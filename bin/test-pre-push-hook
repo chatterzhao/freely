@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK="./.githooks/pre-push"
+
+pass=0
+fail=0
+
+expect_rc() {
+  local name="$1"
+  local expected_rc="$2"
+  local stdin_payload="$3"
+  local env_flag="${4:-}"
+
+  local rc=0
+  if [[ -n "$env_flag" ]]; then
+    if printf '%s\n' "$stdin_payload" | env "$env_flag" "$HOOK" >/tmp/freely-hook-out.txt 2>/tmp/freely-hook-err.txt; then
+      rc=0
+    else
+      rc=$?
+    fi
+  elif printf '%s\n' "$stdin_payload" | "$HOOK" >/tmp/freely-hook-out.txt 2>/tmp/freely-hook-err.txt; then
+    rc=0
+  else
+    rc=$?
+  fi
+
+  if [[ "$rc" -eq "$expected_rc" ]]; then
+    echo "[PASS] $name"
+    pass=$((pass + 1))
+    return 0
+  fi
+
+  echo "[FAIL] $name (expected rc=$expected_rc, got rc=$rc)"
+  echo "stdout:"
+  sed -n '1,120p' /tmp/freely-hook-out.txt
+  echo "stderr:"
+  sed -n '1,120p' /tmp/freely-hook-err.txt
+  fail=$((fail + 1))
+}
+
+[[ -x "$HOOK" ]] || {
+  echo "[FAIL] hook not executable: $HOOK"
+  exit 1
+}
+
+expect_rc "T-003-01 empty input pass" 0 ""
+expect_rc "T-003-02 block remote develop" 1 "refs/heads/feature/x abc refs/heads/develop def"
+expect_rc "T-003-03 block local develop" 1 "refs/heads/develop abc refs/heads/pre-develop def"
+expect_rc "T-003-04 block main by default" 1 "refs/heads/feature/x abc refs/heads/main def"
+expect_rc "T-003-05 allow feature push" 0 "refs/heads/feature/x abc refs/heads/pre-develop def"
+expect_rc "T-003-06 allow main with emergency flag" 0 "refs/heads/feature/x abc refs/heads/main def" "FREELY_ALLOW_MAIN_PUSH=1"
+
+echo
+echo "Result: pass=$pass fail=$fail"
+[[ "$fail" -eq 0 ]]

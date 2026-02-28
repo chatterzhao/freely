@@ -7,6 +7,24 @@ CONSTITUTION_ANCHOR="#2-branch-and-worktree-policy-hard-requirement"
 while read -r local_ref local_sha remote_ref remote_sha; do
   [[ -z "${local_ref:-}" ]] && continue
 
+  if [[ "$local_ref" == "refs/heads/develop" || "$remote_ref" == "refs/heads/develop" ]]; then
+    cat >&2 <<MSG
+[HOOK] Push blocked: direct push to 'develop' is forbidden.
+
+Policy source:
+- $CONSTITUTION_PATH
+- Section: 2. Branch and Worktree Policy (Hard Requirement)
+- Anchor: $CONSTITUTION_ANCHOR
+
+Required flow:
+- feature/* -> pre-develop (test)
+- pre-develop -> develop (promote after validation)
+- release/* -> main (+ back-merge to develop)
+- hotfix/* -> main (+ back-merge to develop)
+MSG
+    exit 1
+  fi
+
   if [[ "$local_ref" == "refs/heads/main" || "$remote_ref" == "refs/heads/main" ]]; then
     if [[ "${FREELY_ALLOW_MAIN_PUSH:-0}" == "1" ]]; then
       continue
@@ -21,7 +39,8 @@ Policy source:
 - Anchor: $CONSTITUTION_ANCHOR
 
 Required flow:
-- feature/* -> develop
+- feature/* -> pre-develop (test)
+- pre-develop -> develop (promote after validation)
 - release/* -> main (+ back-merge to develop)
 - hotfix/* -> main (+ back-merge to develop)
 
