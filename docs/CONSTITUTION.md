@@ -13,15 +13,17 @@ Branch/worktree rules are hard constraints and must be checked before implementa
 
 1. Branch model (GitFlow baseline):
 - `main` is release-only and must remain stable.
-- `develop` is the nightly integration branch.
-- `feature/*` branches are created from `develop` and merged back into `develop`.
+- `develop` is the nightly integration branch (post-test integration only).
+- `pre-develop` is the mandatory test integration branch for unstable feature validation.
+- `feature/*` branches are created from `develop`, merged to `pre-develop` for test first, then promoted to `develop` after validation.
 - `release/*` branches are created from `develop` for release freeze, then merged into `main` and back into `develop`.
 - `hotfix/*` branches are created from `main`, then merged into both `main` and `develop`.
 
 2. Merge discipline:
 - Unstable changes must not be merged into `main`.
 - `main` accepts merges only from `release/*` or `hotfix/*`.
-- `develop` may contain in-progress changes, but should stay buildable/testable.
+- Direct merge/push to `develop` is forbidden for feature delivery; feature validation must land in `pre-develop` first.
+- `develop` should receive only tested/promoted changes and stay buildable/testable.
 
 3. Worktree discipline:
 - Use `git worktree` for all non-`main`/`develop` development branches.
@@ -38,7 +40,7 @@ Branch/worktree rules are hard constraints and must be checked before implementa
 - Bridge recovery notes must include current branch and worktree path.
 
 5. Enforcement:
-- Git hooks should enforce `main` protection for local workflows (at least block direct push to `main`).
+- Git hooks should enforce push protection for `main` and `develop` in local workflows.
 - Hook rejection messages must point to this constitution section for policy source.
 
 ## 3. Mandatory Tech Stack

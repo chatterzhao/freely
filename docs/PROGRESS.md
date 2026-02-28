@@ -1,23 +1,19 @@
-# 进展记录
+# PROGRESS
 
-## 最新周期
-- 日期：2026-02-28
-- 分支：feature/pretest-doc-gate
-- Worktree：/home/devbox/project/freely-worktrees/feature-pretest-doc-gate
-- 已完成：
-  - STORY-001：完成中文 BMAD 文档链路补齐
-  - STORY-002：`bin/freely` 新增 `doctor` 命令，并在 `start` 前接入文档门禁
-  - STORY-003：新增 `tests/test_doc_gate.sh` 并通过 6 个门禁用例
-- 进行中：
+## Latest Cycle
+- Date: 2026-02-28
+- Branch: feature/story-003-predevelop-gate
+- Worktree: /home/devbox/project/freely-worktrees/feature-story-003-predevelop-gate
+- Subagents:
+  - used: no
+  - reason: 当前工具链无稳定子代理接口，采用串行执行并通过并行命令完成信息收集
+- Completed:
+  - 完成STORY-003文档链路更新（Brainstorm/PRD/EPIC/STORY），补充ore-test先验测试
+  - 更新宪法第2章，明确`feature/* -> pre-develop -> develop`测试门禁路径
+  - 升级`.githooks/pre-push`，阻止`main/develop`直推并保留`main`应急开关
+  - 新增`bin/test-pre-push-hook`并通过6个回归用例
+  - 执行`bin/bmad-check`通过
+- In Progress:
   - 无
-- 下一项 STORY：
-  - 下一轮需求发现（新的 Brainstorm）
-
-## 子任务并行记录
-- 批次：BATCH-001
-- 并行方式：同一编排会话下并行子任务（文档盘点 / 脚本盘点）
-- 映射：
-  - 子任务 A：文档链路盘点（完成）
-  - 子任务 B：脚本与 hook 现状盘点（完成）
-- 结果：两项完成后汇总进入开发阶段
-- 备注：当前工具无独立子代理进程接口，采用并行子任务替代并在文档中留痕
+- Next Story:
+  - STORY-004: 将`bmad-check`与hook回归测试接入CI或统一门禁入口（候选）

@@ -34,3 +34,27 @@ In another terminal:
 ./bin/freely status --project /home/devbox/project/my-fasterp4/fasterp4
 ./bin/freely stop --project /home/devbox/project/my-fasterp4/fasterp4
 ```
+
+## BMAD Documentation Gate
+
+Run BMAD baseline checks before implementation or merge:
+
+```bash
+chmod +x ./bin/bmad-check
+./bin/bmad-check
+```
+
+## Hook Regression Gate
+
+Validate local push policy before merge:
+
+```bash
+chmod +x ./bin/test-pre-push-hook
+./bin/test-pre-push-hook
+```
+
+Branch policy for feature delivery:
+
+- `feature/* -> pre-develop` for test integration
+- `pre-develop -> develop` only after validation
+- direct push/merge to `develop` is blocked by local hook policy
