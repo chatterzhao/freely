@@ -152,3 +152,108 @@ BMA is the execution workflow inside BMAD.
 
 5. Constitution precedence:
 - If prompt text conflicts with constitution and BMAD rules, constitution wins.
+
+## 11. Subagent Planning and Delegation (Hard Requirement)
+
+Freely must proactively use subagents/subprocesses/parallel workers when tasks are parallelizable, while keeping deterministic control and traceability.
+
+1. Single-session compatibility:
+- "Single active AI session per loop instance" means one primary orchestrator AI session owns the loop lifecycle.
+- Subagents are mandatory execution units under the orchestrator, not independent top-level loop owners.
+- All subagents must remain traceable to the same orchestrator session and current STORY context.
+
+2. Planning before delegation:
+- Before spawning subagents, the orchestrator must define:
+  - task split boundaries
+  - expected outputs for each subagent
+  - completion criteria and merge criteria
+- Delegation without explicit completion criteria is prohibited.
+
+3. Parallelism policy:
+- Prefer parallel execution for independent tasks to improve throughput and independent review quality.
+- Default concurrency cap is 4 subagents per batch unless resource constraints require fewer.
+- For dependent tasks, execute in ordered phases instead of forced parallelism.
+
+4. Lifecycle and wait semantics:
+- Parent/orchestrator must wait for all delegated subagents in the current batch before marking the batch complete.
+- A task batch is complete only after all required subagent outputs are collected or explicitly marked failed with reasons.
+- Never report cycle success while required subagents are still running.
+
+5. Failure handling and fallback:
+- If subagent capability is unavailable/unstable for the current tool/mode, fallback to serial execution or process-level scripts.
+- Fallback decision and reason must be recorded in progress/recovery artifacts.
+
+6. Documentation coupling:
+- Progress and recovery records must include:
+  - whether subagents were used
+  - task-to-subagent mapping
+  - completion/failure status per subagent
+  - next actionable STORY after aggregation
+
+## 12. Territory Model for Parallel Development (Hard Requirement)
+
+To reduce merge conflicts in multi-agent and parallel development, Freely must enforce both physical territory and logical territory.
+
+1. Physical territory (worktree):
+- Each active STORY/subagent batch must run in its own dedicated `feature/*` worktree.
+- Different active STORY owners must not share the same non-primary worktree for implementation.
+- Recovery records must include current branch and worktree path for every active territory.
+
+2. Logical territory (change ownership):
+- Before implementation, define logical ownership boundaries (modules/files/docs) per STORY/subagent.
+- Subagents should avoid cross-territory edits unless explicitly planned in merge criteria.
+- Shared hotspots (same files/modules) require serial ownership windows or explicit sequencing.
+
+3. Merge-conflict prevention contract:
+- Plan merge order during task decomposition, not only at merge time.
+- For each territory, define expected output scope and conflict-sensitive files in advance.
+- If cross-territory overlap is unavoidable, create an integration STORY with a single owner.
+
+4. Acceptance rule:
+- A STORY is not considered complete unless its territory boundaries and merge path are documented and executable.
+
+## 13. Pluggable Module Architecture and Interface Versioning (Hard Requirement)
+
+Freely implementation should support side-by-side module evolution: keep current module stable while building a replacement module that can be plugged in during development.
+
+1. Module boundaries:
+- Core capabilities must be split into modules with clear ownership and scope.
+- Modules communicate through explicit contracts (interfaces/protocols), not hidden cross-module assumptions.
+- Avoid direct coupling between unrelated modules.
+
+2. Parallel replacement model (not in-place rewrite):
+- Use parallel replacement for destructive or high-risk refactors, not for every small change.
+- Keep the incumbent module running as baseline while developing a candidate replacement module in parallel.
+- New module should be integrated behind the same contract or a planned versioned contract.
+
+3. Plug-and-switch requirements:
+- Runtime or build-time module selection must be explicit (config/feature flag/adapter routing), not ad-hoc code edits.
+- Rollback to the incumbent module must be possible without emergency redesign.
+- During development, teams may switch between incumbent and candidate implementations for validation.
+
+4. Interface versioning policy:
+- Contract changes must be versioned (for example: v1, v2) and documented with compatibility expectations.
+- Breaking changes require a migration plan, compatibility bridge, or phased rollout strategy.
+- Callers must not be forced into synchronized big-bang changes when a new interface version is introduced.
+
+5. Verification and traceability:
+- Contract tests/integration checks must verify both incumbent and candidate modules against declared interface versions.
+- Progress/review records must state: module replaced/candidate, active interface version, switch strategy, rollback status, and verification results.
+
+## 14. Configuration Backup Before Change (Hard Requirement)
+
+All configuration files must be backed up before any modification.
+
+1. Backup mandatory:
+- Before editing/replacing any configuration file, create a backup copy first.
+- Direct in-place overwrite without backup is prohibited.
+- This rule applies even when Git or other VCS history exists.
+
+2. Unique backup naming:
+- Backup filename must include a timestamp to avoid overwrite.
+- Recommended format: `<filename>.bak.<YYYYMMDD-HHMMSS>`.
+- Reusing the same backup name is prohibited.
+
+3. Retention and traceability:
+- Backup location and filename must be discoverable by operators.
+- Progress/review records should note the backup artifact when configuration changes are part of a STORY.
