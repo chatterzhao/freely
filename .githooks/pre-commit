@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ -f "./bin/worktree-common.sh" ]] || exit 0
+# shellcheck disable=SC1091
+source ./bin/worktree-common.sh
+
+branch="$(freely_wt_current_branch)"
+[[ -n "$branch" ]] || exit 0
+
+case "$branch" in
+  main|develop)
+    cat <<MSG
+[HOOK] Commit blocked: direct development on '$branch' is forbidden.
+Rules:
+- main/develop must not be used for coding commits
+- create/use a worktree branch (feature/*, release/*, hotfix/*)
+MSG
+    exit 1
+    ;;
+esac
+
+if ! freely_wt_is_primary_worktree; then
+  exit 0
+fi
+
+if ! freely_wt_validate_branch_base "$branch"; then
+  cat <<MSG
+[HOOK] Commit blocked: branch '$branch' base check failed.
+Expected:
+  feature/*, release/* from develop
+  hotfix/* from main
+MSG
+  exit 1
+fi
+
+existing_for_branch="$(freely_wt_existing_for_branch "$branch")"
+if [[ -n "$existing_for_branch" ]]; then
+  cat <<MSG
+[HOOK] Commit blocked in primary worktree.
+Branch '$branch' has dedicated worktree:
+  $existing_for_branch
+
+Start work in worktree:
+  cd "$existing_for_branch"
+MSG
+  git worktree list
+  exit 1
+fi
+
+cat <<MSG
+[HOOK] Commit blocked in primary worktree.
+No worktree found for '$branch'.
+
+Create/switch worktree first, for example:
+  source ./bin/wt-enter "$branch"
+Then start work in that worktree directory and commit there.
+MSG
+exit 1

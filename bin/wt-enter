@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<USAGE
+Usage:
+  source bin/wt-enter <branch>
+
+Behavior:
+- checkout branch in primary worktree (triggers post-checkout auto worktree creation)
+- auto-cd into the branch worktree path
+USAGE
+}
+
+branch="${1:-}"
+[[ -n "$branch" ]] || { usage; return 1 2>/dev/null || exit 1; }
+
+# Must be sourced to allow cd in current shell.
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  echo "Please run with: source bin/wt-enter <branch>" >&2
+  exit 1
+fi
+
+# shellcheck disable=SC1091
+source ./bin/worktree-common.sh
+
+existing_path="$(freely_wt_existing_for_branch "$branch")"
+if [[ -n "$existing_path" && "$(pwd -P)" != "$existing_path" ]]; then
+  cd "$existing_path"
+  echo "Entered existing worktree: $existing_path"
+  return 0
+fi
+
+git checkout "$branch"
+wt_path="$(freely_wt_existing_for_branch "$branch")"
+
+if [[ -z "$wt_path" ]]; then
+  echo "No worktree found for branch '$branch'." >&2
+  return 1
+fi
+
+cd "$wt_path"
+echo "Entered worktree: $wt_path"
