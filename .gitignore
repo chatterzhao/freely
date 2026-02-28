@@ -1,0 +1,48 @@
+# Runtime state
+.freely/
+
+# Local environment files (do not commit)
+.env
+.env.local
+.env.*
+!.env.example
+
+# Track .env/ directory for versioned templates
+!.env/
+!.env/**
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+.bun/
+
+# Build outputs
+dist/
+build/
+out/
+target/
+release/
+debug/
+
+# Test and coverage
+coverage/
+.nyc_output/
+.pytest_cache/
+
+# Caches and temp dirs
+.cache/
+tmp/
+temp/
+
+# Logs and temp
+*.log
+*.pid
+*.tmp
+*.out
+*.err
+
+# Editor/OS
+.DS_Store
+.vscode/
+.idea/
