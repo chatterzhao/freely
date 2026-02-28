@@ -1,18 +1,23 @@
-# Brainstorm
+# 头脑风暴记录
 
-## Context
-<TBD>
+## 背景
+当前仓库已具备分支/worktree 基础约束，但 BMAD 业务文档仍是占位内容，且缺少“文档阶段必须先有 pre-test 设计”的硬门禁能力。结果是 `freely start` 可在无测试计划时直接运行，违背“测试是最重要门禁”的项目要求。
 
-## Options
-1. <Option A>
-2. <Option B>
+## 备选方案
+1. 仅补文档，不改脚本
+2. 在 `freely start` 前加入文档门禁检查（推荐）
+3. 新建独立测试编排服务
 
-## Tradeoffs
-- Option A: <TBD>
-- Option B: <TBD>
+## 取舍
+- 方案 1：成本低，但无法强制执行，约束会退化为口头规范。
+- 方案 2：实现成本可控，且能立刻把规范转为可执行门禁。
+- 方案 3：长期潜力更大，但超出当前里程碑，投入过重。
 
-## Decision
-<TBD>
+## 决策
+采用方案 2：新增 `freely doctor` 文档门禁检查，并在 `freely start` 前强制执行；同时补齐中文 BMAD 文档与 pre-test 用例。
 
-## Follow-up Actions
-- [ ] <TBD>
+## 后续动作
+- [x] 建立 PRD/EPIC/STORY 链路
+- [x] 先写 `docs/PRE_TEST.md` 再开发
+- [ ] 代码实现门禁
+- [ ] 执行测试并补充回归用例

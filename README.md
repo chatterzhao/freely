@@ -24,6 +24,7 @@ chmod +x ./bin/freely
   --constitution /home/devbox/project/freely/docs/CONSTITUTION.md \
   --ai codex:gpt-5-codex:auto
 
+./bin/freely doctor --project /home/devbox/project/my-fasterp4/fasterp4
 ./bin/freely start --project /home/devbox/project/my-fasterp4/fasterp4
 ```
 
