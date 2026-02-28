@@ -1,18 +1,20 @@
-# Brainstorm
+# Brainstorm - STORY-002
 
-## Context
-<TBD>
+## 背景
+当前仓库具备宪法、意图和基础脚本，但BMAD运行文档仍以占位符为主，无法形成可执行追踪链路。需要先建立可验证的文档门禁，再继续扩展自动循环能力。
 
-## Options
-1. <Option A>
-2. <Option B>
+## 备选方案
+1. 只靠人工Review检查文档完整性
+2. 增加可执行脚本校验BMAD链路和关键字段
 
-## Tradeoffs
-- Option A: <TBD>
-- Option B: <TBD>
+## 权衡
+- 方案1：改动小，但容易漏检，无法自动化阻断低质量迭代
+- 方案2：一次实现后可复用，能在本地和CI统一执行，符合“可脚本化命令面”原则
 
-## Decision
-<TBD>
+## 决策
+选择方案2，新增`bin/bmad-check`作为本轮交付核心能力。
 
-## Follow-up Actions
-- [ ] <TBD>
+## 后续动作
+- [x] 形成本轮PRD/EPIC/STORY
+- [ ] 实现并验证`bin/bmad-check`
+- [ ] 更新进度、恢复、review记录

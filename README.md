@@ -33,3 +33,12 @@ In another terminal:
 ./bin/freely status --project /home/devbox/project/my-fasterp4/fasterp4
 ./bin/freely stop --project /home/devbox/project/my-fasterp4/fasterp4
 ```
+
+## BMAD Documentation Gate
+
+Run BMAD baseline checks before implementation or merge:
+
+```bash
+chmod +x ./bin/bmad-check
+./bin/bmad-check
+```
