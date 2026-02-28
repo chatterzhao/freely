@@ -1,22 +1,27 @@
-# Docs Structure
+# 文档结构说明
 
-This project follows constitution-driven BMAD documentation discipline.
-BMA is the execution workflow inside BMAD.
+本项目遵循宪法约束下的 BMAD 文档工程。
 
-## Required Traceability
-
-Every non-trivial change should be traceable:
+## 可追溯链路
+每个非 trivial 变更必须可追溯：
 
 Intent -> PRD -> EPIC -> STORY -> Code/Test
 
-## Baseline Docs
+## 基线文档
+- `CONSTITUTION.md`：硬约束与治理规则
+- `PROJECT_INTENT.md`：项目目标与运行模型
+- `PRD.md`：需求目标、范围、验收标准
+- `EPIC.md`：EPIC 级拆分
+- `STORY.md`：可执行 STORY 与验收标准
+- `PRE_TEST.md`：开发前测试设计与门禁用例（必需）
+- `PROGRESS.md`：周期进展与连续性记录
+- `RECOVERY.md`：阻塞/崩溃恢复检查点
+- `brainstorm/`：Brainstorm 记录
+- `review/`：评审记录
 
-- `CONSTITUTION.md`: hard constraints and governance
-- `PROJECT_INTENT.md`: autonomous project goal and operating model
-- `PRD.md`: product requirements and scope boundaries
-- `EPIC.md`: epic-level decomposition
-- `STORY.md`: executable story backlog and acceptance criteria
-- `PROGRESS.md`: cycle-by-cycle progress records
-- `RECOVERY.md`: crash/blocking checkpoints and restart context
-- `brainstorm/`: brainstorm records before PRD decomposition
-- `review/`: review records with timestamp/branch/reviewer naming
+## 执行顺序
+1. 先 Brainstorm
+2. 再 PRD/EPIC/STORY
+3. 开发前先写 `PRE_TEST.md`
+4. 通过 `freely doctor` 文档门禁
+5. 再进入开发与测试

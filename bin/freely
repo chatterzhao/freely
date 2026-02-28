@@ -12,6 +12,7 @@ usage() {
   cat <<'EOF'
 Usage:
   freely init --project <abs_path> --intent <abs_file> --constitution <abs_file> --ai <tool[:model][:mode]>
+  freely doctor --project <abs_path>
   freely start --project <abs_path>
   freely status --project <abs_path>
   freely stop --project <abs_path>
@@ -20,6 +21,42 @@ AI mode:
   auto  -> non-interactive, auto-approve (where supported)
   step  -> interactive/approval mode
 EOF
+}
+
+check_doc_gate_or_fail() {
+  local project="$1"
+  local failed=0
+  local required=(
+    "docs/PROJECT_INTENT.md"
+    "docs/CONSTITUTION.md"
+    "docs/brainstorm/BRAINSTORM.md"
+    "docs/PRD.md"
+    "docs/EPIC.md"
+    "docs/STORY.md"
+    "docs/PRE_TEST.md"
+    "docs/PROGRESS.md"
+    "docs/RECOVERY.md"
+  )
+
+  for rel in "${required[@]}"; do
+    if [[ ! -f "$project/$rel" ]]; then
+      log_error "doc gate failed: missing $project/$rel"
+      failed=1
+    fi
+  done
+
+  if [[ -f "$project/docs/PRE_TEST.md" ]]; then
+    if ! grep -Eq 'CASE-[0-9]+' "$project/docs/PRE_TEST.md"; then
+      log_error "doc gate failed: docs/PRE_TEST.md must include at least one CASE-* test case"
+      failed=1
+    fi
+  fi
+
+  if [[ "$failed" -ne 0 ]]; then
+    return 1
+  fi
+
+  log_info "doc gate PASS"
 }
 
 abs_path_or_fail() {
@@ -112,7 +149,8 @@ $CONSTITUTION_FILE
 2. 由你自主完成：需求发现、头脑风暴、EPIC 拆分、STORY 拆分、开发、验证、记录。
 3. 除用户明确要求外，不中断流程；持续循环推进。
 4. 你可以自主读取项目目录内其他文档，但输入入口只以上面两个文档为准。
-5. 崩溃恢复后优先延续既有会话上下文；若无法恢复，再根据项目现状继续推进。
+5. 开发前必须先完成并通过 PRE_TEST 文档门禁，再进入实现。
+6. 崩溃恢复后优先延续既有会话上下文；若无法恢复，再根据项目现状继续推进。
 EOF
 }
 
@@ -212,6 +250,10 @@ cmd_start() {
   done
   [[ -n "$project" ]] || { usage; exit 1; }
   load_config "$project"
+  check_doc_gate_or_fail "$PROJECT_ROOT" || {
+    log_error "start blocked by doc gate"
+    exit 1
+  }
 
   local sdir run_dir logs_dir sup_pid_file child_pid_file loop_log
   sdir="$(state_dir "$project")"
@@ -278,6 +320,18 @@ cmd_start() {
     fi
     sleep "${RESTART_DELAY:-2}"
   done
+}
+
+cmd_doctor() {
+  local project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  [[ -n "$project" ]] || { usage; exit 1; }
+  check_doc_gate_or_fail "$project"
 }
 
 cmd_status() {
@@ -349,6 +403,7 @@ main() {
   shift || true
   case "$cmd" in
     init) cmd_init "$@" ;;
+    doctor) cmd_doctor "$@" ;;
     start) cmd_start "$@" ;;
     status) cmd_status "$@" ;;
     stop) cmd_stop "$@" ;;
