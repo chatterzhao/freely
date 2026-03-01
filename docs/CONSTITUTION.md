@@ -70,10 +70,10 @@ Freely 是一个自主工程循环系统：
 - **push 规则**：main, develop, pre-develop 都允许 push。
 - **commit 规则**：main, develop, pre-develop 禁止直接 add/commit。
 - **merge 规则**：
-  - 只有 pre-develop 允许接收 merge（来自 feature 分支）
-  - main, develop 禁止直接 merge，除非 hotfix 绕开
-  - hotfix 合并到 main/develop 时使用 `FREELY_ALLOW_MERGE=1 git merge <branch>`
-  - hotfix 合并后必须同步到 pre-develop
+  - main 只允许 release/* merge（hotfix 默认拦截，可用 `FREELY_ALLOW_MERGE=1` 绕过）
+  - develop 只允许 pre-develop merge（hotfix 默认拦截，可用 `FREELY_ALLOW_MERGE=1` 绕过）
+  - pre-develop 只允许 feature/* merge（不允许绕过）
+- hotfix 合并到 main/develop 后必须同步到 pre-develop
 
 ## 3. 版本命名规则（硬性要求）
 
