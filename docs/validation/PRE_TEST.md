@@ -11,9 +11,9 @@
   - `start` 对门禁失败的阻断
 
 ## 开发前测试用例
-- CASE-001：缺少 `docs/PRE_TEST.md` 时，`freely doctor` 失败并返回非 0。
-- CASE-002：`docs/PRE_TEST.md` 存在但不含 `CASE-` 时，`freely doctor` 失败并返回非 0。
-- CASE-003：`docs/PRE_TEST.md` 含至少一个 `CASE-` 时，`freely doctor` 成功。
+- CASE-001：缺少 `docs/validation/PRE_TEST.md` 时，`freely doctor` 失败并返回非 0。
+- CASE-002：`docs/validation/PRE_TEST.md` 存在但不含 `CASE-` 时，`freely doctor` 失败并返回非 0。
+- CASE-003：`docs/validation/PRE_TEST.md` 含至少一个 `CASE-` 时，`freely doctor` 成功。
 - CASE-004：文档门禁失败时，`freely start` 在启动 AI 前退出。
 
 ## 开发后补充回归用例

@@ -12,7 +12,7 @@
 Intent -> PRD -> EPIC -> STORY -> Code/Test
 
 ### 领地边界（Territory）
-- 文档领地：`docs/brainstorm/BRAINSTORM.md`、`docs/PRD.md`、`docs/EPIC.md`、`docs/STORY.md`、`docs/PROGRESS.md`、`docs/RECOVERY.md`
+- 文档领地：`docs/brainstorms/BRAINSTORM.md`、`docs/planning/PRD.md`、`docs/planning/EPIC.md`、`docs/planning/STORY.md`、`docs/continuity/PROGRESS.md`、`docs/continuity/RECOVERY.md`
 - 代码领地：`bin/bmad-check`、`README.md`
 - 冲突敏感文件：`README.md`
 - 合并路径：`feature/story-002-bmad-cycle -> pre-develop`（禁止直合`develop`）
@@ -38,7 +38,7 @@ Intent -> PRD -> EPIC -> STORY -> Code/Test
 Intent -> PRD -> EPIC -> STORY -> Code/Test
 
 ### 领地边界（Territory）
-- 文档领地：`docs/brainstorm/BRAINSTORM.md`、`docs/PRD.md`、`docs/EPIC.md`、`docs/STORY.md`、`docs/CONSTITUTION.md`、`README.md`
+- 文档领地：`docs/brainstorms/BRAINSTORM.md`、`docs/planning/PRD.md`、`docs/planning/EPIC.md`、`docs/planning/STORY.md`、`docs/CONSTITUTION.md`、`README.md`
 - 代码领地：`.githooks/pre-push`、`bin/test-pre-push-hook`
 - 冲突敏感文件：`docs/CONSTITUTION.md`、`.githooks/pre-push`
 - 合并路径：`feature/story-003-predevelop-gate -> pre-develop`（禁止直合`develop`）

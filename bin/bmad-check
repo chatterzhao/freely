@@ -2,12 +2,12 @@
 set -euo pipefail
 
 required_files=(
-  "docs/brainstorm/BRAINSTORM.md"
-  "docs/PRD.md"
-  "docs/EPIC.md"
-  "docs/STORY.md"
-  "docs/PROGRESS.md"
-  "docs/RECOVERY.md"
+  "docs/brainstorms/BRAINSTORM.md"
+  "docs/planning/PRD.md"
+  "docs/planning/EPIC.md"
+  "docs/planning/STORY.md"
+  "docs/continuity/PROGRESS.md"
+  "docs/continuity/RECOVERY.md"
 )
 
 errors=0
@@ -46,14 +46,14 @@ for file in "${required_files[@]}"; do
   check_no_tbd "$file"
 done
 
-check_pattern "docs/brainstorm/BRAINSTORM.md" "^## (决策|Decision)" "brainstorm decision section missing"
-check_pattern "docs/PRD.md" "^## (目标|Goals)" "PRD goals section missing"
-check_pattern "docs/EPIC.md" "^## (映射关系|Mapping)" "EPIC mapping section missing"
-check_pattern "docs/STORY.md" "^## STORY-[0-9]+" "STORY id section missing"
-check_pattern "docs/STORY.md" "Intent -> PRD -> EPIC -> STORY -> Code/Test|Traceability|可追踪|追踪" "traceability statement missing in STORY"
-check_pattern "docs/STORY.md" "ORE-Test|ore-test|先验测试" "ORE-Test section missing in STORY"
-check_pattern "docs/PROGRESS.md" "^## Latest Cycle" "PROGRESS latest cycle section missing"
-check_pattern "docs/RECOVERY.md" "^## Latest Checkpoint" "RECOVERY latest checkpoint section missing"
+check_pattern "docs/brainstorms/BRAINSTORM.md" "^## (决策|Decision)" "brainstorm decision section missing"
+check_pattern "docs/planning/PRD.md" "^## (目标|Goals)" "PRD goals section missing"
+check_pattern "docs/planning/EPIC.md" "^## (映射关系|Mapping)" "EPIC mapping section missing"
+check_pattern "docs/planning/STORY.md" "^## STORY-[0-9]+" "STORY id section missing"
+check_pattern "docs/planning/STORY.md" "Intent -> PRD -> EPIC -> STORY -> Code/Test|Traceability|可追踪|追踪" "traceability statement missing in STORY"
+check_pattern "docs/planning/STORY.md" "ORE-Test|ore-test|先验测试" "ORE-Test section missing in STORY"
+check_pattern "docs/continuity/PROGRESS.md" "^## Latest Cycle" "PROGRESS latest cycle section missing"
+check_pattern "docs/continuity/RECOVERY.md" "^## Latest Checkpoint" "RECOVERY latest checkpoint section missing"
 
 if [[ "$errors" -gt 0 ]]; then
   echo

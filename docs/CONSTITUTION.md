@@ -1,261 +1,301 @@
-# Freely Constitution
+# Freely 宪法
 
-## 1. Product Identity
+> 我是项目宪法，硬性约束，定义不可逾越的边界。
 
-Freely is an autonomous engineering loop system:
-- AI acts as project owner after startup.
-- AI self-manages demand discovery, brainstorm, EPIC/STORY planning, development, and verification.
-- Recovery is mandatory: crash/blocking must trigger automatic continuity.
+## 1. 产品身份
 
-## 2. Branch and Worktree Policy (Hard Requirement)
+Freely 是一个自主工程循环系统：
+- 启动后 AI 担任项目所有者角色。
+- AI 自主管理需求发现、头脑风暴、EPIC/STORY 规划、开发和验证。
+- 恢复是强制性的：崩溃/阻塞必须触发自动续接。
 
-Branch/worktree rules are hard constraints and must be checked before implementation:
+## 2. 分支与工作树策略（硬性要求）
 
-1. Branch model (GitFlow baseline):
-- `main` is release-only and must remain stable.
-- `develop` is the nightly integration branch (post-test integration only).
-- `pre-develop` is the mandatory test integration branch for unstable feature validation.
-- `feature/*` branches are created from `develop`, merged to `pre-develop` for test first, then promoted to `develop` after validation.
-- `release/*` branches are created from `develop` for release freeze, then merged into `main` and back into `develop`.
-- `hotfix/*` branches are created from `main`, then merged into both `main` and `develop`.
+分支/工作树规则是硬性约束，实施前必须检查：
 
-2. Merge discipline:
-- Unstable changes must not be merged into `main`.
-- `main` accepts merges only from `release/*` or `hotfix/*`.
-- Direct merge/push to `develop` is forbidden for feature delivery; feature validation must land in `pre-develop` first.
-- `develop` should receive only tested/promoted changes and stay buildable/testable.
+1. 分支模型（基于 GitFlow）：
+- `main` 仅用于发布，必须保持稳定。
+- `develop` 是夜间集成分支（仅限测试后集成）。
+- `pre-develop` 是强制性的测试集成分支，用于不稳定功能验证。
+- `feature/*` 分支从 `develop` 创建，先合并到 `pre-develop` 测试，验证后再提升到 `develop`。
+- `release/*` 分支从 `develop` 创建用于发布冻结，然后合并到 `main` 并回合并到 `develop`。
+- `hotfix/*` 分支从 `main` 创建，然后合并到 `main` 和 `develop`。
 
-3. Worktree discipline:
-- Use `git worktree` for all non-`main`/`develop` development branches.
-- Worktree root is fixed: `<project_parent>/<project_name>-worktrees/`.
-- For branch checkout in primary worktree, hook should auto-create missing worktree under the fixed root.
-- Operational command contract:
-  - enter/switch branch worktree with `source ./bin/wt-enter <branch>`
-  - run add with worktree check via `source ./bin/wt-add <branch> -- <git-add-args>`
-- Do not create a worktree without a clear STORY/task owner and exit criteria.
-- Merged/abandoned worktrees must be cleaned up with their branch references.
+`pre-develop` 的价值（必须保留）：
+- 它是 `feature/*` 和 `develop` 之间的风险缓冲。
+- 用于在提升前暴露集成冲突、钩子/策略回归和不稳定的测试行为。
+- 允许多功能预演而不污染 `develop`。
+- 如果仓库不保留 `pre-develop`，必须用等效的强制验证分支替代并说明原因。
 
-4. Recovery coupling:
-- Recovery/monitoring must track the active branch/worktree context of the running loop instance.
-- Bridge recovery notes must include current branch and worktree path.
+2. 合并纪律：
+- 不稳定的变更不得合并到 `main`。
+- `main` 只接受来自 `release/*` 或 `hotfix/*` 的合并。
+- 功能交付禁止直接合并/推送到 `develop`；功能验证必须先进入 `pre-develop`。
+- `develop` 应只接收已测试/已提升的变更，保持可构建/可测试。
+- 从 `pre-develop` 提升到 `develop` 必须保留祖先可追溯性（提升的功能提交必须在合并到 `develop` 前可从 `pre-develop` 到达）。
+- 从 `pre-develop` 提升到 `develop` 的检查清单：
+  - 必需的 `PRE_TEST` 检查通过
+  - 必需的评审记录存在于 `docs/reviews/`
+  - 提升的提交可从 `pre-develop` 到达
+  - 进度/恢复文档已更新提升结果
+- 如果功能分支在无法从 `pre-develop` 到达的情况下合并到 `develop`，这是策略违规，必须在评审/进度中记录并采取补救措施。
 
-5. Enforcement:
-- Git hooks should enforce push protection for `main` and `develop` in local workflows.
-- Hook rejection messages must point to this constitution section for policy source.
+3. 工作树纪律：
+- 所有非 `main`/`develop` 的开发分支都使用 `git worktree`。
+- 工作树根目录固定：`<project_parent>/<project_name>-worktrees/`。
+- 在主工作树检出分支时，钩子应在固定根目录下自动创建缺失的工作树。
+- 操作命令约定：
+  - 进入/切换分支工作树：`source ./bin/wt-enter <branch>`
+  - 带工作树检查执行 add：`source ./bin/wt-add <branch> -- <git-add-args>`
+- 没有明确的 STORY/任务所有者和退出标准时不得创建工作树。
+- 已合并/已放弃的工作树必须与其分支引用一起清理。
+- 完成清理是强制性的：
+  - 分支责任完成并合并/提升后，删除本地功能分支
+  - 删除 `<project_parent>/<project_name>-worktrees/` 下的对应工作树
+  - 如果存在远程分支，删除远程功能分支
+  - 在进度/恢复文档中记录清理结果
+- 分支/工作树生命周期状态：
+  - active（活跃）：分支有未完成的 STORY 所有权
+  - promoted（已提升）：分支变更已通过要求路径进入 `develop`
+  - retired（已退役）：分支和工作树已在本地删除（如果存在远程也已删除）
+- 已提升的分支如果没有在进度/恢复中记录原因而保留未删除，是治理违规。
 
-## 3. Mandatory Tech Stack
+4. 恢复耦合：
+- 恢复/监控必须跟踪运行循环实例的活动分支/工作树上下文。
+- 桥接恢复记录必须包含当前分支和工作树路径。
 
-These choices are hard constraints unless explicitly revised:
+5. 执行：
+- Git 钩子应在本地工作流中对 `main` 和 `develop` 强制推送保护。
+- 钩子拒绝消息必须指向本宪法章节作为策略来源。
 
-- Desktop shell: **Tauri**
-- Core runtime/orchestrator/watch/recovery: **Rust**
-- Frontend UI: **React**
-- Frontend package/runtime tooling: **Bun**
-- Terminal rendering: **xterm.js**
-- Terminal process backend: **Rust PTY** (system shell + PTY process)
+## 3. 版本命名规则（硬性要求）
 
-## 4. Baseline Project Structure (Hard Requirement)
+版本格式：`YYYY.MM.DD-HHMM-stage`（stage 不可省略）
 
-Each managed project should keep at least this baseline structure:
+| 版本示例 | 分支 | 阶段 | Tag | 对外 |
+|----------|------|------|-----|------|
+| `2026.03.01-1430-alpha` | `feature/*` | 开发中 | 本地轻量 tag | 否 |
+| `2026.03.01-1430-beta` | `pre-develop` | 测试集成 | 本地轻量 tag | 否 |
+| `2026.03.01-1430-nightly` | `develop` | 夜间构建 | push tag | 是 |
+| `2026.03.01-1430-stable` | `main` | 正式发布 | push tag | 是 |
+| `2026.03.01-1430-hotfix` | `hotfix/*` | 紧急修复 | push tag | 是 |
 
-- `README.md` (project entry and runbook)
-- `docs/` (PRD/EPIC/STORY/progress/recovery/review/brainstorm docs)
-- `src/` (main implementation code)
-- `.env/` (environment templates/scripts/config fragments, versioned)
-- `.env.example` (required env variables template, no secrets)
+- `alpha`、`beta`：本地 tag，不 push 到 GitHub
+- `nightly`：每日自动构建并 push tag，对外可见
+- `stable`：正式发布，push tag
+- `hotfix`：紧急修复，等不了 nightly，单独 push tag
 
-If a project uses a monorepo or different layout, it must provide equivalent mappings in docs.
+自动化构建必须按分支匹配 stage 后缀，不可省略。
 
-## 5. Terminal Architecture Rules
+## 4. 强制技术栈
 
-- UI terminal is embedded in app, but executes real system shell commands via PTY.
-- Each running loop instance owns an isolated AI CLI process/session and PID.
-- Monitoring target is that AI CLI process/session lifecycle.
-- Multiple project instances must be isolated (separate PID/session/state directory).
+除非明确修订，以下选择是硬性约束：
 
-## 6. AI Execution Modes
+- 桌面外壳：**Tauri**
+- 核心运行时/编排器/监控/恢复：**Rust**
+- 前端 UI：**React**
+- 前端包/运行时工具：**Bun**
+- 终端渲染：**xterm.js**
+- 终端进程后端：**Rust PTY**（系统 shell + PTY 进程）
 
-AI spec format: `tool:model:mode`
+## 5. 基线项目结构（硬性要求）
+
+每个托管项目应至少保持以下基线结构：
+
+- `README.md`（项目入口和运行手册）
+- `docs/`（治理 + BMAD + 进度/恢复/评审）
+- `src/`（主要实现代码）
+- `.env/`（环境模板/脚本/配置片段，版本化）
+- `.env.example`（必需的环境变量模板，不含密钥）
+
+如果项目使用 monorepo 或不同布局，必须在文档中提供等效映射。
+
+## 6. 终端架构规则
+
+- UI 终端嵌入应用中，但通过 PTY 执行真实的系统 shell 命令。
+- 每个运行中的循环实例拥有独立的 AI CLI 进程/会话和 PID。
+- 监控目标是该 AI CLI 进程/会话的生命周期。
+- 多个项目实例必须隔离（独立的 PID/会话/状态目录）。
+
+## 7. AI 执行模式
+
+AI 规格格式：`tool:model:mode`
 
 - `mode=auto`
-  - non-interactive execution path
-  - auto-approve path where tool supports it
+  - 非交互式执行路径
+  - 工具支持时使用自动批准路径
 - `mode=step`
-  - interactive/approval path
+  - 交互式/批准路径
 
-Supported tools:
+支持的工具有：
 - `codex`
 - `kiro-cli`
 - `iflow`
 
-## 7. Recovery Policy (Hard Requirement)
+## 8. 恢复策略（硬性要求）
 
-Recovery has two branches:
+恢复有两个分支：
 
-1. Resume branch:
-- If unattended resume is supported for current tool/session, resume directly and continue.
+1. 续接分支：
+- 如果当前工具/会话支持无人值守续接，直接续接并继续。
 
-2. Bridge branch:
-- If unattended resume is not supported:
-  - run one bridge recovery round
-  - write crash/blocking checkpoint into progress docs
-  - restart unattended auto loop from updated project state
+2. 桥接分支：
+- 如果不支持无人值守续接：
+  - 运行一轮桥接恢复
+  - 将崩溃/阻塞检查点写入进度文档
+  - 从更新的项目状态重启无人值守自动循环
 
-Never stop after crash/blocking unless explicit stop criteria are reached.
+除非达到明确的停止标准，否则崩溃/阻塞后不得停止。
 
-## 8. Constraint Surface
+## 9. 约束面
 
-Freely accepts only these primary inputs:
-- project absolute path
-- project intent document path
-- constitution document path
-- ai spec (`tool:model:mode`)
+Freely 只接受这些主要输入：
+- 项目绝对路径
+- 项目意图文档路径
+- 宪法文档路径
+- AI 规格（`tool:model:mode`）
 
-All other project context must be discovered by AI from project files.
+所有其他项目上下文必须由 AI 从项目文件中发现。
 
-## 9. Engineering Discipline
+## 10. 工程纪律
 
-- Keep command surface simple and scriptable (`init/start/status/stop`).
-- Keep state explicit and inspectable on disk.
-- Prefer deterministic behavior over hidden magic.
-- Keep one canonical agent context file at project root (`AGENTS.md`).
+- 保持命令面简单可脚本化（`init/start/status/stop`）。
+- 保持状态显式且可在磁盘上检查。
+- 优先选择确定性行为而非隐藏魔法。
+- 在项目根目录保持一个规范的代理上下文文件（`AGENTS.md`）。
 
-## 10. BMAD Documentation Discipline (Hard Requirement)
+## 11. 方法论总述（硬性要求）
 
-Freely follows BMAD document-driven engineering.
-BMA is the execution workflow inside BMAD.
+Freely 遵循三层循环方法论。
 
-1. BMA workflow:
-- **B**rainstorm: clarify intent and alternatives first.
-- **M**ap: produce PRD-level decomposition to EPIC and STORY.
-- **A**ct: execute STORY items in continuous loops.
+### 11.1 三层循环结构
 
-2. Traceability rule:
-- No implementation by intuition only.
-- Every non-trivial change should be traceable:
-  `Intent -> PRD -> EPIC -> STORY -> Code/Test`.
+```
+A:auto-loop（外循环）
+│
+├── 发现 Issue
+├── 路由到内循环
+│   ├── D:doc-loop(IBM)（内循环-文档）
+│   └── D:dev-loop(DDD)（内循环-开发）
+├── 完成 → 发现下一个 Issue
+│
+└── 循环，除非明确停止
+```
 
-3. Required runtime artifacts:
-- Progress/continuity docs must be updated during normal cycles and recovery bridges.
-- Recovery bridge must record:
-  - where execution stopped
-  - what was completed
-  - what remains and next actionable STORY
-- Review records must be written under `docs/review/`.
-- Brainstorm records must be written under `docs/brainstorm/`.
+### 11.2 核心原则
 
-4. Review record naming (hard requirement):
-- Filename format:
-  `<timestamp>--<reviewer>--<branch>--<topic>.md`
-- `timestamp`: `YYYYMMDD-HHMMSS`
-- `reviewer`: tool+model identifier (example: `codex-gpt5-3-high`)
-- `branch`: current git branch
-- Unsupported filename characters must be replaced with `-`.
+1. **文档驱动**：每个阶段都有文档产出，文档先行。
+2. **进度可追溯**：里程碑确定归属，延期即拆分新 Story，禁止仅凭直觉实现。
+3. **文档目录结构必须遵循**：详见 [`docs/LAWS.md`](./LAWS.md)。
 
-5. Constitution precedence:
-- If prompt text conflicts with constitution and BMAD rules, constitution wins.
+### 11.3 法律链接
 
-## 11. Subagent Planning and Delegation (Hard Requirement)
+详细规则见 [`docs/LAWS.md`](./LAWS.md)：
+- [D:doc-loop(IBM) 文档循环方法论](./LAWS.md#11-ddoc-loopibm-文档循环方法论)
+- [D:dev-loop(DDD) 开发循环方法论](./LAWS.md#12-ddev-loopddd-开发循环方法论)
+- [A:auto-loop(agent-cli) 自主循环方法论](./LAWS.md#13-aauto-loopagent-cli-自主循环方法论)
 
-Freely must proactively use subagents/subprocesses/parallel workers when tasks are parallelizable, while keeping deterministic control and traceability.
+## 12. 子代理规划与委托（硬性要求）
 
-1. Single-session compatibility:
-- "Single active AI session per loop instance" means one primary orchestrator AI session owns the loop lifecycle.
-- Subagents are mandatory execution units under the orchestrator, not independent top-level loop owners.
-- All subagents must remain traceable to the same orchestrator session and current STORY context.
+Freely 必须在任务可并行化时主动使用子代理/子进程/并行工作者，同时保持确定性控制和可追溯性。
 
-2. Planning before delegation:
-- Before spawning subagents, the orchestrator must define:
-  - task split boundaries
-  - expected outputs for each subagent
-  - completion criteria and merge criteria
-- Delegation without explicit completion criteria is prohibited.
+1. 单会话兼容性：
+- "每个循环实例一个活动 AI 会话"意味着一个主要的编排者 AI 会话拥有循环生命周期。
+- 子代理是编排者下的强制执行单元，不是独立的顶层循环所有者。
+- 所有子代理必须保持可追溯到同一个编排者会话和当前 STORY 上下文。
 
-3. Parallelism policy:
-- Prefer parallel execution for independent tasks to improve throughput and independent review quality.
-- Default concurrency cap is 4 subagents per batch unless resource constraints require fewer.
-- For dependent tasks, execute in ordered phases instead of forced parallelism.
+2. 委托前规划：
+- 在生成子代理前，编排者必须定义：
+  - 任务分割边界
+  - 每个子代理的预期输出
+  - 完成标准和合并标准
+- 没有明确完成标准的委托是禁止的。
 
-4. Lifecycle and wait semantics:
-- Parent/orchestrator must wait for all delegated subagents in the current batch before marking the batch complete.
-- A task batch is complete only after all required subagent outputs are collected or explicitly marked failed with reasons.
-- Never report cycle success while required subagents are still running.
+3. 并行策略：
+- 对独立任务优先选择并行执行以提高吞吐量和独立评审质量。
+- 默认并发上限为每批 4 个子代理，除非资源约束要求更少。
+- 对于依赖任务，按有序阶段执行而非强制并行。
 
-5. Failure handling and fallback:
-- If subagent capability is unavailable/unstable for the current tool/mode, fallback to serial execution or process-level scripts.
-- Fallback decision and reason must be recorded in progress/recovery artifacts.
+4. 生命周期与等待语义：
+- 父级/编排者在标记批次完成前必须等待当前批次中所有委托的子代理。
+- 任务批次仅在收集了所有必需的子代理输出或明确标记为失败并说明原因后才算完成。
+- 当必需的子代理仍在运行时，不得报告周期成功。
 
-6. Documentation coupling:
-- Progress and recovery records must include:
-  - whether subagents were used
-  - task-to-subagent mapping
-  - completion/failure status per subagent
-  - next actionable STORY after aggregation
+5. 失败处理与回退：
+- 如果当前工具/模式的子代理能力不可用/不稳定，回退到串行执行或进程级脚本。
+- 回退决定和原因必须记录在进度/恢复产物中。
 
-## 12. Territory Model for Parallel Development (Hard Requirement)
+6. 文档耦合：
+- 进度和恢复记录必须包含：
+  - 是否使用了子代理
+  - 任务到子代理的映射
+  - 每个子代理的完成/失败状态
+  - 汇总后的下一个可执行 STORY
 
-To reduce merge conflicts in multi-agent and parallel development, Freely must enforce both physical territory and logical territory.
+## 13. 并行开发的领域模型（硬性要求）
 
-1. Physical territory (worktree):
-- Each active STORY/subagent batch must run in its own dedicated `feature/*` worktree.
-- Different active STORY owners must not share the same non-primary worktree for implementation.
-- Recovery records must include current branch and worktree path for every active territory.
+为减少多代理和并行开发中的合并冲突，Freely 必须同时强制物理领域和逻辑领域。
 
-2. Logical territory (change ownership):
-- Before implementation, define logical ownership boundaries (modules/files/docs) per STORY/subagent.
-- Subagents should avoid cross-territory edits unless explicitly planned in merge criteria.
-- Shared hotspots (same files/modules) require serial ownership windows or explicit sequencing.
+1. 物理领域（工作树）：
+- 每个活动的 STORY/子代理批次必须在其专用的 `feature/*` 工作树中运行。
+- 不同的活动 STORY 所有者不得共享同一个非主工作树进行实现。
+- 恢复记录必须包含每个活动领域的当前分支和工作树路径。
 
-3. Merge-conflict prevention contract:
-- Plan merge order during task decomposition, not only at merge time.
-- For each territory, define expected output scope and conflict-sensitive files in advance.
-- If cross-territory overlap is unavoidable, create an integration STORY with a single owner.
+2. 逻辑领域（变更所有权）：
+- 实现前，为每个 STORY/子代理定义逻辑所有权边界（模块/文件/文档）。
+- 子代理应避免跨领域编辑，除非在合并标准中明确计划。
+- 共享热点（相同文件/模块）需要串行所有权窗口或显式排序。
 
-4. Acceptance rule:
-- A STORY is not considered complete unless its territory boundaries and merge path are documented and executable.
+3. 合并冲突预防契约：
+- 在任务分解期间规划合并顺序，而不仅仅在合并时。
+- 为每个领域提前定义预期输出范围和冲突敏感文件。
+- 如果跨领域重叠不可避免，创建一个由单一所有者负责的集成 STORY。
 
-## 13. Pluggable Module Architecture and Interface Versioning (Hard Requirement)
+4. 验收规则：
+- 除非 STORY 的领域边界和合并路径已记录并可执行，否则不算完成。
 
-Freely implementation should support side-by-side module evolution: keep current module stable while building a replacement module that can be plugged in during development.
+## 14. 可插拔模块架构与接口版本控制（硬性要求）
 
-1. Module boundaries:
-- Core capabilities must be split into modules with clear ownership and scope.
-- Modules communicate through explicit contracts (interfaces/protocols), not hidden cross-module assumptions.
-- Avoid direct coupling between unrelated modules.
+Freely 实现应支持并行的模块演进：在构建可替换模块时保持当前模块稳定，以便在开发过程中插入。
 
-2. Parallel replacement model (not in-place rewrite):
-- Use parallel replacement for destructive or high-risk refactors, not for every small change.
-- Keep the incumbent module running as baseline while developing a candidate replacement module in parallel.
-- New module should be integrated behind the same contract or a planned versioned contract.
+1. 模块边界：
+- 核心能力必须拆分为具有明确所有权和范围的模块。
+- 模块通过显式契约（接口/协议）通信，而非隐藏的跨模块假设。
+- 避免不相关模块之间的直接耦合。
 
-3. Plug-and-switch requirements:
-- Runtime or build-time module selection must be explicit (config/feature flag/adapter routing), not ad-hoc code edits.
-- Rollback to the incumbent module must be possible without emergency redesign.
-- During development, teams may switch between incumbent and candidate implementations for validation.
+2. 并行替换模型（非原地重写）：
+- 对破坏性或高风险重构使用并行替换，而非每个小改动都使用。
+- 在并行开发候选替换模块时，保持现有模块作为基线运行。
+- 新模块应在相同契约或计划版本化契约后集成。
 
-4. Interface versioning policy:
-- Contract changes must be versioned (for example: v1, v2) and documented with compatibility expectations.
-- Breaking changes require a migration plan, compatibility bridge, or phased rollout strategy.
-- Callers must not be forced into synchronized big-bang changes when a new interface version is introduced.
+3. 插拔与切换要求：
+- 运行时或构建时模块选择必须显式（配置/特性标志/适配器路由），而非临时代码编辑。
+- 必须能够在不需要紧急重新设计的情况下回滚到现有模块。
+- 开发期间，团队可以在现有实现和候选实现之间切换进行验证。
 
-5. Verification and traceability:
-- Contract tests/integration checks must verify both incumbent and candidate modules against declared interface versions.
-- Progress/review records must state: module replaced/candidate, active interface version, switch strategy, rollback status, and verification results.
+4. 接口版本控制策略：
+- 契约变更必须版本化（例如：v1、v2）并记录兼容性期望。
+- 破坏性变更需要迁移计划、兼容性桥接或分阶段推出策略。
+- 引入新接口版本时，调用者不得被迫进行同步的大爆炸式变更。
 
-## 14. Configuration Backup Before Change (Hard Requirement)
+5. 验证与可追溯性：
+- 契约测试/集成检查必须针对声明的接口版本验证现有模块和候选模块。
+- 进度/评审记录必须说明：模块替换/候选、活动接口版本、切换策略、回滚状态和验证结果。
 
-All configuration files must be backed up before any modification.
+## 15. 变更前配置备份（硬性要求）
 
-1. Backup mandatory:
-- Before editing/replacing any configuration file, create a backup copy first.
-- Direct in-place overwrite without backup is prohibited.
-- This rule applies even when Git or other VCS history exists.
+所有配置文件在修改前必须备份。
 
-2. Unique backup naming:
-- Backup filename must include a timestamp to avoid overwrite.
-- Recommended format: `<filename>.bak.<YYYYMMDD-HHMMSS>`.
-- Reusing the same backup name is prohibited.
+1. 强制备份：
+- 编辑/替换任何配置文件前，先创建备份副本。
+- 禁止直接原地覆盖而不备份。
+- 此规则即使存在 Git 或其他 VCS 历史也适用。
 
-3. Retention and traceability:
-- Backup location and filename must be discoverable by operators.
-- Progress/review records should note the backup artifact when configuration changes are part of a STORY.
+2. 唯一备份命名：
+- 备份文件名必须包含时间戳以避免覆盖。
+- 推荐格式：`<filename>.bak.<YYYYMMDD-HHMMSS>`。
+- 禁止重用相同的备份名称。
+
+3. 保留与可追溯性：
+- 备份位置和文件名必须对操作者可发现。
+- 当配置变更是 STORY 的一部分时，进度/评审记录应注明备份产物。

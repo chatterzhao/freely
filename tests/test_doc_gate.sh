@@ -24,15 +24,15 @@ expect_pass() {
 new_project() {
   local dir
   dir="$(mktemp -d)"
-  mkdir -p "$dir/docs/brainstorm"
+  mkdir -p "$dir/docs/brainstorms" "$dir/docs/planning" "$dir/docs/validation" "$dir/docs/continuity"
   cp "$ROOT_DIR/docs/PROJECT_INTENT.md" "$dir/docs/PROJECT_INTENT.md"
   cp "$ROOT_DIR/docs/CONSTITUTION.md" "$dir/docs/CONSTITUTION.md"
-  cp "$ROOT_DIR/docs/brainstorm/BRAINSTORM.md" "$dir/docs/brainstorm/BRAINSTORM.md"
-  cp "$ROOT_DIR/docs/PRD.md" "$dir/docs/PRD.md"
-  cp "$ROOT_DIR/docs/EPIC.md" "$dir/docs/EPIC.md"
-  cp "$ROOT_DIR/docs/STORY.md" "$dir/docs/STORY.md"
-  cp "$ROOT_DIR/docs/PROGRESS.md" "$dir/docs/PROGRESS.md"
-  cp "$ROOT_DIR/docs/RECOVERY.md" "$dir/docs/RECOVERY.md"
+  cp "$ROOT_DIR/docs/brainstorms/BRAINSTORM.md" "$dir/docs/brainstorms/BRAINSTORM.md"
+  cp "$ROOT_DIR/docs/planning/PRD.md" "$dir/docs/planning/PRD.md"
+  cp "$ROOT_DIR/docs/planning/EPIC.md" "$dir/docs/planning/EPIC.md"
+  cp "$ROOT_DIR/docs/planning/STORY.md" "$dir/docs/planning/STORY.md"
+  cp "$ROOT_DIR/docs/continuity/PROGRESS.md" "$dir/docs/continuity/PROGRESS.md"
+  cp "$ROOT_DIR/docs/continuity/RECOVERY.md" "$dir/docs/continuity/RECOVERY.md"
   echo "$dir"
 }
 
@@ -42,7 +42,7 @@ expect_fail "CASE-001 doctor fails when PRE_TEST missing" "$FREELY" doctor --pro
 
 # CASE-002: PRE_TEST 存在但没有 CASE-
 p2="$(new_project)"
-cat > "$p2/docs/PRE_TEST.md" <<'EOT'
+cat > "$p2/docs/validation/PRE_TEST.md" <<'EOT'
 # PRE_TEST
 仅有说明，没有结构化用例。
 EOT
@@ -50,7 +50,7 @@ expect_fail "CASE-002 doctor fails when PRE_TEST has no CASE" "$FREELY" doctor -
 
 # CASE-003 + CASE-006: PRE_TEST 合法时 doctor 成功并返回 0
 p3="$(new_project)"
-cat > "$p3/docs/PRE_TEST.md" <<'EOT'
+cat > "$p3/docs/validation/PRE_TEST.md" <<'EOT'
 # PRE_TEST
 - CASE-001: sample
 EOT
@@ -63,11 +63,11 @@ expect_fail "CASE-004 start blocked before launching loop" "$FREELY" start --pro
 
 # CASE-005: doctor 失败输出具体缺失文档路径（用 stderr 文本验证）
 p5="$(new_project)"
-rm -f "$p5/docs/EPIC.md"
+rm -f "$p5/docs/planning/EPIC.md"
 if "$FREELY" doctor --project "$p5" >/tmp/freely-doctor-out.txt 2>/tmp/freely-doctor-err.txt; then
   fail "CASE-005 expected doctor failure for missing EPIC"
 fi
-if ! grep -q "$p5/docs/EPIC.md" /tmp/freely-doctor-err.txt; then
+if ! grep -q "$p5/docs/planning/EPIC.md" /tmp/freely-doctor-err.txt; then
   fail "CASE-005 expected missing path in doctor stderr"
 fi
 pass "CASE-005 doctor error includes missing file path"

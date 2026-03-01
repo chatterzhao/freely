@@ -15,7 +15,7 @@
 - 更新`docs/CONSTITUTION.md`分支策略描述，纳入`pre-develop`测试门禁路径。
 - 更新`.githooks/pre-push`，阻止对`main`和`develop`的直接推送。
 - 新增`bin/test-pre-push-hook`回归测试脚本。
-- 更新`docs/STORY.md`中的ore-test与开发后测试用例。
+- 更新`docs/planning/STORY.md`中的ore-test与开发后测试用例。
 - 更新`README.md`本地执行说明。
 
 ## 非目标

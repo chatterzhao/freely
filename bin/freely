@@ -29,13 +29,13 @@ check_doc_gate_or_fail() {
   local required=(
     "docs/PROJECT_INTENT.md"
     "docs/CONSTITUTION.md"
-    "docs/brainstorm/BRAINSTORM.md"
-    "docs/PRD.md"
-    "docs/EPIC.md"
-    "docs/STORY.md"
-    "docs/PRE_TEST.md"
-    "docs/PROGRESS.md"
-    "docs/RECOVERY.md"
+    "docs/brainstorms/BRAINSTORM.md"
+    "docs/planning/PRD.md"
+    "docs/planning/EPIC.md"
+    "docs/planning/STORY.md"
+    "docs/validation/PRE_TEST.md"
+    "docs/continuity/PROGRESS.md"
+    "docs/continuity/RECOVERY.md"
   )
 
   for rel in "${required[@]}"; do
@@ -45,9 +45,9 @@ check_doc_gate_or_fail() {
     fi
   done
 
-  if [[ -f "$project/docs/PRE_TEST.md" ]]; then
-    if ! grep -Eq 'CASE-[0-9]+' "$project/docs/PRE_TEST.md"; then
-      log_error "doc gate failed: docs/PRE_TEST.md must include at least one CASE-* test case"
+  if [[ -f "$project/docs/validation/PRE_TEST.md" ]]; then
+    if ! grep -Eq 'CASE-[0-9]+' "$project/docs/validation/PRE_TEST.md"; then
+      log_error "doc gate failed: docs/validation/PRE_TEST.md must include at least one CASE-* test case"
       failed=1
     fi
   fi

@@ -1,42 +1,109 @@
-# Freely Project Intent
+# Freely 项目意图
 
-## Core Goal
+> 我是项目意图，指引方向，阐述为何而做。
 
-Build a Jarvis-like autonomous loop runner:
-- AI starts from project intent, not a fixed task list.
-- AI self-manages brainstorm -> EPIC -> STORY -> implementation -> verification.
-- AI keeps running continuously unless explicit stop conditions are met.
+## 核心目标
 
-## Operating Model
+构建一个 Jarvis 式自主循环运行器：
+- AI 从项目意图、review、test、开发进度文档、chat-todo，自己思考产出或修改 Issue；从 github-issue、里程碑文档，获取 Issue；而非固定从单一任务列表
+- AI 自主管理：获取 Issue → 文档 → 开发 → 验收 → 获取 Issue 的闭环
+- AI 持续运行，除非明确停止
 
-1. Constitution-governed autonomy
-- Constitution is the hard constraint surface.
-- Branch/worktree rules, stack constraints, BMAD discipline, and external system constraints live in constitution.
+## 方法论总述
 
-2. Single active AI session per loop instance
-- Each running instance owns one active AI CLI process/session.
-- Monitoring targets that process/session lifecycle.
+### 三层循环方法论
 
-3. Recovery-first continuity
-- Resume-first when tool supports non-interactive continuation.
-- If resume cannot run in unattended mode, execute a bridge step:
-  update progress docs with crash/blocking checkpoint, then restart unattended loop.
+```
+A:auto-loop（外循环）
+│
+├── 发现 Issue
+│   │
+│   ├── 思考产出或修改 Issue
+│   │   ├── 项目意图 ───────→ 新需求
+│   │   ├── review ─────────→ 改进点
+│   │   ├── test ───────────→ Bug/修复
+│   │   ├── 进度文档 ───────→ 未完成 Issue
+│   │   └── Chat Todo ──────→ 人类介入产出/修改
+│   │
+│   └── 获取 Issue
+│       ├── github-issue ───→ 外部输入
+│       └── 里程碑 ─────────→ 待处理 Issue
+│
+├── 路由到内循环
+│   │
+│   ├── D:doc-loop(IBM)（内循环-文档）
+│   │   │
+│   │   ├── I (Intake) ──── Issue 接入
+│   │   ├── B (Brainstorm) ─ 头脑风暴
+│   │   └── M (Map) ─────── 映射 PRD → EPIC → Story
+│   │
+│   └── D:dev-loop(DDD)（内循环-开发）
+│       │
+│       ├── doc ── 阅读文档指导
+│       ├── dev ── 开发（impl → review → test）
+│       ├── doc ── 更新文档
+│       │
+│       └── 循环直到完成
+│
+├── 完成 → 发现下一个 Issue
+│
+└── 循环，除非明确停止
+```
 
-4. Minimal input surface
-- Only four required inputs:
-  - project absolute path
-  - project intent path
-  - constitution path
-  - ai spec `tool:model:mode`
-- AI discovers all other project docs by itself.
+### Issue 路由规则
 
-5. Documentation method
-- Follow BMAD methodology.
-- Use BMA flow for execution: Brainstorm -> Map (PRD/EPIC/STORY) -> Act (Code/Test).
-- Persist brainstorm and review records in `docs/brainstorm/` and `docs/review/`.
+| Issue 来源 | 路由起点 | 说明 |
+|-----------|---------|------|
+| 进度文档（未完成） | D:dev-loop | 文档已有，继续开发 |
+| 里程碑（待处理） | D:doc-loop(M) 或 D:dev-loop | 视文档完整度 |
+| 项目意图（新需求） | D:doc-loop(I) | 从接入开始 |
+| review/test（Bug/改进） | D:doc-loop(B) 或 D:dev-loop | 视复杂度 |
+| github-issue（外部输入） | D:doc-loop(I) | 从接入开始 |
+| Chat Todo（人类介入） | 视情况 | 人类产出或修改 Issue |
 
-## Non-Goals
+### Chat Todo（人类介入）
 
-- Not a static backlog executor.
-- Not a one-shot command runner.
-- Not a human-driven ticket bot.
+```
+人类 ←──→ Chat Session ←──→ AI
+              │
+              ├── AI 通过 Chat 思考产出讨论文档
+              ├── 基于讨论结果生成 chat-todo
+              ├── 基于 chat-todo 产生或修改 Issue
+              └── 更新 chat-todo 使用状态
+```
+
+### 闭环理念
+
+```
+文档指导开发 → 开发反馈文档 → 循环直到完成
+     ↑                              │
+     └────────── 闭环 ──────────────┘
+```
+
+## 操作模式
+
+1. **宪法约束的自主性**
+   - 宪法是硬性约束面
+   - 分支/工作树规则、技术栈约束、方法论约束
+
+2. **单会话运行**
+   - 每个运行实例拥有一个活动 AI CLI 进程/会话
+   - 监控目标：该进程/会话生命周期
+
+3. **恢复优先的连续性**
+   - 支持无人值守续接时直接续接
+   - 不支持时执行桥接步骤：更新进度文档，重启无人值守循环
+
+4. **最小输入面**
+   - 四个必需输入：
+     - 项目绝对路径
+     - 项目意图路径
+     - 宪法路径
+     - AI 规格 `tool:model:mode`
+   - AI 自主发现其他项目文档
+
+## 非目标
+
+- 不是静态待办列表执行器
+- 不是一次性命令运行器
+- 不是人类驱动的工单机器人

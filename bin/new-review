@@ -38,8 +38,8 @@ reviewer="$(sanitize "$reviewer")"
 branch="$(sanitize "$branch")"
 topic="$(sanitize "$topic")"
 
-mkdir -p docs/review
-file="docs/review/${ts}--${reviewer}--${branch}--${topic}.md"
+mkdir -p docs/reviews
+file="docs/reviews/${ts}--${reviewer}--${branch}--${topic}.md"
 
 cat > "$file" <<MD
 # Review Record
