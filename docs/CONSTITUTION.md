@@ -67,12 +67,17 @@ Freely 是一个自主工程循环系统：
 5. 执行：
 - Git 钩子应在本地工作流中强制分支保护。
 - 钩子拒绝消息必须指向本宪法章节作为策略来源。
-- **push 规则**：main, develop, pre-develop 都允许 push。
-- **commit 规则**：main, develop, pre-develop 禁止直接 add/commit。
-- **merge 规则**：
-  - main 只允许 release/* merge（hotfix 默认拦截，可用 `FREELY_ALLOW_MERGE=1` 绕过）
-  - develop 只允许 pre-develop merge（hotfix 默认拦截，可用 `FREELY_ALLOW_MERGE=1` 绕过）
-  - pre-develop 只允许 feature/* merge（不允许绕过）
+- **分支规则表**：
+
+| 分支 | push | add/commit | merge 来源 | merge 到 | 备注 |
+|------|------|------------|-----------|----------|------|
+| main | ✅ | ❌ | release/* | - | hotfix 可 `FREELY_ALLOW_MERGE=1` 绕过 |
+| develop | ✅ | ❌ | pre-develop | - | hotfix 可 `FREELY_ALLOW_MERGE=1` 绕过 |
+| pre-develop | ✅ | ❌ | feature/* | develop | 不允许绕过 |
+| feature/* | ✅ 同名 | ✅ worktree | - | pre-develop | 必须在 worktree 中开发 |
+| release/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 develop 创建 |
+| hotfix/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 main 创建 |
+
 - hotfix 合并到 main/develop 后必须同步到 pre-develop
 
 ## 3. 版本命名规则（硬性要求）
