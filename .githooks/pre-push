@@ -4,103 +4,69 @@ set -euo pipefail
 CONSTITUTION_PATH="./docs/CONSTITUTION.md"
 CONSTITUTION_ANCHOR="#2-branch-and-worktree-policy-hard-requirement"
 
+# 获取当前分支名
+current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+
 while read -r local_ref local_sha remote_ref remote_sha; do
   [[ -z "${local_ref:-}" ]] && continue
 
-  # 禁止直接 push 到 develop（只有 hotfix 可以绕开）
-  if [[ "$local_ref" == "refs/heads/develop" || "$remote_ref" == "refs/heads/develop" ]]; then
-    # 获取当前分支名
-    current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
-    
-    # hotfix/* 分支允许绕开
-    if [[ "${FREELY_ALLOW_DEVELOP_PUSH:-0}" == "1" && "$current_branch" == hotfix/* ]]; then
+  local_branch="${local_ref#refs/heads/}"
+  remote_branch="${remote_ref#refs/heads/}"
+
+  # 允许 main, develop, pre-develop 直接 push
+  case "$local_branch" in
+    main|develop|pre-develop)
       continue
-    fi
-    
-    # 检查是否从 pre-develop 合并而来
-    if git merge-base --is-ancestor pre-develop develop 2>/dev/null; then
-      # develop 包含 pre-develop，允许 push（已验证流程）
-      continue
-    fi
+      ;;
+  esac
 
-    cat >&2 <<MSG
-[HOOK] Push blocked: direct push to 'develop' is forbidden.
-
-Policy source:
-- $CONSTITUTION_PATH
-- Section: 2. Branch and Worktree Policy (Hard Requirement)
-- Anchor: $CONSTITUTION_ANCHOR
-
-Required flow:
-- feature/* -> pre-develop (test)
-- pre-develop -> develop (promote after validation)
-- hotfix/* -> develop (with FREELY_ALLOW_DEVELOP_PUSH=1, then sync to pre-develop)
-
-Only hotfix/* branches can bypass with:
-FREELY_ALLOW_DEVELOP_PUSH=1 git push ...
-
-Current branch: $current_branch
-MSG
-    exit 1
-  fi
-
-  # 禁止直接 push 到 main（只有 hotfix 可以绕开）
-  if [[ "$local_ref" == "refs/heads/main" || "$remote_ref" == "refs/heads/main" ]]; then
-    # 获取当前分支名
-    current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
-    
-    # 只有 hotfix/* 分支允许绕开
-    if [[ "${FREELY_ALLOW_MAIN_PUSH:-0}" == "1" && "$current_branch" == hotfix/* ]]; then
-      continue
-    fi
-
-    cat >&2 <<MSG
-[HOOK] Push blocked: direct push to 'main' is forbidden.
-
-Policy source:
-- $CONSTITUTION_PATH
-- Section: 2. Branch and Worktree Policy (Hard Requirement)
-- Anchor: $CONSTITUTION_ANCHOR
-
-Required flow:
-- feature/* -> pre-develop (test)
-- pre-develop -> develop (promote after validation)
-- release/* -> main (+ back-merge to develop)
-- hotfix/* -> main (+ back-merge to develop)
-
-Only hotfix/* branches can bypass with:
-FREELY_ALLOW_MAIN_PUSH=1 git push ...
-
-Current branch: $current_branch
-MSG
-    exit 1
-  fi
-
-  # feature/* 分支只能 push 到 pre-develop 或同名的 feature 分支
-  if [[ "$local_ref" == refs/heads/feature/* ]]; then
-    branch_name="${local_ref#refs/heads/}"
-    remote_branch="${remote_ref#refs/heads/}"
-    
-    # 允许 push 到同名的 feature 分支
-    if [[ "$remote_ref" == "refs/heads/$branch_name" ]]; then
-      continue
-    fi
-    
-    # 允许 push 到 pre-develop
-    if [[ "$remote_ref" == "refs/heads/pre-develop" ]]; then
+  # feature/* 分支只能 push 到同名分支
+  if [[ "$local_branch" == feature/* ]]; then
+    # 允许 push 到同名 feature 分支
+    if [[ "$remote_branch" == "$local_branch" ]]; then
       continue
     fi
     
     cat >&2 <<MSG
-[HOOK] Push blocked: feature branch '$branch_name' can only push to:
-- Same branch on remote (refs/heads/$branch_name)
-- pre-develop (for integration)
+[HOOK] Push blocked: feature branch '$local_branch' can only push to:
+- Same branch on remote (refs/heads/$local_branch)
 
 Attempted to push to: $remote_ref
 
-Required flow:
-- feature/* -> pre-develop (test)
-- pre-develop -> develop (promote after validation)
+To merge feature into pre-develop, use:
+  git checkout pre-develop && git merge $local_branch
+MSG
+    exit 1
+  fi
+
+  # hotfix/* 分支
+  if [[ "$local_branch" == hotfix/* ]]; then
+    # 允许 push 到同名 hotfix 分支
+    if [[ "$remote_branch" == "$local_branch" ]]; then
+      continue
+    fi
+    
+    cat >&2 <<MSG
+[HOOK] Push blocked: hotfix branch '$local_branch' can only push to:
+- Same branch on remote (refs/heads/$local_branch)
+
+To merge hotfix into main/develop, checkout target branch and merge.
+MSG
+    exit 1
+  fi
+
+  # release/* 分支
+  if [[ "$local_branch" == release/* ]]; then
+    # 允许 push 到同名 release 分支
+    if [[ "$remote_branch" == "$local_branch" ]]; then
+      continue
+    fi
+    
+    cat >&2 <<MSG
+[HOOK] Push blocked: release branch '$local_branch' can only push to:
+- Same branch on remote (refs/heads/$local_branch)
+
+To merge release into main, checkout main and merge.
 MSG
     exit 1
   fi

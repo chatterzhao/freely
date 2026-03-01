@@ -65,13 +65,15 @@ Freely 是一个自主工程循环系统：
 - 桥接恢复记录必须包含当前分支和工作树路径。
 
 5. 执行：
-- Git 钩子应在本地工作流中对 `main` 和 `develop` 强制推送保护。
+- Git 钩子应在本地工作流中强制分支保护。
 - 钩子拒绝消息必须指向本宪法章节作为策略来源。
-- 只有 `hotfix/*` 分支允许强制绕开推送：
-  - `FREELY_ALLOW_MAIN_PUSH=1` 绕开 main 保护
-  - `FREELY_ALLOW_DEVELOP_PUSH=1` 绕开 develop 保护
-- `hotfix/*` 合并到 `develop` 后必须同步合并到 `pre-develop`。
-- 其他分支（`feature/*`、`release/*` 等）禁止绕开，必须遵循标准流程。
+- **push 规则**：main, develop, pre-develop 都允许 push。
+- **commit 规则**：main, develop, pre-develop 禁止直接 add/commit。
+- **merge 规则**：
+  - 只有 pre-develop 允许接收 merge（来自 feature 分支）
+  - main, develop 禁止直接 merge，除非 hotfix 绕开
+  - hotfix 合并到 main/develop 时使用 `FREELY_ALLOW_MERGE=1 git merge <branch>`
+  - hotfix 合并后必须同步到 pre-develop
 
 ## 3. 版本命名规则（硬性要求）
 

@@ -8,13 +8,54 @@ source ./bin/worktree-common.sh
 branch="$(freely_wt_current_branch)"
 [[ -n "$branch" ]] || exit 0
 
+# 检查是否是 merge 操作
+if [[ -f ".git/MERGE_HEAD" ]]; then
+  # 只有 pre-develop 和 hotfix 允许 merge
+  case "$branch" in
+    pre-develop)
+      # pre-develop 允许 merge feature
+      ;;
+    hotfix/*)
+      # hotfix 允许 merge 到 main/develop（但这是在 hotfix 分支上，不是目标分支）
+      # 实际上 merge 是在目标分支上进行的，所以这里不需要特殊处理
+      ;;
+    main|develop)
+      # main 和 develop 禁止直接 merge，除非是 hotfix 绕开
+      if [[ "${FREELY_ALLOW_MERGE:-0}" != "1" ]]; then
+        cat <<MSG
+[HOOK] Merge blocked: '$branch' cannot receive direct merges.
+Rules:
+- Only pre-develop can receive merges from feature branches
+- main/develop only receive merges from release/hotfix (via FREELY_ALLOW_MERGE=1)
+
+For hotfix merge, use:
+  FREELY_ALLOW_MERGE=1 git merge <hotfix-branch>
+MSG
+        exit 1
+      fi
+      ;;
+    *)
+      # 其他分支不允许执行 merge 操作
+      cat <<MSG
+[HOOK] Merge blocked: '$branch' cannot perform merge operations.
+Rules:
+- Only pre-develop can receive merges from feature branches
+MSG
+      exit 1
+      ;;
+  esac
+  exit 0
+fi
+
+# main, develop, pre-develop 禁止直接 add/commit
 case "$branch" in
-  main|develop)
+  main|develop|pre-develop)
     cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
 Rules:
-- main/develop must not be used for coding commits
+- main, develop, pre-develop must not be used for coding commits
 - create/use a worktree branch (feature/*, release/*, hotfix/*)
+- only pre-develop can receive merges from feature branches
 MSG
     exit 1
     ;;
