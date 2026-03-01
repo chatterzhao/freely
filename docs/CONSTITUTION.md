@@ -67,8 +67,11 @@ Freely 是一个自主工程循环系统：
 5. 执行：
 - Git 钩子应在本地工作流中对 `main` 和 `develop` 强制推送保护。
 - 钩子拒绝消息必须指向本宪法章节作为策略来源。
-- 只有 `hotfix/*` 分支允许使用 `FREELY_ALLOW_MAIN_PUSH=1` 强制绕开推送到 `main`。
-- 其他分支（`feature/*`、`develop` 等）禁止绕开，必须遵循标准流程。
+- 只有 `hotfix/*` 分支允许强制绕开推送：
+  - `FREELY_ALLOW_MAIN_PUSH=1` 绕开 main 保护
+  - `FREELY_ALLOW_DEVELOP_PUSH=1` 绕开 develop 保护
+- `hotfix/*` 合并到 `develop` 后必须同步合并到 `pre-develop`。
+- 其他分支（`feature/*`、`release/*` 等）禁止绕开，必须遵循标准流程。
 
 ## 3. 版本命名规则（硬性要求）
 

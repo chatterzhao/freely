@@ -7,8 +7,16 @@ CONSTITUTION_ANCHOR="#2-branch-and-worktree-policy-hard-requirement"
 while read -r local_ref local_sha remote_ref remote_sha; do
   [[ -z "${local_ref:-}" ]] && continue
 
-  # 禁止直接 push 到 develop
+  # 禁止直接 push 到 develop（只有 hotfix 可以绕开）
   if [[ "$local_ref" == "refs/heads/develop" || "$remote_ref" == "refs/heads/develop" ]]; then
+    # 获取当前分支名
+    current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+    
+    # hotfix/* 分支允许绕开
+    if [[ "${FREELY_ALLOW_DEVELOP_PUSH:-0}" == "1" && "$current_branch" == hotfix/* ]]; then
+      continue
+    fi
+    
     # 检查是否从 pre-develop 合并而来
     if git merge-base --is-ancestor pre-develop develop 2>/dev/null; then
       # develop 包含 pre-develop，允许 push（已验证流程）
@@ -26,10 +34,12 @@ Policy source:
 Required flow:
 - feature/* -> pre-develop (test)
 - pre-develop -> develop (promote after validation)
-- release/* -> main (+ back-merge to develop)
-- hotfix/* -> main (+ back-merge to develop)
+- hotfix/* -> develop (with FREELY_ALLOW_DEVELOP_PUSH=1, then sync to pre-develop)
 
-develop must only receive merges from pre-develop.
+Only hotfix/* branches can bypass with:
+FREELY_ALLOW_DEVELOP_PUSH=1 git push ...
+
+Current branch: $current_branch
 MSG
     exit 1
   fi
