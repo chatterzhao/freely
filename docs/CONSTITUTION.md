@@ -349,7 +349,7 @@ Freely 在开发 Freely 本身时必须执行“吃自己狗粮（dogfooding）�
 
 1. 流程同构：
 - Freely 自身开发必须遵守本宪法、`docs/LAWS.md` 与 `docs/PROJECT_INTENT.md`，不得使用“项目例外”绕开治理流程。
-- 所有架构/治理调整应先进入 `docs/pre-brainstorms/<id>/` 形成候选，再进入 doc-loop/dev-loop 落地。
+- 所有架构/治理调整应先进入 `docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/` 形成候选，再进入 doc-loop/dev-loop 落地。
 
 2. 工具同构：
 - Freely 自身仓库必须使用与面向用户一致的分支、worktree、hook 与门禁策略。
