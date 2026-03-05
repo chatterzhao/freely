@@ -147,6 +147,8 @@
 1. 接口版本策略明确。
 2. 破坏性变更有迁移路径与回滚路径。
 3. 合约测试覆盖当前/候选实现。
+4. 涉及第三方 API 时，以第三方 API 契约为外部事实源，本地代码/适配层已对齐。
+5. 不存在“要求第三方 API 适配本地实现”的反向依赖设计。
 
 执行技能：
 - `skill:module-interface-governance`
@@ -211,6 +213,8 @@
 1. 命令面保持可脚本化、确定性、可检查。
 2. 状态保持显式可落盘验证。
 3. 项目根 `AGENTS.md` 保持存在并可用。
+4. 代码与文档不一致时，已优先执行代码/测试修复路径。
+5. 若存在规范文档改动，已在独立 `feature/*` + worktree 中完成，并绑定对应实现或门禁变更证据。
 
 执行技能：
 - `skill:laws-enforcer`
@@ -255,11 +259,11 @@
 | 7. AI 执行模式 | 3.12 AI 执行模式与输入约束门 | `tool:model:mode` 规格校验记录 | `skill:constitution-guard`, `skill:laws-enforcer` |
 | 8. 恢复策略 | 3.6 恢复与子代理门, 3.9 产品身份与自治闭环门 | 续接/桥接与恢复检查点记录 | `skill:recovery-subagent-governance`, `skill:auto-loop-orchestrator` |
 | 9. 约束面 | 3.12 AI 执行模式与输入约束门 | 输入面白名单检查记录 | `skill:constitution-guard`, `skill:laws-enforcer` |
-| 10. 工程纪律 | 3.13 工程纪律门 | 命令面/状态面/AGENTS 可检查记录 | `skill:laws-enforcer`, `skill:dev-loop-execution` |
+| 10. 工程纪律 | 3.13 工程纪律门 | 命令面/状态面/AGENTS 可检查记录 + 代码优先修复证据 | `skill:laws-enforcer`, `skill:dev-loop-execution` |
 | 11. 方法论总述 | 3.2 Doc Loop 门, 3.3 Dev Loop 门, 3.4 Auto Loop 门 | loop 产物完整性与路由一致性记录 | `skill:doc-loop-execution`, `skill:dev-loop-execution`, `skill:auto-loop-orchestrator` |
 | 12. 子代理规划与委托 | 3.6 恢复与子代理门, 3.14 子代理与并行领域门 | 委托边界/批次等待/失败回退记录 | `skill:recovery-subagent-governance`, `skill:laws-enforcer` |
 | 13. 并行开发领域模型 | 3.14 子代理与并行领域门 | 物理/逻辑领域边界与冲突窗口记录 | `skill:recovery-subagent-governance`, `skill:laws-enforcer` |
-| 14. 模块架构与接口版本 | 3.7 模块接口门 | 版本策略/迁移回滚/合约测试记录 | `skill:module-interface-governance` |
+| 14. 模块架构与接口版本 | 3.7 模块接口门 | 版本策略/迁移回滚/合约测试记录 + 第三方 API 契约对齐证据 | `skill:module-interface-governance` |
 | 15. 变更前配置备份 | 3.8 配置备份门 | 备份文件路径与命名记录 | `skill:config-backup-guard` |
 | 16. Freely 自举开发 | 3.15 Freely 自举一致性门 | pre-brainstorms -> doc/dev 落地链路记录 | `skill:constitution-guard`, `skill:branch-management`, `skill:laws-enforcer` |
 

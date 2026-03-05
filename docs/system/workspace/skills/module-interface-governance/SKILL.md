@@ -7,10 +7,11 @@ description: Apply plug-in module and interface version governance for parallel 
 
 ## Workflow
 1. Define module boundary and current contract version.
-2. For breaking changes, create versioned contract and migration path.
-3. Keep rollback path to stable implementation.
-4. Validate contract compatibility with tests.
-5. Record active version and switch strategy.
+2. If third-party API is involved, treat provider contract as external source of truth and design local adapter around it.
+3. For breaking changes, create versioned contract and migration path.
+4. Keep rollback path to stable implementation.
+5. Validate contract compatibility with tests (including third-party API integration semantics when applicable).
+6. Record active version and switch strategy.
 
 ## Done
-- Module evolution is versioned, testable, and reversible.
+- Module evolution is versioned, testable, reversible, and aligned to third-party API contracts when used.

@@ -73,6 +73,7 @@ description: Manage full autonomous branch lifecycle for Freely-style developmen
 - If semantic checks fail, do not promote; return to reconcile flow.
 - Never resolve conflicts by commit timestamp ordering.
 - Never push `alpha`/`beta` tags.
+- For normative doc changes, keep work in dedicated feature/worktree and require linked implementation or gate-change evidence.
 
 ## Done
 - No branch remains in `git branch --no-merged pre-develop`.
