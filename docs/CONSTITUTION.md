@@ -257,6 +257,40 @@ A:auto-loop(ADD) [外循环]
     └── 返回 A1，继续发现与完成
 ```
 
+### 11.1.A 补充图：路由委派与业务流转闭环（查漏版）
+
+```mermaid
+flowchart TD
+    S1["A1 发现问题源\n(intent/review/test/chat/github-issue)"]
+    S2["候选池\npre-brainstorms/*/candidates.md"]
+    S3["A2 路由委派决策\nroute + reason + status"]
+
+    D1["D:doc-loop(IBM)\nI/B/M\n产出 issue/prd/pre-tests/tasks"]
+    V1["候选转正式 issue\n回填 promoted_issue_path\n落位 epic/story/milestone"]
+    E1["Issue Ready"]
+
+    D2["D:dev-loop(DDD)\n实现/测试/review/文档回写"]
+    G1["pre-develop 集成测试门\nTEST(含集成验收)"]
+    G2["develop 提升门\nTEST + review + progress/recovery"]
+    R1["release/hotfix 流程\n(tag/release/hotfix sync)"]
+
+    A3["A3 回流\n更新状态并进入下一轮发现"]
+    X1["AI CLI 终止态\ncompleted / crash / blocked"]
+    RC["恢复分支\nresume 或 bridge checkpoint"]
+
+    S1 --> S2 --> S3
+    S3 -->|"raw/候选未成型"| D1
+    D1 --> V1 --> E1 --> D2
+    S3 -->|"ready/in-progress"| D2
+
+    D2 --> G1 --> G2 --> R1 --> A3 --> S1
+
+    D1 --> X1
+    D2 --> X1
+    X1 -->|"crash/blocked"| RC --> S3
+    X1 -->|"completed"| A3
+```
+
 ### 11.2 核心原则
 
 1. **文档驱动**：每个阶段都有文档产出，文档先行。
