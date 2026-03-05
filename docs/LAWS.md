@@ -29,7 +29,7 @@
 
 ## 1. 当前阶段约束
 
-在文档模型重构阶段，`docs/` 最小集合：
+在文档模型重构阶段，工作区 `docs/` 最小集合：
 - `docs/PROJECT_INTENT.md`
 - `docs/LAWS.md`
 - `docs/CONSTITUTION.md`
@@ -37,8 +37,9 @@
 
 判定规则：
 1. 新讨论与新决策进入 `docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/`。
-2. 历史执行态文档不在工作区保留，通过 git 历史追溯。
+2. 历史执行态文档可以不在工作区常驻，但验收证据不得缺失；可通过 git 历史、评审记录或恢复记录提供可追溯证据。
 3. 三件套（意图/法律/宪法）未一致前，不扩展旧目录模型。
+4. 第 3 章门禁在本阶段采用“双轨验收”：满足“规范产物路径”或“等价可追溯证据”任一轨即视为通过。
 
 ---
 
@@ -69,8 +70,14 @@
 1. `feature/*` 来源为 `pre-develop`。
 2. `main/develop/pre-develop` 保持 add/commit 禁止。
 3. merge 方向符合宪法分支表。
-4. stage tag 符合 `YYYY.MM.DD-HHMM-stage` 与分支映射。
-5. `alpha/beta` 不可 push。
+4. 从 `pre-develop` 提升到 `develop` 前，`PRE_TEST` 必需检查通过（允许“规范路径文件”或“等价可追溯证据”）。
+5. 从 `pre-develop` 提升到 `develop` 前，必需评审记录存在（`docs/reviews/` 或等价评审记录）。
+6. 从 `pre-develop` 提升到 `develop` 前，提升提交可从 `pre-develop` 到达（祖先可追溯）。
+7. 从 `pre-develop` 提升到 `develop` 前，进度/恢复文档已更新提升结果（或等价记录）。
+8. hook 拒绝消息必须指向宪法章节作为策略来源。
+9. hotfix 合并到 `main/develop` 后，必须同步到 `pre-develop` 并留痕。
+10. stage tag 符合 `YYYY.MM.DD-HHMM-stage` 与分支映射。
+11. `alpha/beta` 不可 push。
 
 执行技能：
 - `skill:branch-management`
@@ -79,9 +86,9 @@
 ### 3.2 Doc Loop 门
 
 通过条件：
-1. intake/brainstorm/map 产物完整。
+1. intake/brainstorm/map 产物完整（规范路径）或存在等价可追溯文档链路。
 2. candidates 的 route/status 一致。
-3. milestone 与 issue 映射同步。
+3. milestone 与 issue 映射同步（规范路径）或存在等价同步证据。
 
 执行技能：
 - `skill:doc-loop-execution`
@@ -91,7 +98,7 @@
 
 通过条件：
 1. 代码与测试产物存在。
-2. 进度/状态文档完成更新。
+2. 进度/状态文档完成更新（规范路径）或存在等价可追溯记录。
 3. 验收与实现一致，无文档漂移。
 
 执行技能：
@@ -236,7 +243,7 @@
 | 宪法章节 | 对齐法律门 | 验收证据（最小） | 主要技能路由 |
 |---|---|---|---|
 | 1. 产品身份 | 3.9 产品身份与自治闭环门 | issue 来源记录 + 闭环执行记录 | `skill:auto-loop-orchestrator`, `skill:laws-enforcer` |
-| 2. 分支与工作树策略 | 3.1 分支与发布门, 3.5 冲突与回退门, 5 清理与退役 | 分支来源/merge 方向/worktree 清理记录 | `skill:branch-management`, `skill:premerge-reconcile`, `skill:constitution-guard` |
+| 2. 分支与工作树策略 | 3.1 分支与发布门, 3.5 冲突与回退门, 5 清理与退役 | 分支来源/merge 方向/worktree 清理记录 + 提升清单证据 | `skill:branch-management`, `skill:premerge-reconcile`, `skill:constitution-guard` |
 | 3. 版本命名规则 | 3.1 分支与发布门 | tag 命名与分支 stage 对照记录 | `skill:branch-management` |
 | 4. 强制技术栈 | 3.10 技术栈与基线结构门 | 技术栈检查记录 | `skill:constitution-guard`, `skill:laws-enforcer` |
 | 5. 基线项目结构 | 3.10 技术栈与基线结构门 | 目录结构检查记录 | `skill:constitution-guard`, `skill:laws-enforcer` |
