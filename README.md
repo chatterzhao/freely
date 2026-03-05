@@ -10,7 +10,8 @@ Freely is an autonomous project loop runner:
 Primary docs:
 - Project intent: `docs/PROJECT_INTENT.md`
 - Constitution: `docs/CONSTITUTION.md`
-- Documentation map: `docs/README.md`
+- Laws: `docs/LAWS.md`
+- Research workspace: `docs/research/README.md`
 
 ## Quick Start
 
@@ -35,9 +36,9 @@ In another terminal:
 ./bin/freely stop --project /home/devbox/project/my-fasterp4/fasterp4
 ```
 
-## BMAD Documentation Gate
+## Documentation Gate
 
-Run BMAD baseline checks before implementation or merge:
+Run baseline documentation checks before implementation or merge:
 
 ```bash
 chmod +x ./bin/bmad-check
