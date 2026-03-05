@@ -6,7 +6,7 @@
 
 构建一个 Jarvis 式自主循环运行器：
 - 启动后 AI 担任项目所有者角色。
-- AI 从项目意图、review、test、开发进度文档、chat-todo，自己思考产出或修改 Issue；从 github-issue、里程碑文档，获取 Issue；而非固定从单一任务列表
+- AI 从项目意图、review、test、开发进度文档、chat 输入与会话证据（人类或自治）中产出或修改候选 Issue；从 github-issue、里程碑文档获取 Issue；而非固定从单一任务列表
 - AI 自主管理：获取 Issue → 文档 → 开发 → 验收 → 获取 Issue 的闭环
 - AI 持续运行（自己监控ai工具崩溃/阻塞自动触发续接），除非明确停止。或找不到需求，或者出现重大事故 AI 自己已经无力自己解决。
 
@@ -26,12 +26,12 @@ A:auto-loop(ADD) [外循环]
 │   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md
 │
 ├── A2 分流决策
-│   ├── raw problem / candidate -> D:doc-loop(IBM)
+│   ├── raw problem / candidate -> D:doc-loop(IBM+G)
 │   └── ready issue / in-progress -> D:dev-loop(DDD)
 │   产出：
 │   - 更新 docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md 的 route/status
 │
-├── D:doc-loop(IBM) [I -> B -> M]
+├── D:doc-loop(IBM+G) [I -> B -> M + Governance]
 │   产出（重构目标目录）：
 │   - docs/epics/{epic}/{story}/issues/{issue-name}.md
 │   - docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md
@@ -39,6 +39,7 @@ A:auto-loop(ADD) [外循环]
 │   - docs/epics/{epic}/{story}/pre-tests.md
 │   - docs/epics/{epic}/{story}/tasks.md
 │   - docs/milestones.md  (与 issue 原子同步写入：新增/调整归属)
+│   - （按需）docs/CONSTITUTION.md, docs/LAWS.md, docs/system/workspace/skills/** 治理一致性修复
 │   目录分层说明：
 │   - pre-brainstorms/**：候选与前置收敛（未正式归属 story 前）
 │   - epics/{epic}/{story}/**：正式 story 产物（归属后长期维护）
@@ -62,7 +63,7 @@ flowchart TD
     S2["候选池\npre-brainstorms/*/candidates.md"]
     S3{"A2 路由委派\nissue 是否就绪?"}
 
-    D1["D:doc-loop(IBM)\nI/B/M\n产出 issues/brainstorms/prd/pre-tests/tasks"]
+    D1["D:doc-loop(IBM+G)\nI/B/M + Governance\n产出 issues/brainstorms/prd/pre-tests/tasks"]
     V1["候选晋升门\n回填 promoted_issue_path\npre-brainstorms -> epics/<epic>/<story>"]
     J1{"是否形成可开发 issue?"}
 
@@ -109,18 +110,19 @@ flowchart TD
 | 里程碑（待处理） | D:doc-loop(M) 或 D:dev-loop | 视文档完整度 |
 | 项目意图（新需求） | D:doc-loop(I) | 从接入开始 |
 | review/test（Bug/改进） | D:doc-loop(B) 或 D:dev-loop | 视复杂度 |
+| 治理漂移（宪法/法律/skills 不一致） | D:doc-loop(G) | 先修治理一致性，再回到业务路由 |
 | github-issue（外部输入） | D:doc-loop(I) | 从接入开始 |
-| Chat Todo（人类介入） | 视情况 | 人类产出或修改 Issue |
+| Chat 输入/会话证据（人类或自治） | D:doc-loop(I/B) | 先进入 pre-brainstorms，再产出候选 Issue |
 
-### Chat Todo（人类介入）
+### Chat 输入与会话证据（人类/自治）
 
 ```
 人类 ←──→ Chat Session ←──→ AI
               │
-              ├── AI 通过 Chat 思考产出讨论文档
-              ├── 基于讨论结果生成 chat-todo
-              ├── 基于 chat-todo 产生或修改 Issue
-              └── 更新 chat-todo 使用状态
+              ├── 讨论先沉淀到 pre-brainstorms/*/brainstorms.md
+              ├── 候选项写入 pre-brainstorms/*/candidates.md
+              ├── 多 AI/子代理会话日志以 jsonl 作为 session evidence
+              └── 在 candidates.md 的 session_refs 留痕并进入 A2 路由
 ```
 
 ### 闭环理念

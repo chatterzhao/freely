@@ -21,7 +21,7 @@ Freely 本身就是一个 Agent 编排系统（外循环→内循环），与文
 │   ├── review → 改进点
 │   ├── test → Bug/修复
 │   ├── 进度文档 → 未完成 Issue
-│   └── Chat Todo → 人类介入
+│   └── Chat 输入/会话证据 → pre-brainstorms 候选收敛
 │
 └── 路由到内循环
     ├── D:doc-loop (IBM)

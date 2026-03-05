@@ -14,9 +14,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: 直接支撑 ADD 外循环可运行，属于当前核心落地项。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260303-102
 - title: 集成测试优先门禁落地
@@ -26,9 +26,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: 符合集成优先与自治可运行目标，纳入主线门禁建设。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260303-103
 - title: 会话管理机制（恢复/压缩/新会话）
@@ -38,6 +38,6 @@
 - priority: P1
 - status: promoted
 - decision_reason: 与恢复优先和自治持续运行目标直接对齐，应纳入主线实现。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []

@@ -34,6 +34,9 @@
 - 20260305-doc-loop-dev-loop-directory-unification
   - brainstorms: docs/pre-brainstorms/20260305-doc-loop-dev-loop-directory-unification/brainstorms.md
   - candidates: docs/pre-brainstorms/20260305-doc-loop-dev-loop-directory-unification/candidates.md
+- 20260305-1402--doc-loop-governance-maintenance
+  - brainstorms: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

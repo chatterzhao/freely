@@ -14,6 +14,6 @@
 - priority: P2
 - status: dropped
 - decision_reason: 当前阶段不适配主线优先级，会分散 owner 内核建设。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []

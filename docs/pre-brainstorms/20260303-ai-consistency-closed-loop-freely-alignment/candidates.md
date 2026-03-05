@@ -14,9 +14,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: 与当前 skills-first + SSOT 主线高度一致，纳入主线契约建设。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260303-002
 - title: 独立监理 Gate 接入 auto-loop
@@ -26,9 +26,9 @@
 - priority: P1
 - status: needs_research
 - decision_reason: 方向合理但缺少与当前执行链路的最小实现边界，需补方案再晋升。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260303-003
 - title: 验收合同 + 自包含交付检查落地
@@ -38,6 +38,6 @@
 - priority: P0
 - status: promoted
 - decision_reason: 来源研究将其列为核心共性 skill 与强制 gate，且与当前主线直接一致。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []

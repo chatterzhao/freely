@@ -14,9 +14,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: 直接支撑隔离模型和可运维性，是当前重构主线刚需。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260305-702
 - title: Hook Policy Template Compiler
@@ -26,9 +26,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: 是“模板化分发治理策略”的核心实现点。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260305-703
 - title: Governance UI for Hooks/Worktree Constraints
@@ -38,9 +38,9 @@
 - priority: P1
 - status: promoted
 - decision_reason: 与长期产品体验强相关，但依赖 P0 策略内核先稳定。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260305-704
 - title: Freely Dogfooding Governance Contract
@@ -50,6 +50,6 @@
 - priority: P0
 - status: promoted
 - decision_reason: 是本轮统一设计理念对齐的起点约束。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
