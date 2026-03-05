@@ -12,49 +12,49 @@
 
 ## 方法论总述
 
-### 三层循环方法论
+### 三层循环方法论（统一循环图 + 产出物）
 
-```
-A:auto-loop（外循环）
+```text
+A:auto-loop(ADD) [外循环]
 │
-├── 发现 Issue
-│   │
-│   ├── 思考产出或修改 Issue
-│   │   ├── 项目意图 ───────→ 新需求
-│   │   ├── review ─────────→ 改进点
-│   │   ├── test ───────────→ Bug/修复
-│   │   ├── 进度文档 ───────→ 未完成 Issue
-│   │   └── Chat Todo ──────→ 人类介入产出/修改
-│   │
-│   └── 获取 Issue
-│       ├── github-issue ───→ 外部输入
-│       └── 里程碑 ─────────→ 待处理 Issue
+├── A1 发现问题（持续）
+│   ├── 新问题源：intent/review/test/chat/github-issue -> pre-brainstorms
+│   ├── 候选源：pre-brainstorms/candidates
+│   └── 执行源：milestones/progress(未完成)
+│   产出：
+│   - docs/pre-brainstorms/<id>/brainstorms.md
+│   - docs/pre-brainstorms/<id>/candidates.md
 │
-├── 路由到内循环
-│   │
-│   ├── D:doc-loop(IBM)（内循环-文档）
-│   │   │
-│   │   ├── I (Intake) ──── Issue 接入
-│   │   ├── B (Brainstorm) ─ 头脑风暴
-│   │   └── M (Map) ─────── 映射 PRD → EPIC → Story
-│   │
-│   └── D:dev-loop(DDD)（内循环-开发）
-│       │
-│       ├── doc ── 阅读文档指导
-│       ├── dev ── 开发（impl → review → test）
-│       ├── doc ── 更新文档
-│       │
-│       └── 循环直到完成
+├── A2 分流决策
+│   ├── raw problem / candidate -> D:doc-loop(IBM)
+│   └── ready issue / in-progress -> D:dev-loop(DDD)
+│   产出：
+│   - 更新 docs/pre-brainstorms/<id>/candidates.md 的 route/status
 │
-├── 完成 → 发现下一个 Issue
+├── D:doc-loop(IBM) [I -> B -> M]
+│   产出（重构目标目录）：
+│   - docs/epics/{epic}/{story}/issues/{issue}.md
+│   - docs/epics/{epic}/{story}/prd.md
+│   - docs/epics/{epic}/{story}/pre-tests.md
+│   - docs/epics/{epic}/{story}/tasks.md
+│   - docs/milestones.md  (与 issue 原子同步写入：新增/调整归属)
 │
-└── 循环，除非明确停止
+├── D:dev-loop(DDD) [Doc-Read -> Dev-Do -> Doc-Update]
+│   产出：
+│   - src/** , tests/**
+│   - docs/progress/{epic}/p-{issue}.md
+│   - docs/milestones.md  (状态更新)
+│   - docs/epics/{epic}/{story}/issues/{issue}.md  (状态更新)
+│
+└── A3 回流
+    └── 返回 A1，继续发现与完成
 ```
 
 ### Issue 路由规则
 
 | Issue 来源 | 路由起点 | 说明 |
 |-----------|---------|------|
+| pre-brainstorms 候选 | D:doc-loop(B/M) | 候选 issue 需收敛并落位到 epic/story/milestone |
 | 进度文档（未完成） | D:dev-loop | 文档已有，继续开发 |
 | 里程碑（待处理） | D:doc-loop(M) 或 D:dev-loop | 视文档完整度 |
 | 项目意图（新需求） | D:doc-loop(I) | 从接入开始 |

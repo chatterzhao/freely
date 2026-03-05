@@ -10,7 +10,8 @@ Freely 是一个自主项目循环运行器：
 主要文档：
 - 项目意图：`docs/PROJECT_INTENT.md`
 - 宪法：`docs/CONSTITUTION.md`
-- 文档地图：`docs/README.md`
+- 法律：`docs/LAWS.md`
+- 研究工作区：`docs/research/README.md`
 
 ## 快速开始
 
@@ -34,9 +35,9 @@ chmod +x ./bin/freely
 ./bin/freely stop --project <项目绝对路径>
 ```
 
-## BMAD 文档门禁
+## 文档门禁
 
-在实现或合并前运行 BMAD 基线检查：
+在实现或合并前运行基线文档检查：
 
 ```bash
 chmod +x ./bin/bmad-check

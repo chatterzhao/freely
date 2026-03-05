@@ -4,6 +4,24 @@
 
 ---
 
+## 0. 研究优先阶段（当前生效）
+
+在 Freely 文档模型重构完成前，`docs/` 目录采用最小集合约束：
+
+- `docs/PROJECT_INTENT.md`
+- `docs/LAWS.md`
+- `docs/CONSTITUTION.md`
+- `docs/research/`
+
+执行规则：
+
+1. 新讨论与新决策写入 `docs/pre-brainstorms/<id>/`（核心文件：`brainstorms.md`、`candidates.md`）。
+2. 历史执行态文档统一暂存到 `docs/research/deferred/`，不作为当前主流程入口。
+3. 在“意图-法律-宪法”三件套达成一致前，不恢复旧目录模型扩展。
+4. 重构完成后，再从 `deferred/` 选择性迁移到新模型。
+
+---
+
 ## 11. D:doc-loop(IBM) 文档循环方法论
 
 ### 11.1 目录结构
@@ -306,24 +324,51 @@ dev
 
 ---
 
-## 13. A:auto-loop(agent-cli) 自主循环方法论
+## 13. A:auto-loop(ADD) 自主循环方法论
 
-### 13.1 循环结构
+### 13.1 循环结构（统一循环图 + 产出物）
 
-```
-A:auto-loop（外循环）
+```text
+A:auto-loop(ADD) [外循环]
 │
-├── 发现 Issue
-├── 路由到内循环
-├── 完成 → 发现下一个 Issue
+├── A1 发现问题（持续）
+│   ├── 新问题源：intent/review/test/chat/github-issue -> pre-brainstorms
+│   ├── 候选源：pre-brainstorms/candidates
+│   └── 执行源：milestones/progress(未完成)
+│   产出：
+│   - docs/pre-brainstorms/<id>/brainstorms.md
+│   - docs/pre-brainstorms/<id>/candidates.md
 │
-└── 循环，除非明确停止
+├── A2 分流决策
+│   ├── raw problem / candidate -> D:doc-loop(IBM)
+│   └── ready issue / in-progress -> D:dev-loop(DDD)
+│   产出：
+│   - 更新 docs/pre-brainstorms/<id>/candidates.md 的 route/status
+│
+├── D:doc-loop(IBM) [I -> B -> M]
+│   产出（重构目标目录）：
+│   - docs/epics/{epic}/{story}/issues/{issue}.md
+│   - docs/epics/{epic}/{story}/prd.md
+│   - docs/epics/{epic}/{story}/pre-tests.md
+│   - docs/epics/{epic}/{story}/tasks.md
+│   - docs/milestones.md  (与 issue 原子同步写入：新增/调整归属)
+│
+├── D:dev-loop(DDD) [Doc-Read -> Dev-Do -> Doc-Update]
+│   产出：
+│   - src/** , tests/**
+│   - docs/progress/{epic}/p-{issue}.md
+│   - docs/milestones.md  (状态更新)
+│   - docs/epics/{epic}/{story}/issues/{issue}.md  (状态更新)
+│
+└── A3 回流
+    └── 返回 A1，继续发现与完成
 ```
 
 ### 13.2 Issue 发现机制
 
 | 类型 | 来源 | 说明 |
 |------|------|------|
+| 发现候选 | pre-brainstorms/candidates | 候选 issue 等待收敛与晋升 |
 | 思考产出或修改 | 项目意图 | 新需求 |
 | 思考产出或修改 | review | 改进点 |
 | 思考产出或修改 | test | Bug/修复 |
@@ -336,6 +381,7 @@ A:auto-loop（外循环）
 
 | Issue 来源 | 路由起点 | 说明 |
 |-----------|---------|------|
+| pre-brainstorms 候选 | D:doc-loop(B/M) | 候选 issue 需收敛并落位到 epic/story/milestone |
 | 进度文档（未完成） | D:dev-loop | 文档已有，继续开发 |
 | 里程碑（待处理） | D:doc-loop(M) 或 D:dev-loop | 视文档完整度 |
 | 项目意图（新需求） | D:doc-loop(I) | 从接入开始 |
