@@ -1,60 +1,60 @@
 # freely
 
-## Project Intent
+## 项目意图
 
-Freely is an autonomous project loop runner:
-- AI runs as the active worker for one project path.
-- AI follows project intent + constitution as hard constraints.
-- AI keeps continuity with monitor/restart behavior.
+Freely 是一个自主项目循环运行器：
+- AI 作为项目路径的活跃工作者运行
+- AI 遵循项目意图 + 宪法作为硬性约束
+- AI 通过监控/重启行为保持连续性
 
-Primary docs:
-- Project intent: `docs/PROJECT_INTENT.md`
-- Constitution: `docs/CONSTITUTION.md`
-- Documentation map: `docs/README.md`
+主要文档：
+- 项目意图：`docs/PROJECT_INTENT.md`
+- 宪法：`docs/CONSTITUTION.md`
+- 法律：`docs/LAWS.md`
+- 研究工作区：`docs/research/README.md`
 
-## Quick Start
+## 快速开始
 
 ```bash
-cd /home/devbox/project/freely
 chmod +x ./bin/freely
 
 ./bin/freely init \
-  --project /home/devbox/project/my-fasterp4/fasterp4 \
-  --intent /home/devbox/project/freely/docs/PROJECT_INTENT.md \
-  --constitution /home/devbox/project/freely/docs/CONSTITUTION.md \
+  --project <项目绝对路径> \
+  --intent <项目意图文件绝对路径> \
+  --constitution <宪法文件绝对路径> \
   --ai codex:gpt-5-codex:auto
 
-./bin/freely doctor --project /home/devbox/project/my-fasterp4/fasterp4
-./bin/freely start --project /home/devbox/project/my-fasterp4/fasterp4
+./bin/freely doctor --project <项目绝对路径>
+./bin/freely start --project <项目绝对路径>
 ```
 
-In another terminal:
+在另一个终端中：
 
 ```bash
-./bin/freely status --project /home/devbox/project/my-fasterp4/fasterp4
-./bin/freely stop --project /home/devbox/project/my-fasterp4/fasterp4
+./bin/freely status --project <项目绝对路径>
+./bin/freely stop --project <项目绝对路径>
 ```
 
-## BMAD Documentation Gate
+## 文档门禁
 
-Run BMAD baseline checks before implementation or merge:
+在实现或合并前运行基线文档检查：
 
 ```bash
 chmod +x ./bin/bmad-check
 ./bin/bmad-check
 ```
 
-## Hook Regression Gate
+## Hook 回归门禁
 
-Validate local push policy before merge:
+合并前验证本地推送策略：
 
 ```bash
 chmod +x ./bin/test-pre-push-hook
 ./bin/test-pre-push-hook
 ```
 
-Branch policy for feature delivery:
+功能交付分支策略：
 
-- `feature/* -> pre-develop` for test integration
-- `pre-develop -> develop` only after validation
-- direct push/merge to `develop` is blocked by local hook policy
+- `feature/* -> pre-develop` 用于测试集成
+- `pre-develop -> develop` 仅在验证后
+- 直接推送/合并到 `develop` 被本地 hook 策略阻止
