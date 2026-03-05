@@ -14,11 +14,13 @@ description: Manage full autonomous branch lifecycle for Freely-style developmen
 3. Enter branch worktree (auto-create + cd):
    - `source ./bin/wt-enter feature/<topic>`
 4. Do changes in this worktree only.
+   - before coding, define this cycle's single change intent and boundary (scope note for later commit split)
 5. Stage and commit in feature worktree:
    - `source ./bin/wt-add feature/<topic> -- <paths or -A>`
-   - split by single logical change (atomic commit); avoid mixing unrelated concerns in one commit
+   - semantic self-check: if staged changes contain mixed concerns, split before commit
    - `git commit -m "<type>: <summary>"`
-6. Run branch-local tests before integration.
+6. Before push/merge, re-check commit boundaries and split again if mixed concerns remain.
+7. Run branch-local tests before integration.
 
 ## Route B: Merge Train to pre-develop
 1. Work only from the `pre-develop` worktree for integration.
