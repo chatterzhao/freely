@@ -58,3 +58,22 @@ chmod +x ./bin/test-pre-push-hook
 - `feature/* -> pre-develop` 用于测试集成
 - `pre-develop -> develop` 仅在验证后
 - 直接推送/合并到 `develop` 被本地 hook 策略阻止
+
+## 清理分支与工作树
+
+统一使用 `./bin/wt-retire` 做清理，避免误删：
+
+```bash
+# 常规清理（默认先检查是否已合并到目标分支）
+./bin/wt-retire feature/my-task --into pre-develop
+
+# 确认不再需要且未合并时，必须显式传强制参数
+./bin/wt-retire feature/my-task --into pre-develop --force-unmerged
+
+# 需要时可连远程分支一起删除
+./bin/wt-retire feature/my-task --into pre-develop --delete-remote
+```
+
+默认行为：
+- 未合并分支拒绝删除
+- 必须显式 `--force-unmerged` 才允许强制删除
