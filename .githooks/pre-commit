@@ -8,16 +8,6 @@ source ./bin/worktree-common.sh
 branch="$(freely_wt_current_branch)"
 [[ -n "$branch" ]] || exit 0
 
-# Merge guard fallback:
-# Some environments may not trigger pre-merge-commit reliably.
-# During merge commit, delegate to pre-merge-commit for the same policy checks.
-if [[ -f ".git/MERGE_HEAD" ]]; then
-  if [[ -x "./.githooks/pre-merge-commit" ]]; then
-    ./.githooks/pre-merge-commit
-    exit $?
-  fi
-fi
-
 # main, develop, pre-develop 禁止直接 add/commit
 case "$branch" in
   main|develop|pre-develop)
