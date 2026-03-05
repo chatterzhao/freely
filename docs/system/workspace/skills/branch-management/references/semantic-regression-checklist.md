@@ -19,3 +19,7 @@ Run after merges into `pre-develop` and before promotion:
 
 5. Decision method:
 - Evaluate by semantic compatibility, not commit time order.
+
+6. Promotion test evidence:
+- `PRE_TEST` exists as development-before baseline (acceptance intent).
+- Promotion to `develop` is gated by executed `TEST` results (including integration acceptance), not by `PRE_TEST` alone.

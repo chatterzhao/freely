@@ -8,9 +8,10 @@ description: Execute D:dev-loop(DDD) workflows with document-read, implementatio
 ## Workflow
 1. Read governing docs and issue context.
 2. Implement changes in correct feature worktree.
-3. Run required tests/reviews.
-4. Update progress/issue status documents.
-5. Validate closure with `skill:laws-enforcer` and `skill:constitution-guard`.
+3. During development and review, continuously add/adjust test cases based on implementation and defects found.
+4. Run required tests, including integration acceptance tests, and treat `TEST` results as merge/promotion evidence.
+5. Update progress/issue status documents with test evidence.
+6. Validate closure with `skill:laws-enforcer` and `skill:constitution-guard`.
 
 ## Done
 - Code, tests, and doc status updates are aligned and verifiable.

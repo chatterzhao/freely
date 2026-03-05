@@ -35,10 +35,11 @@ Freely 是一个自主循环运行器：
 - `develop` 应只接收已测试/已提升的变更，保持可构建/可测试。
 - 从 `pre-develop` 提升到 `develop` 必须保留祖先可追溯性（提升的功能提交必须在合并到 `develop` 前可从 `pre-develop` 到达）。
 - 从 `pre-develop` 提升到 `develop` 的检查清单：
-  - 必需的 `PRE_TEST` 检查通过
+  - 必需的 `TEST`（含集成测试验收）通过
   - 必需的评审记录存在于 `docs/reviews/`
   - 提升的提交可从 `pre-develop` 到达
   - 进度/恢复文档已更新提升结果
+- `PRE_TEST` 的职责是开发前定义验收标准（先验约束），不得替代开发后/合并前的 `TEST` 结果。
 - 如果功能分支在无法从 `pre-develop` 到达的情况下合并到 `develop`，这是策略违规，必须在评审/进度中记录并采取补救措施。
 
 `premerge` 临时分支规则（用于复杂冲突收敛，不新增长期分支层级）：
@@ -236,6 +237,8 @@ A:auto-loop(ADD) [外循环]
 │   - docs/epics/{epic}/{story}/pre-tests.md
 │   - docs/epics/{epic}/{story}/tasks.md
 │   - docs/milestones.md  (与 issue 原子同步写入：新增/调整归属)
+│   说明：
+│   - `pre-tests.md` 只定义开发前验收标准（含集成验收口径），不作为合并门禁测试结果。
 │
 ├── D:dev-loop(DDD) [Doc-Read -> Dev-Do -> Doc-Update]
 │   产出：
@@ -243,6 +246,9 @@ A:auto-loop(ADD) [外循环]
 │   - docs/progress/{epic}/p-{issue}.md
 │   - docs/milestones.md  (状态更新)
 │   - docs/epics/{epic}/{story}/issues/{issue}.md  (状态更新)
+│   说明：
+│   - 在开发中、review、test 阶段持续补全测试用例并执行测试。
+│   - 提升/合并门禁看 `TEST` 结果，不看 `PRE_TEST` 代替。
 │
 └── A3 回流
     └── 返回 A1，继续发现与完成

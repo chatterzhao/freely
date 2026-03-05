@@ -8,9 +8,10 @@ description: Execute D:doc-loop(IBM) workflows under laws and constitution. Use 
 ## Workflow
 1. Intake issue and align epic/story/milestone ownership.
 2. Produce or update brainstorm and mapping artifacts.
-3. Update pre-brainstorms candidates route/status as required.
-4. Sync milestone and issue mapping atomically.
-5. Validate with `skill:laws-enforcer`.
+3. In map stage, define `PRE_TEST` baseline (including integration acceptance criteria) before development starts.
+4. Update pre-brainstorms candidates route/status as required.
+5. Sync milestone and issue mapping atomically.
+6. Validate with `skill:laws-enforcer`.
 
 ## Done
 - Required doc-loop artifacts are complete and route/status are consistent.

@@ -70,7 +70,7 @@
 1. `feature/*` 来源为 `pre-develop`。
 2. `main/develop/pre-develop` 保持 add/commit 禁止。
 3. merge 方向符合宪法分支表。
-4. 从 `pre-develop` 提升到 `develop` 前，`PRE_TEST` 必需检查通过（允许“规范路径文件”或“等价可追溯证据”）。
+4. 从 `pre-develop` 提升到 `develop` 前，`TEST`（含集成测试验收）必需通过（允许“规范路径文件”或“等价可追溯证据”）。
 5. 从 `pre-develop` 提升到 `develop` 前，必需评审记录存在（`docs/reviews/` 或等价评审记录）。
 6. 从 `pre-develop` 提升到 `develop` 前，提升提交可从 `pre-develop` 到达（祖先可追溯）。
 7. 从 `pre-develop` 提升到 `develop` 前，进度/恢复文档已更新提升结果（或等价记录）。
@@ -78,6 +78,7 @@
 9. hotfix 合并到 `main/develop` 后，必须同步到 `pre-develop` 并留痕。
 10. stage tag 符合 `YYYY.MM.DD-HHMM-stage` 与分支映射。
 11. `alpha/beta` 不可 push。
+12. `PRE_TEST` 只作为开发前验收标准定义，不得作为合并/提升通过证据。
 
 执行技能：
 - `skill:branch-management`
@@ -89,6 +90,7 @@
 1. intake/brainstorm/map 产物完整（规范路径）或存在等价可追溯文档链路。
 2. candidates 的 route/status 一致。
 3. milestone 与 issue 映射同步（规范路径）或存在等价同步证据。
+4. map 阶段已给出开发前 `PRE_TEST`（含集成验收标准）基线。
 
 执行技能：
 - `skill:doc-loop-execution`
@@ -100,6 +102,8 @@
 1. 代码与测试产物存在。
 2. 进度/状态文档完成更新（规范路径）或存在等价可追溯记录。
 3. 验收与实现一致，无文档漂移。
+4. 开发中、review、test 阶段有持续补全测试用例并执行的证据。
+5. 合并/提升使用 `TEST` 结果验收，不以 `PRE_TEST` 代替。
 
 执行技能：
 - `skill:dev-loop-execution`

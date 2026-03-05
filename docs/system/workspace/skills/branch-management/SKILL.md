@@ -34,8 +34,10 @@ description: Manage full autonomous branch lifecycle for Freely-style developmen
 ## Route C: Regression + Promotion
 1. After queue completion, run semantic checklist:
    - `references/semantic-regression-checklist.md`
-2. If green, promote `pre-develop` to `develop` through allowed path.
-3. If any semantic mismatch appears, block promotion and return to reconcile flow.
+2. Run required `TEST` evidence check for promotion (including integration acceptance tests).
+3. Ensure `PRE_TEST` remains baseline-only and is not used as substitute for promotion test results.
+4. If all checks are green, promote `pre-develop` to `develop` through allowed path.
+5. If any semantic/test mismatch appears, block promotion and return to reconcile flow.
 
 ## Route D: Release and Tag Flow
 1. Follow stage naming from `references/release-tag-policy.md`:
