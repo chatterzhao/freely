@@ -1,101 +1,101 @@
-# Candidates Convergence (Phase-1)
+# 候选项收敛（阶段 1）
 
-Date: 2026-03-05
+日期：2026-03-05
 
-## Convergence Rule
-Each candidate is checked by reverse constraints before entering issue queue:
+## 收敛规则
+每个候选项在进入 issue 队列前需通过反向约束检查：
 
-1. Intent fit (`docs/PROJECT_INTENT.md`)
-2. Constitution/Laws fit (`docs/CONSTITUTION.md`, `docs/LAWS.md`)
-3. Flow fit to unified loop diagram (A1 -> A2 -> IBM/DDD -> A3)
-4. Implementation feasibility in current architecture/scope
-5. Value > Cost (if changing loop/flow logic)
+1. 意图适配（`docs/PROJECT_INTENT.md`）
+2. 宪法/法律适配（`docs/CONSTITUTION.md`、`docs/LAWS.md`）
+3. 流程适配统一循环图（A1 -> A2 -> IBM/DDD -> A3）
+4. 当前架构/范围内的实现可行性
+5. 价值 > 成本（若改变循环/流程逻辑）
 
-Only candidates passing all 5 checks become issue-ready.
+只有通过全部 5 项检查的候选项才能成为 issue-ready。
 
-## Issue-Ready (Enter Queue Now)
+## Issue-Ready（立即入队）
 
-### Batch P0-Core
-1. `C-20260304-601` Owner Loop Contract
-- route: A1/A2 -> doc-loop(IBM)
-- output target: loop contract + state transitions
-- dependency: none
+### 批次 P0-核心
+1. `C-20260304-601` Owner Loop 契约
+- 路由：A1/A2 -> doc-loop(IBM)
+- 输出目标：循环契约 + 状态转换
+- 依赖：无
 
-2. `C-20260304-602` Gate Contract
-- route: A1/A2 -> doc-loop(IBM)
-- output target: enforceable gate definitions
-- dependency: C-20260304-601
+2. `C-20260304-602` 门禁契约
+- 路由：A1/A2 -> doc-loop(IBM)
+- 输出目标：可执行的门禁定义
+- 依赖：C-20260304-601
 
-3. `C-20260304-603` Recovery Contract
-- route: A1/A2 -> doc-loop(IBM)
-- output target: resume/bridge protocol
-- dependency: C-20260304-601
+3. `C-20260304-603` 恢复契约
+- 路由：A1/A2 -> doc-loop(IBM)
+- 输出目标：续接/桥接协议
+- 依赖：C-20260304-601
 
-4. `C-20260304-604` Issue Discovery + Router Kernel
-- route: A1 -> A2 -> auto-loop(ADD)
-- output target: source scan + routing decision logic
-- dependency: C-20260304-601
+4. `C-20260304-604` Issue 发现 + 路由器内核
+- 路由：A1 -> A2 -> auto-loop(ADD)
+- 输出目标：来源扫描 + 路由决策逻辑
+- 依赖：C-20260304-601
 
-5. `C-20260304-607` Doc Contract Compiler
-- route: doc-loop(IBM) -> dev-loop(DDD)
-- output target: acceptance -> executable checks
-- dependency: C-20260304-602
+5. `C-20260304-607` 文档契约编译器
+- 路由：doc-loop(IBM) -> dev-loop(DDD)
+- 输出目标：验收标准 -> 可执行检查
+- 依赖：C-20260304-602
 
-6. `C-20260303-101` CLI Orchestration MVP
-- route: auto-loop(ADD) / dev-loop(DDD)
-- output target: command orchestration + retry/timeout/log
-- dependency: C-20260304-601
+6. `C-20260303-101` CLI 编排 MVP
+- 路由：auto-loop(ADD) / dev-loop(DDD)
+- 输出目标：命令编排 + 重试/超时/日志
+- 依赖：C-20260304-601
 
-7. `C-20260303-102` Integration-Test-First Gate
-- route: dev-loop(DDD)
-- output target: integration gate before promotion
-- dependency: C-20260304-602, C-20260304-607
+7. `C-20260303-102` 集成测试优先门禁
+- 路由：dev-loop(DDD)
+- 输出目标：提升前的集成门禁
+- 依赖：C-20260304-602, C-20260304-607
 
-8. `C-20260304-201` Backend API Contract v1
-- route: doc-loop(IBM)
-- output target: stable API for frontend decoupling
-- dependency: C-20260304-601, C-20260304-602
+8. `C-20260304-201` 后端 API 契约 v1
+- 路由：doc-loop(IBM)
+- 输出目标：前端解耦的稳定 API
+- 依赖：C-20260304-601, C-20260304-602
 
-### Batch P1-Next
-9. `C-20260304-203` Backend-first execution gate
-10. `C-20260303-003` Acceptance contract + self-contained checker
-11. `C-20260303-103` Session lifecycle (resume/compress/new session)
-12. `C-20260304-202` Multi-project UI isolation implementation
-13. `C-20260304-606` Promotion & Cleanup Enforcer
+### 批次 P1-后续
+9. `C-20260304-203` 后端优先执行门禁
+10. `C-20260303-003` 验收契约 + 自包含检查器
+11. `C-20260303-103` 会话生命周期（续接/压缩/新会话）
+12. `C-20260304-202` 多项目 UI 隔离实现
+13. `C-20260304-606` 提升与清理执行器
 
-## Needs Research (Keep in Candidate Pool)
-1. `C-20260303-002` Independent auditor gate
-- reason: needs minimal implementable boundary for current phase.
+## 需要研究（保留在候选池）
+1. `C-20260303-002` 独立审计门禁
+- 原因：当前阶段需要最小可实现边界。
 
-2. `C-20260304-501` Freely-on-OpenClaw profile
-- reason: external runtime assumption needs current-architecture re-check.
+2. `C-20260304-501` Freely-on-OpenClaw 配置
+- 原因：外部运行时假设需重新检查当前架构。
 
-3. `C-20260304-605` Sub-agent batch orchestrator
-- reason: concurrency boundary and rollout scope not converged.
+3. `C-20260304-605` 子代理批量编排器
+- 原因：并发边界和推广范围未收敛。
 
-## Dropped (Out of Current Architecture Scope)
-1. `C-20260304-301` EvoMap integration as P2 plugin
-2. `C-20260304-401` Acceptance-to-capability asset mapping
+## 已放弃（超出当前架构范围）
+1. `C-20260304-301` EvoMap 集成作为 P2 插件
+2. `C-20260304-401` 验收到能力资产映射
 
-## Next Action
-- Convert Batch P0-Core into executable issue specs first.
-- Keep all flow/contract changes behind value-proof checks.
+## 下一步行动
+- 先将批次 P0-核心转换为可执行 issue 规范。
+- 保持所有流程/契约变更在价值验证检查之后。
 
-## Delta (2026-03-05 Dogfooding + Governance)
+## 变更（2026-03-05 自举 + 治理）
 
-### Add to P0-Core
-- `C-20260305-701` Worktree Root Enforcer + Permission Preflight
-- `C-20260305-702` Hook Policy Template Compiler
-- `C-20260305-704` Freely Dogfooding Governance Contract
+### 新增到 P0-核心
+- `C-20260305-701` Worktree 根目录执行器 + 权限预检
+- `C-20260305-702` 钩子策略模板编译器
+- `C-20260305-704` Freely 自举治理契约
 
-### Add to P1-Next
-- `C-20260305-703` Governance UI for Hooks/Worktree Constraints
+### 新增到 P1-后续
+- `C-20260305-703` 钩子/Worktree 约束治理 UI
 
-## Delta (2026-03-05 Directory Unification)
+## 变更（2026-03-05 目录统一）
 
-### Add to P0-Core
+### 新增到 P0-核心
 - `C-20260305-801` 目录迁移契约（Doc-Loop Contract）
 - `C-20260305-802` 文档门禁对齐到新目录
 
-### Add to P1-Next
+### 新增到 P1-后续
 - `C-20260305-803` Deferred 资产选择性迁移执行器
