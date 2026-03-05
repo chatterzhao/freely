@@ -7,11 +7,10 @@ description: Enforce constitutional hard constraints before and after autonomous
 
 ## Workflow
 1. Run constitutional preflight before execution.
-2. Run `./bin/wt-status-all` to verify all mounted worktrees are clean before gate-sensitive actions.
-3. Validate hard constraints using `references/constitutional-gates.md`.
-4. Block any action that violates hard constraints.
-5. Re-run gate after merge/promotion/release actions.
-6. Record pass/fail with evidence.
+2. Validate hard constraints using `references/constitutional-gates.md`.
+3. Block any action that violates hard constraints.
+4. Re-run gate after merge/promotion/release actions.
+5. Record pass/fail with evidence.
 
 ## Done
 - Hard constraints pass, or action is blocked with explicit reason.

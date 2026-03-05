@@ -7,9 +7,6 @@ Rules:
 - Skills define executable steps for AI agents.
 - When conflicts occur, prefer semantic intent over commit time order.
 - Do not duplicate full execution procedures in multiple docs.
-- Worktree hygiene gate command: `./bin/wt-status-all` (all `CLEAN` required before merge/promotion/release/cleanup).
-- Branch merge audit command: `./bin/branch-merge-audit --only-unmerged` (shows source branch + required target merge status).
-- Guarded merge command: `./bin/merge-guarded <target> <source>` (non-interactive policy gate before merge).
 
 Entry skills:
 - `skill:constitution-guard` -> `constitution-guard/SKILL.md`

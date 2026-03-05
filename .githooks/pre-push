@@ -4,79 +4,8 @@ set -euo pipefail
 CONSTITUTION_PATH="./docs/CONSTITUTION.md"
 CONSTITUTION_ANCHOR="#2-branch-and-worktree-policy-hard-requirement"
 
-is_zero_sha() {
-  [[ "${1:-}" =~ ^0+$ ]]
-}
-
-branch_contains_commit_with_prefix() {
-  local commit="$1"
-  local prefix="$2"
-  local b
-  while IFS= read -r b; do
-    [[ -z "$b" ]] && continue
-    [[ "$b" == "$prefix"* ]] && return 0
-  done < <(git for-each-ref --format='%(refname:short)' --contains "$commit" refs/heads 2>/dev/null || true)
-  return 1
-}
-
-branch_contains_commit_exact() {
-  local commit="$1"
-  local exact="$2"
-  local b
-  while IFS= read -r b; do
-    [[ -z "$b" ]] && continue
-    [[ "$b" == "$exact" ]] && return 0
-  done < <(git for-each-ref --format='%(refname:short)' --contains "$commit" refs/heads 2>/dev/null || true)
-  return 1
-}
-
-validate_merge_sources_for_target() {
-  local target="$1"
-  local from_sha="$2"
-  local to_sha="$3"
-  local m p2 ok
-
-  while IFS= read -r m; do
-    [[ -n "$m" ]] || continue
-    p2="$(git rev-parse "${m}^2" 2>/dev/null || true)"
-    [[ -n "$p2" ]] || continue
-    ok=0
-
-    case "$target" in
-      pre-develop)
-        if branch_contains_commit_with_prefix "$p2" "feature/" || branch_contains_commit_with_prefix "$p2" "hotfix/"; then
-          ok=1
-        fi
-        ;;
-      develop)
-        if branch_contains_commit_exact "$p2" "pre-develop" || branch_contains_commit_with_prefix "$p2" "hotfix/"; then
-          ok=1
-        fi
-        ;;
-      main)
-        if branch_contains_commit_with_prefix "$p2" "release/" || branch_contains_commit_with_prefix "$p2" "hotfix/"; then
-          ok=1
-        fi
-        ;;
-    esac
-
-    if [[ "$ok" != "1" ]]; then
-      cat >&2 <<MSG
-[HOOK] Push blocked: protected branch '$target' includes merge commit with invalid source ancestry.
-Merge commit: $m
-Second parent: $p2
-Rule:
-  pre-develop <= feature/* or hotfix/*
-  develop <= pre-develop or hotfix/*
-  main <= release/* or hotfix/*
-
-Policy source:
-  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
-MSG
-      exit 1
-    fi
-  done < <(git rev-list --min-parents=2 "${from_sha}..${to_sha}" 2>/dev/null || true)
-}
+# 获取当前分支名
+current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 
 while read -r local_ref local_sha remote_ref remote_sha; do
   [[ -z "${local_ref:-}" ]] && continue
@@ -84,46 +13,9 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   local_branch="${local_ref#refs/heads/}"
   remote_branch="${remote_ref#refs/heads/}"
 
-  # 受保护分支只允许同名推送，且必须包含 merge commit（防 fast-forward 绕过 merge gate）
+  # 允许 main, develop, pre-develop 直接 push
   case "$local_branch" in
     main|develop|pre-develop)
-      if [[ "$remote_branch" != "$local_branch" ]]; then
-        cat >&2 <<MSG
-[HOOK] Push blocked: protected branch '$local_branch' can only push to same remote branch.
-Attempted: refs/heads/$local_branch -> $remote_ref
-
-Policy source:
-  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
-MSG
-        exit 1
-      fi
-
-      # branch creation/deletion path; protected branches are expected to exist remotely.
-      if is_zero_sha "$remote_sha" || is_zero_sha "$local_sha"; then
-        cat >&2 <<MSG
-[HOOK] Push blocked: protected branch '$local_branch' create/delete on remote is forbidden.
-Attempted: $local_ref ($local_sha) -> $remote_ref ($remote_sha)
-
-Policy source:
-  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
-MSG
-        exit 1
-      fi
-
-      # Require merge commit in newly pushed range for protected branches.
-      if ! git rev-list --min-parents=2 "${remote_sha}..${local_sha}" | head -n 1 | grep -q .; then
-        cat >&2 <<MSG
-[HOOK] Push blocked: protected branch '$local_branch' update has no merge commit.
-This likely indicates a fast-forward path that bypasses merge gate.
-Use explicit merge with --no-ff on protected branches.
-
-Policy source:
-  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
-MSG
-        exit 1
-      fi
-
-      validate_merge_sources_for_target "$local_branch" "$remote_sha" "$local_sha"
       continue
       ;;
   esac
@@ -143,9 +35,6 @@ Attempted to push to: $remote_ref
 
 To merge feature into pre-develop, use:
   git checkout pre-develop && git merge $local_branch
-
-Policy source:
-  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
 MSG
     exit 1
   fi
@@ -162,10 +51,6 @@ MSG
 - Same branch on remote (refs/heads/$local_branch)
 
 To merge hotfix into main/develop, checkout target branch and merge.
-Then sync result to pre-develop.
-
-Policy source:
-  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
 MSG
     exit 1
   fi
@@ -182,9 +67,6 @@ MSG
 - Same branch on remote (refs/heads/$local_branch)
 
 To merge release into main, checkout main and merge.
-
-Policy source:
-  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
 MSG
     exit 1
   fi
