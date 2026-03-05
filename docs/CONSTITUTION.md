@@ -45,7 +45,7 @@ Freely 是一个自主循环运行器：
 - 所有非 `main`/`develop` 的开发分支都使用 `git worktree`。
 - 工作树根目录固定：`<project_parent>/<project_name>-worktrees/`。
 - 工作树目录命名必须为 `{project-name}-worktrees`，且与项目根目录同级，保证排序和定位时与项目紧邻。
-- 默认不允许将 worktree 放在项目目录内部；仅在无法满足外部目录权限时可临时降级，并必须在进度/恢复文档记录原因与回切计划。
+- 禁止在项目目录内部创建工作树目录（必须与项目目录并列）。
 - 在主工作树检出分支时，钩子应在固定根目录下自动创建缺失的工作树。
 - 操作命令约定：
   - 进入/切换分支工作树：`source ./bin/wt-enter <branch>`

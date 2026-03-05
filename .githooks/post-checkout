@@ -17,6 +17,9 @@ source ./bin/worktree-common.sh
 branch="$(freely_wt_current_branch)"
 [[ -n "$branch" ]] || exit 0
 
+freely_wt_assert_strict_root || exit 1
+freely_wt_assert_existing_in_strict_root "$branch" || exit 1
+
 case "$branch" in
   main|develop)
     exit 0
