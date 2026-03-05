@@ -82,6 +82,7 @@
 13. 执行 merge/promotion/release/cleanup 前，必须执行 `./bin/wt-status-all` 且结果全为 `CLEAN`。
 14. 执行 merge train 前，必须执行 `./bin/branch-merge-audit --only-unmerged`，输出需可见来源分支与目标分支合并状态。
 15. `main/develop/pre-develop` 的推送增量必须包含 merge commit；不允许 fast-forward 方式绕过 merge 门禁。
+16. 受治理分支合并必须通过 `./bin/merge-guarded <target> <source>` 执行，禁止直接 `git merge` 绕过策略检查。
 
 执行技能：
 - `skill:branch-management`

@@ -66,6 +66,7 @@ Freely 是一个自主循环运行器：
   - 带工作树检查执行 add：`source ./bin/wt-add <branch> -- <git-add-args>`
   - 全量工作树洁净检查：`./bin/wt-status-all`
   - 分支合并审计（含来源分支与目标合并状态）：`./bin/branch-merge-audit --only-unmerged`
+  - 受治理合并执行器（非交互门禁）：`./bin/merge-guarded <target> <source>`
 - 没有明确的 STORY/任务所有者和退出标准时不得创建工作树。
 - 已合并/已放弃的工作树必须与其分支引用一起清理。
 - 完成清理是强制性的：

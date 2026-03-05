@@ -8,6 +8,76 @@ is_zero_sha() {
   [[ "${1:-}" =~ ^0+$ ]]
 }
 
+branch_contains_commit_with_prefix() {
+  local commit="$1"
+  local prefix="$2"
+  local b
+  while IFS= read -r b; do
+    [[ -z "$b" ]] && continue
+    [[ "$b" == "$prefix"* ]] && return 0
+  done < <(git for-each-ref --format='%(refname:short)' --contains "$commit" refs/heads 2>/dev/null || true)
+  return 1
+}
+
+branch_contains_commit_exact() {
+  local commit="$1"
+  local exact="$2"
+  local b
+  while IFS= read -r b; do
+    [[ -z "$b" ]] && continue
+    [[ "$b" == "$exact" ]] && return 0
+  done < <(git for-each-ref --format='%(refname:short)' --contains "$commit" refs/heads 2>/dev/null || true)
+  return 1
+}
+
+validate_merge_sources_for_target() {
+  local target="$1"
+  local from_sha="$2"
+  local to_sha="$3"
+  local m p2 ok
+
+  while IFS= read -r m; do
+    [[ -n "$m" ]] || continue
+    p2="$(git rev-parse "${m}^2" 2>/dev/null || true)"
+    [[ -n "$p2" ]] || continue
+    ok=0
+
+    case "$target" in
+      pre-develop)
+        if branch_contains_commit_with_prefix "$p2" "feature/" || branch_contains_commit_with_prefix "$p2" "hotfix/"; then
+          ok=1
+        fi
+        ;;
+      develop)
+        if branch_contains_commit_exact "$p2" "pre-develop" || branch_contains_commit_with_prefix "$p2" "hotfix/"; then
+          ok=1
+        fi
+        ;;
+      main)
+        if branch_contains_commit_with_prefix "$p2" "release/" || branch_contains_commit_with_prefix "$p2" "hotfix/"; then
+          ok=1
+        fi
+        ;;
+    esac
+
+    if [[ "$ok" != "1" ]]; then
+      cat >&2 <<MSG
+[HOOK] Push blocked: protected branch '$target' includes merge commit with invalid source ancestry.
+Merge commit: $m
+Second parent: $p2
+Rule:
+  pre-develop <= feature/* or hotfix/*
+  develop <= pre-develop or hotfix/*
+  main <= release/* or hotfix/*
+
+Policy source:
+  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
+MSG
+      exit 1
+    fi
+  done < <(git rev-list --min-parents=2 "${from_sha}..${to_sha}" 2>/dev/null || true)
+}
+
 while read -r local_ref local_sha remote_ref remote_sha; do
   [[ -z "${local_ref:-}" ]] && continue
 
@@ -52,6 +122,8 @@ Policy source:
 MSG
         exit 1
       fi
+
+      validate_merge_sources_for_target "$local_branch" "$remote_sha" "$local_sha"
       continue
       ;;
   esac
