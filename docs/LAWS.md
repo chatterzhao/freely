@@ -16,7 +16,7 @@
 执行规则：
 
 1. 新讨论与新决策写入 `docs/pre-brainstorms/<id>/`（核心文件：`brainstorms.md`、`candidates.md`）。
-2. 历史执行态文档统一暂存到 `docs/research/deferred/`，不作为当前主流程入口。
+2. 历史执行态文档已归档并移出工作区（见 `docs/research/ARCHIVE.md`），不作为当前主流程入口。
 3. 在“意图-法律-宪法”三件套达成一致前，不恢复旧目录模型扩展。
 4. 重构完成后，再从 `deferred/` 选择性迁移到新模型。
 

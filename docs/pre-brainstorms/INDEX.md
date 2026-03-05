@@ -27,6 +27,9 @@ This directory is the canonical structure for pre-brainstorm records.
 - 20260305-freely-dogfooding-governance-worktree-policy
   - brainstorms: docs/pre-brainstorms/20260305-freely-dogfooding-governance-worktree-policy/brainstorms.md
   - candidates: docs/pre-brainstorms/20260305-freely-dogfooding-governance-worktree-policy/candidates.md
+- 20260305-doc-loop-dev-loop-directory-unification
+  - brainstorms: docs/pre-brainstorms/20260305-doc-loop-dev-loop-directory-unification/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-doc-loop-dev-loop-directory-unification/candidates.md
 
 ## Convergence
 - Summary: docs/pre-brainstorms/CONVERGENCE.md

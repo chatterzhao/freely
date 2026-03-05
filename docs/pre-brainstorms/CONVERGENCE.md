@@ -90,3 +90,12 @@ Only candidates passing all 5 checks become issue-ready.
 
 ### Add to P1-Next
 - `C-20260305-703` Governance UI for Hooks/Worktree Constraints
+
+## Delta (2026-03-05 Directory Unification)
+
+### Add to P0-Core
+- `C-20260305-801` 目录迁移契约（Doc-Loop Contract）
+- `C-20260305-802` 文档门禁对齐到新目录
+
+### Add to P1-Next
+- `C-20260305-803` Deferred 资产选择性迁移执行器

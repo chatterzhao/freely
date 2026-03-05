@@ -125,7 +125,7 @@ Freely 是一个自主循环运行器：
 
 Freely 仓库在“研究优先阶段”有临时覆盖约束：
 - `docs/` 仅保留 `PROJECT_INTENT.md`、`LAWS.md`、`CONSTITUTION.md` 与 `research/`。
-- 其余文档资产进入 `docs/research/deferred/`，待三件套讨论收敛后重构迁移。
+- 历史文档资产已归档并从工作区移除（见 `docs/research/ARCHIVE.md`），不再作为活跃流程入口。
 
 如果项目使用 monorepo 或不同布局，必须在文档中提供等效映射。
 
