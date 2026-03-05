@@ -14,9 +14,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: 是本轮“统一设计理念”落地入口。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260305-802
 - title: 文档门禁对齐到新目录
@@ -26,9 +26,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: 直接影响可执行性与稳定性。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260305-803
 - title: Deferred 资产选择性迁移执行器
@@ -38,6 +38,6 @@
 - priority: P1
 - status: needs_research
 - decision_reason: 旧目录已清理，后续迁移策略改为按需重建。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []

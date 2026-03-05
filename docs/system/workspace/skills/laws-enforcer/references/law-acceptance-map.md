@@ -1,6 +1,6 @@
 # 法律验收映射
 
-- Doc-loop：issue/brainstorm/map 产物、`PRE_TEST` 基线定义（包括集成验收意图）、里程碑同步。
+- Doc-loop：issue/brainstorm/map 产物、`PRE_TEST` 基线定义（包括集成验收意图）、里程碑同步；若触发治理维护，还需提供 Constitution/Laws/Skills 一致性修复证据。
 - Dev-loop：实现、开发/评审/测试期间的测试用例扩展、已执行的 `TEST` 证据（包括集成验收）、文档更新、进度记录。
 - 提升规则：`PRE_TEST` 仅作基线；提升/合并门禁必须使用已执行的 `TEST` 结果。
 - 代码-文档不匹配规则：代码/测试修正路径优先；规范文档更新需要专用 feature/worktree 和关联实现证据。

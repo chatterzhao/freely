@@ -91,10 +91,10 @@ Freely 应优先产出的是“Owner 内核”，不是“外部能力市场适�
 ### 4.1 必须先落地的 8 个内核能力（P0）
 
 1. **Issue Discovery Engine**
-- 从意图、进度、review、test、chat-todo、GitHub issue 汇聚候选 Issue。
+- 从意图、进度、review、test、chat 输入/会话证据、GitHub issue 汇聚候选 Issue。
 
 2. **Issue Router**
-- 按宪法规则路由到 `doc-loop(IBM)` 或 `dev-loop(DDD)`。
+- 按宪法规则路由到 `doc-loop(IBM+G)` 或 `dev-loop(DDD)`。
 
 3. **Governance Gate Engine**
 - 分支/工作树规则、PRE_TEST、review 记录、可追溯性检查自动门禁。
@@ -155,7 +155,7 @@ Freely 应优先产出的是“Owner 内核”，不是“外部能力市场适�
 ### 7.2 三个 loop 的职责边界（当前共识）
 
 1. `A:auto-loop(ADD)`：发现、路由、调度、恢复触发。
-2. `D:doc-loop(IBM)`：文档结构化产出与约束沉淀（issue/prd/pre-tests/tasks/里程碑/进度）。
+2. `D:doc-loop(IBM+G)`：文档结构化产出与约束沉淀（issue/prd/pre-tests/tasks/里程碑/进度 + 治理一致性修复）。
 3. `D:dev-loop(DDD)`：读取文档约束执行开发并回传结果，不负责定义文档写法。
 
 ### 7.3 D:dev-loop(DDD) 的最小执行骨架（工作草案）
