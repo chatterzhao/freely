@@ -1,6 +1,6 @@
-# Pre-Brainstorms 工作区
+# 预头脑风暴工作区
 
-Pre-brainstorm 记录的规范结构：
+预头脑风暴记录的规范结构：
 
 ```text
 docs/pre-brainstorms/
