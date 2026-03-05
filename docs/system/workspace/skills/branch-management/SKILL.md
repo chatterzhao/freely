@@ -54,13 +54,15 @@ description: 管理 Freely 风格开发的完整自主分支生命周期。当 A
    - `develop` -> `nightly`（推送标签）
    - `main` -> `stable`（推送标签）
    - `hotfix/*` -> `hotfix`（推送标签）
-4. 发布分支路径：
+4. 发布分支路径（必须在 `release/*` 对应 worktree 中执行）：
    - 从 `develop` 创建 `release/*`
-   - 合并到 `main`
-   - 回合并到 `develop`
-5. 热修复分支路径：
+   - 通过 `source ./bin/wt-enter release/<topic>` 进入该分支 worktree
+   - 在该 worktree 中完成发布冻结与验证后，合并到 `main`
+   - 将发布结果回合并到 `develop`
+5. 热修复分支路径（必须在 `hotfix/*` 对应 worktree 中执行）：
    - 从 `main` 创建 `hotfix/*`
-   - 合并到 `main` 和 `develop`
+   - 通过 `source ./bin/wt-enter hotfix/<topic>` 进入该分支 worktree
+   - 在该 worktree 中完成修复后，合并到 `main` 和 `develop`
    - 同步热修复结果到 `pre-develop`
 6. 如任何必需验证为红色，阻止推送标签/发布。
 
