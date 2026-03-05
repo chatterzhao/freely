@@ -21,7 +21,7 @@ freely_wt_assert_strict_root || exit 1
 freely_wt_assert_existing_in_strict_root "$branch" || exit 1
 
 case "$branch" in
-  main|develop)
+  main|develop|pre-develop)
     exit 0
     ;;
 esac
