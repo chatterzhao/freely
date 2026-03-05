@@ -138,6 +138,85 @@
 执行技能：
 - `skill:config-backup-guard`
 
+### 3.9 产品身份与自治闭环门
+
+通过条件：
+1. 执行链保持“获取 Issue -> 文档 -> 开发 -> 验收 -> 获取 Issue”闭环。
+2. 需求来源覆盖宪法定义输入面，不退化为单一固定待办列表。
+3. 在无明确停止条件时维持自治循环与续接策略。
+
+执行技能：
+- `skill:auto-loop-orchestrator`
+- `skill:laws-enforcer`
+
+### 3.10 技术栈与基线结构门
+
+通过条件：
+1. 强制技术栈未被擅自替换（Tauri/Rust/React/Bun/xterm.js/Rust PTY）。
+2. 项目基线结构满足宪法最低要求。
+3. 研究阶段目录约束与当前阶段规则一致。
+
+执行技能：
+- `skill:constitution-guard`
+- `skill:laws-enforcer`
+
+### 3.11 终端架构与会话隔离门
+
+通过条件：
+1. 终端通过 PTY 执行真实 shell，而非伪执行。
+2. 循环实例保持独立会话/PID/状态隔离。
+3. 监控与恢复目标对齐到 AI CLI 会话生命周期。
+
+执行技能：
+- `skill:constitution-guard`
+- `skill:recovery-subagent-governance`
+
+### 3.12 AI 执行模式与输入约束门
+
+通过条件：
+1. AI 规格符合 `tool:model:mode`，模式含义不被破坏。
+2. 仅使用宪法允许的主要输入面（路径/意图/宪法/AI规格）。
+3. 其他上下文通过项目文件发现，不走隐式注入。
+
+执行技能：
+- `skill:constitution-guard`
+- `skill:laws-enforcer`
+
+### 3.13 工程纪律门
+
+通过条件：
+1. 命令面保持可脚本化、确定性、可检查。
+2. 状态保持显式可落盘验证。
+3. 项目根 `AGENTS.md` 保持存在并可用。
+
+执行技能：
+- `skill:laws-enforcer`
+- `skill:dev-loop-execution`
+
+### 3.14 子代理与并行领域门
+
+通过条件：
+1. 子代理委托有明确边界、完成标准、合并标准。
+2. 并行开发遵守物理领域（worktree）与逻辑领域（所有权）约束。
+3. 共享热点有串行窗口或显式排序策略。
+
+执行技能：
+- `skill:recovery-subagent-governance`
+- `skill:laws-enforcer`
+
+### 3.15 Freely 自举一致性门
+
+通过条件：
+1. Freely 自身开发不绕开宪法/法律/意图治理链。
+2. 架构治理调整先进入 pre-brainstorms 再进入 doc/dev 落地。
+3. 工具链同构（分支/worktree/hook/门禁）可复用到用户项目。
+4. 外部权限问题提供预检与可执行修复路径。
+
+执行技能：
+- `skill:constitution-guard`
+- `skill:branch-management`
+- `skill:laws-enforcer`
+
 ---
 
 ## 4. 清理与退役
