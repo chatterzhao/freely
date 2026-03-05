@@ -1,4 +1,4 @@
-# Pre-Brainstorms 索引
+# 预头脑风暴索引
 
 本目录是 pre-brainstorm 记录的规范结构。
 
