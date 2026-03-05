@@ -72,7 +72,7 @@ flowchart TD
     G2{"develop 提升门\nTEST + review + progress/recovery通过?"}
     F1["修复路径\n返回 dev-loop 或补 doc-loop"]
     R0{"是否触发 release/hotfix?"}
-    R1["release/hotfix 流程\n(tag/release/hotfix sync)"]
+    R1["release/hotfix 流程\n(tag/release + hotfix sync to pre-develop)"]
 
     A3["A3 回流\n更新状态并进入下一轮发现"]
     X1["AI CLI 终止态\ncompleted / crash / blocked"]
