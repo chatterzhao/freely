@@ -115,10 +115,14 @@ Freely 是一个自主工程循环系统：
 每个托管项目应至少保持以下基线结构：
 
 - `README.md`（项目入口和运行手册）
-- `docs/`（治理 + BMAD + 进度/恢复/评审）
+- `docs/`（治理 + research）
 - `src/`（主要实现代码）
 - `.env/`（环境模板/脚本/配置片段，版本化）
 - `.env.example`（必需的环境变量模板，不含密钥）
+
+Freely 仓库在“研究优先阶段”有临时覆盖约束：
+- `docs/` 仅保留 `PROJECT_INTENT.md`、`LAWS.md`、`CONSTITUTION.md` 与 `research/`。
+- 其余文档资产进入 `docs/research/deferred/`，待三件套讨论收敛后重构迁移。
 
 如果项目使用 monorepo 或不同布局，必须在文档中提供等效映射。
 
@@ -180,18 +184,42 @@ Freely 只接受这些主要输入：
 
 Freely 遵循三层循环方法论。
 
-### 11.1 三层循环结构
+### 11.1 三层循环结构（统一循环图 + 产出物）
 
-```
-A:auto-loop（外循环）
+```text
+A:auto-loop(ADD) [外循环]
 │
-├── 发现 Issue
-├── 路由到内循环
-│   ├── D:doc-loop(IBM)（内循环-文档）
-│   └── D:dev-loop(DDD)（内循环-开发）
-├── 完成 → 发现下一个 Issue
+├── A1 发现问题（持续）
+│   ├── 新问题源：intent/review/test/chat/github-issue -> pre-brainstorms
+│   ├── 候选源：pre-brainstorms/candidates
+│   └── 执行源：milestones/progress(未完成)
+│   产出：
+│   - docs/pre-brainstorms/<id>/brainstorms.md
+│   - docs/pre-brainstorms/<id>/candidates.md
 │
-└── 循环，除非明确停止
+├── A2 分流决策
+│   ├── raw problem / candidate -> D:doc-loop(IBM)
+│   └── ready issue / in-progress -> D:dev-loop(DDD)
+│   产出：
+│   - 更新 docs/pre-brainstorms/<id>/candidates.md 的 route/status
+│
+├── D:doc-loop(IBM) [I -> B -> M]
+│   产出（重构目标目录）：
+│   - docs/epics/{epic}/{story}/issues/{issue}.md
+│   - docs/epics/{epic}/{story}/prd.md
+│   - docs/epics/{epic}/{story}/pre-tests.md
+│   - docs/epics/{epic}/{story}/tasks.md
+│   - docs/milestones.md  (与 issue 原子同步写入：新增/调整归属)
+│
+├── D:dev-loop(DDD) [Doc-Read -> Dev-Do -> Doc-Update]
+│   产出：
+│   - src/** , tests/**
+│   - docs/progress/{epic}/p-{issue}.md
+│   - docs/milestones.md  (状态更新)
+│   - docs/epics/{epic}/{story}/issues/{issue}.md  (状态更新)
+│
+└── A3 回流
+    └── 返回 A1，继续发现与完成
 ```
 
 ### 11.2 核心原则
@@ -205,7 +233,7 @@ A:auto-loop（外循环）
 详细规则见 [`docs/LAWS.md`](./LAWS.md)：
 - [D:doc-loop(IBM) 文档循环方法论](./LAWS.md#11-ddoc-loopibm-文档循环方法论)
 - [D:dev-loop(DDD) 开发循环方法论](./LAWS.md#12-ddev-loopddd-开发循环方法论)
-- [A:auto-loop(agent-cli) 自主循环方法论](./LAWS.md#13-aauto-loopagent-cli-自主循环方法论)
+- [A:auto-loop(ADD) 自主循环方法论](./LAWS.md#13-aauto-loopadd-自主循环方法论)
 
 ## 12. 子代理规划与委托（硬性要求）
 
