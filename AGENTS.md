@@ -5,8 +5,14 @@
 - 项目意图：docs/PROJECT_INTENT.md
 - 法律：docs/LAWS.md
 
----
+## Dogfooding 约束（Freely 开发 Freely）
 
+- Freely 自身开发必须遵守 Freely 的宪法、法律、项目意图，不设项目例外。
+- 架构/治理类改动先进入 `docs/pre-brainstorms/<id>/brainstorms.md + candidates.md`，再进入执行。
+- worktree 策略使用项目外同级目录 `{project-name}-worktrees`，并优先通过预检避免重复提权。
+- 对用户可见的 hooks/约束能力应模板化、可视化、可审计，不以临时脚本堆叠替代。
+
+---
 ## 项目概述
 
 Freely 是一个自主工程循环系统，AI 担任项目所有者角色，自主管理需求发现、头脑风暴、EPIC/STORY 规划、开发和验证。

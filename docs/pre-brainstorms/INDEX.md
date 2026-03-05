@@ -24,6 +24,9 @@ This directory is the canonical structure for pre-brainstorm records.
 - 20260304-research-redo-owner-tool-alignment
   - brainstorms: docs/pre-brainstorms/20260304-research-redo-owner-tool-alignment/brainstorms.md
   - candidates: docs/pre-brainstorms/20260304-research-redo-owner-tool-alignment/candidates.md
+- 20260305-freely-dogfooding-governance-worktree-policy
+  - brainstorms: docs/pre-brainstorms/20260305-freely-dogfooding-governance-worktree-policy/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-freely-dogfooding-governance-worktree-policy/candidates.md
 
 ## Convergence
 - Summary: docs/pre-brainstorms/CONVERGENCE.md
