@@ -21,10 +21,8 @@
 4. 重构完成后，按 issue 驱动在新目录模型中重建必要资产。
 5. AI 自治执行流程以 `docs/system/workspace/skills/` 为执行事实源；本法律定义规则和验收，具体步骤由对应 skill 负责。
 6. 分支治理执行默认调用：
-   - `skill:branch-merge-train`
-   - `skill:premerge-reconcile`
-   - `skill:post-merge-regression`
-   - `skill:promote-predevelop-to-develop`
+   - `skill:branch-management`（主流程）
+   - `skill:premerge-reconcile`（复杂冲突异常流）
 
 ---
 

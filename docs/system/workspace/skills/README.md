@@ -8,8 +8,10 @@ Rules:
 - When conflicts occur, prefer semantic intent over commit time order.
 - Do not duplicate full execution procedures in multiple docs.
 
-Available skills:
-- `skill:branch-merge-train` -> `branch-merge-train/SKILL.md`
+Entry skills:
+- `skill:branch-management` -> `branch-management/SKILL.md`
 - `skill:premerge-reconcile` -> `premerge-reconcile/SKILL.md`
-- `skill:post-merge-regression` -> `post-merge-regression/SKILL.md`
-- `skill:promote-predevelop-to-develop` -> `promote-predevelop-to-develop/SKILL.md`
+
+Design:
+- Keep one main branch-governance skill (`branch-management`) for normal flow.
+- Keep one exception skill (`premerge-reconcile`) for high-conflict recovery.

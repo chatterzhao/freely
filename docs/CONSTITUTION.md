@@ -83,10 +83,8 @@ Freely 是一个自主循环运行器：
 - 钩子拒绝消息必须指向本宪法章节作为策略来源。
 - AI 自治执行步骤以 `docs/system/workspace/skills/` 为执行事实源（How）；本宪法只定义约束与边界（What/Why）。
 - 分支治理相关默认技能映射：
-  - 串行并入：`skill:branch-merge-train`
-  - 复杂冲突收敛：`skill:premerge-reconcile`
-  - 合并后回退检查：`skill:post-merge-regression`
-  - 提升到 develop：`skill:promote-predevelop-to-develop`
+  - 主流程（串行并入、即时测试、回退检查、提升）：`skill:branch-management`
+  - 异常流程（复杂冲突收敛）：`skill:premerge-reconcile`
 - **分支规则表**：
 
 | 分支 | push | add/commit | merge 来源 | merge 到 | 备注 |
