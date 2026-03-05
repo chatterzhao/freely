@@ -47,17 +47,6 @@ freely_wt_assert_strict_root() {
   root="$(freely_wt_root_dir)"
   primary="$(freely_wt_primary_worktree)"
   case "$root" in
-    /tmp|/tmp/*)
-      cat <<MSG >&2
-[HOOK] Worktree root invalid: '$root'
-Rules:
-- worktree root must be sibling to project: <project_parent>/<project_name>-worktrees
-- temp paths (/tmp) are forbidden
-MSG
-      return 1
-      ;;
-  esac
-  case "$root" in
     "$primary"|"$primary"/*)
       cat <<MSG >&2
 [HOOK] Worktree root invalid: '$root'
@@ -104,7 +93,6 @@ freely_wt_assert_existing_in_strict_root() {
   $existing
 Rules:
 - use sibling root only: <project_parent>/<project_name>-worktrees
-- temp paths and other fallback locations are forbidden
 MSG
   return 1
 }
