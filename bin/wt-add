@@ -66,3 +66,17 @@ fi
 
 git add "$@"
 echo "git add done on branch '$branch' at $(pwd -P)"
+staged_count="$(git diff --cached --name-only | sed '/^$/d' | wc -l | tr -d ' ')"
+echo "[WARN] Semantic atomicity self-check: this commit should represent exactly one logical change and one rollback unit (staged files: ${staged_count})."
+
+used_all=0
+for arg in "$@"; do
+  if [[ "$arg" == "-A" || "$arg" == "--all" ]]; then
+    used_all=1
+    break
+  fi
+done
+
+if [[ "$used_all" == "1" ]]; then
+  echo "[WARN] '-A/--all' used: re-check for mixed concerns before commit; split if needed."
+fi
