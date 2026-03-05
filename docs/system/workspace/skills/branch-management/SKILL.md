@@ -1,26 +1,53 @@
 ---
 name: branch-management
-description: Manage autonomous branch flow for Freely-style development. Use when AI needs to integrate multiple feature branches into pre-develop, run merge-train with immediate tests, perform semantic regression checks, and promote pre-develop to develop after gates pass.
+description: Manage full autonomous branch lifecycle for Freely-style development. Use when AI needs to create feature branches from pre-develop, enter worktrees, perform add/commit in correct place, run merge-train into pre-develop with immediate tests, execute semantic regression checks, promote to develop, and clean up branches/worktrees after verification.
 ---
 
 # skill:branch-management
 
-## Workflow
+## Route A: Feature Development
+1. Create feature branch from `pre-develop`:
+   - `git branch feature/<topic> pre-develop`
+2. Enter branch worktree (auto-create + cd):
+   - `source ./bin/wt-enter feature/<topic>`
+3. Do changes in this worktree only.
+4. Stage and commit in feature worktree:
+   - `source ./bin/wt-add feature/<topic> -- <paths or -A>`
+   - `git commit -m "<type>: <summary>"`
+5. Run branch-local tests before integration.
+
+## Route B: Merge Train to pre-develop
 1. Work only from the `pre-develop` worktree for integration.
 2. Collect candidates with `git branch --no-merged pre-develop`.
 3. Build merge queue by semantic dependency, never by commit time:
    - governance/policy changes
    - shared infra
    - product behavior changes
-4. Merge serially (`git merge --no-ff <branch>`), test immediately after each merge.
+4. Merge serially:
+   - `git merge --no-ff <branch>`
+   - run required smoke/regression checks immediately
 5. If conflict is complex or rollback risk appears, stop and switch to `skill:premerge-reconcile`.
-6. After queue completion, run semantic regression checklist in `references/semantic-regression-checklist.md`.
-7. If all gates pass, promote `pre-develop` to `develop` through allowed merge path.
+
+## Route C: Regression + Promotion
+1. After queue completion, run semantic checklist:
+   - `references/semantic-regression-checklist.md`
+2. If green, promote `pre-develop` to `develop` through allowed path.
+3. If any semantic mismatch appears, block promotion and return to reconcile flow.
+
+## Route D: Cleanup Policy
+1. Do not delete branch/worktree immediately after merge.
+2. Keep status progression:
+   - `active` -> `merged-pending-verify` -> `verified-retirable` -> `retired`
+3. Delete branch/worktree only after:
+   - merge complete
+   - tests and semantic regression green
+   - no pending rollback item
 
 ## Hard Rules
 - Never deliver feature branches directly to `develop`.
 - Keep governance intent stable: branch policy, worktree constraints, naming policy.
 - If semantic checks fail, do not promote; return to reconcile flow.
+- Never resolve conflicts by commit timestamp ordering.
 
 ## Done
 - No branch remains in `git branch --no-merged pre-develop`.
