@@ -80,3 +80,22 @@ Only candidates passing all 5 checks become issue-ready.
 ## Next Action
 - Convert Batch P0-Core into executable issue specs first.
 - Keep all flow/contract changes behind value-proof checks.
+
+## Delta (2026-03-05 Dogfooding + Governance)
+
+### Add to P0-Core
+- `C-20260305-701` Worktree Root Enforcer + Permission Preflight
+- `C-20260305-702` Hook Policy Template Compiler
+- `C-20260305-704` Freely Dogfooding Governance Contract
+
+### Add to P1-Next
+- `C-20260305-703` Governance UI for Hooks/Worktree Constraints
+
+## Delta (2026-03-05 Directory Unification)
+
+### Add to P0-Core
+- `C-20260305-801` 目录迁移契约（Doc-Loop Contract）
+- `C-20260305-802` 文档门禁对齐到新目录
+
+### Add to P1-Next
+- `C-20260305-803` Deferred 资产选择性迁移执行器

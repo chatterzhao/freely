@@ -44,6 +44,8 @@ Freely 是一个自主循环运行器：
 3. 工作树纪律：
 - 所有非 `main`/`develop` 的开发分支都使用 `git worktree`。
 - 工作树根目录固定：`<project_parent>/<project_name>-worktrees/`。
+- 工作树目录命名必须为 `{project-name}-worktrees`，且与项目根目录同级，保证排序和定位时与项目紧邻。
+- 默认不允许将 worktree 放在项目目录内部；仅在无法满足外部目录权限时可临时降级，并必须在进度/恢复文档记录原因与回切计划。
 - 在主工作树检出分支时，钩子应在固定根目录下自动创建缺失的工作树。
 - 操作命令约定：
   - 进入/切换分支工作树：`source ./bin/wt-enter <branch>`
@@ -116,14 +118,14 @@ Freely 是一个自主循环运行器：
 每个托管项目应至少保持以下基线结构：
 
 - `README.md`（项目入口和运行手册）
-- `docs/`（治理 + research）
+- `docs/`（治理 + pre-brainstorms）
 - `src/`（主要实现代码）
 - `.env/`（环境模板/脚本/配置片段，版本化）
 - `.env.example`（必需的环境变量模板，不含密钥）
 
 Freely 仓库在“研究优先阶段”有临时覆盖约束：
-- `docs/` 仅保留 `PROJECT_INTENT.md`、`LAWS.md`、`CONSTITUTION.md` 与 `research/`。
-- 其余文档资产进入 `docs/research/deferred/`，待三件套讨论收敛后重构迁移。
+- `docs/` 仅保留 `PROJECT_INTENT.md`、`LAWS.md`、`CONSTITUTION.md` 与 `pre-brainstorms/`。
+- 历史文档资产不在工作区保留，统一通过 git 历史追溯。
 
 如果项目使用 monorepo 或不同布局，必须在文档中提供等效映射。
 
@@ -340,3 +342,19 @@ Freely 实现应支持并行的模块演进：在构建可替换模块时保持�
 3. 保留与可追溯性：
 - 备份位置和文件名必须对操作者可发现。
 - 当配置变更是 STORY 的一部分时，进度/评审记录应注明备份产物。
+
+## 15. Freely 自举开发（硬性要求）
+
+Freely 在开发 Freely 本身时必须执行“吃自己狗粮（dogfooding）”原则。
+
+1. 流程同构：
+- Freely 自身开发必须遵守本宪法、`docs/LAWS.md` 与 `docs/PROJECT_INTENT.md`，不得使用“项目例外”绕开治理流程。
+- 所有架构/治理调整应先进入 `docs/pre-brainstorms/<id>/` 形成候选，再进入 doc-loop/dev-loop 落地。
+
+2. 工具同构：
+- Freely 自身仓库必须使用与面向用户一致的分支、worktree、hook 与门禁策略。
+- 对“worktree 根目录、hooks、约束策略”的改动，必须以模板化/可复用方式实现，确保可下沉到用户项目初始化流程。
+
+3. 权限与可运维性：
+- 对外部目录权限问题，Freely 必须提供预检与修复路径（preflight + actionable guidance），而不是要求用户在每次执行中重复提权。
+- 当运行环境限制导致临时降级策略时，必须记录技术债与回切条件。
