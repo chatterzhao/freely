@@ -17,7 +17,7 @@ Freely 是一个自主工程循环系统：
 - `main` 仅用于发布，必须保持稳定。
 - `develop` 是夜间集成分支（仅限测试后集成）。
 - `pre-develop` 是强制性的测试集成分支，用于不稳定功能验证。
-- `feature/*` 分支从 `develop` 创建，先合并到 `pre-develop` 测试，验证后再提升到 `develop`。
+- `feature/*` 分支从 `pre-develop` 创建，先合并到 `pre-develop` 测试，验证后再提升到 `develop`。
 - `release/*` 分支从 `develop` 创建用于发布冻结，然后合并到 `main` 并回合并到 `develop`。
 - `hotfix/*` 分支从 `main` 创建，然后合并到 `main` 和 `develop`。
 
@@ -75,7 +75,7 @@ Freely 是一个自主工程循环系统：
 | main | ✅ | ❌ | release/* | - | hotfix 可 `FREELY_ALLOW_MERGE=1` 绕过 |
 | develop | ✅ | ❌ | pre-develop | - | hotfix 可 `FREELY_ALLOW_MERGE=1` 绕过 |
 | pre-develop | ✅ | ❌ | feature/* | develop | 不允许绕过 |
-| feature/* | ✅ 同名 | ✅ worktree | - | pre-develop | 必须在 worktree 中开发 |
+| feature/* | ✅ 同名 | ✅ worktree | - | pre-develop | 从 pre-develop 创建，必须在 worktree 中开发 |
 | release/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 develop 创建 |
 | hotfix/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 main 创建 |
 
