@@ -1,6 +1,6 @@
 # Freely 宪法
 
-> 我是项目宪法，硬性约束，定义不可逾越的边界。
+> 我是项目宪法，只负责定义不可逾越的边界与原则（What/Why）；不定义执行步骤（How）与验收口径（Check/Accept）。
 
 ## 1. 产品身份
 
@@ -34,18 +34,13 @@ Freely 是一个自主循环运行器：
 - 功能交付禁止直接合并/推送到 `develop`；功能验证必须先进入 `pre-develop`。
 - `develop` 应只接收已测试/已提升的变更，保持可构建/可测试。
 - 从 `pre-develop` 提升到 `develop` 必须保留祖先可追溯性（提升的功能提交必须在合并到 `develop` 前可从 `pre-develop` 到达）。
-- 从 `pre-develop` 提升到 `develop` 的检查清单：
-  - 必需的 `TEST`（含集成测试验收）通过
-  - 执行 `./bin/wt-status-all` 且所有 worktree 为 `CLEAN`
-  - 必需的评审记录存在于 `docs/reviews/`
-  - 提升的提交可从 `pre-develop` 到达
-  - 进度/恢复文档已更新提升结果
-- `PRE_TEST` 的职责是开发前定义验收标准（先验约束），不得替代开发后/合并前的 `TEST` 结果。
+- 提升前的具体验收门与证据口径由 `docs/LAWS.md` 第 2 章定义。
+- `PRE_TEST` 与 `TEST` 的职责边界由 `docs/LAWS.md` 第 2 章与第 11 章定义。
 - 如果功能分支在无法从 `pre-develop` 到达的情况下合并到 `develop`，这是策略违规，必须在评审/进度中记录并采取补救措施。
 
 `premerge` 临时分支规则（用于复杂冲突收敛，不新增长期分支层级）：
 - 分支名固定使用：`feature/premerge-YYYYMMDD-HHMM--<topic>`。
-- 必须从 `pre-develop` 创建：`git branch feature/premerge-... pre-develop`。
+- 必须从 `pre-develop` 创建（具体命令步骤由 `skill:premerge-reconcile` 定义）。
 - 仅在以下场景使用：
   - 多个 `feature/*` 串行并入 `pre-develop` 时出现复杂冲突，且无法在单次 merge 中稳定解决。
   - 历史分支过旧，常规 merge 风险过高，需要通过 `cherry-pick` 方式回收有效提交。
@@ -60,10 +55,7 @@ Freely 是一个自主循环运行器：
 - 工作树目录命名必须为 `{project-name}-worktrees`，且与项目根目录同级，保证排序和定位时与项目紧邻。
 - 禁止在项目目录内部创建工作树目录（必须与项目目录并列）。
 - 在主工作树检出分支时，钩子应在固定根目录下自动创建缺失的工作树。
-- 操作命令约定：
-  - 进入/切换分支工作树：`source ./bin/wt-enter <branch>`
-  - 带工作树检查执行 add：`source ./bin/wt-add <branch> -- <git-add-args>`
-  - 全量工作树洁净检查：`./bin/wt-status-all`
+- 操作步骤与命令以 `docs/system/workspace/skills/` 为执行事实源（How）。
 - 没有明确的 STORY/任务所有者和退出标准时不得创建工作树。
 - 已合并/已放弃的工作树必须与其分支引用一起清理。
 - 完成清理是强制性的：
@@ -84,24 +76,13 @@ Freely 是一个自主循环运行器：
 5. 执行：
 - Git 钩子应在本地工作流中强制分支保护。
 - 钩子拒绝消息必须指向本宪法章节作为策略来源。
-- AI 自治执行步骤以 `docs/system/workspace/skills/` 为执行事实源（How）；本宪法只定义约束与边界（What/Why）。
-- 宪法约束执行默认技能映射：
-  - 宪法硬约束守卫：`skill:constitution-guard`
-  - 法律验收守卫：`skill:laws-enforcer`
-  - A:auto-loop 编排：`skill:auto-loop-orchestrator`
-  - D:doc-loop 执行：`skill:doc-loop-execution`
-  - D:dev-loop 执行：`skill:dev-loop-execution`
-  - 分支治理主流程：`skill:branch-management`
-  - 复杂冲突异常流：`skill:premerge-reconcile`
-  - 恢复与子代理治理：`skill:recovery-subagent-governance`
-  - 模块/接口版本治理：`skill:module-interface-governance`
-  - 配置变更备份守卫：`skill:config-backup-guard`
+- 执行步骤以 `docs/system/workspace/skills/` 为执行事实源（How）；技能路由与验收门以 `docs/LAWS.md` 为准。
 - **分支规则表**：
 
 | 分支 | push | add/commit | merge 来源 | merge 到 | 备注 |
 |------|------|------------|-----------|----------|------|
-| main | ✅ | ❌ | release/* | - | hotfix 可 `FREELY_ALLOW_MERGE=1` 绕过 |
-| develop | ✅ | ❌ | pre-develop | - | hotfix 可 `FREELY_ALLOW_MERGE=1` 绕过 |
+| main | ✅ | ❌ | release/*, hotfix/* | - | 发布/热修复入口 |
+| develop | ✅ | ❌ | pre-develop, hotfix/* | - | 集成入口 |
 | pre-develop | ✅ | ❌ | feature/* | develop | 不允许绕过 |
 | feature/* | ✅ 同名 | ✅ worktree | - | pre-develop | 从 pre-develop 创建，必须在 worktree 中开发 |
 | release/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 develop 创建 |
@@ -216,96 +197,20 @@ Freely 只接受这些主要输入：
 
 Freely 遵循三层循环方法论。
 
-### 11.1 三层循环结构（统一循环图 + 产出物）
+### 11.1 三层循环结构
 
 ```text
-A:auto-loop(ADD) [外循环]
-│
-├── A1 发现问题（持续）
-│   ├── 新问题源：intent/review/test/chat/github-issue -> pre-brainstorms
-│   ├── 候选源：pre-brainstorms/candidates
-│   └── 执行源：milestones/progress(未完成)
-│   产出：
-│   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/brainstorms.md
-│   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md
-│
-├── A2 分流决策
-│   ├── raw problem / candidate -> D:doc-loop(IBM)
-│   └── ready issue / in-progress -> D:dev-loop(DDD)
-│   产出：
-│   - 更新 docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md 的 route/status
-│
-├── D:doc-loop(IBM) [I -> B -> M]
-│   产出（重构目标目录）：
-│   - docs/epics/{epic}/{story}/issues/{issue-name}.md
-│   - docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md
-│   - docs/epics/{epic}/{story}/prd.md
-│   - docs/epics/{epic}/{story}/pre-tests.md
-│   - docs/epics/{epic}/{story}/tasks.md
-│   - docs/milestones.md  (与 issue 原子同步写入：新增/调整归属)
-│   说明：
-│   - `pre-tests.md` 只定义开发前验收标准（含集成验收口径），不作为合并门禁测试结果。
-│   - pre-brainstorms/** 用于候选与前置收敛；正式归属后进入 epics/{epic}/{story}/** 长期维护。
-│
-├── D:dev-loop(DDD) [Doc-Read -> Dev-Do -> Doc-Update]
-│   产出：
-│   - src/** , tests/**
-│   - docs/progress/{epic}/p-{issue}.md
-│   - docs/milestones.md  (状态更新)
-│   - docs/epics/{epic}/{story}/issues/{issue}.md  (状态更新)
-│   说明：
-│   - 在开发中、review、test 阶段持续补全测试用例并执行测试。
-│   - 提升/合并门禁看 `TEST` 结果，不看 `PRE_TEST` 代替。
-│
-└── A3 回流
-    └── 返回 A1，继续发现与完成
+A:auto-loop（外循环）
+├── 发现与路由 Issue
+├── D:doc-loop（文档内循环）
+├── D:dev-loop（开发内循环）
+└── 回流并进入下一轮
 ```
 
-### 11.1.A 补充图：路由委派与业务流转闭环（查漏版）
-
-```mermaid
-flowchart TD
-    S1["A1 发现问题源\n(intent/review/test/chat/github-issue)"]
-    S2["候选池\npre-brainstorms/*/candidates.md"]
-    S3{"A2 路由委派\nissue 是否就绪?"}
-
-    D1["D:doc-loop(IBM)\nI/B/M\n产出 issues/brainstorms/prd/pre-tests/tasks"]
-    V1["候选晋升门\n回填 promoted_issue_path\npre-brainstorms -> epics/<epic>/<story>"]
-    J1{"是否形成可开发 issue?"}
-
-    D2["D:dev-loop(DDD)\n实现/测试/review/文档回写"]
-    G1{"pre-develop 集成测试门\nTEST(含集成验收)通过?"}
-    G2{"develop 提升门\nTEST + review + progress/recovery通过?"}
-    F1["修复路径\n返回 dev-loop 或补 doc-loop"]
-    R0{"是否触发 release/hotfix?"}
-    R1["release/hotfix 流程\n(tag/release/hotfix sync)"]
-
-    A3["A3 回流\n更新状态并进入下一轮发现"]
-    X1["AI CLI 终止态\ncompleted / crash / blocked"]
-    RC["恢复分支\nresume 或 bridge checkpoint"]
-
-    S1 --> S2 --> S3
-    S3 -->|"否：需求不清/验收缺失"| D1
-    S3 -->|"是：ready/in-progress"| D2
-    D1 --> V1 --> J1
-    J1 -->|"是"| D2
-    J1 -->|"否：文档型完成"| A3
-
-    D2 --> G1
-    G1 -->|"否"| F1
-    G1 -->|"是"| G2
-    G2 -->|"否"| F1
-    G2 -->|"是"| R0
-    F1 --> S3
-    R0 -->|"否"| A3
-    R0 -->|"是"| R1 --> A3
-    A3 --> S1
-
-    D1 --> X1
-    D2 --> X1
-    X1 -->|"crash/blocked"| RC --> S3
-    X1 -->|"completed"| A3
-```
+说明：
+- 宪法仅定义循环边界与必须闭环，不定义产物模板、验收门细则或执行步骤。
+- 产物目录、门禁口径与路由细则由 `docs/LAWS.md` 同章节定义。
+- 实际执行步骤由 `docs/system/workspace/skills/` 定义。
 
 ### 11.2 核心原则
 
@@ -316,130 +221,74 @@ flowchart TD
 ### 11.3 法律链接
 
 详细规则见 [`docs/LAWS.md`](./LAWS.md)：
-- 法律验收门总览：`LAWS.md` 第 3 章（按门禁验收）
-- 宪法全章节映射：`LAWS.md` 第 4 章（逐章对齐矩阵）
+- 与宪法同序的法律章节：`LAWS.md` 第 1~16 章
+- 执行路由：`LAWS.md` 附录 A
+- 三层职责边界：`LAWS.md` 附录 B
 
 ## 12. 子代理规划与委托（硬性要求）
 
-Freely 必须在任务可并行化时主动使用子代理/子进程/并行工作者，同时保持确定性控制和可追溯性。
+Freely 必须在可并行场景下支持子代理委托，但保持单编排者会话下的确定性治理。
 
-1. 单会话兼容性：
-- "每个循环实例一个活动 AI 会话"意味着一个主要的编排者 AI 会话拥有循环生命周期。
-- 子代理是编排者下的强制执行单元，不是独立的顶层循环所有者。
-- 所有子代理必须保持可追溯到同一个编排者会话和当前 STORY 上下文。
+边界原则：
+1. 子代理不是顶层循环所有者，必须可追溯到同一编排者与当前工作上下文。
+2. 委托前必须明确边界与完成定义，禁止所有权不清的委托。
+3. 批次完成必须满足收敛语义，未收敛不得宣告成功。
+4. 子代理能力不可用时必须可回退且可追溯。
 
-2. 委托前规划：
-- 在生成子代理前，编排者必须定义：
-  - 任务分割边界
-  - 每个子代理的预期输出
-  - 完成标准和合并标准
-- 没有明确完成标准的委托是禁止的。
-
-3. 并行策略：
-- 对独立任务优先选择并行执行以提高吞吐量和独立评审质量。
-- 默认并发上限为每批 4 个子代理，除非资源约束要求更少。
-- 对于依赖任务，按有序阶段执行而非强制并行。
-
-4. 生命周期与等待语义：
-- 父级/编排者在标记批次完成前必须等待当前批次中所有委托的子代理。
-- 任务批次仅在收集了所有必需的子代理输出或明确标记为失败并说明原因后才算完成。
-- 当必需的子代理仍在运行时，不得报告周期成功。
-
-5. 失败处理与回退：
-- 如果当前工具/模式的子代理能力不可用/不稳定，回退到串行执行或进程级脚本。
-- 回退决定和原因必须记录在进度/恢复产物中。
-
-6. 文档耦合：
-- 进度和恢复记录必须包含：
-  - 是否使用了子代理
-  - 任务到子代理的映射
-  - 每个子代理的完成/失败状态
-  - 汇总后的下一个可执行 STORY
+说明：
+- 具体验收门与证据口径见 `docs/LAWS.md` 第 12 章。
+- 具体执行步骤见 `skill:recovery-subagent-governance`。
 
 ## 13. 并行开发的领域模型（硬性要求）
 
-为减少多代理和并行开发中的合并冲突，Freely 必须同时强制物理领域和逻辑领域。
+Freely 必须同时强制物理领域与逻辑领域，以降低并行开发的冲突与耦合风险。
 
-1. 物理领域（工作树）：
-- 每个活动的 STORY/子代理批次必须在其专用的 `feature/*` 工作树中运行。
-- 不同的活动 STORY 所有者不得共享同一个非主工作树进行实现。
-- 恢复记录必须包含每个活动领域的当前分支和工作树路径。
+边界原则：
+1. 物理领域：并行任务必须在隔离工作树中执行。
+2. 逻辑领域：并行任务必须有明确变更所有权边界。
+3. 共享热点必须存在显式串行窗口或排序策略。
 
-2. 逻辑领域（变更所有权）：
-- 实现前，为每个 STORY/子代理定义逻辑所有权边界（模块/文件/文档）。
-- 子代理应避免跨领域编辑，除非在合并标准中明确计划。
-- 共享热点（相同文件/模块）需要串行所有权窗口或显式排序。
-
-3. 合并冲突预防契约：
-- 在任务分解期间规划合并顺序，而不仅仅在合并时。
-- 为每个领域提前定义预期输出范围和冲突敏感文件。
-- 如果跨领域重叠不可避免，创建一个由单一所有者负责的集成 STORY。
-
-4. 验收规则：
-- 除非 STORY 的领域边界和合并路径已记录并可执行，否则不算完成。
+说明：
+- 具体验收门与证据口径见 `docs/LAWS.md` 第 13 章。
+- 具体执行步骤见 `skill:recovery-subagent-governance` 与 `skill:laws-enforcer`。
 
 ## 14. 可插拔模块架构与接口版本控制（硬性要求）
 
-Freely 实现应支持并行的模块演进：在构建可替换模块时保持当前模块稳定，以便在开发过程中插入。
+Freely 必须支持可插拔、可演进、可回滚的模块化架构，并保持接口治理可持续。
 
-1. 模块边界：
-- 核心能力必须拆分为具有明确所有权和范围的模块。
-- 模块通过显式契约（接口/协议）通信，而非隐藏的跨模块假设。
-- 避免不相关模块之间的直接耦合。
+边界原则：
+1. 模块边界与契约必须显式，避免隐式跨模块耦合。
+2. 接口变更必须可版本化演进，避免强制同步大爆炸迁移。
+3. 破坏性变更必须具备迁移与回滚路径。
+4. 涉及第三方 API 时，第三方契约为外部事实源，本地实现负责适配。
 
-2. 并行替换模型（非原地重写）：
-- 对破坏性或高风险重构使用并行替换，而非每个小改动都使用。
-- 在并行开发候选替换模块时，保持现有模块作为基线运行。
-- 新模块应在相同契约或计划版本化契约后集成。
-
-3. 插拔与切换要求：
-- 运行时或构建时模块选择必须显式（配置/特性标志/适配器路由），而非临时代码编辑。
-- 必须能够在不需要紧急重新设计的情况下回滚到现有模块。
-- 开发期间，团队可以在现有实现和候选实现之间切换进行验证。
-
-4. 接口版本控制策略：
-- 契约变更必须版本化（例如：v1、v2）并记录兼容性期望。
-- 破坏性变更需要迁移计划、兼容性桥接或分阶段推出策略。
-- 引入新接口版本时，调用者不得被迫进行同步的大爆炸式变更。
-
-5. 验证与可追溯性：
-- 契约测试/集成检查必须针对声明的接口版本验证现有模块和候选模块。
-- 进度/评审记录必须说明：模块替换/候选、活动接口版本、切换策略、回滚状态和验证结果。
-
-6. 第三方 API 主权（硬性要求）：
-- 当集成第三方 API 时，第三方 API 契约（官方文档/协议/响应语义）是外部事实源（king）。
-- 本地代码、适配层与测试必须对齐第三方 API 契约，不得反向要求第三方 API 适配本地实现。
-- 若本地实现与第三方 API 契约冲突，优先修复本地代码与测试；文档随后按实现结果更新。
+说明：
+- 具体验收门与证据口径见 `docs/LAWS.md` 第 14 章。
+- 具体执行步骤见 `skill:module-interface-governance`。
 
 ## 15. 变更前配置备份（硬性要求）
 
-所有配置文件在修改前必须备份。
+所有配置变更必须遵循“先备份、再修改”的不可逆前置约束。
 
-1. 强制备份：
-- 编辑/替换任何配置文件前，先创建备份副本。
-- 禁止直接原地覆盖而不备份。
-- 此规则即使存在 Git 或其他 VCS 历史也适用。
+边界原则：
+1. 未完成备份前不得执行配置修改。
+2. 备份必须唯一且可恢复。
+3. 备份记录必须可追溯。
 
-2. 唯一备份命名：
-- 备份文件名必须包含时间戳以避免覆盖。
-- 推荐格式：`<filename>.bak.<YYYYMMDD-HHMMSS>`。
-- 禁止重用相同的备份名称。
-
-3. 保留与可追溯性：
-- 备份位置和文件名必须对操作者可发现。
-- 当配置变更是 STORY 的一部分时，进度/评审记录应注明备份产物。
+说明：
+- 具体验收门与证据口径见 `docs/LAWS.md` 第 15 章。
+- 具体执行步骤见 `skill:config-backup-guard`。
 
 ## 16. Freely 自举开发（硬性要求）
 
-Freely 在开发 Freely 本身时必须执行“吃自己狗粮（dogfooding）”原则。
+Freely 在开发 Freely 本身时必须遵守与托管项目一致的治理边界，不得自我豁免。
 
-1. 流程同构：
-- Freely 自身开发必须遵守本宪法、`docs/LAWS.md` 与 `docs/PROJECT_INTENT.md`，不得使用“项目例外”绕开治理流程。
-- 所有架构/治理调整应先进入 `docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/` 形成候选，再进入 doc-loop/dev-loop 落地。
+边界原则：
+1. Freely 自身开发不得绕开意图/宪法/法律/skills 的治理链。
+2. 架构与治理变更必须先形成可追溯决策，再进入实现与验证。
+3. 自举过程中沉淀的治理能力必须可复用于托管项目。
+4. 对外部权限与可运维问题必须提供可执行的预检与修复路径。
 
-2. 工具同构：
-- Freely 自身仓库必须使用与面向用户一致的分支、worktree、hook 与门禁策略。
-- 对“worktree 根目录、hooks、约束策略”的改动，必须以模板化/可复用方式实现，确保可下沉到用户项目初始化流程。
-
-3. 权限与可运维性：
-- 对外部目录权限问题，Freely 必须提供预检与修复路径（preflight + actionable guidance），而不是要求用户在每次执行中重复提权。
+说明：
+- 具体验收门与证据口径见 `docs/LAWS.md` 第 16 章。
+- 具体执行步骤见 `skill:constitution-guard`、`skill:branch-management`、`skill:laws-enforcer`。
