@@ -16,6 +16,7 @@ description: Manage full autonomous branch lifecycle for Freely-style developmen
 4. Do changes in this worktree only.
 5. Stage and commit in feature worktree:
    - `source ./bin/wt-add feature/<topic> -- <paths or -A>`
+   - split by single logical change (atomic commit); avoid mixing unrelated concerns in one commit
    - `git commit -m "<type>: <summary>"`
 6. Run branch-local tests before integration.
 
