@@ -1,16 +1,16 @@
 ---
 name: recovery-subagent-governance
-description: Enforce recovery coupling and subagent governance constraints. Use when AI delegates tasks, resumes interrupted work, or needs to preserve branch/worktree context and ownership boundaries.
+description: 强制恢复耦合和子代理治理约束。当 AI 委托任务、恢复中断工作、或需要保持分支/worktree 上下文和所有权边界时使用。
 ---
 
 # skill:recovery-subagent-governance
 
-## Workflow
-1. Record active branch/worktree/session context.
-2. When delegating, define ownership boundaries and expected outputs.
-3. Track subagent completion/failure and merge implications.
-4. On resume, verify continuity artifacts before continuing execution.
-5. Block continuation if context ownership is ambiguous.
+## 工作流
+1. 记录活跃分支/worktree/会话上下文。
+2. 委托时，定义所有权边界和预期输出。
+3. 跟踪子代理完成/失败和合并影响。
+4. 恢复时，在继续执行前验证连续性产物。
+5. 如上下文所有权模糊则阻止继续。
 
-## Done
-- Recovery and delegation state is complete and auditable.
+## 完成
+- 恢复和委托状态完整且可审计。

@@ -1,39 +1,39 @@
 ---
 name: premerge-reconcile
-description: Reconcile high-risk merge conflicts without governance rollback. Use when merge-train into pre-develop fails or semantic regression risk appears; create temporary premerge branch from pre-develop, resolve by semantic intent, merge back to pre-develop, and clean up.
+description: 在不回退治理的情况下协调高风险合并冲突。当合并列车到 pre-develop 失败或语义回归风险出现时使用；从 pre-develop 创建临时 premerge 分支，按语义意图解决，合并回 pre-develop，并清理。
 ---
 
 # skill:premerge-reconcile
 
-## Trigger
-- Normal merge into `pre-develop` fails with high-conflict files.
-- Risk of policy rollback after conflict resolution.
+## 触发条件
+- 正常合并到 `pre-develop` 因高冲突文件失败。
+- 冲突解决后有策略回退风险。
 
-## Preconditions
-- Start from current `pre-develop`.
-- Create dedicated branch:
+## 前置条件
+- 从当前 `pre-develop` 开始。
+- 创建专用分支：
   - `git branch feature/premerge-YYYYMMDD-HHMM--<topic> pre-develop`
-  - enter via worktree (`source ./bin/wt-enter ...`).
+  - 通过 worktree 进入（`source ./bin/wt-enter ...`）。
 
-## Workflow
-1. Reconcile via controlled integration:
-   - merge or cherry-pick needed commits into `feature/premerge-*`
-   - resolve conflicts with semantic-first decisions
-2. For each conflict, follow `references/conflict-decision-template.md`.
-3. Run minimal regression on this branch.
-4. Merge back only to `pre-develop`:
+## 工作流
+1. 通过受控集成协调：
+   - 将需要的提交 merge 或 cherry-pick 到 `feature/premerge-*`
+   - 以语义优先决策解决冲突
+2. 对每个冲突，遵循 `references/conflict-decision-template.md`。
+3. 在此分支上运行最小回归。
+4. 仅合并回 `pre-develop`：
    - `git checkout pre-develop`
    - `git merge --no-ff feature/premerge-...`
-5. Run semantic regression checks via `skill:branch-management` checklist.
-6. Cleanup:
-   - delete premerge branch and worktree
-   - record outcome in progress/recovery notes.
+5. 通过 `skill:branch-management` 检查清单运行语义回归检查。
+6. 清理：
+   - 删除 premerge 分支和 worktree
+   - 在进度/恢复笔记中记录结果。
 
-## Conflict Rule
-- Prefer semantic compatibility with current constitution/laws.
-- If old structure conflicts with current governance, keep governance and adapt old content.
+## 冲突规则
+- 优先与当前宪法/法律的语义兼容性。
+- 如旧结构与当前治理冲突，保留治理并调整旧内容。
 
-## Done
-- `pre-develop` contains reconciled changes.
-- Regression checks pass.
-- Premerge branch/worktree removed.
+## 完成
+- `pre-develop` 包含协调后的变更。
+- 回归检查通过。
+- Premerge 分支/worktree 已删除。
