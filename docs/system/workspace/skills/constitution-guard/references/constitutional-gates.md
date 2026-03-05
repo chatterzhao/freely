@@ -1,11 +1,11 @@
-# Constitutional Gates
+# 宪法门禁
 
-- Branch and merge paths must follow constitution table.
-- Promotion to `develop` must be gated by executed `TEST` evidence (including integration acceptance), not `PRE_TEST` alone.
-- Protected branches remain add/commit blocked.
-- Worktree root must be sibling `{project-name}-worktrees`.
-- No worktree inside project root.
-- If third-party API is used, provider contract remains external source of truth and local code must adapt.
-- If code/docs diverge, code/test correction is first path; normative doc changes require dedicated feature/worktree plus linked implementation evidence.
-- Version stage tags follow branch/stage mapping.
-- Recovery, subagent, and backup requirements remain active.
+- 分支和合并路径必须遵循宪法表。
+- 提升到 `develop` 必须由已执行的 `TEST` 证据门禁（包括集成验收），而非仅靠 `PRE_TEST`。
+- 受保护分支保持 add/commit 禁止。
+- Worktree 根目录必须是同级 `{project-name}-worktrees`。
+- 项目根目录内不得有 worktree。
+- 如使用第三方 API，提供方契约保持为外部事实源，本地代码必须适配。
+- 如代码/文档分歧，代码/测试修正为第一路径；规范文档变更需要专用 feature/worktree 及关联实现证据。
+- 版本阶段标签遵循分支/阶段映射。
+- 恢复、子代理和备份要求保持活跃。

@@ -1,9 +1,9 @@
-# Law Acceptance Map
+# 法律验收映射
 
-- Doc-loop: issue/brainstorm/map artifacts, `PRE_TEST` baseline definition (including integration acceptance intent), and milestone sync.
-- Dev-loop: implementation, test-case expansion during dev/review/test, executed `TEST` evidence (including integration acceptance), docs update, progress records.
-- Promotion rule: `PRE_TEST` is baseline-only; promotion/merge gates must use executed `TEST` results.
-- Code-doc mismatch rule: code/test correction path first; normative doc updates require dedicated feature/worktree and linked implementation evidence.
-- Third-party API rule: provider contract is external source of truth; local code/adapters must align to API contract.
-- Auto-loop: route/status updates and next-issue continuity.
-- Recovery: blockers/progress/recovery fields complete.
+- Doc-loop：issue/brainstorm/map 产物、`PRE_TEST` 基线定义（包括集成验收意图）、里程碑同步。
+- Dev-loop：实现、开发/评审/测试期间的测试用例扩展、已执行的 `TEST` 证据（包括集成验收）、文档更新、进度记录。
+- 提升规则：`PRE_TEST` 仅作基线；提升/合并门禁必须使用已执行的 `TEST` 结果。
+- 代码-文档不匹配规则：代码/测试修正路径优先；规范文档更新需要专用 feature/worktree 和关联实现证据。
+- 第三方 API 规则：提供方契约为外部事实源；本地代码/适配器必须对齐 API 契约。
+- Auto-loop：路由/状态更新和下一 issue 连续性。
+- 恢复：阻塞项/进度/恢复字段完整。
