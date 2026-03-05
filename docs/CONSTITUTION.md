@@ -263,15 +263,17 @@ A:auto-loop(ADD) [外循环]
 flowchart TD
     S1["A1 发现问题源\n(intent/review/test/chat/github-issue)"]
     S2["候选池\npre-brainstorms/*/candidates.md"]
-    S3["A2 路由委派决策\nroute + reason + status"]
+    S3{"A2 路由委派\nissue 是否就绪?"}
 
     D1["D:doc-loop(IBM)\nI/B/M\n产出 issue/prd/pre-tests/tasks"]
-    V1["候选转正式 issue\n回填 promoted_issue_path\n落位 epic/story/milestone"]
-    E1["Issue Ready"]
+    V1["候选晋升门\n回填 promoted_issue_path\n落位 epic/story/milestone"]
+    J1{"是否形成可开发 issue?"}
 
     D2["D:dev-loop(DDD)\n实现/测试/review/文档回写"]
-    G1["pre-develop 集成测试门\nTEST(含集成验收)"]
-    G2["develop 提升门\nTEST + review + progress/recovery"]
+    G1{"pre-develop 集成测试门\nTEST(含集成验收)通过?"}
+    G2{"develop 提升门\nTEST + review + progress/recovery通过?"}
+    F1["修复路径\n返回 dev-loop 或补 doc-loop"]
+    R0{"是否触发 release/hotfix?"}
     R1["release/hotfix 流程\n(tag/release/hotfix sync)"]
 
     A3["A3 回流\n更新状态并进入下一轮发现"]
@@ -279,11 +281,21 @@ flowchart TD
     RC["恢复分支\nresume 或 bridge checkpoint"]
 
     S1 --> S2 --> S3
-    S3 -->|"raw/候选未成型"| D1
-    D1 --> V1 --> E1 --> D2
-    S3 -->|"ready/in-progress"| D2
+    S3 -->|"否：需求不清/验收缺失"| D1
+    S3 -->|"是：ready/in-progress"| D2
+    D1 --> V1 --> J1
+    J1 -->|"是"| D2
+    J1 -->|"否：文档型完成"| A3
 
-    D2 --> G1 --> G2 --> R1 --> A3 --> S1
+    D2 --> G1
+    G1 -->|"否"| F1
+    G1 -->|"是"| G2
+    G2 -->|"否"| F1
+    G2 -->|"是"| R0
+    F1 --> S3
+    R0 -->|"否"| A3
+    R0 -->|"是"| R1 --> A3
+    A3 --> S1
 
     D1 --> X1
     D2 --> X1
