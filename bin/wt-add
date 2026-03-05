@@ -32,7 +32,6 @@ shift
 
 # shellcheck disable=SC1091
 source ./bin/worktree-common.sh
-freely_wt_assert_strict_root || return 1
 
 if [[ -z "$branch" ]]; then
   branch="$(freely_wt_current_branch)"
@@ -41,23 +40,11 @@ fi
 [[ -n "$branch" ]] || { echo "No branch detected." >&2; return 1; }
 
 case "$branch" in
-  main|develop|pre-develop)
-    cat <<MSG >&2
-Add blocked: '$branch' is protected.
-Please create a feature branch from pre-develop, then run add in its worktree.
-
-Run:
-  git branch feature/<task-name> pre-develop
-  source ./bin/wt-enter feature/<task-name>
-
-The hook will auto-create the worktree and cd into that new directory.
-Do not keep working in the current directory.
-MSG
+  main|develop)
+    echo "Add blocked: '$branch' is protected. Use feature/release/hotfix worktree." >&2
     return 1
     ;;
 esac
-
-freely_wt_assert_existing_in_strict_root "$branch" || return 1
 
 if freely_wt_is_primary_worktree; then
   # shellcheck disable=SC1091
@@ -66,17 +53,15 @@ fi
 
 git add "$@"
 echo "git add done on branch '$branch' at $(pwd -P)"
-staged_count="$(git diff --cached --name-only | sed '/^$/d' | wc -l | tr -d ' ')"
-echo "[WARN] Semantic atomicity self-check: this commit should represent exactly one logical change and one rollback unit (staged files: ${staged_count})."
 
-used_all=0
-for arg in "$@"; do
-  if [[ "$arg" == "-A" || "$arg" == "--all" ]]; then
-    used_all=1
-    break
-  fi
-done
-
-if [[ "$used_all" == "1" ]]; then
-  echo "[WARN] '-A/--all' used: re-check for mixed concerns before commit; split if needed."
+# === Scope Check Hint ===
+staged_files=$(git diff --cached --name-only 2>/dev/null || true)
+if [[ -n "$staged_files" ]]; then
+  branch_topic="${branch#*/}"
+  
+  echo ""
+  echo "staged 文件列表："
+  echo "$staged_files" | sed 's/^/  /'
+  echo ""
+  echo "[scope-check] 请确认这些文件一起提交是否符合 git 原子提交原则，是否与分支职责('$branch_topic')匹配。不匹配应拆分提交或创建新 worktree。"
 fi
