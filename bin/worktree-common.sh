@@ -42,6 +42,22 @@ freely_wt_root_dir() {
   echo "${parent_dir}/${repo_name}-worktrees"
 }
 
+freely_wt_assert_strict_root() {
+  local root
+  root="$(freely_wt_root_dir)"
+  case "$root" in
+    /tmp|/tmp/*)
+      cat <<MSG >&2
+[HOOK] Worktree root invalid: '$root'
+Rules:
+- worktree root must be sibling to project: <project_parent>/<project_name>-worktrees
+- temp paths (/tmp) are forbidden
+MSG
+      return 1
+      ;;
+  esac
+}
+
 freely_wt_target_path_for_branch() {
   local branch="$1"
   local safe root
@@ -56,6 +72,29 @@ freely_wt_existing_for_branch() {
     $1=="worktree" {wt=$2}
     $1=="branch" && $2==b {print wt; exit}
   '
+}
+
+freely_wt_path_in_root() {
+  local path="$1"
+  local root
+  root="$(freely_wt_root_dir)"
+  [[ "$path" == "$root" || "$path" == "$root"/* ]]
+}
+
+freely_wt_assert_existing_in_strict_root() {
+  local branch="$1"
+  local existing
+  existing="$(freely_wt_existing_for_branch "$branch")"
+  [[ -z "$existing" ]] && return 0
+  freely_wt_path_in_root "$existing" && return 0
+  cat <<MSG >&2
+[HOOK] Existing worktree path invalid for branch '$branch':
+  $existing
+Rules:
+- use sibling root only: <project_parent>/<project_name>-worktrees
+- temp paths and other fallback locations are forbidden
+MSG
+  return 1
 }
 
 freely_wt_validate_branch_base() {
