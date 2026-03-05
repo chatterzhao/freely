@@ -22,14 +22,14 @@ A:auto-loop(ADD) [外循环]
 │   ├── 候选源：pre-brainstorms/candidates
 │   └── 执行源：milestones/progress(未完成)
 │   产出：
-│   - docs/pre-brainstorms/<id>/brainstorms.md
-│   - docs/pre-brainstorms/<id>/candidates.md
+│   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/brainstorms.md
+│   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md
 │
 ├── A2 分流决策
 │   ├── raw problem / candidate -> D:doc-loop(IBM)
 │   └── ready issue / in-progress -> D:dev-loop(DDD)
 │   产出：
-│   - 更新 docs/pre-brainstorms/<id>/candidates.md 的 route/status
+│   - 更新 docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md 的 route/status
 │
 ├── D:doc-loop(IBM) [I -> B -> M]
 │   产出（重构目标目录）：

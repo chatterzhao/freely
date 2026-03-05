@@ -21,7 +21,9 @@ freely_wt_is_primary_worktree() {
 }
 
 freely_wt_pick_parking_branch() {
-  if git show-ref --verify --quiet refs/heads/develop; then
+  if git show-ref --verify --quiet refs/heads/pre-develop; then
+    echo "pre-develop"
+  elif git show-ref --verify --quiet refs/heads/develop; then
     echo "develop"
   else
     echo "main"
@@ -42,6 +44,23 @@ freely_wt_root_dir() {
   echo "${parent_dir}/${repo_name}-worktrees"
 }
 
+freely_wt_assert_strict_root() {
+  local root primary
+  root="$(freely_wt_root_dir)"
+  primary="$(freely_wt_primary_worktree)"
+  case "$root" in
+    "$primary"|"$primary"/*)
+      cat <<MSG >&2
+[HOOK] Worktree root invalid: '$root'
+Rules:
+- worktree root must be sibling to project: <project_parent>/<project_name>-worktrees
+- creating worktrees inside project directory is forbidden
+MSG
+      return 1
+      ;;
+  esac
+}
+
 freely_wt_target_path_for_branch() {
   local branch="$1"
   local safe root
@@ -58,10 +77,36 @@ freely_wt_existing_for_branch() {
   '
 }
 
+freely_wt_path_in_root() {
+  local path="$1"
+  local root
+  root="$(freely_wt_root_dir)"
+  [[ "$path" == "$root" || "$path" == "$root"/* ]]
+}
+
+freely_wt_assert_existing_in_strict_root() {
+  local branch="$1"
+  local existing
+  existing="$(freely_wt_existing_for_branch "$branch")"
+  [[ -z "$existing" ]] && return 0
+  freely_wt_path_in_root "$existing" && return 0
+  cat <<MSG >&2
+[HOOK] Existing worktree path invalid for branch '$branch':
+  $existing
+Rules:
+- use sibling root only: <project_parent>/<project_name>-worktrees
+MSG
+  return 1
+}
+
 freely_wt_validate_branch_base() {
   local b="$1"
   case "$b" in
-    feature/*|release/*)
+    feature/*)
+      git show-ref --verify --quiet refs/heads/pre-develop || return 0
+      git merge-base --is-ancestor pre-develop "$b"
+      ;;
+    release/*)
       git show-ref --verify --quiet refs/heads/develop || return 0
       git merge-base --is-ancestor develop "$b"
       ;;

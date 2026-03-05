@@ -78,9 +78,14 @@ case "$branch" in
   main|develop|pre-develop)
     cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
-Rules:
-- main, develop, pre-develop must not be used for coding commits
-- create/use a worktree branch (feature/*, release/*, hotfix/*)
+Please create a feature branch from pre-develop, then commit in its worktree.
+
+Run:
+  git branch feature/<task-name> pre-develop
+  source ./bin/wt-enter feature/<task-name>
+
+The hook will auto-create the worktree and you should continue after cd into that new directory.
+Do not keep committing in the current directory.
 MSG
     exit 1
     ;;
@@ -94,7 +99,8 @@ if ! freely_wt_validate_branch_base "$branch"; then
   cat <<MSG
 [HOOK] Commit blocked: branch '$branch' base check failed.
 Expected:
-  feature/*, release/* from develop
+  feature/* from pre-develop
+  release/* from develop
   hotfix/* from main
 MSG
   exit 1

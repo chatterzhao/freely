@@ -18,7 +18,7 @@ Freely 是一个自主循环运行器：
 - `main` 仅用于发布，必须保持稳定。
 - `develop` 是夜间集成分支（仅限测试后集成）。
 - `pre-develop` 是强制性的测试集成分支，用于不稳定功能验证。
-- `feature/*` 分支从 `develop` 创建，先合并到 `pre-develop` 测试，验证后再提升到 `develop`。
+- `feature/*` 分支从 `pre-develop` 创建，先合并到 `pre-develop` 测试，验证后再提升到 `develop`。
 - `release/*` 分支从 `develop` 创建用于发布冻结，然后合并到 `main` 并回合并到 `develop`。
 - `hotfix/*` 分支从 `main` 创建，然后合并到 `main` 和 `develop`。
 
@@ -45,7 +45,7 @@ Freely 是一个自主循环运行器：
 - 所有非 `main`/`develop` 的开发分支都使用 `git worktree`。
 - 工作树根目录固定：`<project_parent>/<project_name>-worktrees/`。
 - 工作树目录命名必须为 `{project-name}-worktrees`，且与项目根目录同级，保证排序和定位时与项目紧邻。
-- 默认不允许将 worktree 放在项目目录内部；仅在无法满足外部目录权限时可临时降级，并必须在进度/恢复文档记录原因与回切计划。
+- 禁止在项目目录内部创建工作树目录（必须与项目目录并列）。
 - 在主工作树检出分支时，钩子应在固定根目录下自动创建缺失的工作树。
 - 操作命令约定：
   - 进入/切换分支工作树：`source ./bin/wt-enter <branch>`
@@ -77,7 +77,7 @@ Freely 是一个自主循环运行器：
 | main | ✅ | ❌ | release/* | - | hotfix 可 `FREELY_ALLOW_MERGE=1` 绕过 |
 | develop | ✅ | ❌ | pre-develop | - | hotfix 可 `FREELY_ALLOW_MERGE=1` 绕过 |
 | pre-develop | ✅ | ❌ | feature/* | develop | 不允许绕过 |
-| feature/* | ✅ 同名 | ✅ worktree | - | pre-develop | 必须在 worktree 中开发 |
+| feature/* | ✅ 同名 | ✅ worktree | - | pre-develop | 从 pre-develop 创建，必须在 worktree 中开发 |
 | release/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 develop 创建 |
 | hotfix/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 main 创建 |
 
@@ -197,14 +197,14 @@ A:auto-loop(ADD) [外循环]
 │   ├── 候选源：pre-brainstorms/candidates
 │   └── 执行源：milestones/progress(未完成)
 │   产出：
-│   - docs/pre-brainstorms/<id>/brainstorms.md
-│   - docs/pre-brainstorms/<id>/candidates.md
+│   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/brainstorms.md
+│   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md
 │
 ├── A2 分流决策
 │   ├── raw problem / candidate -> D:doc-loop(IBM)
 │   └── ready issue / in-progress -> D:dev-loop(DDD)
 │   产出：
-│   - 更新 docs/pre-brainstorms/<id>/candidates.md 的 route/status
+│   - 更新 docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md 的 route/status
 │
 ├── D:doc-loop(IBM) [I -> B -> M]
 │   产出（重构目标目录）：
@@ -349,7 +349,7 @@ Freely 在开发 Freely 本身时必须执行“吃自己狗粮（dogfooding）�
 
 1. 流程同构：
 - Freely 自身开发必须遵守本宪法、`docs/LAWS.md` 与 `docs/PROJECT_INTENT.md`，不得使用“项目例外”绕开治理流程。
-- 所有架构/治理调整应先进入 `docs/pre-brainstorms/<id>/` 形成候选，再进入 doc-loop/dev-loop 落地。
+- 所有架构/治理调整应先进入 `docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/` 形成候选，再进入 doc-loop/dev-loop 落地。
 
 2. 工具同构：
 - Freely 自身仓库必须使用与面向用户一致的分支、worktree、hook 与门禁策略。
@@ -357,4 +357,3 @@ Freely 在开发 Freely 本身时必须执行“吃自己狗粮（dogfooding）�
 
 3. 权限与可运维性：
 - 对外部目录权限问题，Freely 必须提供预检与修复路径（preflight + actionable guidance），而不是要求用户在每次执行中重复提权。
-- 当运行环境限制导致临时降级策略时，必须记录技术债与回切条件。
