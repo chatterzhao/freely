@@ -19,6 +19,12 @@
 2. 历史执行态文档不在工作区保留，统一通过 git 历史追溯。
 3. 在“意图-法律-宪法”三件套达成一致前，不恢复旧目录模型扩展。
 4. 重构完成后，按 issue 驱动在新目录模型中重建必要资产。
+5. AI 自治执行流程以 `docs/system/workspace/skills/` 为执行事实源；本法律定义规则和验收，具体步骤由对应 skill 负责。
+6. 分支治理执行默认调用：
+   - `skill:branch-merge-train`
+   - `skill:premerge-reconcile`
+   - `skill:post-merge-regression`
+   - `skill:promote-predevelop-to-develop`
 
 ---
 
