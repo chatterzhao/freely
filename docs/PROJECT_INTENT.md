@@ -33,11 +33,15 @@ A:auto-loop(ADD) [外循环]
 │
 ├── D:doc-loop(IBM) [I -> B -> M]
 │   产出（重构目标目录）：
-│   - docs/epics/{epic}/{story}/issues/{issue}.md
+│   - docs/epics/{epic}/{story}/issues/{issue-name}.md
+│   - docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md
 │   - docs/epics/{epic}/{story}/prd.md
 │   - docs/epics/{epic}/{story}/pre-tests.md
 │   - docs/epics/{epic}/{story}/tasks.md
 │   - docs/milestones.md  (与 issue 原子同步写入：新增/调整归属)
+│   目录分层说明：
+│   - pre-brainstorms/**：候选与前置收敛（未正式归属 story 前）
+│   - epics/{epic}/{story}/**：正式 story 产物（归属后长期维护）
 │
 ├── D:dev-loop(DDD) [Doc-Read -> Dev-Do -> Doc-Update]
 │   产出：
@@ -48,6 +52,52 @@ A:auto-loop(ADD) [外循环]
 │
 └── A3 回流
     └── 返回 A1，继续发现与完成
+```
+
+### 补充图：路由委派与业务流转闭环（查漏版）
+
+```mermaid
+flowchart TD
+    S1["A1 发现问题源\n(intent/review/test/chat/github-issue)"]
+    S2["候选池\npre-brainstorms/*/candidates.md"]
+    S3{"A2 路由委派\nissue 是否就绪?"}
+
+    D1["D:doc-loop(IBM)\nI/B/M\n产出 issues/brainstorms/prd/pre-tests/tasks"]
+    V1["候选晋升门\n回填 promoted_issue_path\npre-brainstorms -> epics/<epic>/<story>"]
+    J1{"是否形成可开发 issue?"}
+
+    D2["D:dev-loop(DDD)\n实现/测试/review/文档回写"]
+    G1{"pre-develop 集成测试门\nTEST(含集成验收)通过?"}
+    G2{"develop 提升门\nTEST + review + progress/recovery通过?"}
+    F1["修复路径\n返回 dev-loop 或补 doc-loop"]
+    R0{"是否触发 release/hotfix?"}
+    R1["release/hotfix 流程\n(tag/release/hotfix sync)"]
+
+    A3["A3 回流\n更新状态并进入下一轮发现"]
+    X1["AI CLI 终止态\ncompleted / crash / blocked"]
+    RC["恢复分支\nresume 或 bridge checkpoint"]
+
+    S1 --> S2 --> S3
+    S3 -->|"否：需求不清/验收缺失"| D1
+    S3 -->|"是：ready/in-progress"| D2
+    D1 --> V1 --> J1
+    J1 -->|"是"| D2
+    J1 -->|"否：文档型完成"| A3
+
+    D2 --> G1
+    G1 -->|"否"| F1
+    G1 -->|"是"| G2
+    G2 -->|"否"| F1
+    G2 -->|"是"| R0
+    F1 --> S3
+    R0 -->|"否"| A3
+    R0 -->|"是"| R1 --> A3
+    A3 --> S1
+
+    D1 --> X1
+    D2 --> X1
+    X1 -->|"crash/blocked"| RC --> S3
+    X1 -->|"completed"| A3
 ```
 
 ### Issue 路由规则

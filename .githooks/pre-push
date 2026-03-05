@@ -4,8 +4,9 @@ set -euo pipefail
 CONSTITUTION_PATH="./docs/CONSTITUTION.md"
 CONSTITUTION_ANCHOR="#2-branch-and-worktree-policy-hard-requirement"
 
-# 获取当前分支名
-current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+is_zero_sha() {
+  [[ "${1:-}" =~ ^0+$ ]]
+}
 
 while read -r local_ref local_sha remote_ref remote_sha; do
   [[ -z "${local_ref:-}" ]] && continue
@@ -13,9 +14,44 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   local_branch="${local_ref#refs/heads/}"
   remote_branch="${remote_ref#refs/heads/}"
 
-  # 允许 main, develop, pre-develop 直接 push
+  # 受保护分支只允许同名推送，且必须包含 merge commit（防 fast-forward 绕过 merge gate）
   case "$local_branch" in
     main|develop|pre-develop)
+      if [[ "$remote_branch" != "$local_branch" ]]; then
+        cat >&2 <<MSG
+[HOOK] Push blocked: protected branch '$local_branch' can only push to same remote branch.
+Attempted: refs/heads/$local_branch -> $remote_ref
+
+Policy source:
+  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
+MSG
+        exit 1
+      fi
+
+      # branch creation/deletion path; protected branches are expected to exist remotely.
+      if is_zero_sha "$remote_sha" || is_zero_sha "$local_sha"; then
+        cat >&2 <<MSG
+[HOOK] Push blocked: protected branch '$local_branch' create/delete on remote is forbidden.
+Attempted: $local_ref ($local_sha) -> $remote_ref ($remote_sha)
+
+Policy source:
+  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
+MSG
+        exit 1
+      fi
+
+      # Require merge commit in newly pushed range for protected branches.
+      if ! git rev-list --min-parents=2 "${remote_sha}..${local_sha}" | head -n 1 | grep -q .; then
+        cat >&2 <<MSG
+[HOOK] Push blocked: protected branch '$local_branch' update has no merge commit.
+This likely indicates a fast-forward path that bypasses merge gate.
+Use explicit merge with --no-ff on protected branches.
+
+Policy source:
+  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
+MSG
+        exit 1
+      fi
       continue
       ;;
   esac
@@ -35,6 +71,9 @@ Attempted to push to: $remote_ref
 
 To merge feature into pre-develop, use:
   git checkout pre-develop && git merge $local_branch
+
+Policy source:
+  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
 MSG
     exit 1
   fi
@@ -51,6 +90,10 @@ MSG
 - Same branch on remote (refs/heads/$local_branch)
 
 To merge hotfix into main/develop, checkout target branch and merge.
+Then sync result to pre-develop.
+
+Policy source:
+  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
 MSG
     exit 1
   fi
@@ -67,6 +110,9 @@ MSG
 - Same branch on remote (refs/heads/$local_branch)
 
 To merge release into main, checkout main and merge.
+
+Policy source:
+  ${CONSTITUTION_PATH}${CONSTITUTION_ANCHOR}
 MSG
     exit 1
   fi
