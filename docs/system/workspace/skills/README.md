@@ -7,6 +7,7 @@ Rules:
 - Skills define executable steps for AI agents.
 - When conflicts occur, prefer semantic intent over commit time order.
 - Do not duplicate full execution procedures in multiple docs.
+- Worktree hygiene gate command: `./bin/wt-status-all` (all `CLEAN` required before merge/promotion/release/cleanup).
 
 Entry skills:
 - `skill:constitution-guard` -> `constitution-guard/SKILL.md`

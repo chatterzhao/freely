@@ -79,6 +79,7 @@
 10. stage tag 符合 `YYYY.MM.DD-HHMM-stage` 与分支映射。
 11. `alpha/beta` 不可 push。
 12. `PRE_TEST` 只作为开发前验收标准定义，不得作为合并/提升通过证据。
+13. 执行 merge/promotion/release/cleanup 前，必须执行 `./bin/wt-status-all` 且结果全为 `CLEAN`。
 
 执行技能：
 - `skill:branch-management`
