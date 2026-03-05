@@ -3,11 +3,14 @@
 This directory is the execution source for Freely autonomous workflow.
 
 Rules:
-- `CONSTITUTION.md` and `LAWS.md` define constraints and acceptance.
-- Skills define executable steps for AI agents.
+- `CONSTITUTION.md` defines boundaries and principles (What/Why).
+- `LAWS.md` defines checks, evidence, and routing (Check/Accept/Route).
+- Skills define executable steps only (How).
+- Skills must not expand constitutional scope or replace legal acceptance.
 - When conflicts occur, prefer semantic intent over commit time order.
 - Do not duplicate full execution procedures in multiple docs.
 - Worktree hygiene gate command: `./bin/wt-status-all` (all `CLEAN` required before merge/promotion/release/cleanup).
+- Cross-reference order should follow Constitution/Laws chapter order `1..16` to reduce reading friction.
 
 Entry skills:
 - `skill:constitution-guard` -> `constitution-guard/SKILL.md`
