@@ -1,457 +1,160 @@
 # Freely 法律
 
-> 我是项目法律，具体规则，落实执行细节。
+> 我是项目法律，负责判定标准与验收口径。
 
 ---
 
-## 0. 研究优先阶段（当前生效）
+## 0. 法律定位
 
-在 Freely 文档模型重构完成前，`docs/` 目录采用最小集合约束：
+法律只定义三类内容：
+- 判定规则（什么算合规）
+- 验收证据（什么算完成）
+- 技能路由（由哪个 skill 执行）
 
+法律不重复执行步骤。执行步骤以 `docs/system/workspace/skills/` 为唯一执行事实源。
+
+---
+
+## 1. 当前阶段约束
+
+在文档模型重构阶段，`docs/` 最小集合：
 - `docs/PROJECT_INTENT.md`
 - `docs/LAWS.md`
 - `docs/CONSTITUTION.md`
 - `docs/pre-brainstorms/`
 
-执行规则：
-
-1. 新讨论与新决策写入 `docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/`（核心文件：`brainstorms.md`、`candidates.md`）。
-2. 历史执行态文档不在工作区保留，统一通过 git 历史追溯。
-3. 在“意图-法律-宪法”三件套达成一致前，不恢复旧目录模型扩展。
-4. 重构完成后，按 issue 驱动在新目录模型中重建必要资产。
-5. AI 自治执行流程以 `docs/system/workspace/skills/` 为执行事实源；本法律定义规则和验收，具体步骤由对应 skill 负责。
-6. 法律执行默认调用：
-   - 宪法硬约束门禁：`skill:constitution-guard`
-   - 法律验收门禁：`skill:laws-enforcer`
-   - 外循环编排：`skill:auto-loop-orchestrator`
-   - 文档内循环：`skill:doc-loop-execution`
-   - 开发内循环：`skill:dev-loop-execution`
-   - 分支治理主流程：`skill:branch-management`
-   - 复杂冲突异常流：`skill:premerge-reconcile`
-   - 恢复与子代理治理：`skill:recovery-subagent-governance`
-   - 模块/接口治理：`skill:module-interface-governance`
-   - 配置变更备份：`skill:config-backup-guard`
+判定规则：
+1. 新讨论与新决策进入 `docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/`。
+2. 历史执行态文档不在工作区保留，通过 git 历史追溯。
+3. 三件套（意图/法律/宪法）未一致前，不扩展旧目录模型。
 
 ---
 
-## 11. D:doc-loop(IBM) 文档循环方法论
+## 2. 执行路由
 
-### 11.1 目录结构
+默认执行链：
+1. `skill:constitution-guard`（硬约束门禁）
+2. `skill:laws-enforcer`（法律验收门禁）
+3. 业务执行 skill（按场景）
 
-```text
-docs/
-├── milestones.md                              # 里程碑索引
-├── blockers.md                                # 阻塞记录
-├── temp/                                      # 临时讨论区
-│   └── @<topic>.md                            # Issue 归属讨论
-├── chat-todos/                                # Chat Todo 目录
-│   └── <YYYYMMDD>-<topic>.md                  # 人类介入 Todo
-├── reviews/                                   # 评审记录
-│   └── <YYYYMMDD-HHMMSS>--<reviewer>--<branch>--<topic>.md
-├── epics/                                     # EPIC 实例
-│   └── <epic-name>/                           # Epic 目录
-│       ├── README.md                          # Epic 概述
-│       └── <story-name>/                      # Story 目录
-│           ├── issues/                        # I: Issue 输入
-│           │   └── <issue-name>.md
-│           ├── brainstorm/                    # B: 头脑风暴
-│           │   └── b-<issue-name>.md
-│           ├── map/                           # M: 规划设计
-│           │   └── design.md
-│           └── act/                           # A: 执行产出
-│               └── artifacts/
-└── progress/                                  # 进度记录
-    └── <epic-name>/
-        └── p-<issue-name>.md
-```
-
-### 11.2 I (Intake) - 接入
-
-#### 11.2.1 工作方法
-
-在 `docs/temp/@<topic>.md` 讨论：
-- Issue 归属
-- 确定或新建 epic-name
-- 确定或新建 story-name
-- 确定里程碑 M.x.x
-
-#### 11.2.2 工作结果
-
-| 产出 | 位置 | 说明 |
-|------|------|------|
-| Issue 文件 | `epics/<epic-name>/<story-name>/issues/<issue-name>.md` | Issue 详情 |
-| 里程碑索引 | `milestones.md` | 添加 Issue 路径，顺序即开发顺序 |
-
-#### 11.2.3 Issue 文件格式
-
-```markdown
-# Issue: <issue-name>
-
-## 基本信息
-- Epic: <epic-name>
-- Story: <story-name>
-- 里程碑: M.1.0
-- 来源: github-issue / 项目意图 / chat-todo / ...
-
-## 描述
-<!-- Issue 描述 -->
-
-## 状态
-- [ ] 待处理
-```
-
-### 11.3 B (Brainstorm) - 头脑风暴
-
-#### 11.3.1 工作方法
-
-- 意图分析：要解决什么问题
-- 备选方案：可能的解决方案
-- 决策：最终决策及理由
-- 延期决策：是否延期、拆分
-
-#### 11.3.2 工作结果
-
-| 产出 | 位置 | 说明 |
-|------|------|------|
-| 头脑风暴记录 | `brainstorm/b-<issue-name>.md` | 分析过程和决策 |
-| 延期标注 | `issues/<issue-name>.md` 状态 | 如有延期 |
-| 里程碑更新 | `milestones.md` | 如有延期，更新里程碑 |
-
-#### 11.3.3 文件格式
-
-```markdown
-# 头脑风暴: <issue-name>
-
-## 意图分析
-<!-- 要解决什么问题 -->
-
-## 备选方案
-<!-- 可能的解决方案 -->
-
-## 决策
-<!-- 最终决策及理由 -->
-
-## 延期决策（如有）
-- 里程碑: M.1.0 → M.2.0
-- 原因: <!-- 延期原因 -->
-- 处理: 拆分新 story-name
-```
-
-### 11.4 M (Map) - 映射
-
-#### 11.4.1 工作方法
-
-- 技术方案：如何实现
-- 验收标准：如何验证完成
-
-#### 11.4.2 工作结果
-
-| 产出 | 位置 | 说明 |
-|------|------|------|
-| 设计文档 | `map/design.md` | 技术方案和验收标准 |
-
-#### 11.4.3 文件格式
-
-```markdown
-# 设计: <story-name>
-
-## 概述
-<!-- 设计概述 -->
-
-## 技术方案
-<!-- 技术实现方案 -->
-
-## 验收标准
-- [ ] 标准1
-- [ ] 标准2
-```
-
-### 11.5 里程碑规则
-
-#### 11.5.1 里程碑格式
-
-`M.<major>.<minor>`，示例：`M.1.0`、`M.2.0`、`M.2.1`
-
-#### 11.5.2 milestones.md 格式
-
-```markdown
-# milestones.md
-
-## M.1.0 (计划: 2026.03.01)
-- [x] docs/epics/auth/story-login/issues/basic-auth.md
-- 发布版本: 2026.03.01-1430-stable
-
-## M.2.0 (计划: 2026.03.15)
-- [ ] docs/epics/auth/story-mfa/issues/totp.md
-- [ ] docs/epics/auth/story-login-phase2/issues/saml.md (从 M.1.0 延期)
-```
-
-#### 11.5.3 延期处理
-
-延期 = 拆分新 Story，处理步骤：
-1. 创建新 Story
-2. 移动延期 Issue
-3. 更新 milestones.md
-
-### 11.6 评审记录
-
-#### 11.6.1 文件命名
-
-`<YYYYMMDD-HHMMSS>--<reviewer>--<branch>--<topic>.md`
-
-#### 11.6.2 文件格式
-
-```markdown
-# 评审: <topic>
-
-## 基本信息
-- 时间: 2026.03.01-143000
-- 评审者: codex-gpt5
-- 分支: feature/auth-login
-- Issue: docs/epics/auth/story-login/issues/basic-auth.md
-
-## 结果
-- [x] 通过
-- [ ] 需修改
-```
+业务执行 skill：
+- 外循环编排：`skill:auto-loop-orchestrator`
+- 文档内循环：`skill:doc-loop-execution`
+- 开发内循环：`skill:dev-loop-execution`
+- 分支与发布：`skill:branch-management`
+- 复杂冲突：`skill:premerge-reconcile`
+- 恢复与子代理：`skill:recovery-subagent-governance`
+- 模块/接口治理：`skill:module-interface-governance`
+- 配置备份：`skill:config-backup-guard`
 
 ---
 
-## 12. D:dev-loop(DDD) 开发循环方法论
+## 3. 法律验收门
 
-### 12.1 循环结构
+### 3.1 分支与发布门
 
-```
-D:dev-loop(DDD)
-│
-├── D (doc) ── 阅读文档指导
-├── D (dev) ── 开发（impl → review → test）
-├── D (doc) ── 更新文档
-│
-└── 循环直到完成
-```
+通过条件：
+1. `feature/*` 来源为 `pre-develop`。
+2. `main/develop/pre-develop` 保持 add/commit 禁止。
+3. merge 方向符合宪法分支表。
+4. stage tag 符合 `YYYY.MM.DD-HHMM-stage` 与分支映射。
+5. `alpha/beta` 不可 push。
 
-### 12.2 D (doc) - 阅读文档指导
+执行技能：
+- `skill:branch-management`
+- `skill:constitution-guard`
 
-#### 12.2.1 工作方法
+### 3.2 Doc Loop 门
 
-从以下文档获取指导：
-- `issues/<issue-name>.md` - Issue 详情
-- `brainstorm/b-<issue-name>.md` - 头脑风暴决策
-- `map/design.md` - 技术方案和验收标准
+通过条件：
+1. intake/brainstorm/map 产物完整。
+2. candidates 的 route/status 一致。
+3. milestone 与 issue 映射同步。
 
-#### 12.2.2 工作结果
+执行技能：
+- `skill:doc-loop-execution`
+- `skill:laws-enforcer`
 
-无文档产出，输出理解指导。
+### 3.3 Dev Loop 门
 
-### 12.3 D (dev) - 开发
+通过条件：
+1. 代码与测试产物存在。
+2. 进度/状态文档完成更新。
+3. 验收与实现一致，无文档漂移。
 
-#### 12.3.1 工作方法
+执行技能：
+- `skill:dev-loop-execution`
+- `skill:laws-enforcer`
 
-开发包含三个阶段：
+### 3.4 Auto Loop 门
 
-```
-dev
-│
-├── impl ──── 编码实现
-├── review ── 评审（Agent 对抗）
-└── test ──── 测试验收
-```
+通过条件：
+1. issue 发现来源可追踪。
+2. 路由决策可解释（doc-loop/dev-loop）。
+3. 回流后下一轮输入状态正确。
 
-#### 12.3.2 工作结果
+执行技能：
+- `skill:auto-loop-orchestrator`
+- `skill:laws-enforcer`
 
-| 产出 | 位置 | 说明 |
-|------|------|------|
-| 代码实现 | `src/` | 实现代码 |
-| 测试代码 | `tests/` | 测试用例 |
-| 评审记录 | `docs/reviews/*.md` | 评审结果 |
-| 执行产出 | `act/artifacts/` | 设计图、数据模型等 |
+### 3.5 冲突与回退门
 
-### 12.4 D (doc) - 更新文档
+通过条件：
+1. 冲突决策按语义，不按提交时间。
+2. 合并后治理语义无回退（分支策略/worktree/命名/tag 口径一致）。
+3. premerge 分支从 `pre-develop` 拉出并回并 `pre-develop`。
 
-#### 12.4.1 工作方法
+执行技能：
+- `skill:premerge-reconcile`
+- `skill:branch-management`
 
-开发完成后更新相关文档。
+### 3.6 恢复与子代理门
 
-#### 12.4.2 工作结果
+通过条件：
+1. 恢复记录含 branch/worktree/session 上下文。
+2. 子代理任务有边界、状态与合并影响记录。
+3. 不存在所有权不清的续接执行。
 
-| 产出 | 位置 | 说明 |
-|------|------|------|
-| 进度记录 | `progress/<epic-name>/p-<issue-name>.md` | 执行状态 |
-| 里程碑状态 | `milestones.md` | Issue 完成标记 |
-| Issue 状态 | `issues/<issue-name>.md` | 状态更新 |
-| 阻塞记录 | `blockers.md` | 如有阻塞 |
+执行技能：
+- `skill:recovery-subagent-governance`
 
-### 12.5 进度跟踪
+### 3.7 模块接口门
 
-#### 12.5.1 文件格式
+通过条件：
+1. 接口版本策略明确。
+2. 破坏性变更有迁移路径与回滚路径。
+3. 合约测试覆盖当前/候选实现。
 
-位置：`docs/progress/<epic-name>/p-<issue-name>.md`
+执行技能：
+- `skill:module-interface-governance`
 
-```markdown
-# 进度: <issue-name>
+### 3.8 配置备份门
 
-## 基本信息
-- Epic: <epic-name>
-- Story: <story-name>
-- 里程碑: M.1.0
-- 分支: feature/<branch-name>
+通过条件：
+1. 任何配置修改前已完成备份。
+2. 备份命名符合宪法约束。
+3. 执行记录可追溯备份路径。
 
-## 循环状态
-- [ ] D (doc): 阅读指导
-- [ ] D (dev): 开发
-  - [ ] impl
-  - [ ] review
-  - [ ] test
-- [ ] D (doc): 更新文档
-
-## 执行记录
-- 2026.03.01-1430: 开始
-- 2026.03.01-1500: 完成实现
-
-## 下一步
-<!-- 下一步动作 -->
-```
-
-### 12.6 阻塞处理
-
-#### 12.6.1 blockers.md 格式
-
-```markdown
-# 阻塞记录
-
-## 待处理
-- [ ] 阻塞描述 → 产出：补充/修复/重构 Issue
-
-## 已处理
-- [x] 阻塞描述 → Issue: docs/epics/.../xxx.md
-```
-
-### 12.7 恢复策略
-
-1. **续接分支**：支持无人值守续接时直接续接
-2. **桥接分支**：不支持时执行：
-   - 更新进度文档
-   - 重启无人值守循环
-3. **冲突收敛分支（premerge）**：仅在复杂合并冲突时使用
-   - 分支名：`feature/premerge-YYYYMMDD-HHMM--<topic>`
-   - 创建来源：`pre-develop`
-   - 工作内容：冲突修复、提交回收（如 `cherry-pick`）、最小回归验证
-   - 回并目标：仅 `pre-develop`
-   - 完成动作：删除 premerge 分支/worktree，并记录处理结果
+执行技能：
+- `skill:config-backup-guard`
 
 ---
 
-## 13. A:auto-loop(ADD) 自主循环方法论
+## 4. 清理与退役
 
-### 13.1 循环结构（统一循环图 + 产出物）
+判定规则：
+1. 分支/worktree 仅在 `verified-retirable` 后删除。
+2. 不能因“已合并”立即删除，必须先完成语义回退检查与测试。
+3. 删除动作需保留记录（可追溯到合并与验证结果）。
 
-```text
-A:auto-loop(ADD) [外循环]
-│
-├── A1 发现问题（持续）
-│   ├── 新问题源：intent/review/test/chat/github-issue -> pre-brainstorms
-│   ├── 候选源：pre-brainstorms/candidates
-│   └── 执行源：milestones/progress(未完成)
-│   产出：
-│   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/brainstorms.md
-│   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md
-│
-├── A2 分流决策
-│   ├── raw problem / candidate -> D:doc-loop(IBM)
-│   └── ready issue / in-progress -> D:dev-loop(DDD)
-│   产出：
-│   - 更新 docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md 的 route/status
-│
-├── D:doc-loop(IBM) [I -> B -> M]
-│   产出（重构目标目录）：
-│   - docs/epics/{epic}/{story}/issues/{issue}.md
-│   - docs/epics/{epic}/{story}/prd.md
-│   - docs/epics/{epic}/{story}/pre-tests.md
-│   - docs/epics/{epic}/{story}/tasks.md
-│   - docs/milestones.md  (与 issue 原子同步写入：新增/调整归属)
-│
-├── D:dev-loop(DDD) [Doc-Read -> Dev-Do -> Doc-Update]
-│   产出：
-│   - src/** , tests/**
-│   - docs/progress/{epic}/p-{issue}.md
-│   - docs/milestones.md  (状态更新)
-│   - docs/epics/{epic}/{story}/issues/{issue}.md  (状态更新)
-│
-└── A3 回流
-    └── 返回 A1，继续发现与完成
-```
+执行技能：
+- `skill:branch-management`
 
-### 13.2 Issue 发现机制
+---
 
-| 类型 | 来源 | 说明 |
-|------|------|------|
-| 发现候选 | pre-brainstorms/candidates | 候选 issue 等待收敛与晋升 |
-| 思考产出或修改 | 项目意图 | 新需求 |
-| 思考产出或修改 | review | 改进点 |
-| 思考产出或修改 | test | Bug/修复 |
-| 思考产出或修改 | 进度文档 | 未完成 Issue |
-| 思考产出或修改 | chat-todo | 人类介入 |
-| 获取 | github-issue | 外部输入 |
-| 获取 | 里程碑 | 待处理 Issue |
+## 5. 违例处理
 
-### 13.3 Issue 路由规则
-
-| Issue 来源 | 路由起点 | 说明 |
-|-----------|---------|------|
-| pre-brainstorms 候选 | D:doc-loop(B/M) | 候选 issue 需收敛并落位到 epic/story/milestone |
-| 进度文档（未完成） | D:dev-loop | 文档已有，继续开发 |
-| 里程碑（待处理） | D:doc-loop(M) 或 D:dev-loop | 视文档完整度 |
-| 项目意图（新需求） | D:doc-loop(I) | 从接入开始 |
-| review/test（Bug/改进） | D:doc-loop(B) 或 D:dev-loop | 视复杂度 |
-| github-issue（外部输入） | D:doc-loop(I) | 从接入开始 |
-| chat-todo（人类介入） | 视情况 | 人类产出或修改 Issue |
-
-### 13.4 Chat Todo（人类介入）
-
-#### 13.4.1 文件格式
-
-位置：`docs/chat-todos/<YYYYMMDD>-<topic>.md`
-
-```markdown
-# Chat Todo: <topic>
-
-## 讨论文档
-<!-- AI 通过 Chat 思考产出的讨论内容 -->
-
-## Todo 列表
-- [ ] 待处理项1 → Issue: docs/epics/.../xxx.md
-- [x] 已处理项2 → Issue: docs/epics/.../xxx.md
-
-## 使用状态
-- 创建时间: 2026.03.01-1430
-- 最后更新: 2026.03.01-1500
-- 状态: 进行中 / 已完成
-```
-
-#### 13.4.2 工作流程
-
-```
-人类 ←──→ Chat Session ←──→ AI
-              │
-              ├── AI 通过 Chat 思考产出讨论文档
-              ├── 基于讨论结果生成 chat-todo
-              ├── 基于 chat-todo 产生或修改 Issue
-              └── 更新 chat-todo 使用状态
-```
-
-### 13.5 循环控制
-
-| 操作 | 说明 |
-|------|------|
-| 启动 | 开始自主循环 |
-| 停止 | 明确停止信号 |
-| 恢复 | 从进度文档恢复未完成 Issue |
-
-### 13.6 外循环闭环
-
-```
-获取 Issue → D:doc-loop(IBM) → D:dev-loop(DDD) → 完成 → 获取 Issue
-     ↑                                                        │
-     └──────────────────── 闭环 ───────────────────────────────┘
-```
+任一门禁失败：
+1. 阻断后续 promotion/release。
+2. 记录失败门、证据与修复路径。
+3. 需要时转入 `skill:premerge-reconcile`。
