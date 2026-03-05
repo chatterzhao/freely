@@ -17,14 +17,15 @@ source ./bin/worktree-common.sh
 branch="$(freely_wt_current_branch)"
 [[ -n "$branch" ]] || exit 0
 
-freely_wt_assert_strict_root || exit 1
-freely_wt_assert_existing_in_strict_root "$branch" || exit 1
-
+# main/develop/pre-develop 不需要 worktree，直接退出
 case "$branch" in
   main|develop|pre-develop)
     exit 0
     ;;
 esac
+
+freely_wt_assert_strict_root || exit 1
+freely_wt_assert_existing_in_strict_root "$branch" || exit 1
 
 if ! freely_wt_is_primary_worktree; then
   exit 0
