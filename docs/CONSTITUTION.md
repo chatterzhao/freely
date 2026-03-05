@@ -257,9 +257,8 @@ A:auto-loop(ADD) [外循环]
 ### 11.3 法律链接
 
 详细规则见 [`docs/LAWS.md`](./LAWS.md)：
-- [D:doc-loop(IBM) 文档循环方法论](./LAWS.md#11-ddoc-loopibm-文档循环方法论)
-- [D:dev-loop(DDD) 开发循环方法论](./LAWS.md#12-ddev-loopddd-开发循环方法论)
-- [A:auto-loop(ADD) 自主循环方法论](./LAWS.md#13-aauto-loopadd-自主循环方法论)
+- 法律验收门总览：`LAWS.md` 第 3 章（按门禁验收）
+- 宪法全章节映射：`LAWS.md` 第 4 章（逐章对齐矩阵）
 
 ## 12. 子代理规划与委托（硬性要求）
 
@@ -366,7 +365,7 @@ Freely 实现应支持并行的模块演进：在构建可替换模块时保持�
 - 备份位置和文件名必须对操作者可发现。
 - 当配置变更是 STORY 的一部分时，进度/评审记录应注明备份产物。
 
-## 15. Freely 自举开发（硬性要求）
+## 16. Freely 自举开发（硬性要求）
 
 Freely 在开发 Freely 本身时必须执行“吃自己狗粮（dogfooding）”原则。
 

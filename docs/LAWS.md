@@ -13,6 +13,18 @@
 
 法律不重复执行步骤。执行步骤以 `docs/system/workspace/skills/` 为唯一执行事实源。
 
+### 0.1 三层职责边界（宪法 / 法律 / skills）
+
+三层不冗余，职责如下：
+- 宪法（What/Why）：定义不可逾越边界与原则，不写执行步骤。
+- 法律（Check/Accept/Route）：定义判定门、证据口径、技能路由，不写执行步骤。
+- skills（How）：定义可执行操作步骤，按法律门验收。
+
+判定规则：
+1. 宪法出现的硬约束，必须在法律中存在可检查门禁。
+2. 法律出现的门禁，必须能路由到至少一个可执行 skill。
+3. skills 变更不得绕开宪法与法律；仅可优化实现方式。
+
 ---
 
 ## 1. 当前阶段约束
@@ -219,7 +231,35 @@
 
 ---
 
-## 4. 清理与退役
+## 4. 宪法全章节对齐矩阵
+
+| 宪法章节 | 对齐法律门 | 验收证据（最小） | 主要技能路由 |
+|---|---|---|---|
+| 1. 产品身份 | 3.9 产品身份与自治闭环门 | issue 来源记录 + 闭环执行记录 | `skill:auto-loop-orchestrator`, `skill:laws-enforcer` |
+| 2. 分支与工作树策略 | 3.1 分支与发布门, 3.5 冲突与回退门, 5 清理与退役 | 分支来源/merge 方向/worktree 清理记录 | `skill:branch-management`, `skill:premerge-reconcile`, `skill:constitution-guard` |
+| 3. 版本命名规则 | 3.1 分支与发布门 | tag 命名与分支 stage 对照记录 | `skill:branch-management` |
+| 4. 强制技术栈 | 3.10 技术栈与基线结构门 | 技术栈检查记录 | `skill:constitution-guard`, `skill:laws-enforcer` |
+| 5. 基线项目结构 | 3.10 技术栈与基线结构门 | 目录结构检查记录 | `skill:constitution-guard`, `skill:laws-enforcer` |
+| 6. 终端架构规则 | 3.11 终端架构与会话隔离门 | PTY 执行与会话隔离记录 | `skill:constitution-guard`, `skill:recovery-subagent-governance` |
+| 7. AI 执行模式 | 3.12 AI 执行模式与输入约束门 | `tool:model:mode` 规格校验记录 | `skill:constitution-guard`, `skill:laws-enforcer` |
+| 8. 恢复策略 | 3.6 恢复与子代理门, 3.9 产品身份与自治闭环门 | 续接/桥接与恢复检查点记录 | `skill:recovery-subagent-governance`, `skill:auto-loop-orchestrator` |
+| 9. 约束面 | 3.12 AI 执行模式与输入约束门 | 输入面白名单检查记录 | `skill:constitution-guard`, `skill:laws-enforcer` |
+| 10. 工程纪律 | 3.13 工程纪律门 | 命令面/状态面/AGENTS 可检查记录 | `skill:laws-enforcer`, `skill:dev-loop-execution` |
+| 11. 方法论总述 | 3.2 Doc Loop 门, 3.3 Dev Loop 门, 3.4 Auto Loop 门 | loop 产物完整性与路由一致性记录 | `skill:doc-loop-execution`, `skill:dev-loop-execution`, `skill:auto-loop-orchestrator` |
+| 12. 子代理规划与委托 | 3.6 恢复与子代理门, 3.14 子代理与并行领域门 | 委托边界/批次等待/失败回退记录 | `skill:recovery-subagent-governance`, `skill:laws-enforcer` |
+| 13. 并行开发领域模型 | 3.14 子代理与并行领域门 | 物理/逻辑领域边界与冲突窗口记录 | `skill:recovery-subagent-governance`, `skill:laws-enforcer` |
+| 14. 模块架构与接口版本 | 3.7 模块接口门 | 版本策略/迁移回滚/合约测试记录 | `skill:module-interface-governance` |
+| 15. 变更前配置备份 | 3.8 配置备份门 | 备份文件路径与命名记录 | `skill:config-backup-guard` |
+| 16. Freely 自举开发 | 3.15 Freely 自举一致性门 | pre-brainstorms -> doc/dev 落地链路记录 | `skill:constitution-guard`, `skill:branch-management`, `skill:laws-enforcer` |
+
+对齐规则：
+1. 任一宪法章节不得出现“无对应法律门”的空洞。
+2. 任一法律门不得出现“无证据口径”的不可验收状态。
+3. 任一法律门不得出现“无技能路由”的不可执行状态。
+
+---
+
+## 5. 清理与退役
 
 判定规则：
 1. 分支/worktree 仅在 `verified-retirable` 后删除。
@@ -231,7 +271,7 @@
 
 ---
 
-## 5. 违例处理
+## 6. 违例处理
 
 任一门禁失败：
 1. 阻断后续 promotion/release。
