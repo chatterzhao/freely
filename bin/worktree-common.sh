@@ -43,8 +43,9 @@ freely_wt_root_dir() {
 }
 
 freely_wt_assert_strict_root() {
-  local root
+  local root primary
   root="$(freely_wt_root_dir)"
+  primary="$(freely_wt_primary_worktree)"
   case "$root" in
     /tmp|/tmp/*)
       cat <<MSG >&2
@@ -52,6 +53,17 @@ freely_wt_assert_strict_root() {
 Rules:
 - worktree root must be sibling to project: <project_parent>/<project_name>-worktrees
 - temp paths (/tmp) are forbidden
+MSG
+      return 1
+      ;;
+  esac
+  case "$root" in
+    "$primary"|"$primary"/*)
+      cat <<MSG >&2
+[HOOK] Worktree root invalid: '$root'
+Rules:
+- worktree root must be sibling to project: <project_parent>/<project_name>-worktrees
+- creating worktrees inside project directory is forbidden
 MSG
       return 1
       ;;
