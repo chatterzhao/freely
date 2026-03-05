@@ -1,15 +1,15 @@
 ---
 name: config-backup-guard
-description: Enforce mandatory configuration backup before modifications. Use whenever AI changes any configuration file to create traceable backup and recovery path before editing.
+description: 强制配置修改前的必要备份。当 AI 修改任何配置文件时使用，在编辑前创建可追溯的备份和恢复路径。
 ---
 
 # skill:config-backup-guard
 
-## Workflow
-1. Detect target config files before edit.
-2. Create backup using required naming convention.
-3. Apply changes only after backup success.
-4. Record backup path and timestamp in execution notes.
+## 工作流
+1. 在编辑前检测目标配置文件。
+2. 使用必需的命名约定创建备份。
+3. 仅在备份成功后应用变更。
+4. 在执行笔记中记录备份路径和时间戳。
 
-## Done
-- Every config change has a recoverable backup artifact.
+## 完成
+- 每个配置变更都有可恢复的备份产物。

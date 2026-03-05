@@ -1,6 +1,6 @@
-# Pre-Brainstorms Workspace
+# 预头脑风暴工作区
 
-Canonical structure for pre-brainstorm records:
+预头脑风暴记录的规范结构：
 
 ```text
 docs/pre-brainstorms/
@@ -10,12 +10,12 @@ docs/pre-brainstorms/
     candidates.md
 ```
 
-Naming rule for `<id>`:
-- Use `YYYYMMDD-HHMM--<topic>` (24-hour clock, zero-padded).
-- Keep `<topic>` concise and kebab-case.
-- This ensures same-day entries are naturally ordered by time.
+`<id>` 命名规则：
+- 使用 `YYYYMMDD-HHMM--<topic>` 格式（24 小时制，零填充）。
+- `<topic>` 保持简洁，使用 kebab-case。
+- 确保同一天的条目按时间自然排序。
 
-## Status
+## 状态
 
-- Migration completed.
-- This directory is the active source for pre-brainstorm records.
+- 迁移已完成。
+- 本目录是 pre-brainstorm 记录的活跃来源。

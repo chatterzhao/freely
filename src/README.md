@@ -1,3 +1,3 @@
-# Source
+# 源代码
 
-Place core implementation code here.
+在此放置核心实现代码。

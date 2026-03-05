@@ -1,18 +1,18 @@
 ---
 name: doc-loop-execution
-description: Execute D:doc-loop(IBM) workflows under laws and constitution. Use when AI must intake issues, produce brainstorm/map artifacts, and keep milestone and routing documents consistent.
+description: 在法律和宪法下执行 D:doc-loop(IBM) 工作流。当 AI 需要接收 issue、产出 brainstorm/map 产物、并保持里程碑和路由文档一致时使用。
 ---
 
 # skill:doc-loop-execution
 
-## Workflow
-1. Intake issue and align epic/story/milestone ownership.
-2. Produce or update brainstorm and mapping artifacts.
-3. In map stage, define `PRE_TEST` baseline (including integration acceptance criteria) before development starts.
-4. Update pre-brainstorms candidates route/status as required.
-5. Sync milestone and issue mapping atomically.
-6. If normative docs must be changed, ensure work is in dedicated `feature/*` branch + worktree and linked implementation/gate change exists.
-7. Validate with `skill:laws-enforcer`.
+## 工作流
+1. 接收 issue 并对齐 epic/story/milestone 所有权。
+2. 产出或更新 brainstorm 和 mapping 产物。
+3. 在 map 阶段，开发开始前定义 `PRE_TEST` 基线（包括集成验收标准）。
+4. 按要求更新 pre-brainstorms 候选项路由/状态。
+5. 原子化同步里程碑和 issue 映射。
+6. 如需变更规范文档，确保在专用 `feature/*` 分支 + worktree 中工作，并存在关联实现/门禁变更。
+7. 用 `skill:laws-enforcer` 验证。
 
-## Done
-- Required doc-loop artifacts are complete and route/status are consistent.
+## 完成
+- 必需的 doc-loop 产物完整，路由/状态一致。

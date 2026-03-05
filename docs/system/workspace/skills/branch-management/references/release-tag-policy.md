@@ -1,27 +1,27 @@
-# Release and Tag Policy
+# 发布和标签策略
 
-## Stage Format
-- Tag format must be: `YYYY.MM.DD-HHMM-stage`
-- `stage` is required and cannot be omitted.
+## 阶段格式
+- 标签格式必须为：`YYYY.MM.DD-HHMM-stage`
+- `stage` 是必需的，不可省略。
 
-## Stage by Branch
-- `feature/*` -> `alpha` (local lightweight tag, do not push)
-- `pre-develop` -> `beta` (local lightweight tag, do not push)
-- `develop` -> `nightly` (push tag)
-- `main` -> `stable` (push tag)
-- `hotfix/*` -> `hotfix` (push tag)
+## 按分支的阶段
+- `feature/*` -> `alpha`（本地轻量标签，不推送）
+- `pre-develop` -> `beta`（本地轻量标签，不推送）
+- `develop` -> `nightly`（推送标签）
+- `main` -> `stable`（推送标签）
+- `hotfix/*` -> `hotfix`（推送标签）
 
-## Release Branch Flow
-1. Create `release/*` from `develop`.
-2. Freeze and validate release content.
-3. Merge `release/*` into `main`.
-4. Back-merge release result into `develop`.
+## 发布分支流程
+1. 从 `develop` 创建 `release/*`。
+2. 冻结并验证发布内容。
+3. 将 `release/*` 合并到 `main`。
+4. 将发布结果回合并到 `develop`。
 
-## Hotfix Flow
-1. Create `hotfix/*` from `main`.
-2. Merge hotfix into `main` and `develop`.
-3. Sync hotfix result into `pre-develop`.
+## 热修复流程
+1. 从 `main` 创建 `hotfix/*`。
+2. 将热修复合并到 `main` 和 `develop`。
+3. 将热修复结果同步到 `pre-develop`。
 
-## Guardrails
-- Never push `alpha`/`beta`.
-- If required tests or governance checks fail, block release and block push tag.
+## 保护措施
+- 绝不推送 `alpha`/`beta`。
+- 如必需测试或治理检查失败，阻止发布并阻止推送标签。

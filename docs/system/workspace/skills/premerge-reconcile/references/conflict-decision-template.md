@@ -1,13 +1,13 @@
-# Conflict Decision Template
+# 冲突决策模板
 
-For each conflict block, record:
+对每个冲突块，记录：
 
-1. File and section.
-2. Side A intent (semantic).
-3. Side B intent (semantic).
-4. Chosen intent and why it preserves current governance.
-5. Post-merge assertion to verify no rollback.
+1. 文件和章节。
+2. A 方意图（语义）。
+3. B 方意图（语义）。
+4. 选择的意图及为何保留当前治理。
+5. 合并后断言以验证无回退。
 
-Decision rule:
-- Never pick by commit time.
-- Preserve current constitution/laws intent over legacy structure.
+决策规则：
+- 绝不按提交时间选择。
+- 保留当前宪法/法律意图优先于遗留结构。

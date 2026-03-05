@@ -1,17 +1,17 @@
 ---
 name: module-interface-governance
-description: Apply plug-in module and interface version governance for parallel evolution. Use when AI introduces replacements, versioned contracts, or migration paths across modules.
+description: 应用可插拔模块和接口版本治理以支持并行演进。当 AI 引入替换、版本化契约或模块间迁移路径时使用。
 ---
 
 # skill:module-interface-governance
 
-## Workflow
-1. Define module boundary and current contract version.
-2. If third-party API is involved, treat provider contract as external source of truth and design local adapter around it.
-3. For breaking changes, create versioned contract and migration path.
-4. Keep rollback path to stable implementation.
-5. Validate contract compatibility with tests (including third-party API integration semantics when applicable).
-6. Record active version and switch strategy.
+## 工作流
+1. 定义模块边界和当前契约版本。
+2. 如涉及第三方 API，将提供方契约视为外部事实源，围绕其设计本地适配器。
+3. 对于破坏性变更，创建版本化契约和迁移路径。
+4. 保持到稳定实现的回滚路径。
+5. 用测试验证契约兼容性（适用时包括第三方 API 集成语义）。
+6. 记录活跃版本和切换策略。
 
-## Done
-- Module evolution is versioned, testable, reversible, and aligned to third-party API contracts when used.
+## 完成
+- 模块演进已版本化、可测试、可逆，并在使用时对齐第三方 API 契约。
