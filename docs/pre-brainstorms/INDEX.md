@@ -1,12 +1,12 @@
-# Pre-Brainstorms Index
+# Pre-Brainstorms 索引
 
-This directory is the canonical structure for pre-brainstorm records.
+本目录是 pre-brainstorm 记录的规范结构。
 
-## Naming Rule
-- New directory names must use `YYYYMMDD-HHMM--<topic>`.
-- Existing date-only directories are legacy and can be renamed in a follow-up migration.
+## 命名规则
+- 新目录名必须使用 `YYYYMMDD-HHMM--<topic>` 格式。
+- 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
-## Entries
+## 条目
 - 20260303-ai-consistency-closed-loop-freely-alignment
   - brainstorms: docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/brainstorms.md
   - candidates: docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/candidates.md
@@ -35,5 +35,5 @@ This directory is the canonical structure for pre-brainstorm records.
   - brainstorms: docs/pre-brainstorms/20260305-doc-loop-dev-loop-directory-unification/brainstorms.md
   - candidates: docs/pre-brainstorms/20260305-doc-loop-dev-loop-directory-unification/candidates.md
 
-## Convergence
-- Summary: docs/pre-brainstorms/CONVERGENCE.md
+## 收敛
+- 摘要: docs/pre-brainstorms/CONVERGENCE.md
