@@ -357,4 +357,3 @@ Freely 在开发 Freely 本身时必须执行“吃自己狗粮（dogfooding）�
 
 3. 权限与可运维性：
 - 对外部目录权限问题，Freely 必须提供预检与修复路径（preflight + actionable guidance），而不是要求用户在每次执行中重复提权。
-- 当运行环境限制导致临时降级策略时，必须记录技术债与回切条件。
