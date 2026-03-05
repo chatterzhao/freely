@@ -1,6 +1,6 @@
 ---
 name: branch-management
-description: Manage full autonomous branch lifecycle for Freely-style development. Use when AI needs to create feature branches from pre-develop, enter worktrees, perform add/commit in correct place, run merge-train into pre-develop with immediate tests, execute semantic regression checks, promote to develop, and clean up branches/worktrees after verification.
+description: Manage full autonomous branch lifecycle for Freely-style development. Use when AI needs to create feature branches from pre-develop, enter worktrees, perform add/commit in correct place, run merge-train into pre-develop with immediate tests, execute semantic regression checks, promote to develop, manage release/hotfix branches, apply stage-based tags, and clean up branches/worktrees after verification.
 ---
 
 # skill:branch-management
@@ -34,7 +34,26 @@ description: Manage full autonomous branch lifecycle for Freely-style developmen
 2. If green, promote `pre-develop` to `develop` through allowed path.
 3. If any semantic mismatch appears, block promotion and return to reconcile flow.
 
-## Route D: Cleanup Policy
+## Route D: Release and Tag Flow
+1. Follow stage naming from `references/release-tag-policy.md`:
+   - format: `YYYY.MM.DD-HHMM-stage`
+2. Tag behavior by branch/stage:
+   - `feature/*` -> `alpha` (local lightweight tag, no push)
+   - `pre-develop` -> `beta` (local lightweight tag, no push)
+   - `develop` -> `nightly` (push tag)
+   - `main` -> `stable` (push tag)
+   - `hotfix/*` -> `hotfix` (push tag)
+3. Release branch path:
+   - create `release/*` from `develop`
+   - merge to `main`
+   - back-merge to `develop`
+4. Hotfix branch path:
+   - create `hotfix/*` from `main`
+   - merge to `main` and `develop`
+   - sync hotfix result to `pre-develop`
+5. If any required verification is red, block push tag/release.
+
+## Route E: Cleanup Policy
 1. Do not delete branch/worktree immediately after merge.
 2. Keep status progression:
    - `active` -> `merged-pending-verify` -> `verified-retirable` -> `retired`
@@ -48,8 +67,9 @@ description: Manage full autonomous branch lifecycle for Freely-style developmen
 - Keep governance intent stable: branch policy, worktree constraints, naming policy.
 - If semantic checks fail, do not promote; return to reconcile flow.
 - Never resolve conflicts by commit timestamp ordering.
+- Never push `alpha`/`beta` tags.
 
 ## Done
 - No branch remains in `git branch --no-merged pre-develop`.
 - Semantic regression checklist is fully green.
-- Promotion to `develop` is completed or explicitly blocked with recorded reason.
+- Promotion/tag/release actions are completed or explicitly blocked with recorded reason.
