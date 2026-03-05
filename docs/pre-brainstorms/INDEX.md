@@ -1,4 +1,4 @@
-# 预头脑风暴索引
+# 预研头脑风暴索引
 
 本目录是 pre-brainstorm 记录的规范结构。
 
@@ -34,6 +34,9 @@
 - 20260305-doc-loop-dev-loop-directory-unification
   - brainstorms: docs/pre-brainstorms/20260305-doc-loop-dev-loop-directory-unification/brainstorms.md
   - candidates: docs/pre-brainstorms/20260305-doc-loop-dev-loop-directory-unification/candidates.md
+- 20260305-1402--doc-loop-governance-maintenance
+  - brainstorms: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

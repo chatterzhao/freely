@@ -14,9 +14,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: 前后端解耦主线的关键前置，需先冻结最小 API 契约。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260304-202
 - title: 多项目 UI 隔离规则实现
@@ -26,9 +26,9 @@
 - priority: P1
 - status: promoted
 - decision_reason: 与多项目隔离交互主线一致，已形成明确实现边界。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260304-203
 - title: 先后端后前端执行门禁
@@ -38,6 +38,6 @@
 - priority: P0
 - status: promoted
 - decision_reason: 来自该研究核心结论与执行建议，属于减少返工的关键约束。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []

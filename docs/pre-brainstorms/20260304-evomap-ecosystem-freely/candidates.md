@@ -14,6 +14,6 @@
 - priority: P2
 - status: dropped
 - decision_reason: 偏中长期能力资产化，当前阶段与落地主线耦合弱。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []

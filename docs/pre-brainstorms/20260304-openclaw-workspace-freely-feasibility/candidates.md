@@ -14,6 +14,6 @@
 - priority: P1
 - status: needs_research
 - decision_reason: 可作为过渡方案但依赖外部运行时假设，需结合当前架构再评估。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []

@@ -14,9 +14,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: Owner Loop Contract 是当前自治闭环的核心契约。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260304-602
 - title: Gate Contract
@@ -26,9 +26,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: Gate Contract 是质量与一致性的强制约束核心。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260304-603
 - title: Recovery Contract
@@ -38,9 +38,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: Recovery Contract 是无人值守自治稳定性的必要条件。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260304-604
 - title: Issue Discovery + Router 内核实现
@@ -50,9 +50,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: 对应原研究 P0 能力 1/2，且与当前统一循环图完全一致。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260304-605
 - title: Sub-agent 批次编排器
@@ -62,9 +62,9 @@
 - priority: P1
 - status: needs_research
 - decision_reason: 方向重要但需先明确当前阶段并发范围与最小可行边界。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260304-606
 - title: Promotion & Cleanup Enforcer
@@ -74,9 +74,9 @@
 - priority: P1
 - status: promoted
 - decision_reason: 对应原研究 P0 能力 8，与现有分支治理硬约束直接一致。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ### C-20260304-607
 - title: Doc Contract Compiler
@@ -86,6 +86,6 @@
 - priority: P0
 - status: promoted
 - decision_reason: 原研究 P0 能力明确列出，且直接支撑 Gate Contract 的可执行化。
-- promoted_issue_path:
-- milestone:
-- session_refs:
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
