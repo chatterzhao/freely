@@ -75,7 +75,7 @@ fi
 
 # main, develop, pre-develop 禁止直接 add/commit
 case "$branch" in
-  main|develop)
+  main|develop|pre-develop)
     cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
 Please create a feature branch from pre-develop, then commit in its worktree.
@@ -86,14 +86,6 @@ Run:
 
 The hook will auto-create the worktree and you should continue after cd into that new directory.
 Do not keep committing in the current directory.
-MSG
-    exit 1
-    ;;
-  pre-develop)
-    cat <<MSG
-[HOOK] Commit blocked: direct development on '$branch' is forbidden.
-Rules:
-- create/use a worktree branch (feature/*, release/*, hotfix/*)
 MSG
     exit 1
     ;;

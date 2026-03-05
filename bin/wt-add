@@ -41,7 +41,7 @@ fi
 [[ -n "$branch" ]] || { echo "No branch detected." >&2; return 1; }
 
 case "$branch" in
-  main|develop)
+  main|develop|pre-develop)
     cat <<MSG >&2
 Add blocked: '$branch' is protected.
 Please create a feature branch from pre-develop, then run add in its worktree.
