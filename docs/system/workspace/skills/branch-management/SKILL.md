@@ -24,48 +24,52 @@ description: 管理 Freely 风格开发的完整自主分支生命周期。当 A
 
 ## 路由 B：合并列车到 pre-develop
 1. 仅从 `pre-develop` worktree 进行集成工作。
-2. 使用 `git branch --no-merged pre-develop` 收集候选项。
-3. 按语义依赖构建合并队列，绝不按提交时间：
+2. 合并前执行 Worktree 卫生门禁：`./bin/wt-status-all`，结果必须全 `CLEAN`。
+3. 使用 `git branch --no-merged pre-develop` 收集候选项。
+4. 按语义依赖构建合并队列，绝不按提交时间：
    - 治理/策略变更
    - 共享基础设施
    - 产品行为变更
-4. 串行合并：
+5. 串行合并：
    - `git merge --no-ff <branch>`
    - 立即运行必需的冒烟/回归检查
-5. 如果冲突复杂或回滚风险出现，停止并切换到 `skill:premerge-reconcile`。
+6. 如果冲突复杂或回滚风险出现，停止并切换到 `skill:premerge-reconcile`。
 
 ## 路由 C：回归 + 提升
-1. 队列完成后，运行语义检查清单：
+1. 提升前再次执行 Worktree 卫生门禁：`./bin/wt-status-all`，结果必须全 `CLEAN`。
+2. 队列完成后，运行语义检查清单：
    - `references/semantic-regression-checklist.md`
-2. 运行提升所需的 `TEST` 证据检查（包括集成验收测试）。
-3. 确保 `PRE_TEST` 仅作为基线，不得替代提升测试结果。
-4. 如所有检查为绿色，通过允许路径将 `pre-develop` 提升到 `develop`。
-5. 如有任何语义/测试不匹配出现，阻止提升并返回协调流程。
+3. 运行提升所需的 `TEST` 证据检查（包括集成验收测试）。
+4. 确保 `PRE_TEST` 仅作为基线，不得替代提升测试结果。
+5. 如所有检查为绿色，通过允许路径将 `pre-develop` 提升到 `develop`。
+6. 如有任何语义/测试不匹配出现，阻止提升并返回协调流程。
 
 ## 路由 D：发布和标签流程
-1. 遵循 `references/release-tag-policy.md` 的阶段命名：
+1. 发布/打标签前执行 Worktree 卫生门禁：`./bin/wt-status-all`，结果必须全 `CLEAN`。
+2. 遵循 `references/release-tag-policy.md` 的阶段命名：
    - 格式：`YYYY.MM.DD-HHMM-stage`
-2. 按分支/阶段的标签行为：
+3. 按分支/阶段的标签行为：
    - `feature/*` -> `alpha`（本地轻量标签，不推送）
    - `pre-develop` -> `beta`（本地轻量标签，不推送）
    - `develop` -> `nightly`（推送标签）
    - `main` -> `stable`（推送标签）
    - `hotfix/*` -> `hotfix`（推送标签）
-3. 发布分支路径：
+4. 发布分支路径：
    - 从 `develop` 创建 `release/*`
    - 合并到 `main`
    - 回合并到 `develop`
-4. 热修复分支路径：
+5. 热修复分支路径：
    - 从 `main` 创建 `hotfix/*`
    - 合并到 `main` 和 `develop`
    - 同步热修复结果到 `pre-develop`
-5. 如任何必需验证为红色，阻止推送标签/发布。
+6. 如任何必需验证为红色，阻止推送标签/发布。
 
 ## 路由 E：清理策略
-1. 合并后不要立即删除分支/worktree。
-2. 保持状态演进：
+1. 清理前执行 Worktree 卫生门禁：`./bin/wt-status-all`，结果必须全 `CLEAN`。
+2. 合并后不要立即删除分支/worktree。
+3. 保持状态演进：
    - `active` -> `merged-pending-verify` -> `verified-retirable` -> `retired`
-3. 仅在以下条件后删除分支/worktree：
+4. 仅在以下条件后删除分支/worktree：
    - 合并完成
    - 测试和语义回归为绿色
    - 无待处理回滚项
