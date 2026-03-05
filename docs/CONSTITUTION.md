@@ -50,7 +50,7 @@ Freely 是一个自主循环运行器：
 - 合并完成后必须删除该 `feature/premerge-*` 分支及其工作树，并在进度/恢复文档记录处理结果。
 
 3. 工作树纪律：
-- 所有非 `main`/`develop` 的开发分支都使用 `git worktree`。
+- 所有非 `main`/`develop`/`pre-develop` 的开发分支都使用 `git worktree`。
 - 工作树根目录固定：`<project_parent>/<project_name>-worktrees/`。
 - 工作树目录命名必须为 `{project-name}-worktrees`，且与项目根目录同级，保证排序和定位时与项目紧邻。
 - 禁止在项目目录内部创建工作树目录（必须与项目目录并列）。
