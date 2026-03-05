@@ -11,14 +11,14 @@
 - `docs/PROJECT_INTENT.md`
 - `docs/LAWS.md`
 - `docs/CONSTITUTION.md`
-- `docs/research/`
+- `docs/pre-brainstorms/`
 
 执行规则：
 
 1. 新讨论与新决策写入 `docs/pre-brainstorms/<id>/`（核心文件：`brainstorms.md`、`candidates.md`）。
-2. 历史执行态文档已归档并移出工作区（见 `docs/research/ARCHIVE.md`），不作为当前主流程入口。
+2. 历史执行态文档不在工作区保留，统一通过 git 历史追溯。
 3. 在“意图-法律-宪法”三件套达成一致前，不恢复旧目录模型扩展。
-4. 重构完成后，再从 `deferred/` 选择性迁移到新模型。
+4. 重构完成后，按 issue 驱动在新目录模型中重建必要资产。
 
 ---
 

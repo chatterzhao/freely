@@ -14,7 +14,6 @@ Current active docs scope is:
 - `docs/CONSTITUTION.md`
 - `docs/LAWS.md`
 - `docs/PROJECT_INTENT.md`
-- `docs/research/`
 - `docs/pre-brainstorms/`
 
 Do not treat legacy paths as active workflow inputs (for example: `docs/brainstorms/`, `docs/planning/`, `docs/continuity/`, `docs/validation/`, `docs/reviews/` under old layout).
