@@ -8,79 +8,19 @@ source ./bin/worktree-common.sh
 branch="$(freely_wt_current_branch)"
 [[ -n "$branch" ]] || exit 0
 
-# 检查是否是 merge 操作
-if [[ -f ".git/MERGE_HEAD" ]]; then
-  # 获取被 merge 的分支名
-  merge_head=$(cat .git/MERGE_HEAD 2>/dev/null || echo "")
-  merge_branch=$(git branch --contains "$merge_head" 2>/dev/null | head -1 | sed 's/^[* ]*//' || echo "")
-  
-  case "$branch" in
-    pre-develop)
-      # pre-develop 只允许 feature/* merge
-      if [[ "$merge_branch" != feature/* ]]; then
-        cat <<MSG
-[HOOK] Merge blocked: pre-develop can only receive merges from feature/*.
-Attempted to merge: $merge_branch
-
-Allowed: feature/* -> pre-develop
-MSG
-        exit 1
-      fi
-      ;;
-    develop)
-      # develop 只允许 pre-develop merge，hotfix 可绕过
-      if [[ "$merge_branch" != "pre-develop" ]]; then
-        if [[ "${FREELY_ALLOW_MERGE:-0}" != "1" ]]; then
-          cat <<MSG
-[HOOK] Merge blocked: develop can only receive merges from pre-develop.
-Attempted to merge: $merge_branch
-
-Allowed: pre-develop -> develop
-Hotfix bypass: FREELY_ALLOW_MERGE=1 git merge <branch>
-MSG
-          exit 1
-        fi
-      fi
-      ;;
-    main)
-      # main 只允许 release/* merge，hotfix 可绕过
-      if [[ "$merge_branch" != release/* ]]; then
-        if [[ "${FREELY_ALLOW_MERGE:-0}" != "1" ]]; then
-          cat <<MSG
-[HOOK] Merge blocked: main can only receive merges from release/*.
-Attempted to merge: $merge_branch
-
-Allowed: release/* -> main
-Hotfix bypass: FREELY_ALLOW_MERGE=1 git merge <branch>
-MSG
-          exit 1
-        fi
-      fi
-      ;;
-    *)
-      # 其他分支不允许执行 merge 操作
-      cat <<MSG
-[HOOK] Merge blocked: '$branch' cannot receive merges.
-Rules:
-- feature/* -> pre-develop
-- pre-develop -> develop
-- release/* -> main
-- hotfix/* -> main/develop (with FREELY_ALLOW_MERGE=1)
-MSG
-      exit 1
-      ;;
-  esac
-  exit 0
-fi
-
 # main, develop, pre-develop 禁止直接 add/commit
 case "$branch" in
   main|develop|pre-develop)
     cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
-Rules:
-- main, develop, pre-develop must not be used for coding commits
-- create/use a worktree branch (feature/*, release/*, hotfix/*)
+Please create a feature branch from pre-develop, then commit in its worktree.
+
+Run:
+  git branch feature/<task-name> pre-develop
+  source ./bin/wt-enter feature/<task-name>
+
+The hook will auto-create the worktree and you should continue after cd into that new directory.
+Do not keep committing in the current directory.
 MSG
     exit 1
     ;;
@@ -94,7 +34,8 @@ if ! freely_wt_validate_branch_base "$branch"; then
   cat <<MSG
 [HOOK] Commit blocked: branch '$branch' base check failed.
 Expected:
-  feature/*, release/* from develop
+  feature/* from pre-develop
+  release/* from develop
   hotfix/* from main
 MSG
   exit 1

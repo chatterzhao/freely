@@ -1,36 +1,36 @@
-# Project Intent Template
+# 项目意图模板
 
-## Project Name
-<name>
+## 项目名称
+<名称>
 
-## Core Intent
-<one paragraph: what autonomous outcome this project should continuously pursue>
+## 核心意图
+<一段话：本项目应持续追求的自主目标是什么>
 
-## Autonomous Behavior
-- AI is the project owner once loop starts.
-- AI self-manages: brainstorm -> EPIC -> STORY -> implementation -> verification.
-- AI keeps iterating until stop criteria are met.
+## 自主行为
+- 循环启动后，AI 即为项目所有者。
+- AI 自主管理：头脑风暴 -> EPIC -> STORY -> 实现 -> 验证。
+- AI 持续迭代，直到满足停止条件。
 
-## Constitution Contract
-- Constitution is mandatory hard constraint.
-- Constitution should include (in this priority order):
-  - branch/worktree policy
-  - baseline project structure policy (docs, README.md, src, .env, .env.example or equivalent)
-  - tech stack constraints
-  - BMAD document discipline (BMA execution workflow)
-  - external system and integration constraints
+## 宪法契约
+- 宪法是强制性的硬性约束。
+- 宪法应包含（按优先级顺序）：
+  - 分支/工作树策略
+  - 基线项目结构策略（docs、README.md、src、.env、.env.example 或等效配置）
+  - 技术栈约束
+  - BMAD 文档纪律（BMA 执行工作流）
+  - 外部系统与集成约束
 
-## Recovery Contract
-- Resume-first when unattended resume is supported.
-- If unattended resume is not supported:
-  1. run bridge recovery to write crash/blocking checkpoint into progress docs
-  2. restart unattended execution from updated project state
+## 恢复契约
+- 支持无人值守续接时优先续接。
+- 若不支持无人值守续接：
+  1. 运行桥接恢复，将崩溃/阻塞检查点写入进度文档
+  2. 从更新的项目状态重启无人值守执行
 
-## Input Surface
-- project absolute path
-- intent file path
-- constitution file path
-- ai spec `tool:model:mode`
+## 输入面
+- 项目绝对路径
+- 意图文件路径
+- 宪法文件路径
+- AI 规格 `工具:模型:模式`
 
-## Stop Criteria
-<explicit termination rules; if empty, loop is continuous by default>
+## 停止条件
+<明确的终止规则；若为空，默认持续循环>

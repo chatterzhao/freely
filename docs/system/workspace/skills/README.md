@@ -1,0 +1,31 @@
+# 系统工作区技能
+
+本目录是 Freely 自主工作流的执行来源。
+
+规则：
+- `CONSTITUTION.md` 定义边界与原则（What/Why）。
+- `LAWS.md` 定义检查、证据和路由（Check/Accept/Route）。
+- Skills 仅定义可执行步骤（How）。
+- Skills 不得扩展宪法范围或替代法律验收。
+- 当冲突发生时，优先语义意图而非提交时间顺序。
+- 不要在多个文档中重复完整执行过程。
+- Worktree 卫生门禁命令：`./bin/wt-status-all`（合并/提升/发布/清理前必须全部 `CLEAN`）。
+- 交叉引用顺序应遵循宪法/法律章节顺序 `1..16` 以减少阅读摩擦。
+
+入口技能：
+- `skill:constitution-guard` -> `constitution-guard/SKILL.md`
+- `skill:laws-enforcer` -> `laws-enforcer/SKILL.md`
+- `skill:auto-loop-orchestrator` -> `auto-loop-orchestrator/SKILL.md`
+- `skill:doc-loop-execution` -> `doc-loop-execution/SKILL.md`
+- `skill:dev-loop-execution` -> `dev-loop-execution/SKILL.md`
+- `skill:branch-management` -> `branch-management/SKILL.md`
+- `skill:premerge-reconcile` -> `premerge-reconcile/SKILL.md`
+- `skill:recovery-subagent-governance` -> `recovery-subagent-governance/SKILL.md`
+- `skill:module-interface-governance` -> `module-interface-governance/SKILL.md`
+- `skill:config-backup-guard` -> `config-backup-guard/SKILL.md`
+
+执行顺序（默认）：
+1. `constitution-guard`（预检门禁）
+2. `laws-enforcer`（验收门禁）
+3. 领域工作流技能（`auto/doc/dev/branch`）
+4. 异常技能（`premerge-reconcile`）按需使用

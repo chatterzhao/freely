@@ -23,6 +23,8 @@ fi
 
 # shellcheck disable=SC1091
 source ./bin/worktree-common.sh
+freely_wt_assert_strict_root || return 1 2>/dev/null || exit 1
+freely_wt_assert_existing_in_strict_root "$branch" || return 1 2>/dev/null || exit 1
 
 existing_path="$(freely_wt_existing_for_branch "$branch")"
 if [[ -n "$existing_path" && "$(pwd -P)" != "$existing_path" ]]; then
