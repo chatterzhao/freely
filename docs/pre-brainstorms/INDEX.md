@@ -37,6 +37,9 @@
 - 20260305-1402--doc-loop-governance-maintenance
   - brainstorms: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/candidates.md
+- 20260305-worktree-policy-predevelop-exclusion
+  - brainstorms: docs/pre-brainstorms/20260305-worktree-policy-predevelop-exclusion/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-worktree-policy-predevelop-exclusion/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
