@@ -1,38 +1,38 @@
-# Agent Context Entry
+# Agent 上下文入口
 
-## Authoritative Sources (in order)
-1. `docs/CONSTITUTION.md` (hard constraints)
-2. `docs/LAWS.md` (operational rules)
-3. `docs/PROJECT_INTENT.md` (product direction)
-4. `AGENTS.md` (entry guidance only, must not override 1-3)
+## 权威来源（按优先级排序）
+1. `docs/CONSTITUTION.md`（硬性约束）
+2. `docs/LAWS.md`（操作规则）
+3. `docs/PROJECT_INTENT.md`（产品方向）
+4. `AGENTS.md`（仅入口指引，不得覆盖 1-3）
 
-If any statement in this file conflicts with the three core docs above, the core docs win.
+如果本文件中的任何陈述与上述三个核心文档冲突，以核心文档为准。
 
-## Current Project Phase
-Freely is in a research-first consolidation phase.
-Current active docs scope is:
+## 当前项目阶段
+Freely 处于研究优先的整合阶段。
+当前活跃文档范围：
 - `docs/CONSTITUTION.md`
 - `docs/LAWS.md`
 - `docs/PROJECT_INTENT.md`
 - `docs/pre-brainstorms/`
 
-Do not treat legacy paths as active workflow inputs (for example: `docs/brainstorms/`, `docs/planning/`, `docs/continuity/`, `docs/validation/`, `docs/reviews/` under old layout).
+不要将遗留路径视为活跃工作流输入（例如：旧布局下的 `docs/brainstorms/`、`docs/planning/`、`docs/continuity/`、`docs/validation/`、`docs/reviews/`）。
 
-## Dogfooding Rule (Freely builds Freely)
-Freely must be developed under Freely governance rules, without project-specific exceptions.
+## 吃自己的狗粮规则（Freely 构建 Freely）
+Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外。
 
-Required:
-- Use the same branch/worktree/hook discipline expected for user projects.
-- Worktree root follows constitution policy: project sibling directory named `{project-name}-worktrees`.
-- Architecture/governance changes must first enter `docs/pre-brainstorms/<id>/` before execution-loop landing.
-- Prefer preflight checks + actionable remediation over repeated privilege prompts.
+要求：
+- 使用对用户项目期望的相同分支/worktree/钩子规范。
+- Worktree 根目录遵循宪法策略：项目同级目录，命名为 `{project-name}-worktrees`。
+- 架构/治理变更必须先进入 `docs/pre-brainstorms/<id>/`，然后才能进入执行循环落地。
+- 优先使用预检 + 可操作的修复方案，而非重复的权限提示。
 
-## Execution Guidance
-- Keep this file minimal and stable; do not duplicate detailed rules from Constitution/Laws.
-- Add details to the canonical docs, then reference them here.
-- When uncertainty appears, open/update a pre-brainstorm entry and converge there first.
+## 执行指引
+- 保持本文件简洁稳定；不要重复宪法/法则中的详细规则。
+- 将细节添加到规范文档中，然后在此引用。
+- 当出现不确定性时，打开/更新一个预头脑风暴条目，先在那里收敛。
 
-## Minimal Commands
+## 基本命令
 - `./bin/freely init|doctor|start|status|stop`
 - `./bin/bmad-check`
 - `./bin/test-pre-push-hook`
