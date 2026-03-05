@@ -235,13 +235,15 @@ A:auto-loop(ADD) [外循环]
 │
 ├── D:doc-loop(IBM) [I -> B -> M]
 │   产出（重构目标目录）：
-│   - docs/epics/{epic}/{story}/issues/{issue}.md
+│   - docs/epics/{epic}/{story}/issues/{issue-name}.md
+│   - docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md
 │   - docs/epics/{epic}/{story}/prd.md
 │   - docs/epics/{epic}/{story}/pre-tests.md
 │   - docs/epics/{epic}/{story}/tasks.md
 │   - docs/milestones.md  (与 issue 原子同步写入：新增/调整归属)
 │   说明：
 │   - `pre-tests.md` 只定义开发前验收标准（含集成验收口径），不作为合并门禁测试结果。
+│   - pre-brainstorms/** 用于候选与前置收敛；正式归属后进入 epics/{epic}/{story}/** 长期维护。
 │
 ├── D:dev-loop(DDD) [Doc-Read -> Dev-Do -> Doc-Update]
 │   产出：
@@ -265,8 +267,8 @@ flowchart TD
     S2["候选池\npre-brainstorms/*/candidates.md"]
     S3{"A2 路由委派\nissue 是否就绪?"}
 
-    D1["D:doc-loop(IBM)\nI/B/M\n产出 issue/prd/pre-tests/tasks"]
-    V1["候选晋升门\n回填 promoted_issue_path\n落位 epic/story/milestone"]
+    D1["D:doc-loop(IBM)\nI/B/M\n产出 issues/brainstorms/prd/pre-tests/tasks"]
+    V1["候选晋升门\n回填 promoted_issue_path\npre-brainstorms -> epics/<epic>/<story>"]
     J1{"是否形成可开发 issue?"}
 
     D2["D:dev-loop(DDD)\n实现/测试/review/文档回写"]
