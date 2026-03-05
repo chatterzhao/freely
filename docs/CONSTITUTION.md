@@ -81,8 +81,8 @@ Freely 是一个自主循环运行器：
 
 | 分支 | push | add/commit | merge 来源 | merge 到 | 备注 |
 |------|------|------------|-----------|----------|------|
-| main | ✅ | ❌ | release/* | - | hotfix 可 `FREELY_ALLOW_MERGE=1` 绕过 |
-| develop | ✅ | ❌ | pre-develop | - | hotfix 可 `FREELY_ALLOW_MERGE=1` 绕过 |
+| main | ✅ | ❌ | release/*, hotfix/* | - | 发布/热修复入口 |
+| develop | ✅ | ❌ | pre-develop, hotfix/* | - | 集成入口 |
 | pre-develop | ✅ | ❌ | feature/* | develop | 不允许绕过 |
 | feature/* | ✅ 同名 | ✅ worktree | - | pre-develop | 从 pre-develop 创建，必须在 worktree 中开发 |
 | release/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 develop 创建 |

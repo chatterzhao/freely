@@ -34,14 +34,14 @@ case "$target" in
   develop)
     if [[ "$source_branch" == "pre-develop" ]]; then
       allowed=1
-    elif [[ "$source_branch" == hotfix/* && "${FREELY_ALLOW_MERGE:-0}" == "1" ]]; then
+    elif [[ "$source_branch" == hotfix/* ]]; then
       allowed=1
     fi
     ;;
   main)
     if [[ "$source_branch" == release/* ]]; then
       allowed=1
-    elif [[ "$source_branch" == hotfix/* && "${FREELY_ALLOW_MERGE:-0}" == "1" ]]; then
+    elif [[ "$source_branch" == hotfix/* ]]; then
       allowed=1
     fi
     ;;
@@ -60,13 +60,12 @@ Allowed:
   feature/* -> pre-develop
   hotfix/* -> pre-develop
   pre-develop -> develop
-  hotfix/* -> develop (FREELY_ALLOW_MERGE=1)
+  hotfix/* -> develop
   release/* -> main
-  hotfix/* -> main (FREELY_ALLOW_MERGE=1)
+  hotfix/* -> main
 MSG
   exit 1
 fi
 
 echo "[MERGE-GUARD] allowed: $source_branch -> $target"
 git merge --no-ff "$source_branch"
-
