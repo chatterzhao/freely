@@ -28,7 +28,7 @@ description: Manage full autonomous branch lifecycle for Freely-style developmen
    - shared infra
    - product behavior changes
 5. Merge serially:
-   - `git merge --no-ff <branch>`
+   - `./bin/merge-guarded pre-develop <branch>`
    - run required smoke/regression checks immediately
 6. If conflict is complex or rollback risk appears, stop and switch to `skill:premerge-reconcile`.
 
@@ -39,6 +39,7 @@ description: Manage full autonomous branch lifecycle for Freely-style developmen
 3. Run required `TEST` evidence check for promotion (including integration acceptance tests).
 4. Ensure `PRE_TEST` remains baseline-only and is not used as substitute for promotion test results.
 5. If all checks are green, promote `pre-develop` to `develop` through allowed path.
+   - `./bin/merge-guarded develop pre-develop`
 6. If any semantic/test mismatch appears, block promotion and return to reconcile flow.
 
 ## Route D: Release and Tag Flow
