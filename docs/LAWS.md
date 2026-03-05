@@ -20,9 +20,17 @@
 3. 在“意图-法律-宪法”三件套达成一致前，不恢复旧目录模型扩展。
 4. 重构完成后，按 issue 驱动在新目录模型中重建必要资产。
 5. AI 自治执行流程以 `docs/system/workspace/skills/` 为执行事实源；本法律定义规则和验收，具体步骤由对应 skill 负责。
-6. 分支治理执行默认调用：
-   - `skill:branch-management`（主流程）
-   - `skill:premerge-reconcile`（复杂冲突异常流）
+6. 法律执行默认调用：
+   - 宪法硬约束门禁：`skill:constitution-guard`
+   - 法律验收门禁：`skill:laws-enforcer`
+   - 外循环编排：`skill:auto-loop-orchestrator`
+   - 文档内循环：`skill:doc-loop-execution`
+   - 开发内循环：`skill:dev-loop-execution`
+   - 分支治理主流程：`skill:branch-management`
+   - 复杂冲突异常流：`skill:premerge-reconcile`
+   - 恢复与子代理治理：`skill:recovery-subagent-governance`
+   - 模块/接口治理：`skill:module-interface-governance`
+   - 配置变更备份：`skill:config-backup-guard`
 
 ---
 

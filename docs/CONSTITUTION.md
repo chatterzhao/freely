@@ -82,9 +82,17 @@ Freely 是一个自主循环运行器：
 - Git 钩子应在本地工作流中强制分支保护。
 - 钩子拒绝消息必须指向本宪法章节作为策略来源。
 - AI 自治执行步骤以 `docs/system/workspace/skills/` 为执行事实源（How）；本宪法只定义约束与边界（What/Why）。
-- 分支治理相关默认技能映射：
-  - 主流程（串行并入、即时测试、回退检查、提升）：`skill:branch-management`
-  - 异常流程（复杂冲突收敛）：`skill:premerge-reconcile`
+- 宪法约束执行默认技能映射：
+  - 宪法硬约束守卫：`skill:constitution-guard`
+  - 法律验收守卫：`skill:laws-enforcer`
+  - A:auto-loop 编排：`skill:auto-loop-orchestrator`
+  - D:doc-loop 执行：`skill:doc-loop-execution`
+  - D:dev-loop 执行：`skill:dev-loop-execution`
+  - 分支治理主流程：`skill:branch-management`
+  - 复杂冲突异常流：`skill:premerge-reconcile`
+  - 恢复与子代理治理：`skill:recovery-subagent-governance`
+  - 模块/接口版本治理：`skill:module-interface-governance`
+  - 配置变更备份守卫：`skill:config-backup-guard`
 - **分支规则表**：
 
 | 分支 | push | add/commit | merge 来源 | merge 到 | 备注 |

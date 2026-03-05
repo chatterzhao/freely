@@ -6,15 +6,18 @@ description: Manage full autonomous branch lifecycle for Freely-style developmen
 # skill:branch-management
 
 ## Route A: Feature Development
-1. Create feature branch from `pre-develop`:
+1. Run preflight guards:
+   - `skill:constitution-guard`
+   - `skill:laws-enforcer`
+2. Create feature branch from `pre-develop`:
    - `git branch feature/<topic> pre-develop`
-2. Enter branch worktree (auto-create + cd):
+3. Enter branch worktree (auto-create + cd):
    - `source ./bin/wt-enter feature/<topic>`
-3. Do changes in this worktree only.
-4. Stage and commit in feature worktree:
+4. Do changes in this worktree only.
+5. Stage and commit in feature worktree:
    - `source ./bin/wt-add feature/<topic> -- <paths or -A>`
    - `git commit -m "<type>: <summary>"`
-5. Run branch-local tests before integration.
+6. Run branch-local tests before integration.
 
 ## Route B: Merge Train to pre-develop
 1. Work only from the `pre-develop` worktree for integration.
