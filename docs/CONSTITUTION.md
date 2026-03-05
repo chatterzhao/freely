@@ -36,6 +36,7 @@ Freely 是一个自主循环运行器：
 - 从 `pre-develop` 提升到 `develop` 必须保留祖先可追溯性（提升的功能提交必须在合并到 `develop` 前可从 `pre-develop` 到达）。
 - 从 `pre-develop` 提升到 `develop` 的检查清单：
   - 必需的 `TEST`（含集成测试验收）通过
+  - 执行 `./bin/wt-status-all` 且所有 worktree 为 `CLEAN`
   - 必需的评审记录存在于 `docs/reviews/`
   - 提升的提交可从 `pre-develop` 到达
   - 进度/恢复文档已更新提升结果
@@ -62,6 +63,7 @@ Freely 是一个自主循环运行器：
 - 操作命令约定：
   - 进入/切换分支工作树：`source ./bin/wt-enter <branch>`
   - 带工作树检查执行 add：`source ./bin/wt-add <branch> -- <git-add-args>`
+  - 全量工作树洁净检查：`./bin/wt-status-all`
 - 没有明确的 STORY/任务所有者和退出标准时不得创建工作树。
 - 已合并/已放弃的工作树必须与其分支引用一起清理。
 - 完成清理是强制性的：
