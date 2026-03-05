@@ -41,6 +41,17 @@ Freely 是一个自主循环运行器：
   - 进度/恢复文档已更新提升结果
 - 如果功能分支在无法从 `pre-develop` 到达的情况下合并到 `develop`，这是策略违规，必须在评审/进度中记录并采取补救措施。
 
+`premerge` 临时分支规则（用于复杂冲突收敛，不新增长期分支层级）：
+- 分支名固定使用：`feature/premerge-YYYYMMDD-HHMM--<topic>`。
+- 必须从 `pre-develop` 创建：`git branch feature/premerge-... pre-develop`。
+- 仅在以下场景使用：
+  - 多个 `feature/*` 串行并入 `pre-develop` 时出现复杂冲突，且无法在单次 merge 中稳定解决。
+  - 历史分支过旧，常规 merge 风险过高，需要通过 `cherry-pick` 方式回收有效提交。
+  - 需要一个短周期“冲突修复批次”来验证治理/hook/目录规则不被回退。
+- 该分支只允许做冲突修复与集成校验，不承载新的业务需求开发。
+- 完成后必须以 `--no-ff` 合并回 `pre-develop`，不得直接合并到 `develop`/`main`。
+- 合并完成后必须删除该 `feature/premerge-*` 分支及其工作树，并在进度/恢复文档记录处理结果。
+
 3. 工作树纪律：
 - 所有非 `main`/`develop` 的开发分支都使用 `git worktree`。
 - 工作树根目录固定：`<project_parent>/<project_name>-worktrees/`。

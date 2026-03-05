@@ -321,6 +321,12 @@ dev
 2. **桥接分支**：不支持时执行：
    - 更新进度文档
    - 重启无人值守循环
+3. **冲突收敛分支（premerge）**：仅在复杂合并冲突时使用
+   - 分支名：`feature/premerge-YYYYMMDD-HHMM--<topic>`
+   - 创建来源：`pre-develop`
+   - 工作内容：冲突修复、提交回收（如 `cherry-pick`）、最小回归验证
+   - 回并目标：仅 `pre-develop`
+   - 完成动作：删除 premerge 分支/worktree，并记录处理结果
 
 ---
 
