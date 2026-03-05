@@ -37,7 +37,8 @@ if ! freely_wt_validate_branch_base "$branch"; then
   cat <<MSG
 [HOOK] Branch '$branch' base check failed.
 Expected:
-  feature/*, release/* from develop
+  feature/* from pre-develop
+  release/* from develop
   hotfix/* from main
 Primary worktree switched back to '$parking_branch'.
 MSG

@@ -21,7 +21,9 @@ freely_wt_is_primary_worktree() {
 }
 
 freely_wt_pick_parking_branch() {
-  if git show-ref --verify --quiet refs/heads/develop; then
+  if git show-ref --verify --quiet refs/heads/pre-develop; then
+    echo "pre-develop"
+  elif git show-ref --verify --quiet refs/heads/develop; then
     echo "develop"
   else
     echo "main"
@@ -100,7 +102,11 @@ MSG
 freely_wt_validate_branch_base() {
   local b="$1"
   case "$b" in
-    feature/*|release/*)
+    feature/*)
+      git show-ref --verify --quiet refs/heads/pre-develop || return 0
+      git merge-base --is-ancestor pre-develop "$b"
+      ;;
+    release/*)
       git show-ref --verify --quiet refs/heads/develop || return 0
       git merge-base --is-ancestor develop "$b"
       ;;
