@@ -2,6 +2,10 @@
 
 This directory is the canonical structure for pre-brainstorm records.
 
+## Naming Rule
+- New directory names must use `YYYYMMDD-HHMM--<topic>`.
+- Existing date-only directories are legacy and can be renamed in a follow-up migration.
+
 ## Entries
 - 20260303-ai-consistency-closed-loop-freely-alignment
   - brainstorms: docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/brainstorms.md

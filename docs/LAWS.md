@@ -15,7 +15,7 @@
 
 执行规则：
 
-1. 新讨论与新决策写入 `docs/pre-brainstorms/<id>/`（核心文件：`brainstorms.md`、`candidates.md`）。
+1. 新讨论与新决策写入 `docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/`（核心文件：`brainstorms.md`、`candidates.md`）。
 2. 历史执行态文档统一暂存到 `docs/research/deferred/`，不作为当前主流程入口。
 3. 在“意图-法律-宪法”三件套达成一致前，不恢复旧目录模型扩展。
 4. 重构完成后，再从 `deferred/` 选择性迁移到新模型。
@@ -336,14 +336,14 @@ A:auto-loop(ADD) [外循环]
 │   ├── 候选源：pre-brainstorms/candidates
 │   └── 执行源：milestones/progress(未完成)
 │   产出：
-│   - docs/pre-brainstorms/<id>/brainstorms.md
-│   - docs/pre-brainstorms/<id>/candidates.md
+│   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/brainstorms.md
+│   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md
 │
 ├── A2 分流决策
 │   ├── raw problem / candidate -> D:doc-loop(IBM)
 │   └── ready issue / in-progress -> D:dev-loop(DDD)
 │   产出：
-│   - 更新 docs/pre-brainstorms/<id>/candidates.md 的 route/status
+│   - 更新 docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md 的 route/status
 │
 ├── D:doc-loop(IBM) [I -> B -> M]
 │   产出（重构目标目录）：

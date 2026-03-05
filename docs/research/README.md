@@ -13,14 +13,14 @@
 
 ## 目录约定
 
-- `../pre-brainstorms/`: 新的 pre-brainstorm 主目录（按 `<id>/brainstorms.md + candidates.md` 组织）
+- `../pre-brainstorms/`: 新的 pre-brainstorm 主目录（按 `<YYYYMMDD-HHMM--topic>/brainstorms.md + candidates.md` 组织）
 - `deferred/`: 暂存历史文档资产，等待基于意图/法律/宪法讨论后重构
 - `README.legacy.md`: 旧文档入口说明（保留供迁移参考）
 
 ## 规则
 
 1. 未完成新文档模型讨论前，不在 `deferred/` 内继续追加执行态流程文档。
-2. 新讨论、新决策优先写入 `docs/pre-brainstorms/<id>/`。
+2. 新讨论、新决策优先写入 `docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/`。
 3. 当新模型达成后，再从 `deferred/` 选择性迁移到新结构。
 
 ## Skills 设计速记清单（防遗忘）
