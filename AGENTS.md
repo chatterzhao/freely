@@ -18,6 +18,14 @@ Freely 处于研究优先的整合阶段。
 
 不要将遗留路径视为活跃工作流输入（例如：旧布局下的 `docs/brainstorms/`、`docs/planning/`、`docs/continuity/`、`docs/validation/`、`docs/reviews/`）。
 
+## 会话启动检查
+
+每次会话开始：
+1. **分支/Worktree检查**：如在 `main`/`develop`/`pre-develop` 则禁止写入。创建 feature 分支及 worktree，cd 到该 worktree 并进入工作
+2. **头脑风暴路由**：
+   - 预研头脑风暴（不是基于 issue 文档）：文档放 `docs/pre-brainstorms/`
+   - IBM 头脑风暴（基于 issue 文档）：文档放 `docs/epics/{epic-name}/{story-name}/brainstorms/b-{issue-name}.md`
+
 ## 吃自己的狗粮规则（Freely 构建 Freely）
 Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外。
 
