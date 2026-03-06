@@ -22,7 +22,9 @@
   - 任务仍在理解、收敛、路由、文档编排阶段
   - 需要较长 prompt 驱动下一跳工作
 - example:
-  - `iflow -p -y "<assembled prompt>"`
+  - fresh/auto: `iflow -p "<assembled prompt>" -y --max-turns 100`
+  - resume/auto: `iflow -c -p "<assembled prompt>" -y --max-turns 100`
+  - fresh/step: `iflow -p "<assembled prompt>" --default --max-turns 100`
 
 ### codex
 
@@ -36,7 +38,9 @@
   - 任务已命中 usable issue
   - 需要直接在仓库中进行实现、验证、修文档
 - example:
-  - `codex exec -C <project-root> - < <prompt-file>`
+  - fresh/auto: `codex exec --skip-git-repo-check -C <project-root> --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
+  - fresh/step: `codex exec --skip-git-repo-check -C <project-root> - < <prompt-file>`
+  - resume/auto: `codex exec resume --last --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
 
 ## Selection Policy
 
@@ -46,6 +50,8 @@
   - implementation/dev-loop
 - AI 应优先选择当前可用且最匹配任务强度的工具。
 - 若多个工具都可用，优先选择更接近当前阶段的工具，而不是固定偏好某一个工具。
+- AI 负责产出 `selected_tool`、`why_selected`、`next_prompt` 与 `target_skill_or_loop`。
+- CLI 的具体启动参数由 Freely runtime 统一执行，不要求 AI 自己发明命令格式。
 - 输出应包含：
   - selected_tool
   - why_selected
