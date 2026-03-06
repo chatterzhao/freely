@@ -11,6 +11,7 @@ description: 执行 `DDD` 开发环，负责在已完成 docs 收敛的 issue/st
 - 负责把代码、测试、progress、milestone、issue 状态保持一致。
 - 负责在测试或评审暴露问题时，判断是否仍留在当前 issue 边界内。
 - 不负责重新发明 issue 边界；边界失稳时应回流给 `auto-loop` 重判。
+- 调用方必须把当前要实现的 issue/story 上下文与 docs 产物传入；本 skill 不负责自己决定实现哪个新问题。
 
 ## 进入条件
 
@@ -19,15 +20,27 @@ description: 执行 `DDD` 开发环，负责在已完成 docs 收敛的 issue/st
 
 ## 输入上下文
 
-- `docs/epics/{epic}/{story}/issues/{issue-name}.md`
-- `docs/epics/{epic}/{story}/prd.md`
-- `docs/epics/{epic}/{story}/pre-tests.md`
-- `docs/epics/{epic}/{story}/tasks.md`
-- `docs/milestones.md`
-- 按需读取：
+- 调用方传入的当前 issue/story 实现目标
+- 调用方显式附带或指向的：
+  - `docs/epics/{epic}/{story}/issues/{issue-name}.md`
+  - `docs/epics/{epic}/{story}/prd.md`
+  - `docs/epics/{epic}/{story}/pre-tests.md`
+  - `docs/epics/{epic}/{story}/tasks.md`
+  - `docs/milestones.md`
+- 按需读取调用方已指向的补充证据：
   - `docs/progress/{epic}/p-{issue}.md`
   - recovery 记录
   - review / test 结果
+
+## 调用约定
+
+- 调用方至少应传入：
+  - `issue_ref`
+  - `implementation_scope_summary`
+  - `required_doc_refs`
+  - `milestone_path`
+  - 当前推荐下一跳仍是本 skill 的原因
+- 本 skill 只处理传入 issue 的实现与验证，不在 skill 内自己挑选新的实现目标。
 
 ## 工作产物
 

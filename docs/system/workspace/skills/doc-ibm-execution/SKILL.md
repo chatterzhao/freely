@@ -11,6 +11,7 @@ description: 在法律和宪法下执行 issue-bound docs 环，负责 `IBM+G` �
 - 负责把问题从“已有 issue 但文档仍不足”推进到“ready for dev”或“明确阻塞”。
 - 负责 docs、milestone、candidate 提升记录之间的一致性。
 - 不负责代码实现；实现进入 `dev-loop-execution`。
+- 调用方必须把当前要处理的 issue 或 candidate-to-issue 上下文传入；本 skill 不负责自己挑新的 issue 来做。
 
 ## 进入条件
 
@@ -21,15 +22,27 @@ description: 在法律和宪法下执行 issue-bound docs 环，负责 `IBM+G` �
 
 ## 输入上下文
 
-- `docs/epics/{epic}/{story}/issues/{issue-name}.md` 或待创建 issue 路径
-- `docs/milestones.md`
-- 当前关联的 `candidates.md` / `brainstorms.md`，若 issue 来自 pre-brainstorm
-- `docs/CONSTITUTION.md`
-- `docs/LAWS.md`
-- 按需读取：
+- 调用方传入的当前 issue 标识、issue path 或 candidate-to-issue 提升信息
+- 调用方显式附带或指向的：
+  - `docs/epics/{epic}/{story}/issues/{issue-name}.md` 或待创建 issue 路径
+  - `docs/milestones.md`
+  - 当前关联的 `candidates.md` / `brainstorms.md`，若 issue 来自 pre-brainstorm
+  - `docs/CONSTITUTION.md`
+  - `docs/LAWS.md`
+- 按需读取调用方已指向的补充证据：
   - `docs/progress/**`
   - review / test / recovery 证据
   - 相关治理资产
+
+## 调用约定
+
+- 调用方至少应传入：
+  - `issue_ref` 或 `candidate_ref`
+  - `issue_scope_summary`
+  - `milestone_path`
+  - 当前缺失的 docs 产物提示
+  - 当前推荐下一跳仍是本 skill 的原因
+- 本 skill 只收敛传入 issue 的 docs 边界，不在 skill 内凭空选择别的 issue。
 
 ## 工作产物
 
