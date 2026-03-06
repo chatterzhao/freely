@@ -25,7 +25,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - 无稳定 issue 边界 -> `skill:doc-pre-brainstorm-execution`
    - issue-bound brainstorm / mapping / governance -> `skill:doc-ibm-execution`
    - ready issue / in-progress -> `skill:dev-loop-execution`
-5. 各 loop skill 在环内完成自己的工作，并把状态、阻塞、完成或恢复上下文回流给 `auto-loop`。
+5. 各 loop skill 在环内完成自己的工作，并把状态、阻塞、完成或恢复上下文回流给 `auto-loop`；不要求下游 skill 直接“调用 auto-loop 的某个子 skill”。
 6. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
 7. 更新候选项 / milestone / issue / progress / route 状态记录。
 8. 重复循环直到停止条件。

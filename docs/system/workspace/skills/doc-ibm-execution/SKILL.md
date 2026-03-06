@@ -5,12 +5,33 @@ description: 在法律和宪法下执行 issue-bound docs 环，负责 `IBM+G` �
 
 # skill:doc-ibm-execution
 
-## 适用边界
+## 职责
+
+- 负责在已有 issue 边界内完成 issue-bound `IBM+G` 文档收敛。
+- 负责把问题从“已有 issue 但文档仍不足”推进到“ready for dev”或“明确阻塞”。
+- 负责 docs、milestone、candidate 提升记录之间的一致性。
+- 不负责代码实现；实现进入 `dev-loop-execution`。
+
+## 进入条件
+
 - `IBM`：issue 接入、brainstorm、mapping、里程碑与路由同步。
 - `G`：治理资产维护（`docs/CONSTITUTION.md`、`docs/LAWS.md`、`docs/system/workspace/skills/**`）的一致性修复与收敛。
-- 本 skill 是 docs 内循环，不负责实现代码；实现进入 `dev-loop-execution`。
+- 当前已有 issue path，或已从 candidate 提升为 issue。
+- 当前仍缺 issue-bound brainstorm、mapping、`PRE_TEST`、tasks 或治理口径收敛。
 
-## 核心产物
+## 输入上下文
+
+- `docs/epics/{epic}/{story}/issues/{issue-name}.md` 或待创建 issue 路径
+- `docs/milestones.md`
+- 当前关联的 `candidates.md` / `brainstorms.md`，若 issue 来自 pre-brainstorm
+- `docs/CONSTITUTION.md`
+- `docs/LAWS.md`
+- 按需读取：
+  - `docs/progress/**`
+  - review / test / recovery 证据
+  - 相关治理资产
+
+## 工作产物
 
 - `docs/epics/{epic}/{story}/issues/{issue-name}.md`
 - `docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md`
@@ -23,7 +44,7 @@ description: 在法律和宪法下执行 issue-bound docs 环，负责 `IBM+G` �
   - `docs/LAWS.md`
   - `docs/system/workspace/skills/**`
 
-## 工作流
+## 工作步骤
 1. 接收 issue 并对齐 epic/story/milestone 所有权。
 2. 产出或更新 issue-bound brainstorm：`brainstorms/b-{issue-name}.md`。
 3. 在 map 阶段完善：
@@ -40,14 +61,35 @@ description: 在法律和宪法下执行 issue-bound docs 环，负责 `IBM+G` �
 9. 用 `skill:laws-enforcer` 验证。
 10. 若 issue 已具备实现条件，明确向 `auto-loop` 返回“可进入 dev-loop”的状态与最小上下文。
 
-## 状态交换
+## 不负责
 
-- 向 `auto-loop` 回流的最小结果应包括：
-  - issue 是否已完成接入与落位
-  - `PRE_TEST` 是否已建立
-  - milestone 是否已同步
-  - 是否已具备进入 `dev-loop-execution` 的条件
-  - 若阻塞，阻塞原因与下一动作
+- 不直接修改实现代码作为主工作。
+- 不把 review/test 暴露的新边界问题强行塞进当前 issue；若边界变化，应回流给 `auto-loop` 重判。
+- 不替代 `dev-loop-execution` 的实现、测试与 progress 主回写职责。
 
-## 完成
-- 必需的 doc-loop 产物完整，且 `IBM` 与 `G` 两轨在当前 issue 范围内保持一致可追溯。
+## 状态回流给 auto-loop
+
+当出现以下任一情况时，应把状态交还 `auto-loop`：
+
+- issue 文档已 ready for `dev-loop-execution`
+- 当前 issue 仍需继续 docs 收敛
+- 当前被阻塞
+- 发现边界变化，应该退回 `doc-pre-brainstorm-execution` 或重新路由
+
+回流时最少应提供：
+- `status`: `in_progress | blocked | reroute_required | completed`
+- `why`
+- `updated_artifacts`
+- `next_recommended_route`
+- `recovery_context`
+
+语义要求：
+- ready for dev 时，`next_recommended_route` 设为 `dev-loop-execution`
+- 仍缺 `b-issue/prd/pre-tests/tasks` 任一关键产物时，保持 `doc-ibm-execution`
+- 若 issue 边界失稳，明确说明为何不能继续留在本环
+
+## 完成判定
+
+- 必需的 issue-bound docs 产物完整。
+- `IBM` 与 `G` 两轨在当前 issue 范围内保持一致可追溯。
+- 已明确是进入 `dev-loop-execution`，还是因阻塞/边界变化回流外循环。

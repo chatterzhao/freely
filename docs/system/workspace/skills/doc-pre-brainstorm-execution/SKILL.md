@@ -5,7 +5,14 @@ description: 执行 pre-brainstorm 前置收敛环，负责把原始问题收敛
 
 # skill:doc-pre-brainstorm-execution
 
-## 适用边界
+## 职责
+
+- 负责把尚未形成稳定 issue 边界的问题收敛为 pre-brainstorm 产物，并把 candidate 与 milestone 保持原子同步。
+- 负责在 docs 范围内完成前置研究、边界收敛、候选分解与下一跳建议。
+- 不负责 issue-bound `IBM+G` 产物。
+- 不负责代码实现、测试执行与 progress 主回写。
+
+## 进入条件
 
 - 当前输入尚未命中可继续执行的正式 issue。
 - 当前问题仍处于前置研究、边界收敛、候选分解阶段。
@@ -17,11 +24,25 @@ description: 执行 pre-brainstorm 前置收敛环，负责把原始问题收敛
   - `docs/PROJECT_INTENT.md`
   - milestone 中仍停留在 `candidate_issues` 的条目
 
+## 输入上下文
+
+- `docs/PROJECT_INTENT.md`
+- `docs/CONSTITUTION.md`
+- `docs/LAWS.md`
+- `docs/milestones.md`
+- 当前关联的 `docs/pre-brainstorms/<id>/` 目录；若不存在则创建
+- 按需读取：
+  - 相关 `issue/progress/recovery` 证据
+  - review / test / chat 原始输入
+  - 相关治理文档
+
 ## 工作产物
 
 - `docs/pre-brainstorms/<id>/brainstorms.md`
 - `docs/pre-brainstorms/<id>/candidates.md`
 - `docs/milestones.md`
+- 按需更新：
+  - 相关治理文档中的术语或路由说明
 
 ## 主事实源
 
@@ -29,7 +50,7 @@ description: 执行 pre-brainstorm 前置收敛环，负责把原始问题收敛
 - milestone 承接 candidate 的可扫描入口，但不是前置收敛事实源
 - 本 skill 的目标是把原始问题收敛成可路由的 candidate，而不是直接产出正式 story 产物
 
-## 工作流
+## 工作步骤
 
 1. 确认当前为何不能直接进入 `doc-ibm-execution` 或 `dev-loop-execution`：
    - 尚无 issue path
@@ -51,7 +72,7 @@ description: 执行 pre-brainstorm 前置收敛环，负责把原始问题收敛
 5. 当 candidate 状态不是 `dropped` 时，原子更新 `docs/milestones.md`：
    - 归属哪个 milestone
    - 位于 `candidate_issues`
-   - 当前下一步动作通常应指向 `doc-loop(IBM+G)`，而不是直接 `dev-loop`
+   - 当前下一步动作通常应指向 `doc-ibm-execution`，而不是直接 `dev-loop-execution`
    - 保留 candidate 与 milestone 的可追溯映射
 6. milestone 绑定完成后，必须回写 `candidates.md`：
    - `milestone` 不再允许停留在 `pending://milestone-binding`
@@ -68,16 +89,29 @@ description: 执行 pre-brainstorm 前置收敛环，负责把原始问题收敛
   - `tasks.md`
 - 不直接进入实现、测试与进度回写
 
-## 状态交换
+## 状态回流给 auto-loop
 
-- 输出给 `auto-loop` / `context-source-skill` 的最小结果应包括：
-  - 本轮 candidate 更新摘要
-  - milestone 同步结果
-  - 是否已形成可进入 `doc-ibm-execution` 的 issue-ready candidate
-  - 若阻塞，阻塞原因与下一动作
+当出现以下任一情况时，应结束本轮 skill 内工作，并把状态交还 `auto-loop`：
 
-## 完成
+- 已经收敛出可进入 `doc-ibm-execution` 的 candidate
+- 发现当前问题其实已存在稳定 issue 边界，应 reroute
+- 当前被阻塞，无法继续前置收敛
+- 当前轮只完成了部分研究，需要后续继续本环
+
+回流时最少应提供：
+- `status`: `in_progress | blocked | reroute_required | completed`
+- `why`
+- `updated_artifacts`
+- `next_recommended_route`
+- `recovery_context`
+
+语义要求：
+- 若仍需继续 pre-brainstorm，`next_recommended_route` 保持 `doc-pre-brainstorm-execution`
+- 若已形成 issue-ready candidate，`next_recommended_route` 设为 `doc-ibm-execution`
+- 若发现当前问题应回到已有 issue，上报 reroute 原因与对应 evidence
+
+## 完成判定
 
 - `brainstorms.md` 与 `candidates.md` 已更新。
 - `docs/milestones.md` 与 candidate 状态保持原子一致。
-- 当前问题已经被收敛成后续可由 `doc-loop(IBM+G)` 接管的 candidate，而不是悬空问题。
+- 当前问题已经被收敛成后续可由 `doc-ibm-execution` 接管的 candidate，或已明确为何继续停留在本环。
