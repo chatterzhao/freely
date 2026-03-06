@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<USAGE
+Usage:
+  bin/new-review --reviewer <name> --topic <scope>
+
+Example:
+  bin/new-review --reviewer codex-gpt5.3-high --topic hook-policy-review
+USAGE
+}
+
+reviewer=""
+topic=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --reviewer) reviewer="${2:-}"; shift 2 ;;
+    --topic) topic="${2:-}"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "unknown arg: $1" >&2; usage; exit 1 ;;
+  esac
+done
+
+[[ -n "$reviewer" && -n "$topic" ]] || { usage; exit 1; }
+
+sanitize() {
+  local s="$1"
+  s="$(echo "$s" | tr '[:upper:]' '[:lower:]')"
+  s="$(echo "$s" | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/-+/-/g')"
+  printf '%s' "$s"
+}
+
+ts="$(date '+%Y%m%d-%H%M%S')"
+branch="$(git symbolic-ref --short HEAD 2>/dev/null || echo no-branch)"
+reviewer="$(sanitize "$reviewer")"
+branch="$(sanitize "$branch")"
+topic="$(sanitize "$topic")"
+
+mkdir -p docs/reviews
+file="docs/reviews/${ts}--${reviewer}--${branch}--${topic}.md"
+
+cat > "$file" <<MD
+# Review Record
+
+- Reviewed At: $(date -u '+%Y-%m-%dT%H:%M:%SZ')
+- Reviewer: ${reviewer}
+- Branch: ${branch}
+- Commit: $(git rev-parse --short HEAD 2>/dev/null || echo N/A)
+- Scope: ${topic}
+
+## Findings
+- <TBD>
+
+## Risks
+- <TBD>
+
+## Decision
+- <TBD>
+MD
+
+echo "$file"

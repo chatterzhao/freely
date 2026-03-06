@@ -1,17 +1,17 @@
 ---
 name: auto-loop-orchestrator
-description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 lead-agent、来源判定、usable issue 分流，再接入 doc-loop 或 dev-loop，并回到发现阶段。当 AI 运行自主持续交付循环时使用。
+description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 lead-agent、上下文判定，再接入 pre-brainstorm/doc-loop/dev-loop，并回到发现阶段。当 AI 运行自主持续交付循环时使用。
 ---
 
 # skill:auto-loop-orchestrator
 
 ## 首段闭环主链
-`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop-execution -> dev-loop-execution`
+`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> doc-pre-brainstorm-execution | doc-ibm-execution | dev-loop-execution`
 
 约束：
 - Freely 当前编排的是外部 AI CLI 工具，而不是自研 AI CLI runtime。
 - `lead-agent` 是角色定义，建议落点：`docs/system/workspace/agents/lead-agent.md`。
-- `context-source-skill`、`no-usable-issue-skill`、`has-usable-issue-skill` 是 skills。
+- `context-source-skill`、`doc-pre-brainstorm-execution`、`doc-ibm-execution`、`dev-loop-execution` 是 skills。
 - skill 名称表达职责，不用 loop 前缀表达归属。
 - `docs/system/workspace/` 是能力真源；`bin/`、`.githooks/` 等是运行时落点。
 - `sh` / `ps1` 的定义源应位于 `docs/system/workspace/scripts/`。
@@ -22,17 +22,16 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 2. `system/workspace/scripts` 中定义的 `sh` / `ps1` 启动外部 AI CLI 工具，并进入 `lead-agent`。
 3. `lead-agent` 调用 `skill:context-source-skill`，基于当前来源、milestone、工具清单与上下文做 usable issue 判定，并组装下一跳提示词。
 4. 根据 `context-source-skill` 的结果分流：
-   - 无 usable issue -> `skill:no-usable-issue-skill`
-   - 有 usable issue -> `skill:has-usable-issue-skill`
-5. `skill:no-usable-issue-skill` 继续停留 `pre-brainstorms`，产出 `brainstorms.md` / `candidates.md` 并同步 milestone。
-6. `skill:has-usable-issue-skill` 负责把已有 issue 接入 issue-bound `skill:doc-loop-execution`。
-7. `skill:doc-loop-execution` 完成 issue 接入、brainstorm、mapping、`PRE_TEST` 与里程碑同步后，后续循环再按状态进入 `skill:dev-loop-execution`。
-8. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
-9. 更新候选项 / milestone / route 状态记录。
-10. 重复循环直到停止条件。
+   - 无稳定 issue 边界 -> `skill:doc-pre-brainstorm-execution`
+   - issue-bound brainstorm / mapping / governance -> `skill:doc-ibm-execution`
+   - ready issue / in-progress -> `skill:dev-loop-execution`
+5. 各 loop skill 在环内完成自己的工作，并把状态、阻塞、完成或恢复上下文回流给 `auto-loop`。
+6. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
+7. 更新候选项 / milestone / issue / progress / route 状态记录。
+8. 重复循环直到停止条件。
 
 ## pre-brainstorms 触发
-当任一条件成立时，经 `context-source-skill` 判定后进入 `no-usable-issue-skill`：
+当任一条件成立时，经 `context-source-skill` 判定后进入 `doc-pre-brainstorm-execution`：
 - 问题来源已发现，但 `epic/story/milestone` 尚未收敛。
 - 验收边界不清，无法直接进入 `dev-loop`。
 - 需要跨工具或子代理进行分歧收敛。

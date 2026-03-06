@@ -56,13 +56,15 @@ description: 对当前输入做来源适配、上下文读取、usable issue 判
 9. 组装下一跳 prompt，prompt 至少包含：
    - `<source input>`
    - `docs/milestones.md` 路径
-   - 需要阅读的 workspace 相对路径，例如 `workspace/skills/no-usable-issue-skill/SKILL.md`
+   - 需要阅读的 workspace 相对路径，例如 `workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
    - 当前为何选择该工具
    - 进入 doc-loop / dev-loop / pre-brainstorm 的边界要求
 10. 产出下一跳：
-   - `pre-brainstorm` -> `skill:no-usable-issue-skill`
-   - `issue-bound brainstorm` -> `skill:has-usable-issue-skill` 并导向 issue-bound `doc-loop-execution`
-   - `issue continuation` -> `skill:has-usable-issue-skill` 并导向 issue-bound `doc-loop-execution` continuation
+   - `pre-brainstorm` -> `skill:doc-pre-brainstorm-execution`
+   - `issue-bound brainstorm` -> `skill:doc-ibm-execution`
+   - `issue continuation`
+     - 若当前缺文档 / 缺 `PRE_TEST` / 缺 mapping -> `skill:doc-ibm-execution`
+     - 若 issue 已 ready/in-progress 且文档足够 -> `skill:dev-loop-execution`
 11. 如发现治理口径漂移，要求在下一跳中补齐对应治理资产。
 
 ## 输出
@@ -93,5 +95,6 @@ description: 对当前输入做来源适配、上下文读取、usable issue 判
 - `lead-agent` 获得可执行的下一跳决定。
 - 当前回合需要更新的 candidate / milestone / issue 状态已被显式指出。
 - 下一跳外部 AI 工具与 prompt 已被组装出来。
-- 若进入 `no-usable-issue-skill`，主产物应是 candidate + milestone 同步。
-- 若进入 `has-usable-issue-skill`，主事实源应切换到 milestone + issue。
+- 若进入 `doc-pre-brainstorm-execution`，主产物应是 candidate + milestone 同步。
+- 若进入 `doc-ibm-execution`，主产物应是 issue-bound `IBM+G` 产物与 milestone 同步。
+- 若进入 `dev-loop-execution`，主产物应是代码 / 测试 / progress / milestone 回写。

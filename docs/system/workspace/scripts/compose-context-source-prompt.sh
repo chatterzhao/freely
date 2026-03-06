@@ -61,10 +61,11 @@ cat <<EOF
    - target_skill_or_loop
    - next_prompt
 5. 若 milestone 中没有 usable issue：
-   - 阅读 workspace/skills/no-usable-issue-skill/SKILL.md
+   - 阅读 workspace/skills/doc-pre-brainstorm-execution/SKILL.md
    - 严格按指南继续 pre-brainstorm 或候选收敛
 6. 若 milestone 中已有 usable issue：
-   - 阅读 workspace/skills/has-usable-issue-skill/SKILL.md
-   - 严格按指南先接入 issue-bound doc-loop-execution(IBM+G)
+   - 先判断当前是 issue-bound 文档收敛，还是 ready/in-progress 的实现延续
+   - 文档收敛时阅读 workspace/skills/doc-ibm-execution/SKILL.md
+   - 实现延续时阅读 workspace/skills/dev-loop-execution/SKILL.md
 7. 不要把路由理解成脚本硬编码分支；应由你基于输入和文档理解后决定。
 EOF

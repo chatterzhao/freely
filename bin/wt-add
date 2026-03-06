@@ -1,67 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-usage() {
-  cat <<USAGE
-Usage:
-  source bin/wt-add [branch] -- <git-add-args>
-
-Examples:
-  source bin/wt-add feature/my-task -- -A
-  source bin/wt-add -- docs/README.md
-
-Notes:
-- Git has no native pre-add hook.
-- This helper performs worktree check/entry before running git add.
-USAGE
-}
-
-if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
-  echo "Please run with: source bin/wt-add [branch] -- <git-add-args>" >&2
-  exit 1
-fi
-
-branch=""
-if [[ $# -gt 0 && "$1" != "--" ]]; then
-  branch="$1"
-  shift
-fi
-
-[[ "${1:-}" == "--" ]] || { usage; return 1; }
-shift
-
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 # shellcheck disable=SC1091
-source ./bin/worktree-common.sh
-
-if [[ -z "$branch" ]]; then
-  branch="$(freely_wt_current_branch)"
-fi
-
-[[ -n "$branch" ]] || { echo "No branch detected." >&2; return 1; }
-
-case "$branch" in
-  main|develop|pre-test-merge)
-    echo "Add blocked: '$branch' is protected. Use feature/release/hotfix worktree." >&2
-    return 1
-    ;;
-esac
-
-if freely_wt_is_primary_worktree; then
-  # shellcheck disable=SC1091
-  source ./bin/wt-enter "$branch"
-fi
-
-git add "$@"
-echo "git add done on branch '$branch' at $(pwd -P)"
-
-# === Scope Check Hint ===
-staged_files=$(git diff --cached --name-only 2>/dev/null || true)
-if [[ -n "$staged_files" ]]; then
-  branch_topic="${branch#*/}"
-  
-  echo ""
-  echo "staged 文件列表："
-  echo "$staged_files" | sed 's/^/  /'
-  echo ""
-  echo "[scope-check] 请确认这些文件一起提交是否符合 git 原子提交原则，是否与分支职责('$branch_topic')匹配。不匹配应拆分提交或创建新 worktree。"
-fi
+source "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-add" "$@"

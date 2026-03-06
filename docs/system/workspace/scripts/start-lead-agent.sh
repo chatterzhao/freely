@@ -124,10 +124,12 @@ cat <<EOF
 7. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
    - \`workspace/agents/lead-agent.md\`
    - \`workspace/skills/context-source-skill/SKILL.md\`
-   - \`workspace/skills/no-usable-issue-skill/SKILL.md\`
-   - \`workspace/skills/has-usable-issue-skill/SKILL.md\`
-8. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/no-usable-issue-skill/SKILL.md\`。
-9. 若已有稳定 issue 边界，下一跳应阅读 \`workspace/skills/has-usable-issue-skill/SKILL.md\`，并先接入 issue-bound \`doc-loop-execution\`。
-10. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
-11. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。
+   - \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`
+   - \`workspace/skills/doc-ibm-execution/SKILL.md\`
+   - \`workspace/skills/dev-loop-execution/SKILL.md\`
+8. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`。
+9. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`workspace/skills/doc-ibm-execution/SKILL.md\`。
+10. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`workspace/skills/dev-loop-execution/SKILL.md\`。
+11. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
+12. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。
 EOF

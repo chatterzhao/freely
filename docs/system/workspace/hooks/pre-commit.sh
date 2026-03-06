@@ -6,8 +6,9 @@ required=(
   "docs/system/workspace/agents/lead-agent.md"
   "docs/system/workspace/scripts/start-lead-agent.sh"
   "docs/system/workspace/skills/context-source-skill/SKILL.md"
-  "docs/system/workspace/skills/no-usable-issue-skill/SKILL.md"
-  "docs/system/workspace/skills/has-usable-issue-skill/SKILL.md"
+  "docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md"
+  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md"
+  "docs/system/workspace/skills/dev-loop-execution/SKILL.md"
 )
 
 for path in "${required[@]}"; do

@@ -23,10 +23,11 @@
 3. 将来源判定、需求池扫描、优先级判断与下一跳提示词组装委托给 `skill:context-source-skill`，而不是在本文件中内嵌所有路由细节。
 4. 读取 `workspace/tools.md`，理解当前可用工具、优先级和适配阶段。
 5. 基于 `context-source-skill` 的输出，自主决定下一跳是：
-   - `skill:no-usable-issue-skill`
-   - `skill:has-usable-issue-skill`
+   - `skill:doc-pre-brainstorm-execution`
+   - `skill:doc-ibm-execution`
+   - `skill:dev-loop-execution`
    - 以及应由哪个外部 AI CLI 工具承接下一跳
-6. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:doc-loop-execution` 或 `skill:dev-loop-execution`；已有 issue 先进入 issue-bound `doc-loop`，再由后续循环进入 `dev-loop`。
+6. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:doc-ibm-execution` 或 `skill:dev-loop-execution`；已有 issue 先进入 issue-bound `doc-loop`，再由后续循环进入 `dev-loop`。
 
 ## 不负责
 

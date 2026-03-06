@@ -18,9 +18,8 @@
 - `skill:laws-enforcer` -> `laws-enforcer/SKILL.md`
 - `skill:auto-loop-orchestrator` -> `auto-loop-orchestrator/SKILL.md`
 - `skill:context-source-skill` -> `context-source-skill/SKILL.md`
-- `skill:no-usable-issue-skill` -> `no-usable-issue-skill/SKILL.md`
-- `skill:has-usable-issue-skill` -> `has-usable-issue-skill/SKILL.md`
-- `skill:doc-loop-execution` -> `doc-loop-execution/SKILL.md`
+- `skill:doc-pre-brainstorm-execution` -> `doc-pre-brainstorm-execution/SKILL.md`
+- `skill:doc-ibm-execution` -> `doc-ibm-execution/SKILL.md`
 - `skill:dev-loop-execution` -> `dev-loop-execution/SKILL.md`
 - `skill:branch-management` -> `branch-management/SKILL.md`
 - `skill:premerge-reconcile` -> `premerge-reconcile/SKILL.md`
@@ -33,3 +32,8 @@
 2. `laws-enforcer`（验收门禁）
 3. 领域工作流技能（`auto/doc/dev/branch`）
 4. 异常技能（`premerge-reconcile`）按需使用
+
+当前模型下，外循环直接编排：
+- `doc-pre-brainstorm-execution`
+- `doc-ibm-execution`
+- `dev-loop-execution`

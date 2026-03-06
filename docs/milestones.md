@@ -62,25 +62,25 @@ routing_policy:
 - completion_note: 已落地来源判定、milestone 扫描与 usable issue 决策规则
 
 3. `C-20260306-1103`
-- title: `no-usable-issue-skill.md`
+- title: `doc-pre-brainstorm-execution.md`
 - milestone_state: completed
 - priority: P0
 - promoted_issue_path: `pending://issue-materialization`
-- evidence: `docs/system/workspace/skills/no-usable-issue-skill/SKILL.md`
-- completion_note: 已落地 pre-brainstorm 收敛与 milestone 原子同步规则
+- evidence: `docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
+- completion_note: 已落地 docs 前置收敛环，负责 pre-brainstorm 产物与 milestone 原子同步
 
 4. `C-20260306-1104`
-- title: `has-usable-issue-skill.md`
+- title: `doc-ibm-execution.md` 与 `dev-loop-execution.md` 的外循环接驳边界
 - milestone_state: completed
 - priority: P0
 - promoted_issue_path: `pending://issue-materialization`
-- evidence: `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`
-- completion_note: 已落地 usable issue 到 doc/dev-loop 的分流边界
+- evidence: `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
+- completion_note: 已收紧 issue-bound `IBM+G` 与 `DDD` 的接驳边界，状态交换统一回流给 auto-loop
 
 5. `C-20260306-1105`
 - title: 现有 `auto-loop-orchestrator` skill 对齐到首段闭环模型
 - milestone_state: completed
 - priority: P0
 - promoted_issue_path: `pending://issue-materialization`
-- evidence: commit `00fd970`, `docs/system/workspace/scripts/`, `docs/system/workspace/hooks/`, `bin/test-routing-foundation-loop`
-- completion_note: 已把 `system/workspace` 真源、`scripts` / `hooks` 与运行时落点映射写回现有 orchestrator skill、补齐脚本与 hook 定义源，并提供最小闭环测试
+- evidence: `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`, `docs/system/workspace/scripts/README.md`, `docs/system/workspace/scripts/tests/test-routing-foundation-loop`, `docs/system/workspace/hooks/pre-commit.sh`
+- completion_note: 已把 `system/workspace` 真源、`scripts` / `hooks` 与运行时投影映射写回 orchestrator，并补齐最小闭环测试

@@ -9,16 +9,17 @@
   - 外部 AI CLI 工具
   - `lead-agent`
   - `context-source-skill`
-  - usable issue 判定
-  - `no-usable-issue-skill` / `has-usable-issue-skill`
-  - `doc-loop(IBM+G)` / `dev-loop(DDD)` 正式工作流接驳
+  - route 判定
+  - `doc-pre-brainstorm-execution`
+  - `doc-ibm-execution`
+  - `dev-loop(DDD)` 正式工作流接驳
 - 附加约束：Freely 正在自举开发 Freely，必须在自己的 worktree / brainstorm / issue 治理下收敛这条主链，且下层设计不得与上层边界冲突。
 
 ## 当前收敛后的主问题
 
 需要回答的已不是单点规则，而是这条首段闭环：
 
-`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) -> dev-loop(DDD)`
+`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> doc-pre-brainstorm-execution | doc-ibm-execution -> dev-loop(DDD)`
 
 因此当前预研的真实主题应收敛为：
 
@@ -519,6 +520,146 @@ routing_policy:
 
 ## 新增待收敛问题
 
+### 新增纠偏：`no/has-usable-issue-skill` 可能是错误分层
+
+进一步对照 `PROJECT_INTENT`、`doc-loop-execution`、`dev-loop-execution` 之后，当前模型里还有一层结构性重复风险：
+
+- `context-source-skill` 已经负责：
+  - 扫描需求池
+  - 判断 issue 边界
+  - 产出 `route_kind`
+- `has-usable-issue-skill` 若继续负责“有 issue 后怎么进 `doc-loop` / `dev-loop`”，就会和真正的 loop skill 重叠
+- `no-usable-issue-skill` 若只是“没 issue 就去 pre-brainstorm”，则更像 route 分支名，而不是稳定工作能力
+
+也就是说，当前 `no/has` 两个 skill 名字按“是否有 usable issue”切开，容易把“路由条件”误建模成“工作能力”。
+
+### 重新拆层后，更稳的职责应接近：
+
+1. `auto-loop`
+   - 负责外循环编排
+   - 负责在每一轮根据当前状态决定进入哪个环
+   - 负责接收环内产物、状态、阻塞、崩溃、正常结束，再进入下一轮
+
+2. `lead-agent`
+   - 负责首跳接管与委托
+   - 不负责具体找活或执行领域工作
+
+3. `context-source-skill`
+   - 负责扫描需求池、解释上下文、判断 issue 边界
+   - 负责产出本轮 route decision
+   - 但不直接承担 loop 内部执行
+
+4. 真正的领域工作 skills
+   - `doc-pre-brainstorm-execution`
+   - `doc-ibm-execution`
+   - `dev-loop-execution`
+
+这里最关键的是：
+
+- `pre-brainstorm` 本身也应被视为一种文档工作能力
+- `IBM` 是 `doc-loop` 的 issue-bound 文档能力
+- `DDD` 是 `dev-loop` 的实现能力
+
+所以更自然的模型不是：
+
+`context-source-skill -> no-skill | has-skill -> doc-loop | dev-loop`
+
+而是：
+
+`context-source-skill -> doc-pre-brainstorm-execution | doc-ibm-execution | dev-loop-execution`
+
+### 这样拆的好处
+
+1. skill 名字表达“做什么”，而不是“当前判定结果是什么”
+
+- `doc-pre-brainstorm-execution`：做 pre-brainstorm 收敛
+- `doc-ibm-execution`：做 `IBM+G`
+- `dev-loop-execution`：做 `DDD`
+
+2. 避免中间层重复
+
+- `has-usable-issue-skill` 会和 `doc-ibm-execution` 重复“已有 issue 后怎么进入 doc-loop”
+- `no-usable-issue-skill` 会和 `context-source-skill` 重复“没 issue 时走 pre-brainstorm”
+
+3. 更符合外循环 / 内循环关系
+
+- 外循环负责路由：进哪个环
+- 内循环 skill 负责在环内正常工作
+- 工作结果、状态交换、阻塞、崩溃、正常结束都回到外循环
+
+### 因此当前更稳的收敛方向应改为
+
+`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> doc-pre-brainstorm-execution | doc-ibm-execution | dev-loop-execution`
+
+进一步解释：
+
+- `auto-loop` / runtime 负责：
+  - 启动
+  - 监控
+  - 续接
+  - 停止
+  - 外循环路由
+- `context-source-skill` 负责：
+  - 扫描需求池
+  - 判断进入哪个环
+- 一旦某个 loop skill 被调用：
+  - 就视为已经进入那个环
+  - 该 skill 要在环内按自己的方法论正常工作
+  - 结束后把状态交换回 `auto-loop`
+
+### 对当前已落地产物的影响
+
+这意味着当前已经落地的：
+
+- `no-usable-issue-skill`
+- `has-usable-issue-skill`
+
+很可能不是最终稳定命名。
+
+更可能的后续收敛是：
+
+- 将二者合并或替换为更薄的 route/handoff 层，甚至直接取消
+- 把 pre-brainstorm 抽成独立 skill
+- 保留 `doc-ibm-execution`
+- 保留 `dev-loop-execution`
+
+### 当前暂时判断
+
+当前 `no/has-usable-issue-skill` 可以视为过渡产物，用于帮助把主链先说清。
+
+但从长期模型看，更正确的技能层级应是：
+
+- `context-source-skill`：判断进哪个环
+- `doc-pre-brainstorm-execution`：前置收敛
+- `doc-ibm-execution`：`IBM+G`
+- `dev-loop-execution`：`DDD`
+
+因此，后续若继续纠偏，优先级应是：
+
+1. 将 `pre-brainstorm` 抽成独立 doc skill
+2. 收缩或移除 `no/has-usable-issue-skill`
+3. 让 `auto-loop` 直接编排 `pre-brainstorm/doc/dev` 三个执行环
+
+### 关于是否需要新 worktree / 新 pre-brainstorm 的判断
+
+这次纠偏虽然较大，但仍属于同一主题：
+
+- 都在回答 Freely 启动后的自治闭环如何分层
+- 都围绕 `lead-agent`、`context-source-skill`、外循环与内循环、以及 `pre-brainstorm/doc/dev` 的职责切分
+- 不是新的产品方向，也不是独立治理主题
+
+因此当前更合理的做法是：
+
+- **继续当前 worktree**
+- **继续当前 pre-brainstorm**
+- 在本条预研内直接修正之前的 `no/has` 中间层设计
+
+不新开平行 worktree 的原因：
+
+- 当前分支尚未进入合并阶段，仍处于预研收敛
+- 新分支只会制造两条相互竞争的结构设计
+- 真正需要的是在当前问题内形成单一结论，而不是把纠偏再拆成平行问题
+
 1. candidate 的状态枚举是否需要统一升级？
    - 当前常见有：`proposed | promoted | dropped | needs_research`
    - 但 milestone 层可能需要：`candidate | research-needed | sequencing-pending | committed | in_progress | blocked`
@@ -813,7 +954,7 @@ route = context_match(milestone, issue, candidate)
 - mermaid 图仍把 `pre-brainstorms/candidates` 放在直接路由入口
 - 仍写“在 candidates.md 的 session_refs 留痕并进入 A2 路由”
 
-2. `docs/system/workspace/skills/doc-loop-execution/SKILL.md`
+2. `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
 - 仍写“更新 pre-brainstorms 候选项路由/状态”
 - 后续应改为：更新候选研究状态 + milestone 绑定，而不是直接承担路由
 
