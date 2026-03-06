@@ -37,7 +37,7 @@
 - status: promoted
 - decision_reason: 这是两层 auto-loop 机制的中枢；不先明确它，后续所有 skill 层级都会继续混乱。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
 
 ### C-20260306-1102
@@ -49,7 +49,7 @@
 - status: promoted
 - decision_reason: 这是 `lead-agent` 的核心依赖文件，也是两层模型里真正承载来源适配的一层。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
 
 ### C-20260306-1103
@@ -61,7 +61,7 @@
 - status: promoted
 - decision_reason: 这是第二跳执行层里“无可用 issue”分支的标准工作法。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
 
 
@@ -74,7 +74,7 @@
 - status: promoted
 - decision_reason: 这是第二跳执行层里“有可用 issue”分支的标准工作法，也是最容易与 doc/dev-loop 混淆的一层，必须单独固化。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
 
 
@@ -87,5 +87,5 @@
 - status: promoted
 - decision_reason: 这是把本次预研结论真正接回现有 orchestrator skill 与项目意图的收口项。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []

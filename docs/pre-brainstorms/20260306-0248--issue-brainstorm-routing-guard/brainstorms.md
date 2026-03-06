@@ -386,6 +386,13 @@ routing_policy:
 - 不是单看 brainstorm 文件本身
 - 还要看 milestone 是否已经承认它为正式 issue 或仅为 candidate
 
+### 修正 4：Freely 自举时，当前候选必须立即进入真实 milestone
+- Freely 既然要求托管项目把 milestone 当作主动扫描层，就不能让自己的活跃候选长期只停留在 `candidates.md`
+- 因此本轮 `C-20260306-1101` ~ `C-20260306-1105` 应立即绑定到 `docs/milestones.md#m-20260306-workspace-routing-foundation`
+- `C-20260306-1101` ~ `C-20260306-1104` 进入该 milestone 的 `committed_issues`，表示顺序已清晰、下一步应继续物化 issue 或直接进入 doc-loop 产出
+- `C-20260306-1105` 保留在同一 milestone，但标记为已完成对齐项，作为当前批次已经落地的证据
+- 后续启动时，Freely 应优先从 milestone 读取这批项，而不是再次把它们当成无归属候选重新解释
+
 ## 新增待收敛问题
 
 1. candidate 的状态枚举是否需要统一升级？
