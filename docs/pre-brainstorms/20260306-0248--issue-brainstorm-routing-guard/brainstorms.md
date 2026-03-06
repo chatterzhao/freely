@@ -7,7 +7,7 @@
 - 当前已命中的关键层次：
   - `sh` / `ps1` 启动入口
   - 外部 AI CLI 工具
-  - `auto-loop-lead-agent`
+  - `lead-agent`
   - `context-source-skill`
   - usable issue 判定
   - `no-usable-issue-skill` / `has-usable-issue-skill`
@@ -18,7 +18,7 @@
 
 需要回答的已不是单点规则，而是这条首段闭环：
 
-`sh/ps1 -> external AI CLI tool -> auto-loop-lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
+`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
 
 因此当前预研的真实主题应收敛为：
 
@@ -45,7 +45,7 @@
 1. 启动层
    - `sh` / `ps1` 如何启动外部 AI CLI 工具
 2. 首跳代理层
-   - `auto-loop-lead-agent` 定义启动后首个 AI 会话承担什么职责、边界在哪里
+   - `lead-agent` 定义启动后首个 AI 会话承担什么职责、边界在哪里
 3. 来源适配层
    - `context-source-skill` 如何读取 chat / review / test / milestone / issue / recovery 等上下文来源
 4. 路由判定层
@@ -66,7 +66,7 @@
 - `agent` 负责角色定义
 - `skill` 负责局部工作法与可执行编排
 - Freely 当前编排的是外部 AI CLI 工具，而不是自研 AI CLI runtime
-- 因此“启动后谁负责总控”应由 `auto-loop-lead-agent` 承担
+- 因此“启动后谁负责总控”应由 `lead-agent` 承担
 - 而“根据来源怎么编排下一跳”应收敛到被 `lead-agent` 调用的 `context-source-skill`
 
 当前不单独引入第三类 `orchestrator/guidance` 产物：
@@ -82,6 +82,14 @@
 - 因此新产物不使用 `auto-loop-*`、`doc-loop-*`、`dev-loop-*` 这类前缀命名规则
 - 现有历史名称若已稳定存在，可暂时保留；新增产物遵循新规则
 
+当前建议的正式落点路径应为：
+
+- `agent`: `docs/system/workspace/agents/lead-agent.md`
+- `skill`: `docs/system/workspace/skills/context-source-skill/SKILL.md`
+- `skill`: `docs/system/workspace/skills/no-usable-issue-skill/SKILL.md`
+- `skill`: `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`
+- 现有对齐项：`docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
+
 ### 5. 文档落位规则已降级为配套子问题
 
 之前的 brainstorm-routing 结论并没有失效，但它现在属于更大主题下的治理子问题：
@@ -94,7 +102,7 @@
 ### 6. 启动后总控归 `lead-agent`，来源编排归 `context-source-skill`
 
 - `sh` / `ps1` 只负责启动外部 AI CLI 工具
-- AI CLI 工具启动后，由 `auto-loop-lead-agent` 接管首段闭环
+- AI CLI 工具启动后，由 `lead-agent` 接管首段闭环
 - `lead-agent` 负责调用 skill，而不是内嵌所有来源判定细节
 - 与上下文来源相关的编排与路由决策，统一收敛到 `context-source-skill`
 - `context-source-skill` 产出下一跳决策：进入 `no-usable-issue-skill` 或 `has-usable-issue-skill`
@@ -133,11 +141,11 @@
 ### A. 启动到首跳代理
 
 1. `sh` / `ps1` 对外部 AI CLI 工具的启动契约是什么？
-2. 外部 AI CLI 工具与 `auto-loop-lead-agent` 的关系应如何表述，才能避免把它误写成业务执行器？
+2. 外部 AI CLI 工具与 `lead-agent` 的关系应如何表述，才能避免把它误写成业务执行器？
 
 ### B. 首跳代理到来源适配
 
-1. `auto-loop-lead-agent` 是否只负责首跳总控，不直接承担 doc/dev-loop 的领域工作？
+1. `lead-agent` 是否只负责首跳总控，不直接承担 doc/dev-loop 的领域工作？
 2. `context-source-skill` 的最小职责集合是什么？
 3. 它应读取哪些上下文来源，按什么优先级整合？
 
@@ -193,7 +201,7 @@
 当前更稳的路线应是：
 
 1. 先把首段闭环主链写清：
-   `sh/ps1 -> external AI CLI tool -> auto-loop-lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
+   `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
 2. 再分别定义每一层的职责边界和输入输出
 3. 产物类型只分为 `agent` 与 `skill`，不额外引入第三类 `orchestrator/guidance`
 4. 将 brainstorm 路由、元数据契约、milestone 绑定、hook / `bmad-check` 明确降为治理配套层
@@ -204,7 +212,7 @@
 
 ### 方向 1：先固化首段闭环的 4 个核心文档
 
-- `auto-loop-lead-agent.md`
+- `lead-agent.md`
 - `context-source-skill.md`
 - `no-usable-issue-skill.md`
 - `has-usable-issue-skill.md`
