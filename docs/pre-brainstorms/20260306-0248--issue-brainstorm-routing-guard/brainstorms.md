@@ -48,7 +48,7 @@
 2. 首跳代理层
    - `lead-agent` 定义启动后首个 AI 会话承担什么职责、边界在哪里
 3. 来源适配层
-   - `context-source-skill` 如何读取 chat / review / test / milestone / issue / recovery 等上下文来源
+   - `context-source-skill` 如何读取 chat / story-scoped code-reviews / test / milestone / issue / recovery 等上下文来源
 4. 路由判定层
    - 如何做 usable issue 判定
 5. 第二跳分支层

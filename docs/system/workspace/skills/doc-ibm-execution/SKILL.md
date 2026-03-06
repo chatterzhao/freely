@@ -31,7 +31,7 @@ description: 在法律和宪法下执行 issue-bound docs 环，负责 `IBM+G` �
   - `docs/LAWS.md`
 - 按需读取调用方已指向的补充证据：
   - `docs/progress/**`
-  - review / test / recovery 证据
+  - story-scoped `code-reviews/**` / test / recovery 证据
   - 相关治理资产
 
 ## 调用约定
@@ -78,7 +78,7 @@ description: 在法律和宪法下执行 issue-bound docs 环，负责 `IBM+G` �
 ## 不负责
 
 - 不直接修改实现代码作为主工作。
-- 不把 review/test 暴露的新边界问题强行塞进当前 issue；若边界变化，应回流给 `auto-loop` 重判。
+- 不把 code-review/test 暴露的新边界问题强行塞进当前 issue；若边界变化，应回流给 `auto-loop` 重判。
 - 不替代 `dev-loop-execution` 的实现、测试与 progress 主回写职责。
 
 ## 状态回流给 auto-loop

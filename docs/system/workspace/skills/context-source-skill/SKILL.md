@@ -43,12 +43,12 @@ description: 对调用方传入的当前输入包做来源适配、上下文判�
 2. 在调用方给定的上下文范围内扫描需求池：
    - `docs/milestones.md`
    - progress / recovery
-   - review / test
+   - story-scoped `code-reviews` / test
    - chat / github-issue
    - `docs/PROJECT_INTENT.md`
 3. AI 基于当前输入包自主判断此刻优先查看哪个池，而不是由脚本硬编码固定顺序。
 4. 识别当前输入来源：
-   - 新问题输入：intent / review / test / chat / github-issue
+   - 新问题输入：intent / code-review / test / chat / github-issue
    - 延续输入：milestone / issue / progress / recovery
 5. 先从 `docs/milestones.md` 查找是否已有匹配条目。
 6. 对命中的条目判定是否为 usable issue：
@@ -99,10 +99,10 @@ description: 对调用方传入的当前输入包做来源适配、上下文判�
 - milestone 是主动扫描层，不是纯报表。
 - `pending://milestone-binding` 只能是短暂过渡态。
 - 已有 issue path 不代表直接进入 dev-loop；仍要结合文档完整度、状态和证据决定。
-- chat / review / test 这类外部输入，若尚未进入正式 issue 体系，先回到 pre-brainstorms 收敛。
+- chat / code-review / test 这类外部输入，若尚未进入正式 issue 体系，先回到 pre-brainstorms 收敛。
 - 核心产出是“提示词组装与工具选择建议”，不是 shell 里的硬编码路由。
 - AI 应理解后路由，而不是按脚本分支表机械跳转。
-- `test` / `review` / `chat` 不得因为来源名直接硬编码路径，必须先判断 issue 边界。
+- `test` / `code-review` / `chat` 不得因为来源名直接硬编码路径，必须先判断 issue 边界。
 
 ## 完成
 
