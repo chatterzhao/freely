@@ -21,7 +21,7 @@ Freely 处于研究优先的整合阶段。
 ## 会话启动检查
 
 每次会话开始：
-1. **分支/Worktree检查**：如在 `main`/`develop`/`pre-develop` 则禁止写入。创建 feature 分支及 worktree，cd 到该 worktree 并进入工作
+1. **分支/Worktree检查**：如在 `main`/`develop`/`pre-test-merge` 则禁止写入。创建 feature 分支及 worktree，cd 到该 worktree 并进入工作
 2. **头脑风暴路由**：
    - 预研头脑风暴（不是基于 issue 文档）：文档放 `docs/pre-brainstorms/`
    - IBM 头脑风暴（基于 issue 文档）：文档放 `docs/epics/{epic-name}/{story-name}/brainstorms/b-{issue-name}.md`

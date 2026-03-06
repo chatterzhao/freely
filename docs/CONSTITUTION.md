@@ -14,47 +14,47 @@ Freely 是一个自主循环运行器：
 
 分支/工作树规则是硬性约束，实施前必须检查：
 
-1. 分支模型（基于 GitFlow）：
+1. 分支模型（基于 GitFlow + 临时预集成验证分支）：
 - `main` 仅用于发布，必须保持稳定。
-- `develop` 是夜间集成分支（仅限测试后集成）。
-- `pre-develop` 是强制性的测试集成分支，用于不稳定功能验证。
-- `feature/*` 分支从 `pre-develop` 创建，先合并到 `pre-develop` 测试，验证后再提升到 `develop`。
+- `develop` 是长期开发集成分支，也是 `feature/*` 的默认父分支与默认合并目标。
+- `pre-test-merge` 是临时预集成验证分支；仅在组合验证、短周期集成验收、复杂冲突收敛或发布前预演时启用。
+- `feature/*` 分支从 `develop` 创建；默认直接合并到 `develop`。如需预集成验证，可先进入 `pre-test-merge`，验证通过后再并入 `develop`。
 - `release/*` 分支从 `develop` 创建用于发布冻结，然后合并到 `main` 并回合并到 `develop`。
 - `hotfix/*` 分支从 `main` 创建，然后合并到 `main` 和 `develop`。
 
-`pre-develop` 的价值（必须保留）：
-- 它是 `feature/*` 和 `develop` 之间的风险缓冲。
-- 用于在提升前暴露集成冲突、钩子/策略回归和不稳定的测试行为。
+`pre-test-merge` 的价值（临时启用，不得固化为长期开发父分支）：
+- 它是 `develop` 前的临时风险缓冲，而不是默认开发主线。
+- 用于在正式进入 `develop` 前暴露组合集成冲突、钩子/策略回归和不稳定测试行为。
 - 允许多功能预演而不污染 `develop`。
-- 如果仓库不保留 `pre-develop`，必须用等效的强制验证分支替代并说明原因。
+- 验证完成或失败后必须退出本轮职责，不得继续承担默认 `feature/*` 父分支角色。
 
 2. 合并纪律：
 - 不稳定的变更不得合并到 `main`。
 - `main` 只接受来自 `release/*` 或 `hotfix/*` 的合并。
-- 功能交付禁止直接合并/推送到 `develop`；功能验证必须先进入 `pre-develop`。
-- `develop` 应只接收已测试/已提升的变更，保持可构建/可测试。
-- 从 `pre-develop` 提升到 `develop` 必须保留祖先可追溯性（提升的功能提交必须在合并到 `develop` 前可从 `pre-develop` 到达）。
+- `develop` 是功能交付的默认目标分支；进入 `develop` 前必须满足要求的 `TEST`、评审与进度/恢复证据。
+- `pre-test-merge` 仅作为临时验证路径；当它被启用时，进入 `develop` 的验证结果必须可追溯到该验证批次。
 - 提升前的具体验收门与证据口径由 `docs/LAWS.md` 第 2 章定义。
 - `PRE_TEST` 与 `TEST` 的职责边界由 `docs/LAWS.md` 第 2 章与第 11 章定义。
-- 如果功能分支在无法从 `pre-develop` 到达的情况下合并到 `develop`，这是策略违规，必须在评审/进度中记录并采取补救措施。
+- 若为高风险集成而先进入 `pre-test-merge`，验证通过后再并入 `develop`；若直接进入 `develop`，不得伪造 `pre-test-merge` 祖先要求。
 
 `premerge` 临时分支规则（用于复杂冲突收敛，不新增长期分支层级）：
 - 分支名固定使用：`feature/premerge-YYYYMMDD-HHMM--<topic>`。
-- 必须从 `pre-develop` 创建（具体命令步骤由 `skill:premerge-reconcile` 定义）。
+- 必须从当前活跃的 `pre-test-merge` 创建；若未启用 `pre-test-merge`，则先从 `develop` 创建该临时验证分支，再进入 `premerge`（具体命令步骤由 `skill:premerge-reconcile` 定义）。
 - 仅在以下场景使用：
-  - 多个 `feature/*` 串行并入 `pre-develop` 时出现复杂冲突，且无法在单次 merge 中稳定解决。
+  - 多个 `feature/*` 串行并入 `pre-test-merge` 时出现复杂冲突，且无法在单次 merge 中稳定解决。
   - 历史分支过旧，常规 merge 风险过高，需要通过 `cherry-pick` 方式回收有效提交。
   - 需要一个短周期“冲突修复批次”来验证治理/hook/目录规则不被回退。
 - 该分支只允许做冲突修复与集成校验，不承载新的业务需求开发。
-- 完成后必须以 `--no-ff` 合并回 `pre-develop`，不得直接合并到 `develop`/`main`。
+- 完成后必须以 `--no-ff` 合并回 `pre-test-merge`，再根据验证结果决定是否并入 `develop`；不得直接合并到 `main`。
 - 合并完成后必须删除该 `feature/premerge-*` 分支及其工作树，并在进度/恢复文档记录处理结果。
 
 3. 工作树纪律：
-- 所有非 `main`/`develop`/`pre-develop` 的开发分支都使用 `git worktree`。
+- 所有非 `main`/`develop`/`pre-test-merge` 的开发分支都使用 `git worktree`。
 - 工作树根目录固定：`<project_parent>/<project_name>-worktrees/`。
 - 工作树目录命名必须为 `{project-name}-worktrees`，且与项目根目录同级，保证排序和定位时与项目紧邻。
 - 禁止在项目目录内部创建工作树目录（必须与项目目录并列）。
 - 在主工作树检出分支时，钩子应在固定根目录下自动创建缺失的工作树。
+- 创建或切换 `feature/*`、`release/*`、`hotfix/*`、`feature/premerge-*` 后，后续工作必须在 dedicated sibling worktree 中继续；主 worktree 仅允许短暂停留以触发自动创建。
 - 操作步骤与命令以 `docs/system/workspace/skills/` 为执行事实源（How）。
 - 没有明确的 STORY/任务所有者和退出标准时不得创建工作树。
 - 已合并/已放弃的工作树必须与其分支引用一起清理。
@@ -82,13 +82,13 @@ Freely 是一个自主循环运行器：
 | 分支 | push | add/commit | merge 来源 | merge 到 | 备注 |
 |------|------|------------|-----------|----------|------|
 | main | ✅ | ❌ | release/*, hotfix/* | - | 发布/热修复入口 |
-| develop | ✅ | ❌ | pre-develop, hotfix/* | - | 集成入口 |
-| pre-develop | ✅ | ❌ | feature/* | develop | 不允许绕过 |
-| feature/* | ✅ 同名 | ✅ worktree | - | pre-develop | 从 pre-develop 创建，必须在 worktree 中开发 |
+| develop | ✅ | ❌ | feature/*, pre-test-merge, hotfix/* | - | 默认开发集成入口 |
+| pre-test-merge | ✅ | ❌ | feature/*, hotfix/*, feature/premerge-* | develop | 临时预集成验证分支 |
+| feature/* | ✅ 同名 | ✅ worktree | - | develop, pre-test-merge | 从 develop 创建，必要时先进入 pre-test-merge 验证 |
 | release/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 develop 创建 |
 | hotfix/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 main 创建 |
 
-- hotfix 合并到 main/develop 后必须同步到 pre-develop
+- 若 `pre-test-merge` 当前活跃，hotfix 合并到 main/develop 后必须同步到该临时验证分支
 
 ## 3. 版本命名规则（硬性要求）
 
@@ -97,7 +97,7 @@ Freely 是一个自主循环运行器：
 | 版本示例 | 分支 | 阶段 | Tag | 对外 |
 |----------|------|------|-----|------|
 | `2026.03.01-1430-alpha` | `feature/*` | 开发中 | 本地轻量 tag | 否 |
-| `2026.03.01-1430-beta` | `pre-develop` | 测试集成 | 本地轻量 tag | 否 |
+| `2026.03.01-1430-beta` | `pre-test-merge` | 测试集成 | 本地轻量 tag | 否 |
 | `2026.03.01-1430-nightly` | `develop` | 夜间构建 | push tag | 是 |
 | `2026.03.01-1430-stable` | `main` | 正式发布 | push tag | 是 |
 | `2026.03.01-1430-hotfix` | `hotfix/*` | 紧急修复 | push tag | 是 |

@@ -40,7 +40,7 @@ fi
 [[ -n "$branch" ]] || { echo "No branch detected." >&2; return 1; }
 
 case "$branch" in
-  main|develop)
+  main|develop|pre-test-merge)
     echo "Add blocked: '$branch' is protected. Use feature/release/hotfix worktree." >&2
     return 1
     ;;

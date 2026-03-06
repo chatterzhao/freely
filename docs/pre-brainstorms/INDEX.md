@@ -40,6 +40,9 @@
 - 20260305-worktree-policy-predevelop-exclusion
   - brainstorms: docs/pre-brainstorms/20260305-worktree-policy-predevelop-exclusion/brainstorms.md
   - candidates: docs/pre-brainstorms/20260305-worktree-policy-predevelop-exclusion/candidates.md
+- 20260305-2355--pre-test-merge-duty-migration
+  - brainstorms: docs/pre-brainstorms/20260305-2355--pre-test-merge-duty-migration/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-2355--pre-test-merge-duty-migration/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

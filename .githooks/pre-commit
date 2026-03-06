@@ -8,15 +8,15 @@ source ./bin/worktree-common.sh
 branch="$(freely_wt_current_branch)"
 [[ -n "$branch" ]] || exit 0
 
-# main, develop, pre-develop 禁止直接 add/commit
+# main, develop, pre-test-merge 禁止直接 add/commit
 case "$branch" in
-  main|develop|pre-develop)
+  main|develop|pre-test-merge)
     cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
-Please create a feature branch from pre-develop, then commit in its worktree.
+Please create a feature branch from develop, then commit in its worktree.
 
 Run:
-  git branch feature/<task-name> pre-develop
+  git branch feature/<task-name> develop
   source ./bin/wt-enter feature/<task-name>
 
 The hook will auto-create the worktree and you should continue after cd into that new directory.
@@ -34,7 +34,8 @@ if ! freely_wt_validate_branch_base "$branch"; then
   cat <<MSG
 [HOOK] Commit blocked: branch '$branch' base check failed.
 Expected:
-  feature/* from pre-develop
+  feature/* from develop
+  feature/premerge-* from pre-test-merge (or develop when pre-test-merge is not active)
   release/* from develop
   hotfix/* from main
 MSG

@@ -1,18 +1,18 @@
 ---
 name: premerge-reconcile
-description: 在不回退治理的情况下协调高风险合并冲突。当合并列车到 pre-develop 失败或语义回归风险出现时使用；从 pre-develop 创建临时 premerge 分支，按语义意图解决，合并回 pre-develop，并清理。
+description: 在不回退治理的情况下协调高风险合并冲突。当临时验证批次到 pre-test-merge 失败或语义回归风险出现时使用；从 pre-test-merge 创建临时 premerge 分支，按语义意图解决，合并回 pre-test-merge，并清理。
 ---
 
 # skill:premerge-reconcile
 
 ## 触发条件
-- 正常合并到 `pre-develop` 因高冲突文件失败。
+- 正常合并到 `pre-test-merge` 因高冲突文件失败。
 - 冲突解决后有策略回退风险。
 
 ## 前置条件
-- 从当前 `pre-develop` 开始。
+- 从当前 `pre-test-merge` 开始。
 - 创建专用分支：
-  - `git branch feature/premerge-YYYYMMDD-HHMM--<topic> pre-develop`
+  - `git branch feature/premerge-YYYYMMDD-HHMM--<topic> pre-test-merge`
   - 通过 worktree 进入（`source ./bin/wt-enter ...`）。
 
 ## 工作流
@@ -21,8 +21,8 @@ description: 在不回退治理的情况下协调高风险合并冲突。当合�
    - 以语义优先决策解决冲突
 2. 对每个冲突，遵循 `references/conflict-decision-template.md`。
 3. 在此分支上运行最小回归。
-4. 仅合并回 `pre-develop`：
-   - `git checkout pre-develop`
+4. 仅合并回 `pre-test-merge`：
+   - `git checkout pre-test-merge`
    - `git merge --no-ff feature/premerge-...`
 5. 通过 `skill:branch-management` 检查清单运行语义回归检查。
 6. 清理：
@@ -34,6 +34,6 @@ description: 在不回退治理的情况下协调高风险合并冲突。当合�
 - 如旧结构与当前治理冲突，保留治理并调整旧内容。
 
 ## 完成
-- `pre-develop` 包含协调后的变更。
+- `pre-test-merge` 包含协调后的变更。
 - 回归检查通过。
 - Premerge 分支/worktree 已删除。

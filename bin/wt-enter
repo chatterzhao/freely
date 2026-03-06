@@ -36,8 +36,12 @@ fi
 git checkout "$branch"
 wt_path="$(freely_wt_existing_for_branch "$branch")"
 
+if [[ "$wt_path" == "$(freely_wt_primary_worktree)" ]]; then
+  wt_path=""
+fi
+
 if [[ -z "$wt_path" ]]; then
-  echo "No worktree found for branch '$branch'." >&2
+  echo "No dedicated sibling worktree found for branch '$branch'." >&2
   return 1
 fi
 
