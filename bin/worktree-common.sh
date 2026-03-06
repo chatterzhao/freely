@@ -44,6 +44,14 @@ freely_wt_root_dir() {
   echo "${parent_dir}/${repo_name}-worktrees"
 }
 
+freely_wt_repo_name() {
+  basename "$(freely_wt_primary_worktree)"
+}
+
+freely_wt_relative_root_dir() {
+  echo "../$(freely_wt_repo_name)-worktrees"
+}
+
 freely_wt_assert_strict_root() {
   local root primary
   root="$(freely_wt_root_dir)"
@@ -66,6 +74,14 @@ freely_wt_target_path_for_branch() {
   local safe root
   safe="$(freely_wt_sanitize_name "$branch")"
   root="$(freely_wt_root_dir)"
+  echo "${root}/${safe}"
+}
+
+freely_wt_relative_target_for_branch() {
+  local branch="$1"
+  local safe root
+  safe="$(freely_wt_sanitize_name "$branch")"
+  root="$(freely_wt_relative_root_dir)"
   echo "${root}/${safe}"
 }
 

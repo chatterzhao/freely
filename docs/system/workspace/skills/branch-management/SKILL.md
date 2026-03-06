@@ -9,10 +9,12 @@ description: 管理 Freely 风格开发的完整自主分支生命周期。当 A
 1. 运行预检门禁：
    - `skill:constitution-guard`
    - `skill:laws-enforcer`
-2. 从 `develop` 创建功能分支：
-   - `git branch feature/<topic> develop`
-3. 进入分支 worktree（自动创建 + cd）：
-   - `source ./bin/wt-enter feature/<topic>`
+2. 先回到项目根目录，再用标准 git worktree 命令创建功能分支与 dedicated worktree：
+   - `cd <your-project-name-path>`
+   - `git worktree add -b feature/<topic> ../<your-project-name>-worktrees/feature-<topic> develop`
+3. 进入该分支 worktree：
+   - `cd ../<your-project-name>-worktrees/feature-<topic>`
+   - 无需先 `git checkout develop`；命令最后的 `develop` 已经指定了基线
 4. 仅在此 worktree 中进行变更。
    - 编码前，定义此周期的单一变更意图和边界（作用域说明，用于后续提交拆分）
 5. 在功能 worktree 中暂存和提交：
@@ -57,12 +59,12 @@ description: 管理 Freely 风格开发的完整自主分支生命周期。当 A
    - `hotfix/*` -> `hotfix`（推送标签）
 4. 发布分支路径（必须在 `release/*` 对应 worktree 中执行）：
    - 从 `develop` 创建 `release/*`
-   - 通过 `source ./bin/wt-enter release/<topic>` 进入该分支 worktree
+   - 使用标准 git worktree 命令创建并进入对应 worktree
    - 在该 worktree 中完成发布冻结与验证后，合并到 `main`
    - 将发布结果回合并到 `develop`
 5. 热修复分支路径（必须在 `hotfix/*` 对应 worktree 中执行）：
    - 从 `main` 创建 `hotfix/*`
-   - 通过 `source ./bin/wt-enter hotfix/<topic>` 进入该分支 worktree
+   - 使用标准 git worktree 命令创建并进入对应 worktree
    - 在该 worktree 中完成修复后，合并到 `main` 和 `develop`
    - 若 `pre-test-merge` 当前活跃，同步热修复结果到 `pre-test-merge`
 6. 如任何必需验证为红色，阻止推送标签/发布。
