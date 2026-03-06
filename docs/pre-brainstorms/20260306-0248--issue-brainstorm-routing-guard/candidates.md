@@ -10,18 +10,20 @@
   - 1 个首跳中枢代理：`auto-loop-lead-agent.md`
   - 1 个来源适配与上下文判定 skill：`context-source-skill.md`
   - 2 个第二跳 workflow skills：`no-usable-issue-skill.md`、`has-usable-issue-skill.md`
-  - 1 个 `auto-loop-orchestrator` / guidance 对齐项
+  - 1 个现有 `auto-loop-orchestrator` skill 对齐项
 - 主链应显式对齐为：
-  `sh/ps1 -> first AI tool -> auto-loop-lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
+  `sh/ps1 -> external AI CLI tool -> auto-loop-lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
+- 产物类型只分为 `agent` 与 `skill`
+- 命名不再使用 loop 前缀；名称表达职责，目录表达归属，元数据表达可调用范围
 - 当前先不把 hook/script 放回主收敛；先把首段闭环主链和 4 个文档型产物写清。
 
 ## Candidates
 
 ### C-20260306-1101
 - title: `auto-loop-lead-agent.md`
-- problem: 当前还缺少一个明确的首跳 AI 中枢代理说明，定义从 `sh/ps1` 启动首个 AI 工具后，到底由谁承担首段闭环编排职责。
+- problem: 当前还缺少一个明确的首跳 AI 中枢代理说明，定义从 `sh/ps1` 启动外部 AI CLI 工具后，到底由谁承担首段闭环编排职责。
 - why_now: 如果没有 `lead-agent` 这一层，启动器、来源适配、usable issue 判定和第二跳 skill 会继续混在一起，无法形成统一主链。
-- acceptance_hint: 创建 `auto-loop-lead-agent.md`，明确：1) 它由首个 AI 工具执行；2) 它位于 `sh/ps1` 与 `context-source-skill.md` 之间；3) 它负责生成下一跳 AI 工具调用指令；4) 它不替代 `doc-loop-execution` / `dev-loop-execution`。
+- acceptance_hint: 创建 `auto-loop-lead-agent.md`，明确：1) 它由启动后的外部 AI CLI 工具执行；2) 它位于 `sh/ps1` 与 `context-source-skill.md` 之间；3) 它负责调用后续 skill，而不是内嵌所有来源判定细节；4) 它不替代 `doc-loop-execution` / `dev-loop-execution`。
 - priority: P0
 - status: promoted
 - decision_reason: 这是两层 auto-loop 机制的中枢；不先明确它，后续所有 skill 层级都会继续混乱。
@@ -31,9 +33,9 @@
 
 ### C-20260306-1102
 - title: `context-source-skill.md`
-- problem: 当前缺少一个供 `lead-agent` 使用的来源适配与上下文判定规则文件，无法稳定把 `<source input>` 转换成 usable issue 判断和下一跳 AI 工具调用指令。
-- why_now: 首跳不是直接执行业务工作，而是先做来源适配、上下文识别和工具调用装配；如果没有这一层，首跳 AI 只能重新自由发挥。
-- acceptance_hint: 创建 `context-source-skill.md`，明确：1) chat/review/test/github-issue/recovery/milestone/issue/progress 等来源输入如何组织；2) 如何做 usable issue 判定；3) 如何结合任务强度、工具优先级、工具可用性列表选工具；4) 如何生成第二跳调用指令；5) 不把 doc/dev-loop 细节塞到该 skill。
+- problem: 当前缺少一个供 `lead-agent` 使用的来源适配与上下文判定规则文件，无法稳定把 `<source input>` 转换成 usable issue 判断和下一跳分支编排决策。
+- why_now: 首跳不是直接执行业务工作，而是先做来源适配、上下文识别和基于来源的编排；如果没有这一层，首跳 AI 只能重新自由发挥。
+- acceptance_hint: 创建 `context-source-skill.md`，明确：1) chat/review/test/github-issue/recovery/milestone/issue/progress 等来源输入如何组织；2) 如何做 usable issue 判定；3) 如何根据来源与状态产出下一跳分支决策；4) 如何结合任务强度、工具优先级、工具可用性列表选工具；5) 不把 doc/dev-loop 细节塞到该 skill。
 - priority: P0
 - status: promoted
 - decision_reason: 这是 `lead-agent` 的核心依赖文件，也是两层模型里真正承载来源适配的一层。
@@ -68,13 +70,13 @@
 
 
 ### C-20260306-1105
-- title: `auto-loop-orchestrator` / guidance 对齐到两层 auto-loop 模型
-- problem: 当前 `PROJECT_INTENT`、`auto-loop-orchestrator` 与本预研内部新增模型之间仍有断层，尚未显式说明 `sh/ps1 -> first AI tool -> lead-agent -> context-source -> no/has-usable-issue-skill -> doc/dev-loop` 这条实现链。
-- why_now: 如果不把 guidance 和现有 orchestrator 一起对齐，后续实现会出现“脑中模型”和规范文案两套说法并存。
-- acceptance_hint: 统一文档与 orchestrator 表述：1) 首跳由 `sh/ps1` 启动首个 AI 工具；2) 首个 AI 工具执行 `auto-loop-lead-agent.md`；3) `lead-agent` 调用 `context-source-skill.md` 生成第二跳指令；4) 第二跳再进入 `no-usable-issue-skill.md` / `has-usable-issue-skill.md`；5) `doc-loop-execution` / `dev-loop-execution` 继续保持正式领域工作流。
+- title: 现有 `auto-loop-orchestrator` skill 对齐到首段闭环模型
+- problem: 当前 `PROJECT_INTENT` 与现有 `auto-loop-orchestrator` skill 之间仍有断层，尚未显式说明 `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> no/has-usable-issue-skill -> doc/dev-loop` 这条实现链。
+- why_now: 如果不把现有 orchestrator skill 一起对齐，后续实现会出现“脑中模型”和规范文案两套说法并存。
+- acceptance_hint: 更新现有 orchestrator skill 表述：1) 首跳由 `sh/ps1` 启动外部 AI CLI 工具；2) AI CLI 工具进入 `auto-loop-lead-agent.md`；3) `lead-agent` 调用 `context-source-skill.md`；4) `context-source-skill` 产出下一跳决策并进入 `no-usable-issue-skill.md` / `has-usable-issue-skill.md`；5) `doc-loop-execution` / `dev-loop-execution` 继续保持正式领域工作流。
 - priority: P0
 - status: promoted
-- decision_reason: 这是把本次预研结论真正接回宪法/法律/项目意图的收口项。
+- decision_reason: 这是把本次预研结论真正接回现有 orchestrator skill 与项目意图的收口项。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []

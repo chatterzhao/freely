@@ -6,7 +6,7 @@
 - 触发：当前讨论已经不再只是“brainstorm 文档放哪”，而是需要把 Freely 从启动入口到正式 issue/workflow skill 的首段闭环统一起来。
 - 当前已命中的关键层次：
   - `sh` / `ps1` 启动入口
-  - 首个 AI 工具
+  - 外部 AI CLI 工具
   - `auto-loop-lead-agent`
   - `context-source-skill`
   - usable issue 判定
@@ -18,11 +18,11 @@
 
 需要回答的已不是单点规则，而是这条首段闭环：
 
-`sh/ps1 -> first AI tool -> auto-loop-lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
+`sh/ps1 -> external AI CLI tool -> auto-loop-lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
 
 因此当前预研的真实主题应收敛为：
 
-1. Freely 启动后首个 AI 工具到底承担什么职责
+1. Freely 启动后外部 AI CLI 工具到底如何进入首跳治理角色
 2. 它如何根据上下文和来源信息做 usable issue 判定
 3. 它何时进入前置研究分支，何时进入已有 issue 的正式工作分支
 4. 文档落位、元数据、milestone、hook、`bmad-check` 应如何作为这条主链的配套治理层，而不是主主题本身
@@ -43,9 +43,9 @@
 当前真正的设计对象包括：
 
 1. 启动层
-   - `sh` / `ps1` 如何启动首个 AI 工具
+   - `sh` / `ps1` 如何启动外部 AI CLI 工具
 2. 首跳代理层
-   - `auto-loop-lead-agent` 定义首个 AI 工具承担什么职责、边界在哪里
+   - `auto-loop-lead-agent` 定义启动后首个 AI 会话承担什么职责、边界在哪里
 3. 来源适配层
    - `context-source-skill` 如何读取 chat / review / test / milestone / issue / recovery 等上下文来源
 4. 路由判定层
@@ -61,7 +61,28 @@
    - milestone 绑定
    - hook / `bmad-check` 兜底
 
-### 3. 文档落位规则已降级为配套子问题
+### 3. `agent` 与 `skill` 必须分层
+
+- `agent` 负责角色定义
+- `skill` 负责局部工作法与可执行编排
+- Freely 当前编排的是外部 AI CLI 工具，而不是自研 AI CLI runtime
+- 因此“启动后谁负责总控”应由 `auto-loop-lead-agent` 承担
+- 而“根据来源怎么编排下一跳”应收敛到被 `lead-agent` 调用的 `context-source-skill`
+
+当前不单独引入第三类 `orchestrator/guidance` 产物：
+
+- 跨层装配、路由接驳、调用关系仍通过 skill 表达
+- `agent` 只负责角色，不承担技能目录的混合职责
+
+### 4. 命名不再使用 loop 前缀
+
+- 名称只表达职责，不表达 loop 归属
+- 主归属通过目录表达
+- 可调用范围通过元数据表达
+- 因此新产物不使用 `auto-loop-*`、`doc-loop-*`、`dev-loop-*` 这类前缀命名规则
+- 现有历史名称若已稳定存在，可暂时保留；新增产物遵循新规则
+
+### 5. 文档落位规则已降级为配套子问题
 
 之前的 brainstorm-routing 结论并没有失效，但它现在属于更大主题下的治理子问题：
 
@@ -70,7 +91,15 @@
 - 这条规则只解决“brainstorm 文档落位”
 - 它不能单独决定总任务路由
 
-### 4. usable issue 判定才是主路由分叉点
+### 6. 启动后总控归 `lead-agent`，来源编排归 `context-source-skill`
+
+- `sh` / `ps1` 只负责启动外部 AI CLI 工具
+- AI CLI 工具启动后，由 `auto-loop-lead-agent` 接管首段闭环
+- `lead-agent` 负责调用 skill，而不是内嵌所有来源判定细节
+- 与上下文来源相关的编排与路由决策，统一收敛到 `context-source-skill`
+- `context-source-skill` 产出下一跳决策：进入 `no-usable-issue-skill` 或 `has-usable-issue-skill`
+
+### 7. usable issue 判定才是主路由分叉点
 
 不能把路由简化成：
 
@@ -83,7 +112,7 @@
 - `命中 usable issue` -> `has-usable-issue-skill` -> 继续正式 issue 工作流
 - `has-usable-issue-skill` 本身不替代 `doc-loop(IBM+G)` / `dev-loop(DDD)`，而是负责把当前上下文接到正确正式工作流
 
-### 5. milestone 是首跳扫描层之一
+### 8. milestone 是首跳扫描层之一
 
 当前更合理的扫描顺序应接近：
 
@@ -103,12 +132,12 @@
 
 ### A. 启动到首跳代理
 
-1. `sh` / `ps1` 对首个 AI 工具的启动契约是什么？
-2. 首个 AI 工具与 `auto-loop-lead-agent` 的关系应如何表述，才能避免把它误写成业务执行器？
+1. `sh` / `ps1` 对外部 AI CLI 工具的启动契约是什么？
+2. 外部 AI CLI 工具与 `auto-loop-lead-agent` 的关系应如何表述，才能避免把它误写成业务执行器？
 
 ### B. 首跳代理到来源适配
 
-1. `auto-loop-lead-agent` 是否只负责编排，不直接承担 doc/dev-loop 的领域工作？
+1. `auto-loop-lead-agent` 是否只负责首跳总控，不直接承担 doc/dev-loop 的领域工作？
 2. `context-source-skill` 的最小职责集合是什么？
 3. 它应读取哪些上下文来源，按什么优先级整合？
 
@@ -142,6 +171,7 @@
   - ready issue / in-progress issue 再进入正式工作流
 - 宪法 / 法律
   - `doc-loop(IBM+G)` 与 `dev-loop(DDD)` 的正式分层已经存在
+  - worktree / agent 上下文与 skills 已是现有治理结构的一部分
 
 ### 2. 执行缺口
 
@@ -152,21 +182,23 @@
 
 ### 3. 风险
 
-- 如果没有显式首段闭环模型，`lead-agent`、`source-skill`、`no/has-usable-issue-skill` 会继续混层
+- 如果没有显式首段闭环模型，`lead-agent`、`context-source-skill`、`no/has-usable-issue-skill` 会继续混层
 - 如果只靠路径名或文件名猜测 brainstorm 类型，会出现误判
 - 如果在 pre-commit 做过重自动迁移，会把错误变成隐蔽状态
 - 如果 candidate 已经收敛到新主题，但前面的 brainstorm 仍维持旧题目，整条文档链会继续失真
+- 如果把编排层再拆成第三类独立产物，会与当前“agent + skill”两类模型冲突
 
 ## 暂时结论
 
 当前更稳的路线应是：
 
 1. 先把首段闭环主链写清：
-   `sh/ps1 -> first AI tool -> auto-loop-lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
+   `sh/ps1 -> external AI CLI tool -> auto-loop-lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
 2. 再分别定义每一层的职责边界和输入输出
-3. 将 brainstorm 路由、元数据契约、milestone 绑定、hook / `bmad-check` 明确降为治理配套层
-4. 让 `candidates.md` 只承载这条主链下的文档型产物，不再回到旧题目
-5. 后续再将这些候选物化为正式 issue，并绑定 milestone
+3. 产物类型只分为 `agent` 与 `skill`，不额外引入第三类 `orchestrator/guidance`
+4. 将 brainstorm 路由、元数据契约、milestone 绑定、hook / `bmad-check` 明确降为治理配套层
+5. 让 `candidates.md` 只承载这条主链下的文档型产物，不再回到旧题目
+6. 后续再将这些候选物化为正式 issue，并绑定 milestone
 
 ## 本轮候选落地方向
 
@@ -182,9 +214,9 @@
 - 先把首段主链固定
 - 避免后续继续在脑中模型和文档模型之间漂移
 
-### 方向 2：同时补一个 orchestrator / guidance 对齐项
+### 方向 2：同时补一个现有 orchestrator skill 对齐项
 
-- 把启动器、lead-agent、source-skill、no/has-usable-issue skill、doc/dev-loop 的主链统一回 guidance / orchestrator
+- 把启动器、lead-agent、source-skill、no/has-usable-issue skill、doc/dev-loop 的主链统一回现有 orchestrator skill
 
 优点：
 
