@@ -80,3 +80,5 @@ description: 对当前输入做来源适配、上下文读取、usable issue 判
 - `lead-agent` 获得可执行的下一跳决定。
 - 当前回合需要更新的 candidate / milestone / issue 状态已被显式指出。
 - 下一跳外部 AI 工具与 prompt 已被组装出来。
+- 若进入 `no-usable-issue-skill`，主产物应是 candidate + milestone 同步。
+- 若进入 `has-usable-issue-skill`，主事实源应切换到 milestone + issue + progress。
