@@ -13,7 +13,9 @@ description: 在不回退治理的情况下协调高风险合并冲突。当临�
 - 从当前 `pre-test-merge` 开始。
 - 创建专用分支：
   - `git branch feature/premerge-YYYYMMDD-HHMM--<topic> pre-test-merge`
-  - 通过 worktree 进入（`source ./bin/wt-enter ...`）。
+  - `cd <your-project-name-path>`
+  - `git worktree add ../<your-project-name>-worktrees/feature-premerge-YYYYMMDD-HHMM--<topic> feature/premerge-YYYYMMDD-HHMM--<topic>`
+  - `cd ../<your-project-name>-worktrees/feature-premerge-YYYYMMDD-HHMM--<topic>`
 
 ## 工作流
 1. 通过受控集成协调：

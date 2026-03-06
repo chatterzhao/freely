@@ -21,7 +21,7 @@ Freely 处于研究优先的整合阶段。
 ## 会话启动检查
 
 每次会话开始：
-1. **分支/Worktree检查**：如在 `main`/`develop`/`pre-test-merge` 则禁止写入。创建 feature 分支及 worktree，cd 到该 worktree 并进入工作
+1. **分支/Worktree检查**：如在 `main`/`develop`/`pre-test-merge` 则禁止写入。先执行 `cd <your-project-name-path>`，再按标准 `git worktree add -b <branch> ../<your-project-name>-worktrees/<branch-dir> develop` 创建 feature worktree，并 `cd` 到该 worktree 中工作
 2. **头脑风暴路由**：
    - 预研头脑风暴（不是基于 issue 文档）：文档放 `docs/pre-brainstorms/`
    - IBM 头脑风暴（基于 issue 文档）：文档放 `docs/epics/{epic-name}/{story-name}/brainstorms/b-{issue-name}.md`
@@ -44,5 +44,8 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - `./bin/freely init|doctor|start|status|stop`
 - `./bin/bmad-check`
 - `./bin/test-pre-push-hook`
+- `cd <your-project-name-path>`
+- `git worktree add -b <branch> ../<your-project-name>-worktrees/<branch-dir> develop`
+- `git worktree remove ../<your-project-name>-worktrees/<branch-dir> && git branch -d <branch>`
 - `source ./bin/wt-enter <branch>`
 - `source ./bin/wt-add <branch> -- <git-add-args>`

@@ -13,13 +13,21 @@ case "$branch" in
   main|develop|pre-test-merge)
     cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
-Please create a feature branch from develop, then commit in its worktree.
+This repo enforces worktree mode for feature development.
+Use the standard git worktree flow from the project root:
 
 Run:
-  git branch feature/<task-name> develop
-  source ./bin/wt-enter feature/<task-name>
+  cd <your-project-name-path>
+  git worktree add -b feature/<task-name> ../<your-project-name>-worktrees/feature-<task-name> develop
+  cd ../<your-project-name>-worktrees/feature-<task-name>
 
-The hook will auto-create the worktree and you should continue after cd into that new directory.
+The final 'develop' argument already selects the correct base branch.
+
+When the work is finished and merged, clean up with:
+  git worktree remove ../<your-project-name>-worktrees/feature-<task-name>
+  git branch -d feature/<task-name>
+
+If you skip this workflow, hooks will create the worktree when possible and print guidance.
 Do not keep committing in the current directory.
 MSG
     exit 1
@@ -44,6 +52,7 @@ fi
 
 existing_for_branch="$(freely_wt_existing_for_branch "$branch")"
 if [[ -n "$existing_for_branch" ]]; then
+  rel_target="$(freely_wt_relative_target_for_branch "$branch")"
   cat <<MSG
 [HOOK] Commit blocked in primary worktree.
 Branch '$branch' has dedicated worktree:
@@ -51,17 +60,27 @@ Branch '$branch' has dedicated worktree:
 
 Start work in worktree:
   cd "$existing_for_branch"
+
+Standard cleanup after merge:
+  git worktree remove ${rel_target}
+  git branch -d "$branch"
 MSG
   git worktree list
   exit 1
 fi
 
+rel_target="$(freely_wt_relative_target_for_branch "$branch")"
 cat <<MSG
 [HOOK] Commit blocked in primary worktree.
 No worktree found for '$branch'.
 
-Create/switch worktree first, for example:
-  source ./bin/wt-enter "$branch"
-Then start work in that worktree directory and commit there.
+Create it from the project root with the standard command:
+  cd <your-project-name-path>
+  git worktree add ../<your-project-name>-worktrees/${branch//\//-} "$branch"
+  cd ../<your-project-name>-worktrees/${branch//\//-}
+
+When the work is finished and merged:
+  git worktree remove ${rel_target}
+  git branch -d "$branch"
 MSG
 exit 1

@@ -111,3 +111,8 @@
 ### 新增到 P0-核心
 - `C-20260305-903` `pre-develop` -> `pre-test-merge` 职责迁移
 - `C-20260305-904` `wt-enter` / `post-checkout` worktree 引导修复
+## 变更（2026-03-06 标准 worktree 提示统一）
+
+### 新增到 P0-核心
+- `C-20260306-1001` 标准 `git worktree` 提示统一
+

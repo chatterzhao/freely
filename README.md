@@ -58,3 +58,26 @@ chmod +x ./bin/test-pre-push-hook
 - `feature/* -> develop` 作为默认开发集成路径
 - `feature/* -> pre-test-merge -> develop` 仅在需要临时预集成验证时使用
 - 直接推送/合并到 `develop` 被本地 hook 策略阻止
+
+标准 worktree 创建方式（从项目根目录执行）：
+
+```bash
+cd <your-project-name-path>
+
+git worktree add -b feature/<topic> \
+  ../<your-project-name>-worktrees/feature-<topic> \
+  develop
+
+cd ../<your-project-name>-worktrees/feature-<topic>
+```
+
+这里不需要先 `git checkout develop`，因为命令最后的 `develop` 已经显式指定了新分支的基线。
+
+合并完成后的标准清理方式：
+
+```bash
+git worktree remove ../<your-project-name>-worktrees/feature-<topic>
+git branch -d feature/<topic>
+```
+
+`bin/wt-enter` / `bin/wt-add` 只是辅助命令；hooks 会在未按规范操作时兜底并给出友好提示。
