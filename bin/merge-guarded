@@ -26,13 +26,15 @@ fi
 
 allowed=0
 case "$target" in
-  pre-develop)
+  pre-test-merge)
     case "$source_branch" in
       feature/*|hotfix/*) allowed=1 ;;
     esac
     ;;
   develop)
-    if [[ "$source_branch" == "pre-develop" ]]; then
+    if [[ "$source_branch" == "pre-test-merge" ]]; then
+      allowed=1
+    elif [[ "$source_branch" == feature/* ]]; then
       allowed=1
     elif [[ "$source_branch" == hotfix/* ]]; then
       allowed=1
@@ -57,9 +59,10 @@ if [[ "$allowed" != "1" ]]; then
   source: $source_branch
 
 Allowed:
-  feature/* -> pre-develop
-  hotfix/* -> pre-develop
-  pre-develop -> develop
+  feature/* -> pre-test-merge
+  hotfix/* -> pre-test-merge
+  feature/* -> develop
+  pre-test-merge -> develop
   hotfix/* -> develop
   release/* -> main
   hotfix/* -> main

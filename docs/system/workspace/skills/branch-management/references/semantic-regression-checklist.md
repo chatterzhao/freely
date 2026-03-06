@@ -1,10 +1,10 @@
 # 语义回归检查清单
 
-在合并到 `pre-develop` 后、提升前运行：
+在进入 `develop` 前运行；若本轮启用了 `pre-test-merge`，则在该临时验证批次完成后执行：
 
 1. 分支治理意图：
-- `feature/*` 必须从 `pre-develop` 创建。
-- `main/develop/pre-develop` 必须保持 add/commit 禁止。
+- `feature/*` 必须从 `develop` 创建。
+- `main/develop/pre-test-merge` 必须保持 add/commit 禁止。
 
 2. Worktree 治理意图：
 - Worktree 根目录必须是同级 `{project-name}-worktrees`。
@@ -15,7 +15,7 @@
 
 4. Premerge 策略意图：
 - 临时协调分支名使用 `feature/premerge-YYYYMMDD-HHMM--<topic>`。
-- 协调流程从 `pre-develop` 开始并合并回 `pre-develop`。
+- 协调流程从 `pre-test-merge` 开始并合并回 `pre-test-merge`。
 
 5. 决策方法：
 - 按语义兼容性评估，而非提交时间顺序。

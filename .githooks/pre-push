@@ -13,9 +13,9 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   local_branch="${local_ref#refs/heads/}"
   remote_branch="${remote_ref#refs/heads/}"
 
-  # 允许 main, develop, pre-develop 直接 push
+  # 允许 main, develop, pre-test-merge 直接 push
   case "$local_branch" in
-    main|develop|pre-develop)
+    main|develop|pre-test-merge)
       continue
       ;;
   esac
@@ -33,8 +33,11 @@ while read -r local_ref local_sha remote_ref remote_sha; do
 
 Attempted to push to: $remote_ref
 
-To merge feature into pre-develop, use:
-  git checkout pre-develop && git merge $local_branch
+    To merge feature into develop, use:
+      git checkout develop && git merge $local_branch
+
+    If this batch requires temporary pre-integration validation, merge into:
+      git checkout pre-test-merge && git merge $local_branch
 MSG
     exit 1
   fi

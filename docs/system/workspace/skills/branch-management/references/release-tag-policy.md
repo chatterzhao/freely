@@ -6,7 +6,7 @@
 
 ## 按分支的阶段
 - `feature/*` -> `alpha`（本地轻量标签，不推送）
-- `pre-develop` -> `beta`（本地轻量标签，不推送）
+- `pre-test-merge` -> `beta`（本地轻量标签，不推送）
 - `develop` -> `nightly`（推送标签）
 - `main` -> `stable`（推送标签）
 - `hotfix/*` -> `hotfix`（推送标签）
@@ -20,7 +20,7 @@
 ## 热修复流程
 1. 从 `main` 创建 `hotfix/*`。
 2. 将热修复合并到 `main` 和 `develop`。
-3. 将热修复结果同步到 `pre-develop`。
+3. 若 `pre-test-merge` 当前活跃，将热修复结果同步到 `pre-test-merge`。
 
 ## 保护措施
 - 绝不推送 `alpha`/`beta`。

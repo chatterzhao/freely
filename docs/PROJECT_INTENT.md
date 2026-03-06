@@ -68,11 +68,11 @@ flowchart TD
     J1{"是否形成可开发 issue?"}
 
     D2["D:dev-loop(DDD)\n实现/测试/review/文档回写"]
-    G1{"pre-develop 集成测试门\nTEST(含集成验收)通过?"}
-    G2{"develop 提升门\nTEST + review + progress/recovery通过?"}
+    G1{"pre-test-merge 临时验证门\nTEST(含集成验收)通过?"}
+    G2{"develop 集成门\nTEST + review + progress/recovery通过?"}
     F1["修复路径\n返回 dev-loop 或补 doc-loop"]
     R0{"是否触发 release/hotfix?"}
-    R1["release/hotfix 流程\n(tag/release + hotfix sync to pre-develop)"]
+    R1["release/hotfix 流程\n(tag/release + hotfix sync to pre-test-merge if active)"]
 
     A3["A3 回流\n更新状态并进入下一轮发现"]
     X1["AI CLI 终止态\ncompleted / crash / blocked"]

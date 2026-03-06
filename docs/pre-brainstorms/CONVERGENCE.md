@@ -105,3 +105,9 @@
 
 - 候选字段统一：`promoted_issue_path`、`milestone`、`session_refs` 不再留空，统一使用显式 pending/空列表值。
 - 路由口径统一：`doc-loop(IBM)` 统一升级为 `doc-loop(IBM+G)`，匹配当前治理职责定义。
+
+## 变更（2026-03-05 pre-test-merge 职责迁移）
+
+### 新增到 P0-核心
+- `C-20260305-903` `pre-develop` -> `pre-test-merge` 职责迁移
+- `C-20260305-904` `wt-enter` / `post-checkout` worktree 引导修复
