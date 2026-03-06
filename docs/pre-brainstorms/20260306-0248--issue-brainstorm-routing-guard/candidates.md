@@ -56,7 +56,7 @@
 - title: `no-usable-issue-skill.md`
 - problem: 当前没有一个正式的第二跳执行指南，指导“没有 usable issue”时如何继续前置研究、如何写 `pre-brainstorms` 产物、以及如何同步 milestone。
 - why_now: 这是下游 AI 命中“无可用 issue”时的唯一标准工作入口；如果不先固化，仍会退回口头解释。
-- acceptance_hint: 创建 `docs/system/workspace/skills/no-usable-issue-skill/SKILL.md`，明确：1) 无稳定 issue 边界时继续停留 `pre-brainstorms`；2) 如何产出 `brainstorms.md` / `candidates.md`；3) 如何将 candidate 原子同步进 milestone；4) milestone 绑定后如何回写 candidate 状态；5) 它不承载执行态，只负责把问题收敛到 candidate + milestone。
+- acceptance_hint: 创建 `docs/system/workspace/skills/no-usable-issue-skill/SKILL.md`，明确：1) 无稳定 issue 边界时继续停留 `pre-brainstorms`；2) 如何产出 `brainstorms.md` / `candidates.md`；3) 如何将 candidate 原子同步进 milestone 的 candidate entry；4) milestone 绑定后如何回写 candidate 状态；5) 它不产出 issue-bound `brainstorms/prd/pre-tests/tasks`，只负责把问题收敛到 candidate + milestone。
 - priority: P0
 - status: promoted
 - decision_reason: 这是第二跳执行层里“无可用 issue/无稳定边界”分支的标准工作法，负责 pre-brainstorm -> candidate -> milestone 的闭环。
@@ -69,7 +69,7 @@
 - title: `has-usable-issue-skill.md`
 - problem: 当前没有一个正式的第二跳执行指南，指导“已经命中 usable issue”时如何进一步进入正式 issue 工作流，以及何时应调用 `doc-loop-execution` 或 `dev-loop-execution`。
 - why_now: 如果这一层不写清，最容易把“已有 usable issue”误实现成固定 doc-loop 路径，破坏宪法/法律已经固定的 doc/dev-loop 分层。
-- acceptance_hint: 创建 `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`，明确：1) 它用于“已有稳定 issue 边界”；2) 它不替代 doc/dev-loop；3) 何时进入 issue-bound IBM 的 `B/M`，何时进入 `dev-loop-execution`；4) test/review/chat 等来源命中后应先重做边界判定，再决定是 issue-bound brainstorm 还是 continuation；5) issue-bound brainstorm / story 目录 / milestone 回写的边界。
+- acceptance_hint: 创建 `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`，明确：1) 它用于“已有稳定 issue 边界”；2) 它不替代 doc/dev-loop，但要指挥 issue-bound `IBM` 或 `DDD`；3) 何时进入 issue-bound IBM 的 `B/M`，何时进入 `dev-loop-execution`；4) 若进入 `IBM`，应要求 issue 目录下产出 `issues/b-{issue}/prd/pre-tests/tasks` 等正式产物并同步 milestone；5) test/review/chat 等来源命中后应先重做边界判定，再决定是 issue-bound brainstorm 还是 continuation。
 - priority: P0
 - status: promoted
 - decision_reason: 这是第二跳执行层里“有可用 issue”分支的标准工作法；本轮纠偏后已明确它是正式 issue 工作流入口，而不是“直接开发”快捷路径。

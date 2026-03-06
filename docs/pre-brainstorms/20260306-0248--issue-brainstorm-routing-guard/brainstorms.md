@@ -306,6 +306,36 @@
 - 问题不在“要不要这些产物”，而在“职责是否写准”
 - 因此本轮不新建一批平行 candidate，而是修正现有 candidate 的 acceptance hint 和决策理由
 
+### 9. 两个第二跳 skill 的产物边界必须写实
+
+`no-usable-issue-skill` 的结束产物应保持在 pre-brainstorm 侧：
+
+- `docs/pre-brainstorms/<id>/brainstorms.md`
+- `docs/pre-brainstorms/<id>/candidates.md`
+- `docs/milestones.md` 中的 candidate entry
+
+它负责把“原始问题”收敛成 candidate，并把 candidate 同步进 milestone；它不直接产出正式 story 目录下的 issue / brainstorm / prd / pre-tests / tasks。
+
+`has-usable-issue-skill` 的职责不是一句“选 doc-loop 还是 dev-loop”就结束，而是要把 issue-bound 工作流指挥完整：
+
+- 若进入 `IBM`，应要求 issue 目录下至少维护：
+  - `docs/epics/{epic}/{story}/issues/{issue-name}.md`
+  - `docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md`
+  - `docs/epics/{epic}/{story}/prd.md`
+  - `docs/epics/{epic}/{story}/pre-tests.md`
+  - `docs/epics/{epic}/{story}/tasks.md`
+- 若进入 `DDD`，应要求继续维护：
+  - `src/**`
+  - `tests/**`
+  - `docs/progress/{epic}/p-{issue}.md`
+  - `docs/milestones.md`
+
+因此：
+
+- `no-usable-issue-skill` 负责 `pre-brainstorm -> candidate -> milestone`
+- `has-usable-issue-skill` 负责 `usable issue -> IBM/DDD`
+- `PRE_TEST` 属于 issue-bound `IBM` / doc-loop 产物，不属于 pre-brainstorm 产物
+
 ## 暂时结论
 
 当前更稳的路线应是：
