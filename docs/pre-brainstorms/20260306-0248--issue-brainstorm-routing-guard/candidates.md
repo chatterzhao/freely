@@ -32,10 +32,10 @@
 - title: `lead-agent.md`
 - problem: 当前还缺少一个明确的首跳 AI 中枢代理说明，定义从 `sh/ps1` 启动外部 AI CLI 工具后，到底由谁承担首段闭环编排职责。
 - why_now: 如果没有 `lead-agent` 这一层，启动器、来源适配、usable issue 判定和第二跳 skill 会继续混在一起，无法形成统一主链。
-- acceptance_hint: 创建 `docs/system/workspace/agents/lead-agent.md`，明确：1) 它由启动后的外部 AI CLI 工具执行；2) 它位于 `sh/ps1` 与 `context-source-skill` 之间；3) 它负责调用后续 skill，而不是内嵌所有来源判定细节；4) 它不替代 `doc-loop-execution` / `dev-loop-execution`。
+- acceptance_hint: 创建 `docs/system/workspace/agents/lead-agent.md`，明确：1) 它由启动后的外部 AI CLI 工具执行；2) 它位于 `sh/ps1` 与 `context-source-skill` 之间；3) 它负责首跳接管、治理前置与委托，不负责自己扫描需求池；4) 它负责调用后续 skill，而不是内嵌所有来源判定细节；5) 它不替代 `doc-loop-execution` / `dev-loop-execution`。
 - priority: P0
 - status: promoted
-- decision_reason: 这是两层 auto-loop 机制的中枢；不先明确它，后续所有 skill 层级都会继续混乱。
+- decision_reason: 这是两层 auto-loop 机制的中枢；本轮纠偏后已明确它是“首跳接管与委托者”，而不是需求池扫描器。
 - promoted_issue_path: pending://issue-materialization
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
@@ -44,10 +44,10 @@
 - title: `context-source-skill.md`
 - problem: 当前缺少一个供 `lead-agent` 使用的来源适配与上下文判定规则文件，无法稳定把 `<source input>` 转换成 usable issue 判断和下一跳分支编排决策。
 - why_now: 首跳不是直接执行业务工作，而是先做来源适配、上下文识别和基于来源的编排；如果没有这一层，首跳 AI 只能重新自由发挥。
-- acceptance_hint: 创建 `docs/system/workspace/skills/context-source-skill/SKILL.md`，明确：1) chat/review/test/github-issue/recovery/milestone/issue/progress 等来源输入如何组织；2) 如何做 usable issue 判定；3) 如何根据来源与状态产出下一跳分支决策；4) 如何结合任务强度、工具优先级、工具可用性列表选工具；5) 不把 doc/dev-loop 细节塞到该 skill。
+- acceptance_hint: 创建 `docs/system/workspace/skills/context-source-skill/SKILL.md`，明确：1) 它负责扫描 `milestone/progress/recovery/review/test/chat/github-issue/intent` 需求池；2) AI 应在此 skill 下自主判断来源优先级，而不是由脚本硬编码；3) 如何做 usable issue 与 issue 边界判定；4) 如何区分 `pre-brainstorm`、`issue-bound brainstorm`、`issue continuation`；5) 如何结合任务强度、工具优先级、工具可用性列表选工具；6) 不把 doc/dev-loop 细节塞到该 skill。
 - priority: P0
 - status: promoted
-- decision_reason: 这是 `lead-agent` 的核心依赖文件，也是两层模型里真正承载来源适配的一层。
+- decision_reason: 这是 `lead-agent` 的核心依赖文件，也是两层模型里真正承载“找活、解释上下文、决定下一跳”的一层。
 - promoted_issue_path: pending://issue-materialization
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
@@ -56,10 +56,10 @@
 - title: `no-usable-issue-skill.md`
 - problem: 当前没有一个正式的第二跳执行指南，指导“没有 usable issue”时如何继续前置研究、如何写 `pre-brainstorms` 产物、以及如何同步 milestone。
 - why_now: 这是下游 AI 命中“无可用 issue”时的唯一标准工作入口；如果不先固化，仍会退回口头解释。
-- acceptance_hint: 创建 `docs/system/workspace/skills/no-usable-issue-skill/SKILL.md`，明确：1) 无 usable issue 时继续停留 `pre-brainstorms`；2) 如何产出 `brainstorms.md` / `candidates.md`；3) 如何将 candidate 原子同步进 milestone；4) 什么情况下停止前置研究并回流。
+- acceptance_hint: 创建 `docs/system/workspace/skills/no-usable-issue-skill/SKILL.md`，明确：1) 无稳定 issue 边界时继续停留 `pre-brainstorms`；2) 如何产出 `brainstorms.md` / `candidates.md`；3) 如何将 candidate 原子同步进 milestone；4) milestone 绑定后如何回写 candidate 状态；5) 它不承载执行态，只负责把问题收敛到 candidate + milestone。
 - priority: P0
 - status: promoted
-- decision_reason: 这是第二跳执行层里“无可用 issue”分支的标准工作法。
+- decision_reason: 这是第二跳执行层里“无可用 issue/无稳定边界”分支的标准工作法，负责 pre-brainstorm -> candidate -> milestone 的闭环。
 - promoted_issue_path: pending://issue-materialization
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
@@ -69,10 +69,10 @@
 - title: `has-usable-issue-skill.md`
 - problem: 当前没有一个正式的第二跳执行指南，指导“已经命中 usable issue”时如何进一步进入正式 issue 工作流，以及何时应调用 `doc-loop-execution` 或 `dev-loop-execution`。
 - why_now: 如果这一层不写清，最容易把“已有 usable issue”误实现成固定 doc-loop 路径，破坏宪法/法律已经固定的 doc/dev-loop 分层。
-- acceptance_hint: 创建 `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`，明确：1) 它用于“已有 usable issue”；2) 它不替代 doc/dev-loop；3) 何时进入 `doc-loop-execution`，何时进入 `dev-loop-execution`；4) issue-bound brainstorm / story 目录 / milestone 回写的边界。
+- acceptance_hint: 创建 `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`，明确：1) 它用于“已有稳定 issue 边界”；2) 它不替代 doc/dev-loop；3) 何时进入 issue-bound IBM 的 `B/M`，何时进入 `dev-loop-execution`；4) test/review/chat 等来源命中后应先重做边界判定，再决定是 issue-bound brainstorm 还是 continuation；5) issue-bound brainstorm / story 目录 / milestone 回写的边界。
 - priority: P0
 - status: promoted
-- decision_reason: 这是第二跳执行层里“有可用 issue”分支的标准工作法，也是最容易与 doc/dev-loop 混淆的一层，必须单独固化。
+- decision_reason: 这是第二跳执行层里“有可用 issue”分支的标准工作法；本轮纠偏后已明确它是正式 issue 工作流入口，而不是“直接开发”快捷路径。
 - promoted_issue_path: pending://issue-materialization
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []

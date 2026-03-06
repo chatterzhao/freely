@@ -20,7 +20,7 @@
    - github-issue
    - milestone
    - issue / progress / recovery
-3. 将来源判定与下一跳提示词组装委托给 `skill:context-source-skill`，而不是在本文件中内嵌所有路由细节。
+3. 将来源判定、需求池扫描、优先级判断与下一跳提示词组装委托给 `skill:context-source-skill`，而不是在本文件中内嵌所有路由细节。
 4. 读取 `workspace/tools.md`，理解当前可用工具、优先级和适配阶段。
 5. 基于 `context-source-skill` 的输出，自主决定下一跳是：
    - `skill:no-usable-issue-skill`
@@ -34,6 +34,7 @@
 - 不直接定义 dev-loop 的实现与测试步骤
 - 不把 milestone、brainstorm、progress 的完整状态机硬编码在这里
 - 不在脚本里预先写死“某输入必须走哪个工具”
+- 不自己扫描需求池并决定当前该从哪个池找活，这个职责归 `context-source-skill`
 
 ## 首跳协议
 

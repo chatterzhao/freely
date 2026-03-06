@@ -208,6 +208,104 @@
 - 如果把编排层再拆成第三类独立产物，会与当前“agent + skill”两类模型冲突
 - 如果 `scripts` / `hooks` 继续散落在根目录语义中，`system/workspace` 就无法成为完整能力入口
 
+## 新增纠偏：自举开发视角下的职责边界
+
+### 1. 当前问题仍属于本条预研，不新开题
+
+- 当前讨论的仍然是“Freely 从启动外部 AI CLI 工具到正式 issue/workflow skill 的首段闭环”
+- 新增讨论虽然更强调“谁在做工作”，但没有超出本条主问题
+- 因此本轮应继续更新当前 `brainstorms.md` / `candidates.md`，而不是新建平行 pre-brainstorm
+
+### 2. Freely 是运行器，不是脚本写死任务的执行器
+
+- Freely 面向用户时，是一个托管外部 AI 工具持续运行的应用
+- Freely 当前自举开发自己时，也必须使用同样的治理模型
+- 因此运行时脚本负责“让 AI 工具开始工作并保持可续接”，而不是负责业务型需求判断
+- 真正的需求发现、边界判断、优先级选择与工作流路由，必须由 AI 在 skill 指南下完成
+
+### 3. `sh` / `ps1` 的职责：运行保障，不做业务判断
+
+- `sh` / `ps1` 负责首次启动外部 AI CLI 工具
+- 负责 AI 工具崩溃、阻塞、定时唤醒、resume、PID 监控、停止
+- 负责把最小固定上下文交给首跳 AI 会话
+- 它启动的不是“Freely 软件本体去做工作”，而是“某个 AI 工具开始在 Freely 运行器下自治工作”
+- 它不负责：
+  - 扫描需求池
+  - 判断当前优先来源
+  - 判断进入 pre-brainstorm、IBM 还是 DDD
+  - 判断测试 / review 发现的问题是否还在原 issue 边界内
+
+### 4. `lead-agent` 的职责：首跳接管与委托，不负责找活
+
+- `lead-agent` 是首跳 AI 会话的总控角色
+- 它负责：
+  - 接管刚启动的 AI 工具
+  - 先执行治理前置门禁
+  - 明确当前进入 Freely 的自治工作模式
+  - 将需求池扫描、上下文解释、优先级判断委托给 `context-source-skill`
+- 它不负责：
+  - 自己去扫描所有来源池
+  - 自己展开全部来源判定细节
+  - 自己代替 IBM / DDD 做领域工作
+
+### 5. `context-source-skill` 的职责：需求池扫描与路由编排核心
+
+- 真正“找活”的核心不在 `lead-agent`，而在 `context-source-skill`
+- 它应指导 AI 扫描这些需求池：
+  - `milestones`
+  - `progress`
+  - `recovery`
+  - `review`
+  - `test`
+  - `chat`
+  - `github issue`
+  - `PROJECT_INTENT`
+- 它的职责不是读取单一来源，而是让 AI 基于当前上下文判断：
+  - 现在先看哪个池
+  - 哪个池优先级更高
+  - 当前问题是否已有稳定 issue 边界
+  - 应进入 `pre-brainstorm`、`issue-bound brainstorm` 还是 `issue continuation`
+- 这些判断不应由脚本硬编码
+
+### 6. `test` / `review` / `chat` 都必须先重做边界判断
+
+测试发现问题，不代表一定直接进入开发；review 或 chat 也同理。
+
+更稳的判断应是：
+
+1. 若问题仍在原 issue 边界内
+- 属于 `issue continuation`
+- 交由 `has-usable-issue-skill` 继续决定 IBM continuation 还是 DDD
+
+2. 若问题与原 issue 强相关，但已超出当前边界
+- 属于 `issue-bound brainstorm`
+- 进入 IBM 的 `B`
+- 不是回 pre-brainstorm
+
+3. 若问题没有稳定 issue 边界
+- 属于 `pre-brainstorm`
+- 进入 `no-usable-issue-skill`
+
+因此“来源类型”不能直接决定路径，必须先做边界判定。
+
+### 7. `no-usable-issue-skill` 与 `has-usable-issue-skill` 的真正分工
+
+- `no-usable-issue-skill`
+  - 负责 pre-brainstorm 收敛
+  - 负责 `brainstorms.md` / `candidates.md`
+  - 负责 candidate -> milestone 同步
+  - milestone 绑定后负责 candidate 回写
+- `has-usable-issue-skill`
+  - 负责已有稳定 issue 边界下的正式工作流入口
+  - 负责将问题送入 issue-bound IBM 或 DDD
+  - 不再回到 pre-brainstorm candidate 线
+
+### 8. 之前的候选不是推翻重来，而是继续纠偏收敛
+
+- 当前已落地的 4 个核心产物方向是对的
+- 问题不在“要不要这些产物”，而在“职责是否写准”
+- 因此本轮不新建一批平行 candidate，而是修正现有 candidate 的 acceptance hint 和决策理由
+
 ## 暂时结论
 
 当前更稳的路线应是：
@@ -220,6 +318,9 @@
 5. 将 brainstorm 路由、元数据契约、milestone 绑定、hook / `bmad-check` 明确降为治理配套层
 6. 让 `candidates.md` 只承载这条主链下的文档型产物，不再回到旧题目
 7. 后续再将这些候选物化为正式 issue，并绑定 milestone
+8. runtime 脚本只负责启动、监控、续接与停止；需求池扫描和路由判断由 AI 在 `context-source-skill` 下完成
+9. `lead-agent` 负责首跳接管与委托；“找活”职责归 `context-source-skill`
+10. `test` / `review` / `chat` 等来源命中后，必须先做 issue 边界判定，而不是按来源名直接硬编码路径
 
 ## 本轮候选落地方向
 

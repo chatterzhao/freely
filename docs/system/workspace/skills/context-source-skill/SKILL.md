@@ -7,7 +7,7 @@ description: 对当前输入做来源适配、上下文读取、usable issue 判
 
 ## 适用边界
 
-- 处理首跳来源识别、路由判定与下一跳提示词组装。
+- 处理首跳来源识别、需求池扫描、优先级判断、路由判定与下一跳提示词组装。
 - 不直接执行业务型 doc/dev-loop。
 - 不替代 milestone、issue、progress 的长期状态维护，只产出当前回合的判定结果、建议更新与下一跳编排输出。
 
@@ -26,39 +26,51 @@ description: 对当前输入做来源适配、上下文读取、usable issue 判
 
 ## 工作流
 
-1. 识别当前输入来源：
+1. 扫描当前需求池：
+   - `docs/milestones.md`
+   - progress / recovery
+   - review / test
+   - chat / github-issue
+   - `docs/PROJECT_INTENT.md`
+2. AI 基于当前上下文自主判断此刻优先查看哪个池，而不是由脚本硬编码固定顺序。
+3. 识别当前输入来源：
    - 新问题输入：intent / review / test / chat / github-issue
    - 延续输入：milestone / issue / progress / recovery
-2. 先从 `docs/milestones.md` 查找是否已有匹配条目。
-3. 对命中的条目判定是否为 usable issue：
+4. 先从 `docs/milestones.md` 查找是否已有匹配条目。
+5. 对命中的条目判定是否为 usable issue：
    - `committed_issues` 中且顺序明确 -> usable
    - `candidate_issues` 中仍需研究或排序 -> not usable
    - `completed_issues` 中 -> 不重复执行，转 completion verification 或回流
-4. 若 milestone 未命中，再检查：
+6. 若 milestone 未命中，再检查：
    - 是否已有 issue path
    - 是否已有 progress / recovery 记录
    - 是否只是 pre-brainstorm candidate
-5. 结合 `tools.md` 判断当前任务强度与工具适配：
+7. 先做边界判定，再决定路径：
+   - 无稳定 issue 边界 -> `pre-brainstorm`
+   - 已有关联 issue，但需要在既有 issue 边界内继续脑暴 -> `issue-bound brainstorm`
+   - 已有稳定 issue 且可继续推进 -> `issue continuation`
+8. 结合 `tools.md` 判断当前任务强度与工具适配：
    - 路由/预研/文档收敛优先考虑更适合长 prompt 编排的工具
    - 命中 usable issue 后的仓库实现优先考虑更适合工程执行的工具
    - 不在规则中硬编码唯一工具，而是让 AI 基于当前输入做解释性选择
-6. 组装下一跳 prompt，prompt 至少包含：
+9. 组装下一跳 prompt，prompt 至少包含：
    - `<source input>`
    - `docs/milestones.md` 路径
    - 需要阅读的 workspace 相对路径，例如 `workspace/skills/no-usable-issue-skill/SKILL.md`
    - 当前为何选择该工具
    - 进入 doc-loop / dev-loop / pre-brainstorm 的边界要求
-7. 产出下一跳：
-   - 无 usable issue -> `skill:no-usable-issue-skill`
-   - 有 usable issue 但文档未完备 -> `skill:has-usable-issue-skill` 并优先导向 `doc-loop-execution`
-   - 有 usable issue 且已具备执行条件 -> `skill:has-usable-issue-skill` 并导向 `dev-loop-execution`
-8. 如发现治理口径漂移，要求在下一跳中补齐对应治理资产。
+10. 产出下一跳：
+   - `pre-brainstorm` -> `skill:no-usable-issue-skill`
+   - `issue-bound brainstorm` -> `skill:has-usable-issue-skill` 并优先导向 IBM 的 `B/M`
+   - `issue continuation` -> `skill:has-usable-issue-skill` 并导向 `doc-loop-execution` continuation 或 `dev-loop-execution`
+11. 如发现治理口径漂移，要求在下一跳中补齐对应治理资产。
 
 ## 输出
 
 - `source_type`
 - `matched_milestone`
 - `usable_issue: true|false`
+- `route_kind`
 - `selected_tool`
 - `why_selected`
 - `next_skill`
@@ -74,6 +86,7 @@ description: 对当前输入做来源适配、上下文读取、usable issue 判
 - chat / review / test 这类外部输入，若尚未进入正式 issue 体系，先回到 pre-brainstorms 收敛。
 - 核心产出是“提示词组装与工具选择建议”，不是 shell 里的硬编码路由。
 - AI 应理解后路由，而不是按脚本分支表机械跳转。
+- `test` / `review` / `chat` 不得因为来源名直接硬编码路径，必须先判断 issue 边界。
 
 ## 完成
 
