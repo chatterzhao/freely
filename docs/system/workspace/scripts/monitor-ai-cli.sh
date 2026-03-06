@@ -80,6 +80,23 @@ launch_iflow() {
   fi
 }
 
+launch_kiro_cli() {
+  local selected_model="${model:-claude-opus-4.6}"
+  if [[ "$launch_kind" == "resume" ]]; then
+    if [[ "$mode" == "auto" ]]; then
+      exec kiro-cli chat --resume --no-interactive --trust-all-tools --model "$selected_model" "继续上次未完成工作，按项目意图和宪法持续推进。"
+    else
+      exec kiro-cli chat --resume --model "$selected_model" "继续上次未完成工作，按项目意图和宪法持续推进。"
+    fi
+  fi
+
+  if [[ "$mode" == "auto" ]]; then
+    exec kiro-cli chat --no-interactive --trust-all-tools --model "$selected_model" <"$prompt_file"
+  else
+    exec kiro-cli chat --model "$selected_model" <"$prompt_file"
+  fi
+}
+
 launch_test_sleep() {
   exec bash -lc 'echo "[TEST] mock AI CLI started"; sleep 5'
 }
@@ -89,6 +106,7 @@ launch_test_sleep() {
   case "$tool" in
     codex) launch_codex ;;
     iflow) launch_iflow ;;
+    kiro-cli) launch_kiro_cli ;;
     test-sleep) launch_test_sleep ;;
     *)
       echo "[ERROR] unsupported tool: $tool" >&2

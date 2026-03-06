@@ -3,6 +3,7 @@ set -euo pipefail
 
 TOOL_NAME="freely"
 STATE_DIR_NAME=".freely"
+SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
 log_info() { echo "[INFO] $*"; }
 log_warn() { echo "[WARN] $*"; }
@@ -131,8 +132,19 @@ IFLOW_MAX_TURNS=100
 EOF
 }
 
+workspace_root_for_project() {
+  local project="$1"
+  if [[ -d "$project/docs/system/workspace" ]]; then
+    echo "$project/docs/system/workspace"
+  else
+    echo "$SELF_ROOT/docs/system/workspace"
+  fi
+}
+
 build_prompt() {
-  bash "$PROJECT_ROOT/docs/system/workspace/scripts/start-lead-agent.sh" \
+  local workspace_root
+  workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
+  bash "$workspace_root/scripts/start-lead-agent.sh" \
     --project "$PROJECT_ROOT" \
     --intent "$INTENT_FILE" \
     --constitution "$CONSTITUTION_FILE" \
@@ -233,7 +245,9 @@ cmd_start() {
     set +e
     {
       echo "===== $(date '+%F %T') mode=$mode_name tool=$AI_TOOL ai_mode=$AI_MODE ====="
-      bash "$PROJECT_ROOT/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+      local workspace_root
+      workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
+      bash "$workspace_root/scripts/monitor-ai-cli.sh" \
         --project "$PROJECT_ROOT" \
         --tool "$AI_TOOL" \
         --model "${AI_MODEL:-}" \

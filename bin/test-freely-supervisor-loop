@@ -11,7 +11,6 @@ mkdir -p \
   "$PROJECT/docs/planning" \
   "$PROJECT/docs/validation" \
   "$PROJECT/docs/continuity" \
-  "$PROJECT/docs/system/workspace" \
   "$PROJECT/.freely/run" \
   "$PROJECT/.freely/logs"
 
@@ -58,12 +57,6 @@ cat >"$PROJECT/docs/continuity/RECOVERY.md" <<'EOF'
 ## Latest Checkpoint
 - ok
 EOF
-
-cp -R "$ROOT_DIR/docs/system/workspace/agents" "$PROJECT/docs/system/workspace/"
-cp -R "$ROOT_DIR/docs/system/workspace/skills" "$PROJECT/docs/system/workspace/"
-cp -R "$ROOT_DIR/docs/system/workspace/scripts" "$PROJECT/docs/system/workspace/"
-cp "$ROOT_DIR/docs/system/workspace/tools.md" "$PROJECT/docs/system/workspace/tools.md"
-cp "$ROOT_DIR/docs/milestones.md" "$PROJECT/docs/milestones.md"
 
 cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
