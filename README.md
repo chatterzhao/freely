@@ -55,6 +55,6 @@ chmod +x ./bin/test-pre-push-hook
 
 功能交付分支策略：
 
-- `feature/* -> pre-develop` 用于测试集成
-- `pre-develop -> develop` 仅在验证后
+- `feature/* -> develop` 作为默认开发集成路径
+- `feature/* -> pre-test-merge -> develop` 仅在需要临时预集成验证时使用
 - 直接推送/合并到 `develop` 被本地 hook 策略阻止

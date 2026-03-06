@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+TEST_TMP="$(mktemp -d /tmp/freely-wt-entry.XXXXXX)"
+trap 'rm -rf "$TEST_TMP"' EXIT
+
+REPO="$TEST_TMP/repo"
+mkdir -p "$REPO"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+git branch pre-test-merge
+
+mkdir -p "$REPO/bin"
+cp -R "$ROOT_DIR/.githooks" "$REPO/.githooks"
+cp "$ROOT_DIR/bin/worktree-common.sh" "$ROOT_DIR/bin/wt-enter" "$ROOT_DIR/bin/wt-add" "$REPO/bin/"
+chmod +x "$REPO/.githooks/"* "$REPO/bin/"*
+git config core.hooksPath .githooks
+
+RESULT="$(
+  bash -lc '
+    set -euo pipefail
+    cd "$1"
+    git branch feature/demo develop
+    source ./bin/wt-enter feature/demo >/dev/null
+    printf "cwd=%s\n" "$(pwd -P)"
+    printf "branch=%s\n" "$(git rev-parse --abbrev-ref HEAD)"
+  ' _ "$REPO"
+)"
+
+PRIMARY_BRANCH="$(git -C "$REPO" rev-parse --abbrev-ref HEAD)"
+FEATURE_WT="$TEST_TMP/repo-worktrees/feature-demo"
+
+[[ "$PRIMARY_BRANCH" == "develop" ]]
+[[ -d "$FEATURE_WT" ]]
+printf '%s\n' "$RESULT" | grep -q "cwd=$FEATURE_WT"
+printf '%s\n' "$RESULT" | grep -q "branch=feature/demo"
+git -C "$FEATURE_WT" rev-parse --abbrev-ref HEAD | grep -q '^feature/demo$'
+
+echo "[PASS] wt-enter auto-creates sibling worktree and enters it"

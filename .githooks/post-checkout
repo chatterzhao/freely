@@ -17,9 +17,9 @@ source ./bin/worktree-common.sh
 branch="$(freely_wt_current_branch)"
 [[ -n "$branch" ]] || exit 0
 
-# main/develop/pre-develop 不需要 worktree，直接退出
+# main/develop/pre-test-merge 不需要 worktree，直接退出
 case "$branch" in
-  main|develop|pre-develop)
+  main|develop|pre-test-merge)
     exit 0
     ;;
 esac
@@ -38,7 +38,8 @@ if ! freely_wt_validate_branch_base "$branch"; then
   cat <<MSG
 [HOOK] Branch '$branch' base check failed.
 Expected:
-  feature/* from pre-develop
+  feature/* from develop
+  feature/premerge-* from pre-test-merge (or develop when pre-test-merge is not active)
   release/* from develop
   hotfix/* from main
 Primary worktree switched back to '$parking_branch'.

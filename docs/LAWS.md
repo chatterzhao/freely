@@ -26,13 +26,13 @@
 
 判定规则：
 1. 分支来源、merge 方向、保护分支策略符合宪法分支表。
-2. `feature/*` 从 `pre-develop` 创建并在 worktree 内开发。
-3. `main/develop/pre-develop` 保持 add/commit 禁止。
-4. `pre-develop -> develop` 提升前，`TEST`（含集成验收）通过。
+2. `feature/*` 从 `develop` 创建并在 worktree 内开发；仅高风险验证批次允许先进入 `pre-test-merge`。
+3. `main/develop/pre-test-merge` 保持 add/commit 禁止。
+4. `develop` 合并前，`TEST`（含集成验收）通过；若走 `pre-test-merge` 路径，验证批次必须可追溯。
 5. `PRE_TEST` 仅作为开发前基线，不得替代提升测试结果。
 6. 提升前必须有评审记录、祖先可追溯证据、进度/恢复更新证据。
 7. merge/promotion/release/cleanup 前执行 `./bin/wt-status-all`，结果全 `CLEAN`。
-8. premerge 仅作冲突收敛，来源与回并目标均为 `pre-develop`。
+8. premerge 仅作冲突收敛，来源与回并目标均为当前活跃的 `pre-test-merge`。
 9. 清理动作只能在 `verified-retirable` 后执行，且必须留痕。
 
 最小验收证据：

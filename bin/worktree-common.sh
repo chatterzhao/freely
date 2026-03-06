@@ -21,10 +21,10 @@ freely_wt_is_primary_worktree() {
 }
 
 freely_wt_pick_parking_branch() {
-  if git show-ref --verify --quiet refs/heads/pre-develop; then
-    echo "pre-develop"
-  elif git show-ref --verify --quiet refs/heads/develop; then
+  if git show-ref --verify --quiet refs/heads/develop; then
     echo "develop"
+  elif git show-ref --verify --quiet refs/heads/pre-test-merge; then
+    echo "pre-test-merge"
   else
     echo "main"
   fi
@@ -88,6 +88,9 @@ freely_wt_assert_existing_in_strict_root() {
   local branch="$1"
   local existing
   existing="$(freely_wt_existing_for_branch "$branch")"
+  if [[ -n "$existing" && "$existing" == "$(freely_wt_primary_worktree)" ]]; then
+    return 0
+  fi
   [[ -z "$existing" ]] && return 0
   freely_wt_path_in_root "$existing" && return 0
   cat <<MSG >&2
@@ -102,9 +105,16 @@ MSG
 freely_wt_validate_branch_base() {
   local b="$1"
   case "$b" in
+    feature/premerge-*)
+      if git show-ref --verify --quiet refs/heads/pre-test-merge; then
+        git merge-base --is-ancestor pre-test-merge "$b"
+      else
+        git merge-base --is-ancestor develop "$b"
+      fi
+      ;;
     feature/*)
-      git show-ref --verify --quiet refs/heads/pre-develop || return 0
-      git merge-base --is-ancestor pre-develop "$b"
+      git show-ref --verify --quiet refs/heads/develop || return 0
+      git merge-base --is-ancestor develop "$b"
       ;;
     release/*)
       git show-ref --verify --quiet refs/heads/develop || return 0
