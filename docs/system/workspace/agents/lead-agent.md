@@ -5,6 +5,7 @@
 ## 位置
 
 - 上游：`docs/system/workspace/scripts/` 中定义的 `sh` / `ps1` 启动入口
+- 当前最小启动器：`docs/system/workspace/scripts/start-lead-agent.sh`
 - 当前层：外部 AI CLI 工具启动后首先执行的代理角色
 - 下游：`skill:context-source-skill`
 

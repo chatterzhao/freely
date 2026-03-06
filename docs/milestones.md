@@ -82,5 +82,5 @@ routing_policy:
 - milestone_state: completed
 - priority: P0
 - promoted_issue_path: `pending://issue-materialization`
-- evidence: commit `00fd970`
-- completion_note: 已把 `system/workspace` 真源、`scripts` / `hooks` 与运行时落点映射写回现有 orchestrator skill 和预研文档
+- evidence: commit `00fd970`, `docs/system/workspace/scripts/`, `docs/system/workspace/hooks/`, `bin/test-routing-foundation-loop`
+- completion_note: 已把 `system/workspace` 真源、`scripts` / `hooks` 与运行时落点映射写回现有 orchestrator skill、补齐脚本与 hook 定义源，并提供最小闭环测试
