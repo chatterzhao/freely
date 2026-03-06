@@ -12,7 +12,7 @@
   - 2 个第二跳 workflow skills：`no-usable-issue-skill.md`、`has-usable-issue-skill.md`
   - 1 个现有 `auto-loop-orchestrator` skill 对齐项
 - 主链应显式对齐为：
-  `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
+  `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) -> dev-loop(DDD)`
 - 产物类型只分为 `agent` 与 `skill`
 - 命名不再使用 loop 前缀；名称表达职责，目录表达归属，元数据表达可调用范围
 - `docs/system/workspace/` 统一暴露 Freely 能力；`bin/`、`.githooks/` 视为运行时落点
@@ -69,7 +69,7 @@
 - title: `has-usable-issue-skill.md`
 - problem: 当前没有一个正式的第二跳执行指南，指导“已经命中 usable issue”时如何进一步进入正式 issue 工作流，以及何时应调用 `doc-loop-execution` 或 `dev-loop-execution`。
 - why_now: 如果这一层不写清，最容易把“已有 usable issue”误实现成固定 doc-loop 路径，破坏宪法/法律已经固定的 doc/dev-loop 分层。
-- acceptance_hint: 创建 `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`，明确：1) 它用于“已有稳定 issue 边界”；2) 它不替代 doc/dev-loop，但要指挥 issue-bound `IBM` 或 `DDD`；3) 何时进入 issue-bound IBM 的 `B/M`，何时进入 `dev-loop-execution`；4) 若进入 `IBM`，应要求 issue 目录下产出 `issues/b-{issue}/prd/pre-tests/tasks` 等正式产物并同步 milestone；5) test/review/chat 等来源命中后应先重做边界判定，再决定是 issue-bound brainstorm 还是 continuation。
+- acceptance_hint: 创建 `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`，明确：1) 它用于“已有稳定 issue 边界”；2) 它不替代 doc/dev-loop，但它自身只负责把 issue 接入 issue-bound `doc-loop(IBM+G)`；3) 若进入 `IBM`，应要求 issue 目录下产出 `issues/b-{issue}/prd/pre-tests/tasks` 等正式产物并同步 milestone；4) `dev-loop-execution` 作为独立 skill 在 doc-loop 之后接管 `DDD`；5) test/review/chat 等来源命中后应先重做边界判定，再决定是 issue-bound brainstorm 还是 continuation。
 - priority: P0
 - status: promoted
 - decision_reason: 这是第二跳执行层里“有可用 issue”分支的标准工作法；本轮纠偏后已明确它是正式 issue 工作流入口，而不是“直接开发”快捷路径。
@@ -80,9 +80,9 @@
 
 ### C-20260306-1105
 - title: 现有 `auto-loop-orchestrator` skill 对齐到首段闭环模型
-- problem: 当前 `PROJECT_INTENT` 与现有 `auto-loop-orchestrator` skill 之间仍有断层，尚未显式说明 `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> no/has-usable-issue-skill -> doc/dev-loop` 这条实现链。
+- problem: 当前 `PROJECT_INTENT` 与现有 `auto-loop-orchestrator` skill 之间仍有断层，尚未显式说明 `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> no/has-usable-issue-skill -> doc-loop -> dev-loop` 这条实现链。
 - why_now: 如果不把现有 orchestrator skill 一起对齐，后续实现会出现“脑中模型”和规范文案两套说法并存。
-- acceptance_hint: 更新 `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`：1) 首跳由 `system/workspace/scripts` 中定义的 `sh` / `ps1` 启动外部 AI CLI 工具；2) AI CLI 工具进入 `docs/system/workspace/agents/lead-agent.md`；3) `lead-agent` 调用 `context-source-skill`；4) `context-source-skill` 产出下一跳决策并进入 `no-usable-issue-skill` / `has-usable-issue-skill`；5) `doc-loop-execution` / `dev-loop-execution` 继续保持正式领域工作流；6) hook 定义源位于 `system/workspace/hooks`，`.githooks/` 作为安装产物。
+- acceptance_hint: 更新 `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`：1) 首跳由 `system/workspace/scripts` 中定义的 `sh` / `ps1` 启动外部 AI CLI 工具；2) AI CLI 工具进入 `docs/system/workspace/agents/lead-agent.md`；3) `lead-agent` 调用 `context-source-skill`；4) `context-source-skill` 产出下一跳决策并进入 `no-usable-issue-skill` / `has-usable-issue-skill`；5) `has-usable-issue-skill` 负责将已有 issue 接入 `doc-loop-execution`，随后再进入 `dev-loop-execution`；6) hook 定义源位于 `system/workspace/hooks`，`.githooks/` 作为安装产物。
 - priority: P0
 - status: promoted
 - decision_reason: 这是把本次预研结论真正接回现有 orchestrator skill 与项目意图的收口项。

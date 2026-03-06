@@ -86,7 +86,7 @@ description: 当当前输入尚未命中 usable issue 时，继续在 pre-brains
 7. 若 candidate 被选中进入后续执行面：
    - 本 skill 到此结束
    - 不自行产出正式 `issues/brainstorms/prd/pre-tests/tasks`
-   - 回流给 `context-source-skill` / `lead-agent`，下一轮由 `has-usable-issue-skill` 指挥 issue-bound `IBM` 或 `DDD`
+   - 回流给 `context-source-skill` / `lead-agent`，下一轮由 `has-usable-issue-skill` 接入 issue-bound `doc-loop(IBM+G)`
 8. 若只是治理问题，允许同步更新治理文档，但不得假装已经进入 dev-loop。
 
 ## 与 doc-loop / dev-loop 的边界

@@ -127,7 +127,7 @@ cat <<EOF
    - \`workspace/skills/no-usable-issue-skill/SKILL.md\`
    - \`workspace/skills/has-usable-issue-skill/SKILL.md\`
 8. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/no-usable-issue-skill/SKILL.md\`。
-9. 若已有稳定 issue 边界，下一跳应阅读 \`workspace/skills/has-usable-issue-skill/SKILL.md\`，再决定进入 issue-bound IBM 或 \`dev-loop-execution\`。
+9. 若已有稳定 issue 边界，下一跳应阅读 \`workspace/skills/has-usable-issue-skill/SKILL.md\`，并先接入 issue-bound \`doc-loop-execution\`。
 10. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
 11. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。
 EOF

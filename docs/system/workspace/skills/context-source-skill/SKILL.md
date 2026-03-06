@@ -61,8 +61,8 @@ description: 对当前输入做来源适配、上下文读取、usable issue 判
    - 进入 doc-loop / dev-loop / pre-brainstorm 的边界要求
 10. 产出下一跳：
    - `pre-brainstorm` -> `skill:no-usable-issue-skill`
-   - `issue-bound brainstorm` -> `skill:has-usable-issue-skill` 并优先导向 IBM 的 `B/M`
-   - `issue continuation` -> `skill:has-usable-issue-skill` 并导向 `doc-loop-execution` continuation 或 `dev-loop-execution`
+   - `issue-bound brainstorm` -> `skill:has-usable-issue-skill` 并导向 issue-bound `doc-loop-execution`
+   - `issue continuation` -> `skill:has-usable-issue-skill` 并导向 issue-bound `doc-loop-execution` continuation
 11. 如发现治理口径漂移，要求在下一跳中补齐对应治理资产。
 
 ## 输出
@@ -94,4 +94,4 @@ description: 对当前输入做来源适配、上下文读取、usable issue 判
 - 当前回合需要更新的 candidate / milestone / issue 状态已被显式指出。
 - 下一跳外部 AI 工具与 prompt 已被组装出来。
 - 若进入 `no-usable-issue-skill`，主产物应是 candidate + milestone 同步。
-- 若进入 `has-usable-issue-skill`，主事实源应切换到 milestone + issue + progress。
+- 若进入 `has-usable-issue-skill`，主事实源应切换到 milestone + issue。

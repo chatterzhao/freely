@@ -6,7 +6,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 # skill:auto-loop-orchestrator
 
 ## 首段闭环主链
-`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop-execution | dev-loop-execution`
+`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop-execution -> dev-loop-execution`
 
 约束：
 - Freely 当前编排的是外部 AI CLI 工具，而不是自研 AI CLI runtime。
@@ -25,12 +25,11 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - 无 usable issue -> `skill:no-usable-issue-skill`
    - 有 usable issue -> `skill:has-usable-issue-skill`
 5. `skill:no-usable-issue-skill` 继续停留 `pre-brainstorms`，产出 `brainstorms.md` / `candidates.md` 并同步 milestone。
-6. `skill:has-usable-issue-skill` 再决定接入：
-   - `skill:doc-loop-execution`
-   - `skill:dev-loop-execution`
-7. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
-8. 更新候选项 / milestone / route 状态记录。
-9. 重复循环直到停止条件。
+6. `skill:has-usable-issue-skill` 负责把已有 issue 接入 issue-bound `skill:doc-loop-execution`。
+7. `skill:doc-loop-execution` 完成 issue 接入、brainstorm、mapping、`PRE_TEST` 与里程碑同步后，后续循环再按状态进入 `skill:dev-loop-execution`。
+8. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
+9. 更新候选项 / milestone / route 状态记录。
+10. 重复循环直到停止条件。
 
 ## pre-brainstorms 触发
 当任一条件成立时，经 `context-source-skill` 判定后进入 `no-usable-issue-skill`：

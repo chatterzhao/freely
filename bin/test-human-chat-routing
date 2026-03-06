@@ -55,6 +55,7 @@ prompt_no_issue="$(
 printf '%s\n' "$prompt_with_issue" | grep -q "$with_issue_chat"
 printf '%s\n' "$prompt_with_issue" | grep -q 'workspace/skills/has-usable-issue-skill/SKILL.md'
 printf '%s\n' "$prompt_with_issue" | grep -q 'doc-loop-execution(IBM+G)'
+! printf '%s\n' "$prompt_with_issue" | grep -q '还是 dev-loop-execution'
 
 printf '%s\n' "$prompt_no_issue" | grep -q "$no_issue_chat"
 printf '%s\n' "$prompt_no_issue" | grep -q 'workspace/skills/no-usable-issue-skill/SKILL.md'

@@ -26,7 +26,7 @@
    - `skill:no-usable-issue-skill`
    - `skill:has-usable-issue-skill`
    - 以及应由哪个外部 AI CLI 工具承接下一跳
-6. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:doc-loop-execution` 或 `skill:dev-loop-execution`。
+6. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:doc-loop-execution` 或 `skill:dev-loop-execution`；已有 issue 先进入 issue-bound `doc-loop`，再由后续循环进入 `dev-loop`。
 
 ## 不负责
 

@@ -18,7 +18,7 @@
 
 需要回答的已不是单点规则，而是这条首段闭环：
 
-`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
+`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) -> dev-loop(DDD)`
 
 因此当前预研的真实主题应收敛为：
 
@@ -127,7 +127,7 @@
 
 - `没命中 usable issue` -> `no-usable-issue-skill` -> 继续 `pre-brainstorms`
 - `命中 usable issue` -> `has-usable-issue-skill` -> 继续正式 issue 工作流
-- `has-usable-issue-skill` 本身不替代 `doc-loop(IBM+G)` / `dev-loop(DDD)`，而是负责把当前上下文接到正确正式工作流
+- `has-usable-issue-skill` 本身不替代 `doc-loop(IBM+G)` / `dev-loop(DDD)`，而是负责把已有 issue 接到 issue-bound `doc-loop(IBM+G)`
 
 ### 8. milestone 是首跳扫描层之一
 
@@ -167,7 +167,7 @@
 ### D. usable issue 分流到第二跳
 
 1. 无 usable issue 时，`no-usable-issue-skill` 的标准产物和停止条件是什么？
-2. 有 usable issue 时，`has-usable-issue-skill` 如何决定进入 `doc-loop(IBM+G)` 还是 `dev-loop(DDD)`？
+2. 有 usable issue 时，`has-usable-issue-skill` 如何把 issue 正确接入 issue-bound `doc-loop(IBM+G)`？
 3. issue-bound brainstorm 与新的 pre-brainstorm 之间的边界如何定义？
 
 ### E. 配套治理层
@@ -275,7 +275,7 @@
 
 1. 若问题仍在原 issue 边界内
 - 属于 `issue continuation`
-- 交由 `has-usable-issue-skill` 继续决定 IBM continuation 还是 DDD
+- 交由 `has-usable-issue-skill` 继续接入 issue-bound `doc-loop(IBM+G)`
 
 2. 若问题与原 issue 强相关，但已超出当前边界
 - 属于 `issue-bound brainstorm`
@@ -316,7 +316,7 @@
 
 它负责把“原始问题”收敛成 candidate，并把 candidate 同步进 milestone；它不直接产出正式 story 目录下的 issue / brainstorm / prd / pre-tests / tasks。
 
-`has-usable-issue-skill` 的职责不是一句“选 doc-loop 还是 dev-loop”就结束，而是要把 issue-bound 工作流指挥完整：
+`has-usable-issue-skill` 的职责不是一句“有 issue 就继续”就结束，而是要把 issue-bound `doc-loop(IBM+G)` 接入做完整：
 
 - 若进入 `IBM`，应要求 issue 目录下至少维护：
   - `docs/epics/{epic}/{story}/issues/{issue-name}.md`
@@ -324,16 +324,9 @@
   - `docs/epics/{epic}/{story}/prd.md`
   - `docs/epics/{epic}/{story}/pre-tests.md`
   - `docs/epics/{epic}/{story}/tasks.md`
-- 若进入 `DDD`，应要求继续维护：
-  - `src/**`
-  - `tests/**`
-  - `docs/progress/{epic}/p-{issue}.md`
-  - `docs/milestones.md`
-
-因此：
-
 - `no-usable-issue-skill` 负责 `pre-brainstorm -> candidate -> milestone`
-- `has-usable-issue-skill` 负责 `usable issue -> IBM/DDD`
+- `has-usable-issue-skill` 负责 `usable issue -> doc-loop(IBM+G)`
+- `dev-loop-execution` 负责 `DDD`
 - `PRE_TEST` 属于 issue-bound `IBM` / doc-loop 产物，不属于 pre-brainstorm 产物
 
 ## 暂时结论
@@ -341,7 +334,7 @@
 当前更稳的路线应是：
 
 1. 先把首段闭环主链写清：
-   `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
+   `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) -> dev-loop(DDD)`
 2. 再分别定义每一层的职责边界和输入输出
 3. 产物类型只分为 `agent` 与 `skill`，不额外引入第三类 `orchestrator/guidance`
 4. `system/workspace` 统一作为能力真源，纳入 `agents`、`skills`、`scripts`、`hooks`
