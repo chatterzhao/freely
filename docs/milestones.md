@@ -37,37 +37,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `C-20260306-1101`
-- title: `lead-agent.md`
-- milestone_state: committed
-- sequencing_state: ready-to-materialize
-- priority: P0
-- promoted_issue_path: `pending://issue-materialization`
-- next_action: 创建 `docs/system/workspace/agents/lead-agent.md`
-
-2. `C-20260306-1102`
-- title: `context-source-skill.md`
-- milestone_state: committed
-- sequencing_state: ready-to-materialize
-- priority: P0
-- promoted_issue_path: `pending://issue-materialization`
-- next_action: 创建 `docs/system/workspace/skills/context-source-skill/SKILL.md`
-
-3. `C-20260306-1103`
-- title: `no-usable-issue-skill.md`
-- milestone_state: committed
-- sequencing_state: ready-to-materialize
-- priority: P0
-- promoted_issue_path: `pending://issue-materialization`
-- next_action: 创建 `docs/system/workspace/skills/no-usable-issue-skill/SKILL.md`
-
-4. `C-20260306-1104`
-- title: `has-usable-issue-skill.md`
-- milestone_state: committed
-- sequencing_state: ready-to-materialize
-- priority: P0
-- promoted_issue_path: `pending://issue-materialization`
-- next_action: 创建 `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`
+- none currently
 
 ### candidate_issues
 
@@ -75,7 +45,39 @@ routing_policy:
 
 ### completed_issues
 
-1. `C-20260306-1105`
+1. `C-20260306-1101`
+- title: `lead-agent.md`
+- milestone_state: completed
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- evidence: `docs/system/workspace/agents/lead-agent.md`
+- completion_note: 已落地首跳中枢代理职责与首跳协议
+
+2. `C-20260306-1102`
+- title: `context-source-skill.md`
+- milestone_state: completed
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- evidence: `docs/system/workspace/skills/context-source-skill/SKILL.md`
+- completion_note: 已落地来源判定、milestone 扫描与 usable issue 决策规则
+
+3. `C-20260306-1103`
+- title: `no-usable-issue-skill.md`
+- milestone_state: completed
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- evidence: `docs/system/workspace/skills/no-usable-issue-skill/SKILL.md`
+- completion_note: 已落地 pre-brainstorm 收敛与 milestone 原子同步规则
+
+4. `C-20260306-1104`
+- title: `has-usable-issue-skill.md`
+- milestone_state: completed
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- evidence: `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`
+- completion_note: 已落地 usable issue 到 doc/dev-loop 的分流边界
+
+5. `C-20260306-1105`
 - title: 现有 `auto-loop-orchestrator` skill 对齐到首段闭环模型
 - milestone_state: completed
 - priority: P0
