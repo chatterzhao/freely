@@ -1,263 +1,205 @@
-# 研究：issue 绑定头脑风暴路由与兜底门禁
+# 研究：Freely 启动到 issue/workflow skill 的首段闭环路由编排
 
 ## Context
 
 - 日期：2026-03-06 02:48 UTC
-- 触发：当前治理已经区分两类头脑风暴：
-  - 非 issue 前置收敛：`docs/pre-brainstorms/`
-  - 基于已有 issue 的 IBM 头脑风暴：`docs/epics/{epic}/{story}/brainstorms/`
-- 现状问题：规则已存在于文档，但缺少统一入口、显式元数据和提交前兜底校验，AI 与人类都可能把 brainstorm 文档放错位置。
-- 附加约束：Freely 正在自举开发 Freely，必须在自己的 worktree / brainstorm / issue 治理下收敛本规则。
+- 触发：当前讨论已经不再只是“brainstorm 文档放哪”，而是需要把 Freely 从启动入口到正式 issue/workflow skill 的首段闭环统一起来。
+- 当前已命中的关键层次：
+  - `sh` / `ps1` 启动入口
+  - 首个 AI 工具
+  - `auto-loop-lead-agent`
+  - `context-source-skill`
+  - usable issue 判定
+  - `no-usable-issue-skill` / `has-usable-issue-skill`
+  - `doc-loop(IBM+G)` / `dev-loop(DDD)` 正式工作流接驳
+- 附加约束：Freely 正在自举开发 Freely，必须在自己的 worktree / brainstorm / issue 治理下收敛这条主链，且下层设计不得与上层边界冲突。
 
-## 需要回答的问题
+## 当前收敛后的主问题
 
-1. 如何判断一个 brainstorm 是“基于已有 issue”还是“尚未形成 issue 的前置研究”？
-2. 如果当前任务是之前任务的连续开发，但没有新的 issue 文档，是否仍应留在原有 issue 路径，还是进入新的 pre-brainstorm？
-3. 哪个环节最适合作为主判断入口：
-   - 会话开始
-   - worktree 创建后
-   - brainstorm 文档创建时
-   - add/commit 前
-   - doc-loop 执行前
-4. 兜底应该做到什么程度：
-   - 只提示
-   - 阻止提交
-   - 自动迁移到正确路径
-5. 文档元数据最小集合应该是什么，才能让 hook / script 低成本判断？
+需要回答的已不是单点规则，而是这条首段闭环：
 
-## 当前观察
+`sh/ps1 -> first AI tool -> auto-loop-lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
 
-### 1. 已有规则来源
+因此当前预研的真实主题应收敛为：
 
-- `AGENTS.md`
-  - 非 issue -> `docs/pre-brainstorms/`
-  - 基于 issue -> `docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md`
-- `PROJECT_INTENT.md`
-  - chat / review / 新问题 先进入 `pre-brainstorms`
-  - issue 绑定产物进入 `epics/...`
-- `doc-loop-execution`
-  - `IBM` 负责 issue 接入、brainstorm、mapping
+1. Freely 启动后首个 AI 工具到底承担什么职责
+2. 它如何根据上下文和来源信息做 usable issue 判定
+3. 它何时进入前置研究分支，何时进入已有 issue 的正式工作分支
+4. 文档落位、元数据、milestone、hook、`bmad-check` 应如何作为这条主链的配套治理层，而不是主主题本身
 
-### 2. 执行缺口
+## 已形成的统一理解
 
-- `.githooks/` 目前没有检查 brainstorm 路由是否正确
-- `bin/bmad-check` 与 `bin/freely` 仍引用旧 `docs/brainstorms/` 路径，说明旧工作流残留尚未清理
-- 当前没有统一的 brainstorm 元数据契约，导致脚本很难可靠判断“是否基于 issue”
+### 1. 主题层级必须是一体化的
 
-### 3. 风险
+- 前面的 brainstorm 不是历史遗迹，而是当前收敛容器
+- 如果后续讨论改变了问题真实中心，就必须回写前面的主题、Context、问题定义
+- 下层候选只能细化上层，不能与上层冲突
+- 如果内层设计看起来在“推翻”上层，通常意味着上层标题和边界应该被重写
 
-- 如果只靠路径名或文件名猜测，会出现误判
-- 如果在 pre-commit 做过重自动迁移，会把错误变成隐蔽状态
-- 如果没有显式证据字段，AI 会继续凭上下文模糊判断，稳定性差
+因此本条预研不应再继续维持“issue 绑定头脑风暴路由与兜底门禁”这个过窄主题，而应提升为“启动到 issue/workflow skill 的首段闭环路由编排”。
 
-## 初步判断框架
+### 2. 现在讨论的是首段闭环，不只是 brainstorm 路径
 
-### A. 默认文档落位原则（不是总任务路由）
+当前真正的设计对象包括：
 
-这里先约束的是 **brainstorm 文档应该落在哪个目录**，而不是整个任务后续要走哪条执行流。
+1. 启动层
+   - `sh` / `ps1` 如何启动首个 AI 工具
+2. 首跳代理层
+   - `auto-loop-lead-agent` 定义首个 AI 工具承担什么职责、边界在哪里
+3. 来源适配层
+   - `context-source-skill` 如何读取 chat / review / test / milestone / issue / recovery 等上下文来源
+4. 路由判定层
+   - 如何做 usable issue 判定
+5. 第二跳分支层
+   - 无 usable issue -> `no-usable-issue-skill`
+   - 有 usable issue -> `has-usable-issue-skill`
+6. 正式工作流接驳层
+   - 继续进入 `doc-loop(IBM+G)` 或 `dev-loop(DDD)`
+7. 配套治理层
+   - brainstorm 落位
+   - 最小元数据契约
+   - milestone 绑定
+   - hook / `bmad-check` 兜底
 
-- **没有明确 issue 证据时，brainstorm 文档默认落到 `docs/pre-brainstorms/`**
-- **只有有明确 issue 证据时，brainstorm 文档才允许落到 `docs/epics/.../brainstorms/`**
+### 3. 文档落位规则已降级为配套子问题
 
-原因：
-- 错误地把研究放进 `pre-brainstorms` 的代价较低
-- 错误地把研究放进正式 issue/story 目录会污染正式执行链路
+之前的 brainstorm-routing 结论并没有失效，但它现在属于更大主题下的治理子问题：
 
-注意：
-- 这条只解决“brainstorm 文件放哪里”
-- **它不能单独决定总任务路由**
-- 总任务路由仍要结合 `context + milestone + status + boundary + runtime`
+- 没有明确 issue 证据时，brainstorm 文档默认落到 `docs/pre-brainstorms/`
+- 只有存在明确 issue 证据时，brainstorm 文档才允许落到 `docs/epics/.../brainstorms/`
+- 这条规则只解决“brainstorm 文档落位”
+- 它不能单独决定总任务路由
 
-### B. “基于 issue” 的可能证据
+### 4. usable issue 判定才是主路由分叉点
 
-候选证据：
-1. 文档元数据里明确存在 `source_issue_path`
-2. 创建命令显式传入 `--issue <path>`
-3. 当前任务上下文明确绑定某个 issue 文档路径
-4. 该 brainstorm 文档位于某个 story 目录下，并引用该 story 下的 issue 文档
+不能把路由简化成：
 
-待决问题：
-- 是否需要允许“基于 milestone、但还未形成 issue”的路径？
-- “之前任务的连续开发”是否必须指回原 issue，而不是开新 pre-brainstorm？
+- `有 issue -> IBM`
+- `没 issue -> pre-brainstorms`
 
-### C. 需要区分的任务场景
+更准确的理解是：
 
-这里要区分的是“当前上下文命中了什么对象、该对象当前处于什么状态”，而不是简单按“有没有 issue”二分。
+- `没命中 usable issue` -> `no-usable-issue-skill` -> 继续 `pre-brainstorms`
+- `命中 usable issue` -> `has-usable-issue-skill` -> 继续正式 issue 工作流
+- `has-usable-issue-skill` 本身不替代 `doc-loop(IBM+G)` / `dev-loop(DDD)`，而是负责把当前上下文接到正确正式工作流
 
-1. 新问题 / 新讨论 / review 发现 / 对话中临时冒出的问题
-   - 若未命中已有 issue/candidate：进入 `pre-brainstorms`
-2. milestone 中已有 candidate，但尚未形成正式 issue
-   - 继续研究流；通常仍由 `pre-brainstorms` 承载
-3. 已有 issue，但当前仍需继续研究
-   - 不一定回 `pre-brainstorms`
-   - 若仍在原 issue 边界内：进入 issue-bound brainstorm（`epics/.../brainstorms/b-*.md`，属于 `IBM` 内的 `B`）
-   - 若已超出原 issue 边界：新开 `pre-brainstorms`
-4. 已有 issue，且已足够清晰但尚未开始
-   - 不需要 pre-brainstorm
-   - 应先做 milestone alignment，再进入 `doc-loop(IBM)`
-5. 已有 issue，处于 `in-progress` / `done`
-   - 需继续结合 runtime / completion 状态决定 continuation、recovery、completion verification 或 follow-up
+### 5. milestone 是首跳扫描层之一
 
-### D. 触发层建议
+当前更合理的扫描顺序应接近：
 
-1. **创建入口**：主判断入口
-   - 最适合决定路径
-   - 可以要求显式参数或上下文选择
-2. **pre-commit**：兜底校验
-   - 不负责主路由
-   - 只阻止明显错误
-3. **doc-loop / bmad-check**：一致性验收
-   - 负责发现旧路径残留、元数据缺失、issue 绑定缺失
-
-### E. 两层判断：文档落位 vs 总任务路由
-
-当前研究需要把两个经常被混淆的判断拆开：
-
-1. **brainstorm 文档落位**
-- 看是否存在明确 issue 证据
-- 决定文件放在 `pre-brainstorms` 还是 `epics/.../brainstorms/`
-
-2. **总任务路由**
-- 看 `context + milestone` 的语义命中结果
-- 再结合状态、边界、运行时做 route decision
-- 因此不能简化成：
-  - `有 issue -> IBM`
-  - `没 issue -> pre-brainstorms`
-
-更准确的是：
-- `没命中 issue/candidate` -> `pre-brainstorms`
-- `命中 candidate/research-needed` -> 研究流
-- `命中 issue 但仍需研究` -> issue-bound brainstorm 或新的 pre-brainstorm
-- `命中 issue 且已清晰` -> `IBM`
-- `命中 in-progress` -> continuation/recovery
-- `命中 done` -> completion verification 或 follow-up pre-brainstorm
-
-## 与现有工作方法的关系
-
-当前感觉存在一个工作方法缺口：
-- 已有“pre-brainstorms -> candidates -> issue-ready”
-- 但“候选 issue -> 里程碑 -> 正式 issue -> IBM brainstorm”之间的操作指引还不够显式
-
-需要进一步澄清的链路可能是：
-1. `pre-brainstorms/<id>/brainstorms.md`
-2. `pre-brainstorms/<id>/candidates.md`
-3. 候选项晋升为正式 issue 文档
-4. issue 被编入 milestone / story
-5. 后续基于该 issue 的 brainstorm 才进入 `docs/epics/.../brainstorms/`
-
-## 候选落地方向
-
-### 方向 1：最小元数据契约 + 轻量 hook 兜底
-
-- pre-brainstorm 禁止出现 `source_issue_path`
-- issue-brainstorm 必须出现 `source_issue_path`
-- `pre-commit` 只检查：路径与元数据是否匹配
-
-优点：
-- 简单
-- 可解释性强
-- 不需要太多自动推断
-
-缺点：
-- 仍需人工在创建时决定类型
-
-### 方向 2：创建命令强制显式选择来源类型
-
-例如未来统一入口：
-- `freely brainstorm --pre ...`
-- `freely brainstorm --issue <path> ...`
-
-优点：
-- 源头约束最强
-- AI 和人类都更容易遵守
-
-缺点：
-- 需要先设计命令入口
-
-### 方向 3：提交前基于 staged 文件做智能推断
-
-- 如果新增了 `docs/epics/.../brainstorms/` 文件，检查是否引用 issue
-- 如果新增了 `docs/pre-brainstorms/` 文件，同时出现 issue 元数据，则阻止
-
-优点：
-- 可作为兜底层
-
-缺点：
-- 单靠提交时推断，不足以作为主入口
-
-## 测试思路（初稿）
-
-### T1. 新 pre-brainstorm 允许
-- 新增 `docs/pre-brainstorms/<id>/brainstorms.md`
-- 无 `source_issue_path`
-- 允许提交
-
-### T2. issue-brainstorm 缺失 issue 绑定时阻止
-- 新增 `docs/epics/.../brainstorms/b-*.md`
-- 缺少 `source_issue_path`
-- `pre-commit` 阻止
-
-### T3. pre-brainstorm 错带 issue 绑定时阻止
-- 新增 `docs/pre-brainstorms/.../brainstorms.md`
-- 包含 `source_issue_path`
-- `pre-commit` 阻止
-
-### T4. 旧路径遗留检测
-- 若新增或修改 `docs/brainstorms/**`
-- `bmad-check` 或 hook 直接报错
-
-## 暂时结论
-
-当前更稳的路线应修正为：
-1. 先定义最小元数据契约
-2. 再把“创建入口”设计为显式选择 pre / issue
-3. `pre-brainstorms` 结束后只产出 candidates，并原子同步进入 milestone
-4. 后续所有活跃任务路由由 milestone 承担
-5. 最后由 `pre-commit` 和 `bmad-check` 做兜底与验收
-
-关键修正：
-- `pre-brainstorms -> candidates -> route` 这个说法不再准确
-- 更准确的是：`pre-brainstorms -> candidates -> milestone -> route decision`
-- 因此 `candidates.md` 不再是调度主表，而是研究收敛产物
-- milestone 才是唯一活跃任务路由面
-
-但还需要继续收敛两件事：
-- 连续开发 / recovery 如何可靠绑定原 issue
-- milestone 与 issue 的状态机、默认路由和完成判定如何表达
-
-## 新增讨论：里程碑应作为起始扫描层
-
-### 1. 里程碑不是后置报表，而是前置扫描入口
-
-当前更合理的理解是：
-- `milestones` 不只是记录“已经决定的 issue”
-- 它还应该是 AI / 人类开始扫描任务时的第一层入口之一
-- 因为项目当前真正“准备做什么、尚未收敛什么、哪些问题需要继续研究”，都应该在 milestone 里有明确表达
-
-因此扫描顺序更接近：
 1. milestone
 2. progress / recovery
 3. issue 文档
 4. pre-brainstorms candidates
 5. review / test / chat / 新输入
 
-其中 milestone 提供的是：
-- 当前项目阶段
-- 当前批次关注范围
-- issue 是否已 ready
-- issue 是否仍需研究
-- issue 在里程碑内的相对顺序
+原因：
 
-### 2. pre-brainstorm 候选 issue 不应停留在“悬空状态”
+- milestone 不应只是后置报表
+- milestone 应表达当前项目阶段、当前批次关注范围、issue 是否 ready、是否仍需研究、优先级和相对顺序
+- `pre-brainstorms` 的 candidate 不能长期悬空，所有非 dropped candidate 都应进入 milestone 体系
 
-当前已有规则要求 `candidates.md` 显式填写 `milestone` 字段，但这还不够。
+## 需要回答的问题
 
-更强的约束应该是：
-- **所有非 dropped 的 candidate，都必须进入 milestone 体系**
-- 不能出现 candidate 还活着，但 milestone 完全无感知的状态
+### A. 启动到首跳代理
 
-但“进入 milestone”不等于“已经 fully scheduled”。
-它至少可以有三种层次：
+1. `sh` / `ps1` 对首个 AI 工具的启动契约是什么？
+2. 首个 AI 工具与 `auto-loop-lead-agent` 的关系应如何表述，才能避免把它误写成业务执行器？
+
+### B. 首跳代理到来源适配
+
+1. `auto-loop-lead-agent` 是否只负责编排，不直接承担 doc/dev-loop 的领域工作？
+2. `context-source-skill` 的最小职责集合是什么？
+3. 它应读取哪些上下文来源，按什么优先级整合？
+
+### C. 来源适配到 usable issue 判定
+
+1. 什么才算 usable issue，而不是“仅存在某个 issue 文件”？
+2. 连续开发 / recovery 如何可靠绑定原 issue？
+3. milestone、progress、issue status、runtime 状态各自如何参与判定？
+
+### D. usable issue 分流到第二跳
+
+1. 无 usable issue 时，`no-usable-issue-skill` 的标准产物和停止条件是什么？
+2. 有 usable issue 时，`has-usable-issue-skill` 如何决定进入 `doc-loop(IBM+G)` 还是 `dev-loop(DDD)`？
+3. issue-bound brainstorm 与新的 pre-brainstorm 之间的边界如何定义？
+
+### E. 配套治理层
+
+1. brainstorm 文档落位规则如何作为主链配套门禁表达？
+2. 让 hook / script 低成本判断所需的最小元数据集合是什么？
+3. `pre-commit`、`bmad-check`、创建入口各自应该承担什么边界？
+
+## 当前观察
+
+### 1. 已有规则来源
+
+- `AGENTS.md`
+  - 非 issue 前置研究 -> `docs/pre-brainstorms/`
+  - 基于已有 issue 的 IBM brainstorm -> `docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md`
+- `PROJECT_INTENT.md`
+  - chat / review / 新问题先进入 `pre-brainstorms`
+  - ready issue / in-progress issue 再进入正式工作流
+- 宪法 / 法律
+  - `doc-loop(IBM+G)` 与 `dev-loop(DDD)` 的正式分层已经存在
+
+### 2. 执行缺口
+
+- 还没有一个显式的“启动入口 -> 首跳代理 -> 来源适配 -> usable issue 分流”的统一说明
+- `.githooks/` 目前没有检查 brainstorm 路由是否正确
+- `bin/bmad-check` 与 `bin/freely` 仍引用旧 `docs/brainstorms/` 路径，说明旧工作流残留尚未清理
+- 当前没有统一的 brainstorm 元数据契约，导致脚本难以判断 issue 绑定关系
+
+### 3. 风险
+
+- 如果没有显式首段闭环模型，`lead-agent`、`source-skill`、`no/has-usable-issue-skill` 会继续混层
+- 如果只靠路径名或文件名猜测 brainstorm 类型，会出现误判
+- 如果在 pre-commit 做过重自动迁移，会把错误变成隐蔽状态
+- 如果 candidate 已经收敛到新主题，但前面的 brainstorm 仍维持旧题目，整条文档链会继续失真
+
+## 暂时结论
+
+当前更稳的路线应是：
+
+1. 先把首段闭环主链写清：
+   `sh/ps1 -> first AI tool -> auto-loop-lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
+2. 再分别定义每一层的职责边界和输入输出
+3. 将 brainstorm 路由、元数据契约、milestone 绑定、hook / `bmad-check` 明确降为治理配套层
+4. 让 `candidates.md` 只承载这条主链下的文档型产物，不再回到旧题目
+5. 后续再将这些候选物化为正式 issue，并绑定 milestone
+
+## 本轮候选落地方向
+
+### 方向 1：先固化首段闭环的 4 个核心文档
+
+- `auto-loop-lead-agent.md`
+- `context-source-skill.md`
+- `no-usable-issue-skill.md`
+- `has-usable-issue-skill.md`
+
+优点：
+
+- 先把首段主链固定
+- 避免后续继续在脑中模型和文档模型之间漂移
+
+### 方向 2：同时补一个 orchestrator / guidance 对齐项
+
+- 把启动器、lead-agent、source-skill、no/has-usable-issue skill、doc/dev-loop 的主链统一回 guidance / orchestrator
+
+优点：
+
+- 防止“新模型只存在于预研文档里”
+
+### 方向 3：后补治理层兜底
+
+- brainstorm 文档落位
+- 最小元数据契约
+- milestone 原子绑定
+- `pre-commit` / `bmad-check` 兜底
+
+优点：
+
+- 先固定主链，再补配套门禁，避免治理层先于主模型定死错误边界
 
 1. 已明确 milestone 归属
 - 已知道属于哪个 milestone
