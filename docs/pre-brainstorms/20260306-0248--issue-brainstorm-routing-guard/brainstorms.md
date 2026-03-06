@@ -1463,6 +1463,76 @@ flowchart TD
 - `has-skill.md`：有可用 issue 时的下游执行指南
 - `doc-loop-execution` / `dev-loop-execution`：仍然保留为真正的领域工作流 skill
 
+### 2.1 现实现状图（保留上图作为历史参考）
+
+上图保留为这轮讨论中的历史推演参考。按当前 worktree 已落地文档与脚本，闭环应表达为：
+
+```mermaid
+flowchart TD
+    subgraph RT["runtime / supervisor"]
+        R0["workspace/scripts/runtime/freely"]
+        R1["start-lead-agent.sh"]
+        R2["monitor-ai-cli.sh"]
+        R3["external AI CLI process"]
+    end
+
+    subgraph OUTER["outer loop: auto-loop"]
+        A0["lead-agent"]
+        A1["context-source-skill"]
+        A2{"route_kind?"}
+    end
+
+    subgraph INNER["inner execution loops"]
+        D0["doc-pre-brainstorm-execution"]
+        D1["doc-ibm-execution"]
+        D2["dev-loop-execution"]
+    end
+
+    subgraph STATE["shared state / artifacts"]
+        S0["docs/milestones.md"]
+        S1["docs/pre-brainstorms/**"]
+        S2["docs/epics/**"]
+        S3["docs/progress/**"]
+    end
+
+    R0 --> R1 --> R2 --> R3
+    R3 --> A0 --> A1 --> A2
+
+    A2 -->|"no stable issue boundary"| D0
+    A2 -->|"issue-bound brainstorm / docs incomplete"| D1
+    A2 -->|"ready issue / in-progress"| D2
+
+    D0 --> S0
+    D0 --> S1
+    D1 --> S0
+    D1 --> S2
+    D2 --> S0
+    D2 --> S2
+    D2 --> S3
+
+    D0 -. "status / next_recommended_route / recovery_context" .-> A1
+    D1 -. "status / next_recommended_route / recovery_context" .-> A1
+    D2 -. "status / next_recommended_route / recovery_context" .-> A1
+
+    R3 -. "natural exit / crash" .-> R2
+    R2 -. "relaunch until Ctrl+C / stop" .-> R3
+```
+
+这张图对应当前实现边界：
+
+- runtime 只负责启动、监控、恢复、停止 AI CLI 进程，不负责业务路由。
+- `lead-agent` 负责首跳接管与委托，不负责自己找新任务。
+- `context-source-skill` 消费调用方传入的输入包，在给定上下文范围内判定下一跳。
+- 3 个 execution skill 都只处理调用方传入的问题上下文，并把状态回流给外循环。
+- `milestones / pre-brainstorms / epics / progress` 是共享状态面，供下一轮 outer loop 继续判定。
+
+闭环判断：
+
+- 外循环已闭环：`lead-agent -> context-source-skill -> execution skill -> 状态回流 -> context-source-skill`
+- 内循环已分层：`doc-pre-brainstorm`、`doc-ibm`、`dev-loop` 各自只负责本环产物
+- runtime 已接住进程闭环：AI CLI 自然退出或崩溃后由 supervisor 续接；显式 `Ctrl+C` / stop 才终止
+- 仍待后续继续强化的是 issue materialization 与更真实的 issue-bound 证据链，而不是这一层职责图本身
+
 ### 3. `has-skill.md` 不能被误写成“已有 issue 就直接做 doc-loop”
 
 这是前面讨论里最容易滑偏的一点。
