@@ -56,6 +56,7 @@ description: 在法律和宪法下执行 issue-bound docs 环，负责 `IBM+G` �
   - `docs/CONSTITUTION.md`
   - `docs/LAWS.md`
   - `docs/system/workspace/skills/**`
+- `docs/progress/**` 不是本 skill 的主工作产物；progress 主回写归 `dev-loop-execution`。
 
 ## 工作步骤
 1. 接收 issue 并对齐 epic/story/milestone 所有权。

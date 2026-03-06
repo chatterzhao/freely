@@ -56,6 +56,7 @@ description: 执行 pre-brainstorm 前置收敛环，负责把原始问题收敛
 - `docs/milestones.md`
 - 按需更新：
   - 相关治理文档中的术语或路由说明
+- `docs/progress/**` 不是本 skill 的工作产物。
 
 ## 主事实源
 
