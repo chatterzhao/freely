@@ -27,7 +27,7 @@ prompt="$(
     --project "$ROOT_DIR" \
     --intent "$ROOT_DIR/docs/PROJECT_INTENT.md" \
     --constitution "$ROOT_DIR/docs/CONSTITUTION.md" \
-    --ai codex:gpt-5:auto
+    --ai codex:auto
 )"
 
 printf '%s\n' "$prompt" | grep -q 'lead-agent'
@@ -36,7 +36,10 @@ printf '%s\n' "$prompt" | grep -q 'docs/milestones.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/agents/lead-agent.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/tools.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/skills/no-usable-issue-skill/SKILL.md'
-printf '%s\n' "$prompt" | grep -q '自主组装下一跳提示词'
-printf '%s\n' "$prompt" | grep -q '不要把路由当作脚本硬编码分支'
+printf '%s\n' "$prompt" | grep -q '需求池至少包括'
+printf '%s\n' "$prompt" | grep -q '当前先看哪个池'
+printf '%s\n' "$prompt" | grep -q 'pre-brainstorm'
+printf '%s\n' "$prompt" | grep -q 'issue-bound brainstorm'
+printf '%s\n' "$prompt" | grep -q '脚本只负责启动和托管 AI'
 
 echo "[PASS] routing foundation loop artifacts are connected"

@@ -24,13 +24,27 @@ abs_path_or_fail() {
 parse_ai_spec_or_fail() {
   local spec="$1"
   local tool="" model="" mode="auto"
+  local first="" second="" third=""
 
-  IFS=':' read -r tool model mode <<<"$spec"
+  IFS=':' read -r first second third <<<"$spec"
+  tool="$first"
   [[ -n "${tool:-}" ]] || {
     echo "[ERROR] invalid --ai spec: $spec" >&2
     exit 1
   }
-  [[ -n "${mode:-}" ]] || mode="auto"
+
+  # Support both tool:model:mode and tool:mode forms.
+  if [[ -n "${third:-}" ]]; then
+    model="$second"
+    mode="$third"
+  elif [[ "$second" == "auto" || "$second" == "step" ]]; then
+    model=""
+    mode="$second"
+  else
+    model="${second:-}"
+    mode="auto"
+  fi
+
   [[ "$mode" == "auto" || "$mode" == "step" ]] || {
     echo "[ERROR] unsupported mode: $mode" >&2
     exit 1
@@ -94,14 +108,25 @@ cat <<EOF
 执行要求：
 1. 先执行 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\`。
 2. 进入 \`lead-agent\`，不要绕过首跳代理。
-3. 用 \`skill:context-source-skill\` 读取当前输入上下文、\`docs/milestones.md\` 与 \`workspace/tools.md\`。
-4. 由你理解输入意图，并自主组装下一跳提示词；不要把路由当作脚本硬编码分支。
-5. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
+3. 由 \`lead-agent\` 委托 \`skill:context-source-skill\` 进行需求池扫描、优先级判断与下一跳提示词组装。
+4. 你的需求池至少包括：
+   - \`docs/milestones.md\`
+   - progress / recovery
+   - review / test
+   - human chat / session evidence
+   - github issue
+   - \`docs/PROJECT_INTENT.md\`
+5. 你需要自主判断：
+   - 当前先看哪个池
+   - 哪个池优先级更高
+   - 当前问题是 \`pre-brainstorm\`、\`issue-bound brainstorm\` 还是 \`issue continuation\`
+6. 不要把路由当作脚本硬编码分支；脚本只负责启动和托管 AI，会话中的需求发现与路由判断由你完成。
+7. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
    - \`workspace/agents/lead-agent.md\`
    - \`workspace/skills/context-source-skill/SKILL.md\`
    - \`workspace/skills/no-usable-issue-skill/SKILL.md\`
    - \`workspace/skills/has-usable-issue-skill/SKILL.md\`
-6. 若没有 usable issue，下一跳应阅读 \`workspace/skills/no-usable-issue-skill/SKILL.md\`。
-7. 若已有 usable issue，下一跳应阅读 \`workspace/skills/has-usable-issue-skill/SKILL.md\`，再决定进入 \`doc-loop-execution\` 还是 \`dev-loop-execution\`。
-8. 你需要解释为什么选择当前工具，以及为什么选择当前下一跳。
+8. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/no-usable-issue-skill/SKILL.md\`。
+9. 若已有稳定 issue 边界，下一跳应阅读 \`workspace/skills/has-usable-issue-skill/SKILL.md\`，再决定进入 issue-bound IBM 或 \`dev-loop-execution\`。
+10. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
 EOF
