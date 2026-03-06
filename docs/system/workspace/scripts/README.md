@@ -14,6 +14,7 @@
   - 接收项目路径、意图路径、宪法路径、AI 规格
   - 生成交给外部 AI CLI 的首跳提示
   - 明确进入 `lead-agent`
+  - 不在脚本层决定最终路由，只负责把 AI 送入可自治理解的首跳语境
 
 ## 输入面
 
@@ -27,6 +28,7 @@
 - 校验通过后输出首跳 prompt
 - 该 prompt 由运行时脚本或外部 AI CLI 消费
 - 不在这里直接承载完整 supervisor / restart / state 逻辑
+- 不在这里硬编码“走 IBM 还是走 pre-brainstorm”
 
 ## 投影规则
 

@@ -1,15 +1,15 @@
 ---
 name: context-source-skill
-description: 对当前输入做来源适配、上下文读取与 usable issue 判定，并为 lead-agent 产出下一跳路由结果。
+description: 对当前输入做来源适配、上下文读取、usable issue 判定与下一跳提示词组装，为 lead-agent 产出 AI 自治编排结果。
 ---
 
 # skill:context-source-skill
 
 ## 适用边界
 
-- 处理首跳来源识别与路由判定。
+- 处理首跳来源识别、路由判定与下一跳提示词组装。
 - 不直接执行业务型 doc/dev-loop。
-- 不替代 milestone、issue、progress 的长期状态维护，只产出当前回合的判定结果与建议更新。
+- 不替代 milestone、issue、progress 的长期状态维护，只产出当前回合的判定结果、建议更新与下一跳编排输出。
 
 ## 输入
 
@@ -18,6 +18,7 @@ description: 对当前输入做来源适配、上下文读取与 usable issue �
 - `docs/CONSTITUTION.md`
 - `docs/LAWS.md`
 - `docs/milestones.md`
+- `docs/system/workspace/tools.md`
 - 按需读取：
   - `docs/pre-brainstorms/**`
   - issue / progress / recovery 证据
@@ -37,19 +38,32 @@ description: 对当前输入做来源适配、上下文读取与 usable issue �
    - 是否已有 issue path
    - 是否已有 progress / recovery 记录
    - 是否只是 pre-brainstorm candidate
-5. 产出下一跳：
+5. 结合 `tools.md` 判断当前任务强度与工具适配：
+   - 路由/预研/文档收敛优先考虑更适合长 prompt 编排的工具
+   - 命中 usable issue 后的仓库实现优先考虑更适合工程执行的工具
+   - 不在规则中硬编码唯一工具，而是让 AI 基于当前输入做解释性选择
+6. 组装下一跳 prompt，prompt 至少包含：
+   - `<source input>`
+   - `docs/milestones.md` 路径
+   - 需要阅读的 skill 路径
+   - 当前为何选择该工具
+   - 进入 doc-loop / dev-loop / pre-brainstorm 的边界要求
+7. 产出下一跳：
    - 无 usable issue -> `skill:no-usable-issue-skill`
    - 有 usable issue 但文档未完备 -> `skill:has-usable-issue-skill` 并优先导向 `doc-loop-execution`
    - 有 usable issue 且已具备执行条件 -> `skill:has-usable-issue-skill` 并导向 `dev-loop-execution`
-6. 如发现治理口径漂移，要求在下一跳中补齐对应治理资产。
+8. 如发现治理口径漂移，要求在下一跳中补齐对应治理资产。
 
 ## 输出
 
 - `source_type`
 - `matched_milestone`
 - `usable_issue: true|false`
+- `selected_tool`
+- `why_selected`
 - `next_skill`
 - `recommended_route`
+- `next_prompt`
 - `required_updates`
 
 ## 判定原则
@@ -58,8 +72,11 @@ description: 对当前输入做来源适配、上下文读取与 usable issue �
 - `pending://milestone-binding` 只能是短暂过渡态。
 - 已有 issue path 不代表直接进入 dev-loop；仍要结合文档完整度、状态和证据决定。
 - chat / review / test 这类外部输入，若尚未进入正式 issue 体系，先回到 pre-brainstorms 收敛。
+- 核心产出是“提示词组装与工具选择建议”，不是 shell 里的硬编码路由。
+- AI 应理解后路由，而不是按脚本分支表机械跳转。
 
 ## 完成
 
 - `lead-agent` 获得可执行的下一跳决定。
 - 当前回合需要更新的 candidate / milestone / issue 状态已被显式指出。
+- 下一跳外部 AI 工具与 prompt 已被组装出来。

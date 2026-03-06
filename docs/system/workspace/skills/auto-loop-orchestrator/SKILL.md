@@ -20,7 +20,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 ## 工作流
 1. 先执行固定前置门禁：`skill:constitution-guard` -> `skill:laws-enforcer`。
 2. `system/workspace/scripts` 中定义的 `sh` / `ps1` 启动外部 AI CLI 工具，并进入 `lead-agent`。
-3. `lead-agent` 调用 `skill:context-source-skill`，基于当前来源与上下文做 usable issue 判定。
+3. `lead-agent` 调用 `skill:context-source-skill`，基于当前来源、milestone、工具清单与上下文做 usable issue 判定，并组装下一跳提示词。
 4. 根据 `context-source-skill` 的结果分流：
    - 无 usable issue -> `skill:no-usable-issue-skill`
    - 有 usable issue -> `skill:has-usable-issue-skill`

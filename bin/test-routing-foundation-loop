@@ -7,10 +7,9 @@ cd "$ROOT_DIR"
 required_files=(
   "docs/milestones.md"
   "docs/system/workspace/agents/lead-agent.md"
+  "docs/system/workspace/tools.md"
   "docs/system/workspace/scripts/README.md"
   "docs/system/workspace/scripts/start-lead-agent.sh"
-  "docs/system/workspace/hooks/README.md"
-  "docs/system/workspace/hooks/pre-commit.sh"
   "docs/system/workspace/skills/context-source-skill/SKILL.md"
   "docs/system/workspace/skills/no-usable-issue-skill/SKILL.md"
   "docs/system/workspace/skills/has-usable-issue-skill/SKILL.md"
@@ -34,7 +33,8 @@ prompt="$(
 printf '%s\n' "$prompt" | grep -q 'lead-agent'
 printf '%s\n' "$prompt" | grep -q 'context-source-skill'
 printf '%s\n' "$prompt" | grep -q 'docs/milestones.md'
-
-bash docs/system/workspace/hooks/pre-commit.sh >/dev/null
+printf '%s\n' "$prompt" | grep -q 'docs/system/workspace/tools.md'
+printf '%s\n' "$prompt" | grep -q '自主组装下一跳提示词'
+printf '%s\n' "$prompt" | grep -q '不要把路由当作脚本硬编码分支'
 
 echo "[PASS] routing foundation loop artifacts are connected"

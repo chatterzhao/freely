@@ -80,6 +80,7 @@ cat <<EOF
 - 项目意图：$intent
 - 宪法：$constitution
 - 里程碑扫描入口：$project/docs/milestones.md
+- 工具清单：$project/docs/system/workspace/tools.md
 - 首跳代理：$project/docs/system/workspace/agents/lead-agent.md
 
 运行上下文：
@@ -91,7 +92,9 @@ cat <<EOF
 执行要求：
 1. 先执行 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\`。
 2. 进入 \`lead-agent\`，不要绕过首跳代理。
-3. 用 \`skill:context-source-skill\` 读取当前输入上下文和 milestone。
-4. 若没有 usable issue，进入 \`skill:no-usable-issue-skill\`。
-5. 若已有 usable issue，进入 \`skill:has-usable-issue-skill\`，再分流到 \`doc-loop-execution\` 或 \`dev-loop-execution\`。
+3. 用 \`skill:context-source-skill\` 读取当前输入上下文、milestone 与 tools。
+4. 由你理解输入意图，并自主组装下一跳提示词；不要把路由当作脚本硬编码分支。
+5. 若没有 usable issue，下一跳应阅读 \`skill:no-usable-issue-skill\`。
+6. 若已有 usable issue，下一跳应阅读 \`skill:has-usable-issue-skill\`，再决定进入 \`doc-loop-execution\` 还是 \`dev-loop-execution\`。
+7. 你需要解释为什么选择当前工具，以及为什么选择当前下一跳。
 EOF
