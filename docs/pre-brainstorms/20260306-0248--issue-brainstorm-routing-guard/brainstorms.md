@@ -1026,3 +1026,298 @@ iflow -p -y "<user-input>or<other input>,<milestone-path>；根据输入，分�
 - `no-usable-issue-skill.md`
 
 后续若觉得文件名过长，可再讨论缩写方案；但在研究阶段，优先保证语义准确，不优先追求短。
+
+## 统一收敛结论
+
+### 1. 本议题的真正核心不是“brainstorm 放哪”，而是“谁承担活跃路由面”
+
+前半段讨论从 brainstorm 路径误放切入是对的，但后半段已经把更深层结论收敛出来：
+
+- 真正需要统一的不是单个 brainstorm 文件的路径规则
+- 而是 **Freely 的活跃任务路由面应由 milestone 承担，而不是 `candidates.md` 承担**
+- 因此，本议题的核心应表述为：
+  - **milestone-centered routing**
+  - brainstorm 路由只是其中一个文档落位与门禁派生问题
+
+### 2. 应视为已被后文修正的前文表述
+
+以下前文表述在研究后半段已经被更准确的结论替代：
+
+- `pre-brainstorms -> candidates -> route`
+- `candidates.md` 直接承担活跃调度主表职责
+- 顶层仅按“有没有 issue”决定进入哪条工作流
+- 把 brainstorm 路由问题直接等同于总任务路由问题
+
+统一后的说法应是：
+
+- `pre-brainstorms -> candidates -> milestone -> route decision`
+- `candidates.md` 是研究收敛产物，不是长期活跃路由面
+- 顶层判断标准是 **是否存在 usable issue**
+- brainstorm 路径判断只是 doc-loop 内的文档落位判断
+
+### 3. brainstorm 路由应降级为 doc-loop 内的子问题
+
+因此本议题应拆成两层：
+
+1. 顶层：
+- auto-loop / router 如何根据统一上下文与 milestone 做路由
+
+2. 子层：
+- 当需要写 brainstorm 文档时，它应落在：
+  - `docs/pre-brainstorms/`
+  - 或 `docs/epics/{epic}/{story}/brainstorms/`
+
+换句话说：
+- **brainstorm 路由不是顶层调度器**
+- **brainstorm 路由是顶层路由命中后，doc-loop 内部的文档放置规则**
+
+### 4. 对 pre-brainstorms 的最终定位
+
+`pre-brainstorms` 的职责应统一为：
+
+- 承接新问题、新输入、边界未收敛问题
+- 形成候选 issue 与研究证据
+- 将非 dropped candidate 原子同步进 milestone
+
+它不再承担：
+
+- 长期活跃调度主表
+- 已有 issue 的默认续写位置
+- 替代 milestone 的路由职责
+
+### 5. 对 issue-bound brainstorm 的最终定位
+
+只要同时满足以下条件，就不应再回到 `pre-brainstorms`：
+
+- 已存在 usable issue
+- 当前研究仍处于该 issue 边界内
+- 已明确进入 `doc-loop(IBM)` 语义空间
+
+此时应：
+
+- 先确认 `epic/story`
+- 再把 brainstorm 放到 `docs/epics/{epic}/{story}/brainstorms/`
+
+只有在以下情况，才应重新进入新的 `pre-brainstorms`：
+
+- 当前问题超出原 issue 边界
+- 还没有 usable issue
+- 当前只是新输入的前置收敛，尚未正式归属
+
+### 6. milestone 的统一职责
+
+研究后半段已经隐含出一个更强结论：
+
+- milestone 不是后置报表
+- milestone 是 AI / 人类开始扫描任务时的前置入口
+- 所有非 dropped candidate 都必须进入 milestone 体系
+
+因此 milestone 至少要承载：
+
+- `candidate`
+- `research-needed`
+- `sequencing-pending`
+- `committed`
+
+也因此：
+
+- `pending://milestone-binding` 只能是短暂过渡值
+- 不能成为候选 issue 的稳定终态
+
+### 7. 中间结论（已被后文两层 auto-loop 模型覆盖）
+
+这一段研究曾短暂收敛到“3 个 skill + hook/script 兜底”的方向，但在继续对照宪法、法律、项目意图与运行时守护机制后，已确认该模型不够准确：
+
+- 它没有显式表达 `auto-loop-lead-agent.md`
+- 它把 `context-source-skill.md` 与 `no/has-skill.md` 错放到了同一层
+- 它容易把 `has-skill` 误写成 doc-loop 的替代物
+- 它过早把 hook/script 拉回主收敛，掩盖了当前真正需要先澄清的两层 auto-loop 机制
+
+因此这一段只保留为研究中间态记录。
+当前有效结论以后文“与宪法 / 法律 / 项目意图对齐后的更稳模型”为准。
+
+## 最终判断：与宪法 / 法律 / 项目意图对齐后的更稳模型
+
+### 1. 先看什么是不能被新抽象覆盖掉的
+
+重新对照宪法、法律、项目意图与现有 skill 后，有三条不能被新模型破坏：
+
+1. 宪法已经固定 Freely 只有三层循环：
+- `A:auto-loop`
+- `D:doc-loop`
+- `D:dev-loop`
+
+2. 法律已经固定：
+- auto-loop 负责发现、路由、回流
+- doc-loop 负责 `IBM+G`
+- dev-loop 负责实现、测试、文档回写
+
+3. 项目意图已经固定：
+- `pre-brainstorms` 不是独立第四层循环
+- 它是 auto-loop 命中“未形成可用 issue”时的研究工作区
+- milestone 才是项目级活跃路由面
+
+因此，新收敛出的 `lead-agent`、`context-source-skill`、`no-skill`、`has-skill`
+**只能是 auto-loop 的实现分层，不能新增第四层方法论，也不能覆盖 doc-loop / dev-loop 的职责。**
+
+### 2. 所以真正对的，不是“3 个并列 skill”
+
+之前把它们理解成“3 个并列 skill”还是不够准确。
+
+更准确的分层应是：
+
+```mermaid
+flowchart TD
+    R0["sh / ps1 runtime guardian"]
+    R1["首个 AI 工具进程"]
+    A1["auto-loop-lead-agent.md"]
+    A2["context-source-skill.md"]
+    A3{"是否有可用 issue?"}
+    A4["no-skill.md"]
+    A5["has-skill.md"]
+    D1["doc-loop-execution"]
+    D2["dev-loop-execution"]
+
+    R0 --> R1 --> A1 --> A2 --> A3
+    A3 -->|"无"| A4
+    A3 -->|"有"| A5
+    A4 --> D1
+    A5 --> D1
+    A5 --> D2
+```
+
+这里的含义是：
+
+- `sh / ps1`：运行时守护层，不是 skill
+- `auto-loop-lead-agent.md`：auto-loop 的中央代理说明，不是 doc/dev-loop 替代物
+- `context-source-skill.md`：供 lead-agent 使用的“来源适配 + 工具选择 + 下一跳指令生成规则”
+- `no-skill.md`：无可用 issue 时的下游执行指南
+- `has-skill.md`：有可用 issue 时的下游执行指南
+- `doc-loop-execution` / `dev-loop-execution`：仍然保留为真正的领域工作流 skill
+
+### 3. `has-skill.md` 不能被误写成“已有 issue 就直接做 doc-loop”
+
+这是前面讨论里最容易滑偏的一点。
+
+重新对照法律和项目意图后，`has-skill.md` 必须这样理解：
+
+- 它的含义是：**已经命中可用 issue，可以离开前置研究态**
+- 但它不等于：**统一进入单一 doc-loop 子路径**
+
+因为命中 usable issue 后，仍然可能存在：
+
+- 需要继续 `IBM` 收敛的 issue -> `doc-loop-execution`
+- 已在进行中的实现问题 -> `dev-loop-execution`
+- 完成后的 completion verification / recovery 场景 -> 先走对应前置判断，再进入合适路径
+
+因此更稳的边界应是：
+
+- `no-skill.md`：负责把工作留在前置研究态，并产出 candidate / milestone 更新
+- `has-skill.md`：负责把工作从前置研究态送回正式 issue 工作流
+- **真正进入 doc 还是 dev，由 `has-skill.md` 内部依据 issue 状态再调用 `doc-loop-execution` 或 `dev-loop-execution`**
+
+### 4. `auto-loop-lead-agent.md` 应视为 auto-loop 的实现中枢，而不是普通 skill
+
+结合你补充的运行机制，更合理的理解是：
+
+- Freely 启动后，由 `sh` / `ps1` 拉起首个 AI 工具
+- 首个 AI 工具读取 `auto-loop-lead-agent.md`
+- `lead-agent` 的职责是：
+  - 稳坐中央
+  - 调用 `context-source-skill.md`
+  - 生成下一跳 AI 工具调用指令
+  - 不直接承担 doc/dev-loop 的细节工作
+
+因此：
+
+- `auto-loop-lead-agent.md` 不是和 `no-skill.md`、`has-skill.md` 同级的 workflow skill
+- 它更像 auto-loop 的“AI 编排代理说明”
+
+### 5. `context-source-skill.md` 的正确职责
+
+`context-source-skill.md` 不应被写成一个“大而全的路由器教程”。
+
+它只应负责三件事：
+
+1. 根据 `<source input>` 识别来源类型
+2. 根据任务强度、工具优先级、工具可用性列表选择下一跳工具
+3. 生成下一跳调用指令
+
+例如当选择 `iflow` 时，组装出：
+
+```text
+iflow -p -y "<source-input>；<里程碑文件路径>；根据输入，分析意图，在里程碑里查询是否有issue可用，无：阅读 path/no-skill.md；有：阅读 path/has-skill.md。严格按指南工作。"
+```
+
+它不负责：
+
+- 自己写 `pre-brainstorms`
+- 自己推进 issue 的 `IBM`
+- 自己替代 `doc-loop-execution` / `dev-loop-execution`
+
+### 6. `no-skill.md` 与 `has-skill.md` 的正确层级
+
+这两个文件是 **第二跳 AI 执行指南**，不是首跳编排指南。
+
+因此：
+
+- `no-skill.md`
+  - 用于“当前没有可用 issue”
+  - 指导如何在 `pre-brainstorms` 中继续研究
+  - 指导如何写 `brainstorms.md` / `candidates.md`
+  - 指导如何把 candidate 同步进 milestone
+
+- `has-skill.md`
+  - 用于“当前已经命中可用 issue”
+  - 指导如何判断应该进入 `doc-loop-execution` 还是 `dev-loop-execution`
+  - 指导 issue-bound brainstorm / story 目录 / milestone 回写的边界
+
+因此最终不应再用长文件名强调 `usable issue`。
+在当前两层提示词模型里，`no-skill.md` / `has-skill.md` 已经足够准确，因为“是否可用”这件事已经在提示词文本里说清楚了。
+
+### 7. 现在更好的候选 issue 收敛方式
+
+因此，当前更稳的候选 issue 不应是“3 个 skill + hook”。
+应收敛成：
+
+1. `auto-loop-lead-agent.md`
+- 定义首跳 AI 中枢代理职责
+- 明确它如何调用 `context-source-skill.md`
+
+2. `context-source-skill.md`
+- 定义来源适配、工具选择、下一跳指令生成
+
+3. `no-skill.md`
+- 定义无可用 issue 时的前置研究工作法
+
+4. `has-skill.md`
+- 定义有可用 issue 时如何进一步进入 `doc-loop-execution` 或 `dev-loop-execution`
+
+5. `auto-loop-orchestrator` / guidance 对齐
+- 把项目意图、现有 auto-loop skill、后续文档表述统一到这套两层实现模型
+
+### 8. 暂时不应把 hook / script 放回当前主收敛
+
+在你已经明确“先信任 AI 按 skill 工作”的前提下，当前最好的收敛不是继续拉 hook/script 进主议题。
+
+因为此时主风险不在监督不足，而在：
+
+- 两层 auto-loop 机制还没完全说清
+- `lead-agent`、`context-source`、`no/has-skill` 的层级还没完全对齐
+- `has-skill.md` 与 `doc/dev-loop` 的边界容易写错
+
+因此当前更好的顺序应是：
+
+1. 先把 4 个文档型产物定义清楚：
+- `auto-loop-lead-agent.md`
+- `context-source-skill.md`
+- `no-skill.md`
+- `has-skill.md`
+
+2. 再把 `auto-loop-orchestrator` 与 guidance 对齐
+
+3. 最后若需要，再补 hook/script 兜底
+
+### 9. 当前最稳的一句话结论
+
+- **真正对且闭环的模型是：`sh/ps1` 负责守护并启动首个 AI 工具；首个 AI 工具执行 `auto-loop-lead-agent.md`；`lead-agent` 调用 `context-source-skill.md` 生成下一跳 AI 工具指令；下游 AI 再依据 milestone 进入 `no-skill.md` 或 `has-skill.md`；而 `doc-loop-execution` 与 `dev-loop-execution` 仍保持为宪法/法律已经固定的正式领域工作流。**
