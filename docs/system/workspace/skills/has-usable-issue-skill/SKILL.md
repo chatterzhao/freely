@@ -23,7 +23,7 @@ description: 当当前输入已经命中 usable issue 时，决定进入 doc-loo
 - 本 skill 不再把 candidate 当成执行态事实源
 - 后续 brainstrom 若仍需要存在，应属于 IBM 的 `B`，即 issue-bound brainstorm，而不是 pre-brainstorm
 
-## Milestone Schema
+## Milestone 字段约定
 
 milestone entry 应表达执行扫描状态，字段可包含：
 

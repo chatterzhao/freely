@@ -22,7 +22,7 @@ description: 当当前输入尚未命中 usable issue 时，继续在 pre-brains
 - milestone 只承接 candidate 被接纳后的扫描入口
 - 本 skill 负责把 candidate 事实同步进 milestone，但执行态事实源还不在这里
 
-## Candidate Schema
+## Candidate 字段约定
 
 `candidates.md` 应只表达前置收敛状态，字段保持最小：
 
@@ -80,4 +80,4 @@ description: 当当前输入尚未命中 usable issue 时，继续在 pre-brains
 
 - `brainstorms.md` 与 `candidates.md` 已更新。
 - `docs/milestones.md` 与 candidate 状态保持原子一致。
-- candidate 被提升后，执行态不再继续写回 candidate schema。
+- candidate 被提升后，执行态不再继续写回 candidate 字段。

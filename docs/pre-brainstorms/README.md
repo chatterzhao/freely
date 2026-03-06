@@ -27,7 +27,7 @@ docs/pre-brainstorms/
 - `milestone`：未绑定前使用 `pending://milestone-binding`
 - `session_refs`：无会话证据时使用 `[]`
 
-## Candidate Schema Position
+## Candidate 产物定位
 
 `candidates.md` 只承载 pre-brainstorm 阶段的前置收敛状态，不承载执行态。
 
