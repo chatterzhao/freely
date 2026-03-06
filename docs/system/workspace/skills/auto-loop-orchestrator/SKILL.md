@@ -13,10 +13,13 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 - `lead-agent` 是角色定义，建议落点：`docs/system/workspace/agents/lead-agent.md`。
 - `context-source-skill`、`no-usable-issue-skill`、`has-usable-issue-skill` 是 skills。
 - skill 名称表达职责，不用 loop 前缀表达归属。
+- `docs/system/workspace/` 是能力真源；`bin/`、`.githooks/` 等是运行时落点。
+- `sh` / `ps1` 的定义源应位于 `docs/system/workspace/scripts/`。
+- hook 的定义源应位于 `docs/system/workspace/hooks/`，根目录 `.githooks/` 作为安装产物。
 
 ## 工作流
 1. 先执行固定前置门禁：`skill:constitution-guard` -> `skill:laws-enforcer`。
-2. `sh/ps1` 启动外部 AI CLI 工具，并进入 `lead-agent`。
+2. `system/workspace/scripts` 中定义的 `sh` / `ps1` 启动外部 AI CLI 工具，并进入 `lead-agent`。
 3. `lead-agent` 调用 `skill:context-source-skill`，基于当前来源与上下文做 usable issue 判定。
 4. 根据 `context-source-skill` 的结果分流：
    - 无 usable issue -> `skill:no-usable-issue-skill`
@@ -25,8 +28,9 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 6. `skill:has-usable-issue-skill` 再决定接入：
    - `skill:doc-loop-execution`
    - `skill:dev-loop-execution`
-7. 更新候选项 / milestone / route 状态记录。
-8. 重复循环直到停止条件。
+7. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
+8. 更新候选项 / milestone / route 状态记录。
+9. 重复循环直到停止条件。
 
 ## pre-brainstorms 触发
 当任一条件成立时，经 `context-source-skill` 判定后进入 `no-usable-issue-skill`：

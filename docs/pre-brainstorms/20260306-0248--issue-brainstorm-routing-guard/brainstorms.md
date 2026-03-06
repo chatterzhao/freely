@@ -82,6 +82,12 @@
 - 因此新产物不使用 `auto-loop-*`、`doc-loop-*`、`dev-loop-*` 这类前缀命名规则
 - 现有历史名称若已稳定存在，可暂时保留；新增产物遵循新规则
 
+路径归属总原则：
+
+- `docs/system/workspace/` 是 Freely 对外暴露工作能力的统一入口
+- `agents`、`skills`、`scripts`、`hooks` 都应在 `system/workspace` 下有清晰归属或映射
+- `bin/`、`.githooks/` 等运行时位置不应作为主定义源，而应视为安装或投影后的落点
+
 当前建议的正式落点路径应为：
 
 - `agent`: `docs/system/workspace/agents/lead-agent.md`
@@ -89,6 +95,8 @@
 - `skill`: `docs/system/workspace/skills/no-usable-issue-skill/SKILL.md`
 - `skill`: `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`
 - 现有对齐项：`docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
+- `script`: `docs/system/workspace/scripts/` 下定义 `sh` / `ps1` 启动与编排脚本
+- `hook`: `docs/system/workspace/hooks/` 下定义 hook 规范或模板；根目录 `.githooks/` 作为运行时安装产物
 
 ### 5. 文档落位规则已降级为配套子问题
 
@@ -102,6 +110,7 @@
 ### 6. 启动后总控归 `lead-agent`，来源编排归 `context-source-skill`
 
 - `sh` / `ps1` 只负责启动外部 AI CLI 工具
+- `sh` / `ps1` 应归入 `system/workspace/scripts` 能力面统一理解
 - AI CLI 工具启动后，由 `lead-agent` 接管首段闭环
 - `lead-agent` 负责调用 skill，而不是内嵌所有来源判定细节
 - 与上下文来源相关的编排与路由决策，统一收敛到 `context-source-skill`
@@ -166,6 +175,7 @@
 1. brainstorm 文档落位规则如何作为主链配套门禁表达？
 2. 让 hook / script 低成本判断所需的最小元数据集合是什么？
 3. `pre-commit`、`bmad-check`、创建入口各自应该承担什么边界？
+4. `system/workspace/hooks` 与运行时 `.githooks/` 之间应如何定义“定义源 vs 安装产物”的关系？
 
 ## 当前观察
 
@@ -187,6 +197,7 @@
 - `.githooks/` 目前没有检查 brainstorm 路由是否正确
 - `bin/bmad-check` 与 `bin/freely` 仍引用旧 `docs/brainstorms/` 路径，说明旧工作流残留尚未清理
 - 当前没有统一的 brainstorm 元数据契约，导致脚本难以判断 issue 绑定关系
+- `sh` / `ps1` / hooks 的定义源与运行时落点尚未统一到 `system/workspace` 口径
 
 ### 3. 风险
 
@@ -195,6 +206,7 @@
 - 如果在 pre-commit 做过重自动迁移，会把错误变成隐蔽状态
 - 如果 candidate 已经收敛到新主题，但前面的 brainstorm 仍维持旧题目，整条文档链会继续失真
 - 如果把编排层再拆成第三类独立产物，会与当前“agent + skill”两类模型冲突
+- 如果 `scripts` / `hooks` 继续散落在根目录语义中，`system/workspace` 就无法成为完整能力入口
 
 ## 暂时结论
 
@@ -204,9 +216,10 @@
    `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
 2. 再分别定义每一层的职责边界和输入输出
 3. 产物类型只分为 `agent` 与 `skill`，不额外引入第三类 `orchestrator/guidance`
-4. 将 brainstorm 路由、元数据契约、milestone 绑定、hook / `bmad-check` 明确降为治理配套层
-5. 让 `candidates.md` 只承载这条主链下的文档型产物，不再回到旧题目
-6. 后续再将这些候选物化为正式 issue，并绑定 milestone
+4. `system/workspace` 统一作为能力真源，纳入 `agents`、`skills`、`scripts`、`hooks`
+5. 将 brainstorm 路由、元数据契约、milestone 绑定、hook / `bmad-check` 明确降为治理配套层
+6. 让 `candidates.md` 只承载这条主链下的文档型产物，不再回到旧题目
+7. 后续再将这些候选物化为正式 issue，并绑定 milestone
 
 ## 本轮候选落地方向
 
@@ -235,6 +248,7 @@
 - brainstorm 文档落位
 - 最小元数据契约
 - milestone 原子绑定
+- `system/workspace/hooks` -> `.githooks/` 的安装映射
 - `pre-commit` / `bmad-check` 兜底
 
 优点：

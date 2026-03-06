@@ -15,12 +15,15 @@
   `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> usable-issue decision -> no-usable-issue-skill | has-usable-issue-skill -> doc-loop(IBM+G) | dev-loop(DDD)`
 - 产物类型只分为 `agent` 与 `skill`
 - 命名不再使用 loop 前缀；名称表达职责，目录表达归属，元数据表达可调用范围
+- `docs/system/workspace/` 统一暴露 Freely 能力；`bin/`、`.githooks/` 视为运行时落点
 - 正式落点路径：
   - `docs/system/workspace/agents/lead-agent.md`
   - `docs/system/workspace/skills/context-source-skill/SKILL.md`
   - `docs/system/workspace/skills/no-usable-issue-skill/SKILL.md`
   - `docs/system/workspace/skills/has-usable-issue-skill/SKILL.md`
   - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
+  - `docs/system/workspace/scripts/` 定义 `sh` / `ps1` 启动与编排脚本
+  - `docs/system/workspace/hooks/` 定义 hook 规范或模板；`.githooks/` 作为安装产物
 - 当前先不把 hook/script 放回主收敛；先把首段闭环主链和 4 个文档型产物写清。
 
 ## Candidates
@@ -79,7 +82,7 @@
 - title: 现有 `auto-loop-orchestrator` skill 对齐到首段闭环模型
 - problem: 当前 `PROJECT_INTENT` 与现有 `auto-loop-orchestrator` skill 之间仍有断层，尚未显式说明 `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> no/has-usable-issue-skill -> doc/dev-loop` 这条实现链。
 - why_now: 如果不把现有 orchestrator skill 一起对齐，后续实现会出现“脑中模型”和规范文案两套说法并存。
-- acceptance_hint: 更新 `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`：1) 首跳由 `sh/ps1` 启动外部 AI CLI 工具；2) AI CLI 工具进入 `docs/system/workspace/agents/lead-agent.md`；3) `lead-agent` 调用 `context-source-skill`；4) `context-source-skill` 产出下一跳决策并进入 `no-usable-issue-skill` / `has-usable-issue-skill`；5) `doc-loop-execution` / `dev-loop-execution` 继续保持正式领域工作流。
+- acceptance_hint: 更新 `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`：1) 首跳由 `system/workspace/scripts` 中定义的 `sh` / `ps1` 启动外部 AI CLI 工具；2) AI CLI 工具进入 `docs/system/workspace/agents/lead-agent.md`；3) `lead-agent` 调用 `context-source-skill`；4) `context-source-skill` 产出下一跳决策并进入 `no-usable-issue-skill` / `has-usable-issue-skill`；5) `doc-loop-execution` / `dev-loop-execution` 继续保持正式领域工作流；6) hook 定义源位于 `system/workspace/hooks`，`.githooks/` 作为安装产物。
 - priority: P0
 - status: promoted
 - decision_reason: 这是把本次预研结论真正接回现有 orchestrator skill 与项目意图的收口项。
