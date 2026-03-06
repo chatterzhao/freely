@@ -18,7 +18,7 @@ description: 对当前输入做来源适配、上下文读取、usable issue 判
 - `docs/CONSTITUTION.md`
 - `docs/LAWS.md`
 - `docs/milestones.md`
-- `docs/system/workspace/tools.md`
+- `workspace/tools.md`
 - 按需读取：
   - `docs/pre-brainstorms/**`
   - issue / progress / recovery 证据
@@ -45,7 +45,7 @@ description: 对当前输入做来源适配、上下文读取、usable issue 判
 6. 组装下一跳 prompt，prompt 至少包含：
    - `<source input>`
    - `docs/milestones.md` 路径
-   - 需要阅读的 skill 路径
+   - 需要阅读的 workspace 相对路径，例如 `workspace/skills/no-usable-issue-skill/SKILL.md`
    - 当前为何选择该工具
    - 进入 doc-loop / dev-loop / pre-brainstorm 的边界要求
 7. 产出下一跳：

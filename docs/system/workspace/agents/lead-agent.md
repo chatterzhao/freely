@@ -4,11 +4,11 @@
 
 ## 位置
 
-- 上游：`docs/system/workspace/scripts/` 中定义的 `sh` / `ps1` 启动入口
-- 当前最小启动器：`docs/system/workspace/scripts/start-lead-agent.sh`
+- 上游：`workspace/scripts/` 中定义的 `sh` / `ps1` 启动入口
+- 当前最小启动器：`workspace/scripts/start-lead-agent.sh`
 - 当前层：外部 AI CLI 工具启动后首先执行的代理角色
 - 下游：`skill:context-source-skill`
-- 工具清单：`docs/system/workspace/tools.md`
+- 工具清单：`workspace/tools.md`
 
 ## 职责
 
@@ -21,7 +21,7 @@
    - milestone
    - issue / progress / recovery
 3. 将来源判定与下一跳提示词组装委托给 `skill:context-source-skill`，而不是在本文件中内嵌所有路由细节。
-4. 读取 `docs/system/workspace/tools.md`，理解当前可用工具、优先级和适配阶段。
+4. 读取 `workspace/tools.md`，理解当前可用工具、优先级和适配阶段。
 5. 基于 `context-source-skill` 的输出，自主决定下一跳是：
    - `skill:no-usable-issue-skill`
    - `skill:has-usable-issue-skill`
@@ -39,7 +39,7 @@
 
 1. 启动器把项目路径、宪法路径、意图路径、AI 规格作为最小输入面交给外部 AI CLI 工具。
 2. `lead-agent` 接管后，先做治理门禁预检。
-3. 将当前 `input_context`、`docs/milestones.md` 与 `docs/system/workspace/tools.md` 作为首跳判定输入交给 `context-source-skill`。
+3. 将当前 `input_context`、`docs/milestones.md` 与 `workspace/tools.md` 作为首跳判定输入交给 `context-source-skill`。
 4. 接收 `context-source-skill` 的输出：
    - 来源判定
    - usable issue 结论

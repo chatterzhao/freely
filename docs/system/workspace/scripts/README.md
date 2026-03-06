@@ -15,6 +15,7 @@
   - 生成交给外部 AI CLI 的首跳提示
   - 明确进入 `lead-agent`
   - 不在脚本层决定最终路由，只负责把 AI 送入可自治理解的首跳语境
+  - prompt 中引用 workspace 资产时，统一使用相对 `workspace/` 根的路径
 
 ## 输入面
 
@@ -29,6 +30,7 @@
 - 该 prompt 由运行时脚本或外部 AI CLI 消费
 - 不在这里直接承载完整 supervisor / restart / state 逻辑
 - 不在这里硬编码“走 IBM 还是走 pre-brainstorm”
+- prompt 中仍可保留项目绝对路径用于定位仓库根和 `docs/milestones.md`
 
 ## 投影规则
 

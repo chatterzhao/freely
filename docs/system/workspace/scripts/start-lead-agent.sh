@@ -80,11 +80,13 @@ cat <<EOF
 - 项目意图：$intent
 - 宪法：$constitution
 - 里程碑扫描入口：$project/docs/milestones.md
-- 工具清单：$project/docs/system/workspace/tools.md
-- 首跳代理：$project/docs/system/workspace/agents/lead-agent.md
+- workspace 根：$project/docs/system/workspace
+- 工具清单：workspace/tools.md
+- 首跳代理：workspace/agents/lead-agent.md
 
 运行上下文：
 - PROJECT_ROOT=$project
+- WORKSPACE_ROOT=$project/docs/system/workspace
 - AI_TOOL=$ai_tool
 - AI_MODEL=${ai_model:-}
 - AI_MODE=$ai_mode
@@ -92,9 +94,14 @@ cat <<EOF
 执行要求：
 1. 先执行 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\`。
 2. 进入 \`lead-agent\`，不要绕过首跳代理。
-3. 用 \`skill:context-source-skill\` 读取当前输入上下文、milestone 与 tools。
+3. 用 \`skill:context-source-skill\` 读取当前输入上下文、\`docs/milestones.md\` 与 \`workspace/tools.md\`。
 4. 由你理解输入意图，并自主组装下一跳提示词；不要把路由当作脚本硬编码分支。
-5. 若没有 usable issue，下一跳应阅读 \`skill:no-usable-issue-skill\`。
-6. 若已有 usable issue，下一跳应阅读 \`skill:has-usable-issue-skill\`，再决定进入 \`doc-loop-execution\` 还是 \`dev-loop-execution\`。
-7. 你需要解释为什么选择当前工具，以及为什么选择当前下一跳。
+5. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
+   - \`workspace/agents/lead-agent.md\`
+   - \`workspace/skills/context-source-skill/SKILL.md\`
+   - \`workspace/skills/no-usable-issue-skill/SKILL.md\`
+   - \`workspace/skills/has-usable-issue-skill/SKILL.md\`
+6. 若没有 usable issue，下一跳应阅读 \`workspace/skills/no-usable-issue-skill/SKILL.md\`。
+7. 若已有 usable issue，下一跳应阅读 \`workspace/skills/has-usable-issue-skill/SKILL.md\`，再决定进入 \`doc-loop-execution\` 还是 \`dev-loop-execution\`。
+8. 你需要解释为什么选择当前工具，以及为什么选择当前下一跳。
 EOF

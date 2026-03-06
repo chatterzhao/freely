@@ -33,7 +33,9 @@ prompt="$(
 printf '%s\n' "$prompt" | grep -q 'lead-agent'
 printf '%s\n' "$prompt" | grep -q 'context-source-skill'
 printf '%s\n' "$prompt" | grep -q 'docs/milestones.md'
-printf '%s\n' "$prompt" | grep -q 'docs/system/workspace/tools.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/agents/lead-agent.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/tools.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/skills/no-usable-issue-skill/SKILL.md'
 printf '%s\n' "$prompt" | grep -q '自主组装下一跳提示词'
 printf '%s\n' "$prompt" | grep -q '不要把路由当作脚本硬编码分支'
 
