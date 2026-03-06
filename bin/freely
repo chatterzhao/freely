@@ -132,84 +132,11 @@ EOF
 }
 
 build_prompt() {
-  cat <<EOF
-你是项目自治执行 AI，你是项目主人。
-
-项目绝对路径：
-$PROJECT_ROOT
-
-项目意图文档（先读）：
-$INTENT_FILE
-
-开发宪法文档（先读，硬约束）：
-$CONSTITUTION_FILE
-
-执行要求：
-1. 首先读取“项目意图”和“开发宪法”，再开始行动。
-2. 由你自主完成：需求发现、头脑风暴、EPIC 拆分、STORY 拆分、开发、验证、记录。
-3. 除用户明确要求外，不中断流程；持续循环推进。
-4. 你可以自主读取项目目录内其他文档，但输入入口只以上面两个文档为准。
-5. 开发前必须先完成并通过 PRE_TEST 文档门禁，再进入实现。
-6. 崩溃恢复后优先延续既有会话上下文；若无法恢复，再根据项目现状继续推进。
-EOF
-}
-
-run_ai_fresh() {
-  local prompt_file="$1"
-  case "$AI_TOOL" in
-    codex)
-      local -a args=(exec --skip-git-repo-check -C "$PROJECT_ROOT")
-      [[ -n "${AI_MODEL:-}" ]] && args+=(-m "$AI_MODEL")
-      [[ "$AI_MODE" == "auto" ]] && args+=(--dangerously-bypass-approvals-and-sandbox)
-      (cd "$PROJECT_ROOT" && codex "${args[@]}" - <"$prompt_file")
-      ;;
-    kiro-cli)
-      local model="${AI_MODEL:-claude-opus-4.6}"
-      if [[ "$AI_MODE" == "auto" ]]; then
-        (cd "$PROJECT_ROOT" && kiro-cli chat --no-interactive --trust-all-tools --model "$model" <"$prompt_file")
-      else
-        (cd "$PROJECT_ROOT" && kiro-cli chat --model "$model" <"$prompt_file")
-      fi
-      ;;
-    iflow)
-      local -a args=()
-      [[ -n "${AI_MODEL:-}" ]] && args+=(-m "$AI_MODEL")
-      if [[ "$AI_MODE" == "auto" ]]; then
-        (cd "$PROJECT_ROOT" && iflow "${args[@]}" -p "$(cat "$prompt_file")" -y --max-turns "${IFLOW_MAX_TURNS:-100}")
-      else
-        (cd "$PROJECT_ROOT" && iflow "${args[@]}" -p "$(cat "$prompt_file")" --default --max-turns "${IFLOW_MAX_TURNS:-100}")
-      fi
-      ;;
-  esac
-}
-
-run_ai_resume() {
-  local prompt_file="$1"
-  case "$AI_TOOL" in
-    codex)
-      local -a args=(exec resume --last --skip-git-repo-check)
-      [[ -n "${AI_MODEL:-}" ]] && args+=(-m "$AI_MODEL")
-      [[ "$AI_MODE" == "auto" ]] && args+=(--dangerously-bypass-approvals-and-sandbox)
-      (cd "$PROJECT_ROOT" && codex "${args[@]}" - <"$prompt_file")
-      ;;
-    kiro-cli)
-      local model="${AI_MODEL:-claude-opus-4.6}"
-      if [[ "$AI_MODE" == "auto" ]]; then
-        (cd "$PROJECT_ROOT" && kiro-cli chat --resume --no-interactive --trust-all-tools --model "$model" "继续上次未完成工作，按项目意图和宪法持续推进。")
-      else
-        (cd "$PROJECT_ROOT" && kiro-cli chat --resume --model "$model" "继续上次未完成工作，按项目意图和宪法持续推进。")
-      fi
-      ;;
-    iflow)
-      local -a args=(-c)
-      [[ -n "${AI_MODEL:-}" ]] && args+=(-m "$AI_MODEL")
-      if [[ "$AI_MODE" == "auto" ]]; then
-        (cd "$PROJECT_ROOT" && iflow "${args[@]}" -p "$(cat "$prompt_file")" -y --max-turns "${IFLOW_MAX_TURNS:-100}")
-      else
-        (cd "$PROJECT_ROOT" && iflow "${args[@]}" -p "$(cat "$prompt_file")" --default --max-turns "${IFLOW_MAX_TURNS:-100}")
-      fi
-      ;;
-  esac
+  bash "$PROJECT_ROOT/docs/system/workspace/scripts/start-lead-agent.sh" \
+    --project "$PROJECT_ROOT" \
+    --intent "$INTENT_FILE" \
+    --constitution "$CONSTITUTION_FILE" \
+    --ai "${AI_TOOL}:${AI_MODEL:-}:${AI_MODE}"
 }
 
 cmd_init() {
@@ -256,6 +183,7 @@ cmd_start() {
   }
 
   local sdir run_dir logs_dir sup_pid_file child_pid_file loop_log
+  local stop_requested=0
   sdir="$(state_dir "$project")"
   run_dir="$sdir/run"
   logs_dir="$sdir/logs"
@@ -273,8 +201,18 @@ cmd_start() {
     fi
   fi
 
+  request_stop() {
+    stop_requested=1
+    if [[ -f "$child_pid_file" ]]; then
+      local active_child
+      active_child="$(cat "$child_pid_file" 2>/dev/null || true)"
+      [[ -n "$active_child" ]] && kill "$active_child" 2>/dev/null || true
+    fi
+  }
+
   echo "$$" >"$sup_pid_file"
-  trap "rm -f '$sup_pid_file' '$child_pid_file'" EXIT INT TERM
+  trap "rm -f '$sup_pid_file' '$child_pid_file'" EXIT
+  trap request_stop INT TERM
 
   local restart_count=0
   local first_round=true
@@ -292,25 +230,29 @@ cmd_start() {
     fi
 
     log_info "launching $AI_TOOL ($mode_name mode, ai_mode=$AI_MODE)"
+    set +e
     {
       echo "===== $(date '+%F %T') mode=$mode_name tool=$AI_TOOL ai_mode=$AI_MODE ====="
-      if [[ "$first_round" == true ]]; then
-        run_ai_fresh "$prompt_file"
-      else
-        run_ai_resume "$prompt_file"
-      fi
-    } 2>&1 | tee -a "$cycle_log" | tee -a "$loop_log" &
-    local child_pid=$!
-    echo "$child_pid" >"$child_pid_file"
-
-    while kill -0 "$child_pid" 2>/dev/null; do
-      sleep "${CHECK_INTERVAL:-10}"
-    done
-    set +e
-    wait "$child_pid"
+      bash "$PROJECT_ROOT/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+        --project "$PROJECT_ROOT" \
+        --tool "$AI_TOOL" \
+        --model "${AI_MODEL:-}" \
+        --mode "$AI_MODE" \
+        --prompt-file "$prompt_file" \
+        --pid-file "$child_pid_file" \
+        --log-file "$cycle_log" \
+        --launch-kind "$mode_name"
+    } >>"$loop_log" 2>&1
     local rc=$?
     set -e
-    log_warn "ai process exited rc=$rc (pid=$child_pid)"
+    local child_pid
+    child_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
+    log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown})"
+
+    if [[ "$stop_requested" -eq 1 ]]; then
+      log_info "received stop signal, exiting supervisor"
+      exit 0
+    fi
 
     first_round=false
     restart_count=$((restart_count + 1))

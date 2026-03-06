@@ -37,7 +37,7 @@ parse_ai_spec_or_fail() {
   }
 
   case "$tool" in
-    codex|kiro-cli|iflow) ;;
+    codex|kiro-cli|iflow|test-sleep) ;;
     *)
       echo "[ERROR] unsupported tool: $tool" >&2
       exit 1
