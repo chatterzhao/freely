@@ -47,6 +47,9 @@
 - 20260306-0113--standard-worktree-prompts-and-fallback-boundary
   - brainstorms: docs/pre-brainstorms/20260306-0113--standard-worktree-prompts-and-fallback-boundary/brainstorms.md
   - candidates: docs/pre-brainstorms/20260306-0113--standard-worktree-prompts-and-fallback-boundary/candidates.md
+- 20260307-0537--ai-tool-worktree-directory-access
+  - brainstorms: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/candidates.md
 
 - 20260306-0248--issue-brainstorm-routing-guard
   - brainstorms: docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/brainstorms.md
