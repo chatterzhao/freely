@@ -43,7 +43,9 @@
 - 20260305-2355--pre-test-merge-duty-migration
   - brainstorms: docs/pre-brainstorms/20260305-2355--pre-test-merge-duty-migration/brainstorms.md
   - candidates: docs/pre-brainstorms/20260305-2355--pre-test-merge-duty-migration/candidates.md
-
+- 20260306-0016--freely-githooks-install-mode
+  - brainstorms: docs/pre-brainstorms/20260306-0016--freely-githooks-install-mode/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260306-0016--freely-githooks-install-mode/candidates.md
 - 20260306-0113--standard-worktree-prompts-and-fallback-boundary
   - brainstorms: docs/pre-brainstorms/20260306-0113--standard-worktree-prompts-and-fallback-boundary/brainstorms.md
   - candidates: docs/pre-brainstorms/20260306-0113--standard-worktree-prompts-and-fallback-boundary/candidates.md

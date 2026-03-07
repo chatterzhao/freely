@@ -111,6 +111,13 @@
 ### 新增到 P0-核心
 - `C-20260305-903` `pre-develop` -> `pre-test-merge` 职责迁移
 - `C-20260305-904` `wt-enter` / `post-checkout` worktree 引导修复
+
+## 变更（2026-03-06 hooks 安装模式）
+
+### 新增到 P0-核心
+- `C-20260306-001` Freely 托管 hooks 默认落在 `.freely/.githooks`
+- `C-20260306-002` Hooks 托管模式前端开关与用户接管退出路径
+
 ## 变更（2026-03-06 标准 worktree 提示统一）
 
 ### 新增到 P0-核心
