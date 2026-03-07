@@ -51,6 +51,9 @@
 - 20260306-0248--issue-brainstorm-routing-guard
   - brainstorms: docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/brainstorms.md
   - candidates: docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/candidates.md
+- 20260307-0930--source-routing-and-derived-worktree-governance
+  - brainstorms: docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

@@ -18,14 +18,14 @@ Use the standard git worktree flow from the project root:
 
 Run:
   cd <your-project-path>
-  git worktree add -b feature/<task-name> ../<your-project-worktrees>/<branch-dir> develop
+  ./bin/wt-create feature/<task-name> [--base <base-branch>]
   cd ../<your-project-worktrees>/<branch-dir>
 
 Where:
   feature/<task-name> without date -> <branch-dir>=feature-<task-name>
   feature/<task-name>-YYYYMMDD-HHMM -> <branch-dir>=YYYYMMDD-HHMM-feature-<task-name>
 
-The final 'develop' argument already selects the correct base branch.
+Omit `--base` for the default `develop`; use `--base <parent-feature>` only when the issue depends on unmerged parent changes.
 
 When the work is finished and merged, clean up with:
   git worktree remove ../<your-project-worktrees>/<branch-dir>
@@ -46,7 +46,7 @@ if ! freely_wt_validate_branch_base "$branch"; then
   cat <<MSG
 [HOOK] Commit blocked: branch '$branch' base check failed.
 Expected:
-  feature/* from develop
+  feature/* from develop (or from dependent feature when the issue explicitly depends on unmerged parent changes)
   feature/premerge-* from pre-test-merge (or develop when pre-test-merge is not active)
   release/* from develop
   hotfix/* from main
@@ -80,7 +80,7 @@ No worktree found for '$branch'.
 
 Create it from the project root with the standard command:
   cd <your-project-path>
-  git worktree add ../<your-project-worktrees>/<branch-dir> "$branch"
+  ./bin/wt-create "$branch"
   cd ../<your-project-worktrees>/<branch-dir>
 
 Use the same derived naming rule as auto-created worktrees:

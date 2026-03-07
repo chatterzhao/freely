@@ -37,7 +37,14 @@ routing_policy:
 
 ### committed_issues
 
-- none currently
+1. `I-20260307-1201`
+- title: 源分类、milestone-owned issue 与派生 worktree 路由治理
+- milestone_state: in_progress
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md`
+- next_action: 继续在 IBM 环内收紧正式 issue 产物，并在后续需要时再推进 dev-loop 或治理实现
 
 ### candidate_issues
 

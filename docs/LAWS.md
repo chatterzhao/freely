@@ -10,6 +10,7 @@
 1. 执行链保持“获取 Issue -> 文档 -> 开发 -> 验收 -> 获取 Issue”闭环。
 2. 需求来源不退化为单一固定待办列表。
 3. 无明确停止条件时维持自治循环与续接策略。
+4. 新问题、编排入口、执行续接入口必须分层处理，不得混用。
 
 最小验收证据：
 - issue 来源记录
@@ -26,7 +27,7 @@
 
 判定规则：
 1. 分支来源、merge 方向、保护分支策略符合宪法分支表。
-2. `feature/*` 从 `develop` 创建并在 worktree 内开发；仅高风险验证批次允许先进入 `pre-test-merge`。
+2. `feature/*` 默认从 `develop` 创建并在 worktree 内开发；若 issue 明确依赖未合并父分支改动，可从父 `feature/*` 派生 dedicated worktree，但必须记录依赖关系与最终集成目标。
 3. `main/develop/pre-test-merge` 保持 add/commit 禁止。
 4. `develop` 合并前，`TEST`（含集成验收）通过；若走 `pre-test-merge` 路径，验证批次必须可追溯。
 5. `PRE_TEST` 仅作为开发前基线，不得替代提升测试结果。
@@ -34,9 +35,11 @@
 7. merge/promotion/release/cleanup 前执行 `./bin/wt-status-all`，结果全 `CLEAN`。
 8. premerge 仅作冲突收敛，来源与回并目标均为当前活跃的 `pre-test-merge`。
 9. 清理动作只能在 `verified-retirable` 后执行，且必须留痕。
+10. 派生 worktree 的 issue 在提升前必须对齐其父分支结果：父分支先进入要求路径，子分支再 restack/rebase/merge 上游并重新验证。
 
 最小验收证据：
 - 分支来源与合并路径记录
+- `execution_base` / `integration_target` / `depends_on` 记录（如存在派生 worktree）
 - `wt-status-all` 输出记录
 - 测试、评审、进度/恢复证据
 - 分支/worktree 清理记录
@@ -45,6 +48,49 @@
 - `skill:branch-management`
 - `skill:premerge-reconcile`
 - `skill:constitution-guard`
+
+---
+
+## 2A. 来源与路由边界（硬性要求）
+
+判定规则：
+1. 原始发现源包括：`PROJECT_INTENT`、chat/session evidence、test、code-review、github-issue、治理漂移、运行时异常。
+2. 原始发现源必须先在合适的 dedicated worktree 中进入 `pre-brainstorm`，产出 candidate，再由 milestone 承接；不得直接伪装成 ready issue。
+3. `milestones.md` 是编排来源，不是原始发现源。
+4. `milestone.candidate_issues` 只能继续研究或进入 IBM，不得默认直接进入 dev-loop。
+5. `milestone.committed_issues` 才是 milestone-owned issue 的正式入口。
+6. `progress` 与 `recovery` 属于延续来源；其中 `progress` 只跟踪 dev-loop 执行态。
+
+最小验收证据：
+- 来源分类记录
+- candidate -> milestone 映射记录
+- 路由决定与下一跳记录
+
+执行技能：
+- `skill:context-source-skill`
+- `skill:doc-pre-brainstorm-execution`
+- `skill:doc-ibm-execution`
+- `skill:dev-loop-execution`
+
+---
+
+## 2B. IBM 与 Progress 边界（硬性要求）
+
+判定规则：
+1. `IBM` 中的 `I` 是 milestone-owned issue，而不是任意发现到的问题。正式 IBM 产物目录必须先确定为 `docs/epics/{epic-name}/{story-name}/...`。
+2. candidate 未进入 milestone 前，不得声称已经进入 IBM。
+3. `progress` 只跟踪 dev-loop 中的实现、测试、阻塞、恢复与回写，不跟踪 candidate 收敛或纯 IBM 文档收敛。
+4. 若 dev-loop 暴露出边界外新问题，应回到 `pre-brainstorm`，而不是塞回当前 issue 进度。
+
+最小验收证据：
+- milestone-owned issue 记录
+- `progress` 与 issue 状态一致性记录
+- reroute 到 `pre-brainstorm` 的原因与证据
+
+执行技能：
+- `skill:doc-ibm-execution`
+- `skill:dev-loop-execution`
+- `skill:laws-enforcer`
 
 ---
 

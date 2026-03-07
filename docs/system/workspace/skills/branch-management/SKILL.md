@@ -1,6 +1,6 @@
 ---
 name: branch-management
-description: 管理 Freely 风格开发的完整自主分支生命周期。当 AI 需要从 develop 创建功能分支、进入 worktree、在正确位置执行 add/commit、在需要时运行临时 pre-test-merge 验证批次、执行语义回归检查、并入 develop、管理 release/hotfix 分支、应用基于阶段的标签、并在验证后清理分支/worktree 时使用。
+description: 管理 Freely 风格开发的完整自主分支生命周期，支持默认 feature worktree 与依赖未合并父分支的派生 worktree。
 ---
 
 # skill:branch-management
@@ -9,28 +9,29 @@ description: 管理 Freely 风格开发的完整自主分支生命周期。当 A
 1. 运行预检门禁：
    - `skill:constitution-guard`
    - `skill:laws-enforcer`
-2. 先回到项目根目录，再用标准 git worktree 命令创建功能分支与 dedicated worktree：
-   - `cd <your-project-path>`
-   - `git worktree add -b feature/<topic> ../<your-project-worktrees>/<branch-dir> develop`
+2. 先判断当前 issue 的执行基线：
+   - 独立 issue：`execution_base=develop`
+   - 依赖未合并父分支：`execution_base=<parent feature branch>`
+   - 最终集成目标默认仍是 `develop`
+3. 回到项目根目录后创建 dedicated worktree：
+   - 推荐：`./bin/wt-create feature/<topic> --base <execution_base>`
+   - 或标准 git：`git worktree add -b feature/<topic> ../<your-project-worktrees>/<branch-dir> <execution_base>`
    - `<branch-dir>` 必须与当前 worktree 派生规则一致：
      - 无日期分支示例：`feature/my-topic` -> `feature-my-topic`
      - 带日期分支示例：`feature/my-topic-20260307-1015` -> `20260307-1015-feature-my-topic`
-3. 进入该分支 worktree：
-   - `cd ../<your-project-worktrees>/<branch-dir>`
-   - 无需先 `git checkout develop`；命令最后的 `develop` 已经指定了基线
-4. 仅在此 worktree 中进行变更。
-   - 编码前，定义此周期的单一变更意图和边界（作用域说明，用于后续提交拆分）
-5. 在功能 worktree 中暂存和提交：
+4. 进入该分支 worktree，仅在此处变更。
+5. 若该分支依赖父 feature，必须在 docs 中显式记录：
+   - `execution_base`
+   - `integration_target`
+   - `depends_on`
+6. 在功能 worktree 中暂存和提交：
    - `source ./bin/wt-add feature/<topic> -- <paths or -A>`
-   - 语义自检：如果暂存变更包含混合关注点，在提交前拆分
-   - `git commit -m "<type>: <summary>"`
-6. 在 push/merge 前，重新检查提交边界，如仍有混合关注点则再次拆分。
-7. 集成前运行分支本地测试。
-8. 准备向上游分支合并前，先在当前 dedicated worktree 中把上游合进自己分支，再处理冲突：
-   - `feature/*`、`release/*` 的默认上游是 `develop`
-   - `hotfix/*` 的默认上游是 `main`
+   - 若暂存内容混合多个关注点，先拆分
+7. 准备向上游合并前，先在当前 dedicated worktree 中把真正上游合进自己分支，再处理冲突：
+   - 独立 issue：通常是 `develop`
+   - 派生 issue：先跟随父 feature 结果，再对齐 `develop`
    - `feature/premerge-*` 的默认上游是当前 `pre-test-merge`
-   - 冲突必须先在当前功能分支的 worktree 中收敛；不要把第一轮冲突留到目标分支上处理
+8. 如果冲突复杂或回滚风险出现，停止并切换到 `skill:premerge-reconcile`。
 
 ## 路由 B：临时验证批次到 pre-test-merge
 1. 仅在需要组合验证时启用 `pre-test-merge`，并从 `develop` 创建或刷新该临时分支。
@@ -49,12 +50,13 @@ description: 管理 Freely 风格开发的完整自主分支生命周期。当 A
 ## 路由 C：回归 + 提升
 1. 并入 `develop` 前再次执行 Worktree 卫生门禁：`./bin/wt-status-all`，结果必须全 `CLEAN`。
 2. 对每个准备提升的分支，确认它已经在自己的 dedicated worktree 中完成一次“merge 上游 -> 解决冲突 -> 自测”。
-3. 队列完成后，运行语义检查清单：
+3. 若当前分支依赖父 feature，先确认父分支已经进入要求路径，再 restack / rebase / merge 上游并重跑测试。
+4. 队列完成后，运行语义检查清单：
    - `references/semantic-regression-checklist.md`
-4. 运行提升所需的 `TEST` 证据检查（包括集成验收测试）。
-5. 确保 `PRE_TEST` 仅作为基线，不得替代提升测试结果。
-6. 如走临时验证路径且所有检查为绿色，将 `pre-test-merge` 合并到 `develop`；否则按允许路径直接将 `feature/*` 合并到 `develop`。
-7. 如有任何语义/测试不匹配出现，阻止提升并返回协调流程。
+5. 运行提升所需的 `TEST` 证据检查（包括集成验收测试）。
+6. 确保 `PRE_TEST` 仅作为基线，不得替代提升测试结果。
+7. 如走临时验证路径且所有检查为绿色，将 `pre-test-merge` 合并到 `develop`；否则按允许路径直接将 `feature/*` 合并到 `develop`。
+8. 如有任何语义/测试不匹配出现，阻止提升并返回协调流程。
 
 ## 路由 D：发布和标签流程
 1. 发布/打标签前执行 Worktree 卫生门禁：`./bin/wt-status-all`，结果必须全 `CLEAN`。
@@ -96,6 +98,7 @@ description: 管理 Freely 风格开发的完整自主分支生命周期。当 A
 - 绝不通过提交时间戳排序解决冲突。
 - 绝不推送 `alpha`/`beta` 标签。
 - 对于规范文档变更，在专用 feature/worktree 中工作，并要求关联实现或门禁变更证据。
+- 对于依赖未合并父分支的子任务，不把 `develop` 伪装成执行基线；必须记录依赖并在提升前完成 restack / rebase / merge 上游。
 
 ## 完成
 - 临时验证批次完成后，无需继续保留的分支不会滞留在 `pre-test-merge` 中。

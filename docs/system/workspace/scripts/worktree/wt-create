@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<USAGE
+Usage:
+  ./bin/wt-create <branch> [--base <base-branch>]
+
+Examples:
+  ./bin/wt-create feature/my-task-20260307 --base develop
+  ./bin/wt-create feature/my-child-task-20260307 --base feature/my-parent-task-20260307
+USAGE
+}
+
+branch="${1:-}"
+[[ -n "$branch" ]] || { usage; exit 1; }
+shift || true
+
+base="develop"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --base)
+      base="${2:-}"
+      [[ -n "$base" ]] || { echo "Missing value for --base" >&2; exit 1; }
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+cd "$ROOT_DIR"
+
+source "$ROOT_DIR/bin/worktree-common.sh"
+freely_wt_assert_strict_root
+
+if git show-ref --verify --quiet "refs/heads/$branch"; then
+  echo "Branch already exists: $branch" >&2
+  exit 1
+fi
+
+if ! git show-ref --verify --quiet "refs/heads/$base" && ! git rev-parse --verify --quiet "$base" >/dev/null; then
+  echo "Base branch/ref not found: $base" >&2
+  exit 1
+fi
+
+target_path="$(freely_wt_resolve_target_path "$branch")"
+mkdir -p "$(freely_wt_root_dir)"
+git worktree add -b "$branch" "$target_path" "$base"
+
+cat <<MSG
+Created worktree:
+  $target_path
+Branch:
+  $branch
+Execution base:
+  $base
+Next:
+  cd "$target_path"
+MSG

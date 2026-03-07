@@ -38,7 +38,7 @@ if ! freely_wt_validate_branch_base "$branch"; then
   cat <<MSG
 [HOOK] Branch '$branch' base check failed.
 Expected:
-  feature/* from develop
+  feature/* from develop (or from dependent feature when the issue explicitly depends on unmerged parent changes)
   feature/premerge-* from pre-test-merge (or develop when pre-test-merge is not active)
   release/* from develop
   hotfix/* from main

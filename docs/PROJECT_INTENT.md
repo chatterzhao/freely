@@ -6,7 +6,7 @@
 
 构建一个 Jarvis 式自主循环运行器：
 - 启动后 AI 担任项目所有者角色。
-- AI 从项目意图、story-scoped code-reviews、test、开发进度文档、chat 输入与会话证据（人类或自治）中产出或修改候选 Issue；从 github-issue、里程碑文档获取 Issue；而非固定从单一任务列表
+- AI 从项目意图、story-scoped code-reviews、test、chat 输入与会话证据（人类或自治）、github-issue、治理漂移、运行时异常中发现新问题，并先收敛为 candidate；从里程碑文档获取已接纳 issue，从进度/恢复文档续接已有 issue；而非固定从单一任务列表
 - AI 自主管理：获取 Issue → 文档 → 开发 → 验收 → 获取 Issue 的闭环
 - AI 持续运行（自己监控ai工具崩溃/阻塞自动触发续接），除非明确停止。或找不到需求，或者出现重大事故 AI 自己已经无力自己解决。
 
@@ -18,39 +18,40 @@
 A:auto-loop(ADD) [外循环]
 │
 ├── A1 发现问题（持续）
-│   ├── 新问题源：intent/code-reviews/test/chat/github-issue -> pre-brainstorms
-│   ├── 候选源：pre-brainstorms/candidates
-│   └── 执行源：milestones/progress(未完成)
+│   ├── 原始发现源：intent/code-reviews/test/chat/github-issue/governance-drift/runtime-failure -> pre-brainstorms
+│   ├── 编排源：milestones
+│   └── 延续源：issue/progress/recovery
 │   产出：
 │   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/brainstorms.md
 │   - docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md
 │
 ├── A2 分流决策
-│   ├── raw problem / candidate -> D:doc-loop(IBM+G)
+│   ├── raw problem -> D:pre-brainstorm
+│   ├── milestone-owned issue but docs incomplete -> D:doc-loop(IBM+G)
 │   └── ready issue / in-progress -> D:dev-loop(DDD)
 │   产出：
 │   - 更新 docs/pre-brainstorms/<YYYYMMDD-HHMM--topic>/candidates.md 的 route/status
 │
 ├── D:doc-loop(IBM+G) [I -> B -> M + Governance]
 │   产出（重构目标目录）：
-│   - docs/epics/{epic}/{story}/issues/{issue-name}.md
-│   - docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md
-│   - docs/epics/{epic}/{story}/prd.md
-│   - docs/epics/{epic}/{story}/pre-tests.md
-│   - docs/epics/{epic}/{story}/tasks.md
-│   - docs/milestones.md  (与 issue 原子同步写入：新增/调整归属)
+│   - docs/epics/{epic-name}/{story-name}/issues/{issue-name}.md
+│   - docs/epics/{epic-name}/{story-name}/brainstorms/b-{issue-name}.md
+│   - docs/epics/{epic-name}/{story-name}/prd.md
+│   - docs/epics/{epic-name}/{story-name}/pre-tests.md
+│   - docs/epics/{epic-name}/{story-name}/tasks.md
+│   - docs/milestones.md  (与 milestone-owned issue 原子同步写入：新增/调整归属)
 │   - （按需）docs/CONSTITUTION.md, docs/LAWS.md, docs/system/workspace/skills/** 治理一致性修复
 │   目录分层说明：
 │   - pre-brainstorms/**：候选与前置收敛（未正式归属 story 前）
-│   - epics/{epic}/{story}/**：正式 story 产物（归属后长期维护）
+│   - epics/{epic-name}/{story-name}/**：正式 story 产物（归属后长期维护）
 │
 ├── D:dev-loop(DDD) [Doc-Read -> Dev-Do -> Doc-Update]
 │   产出：
 │   - src/** , tests/**
-│   - docs/epics/{epic}/{story}/code-reviews/*.md
-│   - docs/progress/{epic}/p-{issue}.md
+│   - docs/epics/{epic-name}/{story-name}/code-reviews/*.md
+│   - docs/progress/{epic-name}/p-{issue-name}.md  (只跟踪 dev-loop 执行态)
 │   - docs/milestones.md  (状态更新)
-│   - docs/epics/{epic}/{story}/issues/{issue}.md  (状态更新)
+│   - docs/epics/{epic-name}/{story-name}/issues/{issue-name}.md  (状态更新)
 │
 └── A3 回流
     └── 返回 A1，继续发现与完成
@@ -65,7 +66,7 @@ flowchart TD
     S3{"A2 路由委派\nissue 是否就绪?"}
 
     D1["D:doc-loop(IBM+G)\nI/B/M + Governance\n产出 issues/brainstorms/prd/pre-tests/tasks"]
-    V1["候选晋升门\n回填 promoted_issue_path\npre-brainstorms -> epics/<epic>/<story>"]
+    V1["候选晋升门\n回填 promoted_issue_path\npre-brainstorms -> epics/<epic-name>/<story-name>"]
     J1{"是否形成可开发 issue?"}
 
     D2["D:dev-loop(DDD)\n实现/测试/code-review/文档回写"]
@@ -102,18 +103,18 @@ flowchart TD
     X1 -->|"completed"| A3
 ```
 
-### Issue 路由规则
+### 来源与路由规则
 
-| Issue 来源 | 路由起点 | 说明 |
+| 来源 | 路由起点 | 说明 |
 |-----------|---------|------|
-| pre-brainstorms 候选 | D:doc-loop(B/M) | 候选 issue 需收敛并落位到 epic/story/milestone |
-| 进度文档（未完成） | D:dev-loop | 文档已有，继续开发 |
-| 里程碑（待处理） | D:doc-loop(M) 或 D:dev-loop | 视文档完整度 |
-| 项目意图（新需求） | D:doc-loop(I) | 从接入开始 |
-| code-reviews/test（Bug/改进） | D:doc-loop(B) 或 D:dev-loop | 视复杂度 |
-| 治理漂移（宪法/法律/skills 不一致） | D:doc-loop(G) | 先修治理一致性，再回到业务路由 |
-| github-issue（外部输入） | D:doc-loop(I) | 从接入开始 |
-| Chat 输入/会话证据（人类或自治） | D:doc-loop(I/B) | 先进入 pre-brainstorms，再产出候选 Issue |
+| 项目意图 / chat / github-issue / test / code-review / 治理漂移 / 运行时异常 | D:pre-brainstorm | 原始发现源先进入 pre-brainstorms，再产出候选 candidate |
+| pre-brainstorms 候选 | D:doc-loop(B/M) | 候选需先进入 milestone，再进入 IBM |
+| 里程碑 `candidate_issues` | D:pre-brainstorm 或 D:doc-loop(M) | 不能默认直接开发；先判断是否仍需研究或已可进入 IBM |
+| 里程碑 `committed_issues` | D:doc-loop(M) 或 D:dev-loop | milestone-owned issue 的正式入口，视 docs 完整度决定 |
+| 里程碑 `completed_issues` | completion verification / 回流 | 不重复执行 |
+| issue 文档 | D:doc-loop(M) 或 D:dev-loop | 继续已有 issue，视 docs 完整度决定 |
+| 进度文档（未完成） | D:dev-loop | `progress` 只跟踪 dev-loop 的实现/测试/阻塞/恢复 |
+| recovery 记录 | 回原环 | 恢复到中断前的 pre/doc/dev 环 |
 
 ### Chat 输入与会话证据（人类/自治）
 
@@ -123,7 +124,7 @@ flowchart TD
               ├── 讨论先沉淀到 pre-brainstorms/*/brainstorms.md
               ├── 候选项写入 pre-brainstorms/*/candidates.md
               ├── 多 AI/子代理会话日志以 jsonl 作为 session evidence
-              └── 在 candidates.md 的 session_refs 留痕并进入 A2 路由
+              └── 在 candidates.md 的 session_refs 留痕，进入 milestone 承接后再继续 A2 路由
 ```
 
 ### 闭环理念
