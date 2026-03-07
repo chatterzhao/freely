@@ -6,7 +6,7 @@
 
 构建一个 Jarvis 式自主循环运行器：
 - 启动后 AI 担任项目所有者角色。
-- AI 从项目意图、review、test、开发进度文档、chat 输入与会话证据（人类或自治）中产出或修改候选 Issue；从 github-issue、里程碑文档获取 Issue；而非固定从单一任务列表
+- AI 从项目意图、story-scoped code-reviews、test、开发进度文档、chat 输入与会话证据（人类或自治）中产出或修改候选 Issue；从 github-issue、里程碑文档获取 Issue；而非固定从单一任务列表
 - AI 自主管理：获取 Issue → 文档 → 开发 → 验收 → 获取 Issue 的闭环
 - AI 持续运行（自己监控ai工具崩溃/阻塞自动触发续接），除非明确停止。或找不到需求，或者出现重大事故 AI 自己已经无力自己解决。
 
@@ -18,7 +18,7 @@
 A:auto-loop(ADD) [外循环]
 │
 ├── A1 发现问题（持续）
-│   ├── 新问题源：intent/review/test/chat/github-issue -> pre-brainstorms
+│   ├── 新问题源：intent/code-reviews/test/chat/github-issue -> pre-brainstorms
 │   ├── 候选源：pre-brainstorms/candidates
 │   └── 执行源：milestones/progress(未完成)
 │   产出：
@@ -47,6 +47,7 @@ A:auto-loop(ADD) [外循环]
 ├── D:dev-loop(DDD) [Doc-Read -> Dev-Do -> Doc-Update]
 │   产出：
 │   - src/** , tests/**
+│   - docs/epics/{epic}/{story}/code-reviews/*.md
 │   - docs/progress/{epic}/p-{issue}.md
 │   - docs/milestones.md  (状态更新)
 │   - docs/epics/{epic}/{story}/issues/{issue}.md  (状态更新)
@@ -59,7 +60,7 @@ A:auto-loop(ADD) [外循环]
 
 ```mermaid
 flowchart TD
-    S1["A1 发现问题源\n(intent/review/test/chat/github-issue)"]
+    S1["A1 发现问题源\n(intent/code-reviews/test/chat/github-issue)"]
     S2["候选池\npre-brainstorms/*/candidates.md"]
     S3{"A2 路由委派\nissue 是否就绪?"}
 
@@ -67,9 +68,9 @@ flowchart TD
     V1["候选晋升门\n回填 promoted_issue_path\npre-brainstorms -> epics/<epic>/<story>"]
     J1{"是否形成可开发 issue?"}
 
-    D2["D:dev-loop(DDD)\n实现/测试/review/文档回写"]
+    D2["D:dev-loop(DDD)\n实现/测试/code-review/文档回写"]
     G1{"pre-test-merge 临时验证门\nTEST(含集成验收)通过?"}
-    G2{"develop 集成门\nTEST + review + progress/recovery通过?"}
+    G2{"develop 集成门\nTEST + code-review + progress/recovery通过?"}
     F1["修复路径\n返回 dev-loop 或补 doc-loop"]
     R0{"是否触发 release/hotfix?"}
     R1["release/hotfix 流程\n(tag/release + hotfix sync to pre-test-merge if active)"]
@@ -109,7 +110,7 @@ flowchart TD
 | 进度文档（未完成） | D:dev-loop | 文档已有，继续开发 |
 | 里程碑（待处理） | D:doc-loop(M) 或 D:dev-loop | 视文档完整度 |
 | 项目意图（新需求） | D:doc-loop(I) | 从接入开始 |
-| review/test（Bug/改进） | D:doc-loop(B) 或 D:dev-loop | 视复杂度 |
+| code-reviews/test（Bug/改进） | D:doc-loop(B) 或 D:dev-loop | 视复杂度 |
 | 治理漂移（宪法/法律/skills 不一致） | D:doc-loop(G) | 先修治理一致性，再回到业务路由 |
 | github-issue（外部输入） | D:doc-loop(I) | 从接入开始 |
 | Chat 输入/会话证据（人类或自治） | D:doc-loop(I/B) | 先进入 pre-brainstorms，再产出候选 Issue |

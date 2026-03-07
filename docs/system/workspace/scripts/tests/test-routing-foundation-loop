@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+cd "$ROOT_DIR"
+
+required_files=(
+  "docs/milestones.md"
+  "docs/system/workspace/agents/lead-agent.md"
+  "docs/system/workspace/tools.md"
+  "docs/system/workspace/scripts/README.md"
+  "docs/system/workspace/scripts/start-lead-agent.sh"
+  "docs/system/workspace/skills/context-source-skill/SKILL.md"
+  "docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md"
+  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md"
+  "docs/system/workspace/skills/dev-loop-execution/SKILL.md"
+)
+
+for file in "${required_files[@]}"; do
+  [[ -f "$file" ]] || {
+    echo "[FAIL] missing file: $file"
+    exit 1
+  }
+done
+
+prompt="$(
+  bash docs/system/workspace/scripts/start-lead-agent.sh \
+    --project "$ROOT_DIR" \
+    --intent "$ROOT_DIR/docs/PROJECT_INTENT.md" \
+    --constitution "$ROOT_DIR/docs/CONSTITUTION.md" \
+    --ai codex:auto
+)"
+
+printf '%s\n' "$prompt" | grep -q 'lead-agent'
+printf '%s\n' "$prompt" | grep -q 'context-source-skill'
+printf '%s\n' "$prompt" | grep -q 'docs/milestones.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/agents/lead-agent.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/tools.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-pre-brainstorm-execution/SKILL.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-ibm-execution/SKILL.md'
+printf '%s\n' "$prompt" | grep -q '需求池至少包括'
+printf '%s\n' "$prompt" | grep -q '当前先看哪个池'
+printf '%s\n' "$prompt" | grep -q 'pre-brainstorm'
+printf '%s\n' "$prompt" | grep -q 'issue-bound brainstorm'
+printf '%s\n' "$prompt" | grep -q '脚本只负责启动和托管 AI'
+
+echo "[PASS] routing foundation loop artifacts are connected"

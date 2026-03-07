@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TEST_TMP="$(mktemp -d /tmp/freely-merge-guard.XXXXXX)"
+trap 'rm -rf "$TEST_TMP"' EXIT
+
+REPO="$TEST_TMP/repo"
+mkdir -p "$REPO"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/merge-guarded" "$REPO/bin-merge-guarded"
+chmod +x "$REPO/bin-merge-guarded"
+
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+
+git branch main
+git branch pre-test-merge
+git branch feature/demo
+git branch hotfix/demo main
+git branch release/demo develop
+
+git checkout -q feature/demo
+echo feature >> README.md
+git commit -q -am "feature change"
+
+git checkout -q hotfix/demo
+echo hotfix >> HOTFIX.md
+git add HOTFIX.md
+git commit -q -m "hotfix change"
+
+git checkout -q develop
+"$REPO/bin-merge-guarded" develop feature/demo >/dev/null
+git merge-base --is-ancestor feature/demo develop
+
+git checkout -q pre-test-merge
+"$REPO/bin-merge-guarded" pre-test-merge hotfix/demo >/dev/null
+git merge-base --is-ancestor hotfix/demo pre-test-merge
+
+git checkout -q main
+if "$REPO/bin-merge-guarded" main feature/demo >/dev/null 2>"$TEST_TMP/blocked.err"; then
+  echo "[FAIL] invalid feature -> main merge unexpectedly allowed" >&2
+  exit 1
+fi
+grep -q "blocked merge" "$TEST_TMP/blocked.err"
+
+echo "[PASS] merge-guarded enforces pre-test-merge/develop paths"

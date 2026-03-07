@@ -26,3 +26,19 @@ docs/pre-brainstorms/
 - `promoted_issue_path`：未落位前使用 `pending://issue-materialization`
 - `milestone`：未绑定前使用 `pending://milestone-binding`
 - `session_refs`：无会话证据时使用 `[]`
+
+## Candidate 产物定位
+
+`candidates.md` 只承载 pre-brainstorm 阶段的前置收敛状态，不承载执行态。
+
+建议状态只使用：
+
+- `proposed`
+- `needs_research`
+- `promoted`
+- `dropped`
+
+说明：
+
+- `promoted` 表示该 candidate 已被 milestone 接纳，后续从 milestone / issue 继续推进
+- `in_progress`、`blocked`、`completed` 这类执行态应写在 milestone / issue / progress 产物中，而不是写回 candidate

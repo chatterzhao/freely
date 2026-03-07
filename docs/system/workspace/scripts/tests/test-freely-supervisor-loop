@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-supervisor-loop.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/brainstorms" \
+  "$PROJECT/docs/planning" \
+  "$PROJECT/docs/validation" \
+  "$PROJECT/docs/continuity" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/brainstorms/BRAINSTORM.md" <<'EOF'
+## 决策
+- ok
+EOF
+
+cat >"$PROJECT/docs/planning/PRD.md" <<'EOF'
+## 目标
+- ok
+EOF
+
+cat >"$PROJECT/docs/planning/EPIC.md" <<'EOF'
+## 映射关系
+- ok
+EOF
+
+cat >"$PROJECT/docs/planning/STORY.md" <<'EOF'
+## STORY-1
+
+Traceability
+ORE-Test
+EOF
+
+cat >"$PROJECT/docs/validation/PRE_TEST.md" <<'EOF'
+CASE-1
+EOF
+
+cat >"$PROJECT/docs/continuity/PROGRESS.md" <<'EOF'
+## Latest Cycle
+- ok
+EOF
+
+cat >"$PROJECT/docs/continuity/RECOVERY.md" <<'EOF'
+## Latest Checkpoint
+- ok
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+IFLOW_MAX_TURNS=100
+EOF
+
+bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 &
+supervisor_pid=$!
+
+for _ in $(seq 1 10); do
+  [[ -f "$PROJECT/.freely/run/ai.pid" ]] && break
+  sleep 1
+done
+
+first_ai_pid="$(cat "$PROJECT/.freely/run/ai.pid")"
+kill -0 "$supervisor_pid" 2>/dev/null
+kill -0 "$first_ai_pid" 2>/dev/null
+
+for _ in $(seq 1 10); do
+  sleep 1
+  second_ai_pid="$(cat "$PROJECT/.freely/run/ai.pid")"
+  if [[ "$second_ai_pid" != "$first_ai_pid" ]]; then
+    break
+  fi
+done
+
+[[ "${second_ai_pid:-}" != "$first_ai_pid" ]]
+kill -0 "$second_ai_pid" 2>/dev/null
+
+kill -TERM "$supervisor_pid"
+wait "$supervisor_pid" || true
+
+if [[ -f "$PROJECT/.freely/run/supervisor.pid" ]]; then
+  echo "[FAIL] supervisor.pid still exists after TERM"
+  exit 1
+fi
+
+echo "[PASS] freely supervisor keeps relaunching ai cli until stop signal terminates it"

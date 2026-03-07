@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  ./bin/merge-guarded <target-branch> <source-branch>
+
+Behavior:
+  - non-interactive policy gate before merge
+  - blocks invalid merge direction immediately
+  - runs git merge --no-ff for allowed paths
+USAGE
+}
+
+target="${1:-}"
+source_branch="${2:-}"
+
+[[ -n "$target" && -n "$source_branch" ]] || { usage; exit 1; }
+
+current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+if [[ "$current_branch" != "$target" ]]; then
+  echo "[MERGE-GUARD] blocked: current branch is '$current_branch', expected '$target'." >&2
+  exit 1
+fi
+
+allowed=0
+case "$target" in
+  pre-test-merge)
+    case "$source_branch" in
+      feature/*|hotfix/*) allowed=1 ;;
+    esac
+    ;;
+  develop)
+    if [[ "$source_branch" == "pre-test-merge" ]]; then
+      allowed=1
+    elif [[ "$source_branch" == feature/* ]]; then
+      allowed=1
+    elif [[ "$source_branch" == hotfix/* ]]; then
+      allowed=1
+    fi
+    ;;
+  main)
+    if [[ "$source_branch" == release/* ]]; then
+      allowed=1
+    elif [[ "$source_branch" == hotfix/* ]]; then
+      allowed=1
+    fi
+    ;;
+  *)
+    allowed=0
+    ;;
+esac
+
+if [[ "$allowed" != "1" ]]; then
+  cat <<MSG >&2
+[MERGE-GUARD] blocked merge:
+  target: $target
+  source: $source_branch
+
+Allowed:
+  feature/* -> pre-test-merge
+  hotfix/* -> pre-test-merge
+  feature/* -> develop
+  pre-test-merge -> develop
+  hotfix/* -> develop
+  release/* -> main
+  hotfix/* -> main
+MSG
+  exit 1
+fi
+
+echo "[MERGE-GUARD] allowed: $source_branch -> $target"
+git merge --no-ff "$source_branch"
