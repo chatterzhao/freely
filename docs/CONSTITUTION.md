@@ -202,8 +202,9 @@ Freely 遵循三层循环方法论。
 ```text
 A:auto-loop（外循环）
 ├── 发现与路由 Issue
-├── D:doc-loop（文档内循环）
-├── D:dev-loop（开发内循环）
+├── D:doc-pre-brainstorm-execution（前置收敛环）
+├── D:doc-ibm-execution（Issue-bound 文档收敛环）
+├── D:dev-loop-execution（开发实现环）
 └── 回流并进入下一轮
 ```
 

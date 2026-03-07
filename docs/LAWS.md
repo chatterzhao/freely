@@ -195,6 +195,7 @@
 - 路由与状态链路记录
 
 执行技能：
+- `skill:doc-pre-brainstorm-execution`
 - `skill:doc-ibm-execution`
 - `skill:dev-loop-execution`
 - `skill:auto-loop-orchestrator`
