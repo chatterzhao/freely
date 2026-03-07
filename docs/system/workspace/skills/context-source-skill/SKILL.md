@@ -1,114 +1,121 @@
 ---
 name: context-source-skill
-description: 对调用方传入的当前输入包做来源适配、上下文判定、usable issue 判断与下一跳提示词组装，为 lead-agent 产出自治编排结果。
+description: 对当前输入做来源分层、可执行性判定、workspace 准备判断与下一跳组装，为 lead-agent 产出自治编排结果。
 ---
 
 # skill:context-source-skill
 
-## 适用边界
+## 职责
 
-- 处理首跳来源识别、需求池扫描、优先级判断、路由判定与下一跳提示词组装。
-- 不直接执行业务型 doc/dev-loop。
-- 不替代 milestone、issue、progress 的长期状态维护，只产出当前回合的判定结果、建议更新与下一跳编排输出。
-- 输入包由调用方传入；本 skill 只消费传入输入，不在 skill 内凭空生成新的起始任务。
+- 判断当前输入属于原始发现源、编排来源还是延续来源。
+- 判断当前是否已经拥有 milestone-owned issue，还是仍需先进入 pre-brainstorm。
+- 判断本轮是否会写入仓库，以及是否需要先创建/进入 dedicated worktree。
+- 产出下一跳 skill、最小上下文包与 workspace 准备建议。
+
+## 不负责
+
+- 不直接执行 `pre-brainstorm` / `IBM` / `dev-loop` 主工作。
+- 不直接修改长期状态文档作为主工作。
+- 不替代 `branch-management` 创建 worktree。
 
 ## 输入
 
-- 调用方传入的 `input_context`
-- 调用方显式附带或指向的：
-  - `docs/PROJECT_INTENT.md`
-  - `docs/CONSTITUTION.md`
-  - `docs/LAWS.md`
-  - `docs/milestones.md`
-  - `workspace/tools.md`
-- 按需读取调用方已指明的补充证据：
+- `input_context`
+- `docs/PROJECT_INTENT.md`
+- `docs/CONSTITUTION.md`
+- `docs/LAWS.md`
+- `docs/milestones.md`
+- `workspace/tools.md`
+- 按需读取：
   - `docs/pre-brainstorms/**`
-  - issue / progress / recovery 证据
-  - chat 或 session evidence
-
-## 调用约定
-
-- `lead-agent` 必须把当前回合需要处理的输入包交给本 skill。
-- 输入包至少应包含：
-  - `source_input`
-  - `source_type` 或可推断来源
-  - `milestone_path`
-  - `tools_path`
-  - 当前已知的 issue / progress / recovery 指针
-- 本 skill 可以在传入路径范围内继续读取上下文，但不负责自己决定“本轮要处理哪个新输入”。
-
-## 工作流
-
-1. 从调用方传入的 `input_context` 开始，识别当前这一轮要处理的来源。
-2. 在调用方给定的上下文范围内扫描需求池：
-   - `docs/milestones.md`
-   - progress / recovery
-   - story-scoped `code-reviews` / test
-   - chat / github-issue
-   - `docs/PROJECT_INTENT.md`
-3. AI 基于当前输入包自主判断此刻优先查看哪个池，而不是由脚本硬编码固定顺序。
-4. 识别当前输入来源：
-   - 新问题输入：intent / code-review / test / chat / github-issue
-   - 延续输入：milestone / issue / progress / recovery
-5. 先从 `docs/milestones.md` 查找是否已有匹配条目。
-6. 对命中的条目判定是否为 usable issue：
-   - `committed_issues` 中且顺序明确 -> usable
-   - `candidate_issues` 中仍需研究或排序 -> not usable
-   - `completed_issues` 中 -> 不重复执行，转 completion verification 或回流
-7. 若 milestone 未命中，再检查：
-   - 是否已有 issue path
-   - 是否已有 progress / recovery 记录
-   - 是否只是 pre-brainstorm candidate
-8. 先做边界判定，再决定路径：
-   - 无稳定 issue 边界 -> `pre-brainstorm`
-   - 已有关联 issue，但需要在既有 issue 边界内继续脑暴 -> `issue-bound brainstorm`
-   - 已有稳定 issue 且可继续推进 -> `issue continuation`
-9. 结合 `tools.md` 判断当前任务强度与工具适配：
-   - 路由/预研/文档收敛优先考虑更适合长 prompt 编排的工具
-   - 命中 usable issue 后的仓库实现优先考虑更适合工程执行的工具
-   - 不在规则中硬编码唯一工具，而是让 AI 基于当前输入做解释性选择
-10. 组装下一跳 prompt，prompt 至少包含：
-   - `<source input>`
-   - `docs/milestones.md` 路径
-   - 需要阅读的 workspace 相对路径，例如 `workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
-   - 当前为何选择该工具
-   - 进入 doc-loop / dev-loop / pre-brainstorm 的边界要求
-11. 产出下一跳：
-   - `pre-brainstorm` -> `skill:doc-pre-brainstorm-execution`
-   - `issue-bound brainstorm` -> `skill:doc-ibm-execution`
-   - `issue continuation`
-     - 若当前缺文档 / 缺 `PRE_TEST` / 缺 mapping -> `skill:doc-ibm-execution`
-     - 若 issue 已 ready/in-progress 且文档足够 -> `skill:dev-loop-execution`
-12. 如发现治理口径漂移，要求在下一跳中补齐对应治理资产。
+  - issue / progress / recovery
+  - code-review / test / chat / session evidence
 
 ## 输出
 
-- `source_type`
-- `matched_milestone`
-- `usable_issue: true|false`
+- `source_class`
 - `route_kind`
-- `selected_tool`
-- `why_selected`
-- `next_skill`
-- `recommended_route`
+- `usable_issue`
+- `target_skill`
+- `workspace_action`
+- `execution_base`
+- `integration_target`
+- `depends_on`
+- `required_context`
 - `next_prompt`
-- `required_updates`
 
-## 判定原则
+## 情景步骤
 
-- milestone 是主动扫描层，不是纯报表。
-- `pending://milestone-binding` 只能是短暂过渡态。
-- 已有 issue path 不代表直接进入 dev-loop；仍要结合文档完整度、状态和证据决定。
-- chat / code-review / test 这类外部输入，若尚未进入正式 issue 体系，先回到 pre-brainstorms 收敛。
-- 核心产出是“提示词组装与工具选择建议”，不是 shell 里的硬编码路由。
-- AI 应理解后路由，而不是按脚本分支表机械跳转。
-- `test` / `code-review` / `chat` 不得因为来源名直接硬编码路径，必须先判断 issue 边界。
+### 情景 A：输入来自原始发现源
 
-## 完成
+适用输入：
+- `PROJECT_INTENT`
+- chat / session evidence
+- test
+- code-review
+- github-issue
+- 治理漂移
+- 运行时异常
 
-- `lead-agent` 获得可执行的下一跳决定。
-- 当前回合需要更新的 candidate / milestone / issue 状态已被显式指出。
-- 下一跳外部 AI 工具与 prompt 已被组装出来。
-- 若进入 `doc-pre-brainstorm-execution`，主产物应是 candidate + milestone 同步。
-- 若进入 `doc-ibm-execution`，主产物应是 issue-bound `IBM+G` 产物与 milestone 同步。
-- 若进入 `dev-loop-execution`，主产物应是代码 / 测试 / progress / milestone 回写。
+这样做：
+1. 先把当前输入归类为 `source_class=discovery`。
+2. 检查 `docs/milestones.md` 中是否已经存在明确匹配的 milestone-owned issue。
+3. 若没有稳定 issue，或只是命中候选 / 边界不稳：
+   - 选择 `target_skill=doc-pre-brainstorm-execution`
+   - 产出 `source_input`、`source_evidence_refs`、建议的 `pre_brainstorm_dir`
+4. 若当前轮会写 docs，且当前不在合法 dedicated worktree：
+   - `workspace_action=create_or_enter_worktree`
+   - 默认 `execution_base=develop`
+5. 返回下一跳 prompt，明确“先 pre-brainstorm，再 candidate->milestone”。
+
+### 情景 B：输入来自 `milestones.md`
+
+这样做：
+1. 先把当前输入归类为 `source_class=milestone`。
+2. 判断命中的条目属于哪一类：
+   - `candidate_issues`
+   - `committed_issues`
+   - `completed_issues`
+3. 如果是 `candidate_issues`：
+   - 若边界仍不稳或还缺研究，进入 `doc-pre-brainstorm-execution`
+   - 若 candidate 已清晰，进入 `doc-ibm-execution`
+4. 如果是 `committed_issues`：
+   - 若缺 `b-issue/prd/pre-tests/tasks`，进入 `doc-ibm-execution`
+   - 若 docs 足够，进入 `dev-loop-execution`
+5. 如果是 `completed_issues`：
+   - 不重复执行；返回校验/追溯或回流
+
+### 情景 C：输入来自 issue / progress / recovery
+
+这样做：
+1. 归类为 `source_class=continuation`。
+2. 如果是 `progress`：
+   - 只把它视为 dev-loop 执行态跟踪，不把它当成新问题发现池
+   - 选择 `target_skill=dev-loop-execution`
+3. 如果是 `recovery`：
+   - 恢复到中断前记录的目标环
+4. 如果是 issue：
+   - 缺 docs -> `doc-ibm-execution`
+   - docs 足够 -> `dev-loop-execution`
+
+### 情景 D：本轮将写入仓库，需要先准备 worktree
+
+这样做：
+1. 判断当前目标 skill 是否会写入仓库：
+   - `doc-pre-brainstorm-execution`：会
+   - `doc-ibm-execution`：会
+   - `dev-loop-execution`：会
+2. 若当前在 `main/develop/pre-test-merge` 或主 worktree 中：
+   - 标记 `workspace_action=create_or_enter_worktree`
+3. 判断新工作是否依赖未合并父分支改动：
+   - 不依赖 -> `execution_base=develop`
+   - 依赖 -> `execution_base=<parent feature branch>`
+4. 无论哪种情况，都保持 `integration_target=develop`，除非任务本身是 release/hotfix/premerge 场景。
+5. 把 `execution_base`、`integration_target`、`depends_on` 一起交给下一跳。
+
+## 完成判定
+
+- 当前输入已被归类到正确来源层。
+- 当前下一跳 skill 已明确。
+- 若本轮需要写入，worktree 准备动作与基线已明确。
+- 对依赖未合并父分支的任务，已显式给出 derived worktree 判断结果。
