@@ -45,3 +45,23 @@ printf '%s\n' "$RESULT" | grep -q "branch=feature/demo"
 git -C "$FEATURE_WT" rev-parse --abbrev-ref HEAD | grep -q '^feature/demo$'
 
 echo "[PASS] wt-enter auto-creates sibling worktree and enters it"
+
+RESULT_DATED="$(
+  bash -lc '
+    set -euo pipefail
+    cd "$1"
+    git branch feature/demo-20260307-1015 develop
+    source ./bin/wt-enter feature/demo-20260307-1015 >/dev/null
+    printf "cwd=%s\n" "$(pwd -P)"
+    printf "branch=%s\n" "$(git rev-parse --abbrev-ref HEAD)"
+  ' _ "$REPO"
+)"
+
+DATED_WT="$TEST_TMP/repo-worktrees/20260307-1015-feature-demo"
+
+[[ -d "$DATED_WT" ]]
+printf '%s\n' "$RESULT_DATED" | grep -q "cwd=$DATED_WT"
+printf '%s\n' "$RESULT_DATED" | grep -q "branch=feature/demo-20260307-1015"
+git -C "$DATED_WT" rev-parse --abbrev-ref HEAD | grep -q '^feature/demo-20260307-1015$'
+
+echo "[PASS] dated branch worktree paths are prefixed with the timestamp for sorting"

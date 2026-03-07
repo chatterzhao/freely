@@ -36,6 +36,30 @@ freely_wt_sanitize_name() {
   printf '%s' "$s"
 }
 
+freely_wt_dir_name_for_branch() {
+  local branch="$1"
+  local safe prefix stamp suffix dir_name
+  safe="$(freely_wt_sanitize_name "$branch")"
+
+  if [[ "$safe" =~ ^(.*[^0-9-])[-]?([0-9]{8}-[0-9]{4,6})(-.*)?$ ]]; then
+    prefix="${BASH_REMATCH[1]}"
+    stamp="${BASH_REMATCH[2]}"
+    suffix="${BASH_REMATCH[3]#-}"
+  elif [[ "$safe" =~ ^(.*[^0-9-])[-]?([0-9]{8})(-.*)?$ ]]; then
+    prefix="${BASH_REMATCH[1]}"
+    stamp="${BASH_REMATCH[2]}"
+    suffix="${BASH_REMATCH[3]#-}"
+  else
+    printf '%s' "$safe"
+    return 0
+  fi
+
+  dir_name="$stamp"
+  [[ -n "$prefix" ]] && dir_name="${dir_name}-${prefix}"
+  [[ -n "$suffix" ]] && dir_name="${dir_name}-${suffix}"
+  freely_wt_sanitize_name "$dir_name"
+}
+
 freely_wt_root_dir() {
   local primary repo_name parent_dir
   primary="$(freely_wt_primary_worktree)"
@@ -72,7 +96,7 @@ MSG
 freely_wt_target_path_for_branch() {
   local branch="$1"
   local safe root
-  safe="$(freely_wt_sanitize_name "$branch")"
+  safe="$(freely_wt_dir_name_for_branch "$branch")"
   root="$(freely_wt_root_dir)"
   echo "${root}/${safe}"
 }
@@ -80,7 +104,7 @@ freely_wt_target_path_for_branch() {
 freely_wt_relative_target_for_branch() {
   local branch="$1"
   local safe root
-  safe="$(freely_wt_sanitize_name "$branch")"
+  safe="$(freely_wt_dir_name_for_branch "$branch")"
   root="$(freely_wt_relative_root_dir)"
   echo "${root}/${safe}"
 }
