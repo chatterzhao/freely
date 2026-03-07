@@ -10,10 +10,13 @@ description: 管理 Freely 风格开发的完整自主分支生命周期。当 A
    - `skill:constitution-guard`
    - `skill:laws-enforcer`
 2. 先回到项目根目录，再用标准 git worktree 命令创建功能分支与 dedicated worktree：
-   - `cd <your-project-name-path>`
-   - `git worktree add -b feature/<topic> ../<your-project-name>-worktrees/feature-<topic> develop`
+   - `cd <your-project-path>`
+   - `git worktree add -b feature/<topic> ../<your-project-worktrees>/<branch-dir> develop`
+   - `<branch-dir>` 必须与当前 worktree 派生规则一致：
+     - 无日期分支示例：`feature/my-topic` -> `feature-my-topic`
+     - 带日期分支示例：`feature/my-topic-20260307-1015` -> `20260307-1015-feature-my-topic`
 3. 进入该分支 worktree：
-   - `cd ../<your-project-name>-worktrees/feature-<topic>`
+   - `cd ../<your-project-worktrees>/<branch-dir>`
    - 无需先 `git checkout develop`；命令最后的 `develop` 已经指定了基线
 4. 仅在此 worktree 中进行变更。
    - 编码前，定义此周期的单一变更意图和边界（作用域说明，用于后续提交拆分）
@@ -23,6 +26,11 @@ description: 管理 Freely 风格开发的完整自主分支生命周期。当 A
    - `git commit -m "<type>: <summary>"`
 6. 在 push/merge 前，重新检查提交边界，如仍有混合关注点则再次拆分。
 7. 集成前运行分支本地测试。
+8. 准备向上游分支合并前，先在当前 dedicated worktree 中把上游合进自己分支，再处理冲突：
+   - `feature/*`、`release/*` 的默认上游是 `develop`
+   - `hotfix/*` 的默认上游是 `main`
+   - `feature/premerge-*` 的默认上游是当前 `pre-test-merge`
+   - 冲突必须先在当前功能分支的 worktree 中收敛；不要把第一轮冲突留到目标分支上处理
 
 ## 路由 B：临时验证批次到 pre-test-merge
 1. 仅在需要组合验证时启用 `pre-test-merge`，并从 `develop` 创建或刷新该临时分支。
@@ -40,12 +48,13 @@ description: 管理 Freely 风格开发的完整自主分支生命周期。当 A
 
 ## 路由 C：回归 + 提升
 1. 并入 `develop` 前再次执行 Worktree 卫生门禁：`./bin/wt-status-all`，结果必须全 `CLEAN`。
-2. 队列完成后，运行语义检查清单：
+2. 对每个准备提升的分支，确认它已经在自己的 dedicated worktree 中完成一次“merge 上游 -> 解决冲突 -> 自测”。
+3. 队列完成后，运行语义检查清单：
    - `references/semantic-regression-checklist.md`
-3. 运行提升所需的 `TEST` 证据检查（包括集成验收测试）。
-4. 确保 `PRE_TEST` 仅作为基线，不得替代提升测试结果。
-5. 如走临时验证路径且所有检查为绿色，将 `pre-test-merge` 合并到 `develop`；否则按允许路径直接将 `feature/*` 合并到 `develop`。
-6. 如有任何语义/测试不匹配出现，阻止提升并返回协调流程。
+4. 运行提升所需的 `TEST` 证据检查（包括集成验收测试）。
+5. 确保 `PRE_TEST` 仅作为基线，不得替代提升测试结果。
+6. 如走临时验证路径且所有检查为绿色，将 `pre-test-merge` 合并到 `develop`；否则按允许路径直接将 `feature/*` 合并到 `develop`。
+7. 如有任何语义/测试不匹配出现，阻止提升并返回协调流程。
 
 ## 路由 D：发布和标签流程
 1. 发布/打标签前执行 Worktree 卫生门禁：`./bin/wt-status-all`，结果必须全 `CLEAN`。
@@ -81,6 +90,7 @@ description: 管理 Freely 风格开发的完整自主分支生命周期。当 A
 
 ## 硬性规则
 - 绝不绕过要求的 `TEST`、评审和进度/恢复证据将功能分支直接推送或违规合并到 `develop`。
+- 绝不跳过“先把上游合进当前分支并在本 worktree 里处理冲突”这一步，就直接把功能分支往上游目标提升。
 - 保持治理意图稳定：分支策略、worktree 约束、命名策略。
 - 如语义检查失败，不提升；返回协调流程。
 - 绝不通过提交时间戳排序解决冲突。

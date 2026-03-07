@@ -21,7 +21,7 @@ Freely 处于研究优先的整合阶段。
 ## 会话启动检查
 
 每次会话开始：
-1. **分支/Worktree检查**：如在 `main`/`develop`/`pre-test-merge` 则禁止写入。先执行 `cd <your-project-name-path>`，再按标准 `git worktree add -b <branch> ../<your-project-name>-worktrees/<branch-dir> develop` 创建 feature worktree，并 `cd` 到该 worktree 中工作
+1. **分支/Worktree检查**：如在 `main`/`develop`/`pre-test-merge` 则禁止写入。先执行 `cd <your-project-path>`，再按标准 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> develop` 创建 feature worktree，并 `cd` 到该 worktree 中工作。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDD-HHMM/HHMMSS`，目录名改为日期前置，例：`feature/foo-20260307-1015` -> `20260307-1015-feature-foo`
 2. **头脑风暴路由**：
    - 预研头脑风暴（不是基于 issue 文档）：文档放 `docs/pre-brainstorms/`
    - IBM 头脑风暴（基于 issue 文档）：文档放 `docs/epics/{epic-name}/{story-name}/brainstorms/b-{issue-name}.md`
@@ -44,8 +44,8 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - `./bin/freely init|doctor|start|status|stop`
 - `./bin/bmad-check`
 - `./bin/test-pre-push-hook`
-- `cd <your-project-name-path>`
-- `git worktree add -b <branch> ../<your-project-name>-worktrees/<branch-dir> develop`
-- `git worktree remove ../<your-project-name>-worktrees/<branch-dir> && git branch -d <branch>`
+- `cd <your-project-path>`
+- `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> develop`
+- `git worktree remove ../<your-project-worktrees>/<branch-dir> && git branch -d <branch>`
 - `source ./bin/wt-enter <branch>`
 - `source ./bin/wt-add <branch> -- <git-add-args>`
