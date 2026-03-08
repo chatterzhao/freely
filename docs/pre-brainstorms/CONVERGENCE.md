@@ -180,3 +180,11 @@
 - 当前 worktree 卫生状态：
   - 仅保留主工作树 `develop`
   - `./bin/wt-status-all` 汇总：`total=1, dirty=0`
+
+## 变更（2026-03-08 里程碑状态标识符语义收敛）
+
+### 新增到候选池
+- `C-20260308-1501` 里程碑状态标识符重命名与职责边界收紧
+  - 问题：`milestone_state=in_progress` 与 `loop_stage` 存在语义重叠
+  - 建议：将 `in_progress` 改为 `active`，`completed` 改为 `delivered`
+  - 状态：proposed，待研究确认

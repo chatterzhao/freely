@@ -64,6 +64,9 @@
 - 20260308-0145--state-sync-and-session-evidence-governance
   - brainstorms: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md
+- 20260308-1500--milestone-state-identifier-refinement
+  - brainstorms: docs/pre-brainstorms/20260308-1500--milestone-state-identifier-refinement/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260308-1500--milestone-state-identifier-refinement/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
