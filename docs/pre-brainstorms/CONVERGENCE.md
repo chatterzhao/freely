@@ -201,3 +201,12 @@
   - 已完成实现落点：`docs/LAWS.md`、`docs/system/workspace/skills/context-source-skill/SKILL.md`、`docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`、`docs/milestones.md`
   - 验证证据：`./bin/bmad-check` 于 2026-03-08 通过；全文检查确认 `blocked_*` 仅作为业务阻塞口径出现在正式治理资产中，系统崩溃统一先走 recovery 判定
   - 当前状态：completed，作为 `I-20260308-1931` 进入 milestone completed_issues
+
+## 变更（2026-03-08 里程碑状态标识符语义收敛）
+
+### 收敛结论
+- `C-20260308-1501` 里程碑状态标识符重命名与职责边界收紧
+  - 问题：`milestone_state=in_progress` 与 `loop_stage` 存在语义重叠
+  - 初步方案：将 `in_progress` 改为 `active`，`completed` 改为 `delivered`
+  - 后续处理：该方案已被 `20260308-1630--stage-prefixed-progress-identifier` 吸收并替代，不再单独进入 milestone 或 issue materialization
+  - 当前状态：dropped，保留为前置探索记录
