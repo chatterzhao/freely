@@ -54,7 +54,7 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 7. 同步回填：
    - `candidates.md.promoted_issue_path`
    - `docs/milestones.md.issue_path`
-   - `loop_stage=ibm`
+   - `phase_state=in_ibm`
    - 从 candidate 继承当前有效 `session_refs`
 
 ### 情景 B：issue 文档仍不完整
@@ -68,7 +68,7 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
    - 治理一致性修复
 2. 逐项补齐。
 3. 更新 `docs/milestones.md` 的 issue 状态与下一动作。
-4. 若当前仍在 IBM 收敛，使用 `loop_stage=ibm`；不要为纯 IBM 工作伪造 `progress`。
+4. 若当前仍在 IBM 收敛，使用 `phase_state=in_ibm`；不要为纯 IBM 工作伪造 `progress`。
 5. 如果该 issue 依赖未合并父分支：
    - 在 issue 文档中保留 `execution_base`、`integration_target`、`depends_on`
 
@@ -77,7 +77,7 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 这样做：
 1. 确认文档已足够驱动实现。
 2. 把下一跳设为 `dev-loop-execution`。
-3. 同步把 issue / milestone 的 `loop_stage` 调整为 `ready_for_dev`。
+3. 同步把 issue / milestone 的 `phase_state` 调整为 `done_ibm`。
 4. 返回最小实现上下文包：
    - `issue_ref`
    - `implementation_scope_summary`

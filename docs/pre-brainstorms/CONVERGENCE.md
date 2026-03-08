@@ -180,3 +180,24 @@
 - 当前 worktree 卫生状态：
   - 仅保留主工作树 `develop`
   - `./bin/wt-status-all` 汇总：`total=1, dirty=0`
+
+## 变更（2026-03-08 阶段前缀式进度标识）
+
+### 收敛结论
+- `C-20260308-1631` 用阶段前缀式主进度标识替代 `in_progress` / `active`
+  - 问题：现有主状态词无法从值本身看出阶段，仍需要额外字段拼读
+  - 结论：采用 `phase_state=<prefix>_<stage>`，如 `in_ibm`、`done_ibm`、`in_dev`
+  - 吸收关系：`20260308-1500--milestone-state-identifier-refinement` 仅作为前置探索保留，不再单独 materialize
+  - 已完成实现落点：`docs/LAWS.md`、`docs/PROJECT_INTENT.md`、`docs/milestones.md`、`docs/system/workspace/skills/context-source-skill/SKILL.md`、`docs/system/workspace/skills/doc-ibm-execution/SKILL.md`、`docs/system/workspace/skills/dev-loop-execution/SKILL.md`
+  - 验证证据：`./bin/bmad-check` 于 2026-03-08 通过；全文检查未发现 `status=in_progress`、`milestone_state=in_progress`、`ready_for_dev` 回流到正式治理口径
+  - 当前状态：completed，作为 `I-20260308-1631` 进入 milestone completed_issues
+
+## 变更（2026-03-08 业务阻塞与系统崩溃恢复分层）
+
+### 收敛结论
+- `C-20260308-1931` 业务阻塞状态与系统崩溃恢复定位治理
+  - 问题：`blocked_*` 容易与 PID 消失、CLI 崩溃等系统事件混用，导致恢复时伪造 AI 交接
+  - 结论：把业务阻塞和系统崩溃明确分层；系统崩溃先做恢复定位，不直接改 `phase_state`
+  - 已完成实现落点：`docs/LAWS.md`、`docs/system/workspace/skills/context-source-skill/SKILL.md`、`docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`、`docs/milestones.md`
+  - 验证证据：`./bin/bmad-check` 于 2026-03-08 通过；全文检查确认 `blocked_*` 仅作为业务阻塞口径出现在正式治理资产中，系统崩溃统一先走 recovery 判定
+  - 当前状态：completed，作为 `I-20260308-1931` 进入 milestone completed_issues

@@ -120,13 +120,13 @@ flowchart TD
 | 运行时异常 | doc-pre-brainstorm-execution 或 recovery-subagent-governance | 新异常先前置研究；已有中断上下文则进入恢复治理 |
 | pre-brainstorms 候选 | doc-ibm-execution | 候选 issue 需收敛并落位到 epic/story/milestone |
 | 里程碑 `candidate_issues` | doc-pre-brainstorm-execution 或 doc-ibm-execution | 仍需研究则回前置收敛；边界已清晰则进入 IBM |
-| 里程碑 `committed_issues` | doc-ibm-execution 或 dev-loop-execution | 视 docs 完整度与 `loop_stage` 决定进入 IBM 还是 dev-loop |
+| 里程碑 `committed_issues` | doc-ibm-execution 或 dev-loop-execution | 视 docs 完整度与 `phase_state` 决定进入 IBM、dev-loop 或 completion verification |
 | 里程碑 `completed_issues` | completion_verification | 不重复执行，只做校验、追溯或必要的重新发现 |
 | issue 文档 | doc-ibm-execution 或 dev-loop-execution | 缺 IBM 产物则回文档环；文档齐备则进入开发环 |
 | 进度文档（未完成） | dev-loop-execution | `progress` 只跟踪 dev-loop 的实现/测试/阻塞/恢复 |
 | recovery 记录 | recovery-subagent-governance | 先恢复到中断前的执行上下文，再回到对应 pre/doc/dev 环 |
 
-流程标识词典与状态联动矩阵的规范语义统一见 `docs/LAWS.md` 第 2C 章；skills 与 milestone policy 不得再自行发明同名状态。
+流程标识词典与状态联动矩阵的规范语义统一见 `docs/LAWS.md` 第 2C 章；其中 issue / progress 的主执行标识统一使用 `phase_state`，skills 与 milestone policy 不得再自行发明同名状态。
 
 ### Chat 输入与会话证据（人类/自治）
 

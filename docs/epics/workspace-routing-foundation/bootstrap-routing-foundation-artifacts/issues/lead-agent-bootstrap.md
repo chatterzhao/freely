@@ -2,8 +2,7 @@
 
 - issue_id: `I-20260306-1101`
 - title: `lead-agent.md`
-- status: completed
-- loop_stage: `completed`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `bootstrap-routing-foundation-artifacts`

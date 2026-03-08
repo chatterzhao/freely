@@ -41,7 +41,7 @@ description: 对当前输入做来源分层、可执行性判定、workspace 准
 - `execution_base`
 - `integration_target`
 - `depends_on`
-- `loop_stage`
+- `phase_state`
 - `session_evidence_refs`
 - `required_context`
 - `next_prompt`
@@ -85,7 +85,7 @@ description: 对当前输入做来源分层、可执行性判定、workspace 准
 4. 如果是 `committed_issues`：
    - 若缺 `b-issue/prd/pre-tests/tasks`，进入 `doc-ibm-execution`
    - 若 docs 足够，进入 `dev-loop-execution`
-   - 同时根据 milestone 条目的 `loop_stage` 判断是否应该期待 `progress`
+   - 同时根据 milestone 条目的 `phase_state` 判断是否应该期待 `progress`
 5. 如果是 `completed_issues`：
    - 不重复执行；返回校验/追溯或回流
 
@@ -101,7 +101,16 @@ description: 对当前输入做来源分层、可执行性判定、workspace 准
 4. 如果是 issue：
    - 缺 docs -> `doc-ibm-execution`
    - docs 足够 -> `dev-loop-execution`
-5. 对 `in_progress` 条目，不再只看名字；必须结合 `loop_stage` 与 `runtime_state` 判断进入 IBM、dev-loop 还是 recovery。
+5. 对 issue 条目，不再只看泛化 `status`；必须结合 `phase_state` 与 `runtime_state` 判断进入 IBM、dev-loop、completion verification 还是 recovery。
+6. 若 `phase_state` 停在 `in_*`：
+   - 先检查当前会话是否仍可 attach / resume
+   - 再检查最近一次 `progress` / `recovery` 是否证明执行仍连续
+   - 若证据中断或会话不可续接，先进入 `recovery-subagent-governance`
+   - 只有恢复判定通过，才继续把该条目视为原 `in_*` 阶段
+7. 若当前输入来自系统监控（如 PID 消失）而不是 AI 主动交接：
+   - 不得直接把该 issue 标记为 `blocked_*`
+   - 先按 `recovery -> progress -> issue -> milestone -> active worktree` 顺序定位上下文
+   - 根据 `tool/session_id/jsonl_path/resume_hint` 选择正确的 resume 或 restart 路径
 
 ### 情景 D：本轮将写入仓库，需要先准备 worktree
 

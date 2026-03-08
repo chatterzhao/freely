@@ -24,7 +24,7 @@ description: 执行 milestone-owned ready issue 的实现、测试与进度回�
 这样做：
 1. 读取 issue、`prd.md`、`pre-tests.md`、`tasks.md`、milestone。
 2. 确认当前 issue 已是 ready issue，而不是候选或仅 docs 收敛中的 issue。
-3. 确认 issue / milestone 的 `loop_stage=ready_for_dev` 或 `dev_in_progress`。
+3. 确认 issue / milestone 的 `phase_state=done_ibm` 或 `in_dev`。
 4. 确认当前 worktree 正确：
    - 独立 issue -> 通常基于 `develop`
    - 依赖父分支 -> 基于 `execution_base`
@@ -41,7 +41,7 @@ description: 执行 milestone-owned ready issue 的实现、测试与进度回�
    - 恢复上下文
    - 当前活跃 `session_refs`
 2. 不把 candidate 收敛或纯 IBM 状态写进 `progress`。
-3. 同步更新 milestone 与 issue 状态，并把 `loop_stage` 置为 `dev_in_progress`。
+3. 同步更新 milestone 与 issue 状态，并把 `phase_state` 置为 `in_dev`。
 
 ### 情景 C：实现中发现边界外新问题
 

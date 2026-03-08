@@ -64,6 +64,12 @@
 - 20260308-0145--state-sync-and-session-evidence-governance
   - brainstorms: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md
+- 20260308-1630--stage-prefixed-progress-identifier
+  - brainstorms: docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/candidates.md
+- 20260308-1930--business-block-vs-system-crash-recovery
+  - brainstorms: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
