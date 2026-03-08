@@ -11,6 +11,7 @@
 - superseded_by:
   - `docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/candidates.md#c-20260308-1631`
   - `docs/epics/workspace-routing-foundation/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md`
+- session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
 - scope:
   - LAWS 2C 流程标识词典
   - milestones.md milestone_state_policy
