@@ -10,9 +10,13 @@
 ## 当前模板
 
 - `pre-commit.sh`
-  - 最小治理检查模板
-  - 确认首段闭环产物存在
-  - 防止工作区继续回退到“只有口头路由，没有定义源”
+  - 分支 / worktree 治理门禁
+  - 阻止在受保护分支直接开发
+  - 阻止在 primary worktree 上继续 feature 分支提交
+- `pre-push.sh`
+  - 分支推送方向门禁
+  - 阻止 feature/release/hotfix 跨分支名推送
+  - 强制提升动作在目标分支 worktree 中完成
 
 ## 投影规则
 

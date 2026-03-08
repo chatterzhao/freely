@@ -6,10 +6,12 @@
 - `CONSTITUTION.md` 定义边界与原则（What/Why）。
 - `LAWS.md` 定义检查、证据和路由（Check/Accept/Route）。
 - Skills 仅定义可执行步骤（How）。
+- Hooks / `bin/*` 脚本是 skills 的运行时承载；若它们执行门禁，必须与宪法、法律和 skills 保持同源对齐。
 - Skills 不得扩展宪法范围或替代法律验收。
 - Skills 可以补充更细执行细节（如包安装、配置预检、修复步骤），但一旦与宪法/法律冲突必须立即回退并修正文档。
 - 当冲突发生时，优先语义意图而非提交时间顺序。
 - 不要在多个文档中重复完整执行过程。
+- 流程标识词典与状态联动矩阵以 `docs/LAWS.md` 第 2C 章为唯一事实源。
 - Worktree 卫生门禁命令：`./bin/wt-status-all`（合并/提升/发布/清理前必须全部 `CLEAN`）。
 - 交叉引用顺序应遵循宪法/法律章节顺序 `1..16` 以减少阅读摩擦。
 
@@ -17,9 +19,7 @@
 - `skill:constitution-guard` -> `constitution-guard/SKILL.md`
 - `skill:laws-enforcer` -> `laws-enforcer/SKILL.md`
 - `skill:auto-loop-orchestrator` -> `auto-loop-orchestrator/SKILL.md`
-- `skill:context-source-skill` -> `context-source-skill/SKILL.md`
-- `skill:doc-pre-brainstorm-execution` -> `doc-pre-brainstorm-execution/SKILL.md`
-- `skill:doc-ibm-execution` -> `doc-ibm-execution/SKILL.md`
+- `skill:doc-loop-execution` -> `doc-loop-execution/SKILL.md`
 - `skill:dev-loop-execution` -> `dev-loop-execution/SKILL.md`
 - `skill:branch-management` -> `branch-management/SKILL.md`
 - `skill:premerge-reconcile` -> `premerge-reconcile/SKILL.md`
@@ -32,8 +32,3 @@
 2. `laws-enforcer`（验收门禁）
 3. 领域工作流技能（`auto/doc/dev/branch`）
 4. 异常技能（`premerge-reconcile`）按需使用
-
-当前模型下，外循环直接编排：
-- `doc-pre-brainstorm-execution`
-- `doc-ibm-execution`
-- `dev-loop-execution`

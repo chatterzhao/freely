@@ -8,9 +8,9 @@
 ## C-20260307-1101：iflow 添加 worktrees 目录访问参数
 
 ### 基本信息
-- **promoted_issue_path**: `pending://issue-materialization`
-- **milestone**: `pending://milestone-binding`
-- **session_refs**: `[iflow-cli-20260307]`
+- promoted_issue_path: `pending://issue-materialization`
+- milestone: `pending://milestone-binding`
+- session_refs: [{tool: iflow, session_id: "iflow-cli-20260307", jsonl_path: "unavailable://historic-session-log-not-captured", role: "analysis"}]
 
 ### 描述
 
@@ -67,9 +67,9 @@
 ## C-20260307-1102：tools.md 补充目录访问能力说明
 
 ### 基本信息
-- **promoted_issue_path**: `pending://issue-materialization`
-- **milestone**: `pending://milestone-binding`
-- **session_refs**: `[iflow-cli-20260307]`
+- promoted_issue_path: `pending://issue-materialization`
+- milestone: `pending://milestone-binding`
+- session_refs: [{tool: iflow, session_id: "iflow-cli-20260307", jsonl_path: "unavailable://historic-session-log-not-captured", role: "analysis"}]
 
 ### 描述
 

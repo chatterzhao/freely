@@ -41,6 +41,8 @@ description: 对当前输入做来源分层、可执行性判定、workspace 准
 - `execution_base`
 - `integration_target`
 - `depends_on`
+- `loop_stage`
+- `session_evidence_refs`
 - `required_context`
 - `next_prompt`
 
@@ -67,6 +69,7 @@ description: 对当前输入做来源分层、可执行性判定、workspace 准
    - `workspace_action=create_or_enter_worktree`
    - 默认 `execution_base=develop`
 5. 返回下一跳 prompt，明确“先 pre-brainstorm，再 candidate->milestone”。
+6. 若当前输入已带有会话证据，按 `docs/LAWS.md` 第 2C 章输出结构化 `session_evidence_refs`。
 
 ### 情景 B：输入来自 `milestones.md`
 
@@ -82,6 +85,7 @@ description: 对当前输入做来源分层、可执行性判定、workspace 准
 4. 如果是 `committed_issues`：
    - 若缺 `b-issue/prd/pre-tests/tasks`，进入 `doc-ibm-execution`
    - 若 docs 足够，进入 `dev-loop-execution`
+   - 同时根据 milestone 条目的 `loop_stage` 判断是否应该期待 `progress`
 5. 如果是 `completed_issues`：
    - 不重复执行；返回校验/追溯或回流
 
@@ -97,6 +101,7 @@ description: 对当前输入做来源分层、可执行性判定、workspace 准
 4. 如果是 issue：
    - 缺 docs -> `doc-ibm-execution`
    - docs 足够 -> `dev-loop-execution`
+5. 对 `in_progress` 条目，不再只看名字；必须结合 `loop_stage` 与 `runtime_state` 判断进入 IBM、dev-loop 还是 recovery。
 
 ### 情景 D：本轮将写入仓库，需要先准备 worktree
 
