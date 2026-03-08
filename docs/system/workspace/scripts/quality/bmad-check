@@ -2,12 +2,13 @@
 set -euo pipefail
 
 required_files=(
-  "docs/brainstorms/BRAINSTORM.md"
-  "docs/planning/PRD.md"
-  "docs/planning/EPIC.md"
-  "docs/planning/STORY.md"
-  "docs/continuity/PROGRESS.md"
-  "docs/continuity/RECOVERY.md"
+  "docs/PROJECT_INTENT.md"
+  "docs/CONSTITUTION.md"
+  "docs/LAWS.md"
+  "AGENTS.md"
+  "docs/pre-brainstorms/README.md"
+  "docs/pre-brainstorms/INDEX.md"
+  "docs/pre-brainstorms/CONVERGENCE.md"
 )
 
 errors=0
@@ -29,31 +30,29 @@ check_no_tbd() {
   fi
 }
 
-check_pattern() {
-  local file="$1"
-  local pattern="$2"
-  local message="$3"
-  if ! rg -n "$pattern" "$file" >/dev/null 2>&1; then
-    fail "$message ($file)"
-  fi
-}
-
 for file in "${required_files[@]}"; do
   check_file_exists "$file"
-done
-
-for file in "${required_files[@]}"; do
   check_no_tbd "$file"
 done
 
-check_pattern "docs/brainstorms/BRAINSTORM.md" "^## (决策|Decision)" "brainstorm decision section missing"
-check_pattern "docs/planning/PRD.md" "^## (目标|Goals)" "PRD goals section missing"
-check_pattern "docs/planning/EPIC.md" "^## (映射关系|Mapping)" "EPIC mapping section missing"
-check_pattern "docs/planning/STORY.md" "^## STORY-[0-9]+" "STORY id section missing"
-check_pattern "docs/planning/STORY.md" "Intent -> PRD -> EPIC -> STORY -> Code/Test|Traceability|可追踪|追踪" "traceability statement missing in STORY"
-check_pattern "docs/planning/STORY.md" "ORE-Test|ore-test|先验测试" "ORE-Test section missing in STORY"
-check_pattern "docs/continuity/PROGRESS.md" "^## Latest Cycle" "PROGRESS latest cycle section missing"
-check_pattern "docs/continuity/RECOVERY.md" "^## Latest Checkpoint" "RECOVERY latest checkpoint section missing"
+mapfile -t entries < <(find docs/pre-brainstorms -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
+if [[ "${#entries[@]}" -eq 0 ]]; then
+  fail "no pre-brainstorm entries found under docs/pre-brainstorms"
+fi
+
+for entry in "${entries[@]}"; do
+  brainstorm="docs/pre-brainstorms/${entry}/brainstorms.md"
+  candidates="docs/pre-brainstorms/${entry}/candidates.md"
+  check_file_exists "$brainstorm"
+  check_file_exists "$candidates"
+  check_no_tbd "$brainstorm"
+  check_no_tbd "$candidates"
+
+  rg -n --fixed-strings "$entry" docs/pre-brainstorms/INDEX.md >/dev/null 2>&1 || fail "INDEX missing entry: $entry"
+  rg -n "promoted_issue_path:" "$candidates" >/dev/null 2>&1 || fail "missing promoted_issue_path in $candidates"
+  rg -n "milestone:" "$candidates" >/dev/null 2>&1 || fail "missing milestone in $candidates"
+  rg -n "session_refs:" "$candidates" >/dev/null 2>&1 || fail "missing session_refs in $candidates"
+done
 
 if [[ "$errors" -gt 0 ]]; then
   echo
@@ -61,4 +60,4 @@ if [[ "$errors" -gt 0 ]]; then
   exit 1
 fi
 
-echo "BMAD check passed."
+echo "BMAD governance check passed."

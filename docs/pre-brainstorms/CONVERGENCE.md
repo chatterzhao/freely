@@ -101,6 +101,11 @@
 ### 新增到 P1-后续
 - `C-20260305-803` Deferred 资产选择性迁移执行器
 
+## 变更（2026-03-05 治理编译链对齐）
+
+### 新增到 P0-核心
+- `C-20260305-902` Governance Alignment Compiler for Skills / Hooks / Bin
+
 ## 变更（2026-03-05 字段收敛与口径统一）
 
 - 候选字段统一：`promoted_issue_path`、`milestone`、`session_refs` 不再留空，统一使用显式 pending/空列表值。
@@ -122,11 +127,3 @@
 
 ### 新增到 P0-核心
 - `C-20260306-1001` 标准 `git worktree` 提示统一
-## 变更（2026-03-06 issue 绑定头脑风暴路由）
-
-### 新增到 P0-核心
-- `C-20260306-1101` `auto-loop-lead-agent.md`
-- `C-20260306-1102` `context-source-skill.md`
-- `C-20260306-1103` `no-skill.md`
-- `C-20260306-1104` `has-skill.md`
-- `C-20260306-1105` `auto-loop-orchestrator` / guidance 对齐到两层 auto-loop 模型

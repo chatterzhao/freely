@@ -241,7 +241,7 @@
 - 路由与状态链路记录
 
 执行技能：
-- `skill:doc-ibm-execution`
+- `skill:doc-loop-execution`
 - `skill:dev-loop-execution`
 - `skill:auto-loop-orchestrator`
 - `skill:laws-enforcer`
@@ -273,8 +273,9 @@
 3. 共享热点采用串行窗口或显式排序策略。
 
 最小验收证据：
-- 领域边界记录
-- 冲突窗口与排序记录
+- 并行任务与 worktree 路径映射
+- 文件/模块 ownership 边界记录
+- 共享热点串行窗口或排序记录
 
 执行技能：
 - `skill:recovery-subagent-governance`
@@ -303,8 +304,8 @@
 
 判定规则：
 1. 配置修改前必须备份。
-2. 备份命名符合宪法约束。
-3. 备份路径可追溯。
+2. 备份名必须包含源文件基名、`.bak` 标记与 UTC 时间戳（`YYYYMMDD-HHMMSS`）。
+3. 备份路径与恢复目标可追溯。
 
 最小验收证据：
 - 备份文件路径与时间记录
@@ -337,7 +338,7 @@
 默认执行链：
 1. `skill:constitution-guard`（硬约束门禁）
 2. `skill:laws-enforcer`（法律门禁与证据校验）
-3. 业务技能（`auto/doc/dev/branch/...`）
+3. 业务技能（`auto/doc/dev/branch/...`；若独立调用，也必须先执行前两步）
 
 说明：
 - 法律只定义门与证据，不定义操作步骤。
