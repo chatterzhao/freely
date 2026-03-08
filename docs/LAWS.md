@@ -94,6 +94,48 @@
 
 ---
 
+## 2C. 状态同步与流程标识（硬性要求）
+
+判定规则：
+1. 以下流程标识的规范语义以本章为唯一事实源：
+   - `source_class`: `discovery | milestone | continuation`
+   - `route_kind`: `pre_brainstorm | ibm | dev_loop | completion_verification | recovery`
+   - `loop_stage`: `pre_brainstorm | ibm | ready_for_dev | dev_in_progress | blocked | completed`
+   - `runtime_state`: `attachable | resumable | restart_required | unavailable`
+2. `candidate.status` 只用于 pre-brainstorm 阶段，建议值保持为 `proposed | needs_research | promoted | dropped`；不得拿它替代 issue 或 dev-loop 状态。
+3. `milestone_state=in_progress` 不是 progress 的同义词；只有 `loop_stage=dev_in_progress` 时才要求匹配 `progress` 证据。
+4. 任何跨环迁移都必须同步更新对应产物，最少遵循：
+   - `discovery -> pre_brainstorm`：更新 `brainstorms.md`、`candidates.md`、`milestones.md.candidate_issues`
+   - `candidate -> milestone-owned issue`：更新 `candidates.md.promoted_issue_path`、`milestones.md.issue_path`、正式 `issue` 路径
+   - `ibm -> ready_for_dev`：更新 `issue`、`milestones.md`，不得强制创建 `progress`
+   - `ready_for_dev -> dev_in_progress`：更新 `issue`、`milestones.md`、`progress`
+   - `recovery`：更新 `progress` 或 `recovery`，并带回当前 `runtime_state`
+   - `completed`：更新 `issue`、`milestones.md`、必要的 `progress/recovery` 完结记录，以及后续清理证据
+5. `session_refs` 是跨环证据字段；当 candidate 进入 issue、issue 进入 dev-loop、或进入 recovery 时，必须把当前有效会话证据继续写入下一层产物。
+6. `session_refs` 的最小字段为：
+   - `tool`
+   - `session_id`
+   - `jsonl_path`
+   - `role`
+7. 若当前 AI 工具无法暴露 jsonl 文件路径，允许 `jsonl_path=unavailable://<reason>`，但不得省略 `session_id`。
+8. milestone 可保留摘要字段如 `active_session_ref`，但完整会话证据的规范落点是 `candidates.md`、`issue`、`progress`、`recovery`。
+
+最小验收证据：
+- 流程标识词典记录
+- 至少一条状态联动矩阵记录
+- `session_refs` 结构化留痕
+- `loop_stage` 与 `progress` 一致性记录
+
+执行技能：
+- `skill:auto-loop-orchestrator`
+- `skill:context-source-skill`
+- `skill:doc-pre-brainstorm-execution`
+- `skill:doc-ibm-execution`
+- `skill:dev-loop-execution`
+- `skill:recovery-subagent-governance`
+
+---
+
 ## 3. 版本命名规则（硬性要求）
 
 判定规则：

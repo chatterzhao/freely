@@ -4,19 +4,29 @@
 
 ## Milestone Policy
 
-milestone_status_policy_version: v1
+milestone_status_policy_version: v2
 
 candidate_policy:
 - dropped: remove from active milestone queues
 - needs_research: keep in candidate_issues and route back to pre-brainstorms or issue-bound brainstorm
 - promoted: bind to a milestone immediately; do not leave as long-term unbound state
-- in_progress: must stay visible in milestone and matching progress evidence
 - blocked: keep visible with blocker and next action
 
 queue_policy:
 - committed_issues: sequencing is clear and the item is the next active batch
 - candidate_issues: belongs to the milestone, but still needs research or ordering
 - completed_issues: delivered work kept for traceability within the same milestone
+
+loop_stage_policy:
+- `loop_stage=ibm`: keep the issue visible in `committed_issues` with `issue_path` and `next_action`; do not require `progress`
+- `loop_stage=ready_for_dev`: keep the issue visible in `committed_issues` with `issue_path` and a clear handoff into dev-loop
+- `loop_stage=dev_in_progress`: keep the issue visible in `committed_issues` and require matching `progress`
+- `loop_stage=blocked`: keep the issue visible with blocker, next action, and current execution context
+- `loop_stage=completed`: move the issue to `completed_issues` with evidence
+
+session_policy:
+- full `session_refs` live in candidate / issue / progress / recovery artifacts
+- milestone may keep `active_session_ref` as a summary, but `issue_path` is the canonical detail pointer
 
 sequencing_policy:
 - ordered_by: dependency_then_control_plane
@@ -40,11 +50,22 @@ routing_policy:
 1. `I-20260307-1201`
 - title: 源分类、milestone-owned issue 与派生 worktree 路由治理
 - milestone_state: in_progress
+- loop_stage: `ibm`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md`
-- next_action: 继续在 IBM 环内收紧正式 issue 产物，并在后续需要时再推进 dev-loop 或治理实现
+- next_action: 继续在 IBM 环内校准状态联动口径，并在 issue ready for dev 后再推进 dev-loop
+
+2. `I-20260308-0101`
+- title: 状态联动、流程标识词典与 session evidence 传播治理
+- milestone_state: in_progress
+- loop_stage: `ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md`
+- next_action: 在治理文档与 skills 中统一流程标识词典、状态联动矩阵与 session evidence 传播规则
 
 ### candidate_issues
 
@@ -56,7 +77,7 @@ routing_policy:
 - title: `lead-agent.md`
 - milestone_state: completed
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/lead-agent-bootstrap.md`
 - evidence: `docs/system/workspace/agents/lead-agent.md`
 - completion_note: 已落地首跳中枢代理职责与首跳协议
 
@@ -64,7 +85,7 @@ routing_policy:
 - title: `context-source-skill.md`
 - milestone_state: completed
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/context-source-skill-bootstrap.md`
 - evidence: `docs/system/workspace/skills/context-source-skill/SKILL.md`
 - completion_note: 已落地来源判定、milestone 扫描与 usable issue 决策规则
 
@@ -72,7 +93,7 @@ routing_policy:
 - title: `doc-pre-brainstorm-execution.md`
 - milestone_state: completed
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/doc-pre-brainstorm-execution-bootstrap.md`
 - evidence: `docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
 - completion_note: 已落地 docs 前置收敛环，负责 pre-brainstorm 产物与 milestone 原子同步
 
@@ -80,7 +101,7 @@ routing_policy:
 - title: `doc-ibm-execution.md` 与 `dev-loop-execution.md` 的外循环接驳边界
 - milestone_state: completed
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/doc-loop-dev-loop-handoff-bootstrap.md`
 - evidence: `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
 - completion_note: 已收紧 issue-bound `IBM+G` 与 `DDD` 的接驳边界，状态交换统一回流给 auto-loop
 
@@ -88,6 +109,6 @@ routing_policy:
 - title: 现有 `auto-loop-orchestrator` skill 对齐到首段闭环模型
 - milestone_state: completed
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/auto-loop-orchestrator-bootstrap.md`
 - evidence: `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`, `docs/system/workspace/scripts/README.md`, `docs/system/workspace/scripts/tests/test-routing-foundation-loop`, `docs/system/workspace/hooks/pre-commit.sh`
 - completion_note: 已把 `system/workspace` 真源、`scripts` / `hooks` 与运行时投影映射写回 orchestrator，并补齐最小闭环测试

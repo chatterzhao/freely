@@ -127,3 +127,17 @@
 
 ### 新增到 P0-核心
 - `C-20260306-1001` 标准 `git worktree` 提示统一
+
+## 变更（2026-03-06 issue 绑定头脑风暴路由）
+
+### 新增到 P0-核心
+- `C-20260306-1101` `auto-loop-lead-agent.md`
+- `C-20260306-1102` `context-source-skill.md`
+- `C-20260306-1103` `no-skill.md`
+- `C-20260306-1104` `has-skill.md`
+- `C-20260306-1105` `auto-loop-orchestrator` / guidance 对齐到两层 auto-loop 模型
+
+## 变更（2026-03-08 状态联动与会话证据治理）
+
+### 新增到 P0-核心
+- `C-20260308-0101` 状态联动、流程标识词典与 session evidence 传播治理

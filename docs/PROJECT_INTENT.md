@@ -121,6 +121,8 @@ flowchart TD
 | github-issue（外部输入） | doc-pre-brainstorm-execution | 先进入前置研究 |
 | Chat 输入/会话证据（人类或自治） | doc-pre-brainstorm-execution | 先进入前置研究，再产出候选 Issue |
 
+流程标识词典与状态联动矩阵的规范语义统一见 `docs/LAWS.md` 第 2C 章；skills 与 milestone policy 不得再自行发明同名状态。
+
 ### Chat 输入与会话证据（人类/自治）
 
 ```
@@ -129,8 +131,12 @@ flowchart TD
               ├── 讨论先沉淀到 pre-brainstorms/*/brainstorms.md
               ├── 候选项写入 pre-brainstorms/*/candidates.md
               ├── 多 AI/子代理会话日志以 jsonl 作为 session evidence
-              └── 在 candidates.md 的 session_refs 留痕，进入 milestone 承接后再继续 A2 路由
+              └── 在 candidates.md / issue / progress / recovery 中持续维护 `session_refs`
 ```
+
+说明：
+- `session_refs` 至少记录 `tool`、`session_id`、`jsonl_path`、`role`
+- 若当前工具无法暴露 jsonl 路径，允许 `jsonl_path=unavailable://<reason>`，但不得省略 `session_id`
 
 ### 闭环理念
 
