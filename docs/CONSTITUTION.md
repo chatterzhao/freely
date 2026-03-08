@@ -63,6 +63,9 @@ Freely 是一个自主循环运行器：
   - 删除 `<project_parent>/<project_name>-worktrees/` 下的对应工作树
   - 如果存在远程分支，删除远程功能分支
   - 在进度/恢复文档中记录清理结果
+- 研究优先阶段的临时等价规则：
+  - 若 `docs/progress/**` 与 `docs/recovery/**` 目录尚未启用，允许把验证批次、恢复上下文与 cleanup 结果记录到 `docs/pre-brainstorms/CONVERGENCE.md`
+  - 一旦正式 `progress/recovery` 路径启用，后续批次必须回到规范目录，不再继续使用该临时落点
 - 分支/工作树生命周期状态：
   - active（活跃）：分支有未完成的 STORY 所有权
   - promoted（已提升）：分支变更已通过要求路径进入 `develop`

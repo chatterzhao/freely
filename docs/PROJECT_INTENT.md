@@ -112,14 +112,19 @@ flowchart TD
 
 | 来源 | 路由起点 | 说明 |
 |-----------|---------|------|
-| pre-brainstorms 候选 | doc-ibm-execution | 候选 issue 需收敛并落位到 epic/story/milestone |
-| 进度文档（未完成） | dev-loop-execution | 文档已有，继续开发 |
-| 里程碑（待处理） | doc-ibm-execution 或 dev-loop-execution | 视文档完整度 |
 | 项目意图（新需求） | doc-pre-brainstorm-execution | 前置研究收敛 |
+| Chat 输入/会话证据（人类或自治） | doc-pre-brainstorm-execution | 先进入前置研究，再产出候选 Issue |
+| github-issue（外部输入） | doc-pre-brainstorm-execution | 先进入前置研究 |
 | code-reviews/test（Bug/改进） | doc-ibm-execution 或 dev-loop-execution | 视复杂度与边界 |
 | 治理漂移（宪法/法律/skills 不一致） | doc-ibm-execution | 先修治理一致性，再回到业务路由 |
-| github-issue（外部输入） | doc-pre-brainstorm-execution | 先进入前置研究 |
-| Chat 输入/会话证据（人类或自治） | doc-pre-brainstorm-execution | 先进入前置研究，再产出候选 Issue |
+| 运行时异常 | doc-pre-brainstorm-execution 或 recovery-subagent-governance | 新异常先前置研究；已有中断上下文则进入恢复治理 |
+| pre-brainstorms 候选 | doc-ibm-execution | 候选 issue 需收敛并落位到 epic/story/milestone |
+| 里程碑 `candidate_issues` | doc-pre-brainstorm-execution 或 doc-ibm-execution | 仍需研究则回前置收敛；边界已清晰则进入 IBM |
+| 里程碑 `committed_issues` | doc-ibm-execution 或 dev-loop-execution | 视 docs 完整度与 `loop_stage` 决定进入 IBM 还是 dev-loop |
+| 里程碑 `completed_issues` | completion_verification | 不重复执行，只做校验、追溯或必要的重新发现 |
+| issue 文档 | doc-ibm-execution 或 dev-loop-execution | 缺 IBM 产物则回文档环；文档齐备则进入开发环 |
+| 进度文档（未完成） | dev-loop-execution | `progress` 只跟踪 dev-loop 的实现/测试/阻塞/恢复 |
+| recovery 记录 | recovery-subagent-governance | 先恢复到中断前的执行上下文，再回到对应 pre/doc/dev 环 |
 
 流程标识词典与状态联动矩阵的规范语义统一见 `docs/LAWS.md` 第 2C 章；skills 与 milestone policy 不得再自行发明同名状态。
 

@@ -44,6 +44,10 @@
 - 测试、评审、进度/恢复证据
 - 分支/worktree 清理记录
 
+研究优先阶段的等价留痕：
+- 若 `docs/progress/**` / `docs/recovery/**` 尚未启用，允许将验证批次、恢复上下文与 cleanup 结果记录到 `docs/pre-brainstorms/CONVERGENCE.md`
+- 该临时落点只用于当前研究阶段；正式目录启用后，证据必须回到规范路径
+
 执行技能：
 - `skill:branch-management`
 - `skill:premerge-reconcile`

@@ -141,3 +141,42 @@
 
 ### 新增到 P0-核心
 - `C-20260308-0101` 状态联动、流程标识词典与 session evidence 传播治理
+
+## 变更（2026-03-08 premerge / pre-test-merge 收敛批次）
+
+### 批次背景
+- 目的：收敛 `feature/governance-alignment-hardening-20260305`、`feature/issue-brainstorm-routing-guard-20260306`、`feature/state-sync-and-session-evidence-governance-20260308`
+- 临时验证路径：
+  - `pre-test-merge`
+  - `feature/premerge-20260308-0235--governance-convergence`
+- 原因：旧 feature 与当前 `develop` 在治理文档、hooks 与路由模型上出现高冲突，直接顺序 merge 风险高
+
+### 合并与验证证据
+- `feature/state-sync-and-session-evidence-governance-20260308` 先固化为提交 `efca6c4`
+- `feature/premerge-20260308-0235--governance-convergence` 收敛提交链：
+  - `85a10eb` merge `feature/governance-alignment-hardening-20260305`
+  - `a08ba20` merge `feature/issue-brainstorm-routing-guard-20260306`
+  - `b4eeb8b` merge `feature/state-sync-and-session-evidence-governance-20260308`
+  - `d74a543` 修复历史 candidate 字段格式，消除 `bmad-check` 阻塞
+- `pre-test-merge` 验证批次提交：`454d0e3`
+- 提升到 `develop` 的提交：`64cd6d4`
+- 验证命令与结果：
+  - `./bin/wt-status-all` -> `CLEAN`
+  - `./bin/bmad-check` -> `passed`
+  - `./bin/test-pre-push-hook` -> `pass=6 fail=0`
+
+### cleanup 结果
+- 已删除本地分支与 worktree：
+  - `feature/premerge-20260308-0235--governance-convergence`
+  - `pre-test-merge`
+  - `feature/state-sync-and-session-evidence-governance-20260308`
+  - `feature/governance-alignment-hardening-20260305`
+  - `feature/issue-brainstorm-routing-guard-20260306`
+  - `feature/loop-routing-derived-worktree-governance-20260307`
+  - `feature/ai-tool-worktree-directory-access-20260307`
+  - `feature/freely-githooks-install-strategy-20260306`
+  - `feature/worktree-date-prefix-20260307`
+  - `feature/worktree-naming-doc-sync-20260307`
+- 当前 worktree 卫生状态：
+  - 仅保留主工作树 `develop`
+  - `./bin/wt-status-all` 汇总：`total=1, dirty=0`
