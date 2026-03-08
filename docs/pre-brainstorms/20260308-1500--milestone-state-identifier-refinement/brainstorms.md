@@ -179,7 +179,6 @@ loop_stage: completed
 
 ## 下一步
 
-- 确认方案方向
-- 更新 LAWS 2C 流程标识词典
-- 更新 milestones.md policy
-- 更新相关 skills
+- 本研究不再单独进入 milestone 或 issue materialization。
+- 其核心问题已被后续 `20260308-1630--stage-prefixed-progress-identifier` 吸收，并升级为 `phase_state=<prefix>_<stage>` 的正式方案。
+- 若需追溯本轮探索，只作为“为何不采用 `active/delivered` 改名方案”的背景材料使用。

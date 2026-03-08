@@ -3,11 +3,14 @@
 ## C-20260308-1501
 
 - title: 里程碑状态标识符重命名与职责边界收紧
-- status: proposed
-- decision_reason: 当前 `milestone_state=in_progress` 与 `loop_stage` 存在语义重叠，`in_progress` 命名不够自解释
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
-- acceptance_hint: 1) LAWS 2C 更新流程标识词典，将 `in_progress` 改为 `active`，`completed` 改为 `delivered`；2) milestones.md policy 同步更新；3) 所有现有 issue 文档迁移状态标识；4) skills 引用更新
+- status: dropped
+- decision_reason: 该候选只覆盖“改名与职责边界收紧”，后续被 `C-20260308-1631` 的阶段前缀式主进度标识方案吸收并替代；继续单独推进会造成并行状态主线。
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md`
+- milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
+- acceptance_hint: 本候选不再单独 materialize；后续统一以 `phase_state` 词典、`done_ibm` handoff 和恢复边界治理作为正式实现口径。
+- superseded_by:
+  - `docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/candidates.md#c-20260308-1631`
+  - `docs/epics/workspace-routing-foundation/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md`
 - scope:
   - LAWS 2C 流程标识词典
   - milestones.md milestone_state_policy

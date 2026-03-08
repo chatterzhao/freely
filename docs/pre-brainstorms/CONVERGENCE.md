@@ -183,8 +183,9 @@
 
 ## 变更（2026-03-08 里程碑状态标识符语义收敛）
 
-### 新增到候选池
+### 收敛结论
 - `C-20260308-1501` 里程碑状态标识符重命名与职责边界收紧
   - 问题：`milestone_state=in_progress` 与 `loop_stage` 存在语义重叠
-  - 建议：将 `in_progress` 改为 `active`，`completed` 改为 `delivered`
-  - 状态：proposed，待研究确认
+  - 初步方案：将 `in_progress` 改为 `active`，`completed` 改为 `delivered`
+  - 后续处理：该方案已被 `20260308-1630--stage-prefixed-progress-identifier` 吸收并替代，不再单独进入 milestone 或 issue materialization
+  - 当前状态：dropped，保留为前置探索记录
