@@ -126,7 +126,6 @@ phase_state: todo_dev
 phase_state: in_dev
 phase_state: blocked_dev
 phase_state: in_recovery
-phase_state: done_verification
 phase_state: completed
 ```
 
@@ -222,7 +221,6 @@ phase_state: completed
 - `in_dev`
 - `blocked_dev`
 - `in_verification`
-- `done_verification`
 - `in_recovery`
 - `completed`
 
@@ -267,7 +265,6 @@ todo_pre_brainstorm
 -> done_ibm
 -> in_dev
 -> in_verification
--> done_verification
 -> completed
 ```
 
