@@ -2,8 +2,7 @@
 
 - issue_id: `I-20260306-1104`
 - title: `doc-ibm-execution.md` 与 `dev-loop-execution.md` 的外循环接驳边界
-- status: completed
-- loop_stage: `completed`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `bootstrap-routing-foundation-artifacts`

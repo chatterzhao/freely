@@ -2,8 +2,7 @@
 
 - issue_id: `I-20260306-1105`
 - title: `auto-loop-orchestrator` skill 对齐到首段闭环模型
-- status: completed
-- loop_stage: `completed`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `bootstrap-routing-foundation-artifacts`

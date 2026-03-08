@@ -7,7 +7,7 @@
 ## Key Decisions
 
 1. `LAWS` 作为流程标识的统一定义源。
-2. `loop_stage` 用来区分 IBM 与 dev-loop，不再只靠 `status=in_progress`。
+2. `phase_state` 用来区分 IBM、dev-loop 与 verification，不再只靠泛化 `status`。
 3. `session_refs` 从 pre-brainstorm 进入 issue，并在 dev-loop / recovery 继续追加。
 
 ## Open Checks

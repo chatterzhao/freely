@@ -2,8 +2,7 @@
 
 - issue_id: `I-20260308-0101`
 - title: 状态联动、流程标识词典与 session evidence 传播治理
-- status: in_progress
-- loop_stage: `ibm`
+- phase_state: `in_ibm`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `state-sync-and-session-evidence-governance`
@@ -28,14 +27,14 @@
 
 1. 在 `LAWS` 中建立流程标识词典与状态联动矩阵。
 2. 更新 `PROJECT_INTENT`，明确规范语义来源和 session evidence 传播要求。
-3. 更新 `milestones.md` policy，区分 `loop_stage=ibm` 与 `loop_stage=dev_in_progress`。
+3. 更新 `milestones.md` policy，区分 `phase_state=in_ibm` 与 `phase_state=in_dev`。
 4. 更新核心 skills，使它们引用同一套标识和同步要求。
 5. 为当前 active milestone 增加一个示范性的状态同步治理 issue。
 
 ## Acceptance
 
-- `LAWS` 明确 `source_class`、`route_kind`、`loop_stage`、`runtime_state`、`session_refs` 的规范语义。
-- 至少定义以下联动：`discovery -> pre_brainstorm`、`candidate -> milestone-owned issue`、`ibm -> ready_for_dev`、`ready_for_dev -> dev_in_progress`、`recovery`、`completed`。
+- `LAWS` 明确 `source_class`、`route_kind`、`phase_state`、`runtime_state`、`session_refs` 的规范语义。
+- 至少定义以下联动：`discovery -> pre_brainstorm`、`candidate -> milestone-owned issue`、`in_ibm -> done_ibm`、`done_ibm -> in_dev`、`recovery`、`completed`。
 - `milestones.md` 不再把所有 `in_progress` 一律要求绑定 `progress`。
 - `session_refs` 的最小字段统一为 `tool/session_id/jsonl_path/role`，缺 jsonl 路径时有显式 fallback。
 

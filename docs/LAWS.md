@@ -104,17 +104,18 @@
 1. 以下流程标识的规范语义以本章为唯一事实源：
    - `source_class`: `discovery | milestone | continuation`
    - `route_kind`: `pre_brainstorm | ibm | dev_loop | completion_verification | recovery`
-   - `loop_stage`: `pre_brainstorm | ibm | ready_for_dev | dev_in_progress | blocked | completed`
+   - `phase_state`: `todo_pre_brainstorm | in_pre_brainstorm | done_pre_brainstorm | todo_ibm | in_ibm | done_ibm | in_dev | blocked_dev | in_verification | in_recovery | completed`
    - `runtime_state`: `attachable | resumable | restart_required | unavailable`
 2. `candidate.status` 只用于 pre-brainstorm 阶段，建议值保持为 `proposed | needs_research | promoted | dropped`；不得拿它替代 issue 或 dev-loop 状态。
-3. `milestone_state=in_progress` 不是 progress 的同义词；只有 `loop_stage=dev_in_progress` 时才要求匹配 `progress` 证据。
+3. `milestone_state` 只表达 milestone 队列归属，建议值保持为 `candidate | committed | completed`；不得再拿它表达 IBM / dev / verification 阶段。
 4. 任何跨环迁移都必须同步更新对应产物，最少遵循：
-   - `discovery -> pre_brainstorm`：更新 `brainstorms.md`、`candidates.md`、`milestones.md.candidate_issues`
-   - `candidate -> milestone-owned issue`：更新 `candidates.md.promoted_issue_path`、`milestones.md.issue_path`、正式 `issue` 路径
-   - `ibm -> ready_for_dev`：更新 `issue`、`milestones.md`，不得强制创建 `progress`
-   - `ready_for_dev -> dev_in_progress`：更新 `issue`、`milestones.md`、`progress`
-   - `recovery`：更新 `progress` 或 `recovery`，并带回当前 `runtime_state`
-   - `completed`：更新 `issue`、`milestones.md`、必要的 `progress/recovery` 完结记录，以及后续清理证据
+   - `discovery -> pre_brainstorm`：更新 `brainstorms.md`、`candidates.md`、`milestones.md.candidate_issues`，并使用 `phase_state=todo_pre_brainstorm | in_pre_brainstorm`
+   - `candidate -> milestone-owned issue`：更新 `candidates.md.promoted_issue_path`、`docs/milestones.md.issue_path`、正式 `issue` 路径，并进入 `phase_state=in_ibm`
+   - `in_ibm -> done_ibm`：更新 `issue`、`docs/milestones.md`，不得强制创建 `progress`
+   - `done_ibm -> in_dev`：更新 `issue`、`docs/milestones.md`、`progress`
+   - `in_dev -> blocked_dev`：更新 `issue`、`progress`、`docs/milestones.md`，并记录 blocker
+   - `recovery`：更新 `progress` 或 `recovery`，并带回当前 `runtime_state` 与 `phase_state=in_recovery`
+   - `in_verification -> completed`：更新 `issue`、`docs/milestones.md`、必要的 `progress/recovery` 完结记录，以及后续清理证据
 5. `session_refs` 是跨环证据字段；当 candidate 进入 issue、issue 进入 dev-loop、或进入 recovery 时，必须把当前有效会话证据继续写入下一层产物。
 6. `session_refs` 的最小字段为：
    - `tool`
@@ -123,12 +124,50 @@
    - `role`
 7. 若当前 AI 工具无法暴露 jsonl 文件路径，允许 `jsonl_path=unavailable://<reason>`，但不得省略 `session_id`。
 8. milestone 可保留摘要字段如 `active_session_ref`，但完整会话证据的规范落点是 `candidates.md`、`issue`、`progress`、`recovery`。
+9. 主执行标识不得再使用 `status=in_progress`、`status=completed`、`milestone_state=in_progress` 或 `pending_*` 这类泛化值；未开始但可推进统一使用 `todo_*`，等待外部条件统一使用 `blocked_*` 或独立依赖字段。
+10. `phase_state=in_*` 只表示“上次已进入该阶段”，不保证当前进程仍在运行；auto-loop 必须结合 `runtime_state`、最近一次 `progress/recovery` 证据、以及当前会话可续接性二次判别。
+11. 若条目停留在 `in_*`，但当前会话不可 attach/resume，或执行证据已经中断且未写回 `blocked_*`，不得直接当作健康执行中；必须先路由到 `recovery` 检查，再决定回到原 `in_*` 继续，还是显式改写为 `blocked_*`。
+12. `blocked_*` 只用于 AI 已识别并显式留痕的业务阻塞；PID 消失、CLI 崩溃、会话断裂、监控探活失败等系统事件，不得直接写成 `blocked_*`。
+13. 系统崩溃或 PID 消失后，恢复定位优先级固定为：`recovery -> progress -> issue -> milestone -> active worktree/uncommitted changes`；`milestone` 只用于发现活跃 issue，不作为恢复事实源。
+14. 用于恢复和 resume 的最小字段除 `tool/session_id/jsonl_path/role` 外，还应尽量包含 `branch`、`worktree_path`、`phase_state`、`runtime_state`、`resume_hint`；若无法完整获得，必须至少保留可追溯的降级原因。
+
+状态词图例：
+- `todo_*`：下一阶段已确定，但尚未开始
+- `in_*`：当前阶段执行中
+- `done_*`：当前阶段完成，可流转到下一阶段
+- `blocked_*`：当前阶段被阻塞，需先解阻或恢复
+- `completed`：整个 issue 生命周期结束
+
+状态流转图：
+
+```mermaid
+flowchart LR
+    A[todo_pre_brainstorm] --> B[in_pre_brainstorm]
+    B --> C[done_pre_brainstorm]
+    C --> D[todo_ibm]
+    D --> E[in_ibm]
+    E --> F[done_ibm]
+    F --> G[in_dev]
+    G --> H[in_verification]
+    H --> J[completed]
+
+    G --> K[blocked_dev]
+    K --> L[in_recovery]
+    L --> G
+```
+
+图示解释：
+- 阶段交接统一通过 `done_* -> 下一个 in_*`
+- `blocked_dev` 不是终态；恢复后回到 `in_dev` 继续
+- 下次重新进入一个未完成 issue 时，若执行上下文仍可续接，应优先回到对应 `in_*`，而不是重新生成新的 `todo_*`
+- 若 `in_*` 已陈旧且会话不可续接，先进入 `in_recovery` 做恢复判定；恢复成功再回原 `in_*`，恢复失败再落 `blocked_*`
+- 系统监控发现 PID 消失时，先做恢复定位，不直接改 `phase_state`
 
 最小验收证据：
 - 流程标识词典记录
 - 至少一条状态联动矩阵记录
 - `session_refs` 结构化留痕
-- `loop_stage` 与 `progress` 一致性记录
+- `phase_state` 与 `progress` 一致性记录
 
 执行技能：
 - `skill:auto-loop-orchestrator`

@@ -17,12 +17,13 @@ queue_policy:
 - candidate_issues: belongs to the milestone, but still needs research or ordering
 - completed_issues: delivered work kept for traceability within the same milestone
 
-loop_stage_policy:
-- `loop_stage=ibm`: keep the issue visible in `committed_issues` with `issue_path` and `next_action`; do not require `progress`
-- `loop_stage=ready_for_dev`: keep the issue visible in `committed_issues` with `issue_path` and a clear handoff into dev-loop
-- `loop_stage=dev_in_progress`: keep the issue visible in `committed_issues` and require matching `progress`
-- `loop_stage=blocked`: keep the issue visible with blocker, next action, and current execution context
-- `loop_stage=completed`: move the issue to `completed_issues` with evidence
+phase_state_policy:
+- `phase_state=in_ibm`: keep the issue visible in `committed_issues` with `issue_path` and `next_action`; do not require `progress`
+- `phase_state=done_ibm`: keep the issue visible in `committed_issues` with `issue_path` and a clear handoff into dev-loop
+- `phase_state=in_dev`: keep the issue visible in `committed_issues` and require matching `progress`
+- `phase_state=blocked_dev`: keep the issue visible with blocker, next action, and current execution context
+- `phase_state=in_verification`: keep the issue visible until completion evidence is written back
+- `phase_state=completed`: move the issue to `completed_issues` with evidence
 
 session_policy:
 - full `session_refs` live in candidate / issue / progress / recovery artifacts
@@ -34,7 +35,7 @@ sequencing_policy:
 
 routing_policy:
 - no_issue_path: stay in pre-brainstorms or continue doc-loop materialization
-- issue_path_present: route by issue status into issue-bound brainstorm, IBM, continuation, or completion verification
+- issue_path_present: route by `phase_state` into issue-bound brainstorm, IBM, continuation, dev-loop, or completion verification
 
 ## M-20260306-workspace-routing-foundation
 
@@ -49,18 +50,18 @@ routing_policy:
 
 1. `I-20260307-1201`
 - title: 源分类、milestone-owned issue 与派生 worktree 路由治理
-- milestone_state: in_progress
-- loop_stage: `ibm`
+- milestone_state: committed
+- phase_state: `in_ibm`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md`
-- next_action: 继续在 IBM 环内校准状态联动口径，并在 issue ready for dev 后再推进 dev-loop
+- next_action: 继续在 IBM 环内校准状态联动口径，并在 issue 完成 `done_ibm` handoff 后再推进 dev-loop
 
 2. `I-20260308-0101`
 - title: 状态联动、流程标识词典与 session evidence 传播治理
-- milestone_state: in_progress
-- loop_stage: `ibm`
+- milestone_state: committed
+- phase_state: `in_ibm`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md`
@@ -76,6 +77,7 @@ routing_policy:
 1. `C-20260306-1101`
 - title: `lead-agent.md`
 - milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/lead-agent-bootstrap.md`
 - evidence: `docs/system/workspace/agents/lead-agent.md`
@@ -84,6 +86,7 @@ routing_policy:
 2. `C-20260306-1102`
 - title: `context-source-skill.md`
 - milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/context-source-skill-bootstrap.md`
 - evidence: `docs/system/workspace/skills/context-source-skill/SKILL.md`
@@ -92,6 +95,7 @@ routing_policy:
 3. `C-20260306-1103`
 - title: `doc-pre-brainstorm-execution.md`
 - milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/doc-pre-brainstorm-execution-bootstrap.md`
 - evidence: `docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
@@ -100,6 +104,7 @@ routing_policy:
 4. `C-20260306-1104`
 - title: `doc-ibm-execution.md` 与 `dev-loop-execution.md` 的外循环接驳边界
 - milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/doc-loop-dev-loop-handoff-bootstrap.md`
 - evidence: `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
@@ -108,7 +113,30 @@ routing_policy:
 5. `C-20260306-1105`
 - title: 现有 `auto-loop-orchestrator` skill 对齐到首段闭环模型
 - milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/auto-loop-orchestrator-bootstrap.md`
 - evidence: `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`, `docs/system/workspace/scripts/README.md`, `docs/system/workspace/scripts/tests/test-routing-foundation-loop`, `docs/system/workspace/hooks/pre-commit.sh`
 - completion_note: 已把 `system/workspace` 真源、`scripts` / `hooks` 与运行时投影映射写回 orchestrator，并补齐最小闭环测试
+
+6. `I-20260308-1631`
+- title: 阶段前缀式主进度标识治理
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/candidates.md`
+- evidence: `docs/LAWS.md`, `docs/PROJECT_INTENT.md`, `docs/milestones.md`, `docs/system/workspace/skills/context-source-skill/SKILL.md`, `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
+- completion_note: 已把 `phase_state` 收敛为 Freely 自举阶段的主执行标识，并统一 `done_ibm -> in_dev` handoff 与 milestone 路由口径
+
+7. `I-20260308-1931`
+- title: 业务阻塞状态与系统崩溃恢复定位治理
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/business-block-vs-system-crash-recovery/issues/business-block-vs-system-crash-recovery.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/candidates.md`
+- evidence: `docs/LAWS.md`, `docs/system/workspace/skills/context-source-skill/SKILL.md`, `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`, `docs/milestones.md`
+- completion_note: 已明确分层业务阻塞与系统崩溃恢复，禁止用 `blocked_*` 伪造系统事件交接，并统一恢复定位顺序与最小字段口径
