@@ -40,6 +40,9 @@
 - 20260305-worktree-policy-predevelop-exclusion
   - brainstorms: docs/pre-brainstorms/20260305-worktree-policy-predevelop-exclusion/brainstorms.md
   - candidates: docs/pre-brainstorms/20260305-worktree-policy-predevelop-exclusion/candidates.md
+- 20260305-2338--governance-skill-hook-alignment
+  - brainstorms: docs/pre-brainstorms/20260305-2338--governance-skill-hook-alignment/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-2338--governance-skill-hook-alignment/candidates.md
 - 20260305-2355--pre-test-merge-duty-migration
   - brainstorms: docs/pre-brainstorms/20260305-2355--pre-test-merge-duty-migration/brainstorms.md
   - candidates: docs/pre-brainstorms/20260305-2355--pre-test-merge-duty-migration/candidates.md
@@ -52,13 +55,15 @@
 - 20260307-0537--ai-tool-worktree-directory-access
   - brainstorms: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/brainstorms.md
   - candidates: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/candidates.md
-
 - 20260306-0248--issue-brainstorm-routing-guard
   - brainstorms: docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/brainstorms.md
   - candidates: docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/candidates.md
 - 20260307-0930--source-routing-and-derived-worktree-governance
   - brainstorms: docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md
+- 20260308-0145--state-sync-and-session-evidence-governance
+  - brainstorms: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

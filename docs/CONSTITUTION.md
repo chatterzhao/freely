@@ -202,8 +202,9 @@ Freely 遵循三层循环方法论。
 ```text
 A:auto-loop（外循环）
 ├── 发现与路由 Issue
-├── D:doc-loop（文档内循环）
-├── D:dev-loop（开发内循环）
+├── D:doc-pre-brainstorm-execution（前置收敛环）
+├── D:doc-ibm-execution（Issue-bound 文档收敛环）
+├── D:dev-loop-execution（开发实现环）
 └── 回流并进入下一轮
 ```
 
@@ -274,7 +275,8 @@ Freely 必须支持可插拔、可演进、可回滚的模块化架构，并保�
 边界原则：
 1. 未完成备份前不得执行配置修改。
 2. 备份必须唯一且可恢复。
-3. 备份记录必须可追溯。
+3. 备份文件名必须保留源文件基名，并包含 UTC 时间戳（`YYYYMMDD-HHMMSS`）与 `.bak` 标记。
+4. 备份记录必须可追溯。
 
 说明：
 - 具体验收门与证据口径见 `docs/LAWS.md` 第 15 章。

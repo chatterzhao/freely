@@ -3,6 +3,7 @@
 - issue_id: `I-20260307-1201`
 - title: 源分类、milestone-owned issue 与派生 worktree 路由治理
 - status: in_progress
+- loop_stage: `ibm`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `source-routing-and-derived-worktree-governance`
@@ -41,4 +42,4 @@
 
 ## Next
 
-- 继续收敛 `prd.md`、`pre-tests.md`、`tasks.md`，使该 issue ready for后续治理/实现工作。
+- 继续在 IBM 环内校准状态联动与路由口径，判定 ready for dev 的进入条件。

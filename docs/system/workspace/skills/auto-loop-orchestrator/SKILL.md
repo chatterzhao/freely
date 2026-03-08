@@ -27,7 +27,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - ready issue / in-progress -> `skill:dev-loop-execution`
 5. 各 loop skill 在环内完成自己的工作，并把状态、阻塞、完成或恢复上下文回流给 `auto-loop`；不要求下游 skill 直接“调用 auto-loop 的某个子 skill”。
 6. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
-7. 更新候选项 / milestone / issue / progress / route 状态记录。
+7. 当状态跨环迁移时，按 `docs/LAWS.md` 第 2C 章同步更新候选项 / milestone / issue / progress / recovery / session evidence。
 8. 重复循环直到停止条件。
 
 ## pre-brainstorms 触发
@@ -39,7 +39,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 最小产物：
 - `docs/pre-brainstorms/<id>/brainstorms.md`
 - `docs/pre-brainstorms/<id>/candidates.md`
-- 会话证据（jsonl）在 `candidates.md` 的 `session_refs` 留痕。
+- 会话证据（jsonl）在 `candidates.md` 的 `session_refs` 留痕，并在后续 issue / progress / recovery 中继续传播。
 
 ## 完成
 - 发现、路由和闭环状态保持可追溯。

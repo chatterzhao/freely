@@ -2,6 +2,10 @@
 
 ## 问题陈述
 
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+
 当前 CONSTITUTION.md 第 2 章规定：
 
 > "所有非 `main`/`develop` 的开发分支都使用 `git worktree`"

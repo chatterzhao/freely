@@ -27,6 +27,14 @@ docs/pre-brainstorms/
 - `milestone`：未绑定前使用 `pending://milestone-binding`
 - `session_refs`：无会话证据时使用 `[]`
 
+`session_refs` 一旦存在，最小结构为：
+- `tool`
+- `session_id`
+- `jsonl_path`
+- `role`
+
+若当前 AI 工具无法暴露 jsonl 文件路径，允许 `jsonl_path=unavailable://<reason>`，但不得省略 `session_id`
+
 ## Candidate 产物定位
 
 `candidates.md` 只承载 pre-brainstorm 阶段的前置收敛状态，不承载执行态。
