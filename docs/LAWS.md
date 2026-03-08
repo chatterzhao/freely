@@ -149,8 +149,7 @@ flowchart LR
     E --> F[done_ibm]
     F --> G[in_dev]
     G --> H[in_verification]
-    H --> I[done_verification]
-    I --> J[completed]
+    H --> J[completed]
 
     G --> K[blocked_dev]
     K --> L[in_recovery]
