@@ -47,6 +47,7 @@ description: 执行 pre-brainstorm 前置收敛环，负责把新问题收敛为
    - `promoted_issue_path`
    - `milestone`
    - `session_refs`
+   - 其中 `session_refs` 采用 `tool/session_id/jsonl_path/role` 的最小结构；若 jsonl 路径不可见，使用 `unavailable://<reason>`
 6. 原子更新 `docs/milestones.md`：
    - 建立 candidate 映射
    - 放入 `candidate_issues`
@@ -73,7 +74,8 @@ description: 执行 pre-brainstorm 前置收敛环，负责把新问题收敛为
 1. 确认 candidate 已具备进入 issue-bound IBM 的条件。
 2. 把 `candidates.md` 的 `status` 更新为 `promoted`。
 3. 确保 `milestone` 不再停留在 `pending://milestone-binding`。
-4. 返回：
+4. 如果当前已确定 issue 归属，立刻回填 `promoted_issue_path`，不要让 promoted 长期停留在 `pending://issue-materialization`。
+5. 返回：
    - `status=completed`
    - `next_recommended_route=doc-ibm-execution`
    - 最小 issue 上下文摘要
