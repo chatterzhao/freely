@@ -73,6 +73,9 @@
 - 20260308-1930--business-block-vs-system-crash-recovery
   - brainstorms: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/brainstorms.md
   - candidates: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/candidates.md
+- 20260309-1943--agent-skills-standard-compliance
+  - brainstorms: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
