@@ -47,7 +47,7 @@
 - `worktree/*`
   - worktree / merge / status 相关命令真源
 - `quality/*`
-  - `bmad-check`、`new-review` 等辅助命令真源
+  - `governance-check`、`new-review` 等辅助命令真源
 - `tests/*`
   - 路由、监控、worktree、merge 等脚本测试真源
 

@@ -8,7 +8,7 @@
 
 ## 现状问题
 
-1. `bin/bmad-check` 与 `bin/freely` 仍依赖 `docs/brainstorms/`、`docs/planning/`、`docs/continuity/`、`docs/validation/`，与 `AGENTS.md` 当前活跃文档范围冲突。
+1. `bin/governance-check` 与 `bin/freely` 若仍依赖 `docs/brainstorms/`、`docs/planning/`、`docs/continuity/`、`docs/validation/`，就会与 `AGENTS.md` 当前活跃文档范围冲突。
 2. `constitution-guard` / `laws-enforcer` 参考清单过薄，无法支撑 1..16 章的逐项执行检查。
 3. `recovery-subagent-governance` 尚未把“并行开发领域模型”写成具体操作步骤，尤其缺少 worktree、ownership、hotspot 串行窗口三项落地说明。
 4. `config-backup-guard` 提到命名约定，但宪法/法律没有定义可检查的备份命名格式。

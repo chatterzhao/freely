@@ -157,12 +157,12 @@
   - `85a10eb` merge `feature/governance-alignment-hardening-20260305`
   - `a08ba20` merge `feature/issue-brainstorm-routing-guard-20260306`
   - `b4eeb8b` merge `feature/state-sync-and-session-evidence-governance-20260308`
-  - `d74a543` 修复历史 candidate 字段格式，消除 `bmad-check` 阻塞
+  - `d74a543` 修复历史 candidate 字段格式，消除当时的治理检查阻塞（现命名为 `governance-check`）
 - `pre-test-merge` 验证批次提交：`454d0e3`
 - 提升到 `develop` 的提交：`64cd6d4`
 - 验证命令与结果：
   - `./bin/wt-status-all` -> `CLEAN`
-  - `./bin/bmad-check` -> `passed`
+  - `./bin/bmad-check` -> `passed`（现命名为 `./bin/governance-check`）
   - `./bin/test-pre-push-hook` -> `pass=6 fail=0`
 
 ### cleanup 结果
@@ -189,7 +189,7 @@
   - 结论：采用 `phase_state=<prefix>_<stage>`，如 `in_ibm`、`done_ibm`、`in_dev`
   - 吸收关系：`20260308-1500--milestone-state-identifier-refinement` 仅作为前置探索保留，不再单独 materialize
   - 已完成实现落点：`docs/LAWS.md`、`docs/PROJECT_INTENT.md`、`docs/milestones.md`、`docs/system/workspace/skills/context-source-skill/SKILL.md`、`docs/system/workspace/skills/doc-ibm-execution/SKILL.md`、`docs/system/workspace/skills/dev-loop-execution/SKILL.md`
-  - 验证证据：`./bin/bmad-check` 于 2026-03-08 通过；全文检查未发现 `status=in_progress`、`milestone_state=in_progress`、`ready_for_dev` 回流到正式治理口径
+  - 验证证据：`./bin/bmad-check` 于 2026-03-08 通过（现命名为 `./bin/governance-check`）；全文检查未发现 `status=in_progress`、`milestone_state=in_progress`、`ready_for_dev` 回流到正式治理口径
   - 当前状态：completed，作为 `I-20260308-1631` 进入 milestone completed_issues
 
 ## 变更（2026-03-08 业务阻塞与系统崩溃恢复分层）
@@ -199,7 +199,7 @@
   - 问题：`blocked_*` 容易与 PID 消失、CLI 崩溃等系统事件混用，导致恢复时伪造 AI 交接
   - 结论：把业务阻塞和系统崩溃明确分层；系统崩溃先做恢复定位，不直接改 `phase_state`
   - 已完成实现落点：`docs/LAWS.md`、`docs/system/workspace/skills/context-source-skill/SKILL.md`、`docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`、`docs/milestones.md`
-  - 验证证据：`./bin/bmad-check` 于 2026-03-08 通过；全文检查确认 `blocked_*` 仅作为业务阻塞口径出现在正式治理资产中，系统崩溃统一先走 recovery 判定
+  - 验证证据：`./bin/bmad-check` 于 2026-03-08 通过（现命名为 `./bin/governance-check`）；全文检查确认 `blocked_*` 仅作为业务阻塞口径出现在正式治理资产中，系统崩溃统一先走 recovery 判定
   - 当前状态：completed，作为 `I-20260308-1931` 进入 milestone completed_issues
 
 ## 变更（2026-03-08 里程碑状态标识符语义收敛）

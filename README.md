@@ -40,8 +40,8 @@ chmod +x ./bin/freely
 在实现或合并前运行基线文档检查：
 
 ```bash
-chmod +x ./bin/bmad-check
-./bin/bmad-check
+chmod +x ./bin/governance-check
+./bin/governance-check
 ```
 
 ## Hook 回归门禁

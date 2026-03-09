@@ -57,7 +57,7 @@ docs/
 ## 收敛策略
 
 1. 先在 doc-loop 产出“目录迁移契约”（何时创建、何时切流、何时删旧）。
-2. 再在 dev-loop 落地脚本/门禁对齐（doctor、bmad-check、hooks）。
+2. 再在 dev-loop 落地脚本/门禁对齐（doctor、governance-check、hooks）。
 3. 分阶段启用：
 - Phase A: 研究与候选（当前）
 - Phase B: 创建目标目录与最小模板

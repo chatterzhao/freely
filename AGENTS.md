@@ -42,7 +42,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 
 ## 基本命令
 - `./bin/freely init|doctor|start|status|stop`
-- `./bin/bmad-check`
+- `./bin/governance-check`
 - `./bin/test-pre-push-hook`
 - `cd <your-project-path>`
 - `./bin/wt-create <branch> [--base <base-branch>]`

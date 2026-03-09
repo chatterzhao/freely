@@ -26,7 +26,7 @@
 1. Freely 启动后外部 AI CLI 工具到底如何进入首跳治理角色
 2. 它如何根据上下文和来源信息做 usable issue 判定
 3. 它何时进入前置研究分支，何时进入已有 issue 的正式工作分支
-4. 文档落位、元数据、milestone、hook、`bmad-check` 应如何作为这条主链的配套治理层，而不是主主题本身
+4. 文档落位、元数据、milestone、hook、`governance-check` 应如何作为这条主链的配套治理层，而不是主主题本身
 
 ## 已形成的统一理解
 
@@ -60,7 +60,7 @@
    - brainstorm 落位
    - 最小元数据契约
    - milestone 绑定
-   - hook / `bmad-check` 兜底
+   - hook / `governance-check` 兜底
 
 ### 3. `agent` 与 `skill` 必须分层
 
@@ -175,7 +175,7 @@
 
 1. brainstorm 文档落位规则如何作为主链配套门禁表达？
 2. 让 hook / script 低成本判断所需的最小元数据集合是什么？
-3. `pre-commit`、`bmad-check`、创建入口各自应该承担什么边界？
+3. `pre-commit`、`governance-check`、创建入口各自应该承担什么边界？
 4. `system/workspace/hooks` 与运行时 `.githooks/` 之间应如何定义“定义源 vs 安装产物”的关系？
 
 ## 当前观察
@@ -196,7 +196,7 @@
 
 - 还没有一个显式的“启动入口 -> 首跳代理 -> 来源适配 -> usable issue 分流”的统一说明
 - `.githooks/` 目前没有检查 brainstorm 路由是否正确
-- `bin/bmad-check` 与 `bin/freely` 仍引用旧 `docs/brainstorms/` 路径，说明旧工作流残留尚未清理
+- `bin/governance-check` 与 `bin/freely` 若仍引用旧 `docs/brainstorms/` 路径，说明旧工作流残留尚未清理
 - 当前没有统一的 brainstorm 元数据契约，导致脚本难以判断 issue 绑定关系
 - `sh` / `ps1` / hooks 的定义源与运行时落点尚未统一到 `system/workspace` 口径
 
@@ -339,7 +339,7 @@
 2. 再分别定义每一层的职责边界和输入输出
 3. 产物类型只分为 `agent` 与 `skill`，不额外引入第三类 `orchestrator/guidance`
 4. `system/workspace` 统一作为能力真源，纳入 `agents`、`skills`、`scripts`、`hooks`
-5. 将 brainstorm 路由、元数据契约、milestone 绑定、hook / `bmad-check` 明确降为治理配套层
+5. 将 brainstorm 路由、元数据契约、milestone 绑定、hook / `governance-check` 明确降为治理配套层
 6. 让 `candidates.md` 只承载这条主链下的文档型产物，不再回到旧题目
 7. 后续再将这些候选物化为正式 issue，并绑定 milestone
 8. runtime 脚本只负责启动、监控、续接与停止；需求池扫描和路由判断由 AI 在 `context-source-skill` 下完成
@@ -374,7 +374,7 @@
 - 最小元数据契约
 - milestone 原子绑定
 - `system/workspace/hooks` -> `.githooks/` 的安装映射
-- `pre-commit` / `bmad-check` 兜底
+- `pre-commit` / `governance-check` 兜底
 
 优点：
 
@@ -505,7 +505,7 @@ routing_policy:
 
 ### 修正 2：`pending://milestone-binding` 只能是短暂过渡态
 - 长期存在说明流程没有闭环
-- 后续可考虑用 hook / bmad-check 检测长期未绑定 candidate
+- 后续可考虑用 hook / `governance-check` 检测长期未绑定 candidate
 
 ### 修正 3：issue 路由判断应结合 milestone
 - 不是单看 brainstorm 文件本身
