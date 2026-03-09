@@ -7,10 +7,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
 mkdir -p \
-  "$PROJECT/docs/brainstorms" \
-  "$PROJECT/docs/planning" \
-  "$PROJECT/docs/validation" \
-  "$PROJECT/docs/continuity" \
+  "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
   "$PROJECT/.freely/run" \
   "$PROJECT/.freely/logs"
 
@@ -22,40 +19,37 @@ cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
 # Constitution
 EOF
 
-cat >"$PROJECT/docs/brainstorms/BRAINSTORM.md" <<'EOF'
-## 决策
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
 - ok
 EOF
 
-cat >"$PROJECT/docs/planning/PRD.md" <<'EOF'
-## 目标
-- ok
-EOF
-
-cat >"$PROJECT/docs/planning/EPIC.md" <<'EOF'
-## 映射关系
-- ok
-EOF
-
-cat >"$PROJECT/docs/planning/STORY.md" <<'EOF'
-## STORY-1
-
-Traceability
-ORE-Test
-EOF
-
-cat >"$PROJECT/docs/validation/PRE_TEST.md" <<'EOF'
-CASE-1
-EOF
-
-cat >"$PROJECT/docs/continuity/PROGRESS.md" <<'EOF'
-## Latest Cycle
-- ok
-EOF
-
-cat >"$PROJECT/docs/continuity/RECOVERY.md" <<'EOF'
-## Latest Checkpoint
-- ok
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 EOF
 
 cat >"$PROJECT/.freely/config.env" <<EOF

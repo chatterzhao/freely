@@ -20,7 +20,7 @@
 
 ### C-20260305-802
 - title: 文档门禁对齐到新目录
-- problem: `doctor/bmad-check/hooks` 仍存在旧结构依赖。
+- problem: `doctor/governance-check/hooks` 仍存在旧结构依赖。
 - why_now: 若门禁不切换，目录重构无法真正生效。
 - acceptance_hint: 将必检路径与规则改为 `pre-brainstorms + epics/progress/milestones` 新模型。
 - priority: P0

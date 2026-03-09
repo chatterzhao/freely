@@ -56,8 +56,8 @@ done
 
 if [[ "$errors" -gt 0 ]]; then
   echo
-  echo "BMAD check failed with $errors issue(s)."
+  echo "Governance check failed with $errors issue(s)."
   exit 1
 fi
 
-echo "BMAD governance check passed."
+echo "Governance check passed."

@@ -79,6 +79,9 @@
 - 20260309-2003--document-skill-boundary-planning
   - brainstorms: docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/brainstorms.md
   - candidates: docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/candidates.md
+- 20260309-2345--governance-check-naming-alignment
+  - brainstorms: docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/candidates.md
 - 20260309-1943--agent-skills-standard-compliance
   - brainstorms: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/candidates.md
