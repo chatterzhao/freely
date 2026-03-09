@@ -20,7 +20,8 @@ description: 强制恢复耦合和子代理治理约束。当 AI 委托任务、
    - 当前活跃 worktree 与未提交改动
 6. 恢复前必须确认 `tool/session_id/jsonl_path` 是否可追溯；若 jsonl 路径不可见，至少保留显式 `unavailable://<reason>`。
 7. 若已知 `tool` 与 `session_id`，优先使用对应工具的 resume/attach 能力；若不能 resume，再按桥接恢复重启。
-8. 如上下文所有权模糊则阻止继续。
+8. 需要恢复路径示例时读取 [recovery-examples.md](references/recovery-examples.md)。
+9. 如上下文所有权模糊则阻止继续。
 
 ## 完成
 - 恢复和委托状态完整且可审计。

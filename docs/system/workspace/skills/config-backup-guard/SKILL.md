@@ -6,11 +6,13 @@ description: 强制配置修改前的必要备份。当 AI 修改任何配置文
 # skill:config-backup-guard
 
 ## 工作流
-1. 在编辑前检测目标配置文件。
-2. 使用统一命名创建备份：`<original-basename>.bak.<YYYYMMDD-HHMMSS>`（UTC）。
-3. 在记录中保留源文件路径、备份文件路径和预期恢复目标。
-4. 仅在备份成功后应用变更。
-5. 在执行笔记中记录备份路径和时间戳。
+
+1. 先读取 [applicability-and-recovery.md](references/applicability-and-recovery.md) 判断目标是否属于需要备份的配置文件。
+2. 在编辑前检测目标配置文件。
+3. 使用统一命名创建备份：`<original-basename>.bak.<YYYYMMDD-HHMMSS>`（UTC）。
+4. 在记录中保留源文件路径、备份文件路径和预期恢复目标。
+5. 仅在备份成功后应用变更。
+6. 在执行笔记中记录备份路径和时间戳。
 
 ## 完成
 - 每个配置变更都有可恢复、可追溯且命名一致的备份产物。
