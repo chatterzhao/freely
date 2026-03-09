@@ -67,6 +67,138 @@
 - issue-bound 文档明确 human chat input 拥有高于普通自治事件的纠偏优先级。
 - issue-bound 文档明确最小 AI 团队态势 UI：至少能看到每个 agent / run 的状态、阶段、最近动作、阻塞原因、输入来源。
 
+## Boundary model
+
+### Frontend owns
+
+- view-local state：面板开合、选中的 tab、临时输入草稿、过滤条件
+- optimistic interaction state：按钮 loading、表单提交中、局部错误提示
+- presentation composition：把 session / run / agent / timeline / terminal 组合成可观察界面
+- route-level intent：用户正在看哪个项目、哪个 session、哪个 agent
+
+### Backend owns
+
+- project registry 与当前 active project
+- session lifecycle、run lifecycle、agent roster、terminal/PTY lifecycle
+- laws / routing / skill invocation 决策结果
+- durable event log、history、snapshot、resume context
+- input arbitration 结果与系统级治理事件
+
+### Shared contract rule
+
+- frontend 不直接持有运行事实，只消费 backend 发布的 `Snapshot` 与 `ServerEvent`
+- frontend 可以缓存最近一份 `Snapshot` 以优化渲染，但缓存不是事实源
+- backend 不关心具体 UI 布局，只提供可被不同 transport 复用的命令、事件和快照语义
+
+## State ownership matrix
+
+| Domain | Frontend | Backend |
+|--------|----------|---------|
+| project selection | 当前界面选中项 | 可执行项目列表、active project 事实 |
+| session | 当前打开的 session panel | session 创建、恢复、历史、状态 |
+| run | 视图聚合与排序 | run 生命周期、阶段、阻塞、恢复 |
+| agent | roster 展示与筛选 | agent 标识、角色、最近动作、当前状态 |
+| terminal | viewport、滚动、tab 聚合 | PTY 进程、输出流、退出码、attach/resume |
+| governance | 呈现检查结果 | `AGENTS/CONSTITUTION/LAWS` 读取、规则判定、skill 路由 |
+| chat intervention | 输入框与交互反馈 | 优先级仲裁、命令入队、执行结果留痕 |
+
+## Protocol layering
+
+### 1. Frontend contract
+
+- 只定义 frontend 可调用的 `ClientCommand`
+- 只定义 frontend 可订阅的 `ServerEvent`
+- 只定义 frontend 首屏与恢复所需的 `Snapshot`
+- 不暴露 transport 细节，不要求 HTTP/WS/Tauri 三选一
+
+### 2. Transport adapter
+
+- `tauri_adapter` 负责把应用内 command/event 桥接到 Rust backend
+- 未来 `ws_adapter` 负责远端或多进程场景
+- adapter 只能转换传输形态，不能改动业务字段语义
+- adapter 必须保留 request correlation、stream ordering 和 error surface
+
+### 3. Backend service contract
+
+- 接收 `ClientCommand`
+- 产出 `ServerEvent`
+- 维护可重建 UI 的 `Snapshot`
+- 对 session/run/agent/governance 作为唯一事实源
+
+## Minimal protocol objects
+
+### ClientCommand
+
+- `CreateOrResumeSession`
+- `SendChatIntervention`
+- `ControlRun`：`start | pause | terminate | resume | retry`
+- `AttachTerminal`
+- `RequestSnapshot`
+
+要求：
+- 每条命令都必须带 `project_id`
+- 涉及既有实体时必须带 `session_id` 或 `run_id`
+- 命令来源必须可追溯，例如 `human-chat`、`human-control`、`auto-loop`
+
+### ServerEvent
+
+- `SessionUpserted`
+- `RunStatusChanged`
+- `AgentStatusChanged`
+- `TerminalChunkAppended`
+- `GovernanceDecisionRecorded`
+- `InputArbitrationRecorded`
+- `RecoveryStatusChanged`
+
+要求：
+- 事件必须单调追加，允许 UI 增量回放
+- 事件至少带 `event_id`、`occurred_at`、`project_id`
+- 事件语义独立于 transport
+
+### Snapshot
+
+- 当前 project 概览
+- active sessions / runs / agents 摘要
+- terminal attach target 摘要
+- 最近 governance / recovery / blocker 摘要
+- UI 恢复所需的最后已知事实
+
+要求：
+- `Snapshot` 用于首屏和重连恢复，不替代完整 history
+- `Snapshot` 必须能从 backend 当前状态重建，不依赖 frontend 私有缓存
+
+## Input arbitration
+
+优先级从高到低：
+
+1. 显式控制命令：`terminate`、`pause`、`resume`
+2. `human chat input`
+3. recovery / monitor signals
+4. system-triggered governance events
+5. auto-loop generated actions
+
+约束：
+
+- 高优先级输入必须可抢占低优先级待执行动作
+- 仲裁结果必须写成 backend event，不能只停留在 UI 上
+- 被抢占动作必须保留可追溯原因
+
+## Day-1 UI contract
+
+- `control bar`：只调用 `ControlRun`
+- `chat intervention panel`：只调用 `SendChatIntervention`
+- `agent roster`：只消费 agent/run snapshot 与状态变更事件
+- `team timeline`：只消费 event log，不拼接隐式推断事实
+- `embedded terminal`：通过 `AttachTerminal` + `TerminalChunkAppended` 组合
+
+## Exit criteria for `done_ibm`
+
+- 本 issue 已明确 frontend/backend 边界、状态归属矩阵和协议分层
+- 已冻结 `ClientCommand`、`ServerEvent`、`Snapshot` 的最小对象族
+- 已明确 `tauri_adapter` 是 day-1 adapter，而不是业务协议本体
+- 已明确输入仲裁与 team visibility 的最小 contract
+- 后续 `Frontend/Backend Boundary Contract v1 for Frontend Probe` 可以直接基于本 issue 继续细化接口，不需要重新争论边界归属
+
 ## MVP autonomy milestone
 
 当且仅当以下能力同时成立，Freely 才算达到“可以开始自治开发自己”的 MVP：

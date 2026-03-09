@@ -16,6 +16,37 @@
 8. 定义 AI team visibility UI：用户能够看到多个 agent / run 的状态、阶段、进展与阻塞。
 9. 定义 day-1 主入口为应用内终端 / 控制台，而不是外部 shell。
 
+## Product rules
+
+1. Frontend 只拥有 view-local state，不拥有 session/run/governance 的事实状态。
+2. Backend 必须作为 session、run、agent、terminal、governance 的唯一事实源。
+3. 协议面固定为 `ClientCommand`、`ServerEvent`、`Snapshot` 三类对象，transport adapter 只能做承载转换。
+4. `tauri_adapter` 是 day-1 实现策略，不是产品协议定义。
+5. `human chat input` 与显式控制命令必须进入 input arbitration，并留下可追溯结果。
+6. team visibility UI 只消费 backend 已发布的事实，不从零散日志推断主状态。
+
+## Required protocol surface
+
+- Commands:
+  - `CreateOrResumeSession`
+  - `SendChatIntervention`
+  - `ControlRun`
+  - `AttachTerminal`
+  - `RequestSnapshot`
+- Events:
+  - `SessionUpserted`
+  - `RunStatusChanged`
+  - `AgentStatusChanged`
+  - `TerminalChunkAppended`
+  - `GovernanceDecisionRecorded`
+  - `InputArbitrationRecorded`
+  - `RecoveryStatusChanged`
+- Snapshot domains:
+  - project overview
+  - active sessions/runs/agents
+  - terminal attachment summary
+  - governance/recovery summary
+
 ## MVP autonomy milestone
 
 Freely 达到以下能力闭环时，视为具备最小自治开发能力：
