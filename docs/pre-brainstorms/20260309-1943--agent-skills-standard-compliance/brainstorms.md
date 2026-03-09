@@ -221,22 +221,22 @@
 
 ## Immediate remediation vs follow-up governance
 
-### Immediate remediation
+### Completed remediation in this branch
 
-- 立即修正 `docs/system/workspace/skills/README.md` 中失效的 `doc-loop-execution` 入口
-- 这类修复属于已确认事实漂移，不需要等待完整架构重组
+- 已修正 `docs/system/workspace/skills/README.md` 中失效的 `doc-loop-execution` 入口
+- 已新增 `workspace-skill-governance`
+- 已把 `context-source-skill`、`doc-pre-brainstorm-execution`、`doc-ibm-execution`、`branch-management` 的长说明拆到各自 `references/`
+- 已为 `dev-loop-execution`、`recovery-subagent-governance`、`module-interface-governance`、`config-backup-guard` 补足 examples / applicability references
 
-### Follow-up governance
+### Remaining non-goals
 
-- 是否新增 `workspace-skill-governance`
-- 哪些核心 skill 先拆 `references/`
-- 是否把更多运行时真源向 skill 目录内收拢
-- 是否补 `metadata` / `allowed-tools`
+- 本次没有重排 `docs/system/workspace/scripts/**`、hooks、`bin/*` 的物理位置
+- 本次没有新增 `metadata` / `allowed-tools`
 
 结论：
 
-- `README` 漂移可先修
-- skill 结构重组仍应走后续治理 issue，不应在这次审计里直接无界扩张
+- 本轮已完成 skill 结构与治理入口整改
+- 剩余项是可选增强，不再作为“必须后续补”的硬缺口
 
 ## 收敛判断
 

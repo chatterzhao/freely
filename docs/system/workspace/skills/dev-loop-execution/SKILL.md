@@ -62,6 +62,10 @@ description: 执行 milestone-owned ready issue 的实现、测试与进度回�
 3. 父分支进入要求路径后，把当前分支 restack / rebase / merge 上游。
 4. 重新执行必需测试，再继续提升。
 
+## 按需参考
+
+- 需要最小执行示例时，读取 [execution-examples.md](references/execution-examples.md)。
+
 ## 回流输出
 
 - `status`

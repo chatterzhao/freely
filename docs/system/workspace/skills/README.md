@@ -22,6 +22,7 @@
 - `skill:doc-pre-brainstorm-execution` -> `doc-pre-brainstorm-execution/SKILL.md`
 - `skill:doc-ibm-execution` -> `doc-ibm-execution/SKILL.md`
 - `skill:dev-loop-execution` -> `dev-loop-execution/SKILL.md`
+- `skill:workspace-skill-governance` -> `workspace-skill-governance/SKILL.md`
 - `skill:branch-management` -> `branch-management/SKILL.md`
 - `skill:premerge-reconcile` -> `premerge-reconcile/SKILL.md`
 - `skill:recovery-subagent-governance` -> `recovery-subagent-governance/SKILL.md`
