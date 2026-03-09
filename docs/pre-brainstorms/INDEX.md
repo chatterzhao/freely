@@ -64,6 +64,9 @@
 - 20260308-0145--state-sync-and-session-evidence-governance
   - brainstorms: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md
+- 20260308-1244--frontend-probe-dogfooding-loop
+  - brainstorms: docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md
 - 20260308-1500--milestone-state-identifier-refinement
   - brainstorms: docs/pre-brainstorms/20260308-1500--milestone-state-identifier-refinement/brainstorms.md
   - candidates: docs/pre-brainstorms/20260308-1500--milestone-state-identifier-refinement/candidates.md

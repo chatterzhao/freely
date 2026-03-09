@@ -140,3 +140,60 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/candidates.md`
 - evidence: `docs/LAWS.md`, `docs/system/workspace/skills/context-source-skill/SKILL.md`, `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`, `docs/milestones.md`
 - completion_note: 已明确分层业务阻塞与系统崩溃恢复，禁止用 `blocked_*` 伪造系统事件交接，并统一恢复定位顺序与最小字段口径
+
+## M-20260308-frontend-probe-dogfooding-loop
+
+- title: Frontend probe + backend increment dogfooding loop
+- status: active
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- intent: 把“backend-core-first + frontend-probe-from-day-1”收敛为 Freely 自举开发自己的正式候选批次，避免继续只有后端结论、没有产品面验证闭环
+- why_now: Freely 的目标本身就是防止 AI 跑偏；如果自举开发中每个后端增量都不能立刻被前端观察、打断和回放，狗粮链路仍然不完整
+
+### committed_issues
+
+1. `I-20260308-1245`
+- title: Freely 内部前后端架构复评与可插拔协议边界
+- milestone_state: committed
+- phase_state: `in_ibm`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- next_action: 在 IBM 内收敛内部前后端边界、状态归属和可插拔协议模型，为后续 boundary contract 和 probe v0 打底
+
+### candidate_issues
+
+1. `C-20260308-1244-02`
+- title: Frontend/Backend Boundary Contract v1 for Frontend Probe
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- next_action: 等整体边界复评完成后进入 IBM，冻结 Probe day-1 所需的最小边界契约与事件语义
+
+2. `C-20260308-1244-03`
+- title: Frontend Probe v0
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- next_action: 等边界契约初步冻结后进入 IBM，收紧 Probe v0 的最小 UI 范围、终端集成方式与验收面
+
+3. `C-20260308-1244-04`
+- title: Incremental Dogfooding Gate for Backend Increments
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- next_action: 在 API / Probe 初步成形后进入 IBM，把“每个后端增量必须有 Probe 验证”固化为正式门禁
+
+### completed_issues
+
+- none currently
