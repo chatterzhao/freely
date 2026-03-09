@@ -73,6 +73,9 @@
 - 20260308-1930--business-block-vs-system-crash-recovery
   - brainstorms: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/brainstorms.md
   - candidates: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/candidates.md
+- 20260309-2003--document-skill-boundary-planning
+  - brainstorms: docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
