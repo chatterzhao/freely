@@ -85,6 +85,9 @@
 - 20260309-1943--agent-skills-standard-compliance
   - brainstorms: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/candidates.md
+- 20260310-0056--evolver-autonomous-development-leverage
+  - brainstorms: docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
