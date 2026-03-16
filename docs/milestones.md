@@ -197,3 +197,122 @@ routing_policy:
 ### completed_issues
 
 - none currently
+
+## M-20260312-control-surface-runtime-convergence
+
+- title: Control surface, runtime, and intervention architecture convergence
+- status: active
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- intent: 先把跨 pre-brainstorm / 跨 feature 分支的架构结论收敛进单一里程碑，停止悬空讨论，再按 milestone 顺序创建后续专用 worktree 落 IBM 与实现；该收敛批次以前置 issue `I-20260308-1245` 的边界复评结论为基础，不替代它。
+- why_now: Freely 正在吃自己的狗粮开发自己；如果架构、控制面、standalone/OpenClaw、human intervention 等候选持续分散在多个分支和 pre-brainstorm 中，auto-loop 与人工协作都会缺少统一编排入口，同时也会与现有 frontend-probe milestone 的边界复评形成重复编排。
+
+### committed_issues
+
+- none currently
+
+### candidate_issues
+
+1. `C-20260312-0011-A`
+- title: Backend Service Contract and Adapter Taxonomy
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 以前置 issue `I-20260308-1245` 的 `done_ibm` 边界结论为基础，作为当前架构收敛总入口冻结 backend service contract 与 adapter taxonomy，再允许后续 UI、runtime 与 intervention 设计继续细化
+
+2. `C-20260312-0011-E`
+- title: AI Team Control Surface and Multi-Worktree Visibility
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 待 contract 边界初步冻结后进入 IBM，定义 day-1 control surface 的信息架构、worktree visibility 和 team timeline
+
+3. `C-20260312-0011-G`
+- title: Standalone Runtime Baseline Without OpenClaw
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 在引入任何外部 runtime profile 前，先把 Freely standalone mode 的最小组件、状态面和未闭合点写成正式 IBM 产物
+
+4. `C-20260312-0011-H`
+- title: Human Intervention Transport Across Auto-Run CLIs
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 在当前 `SendChatIntervention` 协议语义下，先冻结 `resume_with_intervention` 的 day-1 控制链与最小依赖字段
+
+5. `C-20260312-0011-B`
+- title: Frontend Manifest Boundary and Runtime Capability Layering
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 在 contract 与 standalone 基线明确后进入 IBM，收紧 frontend/backend/AI tool/integration 的 manifest 与真源分层
+
+6. `C-20260312-0011-D`
+- title: Event Log and Snapshot Reconstruction Contract
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 作为 boundary contract 的补充，单独冻结 event/snapshot 的 reconstruction 语义，服务 UI、恢复和 team visibility
+
+7. `C-20260312-0011-F`
+- title: Skill-first Capability Exposure with OpenClaw Workspace Projection
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 在 standalone baseline 清晰后再进入 IBM，定义哪些 Freely 能力先以 skill 暴露，再映射到 OpenClaw workspace/profile
+
+8. `C-20260312-0011-C`
+- title: Runtime Independence with OpenClaw Profile as Optional Adapter
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 在 standalone mode 与 skill projection 明确后进入 IBM，正式定义 OpenClaw 只作为 optional adapter/profile 的边界
+
+9. `C-20260310-0056-A`
+- title: Evolver Sidecar for Freely Strategy Evolution
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/candidates.md`
+- next_action: 保持在当前里程碑可见，但只在主架构边界稳定后再决定是否进入 IBM，避免策略进化层早于主控制面落地
+
+10. `C-20260310-0056-B`
+- title: Delay EvoMap Hub Integration Until Single-Node Autonomy Is Stable
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/candidates.md`
+- next_action: 作为架构 guardrail 保持可见，在单机自治和 sidecar 策略未稳定前不得推进 Hub 集成
+
+### completed_issues
+
+- none currently

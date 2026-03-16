@@ -7,6 +7,12 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260310-0056--evolver-autonomous-development-leverage
+  - brainstorms: docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/candidates.md
+- 20260312-0011--architecture-synthesis-and-api-boundary
+  - brainstorms: docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md
 - 20260303-ai-consistency-closed-loop-freely-alignment
   - brainstorms: docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/brainstorms.md
   - candidates: docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/candidates.md
