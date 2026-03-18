@@ -19,6 +19,63 @@
 3. 若此时主管 supervisor 也不存在，就没有任何 AI 或项目级 runtime 可以继续发起恢复。
 4. 因此，必须有一个完全不依赖 AI 的全局 watchdog，先恢复账号，再拉起主管。
 
+另一个关键问题是：`AI 无能为力` 不能混成一个桶，至少要分三类。
+
+## AI-Powerless Taxonomy
+
+### 1. 全局 AI 服务不可用
+
+这类问题的特征是：不是某个单独会话坏了，而是任何新的 AI 进程都起不来。
+
+典型包括：
+- 全局账号限额
+- 认证失效 / token 失效
+- AI 服务网络不可达
+- 登录态损坏，导致任何新 `codex exec` / `iflow` 都无法工作
+
+owner:
+- `global watchdog`
+
+required action:
+- 全局切号 / 全局等待 / 全局健康检查
+- 恢复后再启动主管
+
+### 2. 当前 AI 会话不可延续
+
+这类问题的特征是：服务本身未必不可用，但当前这条响应链已经结束，不能再靠当前 AI 自己继续。
+
+典型包括：
+- 响应已经结束
+- `context compacted` 后需要新进程续接
+- fresh session rotation
+- 需要带新提示词重新启动工具
+- 需要 cron / 定时唤醒 / 外部事件触发
+
+owner:
+- 当前工位 `runtime / scripts`
+
+required action:
+- 写 continuity
+- 重新发起新进程
+- 带角色提示和 handoff 续接
+
+### 3. 其他工位 AI 进程已退出
+
+这类问题的特征是：不是全局账号挂了，而是某个 worker 自己已经死了，它不可能再自己启动自己。
+
+典型包括：
+- 某个 worker supervisor 退出
+- 某个 worker AI 进程异常消失
+- 主管仍活着，但被监督工位已经 `down/down`
+
+owner:
+- `manager runtime` 先做脚本恢复
+- 若脚本恢复后仍异常，再交给 `manager AI` 告警和重排
+
+required action:
+- 脚本拉起该 worker supervisor
+- 主管随后只看恢复结果和下一步编排
+
 ## Decision
 
 Freely 需要新增一个比主管更外层的 global control-plane：
@@ -36,6 +93,11 @@ Freely 需要新增一个比主管更外层的 global control-plane：
    - project runtime 不应承担“全局账号生命线”这个职责
    - 这件事应由 global watchdog 独立执行
 
+补充：
+- 第 1 类问题由 `global watchdog` 处理
+- 第 2 类问题由当前工位 `runtime` 处理
+- 第 3 类问题由 `manager runtime` 先处理，只有失败后才升级给 `manager AI`
+
 ## Capability Shape
 
 - `freely ensure-manager`
@@ -50,14 +112,17 @@ Freely 需要新增一个比主管更外层的 global control-plane：
 - `manager handoff`
   - 主管只接收已经恢复后的结果状态
   - 不接管切号与主管自拉起
+- `worker outage recovery`
+  - manager runtime 先脚本恢复缺席 worker
+  - manager AI 只在脚本恢复不足时做告警与编排
 
 ## Boundary
 
 这条能力必须明确：
 
 - `global watchdog` 管全局账号和主管存活
-- `manager runtime` 管 worker fleet 监督
-- `worker runtime` 管自己工位的会话恢复
+- `manager runtime` 管 worker fleet 监督与 worker 掉线脚本恢复
+- `worker runtime` 管自己工位的会话续接
 - `manager AI` / `worker AI` 都不负责 AI 无能为力的恢复动作
 
 ## Intended Landing
