@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # AI CLI Availability Manager
-# Usage: freely ai-cli <command> [options]
+# Usage: freely ai <command> [options]
 
 # 配置
 AUTH_DIR="$HOME/.ai-auth"
@@ -100,6 +100,44 @@ EOF
   log_info "Auth directory: $AUTH_DIR"
 }
 
+# 登录
+cmd_login() {
+  local tool="$1"
+  
+  case "$tool" in
+    codex)
+      log_info "Launching codex login..."
+      codex login
+      
+      # 登录成功后自动保存
+      if [[ -f "$HOME/.codex/auth.json" ]]; then
+        local account=$(extract_codex_account "$HOME/.codex/auth.json")
+        if [[ -n "$account" ]]; then
+          local dirname=$(account_to_dirname "$account")
+          local target_dir="$AUTH_DIR/codex-$dirname"
+          mkdir -p "$target_dir"
+          cp "$HOME/.codex/auth.json" "$target_dir/"
+          chmod 600 "$target_dir/auth.json"
+          log_info "Auto-saved account: $account"
+          log_info "Location: $target_dir"
+          
+          if [[ "$FORMAT" == "json" ]]; then
+            echo "{\"logged_in\": true, \"tool\": \"codex\", \"account\": \"$account\", \"saved\": true}"
+          fi
+        fi
+      fi
+      ;;
+    iflow)
+      log_info "iflow uses environment variables."
+      log_info "Set IFLOW_API_KEY in your shell config, then run: freely ai save iflow <account>"
+      ;;
+    *)
+      log_error "Unknown tool: $tool"
+      exit 2
+      ;;
+  esac
+}
+
 # 保存当前登录
 cmd_save() {
   local tool="$1"
@@ -109,7 +147,7 @@ cmd_save() {
     codex)
       local auth_file="$HOME/.codex/auth.json"
       if [[ ! -f "$auth_file" ]]; then
-        log_error "No codex auth found. Run 'codex login' first."
+        log_error "No codex auth found. Run 'freely ai login codex' first."
         exit 3
       fi
       
@@ -117,7 +155,7 @@ cmd_save() {
         account=$(extract_codex_account "$auth_file")
         if [[ -z "$account" ]]; then
           log_error "Cannot extract account from auth.json. Please specify account name."
-          log_info "Usage: freely ai-cli save codex <account>"
+          log_info "Usage: freely ai save codex <account>"
           exit 2
         fi
         log_info "Detected account: $account"
@@ -209,7 +247,7 @@ cmd_list() {
   done < <(ls -1 "$AUTH_DIR" 2>/dev/null || true)
   
   if [[ ${#accounts[@]} -eq 0 ]]; then
-    log_info "No accounts found. Run 'freely ai-cli save <tool>' to create one."
+    log_info "No accounts found. Run 'freely ai login codex' to create one."
     return
   fi
   
@@ -330,10 +368,11 @@ cmd_delete() {
 # 帮助
 show_help() {
   cat << EOF
-Usage: freely ai-cli <command> [options]
+Usage: freely ai <command> [options]
 
 Commands:
   init                    Initialize account manager
+  login <tool>            Login and auto-save account
   save <tool> [account]   Save current login (auto-detect account if not specified)
   switch <tool> [account] Switch to account (interactive if no account)
   list                    List all accounts
@@ -355,11 +394,11 @@ Exit codes:
   4 = not found
 
 Examples:
-  freely ai-cli init
-  codex login && freely ai-cli save codex
-  freely ai-cli whoami
-  freely ai-cli switch codex other@email.com --yes
-  freely ai-cli list --format json
+  freely ai init
+  freely ai login codex
+  freely ai whoami
+  freely ai switch codex other@email.com --yes
+  freely ai list --format json
 EOF
 }
 
@@ -392,6 +431,7 @@ main() {
   
   case "$COMMAND" in
     init) cmd_init ;;
+    login) cmd_login "${ARGS[0]}" ;;
     save) cmd_save "${ARGS[0]}" "${ARGS[1]:-}" ;;
     switch) cmd_switch "${ARGS[0]}" "${ARGS[1]:-}" ;;
     list) cmd_list ;;
