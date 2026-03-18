@@ -99,3 +99,57 @@
     - 已在 SKILL.md 中定义切换流程
     - 默认策略：静默自动切换，记录事件到 recovery
     - 兜底行为：全部 profile 失效时暂停循环，通知用户
+
+### C-20260318-E
+- title: CLI First 原则写入宪法
+- problem: Freely 需要明确 CLI 优先的架构原则，确保所有功能都有 CLI 接口。
+- why_now: 在设计 ai-cli 命令时发现需要明确这一原则，避免后续开发走偏。
+- acceptance_hint:
+  - 宪法中添加 CLI First 章节
+  - 定义 CLI 接口设计规范
+- priority: P0
+- status: done
+- decision_reason: 架构层面原则，必须在实现前确定。
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+- sequencing_rank: 1
+- resolution: |
+    - 已写入 CONSTITUTION.md 第 10.1 章
+    - 架构优先级：CLI (核心) → API (可选) → UI (可选)
+
+### C-20260318-F
+- title: 统一登录命令设计
+- problem: 用户需要两步操作（codex login + freely save），体验不连贯。
+- why_now: 用户反馈操作繁琐，需要简化。
+- acceptance_hint:
+  - `freely ai login codex` 一键完成登录和保存
+  - 自动检测账号并保存授权文件
+- priority: P0
+- status: in_progress
+- decision_reason: 用户体验核心改进。
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+- sequencing_rank: 4
+- depends_on:
+  - C-20260318-B
+- resolution: |
+    - 已实现 bin/ai 脚本
+    - login 命令：调用 codex login 后自动保存
+    - 自动从 JWT 提取 email 作为账号名
+
+### C-20260318-G
+- title: 目录命名规则
+- problem: 邮箱中包含 `.` 可能导致某些文件系统问题。
+- why_now: 实现时发现需要明确目录命名规则。
+- acceptance_hint:
+  - 确定哪些字符需要替换
+  - 保持可读性
+- priority: P1
+- status: done
+- decision_reason: 实现细节，但影响用户体验。
+- resolution: |
+    - 测试确认 macOS/Linux 支持 `@`
+    - 只替换 `.` 为 `-`
+    - 示例：worahe3973@outlook.com → codex-worahe3973@outlook-com

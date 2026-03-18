@@ -166,3 +166,52 @@ ai_cli_profiles:
 - [ ] 确认 codex、kiro-cli、iflow 的环境变量支持情况
 - [ ] 设计 profile 配置格式
 - [ ] 实现 SKILL.md 和 references
+
+---
+
+## 迭代讨论（2026-03-18 续）
+
+### CLI First 原则
+
+讨论发现所有功能应优先 CLI 接口，UI 只是展示层。
+
+架构优先级：
+```
+CLI (核心) → API (可选) → UI (可选)
+```
+
+边界原则：
+1. 所有功能必须有 CLI 接口
+2. CLI 必须支持非交互式模式（`--yes`）
+3. CLI 必须支持结构化输出（`--format json|yaml`）
+4. CLI 返回码必须语义化
+
+已写入 `docs/CONSTITUTION.md` 第 10.1 章。
+
+### 登录命令设计
+
+用户反馈：手工操作繁琐
+```bash
+# 之前
+codex login
+freely ai-cli save codex personal
+```
+
+改进为统一入口：
+```bash
+freely ai login codex
+# 自动：登录 -> 提取账号 -> 保存授权
+```
+
+### 账号自动检测
+
+从 `auth.json` 的 JWT `id_token` 中提取 email：
+- 无需用户指定账号名
+- 目录命名：`codex-{email}`
+- 只替换 `.` 为 `-`，保留 `@`（macOS/Linux 支持）
+
+### 命令简化
+
+`freely ai-cli` → `freely ai`
+
+理由：更简洁，与 Freely 品牌一致。
