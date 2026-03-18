@@ -99,6 +99,14 @@
     - 已在 SKILL.md 中定义切换流程
     - 默认策略：静默自动切换，记录事件到 recovery
     - 兜底行为：全部 profile 失效时暂停循环，通知用户
+    - 2026-03-18 当前轮补充验证到 Codex 结构化限额至少分为 `primary` 与 `secondary` 两档
+    - `runtime/freely` 已补充双限额解析、统一 reason 归因与 `reset_at` 选择
+    - 已新增测试覆盖：
+      - `primary_rate_limit_exhausted`
+      - `secondary_rate_limit_exhausted`
+    - 验证证据：
+      - `docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
+      - `docs/system/workspace/scripts/runtime/freely`
 
 ### C-20260318-E
 - title: CLI First 原则写入宪法

@@ -11,6 +11,7 @@
 - 更新 `doc-ibm-execution`
 - 更新 `dev-loop-execution`
 - 更新 `branch-management`
+- 对齐 `lead-agent` 与 `workspace/tools.md` 的同工具第二跳协议
 
 ## T3 Worktree 引导
 - 新增 `./bin/wt-create`
@@ -21,3 +22,8 @@
 ## T4 目录归属治理
 - 明确 IBM 产物路径为 `docs/epics/{epic-name}/{story-name}/...`
 - 禁止 IBM 正式产物继续落在 `docs/pre-brainstorms/`
+
+## T5 首跳执行闭环回归
+- 更新 `workspace/scripts/start-lead-agent.sh`
+- 更新 `workspace/scripts/tests/test-routing-foundation-loop`
+- 锁住“同工具必须继续第二跳、不能只输出 next_prompt”

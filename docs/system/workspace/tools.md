@@ -41,6 +41,12 @@
   - fresh/auto: `codex exec --skip-git-repo-check -C <project-root> --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
   - fresh/step: `codex exec --skip-git-repo-check -C <project-root> - < <prompt-file>`
   - resume/auto: `codex exec resume --last --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
+  - fresh_with_handoff/auto: `codex exec --skip-git-repo-check -C <project-root> --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
+- runtime_notes:
+  - Freely runtime may choose `fresh_with_handoff` when the previous Codex session is technically resumable but no longer healthy to keep extending.
+  - Current rotation triggers include `context compacted`, missing resume evidence, local `resume_streak` threshold, and high context-window usage.
+  - When context-window usage first crosses the local warn threshold, the next prompt should first refresh the phase-appropriate continuity artifact before continuing.
+  - Default Codex runtime config is project-scoped `gpt-5.4` with reasoning effort `medium` unless the project explicitly overrides it.
 
 ## Selection Policy
 
@@ -51,6 +57,7 @@
 - AI 应优先选择当前可用且最匹配任务强度的工具。
 - 若多个工具都可用，优先选择更接近当前阶段的工具，而不是固定偏好某一个工具。
 - AI 负责产出 `selected_tool`、`why_selected`、`next_prompt` 与 `target_skill_or_loop`。
+- 若 `selected_tool` 与当前运行工具一致，AI 不能把 `next_prompt` 当作结束信号；应在当前会话继续执行第二跳，并仅把 `next_prompt` 作为可追溯的中间产物。
 - CLI 的具体启动参数由 Freely runtime 统一执行，不要求 AI 自己发明命令格式。
 - 输出应包含：
   - selected_tool

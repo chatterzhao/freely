@@ -98,6 +98,17 @@ LIMIT_PATTERNS=(
 4. 重启 AI CLI 会话
 5. 继续循环
 
+补充结论（2026-03-18）：
+- Codex 的限额不能只按单一“5小时窗口”理解；实际运行里至少存在两档结构化限额：
+  - `primary`：短窗口限额（当前日志里常见 `window_minutes=300`）
+  - `secondary`：长窗口限额（当前日志里可见 `window_minutes=10080`）
+- Freely runtime 不能只在 `primary.used_percent >= 100` 时切账号；若 `secondary.used_percent >= 100`，也必须进入同一条 account-aware 恢复链。
+- 恢复留痕至少应写出：
+  - 哪一档限额触发（`primary_rate_limit_exhausted | secondary_rate_limit_exhausted`）
+  - 对应的 `reset_at`
+  - 当前切到的 account
+- 验证口径不能只看“切账号命令被调用”，还要确认 `session-state/status` 已写回最新 account 与限额元数据。
+
 ### 与现有 Skill 的集成
 
 ```

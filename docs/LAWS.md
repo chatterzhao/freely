@@ -36,11 +36,15 @@
 8. premerge 仅作冲突收敛，来源与回并目标均为当前活跃的 `pre-test-merge`。
 9. 清理动作只能在 `verified-retirable` 后执行，且必须留痕。
 10. 派生 worktree 的 issue 在提升前必须对齐其父分支结果：父分支先进入要求路径，子分支再 restack/rebase/merge 上游并重新验证。
+11. `in_dev` issue 不得无限期累积脏树；当当前 worktree 进入 checkpoint 预警或阻断预算时，下一轮必须先更新对应 continuity artifact，并优先切出 checkpoint commit 或按 ownership 分流到其他 dedicated worktree。
+12. runtime/status 必须暴露当前 project dirty entries 与项目级 worktree dirty summary，供多 worktree 监督与 promotion 决策使用。
+13. 若当前工位已通过最小验证门，但仍持续扩写实现而不形成 checkpoint commit / checkpoint note，视为自治治理退化，不得宣称“工作正常”。
 
 最小验收证据：
 - 分支来源与合并路径记录
 - `execution_base` / `integration_target` / `depends_on` 记录（如存在派生 worktree）
 - `wt-status-all` 输出记录
+- project dirty budget / worktree dirty summary 记录（如进入 checkpoint 治理）
 - 测试、评审、进度/恢复证据
 - 分支/worktree 清理记录
 
@@ -50,6 +54,7 @@
 
 执行技能：
 - `skill:branch-management`
+- `skill:multi-worktree-supervision`
 - `skill:premerge-reconcile`
 - `skill:constitution-guard`
 
@@ -130,6 +135,17 @@
 12. `blocked_*` 只用于 AI 已识别并显式留痕的业务阻塞；PID 消失、CLI 崩溃、会话断裂、监控探活失败等系统事件，不得直接写成 `blocked_*`。
 13. 系统崩溃或 PID 消失后，恢复定位优先级固定为：`recovery -> progress -> issue -> milestone -> active worktree/uncommitted changes`；`milestone` 只用于发现活跃 issue，不作为恢复事实源。
 14. 用于恢复和 resume 的最小字段除 `tool/session_id/jsonl_path/role` 外，还应尽量包含 `branch`、`worktree_path`、`phase_state`、`runtime_state`、`resume_hint`；若无法完整获得，必须至少保留可追溯的降级原因。
+15. `resume` 只表示“当前工具会话技术上仍可续接”，不自动等于“继续 resume 是最优策略”；若运行时已出现 `context compacted`、连续 resume 退化或达到本地轮换阈值，应允许选择 `fresh_with_handoff`，而不是盲目继续旧会话。
+16. `fresh_with_handoff` 的最小交接面应尽量包含：上一轮 `tool_session_id`（如可得）、上一轮 cycle log 路径、当前 branch/worktree、触发 fresh 的原因，以及最近一段可追溯输出摘录。
+17. 若当前工具可提供结构化上下文使用证据（例如 Codex 的 `token_count` / `model_context_window`），runtime 应允许在真正 compact 之前基于本地阈值做容量治理，而不是只等 `context compacted` 后再被动轮换。
+18. context-window 容量治理至少区分两档：
+   - `warn`：下一轮先更新当前阶段对应的 continuity artifact，再继续当前 issue
+   - `rotate`：下一轮直接进入 `fresh_with_handoff`
+19. continuity artifact 的落点必须遵循 loop 分层，不得一律写成 `progress`：
+   - `dev-loop` 写 `progress`
+   - `doc-loop` 写当前 issue / IBM / pre-brainstorm 产物
+   - `recovery` 写 `recovery` 或允许的等价恢复留痕
+20. 若 runtime 无法直接知道当前 loop 的精确文档路径，至少必须把 `summary_target_hint` 写入 prompt / handoff，由当前 AI 在下一跳先补 continuity，再继续业务推进。
 
 状态词图例：
 - `todo_*`：下一阶段已确定，但尚未开始
@@ -266,10 +282,13 @@ flowchart LR
 1. 优先续接；不支持续接时执行桥接恢复。
 2. 恢复记录必须含 branch/worktree/session 上下文。
 3. 恢复后能回到可执行循环状态。
+4. 额度耗尽、认证失败、账号不可用属于恢复治理，不得静默停机或高频空转重试。
+5. 若工具支持多账号，runtime 必须优先使用非交互 CLI 切换可用账号；当全部账号都不可立即使用时，应切换到最早恢复的账号并 sleep 到 reset 时间。
 
 最小验收证据：
 - 续接或桥接记录
 - 恢复检查点记录
+- 账号切换或 reset backoff 记录（如适用）
 
 执行技能：
 - `skill:recovery-subagent-governance`
@@ -301,6 +320,7 @@ flowchart LR
 4. 代码与文档冲突时，先走代码/测试修复路径。
 5. 规范文档改动必须在独立 `feature/*` + worktree 且绑定实现或门禁证据。
 6. 任一法律门失败时必须阻断提升/发布，并记录修复路径。
+7. 多 worktree 监督与 checkpoint 压力必须以 CLI 能力落地，不得只存在于聊天或人工观察中。
 
 最小验收证据：
 - 命令与状态检查记录

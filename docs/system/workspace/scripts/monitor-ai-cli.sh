@@ -8,11 +8,12 @@ Usage:
     --project <abs_path> \
     --tool <tool> \
     --model <model_or_empty> \
+    --reasoning-effort <effort_or_empty> \
     --mode <auto|step> \
     --prompt-file <abs_file> \
     --pid-file <abs_file> \
     --log-file <abs_file> \
-    --launch-kind <fresh|resume>
+    --launch-kind <fresh|resume|fresh_with_handoff>
 EOF
 }
 
@@ -28,6 +29,7 @@ abs_path_or_fail() {
 project=""
 tool=""
 model=""
+reasoning_effort=""
 mode=""
 prompt_file=""
 pid_file=""
@@ -39,6 +41,7 @@ while [[ $# -gt 0 ]]; do
     --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
     --tool) tool="${2:-}"; shift 2 ;;
     --model) model="${2:-}"; shift 2 ;;
+    --reasoning-effort) reasoning_effort="${2:-}"; shift 2 ;;
     --mode) mode="${2:-}"; shift 2 ;;
     --prompt-file) prompt_file="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
     --pid-file) pid_file="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -63,6 +66,7 @@ launch_codex() {
     args=(exec resume --last --skip-git-repo-check)
   fi
   [[ -n "$model" ]] && args+=(-m "$model")
+  [[ -n "$reasoning_effort" ]] && args+=(-c "model_reasoning_effort=\"$reasoning_effort\"")
   [[ "$mode" == "auto" ]] && args+=(--dangerously-bypass-approvals-and-sandbox)
   exec codex "${args[@]}" - <"$prompt_file"
 }
@@ -101,6 +105,31 @@ launch_test_sleep() {
   exec bash -lc 'echo "[TEST] mock AI CLI started"; sleep 5'
 }
 
+launch_test_compact() {
+  exec bash -lc 'echo "[TEST] mock AI CLI started"; echo "context compacted"; sleep 1'
+}
+
+launch_test_once() {
+  exec bash -lc 'echo "[TEST] mock AI CLI started"; sleep 1'
+}
+
+launch_test_session() {
+  exec bash -lc 'echo "session id: test-session"; echo "[TEST] mock AI CLI started"; sleep 1'
+}
+
+launch_test_route_only() {
+  exec bash -lc "cat <<'EOF'
+[TEST] mock AI CLI started
+selected_tool = test-route-only
+target_skill_or_loop = workspace/skills/doc-ibm-execution/SKILL.md
+\`next_prompt\`：
+```text
+你现在承接第二跳，直接进入 workspace/skills/doc-ibm-execution/SKILL.md 并修改真实文档产物。
+```
+EOF
+sleep 1"
+}
+
 (
   cd "$project"
   case "$tool" in
@@ -108,6 +137,10 @@ launch_test_sleep() {
     iflow) launch_iflow ;;
     kiro-cli) launch_kiro_cli ;;
     test-sleep) launch_test_sleep ;;
+    test-compact) launch_test_compact ;;
+    test-once) launch_test_once ;;
+    test-session) launch_test_session ;;
+    test-route-only) launch_test_route_only ;;
     *)
       echo "[ERROR] unsupported tool: $tool" >&2
       exit 1
