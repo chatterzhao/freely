@@ -12,10 +12,16 @@ required_files=(
 )
 
 errors=0
+warnings=0
 
 fail() {
   echo "[FAIL] $*"
   errors=$((errors + 1))
+}
+
+warn() {
+  echo "[WARN] $*"
+  warnings=$((warnings + 1))
 }
 
 check_file_exists() {
@@ -30,17 +36,41 @@ check_no_tbd() {
   fi
 }
 
+check_entry_naming() {
+  local entry="$1"
+  # 新格式：YYYYMMDD-HHMM--<topic>（时间后双短横线）
+  local new_format="^[0-9]{8}-[0-9]{4}--.+$"
+  # 遗留格式：YYYYMMDD-<topic>（日期后单短横线，topic 可含短横线）
+  local legacy_format="^[0-9]{8}-.+$"
+  
+  if [[ "$entry" =~ $new_format ]]; then
+    return 0
+  elif [[ "$entry" =~ $legacy_format ]]; then
+    warn "pre-brainstorm entry '$entry' uses legacy naming, consider migrating to YYYYMMDD-HHMM--<topic>"
+    return 0
+  else
+    fail "pre-brainstorm entry '$entry' does not match naming convention: YYYYMMDD-HHMM--<topic>"
+    return 1
+  fi
+}
+
 for file in "${required_files[@]}"; do
   check_file_exists "$file"
   check_no_tbd "$file"
 done
 
-mapfile -t entries < <(find docs/pre-brainstorms -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
+entries=()
+while IFS= read -r d; do
+  [[ -d "docs/pre-brainstorms/$d" ]] && entries+=("$d")
+done < <(ls -1 docs/pre-brainstorms/)
+
 if [[ "${#entries[@]}" -eq 0 ]]; then
   fail "no pre-brainstorm entries found under docs/pre-brainstorms"
 fi
 
 for entry in "${entries[@]}"; do
+  check_entry_naming "$entry"
+  
   brainstorm="docs/pre-brainstorms/${entry}/brainstorms.md"
   candidates="docs/pre-brainstorms/${entry}/candidates.md"
   check_file_exists "$brainstorm"
@@ -56,8 +86,13 @@ done
 
 if [[ "$errors" -gt 0 ]]; then
   echo
-  echo "Governance check failed with $errors issue(s)."
+  echo "Governance check failed with $errors error(s), $warnings warning(s)."
   exit 1
 fi
 
-echo "Governance check passed."
+if [[ "$warnings" -gt 0 ]]; then
+  echo
+  echo "Governance check passed with $warnings warning(s)."
+else
+  echo "Governance check passed."
+fi
