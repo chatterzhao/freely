@@ -43,6 +43,34 @@ confirm() {
   [[ "$response" =~ ^[Yy]$ ]]
 }
 
+# 从 auth.json 提取账号信息
+extract_codex_account() {
+  local auth_file="$1"
+  local email=""
+  
+  # 尝试从 JWT id_token 解析 email
+  if command -v python3 &>/dev/null; then
+    email=$(python3 -c "
+import json, sys, base64
+try:
+    data = json.load(open('$auth_file'))
+    id_token = data.get('tokens', {}).get('id_token', '')
+    if id_token:
+        # JWT 格式: header.payload.signature
+        payload = id_token.split('.')[1]
+        # 添加 base64 padding
+        payload += '=' * (4 - len(payload) % 4)
+        decoded = base64.urlsafe_b64decode(payload)
+        claims = json.loads(decoded)
+        print(claims.get('email', ''))
+except:
+    pass
+" 2>/dev/null)
+  fi
+  
+  echo "$email"
+}
+
 # 初始化
 cmd_init() {
   mkdir -p "$AUTH_DIR"
@@ -66,14 +94,14 @@ EOF
     log_info "Created config: $CONFIG_FILE"
   fi
   
-  log_info "Initialized AI CLI profile manager"
+  log_info "Initialized AI CLI account manager"
   log_info "Auth directory: $AUTH_DIR"
 }
 
 # 保存当前登录
 cmd_save() {
   local tool="$1"
-  local account="$2"
+  local account="${2:-}"
   
   case "$tool" in
     codex)
@@ -81,6 +109,17 @@ cmd_save() {
       if [[ ! -f "$auth_file" ]]; then
         log_error "No codex auth found. Run 'codex login' first."
         exit 3
+      fi
+      
+      # 自动提取账号（如果未指定）
+      if [[ -z "$account" ]]; then
+        account=$(extract_codex_account "$auth_file")
+        if [[ -z "$account" ]]; then
+          log_error "Cannot extract account from auth.json. Please specify account name."
+          log_info "Usage: freely ai-cli save codex <account>"
+          exit 2
+        fi
+        log_info "Detected account: $account"
       fi
       
       local target_dir="$AUTH_DIR/codex-$account"
@@ -167,7 +206,7 @@ cmd_list() {
   done < <(ls -1 "$AUTH_DIR" 2>/dev/null || true)
   
   if [[ ${#accounts[@]} -eq 0 ]]; then
-    log_info "No accounts found. Run 'freely ai-cli save <tool> <account>' to create one."
+    log_info "No accounts found. Run 'freely ai-cli save <tool>' to create one."
     return
   fi
   
@@ -189,6 +228,42 @@ cmd_list() {
   esac
 }
 
+# 显示当前账号
+cmd_whoami() {
+  local tool="${1:-codex}"
+  
+  case "$tool" in
+    codex)
+      local auth_file="$HOME/.codex/auth.json"
+      if [[ ! -f "$auth_file" ]]; then
+        case "$FORMAT" in
+          json) echo "{\"tool\": \"codex\", \"account\": null}" ;;
+          *) log_warn "Not logged in" ;;
+        esac
+        exit 0
+      fi
+      
+      local account=$(extract_codex_account "$auth_file")
+      if [[ -z "$account" ]]; then
+        case "$FORMAT" in
+          json) echo "{\"tool\": \"codex\", \"account\": null}" ;;
+          *) log_warn "Cannot determine account" ;;
+        esac
+        exit 0
+      fi
+      
+      case "$FORMAT" in
+        json) echo "{\"tool\": \"codex\", \"account\": \"$account\"}" ;;
+        *) log_info "Current account: $account" ;;
+      esac
+      ;;
+    *)
+      log_error "Unknown tool: $tool"
+      exit 2
+      ;;
+  esac
+}
+
 # 状态
 cmd_status() {
   local tool="${1:-codex}"
@@ -198,14 +273,16 @@ cmd_status() {
       local auth_file="$HOME/.codex/auth.json"
       if [[ -f "$auth_file" ]]; then
         local mtime=$(stat -f "%Sm" "$auth_file" 2>/dev/null || stat -c "%y" "$auth_file" 2>/dev/null || echo "unknown")
+        local account=$(extract_codex_account "$auth_file")
         
         case "$FORMAT" in
           json)
-            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"last_modified\": \"$mtime\"}"
+            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"account\": \"$account\", \"last_modified\": \"$mtime\"}"
             ;;
           *)
             log_info "Tool: codex"
             log_info "Auth: present"
+            log_info "Account: ${account:-unknown}"
             log_info "Last modified: $mtime"
             ;;
         esac
@@ -253,9 +330,10 @@ Usage: freely ai-cli <command> [options]
 
 Commands:
   init                    Initialize account manager
-  save <tool> <account>   Save current login as account
+  save <tool> [account]   Save current login (auto-detect account if not specified)
   switch <tool> [account] Switch to account (interactive if no account)
   list                    List all accounts
+  whoami [tool]           Show current logged-in account
   status [tool]           Show current status
   delete <tool> <account> Delete an account
 
@@ -274,8 +352,9 @@ Exit codes:
 
 Examples:
   freely ai-cli init
-  codex login && freely ai-cli save codex personal
-  freely ai-cli switch codex work --yes
+  codex login && freely ai-cli save codex
+  freely ai-cli whoami
+  freely ai-cli switch codex other@email.com --yes
   freely ai-cli list --format json
 EOF
 }
@@ -309,9 +388,10 @@ main() {
   
   case "$COMMAND" in
     init) cmd_init ;;
-    save) cmd_save "${ARGS[0]}" "${ARGS[1]}" ;;
+    save) cmd_save "${ARGS[0]}" "${ARGS[1]:-}" ;;
     switch) cmd_switch "${ARGS[0]}" "${ARGS[1]:-}" ;;
     list) cmd_list ;;
+    whoami) cmd_whoami "${ARGS[0]:-codex}" ;;
     status) cmd_status "${ARGS[0]:-codex}" ;;
     delete) cmd_delete "${ARGS[0]}" "${ARGS[1]}" ;;
     ""|--help|-h) show_help ;;
