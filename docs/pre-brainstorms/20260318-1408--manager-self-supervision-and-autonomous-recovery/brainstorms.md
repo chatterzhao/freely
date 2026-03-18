@@ -31,6 +31,37 @@ Freely 需要把“主管自检 + 工位巡检 + 自主恢复”提升为 contro
 4. 这种检查不能只靠 Git hook；应落在 runtime hook / cycle post-hook / periodic wakeup。
 5. 主管仍然不直接实现业务；它只做巡检、排班、委派和恢复。
 
+## Role Boundaries
+
+这条能力必须明确分层，避免主管变成“万能执行者”：
+
+1. `manager`
+   - 只负责读取全局工位状态、发现异常、输出清晰委派或清晰告警。
+   - 不直接修业务问题，不代替 worker 做本地恢复，不接管账号切换。
+   - 发现问题后的动作应是：
+     - 指定目标工位；
+     - 指定 owner；
+     - 指定下一步是 `restart / delegate / freeze / merge / cleanup` 中哪一种。
+
+2. `worker`
+   - 只负责自己工位上的 doc loop / dev loop / verification。
+   - 本地 checkpoint、continuity、resume/fresh_with_handoff 由工位 runtime 和 worker 自己配合处理。
+
+3. `runtime / scripts`
+   - 负责 AI 已经无能为力时的脚本恢复动作，例如：
+     - 账号限额后的 `ai switch`
+     - 选择最早恢复账号并等待唤醒
+     - 进程退出后的本工位重启
+   - 如果重启的是主管工位，脚本恢复时继续带主管角色提示；
+     如果重启的是 worker 工位，脚本恢复时继续带 worker 角色提示。
+
+结论：
+- `runtime` 管生存
+- `worker` 管执行
+- `manager` 管编排
+
+主管若发现“账号限额”这类问题，不应自己处理；它只需要识别“该问题的 owner 是本工位 runtime”，然后让脚本链路继续接管。
+
 ## Initial Capability Shape
 
 - `manager-supervision tick`
@@ -39,8 +70,12 @@ Freely 需要把“主管自检 + 工位巡检 + 自主恢复”提升为 contro
   - 写回 `session-state` 的主管监督结论
 - `manager recovery route`
   - 当主管或目标 worker 意外掉线时，自动转入 recovery/delegation handoff
+  - 若异常 owner 属于 `runtime`，只生成结构化恢复目标，不让主管自己下场修
 - `manager continuity`
   - 将“本轮应继续的 worker、冻结列表、异常列表、待恢复列表”作为 continuity artifact，而不是只依赖人工聊天记忆
+- `runtime-owned account recovery`
+  - 限额/认证问题由当前工位 runtime 直接处理
+  - 主管只需看到结果状态，不接管切号逻辑
 
 ## Intended Landing
 
