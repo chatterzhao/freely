@@ -678,7 +678,7 @@ EOF
 }
 
 manager_supervision_alerts() {
-  local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state ai_state
+  local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state ai_state owner next_action anomaly
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || return 0
   while IFS='|' read -r wt_path branch; do
@@ -698,6 +698,8 @@ manager_supervision_alerts() {
       exit_reason="${LAST_EXIT_REASON:-}"
     fi
     [[ "$desired_state" == "running" ]] || continue
+    owner="runtime-owned"
+    next_action="runtime_recovery_requested"
     if [[ -f "$(run_dir_for_project "$wt_path")/supervisor.pid" ]]; then
       local sp
       sp="$(cat "$(run_dir_for_project "$wt_path")/supervisor.pid" 2>/dev/null || true)"
@@ -713,9 +715,11 @@ manager_supervision_alerts() {
       fi
     fi
     if [[ "$supervisor_state" == "down" ]]; then
-      printf -- '- expected_running_worktree_down: branch=%s role=%s exit_reason=%s path=%s\n' "${branch:-unknown}" "${role_hint:-worker}" "${exit_reason:-unknown}" "$wt_path"
+      anomaly="expected_running_worktree_down"
+      printf -- '- %s: branch=%s role=%s owner=%s next_action=%s exit_reason=%s path=%s\n' "$anomaly" "${branch:-unknown}" "${role_hint:-worker}" "$owner" "$next_action" "${exit_reason:-unknown}" "$wt_path"
     elif [[ "$ai_state" == "down" ]]; then
-      printf -- '- expected_running_worktree_degraded: branch=%s role=%s exit_reason=%s path=%s\n' "${branch:-unknown}" "${role_hint:-worker}" "${exit_reason:-unknown}" "$wt_path"
+      anomaly="expected_running_worktree_degraded"
+      printf -- '- %s: branch=%s role=%s owner=%s next_action=%s exit_reason=%s path=%s\n' "$anomaly" "${branch:-unknown}" "${role_hint:-worker}" "$owner" "$next_action" "${exit_reason:-unknown}" "$wt_path"
     fi
   done < <(git -C "$repo_root" worktree list --porcelain | awk '
     /^worktree / { wt=substr($0, 10); br="" }
@@ -736,6 +740,7 @@ Manager supervision alert:
 - 以下工位在控制面中仍应保持运行，但当前已掉线或退化。
 - 在继续普通路由前，先判断这些工位应恢复、冻结还是 cleanup。
 - 这是主管自检信号，不需要人工额外运行 fleet-status 才能发现。
+- 若某条告警标记为 \`owner=runtime-owned\`，主管只做判定与委派；真正切号、等待和重启仍由目标工位 runtime / scripts 接管。
 
 $alerts
 EOF

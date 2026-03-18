@@ -99,6 +99,8 @@ second_prompt="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
 
 grep -q 'Manager supervision alert:' "$second_prompt"
 grep -q 'expected_running_worktree_down:' "$second_prompt"
+grep -q 'owner=runtime-owned' "$second_prompt"
+grep -q 'next_action=runtime_recovery_requested' "$second_prompt"
 grep -q "$WORKER" "$second_prompt"
 
 echo "[PASS] manager prompt auto-surfaces down expected-running workers"
