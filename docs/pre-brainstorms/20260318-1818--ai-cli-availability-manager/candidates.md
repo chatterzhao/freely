@@ -1,8 +1,8 @@
-# Candidates - 20260318-ai-cli-availability-manager
+# Candidates - 20260318-1818--ai-cli-availability-manager
 
 ## Context
 - Source brainstorm: ./brainstorms.md
-- Status: in_research
+- Status: done_research
 
 ## Candidates
 
@@ -15,12 +15,17 @@
   - 对于不支持的工具，确定替代方案（如软链接、配置文件路径参数）
   - 产出 `references/tool-config-matrix.md`
 - priority: P0
-- status: proposed
+- status: done
 - decision_reason: 这一步决定了 skill 的实现路径。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []
 - sequencing_rank: 1
+- resolution: |
+    - codex: 支持 CODEX_HOME 环境变量切换配置目录
+    - iflow: 支持 IFLOW_* 环境变量覆盖配置项，不支持目录切换
+    - kiro: 未安装待确认
+    - 已产出 references/tool-config-matrix.md
 
 ### C-20260318-B
 - title: AI CLI Availability Manager Skill 实现
@@ -33,7 +38,7 @@
   - `references/profile-management.md` 记录 profile 配置规范
   - 与 constitution-guard、laws-enforcer、recovery-subagent-governance 集成
 - priority: P0
-- status: proposed
+- status: done
 - decision_reason: 这是核心功能，必须实现。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -41,6 +46,11 @@
 - sequencing_rank: 2
 - depends_on:
   - C-20260318-A
+- resolution: |
+    - 已创建 SKILL.md 定义核心流程
+    - 已创建 references/tool-config-matrix.md
+    - 已创建 references/limit-patterns.md
+    - 已创建 references/profile-management.md
 
 ### C-20260318-C
 - title: Profile 配置格式设计
@@ -51,7 +61,7 @@
   - 定义配置格式（profile 名称、config_dir 路径、active 标记）
   - 考虑多项目场景下的配置共享与隔离
 - priority: P0
-- status: proposed
+- status: done
 - decision_reason: 配置格式影响 skill 的输入接口设计。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -59,6 +69,11 @@
 - sequencing_rank: 2
 - depends_on:
   - C-20260318-A
+- resolution: |
+    - 已在 references/profile-management.md 中定义配置格式
+    - 全局配置：~/.config/freely/ai-cli-profiles.yaml
+    - 项目级覆盖：.env/ai-cli-profiles.yaml
+    - 支持环境变量引用避免明文存储敏感信息
 
 ### C-20260318-D
 - title: 限流检测与自动切换逻辑
@@ -70,7 +85,7 @@
   - 定义 profile 耗尽时的兜底行为（暂停循环 / 报警 / 等待冷却）
   - 与 recovery-subagent-governance 集成
 - priority: P1
-- status: proposed
+- status: done
 - decision_reason: 可以先实现手动切换验证框架，再逐步完善自动化。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -79,3 +94,8 @@
 - depends_on:
   - C-20260318-B
   - C-20260318-C
+- resolution: |
+    - 已在 references/limit-patterns.md 中定义限流检测模式
+    - 已在 SKILL.md 中定义切换流程
+    - 默认策略：静默自动切换，记录事件到 recovery
+    - 兜底行为：全部 profile 失效时暂停循环，通知用户

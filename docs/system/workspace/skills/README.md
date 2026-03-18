@@ -34,3 +34,4 @@
 2. `laws-enforcer`（验收门禁）
 3. 领域工作流技能（`auto/doc/dev/branch`）
 4. 异常技能（`premerge-reconcile`）按需使用
+- `skill:ai-cli-availability-manager` -> `ai-cli-availability-manager/SKILL.md`
