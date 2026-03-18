@@ -259,6 +259,41 @@
 - next_focus: `I-20260308-0101`
 - next_route: `doc-ibm-execution`
 
+### 更新（2026-03-18 checkpoint verification refresh）
+- issue: `I-20260318-0930`
+- branch: `feature/checkpoint-commit-and-multi-worktree-supervision-governance-20260318-045109`
+- worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260318-045109-feature-checkpoint-commit-and-multi-worktree-supervision-governance`
+- route_decision: `milestones -> committed_issues -> dev-loop-execution -> in_verification`
+- selected_tool: `codex`
+- why_selected:
+  - 当前问题已具备稳定 issue 边界，且需要在仓库内直接补 verification continuity 与状态回写
+  - 当前 `AI_TOOL=codex`，因此不能只输出 `next_prompt`，必须在当前会话继续第二跳
+- next_prompt: |
+    继续以 `skill:dev-loop-execution` 承接 `I-20260318-0930` 的 `completion_verification`；不要重开实现。先按项目级工位快照确认只有当前工位为 dirty，判断这些改动是否仍在本 issue ownership 内；若是，则补 verification continuity、监督排序与 promote/cleanup 前提说明；若不是，则记录分流方案。同步回写 `docs/milestones.md`、issue 文档与研究阶段等价 continuity 留痕，并保留 `selected_tool=codex` 与路由依据。
+- project-level supervision judgment:
+  - 当前项目工位总览为 `total=6, dirty=1`，仅当前 worktree 为 dirty；其余工位保持冻结待核对
+  - `./bin/checkpoint-guard` 返回 `checkpoint_required: no`，说明虽然当前工位仍脏，但尚未进入必须先切 checkpoint commit 的预算区间
+  - 当前 dirty 改动位于本 issue 的 verification continuity 范围内，不需要分流到其他 worktree；但项目仍未达到 promote / cleanup 前提
+  - 本轮只把 `I-20260318-0930` 推进到 `in_verification`，不跨界替其他 issue 宣告完成
+- 已执行 TEST:
+  - `bash docs/system/workspace/scripts/tests/test-checkpoint-guard`
+  - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-checkpoint-governance`
+  - `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
+  - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
+- review 证据:
+  - `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/code-reviews/20260318-checkpoint-and-fleet-verification.md`
+- promote 前置检查:
+  - `./bin/wt-status-all`
+  - 结果摘要：`Summary: total=6, dirty=1`
+  - `./bin/checkpoint-guard`：`checkpoint_required: no`
+  - `./bin/governance-check`：`passed with 10 warning(s)`，均为 legacy pre-brainstorm naming 提示
+- 当前结论:
+  - `I-20260318-0930` 已从 `in_dev` 推进到 `in_verification`
+  - runtime/status 的 dirty budget、project-level worktree summary、fleet snapshot 注入与脚本级测试已形成最小闭环
+  - 主管工位上的首跳已区分 `MANAGER_MODE=true`；`develop/main/pre-test-merge` 只做监督、委派与 continuity，不再在受保护分支直接继续第二跳实现
+  - 下一轮应优先回到 `I-20260307-1201` 与 `I-20260308-0101` 做 completion verification / cleanup 收口
+
 ## 变更（2026-03-16 状态同步治理 verification）
 
 ### 等价执行证据

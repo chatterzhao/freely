@@ -44,6 +44,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 3. 在可并行且写入范围不冲突的任务上，使用 subagent 提高效率。
 4. 主管会话自己的职责是排班、监督、合并节奏和恢复决策；不要把这部分完全外包给 subagent。
 5. 会话轮换前先写 continuity，至少包含项目级工位快照和下一轮监督优先级。
+6. 若主管运行在 `develop` / `main` / `pre-test-merge`，它是只读管理工位；真实 doc-loop / dev-loop 必须在 feature worktree 的 worker 会话中执行。
 
 ## pre-brainstorms 触发
 当任一条件成立时，经 `context-source-skill` 判定后进入 `doc-pre-brainstorm-execution`：
