@@ -145,7 +145,7 @@ stop_marker_file() {
 discover_supervisor_pid() {
   local project="$1"
   ps -axo pid=,command= | awk -v p="$project" '
-    index($0, "runtime/freely start --project") && index($0, p) {print $1; exit}
+    index($0, "runtime/freely start") && (index($0, "--project " p) || index($0, "--project=" p)) {print $1; exit}
   '
 }
 
@@ -154,7 +154,7 @@ pid_matches_project() {
   [[ -n "$pid" ]] || return 1
   kill -0 "$pid" 2>/dev/null || return 1
   ps -p "$pid" -o command= 2>/dev/null | awk -v p="$project" -v e="$expected" '
-    index($0, e) && index($0, p) { found=1 }
+    index($0, e) && (index($0, "--project " p) || index($0, "--project=" p) || index($0, "-C " p) || index($0, " -C" p)) { found=1 }
     END { exit found ? 0 : 1 }
   '
 }
