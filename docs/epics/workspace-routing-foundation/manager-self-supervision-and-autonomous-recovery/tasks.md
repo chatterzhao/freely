@@ -1,0 +1,9 @@
+# Tasks: manager-self-supervision-and-autonomous-recovery
+
+- [x] materialize durable workcell state
+- [x] add manager supervision alert routing
+- [x] tighten pid ownership matching
+- [x] expose desired runtime and exit reason in fleet status
+- [x] add tests for outage alert and pid ownership
+- [x] clarify manager / worker / runtime role boundaries
+- [x] materialize explicit manager-agent and worker-agent roles

@@ -21,6 +21,6 @@
   - 当异常 owner 属于本工位 runtime 时，主管只输出清晰恢复目标，不直接处理。
   - 账号限额后的切号与重启仍由当前工位脚本链完成，主管只负责观察与编排。
   - 至少有一个测试锁住“后台失活不需人工检查即可被主管发现”的行为。
-- promoted_issue_path: pending://issue-materialization
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
 - session_refs: []
-- milestone: pending://milestone-binding
+- milestone: `M-20260306-workspace-routing-foundation`
