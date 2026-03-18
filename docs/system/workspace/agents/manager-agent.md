@@ -36,6 +36,7 @@
 - 不直接修复 worker 本地业务问题
 - 不处理账号切换、限额等待或进程级恢复
 - 不绕过 feature worktree 在受保护主管工位写实现产物
+- 不假定 AI 能在“本轮响应已经结束后”继续自启或热修复自身进程
 
 ## 与其他角色的边界
 
@@ -46,6 +47,11 @@
 说明：
 - `runtime_recovery_requested` 是管理决策，不是主管自己执行脚本恢复。
 - 真正的切号、sleep/recheck、进程重启仍由对应工位的 runtime / scripts 处理。
+- 特别是以下情况必须判为 `runtime-owned`：
+  - 当前 AI 响应已经结束
+  - 目标 supervisor / ai 进程已经退出
+  - 命中账号限额、认证失败、账号不可用
+  - `context compacted`、fresh session rotation 后需要新进程续接
 
 ## 完成标志
 

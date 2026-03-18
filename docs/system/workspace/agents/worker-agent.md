@@ -24,12 +24,14 @@
 - 不判断其他 worktree 的合并/冻结/清理策略
 - 不接管其他 worker 的恢复
 - 不在 `develop` / `main` / `pre-test-merge` 上直接执行
+- 不假定自己能在响应结束、进程退出或限额后继续“自我恢复”
 
 ## 与其他角色的边界
 
 - `manager-agent` 负责任务编排与委派
 - `runtime` 负责账号切换、sleep/recheck、进程重启
 - `worker-agent` 只对自己的 issue 执行结果负责
+- 当发生进程退出、账号限额、认证失败、`context compacted` 需要新进程续接时，worker 只负责记录 blocker / continuity，不负责恢复本身
 
 ## 完成标志
 

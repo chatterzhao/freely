@@ -49,8 +49,12 @@ Freely 需要把“主管自检 + 工位巡检 + 自主恢复”提升为 contro
 
 3. `runtime / scripts`
    - 负责 AI 已经无能为力时的脚本恢复动作，例如：
+     - AI 响应已经结束，当前会话不可能再“自己启动自己”
+     - 进程已经退出或 supervisor/worker 已经消失，当前 AI 不可能再自行 fork/restart
      - 账号限额后的 `ai switch`
+     - 认证失败、token 失效、CLI 退出码要求重新登录或重新选择账号
      - 选择最早恢复账号并等待唤醒
+     - `context compacted` / 会话轮换后，由脚本重新拉起新进程并带上 continuity / 角色提示
      - 进程退出后的本工位重启
    - 如果重启的是主管工位，脚本恢复时继续带主管角色提示；
      如果重启的是 worker 工位，脚本恢复时继续带 worker 角色提示。
@@ -62,6 +66,21 @@ Freely 需要把“主管自检 + 工位巡检 + 自主恢复”提升为 contro
 
 主管若发现“账号限额”这类问题，不应自己处理；它只需要识别“该问题的 owner 是本工位 runtime”，然后让脚本链路继续接管。
 这里的“接管”是指主管输出恢复判定，实际切号、等待和重启仍由 runtime 执行。
+
+## AI-Powerless Boundary
+
+下列情况应被明确视为“AI/manager/worker 无能为力”，只能交由 runtime / scripts：
+
+1. 当前 AI 输出已经结束，无法在自身响应终止后再次调用自己。
+2. 目标进程已退出、被杀掉或尚未启动，AI 无法在不存在的进程内继续执行恢复。
+3. 命中 `primary` / `secondary` 限额、认证失败或账号失效时，当前 AI 往往已经不能继续可靠地产出动作。
+4. 发生 `context compacted`、fresh session rotation、resume after exit 时，需要脚本重新发起带角色提示的新工具进程。
+5. 需要等待未来某个 `reset_at` 时刻并在窗口到达后唤醒，AI 不能假定自己在睡眠后仍持续可用；必须由外层 runtime 重检并重新启动。
+
+因此：
+- `manager` 只能把这类情况标记为 `runtime-owned`
+- `worker` 只能回写 blocker / continuity
+- 真正的恢复动作必须由 runtime / scripts 落地
 
 ## Initial Capability Shape
 

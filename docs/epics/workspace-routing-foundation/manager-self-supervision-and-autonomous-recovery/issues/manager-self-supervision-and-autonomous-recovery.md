@@ -29,6 +29,7 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
 3. 修正 PID 归属误判，避免 `develop` 把其他 worktree 的 supervisor 认成自己。
 4. 在 fleet 视图中显式展示 `desired runtime / role / exit reason`。
 5. 把 `manager-agent` / `worker-agent` 的职责边界物化为正式角色文档。
+6. 明确列出哪些恢复场景属于 AI 无能为力，必须由 runtime / scripts 接管。
 
 ## Acceptance
 
@@ -37,6 +38,7 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
 - 主管 prompt 在发现应运行工位掉线时，优先进入 supervision / recovery / delegation，而不是继续普通路由。
 - 主管只做监督、编排、委派和告警；若判断需要恢复，只输出 `runtime_recovery_requested` 一类管理决策，账号切换、等待和重启仍归 runtime。
 - 仓库内存在显式的 `manager-agent` 与 `worker-agent` 角色文档，而不是只靠 lead-agent 隐式约定。
+- 文档明确规定：响应结束、进程退出、限额/认证失败、`context compacted` 后的新进程续接，都属于 `runtime-owned`，而不是要求 manager/worker 自行恢复。
 
 ## Completion
 
