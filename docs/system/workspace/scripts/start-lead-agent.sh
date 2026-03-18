@@ -25,7 +25,7 @@ abs_path_or_fail() {
 
 project_dirty_entries() {
   local project="$1"
-  git -C "$project" status --porcelain 2>/dev/null | wc -l | tr -d ' '
+  (git -C "$project" status --porcelain 2>/dev/null || true) | wc -l | tr -d ' '
 }
 
 project_clean_state() {

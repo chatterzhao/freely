@@ -124,9 +124,12 @@
 - 20260318-0715--ai-autonomy-checkpoint-commit-governance
   - brainstorms: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/candidates.md
-
-## 收敛
-- 摘要: docs/pre-brainstorms/CONVERGENCE.md
 - 20260318-1210--rate-limit-recheck-and-wakeup
   - brainstorms: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/candidates.md
+- 20260318-1408--manager-self-supervision-and-autonomous-recovery
+  - brainstorms: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md
+
+## 收敛
+- 摘要: docs/pre-brainstorms/CONVERGENCE.md
