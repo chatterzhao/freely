@@ -73,5 +73,7 @@ Freely 当前已经会 worktree 隔离、session handoff、rate-limit account sw
 ## Next
 
 - 保持 `in_verification`。当前实现、脚本测试与 review 已落盘，但 promote / cleanup 证据尚未形成。
-- `./bin/wt-status-all` 当前返回 `Summary: total=6, dirty=1`；当前唯一 dirty 工位就是本 issue 所在 worktree，且脏改动属于 verification continuity，自主治理上无需分流到其他 worktree，但仍未满足 promote / cleanup 前提。
+- 当前项目级工位快照已更新到 `Summary: total=8, dirty=1`；新增的其他工位仍为 `CLEAN` 且 phase/issue 缺失，因此继续冻结待核对。当前唯一 dirty 工位仍是本 issue 所在 worktree，且脏改动属于 verification continuity，自主治理上无需分流到其他 worktree，但仍未满足 promote / cleanup 前提。
+- 本轮 verification 暴露出一个边界外新问题：`commit-first after checkpoint-ready` 自治治理。该问题已按法律要求回写到 `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/` 并同步进入 `docs/milestones.md` 的 `candidate_issues`，不再混入当前 issue scope。
+- 本轮首跳重新扫描 `milestones / progress-recovery / review-test / human chat-session evidence / github issue / PROJECT_INTENT` 后，仍判定最高优先池为当前 milestone continuation；`C-20260318-0715-A` 继续保留在 pre-brainstorm，不抢占当前 issue 的 verification continuity。
 - 项目级监督排序保持为：其他 CLEAN 工位继续冻结待核对；当前工位先完成本 issue 的 verification continuity，然后再回到 `I-20260307-1201` 与 `I-20260308-0101` 做 completion verification / cleanup 收口。

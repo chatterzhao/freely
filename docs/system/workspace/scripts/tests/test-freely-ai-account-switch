@@ -278,3 +278,81 @@ bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT_SECONDARY" >/dev/null 2>&1 
 wait "$secondary_supervisor_pid" 2>/dev/null || true
 
 echo "[PASS] freely auto-switches codex account after secondary rate-limit exhaustion"
+
+PROJECT_RECHECK="$TMP_DIR/project-recheck"
+CODEX_HOME_DIR_RECHECK="$TMP_DIR/codex-home-recheck"
+mkdir -p \
+  "$PROJECT_RECHECK/bin" \
+  "$PROJECT_RECHECK/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_RECHECK/.freely/run" \
+  "$PROJECT_RECHECK/.freely/logs" \
+  "$CODEX_HOME_DIR_RECHECK/sessions/2026/03/17"
+
+git init -q "$PROJECT_RECHECK"
+git -C "$PROJECT_RECHECK" checkout -q -b feature/test-ai-account-switch-recheck
+
+cp "$PROJECT/docs/PROJECT_INTENT.md" "$PROJECT_RECHECK/docs/PROJECT_INTENT.md"
+cp "$PROJECT/docs/CONSTITUTION.md" "$PROJECT_RECHECK/docs/CONSTITUTION.md"
+cp "$PROJECT/docs/LAWS.md" "$PROJECT_RECHECK/docs/LAWS.md"
+cp "$PROJECT/AGENTS.md" "$PROJECT_RECHECK/AGENTS.md"
+cp "$PROJECT/docs/pre-brainstorms/README.md" "$PROJECT_RECHECK/docs/pre-brainstorms/README.md"
+cp "$PROJECT/docs/pre-brainstorms/INDEX.md" "$PROJECT_RECHECK/docs/pre-brainstorms/INDEX.md"
+cp "$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" "$PROJECT_RECHECK/docs/pre-brainstorms/CONVERGENCE.md"
+cp "$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" "$PROJECT_RECHECK/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md"
+cp "$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" "$PROJECT_RECHECK/docs/pre-brainstorms/20260309-0000--sample/candidates.md"
+cp "$PROJECT/.freely/config.env" "$PROJECT_RECHECK/.freely/config.env"
+cp "$PROJECT/bin/ai" "$PROJECT_RECHECK/bin/ai"
+chmod +x "$PROJECT_RECHECK/bin/ai"
+
+cat >"$MOCK_BIN/codex-recheck" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+counter_file="${TMP_DIR:?}/codex-recheck.counter"
+count=0
+if [[ -f "$counter_file" ]]; then
+  count="$(cat "$counter_file")"
+fi
+count=$((count + 1))
+printf '%s' "$count" >"$counter_file"
+
+if [[ "$count" -eq 1 ]]; then
+  echo "session id: test-recheck-session"
+  echo "You've hit your usage limit"
+else
+  echo "session id: test-recheck-session-2"
+  echo "[TEST] resumed after shorter cooldown became available"
+fi
+sleep 1
+EOF
+chmod +x "$MOCK_BIN/codex-recheck"
+
+cat >"$CODEX_HOME_DIR_RECHECK/sessions/2026/03/17/rollout-test-recheck-session.jsonl" <<'EOF'
+{"type":"token_count","info":{"total_token_usage":{"total_tokens":1200},"last_token_usage":{"total_tokens":1200},"model_context_window":258400},"rate_limits":{"primary":{"used_percent":100.0,"window_minutes":300,"resets_at":4102444800},"secondary":{"used_percent":0.0,"window_minutes":10080,"resets_at":4103049600}}}
+EOF
+
+cat >"$CODEX_HOME_DIR_RECHECK/sessions/2026/03/17/rollout-test-recheck-session-2.jsonl" <<'EOF'
+{"type":"token_count","info":{"total_token_usage":{"total_tokens":400},"last_token_usage":{"total_tokens":400},"model_context_window":258400},"rate_limits":{"primary":{"used_percent":5.0,"window_minutes":300,"resets_at":4102444800},"secondary":{"used_percent":5.0,"window_minutes":10080,"resets_at":4103049600}}}
+EOF
+
+ln -sf "$MOCK_BIN/codex-recheck" "$MOCK_BIN/codex"
+printf 'work@example-com\t1\npersonal@example-com\t4102444800\n' >"$PROJECT_RECHECK/.freely/run/codex-account-cooldowns.tsv"
+printf 'personal@example-com' >"$TMP_DIR/active-account-recheck"
+
+AI_SWITCH_LOG="$TMP_DIR/ai-switch-recheck.log" AI_SWITCH_STATE="$TMP_DIR/active-account-recheck" CODEX_HOME="$CODEX_HOME_DIR_RECHECK" TMP_DIR="$TMP_DIR" PATH="$MOCK_BIN:$PATH" \
+  bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_RECHECK" >/dev/null 2>&1 &
+recheck_supervisor_pid=$!
+
+for _ in $(seq 1 80); do
+  if [[ -f "$TMP_DIR/ai-switch-recheck.log" ]] && grep -q 'switch codex work@example-com --yes' "$TMP_DIR/ai-switch-recheck.log"; then
+    break
+  fi
+  sleep 0.25
+done
+
+grep -q 'switch codex work@example-com --yes' "$TMP_DIR/ai-switch-recheck.log"
+
+bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT_RECHECK" >/dev/null 2>&1 || true
+wait "$recheck_supervisor_pid" 2>/dev/null || true
+
+echo "[PASS] freely rechecks cooldowns and wakes up when a shorter account window becomes available"
