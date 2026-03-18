@@ -239,6 +239,24 @@ extract_latest_codex_primary_rate_limit_reset_at_from_jsonl() {
   printf '%s\n' "$line" | sed -n 's/.*"primary":{"used_percent":[0-9.][0-9.]*,"window_minutes":[0-9][0-9]*,"resets_at":\([0-9][0-9]*\).*/\1/p' | tail -n 1
 }
 
+extract_latest_codex_secondary_rate_limit_used_percent_from_jsonl() {
+  local jsonl_path="$1"
+  local line
+  [[ -f "$jsonl_path" ]] || return 0
+  line="$(rg '"type":"token_count"' "$jsonl_path" | rg '"secondary":\{"used_percent":' | tail -n 1 || true)"
+  [[ -n "$line" ]] || return 0
+  printf '%s\n' "$line" | sed -n 's/.*"secondary":{"used_percent":\([0-9.][0-9.]*\).*/\1/p' | tail -n 1
+}
+
+extract_latest_codex_secondary_rate_limit_reset_at_from_jsonl() {
+  local jsonl_path="$1"
+  local line
+  [[ -f "$jsonl_path" ]] || return 0
+  line="$(rg '"type":"token_count"' "$jsonl_path" | rg '"secondary":\{"used_percent":' | tail -n 1 || true)"
+  [[ -n "$line" ]] || return 0
+  printf '%s\n' "$line" | sed -n 's/.*"secondary":{"used_percent":[0-9.][0-9.]*,"window_minutes":[0-9][0-9]*,"resets_at":\([0-9][0-9]*\).*/\1/p' | tail -n 1
+}
+
 ratio_meets_threshold() {
   local ratio="$1" threshold="$2"
   [[ -n "$ratio" && -n "$threshold" ]] || return 1
@@ -249,6 +267,26 @@ rate_limit_exhausted() {
   local used_percent="$1"
   [[ -n "$used_percent" ]] || return 1
   awk -v used_percent="$used_percent" 'BEGIN { exit !(used_percent >= 100) }'
+}
+
+codex_rate_limit_reason_from_usage() {
+  local primary_used_percent="$1" secondary_used_percent="$2"
+  if rate_limit_exhausted "$secondary_used_percent"; then
+    printf 'secondary_rate_limit_exhausted\n'
+    return 0
+  fi
+  if rate_limit_exhausted "$primary_used_percent"; then
+    printf 'primary_rate_limit_exhausted\n'
+    return 0
+  fi
+}
+
+codex_rate_limit_reset_at_for_reason() {
+  local reason="$1" primary_resets_at="$2" secondary_resets_at="$3"
+  case "$reason" in
+    secondary_rate_limit_exhausted) printf '%s\n' "$secondary_resets_at" ;;
+    primary_rate_limit_exhausted) printf '%s\n' "$primary_resets_at" ;;
+  esac
 }
 
 seconds_until_epoch() {
@@ -353,6 +391,8 @@ load_session_state_or_defaults() {
   LAST_CONTEXT_RATIO=""
   LAST_PRIMARY_RATE_LIMIT_USED_PERCENT=""
   LAST_PRIMARY_RATE_LIMIT_RESETS_AT=""
+  LAST_SECONDARY_RATE_LIMIT_USED_PERCENT=""
+  LAST_SECONDARY_RATE_LIMIT_RESETS_AT=""
   LAST_ROUTE_ONLY_HANDOFF="0"
   LAST_ACTIVE_ACCOUNT=""
   LAST_ACCOUNT_SWITCH_REASON=""
@@ -370,7 +410,7 @@ load_session_state_or_defaults() {
 }
 
 write_session_state() {
-  local project="$1" tool_session_id="$2" tool_jsonl_path="$3" launch_kind="$4" rotation_reason="$5" cycle_log="$6" context_compacted="$7" context_ratio="$8" primary_used_percent="$9" primary_resets_at="${10}" route_only_handoff="${11}" route_only_streak="${12}" resume_streak="${13}" active_account="${14}" account_switch_reason="${15}" account_switch_at="${16}" project_dirty_entries="${17}" worktree_summary_total="${18}" worktree_summary_dirty="${19}"
+  local project="$1" tool_session_id="$2" tool_jsonl_path="$3" launch_kind="$4" rotation_reason="$5" cycle_log="$6" context_compacted="$7" context_ratio="$8" primary_used_percent="$9" primary_resets_at="${10}" secondary_used_percent="${11}" secondary_resets_at="${12}" route_only_handoff="${13}" route_only_streak="${14}" resume_streak="${15}" active_account="${16}" account_switch_reason="${17}" account_switch_at="${18}" project_dirty_entries="${19}" worktree_summary_total="${20}" worktree_summary_dirty="${21}"
   local state_file
   state_file="$(session_state_file "$project")"
   cat >"$state_file" <<EOF
@@ -383,6 +423,8 @@ LAST_CONTEXT_COMPACTED="$context_compacted"
 LAST_CONTEXT_RATIO="$context_ratio"
 LAST_PRIMARY_RATE_LIMIT_USED_PERCENT="$primary_used_percent"
 LAST_PRIMARY_RATE_LIMIT_RESETS_AT="$primary_resets_at"
+LAST_SECONDARY_RATE_LIMIT_USED_PERCENT="$secondary_used_percent"
+LAST_SECONDARY_RATE_LIMIT_RESETS_AT="$secondary_resets_at"
 LAST_ROUTE_ONLY_HANDOFF="$route_only_handoff"
 LAST_ACTIVE_ACCOUNT="$active_account"
 LAST_ACCOUNT_SWITCH_REASON="$account_switch_reason"
@@ -901,8 +943,9 @@ cmd_start() {
     local rc=$?
     set -e
     local child_pid tool_session_id tool_jsonl_path context_compacted context_ratio route_only_handoff
-    local primary_rate_limit_used_percent primary_rate_limit_resets_at next_restart_delay
+    local primary_rate_limit_used_percent primary_rate_limit_resets_at secondary_rate_limit_used_percent secondary_rate_limit_resets_at next_restart_delay
     local active_account account_switch_reason account_switch_at switched_account earliest_reset_info earliest_reset_account earliest_reset_at
+    local rate_limit_reason rate_limit_reset_at
     local dirty_entries worktree_total worktree_dirty summary
     child_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
     tool_session_id="$(extract_tool_session_id_from_log "$AI_TOOL" "$cycle_log")"
@@ -910,6 +953,8 @@ cmd_start() {
     context_ratio=""
     primary_rate_limit_used_percent=""
     primary_rate_limit_resets_at=""
+    secondary_rate_limit_used_percent=""
+    secondary_rate_limit_resets_at=""
     active_account=""
     account_switch_reason=""
     account_switch_at=""
@@ -917,6 +962,8 @@ cmd_start() {
     earliest_reset_info=""
     earliest_reset_account=""
     earliest_reset_at=""
+    rate_limit_reason=""
+    rate_limit_reset_at=""
     dirty_entries="0"
     worktree_total="0"
     worktree_dirty="0"
@@ -926,6 +973,8 @@ cmd_start() {
       context_ratio="$(extract_latest_codex_context_ratio_from_jsonl "$tool_jsonl_path")"
       primary_rate_limit_used_percent="$(extract_latest_codex_primary_rate_limit_used_percent_from_jsonl "$tool_jsonl_path")"
       primary_rate_limit_resets_at="$(extract_latest_codex_primary_rate_limit_reset_at_from_jsonl "$tool_jsonl_path")"
+      secondary_rate_limit_used_percent="$(extract_latest_codex_secondary_rate_limit_used_percent_from_jsonl "$tool_jsonl_path")"
+      secondary_rate_limit_resets_at="$(extract_latest_codex_secondary_rate_limit_reset_at_from_jsonl "$tool_jsonl_path")"
     fi
     if [[ "$AI_TOOL" == "codex" ]]; then
       active_account="$(codex_current_account "$PROJECT_ROOT")"
@@ -951,6 +1000,8 @@ cmd_start() {
     LAST_CONTEXT_RATIO="$context_ratio"
     LAST_PRIMARY_RATE_LIMIT_USED_PERCENT="$primary_rate_limit_used_percent"
     LAST_PRIMARY_RATE_LIMIT_RESETS_AT="$primary_rate_limit_resets_at"
+    LAST_SECONDARY_RATE_LIMIT_USED_PERCENT="$secondary_rate_limit_used_percent"
+    LAST_SECONDARY_RATE_LIMIT_RESETS_AT="$secondary_rate_limit_resets_at"
     LAST_ROUTE_ONLY_HANDOFF="$route_only_handoff"
     LAST_ACTIVE_ACCOUNT="$active_account"
     LAST_PROJECT_DIRTY_ENTRIES="$dirty_entries"
@@ -974,9 +1025,11 @@ cmd_start() {
       ROUTE_ONLY_STREAK_CURRENT=0
     fi
     if [[ "$AI_TOOL" == "codex" ]]; then
-      if rate_limit_exhausted "${primary_rate_limit_used_percent:-}"; then
-        account_switch_reason="primary_rate_limit_exhausted"
-        codex_record_account_cooldown "$PROJECT_ROOT" "$active_account" "${primary_rate_limit_resets_at:-}"
+      rate_limit_reason="$(codex_rate_limit_reason_from_usage "${primary_rate_limit_used_percent:-}" "${secondary_rate_limit_used_percent:-}")"
+      rate_limit_reset_at="$(codex_rate_limit_reset_at_for_reason "${rate_limit_reason:-}" "${primary_rate_limit_resets_at:-}" "${secondary_rate_limit_resets_at:-}")"
+      if [[ -n "$rate_limit_reason" ]]; then
+        account_switch_reason="$rate_limit_reason"
+        codex_record_account_cooldown "$PROJECT_ROOT" "$active_account" "${rate_limit_reset_at:-}"
       elif log_has_auth_failure "$cycle_log"; then
         account_switch_reason="auth_failure"
       fi
@@ -989,7 +1042,7 @@ cmd_start() {
           LAST_ACCOUNT_SWITCH_REASON="$account_switch_reason"
           LAST_ACCOUNT_SWITCH_AT="$account_switch_at"
           next_restart_delay="${RESTART_DELAY:-2}"
-        elif rate_limit_exhausted "${primary_rate_limit_used_percent:-}"; then
+        elif [[ -n "$rate_limit_reason" ]]; then
           earliest_reset_info="$(select_earliest_reset_codex_account "$PROJECT_ROOT" "$active_account")"
           earliest_reset_account="${earliest_reset_info%%|*}"
           earliest_reset_at="${earliest_reset_info##*|}"
@@ -1009,9 +1062,9 @@ cmd_start() {
       fi
     fi
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY"
 
-    log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
+    log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, secondary_rate_limit_used_percent=${secondary_rate_limit_used_percent:-unavailable}, secondary_rate_limit_resets_at=${secondary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
     rm -f "$child_pid_file"
 
     FIRST_ROUND=false
@@ -1020,14 +1073,14 @@ cmd_start() {
       log_error "reached MAX_RESTARTS=${MAX_RESTARTS}, stopping"
       exit 1
     fi
-    if rate_limit_exhausted "${primary_rate_limit_used_percent:-}"; then
+    if [[ -n "$rate_limit_reason" ]]; then
       if [[ -n "$switched_account" && "${account_switch_reason:-}" != "all_accounts_cooling_down" ]]; then
-        log_info "rate-limit hit on previous codex account; continuing with switched account=${switched_account}"
+        log_info "rate-limit hit on previous codex account (reason=${rate_limit_reason}); continuing with switched account=${switched_account}"
       elif [[ -n "$earliest_reset_account" && -n "$earliest_reset_at" ]]; then
         log_warn "all codex accounts cooling down; switched to earliest-reset account=${earliest_reset_account}, sleeping until reset_at=${earliest_reset_at} (sleep=${next_restart_delay:-0}s)"
       else
-        next_restart_delay="$(seconds_until_epoch "${primary_rate_limit_resets_at:-}")"
-        log_warn "primary rate limit exhausted; backing off until reset_at=${primary_rate_limit_resets_at:-unavailable} (sleep=${next_restart_delay:-0}s)"
+        next_restart_delay="$(seconds_until_epoch "${rate_limit_reset_at:-}")"
+        log_warn "${rate_limit_reason} detected; backing off until reset_at=${rate_limit_reset_at:-unavailable} (sleep=${next_restart_delay:-0}s)"
       fi
     fi
     sleep "$next_restart_delay"
@@ -1075,6 +1128,8 @@ cmd_status() {
   echo "last_context_ratio: ${LAST_CONTEXT_RATIO:-unavailable}"
   echo "last_primary_rate_limit_used_percent: ${LAST_PRIMARY_RATE_LIMIT_USED_PERCENT:-unavailable}"
   echo "last_primary_rate_limit_resets_at: ${LAST_PRIMARY_RATE_LIMIT_RESETS_AT:-unavailable}"
+  echo "last_secondary_rate_limit_used_percent: ${LAST_SECONDARY_RATE_LIMIT_USED_PERCENT:-unavailable}"
+  echo "last_secondary_rate_limit_resets_at: ${LAST_SECONDARY_RATE_LIMIT_RESETS_AT:-unavailable}"
   echo "last_route_only_handoff: ${LAST_ROUTE_ONLY_HANDOFF:-0}"
   echo "last_active_account: ${LAST_ACTIVE_ACCOUNT:-unavailable}"
   echo "last_account_switch_reason: ${LAST_ACCOUNT_SWITCH_REASON:-unavailable}"

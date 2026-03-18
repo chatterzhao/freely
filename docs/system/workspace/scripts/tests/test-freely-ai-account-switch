@@ -16,6 +16,9 @@ mkdir -p \
   "$MOCK_BIN" \
   "$CODEX_HOME_DIR/sessions/2026/03/17"
 
+git init -q "$PROJECT"
+git -C "$PROJECT" checkout -q -b feature/test-ai-account-switch
+
 cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
 EOF
@@ -75,6 +78,8 @@ ROTATE_ON_CONTEXT_COMPACTED=1
 SESSION_HANDOFF_TAIL_LINES=10
 CONTEXT_WARN_RATIO=0.50
 CONTEXT_ROTATE_RATIO=0.70
+CHECKPOINT_WARN_DIRTY_ENTRIES=40
+CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
 EOF
 
 cat >"$PROJECT/bin/ai" <<'EOF'
@@ -161,10 +166,115 @@ cat >"$CODEX_HOME_DIR/sessions/2026/03/17/rollout-test-session-2.jsonl" <<'EOF'
 EOF
 
 AI_SWITCH_LOG="$TMP_DIR/ai-switch.log" AI_SWITCH_STATE="$TMP_DIR/active-account" CODEX_HOME="$CODEX_HOME_DIR" TMP_DIR="$TMP_DIR" PATH="$MOCK_BIN:$PATH" \
-  bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
+  bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 &
+primary_supervisor_pid=$!
+
+for _ in $(seq 1 40); do
+  if [[ -f "$TMP_DIR/ai-switch.log" ]] && grep -q 'switch codex work@example-com --yes' "$TMP_DIR/ai-switch.log"; then
+    break
+  fi
+  sleep 0.25
+done
+
+for _ in $(seq 1 40); do
+  if [[ -f "$PROJECT/.freely/run/session-state.env" ]] && grep -q 'LAST_ACTIVE_ACCOUNT="work@example-com"' "$PROJECT/.freely/run/session-state.env"; then
+    break
+  fi
+  sleep 0.25
+done
 
 grep -q 'switch codex work@example-com --yes' "$TMP_DIR/ai-switch.log"
 grep -q 'last_active_account: work@example-com' <(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")
 grep -q 'last_account_switch_reason: primary_rate_limit_exhausted' <(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")
 
+bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+wait "$primary_supervisor_pid" 2>/dev/null || true
+
 echo "[PASS] freely auto-switches codex account non-interactively after rate-limit exhaustion"
+
+PROJECT_SECONDARY="$TMP_DIR/project-secondary"
+CODEX_HOME_DIR_SECONDARY="$TMP_DIR/codex-home-secondary"
+mkdir -p \
+  "$PROJECT_SECONDARY/bin" \
+  "$PROJECT_SECONDARY/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_SECONDARY/.freely/run" \
+  "$PROJECT_SECONDARY/.freely/logs" \
+  "$CODEX_HOME_DIR_SECONDARY/sessions/2026/03/17"
+
+git init -q "$PROJECT_SECONDARY"
+git -C "$PROJECT_SECONDARY" checkout -q -b feature/test-ai-account-switch-secondary
+
+cp "$PROJECT/docs/PROJECT_INTENT.md" "$PROJECT_SECONDARY/docs/PROJECT_INTENT.md"
+cp "$PROJECT/docs/CONSTITUTION.md" "$PROJECT_SECONDARY/docs/CONSTITUTION.md"
+cp "$PROJECT/docs/LAWS.md" "$PROJECT_SECONDARY/docs/LAWS.md"
+cp "$PROJECT/AGENTS.md" "$PROJECT_SECONDARY/AGENTS.md"
+cp "$PROJECT/docs/pre-brainstorms/README.md" "$PROJECT_SECONDARY/docs/pre-brainstorms/README.md"
+cp "$PROJECT/docs/pre-brainstorms/INDEX.md" "$PROJECT_SECONDARY/docs/pre-brainstorms/INDEX.md"
+cp "$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" "$PROJECT_SECONDARY/docs/pre-brainstorms/CONVERGENCE.md"
+cp "$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" "$PROJECT_SECONDARY/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md"
+cp "$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" "$PROJECT_SECONDARY/docs/pre-brainstorms/20260309-0000--sample/candidates.md"
+cp "$PROJECT/.freely/config.env" "$PROJECT_SECONDARY/.freely/config.env"
+cp "$PROJECT/bin/ai" "$PROJECT_SECONDARY/bin/ai"
+chmod +x "$PROJECT_SECONDARY/bin/ai"
+
+cat >"$MOCK_BIN/codex-secondary" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+counter_file="${TMP_DIR:?}/codex-secondary.counter"
+count=0
+if [[ -f "$counter_file" ]]; then
+  count="$(cat "$counter_file")"
+fi
+count=$((count + 1))
+printf '%s' "$count" >"$counter_file"
+
+if [[ "$count" -eq 1 ]]; then
+  echo "session id: test-secondary-session"
+  echo "You've hit your usage limit"
+else
+  echo "session id: test-secondary-session-2"
+  echo "[TEST] second launch after secondary switch"
+fi
+sleep 1
+EOF
+chmod +x "$MOCK_BIN/codex-secondary"
+
+cat >"$CODEX_HOME_DIR_SECONDARY/sessions/2026/03/17/rollout-test-secondary-session.jsonl" <<'EOF'
+{"type":"token_count","info":{"total_token_usage":{"total_tokens":1200},"last_token_usage":{"total_tokens":1200},"model_context_window":258400},"rate_limits":{"primary":{"used_percent":0.0,"window_minutes":300,"resets_at":4102444800},"secondary":{"used_percent":100.0,"window_minutes":10080,"resets_at":4103049600}}}
+EOF
+
+cat >"$CODEX_HOME_DIR_SECONDARY/sessions/2026/03/17/rollout-test-secondary-session-2.jsonl" <<'EOF'
+{"type":"token_count","info":{"total_token_usage":{"total_tokens":400},"last_token_usage":{"total_tokens":400},"model_context_window":258400},"rate_limits":{"primary":{"used_percent":5.0,"window_minutes":300,"resets_at":4102444800},"secondary":{"used_percent":10.0,"window_minutes":10080,"resets_at":4103049600}}}
+EOF
+
+mv "$MOCK_BIN/codex" "$MOCK_BIN/codex-primary"
+ln -sf "$MOCK_BIN/codex-secondary" "$MOCK_BIN/codex"
+
+AI_SWITCH_LOG="$TMP_DIR/ai-switch-secondary.log" AI_SWITCH_STATE="$TMP_DIR/active-account-secondary" CODEX_HOME="$CODEX_HOME_DIR_SECONDARY" TMP_DIR="$TMP_DIR" PATH="$MOCK_BIN:$PATH" \
+  bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_SECONDARY" >/dev/null 2>&1 &
+secondary_supervisor_pid=$!
+
+for _ in $(seq 1 40); do
+  if [[ -f "$TMP_DIR/ai-switch-secondary.log" ]] && grep -q 'switch codex work@example-com --yes' "$TMP_DIR/ai-switch-secondary.log"; then
+    break
+  fi
+  sleep 0.25
+done
+
+for _ in $(seq 1 40); do
+  if [[ -f "$PROJECT_SECONDARY/.freely/run/session-state.env" ]] && grep -q 'LAST_ACTIVE_ACCOUNT="work@example-com"' "$PROJECT_SECONDARY/.freely/run/session-state.env"; then
+    break
+  fi
+  sleep 0.25
+done
+
+grep -q 'switch codex work@example-com --yes' "$TMP_DIR/ai-switch-secondary.log"
+grep -q 'last_active_account: work@example-com' <(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT_SECONDARY")
+grep -q 'last_account_switch_reason: secondary_rate_limit_exhausted' <(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT_SECONDARY")
+grep -q 'last_secondary_rate_limit_used_percent: 100.0' <(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT_SECONDARY")
+
+bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT_SECONDARY" >/dev/null 2>&1 || true
+wait "$secondary_supervisor_pid" 2>/dev/null || true
+
+echo "[PASS] freely auto-switches codex account after secondary rate-limit exhaustion"
