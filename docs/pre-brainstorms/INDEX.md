@@ -124,6 +124,9 @@
 - 20260318-0715--ai-autonomy-checkpoint-commit-governance
   - brainstorms: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/candidates.md
+- 20260318-1222--mem9-shared-memory-fit-for-freely
+  - brainstorms: docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
