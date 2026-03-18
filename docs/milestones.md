@@ -68,6 +68,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md`
 - next_action: review 与 verification 已落盘，但 `./bin/wt-status-all` 仍为 `Summary: total=6, dirty=1`；当前需先按 ownership 收束或分流 dirty 改动，其中 `docs/system/workspace/**` / `tests/**` 与 session-lifecycle 相关产物更像上游未提交批次，应先处理，再补 completion verification / cleanup 证据后移入 completed_issues
 
+3. `I-20260318-0930`
+- title: Checkpoint commit and multi-worktree supervision governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/candidates.md`
+- next_action: 先把 runtime/status 的 dirty budget 与 project-level worktree summary 正式落盘，再补脚本级测试与 promote 证据；在此之前，当前 dogfood 工位不得继续被当成“健康扩写中”
+
 ### candidate_issues
 
 - none currently
@@ -191,7 +201,7 @@ routing_policy:
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
 - source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: frontend 侧 contract、transport、manifest 和错误面已基本收敛；下一跳应先把缺失的 `Rust/Tauri Probe Bridge v1` 落成新的 pre-brainstorm / candidate，再由新 issue 承接 backend bridge 实现
+- next_action: frontend 侧 contract、transport、manifest 和错误面已基本收敛；backend bridge 缺口仍由 `I-20260317-1005` 承接。当前 Rust bridge 的本地 `cargo check` / `cargo test`、前端 `typecheck` / `build` 与公开 manifest 对齐验证都已通过；下一步等待真实 Tauri 宿主启动联调结果，再回到本 issue 收紧 frontend host integration 与 blocker 描述
 
 5. `I-20260317-1004`
 - title: Frontend Runtime Baseline for Probe
@@ -221,7 +231,7 @@ routing_policy:
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
 - source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
-- next_action: Rust/Tauri bridge 骨架已落地到 `Cargo.toml` 与 `src-tauri/`，bridge reducer 已从 `src-tauri/src/lib.rs` 抽到 `src-tauri/src/bridge_logic.rs`，day-1 command payload 已开始收口到 `src-tauri/src/command_payload.rs`，day-1 server event payload 也已开始收口到 `src-tauri/src/event_payload.rs`；最近几轮已把 snapshot shape、`probe_send_command` 入参、emitted server event，以及 `runId/sessionId/resumeHint/messageId/reason/commandSource/targetAgentId` 这组 frontend 当前真实发送字段统一对齐到同一份 backend contract，并把默认 `projectName/sessionId/runId/terminalTarget/lastEventId` 生成规则、空态 event fallback 命名、`governanceSummary/recoverySummary` 的“最新前插 + 最多 4 条”滚动规则，以及 `occurredAt` 的动态 RFC3339 时间戳逻辑对齐到 frontend 当前 mock/runtime 语义。下一步优先运行 `bun run rust:preflight` / `bun run cargo:check:probe` 复核并触发统一验证，再在具备 `cargo` 的环境中继续最小联调与 bridge 实现细节
+- next_action: lead-agent 首跳重入后继续命中 `milestones` 池里的当前 committed `in_dev` issue，并在同一 `codex` 会话内进入 `dev-loop-execution`。当前已补齐 `src-tauri/icons/icon.png`，`bun run rust:preflight`、`bun run cargo:check:probe` 与 `cargo test -p freely-probe-bridge` 已通过；先前的 Rust toolchain / icon blocker 和 `dead_code` warning 均已解除。下一步继续围绕真实 Tauri 宿主启动联调推进，确认前端 `Transport=tauri` 不再停在 `bridge offline`
 
 ### candidate_issues
 

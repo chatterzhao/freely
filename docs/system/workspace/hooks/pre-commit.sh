@@ -35,6 +35,26 @@ MSG
 esac
 
 if ! freely_wt_is_primary_worktree; then
+  if [[ -x "./bin/checkpoint-guard" ]]; then
+    set +e
+    checkpoint_output="$(./bin/checkpoint-guard --staged-only --fail-on-required 2>&1)"
+    checkpoint_rc=$?
+    set -e
+    if [[ "$checkpoint_rc" -eq 2 ]]; then
+      cat <<MSG
+[HOOK] Commit blocked: staged change set exceeds checkpoint budget.
+
+$checkpoint_output
+
+Split this commit into issue-aligned atomic batches, or move mixed work into separate worktrees.
+Policy source: docs/LAWS.md §2D
+MSG
+      exit 1
+    elif [[ "$checkpoint_rc" -ne 0 ]]; then
+      echo "$checkpoint_output" >&2
+      exit "$checkpoint_rc"
+    fi
+  fi
   exit 0
 fi
 

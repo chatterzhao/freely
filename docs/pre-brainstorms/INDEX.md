@@ -100,9 +100,21 @@
 - 20260317-0332--rust-tauri-probe-bridge-v1
   - brainstorms: docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md
   - candidates: docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md
+- 20260317-0735--account-aware-loop-and-checkpoint-commit-governance
+  - brainstorms: docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/candidates.md
+- 20260317-1101--frontend-runtime-baseline-for-probe
+  - brainstorms: docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md
+- 20260317-2248--rust-toolchain-bootstrap-skill
+  - brainstorms: docs/pre-brainstorms/20260317-2248--rust-toolchain-bootstrap-skill/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260317-2248--rust-toolchain-bootstrap-skill/candidates.md
 - 20260318-1818--ai-cli-availability-manager
   - brainstorms: docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/candidates.md
+- 20260318-0009--multi-worktree-supervision-control-plane
+  - brainstorms: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

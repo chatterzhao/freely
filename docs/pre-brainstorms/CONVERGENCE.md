@@ -218,6 +218,15 @@
 - phase_state: `in_verification`
 - branch: `feature/dogfood-codex-auto-20260316`
 - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260316-feature-dogfood-codex-auto`
+
+## 变更（2026-03-18 checkpoint commit 与多 worktree 监督治理）
+
+### 收敛结论
+- `C-20260317-0735-B` 与 `C-20260317-0735-C` 已合并物化为 `I-20260318-0930`
+  - 问题：当前 Freely runtime 能续跑会话，但不会在 dirty tree 持续扩大时主动要求 checkpoint，也没有项目级多 worktree 摘要来做主管视角判断。
+  - 结论：runtime/status 必须暴露 `project dirty entries` 与 `worktree dirty summary`，并把 dirty-budget 进入 prompt / handoff / rotation 判定。
+  - 当前落点：`docs/LAWS.md`、`docs/system/workspace/scripts/runtime/freely`、`docs/milestones.md`、`docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
+  - 当前状态：in_dev
 - 原因：当前研究阶段尚未启用正式 `docs/progress/**` / `docs/recovery/**`，按宪法与法律允许把 dev-loop 验证批次临时写入本文件。
 
 ### 验证范围
@@ -2261,3 +2270,331 @@
   - `bun run rust:preflight` ❌ `cargo/rustc/rustup` 缺失
 - residual_gap:
   - 当前环境仍缺少 `cargo/rustc/rustup`，所以这轮 event fallback 收口仍未转化为 Rust 侧编译验证
+
+## 变更（2026-03-17 lead-agent 重入后继续 Rust bridge dev-loop）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: `docs/progress/**` 与 `docs/recovery/**` 当前不存在，`review/test` 池只有 workspace-routing 的既有验证条目，`human chat/session evidence` 与 `github issue` 也没有形成比现有 committed issue 更高优先的新输入；因此最高优先级仍是 `docs/milestones.md` 中 `I-20260317-1005`
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前问题不是继续做研究或 IBM，而是在现有 worktree 中承接 `in_dev` issue、核对 blocker 并回写 continuity；`codex` 最适合这类仓库内实现/验证/修文档动作
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005 Rust/Tauri Probe Bridge v1，优先在具备 Rust toolchain 的环境执行 bun run rust:preflight 与 bun run cargo:check:probe；若仍缺 cargo/rustc/rustup，则保持当前 route_kind=dev_loop、phase_state=in_dev，并把 blocker 明确留在 continuity artifact，而不是误路由成 pre-brainstorm 或 IBM。`
+
+### continuation evidence
+- scanned_pools:
+  - `milestones`: `I-20260317-1005` 仍为 committed + `in_dev`
+  - `progress/recovery`: 当前仓库无规范目录，暂无比 milestone 更强的 continuation 落点
+  - `review/test`: 当前仅见 workspace-routing 旧 verification 文档，没有 frontend probe / rust bridge 新 review 信号
+  - `human chat / session evidence`: 现有 `session_refs` 仍指向 `current-thread`，但没有新的人类输入把当前问题改写成 discovery
+  - `github issue`: 仓库内只有 policy/brainstorm 对该池的规则描述，没有新的外部 issue 落点
+  - `PROJECT_INTENT`: 仍提供原始发现面，但当前不应覆盖已稳定的 milestone-owned issue continuation
+- current_blocker:
+  - 本轮阻塞点仍是环境缺少 `cargo/rustc/rustup`
+  - 这属于当前 dev-loop 的外部执行环境缺口，不构成重新路由到 `doc-pre-brainstorm-execution` 或 `doc-ibm-execution` 的理由
+- handoff_need:
+  - 当前会话已完成首跳与第二跳判定，也已把 continuity 补回仓库
+  - 若外层 runtime 需要继续推进真实 Rust 编译联调，应在具备 Rust toolchain 的环境重新进入同一 `dev-loop`
+
+## 变更（2026-03-17 Rust toolchain preflight 从被动报错改为可操作指引）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: 当前最高优先仍是 `I-20260317-1005` 的 dev-loop continuation，而最直接的剩余阻塞点已经稳定收敛为 Rust toolchain 缺失
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前动作是在仓库内把 blocker 从“知道缺东西”推进到“给出可执行的下一步”，属于实现/验证支撑面改动，`codex` 适合直接修改脚本与文档
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005；若本机缺少 cargo/rustc/rustup，则先根据 bun run rust:preflight 输出完成 rustup 安装与 shell reload，再回跑 cargo check。`
+
+### implementation delta
+- updated_artifacts:
+  - `bin/check-rust-toolchain`
+  - `src-tauri/README.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+  - `docs/milestones.md`
+  - `docs/pre-brainstorms/CONVERGENCE.md`
+- current_effect:
+  - `bun run rust:preflight` 不再只输出 `[missing]`，而会明确列出缺失命令、建议 `rustup` 安装步骤、提示 `source "$HOME/.cargo/env"`，并给出下一步重跑命令
+  - 当前 dev-loop blocker 仍然存在，但已经从模糊环境缺口收敛成可执行的 operator guidance
+
+## 变更（2026-03-17 Rust toolchain guidance 加回归测试）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: 当前最高优先仍是 `I-20260317-1005` 的 dev-loop continuation，且最直接可推进的仓库内动作是把新加的 preflight guidance 固定成可回归测试，而不是再次只做手工验证
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前动作是新增 shell 测试与 continuity 回写，属于仓库内实现/验证工作，`codex` 适合直接完成
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005；在缺少 Rust toolchain 的环境里，至少保持 preflight guidance 和回归测试不退化，待环境具备 cargo/rustc/rustup 后再回到真实 cargo check / Tauri 联调。`
+
+### implementation delta
+- updated_artifacts:
+  - `docs/system/workspace/scripts/tests/test-rust-toolchain-preflight`
+  - `bin/test-rust-toolchain-preflight`
+  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+  - `docs/milestones.md`
+  - `docs/pre-brainstorms/CONVERGENCE.md`
+- current_effect:
+  - 仓库现在会固定验证 `bin/check-rust-toolchain` 在缺少 Rust 命令时必须输出缺失命令汇总、`rustup` 安装建议、shell reload 提示与重跑命令
+  - 当前环境 blocker 仍在，但 preflight operator guidance 已不再只依赖人工观察
+
+## 变更（2026-03-17 Rust preflight test 接入统一 package script）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: 当前最高优先仍是 `I-20260317-1005` 的 dev-loop continuation，而当前最有价值的仓库内动作是把新测试接入统一脚本入口，降低后续调用门槛
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前动作是仓库内脚本与文档收口，不需要换工具
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005；统一通过 bun run rust:preflight / bun run rust:preflight:test / bun run cargo:check:probe 管理 Rust toolchain blocker，待环境具备 cargo/rustc/rustup 后恢复真实 bridge 编译联调。`
+
+### implementation delta
+- updated_artifacts:
+  - `package.json`
+  - `src-tauri/README.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+  - `docs/milestones.md`
+  - `docs/pre-brainstorms/CONVERGENCE.md`
+- current_effect:
+  - Rust toolchain preflight guidance 现在不仅有脚本和测试，还有统一的 `bun run rust:preflight:test` 入口
+  - 当前 blocker 仍是环境缺少 Rust toolchain，但仓库内调用面已经统一
+
+## 变更（2026-03-17 首跳闭环继续 Rust bridge dev-loop）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: 当前没有正式 `docs/progress/**` / `docs/recovery/**`；`review/test` 池没有比 frontend probe backend bridge continuation 更高优先的新信号；`human chat/session evidence`、`github issue` 与 `PROJECT_INTENT` 也没有把当前问题改写回 discovery，因此最高优先仍是 `docs/milestones.md` 中 committed + `in_dev` 的 `I-20260317-1005`
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前动作需要在同一 worktree 内继续做实现验证、检查 blocker 并回写仓库产物，`codex` 比偏研究/托管型工具更适合当前 dev-loop
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005。保持当前 route_kind=dev_loop，不要回退到 pre-brainstorm 或 IBM；先复核 bun run typecheck / build / rust:preflight / rust:preflight:test / cargo:check:probe 的真实结果，并把 blocker 与下一跳写回 continuity artifact。`
+
+### execution evidence
+- governance_precheck:
+  - 当前分支：`feature/dogfood-codex-auto-20260316`
+  - 当前 worktree：`/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260316-feature-dogfood-codex-auto`
+  - `./bin/wt-status-all`：`Summary: total=7, dirty=1`
+  - 结论：当前不在受保护分支，允许继续在 dedicated worktree 内写入；但 worktree 仍为 dirty，不能宣告 promote / cleanup
+- scanned_pools:
+  - `milestones`: `I-20260317-1005` 与 `I-20260317-1002` 都在 committed 队列，但 backend bridge blocker 已由前者承接
+  - `progress/recovery`: 当前仓库无规范目录，continuation 证据仍以 `docs/pre-brainstorms/CONVERGENCE.md` 为等价落点
+  - `review/test`: 本轮真实可执行的验证信号集中在 frontend build 与 Rust preflight/cargo check
+  - `human chat / session evidence`: 只有当前会话，没有新的 discovery 需求
+  - `github issue`: 无本地新落点
+  - `PROJECT_INTENT`: 仍提供原始发现面，但当前不能覆盖已稳定 issue continuation
+- verification:
+  - `bun run typecheck` -> passed
+  - `bun run build` -> passed
+  - `bun run rust:preflight` -> failed (`cargo/rustc/rustup` missing)
+  - `bun run rust:preflight:test` -> passed
+  - `bun run cargo:check:probe` -> failed (`cargo/rustc/rustup` missing)
+- updated_artifacts:
+  - `docs/milestones.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+  - `docs/pre-brainstorms/CONVERGENCE.md`
+- current_conclusion:
+  - 当前问题保持为 `issue continuation`
+  - 当前下一跳保持为 `dev-loop-execution`
+  - 当前 blocker 仍是 Rust toolchain 缺失，而不是 issue 边界不稳
+  - `I-20260317-1002` 的 milestone `next_action` 需要同步到“先继续 `I-20260317-1005`，再回前端 host integration”的新事实
+
+## 变更（2026-03-17 Rust 命令层已解锁，blocker 收窄到 partial toolchain）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: 需求池优先级没有变化，当前仍是 `docs/milestones.md` 中 committed + `in_dev` 的 `I-20260317-1005` 最接近可执行；新的环境尝试没有把问题改写成 discovery
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前动作是同一会话内继续解决 dev-loop 的执行环境阻塞，并把更高分辨率的 blocker 写回 issue/milestone/continuity，`codex` 仍最匹配
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005。Rust 命令层已安装，优先修复 stable-aarch64-apple-darwin toolchain 的 partial install / missing manifest，再回跑 bun run cargo:check:probe。`
+
+### execution evidence
+- environment_progress:
+  - 已执行 `curl ... rustup-init` 与 `rustup default stable`
+  - `~/.cargo/bin` 已出现 `cargo` / `rustc` / `rustup`
+  - `bun run rust:preflight` -> passed
+- current_blocker:
+  - `bun run cargo:check:probe` -> failed
+  - 失败点已从“缺少 cargo/rustc/rustup”收窄为 `rustc -vV`
+  - stderr: `Missing manifest in toolchain 'stable-aarch64-apple-darwin'`
+- updated_artifacts:
+  - `docs/milestones.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+  - `docs/pre-brainstorms/CONVERGENCE.md`
+- current_conclusion:
+  - 当前 route 仍是 `milestones -> issue continuation -> codex -> dev-loop-execution`
+  - 当前 blocker 已从“缺命令”升级为“partial toolchain / missing manifest”
+  - 还不需要 reroute；下一步仍是继续修复 Rust toolchain 完整性
+
+## 变更（2026-03-17 context-ratio warn 后的 dev-loop continuity refresh）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: context ratio 预警不会改变需求池优先级；当前仍是 `I-20260317-1005` 这条 committed + `in_dev` issue 最接近可执行
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: `selected_tool` 与当前 `AI_TOOL` 相同，且当前动作是先补 continuity 再继续修复执行环境，必须在本会话内继续第二跳
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005。已按 warn 阈值先刷新 continuity artifact；下一步直接修复 stable-aarch64-apple-darwin toolchain 的 partial install，再回跑 cargo check。`
+
+### continuity refresh
+- context_ratio_warn:
+  - previous_ratio: `0.5550`
+  - local_warn_threshold: `0.50`
+- phase_appropriate_artifact:
+  - 当前研究阶段尚无正式 `docs/progress/**`
+  - 依宪法与法律允许，dev-loop continuity 继续落到 `docs/pre-brainstorms/CONVERGENCE.md`
+- next_focus:
+  - 先修复 `~/.rustup/toolchains/stable-aarch64-apple-darwin` 的 partial install / missing manifest
+  - 再回跑 `bun run cargo:check:probe`
+
+## 变更（2026-03-17 context-ratio warn 二次 refresh）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: 新一轮 warn 只要求先补 continuity，不改变当前最高优先池；`I-20260317-1005` 仍是 committed + `in_dev` 且最接近可执行的条目
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前仍是在同一会话内先补 continuity，再继续修复 dev-loop blocker；`codex` 与当前 `AI_TOOL` 一致，不能只做 handoff
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005。已按新的 warn 阈值再次刷新 continuity；下一步先核对 stable-aarch64-apple-darwin 实际缺的是 rustc 组件、manifest 元数据，还是 rustup 状态漂移，再决定继续用 rustup 还是切到 Homebrew fallback。`
+
+### continuity refresh
+- context_ratio_warn:
+  - previous_ratio: `0.5776`
+  - local_warn_threshold: `0.50`
+- phase_appropriate_artifact:
+  - 当前研究阶段尚无正式 `docs/progress/**`
+  - 本轮 dev-loop continuity 继续落到 `docs/pre-brainstorms/CONVERGENCE.md`
+- next_focus:
+  - 先核对 `~/.rustup/toolchains/stable-aarch64-apple-darwin` 现状
+  - 再决定继续 rustup 修复还是切到本机更稳的安装路径
+
+## 变更（2026-03-17 rustup 安装路径出现震荡）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: 当前问题仍是 `I-20260317-1005` 的 dev-loop continuation；只是环境 blocker 的分辨率又提高了一层
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前动作仍是修复当前会话内可操作的执行环境并回写 continuity，不需要切工具
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005。不要把当前状态误写成代码编译失败；先记录 rustup toolchain 安装路径震荡，再评估是否切到 Homebrew 作为更稳的本机 Rust fallback。`
+
+### execution evidence
+- observed_state:
+  - 先前 `rustup run stable-aarch64-apple-darwin rustc -vV` 一度可用
+  - 重新执行 `bun run cargo:check:probe` 后，cargo 进入真实构建并最终报 `No such file or directory (os error 2)`
+  - 随后再次检查时，`~/.rustup/toolchains/stable-aarch64-apple-darwin/bin` 已为空
+  - `rustup run stable-aarch64-apple-darwin rustc -vV` 重新退回 `toolchain 'stable-aarch64-apple-darwin' is not installed`
+- current_conclusion:
+  - 当前 blocker 不是仓库 Rust 代码本身
+  - 当前 blocker 是 rustup 安装路径在 partial install 与 uninstalled 之间震荡
+  - 若继续使用 rustup 路径无法稳定，下一步应评估 Homebrew 提供稳定 `cargo/rustc` 作为本机 fallback
+
+## 变更（2026-03-17 context-ratio warn 三次 refresh）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: warn 预警继续只要求先补 continuity；不改变当前最高优先池。`I-20260317-1005` 仍是 committed + `in_dev`，且 blocker 仍停留在执行环境层
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前仍在同一 `codex` 会话内维护 dev-loop continuity 和 blocker 解析，不需要改工具
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005。当前不要把状态回退成 discovery；先保持 continuity artifact 最新，再以有界方式验证本机 Rust 安装路径，而不是无节制重试。`
+
+### continuity refresh
+- context_ratio_warn:
+  - previous_ratio: `0.6503`
+  - local_warn_threshold: `0.50`
+- phase_appropriate_artifact:
+  - 当前研究阶段仍无正式 `docs/progress/**`
+  - dev-loop continuity 继续写入 `docs/pre-brainstorms/CONVERGENCE.md`
+- current_state_snapshot:
+  - 首跳结论未变：`milestones -> issue continuation -> codex -> dev-loop-execution`
+  - `rustup` 路径最近一次表现为安装状态震荡
+  - `brew` fallback 只完成了可用性探测，尚未形成稳定可验证结果
+- next_focus:
+  - 保持 `I-20260317-1005` 为当前 issue
+  - 后续本机 Rust 安装修复应采用单一路径、单次验证、单次回写，避免继续制造新的环境漂移
+
+## 变更（2026-03-18 context-ratio warn 四次 refresh）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: 新一轮 warn 仍不改变需求池优先级，`I-20260317-1005` 继续是当前唯一需要收束的 `in_dev` backend bridge issue
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前动作是同一会话内先补 continuity，再做一次有界的 Rust 环境稳定性验证；`codex` 适合直接完成
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005。既然当前 rustup stable toolchain 已重新稳定可见，就只做一次 cargo check 验证，确认问题是否已经从环境层推进到代码/依赖层。`
+
+### continuity refresh
+- context_ratio_warn:
+  - previous_ratio: `0.6601`
+  - local_warn_threshold: `0.50`
+- phase_appropriate_artifact:
+  - 当前研究阶段仍无正式 `docs/progress/**`
+  - dev-loop continuity 继续写入 `docs/pre-brainstorms/CONVERGENCE.md`
+- bounded_verification_gate:
+  - `rustup show active-toolchain` -> `stable-aarch64-apple-darwin (default)`
+  - `cargo --version` -> `1.94.0`
+  - `rustc --version` -> `1.94.0`
+  - 结论：当前本机 Rust 路径处于可见状态，允许执行一次有界的 `cargo check`
+
+## 变更（2026-03-18 Rust bridge cargo check 解阻）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: `I-20260317-1005` 仍是当前最高优先的 backend bridge continuation；环境已经回到可验证状态，最有价值的动作就是完成一次真正的 `cargo check`
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前动作是仓库内继续修复 dev-loop blocker 并回写 issue/milestone/continuity，`codex` 适合直接完成
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005。Rust toolchain 和 compile-time icon blocker 已解除；下一步转向真实 Tauri 宿主联调，并按需收掉当前 cargo check 的 dead-code warning。`
+
+### execution evidence
+- verification:
+  - `rustup show active-toolchain` -> `stable-aarch64-apple-darwin (default)`
+  - `cargo --version` -> `1.94.0`
+  - `rustc --version` -> `1.94.0`
+  - `bun run rust:preflight` -> passed
+  - `bun run cargo:check:probe` -> passed
+- implementation_delta:
+  - `src-tauri/icons/icon.png`：补成有效 RGBA PNG，解除 `generate_context!()` 的 compile-time icon 错误
+  - `src-tauri/src/event_payload.rs`：移除未使用的 `json` 导入
+- residual_gap:
+  - `cargo check` 仍有少量 `dead_code` warning
+  - 下一阶段重点应是 Tauri 宿主联调，而不是继续处理环境安装问题
+
+## 变更（2026-03-18 Rust bridge contract drift 收口）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: `docs/progress/**` / `docs/recovery/**` 仍未启用；`review/test` 池这轮新暴露的最高价值信号来自 `I-20260317-1005` 自身的 Rust 单测失败与 compile warning，因此当前最高优先仍是 milestone 中 committed + `in_dev` 的 backend bridge continuation
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前动作是同一仓库内直接修复 Rust bridge、重跑本地验证并回写 issue/milestone/continuity；`codex` 比把执行权交回 runtime 或切到偏研究型工具更合适
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260317-1005。当前 cargo check / test 与 frontend build 基线都已通过，下一步直接进入真实 Tauri 宿主启动联调，确认 Transport=tauri 不再停在 bridge offline。`
+
+### execution evidence
+- implementation_delta:
+  - `src-tauri/src/bridge_manifest.rs`：新增 Rust 侧可消费的 contract 入口，并用公开 manifest JSON 做一致性测试
+  - `src-tauri/src/event_payload.rs`：统一复用 `ProbeEventKind`，把事件名事实源收口到单处
+  - `src-tauri/src/bridge_logic.rs`：修正两条已落后于当前 snapshot 行为的单测断言
+  - `src-tauri/src/lib.rs`：在运行入口显式读取 bridge contract，确保运行路径消费同一份命令/事件绑定
+- verification:
+  - `bun run cargo:check:probe` -> passed
+  - `cargo test -p freely-probe-bridge` -> passed (`24 passed`)
+  - `bun run typecheck` -> passed
+  - `bun run build` -> passed
+- residual_gap:
+  - 仍未实际启动桌面 Tauri 宿主，因此还不能声称 `Transport=tauri` 已完成真实 backend 联调
+  - 下一跳应继续留在 `I-20260317-1005` 的 `dev-loop`，直接验证真实宿主路径，而不是回退到 doc-loop 或继续只做本地 contract/warning 清理

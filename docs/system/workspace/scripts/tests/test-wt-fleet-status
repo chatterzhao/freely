@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-wt-fleet-status.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+
+mkdir -p "$REPO/bin"
+cp "$ROOT_DIR/bin/checkpoint-guard" "$REPO/bin/checkpoint-guard"
+chmod +x "$REPO/bin/checkpoint-guard"
+
+git worktree add -q -b feature/demo-a "$TMP_DIR/repo-worktrees/feature-demo-a" develop
+git worktree add -q -b feature/demo-b "$TMP_DIR/repo-worktrees/feature-demo-b" develop
+
+echo dirty > "$TMP_DIR/repo-worktrees/feature-demo-a/demo.txt"
+
+OUTPUT="$(bash "$ROOT_DIR/bin/wt-fleet-status" --project "$REPO")"
+printf '%s\n' "$OUTPUT" | grep -q 'CHECKPOINT'
+printf '%s\n' "$OUTPUT" | grep -q 'feature/demo-a'
+printf '%s\n' "$OUTPUT" | grep -q 'feature/demo-b'
+printf '%s\n' "$OUTPUT" | grep -q 'DIRTY'
+
+echo "[PASS] wt-fleet-status reports multiple worktrees with checkpoint column"

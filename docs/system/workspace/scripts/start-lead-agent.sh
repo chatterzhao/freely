@@ -23,6 +23,57 @@ abs_path_or_fail() {
   echo "$p"
 }
 
+project_dirty_entries() {
+  local project="$1"
+  git -C "$project" status --porcelain 2>/dev/null | wc -l | tr -d ' '
+}
+
+project_clean_state() {
+  local project="$1"
+  local dirty_count
+  dirty_count="$(project_dirty_entries "$project")"
+  if [[ "${dirty_count:-0}" =~ ^[0-9]+$ ]] && (( dirty_count == 0 )); then
+    printf 'CLEAN\n'
+  else
+    printf 'DIRTY\n'
+  fi
+}
+
+checkpoint_guard_summary() {
+  local project="$1"
+  local guard_bin output required reasons
+  guard_bin="$project/bin/checkpoint-guard"
+  if [[ ! -x "$guard_bin" ]]; then
+    printf 'checkpoint_required=unknown; reason_codes=unavailable\n'
+    return 0
+  fi
+  output="$("$guard_bin" --project "$project" --format json 2>/dev/null || true)"
+  required="$(printf '%s\n' "$output" | sed -n 's/.*"checkpoint_required":\(true\|false\).*/\1/p')"
+  reasons="$(printf '%s\n' "$output" | sed -n 's/.*"reason_codes":\[\(.*\)\].*/\1/p' | tr -d '"' | sed 's/, */,/g')"
+  [[ -n "$required" ]] || required="unknown"
+  [[ -n "$reasons" ]] || reasons="none"
+  printf 'checkpoint_required=%s; reason_codes=%s\n' "$required" "$reasons"
+}
+
+worktree_fleet_brief() {
+  local project="$1" repo_root total dirty
+  repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
+  [[ -n "$repo_root" ]] || {
+    printf 'total=unknown; dirty=unknown\n'
+    return 0
+  }
+  total=0
+  dirty=0
+  while IFS= read -r wt_path; do
+    [[ -n "$wt_path" ]] || continue
+    total=$((total + 1))
+    if [[ -n "$(git -C "$wt_path" status --porcelain 2>/dev/null)" ]]; then
+      dirty=$((dirty + 1))
+    fi
+  done < <(git -C "$repo_root" worktree list --porcelain 2>/dev/null | awk '/^worktree / {print substr($0, 10)}')
+  printf 'total=%s; dirty=%s\n' "$total" "$dirty"
+}
+
 parse_ai_spec_or_fail() {
   local spec="$1"
   local tool="" model="" mode="auto"
@@ -101,6 +152,12 @@ fi
 
 IFS='|' read -r ai_tool ai_model ai_mode <<<"$(parse_ai_spec_or_fail "$ai_spec")"
 
+current_branch="$(git -C "$project" branch --show-current 2>/dev/null || printf 'unknown')"
+current_clean_state="$(project_clean_state "$project")"
+current_dirty_entries="$(project_dirty_entries "$project")"
+current_checkpoint_summary="$(checkpoint_guard_summary "$project")"
+current_fleet_summary="$(worktree_fleet_brief "$project")"
+
 cat <<EOF
 你现在进入 Freely 的首跳闭环。
 
@@ -115,10 +172,19 @@ cat <<EOF
 运行上下文：
 - PROJECT_ROOT=$project
 - WORKSPACE_ROOT=$workspace_root
+- CURRENT_BRANCH=${current_branch:-unknown}
 - AI_TOOL=$ai_tool
 - AI_MODEL=${ai_model:-}
 - AI_MODE=$ai_mode
 - AI_REASONING_EFFORT=${reasoning_effort:-}
+
+工作区治理提醒（非强制阻断，但必须纳入判断）：
+- current_worktree_state: ${current_clean_state}
+- current_project_dirty_entries: ${current_dirty_entries}
+- ${current_checkpoint_summary}
+- project_worktree_summary: ${current_fleet_summary}
+- 开始当前轮次前，先判断是否需要先维护工作区卫生、切 checkpoint commit、或把无关改动分流到其他 worktree。
+- 这不是强制停止开发；你需要结合 issue 边界、验证状态和当前改动范围自主决定是否先收口，再继续委派/实现。
 
 执行要求：
 1. 先执行 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\`。
