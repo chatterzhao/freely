@@ -43,12 +43,16 @@ confirm() {
   [[ "$response" =~ ^[Yy]$ ]]
 }
 
+# 账号名转安全目录名
+account_to_dirname() {
+  echo "$1" | sed 's/@/-at-/g' | sed 's/\./-/g'
+}
+
 # 从 auth.json 提取账号信息
 extract_codex_account() {
   local auth_file="$1"
   local email=""
   
-  # 尝试从 JWT id_token 解析 email
   if command -v python3 &>/dev/null; then
     email=$(python3 -c "
 import json, sys, base64
@@ -56,9 +60,7 @@ try:
     data = json.load(open('$auth_file'))
     id_token = data.get('tokens', {}).get('id_token', '')
     if id_token:
-        # JWT 格式: header.payload.signature
         payload = id_token.split('.')[1]
-        # 添加 base64 padding
         payload += '=' * (4 - len(payload) % 4)
         decoded = base64.urlsafe_b64decode(payload)
         claims = json.loads(decoded)
@@ -111,7 +113,6 @@ cmd_save() {
         exit 3
       fi
       
-      # 自动提取账号（如果未指定）
       if [[ -z "$account" ]]; then
         account=$(extract_codex_account "$auth_file")
         if [[ -z "$account" ]]; then
@@ -122,7 +123,8 @@ cmd_save() {
         log_info "Detected account: $account"
       fi
       
-      local target_dir="$AUTH_DIR/codex-$account"
+      local dirname=$(account_to_dirname "$account")
+      local target_dir="$AUTH_DIR/codex-$dirname"
       
       if [[ -d "$target_dir" ]] && [[ "$YES_MODE" != "true" ]]; then
         confirm "Account '$account' exists. Overwrite?" || exit 1
@@ -165,7 +167,8 @@ cmd_switch() {
   
   case "$tool" in
     codex)
-      local source_dir="$AUTH_DIR/codex-$account"
+      local dirname=$(account_to_dirname "$account")
+      local source_dir="$AUTH_DIR/codex-$dirname"
       local target_file="$HOME/.codex/auth.json"
       
       if [[ ! -d "$source_dir" ]]; then
@@ -304,7 +307,8 @@ cmd_status() {
 cmd_delete() {
   local tool="$1"
   local account="$2"
-  local target_dir="$AUTH_DIR/${tool}-${account}"
+  local dirname=$(account_to_dirname "$account")
+  local target_dir="$AUTH_DIR/${tool}-${dirname}"
   
   if [[ ! -d "$target_dir" ]]; then
     log_error "Account '$account' not found"
