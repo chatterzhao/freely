@@ -192,6 +192,31 @@ cmd_save() {
   esac
 }
 
+# 同步当前 auth.json 到对应备份目录
+sync_current_auth() {
+  local tool="$1"
+  local auth_file="$HOME/.codex/auth.json"
+  
+  if [[ ! -f "$auth_file" ]]; then
+    return 0
+  fi
+  
+  local current_account=$(extract_codex_account "$auth_file")
+  if [[ -z "$current_account" ]]; then
+    return 0
+  fi
+  
+  local dirname=$(account_to_dirname "$current_account")
+  local backup_dir="$AUTH_DIR/${tool}-${dirname}"
+  
+  # 只在备份目录已存在时同步（避免创建意外账户）
+  if [[ -d "$backup_dir" ]]; then
+    cp "$auth_file" "$backup_dir/"
+    chmod 600 "$backup_dir/auth.json"
+    log_info "Auto-synced current token to backup: $current_account"
+  fi
+}
+
 # 切换 account
 cmd_switch() {
   local tool="$1"
@@ -215,9 +240,9 @@ cmd_switch() {
         exit 4
       fi
       
+      # 切换前自动同步当前 token 到备份（保持备份最新）
       if [[ -f "$target_file" ]]; then
-        cp "$target_file" "$target_file.bak"
-        log_info "Backed up current auth to: $target_file.bak"
+        sync_current_auth "$tool"
       fi
       
       [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch to $account"; return; }
