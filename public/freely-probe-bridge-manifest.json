@@ -1,0 +1,19 @@
+{
+  "contractVersion": "freely.probe.v1",
+  "commands": {
+    "requestSnapshot": {
+      "commandName": "probe_request_snapshot",
+      "payloadShape": "{ projectId: string }"
+    },
+    "sendCommand": {
+      "commandName": "probe_send_command",
+      "payloadShape": "{ command: ClientCommand }"
+    }
+  },
+  "events": {
+    "serverEvent": {
+      "eventName": "probe_server_event",
+      "payloadShape": "ServerEvent"
+    }
+  }
+}
