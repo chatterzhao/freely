@@ -140,9 +140,9 @@ Last modified: Mar 16 15:50:34 2026
 
 ```
 ~/.ai-auth/
-├── codex-personal-at-outlook-com/auth.json
-├── codex-work-at-company-com/auth.json
-└── codex-backup-at-gmail-com/auth.json
+├── codex-personal@outlook-com/auth.json
+├── codex-work@company-com/auth.json
+└── codex-backup@gmail-com/auth.json
 ```
 
 ## AI Agent 集成示例

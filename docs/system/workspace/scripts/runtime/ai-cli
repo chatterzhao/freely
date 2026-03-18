@@ -45,7 +45,7 @@ confirm() {
 
 # 账号名转安全目录名
 account_to_dirname() {
-  echo "$1" | sed 's/@/-at-/g' | sed 's/\./-/g'
+  echo "$1" | sed 's/\./-/g'
 }
 
 # 从 auth.json 提取账号信息
