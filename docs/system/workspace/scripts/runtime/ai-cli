@@ -57,11 +57,11 @@ tools:
   codex:
     method: copy_auth
     active: ""
-    profiles: {}
+    accounts: {}
   iflow:
     method: env_var
     active: ""
-    profiles: {}
+    accounts: {}
 EOF
     log_info "Created config: $CONFIG_FILE"
   fi
@@ -73,7 +73,7 @@ EOF
 # 保存当前登录
 cmd_save() {
   local tool="$1"
-  local profile="$2"
+  local account="$2"
   
   case "$tool" in
     codex)
@@ -83,10 +83,10 @@ cmd_save() {
         exit 3
       fi
       
-      local target_dir="$AUTH_DIR/codex-$profile"
+      local target_dir="$AUTH_DIR/codex-$account"
       
       if [[ -d "$target_dir" ]] && [[ "$YES_MODE" != "true" ]]; then
-        confirm "Profile '$profile' exists. Overwrite?" || exit 1
+        confirm "Account '$account' exists. Overwrite?" || exit 1
       fi
       
       [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would save to $target_dir"; return; }
@@ -95,15 +95,15 @@ cmd_save() {
       cp "$auth_file" "$target_dir/"
       chmod 600 "$target_dir/auth.json"
       
-      log_info "Saved codex profile: $profile"
+      log_info "Saved codex account: $account"
       log_info "Location: $target_dir"
       
       if [[ "$FORMAT" == "json" ]]; then
-        echo "{\"saved\": true, \"tool\": \"codex\", \"profile\": \"$profile\", \"path\": \"$target_dir\"}"
+        echo "{\"saved\": true, \"tool\": \"codex\", \"account\": \"$account\", \"path\": \"$target_dir\"}"
       fi
       ;;
     iflow)
-      log_error "iflow uses environment variables. Set IFLOW_${profile^^}_KEY in your shell config."
+      log_error "iflow uses environment variables. Set IFLOW_${account^^}_KEY in your shell config."
       exit 2
       ;;
     *)
@@ -113,24 +113,24 @@ cmd_save() {
   esac
 }
 
-# 切换 profile
+# 切换 account
 cmd_switch() {
   local tool="$1"
-  local profile="${2:-}"
+  local account="${2:-}"
   
-  if [[ -z "$profile" ]]; then
-    log_info "Available profiles:"
+  if [[ -z "$account" ]]; then
+    log_info "Available accounts:"
     ls -1 "$AUTH_DIR" 2>/dev/null | grep "^${tool}-" | sed "s/^${tool}-/  /" || true
     return
   fi
   
   case "$tool" in
     codex)
-      local source_dir="$AUTH_DIR/codex-$profile"
+      local source_dir="$AUTH_DIR/codex-$account"
       local target_file="$HOME/.codex/auth.json"
       
       if [[ ! -d "$source_dir" ]]; then
-        log_error "Profile '$profile' not found"
+        log_error "Account '$account' not found"
         log_info "Available: $(ls -1 "$AUTH_DIR" 2>/dev/null | grep '^codex-' | sed 's/codex-//' | tr '\n' ' ')"
         exit 4
       fi
@@ -140,14 +140,14 @@ cmd_switch() {
         log_info "Backed up current auth to: $target_file.bak"
       fi
       
-      [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch to $profile"; return; }
+      [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch to $account"; return; }
       
       cp "$source_dir/auth.json" "$target_file"
-      log_info "Switched codex to profile: $profile"
+      log_info "Switched codex to account: $account"
       log_warn "Restart codex for the change to take effect"
       
       if [[ "$FORMAT" == "json" ]]; then
-        echo "{\"switched\": true, \"tool\": \"codex\", \"profile\": \"$profile\"}"
+        echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$account\"}"
       fi
       ;;
     *)
@@ -157,33 +157,33 @@ cmd_switch() {
   esac
 }
 
-# 列出 profiles
+# 列出 accounts
 cmd_list() {
-  local profiles=()
+  local accounts=()
   
   while IFS= read -r line; do
     [[ -z "$line" ]] && continue
-    profiles+=("$line")
+    accounts+=("$line")
   done < <(ls -1 "$AUTH_DIR" 2>/dev/null || true)
   
-  if [[ ${#profiles[@]} -eq 0 ]]; then
-    log_info "No profiles found. Run 'freely ai-cli save <tool> <profile>' to create one."
+  if [[ ${#accounts[@]} -eq 0 ]]; then
+    log_info "No accounts found. Run 'freely ai-cli save <tool> <account>' to create one."
     return
   fi
   
   case "$FORMAT" in
     json)
-      echo -n "{\"profiles\": ["
+      echo -n "{\"accounts\": ["
       local first=true
-      for p in "${profiles[@]}"; do
+      for a in "${accounts[@]}"; do
         [[ "$first" == "true" ]] && first=false || echo -n ", "
-        echo -n "\"$p\""
+        echo -n "\"$a\""
       done
       echo "]}"
       ;;
     *)
-      for p in "${profiles[@]}"; do
-        echo "  $p"
+      for a in "${accounts[@]}"; do
+        echo "  $a"
       done
       ;;
   esac
@@ -223,26 +223,26 @@ cmd_status() {
   esac
 }
 
-# 删除 profile
+# 删除 account
 cmd_delete() {
   local tool="$1"
-  local profile="$2"
-  local target_dir="$AUTH_DIR/${tool}-${profile}"
+  local account="$2"
+  local target_dir="$AUTH_DIR/${tool}-${account}"
   
   if [[ ! -d "$target_dir" ]]; then
-    log_error "Profile '$profile' not found"
+    log_error "Account '$account' not found"
     exit 4
   fi
   
-  confirm "Delete profile '$profile'?" || exit 1
+  confirm "Delete account '$account'?" || exit 1
   
   [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would delete $target_dir"; return; }
   
   rm -rf "$target_dir"
-  log_info "Deleted profile: $profile"
+  log_info "Deleted account: $account"
   
   if [[ "$FORMAT" == "json" ]]; then
-    echo "{\"deleted\": true, \"tool\": \"$tool\", \"profile\": \"$profile\"}"
+    echo "{\"deleted\": true, \"tool\": \"$tool\", \"account\": \"$account\"}"
   fi
 }
 
@@ -252,12 +252,12 @@ show_help() {
 Usage: freely ai-cli <command> [options]
 
 Commands:
-  init                    Initialize profile manager
-  save <tool> <profile>   Save current login as profile
-  switch <tool> [profile] Switch to profile (interactive if no profile)
-  list                    List all profiles
+  init                    Initialize account manager
+  save <tool> <account>   Save current login as account
+  switch <tool> [account] Switch to account (interactive if no account)
+  list                    List all accounts
   status [tool]           Show current status
-  delete <tool> <profile> Delete a profile
+  delete <tool> <account> Delete an account
 
 Options:
   --yes, -y               Skip confirmations (non-interactive)
