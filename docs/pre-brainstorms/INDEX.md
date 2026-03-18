@@ -115,6 +115,9 @@
 - 20260318-2245--worktree-pid-ownership-validation
   - brainstorms: docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/candidates.md
+- 20260318-2358--manager-workcell-supervision-and-continuity
+  - brainstorms: docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/candidates.md
 - 20260318-0009--multi-worktree-supervision-control-plane
   - brainstorms: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/candidates.md

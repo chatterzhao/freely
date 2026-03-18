@@ -360,6 +360,22 @@ worktree_summary_for_project() {
   printf '%s|%s\n' "$total" "$dirty"
 }
 
+fleet_status_bin_for_project() {
+  local project="$1"
+  if [[ -x "$project/bin/wt-fleet-status" ]]; then
+    echo "$project/bin/wt-fleet-status"
+  else
+    echo "$SELF_ROOT/bin/wt-fleet-status"
+  fi
+}
+
+fleet_status_text_for_project() {
+  local project="$1" fleet_bin
+  fleet_bin="$(fleet_status_bin_for_project "$project")"
+  [[ -x "$fleet_bin" ]] || return 0
+  "$fleet_bin" --project "$project" 2>/dev/null || true
+}
+
 log_has_context_compacted() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
@@ -505,6 +521,18 @@ EOF
       printf 'unavailable://route-only-next-prompt-not-found\n' >>"$out_file"
     fi
   fi
+
+  local fleet_snapshot
+  fleet_snapshot="$(fleet_status_text_for_project "$project")"
+  if [[ -n "$fleet_snapshot" ]]; then
+    cat >>"$out_file" <<EOF
+
+## Fleet Snapshot
+\`\`\`
+$fleet_snapshot
+\`\`\`
+EOF
+  fi
 }
 
 append_handoff_prompt_if_present() {
@@ -572,6 +600,25 @@ Checkpoint governance:
 - If current work should be split by ownership, move unrelated changes into another dedicated worktree instead of letting this tree keep expanding.
 
 $(context_summary_target_hint)
+EOF
+}
+
+append_fleet_supervision_if_needed() {
+  local fleet_snapshot
+  fleet_snapshot="$(fleet_status_text_for_project "$PROJECT_ROOT")"
+  [[ -n "$fleet_snapshot" ]] || return 0
+
+  cat <<EOF
+
+项目级工位快照：
+\`\`\`
+$fleet_snapshot
+\`\`\`
+
+主管模式要求：
+- 若当前轮次承担项目级监督职责，先基于工位快照安排继续开发、冻结、验证、合并和清理顺序。
+- 可并行且互不阻塞的任务，使用 subagent 提高效率。
+- 若工位视图缺少准确 issue/phase，不要伪造；先把该工位视为需要进一步核对的监督对象。
 EOF
 }
 
@@ -835,6 +882,7 @@ build_prompt() {
     --reasoning-effort "${AI_REASONING_EFFORT:-}"
   append_context_warning_if_needed
   append_checkpoint_governance_if_needed
+  append_fleet_supervision_if_needed
   append_route_only_recovery_if_needed
   append_handoff_prompt_if_present "$PROJECT_ROOT"
 }

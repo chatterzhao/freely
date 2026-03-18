@@ -12,5 +12,6 @@
   - `freely status --project <wt>` 在 stale pid 指向其他 worktree 时输出 `supervisor_pid: none`
   - `freely fleet-status --project <wt>` 在同类场景下不显示错误 supervisor pid
   - `freely stop --project <wt>` 只停止真实属于该 worktree 的 supervisor
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
 - session_refs: []
 - milestone: pending://issue-materialization

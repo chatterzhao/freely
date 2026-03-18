@@ -29,6 +29,7 @@ description: 当需要像项目负责人一样同时监督多个 Freely worktree
    - staged commit 超预算：拆分提交或分流到新 worktree
    - `supervisor` 或 `ai` 不活跃：先恢复 runtime
    - 上游依赖未进入要求路径：下游工位冻结或只做 doc-loop
+5. 若当前会话承担主管职责，优先做项目级排班，并在可并行任务上使用 subagent 提高效率。
 
 ## 边界
 
