@@ -130,6 +130,17 @@
 12. `blocked_*` 只用于 AI 已识别并显式留痕的业务阻塞；PID 消失、CLI 崩溃、会话断裂、监控探活失败等系统事件，不得直接写成 `blocked_*`。
 13. 系统崩溃或 PID 消失后，恢复定位优先级固定为：`recovery -> progress -> issue -> milestone -> active worktree/uncommitted changes`；`milestone` 只用于发现活跃 issue，不作为恢复事实源。
 14. 用于恢复和 resume 的最小字段除 `tool/session_id/jsonl_path/role` 外，还应尽量包含 `branch`、`worktree_path`、`phase_state`、`runtime_state`、`resume_hint`；若无法完整获得，必须至少保留可追溯的降级原因。
+15. `resume` 只表示“当前工具会话技术上仍可续接”，不自动等于“继续 resume 是最优策略”；若运行时已出现 `context compacted`、连续 resume 退化或达到本地轮换阈值，应允许选择 `fresh_with_handoff`，而不是盲目继续旧会话。
+16. `fresh_with_handoff` 的最小交接面应尽量包含：上一轮 `tool_session_id`（如可得）、上一轮 cycle log 路径、当前 branch/worktree、触发 fresh 的原因，以及最近一段可追溯输出摘录。
+17. 若当前工具可提供结构化上下文使用证据（例如 Codex 的 `token_count` / `model_context_window`），runtime 应允许在真正 compact 之前基于本地阈值做容量治理，而不是只等 `context compacted` 后再被动轮换。
+18. context-window 容量治理至少区分两档：
+   - `warn`：下一轮先更新当前阶段对应的 continuity artifact，再继续当前 issue
+   - `rotate`：下一轮直接进入 `fresh_with_handoff`
+19. continuity artifact 的落点必须遵循 loop 分层，不得一律写成 `progress`：
+   - `dev-loop` 写 `progress`
+   - `doc-loop` 写当前 issue / IBM / pre-brainstorm 产物
+   - `recovery` 写 `recovery` 或允许的等价恢复留痕
+20. 若 runtime 无法直接知道当前 loop 的精确文档路径，至少必须把 `summary_target_hint` 写入 prompt / handoff，由当前 AI 在下一跳先补 continuity，再继续业务推进。
 
 状态词图例：
 - `todo_*`：下一阶段已确定，但尚未开始

@@ -8,7 +8,9 @@ Usage:
     --project <abs_path> \
     --intent <abs_file> \
     --constitution <abs_file> \
-    --ai <tool[:model][:mode]>
+    --ai <tool[:model][:mode]> \
+    [--workspace-root <abs_dir>] \
+    [--reasoning-effort <effort>]
 EOF
 }
 
@@ -51,7 +53,7 @@ parse_ai_spec_or_fail() {
   }
 
   case "$tool" in
-    codex|kiro-cli|iflow|test-sleep) ;;
+    codex|kiro-cli|iflow|test-sleep|test-compact|test-once|test-session|test-route-only) ;;
     *)
       echo "[ERROR] unsupported tool: $tool" >&2
       exit 1
@@ -65,6 +67,8 @@ project=""
 intent=""
 constitution=""
 ai_spec=""
+workspace_root=""
+reasoning_effort=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -72,6 +76,8 @@ while [[ $# -gt 0 ]]; do
     --intent) intent="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
     --constitution) constitution="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
     --ai) ai_spec="${2:-}"; shift 2 ;;
+    --workspace-root) workspace_root="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+    --reasoning-effort) reasoning_effort="${2:-}"; shift 2 ;;
     *) usage; exit 1 ;;
   esac
 done
@@ -84,6 +90,14 @@ done
 [[ -d "$project" ]] || { echo "[ERROR] project not found: $project" >&2; exit 1; }
 [[ -f "$intent" ]] || { echo "[ERROR] intent file not found: $intent" >&2; exit 1; }
 [[ -f "$constitution" ]] || { echo "[ERROR] constitution file not found: $constitution" >&2; exit 1; }
+if [[ -z "$workspace_root" ]]; then
+  if [[ -d "$project/docs/system/workspace" ]]; then
+    workspace_root="$project/docs/system/workspace"
+  else
+    workspace_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+  fi
+fi
+[[ -d "$workspace_root" ]] || { echo "[ERROR] workspace root not found: $workspace_root" >&2; exit 1; }
 
 IFS='|' read -r ai_tool ai_model ai_mode <<<"$(parse_ai_spec_or_fail "$ai_spec")"
 
@@ -94,16 +108,17 @@ cat <<EOF
 - 项目意图：$intent
 - 宪法：$constitution
 - 里程碑扫描入口：$project/docs/milestones.md
-- workspace 根：$project/docs/system/workspace
+- workspace 根：$workspace_root
 - 工具清单：workspace/tools.md
 - 首跳代理：workspace/agents/lead-agent.md
 
 运行上下文：
 - PROJECT_ROOT=$project
-- WORKSPACE_ROOT=$project/docs/system/workspace
+- WORKSPACE_ROOT=$workspace_root
 - AI_TOOL=$ai_tool
 - AI_MODEL=${ai_model:-}
 - AI_MODE=$ai_mode
+- AI_REASONING_EFFORT=${reasoning_effort:-}
 
 执行要求：
 1. 先执行 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\`。
@@ -132,4 +147,7 @@ cat <<EOF
 10. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`workspace/skills/dev-loop-execution/SKILL.md\`。
 11. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
 12. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。
+13. 默认不要在首跳结束时只输出 \`next_prompt\` 就停下。
+14. 若 \`selected_tool\` 与当前运行中的 \`AI_TOOL\` 相同，你必须在当前会话内继续执行第二跳 skill，直接完成对应的 doc-loop / dev-loop 工作，并修改仓库产物；\`next_prompt\` 只作为中间可追溯产物保留。
+15. 只有当 \`selected_tool\` 与当前 \`AI_TOOL\` 不同，或你明确判断必须把执行权交回外层 runtime 时，才允许把 \`next_prompt\` 作为 handoff 输出结束当前轮次；此时必须说明为什么不能在当前会话继续执行。
 EOF

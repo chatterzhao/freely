@@ -43,5 +43,7 @@ printf '%s\n' "$prompt" | grep -q '当前先看哪个池'
 printf '%s\n' "$prompt" | grep -q 'pre-brainstorm'
 printf '%s\n' "$prompt" | grep -q 'issue-bound brainstorm'
 printf '%s\n' "$prompt" | grep -q '脚本只负责启动和托管 AI'
+printf '%s\n' "$prompt" | grep -q '默认不要在首跳结束时只输出'
+printf '%s\n' "$prompt" | grep -q '必须在当前会话内继续执行第二跳'
 
 echo "[PASS] routing foundation loop artifacts are connected"

@@ -51,22 +51,22 @@ routing_policy:
 1. `I-20260307-1201`
 - title: 源分类、milestone-owned issue 与派生 worktree 路由治理
 - milestone_state: committed
-- phase_state: `in_ibm`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md`
-- next_action: 继续在 IBM 环内校准状态联动口径，并在 issue 完成 `done_ibm` handoff 后再推进 dev-loop
+- next_action: review 与最小验证已落盘，但 `./bin/wt-status-all` 仍为 `Summary: total=6, dirty=1`；当前需先按 ownership 收束或分流 dirty 改动，其中 `docs/system/workspace/**` / `tests/**` 与 session-lifecycle 相关产物更像上游未提交批次，应先处理，再补 promote / cleanup 证据后移入 completed_issues
 
 2. `I-20260308-0101`
 - title: 状态联动、流程标识词典与 session evidence 传播治理
 - milestone_state: committed
-- phase_state: `in_ibm`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md`
-- next_action: 在治理文档与 skills 中统一流程标识词典、状态联动矩阵与 session evidence 传播规则
+- next_action: review 与 verification 已落盘，但 `./bin/wt-status-all` 仍为 `Summary: total=6, dirty=1`；当前需先按 ownership 收束或分流 dirty 改动，其中 `docs/system/workspace/**` / `tests/**` 与 session-lifecycle 相关产物更像上游未提交批次，应先处理，再补 completion verification / cleanup 证据后移入 completed_issues
 
 ### candidate_issues
 
@@ -141,6 +141,17 @@ routing_policy:
 - evidence: `docs/LAWS.md`, `docs/system/workspace/skills/context-source-skill/SKILL.md`, `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`, `docs/milestones.md`
 - completion_note: 已明确分层业务阻塞与系统崩溃恢复，禁止用 `blocked_*` 伪造系统事件交接，并统一恢复定位顺序与最小字段口径
 
+8. `I-20260316-1801`
+- title: Auto-run session lifecycle rotation and handoff governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260303-cli-orchestration-architecture/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260303-cli-orchestration-architecture/candidates.md`
+- evidence: `docs/LAWS.md`, `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/monitor-ai-cli.sh`, `docs/system/workspace/scripts/tests/test-freely-session-rotation`, `bin/test-freely-session-rotation`
+- completion_note: 已把 `resume` 与 `fresh_with_handoff` 区分为显式 runtime 行为，并固定 Codex 默认模型为 `gpt-5.4`、默认 reasoning effort 为 `medium`
+
 ## M-20260308-frontend-probe-dogfooding-loop
 
 - title: Frontend probe + backend increment dogfooding loop
@@ -155,44 +166,74 @@ routing_policy:
 1. `I-20260308-1245`
 - title: Freely 内部前后端架构复评与可插拔协议边界
 - milestone_state: committed
-- phase_state: `in_ibm`
+- phase_state: `done_ibm`
 - priority: P0
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
 - source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: 在 IBM 内收敛内部前后端边界、状态归属和可插拔协议模型，为后续 boundary contract 和 probe v0 打底
+- next_action: IBM 已完成最小边界收敛；下一跳把 `C-20260308-1244-02` `Frontend/Backend Boundary Contract v1 for Frontend Probe` 提升到 issue-bound IBM，基于当前 issue 冻结更细的 boundary contract 与事件语义
+
+2. `I-20260317-1001`
+- title: Frontend/Backend Boundary Contract v1 for Frontend Probe
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- next_action: boundary contract v1 已完成最小 IBM 收敛；下一跳把 `C-20260308-1244-03` `Frontend Probe v0` 提升为 issue-bound IBM，基于当前 contract 收紧最小产品面与验收边界
+
+3. `I-20260317-1002`
+- title: Frontend Probe v0
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- next_action: frontend 侧 contract、transport、manifest 和错误面已基本收敛；下一跳应先把缺失的 `Rust/Tauri Probe Bridge v1` 落成新的 pre-brainstorm / candidate，再由新 issue 承接 backend bridge 实现
+
+5. `I-20260317-1004`
+- title: Frontend Runtime Baseline for Probe
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md`
+- source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md`
+- next_action: runtime baseline 已完成最小 IBM 收敛；下一跳回到 `I-20260317-1002`，把 baseline 真正接入 Probe v0 并尝试解除 `blocked_dev`
+
+4. `I-20260317-1003`
+- title: Incremental Dogfooding Gate for Backend Increments
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- next_action: Probe 验证门禁已完成最小 IBM 收敛；后续实现与评审阶段直接按该门禁检查后端增量，不再把验证当成可选项
+
+6. `I-20260317-1005`
+- title: Rust/Tauri Probe Bridge v1
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+- source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
+- next_action: Rust/Tauri bridge 骨架已落地到 `Cargo.toml` 与 `src-tauri/`，bridge reducer 已从 `src-tauri/src/lib.rs` 抽到 `src-tauri/src/bridge_logic.rs`，day-1 command payload 已开始收口到 `src-tauri/src/command_payload.rs`，day-1 server event payload 也已开始收口到 `src-tauri/src/event_payload.rs`；最近几轮已把 snapshot shape、`probe_send_command` 入参、emitted server event，以及 `runId/sessionId/resumeHint/messageId/reason/commandSource/targetAgentId` 这组 frontend 当前真实发送字段统一对齐到同一份 backend contract，并把默认 `projectName/sessionId/runId/terminalTarget/lastEventId` 生成规则、空态 event fallback 命名、`governanceSummary/recoverySummary` 的“最新前插 + 最多 4 条”滚动规则，以及 `occurredAt` 的动态 RFC3339 时间戳逻辑对齐到 frontend 当前 mock/runtime 语义。下一步优先运行 `bun run rust:preflight` / `bun run cargo:check:probe` 复核并触发统一验证，再在具备 `cargo` 的环境中继续最小联调与 bridge 实现细节
 
 ### candidate_issues
 
-1. `C-20260308-1244-02`
-- title: Frontend/Backend Boundary Contract v1 for Frontend Probe
+1. `C-20260317-1101`
+- title: Frontend Runtime Baseline for Probe
 - milestone_state: candidate
 - phase_state: `todo_ibm`
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: 等整体边界复评完成后进入 IBM，冻结 Probe day-1 所需的最小边界契约与事件语义
-
-2. `C-20260308-1244-03`
-- title: Frontend Probe v0
-- milestone_state: candidate
-- phase_state: `todo_ibm`
-- priority: P0
-- promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: 等边界契约初步冻结后进入 IBM，收紧 Probe v0 的最小 UI 范围、终端集成方式与验收面
-
-3. `C-20260308-1244-04`
-- title: Incremental Dogfooding Gate for Backend Increments
-- milestone_state: candidate
-- phase_state: `todo_ibm`
-- priority: P0
-- promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: 在 API / Probe 初步成形后进入 IBM，把“每个后端增量必须有 Probe 验证”固化为正式门禁
+- promoted_issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md`
+- source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md`
+- next_action: 已提升为独立 issue；后续由 `I-20260317-1004` 承接 issue-bound IBM 收敛
 
 ### completed_issues
 

@@ -43,6 +43,9 @@
   - 供 `bin/freely` 这类运行时投影层调用
 - `runtime/freely`
   - Freely supervisor 真源
+  - 负责 fresh / resume / fresh_with_handoff 的运行时轮换策略
+  - 在需要切新会话时生成最小 handoff 交接文件，并把它拼接进下一轮 prompt
+  - 对支持结构化 token 计数的工具负责 context-window-aware 容量治理（warn / rotate）
   - 根目录 `bin/freely` 只是投影包装层
 - `worktree/*`
   - worktree / merge / status 相关命令真源

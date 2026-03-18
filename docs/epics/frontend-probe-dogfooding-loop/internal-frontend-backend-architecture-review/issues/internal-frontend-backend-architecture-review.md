@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260308-1245`
 - title: Freely 内部前后端架构复评与可插拔协议边界
-- phase_state: `in_ibm`
+- phase_state: `done_ibm`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `internal-frontend-backend-architecture-review`
@@ -235,6 +235,20 @@
    - 人能像看一个团队一样理解整体推进情况
 
 达到以上 6 条后，Freely 就不再只是“能跑脚本”，而是已经具备最小自治开发闭环，可以开始用 Freely 开发 Freely。
+
+## IBM Handoff
+
+- current_status: `done_ibm`
+- why_now: 本轮首跳重扫后，`docs/milestones.md` 中更早的两个 committed issue 仍停在 `in_verification` 且 blocker 已收敛为 ownership split；相比之下，`I-20260308-1245` 仍是当前可继续推进的 milestone-owned issue。
+- selected_tool: `codex`
+- target_skill_or_loop: `skill:doc-ibm-execution`
+- why_selected_tool: 当前工作是仓库内 issue-bound 文档收敛与里程碑回写，`codex` 更适合直接修改现有 IBM 产物，且与当前 `AI_TOOL` 一致。
+- next_prompt: `继续承接 I-20260308-1245 的 issue-bound IBM 收口。确认 frontend/backend 边界、状态归属矩阵、协议分层、ClientCommand/ServerEvent/Snapshot、input arbitration、team visibility 与 MVP autonomy milestone 已足够驱动后续接口细化；把 issue 与 milestone 从 in_ibm 推进到 done_ibm，并把下一跳指向 Frontend/Backend Boundary Contract v1 的 issue-bound materialization。`
+
+## Next
+
+- 当前 issue 已完成 IBM 收敛，下一跳不再继续扩写边界争论。
+- 建议把 `C-20260308-1244-02` `Frontend/Backend Boundary Contract v1 for Frontend Probe` 提升为下一条 issue-bound IBM 工作，直接基于本 issue 冻结最小 boundary contract。
 
 ## Human interaction policy
 

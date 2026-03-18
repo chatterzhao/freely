@@ -59,6 +59,7 @@ CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
 AI_TOOL="test-sleep"
 AI_MODEL=""
 AI_MODE="auto"
+AI_REASONING_EFFORT=""
 CHECK_INTERVAL=1
 RESTART_DELAY=1
 MAX_RESTARTS=0
@@ -79,6 +80,9 @@ kill -0 "$first_ai_pid" 2>/dev/null
 
 for _ in $(seq 1 10); do
   sleep 1
+  if [[ ! -f "$PROJECT/.freely/run/ai.pid" ]]; then
+    continue
+  fi
   second_ai_pid="$(cat "$PROJECT/.freely/run/ai.pid")"
   if [[ "$second_ai_pid" != "$first_ai_pid" ]]; then
     break
@@ -88,11 +92,16 @@ done
 [[ "${second_ai_pid:-}" != "$first_ai_pid" ]]
 kill -0 "$second_ai_pid" 2>/dev/null
 
-kill -TERM "$supervisor_pid"
+bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
 wait "$supervisor_pid" || true
 
 if [[ -f "$PROJECT/.freely/run/supervisor.pid" ]]; then
   echo "[FAIL] supervisor.pid still exists after TERM"
+  exit 1
+fi
+
+if [[ -f "$PROJECT/.freely/run/session-state.env" ]]; then
+  echo "[FAIL] session-state.env still exists after freely stop"
   exit 1
 fi
 
