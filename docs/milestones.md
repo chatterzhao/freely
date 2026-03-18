@@ -71,12 +71,12 @@ routing_policy:
 3. `I-20260318-0930`
 - title: Checkpoint commit and multi-worktree supervision governance
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/candidates.md`
-- next_action: 先把 runtime/status 的 dirty budget 与 project-level worktree summary 正式落盘，再补脚本级测试与 promote 证据；在此之前，当前 dogfood 工位不得继续被当成“健康扩写中”
+- next_action: runtime/status 的 dirty budget、project-level worktree summary、脚本级测试与 review 已落盘；当前保持 `in_verification`。本轮 `wt-status-all` 为 `Summary: total=6, dirty=1`，且唯一 dirty 工位就是当前 issue 的 verification continuity，因此无需分流无关改动，但仍未满足 promote / cleanup 前提；完成当前收口后再回到 `I-20260307-1201` 与 `I-20260308-0101` 做 completion verification / cleanup
 
 ### candidate_issues
 
