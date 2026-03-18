@@ -119,6 +119,7 @@ orchestrator 启动 AI CLI
 - [tool-config-matrix.md](references/tool-config-matrix.md) - 各工具的配置模式
 - [limit-patterns.md](references/limit-patterns.md) - 限流检测模式
 - [profile-management.md](references/profile-management.md) - Profile 配置规范
+- [auth-setup.md](references/auth-setup.md) - 授权文件准备与验证
 - [process-lifecycle.md](references/process-lifecycle.md) - 进程生命周期与会话恢复
 
 ## 与其他 Skill 的集成
