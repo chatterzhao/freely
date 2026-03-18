@@ -2,6 +2,7 @@
 
 - [x] materialize durable workcell state
 - [x] add manager supervision alert routing
+- [x] add manager runtime script recovery for expected-running worker outages
 - [x] tighten pid ownership matching
 - [x] expose desired runtime and exit reason in fleet status
 - [x] add tests for outage alert and pid ownership

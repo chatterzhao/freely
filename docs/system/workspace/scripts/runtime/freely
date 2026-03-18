@@ -401,6 +401,23 @@ fleet_status_text_for_project() {
   "$fleet_bin" --project "$project" 2>/dev/null || true
 }
 
+freely_bin_for_project() {
+  local project="$1"
+  if [[ -x "$project/bin/freely" ]]; then
+    echo "$project/bin/freely"
+  else
+    echo "$SELF_ROOT/bin/freely"
+  fi
+}
+
+start_workcell_supervisor_async() {
+  local project="$1" freely_bin recovery_log
+  freely_bin="$(freely_bin_for_project "$project")"
+  recovery_log="$(logs_dir_for_project "$project")/manager-runtime-recovery.log"
+  mkdir -p "$(dirname "$recovery_log")"
+  nohup bash "$freely_bin" start --project "$project" >>"$recovery_log" 2>&1 </dev/null &
+}
+
 log_has_context_compacted() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
@@ -725,6 +742,52 @@ manager_supervision_alerts() {
     /^worktree / { wt=substr($0, 10); br="" }
     /^branch / { br=$2; sub(/^refs\/heads\//, "", br); print wt "|" br }
   ')
+}
+
+manager_runtime_recover_workers_if_needed() {
+  local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered
+  repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
+  [[ -n "$repo_root" ]] || return 0
+  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
+
+  recovered=0
+  while IFS='|' read -r wt_path branch; do
+    [[ -n "$wt_path" ]] || continue
+    [[ "$wt_path" == "$project" ]] && continue
+    [[ -f "$(config_file "$wt_path")" ]] || continue
+    desired_state=""
+    role_hint=""
+    exit_reason=""
+    supervisor_state="down"
+    if [[ -f "$(workcell_state_file "$wt_path")" ]]; then
+      # shellcheck disable=SC1090
+      source "$(workcell_state_file "$wt_path")"
+      desired_state="${DESIRED_RUNTIME_STATE:-}"
+      role_hint="${LAST_ROLE_HINT:-}"
+      exit_reason="${LAST_EXIT_REASON:-}"
+    fi
+
+    [[ "$desired_state" == "running" ]] || continue
+    [[ "${role_hint:-worker}" == "worker" ]] || continue
+
+    if [[ -f "$(run_dir_for_project "$wt_path")/supervisor.pid" ]]; then
+      local sp
+      sp="$(cat "$(run_dir_for_project "$wt_path")/supervisor.pid" 2>/dev/null || true)"
+      if valid_supervisor_pid_for_project "$wt_path" "$sp"; then
+        supervisor_state="up"
+      fi
+    fi
+    [[ "$supervisor_state" == "down" ]] || continue
+
+    log_info "manager runtime recovering expected-running worker: branch=${branch:-unknown} exit_reason=${exit_reason:-unknown} path=$wt_path"
+    start_workcell_supervisor_async "$wt_path"
+    recovered=$((recovered + 1))
+  done < <(git -C "$repo_root" worktree list --porcelain | awk '
+    /^worktree / { wt=substr($0, 10); br="" }
+    /^branch / { br=$2; sub(/^refs\/heads\//, "", br); print wt "|" br }
+  ')
+
+  printf '%s\n' "$recovered"
 }
 
 append_manager_supervision_alert_if_needed() {
@@ -1126,6 +1189,12 @@ cmd_start() {
     ts="$(date '+%Y%m%d-%H%M%S')"
     prompt_file="$run_dir/prompt-$ts.txt"
     cycle_log="$logs_dir/cycle-$ts.log"
+    local recovered_workers
+    recovered_workers="$(manager_runtime_recover_workers_if_needed "$PROJECT_ROOT")"
+    if [[ "${recovered_workers:-0}" =~ ^[0-9]+$ ]] && (( recovered_workers > 0 )); then
+      log_info "manager runtime auto-recovered $recovered_workers expected-running worker(s) before prompt build"
+      sleep "${RESTART_DELAY:-2}"
+    fi
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
 
