@@ -137,3 +137,147 @@ fetch_wechat_article() {
 ### 结论
 
 **微信公众号文章可以通过本地 curl + 浏览器 UA 成功抓取**，不必完全依赖平台侧 WebFetch 服务。这为 Freely 提供了一个更可控的本地方案。
+
+---
+
+## 20260318-1305 URL 内容摄取能力路由设计（新增）
+
+### 问题
+
+当用户贴一个 URL（如公众号链接），Freely 如何知道该用什么方法处理？
+
+### 设计方案：`skill:url-content-intake`
+
+#### 1. 输入识别层
+
+```
+用户输入 → URL 模式匹配 → 平台识别
+```
+
+| URL 模式 | 平台 | 抓取策略 |
+|----------|------|----------|
+| `mp.weixin.qq.com/s/*` | 微信公众号 | curl + 浏览器 UA |
+| `mp.weixin.qq.com/*` | 微信其他页面 | curl + 浏览器 UA（可能需登录） |
+| `*.medium.com/*` | Medium | curl / web_fetch |
+| `*.substack.com/*` | Substack | curl / web_fetch |
+| `github.com/*` | GitHub | curl / gh CLI |
+| 其他 HTTP(S) URL | 通用网页 | curl / web_fetch |
+
+#### 2. 能力矩阵（Capability Matrix）
+
+```
+┌─────────────────┬────────────────┬────────────────┬────────────────┐
+│ 平台            │ 本地 curl      │ web_fetch 工具 │ 需要登录       │
+├─────────────────┼────────────────┼────────────────┼────────────────┤
+│ 微信公众号      │ ✅ + UA        │ ✅             │ 部分           │
+│ Medium          │ ✅             │ ✅             │ 否             │
+│ Substack        │ ✅             │ ✅             │ 部分           │
+│ GitHub          │ ✅ + gh CLI    │ ✅             │ 私有仓库需认证 │
+│ 通用网页        │ ✅             │ ✅             │ 视情况         │
+└─────────────────┴────────────────┴────────────────┴────────────────┘
+```
+
+#### 3. 路由决策树
+
+```
+输入 URL
+    │
+    ├─► 匹配平台模式？
+    │       │
+    │       ├─ 是 ─► 选择对应策略
+    │       │
+    │       └─ 否 ─► 尝试通用 curl
+    │
+    ├─► 本地抓取成功？
+    │       │
+    │       ├─ 是 ─► 提取正文 ─► 返回内容
+    │       │
+    │       └─ 否 ─► 降级策略
+    │               │
+    │               ├─► web_fetch 可用？ ─► 使用 web_fetch
+    │               │
+    │               └─► 不可用 ─► 提示用户：需手动复制或提供其他方式
+    │
+    └─► 需要登录？
+            │
+            └─► 提示用户：此页面需要登录，请手动复制内容
+```
+
+#### 4. Skill 结构设计
+
+```
+docs/system/workspace/skills/url-content-intake/
+├── SKILL.md                    # 主技能定义
+├── references/
+│   ├── platform-patterns.md    # 平台 URL 模式匹配规则
+│   ├── capability-matrix.md    # 能力矩阵定义
+│   └── fallback-strategies.md  # 降级策略
+└── scripts/
+    ├── wechat-fetch.sh         # 微信公众号抓取脚本
+    ├── generic-fetch.sh        # 通用网页抓取脚本
+    └── content-extract.sh      # 正文提取工具
+```
+
+#### 5. SKILL.md 核心定义
+
+```yaml
+---
+name: url-content-intake
+description: 当用户输入 URL 时，识别平台类型并选择正确的抓取策略，将网页内容转换为可读文本供后续处理。
+---
+
+触发条件:
+  - 用户输入包含 HTTP(S) URL
+  - 用户请求"读取这个链接"、"看看这篇文章"等
+
+输入:
+  - url: 用户提供的 URL
+  - context: 用户希望如何处理内容（摘要、分析、引用等）
+
+输出:
+  - content: 提取的正文内容
+  - metadata: 标题、作者、发布时间等（如可获取）
+  - source: 实际使用的抓取方法
+  - fallback_used: 是否使用了降级策略
+```
+
+#### 6. 与 context-source-skill 的集成
+
+`url-content-intake` 不是顶层路由 skill，而是被 `context-source-skill` 或 `doc-pre-brainstorm-execution` 调用的**能力 skill**：
+
+```
+用户输入 URL
+    │
+    └─► context-source-skill
+            │
+            ├─► source_class = discovery
+            │
+            └─► route_kind = pre_brainstorm
+                    │
+                    └─► doc-pre-brainstorm-execution
+                            │
+                            └─► 调用 url-content-intake 获取内容
+                                    │
+                                    └─► 基于内容继续 brainstorm
+```
+
+#### 7. 关键设计原则
+
+1. **显式优于隐式**：不要假设 AI 工具能"自动理解 URL"，而是显式调用抓取能力
+2. **可失败且可回退**：每种策略都有明确的失败检测和降级路径
+3. **平台感知**：不同平台有不同的反爬机制，需要针对性处理
+4. **渐进增强**：先尝试本地方案，再尝试平台能力，最后提示用户
+
+#### 8. 实现优先级
+
+1. **P0**：微信公众号抓取（已有验证方案）
+2. **P1**：通用网页抓取 + 正文提取
+3. **P2**：其他平台适配（Medium、Substack 等）
+4. **P3**：需要登录的页面处理
+
+### 下一步
+
+1. 在 `docs/system/workspace/skills/` 创建 `url-content-intake/` 目录
+2. 实现 `wechat-fetch.sh` 脚本
+3. 定义平台模式匹配规则
+4. 与现有 skill 路由集成
