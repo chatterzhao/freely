@@ -8,6 +8,7 @@
 - boundaries:
   - 主管只做监督、编排、委派、告警，不直接修业务或处理本地账号限额。
   - 账号切换、限额等待、进程重启属于目标工位 `runtime`/脚本职责。
+  - 主管若判断需要恢复，只能输出 `runtime_recovery_requested` 这一管理决策；真正恢复由 runtime 执行。
   - worker 继续只负责自己工位的 doc loop / dev loop / verification。
 - scope:
   - `runtime/freely`

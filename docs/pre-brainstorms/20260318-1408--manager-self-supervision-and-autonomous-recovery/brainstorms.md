@@ -41,7 +41,7 @@ Freely 需要把“主管自检 + 工位巡检 + 自主恢复”提升为 contro
    - 发现问题后的动作应是：
      - 指定目标工位；
      - 指定 owner；
-     - 指定下一步是 `restart / delegate / freeze / merge / cleanup` 中哪一种。
+     - 指定下一步是 `runtime_recovery_requested / delegate / freeze / merge / cleanup` 中哪一种。
 
 2. `worker`
    - 只负责自己工位上的 doc loop / dev loop / verification。
@@ -61,6 +61,7 @@ Freely 需要把“主管自检 + 工位巡检 + 自主恢复”提升为 contro
 - `manager` 管编排
 
 主管若发现“账号限额”这类问题，不应自己处理；它只需要识别“该问题的 owner 是本工位 runtime”，然后让脚本链路继续接管。
+这里的“接管”是指主管输出恢复判定，实际切号、等待和重启仍由 runtime 执行。
 
 ## Initial Capability Shape
 

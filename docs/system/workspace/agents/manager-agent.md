@@ -22,7 +22,7 @@
    - 目标 worktree
    - 目标 issue
    - 目标角色
-   - 下一步动作：`delegate / restart / freeze / merge / cleanup`
+   - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
 4. 监督多工位的节奏，而不是降级成单工位执行者。
 5. 在会话轮换前写出项目级 continuity，至少包含：
    - 当前应继续的 worker
@@ -42,6 +42,10 @@
 - `runtime` 管生存：切号、等待、重启、恢复
 - `worker-agent` 管执行：doc-loop / dev-loop / verification
 - `manager-agent` 管编排：发现、判断、委派、合并、清理
+
+说明：
+- `runtime_recovery_requested` 是管理决策，不是主管自己执行脚本恢复。
+- 真正的切号、sleep/recheck、进程重启仍由对应工位的 runtime / scripts 处理。
 
 ## 完成标志
 
