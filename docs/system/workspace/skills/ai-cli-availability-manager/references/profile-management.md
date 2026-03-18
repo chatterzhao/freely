@@ -6,34 +6,41 @@
 
 全局配置文件：`~/.config/freely/ai-cli-profiles.yaml`
 
-项目级覆盖（可选）：`<project>/.env/ai-cli-profiles.yaml`
+## 快速配置（推荐）
 
-## 授权文件目录
+```bash
+# 1. 登录 codex 账号1
+codex login
+# 完成后保存为 personal profile
+freely ai-cli save codex personal
 
-**统一存放位置**：`~/.ai-auth/`
+# 2. 登录 codex 账号2
+codex login
+# 完成后保存为 work profile
+freely ai-cli save codex work
 
-```
-~/.ai-auth/
-├── codex-personal/
-│   └── auth.json
-├── codex-work/
-│   └── auth.json
-├── codex-backup/
-│   └── auth.json
-├── iflow-default/
-│   └── settings.json      # 包含 apiKey
-└── iflow-backup/
-    └── settings.json
+# 3. 查看已保存的 profile
+freely ai-cli list
 ```
 
-**命名规则**：`<tool>-<account-name>/`
+**原理**：`freely ai-cli save` 自动复制当前 `~/.codex/auth.json` 到 `~/.ai-auth/codex-<profile>/`
+
+## 目录结构
+
+```
+~/.ai-auth/                    # 授权文件目录（自动管理）
+├── codex-personal/auth.json
+├── codex-work/auth.json
+└── codex-backup/auth.json
+
+~/.config/freely/
+└── ai-cli-profiles.yaml       # 配置文件（自动生成）
+```
 
 ## 配置格式
 
 ```yaml
-# AI CLI Profile 配置
 version: 1
-
 default_tool: codex
 
 tools:
@@ -47,9 +54,6 @@ tools:
       work:
         auth_dir: ~/.ai-auth/codex-work
         description: 工作账号
-      backup:
-        auth_dir: ~/.ai-auth/codex-backup
-        description: 备用账号
     strategy:
       mode: round-robin
       skip_cooling: true
@@ -61,124 +65,95 @@ tools:
       default:
         env:
           IFLOW_apiKey: $IFLOW_DEFAULT_KEY
-          IFLOW_baseUrl: https://apis.iflow.cn/v1
-      backup:
-        env:
-          IFLOW_apiKey: $IFLOW_BACKUP_KEY
-          IFLOW_baseUrl: https://apis.iflow.cn/v1
 
-# 状态跟踪（自动管理）
 state:
   codex:
     personal:
       last_used: 2026-03-18T10:30:00Z
       status: active
-    work:
-      status: cooling
-      cooling_until: 2026-03-18T15:00:00Z
-```
-
-## 切换方式
-
-### codex: copy_auth
-
-```bash
-# 切换流程
-switch_codex_profile() {
-  local profile="$1"
-  local auth_dir=$(get_profile_auth_dir "$profile")  # ~/.ai-auth/codex-work
-  
-  # 备份当前授权
-  cp ~/.codex/auth.json ~/.codex/auth.json.bak
-  
-  # 复制新授权
-  cp "$auth_dir/auth.json" ~/.codex/auth.json
-  
-  # 重启进程
-  kill $pid
-  codex resume --last
-}
-```
-
-### iflow: env_var
-
-```bash
-# 切换流程
-switch_iflow_profile() {
-  local profile="$1"
-  local env=$(get_profile_env "$profile")
-  
-  kill $pid
-  env $env iflow -c
-}
-```
-
-## 目录结构
-
-```
-~/.ai-auth/                    # 统一授权文件目录
-├── codex-personal/auth.json
-├── codex-work/auth.json
-├── codex-backup/auth.json
-├── iflow-default/settings.json
-└── iflow-backup/settings.json
-
-~/.codex/                      # codex 主目录（切换时覆写）
-├── auth.json                  # 当前活跃授权
-├── config.toml
-├── sessions/                  # 会话文件（位置不变）
-└── history.jsonl
-
-~/.iflow/                      # iflow 主目录（不变）
-├── settings.json
-├── history/                   # 会话文件（位置不变）
-└── ...
-```
-
-## 用户准备步骤
-
-### codex
-
-```bash
-# 1. 创建授权目录
-mkdir -p ~/.ai-auth/codex-personal
-mkdir -p ~/.ai-auth/codex-work
-
-# 2. 用对应账号登录 codex，然后复制授权文件
-# 登录账号1后：
-cp ~/.codex/auth.json ~/.ai-auth/codex-personal/
-
-# 登录账号2后：
-cp ~/.codex/auth.json ~/.ai-auth/codex-work/
-
-# 3. 设置权限
-chmod 700 ~/.ai-auth
-chmod 600 ~/.ai-auth/*/auth.json
-```
-
-### iflow
-
-```bash
-# iflow 使用环境变量，在 ~/.zshrc 或 ~/.bashrc 中设置
-export IFLOW_DEFAULT_KEY="sk-xxxxx"
-export IFLOW_BACKUP_KEY="sk-yyyyy"
 ```
 
 ## CLI 命令
 
+| 命令 | 说明 |
+|------|------|
+| `freely ai-cli save <tool> <profile>` | 保存当前登录账号为 profile |
+| `freely ai-cli switch <tool> <profile>` | 切换到指定 profile |
+| `freely ai-cli list` | 列出所有 profile |
+| `freely ai-cli status` | 查看当前状态 |
+| `freely ai-cli delete <tool> <profile>` | 删除指定 profile |
+
+## save 命令实现
+
 ```bash
-# 查看当前状态
-freely ai-cli status
-
-# 切换 profile
-freely ai-cli switch codex work
-
-# 列出所有 profile
-freely ai-cli list
-
-# 验证配置
-freely ai-cli validate
-
-# 从当前登录账号保存到 profile
-freely ai-cli save codex personal
+freely_ai_cli_save() {
+  local tool="$1"
+  local profile="$2"
+  
+  case "$tool" in
+    codex)
+      # 检查当前登录
+      [ -f ~/.codex/auth.json ] || { echo "错误: 请先 codex login"; exit 1; }
+      
+      # 创建目录并复制
+      mkdir -p ~/.ai-auth/codex-$profile
+      cp ~/.codex/auth.json ~/.ai-auth/codex-$profile/
+      chmod 600 ~/.ai-auth/codex-$profile/auth.json
+      
+      # 更新配置文件
+      update_profiles_config codex "$profile"
+      
+      echo "已保存 codex profile: $profile"
+      ;;
+    iflow)
+      echo "iflow 使用环境变量，请在 ~/.zshrc 中设置 IFLOW_${profile}_KEY"
+      ;;
+  esac
+}
 ```
+
+## 切换流程
+
+```bash
+freely_ai_cli_switch() {
+  local tool="$1"
+  local profile="$2"
+  local auth_dir=~/.ai-auth/codex-$profile
+  
+  # 检查 profile 是否存在
+  [ -d "$auth_dir" ] || { echo "错误: profile $profile 不存在"; exit 1; }
+  
+  # 备份当前授权
+  [ -f ~/.codex/auth.json ] && cp ~/.codex/auth.json ~/.codex/auth.json.bak
+  
+  # 复制新授权
+  cp "$auth_dir/auth.json" ~/.codex/auth.json
+  
+  # 更新活跃 profile
+  update_active_profile codex "$profile"
+  
+  echo "已切换到 codex profile: $profile"
+  echo "请重启 codex 使授权生效"
+}
+```
+
+## 首次使用流程
+
+```bash
+# 1. 准备环境
+freely ai-cli init
+
+# 2. 依次登录并保存各账号
+codex login && freely ai-cli save codex personal
+codex login && freely ai-cli save codex work
+codex login && freely ai-cli save codex backup
+
+# 3. 验证
+freely ai-cli list
+```
+
+## 安全
+
+- `~/.ai-auth/` 权限自动设为 `700`
+- 授权文件权限自动设为 `600`
+- Freely 不读取授权文件内容，仅复制
