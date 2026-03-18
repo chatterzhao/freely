@@ -1,29 +1,29 @@
-# Profile 配置规范
+# Account 配置规范
 
-本文档定义 Freely 管理 AI CLI profile 的配置格式和规范。
+本文档定义 Freely 管理 AI CLI account 的配置格式和规范。
 
 ## 配置文件位置
 
-全局配置文件：`~/.config/freely/ai-cli-profiles.yaml`
+全局配置文件：`~/.config/freely/ai-cli-accounts.yaml`
 
 ## 快速配置（推荐）
 
 ```bash
 # 1. 登录 codex 账号1
 codex login
-# 完成后保存为 personal profile
+# 完成后保存为 personal account
 freely ai-cli save codex personal
 
 # 2. 登录 codex 账号2
 codex login
-# 完成后保存为 work profile
+# 完成后保存为 work account
 freely ai-cli save codex work
 
-# 3. 查看已保存的 profile
+# 3. 查看已保存的 account
 freely ai-cli list
 ```
 
-**原理**：`freely ai-cli save` 自动复制当前 `~/.codex/auth.json` 到 `~/.ai-auth/codex-<profile>/`
+**原理**：`freely ai-cli save` 自动复制当前 `~/.codex/auth.json` 到 `~/.ai-auth/codex-<account>/`
 
 ## 目录结构
 
@@ -34,7 +34,7 @@ freely ai-cli list
 └── codex-backup/auth.json
 
 ~/.config/freely/
-└── ai-cli-profiles.yaml       # 配置文件（自动生成）
+└── ai-cli-accounts.yaml       # 配置文件（自动生成）
 ```
 
 ## 配置格式
@@ -47,7 +47,7 @@ tools:
   codex:
     method: copy_auth
     active: personal
-    profiles:
+    accounts:
       personal:
         auth_dir: ~/.ai-auth/codex-personal
         description: 个人账号
@@ -61,7 +61,7 @@ tools:
   iflow:
     method: env_var
     active: default
-    profiles:
+    accounts:
       default:
         env:
           IFLOW_apiKey: $IFLOW_DEFAULT_KEY
@@ -77,18 +77,18 @@ state:
 
 | 命令 | 说明 |
 |------|------|
-| `freely ai-cli save <tool> <profile>` | 保存当前登录账号为 profile |
-| `freely ai-cli switch <tool> <profile>` | 切换到指定 profile |
-| `freely ai-cli list` | 列出所有 profile |
+| `freely ai-cli save <tool> <account>` | 保存当前登录账号为 account |
+| `freely ai-cli switch <tool> <account>` | 切换到指定 account |
+| `freely ai-cli list` | 列出所有 account |
 | `freely ai-cli status` | 查看当前状态 |
-| `freely ai-cli delete <tool> <profile>` | 删除指定 profile |
+| `freely ai-cli delete <tool> <account>` | 删除指定 account |
 
 ## save 命令实现
 
 ```bash
 freely_ai_cli_save() {
   local tool="$1"
-  local profile="$2"
+  local account="$2"
   
   case "$tool" in
     codex)
@@ -96,17 +96,17 @@ freely_ai_cli_save() {
       [ -f ~/.codex/auth.json ] || { echo "错误: 请先 codex login"; exit 1; }
       
       # 创建目录并复制
-      mkdir -p ~/.ai-auth/codex-$profile
-      cp ~/.codex/auth.json ~/.ai-auth/codex-$profile/
-      chmod 600 ~/.ai-auth/codex-$profile/auth.json
+      mkdir -p ~/.ai-auth/codex-$account
+      cp ~/.codex/auth.json ~/.ai-auth/codex-$account/
+      chmod 600 ~/.ai-auth/codex-$account/auth.json
       
       # 更新配置文件
-      update_profiles_config codex "$profile"
+      update_accounts_config codex "$account"
       
-      echo "已保存 codex profile: $profile"
+      echo "已保存 codex account: $account"
       ;;
     iflow)
-      echo "iflow 使用环境变量，请在 ~/.zshrc 中设置 IFLOW_${profile}_KEY"
+      echo "iflow 使用环境变量，请在 ~/.zshrc 中设置 IFLOW_${account}_KEY"
       ;;
   esac
 }
@@ -117,11 +117,11 @@ freely_ai_cli_save() {
 ```bash
 freely_ai_cli_switch() {
   local tool="$1"
-  local profile="$2"
-  local auth_dir=~/.ai-auth/codex-$profile
+  local account="$2"
+  local auth_dir=~/.ai-auth/codex-$account
   
-  # 检查 profile 是否存在
-  [ -d "$auth_dir" ] || { echo "错误: profile $profile 不存在"; exit 1; }
+  # 检查 account 是否存在
+  [ -d "$auth_dir" ] || { echo "错误: account $account 不存在"; exit 1; }
   
   # 备份当前授权
   [ -f ~/.codex/auth.json ] && cp ~/.codex/auth.json ~/.codex/auth.json.bak
@@ -129,10 +129,10 @@ freely_ai_cli_switch() {
   # 复制新授权
   cp "$auth_dir/auth.json" ~/.codex/auth.json
   
-  # 更新活跃 profile
-  update_active_profile codex "$profile"
+  # 更新活跃 account
+  update_active_account codex "$account"
   
-  echo "已切换到 codex profile: $profile"
+  echo "已切换到 codex account: $account"
   echo "请重启 codex 使授权生效"
 }
 ```

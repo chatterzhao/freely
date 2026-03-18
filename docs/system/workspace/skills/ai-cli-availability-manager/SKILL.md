@@ -20,7 +20,7 @@ auto-loop-orchestrator 准备启动 AI CLI
     ↓
 调用 skill:ai-cli-availability-manager
     ↓
-读取当前活跃 profile 配置
+读取当前活跃 account 配置
     ↓
 注入环境变量（如 CODEX_HOME, IFLOW_apiKey）
     ↓
@@ -40,13 +40,13 @@ orchestrator 启动 AI CLI
     ↓
 记录当前会话 ID 和进度到 recovery
     ↓
-标记当前 profile 为"冷却中"
+标记当前 account 为"冷却中"
     ↓
 发送 SIGTERM 终止进程（优雅终止）
     ↓
 等待进程退出（最多 5 秒，超时 SIGKILL）
     ↓
-选择下一个可用 profile
+选择下一个可用 account
     ↓
 注入新环境变量
     ↓
@@ -84,11 +84,11 @@ orchestrator 启动 AI CLI
     ↓
 记录凭证失效事件
     ↓
-标记当前 profile 为 failed
+标记当前 account 为 failed
     ↓
-尝试下一个 profile
+尝试下一个 account
     ↓
-如果所有 profile 都失效：
+如果所有 account 都失效：
     - 暂停循环
     - 通知用户
     - 等待手动干预
@@ -98,13 +98,13 @@ orchestrator 启动 AI CLI
 
 - `tool`: AI CLI 工具名称（codex/iflow/kiro）
 - `action`: `inject` | `switch` | `status`
-- `profile`: 可选，指定 profile 名称
+- `account`: 可选，指定 account 名称
 - `session_id`: 可选，当前会话 ID（用于恢复）
 
 ## 输出
 
 - `env_vars`: 需要注入的环境变量字典
-- `active_profile`: 当前活跃的 profile 名称
+- `active_account`: 当前活跃的 account 名称
 - `event`: 触发的事件（限流/切换/失效）
 - `recovery_hint`: 会话恢复提示（session_id + resume 命令）
 
@@ -118,7 +118,7 @@ orchestrator 启动 AI CLI
 
 - [tool-config-matrix.md](references/tool-config-matrix.md) - 各工具的配置模式
 - [limit-patterns.md](references/limit-patterns.md) - 限流检测模式
-- [profile-management.md](references/profile-management.md) - Profile 配置规范
+- [account-management.md](references/account-management.md) - Account 配置规范
 - [auth-setup.md](references/auth-setup.md) - 授权文件准备与验证
 - [process-lifecycle.md](references/process-lifecycle.md) - 进程生命周期与会话恢复
 - [cli-interface-design.md](references/cli-interface-design.md) - CLI 接口设计
@@ -127,7 +127,7 @@ orchestrator 启动 AI CLI
 
 | Skill | 集成方式 |
 |-------|----------|
-| `constitution-guard` | 预检 profile 配置是否完整 |
+| `constitution-guard` | 预检 account 配置是否完整 |
 | `laws-enforcer` | 验证切换事件是否正确记录 |
 | `auto-loop-orchestrator` | 提供 AI CLI 启动时的环境变量 |
 | `recovery-subagent-governance` | 限流/失效事件触发恢复流程 |

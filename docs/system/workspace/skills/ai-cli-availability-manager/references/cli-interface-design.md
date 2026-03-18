@@ -39,7 +39,7 @@ freely ai-cli status --format yaml
 freely ai-cli switch codex work
 
 # 输出：
-# 当前 profile: personal
+# 当前 account: personal
 # 切换到: work
 # 确认? [y/N] y
 # 已切换到 work
@@ -68,8 +68,8 @@ freely ai-cli status --format json --yes
 # 输出
 {
   "tool": "codex",
-  "active_profile": "personal",
-  "profiles": ["personal", "work", "backup"],
+  "active_account": "personal",
+  "accounts": ["personal", "work", "backup"],
   "last_switch": "2026-03-18T10:30:00Z"
 }
 
@@ -99,20 +99,20 @@ freely ai-cli <command> [options]
 freely ai-cli init [--yes]
 
 # 保存当前登录
-freely ai-cli save <tool> <profile> [--yes]
+freely ai-cli save <tool> <account> [--yes]
 
-# 切换 profile
-freely ai-cli switch <tool> [<profile>] [--yes]
-# profile 省略时显示选择菜单
+# 切换 account
+freely ai-cli switch <tool> [<account>] [--yes]
+# account 省略时显示选择菜单
 
-# 列出 profiles
+# 列出 accounts
 freely ai-cli list [--format json|yaml|text]
 
 # 状态
 freely ai-cli status [--format json|yaml|text]
 
 # 删除
-freely ai-cli delete <tool> <profile> [--yes]
+freely ai-cli delete <tool> <account> [--yes]
 
 # 自动切换（限流触发）
 freely ai-cli auto-switch <tool> [--format json]
@@ -137,7 +137,7 @@ Profiles:
 {
   "tool": "codex",
   "active": "personal",
-  "profiles": [
+  "accounts": [
     {"name": "personal", "description": "个人账号", "active": true},
     {"name": "work", "description": "工作账号", "active": false},
     {"name": "backup", "description": "备用账号", "active": false}
@@ -150,7 +150,7 @@ Profiles:
 ```yaml
 tool: codex
 active: personal
-profiles:
+accounts:
   - name: personal
     description: 个人账号
     active: true
@@ -167,8 +167,8 @@ if echo "$output" | grep -qE "5-hour.*limit|rate.?limit"; then
   # 非交互式切换
   freely ai-cli auto-switch codex --format json --yes
   
-  # 读取返回的 profile 信息
-  # {"switched": true, "profile": "work", "method": "copy_auth"}
+  # 读取返回的 account 信息
+  # {"switched": true, "account": "work", "method": "copy_auth"}
 fi
 ```
 
@@ -177,11 +177,11 @@ fi
 ```bash
 # 非交互式：返回码 + JSON 错误
 freely ai-cli switch codex nonexistent --yes --format json
-# {"error": "profile_not_found", "message": "Profile 'nonexistent' does not exist"}
+# {"error": "account_not_found", "message": "Profile 'nonexistent' does not exist"}
 # exit code: 4
 
 # 交互式：提示用户
 freely ai-cli switch codex nonexistent
 # 错误: Profile 'nonexistent' 不存在
-# 可用 profiles: personal, work, backup
+# 可用 accounts: personal, work, backup
 ```
