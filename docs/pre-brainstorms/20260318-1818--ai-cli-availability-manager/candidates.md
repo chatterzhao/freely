@@ -126,7 +126,7 @@
   - `freely ai login codex` 一键完成登录和保存
   - 自动检测账号并保存授权文件
 - priority: P0
-- status: in_progress
+- status: done
 - decision_reason: 用户体验核心改进。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
