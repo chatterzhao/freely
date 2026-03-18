@@ -63,3 +63,77 @@ Freely 不应把“给 AI 一个 URL 看它会不会自己读”当作可靠工�
   - codex: 依赖本地 fetch / browser / 用户给定内容
   - 其他工具: 逐个标注
 - 再决定是否需要为微信公众号文章单独加子策略
+
+---
+
+## 20260318-1258 实验验证结果（新增）
+
+### 实验
+
+使用 curl 模拟浏览器请求头访问同一公众号链接：
+
+```bash
+curl -sL \
+  -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+  -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" \
+  -H "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8" \
+  "https://mp.weixin.qq.com/s/MB5gKaZMv5RyXFRuubxdrg"
+```
+
+### 结果
+
+**成功获取正文内容！**
+
+关键发现：
+1. 微信公众号的反爬机制主要检测 User-Agent
+2. 模拟浏览器 UA 后，文章内容在 `id="js_content"` 的 div 中
+3. 可用 sed/grep 提取纯文本
+
+### 提取正文的方法
+
+```bash
+# 保存 HTML
+curl -sL -A "Mozilla/5.0..." "$URL" > /tmp/wx_article.html
+
+# 提取纯文本
+grep -A 500 'id="js_content"' /tmp/wx_article.html | \
+  sed 's/<[^>]*>//g' | \
+  sed 's/&nbsp;/ /g' | \
+  sed 's/&amp;/\&/g' | \
+  tr -s ' \n'
+```
+
+### 修正判断
+
+之前认为"本机直抓会返回验证页"，实际上是**请求头问题**：
+- 默认 curl UA 会被微信拦截 → 返回验证页
+- 模拟浏览器 UA → 成功返回正文
+
+### 对 Freely 的更新建议
+
+`wechat-article-intake` 可以实现为本地方案：
+
+```bash
+# wechat-fetch.sh
+fetch_wechat_article() {
+  local url="$1"
+  curl -sL \
+    -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+    -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" \
+    -H "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8" \
+    "$url"
+}
+```
+
+### 局限性
+
+- 此方法可能在以下情况失效：
+  - 文章需要登录才能查看
+  - IP 被微信风控
+  - 文章已被删除
+  - 微信更新反爬策略
+- 应保留"可失败且可回退"设计
+
+### 结论
+
+**微信公众号文章可以通过本地 curl + 浏览器 UA 成功抓取**，不必完全依赖平台侧 WebFetch 服务。这为 Freely 提供了一个更可控的本地方案。
