@@ -259,6 +259,53 @@
 - next_focus: `I-20260308-0101`
 - next_route: `doc-ibm-execution`
 
+## 变更（2026-03-18 checkpoint-ready 后自治提交治理候选）
+
+### continuity refresh
+- source_class: `milestone + continuation`
+- active_issue: `I-20260318-0930`
+- detected_boundary_external_problem: `C-20260318-0715-A`
+- decision: 当前新问题不并回 `I-20260318-0930`；按法律要求先进入 `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/`，并同步到 `docs/milestones.md.candidate_issues`
+- why: 问题已明确来自 verification 过程，但尚未稳定到 issue-bound IBM；继续混入当前 verification 会扩大 scope
+- project_worktree_summary: `total=7, dirty=1`
+- supervisor_order:
+  - 当前工位继续保持 `I-20260318-0930` 的 verification continuity
+  - 其他 CLEAN 工位继续冻结待核对，不伪造 phase/issue
+  - 本 issue 收口后，再回到 `I-20260307-1201` 与 `I-20260308-0101` 的 completion verification / cleanup
+
+### route refresh
+- selected_tool: `codex`
+- why_selected_tool: 当前动作仍是同一 worktree 内继续收敛 pre-brainstorm candidate，并原子回写 milestone / continuity；不需要把执行权交回外层 runtime，也不适合切到只做长 prompt 编排的工具
+- target_skill_or_loop: `doc-pre-brainstorm-execution`
+- next_prompt: `继续收敛 C-20260318-0715-A，冻结 checkpoint-ready 的结构化判定、control-plane 职责分层与进入 IBM 的 promotion gate；不要把新问题并回 I-20260318-0930 的 verification scope。`
+
+## 变更（2026-03-18 首跳重入后的 verification continuity 判定）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: 当前重新扫描 `milestones / progress-recovery / review-test / human chat-session evidence / github issue / PROJECT_INTENT` 后，没有比 `I-20260318-0930` 更高优先的活跃输入；`C-20260318-0715-A` 已合法分流，但仍是 `needs_research`，不应抢占当前 committed verification
+- current_problem_kind: `issue continuation`
+- selected_tool: `codex`
+- why_selected_tool: 当前动作是同一 worktree 内继续维护 verification continuity、更新项目级监督结论并回写 issue/continuity；不需要切换到偏研究型工具或把执行权交回 runtime
+- target_skill_or_loop: `dev-loop-execution`
+- next_prompt: `继续承接 I-20260318-0930。保持当前 committed issue 的 verification continuity，先补齐最新 project-level worktree summary 与 supervisor ordering；C-20260318-0715-A 继续留在 pre-brainstorm，不抢占本轮收口。`
+
+### continuity refresh
+- project_worktree_summary: `total=8, dirty=1`
+- current_worktree_state: `DIRTY`
+- current_project_dirty_entries: `5`
+- checkpoint_required: `unknown`
+- workspace_hygiene_decision:
+  - 当前 5 个 dirty entries 均属于同一 worktree 的 issue continuity 与已同步的 pre-brainstorm candidate
+  - 暂不需要按 ownership 分流到其他 worktree
+  - 也未达到可以宣告 promote / cleanup 的前提
+- pool_scan_result:
+  - `progress / recovery`: 目录尚未启用，不触发 recovery
+  - `review / test`: 当前最高优先仍是 `I-20260318-0930` 的 completion verification / cleanup continuity
+  - `human chat / session evidence`: 只提供本轮首跳重入输入，不改写 issue 边界
+  - `github issue`: 当前仓库无更高优先的新外部输入落点
+  - `PROJECT_INTENT`: 继续要求先从多池扫描决定 route，而不是脚本硬编码
+
 ### 更新（2026-03-18 checkpoint verification refresh）
 - issue: `I-20260318-0930`
 - branch: `feature/checkpoint-commit-and-multi-worktree-supervision-governance-20260318-045109`

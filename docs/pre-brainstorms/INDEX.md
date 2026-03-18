@@ -121,6 +121,12 @@
 - 20260318-0009--multi-worktree-supervision-control-plane
   - brainstorms: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/candidates.md
+- 20260318-0715--ai-autonomy-checkpoint-commit-governance
+  - brainstorms: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
+- 20260318-1210--rate-limit-recheck-and-wakeup
+  - brainstorms: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/candidates.md

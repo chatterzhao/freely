@@ -80,7 +80,15 @@ routing_policy:
 
 ### candidate_issues
 
-- none currently
+1. `C-20260318-0715-A`
+- title: `commit-first after checkpoint-ready` 自治治理
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/candidates.md`
+- next_action: 继续 pre-brainstorm，先冻结 3 个边界：`checkpoint-ready` 的结构化输出、`LAWS/runtime/checkpoint-guard/supervisor` 的职责分层、以及进入 IBM 前的 promotion gate；在这些边界稳定前不得直接写成 IBM issue 或塞回 `I-20260318-0930`
 
 ### completed_issues
 

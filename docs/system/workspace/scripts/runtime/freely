@@ -810,6 +810,17 @@ codex_account_is_available_now() {
   [[ "$(seconds_until_epoch "$reset_at")" == "0" ]]
 }
 
+codex_any_saved_account_available_now() {
+  local project="$1" candidate
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    if codex_account_is_available_now "$project" "$candidate"; then
+      return 0
+    fi
+  done < <(codex_saved_accounts "$project")
+  return 1
+}
+
 select_next_codex_account() {
   local project="$1" current_account="$2"
   local normalized_current candidate
@@ -1151,7 +1162,7 @@ cmd_start() {
         log_warn "${rate_limit_reason} detected; backing off until reset_at=${rate_limit_reset_at:-unavailable} (sleep=${next_restart_delay:-0}s)"
       fi
     fi
-    sleep "$next_restart_delay"
+    sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$next_restart_delay"
   done
 }
 
@@ -1238,6 +1249,28 @@ cmd_status() {
   else
     echo "ai_pid: none"
   fi
+}
+
+sleep_with_rate_limit_recheck() {
+  local project="$1" total_sleep="$2"
+  local remaining chunk stop_file
+  remaining="${total_sleep:-0}"
+  stop_file="$(stop_marker_file "$project")"
+  [[ "$remaining" =~ ^[0-9]+$ ]] || remaining=0
+  while (( remaining > 0 )); do
+    if [[ -f "$stop_file" ]]; then
+      return 0
+    fi
+    if [[ "$AI_TOOL" == "codex" ]] && codex_any_saved_account_available_now "$project"; then
+      return 0
+    fi
+    chunk=60
+    if (( remaining < chunk )); then
+      chunk="$remaining"
+    fi
+    sleep "$chunk"
+    remaining=$((remaining - chunk))
+  done
 }
 
 cmd_fleet_status() {
