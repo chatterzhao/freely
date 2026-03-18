@@ -26,10 +26,22 @@ git worktree add -q -b feature/demo-b "$TMP_DIR/repo-worktrees/feature-demo-b" d
 
 echo dirty > "$TMP_DIR/repo-worktrees/feature-demo-a/demo.txt"
 
+mkdir -p "$TMP_DIR/repo-worktrees/feature-demo-a/.freely/run" "$TMP_DIR/repo-worktrees/feature-demo-b/.freely/run"
+cat >"$TMP_DIR/repo-worktrees/feature-demo-a/.freely/run/session-state.env" <<'EOF'
+LAST_PHASE_HINT="in_dev"
+LAST_ISSUE_HINT="Probe Bridge"
+EOF
+cat >"$TMP_DIR/repo-worktrees/feature-demo-b/.freely/run/session-state.env" <<'EOF'
+LAST_PHASE_HINT="done_ibm"
+LAST_ISSUE_HINT="Boundary Contract"
+EOF
+
 OUTPUT="$(bash "$ROOT_DIR/bin/wt-fleet-status" --project "$REPO")"
 printf '%s\n' "$OUTPUT" | grep -q 'CHECKPOINT'
 printf '%s\n' "$OUTPUT" | grep -q 'feature/demo-a'
 printf '%s\n' "$OUTPUT" | grep -q 'feature/demo-b'
 printf '%s\n' "$OUTPUT" | grep -q 'DIRTY'
+printf '%s\n' "$OUTPUT" | grep -q 'Probe Bridge'
+printf '%s\n' "$OUTPUT" | grep -q 'Boundary Contract'
 
-echo "[PASS] wt-fleet-status reports multiple worktrees with checkpoint column"
+echo "[PASS] wt-fleet-status reports runtime-backed phase and issue hints"

@@ -27,7 +27,9 @@
    - `skill:doc-ibm-execution`
    - `skill:dev-loop-execution`
    - 以及应由哪个外部 AI CLI 工具承接下一跳
-6. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:doc-ibm-execution` 或 `skill:dev-loop-execution`；已有 issue 先进入 issue-bound `doc-loop`，再由后续循环进入 `dev-loop`。
+6. 当当前轮次承担项目级监督职责时，先判断哪些 worktree 应继续 dev-loop、哪些只做 doc-loop、哪些冻结等待上游、哪些需要 checkpoint / review / cleanup。
+7. 在可并行的 review、日志诊断、文档收敛或互不冲突的代码任务上，主动使用 subagent 提高效率，但不要让 subagent 接管主管自己的关键排班判断。
+8. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:doc-ibm-execution` 或 `skill:dev-loop-execution`；已有 issue 先进入 issue-bound `doc-loop`，再由后续循环进入 `dev-loop`。
 
 ## 不负责
 
@@ -50,6 +52,7 @@
    - 需要更新的里程碑/候选状态
 5. 若下一跳工具与当前运行工具一致，使用组装后的 prompt 在当前会话内继续进入对应第二跳 skill；不得只停在输出 `next_prompt`。
 6. 只有当下一跳工具与当前工具不一致，或必须把执行权显式交回外层 runtime 时，才允许把 `next_prompt` 作为交接产物返回。
+7. 若 prompt 中附带项目级工位快照，必须先利用它做主管级判断，再决定下一跳是不是当前 worktree 本地执行，还是委派到其他工位 / subagent。
 
 ## 完成标志
 

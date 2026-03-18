@@ -97,6 +97,7 @@ second_prompt="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
 grep -q 'Checkpoint governance:' "$second_prompt"
 grep -q 'current_project_dirty_entries: 1' "$second_prompt"
 grep -q 'current_worktree_dirty_summary: 1/1' "$second_prompt"
+grep -q '项目级工位快照：' "$second_prompt"
 
 status_output="$(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")"
 grep -q 'last_project_dirty_entries: 1' <<<"$status_output"

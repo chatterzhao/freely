@@ -30,6 +30,21 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 7. 当状态跨环迁移时，按 `docs/LAWS.md` 第 2C 章同步更新候选项 / milestone / issue / progress / recovery / session evidence。
 8. 重复循环直到停止条件。
 
+## 主管模式
+
+当当前会话承担项目级监督职责时：
+
+0. 这是 `auto-loop` 的项目负责人姿态，不是新的并列 loop。
+1. 先读取项目级工位视图，而不是直接把自己降级成单工位执行者。
+2. 基于 worktree 的 `dirty/checkpoint/runtime/phase/issue` 信息决定：
+   - 哪些工位继续 dev-loop
+   - 哪些工位只做 doc-loop
+   - 哪些工位冻结等待上游
+   - 哪些工位进入 review / integration / cleanup
+3. 在可并行且写入范围不冲突的任务上，使用 subagent 提高效率。
+4. 主管会话自己的职责是排班、监督、合并节奏和恢复决策；不要把这部分完全外包给 subagent。
+5. 会话轮换前先写 continuity，至少包含项目级工位快照和下一轮监督优先级。
+
 ## pre-brainstorms 触发
 当任一条件成立时，经 `context-source-skill` 判定后进入 `doc-pre-brainstorm-execution`：
 - 问题来源已发现，但 `epic/story/milestone` 尚未收敛。

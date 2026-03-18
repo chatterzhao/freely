@@ -36,34 +36,16 @@ git -C "$PROJECT_ROOT" rev-parse --show-toplevel >/dev/null 2>&1 || {
 
 extract_phase_hint() {
   local worktree="$1"
-  local milestones="$worktree/docs/milestones.md"
-  [[ -f "$milestones" ]] || return 0
-  awk '
-    /^### committed_issues/ { in_committed=1; next }
-    /^### / && in_committed { exit }
-    in_committed && /^- phase_state:/ {
-      gsub(/`/, "", $0)
-      sub(/- phase_state: /, "", $0)
-      print
-      exit
-    }
-  ' "$milestones"
+  local session_state="$worktree/.freely/run/session-state.env"
+  [[ -f "$session_state" ]] || return 0
+  awk -F '"' '/^LAST_PHASE_HINT=/{print $2; exit}' "$session_state"
 }
 
 extract_issue_hint() {
   local worktree="$1"
-  local milestones="$worktree/docs/milestones.md"
-  [[ -f "$milestones" ]] || return 0
-  awk '
-    /^### committed_issues/ { in_committed=1; next }
-    /^### / && in_committed { exit }
-    in_committed && /^[0-9]+\./ { next }
-    in_committed && /^- title:/ {
-      sub(/- title: /, "", $0)
-      print
-      exit
-    }
-  ' "$milestones"
+  local session_state="$worktree/.freely/run/session-state.env"
+  [[ -f "$session_state" ]] || return 0
+  awk -F '"' '/^LAST_ISSUE_HINT=/{print $2; exit}' "$session_state"
 }
 
 checkpoint_guard_bin_for_project() {

@@ -190,30 +190,32 @@ cat <<EOF
 1. 先执行 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\`。
 2. 进入 \`lead-agent\`，不要绕过首跳代理。
 3. 由 \`lead-agent\` 委托 \`skill:context-source-skill\` 进行需求池扫描、优先级判断与下一跳提示词组装。
-4. 你的需求池至少包括：
+4. 若当前轮次承担项目级监督职责，先基于项目级工位视图做排班、冻结、集成与 cleanup 判断；不要直接把自己降级成单工位写代码代理。
+5. 在可并行的 doc-loop、verification、review、日志诊断或互不冲突的代码任务上，使用 subagent 提高效率。
+6. 你的需求池至少包括：
    - \`docs/milestones.md\`
    - progress / recovery
    - review / test
    - human chat / session evidence
    - github issue
    - \`docs/PROJECT_INTENT.md\`
-5. 你需要自主判断：
+7. 你需要自主判断：
    - 当前先看哪个池
    - 哪个池优先级更高
    - 当前问题是 \`pre-brainstorm\`、\`issue-bound brainstorm\` 还是 \`issue continuation\`
-6. 不要把路由当作脚本硬编码分支；脚本只负责启动和托管 AI，会话中的需求发现与路由判断由你完成。
-7. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
+8. 不要把路由当作脚本硬编码分支；脚本只负责启动和托管 AI，会话中的需求发现与路由判断由你完成。
+9. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
    - \`workspace/agents/lead-agent.md\`
    - \`workspace/skills/context-source-skill/SKILL.md\`
    - \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`
    - \`workspace/skills/doc-ibm-execution/SKILL.md\`
    - \`workspace/skills/dev-loop-execution/SKILL.md\`
-8. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`。
-9. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`workspace/skills/doc-ibm-execution/SKILL.md\`。
-10. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`workspace/skills/dev-loop-execution/SKILL.md\`。
-11. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
-12. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。
-13. 默认不要在首跳结束时只输出 \`next_prompt\` 就停下。
-14. 若 \`selected_tool\` 与当前运行中的 \`AI_TOOL\` 相同，你必须在当前会话内继续执行第二跳 skill，直接完成对应的 doc-loop / dev-loop 工作，并修改仓库产物；\`next_prompt\` 只作为中间可追溯产物保留。
-15. 只有当 \`selected_tool\` 与当前 \`AI_TOOL\` 不同，或你明确判断必须把执行权交回外层 runtime 时，才允许把 \`next_prompt\` 作为 handoff 输出结束当前轮次；此时必须说明为什么不能在当前会话继续执行。
+10. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`。
+11. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`workspace/skills/doc-ibm-execution/SKILL.md\`。
+12. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`workspace/skills/dev-loop-execution/SKILL.md\`。
+13. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
+14. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。
+15. 默认不要在首跳结束时只输出 \`next_prompt\` 就停下。
+16. 若 \`selected_tool\` 与当前运行中的 \`AI_TOOL\` 相同，你必须在当前会话内继续执行第二跳 skill，直接完成对应的 doc-loop / dev-loop 工作，并修改仓库产物；\`next_prompt\` 只作为中间可追溯产物保留。
+17. 只有当 \`selected_tool\` 与当前 \`AI_TOOL\` 不同，或你明确判断必须把执行权交回外层 runtime 时，才允许把 \`next_prompt\` 作为 handoff 输出结束当前轮次；此时必须说明为什么不能在当前会话继续执行。
 EOF
