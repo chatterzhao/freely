@@ -30,6 +30,7 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
 4. 在 fleet 视图中显式展示 `desired runtime / role / exit reason`。
 5. 把 `manager-agent` / `worker-agent` 的职责边界物化为正式角色文档。
 6. 明确列出哪些恢复场景属于 AI 无能为力，必须由 runtime / scripts 接管。
+7. 让 `freely start` 在主管工位自动启动 manager watchdog 脚本，在 worker supervisor 掉线时先做脚本级恢复，只有恢复不了的异常才继续交给主管 AI 告警与编排。
 
 ## Acceptance
 
@@ -39,6 +40,7 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
 - 主管只做监督、编排、委派和告警；若判断需要恢复，只输出 `runtime_recovery_requested` 一类管理决策，账号切换、等待和重启仍归 runtime。
 - 仓库内存在显式的 `manager-agent` 与 `worker-agent` 角色文档，而不是只靠 lead-agent 隐式约定。
 - 文档明确规定：响应结束、进程退出、限额/认证失败、`context compacted` 后的新进程续接，都属于 `runtime-owned`，而不是要求 manager/worker 自行恢复。
+- 当应运行的 worker supervisor 已掉线时，manager runtime 会先尝试脚本级拉起该 worker；只有脚本恢复后仍异常的情况，才继续留给主管 AI 做告警与后续编排。
 
 ## Completion
 
@@ -46,6 +48,7 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
 - `docs/system/workspace/scripts/worktree/wt-fleet-status`
 - `docs/system/workspace/scripts/start-lead-agent.sh`
 - `docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert`
+- `docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
 - `docs/system/workspace/scripts/tests/test-freely-status-pid-ownership`
 - `docs/system/workspace/scripts/tests/test-wt-fleet-status`
 - `docs/system/workspace/agents/manager-agent.md`
@@ -58,6 +61,7 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
   - `./bin/governance-check`
   - `bash docs/system/workspace/scripts/tests/test-freely-supervisor-loop`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
   - `bash docs/system/workspace/scripts/tests/test-freely-status-pid-ownership`
   - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status`
   - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`

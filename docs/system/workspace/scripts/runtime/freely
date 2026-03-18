@@ -1185,12 +1185,18 @@ cmd_start() {
   local LAUNCH_KIND_SELECTED="" LAUNCH_ROTATION_REASON=""
   load_session_state_or_defaults "$project"
   while true; do
-    local ts prompt_file cycle_log mode_name
+    local ts prompt_file cycle_log mode_name watchdog_script workspace_root
     ts="$(date '+%Y%m%d-%H%M%S')"
     prompt_file="$run_dir/prompt-$ts.txt"
     cycle_log="$logs_dir/cycle-$ts.log"
+    workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
     local recovered_workers
-    recovered_workers="$(manager_runtime_recover_workers_if_needed "$PROJECT_ROOT")"
+    watchdog_script="$workspace_root/scripts/runtime/manager-watchdog.sh"
+    if [[ -x "$watchdog_script" ]]; then
+      recovered_workers="$(bash "$watchdog_script" --project "$PROJECT_ROOT" --recover-expected-workers 2>/dev/null || true)"
+    else
+      recovered_workers="$(manager_runtime_recover_workers_if_needed "$PROJECT_ROOT")"
+    fi
     if [[ "${recovered_workers:-0}" =~ ^[0-9]+$ ]] && (( recovered_workers > 0 )); then
       log_info "manager runtime auto-recovered $recovered_workers expected-running worker(s) before prompt build"
       sleep "${RESTART_DELAY:-2}"
@@ -1612,4 +1618,6 @@ main() {
   esac
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi
