@@ -149,6 +149,26 @@ discover_supervisor_pid() {
   '
 }
 
+pid_matches_project() {
+  local pid="$1" project="$2" expected="$3"
+  [[ -n "$pid" ]] || return 1
+  kill -0 "$pid" 2>/dev/null || return 1
+  ps -p "$pid" -o command= 2>/dev/null | awk -v p="$project" -v e="$expected" '
+    index($0, e) && index($0, p) { found=1 }
+    END { exit found ? 0 : 1 }
+  '
+}
+
+valid_supervisor_pid_for_project() {
+  local project="$1" pid="$2"
+  pid_matches_project "$pid" "$project" "runtime/freely start --project"
+}
+
+valid_ai_pid_for_project() {
+  local project="$1" pid="$2"
+  pid_matches_project "$pid" "$project" "codex exec"
+}
+
 load_config() {
   local project="$1"
   local cfg
@@ -1148,7 +1168,12 @@ cmd_status() {
   if [[ -f "$run_dir/supervisor.pid" ]]; then
     local sp
     sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
-    echo "supervisor_pid: ${sp:-none}"
+    if valid_supervisor_pid_for_project "$PROJECT_ROOT" "$sp"; then
+      echo "supervisor_pid: ${sp:-none}"
+    else
+      sp="$(discover_supervisor_pid "$PROJECT_ROOT")"
+      echo "supervisor_pid: ${sp:-none}"
+    fi
   else
     local sp
     sp="$(discover_supervisor_pid "$PROJECT_ROOT")"
@@ -1157,7 +1182,11 @@ cmd_status() {
   if [[ -f "$run_dir/ai.pid" ]]; then
     local ap
     ap="$(cat "$run_dir/ai.pid" 2>/dev/null || true)"
-    echo "ai_pid: ${ap:-none}"
+    if valid_ai_pid_for_project "$PROJECT_ROOT" "$ap"; then
+      echo "ai_pid: ${ap:-none}"
+    else
+      echo "ai_pid: none"
+    fi
   else
     echo "ai_pid: none"
   fi
@@ -1197,9 +1226,15 @@ cmd_fleet_status() {
       session_state="$(session_state_file "$wt_path")"
       if [[ -f "$run_dir/supervisor.pid" ]]; then
         supervisor_pid="$(cat "$run_dir/supervisor.pid" 2>/dev/null || echo none)"
+        if ! valid_supervisor_pid_for_project "$wt_path" "$supervisor_pid"; then
+          supervisor_pid="none"
+        fi
       fi
       if [[ -f "$run_dir/ai.pid" ]]; then
         ai_pid="$(cat "$run_dir/ai.pid" 2>/dev/null || echo none)"
+        if ! valid_ai_pid_for_project "$wt_path" "$ai_pid"; then
+          ai_pid="none"
+        fi
       fi
       if [[ -f "$session_state" ]]; then
         # shellcheck disable=SC1090
@@ -1247,7 +1282,9 @@ cmd_stop() {
   if [[ -f "$run_dir/supervisor.pid" ]]; then
     local sp
     sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
-    [[ -n "$sp" ]] && kill "$sp" 2>/dev/null || true
+    if valid_supervisor_pid_for_project "$project" "$sp"; then
+      [[ -n "$sp" ]] && kill "$sp" 2>/dev/null || true
+    fi
     rm -f "$run_dir/supervisor.pid"
   else
     local sp

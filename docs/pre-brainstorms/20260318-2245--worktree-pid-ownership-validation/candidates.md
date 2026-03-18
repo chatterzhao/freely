@@ -1,0 +1,16 @@
+# Candidates
+
+### C-20260318-A
+- title: worktree 级 supervisor pid 归属校验
+- why:
+  - 多工位监督要求 `status`/`fleet-status` 的 pid 展示可信。
+  - stale pid 若被错误采信，会让自治控制面误判工位是否仍在运行。
+- scope:
+  - `runtime/freely`
+  - `tests`
+- acceptance:
+  - `freely status --project <wt>` 在 stale pid 指向其他 worktree 时输出 `supervisor_pid: none`
+  - `freely fleet-status --project <wt>` 在同类场景下不显示错误 supervisor pid
+  - `freely stop --project <wt>` 只停止真实属于该 worktree 的 supervisor
+- session_refs: []
+- milestone: pending://issue-materialization

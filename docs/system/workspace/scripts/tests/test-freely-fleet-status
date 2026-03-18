@@ -42,8 +42,7 @@ OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$WT")"
 
 printf '%s\n' "$OUTPUT" | grep -q 'feature/demo'
 printf '%s\n' "$OUTPUT" | grep -q 'DIRTY'
-printf '%s\n' "$OUTPUT" | grep -q '12345'
-printf '%s\n' "$OUTPUT" | grep -q '54321'
+printf '%s\n' "$OUTPUT" | grep -E 'feature/demo[[:space:]]+\|[[:space:]]+DIRTY[[:space:]]+\|[[:space:]]+none[[:space:]]+\|[[:space:]]+none' >/dev/null
 printf '%s\n' "$OUTPUT" | grep -q 'launch=resume'
 
-echo "[PASS] freely fleet-status shows project-level worktree runtime state"
+echo "[PASS] freely fleet-status hides stale runtime pid files"
