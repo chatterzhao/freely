@@ -130,3 +130,6 @@
 - 20260318-1210--rate-limit-recheck-and-wakeup
   - brainstorms: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/candidates.md
+- 20260318-1630--global-ai-account-watchdog
+  - brainstorms: docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md
