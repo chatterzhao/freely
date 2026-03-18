@@ -188,3 +188,58 @@ Kill 进程（SIGTERM 优雅终止）
 | codex | `CODEX_HOME` 切换目录 | 需要共享会话目录 | 中 |
 | iflow | `IFLOW_*` 覆盖配置 | 自动保持（优势） | 低 |
 | kiro | 待确认 | 待确认 | 待评估 |
+
+---
+
+## 附录：账号切换实现方案对比
+
+### 方案 A：环境变量切换目录（原方案）
+
+```bash
+CODEX_HOME=~/.codex-work codex
+```
+
+- 优点：不触碰凭证文件
+- 缺点：需要处理会话目录连续性（软链接或复制会话）
+
+### 方案 B：复制授权文件（推荐）
+
+```bash
+# 切换流程
+cp ~/.codex/auth.json ~/.codex/auth.json.bak           # 备份
+cp ~/.codex-profiles/work/auth.json ~/.codex/auth.json # 复制
+kill $pid && codex resume --last                       # 重启
+```
+
+- 优点：
+  - CODEX_HOME 不变，会话自动连续
+  - 实现简单，无需预配置
+  - auth.json 通常 < 5KB，复制成本低
+- 缺点：
+  - 需要 Freely 介入凭证文件管理（但仅复制，不读取内容）
+
+### 推荐方案
+
+**codex 使用方案 B（复制授权文件）**
+
+```yaml
+# ai-cli-profiles.yaml
+tools:
+  codex:
+    method: copy_auth  # 复制授权文件方式
+    profiles:
+      personal:
+        auth_file: ~/.codex-profiles/personal/auth.json
+        config_file: ~/.codex-profiles/personal/config.toml  # 可选
+      work:
+        auth_file: ~/.codex-profiles/work/auth.json
+```
+
+**iflow 使用环境变量覆盖**（iflow 会话位置固定，切换 IFLOW_* 不影响）
+
+### 安全考量
+
+复制授权文件时：
+1. 使用 `cp` 而非 `cat`，避免在进程表中暴露内容
+2. 备份文件权限设置为 `600`
+3. Freely 不解析 auth.json 内容

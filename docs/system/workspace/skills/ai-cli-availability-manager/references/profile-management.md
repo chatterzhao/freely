@@ -20,51 +20,52 @@ default_tool: codex
 # 各工具的 profile 配置
 tools:
   codex:
+    # 切换方式：copy_auth（复制授权文件）或 env_var（环境变量切换目录）
+    method: copy_auth
+    
     # 当前活跃 profile
     active: personal
     
     # profile 定义
     profiles:
       personal:
-        # 环境变量注入
-        env:
-          CODEX_HOME: ~/.codex-personal
-        # 描述（可选）
+        # 授权文件路径（method=copy_auth 时使用）
+        auth_file: ~/.codex-profiles/personal/auth.json
+        # 配置文件路径（可选，如需要切换不同配置）
+        config_file: ~/.codex-profiles/personal/config.toml
         description: 个人账号
-        # 标签（可选，用于分组）
         tags: [personal, primary]
         
       work:
-        env:
-          CODEX_HOME: ~/.codex-work
+        auth_file: ~/.codex-profiles/work/auth.json
+        config_file: ~/.codex-profiles/work/config.toml
         description: 工作账号
         tags: [work]
         
       backup:
-        env:
-          CODEX_HOME: ~/.codex-backup
+        auth_file: ~/.codex-profiles/backup/auth.json
         description: 备用账号
         tags: [backup]
     
     # profile 选择策略
     strategy:
-      # 轮询策略：round-robin, random, priority
-      mode: round-robin
-      # 排除正在冷却的 profile
+      mode: round-robin  # round-robin, random, priority
       skip_cooling: true
   
   iflow:
+    # iflow 使用环境变量覆盖（会话位置固定，不影响连续性）
+    method: env_var
     active: default
     profiles:
       default:
         env:
-          IFLOW_apiKey: sk-default-key
+          IFLOW_apiKey: $IFLOW_DEFAULT_KEY
           IFLOW_baseUrl: https://apis.iflow.cn/v1
         description: 默认账号
         
       backup:
         env:
-          IFLOW_apiKey: sk-backup-key
+          IFLOW_apiKey: $IFLOW_BACKUP_KEY
           IFLOW_baseUrl: https://apis.iflow.cn/v1
         description: 备用账号
 
@@ -76,9 +77,60 @@ state:
       status: active
     work:
       last_used: 2026-03-18T09:00:00Z
-      status: cooling  # 冷却中
+      status: cooling
       cooling_until: 2026-03-18T15:00:00Z
 ```
+
+## 切换方式对比
+
+| 方式 | 适用工具 | 会话连续性 | 实现复杂度 |
+|------|----------|-----------|-----------|
+| `copy_auth` | codex | ✅ 自动保持 | 低 |
+| `env_var` | iflow | ✅ 自动保持 | 低 |
+
+### copy_auth 方式（codex 推荐）
+
+```bash
+# 切换流程
+on_switch() {
+  local profile="$1"
+  local auth_file=$(get_profile_auth_file "$profile")
+  
+  # 1. 备份当前授权
+  cp ~/.codex/auth.json ~/.codex/auth.json.bak.$(date +%Y%m%d%H%M%S)
+  
+  # 2. 复制新授权（如果配置文件也定义了，一并复制）
+  cp "$auth_file" ~/.codex/auth.json
+  [ -f "$config_file" ] && cp "$config_file" ~/.codex/config.toml
+  
+  # 3. 重启进程
+  kill $pid
+  codex resume --last
+}
+```
+
+**优势**：
+- CODEX_HOME 保持不变
+- 会话文件位置不变，自动连续
+- 无需预先配置软链接
+
+### env_var 方式（iflow）
+
+```bash
+# 切换流程
+on_switch() {
+  local profile="$1"
+  local env=$(get_profile_env "$profile")
+  
+  # 直接注入环境变量启动新进程
+  kill $pid
+  env $env iflow -c
+}
+```
+
+**优势**：
+- iflow 会话位置固定在 `~/.iflow/history/`
+- 切换 `IFLOW_*` 不影响会话文件
 
 ## Profile 状态
 
@@ -89,55 +141,48 @@ state:
 | `failed` | 认证失败 | ❌ 需要手动修复 |
 | `disabled` | 用户禁用 | ❌ |
 
-## 环境变量作用域
+## 目录结构示例
 
-Freely 在启动 AI CLI 子进程时注入环境变量，不污染当前 shell 环境：
-
-```bash
-# 错误方式：污染全局环境
-export CODEX_HOME=~/.codex-personal
-codex
-
-# 正确方式：仅注入子进程
-CODEX_HOME=~/.codex-personal codex
 ```
+~/.codex-profiles/
+├── personal/
+│   ├── auth.json      # 个人账号授权
+│   └── config.toml    # 个人配置（可选）
+├── work/
+│   ├── auth.json      # 工作账号授权
+│   └── config.toml    # 工作配置
+└── backup/
+    └── auth.json      # 备用账号授权
 
-## 配置验证规则
-
-1. **至少一个 profile**：每个工具必须定义至少一个 profile
-2. **env 必须是字典**：env 字段必须是键值对
-3. **路径必须存在**：环境变量中的路径必须存在且可访问
-4. **不包含敏感信息**：配置文件中不应包含 API key 明文（使用环境变量引用）
+~/.codex/              # 主配置目录（切换时被覆写）
+├── auth.json          # 当前活跃授权
+├── config.toml        # 当前配置
+├── sessions/          # 会话文件（位置不变）
+└── history.jsonl      # 历史记录
+```
 
 ## 安全建议
 
-### API Key 管理
-
-不要在配置文件中直接写入 API key：
-
-```yaml
-# 不推荐
-profiles:
-  personal:
-    env:
-      IFLOW_apiKey: sk-xxxxx  # 明文暴露
-
-# 推荐：引用环境变量
-profiles:
-  personal:
-    env:
-      IFLOW_apiKey: $IFLOW_PERSONAL_KEY  # 引用外部变量
-```
-
-然后在 `~/.zshrc` 或 `~/.bashrc` 中：
-```bash
-export IFLOW_PERSONAL_KEY="sk-xxxxx"
-```
-
-### 配置文件权限
+### 授权文件管理
 
 ```bash
-chmod 600 ~/.config/freely/ai-cli-profiles.yaml
+# 创建 profile 目录并设置权限
+mkdir -p ~/.codex-profiles/{personal,work,backup}
+chmod 700 ~/.codex-profiles
+chmod 600 ~/.codex-profiles/*/auth.json
+```
+
+### 备份策略
+
+```bash
+# 切换前自动备份（保留最近 5 个）
+backup_auth() {
+  local backup_dir=~/.codex/backups
+  mkdir -p "$backup_dir"
+  cp ~/.codex/auth.json "$backup_dir/auth.json.$(date +%Y%m%d%H%M%S)"
+  # 清理旧备份，保留最近 5 个
+  ls -t "$backup_dir"/*.json | tail -n +6 | xargs rm -f 2>/dev/null
+}
 ```
 
 ## CLI 命令
@@ -154,4 +199,7 @@ freely ai-cli list codex
 
 # 验证配置
 freely ai-cli validate
+
+# 备份当前授权
+freely ai-cli backup codex
 ```
