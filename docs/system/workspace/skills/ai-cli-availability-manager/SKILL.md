@@ -121,6 +121,7 @@ orchestrator 启动 AI CLI
 - [profile-management.md](references/profile-management.md) - Profile 配置规范
 - [auth-setup.md](references/auth-setup.md) - 授权文件准备与验证
 - [process-lifecycle.md](references/process-lifecycle.md) - 进程生命周期与会话恢复
+- [cli-interface-design.md](references/cli-interface-design.md) - CLI 接口设计
 
 ## 与其他 Skill 的集成
 
