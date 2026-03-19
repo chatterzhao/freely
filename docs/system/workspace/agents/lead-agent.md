@@ -7,6 +7,9 @@
 - 上游：`workspace/scripts/` 中定义的 `sh` / `ps1` 启动入口
 - 当前最小启动器：`workspace/scripts/start-lead-agent.sh`
 - 当前层：外部 AI CLI 工具启动后首先执行的代理角色
+- 角色边界：
+  - `workspace/agents/manager-agent.md`
+  - `workspace/agents/worker-agent.md`
 - 下游：`skill:context-source-skill`
 - 工具清单：`workspace/tools.md`
 
@@ -54,6 +57,7 @@
 6. 只有当下一跳工具与当前工具不一致，或必须把执行权显式交回外层 runtime 时，才允许把 `next_prompt` 作为交接产物返回。
 7. 若 prompt 中附带项目级工位快照，必须先利用它做主管级判断，再决定下一跳是不是当前 worktree 本地执行，还是委派到其他工位 / subagent。
 8. 若当前分支是 `develop` / `main` / `pre-test-merge`，当前会话只允许产出监督判断、worker 选择或创建、delegation handoff 与 continuity；不得在受保护主管工位直接执行第二跳实现。
+9. 若当前分支是 `feature/*`，当前会话默认承担 `worker-agent` 执行职责；项目级恢复、切号和重启仍交由 runtime / scripts，而不是在 prompt 内临时发明脚本流程。
 
 ## 完成标志
 

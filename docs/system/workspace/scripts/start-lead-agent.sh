@@ -25,7 +25,7 @@ abs_path_or_fail() {
 
 project_dirty_entries() {
   local project="$1"
-  git -C "$project" status --porcelain 2>/dev/null | wc -l | tr -d ' '
+  (git -C "$project" status --porcelain 2>/dev/null || true) | wc -l | tr -d ' '
 }
 
 project_clean_state() {
@@ -244,4 +244,6 @@ ${execution_rule_17}
 - 可并行且互不阻塞的任务，使用 subagent 提高效率。
 - 若 \`CURRENT_BRANCH\` 是 \`develop/main/pre-test-merge\`，当前会话只做主管，不做实现；实现必须委派到 feature worktree。
 - 若工位视图缺少准确 issue/phase，不要伪造；先把该工位视为需要进一步核对的监督对象。
+- 若当前 AI 响应已经结束、目标进程已退出、命中限额/认证失败、或发生 \`context compacted\` 需要新进程续接，这类问题一律视为 \`runtime-owned\`。
+- 主管只输出恢复判定和委派；worker 只回写 blocker / continuity；真正的切号、sleep/recheck 和新进程启动由 Freely runtime / scripts 处理。
 EOF

@@ -321,6 +321,7 @@ flowchart LR
 5. 规范文档改动必须在独立 `feature/*` + worktree 且绑定实现或门禁证据。
 6. 任一法律门失败时必须阻断提升/发布，并记录修复路径。
 7. 多 worktree 监督与 checkpoint 压力必须以 CLI 能力落地，不得只存在于聊天或人工观察中。
+8. 主管工位必须能从 CLI 控制面主动识别“expected running but down”的 worker 异常；不能依赖人工手动运行状态检查后才发现 supervisor/worker 已失活。
 
 最小验收证据：
 - 命令与状态检查记录

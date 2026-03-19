@@ -14,6 +14,7 @@ usage() {
 Usage:
   freely init --project <abs_path> --intent <abs_file> --constitution <abs_file> --ai <tool[:model][:mode]> [--reasoning-effort <effort>]
   freely doctor --project <abs_path>
+  freely ensure-manager --project <abs_path> [--watch] [--interval <seconds>]
   freely start --project <abs_path>
   freely status --project <abs_path>
   freely fleet-status --project <abs_path>
@@ -127,9 +128,19 @@ session_state_file() {
   echo "$(run_dir_for_project "$project")/session-state.env"
 }
 
+workcell_state_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/workcell-state.env"
+}
+
 handoff_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/session-handoff.txt"
+}
+
+manager_bootstrap_handoff_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/manager-bootstrap-handoff.txt"
 }
 
 codex_account_cooldown_file() {
@@ -142,10 +153,26 @@ stop_marker_file() {
   echo "$(run_dir_for_project "$project")/stop.requested"
 }
 
+ensure_manager_watchdog_pid_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/ensure-manager.pid"
+}
+
 discover_supervisor_pid() {
   local project="$1"
   ps -axo pid=,command= | awk -v p="$project" '
-    index($0, "runtime/freely start") && (index($0, "--project " p) || index($0, "--project=" p)) {print $1; exit}
+    index($0, "runtime/freely start") {
+      for (i = 1; i <= NF; i++) {
+        if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+          print $1
+          exit
+        }
+        if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+          print $1
+          exit
+        }
+      }
+    }
   '
 }
 
@@ -154,7 +181,16 @@ pid_matches_project() {
   [[ -n "$pid" ]] || return 1
   kill -0 "$pid" 2>/dev/null || return 1
   ps -p "$pid" -o command= 2>/dev/null | awk -v p="$project" -v e="$expected" '
-    index($0, e) && (index($0, "--project " p) || index($0, "--project=" p) || index($0, "-C " p) || index($0, " -C" p)) { found=1 }
+    index($0, e) {
+      for (i = 1; i <= NF; i++) {
+        if (($i == "--project" || $i == "-C") && (i + 1) <= NF && $(i + 1) == p) {
+          found=1
+        }
+        if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+          found=1
+        }
+      }
+    }
     END { exit found ? 0 : 1 }
   '
 }
@@ -162,6 +198,11 @@ pid_matches_project() {
 valid_supervisor_pid_for_project() {
   local project="$1" pid="$2"
   pid_matches_project "$pid" "$project" "runtime/freely start --project"
+}
+
+valid_ensure_manager_watchdog_pid_for_project() {
+  local project="$1" pid="$2"
+  pid_matches_project "$pid" "$project" "runtime/freely ensure-manager --project"
 }
 
 valid_ai_pid_for_project() {
@@ -376,6 +417,23 @@ fleet_status_text_for_project() {
   "$fleet_bin" --project "$project" 2>/dev/null || true
 }
 
+freely_bin_for_project() {
+  local project="$1"
+  if [[ -x "$project/bin/freely" ]]; then
+    echo "$project/bin/freely"
+  else
+    echo "$SELF_ROOT/bin/freely"
+  fi
+}
+
+start_workcell_supervisor_async() {
+  local project="$1" freely_bin recovery_log
+  freely_bin="$(freely_bin_for_project "$project")"
+  recovery_log="$(logs_dir_for_project "$project")/manager-runtime-recovery.log"
+  mkdir -p "$(dirname "$recovery_log")"
+  nohup bash "$freely_bin" start --project "$project" >>"$recovery_log" 2>&1 </dev/null &
+}
+
 log_has_context_compacted() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
@@ -443,6 +501,36 @@ load_session_state_or_defaults() {
     # shellcheck disable=SC1090
     source "$state_file"
   fi
+}
+
+branch_name_for_project() {
+  local project="$1"
+  git -C "$project" branch --show-current 2>/dev/null || printf 'unknown'
+}
+
+role_hint_for_project() {
+  local project="$1" branch
+  branch="$(branch_name_for_project "$project")"
+  case "$branch" in
+    develop|main|pre-test-merge) printf 'manager\n' ;;
+    *) printf 'worker\n' ;;
+  esac
+}
+
+write_workcell_state() {
+  local project="$1" desired_state="$2" supervisor_state="$3" ai_state="$4" exit_reason="$5"
+  local state_file role_hint updated_at
+  state_file="$(workcell_state_file "$project")"
+  role_hint="$(role_hint_for_project "$project")"
+  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  cat >"$state_file" <<EOF
+DESIRED_RUNTIME_STATE="$desired_state"
+LAST_SUPERVISOR_STATE="$supervisor_state"
+LAST_AI_STATE="$ai_state"
+LAST_EXIT_REASON="$exit_reason"
+LAST_ROLE_HINT="$role_hint"
+LAST_STATE_UPDATED_AT="$updated_at"
+EOF
 }
 
 write_session_state() {
@@ -551,6 +639,57 @@ EOF
   cat "$handoff_path"
 }
 
+write_manager_bootstrap_handoff() {
+  local project="$1" trigger="$2" previous_account="$3" active_account="$4" reason="$5" next_action="$6"
+  local handoff_path branch fleet_snapshot
+  handoff_path="$(handoff_file "$project")"
+  branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
+  fleet_snapshot="$(fleet_status_text_for_project "$project")"
+
+  cat >"$handoff_path" <<EOF
+# Session Handoff
+
+- rotation_reason: manager_bootstrap_watchdog
+- previous_launch_kind: ensure-manager
+- previous_tool_session_id: unavailable://manager-relaunched-by-script
+- previous_tool_jsonl_path: unavailable://manager-relaunched-by-script
+- previous_cycle_log: unavailable://manager-relaunched-by-script
+- previous_context_ratio: unavailable
+- previous_route_only_handoff: 0
+- previous_project_dirty_entries: 0
+- previous_worktree_summary_total: 0
+- previous_worktree_summary_dirty: 0
+- branch: ${branch:-unknown}
+- worktree_path: $project
+
+## Manager Bootstrap Recovery
+- trigger: ${trigger:-unknown}
+- previous_account: ${previous_account:-unavailable}
+- active_account: ${active_account:-unavailable}
+- reason: ${reason:-unavailable}
+- next_action: ${next_action:-check-fleet-and-continue}
+
+## What To Handle First
+- The previous manager chain stopped or became unusable before this new session started.
+- First inspect the fleet snapshot and decide which worktrees should keep running, which should be resumed, and which should remain stopped.
+- If a worktree is expected-running but currently down, decide whether runtime recovery should proceed with resume or whether a fresh_with_handoff rotation is safer.
+- Do not redo global account switching here; that recovery was already owned by the watchdog script.
+
+## Summary Target Hint
+$(context_summary_target_hint)
+EOF
+
+  if [[ -n "$fleet_snapshot" ]]; then
+    cat >>"$handoff_path" <<EOF
+
+## Fleet Snapshot
+\`\`\`
+$fleet_snapshot
+\`\`\`
+EOF
+  fi
+}
+
 append_context_warning_if_needed() {
   if [[ "${LAUNCH_KIND_SELECTED:-}" != "resume" ]]; then
     return 0
@@ -619,6 +758,121 @@ $fleet_snapshot
 - 若当前轮次承担项目级监督职责，先基于工位快照安排继续开发、冻结、验证、合并和清理顺序。
 - 可并行且互不阻塞的任务，使用 subagent 提高效率。
 - 若工位视图缺少准确 issue/phase，不要伪造；先把该工位视为需要进一步核对的监督对象。
+EOF
+}
+
+manager_supervision_alerts() {
+  local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state ai_state owner next_action anomaly
+  repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
+  [[ -n "$repo_root" ]] || return 0
+  while IFS='|' read -r wt_path branch; do
+    [[ -n "$wt_path" ]] || continue
+    [[ "$wt_path" == "$project" ]] && continue
+    [[ -f "$(config_file "$wt_path")" ]] || continue
+    desired_state=""
+    role_hint=""
+    exit_reason=""
+    supervisor_state="down"
+    ai_state="down"
+    if [[ -f "$(workcell_state_file "$wt_path")" ]]; then
+      # shellcheck disable=SC1090
+      source "$(workcell_state_file "$wt_path")"
+      desired_state="${DESIRED_RUNTIME_STATE:-}"
+      role_hint="${LAST_ROLE_HINT:-}"
+      exit_reason="${LAST_EXIT_REASON:-}"
+    fi
+    [[ "$desired_state" == "running" ]] || continue
+    owner="runtime-owned"
+    next_action="runtime_recovery_requested"
+    if [[ -f "$(run_dir_for_project "$wt_path")/supervisor.pid" ]]; then
+      local sp
+      sp="$(cat "$(run_dir_for_project "$wt_path")/supervisor.pid" 2>/dev/null || true)"
+      if valid_supervisor_pid_for_project "$wt_path" "$sp"; then
+        supervisor_state="up"
+      fi
+    fi
+    if [[ -f "$(run_dir_for_project "$wt_path")/ai.pid" ]]; then
+      local ap
+      ap="$(cat "$(run_dir_for_project "$wt_path")/ai.pid" 2>/dev/null || true)"
+      if valid_ai_pid_for_project "$wt_path" "$ap"; then
+        ai_state="up"
+      fi
+    fi
+    if [[ "$supervisor_state" == "down" ]]; then
+      anomaly="expected_running_worktree_down"
+      printf -- '- %s: branch=%s role=%s owner=%s next_action=%s exit_reason=%s path=%s\n' "$anomaly" "${branch:-unknown}" "${role_hint:-worker}" "$owner" "$next_action" "${exit_reason:-unknown}" "$wt_path"
+    elif [[ "$ai_state" == "down" ]]; then
+      anomaly="expected_running_worktree_degraded"
+      printf -- '- %s: branch=%s role=%s owner=%s next_action=%s exit_reason=%s path=%s\n' "$anomaly" "${branch:-unknown}" "${role_hint:-worker}" "$owner" "$next_action" "${exit_reason:-unknown}" "$wt_path"
+    fi
+  done < <(git -C "$repo_root" worktree list --porcelain | awk '
+    /^worktree / { wt=substr($0, 10); br="" }
+    /^branch / { br=$2; sub(/^refs\/heads\//, "", br); print wt "|" br }
+  ')
+}
+
+manager_runtime_recover_workers_if_needed() {
+  local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered
+  repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
+  [[ -n "$repo_root" ]] || return 0
+  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
+
+  recovered=0
+  while IFS='|' read -r wt_path branch; do
+    [[ -n "$wt_path" ]] || continue
+    [[ "$wt_path" == "$project" ]] && continue
+    [[ -f "$(config_file "$wt_path")" ]] || continue
+    desired_state=""
+    role_hint=""
+    exit_reason=""
+    supervisor_state="down"
+    if [[ -f "$(workcell_state_file "$wt_path")" ]]; then
+      # shellcheck disable=SC1090
+      source "$(workcell_state_file "$wt_path")"
+      desired_state="${DESIRED_RUNTIME_STATE:-}"
+      role_hint="${LAST_ROLE_HINT:-}"
+      exit_reason="${LAST_EXIT_REASON:-}"
+    fi
+
+    [[ "$desired_state" == "running" ]] || continue
+    [[ "${role_hint:-worker}" == "worker" ]] || continue
+
+    if [[ -f "$(run_dir_for_project "$wt_path")/supervisor.pid" ]]; then
+      local sp
+      sp="$(cat "$(run_dir_for_project "$wt_path")/supervisor.pid" 2>/dev/null || true)"
+      if valid_supervisor_pid_for_project "$wt_path" "$sp"; then
+        supervisor_state="up"
+      fi
+    fi
+    [[ "$supervisor_state" == "down" ]] || continue
+
+    log_info "manager runtime recovering expected-running worker: branch=${branch:-unknown} exit_reason=${exit_reason:-unknown} path=$wt_path"
+    start_workcell_supervisor_async "$wt_path"
+    recovered=$((recovered + 1))
+  done < <(git -C "$repo_root" worktree list --porcelain | awk '
+    /^worktree / { wt=substr($0, 10); br="" }
+    /^branch / { br=$2; sub(/^refs\/heads\//, "", br); print wt "|" br }
+  ')
+
+  printf '%s\n' "$recovered"
+}
+
+append_manager_supervision_alert_if_needed() {
+  if [[ "$(role_hint_for_project "$PROJECT_ROOT")" != "manager" ]]; then
+    return 0
+  fi
+  local alerts
+  alerts="$(manager_supervision_alerts "$PROJECT_ROOT")"
+  [[ -n "$alerts" ]] || return 0
+  cat <<EOF
+
+Manager supervision alert:
+- 以下工位在控制面中仍应保持运行，但当前已掉线或退化。
+- 在继续普通路由前，先判断这些工位应恢复、冻结还是 cleanup。
+- 这是主管自检信号，不需要人工额外运行 fleet-status 才能发现。
+- 若某条告警标记为 \`owner=runtime-owned\`，主管只做判定与委派；真正切号、等待和重启仍由目标工位 runtime / scripts 接管。
+
+$alerts
 EOF
 }
 
@@ -800,6 +1054,17 @@ codex_account_cooldown_reset_at() {
   awk -F '\t' -v account="$normalized" '$1 == account {print $2}' "$file" | tail -n 1
 }
 
+codex_clear_account_cooldown() {
+  local project="$1" account="$2"
+  local file tmp normalized
+  normalized="$(normalize_codex_account_name "$account")"
+  file="$(codex_account_cooldown_file "$project")"
+  [[ -f "$file" ]] || return 0
+  tmp="${file}.tmp"
+  awk -F '\t' -v account="$normalized" '$1 != account {print $1 "\t" $2}' "$file" >"$tmp"
+  mv "$tmp" "$file"
+}
+
 codex_account_is_available_now() {
   local project="$1" account="$2"
   local reset_at
@@ -858,16 +1123,96 @@ select_earliest_reset_codex_account() {
   fi
 }
 
+select_any_available_codex_account() {
+  local project="$1" candidate
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    if codex_account_is_available_now "$project" "$candidate"; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done < <(codex_saved_accounts "$project")
+}
+
+select_earliest_reset_codex_account_any() {
+  local project="$1" candidate reset_at best_account="" best_reset=""
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    reset_at="$(codex_account_cooldown_reset_at "$project" "$candidate")"
+    [[ -n "$reset_at" ]] || continue
+    if [[ -z "$best_reset" || "$reset_at" -lt "$best_reset" ]]; then
+      best_account="$candidate"
+      best_reset="$reset_at"
+    fi
+  done < <(codex_saved_accounts "$project")
+  if [[ -n "$best_account" ]]; then
+    printf '%s|%s\n' "$best_account" "$best_reset"
+  fi
+}
+
+codex_probe_current_account_now() {
+  local project="$1" prompt_file output_file rc
+  prompt_file="$(mktemp)"
+  output_file="$(mktemp)"
+  printf 'Reply with exactly: OK\n' >"$prompt_file"
+  rc=0
+  (
+    cd "$project"
+    if [[ -n "${AI_MODEL:-}" ]]; then
+      codex exec \
+        --skip-git-repo-check \
+        -C "$project" \
+        -m "$AI_MODEL" \
+        -c "model_reasoning_effort=\"${AI_REASONING_EFFORT:-medium}\"" \
+        --dangerously-bypass-approvals-and-sandbox \
+        - <"$prompt_file"
+    else
+      codex exec \
+        --skip-git-repo-check \
+        -C "$project" \
+        -c "model_reasoning_effort=\"${AI_REASONING_EFFORT:-medium}\"" \
+        --dangerously-bypass-approvals-and-sandbox \
+        - <"$prompt_file"
+    fi
+  ) >"$output_file" 2>&1 || rc=$?
+  rm -f "$prompt_file"
+  if [[ "$rc" -eq 0 ]] && rg -q '^OK$' "$output_file"; then
+    rm -f "$output_file"
+    return 0
+  fi
+  rm -f "$output_file"
+  return 1
+}
+
+probe_any_usable_codex_account_now() {
+  local project="$1" candidate
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    switch_to_codex_account "$project" "$candidate" "probe_saved_accounts" >/dev/null || continue
+    if codex_probe_current_account_now "$project"; then
+      codex_clear_account_cooldown "$project" "$candidate"
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done < <(codex_saved_accounts "$project")
+}
+
 switch_to_codex_account() {
   local project="$1" account="$2" reason="$3"
-  local ai_bin output
+  local ai_bin output actual_account requested_normalized actual_normalized
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" && -n "$account" ]] || return 1
   output="$("$ai_bin" --quiet --format json switch codex "$account" --yes 2>/dev/null || true)"
-  if printf '%s\n' "$output" | rg -q '"switched": *true'; then
+  requested_normalized="$(normalize_codex_account_name "$account")"
+  actual_account="$(codex_current_account "$project")"
+  actual_normalized="$(normalize_codex_account_name "$actual_account")"
+  if printf '%s\n' "$output" | rg -q '"switched": *true' && [[ -n "$actual_account" && "$actual_normalized" == "$requested_normalized" ]]; then
     log_warn "auto-switched codex account to $account (reason=$reason)" >&2
     printf '%s\n' "$account"
     return 0
+  fi
+  if [[ -n "$actual_account" ]]; then
+    log_warn "codex account switch verification failed (requested=$account actual=$actual_account reason=$reason)" >&2
   fi
   return 1
 }
@@ -879,6 +1224,177 @@ switch_to_next_codex_account() {
   next_account="$(select_next_codex_account "$project" "$current_account")"
   [[ -n "$next_account" ]] || return 1
   switch_to_codex_account "$project" "$next_account" "$reason"
+}
+
+ensure_codex_account_ready_for_manager() {
+  local project="$1"
+  local current_account available_account probed_account earliest_info earliest_account earliest_reset wait_seconds
+
+  current_account="$(codex_current_account "$project")"
+  if [[ -n "$current_account" ]] && codex_account_is_available_now "$project" "$current_account"; then
+    return 0
+  fi
+
+  available_account="$(select_any_available_codex_account "$project")"
+  if [[ -n "$available_account" ]]; then
+    if [[ -z "$current_account" || "$available_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
+      switch_to_codex_account "$project" "$available_account" "ensure_manager" >/dev/null
+      write_manager_bootstrap_handoff "$project" "account_unavailable" "$current_account" "$available_account" "watchdog_switched_to_available_account" "inspect-fleet-and-recover-workers"
+    fi
+    return 0
+  fi
+
+  probed_account="$(probe_any_usable_codex_account_now "$project" || true)"
+  if [[ -n "$probed_account" ]]; then
+    write_manager_bootstrap_handoff "$project" "stale_or_missing_cooldown_probe" "$current_account" "$probed_account" "watchdog_probed_and_found_usable_account" "inspect-fleet-and-recover-workers"
+    return 0
+  fi
+
+  earliest_info="$(select_earliest_reset_codex_account_any "$project")"
+  earliest_account="${earliest_info%%|*}"
+  earliest_reset="${earliest_info##*|}"
+  if [[ -n "$earliest_account" && -n "$earliest_reset" && "$earliest_info" == *"|"* ]]; then
+    if [[ -z "$current_account" || "$earliest_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
+      switch_to_codex_account "$project" "$earliest_account" "all_accounts_cooling_down" >/dev/null || true
+    fi
+    write_manager_bootstrap_handoff "$project" "all_accounts_cooling_down" "$current_account" "$earliest_account" "watchdog_waiting_for_earliest_reset" "recheck-account-availability-before-manager-bootstrap"
+    wait_seconds="$(seconds_until_epoch "$earliest_reset")"
+    if [[ "${wait_seconds:-0}" =~ ^[0-9]+$ ]] && (( wait_seconds > 0 )); then
+      log_warn "all codex accounts cooling down before manager bootstrap; sleeping until reset_at=${earliest_reset} (sleep=${wait_seconds}s)"
+      sleep_with_rate_limit_recheck "$project" "$wait_seconds"
+    fi
+    available_account="$(select_any_available_codex_account "$project")"
+    if [[ -n "$available_account" ]]; then
+      if [[ -z "$current_account" || "$available_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
+        switch_to_codex_account "$project" "$available_account" "ensure_manager" >/dev/null || true
+      fi
+      write_manager_bootstrap_handoff "$project" "cooldown_elapsed" "$earliest_account" "$available_account" "watchdog_resumed_after_wait" "inspect-fleet-and-recover-workers"
+      return 0
+    fi
+  fi
+
+  log_error "no codex account is currently available for manager bootstrap"
+  return 1
+}
+
+launch_manager_supervisor() {
+  local project="$1"
+  local launch_bin
+  launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
+  bash "$launch_bin" start --project "$project" >/dev/null 2>&1 &
+  disown "$!" 2>/dev/null || true
+}
+
+manager_supervisor_pid_for_project() {
+  local project="$1" run_dir sp
+  run_dir="$(run_dir_for_project "$project")"
+  if [[ -f "$run_dir/supervisor.pid" ]]; then
+    sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
+    if valid_supervisor_pid_for_project "$project" "$sp"; then
+      printf '%s\n' "$sp"
+      return 0
+    fi
+  fi
+  discover_supervisor_pid "$project"
+}
+
+manager_ai_pid_for_project() {
+  local project="$1" run_dir ap
+  run_dir="$(run_dir_for_project "$project")"
+  if [[ -f "$run_dir/ai.pid" ]]; then
+    ap="$(cat "$run_dir/ai.pid" 2>/dev/null || true)"
+    if valid_ai_pid_for_project "$project" "$ap"; then
+      printf '%s\n' "$ap"
+      return 0
+    fi
+  fi
+}
+
+restart_manager_supervisor_preserving_handoff() {
+  local project="$1" run_dir ai_pid supervisor_pid
+  run_dir="$(run_dir_for_project "$project")"
+  ai_pid="$(manager_ai_pid_for_project "$project")"
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  if [[ -n "$ai_pid" ]]; then
+    kill "$ai_pid" 2>/dev/null || true
+    rm -f "$run_dir/ai.pid"
+  fi
+  if [[ -n "$supervisor_pid" ]]; then
+    kill "$supervisor_pid" 2>/dev/null || true
+    rm -f "$run_dir/supervisor.pid"
+  fi
+  for _ in $(seq 1 20); do
+    if [[ -n "$supervisor_pid" ]] && kill -0 "$supervisor_pid" 2>/dev/null; then
+      sleep 0.2
+      continue
+    fi
+    break
+  done
+}
+
+ensure_manager_once() {
+  local project="$1"
+  local run_dir sup_pid_file current_pid current_account current_ai_pid
+
+  run_dir="$(run_dir_for_project "$project")"
+  sup_pid_file="$run_dir/supervisor.pid"
+  mkdir -p "$run_dir"
+  current_pid=""
+  if [[ -f "$sup_pid_file" ]]; then
+    current_pid="$(cat "$sup_pid_file" 2>/dev/null || true)"
+    if ! valid_supervisor_pid_for_project "$project" "$current_pid"; then
+      current_pid=""
+    fi
+  fi
+  if [[ -z "$current_pid" ]]; then
+    current_pid="$(discover_supervisor_pid "$project")"
+  fi
+
+  if [[ "$AI_TOOL" == "codex" ]]; then
+    current_account="$(codex_current_account "$project")"
+    current_ai_pid="$(manager_ai_pid_for_project "$project")"
+    if [[ -n "$current_pid" ]] && [[ -n "$current_account" ]] && ! codex_account_is_available_now "$project" "$current_account" && [[ -z "$current_ai_pid" ]]; then
+      log_warn "manager supervisor is idle on an unavailable codex account ($current_account); restarting manager under watchdog control"
+      write_manager_bootstrap_handoff "$project" "manager_limit_detected" "$current_account" "$current_account" "manager_process_ended_on_unavailable_account" "relaunch-manager-after-account-recovery"
+      restart_manager_supervisor_preserving_handoff "$project"
+      current_pid=""
+    fi
+    ensure_codex_account_ready_for_manager "$project"
+  fi
+
+  if [[ -n "$current_pid" ]]; then
+    log_info "manager supervisor already running (pid=$current_pid)"
+    return 0
+  fi
+
+  launch_manager_supervisor "$project"
+  log_info "manager bootstrap requested"
+}
+
+cmd_ensure_manager_watch() {
+  local project="$1" interval="$2" pid_file run_dir existing_pid
+  run_dir="$(run_dir_for_project "$project")"
+  pid_file="$(ensure_manager_watchdog_pid_file "$project")"
+  mkdir -p "$run_dir"
+
+  if [[ -f "$pid_file" ]]; then
+    existing_pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$existing_pid"; then
+      log_info "ensure-manager watchdog already running (pid=$existing_pid)"
+      return 0
+    fi
+  fi
+
+  echo "$$" >"$pid_file"
+  trap 'rm -f "$pid_file"' EXIT
+
+  while true; do
+    if [[ -f "$(stop_marker_file "$project")" ]]; then
+      exit 0
+    fi
+    ensure_manager_once "$project"
+    sleep "$interval"
+  done
 }
 
 build_prompt() {
@@ -894,6 +1410,7 @@ build_prompt() {
   append_context_warning_if_needed
   append_checkpoint_governance_if_needed
   append_fleet_supervision_if_needed
+  append_manager_supervision_alert_if_needed
   append_route_only_recovery_if_needed
   append_handoff_prompt_if_present "$PROJECT_ROOT"
 }
@@ -929,6 +1446,7 @@ cmd_init() {
 
   write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort"
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
+  write_workcell_state "$project" "stopped" "down" "down" "initialized"
   log_info "initialized: $(config_file "$project")"
 }
 
@@ -949,6 +1467,8 @@ cmd_start() {
 
   local sdir run_dir logs_dir sup_pid_file child_pid_file loop_log
   local stop_requested=0
+  local LAST_WORKCELL_EXIT_REASON="supervisor_exit"
+  local DESIRED_RUNTIME_STATE_VALUE="running"
   sdir="$(state_dir "$project")"
   run_dir="$(run_dir_for_project "$project")"
   logs_dir="$(logs_dir_for_project "$project")"
@@ -969,6 +1489,8 @@ cmd_start() {
 
   request_stop() {
     stop_requested=1
+    LAST_WORKCELL_EXIT_REASON="operator_stop"
+    DESIRED_RUNTIME_STATE_VALUE="stopped"
     : >"$(stop_marker_file "$project")"
     if [[ -f "$child_pid_file" ]]; then
       local active_child
@@ -977,8 +1499,14 @@ cmd_start() {
     fi
   }
 
+  cleanup_supervisor() {
+    rm -f "$sup_pid_file" "$child_pid_file" "$(stop_marker_file "$project")"
+    write_workcell_state "$project" "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" "down" "down" "${LAST_WORKCELL_EXIT_REASON:-supervisor_exit}"
+  }
+
   echo "$$" >"$sup_pid_file"
-  trap "rm -f '$sup_pid_file' '$child_pid_file' '$(stop_marker_file "$project")'" EXIT
+  write_workcell_state "$project" "running" "up" "down" "starting"
+  trap cleanup_supervisor EXIT
   trap request_stop INT TERM
 
   local restart_count=0
@@ -986,10 +1514,22 @@ cmd_start() {
   local LAUNCH_KIND_SELECTED="" LAUNCH_ROTATION_REASON=""
   load_session_state_or_defaults "$project"
   while true; do
-    local ts prompt_file cycle_log mode_name
+    local ts prompt_file cycle_log mode_name watchdog_script workspace_root
     ts="$(date '+%Y%m%d-%H%M%S')"
     prompt_file="$run_dir/prompt-$ts.txt"
     cycle_log="$logs_dir/cycle-$ts.log"
+    workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
+    local recovered_workers
+    watchdog_script="$workspace_root/scripts/runtime/manager-watchdog.sh"
+    if [[ -x "$watchdog_script" ]]; then
+      recovered_workers="$(bash "$watchdog_script" --project "$PROJECT_ROOT" --recover-expected-workers 2>/dev/null || true)"
+    else
+      recovered_workers="$(manager_runtime_recover_workers_if_needed "$PROJECT_ROOT")"
+    fi
+    if [[ "${recovered_workers:-0}" =~ ^[0-9]+$ ]] && (( recovered_workers > 0 )); then
+      log_info "manager runtime auto-recovered $recovered_workers expected-running worker(s) before prompt build"
+      sleep "${RESTART_DELAY:-2}"
+    fi
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
 
@@ -1023,7 +1563,7 @@ cmd_start() {
     set -e
     local child_pid tool_session_id tool_jsonl_path context_compacted context_ratio route_only_handoff
     local primary_rate_limit_used_percent primary_rate_limit_resets_at secondary_rate_limit_used_percent secondary_rate_limit_resets_at next_restart_delay
-    local active_account account_switch_reason account_switch_at switched_account earliest_reset_info earliest_reset_account earliest_reset_at
+    local active_account
     local rate_limit_reason rate_limit_reset_at
     local dirty_entries worktree_total worktree_dirty summary
     child_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
@@ -1035,12 +1575,6 @@ cmd_start() {
     secondary_rate_limit_used_percent=""
     secondary_rate_limit_resets_at=""
     active_account=""
-    account_switch_reason=""
-    account_switch_at=""
-    switched_account=""
-    earliest_reset_info=""
-    earliest_reset_account=""
-    earliest_reset_at=""
     rate_limit_reason=""
     rate_limit_reset_at=""
     dirty_entries="0"
@@ -1083,11 +1617,15 @@ cmd_start() {
     LAST_SECONDARY_RATE_LIMIT_RESETS_AT="$secondary_rate_limit_resets_at"
     LAST_ROUTE_ONLY_HANDOFF="$route_only_handoff"
     LAST_ACTIVE_ACCOUNT="$active_account"
+    LAST_ACCOUNT_SWITCH_REASON=""
+    LAST_ACCOUNT_SWITCH_AT=""
     LAST_PROJECT_DIRTY_ENTRIES="$dirty_entries"
     LAST_WORKTREE_SUMMARY_TOTAL="$worktree_total"
     LAST_WORKTREE_SUMMARY_DIRTY="$worktree_dirty"
 
     if [[ "$stop_requested" -eq 1 || -f "$(stop_marker_file "$project")" ]]; then
+      LAST_WORKCELL_EXIT_REASON="operator_stop"
+      DESIRED_RUNTIME_STATE_VALUE="stopped"
       rm -f "$child_pid_file" "$(session_state_file "$project")" "$(handoff_file "$project")"
       log_info "received stop signal, exiting supervisor"
       exit 0
@@ -1113,35 +1651,14 @@ cmd_start() {
         account_switch_reason="auth_failure"
       fi
       if [[ -n "$account_switch_reason" ]]; then
-        switched_account="$(switch_to_next_codex_account "$PROJECT_ROOT" "$account_switch_reason" || true)"
-        if [[ -n "$switched_account" ]]; then
-          active_account="$switched_account"
-          account_switch_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-          LAST_ACTIVE_ACCOUNT="$active_account"
-          LAST_ACCOUNT_SWITCH_REASON="$account_switch_reason"
-          LAST_ACCOUNT_SWITCH_AT="$account_switch_at"
-          next_restart_delay="${RESTART_DELAY:-2}"
-        elif [[ -n "$rate_limit_reason" ]]; then
-          earliest_reset_info="$(select_earliest_reset_codex_account "$PROJECT_ROOT" "$active_account")"
-          earliest_reset_account="${earliest_reset_info%%|*}"
-          earliest_reset_at="${earliest_reset_info##*|}"
-          if [[ -n "$earliest_reset_account" && -n "$earliest_reset_at" && "$earliest_reset_info" == *"|"* ]]; then
-            switched_account="$(switch_to_codex_account "$PROJECT_ROOT" "$earliest_reset_account" "all_accounts_cooling_down" || true)"
-            if [[ -n "$switched_account" ]]; then
-              active_account="$switched_account"
-              account_switch_reason="all_accounts_cooling_down"
-              account_switch_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-              LAST_ACTIVE_ACCOUNT="$active_account"
-              LAST_ACCOUNT_SWITCH_REASON="$account_switch_reason"
-              LAST_ACCOUNT_SWITCH_AT="$account_switch_at"
-            fi
-            next_restart_delay="$(seconds_until_epoch "$earliest_reset_at")"
-          fi
-        fi
+        LAST_ACCOUNT_SWITCH_REASON="$account_switch_reason"
+        LAST_ACCOUNT_SWITCH_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
       fi
     fi
 
     write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY"
+    LAST_WORKCELL_EXIT_REASON="${account_switch_reason:-${rate_limit_reason:-ai_exit_rc_${rc}}}"
+    write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
 
     log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, secondary_rate_limit_used_percent=${secondary_rate_limit_used_percent:-unavailable}, secondary_rate_limit_resets_at=${secondary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
     rm -f "$child_pid_file"
@@ -1152,18 +1669,44 @@ cmd_start() {
       log_error "reached MAX_RESTARTS=${MAX_RESTARTS}, stopping"
       exit 1
     fi
-    if [[ -n "$rate_limit_reason" ]]; then
-      if [[ -n "$switched_account" && "${account_switch_reason:-}" != "all_accounts_cooling_down" ]]; then
-        log_info "rate-limit hit on previous codex account (reason=${rate_limit_reason}); continuing with switched account=${switched_account}"
-      elif [[ -n "$earliest_reset_account" && -n "$earliest_reset_at" ]]; then
-        log_warn "all codex accounts cooling down; switched to earliest-reset account=${earliest_reset_account}, sleeping until reset_at=${earliest_reset_at} (sleep=${next_restart_delay:-0}s)"
-      else
-        next_restart_delay="$(seconds_until_epoch "${rate_limit_reset_at:-}")"
-        log_warn "${rate_limit_reason} detected; backing off until reset_at=${rate_limit_reset_at:-unavailable} (sleep=${next_restart_delay:-0}s)"
-      fi
+    if [[ -n "$account_switch_reason" ]]; then
+      log_warn "${account_switch_reason} detected for this workcell; local runtime is deferring global account recovery to the global watchdog / manager control plane and will now stop"
+      exit 0
     fi
     sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$next_restart_delay"
   done
+}
+
+cmd_ensure_manager() {
+  local project="" branch="" watch_mode="0" watch_interval="5"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --watch) watch_mode="1"; shift ;;
+      --interval) watch_interval="${2:-}"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  [[ -n "$project" ]] || { usage; exit 1; }
+  [[ "$watch_interval" =~ ^[0-9]+$ ]] || { log_error "ensure-manager --interval must be a positive integer"; exit 1; }
+  load_config "$project"
+  check_doc_gate_or_fail "$project" || {
+    log_error "ensure-manager blocked by doc gate"
+    exit 1
+  }
+
+  branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
+  if [[ "$branch" != "develop" ]]; then
+    log_error "ensure-manager only supports the develop manager worktree (current branch: ${branch:-unknown})"
+    exit 1
+  fi
+
+  if [[ "$watch_mode" == "1" ]]; then
+    cmd_ensure_manager_watch "$project" "$watch_interval"
+    return 0
+  fi
+
+  ensure_manager_once "$project"
 }
 
 cmd_doctor() {
@@ -1360,6 +1903,14 @@ cmd_stop() {
     [[ -n "$ap" ]] && kill "$ap" 2>/dev/null || true
     rm -f "$run_dir/ai.pid"
   fi
+  if [[ -f "$(ensure_manager_watchdog_pid_file "$project")" ]]; then
+    local wp
+    wp="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$wp"; then
+      [[ -n "$wp" ]] && kill "$wp" 2>/dev/null || true
+    fi
+    rm -f "$(ensure_manager_watchdog_pid_file "$project")"
+  fi
   if [[ -f "$run_dir/supervisor.pid" ]]; then
     local sp
     sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
@@ -1384,6 +1935,7 @@ cmd_stop() {
   fi
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   rm -f "$(stop_marker_file "$project")"
+  write_workcell_state "$project" "stopped" "down" "down" "operator_stop"
   log_info "stopped (if running)"
 }
 
@@ -1394,6 +1946,7 @@ main() {
   case "$cmd" in
     init) cmd_init "$@" ;;
     doctor) cmd_doctor "$@" ;;
+    ensure-manager) cmd_ensure_manager "$@" ;;
     start) cmd_start "$@" ;;
     status) cmd_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;
@@ -1402,4 +1955,6 @@ main() {
   esac
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi
