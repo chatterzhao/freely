@@ -25,6 +25,7 @@
 - `skill:workspace-skill-governance` -> `workspace-skill-governance/SKILL.md`
 - `skill:branch-management` -> `branch-management/SKILL.md`
 - `skill:multi-worktree-supervision` -> `multi-worktree-supervision/SKILL.md`
+- `skill:worktree-hygiene-supervision` -> `worktree-hygiene-supervision/SKILL.md`
 - `skill:premerge-reconcile` -> `premerge-reconcile/SKILL.md`
 - `skill:recovery-subagent-governance` -> `recovery-subagent-governance/SKILL.md`
 - `skill:module-interface-governance` -> `module-interface-governance/SKILL.md`
