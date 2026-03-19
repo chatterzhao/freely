@@ -30,6 +30,7 @@ prompt="$(
     --constitution "$ROOT_DIR/docs/CONSTITUTION.md" \
     --ai codex:auto
 )"
+current_branch="$(git -C "$ROOT_DIR" branch --show-current 2>/dev/null || printf 'unknown')"
 
 printf '%s\n' "$prompt" | grep -q 'lead-agent'
 printf '%s\n' "$prompt" | grep -q 'context-source-skill'
@@ -38,10 +39,29 @@ printf '%s\n' "$prompt" | grep -q 'workspace/agents/lead-agent.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/tools.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-pre-brainstorm-execution/SKILL.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-ibm-execution/SKILL.md'
+printf '%s\n' "$prompt" | grep -q '工作区治理提醒'
+printf '%s\n' "$prompt" | grep -q 'current_worktree_state:'
+printf '%s\n' "$prompt" | grep -q 'current_project_dirty_entries:'
+printf '%s\n' "$prompt" | grep -q 'checkpoint_required='
+printf '%s\n' "$prompt" | grep -q 'project_worktree_summary:'
+printf '%s\n' "$prompt" | grep -q '使用 subagent 提高效率'
 printf '%s\n' "$prompt" | grep -q '需求池至少包括'
 printf '%s\n' "$prompt" | grep -q '当前先看哪个池'
 printf '%s\n' "$prompt" | grep -q 'pre-brainstorm'
 printf '%s\n' "$prompt" | grep -q 'issue-bound brainstorm'
 printf '%s\n' "$prompt" | grep -q '脚本只负责启动和托管 AI'
+
+case "$current_branch" in
+  develop|main|pre-test-merge)
+    printf '%s\n' "$prompt" | grep -q 'MANAGER_MODE=true'
+    printf '%s\n' "$prompt" | grep -q '当前分支是受保护主管工位'
+    printf '%s\n' "$prompt" | grep -q '只做主管，不做实现'
+    ;;
+  *)
+    printf '%s\n' "$prompt" | grep -q 'MANAGER_MODE=false'
+    printf '%s\n' "$prompt" | grep -q '默认不要在首跳结束时只输出'
+    printf '%s\n' "$prompt" | grep -q '必须在当前会话内继续执行第二跳'
+    ;;
+esac
 
 echo "[PASS] routing foundation loop artifacts are connected"

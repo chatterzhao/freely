@@ -1,0 +1,232 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT="$(pwd -P)"
+FORMAT="text"
+STAGED_ONLY=0
+FAIL_ON_REQUIRED=0
+MAX_CHANGED_FILES="${CHECKPOINT_MAX_CHANGED_FILES:-25}"
+MAX_UNTRACKED_FILES="${CHECKPOINT_MAX_UNTRACKED_FILES:-10}"
+MAX_SCOPE_COUNT="${CHECKPOINT_MAX_SCOPE_COUNT:-4}"
+MAX_STORY_SCOPE_COUNT="${CHECKPOINT_MAX_STORY_SCOPE_COUNT:-2}"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  checkpoint-guard [--project <abs_path>] [--format text|json] [--staged-only] [--fail-on-required]
+
+Purpose:
+  - detect when the current worktree has accumulated too much mixed WIP
+  - surface when the next action should be checkpoint/review/test/commit instead of more implementation
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) PROJECT="$2"; shift 2 ;;
+    --format) FORMAT="$2"; shift 2 ;;
+    --staged-only) STAGED_ONLY=1; shift ;;
+    --fail-on-required) FAIL_ON_REQUIRED=1; shift ;;
+    -h|--help) usage; exit 0 ;;
+    *)
+      echo "unknown arg: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+[[ -d "$PROJECT" ]] || { echo "project not found: $PROJECT" >&2; exit 1; }
+git -C "$PROJECT" rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
+  echo "not a git worktree: $PROJECT" >&2
+  exit 1
+}
+
+normalize_path() {
+  local raw="$1"
+  if [[ "$raw" == *" -> "* ]]; then
+    raw="${raw##* -> }"
+  fi
+  printf '%s\n' "$raw"
+}
+
+scope_for_path() {
+  local path="$1"
+  case "$path" in
+    docs/epics/*/*/*)
+      awk -F/ '{print $1 "/" $2 "/" $3 "/" $4}' <<<"$path"
+      ;;
+    docs/pre-brainstorms/*/*)
+      awk -F/ '{print $1 "/" $2 "/" $3}' <<<"$path"
+      ;;
+    docs/system/workspace/*/*)
+      awk -F/ '{print $1 "/" $2 "/" $3 "/" $4}' <<<"$path"
+      ;;
+    src/frontend_probe_v0/*|src-tauri/*|public/*)
+      awk -F/ '{print $1 "/" $2}' <<<"$path"
+      ;;
+    *)
+      awk -F/ '{print $1}' <<<"$path"
+      ;;
+  esac
+}
+
+story_scope_for_path() {
+  local path="$1"
+  case "$path" in
+    docs/epics/*/*/*)
+      awk -F/ '{print $1 "/" $2 "/" $3 "/" $4}' <<<"$path"
+      ;;
+    *)
+      return 0
+      ;;
+  esac
+}
+
+is_control_scope() {
+  local scope="$1" path="$2"
+  case "$scope" in
+    docs/system/workspace*|.githooks|bin) return 0 ;;
+  esac
+  case "$path" in
+    docs/CONSTITUTION.md|docs/LAWS.md|docs/PROJECT_INTENT.md|AGENTS.md|docs/milestones.md) return 0 ;;
+  esac
+  return 1
+}
+
+is_product_scope() {
+  local scope="$1" path="$2"
+  case "$scope" in
+    src-tauri*|src/frontend_probe_v0*|public*) return 0 ;;
+  esac
+  case "$path" in
+    Cargo.toml|Cargo.lock|package.json|bun.lock|index.html|tsconfig.json|vite.config.ts) return 0 ;;
+    docs/epics/frontend-probe-dogfooding-loop/*) return 0 ;;
+  esac
+  return 1
+}
+
+status_lines=()
+if [[ "$STAGED_ONLY" -eq 1 ]]; then
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && status_lines+=("A  $line")
+  done < <(git -C "$PROJECT" diff --cached --name-only)
+else
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && status_lines+=("$line")
+  done < <(git -C "$PROJECT" status --short)
+fi
+
+changed_count=0
+untracked_count=0
+control_plane=0
+product_plane=0
+declare -a reasons scopes story_scopes files
+
+array_contains() {
+  local needle="$1"
+  shift || true
+  local item
+  for item in "$@"; do
+    [[ "$item" == "$needle" ]] && return 0
+  done
+  return 1
+}
+
+for line in "${status_lines[@]:-}"; do
+  path="$(normalize_path "${line:3}")"
+  [[ -n "$path" ]] || continue
+  files+=("$path")
+  changed_count=$((changed_count + 1))
+  if [[ "${line:0:2}" == "??" ]]; then
+    untracked_count=$((untracked_count + 1))
+  fi
+
+  scope="$(scope_for_path "$path")"
+  if [[ -n "$scope" ]] && ! array_contains "$scope" ${scopes[@]+"${scopes[@]}"}; then
+    scopes+=("$scope")
+  fi
+
+  story_scope="$(story_scope_for_path "$path")"
+  if [[ -n "$story_scope" ]] && ! array_contains "$story_scope" ${story_scopes[@]+"${story_scopes[@]}"}; then
+    story_scopes+=("$story_scope")
+  fi
+
+  if is_control_scope "$scope" "$path"; then
+    control_plane=1
+  fi
+  if is_product_scope "$scope" "$path"; then
+    product_plane=1
+  fi
+done
+
+checkpoint_required=0
+scope_count="${#scopes[@]:-0}"
+story_scope_count="${#story_scopes[@]:-0}"
+
+if [[ "$changed_count" -gt "$MAX_CHANGED_FILES" ]]; then
+  checkpoint_required=1
+  reasons+=("changed_files_threshold")
+fi
+if [[ "$untracked_count" -gt "$MAX_UNTRACKED_FILES" ]]; then
+  checkpoint_required=1
+  reasons+=("untracked_files_threshold")
+fi
+if [[ "$scope_count" -gt "$MAX_SCOPE_COUNT" ]]; then
+  checkpoint_required=1
+  reasons+=("scope_count_threshold")
+fi
+if [[ "$story_scope_count" -gt "$MAX_STORY_SCOPE_COUNT" ]]; then
+  checkpoint_required=1
+  reasons+=("story_scope_count_threshold")
+fi
+if [[ "$control_plane" -eq 1 && "$product_plane" -eq 1 ]]; then
+  checkpoint_required=1
+  reasons+=("mixed_control_and_product_planes")
+fi
+
+if [[ "$FORMAT" == "json" ]]; then
+  scope_json=""
+  for scope in "${scopes[@]:-}"; do
+    [[ -n "$scope_json" ]] && scope_json+=", "
+    scope_json+="\"$scope\""
+  done
+  reason_json=""
+  for reason in "${reasons[@]:-}"; do
+    [[ -n "$reason_json" ]] && reason_json+=", "
+    reason_json+="\"$reason\""
+  done
+  printf '{"project":"%s","staged_only":%s,"checkpoint_required":%s,"changed_files":%s,"untracked_files":%s,"scope_count":%s,"story_scope_count":%s,"reason_codes":[%s],"scopes":[%s]}\n' \
+    "$PROJECT" \
+    "$([[ "$STAGED_ONLY" -eq 1 ]] && echo true || echo false)" \
+    "$([[ "$checkpoint_required" -eq 1 ]] && echo true || echo false)" \
+    "$changed_count" \
+    "$untracked_count" \
+    "$scope_count" \
+    "$story_scope_count" \
+    "$reason_json" \
+    "$scope_json"
+else
+  echo "project: $PROJECT"
+  echo "staged_only: $([[ "$STAGED_ONLY" -eq 1 ]] && echo yes || echo no)"
+  echo "checkpoint_required: $([[ "$checkpoint_required" -eq 1 ]] && echo yes || echo no)"
+  echo "changed_files: $changed_count"
+  echo "untracked_files: $untracked_count"
+  echo "scope_count: $scope_count"
+  echo "story_scope_count: $story_scope_count"
+  if [[ "${#reasons[@]:-0}" -gt 0 ]]; then
+    echo "reason_codes: ${reasons[*]:-}"
+  else
+    echo "reason_codes: none"
+  fi
+  if [[ "${#scopes[@]:-0}" -gt 0 ]]; then
+    echo "scopes:"
+    printf '  - %s\n' "${scopes[@]:-}"
+  fi
+fi
+
+if [[ "$FAIL_ON_REQUIRED" -eq 1 && "$checkpoint_required" -eq 1 ]]; then
+  exit 2
+fi
+
+exit 0

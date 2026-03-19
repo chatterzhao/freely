@@ -58,12 +58,12 @@
 - 20260306-0113--standard-worktree-prompts-and-fallback-boundary
   - brainstorms: docs/pre-brainstorms/20260306-0113--standard-worktree-prompts-and-fallback-boundary/brainstorms.md
   - candidates: docs/pre-brainstorms/20260306-0113--standard-worktree-prompts-and-fallback-boundary/candidates.md
-- 20260307-0537--ai-tool-worktree-directory-access
-  - brainstorms: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/candidates.md
 - 20260306-0248--issue-brainstorm-routing-guard
   - brainstorms: docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/brainstorms.md
   - candidates: docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/candidates.md
+- 20260307-0537--ai-tool-worktree-directory-access
+  - brainstorms: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/candidates.md
 - 20260307-0930--source-routing-and-derived-worktree-governance
   - brainstorms: docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md
@@ -82,15 +82,63 @@
 - 20260308-1930--business-block-vs-system-crash-recovery
   - brainstorms: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/brainstorms.md
   - candidates: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/candidates.md
+- 20260309-1943--agent-skills-standard-compliance
+  - brainstorms: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/candidates.md
 - 20260309-2003--document-skill-boundary-planning
   - brainstorms: docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/brainstorms.md
   - candidates: docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/candidates.md
 - 20260309-2345--governance-check-naming-alignment
   - brainstorms: docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/brainstorms.md
   - candidates: docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/candidates.md
-- 20260309-1943--agent-skills-standard-compliance
-  - brainstorms: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/candidates.md
+- 20260316-1648--codex-reasoning-effort-runtime-alignment
+  - brainstorms: docs/pre-brainstorms/20260316-1648--codex-reasoning-effort-runtime-alignment/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260316-1648--codex-reasoning-effort-runtime-alignment/candidates.md
+- 20260316-1800--session-lifecycle-rotation-and-handoff
+  - brainstorms: docs/pre-brainstorms/20260316-1800--session-lifecycle-rotation-and-handoff/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260316-1800--session-lifecycle-rotation-and-handoff/candidates.md
+- 20260316-1838--context-window-aware-session-rotation
+  - brainstorms: docs/pre-brainstorms/20260316-1838--context-window-aware-session-rotation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260316-1838--context-window-aware-session-rotation/candidates.md
+- 20260316-2202--first-hop-must-execute-second-hop
+  - brainstorms: docs/pre-brainstorms/20260316-2202--first-hop-must-execute-second-hop/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260316-2202--first-hop-must-execute-second-hop/candidates.md
+- 20260317-0332--rust-tauri-probe-bridge-v1
+  - brainstorms: docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md
+- 20260317-0735--account-aware-loop-and-checkpoint-commit-governance
+  - brainstorms: docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/candidates.md
+- 20260317-1101--frontend-runtime-baseline-for-probe
+  - brainstorms: docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md
+- 20260317-2248--rust-toolchain-bootstrap-skill
+  - brainstorms: docs/pre-brainstorms/20260317-2248--rust-toolchain-bootstrap-skill/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260317-2248--rust-toolchain-bootstrap-skill/candidates.md
+- 20260318-1818--ai-cli-availability-manager
+  - brainstorms: docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/candidates.md
+- 20260318-2245--worktree-pid-ownership-validation
+  - brainstorms: docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/candidates.md
+- 20260318-2358--manager-workcell-supervision-and-continuity
+  - brainstorms: docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/candidates.md
+- 20260318-0009--multi-worktree-supervision-control-plane
+  - brainstorms: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/candidates.md
+- 20260318-0715--ai-autonomy-checkpoint-commit-governance
+  - brainstorms: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/candidates.md
+- 20260318-1210--rate-limit-recheck-and-wakeup
+  - brainstorms: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/candidates.md
+- 20260318-1408--manager-self-supervision-and-autonomous-recovery
+  - brainstorms: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md
+- 20260318-1630--global-ai-account-watchdog
+  - brainstorms: docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

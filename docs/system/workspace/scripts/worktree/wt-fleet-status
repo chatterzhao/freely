@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+PROJECT_ROOT="$(pwd -P)"
+FORMAT="text"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  wt-fleet-status [--project <repo_root>] [--format text|json]
+
+Purpose:
+  - show all mounted worktrees as supervised workcells
+  - surface branch, cleanliness, checkpoint pressure, and Freely runtime state in one CLI-first view
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) PROJECT_ROOT="$2"; shift 2 ;;
+    --format) FORMAT="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *)
+      echo "unknown arg: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+git -C "$PROJECT_ROOT" rev-parse --show-toplevel >/dev/null 2>&1 || {
+  echo "not a git repository: $PROJECT_ROOT" >&2
+  exit 1
+}
+
+extract_phase_hint() {
+  local worktree="$1"
+  local session_state="$worktree/.freely/run/session-state.env"
+  [[ -f "$session_state" ]] || return 0
+  awk -F '"' '/^LAST_PHASE_HINT=/{print $2; exit}' "$session_state"
+}
+
+extract_issue_hint() {
+  local worktree="$1"
+  local session_state="$worktree/.freely/run/session-state.env"
+  [[ -f "$session_state" ]] || return 0
+  awk -F '"' '/^LAST_ISSUE_HINT=/{print $2; exit}' "$session_state"
+}
+
+extract_workcell_state_value() {
+  local worktree="$1" key="$2"
+  local workcell_state="$worktree/.freely/run/workcell-state.env"
+  [[ -f "$workcell_state" ]] || return 0
+  awk -F '"' -v key="$key" '$1 == key "=" {print $2; exit}' "$workcell_state"
+}
+
+checkpoint_guard_bin_for_project() {
+  local project="$1"
+  if [[ -x "$project/bin/checkpoint-guard" ]]; then
+    echo "$project/bin/checkpoint-guard"
+  else
+    echo "$SELF_ROOT/bin/checkpoint-guard"
+  fi
+}
+
+json_bool_value() {
+  local json="$1" key="$2" marker value
+  marker="\"${key}\":"
+  value="${json#*${marker}}"
+  [[ "$value" != "$json" ]] || return 0
+  case "$value" in
+    true*) printf 'true\n' ;;
+    false*) printf 'false\n' ;;
+  esac
+}
+
+json_int_value() {
+  local json="$1" key="$2" marker value
+  marker="\"${key}\":"
+  value="${json#*${marker}}"
+  [[ "$value" != "$json" ]] || return 0
+  case "$value" in
+    [0-9]*) printf '%s\n' "${value%%[^0-9]*}" ;;
+  esac
+}
+
+worktree_rows=()
+while IFS='|' read -r wt_path wt_branch; do
+  [[ -n "$wt_path" ]] || continue
+  dirty_state="CLEAN"
+  if [[ -n "$(git -C "$wt_path" status --short 2>/dev/null || true)" ]]; then
+    dirty_state="DIRTY"
+  fi
+
+  checkpoint_json="$(bash "$(checkpoint_guard_bin_for_project "$wt_path")" --project "$wt_path" --format json 2>/dev/null || true)"
+  checkpoint_required="$(json_bool_value "$checkpoint_json" checkpoint_required)"
+  changed_files="$(json_int_value "$checkpoint_json" changed_files)"
+  phase_hint="$(extract_phase_hint "$wt_path")"
+  issue_hint="$(extract_issue_hint "$wt_path")"
+  desired_runtime_state="$(extract_workcell_state_value "$wt_path" DESIRED_RUNTIME_STATE)"
+  role_hint="$(extract_workcell_state_value "$wt_path" LAST_ROLE_HINT)"
+  exit_reason="$(extract_workcell_state_value "$wt_path" LAST_EXIT_REASON)"
+
+  supervisor="down"
+  ai="down"
+  if [[ -f "$wt_path/.freely/run/supervisor.pid" ]]; then
+    supervisor_pid="$(cat "$wt_path/.freely/run/supervisor.pid" 2>/dev/null || true)"
+    if [[ -n "$supervisor_pid" ]] && kill -0 "$supervisor_pid" 2>/dev/null; then
+      supervisor="up"
+    fi
+  fi
+  if [[ -f "$wt_path/.freely/run/ai.pid" ]]; then
+    ai_pid="$(cat "$wt_path/.freely/run/ai.pid" 2>/dev/null || true)"
+    if [[ -n "$ai_pid" ]] && kill -0 "$ai_pid" 2>/dev/null; then
+      ai="up"
+    fi
+  fi
+
+  worktree_rows+=("$wt_path|$wt_branch|$dirty_state|${checkpoint_required:-false}|${changed_files:-0}|$supervisor|$ai|${phase_hint:-unavailable}|${issue_hint:-unavailable}|${desired_runtime_state:-stopped}|${role_hint:-unavailable}|${exit_reason:-unavailable}")
+done < <(git -C "$PROJECT_ROOT" worktree list --porcelain | awk '
+  /^worktree / { wt=substr($0, 10); br="" }
+  /^branch / { br=$2; sub(/^refs\/heads\//, "", br); print wt "|" br }
+')
+
+if [[ "$FORMAT" == "json" ]]; then
+  printf '['
+  first=1
+  for row in "${worktree_rows[@]}"; do
+    IFS='|' read -r wt_path wt_branch dirty checkpoint_required changed_files supervisor ai phase issue desired_runtime_state role_hint exit_reason <<<"$row"
+    [[ "$first" -eq 0 ]] && printf ','
+    first=0
+    printf '{"worktree":"%s","branch":"%s","dirty_state":"%s","checkpoint_required":%s,"changed_files":%s,"supervisor":"%s","ai":"%s","phase_hint":"%s","issue_hint":"%s","desired_runtime_state":"%s","role_hint":"%s","exit_reason":"%s"}' \
+      "$wt_path" "$wt_branch" "$dirty" "$checkpoint_required" "$changed_files" "$supervisor" "$ai" "$phase" "$issue" "$desired_runtime_state" "$role_hint" "$exit_reason"
+  done
+  printf ']\n'
+  exit 0
+fi
+
+printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-10s %-10s %-18s %s\n' "WORKTREE" "BRANCH" "DIRTY" "CHECKPOINT" "FILES" "SUPERVISOR" "AI" "DESIRED" "ROLE" "PHASE" "ISSUE"
+for row in "${worktree_rows[@]}"; do
+  IFS='|' read -r wt_path wt_branch dirty checkpoint_required changed_files supervisor ai phase issue desired_runtime_state role_hint exit_reason <<<"$row"
+  printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-10s %-10s %-18s %s\n' \
+    "$wt_path" "$wt_branch" "$dirty" "$checkpoint_required" "$changed_files" "$supervisor" "$ai" "$desired_runtime_state" "$role_hint" "$phase" "$issue"
+done

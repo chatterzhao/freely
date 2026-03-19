@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-status-pid-ownership.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+WT_A="$WT_ROOT/feature-a"
+WT_B="$WT_ROOT/feature-b"
+MANAGER_REPO="$TMP_DIR/freely"
+MANAGER_WT_ROOT="$TMP_DIR/freely-worktrees"
+MANAGER_WT="$MANAGER_WT_ROOT/feature-demo"
+
+mkdir -p "$REPO" "$WT_ROOT"
+cd "$REPO"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+git branch feature/a
+git branch feature/b
+git worktree add "$WT_A" feature/a >/dev/null
+git worktree add "$WT_B" feature/b >/dev/null
+
+for wt in "$WT_A" "$WT_B"; do
+  mkdir -p "$wt/.freely/run" "$wt/.freely/logs" "$wt/docs"
+  cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$wt/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$wt/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+done
+
+bash -c "exec -a 'runtime/freely start --project $WT_B' sleep 30" >/dev/null 2>&1 &
+REAL_PID=$!
+trap 'kill "$REAL_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+
+printf '%s' "$REAL_PID" >"$WT_A/.freely/run/supervisor.pid"
+
+OUTPUT_STATUS="$(bash "$ROOT_DIR/bin/freely" status --project "$WT_A")"
+printf '%s\n' "$OUTPUT_STATUS" | grep -q 'supervisor_pid: none'
+
+OUTPUT_FLEET="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$WT_A")"
+printf '%s\n' "$OUTPUT_FLEET" | grep -q 'feature/a'
+if printf '%s\n' "$OUTPUT_FLEET" | grep -q "$REAL_PID"; then
+  echo "[FAIL] fleet-status should not surface supervisor pid from another worktree" >&2
+  exit 1
+fi
+
+bash "$ROOT_DIR/bin/freely" stop --project "$WT_A" >/dev/null 2>&1 || true
+kill -0 "$REAL_PID" 2>/dev/null
+
+kill "$REAL_PID" 2>/dev/null || true
+wait "$REAL_PID" 2>/dev/null || true
+
+mkdir -p "$MANAGER_REPO" "$MANAGER_WT_ROOT"
+cd "$MANAGER_REPO"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+git branch feature/demo
+git worktree add "$MANAGER_WT" feature/demo >/dev/null
+
+for wt in "$MANAGER_REPO" "$MANAGER_WT"; do
+  mkdir -p "$wt/.freely/run" "$wt/.freely/logs" "$wt/docs"
+  cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$wt/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$wt/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+done
+
+bash -c "exec -a 'runtime/freely start --project $MANAGER_WT' sleep 30" >/dev/null 2>&1 &
+PREFIX_PID=$!
+trap 'kill "$PREFIX_PID" 2>/dev/null || true; kill "$REAL_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+printf '%s' "$PREFIX_PID" >"$MANAGER_REPO/.freely/run/supervisor.pid"
+
+PREFIX_OUTPUT="$(bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_REPO")"
+printf '%s\n' "$PREFIX_OUTPUT" | grep -q 'supervisor_pid: none'
+
+kill "$PREFIX_PID" 2>/dev/null || true
+wait "$PREFIX_PID" 2>/dev/null || true
+
+echo "[PASS] freely ignores stale supervisor pid files that belong to another worktree"

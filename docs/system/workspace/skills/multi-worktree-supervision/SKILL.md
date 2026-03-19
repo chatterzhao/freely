@@ -1,0 +1,37 @@
+---
+name: multi-worktree-supervision
+description: 当需要像项目负责人一样同时监督多个 Freely worktree、安排哪些工位继续开发、哪些先 checkpoint、哪些进入集成批次时使用。
+---
+
+# skill:multi-worktree-supervision
+
+## 何时使用
+
+- 同一仓库存在多个活跃 worktree
+- 需要项目级判断工位的脏树压力、runtime 状态与合并节奏
+- 需要决定继续开发、先 checkpoint、冻结等待、进入集成批次
+
+## 工作流
+
+1. 看项目级工位总览。
+   - `./bin/wt-fleet-status`
+   - 或 `./bin/freely fleet-status --project <任一该仓库 worktree>`
+
+2. 看单个工位 checkpoint 压力。
+   - `./bin/checkpoint-guard`
+   - commit 前用 `./bin/checkpoint-guard --staged-only`
+
+3. 看单个工位 runtime 连续性。
+   - `./bin/freely status --project <worktree>`
+
+4. 决策规则。
+   - `checkpoint_required=true`：先 continuity / review / integration test / checkpoint commit
+   - staged commit 超预算：拆分提交或分流到新 worktree
+   - `supervisor` 或 `ai` 不活跃：先恢复 runtime
+   - 上游依赖未进入要求路径：下游工位冻结或只做 doc-loop
+5. 若当前会话承担主管职责，优先做项目级排班，并在可并行任务上使用 subagent 提高效率。
+
+## 边界
+
+- 本 skill 负责监督和调度，不代替具体 issue 的 doc/dev skill
+- 最终 promote / cleanup 前仍必须过 `./bin/wt-status-all`

@@ -15,6 +15,8 @@ Freely 在自举和多 worktree / 多 agent 条件下，仍缺一套稳定的来
 6. 在需要写入时，先判断并进入合适 worktree。
 7. 在 issue 依赖未合并父分支时，允许 derived worktree。
 8. 在 IBM 中先确认 `epic-name/story-name/issue-name`，再写正式目录。
+9. 首跳完成工具选择后，若 `selected_tool` 与当前运行工具一致，必须在当前会话继续执行第二跳，而不是只返回 `next_prompt`。
+10. 首跳 prompt、`lead-agent`、`workspace/tools.md` 与脚本回归必须对上述语义保持一致。
 
 ## Non-Goals
 

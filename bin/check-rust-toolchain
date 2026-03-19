@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+missing=0
+missing_cmds=()
+
+check_cmd() {
+  local cmd="$1"
+  if command -v "$cmd" >/dev/null 2>&1; then
+    local path
+    path="$(command -v "$cmd")"
+    local version
+    version="$("$cmd" --version 2>/dev/null || echo "version-unavailable")"
+    printf '[ok] %s -> %s (%s)\n' "$cmd" "$path" "$version"
+  else
+    printf '[missing] %s\n' "$cmd"
+    missing=1
+    missing_cmds+=("$cmd")
+  fi
+}
+
+check_cmd cargo
+check_cmd rustc
+check_cmd rustup
+
+if [[ "$missing" -ne 0 ]]; then
+  echo "Rust toolchain preflight failed."
+  printf 'Missing commands: %s\n' "${missing_cmds[*]}"
+  echo
+  echo "Suggested next step:"
+  echo "  1. Follow skill:rust-tauri-toolchain-bootstrap"
+  echo "  2. Preferred mirrored rustup install:"
+  echo "     export RUSTUP_DIST_SERVER=https://rsproxy.cn"
+  echo "     export RUSTUP_UPDATE_ROOT=https://rsproxy.cn/rustup"
+  echo "     curl --proto '=https' --tlsv1.2 -sSf https://rsproxy.cn/rustup-init.sh | sh -s -- -y"
+  echo "  3. Reload the shell environment:"
+  echo "     source \"\$HOME/.cargo/env\""
+  echo "  4. Re-run:"
+  echo "     bun run rust:preflight"
+  echo "     bun run cargo:check:probe"
+  exit 1
+fi
+
+echo "Rust toolchain preflight passed."
