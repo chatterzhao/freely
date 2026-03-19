@@ -203,3 +203,76 @@ retirement after:
 - skill 重命名 / 分层 issue
 - runtime 与 skill 的脚本边界 issue
 - 历史 worktree retirement/disposition issue
+
+## First-hop route judgment (2026-03-19)
+
+### Demand pool scan
+
+- `docs/milestones.md`
+  - 已存在更高优先级的 committed issue 处于 `in_verification`、`in_ibm` 与 `in_dev`
+  - 但当前 `20260319-0220--watchdog-control-plane-governance` 尚未写入 active milestone，属于需要补齐映射的新 discovery
+- progress / recovery
+  - 当前仓库尚未启用与本问题对应的 `docs/progress/**` 或 `docs/recovery/**`
+  - 因此不能把本轮问题伪装成 continuation
+- review / test
+  - 已有 `test-watchdog-control-plane-skills` 等验证覆盖现有 watchdog skill 接线
+  - 目前没有新的失败测试或 code-review 直接要求进入 dev-loop
+- human chat / session evidence
+  - 当前会话明确要求进入 Freely 首跳闭环，并核对 watchdog control plane 研究线的路由
+  - `docs/pre-brainstorms/CONVERGENCE.md` 已记录旧工位 `materialize_then_retire` 的 handoff 证据
+- github issue
+  - 本轮未发现新的 github issue 输入
+- `docs/PROJECT_INTENT.md`
+  - 本轮问题属于治理命名、监督控制面与 worktree retirement 承接，仍符合“从 chat / session evidence / 治理漂移中发现问题，再先收敛为 candidate”的产品方向
+
+### Route judgment
+
+- source_class: `discovery`
+- current_pool: `human chat / session evidence` with milestone sync and disposition backfill required
+- route_kind: `pre_brainstorm`
+- target_skill: `doc-pre-brainstorm-execution`
+- selected_tool: `codex`
+- why_selected:
+  - 当前需要直接修改仓库内的 pre-brainstorm 与 milestone 产物
+  - 当前剩余工作是把已吸收的治理结论重新绑定到正式 milestone / issue / skill，而不是直接继续实现
+  - 当前运行工具已经是 `codex`，按首跳协议必须在本会话内继续第二跳，而不是只输出 `next_prompt`
+
+### Why not a new IBM issue
+
+1. umbrella taxonomy、skill/runtime 边界与 retirement disposition 的主要内容已经分别被现有正式 issue 和 `watchdog-control-plane` skill 吸收，不适合再重新物化成一个新的单体 IBM issue。
+2. 当前缺的不是更多研究，而是把候选与已有 `I-20260318-1630`、`I-20260318-1408`、`I-20260319-0018` 及 `watchdog-control-plane` skill 的承接关系写清。
+3. 旧 worktree retirement 已在 `docs/pre-brainstorms/CONVERGENCE.md` 留痕；当前需要的是 disposition 对齐与归档，而不是重开 issue。
+
+### Binding result
+
+- `C-20260319-0220-A`
+  - 已被 `docs/system/workspace/skills/watchdog-control-plane/SKILL.md` 与 `I-20260318-1630` / `I-20260318-1408` / `I-20260319-0018` 吸收
+  - disposition: archive，不新开 IBM
+- `C-20260319-0220-B`
+  - availability 与 runtime extraction 已被 `watchdog-control-plane`、`ai-cli-availability-manager`、`runtime/freely` 与 `I-20260318-1630` 吸收
+  - continuity extraction 已确认进入稳定 issue `I-20260319-0018` 的 IBM 收口
+  - disposition: promote 到既有 issue，下一跳走 `doc-ibm-execution`
+- `C-20260319-0220-C`
+  - 已被 `docs/pre-brainstorms/CONVERGENCE.md` 的 `materialize_then_retire` handoff 与当前 brainstorm 的 retirement heuristic 吸收
+  - disposition: archive，不新开 IBM
+
+### Workspace judgment
+
+- current_worktree: `feature/watchdog-control-plane-governance-20260319`
+- workspace_action: `continue_current_worktree`
+- execution_base: `develop`
+- integration_target: `develop`
+- depends_on:
+  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
+
+### Next recommended action
+
+- 继续作为 `pre_brainstorm` 留在 `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/`
+- 把 A / C 从 active candidate queue 收口为 archive trace
+- 把 B 提升并绑定到 `I-20260319-0018`，从 active candidate queue 移出
+- 当前 pre-brainstorm 已完成 binding 和 archive，不再继续扩研究 scope
+- 下一跳改为在 `I-20260319-0018` 中执行 `doc-ibm-execution`
+- 待 `I-20260319-0018` 收口后，若无新增未吸收实现，再把本 pre-brainstorm 整体转入归档/退休
+- 若后续发现新的未吸收实现或新的治理漂移，再重新进入 `doc-pre-brainstorm-execution`

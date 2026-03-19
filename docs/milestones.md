@@ -111,12 +111,12 @@ routing_policy:
 7. `I-20260319-0018`
 - title: Token-efficient session continuity and rotation governance
 - milestone_state: committed
-- phase_state: `in_ibm`
+- phase_state: `done_ibm`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md`
-- next_action: 先把 `context warn`、`fresh_with_handoff`、manager/worker continuity 与旧会话证据引用的边界收敛成正式 IBM 口径；同时写明官方若未来公开支持非交互压缩参数，应优先评估并重构采用
+- next_action: IBM 产物已补齐，下一跳进入 `dev-loop-execution`，把 runtime / prompt / skill 的 continuity 触发边界统一收敛到 trigger matrix，并保持旧会话证据默认按需引用
 
 8. `I-20260319-0148`
 - title: Context-compaction continuity guard salvage
@@ -209,7 +209,25 @@ routing_policy:
 - evidence: `docs/LAWS.md`, `docs/system/workspace/skills/context-source-skill/SKILL.md`, `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`, `docs/milestones.md`
 - completion_note: 已明确分层业务阻塞与系统崩溃恢复，禁止用 `blocked_*` 伪造系统事件交接，并统一恢复定位顺序与最小字段口径
 
-8. `I-20260316-1801`
+8. `C-20260319-0220-A`
+- title: Watchdog umbrella term and sub-control-plane taxonomy
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- evidence: `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`, `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`, `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`, `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+- completion_note: umbrella taxonomy 已由 `watchdog-control-plane` 与现有 availability / runtime / continuity issue 主线吸收，不再单独 materialize
+
+9. `C-20260319-0220-C`
+- title: Historical watchdog productization worktree retirement handoff
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- evidence: `docs/pre-brainstorms/CONVERGENCE.md`, `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md`
+- completion_note: 旧 watchdog 产品化工位的 `materialize_then_retire` handoff、cleanup 结果与 retirement heuristic 已完成留痕；该候选归档，不新开 IBM
+
+10. `I-20260316-1801`
 - title: Auto-run session lifecycle rotation and handoff governance
 - milestone_state: completed
 - phase_state: `completed`

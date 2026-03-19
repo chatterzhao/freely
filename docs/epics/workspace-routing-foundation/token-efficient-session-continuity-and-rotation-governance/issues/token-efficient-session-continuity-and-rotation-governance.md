@@ -1,18 +1,27 @@
 # Issue: token-efficient session continuity and rotation governance
 
-## Metadata
 - issue_id: `I-20260319-0018`
+- title: Token-efficient session continuity and rotation governance
+- phase_state: `done_ibm`
 - milestone: `M-20260306-workspace-routing-foundation`
-- phase_state: `in_ibm`
+- epic-name: `workspace-routing-foundation`
+- story-name: `token-efficient-session-continuity-and-rotation-governance`
+- issue-name: `token-efficient-session-continuity-and-rotation-governance`
 - priority: P0
+- source_candidate: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md#c-20260319-0018-a`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md`
+- execution_base: `develop`
+- integration_target: `develop`
 - depends_on:
   - `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
   - `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
   - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-- source_brainstorm: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md`
+- session_refs:
+  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
+  - {tool: codex, session_id: "019d05d3-be75-7e42-bbd1-aa2b29e1bad0", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/19/rollout-2026-03-19T04-20-56-019d05d3-be75-7e42-bbd1-aa2b29e1bad0.jsonl", role: "fresh_with_handoff_source"}
 
-## Problem
+## Why
 
 Freely 现在已经有：
 - `context_ratio` 预警
@@ -29,44 +38,20 @@ Freely 现在已经有：
 3. manager continuity 与 worker continuity 的目标对象不同，但当前还没有一套明确的正式口径。
 4. 在官方未公开非交互压缩参数前，Freely 需要有明确 fallback；若官方未来支持，应优先重构采用。
 
-## Why Now
+## Scope
 
-Freely 已经把 manager / worker / watchdog / worktree hygiene / checkpoint governance 接入 `develop`。如果上下文管理不统一，主管与 worker 的长会话质量仍会退化，并继续依赖人工提醒“先写进度再换会话”。
-
-## Desired Outcome
-
-把 Freely 的上下文管理收敛成一条自动能力链：
-
-1. `context warn`
-   - 当前 AI 先更新 phase-appropriate continuity artifact
-   - 不立即强制重启
-
-2. `context rotate`
-   - runtime 触发 `fresh_with_handoff`
-   - 新会话默认消费 continuity artifact + handoff
-
-3. `deep recovery`
-   - 新会话保留对旧 `jsonl` / log 的路径引用
-   - 仅在必要时按需读取，不把整份旧证据塞进 prompt
-
-4. `AI powerless`
-   - watchdog 只负责恢复，不负责替 AI 做语义压缩
-
-并形成统一触发矩阵，至少明确：
-
-| trigger | owner | artifact | action | fallback |
-| --- | --- | --- | --- | --- |
-| `context warn`, 当前 AI 仍健康 | current worker/manager session | phase-appropriate continuity artifact | 先更新 continuity，不立刻 rotate | 若会话随后自然结束，则 handoff 仅引用 continuity 与旧证据路径 |
-| `context rotate` / `context compacted` / `context_ratio >= rotate` | worktree runtime | session handoff + continuity | `fresh_with_handoff` | 新会话默认只消费 continuity + handoff，旧 `jsonl/log` 只按需读取 |
-| AI 已退出但 auto-loop runtime 仍在 | worktree runtime | session-state + handoff + `previous_*_path` | 拉起新进程，选择 `resume` 或 `fresh_with_handoff` | 若 resume 证据不足，退化到 `fresh_with_handoff` |
-| manager / worker runtime 不存在 | outer watchdog / ensure-manager | manager bootstrap handoff | 先拉起主管，不做语义压缩 | 主管再读取 fleet 并决定哪些 worker 需恢复 |
-| global account/service unavailable | global watchdog | account recovery state + manager bootstrap handoff | 切到真实可用账号，或选最早恢复账号并等待 | 账号恢复后再拉起主管 |
+1. 定义 `context warn` 与 `context rotate` 的触发分层和 owner。
+2. 明确 doc-loop / dev-loop / recovery 的 continuity artifact 默认落点。
+3. 明确 manager continuity 与 worker continuity 的最小内容结构。
+4. 规定旧 `jsonl` / cycle log 作为 fallback evidence refs 的默认使用方式。
+5. 对齐 `continuity-watchdog`、`watchdog-control-plane`、`recovery-subagent-governance` 与 runtime handoff 的边界。
+6. 固定“官方压缩优先”的后续演进规则。
 
 ## Acceptance
 
 - `context warn` 与 `context rotate` 有清晰分层，不再混成“任何预警都立即新开会话”。
 - worker continuity 与 manager continuity 的目标对象、内容结构和默认落点被正式写清。
-- handoff 默认只保留必要结构化摘要与旧证据路径，不把整份旧 `jsonl` / log` 当作主 prompt 内容。
+- handoff 默认只保留必要结构化摘要与旧证据路径，不把整份旧 `jsonl` / `log` 当作主 prompt 内容。
 - 若官方未来公开支持非交互压缩/总结参数，Freely 的正式口径明确要求优先评估并重构采用官方能力，而不是长期固化外部 fallback。
 - 统一触发矩阵被正式写入实现参考，后续 runtime / prompt / watchdog 改动必须遵循同一矩阵。
 - `continuity watchdog` 作为独立 skill 存在，并作为 `watchdog-control-plane` 的 continuity 子模块被角色与恢复流程引用。
@@ -79,3 +64,27 @@ Freely 已经把 manager / worker / watchdog / worktree hygiene / checkpoint gov
   - `docs/system/workspace/skills/continuity-watchdog/SKILL.md`
   - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
   - `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`
+
+## Implementation References
+
+- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/brainstorms/b-token-efficient-session-continuity-and-rotation-governance.md`
+- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/prd.md`
+- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/pre-tests.md`
+- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/tasks.md`
+- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
+- `docs/system/workspace/skills/continuity-watchdog/SKILL.md`
+- `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
+- `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`
+
+## Ready For Dev
+
+当前 IBM 已补齐正式 issue-bound brainstorm、PRD、pre-tests、tasks 与 trigger matrix 引用，足以驱动后续实现收口：
+
+1. 把 `runtime/freely`、prompt 组装与相关 skill 的 continuity 触发边界对齐到统一矩阵。
+2. 确保 manager/worker continuity 默认只带最小语义与旧证据路径引用。
+3. 把“官方压缩优先”的规则留在实现与后续 review 中持续校验。
+
+## Next
+
+- 当前转入 `done_ibm`。
+- 下一跳应进入 `dev-loop-execution`，把现有 runtime / skill / prompt 细节统一到本 issue 的 trigger matrix 与 owner boundary。
