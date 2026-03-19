@@ -85,6 +85,8 @@ second_prompt="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
   exit 1
 }
 grep -q '会话轮换交接' "$second_prompt"
+grep -q 'previous_context_compacted: 1' "$second_prompt"
+grep -q 'Continuity Guard' "$second_prompt"
 
 echo "[PASS] freely rotates to fresh_with_handoff after context compaction"
 
@@ -344,6 +346,7 @@ second_context_prompt="$(ls "$PROJECT_CONTEXT"/.freely/run/prompt-*.txt | sort |
 }
 grep -q 'previous_tool_jsonl_path' "$second_context_prompt"
 grep -q 'previous_context_ratio: 0.8000' "$second_context_prompt"
+grep -q 'Continuity Guard' "$second_context_prompt"
 
 echo "[PASS] freely rotates to fresh_with_handoff after high context usage"
 
@@ -441,6 +444,7 @@ second_warn_prompt="$(ls "$PROJECT_WARN"/.freely/run/prompt-*.txt | sort | sed -
 }
 grep -q '上下文容量预警' "$second_warn_prompt"
 grep -q '0.5500' "$second_warn_prompt"
+grep -q '先更新当前阶段对应的 continuity artifact' "$second_warn_prompt"
 
 echo "[PASS] freely warns before rotation when context usage crosses warn threshold"
 

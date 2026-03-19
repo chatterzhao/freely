@@ -118,6 +118,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md`
 - next_action: 先把 `context warn`、`fresh_with_handoff`、manager/worker continuity 与旧会话证据引用的边界收敛成正式 IBM 口径；同时写明官方若未来公开支持非交互压缩参数，应优先评估并重构采用
 
+8. `I-20260319-0148`
+- title: Context-compaction continuity guard salvage
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
+- next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

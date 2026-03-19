@@ -601,6 +601,7 @@ write_session_handoff() {
 - previous_tool_session_id: ${LAST_TOOL_SESSION_ID:-unavailable}
 - previous_tool_jsonl_path: ${LAST_TOOL_JSONL_PATH:-unavailable}
 - previous_cycle_log: ${LAST_CYCLE_LOG:-unavailable}
+- previous_context_compacted: ${LAST_CONTEXT_COMPACTED:-0}
 - previous_context_ratio: ${LAST_CONTEXT_RATIO:-unavailable}
 - previous_route_only_handoff: ${LAST_ROUTE_ONLY_HANDOFF:-0}
 - previous_project_dirty_entries: ${LAST_PROJECT_DIRTY_ENTRIES:-0}
@@ -609,6 +610,11 @@ write_session_handoff() {
 - previous_checkpoint_drift_streak: ${CHECKPOINT_DRIFT_STREAK_CURRENT:-0}
 - branch: ${branch:-unknown}
 - worktree_path: $project
+
+## Continuity Guard
+- If the previous cycle compacted or approached a local context threshold, update the phase-appropriate continuity artifact before expanding implementation.
+- Treat explicit `context compacted` / compact / compression signals as a stop-and-summarize trigger, even for tools without structured context metrics.
+- If the current issue boundary is already verified, prefer a checkpoint commit before adding more scope.
 
 ## Summary Target Hint
 $(context_summary_target_hint "$project")
