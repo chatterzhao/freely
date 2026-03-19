@@ -359,13 +359,35 @@ seconds_until_epoch() {
   awk -v target="$target_epoch" -v now="$now" 'BEGIN { d=target-now; if (d < 0) d=0; print d }'
 }
 
-context_summary_target_hint() {
-  cat <<'EOF'
+context_summary_target_hint_for_role() {
+  local role="${1:-worker}"
+  case "$role" in
+    manager)
+      cat <<'EOF'
+phase-appropriate continuity artifact:
+- manager continuity: update project-level continuity first
+- include expected-running worktrees, blocked/frozen list, merge/cleanup queue, and next supervision priority
+- if runtime-owned recovery already happened, record what manager should inspect next instead of redoing script recovery
+EOF
+      ;;
+    *)
+      cat <<'EOF'
 phase-appropriate continuity artifact:
 - dev-loop: update progress first
 - doc-loop: update current issue / IBM / pre-brainstorm artifact first
 - recovery: update recovery or allowed equivalent recovery evidence first
 EOF
+      ;;
+  esac
+}
+
+context_summary_target_hint() {
+  local project="${1:-${PROJECT_ROOT:-}}"
+  local role="worker"
+  if [[ -n "$project" ]]; then
+    role="$(role_hint_for_project "$project")"
+  fi
+  context_summary_target_hint_for_role "$role"
 }
 
 project_dirty_entries() {
@@ -589,7 +611,7 @@ write_session_handoff() {
 - worktree_path: $project
 
 ## Summary Target Hint
-$(context_summary_target_hint)
+$(context_summary_target_hint "$project")
 
 ## Recent Output Excerpt
 EOF
@@ -680,7 +702,7 @@ write_manager_bootstrap_handoff() {
 - Do not redo global account switching here; that recovery was already owned by the watchdog script.
 
 ## Summary Target Hint
-$(context_summary_target_hint)
+$(context_summary_target_hint "$project")
 EOF
 
   if [[ -n "$fleet_snapshot" ]]; then
@@ -708,7 +730,7 @@ append_context_warning_if_needed() {
 - 本地 warn 阈值: ${CONTEXT_WARN_RATIO:-0.50}
 - 在继续当前 issue 前，先更新当前阶段对应的 continuity artifact，再继续推进。
 
-$(context_summary_target_hint)
+$(context_summary_target_hint "$PROJECT_ROOT")
 EOF
 }
 
@@ -742,7 +764,7 @@ Checkpoint governance:
 - Before adding more implementation, first update the phase-appropriate continuity artifact and cut a checkpoint commit when the current issue boundary is verified.
 - If current work should be split by ownership, move unrelated changes into another dedicated worktree instead of letting this tree keep expanding.
 
-$(context_summary_target_hint)
+$(context_summary_target_hint "$PROJECT_ROOT")
 EOF
 }
 
@@ -1645,7 +1667,7 @@ cmd_start() {
     set -e
     local child_pid tool_session_id tool_jsonl_path context_compacted context_ratio route_only_handoff checkpoint_json checkpoint_required
     local primary_rate_limit_used_percent primary_rate_limit_resets_at secondary_rate_limit_used_percent secondary_rate_limit_resets_at next_restart_delay
-    local active_account
+    local active_account account_switch_reason
     local rate_limit_reason rate_limit_reset_at
     local dirty_entries worktree_total worktree_dirty summary
     child_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
@@ -1657,6 +1679,7 @@ cmd_start() {
     secondary_rate_limit_used_percent=""
     secondary_rate_limit_resets_at=""
     active_account=""
+    account_switch_reason=""
     rate_limit_reason=""
     rate_limit_reset_at=""
     dirty_entries="0"
