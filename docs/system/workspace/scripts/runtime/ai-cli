@@ -1,0 +1,499 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# AI CLI Availability Manager
+# Usage: freely ai <command> [options]
+
+# 配置
+AUTH_DIR="$HOME/.ai-auth"
+CONFIG_FILE="$HOME/.config/freely/ai-cli-profiles.yaml"
+
+# 全局选项
+YES_MODE=false
+FORMAT="text"
+QUIET=false
+DRY_RUN=false
+
+# 颜色
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# 工具函数
+log_info() {
+  [[ "$QUIET" == "true" ]] && return
+  echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+log_error() {
+  echo -e "${RED}[ERROR]${NC} $1" >&2
+}
+
+log_warn() {
+  [[ "$QUIET" == "true" ]] && return
+  echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+# 确认操作
+confirm() {
+  local msg="$1"
+  [[ "$YES_MODE" == "true" ]] && return 0
+  read -r -p "$msg [y/N] " response
+  [[ "$response" =~ ^[Yy]$ ]]
+}
+
+# 账号名转安全目录名
+account_to_dirname() {
+  echo "$1" | sed 's/\./-/g'
+}
+
+# 从 auth.json 提取账号信息
+extract_codex_account() {
+  local auth_file="$1"
+  local email=""
+  
+  if command -v python3 &>/dev/null; then
+    email=$(python3 -c "
+import json, sys, base64
+try:
+    data = json.load(open('$auth_file'))
+    id_token = data.get('tokens', {}).get('id_token', '')
+    if id_token:
+        payload = id_token.split('.')[1]
+        payload += '=' * (4 - len(payload) % 4)
+        decoded = base64.urlsafe_b64decode(payload)
+        claims = json.loads(decoded)
+        print(claims.get('email', ''))
+except:
+    pass
+" 2>/dev/null)
+  fi
+  
+  echo "$email"
+}
+
+# 初始化
+cmd_init() {
+  mkdir -p "$AUTH_DIR"
+  chmod 700 "$AUTH_DIR"
+  mkdir -p "$(dirname "$CONFIG_FILE")"
+  
+  if [[ ! -f "$CONFIG_FILE" ]]; then
+    cat > "$CONFIG_FILE" << EOF
+version: 1
+default_tool: codex
+tools:
+  codex:
+    method: copy_auth
+    active: ""
+    accounts: {}
+  iflow:
+    method: env_var
+    active: ""
+    accounts: {}
+EOF
+    log_info "Created config: $CONFIG_FILE"
+  fi
+  
+  log_info "Initialized AI CLI account manager"
+  log_info "Auth directory: $AUTH_DIR"
+}
+
+# 登录
+cmd_login() {
+  local tool="$1"
+  
+  case "$tool" in
+    codex)
+      log_info "Launching codex login..."
+      codex login
+      
+      # 登录成功后自动保存
+      if [[ -f "$HOME/.codex/auth.json" ]]; then
+        local account=$(extract_codex_account "$HOME/.codex/auth.json")
+        if [[ -n "$account" ]]; then
+          local dirname=$(account_to_dirname "$account")
+          local target_dir="$AUTH_DIR/codex-$dirname"
+          mkdir -p "$target_dir"
+          cp "$HOME/.codex/auth.json" "$target_dir/"
+          chmod 600 "$target_dir/auth.json"
+          log_info "Auto-saved account: $account"
+          log_info "Location: $target_dir"
+          
+          if [[ "$FORMAT" == "json" ]]; then
+            echo "{\"logged_in\": true, \"tool\": \"codex\", \"account\": \"$account\", \"saved\": true}"
+          fi
+        fi
+      fi
+      ;;
+    iflow)
+      log_info "iflow uses environment variables."
+      log_info "Set IFLOW_API_KEY in your shell config, then run: freely ai save iflow <account>"
+      ;;
+    *)
+      log_error "Unknown tool: $tool"
+      exit 2
+      ;;
+  esac
+}
+
+# 保存当前登录
+cmd_save() {
+  local tool="$1"
+  local account="${2:-}"
+  
+  case "$tool" in
+    codex)
+      local auth_file="$HOME/.codex/auth.json"
+      if [[ ! -f "$auth_file" ]]; then
+        log_error "No codex auth found. Run 'freely ai login codex' first."
+        exit 3
+      fi
+      
+      if [[ -z "$account" ]]; then
+        account=$(extract_codex_account "$auth_file")
+        if [[ -z "$account" ]]; then
+          log_error "Cannot extract account from auth.json. Please specify account name."
+          log_info "Usage: freely ai save codex <account>"
+          exit 2
+        fi
+        log_info "Detected account: $account"
+      fi
+      
+      local dirname=$(account_to_dirname "$account")
+      local target_dir="$AUTH_DIR/codex-$dirname"
+      
+      if [[ -d "$target_dir" ]] && [[ "$YES_MODE" != "true" ]]; then
+        confirm "Account '$account' exists. Overwrite?" || exit 1
+      fi
+      
+      [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would save to $target_dir"; return; }
+      
+      mkdir -p "$target_dir"
+      cp "$auth_file" "$target_dir/"
+      chmod 600 "$target_dir/auth.json"
+      
+      log_info "Saved codex account: $account"
+      log_info "Location: $target_dir"
+      
+      if [[ "$FORMAT" == "json" ]]; then
+        echo "{\"saved\": true, \"tool\": \"codex\", \"account\": \"$account\", \"path\": \"$target_dir\"}"
+      fi
+      ;;
+    iflow)
+      log_error "iflow uses environment variables. Set IFLOW_${account^^}_KEY in your shell config."
+      exit 2
+      ;;
+    *)
+      log_error "Unknown tool: $tool"
+      exit 2
+      ;;
+  esac
+}
+
+# 同步当前 auth.json 到对应备份目录
+sync_current_auth() {
+  local tool="$1"
+  local auth_file="$HOME/.codex/auth.json"
+  
+  if [[ ! -f "$auth_file" ]]; then
+    return 0
+  fi
+  
+  local current_account=$(extract_codex_account "$auth_file")
+  if [[ -z "$current_account" ]]; then
+    return 0
+  fi
+  
+  local dirname=$(account_to_dirname "$current_account")
+  local backup_dir="$AUTH_DIR/${tool}-${dirname}"
+  
+  # 只在备份目录已存在时同步（避免创建意外账户）
+  if [[ -d "$backup_dir" ]]; then
+    cp "$auth_file" "$backup_dir/"
+    chmod 600 "$backup_dir/auth.json"
+    log_info "Auto-synced current token to backup: $current_account"
+  fi
+}
+
+# 切换 account
+cmd_switch() {
+  local tool="$1"
+  local account="${2:-}"
+  
+  if [[ -z "$account" ]]; then
+    log_info "Available accounts:"
+    ls -1 "$AUTH_DIR" 2>/dev/null | grep "^${tool}-" | sed "s/^${tool}-/  /" || true
+    return
+  fi
+  
+  case "$tool" in
+    codex)
+      local dirname=$(account_to_dirname "$account")
+      local source_dir="$AUTH_DIR/codex-$dirname"
+      local target_file="$HOME/.codex/auth.json"
+      local switched_account=""
+      
+      if [[ ! -d "$source_dir" ]]; then
+        log_error "Account '$account' not found"
+        log_info "Available: $(ls -1 "$AUTH_DIR" 2>/dev/null | grep '^codex-' | sed 's/codex-//' | tr '\n' ' ')"
+        exit 4
+      fi
+      
+      # 切换前自动同步当前 token 到备份（保持备份最新）
+      if [[ -f "$target_file" ]]; then
+        sync_current_auth "$tool"
+      fi
+      
+      [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch to $account"; return; }
+      
+      cp "$source_dir/auth.json" "$target_file"
+      switched_account="$(extract_codex_account "$target_file")"
+      if [[ -z "$switched_account" ]]; then
+        log_error "Switch copied auth.json but could not verify the active codex account"
+        exit 5
+      fi
+      if [[ "$(account_to_dirname "$switched_account")" != "$dirname" ]]; then
+        log_error "Switch verification failed: requested '$account' but auth.json now resolves to '$switched_account'"
+        exit 5
+      fi
+      log_info "Switched codex to account: $account"
+      log_warn "Restart codex for the change to take effect"
+      
+      if [[ "$FORMAT" == "json" ]]; then
+        echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$account\"}"
+      fi
+      ;;
+    *)
+      log_error "Unknown tool: $tool"
+      exit 2
+      ;;
+  esac
+}
+
+# 列出 accounts
+cmd_list() {
+  local accounts=()
+  
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    accounts+=("$line")
+  done < <(ls -1 "$AUTH_DIR" 2>/dev/null || true)
+  
+  if [[ ${#accounts[@]} -eq 0 ]]; then
+    log_info "No accounts found. Run 'freely ai login codex' to create one."
+    return
+  fi
+  
+  case "$FORMAT" in
+    json)
+      echo -n "{\"accounts\": ["
+      local first=true
+      for a in "${accounts[@]}"; do
+        [[ "$first" == "true" ]] && first=false || echo -n ", "
+        echo -n "\"$a\""
+      done
+      echo "]}"
+      ;;
+    *)
+      for a in "${accounts[@]}"; do
+        echo "  $a"
+      done
+      ;;
+  esac
+}
+
+# 显示当前账号
+cmd_whoami() {
+  local tool="${1:-codex}"
+  
+  case "$tool" in
+    codex)
+      local auth_file="$HOME/.codex/auth.json"
+      if [[ ! -f "$auth_file" ]]; then
+        case "$FORMAT" in
+          json) echo "{\"tool\": \"codex\", \"account\": null}" ;;
+          *) log_warn "Not logged in" ;;
+        esac
+        exit 0
+      fi
+      
+      local account=$(extract_codex_account "$auth_file")
+      if [[ -z "$account" ]]; then
+        case "$FORMAT" in
+          json) echo "{\"tool\": \"codex\", \"account\": null}" ;;
+          *) log_warn "Cannot determine account" ;;
+        esac
+        exit 0
+      fi
+      
+      case "$FORMAT" in
+        json) echo "{\"tool\": \"codex\", \"account\": \"$account\"}" ;;
+        *) log_info "Current account: $account" ;;
+      esac
+      ;;
+    *)
+      log_error "Unknown tool: $tool"
+      exit 2
+      ;;
+  esac
+}
+
+# 状态
+cmd_status() {
+  local tool="${1:-codex}"
+  
+  case "$tool" in
+    codex)
+      local auth_file="$HOME/.codex/auth.json"
+      if [[ -f "$auth_file" ]]; then
+        local mtime=$(stat -f "%Sm" "$auth_file" 2>/dev/null || stat -c "%y" "$auth_file" 2>/dev/null || echo "unknown")
+        local account=$(extract_codex_account "$auth_file")
+        
+        case "$FORMAT" in
+          json)
+            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"account\": \"$account\", \"last_modified\": \"$mtime\"}"
+            ;;
+          *)
+            log_info "Tool: codex"
+            log_info "Auth: present"
+            log_info "Account: ${account:-unknown}"
+            log_info "Last modified: $mtime"
+            ;;
+        esac
+      else
+        case "$FORMAT" in
+          json) echo "{\"tool\": \"codex\", \"auth\": \"missing\"}" ;;
+          *) log_warn "No codex auth found" ;;
+        esac
+      fi
+      ;;
+    *)
+      log_error "Unknown tool: $tool"
+      exit 2
+      ;;
+  esac
+}
+
+# 删除 account
+cmd_delete() {
+  local tool="$1"
+  local account="$2"
+  local dirname=$(account_to_dirname "$account")
+  local target_dir="$AUTH_DIR/${tool}-${dirname}"
+  
+  if [[ ! -d "$target_dir" ]]; then
+    log_error "Account '$account' not found"
+    exit 4
+  fi
+  
+  confirm "Delete account '$account'?" || exit 1
+  
+  [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would delete $target_dir"; return; }
+  
+  rm -rf "$target_dir"
+  log_info "Deleted account: $account"
+  
+  if [[ "$FORMAT" == "json" ]]; then
+    echo "{\"deleted\": true, \"tool\": \"$tool\", \"account\": \"$account\"}"
+  fi
+}
+
+# 帮助
+show_help() {
+  cat << EOF
+Usage: freely ai <command> [options]
+
+Commands:
+  init                    Initialize account manager
+  login <tool>            Login and auto-save account
+  save <tool> [account]   Save current login (auto-detect account if not specified)
+  switch [tool] [account] Switch to account (default tool: codex; interactive if no account)
+  list                    List all accounts
+  whoami [tool]           Show current logged-in account
+  status [tool]           Show current status
+  delete <tool> <account> Delete an account
+
+Options:
+  --yes, -y               Skip confirmations (non-interactive)
+  --format FORMAT         Output format: text|json|yaml
+  --quiet, -q             Quiet mode
+  --dry-run               Simulate without changes
+
+Exit codes:
+  0 = success
+  1 = general error
+  2 = parameter error
+  3 = auth error
+  4 = not found
+
+Examples:
+  freely ai init
+  freely ai login codex
+  freely ai whoami
+  freely ai switch codex other@email.com --yes
+  freely ai switch other@email.com --yes
+  freely ai list --format json
+EOF
+}
+
+# 主入口
+main() {
+  local COMMAND=""
+  local ARGS=()
+  
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --yes|-y) YES_MODE=true; shift ;;
+      --format) FORMAT="$2"; shift 2 ;;
+      --quiet|-q) QUIET=true; shift ;;
+      --dry-run) DRY_RUN=true; shift ;;
+      --help|-h) show_help; exit 0 ;;
+      -*)
+        log_error "Unknown option: $1"
+        exit 2
+        ;;
+      *)
+        if [[ -z "$COMMAND" ]]; then
+          COMMAND="$1"
+        else
+          ARGS+=("$1")
+        fi
+        shift
+        ;;
+    esac
+  done
+  
+  case "$COMMAND" in
+    init) cmd_init ;;
+    login) cmd_login "${ARGS[0]}" ;;
+    save) cmd_save "${ARGS[0]}" "${ARGS[1]:-}" ;;
+    switch)
+      case "${ARGS[0]:-}" in
+        codex|iflow)
+          cmd_switch "${ARGS[0]}" "${ARGS[1]:-}"
+          ;;
+        "")
+          cmd_switch "codex" ""
+          ;;
+        *)
+          log_warn "No ai tool name provided; defaulting to codex. If the target account belongs to another tool, switch may fail."
+          cmd_switch "codex" "${ARGS[0]}"
+          ;;
+      esac
+      ;;
+    list) cmd_list ;;
+    whoami) cmd_whoami "${ARGS[0]:-codex}" ;;
+    status) cmd_status "${ARGS[0]:-codex}" ;;
+    delete) cmd_delete "${ARGS[0]}" "${ARGS[1]}" ;;
+    ""|--help|-h) show_help ;;
+    *)
+      log_error "Unknown command: $COMMAND"
+      show_help
+      exit 2
+      ;;
+  esac
+}
+
+main "$@"

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-codex-args.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+prompt_file="$TMP_DIR/prompt.txt"
+pid_file="$TMP_DIR/ai.pid"
+log_file="$TMP_DIR/ai.log"
+mock_bin="$TMP_DIR/bin"
+mkdir -p "$mock_bin"
+
+cat >"$prompt_file" <<'EOF'
+test prompt
+EOF
+
+cat >"$mock_bin/codex" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$@" >"$TMP_DIR/codex.args"
+echo "[TEST] mock codex started"
+sleep 1
+EOF
+chmod +x "$mock_bin/codex"
+
+PATH="$mock_bin:$PATH" TMP_DIR="$TMP_DIR" \
+bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+  --project "$ROOT_DIR" \
+  --tool codex \
+  --model "gpt-5.4" \
+  --reasoning-effort "medium" \
+  --mode auto \
+  --prompt-file "$prompt_file" \
+  --pid-file "$pid_file" \
+  --log-file "$log_file" \
+  --launch-kind fresh \
+  >/dev/null
+
+grep -q 'gpt-5.4' "$TMP_DIR/codex.args"
+grep -q 'model_reasoning_effort="medium"' "$TMP_DIR/codex.args"
+grep -q -- '--dangerously-bypass-approvals-and-sandbox' "$TMP_DIR/codex.args"
+grep -q '\[TEST\] mock codex started' "$log_file"
+
+echo "[PASS] monitor forwards codex model and reasoning effort arguments"

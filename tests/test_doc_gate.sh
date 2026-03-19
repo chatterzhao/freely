@@ -67,6 +67,12 @@ expect_pass "prepare config via init" "$FREELY" init --project "$p4" --intent "$
 rm -f "$p4/docs/LAWS.md"
 expect_fail "CASE-004 start blocked before launching loop" "$FREELY" start --project "$p4"
 
+# CASE-004B: init 可显式写入 reasoning effort 配置
+p4b="$(new_project)"
+expect_pass "CASE-004B init accepts reasoning effort" "$FREELY" init --project "$p4b" --intent "$p4b/docs/PROJECT_INTENT.md" --constitution "$p4b/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --reasoning-effort medium
+grep -q 'AI_REASONING_EFFORT="medium"' "$p4b/.freely/config.env" || fail "CASE-004B expected reasoning effort in config"
+pass "CASE-004B reasoning effort persisted in config"
+
 # CASE-005: doctor 失败输出具体缺失文档路径（用 stderr 文本验证）
 p5="$(new_project)"
 rm -f "$p5/docs/LAWS.md"

@@ -24,13 +24,16 @@
 - `skill:dev-loop-execution` -> `dev-loop-execution/SKILL.md`
 - `skill:workspace-skill-governance` -> `workspace-skill-governance/SKILL.md`
 - `skill:branch-management` -> `branch-management/SKILL.md`
+- `skill:multi-worktree-supervision` -> `multi-worktree-supervision/SKILL.md`
 - `skill:premerge-reconcile` -> `premerge-reconcile/SKILL.md`
 - `skill:recovery-subagent-governance` -> `recovery-subagent-governance/SKILL.md`
 - `skill:module-interface-governance` -> `module-interface-governance/SKILL.md`
 - `skill:config-backup-guard` -> `config-backup-guard/SKILL.md`
+- `skill:rust-tauri-toolchain-bootstrap` -> `rust-tauri-toolchain-bootstrap/SKILL.md`
+- `skill:ai-cli-availability-manager` -> `ai-cli-availability-manager/SKILL.md`
 
 执行顺序（默认）：
 1. `constitution-guard`（预检门禁）
 2. `laws-enforcer`（验收门禁）
-3. 领域工作流技能（`auto/doc/dev/branch`）
+3. 领域工作流技能（`auto/doc/dev/branch/multi-worktree`）
 4. 异常技能（`premerge-reconcile`）按需使用

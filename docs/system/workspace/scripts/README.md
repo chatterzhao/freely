@@ -17,6 +17,7 @@
   - 分支/worktree/merge 卫生相关脚本真源
 - `quality/`
   - 质量检查与辅助文档脚本真源
+  - `checkpoint-guard` 负责 checkpoint budget / staged scope gate
 - `tests/`
   - 脚本级回归测试真源
 - 根目录下保留的 `start-lead-agent.sh`、`compose-context-source-prompt.sh`、`monitor-ai-cli.sh`
@@ -43,13 +44,24 @@
   - 供 `bin/freely` 这类运行时投影层调用
 - `runtime/freely`
   - Freely supervisor 真源
+  - 负责 fresh / resume / fresh_with_handoff 的运行时轮换策略
+  - 在需要切新会话时生成最小 handoff 交接文件，并把它拼接进下一轮 prompt
+  - 对支持结构化 token 计数的工具负责 context-window-aware 容量治理（warn / rotate）
+  - 负责 project dirty budget / checkpoint governance 提示
+  - 提供 `fleet-status` 项目级 worktree 监督视图
   - 根目录 `bin/freely` 只是投影包装层
 - `worktree/*`
   - worktree / merge / status 相关命令真源
 - `quality/*`
   - `governance-check`、`new-review` 等辅助命令真源
+  - `checkpoint-guard`
+    - 判断当前 worktree 或 staged commit 是否必须先 checkpoint
+    - 供 hooks、runtime 与多工位监督 CLI 复用
 - `tests/*`
   - 路由、监控、worktree、merge 等脚本测试真源
+- `worktree/wt-fleet-status`
+  - 以项目级视图展示所有 worktree 的 branch / dirty / checkpoint / runtime 状态
+  - 同时暴露 `desired runtime` / `role` / `exit reason`，供主管判断哪些工位是正常冻结，哪些是应运行但已掉线
 
 ## 输入面
 

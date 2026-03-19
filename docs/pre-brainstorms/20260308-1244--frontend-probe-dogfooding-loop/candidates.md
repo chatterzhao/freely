@@ -26,9 +26,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是“前端从第一天可用”与“后端仍保持解耦”同时成立的最小契约，也避免把 day-1 方案误锁为某种网络部署形态。
-- promoted_issue_path: pending://issue-materialization
+- promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md
 - milestone: M-20260308-frontend-probe-dogfooding-loop
-- session_refs: []
+- session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}]
 
 ### C-20260308-1244-03
 - title: Frontend Probe v0
@@ -38,9 +38,9 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是把“防止 AI 跑偏”落成产品能力的最直接载体，也是 Freely 自举开发自己的必需面。
-- promoted_issue_path: pending://issue-materialization
+- promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md
 - milestone: M-20260308-frontend-probe-dogfooding-loop
-- session_refs: []
+- session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}]
 
 ### C-20260308-1244-04
 - title: Incremental Dogfooding Gate for Backend Increments
@@ -50,6 +50,6 @@
 - priority: P0
 - status: promoted
 - decision_reason: 它把这次讨论从“开发建议”提升为“Freely 自己必须具备的产品与治理能力”。
-- promoted_issue_path: pending://issue-materialization
+- promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md
 - milestone: M-20260308-frontend-probe-dogfooding-loop
-- session_refs: []
+- session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}]

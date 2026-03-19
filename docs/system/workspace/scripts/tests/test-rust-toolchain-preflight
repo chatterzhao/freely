@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+OUTPUT_FILE="$(mktemp)"
+EMPTY_PATH_DIR="$(mktemp -d)"
+
+cleanup() {
+  rm -f "$OUTPUT_FILE"
+  rm -rf "$EMPTY_PATH_DIR"
+}
+trap cleanup EXIT
+
+if PATH="$EMPTY_PATH_DIR" /bin/bash "$ROOT_DIR/bin/check-rust-toolchain" >"$OUTPUT_FILE" 2>&1; then
+  echo "[FAIL] expected preflight to fail when rust commands are absent" >&2
+  exit 1
+fi
+
+grep -Fq "[missing] cargo" "$OUTPUT_FILE" || {
+  echo "[FAIL] expected cargo missing marker" >&2
+  exit 1
+}
+grep -Fq "[missing] rustc" "$OUTPUT_FILE" || {
+  echo "[FAIL] expected rustc missing marker" >&2
+  exit 1
+}
+grep -Fq "[missing] rustup" "$OUTPUT_FILE" || {
+  echo "[FAIL] expected rustup missing marker" >&2
+  exit 1
+}
+grep -Fq "Missing commands: cargo rustc rustup" "$OUTPUT_FILE" || {
+  echo "[FAIL] expected aggregated missing command list" >&2
+  exit 1
+}
+grep -Fq "Follow skill:rust-tauri-toolchain-bootstrap" "$OUTPUT_FILE" || {
+  echo "[FAIL] expected skill guidance" >&2
+  exit 1
+}
+grep -Fq "export RUSTUP_DIST_SERVER=https://rsproxy.cn" "$OUTPUT_FILE" || {
+  echo "[FAIL] expected rsproxy dist server guidance" >&2
+  exit 1
+}
+grep -Fq "export RUSTUP_UPDATE_ROOT=https://rsproxy.cn/rustup" "$OUTPUT_FILE" || {
+  echo "[FAIL] expected rsproxy update root guidance" >&2
+  exit 1
+}
+grep -Fq "curl --proto '=https' --tlsv1.2 -sSf https://rsproxy.cn/rustup-init.sh | sh -s -- -y" "$OUTPUT_FILE" || {
+  echo "[FAIL] expected mirrored rustup install guidance" >&2
+  exit 1
+}
+grep -Fq 'source "$HOME/.cargo/env"' "$OUTPUT_FILE" || {
+  echo "[FAIL] expected cargo env reload guidance" >&2
+  exit 1
+}
+grep -Fq "bun run cargo:check:probe" "$OUTPUT_FILE" || {
+  echo "[FAIL] expected cargo check retry guidance" >&2
+  exit 1
+}
+
+echo "Rust toolchain preflight guidance test passed."

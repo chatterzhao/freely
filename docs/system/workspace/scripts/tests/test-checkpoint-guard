@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-checkpoint-guard.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+
+mkdir -p docs src-tauri/src
+cat > docs/LAWS.md <<'EOF'
+# Laws
+EOF
+cat > src-tauri/src/lib.rs <<'EOF'
+fn main() {}
+EOF
+git add docs/LAWS.md src-tauri/src/lib.rs
+git commit -q -m "init"
+
+clean_output="$(bash "$ROOT_DIR/bin/checkpoint-guard" --project "$REPO")"
+printf '%s\n' "$clean_output" | grep -q 'checkpoint_required: no'
+
+echo "change" >> docs/LAWS.md
+echo "// change" >> src-tauri/src/lib.rs
+
+mixed_output="$(bash "$ROOT_DIR/bin/checkpoint-guard" --project "$REPO")"
+printf '%s\n' "$mixed_output" | grep -q 'checkpoint_required: yes'
+printf '%s\n' "$mixed_output" | grep -q 'mixed_control_and_product_planes'
+
+git add docs/LAWS.md src-tauri/src/lib.rs
+set +e
+bash "$ROOT_DIR/bin/checkpoint-guard" --project "$REPO" --staged-only --fail-on-required >/dev/null 2>&1
+rc=$?
+set -e
+[[ "$rc" -eq 2 ]]
+
+echo "[PASS] checkpoint-guard detects clean trees and blocks mixed staged scope commits"
