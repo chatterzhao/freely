@@ -86,7 +86,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md`
-- next_action: 主管自治的最小实现、PID 归属修复、fleet supervision alert 与角色文档已落盘；当前保持 `in_verification`。下一步先做 review 与 promote/cleanup 判断，再决定是否并回 `develop`。更外层的 manager watchdog/ensure 仍是边界外后续问题，不在本批次继续扩 scope。
+- next_action: 主管自治的最小实现、PID 归属修复、fleet supervision alert、角色文档与“manager/worker runtime 不直接切全局账号”的回归均已落盘；当前保持 `in_verification`。下一步先做 review 与 promote/cleanup 判断，再决定是否并回 `develop`。更外层的 manager watchdog/ensure 仍是边界外后续问题，不在本批次继续扩 scope。
 
 ### candidate_issues
 
