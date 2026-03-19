@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-checkpoint-drift-escalation.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" init -q
+git -C "$PROJECT" config user.name freely-test
+git -C "$PROJECT" config user.email freely-test@example.com
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+echo "dirty" >"$PROJECT/dirty.txt"
+
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+CHECKPOINT_DRIFT_STREAK_CURRENT="1"
+LAST_PROJECT_DIRTY_ENTRIES="1"
+LAST_WORKTREE_SUMMARY_TOTAL="1"
+LAST_WORKTREE_SUMMARY_DIRTY="1"
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-once"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=1
+IFLOW_MAX_TURNS=100
+CHECKPOINT_WARN_DIRTY_ENTRIES=1
+CHECKPOINT_BLOCK_DIRTY_ENTRIES=999
+CHECKPOINT_DRIFT_STREAK_THRESHOLD=1
+EOF
+
+bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
+
+prompt_file="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | tail -n 1)"
+[[ -n "$prompt_file" ]] || {
+  echo "[FAIL] expected prompt file"
+  exit 1
+}
+
+grep -q 'Worktree hygiene intervention:' "$prompt_file"
+grep -q 'checkpoint_drift_streak: 1' "$prompt_file"
+grep -q 'skill:worktree-hygiene-supervision' "$prompt_file"
+
+status_output="$(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")"
+grep -q 'checkpoint_drift_streak: 2' <<<"$status_output"
+
+echo "[PASS] freely escalates repeated checkpoint drift into hygiene intervention"

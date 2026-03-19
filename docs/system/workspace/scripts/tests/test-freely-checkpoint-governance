@@ -64,6 +64,12 @@ git -C "$PROJECT" commit -q -m "init"
 
 echo "dirty" >"$PROJECT/dirty.txt"
 
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+LAST_PROJECT_DIRTY_ENTRIES="1"
+LAST_WORKTREE_SUMMARY_TOTAL="1"
+LAST_WORKTREE_SUMMARY_DIRTY="1"
+EOF
+
 cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
@@ -88,16 +94,16 @@ EOF
 
 bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
 
-second_prompt="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
-[[ -n "$second_prompt" ]] || {
-  echo "[FAIL] expected second prompt file"
+prompt_file="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | tail -n 1)"
+[[ -n "$prompt_file" ]] || {
+  echo "[FAIL] expected prompt file"
   exit 1
 }
 
-grep -q 'Checkpoint governance:' "$second_prompt"
-grep -q 'current_project_dirty_entries: 1' "$second_prompt"
-grep -q 'current_worktree_dirty_summary: 1/1' "$second_prompt"
-grep -q '项目级工位快照：' "$second_prompt"
+grep -q 'Checkpoint governance:' "$prompt_file"
+grep -q 'current_project_dirty_entries: 1' "$prompt_file"
+grep -q 'current_worktree_dirty_summary: 1/1' "$prompt_file"
+grep -q '项目级工位快照：' "$prompt_file"
 
 status_output="$(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")"
 grep -q 'last_project_dirty_entries: 1' <<<"$status_output"
