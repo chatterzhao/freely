@@ -2819,3 +2819,18 @@
   - umbrella watchdog taxonomy issue
   - runtime-vs-skill script boundary issue
   - continuity watchdog formalization issue
+
+## 变更（2026-03-19 continuity watchdog skill materialization）
+
+### 收敛结论
+- `continuity watchdog` 不再只挂在 issue 语义里，而是新增独立 skill：
+  - `docs/system/workspace/skills/continuity-watchdog/SKILL.md`
+- 该 skill 正式收口：
+  - `context warn` 先写 phase-appropriate continuity artifact
+  - `context rotate` / `context compacted` 由 runtime 触发 `fresh_with_handoff`
+  - 旧 `jsonl` / `cycle_log` 默认只保留路径引用，不整份重喂
+  - account recovery 与 continuity summary 明确分层，不混成一个 watchdog owner
+- `watchdog-control-plane` 现在具备完整的三层子模块落点：
+  - availability watchdog
+  - runtime watchdog
+  - continuity watchdog

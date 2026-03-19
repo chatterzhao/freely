@@ -56,6 +56,7 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 
 事实来源：
 - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/**`
+- `skill:continuity-watchdog`
 
 不负责：
 - account switch
@@ -78,4 +79,4 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 
 - 若需要账号探测/切号实现细节：继续看 `skill:ai-cli-availability-manager`
 - 若需要 Freely runtime 监督策略：继续看 `docs/system/workspace/scripts/runtime/freely`
-- 若需要 continuity 触发边界：继续看 token-efficient continuity issue
+- 若需要 continuity 触发边界：继续看 `skill:continuity-watchdog`
