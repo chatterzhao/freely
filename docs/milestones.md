@@ -140,6 +140,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，先冻结 3 个边界：`checkpoint-ready` 的结构化输出、`LAWS/runtime/checkpoint-guard/supervisor` 的职责分层、以及进入 IBM 前的 promotion gate；在这些边界稳定前不得直接写成 IBM issue 或塞回 `I-20260318-0930`
 
+2. `C-20260319-0500-01`
+- title: 为 Freely 补一份更强的 orchestrator executable spec
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/candidates.md`
+- next_action: 保持在 pre-brainstorm，先确认 Freely 是否真的缺一份更集中、可执行的 orchestrator spec；若结论稳定，再 materialize 成 issue，而不是直接把 Symphony 当成架构模板
+
 ### completed_issues
 
 1. `C-20260306-1101`

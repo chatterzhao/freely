@@ -145,6 +145,9 @@
 - 20260319-0148--context-compaction-salvage-and-retirement
   - brainstorms: docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/brainstorms.md
   - candidates: docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md
+- 20260319-0500--openai-symphony-research
+  - brainstorms: docs/pre-brainstorms/20260319-0500--openai-symphony-research/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-0500--openai-symphony-research/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
