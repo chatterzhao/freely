@@ -16,12 +16,13 @@ description: 当输入是 URL 时，识别平台并调用 skill 自带脚本抓�
 1. 先按 [platform-patterns.md](references/platform-patterns.md) 识别平台。
 2. 再按 [capability-matrix.md](references/capability-matrix.md) 选择抓取方式。
 3. 调用 [scripts/fetch-url.sh](scripts/fetch-url.sh)。
-4. 脚本必须返回结构化状态，而不是只打印原始网页：
+4. 若返回 HTML，继续调用 [scripts/extract-readable-content.sh](scripts/extract-readable-content.sh) 提取可读正文。
+5. 脚本必须返回结构化状态，而不是只打印原始网页：
    - `fetch_status`
    - `content_kind`
    - `failure_reason`
    - `recommended_next_step`
-5. 成功时把正文继续交给后续流程；失败时明确说明原因和下一步建议。
+6. 成功时把正文继续交给后续流程；失败时明确说明原因和下一步建议。
 
 ## 微信公众号策略
 
@@ -32,6 +33,7 @@ description: 当输入是 URL 时，识别平台并调用 skill 自带脚本抓�
 ## 边界
 
 - 本 skill 只负责“抓取或明确失败”。
+- 若已抓到 HTML，本 skill 负责做最小正文抽取。
 - 更复杂的正文净化、登录态网站支持、browser/MCP 扩展由后续 issue 继续。
 
 ## References

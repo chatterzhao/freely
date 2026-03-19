@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd)"
 SCRIPT="$ROOT/docs/system/workspace/skills/url-content-intake/scripts/fetch-url.sh"
+EXTRACT="$ROOT/docs/system/workspace/skills/url-content-intake/scripts/extract-readable-content.sh"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
@@ -45,6 +46,17 @@ run_test "unsupported scheme returns unsupported" bash -lc '
   set -e
   [[ $status -eq 2 ]]
   [[ "$output" == *"fetch_status=unsupported"* ]]
+'
+
+run_test "wechat html extracts readable text" bash -lc '
+  sample="'"$TMP"'/sample-wechat.html"
+  cat > "$sample" <<'"'"'EOF'"'"'
+<html><body><div id="js_content"><p>第一段</p><p>第二段 &amp; 第三句</p></div><script>ignored()</script></body></html>
+EOF
+  output=$("'"$EXTRACT"'" "$sample" wechat_article)
+  [[ "$output" == *"第一段"* ]]
+  [[ "$output" == *"第二段 & 第三句"* ]]
+  [[ "$output" != *"ignored"* ]]
 '
 
 echo "[PASS] test-url-content-intake-skill"
