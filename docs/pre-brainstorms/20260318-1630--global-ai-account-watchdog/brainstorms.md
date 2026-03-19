@@ -19,6 +19,12 @@
 3. 若此时主管 supervisor 也不存在，就没有任何 AI 或项目级 runtime 可以继续发起恢复。
 4. 因此，必须有一个完全不依赖 AI 的全局 watchdog，先恢复账号，再拉起主管。
 
+还有一个实现细节必须面对：
+
+- OpenAI/Codex 当前没有可直接拿来查询“这组本地保存账号里谁现在可用、谁何时恢复”的官方本地 CLI。
+- 帮助文档和 rate-limit 文档能说明“usage limit 会在某个窗口恢复”，但不能直接替 Freely 返回本机多个保存账号的实时可用矩阵。
+- 所以 Freely 不能把本地 cooldown 账本当真理；账本只能做排序提示，真实可用性必须由脚本主动 probe。
+
 另一个关键问题是：`AI 无能为力` 不能混成一个桶，至少要分三类。
 
 ## AI-Powerless Taxonomy
@@ -107,7 +113,8 @@ Freely 需要新增一个比主管更外层的 global control-plane：
   - 账号恢复后再执行 `freely start --project <develop>`
 - `global account selection`
   - 有可用账号则立即切
-  - 否则选最早恢复账号
+  - 若账本显示全部不可用，则逐个真实 probe 已保存账号
+  - probe 都失败时才选最早恢复账号
   - 睡眠期间周期重检，不睡死
 - `manager handoff`
   - 主管只接收已经恢复后的结果状态
@@ -132,3 +139,13 @@ Freely 需要新增一个比主管更外层的 global control-plane：
 - `docs/system/workspace/scripts/runtime/ai-cli`
 - `docs/system/workspace/scripts/runtime/freely`
 - 新的全局 watchdog/ensure 脚本
+
+## Verification Notes
+
+- 官方帮助中心和 rate-limit 文档没有提供“查询多个本地 Codex 登录账号当前可用性”的直接入口；因此 Freely 采用脚本真实 probe。
+- 真实验证口径应是：
+  1. 先起 `ensure-manager --watch`
+  2. 切到坏账号
+  3. 让当前 Codex 进程结束
+  4. 观察 watchdog 是否切回好账号并拉起新 Codex
+- 2026-03-18 的 live 验证中，`worahe3972@outlook.com -> worahe3971@outlook.com` 与 `worahe3973@outlook.com -> worahe3971@outlook.com` 两条链均通过。

@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-ai-account-watchdog-and-manager-bootstrap`
@@ -30,6 +30,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 4. 提供一条 live 集成测试脚本，验证：
    - 先用可用账号启动监控/主管链
    - 监控链已运行后，故意切到不可用账号
+   - 当前 AI 进程结束后，由 watchdog 负责恢复；不要把恢复动作交给 AI
    - 每次切号后都由脚本重新拉起新的 Codex 进程，并优先 `resume` 恢复会话
    - 最终自动切回可用账号并恢复主管；若所有账号都不可用，则切到最早恢复账号并等待唤醒
 
@@ -55,12 +56,17 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - 当前验证重点：
   - `freely ensure-manager` 是否是纯脚本，不依赖 AI
   - 当当前账号不可用时，是否能自动切到可用账号并拉起主管
+  - 当 cooldown 账本过时或错误时，是否会真实 probe 所有已保存账号，而不是盲信旧账本
   - live 测试是否能覆盖两个坏账号回切到一个好账号的真实链路
-- 最新 live 验证事实：
-  - 真实链路已确认会从坏账号切回 `worahe3971@outlook.com`
-  - 但当前环境下 `worahe3971@outlook.com` 在主管重新拉起时也命中了 usage limit，因此 live 测试当前仍未通过
-  - 这属于账号可用性前提未满足，不是 `ensure-manager` / 脚本切号职责边界本身的设计错误
+- 最新验证事实：
+  - 官方帮助中心与 rate-limit 文档没有提供“多个本地保存 Codex 账号当前可用性查询”的直接接口，因此 Freely 采用脚本真实 probe 方案
+  - `test-ai-cli-switch-default-tool` 已覆盖默认 `codex` 切号 UX 与切后真实账号校验
+  - `test-freely-ensure-manager` 已覆盖“先选可用账号再拉主管”的脚本回归
+  - `test-freely-global-account-watchdog-live` 已真实通过：
+    - `worahe3972@outlook.com -> worahe3971@outlook.com`
+    - `worahe3973@outlook.com -> worahe3971@outlook.com`
+  - live 测试口径已收紧为：监控脚本先启动，切到坏账号后等待当前 AI 进程结束，再验证 watchdog 是否切回好账号并拉起新 Codex
 
 ## Next
 
-- 保持 `in_dev`。当前已补 `freely ensure-manager`、脚本级回归和 live 测试的清晰失败口径；下一步在存在真实可用好账号的前提下重跑 live recovery 测试，并验证主管恢复后继续监督工位。
+- 进入 completion verification，准备与 manager 自治主线一起评审，并决定是否并回 `develop`。

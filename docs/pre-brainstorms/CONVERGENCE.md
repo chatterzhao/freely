@@ -219,6 +219,20 @@
 - branch: `feature/dogfood-codex-auto-20260316`
 - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260316-feature-dogfood-codex-auto`
 
+## 变更（2026-03-18 全局账号 watchdog 真实 probe 验证）
+
+### 收敛结论
+- `C-20260318-A` 已提升为 `I-20260318-1630` `Global AI account watchdog and manager bootstrap`
+  - 问题：官方没有可直接查询“多个本地保存 Codex 账号当前可用性”的本地 CLI；本地 cooldown 账本会过时，不能当真理
+  - 结论：全局 watchdog 采用“账本排序 + 真实 probe”策略；若坏号导致当前 AI 结束，由脚本切到真实可用号并拉起新的主管 Codex，再继续监督
+  - 已完成实现落点：`docs/system/workspace/scripts/runtime/ai-cli`、`docs/system/workspace/scripts/runtime/freely`、`docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`、`docs/system/workspace/scripts/tests/test-freely-ensure-manager`、`docs/system/workspace/scripts/tests/test-freely-global-account-watchdog-live`
+  - 验证证据：
+    - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
+    - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
+    - `bash docs/system/workspace/scripts/tests/test-freely-global-account-watchdog-live`
+    - live 结果：`worahe3972@outlook.com -> worahe3971@outlook.com` 与 `worahe3973@outlook.com -> worahe3971@outlook.com` 均通过
+  - 当前状态：进入 `in_verification`，等待 completion verification / review 与主线 promotion 判断
+
 ## 变更（2026-03-18 全局账号 watchdog 与主管拉起）
 
 ### 收敛结论

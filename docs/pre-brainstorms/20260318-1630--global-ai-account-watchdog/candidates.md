@@ -21,6 +21,7 @@
   - 文档明确规定：账号限额后的切号与主管拉起由全局脚本负责，不属于 manager/worker
   - 文档明确区分三类 AI powerless 场景，并给出各自 owner
   - 至少存在一个 CLI-first 入口，可在无 AI 帮助时恢复账号并拉起主管
+  - 本地 cooldown 账本只作为提示，真实可用性由脚本逐账号 probe
   - 主管恢复后继续负责 worker fleet 监督
   - 所有账号都不可用时，会切到最早恢复账号并等待唤醒，而不是要求 AI 持续存活
 - promoted_issue_path: pending://issue-materialization

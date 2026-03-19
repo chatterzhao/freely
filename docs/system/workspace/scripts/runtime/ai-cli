@@ -233,6 +233,7 @@ cmd_switch() {
       local dirname=$(account_to_dirname "$account")
       local source_dir="$AUTH_DIR/codex-$dirname"
       local target_file="$HOME/.codex/auth.json"
+      local switched_account=""
       
       if [[ ! -d "$source_dir" ]]; then
         log_error "Account '$account' not found"
@@ -248,6 +249,15 @@ cmd_switch() {
       [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch to $account"; return; }
       
       cp "$source_dir/auth.json" "$target_file"
+      switched_account="$(extract_codex_account "$target_file")"
+      if [[ -z "$switched_account" ]]; then
+        log_error "Switch copied auth.json but could not verify the active codex account"
+        exit 5
+      fi
+      if [[ "$(account_to_dirname "$switched_account")" != "$dirname" ]]; then
+        log_error "Switch verification failed: requested '$account' but auth.json now resolves to '$switched_account'"
+        exit 5
+      fi
       log_info "Switched codex to account: $account"
       log_warn "Restart codex for the change to take effect"
       

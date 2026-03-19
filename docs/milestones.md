@@ -81,12 +81,12 @@ routing_policy:
 4. `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
-- next_action: 纯脚本 `freely ensure-manager` 与账号选择回归已落地；下一步用真实账号完成 live recovery 测试，验证在坏账号下会自动切回 `worahe3971@outlook.com` 并恢复主管监督链
+- next_action: `freely ensure-manager --watch`、坏号后真实 probe、过时 cooldown 账本兜底与 live recovery 测试均已通过；下一步做 completion verification / review，并与 manager 自治主线一起决定 promote 顺序
 
 ### candidate_issues
 

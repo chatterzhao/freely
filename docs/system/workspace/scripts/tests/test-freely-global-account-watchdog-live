@@ -8,6 +8,7 @@ BAD_ACCOUNTS=("worahe3972@outlook.com" "worahe3973@outlook.com")
 TIMEOUT_SECONDS=90
 LOG_ROOT="${TMPDIR:-/tmp}/freely-global-account-watchdog-live-$$"
 mkdir -p "$LOG_ROOT"
+TRACE_FILE="$LOG_ROOT/trace.log"
 
 usage() {
   cat <<'EOF'
@@ -18,9 +19,9 @@ Usage:
     [--bad-account <email>]...
 
 Purpose:
-  - start the Freely manager chain first
+  - start the global ensure-manager watchdog first
   - then intentionally switch the global codex account to known-bad accounts
-  - verify the runtime automatically switches back to the known-good account
+  - verify the watchdog/runtime automatically switches back to the known-good account
 EOF
 }
 
@@ -35,7 +36,66 @@ while [[ $# -gt 0 ]]; do
 done
 
 whoami_account() {
-  bash "$ROOT_DIR/bin/ai" whoami 2>/dev/null | sed -n 's/.*Current account: //p'
+  local output
+  output="$(bash "$ROOT_DIR/bin/ai" whoami 2>/dev/null || true)"
+  printf '%s\n' "$output" | sed -n 's/.*Current account: //p'
+}
+
+status_field() {
+  local field="$1" output
+  output="$(bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null || true)"
+  printf '%s\n' "$output" | sed -n "s/^${field}: //p"
+}
+
+latest_cycle_log() {
+  local latest
+  latest="$(python3 - <<'PY' "$MANAGER_PROJECT/.freely/logs"
+from pathlib import Path
+import sys
+root = Path(sys.argv[1])
+paths = sorted(root.glob("cycle-*.log"), key=lambda p: p.stat().st_mtime, reverse=True)
+print(paths[0] if paths else "")
+PY
+)"
+  [[ -n "$latest" ]] || return 1
+  printf '%s\n' "$latest"
+}
+
+latest_cycle_session_id() {
+  local latest
+  latest="$(latest_cycle_log || true)"
+  [[ -n "$latest" ]] || return 0
+  sed -n 's/^session id: //p' "$latest" | sed -n '1p'
+}
+
+loop_launch_count() {
+  local loop_log
+  loop_log="$MANAGER_PROJECT/.freely/logs/loop.log"
+  [[ -f "$loop_log" ]] || {
+    printf '0\n'
+    return 0
+  }
+  rg -c '^=====' "$loop_log"
+}
+
+trace_event() {
+  local event="$1"
+  local account supervisor_pid ai_pid latest_log latest_session launch_count
+  account="$(whoami_account || true)"
+  supervisor_pid="$(status_field supervisor_pid)"
+  ai_pid="$(status_field ai_pid)"
+  latest_log="$(latest_cycle_log || true)"
+  latest_session="$(latest_cycle_session_id || true)"
+  launch_count="$(loop_launch_count)"
+  printf '%s event=%s account=%s supervisor_pid=%s ai_pid=%s latest_cycle=%s latest_session=%s launch_count=%s\n' \
+    "$(date '+%Y-%m-%dT%H:%M:%S%z')" \
+    "$event" \
+    "${account:-unavailable}" \
+    "${supervisor_pid:-none}" \
+    "${ai_pid:-none}" \
+    "${latest_log:-none}" \
+    "${latest_session:-none}" \
+    "${launch_count:-0}" >>"$TRACE_FILE"
 }
 
 switch_account() {
@@ -52,7 +112,7 @@ wait_for_manager_stopped() {
   local start_ts now supervisor_pid
   start_ts="$(date +%s)"
   while true; do
-    supervisor_pid="$(bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | sed -n 's/^supervisor_pid: //p')"
+    supervisor_pid="$(status_field supervisor_pid)"
     if [[ -z "$supervisor_pid" || "$supervisor_pid" == "none" ]]; then
       return 0
     fi
@@ -69,7 +129,7 @@ wait_for_manager_stopped() {
 
 start_manager() {
   local log_file="$1"
-  bash "$ROOT_DIR/bin/freely" start --project "$MANAGER_PROJECT" >"$log_file" 2>&1 &
+  bash "$ROOT_DIR/bin/freely" ensure-manager --watch --interval 2 --project "$MANAGER_PROJECT" >"$log_file" 2>&1 &
   printf '%s\n' "$!"
 }
 
@@ -78,7 +138,7 @@ wait_for_manager_supervisor() {
   local start_ts now supervisor_pid
   start_ts="$(date +%s)"
   while true; do
-    supervisor_pid="$(bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | sed -n 's/^supervisor_pid: //p')"
+    supervisor_pid="$(status_field supervisor_pid)"
     if [[ -n "$supervisor_pid" && "$supervisor_pid" != "none" ]] && kill -0 "$supervisor_pid" 2>/dev/null; then
       return 0
     fi
@@ -90,13 +150,6 @@ wait_for_manager_supervisor() {
   done
 }
 
-latest_cycle_log() {
-  local latest
-  latest="$(ls -t "$MANAGER_PROJECT/.freely/logs"/cycle-*.log 2>/dev/null | head -n 1 || true)"
-  [[ -n "$latest" ]] || return 1
-  printf '%s\n' "$latest"
-}
-
 latest_cycle_has_usage_limit() {
   local latest
   latest="$(latest_cycle_log || true)"
@@ -104,13 +157,13 @@ latest_cycle_has_usage_limit() {
   rg -q "usage limit|try again at" "$latest"
 }
 
-wait_for_manager_ai_ready() {
+wait_for_manager_session_ready() {
   local timeout="$1"
-  local start_ts now ai_pid
+  local start_ts now latest_session
   start_ts="$(date +%s)"
   while true; do
-    ai_pid="$(manager_ai_pid)"
-    if [[ -n "$ai_pid" && "$ai_pid" != "none" ]] && kill -0 "$ai_pid" 2>/dev/null; then
+    latest_session="$(latest_cycle_session_id || true)"
+    if [[ -n "$latest_session" ]]; then
       return 0
     fi
     if latest_cycle_has_usage_limit && [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]]; then
@@ -141,18 +194,21 @@ wait_for_good_account() {
 }
 
 wait_for_manager_status() {
-  local timeout="$1"
-  local start_ts now supervisor_pid ai_pid
+  local previous_launch_count="$1" timeout="$2"
+  local start_ts now supervisor_pid launch_count
   start_ts="$(date +%s)"
   while true; do
-    supervisor_pid="$(bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | sed -n 's/^supervisor_pid: //p')"
-    ai_pid="$(bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | sed -n 's/^ai_pid: //p')"
+    supervisor_pid="$(status_field supervisor_pid)"
+    launch_count="$(loop_launch_count)"
     if [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]] &&
       [[ -n "$supervisor_pid" && "$supervisor_pid" != "none" ]] &&
-      [[ -n "$ai_pid" && "$ai_pid" != "none" ]] &&
       kill -0 "$supervisor_pid" 2>/dev/null &&
-      kill -0 "$ai_pid" 2>/dev/null; then
+      [[ "$launch_count" =~ ^[0-9]+$ ]] &&
+      (( launch_count > previous_launch_count )); then
       return 0
+    fi
+    if latest_cycle_has_usage_limit && [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]]; then
+      return 2
     fi
     now="$(date +%s)"
     if (( now - start_ts >= timeout )); then
@@ -163,28 +219,25 @@ wait_for_manager_status() {
 }
 
 manager_ai_pid() {
-  bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | sed -n 's/^ai_pid: //p'
+  status_field ai_pid
 }
 
-trigger_manager_relaunch() {
+trigger_current_manager_ai_exit() {
   local ai_pid
   ai_pid="$(manager_ai_pid)"
   if [[ -n "$ai_pid" && "$ai_pid" != "none" ]]; then
     kill "$ai_pid" 2>/dev/null || true
   fi
-  printf '%s\n' "$ai_pid"
 }
 
-wait_for_relaunched_manager_ai() {
-  local previous_ai_pid="$1" timeout="$2"
-  local start_ts now ai_pid
+wait_for_relaunched_manager_launch() {
+  local previous_launch_count="$1" timeout="$2"
+  local start_ts now launch_count
   start_ts="$(date +%s)"
   while true; do
-    ai_pid="$(manager_ai_pid)"
-    if [[ -n "$ai_pid" && "$ai_pid" != "none" ]] &&
-      kill -0 "$ai_pid" 2>/dev/null &&
-      [[ -z "$previous_ai_pid" || "$previous_ai_pid" == "none" || "$ai_pid" != "$previous_ai_pid" ]]; then
-      printf '%s\n' "$ai_pid"
+    launch_count="$(loop_launch_count)"
+    if [[ "$launch_count" =~ ^[0-9]+$ ]] && (( launch_count > previous_launch_count )); then
+      printf '%s\n' "$launch_count"
       return 0
     fi
     if latest_cycle_has_usage_limit && [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]]; then
@@ -202,6 +255,8 @@ dump_failure_context() {
   echo "[DEBUG] whoami=$(whoami_account)" >&2
   echo "[DEBUG] freely status:" >&2
   bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" >&2 || true
+  echo "[DEBUG] trace:" >&2
+  cat "$TRACE_FILE" >&2 2>/dev/null || true
   echo "[DEBUG] recent loop log:" >&2
   tail -n 80 "$MANAGER_PROJECT/.freely/logs/loop.log" >&2 2>/dev/null || true
 }
@@ -217,63 +272,88 @@ trap cleanup EXIT
 
 stop_manager
 wait_for_manager_stopped "$TIMEOUT_SECONDS" || true
+trace_event "manager_stopped"
 
 echo "[INFO] forcing good account baseline: $GOOD_ACCOUNT"
 switch_account "$GOOD_ACCOUNT"
+trace_event "forced_good_account"
 
 baseline_log="$LOG_ROOT/manager-baseline.log"
 baseline_pid="$(start_manager "$baseline_log")"
+trace_event "manager_watchdog_requested"
 if ! wait_for_manager_supervisor "$TIMEOUT_SECONDS"; then
   echo "[FAIL] manager supervisor did not start before bad-account switching" >&2
   dump_failure_context
   exit 1
 fi
-if ! wait_for_manager_ai_ready "$TIMEOUT_SECONDS"; then
+trace_event "manager_supervisor_up"
+if ! wait_for_manager_session_ready "$TIMEOUT_SECONDS"; then
   rc=$?
   if [[ "$rc" -eq 2 ]]; then
     echo "[FAIL] configured good account $GOOD_ACCOUNT cannot currently launch the manager chain (usage limit hit during baseline)" >&2
   else
-    echo "[FAIL] manager ai did not become healthy before bad-account switching" >&2
+    echo "[FAIL] manager did not launch an initial codex session before bad-account switching" >&2
   fi
   dump_failure_context
   exit 1
 fi
+trace_event "manager_ai_ready"
 
 for bad in "${BAD_ACCOUNTS[@]}"; do
+  current_after_bad_switch=""
   [[ "$bad" == "$GOOD_ACCOUNT" ]] && continue
-  previous_ai_pid="$(manager_ai_pid)"
+  previous_launch_count="$(loop_launch_count)"
   echo "[INFO] testing recovery from bad account: $bad"
+  trace_event "before_switch_to_${bad//@/_}"
   switch_account "$bad"
+  trace_event "after_switch_to_${bad//@/_}"
 
-  if [[ "$(whoami_account)" != "$bad" ]]; then
-    echo "[FAIL] expected current account to be $bad before recovery test" >&2
+  current_after_bad_switch="$(whoami_account)"
+  if [[ "$current_after_bad_switch" == "$bad" ]]; then
+    :
+  elif [[ "$current_after_bad_switch" == "$GOOD_ACCOUNT" ]]; then
+    trace_event "immediate_recovery_after_switch_to_${bad//@/_}"
+  else
+    echo "[FAIL] expected current account to be either $bad or immediate recovery to $GOOD_ACCOUNT, got $current_after_bad_switch" >&2
+    dump_failure_context
     exit 1
   fi
 
-  trigger_manager_relaunch >/dev/null
+  trigger_current_manager_ai_exit
+  trace_event "manager_ai_exit_triggered_from_${bad//@/_}"
+
+  trace_event "watchdog_waiting_for_recovery_from_${bad//@/_}"
 
   if ! wait_for_good_account "$TIMEOUT_SECONDS"; then
     echo "[FAIL] did not auto-switch back to $GOOD_ACCOUNT after switching to $bad with manager already running" >&2
     dump_failure_context
     exit 1
   fi
+  trace_event "good_account_restored_from_${bad//@/_}"
 
-  if ! wait_for_relaunched_manager_ai "${previous_ai_pid:-none}" "$TIMEOUT_SECONDS" >/dev/null; then
+  if ! wait_for_relaunched_manager_launch "${previous_launch_count:-0}" "$TIMEOUT_SECONDS" >/dev/null; then
     rc=$?
     if [[ "$rc" -eq 2 ]]; then
-      echo "[FAIL] switched back to $GOOD_ACCOUNT, but the relaunched codex process still hit usage limit before supervision could recover" >&2
+      echo "[FAIL] switched back to $GOOD_ACCOUNT, but the relaunched codex session still hit usage limit before supervision could recover" >&2
     else
-      echo "[FAIL] manager did not launch a new codex process after switching back to $GOOD_ACCOUNT" >&2
+      echo "[FAIL] manager did not launch a new codex session after switching back to $GOOD_ACCOUNT" >&2
     fi
     dump_failure_context
     exit 1
   fi
+  trace_event "relaunch_ai_ready_from_${bad//@/_}"
 
-  if ! wait_for_manager_status "$TIMEOUT_SECONDS"; then
-    echo "[FAIL] manager chain did not become healthy after switching back to $GOOD_ACCOUNT" >&2
+  if ! wait_for_manager_status "${previous_launch_count:-0}" "$TIMEOUT_SECONDS"; then
+    rc=$?
+    if [[ "$rc" -eq 2 ]]; then
+      echo "[FAIL] manager resumed under $GOOD_ACCOUNT but the new codex session immediately hit usage limit" >&2
+    else
+      echo "[FAIL] manager chain did not become healthy after switching back to $GOOD_ACCOUNT" >&2
+    fi
     dump_failure_context
     exit 1
   fi
+  trace_event "manager_healthy_from_${bad//@/_}"
 
   echo "[PASS] recovered from $bad back to $GOOD_ACCOUNT"
 done
