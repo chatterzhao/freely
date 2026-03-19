@@ -54,7 +54,11 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/*`
 - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/tasks.md`
+- `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
+- `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
+- `docs/system/workspace/skills/ai-cli-availability-manager/SKILL.md`
 - `docs/system/workspace/scripts/tests/test-freely-global-account-watchdog-live`
+- `docs/system/workspace/scripts/tests/test-watchdog-control-plane-skills`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/runtime/ai-cli`
 
@@ -65,10 +69,13 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
   - 当当前账号不可用时，是否能自动切到可用账号并拉起主管
   - 当 cooldown 账本过时或错误时，是否会真实 probe 所有已保存账号，而不是盲信旧账本
   - live 测试是否能覆盖两个坏账号回切到一个好账号的真实链路
+  - availability watchdog 是否已经从 `runtime/freely` 中抽成可复用 skill 模块，而不是继续散落在 Freely 专有 orchestration 中
 - 最新验证事实：
   - 官方帮助中心与 rate-limit 文档没有提供“多个本地保存 Codex 账号当前可用性查询”的直接接口，因此 Freely 采用脚本真实 probe 方案
   - `test-ai-cli-switch-default-tool` 已覆盖默认 `codex` 切号 UX 与切后真实账号校验
   - `test-freely-ensure-manager` 已覆盖“先选可用账号再拉主管”的脚本回归
+  - `watchdog-control-plane` 与 `ai-cli-availability-manager` 已把 availability watchdog 定义成可复用 skill 层；`runtime/freely` 现通过 `source "$WATCHDOG_AVAILABILITY_LIB"` 复用同一套 account cooldown / probe / switch / ensure-manager readiness 逻辑
+  - `test-watchdog-control-plane-skills` 已覆盖 watchdog skill 是否被 runtime 与 agent 角色正式接线
   - `freely ensure-manager` 当前在 watchdog 拉起主管前，会写 manager bootstrap handoff，告知 limit/切号/恢复原因及主管优先检查面
   - `test-freely-global-account-watchdog-live` 已真实通过：
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
@@ -77,4 +84,6 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 ## Next
 
-- 进入 completion verification，准备与 manager 自治主线一起评审，并决定是否并回 `develop`。
+- 保持 `in_verification`。
+- 当前 watchdog 已作为 Freely 正式能力落地：CLI 入口、runtime orchestration、availability watchdog skill 模块与角色/测试接线均已存在。
+- 后续若继续演进，应聚焦更外层 target registry / independent daemon 产品化，而不是回退到“watchdog 只等于切号器”的旧模型。

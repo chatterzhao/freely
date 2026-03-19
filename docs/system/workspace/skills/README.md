@@ -32,6 +32,8 @@
 - `skill:module-interface-governance` -> `module-interface-governance/SKILL.md`
 - `skill:config-backup-guard` -> `config-backup-guard/SKILL.md`
 - `skill:rust-tauri-toolchain-bootstrap` -> `rust-tauri-toolchain-bootstrap/SKILL.md`
+- `skill:watchdog-control-plane` -> `watchdog-control-plane/SKILL.md`
+- `skill:continuity-watchdog` -> `continuity-watchdog/SKILL.md`
 - `skill:ai-cli-availability-manager` -> `ai-cli-availability-manager/SKILL.md`
 - `skill:url-content-intake` -> `url-content-intake/SKILL.md`
 

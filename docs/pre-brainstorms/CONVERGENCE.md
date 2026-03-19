@@ -268,6 +268,27 @@
     - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
     - `bash docs/system/workspace/scripts/tests/test-freely-global-account-watchdog-live`
 
+## 变更（2026-03-19 watchdog 控制面命名收敛与旧工位退休）
+
+### 收敛结论
+- `feature/independent-ai-watchdog-productization-20260318`
+  - 问题：该 worktree 的核心实现能力已进入 `develop`，但其独有研究提交仍保留了“watchdog 是否应作为上层控制面总称”与“历史 worktree retirement heuristic”两类治理结论；若直接删除，会丢失承接关系；若继续保留，又会把它误当作活跃执行枝。
+  - 结论：将旧工位判定为 `materialize_then_retire`。其剩余价值统一交接到 `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/`，并把 `watchdog` 正式上提为 umbrella term：
+    - `availability watchdog`
+    - `runtime watchdog`
+    - `continuity watchdog`
+  - 旧工位唯一提交与价值：
+    - commit: `172e0f6` `Add watchdog productization and worktree retirement pre-brainstorm`
+    - commit: `36e44ad` `Refine watchdog productization and restack policy`
+    - unique files: `docs/pre-brainstorms/20260318-1735--independent-ai-watchdog-productization-and-worktree-retirement/*`
+  - 新承接落点：
+    - `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md`
+    - `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/candidates.md`
+  - cleanup 结果：
+    - retired branch: `feature/independent-ai-watchdog-productization-20260318`
+    - removed worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260318-feature-independent-ai-watchdog-productization`
+    - reason: old branch no longer owns active implementation; governance conclusions have been handed off to the new watchdog control-plane pre-brainstorm
+
 ## 变更（2026-03-18 URL 内容摄取 skill 物化）
 
 ### 收敛结论
@@ -2770,3 +2791,58 @@
   - 问题：旧 `feature/context-compaction-delegation-governance-20260318` 分支的大部分治理语义已被 continuity 主线覆盖，但其 continuity guard 小能力仍值得保留。
   - 结论：仅收编 `previous_context_compacted`、`Continuity Guard`、首跳 compact 提醒及相关测试；不再继续沿旧分支推进。
   - 当前状态：`in_dev`
+
+## 变更（2026-03-19 watchdog 控制面模块化重构）
+
+### 收敛结论
+- `watchdog` 不再仅指“账号切换器”，而是正式上提为广义外层监督/恢复控制面。
+  - 子层划分：
+    - `availability watchdog`
+    - `runtime watchdog`
+    - `continuity watchdog`
+- 可复用的 availability 能力改为优先由 skill 承载，而不是继续堆在 `runtime/freely`：
+  - 新增：`docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
+  - 新增：`docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
+  - 该脚本现承接：
+    - codex account cooldown 记录与清理
+    - saved-account availability 判断
+    - active account probe / switch
+    - `ensure-manager` 之前的 account readiness 决策
+- `runtime/freely` 继续保留 Freely 专有 orchestration：
+  - manager bootstrap handoff
+  - manager / worker runtime supervision
+  - continuity 触发矩阵
+  - project-specific lifecycle
+- `skill:ai-cli-availability-manager` 保留为窄入口，但语义改为 watchdog umbrella 下的 availability 子模块，避免一次性打碎现有引用。
+
+### 验证证据
+- `bash -n docs/system/workspace/scripts/runtime/freely`
+- `bash -n docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
+- `bash -n docs/system/workspace/scripts/runtime/manager-watchdog.sh`
+- `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
+- `./bin/governance-check`
+
+### 当前状态
+- 已完成模块化落点与最小回归验证
+- 后续若继续深挖，应优先 materialize：
+  - umbrella watchdog taxonomy issue
+  - runtime-vs-skill script boundary issue
+  - continuity watchdog formalization issue
+
+## 变更（2026-03-19 continuity watchdog skill materialization）
+
+### 收敛结论
+- `continuity watchdog` 不再只挂在 issue 语义里，而是新增独立 skill：
+  - `docs/system/workspace/skills/continuity-watchdog/SKILL.md`
+- 该 skill 正式收口：
+  - `context warn` 先写 phase-appropriate continuity artifact
+  - `context rotate` / `context compacted` 由 runtime 触发 `fresh_with_handoff`
+  - 旧 `jsonl` / `cycle_log` 默认只保留路径引用，不整份重喂
+  - account recovery 与 continuity summary 明确分层，不混成一个 watchdog owner
+- `watchdog-control-plane` 现在具备完整的三层子模块落点：
+  - availability watchdog
+  - runtime watchdog
+  - continuity watchdog
+ - manager / worker 角色文档已把 watchdog 模块作为正式下游依赖写明
+ - 新增脚本级回归：
+   - `bash docs/system/workspace/scripts/tests/test-watchdog-control-plane-skills`

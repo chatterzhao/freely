@@ -1,9 +1,11 @@
 ---
 name: ai-cli-availability-manager
-description: 管理 AI CLI 工具的可用性，包括账号切换、限流检测和恢复集成。当 AI CLI 遇到限流或凭证问题时自动切换到备用账号。
+description: Watchdog 控制面中的 availability 子模块，负责 AI CLI 工具的账号可用性、切号、限流检测与恢复探测。
 ---
 
 # skill:ai-cli-availability-manager
+
+> 这是 `skill:watchdog-control-plane` 的 availability watchdog 子模块。
 
 ## 触发条件
 
@@ -131,6 +133,7 @@ orchestrator 启动 AI CLI
 | `laws-enforcer` | 验证切换事件是否正确记录 |
 | `auto-loop-orchestrator` | 提供 AI CLI 启动时的环境变量 |
 | `recovery-subagent-governance` | 限流/失效事件触发恢复流程 |
+| `watchdog-control-plane` | 作为 umbrella skill 定义 availability / runtime / continuity watchdog 的上层边界 |
 
 ## 安全约束
 

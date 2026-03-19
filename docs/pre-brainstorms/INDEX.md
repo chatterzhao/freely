@@ -148,6 +148,9 @@
 - 20260319-1105--three-loop-capability-lifecycle-governance
   - brainstorms: docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md
+- 20260319-0220--watchdog-control-plane-governance
+  - brainstorms: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
