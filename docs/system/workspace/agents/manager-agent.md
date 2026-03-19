@@ -11,6 +11,7 @@
   - `skill:context-source-skill`
   - `skill:multi-worktree-supervision`
   - `skill:worktree-hygiene-supervision`
+- 主管角色在三层循环中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
 
 ## 职责
 

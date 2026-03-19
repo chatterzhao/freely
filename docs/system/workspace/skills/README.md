@@ -5,6 +5,7 @@
 规则：
 - `CONSTITUTION.md` 定义边界与原则（What/Why）。
 - `LAWS.md` 定义检查、证据和路由（Check/Accept/Route）。
+- `docs/system/workspace/three-loop-capability-lifecycle.md` 定义三层循环下的能力归宿、owner 边界与生命周期细节真源。
 - Skills 仅定义可执行步骤（How）。
 - Hooks / `bin/*` 脚本是 skills 的运行时承载；若它们执行门禁，必须与宪法、法律和 skills 保持同源对齐。
 - Skills 不得扩展宪法范围或替代法律验收。

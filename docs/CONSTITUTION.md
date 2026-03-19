@@ -236,6 +236,7 @@ A:auto-loop（外循环）
 - 宪法仅定义循环边界与必须闭环，不定义产物模板、验收门细则或执行步骤。
 - 产物目录、门禁口径与路由细则由 `docs/LAWS.md` 同章节定义。
 - 实际执行步骤由 `docs/system/workspace/skills/` 定义。
+- 三层循环下的能力归宿、owner 边界与生命周期细节真源见 `docs/system/workspace/three-loop-capability-lifecycle.md`；本章只保留不可越界边界。
 
 ### 11.2 核心原则
 

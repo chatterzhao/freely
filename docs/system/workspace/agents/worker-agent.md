@@ -11,6 +11,7 @@
   - `skill:doc-ibm-execution`
   - `skill:dev-loop-execution`
   - `skill:worktree-hygiene-supervision`
+- worker 角色在三层循环中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
 
 ## 职责
 

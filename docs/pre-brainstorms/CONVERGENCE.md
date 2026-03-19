@@ -130,6 +130,15 @@
     - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-does-not-switch-accounts`
   - 当前状态：`in_verification`
 
+## 变更（2026-03-19 三层循环能力与生命周期真源收敛）
+
+### 收敛结论
+- `C-20260319-1105-A` `三层循环能力映射、owner 边界与生命周期真源收敛`
+  - 问题：三层循环的高层边界已经存在，但能力归宿、owner 边界和生命周期细节散落在 `CONSTITUTION`、`PROJECT_INTENT`、skills 与历史 pre-brainstorms 中，长期维护易冲突和失同步。
+  - 结论：新增 `docs/system/workspace/three-loop-capability-lifecycle.md` 作为唯一细节真源；高层文档只保留摘要与边界，skills 只保留执行步骤和局部职责。
+  - 已完成落点：`docs/system/workspace/three-loop-capability-lifecycle.md`、`docs/CONSTITUTION.md`、`docs/PROJECT_INTENT.md`、`docs/system/workspace/skills/README.md`、`docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`、`docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md`、`docs/system/workspace/skills/doc-ibm-execution/SKILL.md`、`docs/system/workspace/skills/dev-loop-execution/SKILL.md`
+  - 当前状态：`needs_research`
+
 ## 变更（2026-03-18 worktree hygiene 自治收口）
 
 ### 收敛结论

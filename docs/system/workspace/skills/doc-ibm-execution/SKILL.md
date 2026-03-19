@@ -10,6 +10,7 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 - 只处理 milestone 已接纳的 issue。
 - 先确定正式目录归属，再把 issue 从“docs 不足”推进到“ready for dev”或“明确阻塞”。
 - 同步 issue、milestone 与治理资产。
+- `IBM + G` 作为 doc-loop 的一部分，其循环归宿与生命周期细节以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准。
 
 ## 不负责
 
