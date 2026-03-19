@@ -10,6 +10,7 @@
   - `skill:auto-loop-orchestrator`
   - `skill:context-source-skill`
   - `skill:multi-worktree-supervision`
+  - `skill:worktree-hygiene-supervision`
 
 ## 职责
 
@@ -23,8 +24,9 @@
    - 目标 issue
    - 目标角色
    - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
-4. 监督多工位的节奏，而不是降级成单工位执行者。
-5. 在会话轮换前写出项目级 continuity，至少包含：
+4. 当某个 worker 连续多轮处于 checkpoint / dirty-budget 漂移时，优先委派 hygiene 收口，而不是继续让它扩写实现。
+5. 监督多工位的节奏，而不是降级成单工位执行者。
+6. 在会话轮换前写出项目级 continuity，至少包含：
    - 当前应继续的 worker
    - 冻结列表
    - 异常列表

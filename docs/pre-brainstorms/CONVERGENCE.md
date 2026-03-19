@@ -130,6 +130,21 @@
     - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-does-not-switch-accounts`
   - 当前状态：`in_verification`
 
+## 变更（2026-03-18 worktree hygiene 自治收口）
+
+### 收敛结论
+- `I-20260318-1825` `Worktree hygiene supervision control plane`
+  - 问题：checkpoint-guard 与 fleet-status 已能“看到”脏树/漂移，但 Freely 仍缺少一条把观察升级成自治收口动作的控制面。
+  - 结论：增加 `skill:worktree-hygiene-supervision`，并在 runtime 中记录 `checkpoint_drift_streak`；当 worker 连续多轮漂移时，prompt 自动升级为 hygiene intervention；当 manager 看到 drift worker 时，prompt 自动产出 `Worktree hygiene alert` 和 `delegate_hygiene_worker` 信号。
+  - 当前实现落点：`docs/system/workspace/skills/worktree-hygiene-supervision/SKILL.md`、`docs/system/workspace/agents/manager-agent.md`、`docs/system/workspace/agents/worker-agent.md`、`docs/system/workspace/scripts/runtime/freely`
+  - 验证证据：
+    - `bash docs/system/workspace/scripts/tests/test-freely-checkpoint-governance`
+    - `bash docs/system/workspace/scripts/tests/test-freely-checkpoint-drift-escalation`
+    - `bash docs/system/workspace/scripts/tests/test-freely-worktree-hygiene-alert`
+    - `bash docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert`
+    - `./bin/governance-check`
+  - 当前状态：`in_verification`
+
 ## 变更（2026-03-06 hooks 安装模式）
 
 ### 新增到 P0-核心

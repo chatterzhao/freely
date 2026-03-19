@@ -246,6 +246,7 @@ CONTEXT_WARN_RATIO=0.50
 CONTEXT_ROTATE_RATIO=0.70
 CHECKPOINT_WARN_DIRTY_ENTRIES=40
 CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
+CHECKPOINT_DRIFT_STREAK_THRESHOLD=2
 EOF
 }
 
@@ -494,6 +495,7 @@ load_session_state_or_defaults() {
   LAST_PROJECT_DIRTY_ENTRIES="0"
   LAST_WORKTREE_SUMMARY_TOTAL="0"
   LAST_WORKTREE_SUMMARY_DIRTY="0"
+  CHECKPOINT_DRIFT_STREAK_CURRENT="0"
   ROUTE_ONLY_STREAK_CURRENT="0"
   RESUME_STREAK_CURRENT="0"
 
@@ -534,7 +536,7 @@ EOF
 }
 
 write_session_state() {
-  local project="$1" tool_session_id="$2" tool_jsonl_path="$3" launch_kind="$4" rotation_reason="$5" cycle_log="$6" context_compacted="$7" context_ratio="$8" primary_used_percent="$9" primary_resets_at="${10}" secondary_used_percent="${11}" secondary_resets_at="${12}" route_only_handoff="${13}" route_only_streak="${14}" resume_streak="${15}" active_account="${16}" account_switch_reason="${17}" account_switch_at="${18}" project_dirty_entries="${19}" worktree_summary_total="${20}" worktree_summary_dirty="${21}"
+  local project="$1" tool_session_id="$2" tool_jsonl_path="$3" launch_kind="$4" rotation_reason="$5" cycle_log="$6" context_compacted="$7" context_ratio="$8" primary_used_percent="$9" primary_resets_at="${10}" secondary_used_percent="${11}" secondary_resets_at="${12}" route_only_handoff="${13}" route_only_streak="${14}" resume_streak="${15}" active_account="${16}" account_switch_reason="${17}" account_switch_at="${18}" project_dirty_entries="${19}" worktree_summary_total="${20}" worktree_summary_dirty="${21}" checkpoint_drift_streak="${22}"
   local state_file
   state_file="$(session_state_file "$project")"
   cat >"$state_file" <<EOF
@@ -556,6 +558,7 @@ LAST_ACCOUNT_SWITCH_AT="$account_switch_at"
 LAST_PROJECT_DIRTY_ENTRIES="$project_dirty_entries"
 LAST_WORKTREE_SUMMARY_TOTAL="$worktree_summary_total"
 LAST_WORKTREE_SUMMARY_DIRTY="$worktree_summary_dirty"
+CHECKPOINT_DRIFT_STREAK_CURRENT="$checkpoint_drift_streak"
 ROUTE_ONLY_STREAK_CURRENT="$route_only_streak"
 RESUME_STREAK_CURRENT="$resume_streak"
 EOF
@@ -581,6 +584,7 @@ write_session_handoff() {
 - previous_project_dirty_entries: ${LAST_PROJECT_DIRTY_ENTRIES:-0}
 - previous_worktree_summary_total: ${LAST_WORKTREE_SUMMARY_TOTAL:-0}
 - previous_worktree_summary_dirty: ${LAST_WORKTREE_SUMMARY_DIRTY:-0}
+- previous_checkpoint_drift_streak: ${CHECKPOINT_DRIFT_STREAK_CURRENT:-0}
 - branch: ${branch:-unknown}
 - worktree_path: $project
 
@@ -742,6 +746,28 @@ $(context_summary_target_hint)
 EOF
 }
 
+append_checkpoint_intervention_if_needed() {
+  local streak threshold
+  streak="${CHECKPOINT_DRIFT_STREAK_CURRENT:-0}"
+  threshold="${CHECKPOINT_DRIFT_STREAK_THRESHOLD:-2}"
+  [[ "$streak" =~ ^[0-9]+$ ]] || streak=0
+  [[ "$threshold" =~ ^[0-9]+$ ]] || threshold=2
+  if (( streak < threshold )); then
+    return 0
+  fi
+
+  cat <<EOF
+
+Worktree hygiene intervention:
+- checkpoint_drift_streak: ${streak}
+- checkpoint_drift_threshold: ${threshold}
+- 当前工位已连续多轮处于 dirty/checkpoint 漂移，不应继续扩写实现。
+- 先执行 \`skill:worktree-hygiene-supervision\`。
+- 先更新当前阶段 continuity artifact、补最小验证、切原子 checkpoint commit；若 scope 已混杂，先按 ownership 分流到 dedicated worktree。
+- 若你是主管，优先委派 hygiene 收口；若你是 worker，优先收口当前 issue，再继续下一批。
+EOF
+}
+
 append_fleet_supervision_if_needed() {
   local fleet_snapshot
   fleet_snapshot="$(fleet_status_text_for_project "$PROJECT_ROOT")"
@@ -811,6 +837,42 @@ manager_supervision_alerts() {
   ')
 }
 
+manager_hygiene_alerts() {
+  local project="$1" repo_root wt_path branch role_hint dirty_entries checkpoint_json checkpoint_required streak threshold
+  repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
+  [[ -n "$repo_root" ]] || return 0
+  threshold="${CHECKPOINT_DRIFT_STREAK_THRESHOLD:-2}"
+  while IFS='|' read -r wt_path branch; do
+    [[ -n "$wt_path" ]] || continue
+    [[ "$wt_path" == "$project" ]] && continue
+    [[ -f "$(config_file "$wt_path")" ]] || continue
+    role_hint="${LAST_ROLE_HINT:-worker}"
+    if [[ -f "$(workcell_state_file "$wt_path")" ]]; then
+      # shellcheck disable=SC1090
+      source "$(workcell_state_file "$wt_path")"
+      role_hint="${LAST_ROLE_HINT:-worker}"
+    fi
+    [[ "${role_hint:-worker}" == "worker" ]] || continue
+    dirty_entries="$(project_dirty_entries "$wt_path")"
+    checkpoint_json="$(checkpoint_guard_json_for_project "$wt_path")"
+    checkpoint_required="$(checkpoint_guard_value "$checkpoint_json" checkpoint_required)"
+    streak="0"
+    if [[ -f "$(session_state_file "$wt_path")" ]]; then
+      # shellcheck disable=SC1090
+      source "$(session_state_file "$wt_path")"
+      streak="${CHECKPOINT_DRIFT_STREAK_CURRENT:-0}"
+    fi
+    [[ "$streak" =~ ^[0-9]+$ ]] || streak=0
+    if [[ "$checkpoint_required" == "true" || "$dirty_entries" =~ ^[0-9]+$ && "$dirty_entries" -ge "${CHECKPOINT_WARN_DIRTY_ENTRIES:-40}" || "$streak" -ge "$threshold" ]]; then
+      printf -- '- worktree_checkpoint_drift: branch=%s role=%s owner=manager-owned next_action=delegate_hygiene_worker dirty_entries=%s checkpoint_required=%s drift_streak=%s path=%s\n' \
+        "${branch:-unknown}" "${role_hint:-worker}" "${dirty_entries:-0}" "${checkpoint_required:-false}" "${streak:-0}" "$wt_path"
+    fi
+  done < <(git -C "$repo_root" worktree list --porcelain | awk '
+    /^worktree / { wt=substr($0, 10); br="" }
+    /^branch / { br=$2; sub(/^refs\/heads\//, "", br); print wt "|" br }
+  ')
+}
+
 manager_runtime_recover_workers_if_needed() {
   local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
@@ -871,6 +933,24 @@ Manager supervision alert:
 - 在继续普通路由前，先判断这些工位应恢复、冻结还是 cleanup。
 - 这是主管自检信号，不需要人工额外运行 fleet-status 才能发现。
 - 若某条告警标记为 \`owner=runtime-owned\`，主管只做判定与委派；真正切号、等待和重启仍由目标工位 runtime / scripts 接管。
+
+$alerts
+EOF
+}
+
+append_manager_hygiene_alert_if_needed() {
+  if [[ "$(role_hint_for_project "$PROJECT_ROOT")" != "manager" ]]; then
+    return 0
+  fi
+  local alerts
+  alerts="$(manager_hygiene_alerts "$PROJECT_ROOT")"
+  [[ -n "$alerts" ]] || return 0
+  cat <<EOF
+
+Worktree hygiene alert:
+- 以下 worker 工位已进入 checkpoint / dirty-budget 漂移。
+- 在继续普通排班前，先判断是否应委派 hygiene 收口、冻结、cleanup 或分流。
+- 优先使用 \`skill:worktree-hygiene-supervision\` 形成清晰 delegation handoff，而不是继续让原 worker 横向扩 scope。
 
 $alerts
 EOF
@@ -1409,8 +1489,10 @@ build_prompt() {
     --reasoning-effort "${AI_REASONING_EFFORT:-}"
   append_context_warning_if_needed
   append_checkpoint_governance_if_needed
+  append_checkpoint_intervention_if_needed
   append_fleet_supervision_if_needed
   append_manager_supervision_alert_if_needed
+  append_manager_hygiene_alert_if_needed
   append_route_only_recovery_if_needed
   append_handoff_prompt_if_present "$PROJECT_ROOT"
 }
@@ -1561,7 +1643,7 @@ cmd_start() {
     } >>"$loop_log" 2>&1
     local rc=$?
     set -e
-    local child_pid tool_session_id tool_jsonl_path context_compacted context_ratio route_only_handoff
+    local child_pid tool_session_id tool_jsonl_path context_compacted context_ratio route_only_handoff checkpoint_json checkpoint_required
     local primary_rate_limit_used_percent primary_rate_limit_resets_at secondary_rate_limit_used_percent secondary_rate_limit_resets_at next_restart_delay
     local active_account
     local rate_limit_reason rate_limit_reset_at
@@ -1622,6 +1704,13 @@ cmd_start() {
     LAST_PROJECT_DIRTY_ENTRIES="$dirty_entries"
     LAST_WORKTREE_SUMMARY_TOTAL="$worktree_total"
     LAST_WORKTREE_SUMMARY_DIRTY="$worktree_dirty"
+    checkpoint_json="$(checkpoint_guard_json_for_project "$PROJECT_ROOT")"
+    checkpoint_required="$(checkpoint_guard_value "$checkpoint_json" checkpoint_required)"
+    if [[ "$checkpoint_required" == "true" || "$dirty_entries" =~ ^[0-9]+$ && "$dirty_entries" -ge "${CHECKPOINT_WARN_DIRTY_ENTRIES:-40}" ]]; then
+      CHECKPOINT_DRIFT_STREAK_CURRENT=$(( ${CHECKPOINT_DRIFT_STREAK_CURRENT:-0} + 1 ))
+    else
+      CHECKPOINT_DRIFT_STREAK_CURRENT=0
+    fi
 
     if [[ "$stop_requested" -eq 1 || -f "$(stop_marker_file "$project")" ]]; then
       LAST_WORKCELL_EXIT_REASON="operator_stop"
@@ -1656,7 +1745,7 @@ cmd_start() {
       fi
     fi
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT"
     LAST_WORKCELL_EXIT_REASON="${account_switch_reason:-${rate_limit_reason:-ai_exit_rc_${rc}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
 
@@ -1759,6 +1848,7 @@ cmd_status() {
   echo "last_project_dirty_entries: ${LAST_PROJECT_DIRTY_ENTRIES:-0}"
   echo "last_worktree_summary_total: ${LAST_WORKTREE_SUMMARY_TOTAL:-0}"
   echo "last_worktree_summary_dirty: ${LAST_WORKTREE_SUMMARY_DIRTY:-0}"
+  echo "checkpoint_drift_streak: ${CHECKPOINT_DRIFT_STREAK_CURRENT:-0}"
   echo "route_only_streak: ${ROUTE_ONLY_STREAK_CURRENT:-0}"
   local checkpoint_json checkpoint_required checkpoint_reasons
   checkpoint_json="$(checkpoint_guard_json_for_project "$PROJECT_ROOT")"
