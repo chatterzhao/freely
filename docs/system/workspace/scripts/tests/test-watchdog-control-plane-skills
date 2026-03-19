@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+WATCHDOG_SKILL="$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/SKILL.md"
+WATCHDOG_LIB="$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+CONTINUITY_SKILL="$ROOT_DIR/docs/system/workspace/skills/continuity-watchdog/SKILL.md"
+RUNTIME_SCRIPT="$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+MANAGER_AGENT="$ROOT_DIR/docs/system/workspace/agents/manager-agent.md"
+WORKER_AGENT="$ROOT_DIR/docs/system/workspace/agents/worker-agent.md"
+SKILLS_INDEX="$ROOT_DIR/docs/system/workspace/skills/README.md"
+
+[[ -f "$WATCHDOG_SKILL" ]]
+[[ -f "$WATCHDOG_LIB" ]]
+[[ -f "$CONTINUITY_SKILL" ]]
+
+grep -q 'source "\$WATCHDOG_AVAILABILITY_LIB"' "$RUNTIME_SCRIPT"
+grep -q 'skill:watchdog-control-plane' "$SKILLS_INDEX"
+grep -q 'skill:continuity-watchdog' "$SKILLS_INDEX"
+grep -q 'skill:watchdog-control-plane' "$MANAGER_AGENT"
+grep -q 'skill:continuity-watchdog' "$MANAGER_AGENT"
+grep -q 'skill:continuity-watchdog' "$WORKER_AGENT"
+
+bash -n "$WATCHDOG_LIB"
+
+echo "[PASS] watchdog control-plane skills are materialized and wired into runtime + agent roles"

@@ -11,6 +11,8 @@
   - `skill:context-source-skill`
   - `skill:multi-worktree-supervision`
   - `skill:worktree-hygiene-supervision`
+  - `skill:watchdog-control-plane`
+  - `skill:continuity-watchdog`
 
 ## 职责
 
@@ -43,6 +45,7 @@
 ## 与其他角色的边界
 
 - `runtime` 管生存：切号、等待、重启、恢复
+- `watchdog-control-plane` 管 watchdog owner taxonomy：availability / runtime / continuity
 - `worker-agent` 管执行：doc-loop / dev-loop / verification
 - `manager-agent` 管编排：发现、判断、委派、合并、清理
 

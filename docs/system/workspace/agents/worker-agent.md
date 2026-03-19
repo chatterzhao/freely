@@ -11,6 +11,7 @@
   - `skill:doc-ibm-execution`
   - `skill:dev-loop-execution`
   - `skill:worktree-hygiene-supervision`
+  - `skill:continuity-watchdog`
 
 ## 职责
 
@@ -32,6 +33,7 @@
 
 - `manager-agent` 负责任务编排与委派
 - `runtime` 负责账号切换、sleep/recheck、进程重启
+- `continuity-watchdog` 负责 `context warn`、`fresh_with_handoff` 与 continuity artifact 边界
 - `worker-agent` 只对自己的 issue 执行结果负责
 - 当发生进程退出、账号限额、认证失败、`context compacted` 需要新进程续接时，worker 只负责记录 blocker / continuity，不负责恢复本身
 

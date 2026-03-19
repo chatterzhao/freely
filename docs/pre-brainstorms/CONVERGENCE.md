@@ -2834,3 +2834,6 @@
   - availability watchdog
   - runtime watchdog
   - continuity watchdog
+ - manager / worker 角色文档已把 watchdog 模块作为正式下游依赖写明
+ - 新增脚本级回归：
+   - `bash docs/system/workspace/scripts/tests/test-watchdog-control-plane-skills`
