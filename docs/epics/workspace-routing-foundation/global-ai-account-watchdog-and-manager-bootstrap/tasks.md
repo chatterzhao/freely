@@ -8,3 +8,5 @@
 - [x] add script-level regression for account selection before manager bootstrap
 - [x] verify each account switch causes a new codex process launch before continuing
 - [x] probe saved accounts when cooldown records are stale before falling back to earliest reset
+- [x] write structured manager bootstrap handoff before watchdog relaunches the manager
+- [x] let the live test discover a usable account by real probe when no good account is provided

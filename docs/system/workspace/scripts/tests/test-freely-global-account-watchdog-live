@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 MANAGER_PROJECT="/Users/zhaoyu/Downloads/code/my-freely/freely"
-GOOD_ACCOUNT="worahe3971@outlook.com"
-BAD_ACCOUNTS=("worahe3972@outlook.com" "worahe3973@outlook.com")
+GOOD_ACCOUNT=""
+BAD_ACCOUNTS=()
 TIMEOUT_SECONDS=90
 LOG_ROOT="${TMPDIR:-/tmp}/freely-global-account-watchdog-live-$$"
 mkdir -p "$LOG_ROOT"
@@ -21,7 +21,8 @@ Usage:
 Purpose:
   - start the global ensure-manager watchdog first
   - then intentionally switch the global codex account to known-bad accounts
-  - verify the watchdog/runtime automatically switches back to the known-good account
+  - if --good-account is omitted, probe saved accounts and discover a currently usable one
+  - verify the watchdog/runtime automatically switches back to the usable account
 EOF
 }
 
@@ -34,6 +35,49 @@ while [[ $# -gt 0 ]]; do
     *) echo "unknown arg: $1" >&2; usage >&2; exit 1 ;;
   esac
 done
+
+saved_codex_accounts() {
+  bash "$ROOT_DIR/bin/ai" list 2>/dev/null | sed -n 's/^  codex-//p'
+}
+
+normalize_account() {
+  printf '%s\n' "$1" | sed 's/\./-/g'
+}
+
+probe_current_account_now() {
+  local prompt_file output_file rc
+  prompt_file="$(mktemp)"
+  output_file="$(mktemp)"
+  printf 'Reply with exactly: OK\n' >"$prompt_file"
+  rc=0
+  (
+    cd "$MANAGER_PROJECT"
+    codex exec --skip-git-repo-check -C "$MANAGER_PROJECT" --dangerously-bypass-approvals-and-sandbox - <"$prompt_file"
+  ) >"$output_file" 2>&1 || rc=$?
+  rm -f "$prompt_file"
+  if [[ "$rc" -eq 0 ]] && rg -q '^OK$' "$output_file"; then
+    rm -f "$output_file"
+    return 0
+  fi
+  rm -f "$output_file"
+  return 1
+}
+
+discover_good_account() {
+  local candidate
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    if [[ " ${BAD_ACCOUNTS[*]} " == *" ${candidate} "* ]]; then
+      continue
+    fi
+    switch_account "$candidate" >/dev/null 2>&1 || continue
+    if probe_current_account_now; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done < <(saved_codex_accounts)
+  return 1
+}
 
 whoami_account() {
   local output
@@ -182,7 +226,7 @@ wait_for_good_account() {
   local start_ts now
   start_ts="$(date +%s)"
   while true; do
-    if [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]]; then
+    if [[ "$(normalize_account "$(whoami_account)")" == "$(normalize_account "$GOOD_ACCOUNT")" ]]; then
       return 0
     fi
     now="$(date +%s)"
@@ -200,7 +244,7 @@ wait_for_manager_status() {
   while true; do
     supervisor_pid="$(status_field supervisor_pid)"
     launch_count="$(loop_launch_count)"
-    if [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]] &&
+    if [[ "$(normalize_account "$(whoami_account)")" == "$(normalize_account "$GOOD_ACCOUNT")" ]] &&
       [[ -n "$supervisor_pid" && "$supervisor_pid" != "none" ]] &&
       kill -0 "$supervisor_pid" 2>/dev/null &&
       [[ "$launch_count" =~ ^[0-9]+$ ]] &&
@@ -268,6 +312,11 @@ cleanup() {
 trap cleanup EXIT
 
 [[ -d "$MANAGER_PROJECT" ]] || { echo "manager project not found: $MANAGER_PROJECT" >&2; exit 1; }
+if [[ -z "$GOOD_ACCOUNT" ]]; then
+  GOOD_ACCOUNT="$(discover_good_account || true)"
+fi
+
+[[ -n "$GOOD_ACCOUNT" ]] || { echo "could not discover a usable good account" >&2; exit 1; }
 [[ "${#BAD_ACCOUNTS[@]}" -gt 0 ]] || { echo "need at least one --bad-account" >&2; exit 1; }
 
 stop_manager
@@ -300,7 +349,7 @@ fi
 trace_event "manager_ai_ready"
 
 for bad in "${BAD_ACCOUNTS[@]}"; do
-  current_after_bad_switch=""
+current_after_bad_switch=""
   [[ "$bad" == "$GOOD_ACCOUNT" ]] && continue
   previous_launch_count="$(loop_launch_count)"
   echo "[INFO] testing recovery from bad account: $bad"
@@ -309,9 +358,9 @@ for bad in "${BAD_ACCOUNTS[@]}"; do
   trace_event "after_switch_to_${bad//@/_}"
 
   current_after_bad_switch="$(whoami_account)"
-  if [[ "$current_after_bad_switch" == "$bad" ]]; then
+  if [[ "$(normalize_account "$current_after_bad_switch")" == "$(normalize_account "$bad")" ]]; then
     :
-  elif [[ "$current_after_bad_switch" == "$GOOD_ACCOUNT" ]]; then
+  elif [[ "$(normalize_account "$current_after_bad_switch")" == "$(normalize_account "$GOOD_ACCOUNT")" ]]; then
     trace_event "immediate_recovery_after_switch_to_${bad//@/_}"
   else
     echo "[FAIL] expected current account to be either $bad or immediate recovery to $GOOD_ACCOUNT, got $current_after_bad_switch" >&2

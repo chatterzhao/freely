@@ -133,6 +133,11 @@ handoff_file() {
   echo "$(run_dir_for_project "$project")/session-handoff.txt"
 }
 
+manager_bootstrap_handoff_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/manager-bootstrap-handoff.txt"
+}
+
 codex_account_cooldown_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/codex-account-cooldowns.tsv"
@@ -560,6 +565,57 @@ append_handoff_prompt_if_present() {
 
 EOF
   cat "$handoff_path"
+}
+
+write_manager_bootstrap_handoff() {
+  local project="$1" trigger="$2" previous_account="$3" active_account="$4" reason="$5" next_action="$6"
+  local handoff_path branch fleet_snapshot
+  handoff_path="$(handoff_file "$project")"
+  branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
+  fleet_snapshot="$(fleet_status_text_for_project "$project")"
+
+  cat >"$handoff_path" <<EOF
+# Session Handoff
+
+- rotation_reason: manager_bootstrap_watchdog
+- previous_launch_kind: ensure-manager
+- previous_tool_session_id: unavailable://manager-relaunched-by-script
+- previous_tool_jsonl_path: unavailable://manager-relaunched-by-script
+- previous_cycle_log: unavailable://manager-relaunched-by-script
+- previous_context_ratio: unavailable
+- previous_route_only_handoff: 0
+- previous_project_dirty_entries: 0
+- previous_worktree_summary_total: 0
+- previous_worktree_summary_dirty: 0
+- branch: ${branch:-unknown}
+- worktree_path: $project
+
+## Manager Bootstrap Recovery
+- trigger: ${trigger:-unknown}
+- previous_account: ${previous_account:-unavailable}
+- active_account: ${active_account:-unavailable}
+- reason: ${reason:-unavailable}
+- next_action: ${next_action:-check-fleet-and-continue}
+
+## What To Handle First
+- The previous manager chain stopped or became unusable before this new session started.
+- First inspect the fleet snapshot and decide which worktrees should keep running, which should be resumed, and which should remain stopped.
+- If a worktree is expected-running but currently down, decide whether runtime recovery should proceed with resume or whether a fresh_with_handoff rotation is safer.
+- Do not redo global account switching here; that recovery was already owned by the watchdog script.
+
+## Summary Target Hint
+$(context_summary_target_hint)
+EOF
+
+  if [[ -n "$fleet_snapshot" ]]; then
+    cat >>"$handoff_path" <<EOF
+
+## Fleet Snapshot
+\`\`\`
+$fleet_snapshot
+\`\`\`
+EOF
+  fi
 }
 
 append_context_warning_if_needed() {
@@ -996,12 +1052,14 @@ ensure_codex_account_ready_for_manager() {
   if [[ -n "$available_account" ]]; then
     if [[ -z "$current_account" || "$available_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
       switch_to_codex_account "$project" "$available_account" "ensure_manager" >/dev/null
+      write_manager_bootstrap_handoff "$project" "account_unavailable" "$current_account" "$available_account" "watchdog_switched_to_available_account" "inspect-fleet-and-recover-workers"
     fi
     return 0
   fi
 
   probed_account="$(probe_any_usable_codex_account_now "$project" || true)"
   if [[ -n "$probed_account" ]]; then
+    write_manager_bootstrap_handoff "$project" "stale_or_missing_cooldown_probe" "$current_account" "$probed_account" "watchdog_probed_and_found_usable_account" "inspect-fleet-and-recover-workers"
     return 0
   fi
 
@@ -1012,6 +1070,7 @@ ensure_codex_account_ready_for_manager() {
     if [[ -z "$current_account" || "$earliest_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
       switch_to_codex_account "$project" "$earliest_account" "all_accounts_cooling_down" >/dev/null || true
     fi
+    write_manager_bootstrap_handoff "$project" "all_accounts_cooling_down" "$current_account" "$earliest_account" "watchdog_waiting_for_earliest_reset" "recheck-account-availability-before-manager-bootstrap"
     wait_seconds="$(seconds_until_epoch "$earliest_reset")"
     if [[ "${wait_seconds:-0}" =~ ^[0-9]+$ ]] && (( wait_seconds > 0 )); then
       log_warn "all codex accounts cooling down before manager bootstrap; sleeping until reset_at=${earliest_reset} (sleep=${wait_seconds}s)"
@@ -1022,6 +1081,7 @@ ensure_codex_account_ready_for_manager() {
       if [[ -z "$current_account" || "$available_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
         switch_to_codex_account "$project" "$available_account" "ensure_manager" >/dev/null || true
       fi
+      write_manager_bootstrap_handoff "$project" "cooldown_elapsed" "$earliest_account" "$available_account" "watchdog_resumed_after_wait" "inspect-fleet-and-recover-workers"
       return 0
     fi
   fi
@@ -1108,6 +1168,7 @@ ensure_manager_once() {
     current_ai_pid="$(manager_ai_pid_for_project "$project")"
     if [[ -n "$current_pid" ]] && [[ -n "$current_account" ]] && ! codex_account_is_available_now "$project" "$current_account" && [[ -z "$current_ai_pid" ]]; then
       log_warn "manager supervisor is idle on an unavailable codex account ($current_account); restarting manager under watchdog control"
+      write_manager_bootstrap_handoff "$project" "manager_limit_detected" "$current_account" "$current_account" "manager_process_ended_on_unavailable_account" "relaunch-manager-after-account-recovery"
       restart_manager_supervisor_preserving_handoff "$project"
       current_pid=""
     fi

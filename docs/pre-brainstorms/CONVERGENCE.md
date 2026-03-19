@@ -240,9 +240,9 @@
   - 问题：当全局 Codex 账号不可用时，任何 AI 都可能同时失活，不能再依赖 manager/worker 自行恢复
   - 结论：把全局账号切换与主管拉起收为纯脚本职责；当前先通过 `freely ensure-manager` 落下 CLI-first 入口
   - 当前实现落点：`docs/system/workspace/scripts/runtime/freely`、`docs/system/workspace/scripts/runtime/ai-cli`、`docs/system/workspace/scripts/tests/test-freely-ensure-manager`、`docs/system/workspace/scripts/tests/test-freely-global-account-watchdog-live`
-  - 当前状态：`in_dev`
-  - 最新验证事实：真实坏账号回切链已触发，但当前配置的好账号 `worahe3971@outlook.com` 在主管重拉起时同样命中 usage limit，live 测试因此被环境前提阻塞
-  - 下一步：在真实可用好账号前提下重跑 live 测试，并验证主管恢复后继续监督工位
+  - 当前状态：`in_verification`
+  - 最新验证事实：watchdog 现在会在拉起主管前写 manager bootstrap handoff，说明触发 limit/切号/等待原因和主管应优先检查的工位面；live 测试也已收紧为“未显式给好账号时，先真实 probe 当前可用账号，再验证坏号恢复”
+  - 下一步：completion verification / review，并与 manager 自治主线一起判断 promotion 顺序
 
 ## 变更（2026-03-18 checkpoint commit 与多 worktree 监督治理）
 

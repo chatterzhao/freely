@@ -86,7 +86,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
-- next_action: `freely ensure-manager --watch`、坏号后真实 probe、过时 cooldown 账本兜底与 live recovery 测试均已通过；下一步做 completion verification / review，并与 manager 自治主线一起决定 promote 顺序
+- next_action: `freely ensure-manager --watch`、坏号后真实 probe、过时 cooldown 账本兜底、manager bootstrap handoff 与 live recovery 测试均已通过；当前做 completion verification / review，并与 manager 自治主线一起决定 promote 顺序
 
 ### candidate_issues
 
