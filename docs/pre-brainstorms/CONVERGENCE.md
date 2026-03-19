@@ -2782,3 +2782,40 @@
   - 问题：旧 `feature/context-compaction-delegation-governance-20260318` 分支的大部分治理语义已被 continuity 主线覆盖，但其 continuity guard 小能力仍值得保留。
   - 结论：仅收编 `previous_context_compacted`、`Continuity Guard`、首跳 compact 提醒及相关测试；不再继续沿旧分支推进。
   - 当前状态：`in_dev`
+
+## 变更（2026-03-19 watchdog 控制面模块化重构）
+
+### 收敛结论
+- `watchdog` 不再仅指“账号切换器”，而是正式上提为广义外层监督/恢复控制面。
+  - 子层划分：
+    - `availability watchdog`
+    - `runtime watchdog`
+    - `continuity watchdog`
+- 可复用的 availability 能力改为优先由 skill 承载，而不是继续堆在 `runtime/freely`：
+  - 新增：`docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
+  - 新增：`docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
+  - 该脚本现承接：
+    - codex account cooldown 记录与清理
+    - saved-account availability 判断
+    - active account probe / switch
+    - `ensure-manager` 之前的 account readiness 决策
+- `runtime/freely` 继续保留 Freely 专有 orchestration：
+  - manager bootstrap handoff
+  - manager / worker runtime supervision
+  - continuity 触发矩阵
+  - project-specific lifecycle
+- `skill:ai-cli-availability-manager` 保留为窄入口，但语义改为 watchdog umbrella 下的 availability 子模块，避免一次性打碎现有引用。
+
+### 验证证据
+- `bash -n docs/system/workspace/scripts/runtime/freely`
+- `bash -n docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
+- `bash -n docs/system/workspace/scripts/runtime/manager-watchdog.sh`
+- `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
+- `./bin/governance-check`
+
+### 当前状态
+- 已完成模块化落点与最小回归验证
+- 后续若继续深挖，应优先 materialize：
+  - umbrella watchdog taxonomy issue
+  - runtime-vs-skill script boundary issue
+  - continuity watchdog formalization issue
