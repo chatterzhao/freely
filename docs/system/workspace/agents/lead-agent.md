@@ -12,6 +12,7 @@
   - `workspace/agents/worker-agent.md`
 - 下游：`skill:context-source-skill`
 - 工具清单：`workspace/tools.md`
+- 三层循环下首跳路由与能力归宿细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
 
 ## 职责
 

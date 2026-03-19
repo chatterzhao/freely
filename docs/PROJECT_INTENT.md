@@ -14,6 +14,10 @@
 
 ### 三层循环方法论
 
+说明：
+- 本节定义 Freely 为什么需要三层循环，以及高层闭环结构。
+- 三层循环下的能力归宿、owner 边界与生命周期细节真源统一收敛到 `docs/system/workspace/three-loop-capability-lifecycle.md`，避免在多个高层文档中重复维护。
+
 ```text
 A:auto-loop（外循环）
 │
@@ -109,6 +113,10 @@ flowchart TD
 ```
 
 ### 来源与路由规则
+
+说明：
+- 本节保留高层来源到下一跳的方向性约束。
+- 详细 capability -> loop -> owner -> artifact -> transition 映射以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准。
 
 | 来源 | 路由起点 | 说明 |
 |-----------|---------|------|

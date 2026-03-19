@@ -19,6 +19,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 - `docs/system/workspace/` 是能力真源；`bin/`、`.githooks/` 等是运行时落点。
 - `sh` / `ps1` 的定义源应位于 `docs/system/workspace/scripts/`。
 - hook 的定义源应位于 `docs/system/workspace/hooks/`，根目录 `.githooks/` 作为安装产物。
+- 三层循环下各能力的归宿、owner 边界和生命周期细节以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准；本 skill 只定义 auto-loop 编排步骤。
 
 ## 工作流
 1. 先执行固定前置门禁：`skill:constitution-guard` -> `skill:laws-enforcer`。

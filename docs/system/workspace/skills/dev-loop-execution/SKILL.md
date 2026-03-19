@@ -10,6 +10,7 @@ description: 执行 milestone-owned ready issue 的实现、测试与进度回�
 - 只处理 docs 已足够的 ready issue。
 - 在正确 worktree 中实现、测试并回写状态。
 - 让 `progress` 只承载 dev-loop 的执行态。
+- dev-loop 在整个三层循环中的归宿、owner 边界与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`。
 
 ## 不负责
 
