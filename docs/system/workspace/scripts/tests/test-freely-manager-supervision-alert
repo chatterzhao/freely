@@ -85,22 +85,34 @@ DESIRED_RUNTIME_STATE="running"
 LAST_SUPERVISOR_STATE="down"
 LAST_AI_STATE="down"
 LAST_EXIT_REASON="unexpected_supervisor_exit"
-LAST_ROLE_HINT="worker"
+LAST_ROLE_HINT="manager"
 LAST_STATE_UPDATED_AT="2026-03-18T00:00:00Z"
 EOF
 
 bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
 
-second_prompt="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
-[[ -n "$second_prompt" ]] || {
-  echo "[FAIL] expected second prompt file"
+alert_prompt=""
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  alert_prompt="$(find "$PROJECT/.freely/run" -maxdepth 1 -name 'prompt-*.txt' | sort | while read -r prompt; do
+    if grep -q 'Manager supervision alert:' "$prompt"; then
+      printf '%s\n' "$prompt"
+      break
+    fi
+  done)"
+  if [[ -n "$alert_prompt" ]]; then
+    break
+  fi
+  sleep 1
+done
+[[ -n "$alert_prompt" ]] || {
+  echo "[FAIL] expected a prompt file containing manager supervision alert"
   exit 1
 }
 
-grep -q 'Manager supervision alert:' "$second_prompt"
-grep -q 'expected_running_worktree_down:' "$second_prompt"
-grep -q 'owner=runtime-owned' "$second_prompt"
-grep -q 'next_action=runtime_recovery_requested' "$second_prompt"
-grep -q "$WORKER" "$second_prompt"
+grep -q 'Manager supervision alert:' "$alert_prompt"
+grep -q 'expected_running_worktree_down:' "$alert_prompt"
+grep -q 'owner=runtime-owned' "$alert_prompt"
+grep -q 'next_action=runtime_recovery_requested' "$alert_prompt"
+grep -q "$WORKER" "$alert_prompt"
 
 echo "[PASS] manager prompt auto-surfaces down expected-running workers"

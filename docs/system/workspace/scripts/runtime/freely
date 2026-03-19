@@ -1234,7 +1234,7 @@ cmd_start() {
     set -e
     local child_pid tool_session_id tool_jsonl_path context_compacted context_ratio route_only_handoff
     local primary_rate_limit_used_percent primary_rate_limit_resets_at secondary_rate_limit_used_percent secondary_rate_limit_resets_at next_restart_delay
-    local active_account account_switch_reason account_switch_at switched_account earliest_reset_info earliest_reset_account earliest_reset_at
+    local active_account
     local rate_limit_reason rate_limit_reset_at
     local dirty_entries worktree_total worktree_dirty summary
     child_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
@@ -1246,12 +1246,6 @@ cmd_start() {
     secondary_rate_limit_used_percent=""
     secondary_rate_limit_resets_at=""
     active_account=""
-    account_switch_reason=""
-    account_switch_at=""
-    switched_account=""
-    earliest_reset_info=""
-    earliest_reset_account=""
-    earliest_reset_at=""
     rate_limit_reason=""
     rate_limit_reset_at=""
     dirty_entries="0"
@@ -1294,6 +1288,8 @@ cmd_start() {
     LAST_SECONDARY_RATE_LIMIT_RESETS_AT="$secondary_rate_limit_resets_at"
     LAST_ROUTE_ONLY_HANDOFF="$route_only_handoff"
     LAST_ACTIVE_ACCOUNT="$active_account"
+    LAST_ACCOUNT_SWITCH_REASON=""
+    LAST_ACCOUNT_SWITCH_AT=""
     LAST_PROJECT_DIRTY_ENTRIES="$dirty_entries"
     LAST_WORKTREE_SUMMARY_TOTAL="$worktree_total"
     LAST_WORKTREE_SUMMARY_DIRTY="$worktree_dirty"
@@ -1326,36 +1322,13 @@ cmd_start() {
         account_switch_reason="auth_failure"
       fi
       if [[ -n "$account_switch_reason" ]]; then
-        switched_account="$(switch_to_next_codex_account "$PROJECT_ROOT" "$account_switch_reason" || true)"
-        if [[ -n "$switched_account" ]]; then
-          active_account="$switched_account"
-          account_switch_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-          LAST_ACTIVE_ACCOUNT="$active_account"
-          LAST_ACCOUNT_SWITCH_REASON="$account_switch_reason"
-          LAST_ACCOUNT_SWITCH_AT="$account_switch_at"
-          next_restart_delay="${RESTART_DELAY:-2}"
-        elif [[ -n "$rate_limit_reason" ]]; then
-          earliest_reset_info="$(select_earliest_reset_codex_account "$PROJECT_ROOT" "$active_account")"
-          earliest_reset_account="${earliest_reset_info%%|*}"
-          earliest_reset_at="${earliest_reset_info##*|}"
-          if [[ -n "$earliest_reset_account" && -n "$earliest_reset_at" && "$earliest_reset_info" == *"|"* ]]; then
-            switched_account="$(switch_to_codex_account "$PROJECT_ROOT" "$earliest_reset_account" "all_accounts_cooling_down" || true)"
-            if [[ -n "$switched_account" ]]; then
-              active_account="$switched_account"
-              account_switch_reason="all_accounts_cooling_down"
-              account_switch_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-              LAST_ACTIVE_ACCOUNT="$active_account"
-              LAST_ACCOUNT_SWITCH_REASON="$account_switch_reason"
-              LAST_ACCOUNT_SWITCH_AT="$account_switch_at"
-            fi
-            next_restart_delay="$(seconds_until_epoch "$earliest_reset_at")"
-          fi
-        fi
+        LAST_ACCOUNT_SWITCH_REASON="$account_switch_reason"
+        LAST_ACCOUNT_SWITCH_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
       fi
     fi
 
     write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY"
-    LAST_WORKCELL_EXIT_REASON="${rate_limit_reason:-ai_exit_rc_${rc}}"
+    LAST_WORKCELL_EXIT_REASON="${account_switch_reason:-${rate_limit_reason:-ai_exit_rc_${rc}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
 
     log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, secondary_rate_limit_used_percent=${secondary_rate_limit_used_percent:-unavailable}, secondary_rate_limit_resets_at=${secondary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
@@ -1367,15 +1340,9 @@ cmd_start() {
       log_error "reached MAX_RESTARTS=${MAX_RESTARTS}, stopping"
       exit 1
     fi
-    if [[ -n "$rate_limit_reason" ]]; then
-      if [[ -n "$switched_account" && "${account_switch_reason:-}" != "all_accounts_cooling_down" ]]; then
-        log_info "rate-limit hit on previous codex account (reason=${rate_limit_reason}); continuing with switched account=${switched_account}"
-      elif [[ -n "$earliest_reset_account" && -n "$earliest_reset_at" ]]; then
-        log_warn "all codex accounts cooling down; switched to earliest-reset account=${earliest_reset_account}, sleeping until reset_at=${earliest_reset_at} (sleep=${next_restart_delay:-0}s)"
-      else
-        next_restart_delay="$(seconds_until_epoch "${rate_limit_reset_at:-}")"
-        log_warn "${rate_limit_reason} detected; backing off until reset_at=${rate_limit_reset_at:-unavailable} (sleep=${next_restart_delay:-0}s)"
-      fi
+    if [[ -n "$account_switch_reason" ]]; then
+      log_warn "${account_switch_reason} detected for this workcell; local runtime is deferring global account recovery to the global watchdog / manager control plane and will now stop"
+      exit 0
     fi
     sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$next_restart_delay"
   done

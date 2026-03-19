@@ -38,6 +38,7 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
 - `wt-fleet-status` 能区分 `expected running but down` 与 `intentionally stopped/frozen`。
 - 主管 prompt 在发现应运行工位掉线时，优先进入 supervision / recovery / delegation，而不是继续普通路由。
 - 主管只做监督、编排、委派和告警；若判断需要恢复，只输出 `runtime_recovery_requested` 一类管理决策，账号切换、等待和重启仍归 runtime。
+- manager / worker runtime 不再执行全局 Codex 账号切换；若命中限额，只记录 `runtime-owned` 异常并等待外层 global watchdog/account controller 接管。
 - 仓库内存在显式的 `manager-agent` 与 `worker-agent` 角色文档，而不是只靠 lead-agent 隐式约定。
 - 文档明确规定：响应结束、进程退出、限额/认证失败、`context compacted` 后的新进程续接，都属于 `runtime-owned`，而不是要求 manager/worker 自行恢复。
 - 当应运行的 worker supervisor 已掉线时，manager runtime 会先尝试脚本级拉起该 worker；只有脚本恢复后仍异常的情况，才继续留给主管 AI 做告警与后续编排。
@@ -49,6 +50,7 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
 - `docs/system/workspace/scripts/start-lead-agent.sh`
 - `docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert`
 - `docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
+- `docs/system/workspace/scripts/tests/test-freely-manager-runtime-does-not-switch-accounts`
 - `docs/system/workspace/scripts/tests/test-freely-status-pid-ownership`
 - `docs/system/workspace/scripts/tests/test-wt-fleet-status`
 - `docs/system/workspace/agents/manager-agent.md`
@@ -62,6 +64,7 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
   - `bash docs/system/workspace/scripts/tests/test-freely-supervisor-loop`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-does-not-switch-accounts`
   - `bash docs/system/workspace/scripts/tests/test-freely-status-pid-ownership`
   - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status`
   - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
@@ -69,6 +72,10 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
   - 主管是否在 worker 掉线时优先进入 supervision alert
   - 工位状态是否能正确保留 `desired runtime` 和 `exit reason`
   - 角色边界是否已经从预研提升为正式能力文档
+  - manager / worker runtime 是否已经停止直接操作全局 Codex 账号
+- 最新验证事实：
+  - `test-freely-manager-runtime-does-not-switch-accounts` 已覆盖 worker 命中 auth failure 时不再执行 `ai switch`，而是留下 `runtime-owned` 退出原因并退出本地 supervisor
+  - 主管/worker 的全局账号恢复 owner 已进一步收紧到外层 global watchdog / account controller
 
 ## Next
 
