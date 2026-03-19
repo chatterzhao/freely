@@ -61,6 +61,7 @@
   - 路由、监控、worktree、merge 等脚本测试真源
 - `worktree/wt-fleet-status`
   - 以项目级视图展示所有 worktree 的 branch / dirty / checkpoint / runtime 状态
+  - 同时暴露 `desired runtime` / `role` / `exit reason`，供主管判断哪些工位是正常冻结，哪些是应运行但已掉线
 
 ## 输入面
 

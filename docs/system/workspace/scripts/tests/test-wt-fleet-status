@@ -31,9 +31,19 @@ cat >"$TMP_DIR/repo-worktrees/feature-demo-a/.freely/run/session-state.env" <<'E
 LAST_PHASE_HINT="in_dev"
 LAST_ISSUE_HINT="Probe Bridge"
 EOF
+cat >"$TMP_DIR/repo-worktrees/feature-demo-a/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_ROLE_HINT="worker"
+LAST_EXIT_REASON="ai_exit_rc_0"
+EOF
 cat >"$TMP_DIR/repo-worktrees/feature-demo-b/.freely/run/session-state.env" <<'EOF'
 LAST_PHASE_HINT="done_ibm"
 LAST_ISSUE_HINT="Boundary Contract"
+EOF
+cat >"$TMP_DIR/repo-worktrees/feature-demo-b/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_ROLE_HINT="worker"
+LAST_EXIT_REASON="operator_stop"
 EOF
 
 OUTPUT="$(bash "$ROOT_DIR/bin/wt-fleet-status" --project "$REPO")"
@@ -41,7 +51,9 @@ printf '%s\n' "$OUTPUT" | grep -q 'CHECKPOINT'
 printf '%s\n' "$OUTPUT" | grep -q 'feature/demo-a'
 printf '%s\n' "$OUTPUT" | grep -q 'feature/demo-b'
 printf '%s\n' "$OUTPUT" | grep -q 'DIRTY'
+printf '%s\n' "$OUTPUT" | grep -q 'running'
+printf '%s\n' "$OUTPUT" | grep -q 'worker'
 printf '%s\n' "$OUTPUT" | grep -q 'Probe Bridge'
 printf '%s\n' "$OUTPUT" | grep -q 'Boundary Contract'
 
-echo "[PASS] wt-fleet-status reports runtime-backed phase and issue hints"
+echo "[PASS] wt-fleet-status reports runtime-backed phase, issue, and desired runtime hints"

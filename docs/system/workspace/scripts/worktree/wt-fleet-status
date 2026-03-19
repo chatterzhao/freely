@@ -48,6 +48,13 @@ extract_issue_hint() {
   awk -F '"' '/^LAST_ISSUE_HINT=/{print $2; exit}' "$session_state"
 }
 
+extract_workcell_state_value() {
+  local worktree="$1" key="$2"
+  local workcell_state="$worktree/.freely/run/workcell-state.env"
+  [[ -f "$workcell_state" ]] || return 0
+  awk -F '"' -v key="$key" '$1 == key "=" {print $2; exit}' "$workcell_state"
+}
+
 checkpoint_guard_bin_for_project() {
   local project="$1"
   if [[ -x "$project/bin/checkpoint-guard" ]]; then
@@ -91,6 +98,9 @@ while IFS='|' read -r wt_path wt_branch; do
   changed_files="$(json_int_value "$checkpoint_json" changed_files)"
   phase_hint="$(extract_phase_hint "$wt_path")"
   issue_hint="$(extract_issue_hint "$wt_path")"
+  desired_runtime_state="$(extract_workcell_state_value "$wt_path" DESIRED_RUNTIME_STATE)"
+  role_hint="$(extract_workcell_state_value "$wt_path" LAST_ROLE_HINT)"
+  exit_reason="$(extract_workcell_state_value "$wt_path" LAST_EXIT_REASON)"
 
   supervisor="down"
   ai="down"
@@ -107,7 +117,7 @@ while IFS='|' read -r wt_path wt_branch; do
     fi
   fi
 
-  worktree_rows+=("$wt_path|$wt_branch|$dirty_state|${checkpoint_required:-false}|${changed_files:-0}|$supervisor|$ai|${phase_hint:-unavailable}|${issue_hint:-unavailable}")
+  worktree_rows+=("$wt_path|$wt_branch|$dirty_state|${checkpoint_required:-false}|${changed_files:-0}|$supervisor|$ai|${phase_hint:-unavailable}|${issue_hint:-unavailable}|${desired_runtime_state:-stopped}|${role_hint:-unavailable}|${exit_reason:-unavailable}")
 done < <(git -C "$PROJECT_ROOT" worktree list --porcelain | awk '
   /^worktree / { wt=substr($0, 10); br="" }
   /^branch / { br=$2; sub(/^refs\/heads\//, "", br); print wt "|" br }
@@ -117,19 +127,19 @@ if [[ "$FORMAT" == "json" ]]; then
   printf '['
   first=1
   for row in "${worktree_rows[@]}"; do
-    IFS='|' read -r wt_path wt_branch dirty checkpoint_required changed_files supervisor ai phase issue <<<"$row"
+    IFS='|' read -r wt_path wt_branch dirty checkpoint_required changed_files supervisor ai phase issue desired_runtime_state role_hint exit_reason <<<"$row"
     [[ "$first" -eq 0 ]] && printf ','
     first=0
-    printf '{"worktree":"%s","branch":"%s","dirty_state":"%s","checkpoint_required":%s,"changed_files":%s,"supervisor":"%s","ai":"%s","phase_hint":"%s","issue_hint":"%s"}' \
-      "$wt_path" "$wt_branch" "$dirty" "$checkpoint_required" "$changed_files" "$supervisor" "$ai" "$phase" "$issue"
+    printf '{"worktree":"%s","branch":"%s","dirty_state":"%s","checkpoint_required":%s,"changed_files":%s,"supervisor":"%s","ai":"%s","phase_hint":"%s","issue_hint":"%s","desired_runtime_state":"%s","role_hint":"%s","exit_reason":"%s"}' \
+      "$wt_path" "$wt_branch" "$dirty" "$checkpoint_required" "$changed_files" "$supervisor" "$ai" "$phase" "$issue" "$desired_runtime_state" "$role_hint" "$exit_reason"
   done
   printf ']\n'
   exit 0
 fi
 
-printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-18s %s\n' "WORKTREE" "BRANCH" "DIRTY" "CHECKPOINT" "FILES" "SUPERVISOR" "AI" "PHASE" "ISSUE"
+printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-10s %-10s %-18s %s\n' "WORKTREE" "BRANCH" "DIRTY" "CHECKPOINT" "FILES" "SUPERVISOR" "AI" "DESIRED" "ROLE" "PHASE" "ISSUE"
 for row in "${worktree_rows[@]}"; do
-  IFS='|' read -r wt_path wt_branch dirty checkpoint_required changed_files supervisor ai phase issue <<<"$row"
-  printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-18s %s\n' \
-    "$wt_path" "$wt_branch" "$dirty" "$checkpoint_required" "$changed_files" "$supervisor" "$ai" "$phase" "$issue"
+  IFS='|' read -r wt_path wt_branch dirty checkpoint_required changed_files supervisor ai phase issue desired_runtime_state role_hint exit_reason <<<"$row"
+  printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-10s %-10s %-18s %s\n' \
+    "$wt_path" "$wt_branch" "$dirty" "$checkpoint_required" "$changed_files" "$supervisor" "$ai" "$desired_runtime_state" "$role_hint" "$phase" "$issue"
 done
