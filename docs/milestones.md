@@ -78,7 +78,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/candidates.md`
 - next_action: runtime/status 的 dirty budget、project-level worktree summary、脚本级测试与 review 已落盘；当前保持 `in_verification`。本轮 `wt-status-all` 为 `Summary: total=6, dirty=1`，且唯一 dirty 工位就是当前 issue 的 verification continuity，因此无需分流无关改动，但仍未满足 promote / cleanup 前提；完成当前收口后再回到 `I-20260307-1201` 与 `I-20260308-0101` 做 completion verification / cleanup
 
-4. `I-20260318-1630`
+4. `I-20260318-1408`
+- title: Manager self-supervision and autonomous recovery
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
+- source_brainstorm: `docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md`
+- next_action: 主管自治的最小实现、PID 归属修复、fleet supervision alert、角色文档与“manager/worker runtime 不直接切全局账号”的回归均已落盘；当前保持 `in_verification`。下一步先做 review 与 promote/cleanup 判断，再决定是否并回 `develop`。更外层的 manager watchdog/ensure 仍是边界外后续问题，不在本批次继续扩 scope。
+
+5. `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
 - milestone_state: committed
 - phase_state: `in_verification`
