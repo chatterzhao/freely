@@ -177,6 +177,21 @@ start_manager() {
   printf '%s\n' "$!"
 }
 
+wait_for_pid_gone() {
+  local pid="$1" timeout="$2"
+  local start_ts now
+  [[ -n "$pid" ]] || return 0
+  start_ts="$(date +%s)"
+  while kill -0 "$pid" 2>/dev/null; do
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout )); then
+      return 1
+    fi
+    sleep 1
+  done
+  return 0
+}
+
 wait_for_manager_supervisor() {
   local timeout="$1"
   local start_ts now supervisor_pid
@@ -408,5 +423,5 @@ current_after_bad_switch=""
 done
 
 stop_manager
-wait "$baseline_pid" 2>/dev/null || true
+wait_for_pid_gone "$baseline_pid" 15 || true
 echo "[PASS] live global account recovery succeeded for all configured bad accounts"
