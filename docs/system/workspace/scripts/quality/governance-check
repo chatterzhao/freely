@@ -6,9 +6,24 @@ required_files=(
   "docs/CONSTITUTION.md"
   "docs/LAWS.md"
   "AGENTS.md"
+  "docs/system/workspace/three-loop-capability-lifecycle.md"
   "docs/pre-brainstorms/README.md"
   "docs/pre-brainstorms/INDEX.md"
   "docs/pre-brainstorms/CONVERGENCE.md"
+)
+
+three_loop_reference_targets=(
+  "docs/CONSTITUTION.md"
+  "docs/PROJECT_INTENT.md"
+  "docs/system/workspace/scripts/README.md"
+  "docs/system/workspace/skills/README.md"
+  "docs/system/workspace/agents/lead-agent.md"
+  "docs/system/workspace/agents/manager-agent.md"
+  "docs/system/workspace/agents/worker-agent.md"
+  "docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md"
+  "docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md"
+  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md"
+  "docs/system/workspace/skills/dev-loop-execution/SKILL.md"
 )
 
 errors=0
@@ -36,6 +51,12 @@ check_no_tbd() {
   fi
 }
 
+check_three_loop_reference() {
+  local file="$1"
+  rg -n --fixed-strings "docs/system/workspace/three-loop-capability-lifecycle.md" "$file" >/dev/null 2>&1 \
+    || fail "missing three-loop lifecycle reference in $file"
+}
+
 check_entry_naming() {
   local entry="$1"
   # 新格式：YYYYMMDD-HHMM--<topic>（时间后双短横线）
@@ -57,6 +78,11 @@ check_entry_naming() {
 for file in "${required_files[@]}"; do
   check_file_exists "$file"
   check_no_tbd "$file"
+done
+
+for file in "${three_loop_reference_targets[@]}"; do
+  check_file_exists "$file"
+  check_three_loop_reference "$file"
 done
 
 entries=()
