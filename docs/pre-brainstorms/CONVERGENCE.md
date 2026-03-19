@@ -259,6 +259,27 @@
     - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
     - `bash docs/system/workspace/scripts/tests/test-freely-global-account-watchdog-live`
 
+## 变更（2026-03-19 watchdog 控制面命名收敛与旧工位退休）
+
+### 收敛结论
+- `feature/independent-ai-watchdog-productization-20260318`
+  - 问题：该 worktree 的核心实现能力已进入 `develop`，但其独有研究提交仍保留了“watchdog 是否应作为上层控制面总称”与“历史 worktree retirement heuristic”两类治理结论；若直接删除，会丢失承接关系；若继续保留，又会把它误当作活跃执行枝。
+  - 结论：将旧工位判定为 `materialize_then_retire`。其剩余价值统一交接到 `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/`，并把 `watchdog` 正式上提为 umbrella term：
+    - `availability watchdog`
+    - `runtime watchdog`
+    - `continuity watchdog`
+  - 旧工位唯一提交与价值：
+    - commit: `172e0f6` `Add watchdog productization and worktree retirement pre-brainstorm`
+    - commit: `36e44ad` `Refine watchdog productization and restack policy`
+    - unique files: `docs/pre-brainstorms/20260318-1735--independent-ai-watchdog-productization-and-worktree-retirement/*`
+  - 新承接落点：
+    - `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md`
+    - `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/candidates.md`
+  - cleanup 结果：
+    - retired branch: `feature/independent-ai-watchdog-productization-20260318`
+    - removed worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260318-feature-independent-ai-watchdog-productization`
+    - reason: old branch no longer owns active implementation; governance conclusions have been handed off to the new watchdog control-plane pre-brainstorm
+
 ## 变更（2026-03-18 URL 内容摄取 skill 物化）
 
 ### 收敛结论

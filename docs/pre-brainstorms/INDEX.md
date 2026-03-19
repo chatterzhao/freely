@@ -145,6 +145,9 @@
 - 20260319-0148--context-compaction-salvage-and-retirement
   - brainstorms: docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/brainstorms.md
   - candidates: docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md
+- 20260319-0220--watchdog-control-plane-governance
+  - brainstorms: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
