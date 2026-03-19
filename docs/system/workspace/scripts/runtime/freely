@@ -14,6 +14,7 @@ usage() {
 Usage:
   freely init --project <abs_path> --intent <abs_file> --constitution <abs_file> --ai <tool[:model][:mode]> [--reasoning-effort <effort>]
   freely doctor --project <abs_path>
+  freely ensure-manager --project <abs_path> [--watch] [--interval <seconds>]
   freely start --project <abs_path>
   freely status --project <abs_path>
   freely fleet-status --project <abs_path>
@@ -132,6 +133,11 @@ handoff_file() {
   echo "$(run_dir_for_project "$project")/session-handoff.txt"
 }
 
+manager_bootstrap_handoff_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/manager-bootstrap-handoff.txt"
+}
+
 codex_account_cooldown_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/codex-account-cooldowns.tsv"
@@ -140,6 +146,11 @@ codex_account_cooldown_file() {
 stop_marker_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/stop.requested"
+}
+
+ensure_manager_watchdog_pid_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/ensure-manager.pid"
 }
 
 discover_supervisor_pid() {
@@ -162,6 +173,11 @@ pid_matches_project() {
 valid_supervisor_pid_for_project() {
   local project="$1" pid="$2"
   pid_matches_project "$pid" "$project" "runtime/freely start --project"
+}
+
+valid_ensure_manager_watchdog_pid_for_project() {
+  local project="$1" pid="$2"
+  pid_matches_project "$pid" "$project" "runtime/freely ensure-manager --project"
 }
 
 valid_ai_pid_for_project() {
@@ -551,6 +567,57 @@ EOF
   cat "$handoff_path"
 }
 
+write_manager_bootstrap_handoff() {
+  local project="$1" trigger="$2" previous_account="$3" active_account="$4" reason="$5" next_action="$6"
+  local handoff_path branch fleet_snapshot
+  handoff_path="$(handoff_file "$project")"
+  branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
+  fleet_snapshot="$(fleet_status_text_for_project "$project")"
+
+  cat >"$handoff_path" <<EOF
+# Session Handoff
+
+- rotation_reason: manager_bootstrap_watchdog
+- previous_launch_kind: ensure-manager
+- previous_tool_session_id: unavailable://manager-relaunched-by-script
+- previous_tool_jsonl_path: unavailable://manager-relaunched-by-script
+- previous_cycle_log: unavailable://manager-relaunched-by-script
+- previous_context_ratio: unavailable
+- previous_route_only_handoff: 0
+- previous_project_dirty_entries: 0
+- previous_worktree_summary_total: 0
+- previous_worktree_summary_dirty: 0
+- branch: ${branch:-unknown}
+- worktree_path: $project
+
+## Manager Bootstrap Recovery
+- trigger: ${trigger:-unknown}
+- previous_account: ${previous_account:-unavailable}
+- active_account: ${active_account:-unavailable}
+- reason: ${reason:-unavailable}
+- next_action: ${next_action:-check-fleet-and-continue}
+
+## What To Handle First
+- The previous manager chain stopped or became unusable before this new session started.
+- First inspect the fleet snapshot and decide which worktrees should keep running, which should be resumed, and which should remain stopped.
+- If a worktree is expected-running but currently down, decide whether runtime recovery should proceed with resume or whether a fresh_with_handoff rotation is safer.
+- Do not redo global account switching here; that recovery was already owned by the watchdog script.
+
+## Summary Target Hint
+$(context_summary_target_hint)
+EOF
+
+  if [[ -n "$fleet_snapshot" ]]; then
+    cat >>"$handoff_path" <<EOF
+
+## Fleet Snapshot
+\`\`\`
+$fleet_snapshot
+\`\`\`
+EOF
+  fi
+}
+
 append_context_warning_if_needed() {
   if [[ "${LAUNCH_KIND_SELECTED:-}" != "resume" ]]; then
     return 0
@@ -800,6 +867,17 @@ codex_account_cooldown_reset_at() {
   awk -F '\t' -v account="$normalized" '$1 == account {print $2}' "$file" | tail -n 1
 }
 
+codex_clear_account_cooldown() {
+  local project="$1" account="$2"
+  local file tmp normalized
+  normalized="$(normalize_codex_account_name "$account")"
+  file="$(codex_account_cooldown_file "$project")"
+  [[ -f "$file" ]] || return 0
+  tmp="${file}.tmp"
+  awk -F '\t' -v account="$normalized" '$1 != account {print $1 "\t" $2}' "$file" >"$tmp"
+  mv "$tmp" "$file"
+}
+
 codex_account_is_available_now() {
   local project="$1" account="$2"
   local reset_at
@@ -858,16 +936,96 @@ select_earliest_reset_codex_account() {
   fi
 }
 
+select_any_available_codex_account() {
+  local project="$1" candidate
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    if codex_account_is_available_now "$project" "$candidate"; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done < <(codex_saved_accounts "$project")
+}
+
+select_earliest_reset_codex_account_any() {
+  local project="$1" candidate reset_at best_account="" best_reset=""
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    reset_at="$(codex_account_cooldown_reset_at "$project" "$candidate")"
+    [[ -n "$reset_at" ]] || continue
+    if [[ -z "$best_reset" || "$reset_at" -lt "$best_reset" ]]; then
+      best_account="$candidate"
+      best_reset="$reset_at"
+    fi
+  done < <(codex_saved_accounts "$project")
+  if [[ -n "$best_account" ]]; then
+    printf '%s|%s\n' "$best_account" "$best_reset"
+  fi
+}
+
+codex_probe_current_account_now() {
+  local project="$1" prompt_file output_file rc
+  prompt_file="$(mktemp)"
+  output_file="$(mktemp)"
+  printf 'Reply with exactly: OK\n' >"$prompt_file"
+  rc=0
+  (
+    cd "$project"
+    if [[ -n "${AI_MODEL:-}" ]]; then
+      codex exec \
+        --skip-git-repo-check \
+        -C "$project" \
+        -m "$AI_MODEL" \
+        -c "model_reasoning_effort=\"${AI_REASONING_EFFORT:-medium}\"" \
+        --dangerously-bypass-approvals-and-sandbox \
+        - <"$prompt_file"
+    else
+      codex exec \
+        --skip-git-repo-check \
+        -C "$project" \
+        -c "model_reasoning_effort=\"${AI_REASONING_EFFORT:-medium}\"" \
+        --dangerously-bypass-approvals-and-sandbox \
+        - <"$prompt_file"
+    fi
+  ) >"$output_file" 2>&1 || rc=$?
+  rm -f "$prompt_file"
+  if [[ "$rc" -eq 0 ]] && rg -q '^OK$' "$output_file"; then
+    rm -f "$output_file"
+    return 0
+  fi
+  rm -f "$output_file"
+  return 1
+}
+
+probe_any_usable_codex_account_now() {
+  local project="$1" candidate
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    switch_to_codex_account "$project" "$candidate" "probe_saved_accounts" >/dev/null || continue
+    if codex_probe_current_account_now "$project"; then
+      codex_clear_account_cooldown "$project" "$candidate"
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done < <(codex_saved_accounts "$project")
+}
+
 switch_to_codex_account() {
   local project="$1" account="$2" reason="$3"
-  local ai_bin output
+  local ai_bin output actual_account requested_normalized actual_normalized
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" && -n "$account" ]] || return 1
   output="$("$ai_bin" --quiet --format json switch codex "$account" --yes 2>/dev/null || true)"
-  if printf '%s\n' "$output" | rg -q '"switched": *true'; then
+  requested_normalized="$(normalize_codex_account_name "$account")"
+  actual_account="$(codex_current_account "$project")"
+  actual_normalized="$(normalize_codex_account_name "$actual_account")"
+  if printf '%s\n' "$output" | rg -q '"switched": *true' && [[ -n "$actual_account" && "$actual_normalized" == "$requested_normalized" ]]; then
     log_warn "auto-switched codex account to $account (reason=$reason)" >&2
     printf '%s\n' "$account"
     return 0
+  fi
+  if [[ -n "$actual_account" ]]; then
+    log_warn "codex account switch verification failed (requested=$account actual=$actual_account reason=$reason)" >&2
   fi
   return 1
 }
@@ -879,6 +1037,177 @@ switch_to_next_codex_account() {
   next_account="$(select_next_codex_account "$project" "$current_account")"
   [[ -n "$next_account" ]] || return 1
   switch_to_codex_account "$project" "$next_account" "$reason"
+}
+
+ensure_codex_account_ready_for_manager() {
+  local project="$1"
+  local current_account available_account probed_account earliest_info earliest_account earliest_reset wait_seconds
+
+  current_account="$(codex_current_account "$project")"
+  if [[ -n "$current_account" ]] && codex_account_is_available_now "$project" "$current_account"; then
+    return 0
+  fi
+
+  available_account="$(select_any_available_codex_account "$project")"
+  if [[ -n "$available_account" ]]; then
+    if [[ -z "$current_account" || "$available_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
+      switch_to_codex_account "$project" "$available_account" "ensure_manager" >/dev/null
+      write_manager_bootstrap_handoff "$project" "account_unavailable" "$current_account" "$available_account" "watchdog_switched_to_available_account" "inspect-fleet-and-recover-workers"
+    fi
+    return 0
+  fi
+
+  probed_account="$(probe_any_usable_codex_account_now "$project" || true)"
+  if [[ -n "$probed_account" ]]; then
+    write_manager_bootstrap_handoff "$project" "stale_or_missing_cooldown_probe" "$current_account" "$probed_account" "watchdog_probed_and_found_usable_account" "inspect-fleet-and-recover-workers"
+    return 0
+  fi
+
+  earliest_info="$(select_earliest_reset_codex_account_any "$project")"
+  earliest_account="${earliest_info%%|*}"
+  earliest_reset="${earliest_info##*|}"
+  if [[ -n "$earliest_account" && -n "$earliest_reset" && "$earliest_info" == *"|"* ]]; then
+    if [[ -z "$current_account" || "$earliest_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
+      switch_to_codex_account "$project" "$earliest_account" "all_accounts_cooling_down" >/dev/null || true
+    fi
+    write_manager_bootstrap_handoff "$project" "all_accounts_cooling_down" "$current_account" "$earliest_account" "watchdog_waiting_for_earliest_reset" "recheck-account-availability-before-manager-bootstrap"
+    wait_seconds="$(seconds_until_epoch "$earliest_reset")"
+    if [[ "${wait_seconds:-0}" =~ ^[0-9]+$ ]] && (( wait_seconds > 0 )); then
+      log_warn "all codex accounts cooling down before manager bootstrap; sleeping until reset_at=${earliest_reset} (sleep=${wait_seconds}s)"
+      sleep_with_rate_limit_recheck "$project" "$wait_seconds"
+    fi
+    available_account="$(select_any_available_codex_account "$project")"
+    if [[ -n "$available_account" ]]; then
+      if [[ -z "$current_account" || "$available_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
+        switch_to_codex_account "$project" "$available_account" "ensure_manager" >/dev/null || true
+      fi
+      write_manager_bootstrap_handoff "$project" "cooldown_elapsed" "$earliest_account" "$available_account" "watchdog_resumed_after_wait" "inspect-fleet-and-recover-workers"
+      return 0
+    fi
+  fi
+
+  log_error "no codex account is currently available for manager bootstrap"
+  return 1
+}
+
+launch_manager_supervisor() {
+  local project="$1"
+  local launch_bin
+  launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
+  bash "$launch_bin" start --project "$project" >/dev/null 2>&1 &
+  disown "$!" 2>/dev/null || true
+}
+
+manager_supervisor_pid_for_project() {
+  local project="$1" run_dir sp
+  run_dir="$(run_dir_for_project "$project")"
+  if [[ -f "$run_dir/supervisor.pid" ]]; then
+    sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
+    if valid_supervisor_pid_for_project "$project" "$sp"; then
+      printf '%s\n' "$sp"
+      return 0
+    fi
+  fi
+  discover_supervisor_pid "$project"
+}
+
+manager_ai_pid_for_project() {
+  local project="$1" run_dir ap
+  run_dir="$(run_dir_for_project "$project")"
+  if [[ -f "$run_dir/ai.pid" ]]; then
+    ap="$(cat "$run_dir/ai.pid" 2>/dev/null || true)"
+    if valid_ai_pid_for_project "$project" "$ap"; then
+      printf '%s\n' "$ap"
+      return 0
+    fi
+  fi
+}
+
+restart_manager_supervisor_preserving_handoff() {
+  local project="$1" run_dir ai_pid supervisor_pid
+  run_dir="$(run_dir_for_project "$project")"
+  ai_pid="$(manager_ai_pid_for_project "$project")"
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  if [[ -n "$ai_pid" ]]; then
+    kill "$ai_pid" 2>/dev/null || true
+    rm -f "$run_dir/ai.pid"
+  fi
+  if [[ -n "$supervisor_pid" ]]; then
+    kill "$supervisor_pid" 2>/dev/null || true
+    rm -f "$run_dir/supervisor.pid"
+  fi
+  for _ in $(seq 1 20); do
+    if [[ -n "$supervisor_pid" ]] && kill -0 "$supervisor_pid" 2>/dev/null; then
+      sleep 0.2
+      continue
+    fi
+    break
+  done
+}
+
+ensure_manager_once() {
+  local project="$1"
+  local run_dir sup_pid_file current_pid current_account current_ai_pid
+
+  run_dir="$(run_dir_for_project "$project")"
+  sup_pid_file="$run_dir/supervisor.pid"
+  mkdir -p "$run_dir"
+  current_pid=""
+  if [[ -f "$sup_pid_file" ]]; then
+    current_pid="$(cat "$sup_pid_file" 2>/dev/null || true)"
+    if ! valid_supervisor_pid_for_project "$project" "$current_pid"; then
+      current_pid=""
+    fi
+  fi
+  if [[ -z "$current_pid" ]]; then
+    current_pid="$(discover_supervisor_pid "$project")"
+  fi
+
+  if [[ "$AI_TOOL" == "codex" ]]; then
+    current_account="$(codex_current_account "$project")"
+    current_ai_pid="$(manager_ai_pid_for_project "$project")"
+    if [[ -n "$current_pid" ]] && [[ -n "$current_account" ]] && ! codex_account_is_available_now "$project" "$current_account" && [[ -z "$current_ai_pid" ]]; then
+      log_warn "manager supervisor is idle on an unavailable codex account ($current_account); restarting manager under watchdog control"
+      write_manager_bootstrap_handoff "$project" "manager_limit_detected" "$current_account" "$current_account" "manager_process_ended_on_unavailable_account" "relaunch-manager-after-account-recovery"
+      restart_manager_supervisor_preserving_handoff "$project"
+      current_pid=""
+    fi
+    ensure_codex_account_ready_for_manager "$project"
+  fi
+
+  if [[ -n "$current_pid" ]]; then
+    log_info "manager supervisor already running (pid=$current_pid)"
+    return 0
+  fi
+
+  launch_manager_supervisor "$project"
+  log_info "manager bootstrap requested"
+}
+
+cmd_ensure_manager_watch() {
+  local project="$1" interval="$2" pid_file run_dir existing_pid
+  run_dir="$(run_dir_for_project "$project")"
+  pid_file="$(ensure_manager_watchdog_pid_file "$project")"
+  mkdir -p "$run_dir"
+
+  if [[ -f "$pid_file" ]]; then
+    existing_pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$existing_pid"; then
+      log_info "ensure-manager watchdog already running (pid=$existing_pid)"
+      return 0
+    fi
+  fi
+
+  echo "$$" >"$pid_file"
+  trap 'rm -f "$pid_file"' EXIT
+
+  while true; do
+    if [[ -f "$(stop_marker_file "$project")" ]]; then
+      exit 0
+    fi
+    ensure_manager_once "$project"
+    sleep "$interval"
+  done
 }
 
 build_prompt() {
@@ -1166,6 +1495,38 @@ cmd_start() {
   done
 }
 
+cmd_ensure_manager() {
+  local project="" branch="" watch_mode="0" watch_interval="5"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --watch) watch_mode="1"; shift ;;
+      --interval) watch_interval="${2:-}"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  [[ -n "$project" ]] || { usage; exit 1; }
+  [[ "$watch_interval" =~ ^[0-9]+$ ]] || { log_error "ensure-manager --interval must be a positive integer"; exit 1; }
+  load_config "$project"
+  check_doc_gate_or_fail "$project" || {
+    log_error "ensure-manager blocked by doc gate"
+    exit 1
+  }
+
+  branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
+  if [[ "$branch" != "develop" ]]; then
+    log_error "ensure-manager only supports the develop manager worktree (current branch: ${branch:-unknown})"
+    exit 1
+  fi
+
+  if [[ "$watch_mode" == "1" ]]; then
+    cmd_ensure_manager_watch "$project" "$watch_interval"
+    return 0
+  fi
+
+  ensure_manager_once "$project"
+}
+
 cmd_doctor() {
   local project=""
   while [[ $# -gt 0 ]]; do
@@ -1360,6 +1721,14 @@ cmd_stop() {
     [[ -n "$ap" ]] && kill "$ap" 2>/dev/null || true
     rm -f "$run_dir/ai.pid"
   fi
+  if [[ -f "$(ensure_manager_watchdog_pid_file "$project")" ]]; then
+    local wp
+    wp="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$wp"; then
+      [[ -n "$wp" ]] && kill "$wp" 2>/dev/null || true
+    fi
+    rm -f "$(ensure_manager_watchdog_pid_file "$project")"
+  fi
   if [[ -f "$run_dir/supervisor.pid" ]]; then
     local sp
     sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
@@ -1394,6 +1763,7 @@ main() {
   case "$cmd" in
     init) cmd_init "$@" ;;
     doctor) cmd_doctor "$@" ;;
+    ensure-manager) cmd_ensure_manager "$@" ;;
     start) cmd_start "$@" ;;
     status) cmd_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;

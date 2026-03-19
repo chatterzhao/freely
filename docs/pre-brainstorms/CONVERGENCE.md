@@ -219,6 +219,31 @@
 - branch: `feature/dogfood-codex-auto-20260316`
 - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260316-feature-dogfood-codex-auto`
 
+## 变更（2026-03-18 全局账号 watchdog 真实 probe 验证）
+
+### 收敛结论
+- `C-20260318-A` 已提升为 `I-20260318-1630` `Global AI account watchdog and manager bootstrap`
+  - 问题：官方没有可直接查询“多个本地保存 Codex 账号当前可用性”的本地 CLI；本地 cooldown 账本会过时，不能当真理
+  - 结论：全局 watchdog 采用“账本排序 + 真实 probe”策略；若坏号导致当前 AI 结束，由脚本切到真实可用号并拉起新的主管 Codex，再继续监督
+  - 已完成实现落点：`docs/system/workspace/scripts/runtime/ai-cli`、`docs/system/workspace/scripts/runtime/freely`、`docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`、`docs/system/workspace/scripts/tests/test-freely-ensure-manager`、`docs/system/workspace/scripts/tests/test-freely-global-account-watchdog-live`
+  - 验证证据：
+    - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
+    - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
+    - `bash docs/system/workspace/scripts/tests/test-freely-global-account-watchdog-live`
+    - live 结果：`worahe3972@outlook.com -> worahe3971@outlook.com` 与 `worahe3973@outlook.com -> worahe3971@outlook.com` 均通过
+  - 当前状态：进入 `in_verification`，等待 completion verification / review 与主线 promotion 判断
+
+## 变更（2026-03-18 全局账号 watchdog 与主管拉起）
+
+### 收敛结论
+- `C-20260318-A` 已提升为 `I-20260318-1630` `Global AI account watchdog and manager bootstrap`
+  - 问题：当全局 Codex 账号不可用时，任何 AI 都可能同时失活，不能再依赖 manager/worker 自行恢复
+  - 结论：把全局账号切换与主管拉起收为纯脚本职责；当前先通过 `freely ensure-manager` 落下 CLI-first 入口
+  - 当前实现落点：`docs/system/workspace/scripts/runtime/freely`、`docs/system/workspace/scripts/runtime/ai-cli`、`docs/system/workspace/scripts/tests/test-freely-ensure-manager`、`docs/system/workspace/scripts/tests/test-freely-global-account-watchdog-live`
+  - 当前状态：`in_verification`
+  - 最新验证事实：watchdog 现在会在拉起主管前写 manager bootstrap handoff，说明触发 limit/切号/等待原因和主管应优先检查的工位面；live 测试也已收紧为“未显式给好账号时，先真实 probe 当前可用账号，再验证坏号恢复”
+  - 下一步：completion verification / review，并与 manager 自治主线一起判断 promotion 顺序
+
 ## 变更（2026-03-18 checkpoint commit 与多 worktree 监督治理）
 
 ### 收敛结论
