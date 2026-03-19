@@ -219,6 +219,17 @@
 - branch: `feature/dogfood-codex-auto-20260316`
 - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260316-feature-dogfood-codex-auto`
 
+## 变更（2026-03-18 全局账号 watchdog 与主管拉起）
+
+### 收敛结论
+- `C-20260318-A` 已提升为 `I-20260318-1630` `Global AI account watchdog and manager bootstrap`
+  - 问题：当全局 Codex 账号不可用时，任何 AI 都可能同时失活，不能再依赖 manager/worker 自行恢复
+  - 结论：把全局账号切换与主管拉起收为纯脚本职责；当前先通过 `freely ensure-manager` 落下 CLI-first 入口
+  - 当前实现落点：`docs/system/workspace/scripts/runtime/freely`、`docs/system/workspace/scripts/runtime/ai-cli`、`docs/system/workspace/scripts/tests/test-freely-ensure-manager`、`docs/system/workspace/scripts/tests/test-freely-global-account-watchdog-live`
+  - 当前状态：`in_dev`
+  - 最新验证事实：真实坏账号回切链已触发，但当前配置的好账号 `worahe3971@outlook.com` 在主管重拉起时同样命中 usage limit，live 测试因此被环境前提阻塞
+  - 下一步：在真实可用好账号前提下重跑 live 测试，并验证主管恢复后继续监督工位
+
 ## 变更（2026-03-18 checkpoint commit 与多 worktree 监督治理）
 
 ### 收敛结论

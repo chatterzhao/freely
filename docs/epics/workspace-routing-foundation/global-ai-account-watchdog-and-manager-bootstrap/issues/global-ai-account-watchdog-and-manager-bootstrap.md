@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- phase_state: `in_ibm`
+- phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-ai-account-watchdog-and-manager-bootstrap`
@@ -30,13 +30,15 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 4. 提供一条 live 集成测试脚本，验证：
    - 先用可用账号启动监控/主管链
    - 监控链已运行后，故意切到不可用账号
-   - 最终自动切回可用账号并恢复主管
+   - 每次切号后都由脚本重新拉起新的 Codex 进程，并优先 `resume` 恢复会话
+   - 最终自动切回可用账号并恢复主管；若所有账号都不可用，则切到最早恢复账号并等待唤醒
 
 ## Acceptance
 
 - 文档明确区分三类 AI powerless 场景及其 owner。
 - 至少存在一个纯脚本入口，可在没有任何 AI 帮助时恢复账号并拉起主管。
 - live 集成测试脚本能验证“切到坏账号后自动切回好账号”的真实链路。
+- live 集成测试脚本能验证“切号 -> 新 Codex 进程启动 -> resume/续接 -> 继续监督”的真实链路。
 - 主管恢复后继续只承担监督和委派，不接管全局账号切换。
 
 ## Completion
@@ -54,7 +56,11 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
   - `freely ensure-manager` 是否是纯脚本，不依赖 AI
   - 当当前账号不可用时，是否能自动切到可用账号并拉起主管
   - live 测试是否能覆盖两个坏账号回切到一个好账号的真实链路
+- 最新 live 验证事实：
+  - 真实链路已确认会从坏账号切回 `worahe3971@outlook.com`
+  - 但当前环境下 `worahe3971@outlook.com` 在主管重新拉起时也命中了 usage limit，因此 live 测试当前仍未通过
+  - 这属于账号可用性前提未满足，不是 `ensure-manager` / 脚本切号职责边界本身的设计错误
 
 ## Next
 
-- 先保持 `in_ibm`，把正式职责、CLI 入口和 live 集成测试方案收敛清楚。
+- 保持 `in_dev`。当前已补 `freely ensure-manager`、脚本级回归和 live 测试的清晰失败口径；下一步在存在真实可用好账号的前提下重跑 live recovery 测试，并验证主管恢复后继续监督工位。

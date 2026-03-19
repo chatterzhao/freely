@@ -78,6 +78,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/candidates.md`
 - next_action: runtime/status 的 dirty budget、project-level worktree summary、脚本级测试与 review 已落盘；当前保持 `in_verification`。本轮 `wt-status-all` 为 `Summary: total=6, dirty=1`，且唯一 dirty 工位就是当前 issue 的 verification continuity，因此无需分流无关改动，但仍未满足 promote / cleanup 前提；完成当前收口后再回到 `I-20260307-1201` 与 `I-20260308-0101` 做 completion verification / cleanup
 
+4. `I-20260318-1630`
+- title: Global AI account watchdog and manager bootstrap
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
+- next_action: 纯脚本 `freely ensure-manager` 与账号选择回归已落地；下一步用真实账号完成 live recovery 测试，验证在坏账号下会自动切回 `worahe3971@outlook.com` 并恢复主管监督链
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

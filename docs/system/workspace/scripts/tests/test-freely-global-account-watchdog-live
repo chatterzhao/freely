@@ -47,6 +47,26 @@ stop_manager() {
   bash "$ROOT_DIR/bin/freely" stop --project "$MANAGER_PROJECT" >/dev/null 2>&1 || true
 }
 
+wait_for_manager_stopped() {
+  local timeout="$1"
+  local start_ts now supervisor_pid
+  start_ts="$(date +%s)"
+  while true; do
+    supervisor_pid="$(bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | sed -n 's/^supervisor_pid: //p')"
+    if [[ -z "$supervisor_pid" || "$supervisor_pid" == "none" ]]; then
+      return 0
+    fi
+    if ! kill -0 "$supervisor_pid" 2>/dev/null; then
+      return 0
+    fi
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout )); then
+      return 1
+    fi
+    sleep 2
+  done
+}
+
 start_manager() {
   local log_file="$1"
   bash "$ROOT_DIR/bin/freely" start --project "$MANAGER_PROJECT" >"$log_file" 2>&1 &
@@ -55,11 +75,46 @@ start_manager() {
 
 wait_for_manager_supervisor() {
   local timeout="$1"
-  local start_ts now
+  local start_ts now supervisor_pid
   start_ts="$(date +%s)"
   while true; do
-    if bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | rg -q '^supervisor_pid: [0-9]'; then
+    supervisor_pid="$(bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | sed -n 's/^supervisor_pid: //p')"
+    if [[ -n "$supervisor_pid" && "$supervisor_pid" != "none" ]] && kill -0 "$supervisor_pid" 2>/dev/null; then
       return 0
+    fi
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout )); then
+      return 1
+    fi
+    sleep 2
+  done
+}
+
+latest_cycle_log() {
+  local latest
+  latest="$(ls -t "$MANAGER_PROJECT/.freely/logs"/cycle-*.log 2>/dev/null | head -n 1 || true)"
+  [[ -n "$latest" ]] || return 1
+  printf '%s\n' "$latest"
+}
+
+latest_cycle_has_usage_limit() {
+  local latest
+  latest="$(latest_cycle_log || true)"
+  [[ -n "$latest" ]] || return 1
+  rg -q "usage limit|try again at" "$latest"
+}
+
+wait_for_manager_ai_ready() {
+  local timeout="$1"
+  local start_ts now ai_pid
+  start_ts="$(date +%s)"
+  while true; do
+    ai_pid="$(manager_ai_pid)"
+    if [[ -n "$ai_pid" && "$ai_pid" != "none" ]] && kill -0 "$ai_pid" 2>/dev/null; then
+      return 0
+    fi
+    if latest_cycle_has_usage_limit && [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]]; then
+      return 2
     fi
     now="$(date +%s)"
     if (( now - start_ts >= timeout )); then
@@ -87,10 +142,16 @@ wait_for_good_account() {
 
 wait_for_manager_status() {
   local timeout="$1"
-  local start_ts now
+  local start_ts now supervisor_pid ai_pid
   start_ts="$(date +%s)"
   while true; do
-    if bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | rg -q "last_active_account: ${GOOD_ACCOUNT//./\\.}"; then
+    supervisor_pid="$(bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | sed -n 's/^supervisor_pid: //p')"
+    ai_pid="$(bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | sed -n 's/^ai_pid: //p')"
+    if [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]] &&
+      [[ -n "$supervisor_pid" && "$supervisor_pid" != "none" ]] &&
+      [[ -n "$ai_pid" && "$ai_pid" != "none" ]] &&
+      kill -0 "$supervisor_pid" 2>/dev/null &&
+      kill -0 "$ai_pid" 2>/dev/null; then
       return 0
     fi
     now="$(date +%s)"
@@ -111,6 +172,30 @@ trigger_manager_relaunch() {
   if [[ -n "$ai_pid" && "$ai_pid" != "none" ]]; then
     kill "$ai_pid" 2>/dev/null || true
   fi
+  printf '%s\n' "$ai_pid"
+}
+
+wait_for_relaunched_manager_ai() {
+  local previous_ai_pid="$1" timeout="$2"
+  local start_ts now ai_pid
+  start_ts="$(date +%s)"
+  while true; do
+    ai_pid="$(manager_ai_pid)"
+    if [[ -n "$ai_pid" && "$ai_pid" != "none" ]] &&
+      kill -0 "$ai_pid" 2>/dev/null &&
+      [[ -z "$previous_ai_pid" || "$previous_ai_pid" == "none" || "$ai_pid" != "$previous_ai_pid" ]]; then
+      printf '%s\n' "$ai_pid"
+      return 0
+    fi
+    if latest_cycle_has_usage_limit && [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]]; then
+      return 2
+    fi
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout )); then
+      return 1
+    fi
+    sleep 2
+  done
 }
 
 dump_failure_context() {
@@ -130,6 +215,9 @@ trap cleanup EXIT
 [[ -d "$MANAGER_PROJECT" ]] || { echo "manager project not found: $MANAGER_PROJECT" >&2; exit 1; }
 [[ "${#BAD_ACCOUNTS[@]}" -gt 0 ]] || { echo "need at least one --bad-account" >&2; exit 1; }
 
+stop_manager
+wait_for_manager_stopped "$TIMEOUT_SECONDS" || true
+
 echo "[INFO] forcing good account baseline: $GOOD_ACCOUNT"
 switch_account "$GOOD_ACCOUNT"
 
@@ -140,9 +228,20 @@ if ! wait_for_manager_supervisor "$TIMEOUT_SECONDS"; then
   dump_failure_context
   exit 1
 fi
+if ! wait_for_manager_ai_ready "$TIMEOUT_SECONDS"; then
+  rc=$?
+  if [[ "$rc" -eq 2 ]]; then
+    echo "[FAIL] configured good account $GOOD_ACCOUNT cannot currently launch the manager chain (usage limit hit during baseline)" >&2
+  else
+    echo "[FAIL] manager ai did not become healthy before bad-account switching" >&2
+  fi
+  dump_failure_context
+  exit 1
+fi
 
 for bad in "${BAD_ACCOUNTS[@]}"; do
   [[ "$bad" == "$GOOD_ACCOUNT" ]] && continue
+  previous_ai_pid="$(manager_ai_pid)"
   echo "[INFO] testing recovery from bad account: $bad"
   switch_account "$bad"
 
@@ -151,7 +250,7 @@ for bad in "${BAD_ACCOUNTS[@]}"; do
     exit 1
   fi
 
-  trigger_manager_relaunch
+  trigger_manager_relaunch >/dev/null
 
   if ! wait_for_good_account "$TIMEOUT_SECONDS"; then
     echo "[FAIL] did not auto-switch back to $GOOD_ACCOUNT after switching to $bad with manager already running" >&2
@@ -159,8 +258,19 @@ for bad in "${BAD_ACCOUNTS[@]}"; do
     exit 1
   fi
 
+  if ! wait_for_relaunched_manager_ai "${previous_ai_pid:-none}" "$TIMEOUT_SECONDS" >/dev/null; then
+    rc=$?
+    if [[ "$rc" -eq 2 ]]; then
+      echo "[FAIL] switched back to $GOOD_ACCOUNT, but the relaunched codex process still hit usage limit before supervision could recover" >&2
+    else
+      echo "[FAIL] manager did not launch a new codex process after switching back to $GOOD_ACCOUNT" >&2
+    fi
+    dump_failure_context
+    exit 1
+  fi
+
   if ! wait_for_manager_status "$TIMEOUT_SECONDS"; then
-    echo "[FAIL] manager status did not record recovered account $GOOD_ACCOUNT after switching to $bad" >&2
+    echo "[FAIL] manager chain did not become healthy after switching back to $GOOD_ACCOUNT" >&2
     dump_failure_context
     exit 1
   fi

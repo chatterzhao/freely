@@ -12,6 +12,7 @@ printf '{"account":"old"}\n' >"$TMP_HOME/.codex/auth.json"
 
 HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" switch work@example.com --yes >"$OUTPUT_FILE"
 
+grep -q 'No ai tool name provided; defaulting to codex' "$OUTPUT_FILE"
 grep -q 'Switched codex to account: work@example.com' "$OUTPUT_FILE"
 grep -q '{"account":"work"}' "$TMP_HOME/.codex/auth.json"
 

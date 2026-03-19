@@ -443,6 +443,7 @@ main() {
           cmd_switch "codex" ""
           ;;
         *)
+          log_warn "No ai tool name provided; defaulting to codex. If the target account belongs to another tool, switch may fail."
           cmd_switch "codex" "${ARGS[0]}"
           ;;
       esac

@@ -14,6 +14,7 @@ usage() {
 Usage:
   freely init --project <abs_path> --intent <abs_file> --constitution <abs_file> --ai <tool[:model][:mode]> [--reasoning-effort <effort>]
   freely doctor --project <abs_path>
+  freely ensure-manager --project <abs_path>
   freely start --project <abs_path>
   freely status --project <abs_path>
   freely fleet-status --project <abs_path>
@@ -858,6 +859,33 @@ select_earliest_reset_codex_account() {
   fi
 }
 
+select_any_available_codex_account() {
+  local project="$1" candidate
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    if codex_account_is_available_now "$project" "$candidate"; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done < <(codex_saved_accounts "$project")
+}
+
+select_earliest_reset_codex_account_any() {
+  local project="$1" candidate reset_at best_account="" best_reset=""
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    reset_at="$(codex_account_cooldown_reset_at "$project" "$candidate")"
+    [[ -n "$reset_at" ]] || continue
+    if [[ -z "$best_reset" || "$reset_at" -lt "$best_reset" ]]; then
+      best_account="$candidate"
+      best_reset="$reset_at"
+    fi
+  done < <(codex_saved_accounts "$project")
+  if [[ -n "$best_account" ]]; then
+    printf '%s|%s\n' "$best_account" "$best_reset"
+  fi
+}
+
 switch_to_codex_account() {
   local project="$1" account="$2" reason="$3"
   local ai_bin output
@@ -879,6 +907,56 @@ switch_to_next_codex_account() {
   next_account="$(select_next_codex_account "$project" "$current_account")"
   [[ -n "$next_account" ]] || return 1
   switch_to_codex_account "$project" "$next_account" "$reason"
+}
+
+ensure_codex_account_ready_for_manager() {
+  local project="$1"
+  local current_account available_account earliest_info earliest_account earliest_reset wait_seconds
+
+  current_account="$(codex_current_account "$project")"
+  if [[ -n "$current_account" ]] && codex_account_is_available_now "$project" "$current_account"; then
+    return 0
+  fi
+
+  available_account="$(select_any_available_codex_account "$project")"
+  if [[ -n "$available_account" ]]; then
+    if [[ -z "$current_account" || "$available_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
+      switch_to_codex_account "$project" "$available_account" "ensure_manager" >/dev/null
+    fi
+    return 0
+  fi
+
+  earliest_info="$(select_earliest_reset_codex_account_any "$project")"
+  earliest_account="${earliest_info%%|*}"
+  earliest_reset="${earliest_info##*|}"
+  if [[ -n "$earliest_account" && -n "$earliest_reset" && "$earliest_info" == *"|"* ]]; then
+    if [[ -z "$current_account" || "$earliest_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
+      switch_to_codex_account "$project" "$earliest_account" "all_accounts_cooling_down" >/dev/null || true
+    fi
+    wait_seconds="$(seconds_until_epoch "$earliest_reset")"
+    if [[ "${wait_seconds:-0}" =~ ^[0-9]+$ ]] && (( wait_seconds > 0 )); then
+      log_warn "all codex accounts cooling down before manager bootstrap; sleeping until reset_at=${earliest_reset} (sleep=${wait_seconds}s)"
+      sleep_with_rate_limit_recheck "$project" "$wait_seconds"
+    fi
+    available_account="$(select_any_available_codex_account "$project")"
+    if [[ -n "$available_account" ]]; then
+      if [[ -z "$current_account" || "$available_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
+        switch_to_codex_account "$project" "$available_account" "ensure_manager" >/dev/null || true
+      fi
+      return 0
+    fi
+  fi
+
+  log_error "no codex account is currently available for manager bootstrap"
+  return 1
+}
+
+launch_manager_supervisor() {
+  local project="$1"
+  local launch_bin
+  launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
+  bash "$launch_bin" start --project "$project" >/dev/null 2>&1 &
+  disown "$!" 2>/dev/null || true
 }
 
 build_prompt() {
@@ -1166,6 +1244,52 @@ cmd_start() {
   done
 }
 
+cmd_ensure_manager() {
+  local project="" branch="" run_dir sup_pid_file current_pid
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  [[ -n "$project" ]] || { usage; exit 1; }
+  load_config "$project"
+  check_doc_gate_or_fail "$project" || {
+    log_error "ensure-manager blocked by doc gate"
+    exit 1
+  }
+
+  branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
+  if [[ "$branch" != "develop" ]]; then
+    log_error "ensure-manager only supports the develop manager worktree (current branch: ${branch:-unknown})"
+    exit 1
+  fi
+
+  run_dir="$(run_dir_for_project "$project")"
+  sup_pid_file="$run_dir/supervisor.pid"
+  mkdir -p "$run_dir"
+  if [[ -f "$sup_pid_file" ]]; then
+    current_pid="$(cat "$sup_pid_file" 2>/dev/null || true)"
+    if valid_supervisor_pid_for_project "$project" "$current_pid"; then
+      log_info "manager supervisor already running (pid=$current_pid)"
+      return 0
+    fi
+  else
+    current_pid="$(discover_supervisor_pid "$project")"
+    if [[ -n "$current_pid" ]]; then
+      log_info "manager supervisor already running (pid=$current_pid)"
+      return 0
+    fi
+  fi
+
+  if [[ "$AI_TOOL" == "codex" ]]; then
+    ensure_codex_account_ready_for_manager "$project"
+  fi
+
+  launch_manager_supervisor "$project"
+  log_info "manager bootstrap requested"
+}
+
 cmd_doctor() {
   local project=""
   while [[ $# -gt 0 ]]; do
@@ -1394,6 +1518,7 @@ main() {
   case "$cmd" in
     init) cmd_init "$@" ;;
     doctor) cmd_doctor "$@" ;;
+    ensure-manager) cmd_ensure_manager "$@" ;;
     start) cmd_start "$@" ;;
     status) cmd_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;
