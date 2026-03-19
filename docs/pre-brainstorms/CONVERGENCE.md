@@ -2753,3 +2753,11 @@
     - `session_id` / `jsonl_path` / `cycle_log` 应保留为恢复证据引用，但默认不应作为整份 prompt 负载重喂。
     - 若官方未来公开支持非交互压缩/总结参数，应优先评估并重构采用官方能力。
   - 当前状态：`in_ibm`
+
+## 变更（2026-03-19 context-compaction salvage）
+
+### 收敛结论
+- `I-20260319-0148` `Context-compaction continuity guard salvage`
+  - 问题：旧 `feature/context-compaction-delegation-governance-20260318` 分支的大部分治理语义已被 continuity 主线覆盖，但其 continuity guard 小能力仍值得保留。
+  - 结论：仅收编 `previous_context_compacted`、`Continuity Guard`、首跳 compact 提醒及相关测试；不再继续沿旧分支推进。
+  - 当前状态：`in_dev`

@@ -142,6 +142,9 @@
 - 20260319-0018--token-efficient-session-continuity-and-rotation
   - brainstorms: docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md
   - candidates: docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md
+- 20260319-0148--context-compaction-salvage-and-retirement
+  - brainstorms: docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

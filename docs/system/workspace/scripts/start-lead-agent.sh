@@ -204,6 +204,8 @@ cat <<EOF
 - ${current_checkpoint_summary}
 - project_worktree_summary: ${current_fleet_summary}
 - 开始当前轮次前，先判断是否需要先维护工作区卫生、切 checkpoint commit、或把无关改动分流到其他 worktree。
+- 若上一轮 handoff、当前运行输出、或工具自身提示出现 \`context compacted\`、compact、上下文压缩/摘要信号，不要继续扩 scope；先更新当前阶段对应的 continuity artifact，再决定是继续、checkpoint，还是交给外层 runtime 做 \`fresh_with_handoff\`。
+- 若 runtime 已注入 \`上下文容量预警\` 或 \`会话轮换交接\`，优先按该治理提示收口；不要把它当作可忽略的背景信息。
 - 这不是强制停止开发；你需要结合 issue 边界、验证状态和当前改动范围自主决定是否先收口，再继续委派/实现。
 
 执行要求：
