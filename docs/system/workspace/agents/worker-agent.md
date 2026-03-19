@@ -10,13 +10,15 @@
   - `skill:doc-pre-brainstorm-execution`
   - `skill:doc-ibm-execution`
   - `skill:dev-loop-execution`
+  - `skill:worktree-hygiene-supervision`
 
 ## 职责
 
 1. 在自己工位上推进明确 issue 的 doc-loop / dev-loop / verification。
 2. 在达到 checkpoint 边界时优先 continuity、验证与原子提交，而不是继续扩 scope。
-3. 遇到本地运行时异常时，把恢复职责交回本工位 runtime / scripts。
-4. 把状态、验证、阻塞和下一跳回写到 issue / milestone / continuity 产物。
+3. 若 runtime 已将当前轮次升级为 hygiene intervention，先按 hygiene 收口再继续实现。
+4. 遇到本地运行时异常时，把恢复职责交回本工位 runtime / scripts。
+5. 把状态、验证、阻塞和下一跳回写到 issue / milestone / continuity 产物。
 
 ## 不负责
 
