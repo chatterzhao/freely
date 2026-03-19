@@ -2741,3 +2741,15 @@
 - residual_gap:
   - 仍未实际启动桌面 Tauri 宿主，因此还不能声称 `Transport=tauri` 已完成真实 backend 联调
   - 下一跳应继续留在 `I-20260317-1005` 的 `dev-loop`，直接验证真实宿主路径，而不是回退到 doc-loop 或继续只做本地 contract/warning 清理
+
+## 变更（2026-03-19 token-efficient continuity）
+
+### 收敛结论
+- `I-20260319-0018` `Token-efficient session continuity and rotation governance`
+  - 问题：Freely 已经有 `context_ratio`、`context compacted`、`fresh_with_handoff` 与 handoff 文件，但这些能力还没有收敛成一条自动、低 token、统一边界的上下文管理控制面。
+  - 结论：
+    - `context warn` 的主路应是当前 AI 先更新当前阶段 continuity artifact。
+    - `fresh_with_handoff` 是脚本轮换 fallback，不等同于高质量模型内压缩。
+    - `session_id` / `jsonl_path` / `cycle_log` 应保留为恢复证据引用，但默认不应作为整份 prompt 负载重喂。
+    - 若官方未来公开支持非交互压缩/总结参数，应优先评估并重构采用官方能力。
+  - 当前状态：`in_ibm`

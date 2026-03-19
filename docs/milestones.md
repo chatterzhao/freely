@@ -108,6 +108,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1825--autonomous-worktree-hygiene-and-checkpoint-supervision/candidates.md`
 - next_action: 新增 hygiene skill、checkpoint drift streak、manager hygiene alert 与回归测试已落盘；当前先做 review 与 promote 判断。若后续仍需专门 hygiene worker，再从同一预研线 materialize，不在本批次越界扩 scope
 
+7. `I-20260319-0018`
+- title: Token-efficient session continuity and rotation governance
+- milestone_state: committed
+- phase_state: `in_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md`
+- next_action: 先把 `context warn`、`fresh_with_handoff`、manager/worker continuity 与旧会话证据引用的边界收敛成正式 IBM 口径；同时写明官方若未来公开支持非交互压缩参数，应优先评估并重构采用
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`
