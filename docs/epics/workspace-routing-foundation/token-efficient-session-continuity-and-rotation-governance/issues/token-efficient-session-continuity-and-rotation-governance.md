@@ -69,8 +69,13 @@ Freely 已经把 manager / worker / watchdog / worktree hygiene / checkpoint gov
 - handoff 默认只保留必要结构化摘要与旧证据路径，不把整份旧 `jsonl` / log` 当作主 prompt 内容。
 - 若官方未来公开支持非交互压缩/总结参数，Freely 的正式口径明确要求优先评估并重构采用官方能力，而不是长期固化外部 fallback。
 - 统一触发矩阵被正式写入实现参考，后续 runtime / prompt / watchdog 改动必须遵循同一矩阵。
+- `continuity watchdog` 作为独立 skill 存在，并作为 `watchdog-control-plane` 的 continuity 子模块被角色与恢复流程引用。
 
 ## Notes
 
 - 当前这条 issue 优先处理治理与控制面口径，不要求立即引入新的 UI。
 - 这条 issue 不是否定现有 `fresh_with_handoff`；它的目标是把现有能力和 continuity / session evidence 融合成更高质量、低 token 的自动策略。
+- 当前已物化落点：
+  - `docs/system/workspace/skills/continuity-watchdog/SKILL.md`
+  - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
+  - `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`
