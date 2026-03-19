@@ -258,6 +258,14 @@
     - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
     - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
     - `bash docs/system/workspace/scripts/tests/test-freely-global-account-watchdog-live`
+
+## 变更（2026-03-18 URL 内容摄取 skill 物化）
+
+### 收敛结论
+- `I-20260318-1908` `URL 内容摄取 skill 与微信公众号抓取治理`
+  - 问题：公众号链接研究已经完成，但能力仍停留在 pre-brainstorm 文本，skill、脚本和测试未落地
+  - 结论：把能力物化为 `skill:url-content-intake`，并把微信公众号抓取脚本收进 skill 目录，确保分享 skill 时能力是完整的
+  - 当前状态：`in_dev`
     - live 结果：`worahe3972@outlook.com -> worahe3971@outlook.com` 与 `worahe3973@outlook.com -> worahe3971@outlook.com` 均通过
   - 当前状态：进入 `in_verification`，等待 completion verification / review 与主线 promotion 判断
 

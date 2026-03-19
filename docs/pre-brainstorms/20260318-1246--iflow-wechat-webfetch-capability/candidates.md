@@ -11,6 +11,7 @@
   - Freely 能明确区分“工具原生 WebFetch 能力”和“本地抓取能力”
   - 对公众号链接能显式区分正文页、验证页、受限页
   - 抓取失败时提供下一步建议，而不是把 URL 原样丢给模型
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
-- session_refs: []
+- promoted_issue_path: docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md
+- milestone: M-20260318-url-content-intake-skill-and-wechat-fetch-governance
+- session_refs:
+  - feature/url-content-intake-skill-materialization-20260318
