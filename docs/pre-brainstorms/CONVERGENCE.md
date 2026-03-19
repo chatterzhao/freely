@@ -117,6 +117,19 @@
 - `C-20260305-903` `pre-develop` -> `pre-test-merge` 职责迁移
 - `C-20260305-904` `wt-enter` / `post-checkout` worktree 引导修复
 
+## 变更（2026-03-18 主管自治边界收紧）
+
+### 收敛结论
+- `I-20260318-1408` `Manager self-supervision and autonomous recovery`
+  - 问题：manager/worker runtime 之前仍会在本工位 loop 内直接执行全局 Codex 账号切换，这和“全局账号由外层 watchdog 接管”的边界冲突。
+  - 结论：manager/worker runtime 只保留 worker supervisor 恢复、supervision alert 和 `runtime-owned` 异常记录；全局账号切换不再由本 issue 的 runtime 执行。
+  - 当前实现落点：`docs/system/workspace/scripts/runtime/freely`、`docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`、`docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert`、`docs/system/workspace/scripts/tests/test-freely-manager-runtime-does-not-switch-accounts`
+  - 验证证据：
+    - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
+    - `bash docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert`
+    - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-does-not-switch-accounts`
+  - 当前状态：`in_verification`
+
 ## 变更（2026-03-06 hooks 安装模式）
 
 ### 新增到 P0-核心
