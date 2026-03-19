@@ -374,7 +374,7 @@ Commands:
   init                    Initialize account manager
   login <tool>            Login and auto-save account
   save <tool> [account]   Save current login (auto-detect account if not specified)
-  switch <tool> [account] Switch to account (interactive if no account)
+  switch [tool] [account] Switch to account (default tool: codex; interactive if no account)
   list                    List all accounts
   whoami [tool]           Show current logged-in account
   status [tool]           Show current status
@@ -398,6 +398,7 @@ Examples:
   freely ai login codex
   freely ai whoami
   freely ai switch codex other@email.com --yes
+  freely ai switch other@email.com --yes
   freely ai list --format json
 EOF
 }
@@ -433,7 +434,19 @@ main() {
     init) cmd_init ;;
     login) cmd_login "${ARGS[0]}" ;;
     save) cmd_save "${ARGS[0]}" "${ARGS[1]:-}" ;;
-    switch) cmd_switch "${ARGS[0]}" "${ARGS[1]:-}" ;;
+    switch)
+      case "${ARGS[0]:-}" in
+        codex|iflow)
+          cmd_switch "${ARGS[0]}" "${ARGS[1]:-}"
+          ;;
+        "")
+          cmd_switch "codex" ""
+          ;;
+        *)
+          cmd_switch "codex" "${ARGS[0]}"
+          ;;
+      esac
+      ;;
     list) cmd_list ;;
     whoami) cmd_whoami "${ARGS[0]:-codex}" ;;
     status) cmd_status "${ARGS[0]:-codex}" ;;

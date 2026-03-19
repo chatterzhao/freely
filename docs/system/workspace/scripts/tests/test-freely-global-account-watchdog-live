@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+MANAGER_PROJECT="/Users/zhaoyu/Downloads/code/my-freely/freely"
+GOOD_ACCOUNT="worahe3971@outlook.com"
+BAD_ACCOUNTS=("worahe3972@outlook.com" "worahe3973@outlook.com")
+TIMEOUT_SECONDS=90
+LOG_ROOT="${TMPDIR:-/tmp}/freely-global-account-watchdog-live-$$"
+mkdir -p "$LOG_ROOT"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  test-freely-global-account-watchdog-live \
+    [--manager-project <abs_path>] \
+    [--good-account <email>] \
+    [--bad-account <email>]...
+
+Purpose:
+  - start the Freely manager chain first
+  - then intentionally switch the global codex account to known-bad accounts
+  - verify the runtime automatically switches back to the known-good account
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --manager-project) MANAGER_PROJECT="${2:?}"; shift 2 ;;
+    --good-account) GOOD_ACCOUNT="${2:?}"; shift 2 ;;
+    --bad-account) BAD_ACCOUNTS+=("${2:?}"); shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "unknown arg: $1" >&2; usage >&2; exit 1 ;;
+  esac
+done
+
+whoami_account() {
+  bash "$ROOT_DIR/bin/ai" whoami 2>/dev/null | sed -n 's/.*Current account: //p'
+}
+
+switch_account() {
+  local account="$1"
+  bash "$ROOT_DIR/bin/ai" switch codex "$account" --yes >/dev/null
+}
+
+stop_manager() {
+  bash "$ROOT_DIR/bin/freely" stop --project "$MANAGER_PROJECT" >/dev/null 2>&1 || true
+}
+
+start_manager() {
+  local log_file="$1"
+  bash "$ROOT_DIR/bin/freely" start --project "$MANAGER_PROJECT" >"$log_file" 2>&1 &
+  printf '%s\n' "$!"
+}
+
+wait_for_manager_supervisor() {
+  local timeout="$1"
+  local start_ts now
+  start_ts="$(date +%s)"
+  while true; do
+    if bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | rg -q '^supervisor_pid: [0-9]'; then
+      return 0
+    fi
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout )); then
+      return 1
+    fi
+    sleep 2
+  done
+}
+
+wait_for_good_account() {
+  local timeout="$1"
+  local start_ts now
+  start_ts="$(date +%s)"
+  while true; do
+    if [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]]; then
+      return 0
+    fi
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout )); then
+      return 1
+    fi
+    sleep 2
+  done
+}
+
+wait_for_manager_status() {
+  local timeout="$1"
+  local start_ts now
+  start_ts="$(date +%s)"
+  while true; do
+    if bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | rg -q "last_active_account: ${GOOD_ACCOUNT//./\\.}"; then
+      return 0
+    fi
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout )); then
+      return 1
+    fi
+    sleep 2
+  done
+}
+
+manager_ai_pid() {
+  bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null | sed -n 's/^ai_pid: //p'
+}
+
+trigger_manager_relaunch() {
+  local ai_pid
+  ai_pid="$(manager_ai_pid)"
+  if [[ -n "$ai_pid" && "$ai_pid" != "none" ]]; then
+    kill "$ai_pid" 2>/dev/null || true
+  fi
+}
+
+dump_failure_context() {
+  echo "[DEBUG] whoami=$(whoami_account)" >&2
+  echo "[DEBUG] freely status:" >&2
+  bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" >&2 || true
+  echo "[DEBUG] recent loop log:" >&2
+  tail -n 80 "$MANAGER_PROJECT/.freely/logs/loop.log" >&2 2>/dev/null || true
+}
+
+cleanup() {
+  stop_manager
+  switch_account "$GOOD_ACCOUNT" || true
+}
+trap cleanup EXIT
+
+[[ -d "$MANAGER_PROJECT" ]] || { echo "manager project not found: $MANAGER_PROJECT" >&2; exit 1; }
+[[ "${#BAD_ACCOUNTS[@]}" -gt 0 ]] || { echo "need at least one --bad-account" >&2; exit 1; }
+
+echo "[INFO] forcing good account baseline: $GOOD_ACCOUNT"
+switch_account "$GOOD_ACCOUNT"
+
+baseline_log="$LOG_ROOT/manager-baseline.log"
+baseline_pid="$(start_manager "$baseline_log")"
+if ! wait_for_manager_supervisor "$TIMEOUT_SECONDS"; then
+  echo "[FAIL] manager supervisor did not start before bad-account switching" >&2
+  dump_failure_context
+  exit 1
+fi
+
+for bad in "${BAD_ACCOUNTS[@]}"; do
+  [[ "$bad" == "$GOOD_ACCOUNT" ]] && continue
+  echo "[INFO] testing recovery from bad account: $bad"
+  switch_account "$bad"
+
+  if [[ "$(whoami_account)" != "$bad" ]]; then
+    echo "[FAIL] expected current account to be $bad before recovery test" >&2
+    exit 1
+  fi
+
+  trigger_manager_relaunch
+
+  if ! wait_for_good_account "$TIMEOUT_SECONDS"; then
+    echo "[FAIL] did not auto-switch back to $GOOD_ACCOUNT after switching to $bad with manager already running" >&2
+    dump_failure_context
+    exit 1
+  fi
+
+  if ! wait_for_manager_status "$TIMEOUT_SECONDS"; then
+    echo "[FAIL] manager status did not record recovered account $GOOD_ACCOUNT after switching to $bad" >&2
+    dump_failure_context
+    exit 1
+  fi
+
+  echo "[PASS] recovered from $bad back to $GOOD_ACCOUNT"
+done
+
+stop_manager
+wait "$baseline_pid" 2>/dev/null || true
+echo "[PASS] live global account recovery succeeded for all configured bad accounts"
