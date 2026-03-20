@@ -150,6 +150,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，先验证 `docs/system/workspace/three-loop-capability-lifecycle.md` 是否足以成为唯一细节真源；若仍需更多行为约束，再 materialize 为独立 IBM issue，而不是继续把细节散落到 `CONSTITUTION`、`PROJECT_INTENT` 和多个 skills 中
 
+3. `C-20260319-2315-A`
+- title: CLI TUI interruption input box for Freely
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md`
+- next_action: 继续 pre-brainstorm，先收敛 TUI 是否只作为 interruption shell、中文输入的最低验收、以及输入框/状态区的最小布局；在这些边界稳定前不要直接写 UI 代码或把 TUI 做成第二套入口系统
+
 ### completed_issues
 
 1. `C-20260306-1101`
