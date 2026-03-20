@@ -29,4 +29,4 @@
 
 ## Residual Risks
 
-- This branch and the canonicalization companion branch still need final de-duplication before promotion/merge.
+- The canonicalization companion branch is now explicitly suspended as a historical companion. Any remaining unique human-chat doc deltas should be extracted selectively rather than merged wholesale.
