@@ -170,16 +170,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/candidates.md`
 - next_action: M1-M3 的 interruption 最小 slice 已落盘：主管 triage 已改成抽象 routing contract，且 `cleanup` followthrough 已形成第一条完整 event 链。下一步继续 pre-brainstorm，把同一 contract 扩到 review/test/runtime anomaly/worker-discovered gap 与 standing-source scan，再决定是否 materialize 为统一 routing issue
 
-5. `I-20260320-0500`
-- title: Candidate acceptance review governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/candidates.md`
-- next_action: v2 candidate schema、independent acceptance review、IBM acceptance deepening 与 governance-check 门禁已落盘；当前需做 review / promote 判断，并观察高风险 candidate 是否还需要补双审策略
-
 ### completed_issues
 
 1. `C-20260306-1101`
@@ -277,6 +267,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260303-cli-orchestration-architecture/candidates.md`
 - evidence: `docs/LAWS.md`, `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/monitor-ai-cli.sh`, `docs/system/workspace/scripts/tests/test-freely-session-rotation`, `bin/test-freely-session-rotation`
 - completion_note: 已把 `resume` 与 `fresh_with_handoff` 区分为显式 runtime 行为，并固定 Codex 默认模型为 `gpt-5.4`、默认 reasoning effort 为 `medium`
+
+11. `I-20260320-0500`
+- title: Candidate acceptance review governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/candidates.md`
+- evidence: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`, `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/tasks.md`, `docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`, `docs/system/workspace/scripts/quality/governance-check`
+- completion_note: future candidate v2 schema、独立 acceptance review、IBM acceptance deepening 与治理门禁已稳定落盘；高风险 candidate 的双审策略保留为后续治理演进，不阻塞当前 issue 完成
 
 ## M-20260308-frontend-probe-dogfooding-loop
 

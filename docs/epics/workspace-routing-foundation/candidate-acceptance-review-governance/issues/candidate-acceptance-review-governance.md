@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260320-0500`
 - title: Candidate acceptance review governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `candidate-acceptance-review-governance`
@@ -52,6 +52,7 @@ Freely 已经要求 pre-brainstorm candidate 进入 milestone，但 candidate �
 - `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`
 
-## Next
+## Completion
 
-- 当前保持 `in_verification`。schema、review 语义、门禁与 IBM deepening 已落盘，下一步做 review / promote 判断，并观察是否还需要补高风险 candidate 的双审策略。
+- candidate acceptance review governance 已落盘并通过回归，future candidate 的 v2 schema、独立 review 记录、IBM acceptance deepening 与治理门禁都已稳定。
+- 高风险 candidate 是否需要双审，保留为后续策略判断，不阻塞当前 canonical issue 完成。
