@@ -268,6 +268,17 @@ routing_policy:
 - evidence: `docs/LAWS.md`, `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/monitor-ai-cli.sh`, `docs/system/workspace/scripts/tests/test-freely-session-rotation`, `bin/test-freely-session-rotation`
 - completion_note: 已把 `resume` 与 `fresh_with_handoff` 区分为显式 runtime 行为，并固定 Codex 默认模型为 `gpt-5.4`、默认 reasoning effort 为 `medium`
 
+11. `I-20260320-0018`
+- title: Default project resolution and authorized project memory for CLI-first interruption entrypoints
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-0018--default-project-resolution-and-authorized-project-memory/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-0018--default-project-resolution-and-authorized-project-memory/candidates.md`
+- evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-project-resolution-defaults`
+- completion_note: 默认项目解析已由共享 runtime resolver 覆盖，并通过 cwd auto-resolution 与单一已授权项目回退回归锁定；后续如需多项目切换能力，应从新的 candidate materialize，不要继续扩大本条 completed issue
+
 ## M-20260308-frontend-probe-dogfooding-loop
 
 - title: Frontend probe + backend increment dogfooding loop
