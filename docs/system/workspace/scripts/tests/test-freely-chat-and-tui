@@ -6,6 +6,8 @@ TMP_DIR="$(mktemp -d /tmp/freely-chat-tui.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
+FREELY_HOME="$TMP_DIR/freely-home"
+CANON_PROJECT=""
 mkdir -p "$PROJECT/docs/pre-brainstorms/20260319-0000--sample"
 
 git init -q -b develop "$PROJECT"
@@ -51,7 +53,17 @@ cat >"$PROJECT/docs/pre-brainstorms/20260319-0000--sample/candidates.md" <<'EOF'
 - session_refs: []
 EOF
 
-CHAT_OUTPUT="$(bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "你好，Freely")"
+INIT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto)"
+printf '%s\n' "$INIT_OUTPUT" | grep -q 'initialized:'
+CANON_PROJECT="$(cd "$PROJECT" && pwd -P)"
+
+DOCTOR_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" doctor)"
+printf '%s\n' "$DOCTOR_OUTPUT" | grep -q 'doc gate PASS'
+
+STATUS_OUTPUT_BEFORE_START="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
+printf '%s\n' "$STATUS_OUTPUT_BEFORE_START" | grep -q "project: $CANON_PROJECT"
+
+CHAT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" chat "你好，Freely")"
 CHAT_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
 [[ -n "$CHAT_ID" ]] || {
   echo "[FAIL] freely chat did not return intake_id" >&2
@@ -59,15 +71,19 @@ CHAT_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
 }
 grep -q '你好，Freely' "$PROJECT/.freely/intake/$CHAT_ID/message.txt"
 
-TUI_OUTPUT="$(printf '继续测试中文输入框\n' | bash "$ROOT_DIR/bin/freely" tui --project "$PROJECT" --once)"
+TUI_OUTPUT="$(cd "$PROJECT" && printf '继续测试中文输入框\n' | FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" tui --once)"
 printf '%s\n' "$TUI_OUTPUT" | grep -q 'Freely TUI'
 printf '%s\n' "$TUI_OUTPUT" | grep -q 'submitted: 继续测试中文输入框'
 
-STATUS_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake status --project "$PROJECT")"
+STATUS_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" intake status)"
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'active_items: 2'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'new_items: 2'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'channel=chat'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'channel=tui'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q '继续测试中文输入框'
+
+REGISTRY_STATUS_OUTPUT="$(cd "$TMP_DIR" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" intake status)"
+printf '%s\n' "$REGISTRY_STATUS_OUTPUT" | grep -q "project: $CANON_PROJECT"
+printf '%s\n' "$REGISTRY_STATUS_OUTPUT" | grep -q 'active_items: 2'
 
 echo "[PASS] freely chat alias and tui input both write durable interruption intake"

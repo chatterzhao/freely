@@ -20,19 +20,19 @@ source "$WATCHDOG_AVAILABILITY_LIB"
 usage() {
   cat <<'EOF'
 Usage:
-  freely init --project <abs_path> --intent <abs_file> --constitution <abs_file> --ai <tool[:model][:mode]> [--reasoning-effort <effort>]
-  freely doctor --project <abs_path>
-  freely chat --project <abs_path> <message>
-  freely tui --project <abs_path> [--once]
-  freely intake chat --project <abs_path> (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
-  freely intake claim --project <abs_path> --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
-  freely intake resolve --project <abs_path> --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
-  freely intake status --project <abs_path>
-  freely ensure-manager --project <abs_path> [--watch] [--interval <seconds>]
-  freely start --project <abs_path>
-  freely status --project <abs_path>
-  freely fleet-status --project <abs_path>
-  freely stop --project <abs_path>
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> --ai <tool[:model][:mode]> [--reasoning-effort <effort>]
+  freely doctor [--project <abs_path>]
+  freely chat [--project <abs_path>] <message>
+  freely tui [--project <abs_path>] [--once]
+  freely intake chat [--project <abs_path>] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
+  freely intake claim [--project <abs_path>] --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
+  freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
+  freely intake status [--project <abs_path>]
+  freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely start [--project <abs_path>]
+  freely status [--project <abs_path>]
+  freely fleet-status [--project <abs_path>]
+  freely stop [--project <abs_path>]
 
 AI mode:
   auto  -> non-interactive, auto-approve (where supported)
@@ -122,6 +122,14 @@ state_dir() {
   echo "$project/$STATE_DIR_NAME"
 }
 
+global_state_dir() {
+  echo "${FREELY_HOME:-$HOME/.freely}"
+}
+
+projects_registry_file() {
+  echo "$(global_state_dir)/projects.tsv"
+}
+
 run_dir_for_project() {
   local project="$1"
   echo "$(state_dir "$project")/run"
@@ -135,6 +143,101 @@ logs_dir_for_project() {
 config_file() {
   local project="$1"
   echo "$(state_dir "$project")/config.env"
+}
+
+project_has_freely_config() {
+  local project="$1"
+  [[ -n "$project" && -f "$(config_file "$project")" ]]
+}
+
+looks_like_project_root() {
+  local project="$1"
+  [[ -n "$project" ]] || return 1
+  [[ -f "$project/docs/PROJECT_INTENT.md" ]] || return 1
+  [[ -f "$project/docs/CONSTITUTION.md" ]] || return 1
+  [[ -f "$project/docs/LAWS.md" ]] || return 1
+  [[ -f "$project/AGENTS.md" ]] || return 1
+  [[ -d "$project/docs/pre-brainstorms" ]] || return 1
+}
+
+git_root_for_path() {
+  local path="$1"
+  git -C "$path" rev-parse --show-toplevel 2>/dev/null || true
+}
+
+register_project_in_registry() {
+  local project="$1"
+  local registry dir tmp now existing
+  registry="$(projects_registry_file)"
+  dir="$(dirname "$registry")"
+  now="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  mkdir -p "$dir"
+  tmp="$(mktemp "${dir}/projects.XXXXXX")"
+  {
+    printf '%s\t%s\n' "$project" "$now"
+    if [[ -f "$registry" ]]; then
+      awk -F '\t' -v project="$project" '$1 != project { print $0 }' "$registry"
+    fi
+  } >"$tmp"
+  mv "$tmp" "$registry"
+}
+
+read_single_registered_project() {
+  local registry first count
+  registry="$(projects_registry_file)"
+  [[ -f "$registry" ]] || return 0
+  count="$(awk 'END { print NR }' "$registry")"
+  [[ "$count" == "1" ]] || return 0
+  awk -F '\t' 'NR==1 { print $1; exit }' "$registry"
+}
+
+resolve_project_or_fail() {
+  local project="${1:-}" allow_uninitialized="${2:-0}"
+  local candidate git_root registered
+  if [[ -n "$project" ]]; then
+    candidate="$(abs_path_or_fail "$project")"
+  elif [[ -n "${FREELY_PROJECT:-}" ]]; then
+    candidate="$(abs_path_or_fail "$FREELY_PROJECT")"
+  else
+    git_root="$(git_root_for_path "$PWD")"
+    if [[ -n "$git_root" && -f "$(config_file "$git_root")" ]]; then
+      candidate="$git_root"
+    elif [[ -f "$(config_file "$PWD")" ]]; then
+      candidate="$PWD"
+    fi
+
+    if [[ -z "$candidate" ]]; then
+      registered="$(read_single_registered_project)"
+      if [[ -n "$registered" && -f "$(config_file "$registered")" ]]; then
+        candidate="$registered"
+      fi
+    fi
+
+    if [[ -z "$candidate" && "$allow_uninitialized" == "1" ]]; then
+      if [[ -n "$git_root" ]] && looks_like_project_root "$git_root"; then
+        candidate="$git_root"
+      elif looks_like_project_root "$PWD"; then
+        candidate="$PWD"
+      fi
+    fi
+  fi
+
+  [[ -n "$candidate" ]] || {
+    log_error "unable to resolve project; use --project, set FREELY_PROJECT, or run inside an initialized repo"
+    exit 1
+  }
+  [[ -d "$candidate" ]] || {
+    log_error "project not found: $candidate"
+    exit 1
+  }
+  if [[ "$allow_uninitialized" != "1" ]]; then
+    project_has_freely_config "$candidate" || {
+      log_error "project is not initialized for freely: $candidate"
+      log_error "run: freely init --project $candidate --intent <abs_file> --constitution <abs_file> --ai <tool[:model][:mode]>"
+      exit 1
+    }
+  fi
+  printf '%s\n' "$candidate"
 }
 
 session_state_file() {
@@ -1625,10 +1728,11 @@ cmd_init() {
     esac
   done
 
-  [[ -n "$project" && -n "$intent" && -n "$constitution" && -n "$ai_spec" ]] || {
+  [[ -n "$intent" && -n "$constitution" && -n "$ai_spec" ]] || {
     usage
     exit 1
   }
+  project="$(resolve_project_or_fail "$project" 1)"
   [[ -d "$project" ]] || { log_error "project not found: $project"; exit 1; }
   [[ -f "$intent" ]] || { log_error "intent file not found: $intent"; exit 1; }
   [[ -f "$constitution" ]] || { log_error "constitution file not found: $constitution"; exit 1; }
@@ -1642,6 +1746,7 @@ cmd_init() {
   fi
 
   write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort"
+  register_project_in_registry "$project"
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "initialized"
   log_info "initialized: $(config_file "$project")"
@@ -1655,7 +1760,7 @@ cmd_start() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  [[ -n "$project" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project")"
   load_config "$project"
   check_doc_gate_or_fail "$project" || {
     log_error "start blocked by doc gate"
@@ -1892,7 +1997,7 @@ cmd_ensure_manager() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  [[ -n "$project" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project")"
   [[ "$watch_interval" =~ ^[0-9]+$ ]] || { log_error "ensure-manager --interval must be a positive integer"; exit 1; }
   load_config "$project"
   check_doc_gate_or_fail "$project" || {
@@ -1922,7 +2027,7 @@ cmd_doctor() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  [[ -n "$project" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project" 1)"
   check_doc_gate_or_fail "$project"
 }
 
@@ -1942,7 +2047,8 @@ cmd_chat() {
         ;;
     esac
   done
-  [[ -n "$project" && -n "$message" ]] || { usage; exit 1; }
+  [[ -n "$message" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project" 1)"
   cmd_intake_chat --project "$project" --author human --channel chat --message "$message"
 }
 
@@ -1955,7 +2061,7 @@ cmd_tui() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  [[ -n "$project" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project" 1)"
   check_doc_gate_or_fail "$project"
 
   if [[ "$once" == "1" || ! -t 0 ]]; then
@@ -2000,7 +2106,7 @@ cmd_intake_chat() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  [[ -n "$project" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project" 1)"
   if [[ -n "$message_file" ]]; then
     [[ -f "$message_file" ]] || { log_error "message file not found: $message_file"; exit 1; }
     message="$(cat "$message_file")"
@@ -2028,7 +2134,8 @@ cmd_intake_claim() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  [[ -n "$project" && -n "$intake_id" && -n "$claimed_by" && -n "$reaction" ]] || { usage; exit 1; }
+  [[ -n "$intake_id" && -n "$claimed_by" && -n "$reaction" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project" 1)"
   validate_reaction_or_fail "$reaction"
   validate_absorption_classification_or_fail "$classification"
   meta_file="$(intake_item_meta_file "$project" "$intake_id")"
@@ -2065,7 +2172,8 @@ cmd_intake_resolve() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  [[ -n "$project" && -n "$intake_id" && -n "$resolved_by" && -n "$reaction" && -n "$resolution_file" && -n "$absorption_target" ]] || { usage; exit 1; }
+  [[ -n "$intake_id" && -n "$resolved_by" && -n "$reaction" && -n "$resolution_file" && -n "$absorption_target" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project" 1)"
   [[ -f "$resolution_file" ]] || { log_error "resolution file not found: $resolution_file"; exit 1; }
   validate_reaction_or_fail "$reaction"
   validate_absorption_classification_or_fail "$classification"
@@ -2115,7 +2223,7 @@ cmd_intake_status() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  [[ -n "$project" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project" 1)"
   echo "project: $project"
   echo "intake_dir: $(intake_dir_for_project "$project")"
   echo "active_items: $(count_active_intake_items "$project")"
@@ -2142,7 +2250,7 @@ cmd_status() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  [[ -n "$project" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project")"
   load_config "$project"
   local sdir run_dir
   sdir="$(state_dir "$project")"
@@ -2242,7 +2350,7 @@ cmd_fleet_status() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  [[ -n "$project" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project")"
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || { log_error "not a git repo: $project"; exit 1; }
   entries="$(git -C "$repo_root" worktree list --porcelain 2>/dev/null || true)"
@@ -2308,7 +2416,7 @@ cmd_stop() {
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
-  [[ -n "$project" ]] || { usage; exit 1; }
+  project="$(resolve_project_or_fail "$project")"
   local sdir run_dir
   sdir="$(state_dir "$project")"
   run_dir="$(run_dir_for_project "$project")"

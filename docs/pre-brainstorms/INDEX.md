@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260320-0018--default-project-resolution-and-authorized-project-memory
 
 本目录是 pre-brainstorm 记录的规范结构。
 
