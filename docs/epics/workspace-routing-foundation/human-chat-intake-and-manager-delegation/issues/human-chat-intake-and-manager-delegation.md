@@ -73,5 +73,7 @@ Freely 已经有 human chat intake 的最小闭环，但要真正“用 Freely �
 
 ## Next
 
-- 保持 `in_verification`，直到 manager 自动接线和治理 / 集成检查继续收口。
-- 后续若要扩展到更强的前台交互，应从单独的 `CLI TUI` pre-brainstorm 继续，不要回退本 issue 的 intake / delegation 语义。
+- 当前 canonical worktree 显式挂起：不得作为 `I-20260319-1715` 的独立 promote / merge 来源。
+- 挂起原因：本工位只重复物化了 human-chat issue 文档包，没有新增独立实现或 verification 证据；正式 verification review 已落在 `feature/human-chat-intake-supervision-20260319-1030`，而本工位的祖先历史还混入了 `CLI TUI` 与 `project-resolution` 能力线。
+- next_action: 仅在人工比对后，把本工位里真正独有且仍然属于 human-chat 的文档差异摘取到 `feature/human-chat-intake-supervision-20260319-1030`；不要整支合并，也不要把 `CLI TUI` / `project-resolution` 相关历史当成本 issue 的收口依据。
+- 若没有需要保留的独有人类插话文档差异，则直接退休本工位；human-chat 的 promote / cleanup 只在主收口分支完成。

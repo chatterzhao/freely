@@ -136,7 +136,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
 - source_brainstorm: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md`
-- next_action: human chat intake 的 CLI-first durable surface、manager notice/claim/delegate contract 与 `skill:human-interruption-handling` 的最小闭环已落盘；当前继续 verification / promote 判断，并保持 canonical absorption 回写可追踪
+- next_action: 当前 canonical 工位只承载重复的 human-chat 文档物化，且缺少独立 review / verification 证据；先显式挂起本工位，只允许把仍属 human-chat 的独有文档差异摘取到 `feature/human-chat-intake-supervision-20260319-1030`。若无独有差异，则直接退休本工位，不得单独 promote。
 
 ### candidate_issues
 
