@@ -219,4 +219,22 @@ grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_R
 grep -q '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
 grep -q '^CREATED_AT="'"$CREATED_AT_RETRY"'"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
 
-echo "[PASS] interruption manager routes abstract answer, cleanup followthrough, delegated handoff, and retries cleanly after handler failure"
+CHAT_OUTPUT_STALE="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "检查已经合并到develop的worktree，应该怎么收口")"
+INTAKE_ID_STALE="$(printf '%s\n' "$CHAT_OUTPUT_STALE" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_STALE" ]] || {
+  echo "[FAIL] missing stale intake id" >&2
+  exit 1
+}
+bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" intake claim --project "$PROJECT" --intake-id "$INTAKE_ID_STALE" --claimed-by interruption-manager-agent --reaction followup --linked-artifact pending://interruption-manager-triage >/dev/null
+grep -q '^STATUS="classified"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^LINKED_ARTIFACT="pending://interruption-manager-triage"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+
+FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$PROJECT" >/dev/null
+grep -q '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^LINKED_ARTIFACT="cleanup://merged-worktree-followthrough"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_STALE/resolution.md"
+
+echo "[PASS] interruption manager routes abstract answer, cleanup followthrough, delegated handoff, retries cleanly after handler failure, and recovers stale triage claims"
