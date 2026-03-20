@@ -22,6 +22,10 @@ usage() {
 Usage:
   freely init --project <abs_path> --intent <abs_file> --constitution <abs_file> --ai <tool[:model][:mode]> [--reasoning-effort <effort>]
   freely doctor --project <abs_path>
+  freely intake chat --project <abs_path> (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
+  freely intake claim --project <abs_path> --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
+  freely intake resolve --project <abs_path> --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
+  freely intake status --project <abs_path>
   freely ensure-manager --project <abs_path> [--watch] [--interval <seconds>]
   freely start --project <abs_path>
   freely status --project <abs_path>
@@ -151,6 +155,21 @@ manager_bootstrap_handoff_file() {
   echo "$(run_dir_for_project "$project")/manager-bootstrap-handoff.txt"
 }
 
+intake_dir_for_project() {
+  local project="$1"
+  echo "$(state_dir "$project")/intake"
+}
+
+interruption_resolution_dir_for_project() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/interruption-resolution"
+}
+
+intake_pending_signal_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/intake.pending"
+}
+
 codex_account_cooldown_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/codex-account-cooldowns.tsv"
@@ -159,6 +178,21 @@ codex_account_cooldown_file() {
 stop_marker_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/stop.requested"
+}
+
+intake_item_meta_file() {
+  local project="$1" intake_id="$2"
+  echo "$(intake_dir_for_project "$project")/$intake_id/meta.env"
+}
+
+intake_item_message_file() {
+  local project="$1" intake_id="$2"
+  echo "$(intake_dir_for_project "$project")/$intake_id/message.txt"
+}
+
+interruption_resolution_item_dir() {
+  local project="$1" intake_id="$2"
+  echo "$(interruption_resolution_dir_for_project "$project")/$intake_id"
 }
 
 ensure_manager_watchdog_pid_file() {
@@ -331,6 +365,230 @@ ratio_meets_threshold() {
   local ratio="$1" threshold="$2"
   [[ -n "$ratio" && -n "$threshold" ]] || return 1
   awk -v ratio="$ratio" -v threshold="$threshold" 'BEGIN { exit !(ratio >= threshold) }'
+}
+
+slugify_text() {
+  local text="$1"
+  printf '%s\n' "$text" \
+    | tr '[:upper:]' '[:lower:]' \
+    | tr -cs 'a-z0-9' '-' \
+    | sed 's/^-//; s/-$//' \
+    | cut -c1-32
+}
+
+next_intake_id() {
+  local project="$1" message="$2"
+  local ts slug base candidate n intake_root
+  ts="$(date '+%Y%m%d-%H%M%S')"
+  slug="$(slugify_text "$message")"
+  [[ -n "$slug" ]] || slug="message"
+  base="${ts}-${slug}"
+  candidate="$base"
+  n=1
+  intake_root="$(intake_dir_for_project "$project")"
+  mkdir -p "$intake_root"
+  while [[ -e "$intake_root/$candidate" ]]; do
+    n=$((n + 1))
+    candidate="${base}-${n}"
+  done
+  printf '%s\n' "$candidate"
+}
+
+count_intake_items_by_status() {
+  local project="$1" expected_status="$2"
+  local intake_root meta_file count
+  intake_root="$(intake_dir_for_project "$project")"
+  [[ -d "$intake_root" ]] || {
+    printf '0\n'
+    return 0
+  }
+  count=0
+  while IFS= read -r meta_file; do
+    [[ -f "$meta_file" ]] || continue
+    if awk -F '"' -v expected="$expected_status" '/^STATUS=/{ if ($2 == expected) found=1 } END { exit found ? 0 : 1 }' "$meta_file"; then
+      count=$((count + 1))
+    fi
+  done < <(find "$intake_root" -mindepth 2 -maxdepth 2 -type f -name meta.env | sort)
+  printf '%s\n' "$count"
+}
+
+count_active_intake_items() {
+  local project="$1"
+  local intake_root meta_file count status
+  intake_root="$(intake_dir_for_project "$project")"
+  [[ -d "$intake_root" ]] || {
+    printf '0\n'
+    return 0
+  }
+  count=0
+  while IFS= read -r meta_file; do
+    [[ -f "$meta_file" ]] || continue
+    status="$(awk -F '"' '/^STATUS=/{print $2; exit}' "$meta_file")"
+    case "$status" in
+      absorbed|dropped) ;;
+      *) count=$((count + 1)) ;;
+    esac
+  done < <(find "$intake_root" -mindepth 2 -maxdepth 2 -type f -name meta.env | sort)
+  printf '%s\n' "$count"
+}
+
+meta_env_value() {
+  local meta_file="$1" key="$2"
+  [[ -f "$meta_file" ]] || return 0
+  awk -F '"' -v key="$key" '$1 == key "=" { print $2; exit }' "$meta_file"
+}
+
+validate_reaction_or_fail() {
+  local reaction="$1"
+  case "$reaction" in
+    steer|followup|collect|interrupt|noise) ;;
+    *)
+      log_error "unsupported reaction: $reaction (supported: steer, followup, collect, interrupt, noise)"
+      exit 1
+      ;;
+  esac
+}
+
+validate_absorption_classification_or_fail() {
+  local classification="$1"
+  [[ -z "$classification" ]] && return 0
+  case "$classification" in
+    discovery|continuation|control|noise) ;;
+    *)
+      log_error "unsupported classification: $classification (supported: discovery, continuation, control, noise)"
+      exit 1
+      ;;
+  esac
+}
+
+validate_intake_status_or_fail() {
+  local status="$1"
+  case "$status" in
+    new|classified|delegated|absorbed|dropped) ;;
+    *)
+      log_error "unsupported intake status: $status (supported: new, classified, delegated, absorbed, dropped)"
+      exit 1
+      ;;
+  esac
+}
+
+update_intake_pending_signal() {
+  local project="$1"
+  local pending_file count
+  pending_file="$(intake_pending_signal_file "$project")"
+  mkdir -p "$(dirname "$pending_file")"
+  count="$(count_active_intake_items "$project")"
+  if [[ "$count" -gt 0 ]]; then
+    cat >"$pending_file" <<EOF
+PENDING_INTAKE_ITEMS="$count"
+UPDATED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+EOF
+  else
+    rm -f "$pending_file"
+  fi
+}
+
+write_intake_item() {
+  local project="$1" intake_id="$2" author="$3" channel="$4" status="$5" classification="$6" linked_artifact="$7" delegated_worktree="$8" session_refs="$9" message="${10}" reaction="${11:-}" claimed_by="${12:-}" claimed_at="${13:-}" absorption_target="${14:-}" resolution_artifact="${15:-}"
+  local intake_root item_dir meta_file message_file created_at
+  intake_root="$(intake_dir_for_project "$project")"
+  item_dir="$intake_root/$intake_id"
+  meta_file="$item_dir/meta.env"
+  message_file="$item_dir/message.txt"
+  created_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  mkdir -p "$item_dir"
+  cat >"$meta_file" <<EOF
+INTAKE_ID="$intake_id"
+CREATED_AT="$created_at"
+AUTHOR="$author"
+CHANNEL="$channel"
+STATUS="$status"
+CLASSIFICATION="$classification"
+REACTION="$reaction"
+LINKED_ARTIFACT="$linked_artifact"
+DELEGATED_WORKTREE="$delegated_worktree"
+SESSION_REFS="$session_refs"
+CLAIMED_BY="$claimed_by"
+CLAIMED_AT="$claimed_at"
+ABSORPTION_TARGET="$absorption_target"
+RESOLUTION_ARTIFACT="$resolution_artifact"
+EOF
+  printf '%s\n' "$message" >"$message_file"
+  update_intake_pending_signal "$project"
+}
+
+write_interruption_resolution_artifact() {
+  local project="$1" intake_id="$2" resolved_by="$3" reaction="$4" classification="$5" absorption_target="$6" linked_artifact="$7" delegated_worktree="$8" status="$9" content="${10}"
+  local item_dir meta_file content_file created_at
+  item_dir="$(interruption_resolution_item_dir "$project" "$intake_id")"
+  meta_file="$item_dir/meta.env"
+  content_file="$item_dir/resolution.md"
+  created_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  mkdir -p "$item_dir"
+  cat >"$meta_file" <<EOF
+INTAKE_ID="$intake_id"
+CREATED_AT="$created_at"
+RESOLVED_BY="$resolved_by"
+REACTION="$reaction"
+CLASSIFICATION="$classification"
+ABSORPTION_TARGET="$absorption_target"
+LINKED_ARTIFACT="$linked_artifact"
+DELEGATED_WORKTREE="$delegated_worktree"
+STATUS="$status"
+EOF
+  printf '%s\n' "$content" >"$content_file"
+  printf '%s\n' "$item_dir"
+}
+
+intake_snapshot_for_project() {
+  local project="$1" limit="${2:-8}"
+  local intake_root item_dir meta_file message_file status intake_id created_at channel author classification linked_artifact first_line count reaction claimed_by absorption_target
+  intake_root="$(intake_dir_for_project "$project")"
+  [[ -d "$intake_root" ]] || return 0
+  count=0
+  while IFS= read -r item_dir; do
+    meta_file="$item_dir/meta.env"
+    message_file="$item_dir/message.txt"
+    [[ -f "$meta_file" ]] || continue
+    status="$(awk -F '"' '/^STATUS=/{print $2; exit}' "$meta_file")"
+    case "$status" in
+      absorbed|dropped) continue ;;
+    esac
+    intake_id="$(awk -F '"' '/^INTAKE_ID=/{print $2; exit}' "$meta_file")"
+    created_at="$(awk -F '"' '/^CREATED_AT=/{print $2; exit}' "$meta_file")"
+    channel="$(awk -F '"' '/^CHANNEL=/{print $2; exit}' "$meta_file")"
+    author="$(awk -F '"' '/^AUTHOR=/{print $2; exit}' "$meta_file")"
+    classification="$(awk -F '"' '/^CLASSIFICATION=/{print $2; exit}' "$meta_file")"
+    reaction="$(awk -F '"' '/^REACTION=/{print $2; exit}' "$meta_file")"
+    claimed_by="$(awk -F '"' '/^CLAIMED_BY=/{print $2; exit}' "$meta_file")"
+    linked_artifact="$(awk -F '"' '/^LINKED_ARTIFACT=/{print $2; exit}' "$meta_file")"
+    absorption_target="$(awk -F '"' '/^ABSORPTION_TARGET=/{print $2; exit}' "$meta_file")"
+    first_line="$(sed -n '1p' "$message_file" 2>/dev/null || true)"
+    printf -- '- id=%s status=%s classification=%s reaction=%s claimed_by=%s author=%s channel=%s created_at=%s linked_artifact=%s absorption_target=%s message=%s\n' \
+      "${intake_id:-unknown}" "${status:-unknown}" "${classification:-unclassified}" "${reaction:-pending}" "${claimed_by:-unclaimed}" "${author:-unknown}" "${channel:-unknown}" "${created_at:-unknown}" "${linked_artifact:-none}" "${absorption_target:-pending}" "${first_line:-}"
+    count=$((count + 1))
+    if (( count >= limit )); then
+      break
+    fi
+  done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort -r)
+}
+
+rewrite_existing_intake_item() {
+  local project="$1" intake_id="$2" status="$3" classification="$4" linked_artifact="$5" delegated_worktree="$6" reaction="$7" claimed_by="$8" claimed_at="$9" absorption_target="${10}" resolution_artifact="${11}"
+  local meta_file message_file author channel session_refs message
+  meta_file="$(intake_item_meta_file "$project" "$intake_id")"
+  message_file="$(intake_item_message_file "$project" "$intake_id")"
+  [[ -f "$meta_file" ]] || {
+    log_error "intake item not found: $intake_id"
+    exit 1
+  }
+  author="$(meta_env_value "$meta_file" "AUTHOR")"
+  channel="$(meta_env_value "$meta_file" "CHANNEL")"
+  session_refs="$(meta_env_value "$meta_file" "SESSION_REFS")"
+  message="$(cat "$message_file" 2>/dev/null || true)"
+  write_intake_item \
+    "$project" "$intake_id" "$author" "$channel" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "${session_refs:-[]}" "$message" \
+    "$reaction" "$claimed_by" "$claimed_at" "$absorption_target" "$resolution_artifact"
 }
 
 rate_limit_exhausted() {
@@ -823,6 +1081,26 @@ $fleet_snapshot
 EOF
 }
 
+append_human_chat_intake_if_needed() {
+  if [[ "$(role_hint_for_project "$PROJECT_ROOT")" != "manager" ]]; then
+    return 0
+  fi
+  local intake_snapshot
+  intake_snapshot="$(intake_snapshot_for_project "$PROJECT_ROOT" 8)"
+  [[ -n "$intake_snapshot" ]] || return 0
+  cat <<EOF
+
+Human chat intake queue:
+- 以下 human/project-facing interruptions 已 durable 写入 intake 队列。
+- 对每条 pending intake，先 \`claim\`，再选择 \`steer/followup/collect/interrupt/noise\`。
+- 使用 \`skill:human-interruption-handling\` 生成 resolution artifact / handoff，不要让主管自己承担深度解释。
+- 若最终 absorption 为新的 \`discovery\`，再走 \`doc-pre-brainstorm-execution\`，不要在主管工位直接落仓库产物。
+- intake item 只有在被吸收进 recovery / issue / pre-brainstorm / milestone 后，才算处理完成。
+
+$intake_snapshot
+EOF
+}
+
 manager_supervision_alerts() {
   local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state ai_state owner next_action anomaly
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
@@ -1258,6 +1536,7 @@ build_prompt() {
   append_checkpoint_governance_if_needed
   append_checkpoint_intervention_if_needed
   append_fleet_supervision_if_needed
+  append_human_chat_intake_if_needed
   append_manager_supervision_alert_if_needed
   append_manager_hygiene_alert_if_needed
   append_route_only_recovery_if_needed
@@ -1578,6 +1857,152 @@ cmd_doctor() {
   check_doc_gate_or_fail "$project"
 }
 
+cmd_intake_chat() {
+  local project="" message="" message_file="" author="human" channel="chat" intake_id=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --message) message="${2:-}"; shift 2 ;;
+      --message-file) message_file="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --author) author="${2:-}"; shift 2 ;;
+      --channel) channel="${2:-}"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  [[ -n "$project" ]] || { usage; exit 1; }
+  if [[ -n "$message_file" ]]; then
+    [[ -f "$message_file" ]] || { log_error "message file not found: $message_file"; exit 1; }
+    message="$(cat "$message_file")"
+  fi
+  [[ -n "$message" ]] || { log_error "missing --message or --message-file"; exit 1; }
+  intake_id="$(next_intake_id "$project" "$message")"
+  write_intake_item "$project" "$intake_id" "$author" "$channel" "new" "" "pending://unclassified" "" "[]" "$message"
+  log_info "intake recorded: $intake_id"
+  echo "intake_id: $intake_id"
+  echo "intake_path: $(intake_dir_for_project "$project")/$intake_id"
+}
+
+cmd_intake_claim() {
+  local project="" intake_id="" claimed_by="" reaction="" classification="" delegated_worktree="" linked_artifact="pending://claim-unlinked" status=""
+  local meta_file claimed_at
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --intake-id) intake_id="${2:-}"; shift 2 ;;
+      --claimed-by) claimed_by="${2:-}"; shift 2 ;;
+      --reaction) reaction="${2:-}"; shift 2 ;;
+      --classification) classification="${2:-}"; shift 2 ;;
+      --delegated-worktree) delegated_worktree="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --linked-artifact) linked_artifact="${2:-}"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  [[ -n "$project" && -n "$intake_id" && -n "$claimed_by" && -n "$reaction" ]] || { usage; exit 1; }
+  validate_reaction_or_fail "$reaction"
+  validate_absorption_classification_or_fail "$classification"
+  meta_file="$(intake_item_meta_file "$project" "$intake_id")"
+  [[ -f "$meta_file" ]] || { log_error "intake item not found: $intake_id"; exit 1; }
+  claimed_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  if [[ -n "$delegated_worktree" ]]; then
+    status="delegated"
+  else
+    status="classified"
+  fi
+  rewrite_existing_intake_item \
+    "$project" "$intake_id" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "$reaction" "$claimed_by" "$claimed_at" "" ""
+  log_info "intake claimed: $intake_id"
+  echo "intake_id: $intake_id"
+  echo "status: $status"
+  echo "reaction: $reaction"
+}
+
+cmd_intake_resolve() {
+  local project="" intake_id="" resolved_by="" reaction="" classification="" linked_artifact="pending://resolution-unlinked" delegated_worktree="" resolution_file="" absorption_target="" status="absorbed"
+  local meta_file claimed_by claimed_at reaction_existing classification_existing delegated_existing linked_existing resolution_content resolution_dir resolution_artifact
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --intake-id) intake_id="${2:-}"; shift 2 ;;
+      --resolved-by) resolved_by="${2:-}"; shift 2 ;;
+      --reaction) reaction="${2:-}"; shift 2 ;;
+      --classification) classification="${2:-}"; shift 2 ;;
+      --linked-artifact) linked_artifact="${2:-}"; shift 2 ;;
+      --delegated-worktree) delegated_worktree="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --resolution-file) resolution_file="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --absorption-target) absorption_target="${2:-}"; shift 2 ;;
+      --status) status="${2:-}"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  [[ -n "$project" && -n "$intake_id" && -n "$resolved_by" && -n "$reaction" && -n "$resolution_file" && -n "$absorption_target" ]] || { usage; exit 1; }
+  [[ -f "$resolution_file" ]] || { log_error "resolution file not found: $resolution_file"; exit 1; }
+  validate_reaction_or_fail "$reaction"
+  validate_absorption_classification_or_fail "$classification"
+  validate_intake_status_or_fail "$status"
+  case "$status" in
+    absorbed|dropped) ;;
+    *)
+      log_error "intake resolve only supports --status absorbed|dropped"
+      exit 1
+      ;;
+  esac
+  meta_file="$(intake_item_meta_file "$project" "$intake_id")"
+  [[ -f "$meta_file" ]] || { log_error "intake item not found: $intake_id"; exit 1; }
+  claimed_by="$(meta_env_value "$meta_file" "CLAIMED_BY")"
+  claimed_at="$(meta_env_value "$meta_file" "CLAIMED_AT")"
+  reaction_existing="$(meta_env_value "$meta_file" "REACTION")"
+  classification_existing="$(meta_env_value "$meta_file" "CLASSIFICATION")"
+  delegated_existing="$(meta_env_value "$meta_file" "DELEGATED_WORKTREE")"
+  linked_existing="$(meta_env_value "$meta_file" "LINKED_ARTIFACT")"
+  [[ -n "$classification" ]] || classification="$classification_existing"
+  [[ -n "$delegated_worktree" ]] || delegated_worktree="$delegated_existing"
+  if [[ "$linked_artifact" == "pending://resolution-unlinked" && -n "$linked_existing" ]]; then
+    linked_artifact="$linked_existing"
+  fi
+  if [[ -z "$reaction" && -n "$reaction_existing" ]]; then
+    reaction="$reaction_existing"
+  fi
+  resolution_content="$(cat "$resolution_file")"
+  resolution_dir="$(
+    write_interruption_resolution_artifact \
+      "$project" "$intake_id" "$resolved_by" "$reaction" "$classification" "$absorption_target" "$linked_artifact" "$delegated_worktree" "$status" "$resolution_content"
+  )"
+  resolution_artifact="$resolution_dir/resolution.md"
+  rewrite_existing_intake_item \
+    "$project" "$intake_id" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "$reaction" "${claimed_by:-$resolved_by}" "${claimed_at:-$(date -u '+%Y-%m-%dT%H:%M:%SZ')}" "$absorption_target" "$resolution_artifact"
+  log_info "intake resolved: $intake_id"
+  echo "intake_id: $intake_id"
+  echo "status: $status"
+  echo "resolution_artifact: $resolution_artifact"
+}
+
+cmd_intake_status() {
+  local project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  [[ -n "$project" ]] || { usage; exit 1; }
+  echo "project: $project"
+  echo "intake_dir: $(intake_dir_for_project "$project")"
+  echo "active_items: $(count_active_intake_items "$project")"
+  echo "new_items: $(count_intake_items_by_status "$project" "new")"
+  echo "classified_items: $(count_intake_items_by_status "$project" "classified")"
+  echo "delegated_items: $(count_intake_items_by_status "$project" "delegated")"
+  echo "absorbed_items: $(count_intake_items_by_status "$project" "absorbed")"
+  echo "dropped_items: $(count_intake_items_by_status "$project" "dropped")"
+  local snapshot
+  snapshot="$(intake_snapshot_for_project "$project" 10)"
+  if [[ -n "$snapshot" ]]; then
+    echo "items:"
+    printf '%s\n' "$snapshot"
+  else
+    echo "items: none"
+  fi
+}
+
 cmd_status() {
   local project=""
   while [[ $# -gt 0 ]]; do
@@ -1616,6 +2041,10 @@ cmd_status() {
   echo "last_project_dirty_entries: ${LAST_PROJECT_DIRTY_ENTRIES:-0}"
   echo "last_worktree_summary_total: ${LAST_WORKTREE_SUMMARY_TOTAL:-0}"
   echo "last_worktree_summary_dirty: ${LAST_WORKTREE_SUMMARY_DIRTY:-0}"
+  echo "intake_active_items: $(count_active_intake_items "$PROJECT_ROOT")"
+  echo "intake_new_items: $(count_intake_items_by_status "$PROJECT_ROOT" "new")"
+  echo "intake_classified_items: $(count_intake_items_by_status "$PROJECT_ROOT" "classified")"
+  echo "intake_delegated_items: $(count_intake_items_by_status "$PROJECT_ROOT" "delegated")"
   echo "checkpoint_drift_streak: ${CHECKPOINT_DRIFT_STREAK_CURRENT:-0}"
   echo "route_only_streak: ${ROUTE_ONLY_STREAK_CURRENT:-0}"
   local checkpoint_json checkpoint_required checkpoint_reasons
@@ -1804,6 +2233,17 @@ main() {
   case "$cmd" in
     init) cmd_init "$@" ;;
     doctor) cmd_doctor "$@" ;;
+    intake)
+      local subcmd="${1:-}"
+      shift || true
+      case "$subcmd" in
+        chat) cmd_intake_chat "$@" ;;
+        claim) cmd_intake_claim "$@" ;;
+        resolve) cmd_intake_resolve "$@" ;;
+        status) cmd_intake_status "$@" ;;
+        *) log_error "unknown intake subcommand: $subcmd"; usage; exit 1 ;;
+      esac
+      ;;
     ensure-manager) cmd_ensure_manager "$@" ;;
     start) cmd_start "$@" ;;
     status) cmd_status "$@" ;;
