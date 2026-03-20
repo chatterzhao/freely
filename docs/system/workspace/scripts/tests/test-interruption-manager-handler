@@ -7,7 +7,6 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
 FAKE_BIN="$TMP_DIR/bin"
-INTENT_FIXTURE="$TMP_DIR/intent-handler-fixture"
 INTAKE_ID="20260320-000000-test"
 mkdir -p "$PROJECT/.freely/intake/$INTAKE_ID" "$FAKE_BIN"
 
@@ -43,23 +42,8 @@ OUT
 EOF
 chmod +x "$FAKE_BIN/codex"
 
-cat >"$INTENT_FIXTURE" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-cat <<'OUT'
-INTENT_KIND=audit
-NEEDS_LIVE_INSPECTION=true
-NEEDS_EXECUTION=true
-SCOPE=fleet
-COMPLEXITY=multi-step
-CURRENT_CONTEXT=需要先审计 live worktree 状态再判断收口
-OUT
-EOF
-chmod +x "$INTENT_FIXTURE"
-
 OUTPUT="$(
   PATH="$FAKE_BIN:$PATH" \
-  FREELY_SIGNAL_INTENT_HANDLER_BIN="$INTENT_FIXTURE" \
     bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/interruption-manager-handler" \
       --project "$PROJECT" \
       --intake-id "$INTAKE_ID"
