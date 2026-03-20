@@ -67,6 +67,7 @@ auto-loop -> doc-loop -> dev-loop -> verification/completion -> cleanup -> auto-
 负责：
 - `pre-brainstorm`
 - candidate recording
+- unresolved candidate persistence / revisit governance
 - milestone intake
 - issue materialization
 - `IBM + G`
@@ -229,6 +230,8 @@ PROJECT_INTENT / chat / review / test / runtime anomaly
 - 并非所有 source 都必须先进入 `pre-brainstorm`；主管需要先判断正确 restart point。这里描述的是“当新 signal 被判定为 discovery source 时”的典型链路。
 - 原始发现源不得直接伪装成 ready issue
 - candidate 在未进入 milestone-owned issue 前，不得跳过 IBM 直接进入 dev-loop
+- candidate 若当前仍不能收敛到 IBM，不得在扫描中静默消失；必须同时保留在源 `candidates.md` 与 `docs/milestones.md#candidate_issues`
+- unresolved candidate 至少要写清 `status`、`decision_reason`、`next_action` 与 `revisit_trigger`，让下一轮主管知道为什么继续研究、何时重启、而不是默认跳过
 - future candidate 默认使用 `candidate_format_version: v2`，并包含 `acceptance_criteria`、`promotion_gate`、`open_questions`、`acceptance_reviews`
 
 ### 5.2 Candidate to milestone-owned issue

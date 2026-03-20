@@ -22,7 +22,7 @@ description: 执行 pre-brainstorm 前置收敛环，负责把新问题收敛为
 
 1. 写入前先读取 [entry-and-worktree-checks.md](references/entry-and-worktree-checks.md)。
 2. 若是首次进入 pre-brainstorm，按 [candidate-recording.md](references/candidate-recording.md) 写 `brainstorms.md`、`candidates.md` 和 `docs/milestones.md`。
-3. 若是继续研究 milestone 里的 `candidate_issues`，继续沿用同一 reference 补边界、依赖和下一动作。
+3. 若是继续研究 milestone 里的 `candidate_issues`，继续沿用同一 reference 补边界、依赖、下一动作和重启触发条件；若本轮仍不能收口，必须显式保留它的可见状态，而不是跳过。
 4. future candidate 默认使用 `candidate_format_version: v2`，并补齐 candidate-level acceptance boundary：
    - `acceptance_criteria`
    - `promotion_gate`
@@ -51,3 +51,4 @@ description: 执行 pre-brainstorm 前置收敛环，负责把新问题收敛为
 - `v2` candidate 的 acceptance boundary 已写清。
 - candidate 已同步到 milestone。
 - 已明确它继续 pre-brainstorm，还是进入 IBM。
+- 若本轮未进入 IBM，已显式标记 `needs_research` / `blocked` 等状态，并写清 `next_action` 与 `revisit_trigger`。
