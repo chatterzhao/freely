@@ -9,6 +9,7 @@ PROJECT="$TMP_DIR/project"
 FREELY_HOME="$TMP_DIR/freely-home"
 HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
 CLEANUP_WT="$TMP_DIR/cleanup-wt"
+CLEANUP_WT_2="$TMP_DIR/cleanup-wt-2"
 mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0000--sample"
 
 git init -q -b develop "$PROJECT"
@@ -117,7 +118,9 @@ cd "$PROJECT"
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto >/dev/null
 
 git -C "$PROJECT" worktree add -q -b feature/cleanup-fixture "$CLEANUP_WT" develop
+git -C "$PROJECT" worktree add -q -b feature/cleanup-fixture-2 "$CLEANUP_WT_2" develop
 CLEANUP_WT_REAL="$(cd "$CLEANUP_WT" && pwd -P)"
+CLEANUP_WT_2_REAL="$(cd "$CLEANUP_WT_2" && pwd -P)"
 
 cleanup_dispatcher() {
   if [[ -f "$PROJECT/.freely/run/interruption-dispatch.pid" ]]; then
@@ -152,12 +155,21 @@ grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env
 grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
 grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
 grep -q 'feature/cleanup-fixture @ '"$CLEANUP_WT_REAL" ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+grep -q 'feature/cleanup-fixture-2 @ '"$CLEANUP_WT_2_REAL" ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
 [[ ! -d "$CLEANUP_WT" ]] || {
   echo "[FAIL] cleanup worktree still exists" >&2
   exit 1
 }
+[[ ! -d "$CLEANUP_WT_2" ]] || {
+  echo "[FAIL] second cleanup worktree still exists" >&2
+  exit 1
+}
 if git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-fixture; then
   echo "[FAIL] cleanup branch still exists" >&2
+  exit 1
+fi
+if git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-fixture-2; then
+  echo "[FAIL] second cleanup branch still exists" >&2
   exit 1
 fi
 

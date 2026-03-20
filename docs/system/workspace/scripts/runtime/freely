@@ -1865,21 +1865,31 @@ EOF
 
 merged_feature_worktree_entries_for_project() {
   local project="$1"
-  local merged_branches
+  local merged_branches wt_path branch line
   merged_branches="$(git -C "$project" branch --format='%(refname:short)' --merged develop 2>/dev/null | grep '^feature/' || true)"
   [[ -n "$merged_branches" ]] || return 0
-  git -C "$project" worktree list --porcelain 2>/dev/null | awk -v merged="$merged_branches" '
-    BEGIN {
-      split(merged, lines, "\n")
-      for (i in lines) if (lines[i] != "") keep[lines[i]] = 1
-    }
-    /^worktree / { wt = substr($0, 10); next }
-    /^branch refs\/heads\// {
-      br = substr($0, 19)
-      if (keep[br]) print wt "\t" br
-      wt = ""
-    }
-  ' || true
+  wt_path=""
+  branch=""
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    case "$line" in
+      "worktree "*)
+        wt_path="${line#worktree }"
+        ;;
+      "branch refs/heads/"*)
+        branch="${line#branch refs/heads/}"
+        ;;
+      "")
+        if [[ -n "$wt_path" && -n "$branch" ]] && printf '%s\n' "$merged_branches" | grep -Fxq "$branch"; then
+          printf '%s\t%s\n' "$wt_path" "$branch"
+        fi
+        wt_path=""
+        branch=""
+        ;;
+    esac
+  done < <(git -C "$project" worktree list --porcelain 2>/dev/null)
+  if [[ -n "$wt_path" && -n "$branch" ]] && printf '%s\n' "$merged_branches" | grep -Fxq "$branch"; then
+    printf '%s\t%s\n' "$wt_path" "$branch"
+  fi
 }
 
 write_cleanup_followthrough_resolution_file() {
