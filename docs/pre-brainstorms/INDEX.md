@@ -148,6 +148,9 @@
 - 20260319-1105--three-loop-capability-lifecycle-governance
   - brainstorms: docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md
+- 20260319-1715--human-chat-intake-and-manager-delegation
+  - brainstorms: docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md
 - 20260319-0220--watchdog-control-plane-governance
   - brainstorms: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/candidates.md
