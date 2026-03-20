@@ -631,13 +631,13 @@ EOF
 }
 
 write_intake_item() {
-  local project="$1" intake_id="$2" author="$3" channel="$4" status="$5" classification="$6" linked_artifact="$7" delegated_worktree="$8" session_refs="$9" message="${10}" reaction="${11:-}" claimed_by="${12:-}" claimed_at="${13:-}" absorption_target="${14:-}" resolution_artifact="${15:-}"
+  local project="$1" intake_id="$2" author="$3" channel="$4" status="$5" classification="$6" linked_artifact="$7" delegated_worktree="$8" session_refs="$9" message="${10}" reaction="${11:-}" claimed_by="${12:-}" claimed_at="${13:-}" absorption_target="${14:-}" resolution_artifact="${15:-}" created_at_override="${16:-}"
   local intake_root item_dir meta_file message_file created_at
   intake_root="$(intake_dir_for_project "$project")"
   item_dir="$intake_root/$intake_id"
   meta_file="$item_dir/meta.env"
   message_file="$item_dir/message.txt"
-  created_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  created_at="${created_at_override:-$(date -u '+%Y-%m-%dT%H:%M:%SZ')}"
   mkdir -p "$item_dir"
   cat >"$meta_file" <<EOF
 INTAKE_ID="$intake_id"
@@ -716,21 +716,28 @@ intake_snapshot_for_project() {
 }
 
 rewrite_existing_intake_item() {
-  local project="$1" intake_id="$2" status="$3" classification="$4" linked_artifact="$5" delegated_worktree="$6" reaction="$7" claimed_by="$8" claimed_at="$9" absorption_target="${10}" resolution_artifact="${11}"
-  local meta_file message_file author channel session_refs message
+  local project="$1" intake_id="$2" status="$3" classification="$4" linked_artifact="$5" delegated_worktree="$6" reaction="$7" claimed_by="$8" claimed_at="$9" absorption_target="${10:-}" resolution_artifact="${11:-}"
+  local meta_file message_file author channel session_refs message created_at
   meta_file="$(intake_item_meta_file "$project" "$intake_id")"
   message_file="$(intake_item_message_file "$project" "$intake_id")"
   [[ -f "$meta_file" ]] || {
     log_error "intake item not found: $intake_id"
     exit 1
   }
+  created_at="$(meta_env_value "$meta_file" "CREATED_AT")"
   author="$(meta_env_value "$meta_file" "AUTHOR")"
   channel="$(meta_env_value "$meta_file" "CHANNEL")"
   session_refs="$(meta_env_value "$meta_file" "SESSION_REFS")"
   message="$(cat "$message_file" 2>/dev/null || true)"
   write_intake_item \
     "$project" "$intake_id" "$author" "$channel" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "${session_refs:-[]}" "$message" \
-    "$reaction" "$claimed_by" "$claimed_at" "$absorption_target" "$resolution_artifact"
+    "$reaction" "$claimed_by" "$claimed_at" "$absorption_target" "$resolution_artifact" "$created_at"
+}
+
+reset_intake_claim_for_retry() {
+  local project="$1" intake_id="$2"
+  rewrite_existing_intake_item \
+    "$project" "$intake_id" "new" "" "pending://unclassified" "" "" "" "" ""
 }
 
 resolution_snapshot_for_project() {
@@ -2037,8 +2044,14 @@ handle_interruption_intake_once() {
     --linked-artifact pending://interruption-manager-triage >/dev/null
 
   handler_bin="$(interruption_handler_bin_for_project "$project")"
-  [[ -x "$handler_bin" ]] || return 0
+  if [[ ! -x "$handler_bin" ]]; then
+    log_warn "interruption handler missing or not executable; returning intake to new: $intake_id"
+    reset_intake_claim_for_retry "$project" "$intake_id"
+    return 0
+  fi
   if ! handler_output="$("$handler_bin" --project "$project" --intake-id "$intake_id" 2>/dev/null)"; then
+    log_warn "interruption handler exited non-zero; returning intake to new: $intake_id"
+    reset_intake_claim_for_retry "$project" "$intake_id"
     return 0
   fi
   decision="$(printf '%s\n' "$handler_output" | awk -F= '/^DECISION=/{print substr($0,10); exit}')"
@@ -2049,7 +2062,11 @@ handle_interruption_intake_once() {
   why_text="$(printf '%s\n' "$handler_output" | awk -F= '/^WHY=/{print substr($0,5); exit}')"
   handoff_text="$(printf '%s\n' "$handler_output" | awk -F= '/^HANDOFF=/{print substr($0,9); exit}')"
   answer_text="$(printf '%s\n' "$handler_output" | awk -F= '/^ANSWER=/{print substr($0,8); exit}')"
-  [[ -n "$decision" ]] || return 0
+  if [[ -z "$decision" ]]; then
+    log_warn "interruption handler returned no decision; returning intake to new: $intake_id"
+    reset_intake_claim_for_retry "$project" "$intake_id"
+    return 0
+  fi
   apply_interruption_manager_decision "$project" "$intake_id" "$decision" "$reaction" "$classification" "$why_text" "$restart_point" "$ownership" "$handoff_text" "$answer_text"
 }
 

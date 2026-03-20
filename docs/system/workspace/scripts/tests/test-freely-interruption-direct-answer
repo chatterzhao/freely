@@ -8,6 +8,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 PROJECT="$TMP_DIR/project"
 FREELY_HOME="$TMP_DIR/freely-home"
 HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
+HANDLER_FAIL_FIXTURE="$TMP_DIR/interruption-handler-fail-fixture"
 CLEANUP_WT="$TMP_DIR/cleanup-wt"
 CLEANUP_WT_2="$TMP_DIR/cleanup-wt-2"
 mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0000--sample"
@@ -114,6 +115,13 @@ fi
 EOF
 chmod +x "$HANDLER_FIXTURE"
 
+cat >"$HANDLER_FAIL_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 1
+EOF
+chmod +x "$HANDLER_FAIL_FIXTURE"
+
 cd "$PROJECT"
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto >/dev/null
 
@@ -186,4 +194,29 @@ grep -q '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE
 grep -q 'restart_point: `pre_brainstorm`' ".freely/run/interruption-resolution/$INTAKE_ID_DELEGATE/resolution.md"
 grep -q 'handoff_summary: 进入 pre-brainstorm 分析并产出候选 issue' ".freely/run/interruption-resolution/$INTAKE_ID_DELEGATE/resolution.md"
 
-echo "[PASS] interruption manager routes abstract answer, cleanup followthrough, and delegated handoff"
+CHAT_OUTPUT_RETRY="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FAIL_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "检查worktree")"
+INTAKE_ID_RETRY="$(printf '%s\n' "$CHAT_OUTPUT_RETRY" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_RETRY" ]] || {
+  echo "[FAIL] missing retry intake id" >&2
+  exit 1
+}
+grep -q '^STATUS="new"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+grep -q '^CLASSIFICATION=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+grep -q '^CLAIMED_BY=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+grep -q '^LINKED_ARTIFACT="pending://unclassified"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+grep -q '^RESOLUTION_ARTIFACT=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+
+CREATED_AT_RETRY="$(awk -F '\"' '/^CREATED_AT=/{print $2; exit}' ".freely/intake/$INTAKE_ID_RETRY/meta.env")"
+[[ -n "$CREATED_AT_RETRY" ]] || {
+  echo "[FAIL] missing retry created_at" >&2
+  exit 1
+}
+
+FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$PROJECT" >/dev/null
+grep -q '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+grep -q '^CLASSIFICATION="discovery"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+grep -q '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+grep -q '^CREATED_AT="'"$CREATED_AT_RETRY"'"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+
+echo "[PASS] interruption manager routes abstract answer, cleanup followthrough, delegated handoff, and retries cleanly after handler failure"
