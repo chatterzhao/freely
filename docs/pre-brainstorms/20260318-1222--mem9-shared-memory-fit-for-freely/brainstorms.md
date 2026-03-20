@@ -102,5 +102,5 @@ Freely 未来若服务用户项目，可研究：
 
 1. 继续读取 `mem9` 的设计文档与插件目录，确认它对 OpenClaw/OpenCode/Claude Code 的接入模型。
 2. 评估 Freely 当前 continuity artifact 中，哪些字段值得外部化。
-3. 先 materialize 一个 issue：`Mem9 shared memory evaluation for Freely continuity plane`。
-4. 只把它放到研究/skill 轨道，不直接拉进当前主管/worker 主线。
+3. 已 materialize issue：`Mem9 shared memory evaluation for Freely continuity plane`。
+4. 已将落点限定为 `skill:mem9-continuity-bridge`，后续若要进入 runtime 集成，再从 issue 继续推进，不把外部 memory 直接抬成治理真源。

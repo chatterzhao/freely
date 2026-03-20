@@ -12,9 +12,9 @@
 - why_now: `mem9` 明确支持多种 AI coding agent，且方向与 Freely 的多工具未来形态有重叠。
 - acceptance_hint: 明确 Freely 与 mem9 的边界，给出适合 materialize 的 issue 或 skill 方向。
 - priority: P2
-- status: needs_research
-- decision_reason: 值得研究，但当前更像未来增强层，不应打断正在推进的主管/worker 主线。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: promoted
+- decision_reason: 研究结论已经稳定到可 materialize 的边界；mem9 适合被定义为可选连续性增强层，而不是治理真源。
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/mem9-continuity-bridge/issues/mem9-continuity-bridge.md`
+- milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:
   - github:https://github.com/mem9-ai/mem9
