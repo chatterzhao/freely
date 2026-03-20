@@ -368,6 +368,17 @@ valid_ai_pid_for_project() {
   pid_matches_project "$pid" "$project" "codex exec"
 }
 
+interruption_handler_bin_for_project() {
+  local project="$1"
+  if [[ -n "${FREELY_INTERRUPTION_HANDLER_BIN:-}" ]]; then
+    printf '%s\n' "$FREELY_INTERRUPTION_HANDLER_BIN"
+  elif [[ -x "$project/bin/interruption-handler" ]]; then
+    printf '%s\n' "$project/bin/interruption-handler"
+  else
+    printf '%s\n' "$SELF_ROOT/docs/system/workspace/scripts/runtime/interruption-manager-handler"
+  fi
+}
+
 load_config() {
   local project="$1"
   local cfg
@@ -1758,44 +1769,73 @@ intake_message_is_ai_process_query() {
 }
 
 write_direct_answer_resolution_file() {
-  local project="$1" intake_id="$2" out_file="$3"
+  local project="$1" intake_id="$2" out_file="$3" why_text="${4:-这是主管监督职责范围内的 runtime control 询问，应直接回答。}"
   cat >"$out_file" <<EOF
 # Interruption Resolution
 - intake_id: \`$intake_id\`
 - intent_summary: 查询当前后台 AI 进程的运行状态与正在执行的命令。
-- why_this_reaction: 这是高注意力但低业务价值的 runtime control 询问，不应等待主主管长循环空闲后再处理，也不应升级成 pre-brainstorm / issue。
+- why_this_reaction: $why_text
 - recommended_reaction: \`followup\`
 - absorption_recommendation: \`control -> answer-only runtime resolution\`
 $(ai_process_snapshot_markdown "$project")
 EOF
 }
 
-handle_direct_answer_intake_if_supported() {
+apply_interruption_manager_decision() {
+  local project="$1" intake_id="$2" decision="$3" reaction="$4" classification="$5" why_text="$6"
+  local resolution_file
+  case "$decision" in
+    manager_answer_ai_process_status)
+      cmd_intake_claim --project "$project" --intake-id "$intake_id" --claimed-by interruption-manager-agent --reaction "${reaction:-followup}" --classification "${classification:-control}" --linked-artifact runtime://ai-process-status >/dev/null
+      resolution_file="$(mktemp /tmp/freely-interruption-direct-answer.XXXXXX.md)"
+      write_direct_answer_resolution_file "$project" "$intake_id" "$resolution_file" "$why_text"
+      cmd_intake_resolve \
+        --project "$project" \
+        --intake-id "$intake_id" \
+        --resolved-by interruption-manager-agent \
+        --reaction "${reaction:-followup}" \
+        --classification "${classification:-control}" \
+        --resolution-file "$resolution_file" \
+        --absorption-target answer-only://runtime-ai-process-status \
+        --linked-artifact runtime://ai-process-status >/dev/null
+      rm -f "$resolution_file"
+      ;;
+    delegate_general)
+      cmd_intake_claim \
+        --project "$project" \
+        --intake-id "$intake_id" \
+        --claimed-by interruption-manager-agent \
+        --reaction "${reaction:-followup}" \
+        --classification "${classification:-discovery}" \
+        --linked-artifact pending://interruption-manager-delegation >/dev/null
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+handle_interruption_intake_once() {
   local project="$1" intake_id="$2"
-  local meta_file message_file status claimed_by message resolution_file
+  local meta_file message_file status claimed_by handler_bin handler_output decision reaction classification why_text
   meta_file="$(intake_item_meta_file "$project" "$intake_id")"
   message_file="$(intake_item_message_file "$project" "$intake_id")"
   [[ -f "$meta_file" && -f "$message_file" ]] || return 1
   status="$(meta_env_value "$meta_file" "STATUS")"
   claimed_by="$(meta_env_value "$meta_file" "CLAIMED_BY")"
   [[ "$status" == "new" && -z "$claimed_by" ]] || return 1
-  message="$(cat "$message_file" 2>/dev/null || true)"
-  intake_message_is_ai_process_query "$message" || return 1
 
-  cmd_intake_claim --project "$project" --intake-id "$intake_id" --claimed-by interruption-dispatcher --reaction followup --classification control --linked-artifact runtime://ai-process-status >/dev/null
-  resolution_file="$(mktemp /tmp/freely-interruption-direct-answer.XXXXXX.md)"
-  write_direct_answer_resolution_file "$project" "$intake_id" "$resolution_file"
-  cmd_intake_resolve \
-    --project "$project" \
-    --intake-id "$intake_id" \
-    --resolved-by interruption-dispatcher \
-    --reaction followup \
-    --classification control \
-    --resolution-file "$resolution_file" \
-    --absorption-target answer-only://runtime-ai-process-status \
-    --linked-artifact runtime://ai-process-status >/dev/null
-  rm -f "$resolution_file"
-  return 0
+  handler_bin="$(interruption_handler_bin_for_project "$project")"
+  [[ -x "$handler_bin" ]] || return 1
+  if ! handler_output="$("$handler_bin" --project "$project" --intake-id "$intake_id" 2>/dev/null)"; then
+    return 1
+  fi
+  decision="$(printf '%s\n' "$handler_output" | awk -F= '/^DECISION=/{print substr($0,10); exit}')"
+  reaction="$(printf '%s\n' "$handler_output" | awk -F= '/^REACTION=/{print substr($0,10); exit}')"
+  classification="$(printf '%s\n' "$handler_output" | awk -F= '/^CLASSIFICATION=/{print substr($0,16); exit}')"
+  why_text="$(printf '%s\n' "$handler_output" | awk -F= '/^WHY=/{print substr($0,5); exit}')"
+  [[ -n "$decision" ]] || return 1
+  apply_interruption_manager_decision "$project" "$intake_id" "$decision" "$reaction" "$classification" "$why_text"
 }
 
 ensure_interruption_dispatch_once() {
@@ -1806,12 +1846,12 @@ ensure_interruption_dispatch_once() {
   handled_any="0"
   while IFS= read -r item_dir; do
     intake_id="$(basename "$item_dir")"
-    if handle_direct_answer_intake_if_supported "$project" "$intake_id"; then
+    if handle_interruption_intake_once "$project" "$intake_id"; then
       handled_any="1"
     fi
   done < <(find "$(intake_dir_for_project "$project")" -mindepth 1 -maxdepth 1 -type d | sort)
   if [[ "$handled_any" == "1" ]]; then
-    log_info "interruption dispatcher handled direct-answer intake(s)"
+    log_info "interruption dispatcher handled intake(s)"
   fi
 }
 

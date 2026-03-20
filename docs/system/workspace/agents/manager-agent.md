@@ -31,7 +31,7 @@
    - 先 notice / claim
    - 选择 `steer/followup/collect/interrupt/noise`
    - 委派 `skill:human-interruption-handling` 产出 resolution artifact / handoff
-   - 但 runtime-owned 的 answer-only control query 允许由 interruption dispatcher 直接 claim / resolve；这不是第二个主管
+   - 独立 interruption dispatcher 允许先调用 `skill:human-interruption-manager-triage`，判断主管是否应直接回答；这不是第二个主管
 5. 当某个 worker 连续多轮处于 checkpoint / dirty-budget 漂移时，优先委派 hygiene 收口，而不是继续让它扩写实现。
 6. 监督多工位的节奏，而不是降级成单工位执行者。
 7. 在会话轮换前写出项目级 continuity，至少包含：
@@ -60,8 +60,9 @@
 当主管看到 pending human interruption 时，必须遵守下面的固定顺序：
 
 例外：
-- 若 runtime interruption dispatcher 能直接判定为窄范围的 answer-only control query（例如查询后台 AI 进程状态），允许 dispatcher 直接 claim / resolve。
-- 该例外只适用于 runtime-owned direct answer，不得扩张到 discovery / continuation / worker delegation。
+- runtime interruption dispatcher 可先调用 `skill:human-interruption-manager-triage`。
+- 若 triage 结果是主管职责内的 direct answer，可由 dispatcher 直接 claim / resolve。
+- 若 triage 结果是 `delegate_general`，dispatcher 只做及时 claim，不替代主主管完成完整排班。
 
 1. `notice`
 - 看到 durable intake item，而不是依赖聊天线程记忆。
