@@ -128,16 +128,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
-9. `I-20260319-1715`
-- title: CLI-first human chat intake and manager delegation loop
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
-- source_brainstorm: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md`
-- next_action: 当前 canonical 工位只承载重复的 human-chat 文档物化，且缺少独立 review / verification 证据；先显式挂起本工位，只允许把仍属 human-chat 的独有文档差异摘取到 `feature/human-chat-intake-supervision-20260319-1030`。若无独有差异，则直接退休本工位，不得单独 promote。
-
 ### candidate_issues
 
 1. `C-20260318-0715-A`
@@ -160,16 +150,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，先验证 `docs/system/workspace/three-loop-capability-lifecycle.md` 是否足以成为唯一细节真源；若仍需更多行为约束，再 materialize 为独立 IBM issue，而不是继续把细节散落到 `CONSTITUTION`、`PROJECT_INTENT` 和多个 skills 中
 
-3. `C-20260319-2315-A`
-- title: CLI TUI interruption input box for Freely
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
-- priority: P0
-- promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md`
-- next_action: 继续 pre-brainstorm，先收敛 TUI 是否只作为 interruption shell、中文输入的最低验收、以及输入框/状态区的最小布局；在这些边界稳定前不要直接写 UI 代码或把 TUI 做成第二套入口系统
-
 ### completed_issues
 
 1. `C-20260306-1101`
@@ -180,6 +160,28 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/lead-agent-bootstrap.md`
 - evidence: `docs/system/workspace/agents/lead-agent.md`
 - completion_note: 已落地首跳中枢代理职责与首跳协议
+
+2. `I-20260319-1715`
+- title: CLI-first human chat intake and manager delegation loop
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md`
+- evidence: `feature/human-chat-intake-supervision-20260319-1030`
+- completion_note: 本工位只保留 historical companion 说明；正式 completed 真源在 `feature/human-chat-intake-supervision-20260319-1030`，不得从本工位回退主线状态
+
+3. `I-20260319-2315`
+- title: CLI TUI interruption input box for Freely
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md`
+- evidence: `feature/cli-tui-input-interruption-20260319-2310`
+- completion_note: CLI TUI 能力已在独立主线完成；本工位不得继续把它当成活动 candidate
 
 2. `C-20260306-1102`
 - title: `context-source-skill.md`

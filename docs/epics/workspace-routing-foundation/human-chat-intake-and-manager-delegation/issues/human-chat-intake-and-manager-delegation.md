@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260319-1715`
 - title: CLI-first human chat intake and manager delegation loop
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `human-chat-intake-and-manager-delegation`
@@ -45,33 +45,17 @@ Freely 已经有 human chat intake 的最小闭环，但要真正“用 Freely �
 
 ## Completion
 
-- `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md`
-- `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md`
-- `docs/system/workspace/three-loop-capability-lifecycle.md`
-- `docs/system/workspace/agents/manager-agent.md`
-- `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
-- `docs/system/workspace/skills/human-interruption-handling/SKILL.md`
-- `docs/system/workspace/scripts/runtime/freely`
-- `docs/system/workspace/scripts/tests/test-freely-human-chat-intake`
-- `docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
+- 本工位仅保留 human-chat canonical 文档物化与历史差异说明。
+- `I-20260319-1715` 的正式完成态与 verification 真源位于 `feature/human-chat-intake-supervision-20260319-1030`。
+- 本工位不得作为 `I-20260319-1715` 的独立 promote / merge 来源。
 
 ## Verification
 
-- 当前验证重点：
-  - `freely intake chat` 是否会持久化 raw interruption 到 `.freely/intake/**`
-  - `freely intake claim` 是否能把 intake item 变成可监督的 claimed state
-  - `freely intake resolve` 是否会写 resolution artifact 并回写 absorption target
-  - `manager-agent` / `auto-loop-orchestrator` / `human-interruption-handling` 是否共享同一套 human interruption contract
-- 已执行验证检查：
-  - `bash docs/system/workspace/scripts/tests/test-freely-human-chat-intake`
-  - `bash docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
-- 已物化落点：
-  - `docs/system/workspace/scripts/runtime/freely`
-  - `docs/system/workspace/skills/human-interruption-handling/SKILL.md`
-  - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
-  - `docs/system/workspace/agents/manager-agent.md`
+- 本工位不再承载独立 verification。
+- formal verification review 已落在 `feature/human-chat-intake-supervision-20260319-1030`。
+- 本工位只允许保留“哪些差异仍需人工摘取”的 companion 说明，不重复宣称运行时或跨能力测试证据。
 
-## Next
+## Companion Status
 
 - 当前 canonical worktree 显式挂起：不得作为 `I-20260319-1715` 的独立 promote / merge 来源。
 - 挂起原因：本工位只重复物化了 human-chat issue 文档包，没有新增独立实现或 verification 证据；正式 verification review 已落在 `feature/human-chat-intake-supervision-20260319-1030`，而本工位的祖先历史还混入了 `CLI TUI` 与 `project-resolution` 能力线。
