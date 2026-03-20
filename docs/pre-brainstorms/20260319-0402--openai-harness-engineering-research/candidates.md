@@ -12,6 +12,8 @@
   - 能回答 Freely 目前哪些能力已经是 agent-first，哪些仍依赖人工隐性知识
   - 后续 issue 可以按 harness 分层而不是按零散脚本推进
 - decision_reason: 这是本次研究里最接近“问题定义层”的候选项；若不先统一地图，后续容易继续碎片化补控制面。
+- next_action: 继续 pre-brainstorm，先把 Freely 的 harness 分层与缺口图收束成稳定问题定义；边界稳定前不要 materialize。
+- revisit_trigger: 当 record system、feedback loop、invariants、cleanup 四层之间的缺口可以被明确映射到最小可执行问题时。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []
@@ -28,6 +30,8 @@
   - agent 能在少量上下文下直接拿到当前 worktree 的可执行状态摘要
   - 恢复、验证、promotion 决策减少对人工解释的依赖
 - decision_reason: 这项最直接服务“自治开发应用”的主目标，因为它减少 agent 在三层循环里判断上下文时的额外成本。
+- next_action: 继续 pre-brainstorm，先盘点现有 status / wt-status-all / runtime 输出，再决定要不要 materialize 成统一 machine-readable 汇总接口。
+- revisit_trigger: 当可以明确指出哪些字段必须稳定暴露给 agent，而不是继续依赖人工解释时。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []
@@ -44,6 +48,8 @@
   - 清理动作可以周期性运行，而不是只在人工注意到时发生
   - “治理漂移”被前移到自动发现和小步修复
 - decision_reason: 方向成立，但前提是 Freely 先把反馈面和 enforcement 面统一，否则会过早进入“自动清理自动化”而缺少稳定基线。
+- next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize。
+- revisit_trigger: 当反馈面和 enforcement 面已经可稳定消费后，再回看是否需要常驻 cleanup loop。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []
