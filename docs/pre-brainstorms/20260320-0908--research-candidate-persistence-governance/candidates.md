@@ -14,7 +14,7 @@
 - priority: P0
 - status: needs_research
 - decision_reason: 方向已经明确，但还需要验证最小治理是否只靠文档/提示词/测试就够，还是后续要 materialize 为更强的 issue-bound control-plane。
-- next_action: 先把 unresolved candidate persistence 规则写入 lifecycle、skill reference、lead prompt 与 milestone policy，并用最小测试锁住。
+- next_action: unresolved candidate persistence 规则已写入 lifecycle、skill reference、lead prompt、milestone policy 与 prompt test；下一步观察是否还需要 materialize 为独立治理 issue，并继续补 queue-level `revisit_trigger` 一致性。
 - revisit_trigger: 下一轮 worktree 审查再次发现“已研究但本轮未推进”的能力项无法在 `candidate_issues` 或 issue-bound artifact 中被看到。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260306-workspace-routing-foundation
