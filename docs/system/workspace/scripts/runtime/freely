@@ -798,6 +798,7 @@ tui_submit_message() {
   local project="$1" message="$2"
   [[ -n "$message" ]] || return 0
   bash "$SELF_ROOT/bin/freely" intake chat --project "$project" --author human --channel tui --message "$message" >/dev/null
+  ensure_interruption_dispatch_once "$project"
 }
 
 rate_limit_exhausted() {
@@ -2349,6 +2350,7 @@ cmd_chat() {
   project="$(resolve_project_or_fail "$project" 1)"
   bootstrap_interruption_entry_runtime_or_fail "$project"
   cmd_intake_chat --project "$project" --author human --channel chat --message "$message"
+  ensure_interruption_dispatch_once "$project"
 }
 
 cmd_tui() {
