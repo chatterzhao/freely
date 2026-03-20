@@ -58,6 +58,57 @@ Freely 真正要吸收的都是同一类东西：
 
 如果 Freely 能吸收这些能力，它就不只是“有三层循环的 agent runner”，而可以更接近“面向应用开发的 harnessed agentic engineering runtime”。
 
+## Harness Source Graph
+
+当前这条研究实际依赖的外部来源，不应被看成若干孤立文章，而应看成一个互补来源图：
+
+1. OpenAI `Harness engineering`
+   - 链接：`https://openai.com/index/harness-engineering/`
+   - 作用：给出总纲。
+   - 重点在：
+     - `Humans steer. Agents execute.`
+     - repository as system of record
+     - application legibility
+     - architecture / taste enforcement
+     - entropy / garbage collection
+
+2. OpenAI `Unlocking the Codex harness`
+   - 链接：`https://openai.com/index/unlocking-the-codex-harness/`
+   - 作用：给出 runtime 侧定义。
+   - 重点在：
+     - harness 不只是 repo 规范，也包括 agent loop、thread persistence、client/server protocol、event stream、approval pause/resume
+     - 这让 `harness` 不再只是方法论，而是一个可嵌入、可复用的 runtime surface
+
+3. OpenAI Cookbook `Using PLANS.md for multi-hour problem solving`
+   - 链接：`https://cookbook.openai.com/articles/codex_exec_plans/`
+   - 作用：补足 execution plans / checked-in progress / decision logs 这一层
+   - 重点在：
+     - plans 也是 harness 的一部分，而不是额外文档负担
+
+4. Entrix / 反熵治理文章
+   - 链接：`https://mp.weixin.qq.com/s/hvdNDXUJdzxAZMDnk-F0pA`
+   - 作用：细化 completion model / guardrails / risk routing / deep validation / decision loop
+
+5. HelixVerify / 自举闭环文章
+   - 链接：`https://mp.weixin.qq.com/s/xIWN6_X3UPbLXC3SUUdwrg`
+   - 作用：细化 bootstrap ladder、benchmark/detail、safe iteration、loop infra、supervisor
+
+6. Thoughtworks `fitness functions`
+   - 链接：`https://martinfowler.com/articles/fitness-functions-data-products.html`
+   - 作用：给 `fitness function` 一个更基础的定义：
+   - `a test that is used to evaluate how close a given implementation is to its stated design objectives`
+   - 这帮助我们把 `harness / fitness / guardrails` 统一回“可执行评估与治理自动化”。
+
+这些来源共同指向的不是一个名词，而是一组能力层：
+
+- repo-as-record-system
+- executable plans
+- legible runtime
+- executable evaluation
+- risk-aware guardrails
+- persistence / evented runtime
+- anti-entropy loop
+
 ## Observations
 
 1. OpenAI 把“人写代码”替换成“人设计 harness，agent 执行代码”。
@@ -369,6 +420,337 @@ dev-loop 已经最接近执行面，但还缺真正的 harness 落地能力：
 5. `anti-entropy background loop`
    - 把经验回写、漂移扫描和小步修复常态化。
 
+## Progressive Adoption Policy
+
+这条研究不应被当作“外部理念来了，就必须整包导入”的路线图。更合理的吸收方式是渐进和可逆的：
+
+1. `adopt as-is`
+   - 当外部做法与 Freely 的三层循环和治理边界天然兼容时，可以直接吸收。
+
+2. `adopt as variant`
+   - 当外部理念成立，但实现方式和 Freely 当前结构不兼容时，应保留原则、改写实现。
+   - 例如保留 `harness` / `fitness` / `guardrails` 背后的判断结构，但落成 Freely 自己的 loop artifacts、CLI、hook、status 接口。
+
+3. `adopt later`
+   - 当方向正确，但当前缺前置 substrate 时，保持为 candidate 或 `needs_research`，不抢跑 materialize。
+
+4. `drop explicitly`
+   - 当某个叙事只适用于外部团队环境，不适用于 Freely 的产品目标时，应明确记录为 `dropped`，而不是反复回收讨论。
+
+研究产物本身也应允许这种渐进性：
+
+- 先记录观察
+- 再形成候选
+- 再做 Freely 变种设计
+- 最后才决定是否 materialize
+
+这意味着研究产物本来就可以是：
+
+- 逐步的
+- 谨慎吸收的
+- 被丢弃的
+- 被 Freely 变种重写的
+
+而不是一开始就承诺“必须照搬”。
+
+## Freely-First Evaluation Principle
+
+更重要的是，这条研究不能默认把 `harness` 当成更高阶真理，再要求 Freely 去贴合它。
+
+正确顺序应当是：
+
+1. 先看 Freely 自己的产品理念和三层循环是否已经有更优设计。
+2. 再看外部 `harness` 理论是在补强 Freely，还是在把 Freely 拉回更通用、但更弱的抽象。
+3. 如果 Freely 已有更优秀、更贴合自主循环运行器目标的设计，不应为了术语对齐而退化。
+
+因此，所有外部 `harness` 能力进入 Freely 前，都应经过三问：
+
+1. `does it strengthen Freely's core goal?`
+   - 它是否真的增强“AI 在三层循环下持续自治开发应用”这个核心目标？
+
+2. `does it preserve Freely's differentiators?`
+   - 它是否保留 Freely 已有优势：
+   - 三层 loop 分层
+   - worktree-first discipline
+   - recovery / supervision / continuity
+   - 文档先于实现的路由治理
+
+3. `does it reduce or increase operational friction?`
+   - 它是降低 agent 与系统的摩擦，还是引入额外 ceremony、额外文档、额外概念负担？
+
+如果答案不好，就不该“为了 harness 而 harness”。
+
+## Rejection And Internalization Rules
+
+外部 `harness` 相关做法，不应只有“采纳/不采纳”两种命运，而应区分四种处理方式：
+
+1. `adopt`
+   - 当它直接增强 Freely 且不破坏现有优势时，直接吸收。
+
+2. `internalize`
+   - 当原理成立，但外部表达过重、过度设计或与 Freely 术语不兼容时，只内化其能力本质，不照搬形式。
+
+3. `supersede`
+   - 当 Freely 已有同类能力且设计更贴近自主循环运行器目标时，明确记为“Freely 现有设计优于外部默认说法”，不反向改弱。
+
+4. `drop`
+   - 当它华而不实、过度设计、只适用于别的团队环境、或会把 Freely 拖向更高维护成本时，明确丢弃。
+
+## Current Anti-Retrogression Judgment
+
+按这个标准回看，目前最需要警惕的不是“Freely 不够 harness”，而是两类退化风险：
+
+1. `terminology-first regression`
+   - 只因为外部有 `harness / app server / fitness / plans` 这些词，就急于全仓 rename。
+   - 这会制造术语热闹，但不一定带来真实能力增益。
+
+2. `ceremony-first regression`
+   - 为了看起来更完整，引入过多计划文件、流程门、记录面和控制层。
+   - 如果这些东西不能被 agent 实际消费、不能减少判断摩擦、不能提升闭环成功率，那就是华而不实。
+
+Freely 后续吸收外部理论时，应坚持一个更强的判定：
+
+- 能增强三层循环闭环，就吸收
+- 只是换一种叫法，就内化或忽略
+- 比 Freely 现有设计更弱，就拒绝回退
+- 过度设计且 agent 不真正受益，就丢弃
+
+## Current Freely Capability Inventory Against Harness
+
+在重新核对 `PROJECT_INTENT`、`three-loop-capability-lifecycle`、相关 skills 和脚本测试后，Freely 当前并不是“还没有 harness 雏形”，而是已经具备了一部分明显的 harness substrate。
+
+### 已经存在、且比较像 harness 内核的能力
+
+1. `three-loop routing and ownership`
+   - `auto-loop / doc-loop / dev-loop` 的边界、owner 和 artifact 已经有清晰真源。
+   - 这意味着 Freely 已经不是“一个 agent + 一串 prompt”，而是有明确分层的执行系统。
+
+2. `worktree-scoped execution isolation`
+   - feature worktree、protected branch 只读、manager/worker 分层，这些已经是很强的执行隔离和并行控制。
+   - 这非常接近 OpenAI 文中“每次改动都在独立实例中运行并验证”的前提。
+
+3. `machine-readable runtime snapshots`
+   - `freely status`、`freely fleet-status`、`wt-fleet-status`、`checkpoint-guard`、相关脚本测试已经说明：Freely 不只是“口头上有监督”，而是已经在暴露 project dirty、worktree summary、launch kind、checkpoint reasons 这些结构化信号。
+
+4. `recovery and supervision substrate`
+   - recovery routing、runtime continuity、manager supervision、watchdog / expected-running-but-down 等能力已经有明确 owner 和测试覆盖。
+   - 这使 Freely 在“loop 能持续跑”这件事上，比普通 agent workflow 更接近真正 runtime。
+
+5. `repo-as-record-system`
+   - `AGENTS.md` 只做入口、知识下沉到 `docs/`、session evidence 传播，这一层已经与 OpenAI 的 system-of-record 方向高度同构。
+
+### 明显还缺、且会阻塞 Freely 成为 harness runtime 的能力
+
+1. `issue-bound executable acceptance`
+   - 当前 Freely 有 issue / PRD / pre-tests / tasks，但“每个 issue 默认带一个最小可执行 gate”还没有成为稳定规则。
+   - 这使 doc-loop 和 dev-loop 之间仍然可能靠人工解释接缝。
+
+2. `guardrail planning as a first-class capability`
+   - Freely 已有 checkpoint、status、verification 等信号。
+   - 但还缺一个明确的 planner，把 `issue/change/risk` 映射到 `required gates + escalation path`。
+
+3. `benchmark/detail/experiment ledger`
+   - Freely 现在能写 progress / recovery / milestone / issue，但还缺像 HelixVerify 那样统一、可跨 session 继续消费的 benchmark/detail/experiment 记录面。
+
+4. `validation depth model`
+   - 现在的验证能力已经存在，但还没有统一成：
+   - 基础门
+   - 集成门
+   - 深验证门
+   - 人工复核门
+   - 这样一个清晰的 escalation model。
+
+5. `anti-entropy automation`
+   - Freely 已有治理漂移意识和 reroute 机制。
+   - 但离“后台持续扫描 drift 并主动发修复”还有一段距离。
+
+### 三层 loop 对 harness 的当前贴合度
+
+#### auto-loop
+
+已经有：
+- 来源扫描与路由
+- 多 worktree 监督
+- runtime continuity / recovery
+- manager supervision / freeze / cleanup decision
+
+仍缺：
+- 显式的 `guardrail planner`
+- 风险等级到验证深度的统一映射
+- 更强的 experiment-aware continuation policy
+
+#### doc-loop
+
+已经有：
+- pre-brainstorm 收敛
+- candidate / milestone intake
+- IBM materialization
+- issue / PRD / pre-tests / tasks 落点
+
+仍缺：
+- issue acceptance 默认变成最小可执行 gate
+- 风险拆解成为标准文档部分
+- “当前卡在哪个 bootstrap stage” 成为正式记录项
+
+#### dev-loop
+
+已经有：
+- dedicated worktree 内实现
+- 测试
+- progress writeback
+- verification / checkpoint / hygiene / promotion readiness
+
+仍缺：
+- 由 issue acceptance 驱动的最小集成测试
+- benchmark / detail / experiment lineage
+- 阶梯式验证和深验证升级的统一模型
+
+## Updated Meta-Judgment
+
+综合所有外部链接和 Freely 现状后，更准确的结论不是“Freely 要不要做 harness”，而是：
+
+- Freely 已经有一部分 harness runtime substrate
+- 但还没有把 `issue acceptance -> executable gates -> risk-aware escalation -> experiment ledger -> anti-entropy loop` 串成完整控制面
+
+因此，本研究最合理的下一步不是继续追逐概念，而是把 Freely 现有能力映射到一个明确的 harness capability map：
+
+1. 已有，保持并加固
+2. 已有雏形，需 formalize
+3. 缺失，需要 materialize
+
+## Semantic Alignment Opportunities
+
+研究到这里，Freely 面临的并不只是“缺不缺能力”，还有一个语义摩擦问题：外部专业讨论里的 `harness`、`fitness`、`guardrails`、`execution plans`、`app server` 等词，与 Freely 当前术语并不完全对齐。
+
+这会带来两种成本：
+
+1. 对外理解成本
+   - 外部读者/协作者很难快速判断 Freely 哪些能力已经等价存在。
+
+2. 对内设计成本
+   - 同一类能力可能被不同 loop / script / skill 用不同词描述，导致难以形成统一 capability map。
+
+目前可见的高价值语义对齐点：
+
+1. `harness`
+   - Freely 当前更接近：
+     - three-loop runtime
+     - supervision / recovery control plane
+     - agent-readable repo + runtime state
+   - 后续可以考虑在研究或设计文档中明确：
+     - `Freely harness runtime`
+     - `Freely harness control plane`
+   - 但不必急着全仓 rename。
+
+2. `fitness / guardrails`
+   - Freely 当前对应的是：
+     - verification
+     - checkpoint governance
+     - promotion gates
+     - review / recovery / reroute rules
+   - 这里更适合先做“术语映射表”，再决定是否把文档措辞逐步对齐。
+
+3. `execution plans`
+   - Freely 已有：
+     - pre-brainstorm
+     - IBM artifacts
+     - tasks / PRD / pre-tests
+     - progress / recovery
+   - 但还缺一个更明确的“checked-in active plan / completed plan / decision log”语义层。
+
+4. `app server / thread persistence / event stream`
+   - Freely 当前已有 runtime continuity / session evidence / supervisor / status
+   - 但还没有把它抽象成一个清晰、对外可描述的 runtime protocol surface
+
+因此，语义对齐应分两步走：
+
+1. 先在研究产物里建立 mapping
+   - 证明 Freely 哪些能力已与专业理论同构
+2. 再决定是否开专门 worktree 修改规范措辞
+   - 只在映射稳定后做
+   - 避免为了追词而制造无谓 churn
+
+当前判断：
+
+- 现在适合继续在本 research worktree 内做语义映射研究
+- 若后续确认要修改 `PROJECT_INTENT / LAWS / capability docs / skill docs` 的正式术语，再单开 dedicated feature worktree 做规范对齐
+
+## External Concept To Freely Mapping
+
+下面这张表不是 rename 清单，而是“专业理论与 Freely 现状的摩擦地图”。
+
+| External concept | Core meaning | Current Freely equivalent | Current judgment | Action |
+| --- | --- | --- | --- | --- |
+| `harness` | 让 agent 能稳定执行、验证、恢复和持续推进的工程控制面 | three-loop runtime + repo record system + supervision/recovery + worktree discipline | Freely 已有 substrate，但 control plane 语义未统一 | `internalize` |
+| `repo as system of record` | agent 看不见仓外知识 | `AGENTS.md` 入口 + `docs/**` 真源 + `session_refs` 传播 | 已高度同构 | `supersede` |
+| `execution plans` / `PLANS.md` | checked-in active plan, progress log, decision log | pre-brainstorm / issue / PRD / pre-tests / tasks / progress / recovery | 有等价碎片，但缺单独 plan ledger 语义 | `internalize` |
+| `fitness functions` | 用测试衡量实现与设计目标的距离 | pre-tests + tests + verification + checkpoint / promotion gates | 原理已存在，但尚未统一成 explicit completion model | `internalize` |
+| `quality gates` | 基础自动门 | tests / review / verification / checkpoint-governance | 已有但未统一编排 | `internalize` |
+| `risk routing` | 不同改动走不同验证深度 | reroute / milestone routing / recovery routing / manager supervision | 已有部分路由，但缺 risk->gate planner | `adopt` |
+| `deep validation` | 高风险变更需要更深验证 | verification / code review / completion verification | 有轮廓，缺统一 depth model | `adopt` |
+| `doc-gardening` | 持续修文档漂移 | 治理漂移意识 + pre-brainstorm reroute | 有理念，无常驻循环 | `adopt later` |
+| `legible runtime` | app/log/trace/status 对 agent 可读 | `freely status` / `fleet-status` / checkpoint / runtime continuity | 已起步，但还不够应用级 | `adopt` |
+| `thread persistence` / `event stream` | runtime 维持 agent loop 连续性 | session evidence / recovery / supervisor / runtime continuity | 原理已在，但外述语义不统一 | `internalize` |
+| `app server harness` | 可嵌入 agent runtime 协议面 | runtime scripts + external AI CLI orchestration | Freely 不需要照搬 server 形式，重点是保留 runtime surface | `drop` as form, `internalize` as capability |
+| `Humans steer. Agents execute.` | 人定义目标和边界，agent 负责执行 | auto-loop + doc-loop + dev-loop + manager/worker | 与 Freely 主理念同构 | `supersede` |
+
+### Table Notes
+
+1. `supersede`
+   - 表示 Freely 已经有同类能力，且当前表达更贴近自主循环运行器目标，不应为了外部词汇回退设计。
+
+2. `internalize`
+   - 表示原理成立，但应吸收到 Freely 现有 loop / skill / artifact 体系内，而不是照搬外部形式。
+
+3. `adopt`
+   - 表示确实是 Freely 目前缺的控制面能力，需要后续 materialize。
+
+4. `drop`
+   - 只丢外部形式，不丢背后的能力本质。
+
+## Near-Term Alignment Decisions
+
+基于上表，当前更适合做的不是大规模 rename，而是三类动作：
+
+1. `formalize existing equivalents`
+   - 把 Freely 已有但尚未统一表述的能力收束成更清晰的 control-plane 语义。
+   - 例如 completion model、validation depth、shared evidence plane。
+
+2. `materialize missing glue`
+   - 补上真正缺的连接层：
+   - guardrail planner
+   - issue acceptance driven executable gates
+   - bootstrap ladder
+   - experiment ledger
+
+3. `defer terminology refactor`
+   - 在 capability map 稳定前，不做全局术语改写。
+   - 只有当映射和边界稳定后，再评估是否需要专门 worktree 调整规范文档措辞。
+
+## Naming Preference For Alignment
+
+后续对齐时，默认优先使用 Freely 已有命名和语义，而不是为了贴近外部理论重新发明术语。
+
+具体原则：
+
+1. `reuse existing Freely terms by default`
+   - 如果 Freely 现有术语已经能表达同一能力，就继续沿用。
+
+2. `rename only when current wording is actively misleading`
+   - 只有当当前命名明显妨碍理解、遮蔽能力边界、或与现有 loop/owner/artifact 结构冲突时，才考虑改名。
+
+3. `introduce new terms only for genuinely new capabilities`
+   - 若外部理论揭示的是 Freely 目前没有被明确命名的新能力层，才引入新增术语。
+
+4. `prefer semantic mapping over vocabulary replacement`
+   - 先证明“Freely 现有词 = 外部理论中的哪一层能力”，再决定是否需要变更措辞。
+
+因此，当前研究阶段的默认策略应是：
+
+- 优先复用 Freely 既有命名
+- 把外部术语映射到 Freely 语义
+- 只有在“不合适”或“新增能力”两种情况下，才引入新词
+
 ## 2026-03-20 HelixVerify 增量证据
 
 ### 外部来源
@@ -420,16 +802,21 @@ dev-loop 已经最接近执行面，但还缺真正的 harness 落地能力：
    - 现在 Freely 更擅长治理和路由。
    - 但如果 agent 不能低成本地看系统、量化结果、拿到 detail 级证据，它就只能停留在“改代码 + 看粗粒度测试结果”。
 
-3. Freely 需要把 `safe iteration guardrails` 独立成正式能力。
+3. `issue acceptance driven integration tests` 应成为最早补起的一批 substrate。
+   - 集成测试不只是验证手段，而是把 issue 验收标准变成 agent 可执行环境的关键桥梁。
+   - 对 Freely 来说，优先级不应是“先把所有测试类型补齐”，而是“先把当前 issue 最小可执行验收门落成集成测试或等价应用级验证”。
+   - 没有这一层，agent 往往只能看到单测或静态输出，闭环在运行时事实层断裂。
+
+4. Freely 需要把 `safe iteration guardrails` 独立成正式能力。
    - 对抗验证
    - 分阶段验证
    - 失败快速暴露
    - 这些不应只是某个 issue 临时手法，而应成为通用执行模式。
 
-4. Freely 需要更强的 `experiment ledger / evidence lineage`。
+5. Freely 需要更强的 `experiment ledger / evidence lineage`。
    - 当前有 progress / recovery / docs，但还缺一层更统一的实验与验证记录面，能跨 session、跨 loop、跨 worktree 被继续消费。
 
-5. outer loop 的 supervisor 角色需要更正式地支持“持续驱动 + 审查 + 升级”。
+6. outer loop 的 supervisor 角色需要更正式地支持“持续驱动 + 审查 + 升级”。
    - 这篇文章证明，单纯 loop 还不够。
    - 外层仍需要一个更高阶的判断者来决定是否继续、是否升级、是否需要人类介入。
 
@@ -447,10 +834,14 @@ dev-loop 已经最接近执行面，但还缺真正的 harness 落地能力：
   - 当前能力阶段
   - 当前缺的是 `看`、`量`、`诊`、`安全验证` 还是 `持续运行`
 - 把验证设计从“是否有测试”提升为“是否具备闭环下一层能力”
+- 把 `issue acceptance -> minimal executable gate` 写成正式设计项
+  - 默认优先考虑最小集成测试、应用级验证或等价 runtime gate
+  - 而不是只停留在自然语言验收标准
 
 #### dev-loop
 
 - 增加标准化 benchmark / detail 输出面
+- 增加由 issue acceptance 驱动的最小集成测试
 - 增加对抗验证与阶梯式验证
 - 增加实验目录和结果 lineage，供下一轮 session 继续消费
 

@@ -139,6 +139,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，先冻结 3 个边界：`checkpoint-ready` 的结构化输出、`LAWS/runtime/checkpoint-guard/supervisor` 的职责分层、以及进入 IBM 前的 promotion gate；在这些边界稳定前不得直接写成 IBM issue 或塞回 `I-20260318-0930`
+- revisit_trigger: 当 `checkpoint-ready` 的结构化输出、supervisor 职责边界与 promotion gate 可以被稳定写成最小 issue contract 时，重新进入 materialization 判断
 
 2. `C-20260319-0402-01`
 - title: 定义 Freely 的 harness engineering 分层与缺口图
@@ -149,6 +150,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/candidates.md`
 - next_action: 保持在 pre-brainstorm，先验证 Freely 是否需要一份更明确的 harness 分层与缺口图；若边界稳定，再 materialize 成 issue，而不是直接把外部文章结论塞进现有主线
+- revisit_trigger: 当 harness 分层、缺口图与 Freely 自身的最小吸收面可以冻结成独立 issue contract 时，重新进入 materialization 判断
 
 3. `C-20260319-0402-02`
 - title: 把 worktree 级验证信号统一暴露成 agent 可消费接口
@@ -159,6 +161,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/candidates.md`
 - next_action: 继续 pre-brainstorm，先盘点现有 status / wt-status-all / runtime 输出，再决定要不要 materialize 成统一 machine-readable 汇总接口
+- revisit_trigger: 当 worktree 级验证信号的 canonical 输入、输出与 machine-readable summary contract 可以被冻结成 issue scope 时，重新进入 materialization 判断
 
 4. `C-20260319-0402-03`
 - title: 建立文档园艺与 AI 残渣清理的周期性后台循环
@@ -169,6 +172,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/candidates.md`
 - next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize
+- revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
 
 ### completed_issues
 

@@ -30,6 +30,7 @@
   - 设计统一的 machine-readable 汇总接口
   - 覆盖 benchmark / detail / experiment lineage 这类可续接证据
   - 明确哪些字段要直接服务 risk routing、哪些字段用于触发 deep validation 或人工复核
+  - 让 issue acceptance、最小集成测试结果和更深验证结果都能进入同一证据接口
   - 优先补自主循环最依赖的最小字段
 - acceptance_hint:
   - agent 能在少量上下文下直接拿到当前 worktree 的可执行状态摘要
@@ -37,6 +38,12 @@
   - 这些结构化信号可被 outer/doc/dev 三层循环共同消费，而不是只给 dev-loop 自己看
   - 新 session 能消费这些证据继续推进，而不是只能依赖短期上下文
   - 恢复、验证、promotion 决策减少对人工解释的依赖
+- decision_reason: 外部研究把问题从“状态要不要统一”推进到“统一状态是否足以支撑完成条件判断与验证升级决策”；这让本候选更接近 Freely 的执行控制面。
+- next_action: 继续 pre-brainstorm，先盘点现有 status / wt-status-all / runtime 输出里哪些已经可支撑 risk routing，哪些深验证触发信号仍缺失，再决定要不要 materialize。
+- revisit_trigger: 当可以明确指出哪些字段必须稳定暴露给 agent，且这些字段已经足以支持最小的 risk routing / validation escalation 决策时。
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
 
 ## C-20260320-01：为 Freely 增加 guardrail planner 与 validation escalation
 
@@ -45,6 +52,7 @@
 - change:
   - 定义 `change_class` / `risk_class` 的最小分类
   - 设计一个 `guardrail planner`，输入 issue/change/risk，输出本轮必须执行的 gates 与证据要求
+  - 把 issue acceptance 驱动的最小集成测试纳入 planner 的默认基础门
   - 把阶梯式验证和对抗验证纳入 planner 的默认 guardrails
   - 定义何时升级到 deep validation、何时必须人工复核、何时 reroute 到 pre-brainstorm / recovery
 - acceptance_hint:
@@ -76,9 +84,22 @@
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []
-- decision_reason: 外部研究把问题从“状态要不要统一”推进到“统一状态是否足以支撑完成条件判断与验证升级决策”；这让本候选更接近 Freely 的执行控制面。
-- next_action: 继续 pre-brainstorm，先盘点现有 status / wt-status-all / runtime 输出里哪些已经可支撑 risk routing，哪些深验证触发信号仍缺失，再决定要不要 materialize。
-- revisit_trigger: 当可以明确指出哪些字段必须稳定暴露给 agent，且这些字段已经足以支持最小的 risk routing / validation escalation 决策时。
+
+## C-20260320-03：以 issue acceptance 驱动 Freely 的最小集成测试 substrate
+
+- status: `proposed`
+- problem: Freely 当前已有测试与治理，但“issue 验收标准如何第一时间落成可执行集成门”还不稳定，导致 agent 容易停留在单测或静态结果层面，闭环缺少运行时事实校验。
+- change:
+  - 定义 `issue acceptance -> minimal executable gate` 的最小映射规则
+  - 默认优先将验收标准落成集成测试、应用级验证或等价 runtime gate
+  - 规定何时只需基础集成门，何时升级到更深验证
+- acceptance_hint:
+  - 新 issue 不再只有自然语言验收标准，而是默认带有一个最小可执行验证门
+  - agent 能直接用这道门判断当前变更是否真正触达运行时验收事实
+  - 该能力可作为 harness 的第一批 substrate，而不是等到后期再补
+- decision_reason: 多篇外部研究都在指向同一点：没有 issue-bound executable validation，agent 只是在“改代码”，而不是在闭环里交付应用。
+- next_action: 继续 pre-brainstorm，先抽样 Freely 现有 3-5 类 issue，看它们各自最合理的最小集成门是什么，再决定是否 materialize。
+- revisit_trigger: 当 issue 类型与最小可执行 gate 的映射已经足够稳定，能形成统一规则时。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []
