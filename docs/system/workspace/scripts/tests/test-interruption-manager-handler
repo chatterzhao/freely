@@ -8,6 +8,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 PROJECT="$TMP_DIR/project"
 FAKE_BIN="$TMP_DIR/bin"
 INTAKE_ID="20260320-000000-test"
+PROMPT_CAPTURE="$TMP_DIR/prompt.txt"
 mkdir -p "$PROJECT/.freely/intake/$INTAKE_ID" "$FAKE_BIN"
 
 cat >"$PROJECT/.freely/config.env" <<'EOF'
@@ -27,6 +28,7 @@ EOF
 cat >"$FAKE_BIN/codex" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+cat >"${PROMPT_CAPTURE:?}"
 cat <<'OUT'
 noise that should be ignored
 DECISION=delegate
@@ -43,6 +45,7 @@ EOF
 chmod +x "$FAKE_BIN/codex"
 
 OUTPUT="$(
+  PROMPT_CAPTURE="$PROMPT_CAPTURE" \
   PATH="$FAKE_BIN:$PATH" \
     bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/interruption-manager-handler" \
       --project "$PROJECT" \
@@ -53,5 +56,7 @@ grep -q '^DECISION=delegate$' <<<"$OUTPUT"
 grep -q '^RESTART_POINT=cleanup$' <<<"$OUTPUT"
 grep -q '^OWNERSHIP=worker$' <<<"$OUTPUT"
 grep -q '^HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口$' <<<"$OUTPUT"
+grep -q '优先按 worktree maintenance 问题理解，而不是泛化成 continuation' "$PROMPT_CAPTURE"
+grep -q 'worktree-maintenance-governance' "$PROMPT_CAPTURE"
 
 echo "[PASS] interruption manager handler writes prompt temp file and filters structured output"
