@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260319-1715`
 - title: CLI-first human chat intake and manager delegation loop
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `human-chat-intake-and-manager-delegation`
@@ -46,6 +46,7 @@ Freely 已经把 human chat 定义为 discovery / continuation / control 的正�
   - `docs/system/workspace/skills/human-interruption-handling/SKILL.md`
   - `docs/system/workspace/agents/manager-agent.md`
 
-## Next
+## Completion
 
-- 保持 `in_verification`，等待 review 与 promote / cleanup 判断。
+- human chat intake 与 manager delegation 主线已完成验证并收口。
+- companion canonical 分支已明确挂起，不再阻塞本主线完成。

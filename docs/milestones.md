@@ -128,16 +128,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
-9. `I-20260319-1715`
-- title: CLI-first human chat intake and manager delegation loop
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
-- source_brainstorm: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md`
-- next_action: 这条能力线已经在 runtime / skill / test 层闭环，当前只需完成 review 与 promote / cleanup 判断；不要再把它留在 candidate_issues 里拖延 formalization
-
 ### candidate_issues
 
 1. `C-20260318-0715-A`
@@ -162,14 +152,16 @@ routing_policy:
 
 ### completed_issues
 
-1. `C-20260306-1101`
-- title: `lead-agent.md`
+1. `I-20260319-1715`
+- title: CLI-first human chat intake and manager delegation loop
 - milestone_state: completed
 - phase_state: `completed`
 - priority: P0
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/lead-agent-bootstrap.md`
-- evidence: `docs/system/workspace/agents/lead-agent.md`
-- completion_note: 已落地首跳中枢代理职责与首跳协议
+- issue_path: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md`
+- evidence: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`, `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/code-reviews/20260320-human-chat-intake-and-manager-delegation-verification.md`, `docs/system/workspace/scripts/tests/test-freely-human-chat-intake`
+- completion_note: CLI-first human chat intake、manager queue scanning、claim/resolve/absorption writeback 与专项测试已闭环；companion canonical 分支已挂起，不再阻塞主线完成
 
 2. `C-20260306-1102`
 - title: `context-source-skill.md`
