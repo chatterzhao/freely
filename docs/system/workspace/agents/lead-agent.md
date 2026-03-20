@@ -32,8 +32,9 @@
    - `skill:dev-loop-execution`
    - 以及应由哪个外部 AI CLI 工具承接下一跳
 6. 当当前轮次承担项目级监督职责时，先判断哪些 worktree 应继续 dev-loop、哪些只做 doc-loop、哪些冻结等待上游、哪些需要 checkpoint / review / cleanup。
-7. 在可并行的 review、日志诊断、文档收敛或互不冲突的代码任务上，主动使用 subagent 提高效率，但不要让 subagent 接管主管自己的关键排班判断。
-8. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:doc-ibm-execution` 或 `skill:dev-loop-execution`；已有 issue 先进入 issue-bound `doc-loop`，再由后续循环进入 `dev-loop`。
+7. 当问题本身是“检查 worktree 是否完成 / 哪些可 merge / 哪些只该 retire”时，调用 `skill:worktree-maintenance-governance`，而不是只靠 milestone 或 git graph 临时拼判断。
+8. 在可并行的 review、日志诊断、文档收敛或互不冲突的代码任务上，主动使用 subagent 提高效率，但不要让 subagent 接管主管自己的关键排班判断。
+9. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:doc-ibm-execution` 或 `skill:dev-loop-execution`；已有 issue 先进入 issue-bound `doc-loop`，再由后续循环进入 `dev-loop`。
 
 ## 不负责
 

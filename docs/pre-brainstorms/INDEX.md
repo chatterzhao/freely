@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260320-1410--worktree-maintenance-skill-taxonomy
 - 20260320-0252--interruption-topology-and-manager-routing
 - 20260320-0152--chat-entrypoint-autobootstrap
 - 20260320-0138--interruption-entrypoint-runtime-preflight
@@ -13,6 +14,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260320-1410--worktree-maintenance-skill-taxonomy
+  - brainstorms: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/candidates.md
 - 20260303-ai-consistency-closed-loop-freely-alignment
   - brainstorms: docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/brainstorms.md
   - candidates: docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/candidates.md
