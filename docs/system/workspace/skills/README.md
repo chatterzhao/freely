@@ -20,6 +20,7 @@
 - `skill:constitution-guard` -> `constitution-guard/SKILL.md`
 - `skill:laws-enforcer` -> `laws-enforcer/SKILL.md`
 - `skill:auto-loop-orchestrator` -> `auto-loop-orchestrator/SKILL.md`
+- `skill:candidate-acceptance-review` -> `candidate-acceptance-review/SKILL.md`
 - `skill:doc-pre-brainstorm-execution` -> `doc-pre-brainstorm-execution/SKILL.md`
 - `skill:doc-ibm-execution` -> `doc-ibm-execution/SKILL.md`
 - `skill:dev-loop-execution` -> `dev-loop-execution/SKILL.md`

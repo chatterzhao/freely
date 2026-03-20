@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260320-0500--candidate-acceptance-review-governance
 - 20260320-0252--interruption-topology-and-manager-routing
 - 20260320-0152--chat-entrypoint-autobootstrap
 - 20260320-0138--interruption-entrypoint-runtime-preflight
@@ -163,6 +164,9 @@
 - 20260319-0220--watchdog-control-plane-governance
   - brainstorms: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/candidates.md
+- 20260320-0500--candidate-acceptance-review-governance
+  - brainstorms: docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

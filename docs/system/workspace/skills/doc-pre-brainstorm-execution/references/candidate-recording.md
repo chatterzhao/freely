@@ -13,12 +13,38 @@
 
 至少记录：
 
+- `candidate_format_version: v2`
 - `title`
 - `status`
 - `decision_reason`
+- `acceptance_criteria`
+- `promotion_gate`
+- `open_questions`
+- `acceptance_reviews`
 - `promoted_issue_path`
 - `milestone`
 - `session_refs`
+
+说明：
+
+- `acceptance_criteria` 记录 candidate 在 pre-brainstorm 阶段何时算完成
+- `promotion_gate` 记录进入 IBM materialization 前必须满足的边界
+- `open_questions` 记录当前仍未收敛的关键问题
+- `acceptance_reviews` 记录独立 acceptance review 的摘要与 verdict
+- 这层 acceptance 是 candidate-level acceptance，不等于 issue / dev / verification 的实现验收
+
+## `acceptance_reviews`
+
+- 允许在仍未准备 promotion 时暂时为空：`[]`
+- 当 candidate 准备 promotion，至少应有一次独立 review 记录
+- 高风险 candidate 优先使用多个 subagent 或 fresh process review
+
+最小结构：
+
+- `reviewer`
+- `mode`
+- `summary`
+- `verdict`
 
 ## `session_refs`
 
