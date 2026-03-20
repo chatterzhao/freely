@@ -1,17 +1,23 @@
-# Candidates
+# Candidates - 20260320-0512--milestone-planning-and-state-maintenance
 
-- capability: milestone planning and state maintenance
-- owner_loop: auto-loop manager supervision -> doc-loop governance maintenance
-- primary_surface: `docs/milestones.md`, linked `candidates.md`, issue / progress / recovery / cleanup evidence
-- canonical_artifact: `docs/system/workspace/skills/milestone-planning-state-maintenance/SKILL.md`
-- promoted_issue_path: pending://milestone-planning-state-maintenance-materialization
-- milestone: pending://workspace-routing-foundation
-- session_refs: []
-- key_questions:
-  - milestone 排期应何时被当作独立工作而不是临时补写
-  - 主管何时应委派专门 worker 做 milestone sequencing 和状态维护
-  - `pre-brainstorm -> candidate -> milestone -> issue -> progress/recovery` 是否应被显式视为治理事务
-- validation:
-  - manager / auto-loop / lifecycle 已明确 milestone planning worker 的职责边界
-  - 明确这条能力不替代业务 worker，只负责 planning / reconcile / writeback
-  - 明确何时触发 standing-source scan 下的委派
+## Context
+- Source brainstorm: `./brainstorms.md`
+- Status: `promoted`
+
+## Candidates
+
+### C-20260320-0512-A
+- title: Milestone planning and state maintenance
+- problem: Freely 已经把 `docs/milestones.md` 作为 standing source 和项目级编排入口，但还没有一个明确能力专门负责 milestone sequencing、candidate/committed/completed 队列维护，以及 candidate/issue/progress/recovery/cleanup 之间的状态 reconcile，导致这些工作长期靠业务 worker 顺手补写。
+- why_now: 本轮已经把 manager、auto-loop、lifecycle 与专门 skill 中的 milestone planning / state maintenance worker 语义落盘。当前缺口不再是“是否需要这个能力”，而是正式 materialize 为 canonical issue，避免真源和 milestone 仍停在 `pending://...materialization`。
+- acceptance_hint:
+  - manager 能在 standing-source scan 后识别“这是 planning/state-maintenance 问题”
+  - `skill:milestone-planning-state-maintenance` 明确只做 sequencing / reconcile / writeback，不做业务实现
+  - `three-loop-capability-lifecycle.md` 明确这是独立的 standing-source maintenance worker
+  - `pre-brainstorm -> candidate -> milestone -> issue -> progress/recovery` 被视为需要同步收敛的治理事务
+- priority: `P0`
+- status: `promoted`
+- decision_reason: manager 路由、auto-loop skill、专门 worker skill 与 lifecycle 真源都已改到位；继续把这条能力停留在 research 状态，会让 Freely 继续把 milestone maintenance 当成无 owner 的附属工作。
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/milestone-planning-and-state-maintenance/issues/milestone-planning-and-state-maintenance.md`
+- milestone: `M-20260306-workspace-routing-foundation`
+- session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
