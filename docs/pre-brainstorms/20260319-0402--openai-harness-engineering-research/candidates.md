@@ -130,8 +130,8 @@
   - agent 能直接用这道门判断当前变更是否真正触达运行时验收事实
   - 该能力可作为 harness 的第一批 substrate，而不是等到后期再补
 - decision_reason: 多篇外部研究都在指向同一点：没有 issue-bound executable validation，agent 只是在“改代码”，而不是在闭环里交付应用。
-- next_action: 继续 pre-brainstorm，先抽样 Freely 现有 3-5 类 issue，看它们各自最合理的最小集成门是什么，再决定是否 materialize。
-- revisit_trigger: 当 issue 类型与最小可执行 gate 的映射已经足够稳定，能形成统一规则时。
+- next_action: 继续 pre-brainstorm，把当前样本收束成一版 `issue type -> minimal gate -> escalation path` 规则草图，再决定是否 materialize。
+- revisit_trigger: 当 issue taxonomy、acceptance taxonomy 与最小可执行 gate 的映射已经足够稳定，能形成统一规则时。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []

@@ -778,6 +778,202 @@ Freely 后续吸收外部理论时，应坚持一个更强的判定：
    - 在 capability map 稳定前，不做全局术语改写。
    - 只有当映射和边界稳定后，再评估是否需要专门 worktree 调整规范文档措辞。
 
+## Sample Issue Mapping: Acceptance To Minimal Gate
+
+为了避免 `C-20260320-03` 继续停留在抽象层，这里直接用 Freely 现有 issue 做小样本映射。
+
+### Sample A: checkpoint / fleet supervision / runtime governance
+
+来源：
+- `I-20260318-0930`
+- `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
+
+issue 类型：
+- runtime / governance / CLI control plane
+
+acceptance 特征：
+- CLI 输出结构化结论
+- staged scope gate 返回非零
+- `freely status` / `wt-fleet-status` 暴露 checkpoint 与 runtime 摘要
+
+最小 executable gate：
+- 脚本级集成测试
+- CLI 输出断言
+- 非零退出码断言
+
+为什么不是更重验证：
+- 这个 issue 的核心事实在 CLI / runtime surface，而不是 UI 或人工流程
+- 因此最小门应优先锁住命令输出、状态字段和阻断行为
+
+何时升级：
+- 若影响 manager/worker supervisor 协作
+- 若牵涉实际 runtime ownership / PID / recovery 路径
+- 则升级到项目级 supervision / recovery 联动验证
+
+### Sample B: skill materialization / URL content intake
+
+来源：
+- `I-20260318-1908`
+- `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
+
+issue 类型：
+- skill materialization / platform routing
+
+acceptance 特征：
+- skill 目录完整
+- 脚本输出固定结构化字段
+- 平台模式选择正确 curl 参数
+
+最小 executable gate：
+- skill 脚本级测试
+- 参数选择断言
+- 输出字段断言
+
+为什么不是更重验证：
+- 当前 issue 目标是“能力物化为可分享 skill”，不是“全站点真实抓取成功率”
+- 因此最小门应该先锁住 platform routing 与 output contract
+
+何时升级：
+- 若要接入更多真实站点
+- 若要声明 runtime 级 URL intake 默认能力
+- 若要把 browser/MCP 纳入同一路由器
+- 则升级到更真实的网络/集成验证
+
+### Sample C: frontend/backend bridge contract
+
+来源：
+- `I-20260317-1005`
+- `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+
+issue 类型：
+- contract / bridge / app-facing runtime seam
+
+acceptance 特征：
+- bridge contract 最小签名明确
+- snapshot / command / event 子集冻结
+- 与前端 issue 边界清晰
+
+最小 executable gate：
+- typed contract tests
+- backend compile/check
+- frontend typecheck/build
+- Rust 单测或 bridge manifest 一致性测试
+
+为什么这里最小门已经更重：
+- 这是应用 runtime seam，不只是文档或脚本
+- 如果没有 compile + contract consistency，issue 验收标准就无法成立
+
+何时升级：
+- 一旦进入真实 Tauri 宿主联调
+- 一旦 bridge 事件开始驱动真实 UI
+- 就应升级到应用级联调或更接近 E2E 的验证
+
+## Mapping Pattern Learned From Samples
+
+从这三个样本里，可以先得到一个 Freely-first 的规则：
+
+1. `governance/runtime surface issue`
+   - 最小 gate 通常是 CLI/脚本级集成测试
+
+2. `skill/materialization issue`
+   - 最小 gate 通常是脚本 contract test + output shape test
+
+3. `app seam / bridge / runtime integration issue`
+   - 最小 gate 通常至少包含 compile/typecheck/contract consistency
+
+换句话说，Freely 不需要把“最小可执行 gate”理解成统一模板，而应该理解成：
+
+`issue 类型决定最小 executable gate 的层级`
+
+这进一步说明，后续真正需要 materialize 的，不只是“写集成测试”，而是：
+
+- issue taxonomy
+- acceptance taxonomy
+- gate selection taxonomy
+
+三者之间的映射规则。
+
+## Draft Rule: Issue Type To Gate Selection
+
+基于当前样本，可以先形成一版 Freely-first 的最小规则草图：
+
+| Issue type | Typical acceptance shape | Minimal executable gate | Escalation path |
+| --- | --- | --- | --- |
+| governance / runtime surface | CLI 输出、状态字段、阻断行为、调度摘要 | CLI assertions + script integration tests + exit code checks | 升级到 supervisor/recovery 联动验证 |
+| skill / script materialization | 输出 contract、参数选择、目录完整性、局部行为 | script contract tests + output shape tests + fixture-based checks | 升级到真实平台集成验证或路由器联调 |
+| doc / IBM boundary issue | issue 边界、产物完整性、目录归属、前置测试定义 | artifact completeness checks + doc gate checks + cross-link checks | 升级到 ready-for-dev audit |
+| bridge / runtime seam | typed contract、compile、event/schema 对齐、跨端接口稳定性 | compile/check + typecheck/build + contract consistency tests | 升级到宿主联调 / app-level integration |
+| runtime continuity / recovery | handoff、resume/fresh、rotation、state continuity | runtime script regression tests + session-state assertions | 升级到 multi-cycle recovery simulations |
+| application behavior issue | 用户可见行为、状态流、交互结果 | issue-specific integration test or equivalent runtime gate | 升级到 E2E / accessibility / perf / manual review |
+
+### Rule Notes
+
+1. `minimal` 不等于 `cheap at all costs`
+   - 它表示“能最早证明该 issue 的核心验收事实”的最低门。
+
+2. `integration test` 不是唯一形式
+   - 对某些 issue，CLI/script/runtime contract test 本身就是最正确的最小集成门。
+
+3. `doc-loop` 也有 executable gate
+   - 不是只有 dev-loop 才需要可执行门。
+   - 当 issue 本身是文档边界、治理边界或 contract 冻结时，文档产物完整性检查就是正式 gate。
+
+4. `escalation` 必须由 issue 风险驱动
+   - 不是所有 issue 都需要 E2E / manual review。
+   - 但一旦跨越 runtime seam、影响用户面、或影响 supervisor/recovery 语义，就不应停在最小门。
+
+## Draft Judgment For Freely
+
+按这张表回看，Freely 最需要新增的不是“更多测试”本身，而是：
+
+1. 一套轻量 `issue type taxonomy`
+2. 一套 `acceptance -> gate` 映射规则
+3. 一套 `minimal gate -> escalation path` 规则
+
+这样外部 `harness` 理论才能真正落入 Freely，而不是停在口号层。
+
+## Harness Capability Comparison Table
+
+下面这张表是当前研究最直接的对照结论。它回答的不是“Freely 要不要变成 harness”，而是：
+
+- `harness` 相关能力到底是什么
+- Freely 当前是否已有对应能力
+- 是 Freely 更优、需要优化、需要融合新增，还是根本用不上
+
+| Harness capability | What it means | Freely current equivalent | Current comparison | Next judgment |
+| --- | --- | --- | --- | --- |
+| repo-as-record-system | agent 所需知识都在仓内可发现 | `AGENTS.md` 入口 + `docs/**` 真源 + `session_refs` | Freely 已高度同构，且三层 loop 语义更清晰 | `Freely更优` |
+| progressive disclosure | 从稳定入口逐步暴露上下文 | `AGENTS.md -> CONSTITUTION/LAWS/PROJECT_INTENT -> skills -> artifacts` | Freely 已有明确分层 | `Freely更优` |
+| worktree-scoped execution | 每次改动在隔离实例中执行 | feature worktree / manager-worker / protected branch 只读 | Freely 已是核心纪律 | `Freely更优` |
+| runtime continuity | 会话轮换、恢复、继续执行 | runtime continuity / recovery / supervisor / handoff | Freely 已有强 substrate | `Freely更优` |
+| machine-readable status | agent 可读状态面 | `freely status` / `fleet-status` / `wt-fleet-status` / checkpoint fields | 已有，但仍偏 runtime/governance 视角 | `Freely需要优化` |
+| completion model | 什么叫完成、何时升级验证 | issue / verification / promotion gates 零散存在 | 有雏形但未统一成显式模型 | `Freely需要优化` |
+| quality gates | 基础自动化门 | tests / review / verification / checkpoint governance | 已有，但缺统一编排语义 | `Freely需要优化` |
+| risk-aware routing | 风险决定验证深度和推进路径 | route_kind / reroute / manager supervision / recovery routing | 有部分能力，但缺显式 planner | `Freely需要融合新增` |
+| deep validation | 高风险路径升级到更深验证 | verification / code review / completion verification | 有轮廓，缺 depth model | `Freely需要融合新增` |
+| issue-bound executable acceptance | issue 验收标准直接变成可执行门 | issue / pre-tests / tests 存在，但未形成稳定映射 | 这是当前关键缺口 | `Freely需要融合新增` |
+| experiment ledger | benchmark/detail/实验 lineage 可跨 session 消费 | progress / recovery / issue / milestone 有碎片 | 还没有统一实验记录面 | `Freely需要融合新增` |
+| bootstrap ladder | agent 逐层长出闭环能力 | Freely 有 doc-loop/dev-loop/recovery，但未显式建模 `see/measure/diagnose/...` | 原理可吸收，但要 Freely 变种表达 | `Freely需要融合新增` |
+| anti-entropy loop | 周期性扫描漂移并修复 | 治理漂移意识 + reroute + cleanup 候选 | 还没成为后台常驻能力 | `Freely需要优化` |
+| execution plans as first-class artifact | checked-in active plan / decision log | pre-brainstorm / IBM / PRD / tasks / progress / recovery | 有等价物，但未统一成同一语义层 | `Freely需要优化` |
+| app-facing observability | 运行中的 app/log/trace 对 agent 低成本可读 | probe/runtime/status 基础能力正在长出 | 对 Freely 很重要，但仍偏早期 | `Freely需要优化` |
+| external app-server harness form | 以 server/protocol/event stream 形式暴露 harness runtime | Freely 当前是脚本/runtime/CLI/orchestrator 形态 | 外部形式不必照搬 | `Freely用不上` |
+| throughput-first culture | 以更多 PR、更短周期为主目标 | Freely 当前目标是自治闭环稳定性 | 与当前阶段不匹配 | `Freely用不上` |
+
+### Table Reading Guide
+
+1. `Freely更优`
+   - Freely 已有等价能力，而且当前表达更贴近“自主循环运行器”目标，不应回退。
+
+2. `Freely需要优化`
+   - 能力方向已存在，但表达、统一性、可消费性或自动化程度还不够。
+
+3. `Freely需要融合新增`
+   - 这是外部研究提供的真实增量，需要按 Freely 自己的语义和三层 loop 结构融合进去。
+
+4. `Freely用不上`
+   - 不是说原理错误，而是当前外部形式、叙事或优先级不适合 Freely。
+
 ## Naming Preference For Alignment
 
 后续对齐时，默认优先使用 Freely 已有命名和语义，而不是为了贴近外部理论重新发明术语。
