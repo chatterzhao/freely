@@ -20,3 +20,4 @@
   - 明确哪些已实现、哪些未实现、哪些已有测试覆盖
   - 明确主管顶层职责是 `restart point routing`
   - 明确当前 interruption 局部规则表不应继续扩张
+  - 至少打通一条完整 event 链，并证明它能形成真实 followthrough 和 canonical writeback

@@ -168,7 +168,7 @@ routing_policy:
 - promoted_issue_path: `pending://restart-point-routing-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/candidates.md`
-- next_action: 继续 pre-brainstorm，先把“任意 signal 出现后应从哪一层 loop 重启”收敛成统一模型，并修正当前 interruption 文档里对主管直答和专属路由的局部化表述；在 restart-point routing 未收敛前，不再扩 interruption runtime 规则
+- next_action: M1-M3 的 interruption 最小 slice 已落盘：主管 triage 已改成抽象 routing contract，且 `cleanup` followthrough 已形成第一条完整 event 链。下一步继续 pre-brainstorm，把同一 contract 扩到 review/test/runtime anomaly/worker-discovered gap 与 standing-source scan，再决定是否 materialize 为统一 routing issue
 
 ### completed_issues
 

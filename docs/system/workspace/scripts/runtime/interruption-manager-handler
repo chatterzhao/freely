@@ -54,28 +54,34 @@ cat >"$prompt_file" <<EOF
 
 目标：
 - 第一时间注意到任意人类插话。
-- 判断这条插话应由主管自己直接回答，还是只做 notice/claim 后委派到后续主线。
-- 不要靠关键词穷举，不要扩写长解释，只做最小判断。
+- 你只根据自己的职责做最小判断：
+  - 是主管先做简短澄清/回答
+  - 还是委派到后续专门处理链
+- 不能靠关键词穷举，也不要发明很多问题类型。
+- 可以参考少量示例，但示例不是硬编码规则：
+  - 纯主管监督面事实查询，通常可由主管先澄清
+  - 涉及分析、执行、清理、分支/worktree收口、文档补齐、实现/测试/review 的，通常应委派
 
-主管自己直接回答的条件：
-- 这条插话本质上是在问主管监督面可直接看到的事实。
-- 例如后台 AI 进程、当前监督状态、当前 manager focus。
-- 这类问题高注意力，但不应升级成 pre-brainstorm / issue。
-
-否则：
-- 选择 delegate_general。
-- 不要假装知道后续 worker 细节。
+若选择委派，必须同时判断：
+- restart point 从哪里重新开始：
+  - pre_brainstorm / candidate / milestone / ibm / dev / review / verification / continuation / runtime / cleanup
+- ownership 属于 manager / worker / runtime 哪一侧
+- 给出一行 handoff 摘要
 
 只输出以下 KEY=VALUE 行，不要输出任何额外文本：
-DECISION=manager_answer_ai_process_status 或 delegate_general
+DECISION=answer 或 delegate
 REACTION=followup
 CLASSIFICATION=control 或 discovery 或 continuation 或 noise
+RESTART_POINT=<pre_brainstorm|candidate|milestone|ibm|dev|review|verification|continuation|runtime|cleanup>
+OWNERSHIP=<manager|worker|runtime>
 WHY=<单行中文原因，最多 40 字>
+HANDOFF=<单行中文交接摘要，最多 60 字；若是 answer 可留空>
+ANSWER=<单行中文回答摘要，最多 60 字；若是 delegate 可留空>
 
 插话：
 $message
 EOF
 
 codex exec --skip-git-repo-check -C "$project" -m "$model" -c "model_reasoning_effort=\"$reasoning_effort\"" --dangerously-bypass-approvals-and-sandbox - <"$prompt_file" \
-  | awk '/^(DECISION|REACTION|CLASSIFICATION|WHY)=/' \
-  | head -n 4
+  | awk '/^(DECISION|REACTION|CLASSIFICATION|RESTART_POINT|OWNERSHIP|WHY|HANDOFF|ANSWER)=/' \
+  | head -n 8

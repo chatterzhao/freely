@@ -2,15 +2,22 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
-TMP_DIR="$(mktemp -d /tmp/freely-interruption-direct-answer.XXXXXX)"
+TMP_DIR="$(mktemp -d /tmp/freely-interruption-routing.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
 FREELY_HOME="$TMP_DIR/freely-home"
 HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
+CLEANUP_WT="$TMP_DIR/cleanup-wt"
 mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0000--sample"
 
 git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
 
 cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
@@ -53,6 +60,9 @@ cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/candidates.md" <<'EOF'
 - session_refs: []
 EOF
 
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
 cat >"$HANDLER_FIXTURE" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -68,17 +78,36 @@ done
 message="$(cat "$project/.freely/intake/$intake_id/message.txt")"
 if [[ "$message" == *后台* ]]; then
   cat <<'OUT'
-DECISION=manager_answer_ai_process_status
+DECISION=answer
 REACTION=followup
 CLASSIFICATION=control
-WHY=这是主管监督面可直接回答的问题
+RESTART_POINT=runtime
+OWNERSHIP=manager
+WHY=这是主管监督面需要先做澄清的问题
+HANDOFF=
+ANSWER=主管先回答当前后台 AI 进程状态
+OUT
+elif [[ "$message" == *worktree* && "$message" == *收口* ]]; then
+  cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=cleanup
+OWNERSHIP=worker
+WHY=这涉及实际收口动作，需要委派清理
+HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口
+ANSWER=
 OUT
 else
   cat <<'OUT'
-DECISION=delegate_general
+DECISION=delegate
 REACTION=followup
 CLASSIFICATION=discovery
-WHY=这不属于主管直接回答范围
+RESTART_POINT=pre_brainstorm
+OWNERSHIP=worker
+WHY=这件事需要先进入预研收敛
+HANDOFF=进入 pre-brainstorm 分析并产出候选 issue
+ANSWER=
 OUT
 fi
 EOF
@@ -86,93 +115,63 @@ chmod +x "$HANDLER_FIXTURE"
 
 cd "$PROJECT"
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto >/dev/null
-FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --watch --interval 1 >/tmp/freely-interruption-dispatch.log 2>&1 &
-DISPATCH_PID=$!
-trap 'kill "$DISPATCH_PID" 2>/dev/null || true; wait "$DISPATCH_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
 
-for _ in $(seq 1 10); do
-  if [[ -f ".freely/run/interruption-dispatch.pid" ]]; then
-    READY_PID="$(cat ".freely/run/interruption-dispatch.pid" 2>/dev/null || true)"
-    if [[ -n "$READY_PID" ]] && kill -0 "$READY_PID" 2>/dev/null; then
-      break
+git -C "$PROJECT" worktree add -q -b feature/cleanup-fixture "$CLEANUP_WT" develop
+CLEANUP_WT_REAL="$(cd "$CLEANUP_WT" && pwd -P)"
+
+cleanup_dispatcher() {
+  if [[ -f "$PROJECT/.freely/run/interruption-dispatch.pid" ]]; then
+    pid="$(cat "$PROJECT/.freely/run/interruption-dispatch.pid" 2>/dev/null || true)"
+    if [[ -n "${pid:-}" ]]; then
+      kill "$pid" 2>/dev/null || true
+      wait "$pid" 2>/dev/null || true
     fi
   fi
-  sleep 1
-done
-[[ -f ".freely/run/interruption-dispatch.pid" ]] || {
-  echo "[FAIL] interruption dispatcher did not become ready" >&2
+}
+trap 'cleanup_dispatcher; rm -rf "$TMP_DIR"' EXIT
+
+CHAT_OUTPUT_ANSWER="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "看看后台AI进程都在做什么？")"
+INTAKE_ID_ANSWER="$(printf '%s\n' "$CHAT_OUTPUT_ANSWER" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_ANSWER" ]] || {
+  echo "[FAIL] missing answer intake id" >&2
   exit 1
 }
+grep -q '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
+grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
+grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
+grep -q '主管先回答当前后台 AI 进程状态' ".freely/run/interruption-resolution/$INTAKE_ID_ANSWER/resolution.md"
 
-CHAT_OUTPUT="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat "看看后台进程都在做什么？")"
-INTAKE_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
-[[ -n "$INTAKE_ID" ]] || {
-  echo "[FAIL] missing intake id" >&2
+CHAT_OUTPUT_CLEANUP="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "检查已经合并到develop的worktree，应该怎么收口")"
+INTAKE_ID_CLEANUP="$(printf '%s\n' "$CHAT_OUTPUT_CLEANUP" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_CLEANUP" ]] || {
+  echo "[FAIL] missing cleanup intake id" >&2
   exit 1
 }
-
-for _ in $(seq 1 10); do
-  STATUS="$(awk -F '\"' '/^STATUS=/{print $2; exit}' ".freely/intake/$INTAKE_ID/meta.env")"
-  if [[ "$STATUS" == "absorbed" ]]; then
-    break
-  fi
-  sleep 1
-done
-
-[[ "$(awk -F '\"' '/^STATUS=/{print $2; exit}' ".freely/intake/$INTAKE_ID/meta.env")" == "absorbed" ]] || {
-  echo "[FAIL] direct-answer intake was not absorbed" >&2
+grep -q '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+grep -q 'feature/cleanup-fixture @ '"$CLEANUP_WT_REAL" ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+[[ ! -d "$CLEANUP_WT" ]] || {
+  echo "[FAIL] cleanup worktree still exists" >&2
   exit 1
 }
-grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID/meta.env"
-grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID/meta.env"
-grep -q 'direct_answer: 当前没有运行中的后台 AI 进程。' ".freely/run/interruption-resolution/$INTAKE_ID/resolution.md"
-
-bash -c 'exec -a "node /Users/test/.bun/bin/codex exec --skip-git-repo-check -C '"$PROJECT"' -m gpt-5.4 -" sleep 30' &
-FAKE_AI_PID=$!
-trap 'kill "$FAKE_AI_PID" 2>/dev/null || true; kill "$DISPATCH_PID" 2>/dev/null || true; wait "$FAKE_AI_PID" 2>/dev/null || true; wait "$DISPATCH_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
-printf '%s\n' "$FAKE_AI_PID" >".freely/run/ai.pid"
-
-CHAT_OUTPUT_RUNNING="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat "看看后台AI进程都在做什么？")"
-INTAKE_ID_RUNNING="$(printf '%s\n' "$CHAT_OUTPUT_RUNNING" | sed -n 's/^intake_id: //p')"
-[[ -n "$INTAKE_ID_RUNNING" ]] || {
-  echo "[FAIL] missing running intake id" >&2
+if git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-fixture; then
+  echo "[FAIL] cleanup branch still exists" >&2
   exit 1
-}
+fi
 
-for _ in $(seq 1 10); do
-  STATUS_RUNNING="$(awk -F '\"' '/^STATUS=/{print $2; exit}' ".freely/intake/$INTAKE_ID_RUNNING/meta.env")"
-  if [[ "$STATUS_RUNNING" == "absorbed" ]]; then
-    break
-  fi
-  sleep 1
-done
-
-[[ "$(awk -F '\"' '/^STATUS=/{print $2; exit}' ".freely/intake/$INTAKE_ID_RUNNING/meta.env")" == "absorbed" ]] || {
-  echo "[FAIL] running direct-answer intake was not absorbed" >&2
-  exit 1
-}
-grep -q '正在运行' ".freely/run/interruption-resolution/$INTAKE_ID_RUNNING/resolution.md"
-grep -q "$FAKE_AI_PID" ".freely/run/interruption-resolution/$INTAKE_ID_RUNNING/resolution.md"
-
-CHAT_OUTPUT_DELEGATE="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat "去重新设计一下 TUI 输入体验")"
+CHAT_OUTPUT_DELEGATE="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "去重新设计一下 TUI 输入体验")"
 INTAKE_ID_DELEGATE="$(printf '%s\n' "$CHAT_OUTPUT_DELEGATE" | sed -n 's/^intake_id: //p')"
 [[ -n "$INTAKE_ID_DELEGATE" ]] || {
   echo "[FAIL] missing delegate intake id" >&2
   exit 1
 }
-for _ in $(seq 1 10); do
-  STATUS_DELEGATE="$(awk -F '\"' '/^STATUS=/{print $2; exit}' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env")"
-  if [[ "$STATUS_DELEGATE" == "classified" ]]; then
-    break
-  fi
-  sleep 1
-done
-[[ "$(awk -F '\"' '/^STATUS=/{print $2; exit}' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env")" == "classified" ]] || {
-  echo "[FAIL] delegate intake was not classified" >&2
-  exit 1
-}
-grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+grep -q '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
 grep -q '^CLASSIFICATION="discovery"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
-grep -q '^LINKED_ARTIFACT="pending://interruption-manager-delegation"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+grep -q '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+grep -q 'restart_point: `pre_brainstorm`' ".freely/run/interruption-resolution/$INTAKE_ID_DELEGATE/resolution.md"
+grep -q 'handoff_summary: 进入 pre-brainstorm 分析并产出候选 issue' ".freely/run/interruption-resolution/$INTAKE_ID_DELEGATE/resolution.md"
 
-echo "[PASS] interruption manager triage answers manager-owned queries and claims delegate cases"
+echo "[PASS] interruption manager routes abstract answer, cleanup followthrough, and delegated handoff"

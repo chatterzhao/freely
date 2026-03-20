@@ -376,19 +376,33 @@ standing source 在这里的特殊性仅仅是：
   - durable intake
   - dispatcher
   - triage handler
+  - abstract routing contract:
+    - `DECISION`
+    - `RESTART_POINT`
+    - `OWNERSHIP`
+    - `WHY/HANDOFF/ANSWER`
   - `chat/tui` auto bootstrap
 - 已测：
   - [test-freely-human-chat-intake](/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260320-0248-feature-interruption-topology-prebrainstorm/docs/system/workspace/scripts/tests/test-freely-human-chat-intake)
   - [test-freely-chat-and-tui](/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260320-0248-feature-interruption-topology-prebrainstorm/docs/system/workspace/scripts/tests/test-freely-chat-and-tui)
   - [test-freely-interruption-direct-answer](/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260320-0248-feature-interruption-topology-prebrainstorm/docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer)
 
-2. `runtime` / `fleet` / supervision signal 的部分 standing scan
+2. 第一条完整 event 链：`human interruption -> manager triage -> cleanup followthrough -> writeback`
+- 已实现：
+  - manager triage 不再输出 `manager_answer_*` 这类硬编码问题类型
+  - cleanup 类 signal 可被路由到 `restart_point=cleanup`
+  - worker followthrough 会检查 merged feature worktree 是否可安全删除
+  - followthrough 会写回 cleanup resolution artifact 与 intake absorption
+- 已测：
+  - [test-freely-interruption-direct-answer](/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260320-0248-feature-interruption-topology-prebrainstorm/docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer)
+
+3. `runtime` / `fleet` / supervision signal 的部分 standing scan
 - 已实现：
   - status / PID / hygiene / manager supervision alert 的部分扫描
 - 已测：
   - 若干 `test-freely-*manager*`, `test-freely-*hygiene*`, `test-freely-*status*`
 
-3. `doc-loop` / `dev-loop` 的 canonical artifact 主链
+4. `doc-loop` / `dev-loop` 的 canonical artifact 主链
 - 已实现：
   - `pre-brainstorm`
   - `IBM`
@@ -410,8 +424,11 @@ standing source 在这里的特殊性仅仅是：
 3. `standing source -> derived signal` 的主动扫描闭环
 - 当前只有零散 alert / scan，不是统一问题发现模型。
 
-4. `delegate_general` 之后的统一后续链
-- interruption triage 之后如何 materialize 为 `pre-brainstorm / IBM / dev / review / cleanup` 还未统一。
+4. generic delegated followthrough 仍未统一
+- 当前已打通：
+  - `restart_point=cleanup`
+- 仍未统一：
+  - `pre-brainstorm / IBM / dev / review / verification / continuation`
 
 ## 阶段性里程碑建议
 
@@ -427,6 +444,9 @@ standing source 在这里的特殊性仅仅是：
 - 主管顶层职责是 `restart-point routing`
 - 不再把 interruption 写成单独局部协议中心
 
+当前状态：
+- 已完成最小真源对齐
+
 ### M2: 统一 signal record 与 routing contract
 
 - 定义各类 signal 的 source record
@@ -437,12 +457,20 @@ standing source 在这里的特殊性仅仅是：
   - `suggested_owner`
   - `handoff_note`
 
+当前状态：
+- interruption slice 已完成最小 contract
+- 其他 signal source 尚未全部接入
+
 ### M3: 先打通一条完整 event 链
 
 - 从 `human interruption`
 - 到 `restart point`
 - 到真实 delegated loop
 - 到 canonical artifact writeback
+
+当前状态：
+- 已完成第一条最小链：
+  - `human interruption -> cleanup followthrough`
 
 ### M4: 打通 standing scan
 

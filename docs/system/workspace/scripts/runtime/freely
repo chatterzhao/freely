@@ -26,7 +26,7 @@ Usage:
   freely tui [--project <abs_path>] [--once]
   freely intake chat [--project <abs_path>] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
   freely intake claim [--project <abs_path>] --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
-  freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
+  freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <delegated|absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
   freely intake status [--project <abs_path>]
   freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
   freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
@@ -1811,37 +1811,161 @@ EOF
   fi
 }
 
-intake_message_is_ai_process_query() {
-  local message="$1"
-  case "$message" in
-    *后台*进程*做什么*|*后台*AI*进程*做什么*|*后台*ai*进程*做什么*|*后台*进程*干什么*|*AI*进程*做什么*|*ai*进程*做什么*|*后台*AI*状态*|*后台*ai*状态*)
-      return 0
+validate_restart_point_or_fail() {
+  local restart_point="$1"
+  [[ -z "$restart_point" ]] && return 0
+  case "$restart_point" in
+    pre_brainstorm|candidate|milestone|ibm|dev|review|verification|continuation|runtime|cleanup) ;;
+    *)
+      log_error "unsupported restart point: $restart_point"
+      exit 1
       ;;
   esac
-  return 1
 }
 
-write_direct_answer_resolution_file() {
-  local project="$1" intake_id="$2" out_file="$3" why_text="${4:-这是主管监督职责范围内的 runtime control 询问，应直接回答。}"
+validate_signal_ownership_or_fail() {
+  local ownership="$1"
+  [[ -z "$ownership" ]] && return 0
+  case "$ownership" in
+    manager|worker|runtime) ;;
+    *)
+      log_error "unsupported ownership: $ownership"
+      exit 1
+      ;;
+  esac
+}
+
+write_manager_answer_resolution_file() {
+  local intake_id="$1" out_file="$2" answer_text="$3" why_text="$4" restart_point="$5"
   cat >"$out_file" <<EOF
 # Interruption Resolution
 - intake_id: \`$intake_id\`
-- intent_summary: 查询当前后台 AI 进程的运行状态与正在执行的命令。
-- why_this_reaction: $why_text
+- intent_summary: ${answer_text:-主管根据当前职责先做了必要澄清。}
+- why_this_reaction: ${why_text:-这是主管职责范围内可先澄清的问题。}
 - recommended_reaction: \`followup\`
-- absorption_recommendation: \`control -> answer-only runtime resolution\`
-$(ai_process_snapshot_markdown "$project")
+- restart_point: \`${restart_point:-continuation}\`
+- absorption_recommendation: \`manager answer -> continuity / next routing\`
 EOF
 }
 
+write_delegate_handoff_resolution_file() {
+  local intake_id="$1" out_file="$2" why_text="$3" classification="$4" restart_point="$5" ownership="$6" handoff_text="$7"
+  cat >"$out_file" <<EOF
+# Interruption Resolution
+- intake_id: \`$intake_id\`
+- intent_summary: 这条 signal 已被主管接住，并需要进入下一段 delegated loop。
+- why_this_reaction: ${why_text:-这件事需要交给后续专门处理链。}
+- recommended_reaction: \`followup\`
+- classification: \`${classification:-discovery}\`
+- restart_point: \`${restart_point:-pre_brainstorm}\`
+- ownership: \`${ownership:-worker}\`
+- handoff_summary: ${handoff_text:-请按 restart point 接续处理。}
+EOF
+}
+
+merged_feature_worktree_entries_for_project() {
+  local project="$1"
+  local merged_branches
+  merged_branches="$(git -C "$project" branch --format='%(refname:short)' --merged develop 2>/dev/null | grep '^feature/' || true)"
+  [[ -n "$merged_branches" ]] || return 0
+  git -C "$project" worktree list --porcelain 2>/dev/null | awk -v merged="$merged_branches" '
+    BEGIN {
+      split(merged, lines, "\n")
+      for (i in lines) if (lines[i] != "") keep[lines[i]] = 1
+    }
+    /^worktree / { wt = substr($0, 10); next }
+    /^branch refs\/heads\// {
+      br = substr($0, 19)
+      if (keep[br]) print wt "\t" br
+      wt = ""
+    }
+  ' || true
+}
+
+write_cleanup_followthrough_resolution_file() {
+  local intake_id="$1" out_file="$2" cleaned="$3" retained="$4" blocked_reason="$5"
+  cat >"$out_file" <<EOF
+# Interruption Resolution
+- intake_id: \`$intake_id\`
+- intent_summary: 已检查 merged worktree 的 cleanup 收口状态。
+- worker_action: \`cleanup-followthrough\`
+- blocked_reason: ${blocked_reason:-none}
+- cleaned_items:
+$(if [[ -n "$cleaned" ]]; then printf '%s\n' "$cleaned" | sed 's/^/  - /'; else printf '  - none\n'; fi)
+- retained_items:
+$(if [[ -n "$retained" ]]; then printf '%s\n' "$retained" | sed 's/^/  - /'; else printf '  - none\n'; fi)
+EOF
+}
+
+run_cleanup_followthrough() {
+  local project="$1" intake_id="$2" classification="$3" reaction="$4" why_text="$5" handoff_text="$6"
+  local fleet_status resolution_file blocked_reason cleaned retained wt_path branch dirty supervisor ai
+  fleet_status="$(cd "$project" && bash "$SELF_ROOT/bin/wt-status-all" 2>/dev/null || true)"
+  blocked_reason=""
+  cleaned=""
+  retained=""
+
+  if ! (cd "$project" && bash "$SELF_ROOT/bin/wt-status-all" >/dev/null 2>&1); then
+    blocked_reason="fleet_not_clean"
+  fi
+
+  while IFS=$'\t' read -r wt_path branch; do
+    [[ -n "$wt_path" && -n "$branch" ]] || continue
+    if [[ "$wt_path" == "$project" ]]; then
+      continue
+    fi
+    if [[ -n "$blocked_reason" ]]; then
+      retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (blocked:${blocked_reason})"
+      continue
+    fi
+    dirty="$(git -C "$wt_path" status --porcelain 2>/dev/null || true)"
+    if [[ -n "$dirty" ]]; then
+      retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (dirty)"
+      continue
+    fi
+    supervisor=""
+    ai=""
+    if [[ -f "$wt_path/.freely/run/supervisor.pid" ]]; then
+      supervisor="$(cat "$wt_path/.freely/run/supervisor.pid" 2>/dev/null || true)"
+    fi
+    if [[ -f "$wt_path/.freely/run/ai.pid" ]]; then
+      ai="$(cat "$wt_path/.freely/run/ai.pid" 2>/dev/null || true)"
+    fi
+    if ([[ -n "$supervisor" ]] && kill -0 "$supervisor" 2>/dev/null) || ([[ -n "$ai" ]] && kill -0 "$ai" 2>/dev/null); then
+      retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (runtime-active)"
+      continue
+    fi
+    if git -C "$project" worktree remove "$wt_path" >/dev/null 2>&1 && git -C "$project" branch -d "$branch" >/dev/null 2>&1; then
+      cleaned="${cleaned}${cleaned:+$'\n'}${branch} @ ${wt_path}"
+    else
+      retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (remove-failed)"
+    fi
+  done < <(merged_feature_worktree_entries_for_project "$project")
+
+  resolution_file="$(mktemp /tmp/freely-interruption-cleanup-followthrough.XXXXXX)"
+  write_cleanup_followthrough_resolution_file "$intake_id" "$resolution_file" "$cleaned" "$retained" "$blocked_reason"
+  cmd_intake_resolve \
+    --project "$project" \
+    --intake-id "$intake_id" \
+    --resolved-by interruption-cleanup-worker \
+    --reaction "${reaction:-followup}" \
+    --classification "${classification:-control}" \
+    --resolution-file "$resolution_file" \
+    --absorption-target cleanup://merged-worktree-followthrough \
+    --linked-artifact cleanup://merged-worktree-followthrough >/dev/null
+  rm -f "$resolution_file"
+}
+
 apply_interruption_manager_decision() {
-  local project="$1" intake_id="$2" decision="$3" reaction="$4" classification="$5" why_text="$6"
+  local project="$1" intake_id="$2" decision="$3" reaction="$4" classification="$5" why_text="$6" restart_point="$7" ownership="$8" handoff_text="$9" answer_text="${10}"
   local resolution_file
+  validate_restart_point_or_fail "$restart_point"
+  validate_signal_ownership_or_fail "$ownership"
   case "$decision" in
-    manager_answer_ai_process_status)
-      cmd_intake_claim --project "$project" --intake-id "$intake_id" --claimed-by interruption-manager-agent --reaction "${reaction:-followup}" --classification "${classification:-control}" --linked-artifact runtime://ai-process-status >/dev/null
-      resolution_file="$(mktemp /tmp/freely-interruption-direct-answer.XXXXXX.md)"
-      write_direct_answer_resolution_file "$project" "$intake_id" "$resolution_file" "$why_text"
+    answer)
+      cmd_intake_claim --project "$project" --intake-id "$intake_id" --claimed-by interruption-manager-agent --reaction "${reaction:-followup}" --classification "${classification:-control}" --linked-artifact pending://interruption-manager-answer >/dev/null
+      resolution_file="$(mktemp /tmp/freely-interruption-answer.XXXXXX)"
+      write_manager_answer_resolution_file "$intake_id" "$resolution_file" "$answer_text" "$why_text" "$restart_point"
       cmd_intake_resolve \
         --project "$project" \
         --intake-id "$intake_id" \
@@ -1849,11 +1973,11 @@ apply_interruption_manager_decision() {
         --reaction "${reaction:-followup}" \
         --classification "${classification:-control}" \
         --resolution-file "$resolution_file" \
-        --absorption-target answer-only://runtime-ai-process-status \
-        --linked-artifact runtime://ai-process-status >/dev/null
+        --absorption-target answer://manager-clarification \
+        --linked-artifact answer://manager-clarification >/dev/null
       rm -f "$resolution_file"
       ;;
-    delegate_general)
+    delegate)
       cmd_intake_claim \
         --project "$project" \
         --intake-id "$intake_id" \
@@ -1861,6 +1985,23 @@ apply_interruption_manager_decision() {
         --reaction "${reaction:-followup}" \
         --classification "${classification:-discovery}" \
         --linked-artifact pending://interruption-manager-delegation >/dev/null
+      if [[ "$restart_point" == "cleanup" && "$ownership" == "worker" ]]; then
+        run_cleanup_followthrough "$project" "$intake_id" "${classification:-control}" "${reaction:-followup}" "$why_text" "$handoff_text"
+        return 0
+      fi
+      resolution_file="$(mktemp /tmp/freely-interruption-delegate.XXXXXX)"
+      write_delegate_handoff_resolution_file "$intake_id" "$resolution_file" "$why_text" "${classification:-discovery}" "$restart_point" "$ownership" "$handoff_text"
+      cmd_intake_resolve \
+        --project "$project" \
+        --intake-id "$intake_id" \
+        --resolved-by interruption-manager-agent \
+        --reaction "${reaction:-followup}" \
+        --classification "${classification:-discovery}" \
+        --resolution-file "$resolution_file" \
+        --absorption-target "handoff://${restart_point:-pre_brainstorm}" \
+        --status delegated \
+        --linked-artifact pending://interruption-manager-delegation >/dev/null
+      rm -f "$resolution_file"
       ;;
     *)
       return 1
@@ -1870,7 +2011,7 @@ apply_interruption_manager_decision() {
 
 handle_interruption_intake_once() {
   local project="$1" intake_id="$2"
-  local meta_file message_file status claimed_by handler_bin handler_output decision reaction classification why_text
+  local meta_file message_file status claimed_by handler_bin handler_output decision reaction classification why_text restart_point ownership handoff_text answer_text
   meta_file="$(intake_item_meta_file "$project" "$intake_id")"
   message_file="$(intake_item_message_file "$project" "$intake_id")"
   [[ -f "$meta_file" && -f "$message_file" ]] || return 1
@@ -1893,9 +2034,13 @@ handle_interruption_intake_once() {
   decision="$(printf '%s\n' "$handler_output" | awk -F= '/^DECISION=/{print substr($0,10); exit}')"
   reaction="$(printf '%s\n' "$handler_output" | awk -F= '/^REACTION=/{print substr($0,10); exit}')"
   classification="$(printf '%s\n' "$handler_output" | awk -F= '/^CLASSIFICATION=/{print substr($0,16); exit}')"
+  restart_point="$(printf '%s\n' "$handler_output" | awk -F= '/^RESTART_POINT=/{print substr($0,15); exit}')"
+  ownership="$(printf '%s\n' "$handler_output" | awk -F= '/^OWNERSHIP=/{print substr($0,11); exit}')"
   why_text="$(printf '%s\n' "$handler_output" | awk -F= '/^WHY=/{print substr($0,5); exit}')"
+  handoff_text="$(printf '%s\n' "$handler_output" | awk -F= '/^HANDOFF=/{print substr($0,9); exit}')"
+  answer_text="$(printf '%s\n' "$handler_output" | awk -F= '/^ANSWER=/{print substr($0,8); exit}')"
   [[ -n "$decision" ]] || return 0
-  apply_interruption_manager_decision "$project" "$intake_id" "$decision" "$reaction" "$classification" "$why_text"
+  apply_interruption_manager_decision "$project" "$intake_id" "$decision" "$reaction" "$classification" "$why_text" "$restart_point" "$ownership" "$handoff_text" "$answer_text"
 }
 
 ensure_interruption_dispatch_once() {
@@ -2481,9 +2626,9 @@ cmd_intake_resolve() {
   validate_absorption_classification_or_fail "$classification"
   validate_intake_status_or_fail "$status"
   case "$status" in
-    absorbed|dropped) ;;
+    delegated|absorbed|dropped) ;;
     *)
-      log_error "intake resolve only supports --status absorbed|dropped"
+      log_error "intake resolve only supports --status delegated|absorbed|dropped"
       exit 1
       ;;
   esac

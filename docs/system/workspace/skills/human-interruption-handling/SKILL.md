@@ -42,11 +42,12 @@ description: 处理 human interruption intake。接收 manager 已 claim 的插�
 
 ## 最小输出
 
-- `intent_summary`
-- `why_this_reaction`
+- `problem_kind`
+- `current_context`
+- `restart_point`
+- `suggested_owner`
 - `worker_handoff`
 - `absorption_recommendation`
-- `link_schema`
 - `resolution_artifact`
 
 ## 工作流
