@@ -300,6 +300,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先验证 `docs/system/workspace/three-loop-capability-lifecycle.md` 是否足以成为唯一细节真源；若仍需更多行为约束，再 materialize 为独立 IBM issue，而不是继续把细节散落到 `CONSTITUTION`、`PROJECT_INTENT` 和多个 skills 中
 - revisit_trigger: 当 lifecycle 真源之外仍出现新的行为约束必须落到独立 issue，或 manager/doc/dev-loop 继续出现无法由当前真源解释的冲突时，重新进入 materialization 判断
 
+<<<<<<< HEAD
 11. `C-20260320-0252-A`
 - title: Signal restart-point routing across interruption, review, test, and recovery
 - milestone_state: candidate
@@ -331,6 +332,8 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-0605--agent-state-time-machine-and-shared-continuity/candidates.md`
 - next_action: 继续 pre-brainstorm，先冻结四个边界：Freely 当前哪些关键状态不在 Git/worktree 治理内、哪些状态必须一起 snapshot/rollback、共享连续性与 worker 私有状态如何分层、以及最小实现是否应先从本地 snapshot index / continuity metadata 开始；在这些边界稳定前不要把 PGFS 或 PostgreSQL 直接定成默认架构
 - revisit_trigger: 当 Freely 的多设备或多人协作场景需要统一共享连续性控制面，且本地 snapshot index 方案边界稳定后，再进入 IBM。
+=======
+>>>>>>> 69e66c8 (feat: finalize cli tui interruption input)
 ### completed_issues
 
 1. `I-20260319-1715`
@@ -452,6 +455,7 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`, `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`, `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`, `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - completion_note: umbrella taxonomy 已由 `watchdog-control-plane` 与现有 availability / runtime / continuity issue 主线吸收，不再单独 materialize
 
+<<<<<<< HEAD
 9. `I-20260320-0512`
 - title: Milestone planning and state maintenance
 - milestone_state: completed
@@ -463,6 +467,9 @@ routing_policy:
 - completion_note: milestone planning 与 state maintenance 已作为独立治理能力物化并验证，收口为 `completed`
 
 10. `I-20260319-2315`
+=======
+9. `I-20260319-2315`
+>>>>>>> 69e66c8 (feat: finalize cli tui interruption input)
 - title: CLI TUI interruption input box for Freely
 - milestone_state: completed
 - phase_state: `completed`
@@ -473,7 +480,11 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
 - completion_note: `freely tui` 已收口为 interruption presentation shell，并补齐中文与多行提交回归，输入仍统一落到既有 durable intake 链路
 
+<<<<<<< HEAD
 11. `C-20260319-0220-C`
+=======
+9. `C-20260319-0220-C`
+>>>>>>> 69e66c8 (feat: finalize cli tui interruption input)
 - title: Historical watchdog productization worktree retirement handoff
 - milestone_state: completed
 - phase_state: `completed`
