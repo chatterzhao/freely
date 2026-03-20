@@ -12,9 +12,9 @@
 - why_now: 如果不先冻结这一层，后续 Frontend Probe、transport 选择、第三方 runtime 接入都会继续在“协议语义”和“承载方式”之间混层。
 - acceptance_hint: 明确 backend service contract 的职责边界；定义 adapter taxonomy；说明 `tauri_adapter`、`ws_adapter`、`local_process_adapter`、`openclaw_adapter/profile` 的角色差异；规定 adapter 只做承载与映射，不改业务语义。
 - priority: P0
-- status: proposed
+- status: promoted
 - decision_reason: 这是把现有分散架构研究收敛成单一中间层真源的前置问题。
-- promoted_issue_path: pending://issue-materialization
+- promoted_issue_path: `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
 - milestone: M-20260312-control-surface-runtime-convergence
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
 - sequencing_rank: 1
