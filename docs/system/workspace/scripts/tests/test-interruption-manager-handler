@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-interruption-handler.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+FAKE_BIN="$TMP_DIR/bin"
+INTAKE_ID="20260320-000000-test"
+mkdir -p "$PROJECT/.freely/intake/$INTAKE_ID" "$FAKE_BIN"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+AI_MODEL="gpt-5.4"
+AI_REASONING_EFFORT="medium"
+EOF
+
+cat >"$PROJECT/.freely/intake/$INTAKE_ID/meta.env" <<'EOF'
+INTAKE_ID="20260320-000000-test"
+STATUS="classified"
+EOF
+
+cat >"$PROJECT/.freely/intake/$INTAKE_ID/message.txt" <<'EOF'
+检查已经合并到develop的worktree，应该怎么收口
+EOF
+
+cat >"$FAKE_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cat <<'OUT'
+noise that should be ignored
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=cleanup
+OWNERSHIP=worker
+WHY=这涉及实际收口动作，需要委派清理
+HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口
+ANSWER=
+extra trailing noise
+OUT
+EOF
+chmod +x "$FAKE_BIN/codex"
+
+OUTPUT="$(
+  PATH="$FAKE_BIN:$PATH" \
+    bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/interruption-manager-handler" \
+      --project "$PROJECT" \
+      --intake-id "$INTAKE_ID"
+)"
+
+grep -q '^DECISION=delegate$' <<<"$OUTPUT"
+grep -q '^RESTART_POINT=cleanup$' <<<"$OUTPUT"
+grep -q '^OWNERSHIP=worker$' <<<"$OUTPUT"
+grep -q '^HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口$' <<<"$OUTPUT"
+
+echo "[PASS] interruption manager handler writes prompt temp file and filters structured output"

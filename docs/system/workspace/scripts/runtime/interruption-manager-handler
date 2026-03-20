@@ -46,7 +46,7 @@ source "$config_file"
 
 model="${AI_MODEL:-gpt-5.4}"
 reasoning_effort="${AI_REASONING_EFFORT:-medium}"
-prompt_file="$(mktemp /tmp/freely-interruption-manager-prompt.XXXXXX.txt)"
+prompt_file="$(mktemp /tmp/freely-interruption-manager-prompt.XXXXXX)"
 trap 'rm -f "$prompt_file"' EXIT
 
 cat >"$prompt_file" <<EOF
