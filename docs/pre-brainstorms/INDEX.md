@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260320-0120--interruption-manager-agent-triage
 - 20260320-0052--interruption-direct-answer-control-plane
 - 20260320-0018--default-project-resolution-and-authorized-project-memory
 

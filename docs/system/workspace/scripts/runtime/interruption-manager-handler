@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  interruption-manager-handler --project <abs_path> --intake-id <id>
+EOF
+}
+
+abs_path_or_fail() {
+  local p="$1"
+  [[ "$p" == /* ]] || {
+    echo "[ERROR] path must be absolute: $p" >&2
+    exit 1
+  }
+  printf '%s\n' "$p"
+}
+
+project=""
+intake_id=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+    --intake-id) intake_id="${2:-}"; shift 2 ;;
+    *) usage; exit 1 ;;
+  esac
+done
+
+[[ -n "$project" && -n "$intake_id" ]] || {
+  usage
+  exit 1
+}
+
+meta_file="$project/.freely/intake/$intake_id/meta.env"
+message_file="$project/.freely/intake/$intake_id/message.txt"
+[[ -f "$meta_file" && -f "$message_file" ]] || exit 1
+message="$(cat "$message_file")"
+
+config_file="$project/.freely/config.env"
+[[ -f "$config_file" ]] || exit 1
+# shellcheck disable=SC1090
+source "$config_file"
+
+model="${AI_MODEL:-gpt-5.4}"
+reasoning_effort="${AI_REASONING_EFFORT:-medium}"
+prompt_file="$(mktemp /tmp/freely-interruption-manager-prompt.XXXXXX.txt)"
+trap 'rm -f "$prompt_file"' EXIT
+
+cat >"$prompt_file" <<EOF
+你现在承担 Freely 的 interruption manager agent。
+
+目标：
+- 第一时间注意到任意人类插话。
+- 判断这条插话应由主管自己直接回答，还是只做 notice/claim 后委派到后续主线。
+- 不要靠关键词穷举，不要扩写长解释，只做最小判断。
+
+主管自己直接回答的条件：
+- 这条插话本质上是在问主管监督面可直接看到的事实。
+- 例如后台 AI 进程、当前监督状态、当前 manager focus。
+- 这类问题高注意力，但不应升级成 pre-brainstorm / issue。
+
+否则：
+- 选择 delegate_general。
+- 不要假装知道后续 worker 细节。
+
+只输出以下 KEY=VALUE 行，不要输出任何额外文本：
+DECISION=manager_answer_ai_process_status 或 delegate_general
+REACTION=followup
+CLASSIFICATION=control 或 discovery 或 continuation 或 noise
+WHY=<单行中文原因，最多 40 字>
+
+插话：
+$message
+EOF
+
+codex exec --skip-git-repo-check -C "$project" -m "$model" -c "model_reasoning_effort=\"$reasoning_effort\"" --dangerously-bypass-approvals-and-sandbox - <"$prompt_file" \
+  | awk '/^(DECISION|REACTION|CLASSIFICATION|WHY)=/' \
+  | head -n 4
