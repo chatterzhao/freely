@@ -8,9 +8,9 @@ milestone_status_policy_version: v2
 
 candidate_policy:
 - dropped: remove from active milestone queues
-- needs_research: keep in candidate_issues and route back to pre-brainstorms or issue-bound brainstorm
+- needs_research: keep in candidate_issues with `next_action` and `revisit_trigger`, and route back to pre-brainstorms or issue-bound brainstorm; do not silently drop it from active scans
 - promoted: bind to a milestone immediately; do not leave as long-term unbound state
-- blocked: keep visible with blocker and next action
+- blocked: keep visible with blocker, next action, and revisit trigger
 
 queue_policy:
 - committed_issues: sequencing is clear and the item is the next active batch
@@ -36,6 +36,7 @@ sequencing_policy:
 routing_policy:
 - no_issue_path: stay in pre-brainstorms or continue doc-loop materialization
 - issue_path_present: route by `phase_state` into issue-bound brainstorm, IBM, continuation, dev-loop, or completion verification
+- unresolved candidate or issue never disappears just because the current round chose another priority; keep it in the appropriate queue with an explicit restart condition
 
 ## M-20260306-workspace-routing-foundation
 

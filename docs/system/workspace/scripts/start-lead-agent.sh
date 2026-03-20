@@ -225,6 +225,7 @@ cat <<EOF
    - 当前先看哪个池
    - 哪个池优先级更高
    - 当前问题是 \`pre-brainstorm\`、\`issue-bound brainstorm\` 还是 \`issue continuation\`
+   - 对暂不能收口的研究项，不允许因为本轮不继续实现就跳过；必须明确它继续停留在 \`candidate_issues\`、issue-bound brainstorm 或 blocked state，并写清 \`next_action\` 与 \`revisit_trigger\`
 8. 不要把路由当作脚本硬编码分支；脚本只负责启动和托管 AI，会话中的需求发现与路由判断由你完成。
 9. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
    - \`workspace/agents/lead-agent.md\`
