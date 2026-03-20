@@ -1,5 +1,37 @@
 # Candidates
 
+## Priority Summary
+
+当前候选按优先级重新收束如下：
+
+1. `C-20260319-0402-01`
+   - completion model 与 change guardrails
+   - 这是问题定义层，优先级最高
+
+2. `C-20260320-03`
+   - issue acceptance 驱动的最小集成测试 substrate
+   - 这是把 doc-loop 和 dev-loop 真正接起来的最小执行门
+
+3. `C-20260320-01`
+   - guardrail planner 与 validation escalation
+   - 这是把 completion model 变成 runtime 决策的连接层
+
+4. `C-20260319-0402-02`
+   - machine-readable evidence interface
+   - 这是把信号统一暴露给三层 loop 消费的证据面
+
+5. `C-20260320-02`
+   - bootstrap ladder 与 experiment ledger
+   - 方向成立，但更像在前四者稳定后再 formalize
+
+6. `C-20260319-0402-03`
+   - doc-gardening / cleanup loop
+   - 保持 `needs_research`
+
+7. `C-20260319-0402-04`
+   - 吞吐量叙事与全 agent 纯度
+   - 明确 `dropped`
+
 ## C-20260319-0402-01：定义 Freely 的 completion model 与 change guardrails
 
 - status: `proposed`

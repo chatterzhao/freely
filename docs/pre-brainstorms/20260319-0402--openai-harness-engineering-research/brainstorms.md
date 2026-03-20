@@ -1,4 +1,4 @@
-# OpenAI / Entrix Agentic Engineering Principles Research
+# Freely-First Harness Research
 
 ## Trigger
 
@@ -8,7 +8,58 @@
 - publish_date: 2026-02-11
 - research_date: 2026-03-19
 
-目标不是复述宣传语，也不是追着 `harness` 这个名字跑，而是抽取对 Freely 作为自主循环运行器最有用的工程理念、判断结构与可落地机制。
+目标不是复述宣传语，也不是追着 `harness` 这个名字跑，而是重新定义：
+
+- 外部 `harness` 理论到底在说什么
+- Freely 现有三层循环已经具备了什么同构能力
+- 哪些值得吸收
+- 哪些只该内化
+- 哪些会让 Freely 退化，应该明确丢弃
+
+## Current Research Position
+
+截至本轮研究，结论已经从“研究 OpenAI 的 harness engineering”收束为更 Freely-first 的判断：
+
+1. Freely 不应为了贴近 `harness` 概念而改造自己。
+2. Freely 应优先用自身已有命名和三层 loop 语义理解外部理论。
+3. 若 Freely 已有更优秀的设计，应明确 `supersede` 外部默认说法，而不是回退。
+4. 真正需要吸收的，是那些能强化三层循环闭环、降低 agent 摩擦、并提升可恢复性的能力层。
+5. 所有外部理论进入 Freely 前，都应经过：
+   - `adopt`
+   - `internalize`
+   - `supersede`
+   - `drop`
+   这四种命运判断。
+
+## Executive Synthesis
+
+现在可以把这条研究压缩成一句话：
+
+`Freely 已经拥有部分 harness substrate，但尚未把 completion model、guardrail planning、issue-bound executable acceptance、experiment ledger 和 anti-entropy automation 串成完整 control plane。`
+
+进一步展开：
+
+### Freely 已经有的
+
+- 三层 loop 与 owner boundary
+- worktree-first execution isolation
+- repo-as-record-system
+- checkpoint / status / fleet-status / recovery / supervision substrate
+
+### Freely 还缺的
+
+- issue-bound executable acceptance
+- guardrail planner
+- validation depth / escalation model
+- benchmark / detail / experiment ledger
+- 后台 anti-entropy automation
+
+### Freely 不应为了外部理论而回退的
+
+- 不应放弃三层 loop，退回单环 agent workflow
+- 不应为了外部命名大规模 rename
+- 不应用更重 ceremony 替代 Freely 当前更直接的治理结构
+- 不应把外部 runtime 形式原样套进 Freely
 
 ## Naming Is Not The Point
 
