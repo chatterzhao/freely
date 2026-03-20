@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-interruption-direct-answer.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0000--sample"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cd "$PROJECT"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto >/dev/null
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --watch --interval 1 >/tmp/freely-interruption-dispatch.log 2>&1 &
+DISPATCH_PID=$!
+trap 'kill "$DISPATCH_PID" 2>/dev/null || true; wait "$DISPATCH_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+
+CHAT_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" chat "看看后台进程都在做什么？")"
+INTAKE_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID" ]] || {
+  echo "[FAIL] missing intake id" >&2
+  exit 1
+}
+
+for _ in $(seq 1 10); do
+  STATUS="$(awk -F '\"' '/^STATUS=/{print $2; exit}' ".freely/intake/$INTAKE_ID/meta.env")"
+  if [[ "$STATUS" == "absorbed" ]]; then
+    break
+  fi
+  sleep 1
+done
+
+[[ "$(awk -F '\"' '/^STATUS=/{print $2; exit}' ".freely/intake/$INTAKE_ID/meta.env")" == "absorbed" ]] || {
+  echo "[FAIL] direct-answer intake was not absorbed" >&2
+  exit 1
+}
+grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID/meta.env"
+grep -q '^CLAIMED_BY="interruption-dispatcher"$' ".freely/intake/$INTAKE_ID/meta.env"
+grep -q 'direct_answer: 当前没有运行中的后台 AI 进程。' ".freely/run/interruption-resolution/$INTAKE_ID/resolution.md"
+
+echo "[PASS] interruption dispatcher directly answers AI process status queries"

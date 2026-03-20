@@ -29,6 +29,7 @@ Usage:
   freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
   freely intake status [--project <abs_path>]
   freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
   freely start [--project <abs_path>]
   freely status [--project <abs_path>]
   freely fleet-status [--project <abs_path>]
@@ -305,6 +306,11 @@ ensure_manager_watchdog_pid_file() {
   echo "$(run_dir_for_project "$project")/ensure-manager.pid"
 }
 
+interruption_dispatcher_pid_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/interruption-dispatch.pid"
+}
+
 discover_supervisor_pid() {
   local project="$1"
   ps -axo pid=,command= | awk -v p="$project" '
@@ -350,6 +356,11 @@ valid_supervisor_pid_for_project() {
 valid_ensure_manager_watchdog_pid_for_project() {
   local project="$1" pid="$2"
   pid_matches_project "$pid" "$project" "runtime/freely ensure-manager --project"
+}
+
+valid_interruption_dispatcher_pid_for_project() {
+  local project="$1" pid="$2"
+  pid_matches_project "$pid" "$project" "runtime/freely ensure-interruption-dispatch --project"
 }
 
 valid_ai_pid_for_project() {
@@ -1582,6 +1593,14 @@ launch_manager_supervisor() {
   disown "$!" 2>/dev/null || true
 }
 
+launch_interruption_dispatcher() {
+  local project="$1"
+  local launch_bin
+  launch_bin="${FREELY_INTERRUPTION_DISPATCH_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
+  bash "$launch_bin" ensure-interruption-dispatch --project "$project" --watch >/dev/null 2>&1 &
+  disown "$!" 2>/dev/null || true
+}
+
 manager_supervisor_pid_for_project() {
   local project="$1" run_dir sp
   run_dir="$(run_dir_for_project "$project")"
@@ -1666,6 +1685,148 @@ ensure_manager_once() {
 
   launch_manager_supervisor "$project"
   log_info "manager bootstrap requested"
+}
+
+latest_prompt_file_for_project() {
+  local project="$1"
+  local run_dir
+  run_dir="$(run_dir_for_project "$project")"
+  find "$run_dir" -maxdepth 1 -type f -name 'prompt-*.txt' | sort | tail -n 1
+}
+
+ai_process_command_for_project() {
+  local project="$1" ai_pid
+  ai_pid="$(manager_ai_pid_for_project "$project")"
+  [[ -n "$ai_pid" ]] || return 0
+  ps -p "$ai_pid" -o command= 2>/dev/null || true
+}
+
+ai_process_snapshot_markdown() {
+  local project="$1"
+  local ai_pid session_state tool_session_id tool_jsonl_path prompt_file ai_ps_line
+  ai_pid="$(manager_ai_pid_for_project "$project")"
+  load_session_state_or_defaults "$project"
+  tool_session_id="${LAST_TOOL_SESSION_ID:-unavailable}"
+  tool_jsonl_path="${LAST_TOOL_JSONL_PATH:-unavailable}"
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  [[ -n "$prompt_file" ]] || prompt_file="unavailable"
+  if [[ -n "$ai_pid" ]]; then
+    ai_ps_line="$(ps -p "$ai_pid" -o pid=,etime=,state=,command= 2>/dev/null | sed 's/^ *//')"
+    cat <<EOF
+- direct_answer: 当前后台 AI 进程正在运行。
+- ai_process:
+  - pid: \`$ai_pid\`
+  - snapshot: \`${ai_ps_line:-unavailable}\`
+- last_tool_session_id: \`$tool_session_id\`
+- last_tool_jsonl_path: \`$tool_jsonl_path\`
+- latest_prompt_file: \`$prompt_file\`
+EOF
+  else
+    cat <<EOF
+- direct_answer: 当前没有运行中的后台 AI 进程。
+- ai_process:
+  - pid: \`none\`
+  - snapshot: \`none\`
+- last_tool_session_id: \`$tool_session_id\`
+- last_tool_jsonl_path: \`$tool_jsonl_path\`
+- latest_prompt_file: \`$prompt_file\`
+EOF
+  fi
+}
+
+intake_message_is_ai_process_query() {
+  local message="$1"
+  case "$message" in
+    *后台*进程*做什么*|*后台*AI*进程*做什么*|*后台*ai*进程*做什么*|*后台*进程*干什么*|*AI*进程*做什么*|*ai*进程*做什么*|*后台*AI*状态*|*后台*ai*状态*)
+      return 0
+      ;;
+  esac
+  return 1
+}
+
+write_direct_answer_resolution_file() {
+  local project="$1" intake_id="$2" out_file="$3"
+  cat >"$out_file" <<EOF
+# Interruption Resolution
+- intake_id: \`$intake_id\`
+- intent_summary: 查询当前后台 AI 进程的运行状态与正在执行的命令。
+- why_this_reaction: 这是高注意力但低业务价值的 runtime control 询问，不应等待主主管长循环空闲后再处理，也不应升级成 pre-brainstorm / issue。
+- recommended_reaction: \`followup\`
+- absorption_recommendation: \`control -> answer-only runtime resolution\`
+$(ai_process_snapshot_markdown "$project")
+EOF
+}
+
+handle_direct_answer_intake_if_supported() {
+  local project="$1" intake_id="$2"
+  local meta_file message_file status claimed_by message resolution_file
+  meta_file="$(intake_item_meta_file "$project" "$intake_id")"
+  message_file="$(intake_item_message_file "$project" "$intake_id")"
+  [[ -f "$meta_file" && -f "$message_file" ]] || return 1
+  status="$(meta_env_value "$meta_file" "STATUS")"
+  claimed_by="$(meta_env_value "$meta_file" "CLAIMED_BY")"
+  [[ "$status" == "new" && -z "$claimed_by" ]] || return 1
+  message="$(cat "$message_file" 2>/dev/null || true)"
+  intake_message_is_ai_process_query "$message" || return 1
+
+  cmd_intake_claim --project "$project" --intake-id "$intake_id" --claimed-by interruption-dispatcher --reaction followup --classification control --linked-artifact runtime://ai-process-status >/dev/null
+  resolution_file="$(mktemp /tmp/freely-interruption-direct-answer.XXXXXX.md)"
+  write_direct_answer_resolution_file "$project" "$intake_id" "$resolution_file"
+  cmd_intake_resolve \
+    --project "$project" \
+    --intake-id "$intake_id" \
+    --resolved-by interruption-dispatcher \
+    --reaction followup \
+    --classification control \
+    --resolution-file "$resolution_file" \
+    --absorption-target answer-only://runtime-ai-process-status \
+    --linked-artifact runtime://ai-process-status >/dev/null
+  rm -f "$resolution_file"
+  return 0
+}
+
+ensure_interruption_dispatch_once() {
+  local project="$1"
+  local run_dir pid_file existing_pid item_dir intake_id handled_any
+  run_dir="$(run_dir_for_project "$project")"
+  mkdir -p "$run_dir"
+  handled_any="0"
+  while IFS= read -r item_dir; do
+    intake_id="$(basename "$item_dir")"
+    if handle_direct_answer_intake_if_supported "$project" "$intake_id"; then
+      handled_any="1"
+    fi
+  done < <(find "$(intake_dir_for_project "$project")" -mindepth 1 -maxdepth 1 -type d | sort)
+  if [[ "$handled_any" == "1" ]]; then
+    log_info "interruption dispatcher handled direct-answer intake(s)"
+  fi
+}
+
+cmd_ensure_interruption_dispatch_watch() {
+  local project="$1" interval="$2" pid_file existing_pid
+  pid_file="$(interruption_dispatcher_pid_file "$project")"
+  mkdir -p "$(dirname "$pid_file")"
+
+  if [[ -f "$pid_file" ]]; then
+    existing_pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if valid_interruption_dispatcher_pid_for_project "$project" "$existing_pid"; then
+      log_info "interruption dispatcher already running (pid=$existing_pid)"
+      return 0
+    fi
+  fi
+
+  echo "$$" >"$pid_file"
+  trap 'rm -f "$pid_file"' EXIT
+
+  while true; do
+    if [[ -f "$(stop_marker_file "$project")" ]]; then
+      exit 0
+    fi
+    if [[ -f "$(intake_pending_signal_file "$project")" ]]; then
+      ensure_interruption_dispatch_once "$project"
+    fi
+    sleep "$interval"
+  done
 }
 
 cmd_ensure_manager_watch() {
@@ -1810,6 +1971,7 @@ cmd_start() {
   write_workcell_state "$project" "running" "up" "down" "starting"
   trap cleanup_supervisor EXIT
   trap request_stop INT TERM
+  launch_interruption_dispatcher "$project"
 
   local restart_count=0
   local FIRST_ROUND=true
@@ -2019,6 +2181,30 @@ cmd_ensure_manager() {
   ensure_manager_once "$project"
 }
 
+cmd_ensure_interruption_dispatch() {
+  local project="" watch_mode="0" watch_interval="2"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --watch) watch_mode="1"; shift ;;
+      --interval) watch_interval="${2:-}"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  [[ "$watch_interval" =~ ^[0-9]+$ ]] || { log_error "ensure-interruption-dispatch --interval must be a positive integer"; exit 1; }
+  load_config "$project"
+  check_doc_gate_or_fail "$project" || {
+    log_error "ensure-interruption-dispatch blocked by doc gate"
+    exit 1
+  }
+  if [[ "$watch_mode" == "1" ]]; then
+    cmd_ensure_interruption_dispatch_watch "$project" "$watch_interval"
+    return 0
+  fi
+  ensure_interruption_dispatch_once "$project"
+}
+
 cmd_doctor() {
   local project=""
   while [[ $# -gt 0 ]]; do
@@ -2050,6 +2236,9 @@ cmd_chat() {
   [[ -n "$message" ]] || { usage; exit 1; }
   project="$(resolve_project_or_fail "$project" 1)"
   cmd_intake_chat --project "$project" --author human --channel chat --message "$message"
+  if [[ -n "$(discover_supervisor_pid "$project")" ]]; then
+    launch_interruption_dispatcher "$project"
+  fi
 }
 
 cmd_tui() {
@@ -2318,6 +2507,17 @@ cmd_status() {
   else
     echo "ai_pid: none"
   fi
+  if [[ -f "$(interruption_dispatcher_pid_file "$PROJECT_ROOT")" ]]; then
+    local dp
+    dp="$(cat "$(interruption_dispatcher_pid_file "$PROJECT_ROOT")" 2>/dev/null || true)"
+    if valid_interruption_dispatcher_pid_for_project "$PROJECT_ROOT" "$dp"; then
+      echo "interruption_dispatcher_pid: ${dp:-none}"
+    else
+      echo "interruption_dispatcher_pid: none"
+    fi
+  else
+    echo "interruption_dispatcher_pid: none"
+  fi
 }
 
 sleep_with_rate_limit_recheck() {
@@ -2437,6 +2637,14 @@ cmd_stop() {
     fi
     rm -f "$(ensure_manager_watchdog_pid_file "$project")"
   fi
+  if [[ -f "$(interruption_dispatcher_pid_file "$project")" ]]; then
+    local dp
+    dp="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
+    if valid_interruption_dispatcher_pid_for_project "$project" "$dp"; then
+      [[ -n "$dp" ]] && kill "$dp" 2>/dev/null || true
+    fi
+    rm -f "$(interruption_dispatcher_pid_file "$project")"
+  fi
   if [[ -f "$run_dir/supervisor.pid" ]]; then
     local sp
     sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
@@ -2486,6 +2694,7 @@ main() {
       esac
       ;;
     ensure-manager) cmd_ensure_manager "$@" ;;
+    ensure-interruption-dispatch) cmd_ensure_interruption_dispatch "$@" ;;
     start) cmd_start "$@" ;;
     status) cmd_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;

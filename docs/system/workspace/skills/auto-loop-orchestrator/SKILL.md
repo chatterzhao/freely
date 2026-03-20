@@ -57,6 +57,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - 选择 `steer/followup/collect/interrupt/noise`
    - 委派 `skill:human-interruption-handling`
    - 等待 resolution artifact 与 canonical absorption 回写
+   - 例外：runtime interruption dispatcher 已直接吸收的 answer-only control query，不再进入主管排班
 10. 主管不直接深度解释 human interruption；解释与 handoff 生成由 specialized skill 负责。
 11. 主管不把 raw interruption 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
 
