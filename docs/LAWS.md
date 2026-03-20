@@ -69,6 +69,7 @@
 4. `milestone.candidate_issues` 只能继续研究或进入 IBM，不得默认直接进入 dev-loop。
 5. `milestone.committed_issues` 才是 milestone-owned issue 的正式入口。
 6. `progress` 与 `recovery` 属于延续来源；其中 `progress` 只跟踪 dev-loop 执行态。
+7. 研究项若当前仍不能收口，不得因为本轮未继续实现而静默消失；必须继续留在 `candidates.md` 与 `milestones.md.candidate_issues` 或等价的 issue-bound 挂起产物中，并写清 `next_action` 与重启条件。
 
 最小验收证据：
 - 来源分类记录
@@ -147,6 +148,7 @@
    - `doc-loop` 写当前 issue / IBM / pre-brainstorm 产物
    - `recovery` 写 `recovery` 或允许的等价恢复留痕
 20. 若 runtime 无法直接知道当前 loop 的精确文档路径，至少必须把 `summary_target_hint` 写入 prompt / handoff，由当前 AI 在下一跳先补 continuity，再继续业务推进。
+21. `needs_research` 或其他未收口 candidate 不得脱离 milestone 可见队列；除非显式写成 `dropped` 或已 materialize 为 milestone-owned issue，否则必须保留在 `milestones.md.candidate_issues`，并具备可执行的 `next_action` 与 `revisit_trigger` 或等价字段。
 
 状态词图例：
 - `todo_*`：下一阶段已确定，但尚未开始
