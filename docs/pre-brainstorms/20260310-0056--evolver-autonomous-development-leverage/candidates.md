@@ -12,8 +12,10 @@
 - why_now: 随着 Freely 把 AI 定位为项目主人，routing / recovery / review / skill prompt 的质量会直接决定自治开发是否稳定。若没有经验固化机制，Freely 容易停留在“能继续跑，但不一定越跑越强”。
 - acceptance_hint: 把 `evolver` 明确定位为本地可选 sidecar；只负责分析失败信号并提出 routing / recovery / review / skill hint 的 mutation；变更必须经过 review / validation / rollback gate；默认关闭，不接管主 runtime。
 - priority: P1
-- status: proposed
+- status: needs_research
 - decision_reason: 与 Freely 的治理取向一致，能增强主人能力，但不应破坏 Rust/Tauri 主架构或过早引入外部网络依赖。
+- next_action: 继续收敛 sidecar 的最小职责边界与验证门，优先判断是否需要在本地自治优化层落地，而不是扩展为主 runtime 或 Hub 依赖。
+- revisit_trigger: 当 Freely 需要系统性减少重复失败、且已有明确可审计的策略进化输入输出时，再推进到 IBM materialization。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs:
