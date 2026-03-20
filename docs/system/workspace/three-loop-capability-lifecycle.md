@@ -177,6 +177,7 @@ Freely 的能力必须同时标注 loop 和 owner，避免“能力有了，但�
 | runtime continuity | auto-loop | runtime/scripts | session nearing limit / crash / compacted context | `resume` or `fresh_with_handoff` | runtime scripts + handoff artifacts |
 | recovery routing | auto-loop | `recovery-subagent-governance` + runtime | unavailable runtime / stale `in_*` state | recovery path and continuity | recovery artifacts |
 | pre-brainstorm | doc-loop | `doc-pre-brainstorm-execution` | discovery source or unstable boundary | `brainstorms.md`, `candidates.md` | `docs/pre-brainstorms/**` |
+| milestone planning / state maintenance | auto-loop -> doc-loop | `manager-agent` + `skill:milestone-planning-state-maintenance` | standing-source scan detects sequencing conflict or state drift | updated milestone queues, writeback reconciliation, next-batch sequencing | `docs/milestones.md`, linked candidate/issue/progress/recovery artifacts |
 | milestone intake | doc-loop | `doc-pre-brainstorm-execution` or `doc-ibm-execution` | candidate accepted into active scope | milestone queue update | `docs/milestones.md` |
 | IBM + G | doc-loop | `doc-ibm-execution` | milestone-owned issue needs docs | `issue`, `brainstorm`, `prd`, `pre-tests`, `tasks` | `docs/epics/**` |
 | doc continuity | doc-loop | worker-agent + current doc skill | warn/rotate/recovery inside doc work | updated issue/brainstorm continuity | current doc artifacts |
@@ -204,6 +205,13 @@ Freely 的来源先分成两类：
   - fleet / branch / worktree / runtime state
 
 standing source 经周期扫描后，会派生新的 `problem signal`。
+
+其中一类派生 signal 不属于新业务问题，而属于治理维护问题：
+
+- sequencing drift
+- queue imbalance
+- candidate / issue / progress / recovery state mismatch
+- completed / cleanup writeback missing
 
 所有 source 最终都应汇聚成：
 
@@ -397,6 +405,7 @@ completed
 | --- | --- | --- |
 | raw discovery convergence | `skill:doc-pre-brainstorm-execution` | worker |
 | candidate recording and milestone intake | `skill:doc-pre-brainstorm-execution`, `docs/milestones.md` | worker |
+| milestone sequencing and state maintenance | `skill:milestone-planning-state-maintenance`, `docs/milestones.md` | manager -> worker |
 | milestone-owned issue materialization | `skill:doc-ibm-execution` | worker |
 | governance maintenance within issue docs | `IBM + G` semantics in `skill:doc-ibm-execution` | worker |
 | doc continuity writeback | current brainstorm / issue / recovery artifacts | worker |

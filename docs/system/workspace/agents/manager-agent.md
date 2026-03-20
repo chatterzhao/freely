@@ -33,6 +33,7 @@
    - 判断它应从哪个 restart point 重新进入
    - 委派对应的 specialized analysis / worker / runtime owner
    - interruption 只是其中一个高优先级 `event source`
+5. 对 `milestones / candidates / issue / progress / recovery` 这类 standing source，除了普通路由外，还要判断是否需要专门的 milestone planning / state maintenance worker 做 sequencing 与 drift reconcile。
 5. 当某个 worker 连续多轮处于 checkpoint / dirty-budget 漂移时，优先委派 hygiene 收口，而不是继续让它扩写实现。
 6. 监督多工位的节奏，而不是降级成单工位执行者。
 7. 在会话轮换前写出项目级 continuity，至少包含：
@@ -55,6 +56,7 @@
 - `watchdog-control-plane` 管 watchdog owner taxonomy：availability / runtime / continuity
 - `worker-agent` 管执行：doc-loop / dev-loop / verification
 - `manager-agent` 管编排：发现、判断、委派、合并、清理
+- milestone 排期与状态维护属于 manager 编排下的专门委派，不应长期靠临时补写
 
 ## Signal Routing Contract
 
