@@ -150,16 +150,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，先验证 `docs/system/workspace/three-loop-capability-lifecycle.md` 是否足以成为唯一细节真源；若仍需更多行为约束，再 materialize 为独立 IBM issue，而不是继续把细节散落到 `CONSTITUTION`、`PROJECT_INTENT` 和多个 skills 中
 
-3. `C-20260319-2315-A`
-- title: CLI TUI interruption input box for Freely
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
-- priority: P0
-- promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md`
-- next_action: 继续 pre-brainstorm，先收敛 TUI 是否只作为 interruption shell、中文输入的最低验收、以及输入框/状态区的最小布局；在这些边界稳定前不要直接写 UI 代码或把 TUI 做成第二套入口系统
-
 ### completed_issues
 
 1. `C-20260306-1101`
@@ -237,6 +227,17 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - evidence: `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`, `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`, `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`, `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - completion_note: umbrella taxonomy 已由 `watchdog-control-plane` 与现有 availability / runtime / continuity issue 主线吸收，不再单独 materialize
+
+9. `I-20260319-2315`
+- title: CLI TUI interruption input box for Freely
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md`
+- evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
+- completion_note: `freely tui` 已收口为 interruption presentation shell，并补齐中文与多行提交回归，输入仍统一落到既有 durable intake 链路
 
 9. `C-20260319-0220-C`
 - title: Historical watchdog productization worktree retirement handoff

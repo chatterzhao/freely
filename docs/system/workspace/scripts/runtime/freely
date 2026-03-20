@@ -649,15 +649,51 @@ render_tui_dashboard() {
     printf '%s\n' '- none'
   fi
   printf '\n%s\n' 'Input'
-  printf '%s\n' '- 直接输入一条插话并回车提交'
-  printf '%s\n' '- 输入 /quit 退出，输入 /refresh 刷新'
+  printf '%s\n' '- 直接输入插话内容，空行提交；支持多行连续输入'
+  printf '%s\n' '- 第一行可输入 /quit 退出，输入 /refresh 刷新'
   printf '%s\n' '================================================================================'
 }
 
 tui_submit_message() {
-  local project="$1" message="$2"
+  local project="$1" message="$2" intake_output intake_id
   [[ -n "$message" ]] || return 0
-  bash "$SELF_ROOT/bin/freely" intake chat --project "$project" --author human --channel tui --message "$message" >/dev/null
+  intake_output="$(bash "$SELF_ROOT/bin/freely" intake chat --project "$project" --author human --channel tui --message "$message")"
+  intake_id="$(printf '%s\n' "$intake_output" | sed -n 's/^intake_id: //p')"
+  [[ -n "$intake_id" ]] && printf 'intake_id: %s\n' "$intake_id"
+}
+
+tui_compose_message() {
+  local __result_var="$1"
+  local prompt="> "
+  local line message=""
+
+  while true; do
+    if [[ -t 0 ]]; then
+      if ! IFS= read -er -p "$prompt" line; then
+        if [[ -n "$message" ]]; then
+          break
+        fi
+        return 1
+      fi
+    else
+      if ! IFS= read -r line; then
+        if [[ -n "$message" ]]; then
+          break
+        fi
+        return 1
+      fi
+    fi
+
+    [[ -n "$line" ]] || break
+    if [[ -n "$message" ]]; then
+      message+=$'\n'
+    fi
+    message+="$line"
+    prompt="| "
+  done
+
+  printf -v "$__result_var" '%s' "$message"
+  return 0
 }
 
 rate_limit_exhausted() {
@@ -1960,9 +1996,13 @@ cmd_tui() {
 
   if [[ "$once" == "1" || ! -t 0 ]]; then
     render_tui_dashboard "$project"
-    if ! IFS= read -r input; then
+    if ! tui_compose_message input; then
       exit 0
     fi
+    case "$input" in
+      /quit|/exit) exit 0 ;;
+      /refresh|"") exit 0 ;;
+    esac
     [[ -n "$input" ]] || exit 0
     tui_submit_message "$project" "$input"
     printf 'submitted: %s\n' "$input"
@@ -1971,8 +2011,7 @@ cmd_tui() {
 
   while true; do
     render_tui_dashboard "$project"
-    printf '> '
-    if ! IFS= read -r input; then
+    if ! tui_compose_message input; then
       printf '\n'
       break
     fi
