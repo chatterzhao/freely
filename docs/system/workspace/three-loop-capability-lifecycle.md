@@ -162,12 +162,14 @@ Freely 的能力必须同时标注 loop 和 owner，避免“能力有了，但�
 - `docs/epics/**`
 - `docs/progress/**`
 - `docs/recovery/**`
+- `.freely/intake/**`
 
 ## 4. Capability Placement Map
 
 | Capability | Primary loop | Primary owner | Trigger | Main outputs | Canonical artifacts |
 | --- | --- | --- | --- | --- | --- |
 | source classification | auto-loop | `context-source-skill` | new input / next cycle | `source_class`, `route_kind` | `docs/system/workspace/skills/context-source-skill/**` |
+| human chat intake | auto-loop | runtime/scripts + `manager-agent` + `skill:human-interruption-handling` | user interruption / explicit chat intake | intake record, reaction decision, resolution artifact, completion signal | `.freely/intake/**`, `.freely/run/interruption-resolution/**`, manager continuity, delegated worker handoff |
 | worktree preparation | auto-loop | `branch-management` + runtime | before write | branch/worktree decision | `docs/system/workspace/skills/branch-management/**` |
 | project supervision | auto-loop | `manager-agent` | manager cycle | delegate/freeze/merge/cleanup decision | `docs/system/workspace/agents/manager-agent.md` |
 | watchdog / supervision control plane | auto-loop | runtime + manager-agent | expected running but down / hygiene drift / availability loss | recovery or supervision action | `docs/system/workspace/scripts/runtime/**`, relevant supervision skills |
@@ -196,6 +198,7 @@ PROJECT_INTENT / chat / review / test / runtime anomaly
 ```
 
 约束：
+- `chat` 在进入 `doc-loop(pre-brainstorm)` 前，可先经过 `auto-loop` 的 durable intake / classification / delegation；该 intake 层不改变“原始发现源不得伪装成 ready issue”的规则，只负责把外部输入变成可恢复、可监督的 source record
 - 原始发现源不得直接伪装成 ready issue
 - candidate 在未进入 milestone-owned issue 前，不得跳过 IBM 直接进入 dev-loop
 

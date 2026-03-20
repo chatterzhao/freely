@@ -35,6 +35,7 @@
 - `skill:watchdog-control-plane` -> `watchdog-control-plane/SKILL.md`
 - `skill:continuity-watchdog` -> `continuity-watchdog/SKILL.md`
 - `skill:ai-cli-availability-manager` -> `ai-cli-availability-manager/SKILL.md`
+- `skill:human-interruption-handling` -> `human-interruption-handling/SKILL.md`
 - `skill:url-content-intake` -> `url-content-intake/SKILL.md`
 
 执行顺序（默认）：
