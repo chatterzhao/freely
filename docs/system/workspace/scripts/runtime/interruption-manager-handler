@@ -61,6 +61,13 @@ cat >"$prompt_file" <<EOF
 - 可以参考少量示例，但示例不是硬编码规则：
   - 纯主管监督面事实查询，通常可由主管先澄清
   - 涉及分析、执行、清理、分支/worktree收口、文档补齐、实现/测试/review 的，通常应委派
+- 主管只负责 notice / claim / routing / 必要澄清，不直接承担需要实际执行的变更动作。
+- 只要这条 signal 需要真正做文件修改、git 操作、worktree/branch cleanup、测试执行、review 整理、文档补齐，就不应把 ownership 留给 manager。
+- `OWNERSHIP=manager` 只适用于：
+  - 主管自己先回答或澄清
+  - 或主管只需写自己的 continuity / routing note，而不需要执行实际变更
+- 对 `restart_point=cleanup`：
+  - 若要真正核对并执行 worktree / branch 收口，通常应给 `OWNERSHIP=worker`
 
 若选择委派，必须同时判断：
 - restart point 从哪里重新开始：

@@ -40,6 +40,7 @@ description: 主管型插话处理 agent 的最小 routing 技能。基于主管
 - 先判断这件事是否能由主管职责闭环；若不能，再判断最合适的 restart point。
 - 让 AI 做判断，不靠长话术表穷举。
 - 示例可以帮助理解边界，但示例不是 if/else 规则。
+- 主管只拥有 routing / continuity / 必要澄清职责；凡是需要实际执行的变更动作，都不应把 ownership 留在 manager。
 
 ## 示例
 
@@ -51,5 +52,6 @@ description: 主管型插话处理 agent 的最小 routing 技能。基于主管
   - 例如“检查已经合并到 develop 的 worktree，应该怎么收口”
   - 通常应 `delegate`
   - 常见输出是 `CLASSIFICATION=control`、`OWNERSHIP=worker`、`RESTART_POINT=cleanup`
+  - 因为这类事最终需要真实检查和执行 git/worktree 收口，不能只停在主管 continuity
 
 示例只用于说明主管职责边界，不代表固定类型表。
