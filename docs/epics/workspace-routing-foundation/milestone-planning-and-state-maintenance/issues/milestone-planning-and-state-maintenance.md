@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260320-0512`
 - title: Milestone planning and state maintenance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `milestone-planning-and-state-maintenance`
@@ -49,6 +49,16 @@ Freely 已经把 milestone 当成 standing source 和编排入口，但对 miles
 
 - `./bin/governance-check`
 
-## Next
+## Completion
 
-- 当前保持 `in_verification`。manager route、worker skill 与 lifecycle 真源已经对齐，下一步做 review / promote 判断，并观察是否还需要补针对 queue drift / writeback reconcile 的专门脚本回归。
+- `docs/epics/workspace-routing-foundation/milestone-planning-and-state-maintenance/code-reviews/20260320-milestone-planning-state-maintenance-verification.md`
+- `docs/system/workspace/agents/manager-agent.md`
+- `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
+- `docs/system/workspace/skills/milestone-planning-state-maintenance/SKILL.md`
+- `docs/system/workspace/skills/README.md`
+- `docs/system/workspace/three-loop-capability-lifecycle.md`
+- `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/**`
+
+## Completion Note
+
+milestone planning and state maintenance 已完成物化并验证，作为 standing-source scan 下的独立治理能力收口。
