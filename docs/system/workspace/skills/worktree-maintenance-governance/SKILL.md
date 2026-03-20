@@ -30,12 +30,23 @@ description: 当主管需要核清单个 worktree 的真实状态、为多条 wo
 5. 若问题只是创建/进入/删除 worktree，回到 `skill:branch-management`
 6. 若问题已经升级为高风险文本冲突收敛，切到 `skill:premerge-reconcile`
 
+## Research worktree policy
+
+- `research-only` 指研究结论当前只保留在 canonical 文档，不指“长期保留这棵 research worktree”。
+- research worktree 是一次研究执行容器；研究完成后，默认把结论回写到：
+  - `docs/pre-brainstorms/<id>/brainstorms.md`
+  - `docs/pre-brainstorms/<id>/candidates.md`
+  - `docs/milestones.md` 的 candidate / 待研究区域
+- 回写完成后，research worktree 默认进入 `retirement_handoff`，不长期挂在项目里。
+- 若后续继续研究同一主题，应重新创建新的 dedicated worktree，并继续更新原 canonical brainstorm/candidate，而不是复活旧 research worktree。
+
 ## 边界
 
 - 不替代 `branch-management` 的创建、promotion 和 cleanup 基础命令
 - 不替代 `worktree-hygiene-supervision` 的 dirty-budget / checkpoint 收口
 - 不替代 `premerge-reconcile` 的冲突修复
 - 不允许只凭 `milestones.md` 单独下结论
+- 不允许只按提交先后、分支新旧或“谁更接近 develop”决定保留哪套行为；遇到相近能力时必须先做 anti-retrogression 比较，保留更好的设计、验证门和用户语义
 
 ## 完成
 
