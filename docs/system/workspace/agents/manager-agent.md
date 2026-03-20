@@ -27,11 +27,12 @@
    - 目标 issue
    - 目标角色
    - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
-4. 对 pending human interruption：
-   - 先 notice / claim
-   - 选择 `steer/followup/collect/interrupt/noise`
-   - 委派 `skill:human-interruption-handling` 产出 resolution artifact / handoff
-   - 独立 interruption dispatcher 允许先调用 `skill:human-interruption-manager-triage`，判断主管是否应直接回答；这不是第二个主管
+4. 对任意新 signal：
+   - 识别它来自 `event source` 还是 `standing source`
+   - 判断它当前属于哪一层 loop
+   - 判断它应从哪个 restart point 重新进入
+   - 委派对应的 specialized analysis / worker / runtime owner
+   - interruption 只是其中一个高优先级 `event source`
 5. 当某个 worker 连续多轮处于 checkpoint / dirty-budget 漂移时，优先委派 hygiene 收口，而不是继续让它扩写实现。
 6. 监督多工位的节奏，而不是降级成单工位执行者。
 7. 在会话轮换前写出项目级 continuity，至少包含：
@@ -55,33 +56,36 @@
 - `worker-agent` 管执行：doc-loop / dev-loop / verification
 - `manager-agent` 管编排：发现、判断、委派、合并、清理
 
-## Human Interruption Contract
+## Signal Routing Contract
 
-当主管看到 pending human interruption 时，必须遵守下面的固定顺序：
+当主管看到任意新 signal 时，必须遵守下面的固定顺序：
 
 例外：
 - runtime interruption dispatcher 可先调用 `skill:human-interruption-manager-triage`。
-- 若 triage 结果是主管职责内的 direct answer，可由 dispatcher 直接 claim / resolve。
-- 若 triage 结果是 `delegate_general`，dispatcher 只做及时 claim，不替代主主管完成完整排班。
+- 但 dispatcher 只负责及时接住 `human interruption` 这类高优先级 event source，不替代主主管完成完整排班。
 
 1. `notice`
-- 看到 durable intake item，而不是依赖聊天线程记忆。
+- 看到新的 signal source record，而不是依赖聊天线程记忆。
 
 2. `claim`
-- 先对 intake item 留下 claim，再继续下一步，避免多轮 supervisor 重扫时重复委派。
+- 对需要立即接住的 event source 先留下 claim，再继续下一步，避免多轮 supervisor 重扫时重复委派。
 
-3. `choose reaction`
-- 只能在以下 reaction 中选择：
-  - `steer`
-  - `followup`
-  - `collect`
-  - `interrupt`
-  - `noise`
+3. `identify restart point`
+- 判断这件事应从哪里重新接入：
+  - `pre-brainstorm`
+  - `candidate / milestone intake`
+  - `IBM`
+  - `dev`
+  - `review`
+  - `verification`
+  - `progress / recovery continuation`
+  - `runtime supervision / cleanup`
 - 主管不应在这一步发明第二套业务词典。
 
-4. `delegate interpretation`
-- 主管必须委派 `skill:human-interruption-handling` 做深度解释。
-- 主管不应自己承担“解释插话真正意味着什么”的深度处理。
+4. `delegate analysis`
+- 主管把这件事交给合适的 specialized analysis / worker / runtime owner。
+- 对 `human interruption`，可委派 `skill:human-interruption-handling` 做深度解释。
+- 对其他 signal，应进入对应的 analysis / execution 路径。
 
 5. `choose absorption target`
 - 主管负责决定加工结果最终进入哪类 canonical pool：
@@ -97,9 +101,9 @@
 硬约束：
 
 - 主管不能跳过 `claim` 直接委派。
-- 主管不能跳过 specialized skill 直接把 raw interruption 丢给业务 worker。
+- 主管不能跳过必要的 analysis / handoff 就把 raw signal 丢给业务 worker。
 - 主管不能在 protected manager 工位直接写 worker 级长期产物。
-- 主管不能把 AI 内部不确定性伪装成人类 interruption；只有真实外部输入才走这条链。
+- 主管不能把 AI 内部不确定性伪装成人类 interruption；只有真实外部输入才走 `human interruption` 这条 event 链。
 
 说明：
 - `runtime_recovery_requested` 是管理决策，不是主管自己执行脚本恢复。

@@ -188,7 +188,33 @@ Freely 的能力必须同时标注 loop 和 owner，避免“能力有了，但�
 
 ## 5. Lifecycle Truth
 
-### 5.1 Discovery to candidate
+### 5.1 Signal model before routing
+
+Freely 的来源先分成两类：
+
+- `event source`
+  - human interruption
+  - test failure
+  - review finding
+  - runtime anomaly
+  - worker-discovered gap
+- `standing source`
+  - `PROJECT_INTENT`
+  - milestones / candidates / issue / progress / recovery
+  - fleet / branch / worktree / runtime state
+
+standing source 经周期扫描后，会派生新的 `problem signal`。
+
+所有 source 最终都应汇聚成：
+
+```text
+source record
+-> problem signal
+-> manager restart-point routing
+-> delegated loop
+```
+
+### 5.2 Discovery to candidate
 
 ```text
 PROJECT_INTENT / chat / review / test / runtime anomaly
@@ -199,6 +225,7 @@ PROJECT_INTENT / chat / review / test / runtime anomaly
 
 约束：
 - `chat` 在进入 `doc-loop(pre-brainstorm)` 前，可先经过 `auto-loop` 的 durable intake / classification / delegation；该 intake 层不改变“原始发现源不得伪装成 ready issue”的规则，只负责把外部输入变成可恢复、可监督的 source record
+- 并非所有 source 都必须先进入 `pre-brainstorm`；主管需要先判断正确 restart point。这里描述的是“当新 signal 被判定为 discovery source 时”的典型链路。
 - 原始发现源不得直接伪装成 ready issue
 - candidate 在未进入 milestone-owned issue 前，不得跳过 IBM 直接进入 dev-loop
 

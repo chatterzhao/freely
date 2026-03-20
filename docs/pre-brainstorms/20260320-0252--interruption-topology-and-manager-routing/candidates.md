@@ -1,0 +1,22 @@
+# Candidates
+
+- capability: interruption topology and manager restart-point routing
+- owner_loop: auto-loop manager supervision
+- primary_surface: `human interruption`, `test signal`, `review finding`, `runtime anomaly`, `worker-discovered gap`
+- canonical_artifact: `docs/system/workspace/three-loop-capability-lifecycle.md`
+- promoted_issue_path: pending://restart-point-routing-materialization
+- milestone: pending://signal-routing-and-loop-reentry-governance
+- session_refs: []
+- key_questions:
+  - source 是否应拆为 `event source` 与 `standing source`
+  - `PROJECT_INTENT`、milestone、progress、recovery、fleet 是否属于 standing source，并通过扫描生成 derived signal
+  - 任意新问题应从 `pre-brainstorm / candidate / milestone / IBM / dev / review / verification / recovery` 的哪一层重新开始
+  - 主管应如何基于当前 phase/context 决定 restart point
+  - interruption handler 应输出什么结构化判断，才能和其他 signal source 统一
+- validation:
+  - pre-brainstorm 明确 interruption 只是 signal source，不是单独生命周期
+  - 明确 `event source` / `standing source` 的拆分与 standing scan 的意义
+  - 明确每种 source 的 source record / manager activation / restart point / artifact 生命周期
+  - 明确哪些已实现、哪些未实现、哪些已有测试覆盖
+  - 明确主管顶层职责是 `restart point routing`
+  - 明确当前 interruption 局部规则表不应继续扩张

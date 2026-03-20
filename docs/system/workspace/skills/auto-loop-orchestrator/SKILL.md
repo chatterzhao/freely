@@ -51,15 +51,21 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 6. 若主管运行在 `develop` / `main` / `pre-test-merge`，它是只读管理工位；真实 doc-loop / dev-loop 必须在 feature worktree 的 worker 会话中执行。
 7. 若控制面出现 `expected running but down` 的工位告警，优先处理 supervision / recovery / freeze 判定，再继续普通路由。
 8. 若异常 owner 属于目标工位 `runtime`，主管只输出结构化恢复目标，不自行处理切号、等待或重启。
-9. 若存在 pending human interruption，主管按固定顺序执行：
-   - `notice` intake queue
-   - `claim` intake item
-   - 选择 `steer/followup/collect/interrupt/noise`
-   - 委派 `skill:human-interruption-handling`
-   - 等待 resolution artifact 与 canonical absorption 回写
-   - 例外：runtime interruption dispatcher 可先调用 `skill:human-interruption-manager-triage`；若已判定为主管直答型 control query，则不再进入主管排班
-10. 主管不直接深度解释 human interruption；解释与 handoff 生成由 specialized skill 负责。
-11. 主管不把 raw interruption 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
+9. 主管同时处理两类 source：
+   - `event source`：interruption / review finding / test failure / runtime anomaly / worker-discovered gap
+   - `standing source`：`PROJECT_INTENT` / milestones / issue / progress / recovery / fleet
+10. 对 `event source`，主管及时 notice；对 `standing source`，主管周期扫描，并在必要时生成 derived problem signal。
+11. 主管的核心职责不是“分流插话”，而是对任意 signal 决定 restart point：
+   - `pre-brainstorm`
+   - `candidate / milestone intake`
+   - `IBM`
+   - `dev`
+   - `review`
+   - `verification`
+   - `progress / recovery`
+   - `runtime supervision / cleanup`
+12. 对 `human interruption`，runtime interruption dispatcher 可先做 durable 接住与及时 notice，但不替代主主管完成完整路由。
+13. 主管不把 raw signal 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
 
 ## 角色组织
 

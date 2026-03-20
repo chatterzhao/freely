@@ -160,6 +160,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md`
 - next_action: 继续 pre-brainstorm，先收敛 TUI 是否只作为 interruption shell、中文输入的最低验收、以及输入框/状态区的最小布局；在这些边界稳定前不要直接写 UI 代码或把 TUI 做成第二套入口系统
 
+4. `C-20260320-0252-A`
+- title: Signal restart-point routing across interruption, review, test, and recovery
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://restart-point-routing-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/candidates.md`
+- next_action: 继续 pre-brainstorm，先把“任意 signal 出现后应从哪一层 loop 重启”收敛成统一模型，并修正当前 interruption 文档里对主管直答和专属路由的局部化表述；在 restart-point routing 未收敛前，不再扩 interruption runtime 规则
+
 ### completed_issues
 
 1. `C-20260306-1101`
