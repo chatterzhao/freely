@@ -39,6 +39,12 @@ message_file="$project/.freely/intake/$intake_id/message.txt"
 [[ -f "$meta_file" && -f "$message_file" ]] || exit 1
 message="$(cat "$message_file")"
 
+intent_handler_bin="${FREELY_SIGNAL_INTENT_HANDLER_BIN:-$SELF_ROOT/docs/system/workspace/scripts/runtime/signal-intent-handler}"
+intent_output=""
+if [[ -x "$intent_handler_bin" ]]; then
+  intent_output="$("$intent_handler_bin" --project "$project" --intake-id "$intake_id" 2>/dev/null || true)"
+fi
+
 config_file="$project/.freely/config.env"
 [[ -f "$config_file" ]] || exit 1
 # shellcheck disable=SC1090
@@ -54,6 +60,7 @@ cat >"$prompt_file" <<EOF
 
 目标：
 - 第一时间注意到任意人类插话。
+- 先基于已有的意图理解结果判断，这条 signal 真正想推进什么。
 - 你只根据自己的职责做最小判断：
   - 是主管先做简短澄清/回答
   - 还是委派到后续专门处理链
@@ -69,7 +76,10 @@ cat >"$prompt_file" <<EOF
   - 或主管只需写自己的 continuity / routing note，而不需要执行实际变更
 - 对 restart_point=cleanup：
   - 若要真正核对并执行 worktree / branch 收口，通常应给 OWNERSHIP=worker
-  - 如果用户问的是“这个现在应该怎么收口”，由于答案依赖 live fleet state，也通常应走 delegate + cleanup + worker
+- 如果用户问的是“这个现在应该怎么收口”，由于答案依赖 live fleet state，也通常应走 delegate + cleanup + worker
+
+这条 signal 的前置 intent understanding 如下：
+$intent_output
 
 若选择委派，必须同时判断：
 - restart point 从哪里重新开始：

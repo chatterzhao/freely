@@ -30,8 +30,10 @@
    - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
 4. 对任意新 signal：
    - 识别它来自 `event source` 还是 `standing source`
+   - 先做最小 `intent understanding`
    - 判断它当前属于哪一层 loop
    - 判断它应从哪个 restart point 重新进入
+   - 判断自己回答、委派 analysis worker、还是委派 execution worker
    - 委派对应的 specialized analysis / worker / runtime owner
    - interruption 只是其中一个高优先级 `event source`
 5. 当某个 worker 连续多轮处于 checkpoint / dirty-budget 漂移时，优先委派 hygiene 收口，而不是继续让它扩写实现。
@@ -72,8 +74,19 @@
 2. `claim`
 - 对需要立即接住的 event source 先留下 claim，再继续下一步，避免多轮 supervisor 重扫时重复委派。
 
-3. `identify restart point`
-- 判断这件事应从哪里重新接入：
+3. `intent understanding`
+- 不从 raw signal 直接跳进执行桶。
+- 先通过 `skill:signal-intent-understanding` 或等价推理收敛最小意图结构：
+  - `intent_kind`
+  - `needs_live_inspection`
+  - `needs_execution`
+  - `scope`
+  - `complexity`
+  - `current_context`
+- 这一步帮助主管先判断“自己回答 / analysis / execution”，而不是穷举场景类型。
+
+4. `identify restart point`
+- 基于意图理解后，判断这件事应从哪里重新接入：
   - `pre-brainstorm`
   - `candidate / milestone intake`
   - `IBM`
@@ -82,21 +95,22 @@
   - `verification`
   - `progress / recovery continuation`
   - `runtime supervision / cleanup`
-- 主管不应在这一步发明第二套业务词典。
+- 主管不应在这一步发明第二套业务词典，也不应用 runtime 规则表替代意图理解。
 
-4. `delegate analysis`
+5. `delegate analysis or execution`
 - 主管把这件事交给合适的 specialized analysis / worker / runtime owner。
 - 对 `human interruption`，可委派 `skill:human-interruption-handling` 做深度解释。
-- 对其他 signal，应进入对应的 analysis / execution 路径。
+- 对需要先读现场、再决定动作的 signal，应先进入 analysis 路径。
+- 对边界已经清楚的 signal，可直接进入 execution 路径。
 
-5. `choose absorption target`
+6. `choose absorption target`
 - 主管负责决定加工结果最终进入哪类 canonical pool：
   - discovery -> `doc-pre-brainstorm-execution`
   - continuation -> 当前 issue / progress / recovery
   - control -> runtime / manager continuity
   - noise -> resolution note / continuity
 
-6. `supervise completion`
+7. `supervise completion`
 - 主管负责确认 resolution artifact 已生成，且 canonical absorption 已完成。
 - “我看过了”不算完成；“已被正确吸收并可追溯”才算完成。
 

@@ -39,6 +39,7 @@
 - `skill:human-interruption-handling` -> `human-interruption-handling/SKILL.md`
 - `skill:human-interruption-direct-answer` -> `human-interruption-direct-answer/SKILL.md`
 - `skill:human-interruption-manager-triage` -> `human-interruption-manager-triage/SKILL.md`
+- `skill:signal-intent-understanding` -> `signal-intent-understanding/SKILL.md`
 - `skill:url-content-intake` -> `url-content-intake/SKILL.md`
 
 执行顺序（默认）：
