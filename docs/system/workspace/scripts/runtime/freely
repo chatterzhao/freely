@@ -1825,16 +1825,23 @@ handle_interruption_intake_once() {
   claimed_by="$(meta_env_value "$meta_file" "CLAIMED_BY")"
   [[ "$status" == "new" && -z "$claimed_by" ]] || return 1
 
+  cmd_intake_claim \
+    --project "$project" \
+    --intake-id "$intake_id" \
+    --claimed-by interruption-manager-agent \
+    --reaction followup \
+    --linked-artifact pending://interruption-manager-triage >/dev/null
+
   handler_bin="$(interruption_handler_bin_for_project "$project")"
-  [[ -x "$handler_bin" ]] || return 1
+  [[ -x "$handler_bin" ]] || return 0
   if ! handler_output="$("$handler_bin" --project "$project" --intake-id "$intake_id" 2>/dev/null)"; then
-    return 1
+    return 0
   fi
   decision="$(printf '%s\n' "$handler_output" | awk -F= '/^DECISION=/{print substr($0,10); exit}')"
   reaction="$(printf '%s\n' "$handler_output" | awk -F= '/^REACTION=/{print substr($0,10); exit}')"
   classification="$(printf '%s\n' "$handler_output" | awk -F= '/^CLASSIFICATION=/{print substr($0,16); exit}')"
   why_text="$(printf '%s\n' "$handler_output" | awk -F= '/^WHY=/{print substr($0,5); exit}')"
-  [[ -n "$decision" ]] || return 1
+  [[ -n "$decision" ]] || return 0
   apply_interruption_manager_decision "$project" "$intake_id" "$decision" "$reaction" "$classification" "$why_text"
 }
 
@@ -1869,7 +1876,7 @@ cmd_ensure_interruption_dispatch_watch() {
   fi
 
   echo "$$" >"$pid_file"
-  trap 'rm -f "$pid_file"' EXIT
+  trap "rm -f '$pid_file'" EXIT
 
   while true; do
     if [[ -f "$(stop_marker_file "$project")" ]]; then
@@ -1897,7 +1904,7 @@ cmd_ensure_manager_watch() {
   fi
 
   echo "$$" >"$pid_file"
-  trap 'rm -f "$pid_file"' EXIT
+  trap "rm -f '$pid_file'" EXIT
 
   while true; do
     if [[ -f "$(stop_marker_file "$project")" ]]; then
