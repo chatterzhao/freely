@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260320-0605--agent-state-time-machine-and-shared-continuity
 - 20260320-0252--interruption-topology-and-manager-routing
 - 20260320-0152--chat-entrypoint-autobootstrap
 - 20260320-0138--interruption-entrypoint-runtime-preflight
@@ -160,6 +161,9 @@
 - 20260319-2315--cli-tui-human-interruption-input
   - brainstorms: docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md
   - candidates: docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md
+- 20260320-0605--agent-state-time-machine-and-shared-continuity
+  - brainstorms: docs/pre-brainstorms/20260320-0605--agent-state-time-machine-and-shared-continuity/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0605--agent-state-time-machine-and-shared-continuity/candidates.md
 - 20260319-0220--watchdog-control-plane-governance
   - brainstorms: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/candidates.md
