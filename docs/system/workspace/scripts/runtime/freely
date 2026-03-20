@@ -345,7 +345,10 @@ pid_matches_project() {
       }
     }
     END { exit found ? 0 : 1 }
-  '
+  ' && return 0
+  local cwd
+  cwd="$(lsof -a -d cwd -p "$pid" -Fn 2>/dev/null | sed -n 's/^n//p' | head -n 1)"
+  [[ "$cwd" == "$project" ]]
 }
 
 valid_supervisor_pid_for_project() {
@@ -361,6 +364,18 @@ valid_ensure_manager_watchdog_pid_for_project() {
 valid_interruption_dispatcher_pid_for_project() {
   local project="$1" pid="$2"
   pid_matches_project "$pid" "$project" "runtime/freely ensure-interruption-dispatch --project"
+}
+
+interruption_dispatcher_pid_for_project() {
+  local project="$1" pid_file pid
+  pid_file="$(interruption_dispatcher_pid_file "$project")"
+  if [[ -f "$pid_file" ]]; then
+    pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if valid_interruption_dispatcher_pid_for_project "$project" "$pid"; then
+      printf '%s\n' "$pid"
+      return 0
+    fi
+  fi
 }
 
 valid_ai_pid_for_project() {
@@ -1650,6 +1665,36 @@ runtime_ai_pid_hint_for_project() {
   manager_ai_pid_for_project "$project"
 }
 
+ensure_interruption_entry_runtime_or_fail() {
+  local project="$1" supervisor_pid dispatcher_pid attempts
+  dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  if [[ -n "$dispatcher_pid" ]]; then
+    return 0
+  fi
+
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  if [[ -n "$supervisor_pid" ]]; then
+    launch_interruption_dispatcher "$project"
+    for attempts in 1 2 3 4 5; do
+      sleep 1
+      dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+      if [[ -n "$dispatcher_pid" ]]; then
+        return 0
+      fi
+    done
+    log_error "freely interruption control plane did not become ready for project: $project"
+    log_error "try: ./bin/freely ensure-interruption-dispatch --project \"$project\" --watch"
+    exit 1
+  fi
+
+  log_error "freely is not running for project: $project"
+  log_error "for human interruption entrypoints, start one of:"
+  log_error "  ./bin/freely start --project \"$project\""
+  log_error "  ./bin/freely ensure-interruption-dispatch --project \"$project\" --watch"
+  log_error "if you only want offline durable intake, use: ./bin/freely intake chat --project \"$project\" --message \"...\""
+  exit 1
+}
+
 restart_manager_supervisor_preserving_handoff() {
   local project="$1" run_dir ai_pid supervisor_pid
   run_dir="$(run_dir_for_project "$project")"
@@ -2295,10 +2340,8 @@ cmd_chat() {
   done
   [[ -n "$message" ]] || { usage; exit 1; }
   project="$(resolve_project_or_fail "$project" 1)"
+  ensure_interruption_entry_runtime_or_fail "$project"
   cmd_intake_chat --project "$project" --author human --channel chat --message "$message"
-  if [[ -n "$(discover_supervisor_pid "$project")" ]]; then
-    launch_interruption_dispatcher "$project"
-  fi
 }
 
 cmd_tui() {
@@ -2312,6 +2355,7 @@ cmd_tui() {
   done
   project="$(resolve_project_or_fail "$project" 1)"
   check_doc_gate_or_fail "$project"
+  ensure_interruption_entry_runtime_or_fail "$project"
 
   if [[ "$once" == "1" || ! -t 0 ]]; then
     render_tui_dashboard "$project"

@@ -8,6 +8,8 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 PROJECT="$TMP_DIR/project"
 FREELY_HOME="$TMP_DIR/freely-home"
 CANON_PROJECT=""
+DISPATCH_PID=""
+HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
 mkdir -p "$PROJECT/docs/pre-brainstorms/20260319-0000--sample"
 
 git init -q -b develop "$PROJECT"
@@ -53,6 +55,17 @@ cat >"$PROJECT/docs/pre-brainstorms/20260319-0000--sample/candidates.md" <<'EOF'
 - session_refs: []
 EOF
 
+cat >"$HANDLER_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+cat <<'OUT'
+DECISION=delegate_general
+REACTION=followup
+CLASSIFICATION=discovery
+WHY=测试使用的通用委派夹具
+OUT
+EOF
+chmod +x "$HANDLER_FIXTURE"
+
 INIT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto)"
 printf '%s\n' "$INIT_OUTPUT" | grep -q 'initialized:'
 CANON_PROJECT="$(cd "$PROJECT" && pwd -P)"
@@ -63,7 +76,57 @@ printf '%s\n' "$DOCTOR_OUTPUT" | grep -q 'doc gate PASS'
 STATUS_OUTPUT_BEFORE_START="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
 printf '%s\n' "$STATUS_OUTPUT_BEFORE_START" | grep -q "project: $CANON_PROJECT"
 
-CHAT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" chat "你好，Freely")"
+set +e
+CHAT_FAIL_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" chat "你好，Freely" 2>&1)"
+CHAT_FAIL_STATUS=$?
+set -e
+[[ "$CHAT_FAIL_STATUS" -ne 0 ]] || {
+  echo "[FAIL] freely chat should require interruption runtime" >&2
+  exit 1
+}
+printf '%s\n' "$CHAT_FAIL_OUTPUT" | grep -q 'freely is not running for project'
+
+set +e
+TUI_FAIL_OUTPUT="$(cd "$PROJECT" && printf '继续测试中文输入框\n' | FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" tui --once 2>&1)"
+TUI_FAIL_STATUS=$?
+set -e
+[[ "$TUI_FAIL_STATUS" -ne 0 ]] || {
+  echo "[FAIL] freely tui should require interruption runtime" >&2
+  exit 1
+}
+printf '%s\n' "$TUI_FAIL_OUTPUT" | grep -q 'freely is not running for project'
+
+OFFLINE_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" intake chat --author human --channel chat --message "离线收件仍然允许")"
+OFFLINE_ID="$(printf '%s\n' "$OFFLINE_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$OFFLINE_ID" ]] || {
+  echo "[FAIL] freely intake chat should still work offline" >&2
+  exit 1
+}
+grep -q '离线收件仍然允许' "$PROJECT/.freely/intake/$OFFLINE_ID/message.txt"
+
+(
+  cd "$PROJECT"
+  FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" \
+    bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --watch --interval 1 >/tmp/freely-chat-tui-dispatch.log 2>&1
+) &
+DISPATCH_PID=$!
+trap 'kill "$DISPATCH_PID" 2>/dev/null || true; wait "$DISPATCH_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+
+for _ in $(seq 1 10); do
+  if [[ -f "$PROJECT/.freely/run/interruption-dispatch.pid" ]]; then
+    READY_PID="$(cat "$PROJECT/.freely/run/interruption-dispatch.pid" 2>/dev/null || true)"
+    if [[ -n "$READY_PID" ]] && kill -0 "$READY_PID" 2>/dev/null; then
+      break
+    fi
+  fi
+  sleep 1
+done
+[[ -f "$PROJECT/.freely/run/interruption-dispatch.pid" ]] || {
+  echo "[FAIL] interruption dispatcher did not become ready" >&2
+  exit 1
+}
+
+CHAT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat "你好，Freely")"
 CHAT_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
 [[ -n "$CHAT_ID" ]] || {
   echo "[FAIL] freely chat did not return intake_id" >&2
@@ -71,19 +134,20 @@ CHAT_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
 }
 grep -q '你好，Freely' "$PROJECT/.freely/intake/$CHAT_ID/message.txt"
 
-TUI_OUTPUT="$(cd "$PROJECT" && printf '继续测试中文输入框\n' | FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" tui --once)"
+TUI_OUTPUT="$(cd "$PROJECT" && printf '继续测试中文输入框\n' | FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" tui --once)"
 printf '%s\n' "$TUI_OUTPUT" | grep -q 'Freely TUI'
 printf '%s\n' "$TUI_OUTPUT" | grep -q 'submitted: 继续测试中文输入框'
 
 STATUS_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" intake status)"
-printf '%s\n' "$STATUS_OUTPUT" | grep -q 'active_items: 2'
-printf '%s\n' "$STATUS_OUTPUT" | grep -q 'new_items: 2'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q 'active_items: 3'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'channel=chat'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'channel=tui'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q '继续测试中文输入框'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '离线收件仍然允许'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '你好，Freely'
 
 REGISTRY_STATUS_OUTPUT="$(cd "$TMP_DIR" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" intake status)"
 printf '%s\n' "$REGISTRY_STATUS_OUTPUT" | grep -q "project: $CANON_PROJECT"
-printf '%s\n' "$REGISTRY_STATUS_OUTPUT" | grep -q 'active_items: 2'
+printf '%s\n' "$REGISTRY_STATUS_OUTPUT" | grep -q 'active_items: 3'
 
-echo "[PASS] freely chat alias and tui input both write durable interruption intake"
+echo "[PASS] freely chat and tui require interruption runtime while intake chat remains the offline escape hatch"
