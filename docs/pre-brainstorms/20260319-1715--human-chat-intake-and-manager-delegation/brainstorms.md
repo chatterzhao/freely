@@ -1424,3 +1424,8 @@ Freely 需要在 `openclaw` 的 reaction plane 之上，再增加：
 - 最终 absorption 放哪
 
 只有这 4 件事固定下来，human interruption 才算从“预研想法”真正进入“Freely 能力设计”。
+
+## Materialization Update
+
+- `I-20260319-1715` 已物化为正式 issue：`docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
+- 后续对这条能力的收口应从 issue / verification 继续，不应再回退到 pre-brainstorm 作为主执行入口。

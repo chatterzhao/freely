@@ -128,6 +128,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
+9. `I-20260319-1715`
+- title: CLI-first human chat intake and manager delegation loop
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md`
+- next_action: human chat intake 的 CLI-first durable surface、manager notice/claim/delegate contract 与 `skill:human-interruption-handling` 的最小闭环已落盘；当前继续 verification / promote 判断，并保持 canonical absorption 回写可追踪
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`
