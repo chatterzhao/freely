@@ -14,6 +14,7 @@ required_files=(
   "docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md"
   "docs/system/workspace/skills/doc-ibm-execution/SKILL.md"
   "docs/system/workspace/skills/dev-loop-execution/SKILL.md"
+  "docs/system/workspace/skills/worktree-maintenance-governance/SKILL.md"
 )
 
 for file in "${required_files[@]}"; do
@@ -39,6 +40,7 @@ printf '%s\n' "$prompt" | grep -q 'workspace/agents/lead-agent.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/tools.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-pre-brainstorm-execution/SKILL.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-ibm-execution/SKILL.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/skills/worktree-maintenance-governance/SKILL.md'
 printf '%s\n' "$prompt" | grep -q '工作区治理提醒'
 printf '%s\n' "$prompt" | grep -q 'current_worktree_state:'
 printf '%s\n' "$prompt" | grep -q 'current_project_dirty_entries:'
@@ -51,6 +53,7 @@ printf '%s\n' "$prompt" | grep -q '需求池至少包括'
 printf '%s\n' "$prompt" | grep -q '当前先看哪个池'
 printf '%s\n' "$prompt" | grep -q 'pre-brainstorm'
 printf '%s\n' "$prompt" | grep -q 'issue-bound brainstorm'
+printf '%s\n' "$prompt" | grep -q 'worktree 维护'
 printf '%s\n' "$prompt" | grep -q '脚本只负责启动和托管 AI'
 
 case "$current_branch" in

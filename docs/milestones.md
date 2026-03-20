@@ -172,7 +172,18 @@ routing_policy:
 
 ### completed_issues
 
-1. `C-20260306-1101`
+1. `I-20260320-1405`
+- title: Worktree maintenance governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/candidates.md`
+- evidence: `docs/system/workspace/skills/worktree-maintenance-governance/SKILL.md`, `docs/system/workspace/agents/lead-agent.md`, `docs/system/workspace/agents/manager-agent.md`, `docs/system/workspace/scripts/start-lead-agent.sh`, `docs/system/workspace/scripts/tests/test-routing-foundation-loop`
+- completion_note: 已把 worktree 创建后的维护能力收敛成专门 skill，明确 `audit / merge_prep / retirement_handoff` 三种模式，并接入主管真源与首跳测试
+
+2. `C-20260306-1101`
 - title: `lead-agent.md`
 - milestone_state: completed
 - phase_state: `completed`

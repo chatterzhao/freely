@@ -55,6 +55,7 @@
 执行技能：
 - `skill:branch-management`
 - `skill:multi-worktree-supervision`
+- `skill:worktree-maintenance-governance`
 - `skill:premerge-reconcile`
 - `skill:constitution-guard`
 
