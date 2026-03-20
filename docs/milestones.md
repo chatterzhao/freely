@@ -8,9 +8,9 @@ milestone_status_policy_version: v2
 
 candidate_policy:
 - dropped: remove from active milestone queues
-- needs_research: keep in candidate_issues and route back to pre-brainstorms or issue-bound brainstorm
+- needs_research: keep in candidate_issues with `next_action` and `revisit_trigger`, and route back to pre-brainstorms or issue-bound brainstorm; do not silently drop it from active scans
 - promoted: bind to a milestone immediately; do not leave as long-term unbound state
-- blocked: keep visible with blocker and next action
+- blocked: keep visible with blocker, next action, and revisit trigger
 
 queue_policy:
 - committed_issues: sequencing is clear and the item is the next active batch
@@ -36,6 +36,7 @@ sequencing_policy:
 routing_policy:
 - no_issue_path: stay in pre-brainstorms or continue doc-loop materialization
 - issue_path_present: route by `phase_state` into issue-bound brainstorm, IBM, continuation, dev-loop, or completion verification
+- unresolved candidate or issue never disappears just because the current round chose another priority; keep it in the appropriate queue with an explicit restart condition
 
 ## M-20260306-workspace-routing-foundation
 
@@ -169,6 +170,16 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/candidates.md`
 - next_action: M1-M3 的 interruption 最小 slice 已落盘：主管 triage 已改成抽象 routing contract，且 `cleanup` followthrough 已形成第一条完整 event 链。下一步继续 pre-brainstorm，把同一 contract 扩到 review/test/runtime anomaly/worker-discovered gap 与 standing-source scan，再决定是否 materialize 为统一 routing issue
+
+5. `C-20260320-0908-A`
+- title: Unresolved research candidate persistence and revisit governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260320-0908--research-candidate-persistence-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-0908--research-candidate-persistence-governance/candidates.md`
+- next_action: 继续 pre-brainstorm，先把“不能收口时必须显式保持在 candidate/blocked 队列并写清重启条件”的规则写入 lifecycle、lead prompt 与 doc-loop reference，再决定是否 materialize 为独立治理 issue
 
 ### completed_issues
 
