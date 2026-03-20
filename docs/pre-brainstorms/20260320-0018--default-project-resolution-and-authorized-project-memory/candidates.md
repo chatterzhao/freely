@@ -2,7 +2,7 @@
 
 ## Context
 - Source brainstorm: ./brainstorms.md
-- Status: in_research
+- Status: promoted
 
 ## Candidates
 
@@ -17,9 +17,9 @@
   - 明确 `chat` / `tui` / `intake status` 等入口在当前仓库内可免参运行
   - 明确不会把任意外部 `$PWD` 误判为项目
 - priority: P0
-- status: needs_research
-- decision_reason: 方向已清晰，但还需要通过脚本测试验证“当前目录解析”和“单授权项目回退”都能成立，才能安全推广到全部 CLI 入口。
-- promoted_issue_path: pending://issue-materialization
+- status: promoted
+- decision_reason: runtime 已具备统一 resolver；本轮补齐 cwd 自动解析和单一已授权项目回退的脚本回归后，已可以 materialize 为 issue。
+- promoted_issue_path: docs/epics/workspace-routing-foundation/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex
