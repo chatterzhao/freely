@@ -76,26 +76,6 @@ printf '%s\n' "$DOCTOR_OUTPUT" | grep -q 'doc gate PASS'
 STATUS_OUTPUT_BEFORE_START="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
 printf '%s\n' "$STATUS_OUTPUT_BEFORE_START" | grep -q "project: $CANON_PROJECT"
 
-set +e
-CHAT_FAIL_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" chat "你好，Freely" 2>&1)"
-CHAT_FAIL_STATUS=$?
-set -e
-[[ "$CHAT_FAIL_STATUS" -ne 0 ]] || {
-  echo "[FAIL] freely chat should require interruption runtime" >&2
-  exit 1
-}
-printf '%s\n' "$CHAT_FAIL_OUTPUT" | grep -q 'freely is not running for project'
-
-set +e
-TUI_FAIL_OUTPUT="$(cd "$PROJECT" && printf '继续测试中文输入框\n' | FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" tui --once 2>&1)"
-TUI_FAIL_STATUS=$?
-set -e
-[[ "$TUI_FAIL_STATUS" -ne 0 ]] || {
-  echo "[FAIL] freely tui should require interruption runtime" >&2
-  exit 1
-}
-printf '%s\n' "$TUI_FAIL_OUTPUT" | grep -q 'freely is not running for project'
-
 OFFLINE_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" intake chat --author human --channel chat --message "离线收件仍然允许")"
 OFFLINE_ID="$(printf '%s\n' "$OFFLINE_OUTPUT" | sed -n 's/^intake_id: //p')"
 [[ -n "$OFFLINE_ID" ]] || {
@@ -104,28 +84,6 @@ OFFLINE_ID="$(printf '%s\n' "$OFFLINE_OUTPUT" | sed -n 's/^intake_id: //p')"
 }
 grep -q '离线收件仍然允许' "$PROJECT/.freely/intake/$OFFLINE_ID/message.txt"
 
-(
-  cd "$PROJECT"
-  FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" \
-    bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --watch --interval 1 >/tmp/freely-chat-tui-dispatch.log 2>&1
-) &
-DISPATCH_PID=$!
-trap 'kill "$DISPATCH_PID" 2>/dev/null || true; wait "$DISPATCH_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
-
-for _ in $(seq 1 10); do
-  if [[ -f "$PROJECT/.freely/run/interruption-dispatch.pid" ]]; then
-    READY_PID="$(cat "$PROJECT/.freely/run/interruption-dispatch.pid" 2>/dev/null || true)"
-    if [[ -n "$READY_PID" ]] && kill -0 "$READY_PID" 2>/dev/null; then
-      break
-    fi
-  fi
-  sleep 1
-done
-[[ -f "$PROJECT/.freely/run/interruption-dispatch.pid" ]] || {
-  echo "[FAIL] interruption dispatcher did not become ready" >&2
-  exit 1
-}
-
 CHAT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat "你好，Freely")"
 CHAT_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
 [[ -n "$CHAT_ID" ]] || {
@@ -133,10 +91,45 @@ CHAT_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
   exit 1
 }
 grep -q '你好，Freely' "$PROJECT/.freely/intake/$CHAT_ID/message.txt"
+for _ in $(seq 1 10); do
+  if [[ -f "$PROJECT/.freely/run/interruption-dispatch.pid" ]]; then
+    READY_PID="$(cat "$PROJECT/.freely/run/interruption-dispatch.pid" 2>/dev/null || true)"
+    if [[ -n "$READY_PID" ]] && kill -0 "$READY_PID" 2>/dev/null; then
+      DISPATCH_PID="$READY_PID"
+      break
+    fi
+  fi
+  sleep 1
+done
+[[ -n "$DISPATCH_PID" ]] || {
+  echo "[FAIL] freely chat did not auto-bootstrap interruption dispatcher" >&2
+  exit 1
+}
+trap 'kill "$DISPATCH_PID" 2>/dev/null || true; wait "$DISPATCH_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+for _ in $(seq 1 10); do
+  STATUS_CHAT="$(awk -F '\"' '/^STATUS=/{print $2; exit}' "$PROJECT/.freely/intake/$CHAT_ID/meta.env")"
+  if [[ "$STATUS_CHAT" == "classified" || "$STATUS_CHAT" == "absorbed" ]]; then
+    break
+  fi
+  sleep 1
+done
+STATUS_CHAT="$(awk -F '\"' '/^STATUS=/{print $2; exit}' "$PROJECT/.freely/intake/$CHAT_ID/meta.env")"
+[[ "$STATUS_CHAT" == "classified" || "$STATUS_CHAT" == "absorbed" ]] || {
+  echo "[FAIL] freely chat intake was not claimed after autobootstrap" >&2
+  exit 1
+}
 
 TUI_OUTPUT="$(cd "$PROJECT" && printf '继续测试中文输入框\n' | FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" tui --once)"
 printf '%s\n' "$TUI_OUTPUT" | grep -q 'Freely TUI'
 printf '%s\n' "$TUI_OUTPUT" | grep -q 'submitted: 继续测试中文输入框'
+TUI_ID="$(find "$PROJECT/.freely/intake" -mindepth 1 -maxdepth 1 -type d -print | xargs ls -td | head -n 1 | xargs basename)"
+for _ in $(seq 1 10); do
+  STATUS_TUI="$(awk -F '\"' '/^STATUS=/{print $2; exit}' "$PROJECT/.freely/intake/$TUI_ID/meta.env")"
+  if [[ "$STATUS_TUI" == "classified" || "$STATUS_TUI" == "absorbed" ]]; then
+    break
+  fi
+  sleep 1
+done
 
 STATUS_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" intake status)"
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'active_items: 3'
@@ -150,4 +143,4 @@ REGISTRY_STATUS_OUTPUT="$(cd "$TMP_DIR" && FREELY_HOME="$FREELY_HOME" bash "$ROO
 printf '%s\n' "$REGISTRY_STATUS_OUTPUT" | grep -q "project: $CANON_PROJECT"
 printf '%s\n' "$REGISTRY_STATUS_OUTPUT" | grep -q 'active_items: 3'
 
-echo "[PASS] freely chat and tui require interruption runtime while intake chat remains the offline escape hatch"
+echo "[PASS] freely chat and tui auto-bootstrap interruption handling while intake chat remains the offline primitive"
