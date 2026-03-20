@@ -12,6 +12,8 @@
   - 能明确 Freely 运行器最小必选能力和推荐扩展能力
   - 后续实现不再主要靠散落的脚本说明和 prompt 注入对齐
 - decision_reason: 这是 Symphony 对 Freely 最值得吸收的部分之一，而且不会破坏三层循环本身。
+- next_action: 继续 pre-brainstorm，先确认 Freely 是否真的缺一份更集中、可执行的 orchestrator spec；若边界继续稳定，再 materialize 为独立 issue。
+- revisit_trigger: 当 auto-loop / worker execution / recovery / supervision 的最小执行规范缺口被明确证明，且不再只是文档表述偏好时。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []
@@ -28,6 +30,8 @@
   - 能说明哪些信息必须跨环持续存在，哪些仍应按 loop 分层存放
   - 设计结果不会把 Freely 退化成单文档系统
 - decision_reason: 有启发，但风险也高；如果处理不好，会冲掉 Freely 已建立的分层模型。
+- next_action: 保持在 pre-brainstorm，先确认哪些 continuity 信息必须跨环持续存在、哪些仍应按 loop 分层存放；未稳定前不要 materialize。
+- revisit_trigger: 当能明确写出跨环 continuity 的最小抽象且不破坏 pre-brainstorm / IBM / dev-loop 分层时。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []
@@ -43,6 +47,8 @@
   - 明确远程 worker 是否只是扩展，还是会反过来要求重写当前本地执行模型
   - 若推进，能列出最小必要前置条件
 - decision_reason: 方向成立，但与当前“自治开发应用”主线相比优先级明显更低。
+- next_action: 保持在 pre-brainstorm，优先只收集远程 worker 对 workspace ownership、cleanup、resume、host health 的新增要求。
+- revisit_trigger: 当远程执行不再只是扩展设想，而是已经出现明确的前置条件或主线压力时。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - session_refs: []

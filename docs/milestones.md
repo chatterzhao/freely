@@ -150,6 +150,26 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/candidates.md`
 - next_action: 保持在 pre-brainstorm，先确认 Freely 是否真的缺一份更集中、可执行的 orchestrator spec；若结论稳定，再 materialize 成 issue，而不是直接把 Symphony 当成架构模板
 
+3. `C-20260319-0500-02`
+- title: 统一 issue-level continuity artifact 设计
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/candidates.md`
+- next_action: 保持在 pre-brainstorm，先确认哪些 continuity 信息必须跨环持续存在、哪些仍应按 loop 分层存放；未稳定前不要 materialize
+
+4. `C-20260319-0500-03`
+- title: 评估远程 worker / SSH 执行扩展对 Freely 的适用性
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P2
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/candidates.md`
+- next_action: 保持在 pre-brainstorm，优先只收集远程 worker 对 workspace ownership、cleanup、resume、host health 的新增要求
+
 ### completed_issues
 
 1. `C-20260306-1101`
