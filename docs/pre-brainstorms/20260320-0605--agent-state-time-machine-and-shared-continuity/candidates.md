@@ -19,6 +19,8 @@
 - priority: `P1`
 - status: `needs_research`
 - decision_reason: 这条能力方向对 Freely 的长期自治恢复和多 agent 协作很重要，但当前仍应先做边界收敛，而不是直接做基础设施绑定。
+- next_action: 继续 pre-brainstorm，优先冻结 snapshot / fork / rollback / shared continuity 的边界，再决定是否 materialize 为独立 issue。
+- revisit_trigger: 当 Freely 的多设备或多人协作场景需要统一共享连续性控制面，且本地 snapshot index 方案边界稳定后，再进入 IBM。
 - promoted_issue_path: `pending://state-snapshot-fork-and-shared-continuity-materialization`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:
