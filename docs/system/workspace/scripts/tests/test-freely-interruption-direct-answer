@@ -9,6 +9,7 @@ PROJECT="$TMP_DIR/project"
 FREELY_HOME="$TMP_DIR/freely-home"
 HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
 HANDLER_FAIL_FIXTURE="$TMP_DIR/interruption-handler-fail-fixture"
+HANDLER_STALE_FIXTURE="$TMP_DIR/interruption-handler-stale-fixture"
 CLEANUP_WT="$TMP_DIR/cleanup-wt"
 CLEANUP_WT_2="$TMP_DIR/cleanup-wt-2"
 mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0000--sample"
@@ -122,6 +123,22 @@ exit 1
 EOF
 chmod +x "$HANDLER_FAIL_FIXTURE"
 
+cat >"$HANDLER_STALE_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cat <<'OUT'
+DECISION=answer
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=runtime
+OWNERSHIP=manager
+WHY=这是主管监督面需要先做澄清的问题
+HANDOFF=
+ANSWER=主管先回答当前后台 AI 进程状态
+OUT
+EOF
+chmod +x "$HANDLER_STALE_FIXTURE"
+
 cd "$PROJECT"
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto >/dev/null
 
@@ -219,4 +236,32 @@ grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_R
 grep -q '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
 grep -q '^CREATED_AT="'"$CREATED_AT_RETRY"'"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
 
-echo "[PASS] interruption manager routes abstract answer, cleanup followthrough, delegated handoff, and retries cleanly after handler failure"
+INTAKE_ID_STALE="20260320-000001-stale"
+mkdir -p ".freely/intake/$INTAKE_ID_STALE"
+cat >".freely/intake/$INTAKE_ID_STALE/message.txt" <<'EOF'
+看看后台AI进程都在做什么？
+EOF
+cat >".freely/intake/$INTAKE_ID_STALE/meta.env" <<'EOF'
+INTAKE_ID="20260320-000001-stale"
+CREATED_AT="2026-03-20T00:00:00Z"
+AUTHOR="human"
+CHANNEL="chat"
+STATUS="classified"
+CLASSIFICATION=""
+REACTION="followup"
+LINKED_ARTIFACT="pending://interruption-manager-triage"
+DELEGATED_WORKTREE=""
+SESSION_REFS="[]"
+CLAIMED_BY="interruption-manager-agent"
+CLAIMED_AT="2026-03-20T00:00:05Z"
+ABSORPTION_TARGET=""
+RESOLUTION_ARTIFACT=""
+EOF
+
+FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_STALE_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$PROJECT" >/dev/null
+grep -q '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '主管先回答当前后台 AI 进程状态' ".freely/run/interruption-resolution/$INTAKE_ID_STALE/resolution.md"
+
+echo "[PASS] interruption manager routes abstract answer, cleanup followthrough, delegated handoff, retries cleanly after handler failure, and recovers stale triage claims"

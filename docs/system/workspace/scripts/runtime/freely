@@ -740,6 +740,25 @@ reset_intake_claim_for_retry() {
     "$project" "$intake_id" "new" "" "pending://unclassified" "" "" "" "" ""
 }
 
+intake_claim_is_stale_for_retry() {
+  local project="$1" intake_id="$2" threshold_secs="${3:-60}"
+  local meta_file claimed_at linked_artifact resolution_artifact claimed_by claimed_epoch now_epoch
+  meta_file="$(intake_item_meta_file "$project" "$intake_id")"
+  [[ -f "$meta_file" ]] || return 1
+  claimed_by="$(meta_env_value "$meta_file" "CLAIMED_BY")"
+  linked_artifact="$(meta_env_value "$meta_file" "LINKED_ARTIFACT")"
+  resolution_artifact="$(meta_env_value "$meta_file" "RESOLUTION_ARTIFACT")"
+  claimed_at="$(meta_env_value "$meta_file" "CLAIMED_AT")"
+  [[ "$claimed_by" == "interruption-manager-agent" ]] || return 1
+  [[ "$linked_artifact" == "pending://interruption-manager-triage" ]] || return 1
+  [[ -z "$resolution_artifact" ]] || return 1
+  [[ -n "$claimed_at" ]] || return 1
+  claimed_epoch="$(date -j -u -f '%Y-%m-%dT%H:%M:%SZ' "$claimed_at" '+%s' 2>/dev/null || true)"
+  [[ -n "$claimed_epoch" ]] || return 1
+  now_epoch="$(date -u '+%s')"
+  (( now_epoch - claimed_epoch >= threshold_secs ))
+}
+
 resolution_snapshot_for_project() {
   local project="$1" limit="${2:-5}"
   local root item_dir meta_file content_file intake_id reaction classification absorption_target status first_line count
@@ -2034,6 +2053,12 @@ handle_interruption_intake_once() {
   [[ -f "$meta_file" && -f "$message_file" ]] || return 1
   status="$(meta_env_value "$meta_file" "STATUS")"
   claimed_by="$(meta_env_value "$meta_file" "CLAIMED_BY")"
+  if [[ "$status" == "classified" ]] && intake_claim_is_stale_for_retry "$project" "$intake_id"; then
+    log_warn "stale interruption triage claim detected; resetting intake for retry: $intake_id"
+    reset_intake_claim_for_retry "$project" "$intake_id"
+    status="new"
+    claimed_by=""
+  fi
   [[ "$status" == "new" && -z "$claimed_by" ]] || return 1
 
   cmd_intake_claim \
