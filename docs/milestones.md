@@ -301,12 +301,12 @@ routing_policy:
 1. `I-20260312-0011`
 - title: Backend Service Contract and Adapter Taxonomy
 - milestone_state: committed
-- phase_state: `todo_ibm`
+- phase_state: `done_ibm`
 - priority: P0
 - issue_path: `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
 - source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
-- next_action: 先把 backend service contract 与 adapter taxonomy 作为控制面总入口冻结下来，再允许后续 UI、runtime 与 intervention 设计继续细化
+- next_action: contract 与 adapter taxonomy 的 IBM 已冻结完成；下一步按 sequencing 推进 `C-20260312-0011-E/G/H` 等后续 issue，复用这条 contract 真源，而不是再次回到架构总论预研
 
 ### candidate_issues
 

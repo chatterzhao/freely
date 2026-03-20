@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260312-0011`
 - title: Backend Service Contract and Adapter Taxonomy
-- phase_state: `todo_ibm`
+- phase_state: `done_ibm`
 - milestone: `M-20260312-control-surface-runtime-convergence`
 - epic-name: `control-surface-runtime-convergence`
 - story-name: `backend-service-contract-and-adapter-taxonomy`
@@ -60,4 +60,4 @@ Freely 已经接受 `ClientCommand`、`ServerEvent`、`Snapshot` 的方向，但
 
 ## Next
 
-- 继续在 IBM 中把 contract boundary 写实到后续 issue，而不是再回头扩写 pre-brainstorm。
+- IBM 已完成，下一步按 sequencing 拆到后续 control surface / runtime / intervention issue，而不是再回头扩写 pre-brainstorm 或重复争论 contract/adaptor 边界。
