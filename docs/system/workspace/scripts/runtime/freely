@@ -1626,6 +1626,19 @@ manager_ai_pid_for_project() {
   fi
 }
 
+runtime_ai_pid_hint_for_project() {
+  local project="$1" run_dir ap
+  run_dir="$(run_dir_for_project "$project")"
+  if [[ -f "$run_dir/ai.pid" ]]; then
+    ap="$(cat "$run_dir/ai.pid" 2>/dev/null || true)"
+    if [[ -n "$ap" ]] && kill -0 "$ap" 2>/dev/null; then
+      printf '%s\n' "$ap"
+      return 0
+    fi
+  fi
+  manager_ai_pid_for_project "$project"
+}
+
 restart_manager_supervisor_preserving_handoff() {
   local project="$1" run_dir ai_pid supervisor_pid
   run_dir="$(run_dir_for_project "$project")"
@@ -1696,7 +1709,7 @@ latest_prompt_file_for_project() {
 
 ai_process_command_for_project() {
   local project="$1" ai_pid
-  ai_pid="$(manager_ai_pid_for_project "$project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
   [[ -n "$ai_pid" ]] || return 0
   ps -p "$ai_pid" -o command= 2>/dev/null || true
 }
@@ -1704,7 +1717,7 @@ ai_process_command_for_project() {
 ai_process_snapshot_markdown() {
   local project="$1"
   local ai_pid session_state tool_session_id tool_jsonl_path prompt_file ai_ps_line
-  ai_pid="$(manager_ai_pid_for_project "$project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
   load_session_state_or_defaults "$project"
   tool_session_id="${LAST_TOOL_SESSION_ID:-unavailable}"
   tool_jsonl_path="${LAST_TOOL_JSONL_PATH:-unavailable}"
@@ -2499,7 +2512,9 @@ cmd_status() {
   if [[ -f "$run_dir/ai.pid" ]]; then
     local ap
     ap="$(cat "$run_dir/ai.pid" 2>/dev/null || true)"
-    if valid_ai_pid_for_project "$PROJECT_ROOT" "$ap"; then
+    if [[ -n "$ap" ]] && kill -0 "$ap" 2>/dev/null; then
+      echo "ai_pid: ${ap:-none}"
+    elif valid_ai_pid_for_project "$PROJECT_ROOT" "$ap"; then
       echo "ai_pid: ${ap:-none}"
     else
       echo "ai_pid: none"

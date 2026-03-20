@@ -81,4 +81,31 @@ grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID/meta.env"
 grep -q '^CLAIMED_BY="interruption-dispatcher"$' ".freely/intake/$INTAKE_ID/meta.env"
 grep -q 'direct_answer: 当前没有运行中的后台 AI 进程。' ".freely/run/interruption-resolution/$INTAKE_ID/resolution.md"
 
+bash -c 'exec -a "node /Users/test/.bun/bin/codex exec --skip-git-repo-check -C '"$PROJECT"' -m gpt-5.4 -" sleep 30' &
+FAKE_AI_PID=$!
+trap 'kill "$FAKE_AI_PID" 2>/dev/null || true; kill "$DISPATCH_PID" 2>/dev/null || true; wait "$FAKE_AI_PID" 2>/dev/null || true; wait "$DISPATCH_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+printf '%s\n' "$FAKE_AI_PID" >".freely/run/ai.pid"
+
+CHAT_OUTPUT_RUNNING="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" chat "看看后台AI进程都在做什么？")"
+INTAKE_ID_RUNNING="$(printf '%s\n' "$CHAT_OUTPUT_RUNNING" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_RUNNING" ]] || {
+  echo "[FAIL] missing running intake id" >&2
+  exit 1
+}
+
+for _ in $(seq 1 10); do
+  STATUS_RUNNING="$(awk -F '\"' '/^STATUS=/{print $2; exit}' ".freely/intake/$INTAKE_ID_RUNNING/meta.env")"
+  if [[ "$STATUS_RUNNING" == "absorbed" ]]; then
+    break
+  fi
+  sleep 1
+done
+
+[[ "$(awk -F '\"' '/^STATUS=/{print $2; exit}' ".freely/intake/$INTAKE_ID_RUNNING/meta.env")" == "absorbed" ]] || {
+  echo "[FAIL] running direct-answer intake was not absorbed" >&2
+  exit 1
+}
+grep -q '正在运行' ".freely/run/interruption-resolution/$INTAKE_ID_RUNNING/resolution.md"
+grep -q "$FAKE_AI_PID" ".freely/run/interruption-resolution/$INTAKE_ID_RUNNING/resolution.md"
+
 echo "[PASS] interruption dispatcher directly answers AI process status queries"
