@@ -740,6 +740,32 @@ reset_intake_claim_for_retry() {
     "$project" "$intake_id" "new" "" "pending://unclassified" "" "" "" "" ""
 }
 
+recover_stale_interruption_triage_claims() {
+  local project="$1"
+  local intake_root item_dir meta_file intake_id item_status claimed_by linked_artifact resolution_artifact recovered_any
+  intake_root="$(intake_dir_for_project "$project")"
+  [[ -d "$intake_root" ]] || return 0
+  recovered_any="0"
+  while IFS= read -r item_dir; do
+    meta_file="$item_dir/meta.env"
+    [[ -f "$meta_file" ]] || continue
+    intake_id="$(meta_env_value "$meta_file" "INTAKE_ID")"
+    item_status="$(meta_env_value "$meta_file" "STATUS")"
+    claimed_by="$(meta_env_value "$meta_file" "CLAIMED_BY")"
+    linked_artifact="$(meta_env_value "$meta_file" "LINKED_ARTIFACT")"
+    resolution_artifact="$(meta_env_value "$meta_file" "RESOLUTION_ARTIFACT")"
+    [[ "$item_status" == "classified" ]] || continue
+    [[ "$claimed_by" == "interruption-manager-agent" ]] || continue
+    [[ "$linked_artifact" == "pending://interruption-manager-triage" ]] || continue
+    [[ -z "$resolution_artifact" ]] || continue
+    reset_intake_claim_for_retry "$project" "$intake_id"
+    recovered_any="1"
+  done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort)
+  if [[ "$recovered_any" == "1" ]]; then
+    log_info "recovered stale interruption triage claim(s)"
+  fi
+}
+
 resolution_snapshot_for_project() {
   local project="$1" limit="${2:-5}"
   local root item_dir meta_file content_file intake_id reaction classification absorption_target status first_line count
@@ -2075,6 +2101,7 @@ ensure_interruption_dispatch_once() {
   local run_dir pid_file existing_pid item_dir intake_id handled_any
   run_dir="$(run_dir_for_project "$project")"
   mkdir -p "$run_dir"
+  recover_stale_interruption_triage_claims "$project"
   handled_any="0"
   while IFS= read -r item_dir; do
     intake_id="$(basename "$item_dir")"
