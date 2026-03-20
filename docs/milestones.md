@@ -139,6 +139,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，先冻结 3 个边界：`checkpoint-ready` 的结构化输出、`LAWS/runtime/checkpoint-guard/supervisor` 的职责分层、以及进入 IBM 前的 promotion gate；在这些边界稳定前不得直接写成 IBM issue 或塞回 `I-20260318-0930`
+- revisit_trigger: 当 `checkpoint-ready` 的结构化输出、supervisor 职责边界与 promotion gate 可以被稳定写成最小 issue contract 时，重新进入 materialization 判断
 
 2. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec
@@ -149,6 +150,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/candidates.md`
 - next_action: 保持在 pre-brainstorm，先确认 Freely 是否真的缺一份更集中、可执行的 orchestrator spec；若结论稳定，再 materialize 成 issue，而不是直接把 Symphony 当成架构模板
+- revisit_trigger: 当 orchestrator executable spec 的缺口、职责边界与最小验收可以冻结成独立 issue contract 时，重新进入 materialization 判断
 
 3. `C-20260319-0500-02`
 - title: 统一 issue-level continuity artifact 设计
@@ -159,6 +161,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/candidates.md`
 - next_action: 保持在 pre-brainstorm，先确认哪些 continuity 信息必须跨环持续存在、哪些仍应按 loop 分层存放；未稳定前不要 materialize
+- revisit_trigger: 当 issue-level continuity artifact 的最小字段、跨环写回边界与 canonical 落点可以被冻结成 issue scope 时，重新进入 materialization 判断
 
 4. `C-20260319-0500-03`
 - title: 评估远程 worker / SSH 执行扩展对 Freely 的适用性
@@ -169,6 +172,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-0500--openai-symphony-research/candidates.md`
 - next_action: 保持在 pre-brainstorm，优先只收集远程 worker 对 workspace ownership、cleanup、resume、host health 的新增要求
+- revisit_trigger: 当远程 worker / SSH 扩展的 ownership、cleanup、resume 与 host health 新约束可以冻结成最小 issue contract 时，重新进入 materialization 判断
 
 ### completed_issues
 
