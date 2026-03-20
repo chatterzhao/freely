@@ -41,6 +41,7 @@ description: 主管型插话处理 agent 的最小 routing 技能。基于主管
 - 让 AI 做判断，不靠长话术表穷举。
 - 示例可以帮助理解边界，但示例不是 if/else 规则。
 - 主管只拥有 routing / continuity / 必要澄清职责；凡是需要实际执行的变更动作，都不应把 ownership 留在 manager。
+- 只要正确回答依赖 live repo / live runtime / live fleet 的真实检查结果，也应优先委派，而不是让主管给抽象规则答复。
 
 ## 示例
 
