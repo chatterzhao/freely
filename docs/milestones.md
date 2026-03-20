@@ -319,6 +319,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
 - next_action: 待 contract 边界初步冻结后进入 IBM，定义 day-1 control surface 的信息架构、worktree visibility 和 team timeline
+- revisit_trigger: 当需要设计控制面首页、多 worktree lanes 或团队态势视图时重新唤起
 
 2. `C-20260312-0011-G`
 - title: Standalone Runtime Baseline Without OpenClaw
@@ -329,6 +330,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
 - next_action: 在引入任何外部 runtime profile 前，先把 Freely standalone mode 的最小组件、状态面和未闭合点写成正式 IBM 产物
+- revisit_trigger: 当要证明 Freely 可以在不依赖 OpenClaw 的情况下独立运行时重新唤起
 
 3. `C-20260312-0011-H`
 - title: Human Intervention Transport Across Auto-Run CLIs
@@ -339,6 +341,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
 - next_action: 在当前 `SendChatIntervention` 协议语义下，先冻结 `resume_with_intervention` 的 day-1 控制链与最小依赖字段
+- revisit_trigger: 当 human interruption transport 需要正式进入 IBM 或无法继续停留在临时 transport 约定时重新唤起
 
 4. `C-20260312-0011-B`
 - title: Frontend Manifest Boundary and Runtime Capability Layering
@@ -349,6 +352,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
 - next_action: 在 contract 与 standalone 基线明确后进入 IBM，收紧 frontend/backend/AI tool/integration 的 manifest 与真源分层
+- revisit_trigger: 当 manifest 分层必须落地到可执行依赖文件时重新唤起
 
 5. `C-20260312-0011-D`
 - title: Event Log and Snapshot Reconstruction Contract
@@ -359,6 +363,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
 - next_action: 作为 boundary contract 的补充，单独冻结 event/snapshot 的 reconstruction 语义，服务 UI、恢复和 team visibility
+- revisit_trigger: 当事件日志、快照重建或恢复语义出现实现歧义时重新唤起
 
 6. `C-20260312-0011-F`
 - title: Skill-first Capability Exposure with OpenClaw Workspace Projection
@@ -369,6 +374,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
 - next_action: 在 standalone baseline 清晰后再进入 IBM，定义哪些 Freely 能力先以 skill 暴露，再映射到 OpenClaw workspace/profile
+- revisit_trigger: 当需要把 Freely 能力投影到 OpenClaw workspace 或 hooks 时重新唤起
 
 7. `C-20260312-0011-C`
 - title: Runtime Independence with OpenClaw Profile as Optional Adapter
@@ -379,6 +385,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
 - next_action: 在 standalone mode 与 skill projection 明确后进入 IBM，正式定义 OpenClaw 只作为 optional adapter/profile 的边界
+- revisit_trigger: 当 OpenClaw 借力边界必须被正式冻结或替换时重新唤起
 
 8. `C-20260310-0056-A`
 - title: Evolver Sidecar for Freely Strategy Evolution

@@ -27,6 +27,8 @@
 - priority: P0
 - status: proposed
 - decision_reason: 这是技术栈长期可维护的基础，也能避免“产品运行时依赖”和“AI 执行环境工具”混层。
+- next_action: 在 contract 真源冻结后进入 IBM，先把 frontend/backend/agent tooling 的 manifest 分层写成最小可执行边界，再决定具体依赖落点。
+- revisit_trigger: 当 frontend shell、backend core 与外部 AI tooling 的依赖边界出现混写迹象，或需要为后续实现落地 manifest 时重新唤起。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260312-control-surface-runtime-convergence
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
@@ -42,6 +44,8 @@
 - priority: P1
 - status: proposed
 - decision_reason: 它能把“借力现有 runtime”变成可治理的实现策略，而不是新的架构中心。
+- next_action: 待 standalone baseline 和 contract 边界更清晰后再 materialize，定义 OpenClaw 只能作为 optional adapter/profile，不得成为 Freely 主定义。
+- revisit_trigger: 当需要正式处理 OpenClaw 借力、退出或替换边界时重新唤起。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260312-control-surface-runtime-convergence
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
@@ -57,6 +61,8 @@
 - priority: P1
 - status: proposed
 - decision_reason: 它是把 backend contract 真正落成可观测控制面的关键补充。
+- next_action: 在 backend contract 可复用后进入 IBM，单独冻结 event / snapshot 的 reconstruction 语义与最小事件字段。
+- revisit_trigger: 当 UI 首屏恢复、recovery 或 event-snapshot 重建语义再次出现歧义时重新唤起。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260312-control-surface-runtime-convergence
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
@@ -72,6 +78,8 @@
 - priority: P0
 - status: proposed
 - decision_reason: 这直接决定 Freely 的产品体验是否服务于多 agent / 多 worktree / 多 subagent 的真实使用场景。
+- next_action: 待 contract 边界确认后进入 IBM，定义 day-1 control surface 的信息架构、worktree lanes、team timeline 与 agent roster。
+- revisit_trigger: 当需要设计控制面首页、团队态势或多 worktree 可见性时重新唤起。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260312-control-surface-runtime-convergence
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
@@ -87,6 +95,8 @@
 - priority: P1
 - status: proposed
 - decision_reason: 这能把 OpenClaw 的优势用起来，同时不损害 Freely 的产品独立性和治理主权。
+- next_action: 在 standalone baseline 和 OpenClaw optional 边界明确后再 materialize，定义 skill-first 能力如何投影到 OpenClaw workspace/profile。
+- revisit_trigger: 当需要把 Freely 能力投影到 OpenClaw workspace、memory 或 hooks 时重新唤起。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260312-control-surface-runtime-convergence
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
@@ -103,6 +113,8 @@
 - priority: P0
 - status: proposed
 - decision_reason: 这是把“Freely 必须先独立成立”从口头判断提升为技术架构承诺的关键一步。
+- next_action: 先冻结 standalone mode 的最小组件，再根据 sequencing 决定是否进入 IBM；如果后续借力 OpenClaw，也应以此为基线。
+- revisit_trigger: 当 runtime / CLI / governance / state evidence 的独立闭环需要重新证明时重新唤起。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260312-control-surface-runtime-convergence
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
@@ -116,6 +128,8 @@
 - priority: P0
 - status: proposed
 - decision_reason: 这是把“人类在环侧观察并偶尔高优先级介入”从产品意图落成技术控制链的关键一步。
+- next_action: 待 contract 与 runtime baseline 稳定后进入 IBM，冻结 `resume_with_intervention` 的最小依赖与交互路径。
+- revisit_trigger: 当 human interruption 需要进入当前会话且不能继续依赖临时脚本或自然语言约定时重新唤起。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260312-control-surface-runtime-convergence
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
