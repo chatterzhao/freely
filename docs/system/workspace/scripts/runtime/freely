@@ -741,11 +741,12 @@ reset_intake_claim_for_retry() {
 }
 
 recover_stale_interruption_triage_claims() {
-  local project="$1"
-  local intake_root item_dir meta_file intake_id item_status claimed_by linked_artifact resolution_artifact recovered_any
+  local project="$1" threshold_secs="${2:-60}"
+  local intake_root item_dir meta_file intake_id item_status claimed_by linked_artifact resolution_artifact claimed_at claimed_epoch now_epoch recovered_any
   intake_root="$(intake_dir_for_project "$project")"
   [[ -d "$intake_root" ]] || return 0
   recovered_any="0"
+  now_epoch="$(date -u '+%s')"
   while IFS= read -r item_dir; do
     meta_file="$item_dir/meta.env"
     [[ -f "$meta_file" ]] || continue
@@ -754,10 +755,15 @@ recover_stale_interruption_triage_claims() {
     claimed_by="$(meta_env_value "$meta_file" "CLAIMED_BY")"
     linked_artifact="$(meta_env_value "$meta_file" "LINKED_ARTIFACT")"
     resolution_artifact="$(meta_env_value "$meta_file" "RESOLUTION_ARTIFACT")"
+    claimed_at="$(meta_env_value "$meta_file" "CLAIMED_AT")"
     [[ "$item_status" == "classified" ]] || continue
     [[ "$claimed_by" == "interruption-manager-agent" ]] || continue
     [[ "$linked_artifact" == "pending://interruption-manager-triage" ]] || continue
     [[ -z "$resolution_artifact" ]] || continue
+    [[ -n "$claimed_at" ]] || continue
+    claimed_epoch="$(date -j -u -f '%Y-%m-%dT%H:%M:%SZ' "$claimed_at" '+%s' 2>/dev/null || true)"
+    [[ -n "$claimed_epoch" ]] || continue
+    (( now_epoch - claimed_epoch >= threshold_secs )) || continue
     reset_intake_claim_for_retry "$project" "$intake_id"
     recovered_any="1"
   done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort)

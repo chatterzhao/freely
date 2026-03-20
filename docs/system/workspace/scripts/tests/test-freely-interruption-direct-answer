@@ -226,6 +226,7 @@ INTAKE_ID_STALE="$(printf '%s\n' "$CHAT_OUTPUT_STALE" | sed -n 's/^intake_id: //
   exit 1
 }
 bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" intake claim --project "$PROJECT" --intake-id "$INTAKE_ID_STALE" --claimed-by interruption-manager-agent --reaction followup --linked-artifact pending://interruption-manager-triage >/dev/null
+perl -0pi -e 's/CLAIMED_AT=\"[^\"]+\"/CLAIMED_AT=\"2026-03-20T00:00:05Z\"/' ".freely/intake/$INTAKE_ID_STALE/meta.env"
 grep -q '^STATUS="classified"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
 grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
 grep -q '^LINKED_ARTIFACT="pending://interruption-manager-triage"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
