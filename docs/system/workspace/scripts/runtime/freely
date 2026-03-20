@@ -22,6 +22,8 @@ usage() {
 Usage:
   freely init --project <abs_path> --intent <abs_file> --constitution <abs_file> --ai <tool[:model][:mode]> [--reasoning-effort <effort>]
   freely doctor --project <abs_path>
+  freely chat --project <abs_path> <message>
+  freely tui --project <abs_path> [--once]
   freely intake chat --project <abs_path> (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
   freely intake claim --project <abs_path> --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
   freely intake resolve --project <abs_path> --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
@@ -589,6 +591,73 @@ rewrite_existing_intake_item() {
   write_intake_item \
     "$project" "$intake_id" "$author" "$channel" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "${session_refs:-[]}" "$message" \
     "$reaction" "$claimed_by" "$claimed_at" "$absorption_target" "$resolution_artifact"
+}
+
+resolution_snapshot_for_project() {
+  local project="$1" limit="${2:-5}"
+  local root item_dir meta_file content_file intake_id reaction classification absorption_target status first_line count
+  root="$(interruption_resolution_dir_for_project "$project")"
+  [[ -d "$root" ]] || return 0
+  count=0
+  while IFS= read -r item_dir; do
+    meta_file="$item_dir/meta.env"
+    content_file="$item_dir/resolution.md"
+    [[ -f "$meta_file" ]] || continue
+    intake_id="$(meta_env_value "$meta_file" "INTAKE_ID")"
+    reaction="$(meta_env_value "$meta_file" "REACTION")"
+    classification="$(meta_env_value "$meta_file" "CLASSIFICATION")"
+    absorption_target="$(meta_env_value "$meta_file" "ABSORPTION_TARGET")"
+    status="$(meta_env_value "$meta_file" "STATUS")"
+    first_line="$(sed -n '2p' "$content_file" 2>/dev/null | sed 's/^- //')"
+    printf -- '- id=%s status=%s classification=%s reaction=%s absorption_target=%s summary=%s\n' \
+      "${intake_id:-unknown}" "${status:-unknown}" "${classification:-unclassified}" "${reaction:-pending}" "${absorption_target:-pending}" "${first_line:-}"
+    count=$((count + 1))
+    if (( count >= limit )); then
+      break
+    fi
+  done < <(find "$root" -mindepth 1 -maxdepth 1 -type d | sort -r)
+}
+
+render_tui_dashboard() {
+  local project="$1"
+  local manager_state intake_active intake_new last_resolution intake_snapshot resolution_snapshot
+  manager_state="down"
+  if [[ -f "$(run_dir_for_project "$project")/supervisor.pid" ]]; then
+    local sp
+    sp="$(cat "$(run_dir_for_project "$project")/supervisor.pid" 2>/dev/null || true)"
+    if valid_supervisor_pid_for_project "$project" "$sp"; then
+      manager_state="running"
+    fi
+  fi
+  intake_active="$(count_active_intake_items "$project")"
+  intake_new="$(count_intake_items_by_status "$project" "new")"
+  intake_snapshot="$(intake_snapshot_for_project "$project" 5)"
+  resolution_snapshot="$(resolution_snapshot_for_project "$project" 3)"
+  printf '\033[2J\033[H'
+  printf 'Freely TUI | project: %s | manager: %s | intake active: %s | new: %s\n' "$project" "$manager_state" "$intake_active" "$intake_new"
+  printf '%s\n' '================================================================================'
+  printf '%s\n' 'Intake Queue'
+  if [[ -n "$intake_snapshot" ]]; then
+    printf '%s\n' "$intake_snapshot"
+  else
+    printf '%s\n' '- none'
+  fi
+  printf '\n%s\n' 'Recent Resolutions'
+  if [[ -n "$resolution_snapshot" ]]; then
+    printf '%s\n' "$resolution_snapshot"
+  else
+    printf '%s\n' '- none'
+  fi
+  printf '\n%s\n' 'Input'
+  printf '%s\n' '- 直接输入一条插话并回车提交'
+  printf '%s\n' '- 输入 /quit 退出，输入 /refresh 刷新'
+  printf '%s\n' '================================================================================'
+}
+
+tui_submit_message() {
+  local project="$1" message="$2"
+  [[ -n "$message" ]] || return 0
+  bash "$SELF_ROOT/bin/freely" intake chat --project "$project" --author human --channel tui --message "$message" >/dev/null
 }
 
 rate_limit_exhausted() {
@@ -1857,6 +1926,68 @@ cmd_doctor() {
   check_doc_gate_or_fail "$project"
 }
 
+cmd_chat() {
+  local project="" message=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --help|-h) usage; exit 0 ;;
+      *)
+        if [[ -n "$message" ]]; then
+          message="$message $1"
+        else
+          message="$1"
+        fi
+        shift
+        ;;
+    esac
+  done
+  [[ -n "$project" && -n "$message" ]] || { usage; exit 1; }
+  cmd_intake_chat --project "$project" --author human --channel chat --message "$message"
+}
+
+cmd_tui() {
+  local project="" once="0" input=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --once) once="1"; shift ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  [[ -n "$project" ]] || { usage; exit 1; }
+  check_doc_gate_or_fail "$project"
+
+  if [[ "$once" == "1" || ! -t 0 ]]; then
+    render_tui_dashboard "$project"
+    if ! IFS= read -r input; then
+      exit 0
+    fi
+    [[ -n "$input" ]] || exit 0
+    tui_submit_message "$project" "$input"
+    printf 'submitted: %s\n' "$input"
+    exit 0
+  fi
+
+  while true; do
+    render_tui_dashboard "$project"
+    printf '> '
+    if ! IFS= read -r input; then
+      printf '\n'
+      break
+    fi
+    case "$input" in
+      /quit|/exit) break ;;
+      /refresh|"") continue ;;
+      *)
+        tui_submit_message "$project" "$input"
+        printf 'submitted. press Enter to continue...'
+        IFS= read -r _ || true
+        ;;
+    esac
+  done
+}
+
 cmd_intake_chat() {
   local project="" message="" message_file="" author="human" channel="chat" intake_id=""
   while [[ $# -gt 0 ]]; do
@@ -2233,6 +2364,8 @@ main() {
   case "$cmd" in
     init) cmd_init "$@" ;;
     doctor) cmd_doctor "$@" ;;
+    chat) cmd_chat "$@" ;;
+    tui) cmd_tui "$@" ;;
     intake)
       local subcmd="${1:-}"
       shift || true
