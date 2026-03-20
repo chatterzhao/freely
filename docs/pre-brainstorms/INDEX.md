@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260320-0152--chat-entrypoint-autobootstrap
 - 20260320-0138--interruption-entrypoint-runtime-preflight
 - 20260320-0120--interruption-manager-agent-triage
 - 20260320-0052--interruption-direct-answer-control-plane
