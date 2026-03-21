@@ -128,6 +128,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
+9. `I-20260321-0217`
+- title: Claude Code tool profiles and Codex MCP session evidence governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md`, `docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md`
+- next_action: runtime、tests、双层会话证据与 `cc-use-codex-cli` live smoke 已落盘；下一步先按依赖链把当前分支合回 `feature/research-codex-in-cc-mcp`，再复核父分支是否具备继续并入 `develop` 的条件。若父分支仍未完成治理承接或 review，不得跳过上游直接并入 `develop`
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

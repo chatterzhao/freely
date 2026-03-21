@@ -2,11 +2,11 @@
 
 - id: C-20260321-0148-001
   title: Add exact Claude/Codex session evidence resolution for cc-based tools
-  status: proposed
+  status: promoted
   why_now:
     - 当前 `cc-use-codex-cli` 已可用，但恢复与多并发证据仍偏弱，应该升级为精确 jsonl 解析。
-  promoted_issue_path: pending://issue-materialization
-  milestone: pending://milestone-binding
+  promoted_issue_path: docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md
+  milestone: M-20260306-workspace-routing-foundation
   session_refs:
     - tool: cc-use-codex-cli
       session_id: 11111111-2222-4333-8444-555555555555

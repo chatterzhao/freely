@@ -2,11 +2,11 @@
 
 - id: C-20260320-2145-001
   title: Add explicit `cc` and `cc-use-codex-cli` top-level Freely tools
-  status: proposed
+  status: promoted
   why_now:
     - 当前 `cc` 语义需要和 `cc-use-codex-cli` 固定 profile 拆开，避免 capability 参数泄漏到用户侧。
-  promoted_issue_path: pending://issue-materialization
-  milestone: pending://milestone-binding
+  promoted_issue_path: docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md
+  milestone: M-20260306-workspace-routing-foundation
   session_refs:
     - tool: cc-use-codex-cli
       session_id: unavailable://freely-runtime-uses-claude-session-id-state
@@ -19,11 +19,11 @@
 
 - id: C-20260320-2145-002
   title: Use per-workcell Claude session-id as cc concurrency anchor
-  status: proposed
+  status: promoted
   why_now:
     - 多 worker / 多 worktree 并发必须立即稳定，不能阻塞在隐藏 `Codex threadId` 可见性上。
-  promoted_issue_path: pending://issue-materialization
-  milestone: pending://milestone-binding
+  promoted_issue_path: docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md
+  milestone: M-20260306-workspace-routing-foundation
   session_refs:
     - tool: cc
       session_id: unavailable://generated-at-runtime-and-persisted-in-session-state
