@@ -1,8 +1,7 @@
 # Tasks: human-chat-intake-and-manager-delegation
 
-- [x] materialize durable human chat intake entry
-- [x] expose manager intake queue scanning in prompt / runtime
-- [x] add `skill:human-interruption-handling`
-- [x] add claim / resolve / absorption writeback flow
-- [x] add regression coverage for record / claim / resolve / status
-- [x] bind pre-brainstorm candidate to milestone and formal issue
+- 保持 human chat intake 的 durable artifact 语义。
+- 保持 manager notice / claim / delegate / absorption contract。
+- 保持 specialized skill 的 resolution artifact 产出。
+- 保持与 `auto-loop-orchestrator` 的 reaction / absorption 边界一致。
+- 保持与 milestone / candidate / issue 回写的一致性。

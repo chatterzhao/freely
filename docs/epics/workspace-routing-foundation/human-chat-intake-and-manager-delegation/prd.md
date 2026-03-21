@@ -1,15 +1,13 @@
 # PRD: human-chat-intake-and-manager-delegation
 
-## Problem
+## Goal
 
-Freely needs CLI-first human chat intake as a formal discovery and continuation source, but the intake must stay durable, manager-visible, and route back into the same governance loops instead of bypassing them.
+把 human chat / session evidence 变成 Freely 可恢复、可监督、可委派的正式输入面。
 
-## Product Requirement
+## Requirements
 
-Human chat intake must write durable intake artifacts, let the manager notice/claim/classify them, and hand off to `human-interruption-handling` for resolution and canonical absorption guidance.
-
-## Non-goals
-
-- Do not let human chat bypass pre-brainstorm / issue / continuation routing
-- Do not let the human-side CLI directly claim or resolve intake items
-- Do not create a second state store outside `.freely/intake/**`
+1. raw human chat 必须先进入 durable intake。
+2. manager 必须能够 notice / claim / delegate / absorb。
+3. 深度解释必须由 specialized AI 或 skill 执行，不由 manager 越权承担。
+4. canonical absorption 必须回写到可追踪的正式产物。
+5. CLI-first surface 必须保持最小一致性，UI 只能是 presentation shell。
