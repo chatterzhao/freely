@@ -4,7 +4,7 @@
 
 - 日期：2026-03-16 16:48 America/Los_Angeles
 - 触发：Freely 已能通过 `--ai codex:<model>:auto` 指定 Codex 工具、模型和模式，但在实际狗粮启动时，`medium` 这类 reasoning effort 只能依赖用户全局 `~/.codex/config.toml`，不能由 Freely 项目级运行时显式携带。
-- 会话现状：当前仓库已在 dedicated worktree 内启动 `freely start`，并成功拉起 `codex:gpt-5.4:auto`。但 reasoning effort 没有进入 `.freely/config.env`、`freely status` 或 `monitor-ai-cli.sh` 的显式参数面。
+- 会话现状：当前仓库已在 dedicated worktree 内启动 `freely start`，并成功拉起 `codex:gpt-5.4:auto`。但 reasoning effort 没有进入 `.freely/config.env`、`freely baseline-status` 或 `monitor-ai-cli.sh` 的显式参数面。
 - 约束：
   - 宪法仍规定 Freely 的核心 AI 规格是 `tool:model:mode`，不应把 reasoning effort 塞回这个三段式规范并破坏现有兼容性。
   - Freely 正处于研究优先阶段；来自 chat / session evidence 的新缺口应先进入 `pre-brainstorm`，再决定最小实现。
@@ -22,7 +22,7 @@
 
 3. 当前狗粮链路依赖“用户全局状态”而不是“项目运行时状态”
 - 这会导致 Freely 的自举行为在换机、换账号或切换全局 Codex 配置时产生隐式漂移。
-- 也使得 `freely status` 无法完整表达项目当前到底是以什么模型强度在运行。
+- 也使得 `freely baseline-status` 无法完整表达项目当前到底是以什么模型强度在运行。
 
 ## 方案比较
 
@@ -58,7 +58,7 @@
 - 保持 `--ai tool:model:mode` 不变
 - 新增可选 `--reasoning-effort <effort>`
 - 写入 `.freely/config.env`
-- `freely status` 显示该值
+- `freely baseline-status` 显示该值
 - `monitor-ai-cli.sh` 仅在 `tool=codex` 时把它翻译成 `-c model_reasoning_effort="<effort>"`
 
 优点：

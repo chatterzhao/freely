@@ -105,7 +105,7 @@ grep -q 'current_project_dirty_entries: 1' "$prompt_file"
 grep -q 'current_worktree_dirty_summary: 1/1' "$prompt_file"
 grep -q '项目级工位快照：' "$prompt_file"
 
-status_output="$(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")"
+status_output="$(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")"
 grep -q 'last_project_dirty_entries: 1' <<<"$status_output"
 grep -q 'last_worktree_summary_total: 1' <<<"$status_output"
 grep -q 'last_worktree_summary_dirty: 1' <<<"$status_output"

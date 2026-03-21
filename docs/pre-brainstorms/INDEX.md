@@ -174,6 +174,9 @@
 - 20260320-1945--watchdog-live-status-surface-and-manager-supervision
   - brainstorms: docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/candidates.md
+- 20260320-2105--status-family-baseline-rename-and-future-aggregation
+  - brainstorms: docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

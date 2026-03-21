@@ -22,7 +22,7 @@ Freely 已经有 runtime watchdog、manager continuity、interruption intake 和
 
 - 进程活着但是否在推进不清楚
 - 主管监督缺少 canonical current-state 入口
-- 用户需要手工拼 `status + prompt + continuity + ps + jsonl`
+- 用户需要手工拼 `baseline-status + prompt + continuity + ps + jsonl`
 
 ## Scope
 

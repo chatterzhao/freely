@@ -87,7 +87,7 @@ whoami_account() {
 
 status_field() {
   local field="$1" output
-  output="$(bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" 2>/dev/null || true)"
+  output="$(bash "$ROOT_DIR/bin/freely" baseline-status --project "$MANAGER_PROJECT" 2>/dev/null || true)"
   printf '%s\n' "$output" | sed -n "s/^${field}: //p"
 }
 
@@ -312,8 +312,8 @@ wait_for_relaunched_manager_launch() {
 
 dump_failure_context() {
   echo "[DEBUG] whoami=$(whoami_account)" >&2
-  echo "[DEBUG] freely status:" >&2
-  bash "$ROOT_DIR/bin/freely" status --project "$MANAGER_PROJECT" >&2 || true
+  echo "[DEBUG] freely baseline-status:" >&2
+  bash "$ROOT_DIR/bin/freely" baseline-status --project "$MANAGER_PROJECT" >&2 || true
   echo "[DEBUG] trace:" >&2
   cat "$TRACE_FILE" >&2 2>/dev/null || true
   echo "[DEBUG] recent loop log:" >&2

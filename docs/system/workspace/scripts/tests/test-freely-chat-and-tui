@@ -73,7 +73,7 @@ CANON_PROJECT="$(cd "$PROJECT" && pwd -P)"
 DOCTOR_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" doctor)"
 printf '%s\n' "$DOCTOR_OUTPUT" | grep -q 'doc gate PASS'
 
-STATUS_OUTPUT_BEFORE_START="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
+STATUS_OUTPUT_BEFORE_START="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" baseline-status)"
 printf '%s\n' "$STATUS_OUTPUT_BEFORE_START" | grep -q "project: $CANON_PROJECT"
 
 OFFLINE_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" intake chat --author human --channel chat --message "离线收件仍然允许")"

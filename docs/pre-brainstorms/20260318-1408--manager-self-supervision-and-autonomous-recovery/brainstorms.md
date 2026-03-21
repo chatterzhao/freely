@@ -5,7 +5,7 @@
 这次后台 supervisor/worker 实际已经停摆，但问题不是主管自动发现，而是人工主动要求检查后才暴露：
 
 - `wt-fleet-status` 已显示全盘 `down/down`
-- `freely status --project <develop>` 仍残留陈旧 `supervisor_pid`
+- `freely baseline-status --project <develop>` 仍残留陈旧 `supervisor_pid`
 - 主管没有主动发起“后台工位巡检失败”的恢复动作
 
 这说明 Freely 已经有 worker supervision 的局部能力，但缺少“主管自我监督”这一层。

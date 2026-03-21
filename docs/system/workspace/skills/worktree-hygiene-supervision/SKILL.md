@@ -16,7 +16,7 @@ description: 当某个 worktree 进入 checkpoint 预警、dirty-budget 漂移�
 
 1. 先读当前 worktree 的 hygiene 信号。
    - `./bin/checkpoint-guard`
-   - `./bin/freely status --project <current-worktree>`
+   - `./bin/freely baseline-status --project <current-worktree>`
 
 2. 若已达到最小验证门：
    - 先更新 issue / continuity artifact

@@ -26,8 +26,9 @@ description: 当需要像项目负责人一样同时监督多个 Freely worktree
    - `./bin/checkpoint-guard`
    - commit 前用 `./bin/checkpoint-guard --staged-only`
 
-4. 看单个工位 runtime 连续性。
-   - `./bin/freely status --project <worktree>`
+4. 看单个工位 baseline snapshot。
+   - `./bin/freely baseline-status --project <worktree>`
+   - 它负责 durable / baseline / session-state 视图，而不是当前谁在干活
 
 5. 决策规则。
    - `checkpoint_required=true`：先 continuity / review / integration test / checkpoint commit

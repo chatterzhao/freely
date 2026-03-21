@@ -29,7 +29,7 @@
 
 - `checkpoint-guard` 能同时覆盖 clean tree、mixed control/product planes 与 staged-only 阻断。
 - `wt-fleet-status` 与 `freely fleet-status` 已按工位读取 runtime 摘要；缺少结构化 phase/issue 时保持 `unavailable`，不伪造 milestone 状态。
-- `freely status` 已暴露 `last_project_dirty_entries`、`last_worktree_summary_total`、`last_worktree_summary_dirty`、`checkpoint_required` 与 `checkpoint_reasons`。
+- `freely baseline-status` 已暴露 `last_project_dirty_entries`、`last_worktree_summary_total`、`last_worktree_summary_dirty`、`checkpoint_required` 与 `checkpoint_reasons`。
 - 首跳 prompt 已携带项目级工位快照，并要求主管模式先做排班、冻结、集成与 cleanup 判断；同工具场景继续第二跳而不是只停在 handoff。
 - 受保护分支上的首跳 prompt 现在会进入 `MANAGER_MODE=true`，明确限制主管工位只做监督、委派与 continuity，不在 `develop/main/pre-test-merge` 直接执行第二跳实现。
 

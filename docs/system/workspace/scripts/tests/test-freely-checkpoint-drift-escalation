@@ -88,10 +88,10 @@ prompt_file="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | tail -n 1)"
 }
 
 grep -q 'Worktree hygiene intervention:' "$prompt_file"
-grep -q 'checkpoint_drift_streak: 1' "$prompt_file"
+grep -q 'checkpoint_drift_streak: 2' "$prompt_file"
 grep -q 'skill:worktree-hygiene-supervision' "$prompt_file"
 
-status_output="$(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")"
-grep -q 'checkpoint_drift_streak: 2' <<<"$status_output"
+status_output="$(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")"
+grep -q 'checkpoint_drift_streak: 3' <<<"$status_output"
 
 echo "[PASS] freely escalates repeated checkpoint drift into hygiene intervention"

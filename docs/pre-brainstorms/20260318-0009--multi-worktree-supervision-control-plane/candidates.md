@@ -5,7 +5,7 @@
   Status: proposed
   Why:
   - 多个活跃 worktree 并行时，主监督者需要 CLI first 的全局盘面
-  - 当前只能通过零散 `git` / `freely status` 命令手工拼装
+  - 当前只能通过零散 `git` / `freely baseline-status` 命令手工拼装
   Acceptance Hint:
   - 可显示 branch、dirty state、supervisor/ai pid、最近运行态
   promoted_issue_path: pending://issue-materialization

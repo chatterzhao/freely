@@ -26,7 +26,7 @@
 TUI 的正确站位应是：
 
 - 一个 CLI 应用形态
-- 一个 `freely intake chat` / `freely intake status` / `freely status` 的交互壳
+- 一个 `freely intake chat` / `freely intake status` / `freely baseline-status` 的交互壳
 - 一个帮助人类稳定插话的前端
 
 它不应成为：
@@ -174,7 +174,7 @@ TUI 的正确站位应是：
 - UI 层只负责收集输入与展示状态
 - 提交时调用现有 `freely intake chat`
 - 队列显示来自 `freely intake status`
-- 项目状态来自 `freely status`
+- 项目状态来自 `freely baseline-status`
 
 更进一步的实现建议：
 

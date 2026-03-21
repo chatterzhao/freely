@@ -2,7 +2,7 @@
 
 ## Problem
 
-- `freely status --project <worktree>` 目前会优先读取该 worktree 自己 `.freely/run/supervisor.pid`。
+- `freely baseline-status --project <worktree>` 目前会优先读取该 worktree 自己 `.freely/run/supervisor.pid`。
 - 如果该 pid 文件是旧值，但对应 pid 还活着且实际属于另一个 worktree，状态就会把别人工位的 supervisor 错认成当前工位。
 - 这会直接破坏多 worktree supervision 的可信度，主管层会误判某个工位仍在自治执行。
 
@@ -22,6 +22,6 @@
 
 ## Expected Outcome
 
-- 单工位 `freely status` 不再错误显示其他 worktree 的 supervisor pid。
+- 单工位 `freely baseline-status` 不再错误显示其他 worktree 的 supervisor pid。
 - 项目级 `fleet-status` 不再把 stale pid 当成活跃 supervisor。
 - `stop --project` 不会误杀另一个 worktree 的 supervisor。
