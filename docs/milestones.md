@@ -203,7 +203,17 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/worktree-maintenance-governance/SKILL.md`, `docs/system/workspace/agents/lead-agent.md`, `docs/system/workspace/agents/manager-agent.md`, `docs/system/workspace/scripts/start-lead-agent.sh`, `docs/system/workspace/scripts/tests/test-routing-foundation-loop`
 - completion_note: 已把 worktree 创建后的维护能力收敛成专门 skill，明确 `audit / merge_prep / retirement_handoff` 三种模式，并接入主管真源与首跳测试
 
-2. `C-20260306-1101`
+2. `I-20260318-1222`
+- title: Mem9 shared memory evaluation for Freely continuity plane
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P2
+- issue_path: `docs/epics/workspace-routing-foundation/mem9-continuity-bridge/issues/mem9-continuity-bridge.md`
+- source_brainstorm: `docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/candidates.md`
+- completion_note: mem9 已明确收束为可选连续性增强层，不是 Freely 的治理真源；对应边界已 materialize 为 `skill:mem9-continuity-bridge`，并保持本地治理事实源优先
+
+3. `C-20260306-1101`
 - title: `lead-agent.md`
 - milestone_state: completed
 - phase_state: `completed`
@@ -212,7 +222,7 @@ routing_policy:
 - evidence: `docs/system/workspace/agents/lead-agent.md`
 - completion_note: 已落地首跳中枢代理职责与首跳协议
 
-2. `C-20260306-1102`
+4. `C-20260306-1102`
 - title: `context-source-skill.md`
 - milestone_state: completed
 - phase_state: `completed`
@@ -221,7 +231,7 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/context-source-skill/SKILL.md`
 - completion_note: 已落地来源判定、milestone 扫描与 usable issue 决策规则
 
-3. `C-20260306-1103`
+5. `C-20260306-1103`
 - title: `doc-pre-brainstorm-execution.md`
 - milestone_state: completed
 - phase_state: `completed`
@@ -230,7 +240,7 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
 - completion_note: 已落地 docs 前置收敛环，负责 pre-brainstorm 产物与 milestone 原子同步
 
-4. `C-20260306-1104`
+6. `C-20260306-1104`
 - title: `doc-ibm-execution.md` 与 `dev-loop-execution.md` 的外循环接驳边界
 - milestone_state: completed
 - phase_state: `completed`
@@ -239,7 +249,7 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
 - completion_note: 已收紧 issue-bound `IBM+G` 与 `DDD` 的接驳边界，状态交换统一回流给 auto-loop
 
-5. `C-20260306-1105`
+7. `C-20260306-1105`
 - title: 现有 `auto-loop-orchestrator` skill 对齐到首段闭环模型
 - milestone_state: completed
 - phase_state: `completed`

@@ -147,6 +147,9 @@
 - 20260318-1246--iflow-wechat-webfetch-capability
   - brainstorms: docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md
+- 20260318-1222--mem9-shared-memory-fit-for-freely
+  - brainstorms: docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/candidates.md
 - 20260318-1408--manager-self-supervision-and-autonomous-recovery
   - brainstorms: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md
