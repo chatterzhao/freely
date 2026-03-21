@@ -21,9 +21,21 @@
 - 合并完成
 - 测试和语义回归为绿色
 - 无待处理回滚项
+- 若存在远程 branch，其 disposition 已明确：
+  - merged and deleted
+  - or retained with reason
 
 ## Required evidence
 
 - 清理的分支名与 worktree 路径
 - 本地/远程删除结果
 - 若保留分支，记录原因与预计清理时机
+
+## Remote branch check
+
+1. 若仓库没有配置 remote，可只做本地 cleanup，并在 evidence 中写明 `remote: not-configured`
+2. 若存在 remote branch：
+  - 先同步 remote refs
+  - 确认远程分支是否已被当前 integration target 吸收
+  - 已吸收：先删 remote，再删本地 worktree / branch
+  - 未吸收或 remote delete 失败：保留本地并记录原因

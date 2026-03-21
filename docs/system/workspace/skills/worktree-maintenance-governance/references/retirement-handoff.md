@@ -28,6 +28,7 @@
 - 可摘取的最小差异
 - 绝不能整支合并的范围
 - retirement 前置条件
+- 本地 / 远程 branch disposition
 - 若是 research worktree，明确：
   - 已回写到哪些 canonical 文档
   - 哪些结论是 `adopt now / partial adopt / defer / drop`
@@ -40,3 +41,6 @@
 - research worktree 默认不长期保留；只要 canonical 文档已完成回写，就进入 `research writeback then retire`
 - 若研究结论只有部分可在当前里程碑吸收，当前吸收部分写入正式 issue / milestone，剩余部分继续留在 canonical candidate 区，不以保留旧 research worktree 作为延续方式
 - cleanup 前仍必须回到 `skill:branch-management` 的 cleanup lifecycle
+- 若远程 branch 仍存在，retirement handoff 必须说明是：
+  - 删除 remote
+  - 还是保留，并给出明确 blocker / owner / revisit trigger

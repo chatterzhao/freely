@@ -2214,12 +2214,32 @@ $(if [[ -n "$retained" ]]; then printf '%s\n' "$retained" | sed 's/^/  - /'; els
 EOF
 }
 
+cleanup_followthrough_remote_name() {
+  local project="$1"
+  if git -C "$project" remote | grep -Fxq origin; then
+    printf 'origin\n'
+    return 0
+  fi
+  git -C "$project" remote | sed -n '1p'
+}
+
 run_cleanup_followthrough() {
   local project="$1" intake_id="$2" classification="$3" reaction="$4" why_text="$5" handoff_text="$6"
   local resolution_file blocked_reason cleaned retained wt_path branch dirty supervisor ai
+  local remote_name remote_fetch_state remote_note remote_ref
   blocked_reason=""
   cleaned=""
   retained=""
+  remote_name="$(cleanup_followthrough_remote_name "$project")"
+  if [[ -n "$remote_name" ]]; then
+    if git -C "$project" fetch "$remote_name" --prune >/dev/null 2>&1; then
+      remote_fetch_state="ready"
+    else
+      remote_fetch_state="sync-failed"
+    fi
+  else
+    remote_fetch_state="not-configured"
+  fi
 
   while IFS=$'\t' read -r wt_path branch; do
     [[ -n "$wt_path" && -n "$branch" ]] || continue
@@ -2243,10 +2263,38 @@ run_cleanup_followthrough() {
       retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (runtime-active)"
       continue
     fi
+    remote_note="not-configured"
+    case "$remote_fetch_state" in
+      ready)
+        remote_ref="refs/remotes/$remote_name/$branch"
+        if git -C "$project" show-ref --verify --quiet "$remote_ref"; then
+          if git -C "$project" merge-base --is-ancestor "$remote_ref" HEAD >/dev/null 2>&1; then
+            if git -C "$project" push "$remote_name" --delete "$branch" >/dev/null 2>&1; then
+              remote_note="$remote_name deleted"
+            else
+              retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (remote-delete-failed:$remote_name)"
+              continue
+            fi
+          else
+            retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (remote-unmerged:$remote_name)"
+            continue
+          fi
+        else
+          remote_note="$remote_name absent"
+        fi
+        ;;
+      sync-failed)
+        retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (remote-sync-failed:$remote_name)"
+        continue
+        ;;
+      not-configured)
+        remote_note="not-configured"
+        ;;
+    esac
     if git -C "$project" worktree remove "$wt_path" >/dev/null 2>&1 && git -C "$project" branch -d "$branch" >/dev/null 2>&1; then
-      cleaned="${cleaned}${cleaned:+$'\n'}${branch} @ ${wt_path}"
+      cleaned="${cleaned}${cleaned:+$'\n'}${branch} @ ${wt_path} (remote:${remote_note})"
     else
-      retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (remove-failed)"
+      retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (local-remove-failed; remote:${remote_note})"
     fi
   done < <(merged_feature_worktree_entries_for_project "$project")
 

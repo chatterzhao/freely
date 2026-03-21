@@ -31,6 +31,9 @@ description: 当主管需要核清单个 worktree 的真实状态、为多条 wo
    - `research-only`
    - `companion-only`
    - `retire-only`
+5. 对进入 retirement / cleanup 的分支，必须同时给出本地与远程 branch disposition：
+   - `deleted`
+   - `retained-with-reason`
 5. 若问题只是创建/进入/删除 worktree，回到 `skill:branch-management`
 6. 若问题已经升级为高风险文本冲突收敛，切到 `skill:premerge-reconcile`
 7. 若是仓库级 fleet closure，必须允许“本轮只闭环其中一部分 worktree”；未闭环工位继续保留可见 disposition，而不是为了追求清空而误删
@@ -60,3 +63,4 @@ description: 当主管需要核清单个 worktree 的真实状态、为多条 wo
 - 当前问题已被稳定分类，或已有可执行的 merge / retire checklist
 - companion / research / completed 的边界不再混淆
 - 若是 fleet closure，当前 active worktree 都已有明确 disposition、下一步和 cleanup gate
+- 若进入 cleanup，远程 branch disposition 也已明确，而不是只删除本地 worktree

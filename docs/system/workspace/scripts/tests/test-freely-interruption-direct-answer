@@ -12,6 +12,7 @@ HANDLER_FAIL_FIXTURE="$TMP_DIR/interruption-handler-fail-fixture"
 CLEANUP_WT="$TMP_DIR/cleanup-wt"
 CLEANUP_WT_2="$TMP_DIR/cleanup-wt-2"
 DIRTY_WT="$TMP_DIR/dirty-wt"
+REMOTE_REPO="$TMP_DIR/remote.git"
 mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0000--sample"
 
 git init -q -b develop "$PROJECT"
@@ -65,6 +66,9 @@ EOF
 
 git -C "$PROJECT" add .
 git -C "$PROJECT" commit -q -m "init"
+git init -q --bare "$REMOTE_REPO"
+git -C "$PROJECT" remote add origin "$REMOTE_REPO"
+git -C "$PROJECT" push -q -u origin develop
 
 cat >"$HANDLER_FIXTURE" <<'EOF'
 #!/usr/bin/env bash
@@ -133,6 +137,9 @@ CLEANUP_WT_REAL="$(cd "$CLEANUP_WT" && pwd -P)"
 CLEANUP_WT_2_REAL="$(cd "$CLEANUP_WT_2" && pwd -P)"
 DIRTY_WT_REAL="$(cd "$DIRTY_WT" && pwd -P)"
 printf 'dirty\n' >"$DIRTY_WT/local-dirty.txt"
+git -C "$PROJECT" push -q -u origin feature/cleanup-fixture
+git -C "$PROJECT" push -q -u origin feature/cleanup-fixture-2
+git -C "$PROJECT" push -q -u origin feature/dirty-fixture
 
 cleanup_dispatcher() {
   if [[ -f "$PROJECT/.freely/run/interruption-dispatch.pid" ]]; then
@@ -167,8 +174,8 @@ grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env
 grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
 grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
 grep -q 'blocked_reason: none' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
-grep -q 'feature/cleanup-fixture @ '"$CLEANUP_WT_REAL" ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
-grep -q 'feature/cleanup-fixture-2 @ '"$CLEANUP_WT_2_REAL" ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+grep -q 'feature/cleanup-fixture @ '"$CLEANUP_WT_REAL"' (remote:origin deleted)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+grep -q 'feature/cleanup-fixture-2 @ '"$CLEANUP_WT_2_REAL"' (remote:origin deleted)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
 grep -q 'feature/dirty-fixture @ '"$DIRTY_WT_REAL"' (dirty)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
 [[ ! -d "$CLEANUP_WT" ]] || {
   echo "[FAIL] cleanup worktree still exists" >&2
@@ -186,12 +193,24 @@ if git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-fixtur
   echo "[FAIL] second cleanup branch still exists" >&2
   exit 1
 fi
+if git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/cleanup-fixture; then
+  echo "[FAIL] cleanup remote branch still exists" >&2
+  exit 1
+fi
+if git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/cleanup-fixture-2; then
+  echo "[FAIL] second cleanup remote branch still exists" >&2
+  exit 1
+fi
 [[ -d "$DIRTY_WT" ]] || {
   echo "[FAIL] dirty worktree should be retained" >&2
   exit 1
 }
 if ! git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/dirty-fixture; then
   echo "[FAIL] dirty branch should still exist" >&2
+  exit 1
+fi
+if ! git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/dirty-fixture; then
+  echo "[FAIL] dirty remote branch should still exist" >&2
   exit 1
 fi
 

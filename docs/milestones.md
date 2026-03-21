@@ -189,6 +189,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md`
 - next_action: `fleet_closure` 已收编到 worktree-maintenance skill，正式项目 fleet 现已收敛到 `develop + current sweep` 两棵 canonical 工位；剩余动作是完成最终 review，并在通过 promote gate 后将当前 sweep 合入 `develop`
 
+14. `I-20260321-1515`
+- title: Remote branch retirement governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/issues/remote-branch-retirement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md`
+- next_action: 把 remote branch deletion / retained reason 纳入 `worktree-maintenance-governance` 与 `cleanup-followthrough`，并用真实 cleanup 测试和 Freely 插话验证主管能够把这层收口做完
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`
