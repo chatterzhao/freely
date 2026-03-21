@@ -228,7 +228,8 @@ cat <<EOF
 6. 你的需求池至少包括：
    - \`docs/milestones.md\`
    - progress / recovery
-   - review / test
+   - review / test / acceptance review
+   - milestone planning / state maintenance
    - human chat / session evidence
    - github issue
    - \`docs/PROJECT_INTENT.md\`
