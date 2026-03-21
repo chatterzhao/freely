@@ -8,9 +8,9 @@ milestone_status_policy_version: v2
 
 candidate_policy:
 - dropped: remove from active milestone queues
-- needs_research: keep in candidate_issues and route back to pre-brainstorms or issue-bound brainstorm
+- needs_research: keep in candidate_issues with `next_action` and `revisit_trigger`, and route back to pre-brainstorms or issue-bound brainstorm; do not silently drop it from active scans
 - promoted: bind to a milestone immediately; do not leave as long-term unbound state
-- blocked: keep visible with blocker and next action
+- blocked: keep visible with blocker, next action, and revisit trigger
 
 queue_policy:
 - committed_issues: sequencing is clear and the item is the next active batch
@@ -36,6 +36,7 @@ sequencing_policy:
 routing_policy:
 - no_issue_path: stay in pre-brainstorms or continue doc-loop materialization
 - issue_path_present: route by `phase_state` into issue-bound brainstorm, IBM, continuation, dev-loop, or completion verification
+- unresolved candidate or issue never disappears just because the current round chose another priority; keep it in the appropriate queue with an explicit restart condition
 
 ## M-20260306-workspace-routing-foundation
 
@@ -159,6 +160,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，先冻结 3 个边界：`checkpoint-ready` 的结构化输出、`LAWS/runtime/checkpoint-guard/supervisor` 的职责分层、以及进入 IBM 前的 promotion gate；在这些边界稳定前不得直接写成 IBM issue 或塞回 `I-20260318-0930`
+- revisit_trigger: 当 `checkpoint-ready` 的结构化输出、supervisor 职责边界与 promotion gate 可以被稳定写成最小 issue contract 时，重新进入 materialization 判断
 
 2. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛
@@ -169,6 +171,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，先验证 `docs/system/workspace/three-loop-capability-lifecycle.md` 是否足以成为唯一细节真源；若仍需更多行为约束，再 materialize 为独立 IBM issue，而不是继续把细节散落到 `CONSTITUTION`、`PROJECT_INTENT` 和多个 skills 中
+- revisit_trigger: 当 lifecycle 真源之外仍出现新的行为约束必须落到独立 issue，或 manager/doc/dev-loop 继续出现无法由当前真源解释的冲突时，重新进入 materialization 判断
 
 3. `C-20260319-2315-A`
 - title: CLI TUI interruption input box for Freely
@@ -179,6 +182,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md`
 - next_action: 继续 pre-brainstorm，先收敛 TUI 是否只作为 interruption shell、中文输入的最低验收、以及输入框/状态区的最小布局；在这些边界稳定前不要直接写 UI 代码或把 TUI 做成第二套入口系统
+- revisit_trigger: 当 TUI shell 边界、中文输入最低验收与布局最小集可以被明确冻结成 issue scope 时，重新进入 materialization 判断
 
 4. `C-20260320-0252-A`
 - title: Signal restart-point routing across interruption, review, test, and recovery
@@ -189,6 +193,18 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/candidates.md`
 - next_action: M1-M3 的 interruption 最小 slice 已落盘：主管 triage 已改成抽象 routing contract，且 `cleanup` followthrough 已形成第一条完整 event 链。下一步继续 pre-brainstorm，把同一 contract 扩到 review/test/runtime anomaly/worker-discovered gap 与 standing-source scan，再决定是否 materialize 为统一 routing issue
+- revisit_trigger: 当 review/test/runtime anomaly/worker-discovered gap 与 standing-source scan 已共享同一 restart-point routing contract 时，重新进入 materialization 判断
+
+5. `C-20260320-0908-A`
+- title: Unresolved research candidate persistence and revisit governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260320-0908--research-candidate-persistence-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-0908--research-candidate-persistence-governance/candidates.md`
+- next_action: 继续 pre-brainstorm，先把“不能收口时必须显式保持在 candidate/blocked 队列并写清重启条件”的规则写入 lifecycle、lead prompt 与 doc-loop reference，再决定是否 materialize 为独立治理 issue
+- revisit_trigger: 当后续 worktree 审查再次发现 unresolved candidate 仍会在队列层被跳过，或当前规则需要更强的 issue-bound enforcement 时，重新进入 materialization 判断
 
 ### completed_issues
 
@@ -203,7 +219,17 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/worktree-maintenance-governance/SKILL.md`, `docs/system/workspace/agents/lead-agent.md`, `docs/system/workspace/agents/manager-agent.md`, `docs/system/workspace/scripts/start-lead-agent.sh`, `docs/system/workspace/scripts/tests/test-routing-foundation-loop`
 - completion_note: 已把 worktree 创建后的维护能力收敛成专门 skill，明确 `audit / merge_prep / retirement_handoff` 三种模式，并接入主管真源与首跳测试
 
-2. `C-20260306-1101`
+2. `I-20260318-1222`
+- title: Mem9 shared memory evaluation for Freely continuity plane
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P2
+- issue_path: `docs/epics/workspace-routing-foundation/mem9-continuity-bridge/issues/mem9-continuity-bridge.md`
+- source_brainstorm: `docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/candidates.md`
+- completion_note: mem9 已明确收束为可选连续性增强层，不是 Freely 的治理真源；对应边界已 materialize 为 `skill:mem9-continuity-bridge`，并保持本地治理事实源优先
+
+3. `C-20260306-1101`
 - title: `lead-agent.md`
 - milestone_state: completed
 - phase_state: `completed`
@@ -212,7 +238,7 @@ routing_policy:
 - evidence: `docs/system/workspace/agents/lead-agent.md`
 - completion_note: 已落地首跳中枢代理职责与首跳协议
 
-2. `C-20260306-1102`
+4. `C-20260306-1102`
 - title: `context-source-skill.md`
 - milestone_state: completed
 - phase_state: `completed`
@@ -221,7 +247,7 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/context-source-skill/SKILL.md`
 - completion_note: 已落地来源判定、milestone 扫描与 usable issue 决策规则
 
-3. `C-20260306-1103`
+5. `C-20260306-1103`
 - title: `doc-pre-brainstorm-execution.md`
 - milestone_state: completed
 - phase_state: `completed`
@@ -230,7 +256,7 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
 - completion_note: 已落地 docs 前置收敛环，负责 pre-brainstorm 产物与 milestone 原子同步
 
-4. `C-20260306-1104`
+6. `C-20260306-1104`
 - title: `doc-ibm-execution.md` 与 `dev-loop-execution.md` 的外循环接驳边界
 - milestone_state: completed
 - phase_state: `completed`
@@ -239,7 +265,7 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
 - completion_note: 已收紧 issue-bound `IBM+G` 与 `DDD` 的接驳边界，状态交换统一回流给 auto-loop
 
-5. `C-20260306-1105`
+7. `C-20260306-1105`
 - title: 现有 `auto-loop-orchestrator` skill 对齐到首段闭环模型
 - milestone_state: completed
 - phase_state: `completed`

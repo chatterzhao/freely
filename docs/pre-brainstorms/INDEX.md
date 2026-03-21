@@ -1,6 +1,10 @@
 # 预研头脑风暴索引
+<<<<<<< HEAD
 - 20260320-1745--dirty-worktree-governance-redesign
 - 20260320-1410--worktree-maintenance-skill-taxonomy
+=======
+- 20260320-0908--research-candidate-persistence-governance
+>>>>>>> feature/research-candidate-persistence-governance-20260320
 - 20260320-0252--interruption-topology-and-manager-routing
 - 20260320-0152--chat-entrypoint-autobootstrap
 - 20260320-0138--interruption-entrypoint-runtime-preflight
@@ -147,6 +151,9 @@
 - 20260318-1246--iflow-wechat-webfetch-capability
   - brainstorms: docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md
+- 20260318-1222--mem9-shared-memory-fit-for-freely
+  - brainstorms: docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/candidates.md
 - 20260318-1408--manager-self-supervision-and-autonomous-recovery
   - brainstorms: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md
@@ -177,6 +184,9 @@
 - 20260320-2105--status-family-baseline-rename-and-future-aggregation
   - brainstorms: docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/candidates.md
+- 20260320-0908--research-candidate-persistence-governance
+  - brainstorms: docs/pre-brainstorms/20260320-0908--research-candidate-persistence-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0908--research-candidate-persistence-governance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
