@@ -12,7 +12,8 @@
 - why_now: 属于 Freely 自举治理主线，若不修正会持续放大流程偏差。
 - acceptance_hint: 在 doc-loop skill 与法律验收映射中显式纳入治理维护轨（Constitution/Laws/Skills）；定义触发条件与最小证据。
 - priority: P0
-- status: superseded
+- status: dropped
+- adoption_type: superseded
 - decision_reason: 文档循环中的治理维护职责已经被三层循环和 IBM 执行真源吸收。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding

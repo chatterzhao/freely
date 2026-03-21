@@ -12,7 +12,8 @@
 - why_now: 是“外部同级目录强约束”可持续运行的前置条件。
 - acceptance_hint: 强制 `{project-name}-worktrees` 命名与同级路径检查；提供一次性 preflight 结果与修复建议。
 - priority: P0
-- status: superseded
+- status: dropped
+- adoption_type: superseded
 - decision_reason: worktree root enforcement 已实现；混合的 permission preflight 范围过宽，不适合作为旧候选继续 materialize。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -27,7 +28,8 @@
 - why_now: Freely 需要把自身治理能力产品化给用户项目。
 - acceptance_hint: 以单一策略源生成 `.githooks/*`，支持审计与回滚。
 - priority: P0
-- status: superseded
+- status: dropped
+- adoption_type: superseded
 - decision_reason: 当前 canonical 设计已明确 hooks 真源与运行时投影，不需要再补抽象 compiler issue。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -54,7 +56,8 @@
 - why_now: 当前正处于方法论重构期，必须先锁定行为基线。
 - acceptance_hint: 在 AGENTS/Constitution 固化 dogfooding 规则并纳入门禁清单。
 - priority: P0
-- status: superseded
+- status: dropped
+- adoption_type: superseded
 - decision_reason: dogfooding 契约已经进入入口说明与宪法级约束。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding

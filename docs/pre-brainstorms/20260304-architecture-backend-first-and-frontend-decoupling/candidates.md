@@ -12,7 +12,8 @@
 - why_now: 不冻结接口会导致前端高返工。
 - acceptance_hint: 明确 sessions/memory/commands/status 最小 API 集。
 - priority: P0
-- status: superseded
+- status: dropped
+- adoption_type: superseded
 - decision_reason: 后续正式 issue 已承接该 API 契约冻结方向，不应继续保留为假 promotion 候选。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -38,7 +39,8 @@
 - why_now: 研究明确了“后端闭环优先”，需固化为执行规则。
 - acceptance_hint: 定义前端启动前必须通过的后端能力清单与验收门槛。
 - priority: P0
-- status: superseded
+- status: dropped
+- adoption_type: superseded
 - decision_reason: “先后端后前端” 已被后续增量 dogfooding gate issue 明确吸收。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding

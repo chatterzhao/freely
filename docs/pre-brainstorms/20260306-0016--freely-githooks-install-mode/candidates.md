@@ -12,7 +12,8 @@
 - why_now: 这是 Freely 管理用户项目的基础治理能力，需要先定义默认托管模式。
 - acceptance_hint: 明确 `.freely/.githooks` 为默认事实源，`core.hooksPath` 指向该目录，并说明升级覆盖边界。
 - priority: P0
-- status: superseded
+- status: dropped
+- adoption_type: superseded
 - decision_reason: 其假设的 `.freely/.githooks` 模式已被当前 canonical hooks 架构明确取代。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding

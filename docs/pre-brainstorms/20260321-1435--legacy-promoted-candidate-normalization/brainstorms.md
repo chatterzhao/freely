@@ -42,7 +42,7 @@ promoted_issue_path: pending://issue-materialization
 ## Proposed Action
 
 - 对 legacy candidate 执行逐条 disposition，而不是一刀切：
-  - 已被后续 issue / skill / constitution / laws 吸收：改为 `superseded`
+  - 已被后续 issue / skill / constitution / laws 吸收：改为 `status: dropped`，并用 `adoption_type: superseded` 留痕
   - 方向仍可能有效但尚未达到 materialization gate：改为 `needs_research`
   - 仅在仍值得保留且尚无更好归宿时，回到 `proposed`
 
@@ -77,5 +77,5 @@ promoted_issue_path: pending://issue-materialization
   - 或已经在 milestone / issue 生命周期中可追踪
 
 - 对历史候选的 disposition 更准确：
-  - `superseded` 表示已被主线吸收
+  - `status: dropped + adoption_type: superseded` 表示已被主线吸收
   - `needs_research` 表示还值得保留但不能假装已 materialize

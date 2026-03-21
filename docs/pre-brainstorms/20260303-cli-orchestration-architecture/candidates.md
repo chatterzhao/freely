@@ -12,7 +12,8 @@
 - why_now: 是让 auto-loop 可运行的直接前置。
 - acceptance_hint: 提供命令编排、超时重试、日志与失败回退策略。
 - priority: P0
-- status: superseded
+- status: dropped
+- adoption_type: superseded
 - decision_reason: 已由 auto-loop-orchestrator bootstrap 与现有编排真源吸收，不应再保留为独立待 materialize 候选。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
@@ -27,7 +28,8 @@
 - why_now: 自治开发优先保障可运行与可回归。
 - acceptance_hint: 进入提升流程前强制集成测试通过。
 - priority: P0
-- status: superseded
+- status: dropped
+- adoption_type: superseded
 - decision_reason: 集成测试优先门禁已被现行法律和分支治理真源吸收，无需再补历史 issue。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding

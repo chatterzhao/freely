@@ -36,7 +36,8 @@
 - why_now: 会直接影响 dev-loop 进入条件与交付稳定性。
 - acceptance_hint: 提供 acceptance-contract-builder 与 self-contained-delivery-checker 的最小实现规范。
 - priority: P0
-- status: superseded
+- status: dropped
+- adoption_type: superseded
 - decision_reason: 核心意图已被现有 IBM 执行与法律门禁真源吸收，不需要再单独 materialize 新 issue。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding

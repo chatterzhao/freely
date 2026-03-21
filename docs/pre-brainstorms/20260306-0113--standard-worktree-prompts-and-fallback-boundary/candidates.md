@@ -12,7 +12,8 @@
 - why_now: `pre-test-merge` 职责迁移后，开发主路径已经回到 `develop`；此时必须同步把创建 feature worktree 的用户提示收敛为行业通用写法。
 - acceptance_hint: 所有规范入口统一以 `cd <your-project-name-path>` + `git worktree add -b ... ../<your-project-name>-worktrees/... develop` 为主路径；helper 退居辅助；hook 仅承担兜底提示。
 - priority: P0
-- status: superseded
+- status: dropped
+- adoption_type: superseded
 - decision_reason: 标准 worktree 提示已统一到 hooks、AGENTS 和 branch-management reference。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
