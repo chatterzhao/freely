@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260321-1835--lifecycle-complete-before-merge-governance
 - 20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery
 - 20260321-1715--manager-patrol-trigger-and-restart-routing
 - 20260321-1430--external-drift-and-out-of-band-reconcile
@@ -31,6 +32,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260321-1835--lifecycle-complete-before-merge-governance
+  - brainstorms: docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/candidates.md
 - 20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery
   - brainstorms: docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/candidates.md
