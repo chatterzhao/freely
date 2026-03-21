@@ -32,7 +32,7 @@ Usage:
   freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
   freely start [--project <abs_path>]
   freely baseline-status [--project <abs_path>]
-  freely status [--project <abs_path>]   # compatibility alias for baseline-status
+  freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]
   freely fleet-status [--project <abs_path>]
   freely stop [--project <abs_path>]
