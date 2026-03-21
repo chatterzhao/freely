@@ -202,12 +202,12 @@ routing_policy:
 15. `I-20260321-1715`
 - title: Manager watchdog trigger and drift reconcile governance
 - milestone_state: committed
-- phase_state: `in_ibm`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/candidates.md`, `docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/candidates.md`
-- next_action: 先完成 IBM 产物与统一 wording，再进入 dev-loop，以应用产物收敛重构方式更新 `three-loop` / `manager-agent` / `auto-loop-orchestrator` / patrol reference；不要回写历史已完成 issue
+- next_action: `three-loop` / `manager-agent` / `auto-loop-orchestrator` / patrol reference 的收敛重构已落盘；当前进入 wording review 与 consistency verification，确认不再要求读完整个文件才能避免误解
 
 ### candidate_issues
 

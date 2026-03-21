@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260321-1715`
 - title: Manager watchdog trigger and drift reconcile governance
-- phase_state: `in_ibm`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-watchdog-trigger-and-drift-reconcile-governance`
@@ -82,6 +82,7 @@ Freely 当前已经分别定义了：
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
+- `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/code-reviews/20260321-manager-watchdog-trigger-and-drift-reconcile-verification.md`
 
 ## Verification
 
@@ -90,5 +91,5 @@ Freely 当前已经分别定义了：
 
 ## Next
 
-- 当前先完成 IBM 产物收敛。
-- 下一步进入 `dev-loop`，以“应用产物收敛重构”的方式更新现有真源，而不是在旧 issue 或历史预研上追加流水账。
+- 当前 IBM 产物与真源重构已落盘，下一步做 wording review 与一致性 verification。
+- 后续若还需把 patrol cadence、event emission 或自动派单脚本化，再基于本 issue 继续进入新的 runtime/dev 增量；当前不回写历史已完成 issue。

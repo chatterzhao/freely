@@ -37,9 +37,11 @@
    - 先做最小 `intent understanding`
    - 判断它当前属于哪一层 loop
    - 判断它应从哪个 restart point 重新进入
+   - 向用户或当前上游解释当前状态与 ownership 判断
    - 判断自己回答、委派 analysis worker、还是委派 execution worker
    - 委派对应的 specialized analysis / worker / runtime owner
    - interruption 只是其中一个高优先级 `event source`
+   - delegated owner 返回结果后，再继续判断是否需要下一轮 restart-point routing
 6. 当某个 worker 连续多轮处于 checkpoint / dirty-budget 漂移时，优先委派 hygiene 收口，而不是继续让它扩写实现。
 7. issue 生命周期已 completed 但 worktree 仍未 merge / cleanup，也属于主管 patrol 必查项，不得因为“实现已经做完”而静默遗忘。
 8. 监督多工位的节奏，而不是降级成单工位执行者。
@@ -121,6 +123,7 @@
 7. `supervise completion`
 - 主管负责确认 resolution artifact 已生成，且 canonical absorption 已完成。
 - “我看过了”不算完成；“已被正确吸收并可追溯”才算完成。
+- 若 delegated result 只解决了当前阶段的一部分，主管必须继续决定下一跳，而不是把半成品静默遗留在系统里。
 
 硬约束：
 

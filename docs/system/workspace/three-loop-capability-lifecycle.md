@@ -43,6 +43,14 @@ auto-loop -> doc-loop -> dev-loop -> verification/completion -> cleanup -> auto-
 - 判断当前应该推进什么
 - 在中断后恢复到正确上下文
 
+触发模型：
+- `auto-loop` 不只有单一轮询入口。
+- 它同时包含：
+  - `patrol-driven`：由 `standing source` 的周期扫描触发
+  - `event-driven`：由 `event source` 的新 signal 触发
+- 两类入口最终都应汇聚到同一条主管语义：
+  - `source record -> problem signal -> manager restart-point routing -> delegated loop`
+
 负责：
 - 来源扫描与路由
 - 多 worktree 监督与排班
@@ -57,6 +65,7 @@ auto-loop -> doc-loop -> dev-loop -> verification/completion -> cleanup -> auto-
 - 不直接替代 `doc-loop` 做 issue 文档收敛
 - 不直接替代 `dev-loop` 做实现和测试
 - 不在 protected branch 上写 worker 级产物
+- 不形成第四层 loop；verification / writeback / cleanup 仍是 `auto-loop` 编排与 `dev-loop` 产物的一部分
 
 ### 2.2 doc-loop
 
@@ -222,6 +231,8 @@ Freely 的来源先分成两类：
 
 standing source 经周期扫描后，会派生新的 `problem signal`。
 
+event source 经 notice/claim 后，也会进入同一条 `problem signal` 汇流。
+
 其中一类派生 signal 不属于新业务问题，而属于治理维护问题：
 
 - sequencing drift
@@ -237,6 +248,10 @@ source record
 -> manager restart-point routing
 -> delegated loop
 ```
+
+说明：
+- 主管不是只在最前面做一次静态路由。
+- delegated loop 完成后，结果应回流给主管，再由主管继续判断下一跳 restart point，直到当前问题被正确吸收到 canonical artifacts 或完成收口。
 
 ### 5.2 Discovery to candidate
 
