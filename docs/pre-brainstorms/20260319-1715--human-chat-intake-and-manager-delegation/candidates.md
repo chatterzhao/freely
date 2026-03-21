@@ -2,7 +2,7 @@
 
 ## Context
 - Source brainstorm: ./brainstorms.md
-- Status: in_research
+- Status: promoted
 
 ## Candidates
 
@@ -28,9 +28,9 @@
   - 明确旧口径“chat / session evidence 是 discovery source”只对 absorption 为 discovery 的输入继续成立
   - UI 如需存在，只能复用同一 intake 能力，不新增绕过 CLI 的业务逻辑
 - priority: P0
-- status: in_progress
-- decision_reason: CLI-first intake、manager queue surfacing、`claim/resolve`、resolution artifact 与 `skill:human-interruption-handling` 的最小闭环已经落地；当前剩余工作不再是能力定义缺失，而是把 manager 真正自动接到这条链上，并完成进入 develop 前的治理与集成检查。
-- promoted_issue_path: pending://issue-materialization
+- status: promoted
+- decision_reason: CLI-first intake、manager queue surfacing、`claim/resolve`、resolution artifact 与 `skill:human-interruption-handling` 的闭环已在 runtime / skill / test 中落地；当前 candidate 已 materialize 为正式 issue，后续只做 issue 级验证与清理。
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex

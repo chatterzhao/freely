@@ -259,7 +259,18 @@ routing_policy:
 
 ### completed_issues
 
-1. `I-20260320-1405`
+1. `I-20260319-1715`
+- title: CLI-first human chat intake and manager delegation loop
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md`
+- evidence: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`, `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/code-reviews/20260320-human-chat-intake-and-manager-delegation-verification.md`, `docs/system/workspace/scripts/tests/test-freely-human-chat-intake`
+- completion_note: CLI-first human chat intake、manager queue scanning、claim/resolve/absorption writeback 与专项测试已闭环；companion canonical 分支已挂起，不再阻塞主线完成
+
+2. `I-20260320-1405`
 - title: Worktree maintenance governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -270,7 +281,7 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/worktree-maintenance-governance/SKILL.md`, `docs/system/workspace/agents/lead-agent.md`, `docs/system/workspace/agents/manager-agent.md`, `docs/system/workspace/scripts/start-lead-agent.sh`, `docs/system/workspace/scripts/tests/test-routing-foundation-loop`
 - completion_note: 已把 worktree 创建后的维护能力收敛成专门 skill，明确 `audit / merge_prep / retirement_handoff` 三种模式，并接入主管真源与首跳测试
 
-2. `I-20260318-1222`
+3. `I-20260318-1222`
 - title: Mem9 shared memory evaluation for Freely continuity plane
 - milestone_state: completed
 - phase_state: `completed`
@@ -280,7 +291,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/candidates.md`
 - completion_note: mem9 已明确收束为可选连续性增强层，不是 Freely 的治理真源；对应边界已 materialize 为 `skill:mem9-continuity-bridge`，并保持本地治理事实源优先
 
-3. `C-20260306-1101`
+4. `C-20260306-1101`
 - title: `lead-agent.md`
 - milestone_state: completed
 - phase_state: `completed`
@@ -289,7 +300,7 @@ routing_policy:
 - evidence: `docs/system/workspace/agents/lead-agent.md`
 - completion_note: 已落地首跳中枢代理职责与首跳协议
 
-4. `C-20260306-1102`
+5. `C-20260306-1102`
 - title: `context-source-skill.md`
 - milestone_state: completed
 - phase_state: `completed`
