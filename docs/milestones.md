@@ -199,6 +199,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md`
 - next_action: 把 remote branch deletion / retained reason 纳入 `worktree-maintenance-governance` 与 `cleanup-followthrough`，并用真实 cleanup 测试和 Freely 插话验证主管能够把这层收口做完
 
+15. `I-20260321-2010`
+- title: Explicit session-addressed resume governance
+- milestone_state: committed
+- phase_state: `in_ibm`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/candidates.md`
+- next_action: 先完成 IBM，冻结各工具 continuity contract，明确 `codex` 的 `--last` 风险、`cc` 的显式 `session-id` 基线，以及 `iflow` / `kiro-cli` 当前 contract 是否足以支持多进程并行
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

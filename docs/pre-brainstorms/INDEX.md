@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260321-2010--explicit-session-addressed-resume-over-last-and-pty
 - 20260321-1515--remote-branch-retirement-governance
 - 20260321-1530--agent-ready-prd-for-freely-flow
 - 20260321-1435--legacy-promoted-candidate-normalization
@@ -28,6 +29,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260321-2010--explicit-session-addressed-resume-over-last-and-pty
+  - brainstorms: docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/candidates.md
 - 20260321-1515--remote-branch-retirement-governance
   - brainstorms: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md
