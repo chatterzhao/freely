@@ -3303,7 +3303,8 @@ cmd_live_status() {
 }
 
 cmd_status() {
-  local project="" view="all" forwarded=()
+  local project="" view="all"
+  local -a forwarded=()
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -3323,23 +3324,47 @@ cmd_status() {
   fi
   case "$view" in
     baseline)
-      cmd_baseline_status "${forwarded[@]}"
+      if ((${#forwarded[@]})); then
+        cmd_baseline_status "${forwarded[@]}"
+      else
+        cmd_baseline_status
+      fi
       ;;
     live)
-      cmd_live_status "${forwarded[@]}"
+      if ((${#forwarded[@]})); then
+        cmd_live_status "${forwarded[@]}"
+      else
+        cmd_live_status
+      fi
       ;;
     fleet)
-      cmd_fleet_status "${forwarded[@]}"
+      if ((${#forwarded[@]})); then
+        cmd_fleet_status "${forwarded[@]}"
+      else
+        cmd_fleet_status
+      fi
       ;;
     all)
       echo "== baseline =="
-      cmd_baseline_status "${forwarded[@]}"
+      if ((${#forwarded[@]})); then
+        cmd_baseline_status "${forwarded[@]}"
+      else
+        cmd_baseline_status
+      fi
       echo
       echo "== live =="
-      cmd_live_status "${forwarded[@]}"
+      if ((${#forwarded[@]})); then
+        cmd_live_status "${forwarded[@]}"
+      else
+        cmd_live_status
+      fi
       echo
       echo "== fleet =="
-      cmd_fleet_status "${forwarded[@]}"
+      if ((${#forwarded[@]})); then
+        cmd_fleet_status "${forwarded[@]}"
+      else
+        cmd_fleet_status
+      fi
       ;;
   esac
 }
