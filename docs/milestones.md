@@ -129,6 +129,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
+9. `I-20260321-1045`
+- title: Stacked worktree merge-chain governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/candidates.md`
+- next_action: 已将 stacked merge-chain 判定正式并入 `worktree-maintenance-governance` skill，并补了 lead/start prompt 与回归；下一步在真实 worktree 收口时优先按 `child -> parent -> merge-prep-from-develop -> develop` 链路使用该 skill，而不是直接在 develop 工位试合
+
 9. `I-20260320-1945`
 - title: Watchdog live status surface and manager supervision
 - milestone_state: committed

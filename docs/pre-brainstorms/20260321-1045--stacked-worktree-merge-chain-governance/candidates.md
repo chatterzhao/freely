@@ -2,12 +2,12 @@
 
 - id: C-20260321-1045-001
   title: Extend `worktree-maintenance-governance` with stacked merge-chain and merge-prep gates
-  status: proposed
+  status: promoted
   why_now:
     - 当前实际 dogfooding 已经证明，复杂 worktree 不是“单棵树 ready 就 merge”，而是需要 `child -> parent -> merge-prep-from-develop -> develop` 的逐层治理。
     - 这类规则目前还在人工经验里，没有沉淀成 Freely 可复用的 skill 能力。
-  promoted_issue_path: pending://issue-materialization
-  milestone: pending://milestone-binding
+  promoted_issue_path: docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md
+  milestone: M-20260306-workspace-routing-foundation
   session_refs:
     - tool: cc-use-codex-cli
       session_id: 11111111-2222-4333-8444-555555555555
