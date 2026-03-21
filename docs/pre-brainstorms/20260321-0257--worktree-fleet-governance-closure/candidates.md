@@ -2,7 +2,7 @@
 
 ## Context
 - Source brainstorm: ./brainstorms.md
-- Status: proposed
+- Status: promoted
 
 ## Candidates
 
@@ -17,10 +17,10 @@
   - 明确只有 `verified-retirable` 才能 cleanup
   - 至少有一条 skill / prompt / test 级证据，保证未来 Freely 能按此流程执行
 - priority: P0
-- status: proposed
+- status: promoted
 - decision_reason: 这是通过狗粮开发直接发现的治理缺口。现在不收编成 skill，后续每次大批量 worktree 收口都会重复踩同一类问题。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- promoted_issue_path: docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md
+- milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex
   - session_id: current-thread

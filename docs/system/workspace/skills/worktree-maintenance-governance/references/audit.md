@@ -2,6 +2,8 @@
 
 用于核清单棵 worktree 的真实状态。
 
+若当前问题已经变成“检查所有 active worktree 是否完成、哪些该 merge、哪些该 cleanup”，切到 [fleet-closure.md](fleet-closure.md)，不要用单树 audit 假装完成项目级判断。
+
 ## 必查面
 
 1. `git status`
