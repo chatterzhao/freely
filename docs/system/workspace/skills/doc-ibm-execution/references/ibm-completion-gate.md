@@ -10,6 +10,12 @@
 - `tasks.md`
 - 治理一致性修复
 
+并验证：
+
+- `prd.md` 满足 [prd-quality-bar.md](prd-quality-bar.md)
+- `pre-tests.md` 来自 `prd.md` 的 eval / acceptance 结构
+- `tasks.md` 来自 `prd.md` 的 decomposition / execution slices
+
 并保持：
 
 - `phase_state=in_ibm`
@@ -23,6 +29,8 @@
 - 文档已足够驱动实现
 - issue scope 与 acceptance 稳定
 - implementation 所需文档引用齐备
+- `prd.md` 已达到 AI-ready quality bar，而不是只剩人类摘要
+- `pre-tests.md` 与 `tasks.md` 已被 `prd.md` 稳定约束
 
 ## Return package
 

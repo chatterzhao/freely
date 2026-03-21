@@ -7,6 +7,7 @@ required_files=(
   "docs/LAWS.md"
   "AGENTS.md"
   "docs/system/workspace/three-loop-capability-lifecycle.md"
+  "docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md"
   "docs/pre-brainstorms/README.md"
   "docs/pre-brainstorms/INDEX.md"
   "docs/pre-brainstorms/CONVERGENCE.md"
@@ -57,6 +58,13 @@ check_three_loop_reference() {
     || fail "missing three-loop lifecycle reference in $file"
 }
 
+check_fixed_string() {
+  local file="$1"
+  local text="$2"
+  local description="$3"
+  rg -n --fixed-strings "$text" "$file" >/dev/null 2>&1 || fail "missing ${description} in $file"
+}
+
 check_entry_naming() {
   local entry="$1"
   # 新格式：YYYYMMDD-HHMM--<topic>（时间后双短横线）
@@ -84,6 +92,31 @@ for file in "${three_loop_reference_targets[@]}"; do
   check_file_exists "$file"
   check_three_loop_reference "$file"
 done
+
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md" \
+  "references/prd-quality-bar.md" \
+  "PRD quality bar reference"
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md" \
+  'pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生' \
+  "PRD-derived pre-tests/tasks requirement"
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md" \
+  "prd-quality-bar.md" \
+  "IBM completion gate PRD quality bar linkage"
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md" \
+  "prd-quality-bar.md" \
+  "issue materialization PRD quality bar linkage"
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md" \
+  "## Minimum structure" \
+  "PRD quality minimum structure section"
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md" \
+  '## Bar for `done_ibm`' \
+  "PRD quality done_ibm bar"
 
 entries=()
 while IFS= read -r d; do

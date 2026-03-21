@@ -20,9 +20,11 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 ## 工作流
 
 1. 先读取 [issue-materialization-checklist.md](references/issue-materialization-checklist.md) 确认当前输入已经是 milestone-owned issue，且正式目录归属稳定。
-2. 若 IBM 产物缺失或不完整，按 [ibm-completion-gate.md](references/ibm-completion-gate.md) 补齐 issue、brainstorm、`prd.md`、`pre-tests.md`、`tasks.md` 与 milestone 回写。
-3. 若文档已经足够驱动实现，按同一 gate 把 `phase_state` 切到 `done_ibm`，并返回最小实现上下文。
-4. 若在 IBM 中发现边界外新问题，停止扩写当前 issue，返回 `next_recommended_route=doc-pre-brainstorm-execution`。
+2. 补齐 IBM 产物时，`prd.md` 不得只停留在人类摘要；必须按 [prd-quality-bar.md](references/prd-quality-bar.md) 达到 AI-ready 的最小结构。
+3. 若 IBM 产物缺失或不完整，按 [ibm-completion-gate.md](references/ibm-completion-gate.md) 补齐 issue、brainstorm、`prd.md`、`pre-tests.md`、`tasks.md` 与 milestone 回写。
+4. `pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生；若三者之间仍需大量口头补充，视为 IBM 未收口。
+5. 若文档已经足够驱动实现，按同一 gate 把 `phase_state` 切到 `done_ibm`，并返回最小实现上下文。
+6. 若在 IBM 中发现边界外新问题，停止扩写当前 issue，返回 `next_recommended_route=doc-pre-brainstorm-execution`。
 
 ## 回流输出
 
@@ -39,4 +41,5 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 
 - 当前 issue 已明确属于 milestone-owned issue。
 - 关键 IBM 产物完整，或已明确为什么必须 reroute。
+- `prd.md` 已达到 AI-ready quality bar，且 `pre-tests.md`、`tasks.md` 与之对齐。
 - 进入 dev-loop 所需的最小上下文已备齐。

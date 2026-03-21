@@ -441,3 +441,30 @@ routing_policy:
 ### completed_issues
 
 - none currently
+
+## M-20260321-ai-native-doc-loop
+
+- title: AI-native doc-loop artifacts for Freely
+- status: active
+- linked_issue: `docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/issues/agent-ready-prd-for-freely-flow.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/candidates.md`
+- intent: 把“AI 时代的 PRD 应该是什么”从 chat 讨论收敛为 Freely 自己可执行的 IBM 产物
+- why_now: Freely 自己的 `prd.md` 还偏向人类摘要，而用户已经明确提出要在 Freely 流程里回答“AI 生成 PRD 应该长什么样”；如果不先给出 canonical 结构，后续 doc-loop 仍会沿用旧范式
+
+### committed_issues
+
+- none currently
+
+### completed_issues
+
+1. `I-20260321-1530`
+- title: Agent-ready PRD architecture for Freely IBM flow
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/issues/agent-ready-prd-for-freely-flow.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/candidates.md`
+- evidence: `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`, `docs/system/workspace/scripts/quality/governance-check`, `docs/system/workspace/scripts/tests/test-doc-ibm-prd-quality-bar`
+- completion_note: 已把 AI-ready PRD 的最小质量门槛接入 `doc-ibm-execution` 真源，并补齐 governance-check 与回归测试，确保 IBM 产物中的 `prd.md` 不再只停留在人类摘要
