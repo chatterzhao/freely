@@ -12,10 +12,13 @@
 - why_now: 是让 auto-loop 可运行的直接前置。
 - acceptance_hint: 提供命令编排、超时重试、日志与失败回退策略。
 - priority: P0
-- status: promoted
-- decision_reason: 直接支撑 ADD 外循环可运行，属于当前核心落地项。
+- status: superseded
+- decision_reason: 已由 auto-loop-orchestrator bootstrap 与现有编排真源吸收，不应再保留为独立待 materialize 候选。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
+- superseded_by:
+  - `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/auto-loop-orchestrator-bootstrap.md`
+  - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - session_refs: []
 
 ### C-20260303-102
@@ -24,10 +27,13 @@
 - why_now: 自治开发优先保障可运行与可回归。
 - acceptance_hint: 进入提升流程前强制集成测试通过。
 - priority: P0
-- status: promoted
-- decision_reason: 符合集成优先与自治可运行目标，纳入主线门禁建设。
+- status: superseded
+- decision_reason: 集成测试优先门禁已被现行法律和分支治理真源吸收，无需再补历史 issue。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
+- superseded_by:
+  - `docs/LAWS.md`
+  - `docs/system/workspace/skills/branch-management/SKILL.md`
 - session_refs: []
 
 ### C-20260303-103

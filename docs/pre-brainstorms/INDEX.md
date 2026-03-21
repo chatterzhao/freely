@@ -1,5 +1,6 @@
 # 预研头脑风暴索引
 - 20260321-1530--agent-ready-prd-for-freely-flow
+- 20260321-1435--legacy-promoted-candidate-normalization
 - 20260321-1045--stacked-worktree-merge-chain-governance
 - 20260321-0345--manager-reactivation-and-fleet-patrol
 - 20260321-0257--worktree-fleet-governance-closure
@@ -29,6 +30,9 @@
 - 20260321-1530--agent-ready-prd-for-freely-flow
   - brainstorms: docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/candidates.md
+- 20260321-1435--legacy-promoted-candidate-normalization
+  - brainstorms: docs/pre-brainstorms/20260321-1435--legacy-promoted-candidate-normalization/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-1435--legacy-promoted-candidate-normalization/candidates.md
 - 20260321-1045--stacked-worktree-merge-chain-governance
   - brainstorms: docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/candidates.md

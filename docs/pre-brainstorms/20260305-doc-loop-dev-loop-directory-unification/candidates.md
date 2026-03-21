@@ -12,10 +12,13 @@
 - why_now: 不先定契约会导致文档与脚本反复打架。
 - acceptance_hint: 明确 Phase A-D、目录创建时机、旧目录退役条件、回滚条件。
 - priority: P0
-- status: promoted
-- decision_reason: 是本轮“统一设计理念”落地入口。
+- status: superseded
+- decision_reason: 目录迁移契约已被当前 canonical 目录模型取代，无需再补历史迁移 issue。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
+- superseded_by:
+  - `AGENTS.md`
+  - `docs/system/workspace/scripts/README.md`
 - session_refs: []
 
 ### C-20260305-802
@@ -24,10 +27,13 @@
 - why_now: 若门禁不切换，目录重构无法真正生效。
 - acceptance_hint: 将必检路径与规则改为 `pre-brainstorms + epics/progress/milestones` 新模型。
 - priority: P0
-- status: promoted
-- decision_reason: 直接影响可执行性与稳定性。
+- status: superseded
+- decision_reason: 门禁已经对齐到当前目录真源与 hooks/scripts 结构，不需要再单独 materialize。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
+- superseded_by:
+  - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
+  - `docs/system/workspace/hooks/README.md`
 - session_refs: []
 
 ### C-20260305-803
