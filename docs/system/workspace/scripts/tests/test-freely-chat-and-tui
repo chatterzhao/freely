@@ -119,11 +119,7 @@ STATUS_CHAT="$(awk -F '\"' '/^STATUS=/{print $2; exit}' "$PROJECT/.freely/intake
   exit 1
 }
 
-<<<<<<< HEAD
 TUI_OUTPUT="$(cd "$PROJECT" && printf '继续测试中文输入框\n第二行中文\n\n' | FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" tui --project "$PROJECT" --once)"
-=======
-TUI_OUTPUT="$(printf '继续测试中文输入框\n第二行中文\n\n' | bash "$ROOT_DIR/bin/freely" tui --project "$PROJECT" --once)"
->>>>>>> 69e66c8 (feat: finalize cli tui interruption input)
 printf '%s\n' "$TUI_OUTPUT" | grep -q 'Freely TUI'
 printf '%s\n' "$TUI_OUTPUT" | grep -q 'submitted: 继续测试中文输入框'
 printf '%s\n' "$TUI_OUTPUT" | grep -q '第二行中文'
@@ -133,7 +129,6 @@ TUI_ID="$(printf '%s\n' "$TUI_OUTPUT" | sed -n 's/^intake_id: //p')"
   exit 1
 }
 grep -q '第二行中文' "$PROJECT/.freely/intake/$TUI_ID/message.txt"
-<<<<<<< HEAD
 for _ in $(seq 1 10); do
   STATUS_TUI="$(awk -F '\"' '/^STATUS=/{print $2; exit}' "$PROJECT/.freely/intake/$TUI_ID/meta.env")"
   if [[ "$STATUS_TUI" == "classified" || "$STATUS_TUI" == "absorbed" ]]; then
@@ -141,8 +136,6 @@ for _ in $(seq 1 10); do
   fi
   sleep 1
 done
-=======
->>>>>>> 69e66c8 (feat: finalize cli tui interruption input)
 
 STATUS_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" intake status)"
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'active_items: 3'

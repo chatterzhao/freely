@@ -1027,12 +1027,9 @@ render_tui_dashboard() {
 tui_submit_message() {
   local project="$1" message="$2" intake_output intake_id
   [[ -n "$message" ]] || return 0
-<<<<<<< HEAD
-  bash "$SELF_ROOT/bin/freely" intake chat --project "$project" --author human --channel tui --message "$message" >/dev/null
-  ensure_interruption_dispatch_once "$project"
-=======
   intake_output="$(bash "$SELF_ROOT/bin/freely" intake chat --project "$project" --author human --channel tui --message "$message")"
   intake_id="$(printf '%s\n' "$intake_output" | sed -n 's/^intake_id: //p')"
+  ensure_interruption_dispatch_once "$project"
   [[ -n "$intake_id" ]] && printf 'intake_id: %s\n' "$intake_id"
 }
 
@@ -1068,7 +1065,6 @@ tui_compose_message() {
 
   printf -v "$__result_var" '%s' "$message"
   return 0
->>>>>>> 69e66c8 (feat: finalize cli tui interruption input)
 }
 
 rate_limit_exhausted() {
