@@ -9,6 +9,22 @@
   2. 应优先使用哪种 server：内置 `codex mcp-server` 还是第三方 `codex-cli-mcp-tool`
   3. 若可行，Freely 应如何建模 tool / model / capability，避免把“顶层执行器”和“内部 MCP 能力”混在一起
 
+## Outcome Update
+
+后续实现与用户交互约束已把本预研进一步收敛为：
+
+- 顶层保留两个显式工具：
+  - `cc`
+  - `cc-use-codex-cli`
+- setup / provider / MCP 安装与验证收敛为：
+  - `skill:tool-cc-codex-mcp-runtime`
+- runtime 不再只停留在 capability 建模，而是显式支持：
+  - 固定 Codex MCP policy
+  - per-workcell `Claude session-id`
+  - `Claude jsonl -> Codex threadId -> Codex jsonl` 的双层会话证据
+
+也就是说，本预研的早期“不要让 `cc-use-codex-cli` 成为顶层工具名”的判断，已经被后续用户侧操作要求和 runtime 实装路径替代；当前应以实际落地结果为准。
+
 ## Done Definition For This Research Worktree
 
 当前 research worktree 的完成，不是指 runtime 已经改完，而是指以下研究产物已经收口：
