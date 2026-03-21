@@ -1,4 +1,6 @@
 # 预研头脑风暴索引
+- 20260321-0148--cc-codex-session-evidence-resolution
+- 20260320-2145--cc-tool-profiles-and-concurrent-session-continuity
 - 20260320-1410--worktree-maintenance-skill-taxonomy
 - 20260320-0252--interruption-topology-and-manager-routing
 - 20260320-0152--chat-entrypoint-autobootstrap
@@ -14,6 +16,12 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260321-0148--cc-codex-session-evidence-resolution
+  - brainstorms: docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md
+- 20260320-2145--cc-tool-profiles-and-concurrent-session-continuity
+  - brainstorms: docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md
 - 20260320-1410--worktree-maintenance-skill-taxonomy
   - brainstorms: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/candidates.md
