@@ -7,6 +7,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
 FREELY_HOME="$TMP_DIR/freely-home"
+HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
 mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0018--sample" "$PROJECT/nested/work"
 
 git init -q -b develop "$PROJECT"
@@ -52,6 +53,17 @@ cat >"$PROJECT/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
 - session_refs: []
 EOF
 
+cat >"$HANDLER_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+cat <<'OUT'
+DECISION=delegate_general
+REACTION=followup
+CLASSIFICATION=discovery
+WHY=测试使用的通用委派夹具
+OUT
+EOF
+chmod +x "$HANDLER_FIXTURE"
+
 INIT_OUTPUT="$(
   cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
     --intent "$PROJECT/docs/PROJECT_INTENT.md" \
@@ -67,7 +79,7 @@ STATUS_OUTPUT="$(
 printf '%s\n' "$STATUS_OUTPUT" | grep -q "project: $CANON_PROJECT"
 
 CHAT_OUTPUT="$(
-  cd "$PROJECT/nested/work" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" chat "你好，Freely"
+  cd "$PROJECT/nested/work" && FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat "你好，Freely"
 )"
 CHAT_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
 [[ -n "$CHAT_ID" ]] || {
@@ -77,7 +89,7 @@ CHAT_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
 grep -q '你好，Freely' "$PROJECT/.freely/intake/$CHAT_ID/message.txt"
 
 TUI_OUTPUT="$(
-  cd "$PROJECT/nested/work" && printf '继续测试默认项目解析\n' | FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" tui --once
+  cd "$PROJECT/nested/work" && printf '继续测试默认项目解析\n' | FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" tui --once
 )"
 printf '%s\n' "$TUI_OUTPUT" | grep -q 'submitted: 继续测试默认项目解析'
 

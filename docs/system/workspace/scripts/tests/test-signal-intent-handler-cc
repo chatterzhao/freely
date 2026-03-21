@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-signal-intent-handler-cc.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+run_case() {
+  local tool="$1"
+  local capabilities="$2"
+  local policy="$3"
+  local codex_model="$4"
+  local codex_sandbox="$5"
+  local codex_approval="$6"
+  local codex_cwd_mode="$7"
+  local case_dir="$TMP_DIR/$tool"
+  local project="$case_dir/project"
+  local fake_bin="$case_dir/bin"
+  local intake_id="20260320-000000-test"
+  mkdir -p "$project/.freely/intake/$intake_id" "$fake_bin"
+
+  cat >"$project/.freely/config.env" <<EOF
+AI_TOOL="$tool"
+AI_MODEL="sonnet"
+AI_REASONING_EFFORT="medium"
+AI_TOOL_CAPABILITIES="$capabilities"
+AI_TOOL_POLICY="$policy"
+AI_CAPABILITY_CODEX_MODEL="$codex_model"
+AI_CAPABILITY_CODEX_SANDBOX="$codex_sandbox"
+AI_CAPABILITY_CODEX_APPROVAL_POLICY="$codex_approval"
+AI_CAPABILITY_CODEX_CWD_MODE="$codex_cwd_mode"
+EOF
+
+  cat >"$project/.freely/intake/$intake_id/meta.env" <<'EOF'
+INTAKE_ID="20260320-000000-test"
+STATUS="classified"
+EOF
+
+  cat >"$project/.freely/intake/$intake_id/message.txt" <<'EOF'
+检查脏的位置，仔细思考他们是否过时，还是有用但是没提交没合并
+EOF
+
+  cat >"$fake_bin/claude" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$@" >"$TMP_DIR/claude.args"
+cat <<'OUT'
+INTENT_KIND=audit
+NEEDS_LIVE_INSPECTION=true
+NEEDS_EXECUTION=true
+SCOPE=fleet
+COMPLEXITY=multi-step
+CURRENT_CONTEXT=需要读取当前 fleet 状态后再决定收口动作
+OUT
+EOF
+  chmod +x "$fake_bin/claude"
+
+  OUTPUT="$(
+    PATH="$fake_bin:$PATH" TMP_DIR="$case_dir" \
+      bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/signal-intent-handler" \
+        --project "$project" \
+        --intake-id "$intake_id"
+  )"
+
+  grep -q '^INTENT_KIND=audit$' <<<"$OUTPUT"
+  grep -q '^NEEDS_LIVE_INSPECTION=true$' <<<"$OUTPUT"
+  grep -q '^NEEDS_EXECUTION=true$' <<<"$OUTPUT"
+  grep -q -- '^--permission-mode$' "$case_dir/claude.args"
+  grep -q -- '^bypassPermissions$' "$case_dir/claude.args"
+
+  if [[ "$tool" == "cc-use-codex-cli" ]]; then
+    grep -q -- '^--append-system-prompt$' "$case_dir/claude.args"
+    grep -q 'approval-policy=never' "$case_dir/claude.args"
+    grep -q 'sandbox=workspace-write' "$case_dir/claude.args"
+  else
+    if grep -q -- '^--append-system-prompt$' "$case_dir/claude.args"; then
+      echo "[FAIL] plain cc signal handler should not append codex policy" >&2
+      exit 1
+    fi
+  fi
+}
+
+run_case "cc" "" "" "" "" "" ""
+run_case "cc-use-codex-cli" "codex-cli" "prefer-codex-for-repo-work" "gpt-5.4" "workspace-write" "never" "project-root"
+
+echo "[PASS] signal intent handler supports plain cc and cc-use-codex-cli profiles"
