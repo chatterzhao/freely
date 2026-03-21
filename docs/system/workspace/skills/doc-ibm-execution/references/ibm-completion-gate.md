@@ -15,6 +15,7 @@
 - `phase_state=in_ibm`
 - 不为纯 IBM 工作伪造 `progress`
 - 若依赖未合并父分支，保留 `execution_base`、`integration_target`、`depends_on`
+- candidate-level acceptance 已在 issue-bound artifacts 中被继续深化
 
 ## Ready for dev
 
@@ -22,6 +23,8 @@
 
 - 文档已足够驱动实现
 - issue scope 与 acceptance 稳定
+- `pre-tests.md` 与 `tasks.md` 已体现 issue-level acceptance
+- issue-bound brainstorm 的未决问题已不再阻断 dev
 - implementation 所需文档引用齐备
 
 ## Return package

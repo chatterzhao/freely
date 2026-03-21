@@ -131,6 +131,14 @@
    - `role`
 7. 若当前 AI 工具无法暴露 jsonl 文件路径，允许 `jsonl_path=unavailable://<reason>`，但不得省略 `session_id`。
 8. milestone 可保留摘要字段如 `active_session_ref`，但完整会话证据的规范落点是 `candidates.md`、`issue`、`progress`、`recovery`。
+8a. future pre-brainstorm candidate 应使用 `candidate_format_version: v2`，并至少包含：
+   - `acceptance_criteria`
+   - `promotion_gate`
+   - `open_questions`
+   - `acceptance_reviews`
+8b. `acceptance_criteria` / `promotion_gate` / `open_questions` 属于 candidate-level acceptance boundary，不等于 issue / dev / verification 的实现验收。
+8c. `candidate_format_version: v2` 的 candidate 若进入 promotion 决策，至少应有一次独立 acceptance review 记录；高风险 candidate 优先多个 subagent 或 fresh process review。
+8d. 进入 IBM 后，必须把 candidate-level acceptance 深化为 issue-level acceptance，并反映在 issue / `prd.md` / `pre-tests.md` / `tasks.md` / issue-bound brainstorm 中。
 9. 主执行标识不得再使用 `status=in_progress`、`status=completed`、`milestone_state=in_progress` 或 `pending_*` 这类泛化值；未开始但可推进统一使用 `todo_*`，等待外部条件统一使用 `blocked_*` 或独立依赖字段。
 10. `phase_state=in_*` 只表示“上次已进入该阶段”，不保证当前进程仍在运行；auto-loop 必须结合 `runtime_state`、最近一次 `progress/recovery` 证据、以及当前会话可续接性二次判别。
 11. 若条目停留在 `in_*`，但当前会话不可 attach/resume，或执行证据已经中断且未写回 `blocked_*`，不得直接当作健康执行中；必须先路由到 `recovery` 检查，再决定回到原 `in_*` 继续，还是显式改写为 `blocked_*`。

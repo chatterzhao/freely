@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-governance-v2-candidate.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+cp -R "$ROOT_DIR/." "$TMP_DIR/repo"
+cd "$TMP_DIR/repo"
+
+ENTRY="20260320-9999--candidate-v2-sample"
+mkdir -p "docs/pre-brainstorms/$ENTRY"
+
+cat >"docs/pre-brainstorms/$ENTRY/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"docs/pre-brainstorms/$ENTRY/candidates.md" <<'EOF'
+# Candidates
+- candidate_format_version: v2
+- title: sample
+- status: needs_research
+- decision_reason: sample
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone
+- session_refs: []
+EOF
+
+python3 - <<'PY'
+from pathlib import Path
+p = Path("docs/pre-brainstorms/INDEX.md")
+text = p.read_text()
+header = "# 预研头脑风暴索引\n"
+quick = "- 20260320-9999--candidate-v2-sample\n"
+if quick not in text:
+    text = text.replace(header, header + quick, 1)
+entry = "- 20260320-9999--candidate-v2-sample\n  - brainstorms: docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md\n  - candidates: docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md\n"
+if entry not in text:
+    text = text.replace("\n## 收敛\n", "\n" + entry + "\n## 收敛\n", 1)
+p.write_text(text)
+PY
+
+if ./bin/governance-check >/tmp/gov.out 2>&1; then
+  echo "[FAIL] governance-check should fail when v2 candidate fields are missing" >&2
+  cat /tmp/gov.out >&2
+  exit 1
+fi
+grep -q 'missing acceptance_criteria' /tmp/gov.out
+
+cat >"docs/pre-brainstorms/$ENTRY/candidates.md" <<'EOF'
+# Candidates
+- candidate_format_version: v2
+- title: sample
+- status: promoted
+- decision_reason: sample
+- acceptance_criteria:
+  - candidate boundary is clear
+- promotion_gate:
+  - IBM ownership and loop placement are clear
+- open_questions: []
+- acceptance_reviews:
+  - reviewer: codex-mini
+  - mode: subagent
+  - summary: boundary is stable enough for promotion
+  - verdict: pass
+- promoted_issue_path: docs/epics/sample/issues/sample.md
+- milestone: pending://milestone
+- session_refs: []
+EOF
+
+./bin/governance-check >/tmp/gov-pass.out 2>&1
+
+echo "[PASS] governance-check enforces v2 candidate acceptance fields and promotion review"

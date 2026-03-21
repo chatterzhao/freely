@@ -325,6 +325,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-0018--default-project-resolution-and-authorized-project-memory/candidates.md`
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-project-resolution-defaults`
 - completion_note: 默认项目解析已由共享 runtime resolver 覆盖，并通过 cwd auto-resolution 与单一已授权项目回退回归锁定；后续如需多项目切换能力，应从新的 candidate materialize，不要继续扩大本条 completed issue
+11. `I-20260320-0500`
+- title: Candidate acceptance review governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/candidates.md`
+- evidence: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`, `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/tasks.md`, `docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`, `docs/system/workspace/scripts/quality/governance-check`
+- completion_note: future candidate v2 schema、独立 acceptance review、IBM acceptance deepening 与治理门禁已稳定落盘；高风险 candidate 的双审策略保留为后续治理演进，不阻塞当前 issue 完成
 
 ## M-20260308-frontend-probe-dogfooding-loop
 
