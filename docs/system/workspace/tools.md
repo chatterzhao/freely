@@ -48,6 +48,45 @@
   - When context-window usage first crosses the local warn threshold, the next prompt should first refresh the phase-appropriate continuity artifact before continuing.
   - Default Codex runtime config is project-scoped `gpt-5.4` with reasoning effort `medium` unless the project explicitly overrides it.
 
+### cc
+
+- availability: experimental
+- priority: P1-default
+- strengths:
+  - Claude Code 作为顶层 agent 提供会话管理与工具编排
+  - 适合作为普通 Claude Code tool，在 Freely 中承接上下文管理、并行 worktree、subagent 和非交互会话
+- recommended_when:
+  - 需要 `Claude Code` 的 agent/context 管理
+- example:
+  - fresh/auto: `claude -p --permission-mode bypassPermissions --session-id <uuid> "<assembled prompt>"`
+  - resume/auto: `claude -p --permission-mode bypassPermissions --session-id <same-uuid> "<assembled prompt>"`
+- runtime_notes:
+  - `cc` 不默认启用 `codex-cli` MCP；它是纯 Claude Code 顶层工具。
+  - Freely 会为每个运行中的 workcell 分配独立 `session-id`，降低多 worker / 多 worktree 并发时串会话的风险。
+  - `cc` 的 continuity 证据以 `Claude session-id + Claude jsonl + debug/cycle log` 为主。
+
+### cc-use-codex-cli
+
+- availability: experimental
+- priority: P1-default
+- strengths:
+  - 继续使用 Claude Code 作为顶层 agent/context manager
+  - 默认强制附带 `codex-cli` MCP policy，让 repo work 优先交给 Codex
+- recommended_when:
+  - 需要 `Claude Code` 的会话和上下文能力
+  - 同时希望 repo 实现、review、verification 默认走 Codex MCP
+- example:
+  - fresh/auto: `claude -p --permission-mode bypassPermissions --session-id <uuid> --append-system-prompt "<fixed codex-cli MCP policy>" "<assembled prompt>"`
+  - resume/auto: `claude -p --permission-mode bypassPermissions --session-id <same-uuid> --append-system-prompt "<fixed codex-cli MCP policy>" "<assembled prompt>"`
+- runtime_notes:
+  - `cc-use-codex-cli` 是固定 profile，不要求用户再单独配置 capability 参数。
+  - Freely 会固定注入：`model=gpt-5.4`、`sandbox=workspace-write`、`approval-policy=never`、`cwd=project-root`。
+  - 每个 running workcell 使用独立 `Claude session-id`，降低多 worker / 多 worktree 并发时的会话串线风险。
+  - 证据模型分两层：
+    - 外层：`Claude session-id`、`Claude jsonl path` 与 `cycle/debug log`
+    - 内层：`Codex threadId` 与 `Codex jsonl path`
+  - `Codex threadId` 优先从 `Claude jsonl` 的 `mcp__codex-cli__codex` tool result 提取，而不是仅依赖 debug log 或时间窗口猜测。
+
 ## Selection Policy
 
 - AI 应根据当前输入判断任务强度：

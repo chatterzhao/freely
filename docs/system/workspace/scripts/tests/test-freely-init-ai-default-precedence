@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-init-ai-default-precedence.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_project() {
+  local project="$1"
+  mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample"
+  git init -q -b develop "$project"
+
+  cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+  cat >"$project/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+  cat >"$project/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+  cat >"$project/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0018--sample
+EOF
+
+  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+}
+
+FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$FREELY_HOME"
+
+cat >"$FREELY_HOME/config.env" <<'EOF'
+AI_TOOL="cc"
+AI_MODEL=""
+AI_MODE="auto"
+EOF
+
+PROJECT_GLOBAL="$TMP_DIR/project-global"
+make_project "$PROJECT_GLOBAL"
+cd "$PROJECT_GLOBAL"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --intent "$PROJECT_GLOBAL/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT_GLOBAL/docs/CONSTITUTION.md" \
+  >/dev/null
+PROJECT_GLOBAL_CANON="$(cd "$PROJECT_GLOBAL" && pwd -P)"
+
+grep -q '^AI_TOOL="cc"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
+grep -q '^AI_TOOL_CAPABILITIES=""$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
+
+PROJECT_OVERRIDE="$TMP_DIR/project-override"
+make_project "$PROJECT_OVERRIDE"
+cd "$PROJECT_OVERRIDE"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --intent "$PROJECT_OVERRIDE/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT_OVERRIDE/docs/CONSTITUTION.md" \
+  --ai iflow:auto \
+  >/dev/null
+PROJECT_OVERRIDE_CANON="$(cd "$PROJECT_OVERRIDE" && pwd -P)"
+
+grep -q '^AI_TOOL="iflow"$' "$PROJECT_OVERRIDE_CANON/.freely/config.env"
+grep -q '^AI_TOOL_CAPABILITIES=""$' "$PROJECT_OVERRIDE_CANON/.freely/config.env"
+
+PROJECT_REINIT="$TMP_DIR/project-reinit"
+make_project "$PROJECT_REINIT"
+cd "$PROJECT_REINIT"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --intent "$PROJECT_REINIT/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT_REINIT/docs/CONSTITUTION.md" \
+  --ai codex:gpt-5.4:auto \
+  >/dev/null
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --intent "$PROJECT_REINIT/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT_REINIT/docs/CONSTITUTION.md" \
+  >/dev/null
+PROJECT_REINIT_CANON="$(cd "$PROJECT_REINIT" && pwd -P)"
+
+grep -q '^AI_TOOL="codex"$' "$PROJECT_REINIT_CANON/.freely/config.env"
+grep -q '^AI_MODEL="gpt-5.4"$' "$PROJECT_REINIT_CANON/.freely/config.env"
+
+echo "[PASS] freely init resolves AI defaults with precedence: explicit > project > global"

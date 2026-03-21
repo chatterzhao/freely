@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-init-cc-config.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_project() {
+  local project="$1"
+  mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample"
+  git init -q -b develop "$project"
+
+  cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+  cat >"$project/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+  cat >"$project/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+  cat >"$project/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0018--sample
+EOF
+
+  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+}
+
+FREELY_HOME="$TMP_DIR/freely-home"
+
+PROJECT_CC="$TMP_DIR/project-cc"
+make_project "$PROJECT_CC"
+cd "$PROJECT_CC"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --intent "$PROJECT_CC/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT_CC/docs/CONSTITUTION.md" \
+  --ai cc:auto \
+  >/dev/null
+
+CONFIG_FILE="$PROJECT_CC/.freely/config.env"
+grep -q '^AI_TOOL="cc"$' "$CONFIG_FILE"
+grep -q '^AI_MODE="auto"$' "$CONFIG_FILE"
+grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
+grep -q '^AI_TOOL_CAPABILITIES=""$' "$CONFIG_FILE"
+grep -q '^AI_TOOL_POLICY=""$' "$CONFIG_FILE"
+grep -q '^AI_CAPABILITY_CODEX_MODEL=""$' "$CONFIG_FILE"
+grep -q '^AI_CAPABILITY_CODEX_SANDBOX=""$' "$CONFIG_FILE"
+grep -q '^AI_CAPABILITY_CODEX_APPROVAL_POLICY=""$' "$CONFIG_FILE"
+grep -q '^AI_CAPABILITY_CODEX_CWD_MODE=""$' "$CONFIG_FILE"
+
+STATUS_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^ai: cc:default:auto$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_capabilities: none$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_policy: none$'
+
+PROJECT_CC_CODEX="$TMP_DIR/project-cc-codex"
+make_project "$PROJECT_CC_CODEX"
+cd "$PROJECT_CC_CODEX"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --intent "$PROJECT_CC_CODEX/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT_CC_CODEX/docs/CONSTITUTION.md" \
+  --ai cc-use-codex-cli:auto \
+  >/dev/null
+
+CONFIG_FILE_CODEX="$PROJECT_CC_CODEX/.freely/config.env"
+grep -q '^AI_TOOL="cc-use-codex-cli"$' "$CONFIG_FILE_CODEX"
+grep -q '^AI_MODE="auto"$' "$CONFIG_FILE_CODEX"
+grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE_CODEX"
+grep -q '^AI_TOOL_CAPABILITIES="codex-cli"$' "$CONFIG_FILE_CODEX"
+grep -q '^AI_TOOL_POLICY="prefer-codex-for-repo-work"$' "$CONFIG_FILE_CODEX"
+grep -q '^AI_CAPABILITY_CODEX_MODEL="gpt-5.4"$' "$CONFIG_FILE_CODEX"
+grep -q '^AI_CAPABILITY_CODEX_SANDBOX="workspace-write"$' "$CONFIG_FILE_CODEX"
+grep -q '^AI_CAPABILITY_CODEX_APPROVAL_POLICY="never"$' "$CONFIG_FILE_CODEX"
+grep -q '^AI_CAPABILITY_CODEX_CWD_MODE="project-root"$' "$CONFIG_FILE_CODEX"
+
+STATUS_OUTPUT_CODEX="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
+printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^ai: cc-use-codex-cli:default:auto$'
+printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^tool_capabilities: codex-cli$'
+printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^tool_policy: prefer-codex-for-repo-work$'
+printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^codex_capability_model: gpt-5.4$'
+printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^codex_capability_sandbox: workspace-write$'
+printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^codex_capability_approval_policy: never$'
+printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^codex_capability_cwd_mode: project-root$'
+
+echo "[PASS] freely init writes separate plain-cc and cc-use-codex-cli profiles"
