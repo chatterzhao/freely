@@ -32,7 +32,7 @@
 4. `develop` 合并前，`TEST`（含集成验收）通过；若走 `pre-test-merge` 路径，验证批次必须可追溯。
 5. `PRE_TEST` 仅作为开发前基线，不得替代提升测试结果。
 6. 提升前必须有评审记录、祖先可追溯证据、进度/恢复更新证据。
-7. merge/promotion/release/cleanup 前执行 `./bin/wt-status-all`，结果全 `CLEAN`。
+7. merge/promotion/release 前执行 `./bin/wt-status-all`，结果全 `CLEAN`；cleanup 前至少要求 target worktree 自身安全。若存在 unrelated dirty 或 busy worktree，必须显式跳过并在 cleanup 证据中留痕，不得误删。
 8. premerge 仅作冲突收敛，来源与回并目标均为当前活跃的 `pre-test-merge`。
 9. 清理动作只能在 `verified-retirable` 后执行，且必须留痕。
 10. 派生 worktree 的 issue 在提升前必须对齐其父分支结果：父分支先进入要求路径，子分支再 restack/rebase/merge 上游并重新验证。
