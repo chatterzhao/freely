@@ -1,10 +1,8 @@
 # 预研头脑风暴索引
-<<<<<<< HEAD
+- 20260321-0257--worktree-fleet-governance-closure
 - 20260320-1745--dirty-worktree-governance-redesign
 - 20260320-1410--worktree-maintenance-skill-taxonomy
-=======
 - 20260320-0908--research-candidate-persistence-governance
->>>>>>> feature/research-candidate-persistence-governance-20260320
 - 20260320-0252--interruption-topology-and-manager-routing
 - 20260320-0152--chat-entrypoint-autobootstrap
 - 20260320-0138--interruption-entrypoint-runtime-preflight
@@ -19,6 +17,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260321-0257--worktree-fleet-governance-closure
+  - brainstorms: docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md
 - 20260320-1745--dirty-worktree-governance-redesign
   - brainstorms: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/candidates.md
