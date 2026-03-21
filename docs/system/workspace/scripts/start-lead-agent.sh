@@ -213,6 +213,7 @@ cat <<EOF
 2. 进入 \`lead-agent\`，不要绕过首跳代理。
 3. 由 \`lead-agent\` 委托 \`skill:context-source-skill\` 进行需求池扫描、优先级判断与下一跳提示词组装。
 4. 若当前轮次承担项目级监督职责，先基于项目级工位视图做排班、冻结、集成与 cleanup 判断；不要直接把自己降级成单工位写代码代理。
+4A. 若当前轮次承担项目级监督职责，先读取 \`./bin/freely live-status --project $project\`，把它当作 supervisor / dispatcher / AI 当前态入口；只有在它提示需要继续深挖时，才展开 \`fleet-status\`、prompt、continuity、jsonl 等细节。
 5. 在可并行的 doc-loop、verification、review、日志诊断或互不冲突的代码任务上，使用 subagent 提高效率。
 6. 你的需求池至少包括：
    - \`docs/milestones.md\`

@@ -37,6 +37,7 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 - recover expected workers
 - 消费 availability watchdog 结果
 - 触发 Freely 专有 manager bootstrap handoff
+- 暴露当前态控制面，让主管能直接看到活跃 pid、当前 prompt/continuity 聚焦点与 deep refs
 
 实现承载：
 - `docs/system/workspace/scripts/runtime/freely`
@@ -74,6 +75,10 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 - `scripts/availability-watchdog.sh`
   - 提供 codex account cooldown、probe、switch、ensure-manager account readiness 等共享函数
   - 由 `runtime/freely` source 使用
+- `freely live-status`
+  - 提供 watchdog / runtime 当前态视图
+  - 默认只展示活跃 supervisor / dispatcher / ai 与 prompt excerpt、continuity excerpt、deep refs
+  - 供主管 supervision 轮次优先读取，而不是继续人肉拼 `ps + prompt + jsonl`
 
 ## 下一跳
 

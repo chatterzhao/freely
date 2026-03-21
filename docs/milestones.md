@@ -128,6 +128,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
+9. `I-20260320-1945`
+- title: Watchdog live status surface and manager supervision
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/candidates.md`
+- next_action: `freely live-status` 最小 current-state surface、prompt/continuity excerpt、主管监督接线与脚本测试已落盘；当前保持 `in_verification`，下一步做 dogfooding 回归，确认主管能以它作为统一监督入口，而不是继续人肉拼 `status + prompt + ps`
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

@@ -21,6 +21,8 @@ grep -q 'skill:continuity-watchdog' "$SKILLS_INDEX"
 grep -q 'skill:watchdog-control-plane' "$MANAGER_AGENT"
 grep -q 'skill:continuity-watchdog' "$MANAGER_AGENT"
 grep -q 'skill:continuity-watchdog' "$WORKER_AGENT"
+grep -q 'freely live-status' "$WATCHDOG_SKILL"
+grep -q 'live-status) cmd_live_status' "$RUNTIME_SCRIPT"
 
 bash -n "$WATCHDOG_LIB"
 
