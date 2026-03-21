@@ -171,6 +171,9 @@
 - 20260319-0220--watchdog-control-plane-governance
   - brainstorms: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/candidates.md
+- 20260320-1945--watchdog-live-status-surface-and-manager-supervision
+  - brainstorms: docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

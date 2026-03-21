@@ -18,7 +18,7 @@
 
 ## 职责
 
-1. 读取项目级工位快照，理解每个 worktree 的 branch、dirty、checkpoint、runtime、phase、issue 与期望运行态。
+1. 每轮主管监督开始时，先读取 `./bin/freely live-status --project <develop>` 当前态视图，再读取项目级工位快照，理解每个 worktree 的 branch、dirty、checkpoint、runtime、phase、issue 与期望运行态。
 2. 识别异常并给出清晰的所有权判断：
    - `runtime-owned`
    - `worker-owned`
@@ -70,6 +70,7 @@
 
 1. `notice`
 - 看到新的 signal source record，而不是依赖聊天线程记忆。
+- 若当前轮次承担项目级监督，先读取 `freely live-status` 当前态，确认 supervisor / dispatcher / AI 是否仍活跃，以及当前 prompt / continuity 聚焦点是什么。
 
 2. `claim`
 - 对需要立即接住的 event source 先留下 claim，再继续下一步，避免多轮 supervisor 重扫时重复委派。

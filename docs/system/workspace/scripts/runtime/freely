@@ -32,6 +32,7 @@ Usage:
   freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
   freely start [--project <abs_path>]
   freely status [--project <abs_path>]
+  freely live-status [--project <abs_path>]
   freely fleet-status [--project <abs_path>]
   freely stop [--project <abs_path>]
 
@@ -309,6 +310,68 @@ ensure_manager_watchdog_pid_file() {
 interruption_dispatcher_pid_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/interruption-dispatch.pid"
+}
+
+latest_run_artifact_for_project() {
+  local project="$1" pattern="$2" run_dir
+  run_dir="$(run_dir_for_project "$project")"
+  [[ -d "$run_dir" ]] || return 0
+  find "$run_dir" -maxdepth 1 -type f -name "$pattern" | sort | tail -n 1
+}
+
+find_latest_prompt_file_for_project() {
+  local project="$1"
+  latest_run_artifact_for_project "$project" 'prompt-*.txt'
+}
+
+find_latest_manager_continuity_file_for_project() {
+  local project="$1"
+  latest_run_artifact_for_project "$project" 'manager-continuity-*.md'
+}
+
+ps_command_for_pid() {
+  local pid="$1"
+  [[ -n "$pid" ]] || return 0
+  ps -p "$pid" -o command= 2>/dev/null | sed -n '1p'
+}
+
+emit_indented_block() {
+  local prefix="$1" text="$2"
+  [[ -n "$text" ]] || return 0
+  while IFS= read -r line; do
+    printf '%s%s\n' "$prefix" "$line"
+  done <<<"$text"
+}
+
+trimmed_file_excerpt() {
+  local file="$1" mode="${2:-head}" limit="${3:-10}" text
+  [[ -f "$file" ]] || return 0
+  case "$mode" in
+    tail) text="$(tail -n 80 "$file" 2>/dev/null || true)" ;;
+    *) text="$(sed -n '1,80p' "$file" 2>/dev/null || true)" ;;
+  esac
+  printf '%s\n' "$text" | sed '/^[[:space:]]*$/d' | head -n "$limit"
+}
+
+live_status_activity_state_for_project() {
+  local project="$1" supervisor_pid ai_pid dispatcher_pid intake_active
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  intake_active="$(count_active_intake_items "$project")"
+  if [[ -n "$ai_pid" ]]; then
+    printf 'ai_active\n'
+  elif [[ -n "$supervisor_pid" && -n "$dispatcher_pid" && "${intake_active:-0}" -gt 0 ]]; then
+    printf 'supervising_with_pending_intake\n'
+  elif [[ -n "$supervisor_pid" ]]; then
+    printf 'supervising\n'
+  elif [[ -n "$dispatcher_pid" ]]; then
+    printf 'dispatch_only\n'
+  elif [[ "${intake_active:-0}" -gt 0 ]]; then
+    printf 'stalled_without_runtime\n'
+  else
+    printf 'idle\n'
+  fi
 }
 
 discover_supervisor_pid() {
@@ -2831,6 +2894,123 @@ cmd_status() {
   fi
 }
 
+cmd_live_status() {
+  local project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  load_config "$project"
+  load_session_state_or_defaults "$project"
+
+  local run_dir branch role_hint activity_state
+  local supervisor_pid ai_pid dispatcher_pid
+  local supervisor_cmd ai_cmd dispatcher_cmd
+  local prompt_file continuity_file prompt_excerpt continuity_excerpt
+  local intake_snapshot latest_resolution_snapshot
+  local desired_runtime_state last_supervisor_state last_ai_state last_exit_reason last_role_hint last_state_updated_at
+
+  run_dir="$(run_dir_for_project "$project")"
+  branch="$(branch_name_for_project "$project")"
+  role_hint="$(role_hint_for_project "$project")"
+  activity_state="$(live_status_activity_state_for_project "$project")"
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  supervisor_cmd="$(ps_command_for_pid "$supervisor_pid")"
+  ai_cmd="$(ps_command_for_pid "$ai_pid")"
+  dispatcher_cmd="$(ps_command_for_pid "$dispatcher_pid")"
+  prompt_file="$(find_latest_prompt_file_for_project "$project")"
+  continuity_file="$(find_latest_manager_continuity_file_for_project "$project")"
+  prompt_excerpt="$(trimmed_file_excerpt "$prompt_file" tail 12)"
+  continuity_excerpt="$(trimmed_file_excerpt "$continuity_file" head 12)"
+  intake_snapshot="$(intake_snapshot_for_project "$project" 3)"
+  latest_resolution_snapshot="$(resolution_snapshot_for_project "$project" 1)"
+
+  desired_runtime_state="unknown"
+  last_supervisor_state="unknown"
+  last_ai_state="unknown"
+  last_exit_reason="unknown"
+  last_role_hint="$role_hint"
+  last_state_updated_at="unknown"
+  if [[ -f "$(workcell_state_file "$project")" ]]; then
+    # shellcheck disable=SC1090
+    source "$(workcell_state_file "$project")"
+    desired_runtime_state="${DESIRED_RUNTIME_STATE:-unknown}"
+    last_supervisor_state="${LAST_SUPERVISOR_STATE:-unknown}"
+    last_ai_state="${LAST_AI_STATE:-unknown}"
+    last_exit_reason="${LAST_EXIT_REASON:-unknown}"
+    last_role_hint="${LAST_ROLE_HINT:-$role_hint}"
+    last_state_updated_at="${LAST_STATE_UPDATED_AT:-unknown}"
+  fi
+
+  echo "project: $project"
+  echo "branch: $branch"
+  echo "role_hint: $role_hint"
+  echo "activity_state: $activity_state"
+  echo "desired_runtime_state: $desired_runtime_state"
+  echo "last_supervisor_state: $last_supervisor_state"
+  echo "last_ai_state: $last_ai_state"
+  echo "last_exit_reason: $last_exit_reason"
+  echo "last_role_hint: $last_role_hint"
+  echo "last_state_updated_at: $last_state_updated_at"
+  echo "intake_active_items: $(count_active_intake_items "$project")"
+  echo "intake_classified_items: $(count_intake_items_by_status "$project" "classified")"
+  echo "intake_delegated_items: $(count_intake_items_by_status "$project" "delegated")"
+  echo "last_launch_kind: ${LAST_LAUNCH_KIND:-unavailable}"
+  echo "last_rotation_reason: ${LAST_ROTATION_REASON:-unavailable}"
+
+  if [[ -n "$supervisor_pid" || -n "$dispatcher_pid" || -n "$ai_pid" ]]; then
+    echo "active_processes:"
+    if [[ -n "$supervisor_pid" ]]; then
+      echo "- role=supervisor pid=$supervisor_pid command=${supervisor_cmd:-unavailable}"
+    fi
+    if [[ -n "$dispatcher_pid" ]]; then
+      echo "- role=interruption_dispatcher pid=$dispatcher_pid command=${dispatcher_cmd:-unavailable}"
+    fi
+    if [[ -n "$ai_pid" ]]; then
+      echo "- role=ai pid=$ai_pid command=${ai_cmd:-unavailable}"
+    fi
+  else
+    echo "active_processes: none"
+  fi
+
+  echo "current_focus:"
+  if [[ -n "$prompt_file" ]]; then
+    echo "- prompt_file: $prompt_file"
+    echo "- prompt_excerpt:"
+    emit_indented_block "  " "$prompt_excerpt"
+  else
+    echo "- prompt_file: none"
+  fi
+  if [[ -n "$continuity_file" ]]; then
+    echo "- manager_continuity_file: $continuity_file"
+    echo "- manager_continuity_excerpt:"
+    emit_indented_block "  " "$continuity_excerpt"
+  else
+    echo "- manager_continuity_file: none"
+  fi
+  if [[ -n "$intake_snapshot" ]]; then
+    echo "- intake_snapshot:"
+    emit_indented_block "  " "$intake_snapshot"
+  else
+    echo "- intake_snapshot: none"
+  fi
+  if [[ -n "$latest_resolution_snapshot" ]]; then
+    echo "- latest_resolution:"
+    emit_indented_block "  " "$latest_resolution_snapshot"
+  fi
+
+  echo "deep_refs:"
+  echo "- run_dir: $run_dir"
+  echo "- last_tool_jsonl_path: ${LAST_TOOL_JSONL_PATH:-unavailable}"
+  echo "- last_tool_session_id: ${LAST_TOOL_SESSION_ID:-unavailable}"
+  echo "- last_cycle_log: ${LAST_CYCLE_LOG:-unavailable}"
+}
+
 sleep_with_rate_limit_recheck() {
   local project="$1" total_sleep="$2"
   local remaining chunk stop_file
@@ -3008,6 +3188,7 @@ main() {
     ensure-interruption-dispatch) cmd_ensure_interruption_dispatch "$@" ;;
     start) cmd_start "$@" ;;
     status) cmd_status "$@" ;;
+    live-status) cmd_live_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;
     stop) cmd_stop "$@" ;;
     *) log_error "unknown command: $cmd"; usage; exit 1 ;;
