@@ -187,6 +187,9 @@
 - 20260318-1630--global-ai-account-watchdog
   - brainstorms: docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md
+- 20260310-0056--evolver-autonomous-development-leverage
+  - brainstorms: docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/candidates.md
 - 20260319-0018--token-efficient-session-continuity-and-rotation
   - brainstorms: docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md
   - candidates: docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md
