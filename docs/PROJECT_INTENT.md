@@ -50,7 +50,7 @@ A:auto-loop（外循环）
 ├── D:dev-loop-execution（开发实现环）
 │   ├── 触发条件：ready issue / in-progress
 │   └── 产出：
-│       - src/**, tests/**
+│       - AI-native capability artifacts（如 code / tests / agents / skills / runtime scripts / hooks / implementation docs）
 │       - docs/epics/{epic}/{story}/code-reviews/*.md
 │       - docs/progress/{epic}/p-{issue}.md
 │       - docs/milestones.md（状态更新）
@@ -117,6 +117,7 @@ flowchart TD
 说明：
 - 本节保留高层来源到下一跳的方向性约束。
 - 详细 capability -> loop -> owner -> artifact -> transition 映射以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准。
+- 其中 `dev-loop` 是 AI-native 能力实现层，不限于传统“写代码”；凡是在既有 issue 边界内把能力真正 materialize 出来的工作，都属于 `dev-loop`。
 
 | 来源 | 路由起点 | 说明 |
 |-----------|---------|------|

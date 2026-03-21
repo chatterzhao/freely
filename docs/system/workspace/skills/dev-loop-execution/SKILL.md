@@ -1,6 +1,6 @@
 ---
 name: dev-loop-execution
-description: 执行 milestone-owned ready issue 的实现、测试与进度回写。
+description: 执行 milestone-owned ready issue 的 AI-native 实现、测试与进度回写。
 ---
 
 # skill:dev-loop-execution
@@ -9,6 +9,7 @@ description: 执行 milestone-owned ready issue 的实现、测试与进度回�
 
 - 只处理 docs 已足够的 ready issue。
 - 在正确 worktree 中实现、测试并回写状态。
+- `dev-loop` 中的“实现”不限于传统代码；也可以是 agent、skill、runtime script、hook、reference 或其他能力产物，只要它们属于已收敛 issue 的交付实现。
 - 让 `progress` 只承载 dev-loop 的执行态。
 - dev-loop 在整个三层循环中的归宿、owner 边界与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`。
 

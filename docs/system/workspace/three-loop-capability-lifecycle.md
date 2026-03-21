@@ -84,11 +84,24 @@ auto-loop -> doc-loop -> dev-loop -> verification/completion -> cleanup -> auto-
 ### 2.3 dev-loop
 
 目标：
-- 在已收敛的 issue 边界内完成实现、验证与交付
+- 在已收敛的 issue 边界内完成 AI-native 的实现、验证与交付
+
+定义：
+- `dev-loop` 不是“只写代码”的窄义开发环。
+- `dev-loop` 指在 ready issue 边界内，把问题 materialize 成可交付能力的执行层。
+- 只要当前工作是在既有 issue 边界内把能力真正做出来，而不是继续定义问题边界，就属于 `dev-loop`。
 
 负责：
-- 代码实现
-- 测试
+- 能力实现，产物可以包括：
+  - 代码
+  - 测试
+  - agent
+  - skill
+  - reference
+  - runtime script
+  - hook
+  - 配置与适配层
+  - 作为能力真源一部分的实现型文档
 - code review
 - verification
 - progress writeback
@@ -99,6 +112,7 @@ auto-loop -> doc-loop -> dev-loop -> verification/completion -> cleanup -> auto-
 - 不重新定义 issue 边界
 - 不把边界外问题直接吞进当前实现
 - 不承担进程退出后的恢复动作
+- 不把纯问题定义、候选收敛或 issue materialization 伪装成实现工作
 
 ## 3. Owner Layers
 
@@ -428,6 +442,7 @@ completed
 | Capability | Main implementation | Primary owner |
 | --- | --- | --- |
 | ready issue implementation | `skill:dev-loop-execution` | worker |
+| AI-native capability materialization | agents / skills / runtime scripts / hooks / implementation docs | worker |
 | test execution and proof | `tests/**`, issue verification sections | worker |
 | review evidence | `docs/epics/**/code-reviews/*.md`, `new-review` | worker |
 | checkpoint and batch hygiene | `checkpoint-guard`, `worktree-hygiene-supervision` | worker |
@@ -438,6 +453,7 @@ completed
 
 说明：
 - 某些能力如 `checkpoint-guard` 横跨 auto/dev，但在“当前 issue 是否该先收口再继续实现”这一层，它主要服务 dev-loop。
+- `dev-loop` 的判断标准是“是否在既有 issue 边界内落地能力”，而不是“是否改了传统源代码目录”。
 
 ## 10. Cross-Loop Capability Rules
 
