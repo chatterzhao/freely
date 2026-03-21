@@ -72,5 +72,5 @@ Freely 已经具备单树 worktree audit、merge-prep、stacked merge-chain 和 
 
 ## Next
 
-- 本 issue 只固化 fleet closure 的治理模式与当前首轮 inventory。
-- 后续具体到某条 merge/cleanup 链时，仍应回到 `merge_prep`、`stacked_merge_chain` 或 `retirement_handoff` 执行。
+- 本 issue 的模式与首轮 inventory 已完成，并已支撑本轮 fleet 收口到 `develop + current sweep` 两棵 canonical 工位。
+- 剩余动作是完成最终 review，并在通过 promote gate 后把当前 sweep 正式提升到 `develop`；更细的 merge/cleanup 链仍回到 `merge_prep`、`stacked_merge_chain` 或 `retirement_handoff` 执行。

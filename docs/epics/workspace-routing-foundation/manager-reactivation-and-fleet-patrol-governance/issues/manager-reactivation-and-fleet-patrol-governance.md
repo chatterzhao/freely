@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260321-0345`
 - title: Manager reactivation and fleet patrol governance
-- phase_state: `in_ibm`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-reactivation-and-fleet-patrol-governance`
@@ -65,5 +65,5 @@ Freely 现在已经能通过 runtime watchdog 拉起主管，也能通过 `live-
 
 ## Next
 
-- 本 issue 先固化 patrol 协议与路由真源。
+- 当前协议、reference、首跳提示与 routing 回归已落盘，下一步进入 verification / review，而不是继续停留在 IBM。
 - 后续若需要真正脚本级的“定时重新唤醒并自动派单”，再作为 runtime / watchdog 增量继续 materialize，不在本 issue 直接越界。

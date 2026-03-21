@@ -93,5 +93,5 @@ Freely 已经支持多个顶层 AI tool，但 `Claude Code` 仍缺两类关键�
 
 ## Next
 
-- 当前 issue 已有实现与验证证据，但依赖父分支 `feature/research-codex-in-cc-mcp`；下一步先检查当前分支能否无冲突合回父分支。
-- 若父分支 review / governance / ancestry 仍未完成，则继续在父分支层面收口，不得跳过上游直接 merge 到 `develop`。
+- 当前 issue 的实现、验证与 live smoke 证据已被当前 develop-facing sweep 分支吸收，父链收口工作已完成。
+- 剩余动作是完成最终 review，并在通过 promote gate 后随当前 sweep 一起正式提升到 `develop`。

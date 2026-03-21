@@ -129,25 +129,15 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
-9. `I-20260319-2315`
-- title: CLI TUI interruption input box for Freely
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md`
-- source_brainstorm: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md`
-- next_action: `freely tui` 的 durable intake shell、中文/多行 composer 与脚本回归已落盘；当前能力应作为 interruption 输入壳保留在主线，不再以 pre-brainstorm 候选形式悬挂。后续仅在需要扩更强 TUI control surface 时回到同一 issue。
-
 9. `I-20260321-0345`
 - title: Manager reactivation and fleet patrol governance
 - milestone_state: committed
-- phase_state: `in_ibm`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/candidates.md`
-- next_action: 当前先完成 IBM 级治理收敛，把 manager patrol 协议写进 `manager-agent`、`multi-worktree-supervision`、`auto-loop-orchestrator` 与首跳提示；后续若需要真正脚本级 patrol tick 或自动派单，再基于同一 issue 继续进入 dev-loop
+- next_action: manager reactivation patrol 协议、reference、首跳提示与 routing 回归已落盘；当前进入 verification，后续若需要真正脚本级 patrol tick 或自动派单，再基于同一 issue 继续进入新的 runtime/dev 增量
 
 10. `I-20260321-1045`
 - title: Stacked worktree merge-chain governance
@@ -187,7 +177,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md`, `docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md`
-- next_action: `cc` / `cc-use-codex-cli` runtime、skill、双层会话证据与 live smoke 已落盘；当前 merge-prep 已证明从 `feature/research-codex-in-cc-mcp` 合入最新 `develop` 仅需处理治理索引冲突。完成 review 与 cleanup 后，可继续进入正式 develop 合并与后续退休工作
+- next_action: `cc` / `cc-use-codex-cli` runtime、skill、双层会话证据与 live smoke 已落盘，且当前 sweep 已完成 fleet 收口。剩余动作是完成最终 review，然后按保护规则从当前 develop-facing sweep 分支推进正式 promote
 
 13. `I-20260321-0257`
 - title: Worktree fleet governance closure
@@ -197,7 +187,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
 - source_brainstorm: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md`
-- next_action: 已把 `fleet_closure` 收编到 worktree-maintenance skill，并完成首轮 active worktree inventory。下一步按该 inventory 对可闭环链继续 merge-up / merge-prep / retirement handoff；仍在开发中的 worktree 保持可见 disposition，不做强行清空
+- next_action: `fleet_closure` 已收编到 worktree-maintenance skill，正式项目 fleet 现已收敛到 `develop + current sweep` 两棵 canonical 工位；剩余动作是完成最终 review，并在通过 promote gate 后将当前 sweep 合入 `develop`
 
 ### candidate_issues
 
@@ -461,17 +451,6 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/candidates.md`
 - completion_note: milestone planning 与 state maintenance 已作为独立治理能力物化并验证，收口为 `completed`
-
-9. `I-20260319-2315`
-- title: CLI TUI interruption input box for Freely
-- milestone_state: completed
-- phase_state: `completed`
-- priority: P0
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md`
-- source_brainstorm: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md`
-- evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
-- completion_note: `freely tui` 已收口为 interruption presentation shell，并补齐中文与多行提交回归，输入仍统一落到既有 durable intake 链路
 
 11. `C-20260319-0220-C`
 - title: Historical watchdog productization worktree retirement handoff
