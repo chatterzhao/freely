@@ -55,7 +55,12 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - `event source`：interruption / review finding / test failure / runtime anomaly / worker-discovered gap
    - `standing source`：`PROJECT_INTENT` / milestones / issue / progress / recovery / fleet
 10. 对 `event source`，主管及时 notice；对 `standing source`，主管周期扫描，并在必要时生成 derived problem signal。
-11. 主管的核心职责不是“分流插话”，而是对任意 signal 决定 restart point：
+11. 主管被 runtime 重新激活后，不得只确认“进程活着”；必须先做一轮 patrol：
+   - `live-status`
+   - `fleet-status`
+   - milestone / issue / progress / recovery
+   - 主动寻找没有 worker 在推进的点位与已完成但未收口的 worktree
+12. 主管的核心职责不是“分流插话”，而是对任意 signal 决定 restart point：
    - `pre-brainstorm`
    - `candidate / milestone intake`
    - `IBM`
@@ -64,8 +69,8 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - `verification`
    - `progress / recovery`
    - `runtime supervision / cleanup`
-12. 对 `human interruption`，runtime interruption dispatcher 可先做 durable 接住与及时 notice，但不替代主主管完成完整路由。
-13. 主管不把 raw signal 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
+13. 对 `human interruption`，runtime interruption dispatcher 可先做 durable 接住与及时 notice，但不替代主主管完成完整路由。
+14. 主管不把 raw signal 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
 
 ## 角色组织
 

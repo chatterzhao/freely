@@ -2,7 +2,7 @@
 
 ## Context
 - Source brainstorm: ./brainstorms.md
-- Status: proposed
+- Status: promoted
 
 ## Candidates
 
@@ -17,10 +17,10 @@
   - 明确 issue 完成但 worktree 未收口也属于 patrol 发现范围
   - 最终产物应落为主管监督协议增强，而不是一次性聊天建议
 - priority: P0
-- status: proposed
+- status: promoted
 - decision_reason: 这是 Freely 从“manager process alive”走向“manager genuinely supervising the fleet”的关键一步；不先研究清楚，后续自动监督仍会停在 runtime 层。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- promoted_issue_path: docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md
+- milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex
   - session_id: current-thread

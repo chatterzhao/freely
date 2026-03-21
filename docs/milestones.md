@@ -129,7 +129,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
-9. `I-20260320-1945`
+9. `I-20260321-0345`
+- title: Manager reactivation and fleet patrol governance
+- milestone_state: committed
+- phase_state: `in_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/candidates.md`
+- next_action: 当前先完成 IBM 级治理收敛，把 manager patrol 协议写进 `manager-agent`、`multi-worktree-supervision`、`auto-loop-orchestrator` 与首跳提示；后续若需要真正脚本级 patrol tick 或自动派单，再基于同一 issue 继续进入 dev-loop
+
+10. `I-20260320-1945`
 - title: Watchdog live status surface and manager supervision
 - milestone_state: committed
 - phase_state: `completed`

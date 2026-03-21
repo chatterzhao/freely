@@ -36,6 +36,13 @@ description: 当需要像项目负责人一样同时监督多个 Freely worktree
    - `supervisor` 或 `ai` 不活跃：先恢复 runtime
    - 上游依赖未进入要求路径：下游工位冻结或只做 doc-loop
 6. 若当前会话承担主管职责，优先做项目级排班，并在可并行任务上使用 subagent 提高效率。
+7. 若主管刚被 runtime 重新激活，先做一轮 manager reactivation patrol：
+   - 先读 `live-status`
+   - 再读 `fleet-status`
+   - 再读 milestone / issue / progress / recovery
+   - 主动找出 `candidate stuck / phase orphaned / completion without closure`
+   - 发现后明确输出 `ownership + restart_point + next_action`
+   - 详细检查面见 `references/manager-reactivation-patrol.md`
 
 ## 边界
 
