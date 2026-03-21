@@ -29,7 +29,7 @@
 - `freely tui`
 - `freely intake chat`
 - `freely intake status`
-- `freely start|status|fleet-status|stop`
+- `freely start|baseline-status|fleet-status|stop`
 
 显式 `--project` 的职责应降级为：
 

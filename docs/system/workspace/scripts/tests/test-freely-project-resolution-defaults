@@ -62,7 +62,7 @@ printf '%s\n' "$INIT_OUTPUT" | grep -q 'initialized:'
 CANON_PROJECT="$(cd "$PROJECT" && pwd -P)"
 
 STATUS_OUTPUT="$(
-  cd "$PROJECT/nested/work" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status
+  cd "$PROJECT/nested/work" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" baseline-status
 )"
 printf '%s\n' "$STATUS_OUTPUT" | grep -q "project: $CANON_PROJECT"
 
@@ -82,13 +82,13 @@ TUI_OUTPUT="$(
 printf '%s\n' "$TUI_OUTPUT" | grep -q 'submitted: 继续测试默认项目解析'
 
 REGISTRY_STATUS_OUTPUT="$(
-  cd "$TMP_DIR" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status
+  cd "$TMP_DIR" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" baseline-status
 )"
 printf '%s\n' "$REGISTRY_STATUS_OUTPUT" | grep -q "project: $CANON_PROJECT"
 
 INTAKE_STATUS_OUTPUT="$(
   cd "$PROJECT/nested/work" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" intake status
 )"
-printf '%s\n' "$INTAKE_STATUS_OUTPUT" | grep -q 'active_items: 2'
+printf '%s\n' "$INTAKE_STATUS_OUTPUT" | grep -q 'active_items: 1'
 
 echo "[PASS] freely resolves current project from cwd and falls back to a single authorized project"

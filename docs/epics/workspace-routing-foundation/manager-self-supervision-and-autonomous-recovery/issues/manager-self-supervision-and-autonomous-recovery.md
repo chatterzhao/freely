@@ -34,7 +34,7 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
 
 ## Acceptance
 
-- `freely status` 不再把其他 worktree 的 PID 误报为当前工位 supervisor / ai。
+- `freely baseline-status` 不再把其他 worktree 的 PID 误报为当前工位 supervisor / ai。
 - `wt-fleet-status` 能区分 `expected running but down` 与 `intentionally stopped/frozen`。
 - 主管 prompt 在发现应运行工位掉线时，优先进入 supervision / recovery / delegation，而不是继续普通路由。
 - 主管只做监督、编排、委派和告警；若判断需要恢复，只输出 `runtime_recovery_requested` 一类管理决策，账号切换、等待和重启仍归 runtime。

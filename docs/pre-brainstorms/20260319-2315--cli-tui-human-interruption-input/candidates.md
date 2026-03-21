@@ -11,7 +11,7 @@
 - problem: Freely 已经有 human interruption 的 CLI-first intake 链，但真实人类入口仍偏脚本化；缺少一个启动即有输入框、输入即成为 interruption、且支持中文的 TUI 前端，导致“插话”能力还不够可用。
 - why_now: 如果要让接下来的对话真正进入“插话模式”，就必须先给人一个稳定前台入口，而不是继续依赖手动拼 `freely intake chat` 命令。
 - acceptance_hint:
-  - 明确 TUI 是 `freely intake chat` / `freely intake status` / `freely status` 的 presentation shell，而不是第二套入口系统
+- 明确 TUI 是 `freely intake chat` / `freely intake status` / `freely baseline-status` 的 presentation shell，而不是第二套入口系统
   - 明确第一版只做输入与状态展示，不做人类侧 claim / resolve
   - 明确底部输入框是第一优先级能力，启动后默认聚焦
   - 明确第一版至少支持 UTF-8 中文输入、全角显示和多行编辑

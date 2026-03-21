@@ -19,7 +19,7 @@
 - acceptance:
   - 主管位能周期性读取项目级 fleet 视图，而不是只在首跳 prompt 注入一次。
   - 当应活跃的 worker 工位掉到 `down/down` 时，主管下一轮优先进入 supervision/recovery 路由。
-  - `freely status` / `wt-fleet-status` 能区分“冻结工位”和“应运行但掉线的工位”。
+  - `freely baseline-status` / `wt-fleet-status` 能区分“冻结工位”和“应运行但掉线的工位”。
   - 当异常 owner 属于本工位 runtime 时，主管只输出清晰恢复目标，不直接处理。
   - 账号限额后的切号与重启仍由当前工位脚本链完成，主管只负责观察与编排。
   - 文档明确列出哪些情况属于“AI/manager/worker 无能为力”，并由 runtime / scripts 接管。

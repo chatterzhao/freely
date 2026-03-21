@@ -184,8 +184,8 @@ for _ in $(seq 1 40); do
 done
 
 grep -q 'switch codex work@example-com --yes' "$TMP_DIR/ai-switch.log"
-grep -q 'last_active_account: work@example-com' <(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")
-grep -q 'last_account_switch_reason: primary_rate_limit_exhausted' <(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")
+grep -q 'last_active_account: work@example-com' <(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")
+grep -q 'last_account_switch_reason: primary_rate_limit_exhausted' <(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")
 
 bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
 wait "$primary_supervisor_pid" 2>/dev/null || true
@@ -270,9 +270,9 @@ for _ in $(seq 1 40); do
 done
 
 grep -q 'switch codex work@example-com --yes' "$TMP_DIR/ai-switch-secondary.log"
-grep -q 'last_active_account: work@example-com' <(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT_SECONDARY")
-grep -q 'last_account_switch_reason: secondary_rate_limit_exhausted' <(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT_SECONDARY")
-grep -q 'last_secondary_rate_limit_used_percent: 100.0' <(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT_SECONDARY")
+grep -q 'last_active_account: work@example-com' <(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT_SECONDARY")
+grep -q 'last_account_switch_reason: secondary_rate_limit_exhausted' <(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT_SECONDARY")
+grep -q 'last_secondary_rate_limit_used_percent: 100.0' <(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT_SECONDARY")
 
 bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT_SECONDARY" >/dev/null 2>&1 || true
 wait "$secondary_supervisor_pid" 2>/dev/null || true

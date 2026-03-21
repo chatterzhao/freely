@@ -33,8 +33,8 @@ Freely 的 CLI-first 人类入口已经可用，但默认项目解析仍然需�
 
 ## Acceptance
 
-- 在已初始化项目的任意子目录内，`freely status` / `freely chat` / `freely tui --once` 不需要显式 `--project`。
-- 在当前目录之外、但 `FREELY_HOME` 中只有一个已注册项目时，`freely status` 可以自动回退到该项目。
+- 在已初始化项目的任意子目录内，`freely baseline-status` / `freely chat` / `freely tui --once` 不需要显式 `--project`。
+- 在当前目录之外、但 `FREELY_HOME` 中只有一个已注册项目时，`freely baseline-status` 可以自动回退到该项目。
 - 当存在多个候选项目时，解析仍然失败并要求显式输入。
 - 脚本回归覆盖上述行为。
 

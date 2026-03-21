@@ -49,6 +49,8 @@
   - 在需要切新会话时生成最小 handoff 交接文件，并把它拼接进下一轮 prompt
   - 对支持结构化 token 计数的工具负责 context-window-aware 容量治理（warn / rotate）
   - 负责 project dirty budget / checkpoint governance 提示
+  - 提供 `baseline-status` 基线快照视图
+  - 提供 `status` family 聚合入口，可切 `baseline / live / fleet`
   - 提供 `live-status` 当前态监督视图
   - 提供 `fleet-status` 项目级 worktree 监督视图
   - 根目录 `bin/freely` 只是投影包装层

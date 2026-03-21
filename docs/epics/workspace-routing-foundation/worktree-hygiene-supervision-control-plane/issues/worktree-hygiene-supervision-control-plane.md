@@ -27,7 +27,7 @@ Freely 已有 checkpoint-guard、fleet-status 与 manager/worker 角色边界，
 1. 新增 `skill:worktree-hygiene-supervision`，统一 manager/worker 的 hygiene 收口步骤。
 2. 在 runtime 里记录 `checkpoint_drift_streak`，连续多轮漂移时升级为 hygiene intervention。
 3. 在 manager prompt 中增加 `Worktree hygiene alert`，对进入 drift 的 worker 输出结构化委派信号。
-4. 在 `freely status` 中暴露 `checkpoint_drift_streak`。
+4. 在 `freely baseline-status` 中暴露 `checkpoint_drift_streak`。
 5. 增加脚本级测试，锁住 worker escalation 与 manager alert 行为。
 
 ## Acceptance
@@ -35,7 +35,7 @@ Freely 已有 checkpoint-guard、fleet-status 与 manager/worker 角色边界，
 - `docs/system/workspace/skills/worktree-hygiene-supervision/SKILL.md` 存在并被技能目录索引。
 - worker 在 `checkpoint_drift_streak >= threshold` 时，prompt 中出现 `Worktree hygiene intervention`。
 - manager 在存在 drift worker 时，prompt 中出现 `Worktree hygiene alert` 和 `next_action=delegate_hygiene_worker`。
-- `./bin/freely status --project <worktree>` 能显示 `checkpoint_drift_streak`。
+- `./bin/freely baseline-status --project <worktree>` 能显示 `checkpoint_drift_streak`。
 - 新旧 checkpoint / supervision 相关测试同时通过。
 
 ## Completion

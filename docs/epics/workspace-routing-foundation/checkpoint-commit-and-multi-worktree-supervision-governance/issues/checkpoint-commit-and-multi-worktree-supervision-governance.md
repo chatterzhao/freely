@@ -27,7 +27,7 @@ Freely 当前已经会 worktree 隔离、session handoff、rate-limit account sw
 1. 提供 `checkpoint-guard` CLI，面向当前 worktree 和 staged commit 输出 checkpoint budget 结果。
 2. 在 `pre-commit` 上接 staged scope gate，阻止明显跨 issue 的混提。
 3. 提供 `wt-fleet-status` CLI，以项目级视图展示所有 worktree 的 branch、dirty、checkpoint 与 runtime 状态。
-4. 把 checkpoint 结果接回 `freely status` 与 auto-loop prompt。
+4. 把 checkpoint 结果接回 `freely baseline-status` 与 auto-loop prompt。
 5. 增加 skill 和脚本级测试。
 
 ## Acceptance
@@ -35,7 +35,7 @@ Freely 当前已经会 worktree 隔离、session handoff、rate-limit account sw
 - `./bin/checkpoint-guard` 可输出结构化 checkpoint 结论。
 - `./bin/checkpoint-guard --staged-only --fail-on-required` 对混 scope staged commit 返回非零。
 - `./bin/wt-fleet-status` 能列出多个 worktree，并展示 dirty / checkpoint / supervisor / ai。
-- `./bin/freely status --project <worktree>` 能显示 `checkpoint_required` 与 `checkpoint_reasons`。
+- `./bin/freely baseline-status --project <worktree>` 能显示 `checkpoint_required` 与 `checkpoint_reasons`。
 - `pre-commit` 对超预算 staged commit 给出阻断信息，不再只是 scope hint。
 
 ## Completion
@@ -53,7 +53,7 @@ Freely 当前已经会 worktree 隔离、session handoff、rate-limit account sw
 - 当前验证重点：
   - `checkpoint-guard` 是否对当前 worktree 和 staged scope 正确给出 checkpoint 结论
   - `wt-fleet-status` 与 `freely fleet-status` 是否能按工位展示 dirty / checkpoint / runtime 摘要
-  - `freely status` / 首跳 prompt 是否已暴露 project dirty budget 与 project-level worktree summary
+  - `freely baseline-status` / 首跳 prompt 是否已暴露 project dirty budget 与 project-level worktree summary
   - `develop/main/pre-test-merge` 上的主管首跳是否只做监督与委派，不直接执行第二跳实现
 - 已执行 `TEST`：
   - `bash docs/system/workspace/scripts/tests/test-checkpoint-guard`

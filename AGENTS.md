@@ -41,7 +41,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - 当出现不确定性时，打开/更新一个预研头脑风暴条目，先在那里收敛。
 
 ## 基本命令
-- `./bin/freely init|doctor|start|status|stop`
+- `./bin/freely init|doctor|start|status|baseline-status|live-status|fleet-status|stop`
 - `./bin/governance-check`
 - `./bin/test-pre-push-hook`
 - `cd <your-project-path>`
