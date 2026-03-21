@@ -2,7 +2,7 @@
 
 ## Context
 - Source brainstorm: ./brainstorms.md
-- Status: in_research
+- Status: reviewed
 
 ## Candidates
 
@@ -20,10 +20,10 @@
   - 明确提交交互与换行交互，避免输入框不可用
   - 明确 TUI 与 manager contract 的边界，避免越权处理 reaction / absorption
 - priority: P0
-- status: needs_research
-- decision_reason: 这条需求已经有清晰产品方向，但 UI 技术栈、中文字符处理、交互键位和状态展示范围还未收敛；需要先完成 pre-brainstorm，再决定是否 materialize 为独立 issue。
-- promoted_issue_path: pending://issue-materialization
-- milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
+- status: promoted
+- decision_reason: 这条需求已经在 Freely runtime 中 materialize 为 `freely tui`，并补齐了中文/多行提交的脚本回归；现在应以正式 issue 记录完成态，而不是继续留在 research 状态。
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md`
+- milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:
   - tool: codex
   - session_id: current-thread
