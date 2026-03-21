@@ -24,12 +24,15 @@
   - 明确主管发现 drift 后的最小 reconcile 动作
   - 至少落到现有 issue/skill/reference 之一，而不是停留在聊天建议
 - priority: P0
-- status: proposed
-- decision_reason: 问题已真实出现，且当前预研已收敛出承接边界：它首先是主管 patrol / project-level supervision 能力，其次才分流到 state-maintenance、worktree closure 或 runtime recovery；因此应扩现有 `manager-reactivation-and-fleet-patrol` 与 `skill:multi-worktree-supervision`，而不是新造平行 skill。
-- next_action: materialize 为对现有 `manager-reactivation-and-fleet-patrol` issue 与 `skill:multi-worktree-supervision` 的增强，并补 drift detection / ownership / reconcile routing 的 reference。
-- revisit_trigger: 当需要把 drift classification、routing 和 writeback contract 正式落到 issue / skill / tests 时。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: dropped
+- adoption_type: superseded
+- decision_reason: 本轮研究结论已被吸收到新的 `manager-watchdog-trigger-and-drift-reconcile-governance` issue 中，后续以该 issue 生命周期为准，不再把本候选保留成平行推进线。
+- next_action: 通过新的 issue 在主管巡检真源中落下 `external drift / out-of-band reconcile` 检查面，并保持本预研仅作为历史追溯输入。
+- revisit_trigger: 若未来需要单独拆出 runtime-level drift detector，而不只是主管 patrol 语义增强，再重新开启新预研。
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+- milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
+- superseded_by:
+  - `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
 - session_refs:
   - tool: codex
   - session_id: current-thread

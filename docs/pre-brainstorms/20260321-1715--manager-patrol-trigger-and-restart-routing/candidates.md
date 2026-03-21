@@ -18,12 +18,12 @@
   - 明确 worker 或 runtime owner 返回结果后，主管继续决定下一跳 restart point
   - 明确 restart point 可落在 auto/doc/dev 三层的任意正确位置
 - priority: P0
-- status: proposed
-- decision_reason: 现有真源已具备大部分组成件，当前最需要的是把它们收束成一致的主管 watchdog 语义，再回写到三层 loop 真源与相关 agent/skill/reference，而不是再造新能力。
-- next_action: 将本条提升为对 `three-loop-capability-lifecycle`、`manager-agent`、`auto-loop-orchestrator` 与 `manager-reactivation-patrol` 的一致性增强 issue。
-- revisit_trigger: 当需要把 patrol-driven/event-driven、委派回流 contract 和动态 restart-point routing 正式写入现有真源时。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: promoted
+- decision_reason: 已进入正式 issue 生命周期；后续不再停留在聊天结论，而是通过新的治理 issue 对现有真源做应用产物收敛重构。
+- next_action: 完成 IBM 产物后，进入 dev-loop，对 `three-loop` / `manager-agent` / `auto-loop-orchestrator` / patrol reference 做一致性重构。
+- revisit_trigger: 当新的 truth-source wording 已落盘，需要 review 是否仍存在局部自相矛盾时。
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+- milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
 - session_refs:
   - tool: codex
   - session_id: current-thread
