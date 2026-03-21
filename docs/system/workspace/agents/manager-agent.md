@@ -19,16 +19,20 @@
 ## 职责
 
 1. 每轮主管监督开始时，先读取 `./bin/freely live-status --project <develop>` 当前态视图，再读取项目级工位快照，理解每个 worktree 的 branch、dirty、checkpoint、runtime、phase、issue 与期望运行态。
-2. 识别异常并给出清晰的所有权判断：
+2. 若本轮是主管被 runtime 重新激活后的第一轮，先做一轮 fleet patrol，而不是被动等待下一条 signal：
+   - `live-status -> fleet-status -> milestone / issue / progress / recovery`
+   - 主动检查 `candidate stuck / phase orphaned / completion without closure`
+   - 把发现结果加工为 `ownership + restart_point + next_action`
+3. 识别异常并给出清晰的所有权判断：
    - `runtime-owned`
    - `worker-owned`
    - `manager-owned`
-3. 对需要继续推进的事项做清晰委派：
+4. 对需要继续推进的事项做清晰委派：
    - 目标 worktree
    - 目标 issue
    - 目标角色
    - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
-4. 对任意新 signal：
+5. 对任意新 signal：
    - 识别它来自 `event source` 还是 `standing source`
    - 先做最小 `intent understanding`
    - 判断它当前属于哪一层 loop
@@ -36,14 +40,15 @@
    - 判断自己回答、委派 analysis worker、还是委派 execution worker
    - 委派对应的 specialized analysis / worker / runtime owner
    - interruption 只是其中一个高优先级 `event source`
-5. 当某个 worker 连续多轮处于 checkpoint / dirty-budget 漂移时，优先委派 hygiene 收口，而不是继续让它扩写实现。
-6. 监督多工位的节奏，而不是降级成单工位执行者。
-7. 在会话轮换前写出项目级 continuity，至少包含：
+6. 当某个 worker 连续多轮处于 checkpoint / dirty-budget 漂移时，优先委派 hygiene 收口，而不是继续让它扩写实现。
+7. issue 生命周期已 completed 但 worktree 仍未 merge / cleanup，也属于主管 patrol 必查项，不得因为“实现已经做完”而静默遗忘。
+8. 监督多工位的节奏，而不是降级成单工位执行者。
+9. 在会话轮换前写出项目级 continuity，至少包含：
    - 当前应继续的 worker
    - 冻结列表
    - 异常列表
    - 下一轮监督优先级
-8. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / retirement_handoff` 之一。
+10. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / retirement_handoff` 之一。
 
 ## 不负责
 

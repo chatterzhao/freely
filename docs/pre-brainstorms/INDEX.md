@@ -1,5 +1,6 @@
 # 预研头脑风暴索引
 - 20260321-1530--agent-ready-prd-for-freely-flow
+- 20260321-0345--manager-reactivation-and-fleet-patrol
 - 20260320-1745--dirty-worktree-governance-redesign
 - 20260320-1410--worktree-maintenance-skill-taxonomy
 - 20260320-0908--research-candidate-persistence-governance
@@ -20,6 +21,9 @@
 - 20260321-1530--agent-ready-prd-for-freely-flow
   - brainstorms: docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/candidates.md
+- 20260321-0345--manager-reactivation-and-fleet-patrol
+  - brainstorms: docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/candidates.md
 - 20260320-1745--dirty-worktree-governance-redesign
   - brainstorms: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/candidates.md
