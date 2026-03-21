@@ -2,6 +2,8 @@
 set -euo pipefail
 
 SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+# shellcheck disable=SC1091
+source "$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-launchers.sh"
 
 usage() {
   cat <<'EOF'
@@ -44,8 +46,15 @@ config_file="$project/.freely/config.env"
 # shellcheck disable=SC1090
 source "$config_file"
 
+tool="${AI_TOOL:-codex}"
 model="${AI_MODEL:-gpt-5.4}"
 reasoning_effort="${AI_REASONING_EFFORT:-medium}"
+tool_capabilities="${AI_TOOL_CAPABILITIES:-$(tool_default_capabilities "$tool")}"
+tool_policy="${AI_TOOL_POLICY:-$(tool_default_policy "$tool")}"
+codex_capability_model="${AI_CAPABILITY_CODEX_MODEL:-gpt-5.4}"
+codex_capability_sandbox="${AI_CAPABILITY_CODEX_SANDBOX:-workspace-write}"
+codex_capability_approval_policy="${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-never}"
+codex_capability_cwd_mode="${AI_CAPABILITY_CODEX_CWD_MODE:-project-root}"
 prompt_file="$(mktemp /tmp/freely-signal-intent-prompt.XXXXXX)"
 trap 'rm -f "$prompt_file"' EXIT
 
@@ -69,6 +78,9 @@ signal:
 $message
 EOF
 
-codex exec --skip-git-repo-check -C "$project" -m "$model" -c "model_reasoning_effort=\"$reasoning_effort\"" --dangerously-bypass-approvals-and-sandbox - <"$prompt_file" \
+(
+  cd "$project"
+  tool_run_from_prompt_file "$project" "$tool" "$model" "$reasoning_effort" "auto" "$prompt_file" "fresh" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode"
+) \
   | awk '/^(INTENT_KIND|NEEDS_LIVE_INSPECTION|NEEDS_EXECUTION|SCOPE|COMPLEXITY|CURRENT_CONTEXT)=/' \
   | head -n 6

@@ -1,10 +1,10 @@
 # 预研头脑风暴索引
-<<<<<<< HEAD
 - 20260320-1745--dirty-worktree-governance-redesign
+- 20260320-1628--claude-code-codex-mcp-tool-routing
+- 20260321-0148--cc-codex-session-evidence-resolution
+- 20260320-2145--cc-tool-profiles-and-concurrent-session-continuity
 - 20260320-1410--worktree-maintenance-skill-taxonomy
-=======
 - 20260320-0908--research-candidate-persistence-governance
->>>>>>> feature/research-candidate-persistence-governance-20260320
 - 20260320-0252--interruption-topology-and-manager-routing
 - 20260320-0152--chat-entrypoint-autobootstrap
 - 20260320-0138--interruption-entrypoint-runtime-preflight
@@ -22,6 +22,15 @@
 - 20260320-1745--dirty-worktree-governance-redesign
   - brainstorms: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/candidates.md
+- 20260320-1628--claude-code-codex-mcp-tool-routing
+  - brainstorms: docs/pre-brainstorms/20260320-1628--claude-code-codex-mcp-tool-routing/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-1628--claude-code-codex-mcp-tool-routing/candidates.md
+- 20260321-0148--cc-codex-session-evidence-resolution
+  - brainstorms: docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md
+- 20260320-2145--cc-tool-profiles-and-concurrent-session-continuity
+  - brainstorms: docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md
 - 20260320-1410--worktree-maintenance-skill-taxonomy
   - brainstorms: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/candidates.md

@@ -112,7 +112,7 @@ parse_ai_spec_or_fail() {
   }
 
   case "$tool" in
-    codex|kiro-cli|iflow|test-sleep|test-compact|test-once|test-session|test-route-only) ;;
+    codex|kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only) ;;
     *)
       echo "[ERROR] unsupported tool: $tool" >&2
       exit 1
@@ -197,6 +197,12 @@ cat <<EOF
 - AI_MODEL=${ai_model:-}
 - AI_MODE=$ai_mode
 - AI_REASONING_EFFORT=${reasoning_effort:-}
+- AI_TOOL_CAPABILITIES=${AI_TOOL_CAPABILITIES:-}
+- AI_TOOL_POLICY=${AI_TOOL_POLICY:-}
+- AI_CAPABILITY_CODEX_MODEL=${AI_CAPABILITY_CODEX_MODEL:-}
+- AI_CAPABILITY_CODEX_SANDBOX=${AI_CAPABILITY_CODEX_SANDBOX:-}
+- AI_CAPABILITY_CODEX_APPROVAL_POLICY=${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}
+- AI_CAPABILITY_CODEX_CWD_MODE=${AI_CAPABILITY_CODEX_CWD_MODE:-}
 
 工作区治理提醒（非强制阻断，但必须纳入判断）：
 - current_worktree_state: ${current_clean_state}

@@ -149,6 +149,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/candidates.md`
 - next_action: 已在 `develop` 完成 `baseline-status` 命名迁移与 `status` family 聚合入口，并通过 checkpoint / pid ownership / routing 回归；后续若要扩 JSON family 输出或 watch 模式，再回到同一 issue 继续推进
 
+11. `I-20260321-0217`
+- title: Claude Code tool profiles and Codex MCP session evidence governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md`, `docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md`
+- next_action: `cc` / `cc-use-codex-cli` runtime、skill、双层会话证据与 live smoke 已落盘；当前 merge-prep 已证明从 `feature/research-codex-in-cc-mcp` 合入最新 `develop` 仅需处理治理索引冲突。完成 review 与 cleanup 后，可继续进入正式 develop 合并与后续退休工作
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

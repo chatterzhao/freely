@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-cc-codex-evidence-status.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-2145--sample" "$PROJECT/.freely/run"
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-2145--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260320-2145--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260320-2145--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="cc-use-codex-cli"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+AI_TOOL_CAPABILITIES="codex-cli"
+AI_TOOL_POLICY="prefer-codex-for-repo-work"
+AI_CAPABILITY_CODEX_MODEL="gpt-5.4"
+AI_CAPABILITY_CODEX_SANDBOX="workspace-write"
+AI_CAPABILITY_CODEX_APPROVAL_POLICY="never"
+AI_CAPABILITY_CODEX_CWD_MODE="project-root"
+EOF
+
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+LAST_TOOL_SESSION_ID=""
+LAST_TOOL_JSONL_PATH=""
+LAST_LAUNCH_KIND="resume"
+LAST_ROTATION_REASON=""
+LAST_CYCLE_LOG="/tmp/fake-cycle.log"
+LAST_CONTEXT_COMPACTED="0"
+LAST_CONTEXT_RATIO=""
+LAST_PRIMARY_RATE_LIMIT_USED_PERCENT=""
+LAST_PRIMARY_RATE_LIMIT_RESETS_AT=""
+LAST_SECONDARY_RATE_LIMIT_USED_PERCENT=""
+LAST_SECONDARY_RATE_LIMIT_RESETS_AT=""
+LAST_ROUTE_ONLY_HANDOFF="0"
+LAST_ACTIVE_ACCOUNT=""
+LAST_ACCOUNT_SWITCH_REASON=""
+LAST_ACCOUNT_SWITCH_AT=""
+LAST_CYCLE_DEBUG_LOG="/tmp/fake-cycle.debug.log"
+LAST_CLAUDE_JSONL_PATH="/tmp/fake-claude.jsonl"
+LAST_CODEX_MCP_USED="1"
+LAST_CODEX_MCP_THREAD_ID="unavailable://claude-code-does-not-expose-codex-thread-id"
+LAST_CODEX_MCP_JSONL_PATH="unavailable://claude-code-does-not-expose-codex-jsonl"
+CLAUDE_SESSION_ID_CURRENT="11111111-2222-3333-4444-555555555555"
+CLAUDE_SESSION_ID_PREVIOUS="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+LAST_PROJECT_DIRTY_ENTRIES="0"
+LAST_WORKTREE_SUMMARY_TOTAL="1"
+LAST_WORKTREE_SUMMARY_DIRTY="0"
+CHECKPOINT_DRIFT_STREAK_CURRENT="0"
+ROUTE_ONLY_STREAK_CURRENT="0"
+RESUME_STREAK_CURRENT="1"
+EOF
+
+STATUS_OUTPUT="$(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")"
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^last_claude_jsonl_path: /tmp/fake-claude.jsonl$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^last_codex_mcp_used: 1$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^last_codex_mcp_thread_id: unavailable://claude-code-does-not-expose-codex-thread-id$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^last_codex_mcp_jsonl_path: unavailable://claude-code-does-not-expose-codex-jsonl$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^claude_session_id_current: 11111111-2222-3333-4444-555555555555$'
+
+echo "[PASS] freely status exposes two-layer cc/codex evidence without hiding unavailable codex internals"

@@ -17,10 +17,17 @@ WATCHDOG_AVAILABILITY_LIB="$WATCHDOG_CONTROL_PLANE_SKILL_ROOT/scripts/availabili
 }
 source "$WATCHDOG_AVAILABILITY_LIB"
 
+SESSION_EVIDENCE_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh"
+[[ -f "$SESSION_EVIDENCE_RESOLVER_LIB" ]] || {
+  echo "[ERROR] missing session evidence resolver module: $SESSION_EVIDENCE_RESOLVER_LIB" >&2
+  exit 1
+}
+source "$SESSION_EVIDENCE_RESOLVER_LIB"
+
 usage() {
   cat <<'EOF'
 Usage:
-  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> --ai <tool[:model][:mode]> [--reasoning-effort <effort>]
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--reasoning-effort <effort>]
   freely doctor [--project <abs_path>]
   freely chat [--project <abs_path>] <message>
   freely tui [--project <abs_path>] [--once]
@@ -110,9 +117,9 @@ parse_ai_spec() {
   }
 
   case "$tool" in
-    codex|kiro-cli|iflow) ;;
+    codex|kiro-cli|iflow|cc|cc-use-codex-cli) ;;
     *)
-      log_error "unsupported tool: $tool (supported: codex, kiro-cli, iflow)"
+      log_error "unsupported tool: $tool (supported: codex, kiro-cli, iflow, cc, cc-use-codex-cli)"
       exit 1
       ;;
   esac
@@ -127,6 +134,10 @@ state_dir() {
 
 global_state_dir() {
   echo "${FREELY_HOME:-$HOME/.freely}"
+}
+
+global_config_file() {
+  echo "$(global_state_dir)/config.env"
 }
 
 projects_registry_file() {
@@ -194,6 +205,61 @@ read_single_registered_project() {
   awk -F '\t' 'NR==1 { print $1; exit }' "$registry"
 }
 
+compose_ai_spec() {
+  local tool="$1" model="$2" mode="$3"
+  [[ -n "$tool" ]] || return 1
+  if [[ -n "$model" ]]; then
+    printf '%s:%s:%s\n' "$tool" "$model" "${mode:-auto}"
+  else
+    printf '%s:%s\n' "$tool" "${mode:-auto}"
+  fi
+}
+
+resolve_ai_spec_for_project_or_global() {
+  local project="$1" explicit_ai_spec="${2:-}"
+  local cfg tool model mode
+
+  if [[ -n "$explicit_ai_spec" ]]; then
+    printf '%s\n' "$explicit_ai_spec"
+    return 0
+  fi
+
+  cfg="$(config_file "$project")"
+  if [[ -f "$cfg" ]]; then
+    unset AI_TOOL AI_MODEL AI_MODE
+    # shellcheck disable=SC1090
+    source "$cfg"
+    tool="${AI_TOOL:-}"
+    model="${AI_MODEL:-}"
+    mode="${AI_MODE:-auto}"
+    if [[ -n "$tool" ]]; then
+      compose_ai_spec "$tool" "$model" "$mode"
+      return 0
+    fi
+  fi
+
+  cfg="$(global_config_file)"
+  if [[ -f "$cfg" ]]; then
+    unset AI_TOOL AI_MODEL AI_MODE
+    # shellcheck disable=SC1090
+    source "$cfg"
+    tool="${AI_TOOL:-}"
+    model="${AI_MODEL:-}"
+    mode="${AI_MODE:-auto}"
+    if [[ -n "$tool" ]]; then
+      compose_ai_spec "$tool" "$model" "$mode"
+      return 0
+    fi
+  fi
+
+  if [[ -n "${FREELY_DEFAULT_AI:-}" ]]; then
+    printf '%s\n' "$FREELY_DEFAULT_AI"
+    return 0
+  fi
+
+  return 1
+}
+
 resolve_project_or_fail() {
   local project="${1:-}" allow_uninitialized="${2:-0}"
   local candidate git_root registered
@@ -209,18 +275,18 @@ resolve_project_or_fail() {
       candidate="$PWD"
     fi
 
-    if [[ -z "$candidate" ]]; then
-      registered="$(read_single_registered_project)"
-      if [[ -n "$registered" && -f "$(config_file "$registered")" ]]; then
-        candidate="$registered"
-      fi
-    fi
-
     if [[ -z "$candidate" && "$allow_uninitialized" == "1" ]]; then
       if [[ -n "$git_root" ]] && looks_like_project_root "$git_root"; then
         candidate="$git_root"
       elif looks_like_project_root "$PWD"; then
         candidate="$PWD"
+      fi
+    fi
+
+    if [[ -z "$candidate" ]]; then
+      registered="$(read_single_registered_project)"
+      if [[ -n "$registered" && -f "$(config_file "$registered")" ]]; then
+        candidate="$registered"
       fi
     fi
   fi
@@ -444,7 +510,62 @@ interruption_dispatcher_pid_for_project() {
 
 valid_ai_pid_for_project() {
   local project="$1" pid="$2"
-  pid_matches_project "$pid" "$project" "codex exec"
+  local cfg tool expected
+  cfg="$(config_file "$project")"
+  tool="codex"
+  if [[ -f "$cfg" ]]; then
+    # shellcheck disable=SC1090
+    source "$cfg"
+    tool="${AI_TOOL:-codex}"
+  fi
+  case "$tool" in
+    codex) expected="codex exec" ;;
+    iflow) expected="iflow" ;;
+    kiro-cli) expected="kiro-cli chat" ;;
+    cc|cc-use-codex-cli) expected="claude" ;;
+    *) expected="" ;;
+  esac
+  pid_matches_project "$pid" "$project" "$expected"
+}
+
+generate_uuid_for_runtime() {
+  if command -v uuidgen >/dev/null 2>&1; then
+    uuidgen | tr '[:upper:]' '[:lower:]'
+  else
+    python3 - <<'PY'
+import uuid
+print(str(uuid.uuid4()))
+PY
+  fi
+}
+
+tool_uses_claude_session_id() {
+  local tool="$1"
+  case "$tool" in
+    cc|cc-use-codex-cli) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+is_valid_uuid() {
+  local value="$1"
+  [[ "$value" =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$ ]]
+}
+
+ensure_runtime_tool_session_anchor() {
+  local tool="$1" launch_kind="$2"
+  if tool_uses_claude_session_id "$tool"; then
+    if ! is_valid_uuid "${CLAUDE_SESSION_ID_CURRENT:-}"; then
+      CLAUDE_SESSION_ID_CURRENT=""
+    fi
+    if ! is_valid_uuid "${CLAUDE_SESSION_ID_PREVIOUS:-}"; then
+      CLAUDE_SESSION_ID_PREVIOUS=""
+    fi
+    if [[ "$launch_kind" == "fresh_with_handoff" || -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+      CLAUDE_SESSION_ID_PREVIOUS="${CLAUDE_SESSION_ID_CURRENT:-}"
+      CLAUDE_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
+    fi
+  fi
 }
 
 interruption_handler_bin_for_project() {
@@ -468,7 +589,7 @@ load_config() {
 }
 
 write_config() {
-  local project="$1" intent="$2" constitution="$3" tool="$4" model="$5" mode="$6" reasoning_effort="$7"
+  local project="$1" intent="$2" constitution="$3" tool="$4" model="$5" mode="$6" reasoning_effort="$7" tool_capabilities="$8" tool_policy="$9" codex_capability_model="${10}" codex_capability_sandbox="${11}" codex_capability_approval_policy="${12}" codex_capability_cwd_mode="${13}"
   local sdir cfg
   sdir="$(state_dir "$project")"
   cfg="$(config_file "$project")"
@@ -482,6 +603,12 @@ AI_TOOL="$tool"
 AI_MODEL="$model"
 AI_MODE="$mode"
 AI_REASONING_EFFORT="$reasoning_effort"
+AI_TOOL_CAPABILITIES="$tool_capabilities"
+AI_TOOL_POLICY="$tool_policy"
+AI_CAPABILITY_CODEX_MODEL="$codex_capability_model"
+AI_CAPABILITY_CODEX_SANDBOX="$codex_capability_sandbox"
+AI_CAPABILITY_CODEX_APPROVAL_POLICY="$codex_capability_approval_policy"
+AI_CAPABILITY_CODEX_CWD_MODE="$codex_capability_cwd_mode"
 CHECK_INTERVAL=10
 RESTART_DELAY=2
 MAX_RESTARTS=0
@@ -1042,6 +1169,12 @@ log_has_context_compacted() {
   rg -q "context compacted" "$log_file"
 }
 
+cc_debug_log_has_codex_tool_call() {
+  local debug_log="$1"
+  [[ -f "$debug_log" ]] || return 1
+  rg -q 'Calling MCP tool: codex|Tool '\''codex'\'' completed successfully|mcp__codex-cli__codex' "$debug_log"
+}
+
 log_has_auth_failure() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
@@ -1051,8 +1184,23 @@ log_has_auth_failure() {
 tool_prefers_resume_evidence() {
   local tool="$1"
   case "$tool" in
-    codex) return 0 ;;
+    codex|cc|cc-use-codex-cli) return 0 ;;
     *) return 1 ;;
+  esac
+}
+
+tool_has_resume_evidence() {
+  local tool="$1"
+  case "$tool" in
+    codex)
+      [[ -n "${LAST_TOOL_SESSION_ID:-}" ]]
+      ;;
+    cc|cc-use-codex-cli)
+      [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]
+      ;;
+    *)
+      return 0
+      ;;
   esac
 }
 
@@ -1093,6 +1241,13 @@ load_session_state_or_defaults() {
   LAST_ACTIVE_ACCOUNT=""
   LAST_ACCOUNT_SWITCH_REASON=""
   LAST_ACCOUNT_SWITCH_AT=""
+  LAST_CYCLE_DEBUG_LOG=""
+  LAST_CLAUDE_JSONL_PATH=""
+  LAST_CODEX_MCP_USED="0"
+  LAST_CODEX_MCP_THREAD_ID=""
+  LAST_CODEX_MCP_JSONL_PATH=""
+  CLAUDE_SESSION_ID_CURRENT=""
+  CLAUDE_SESSION_ID_PREVIOUS=""
   LAST_PROJECT_DIRTY_ENTRIES="0"
   LAST_WORKTREE_SUMMARY_TOTAL="0"
   LAST_WORKTREE_SUMMARY_DIRTY="0"
@@ -1137,7 +1292,7 @@ EOF
 }
 
 write_session_state() {
-  local project="$1" tool_session_id="$2" tool_jsonl_path="$3" launch_kind="$4" rotation_reason="$5" cycle_log="$6" context_compacted="$7" context_ratio="$8" primary_used_percent="$9" primary_resets_at="${10}" secondary_used_percent="${11}" secondary_resets_at="${12}" route_only_handoff="${13}" route_only_streak="${14}" resume_streak="${15}" active_account="${16}" account_switch_reason="${17}" account_switch_at="${18}" project_dirty_entries="${19}" worktree_summary_total="${20}" worktree_summary_dirty="${21}" checkpoint_drift_streak="${22}"
+  local project="$1" tool_session_id="$2" tool_jsonl_path="$3" launch_kind="$4" rotation_reason="$5" cycle_log="$6" context_compacted="$7" context_ratio="$8" primary_used_percent="$9" primary_resets_at="${10}" secondary_used_percent="${11}" secondary_resets_at="${12}" route_only_handoff="${13}" route_only_streak="${14}" resume_streak="${15}" active_account="${16}" account_switch_reason="${17}" account_switch_at="${18}" cycle_debug_log="${19}" claude_jsonl_path="${20}" codex_mcp_used="${21}" codex_mcp_thread_id="${22}" codex_mcp_jsonl_path="${23}" claude_session_id_current="${24}" claude_session_id_previous="${25}" project_dirty_entries="${26}" worktree_summary_total="${27}" worktree_summary_dirty="${28}" checkpoint_drift_streak="${29}"
   local state_file
   state_file="$(session_state_file "$project")"
   cat >"$state_file" <<EOF
@@ -1156,6 +1311,13 @@ LAST_ROUTE_ONLY_HANDOFF="$route_only_handoff"
 LAST_ACTIVE_ACCOUNT="$active_account"
 LAST_ACCOUNT_SWITCH_REASON="$account_switch_reason"
 LAST_ACCOUNT_SWITCH_AT="$account_switch_at"
+LAST_CYCLE_DEBUG_LOG="$cycle_debug_log"
+LAST_CLAUDE_JSONL_PATH="$claude_jsonl_path"
+LAST_CODEX_MCP_USED="$codex_mcp_used"
+LAST_CODEX_MCP_THREAD_ID="$codex_mcp_thread_id"
+LAST_CODEX_MCP_JSONL_PATH="$codex_mcp_jsonl_path"
+CLAUDE_SESSION_ID_CURRENT="$claude_session_id_current"
+CLAUDE_SESSION_ID_PREVIOUS="$claude_session_id_previous"
 LAST_PROJECT_DIRTY_ENTRIES="$project_dirty_entries"
 LAST_WORKTREE_SUMMARY_TOTAL="$worktree_summary_total"
 LAST_WORKTREE_SUMMARY_DIRTY="$worktree_summary_dirty"
@@ -1179,6 +1341,12 @@ write_session_handoff() {
 - previous_launch_kind: ${LAST_LAUNCH_KIND:-unknown}
 - previous_tool_session_id: ${LAST_TOOL_SESSION_ID:-unavailable}
 - previous_tool_jsonl_path: ${LAST_TOOL_JSONL_PATH:-unavailable}
+- previous_claude_session_id: ${CLAUDE_SESSION_ID_CURRENT:-unavailable}
+- previous_claude_jsonl_path: ${LAST_CLAUDE_JSONL_PATH:-unavailable}
+- previous_cc_debug_log: ${LAST_CYCLE_DEBUG_LOG:-unavailable}
+- previous_codex_mcp_used: ${LAST_CODEX_MCP_USED:-0}
+- previous_codex_mcp_thread_id: ${LAST_CODEX_MCP_THREAD_ID:-unavailable}
+- previous_codex_mcp_jsonl_path: ${LAST_CODEX_MCP_JSONL_PATH:-unavailable}
 - previous_cycle_log: ${LAST_CYCLE_LOG:-unavailable}
 - previous_context_compacted: ${LAST_CONTEXT_COMPACTED:-0}
 - previous_context_ratio: ${LAST_CONTEXT_RATIO:-unavailable}
@@ -1641,7 +1809,7 @@ select_launch_kind() {
     return 0
   fi
 
-  if tool_prefers_resume_evidence "$AI_TOOL" && [[ -z "${LAST_TOOL_SESSION_ID:-}" ]]; then
+  if tool_prefers_resume_evidence "$AI_TOOL" && ! tool_has_resume_evidence "$AI_TOOL"; then
     LAUNCH_KIND_SELECTED="fresh_with_handoff"
     LAUNCH_ROTATION_REASON="missing_resume_evidence"
     return 0
@@ -2231,6 +2399,12 @@ cmd_ensure_manager_watch() {
 build_prompt() {
   local workspace_root
   workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
+  AI_TOOL_CAPABILITIES="${AI_TOOL_CAPABILITIES:-}" \
+  AI_TOOL_POLICY="${AI_TOOL_POLICY:-}" \
+  AI_CAPABILITY_CODEX_MODEL="${AI_CAPABILITY_CODEX_MODEL:-}" \
+  AI_CAPABILITY_CODEX_SANDBOX="${AI_CAPABILITY_CODEX_SANDBOX:-}" \
+  AI_CAPABILITY_CODEX_APPROVAL_POLICY="${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}" \
+  AI_CAPABILITY_CODEX_CWD_MODE="${AI_CAPABILITY_CODEX_CWD_MODE:-}" \
   bash "$workspace_root/scripts/start-lead-agent.sh" \
     --project "$PROJECT_ROOT" \
     --intent "$INTENT_FILE" \
@@ -2262,7 +2436,7 @@ cmd_init() {
     esac
   done
 
-  [[ -n "$intent" && -n "$constitution" && -n "$ai_spec" ]] || {
+  [[ -n "$intent" && -n "$constitution" ]] || {
     usage
     exit 1
   }
@@ -2270,20 +2444,82 @@ cmd_init() {
   [[ -d "$project" ]] || { log_error "project not found: $project"; exit 1; }
   [[ -f "$intent" ]] || { log_error "intent file not found: $intent"; exit 1; }
   [[ -f "$constitution" ]] || { log_error "constitution file not found: $constitution"; exit 1; }
+  ai_spec="$(resolve_ai_spec_for_project_or_global "$project" "$ai_spec")" || {
+    log_error "missing --ai and no project/global default AI configured"
+    log_error "set --ai explicitly, or define AI_TOOL/AI_MODEL/AI_MODE in $(global_config_file)"
+    exit 1
+  }
 
-  local parsed tool model mode
+  local parsed tool model mode tool_capabilities tool_policy
+  local codex_capability_model codex_capability_sandbox codex_capability_approval_policy codex_capability_cwd_mode
   parsed="$(parse_ai_spec "$ai_spec")"
   IFS='|' read -r tool model mode <<<"$parsed"
+  tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
+  tool_policy="$(tool_default_policy_for_runtime "$tool")"
+  codex_capability_model="$(codex_capability_default_model_for_runtime "$tool")"
+  codex_capability_sandbox="$(codex_capability_default_sandbox_for_runtime "$tool")"
+  codex_capability_approval_policy="$(codex_capability_default_approval_policy_for_runtime "$tool")"
+  codex_capability_cwd_mode="$(codex_capability_default_cwd_mode_for_runtime "$tool")"
   if [[ "$tool" == "codex" ]]; then
     [[ -n "$model" ]] || model="gpt-5.4"
     [[ -n "$reasoning_effort" ]] || reasoning_effort="medium"
+  elif [[ "$tool" == "cc" || "$tool" == "cc-use-codex-cli" ]]; then
+    [[ -n "$reasoning_effort" ]] || reasoning_effort="medium"
   fi
 
-  write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort"
+  write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode"
   register_project_in_registry "$project"
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "initialized"
   log_info "initialized: $(config_file "$project")"
+}
+
+tool_default_capabilities_for_runtime() {
+  local tool="$1"
+  case "$tool" in
+    cc-use-codex-cli) printf 'codex-cli\n' ;;
+    *) printf '\n' ;;
+  esac
+}
+
+tool_default_policy_for_runtime() {
+  local tool="$1"
+  case "$tool" in
+    cc-use-codex-cli) printf 'prefer-codex-for-repo-work\n' ;;
+    *) printf '\n' ;;
+  esac
+}
+
+codex_capability_default_model_for_runtime() {
+  local tool="$1"
+  case "$tool" in
+    cc-use-codex-cli) printf 'gpt-5.4\n' ;;
+    *) printf '\n' ;;
+  esac
+}
+
+codex_capability_default_sandbox_for_runtime() {
+  local tool="$1"
+  case "$tool" in
+    cc-use-codex-cli) printf 'workspace-write\n' ;;
+    *) printf '\n' ;;
+  esac
+}
+
+codex_capability_default_approval_policy_for_runtime() {
+  local tool="$1"
+  case "$tool" in
+    cc-use-codex-cli) printf 'never\n' ;;
+    *) printf '\n' ;;
+  esac
+}
+
+codex_capability_default_cwd_mode_for_runtime() {
+  local tool="$1"
+  case "$tool" in
+    cc-use-codex-cli) printf 'project-root\n' ;;
+    *) printf '\n' ;;
+  esac
 }
 
 cmd_start() {
@@ -2351,10 +2587,11 @@ cmd_start() {
   local LAUNCH_KIND_SELECTED="" LAUNCH_ROTATION_REASON=""
   load_session_state_or_defaults "$project"
   while true; do
-    local ts prompt_file cycle_log mode_name watchdog_script workspace_root
+    local ts prompt_file cycle_log cycle_debug_log mode_name watchdog_script workspace_root
     ts="$(date '+%Y%m%d-%H%M%S')"
     prompt_file="$run_dir/prompt-$ts.txt"
     cycle_log="$logs_dir/cycle-$ts.log"
+    cycle_debug_log="$logs_dir/cycle-$ts.debug.log"
     workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
     local recovered_workers
     watchdog_script="$workspace_root/scripts/runtime/manager-watchdog.sh"
@@ -2369,6 +2606,7 @@ cmd_start() {
     fi
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
+    ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name"
 
     if [[ "$mode_name" == "fresh_with_handoff" ]]; then
       write_session_handoff "$PROJECT_ROOT" "$LAUNCH_ROTATION_REASON"
@@ -2390,6 +2628,14 @@ cmd_start() {
         --tool "$AI_TOOL" \
         --model "${AI_MODEL:-}" \
         --reasoning-effort "${AI_REASONING_EFFORT:-}" \
+        --tool-capabilities "${AI_TOOL_CAPABILITIES:-}" \
+        --tool-policy "${AI_TOOL_POLICY:-}" \
+        --codex-capability-model "${AI_CAPABILITY_CODEX_MODEL:-}" \
+        --codex-capability-sandbox "${AI_CAPABILITY_CODEX_SANDBOX:-}" \
+        --codex-capability-approval-policy "${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}" \
+        --codex-capability-cwd-mode "${AI_CAPABILITY_CODEX_CWD_MODE:-}" \
+        --debug-log-file "$cycle_debug_log" \
+        --claude-session-id "${CLAUDE_SESSION_ID_CURRENT:-}" \
         --mode "$AI_MODE" \
         --prompt-file "$prompt_file" \
         --pid-file "$child_pid_file" \
@@ -2399,6 +2645,8 @@ cmd_start() {
     local rc=$?
     set -e
     local child_pid tool_session_id tool_jsonl_path context_compacted context_ratio route_only_handoff checkpoint_json checkpoint_required
+    local codex_mcp_used codex_mcp_thread_id codex_mcp_jsonl_path
+    local claude_jsonl_path
     local primary_rate_limit_used_percent primary_rate_limit_resets_at secondary_rate_limit_used_percent secondary_rate_limit_resets_at next_restart_delay
     local active_account account_switch_reason
     local rate_limit_reason rate_limit_reset_at
@@ -2439,8 +2687,32 @@ cmd_start() {
       context_compacted="1"
     fi
     route_only_handoff="0"
+    claude_jsonl_path=""
+    codex_mcp_used="0"
+    codex_mcp_thread_id=""
+    codex_mcp_jsonl_path=""
     if log_has_same_tool_route_only_handoff "$cycle_log" "$AI_TOOL"; then
       route_only_handoff="1"
+    fi
+    if tool_uses_claude_session_id "$AI_TOOL" && [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+      local resolved_cc_evidence
+      resolved_cc_evidence="$(resolve_cc_session_evidence "$PROJECT_ROOT" "${CLAUDE_SESSION_ID_CURRENT:-}")"
+      if [[ -n "$resolved_cc_evidence" ]]; then
+        unset CLAUDE_JSONL_PATH CODEX_MCP_USED CODEX_MCP_THREAD_ID CODEX_MCP_JSONL_PATH
+        # shellcheck disable=SC1090
+        source /dev/stdin <<<"$resolved_cc_evidence"
+        claude_jsonl_path="${CLAUDE_JSONL_PATH:-}"
+        if [[ "$AI_TOOL" == "cc-use-codex-cli" ]]; then
+          codex_mcp_used="${CODEX_MCP_USED:-0}"
+          codex_mcp_thread_id="${CODEX_MCP_THREAD_ID:-}"
+          codex_mcp_jsonl_path="${CODEX_MCP_JSONL_PATH:-}"
+        fi
+      fi
+    fi
+    if [[ "$AI_TOOL" == "cc-use-codex-cli" && "$codex_mcp_used" != "1" ]] && cc_debug_log_has_codex_tool_call "$cycle_debug_log"; then
+      codex_mcp_used="1"
+      [[ -n "$codex_mcp_thread_id" ]] || codex_mcp_thread_id="unavailable://claude-jsonl-did-not-yet-expose-codex-thread-id"
+      [[ -n "$codex_mcp_jsonl_path" ]] || codex_mcp_jsonl_path="unavailable://codex-thread-id-not-yet-resolved"
     fi
     LAST_TOOL_SESSION_ID="$tool_session_id"
     LAST_TOOL_JSONL_PATH="$tool_jsonl_path"
@@ -2457,6 +2729,11 @@ cmd_start() {
     LAST_ACTIVE_ACCOUNT="$active_account"
     LAST_ACCOUNT_SWITCH_REASON=""
     LAST_ACCOUNT_SWITCH_AT=""
+    LAST_CYCLE_DEBUG_LOG="$cycle_debug_log"
+    LAST_CLAUDE_JSONL_PATH="$claude_jsonl_path"
+    LAST_CODEX_MCP_USED="$codex_mcp_used"
+    LAST_CODEX_MCP_THREAD_ID="$codex_mcp_thread_id"
+    LAST_CODEX_MCP_JSONL_PATH="$codex_mcp_jsonl_path"
     LAST_PROJECT_DIRTY_ENTRIES="$dirty_entries"
     LAST_WORKTREE_SUMMARY_TOTAL="$worktree_total"
     LAST_WORKTREE_SUMMARY_DIRTY="$worktree_dirty"
@@ -2501,7 +2778,7 @@ cmd_start() {
       fi
     fi
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT"
     LAST_WORKCELL_EXIT_REASON="${account_switch_reason:-${rate_limit_reason:-ai_exit_rc_${rc}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
 
@@ -2824,6 +3101,12 @@ cmd_baseline_status() {
   echo "constitution: $CONSTITUTION_FILE"
   echo "ai: ${AI_TOOL}:${AI_MODEL:-default}:${AI_MODE}"
   echo "reasoning_effort: ${AI_REASONING_EFFORT:-default}"
+  echo "tool_capabilities: ${AI_TOOL_CAPABILITIES:-none}"
+  echo "tool_policy: ${AI_TOOL_POLICY:-none}"
+  echo "codex_capability_model: ${AI_CAPABILITY_CODEX_MODEL:-none}"
+  echo "codex_capability_sandbox: ${AI_CAPABILITY_CODEX_SANDBOX:-none}"
+  echo "codex_capability_approval_policy: ${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-none}"
+  echo "codex_capability_cwd_mode: ${AI_CAPABILITY_CODEX_CWD_MODE:-none}"
   echo "resume_streak: ${RESUME_STREAK_CURRENT:-0}"
   echo "last_tool_session_id: ${LAST_TOOL_SESSION_ID:-unavailable}"
   echo "last_tool_jsonl_path: ${LAST_TOOL_JSONL_PATH:-unavailable}"
@@ -2839,6 +3122,13 @@ cmd_baseline_status() {
   echo "last_active_account: ${LAST_ACTIVE_ACCOUNT:-unavailable}"
   echo "last_account_switch_reason: ${LAST_ACCOUNT_SWITCH_REASON:-unavailable}"
   echo "last_account_switch_at: ${LAST_ACCOUNT_SWITCH_AT:-unavailable}"
+  echo "last_cycle_debug_log: ${LAST_CYCLE_DEBUG_LOG:-unavailable}"
+  echo "last_claude_jsonl_path: ${LAST_CLAUDE_JSONL_PATH:-unavailable}"
+  echo "last_codex_mcp_used: ${LAST_CODEX_MCP_USED:-0}"
+  echo "last_codex_mcp_thread_id: ${LAST_CODEX_MCP_THREAD_ID:-unavailable}"
+  echo "last_codex_mcp_jsonl_path: ${LAST_CODEX_MCP_JSONL_PATH:-unavailable}"
+  echo "claude_session_id_current: ${CLAUDE_SESSION_ID_CURRENT:-unavailable}"
+  echo "claude_session_id_previous: ${CLAUDE_SESSION_ID_PREVIOUS:-unavailable}"
   echo "last_project_dirty_entries: ${LAST_PROJECT_DIRTY_ENTRIES:-0}"
   echo "last_worktree_summary_total: ${LAST_WORKTREE_SUMMARY_TOTAL:-0}"
   echo "last_worktree_summary_dirty: ${LAST_WORKTREE_SUMMARY_DIRTY:-0}"
