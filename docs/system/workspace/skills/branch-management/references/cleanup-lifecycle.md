@@ -2,7 +2,11 @@
 
 ## Preconditions
 
-- 清理前执行 `./bin/wt-status-all`，结果必须全 `CLEAN`
+- 清理前确认 target worktree 自身安全：
+  - merged
+  - inactive
+  - target clean
+- 若存在 unrelated dirty 或 busy worktree，不作为全局阻断；必须在 cleanup evidence 中显式记录为 retained / skipped
 - 合并后不要立即删除分支/worktree
 
 ## State progression

@@ -1948,23 +1948,14 @@ EOF
 
 run_cleanup_followthrough() {
   local project="$1" intake_id="$2" classification="$3" reaction="$4" why_text="$5" handoff_text="$6"
-  local fleet_status resolution_file blocked_reason cleaned retained wt_path branch dirty supervisor ai
-  fleet_status="$(cd "$project" && bash "$SELF_ROOT/bin/wt-status-all" 2>/dev/null || true)"
+  local resolution_file blocked_reason cleaned retained wt_path branch dirty supervisor ai
   blocked_reason=""
   cleaned=""
   retained=""
 
-  if ! (cd "$project" && bash "$SELF_ROOT/bin/wt-status-all" >/dev/null 2>&1); then
-    blocked_reason="fleet_not_clean"
-  fi
-
   while IFS=$'\t' read -r wt_path branch; do
     [[ -n "$wt_path" && -n "$branch" ]] || continue
     if [[ "$wt_path" == "$project" ]]; then
-      continue
-    fi
-    if [[ -n "$blocked_reason" ]]; then
-      retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (blocked:${blocked_reason})"
       continue
     fi
     dirty="$(git -C "$wt_path" status --porcelain 2>/dev/null || true)"
