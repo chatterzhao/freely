@@ -1,7 +1,12 @@
 # 预研头脑风暴索引
 - 20260321-1530--agent-ready-prd-for-freely-flow
+- 20260321-1045--stacked-worktree-merge-chain-governance
 - 20260321-0345--manager-reactivation-and-fleet-patrol
+- 20260321-0257--worktree-fleet-governance-closure
 - 20260320-1745--dirty-worktree-governance-redesign
+- 20260320-1628--claude-code-codex-mcp-tool-routing
+- 20260321-0148--cc-codex-session-evidence-resolution
+- 20260320-2145--cc-tool-profiles-and-concurrent-session-continuity
 - 20260320-1410--worktree-maintenance-skill-taxonomy
 - 20260320-0908--research-candidate-persistence-governance
 - 20260320-0252--interruption-topology-and-manager-routing
@@ -21,12 +26,27 @@
 - 20260321-1530--agent-ready-prd-for-freely-flow
   - brainstorms: docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/candidates.md
+- 20260321-1045--stacked-worktree-merge-chain-governance
+  - brainstorms: docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/candidates.md
 - 20260321-0345--manager-reactivation-and-fleet-patrol
   - brainstorms: docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/candidates.md
+- 20260321-0257--worktree-fleet-governance-closure
+  - brainstorms: docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md
 - 20260320-1745--dirty-worktree-governance-redesign
   - brainstorms: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/candidates.md
+- 20260320-1628--claude-code-codex-mcp-tool-routing
+  - brainstorms: docs/pre-brainstorms/20260320-1628--claude-code-codex-mcp-tool-routing/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-1628--claude-code-codex-mcp-tool-routing/candidates.md
+- 20260321-0148--cc-codex-session-evidence-resolution
+  - brainstorms: docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md
+- 20260320-2145--cc-tool-profiles-and-concurrent-session-continuity
+  - brainstorms: docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md
 - 20260320-1410--worktree-maintenance-skill-taxonomy
   - brainstorms: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/candidates.md

@@ -2,6 +2,8 @@
 
 用于 historical / companion / obsolete worktree 的收口。
 
+若当前同时涉及多棵 worktree 的保留/合并/清理排序，先做 `fleet_closure` 或 `stacked_merge_chain`，再进入单树 retirement handoff。
+
 ## 目标
 
 区分三种情况：

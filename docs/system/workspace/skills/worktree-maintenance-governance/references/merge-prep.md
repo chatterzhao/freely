@@ -9,6 +9,10 @@
 - `git diff --name-only develop...<branch>`
 - 必要时的 `git merge-tree`
 
+若当前问题不是平面的一组相关工位，而是存在明确父子依赖链，先切到：
+
+- [stacked-merge-chain.md](stacked-merge-chain.md)
+
 ## 输出
 
 1. 安全顺序
@@ -61,6 +65,7 @@
 ## 硬规则
 
 - 先定顺序，再谈冲突修复
+- 若已知存在 child/parent 依赖链，不得把它压平成“平面多棵树”直接谈顺序；必须先跑 stacked merge-chain 判断
 - completed 主线不得被 companion / candidate 视图回拉
 - 当存在“两个分支都碰相近功能”时，默认先保留设计更优、验证更强、边界更清楚的那条；另一条只允许 salvage 差异，不允许把主线拉回旧设计
 - 若只是共享真源叠加语义，先按顺序 merge，不提前进入 `premerge`

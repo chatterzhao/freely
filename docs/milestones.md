@@ -139,7 +139,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/candidates.md`
 - next_action: 当前先完成 IBM 级治理收敛，把 manager patrol 协议写进 `manager-agent`、`multi-worktree-supervision`、`auto-loop-orchestrator` 与首跳提示；后续若需要真正脚本级 patrol tick 或自动派单，再基于同一 issue 继续进入 dev-loop
 
-10. `I-20260320-1945`
+10. `I-20260321-1045`
+- title: Stacked worktree merge-chain governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/candidates.md`
+- next_action: 已将 stacked merge-chain 判定正式并入 `worktree-maintenance-governance` skill，并补了 lead/start prompt 与回归；下一步在真实 worktree 收口时优先按 `child -> parent -> merge-prep-from-develop -> develop` 链路使用该 skill，而不是直接在 develop 工位试合
+
+11. `I-20260320-1945`
 - title: Watchdog live status surface and manager supervision
 - milestone_state: committed
 - phase_state: `completed`
@@ -149,7 +159,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/candidates.md`
 - next_action: 已在 `develop` 完成 `freely live-status`、主管监督接线与脚本回归；后续若要扩 `--format json`、`--watch` 或 stall scoring，再回到同一 issue 继续推进
 
-10. `I-20260320-2105`
+11. `I-20260320-2105`
 - title: Baseline-status command and status family governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -158,6 +168,26 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/candidates.md`
 - next_action: 已在 `develop` 完成 `baseline-status` 命名迁移与 `status` family 聚合入口，并通过 checkpoint / pid ownership / routing 回归；后续若要扩 JSON family 输出或 watch 模式，再回到同一 issue 继续推进
+
+12. `I-20260321-0217`
+- title: Claude Code tool profiles and Codex MCP session evidence governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md`, `docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md`
+- next_action: `cc` / `cc-use-codex-cli` runtime、skill、双层会话证据与 live smoke 已落盘；当前 merge-prep 已证明从 `feature/research-codex-in-cc-mcp` 合入最新 `develop` 仅需处理治理索引冲突。完成 review 与 cleanup 后，可继续进入正式 develop 合并与后续退休工作
+
+13. `I-20260321-0257`
+- title: Worktree fleet governance closure
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md`
+- next_action: 已把 `fleet_closure` 收编到 worktree-maintenance skill，并完成首轮 active worktree inventory。下一步按该 inventory 对可闭环链继续 merge-up / merge-prep / retirement handoff；仍在开发中的 worktree 保持可见 disposition，不做强行清空
 
 ### candidate_issues
 

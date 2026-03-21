@@ -112,7 +112,7 @@ parse_ai_spec_or_fail() {
   }
 
   case "$tool" in
-    codex|kiro-cli|iflow|test-sleep|test-compact|test-once|test-session|test-route-only) ;;
+    codex|kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only) ;;
     *)
       echo "[ERROR] unsupported tool: $tool" >&2
       exit 1
@@ -197,6 +197,12 @@ cat <<EOF
 - AI_MODEL=${ai_model:-}
 - AI_MODE=$ai_mode
 - AI_REASONING_EFFORT=${reasoning_effort:-}
+- AI_TOOL_CAPABILITIES=${AI_TOOL_CAPABILITIES:-}
+- AI_TOOL_POLICY=${AI_TOOL_POLICY:-}
+- AI_CAPABILITY_CODEX_MODEL=${AI_CAPABILITY_CODEX_MODEL:-}
+- AI_CAPABILITY_CODEX_SANDBOX=${AI_CAPABILITY_CODEX_SANDBOX:-}
+- AI_CAPABILITY_CODEX_APPROVAL_POLICY=${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}
+- AI_CAPABILITY_CODEX_CWD_MODE=${AI_CAPABILITY_CODEX_CWD_MODE:-}
 
 工作区治理提醒（非强制阻断，但必须纳入判断）：
 - current_worktree_state: ${current_clean_state}
@@ -241,7 +247,8 @@ cat <<EOF
 10. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`。
 11. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`workspace/skills/doc-ibm-execution/SKILL.md\`。
 12. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`workspace/skills/dev-loop-execution/SKILL.md\`。
-12A. 若当前问题本身是 worktree 维护：例如“哪些 worktree 已完成 / 哪些该 merge / 哪些只应退休或保留 research-only”，优先阅读 \`workspace/skills/worktree-maintenance-governance/SKILL.md\`，先完成 \`audit / merge_prep / retirement_handoff\` 判断，再决定是否进入 doc/dev-loop。
+12A. 若当前问题本身是 worktree 维护：例如“哪些 worktree 已完成 / 哪些该 merge / 哪些只应退休或保留 research-only / 当前所有 worktree 这轮哪些该 cleanup”，优先阅读 \`workspace/skills/worktree-maintenance-governance/SKILL.md\`，先完成 \`audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff\` 判断，再决定是否进入 doc/dev-loop。
+12B. 若当前目标分支不是直接从 \`develop\` 派生，而是依赖未合并父分支，不要直接给出“并入 develop”的结论；先按 \`child -> parent -> merge-prep-from-develop -> develop\` 的 stacked merge-chain 逐层检查。
 13. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
 14. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。
 ${execution_rule_15}
