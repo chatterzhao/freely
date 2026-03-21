@@ -129,6 +129,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
+9. `I-20260319-2315`
+- title: CLI TUI interruption input box for Freely
+- milestone_state: committed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md`
+- next_action: `freely tui` 的 durable intake shell、中文/多行 composer 与脚本回归已落盘；当前能力应作为 interruption 输入壳保留在主线，不再以 pre-brainstorm 候选形式悬挂。后续仅在需要扩更强 TUI control surface 时回到同一 issue。
+
 9. `I-20260321-0345`
 - title: Manager reactivation and fleet patrol governance
 - milestone_state: committed
@@ -452,7 +462,18 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/candidates.md`
 - completion_note: milestone planning 与 state maintenance 已作为独立治理能力物化并验证，收口为 `completed`
 
-10. `C-20260319-0220-C`
+10. `I-20260319-2315`
+- title: CLI TUI interruption input box for Freely
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md`
+- evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
+- completion_note: `freely tui` 已收口为 interruption presentation shell，并补齐中文与多行提交回归，输入仍统一落到既有 durable intake 链路
+
+11. `C-20260319-0220-C`
 - title: Historical watchdog productization worktree retirement handoff
 - milestone_state: completed
 - phase_state: `completed`
@@ -461,7 +482,7 @@ routing_policy:
 - evidence: `docs/pre-brainstorms/CONVERGENCE.md`, `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md`
 - completion_note: 旧 watchdog 产品化工位的 `materialize_then_retire` handoff、cleanup 结果与 retirement heuristic 已完成留痕；该候选归档，不新开 IBM
 
-10. `I-20260316-1801`
+12. `I-20260316-1801`
 - title: Auto-run session lifecycle rotation and handoff governance
 - milestone_state: completed
 - phase_state: `completed`
