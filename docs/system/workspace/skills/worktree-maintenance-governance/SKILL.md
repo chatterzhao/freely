@@ -1,6 +1,6 @@
 ---
 name: worktree-maintenance-governance
-description: 当主管需要核清单个 worktree 的真实状态、为多条 worktree 制定安全 merge 顺序、或处理 companion/obsolete worktree 的 salvage_then_retire 时使用。
+description: 当主管需要核清单个 worktree 的真实状态、为多条 worktree 制定安全 merge 顺序、处理存在父子依赖的 stacked merge-chain，或处理 companion/obsolete worktree 的 salvage_then_retire 时使用。
 ---
 
 # skill:worktree-maintenance-governance
@@ -9,19 +9,21 @@ description: 当主管需要核清单个 worktree 的真实状态、为多条 wo
 
 - 需要判断某个 worktree 是 `merge-ready`、`research-only`、`companion-only` 还是 `retire-only`
 - 需要为一组相关 worktree 做 merge-prep，而不是只看 milestone
+- 需要处理“不是直接从 develop 派生”的 child/parent 链路，并判断是否必须先向上逐层合并
 - 需要处理 historical / companion / obsolete worktree 的差异摘取与 retirement handoff
 
 ## 模式选择
 
 1. 单棵树真实状态核对：读 [references/audit.md](references/audit.md)
 2. 多棵树合并预演：读 [references/merge-prep.md](references/merge-prep.md)
-3. 历史工位收口与退休：读 [references/retirement-handoff.md](references/retirement-handoff.md)
+3. 存在父子依赖的逐层合并：读 [references/stacked-merge-chain.md](references/stacked-merge-chain.md)
+4. 历史工位收口与退休：读 [references/retirement-handoff.md](references/retirement-handoff.md)
 
 ## 工作流
 
 1. 先跑 `skill:constitution-guard` 和 `skill:laws-enforcer`
 2. 若当前承担项目级判断，先结合 `skill:multi-worktree-supervision` 读取工位总览
-3. 再根据当前问题选择 `audit / merge_prep / retirement_handoff`
+3. 再根据当前问题选择 `audit / merge_prep / stacked_merge_chain / retirement_handoff`
 4. 结论必须落成清晰分类或顺序：
    - `merge-ready`
    - `research-only`
@@ -47,6 +49,7 @@ description: 当主管需要核清单个 worktree 的真实状态、为多条 wo
 - 不替代 `premerge-reconcile` 的冲突修复
 - 不允许只凭 `milestones.md` 单独下结论
 - 不允许只按提交先后、分支新旧或“谁更接近 develop”决定保留哪套行为；遇到相近能力时必须先做 anti-retrogression 比较，保留更好的设计、验证门和用户语义
+- 不允许 child worktree 在存在明确 parent 依赖时，跳过 parent 直接声称可并入 `develop`
 
 ## 完成
 

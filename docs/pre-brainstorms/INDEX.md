@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260321-1045--stacked-worktree-merge-chain-governance
 - 20260321-0257--worktree-fleet-governance-closure
 - 20260320-1745--dirty-worktree-governance-redesign
 - 20260320-1410--worktree-maintenance-skill-taxonomy
@@ -17,6 +18,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260321-1045--stacked-worktree-merge-chain-governance
+  - brainstorms: docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/candidates.md
 - 20260321-0257--worktree-fleet-governance-closure
   - brainstorms: docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md
