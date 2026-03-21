@@ -132,6 +132,18 @@ Freely 应该具备一条怎样的能力，来处理：
 
 这条能力最适合扩到现有的 `manager-reactivation-and-fleet-patrol` / `multi-worktree-supervision` 真源中，而不是新造平行 skill。
 
+同时，不应重复发明主管职责边界。
+
+现有 `manager-agent` 已经明确规定：
+- 主管负责巡检、判断、解释、委派、监督完成
+- 主管不直接做 doc-loop / dev-loop 实现
+- 一旦进入“要做事”，应交给 worker、maintenance worker 或 runtime owner
+
+所以这条预研新增的不是“主管也能修复 drift”，而是：
+- 主管如何识别 `external drift`
+- 主管如何把 drift 结构化成 `ownership + restart_point + next_action`
+- 主管随后应把哪类 drift 委派到哪条已有能力
+
 原因：
 
 1. 这条问题首先是主管巡检问题，不是单纯 worktree cleanup 问题
@@ -156,6 +168,31 @@ Freely 应该具备一条怎样的能力，来处理：
   - candidate / issue / milestone / completed queue 没同步
   - 已完成但未回写 milestone
 - 此时主管应把它识别为 state-maintenance 问题并委派，而不是自己长期手工 reconcile
+
+## Non-Redundant Boundary
+
+这条能力必须遵守现有主管定义，不新增以下错误语义：
+
+1. 不把主管变成 repair worker
+- 主管不直接修改业务实现、不直接补 worker 级长期产物
+
+2. 不把主管变成 runtime operator
+- 账号切换、重启、等待、attach/resume 失败后的恢复，仍属于 `runtime-owned`
+
+3. 不把主管变成万能 reconcile 脚本
+- 主管只做：
+  - `detect`
+  - `classify`
+  - `explain`
+  - `delegate`
+  - `supervise completion`
+
+4. 对用户的输出应先是状态解释，再是委派决定
+- 主管先告诉用户：
+  - 发生了哪类 drift
+  - 为什么当前 Freely 视图已不可信
+  - 这件事将委派给谁处理
+- 然后再由对应 owner 执行对齐
 
 ## Recommended Shape
 

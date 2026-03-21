@@ -14,6 +14,7 @@
   - 不新造平行大 skill，优先扩已有真源
   - 主承接应是 `manager-reactivation-and-fleet-patrol` / `skill:multi-worktree-supervision`
   - 发现后的写回与收口再分流到 `milestone-planning-state-maintenance` / `worktree-maintenance-governance` / runtime recovery
+  - 不重复定义主管职责；沿用现有 `manager-agent` 边界，只新增 drift detection / explain / delegate / supervise-completion 检查面
   - 明确 drift 最小分类：
     - runtime drift
     - intake absorption drift
