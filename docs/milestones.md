@@ -300,7 +300,6 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先验证 `docs/system/workspace/three-loop-capability-lifecycle.md` 是否足以成为唯一细节真源；若仍需更多行为约束，再 materialize 为独立 IBM issue，而不是继续把细节散落到 `CONSTITUTION`、`PROJECT_INTENT` 和多个 skills 中
 - revisit_trigger: 当 lifecycle 真源之外仍出现新的行为约束必须落到独立 issue，或 manager/doc/dev-loop 继续出现无法由当前真源解释的冲突时，重新进入 materialization 判断
 
-<<<<<<< HEAD
 11. `C-20260320-0252-A`
 - title: Signal restart-point routing across interruption, review, test, and recovery
 - milestone_state: candidate
@@ -332,8 +331,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-0605--agent-state-time-machine-and-shared-continuity/candidates.md`
 - next_action: 继续 pre-brainstorm，先冻结四个边界：Freely 当前哪些关键状态不在 Git/worktree 治理内、哪些状态必须一起 snapshot/rollback、共享连续性与 worker 私有状态如何分层、以及最小实现是否应先从本地 snapshot index / continuity metadata 开始；在这些边界稳定前不要把 PGFS 或 PostgreSQL 直接定成默认架构
 - revisit_trigger: 当 Freely 的多设备或多人协作场景需要统一共享连续性控制面，且本地 snapshot index 方案边界稳定后，再进入 IBM。
-=======
->>>>>>> 69e66c8 (feat: finalize cli tui interruption input)
 ### completed_issues
 
 1. `I-20260319-1715`
@@ -455,7 +452,6 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`, `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`, `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`, `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - completion_note: umbrella taxonomy 已由 `watchdog-control-plane` 与现有 availability / runtime / continuity issue 主线吸收，不再单独 materialize
 
-<<<<<<< HEAD
 9. `I-20260320-0512`
 - title: Milestone planning and state maintenance
 - milestone_state: completed
@@ -466,10 +462,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/candidates.md`
 - completion_note: milestone planning 与 state maintenance 已作为独立治理能力物化并验证，收口为 `completed`
 
-10. `I-20260319-2315`
-=======
 9. `I-20260319-2315`
->>>>>>> 69e66c8 (feat: finalize cli tui interruption input)
 - title: CLI TUI interruption input box for Freely
 - milestone_state: completed
 - phase_state: `completed`
@@ -480,11 +473,7 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
 - completion_note: `freely tui` 已收口为 interruption presentation shell，并补齐中文与多行提交回归，输入仍统一落到既有 durable intake 链路
 
-<<<<<<< HEAD
 11. `C-20260319-0220-C`
-=======
-9. `C-20260319-0220-C`
->>>>>>> 69e66c8 (feat: finalize cli tui interruption input)
 - title: Historical watchdog productization worktree retirement handoff
 - milestone_state: completed
 - phase_state: `completed`
@@ -524,6 +513,106 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/candidates.md`
 - evidence: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`, `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/tasks.md`, `docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`, `docs/system/workspace/scripts/quality/governance-check`
 - completion_note: future candidate v2 schema、独立 acceptance review、IBM acceptance deepening 与治理门禁已稳定落盘；高风险 candidate 的双审策略保留为后续治理演进，不阻塞当前 issue 完成
+
+## M-20260312-control-surface-runtime-convergence
+
+- title: Control surface, runtime, and intervention architecture convergence
+- status: active
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- intent: 把跨 pre-brainstorm / 跨 feature 分支的架构结论收敛进单一里程碑，停止悬空讨论，再按 milestone 顺序创建后续专用 worktree 落 IBM 与实现；该收敛批次以前置 issue `I-20260308-1245` 的边界复评结论为基础，不替代它。
+- why_now: Freely 正在吃自己的狗粮开发自己；如果架构、控制面、standalone/OpenClaw、human intervention 等候选持续分散在多个分支和 pre-brainstorm 中，auto-loop 与人工协作都会缺少统一编排入口，同时也会与现有 frontend-probe milestone 的边界复评形成重复编排。
+
+### committed_issues
+
+1. `I-20260312-0011`
+- title: Backend Service Contract and Adapter Taxonomy
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: contract 与 adapter taxonomy 的 IBM 已冻结完成；下一步按 sequencing 推进 `C-20260312-0011-E/G/H` 等后续 issue，复用这条 contract 真源，而不是再次回到架构总论预研
+
+### candidate_issues
+
+1. `C-20260312-0011-E`
+- title: AI Team Control Surface and Multi-Worktree Visibility
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 待 contract 边界初步冻结后进入 IBM，定义 day-1 control surface 的信息架构、worktree visibility 和 team timeline
+- revisit_trigger: 当需要设计控制面首页、多 worktree lanes 或团队态势视图时重新唤起
+
+2. `C-20260312-0011-G`
+- title: Standalone Runtime Baseline Without OpenClaw
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 在引入任何外部 runtime profile 前，先把 Freely standalone mode 的最小组件、状态面和未闭合点写成正式 IBM 产物
+- revisit_trigger: 当要证明 Freely 可以在不依赖 OpenClaw 的情况下独立运行时重新唤起
+
+3. `C-20260312-0011-H`
+- title: Human Intervention Transport Across Auto-Run CLIs
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 在当前 `SendChatIntervention` 协议语义下，先冻结 `resume_with_intervention` 的 day-1 控制链与最小依赖字段
+- revisit_trigger: 当 human interruption transport 需要正式进入 IBM 或无法继续停留在临时 transport 约定时重新唤起
+
+4. `C-20260312-0011-B`
+- title: Frontend Manifest Boundary and Runtime Capability Layering
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 在 contract 与 standalone 基线明确后进入 IBM，收紧 frontend/backend/AI tool/integration 的 manifest 与真源分层
+- revisit_trigger: 当 manifest 分层必须落地到可执行依赖文件时重新唤起
+
+5. `C-20260312-0011-D`
+- title: Event Log and Snapshot Reconstruction Contract
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 作为 boundary contract 的补充，单独冻结 event/snapshot 的 reconstruction 语义，服务 UI、恢复和 team visibility
+- revisit_trigger: 当事件日志、快照重建或恢复语义出现实现歧义时重新唤起
+
+6. `C-20260312-0011-F`
+- title: Skill-first Capability Exposure with OpenClaw Workspace Projection
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 在 standalone baseline 清晰后再进入 IBM，定义哪些 Freely 能力先以 skill 暴露，再映射到 OpenClaw workspace/profile
+- revisit_trigger: 当需要把 Freely 能力投影到 OpenClaw workspace 或 hooks 时重新唤起
+
+7. `C-20260312-0011-C`
+- title: Runtime Independence with OpenClaw Profile as Optional Adapter
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- next_action: 在 standalone mode 与 skill projection 明确后进入 IBM，正式定义 OpenClaw 只作为 optional adapter/profile 的边界
+- revisit_trigger: 当 OpenClaw 借力边界必须被正式冻结或替换时重新唤起
 
 ## M-20260308-frontend-probe-dogfooding-loop
 
