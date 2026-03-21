@@ -209,6 +209,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/candidates.md`, `docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/candidates.md`
 - next_action: `three-loop` / `manager-agent` / `auto-loop-orchestrator` / patrol reference 的收敛重构已落盘；当前进入 wording review 与 consistency verification，确认不再要求读完整个文件才能避免误解
 
+16. `I-20260321-1745`
+- title: Active lifecycle boundary and dogfooding capability discovery
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/candidates.md`
+- next_action: `three-loop-capability-lifecycle` 与 `PROJECT_INTENT` 的边界 wording 已落盘；当前进入 consistency verification，确认“历史 vs 当前”与狗粮能力发现原则不会与既有真源冲突
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

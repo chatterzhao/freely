@@ -17,12 +17,12 @@
   - 明确狗粮中暴露的可复现共性问题，默认先判断为 Freely 能力缺口
   - 落点优先放在三层 loop / 产品意图 / 管理路由真源，而不是只记在预研里
 - priority: P0
-- status: proposed
-- decision_reason: 这是当前 Freely 自举方法论中的基础判断规则；不先固定，后面每条新线都会重复争论“该不该改”“是不是历史”“是不是产品能力”。
-- next_action: 继续判断它最适合 materialize 到 `three-loop-capability-lifecycle`、`PROJECT_INTENT` 还是主管/routing 真源，并避免和现有 worktree / lifecycle 治理能力重复。
-- revisit_trigger: 当“历史 vs 当前”的生命周期边界和“狗粮问题 -> 能力发现”的产品原则可以写成统一、无二义性的真源 wording 时。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: promoted
+- decision_reason: 已进入正式 issue 生命周期；后续通过新的 issue 在三层 loop 与项目意图真源中收敛生命周期边界和狗粮能力发现原则，而不是继续停留在口头约定。
+- next_action: 完成 IBM 产物与真源 wording 收敛后，进入 consistency verification，确认不会再把“历史/当前”边界读错，也不会把狗粮问题降格成一次性经验。
+- revisit_trigger: 当新增 wording 落盘后，需要验证它与既有三层 loop / manager / worktree 治理仍一致时。
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
+- milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
 - session_refs:
   - tool: codex
   - session_id: current-thread

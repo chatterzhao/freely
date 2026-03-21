@@ -214,7 +214,29 @@ Freely 的能力必须同时标注 loop 和 owner，避免“能力有了，但�
 
 ## 5. Lifecycle Truth
 
-### 5.1 Signal model before routing
+### 5.1 Active lifecycle vs historical artifacts
+
+Freely 判断“历史”与“当前”时，不看文件创建时间，优先看生命周期是否已闭环。
+
+- `historical`
+  - 当前 issue 已走完三层 loop
+  - 状态已进入 `completed` 或等价闭环态
+  - 对应 worktree / merge / cleanup 已完成
+  - 产物已不再属于当前活跃执行链
+
+- `active lifecycle`
+  - 仍属于当前活跃执行链
+  - 即使文件创建较早，只要 issue / worktree / cleanup 尚未收口，仍可继续修改
+
+当前活跃生命周期中的应用产物允许继续做收敛重构：
+
+- 目标是统一边界、消除局部误读
+- 不是 append-only 地追加口头解释
+- 不应要求 AI 必须读完整个文件才能避免误判
+
+历史产物则只承担追溯输入，不再作为当前轮新问题的主承接面。
+
+### 5.2 Signal model before routing
 
 Freely 的来源先分成两类：
 
@@ -253,7 +275,7 @@ source record
 - 主管不是只在最前面做一次静态路由。
 - delegated loop 完成后，结果应回流给主管，再由主管继续判断下一跳 restart point，直到当前问题被正确吸收到 canonical artifacts 或完成收口。
 
-### 5.2 Discovery to candidate
+### 5.3 Discovery to candidate
 
 ```text
 PROJECT_INTENT / chat / review / test / runtime anomaly
@@ -271,7 +293,7 @@ PROJECT_INTENT / chat / review / test / runtime anomaly
 - unresolved candidate 至少要写清 `status`、`decision_reason`、`next_action` 与 `revisit_trigger`，让下一轮主管知道为什么继续研究、何时重启、而不是默认跳过
 - future candidate 默认使用 `candidate_format_version: v2`，并包含 `acceptance_criteria`、`promotion_gate`、`open_questions`、`acceptance_reviews`
 
-### 5.2 Candidate to milestone-owned issue
+### 5.4 Candidate to milestone-owned issue
 
 ```text
 candidate_issues
@@ -287,7 +309,7 @@ candidate_issues
 - `candidate_format_version: v2` 的 candidate 在 promotion 前，应有独立 acceptance review 记录
 - IBM 不是复制 candidate acceptance；它必须把 candidate boundary 深化成 issue-level acceptance
 
-### 5.3 Issue docs to ready implementation
+### 5.5 Issue docs to ready implementation
 
 ```text
 in_ibm
@@ -300,7 +322,7 @@ in_ibm
 - doc-loop 必须先把 issue 边界、产物和治理口径收齐
 - 不允许用 `progress` 代替 IBM 产物
 
-### 5.4 Implementation to verification
+### 5.6 Implementation to verification
 
 ```text
 done_ibm
@@ -313,7 +335,7 @@ done_ibm
 - `progress` 只跟踪 dev-loop
 - 边界外新问题必须 reroute 到 pre-brainstorm
 
-### 5.5 Verification to completion
+### 5.7 Verification to completion
 
 ```text
 in_verification
@@ -325,7 +347,7 @@ in_verification
 - completion 前必须完成要求的 review、tests、evidence writeback
 - completion 不等于 cleanup 已完成
 
-### 5.6 Completion to cleanup
+### 5.8 Completion to cleanup
 
 ```text
 completed
