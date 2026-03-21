@@ -65,6 +65,8 @@ printf '%s\n' "$prompt" | grep -q 'worktree 维护'
 printf '%s\n' "$prompt" | grep -q 'candidate stuck'
 printf '%s\n' "$prompt" | grep -q 'phase orphaned'
 printf '%s\n' "$prompt" | grep -q 'completion without closure'
+printf '%s\n' "$prompt" | grep -q 'acceptance review'
+printf '%s\n' "$prompt" | grep -q 'state maintenance'
 printf '%s\n' "$prompt" | grep -q '脚本只负责启动和托管 AI'
 
 case "$current_branch" in

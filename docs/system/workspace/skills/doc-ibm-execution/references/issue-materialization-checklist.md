@@ -4,6 +4,7 @@
 
 - 当前输入已经是 milestone-owned issue，或 candidate 已被 milestone 接纳
 - 若仍只是未绑定 milestone 的 pre-brainstorm candidate：回到 `doc-pre-brainstorm-execution`
+- 若来源 candidate 是 `candidate_format_version: v2`，先读取其 `acceptance_criteria`、`promotion_gate`、`open_questions`、`acceptance_reviews`
 
 ## Stable ownership required
 
@@ -34,3 +35,4 @@
 - `docs/milestones.md.issue_path`
 - `phase_state=in_ibm`
 - 继承有效 `session_refs`
+- 在 issue / `prd.md` / `pre-tests.md` / `tasks.md` / issue-bound brainstorm 中继续深化 acceptance 边界

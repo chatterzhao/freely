@@ -178,6 +178,8 @@ Freely 的能力必须同时标注 loop 和 owner，避免“能力有了，但�
 | runtime continuity | auto-loop | runtime/scripts | session nearing limit / crash / compacted context | `resume` or `fresh_with_handoff` | runtime scripts + handoff artifacts |
 | recovery routing | auto-loop | `recovery-subagent-governance` + runtime | unavailable runtime / stale `in_*` state | recovery path and continuity | recovery artifacts |
 | pre-brainstorm | doc-loop | `doc-pre-brainstorm-execution` | discovery source or unstable boundary | `brainstorms.md`, `candidates.md` | `docs/pre-brainstorms/**` |
+| candidate acceptance review | doc-loop | worker-agent + `skill:candidate-acceptance-review` | candidate preparing promotion or high-risk boundary | independent acceptance review verdict, updated `acceptance_reviews` | `docs/pre-brainstorms/**/candidates.md` |
+| milestone planning / state maintenance | auto-loop -> doc-loop | `manager-agent` + `skill:milestone-planning-state-maintenance` | standing-source scan detects sequencing conflict or state drift | updated milestone queues, writeback reconciliation, next-batch sequencing | `docs/milestones.md`, linked candidate/issue/progress/recovery artifacts |
 | milestone intake | doc-loop | `doc-pre-brainstorm-execution` or `doc-ibm-execution` | candidate accepted into active scope | milestone queue update | `docs/milestones.md` |
 | IBM + G | doc-loop | `doc-ibm-execution` | milestone-owned issue needs docs | `issue`, `brainstorm`, `prd`, `pre-tests`, `tasks` | `docs/epics/**` |
 | doc continuity | doc-loop | worker-agent + current doc skill | warn/rotate/recovery inside doc work | updated issue/brainstorm continuity | current doc artifacts |
@@ -206,6 +208,13 @@ Freely 的来源先分成两类：
 
 standing source 经周期扫描后，会派生新的 `problem signal`。
 
+其中一类派生 signal 不属于新业务问题，而属于治理维护问题：
+
+- sequencing drift
+- queue imbalance
+- candidate / issue / progress / recovery state mismatch
+- completed / cleanup writeback missing
+
 所有 source 最终都应汇聚成：
 
 ```text
@@ -231,6 +240,7 @@ PROJECT_INTENT / chat / review / test / runtime anomaly
 - candidate 在未进入 milestone-owned issue 前，不得跳过 IBM 直接进入 dev-loop
 - candidate 若当前仍不能收敛到 IBM，不得在扫描中静默消失；必须同时保留在源 `candidates.md` 与 `docs/milestones.md#candidate_issues`
 - unresolved candidate 至少要写清 `status`、`decision_reason`、`next_action` 与 `revisit_trigger`，让下一轮主管知道为什么继续研究、何时重启、而不是默认跳过
+- future candidate 默认使用 `candidate_format_version: v2`，并包含 `acceptance_criteria`、`promotion_gate`、`open_questions`、`acceptance_reviews`
 
 ### 5.2 Candidate to milestone-owned issue
 
@@ -245,6 +255,8 @@ candidate_issues
 约束：
 - `milestones.md` 是编排入口，不是原始发现源
 - issue 的正式边界在 `docs/epics/**`
+- `candidate_format_version: v2` 的 candidate 在 promotion 前，应有独立 acceptance review 记录
+- IBM 不是复制 candidate acceptance；它必须把 candidate boundary 深化成 issue-level acceptance
 
 ### 5.3 Issue docs to ready implementation
 
@@ -400,6 +412,7 @@ completed
 | --- | --- | --- |
 | raw discovery convergence | `skill:doc-pre-brainstorm-execution` | worker |
 | candidate recording and milestone intake | `skill:doc-pre-brainstorm-execution`, `docs/milestones.md` | worker |
+| milestone sequencing and state maintenance | `skill:milestone-planning-state-maintenance`, `docs/milestones.md` | manager -> worker |
 | milestone-owned issue materialization | `skill:doc-ibm-execution` | worker |
 | governance maintenance within issue docs | `IBM + G` semantics in `skill:doc-ibm-execution` | worker |
 | doc continuity writeback | current brainstorm / issue / recovery artifacts | worker |
