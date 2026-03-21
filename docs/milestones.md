@@ -131,22 +131,22 @@ routing_policy:
 9. `I-20260320-1945`
 - title: Watchdog live status surface and manager supervision
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
 - source_brainstorm: `docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/candidates.md`
-- next_action: `freely live-status` 最小 current-state surface、prompt/continuity excerpt、主管监督接线与脚本测试已落盘；当前保持 `in_verification`，下一步做 dogfooding 回归，确认主管能以它作为统一监督入口，而不是继续人肉拼 `baseline-status + prompt + ps`
+- next_action: 已在 `develop` 完成 `freely live-status`、主管监督接线与脚本回归；后续若要扩 `--format json`、`--watch` 或 stall scoring，再回到同一 issue 继续推进
 
 10. `I-20260320-2105`
 - title: Baseline-status command and status family governance
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/candidates.md`
-- next_action: baseline snapshot 已正式迁移为 `freely baseline-status`，`status` 已升级为 family 聚合入口；当前保持 `in_verification`，下一步确认现有 dogfooding 与 checkpoint / pid ownership / default project resolution 链路都未退化
+- next_action: 已在 `develop` 完成 `baseline-status` 命名迁移与 `status` family 聚合入口，并通过 checkpoint / pid ownership / routing 回归；后续若要扩 JSON family 输出或 watch 模式，再回到同一 issue 继续推进
 
 ### candidate_issues
 

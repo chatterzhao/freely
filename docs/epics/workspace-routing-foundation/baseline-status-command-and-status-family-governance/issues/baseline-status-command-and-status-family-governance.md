@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260320-2105`
 - title: Baseline-status command and status family governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `baseline-status-command-and-status-family-governance`
@@ -60,5 +60,5 @@ Freely 已经形成三块状态面：
 
 ## Next
 
-- 保持 `in_verification`。
+- 当前批次已完成并并入 `develop`。
 - 后续若还要加 JSON family 输出、watch 模式或更细的过滤，再从同一 issue 继续扩，不必重新定义 taxonomy。

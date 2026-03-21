@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260320-1945`
 - title: Watchdog live status surface and manager supervision
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `watchdog-live-status-surface-and-manager-supervision`
@@ -71,5 +71,5 @@ Freely 已经有 runtime watchdog、manager continuity、interruption intake 和
 
 ## Next
 
-- 保持 `in_verification`，先锁住 current-state surface 与主管监督接线。
+- 当前批次已完成并并入 `develop`。
 - 若后续仍需 `--format json`、`--watch` 或 stall scoring，再从同一预研线继续 materialize，不在本 issue 当前批次扩 scope。
