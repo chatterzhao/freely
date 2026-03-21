@@ -36,16 +36,9 @@ CHECKPOINT_DRIFT_STREAK_CURRENT="2"
 EOF
 
 BASELINE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")"
-STATUS_VIEW_OUTPUT="$(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT" --view baseline)"
-
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'project: '
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'last_tool_session_id: session-123'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'reasoning_effort: high'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'checkpoint_drift_streak: 2'
-
-if [[ "$BASELINE_OUTPUT" != "$STATUS_VIEW_OUTPUT" ]]; then
-  echo "[FAIL] status --view baseline diverged from baseline-status" >&2
-  exit 1
-fi
 
 echo "[PASS] freely baseline-status is the canonical baseline snapshot"

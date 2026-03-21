@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-status-family.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/repo"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/docs"
+git -C "$TMP_DIR" init -q "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+LAST_TOOL_SESSION_ID="session-abc"
+LAST_TOOL_JSONL_PATH="/tmp/session.jsonl"
+LAST_LAUNCH_KIND="fresh_with_handoff"
+LAST_ROTATION_REASON="context_compacted"
+EOF
+
+ALL_OUTPUT="$(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")"
+BASELINE_VIEW_OUTPUT="$(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT" --view baseline)"
+LIVE_VIEW_OUTPUT="$(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT" --view live)"
+FLEET_VIEW_OUTPUT="$(bash "$ROOT_DIR/bin/freely" status --project "$PROJECT" --view fleet)"
+
+printf '%s\n' "$ALL_OUTPUT" | grep -q '^== baseline ==$'
+printf '%s\n' "$ALL_OUTPUT" | grep -q '^== live ==$'
+printf '%s\n' "$ALL_OUTPUT" | grep -q '^== fleet ==$'
+printf '%s\n' "$ALL_OUTPUT" | grep -q 'last_tool_session_id: session-abc'
+printf '%s\n' "$ALL_OUTPUT" | grep -q 'activity_state:'
+printf '%s\n' "$ALL_OUTPUT" | grep -q '^branch'
+
+printf '%s\n' "$BASELINE_VIEW_OUTPUT" | grep -q 'last_tool_session_id: session-abc'
+printf '%s\n' "$LIVE_VIEW_OUTPUT" | grep -q 'activity_state:'
+printf '%s\n' "$FLEET_VIEW_OUTPUT" | grep -q '^branch'
+
+echo "[PASS] freely status aggregates baseline, live, and fleet views"
