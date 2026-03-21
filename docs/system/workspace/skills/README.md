@@ -41,6 +41,7 @@
 - `skill:human-interruption-manager-triage` -> `human-interruption-manager-triage/SKILL.md`
 - `skill:signal-intent-understanding` -> `signal-intent-understanding/SKILL.md`
 - `skill:url-content-intake` -> `url-content-intake/SKILL.md`
+- `skill:tool-cc-codex-mcp-runtime` -> `tool-cc-codex-mcp-runtime/SKILL.md`
 
 执行顺序（默认）：
 1. `constitution-guard`（预检门禁）
