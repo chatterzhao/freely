@@ -202,7 +202,40 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 3 个边界：`checkpoint-ready` 的结构化输出、`LAWS/runtime/checkpoint-guard/supervisor` 的职责分层、以及进入 IBM 前的 promotion gate；在这些边界稳定前不得直接写成 IBM issue 或塞回 `I-20260318-0930`
 - revisit_trigger: 当 `checkpoint-ready` 的结构化输出、supervisor 职责边界与 promotion gate 可以被稳定写成最小 issue contract 时，重新进入 materialization 判断
 
-2. `C-20260319-0500-01`
+2. `C-20260319-0402-01`
+- title: 定义 Freely 的 harness engineering 分层与缺口图
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/candidates.md`
+- next_action: 保持在 pre-brainstorm，先验证 Freely 是否需要一份更明确的 harness 分层与缺口图；若边界稳定，再 materialize 成 issue，而不是直接把外部文章结论塞进现有主线
+- revisit_trigger: 当 harness 分层、缺口图与 Freely 自身的最小吸收面可以冻结成独立 issue contract 时，重新进入 materialization 判断
+
+3. `C-20260319-0402-02`
+- title: 把 worktree 级验证信号统一暴露成 agent 可消费接口
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/candidates.md`
+- next_action: 继续 pre-brainstorm，先盘点现有 status / wt-status-all / runtime 输出，再决定要不要 materialize 成统一 machine-readable 汇总接口
+- revisit_trigger: 当 worktree 级验证信号的 canonical 输入、输出与 machine-readable summary contract 可以被冻结成 issue scope 时，重新进入 materialization 判断
+
+4. `C-20260319-0402-03`
+- title: 建立文档园艺与 AI 残渣清理的周期性后台循环
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P2
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/candidates.md`
+- next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize
+- revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
+
+5. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -213,7 +246,7 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，先确认 Freely 是否真的缺一份更集中、可执行的 orchestrator spec；若结论稳定，再 materialize 成 issue，而不是直接把 Symphony 当成架构模板
 - revisit_trigger: 当 orchestrator executable spec 的缺口、职责边界与最小验收可以冻结成独立 issue contract 时，重新进入 materialization 判断
 
-3. `C-20260319-0500-02`
+6. `C-20260319-0500-02`
 - title: 统一 issue-level continuity artifact 设计
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -224,7 +257,7 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，先确认哪些 continuity 信息必须跨环持续存在、哪些仍应按 loop 分层存放；未稳定前不要 materialize
 - revisit_trigger: 当 issue-level continuity artifact 的最小字段、跨环写回边界与 canonical 落点可以被冻结成 issue scope 时，重新进入 materialization 判断
 
-4. `C-20260319-0500-03`
+7. `C-20260319-0500-03`
 - title: 评估远程 worker / SSH 执行扩展对 Freely 的适用性
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -235,7 +268,7 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，优先只收集远程 worker 对 workspace ownership、cleanup、resume、host health 的新增要求
 - revisit_trigger: 当远程 worker / SSH 扩展的 ownership、cleanup、resume 与 host health 新约束可以冻结成最小 issue contract 时，重新进入 materialization 判断
 
-5. `C-20260310-0056-A`
+8. `C-20260310-0056-A`
 - title: Evolver Sidecar for Freely Strategy Evolution
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -246,7 +279,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先把本地可选 sidecar 的最小职责边界、review / validation / rollback gate 和不接管主 runtime 的约束写稳，再决定是否 materialize 成独立 issue
 - revisit_trigger: 当 sidecar 的职责边界、review/validation/rollback gate 与“不接管主 runtime”约束可以被冻结成最小 issue contract 时，重新进入 materialization 判断
 
-6. `C-20260319-1105-A`
+9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -257,7 +290,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先验证 `docs/system/workspace/three-loop-capability-lifecycle.md` 是否足以成为唯一细节真源；若仍需更多行为约束，再 materialize 为独立 IBM issue，而不是继续把细节散落到 `CONSTITUTION`、`PROJECT_INTENT` 和多个 skills 中
 - revisit_trigger: 当 lifecycle 真源之外仍出现新的行为约束必须落到独立 issue，或 manager/doc/dev-loop 继续出现无法由当前真源解释的冲突时，重新进入 materialization 判断
 
-7. `C-20260319-2315-A`
+10. `C-20260319-2315-A`
 - title: CLI TUI interruption input box for Freely
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -268,7 +301,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先收敛 TUI 是否只作为 interruption shell、中文输入的最低验收、以及输入框/状态区的最小布局；在这些边界稳定前不要直接写 UI 代码或把 TUI 做成第二套入口系统
 - revisit_trigger: 当 TUI shell 边界、中文输入最低验收与布局最小集可以被明确冻结成 issue scope 时，重新进入 materialization 判断
 
-8. `C-20260320-0252-A`
+11. `C-20260320-0252-A`
 - title: Signal restart-point routing across interruption, review, test, and recovery
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -279,7 +312,7 @@ routing_policy:
 - next_action: M1-M3 的 interruption 最小 slice 已落盘：主管 triage 已改成抽象 routing contract，且 `cleanup` followthrough 已形成第一条完整 event 链。下一步继续 pre-brainstorm，把同一 contract 扩到 review/test/runtime anomaly/worker-discovered gap 与 standing-source scan，再决定是否 materialize 为统一 routing issue
 - revisit_trigger: 当 review/test/runtime anomaly/worker-discovered gap 与 standing-source scan 已共享同一 restart-point routing contract 时，重新进入 materialization 判断
 
-9. `C-20260320-0908-A`
+12. `C-20260320-0908-A`
 - title: Unresolved research candidate persistence and revisit governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
