@@ -311,8 +311,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/candidates.md`
 - next_action: M1-M3 的 interruption 最小 slice 已落盘：主管 triage 已改成抽象 routing contract，且 `cleanup` followthrough 已形成第一条完整 event 链。下一步继续 pre-brainstorm，把同一 contract 扩到 review/test/runtime anomaly/worker-discovered gap 与 standing-source scan，再决定是否 materialize 为统一 routing issue
 - revisit_trigger: 当 review/test/runtime anomaly/worker-discovered gap 与 standing-source scan 已共享同一 restart-point routing contract 时，重新进入 materialization 判断
-
-<<<<<<< HEAD
 12. `C-20260320-0908-A`
 - title: Unresolved research candidate persistence and revisit governance
 - milestone_state: candidate
@@ -323,8 +321,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-0908--research-candidate-persistence-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，先把“不能收口时必须显式保持在 candidate/blocked 队列并写清重启条件”的规则写入 lifecycle、lead prompt 与 doc-loop reference，再决定是否 materialize 为独立治理 issue
 - revisit_trigger: 当后续 worktree 审查再次发现 unresolved candidate 仍会在队列层被跳过，或当前规则需要更强的 issue-bound enforcement 时，重新进入 materialization 判断
-=======
-5. `C-20260320-0605-A`
+13. `C-20260320-0605-A`
 - title: Agent state time-machine and shared continuity control plane
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -333,8 +330,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260320-0605--agent-state-time-machine-and-shared-continuity/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260320-0605--agent-state-time-machine-and-shared-continuity/candidates.md`
 - next_action: 继续 pre-brainstorm，先冻结四个边界：Freely 当前哪些关键状态不在 Git/worktree 治理内、哪些状态必须一起 snapshot/rollback、共享连续性与 worker 私有状态如何分层、以及最小实现是否应先从本地 snapshot index / continuity metadata 开始；在这些边界稳定前不要把 PGFS 或 PostgreSQL 直接定成默认架构
-
->>>>>>> feature/wechat-article-research-20260320-0605
+- revisit_trigger: 当 Freely 的多设备或多人协作场景需要统一共享连续性控制面，且本地 snapshot index 方案边界稳定后，再进入 IBM。
 ### completed_issues
 
 1. `I-20260319-1715`
