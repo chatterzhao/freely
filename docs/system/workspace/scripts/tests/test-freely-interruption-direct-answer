@@ -247,34 +247,35 @@ grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_M
 grep -q 'restart_point: `continuation`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
 grep -q 'ownership: `manager`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
 
-mkdir -p "$PROJECT/.freely/run"
-cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --project "$DIRTY_WT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto >/dev/null
+mkdir -p "$DIRTY_WT/.freely/run"
+cat >"$DIRTY_WT/.freely/run/session-state.env" <<'EOF'
 LAST_TOOL_SESSION_ID="codex-session-current"
 LAST_TOOL_RESUME_TARGET="codex-session-current"
 EOF
 bash -c 'sleep 30' >/dev/null 2>&1 &
 CONT_PID=$!
-echo "$CONT_PID" >"$PROJECT/.freely/run/ai.pid"
+echo "$CONT_PID" >"$DIRTY_WT/.freely/run/ai.pid"
 
-CHAT_OUTPUT_CONT="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "continue-current-issue")"
+CHAT_OUTPUT_CONT="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$DIRTY_WT" "continue-current-issue")"
 INTAKE_ID_CONT="$(printf '%s\n' "$CHAT_OUTPUT_CONT" | sed -n 's/^intake_id: //p')"
 [[ -n "$INTAKE_ID_CONT" ]] || {
   echo "[FAIL] missing continuation intake id" >&2
   exit 1
 }
-grep -q '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_CONT/meta.env"
-grep -q '^CLASSIFICATION="continuation"$' ".freely/intake/$INTAKE_ID_CONT/meta.env"
-grep -q '^ABSORPTION_TARGET="handoff://continuation"$' ".freely/intake/$INTAKE_ID_CONT/meta.env"
-grep -q '^SESSION_REFS="\[tool=codex,resume_target=codex-session-current,scope=workcell-current\]"$' ".freely/intake/$INTAKE_ID_CONT/meta.env"
-grep -q 'restart_point: `continuation`' ".freely/run/interruption-resolution/$INTAKE_ID_CONT/resolution.md"
+grep -q '^STATUS="delegated"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+grep -q '^CLASSIFICATION="continuation"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+grep -q '^ABSORPTION_TARGET="handoff://continuation"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+grep -q '^SESSION_REFS="\[tool=codex,resume_target=codex-session-current,scope=workcell-current\]"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+grep -q 'restart_point: `continuation`' "$DIRTY_WT/.freely/run/interruption-resolution/$INTAKE_ID_CONT/resolution.md"
 sleep 1
 if kill -0 "$CONT_PID" 2>/dev/null; then
   echo "[FAIL] delegated continuation should interrupt current ai pid for local re-entry" >&2
   exit 1
 fi
-grep -q '^LAST_PREEMPTION_MODE="graceful_term"$' ".freely/run/preemption-state.env"
-grep -q '^LAST_PREEMPTION_REASON="local_continuation_reentry"$' ".freely/run/preemption-state.env"
-grep -q "^LAST_PREEMPTION_INTAKE_ID=\"$INTAKE_ID_CONT\"$" ".freely/run/preemption-state.env"
+grep -q '^LAST_PREEMPTION_MODE="graceful_term"$' "$DIRTY_WT/.freely/run/preemption-state.env"
+grep -q '^LAST_PREEMPTION_REASON="local_continuation_reentry"$' "$DIRTY_WT/.freely/run/preemption-state.env"
+grep -q "^LAST_PREEMPTION_INTAKE_ID=\"$INTAKE_ID_CONT\"$" "$DIRTY_WT/.freely/run/preemption-state.env"
 wait "$CONT_PID" 2>/dev/null || true
 
 CHAT_OUTPUT_DELEGATE="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "去重新设计一下 TUI 输入体验")"
