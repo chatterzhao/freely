@@ -259,6 +259,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
 - next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
 
+21. `I-20260322-0445`
+- title: Latest manager continuity worker consumption governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
+- next_action: 已把 latest continuity consumption 接到主管 watchdog 主路径，并补 generated/consumed launch-state truth 与脚本级验收；下一步在 merge 到 `develop` 后执行真实 `freely chat` post-merge acceptance，确认 worker 会消费最新 manager continuity round
+
 ### completed_issues
 
 1. `I-20260322-1801`

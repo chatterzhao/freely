@@ -3,9 +3,10 @@
 - id: `C-20260322-0445-A`
 - title: Make manager runtime consume the latest manager continuity and worker prompt set
 - source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
-- status: `proposed`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `pending://latest-manager-continuity-worker-consumption-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- session_refs: []
 - why_now:
   - real dogfooding shows manager can now produce correct worktree dispositions
   - but runtime still leaves workers on older delegated continuations even after a newer manager continuity and prompt set are generated

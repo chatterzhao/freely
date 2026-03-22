@@ -86,10 +86,25 @@ cat >"$CONT_FILE" <<EOF
   - $PROMPT_FILE
 EOF
 
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$PROJECT/.freely/run/manager-continuity-20260322-010101.md"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$PROJECT/.freely/run/worker-prompts/20260322-010101-worker-cli-retire-codex.txt"
+LAST_MANAGER_CONTINUITY_CONSUMED="$PROJECT/.freely/run/manager-continuity-20260322-010101.md"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$PROJECT/.freely/run/worker-prompts/20260322-010101-worker-cli-retire-codex.txt"
+LAUNCHED_WORKER_PROMPTS="$PROJECT/.freely/run/worker-prompts/20260322-010101-worker-cli-retire-codex.txt"
+UPDATED_AT="2026-03-22T02:03:03Z"
+EOF
+
 # shellcheck disable=SC1090
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 
 START_LOG="$TMP_DIR/started.log"
+manager_supervisor_pid_for_project() {
+  return 0
+}
+runtime_ai_pid_hint_for_project() {
+  return 0
+}
 start_workcell_supervisor_async() {
   echo "$1" >>"$START_LOG"
 }
@@ -113,5 +128,9 @@ grep -q '^STATUS="delegated"$' "$INTAKE_DIR/meta.env"
 grep -q '^CLASSIFICATION="continuation"$' "$INTAKE_DIR/meta.env"
 grep -q '^ABSORPTION_TARGET="handoff://continuation"$' "$INTAKE_DIR/meta.env"
 grep -q '当前任务是 completion verification / cleanup followthrough。' "$INTAKE_DIR/message.txt"
+grep -q "^LAST_MANAGER_CONTINUITY_GENERATED=\"$CONT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
+grep -q "^LAST_MANAGER_CONTINUITY_CONSUMED=\"$CONT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
+grep -q "^LAST_MANAGER_WORKER_PROMPTS_GENERATED=\"$PROMPT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
+grep -q "^LAST_MANAGER_WORKER_PROMPTS_CONSUMED=\"$PROMPT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
 
 echo "[PASS] manager continuity worker prompt is converted into worker continuation launch"
