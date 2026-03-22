@@ -23,6 +23,27 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
 - `bash docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`
 - `./bin/governance-check`
+- `git merge-base --is-ancestor HEAD develop`
+- `git fetch origin --prune`
+- `git branch -r --list 'origin/feature/cli-first-observability-surfaces-20260322'`
+
+## Cleanup Followthrough
+
+- maintenance_mode: `audit + retirement_handoff`
+- disposition: `retire-only`
+- cleanup_gate: `verified-retirable`
+- local_branch_disposition: `retained-with-reason`
+- local_branch_reason: 当前 Codex worker 正运行在目标 worktree 中，不能在本会话内安全删除该 worktree / branch
+- remote_branch_disposition: `deleted`
+- remote_branch_evidence: prune 后仍无 `origin/feature/cli-first-observability-surfaces-20260322`
+- continuation_refresh:
+  - 当前 fresh session 先吸收 `context_compacted` handoff，再继续 retirement followthrough
+  - 当前 `git rev-list --left-right --count HEAD...develop` 为 `0 11`；旧 handoff 中的 `behind 7` 已过时
+- canonical_gap_fixed:
+  - 当前 worktree 中的 `docs/milestones.md` 已从 `committed_issues` 改写到 `completed_issues`
+  - 当前 worktree 中的 issue / progress 已补齐 cleanup evidence
+- residual_action:
+  - supervisor/runtime 在 worktree 外执行最终 branch/worktree cleanup
 
 ## Result
 

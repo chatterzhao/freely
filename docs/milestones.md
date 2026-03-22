@@ -257,7 +257,6 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
 - next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
-
 ### candidate_issues
 
 1. `C-20260318-0715-A`
@@ -392,7 +391,23 @@ routing_policy:
 - revisit_trigger: 当 Freely 的多设备或多人协作场景需要统一共享连续性控制面，且本地 snapshot index 方案边界稳定后，再进入 IBM。
 ### completed_issues
 
-1. `I-20260321-1925`
+1. `I-20260322-0115`
+- title: CLI-first entrypoint and observability surface unification
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md`
+- evidence: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`, `docs/progress/workspace-routing-foundation/p-cli-first-entrypoint-and-observability-surface-unification.md`, `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
+- cleanup_gate: `verified-retirable`
+- branch: `feature/cli-first-observability-surfaces-20260322`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-cli-first-observability-surfaces`
+- local_branch_disposition: `retained-with-reason`
+- remote_branch_disposition: `deleted`
+- completion_note: 当前 worktree 已按 `worktree-maintenance-governance` 完成 `audit + retirement_handoff` 判定为 `retire-only`；`HEAD` 已被本地 `develop` 吸收，`origin/feature/cli-first-observability-surfaces-20260322` 在 `git fetch origin --prune` 后仍不存在。cleanup gate 已满足 `verified-retirable`，但当前会话正运行在目标 worktree 内，故本地 branch/worktree 先记为 `retained-with-reason`，待 supervisor/runtime 从外层执行实际删除。
+
+2. `I-20260321-1925`
 - title: Manager chat reentry and cleanup misrouting governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -403,7 +418,7 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/interruption-manager-handler`, `docs/system/workspace/scripts/tests/test-interruption-manager-handler`, `docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`, `docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/code-reviews/20260321-manager-chat-reentry-and-cleanup-misrouting-verification.md`
 - completion_note: broad supervisor chat signal 已不再默认误落 cleanup followthrough；纯 cleanup 请求仍保持 worker cleanup 路径，主管级广义巡检请求则回到 `handoff://continuation` 与 manager ownership
 
-2. `I-20260321-2010`
+3. `I-20260321-2010`
 - title: Explicit session-addressed resume governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -414,7 +429,7 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/runtime/tool-launchers.sh`, `docs/system/workspace/scripts/monitor-ai-cli.sh`, `docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`, `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/code-reviews/20260321-explicit-session-addressed-resume-verification.md`
 - completion_note: 显式 session-addressed resume 已成为 Freely 的 canonical continuity model；`codex` 默认路径不再依赖 `--last`，worker-scoped target evidence 与 preemption fallback 也已闭环
 
-3. `I-20260321-1706`
+4. `I-20260321-1706`
 - title: Chat-triggered worker runtime reactivation governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -425,7 +440,7 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`, `docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/code-reviews/20260321-chat-triggered-worker-runtime-reactivation-verification.md`
 - completion_note: worker 工位在 `operator_stop` 后的 `freely chat` 现在会通过 delegated handoff gate 重新拉起本工位主循环；脚本级与真实狗粮验证均已通过
 
-4. `I-20260319-1715`
+5. `I-20260319-1715`
 - title: CLI-first human chat intake and manager delegation loop
 - milestone_state: completed
 - phase_state: `completed`
@@ -436,7 +451,7 @@ routing_policy:
 - evidence: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`, `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/code-reviews/20260320-human-chat-intake-and-manager-delegation-verification.md`, `docs/system/workspace/scripts/tests/test-freely-human-chat-intake`
 - completion_note: CLI-first human chat intake、manager queue scanning、claim/resolve/absorption writeback 与专项测试已闭环；companion canonical 分支已挂起，不再阻塞主线完成
 
-2. `I-20260319-2315`
+6. `I-20260319-2315`
 - title: CLI TUI interruption input box for Freely
 - milestone_state: completed
 - phase_state: `completed`
@@ -447,7 +462,7 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
 - completion_note: `freely tui` 已收口为 interruption presentation shell，并补齐中文与多行提交回归，输入仍统一落到既有 durable intake 链路
 
-2. `I-20260320-1405`
+7. `I-20260320-1405`
 - title: Worktree maintenance governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -458,7 +473,7 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/worktree-maintenance-governance/SKILL.md`, `docs/system/workspace/agents/lead-agent.md`, `docs/system/workspace/agents/manager-agent.md`, `docs/system/workspace/scripts/start-lead-agent.sh`, `docs/system/workspace/scripts/tests/test-routing-foundation-loop`
 - completion_note: 已把 worktree 创建后的维护能力收敛成专门 skill，明确 `audit / merge_prep / retirement_handoff` 三种模式，并接入主管真源与首跳测试
 
-3. `I-20260318-1222`
+8. `I-20260318-1222`
 - title: Mem9 shared memory evaluation for Freely continuity plane
 - milestone_state: completed
 - phase_state: `completed`
