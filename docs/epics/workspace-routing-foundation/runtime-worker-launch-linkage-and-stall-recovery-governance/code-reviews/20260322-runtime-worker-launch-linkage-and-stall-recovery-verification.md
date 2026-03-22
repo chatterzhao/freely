@@ -36,4 +36,4 @@
 - `git diff-tree --no-commit-id --name-only -r HEAD` -> 最新本地 closure commit 仍只涉及 issue / progress / review / milestone 四个 runtime-worker-launch canonical 文档
 - `git status --short` -> clean；目标 issue 无新的 runtime implementation 改动
 - `git ls-remote --heads origin feature/runtime-worker-launch-linkage-and-stall-recovery-20260322` -> no match
-- `./bin/wt-status-all` -> `Summary: total=7, dirty=2`；当前工位已为 `CLEAN`，其余 dirty 工位需按 ownership 显式跳过，因此当前 cleanup blocker 仍是 develop absorption 与 project-level skipped dirty evidence
+- `./bin/wt-status-all` -> 当前工位已为 `CLEAN`，其余 dirty 工位需按 ownership 显式跳过，因此当前 cleanup blocker 仍是 develop absorption 与 project-level skipped dirty evidence
