@@ -193,10 +193,10 @@ INTAKE_ID_ANSWER="$(printf '%s\n' "$CHAT_OUTPUT_ANSWER" | sed -n 's/^intake_id: 
   echo "[FAIL] missing answer intake id" >&2
   exit 1
 }
-grep -q '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
-grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
-grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
-grep -q '主管先回答当前后台 AI 进程状态' ".freely/run/interruption-resolution/$INTAKE_ID_ANSWER/resolution.md"
+wait_for_grep '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
+wait_for_grep '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
+wait_for_grep '主管先回答当前后台 AI 进程状态' ".freely/run/interruption-resolution/$INTAKE_ID_ANSWER/resolution.md"
 
 CHAT_OUTPUT_CLEANUP="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "检查已经合并到develop的worktree，应该怎么收口")"
 INTAKE_ID_CLEANUP="$(printf '%s\n' "$CHAT_OUTPUT_CLEANUP" | sed -n 's/^intake_id: //p')"
@@ -204,14 +204,14 @@ INTAKE_ID_CLEANUP="$(printf '%s\n' "$CHAT_OUTPUT_CLEANUP" | sed -n 's/^intake_id
   echo "[FAIL] missing cleanup intake id" >&2
   exit 1
 }
-grep -q '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
-grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
-grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
-grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
-grep -q 'blocked_reason: none' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
-grep -q 'feature/cleanup-fixture @ '"$CLEANUP_WT_REAL"' (remote:origin deleted)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
-grep -q 'feature/cleanup-fixture-2 @ '"$CLEANUP_WT_2_REAL"' (remote:origin deleted)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
-grep -q 'feature/dirty-fixture @ '"$DIRTY_WT_REAL"' (dirty)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+wait_for_grep '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+wait_for_grep '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+wait_for_grep 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+wait_for_grep 'blocked_reason: none' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+wait_for_grep 'feature/cleanup-fixture @ '"$CLEANUP_WT_REAL"' (remote:origin deleted)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+wait_for_grep 'feature/cleanup-fixture-2 @ '"$CLEANUP_WT_2_REAL"' (remote:origin deleted)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+wait_for_grep 'feature/dirty-fixture @ '"$DIRTY_WT_REAL"' (dirty)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
 [[ ! -d "$CLEANUP_WT" ]] || {
   echo "[FAIL] cleanup worktree still exists" >&2
   exit 1
@@ -255,12 +255,12 @@ INTAKE_ID_MANAGER="$(printf '%s\n' "$CHAT_OUTPUT_MANAGER" | sed -n 's/^intake_id
   echo "[FAIL] missing manager intake id" >&2
   exit 1
 }
-grep -q '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
-grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
-grep -q '^ABSORPTION_TARGET="handoff://continuation"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
-grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
-grep -q 'restart_point: `continuation`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
-grep -q 'ownership: `manager`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
+wait_for_grep '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+wait_for_grep '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+wait_for_grep '^ABSORPTION_TARGET="handoff://continuation"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+wait_for_grep 'restart_point: `continuation`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
+wait_for_grep 'ownership: `manager`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
 
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --project "$DIRTY_WT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto >/dev/null
 FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$DIRTY_WT" --watch >/dev/null 2>&1 &
@@ -302,12 +302,12 @@ INTAKE_ID_DELEGATE="$(printf '%s\n' "$CHAT_OUTPUT_DELEGATE" | sed -n 's/^intake_
   echo "[FAIL] missing delegate intake id" >&2
   exit 1
 }
-grep -q '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
-grep -q '^CLASSIFICATION="discovery"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
-grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
-grep -q '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
-grep -q 'restart_point: `pre_brainstorm`' ".freely/run/interruption-resolution/$INTAKE_ID_DELEGATE/resolution.md"
-grep -q 'handoff_summary: 进入 pre-brainstorm 分析并产出候选 issue' ".freely/run/interruption-resolution/$INTAKE_ID_DELEGATE/resolution.md"
+wait_for_grep '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+wait_for_grep '^CLASSIFICATION="discovery"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+wait_for_grep '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+wait_for_grep 'restart_point: `pre_brainstorm`' ".freely/run/interruption-resolution/$INTAKE_ID_DELEGATE/resolution.md"
+wait_for_grep 'handoff_summary: 进入 pre-brainstorm 分析并产出候选 issue' ".freely/run/interruption-resolution/$INTAKE_ID_DELEGATE/resolution.md"
 
 CHAT_OUTPUT_RETRY="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FAIL_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "检查worktree")"
 INTAKE_ID_RETRY="$(printf '%s\n' "$CHAT_OUTPUT_RETRY" | sed -n 's/^intake_id: //p')"
@@ -315,11 +315,12 @@ INTAKE_ID_RETRY="$(printf '%s\n' "$CHAT_OUTPUT_RETRY" | sed -n 's/^intake_id: //
   echo "[FAIL] missing retry intake id" >&2
   exit 1
 }
-grep -q '^STATUS="new"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
-grep -q '^CLASSIFICATION=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
-grep -q '^CLAIMED_BY=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
-grep -q '^LINKED_ARTIFACT="pending://unclassified"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
-grep -q '^RESOLUTION_ARTIFACT=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^STATUS="new"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CLASSIFICATION=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CLAIMED_BY=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^LINKED_ARTIFACT="pending://unclassified"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^RESOLUTION_ARTIFACT=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CREATED_AT="' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
 
 CREATED_AT_RETRY="$(awk -F '\"' '/^CREATED_AT=/{print $2; exit}' ".freely/intake/$INTAKE_ID_RETRY/meta.env")"
 [[ -n "$CREATED_AT_RETRY" ]] || {
@@ -328,11 +329,11 @@ CREATED_AT_RETRY="$(awk -F '\"' '/^CREATED_AT=/{print $2; exit}' ".freely/intake
 }
 
 FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$PROJECT" >/dev/null
-grep -q '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
-grep -q '^CLASSIFICATION="discovery"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
-grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
-grep -q '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
-grep -q '^CREATED_AT="'"$CREATED_AT_RETRY"'"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CLASSIFICATION="discovery"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CREATED_AT="'"$CREATED_AT_RETRY"'"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
 
 CHAT_OUTPUT_STALE="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "检查已经合并到develop的worktree，应该怎么收口")"
 INTAKE_ID_STALE="$(printf '%s\n' "$CHAT_OUTPUT_STALE" | sed -n 's/^intake_id: //p')"
@@ -342,15 +343,15 @@ INTAKE_ID_STALE="$(printf '%s\n' "$CHAT_OUTPUT_STALE" | sed -n 's/^intake_id: //
 }
 bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" intake claim --project "$PROJECT" --intake-id "$INTAKE_ID_STALE" --claimed-by interruption-manager-agent --reaction followup --linked-artifact pending://interruption-manager-triage >/dev/null
 perl -0pi -e 's/CLAIMED_AT=\"[^\"]+\"/CLAIMED_AT=\"2026-03-20T00:00:05Z\"/' ".freely/intake/$INTAKE_ID_STALE/meta.env"
-grep -q '^STATUS="classified"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
-grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
-grep -q '^LINKED_ARTIFACT="pending://interruption-manager-triage"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+wait_for_grep '^STATUS="classified"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+wait_for_grep '^LINKED_ARTIFACT="pending://interruption-manager-triage"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
 
 FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$PROJECT" >/dev/null
-grep -q '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
-grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
-grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
-grep -q '^LINKED_ARTIFACT="cleanup://merged-worktree-followthrough"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
-grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_STALE/resolution.md"
+wait_for_grep '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+wait_for_grep '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+wait_for_grep '^LINKED_ARTIFACT="cleanup://merged-worktree-followthrough"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+wait_for_grep 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_STALE/resolution.md"
 
 echo "[PASS] interruption manager routes abstract answer, cleanup followthrough, delegated handoff, retries cleanly after handler failure, and recovers stale triage claims"
