@@ -74,22 +74,24 @@ Freely 已经有：
 - route_kind: `completion_verification`
 - maintenance_mode: `audit + retirement_handoff`
 - worktree_disposition: `retire-only`
-- verified_retirable: `true`
+- retirement_path: `salvage_then_retire`
+- verified_retirable: `false`
 - branch: `feature/cli-first-observability-surfaces-20260322`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-cli-first-observability-surfaces`
 - local_branch_disposition: `retained-with-reason`
-- local_branch_reason: 当前会话正在该 worktree 中执行 canonical writeback；本轮只补 closure evidence，不在目标 worktree 内自删 branch/worktree
+- local_branch_reason: `feature/cli-first-observability-surfaces-20260322` 已 rebase 到最新 `develop`，但仍有 docs-only closure commit `014431d` 未被 `develop` 吸收；在该提交被收编前不能直接进入 cleanup
 - remote_branch_disposition: `deleted`
 - remote_branch_evidence: `git fetch origin --prune` 后，`origin/feature/cli-first-observability-surfaces-20260322` 仍不存在
 - integration_absorption_evidence:
-  - `git merge-base --is-ancestor HEAD develop` -> exit `0`
-  - `git rev-list --left-right --count HEAD...develop` -> `0 11`
-  - `develop` tip: `e7d93d9`
-  - current branch tip: `7c3ff74`
+  - `git merge-base --is-ancestor feature/cli-first-observability-surfaces-20260322 develop` -> exit `1`
+  - `git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` -> `1 0`
+  - `develop` tip: `209860b`
+  - feature branch tip: `014431d`
+  - unique delta: 仅剩 rebased docs closure commit `014431d`
 - continuity_refresh:
   - 当前轮次先吸收 `context_compacted` 轮换交接，再继续 `completion_verification`
-  - 先前 handoff 中的 `behind 7` 已过时；当前实际相对本地 `develop` 为 `ahead 0 / behind 11`
-- next_action: 由 supervisor/runtime 在 worktree 外执行实际 cleanup；若后续要继续 Tauri 渲染层，必须新开 lifecycle，而不是复用当前 retired worktree
+  - 先前 handoff 中“已被 `develop` 吸收 / verified-retirable”的前提已失效；当前真实状态是 rebase 后的 feature branch `ahead 1 / behind 0`
+- next_action: 先把 docs closure writeback 从当前 branch tip `014431d` 吸收到 canonical `develop` 线，再由 supervisor/runtime 在 worktree 外重新判定 cleanup gate；若后续要继续 Tauri 渲染层，必须新开 lifecycle，而不是复用当前分支
 
 ## Next
 

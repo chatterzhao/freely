@@ -208,17 +208,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/candidates.md`
 - next_action: 已完成 generated/consumed evidence、`live-status` 暴露与 shell-safe handoff writer 修复；后续若要把 manager continuation 消费结果进一步提升成显式治理产出，应通过新 lifecycle 承接
-16. `I-20260322-0115`
-- title: CLI-first entrypoint and observability surface unification
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
-- source_brainstorm: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md`
-- next_action: 已完成 `chat` / `tui` 的 shared front-door submit helper，并把 CLI-first backend contract 写回真源；若后续继续做 Tauri 渲染层，需新开 lifecycle
-
-17. `I-20260322-0135`
+16. `I-20260322-0135`
 - title: Integration-acceptance-first IBM and verification governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -228,7 +218,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/candidates.md`
 - next_action: 已将 `pre-tests.md` 收敛为 issue-level acceptance 控制面，并把 integration / acceptance-first 口径写回 IBM、three-loop 与 `LAWS`；后续若要继续结构化 verification review 模板，应通过新 lifecycle 承接
 
-18. `I-20260322-0228`
+17. `I-20260322-0228`
 - title: Manager delegation after sufficient patrol evidence governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -238,7 +228,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/candidates.md`
 - next_action: 已把 patrol evidence 充足后必须切到 concrete worker delegation 的阈值语义写回主管真源；若后续仍观察到主管只巡检不委派，应通过新 lifecycle 进入 runtime / delegation mechanism 层修复
 
-19. `I-20260322-0245`
+18. `I-20260322-0245`
 - title: Runtime worker launch linkage and stall recovery governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -248,7 +238,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/candidates.md`
 - next_action: runtime 已补 worker handoff ingestion 与 stalled AI recovery；下一步完成 review 后决定是否可向 `develop` 合并，并在 merge 后用真实 `freely chat` 再跑一次 develop 集成验收
 
-20. `I-20260322-0412`
+19. `I-20260322-0412`
 - title: Worker active reentry for manager-delegated continuation governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -400,12 +390,12 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md`
 - evidence: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`, `docs/progress/workspace-routing-foundation/p-cli-first-entrypoint-and-observability-surface-unification.md`, `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
-- cleanup_gate: `verified-retirable`
+- cleanup_gate: `merged-pending-verify`
 - branch: `feature/cli-first-observability-surfaces-20260322`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-cli-first-observability-surfaces`
 - local_branch_disposition: `retained-with-reason`
 - remote_branch_disposition: `deleted`
-- completion_note: 当前 worktree 已按 `worktree-maintenance-governance` 完成 `audit + retirement_handoff` 判定为 `retire-only`；`HEAD` 已被本地 `develop` 吸收，`origin/feature/cli-first-observability-surfaces-20260322` 在 `git fetch origin --prune` 后仍不存在。cleanup gate 已满足 `verified-retirable`，但当前会话正运行在目标 worktree 内，故本地 branch/worktree 先记为 `retained-with-reason`，待 supervisor/runtime 从外层执行实际删除。
+- completion_note: issue 实现能力已被 `develop` 吸收，当前 feature branch 也已 rebase 到最新 `develop` 之上，但仍保留 docs-only closure commit `014431d` 未被主线吸收。远程同名 branch 已不存在，因此当前 disposition 仍是 `retire-only`，但 cleanup gate 只能保持 `merged-pending-verify`；先把该 docs closure 吸收到 canonical `develop`，再由 supervisor/runtime 在 worktree 外执行最终 branch/worktree 删除。
 
 2. `I-20260321-1925`
 - title: Manager chat reentry and cleanup misrouting governance
