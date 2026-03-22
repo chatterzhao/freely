@@ -36,3 +36,4 @@
 - `phase_state=in_ibm`
 - 继承有效 `session_refs`
 - 在 issue / `prd.md` / `pre-tests.md` / `tasks.md` / issue-bound brainstorm 中继续深化 acceptance 边界
+- 在 `pre-tests.md` 中默认先写 integration / acceptance 行为；若存在 merge 后验收，显式标记 `post-merge acceptance`

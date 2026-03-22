@@ -26,8 +26,12 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 5. 在 IBM 中继续深化验收边界：
    - 把 candidate-level acceptance 转成 issue-level acceptance
    - 让 `pre-tests.md`、`tasks.md` 和 issue-bound brainstorm 体现这层深化
-6. 若文档已经足够驱动实现，按同一 gate 把 `phase_state` 切到 `done_ibm`，并返回最小实现上下文。
-7. 若在 IBM 中发现边界外新问题，停止扩写当前 issue，返回 `next_recommended_route=doc-pre-brainstorm-execution`。
+6. `pre-tests.md` 不是附属清单，而是 issue-level acceptance 的主控制面：
+   - 默认优先表达 integration / acceptance 行为
+   - 若存在 merge 后才能验证的能力，显式标记 `post-merge acceptance`
+   - 不要让后续 verification 只能靠口头解释或代码阅读来恢复验收标准
+7. 若文档已经足够驱动实现，按同一 gate 把 `phase_state` 切到 `done_ibm`，并返回最小实现上下文。
+8. 若在 IBM 中发现边界外新问题，停止扩写当前 issue，返回 `next_recommended_route=doc-pre-brainstorm-execution`。
 
 ## 回流输出
 
@@ -46,4 +50,5 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 - 关键 IBM 产物完整，或已明确为什么必须 reroute。
 - `prd.md` 已达到 AI-ready quality bar，且 `pre-tests.md`、`tasks.md` 与之对齐。
 - candidate acceptance 已被深化为 issue-level acceptance。
+- `pre-tests.md` 已明确本 issue 的主验收面，且默认以 integration / acceptance evidence 为主。
 - 进入 dev-loop 所需的最小上下文已备齐。

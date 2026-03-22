@@ -337,6 +337,8 @@ done_ibm
 约束：
 - `progress` 只跟踪 dev-loop
 - 边界外新问题必须 reroute 到 pre-brainstorm
+- verification 默认先看 integration / acceptance evidence，再做定向代码评审
+- code review 是重要但次级的验证面，不替代 issue-level acceptance
 
 ### 5.5 Verification to completion
 
@@ -348,6 +350,7 @@ in_verification
 
 约束：
 - completion 前必须完成要求的 review、tests、evidence writeback
+- `tests` 默认优先指向 `pre-tests.md` 所描述的 integration / acceptance evidence
 - completion 不等于 cleanup 已完成
 
 ### 5.6 Completion to cleanup

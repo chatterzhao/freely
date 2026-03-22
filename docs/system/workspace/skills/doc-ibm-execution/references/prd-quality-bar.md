@@ -32,6 +32,7 @@
 
 9. `Eval Plan`
 - 成功、失败、退化、不可接受行为分别如何判定
+- 默认先表达 integration / acceptance evidence，再决定哪些地方需要定向代码审查
 
 10. `Execution Slices`
 - 哪些 slice 可以独立实现、独立验证、独立回写
@@ -49,6 +50,7 @@
 进入 `done_ibm` 前，至少还要满足：
 
 - `pre-tests.md` 能从 `prd.md` 自然派生，而不是另起一套口头标准
+- `pre-tests.md` 能直接表达 issue-level acceptance，且默认以 smoke / integration / regression / non-goals 这类行为视角组织
 - `tasks.md` 能从 `prd.md` 的 decomposition / execution slices 派生，而不是与 PRD 脱节
 - AI 读取 `prd.md` 后，能回答：
   - 目标是什么
@@ -63,5 +65,6 @@
 
 - PRD 主要是 prose 背景说明，缺少执行结构
 - `pre-tests.md` 与 `tasks.md` 需要额外聊天解释才能成立
+- `pre-tests.md` 主要还是“读代码后再判断怎么测”，而不是先表达 acceptance 行为
 - 没有写出 non-goals / non-negotiables
 - 没有写出 revisit trigger，默认旧 workaround 永久有效

@@ -218,6 +218,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md`
 - next_action: 已完成 `chat` / `tui` 的 shared front-door submit helper，并把 CLI-first backend contract 写回真源；若后续继续做 Tauri 渲染层，需新开 lifecycle
 
+17. `I-20260322-0135`
+- title: Integration-acceptance-first IBM and verification governance
+- milestone_state: committed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/candidates.md`
+- next_action: 已将 `pre-tests.md` 收敛为 issue-level acceptance 控制面，并把 integration / acceptance-first 口径写回 IBM、three-loop 与 `LAWS`；后续若要继续结构化 verification review 模板，应通过新 lifecycle 承接
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

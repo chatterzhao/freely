@@ -14,6 +14,7 @@
 
 - `prd.md` 满足 [prd-quality-bar.md](prd-quality-bar.md)
 - `pre-tests.md` 来自 `prd.md` 的 eval / acceptance 结构
+- `pre-tests.md` 默认以 integration / acceptance 为主，而不是只列代码检查点
 - `tasks.md` 来自 `prd.md` 的 decomposition / execution slices
 
 并保持：
@@ -30,6 +31,7 @@
 - 文档已足够驱动实现
 - issue scope 与 acceptance 稳定
 - `pre-tests.md` 与 `tasks.md` 已体现 issue-level acceptance
+- 若存在 merge 后才能验证的关键路径，`pre-tests.md` 已显式区分 `pre-merge` 与 `post-merge`
 - issue-bound brainstorm 的未决问题已不再阻断 dev
 - implementation 所需文档引用齐备
 - `prd.md` 已达到 AI-ready quality bar，而不是只剩人类摘要
