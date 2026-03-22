@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260321-2010`
 - title: Explicit session-addressed resume governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `explicit-session-addressed-resume-governance`
@@ -137,5 +137,5 @@ Freely 现在对不同工具的会话续接模型不一致：
 
 ## Next
 
-- 当前进入 `in_verification`，progress 见 `docs/progress/workspace-routing-foundation/p-explicit-session-addressed-resume-governance.md`
-- 本轮等待 review / merge gate 判断；若后续要继续增强 cross-worktree worker targeting 或更强 flush contract，应通过新生命周期承接，而不是在本 issue 上继续扩 scope
+- 当前批次已完成。
+- 若后续要继续增强 cross-worktree worker targeting 或更强 flush contract，应通过新生命周期承接，而不是在本 issue 上继续扩 scope

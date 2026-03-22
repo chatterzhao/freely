@@ -199,16 +199,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md`
 - next_action: 把 remote branch deletion / retained reason 纳入 `worktree-maintenance-governance` 与 `cleanup-followthrough`，并用真实 cleanup 测试和 Freely 插话验证主管能够把这层收口做完
 
-15. `I-20260321-2010`
-- title: Explicit session-addressed resume governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/candidates.md`
-- next_action: 当前实现与验证已落盘；保持 review / progress / merge gate 对齐，并仅在出现新的 cross-worktree targeting 或 stronger flush contract 范围时再开新 lifecycle
-
 ### candidate_issues
 
 1. `C-20260318-0715-A`
@@ -342,6 +332,28 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结四个边界：Freely 当前哪些关键状态不在 Git/worktree 治理内、哪些状态必须一起 snapshot/rollback、共享连续性与 worker 私有状态如何分层、以及最小实现是否应先从本地 snapshot index / continuity metadata 开始；在这些边界稳定前不要把 PGFS 或 PostgreSQL 直接定成默认架构
 - revisit_trigger: 当 Freely 的多设备或多人协作场景需要统一共享连续性控制面，且本地 snapshot index 方案边界稳定后，再进入 IBM。
 ### completed_issues
+
+1. `I-20260321-2010`
+- title: Explicit session-addressed resume governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/candidates.md`
+- evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/runtime/tool-launchers.sh`, `docs/system/workspace/scripts/monitor-ai-cli.sh`, `docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`, `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/code-reviews/20260321-explicit-session-addressed-resume-verification.md`
+- completion_note: 显式 session-addressed resume 已成为 Freely 的 canonical continuity model；`codex` 默认路径不再依赖 `--last`，worker-scoped target evidence 与 preemption fallback 也已闭环
+
+2. `I-20260321-1706`
+- title: Chat-triggered worker runtime reactivation governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1706--chat-triggered-worker-runtime-reactivation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1706--chat-triggered-worker-runtime-reactivation/candidates.md`
+- evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`, `docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/code-reviews/20260321-chat-triggered-worker-runtime-reactivation-verification.md`
+- completion_note: worker 工位在 `operator_stop` 后的 `freely chat` 现在会通过 delegated handoff gate 重新拉起本工位主循环；脚本级与真实狗粮验证均已通过
 
 1. `I-20260319-1715`
 - title: CLI-first human chat intake and manager delegation loop

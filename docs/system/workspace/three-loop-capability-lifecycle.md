@@ -239,6 +239,14 @@ source record
 -> delegated loop
 ```
 
+对于 worker-local 的 human chat re-entry，canonical contract 还包括：
+
+- `freely chat` 先 durable 写 intake，再运行 interruption classification
+- 若 classification 已收敛成当前工位的 worker-owned delegated `handoff://continuation` / `handoff://verification`
+- 且当前 worker runtime 因 `operator_stop` 停止、同时没有 active supervisor / ai
+- runtime 应重激活本工位主循环去消费 delegated handoff，而不是让 intake 长期停在 `dispatch_only`
+- 若退出原因是 `auth_failure`、`runtime-owned crash` 或当前已有 active AI，则不得把它混成同一种自动重启
+
 ### 5.1A Runtime continuity contract
 
 runtime truth source 必须把 continuity contract 写成两层：

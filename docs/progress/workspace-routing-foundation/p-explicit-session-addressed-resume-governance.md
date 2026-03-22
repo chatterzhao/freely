@@ -2,8 +2,8 @@
 
 - issue_id: `I-20260321-2010`
 - title: Explicit session-addressed resume governance
-- phase_state: `in_verification`
-- runtime_state: `verification_running`
+- phase_state: `completed`
+- runtime_state: `closed_for_this_batch`
 - branch: `feature/codex-session-reentry-and-pty-input-20260321`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260321-feature-codex-session-reentry-and-pty-input`
 - issue_path: `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
@@ -13,7 +13,7 @@
 
 ## Summary
 
-- 当前 issue 已完成本轮 dev-loop materialization，进入 verification。
+- 当前 issue 已完成本轮 dev-loop materialization、verification 与 writeback。
 - runtime 现在显式保存 per-tool resume target，并把 delegated continuation 收敛到 worker-scoped target evidence。
 
 ## Scope For This Round
@@ -22,7 +22,7 @@
    - `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/code-reviews/20260321-explicit-session-addressed-resume-verification.md`
 2. 保持 verification 证据：
    - runtime / launcher / interruption tests
-3. 等待 merge gate 判断是否允许向上合并
+3. 等待 worktree 层 merge / cleanup gate，不再在本 issue 内继续扩 scope
 
 ## Recovery Context
 
@@ -41,7 +41,7 @@
 
 ## Remaining Scope
 
-- 当前无阻塞实现缺口。
+- 当前批次无剩余实现缺口。
 - 后续若要继续增强：
   - cross-worktree worker-specific target delivery
   - 更强的 flush/checkpoint contract

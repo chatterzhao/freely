@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-chat-worker-reactivation.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+FREELY_HOME="$TMP_DIR/freely-home"
+HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0000--sample"
+
+git init -q -b feature/test-worker-reactivation "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+cat >"$HANDLER_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=continuation
+RESTART_POINT=continuation
+OWNERSHIP=worker
+WHY=当前工位应继续当前 issue
+HANDOFF=让当前 worker 主循环继续接棒
+ANSWER=
+OUT
+EOF
+chmod +x "$HANDLER_FIXTURE"
+
+cd "$PROJECT"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto >/dev/null
+
+python3 - <<'PY'
+from pathlib import Path
+cfg = Path(".freely/config.env")
+text = cfg.read_text()
+text = text.replace('AI_TOOL="codex"', 'AI_TOOL="test-sleep"', 1)
+cfg.write_text(text)
+PY
+
+mkdir -p "$PROJECT/.freely/run"
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-03-21T00:00:00Z"
+EOF
+
+wait_for_ai() {
+  local pid tries=0
+  while (( tries < 30 )); do
+    if [[ -f "$PROJECT/.freely/run/ai.pid" ]]; then
+      pid="$(cat "$PROJECT/.freely/run/ai.pid" 2>/dev/null || true)"
+      if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+        return 0
+      fi
+    fi
+    sleep 0.2
+    tries=$((tries + 1))
+  done
+  return 1
+}
+
+FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "continue-current-issue" >/dev/null
+
+wait_for_ai || {
+  echo "[FAIL] chat-triggered delegated continuation should reactivate stopped worker runtime" >&2
+  exit 1
+}
+
+grep -q 'chat-triggered worker runtime reactivation started' "$PROJECT/.freely/logs/chat-reactivation.log" && {
+  :
+} || true
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null || true
+sleep 1
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="auth_failure"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-03-21T00:00:00Z"
+EOF
+rm -f "$PROJECT/.freely/run/ai.pid" "$PROJECT/.freely/run/supervisor.pid"
+
+FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "continue-current-issue-after-auth-failure" >/dev/null
+sleep 1
+if [[ -f "$PROJECT/.freely/run/ai.pid" ]]; then
+  pid="$(cat "$PROJECT/.freely/run/ai.pid" 2>/dev/null || true)"
+  if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+    echo "[FAIL] auth_failure should not auto-reactivate worker runtime via chat" >&2
+    exit 1
+  fi
+fi
+
+echo "[PASS] freely reactivates stopped worker runtime only for the allowed chat-triggered continuation gate"

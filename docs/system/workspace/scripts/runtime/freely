@@ -830,6 +830,33 @@ count_active_intake_items() {
   printf '%s\n' "$count"
 }
 
+has_local_delegated_worker_reactivation_target() {
+  local project="$1"
+  local intake_root meta_file status absorption_target delegated_worktree project_real delegated_real
+  intake_root="$(intake_dir_for_project "$project")"
+  [[ -d "$intake_root" ]] || return 1
+  project_real="$(cd "$project" && pwd -P)"
+  while IFS= read -r meta_file; do
+    [[ -f "$meta_file" ]] || continue
+    status="$(meta_env_value "$meta_file" "STATUS")"
+    absorption_target="$(meta_env_value "$meta_file" "ABSORPTION_TARGET")"
+    delegated_worktree="$(meta_env_value "$meta_file" "DELEGATED_WORKTREE")"
+    [[ "$status" == "delegated" ]] || continue
+    case "$absorption_target" in
+      handoff://continuation|handoff://verification) ;;
+      *) continue ;;
+    esac
+    delegated_real=""
+    if [[ -n "$delegated_worktree" ]]; then
+      delegated_real="$(cd "$delegated_worktree" 2>/dev/null && pwd -P || true)"
+    fi
+    if [[ -z "$delegated_real" || "$delegated_real" == "$project_real" ]]; then
+      return 0
+    fi
+  done < <(find "$intake_root" -mindepth 2 -maxdepth 2 -type f -name meta.env | sort)
+  return 1
+}
+
 meta_env_value() {
   local meta_file="$1" key="$2"
   [[ -f "$meta_file" ]] || return 0
@@ -2642,6 +2669,38 @@ cmd_ensure_manager_watch() {
   done
 }
 
+worker_runtime_reactivation_allowed() {
+  local project="$1"
+  local role desired_state last_exit_reason supervisor_pid ai_pid
+  role="$(role_hint_for_project "$project")"
+  [[ "$role" == "worker" ]] || return 1
+  desired_state="unknown"
+  last_exit_reason=""
+  if [[ -f "$(workcell_state_file "$project")" ]]; then
+    # shellcheck disable=SC1090
+    source "$(workcell_state_file "$project")"
+    desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+    last_exit_reason="${LAST_EXIT_REASON:-}"
+  fi
+  [[ "$desired_state" == "stopped" ]] || return 1
+  [[ "$last_exit_reason" == "operator_stop" ]] || return 1
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  [[ -z "$supervisor_pid" && -z "$ai_pid" ]] || return 1
+  has_local_delegated_worker_reactivation_target "$project"
+}
+
+reactivate_worker_runtime_if_needed_after_chat() {
+  local project="$1" runtime_log
+  worker_runtime_reactivation_allowed "$project" || return 0
+  runtime_log="$(logs_dir_for_project "$project")/chat-reactivation.log"
+  (
+    cd "$project"
+    bash "$SELF_ROOT/bin/freely" start --project "$project"
+  ) >>"$runtime_log" 2>&1 &
+  log_info "chat-triggered worker runtime reactivation started (project=$project pid=$!)"
+}
+
 build_prompt() {
   local workspace_root
   workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
@@ -3142,6 +3201,7 @@ cmd_chat() {
   bootstrap_interruption_entry_runtime_or_fail "$project"
   cmd_intake_chat --project "$project" --author human --channel chat --message "$message"
   ensure_interruption_dispatch_once "$project"
+  reactivate_worker_runtime_if_needed_after_chat "$project"
 }
 
 cmd_tui() {
