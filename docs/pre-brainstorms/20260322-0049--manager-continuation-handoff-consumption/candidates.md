@@ -1,0 +1,21 @@
+# Candidates
+
+- id: C-20260322-0049-A
+- title: Ensure delegated manager continuation handoffs are consumed by supervisor main loop
+- status: proposed
+- adoption_type: n/a
+- source_brainstorm: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/brainstorms.md`
+- why_now: Dogfood shows interruption triage already returns manager-owned `handoff://continuation`, but manager runtime does not reliably convert that into new project-level supervision output.
+- proposed_scope:
+  - define canonical consumption rule for delegated manager continuation
+  - extend runtime/manager truth sources instead of inventing a parallel skill
+  - add observability evidence for `handoff generated` vs `handoff consumed`
+- acceptance_hint:
+  - a real `freely chat` broad supervisor request on develop yields delegated manager continuation
+  - supervisor main loop consumes it in a later cycle
+  - resulting manager output reflects current `live-status + fleet-status + milestone/issue/intake` judgment instead of staying on old prompt focus
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs:
+  - `run:/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/intake/20260322-004126-develop-worktree-live-status-fle/meta.env`
+  - `run:/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/intake/20260322-004411-handoff-live-status-fleet-status/meta.env`
