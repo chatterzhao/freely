@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260322-0228--manager-delegation-after-sufficient-patrol-evidence
 - 20260321-1925--manager-chat-reentry-and-cleanup-misrouting
 - 20260321-1706--chat-triggered-worker-runtime-reactivation
 - 20260321-2010--explicit-session-addressed-resume-over-last-and-pty
@@ -31,6 +32,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260322-0228--manager-delegation-after-sufficient-patrol-evidence
+  - brainstorms: docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/candidates.md
 - 20260321-1925--manager-chat-reentry-and-cleanup-misrouting
   - brainstorms: docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/candidates.md

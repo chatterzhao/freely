@@ -1,0 +1,23 @@
+# 候选：manager-delegation-after-sufficient-patrol-evidence
+
+- id: `C-20260322-0228-A`
+- title: Make manager stop patrolling and delegate once worktree evidence is sufficient
+- source_brainstorm: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/brainstorms.md`
+- status: `proposed`
+- why_now:
+  - real Freely dogfooding now shows manager can patrol and classify remaining feature worktrees correctly
+  - but still delays concrete worker delegation after evidence is already sufficient
+  - this blocks lifecycle completion even when the system already knows which branches are `retire-only`, `retire-now`, or `continue-dev`
+- expected_outcome:
+  - define a canonical delegation threshold for manager patrol
+  - require manager to emit concrete worker handoff once disposition is stable
+  - prevent endless patrol-only loops when cleanup or continue-dev execution is already the next correct step
+- likely_truth_sources:
+  - `docs/system/workspace/agents/manager-agent.md`
+  - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
+  - `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`
+- acceptance_hint:
+  - after a real manager patrol establishes `retire-only`, `retire-now`, or `continue-dev`, the next loop emits worker-specific execution handoff instead of only more supervisory investigation
+  - integration evidence shows at least one cleanup/continue-dev branch actually transitions into the next worker step
+- revisit_trigger:
+  - when Freely can repeatedly patrol, classify, and then immediately move at least one branch into concrete worker execution without extra human nudging
