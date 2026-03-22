@@ -13,6 +13,7 @@
 - session continuity
 - event-driven re-entry
 - 多 worker / 多 worktree 并行下的会话寻址
+- 主管在理解 signal 之后，如何把 handoff 精确交给某个 worker
 
 ## Current Implementation Findings
 
@@ -97,6 +98,11 @@ Freely 经常：
 - `cwd`
 - `workcell ownership`
 
+还要能表达：
+
+- 当前 handoff 该交给哪个 worker / workcell
+- 这个 worker 下一轮应接哪一个 session
+
 ## PTY Injection Interpretation
 
 给活着的 Codex 终端直接写字符，不是不能做，但它不应是 canonical path：
@@ -110,6 +116,24 @@ Freely 经常：
 - 同一交互终端仍活着
 - 且明确需要即时交互
 
+## Forced Termination Risk
+
+如果 runtime 为了让新 signal 生效而强制结束当前 AI 进程，会额外引入一个问题：
+
+- 进程里可能仍有未落盘内容
+
+这意味着 canonical contract 不应只定义“怎么 resume”，还要定义：
+
+- 优先如何做 graceful preemption
+- 什么情况下允许 hard kill
+- hard kill 后 supervisor 最少要保留哪些 recovery evidence
+
+对 Freely 更合理的顺序应是：
+
+1. 优先 graceful handoff / checkpoint / structured flush
+2. 如果工具或当前场景做不到，再退化到 hard kill
+3. hard kill 不能丢失 session evidence、current issue ownership 和 delegated handoff
+
 ## Candidate Direction
 
 优先候选应是：
@@ -117,4 +141,6 @@ Freely 经常：
 1. 把 `explicit session-addressed resume` 定义成 Freely 的 canonical continuity model
 2. 先修 `codex` 的 `--last`
 3. 再审视 `iflow` / `kiro-cli` 是否也需要显式 session addressing contract
-4. PTY 注入只保留为 fallback，不作为 supervisor 默认路径
+4. 定义 manager -> worker handoff 时的 explicit session target
+5. PTY 注入只保留为 fallback，不作为 supervisor 默认路径
+6. 把 graceful preemption / hard kill fallback 也收进 continuity contract

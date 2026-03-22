@@ -202,12 +202,12 @@ routing_policy:
 15. `I-20260321-2010`
 - title: Explicit session-addressed resume governance
 - milestone_state: committed
-- phase_state: `in_ibm`
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/candidates.md`
-- next_action: 先完成 IBM，冻结各工具 continuity contract，明确 `codex` 的 `--last` 风险、`cc` 的显式 `session-id` 基线，以及 `iflow` / `kiro-cli` 当前 contract 是否足以支持多进程并行
+- next_action: 当前实现与验证已落盘；保持 review / progress / merge gate 对齐，并仅在出现新的 cross-worktree targeting 或 stronger flush contract 范围时再开新 lifecycle
 
 ### candidate_issues
 

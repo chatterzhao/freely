@@ -22,6 +22,22 @@ tool_has_capability() {
   printf '%s\n' "$capabilities" | tr ',' '\n' | sed 's/^ *//; s/ *$//' | grep -Fxq "$capability"
 }
 
+tool_accepts_explicit_resume_target() {
+  local tool="$1"
+  case "$tool" in
+    codex|iflow) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+tool_requires_explicit_resume_target() {
+  local tool="$1"
+  case "$tool" in
+    codex) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 cc_codex_policy_prompt() {
   local policy="${1:-}"
   local project_root="${2:-}"
@@ -62,12 +78,17 @@ tool_run_from_prompt_file() {
   local codex_capability_cwd_mode="${13:-project-root}"
   local debug_log_file="${14:-}"
   local claude_session_id="${15:-}"
+  local tool_resume_target="${16:-}"
 
   case "$tool" in
     codex)
       local -a args=(exec --skip-git-repo-check -C "$project")
       if [[ "$launch_kind" == "resume" ]]; then
-        args=(exec resume --last --skip-git-repo-check)
+        [[ -n "$tool_resume_target" ]] || {
+          echo "[ERROR] codex resume requires an explicit session target" >&2
+          return 1
+        }
+        args=(exec resume "$tool_resume_target" --skip-git-repo-check)
       fi
       [[ -n "$model" ]] && args+=(-m "$model")
       [[ -n "$reasoning_effort" ]] && args+=(-c "model_reasoning_effort=\"$reasoning_effort\"")
@@ -78,7 +99,11 @@ tool_run_from_prompt_file() {
       local -a args=()
       [[ -n "$model" ]] && args+=(-m "$model")
       if [[ "$launch_kind" == "resume" ]]; then
-        args+=(-c)
+        if [[ -n "$tool_resume_target" ]]; then
+          args+=(-r "$tool_resume_target")
+        else
+          args+=(-c)
+        fi
       fi
       if [[ "$mode" == "auto" ]]; then
         exec iflow "${args[@]}" -p "$(cat "$prompt_file")" -y --max-turns 100

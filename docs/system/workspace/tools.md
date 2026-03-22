@@ -23,8 +23,13 @@
   - 需要较长 prompt 驱动下一跳工作
 - example:
   - fresh/auto: `iflow -p "<assembled prompt>" -y --max-turns 100`
-  - resume/auto: `iflow -c -p "<assembled prompt>" -y --max-turns 100`
+  - resume/auto with explicit session file: `iflow -r <session-file> -p "<assembled prompt>" -y --max-turns 100`
+  - resume/auto without explicit target: `iflow -c -p "<assembled prompt>" -y --max-turns 100`
   - fresh/step: `iflow -p "<assembled prompt>" --default --max-turns 100`
+- runtime_notes:
+  - `iflow --continue` only means recent conversation, not workcell-scoped explicit session addressing.
+  - `iflow --resume <session-file>` can target a specific session file, but Freely does not yet materialize it as a canonical per-workcell resume target.
+  - Until that materialization exists, `iflow` remains a weaker continuity contract than `codex` / `cc`.
 
 ### codex
 
@@ -40,13 +45,34 @@
 - example:
   - fresh/auto: `codex exec --skip-git-repo-check -C <project-root> --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
   - fresh/step: `codex exec --skip-git-repo-check -C <project-root> - < <prompt-file>`
-  - resume/auto: `codex exec resume --last --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
+  - resume/auto: `codex exec resume <SESSION_ID> --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
   - fresh_with_handoff/auto: `codex exec --skip-git-repo-check -C <project-root> --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
 - runtime_notes:
+  - Freely treats `codex` as an explicit session-addressed resume tool: canonical continuity target is the concrete `SESSION_ID`, not `resume --last`.
+  - If the runtime lacks an explicit Codex session target, it must rotate to `fresh_with_handoff` instead of silently falling back to `--last`.
   - Freely runtime may choose `fresh_with_handoff` when the previous Codex session is technically resumable but no longer healthy to keep extending.
   - Current rotation triggers include `context compacted`, missing resume evidence, local `resume_streak` threshold, and high context-window usage.
   - When context-window usage first crosses the local warn threshold, the next prompt should first refresh the phase-appropriate continuity artifact before continuing.
   - Default Codex runtime config is project-scoped `gpt-5.4` with reasoning effort `medium` unless the project explicitly overrides it.
+
+### kiro-cli
+
+- availability: available
+- priority: P2-weak-contract
+- strengths:
+  - 能承接单目录下的连续对话
+  - 具备交互式恢复入口
+- recommended_when:
+  - 当前任务不要求并发安全的 explicit session-addressed resume
+  - 可以接受“当前目录最近会话”语义
+- example:
+  - fresh/auto: `kiro-cli chat --no-interactive --trust-all-tools --model <model> < <prompt-file>`
+  - resume/auto: `kiro-cli chat --resume --no-interactive --trust-all-tools --model <model> "继续上次未完成工作，按项目意图和宪法持续推进。"`
+  - interactive fallback: `kiro-cli chat --resume-picker`
+- runtime_notes:
+  - `kiro-cli --resume` 当前只恢复当前目录最近会话，不是 canonical 的 explicit session-addressed resume。
+  - `--resume-picker` 只是人工交互 fallback，不能作为 supervisor/runtime 默认重入路径。
+  - 因此 `kiro-cli` 当前不应被标记为并发安全的 canonical continuity tool。
 
 ### cc
 

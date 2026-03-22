@@ -131,6 +131,7 @@ Freely 的能力必须同时标注 loop 和 owner，避免“能力有了，但�
 - availability probing
 - account cooldown / switch / sleep-until-reset
 - `resume` / `fresh` / `fresh_with_handoff`
+- explicit session-addressed resume target 管理与传递
 - fleet runtime status
 
 ### 3.2 manager-agent
@@ -237,6 +238,35 @@ source record
 -> manager restart-point routing
 -> delegated loop
 ```
+
+### 5.1A Runtime continuity contract
+
+runtime truth source 必须把 continuity contract 写成两层：
+
+- `process alive`
+  - 当前 AI 进程是否仍存活、可 attach
+- `session resumable`
+  - 当前工具是否存在明确且可追溯的 resume target
+
+Freely 的 canonical continuity model 固定为：
+
+- `tool + explicit session identifier + workcell ownership + evidence refs`
+
+当前工具矩阵：
+
+- `codex`
+  - canonical: `codex exec resume <SESSION_ID>`
+  - 缺少显式 target 时必须转 `fresh_with_handoff`，不得退回 `--last`
+- `cc` / `cc-use-codex-cli`
+  - canonical: per-workcell `--session-id <uuid>`
+- `iflow`
+  - `--continue` 仅表示 recent conversation
+  - `--resume <session-file>` 具备特定 session file 恢复能力，但 Freely 尚未把它物化成 canonical per-workcell target
+- `kiro-cli`
+  - `--resume` 仅表示当前目录最近会话
+  - `--resume-picker` 仅是交互 fallback
+
+PTY input injection 只能解释为 fallback，不属于默认 runtime/supervisor continuity path。
 
 ### 5.2 Discovery to candidate
 

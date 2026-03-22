@@ -547,6 +547,71 @@ tool_uses_claude_session_id() {
   esac
 }
 
+tool_prefers_explicit_resume_target() {
+  local tool="$1"
+  case "$tool" in
+    codex|cc|cc-use-codex-cli) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+tool_runtime_resume_target_before_launch() {
+  local tool="$1"
+  case "$tool" in
+    cc|cc-use-codex-cli)
+      printf '%s\n' "${CLAUDE_SESSION_ID_CURRENT:-}"
+      ;;
+    *)
+      printf '%s\n' "${LAST_TOOL_RESUME_TARGET:-}"
+      ;;
+  esac
+}
+
+tool_runtime_resume_target_after_cycle() {
+  local tool="$1" observed_tool_session_id="$2" launch_resume_target="$3"
+  case "$tool" in
+    codex)
+      if [[ -n "$observed_tool_session_id" ]]; then
+        printf '%s\n' "$observed_tool_session_id"
+      else
+        printf '%s\n' "$launch_resume_target"
+      fi
+      ;;
+    cc|cc-use-codex-cli)
+      printf '%s\n' "${CLAUDE_SESSION_ID_CURRENT:-}"
+      ;;
+    *)
+      printf '%s\n' "$launch_resume_target"
+      ;;
+  esac
+}
+
+tool_persisted_session_id_after_cycle() {
+  local tool="$1" observed_tool_session_id="$2" resolved_resume_target="$3"
+  case "$tool" in
+    codex)
+      if [[ -n "$observed_tool_session_id" ]]; then
+        printf '%s\n' "$observed_tool_session_id"
+      else
+        printf '%s\n' "$resolved_resume_target"
+      fi
+      ;;
+    *)
+      printf '%s\n' "$observed_tool_session_id"
+      ;;
+  esac
+}
+
+current_workcell_session_refs() {
+  local tool="${AI_TOOL:-}" resume_target
+  resume_target="$(tool_runtime_resume_target_before_launch "$tool")"
+  if [[ -z "$tool" || -z "$resume_target" ]]; then
+    printf '[]\n'
+    return 0
+  fi
+  printf '[tool=%s,resume_target=%s,scope=workcell-current]\n' "$tool" "$resume_target"
+}
+
 is_valid_uuid() {
   local value="$1"
   [[ "$value" =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$ ]]
@@ -906,8 +971,49 @@ intake_snapshot_for_project() {
   done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort -r)
 }
 
+delegated_continuation_snapshot_for_project() {
+  local project="$1" limit="${2:-3}"
+  local intake_root item_dir meta_file message_file resolution_file status absorption_target delegated_worktree message summary count project_real delegated_real session_refs
+  intake_root="$(intake_dir_for_project "$project")"
+  [[ -d "$intake_root" ]] || return 0
+  project_real="$(cd "$project" && pwd -P)"
+  count=0
+  while IFS= read -r item_dir; do
+    meta_file="$item_dir/meta.env"
+    message_file="$item_dir/message.txt"
+    [[ -f "$meta_file" && -f "$message_file" ]] || continue
+    status="$(meta_env_value "$meta_file" "STATUS")"
+    absorption_target="$(meta_env_value "$meta_file" "ABSORPTION_TARGET")"
+    delegated_worktree="$(meta_env_value "$meta_file" "DELEGATED_WORKTREE")"
+    session_refs="$(meta_env_value "$meta_file" "SESSION_REFS")"
+    [[ "$status" == "delegated" ]] || continue
+    [[ "$absorption_target" == "handoff://continuation" ]] || continue
+    delegated_real=""
+    if [[ -n "$delegated_worktree" ]]; then
+      delegated_real="$(cd "$delegated_worktree" 2>/dev/null && pwd -P || true)"
+    fi
+    if [[ -n "$delegated_real" && "$delegated_real" != "$project_real" ]]; then
+      continue
+    fi
+    message="$(tr '\n' ' ' <"$message_file" | sed 's/  */ /g')"
+    printf -- '- intake_id=%s message=%s\n' "$(basename "$item_dir")" "$message"
+    if [[ -n "$session_refs" && "$session_refs" != "[]" ]]; then
+      printf '  session_refs=%s\n' "$session_refs"
+    fi
+    resolution_file="$(meta_env_value "$meta_file" "RESOLUTION_ARTIFACT")"
+    if [[ -n "$resolution_file" && -f "$resolution_file" ]]; then
+      summary="$(tr '\n' ' ' <"$resolution_file" | sed 's/  */ /g')"
+      printf '  resolution=%s\n' "$summary"
+    fi
+    count=$((count + 1))
+    if (( count >= limit )); then
+      break
+    fi
+  done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort -r)
+}
+
 rewrite_existing_intake_item() {
-  local project="$1" intake_id="$2" status="$3" classification="$4" linked_artifact="$5" delegated_worktree="$6" reaction="$7" claimed_by="$8" claimed_at="$9" absorption_target="${10:-}" resolution_artifact="${11:-}"
+  local project="$1" intake_id="$2" status="$3" classification="$4" linked_artifact="$5" delegated_worktree="$6" reaction="$7" claimed_by="$8" claimed_at="$9" absorption_target="${10:-}" resolution_artifact="${11:-}" session_refs_override="${12:-}"
   local meta_file message_file author channel session_refs message created_at
   meta_file="$(intake_item_meta_file "$project" "$intake_id")"
   message_file="$(intake_item_message_file "$project" "$intake_id")"
@@ -919,6 +1025,7 @@ rewrite_existing_intake_item() {
   author="$(meta_env_value "$meta_file" "AUTHOR")"
   channel="$(meta_env_value "$meta_file" "CHANNEL")"
   session_refs="$(meta_env_value "$meta_file" "SESSION_REFS")"
+  [[ -n "$session_refs_override" ]] && session_refs="$session_refs_override"
   message="$(cat "$message_file" 2>/dev/null || true)"
   write_intake_item \
     "$project" "$intake_id" "$author" "$channel" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "${session_refs:-[]}" "$message" \
@@ -1219,25 +1326,18 @@ log_has_auth_failure() {
 
 tool_prefers_resume_evidence() {
   local tool="$1"
-  case "$tool" in
-    codex|cc|cc-use-codex-cli) return 0 ;;
-    *) return 1 ;;
-  esac
+  tool_prefers_explicit_resume_target "$tool"
 }
 
 tool_has_resume_evidence() {
   local tool="$1"
-  case "$tool" in
-    codex)
-      [[ -n "${LAST_TOOL_SESSION_ID:-}" ]]
-      ;;
-    cc|cc-use-codex-cli)
-      [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]
-      ;;
-    *)
-      return 0
-      ;;
-  esac
+  local resume_target
+  resume_target="$(tool_runtime_resume_target_before_launch "$tool")"
+  if tool_prefers_explicit_resume_target "$tool"; then
+    [[ -n "$resume_target" ]]
+  else
+    return 0
+  fi
 }
 
 log_has_same_tool_route_only_handoff() {
@@ -1263,6 +1363,7 @@ load_session_state_or_defaults() {
   state_file="$(session_state_file "$project")"
 
   LAST_TOOL_SESSION_ID=""
+  LAST_TOOL_RESUME_TARGET=""
   LAST_TOOL_JSONL_PATH=""
   LAST_LAUNCH_KIND=""
   LAST_ROTATION_REASON=""
@@ -1327,12 +1428,54 @@ LAST_STATE_UPDATED_AT="$updated_at"
 EOF
 }
 
+preemption_state_file() {
+  local project="$1"
+  printf '%s/run/preemption-state.env\n' "$(state_dir "$project")"
+}
+
+write_preemption_state() {
+  local project="$1" mode="$2" reason="$3" intake_id="$4" pid="$5"
+  cat >"$(preemption_state_file "$project")" <<EOF
+LAST_PREEMPTION_MODE="$mode"
+LAST_PREEMPTION_REASON="$reason"
+LAST_PREEMPTION_INTAKE_ID="$intake_id"
+LAST_PREEMPTION_PID="$pid"
+LAST_PREEMPTION_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+EOF
+}
+
+request_local_continuation_reentry() {
+  local project="$1" intake_id="$2"
+  local ai_pid waited=0
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  [[ -n "$ai_pid" ]] || return 0
+  if ! kill -0 "$ai_pid" 2>/dev/null; then
+    return 0
+  fi
+
+  kill "$ai_pid" 2>/dev/null || true
+  while kill -0 "$ai_pid" 2>/dev/null; do
+    if (( waited >= 30 )); then
+      kill -9 "$ai_pid" 2>/dev/null || true
+      write_preemption_state "$project" "hard_kill_fallback" "local_continuation_reentry" "$intake_id" "$ai_pid"
+      log_warn "forced hard-kill fallback for local continuation re-entry: intake=$intake_id pid=$ai_pid"
+      return 0
+    fi
+    sleep 0.1
+    waited=$((waited + 1))
+  done
+
+  write_preemption_state "$project" "graceful_term" "local_continuation_reentry" "$intake_id" "$ai_pid"
+  log_info "triggered graceful local continuation re-entry for intake: $intake_id (ai pid=$ai_pid)"
+}
+
 write_session_state() {
-  local project="$1" tool_session_id="$2" tool_jsonl_path="$3" launch_kind="$4" rotation_reason="$5" cycle_log="$6" context_compacted="$7" context_ratio="$8" primary_used_percent="$9" primary_resets_at="${10}" secondary_used_percent="${11}" secondary_resets_at="${12}" route_only_handoff="${13}" route_only_streak="${14}" resume_streak="${15}" active_account="${16}" account_switch_reason="${17}" account_switch_at="${18}" cycle_debug_log="${19}" claude_jsonl_path="${20}" codex_mcp_used="${21}" codex_mcp_thread_id="${22}" codex_mcp_jsonl_path="${23}" claude_session_id_current="${24}" claude_session_id_previous="${25}" project_dirty_entries="${26}" worktree_summary_total="${27}" worktree_summary_dirty="${28}" checkpoint_drift_streak="${29}"
+  local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" context_compacted="$8" context_ratio="$9" primary_used_percent="${10}" primary_resets_at="${11}" secondary_used_percent="${12}" secondary_resets_at="${13}" route_only_handoff="${14}" route_only_streak="${15}" resume_streak="${16}" active_account="${17}" account_switch_reason="${18}" account_switch_at="${19}" cycle_debug_log="${20}" claude_jsonl_path="${21}" codex_mcp_used="${22}" codex_mcp_thread_id="${23}" codex_mcp_jsonl_path="${24}" claude_session_id_current="${25}" claude_session_id_previous="${26}" project_dirty_entries="${27}" worktree_summary_total="${28}" worktree_summary_dirty="${29}" checkpoint_drift_streak="${30}"
   local state_file
   state_file="$(session_state_file "$project")"
   cat >"$state_file" <<EOF
 LAST_TOOL_SESSION_ID="$tool_session_id"
+LAST_TOOL_RESUME_TARGET="$tool_resume_target"
 LAST_TOOL_JSONL_PATH="$tool_jsonl_path"
 LAST_LAUNCH_KIND="$launch_kind"
 LAST_ROTATION_REASON="$rotation_reason"
@@ -1376,6 +1519,7 @@ write_session_handoff() {
 - rotation_reason: $rotation_reason
 - previous_launch_kind: ${LAST_LAUNCH_KIND:-unknown}
 - previous_tool_session_id: ${LAST_TOOL_SESSION_ID:-unavailable}
+- previous_tool_resume_target: ${LAST_TOOL_RESUME_TARGET:-unavailable}
 - previous_tool_jsonl_path: ${LAST_TOOL_JSONL_PATH:-unavailable}
 - previous_claude_session_id: ${CLAUDE_SESSION_ID_CURRENT:-unavailable}
 - previous_claude_jsonl_path: ${LAST_CLAUDE_JSONL_PATH:-unavailable}
@@ -1615,6 +1759,21 @@ Human chat intake queue:
 - intake item 只有在被吸收进 recovery / issue / pre-brainstorm / milestone 后，才算处理完成。
 
 $intake_snapshot
+EOF
+}
+
+append_local_delegated_continuation_if_needed() {
+  local snapshot
+  snapshot="$(delegated_continuation_snapshot_for_project "$PROJECT_ROOT" 3)"
+  [[ -n "$snapshot" ]] || return 0
+  cat <<EOF
+
+Delegated continuation handoff:
+- interruption dispatcher 已将以下 signal 委派回当前工位继续处理。
+- 本轮不要忽略这些 delegated continuation；先吸收它们，再继续当前 issue。
+- 若 handoff 与当前 active issue 一致，优先按 handoff 继续，不要停留在旧 prompt 或旧 focus。
+
+$snapshot
 EOF
 }
 
@@ -2087,10 +2246,11 @@ ai_process_command_for_project() {
 
 ai_process_snapshot_markdown() {
   local project="$1"
-  local ai_pid session_state tool_session_id tool_jsonl_path prompt_file ai_ps_line
+  local ai_pid session_state tool_session_id tool_resume_target tool_jsonl_path prompt_file ai_ps_line
   ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
   load_session_state_or_defaults "$project"
   tool_session_id="${LAST_TOOL_SESSION_ID:-unavailable}"
+  tool_resume_target="${LAST_TOOL_RESUME_TARGET:-unavailable}"
   tool_jsonl_path="${LAST_TOOL_JSONL_PATH:-unavailable}"
   prompt_file="$(latest_prompt_file_for_project "$project")"
   [[ -n "$prompt_file" ]] || prompt_file="unavailable"
@@ -2102,6 +2262,7 @@ ai_process_snapshot_markdown() {
   - pid: \`$ai_pid\`
   - snapshot: \`${ai_ps_line:-unavailable}\`
 - last_tool_session_id: \`$tool_session_id\`
+- last_tool_resume_target: \`$tool_resume_target\`
 - last_tool_jsonl_path: \`$tool_jsonl_path\`
 - latest_prompt_file: \`$prompt_file\`
 EOF
@@ -2112,6 +2273,7 @@ EOF
   - pid: \`none\`
   - snapshot: \`none\`
 - last_tool_session_id: \`$tool_session_id\`
+- last_tool_resume_target: \`$tool_resume_target\`
 - last_tool_jsonl_path: \`$tool_jsonl_path\`
 - latest_prompt_file: \`$prompt_file\`
 EOF
@@ -2501,6 +2663,7 @@ build_prompt() {
   append_checkpoint_intervention_if_needed
   append_fleet_supervision_if_needed
   append_human_chat_intake_if_needed
+  append_local_delegated_continuation_if_needed
   append_manager_supervision_alert_if_needed
   append_manager_hygiene_alert_if_needed
   append_route_only_recovery_if_needed
@@ -2720,6 +2883,7 @@ cmd_start() {
         --codex-capability-cwd-mode "${AI_CAPABILITY_CODEX_CWD_MODE:-}" \
         --debug-log-file "$cycle_debug_log" \
         --claude-session-id "${CLAUDE_SESSION_ID_CURRENT:-}" \
+        --tool-resume-target "$(tool_runtime_resume_target_before_launch "$AI_TOOL")" \
         --mode "$AI_MODE" \
         --prompt-file "$prompt_file" \
         --pid-file "$child_pid_file" \
@@ -2728,15 +2892,17 @@ cmd_start() {
     } >>"$loop_log" 2>&1
     local rc=$?
     set -e
-    local child_pid tool_session_id tool_jsonl_path context_compacted context_ratio route_only_handoff checkpoint_json checkpoint_required
+    local child_pid tool_session_id tool_resume_target tool_jsonl_path context_compacted context_ratio route_only_handoff checkpoint_json checkpoint_required
     local codex_mcp_used codex_mcp_thread_id codex_mcp_jsonl_path
     local claude_jsonl_path
     local primary_rate_limit_used_percent primary_rate_limit_resets_at secondary_rate_limit_used_percent secondary_rate_limit_resets_at next_restart_delay
     local active_account account_switch_reason
     local rate_limit_reason rate_limit_reset_at
     local dirty_entries worktree_total worktree_dirty summary
+    local launch_resume_target
     child_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
     tool_session_id="$(extract_tool_session_id_from_log "$AI_TOOL" "$cycle_log")"
+    tool_resume_target=""
     tool_jsonl_path=""
     context_ratio=""
     primary_rate_limit_used_percent=""
@@ -2751,6 +2917,7 @@ cmd_start() {
     worktree_total="0"
     worktree_dirty="0"
     next_restart_delay="${RESTART_DELAY:-2}"
+    launch_resume_target="$(tool_runtime_resume_target_before_launch "$AI_TOOL")"
     if [[ "$AI_TOOL" == "codex" && -n "$tool_session_id" ]]; then
       tool_jsonl_path="$(find_codex_jsonl_path_for_session "$tool_session_id")"
       context_ratio="$(extract_latest_codex_context_ratio_from_jsonl "$tool_jsonl_path")"
@@ -2778,6 +2945,8 @@ cmd_start() {
     if log_has_same_tool_route_only_handoff "$cycle_log" "$AI_TOOL"; then
       route_only_handoff="1"
     fi
+    tool_resume_target="$(tool_runtime_resume_target_after_cycle "$AI_TOOL" "$tool_session_id" "$launch_resume_target")"
+    tool_session_id="$(tool_persisted_session_id_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_resume_target")"
     if tool_uses_claude_session_id "$AI_TOOL" && [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
       local resolved_cc_evidence
       resolved_cc_evidence="$(resolve_cc_session_evidence "$PROJECT_ROOT" "${CLAUDE_SESSION_ID_CURRENT:-}")"
@@ -2799,6 +2968,7 @@ cmd_start() {
       [[ -n "$codex_mcp_jsonl_path" ]] || codex_mcp_jsonl_path="unavailable://codex-thread-id-not-yet-resolved"
     fi
     LAST_TOOL_SESSION_ID="$tool_session_id"
+    LAST_TOOL_RESUME_TARGET="$tool_resume_target"
     LAST_TOOL_JSONL_PATH="$tool_jsonl_path"
     LAST_LAUNCH_KIND="$mode_name"
     LAST_ROTATION_REASON="$LAUNCH_ROTATION_REASON"
@@ -2862,7 +3032,7 @@ cmd_start() {
       fi
     fi
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT"
     LAST_WORKCELL_EXIT_REASON="${account_switch_reason:-${rate_limit_reason:-ai_exit_rc_${rc}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
 
@@ -3082,6 +3252,7 @@ cmd_intake_claim() {
 
 cmd_intake_resolve() {
   local project="" intake_id="" resolved_by="" reaction="" classification="" linked_artifact="pending://resolution-unlinked" delegated_worktree="" resolution_file="" absorption_target="" status="absorbed"
+  local session_refs_override=""
   local meta_file claimed_by claimed_at reaction_existing classification_existing delegated_existing linked_existing resolution_content resolution_dir resolution_artifact
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -3104,6 +3275,8 @@ cmd_intake_resolve() {
   validate_reaction_or_fail "$reaction"
   validate_absorption_classification_or_fail "$classification"
   validate_intake_status_or_fail "$status"
+  load_config "$project"
+  load_session_state_or_defaults "$project"
   case "$status" in
     delegated|absorbed|dropped) ;;
     *)
@@ -3133,8 +3306,22 @@ cmd_intake_resolve() {
       "$project" "$intake_id" "$resolved_by" "$reaction" "$classification" "$absorption_target" "$linked_artifact" "$delegated_worktree" "$status" "$resolution_content"
   )"
   resolution_artifact="$resolution_dir/resolution.md"
+  if [[ "$status" == "delegated" && "$absorption_target" == "handoff://continuation" ]]; then
+    session_refs_override="$(current_workcell_session_refs)"
+  fi
   rewrite_existing_intake_item \
-    "$project" "$intake_id" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "$reaction" "${claimed_by:-$resolved_by}" "${claimed_at:-$(date -u '+%Y-%m-%dT%H:%M:%SZ')}" "$absorption_target" "$resolution_artifact"
+    "$project" "$intake_id" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "$reaction" "${claimed_by:-$resolved_by}" "${claimed_at:-$(date -u '+%Y-%m-%dT%H:%M:%SZ')}" "$absorption_target" "$resolution_artifact" "$session_refs_override"
+  if [[ "$status" == "delegated" && "$absorption_target" == "handoff://continuation" ]]; then
+    local project_real delegated_real
+    project_real="$(cd "$project" && pwd -P)"
+    delegated_real=""
+    if [[ -n "$delegated_worktree" ]]; then
+      delegated_real="$(cd "$delegated_worktree" 2>/dev/null && pwd -P || true)"
+    fi
+    if [[ -z "$delegated_real" || "$delegated_real" == "$project_real" ]]; then
+      request_local_continuation_reentry "$project" "$intake_id"
+    fi
+  fi
   log_info "intake resolved: $intake_id"
   echo "intake_id: $intake_id"
   echo "status: $status"
@@ -3196,6 +3383,7 @@ cmd_baseline_status() {
   echo "codex_capability_cwd_mode: ${AI_CAPABILITY_CODEX_CWD_MODE:-none}"
   echo "resume_streak: ${RESUME_STREAK_CURRENT:-0}"
   echo "last_tool_session_id: ${LAST_TOOL_SESSION_ID:-unavailable}"
+  echo "last_tool_resume_target: ${LAST_TOOL_RESUME_TARGET:-unavailable}"
   echo "last_tool_jsonl_path: ${LAST_TOOL_JSONL_PATH:-unavailable}"
   echo "last_launch_kind: ${LAST_LAUNCH_KIND:-unavailable}"
   echo "last_rotation_reason: ${LAST_ROTATION_REASON:-unavailable}"
@@ -3386,6 +3574,7 @@ cmd_live_status() {
   echo "- run_dir: $run_dir"
   echo "- last_tool_jsonl_path: ${LAST_TOOL_JSONL_PATH:-unavailable}"
   echo "- last_tool_session_id: ${LAST_TOOL_SESSION_ID:-unavailable}"
+  echo "- last_tool_resume_target: ${LAST_TOOL_RESUME_TARGET:-unavailable}"
   echo "- last_cycle_log: ${LAST_CYCLE_LOG:-unavailable}"
 }
 
