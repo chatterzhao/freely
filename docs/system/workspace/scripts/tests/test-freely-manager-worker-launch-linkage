@@ -72,7 +72,7 @@ cat >"$PROMPT_FILE" <<EOF
 你现在运行在 Freely 的 worker 工位，不是主管工位。
 
 你的 worktree：
-- $WORKER_WT
+- \`$WORKER_WT\`
 - branch: \`feature/test-worker\`
 
 当前任务是 completion verification / cleanup followthrough。
