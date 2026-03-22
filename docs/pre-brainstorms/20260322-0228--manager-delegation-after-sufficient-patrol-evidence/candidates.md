@@ -6,7 +6,8 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`
-- session_refs: []
+- session_refs:
+  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "author"}
 - why_now:
   - real Freely dogfooding now shows manager can patrol and classify remaining feature worktrees correctly
   - but still delays concrete worker delegation after evidence is already sufficient
