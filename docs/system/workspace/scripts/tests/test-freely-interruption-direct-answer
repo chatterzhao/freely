@@ -114,6 +114,8 @@ RESTART_POINT=continuation
 OWNERSHIP=manager
 WHY=这是新的项目级主管巡检任务，应回到主管主循环做 patrol 与 restart-point routing
 HANDOFF=下一轮主管主循环先做 live-status 和 fleet-status 巡检再决定委派
+ANSWER=
+OUT
 elif [[ "$message" == *continue-current-issue* ]]; then
   cat <<'OUT'
 DECISION=delegate
@@ -169,6 +171,19 @@ cleanup_dispatcher() {
       wait "$pid" 2>/dev/null || true
     fi
   fi
+}
+
+wait_for_grep() {
+  local pattern="$1" file="$2" attempts
+  for attempts in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+    if grep -q "$pattern" "$file" 2>/dev/null; then
+      return 0
+    fi
+    sleep 0.1
+  done
+  echo "[FAIL] pattern not observed after retry: $pattern in $file" >&2
+  [[ -f "$file" ]] && cat "$file" >&2
+  return 1
 }
 trap 'cleanup_dispatcher; rm -rf "$TMP_DIR"' EXIT
 
@@ -255,8 +270,7 @@ cat >"$DIRTY_WT/.freely/run/session-state.env" <<'EOF'
 LAST_TOOL_SESSION_ID="codex-session-current"
 LAST_TOOL_RESUME_TARGET="codex-session-current"
 EOF
-bash -c 'sleep 30' >/dev/null 2>&1 &
-CONT_PID=$!
+CONT_PID="$(bash -lc 'sleep 30 >/dev/null 2>&1 & pid=$!; disown "$pid" 2>/dev/null || true; printf "%s\n" "$pid"')"
 echo "$CONT_PID" >"$DIRTY_WT/.freely/run/ai.pid"
 
 CHAT_OUTPUT_CONT="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$DIRTY_WT" "continue-current-issue")"
@@ -265,19 +279,19 @@ INTAKE_ID_CONT="$(printf '%s\n' "$CHAT_OUTPUT_CONT" | sed -n 's/^intake_id: //p'
   echo "[FAIL] missing continuation intake id" >&2
   exit 1
 }
-grep -q '^STATUS="delegated"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
-grep -q '^CLASSIFICATION="continuation"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
-grep -q '^ABSORPTION_TARGET="handoff://continuation"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
-grep -q '^SESSION_REFS="\[tool=codex,resume_target=codex-session-current,scope=workcell-current\]"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
-grep -q 'restart_point: `continuation`' "$DIRTY_WT/.freely/run/interruption-resolution/$INTAKE_ID_CONT/resolution.md"
+wait_for_grep '^STATUS="delegated"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+wait_for_grep '^CLASSIFICATION="continuation"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+wait_for_grep '^ABSORPTION_TARGET="handoff://continuation"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+wait_for_grep '^SESSION_REFS="\[tool=codex,resume_target=codex-session-current,scope=workcell-current\]"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+wait_for_grep 'restart_point: `continuation`' "$DIRTY_WT/.freely/run/interruption-resolution/$INTAKE_ID_CONT/resolution.md"
 sleep 1
 if kill -0 "$CONT_PID" 2>/dev/null; then
   echo "[FAIL] delegated continuation should interrupt current ai pid for local re-entry" >&2
   exit 1
 fi
-grep -q '^LAST_PREEMPTION_MODE="graceful_term"$' "$DIRTY_WT/.freely/run/preemption-state.env"
-grep -q '^LAST_PREEMPTION_REASON="local_continuation_reentry"$' "$DIRTY_WT/.freely/run/preemption-state.env"
-grep -q "^LAST_PREEMPTION_INTAKE_ID=\"$INTAKE_ID_CONT\"$" "$DIRTY_WT/.freely/run/preemption-state.env"
+wait_for_grep '^LAST_PREEMPTION_MODE="graceful_term"$' "$DIRTY_WT/.freely/run/preemption-state.env"
+wait_for_grep '^LAST_PREEMPTION_REASON="local_continuation_reentry"$' "$DIRTY_WT/.freely/run/preemption-state.env"
+wait_for_grep "^LAST_PREEMPTION_INTAKE_ID=\"$INTAKE_ID_CONT\"$" "$DIRTY_WT/.freely/run/preemption-state.env"
 wait "$CONT_PID" 2>/dev/null || true
 kill "$WORKER_DISPATCH_PID" 2>/dev/null || true
 wait "$WORKER_DISPATCH_PID" 2>/dev/null || true
