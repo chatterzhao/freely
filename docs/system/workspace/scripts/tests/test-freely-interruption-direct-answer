@@ -105,7 +105,6 @@ WHY=这涉及实际收口动作，需要委派清理
 HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口
 ANSWER=
 OUT
-<<<<<<< HEAD
 elif [[ "$message" == *主管* && "$message" == *milestones* && "$message" == *issues* && "$message" == *intake* && "$message" == *runtime* ]]; then
   cat <<'OUT'
 DECISION=delegate
@@ -115,7 +114,6 @@ RESTART_POINT=continuation
 OWNERSHIP=manager
 WHY=这是新的项目级主管巡检任务，应回到主管主循环做 patrol 与 restart-point routing
 HANDOFF=下一轮主管主循环先做 live-status 和 fleet-status 巡检再决定委派
-=======
 elif [[ "$message" == *continue-current-issue* ]]; then
   cat <<'OUT'
 DECISION=delegate
@@ -125,7 +123,6 @@ RESTART_POINT=continuation
 OWNERSHIP=worker
 WHY=这条信号应回到当前工位继续推进 active issue
 HANDOFF=围绕当前工位 active issue 继续推进，不要停留在旧 prompt
->>>>>>> develop
 ANSWER=
 OUT
 else
