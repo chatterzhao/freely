@@ -241,12 +241,12 @@ routing_policy:
 19. `I-20260322-0245`
 - title: Runtime worker launch linkage and stall recovery governance
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/candidates.md`
-- next_action: runtime 已补 worker handoff ingestion 与 stalled AI recovery；下一步完成 review 后决定是否可向 `develop` 合并，并在 merge 后用真实 `freely chat` 再跑一次 develop 集成验收
+- next_action: 当前生命周期已完成；若后续仍观察到 manager handoff 进入 queue 但 worker 未被拉起，或 stalled AI recovery 误判/漏判，再通过新 lifecycle 继续 materialize
 
 20. `I-20260322-0412`
 - title: Worker active reentry for manager-delegated continuation governance

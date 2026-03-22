@@ -20,6 +20,9 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery`
 - `./bin/governance-check`
+- real post-merge acceptance on `develop`
+  - `manager-worker-launch-state.env` recorded all three launched worker prompt paths
+  - `fleet-status` showed worker supervisors/AI active on the three target worktrees
 
 ## Residual risk
 

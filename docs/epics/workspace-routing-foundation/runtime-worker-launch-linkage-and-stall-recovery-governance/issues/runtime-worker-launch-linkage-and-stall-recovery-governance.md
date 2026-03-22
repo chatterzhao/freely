@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260322-0245`
 - title: Runtime worker launch linkage and stall recovery governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-worker-launch-linkage-and-stall-recovery-governance`
@@ -61,3 +61,10 @@ Freely 最新 dogfood 证明：
 - `./bin/governance-check`
 - worker launch linkage integration test
 - stalled AI recovery runtime test
+- post-merge acceptance on `develop`:
+  - after restarting `freely`, manager runtime consumed `manager-continuity-20260322-021727.md`
+  - `manager-worker-launch-state.env` recorded all three launched worker prompt paths
+  - `fleet-status` showed worker supervisors/AI running on:
+    - `feature/cli-first-observability-surfaces-20260322`
+    - `feature/manager-handoff-consumption-reentry-20260322`
+    - `feature/three-loop-dev-loop-ai-native-definition-20260321`
