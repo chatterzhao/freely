@@ -261,6 +261,8 @@ wait_for_grep '^ABSORPTION_TARGET="handoff://continuation"$' ".freely/intake/$IN
 wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
 wait_for_grep 'restart_point: `continuation`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
 wait_for_grep 'ownership: `manager`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
+LIVE_STATUS_MANAGER="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+printf '%s\n' "$LIVE_STATUS_MANAGER" | grep -q "pending_delegated_continuation_ids: $INTAKE_ID_MANAGER"
 
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --project "$DIRTY_WT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto >/dev/null
 FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$DIRTY_WT" --watch >/dev/null 2>&1 &

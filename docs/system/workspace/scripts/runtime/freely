@@ -1039,6 +1039,49 @@ delegated_continuation_snapshot_for_project() {
   done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort -r)
 }
 
+delegated_continuation_ids_for_project() {
+  local project="$1"
+  local intake_root item_dir meta_file status absorption_target delegated_worktree intake_id
+  local project_real delegated_real ids=()
+  intake_root="$(intake_dir_for_project "$project")"
+  [[ -d "$intake_root" ]] || return 0
+  project_real="$(cd "$project" && pwd -P)"
+  while IFS= read -r item_dir; do
+    meta_file="$item_dir/meta.env"
+    [[ -f "$meta_file" ]] || continue
+    status="$(meta_env_value "$meta_file" "STATUS")"
+    absorption_target="$(meta_env_value "$meta_file" "ABSORPTION_TARGET")"
+    delegated_worktree="$(meta_env_value "$meta_file" "DELEGATED_WORKTREE")"
+    [[ "$status" == "delegated" ]] || continue
+    [[ "$absorption_target" == "handoff://continuation" ]] || continue
+    delegated_real=""
+    if [[ -n "$delegated_worktree" ]]; then
+      delegated_real="$(cd "$delegated_worktree" 2>/dev/null && pwd -P || true)"
+    fi
+    if [[ -n "$delegated_real" && "$delegated_real" != "$project_real" ]]; then
+      continue
+    fi
+    intake_id="$(basename "$item_dir")"
+    ids+=("$intake_id")
+  done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort)
+  if ((${#ids[@]})); then
+    local joined="" id
+    for id in "${ids[@]}"; do
+      [[ -z "$joined" ]] && joined="$id" || joined="$joined,$id"
+    done
+    printf '%s\n' "$joined"
+  fi
+}
+
+csv_item_count() {
+  local value="$1"
+  [[ -n "$value" ]] || {
+    printf '0\n'
+    return 0
+  }
+  printf '%s\n' "$value" | awk -F',' '{ print NF }'
+}
+
 rewrite_existing_intake_item() {
   local project="$1" intake_id="$2" status="$3" classification="$4" linked_artifact="$5" delegated_worktree="$6" reaction="$7" claimed_by="$8" claimed_at="$9" absorption_target="${10:-}" resolution_artifact="${11:-}" session_refs_override="${12:-}"
   local meta_file message_file author channel session_refs message created_at
@@ -1415,6 +1458,10 @@ load_session_state_or_defaults() {
   LAST_PROJECT_DIRTY_ENTRIES="0"
   LAST_WORKTREE_SUMMARY_TOTAL="0"
   LAST_WORKTREE_SUMMARY_DIRTY="0"
+  LAST_DELEGATED_CONTINUATION_PENDING_IDS=""
+  LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0"
+  LAST_DELEGATED_CONTINUATION_CONSUMED_IDS=""
+  LAST_DELEGATED_CONTINUATION_CONSUMED_AT=""
   CHECKPOINT_DRIFT_STREAK_CURRENT="0"
   ROUTE_ONLY_STREAK_CURRENT="0"
   RESUME_STREAK_CURRENT="0"
@@ -1497,7 +1544,7 @@ request_local_continuation_reentry() {
 }
 
 write_session_state() {
-  local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" context_compacted="$8" context_ratio="$9" primary_used_percent="${10}" primary_resets_at="${11}" secondary_used_percent="${12}" secondary_resets_at="${13}" route_only_handoff="${14}" route_only_streak="${15}" resume_streak="${16}" active_account="${17}" account_switch_reason="${18}" account_switch_at="${19}" cycle_debug_log="${20}" claude_jsonl_path="${21}" codex_mcp_used="${22}" codex_mcp_thread_id="${23}" codex_mcp_jsonl_path="${24}" claude_session_id_current="${25}" claude_session_id_previous="${26}" project_dirty_entries="${27}" worktree_summary_total="${28}" worktree_summary_dirty="${29}" checkpoint_drift_streak="${30}"
+  local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" context_compacted="$8" context_ratio="$9" primary_used_percent="${10}" primary_resets_at="${11}" secondary_used_percent="${12}" secondary_resets_at="${13}" route_only_handoff="${14}" route_only_streak="${15}" resume_streak="${16}" active_account="${17}" account_switch_reason="${18}" account_switch_at="${19}" cycle_debug_log="${20}" claude_jsonl_path="${21}" codex_mcp_used="${22}" codex_mcp_thread_id="${23}" codex_mcp_jsonl_path="${24}" claude_session_id_current="${25}" claude_session_id_previous="${26}" project_dirty_entries="${27}" worktree_summary_total="${28}" worktree_summary_dirty="${29}" checkpoint_drift_streak="${30}" delegated_pending_ids="${31}" delegated_pending_count="${32}" delegated_consumed_ids="${33}" delegated_consumed_at="${34}"
   local state_file
   state_file="$(session_state_file "$project")"
   cat >"$state_file" <<EOF
@@ -1527,6 +1574,10 @@ CLAUDE_SESSION_ID_PREVIOUS="$claude_session_id_previous"
 LAST_PROJECT_DIRTY_ENTRIES="$project_dirty_entries"
 LAST_WORKTREE_SUMMARY_TOTAL="$worktree_summary_total"
 LAST_WORKTREE_SUMMARY_DIRTY="$worktree_summary_dirty"
+LAST_DELEGATED_CONTINUATION_PENDING_IDS="$delegated_pending_ids"
+LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
+LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
+LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
 CHECKPOINT_DRIFT_STREAK_CURRENT="$checkpoint_drift_streak"
 ROUTE_ONLY_STREAK_CURRENT="$route_only_streak"
 RESUME_STREAK_CURRENT="$resume_streak"
@@ -1567,7 +1618,7 @@ write_session_handoff() {
 
 ## Continuity Guard
 - If the previous cycle compacted or approached a local context threshold, update the phase-appropriate continuity artifact before expanding implementation.
-- Treat explicit `context compacted` / compact / compression signals as a stop-and-summarize trigger, even for tools without structured context metrics.
+- Treat explicit 'context compacted' / compact / compression signals as a stop-and-summarize trigger, even for tools without structured context metrics.
 - If the current issue boundary is already verified, prefer a checkpoint commit before adding more scope.
 
 ## Summary Target Hint
@@ -2894,6 +2945,7 @@ cmd_start() {
   load_session_state_or_defaults "$project"
   while true; do
     local ts prompt_file cycle_log cycle_debug_log mode_name watchdog_script workspace_root
+    local delegated_pending_ids delegated_pending_count delegated_consumed_ids delegated_consumed_at
     ts="$(date '+%Y%m%d-%H%M%S')"
     prompt_file="$run_dir/prompt-$ts.txt"
     cycle_log="$logs_dir/cycle-$ts.log"
@@ -2913,12 +2965,20 @@ cmd_start() {
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
     ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name"
+    delegated_pending_ids="$(delegated_continuation_ids_for_project "$PROJECT_ROOT")"
+    delegated_pending_count="$(csv_item_count "$delegated_pending_ids")"
+    delegated_consumed_ids="${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-}"
+    delegated_consumed_at="${LAST_DELEGATED_CONTINUATION_CONSUMED_AT:-}"
 
     if [[ "$mode_name" == "fresh_with_handoff" ]]; then
       write_session_handoff "$PROJECT_ROOT" "$LAUNCH_ROTATION_REASON"
       log_info "rotating session via fresh_with_handoff (reason=$LAUNCH_ROTATION_REASON)"
     fi
     build_prompt >"$prompt_file"
+    if [[ -n "$delegated_pending_ids" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
+      delegated_consumed_ids="$delegated_pending_ids"
+      delegated_consumed_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+    fi
     if [[ "$mode_name" == "fresh" || "$mode_name" == "fresh_with_handoff" ]]; then
       rm -f "$(handoff_file "$PROJECT_ROOT")"
     fi
@@ -3050,6 +3110,10 @@ cmd_start() {
     LAST_PROJECT_DIRTY_ENTRIES="$dirty_entries"
     LAST_WORKTREE_SUMMARY_TOTAL="$worktree_total"
     LAST_WORKTREE_SUMMARY_DIRTY="$worktree_dirty"
+    LAST_DELEGATED_CONTINUATION_PENDING_IDS="$delegated_pending_ids"
+    LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
+    LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
+    LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
     checkpoint_json="$(checkpoint_guard_json_for_project "$PROJECT_ROOT")"
     checkpoint_required="$(checkpoint_guard_value "$checkpoint_json" checkpoint_required)"
     if [[ "$checkpoint_required" == "true" || "$dirty_entries" =~ ^[0-9]+$ && "$dirty_entries" -ge "${CHECKPOINT_WARN_DIRTY_ENTRIES:-40}" ]]; then
@@ -3091,7 +3155,7 @@ cmd_start() {
       fi
     fi
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT"
     LAST_WORKCELL_EXIT_REASON="${account_switch_reason:-${rate_limit_reason:-ai_exit_rc_${rc}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
 
@@ -3467,6 +3531,10 @@ cmd_baseline_status() {
   echo "last_project_dirty_entries: ${LAST_PROJECT_DIRTY_ENTRIES:-0}"
   echo "last_worktree_summary_total: ${LAST_WORKTREE_SUMMARY_TOTAL:-0}"
   echo "last_worktree_summary_dirty: ${LAST_WORKTREE_SUMMARY_DIRTY:-0}"
+  echo "last_delegated_continuation_pending_ids: ${LAST_DELEGATED_CONTINUATION_PENDING_IDS:-none}"
+  echo "last_delegated_continuation_pending_count: ${LAST_DELEGATED_CONTINUATION_PENDING_COUNT:-0}"
+  echo "last_delegated_continuation_consumed_ids: ${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-none}"
+  echo "last_delegated_continuation_consumed_at: ${LAST_DELEGATED_CONTINUATION_CONSUMED_AT:-unavailable}"
   echo "intake_active_items: $(count_active_intake_items "$PROJECT_ROOT")"
   echo "intake_new_items: $(count_intake_items_by_status "$PROJECT_ROOT" "new")"
   echo "intake_classified_items: $(count_intake_items_by_status "$PROJECT_ROOT" "classified")"
@@ -3537,6 +3605,7 @@ cmd_live_status() {
   local supervisor_cmd ai_cmd dispatcher_cmd
   local prompt_file continuity_file prompt_excerpt continuity_excerpt
   local intake_snapshot latest_resolution_snapshot
+  local delegated_pending_ids prompt_has_delegated
   local desired_runtime_state last_supervisor_state last_ai_state last_exit_reason last_role_hint last_state_updated_at
 
   run_dir="$(run_dir_for_project "$project")"
@@ -3555,6 +3624,11 @@ cmd_live_status() {
   continuity_excerpt="$(trimmed_file_excerpt "$continuity_file" head 12)"
   intake_snapshot="$(intake_snapshot_for_project "$project" 3)"
   latest_resolution_snapshot="$(resolution_snapshot_for_project "$project" 1)"
+  delegated_pending_ids="$(delegated_continuation_ids_for_project "$project")"
+  prompt_has_delegated="0"
+  if [[ -n "$prompt_file" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
+    prompt_has_delegated="1"
+  fi
 
   desired_runtime_state="unknown"
   last_supervisor_state="unknown"
@@ -3588,6 +3662,10 @@ cmd_live_status() {
   echo "intake_delegated_items: $(count_intake_items_by_status "$project" "delegated")"
   echo "last_launch_kind: ${LAST_LAUNCH_KIND:-unavailable}"
   echo "last_rotation_reason: ${LAST_ROTATION_REASON:-unavailable}"
+  echo "pending_delegated_continuation_ids: ${delegated_pending_ids:-none}"
+  echo "last_consumed_delegated_continuation_ids: ${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-none}"
+  echo "last_consumed_delegated_continuation_at: ${LAST_DELEGATED_CONTINUATION_CONSUMED_AT:-unavailable}"
+  echo "current_prompt_has_delegated_continuation: ${prompt_has_delegated}"
 
   if [[ -n "$supervisor_pid" || -n "$dispatcher_pid" || -n "$ai_pid" ]]; then
     echo "active_processes:"

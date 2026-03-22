@@ -87,8 +87,120 @@ second_prompt="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
 grep -q '会话轮换交接' "$second_prompt"
 grep -q 'previous_context_compacted: 1' "$second_prompt"
 grep -q 'Continuity Guard' "$second_prompt"
+if grep -q 'command not found' "$PROJECT/.freely/logs/loop.log"; then
+  echo "[FAIL] session handoff writer should be shell-safe during fresh_with_handoff"
+  exit 1
+fi
 
 echo "[PASS] freely rotates to fresh_with_handoff after context compaction"
+
+PROJECT_HANDOFF="$TMP_DIR/project-handoff-consumption"
+mkdir -p \
+  "$PROJECT_HANDOFF/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_HANDOFF/.freely/run" \
+  "$PROJECT_HANDOFF/.freely/logs"
+
+cat >"$PROJECT_HANDOFF/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT_HANDOFF/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT_HANDOFF/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_HANDOFF"
+INTENT_FILE="$PROJECT_HANDOFF/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_HANDOFF/docs/CONSTITUTION.md"
+AI_TOOL="test-once"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=1
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+HANDOFF_INTAKE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake chat --project "$PROJECT_HANDOFF" --author human --channel chat --message "主管继续检查所有 worktree 并决定下一步")"
+HANDOFF_INTAKE_ID="$(printf '%s\n' "$HANDOFF_INTAKE_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$HANDOFF_INTAKE_ID" ]] || {
+  echo "[FAIL] expected delegated handoff intake id"
+  exit 1
+}
+
+HANDOFF_RESOLUTION="$TMP_DIR/manager-handoff-resolution.md"
+cat >"$HANDOFF_RESOLUTION" <<'EOF'
+restart_point: `continuation`
+ownership: `manager`
+handoff_summary: 下一轮主管主循环先做 live-status 和 fleet-status 巡检
+EOF
+
+bash "$ROOT_DIR/bin/freely" intake resolve \
+  --project "$PROJECT_HANDOFF" \
+  --intake-id "$HANDOFF_INTAKE_ID" \
+  --resolved-by interruption-manager-agent \
+  --reaction followup \
+  --classification continuation \
+  --resolution-file "$HANDOFF_RESOLUTION" \
+  --absorption-target handoff://continuation \
+  --status delegated >/dev/null
+
+bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_HANDOFF" >/dev/null 2>&1 || true
+
+first_handoff_prompt="$(ls "$PROJECT_HANDOFF"/.freely/run/prompt-*.txt | sort | head -n 1)"
+[[ -n "$first_handoff_prompt" ]] || {
+  echo "[FAIL] expected prompt file for delegated continuation consumption"
+  exit 1
+}
+grep -q 'Delegated continuation handoff:' "$first_handoff_prompt"
+grep -q "$HANDOFF_INTAKE_ID" "$first_handoff_prompt"
+grep -q "^LAST_DELEGATED_CONTINUATION_PENDING_IDS=\"$HANDOFF_INTAKE_ID\"$" "$PROJECT_HANDOFF/.freely/run/session-state.env"
+grep -q '^LAST_DELEGATED_CONTINUATION_PENDING_COUNT="1"$' "$PROJECT_HANDOFF/.freely/run/session-state.env"
+grep -q "^LAST_DELEGATED_CONTINUATION_CONSUMED_IDS=\"$HANDOFF_INTAKE_ID\"$" "$PROJECT_HANDOFF/.freely/run/session-state.env"
+grep -q '^LAST_DELEGATED_CONTINUATION_CONSUMED_AT="' "$PROJECT_HANDOFF/.freely/run/session-state.env"
+LIVE_STATUS_HANDOFF="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT_HANDOFF")"
+printf '%s\n' "$LIVE_STATUS_HANDOFF" | grep -q "last_consumed_delegated_continuation_ids: $HANDOFF_INTAKE_ID"
+
+echo "[PASS] freely records delegated continuation pending and consumed evidence"
 
 PROJECT_NO_SESSION="$TMP_DIR/project-no-session"
 mkdir -p \

@@ -199,6 +199,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md`
 - next_action: 把 remote branch deletion / retained reason 纳入 `worktree-maintenance-governance` 与 `cleanup-followthrough`，并用真实 cleanup 测试和 Freely 插话验证主管能够把这层收口做完
 
+15. `I-20260322-0049`
+- title: Manager continuation handoff consumption governance
+- milestone_state: committed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/candidates.md`
+- next_action: 已完成 generated/consumed evidence、`live-status` 暴露与 shell-safe handoff writer 修复；后续若要把 manager continuation 消费结果进一步提升成显式治理产出，应通过新 lifecycle 承接
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

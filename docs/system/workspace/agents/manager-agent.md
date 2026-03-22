@@ -48,6 +48,10 @@
    - 冻结列表
    - 异常列表
    - 下一轮监督优先级
+   - 若存在 delegated manager continuation handoff，还要保证 runtime 至少留下：
+     - handoff generated
+     - handoff consumed into prompt
+     - handoff still pending after failure boundary
 10. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff / 这轮哪些该 cleanup”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff` 之一。
 11. 对 `milestones / candidates / issue / progress / recovery` 这类 standing source，除了普通路由外，还要判断是否需要专门的 milestone planning / state maintenance worker 做 sequencing 与 drift reconcile。
 
