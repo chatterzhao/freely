@@ -248,6 +248,8 @@ grep -q 'restart_point: `continuation`' ".freely/run/interruption-resolution/$IN
 grep -q 'ownership: `manager`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
 
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --project "$DIRTY_WT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto >/dev/null
+FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$DIRTY_WT" --watch >/dev/null 2>&1 &
+WORKER_DISPATCH_PID=$!
 mkdir -p "$DIRTY_WT/.freely/run"
 cat >"$DIRTY_WT/.freely/run/session-state.env" <<'EOF'
 LAST_TOOL_SESSION_ID="codex-session-current"
@@ -277,6 +279,8 @@ grep -q '^LAST_PREEMPTION_MODE="graceful_term"$' "$DIRTY_WT/.freely/run/preempti
 grep -q '^LAST_PREEMPTION_REASON="local_continuation_reentry"$' "$DIRTY_WT/.freely/run/preemption-state.env"
 grep -q "^LAST_PREEMPTION_INTAKE_ID=\"$INTAKE_ID_CONT\"$" "$DIRTY_WT/.freely/run/preemption-state.env"
 wait "$CONT_PID" 2>/dev/null || true
+kill "$WORKER_DISPATCH_PID" 2>/dev/null || true
+wait "$WORKER_DISPATCH_PID" 2>/dev/null || true
 
 CHAT_OUTPUT_DELEGATE="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "去重新设计一下 TUI 输入体验")"
 INTAKE_ID_DELEGATE="$(printf '%s\n' "$CHAT_OUTPUT_DELEGATE" | sed -n 's/^intake_id: //p')"
