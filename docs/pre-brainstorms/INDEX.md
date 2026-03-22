@@ -263,3 +263,4 @@
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
 - 20260322-0049--manager-continuation-handoff-consumption
+- `20260322-0135--integration-acceptance-first-ibm-and-verification`: integration-acceptance-first-ibm-and-verification
