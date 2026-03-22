@@ -120,6 +120,26 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT"
 sleep 1
 
 cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-03-21T00:00:00Z"
+EOF
+rm -f "$PROJECT/.freely/run/ai.pid" "$PROJECT/.freely/run/supervisor.pid"
+
+printf 'continue-current-issue-from-tui\n\n' | FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" tui --project "$PROJECT" --once >/dev/null
+
+wait_for_ai || {
+  echo "[FAIL] tui-triggered delegated continuation should reactivate stopped worker runtime" >&2
+  exit 1
+}
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null || true
+sleep 1
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
 DESIRED_RUNTIME_STATE="running"
 LAST_SUPERVISOR_STATE="down"
 LAST_AI_STATE="down"
@@ -139,4 +159,4 @@ if [[ -f "$PROJECT/.freely/run/ai.pid" ]]; then
   fi
 fi
 
-echo "[PASS] freely reactivates stopped worker runtime only for the allowed chat-triggered continuation gate"
+echo "[PASS] freely reactivates stopped worker runtime only for the allowed chat/tui-triggered continuation gate"

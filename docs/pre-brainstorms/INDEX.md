@@ -40,6 +40,9 @@
 - 20260321-2010--explicit-session-addressed-resume-over-last-and-pty
   - brainstorms: docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/candidates.md
+- 20260322-0115--cli-first-entrypoint-and-observability-surface-unification
+  - brainstorms: docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md
 - 20260321-1515--remote-branch-retirement-governance
   - brainstorms: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md

@@ -208,6 +208,15 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/candidates.md`
 - next_action: 已完成 generated/consumed evidence、`live-status` 暴露与 shell-safe handoff writer 修复；后续若要把 manager continuation 消费结果进一步提升成显式治理产出，应通过新 lifecycle 承接
+16. `I-20260322-0115`
+- title: CLI-first entrypoint and observability surface unification
+- milestone_state: committed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md`
+- next_action: 已完成 `chat` / `tui` 的 shared front-door submit helper，并把 CLI-first backend contract 写回真源；若后续继续做 Tauri 渲染层，需新开 lifecycle
 
 ### candidate_issues
 

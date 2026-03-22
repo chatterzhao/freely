@@ -80,6 +80,10 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - interruption resolution 生成 `handoff://continuation` 只是第一步
    - runtime 还必须留下 generated-vs-consumed evidence
    - 若后续命中 `fresh_with_handoff`、`auth_failure` 或其他 failure boundary，不能把 handoff 是否已消费变成不可见状态
+18. `freely` 是唯一正式 front-door command：
+   - `chat` 是 canonical high-level submit primitive
+   - `tui` 只是交互壳，必须复用同一 post-submit runtime chain
+   - 未来 GUI 也应复用同一 backend contract，而不是另造提交语义
 
 ## 角色组织
 

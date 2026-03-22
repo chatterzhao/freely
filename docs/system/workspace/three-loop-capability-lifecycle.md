@@ -189,6 +189,7 @@ Freely 的能力必须同时标注 loop 和 owner，避免“能力有了，但�
 | worktree preparation | auto-loop | `branch-management` + runtime | before write | branch/worktree decision | `docs/system/workspace/skills/branch-management/**` |
 | project supervision | auto-loop | `manager-agent` | manager cycle | delegate/freeze/merge/cleanup decision | `docs/system/workspace/agents/manager-agent.md` |
 | watchdog / supervision control plane | auto-loop | runtime + manager-agent | expected running but down / hygiene drift / availability loss | recovery or supervision action | `docs/system/workspace/scripts/runtime/**`, relevant supervision skills |
+| front-door human entrypoint | auto-loop | runtime/scripts | human sends a new signal via `freely` | bootstrap, submit, dispatch, optional worker reactivation | `freely chat`, `freely tui`, status family |
 | availability / account switching | auto-loop | runtime/scripts | auth failure / usage limit / probe failure | switch, cooldown, wait, restart | runtime + watchdog availability module |
 | runtime continuity | auto-loop | runtime/scripts | session nearing limit / crash / compacted context | `resume` or `fresh_with_handoff` | runtime scripts + handoff artifacts |
 | recovery routing | auto-loop | `recovery-subagent-governance` + runtime | unavailable runtime / stale `in_*` state | recovery path and continuity | recovery artifacts |
@@ -246,6 +247,7 @@ source record
 - 且当前 worker runtime 因 `operator_stop` 停止、同时没有 active supervisor / ai
 - runtime 应重激活本工位主循环去消费 delegated handoff，而不是让 intake 长期停在 `dispatch_only`
 - 若退出原因是 `auth_failure`、`runtime-owned crash` 或当前已有 active AI，则不得把它混成同一种自动重启
+- `freely` 是唯一正式 front-door command；其中 `chat` 是 canonical high-level submit primitive，`tui` 与后续 GUI 只复用同一 backend contract
 
 ### 5.1A Runtime continuity contract
 
