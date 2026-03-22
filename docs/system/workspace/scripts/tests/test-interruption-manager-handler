@@ -5,58 +5,83 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-interruption-handler.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-PROJECT="$TMP_DIR/project"
-FAKE_BIN="$TMP_DIR/bin"
-INTAKE_ID="20260320-000000-test"
-PROMPT_CAPTURE="$TMP_DIR/prompt.txt"
-mkdir -p "$PROJECT/.freely/intake/$INTAKE_ID" "$FAKE_BIN"
+run_case() {
+local message="$1"
+local expected_restart="$2"
+local expected_owner="$3"
+local expected_handoff="$4"
+local prompt_expectation="$5"
+local prompt_expectation_mode="${6:-regex}"
+local case_dir="$TMP_DIR/$expected_restart"
+local project="$case_dir/project"
+local fake_bin="$case_dir/bin"
+local intake_id="20260320-000000-test"
+local prompt_capture="$case_dir/prompt.txt"
+mkdir -p "$project/.freely/intake/$intake_id" "$fake_bin"
 
-cat >"$PROJECT/.freely/config.env" <<'EOF'
+cat >"$project/.freely/config.env" <<'EOF'
 AI_MODEL="gpt-5.4"
 AI_REASONING_EFFORT="medium"
 EOF
 
-cat >"$PROJECT/.freely/intake/$INTAKE_ID/meta.env" <<'EOF'
+cat >"$project/.freely/intake/$intake_id/meta.env" <<'EOF'
 INTAKE_ID="20260320-000000-test"
 STATUS="classified"
 EOF
 
-cat >"$PROJECT/.freely/intake/$INTAKE_ID/message.txt" <<'EOF'
-检查已经合并到develop的worktree，应该怎么收口
-EOF
+printf '%s\n' "$message" >"$project/.freely/intake/$intake_id/message.txt"
 
-cat >"$FAKE_BIN/codex" <<'EOF'
+cat >"$fake_bin/codex" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 cat >"${PROMPT_CAPTURE:?}"
-cat <<'OUT'
+cat <<OUT
 noise that should be ignored
 DECISION=delegate
 REACTION=followup
 CLASSIFICATION=control
-RESTART_POINT=cleanup
-OWNERSHIP=worker
-WHY=这涉及实际收口动作，需要委派清理
-HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口
+RESTART_POINT=${EXPECTED_RESTART:?}
+OWNERSHIP=${EXPECTED_OWNER:?}
+WHY=按意图选择正确主管路由
+HANDOFF=${EXPECTED_HANDOFF:?}
 ANSWER=
 extra trailing noise
 OUT
 EOF
-chmod +x "$FAKE_BIN/codex"
+chmod +x "$fake_bin/codex"
 
 OUTPUT="$(
-  PROMPT_CAPTURE="$PROMPT_CAPTURE" \
-  PATH="$FAKE_BIN:$PATH" \
+  PROMPT_CAPTURE="$prompt_capture" EXPECTED_RESTART="$expected_restart" EXPECTED_OWNER="$expected_owner" EXPECTED_HANDOFF="$expected_handoff" \
+  PATH="$fake_bin:$PATH" \
     bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/interruption-manager-handler" \
-      --project "$PROJECT" \
-      --intake-id "$INTAKE_ID"
+      --project "$project" \
+      --intake-id "$intake_id"
 )"
 
 grep -q '^DECISION=delegate$' <<<"$OUTPUT"
-grep -q '^RESTART_POINT=cleanup$' <<<"$OUTPUT"
-grep -q '^OWNERSHIP=worker$' <<<"$OUTPUT"
-grep -q '^HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口$' <<<"$OUTPUT"
-grep -q '优先按 worktree maintenance 问题理解，而不是泛化成 continuation' "$PROMPT_CAPTURE"
-grep -q 'worktree-maintenance-governance' "$PROMPT_CAPTURE"
+grep -q "^RESTART_POINT=$expected_restart$" <<<"$OUTPUT"
+grep -q "^OWNERSHIP=$expected_owner$" <<<"$OUTPUT"
+grep -q "^HANDOFF=$expected_handoff$" <<<"$OUTPUT"
+if [[ "$prompt_expectation_mode" == "fixed" ]]; then
+  grep -Fq "$prompt_expectation" "$prompt_capture"
+else
+  grep -q "$prompt_expectation" "$prompt_capture"
+fi
+}
 
-echo "[PASS] interruption manager handler writes prompt temp file and filters structured output"
+run_case \
+  "检查已经合并到develop的worktree，应该怎么收口" \
+  "cleanup" \
+  "worker" \
+  "检查 merged worktree 是否满足 cleanup 生命周期并执行收口" \
+  '优先按 worktree maintenance 问题理解，而不是泛化成 continuation'
+
+run_case \
+  "你现在是 develop 工位上的主管。先检查所有 worktree、milestones、issues、intake 与 runtime 状态，然后决定下一步该委派什么。" \
+  "continuation" \
+  "manager" \
+  "下一轮主管主循环先做 live-status 和 fleet-status 巡检再决定委派" \
+  'worktree + milestones + issues + intake + runtime' \
+  'fixed'
+
+echo "[PASS] interruption manager handler distinguishes cleanup-only routing from broad supervisor reentry"

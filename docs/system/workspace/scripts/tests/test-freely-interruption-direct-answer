@@ -105,6 +105,17 @@ WHY=这涉及实际收口动作，需要委派清理
 HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口
 ANSWER=
 OUT
+elif [[ "$message" == *主管* && "$message" == *milestones* && "$message" == *issues* && "$message" == *intake* && "$message" == *runtime* ]]; then
+  cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=continuation
+OWNERSHIP=manager
+WHY=这是新的项目级主管巡检任务，应回到主管主循环做 patrol 与 restart-point routing
+HANDOFF=下一轮主管主循环先做 live-status 和 fleet-status 巡检再决定委派
+ANSWER=
+OUT
 else
   cat <<'OUT'
 DECISION=delegate
@@ -213,6 +224,19 @@ if ! git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/d
   echo "[FAIL] dirty remote branch should still exist" >&2
   exit 1
 fi
+
+CHAT_OUTPUT_MANAGER="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "你现在是 develop 工位上的主管。先检查所有 worktree、milestones、issues、intake 与 runtime 状态，然后决定下一步该委派什么。")"
+INTAKE_ID_MANAGER="$(printf '%s\n' "$CHAT_OUTPUT_MANAGER" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_MANAGER" ]] || {
+  echo "[FAIL] missing manager intake id" >&2
+  exit 1
+}
+grep -q '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+grep -q '^ABSORPTION_TARGET="handoff://continuation"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+grep -q 'restart_point: `continuation`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
+grep -q 'ownership: `manager`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
 
 CHAT_OUTPUT_DELEGATE="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "去重新设计一下 TUI 输入体验")"
 INTAKE_ID_DELEGATE="$(printf '%s\n' "$CHAT_OUTPUT_DELEGATE" | sed -n 's/^intake_id: //p')"
