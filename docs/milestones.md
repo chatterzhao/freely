@@ -238,17 +238,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/candidates.md`
 - next_action: 已把 patrol evidence 充足后必须切到 concrete worker delegation 的阈值语义写回主管真源；若后续仍观察到主管只巡检不委派，应通过新 lifecycle 进入 runtime / delegation mechanism 层修复
 
-19. `I-20260322-0245`
-- title: Runtime worker launch linkage and stall recovery governance
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/candidates.md`
-- next_action: 当前生命周期已完成；若后续仍观察到 manager handoff 进入 queue 但 worker 未被拉起，或 stalled AI recovery 误判/漏判，再通过新 lifecycle 继续 materialize
-
-20. `I-20260322-0412`
+19. `I-20260322-0412`
 - title: Worker active reentry for manager-delegated continuation governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -257,7 +247,6 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
 - next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
-
 ### candidate_issues
 
 1. `C-20260318-0715-A`
@@ -403,7 +392,18 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/interruption-manager-handler`, `docs/system/workspace/scripts/tests/test-interruption-manager-handler`, `docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`, `docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/code-reviews/20260321-manager-chat-reentry-and-cleanup-misrouting-verification.md`
 - completion_note: broad supervisor chat signal 已不再默认误落 cleanup followthrough；纯 cleanup 请求仍保持 worker cleanup 路径，主管级广义巡检请求则回到 `handoff://continuation` 与 manager ownership
 
-2. `I-20260321-2010`
+2. `I-20260322-0245`
+- title: Runtime worker launch linkage and stall recovery governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/candidates.md`
+- evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/runtime/manager-watchdog.sh`, `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`, `docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery`, `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/code-reviews/20260322-runtime-worker-launch-linkage-and-stall-recovery-verification.md`
+- completion_note: manager-generated worker handoff 已可直接转成 target worker continuation launch，stall recovery 也已进入 runtime-owned 控制面；当前 issue 仅剩 closure writeback / cleanup followthrough，但 worktree 仍未 `target clean`、`./bin/wt-status-all` 当前为 `Summary: total=6, dirty=4`，且本地分支与 `develop` 为 `0 1`，因此本轮 cleanup 结论仍为 `retained-with-reason`
+
+3. `I-20260321-2010`
 - title: Explicit session-addressed resume governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -414,7 +414,7 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/runtime/tool-launchers.sh`, `docs/system/workspace/scripts/monitor-ai-cli.sh`, `docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`, `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/code-reviews/20260321-explicit-session-addressed-resume-verification.md`
 - completion_note: 显式 session-addressed resume 已成为 Freely 的 canonical continuity model；`codex` 默认路径不再依赖 `--last`，worker-scoped target evidence 与 preemption fallback 也已闭环
 
-3. `I-20260321-1706`
+4. `I-20260321-1706`
 - title: Chat-triggered worker runtime reactivation governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -425,7 +425,7 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`, `docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/code-reviews/20260321-chat-triggered-worker-runtime-reactivation-verification.md`
 - completion_note: worker 工位在 `operator_stop` 后的 `freely chat` 现在会通过 delegated handoff gate 重新拉起本工位主循环；脚本级与真实狗粮验证均已通过
 
-4. `I-20260319-1715`
+5. `I-20260319-1715`
 - title: CLI-first human chat intake and manager delegation loop
 - milestone_state: completed
 - phase_state: `completed`
@@ -436,7 +436,7 @@ routing_policy:
 - evidence: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`, `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/code-reviews/20260320-human-chat-intake-and-manager-delegation-verification.md`, `docs/system/workspace/scripts/tests/test-freely-human-chat-intake`
 - completion_note: CLI-first human chat intake、manager queue scanning、claim/resolve/absorption writeback 与专项测试已闭环；companion canonical 分支已挂起，不再阻塞主线完成
 
-2. `I-20260319-2315`
+6. `I-20260319-2315`
 - title: CLI TUI interruption input box for Freely
 - milestone_state: completed
 - phase_state: `completed`
@@ -447,7 +447,7 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
 - completion_note: `freely tui` 已收口为 interruption presentation shell，并补齐中文与多行提交回归，输入仍统一落到既有 durable intake 链路
 
-2. `I-20260320-1405`
+7. `I-20260320-1405`
 - title: Worktree maintenance governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -458,7 +458,7 @@ routing_policy:
 - evidence: `docs/system/workspace/skills/worktree-maintenance-governance/SKILL.md`, `docs/system/workspace/agents/lead-agent.md`, `docs/system/workspace/agents/manager-agent.md`, `docs/system/workspace/scripts/start-lead-agent.sh`, `docs/system/workspace/scripts/tests/test-routing-foundation-loop`
 - completion_note: 已把 worktree 创建后的维护能力收敛成专门 skill，明确 `audit / merge_prep / retirement_handoff` 三种模式，并接入主管真源与首跳测试
 
-3. `I-20260318-1222`
+8. `I-20260318-1222`
 - title: Mem9 shared memory evaluation for Freely continuity plane
 - milestone_state: completed
 - phase_state: `completed`
@@ -468,7 +468,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/candidates.md`
 - completion_note: mem9 已明确收束为可选连续性增强层，不是 Freely 的治理真源；对应边界已 materialize 为 `skill:mem9-continuity-bridge`，并保持本地治理事实源优先
 
-4. `C-20260306-1101`
+9. `C-20260306-1101`
 - title: `lead-agent.md`
 - milestone_state: completed
 - phase_state: `completed`
@@ -477,7 +477,7 @@ routing_policy:
 - evidence: `docs/system/workspace/agents/lead-agent.md`
 - completion_note: 已落地首跳中枢代理职责与首跳协议
 
-5. `C-20260306-1102`
+10. `C-20260306-1102`
 - title: `context-source-skill.md`
 - milestone_state: completed
 - phase_state: `completed`
