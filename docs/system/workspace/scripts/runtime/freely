@@ -1646,12 +1646,27 @@ write_manager_worker_launch_intake() {
     "$created_at" >/dev/null
 }
 
+ensure_runtime_workcell_initialized_for_launch() {
+  local target_project="$1"
+  local freely_bin
+  [[ -d "$target_project" ]] || return 1
+  if [[ -f "$(config_file "$target_project")" ]]; then
+    return 0
+  fi
+  freely_bin="$(freely_bin_for_project "$target_project")"
+  bash "$freely_bin" init \
+    --project "$target_project" \
+    --intent "$target_project/docs/PROJECT_INTENT.md" \
+    --constitution "$target_project/docs/CONSTITUTION.md" \
+    --ai "${AI_TOOL:-codex}:${AI_MODEL:-}:${AI_MODE:-auto}" >/dev/null
+}
+
 launch_worker_from_manager_prompt_if_needed() {
   local manager_project="$1" prompt_file="$2"
   local target_project
   target_project="$(worker_prompt_target_worktree "$prompt_file")"
   [[ -n "$target_project" && -d "$target_project" ]] || return 1
-  [[ -f "$(config_file "$target_project")" ]] || return 1
+  ensure_runtime_workcell_initialized_for_launch "$target_project" || return 1
   write_manager_worker_launch_intake "$target_project" "$prompt_file"
   write_workcell_state "$target_project" "running" "down" "down" "manager_worker_launch_linkage"
   start_workcell_supervisor_async "$target_project"
