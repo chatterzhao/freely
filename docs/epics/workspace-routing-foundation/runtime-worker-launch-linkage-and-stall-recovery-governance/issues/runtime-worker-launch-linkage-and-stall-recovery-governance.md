@@ -77,8 +77,8 @@ Freely 最新 dogfood 证明：
 - classification: `retire-only`
 - cleanup_gate: `retained-with-reason`
 - why_not_verified_retirable:
-  - 当前工位虽已重落到最新 `develop` 顶上并恢复 `target clean`，但 `develop...HEAD` 右侧仍非零：本地仍保留 docs-only closure commits 待经 develop-facing 路径吸收，因此不能直接宣称已完成 cleanup
-  - `./bin/wt-status-all` 当前确认本工位自身为 `CLEAN`，但项目里仍有其他 dirty worktree；因此本轮只能确认本工位已满足 target safety，不能伪装成全项目 hygiene 已收口
+  - 当前工位已恢复 `target clean`，但 `develop...HEAD` 右侧仍非零：本地仍保留 docs-only closure commits 待经 develop-facing 路径吸收，因此不能直接宣称已完成 cleanup
+  - `./bin/wt-status-all` 当前为 `Summary: total=7, dirty=2`；虽已确认本工位自身为 `CLEAN`，但项目里仍有其他 dirty worktree，因此本轮只能确认本工位已满足 target safety，不能伪装成全项目 hygiene 已收口
 - local_branch_disposition: `retained-with-reason`
 - local_branch_reason: 当前工位已满足 `target clean`，但仍需先让本地 docs-only closure commits 经 develop-facing 路径被吸收；在分支被主线吸收前，不执行本地 branch/worktree cleanup
 - remote_branch_disposition: `deleted`
