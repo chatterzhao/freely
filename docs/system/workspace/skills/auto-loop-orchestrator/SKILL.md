@@ -84,6 +84,10 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - `chat` 是 canonical high-level submit primitive
    - `tui` 只是交互壳，必须复用同一 post-submit runtime chain
    - 未来 GUI 也应复用同一 backend contract，而不是另造提交语义
+19. 当项目级 patrol 已经把某条线稳定判成 `retire-only`、`retire-now` 或 `continue-dev` 时，主管下一步必须进入 concrete execution routing：
+   - `retire-only / retire-now` -> cleanup / retirement worker
+   - `continue-dev` -> verification / dev continuation worker
+   - 只有在关键事实缺失、上游依赖不明或 blocker 未冻结时，才允许继续 manager-only patrol
 
 ## 角色组织
 

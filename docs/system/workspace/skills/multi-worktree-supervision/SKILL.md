@@ -43,6 +43,10 @@ description: 当需要像项目负责人一样同时监督多个 Freely worktree
    - 主动找出 `candidate stuck / phase orphaned / completion without closure`
    - 发现后明确输出 `ownership + restart_point + next_action`
    - 详细检查面见 `references/manager-reactivation-patrol.md`
+8. 当某条线已经被稳定判定为 `retire-only`、`retire-now` 或 `continue-dev` 时，默认下一跳不是继续 patrol，而是：
+   - `retire-only / retire-now` -> cleanup / retirement handoff worker
+   - `continue-dev` -> verification / dev continuation worker
+   - 只有关键事实仍缺失或 blocker 未明时，主管才继续停留在 manager-only supervision
 
 ## 边界
 

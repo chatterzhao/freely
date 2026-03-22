@@ -228,6 +228,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/candidates.md`
 - next_action: 已将 `pre-tests.md` 收敛为 issue-level acceptance 控制面，并把 integration / acceptance-first 口径写回 IBM、three-loop 与 `LAWS`；后续若要继续结构化 verification review 模板，应通过新 lifecycle 承接
 
+18. `I-20260322-0228`
+- title: Manager delegation after sufficient patrol evidence governance
+- milestone_state: committed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/candidates.md`
+- next_action: 已把 patrol evidence 充足后必须切到 concrete worker delegation 的阈值语义写回主管真源；若后续仍观察到主管只巡检不委派，应通过新 lifecycle 进入 runtime / delegation mechanism 层修复
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

@@ -32,6 +32,7 @@
    - 目标 issue
    - 目标角色
    - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
+   - 一旦 `ownership + restart_point + next_action` 已经稳定，优先产出具体 worker handoff；不要继续停留在 manager-only patrol
 5. 对任意新 signal：
    - 识别它来自 `event source` 还是 `standing source`
    - 先做最小 `intent understanding`
@@ -43,7 +44,8 @@
 6. 当某个 worker 连续多轮处于 checkpoint / dirty-budget 漂移时，优先委派 hygiene 收口，而不是继续让它扩写实现。
 7. issue 生命周期已 completed 但 worktree 仍未 merge / cleanup，也属于主管 patrol 必查项，不得因为“实现已经做完”而静默遗忘。
 8. 监督多工位的节奏，而不是降级成单工位执行者。
-9. 在会话轮换前写出项目级 continuity，至少包含：
+9. 若 patrol 已经拿到足够证据支持 `retire-only / retire-now / continue-dev`，主管必须从“继续补充只读证据”切换到“具体 worker delegation / cleanup execution”；只有在关键事实缺失或 blocker 未明时才允许继续 patrol。
+10. 在会话轮换前写出项目级 continuity，至少包含：
    - 当前应继续的 worker
    - 冻结列表
    - 异常列表
@@ -52,8 +54,8 @@
      - handoff generated
      - handoff consumed into prompt
      - handoff still pending after failure boundary
-10. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff / 这轮哪些该 cleanup”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff` 之一。
-11. 对 `milestones / candidates / issue / progress / recovery` 这类 standing source，除了普通路由外，还要判断是否需要专门的 milestone planning / state maintenance worker 做 sequencing 与 drift reconcile。
+11. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff / 这轮哪些该 cleanup”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff` 之一。
+12. 对 `milestones / candidates / issue / progress / recovery` 这类 standing source，除了普通路由外，还要判断是否需要专门的 milestone planning / state maintenance worker 做 sequencing 与 drift reconcile。
 
 ## 不负责
 

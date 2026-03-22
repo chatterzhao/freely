@@ -3,7 +3,8 @@
 - id: `C-20260322-0228-A`
 - title: Make manager stop patrolling and delegate once worktree evidence is sufficient
 - source_brainstorm: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/brainstorms.md`
-- status: `proposed`
+- status: `promoted`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`
 - why_now:
   - real Freely dogfooding now shows manager can patrol and classify remaining feature worktrees correctly
   - but still delays concrete worker delegation after evidence is already sufficient
