@@ -34,17 +34,17 @@
 - retirement_path: `salvage_then_retire`
 - cleanup_gate: `merged-pending-verify`
 - local_branch_disposition: `retained-with-reason`
-- local_branch_reason: feature branch 已 rebase 到最新 `develop`，但仍有 docs-only closure commit `014431d` 未被 `develop` 吸收，不能直接 cleanup
+- local_branch_reason: feature branch 已 rebase 到最新 `develop`，但当前 branch tip 仍包含未被 `develop` 吸收的 canonical closure writeback，不能直接 cleanup
 - remote_branch_disposition: `deleted`
 - remote_branch_evidence: prune 后仍无 `origin/feature/cli-first-observability-surfaces-20260322`
 - continuation_refresh:
   - 当前 fresh session 先吸收 `context_compacted` handoff，再继续 retirement followthrough
-  - 当前 `git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` 为 `1 0`；旧 handoff 中的 `behind 7` 与“已吸收”结论都已过时
+  - 当前 `git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` 仍显示 feature branch 领先 `develop`；旧 handoff 中的 `behind 7` 与“已吸收”结论都已过时
 - canonical_gap_fixed:
   - 当前 worktree 中的 `docs/milestones.md` 已将 `I-20260322-0115` 从 `committed_issues` 移除，只保留 `completed_issues` canonical entry
   - 当前 worktree 中的 issue / progress 已从“verified-retirable”改写为当前真实的 salvage-pending 状态，并反映 rebase 后的最新 branch事实
 - residual_action:
-  - 先把 docs closure writeback 从 `014431d` 吸收到 canonical `develop`，再由 supervisor/runtime 在 worktree 外执行最终 branch/worktree cleanup
+  - 先把当前 branch tip 上的 docs closure writeback 吸收到 canonical `develop`，再由 supervisor/runtime 在 worktree 外执行最终 branch/worktree cleanup
 
 ## Result
 
