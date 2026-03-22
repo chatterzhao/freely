@@ -72,6 +72,10 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 13. 对 `human interruption`，runtime interruption dispatcher 可先做 durable 接住与及时 notice，但不替代主主管完成完整路由。
 14. 主管不把 raw signal 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
 15. 当 standing source 的重点问题是 sequencing / queue drift / state maintenance，而不是业务边界本身时，主管应优先委派 `skill:milestone-planning-state-maintenance`，而不是让业务 worker 顺手补 milestone。
+16. 对 worker 工位的 `human interruption`：
+   - `freely chat` 先完成 durable intake 与 interruption classification
+   - 若结果已收敛成当前工位的 worker-owned `continuation` / `verification` handoff，且当前 worker runtime 因 `operator_stop` 停止
+   - runtime 应重激活该 worker 主循环，而不是让 delegated intake 悬空
 
 ## 角色组织
 

@@ -1,5 +1,7 @@
 # 预研头脑风暴索引
 - 20260321-1925--manager-chat-reentry-and-cleanup-misrouting
+- 20260321-1706--chat-triggered-worker-runtime-reactivation
+- 20260321-2010--explicit-session-addressed-resume-over-last-and-pty
 - 20260321-1515--remote-branch-retirement-governance
 - 20260321-1530--agent-ready-prd-for-freely-flow
 - 20260321-1435--legacy-promoted-candidate-normalization
@@ -32,6 +34,12 @@
 - 20260321-1925--manager-chat-reentry-and-cleanup-misrouting
   - brainstorms: docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/candidates.md
+- 20260321-1706--chat-triggered-worker-runtime-reactivation
+  - brainstorms: docs/pre-brainstorms/20260321-1706--chat-triggered-worker-runtime-reactivation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-1706--chat-triggered-worker-runtime-reactivation/candidates.md
+- 20260321-2010--explicit-session-addressed-resume-over-last-and-pty
+  - brainstorms: docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/candidates.md
 - 20260321-1515--remote-branch-retirement-governance
   - brainstorms: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md

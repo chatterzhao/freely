@@ -32,6 +32,11 @@
 - live-status 显示 supervisor / dispatcher / ai 已下线或异常
 - 但没有明确 `runtime-owned` 恢复动作
 
+5. `worker dispatch-only with delegated local handoff`
+- worker 工位 `live-status` 停在 `dispatch_only`
+- intake 已存在本工位 delegated `handoff://continuation` / `handoff://verification`
+- 但没有新的 worker 主循环接棒
+
 ## 输出
 
 主管必须把巡检结果加工成：
@@ -61,3 +66,4 @@
 - 主管必须先做一轮 standing-source patrol，再决定这轮最重要的 worker 动作。
 - issue 已 completed 但 worktree 未收口，也属于 patrol 必查项。
 - 不要求每轮关闭所有 worktree；但不得让 stalled/orphaned 点位继续无人认领。
+- 若 patrol 发现 worker-local delegated handoff 因 `operator_stop` 后 runtime 未恢复而悬空，应要求 runtime 走本工位 reactivation gate，而不是继续把问题留在 delegated intake 中。
