@@ -5,6 +5,7 @@
 - 20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery
 - 20260321-1715--manager-patrol-trigger-and-restart-routing
 - 20260321-1430--external-drift-and-out-of-band-reconcile
+- 20260322-0445--latest-manager-continuity-worker-consumption
 - 20260322-0245--runtime-worker-launch-linkage-and-stall-recovery
 - 20260322-0412--worker-active-reentry-for-manager-delegated-continuation
 - 20260322-0228--manager-delegation-after-sufficient-patrol-evidence
@@ -52,6 +53,9 @@
 - 20260321-1430--external-drift-and-out-of-band-reconcile
   - brainstorms: docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/candidates.md
+- 20260322-0445--latest-manager-continuity-worker-consumption
+  - brainstorms: docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md
 - 20260322-0245--runtime-worker-launch-linkage-and-stall-recovery
   - brainstorms: docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/brainstorms.md
   - candidates: docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/candidates.md
