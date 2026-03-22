@@ -1505,6 +1505,11 @@ preemption_state_file() {
   printf '%s/run/preemption-state.env\n' "$(state_dir "$project")"
 }
 
+manager_worker_launch_state_file() {
+  local project="$1"
+  printf '%s/run/manager-worker-launch-state.env\n' "$(state_dir "$project")"
+}
+
 write_preemption_state() {
   local project="$1" mode="$2" reason="$3" intake_id="$4" pid="$5"
   cat >"$(preemption_state_file "$project")" <<EOF
@@ -1514,6 +1519,37 @@ LAST_PREEMPTION_INTAKE_ID="$intake_id"
 LAST_PREEMPTION_PID="$pid"
 LAST_PREEMPTION_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 EOF
+}
+
+write_manager_worker_launch_state() {
+  local project="$1" continuity_file="$2" launched_prompts_csv="$3"
+  cat >"$(manager_worker_launch_state_file "$project")" <<EOF
+LAST_MANAGER_CONTINUITY_CONSUMED="$continuity_file"
+LAUNCHED_WORKER_PROMPTS="$launched_prompts_csv"
+UPDATED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+EOF
+}
+
+csv_contains_exact_item() {
+  local csv="$1" needle="$2"
+  [[ -n "$csv" && -n "$needle" ]] || return 1
+  local item
+  IFS=',' read -r -a __csv_items <<<"$csv"
+  for item in "${__csv_items[@]}"; do
+    [[ "$item" == "$needle" ]] && return 0
+  done
+  return 1
+}
+
+csv_append_unique_item() {
+  local csv="$1" needle="$2"
+  if csv_contains_exact_item "$csv" "$needle"; then
+    printf '%s\n' "$csv"
+  elif [[ -n "$csv" ]]; then
+    printf '%s,%s\n' "$csv" "$needle"
+  else
+    printf '%s\n' "$needle"
+  fi
 }
 
 request_local_continuation_reentry() {
@@ -1539,6 +1575,145 @@ request_local_continuation_reentry() {
 
   write_preemption_state "$project" "graceful_term" "local_continuation_reentry" "$intake_id" "$ai_pid"
   log_info "triggered graceful local continuation re-entry for intake: $intake_id (ai pid=$ai_pid)"
+}
+
+latest_manager_continuity_file_for_project() {
+  local project="$1"
+  find "$(run_dir_for_project "$project")" -maxdepth 1 -type f -name 'manager-continuity-*.md' | sort | tail -n 1
+}
+
+latest_cycle_log_for_project() {
+  local project="$1"
+  find "$(logs_dir_for_project "$project")" -maxdepth 1 -type f -name 'cycle-*.log' | sort | tail -n 1
+}
+
+file_mtime_epoch() {
+  local path="$1"
+  [[ -f "$path" ]] || return 1
+  stat -f '%m' "$path" 2>/dev/null || return 1
+}
+
+latest_manager_worker_prompt_paths_from_continuity() {
+  local continuity_file="$1"
+  [[ -f "$continuity_file" ]] || return 0
+  rg -o '/[^` ]+/.freely/run/worker-prompts/[^` ]+\.txt' "$continuity_file" | sort -u
+}
+
+worker_prompt_target_worktree() {
+  local prompt_file="$1"
+  [[ -f "$prompt_file" ]] || return 0
+  awk '
+    /^你的 worktree：$/ { capture=1; next }
+    capture && /^- / { sub(/^- /, "", $0); print; exit }
+  ' "$prompt_file"
+}
+
+manager_worker_launch_intake_id_for_prompt() {
+  local prompt_file="$1"
+  local base
+  base="$(basename "$prompt_file" .txt | tr -cs 'A-Za-z0-9' '-' | sed 's/^-//; s/-$//')"
+  printf '%s-manager-worker-%s\n' "$(date '+%Y%m%d-%H%M%S')" "${base:-prompt}"
+}
+
+write_manager_worker_launch_intake() {
+  local target_project="$1" prompt_file="$2"
+  local intake_id created_at claimed_at message
+  intake_id="$(manager_worker_launch_intake_id_for_prompt "$prompt_file")"
+  created_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  claimed_at="$created_at"
+  message="$(cat "$prompt_file")"
+  write_intake_item \
+    "$target_project" \
+    "$intake_id" \
+    "manager-runtime-launcher" \
+    "delegation" \
+    "delegated" \
+    "continuation" \
+    "pending://manager-worker-launch" \
+    "$target_project" \
+    "[]" \
+    "$message" \
+    "followup" \
+    "manager-runtime-launcher" \
+    "$claimed_at" \
+    "handoff://continuation" \
+    "" \
+    "$created_at" >/dev/null
+}
+
+launch_worker_from_manager_prompt_if_needed() {
+  local manager_project="$1" prompt_file="$2"
+  local target_project
+  target_project="$(worker_prompt_target_worktree "$prompt_file")"
+  [[ -n "$target_project" && -d "$target_project" ]] || return 1
+  [[ -f "$(config_file "$target_project")" ]] || return 1
+  write_manager_worker_launch_intake "$target_project" "$prompt_file"
+  write_workcell_state "$target_project" "running" "down" "down" "manager_worker_launch_linkage"
+  start_workcell_supervisor_async "$target_project"
+}
+
+manager_runtime_launch_workers_from_latest_handoff() {
+  local project="$1"
+  local continuity_file launched_csv launched_count prompt_file
+  continuity_file="$(latest_manager_continuity_file_for_project "$project")"
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
+    printf '0\n'
+    return 0
+  }
+
+  launched_csv=""
+  if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
+    # shellcheck disable=SC1090
+    source "$(manager_worker_launch_state_file "$project")"
+    launched_csv="${LAUNCHED_WORKER_PROMPTS:-}"
+  fi
+
+  launched_count=0
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    if csv_contains_exact_item "$launched_csv" "$prompt_file"; then
+      continue
+    fi
+    if launch_worker_from_manager_prompt_if_needed "$project" "$prompt_file"; then
+      launched_csv="$(csv_append_unique_item "$launched_csv" "$prompt_file")"
+      launched_count=$((launched_count + 1))
+    fi
+  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+
+  write_manager_worker_launch_state "$project" "$continuity_file" "$launched_csv"
+  printf '%s\n' "$launched_count"
+}
+
+manager_ai_stalled_with_pending_intake() {
+  local project="$1" threshold_secs="${2:-90}"
+  local ai_pid cycle_log intake_signal log_mtime signal_mtime now
+  ai_pid="$(manager_ai_pid_for_project "$project")"
+  [[ -n "$ai_pid" ]] || return 1
+  cycle_log="$(latest_cycle_log_for_project "$project")"
+  [[ -n "$cycle_log" && -f "$cycle_log" ]] || return 1
+  intake_signal="$(intake_pending_signal_file "$project")"
+  [[ -f "$intake_signal" ]] || return 1
+  log_mtime="$(file_mtime_epoch "$cycle_log" 2>/dev/null || true)"
+  signal_mtime="$(file_mtime_epoch "$intake_signal" 2>/dev/null || true)"
+  [[ -n "$log_mtime" && -n "$signal_mtime" ]] || return 1
+  (( signal_mtime > log_mtime )) || return 1
+  now="$(date +%s)"
+  (( now - log_mtime >= threshold_secs )) || return 1
+}
+
+recover_stalled_manager_ai_if_needed() {
+  local project="$1" ai_pid current_account
+  manager_ai_stalled_with_pending_intake "$project" "${MANAGER_AI_STALL_THRESHOLD_SECS:-90}" || return 1
+  ai_pid="$(manager_ai_pid_for_project "$project")"
+  current_account=""
+  if [[ "${AI_TOOL:-}" == "codex" ]]; then
+    current_account="$(codex_current_account "$project")"
+  fi
+  write_manager_bootstrap_handoff "$project" "manager_stall_detected" "${current_account:-unknown}" "${current_account:-unknown}" "manager_ai_stalled_with_pending_intake" "relaunch-manager-after-stall-recovery"
+  request_local_continuation_reentry "$project" "runtime-stalled-ai-recovery"
+  restart_manager_supervisor_preserving_handoff "$project"
+  log_warn "recovered stalled manager ai with pending intake (project=$project ai_pid=${ai_pid:-unknown})"
+  return 0
 }
 
 write_session_state() {
@@ -1945,7 +2120,8 @@ manager_runtime_recover_workers_if_needed() {
   [[ -n "$repo_root" ]] || return 0
   [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
 
-  recovered=0
+  recovered="$(manager_runtime_launch_workers_from_latest_handoff "$project")"
+  [[ "$recovered" =~ ^[0-9]+$ ]] || recovered=0
   while IFS='|' read -r wt_path branch; do
     [[ -n "$wt_path" ]] || continue
     [[ "$wt_path" == "$project" ]] && continue
@@ -2288,6 +2464,12 @@ ensure_manager_once() {
   if [[ "$AI_TOOL" == "codex" ]]; then
     current_account="$(codex_current_account "$project")"
     current_ai_pid="$(manager_ai_pid_for_project "$project")"
+    if [[ -n "$current_pid" ]] && [[ -n "$current_ai_pid" ]]; then
+      if recover_stalled_manager_ai_if_needed "$project"; then
+        current_pid=""
+        current_ai_pid=""
+      fi
+    fi
     if [[ -n "$current_pid" ]] && [[ -n "$current_account" ]] && ! codex_account_is_available_now "$project" "$current_account" && [[ -z "$current_ai_pid" ]]; then
       log_warn "manager supervisor is idle on an unavailable codex account ($current_account); restarting manager under watchdog control"
       write_manager_bootstrap_handoff "$project" "manager_limit_detected" "$current_account" "$current_account" "manager_process_ended_on_unavailable_account" "relaunch-manager-after-account-recovery"

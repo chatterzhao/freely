@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-worker-launch.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER_WT="$TMP_DIR/worker-wt"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260322-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" worktree add -q -b feature/test-worker "$WORKER_WT" develop
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WORKER_WT/.freely/run" "$WORKER_WT/.freely/logs"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$WORKER_WT/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER_WT"
+INTENT_FILE="$WORKER_WT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER_WT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/20260322-020303-worker-cli-retire-codex.txt"
+cat >"$PROMPT_FILE" <<EOF
+你现在运行在 Freely 的 worker 工位，不是主管工位。
+
+你的 worktree：
+- $WORKER_WT
+- branch: \`feature/test-worker\`
+
+当前任务是 completion verification / cleanup followthrough。
+EOF
+
+CONT_FILE="$PROJECT/.freely/run/manager-continuity-20260322-020303.md"
+cat >"$CONT_FILE" <<EOF
+# Manager Continuity
+
+- first worker prompt:
+  - $PROMPT_FILE
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+START_LOG="$TMP_DIR/started.log"
+start_workcell_supervisor_async() {
+  echo "$1" >>"$START_LOG"
+}
+
+LAUNCHED="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$LAUNCHED" == "1" ]] || {
+  echo "[FAIL] expected one launched worker, got $LAUNCHED" >&2
+  exit 1
+}
+
+grep -q "$WORKER_WT" "$START_LOG"
+grep -q '^DESIRED_RUNTIME_STATE="running"$' "$WORKER_WT/.freely/run/workcell-state.env"
+
+INTAKE_DIR="$(find "$WORKER_WT/.freely/intake" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+[[ -n "$INTAKE_DIR" ]] || {
+  echo "[FAIL] expected worker intake item" >&2
+  exit 1
+}
+
+grep -q '^STATUS="delegated"$' "$INTAKE_DIR/meta.env"
+grep -q '^CLASSIFICATION="continuation"$' "$INTAKE_DIR/meta.env"
+grep -q '^ABSORPTION_TARGET="handoff://continuation"$' "$INTAKE_DIR/meta.env"
+grep -q '当前任务是 completion verification / cleanup followthrough。' "$INTAKE_DIR/message.txt"
+
+echo "[PASS] manager continuity worker prompt is converted into worker continuation launch"
