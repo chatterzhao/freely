@@ -248,6 +248,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/candidates.md`
 - next_action: runtime 已补 worker handoff ingestion 与 stalled AI recovery；下一步完成 review 后决定是否可向 `develop` 合并，并在 merge 后用真实 `freely chat` 再跑一次 develop 集成验收
 
+20. `I-20260322-0412`
+- title: Worker active reentry for manager-delegated continuation governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
+- next_action: 先完成脚本级验证，再回到 `develop` 做一次真实 `freely chat` 后的 post-merge acceptance，确认 active worker 不再长期悬空 pending delegated continuation
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

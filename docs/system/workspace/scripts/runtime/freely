@@ -1644,6 +1644,7 @@ write_manager_worker_launch_intake() {
     "handoff://continuation" \
     "" \
     "$created_at" >/dev/null
+  printf '%s\n' "$intake_id"
 }
 
 ensure_runtime_workcell_initialized_for_launch() {
@@ -1663,11 +1664,17 @@ ensure_runtime_workcell_initialized_for_launch() {
 
 launch_worker_from_manager_prompt_if_needed() {
   local manager_project="$1" prompt_file="$2"
-  local target_project
+  local target_project intake_id supervisor_pid ai_pid
   target_project="$(worker_prompt_target_worktree "$prompt_file")"
   [[ -n "$target_project" && -d "$target_project" ]] || return 1
   ensure_runtime_workcell_initialized_for_launch "$target_project" || return 1
-  write_manager_worker_launch_intake "$target_project" "$prompt_file"
+  intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"
+  supervisor_pid="$(manager_supervisor_pid_for_project "$target_project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$target_project")"
+  if [[ -n "$supervisor_pid" && -n "$ai_pid" ]]; then
+    request_local_continuation_reentry "$target_project" "$intake_id"
+    return 0
+  fi
   write_workcell_state "$target_project" "running" "down" "down" "manager_worker_launch_linkage"
   start_workcell_supervisor_async "$target_project"
 }

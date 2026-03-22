@@ -36,6 +36,7 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 - ensure manager alive
 - recover expected workers
 - consume manager-generated worker launch handoff and translate it into target worker runtime activation
+- if the target worker is already active, trigger local continuation reentry instead of relaunching a second supervisor
 - detect stalled AI processes when newer intake/continuation is pending, then trigger runtime-owned recovery
 - 消费 availability watchdog 结果
 - 触发 Freely 专有 manager bootstrap handoff

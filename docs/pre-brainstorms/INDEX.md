@@ -1,5 +1,6 @@
 # 预研头脑风暴索引
 - 20260322-0245--runtime-worker-launch-linkage-and-stall-recovery
+- 20260322-0412--worker-active-reentry-for-manager-delegated-continuation
 - 20260322-0228--manager-delegation-after-sufficient-patrol-evidence
 - 20260321-1925--manager-chat-reentry-and-cleanup-misrouting
 - 20260321-1706--chat-triggered-worker-runtime-reactivation
