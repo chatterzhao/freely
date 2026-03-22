@@ -27,12 +27,13 @@
 ## Residual risk
 
 - manager continuity 里的 worker prompt 解析当前依赖 prompt 文件路径和 prompt 文本中的 `你的 worktree：` 结构，后续若 manager handoff 格式继续演化，应考虑把 handoff queue 进一步结构化
-- worktree cleanup 尚未执行；当前 worktree 仍有未提交 closure writeback，且本地分支与 `develop` 已 `1 1` 分叉，因此本轮只能记为 `retained-with-reason`，不能判成 `verified-retirable`
+- worktree cleanup 尚未执行；当前 worktree 已恢复 clean，但本地分支相对 `develop` 仍保留 2 个 docs-only closure commits，因此本轮只能记为 `retained-with-reason`，不能判成 `verified-retirable`
 
 ## Cleanup evidence
 
-- `git rev-list --left-right --count develop...HEAD` -> `0 1`
-- `git diff-tree --no-commit-id --name-only -r HEAD` -> 当前分支唯一待吸收的 docs-only closure commit 仍只涉及 issue / progress / review / milestone 四个 runtime-worker-launch canonical 文档
-- `git status --short` -> 当前 worktree 仅这四个 closure 文档为 modified；目标 issue 无新的 runtime implementation 改动
+- `git rev-list --left-right --count develop...HEAD` -> `0 2`
+- `git log --oneline --left-right develop...HEAD` -> 当前本地待吸收提交为 `c546134` 与 `8418c36`，均为 docs-only closure commits
+- `git diff-tree --no-commit-id --name-only -r HEAD` -> 最新本地 closure commit 仍只涉及 issue / progress / review / milestone 四个 runtime-worker-launch canonical 文档
+- `git status --short` -> clean；目标 issue 无新的 runtime implementation 改动
 - `git ls-remote --heads origin feature/runtime-worker-launch-linkage-and-stall-recovery-20260322` -> no match
-- `./bin/wt-status-all` -> `Summary: total=6, dirty=4`; 当前工位仍为 `DIRTY`，且其他 dirty 工位需按 ownership 显式跳过，因此尚未满足 cleanup lifecycle 的 `target clean`
+- `./bin/wt-status-all` -> `Summary: total=6, dirty=3`; 当前工位已为 `CLEAN`，其余 dirty 工位需按 ownership 显式跳过，因此当前 cleanup blocker 只剩 develop absorption

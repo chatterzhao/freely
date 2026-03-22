@@ -401,7 +401,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/candidates.md`
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/runtime/manager-watchdog.sh`, `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`, `docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery`, `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/code-reviews/20260322-runtime-worker-launch-linkage-and-stall-recovery-verification.md`
-- completion_note: manager-generated worker handoff 已可直接转成 target worker continuation launch，stall recovery 也已进入 runtime-owned 控制面；当前 issue 仅剩 closure writeback / cleanup followthrough，但 worktree 仍未 `target clean`、`./bin/wt-status-all` 当前为 `Summary: total=6, dirty=4`，且本地分支与 `develop` 为 `0 1`，因此本轮 cleanup 结论仍为 `retained-with-reason`
+- completion_note: manager-generated worker handoff 已可直接转成 target worker continuation launch，stall recovery 也已进入 runtime-owned 控制面；当前 issue 的 closure writeback 已固化且本工位已恢复 `target clean`，但 `./bin/wt-status-all` 当前为 `Summary: total=6, dirty=3`，且本地分支与 `develop` 为 `0 2`，因此本轮 cleanup 结论仍为 `retained-with-reason`
 
 3. `I-20260321-2010`
 - title: Explicit session-addressed resume governance

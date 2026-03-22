@@ -73,18 +73,16 @@ Freely 最新 dogfood 证明：
 
 - audit_date: `2026-03-22`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-runtime-worker-launch-linkage-and-stall-recovery`
-- worktree_state: `dirty`
+- worktree_state: `clean`
 - classification: `retire-only`
 - cleanup_gate: `retained-with-reason`
 - why_not_verified_retirable:
-  - 当前 worktree 仍有未提交的 closure writeback（issue / progress / review / milestone 四个 canonical 文档），因此不满足 cleanup lifecycle 的 `target clean`
-  - `git rev-list --left-right --count develop...HEAD` 当前为 `0 1`：当前工位已重落到最新 `develop` 顶上，但仍保留一个本地 docs-only closure commit 待经 develop-facing 路径吸收，因此不能直接宣称已完成 cleanup
-  - `./bin/wt-status-all` 当前为 `Summary: total=6, dirty=4`；除当前工位外项目里仍有其他 dirty worktree，因此本轮只能确认当前工位进入 completion verification closure，不能伪装成全项目 hygiene 已收口
+  - `git rev-list --left-right --count develop...HEAD` 当前为 `0 2`：当前工位虽已重落到最新 `develop` 顶上并恢复 `target clean`，但仍保留两个本地 docs-only closure commit 待经 develop-facing 路径吸收，因此不能直接宣称已完成 cleanup
+  - `./bin/wt-status-all` 当前为 `Summary: total=6, dirty=3`；当前工位自身已 clean，但项目里仍有其他 dirty worktree，因此本轮只能确认本工位已满足 target safety，不能伪装成全项目 hygiene 已收口
 - local_branch_disposition: `retained-with-reason`
-- local_branch_reason: 先把当前 closure evidence 固化并让 `da5bc39` 经 develop-facing 路径被吸收；在 worktree 恢复 clean 且 cleanup gate 重新验证前，不执行本地 branch/worktree cleanup
+- local_branch_reason: 当前工位已满足 `target clean`，但仍需先让本地 docs-only closure commits 经 develop-facing 路径被吸收；在分支被主线吸收前，不执行本地 branch/worktree cleanup
 - remote_branch_disposition: `deleted`
 - remote_branch_reason: `origin` 未发现同名远程分支
 - revisit_trigger:
-  - 当前四个 closure 文档完成写回并恢复 `target clean`
-  - `develop` 吸收 `da5bc39` 或等价的 closure evidence
+  - `develop` 吸收当前两个 docs-only closure commits 或等价的 closure evidence
   - 当前工位重新执行 cleanup followthrough
