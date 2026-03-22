@@ -76,6 +76,10 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - `freely chat` 先完成 durable intake 与 interruption classification
    - 若结果已收敛成当前工位的 worker-owned `continuation` / `verification` handoff，且当前 worker runtime 因 `operator_stop` 停止
    - runtime 应重激活该 worker 主循环，而不是让 delegated intake 悬空
+17. `freely` 是唯一正式 front-door command：
+   - `chat` 是 canonical high-level submit primitive
+   - `tui` 只是交互壳，必须复用同一 post-submit runtime chain
+   - 未来 GUI 也应复用同一 backend contract，而不是另造提交语义
 
 ## 角色组织
 

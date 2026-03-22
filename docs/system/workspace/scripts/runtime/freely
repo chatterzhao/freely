@@ -1159,12 +1159,10 @@ render_tui_dashboard() {
 }
 
 tui_submit_message() {
-  local project="$1" message="$2" intake_output intake_id
+  local project="$1" message="$2" intake_output
   [[ -n "$message" ]] || return 0
-  intake_output="$(bash "$SELF_ROOT/bin/freely" intake chat --project "$project" --author human --channel tui --message "$message")"
-  intake_id="$(printf '%s\n' "$intake_output" | sed -n 's/^intake_id: //p')"
-  ensure_interruption_dispatch_once "$project"
-  [[ -n "$intake_id" ]] && printf 'intake_id: %s\n' "$intake_id"
+  intake_output="$(submit_human_frontdoor_message "$project" human tui "$message")"
+  [[ -n "$intake_output" ]] && printf '%s\n' "$intake_output"
 }
 
 tui_compose_message() {
@@ -3198,10 +3196,17 @@ cmd_chat() {
   done
   [[ -n "$message" ]] || { usage; exit 1; }
   project="$(resolve_project_or_fail "$project" 1)"
+  submit_human_frontdoor_message "$project" human chat "$message"
+}
+
+submit_human_frontdoor_message() {
+  local project="$1" author="$2" channel="$3" message="$4"
   bootstrap_interruption_entry_runtime_or_fail "$project"
-  cmd_intake_chat --project "$project" --author human --channel chat --message "$message"
+  local intake_output
+  intake_output="$(cmd_intake_chat --project "$project" --author "$author" --channel "$channel" --message "$message")"
   ensure_interruption_dispatch_once "$project"
   reactivate_worker_runtime_if_needed_after_chat "$project"
+  printf '%s\n' "$intake_output"
 }
 
 cmd_tui() {

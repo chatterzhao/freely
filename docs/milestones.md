@@ -199,6 +199,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md`
 - next_action: 把 remote branch deletion / retained reason 纳入 `worktree-maintenance-governance` 与 `cleanup-followthrough`，并用真实 cleanup 测试和 Freely 插话验证主管能够把这层收口做完
 
+15. `I-20260322-0115`
+- title: CLI-first entrypoint and observability surface unification
+- milestone_state: committed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md`
+- next_action: 已完成 `chat` / `tui` 的 shared front-door submit helper，并把 CLI-first backend contract 写回真源；若后续继续做 Tauri 渲染层，需新开 lifecycle
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`
