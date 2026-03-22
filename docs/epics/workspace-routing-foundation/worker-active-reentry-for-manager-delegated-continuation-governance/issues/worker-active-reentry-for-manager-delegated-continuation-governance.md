@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260322-0412`
 - title: Worker active reentry for manager-delegated continuation governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `worker-active-reentry-for-manager-delegated-continuation-governance`
@@ -45,3 +45,15 @@ manager runtime 已经能把 stable worker prompt 转成目标 worker worktree �
 - `docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
 - `docs/progress/workspace-routing-foundation/p-worker-active-reentry-for-manager-delegated-continuation-governance.md`
 - `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/code-reviews/20260322-worker-active-reentry-for-manager-delegated-continuation-verification.md`
+
+## Verification Summary
+
+- 脚本级验收已覆盖：
+  - inactive worker 仍按原路径被拉起；
+  - active worker 会触发 `request_local_continuation_reentry`，而不是重复启动第二个 supervisor。
+- merge 后在 `develop` 做了真实 runtime acceptance：
+  - manager runtime 生成新的 worker prompt / manager continuity；
+  - 对已 active 的 `feature/cli-first-observability-surfaces-20260322` 触发了真实 `graceful_term`；
+  - worker 写出了 `LAST_PREEMPTION_REASON="local_continuation_reentry"`；
+  - worker 随后拉起了新的 AI 进程，且 `current_prompt_has_delegated_continuation: 1`。
+- 观察到 `last_consumed_delegated_continuation_ids` 仍按 cycle completion 回写，属于既有 consumption evidence 节奏，不阻塞本次 active-worker reentry 修复收口。

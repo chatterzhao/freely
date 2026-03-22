@@ -251,12 +251,12 @@ routing_policy:
 20. `I-20260322-0412`
 - title: Worker active reentry for manager-delegated continuation governance
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
-- next_action: 先完成脚本级验证，再回到 `develop` 做一次真实 `freely chat` 后的 post-merge acceptance，确认 active worker 不再长期悬空 pending delegated continuation
+- next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
 
 ### candidate_issues
 
