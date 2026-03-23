@@ -199,7 +199,27 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md`
 - next_action: 把 remote branch deletion / retained reason 纳入 `worktree-maintenance-governance` 与 `cleanup-followthrough`，并用真实 cleanup 测试和 Freely 插话验证主管能够把这层收口做完
 
-16. `I-20260322-0115`
+15. `I-20260321-1715`
+- title: Manager watchdog trigger and drift reconcile governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/candidates.md`, `docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/candidates.md`
+- next_action: 已补上 cleanup signal 的最小 routing 修复：`restart_point=cleanup` 先保留为 `handoff://cleanup`，不再直接吸收到旧 `cleanup://merged-worktree-followthrough` continuity。下一步继续做真实 manager/develop 工位回归，确认新项目级 signal 会先进入 notice/claim/restart-point routing，再决定最终 absorption target
+
+16. `I-20260321-1745`
+- title: Active lifecycle boundary and dogfooding capability discovery
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/candidates.md`
+- next_action: `three-loop-capability-lifecycle` 与 `PROJECT_INTENT` 的边界 wording 已落盘；当前进入 consistency verification，确认“历史 vs 当前”与狗粮能力发现原则不会与既有真源冲突
+
+17. `I-20260322-0115`
 - title: CLI-first entrypoint and observability surface unification
 - milestone_state: committed
 - phase_state: `completed`
@@ -209,7 +229,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md`
 - next_action: 已完成 `chat` / `tui` 的 shared front-door submit helper，并把 CLI-first backend contract 写回真源；若后续继续做 Tauri 渲染层，需新开 lifecycle
 
-17. `I-20260322-0135`
+18. `I-20260322-0135`
 - title: Integration-acceptance-first IBM and verification governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -219,7 +239,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/candidates.md`
 - next_action: 已将 `pre-tests.md` 收敛为 issue-level acceptance 控制面，并把 integration / acceptance-first 口径写回 IBM、three-loop 与 `LAWS`；后续若要继续结构化 verification review 模板，应通过新 lifecycle 承接
 
-17. `I-20260322-0228`
+19. `I-20260322-0228`
 - title: Manager delegation after sufficient patrol evidence governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -229,7 +249,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/candidates.md`
 - next_action: 已把 patrol evidence 充足后必须切到 concrete worker delegation 的阈值语义写回主管真源；若后续仍观察到主管只巡检不委派，应通过新 lifecycle 进入 runtime / delegation mechanism 层修复
 
-19. `I-20260322-0412`
+20. `I-20260322-0412`
 - title: Worker active reentry for manager-delegated continuation governance
 - milestone_state: committed
 - phase_state: `completed`

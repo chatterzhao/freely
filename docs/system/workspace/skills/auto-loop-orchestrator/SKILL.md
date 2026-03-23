@@ -55,12 +55,16 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - `event source`：interruption / review finding / test failure / runtime anomaly / worker-discovered gap
    - `standing source`：`PROJECT_INTENT` / milestones / issue / progress / recovery / fleet
 10. 对 `event source`，主管及时 notice；对 `standing source`，主管周期扫描，并在必要时生成 derived problem signal。
-11. 主管被 runtime 重新激活后，不得只确认“进程活着”；必须先做一轮 patrol：
+11. 因此 `auto-loop` 对主管而言至少有两类入口：
+   - `event-driven`
+   - `patrol-driven`
+   两者都要回到统一的 manager restart-point routing，而不是形成两套并列流程。
+12. 主管被 runtime 重新激活后，不得只确认“进程活着”；必须先做一轮 patrol：
    - `live-status`
    - `fleet-status`
    - milestone / issue / progress / recovery
    - 主动寻找没有 worker 在推进的点位与已完成但未收口的 worktree
-12. 主管的核心职责不是“分流插话”，而是对任意 signal 决定 restart point：
+13. 主管的核心职责不是“分流插话”，而是对任意 signal 决定 restart point：
    - `pre-brainstorm`
    - `candidate / milestone intake`
    - `IBM`
@@ -69,25 +73,26 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - `verification`
    - `progress / recovery`
    - `runtime supervision / cleanup`
-13. 对 `human interruption`，runtime interruption dispatcher 可先做 durable 接住与及时 notice，但不替代主主管完成完整路由。
-14. 主管不把 raw signal 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
-15. 当 standing source 的重点问题是 sequencing / queue drift / state maintenance，而不是业务边界本身时，主管应优先委派 `skill:milestone-planning-state-maintenance`，而不是让业务 worker 顺手补 milestone。
-16. 对 worker 工位的 `human interruption`：
-   - `freely chat` 先完成 durable intake 与 interruption classification
-   - 若结果已收敛成当前工位的 worker-owned `continuation` / `verification` handoff，且当前 worker runtime 因 `operator_stop` 停止
-   - runtime 应重激活该 worker 主循环，而不是让 delegated intake 悬空
-17. 对 manager continuation handoff：
-   - interruption resolution 生成 `handoff://continuation` 只是第一步
-   - runtime 还必须留下 generated-vs-consumed evidence
-   - 若后续命中 `fresh_with_handoff`、`auth_failure` 或其他 failure boundary，不能把 handoff 是否已消费变成不可见状态
-18. `freely` 是唯一正式 front-door command：
-   - `chat` 是 canonical high-level submit primitive
-   - `tui` 只是交互壳，必须复用同一 post-submit runtime chain
-   - 未来 GUI 也应复用同一 backend contract，而不是另造提交语义
-19. 当项目级 patrol 已经把某条线稳定判成 `retire-only`、`retire-now` 或 `continue-dev` 时，主管下一步必须进入 concrete execution routing：
-   - `retire-only / retire-now` -> cleanup / retirement worker
-   - `continue-dev` -> verification / dev continuation worker
-   - 只有在关键事实缺失、上游依赖不明或 blocker 未冻结时，才允许继续 manager-only patrol
+14. verification / writeback / cleanup 不是第四层 loop；它们要么属于 worker 在 `dev-loop` 中产出的证据，要么属于主管在 `auto-loop` 中做出的治理判断与收口委派。
+15. 对 `human interruption`，runtime interruption dispatcher 可先做 durable 接住与及时 notice，但不替代主主管完成完整路由。
+16. 主管不把 raw signal 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
+17. 当 standing source 的重点问题是 sequencing / queue drift / state maintenance，而不是业务边界本身时，主管应优先委派 `skill:milestone-planning-state-maintenance`，而不是让业务 worker 顺手补 milestone。
+18. 对 worker 工位的 `human interruption`：
+  - `freely chat` 先完成 durable intake 与 interruption classification
+  - 若结果已收敛成当前工位的 worker-owned `continuation` / `verification` handoff，且当前 worker runtime 因 `operator_stop` 停止
+  - runtime 应重激活该 worker 主循环，而不是让 delegated intake 悬空
+19. 对 manager continuation handoff：
+  - interruption resolution 生成 `handoff://continuation` 只是第一步
+  - runtime 还必须留下 generated-vs-consumed evidence
+  - 若后续命中 `fresh_with_handoff`、`auth_failure` 或其他 failure boundary，不能把 handoff 是否已消费变成不可见状态
+20. `freely` 是唯一正式 front-door command：
+  - `chat` 是 canonical high-level submit primitive
+  - `tui` 只是交互壳，必须复用同一 post-submit runtime chain
+  - 未来 GUI 也应复用同一 backend contract，而不是另造提交语义
+21. 当项目级 patrol 已经把某条线稳定判成 `retire-only`、`retire-now` 或 `continue-dev` 时，主管下一步必须进入 concrete execution routing：
+  - `retire-only / retire-now` -> cleanup / retirement worker
+  - `continue-dev` -> verification / dev continuation worker
+  - 只有在关键事实缺失、上游依赖不明或 blocker 未冻结时，才允许继续 manager-only patrol
 
 ## 角色组织
 

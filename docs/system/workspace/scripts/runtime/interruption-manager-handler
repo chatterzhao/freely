@@ -84,7 +84,8 @@ cat >"$prompt_file" <<EOF
   - scope 更偏 manager-only / current-issue / fleet / runtime / project 哪一侧
   - complexity 更偏 direct 还是 multi-step
 - 对 restart_point=cleanup：
-  - 若要真正核对并执行 worktree / branch 收口，通常应给 OWNERSHIP=worker
+- 若要真正核对并执行 worktree / branch 收口，通常应给 OWNERSHIP=worker
+- 即使判断为 cleanup，也只表示主管已识别 restart point；当前 signal 仍应先交接为 cleanup handoff，而不是直接吸收到旧 cleanup continuity
 - 如果用户问的是“这个现在应该怎么收口”，由于答案依赖 live fleet state，也通常应走 delegate + cleanup + worker
 - 如果 signal 本身是在问“检查 worktree / 哪些 worktree 可 merge / 哪些应退休 / 现在该怎么收口”：
   - 优先按 worktree maintenance 问题理解，而不是泛化成 continuation

@@ -37,6 +37,25 @@
 - intake 已存在本工位 delegated `handoff://continuation` / `handoff://verification`
 - 但没有新的 worker 主循环接棒
 
+6. `external drift / out-of-band reconcile`
+- 仓库、docs 或 cleanup 现实已经前进
+- 但 `.freely` / intake / continuity / worktree 视图仍停留在旧状态
+- 主管需要先解释当前 drift，再把它分流到 maintenance worker、execution worker 或 runtime owner
+
+## Trigger Model
+
+主管 patrol 不应被理解成只有单一轮询入口。
+
+- `patrol-driven`
+  - 来源：standing-source scan
+  - 典型输入：`live-status` / `fleet-status` / milestone / issue / progress / recovery
+
+- `event-driven`
+  - 来源：human interruption / worker result / runtime anomaly / review/test signal
+  - 这些事件进入系统后，也应回到同一套 `ownership + restart_point + next_action` contract
+
+两类入口最终都应汇聚到主管的统一 routing，而不是形成两套平行流程。
+
 ## 输出
 
 主管必须把巡检结果加工成：
@@ -59,6 +78,10 @@
   - `freeze`
   - `merge`
   - `cleanup`
+
+补充：
+- 主管先输出状态解释与 ownership 判断，再委派对应 owner。
+- delegated owner 返回结果后，主管继续决定下一跳 restart point，直到当前问题被正确吸收或完成收口。
 
 ## 硬规则
 

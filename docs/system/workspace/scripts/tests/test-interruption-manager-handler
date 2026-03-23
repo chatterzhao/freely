@@ -67,6 +67,10 @@ if [[ "$prompt_expectation_mode" == "fixed" ]]; then
 else
   grep -q "$prompt_expectation" "$prompt_capture"
 fi
+if [[ "$expected_restart" == "cleanup" && "$expected_owner" == "worker" ]]; then
+  grep -q 'worktree-maintenance-governance' "$prompt_capture"
+  grep -q '当前 signal 仍应先交接为 cleanup handoff' "$prompt_capture"
+fi
 }
 
 run_case \
