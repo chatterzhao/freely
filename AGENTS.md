@@ -95,6 +95,8 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - Worktree 根目录遵循宪法策略：项目同级目录，命名为 `{project-name}-worktrees`。
 - 架构/治理变更必须先进入 `docs/pre-brainstorms/<id>/`，然后才能进入执行循环落地。
 - Freely 自举中发现的新能力，默认优先判断是否已被现有 milestone-owned issue 吸收；仅当现有 issue 无法承接时，才新开 candidate / issue。
+- 若当前项目的 Freely runtime 已在运行，优先通过 `./bin/freely chat --project <project-root> <message>` 这类 human interruption / intake 入口指导它继续开发；不要绕过 runtime 另造一套平行调度。
+- 若在插话驱动的开发过程中发现 bug、缺口或新的能力沉淀点，仍按同一治理规则处理：必要时让 Freely 创建/进入 dedicated worktree 修复、验证、合并到 `develop`、重启 runtime，再继续通过 interruption 推进。
 - 优先使用预检 + 可操作的修复方案，而非重复的权限提示。
 
 ## 执行指引
