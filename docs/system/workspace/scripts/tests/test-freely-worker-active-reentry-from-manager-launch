@@ -86,6 +86,15 @@ cat >"$CONT_FILE" <<EOF
   - $PROMPT_FILE
 EOF
 
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$PROJECT/.freely/run/manager-continuity-20260322-010101.md"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$PROJECT/.freely/run/worker-prompts/20260322-010101-worker-three-loop-continue-dev-codex.txt"
+LAST_MANAGER_CONTINUITY_CONSUMED="$PROJECT/.freely/run/manager-continuity-20260322-010101.md"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$PROJECT/.freely/run/worker-prompts/20260322-010101-worker-three-loop-continue-dev-codex.txt"
+LAUNCHED_WORKER_PROMPTS="$PROJECT/.freely/run/worker-prompts/20260322-010101-worker-three-loop-continue-dev-codex.txt"
+UPDATED_AT="2026-03-22T04:12:00Z"
+EOF
+
 # shellcheck disable=SC1090
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 
@@ -131,5 +140,9 @@ if [[ -f "$START_LOG" ]]; then
   echo "[FAIL] active worker should not launch a second supervisor" >&2
   exit 1
 fi
+grep -q "^LAST_MANAGER_CONTINUITY_GENERATED=\"$CONT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
+grep -q "^LAST_MANAGER_CONTINUITY_CONSUMED=\"$CONT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
+grep -q "^LAST_MANAGER_WORKER_PROMPTS_GENERATED=\"$PROMPT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
+grep -q "^LAST_MANAGER_WORKER_PROMPTS_CONSUMED=\"$PROMPT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
 
 echo "[PASS] manager launch linkage reenters active worker instead of relaunching supervisor"
