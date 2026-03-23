@@ -4,23 +4,44 @@ normalize_codex_account_name() {
   printf '%s' "$1" | sed 's/\./-/g'
 }
 
-# Parse "Mar 23rd, 2026 3:51 PM" format to Unix timestamp
+# Parse various time formats from codex output
+# Supported formats:
+#   - "Mar 23rd, 2026 3:51 PM" (full date)
+#   - "1:42 AM" (time only, assumes today or tomorrow)
 parse_try_again_time() {
   local date_str="$1"
   [[ -n "$date_str" ]] || return 1
   python3 -c "
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import sys
 
 date_str = sys.argv[1]
 # Remove ordinal suffixes (st, nd, rd, th)
-cleaned = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', date_str)
+cleaned = re.sub(r\"(\d+)(st|nd|rd|th)\", r\"\1\", date_str).strip()
+
 try:
-    dt = datetime.strptime(cleaned, '%b %d, %Y %I:%M %p')
+    # Try full date format: \"Mar 23, 2026 3:51 PM\"
+    dt = datetime.strptime(cleaned, \"%b %d, %Y %I:%M %p\")
     print(int(dt.timestamp()))
-except Exception:
-    sys.exit(1)
+    sys.exit(0)
+except ValueError:
+    pass
+
+try:
+    # Try time-only format: \"1:42 AM\"
+    # Assume it is today, but if the time has already passed, assume tomorrow
+    time_only = datetime.strptime(cleaned, \"%I:%M %p\")
+    now = datetime.now()
+    dt = now.replace(hour=time_only.hour, minute=time_only.minute, second=0, microsecond=0)
+    if dt <= now:
+        dt += timedelta(days=1)
+    print(int(dt.timestamp()))
+    sys.exit(0)
+except ValueError:
+    pass
+
+sys.exit(1)
 " "$date_str" 2>/dev/null
 }
 
@@ -30,7 +51,12 @@ extract_try_again_time_from_output() {
   local output="$1"
   local try_again_str
   # Match: try again at Mar 23rd, 2026 3:51 PM.
+  # Also match: try again at 1:42 AM.
   try_again_str="$(printf '%s\n' "$output" | grep -oiE 'try again at [^.]+\.' | sed 's/try again at //i' | sed 's/\.$//' | head -1)"
+  if [[ -z "$try_again_str" ]]; then
+    # Try alternative patterns without trailing dot
+    try_again_str="$(printf '%s\n' "$output" | grep -oiE 'try again at [A-Za-z0-9, :]+[AP]M' | sed 's/try again at //i' | head -1)"
+  fi
   [[ -n "$try_again_str" ]] || return 1
   parse_try_again_time "$try_again_str"
 }
@@ -181,6 +207,10 @@ select_earliest_reset_codex_account_any() {
 # Output format:
 #   usable
 #   rate_limited:<reset_at>
+#   subscription_expired
+#   unauthorized
+#   timeout
+#   error:<message>
 # Exit code:
 #   0 for usable or rate limited
 #   1 for other probe failures
@@ -233,7 +263,8 @@ codex_probe_current_account_now() {
     kill "$pid" 2>/dev/null
     wait "$pid" 2>/dev/null
     rm -f "$prompt_file" "$output_file"
-    return 1  # Timeout
+    printf 'timeout\n'
+    return 0
   fi
 
   wait "$pid" 2>/dev/null || rc=$?
@@ -243,9 +274,25 @@ codex_probe_current_account_now() {
   output="$(cat "$output_file")"
   rm -f "$output_file"
 
+  # Strip ANSI escape codes for reliable grep matching
+  # Handle various escape sequences: ESC[...m, ESC]...BEL, ESC[?...h/l, etc.
+  output="$(printf '%s\n' "$output" | sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g; s/\x1b\].*\x07//g; s/\x1b\][^\x1b]*\x1b\\//g')"
+
   # Check for success.
   if [[ "$rc" -eq 0 ]]; then
     printf 'usable\n'
+    return 0
+  fi
+
+  # Check for subscription/payment issues
+  if printf '%s\n' "$output" | grep -qi "subscription\|billing\|payment\|quota\|plan\|upgrade"; then
+    printf 'subscription_expired\n'
+    return 0
+  fi
+
+  # Check for unauthorized/auth issues
+  if printf '%s\n' "$output" | grep -qi "unauthorized\|authentication\|invalid.*token\|login required\|401\|403"; then
+    printf 'unauthorized\n'
     return 0
   fi
 
@@ -253,12 +300,20 @@ codex_probe_current_account_now() {
   if printf '%s\n' "$output" | grep -qi "usage limit\|try again"; then
     local reset_at
     reset_at="$(extract_try_again_time_from_output "$output")"
-    [[ -n "$reset_at" ]] || return 1
-    printf 'rate_limited:%s\n' "$reset_at"
+    if [[ -n "$reset_at" ]]; then
+      printf 'rate_limited:%s\n' "$reset_at"
+      return 0
+    fi
+    # Fallback: rate limited but no time found, still report it
+    printf 'rate_limited:0\n'
     return 0
   fi
 
-  return 1
+  # Generic error
+  local error_msg
+  error_msg="$(printf '%s' "$output" | head -1 | tr '\n' ' ' | cut -c1-50)"
+  printf 'error:%s\n' "$error_msg"
+  return 0
 }
 
 probe_any_usable_codex_account_now() {
@@ -292,16 +347,30 @@ probe_all_codex_accounts_and_update_cooldown() {
   local candidate probe_result reset_at
   local usable_account=""
   local earliest_account="" earliest_reset=""
+  local -a account_status=()
+  local current_account
+
+  current_account="$(codex_current_account "$project")"
+
+  # Print header
+  printf '\n%-30s  %-15s  %s\n' "Account" "Status" "Details" >&2
+  printf '%s\n' "$(printf '%-30s  %-15s  %s' '' '' '' | tr ' ' '-')" >&2
 
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
     switch_to_codex_account "$project" "$candidate" "probe_all_accounts" >/dev/null || continue
 
     probe_result="$(codex_probe_current_account_now "$project")" || continue
+
+    local status_line="" status_icon="" status_text="" details=""
+
     case "$probe_result" in
       usable)
         codex_clear_account_cooldown "$project" "$candidate"
         usable_account="$candidate"
+        status_icon="✅"
+        status_text="usable"
+        details="ready to use"
         ;;
       rate_limited:*)
         reset_at="${probe_result#rate_limited:}"
@@ -310,9 +379,52 @@ probe_all_codex_accounts_and_update_cooldown() {
           earliest_account="$candidate"
           earliest_reset="$reset_at"
         fi
+        status_icon="⏳"
+        status_text="rate_limited"
+        local human_time
+        human_time="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo "$reset_at")"
+        details="resets at $human_time"
+        ;;
+      subscription_expired)
+        status_icon="💳"
+        status_text="subscription"
+        details="plan expired or quota exceeded"
+        ;;
+      unauthorized)
+        status_icon="🔒"
+        status_text="unauthorized"
+        details="auth token invalid or expired"
+        ;;
+      timeout)
+        status_icon="⏱️"
+        status_text="timeout"
+        details="probe timed out after ${CODEX_PROBE_TIMEOUT:-15}s"
+        ;;
+      error:*)
+        status_icon="❌"
+        status_text="error"
+        details="${probe_result#error:}"
+        ;;
+      *)
+        status_icon="❓"
+        status_text="unknown"
+        details="$probe_result"
         ;;
     esac
+
+    # Mark current account
+    local current_marker=""
+    if [[ "$(normalize_codex_account_name "$candidate")" == "$(normalize_codex_account_name "$current_account")" ]]; then
+      current_marker=" *"
+    fi
+
+    # Print status line
+    printf '%s %-28s  %-15s  %s\n' "$status_icon" "$candidate$current_marker" "$status_text" "$details" >&2
+
+    account_status+=("$candidate:$status_text")
   done < <(codex_saved_accounts "$project")
+
+  printf '\n' >&2
 
   # Return results
   if [[ -n "$usable_account" ]]; then
@@ -336,8 +448,11 @@ switch_to_codex_account() {
   requested_normalized="$(normalize_codex_account_name "$account")"
   actual_account="$(codex_current_account "$project")"
   actual_normalized="$(normalize_codex_account_name "$actual_account")"
-  if printf '%s\n' "$output" | rg -q '"switched": *true' && [[ -n "$actual_account" && "$actual_normalized" == "$requested_normalized" ]]; then
-    log_warn "auto-switched codex account to $account (reason=$reason)" >&2
+  if printf '%s\n' "$output" | grep -qE '"switched": *true' && [[ -n "$actual_account" && "$actual_normalized" == "$requested_normalized" ]]; then
+    # Only log if not a probe operation (probe logs are handled by caller)
+    if [[ "$reason" != probe_all_accounts ]]; then
+      log_warn "auto-switched codex account to $account (reason=$reason)" >&2
+    fi
     printf '%s\n' "$account"
     return 0
   fi
