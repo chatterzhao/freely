@@ -83,6 +83,13 @@ Freely 开发 Freely 时，默认先问三件事：
 ## 吃自己的狗粮规则（Freely 构建 Freely）
 Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外。
 
+“吃自己的狗粮”在本项目中的具体含义：
+- Freely 开发过程中暴露的问题，不只是在修当前仓库；要先判断它是否应沉淀为 Freely 对外可复用的能力。
+- 若某个解决方案最终会被 Freely runtime、agent、skill、CLI 或打包产物长期消费，它必须落到 Freely 能力目录中，例如 `docs/system/**`、`bin/**`、实现代码目录；不要把这类能力定义留在 `pre-brainstorms`、`epics`、`progress` 等过程文档里。
+- 过程文档可以记录“为什么要做、边界如何收敛、当前结论是什么”，但不能替代最终能力真源。
+- 对已经稳定、可复用的提示词编排、角色职责、执行约束，优先拆到 `agents/**` 或 `skills/**`；runtime 脚本只保留启动、上下文注入、状态托管和恢复动作。
+- 开发 Freely 时调用这些 `agents/**`、`skills/**`、runtime 真源来继续开发 Freely，自身就是 dogfooding；这不是目录混用，而是产品自举。
+
 要求：
 - 使用对用户项目期望的相同分支/worktree/钩子规范。
 - Worktree 根目录遵循宪法策略：项目同级目录，命名为 `{project-name}-worktrees`。
