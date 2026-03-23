@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260323-1135--codex-account-active-probe-governance
 - 20260322-1802--pre-test-merge-semantic-audit-and-recovery
 - 20260322-1801--pre-test-merge-governance-lifecycle
 - 20260321-1835--lifecycle-complete-before-merge-governance
@@ -42,6 +43,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260323-1135--codex-account-active-probe-governance
+  - brainstorms: docs/pre-brainstorms/20260323-1135--codex-account-active-probe-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260323-1135--codex-account-active-probe-governance/candidates.md
 - 20260321-1835--lifecycle-complete-before-merge-governance
   - brainstorms: docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/candidates.md

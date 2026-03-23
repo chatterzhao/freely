@@ -218,36 +218,40 @@ sync_current_auth() {
 }
 
 # 切换 account
+# Usage:
+#   switch <tool> <account>  - 切换到指定账号
+#   switch <tool>            - 自动探测，切换到可用的或最早恢复的
 cmd_switch() {
   local tool="$1"
   local account="${2:-}"
-  
-  if [[ -z "$account" ]]; then
-    log_info "Available accounts:"
-    ls -1 "$AUTH_DIR" 2>/dev/null | grep "^${tool}-" | sed "s/^${tool}-/  /" || true
-    return
-  fi
-  
+
   case "$tool" in
     codex)
+      # 如果没有指定账号，自动探测
+      if [[ -z "$account" ]]; then
+        _cmd_switch_auto_codex
+        return $?
+      fi
+
+      # 指定了账号，直接切换
       local dirname=$(account_to_dirname "$account")
       local source_dir="$AUTH_DIR/codex-$dirname"
       local target_file="$HOME/.codex/auth.json"
       local switched_account=""
-      
+
       if [[ ! -d "$source_dir" ]]; then
         log_error "Account '$account' not found"
         log_info "Available: $(ls -1 "$AUTH_DIR" 2>/dev/null | grep '^codex-' | sed 's/codex-//' | tr '\n' ' ')"
         exit 4
       fi
-      
+
       # 切换前自动同步当前 token 到备份（保持备份最新）
       if [[ -f "$target_file" ]]; then
         sync_current_auth "$tool"
       fi
-      
+
       [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch to $account"; return; }
-      
+
       cp "$source_dir/auth.json" "$target_file"
       switched_account="$(extract_codex_account "$target_file")"
       if [[ -z "$switched_account" ]]; then
@@ -260,7 +264,7 @@ cmd_switch() {
       fi
       log_info "Switched codex to account: $account"
       log_warn "Restart codex for the change to take effect"
-      
+
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$account\"}"
       fi
@@ -270,6 +274,97 @@ cmd_switch() {
       exit 2
       ;;
   esac
+}
+
+# 自动探测并切换 codex 账号
+run_dir_for_project() {
+  local project="$1"
+  printf '%s\n' "$project/.freely/run"
+}
+
+codex_account_cooldown_file() {
+  local project="$1"
+  printf '%s\n' "$(run_dir_for_project "$project")/codex-account-cooldowns.tsv"
+}
+
+ai_cli_bin_for_project() {
+  local project="$1"
+  if [[ -x "$project/bin/ai" ]]; then
+    printf '%s\n' "$project/bin/ai"
+    return 0
+  fi
+  printf '%s\n' "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)/bin/ai"
+}
+
+_cmd_switch_auto_codex() {
+  local project="${PROJECT_ROOT:-$(pwd)}"
+  local tool="codex"
+
+  # Source watchdog functions
+  local watchdog_script=""
+  if [[ -f "$project/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" ]]; then
+    watchdog_script="$project/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  elif [[ -f "$(dirname "$0")/../docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" ]]; then
+    watchdog_script="$(dirname "$0")/../docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  fi
+
+  if [[ -z "$watchdog_script" ]]; then
+    log_error "Cannot find availability-watchdog.sh"
+    exit 3
+  fi
+
+  # shellcheck source=/dev/null
+  source "$watchdog_script"
+
+  log_info "Probing all codex accounts..."
+
+  local result
+  result="$(probe_all_codex_accounts_and_update_cooldown "$project")"
+
+  case "$result" in
+    usable:*)
+      local account="${result#usable:}"
+      log_info "Found usable account: $account"
+      _do_switch_codex "$tool" "$account"
+      if [[ "$FORMAT" == "json" ]]; then
+        echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$account\", \"status\": \"usable\"}"
+      fi
+      ;;
+    earliest:*)
+      local info="${result#earliest:}"
+      local account="${info%%|*}"
+      local reset_at="${info##*|}"
+      local human_time
+      human_time="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo "$reset_at")"
+      log_warn "All accounts rate limited. Earliest available: $account at $human_time"
+      _do_switch_codex "$tool" "$account"
+      if [[ "$FORMAT" == "json" ]]; then
+        echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$account\", \"status\": \"rate_limited\", \"reset_at\": $reset_at, \"reset_at_human\": \"$human_time\"}"
+      fi
+      ;;
+    none)
+      log_error "No accounts found or all probing failed"
+      if [[ "$FORMAT" == "json" ]]; then
+        echo "{\"switched\": false, \"status\": \"none\"}"
+      fi
+      exit 4
+      ;;
+    *)
+      log_error "Unknown result: $result"
+      exit 1
+      ;;
+  esac
+}
+
+# 实际执行切换（不包含探测逻辑），但复用显式切号路径的校验和 dry-run 语义。
+_do_switch_codex() {
+  local tool="$1" account="$2"
+  local old_format="$FORMAT"
+  FORMAT="text"
+  cmd_switch "$tool" "$account"
+  local rc=$?
+  FORMAT="$old_format"
+  return $rc
 }
 
 # 列出 accounts
@@ -382,19 +477,19 @@ cmd_delete() {
   local account="$2"
   local dirname=$(account_to_dirname "$account")
   local target_dir="$AUTH_DIR/${tool}-${dirname}"
-  
+
   if [[ ! -d "$target_dir" ]]; then
     log_error "Account '$account' not found"
     exit 4
   fi
-  
+
   confirm "Delete account '$account'?" || exit 1
-  
+
   [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would delete $target_dir"; return; }
-  
+
   rm -rf "$target_dir"
   log_info "Deleted account: $account"
-  
+
   if [[ "$FORMAT" == "json" ]]; then
     echo "{\"deleted\": true, \"tool\": \"$tool\", \"account\": \"$account\"}"
   fi
@@ -409,7 +504,7 @@ Commands:
   init                    Initialize account manager
   login <tool>            Login and auto-save account
   save <tool> [account]   Save current login (auto-detect account if not specified)
-  switch [tool] [account] Switch to account (default tool: codex; interactive if no account)
+  switch [tool] [account] Switch to account. No account = auto-probe and switch to usable/earliest
   list                    List all accounts
   whoami [tool]           Show current logged-in account
   status [tool]           Show current status
@@ -432,8 +527,9 @@ Examples:
   freely ai init
   freely ai login codex
   freely ai whoami
-  freely ai switch codex other@email.com --yes
-  freely ai switch other@email.com --yes
+  freely ai switch codex                    # Auto-probe, switch to usable/earliest
+  freely ai switch codex other@email.com    # Switch to specific account
+  freely ai switch other@email.com --yes    # Switch to specific account (default tool: codex)
   freely ai list --format json
 EOF
 }
