@@ -22,10 +22,6 @@ EOF
 # Laws
 EOF
 
-  cat >"$project/AGENTS.md" <<'EOF'
-# Agents
-EOF
-
   cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
 # 预研头脑风暴工作区
 EOF
@@ -58,12 +54,15 @@ PROJECT_CC="$TMP_DIR/project-cc"
 make_project "$PROJECT_CC"
 cd "$PROJECT_CC"
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --project "$PROJECT_CC" \
   --intent "$PROJECT_CC/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT_CC/docs/CONSTITUTION.md" \
   --ai cc:auto \
   >/dev/null
 
 CONFIG_FILE="$PROJECT_CC/.freely/config.env"
+test -f "$PROJECT_CC/AGENTS.md"
+grep -q '^# Project Agent Entry$' "$PROJECT_CC/AGENTS.md"
 grep -q '^AI_TOOL="cc"$' "$CONFIG_FILE"
 grep -q '^AI_MODE="auto"$' "$CONFIG_FILE"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
@@ -83,6 +82,7 @@ PROJECT_CC_CODEX="$TMP_DIR/project-cc-codex"
 make_project "$PROJECT_CC_CODEX"
 cd "$PROJECT_CC_CODEX"
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --project "$PROJECT_CC_CODEX" \
   --intent "$PROJECT_CC_CODEX/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT_CC_CODEX/docs/CONSTITUTION.md" \
   --ai cc-use-codex-cli:auto \
