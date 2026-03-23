@@ -315,6 +315,28 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 4 个边界：`pre-test-merge -> develop` 是否允许直接 promote、`develop-only completion verification` 与 `pre-test-merge batch acceptance` 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
 - revisit_trigger: 当 protected verification environment 的 promote policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
 
+8. `C-20260322-1801-A`
+- title: pre-test-merge responsibility, usage, and lifecycle governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://pre-test-merge-governance-lifecycle-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
+- next_action: 继续 pre-brainstorm，先冻结 `pre-test-merge` 的唯一职责、允许/禁止操作、stale/retire 条件，以及 promote 语义是否必须 replay 来源 feature；在这些边界稳定前不得把当前 `pre-test-merge` 快照误当成长期真相
+- revisit_trigger: 当 `pre-test-merge` 的职责模型、生命周期阶段与 promote/replay/retire contract 可以被冻结成独立 issue contract 时，重新进入 materialization 判断
+
+9. `C-20260322-1801-B`
+- title: pre-test-merge lifecycle management capability for Freely
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
+- source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
+- next_action: 等职责定义收稳后，再决定 stale-batch detection、batch retirement、replay requirement 和 promote visibility 应落在 runtime/status、branch-management、manager patrol 还是组合能力中；在此之前不直接写成某一层的局部补丁
+- revisit_trigger: 当 `pre-test-merge` lifecycle capability 的真源、触发面与最小 machine-readable outputs 可以被冻结成独立 issue contract 时，重新进入 materialization 判断
+
 5. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec
 - milestone_state: candidate

@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260322-1801--pre-test-merge-governance-lifecycle
 - 20260321-1835--lifecycle-complete-before-merge-governance
 - 20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery
 - 20260321-1715--manager-patrol-trigger-and-restart-routing
