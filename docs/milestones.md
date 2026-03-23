@@ -259,6 +259,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
 - next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
 
+21. `I-20260322-0445`
+- title: Latest manager continuity worker consumption governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
+- next_action: 已把 latest continuity consumption 接到主管 watchdog 主路径，并补 generated/consumed launch-state truth 与脚本级验收；下一步在 merge 到 `develop` 后执行真实 `freely chat` post-merge acceptance，确认 worker 会消费最新 manager continuity round
+
 ### completed_issues
 
 1. `I-20260322-1801`
@@ -389,6 +399,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/candidates.md`
 - next_action: 继续 pre-brainstorm，先把本地可选 sidecar 的最小职责边界、review / validation / rollback gate 和不接管主 runtime 的约束写稳，再决定是否 materialize 成独立 issue
 - revisit_trigger: 当 sidecar 的职责边界、review/validation/rollback gate 与“不接管主 runtime”约束可以被冻结成最小 issue contract 时，重新进入 materialization 判断
+
+9. `C-20260322-0715-A`
+- title: Detect and recover pre-test-merge manager acceptance stalls after delegated continuation
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://pre-test-merge-acceptance-stall-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/candidates.md`
+- next_action: 保持 active candidate；先依赖 `pre-test-merge` 治理 issue 冻结 protected-env 生命周期语义，再把 delegated acceptance continuation stall materialize 成独立 runtime/orchestration issue
+- revisit_trigger: 当治理 issue 稳定 `pre-test-merge` 边界后，或真实 post-merge acceptance 再次复现 delegated continuation stall 时，重新进入 issue materialization 判断
 
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛

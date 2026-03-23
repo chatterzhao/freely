@@ -93,6 +93,11 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
   - `retire-only / retire-now` -> cleanup / retirement worker
   - `continue-dev` -> verification / dev continuation worker
   - 只有在关键事实缺失、上游依赖不明或 blocker 未冻结时，才允许继续 manager-only patrol
+22. 当主管已经生成更新的一轮 manager continuity 和 worker prompt set 时，runtime 必须以后者为最新 truth：
+   - latest continuity generated
+   - latest prompt set generated
+   - latest continuity / prompt set consumed
+   主管 watchdog 不得仅因为 supervisor 已在运行就停留在旧 continuity；要持续把最新一轮监督结果推进成 worker launch / reentry。
 
 ## 角色组织
 

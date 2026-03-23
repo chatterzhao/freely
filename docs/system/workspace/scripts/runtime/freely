@@ -1522,9 +1522,12 @@ EOF
 }
 
 write_manager_worker_launch_state() {
-  local project="$1" continuity_file="$2" launched_prompts_csv="$3"
+  local project="$1" continuity_generated="$2" prompts_generated_csv="$3" continuity_consumed="$4" launched_prompts_csv="$5"
   cat >"$(manager_worker_launch_state_file "$project")" <<EOF
-LAST_MANAGER_CONTINUITY_CONSUMED="$continuity_file"
+LAST_MANAGER_CONTINUITY_GENERATED="$continuity_generated"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$prompts_generated_csv"
+LAST_MANAGER_CONTINUITY_CONSUMED="$continuity_consumed"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$launched_prompts_csv"
 LAUNCHED_WORKER_PROMPTS="$launched_prompts_csv"
 UPDATED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 EOF
@@ -1597,6 +1600,13 @@ latest_manager_worker_prompt_paths_from_continuity() {
   local continuity_file="$1"
   [[ -f "$continuity_file" ]] || return 0
   rg -o '/[^` ]+/.freely/run/worker-prompts/[^` ]+\.txt' "$continuity_file" | sort -u
+}
+
+latest_manager_worker_prompt_csv_from_continuity() {
+  local continuity_file="$1"
+  local csv
+  csv="$(latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | paste -sd, -)"
+  printf '%s\n' "${csv:-}"
 }
 
 worker_prompt_target_worktree() {
@@ -1681,18 +1691,23 @@ launch_worker_from_manager_prompt_if_needed() {
 
 manager_runtime_launch_workers_from_latest_handoff() {
   local project="$1"
-  local continuity_file launched_csv launched_count prompt_file
+  local continuity_file continuity_generated prompt_generated_csv launched_csv launched_count prompt_file
   continuity_file="$(latest_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
     printf '0\n'
     return 0
   }
+  continuity_generated="$continuity_file"
+  prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
 
   launched_csv=""
   if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
     # shellcheck disable=SC1090
     source "$(manager_worker_launch_state_file "$project")"
-    launched_csv="${LAUNCHED_WORKER_PROMPTS:-}"
+    launched_csv="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
+    if [[ -n "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" && "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" != "$continuity_file" ]]; then
+      launched_csv=""
+    fi
   fi
 
   launched_count=0
@@ -1707,7 +1722,7 @@ manager_runtime_launch_workers_from_latest_handoff() {
     fi
   done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
 
-  write_manager_worker_launch_state "$project" "$continuity_file" "$launched_csv"
+  write_manager_worker_launch_state "$project" "$continuity_generated" "$prompt_generated_csv" "$continuity_file" "$launched_csv"
   printf '%s\n' "$launched_count"
 }
 
@@ -2507,6 +2522,7 @@ ensure_manager_once() {
   fi
 
   if [[ -n "$current_pid" ]]; then
+    manager_runtime_recover_workers_if_needed "$project" >/dev/null || true
     log_info "manager supervisor already running (pid=$current_pid)"
     return 0
   fi
@@ -3745,6 +3761,14 @@ cmd_baseline_status() {
   echo "last_delegated_continuation_pending_count: ${LAST_DELEGATED_CONTINUATION_PENDING_COUNT:-0}"
   echo "last_delegated_continuation_consumed_ids: ${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-none}"
   echo "last_delegated_continuation_consumed_at: ${LAST_DELEGATED_CONTINUATION_CONSUMED_AT:-unavailable}"
+  if [[ -f "$(manager_worker_launch_state_file "$PROJECT_ROOT")" ]]; then
+    # shellcheck disable=SC1090
+    source "$(manager_worker_launch_state_file "$PROJECT_ROOT")"
+    echo "latest_manager_continuity_generated: ${LAST_MANAGER_CONTINUITY_GENERATED:-unavailable}"
+    echo "latest_manager_continuity_consumed: ${LAST_MANAGER_CONTINUITY_CONSUMED:-unavailable}"
+    echo "latest_manager_worker_prompts_generated: ${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-none}"
+    echo "latest_manager_worker_prompts_consumed: ${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}"
+  fi
   echo "intake_active_items: $(count_active_intake_items "$PROJECT_ROOT")"
   echo "intake_new_items: $(count_intake_items_by_status "$PROJECT_ROOT" "new")"
   echo "intake_classified_items: $(count_intake_items_by_status "$PROJECT_ROOT" "classified")"
@@ -3846,6 +3870,7 @@ cmd_live_status() {
   last_exit_reason="unknown"
   last_role_hint="$role_hint"
   last_state_updated_at="unknown"
+  local latest_manager_continuity_generated latest_manager_continuity_consumed latest_manager_worker_prompts_generated latest_manager_worker_prompts_consumed
   if [[ -f "$(workcell_state_file "$project")" ]]; then
     # shellcheck disable=SC1090
     source "$(workcell_state_file "$project")"
@@ -3855,6 +3880,18 @@ cmd_live_status() {
     last_exit_reason="${LAST_EXIT_REASON:-unknown}"
     last_role_hint="${LAST_ROLE_HINT:-$role_hint}"
     last_state_updated_at="${LAST_STATE_UPDATED_AT:-unknown}"
+  fi
+  latest_manager_continuity_generated="unavailable"
+  latest_manager_continuity_consumed="unavailable"
+  latest_manager_worker_prompts_generated="none"
+  latest_manager_worker_prompts_consumed="none"
+  if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
+    # shellcheck disable=SC1090
+    source "$(manager_worker_launch_state_file "$project")"
+    latest_manager_continuity_generated="${LAST_MANAGER_CONTINUITY_GENERATED:-unavailable}"
+    latest_manager_continuity_consumed="${LAST_MANAGER_CONTINUITY_CONSUMED:-unavailable}"
+    latest_manager_worker_prompts_generated="${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-none}"
+    latest_manager_worker_prompts_consumed="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}"
   fi
 
   echo "project: $project"
@@ -3876,6 +3913,10 @@ cmd_live_status() {
   echo "last_consumed_delegated_continuation_ids: ${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-none}"
   echo "last_consumed_delegated_continuation_at: ${LAST_DELEGATED_CONTINUATION_CONSUMED_AT:-unavailable}"
   echo "current_prompt_has_delegated_continuation: ${prompt_has_delegated}"
+  echo "latest_manager_continuity_generated: ${latest_manager_continuity_generated}"
+  echo "latest_manager_continuity_consumed: ${latest_manager_continuity_consumed}"
+  echo "latest_manager_worker_prompts_generated: ${latest_manager_worker_prompts_generated}"
+  echo "latest_manager_worker_prompts_consumed: ${latest_manager_worker_prompts_consumed}"
 
   if [[ -n "$supervisor_pid" || -n "$dispatcher_pid" || -n "$ai_pid" ]]; then
     echo "active_processes:"
