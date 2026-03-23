@@ -316,15 +316,13 @@ _cmd_switch_auto_codex() {
   # shellcheck source=/dev/null
   source "$watchdog_script"
 
-  log_info "Probing all codex accounts..."
-
   local result
   result="$(probe_all_codex_accounts_and_update_cooldown "$project")"
 
   case "$result" in
     usable:*)
       local account="${result#usable:}"
-      log_info "Found usable account: $account"
+      echo -e "${GREEN}[SWITCHED]${NC} -> $account (usable)"
       _do_switch_codex "$tool" "$account"
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$account\", \"status\": \"usable\"}"
@@ -336,7 +334,7 @@ _cmd_switch_auto_codex() {
       local reset_at="${info##*|}"
       local human_time
       human_time="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo "$reset_at")"
-      log_warn "All accounts rate limited. Earliest available: $account at $human_time"
+      echo -e "${YELLOW}[SWITCHED]${NC} -> $account (rate limited, resets at $human_time)"
       _do_switch_codex "$tool" "$account"
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$account\", \"status\": \"rate_limited\", \"reset_at\": $reset_at, \"reset_at_human\": \"$human_time\"}"

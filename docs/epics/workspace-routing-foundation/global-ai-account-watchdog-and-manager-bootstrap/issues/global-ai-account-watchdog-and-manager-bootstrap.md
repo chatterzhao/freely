@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-ai-account-watchdog-and-manager-bootstrap`
@@ -82,6 +82,10 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
   - `watchdog-control-plane` 与 `ai-cli-availability-manager` 已把 availability watchdog 定义成可复用 skill 层；`runtime/freely` 现通过 `source "$WATCHDOG_AVAILABILITY_LIB"` 复用同一套 account cooldown / probe / switch / ensure-manager readiness 逻辑
   - `test-watchdog-control-plane-skills` 已覆盖 watchdog skill 是否被 runtime 与 agent 角色正式接线
   - `freely ensure-manager` 当前在 watchdog 拉起主管前，会写 manager bootstrap handoff，告知 limit/切号/恢复原因及主管优先检查面
+  - 2026-03-23 当前 verification batch 在 dedicated feature worktree 中直接完成，无需引入 `pre-test-merge` 或提前要求 `post-merge acceptance`：
+    - `freely ensure-manager --project <tmp-project>` 直接命令验证通过，确认 watchdog 会先切到可用账号，再发起 manager bootstrap
+    - `freely start --project <tmp-project>` 最小 rate-limit 场景可直接写出 `LAST_ACCOUNT_SWITCH_REASON="primary_rate_limit_exhausted"`，证明 runtime 仍把恢复理由写回 watchdog 接管面
+    - `test-freely-rate-limit-defers-to-watchdog` 曾出现一次 3 秒边界失败，但随后单独复现与连续重跑均通过；当前判断为时间阈值边界上的 flaky，而非稳定功能回归
   - `test-freely-global-account-watchdog-live` 已真实通过：
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
@@ -89,7 +93,10 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 ## Next
 
-- 保持 `in_verification`。
+- 当前 verification batch 已在 dedicated feature worktree 中完成并具备 promote 条件。
 - 当前 watchdog 已作为 Freely 正式能力落地：CLI 入口、runtime orchestration、availability watchdog skill 模块与角色/测试接线均已存在。
 - 当前 feature worktree `feature/codex-account-cooldown-active-probe` 承接的是同一 issue 的 verification batch，不再单独 materialize 新 issue；该 batch 已 replay 到 `develop` 并通过 post-merge acceptance，后续若继续扩 outer watchdog/productization，需新开 dedicated feature worktree。
+- 当前 batch 的下一步是：
+  - replay 到 `develop`
+  - 若 `develop` 真实环境再暴露新问题，则新开 dedicated feature worktree 承接，而不是在 protected worktree 直接修实现
 - 后续若继续演进，应聚焦更外层 target registry / independent daemon 产品化，而不是回退到“watchdog 只等于切号器”的旧模型。
