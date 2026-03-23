@@ -290,7 +290,18 @@ routing_policy:
 
 ### candidate_issues
 
-1. `C-20260318-0715-A`
+1. `C-20260323-1435-A`
+- title: Interactive init bootstrap and fine-grained force/skip governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://interactive-init-bootstrap-and-force-governance`
+- source_brainstorm: `docs/pre-brainstorms/20260323-1435--interactive-init-bootstrap-and-force-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260323-1435--interactive-init-bootstrap-and-force-governance/candidates.md`
+- next_action: 继续 pre-brainstorm，先冻结 `init` 的 step graph、bootstrap commit 豁免边界，以及每个 managed item 的 skip/force contract；在这些边界稳定前，不直接往现有 `init` 继续堆局部 patch
+- revisit_trigger: 当 `init` 的交互入口、repo bootstrap 语义与细粒度 skip/force 输出 contract 可以被冻结成独立 issue scope 时，重新进入 materialization 判断
+
+2. `C-20260318-0715-A`
 - title: `commit-first after checkpoint-ready` 自治治理
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -301,7 +312,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 3 个边界：`checkpoint-ready` 的结构化输出、`LAWS/runtime/checkpoint-guard/supervisor` 的职责分层、以及进入 IBM 前的 promotion gate；在这些边界稳定前不得直接写成 IBM issue 或塞回 `I-20260318-0930`
 - revisit_trigger: 当 `checkpoint-ready` 的结构化输出、supervisor 职责边界与 promotion gate 可以被稳定写成最小 issue contract 时，重新进入 materialization 判断
 
-2. `C-20260319-0402-01`
+3. `C-20260319-0402-01`
 - title: 定义 Freely 的 harness engineering 分层与缺口图
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -312,7 +323,7 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，先验证 Freely 是否需要一份更明确的 harness 分层与缺口图；若边界稳定，再 materialize 成 issue，而不是直接把外部文章结论塞进现有主线
 - revisit_trigger: 当 harness 分层、缺口图与 Freely 自身的最小吸收面可以冻结成独立 issue contract 时，重新进入 materialization 判断
 
-3. `C-20260319-0402-02`
+4. `C-20260319-0402-02`
 - title: 把 worktree 级验证信号统一暴露成 agent 可消费接口
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -323,7 +334,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先盘点现有 status / wt-status-all / runtime 输出，再决定要不要 materialize 成统一 machine-readable 汇总接口
 - revisit_trigger: 当 worktree 级验证信号的 canonical 输入、输出与 machine-readable summary contract 可以被冻结成 issue scope 时，重新进入 materialization 判断
 
-4. `C-20260319-0402-03`
+5. `C-20260319-0402-03`
 - title: 建立文档园艺与 AI 残渣清理的周期性后台循环
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -334,7 +345,7 @@ routing_policy:
 - next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize
 - revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
 
-7. `C-20260322-1615-A`
+8. `C-20260322-1615-A`
 - title: Protected post-merge acceptance route and promotion guard governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -345,7 +356,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，但已冻结一条硬规则：`pre-test-merge` 是 shadow batch，只做测试 merge，不直接 merge 到 `develop`。剩余要收口的是 `develop-only completion verification` 与 `pre-test-merge batch acceptance` 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
 - revisit_trigger: 当 protected verification environment 的 replay policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
 
-9. `C-20260322-1801-B`
+10. `C-20260322-1801-B`
 - title: pre-test-merge lifecycle management capability for Freely
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -356,7 +367,7 @@ routing_policy:
 - next_action: 等职责定义收稳后，再决定 stale-batch detection、batch retirement、replay requirement 和 promote visibility 应落在 runtime/status、branch-management、manager patrol 还是组合能力中；在此之前不直接写成某一层的局部补丁
 - revisit_trigger: 当 `pre-test-merge` lifecycle capability 的真源、触发面与最小 machine-readable outputs 可以被冻结成独立 issue contract 时，重新进入 materialization 判断
 
-5. `C-20260319-0500-01`
+6. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`

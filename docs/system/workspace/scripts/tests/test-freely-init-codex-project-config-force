@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-init-codex-project-config-force.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_project() {
+  local project="$1"
+  mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample"
+  git init -q -b develop "$project"
+
+  cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+  cat >"$project/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+  cat >"$project/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0018--sample
+EOF
+
+  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+}
+
+FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$FREELY_HOME"
+
+PROJECT="$TMP_DIR/project"
+make_project "$PROJECT"
+cd "$PROJECT"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --project "$PROJECT" \
+  --intent "$PROJECT/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT/docs/CONSTITUTION.md" \
+  --ai codex:gpt-5.4:auto \
+  >/dev/null
+
+CONFIG_FILE="$PROJECT/.freely/config.env"
+CODEX_CONFIG_FILE="$PROJECT/.codex/config.toml"
+PROJECT_WORKTREES_ROOT="${PROJECT}-worktrees"
+
+test -f "$CONFIG_FILE"
+test -f "$CODEX_CONFIG_FILE"
+grep -q '^AI_TOOL="codex"$' "$CONFIG_FILE"
+grep -q '^AI_MODEL="gpt-5.4"$' "$CONFIG_FILE"
+grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
+grep -Fq "writable_roots = [\"$PROJECT_WORKTREES_ROOT\"]" "$CODEX_CONFIG_FILE"
+
+cat >"$CONFIG_FILE" <<'EOF'
+AI_TOOL="sentinel"
+EOF
+
+cat >"$CODEX_CONFIG_FILE" <<'EOF'
+model_context_window = 111111
+model_auto_compact_token_limit = 22222
+project_doc_max_bytes = 1
+approval_policy = "never"
+sandbox_mode = "read-only"
+[sandbox_workspace_write]
+network_access = true
+writable_roots = ["/tmp/sentinel"]
+EOF
+
+REINIT_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --project "$PROJECT" \
+  --intent "$PROJECT/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT/docs/CONSTITUTION.md" \
+  --ai codex:gpt-5.4:auto \
+  2>&1)"
+
+printf '%s\n' "$REINIT_OUTPUT" | grep -Fq "skip: $CONFIG_FILE already exists"
+printf '%s\n' "$REINIT_OUTPUT" | grep -Fq "skip: $CODEX_CONFIG_FILE already exists"
+grep -q '^AI_TOOL="sentinel"$' "$CONFIG_FILE"
+grep -q '^model_context_window = 111111$' "$CODEX_CONFIG_FILE"
+grep -Fq 'writable_roots = ["/tmp/sentinel"]' "$CODEX_CONFIG_FILE"
+
+FORCE_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --project "$PROJECT" \
+  --intent "$PROJECT/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT/docs/CONSTITUTION.md" \
+  --ai codex:gpt-5.4:auto \
+  --force \
+  2>&1)"
+
+grep -q '^AI_TOOL="codex"$' "$CONFIG_FILE"
+grep -q '^AI_MODEL="gpt-5.4"$' "$CONFIG_FILE"
+grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
+grep -q '^model_context_window = 200000$' "$CODEX_CONFIG_FILE"
+grep -q '^model_auto_compact_token_limit = 150000$' "$CODEX_CONFIG_FILE"
+grep -q '^project_doc_max_bytes = 32768$' "$CODEX_CONFIG_FILE"
+grep -q '^approval_policy = "on-request"$' "$CODEX_CONFIG_FILE"
+grep -q '^sandbox_mode = "workspace-write"$' "$CODEX_CONFIG_FILE"
+grep -q '^network_access = false$' "$CODEX_CONFIG_FILE"
+grep -Fq "writable_roots = [\"$PROJECT_WORKTREES_ROOT\"]" "$CODEX_CONFIG_FILE"
+
+printf '%s\n' "$FORCE_OUTPUT" | grep -Fq "initialized: $CONFIG_FILE"
+
+echo "[PASS] freely init keeps project config non-destructive by default and rewrites it with --force"

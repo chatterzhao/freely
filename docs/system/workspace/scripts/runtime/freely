@@ -27,7 +27,7 @@ source "$SESSION_EVIDENCE_RESOLVER_LIB"
 usage() {
   cat <<'EOF'
 Usage:
-  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--reasoning-effort <effort>]
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--reasoning-effort <effort>] [--force]
   freely doctor [--project <abs_path>]
   freely chat [--project <abs_path>] <message>
   freely tui [--project <abs_path>] [--once]
@@ -157,6 +157,19 @@ logs_dir_for_project() {
 config_file() {
   local project="$1"
   echo "$(state_dir "$project")/config.env"
+}
+
+project_codex_config_file() {
+  local project="$1"
+  echo "$project/.codex/config.toml"
+}
+
+project_worktrees_root_for_path() {
+  local project="$1"
+  local project_parent project_name
+  project_parent="$(dirname "$project")"
+  project_name="$(basename "$project")"
+  echo "${project_parent}/${project_name}-worktrees"
 }
 
 project_has_freely_config() {
@@ -654,11 +667,17 @@ load_config() {
 }
 
 write_config() {
-  local project="$1" intent="$2" constitution="$3" tool="$4" model="$5" mode="$6" reasoning_effort="$7" tool_capabilities="$8" tool_policy="$9" codex_capability_model="${10}" codex_capability_sandbox="${11}" codex_capability_approval_policy="${12}" codex_capability_cwd_mode="${13}"
+  local project="$1" intent="$2" constitution="$3" tool="$4" model="$5" mode="$6" reasoning_effort="$7" tool_capabilities="$8" tool_policy="$9" codex_capability_model="${10}" codex_capability_sandbox="${11}" codex_capability_approval_policy="${12}" codex_capability_cwd_mode="${13}" force="${14:-false}"
   local sdir cfg
   sdir="$(state_dir "$project")"
   cfg="$(config_file "$project")"
   mkdir -p "$sdir/logs" "$sdir/run"
+
+  if [[ -f "$cfg" && "$force" != "true" ]]; then
+    log_info "skip: $cfg already exists"
+    log_info "manual: edit $cfg or rerun freely init --force to rewrite Freely-managed defaults"
+    return 0
+  fi
 
   cat >"$cfg" <<EOF
 PROJECT_ROOT="$project"
@@ -688,6 +707,71 @@ CHECKPOINT_WARN_DIRTY_ENTRIES=40
 CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
 CHECKPOINT_DRIFT_STREAK_THRESHOLD=2
 EOF
+}
+
+tool_requires_project_codex_config() {
+  local tool="$1" tool_capabilities="${2:-}"
+  case "$tool" in
+    codex|cc-use-codex-cli) return 0 ;;
+  esac
+  printf '%s\n' "$tool_capabilities" | tr ',' '\n' | sed 's/^ *//; s/ *$//' | grep -Fxq 'codex-cli'
+}
+
+write_project_codex_config() {
+  local project="$1" force="${2:-false}"
+  local cfg root
+  cfg="$(project_codex_config_file "$project")"
+  root="$(project_worktrees_root_for_path "$project")"
+  mkdir -p "$(dirname "$cfg")"
+
+  if [[ -f "$cfg" && "$force" != "true" ]]; then
+    log_info "skip: $cfg already exists"
+    log_info "manual: edit $cfg or rerun freely init --force to rewrite Freely-managed codex defaults"
+    return 0
+  fi
+
+  local template
+  template="$(cat <<'EOF'
+# Freely project-level Codex config
+# Reference: https://developers.openai.com/codex/config-reference/
+#
+# This file is versioned on purpose so every worktree inherits the same project
+# defaults. `freely init` should create or update this file as a managed
+# bootstrap artifact instead of mutating user-global `~/.codex/config.toml`.
+#
+# Why these keys exist:
+# - `model_context_window`: keep the effective budget below the cost step-up zone
+#   observed during dogfooding so Codex compacts earlier instead of drifting
+#   into an expensive context shape.
+# - `model_auto_compact_token_limit`: trigger compaction before the window cap so
+#   long-running sessions compress predictably.
+# - `project_doc_max_bytes`: bound auto-loaded project docs so startup context is
+#   stable and large governance files do not dominate the prompt budget.
+# - `approval_policy` / `sandbox_mode`: keep repo work in the normal guarded
+#   workspace-write posture while still allowing explicit escalation paths.
+# - `sandbox_workspace_write.writable_roots`: allow direct access to the sibling
+#   `{project}-worktrees` root, which is outside the project root by design.
+
+# Context window governance
+model_context_window = 200000
+model_auto_compact_token_limit = 150000
+
+# Project doc budget
+project_doc_max_bytes = 32768
+
+# Approval and sandbox defaults
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = false
+writable_roots = ["__FREELY_WORKTREES_ROOT__"]
+EOF
+)"
+  template="${template/__FREELY_WORKTREES_ROOT__/$root}"
+  printf '%s\n' "$template" >"$cfg"
+
+  log_info "manual: trust this project in ~/.codex/config.toml if Codex has not yet marked it trusted"
 }
 
 extract_tool_session_id_from_log() {
@@ -3019,7 +3103,7 @@ build_prompt() {
 }
 
 cmd_init() {
-  local project="" intent="" constitution="" ai_spec="" reasoning_effort=""
+  local project="" intent="" constitution="" ai_spec="" reasoning_effort="" force="false"
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -3027,6 +3111,7 @@ cmd_init() {
       --constitution) constitution="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --ai) ai_spec="${2:-}"; shift 2 ;;
       --reasoning-effort) reasoning_effort="${2:-}"; shift 2 ;;
+      --force) force="true"; shift ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
@@ -3063,7 +3148,10 @@ cmd_init() {
   fi
 
   ensure_project_agents_md "$project"
-  write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode"
+  write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$force"
+  if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
+    write_project_codex_config "$project" "$force"
+  fi
   register_project_in_registry "$project"
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "initialized"
