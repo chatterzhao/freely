@@ -2,14 +2,31 @@
 
 - issue_id: `I-20260322-0245`
 - phase_state: `completed`
+- disposition: `retire-only`
+- cleanup_gate: `retained-with-reason`
+- local_branch_disposition: `retained-with-reason`
+- remote_branch_disposition: `deleted`
+- session_refs:
+  - {tool: codex, session_id: "019d15e2-5874-7e73-8487-715b7aee1ce1", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/22/rollout-2026-03-22T07-10-48-019d15e2-5874-7e73-8487-715b7aee1ce1.jsonl", role: "cleanup-followthrough"}
+  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "cleanup-followthrough-verifier"}
 - summary:
   - 已把 manager continuity 中的 worker prompt ingestion 到 runtime
   - 已把 worker prompt 转成 target worker worktree 的 delegated continuation intake，并拉起 target worker supervisor
   - 已补 manager stalled AI + pending intake 的 runtime-owned recovery
   - 已新增两条测试覆盖上述 contract
+- latest_followthrough_evidence:
+  - `git rev-list --left-right --count develop...HEAD` 在固化本轮 writeback 后右侧仍非零
+  - `git diff-tree --no-commit-id --name-only -r HEAD` 仍只涉及 issue / progress / review / milestone 四个 canonical 文档
+  - 当前 closure writeback commit 落盘前，`git status --short` 仅剩 issue / progress / review / milestone 四个 canonical 文档的 closure writeback
+  - 当前 closure writeback commit 落盘后，当前工位会恢复 `CLEAN`
+  - `git ls-remote --heads origin feature/runtime-worker-launch-linkage-and-stall-recovery-20260322` = no match
 - next_action:
-  - 当前生命周期已完成，验证也已通过；当前 worktree 已恢复 `target clean`，但 `develop...HEAD` 右侧仍非零，说明本地 docs-only closure commits 仍未被 `develop` 吸收，因此 cleanup gate 仍是 `retained-with-reason`
-  - 当前 `./bin/wt-status-all` 已确认本工位为 `CLEAN`，但项目里仍有其他 dirty worktree；应把它们显式留在 skipped / retained 语义中，避免误报项目级 hygiene 已完成
-  - 先让当前本地 docs-only closure commits 经 develop-facing 路径吸收，再重跑 cleanup followthrough
+  - 当前生命周期已完成，验证也已通过；分类稳定为 `retire-only`，但本地 docs-only closure commits 仍未被 `develop` 吸收，因此 cleanup gate 仍是 `retained-with-reason`
+  - 当前工位在固化本轮 canonical writeback 后会恢复 clean；随后仍需先让本地 docs-only closure commits 经 develop-facing 路径吸收，再重跑 cleanup followthrough
+  - 即使当前工位恢复 clean，其余 dirty worktree 也应继续按 ownership 留在 skipped / retained 语义中，避免误报项目级 hygiene 已完成
   - `origin` 未发现同名远程分支，无远程 cleanup 待办
   - 后续若仍出现 worker handoff queue 漏发、workcell bootstrap 失败，或 stall recovery 误判，再开新 lifecycle
+- revisit_trigger:
+  - 当前 canonical closure writeback 已固化
+  - `develop` 已吸收当前本地 docs-only closure commits 或等价 closure evidence
+  - 当前工位重新执行 cleanup followthrough

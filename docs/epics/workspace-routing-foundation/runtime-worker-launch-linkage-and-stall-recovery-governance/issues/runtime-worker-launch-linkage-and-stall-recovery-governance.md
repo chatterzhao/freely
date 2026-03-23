@@ -16,6 +16,9 @@
   - `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
   - `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`
   - `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
+- session_refs:
+  - {tool: codex, session_id: "019d15e2-5874-7e73-8487-715b7aee1ce1", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/22/rollout-2026-03-22T07-10-48-019d15e2-5874-7e73-8487-715b7aee1ce1.jsonl", role: "cleanup-followthrough"}
+  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "cleanup-followthrough-verifier"}
 
 ## Why
 
@@ -77,12 +80,18 @@ Freely 最新 dogfood 证明：
 - classification: `retire-only`
 - cleanup_gate: `retained-with-reason`
 - why_not_verified_retirable:
-  - 当前工位已恢复 `target clean`，但 `develop...HEAD` 右侧仍非零：本地仍保留 docs-only closure commits 待经 develop-facing 路径吸收，因此不能直接宣称已完成 cleanup
-  - `./bin/wt-status-all` 当前确认本工位自身为 `CLEAN`，但项目里仍有其他 dirty worktree；因此本轮只能确认本工位已满足 target safety，不能伪装成全项目 hygiene 已收口
+  - 当前工位只剩 canonical closure writeback；固化本轮 writeback commit 后可恢复 `target clean`，但这并不等于 branch cleanup 已完成
+  - `git rev-list --left-right --count develop...HEAD` 在固化本轮 writeback 后仍会保持右侧非零；本地 docs-only closure commits 仍待经 develop-facing 路径吸收，因此不能直接宣称已完成 cleanup
+  - `./bin/wt-status-all` 在本工位恢复 clean 后，项目里仍有其他 dirty worktree 需按 skipped / retained 语义留痕，不能伪装成全项目 hygiene 已收口
 - local_branch_disposition: `retained-with-reason`
-- local_branch_reason: 当前工位已满足 `target clean`，但仍需先让本地 docs-only closure commits 经 develop-facing 路径被吸收；在分支被主线吸收前，不执行本地 branch/worktree cleanup
+- local_branch_reason: 当前工位只剩 canonical closure writeback，固化本轮 writeback 后仍需先让本地 docs-only closure commits 经 develop-facing 路径被吸收；在分支被主线吸收前，不执行本地 branch/worktree cleanup
 - remote_branch_disposition: `deleted`
 - remote_branch_reason: `origin` 未发现同名远程分支
+- latest_followthrough_evidence:
+  - `git log --oneline --left-right develop...HEAD` 仅显示 docs-only closure commits
+  - `git diff-tree --no-commit-id --name-only -r HEAD` 仍只涉及 issue / progress / review / milestone 四个 canonical 文档
+  - 当前 closure writeback commit 落盘后，`git status --short` 应恢复 clean
+  - 当前 closure writeback commit 落盘后，`./bin/wt-status-all` 应恢复当前工位 `CLEAN`
 - revisit_trigger:
-  - `develop` 吸收当前本地 docs-only closure commits 或等价的 closure evidence
+  - 当前 canonical closure writeback 已固化，且 `develop` 吸收当前本地 docs-only closure commits 或等价的 closure evidence
   - 当前工位重新执行 cleanup followthrough
