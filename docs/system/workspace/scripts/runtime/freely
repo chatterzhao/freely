@@ -1500,6 +1500,25 @@ LAST_STATE_UPDATED_AT="$updated_at"
 EOF
 }
 
+ensure_project_agents_md() {
+  local project="$1"
+  local agents_file="$project/AGENTS.md"
+  [[ -f "$agents_file" ]] && return 0
+
+  cat >"$agents_file" <<'EOF'
+# Project Agent Entry
+
+This file is the project-level governance entrypoint for Freely.
+
+Rules:
+- Always read this file before executing project work.
+- Treat this repository as the current target project.
+- Reusable Freely capabilities live under `docs/system/workspace/**` and `bin/**`.
+- Capability docs must not replace this project-level governance file.
+- If this project ships Freely capabilities, consume them from `docs/system/workspace/**` after reading this file.
+EOF
+}
+
 preemption_state_file() {
   local project="$1"
   printf '%s/run/preemption-state.env\n' "$(state_dir "$project")"
@@ -3043,6 +3062,7 @@ cmd_init() {
     [[ -n "$reasoning_effort" ]] || reasoning_effort="medium"
   fi
 
+  ensure_project_agents_md "$project"
   write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode"
   register_project_in_registry "$project"
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"

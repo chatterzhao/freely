@@ -22,6 +22,38 @@ Freely 处于研究优先的整合阶段。
 
 不要将遗留路径视为活跃工作流输入（例如：旧布局下的 `docs/brainstorms/`、`docs/planning/`、`docs/continuity/`、`docs/validation/`、`docs/reviews/`）。
 
+## 仓库分层
+
+先区分两类目录，不要把“文档”一概归为开发过程资产。
+
+### 1. 指导开发 Freely 的目录
+
+这些目录主要用于治理、收敛、排期、验收与 lifecycle 留痕；它们指导 Freely 如何开发 Freely，但不是最终要随 Freely 能力一起被消费的主交付面：
+
+- `AGENTS.md`
+- `docs/CONSTITUTION.md`
+- `docs/LAWS.md`
+- `docs/PROJECT_INTENT.md`
+- `docs/pre-brainstorms/`
+- `docs/milestones.md`
+- `docs/epics/`
+- `docs/progress/`
+
+### 2. Freely 开发完成后的能力目录
+
+这些目录属于 Freely 产品/能力本体。即使它们是文档，只要发布后会被 agent / runtime / skills / CLI 直接消费或打包，就应视为 Freely 的能力输出，而不是单纯“开发过程文档”：
+
+- `bin/`
+- `docs/system/`
+- `src/`（如存在）
+- TUI / GUI / 前端 / Tauri / Rust runtime 对应实现目录（如存在）
+
+判定规则：
+- 如果一个文档主要用于当前研发过程中的问题收敛、issue 生命周期推进、review / verification / cleanup 留痕，它属于“指导开发 Freely”。
+- 如果一个文档主要定义 Freely 运行时、agent、skill、脚本、CLI、系统行为，并会作为产品能力被长期消费或打包，它属于“Freely 能力目录”。
+- Freely 是 AI 开发工具，所以 `agent`、`skill`、runtime script、系统说明文档本身就是 Freely 的能力，不因为它们是 Markdown 就降级为“仅开发辅助”。
+- 开发 Freely 过程允许调用 Freely 能力目录中的 agent / skill / runtime 真源来指导开发自己；这就是吃狗粮，而不是目录混淆。
+
 ## 会话启动检查
 
 每次会话开始：
@@ -51,11 +83,20 @@ Freely 开发 Freely 时，默认先问三件事：
 ## 吃自己的狗粮规则（Freely 构建 Freely）
 Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外。
 
+“吃自己的狗粮”在本项目中的具体含义：
+- Freely 开发过程中暴露的问题，不只是在修当前仓库；要先判断它是否应沉淀为 Freely 对外可复用的能力。
+- 若某个解决方案最终会被 Freely runtime、agent、skill、CLI 或打包产物长期消费，它必须落到 Freely 能力目录中，例如 `docs/system/**`、`bin/**`、实现代码目录；不要把这类能力定义留在 `pre-brainstorms`、`epics`、`progress` 等过程文档里。
+- 过程文档可以记录“为什么要做、边界如何收敛、当前结论是什么”，但不能替代最终能力真源。
+- 对已经稳定、可复用的提示词编排、角色职责、执行约束，优先拆到 `agents/**` 或 `skills/**`；runtime 脚本只保留启动、上下文注入、状态托管和恢复动作。
+- 开发 Freely 时调用这些 `agents/**`、`skills/**`、runtime 真源来继续开发 Freely，自身就是 dogfooding；这不是目录混用，而是产品自举。
+
 要求：
 - 使用对用户项目期望的相同分支/worktree/钩子规范。
 - Worktree 根目录遵循宪法策略：项目同级目录，命名为 `{project-name}-worktrees`。
 - 架构/治理变更必须先进入 `docs/pre-brainstorms/<id>/`，然后才能进入执行循环落地。
 - Freely 自举中发现的新能力，默认优先判断是否已被现有 milestone-owned issue 吸收；仅当现有 issue 无法承接时，才新开 candidate / issue。
+- 若当前项目的 Freely runtime 已在运行，优先通过 `./bin/freely chat --project <project-root> <message>` 这类 human interruption / intake 入口指导它继续开发；不要绕过 runtime 另造一套平行调度。
+- 若在插话驱动的开发过程中发现 bug、缺口或新的能力沉淀点，仍按同一治理规则处理：必要时让 Freely 创建/进入 dedicated worktree 修复、验证、合并到 `develop`、重启 runtime，再继续通过 interruption 推进。
 - 优先使用预检 + 可操作的修复方案，而非重复的权限提示。
 
 ## 执行指引

@@ -35,6 +35,9 @@ current_branch="$(git -C "$ROOT_DIR" branch --show-current 2>/dev/null || printf
 
 printf '%s\n' "$prompt" | grep -q 'lead-agent'
 printf '%s\n' "$prompt" | grep -q 'context-source-skill'
+printf '%s\n' "$prompt" | grep -q '项目治理入口：'
+printf '%s\n' "$prompt" | grep -q "$ROOT_DIR/AGENTS.md"
+printf '%s\n' "$prompt" | grep -q '先遵守 `PROJECT_ROOT/AGENTS.md`'
 printf '%s\n' "$prompt" | grep -q 'docs/milestones.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/agents/lead-agent.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/tools.md'

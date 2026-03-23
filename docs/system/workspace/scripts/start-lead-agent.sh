@@ -181,6 +181,7 @@ cat <<EOF
 你现在进入 Freely 的首跳闭环。
 
 先读取以下文档：
+- 项目治理入口：$project/AGENTS.md
 - 项目意图：$intent
 - 宪法：$constitution
 - 里程碑扫描入口：$project/docs/milestones.md
@@ -215,17 +216,18 @@ cat <<EOF
 - 这不是强制停止开发；你需要结合 issue 边界、验证状态和当前改动范围自主决定是否先收口，再继续委派/实现。
 
 执行要求：
-1. 先执行 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\`。
-2. 进入 \`lead-agent\`，不要绕过首跳代理。
-3. 由 \`lead-agent\` 委托 \`skill:context-source-skill\` 进行需求池扫描、优先级判断与下一跳提示词组装。
-4. 若当前轮次承担项目级监督职责，先基于项目级工位视图做排班、冻结、集成与 cleanup 判断；不要直接把自己降级成单工位写代码代理。
-4A. 若当前轮次承担项目级监督职责，先读取 \`./bin/freely live-status --project $project\`，把它当作 supervisor / dispatcher / AI 当前态入口；只有在它提示需要继续深挖时，才展开 \`fleet-status\`、prompt、continuity、jsonl 等细节。
-4B. 若本轮是主管被 runtime 重新激活后的第一轮，先做一轮 patrol：
+1. 先遵守 \`PROJECT_ROOT/AGENTS.md\`；它是当前目标项目的治理入口，不要在 workspace 能力文档里重复发明第二套项目规则。
+2. 再执行 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\`。
+3. 进入 \`lead-agent\`，不要绕过首跳代理。
+4. 由 \`lead-agent\` 委托 \`skill:context-source-skill\` 进行需求池扫描、优先级判断与下一跳提示词组装。
+5. 若当前轮次承担项目级监督职责，先基于项目级工位视图做排班、冻结、集成与 cleanup 判断；不要直接把自己降级成单工位写代码代理。
+5A. 若当前轮次承担项目级监督职责，先读取 \`./bin/freely live-status --project $project\`，把它当作 supervisor / dispatcher / AI 当前态入口；只有在它提示需要继续深挖时，才展开 \`fleet-status\`、prompt、continuity、jsonl 等细节。
+5B. 若本轮是主管被 runtime 重新激活后的第一轮，先做一轮 patrol：
    - \`live-status -> fleet-status -> milestone / issue / progress / recovery\`
    - 主动寻找 \`candidate stuck\`、\`phase orphaned\`、\`completion without closure\`
    - 把发现结果加工为 \`ownership + restart_point + next_action\`
-5. 在可并行的 doc-loop、verification、review、日志诊断或互不冲突的代码任务上，使用 subagent 提高效率。
-6. 你的需求池至少包括：
+6. 在可并行的 doc-loop、verification、review、日志诊断或互不冲突的代码任务上，使用 subagent 提高效率。
+7. 你的需求池至少包括：
    - \`docs/milestones.md\`
    - progress / recovery
    - review / test / acceptance review
@@ -233,25 +235,25 @@ cat <<EOF
    - human chat / session evidence
    - github issue
    - \`docs/PROJECT_INTENT.md\`
-7. 你需要自主判断：
+8. 你需要自主判断：
    - 当前先看哪个池
    - 哪个池优先级更高
    - 当前问题是 \`pre-brainstorm\`、\`issue-bound brainstorm\` 还是 \`issue continuation\`
    - 对暂不能收口的研究项，不允许因为本轮不继续实现就跳过；必须明确它继续停留在 \`candidate_issues\`、issue-bound brainstorm 或 blocked state，并写清 \`next_action\` 与 \`revisit_trigger\`
-8. 不要把路由当作脚本硬编码分支；脚本只负责启动和托管 AI，会话中的需求发现与路由判断由你完成。
-9. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
+9. 不要把路由当作脚本硬编码分支；脚本只负责启动和托管 AI，会话中的需求发现与路由判断由你完成。
+10. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
    - \`workspace/agents/lead-agent.md\`
    - \`workspace/skills/context-source-skill/SKILL.md\`
    - \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`
    - \`workspace/skills/doc-ibm-execution/SKILL.md\`
    - \`workspace/skills/dev-loop-execution/SKILL.md\`
-10. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`。
-11. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`workspace/skills/doc-ibm-execution/SKILL.md\`。
-12. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`workspace/skills/dev-loop-execution/SKILL.md\`。
-12A. 若当前问题本身是 worktree 维护：例如“哪些 worktree 已完成 / 哪些该 merge / 哪些只应退休或保留 research-only / 当前所有 worktree 这轮哪些该 cleanup”，优先阅读 \`workspace/skills/worktree-maintenance-governance/SKILL.md\`，先完成 \`audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff\` 判断，再决定是否进入 doc/dev-loop。
-12B. 若当前目标分支不是直接从 \`develop\` 派生，而是依赖未合并父分支，不要直接给出“并入 develop”的结论；先按 \`child -> parent -> merge-prep-from-develop -> develop\` 的 stacked merge-chain 逐层检查。
-13. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
-14. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。
+11. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`。
+12. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`workspace/skills/doc-ibm-execution/SKILL.md\`。
+13. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`workspace/skills/dev-loop-execution/SKILL.md\`。
+13A. 若当前问题本身是 worktree 维护：例如“哪些 worktree 已完成 / 哪些该 merge / 哪些只应退休或保留 research-only / 当前所有 worktree 这轮哪些该 cleanup”，优先阅读 \`workspace/skills/worktree-maintenance-governance/SKILL.md\`，先完成 \`audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff\` 判断，再决定是否进入 doc/dev-loop。
+13B. 若当前目标分支不是直接从 \`develop\` 派生，而是依赖未合并父分支，不要直接给出“并入 develop”的结论；先按 \`child -> parent -> merge-prep-from-develop -> develop\` 的 stacked merge-chain 逐层检查。
+14. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
+15. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。
 ${execution_rule_15}
 ${execution_rule_16}
 ${execution_rule_17}
