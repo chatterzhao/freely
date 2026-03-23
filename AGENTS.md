@@ -22,6 +22,38 @@ Freely 处于研究优先的整合阶段。
 
 不要将遗留路径视为活跃工作流输入（例如：旧布局下的 `docs/brainstorms/`、`docs/planning/`、`docs/continuity/`、`docs/validation/`、`docs/reviews/`）。
 
+## 仓库分层
+
+先区分两类目录，不要把“文档”一概归为开发过程资产。
+
+### 1. 指导开发 Freely 的目录
+
+这些目录主要用于治理、收敛、排期、验收与 lifecycle 留痕；它们指导 Freely 如何开发 Freely，但不是最终要随 Freely 能力一起被消费的主交付面：
+
+- `AGENTS.md`
+- `docs/CONSTITUTION.md`
+- `docs/LAWS.md`
+- `docs/PROJECT_INTENT.md`
+- `docs/pre-brainstorms/`
+- `docs/milestones.md`
+- `docs/epics/`
+- `docs/progress/`
+
+### 2. Freely 开发完成后的能力目录
+
+这些目录属于 Freely 产品/能力本体。即使它们是文档，只要发布后会被 agent / runtime / skills / CLI 直接消费或打包，就应视为 Freely 的能力输出，而不是单纯“开发过程文档”：
+
+- `bin/`
+- `docs/system/`
+- `src/`（如存在）
+- TUI / GUI / 前端 / Tauri / Rust runtime 对应实现目录（如存在）
+
+判定规则：
+- 如果一个文档主要用于当前研发过程中的问题收敛、issue 生命周期推进、review / verification / cleanup 留痕，它属于“指导开发 Freely”。
+- 如果一个文档主要定义 Freely 运行时、agent、skill、脚本、CLI、系统行为，并会作为产品能力被长期消费或打包，它属于“Freely 能力目录”。
+- Freely 是 AI 开发工具，所以 `agent`、`skill`、runtime script、系统说明文档本身就是 Freely 的能力，不因为它们是 Markdown 就降级为“仅开发辅助”。
+- 开发 Freely 过程允许调用 Freely 能力目录中的 agent / skill / runtime 真源来指导开发自己；这就是吃狗粮，而不是目录混淆。
+
 ## 会话启动检查
 
 每次会话开始：
