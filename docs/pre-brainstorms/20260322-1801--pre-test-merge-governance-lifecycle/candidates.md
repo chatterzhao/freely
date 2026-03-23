@@ -17,9 +17,9 @@
   - 明确 promote 语义是保留批次快照，还是 replay 来源 feature
   - 明确这套判断能被 Freely 自己消费，而不是只靠人工记忆
 - priority: P0
-- status: proposed
+- status: promoted
 - decision_reason: 这是治理定义问题，不是 runtime 修补问题。它决定 Freely 后续如何使用 `pre-test-merge`，而不是单次如何合并。
-- promoted_issue_path: `pending://pre-test-merge-governance-lifecycle-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - session_refs:
   - tool: codex
@@ -41,6 +41,7 @@
 - decision_reason: 这是治理规则落成工具能力的下一步，不应和职责定义混在同一个 issue 中。
 - promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
+- next_action: `C-20260322-1801-A` 已 materialize 成正式 issue；当前保持在 pre-brainstorm，等职责定义 issue 写稳后，再决定 stale-batch detection、batch retirement、replay requirement 和 promote visibility 应落在 runtime/status、branch-management、manager patrol 还是组合能力中
 - session_refs:
   - tool: codex
   - session_id: current-thread

@@ -258,6 +258,16 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
 - next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
+
+21. `I-20260322-1801`
+- title: pre-test-merge responsibility, usage, and lifecycle governance
+- milestone_state: committed
+- phase_state: `in_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
+- next_action: 当前已从 pre-brainstorm 进入 IBM，先把 `pre-test-merge` 的职责、允许/禁止操作、stale/retire/rebuild 语义和 replay 默认策略写稳；后续 runtime/status 能力化仍由 `C-20260322-1801-B` 继续承接
 ### candidate_issues
 
 1. `C-20260318-0715-A`
@@ -314,17 +324,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，先冻结 4 个边界：`pre-test-merge -> develop` 是否允许直接 promote、`develop-only completion verification` 与 `pre-test-merge batch acceptance` 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
 - revisit_trigger: 当 protected verification environment 的 promote policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
-
-8. `C-20260322-1801-A`
-- title: pre-test-merge responsibility, usage, and lifecycle governance
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
-- priority: P0
-- promoted_issue_path: `pending://pre-test-merge-governance-lifecycle-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
-- next_action: 继续 pre-brainstorm，先冻结 `pre-test-merge` 的唯一职责、允许/禁止操作、stale/retire 条件，以及 promote 语义是否必须 replay 来源 feature；在这些边界稳定前不得把当前 `pre-test-merge` 快照误当成长期真相
-- revisit_trigger: 当 `pre-test-merge` 的职责模型、生命周期阶段与 promote/replay/retire contract 可以被冻结成独立 issue contract 时，重新进入 materialization 判断
 
 9. `C-20260322-1801-B`
 - title: pre-test-merge lifecycle management capability for Freely
