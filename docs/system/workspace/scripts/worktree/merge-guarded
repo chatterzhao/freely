@@ -32,9 +32,7 @@ case "$target" in
     esac
     ;;
   develop)
-    if [[ "$source_branch" == "pre-test-merge" ]]; then
-      allowed=1
-    elif [[ "$source_branch" == feature/* ]]; then
+    if [[ "$source_branch" == feature/* ]]; then
       allowed=1
     elif [[ "$source_branch" == hotfix/* ]]; then
       allowed=1
@@ -62,7 +60,6 @@ Allowed:
   feature/* -> pre-test-merge
   hotfix/* -> pre-test-merge
   feature/* -> develop
-  pre-test-merge -> develop
   hotfix/* -> develop
   release/* -> main
   hotfix/* -> main

@@ -258,6 +258,26 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
 - next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
+
+### completed_issues
+
+1. `I-20260322-1801`
+- title: pre-test-merge responsibility, usage, and lifecycle governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
+- evidence:
+  - `docs/CONSTITUTION.md`
+  - `docs/LAWS.md`
+  - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`
+  - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
+  - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
+  - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
+- completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`
@@ -312,8 +332,19 @@ routing_policy:
 - promoted_issue_path: `pending://protected-post-merge-acceptance-route-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/candidates.md`
-- next_action: 继续 pre-brainstorm，先冻结 4 个边界：`pre-test-merge -> develop` 是否允许直接 promote、`develop-only completion verification` 与 `pre-test-merge batch acceptance` 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
-- revisit_trigger: 当 protected verification environment 的 promote policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
+- next_action: 继续 pre-brainstorm，但已冻结一条硬规则：`pre-test-merge` 是 shadow batch，只做测试 merge，不直接 merge 到 `develop`。剩余要收口的是 `develop-only completion verification` 与 `pre-test-merge batch acceptance` 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
+- revisit_trigger: 当 protected verification environment 的 replay policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
+
+9. `C-20260322-1801-B`
+- title: pre-test-merge lifecycle management capability for Freely
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
+- source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
+- next_action: 等职责定义收稳后，再决定 stale-batch detection、batch retirement、replay requirement 和 promote visibility 应落在 runtime/status、branch-management、manager patrol 还是组合能力中；在此之前不直接写成某一层的局部补丁
+- revisit_trigger: 当 `pre-test-merge` lifecycle capability 的真源、触发面与最小 machine-readable outputs 可以被冻结成独立 issue contract 时，重新进入 materialization 判断
 
 5. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec

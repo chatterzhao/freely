@@ -16,6 +16,29 @@
    - 共享基础设施
    - 产品行为变更
 8. 串行 `git merge --no-ff <branch>` 并立即运行冒烟/回归检查
+9. `pre-test-merge` 是 shadow batch，不是 promote 单位：
+   - 它可以承载已验证的组合快照
+   - 它不直接 merge 到 `develop`
+   - `develop` 只吸收来源 `feature/*` 的 replay
+
+## Responsibilities
+
+1. `pre-test-merge` 只承担两类主线前临时职责：
+   - 预检运行测试：在来源 feature 还未进入 `develop` 前，执行需要真实集成面的 smoke / regression / acceptance
+   - 预测试 merge：把多个来源 feature 临时合入同一批次，验证组合冲突、集成次序与交互行为
+2. 这两类职责都不是开发面：
+   - 在这里发现问题，统一回到来源 `feature/*` 或新的 dedicated feature worktree 修复
+   - 修复后再重新 merge 回 `pre-test-merge` 复验
+3. `develop` 不承担“先预测试”的职责：
+   - 需要主线前验证时，使用 `pre-test-merge`
+   - 需要主线后真实环境确认时，才在 `develop` 做 completion verification
+
+## Batch freshness and replay
+
+1. `pre-test-merge` 批次只有在当前仍然权威时才可作为验证面消费。
+2. 若 `develop` 已继续前进、批次出现 protected-env 独有差异，或 promotion / cleanup 证据断裂，该批次就应视为 stale。
+3. stale 批次必须先 retire，再决定是否重建；不能继续把旧批次快照当成当前真相面。
+4. 若同一能力仍需继续验证，默认做法是 replay 来源 feature 到新的 `pre-test-merge` 批次，而不是保留旧批次快照作为 promote 单位。
 
 ## Post-merge acceptance environment
 
@@ -32,11 +55,24 @@
    - 新建 feature worktree 承接该 post-merge finding
 5. 只有当 `post-merge acceptance` 明确通过后，才允许把该批次继续 promote 到更高一层或进入 cleanup。
 
-## Promotion to `develop`
+## Replay to `develop`
 
 1. 并入 `develop` 前再次执行 `./bin/wt-status-all`
-2. 确认每个分支都已在自己的 dedicated worktree 中完成“merge 上游 -> 解决冲突 -> 自测”
-3. 派生分支先确认父分支已进入要求路径，再 restack / rebase / merge 上游并重跑测试
-4. 运行 [semantic-regression-checklist.md](semantic-regression-checklist.md)
-5. 运行要求的 `TEST` 证据检查
-6. `PRE_TEST` 只作基线，不替代提升测试结果
+2. 确认每个来源 `feature/*` 都已在自己的 dedicated worktree 中完成“merge 上游 -> 解决冲突 -> 自测”
+3. 若某条线先经过 `pre-test-merge`，进入 `develop` 的动作是 replay 已验证的来源 `feature/*`，而不是 merge `pre-test-merge`
+4. 派生分支先确认父分支已进入要求路径，再 restack / rebase / merge 上游并重跑测试
+5. 运行 [semantic-regression-checklist.md](semantic-regression-checklist.md)
+6. 运行要求的 `TEST` 证据检查
+7. `PRE_TEST` 只作基线，不替代提升测试结果
+
+## Retirement
+
+1. `pre-test-merge` 验证通过后：
+   - 记录批次 manifest、验证结果和 replay 顺序
+   - 由来源 `feature/*` replay 到 `develop`
+   - retire 当前 `pre-test-merge` 批次
+2. `pre-test-merge` 验证失败后：
+   - 记录失败原因和回流目标 feature worktree
+   - 不在 `pre-test-merge` 上直接修实现
+   - 视需要 retire 当前批次，并在后续用新批次 rebuild
+3. 不允许把同一 `pre-test-merge` 批次长期保留为滚动真相面。

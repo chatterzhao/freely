@@ -13,8 +13,8 @@ Freely 已经正式允许某些 issue 声明 `post-merge acceptance`，并且刚
 - hook 能阻止在 `pre-test-merge` 上 `commit`
 - `wt-add` helper 能阻止在 `pre-test-merge` 上 `add`
 - 但 Git 没有原生 pre-add hook，raw `git add` 无法被同级拦截
-- `merge-guarded` 仍允许 `pre-test-merge -> develop`
-- 还没有把“`pre-test-merge` 只是受保护验证环境，不应携带需要直接 promote 的独有实现差异”收成 promotion gate
+- 旧规则曾允许 `pre-test-merge -> develop`
+- 现在已经冻结新规则：`pre-test-merge` 只是受保护验证环境 / shadow batch，不应携带需要直接 promote 的独有实现差异
 
 这会让使用者很容易忘记：
 
@@ -47,12 +47,13 @@ Freely 已经正式允许某些 issue 声明 `post-merge acceptance`，并且刚
 - 但这不是 Git 原生 hook，只是“走规范入口时的保护”
 
 3. `docs/system/workspace/scripts/worktree/merge-guarded`
-- 当前允许：
+- 现在允许：
   - `feature/* -> pre-test-merge`
   - `feature/* -> develop`
+- 不允许：
   - `pre-test-merge -> develop`
 - 但没有额外校验：
-  - `pre-test-merge` 是否完全 clean
+  - replay 用 batch manifest 的最小字段
   - 当前批次是否只包含来源 feature 的可追溯合入
   - 是否存在 protected env 上未回流到来源 worktree 的差异
 
@@ -72,8 +73,8 @@ Freely 已经正式允许某些 issue 声明 `post-merge acceptance`，并且刚
 ## 关键张力
 
 1. `pre-test-merge` 是临时集成验证分支
-- 如果它只是 batch shadow，理论上不该承载“只能从它 promote 的独有实现”
-- 但如果多个 feature 的组合行为只能在这里看见，直接废掉 `pre-test-merge -> develop` 也可能失去批次可追溯性
+- 现在已确定它是 batch shadow，不承载“只能从它 promote 的独有实现”
+- 剩下的问题不是要不要保留 `pre-test-merge -> develop`，而是如何定义 replay 批次的可追溯证据
 
 2. `develop` 是真实长期运行环境
 - 某些主管位验收只能在 `develop` 里看见
@@ -95,13 +96,22 @@ Freely 已经正式允许某些 issue 声明 `post-merge acceptance`，并且刚
   - 当前批次可被解释为“来源 feature 集合 + merge order + acceptance evidence”
 - 若不满足，上游不得 promote
 
+说明：该方向已不再采用，保留仅作决策追溯。
+
 ### 方向 B：把 `pre-test-merge` 定义为纯 shadow batch，不再直接 promote
 
 - `pre-test-merge` 只负责组合验证
 - 验证通过后，删除 `pre-test-merge`
-- 再按已验证顺序把来源 feature 逐条 merge 到 `develop`
+- 再按已验证顺序把来源 feature 逐条 replay/merge 到 `develop`
 - 优点：更强地保证“实现来源永远是 feature”
 - 风险：需要一个可重放、可追溯的 batch manifest，否则容易与真实已验批次漂移
+
+### 当前决议
+
+- 采用方向 B。
+- `pre-test-merge` 的角色固定为 shadow batch / test-merge 环境。
+- 它不会被直接用来合并到 `develop`。
+- 若某条线需要先经过 `pre-test-merge`，进入 `develop` 的动作必须是 replay 已验证的来源 feature，而不是提升 `pre-test-merge` 批次本身。
 
 ### 方向 C：按目标环境区分两类 post-merge acceptance
 
@@ -125,7 +135,7 @@ Freely 已经正式允许某些 issue 声明 `post-merge acceptance`，并且刚
 
 ## 需要冻结的开放问题
 
-1. `pre-test-merge -> develop` 应该保留，但增加强 gate，还是应改成“只允许 replay 来源 feature”？
+1. replay 来源 feature 的 batch manifest 与验证重放证据最小字段是什么？
 2. 对 `develop` 上的主环境验收，是否应明确归类为：
 - `completion_verification on protected environment`
 而不是泛化 `post-merge acceptance`

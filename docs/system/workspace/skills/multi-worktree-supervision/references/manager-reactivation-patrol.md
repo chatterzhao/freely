@@ -42,6 +42,12 @@
 - 但 `.freely` / intake / continuity / worktree 视图仍停留在旧状态
 - 主管需要先解释当前 drift，再把它分流到 maintenance worker、execution worker 或 runtime owner
 
+7. `stale validation batch`
+- `pre-test-merge` worktree 仍在，但 `develop` 已前进到让它不再权威，或批次只剩 protected-env 独有差异 / 断裂的 cleanup 证据
+- 主管应将 ownership 判为 `manager-owned`
+- restart_point 应回到 `runtime supervision / cleanup`，并在需要继续验证时把 `replay source feature` 作为下一跳委派给对应 feature worktree
+- stale 批次不得继续作为当前真相面；它必须先 retire，再决定是否 rebuild
+
 ## Trigger Model
 
 主管 patrol 不应被理解成只有单一轮询入口。
@@ -90,3 +96,4 @@
 - issue 已 completed 但 worktree 未收口，也属于 patrol 必查项。
 - 不要求每轮关闭所有 worktree；但不得让 stalled/orphaned 点位继续无人认领。
 - 若 patrol 发现 worker-local delegated handoff 因 `operator_stop` 后 runtime 未恢复而悬空，应要求 runtime 走本工位 reactivation gate，而不是继续把问题留在 delegated intake 中。
+- 若 patrol 发现 `pre-test-merge` 批次 stale，不能把它继续当成验证真相；必须先 retire，再按需要 replay 来源 feature 到新的批次。
