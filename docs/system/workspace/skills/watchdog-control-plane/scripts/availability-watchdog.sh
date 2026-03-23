@@ -4,6 +4,37 @@ normalize_codex_account_name() {
   printf '%s' "$1" | sed 's/\./-/g'
 }
 
+# Parse "Mar 23rd, 2026 3:51 PM" format to Unix timestamp
+parse_try_again_time() {
+  local date_str="$1"
+  [[ -n "$date_str" ]] || return 1
+  python3 -c "
+import re
+from datetime import datetime
+import sys
+
+date_str = sys.argv[1]
+# Remove ordinal suffixes (st, nd, rd, th)
+cleaned = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', date_str)
+try:
+    dt = datetime.strptime(cleaned, '%b %d, %Y %I:%M %p')
+    print(int(dt.timestamp()))
+except Exception:
+    sys.exit(1)
+" "$date_str" 2>/dev/null
+}
+
+# Extract "try again at ..." time from codex output
+# Returns Unix timestamp, or empty if not found
+extract_try_again_time_from_output() {
+  local output="$1"
+  local try_again_str
+  # Match: try again at Mar 23rd, 2026 3:51 PM.
+  try_again_str="$(printf '%s\n' "$output" | grep -oiE 'try again at [^.]+\.' | sed 's/try again at //i' | sed 's/\.$//' | head -1)"
+  [[ -n "$try_again_str" ]] || return 1
+  parse_try_again_time "$try_again_str"
+}
+
 codex_current_account() {
   local project="$1" ai_bin output
   ai_bin="$(ai_cli_bin_for_project "$project")"
@@ -22,17 +53,20 @@ codex_saved_accounts() {
 
 codex_record_account_cooldown() {
   local project="$1" account="$2" reset_at="$3"
-  local file tmp normalized
+  local file tmp normalized human_readable
   [[ -n "$account" && -n "$reset_at" ]] || return 0
   normalized="$(normalize_codex_account_name "$account")"
+  # Convert timestamp to human-readable format
+  human_readable="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo '')"
   file="$(codex_account_cooldown_file "$project")"
   mkdir -p "$(dirname "$file")"
   tmp="${file}.tmp"
   {
     if [[ -f "$file" ]]; then
-      awk -F '\t' -v account="$normalized" '$1 != account {print $1 "\t" $2}' "$file"
+      # Keep existing entries (preserve human-readable column if present)
+      awk -F '\t' -v account="$normalized" '$1 != account {print $1 "\t" $2 "\t" $3}' "$file"
     fi
-    printf '%s\t%s\n' "$normalized" "$reset_at"
+    printf '%s\t%s\t%s\n' "$normalized" "$reset_at" "$human_readable"
   } >"$tmp"
   mv "$tmp" "$file"
 }
@@ -53,7 +87,8 @@ codex_clear_account_cooldown() {
   file="$(codex_account_cooldown_file "$project")"
   [[ -f "$file" ]] || return 0
   tmp="${file}.tmp"
-  awk -F '\t' -v account="$normalized" '$1 != account {print $1 "\t" $2}' "$file" >"$tmp"
+  # Preserve all columns except the target account
+  awk -F '\t' -v account="$normalized" '$1 != account {print $1 "\t" $2 "\t" $3}' "$file" >"$tmp"
   mv "$tmp" "$file"
 }
 
@@ -142,14 +177,26 @@ select_earliest_reset_codex_account_any() {
   fi
 }
 
+# Probe current codex account with proxy support and timeout
+# Returns:
+#   0 + stdout empty: success, account is usable
+#   0 + stdout non-empty: rate limited, stdout contains reset_at timestamp
+#   1: other error (timeout, network, etc.)
 codex_probe_current_account_now() {
-  local project="$1" prompt_file output_file rc
+  local project="$1" prompt_file output_file rc timeout_secs="${CODEX_PROBE_TIMEOUT:-15}"
   prompt_file="$(mktemp)"
   output_file="$(mktemp)"
   printf 'Reply with exactly: OK\n' >"$prompt_file"
   rc=0
+
+  # Run codex exec with proxy and timeout
   (
     cd "$project"
+    # Export proxy env for codex
+    export ALL_PROXY="${ALL_PROXY:-http://127.0.0.1:7890}"
+    export HTTP_PROXY="${HTTP_PROXY:-http://127.0.0.1:7890}"
+    export HTTPS_PROXY="${HTTPS_PROXY:-http://127.0.0.1:7890}"
+
     if [[ -n "${AI_MODEL:-}" ]]; then
       codex exec \
         --skip-git-repo-check \
@@ -166,27 +213,118 @@ codex_probe_current_account_now() {
         --dangerously-bypass-approvals-and-sandbox \
         - <"$prompt_file"
     fi
-  ) >"$output_file" 2>&1 || rc=$?
+  ) >"$output_file" 2>&1 &
+  local pid=$!
+
+  # Wait with timeout
+  local slept=0
+  while [[ $slept -lt $timeout_secs ]]; do
+    if ! kill -0 "$pid" 2>/dev/null; then
+      break
+    fi
+    sleep 1
+    ((slept++))
+  done
+
+  # Kill if still running
+  if kill -0 "$pid" 2>/dev/null; then
+    kill "$pid" 2>/dev/null
+    wait "$pid" 2>/dev/null
+    rm -f "$prompt_file" "$output_file"
+    return 1  # Timeout
+  fi
+
+  wait "$pid" 2>/dev/null || rc=$?
   rm -f "$prompt_file"
-  if [[ "$rc" -eq 0 ]] && rg -q '^OK$' "$output_file"; then
-    rm -f "$output_file"
+
+  local output
+  output="$(cat "$output_file")"
+  rm -f "$output_file"
+
+  # Check for success
+  if [[ "$rc" -eq 0 ]] && printf '%s\n' "$output" | rg -q '^OK$'; then
     return 0
   fi
-  rm -f "$output_file"
-  return 1
+
+  # Check for rate limit
+  if printf '%s\n' "$output" | grep -qi "usage limit\|try again"; then
+    local reset_at
+    reset_at="$(extract_try_again_time_from_output "$output")"
+    if [[ -n "$reset_at" ]]; then
+      printf '%s\n' "$reset_at"
+    fi
+    return 0  # Return 0 to signal we have rate limit info
+  fi
+
+  return 1  # Other error
 }
 
 probe_any_usable_codex_account_now() {
-  local project="$1" candidate
+  local project="$1" candidate reset_at
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
     switch_to_codex_account "$project" "$candidate" "probe_saved_accounts" >/dev/null || continue
-    if codex_probe_current_account_now "$project"; then
+
+    reset_at="$(codex_probe_current_account_now "$project")"
+    local probe_rc=$?
+
+    if [[ $probe_rc -eq 0 && -z "$reset_at" ]]; then
+      # Success: account is usable
       codex_clear_account_cooldown "$project" "$candidate"
       printf '%s\n' "$candidate"
       return 0
+    elif [[ -n "$reset_at" ]]; then
+      # Rate limited: record cooldown
+      codex_record_account_cooldown "$project" "$candidate" "$reset_at"
     fi
   done < <(codex_saved_accounts "$project")
+}
+
+# Probe ALL saved accounts and update cooldown file
+# Output format:
+#   usable:<account>           - Found a usable account
+#   earliest:<account>|<reset_at>  - All accounts rate limited, this is earliest available
+#   none                       - No accounts saved or all failed without rate limit info
+probe_all_codex_accounts_and_update_cooldown() {
+  local project="$1"
+  local candidate reset_at probe_rc
+  local usable_account=""
+  local earliest_account="" earliest_reset=""
+
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    switch_to_codex_account "$project" "$candidate" "probe_all_accounts" >/dev/null || continue
+
+    reset_at="$(codex_probe_current_account_now "$project")"
+    probe_rc=$?
+
+    if [[ $probe_rc -eq 0 && -z "$reset_at" ]]; then
+      # Success: account is usable
+      codex_clear_account_cooldown "$project" "$candidate"
+      usable_account="$candidate"
+      # Don't return immediately - continue probing to update all cooldowns
+    elif [[ -n "$reset_at" ]]; then
+      # Rate limited: record cooldown
+      codex_record_account_cooldown "$project" "$candidate" "$reset_at"
+      # Track earliest available
+      if [[ -z "$earliest_reset" || "$reset_at" -lt "$earliest_reset" ]]; then
+        earliest_account="$candidate"
+        earliest_reset="$reset_at"
+      fi
+    fi
+  done < <(codex_saved_accounts "$project")
+
+  # Return results
+  if [[ -n "$usable_account" ]]; then
+    printf 'usable:%s\n' "$usable_account"
+    return 0
+  elif [[ -n "$earliest_account" ]]; then
+    printf 'earliest:%s|%s\n' "$earliest_account" "$earliest_reset"
+    return 0
+  else
+    printf 'none\n'
+    return 1
+  fi
 }
 
 switch_to_codex_account() {
