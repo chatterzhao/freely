@@ -7,8 +7,12 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `pending://pre-test-merge-acceptance-stall-materialization`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
-- session_refs: []
+  - `pending://pre-test-merge-responsibility-usage-and-lifecycle-governance-materialization`
+- session_refs:
+  - tool: `codex`
+    session_id: `current-thread`
+    jsonl_path: `unavailable://codex-thread-only`
+    role: `author`
 - why_now:
   - `I-20260322-0445` 的真实 post-merge acceptance 已经把 delegated continuation 注入 prompt
   - 但 `pre-test-merge` 主管长时间没有产出新的 continuity / decision

@@ -62,7 +62,7 @@
 ## Reroute decision
 
 - The governance boundary part of this finding now depends on:
-  - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
+  - `pending://pre-test-merge-responsibility-usage-and-lifecycle-governance-materialization`
 - That governance issue owns:
   - `pre-test-merge` role boundaries
   - stale/retire/rebuild semantics
