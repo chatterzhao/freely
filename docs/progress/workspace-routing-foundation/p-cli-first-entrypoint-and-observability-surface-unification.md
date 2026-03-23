@@ -5,3 +5,17 @@
 - summary: 已完成 `freely` front-door contract 收敛，并让 `chat` / `tui` 共用同一个 high-level submit chain。
 - current_focus:
   - none
+- closure_status: `merged-pending-verify`
+- closure_evidence:
+  - `worktree_disposition: retire-only`
+  - `retirement_path: salvage_then_retire`
+  - `branch: feature/cli-first-observability-surfaces-20260322`
+  - `worktree_path: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-cli-first-observability-surfaces`
+  - `local_branch_disposition: retained-with-reason`
+  - `local_branch_reason: feature branch 当前已 rebase 到最新 develop 之上，但 branch tip 仍包含未被 develop 吸收的 closure writeback；在这些 canonical 收口提交被收编前不能宣称 verified-retirable`
+  - `remote_branch_disposition: deleted`
+  - `remote_branch_evidence: git fetch origin --prune` 后未发现 `origin/feature/cli-first-observability-surfaces-20260322`
+  - `integration_absorption_evidence: git merge-base --is-ancestor feature/cli-first-observability-surfaces-20260322 develop` 仍返回非零，说明当前 feature branch tip 尚未被 develop 吸收
+  - `branch_divergence_evidence: git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` 当前为 `3 0`，说明当前 branch 领先 develop 3 个 closure writeback 提交、behind 为 0
+  - `post_merge_acceptance_2026_03_22: bash -n docs/system/workspace/scripts/runtime/freely`、`bash docs/system/workspace/scripts/tests/test-freely-chat-and-tui`、`bash docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation` 与 `./bin/governance-check` 均通过；milestone queue 已保持 canonical completed entry`
+  - `audit_refresh_2026_03_22: source candidate C-20260322-0115-A 仍为 promoted，且当前 dirty 文件仅剩 issue/progress/review/milestone 四个 closure artifacts；因此当前仅做 retirement writeback，不回退 pre-brainstorm 或 dev-loop`
