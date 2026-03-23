@@ -1,5 +1,6 @@
 # Runtime state
 .freely/
+.codex/
 
 # Local environment files (do not commit)
 .env
