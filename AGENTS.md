@@ -15,6 +15,10 @@ Freely 处于研究优先的整合阶段。
 - `docs/LAWS.md`
 - `docs/PROJECT_INTENT.md`
 - `docs/pre-brainstorms/`
+- `docs/milestones.md`
+- `docs/epics/`
+- `docs/progress/`
+- `docs/system/workspace/`
 
 不要将遗留路径视为活跃工作流输入（例如：旧布局下的 `docs/brainstorms/`、`docs/planning/`、`docs/continuity/`、`docs/validation/`、`docs/reviews/`）。
 
@@ -22,9 +26,27 @@ Freely 处于研究优先的整合阶段。
 
 每次会话开始：
 1. **分支/Worktree检查**：如在 `main`/`develop`/`pre-test-merge` 则禁止写入。先执行 `cd <your-project-path>`，再按标准 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base>` 创建 feature worktree，并 `cd` 到该 worktree 中工作。默认 `<base>` 为 `develop`；若当前 issue 依赖未合并父分支改动，可用父 `feature/*` 作为 `<base>`，但必须在 pre-brainstorm / milestone / issue 中记录依赖关系。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDD-HHMM/HHMMSS`，目录名改为日期前置，例：`feature/foo-20260307-1015` -> `20260307-1015-feature-foo`
-2. **头脑风暴路由**：
+2. **首跳先判 loop，不要先判 cleanup**：
+   - 如果是 Freely 自举中暴露的新共性问题，先判它是否应成为 Freely 能力发现；若边界未稳定，先进入 `docs/pre-brainstorms/`
+   - 如果当前变更已落在现有 issue scope 内，优先吸收到既有 `issue / milestones / progress / code-review` 生命周期，不要为了一个新 worktree 再伪造新 candidate / issue
+   - 只有当问题已经是“现有 lifecycle 走到 merge / verification / cleanup 哪一步”时，才切到 worktree promotion / retirement 判断
+3. **头脑风暴路由**：
    - 预研头脑风暴（不是基于 issue 文档）：文档放 `docs/pre-brainstorms/`
    - IBM 头脑风暴（基于 issue 文档）：文档放 `docs/epics/{epic-name}/{story-name}/brainstorms/b-{issue-name}.md`
+
+## Freely 自举首跳
+
+Freely 开发 Freely 时，默认先问三件事：
+
+1. 这是新问题，还是现有 issue 的 continuation？
+   - 新问题：先走 pre-brainstorm / candidate / milestone
+   - 现有 issue continuation：直接回到该 issue 的 doc-loop / dev-loop / verification
+2. 这是能力边界问题，还是单纯 worktree 生命周期问题？
+   - 能力边界问题：先看 `PROJECT_INTENT`、`three-loop-capability-lifecycle`、现有 issue / milestone
+   - worktree 生命周期问题：再看 `worktree-maintenance-governance` / `branch-management`
+3. 这棵树是 research-only、merge-ready、companion-only，还是 verified-retirable？
+   - 不要把“已经有 feature worktree”误当成“已经完成 issue materialization”
+   - 不要把“已经 merge”误当成“cleanup 已完成”
 
 ## 吃自己的狗粮规则（Freely 构建 Freely）
 Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外。
@@ -33,6 +55,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - 使用对用户项目期望的相同分支/worktree/钩子规范。
 - Worktree 根目录遵循宪法策略：项目同级目录，命名为 `{project-name}-worktrees`。
 - 架构/治理变更必须先进入 `docs/pre-brainstorms/<id>/`，然后才能进入执行循环落地。
+- Freely 自举中发现的新能力，默认优先判断是否已被现有 milestone-owned issue 吸收；仅当现有 issue 无法承接时，才新开 candidate / issue。
 - 优先使用预检 + 可操作的修复方案，而非重复的权限提示。
 
 ## 执行指引
