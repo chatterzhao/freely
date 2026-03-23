@@ -268,6 +268,9 @@
 - 20260320-0512--milestone-planning-and-state-maintenance
   - brainstorms: docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/candidates.md
+- 20260322-1615--protected-post-merge-acceptance-route-governance
+  - brainstorms: docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

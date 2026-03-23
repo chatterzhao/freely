@@ -2846,3 +2846,80 @@
  - manager / worker 角色文档已把 watchdog 模块作为正式下游依赖写明
  - 新增脚本级回归：
    - `bash docs/system/workspace/scripts/tests/test-watchdog-control-plane-skills`
+
+## 变更（2026-03-22 worktree fleet lifecycle closure）
+
+### lead-agent routing
+- selected_pool: `milestones`
+- why_selected_pool: 当前问题不是继续实现单个 issue，而是对现有 feature fleet 做 project-level lifecycle closure，核对哪些 worktree 已满足 cleanup gate、哪些仍应保留为 active 或 blocked。
+- current_problem_kind: `fleet lifecycle closure`
+- selected_tool: `codex`
+- why_selected_tool: 这轮动作需要直接读取 git/worktree 真相、执行本地 branch/worktree cleanup，并把 evidence 回写仓库文档。
+- target_skill_or_loop: `worktree-maintenance-governance:fleet_closure`
+- next_prompt: `后续若要继续收口，请先处理剩余 3 个 dirty worktree 的 continuity / verification，再由 manager 统一判断 merge-up 或 cleanup；不要直接在 pre-test-merge 上写入。`
+
+### fleet inventory
+- audited_inputs:
+  - `git worktree list --porcelain`
+  - `./bin/wt-status-all`
+  - `git branch -vv`
+  - merge ancestry checks against `develop` and `pre-test-merge`
+- retired_now:
+  - `feature/worker-delegated-continuation-reentry-20260322`
+    - disposition: `retire-now`
+    - reason: clean, fully absorbed by `develop`, issue `I-20260322-0412` is already `completed`
+  - `feature/latest-manager-continuity-worker-consumption-20260322`
+    - disposition: `retire-now`
+    - reason: clean, fully absorbed by `pre-test-merge`, no remaining dedicated worktree-only delta
+  - `feature/completed-worktree-closeout-merge-prep-20260322`
+    - disposition: `retire-now`
+    - reason: clean merge-prep companion branch, tip equals current `pre-test-merge`, no remaining unique payload after merge-up
+- retained_ready_for_manager_merge:
+  - `feature/cli-first-observability-surfaces-20260322`
+    - disposition: `ready-for-manager-merge`
+    - evidence: worktree clean after closeout commit `0681fba`; issue/progress/review/milestone 已对齐为 completed closeout
+    - cleanup_gate: not-yet; branch still has unique commits beyond `develop`
+  - `feature/manager-handoff-consumption-reentry-20260322`
+    - disposition: `ready-for-manager-merge`
+    - evidence: worktree clean after closeout commit `4678b09`; cleanup followthrough 已写回 issue/progress/review/milestone
+    - cleanup_gate: not-yet; manager 仍需确认 merge absorption 后再 retire
+- retained_in_verification:
+  - `feature/three-loop-dev-loop-ai-native-definition-20260321`
+    - disposition: `verification-pending-manager-review`
+    - reason: worktree 已 clean，并新增 `Finalize cleanup handoff routing verification` 提交 `70fdbe5`，但 branch 仍有独立 payload，需要单独 manager disposition
+  - `feature/runtime-worker-launch-linkage-and-stall-recovery-20260322`
+    - disposition: `blocked`
+    - blocker: dirty worktree and issue `I-20260322-0245` remains `in_verification`
+- retained_active:
+  - `feature/pre-test-merge-post-merge-acceptance-stall-20260322`
+    - disposition: `continue-dev`
+    - reason: clean research branch with unique pre-brainstorm commits not yet absorbed upstream
+  - `pre-test-merge`
+    - disposition: `active integration buffer`
+    - reason: still ahead of `develop`; this round only did fleet closure and cleanup, not protected-branch integration writes
+  - `feature/worktree-fleet-lifecycle-closure-20260322`
+    - disposition: `active`
+    - reason: current dedicated worktree for closure evidence
+  - `feature/worktree-governance-fleet-audit-20260322`
+    - disposition: `active audit companion`
+    - reason: 审计工位仍有未吸收的 `CONVERGENCE` 写回，需要被当前 closure 工位吸收或明确退役
+  - `C-20260322-1615-A`
+    - disposition: `new candidate in_pre_brainstorm`
+    - reason: protected `post-merge acceptance` 的 promote / replay / cleanup guard 缺口已被正确回流为新生命周期，而不是继续塞进当前 issue
+
+### cleanup evidence
+- commands:
+  - `git worktree remove /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-worker-delegated-continuation-reentry`
+  - `git branch -d feature/worker-delegated-continuation-reentry-20260322`
+  - `git worktree remove /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-latest-manager-continuity-worker-consumption`
+  - `git branch -D feature/latest-manager-continuity-worker-consumption-20260322`
+  - `git worktree remove /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-completed-worktree-closeout-merge-prep`
+  - `git branch -D feature/completed-worktree-closeout-merge-prep-20260322`
+- force_delete_reason:
+  - `git branch -d` only validates merge into current `HEAD`; the two forced deletions were explicitly checked as ancestors of `pre-test-merge` before deletion.
+- remote_disposition:
+  - `origin` exists, but no matching remote refs were found for the three retired feature branches
+  - remote_result: `not-present`
+- post_cleanup_status:
+  - `./bin/wt-status-all` -> `total=9`, `dirty=3`
+  - local fleet now excludes the three retired worktrees above

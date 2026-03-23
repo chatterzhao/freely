@@ -187,7 +187,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
 - source_brainstorm: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md`
-- next_action: `fleet_closure` 已收编到 worktree-maintenance skill，正式项目 fleet 现已收敛到 `develop + current sweep` 两棵 canonical 工位；剩余动作是完成最终 review，并在通过 promote gate 后将当前 sweep 合入 `develop`
+- next_action: `fleet_closure` 已收编到 worktree-maintenance skill，并已把 `post-merge acceptance` 的 protected-environment 缺口回流到新的 pre-brainstorm `C-20260322-1615-A`。当前 fleet 快照是 `total=9, dirty=3`：`cli-first`、`manager-handoff` 与 `manager-watchdog-trigger` 已 clean，其中前两者已完成 closeout 并 ready for manager merge，但尚未被上游吸收；`runtime-worker-launch-linkage` 与当前 `fleet-closure` / `fleet-audit` 工位仍需完成最终 verification / evidence write-back。待这些尾项收口后，再由 manager 做统一 promote / cleanup 判断
 
 14. `I-20260321-1515`
 - title: Remote branch retirement governance
@@ -283,6 +283,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/candidates.md`
 - next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize
 - revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
+
+7. `C-20260322-1615-A`
+- title: Protected post-merge acceptance route and promotion guard governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://protected-post-merge-acceptance-route-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/candidates.md`
+- next_action: 继续 pre-brainstorm，先冻结 4 个边界：`pre-test-merge -> develop` 是否允许直接 promote、`develop-only completion verification` 与 `pre-test-merge batch acceptance` 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
+- revisit_trigger: 当 protected verification environment 的 promote policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
 
 5. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec

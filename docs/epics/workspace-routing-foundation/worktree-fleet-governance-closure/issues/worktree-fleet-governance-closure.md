@@ -72,5 +72,8 @@ Freely 已经具备单树 worktree audit、merge-prep、stacked merge-chain 和 
 
 ## Next
 
-- 本 issue 的模式与首轮 inventory 已完成，并已支撑本轮 fleet 收口到 `develop + current sweep` 两棵 canonical 工位。
-- 剩余动作是完成最终 review，并在通过 promote gate 后把当前 sweep 正式提升到 `develop`；更细的 merge/cleanup 链仍回到 `merge_prep`、`stacked_merge_chain` 或 `retirement_handoff` 执行。
+- 本 issue 的模式与首轮 inventory 已完成，但最终 review 仍需跟上当前真实 fleet，而不是停留在旧的 `current sweep` 快照。
+- `cli-first`、`manager-handoff` 已完成 closeout 且 worktree clean，当前是 `ready for manager merge`，但在被上游吸收前仍不能 cleanup。
+- `manager-watchdog-trigger` worktree 也已 clean，并进入单独的 manager disposition；`runtime-worker-launch-linkage` 仍保持 `in_verification`。
+- 本轮新增的 `protected-post-merge-acceptance-route-governance` 已正确回流到 pre-brainstorm，说明 `fleet_closure` 已把“当前 issue 之外的新治理缺口”重新路由，而不是硬塞回原 issue。
+- 待 manager 完成剩余 worktree 的 merge / verification / cleanup 判断后，本 issue 才能从 `in_verification` 进入最终 promote / cleanup followthrough。

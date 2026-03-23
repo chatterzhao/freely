@@ -18,104 +18,60 @@
 ### Protected / Control Trees
 
 - `develop`
+  - disposition: `protected manager environment`
+  - reason: clean；只承担监督、集成扫描与 post-merge acceptance，不承担 feature 开发
+- `pre-test-merge`
+  - disposition: `protected integration buffer`
+  - reason: clean；仍领先 `develop`，但当前只作为受保护验证环境保留
+
+### Ready For Manager Merge
+
+- `feature/cli-first-observability-surfaces-20260322`
+  - disposition: `ready-for-manager-merge`
+  - reason: worktree clean，closeout commit `0681fba` 已把 issue / progress / review / milestone 对齐；尚未被上游吸收，因此不能 cleanup
+- `feature/manager-handoff-consumption-reentry-20260322`
+  - disposition: `ready-for-manager-merge`
+  - reason: worktree clean，closeout commit `4678b09` 已完成 cleanup followthrough 写回；仍需 manager 做 merge absorption 判断
+
+### Still In Verification
+
+- `feature/three-loop-dev-loop-ai-native-definition-20260321`
+  - disposition: `verification-pending-manager-review`
+  - reason: worktree clean，最新提交 `70fdbe5` 已把 cleanup handoff routing verification 写回，但 branch 仍有独立 payload，不能直接视为 retired
+- `feature/runtime-worker-launch-linkage-and-stall-recovery-20260322`
+  - disposition: `blocked-in-verification`
+  - reason: worktree 仍 dirty，issue `I-20260322-0245` 仍是 `in_verification`
+- `feature/worktree-fleet-lifecycle-closure-20260322`
+  - disposition: `active-final-review`
+  - reason: 当前 dedicated worktree 用于吸收最新 fleet disposition 与 protected acceptance routing evidence
+
+### Active Research / Audit Trees
+
+- `feature/pre-test-merge-post-merge-acceptance-stall-20260322`
   - disposition: `continue-dev`
-  - reason: 受保护主管工位，只做监督与集成扫描，不直接写入
-- `feature/worktree-fleet-governance-sweep-20260321`
-  - disposition: `merge-prep-to-develop`
-  - reason: 当前 develop-facing integration branch，已吸收本轮可安全向上收口的治理链，当前相对 `develop` 为 `0 80`
-- `(detached) /Users/zhaoyu/.codex/worktrees/2068/freely`
-  - disposition: `blocked`
-  - reason: 非正式项目 worktree，不纳入 Freely canonical merge/cleanup 生命周期
-
-### Absorbed / Retired This Round
-
-- `feature/evolver-autonomy-integration-20260310-0056`
-  - disposition: `research-writeback-then-retire`
-  - reason: 已吸收 `evolver` 研究写回并退休旧工位
-- `feature/architecture-synthesis-prebrainstorm-20260312-001104`
-  - disposition: `research-writeback-then-retire`
-  - reason: 已吸收 architecture pre-brainstorm、control-surface milestone 与 backend-service-contract issue 写回并退休旧工位
-- `feature/research-openai-symphony-20260319-0500`
-  - disposition: `research-writeback-then-retire`
-  - reason: 已吸收 Symphony research candidate 队列并退休旧工位
-- `feature/human-chat-intake-supervision-20260319-1030`
-  - disposition: `merge-up`
-  - reason: 已吸收 human-chat 治理实现并退休旧工位
-- `feature/cli-tui-input-interruption-20260319-2310`
-  - disposition: `merge-up`
-  - reason: 已吸收正式 issue、验证与更强 TUI 回归，并退休旧工位
-- `feature/research-harness-engineering-20260319`
-  - disposition: `research-writeback-then-retire`
-  - reason: 已吸收 harness research candidate 队列并退休旧工位
-- `feature/prebrainstorm-human-chat-canonical-20260320-0023`
-  - disposition: `merge-up`
-  - reason: 已吸收 canonical human-chat 写回并退休旧工位
-- `feature/interruption-delegation-followthrough-20260320-0225`
-  - disposition: `retire-now`
-  - reason: 当前 sweep 已拥有更强的 `signal-intent-understanding`、`restart_point/ownership` triage 与 cleanup routing；该分支语义被主线超集吸收
-- `feature/signal-intent-understanding-prebrainstorm-20260320-0400`
-  - disposition: `retire-now`
-  - reason: 当前 sweep 已包含 `signal-intent-understanding` skill、handler、测试与 manager routing contract；旧分支已被超集吸收
-- `feature/candidate-acceptance-review-governance-20260320-0505`
-  - disposition: `merge-up`
-  - reason: 已被当前 sweep 上游治理链吸收并退休
-- `feature/milestone-planning-state-maintenance-20260320-0515`
-  - disposition: `merge-up`
-  - reason: 已被当前 sweep 上游治理链吸收并退休
-- `feature/wechat-article-research-20260320-0605`
-  - disposition: `research-writeback-then-retire`
-  - reason: 已吸收 time-machine/shared-continuity candidate 并退休
-- `feature/subagent-delegation-governance-20260320-0730`
-  - disposition: `retire-now`
-  - reason: 当前 sweep 已包含更高层的 manager patrol、multi-worktree supervision 与 worktree governance；旧分支治理意图已被超集吸收
-
-- `feature/worktree-maintenance-merge-chain-governance-20260321-1045`
-  - disposition: `merge-up`
-  - reason: 已通过 `feature/worktree-fleet-governance-audit-20260321` 吸收到当前 sweep branch；cleanup 仍等待 develop-facing promote
-- `feature/manager-reactivation-and-fleet-patrol-20260321`
-  - disposition: `merge-up`
-  - reason: 本轮已直接并入当前 sweep branch；cleanup 仍等待 develop-facing promote
-- `feature/worktree-fleet-governance-audit-20260321`
-  - disposition: `merge-up`
-  - reason: 本轮已直接并入当前 sweep branch；其 `fleet_closure` / stacked merge / cc-codex runtime 治理内容已被吸收
-- `feature/merge-prep-cc-codex-runtime-20260321-1005`
-  - disposition: `merge-up`
-  - reason: 已被 `feature/worktree-fleet-governance-audit-20260321` 吸收，并随本轮 sweep 进入 develop-facing integration branch
-- `feature/research-codex-in-cc-mcp`
-  - disposition: `merge-up`
-  - reason: 已被上游 merge-prep 工位吸收，并随本轮 sweep 进入 develop-facing integration branch
-- `feature/cc-runtime-codex-mcp-20260320-2017`
-  - disposition: `merge-up`
-  - reason: 子分支内容已被父 research 分支与后续 merge-prep / fleet-audit 链吸收；cleanup 仍等待 develop-facing promote
+  - reason: clean research branch；pre-brainstorm payload 仍未被上游吸收
+- `feature/worktree-governance-fleet-audit-20260322`
+  - disposition: `active-audit-companion`
+  - reason: 仍有未吸收的 `CONVERGENCE` 写回；待当前 closure 工位吸收后再判断退役
+- `C-20260322-1615-A`
+  - disposition: `new-pre-brainstorm-candidate`
+  - reason: `post-merge acceptance` 的 protected verification routing / promotion guard 缺口已被正确回流成新生命周期
 
 ## Actions Executed This Round
 
-- 创建 develop-facing integration branch：`feature/worktree-fleet-governance-sweep-20260321`
-- 合并并吸收：
-  - `feature/manager-reactivation-and-fleet-patrol-20260321`
-  - `feature/worktree-fleet-governance-audit-20260321`
-  - `feature/evolver-autonomy-integration-20260310-0056`
-  - `feature/human-chat-intake-supervision-20260319-1030`
-  - `feature/prebrainstorm-human-chat-canonical-20260320-0023`
-  - `feature/research-openai-symphony-20260319-0500`
-  - `feature/research-harness-engineering-20260319`
-  - `feature/wechat-article-research-20260320-0605`
-  - `feature/cli-tui-input-interruption-20260319-2310`
-  - `feature/architecture-synthesis-prebrainstorm-20260312-001104`
-- superseded cleanup / governance 工位已退休
-- 当前正式项目 fleet 已收敛为：
-  - `develop`
-  - `feature/worktree-fleet-governance-sweep-20260321`
+- 更新 `fleet_closure` evidence，使其从旧的 sweep-era snapshot 对齐到 `2026-03-22` 当前 fleet 真相
+- 将 `cli-first` / `manager-handoff` 的 closeout 结果吸收到 closure evidence，明确它们是 `ready-for-manager-merge` 而非 `blocked dirty`
+- 将 protected `post-merge acceptance` 的 promote / replay / cleanup gap 回流到新 pre-brainstorm `C-20260322-1615-A`
+- 保持 `runtime-worker-launch-linkage` 与其他未完成工位继续走各自生命周期，而不是强行并入 cleanup
 
 ## Verification
 
 - `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
-- `bash docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
-- `bash docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
 - `./bin/wt-status-all`
 
 ## Residual Risks
 
-- sweep 仍未正式 merge 到 `develop`；按保护规则，需要在 promote gate 通过后完成最终向上合并。
-- detached Codex 临时树不在 Freely canonical cleanup 生命周期内。
+- 当前 fleet 仍有 3 个 dirty worktree：`runtime-worker-launch-linkage`、当前 `fleet-closure` 工位，以及 `fleet-audit` companion。
+- `cli-first` 与 `manager-handoff` 已 ready for manager merge，但在被上游吸收前仍不能 cleanup。
+- `protected post-merge acceptance` 的 promote policy 仍停留在 pre-brainstorm，尚未 materialize 为独立 issue / gate 实现。

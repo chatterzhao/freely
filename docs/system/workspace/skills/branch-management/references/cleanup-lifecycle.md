@@ -6,6 +6,7 @@
   - merged
   - inactive
   - target clean
+- `issue phase_state=completed` 只表示业务实现/验收已收口；若 cleanup / continuity / verification write-back 仍停留在该 feature worktree 的 dirty 改动中，则这条 branch lifecycle 仍未完成
 - 若存在 unrelated dirty 或 busy worktree，不作为全局阻断；必须在 cleanup evidence 中显式记录为 retained / skipped
 - 合并后不要立即删除分支/worktree
 
