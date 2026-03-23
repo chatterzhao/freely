@@ -58,3 +58,16 @@
 - 这不是历史 closeout
 - 这是 `0445` post-merge acceptance 发现的新 runtime/acceptance gap
 - 应进入新的 issue 生命周期，不应回写 `0445` 的已实现 scope
+
+## Reroute decision
+
+- The governance boundary part of this finding now depends on:
+  - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
+- That governance issue owns:
+  - `pre-test-merge` role boundaries
+  - stale/retire/rebuild semantics
+  - promote vs replay rules
+- This `0715` lifecycle remains independently active because its core gap is narrower and more runtime-specific:
+  - delegated acceptance continuation has entered the manager prompt
+  - but the manager does not emit the next continuity/decision in bounded time
+- Therefore this worktree should not be retired or absorbed wholesale; it should continue as a rerouted, dependency-aware candidate.

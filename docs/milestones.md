@@ -400,6 +400,17 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先把本地可选 sidecar 的最小职责边界、review / validation / rollback gate 和不接管主 runtime 的约束写稳，再决定是否 materialize 成独立 issue
 - revisit_trigger: 当 sidecar 的职责边界、review/validation/rollback gate 与“不接管主 runtime”约束可以被冻结成最小 issue contract 时，重新进入 materialization 判断
 
+9. `C-20260322-0715-A`
+- title: Detect and recover pre-test-merge manager acceptance stalls after delegated continuation
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://pre-test-merge-acceptance-stall-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/candidates.md`
+- next_action: 保持 active candidate；先依赖 `pre-test-merge` 治理 issue 冻结 protected-env 生命周期语义，再把 delegated acceptance continuation stall materialize 成独立 runtime/orchestration issue
+- revisit_trigger: 当治理 issue 稳定 `pre-test-merge` 边界后，或真实 post-merge acceptance 再次复现 delegated continuation stall 时，重新进入 issue materialization 判断
+
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛
 - milestone_state: candidate

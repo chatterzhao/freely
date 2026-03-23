@@ -3,9 +3,11 @@
 - id: `C-20260322-0715-A`
 - title: Detect and recover pre-test-merge manager acceptance stalls after delegated continuation
 - source_brainstorm: `docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/brainstorms.md`
-- status: `proposed`
+- status: `needs_research`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `pending://pre-test-merge-acceptance-stall-materialization`
+- depends_on:
+  - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
 - session_refs: []
 - why_now:
   - `I-20260322-0445` 的真实 post-merge acceptance 已经把 delegated continuation 注入 prompt
@@ -18,3 +20,12 @@
 - acceptance_hint:
   - real post-merge acceptance no longer remains indefinitely at `current_prompt_has_delegated_continuation=1` with no new manager continuity
   - runtime can surface or recover this stall instead of leaving acceptance hanging
+- decision_reason:
+  - boundary-governance for `pre-test-merge` now routes through the dedicated governance issue
+  - this candidate remains active because the concrete acceptance-stall detection and recovery contract is still unresolved
+- next_action:
+  - keep this candidate visible while the governance issue stabilizes protected-env lifecycle semantics
+  - then materialize a separate runtime/orchestration issue for delegated acceptance stall detection and recovery
+- revisit_trigger:
+  - after the governance issue freezes `pre-test-merge` role/stale semantics
+  - or earlier if another post-merge acceptance run reproduces the same delegated-continuation stall
