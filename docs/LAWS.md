@@ -41,6 +41,9 @@
 11. `in_dev` issue 不得无限期累积脏树；当当前 worktree 进入 checkpoint 预警或阻断预算时，下一轮必须先更新对应 continuity artifact，并优先切出 checkpoint commit 或按 ownership 分流到其他 dedicated worktree。
 12. runtime/status 必须暴露当前 project dirty entries 与项目级 worktree dirty summary，供多 worktree 监督与 promotion 决策使用。
 13. 若当前工位已通过最小验证门，但仍持续扩写实现而不形成 checkpoint commit / checkpoint note，视为自治治理退化，不得宣称“工作正常”。
+14. `pre-test-merge` 作为临时预集成批次时，若 `develop` 已前进到使其不再权威、或批次出现 protected-env 独有差异、或 promotion/cleanup 证据断裂，则该批次应被判定为 stale 并进入退役/重建流程。
+15. `pre-test-merge` 的 promotion 默认回到来源 feature 的已验证结果；保留旧批次快照不是默认真相面，只有在当前批次仍然权威时才可继续消费。
+16. 若 stale 的 `pre-test-merge` 仍需继续验证，必须先 retire 当前批次，再 replay 来源 feature 或当前已验证上游重建新的验证批次。
 
 最小验收证据：
 - 分支来源与合并路径记录（若经过 `pre-test-merge`，需包含 replay 到 `develop` 的来源 feature 顺序，以及该批次的 retire / rebuild 结论）

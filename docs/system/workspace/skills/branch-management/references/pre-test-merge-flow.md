@@ -33,6 +33,13 @@
    - 需要主线前验证时，使用 `pre-test-merge`
    - 需要主线后真实环境确认时，才在 `develop` 做 completion verification
 
+## Batch freshness and replay
+
+1. `pre-test-merge` 批次只有在当前仍然权威时才可作为验证面消费。
+2. 若 `develop` 已继续前进、批次出现 protected-env 独有差异，或 promotion / cleanup 证据断裂，该批次就应视为 stale。
+3. stale 批次必须先 retire，再决定是否重建；不能继续把旧批次快照当成当前真相面。
+4. 若同一能力仍需继续验证，默认做法是 replay 来源 feature 到新的 `pre-test-merge` 批次，而不是保留旧批次快照作为 promote 单位。
+
 ## Post-merge acceptance environment
 
 1. 若 issue 的 `pre-tests.md` 显式声明 `post-merge acceptance`，先看它的 `integration_target`：

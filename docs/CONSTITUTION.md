@@ -29,6 +29,8 @@ Freely 是一个自主循环运行器：
   - 预测试 merge：把来源 `feature/*` 临时合入同一批次，暴露组合冲突与集成问题
 - 允许多功能预演而不污染 `develop`。
 - 在这两类职责里发现问题，都必须回到来源 `feature/*` 或新的 dedicated feature worktree 修复；不得在 `pre-test-merge` 上直接改实现。
+- 只有当前批次仍具备权威性时，它才是可消费的验证面；若 `develop` 已继续前进、批次出现 protected-env 独有差异，或 promotion/cleanup 证据断裂，该批次就应被判定为 stale。
+- stale 批次必须退休；如果同一能力仍需继续验证，应从来源 feature replay 到新的 `pre-test-merge` 批次，而不是继续把旧批次快照当成当前真相。
 - 验证完成或失败后必须退出本轮职责，不得继续承担默认 `feature/*` 父分支角色。
 
 2. 合并纪律：
@@ -37,6 +39,7 @@ Freely 是一个自主循环运行器：
 - `develop` 是功能交付的默认目标分支；进入 `develop` 前必须满足要求的 `TEST`、评审与进度/恢复证据。
 - `pre-test-merge` 仅作为临时验证路径；当它被启用时，进入 `develop` 的验证结果必须可追溯到该验证批次，但 `develop` 不直接吸收 `pre-test-merge` 分支本身。
 - `develop` 不得承担“尚未进入主线前的预测试环境”职责；需要主线前集成验证时，应使用 `pre-test-merge`，而不是在 `develop` 上先做预检。
+- `pre-test-merge` 的 promotion 默认围绕来源 feature 的已验证结果，而不是保留旧批次快照；若当前批次已 stale，先 retire / rebuild，再决定是否继续 promote。
 - 提升前的具体验收门与证据口径由 `docs/LAWS.md` 第 2 章定义。
 - `PRE_TEST` 与 `TEST` 的职责边界由 `docs/LAWS.md` 第 2 章与第 11 章定义。
 - 若为高风险集成而先进入 `pre-test-merge`，验证通过后必须 replay 来源 `feature/*` 并入 `develop`；不得把 `pre-test-merge` 作为直接 merge 到 `develop` 的载体。若直接进入 `develop`，不得伪造 `pre-test-merge` 验证祖先要求。
