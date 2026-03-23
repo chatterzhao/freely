@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-ai-account-watchdog-and-manager-bootstrap`
@@ -93,11 +93,10 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 ## Next
 
-- 保持 `in_verification`。
+- 当前 verification batch 已在 dedicated feature worktree 中完成并具备 promote 条件。
 - 当前 watchdog 已作为 Freely 正式能力落地：CLI 入口、runtime orchestration、availability watchdog skill 模块与角色/测试接线均已存在。
 - 当前 feature worktree `feature/codex-account-cooldown-active-probe` 承接的是同一 issue 的 verification batch，不再单独 materialize 新 issue；该 batch 已 replay 到 `develop` 并通过 post-merge acceptance，后续若继续扩 outer watchdog/productization，需新开 dedicated feature worktree。
 - 当前 batch 的下一步是：
-  - 在 dedicated feature worktree 内完成 verification writeback 与提交
-  - 再决定是否 promote 到 `develop`
-  - 只有 merge 之后才讨论是否需要受保护分支上的 post-merge acceptance
+  - replay 到 `develop`
+  - 若 `develop` 真实环境再暴露新问题，则新开 dedicated feature worktree 承接，而不是在 protected worktree 直接修实现
 - 后续若继续演进，应聚焦更外层 target registry / independent daemon 产品化，而不是回退到“watchdog 只等于切号器”的旧模型。
