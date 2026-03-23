@@ -259,15 +259,25 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
 - next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
 
-21. `I-20260322-1801`
+### completed_issues
+
+1. `I-20260322-1801`
 - title: pre-test-merge responsibility, usage, and lifecycle governance
-- milestone_state: committed
-- phase_state: `in_ibm`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
-- next_action: 当前已从 pre-brainstorm 进入 IBM，先把 `pre-test-merge` 的职责、允许/禁止操作、stale/retire/rebuild 语义和 replay 默认策略写稳；后续 runtime/status 能力化仍由 `C-20260322-1801-B` 继续承接
+- evidence:
+  - `docs/CONSTITUTION.md`
+  - `docs/LAWS.md`
+  - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`
+  - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
+  - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
+  - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
+- completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
+
 ### candidate_issues
 
 1. `C-20260318-0715-A`

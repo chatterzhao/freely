@@ -27,6 +27,7 @@
 - adoption_type: `supporting_evidence`
 - decision_reason: the audit confirmed that the remaining gap is governance/lifecycle, not a direct runtime rollback. That problem is now owned by the formal governance issue instead of this audit worktree.
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
+- milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1802--pre-test-merge-semantic-audit-and-recovery/brainstorms.md`
 - session_refs:
   - tool: `codex`

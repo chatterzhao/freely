@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260322-1801`
 - title: pre-test-merge responsibility, usage, and lifecycle governance
-- phase_state: `in_ibm`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `pre-test-merge-responsibility-usage-and-lifecycle-governance`
@@ -18,6 +18,11 @@
   - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`
   - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
   - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
+- session_refs:
+  - tool: `codex`
+    session_id: `current-thread`
+    jsonl_path: `unavailable://codex-thread-only`
+    role: `author`
 
 ## Why
 
@@ -63,6 +68,7 @@ Freely 这次不是遇到一次性 merge 事故，而是暴露出 `pre-test-merg
 - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`
 - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
+- `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
 - `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
 - `docs/milestones.md`
 
