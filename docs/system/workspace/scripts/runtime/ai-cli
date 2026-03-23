@@ -277,8 +277,28 @@ cmd_switch() {
 }
 
 # 自动探测并切换 codex 账号
+run_dir_for_project() {
+  local project="$1"
+  printf '%s\n' "$project/.freely/run"
+}
+
+codex_account_cooldown_file() {
+  local project="$1"
+  printf '%s\n' "$(run_dir_for_project "$project")/codex-account-cooldowns.tsv"
+}
+
+ai_cli_bin_for_project() {
+  local project="$1"
+  if [[ -x "$project/bin/ai" ]]; then
+    printf '%s\n' "$project/bin/ai"
+    return 0
+  fi
+  printf '%s\n' "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)/bin/ai"
+}
+
 _cmd_switch_auto_codex() {
   local project="${PROJECT_ROOT:-$(pwd)}"
+  local tool="codex"
 
   # Source watchdog functions
   local watchdog_script=""
@@ -305,8 +325,7 @@ _cmd_switch_auto_codex() {
     usable:*)
       local account="${result#usable:}"
       log_info "Found usable account: $account"
-      # 切换到可用账号
-      _do_switch_codex "$account"
+      _do_switch_codex "$tool" "$account"
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$account\", \"status\": \"usable\"}"
       fi
@@ -318,8 +337,7 @@ _cmd_switch_auto_codex() {
       local human_time
       human_time="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo "$reset_at")"
       log_warn "All accounts rate limited. Earliest available: $account at $human_time"
-      # 切换到最早恢复的账号
-      _do_switch_codex "$account"
+      _do_switch_codex "$tool" "$account"
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$account\", \"status\": \"rate_limited\", \"reset_at\": $reset_at, \"reset_at_human\": \"$human_time\"}"
       fi
@@ -338,26 +356,15 @@ _cmd_switch_auto_codex() {
   esac
 }
 
-# 实际执行切换（不包含探测逻辑）
+# 实际执行切换（不包含探测逻辑），但复用显式切号路径的校验和 dry-run 语义。
 _do_switch_codex() {
-  local account="$1"
-  local dirname=$(account_to_dirname "$account")
-  local source_dir="$AUTH_DIR/codex-$dirname"
-  local target_file="$HOME/.codex/auth.json"
-
-  if [[ ! -d "$source_dir" ]]; then
-    log_error "Account '$account' not found in auth backup"
-    return 1
-  fi
-
-  # 切换前同步当前 token
-  if [[ -f "$target_file" ]]; then
-    sync_current_auth "codex"
-  fi
-
-  cp "$source_dir/auth.json" "$target_file"
-  log_info "Switched codex to account: $account"
-  log_warn "Restart codex for the change to take effect"
+  local tool="$1" account="$2"
+  local old_format="$FORMAT"
+  FORMAT="text"
+  cmd_switch "$tool" "$account"
+  local rc=$?
+  FORMAT="$old_format"
+  return $rc
 }
 
 # 列出 accounts

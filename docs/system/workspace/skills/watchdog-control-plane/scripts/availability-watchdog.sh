@@ -177,16 +177,18 @@ select_earliest_reset_codex_account_any() {
   fi
 }
 
-# Probe current codex account with proxy support and timeout
-# Returns:
-#   0 + stdout empty: success, account is usable
-#   0 + stdout non-empty: rate limited, stdout contains reset_at timestamp
-#   1: other error (timeout, network, etc.)
+# Probe current codex account with proxy support and timeout.
+# Output format:
+#   usable
+#   rate_limited:<reset_at>
+# Exit code:
+#   0 for usable or rate limited
+#   1 for other probe failures
 codex_probe_current_account_now() {
   local project="$1" prompt_file output_file rc timeout_secs="${CODEX_PROBE_TIMEOUT:-15}"
   prompt_file="$(mktemp)"
   output_file="$(mktemp)"
-  printf 'Reply with exactly: OK\n' >"$prompt_file"
+  printf 'hi\n' >"$prompt_file"
   rc=0
 
   # Run codex exec with proxy and timeout
@@ -241,42 +243,42 @@ codex_probe_current_account_now() {
   output="$(cat "$output_file")"
   rm -f "$output_file"
 
-  # Check for success
-  if [[ "$rc" -eq 0 ]] && printf '%s\n' "$output" | rg -q '^OK$'; then
+  # Check for success.
+  if [[ "$rc" -eq 0 ]]; then
+    printf 'usable\n'
     return 0
   fi
 
-  # Check for rate limit
+  # Check for rate limit.
   if printf '%s\n' "$output" | grep -qi "usage limit\|try again"; then
     local reset_at
     reset_at="$(extract_try_again_time_from_output "$output")"
-    if [[ -n "$reset_at" ]]; then
-      printf '%s\n' "$reset_at"
-    fi
-    return 0  # Return 0 to signal we have rate limit info
+    [[ -n "$reset_at" ]] || return 1
+    printf 'rate_limited:%s\n' "$reset_at"
+    return 0
   fi
 
-  return 1  # Other error
+  return 1
 }
 
 probe_any_usable_codex_account_now() {
-  local project="$1" candidate reset_at
+  local project="$1" candidate probe_result reset_at
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
     switch_to_codex_account "$project" "$candidate" "probe_saved_accounts" >/dev/null || continue
 
-    reset_at="$(codex_probe_current_account_now "$project")"
-    local probe_rc=$?
-
-    if [[ $probe_rc -eq 0 && -z "$reset_at" ]]; then
-      # Success: account is usable
+    probe_result="$(codex_probe_current_account_now "$project")" || continue
+    case "$probe_result" in
+      usable)
       codex_clear_account_cooldown "$project" "$candidate"
       printf '%s\n' "$candidate"
       return 0
-    elif [[ -n "$reset_at" ]]; then
-      # Rate limited: record cooldown
-      codex_record_account_cooldown "$project" "$candidate" "$reset_at"
-    fi
+      ;;
+      rate_limited:*)
+        reset_at="${probe_result#rate_limited:}"
+        codex_record_account_cooldown "$project" "$candidate" "$reset_at"
+        ;;
+    esac
   done < <(codex_saved_accounts "$project")
 }
 
@@ -287,7 +289,7 @@ probe_any_usable_codex_account_now() {
 #   none                       - No accounts saved or all failed without rate limit info
 probe_all_codex_accounts_and_update_cooldown() {
   local project="$1"
-  local candidate reset_at probe_rc
+  local candidate probe_result reset_at
   local usable_account=""
   local earliest_account="" earliest_reset=""
 
@@ -295,23 +297,21 @@ probe_all_codex_accounts_and_update_cooldown() {
     [[ -n "$candidate" ]] || continue
     switch_to_codex_account "$project" "$candidate" "probe_all_accounts" >/dev/null || continue
 
-    reset_at="$(codex_probe_current_account_now "$project")"
-    probe_rc=$?
-
-    if [[ $probe_rc -eq 0 && -z "$reset_at" ]]; then
-      # Success: account is usable
-      codex_clear_account_cooldown "$project" "$candidate"
-      usable_account="$candidate"
-      # Don't return immediately - continue probing to update all cooldowns
-    elif [[ -n "$reset_at" ]]; then
-      # Rate limited: record cooldown
-      codex_record_account_cooldown "$project" "$candidate" "$reset_at"
-      # Track earliest available
-      if [[ -z "$earliest_reset" || "$reset_at" -lt "$earliest_reset" ]]; then
-        earliest_account="$candidate"
-        earliest_reset="$reset_at"
-      fi
-    fi
+    probe_result="$(codex_probe_current_account_now "$project")" || continue
+    case "$probe_result" in
+      usable)
+        codex_clear_account_cooldown "$project" "$candidate"
+        usable_account="$candidate"
+        ;;
+      rate_limited:*)
+        reset_at="${probe_result#rate_limited:}"
+        codex_record_account_cooldown "$project" "$candidate" "$reset_at"
+        if [[ -z "$earliest_reset" || "$reset_at" -lt "$earliest_reset" ]]; then
+          earliest_account="$candidate"
+          earliest_reset="$reset_at"
+        fi
+        ;;
+    esac
   done < <(codex_saved_accounts "$project")
 
   # Return results

@@ -73,7 +73,12 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - 最新验证事实：
   - 官方帮助中心与 rate-limit 文档没有提供“多个本地保存 Codex 账号当前可用性查询”的直接接口，因此 Freely 采用脚本真实 probe 方案
   - `test-ai-cli-switch-default-tool` 已覆盖默认 `codex` 切号 UX 与切后真实账号校验
+  - `test-freely-ai-account-switch` 已覆盖 `freely ai switch codex` 在未显式指定账号时主动 probe 所有已保存账号，并验证：
+    - 找到可用账号时切到可用账号
+    - 全部限流时切到最早恢复账号
+    - probe 期间显式带代理并写回 cooldown 账本
   - `test-freely-ensure-manager` 已覆盖“先选可用账号再拉主管”的脚本回归
+  - `test-freely-rate-limit-defers-to-watchdog` 继续通过，证明主动 probe 收敛后，本地 runtime 仍把 rate-limit 恢复交给 watchdog，而不是回退到本地睡眠
   - `watchdog-control-plane` 与 `ai-cli-availability-manager` 已把 availability watchdog 定义成可复用 skill 层；`runtime/freely` 现通过 `source "$WATCHDOG_AVAILABILITY_LIB"` 复用同一套 account cooldown / probe / switch / ensure-manager readiness 逻辑
   - `test-watchdog-control-plane-skills` 已覆盖 watchdog skill 是否被 runtime 与 agent 角色正式接线
   - `freely ensure-manager` 当前在 watchdog 拉起主管前，会写 manager bootstrap handoff，告知 limit/切号/恢复原因及主管优先检查面
@@ -86,4 +91,5 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 - 保持 `in_verification`。
 - 当前 watchdog 已作为 Freely 正式能力落地：CLI 入口、runtime orchestration、availability watchdog skill 模块与角色/测试接线均已存在。
+- 当前 feature worktree `feature/codex-account-cooldown-active-probe` 承接的是同一 issue 的 verification batch，不再单独 materialize 新 issue；下一步是从该 feature worktree replay 到 `develop` 并完成 post-merge acceptance。
 - 后续若继续演进，应聚焦更外层 target registry / independent daemon 产品化，而不是回退到“watchdog 只等于切号器”的旧模型。

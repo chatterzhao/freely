@@ -2923,3 +2923,55 @@
 - post_cleanup_status:
   - `./bin/wt-status-all` -> `total=9`, `dirty=3`
   - local fleet now excludes the three retired worktrees above
+
+## 变更（2026-03-22 codex account active probe closeout check）
+
+### worktree audit
+- audit_time: `2026-03-22 21:34:43 PDT`
+- commands:
+  - `git branch --show-current`
+  - `git worktree list`
+  - `./bin/wt-status-all`
+  - `git status --short --branch`
+- current_main_worktree:
+  - branch: `develop`
+  - disposition: `protected-no-write`
+  - evidence: `## develop...origin/develop [ahead 69]`
+- active_feature_worktree:
+  - branch: `feature/codex-account-cooldown-active-probe`
+  - path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260323-feature-codex-account-cooldown-active-probe`
+  - disposition: `active-closeout-target`
+  - evidence: `./bin/wt-status-all` reported `dirty=1`, and the only dirty worktree is this feature branch
+- integration_buffer:
+  - branch: `pre-test-merge`
+  - disposition: `clean-idle`
+
+### convergence result
+- scope:
+  - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
+  - `docs/system/workspace/scripts/runtime/ai-cli`
+  - `docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
+  - `docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog`
+  - `docs/pre-brainstorms/20260323-1135--codex-account-active-probe-governance/*`
+- closeout_decision: `retain-as-active-feature`
+- reason:
+  - 当前收口目标不是 cleanup/retire，而是确认该 feature worktree 已形成可验证的 checkpoint
+  - 主工作树仍在 `develop`，不能直接写入；本轮只在 dedicated feature worktree 留痕
+  - 新增 pre-brainstorm 结构已从单文件 `README.md` 收敛为 `brainstorms.md` + `candidates.md`
+  - `C-20260323-1135-A` 不再作为独立 issue 候选悬挂，已吸收到 `I-20260318-1630`
+
+### verification evidence
+- `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
+  - result: `PASS`
+- `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog`
+  - result: `PASS`
+  - note: 首次单跑曾出现一次 `expected local runtime to defer rate-limit recovery instead of sleeping locally`，随后重复执行 8 次均通过，当前更像时序抖动而非稳定回归
+- `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
+  - result: `PASS`
+- `./bin/governance-check`
+  - result: `passed with 10 warnings`
+  - note: warning 仅为历史 pre-brainstorm 目录命名格式，不属于本次改动新增阻塞
+
+### next action
+- 在当前 feature worktree 内整理为 checkpoint commit，再 replay 到 `develop` 做 completion verification
+- 若后续再次复现 `test-freely-rate-limit-defers-to-watchdog` 的偶发失败，优先补时序稳定性证据，而不是回退主动 probe 语义
