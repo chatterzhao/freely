@@ -89,6 +89,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   >/dev/null
 
 CONFIG_FILE_CODEX="$PROJECT_CC_CODEX/.freely/config.env"
+CODEX_CONFIG_FILE="$PROJECT_CC_CODEX/.codex/config.toml"
 grep -q '^AI_TOOL="cc-use-codex-cli"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_MODE="auto"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE_CODEX"
@@ -98,6 +99,8 @@ grep -q '^AI_CAPABILITY_CODEX_MODEL="gpt-5.4"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_CAPABILITY_CODEX_SANDBOX="workspace-write"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_CAPABILITY_CODEX_APPROVAL_POLICY="never"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_CAPABILITY_CODEX_CWD_MODE="project-root"$' "$CONFIG_FILE_CODEX"
+test -f "$CODEX_CONFIG_FILE"
+grep -Fq "writable_roots = [\"$PROJECT_CC_CODEX-worktrees\"]" "$CODEX_CONFIG_FILE"
 
 STATUS_OUTPUT_CODEX="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
 printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^ai: cc-use-codex-cli:default:auto$'
