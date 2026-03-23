@@ -91,5 +91,5 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 - 保持 `in_verification`。
 - 当前 watchdog 已作为 Freely 正式能力落地：CLI 入口、runtime orchestration、availability watchdog skill 模块与角色/测试接线均已存在。
-- 当前 feature worktree `feature/codex-account-cooldown-active-probe` 承接的是同一 issue 的 verification batch，不再单独 materialize 新 issue；下一步是从该 feature worktree replay 到 `develop` 并完成 post-merge acceptance。
+- 当前 feature worktree `feature/codex-account-cooldown-active-probe` 承接的是同一 issue 的 verification batch，不再单独 materialize 新 issue；该 batch 已 replay 到 `develop` 并通过 post-merge acceptance，后续若继续扩 outer watchdog/productization，需新开 dedicated feature worktree。
 - 后续若继续演进，应聚焦更外层 target registry / independent daemon 产品化，而不是回退到“watchdog 只等于切号器”的旧模型。

@@ -2975,3 +2975,20 @@
 ### next action
 - 在当前 feature worktree 内整理为 checkpoint commit，再 replay 到 `develop` 做 completion verification
 - 若后续再次复现 `test-freely-rate-limit-defers-to-watchdog` 的偶发失败，优先补时序稳定性证据，而不是回退主动 probe 语义
+
+### cleanup evidence
+- promote_result:
+  - replay_target: `develop`
+  - merge_commit_on_develop: `3a41c0d`
+  - merge_mode: `git merge --no-ff feature/codex-account-cooldown-active-probe`
+- post_merge_acceptance:
+  - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` -> `PASS`
+  - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog` -> `PASS`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager` -> `PASS`
+  - `./bin/governance-check` -> `passed with 10 historical naming warnings`
+- lifecycle_state: `verified-retirable`
+- retire_target:
+  - branch: `feature/codex-account-cooldown-active-probe`
+  - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260323-feature-codex-account-cooldown-active-probe`
+  - remote: `not-present`
