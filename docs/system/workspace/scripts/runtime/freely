@@ -406,7 +406,7 @@ find_latest_prompt_file_for_project() {
 
 find_latest_manager_continuity_file_for_project() {
   local project="$1"
-  latest_run_artifact_for_project "$project" 'manager-continuity-*.md'
+  latest_launchable_manager_continuity_file_for_project "$project"
 }
 
 ps_command_for_pid() {
@@ -1685,7 +1685,7 @@ request_local_continuation_reentry() {
 
 latest_manager_continuity_file_for_project() {
   local project="$1"
-  find "$(run_dir_for_project "$project")" -maxdepth 1 -type f -name 'manager-continuity-*.md' | sort | tail -n 1
+  latest_launchable_manager_continuity_file_for_project "$project"
 }
 
 latest_cycle_log_for_project() {
@@ -1703,6 +1703,85 @@ latest_manager_worker_prompt_paths_from_continuity() {
   local continuity_file="$1"
   [[ -f "$continuity_file" ]] || return 0
   rg -o '/[^` ]+/.freely/run/worker-prompts/[^` ]+\.txt' "$continuity_file" | sort -u
+}
+
+worker_prompt_target_branch() {
+  local prompt_file="$1"
+  [[ -f "$prompt_file" ]] || return 0
+  awk '
+    /^- branch: / {
+      value=$0
+      sub(/^- branch: `/, "", value)
+      sub(/`$/, "", value)
+      print value
+      exit
+    }
+  ' "$prompt_file"
+}
+
+worktree_path_for_branch() {
+  local project="$1" target_branch="$2"
+  [[ -n "$target_branch" ]] || return 0
+  git -C "$project" worktree list --porcelain 2>/dev/null | awk -v target="refs/heads/$target_branch" '
+    /^worktree / { wt=substr($0, 10); next }
+    /^branch / {
+      if ($2 == target) {
+        print wt
+        exit
+      }
+    }
+  '
+}
+
+worker_prompt_resolved_worktree() {
+  local manager_project="$1" prompt_file="$2"
+  local target_worktree target_branch
+  target_worktree="$(worker_prompt_target_worktree "$prompt_file")"
+  if [[ -n "$target_worktree" && -d "$target_worktree" ]]; then
+    printf '%s\n' "$target_worktree"
+    return 0
+  fi
+  target_branch="$(worker_prompt_target_branch "$prompt_file")"
+  if [[ -n "$target_branch" ]]; then
+    worktree_path_for_branch "$manager_project" "$target_branch"
+  fi
+}
+
+worker_prompt_launchable_for_manager_project() {
+  local manager_project="$1" prompt_file="$2" resolved_worktree
+  resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+  [[ -n "$resolved_worktree" && -d "$resolved_worktree" ]]
+}
+
+manager_continuity_has_worker_prompts() {
+  local continuity_file="$1"
+  [[ -n "$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")" ]]
+}
+
+manager_continuity_is_launchable_for_project() {
+  local project="$1" continuity_file="$2" prompt_file
+  [[ -f "$continuity_file" ]] || return 1
+  if ! manager_continuity_has_worker_prompts "$continuity_file"; then
+    return 0
+  fi
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    if worker_prompt_launchable_for_manager_project "$project" "$prompt_file"; then
+      return 0
+    fi
+  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  return 1
+}
+
+latest_launchable_manager_continuity_file_for_project() {
+  local project="$1" continuity_file
+  while IFS= read -r continuity_file; do
+    [[ -f "$continuity_file" ]] || continue
+    if manager_continuity_is_launchable_for_project "$project" "$continuity_file"; then
+      printf '%s\n' "$continuity_file"
+      return 0
+    fi
+  done < <(find "$(run_dir_for_project "$project")" -maxdepth 1 -type f -name 'manager-continuity-*.md' | sort -r)
 }
 
 latest_manager_worker_prompt_csv_from_continuity() {
@@ -1778,7 +1857,7 @@ ensure_runtime_workcell_initialized_for_launch() {
 launch_worker_from_manager_prompt_if_needed() {
   local manager_project="$1" prompt_file="$2"
   local target_project intake_id supervisor_pid ai_pid
-  target_project="$(worker_prompt_target_worktree "$prompt_file")"
+  target_project="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   [[ -n "$target_project" && -d "$target_project" ]] || return 1
   ensure_runtime_workcell_initialized_for_launch "$target_project" || return 1
   intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"

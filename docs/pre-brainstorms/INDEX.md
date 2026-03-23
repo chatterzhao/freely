@@ -1,5 +1,6 @@
 # 预研头脑风暴索引
 - 20260323-1435--interactive-init-bootstrap-and-force-governance
+- 20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion
 - 20260323-1135--codex-account-active-probe-governance
 - 20260322-1802--pre-test-merge-semantic-audit-and-recovery
 - 20260322-1801--pre-test-merge-governance-lifecycle
@@ -47,6 +48,9 @@
 - 20260323-1435--interactive-init-bootstrap-and-force-governance
   - brainstorms: docs/pre-brainstorms/20260323-1435--interactive-init-bootstrap-and-force-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260323-1435--interactive-init-bootstrap-and-force-governance/candidates.md
+- 20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion
+  - brainstorms: docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/candidates.md
 - 20260323-1135--codex-account-active-probe-governance
   - brainstorms: docs/pre-brainstorms/20260323-1135--codex-account-active-probe-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260323-1135--codex-account-active-probe-governance/candidates.md
