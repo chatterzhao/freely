@@ -26,6 +26,7 @@
 - `git merge-base --is-ancestor HEAD develop`
 - `git fetch origin --prune`
 - `git branch -r --list 'origin/feature/cli-first-observability-surfaces-20260322'`
+- `git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop`
 
 ## Cleanup Followthrough
 
@@ -43,6 +44,17 @@
 - canonical_gap_fixed:
   - 当前 worktree 中的 `docs/milestones.md` 已将 `I-20260322-0115` 从 `committed_issues` 移除，只保留 `completed_issues` canonical entry
   - 当前 worktree 中的 issue / progress 已从“verified-retirable”改写为当前真实的 salvage-pending 状态，并反映 rebase 后的最新 branch事实
+- audit_refresh_2026_03_22:
+  - source candidate `C-20260322-0115-A` 仍保持 `promoted`，没有新的 candidate / issue closure gap
+  - 当前 dirty 文件只包含 issue / progress / review / milestone 四个 canonical closure artifacts，因此这轮属于 retirement writeback，不是新实现
+- post_merge_acceptance_2026_03_22:
+  - `bash -n docs/system/workspace/scripts/runtime/freely` 通过
+  - `bash docs/system/workspace/scripts/tests/test-freely-chat-and-tui` 通过
+  - `bash docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation` 通过
+  - `./bin/governance-check` 通过，仅剩 10 条 legacy pre-brainstorm naming warning
+  - `git merge-base --is-ancestor HEAD develop` 返回 `1`，说明 `HEAD` 仍未被 `develop` 吸收
+  - `git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` 返回 `3 0`，说明当前 feature branch 仍领先 `develop` 3 个 closure writeback 提交
+  - `git branch -r --list 'origin/feature/cli-first-observability-surfaces-20260322'` 为空，说明远程同名 branch 仍不存在
 - residual_action:
   - 先把当前 branch tip 上的 docs closure writeback 吸收到 canonical `develop`，再由 supervisor/runtime 在 worktree 外执行最终 branch/worktree cleanup
 

@@ -86,6 +86,14 @@ Freely 已经有：
   - `git merge-base --is-ancestor feature/cli-first-observability-surfaces-20260322 develop` 仍返回非零，说明当前 feature branch tip 尚未被 `develop` 吸收
   - `git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` 仍显示当前 branch 领先 `develop`
   - unique delta: 仅剩本 worktree 的 canonical closure writeback commits，未包含新的实现能力
+- post_merge_acceptance_2026_03_22:
+  - verification commands 继续通过：`bash -n docs/system/workspace/scripts/runtime/freely`、`bash docs/system/workspace/scripts/tests/test-freely-chat-and-tui`、`bash docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`、`./bin/governance-check`
+  - 当前 `git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` 为 `3 0`
+  - milestone 队列已保持 canonical `completed_issues`，不存在需要再次从 `committed_issues` 纠正的 closure gap
+- audit_refresh_2026_03_22:
+  - source candidate `C-20260322-0115-A` 仍保持 `promoted`，不存在回退到 `pre-brainstorm` 的 candidate gap
+  - 当前 dirty 文件仅剩 issue / progress / review / milestone 四个 canonical closure artifacts；未发现新的实现或治理扩 scope
+  - 因此当前 route 保持 `completion_verification -> audit + retirement_handoff`，不回退到实现环
 - continuity_refresh:
   - 当前轮次先吸收 `context_compacted` 轮换交接，再继续 `completion_verification`
   - 先前 handoff 中“已被 `develop` 吸收 / verified-retirable”的前提已失效；当前真实状态是 rebase 后的 feature branch 仍领先 `develop`，只能保持 `merged-pending-verify`

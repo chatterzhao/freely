@@ -16,4 +16,6 @@
   - `remote_branch_disposition: deleted`
   - `remote_branch_evidence: git fetch origin --prune` 后未发现 `origin/feature/cli-first-observability-surfaces-20260322`
   - `integration_absorption_evidence: git merge-base --is-ancestor feature/cli-first-observability-surfaces-20260322 develop` 仍返回非零，说明当前 feature branch tip 尚未被 develop 吸收
-  - `branch_divergence_evidence: git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` 仍显示当前 branch 领先 develop
+  - `branch_divergence_evidence: git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` 当前为 `3 0`，说明当前 branch 领先 develop 3 个 closure writeback 提交、behind 为 0
+  - `post_merge_acceptance_2026_03_22: bash -n docs/system/workspace/scripts/runtime/freely`、`bash docs/system/workspace/scripts/tests/test-freely-chat-and-tui`、`bash docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation` 与 `./bin/governance-check` 均通过；milestone queue 已保持 canonical completed entry`
+  - `audit_refresh_2026_03_22: source candidate C-20260322-0115-A 仍为 promoted，且当前 dirty 文件仅剩 issue/progress/review/milestone 四个 closure artifacts；因此当前仅做 retirement writeback，不回退 pre-brainstorm 或 dev-loop`

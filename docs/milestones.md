@@ -395,7 +395,7 @@ routing_policy:
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-cli-first-observability-surfaces`
 - local_branch_disposition: `retained-with-reason`
 - remote_branch_disposition: `deleted`
-- completion_note: issue 实现能力已被 `develop` 吸收，当前 feature branch 也已 rebase 到最新 `develop` 之上，但 branch tip 仍保留未被主线吸收的 canonical closure writeback。远程同名 branch 已不存在，因此当前 disposition 仍是 `retire-only`，但 cleanup gate 只能保持 `merged-pending-verify`；先把这些收口提交吸收到 canonical `develop`，再由 supervisor/runtime 在 worktree 外执行最终 branch/worktree 删除。
+- completion_note: issue 实现能力已被 `develop` 吸收，当前 feature branch 也已 rebase 到最新 `develop` 之上，但 branch tip 仍保留未被主线吸收的 canonical closure writeback。`2026-03-22` 的 post-merge acceptance 再次确认：milestone 队列已经保持 canonical `completed_issues`，远程同名 branch 仍不存在，但 `git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` 仍为 `3 0`，因此当前 disposition 继续是 `retire-only`，cleanup gate 只能保持 `merged-pending-verify`；先把这些收口提交吸收到 canonical `develop`，再由 supervisor/runtime 在 worktree 外执行最终 branch/worktree 删除。
 
 2. `I-20260321-1925`
 - title: Manager chat reentry and cleanup misrouting governance
