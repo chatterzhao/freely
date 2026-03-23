@@ -78,4 +78,5 @@ Freely 当前已经具备：
 ## Next
 
 - 当前批次已完成。
+- cleanup followthrough 已确认当前 worktree 仅剩 `retire-only` 收口语义，且相关 anomaly 只保留 `historical-only` 追溯价值；不得因为这段历史事实重新打开本 issue 的 runtime/control-plane 实现范围。
 - 若后续要继续扩“manager continuation 最终产出显式治理结论”的更高层语义，应通过新 lifecycle 承接，不在本 issue 上继续扩 scope。
