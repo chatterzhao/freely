@@ -24,8 +24,11 @@ Freely 是一个自主循环运行器：
 
 `pre-test-merge` 的价值（临时启用，不得固化为长期开发父分支）：
 - 它是 `develop` 前的临时风险缓冲，而不是默认开发主线。
-- 用于在正式进入 `develop` 前暴露组合集成冲突、钩子/策略回归和不稳定测试行为。
+- 用于在正式进入 `develop` 前承担两类临时验证职责：
+  - 预检运行测试：在不污染 `develop` 的前提下做预集成 smoke / regression / acceptance
+  - 预测试 merge：把来源 `feature/*` 临时合入同一批次，暴露组合冲突与集成问题
 - 允许多功能预演而不污染 `develop`。
+- 在这两类职责里发现问题，都必须回到来源 `feature/*` 或新的 dedicated feature worktree 修复；不得在 `pre-test-merge` 上直接改实现。
 - 验证完成或失败后必须退出本轮职责，不得继续承担默认 `feature/*` 父分支角色。
 
 2. 合并纪律：
@@ -33,9 +36,11 @@ Freely 是一个自主循环运行器：
 - `main` 只接受来自 `release/*` 或 `hotfix/*` 的合并。
 - `develop` 是功能交付的默认目标分支；进入 `develop` 前必须满足要求的 `TEST`、评审与进度/恢复证据。
 - `pre-test-merge` 仅作为临时验证路径；当它被启用时，进入 `develop` 的验证结果必须可追溯到该验证批次，但 `develop` 不直接吸收 `pre-test-merge` 分支本身。
+- `develop` 不得承担“尚未进入主线前的预测试环境”职责；需要主线前集成验证时，应使用 `pre-test-merge`，而不是在 `develop` 上先做预检。
 - 提升前的具体验收门与证据口径由 `docs/LAWS.md` 第 2 章定义。
 - `PRE_TEST` 与 `TEST` 的职责边界由 `docs/LAWS.md` 第 2 章与第 11 章定义。
 - 若为高风险集成而先进入 `pre-test-merge`，验证通过后必须 replay 来源 `feature/*` 并入 `develop`；不得把 `pre-test-merge` 作为直接 merge 到 `develop` 的载体。若直接进入 `develop`，不得伪造 `pre-test-merge` 验证祖先要求。
+- `pre-test-merge` 的退出形态固定为：验证结束后 retire / rebuild；不得长期保留并继续滚动承接后续实现。
 
 `premerge` 临时分支规则（用于复杂冲突收敛，不新增长期分支层级）：
 - 分支名固定使用：`feature/premerge-YYYYMMDD-HHMM--<topic>`。

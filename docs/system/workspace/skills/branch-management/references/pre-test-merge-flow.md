@@ -21,6 +21,18 @@
    - 它不直接 merge 到 `develop`
    - `develop` 只吸收来源 `feature/*` 的 replay
 
+## Responsibilities
+
+1. `pre-test-merge` 只承担两类主线前临时职责：
+   - 预检运行测试：在来源 feature 还未进入 `develop` 前，执行需要真实集成面的 smoke / regression / acceptance
+   - 预测试 merge：把多个来源 feature 临时合入同一批次，验证组合冲突、集成次序与交互行为
+2. 这两类职责都不是开发面：
+   - 在这里发现问题，统一回到来源 `feature/*` 或新的 dedicated feature worktree 修复
+   - 修复后再重新 merge 回 `pre-test-merge` 复验
+3. `develop` 不承担“先预测试”的职责：
+   - 需要主线前验证时，使用 `pre-test-merge`
+   - 需要主线后真实环境确认时，才在 `develop` 做 completion verification
+
 ## Post-merge acceptance environment
 
 1. 若 issue 的 `pre-tests.md` 显式声明 `post-merge acceptance`，先看它的 `integration_target`：
@@ -45,3 +57,15 @@
 5. 运行 [semantic-regression-checklist.md](semantic-regression-checklist.md)
 6. 运行要求的 `TEST` 证据检查
 7. `PRE_TEST` 只作基线，不替代提升测试结果
+
+## Retirement
+
+1. `pre-test-merge` 验证通过后：
+   - 记录批次 manifest、验证结果和 replay 顺序
+   - 由来源 `feature/*` replay 到 `develop`
+   - retire 当前 `pre-test-merge` 批次
+2. `pre-test-merge` 验证失败后：
+   - 记录失败原因和回流目标 feature worktree
+   - 不在 `pre-test-merge` 上直接修实现
+   - 视需要 retire 当前批次，并在后续用新批次 rebuild
+3. 不允许把同一 `pre-test-merge` 批次长期保留为滚动真相面。

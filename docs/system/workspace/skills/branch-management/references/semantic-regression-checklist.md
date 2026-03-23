@@ -23,3 +23,8 @@
 6. 提升测试证据：
 - `PRE_TEST` 作为开发前基线存在（验收意图）。
 - 提升到 `develop` 由已执行的 `TEST` 结果门禁（包括集成验收），而非仅靠 `PRE_TEST`。
+
+7. `pre-test-merge` 语义：
+- `pre-test-merge` 只承担主线前验证，不承担在 `develop` 上先预测试的替代语义。
+- 进入 `develop` 的对象必须是来源 `feature/*` replay，而不是 `pre-test-merge` 批次本身。
+- 当前批次完成后必须进入 retire / rebuild 判断，不长期保留。
