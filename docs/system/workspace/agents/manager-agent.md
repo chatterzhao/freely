@@ -119,6 +119,7 @@
   - continuation -> 当前 issue / progress / recovery
   - control -> runtime / manager continuity
   - noise -> resolution note / continuity
+- `restart_point=cleanup` 仍先产出 cleanup handoff；只有 delegated cleanup followthrough 完成后，结果才允许被吸收到 cleanup continuity
 
 7. `supervise completion`
 - 主管负责确认 resolution artifact 已生成，且 canonical absorption 已完成。

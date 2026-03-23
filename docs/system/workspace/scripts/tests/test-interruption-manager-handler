@@ -58,5 +58,6 @@ grep -q '^OWNERSHIP=worker$' <<<"$OUTPUT"
 grep -q '^HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口$' <<<"$OUTPUT"
 grep -q '优先按 worktree maintenance 问题理解，而不是泛化成 continuation' "$PROMPT_CAPTURE"
 grep -q 'worktree-maintenance-governance' "$PROMPT_CAPTURE"
+grep -q '当前 signal 仍应先交接为 cleanup handoff' "$PROMPT_CAPTURE"
 
 echo "[PASS] interruption manager handler writes prompt temp file and filters structured output"

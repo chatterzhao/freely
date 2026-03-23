@@ -207,7 +207,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/candidates.md`, `docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/candidates.md`
-- next_action: `three-loop` / `manager-agent` / `auto-loop-orchestrator` / patrol reference 的收敛重构已落盘；当前进入 wording review 与 consistency verification，确认不再要求读完整个文件才能避免误解
+- next_action: 已补上 cleanup signal 的最小 routing 修复：`restart_point=cleanup` 先保留为 `handoff://cleanup`，不再直接吸收到旧 `cleanup://merged-worktree-followthrough` continuity。下一步继续做真实 manager/develop 工位回归，确认新项目级 signal 会先进入 notice/claim/restart-point routing，再决定最终 absorption target
 
 16. `I-20260321-1745`
 - title: Active lifecycle boundary and dogfooding capability discovery

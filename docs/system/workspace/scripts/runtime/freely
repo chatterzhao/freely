@@ -2341,10 +2341,6 @@ apply_interruption_manager_decision() {
         --reaction "${reaction:-followup}" \
         --classification "${classification:-discovery}" \
         --linked-artifact pending://interruption-manager-delegation >/dev/null
-      if [[ "$restart_point" == "cleanup" && "$ownership" == "worker" ]]; then
-        run_cleanup_followthrough "$project" "$intake_id" "${classification:-control}" "${reaction:-followup}" "$why_text" "$handoff_text"
-        return 0
-      fi
       resolution_file="$(mktemp /tmp/freely-interruption-delegate.XXXXXX)"
       write_delegate_handoff_resolution_file "$intake_id" "$resolution_file" "$why_text" "${classification:-discovery}" "$restart_point" "$ownership" "$handoff_text"
       cmd_intake_resolve \

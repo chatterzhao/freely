@@ -9,14 +9,16 @@
 
 ## Findings
 
-- High: 真实 `develop` 工位集成测试表明，主管虽然能被 `freely start` 拉起且能通过 `freely chat` 接住新的项目级任务，但该任务被错误吸收到旧的 `cleanup://merged-worktree-followthrough` continuity，而不是先触发新的 patrol / restart-point routing。这说明当前真源 wording 已基本收敛，但运行时主管还没有稳定兑现“新 signal 先 notice/claim/identify restart point，再决定 absorption target”的能力。
+- Fixed: runtime 不再在 `restart_point=cleanup && ownership=worker` 时直接执行 `run_cleanup_followthrough`。新的 cleanup signal 现在会先保留为 `handoff://cleanup` delegation，由后续 owner 完成真正的 cleanup followthrough 后再决定是否吸收到 `cleanup://merged-worktree-followthrough` continuity。
 
 ## Verification
 
 - `./bin/governance-check`
+- `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler`
+- `bash docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
 
 ## Residual Risks
 
-- 当前已把语义收敛到真源，但真实集成测试表明主管仍会被旧 continuity 主导，错误吸收新的项目级监督任务。
+- 当前修复的是 cleanup restart-point 的错误捷径；若后续出现其他 restart point 被 runtime 直接短路吸收，仍需继续补回统一 handoff contract。
 - 当前还没有把 patrol cadence、event emission 或自动派单脚本化。
 - 若后续 runtime 需要主动发 patrol tick 或 event bus，再应通过同一 issue 继续 materialize，而不是回写历史 issue。

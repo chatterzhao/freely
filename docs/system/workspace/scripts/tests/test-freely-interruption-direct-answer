@@ -169,36 +169,40 @@ INTAKE_ID_CLEANUP="$(printf '%s\n' "$CHAT_OUTPUT_CLEANUP" | sed -n 's/^intake_id
   echo "[FAIL] missing cleanup intake id" >&2
   exit 1
 }
-grep -q '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+grep -q '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
 grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
 grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
-grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
-grep -q 'blocked_reason: none' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
-grep -q 'feature/cleanup-fixture @ '"$CLEANUP_WT_REAL"' (remote:origin deleted)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
-grep -q 'feature/cleanup-fixture-2 @ '"$CLEANUP_WT_2_REAL"' (remote:origin deleted)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
-grep -q 'feature/dirty-fixture @ '"$DIRTY_WT_REAL"' (dirty)' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
-[[ ! -d "$CLEANUP_WT" ]] || {
-  echo "[FAIL] cleanup worktree still exists" >&2
+grep -q '^ABSORPTION_TARGET="handoff://cleanup"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+grep -q '^LINKED_ARTIFACT="pending://interruption-manager-delegation"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+grep -q 'restart_point: `cleanup`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+grep -q 'ownership: `worker`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+grep -q 'handoff_summary: 检查 merged worktree 是否满足 cleanup 生命周期并执行收口' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+if grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"; then
+  echo "[FAIL] direct cleanup signals should hand off before cleanup followthrough absorption" >&2
+  exit 1
+fi
+[[ -d "$CLEANUP_WT" ]] || {
+  echo "[FAIL] cleanup worktree should still exist before delegated followthrough" >&2
   exit 1
 }
-[[ ! -d "$CLEANUP_WT_2" ]] || {
-  echo "[FAIL] second cleanup worktree still exists" >&2
+[[ -d "$CLEANUP_WT_2" ]] || {
+  echo "[FAIL] second cleanup worktree should still exist before delegated followthrough" >&2
   exit 1
 }
-if git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-fixture; then
-  echo "[FAIL] cleanup branch still exists" >&2
+if ! git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-fixture; then
+  echo "[FAIL] cleanup branch should still exist before delegated followthrough" >&2
   exit 1
 fi
-if git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-fixture-2; then
-  echo "[FAIL] second cleanup branch still exists" >&2
+if ! git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-fixture-2; then
+  echo "[FAIL] second cleanup branch should still exist before delegated followthrough" >&2
   exit 1
 fi
-if git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/cleanup-fixture; then
-  echo "[FAIL] cleanup remote branch still exists" >&2
+if ! git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/cleanup-fixture; then
+  echo "[FAIL] cleanup remote branch should still exist before delegated followthrough" >&2
   exit 1
 fi
-if git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/cleanup-fixture-2; then
-  echo "[FAIL] second cleanup remote branch still exists" >&2
+if ! git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/cleanup-fixture-2; then
+  echo "[FAIL] second cleanup remote branch should still exist before delegated followthrough" >&2
   exit 1
 fi
 [[ -d "$DIRTY_WT" ]] || {
@@ -265,10 +269,16 @@ grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_S
 grep -q '^LINKED_ARTIFACT="pending://interruption-manager-triage"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
 
 FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$PROJECT" >/dev/null
-grep -q '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
 grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
 grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
-grep -q '^LINKED_ARTIFACT="cleanup://merged-worktree-followthrough"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
-grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_STALE/resolution.md"
+grep -q '^ABSORPTION_TARGET="handoff://cleanup"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^LINKED_ARTIFACT="pending://interruption-manager-delegation"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q 'restart_point: `cleanup`' ".freely/run/interruption-resolution/$INTAKE_ID_STALE/resolution.md"
+grep -q 'ownership: `worker`' ".freely/run/interruption-resolution/$INTAKE_ID_STALE/resolution.md"
+if grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_STALE/resolution.md"; then
+  echo "[FAIL] cleanup signals should hand off before cleanup followthrough absorption" >&2
+  exit 1
+fi
 
-echo "[PASS] interruption manager routes abstract answer, cleanup followthrough, delegated handoff, retries cleanly after handler failure, and recovers stale triage claims"
+echo "[PASS] interruption manager routes abstract answer, cleanup handoff, delegated handoff, retries cleanly after handler failure, and recovers cleanup signals as handoffs instead of direct cleanup absorption"

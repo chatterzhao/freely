@@ -87,9 +87,12 @@ Freely 当前已经分别定义了：
 ## Verification
 
 - `./bin/governance-check`
-- review of the updated truth-source wording for contradiction / overlap / residual ambiguity
+- `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler`
+- `bash docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
+- review of the updated truth-source wording and cleanup restart-point routing for contradiction / overlap / residual ambiguity
 
 ## Next
 
-- 当前 IBM 产物与真源重构已落盘，下一步做 wording review 与一致性 verification。
+- 当前最小 acceptance delta 已 materialize：新的项目级 cleanup signal 先进入 manager `notice -> claim -> restart-point routing`，产出 `handoff://cleanup`，不再被旧 `cleanup://merged-worktree-followthrough` continuity 直接吸收。
+- issue 继续保持 `in_verification`；下一步做真实 manager/develop 工位回归，确认 cleanup 之外的新项目级 signal 也会先走同一 restart-point routing，再决定最终 absorption target。
 - 后续若还需把 patrol cadence、event emission 或自动派单脚本化，再基于本 issue 继续进入新的 runtime/dev 增量；当前不回写历史已完成 issue。
