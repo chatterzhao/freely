@@ -24,6 +24,11 @@ description: 管理 Freely 风格开发的完整自主分支生命周期，支�
 - 绝不推送 `alpha`/`beta` 标签。
 - 对于规范文档变更，在专用 feature/worktree 中工作，并要求关联实现或门禁变更证据。
 - 对于依赖未合并父分支的子任务，不把 `develop` 伪装成执行基线；必须记录依赖并在提升前完成 restack / rebase / merge 上游。
+- `develop` / `main` / `pre-test-merge` 可以存在 canonical worktree，但它们只承担受保护分支的管理/集成/验收环境，不承担真实 feature 开发。
+- `post-merge acceptance` 默认直接在目标受保护分支自己的 canonical worktree 中执行：
+  - `develop`：项目主 worktree
+  - `pre-test-merge`：同名 sibling worktree
+- 不为一次 `post-merge acceptance` 再额外创建匿名 companion worktree；若验收暴露缺陷，回到现有 feature worktree 或新建 feature worktree 修复，再重新走提升路径。
 
 ## 完成
 - 临时验证批次完成后，无需继续保留的分支不会滞留在 `pre-test-merge` 中。

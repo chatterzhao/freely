@@ -32,6 +32,8 @@
 - issue scope 与 acceptance 稳定
 - `pre-tests.md` 与 `tasks.md` 已体现 issue-level acceptance
 - 若存在 merge 后才能验证的关键路径，`pre-tests.md` 已显式区分 `pre-merge` 与 `post-merge`
+- `post-merge acceptance` 已写明目标环境是 `develop` 还是 `pre-test-merge`
+- `post-merge acceptance` 已写明：在 protected branch worktree 中只做验证，不直接修实现
 - issue-bound brainstorm 的未决问题已不再阻断 dev
 - implementation 所需文档引用齐备
 - `prd.md` 已达到 AI-ready quality bar，而不是只剩人类摘要

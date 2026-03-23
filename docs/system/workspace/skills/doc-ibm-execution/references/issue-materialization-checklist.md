@@ -37,3 +37,7 @@
 - 继承有效 `session_refs`
 - 在 issue / `prd.md` / `pre-tests.md` / `tasks.md` / issue-bound brainstorm 中继续深化 acceptance 边界
 - 在 `pre-tests.md` 中默认先写 integration / acceptance 行为；若存在 merge 后验收，显式标记 `post-merge acceptance`
+- 对 `post-merge acceptance`，必须同时写出：
+  - target environment: `develop` 或 `pre-test-merge`
+  - environment type: `protected verification worktree`
+  - failure handling: 验收失败后回到 feature worktree / 新 feature worktree 修复

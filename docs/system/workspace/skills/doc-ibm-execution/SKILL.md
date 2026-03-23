@@ -29,6 +29,8 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 6. `pre-tests.md` 不是附属清单，而是 issue-level acceptance 的主控制面：
    - 默认优先表达 integration / acceptance 行为
    - 若存在 merge 后才能验证的能力，显式标记 `post-merge acceptance`
+   - 并明确目标验证环境：`develop` 或 `pre-test-merge`
+   - 写清该环境只用于验证，不用于继续实现
    - 不要让后续 verification 只能靠口头解释或代码阅读来恢复验收标准
 7. 若文档已经足够驱动实现，按同一 gate 把 `phase_state` 切到 `done_ibm`，并返回最小实现上下文。
 8. 若在 IBM 中发现边界外新问题，停止扩写当前 issue，返回 `next_recommended_route=doc-pre-brainstorm-execution`。
