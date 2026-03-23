@@ -404,6 +404,11 @@ find_latest_prompt_file_for_project() {
   latest_run_artifact_for_project "$project" 'prompt-*.txt'
 }
 
+latest_generated_manager_continuity_file_for_project() {
+  local project="$1"
+  latest_run_artifact_for_project "$project" 'manager-continuity-*.md'
+}
+
 find_latest_manager_continuity_file_for_project() {
   local project="$1"
   latest_launchable_manager_continuity_file_for_project "$project"
@@ -1925,18 +1930,67 @@ manager_ai_stalled_with_pending_intake() {
   (( now - log_mtime >= threshold_secs )) || return 1
 }
 
+prompt_file_has_delegated_continuation() {
+  local prompt_file="$1"
+  [[ -f "$prompt_file" ]] || return 1
+  grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null
+}
+
+manager_ai_stalled_after_delegated_continuation_prompt() {
+  local project="$1" threshold_secs="${2:-90}"
+  local ai_pid cycle_log prompt_file continuity_file
+  local log_mtime prompt_mtime continuity_mtime now
+
+  ai_pid="$(manager_ai_pid_for_project "$project")"
+  [[ -n "$ai_pid" ]] || return 1
+  cycle_log="$(latest_cycle_log_for_project "$project")"
+  [[ -n "$cycle_log" && -f "$cycle_log" ]] || return 1
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  prompt_file_has_delegated_continuation "$prompt_file" || return 1
+
+  log_mtime="$(file_mtime_epoch "$cycle_log" 2>/dev/null || true)"
+  prompt_mtime="$(file_mtime_epoch "$prompt_file" 2>/dev/null || true)"
+  [[ -n "$log_mtime" && -n "$prompt_mtime" ]] || return 1
+
+  now="$(date +%s)"
+  (( now - log_mtime >= threshold_secs )) || return 1
+  (( now - prompt_mtime >= threshold_secs )) || return 1
+
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
+    continuity_mtime="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
+    if [[ -n "$continuity_mtime" ]] && (( continuity_mtime > prompt_mtime )); then
+      return 1
+    fi
+  fi
+}
+
+manager_ai_runtime_recovery_reason() {
+  local project="$1" threshold_secs="${2:-90}"
+  if manager_ai_stalled_with_pending_intake "$project" "$threshold_secs"; then
+    printf 'manager_ai_stalled_with_pending_intake\n'
+    return 0
+  fi
+  if manager_ai_stalled_after_delegated_continuation_prompt "$project" "$threshold_secs"; then
+    printf 'manager_ai_stalled_after_delegated_continuation_prompt\n'
+    return 0
+  fi
+  return 1
+}
+
 recover_stalled_manager_ai_if_needed() {
-  local project="$1" ai_pid current_account
-  manager_ai_stalled_with_pending_intake "$project" "${MANAGER_AI_STALL_THRESHOLD_SECS:-90}" || return 1
+  local project="$1" ai_pid current_account stall_reason
+  stall_reason="$(manager_ai_runtime_recovery_reason "$project" "${MANAGER_AI_STALL_THRESHOLD_SECS:-90}")" || return 1
   ai_pid="$(manager_ai_pid_for_project "$project")"
   current_account=""
   if [[ "${AI_TOOL:-}" == "codex" ]]; then
     current_account="$(codex_current_account "$project")"
   fi
-  write_manager_bootstrap_handoff "$project" "manager_stall_detected" "${current_account:-unknown}" "${current_account:-unknown}" "manager_ai_stalled_with_pending_intake" "relaunch-manager-after-stall-recovery"
+  write_manager_bootstrap_handoff "$project" "manager_stall_detected" "${current_account:-unknown}" "${current_account:-unknown}" "$stall_reason" "relaunch-manager-after-stall-recovery"
   request_local_continuation_reentry "$project" "runtime-stalled-ai-recovery"
   restart_manager_supervisor_preserving_handoff "$project"
-  log_warn "recovered stalled manager ai with pending intake (project=$project ai_pid=${ai_pid:-unknown})"
+  log_warn "recovered stalled manager ai (project=$project ai_pid=${ai_pid:-unknown} reason=$stall_reason)"
   return 0
 }
 
