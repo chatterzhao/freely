@@ -312,8 +312,8 @@ routing_policy:
 - promoted_issue_path: `pending://protected-post-merge-acceptance-route-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/candidates.md`
-- next_action: 继续 pre-brainstorm，先冻结 4 个边界：`pre-test-merge -> develop` 是否允许直接 promote、`develop-only completion verification` 与 `pre-test-merge batch acceptance` 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
-- revisit_trigger: 当 protected verification environment 的 promote policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
+- next_action: 继续 pre-brainstorm，但已冻结一条硬规则：`pre-test-merge` 是 shadow batch，只做测试 merge，不直接 merge 到 `develop`。剩余要收口的是 `develop-only completion verification` 与 `pre-test-merge batch acceptance` 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
+- revisit_trigger: 当 protected verification environment 的 replay policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
 
 5. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec

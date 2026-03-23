@@ -16,6 +16,10 @@
    - 共享基础设施
    - 产品行为变更
 8. 串行 `git merge --no-ff <branch>` 并立即运行冒烟/回归检查
+9. `pre-test-merge` 是 shadow batch，不是 promote 单位：
+   - 它可以承载已验证的组合快照
+   - 它不直接 merge 到 `develop`
+   - `develop` 只吸收来源 `feature/*` 的 replay
 
 ## Post-merge acceptance environment
 
@@ -32,11 +36,12 @@
    - 新建 feature worktree 承接该 post-merge finding
 5. 只有当 `post-merge acceptance` 明确通过后，才允许把该批次继续 promote 到更高一层或进入 cleanup。
 
-## Promotion to `develop`
+## Replay to `develop`
 
 1. 并入 `develop` 前再次执行 `./bin/wt-status-all`
-2. 确认每个分支都已在自己的 dedicated worktree 中完成“merge 上游 -> 解决冲突 -> 自测”
-3. 派生分支先确认父分支已进入要求路径，再 restack / rebase / merge 上游并重跑测试
-4. 运行 [semantic-regression-checklist.md](semantic-regression-checklist.md)
-5. 运行要求的 `TEST` 证据检查
-6. `PRE_TEST` 只作基线，不替代提升测试结果
+2. 确认每个来源 `feature/*` 都已在自己的 dedicated worktree 中完成“merge 上游 -> 解决冲突 -> 自测”
+3. 若某条线先经过 `pre-test-merge`，进入 `develop` 的动作是 replay 已验证的来源 `feature/*`，而不是 merge `pre-test-merge`
+4. 派生分支先确认父分支已进入要求路径，再 restack / rebase / merge 上游并重跑测试
+5. 运行 [semantic-regression-checklist.md](semantic-regression-checklist.md)
+6. 运行要求的 `TEST` 证据检查
+7. `PRE_TEST` 只作基线，不替代提升测试结果

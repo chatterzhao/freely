@@ -103,6 +103,13 @@ Freely 已经正式允许某些 issue 声明 `post-merge acceptance`，并且刚
 - 优点：更强地保证“实现来源永远是 feature”
 - 风险：需要一个可重放、可追溯的 batch manifest，否则容易与真实已验批次漂移
 
+### 当前决议
+
+- 采用方向 B。
+- `pre-test-merge` 的角色固定为 shadow batch / test-merge 环境。
+- 它不会被直接用来合并到 `develop`。
+- 若某条线需要先经过 `pre-test-merge`，进入 `develop` 的动作必须是 replay 已验证的来源 feature，而不是提升 `pre-test-merge` 批次本身。
+
 ### 方向 C：按目标环境区分两类 post-merge acceptance
 
 - `develop-only acceptance`
@@ -125,7 +132,7 @@ Freely 已经正式允许某些 issue 声明 `post-merge acceptance`，并且刚
 
 ## 需要冻结的开放问题
 
-1. `pre-test-merge -> develop` 应该保留，但增加强 gate，还是应改成“只允许 replay 来源 feature”？
+1. replay 来源 feature 的 batch manifest 与验证重放证据最小字段是什么？
 2. 对 `develop` 上的主环境验收，是否应明确归类为：
 - `completion_verification on protected environment`
 而不是泛化 `post-merge acceptance`

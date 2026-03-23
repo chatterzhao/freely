@@ -29,7 +29,7 @@
 1. 分支来源、merge 方向、保护分支策略符合宪法分支表。
 2. `feature/*` 默认从 `develop` 创建并在 worktree 内开发；若 issue 明确依赖未合并父分支改动，可从父 `feature/*` 派生 dedicated worktree，但必须记录依赖关系与最终集成目标。
 3. `main/develop/pre-test-merge` 保持 add/commit 禁止。
-4. `develop` 合并前，`TEST`（含集成验收）通过；若走 `pre-test-merge` 路径，验证批次必须可追溯。
+4. `develop` 合并前，`TEST`（含集成验收）通过；若走 `pre-test-merge` 路径，验证批次必须可追溯，且 `develop` 只吸收来源 `feature/*` 的 replay，不直接吸收 `pre-test-merge`。
 4a. 当 issue 已有 `pre-tests.md` 时，develop 合并 gate 默认优先看其中定义的 integration / acceptance evidence；代码评审完成度不得替代这层验收。
 5. `PRE_TEST` 仅作为开发前基线，不得替代提升测试结果。
 6. 提升前必须有评审记录、祖先可追溯证据、进度/恢复更新证据。
@@ -42,7 +42,7 @@
 13. 若当前工位已通过最小验证门，但仍持续扩写实现而不形成 checkpoint commit / checkpoint note，视为自治治理退化，不得宣称“工作正常”。
 
 最小验收证据：
-- 分支来源与合并路径记录
+- 分支来源与合并路径记录（若经过 `pre-test-merge`，需包含 replay 到 `develop` 的来源 feature 顺序）
 - `execution_base` / `integration_target` / `depends_on` 记录（如存在派生 worktree）
 - `wt-status-all` 输出记录
 - project dirty budget / worktree dirty summary 记录（如进入 checkpoint 治理）
