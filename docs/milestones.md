@@ -199,15 +199,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md`
 - next_action: 把 remote branch deletion / retained reason 纳入 `worktree-maintenance-governance` 与 `cleanup-followthrough`，并用真实 cleanup 测试和 Freely 插话验证主管能够把这层收口做完
 
-15. `I-20260322-0049`
-- title: Manager continuation handoff consumption governance
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/candidates.md`
-- next_action: 已完成 generated/consumed evidence、`live-status` 暴露与 shell-safe handoff writer 修复；后续若要把 manager continuation 消费结果进一步提升成显式治理产出，应通过新 lifecycle 承接
 16. `I-20260322-0115`
 - title: CLI-first entrypoint and observability surface unification
 - milestone_state: committed
@@ -402,6 +393,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/candidates.md`
 - evidence: `docs/system/workspace/scripts/runtime/interruption-manager-handler`, `docs/system/workspace/scripts/tests/test-interruption-manager-handler`, `docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`, `docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/code-reviews/20260321-manager-chat-reentry-and-cleanup-misrouting-verification.md`
 - completion_note: broad supervisor chat signal 已不再默认误落 cleanup followthrough；纯 cleanup 请求仍保持 worker cleanup 路径，主管级广义巡检请求则回到 `handoff://continuation` 与 manager ownership
+
+1. `I-20260322-0049`
+- title: Manager continuation handoff consumption governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/candidates.md`
+- evidence: `docs/progress/workspace-routing-foundation/p-manager-continuation-handoff-consumption-governance.md`, `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/code-reviews/20260322-manager-continuation-handoff-consumption-verification.md`, `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/code-reviews/20260322-manager-continuation-handoff-consumption-cleanup-verification.md`
+- completion_note: 当前 worktree 已确认 `retire-only`，历史 anomaly 仅保留追溯语义，不再 materialize 新实现 scope；milestone 队列已纠正到 `completed_issues`。fresh session after `context_compacted` 已再次复核 canonical closeout，结论未变：当前分支还保留一个已被 `feature/completed-worktree-closeout-merge-prep-20260322` 吸收的 cleanup/closure 提交且无远程同名分支；本地 branch/worktree 删除应走 closeout chain，而不是重新打开本 issue 的实现范围
 
 2. `I-20260321-2010`
 - title: Explicit session-addressed resume governance
