@@ -2095,6 +2095,45 @@ recover_stalled_manager_ai_if_needed() {
   return 0
 }
 
+worker_ai_stalled_after_delegated_continuation_prompt() {
+  local project="$1" threshold_secs="${2:-90}"
+  local ai_pid cycle_log prompt_file log_mtime prompt_mtime now
+
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  [[ -n "$ai_pid" ]] || return 1
+  cycle_log="$(latest_cycle_log_for_project "$project")"
+  [[ -n "$cycle_log" && -f "$cycle_log" ]] || return 1
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  prompt_file_has_delegated_continuation "$prompt_file" || return 1
+
+  log_mtime="$(file_mtime_epoch "$cycle_log" 2>/dev/null || true)"
+  prompt_mtime="$(file_mtime_epoch "$prompt_file" 2>/dev/null || true)"
+  [[ -n "$log_mtime" && -n "$prompt_mtime" ]] || return 1
+
+  now="$(date +%s)"
+  (( now - log_mtime >= threshold_secs )) || return 1
+  (( now - prompt_mtime >= threshold_secs )) || return 1
+}
+
+worker_ai_runtime_recovery_reason() {
+  local project="$1" threshold_secs="${2:-90}"
+  if worker_ai_stalled_after_delegated_continuation_prompt "$project" "$threshold_secs"; then
+    printf 'worker_ai_stalled_after_delegated_continuation_prompt\n'
+    return 0
+  fi
+  return 1
+}
+
+recover_stalled_worker_ai_if_needed() {
+  local project="$1" ai_pid stall_reason
+  stall_reason="$(worker_ai_runtime_recovery_reason "$project" "${WORKER_AI_STALL_THRESHOLD_SECS:-90}")" || return 1
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  request_local_continuation_reentry "$project" "runtime-stalled-ai-recovery"
+  log_warn "recovered stalled worker ai (project=$project ai_pid=${ai_pid:-unknown} reason=$stall_reason)"
+  return 0
+}
+
 write_session_state() {
   local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" context_compacted="$8" context_ratio="$9" primary_used_percent="${10}" primary_resets_at="${11}" secondary_used_percent="${12}" secondary_resets_at="${13}" route_only_handoff="${14}" route_only_streak="${15}" resume_streak="${16}" active_account="${17}" account_switch_reason="${18}" account_switch_at="${19}" cycle_debug_log="${20}" claude_jsonl_path="${21}" codex_mcp_used="${22}" codex_mcp_thread_id="${23}" codex_mcp_jsonl_path="${24}" claude_session_id_current="${25}" claude_session_id_previous="${26}" project_dirty_entries="${27}" worktree_summary_total="${28}" worktree_summary_dirty="${29}" checkpoint_drift_streak="${30}" delegated_pending_ids="${31}" delegated_pending_count="${32}" delegated_consumed_ids="${33}" delegated_consumed_at="${34}"
   local state_file
@@ -2527,7 +2566,12 @@ manager_runtime_recover_workers_if_needed() {
         supervisor_state="up"
       fi
     fi
-    [[ "$supervisor_state" == "down" ]] || continue
+    if [[ "$supervisor_state" == "up" ]]; then
+      if recover_stalled_worker_ai_if_needed "$wt_path"; then
+        recovered=$((recovered + 1))
+      fi
+      continue
+    fi
 
     log_info "manager runtime recovering expected-running worker: branch=${branch:-unknown} exit_reason=${exit_reason:-unknown} path=$wt_path"
     start_workcell_supervisor_async "$wt_path"

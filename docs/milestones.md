@@ -433,6 +433,17 @@ routing_policy:
 - next_action: 保持 active candidate；先用 runtime 补丁和真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被恢复，再决定是 materialize 为独立 issue，还是吸收到现有 stall/recovery issue 族
 - revisit_trigger: 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，或当前 runtime 补丁验证稳定后需要冻结独立 issue contract 时，重新进入 materialization 判断
 
+11. `C-20260323-1835-A`
+- title: Detect and recover active worker delegated-continuation stalls
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://worker-delegated-continuation-active-stall-recovery-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260323-1835--worker-delegated-continuation-active-stall-recovery/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260323-1835--worker-delegated-continuation-active-stall-recovery/candidates.md`
+- next_action: 保持 active candidate；先让 manager watchdog 能识别并恢复 active worker delegated-continuation stall，再继续真实 dogfood 验证 retained worker 能否自动收口、cleanup 并回到 next patrol
+- revisit_trigger: 当再次复现 active worker 已收到 delegated continuation 但 cycle log / closeout 长时间不推进，或当前 runtime 补丁验证稳定后需要冻结独立 issue contract 时，重新进入 materialization 判断
+
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛
 - milestone_state: candidate
