@@ -378,6 +378,45 @@ Validation batch governance:
   - 集成测试
   - application-native real-environment testing
 - 若缺少这些 evidence，manager 不应把 lane 判成 `completion_verification done` 或允许 worktree retirement
+
+## 三层 loop 的进入、跳出与最终结束
+
+- 当前这条能力真正缺的，不只是“哪些 gate 组成 delete eligibility”，还缺一条稳定的 loop exit 语义：每层 loop 何时只是局部收口，何时真正跳回外层，何时才允许把整个主题当成结束
+- 结合 [three-loop-capability-lifecycle](/Users/zhaoyu/Downloads/code/my-freely/freely/docs/system/workspace/three-loop-capability-lifecycle.md) 与现有 lifecycle 词典，可以把它收敛成三层：
+  - doc-loop / pre-brainstorm / IBM：负责定义边界、contract、acceptance surface；其内循环结束，只表示“当前文档层可交给下一层”，不表示 issue 已完成，也不表示 worktree 可删除
+  - dev-loop / completion verification：负责实现、测试、验证与 issue 级 `completed`；其内循环结束，只表示“issue 已完成或已回流到新边界”，不表示 cleanup 已完成
+  - cleanup / auto-loop governance：负责 merge 后 closeout、cleanup evidence、`verified-retirable`、`retired` 与 next-task scan；只有这层闭合，当前 worktree lifecycle 才真正结束
+- 因而每层 loop 的跳出条件应明确区分：
+  - doc-loop 跳出：
+    - `pre-brainstorm -> IBM`：candidate/materialization contract 已冻结
+    - `IBM -> dev-loop`：`done_ibm` 且 `pre-tests.md` 质量 gate 通过
+    - doc-loop 内部收口若只得到 `needs_research` / `blocked` / `pending://...`，说明仍停在当前 loop，不得冒充“完成”
+  - dev-loop 跳出：
+    - `in_dev -> in_verification`：实现与测试准备齐
+    - `in_verification -> completed`：按 `pre-tests.md` 逐项完成 testing closeout，含 integration 与 application-native real-environment testing evidence
+    - `in_verification -> pre_brainstorm|ibm`：若验证暴露出新边界或 acceptance contract 缺口，则不是完成，而是回到外层 doc-loop
+  - cleanup / auto-loop governance 跳出：
+    - `completed -> merged-not-cleaned`：issue 完成后进入 merge / closeout，不是结束
+    - `merged-not-cleaned -> verified-retirable`：cleanup evidence 齐
+    - `verified-retirable -> retired`：删除门通过，worktree/branch 真正退休
+- 这也解释了为什么经常误删：
+  - 把 doc-loop 的“研究收口”当成任务完成
+  - 把 dev-loop 的 `completed` 当成 worktree 完成
+  - 把 merge / clean 当成 cleanup loop 已结束
+- 当前更稳的最终完成定义应是：
+  - issue 完成：停在 `phase_state=completed`
+  - worktree 完成：停在 `retired`
+  - topic 真正结束：当前主题没有未闭合的 delegated continuation / cleanup lane，且 auto-loop 已把它从 active patrol 集合移出；之后系统才应进入 next-task scan 或新任务循环
+- 因此“最外层结束”不是简单的“不再跑内循环”，而是：
+  - 当前主题的 doc-loop、dev-loop、cleanup/auto-loop governance 都已各自跳出
+  - 最终停在 `retired`
+  - 下一轮 patrol 看到的是 closed lifecycle，而不是 retained owner / pending cleanup / queued followthrough
+- 若任一内层 loop 结束后仍留下：
+  - `remaining_cleanup_requirement`
+  - queued/delegated continuation
+  - `verified-retirable` 未达成
+  - stale batch replay/source evidence 未吸收
+  则说明只是局部 loop 收口，不能判“任务最终完成”
 - 因此，`completed` 前要有测试门，`completed` 后仍要有删除门；两者不能混成一次判断
 - 最终删除门若未来可以由 hook / guard 投影执行，应以现有状态与 evidence 组合作为输入，而不是重新发明平行状态
 
