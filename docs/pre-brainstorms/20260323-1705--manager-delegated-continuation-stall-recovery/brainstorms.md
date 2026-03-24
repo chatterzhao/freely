@@ -86,6 +86,45 @@
   - 但 promotion 仍缺一层针对当前 prompt cycle / 当前 stalled continuation 的稳定 runtime-visible absorption proof，避免未来把“pending 与 consumed 并存”的状态误当成已经完成 issue-level acceptance
   - 现有 runtime / test 已经提供 prompt-level absorption 加 state-surface evidence；这足以支撑 watchdog 行为，但仍不足以充当后续 IBM issue-level acceptance anchor
 
+## remaining binding proof gap
+
+- 当前还缺的不是泛泛的 “runtime 再多给一点状态”，而是一条精确的 runtime-visible binding proof：
+  - 同一轮真实 dogfood 中，先观察某个具体 stalled delegated continuation intake id 进入当前 manager prompt cycle
+  - 然后由 runtime 给出稳定锚点，明确“当前 `last_consumed_delegated_continuation_ids` 中的哪一次 consumed 事件，正对应这个 prompt cycle / 这个 stalled intake”
+  - 再证明这条绑定之后，若 manager 仍无新 continuity / worker handoff，watchdog recovery 命中的是“当前 prompt 已吸收但未继续产出”的 stall，而不是历史 consumed truth 的回放
+- 现在缺的正是这一跳一一绑定：
+  - `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 长期并存
+  - prompt excerpt 只能证明“当前 prompt 有 delegated continuation 语义”
+  - consumed 列表只能证明“runtime 某时记录过 consumed truth”
+  - 但两者之间还没有一个稳定、可重复复核的 current-cycle binding anchor
+- 因此当前缺口必须保持显式：
+  - missing proof: `current stalled intake id -> current prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict`
+  - 只要这条链还不能稳定观察，本候选就不能进入 IBM，也不能被 cleanup/retirement 视为已完成 proof
+
+## next dogfood experiment required
+
+- 下一轮必须做的不是脚本级回归，而是一轮真实 Freely dogfood：
+  - 从 `develop` 启动 runtime
+  - 通过 `freely chat --project <project-root> ...` 注入一条可追踪的 delegated continuation
+  - 在 manager prompt 已吸收该 intake 后，持续抓取 `live-status` / continuity / worker prompt surface
+  - 要求这轮证据能同时回答四件事：
+    - 哪个 stalled intake id 被当前 prompt cycle 吸收
+    - 哪个 consumed 事件与这个 prompt cycle 绑定
+    - 在无新 continuity / handoff 的窗口内，watchdog 是否按这条绑定触发 recovery
+    - recovery 后 cleanup / followthrough 是否继续推进，而不是只留下历史 consumed truth
+- 若这轮 dogfood 仍只能看到 `pending/consumed` 并存，却无法稳定回答上述四件事，则本候选继续留在 pre-brainstorm
+
+## retirement gate remains blocked
+
+- 当前这棵树的 delete / retirement gate 仍然阻塞，原因不是 worktree hygiene，而是 proof hygiene：
+  - 当前 canonical writeback 仍是这条候选的唯一 owner-facing continuity anchor
+  - 上游还没有吸收并固定“current prompt cycle / current stalled intake”所需的 binding proof 结论
+  - 也还没有完成上述真实 dogfood followthrough
+- 因此当前只能判：
+  - `cleanup_disposition=retain-for-followthrough`
+  - `safe_for_retirement=false`
+  - 不得把“本树 clean”或“已有 runtime tests”误读成可删除
+
 ## continuity guard writeback
 
 - 上一轮确实经历过 `fresh_with_handoff`，直接原因是旧 `codex` 会话命中 `context_compacted`
@@ -189,9 +228,10 @@
 - 这条 contract 已经从“模糊现象”收敛为“可描述、可测试、可观测”的 runtime gap
 - 但本轮仍不直接 materialize：
   - 仓库里已有 runtime / skill / test 证据，但尚未形成 milestone-owned issue 真源
-  - 仍需再做一轮真实 dogfood，确认该 contract 在 cleanup / retirement followthrough 上稳定，不会被吸收到更大的 manager recovery 家族
-  - 还需把“pending 与 consumed 同时出现”的 current truth 与“当前 prompt cycle 真正吸收了哪个 stalled intake”的 prompt-bound proof 之间的最小 runtime-visible evidence 冻结清楚，否则 promotion 后 acceptance anchor 仍会摇摆
-  - 当前 runtime / test 已证明 watchdog 可以结合 prompt-level signal 与状态面做 recovery，但仍未证明 consumed truth 对当前 prompt cycle 的绑定足够稳定
+- 仍需再做一轮真实 dogfood，确认该 contract 在 cleanup / retirement followthrough 上稳定，不会被吸收到更大的 manager recovery 家族
+- 还需把“pending 与 consumed 同时出现”的 current truth 与“当前 prompt cycle 真正吸收了哪个 stalled intake”的 prompt-bound proof 之间的最小 runtime-visible evidence 冻结清楚，否则 promotion 后 acceptance anchor 仍会摇摆
+- 当前 runtime / test 已证明 watchdog 可以结合 prompt-level signal 与状态面做 recovery，但仍未证明 consumed truth 对当前 prompt cycle 的绑定足够稳定
+- 在完成这轮真实 dogfood 并固定 binding proof 之前，不得把该候选对应 worktree 视为可 delete / retire
 - 因此当前继续保留在 `pre-brainstorm`
   - route_kind: `pre_brainstorm`
   - target_skill: `workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
