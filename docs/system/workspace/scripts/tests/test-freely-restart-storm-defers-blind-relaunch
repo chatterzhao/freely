@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-restart-storm-relaunch.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/mock-bin"
+CODEX_LOG="$TMP_DIR/codex.log"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260324-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$PROJECT/bin" \
+  "$MOCK_BIN"
+
+git init -q "$PROJECT"
+git -C "$PROJECT" checkout -q -b feature/test-restart-storm
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260324-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=20
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+MAX_ROUTE_ONLY_STREAK=1
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+RESTART_STORM_WINDOW_SECS=30
+RESTART_STORM_COUNT=2
+PROCESS_CHURN_PEAK=99
+RESTART_STORM_OBSERVE_DELAY_SECS=2
+EOF
+
+cat >"$PROJECT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+case "$*" in
+  *"whoami"*) echo '{"tool":"codex","account":"stable@example.com"}' ;;
+  *"list"*) echo '{"accounts":[]}' ;;
+  *"switch"*) echo '{"switched": false, "tool":"codex","account":"stable@example.com"}' ;;
+  *) echo '{}' ;;
+esac
+EOF
+chmod +x "$PROJECT/bin/ai"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$(date +%s)" >>"${CODEX_LOG:?}"
+echo "session id: restart-storm-session"
+echo "mock failure"
+exit 1
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+CODEX_LOG="$CODEX_LOG" PATH="$MOCK_BIN:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 &
+runtime_pid="$!"
+
+sleep 3
+
+grep -q 'LAST_RESTART_STORM_SIGNAL_REASON="restart_storm_count_threshold"' "$PROJECT/.freely/run/session-state.env"
+grep -q 'LAST_RESTART_STORM_ESCALATION_TARGET="manager_bootstrap_handoff"' "$PROJECT/.freely/run/session-state.env"
+grep -q 'trigger: restart_storm_detected' "$PROJECT/.freely/run/session-handoff.txt"
+grep -q 'reason: restart_storm_count_threshold' "$PROJECT/.freely/run/session-handoff.txt"
+
+if grep -q 'RESTART_STORM' "$PROJECT/.freely/run/workcell-state.env"; then
+  echo "[FAIL] workcell-state.env should not mirror restart storm counters"
+  kill "$runtime_pid" 2>/dev/null || true
+  wait "$runtime_pid" 2>/dev/null || true
+  exit 1
+fi
+
+launch_count="$(wc -l <"$CODEX_LOG" | tr -d ' ')"
+if (( launch_count > 3 )); then
+  echo "[FAIL] expected restart storm handling to pause blind relaunches, got $launch_count launches in a short window"
+  kill "$runtime_pid" 2>/dev/null || true
+  wait "$runtime_pid" 2>/dev/null || true
+  exit 1
+fi
+
+kill "$runtime_pid" 2>/dev/null || true
+wait "$runtime_pid" 2>/dev/null || true
+
+echo "[PASS] freely emits restart storm signal, escalates via manager handoff, and pauses blind relaunch"
