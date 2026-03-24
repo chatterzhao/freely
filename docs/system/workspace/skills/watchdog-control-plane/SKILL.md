@@ -21,7 +21,7 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 - account switch
 - earliest-reset wait / recheck
 - reset buffer 与 cooldown_elapsed 后的真实 re-probe
-- 产出结构化恢复状态，交给上层 orchestration
+- 产出结构化恢复状态，并写出 manager bootstrap handoff 供 runtime/manager 恢复链消费
 
 代码真源：
 - `scripts/availability-watchdog.sh`
@@ -29,7 +29,7 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 
 不负责：
 - Freely 的 milestone / issue / worktree 编排
-- Freely 专有 handoff 文本写回
+- manager bootstrap handoff 的消费与后续 supervisor / fleet 编排
 
 ### 2. Runtime Watchdog
 
