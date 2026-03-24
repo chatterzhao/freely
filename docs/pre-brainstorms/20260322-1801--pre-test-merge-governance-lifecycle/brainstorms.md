@@ -359,6 +359,14 @@ Validation batch governance:
   - issue completion chain：`done_ibm` -> `pre-tests.md` 质量 gate -> dev / verification -> testing closeout -> `phase_state=completed`
   - delete eligibility chain：merge -> cleanup evidence -> `verified-retirable` -> delete branch/worktree guard -> `retired`
 - 若 `pre-tests.md` 显式声明 `post-merge acceptance`，则它插在 delete eligibility chain 中的 merge 之后、cleanup evidence 之前；未显式声明时，不得把它误用成默认必经项
+- 还要单独承认一条 merge gate：
+  - `merge gate` 只回答“当前 feature 是否可并入 `develop`”
+  - 它不是 issue `completed`
+  - 它也不是 worktree 已可删除
+- 因此 merge 后若 closeout 未闭合，系统必须立刻进入下一跳，而不是把 merge 当作结束：
+  - delegated continuation / cleanup lane
+  - 或 milestone/owner queue 中的显式挂起，带 `next_action` / `revisit_trigger`
+  - 不允许 merge 后因为树 clean 或 issue 已 `completed` 就静默失踪
 - 其中 `completed` 只表示 issue 完成，不表示 delete-eligible；只有 delete eligibility chain 闭合后，worktree/branch 才能进入 `retired`
 - “application-native real-environment testing” 指当前应用自己的真实入口、真实交互面、真实集成路径，而不是抽象脚本替身
 - 在 Freely 自举场景里，它当前的具体形态才是：
@@ -442,6 +450,10 @@ Validation batch governance:
 - 不得因为 issue 已标 `completed`、某个 loop 已收口、或某个 agent/skill 已完成单轮交付，就删除最后一个 owner worktree
 - 只有当当前树已达到 cleanup gate、进入 `verified-retirable`，并最终执行到 `retired`，才算这棵树真的收口
 - 若未来实现 delete guard / hook，它应兜住 branch/worktree 删除动作，只允许在 `completed`、testing closeout、cleanup gate、`verified-retirable` 都已满足时继续执行；否则只能拒绝删除并要求回到三层 loop 继续推进
+- merge 后未完成的 worktree 也必须有可恢复 owner：
+  - 要么有 active delegated continuation / cleanup lane
+  - 要么在 milestone / issue 上显式挂起并写清下一跳
+  - 否则不得删除该树，也不得宣称“任务已做完”
 
 ## 应保留 AI 自主的边界
 
