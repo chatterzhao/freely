@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260324-0405`
 - title: 三个 loop 的并列关系与 terminal governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `three-loops-sibling-relationship-and-terminal-governance`
@@ -91,7 +91,14 @@ Freely 当前已经把 `auto-loop`、`doc-loop`、`dev-loop` 写进多个 active
 - read the updated active truth set together and confirm no file still implies `doc-loop` contains `dev-loop`
 - confirm verification / cleanup are described as route / phase / governance path rather than extra loop
 
-## Next
+## Code Review
 
-- 先完成本 issue 的 active truth 改写与一致性验证。
-- 若后续还要把“loop progress/stall observation”产品化到 CLI/TUI/GUI/API，应另走 observability capability lifecycle，而不是继续扩本 issue scope。
+- `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/code-reviews/20260324-three-loops-sibling-relationship-verification.md`
+
+## Verification Summary
+
+- active truth、runtime-facing contract、脚本提示词真源已统一到“`auto-loop` outer + `doc-loop` / `dev-loop` sibling”的模型，不再把它们描述成包含式“三层”。
+- verification / cleanup / recovery 已统一收束为 route / phase / governance path，不再伪装成额外 loop。
+- worker 负责在 `doc-loop` / `dev-loop` 内产出文档、实现、测试和 verification evidence；completion / cleanup / retirement judgement 明确回到 `auto-loop`。
+- watchdog 发现 restart storm / process churn 时只暴露 supervision signal；dead-loop / thrash 结论仍由主管在 `auto-loop` 中裁决。
+- 本 issue 的 pre-merge 验收已完成，但 worktree 仍需后续 merge / cleanup / retirement 才能进入 delete-eligible。
