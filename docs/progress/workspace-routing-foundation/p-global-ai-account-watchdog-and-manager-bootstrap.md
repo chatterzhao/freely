@@ -19,6 +19,7 @@
   - `ensure-manager.pid` 只代表 live watchdog，stale pid 会被覆盖并在退出时清理
   - cooldown elapsed 后先 reprobe/reselect，再决定 manager relaunch
 - 当前轮次主要补 canonical writeback，纠正 issue / milestone / code-review 与实际 continuation 状态之间的漂移。
+- 2026-03-24 fresh session 因上一轮 `context_compacted` 交接被重新拉起后，先按 continuity guard 重跑聚焦验证，再继续保持当前批次 `in_verification` / manager merge review 待处理结论。
 
 ## Verification
 
@@ -29,6 +30,15 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog`
 - `bash docs/system/workspace/scripts/tests/test-watchdog-control-plane-skills`
 - `./bin/governance-check`
+
+### Latest rerun
+
+- 2026-03-24 02:25:39 PDT fresh session rerun:
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-earliest-reset-wait-revive` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog` pass
+  - `bash docs/system/workspace/scripts/tests/test-watchdog-control-plane-skills` pass
+  - `./bin/governance-check` pass with legacy pre-brainstorm naming warnings only
 
 ## Next Action
 
