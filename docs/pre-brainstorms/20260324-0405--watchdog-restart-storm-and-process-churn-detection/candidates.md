@@ -3,9 +3,9 @@
 - id: `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation
 - source_brainstorm: `docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/brainstorms.md`
-- status: `needs_research`
+- status: `materialized`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `pending://watchdog-restart-storm-and-process-churn-signal-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/issues/watchdog-restart-storm-and-process-churn-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -31,7 +31,7 @@
   - 这是 runtime/watchdog 实现缺口，不是当前三个 loop 语义重构 issue 的附带 patch
   - 但它又已经被 active truth 明确依赖，不能继续只停留在口头 follow-on
 - next_action:
-  - 已可 materialize 为独立 issue；IBM 里继续冻结 `live-status` / `fleet-status` 暴露格式与测试矩阵
+  - 已 materialize；下一步进入 dev，实现 runtime signal、status surface 与 escalation followthrough
 - promotion_gate:
   - signal truth surface frozen
   - manager escalation path frozen

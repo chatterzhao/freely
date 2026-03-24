@@ -101,12 +101,13 @@ routing_policy:
 
 6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+- milestone_state: committed
+- phase_state: `done_ibm`
 - priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/issues/watchdog-restart-storm-and-process-churn-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/candidates.md`
-- next_action: 继续 pre-brainstorm，先冻结短窗口 restart / relaunch / process-count signal 的真相面、manager escalation 路径、以及 watchdog 暂停盲重启的最小规则；在这些边界稳定前，不直接往 `runtime/freely` 塞实现补丁
+- next_action: IBM 已 materialize，并冻结了 signal 真相面、manager escalation 边界、stall 分离语义与默认阈值；下一步进入 dev，实现 `runtime/freely` 的 signal helper、`session-state.env` 字段、`live-status`/`fleet-status` 暴露与 manager escalation followthrough
 
 7. `I-20260318-1825`
 - title: Worktree hygiene supervision control plane
