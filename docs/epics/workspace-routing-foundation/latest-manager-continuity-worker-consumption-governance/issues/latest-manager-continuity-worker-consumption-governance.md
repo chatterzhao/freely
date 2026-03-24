@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260322-0445`
 - title: Latest manager continuity worker consumption governance
-- phase_state: `in_progress`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `latest-manager-continuity-worker-consumption-governance`
@@ -88,5 +88,6 @@
 
 ## Next
 
-- 当前 pre-merge verification 已完成。
-- 仍需 merge 后在 `develop` 上做一次真实 `freely chat` post-merge acceptance，确认最新 manager continuity 会被 worker runtime 消费。
+- 2026-03-23 worker continuation re-ran the full targeted verification suite in the feature worktree and confirmed the scope is still verification-only; no new implementation gap surfaced.
+- 当前 pre-merge verification 已完成，并补上 delegated continuation active-prompt visibility 回归，确认 consumed ids 会在 AI 活跃期间立刻进入 live-status、停止后重新回到 pending。
+- 仍需 merge 后在 `develop` 上做一次真实 `freely chat` post-merge acceptance，确认最新 manager continuity 会被 worker runtime 消费，且 active pending 视图与 consumed truth 保持一致。

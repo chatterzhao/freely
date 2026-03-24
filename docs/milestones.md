@@ -267,7 +267,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
-- next_action: 已把 latest continuity consumption 接到主管 watchdog 主路径，并补 generated/consumed launch-state truth 与脚本级验收；下一步在 merge 到 `develop` 后执行真实 `freely chat` post-merge acceptance，确认 worker 会消费最新 manager continuity round
+- next_action: 2026-03-23 worker continuation 已重跑目标回归并完成 verification writeback，确认当前 lane 仍只剩 `develop` 上的真实 `freely chat` post-merge acceptance；在此之前保持 `in_verification`，不要重新扩成实现或 research scope
 
 ### completed_issues
 
