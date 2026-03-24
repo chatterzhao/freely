@@ -256,6 +256,34 @@ Validation batch governance:
 
 - runtime 只解析这个块，不从普通自然语言段落推理
 
+### F. `Validation batch governance:` `v1` contract freeze
+
+- 当前先冻结为单一 machine-readable block，而不是继续扩散到多处自然语言说明
+- `Validation batch governance:` `v1` 的最小 contract 以这 17 个 key 为准，顺序不得变化：
+  1. `block_format_version`
+  2. `validation_batch_id`
+  3. `validation_batch_state`
+  4. `validation_batch_mode`
+  5. `stale_reason`
+  6. `lifecycle_decision`
+  7. `integration_target`
+  8. `source_batch_base`
+  9. `replay_source_manifest`
+  10. `replay_order`
+  11. `retire_evidence_ref`
+  12. `remaining_cleanup_requirement`
+  13. `acceptance_contract_state`
+  14. `acceptance_contract_source`
+  15. `acceptance_contract_blocker`
+  16. `superseded_worker_prompts`
+  17. `superseded_worker_prompts_applied_at`
+- 其中 `retire_evidence_ref`、`remaining_cleanup_requirement`、`acceptance_contract_*`、`superseded_worker_prompts*` 都是必留 key；值未知时写 `unavailable`，不得省略
+- runtime / cleanup / delete gate 只能消费这一固定块，不得退回普通段落重新推理
+- 当前 freeze 的目标不是证明所有实现细节都已足够，而是证明：
+  - stale-batch truth surface 已唯一化
+  - delete gate 输入组合可以只靠这组字段和现有 lifecycle gate 读取
+  - `specimen-S1/S2/S3` 的拒绝结论不需要再引入平行状态词
+
 ### E. IBM 到 manager continuity 的最小桥
 
 - manager 不应自由发挥地“读完 issue 自己猜 acceptance 是否完整”
@@ -595,6 +623,35 @@ Validation batch governance:
 
 ## delete gate refusal samples
 
+## delete gate input combination v1
+
+- delete gate 不看 `merged + clean` 单点，不看 issue `completed` 单点，也不看 stale batch 已 `stopped` 单点
+- 当前冻结的最小输入组合只有两类：
+  - issue completion chain 输入：
+    - `done_ibm`
+    - `pre-tests.md` 质量 gate
+    - dev / verification writeback
+    - testing closeout evidence
+    - `phase_state=completed`
+  - delete eligibility chain 输入：
+    - merge evidence
+    - cleanup evidence
+    - `verified-retirable`
+    - delete guard decision
+    - `retired`
+- 若 `pre-tests.md` 显式声明 `post-merge acceptance`，它才作为 delete eligibility chain 的附加必经输入；未显式声明时，不得默认要求它
+- stale validation batch 还要附加读取：
+  - `validation_batch_state`
+  - `lifecycle_decision`
+  - `replay_source_manifest`
+  - `retire_evidence_ref`
+  - `remaining_cleanup_requirement`
+- 也就是说，当前 delete gate v1 的冻结目标是：
+  - issue completion chain 证明“issue 可 completed”
+  - delete eligibility chain 证明“worktree 可 delete”
+  - stale-batch 证据证明“source / replay / retire 已被当前 canonical owner 吸收”
+- 三者少任何一个，都只能 `delete_denied`
+
 - `specimen-S1 merged-clean-only`
   - 最小输入：
     - worktree `merged + clean`
@@ -608,7 +665,8 @@ Validation batch governance:
 - `specimen-S2 completed-only`
   - 最小输入：
     - issue `phase_state=completed`
-    - merge 已发生或已计划，但 `acceptance_contract_blocker!=none`，或 `remaining_cleanup_requirement` 仍包含 `post_merge_acceptance` / `cleanup_chain`
+    - merge 已发生或已计划，但 `acceptance_contract_blocker!=none`，或 `remaining_cleanup_requirement` 仍包含 `cleanup_chain`
+    - 若 `pre-tests.md` 显式声明 `post-merge acceptance`，则它也可出现在 `remaining_cleanup_requirement`
     - 没有 `verified-retirable` 或 `retired` 证据
   - 必要 supporting evidence：
     - issue / pre-tests / code-review 指针能证明 `completed` 不是 delete 放行条件
@@ -625,6 +683,10 @@ Validation batch governance:
     - fresh batch / replay closeout 证据不存在，或未能指向 manifest absorption
   - 期望结论：`delete_denied`
 - 当前 delete gate specimen 不另造新状态词；它们只证明 `Validation batch governance:` `v1` 块与既有 `completed` / cleanup gate / `verified-retirable` / `retired` 组合足以拒绝三类误删
+- 当前 `specimen-S1/S2/S3` 的 freeze 目标也固定为三条拒绝语义：
+  - `S1` 证明 `merged + clean` 从来不是 delete-eligible
+  - `S2` 证明 issue `completed` 仍不能跳过 cleanup / optional post-merge acceptance / retirement chain
+  - `S3` 证明 stale batch 即使 stopped，也不能在 source manifest 未被 fresh owner 吸收时删除
 
 ## pre-IBM validation matrix draft
 
@@ -660,6 +722,13 @@ Validation batch governance:
   - `specimen-S1/S2/S3` 对应的 refusal specimen / evidence 组合，用于证明这组字段已足够支撑 runtime gate 与 cleanup/delete 判断
   - `retire_evidence_ref` / `remaining_cleanup_requirement` 是否仍需额外补强，才能支撑 cleanup skill、future hook 与 fresh-batch absorption 共读
 - 在这三块还没冻结前，当前 lane 仍应停在 `continuation -> pre_brainstorm`
+- 本轮收口后，已冻结的是：
+  - `Validation batch governance:` `v1` 固定块与 key 顺序
+  - delete gate 输入组合 v1
+  - `specimen-S1/S2/S3` 的最小拒绝语义
+- 仍未冻结的只剩：
+  - `retire_evidence_ref` / `remaining_cleanup_requirement` 是否足够表达 fresh-batch absorption
+  - 独立 acceptance review 是否认为这三块已经足以 materialize
 
 ## 需要冻结的开放问题
 

@@ -61,13 +61,14 @@
   - 冻结 `pre-test-merge` 的反滥用默认路由：未命中显式 `integration_target=pre-test-merge` 或主线前组合验证需求时，不得把它当默认验证面
   - 冻结 `superseded_worker_prompts` 与 stale batch gate 的联动，保证旧 queued prompt 不会继续被 runtime 消费
   - 冻结 `validation_batch_mode=read_only_cleanup|rebuild_planning`，确保 `collect_cleanup_evidence` 不会被误读成恢复普通 verification
-  - 冻结 `Validation batch governance:` `v1` specimen 与 key 顺序，并证明 runtime / cleanup skill 只靠该块就能稳定读到最小治理字段
+  - 冻结 `Validation batch governance:` `v1` 固定块、必留 key 与 key 顺序，并证明 runtime / cleanup skill 只靠该块就能稳定读到最小治理字段
   - 明确 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链与 stale governance 的连接点，避免把 acceptance contract 缺失误修成纯 runtime stale 判定
   - 冻结 issue completion chain 与 delete eligibility chain 的分段语义，证明 `completed` 只表示 issue 完成，不表示 worktree / branch 已可删除
   - 冻结三层 loop 的进入/跳出/最外层结束条件，证明只有 cleanup/auto-loop governance 闭合并到 `retired`，当前主题才从 active lifecycle 中退出
   - 冻结 testing closeout 的最低 evidence bar，明确 application-native real-environment testing 属于主验证面；Freely self-host 时其当前实例才是 `freely chat`
   - 冻结最终 delete worktree / branch 门禁的最小输入组合与拒绝语义，并判断它是否应由现有 hook / guard 投影兜住
   - 用 `specimen-S1/S2/S3` 的 field audit/evidence 证明 delete gate 会拦住至少三类误删：`merged + clean` 误删、issue `completed` 误删、stale batch source/replay evidence 尚未吸收时的误删
+  - 证明 `post-merge acceptance` 只有在 `pre-tests.md` 显式声明时才进入 delete eligibility chain，而不是默认必经 gate
   - 完成一轮针对 `combined minimal contract v0` 的独立 acceptance review，确认 supporting pools 仍只支持 `stay_pre_brainstorm` 或已经足够升级到 IBM，而不是在当前 worker round 里靠作者自证
 - open_questions:
   - `develop` 前进、protected-env 独有差异、cleanup/replay 证据未齐三者的优先级如何定义
@@ -103,10 +104,10 @@
     verdict: `stay_pre_brainstorm`
 - priority: P1
 - status: needs_research
-- decision_reason: 这是治理规则落成工具能力的下一步，但当前稳定边界是 stale-batch combined minimal contract，而不是单点 runtime/status 补丁。human continuation `20260324-001134-continuation-dogfood-watchdog-fr` 及其 superseding delegated continuations `20260324-024942`、`20260324-025910`、`20260324-030713`，连同 supporting pools，仍只证明应继续 pre-brainstorm；它们还没有把 manager truth surface、runtime gate、replay/retire evidence、acceptance bridge 与 delete gate 输入冻结成可直接 materialize 的单一 issue contract。
+- decision_reason: 这是治理规则落成工具能力的下一步，但当前稳定边界是 stale-batch combined minimal contract，而不是单点 runtime/status 补丁。human continuation `20260324-001134-continuation-dogfood-watchdog-fr` 及其 superseding delegated continuations `20260324-024942`、`20260324-025910`、`20260324-030713`，连同 supporting pools，仍只证明应继续 pre-brainstorm；本轮已把 manager truth surface、runtime gate、delete gate 输入组合和 `specimen-S1/S2/S3` refusal evidence 收紧到更接近 materializable，但 `retire_evidence_ref` / `remaining_cleanup_requirement` 对 fresh-batch absorption 的 sufficiency 与独立 acceptance review 仍未收口。
 - promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
-- next_action: `C-20260322-1801-A` 已 materialize 成正式 issue；当前继续 pre-brainstorm，并将 `20260324-001134-continuation-dogfood-watchdog-fr` 及其 superseding delegated continuations 明确吸收到 `C-20260322-1801-B` 的 canonical contract 中，继续保留 `combined minimal contract v0`。本轮进一步把最小下一步冻结为三件事：先把 manager continuity 的 `Validation batch governance:` `v1` 块与固定 key 顺序写实成唯一承载语法；再用 `specimen-S1/S2/S3` 的 refusal specimen/evidence 证明这组字段已足够支撑 runtime gate 与 cleanup/delete 判断；随后再确认 `retire_evidence_ref` / `remaining_cleanup_requirement` 是否还需额外补强来表达 fresh-batch absorption，最后才重新判断是否进入 IBM
+- next_action: `C-20260322-1801-A` 已 materialize 成正式 issue；当前继续 pre-brainstorm，并将 `20260324-001134-continuation-dogfood-watchdog-fr` 及其 superseding delegated continuations 明确吸收到 `C-20260322-1801-B` 的 canonical contract 中，继续保留 `combined minimal contract v0`。本轮已冻结 manager continuity 的 `Validation batch governance:` `v1` 固定块、delete gate 输入组合 v1，以及 `specimen-S1/S2/S3` 的 refusal specimen/evidence；最小剩余下一步收窄为确认 `retire_evidence_ref` / `remaining_cleanup_requirement` 是否已足够表达 fresh-batch absorption，并补一轮独立 acceptance review，之后再重新判断是否进入 IBM
 - revisit_trigger: 当 `Validation batch governance:` `v1` 固定块、runtime gate、replay/retire evidence、`acceptance_contract_state/source/blocker -> pre-tests.md` 质量 gate 的桥、pre-IBM validation matrix，以及“`completed` / cleanup gate / `verified-retirable` / `retired` / delete guard”组合和 `specimen-S1/S2/S3` 的 refusal evidence 都经独立 review 证实稳定，且未重新混入 `worker self-loop exit` 时，重新进入 materialization 判断
 - session_refs:
   - tool: codex
