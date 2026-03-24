@@ -54,6 +54,45 @@ cat >"$PROJECT/.freely/run/manager-continuity-20260321-003954.md" <<'EOF'
 - next_supervision_priority:
   - runtime 创建或进入 dedicated worktree
 EOF
+mkdir -p "$PROJECT/.freely/run/worker-prompts"
+QUEUE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260321-004000-worker-queued-codex.txt"
+FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260321-004100-worker-frozen-codex.txt"
+cat >"$QUEUE_PROMPT" <<'EOF'
+Worktree:
+- `/tmp/queued-worktree`
+Branch:
+- `feature/queued`
+EOF
+cat >"$FROZEN_PROMPT" <<'EOF'
+Worktree:
+- `/tmp/frozen-worktree`
+Branch:
+- `feature/frozen`
+EOF
+cat >"$PROJECT/.freely/run/manager-continuity-20260321-004200.md" <<EOF
+# Manager Continuity
+- selected_pool: \`human chat / session evidence\`
+
+## Queue
+- lane: \`dispatchable\`
+  - prompt_path: \`$QUEUE_PROMPT\`
+
+## Frozen Queue
+- lane: \`keep-frozen\`
+  - prompt_path: \`$FROZEN_PROMPT\`
+EOF
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$PROJECT/.freely/run/manager-continuity-20260321-004200.md"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$QUEUE_PROMPT"
+LAST_MANAGER_CONTINUITY_CONSUMED="$PROJECT/.freely/run/manager-continuity-20260321-004200.md"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$FROZEN_PROMPT"
+LAUNCHED_WORKER_PROMPTS="$FROZEN_PROMPT"
+QUEUED_WORKER_PROMPTS=""
+MAX_PARALLEL_WORKERS="2"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="2"
+UPDATED_AT="2026-03-20T19:47:46Z"
+EOF
 cat >"$PROJECT/.freely/intake/20260320-000001-demo/meta.env" <<'EOF'
 INTAKE_ID="20260320-000001-demo"
 CREATED_AT="2026-03-20T19:47:46Z"
@@ -114,6 +153,11 @@ printf '%s\n' "$OUTPUT" | grep -q 'CURRENT_BRANCH=feature/research-codex-in-cc-m
 printf '%s\n' "$OUTPUT" | grep -q 'selected_pool: `human chat / session evidence`'
 printf '%s\n' "$OUTPUT" | grep -q 'last_tool_jsonl_path: '
 printf '%s\n' "$OUTPUT" | grep -q 'latest_resolution:'
+printf '%s\n' "$OUTPUT" | grep -q "latest_manager_worker_prompts_generated: $QUEUE_PROMPT"
+printf '%s\n' "$OUTPUT" | grep -q 'latest_manager_worker_prompts_consumed: none'
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}" == "none" || -z "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" ]]
 
 kill "$SUP_PID" "$DISPATCH_PID" "$AI_PID" 2>/dev/null || true
 wait "$SUP_PID" 2>/dev/null || true
