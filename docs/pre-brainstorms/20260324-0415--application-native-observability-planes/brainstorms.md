@@ -21,6 +21,7 @@
 - 主管、watchdog、用户插话之前，应该按什么顺序读哪些证据面。
 - 多个状态平面、会话平面、流式日志平面、fleet 平面之间如何对应。
 - 如何把 Freely 自己的观测信号泛化成未来任意应用都能消费的 contract。
+- CLI / TUI / GUI / API 应该把哪些平面直接暴露给用户，才能让用户知道“系统现在在哪个状态、该往哪里插话、该展开哪条日志/会话继续判断”。
 
 ## Direction
 
@@ -39,6 +40,19 @@
 4. 哪些 surface 回答“用户应该往哪个状态、哪个会话、哪个 artifact 插话”。
 5. 哪些 surface 回答“什么时候测试真正通过，什么时候还不能删 worktree”。
 
+## Product Surface Requirement
+
+这条线不只是内部 watchdog 观察技巧，还要收敛成用户可消费的状态暴露 contract。
+
+未来至少要支持：
+
+- CLI surface：快速 current-state / fleet summary，以及可点击/可复制的 deep refs
+- TUI surface：状态卡片、日志 tail、artifact drill-down、用户插话入口
+- GUI surface：多平面视图、lane/worktree/session drill-down、实时流展开
+- future API surface：结构化状态、session refs、artifact refs、queue/frozen/retire 状态暴露
+
+这些 surface 不必 day-1 同时实现，但本线必须先冻结它们共享的最小信息架构。
+
 ## Proposed Planes
 
 ### 1. Current-state plane
@@ -56,6 +70,12 @@ Freely 当前 concrete profile：
 - `manager continuity`
 - `worker prompts`
 
+产品面要求：
+
+- 每个状态卡片至少应带 `owner / phase / desired state / current activity`
+- 卡片必须能告诉用户“下一步最相关的深挖入口是什么”
+- 若当前适合插话，卡片必须能暴露对应 lane / topic / project 着力点
+
 ### 2. Session plane
 
 回答：
@@ -71,6 +91,12 @@ Freely 当前 concrete profile：
 - `.freely/logs/cycle-*.log`
 - `.freely/run/prompt-*.txt`
 
+产品面要求：
+
+- 状态卡片能跳到对应 session / prompt / log
+- 同一 topic 下多个 worktree / subagent 的 session 能映射回统一 lane
+- deep ref 允许 human-readable，但最小映射字段要 machine-readable
+
 ### 3. Stream plane
 
 回答：
@@ -85,6 +111,12 @@ Freely 当前 concrete profile：
 - cycle log tail
 - session jsonl tail
 
+产品面要求：
+
+- 默认只看 tail，但要能一键展开完整实时流
+- 流式面必须标清它属于哪个 worktree / lane / session
+- 若存在多个并行流，默认要能按 topic 或 owner 聚合，而不是只按文件名堆叠
+
 ### 4. Fleet plane
 
 回答：
@@ -97,6 +129,12 @@ Freely 当前 concrete profile：
 
 - `fleet-status`
 - milestone / issue / progress / recovery
+
+产品面要求：
+
+- 必须能看到多 worktree / 多 lane / 多 subagent 的全局状态流转
+- 至少区分 `active / queued / frozen / evidence-only / merge-ready-not-delete-ready / retire-candidate`
+- 要能从 fleet 总览点进单个 lane 的状态卡片和 deep refs
 
 ### 5. Artifact plane
 
@@ -112,6 +150,15 @@ Freely 当前 concrete profile：
 - worker continuity
 - verification / cleanup evidence
 - issue `pre-tests.md`
+
+产品面要求：
+
+- artifact plane 必须告诉用户“当前是缺 artifact、缺消费、缺测试、还是缺 cleanup”
+- testing closeout 必须能从 artifact plane 直接看出：
+  - `pre-tests.md` 是否存在
+  - 是否逐项执行
+  - application-native real-environment testing evidence 是否齐
+  - 为什么 아직不能删 tree
 
 ## Observation Order
 
@@ -134,6 +181,15 @@ Freely 当前 concrete profile：
 5. 需要全项目判断时再看 `fleet-status`
 6. 超过 stall threshold 仅作为最后兜底
 
+这里的关键不是“等几秒”，而是：
+
+- 先看当前态是否已经给出插话着力点
+- 再看 stream tail 是否还有推进信号
+- 再看 artifact 是否真的在前进
+- 最后才让时间阈值兜底
+
+这样既适用于 Freely 自举，也能泛化到 future arbitrary apps。
+
 ## Boundary
 
 本线不直接实现：
@@ -147,6 +203,7 @@ Freely 当前 concrete profile：
 - observation planes 词典
 - application-native observation contract
 - Freely self-host concrete profile
+- product-facing state exposure contract
 - 与现有 `live-status` issue、stall candidate、frontend probe 的依赖关系
 
 ## Coordination With Existing Lines
