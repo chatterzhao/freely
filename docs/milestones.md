@@ -364,8 +364,19 @@ routing_policy:
 - promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
-- next_action: 等职责定义收稳后，再决定 stale-batch detection、batch retirement、replay requirement 和 promote visibility 应落在 runtime/status、branch-management、manager patrol 还是组合能力中；在此之前不直接写成某一层的局部补丁
-- revisit_trigger: 当 `pre-test-merge` lifecycle capability 的真源、触发面与最小 machine-readable outputs 可以被冻结成独立 issue contract 时，重新进入 materialization 判断
+- next_action: 继续 pre-brainstorm，但 scope 已收窄为 `stale pre-test-merge governance`，先冻结三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`；同时补齐 `replay source manifest / replay order / retire evidence`，把 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链桥接成固定的 `acceptance_contract_state/source/blocker` 字段，并把 testing closeout 的集成测试 / application-native real-environment testing evidence bar 写死，在这些真源稳定前不进入实现
+- revisit_trigger: 当 stale state 的 canonical 落点、manager lifecycle transaction 字段、runtime gate 消费路径、replay/retire manifest、`acceptance_contract_state/source/blocker` 桥，以及 testing closeout evidence bar 都能冻结成独立 issue contract 时，重新进入 materialization 判断
+
+11. `C-20260322-1801-C`
+- title: worker self-loop exit and scheduler closeout governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://worker-self-loop-exit-and-scheduler-closeout-governance`
+- source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
+- next_action: 继续 pre-brainstorm，单独冻结 `phase progress`、`loop stall`、`manager handback`、`capacity release / supersede` 规则；同时补清 lane 回交后如何识别“其实是上游 `Issue + Brainstorm + PRD -> pre-tests.md` acceptance 面不完整”以及“其实还没完成 integration / application-native real-environment testing closeout”；在 machine-readable 阈值稳定前，不与 stale `pre-test-merge` gate 绑在一起实现
+- revisit_trigger: 当 low-value self-loop 的判据、manager 回交 contract、容量释放规则，以及与 IBM/`Issue + Brainstorm + PRD -> pre-tests.md` 缺口和 testing closeout 缺口的分流条件都能冻结成独立 issue contract 时，重新进入 materialization 判断
 
 6. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec
