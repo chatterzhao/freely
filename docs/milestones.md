@@ -282,12 +282,12 @@ routing_policy:
 22. `I-20260322-0445`
 - title: Latest manager continuity worker consumption governance
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
-- next_action: 本轮 active-worker launch-state followthrough 仍未复现新的 repo gap；`develop` 上 canonical truth 先对齐到 continuity `20260324-033747`，随后又继续前进到 `20260324-034106`，且 `live-status` 与 `manager-worker-launch-state.env` 在两个时间切片都保持一致。最新 surface 已把同一 worker prompt `20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt` 记录为 generated+consumed，`queued_worker_prompts=none`，`active_running_worker_count=1`；fleet 中分离出来的 stale-batch lane 继续归 `C-20260322-1801-B` / runtime-owned。当前 branch 仍只剩 canonical `develop` acceptance 的最终 closeout 作为 completion blocker；在此之前保持 `in_verification`，视为 merge-ready 但不是 delete-ready，不要重新扩成实现或 research scope
+- next_action: canonical `develop` post-merge acceptance 已通过，当前 issue 已 `completed`。后续仅继续 cleanup / retirement followthrough：吸收 docs-only closeout writeback，保持 same-family active/recovery 树的显式保留理由，等 supervisor/runtime 跑完正常 cleanup gate 后再判断 `verified-retirable` 与 delete eligibility
 
 ### completed_issues
 
