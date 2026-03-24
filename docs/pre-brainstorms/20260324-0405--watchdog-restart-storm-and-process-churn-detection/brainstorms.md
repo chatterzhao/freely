@@ -55,6 +55,44 @@
 3. signal 进入 manager continuity / launch-state / live-status，可被主管在 `auto-loop` 中消费
 4. 命中 churn signal 后，watchdog 暂停盲重启，改为等待 manager judgement / handoff
 
+## 真相面草案
+
+- 原始 runtime signal 真相面：`session-state.env`
+  - 适合承载短窗口计数、时间窗、上次 signal 时间、最近一次 escalation 理由
+  - 属于 runtime 原生观察面，`live-status` / `fleet-status` 已经会消费它
+- manager continuity：只承载主管对 signal 的治理裁决
+  - 例如继续恢复、冻结 lane、kill/restart worker、重判 route
+  - 不应作为 restart storm 原始计数真相面
+- `live-status` / `fleet-status`：只做派生观察，不自判 dead-loop
+
+## 最小字段草案
+
+- `RESTART_STORM_WINDOW_SECS`
+- `RESTART_STORM_COUNT`
+- `PROCESS_CHURN_PEAK`
+- `LAST_RESTART_STORM_SIGNAL_AT`
+- `LAST_RESTART_STORM_SIGNAL_REASON`
+- `LAST_RESTART_STORM_ESCALATED_AT`
+- `LAST_RESTART_STORM_ESCALATION_TARGET`
+
+## 交互草案
+
+1. runtime watchdog 记录短窗口启动/重启/进程峰值
+2. 阈值命中后写 `session-state.env` signal 字段
+3. `live-status` / `fleet-status` 暴露 signal
+4. watchdog 不继续无限盲重启，而是把当前轮切到 manager escalation
+5. 主管在 `auto-loop` 中基于 signal + prompt/jsonl/cycle tail 判断：
+   - 正常 recovery
+   - stale prompt / route drift
+   - dead-loop / thrash
+6. 裁决结果再通过 continuity / handoff 写回 runtime
+
+## 进入 IBM 前必须冻结的问题
+
+1. signal 只放 `session-state.env`，还是还要同步到 `workcell-state.env`
+2. manager escalation 触发后，watchdog 是完全暂停，还是进入低频观察模式
+3. manager continuity 最小需要哪些字段，才能既不重复 signal 真相，又足够驱动 runtime followthrough
+
 ## 代码与真源落点候选
 
 - `docs/system/workspace/scripts/runtime/freely`
