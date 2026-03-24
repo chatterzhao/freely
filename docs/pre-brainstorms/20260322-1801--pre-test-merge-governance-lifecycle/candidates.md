@@ -37,7 +37,7 @@
   - stale 后 manager 继续使用既有 `ownership / restart_point / next_action` 词典，但必须补齐 `replay source manifest`、`replay order`、`retire evidence`、`remaining cleanup requirement`
   - runtime 对 stale batch 只允许 read-only patrol、cleanup handoff、rebuild/replay handoff，不再把它恢复成普通 verification 会话
   - 所有指向 stale batch 的旧 queued worker prompts / delegated launches 都会被 supersede 或失效，不再继续消费旧 prompt 池
-  - 只能使用现有状态与 gate 组合判断是否继续推进或删树：`done_ibm`、`completed`、cleanup gate、`verified-retirable`、`retired`；stale retire/rebuild 不得只依据 issue `completed` 或局部 loop 收口
+  - 只能使用现有状态与 gate 组合判断是否继续推进或删树：`done_ibm`、`completed`、cleanup gate、`verified-retirable`、`retired`；其中 `completed` 只代表 issue completion，不代表 delete-eligible，stale retire/rebuild 不得只依据 issue `completed` 或局部 loop 收口
   - 上述 contract 优先落在现有真源：manager continuity 为唯一治理真相面，`manager-worker-launch-state.env` 与 `live-status` 仅做消费镜像，不新增平行状态文件
   - manager continuity 必须带批次身份锚点与固定承载语法，至少包括 `validation_batch_id`、`integration_target`、`source_batch_base`，并以固定可解析块承载，而不是自由文本
   - 当前固定承载语法先冻结为 manager continuity 中连续的 `Validation batch governance:` `v1` 块，标题下每行固定为 `- key: value`，并保持固定 key 顺序
@@ -58,6 +58,7 @@
   - 冻结 `validation_batch_mode=read_only_cleanup|rebuild_planning`，确保 `collect_cleanup_evidence` 不会被误读成恢复普通 verification
   - 冻结 `Validation batch governance:` `v1` specimen 与 key 顺序，并证明 runtime / cleanup skill 只靠该块就能稳定读到最小治理字段
   - 明确 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链与 stale governance 的连接点，避免把 acceptance contract 缺失误修成纯 runtime stale 判定
+  - 冻结 issue completion chain 与 delete eligibility chain 的分段语义，证明 `completed` 只表示 issue 完成，不表示 worktree / branch 已可删除
   - 冻结 testing closeout 的最低 evidence bar，明确 application-native real-environment testing 属于主验证面；Freely self-host 时其当前实例才是 `freely chat`
   - 冻结最终 delete worktree / branch 门禁的最小输入组合与拒绝语义，并判断它是否应由现有 hook / guard 投影兜住
   - 用 `specimen-S1/S2/S3` 的 field audit/evidence 证明 delete gate 会拦住至少三类误删：`merged + clean` 误删、issue `completed` 误删、stale batch source/replay evidence 尚未吸收时的误删

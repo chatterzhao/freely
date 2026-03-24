@@ -23,7 +23,7 @@ phase_state_policy:
 - `phase_state=in_dev`: keep the issue visible in `committed_issues` and require matching `progress`
 - `phase_state=blocked_dev`: keep the issue visible with blocker, next action, and current execution context
 - `phase_state=in_verification`: keep the issue visible until completion evidence is written back
-- `phase_state=completed`: move the issue to `completed_issues` with evidence
+- `phase_state=completed`: move the issue to `completed_issues` with evidence; this is issue-level completion only and does not by itself make the worktree / branch delete-eligible
 
 session_policy:
 - full `session_refs` live in candidate / issue / progress / recovery artifacts
@@ -364,8 +364,8 @@ routing_policy:
 - promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
-- next_action: 继续 pre-brainstorm；当前已把 `C-20260322-1801-B` 收紧到 `combined minimal contract v0`，且独立 review 已确认 supporting pools 仍只支持 `stay_pre_brainstorm`：`manager continuity` 持有唯一 stale truth surface 与 acceptance bridge，runtime launch state / `live-status` 只 mirror + hard gate，branch/worktree governance 只消费 replay / retire / delete 证据。当前最小下一步进一步冻结为先写实 manager continuity 的 `Validation batch governance:` `v1` 固定块与 key 顺序，再用 `specimen-S1/S2/S3` 的 refusal specimen/evidence 证明这组字段足以支撑 runtime gate 与 cleanup/delete 判断；随后再确认 `retire_evidence_ref` / `remaining_cleanup_requirement` 是否还需额外补强来表达 fresh-batch absorption，再决定是否进入 issue materialization
-- revisit_trigger: 当 `Validation batch governance:` `v1` 固定块、runtime gate、replay/retire evidence、`acceptance_contract_state/source/blocker -> pre-tests.md` 质量 gate 的桥、pre-IBM validation matrix，以及“`completed` / cleanup gate / `verified-retirable` / `retired` / delete guard”组合和 `specimen-S1/S2/S3` 的 refusal evidence 都经独立 review 证实稳定，且未重新混入 `worker self-loop exit` 时，重新进入 materialization 判断
+- next_action: 继续 pre-brainstorm；当前已把 `C-20260322-1801-B` 收紧到 `combined minimal contract v0`，且独立 review 已确认 supporting pools 仍只支持 `stay_pre_brainstorm`：`manager continuity` 持有唯一 stale truth surface 与 acceptance bridge，runtime launch state / `live-status` 只 mirror + hard gate，branch/worktree governance 只消费 replay / retire / delete 证据。当前最小下一步进一步冻结为先写实 manager continuity 的 `Validation batch governance:` `v1` 固定块与 key 顺序，再用 `specimen-S1/S2/S3` 的 refusal specimen/evidence 证明这组字段足以支撑 runtime gate 与 cleanup/delete 判断；随后再确认 `retire_evidence_ref` / `remaining_cleanup_requirement` 是否还需额外补强来表达 fresh-batch absorption，再决定是否进入 issue materialization。这里的完成顺序必须固定：`done_ibm` -> `pre-tests.md` 质量 gate -> dev / verification -> testing closeout -> `completed` -> merge / post-merge acceptance -> cleanup evidence -> `verified-retirable` -> delete guard -> `retired`
+- revisit_trigger: 当 `Validation batch governance:` `v1` 固定块、runtime gate、replay/retire evidence、`acceptance_contract_state/source/blocker -> pre-tests.md` 质量 gate 的桥、pre-IBM validation matrix，以及“issue completion chain / delete eligibility chain”分段语义和 `specimen-S1/S2/S3` 的 refusal evidence 都经独立 review 证实稳定，且未重新混入 `worker self-loop exit` 时，重新进入 materialization 判断
 
 11. `C-20260322-1801-C`
 - title: worker self-loop exit and scheduler closeout governance
