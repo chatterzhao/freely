@@ -350,6 +350,41 @@ Freely 后续应具备能力去判断：
 - 因此，`completed` 之前要有测试门，最终 delete worktree / delete branch 之前还要有最后一道删除门；两者不能混成一次判断
 - 最终删除门若未来可以由 hook / guard 投影执行，应以现有状态与 evidence 组合作为输入，而不是重新发明平行状态
 
+## 最新 field audit
+
+这轮并行审计把一个关键事实钉死了：`merged + clean` 不是 delete gate，甚至连“接近可删”都不稳定。
+
+当前最有代表性的 worktree 现状如下：
+
+1. `pre-test-merge`
+- 已确认 stale
+- 已补最小 retire-evidence 文档，但仍不可 delete
+- 当前 blocker 不是 dirt，而是 stale batch 里仍承载了只存在于该批次的 source payload / replay chain；它必须先被 replay/absorb 到当前 `develop`，或明确 return 到来源 feature lane，删除才安全
+
+2. `feature/delegated-continuation-prompt-consumption-visibility-20260323`
+- 已收敛成 verification-only closeout lane
+- 当前可以视为 merge-ready
+- 但仍不可 delete；唯一剩余 gate 是 merge 后在 `develop` 上跑一次真实 post-merge acceptance，并按 `pre-tests.md` 留下 application-native real-environment testing evidence
+
+3. `feature/manager-scheduler-capacity-and-queueing-20260323`
+- 仍是 active pre-brainstorm candidate
+- 不但不能 delete，连 issue materialization 也还没到
+- 下一门已明确：先冻结 capacity owner、queue reconcile winner、busy-worker relaunch scope，再用一轮 `develop` dogfood 证明 queue / capacity / busy-worker 行为稳定
+
+4. `feature/manager-delegated-continuation-stall-materialization-20260323`
+- 仍是 active pre-brainstorm followthrough
+- 明确不可 delete
+- 剩余缺口已收紧成一条 proof chain：`stalled delegated continuation intake id -> current manager prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict`
+
+5. 另外 6 棵“merged + clean”的历史树也全部未过 delete gate
+- 共通缺口不是 Git 状态，而是 lifecycle closeout evidence
+- 它们分别仍停在 `in_verification`、`needs_research`、`pending://issue-materialization`，或缺少 explicit cleanup / retire evidence
+
+这轮 audit 直接说明：未来 delete guard / hook 至少要能拒绝以下误删：
+- 只因 `merged + clean` 就删树
+- 只因 issue `completed` 或局部 loop 收口就删最后一个 owner tree
+- 只因 stale batch 已停止运行就删除仍承载 replay/source evidence 的验证批次
+
 - worker continuity 先作为真相面：
   - `lane_phase_progress=advanced|unchanged`
   - `lane_stall_reason=verification_only_repeat|continuity_refresh_repeat|none`

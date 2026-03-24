@@ -57,6 +57,7 @@
   - 明确 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链与 stale governance 的连接点，避免把 acceptance contract 缺失误修成纯 runtime stale 判定
   - 冻结 testing closeout 的最低 evidence bar，明确 application-native real-environment testing 属于主验证面；Freely self-host 时其当前实例才是 `freely chat`
   - 冻结最终 delete worktree / branch 门禁的最小输入组合与拒绝语义，并判断它是否应由现有 hook / guard 投影兜住
+  - 用真实 field audit 证明 delete gate 会拦住至少三类误删：`merged + clean` 误删、issue `completed` 误删、stale batch source/replay evidence 尚未吸收时的误删
 - open_questions:
   - `develop` 前进、protected-env 独有差异、cleanup/replay 证据未齐三者的优先级如何定义
   - stale 后哪些过渡动作被允许保留在 manager-owned lane 中，哪些必须直接进入 rebuild/cleanup
@@ -77,7 +78,7 @@
 - decision_reason: 这是治理规则落成工具能力的下一步，但 scope 应收窄到 stale `pre-test-merge` lifecycle transaction，不应继续绑入一般性的 worker self-loop exit。
 - promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
-- next_action: `C-20260322-1801-A` 已 materialize 成正式 issue；当前继续 pre-brainstorm，但 focus 收窄为三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`。在 replay/retire manifest 及状态真相面冻结前，不直接实现
+- next_action: `C-20260322-1801-A` 已 materialize 成正式 issue；当前继续 pre-brainstorm，但 focus 收窄为三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`。本轮 field audit 已确认 `merged + clean`、issue `completed`、stale batch stopped 三类信号都不足以删树；下一步先把这些误删拒绝条件整理成 delete gate 最小输入，再决定是否 materialize
 - revisit_trigger: 当 stale state 的 canonical 落点、manager lifecycle transaction 字段、runtime gate 消费路径、`acceptance_contract_state/source/blocker` 如何桥接 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链、从 `done_ibm` 到 delete worktree 的完成检查顺序，以及最终 delete guard / hook 的最小输入组合与拒绝语义都能冻结为 issue contract 时，重新进入 materialization 判断
 - session_refs:
   - tool: codex
