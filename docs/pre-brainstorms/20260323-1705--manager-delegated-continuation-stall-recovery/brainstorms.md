@@ -104,7 +104,7 @@
   - 当前 prompt excerpt 仍直接指向这条候选前一轮 writeback diff，说明 delegated continuation 语义仍在当前 worker prompt 上下文中
 - 这层 worker-side `live-status` 说明 runtime 当前仍在沿用 `context_compacted -> fresh_with_handoff` 的 continuity 策略，而且 current process view 已经出现 `activity_state=ai_active` 与 `last_ai_state=down/ai_exit_rc_0` 并存；它证明运行态切面仍在推进或轮换，但仍不能替代当前候选所需的 manager-side prompt-cycle binding acceptance anchor
 - 当前 worktree hygiene 事实：
-  - canonical writeback 已继续收敛到当前 `HEAD` 提交 `114a6a4 docs: refresh delegated continuation continuity state`
+  - canonical writeback 已继续收敛到当前 `HEAD` 提交 `16182d6 docs: align delegated continuation continuity anchors`
   - 当前 `git status --short` 已 clean，没有发现超出本候选 write scope 的残留脏项
   - 因此这轮不再需要额外 checkpoint/commit；后续 cleanup 判断的关键前提改为“这些提交何时被上游吸收”，而不是“是否还有未提交 dirty delta”
 - 当前仓库扫描未发现 `docs/progress/**`、`docs/epics/**` 或其他 issue/progress/recovery 真源已经接管本候选；因此这轮 continuity 仍应写回 pre-brainstorm，而不是误切到 IBM、dev-loop 或 recovery
@@ -138,6 +138,7 @@
     - `7fc7b24 docs: checkpoint delegated continuation stall writeback`
     - `473075b docs: refresh delegated continuation evidence counts`
     - `114a6a4 docs: refresh delegated continuation continuity state`
+    - `16182d6 docs: align delegated continuation continuity anchors`
 - 因此当前真实问题不是“是否保留 dirty delta”，而是“这些 canonical pre-brainstorm writeback 提交是否仍应保留为独有分支提交，还是应该冻结/丢弃”
 - 本轮再次核对：
   - `docs/milestones.md` 仍把 `C-20260323-1705-A` 保留在 `candidate_issues`
