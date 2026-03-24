@@ -325,9 +325,18 @@ Freely 后续应具备能力去判断：
   - integration / end-to-end evidence
   - application-native real-environment testing evidence
   - 最后才是局部代码级或纯单测证据
-- `phase_state=completed` 只能表达 issue-level completion；它不等于 worker/agent/skill lane 已完全收口，也不等于 branch/worktree/topic 已 fully closed
-- 内循环完成、外循环完成、单个 agent/skill 的局部完成，都不能直接当作“任务做完”
-- 真正的 topic closeout 还要继续经过：merge / post-merge acceptance / cleanup evidence / owner continuity 全部闭合
+- `phase_state=completed` 是 issue 唯一的最终态，但它只说明 issue 生命周期完成；它本身不等于 worktree 已可删除
+- `done_ibm`、单轮 verification 收口、单个 agent/skill 的局部完成，都不是任务最终完成
+- 删除 worktree 还要继续看现有 lifecycle gate 是否凑齐：merge / post-merge acceptance / cleanup evidence / `verified-retirable` / `retired`
+- 因而完成检查顺序至少应固定为：
+  - IBM 产物达标，且 `pre-tests.md` 质量 gate 通过
+  - dev / verification 执行完成
+  - testing closeout gate 通过，且 `pre-tests.md` 项目逐项执行并留痕
+  - issue 才允许进入 `phase_state=completed`
+  - 之后继续检查 merge / post-merge acceptance / cleanup evidence
+  - 当前树达到 `verified-retirable`
+  - 执行最终 delete branch/worktree guard
+  - 最后才进入 `retired`
 - “application-native real-environment testing” 指当前应用自己的真实入口、真实交互面、真实集成路径，而不是抽象脚本替身
 - 在 Freely 自举场景里，它当前的具体形态才是：
   - `./bin/freely start`
@@ -338,6 +347,8 @@ Freely 后续应具备能力去判断：
   - 集成测试
   - application-native real-environment testing
 - 若缺少这些 evidence，manager 不应把 lane 判成 `completion_verification done` 或允许 worktree retirement
+- 因此，`completed` 之前要有测试门，最终 delete worktree / delete branch 之前还要有最后一道删除门；两者不能混成一次判断
+- 最终删除门若未来可以由 hook / guard 投影执行，应以现有状态与 evidence 组合作为输入，而不是重新发明平行状态
 
 - worker continuity 先作为真相面：
   - `lane_phase_progress=advanced|unchanged`
@@ -357,6 +368,8 @@ Freely 后续应具备能力去判断：
 - worker 在 verification-only / continuity-refresh 多轮无新阶段推进后，必须退出到 manager decision
 - `cleanup / retire / rebuild / replay source feature` 只能由 manager 做生命周期决定
 - 不得因为 issue 已标 `completed`、某个 loop 已收口、或某个 agent/skill 已完成单轮交付，就删除最后一个 owner worktree
+- 只有当当前树已达到 cleanup gate、进入 `verified-retirable`，并最终执行到 `retired`，才算这棵树真的收口
+- 若未来实现 delete guard / hook，它应兜住 branch/worktree 删除动作，只允许在 `completed`、testing closeout、cleanup gate、`verified-retirable` 都已满足时继续执行；否则只能拒绝删除并要求回到三层 loop 继续推进
 
 ## 应保留 AI 自主的边界
 
@@ -384,7 +397,7 @@ Freely 后续应具备能力去判断：
 - 当前更稳的路线是：
   - `C-20260322-1801-B` 收窄为 `stale pre-test-merge governance capability`
   - 新开平行 candidate 承接 `worker self-loop exit / scheduling closeout`
-- 这轮还补清了一个容易误判的边界：milestone 里的 issue `completed` 不等于 topic 已 fully closed；若 merge / cleanup / next owner continuity 未闭合，仍不得删除最后一个 owner worktree
+- 这轮还补清了一个容易误判的边界：milestone 里的 issue `completed` 不等于 worktree 已可删除；若 merge / cleanup / `verified-retirable` / `retired` 链条未闭合，仍不得删除最后一个 owner worktree
 - 在 machine-readable stale state、manager lifecycle transaction、runtime consumption gate 还没冻结前，不应直接实现局部 patch，否则很容易继续出现“修了 watchdog，又退回 manager/worker 自环”的倒退
 
 ## 需要冻结的开放问题
@@ -395,4 +408,5 @@ Freely 后续应具备能力去判断：
 4. manager 的 lifecycle transaction 至少要包含哪些 manifest / evidence，才允许 retire 或 rebuild。
 5. runtime gate 消费哪个字段，以及旧 queued prompt 如何 supersede。
 6. `worker self-loop exit` 是否应单开 candidate，并用什么 phase-progress 规则定义停滞。
-7. `issue completed`、`loop closed`、`topic fully closed` 三层完成语义，分别由哪些 artifact 和 gate 支撑。
+7. 哪些现有状态与证据组合才表示“继续推进三层 loop”，哪些组合才表示“可以进入 delete worktree”。
+8. 最终 delete worktree / delete branch 门禁若要由 hook / guard 兜底，应该投影到哪一层，以及最小拒绝语义是什么。
