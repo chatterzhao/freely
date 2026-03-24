@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260322-0445`
 - title: Latest manager continuity worker consumption governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `latest-manager-continuity-worker-consumption-governance`
@@ -101,45 +101,38 @@
 
 ## Next
 
-- 2026-03-24 latest worker continuation absorbed one more runtime gap inside this same issue family: continuity parser previously treated every `worker-prompts/*.txt` path in manager continuity as launchable inventory, so prompts listed only under `Frozen Queue` / `desired-frozen` could stay in launched state and be relaunched via stale-consumed or expected-running recovery. Runtime now filters those prompts out of launchable generated/consumed/queued state, purges stale frozen prompt remnants from same-continuity launch-state csv during reconcile, and skips manager auto-recovery for worktrees explicitly frozen by the latest continuity.
-- Canonical closeout remains on the same issue family: this branch is `merge-ready` for the absorbed frozen-queue runtime fix plus verification writeback, but not `delete-ready`.
-- Remaining blocker is unchanged: one real post-merge `develop` acceptance via `freely chat` in the application-native real environment, confirming workers consume the newest manager continuity round and that active pending vs consumed delegated ids stay aligned.
-- Until that acceptance is recorded, keep this issue in `in_verification`, keep this feature tree scoped to doc-only closeout, and do not reopen implementation or research scope from this branch.
-- 2026-03-24 the latest fresh session still stayed on `lead-agent -> constitution-guard -> laws-enforcer -> context-source-skill`, kept this same delegated continuation worker lane as the top pool, and selected the same in-session route: `source_class=continuation`, `route_kind=dev_loop`, `target_skill=dev-loop-execution`, `selected_tool=codex`.
-- 2026-03-24 the worker reran the full declared verification suite and all checks stayed green; a read-only sidecar runtime/test audit again confirmed the active-prompt visibility acceptance is already implemented inside `docs/system/workspace/scripts/runtime/freely` and `test-freely-delegated-continuation-active-prompt-visibility`, and `git diff --name-only` still only lists the same three issue-owned continuity docs.
-- This issue therefore remains `in_verification` with unchanged remaining scope: one real post-merge `develop` acceptance.
-- 2026-03-23 current fresh session first absorbed the queued delegated continuation handoff set (`20260323-224831`, `20260323-224818`, `20260323-224244`) and confirmed those intake ids still belonged to this same `I-20260322-0445` worker lane rather than any new discovery, IBM reroute, or project-level supervisor task.
-- 2026-03-23 first-hop closure after that absorption still stayed on `source_class=continuation`, `route_kind=dev_loop`, `target_skill=dev-loop-execution`, and `selected_tool=codex`, so the correct action remained in-session verification work inside the current feature worktree.
-- 2026-03-23 the worker reran the same targeted verification suite again:
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
-  - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
-  - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
-  - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
-  - `./bin/governance-check`
-- 2026-03-23 no new implementation gap surfaced in that rerun either; this lane still remains verification-only and still needs only the protected-environment post-merge `develop` acceptance.
-- 2026-03-23 fresh-session reentry after the recorded `context_compacted` handoff still followed the same first-hop closure in this feature worktree: the intake remained `source_class=continuation`, `route_kind=dev_loop`, `target_skill=dev-loop-execution`, and `selected_tool=codex`, so this lane continued in-session instead of handing execution back to runtime.
-- 2026-03-23 that fresh session reran the full targeted verification suite inside the declared worker write scope:
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
-  - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
-  - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
-  - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
-  - `./bin/governance-check`
-- 2026-03-23 no new implementation gap surfaced in that rerun; the lane remains verification-only and still needs only the protected-environment post-merge `develop` acceptance.
-- 2026-03-23 latest worker continuation repeated the full first-hop closure in this feature worktree and stayed on the same route: `constitution-guard` kept execution in the current feature worktree, `laws-enforcer` kept the intake classified as a stable continuation, `context-source-skill` stayed on `source_class=continuation` / `route_kind=dev_loop`, and `selected_tool=codex` matched the active tool so the lane continued in-session instead of stopping at a handoff-only prompt.
-- 2026-03-23 targeted verification was rerun again after that closure:
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
-  - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
-  - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
-  - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
-  - `./bin/governance-check`
-- 2026-03-23 runtime truth-source recheck stayed aligned with acceptance: prompt build still persists `LAST_DELEGATED_CONTINUATION_CONSUMED_IDS`, active pending views still suppress those ids only while the same AI pid is alive, and the ids still return to pending once the active prompt exits.
-- 2026-03-23 worker continuation re-ran the full targeted verification suite in the feature worktree and confirmed the scope is still verification-only; no new implementation gap surfaced.
-- 2026-03-23 lead-agent first-hop closure revalidated the route as `continuation -> dev_loop`; because the selected tool remained `codex`, the worker continued in-session instead of emitting a handoff-only `next_prompt`.
-- 2026-03-23 second-hop `dev-loop-execution` rechecked the runtime/test truth source for active-prompt visibility and reran the full verification suite; all checks stayed green, so the worktree remains limited to verification writeback rather than reopening implementation scope.
-- 2026-03-23 runtime truth-source inspection confirmed the active-prompt visibility contract now matches acceptance: prompt build persists `last_consumed_delegated_continuation_ids`, active pending views suppress those same ids while the AI pid is still alive, and `live-status` shows them as pending again once the AI stops.
-- 2026-03-23 a follow-up worker continuation reran the complete targeted suite from a clean worktree and reconfirmed the same route/result: `continuation -> dev_loop -> codex`, no new code delta inside the declared write scope, and the only remaining gap is protected-environment post-merge acceptance.
-- 当前 pre-merge verification 已完成，并补上 delegated continuation active-prompt visibility 回归，确认 consumed ids 会在 AI 活跃期间立刻进入 live-status、停止后重新回到 pending。
-- 仍需 merge 后在 `develop` 上做一次真实 `freely chat` post-merge acceptance，确认最新 manager continuity 会被 worker runtime 消费，且 active pending 视图与 consumed truth 保持一致。
+- 2026-03-24 canonical `develop` post-merge acceptance is now recorded as `pass`. During manager patrol, `live-status`, `fleet-status`, and `.freely/run/manager-worker-launch-state.env` agreed on the acceptance truth surface:
+  - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-034106.md`
+  - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt`
+  - `queued_worker_prompts = none`
+  - `LAUNCHED_WORKER_PROMPTS` matched the same latest prompt path
+  - `ACTIVE_RUNNING_WORKER_COUNT = 1`
+- 2026-03-24 manager then generated the dedicated closeout continuity/prompt for this writeback lane, and the current canonical truth surfaces also show latest-truth consumption for that newer round:
+  - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-051509.md`
+  - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-051509-worker-i-20260322-0445-closeout-codex.txt`
+  - `queued_worker_prompts = none`
+- This confirms the issue family acceptance is closed on canonical `develop`: workers consumed the newest manager continuity / worker prompt truth instead of staying on an older delegated continuation, and active pending vs consumed delegated ids remained aligned.
+- Cleanup is intentionally not executed from manager in this round. Keep the disposition explicit instead of pretending the lifecycle is retired:
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`: retain until this docs-only closeout commit is absorbed by the develop-facing path; `merge-ready`, not `delete-ready`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile`: retain; active same-family implementation lane still owns ongoing worker state
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough`: retain as separate `runtime-owned` recovery lane after `secondary_rate_limit_exhausted`; do not fold it into this issue's acceptance result
+- No further implementation or research scope remains inside `I-20260322-0445`. Any new regression after this closeout should reopen as a new continuation or new lifecycle based on the then-current truth source.
+
+## Retirement Audit
+
+- audit_date: `2026-03-24`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
+- worktree_state: `clean`
+- classification: `retire-only`
+- cleanup_gate: `retained-with-reason`
+- why_not_verified_retirable:
+  - current worktree still owns canonical closeout writeback for this issue family; writeback must be absorbed through the develop-facing path before branch/worktree cleanup
+  - same-family worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile` remains active and dirty, so this issue family is closed but not yet fully retired as a fleet unit
+  - separate worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough` remains `runtime-owned` recovery and must stay outside this issue's cleanup claim
+- local_branch_disposition: `retained-with-reason`
+- local_branch_reason: keep the branch/worktree until the docs-only closeout writeback is absorbed and supervisor/runtime runs the normal cleanup followthrough; do not delete from this worker round
+- remote_branch_disposition: `not_checked`
+- remote_branch_reason: remote cleanup is outside this worker's closeout-writeback scope
+- revisit_trigger:
+  - current docs-only closeout writeback is absorbed by the develop-facing path
+  - supervisor/runtime re-enters cleanup followthrough for this worktree

@@ -3,47 +3,33 @@
 ## Result
 
 - pre-merge verification passed
-- 2026-03-23 worker continuation reran the same verification suite and kept the issue in `in_verification`; only protected-environment post-merge acceptance remains.
-- 2026-03-23 first-hop closure rechecked `lead-agent -> constitution-guard -> laws-enforcer -> context-source-skill`, confirmed this intake is still a `continuation` routed to `dev-loop-execution`, and found no new implementation gap beyond the existing post-merge acceptance requirement.
-- 2026-03-23 second-hop dev-loop continuation revalidated the runtime/test truth source for delegated continuation active-prompt visibility and reran the full targeted suite; all checks remained green, so this lane still needs only post-merge `develop` acceptance.
-- 2026-03-23 direct runtime inspection confirmed why the visibility regression is closed: `freely` persists consumed delegated ids immediately after prompt build, filters those ids out of active pending snapshots while the same prompt is running, and exposes them again after AI exit.
-- 2026-03-24 the latest fresh session still stayed on `continuation -> dev_loop -> codex`, reran the targeted verification suite, and a read-only sidecar runtime/test audit again found no remaining implementation gap inside the declared worker write scope. The worktree remains doc-only dirty, and the only remaining gap is one real post-merge `develop` acceptance.
-- Canonical review disposition: this tree is `merge-ready` for verification-only closeout, but not `delete-ready` until one real post-merge `develop` acceptance is recorded via `freely chat` in the application-native real environment.
+- 2026-03-24 canonical `develop` post-merge acceptance passed
+- no remaining implementation gap was found inside the declared runtime/test scope
+- canonical review disposition: this tree is `merge-ready` for docs-only closeout absorption, but not `delete-ready` until supervisor/runtime executes normal cleanup followthrough after the writeback is absorbed
 
 ## Evidence
 
-- 2026-03-24 reran `test-freely-manager-worker-launch-linkage`, `test-freely-worker-active-reentry-from-manager-launch`, `test-freely-latest-manager-continuity-worker-consumption`, `test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`, `test-freely-delegated-continuation-active-prompt-visibility`, and `./bin/governance-check`
-- 2026-03-24 sidecar runtime/test audit rechecked `docs/system/workspace/scripts/runtime/freely` and `docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`, confirmed the acceptance remains implemented, and found no remaining implementation gap inside the declared runtime/test scope
-- 2026-03-24 `git diff --name-only` still only listed the same three issue-owned continuity docs, so the dirty state remained doc-only during this rerun
-- absorbed delegated continuation intake ids `20260323-224831`, `20260323-224818`, and `20260323-224244` into the current `I-20260322-0445` worker continuation before re-running verification
-- `lead-agent -> constitution-guard -> laws-enforcer -> context-source-skill` first-hop closure in the current worker session
-- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
-- `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
-- `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
-- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
-- `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
-- `./bin/governance-check`
-- runtime truth-source checkpoints in `docs/system/workspace/scripts/runtime/freely`:
-  - `LAST_DELEGATED_CONTINUATION_CONSUMED_IDS` / `..._AT` persistence
-  - `active_prompt_consumed_delegation_ids_for_project`
-  - `delegated_continuation_snapshot_for_project`
-  - `delegated_continuation_ids_for_project`
-
-## What Changed
-
-1. `ensure_manager_once` now invokes worker latest-continuity consumption even when the manager supervisor is already running.
-2. `manager-worker-launch-state.env` now records:
-   - latest continuity generated
-   - latest continuity consumed
-   - latest worker prompts generated
-   - latest worker prompts consumed
-3. baseline/live status now expose the generated/consumed launch-state truth.
-4. stale continuity snapshots are reset when a newer continuity file becomes canonical.
-5. delegated continuation ids are now treated as consumed as soon as they are absorbed into the active prompt, so live status hides them from pending until the active AI exits.
-6. the active-prompt visibility contract remained stable under repeated worker continuation reruns; no new implementation delta was needed in this lane.
+- 2026-03-24 manager patrol on canonical `develop` recorded post-merge acceptance `pass` with:
+  - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-034106.md`
+  - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt`
+  - `queued_worker_prompts = none`
+  - `LAUNCHED_WORKER_PROMPTS` on that same prompt path
+  - `ACTIVE_RUNNING_WORKER_COUNT = 1`
+- 2026-03-24 closeout writeback dispatch then generated `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-051509.md` and `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-051509-worker-i-20260322-0445-closeout-codex.txt`, and current truth surfaces show those newer artifacts are also already the latest generated/consumed truth
+- reran:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
+  - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
+  - `./bin/governance-check`
+- sidecar runtime/test audit rechecked:
+  - `docs/system/workspace/scripts/runtime/freely`
+  - `docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
+- `git diff --name-only` remained limited to the issue-owned continuity docs during closeout writeback
 
 ## Remaining Acceptance
 
-- run one real post-merge acceptance on `develop` via `freely chat`, confirming workers consume the newest manager continuity round in a live dogfooding loop.
-- keep this feature worktree scoped to verification writeback only until that `develop` acceptance is recorded.
-- treat the branch as merge-ready, but not delete-ready, until that native post-merge acceptance is written back.
+- no further acceptance blocker remains inside `I-20260322-0445`
+- keep this feature worktree scoped to docs-only closeout absorption and cleanup disposition only
+- treat the branch as `merge-ready`, but not `delete-ready`, until supervisor/runtime executes cleanup followthrough after the writeback is absorbed

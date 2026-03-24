@@ -259,16 +259,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
 - next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
 
-21. `I-20260322-0445`
-- title: Latest manager continuity worker consumption governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
-- next_action: canonical verification writeback 已完成，当前 branch 只剩 `develop` 上一次真实 `freely chat` post-merge acceptance 作为 completion blocker；在此之前保持 `in_verification`，视为 merge-ready 但不是 delete-ready，不要重新扩成实现或 research scope
-
 ### completed_issues
 
 1. `I-20260322-1801`
@@ -284,9 +274,25 @@ routing_policy:
   - `docs/LAWS.md`
   - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`
   - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
-  - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
-  - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
+- `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
+- `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
 - completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
+
+2. `I-20260322-0445`
+- title: Latest manager continuity worker consumption governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
+- evidence:
+  - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `./bin/freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-worker-launch-state.env`
+  - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+  - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md`
+- completion_note: canonical `develop` post-merge acceptance passed on 2026-03-24. Manager patrol first confirmed `034106` continuity and `032208` worker prompt were both consumed as latest truth with `queued_worker_prompts = none`, then generated the dedicated `051509` closeout continuity/prompt and that newer round also appeared as latest generated/consumed truth. Cleanup is not executed in this writeback round: keep the closeout worktree retained until the docs-only closure is absorbed, keep the active same-family worker lane retained, and keep the pre-test-merge lifecycle lane separate as runtime-owned recovery.
 
 ### candidate_issues
 
