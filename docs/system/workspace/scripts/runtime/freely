@@ -1777,6 +1777,13 @@ worker_prompt_target_branch() {
   local prompt_file="$1"
   [[ -f "$prompt_file" ]] || return 0
   awk '
+    /^You are the [^`]*worker for `/ && / in `\// {
+      value=$0
+      sub(/^You are the [^`]*worker for `/, "", value)
+      split(value, parts, "` in `")
+      print parts[1]
+      exit
+    }
     /^- branch: / {
       value=$0
       sub(/^- branch: `/, "", value)
@@ -1919,6 +1926,16 @@ worker_prompt_target_worktree() {
   local prompt_file="$1"
   [[ -f "$prompt_file" ]] || return 0
   awk '
+    /^You are the [^`]*worker for `/ && / in `\// {
+      value=$0
+      sub(/^You are the [^`]*worker for `/, "", value)
+      split(value, parts, "` in `")
+      value=parts[2]
+      sub(/`\.$/, "", value)
+      sub(/`$/, "", value)
+      print value
+      exit
+    }
     /^你的 worktree：$/ { capture=1; next }
     /^Worktree:$/ { capture=1; next }
     capture && /^- / {

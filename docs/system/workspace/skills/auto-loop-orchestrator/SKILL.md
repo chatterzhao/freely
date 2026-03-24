@@ -98,6 +98,10 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - latest prompt set generated
    - latest continuity / prompt set consumed
    主管 watchdog 不得仅因为 supervisor 已在运行就停留在旧 continuity；要持续把最新一轮监督结果推进成 worker launch / reentry。
+23. manager handoff 中的每个 worker prompt 都必须同时满足两层契约：
+   - continuity 中显式引用 worker prompt 绝对路径
+   - worker prompt 本体携带 machine-readable `Worktree:` / `Branch:` header
+   否则 manager 虽然完成了排班判断，runtime 仍可能无法把 handoff 推进成真实 worker launch。
 
 ## 角色组织
 

@@ -184,11 +184,17 @@ if is_manager_branch "$current_branch"; then
 18. 当前轮次若形成了 manager judgement / worker delegation / cleanup queue，你必须把它 materialize 成 runtime 可消费的非版本化产物，不能只停在自然语言回答。
 19. 至少创建一个 manager continuity 文件：\`$manager_continuity_path\`。
 20. 若需要委派 worker，再在 \`$worker_prompt_dir\` 下创建 worker prompt 文件；命名格式参考：\`$worker_prompt_path_example\`。
-21. manager continuity 必须显式引用每个 worker prompt 的绝对路径；runtime 只会从 continuity 中消费这些 \`.freely/run/worker-prompts/*.txt\` 路径，不会从普通回答里自动提炼 handoff。
-22. 若本轮结论是 manager-only cleanup queue、暂不发 worker，也仍然必须写 manager continuity，至少包含：fleet inventory、route_kind / restart_point / ownership / next_action、cleanup queue 或 frozen queue、以及 next supervision priority。
-23. 你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径；若没有写这些产物，就不算完成主管交付。
-24. 若当前输入包含 delegated continuation、cleanup followthrough、或明确的 project-level restart point，在主 handoff artifact 落盘前不要先 spawn subagent，也不要先等待子任务结果。
-25. 先用当前已足够的现场证据写出 primary manager continuity / worker prompts；subagent 只能用于不阻塞首个 handoff 的二次核对或次优先研究。
+21. 每个 worker prompt 除正文外，必须带 machine-readable header：
+   - \`Worktree:\`
+   - \`- \\\`/abs/path/to/target-worktree\\\`\`
+   - \`Branch:\`
+   - \`- \\\`feature/target-branch\\\`\`
+   自然语言说明可以补充，但不能替代这两个 header。
+22. manager continuity 必须显式引用每个 worker prompt 的绝对路径；runtime 只会从 continuity 中消费这些 \`.freely/run/worker-prompts/*.txt\` 路径，不会从普通回答里自动提炼 handoff。
+23. 若本轮结论是 manager-only cleanup queue、暂不发 worker，也仍然必须写 manager continuity，至少包含：fleet inventory、route_kind / restart_point / ownership / next_action、cleanup queue 或 frozen queue、以及 next supervision priority。
+24. 你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径；若没有写这些产物，就不算完成主管交付。
+25. 若当前输入包含 delegated continuation、cleanup followthrough、或明确的 project-level restart point，在主 handoff artifact 落盘前不要先 spawn subagent，也不要先等待子任务结果。
+26. 先用当前已足够的现场证据写出 primary manager continuity / worker prompts；subagent 只能用于不阻塞首个 handoff 的二次核对或次优先研究。
 EOF
 )"
 fi

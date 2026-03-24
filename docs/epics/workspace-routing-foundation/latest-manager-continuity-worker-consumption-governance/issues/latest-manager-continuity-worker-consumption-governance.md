@@ -42,6 +42,9 @@
 5. 补脚本级 integration tests，覆盖：
    - stale launch-state -> latest continuity consumption
    - manager watchdog already-running path 也会触发最新 continuity 消费
+6. worker prompt contract 必须保持 runtime-launchable：
+   - manager handoff 默认写 machine-readable `Worktree:` / `Branch:` header
+   - runtime 在兼容期内也要能解析当前自然语言句式 `You are the worker for ... in ...`
 
 ## Acceptance
 
@@ -63,6 +66,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
 - `docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
+- `docs/system/workspace/scripts/tests/test-freely-worker-prompt-natural-language-contract-compat`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md`
 - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260322-latest-manager-continuity-worker-consumption-verification.md`
