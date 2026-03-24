@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260324-0405`
 - title: Watchdog restart-storm and process-churn governance
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `watchdog-restart-storm-and-process-churn-governance`
@@ -89,7 +89,18 @@
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 
-## Next
+## Completion
 
-- 当前转入 `done_ibm`。
-- 下一跳进入 `dev-loop-execution`，实现 runtime signal、status surface 暴露与 manager escalation followthrough。
+- `docs/system/workspace/scripts/runtime/freely`
+- `docs/system/workspace/scripts/tests/test-freely-restart-storm-defers-blind-relaunch`
+- `docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
+- `docs/progress/workspace-routing-foundation/p-watchdog-restart-storm-and-process-churn-governance.md`
+- `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/code-reviews/20260324-watchdog-restart-storm-and-process-churn-verification.md`
+
+## Verification Summary
+
+- runtime 现在会在短窗口内记录 restart storm / process churn，原始 signal 只写入 `session-state.env`。
+- `workcell-state.env` 继续只承载当前 workcell 生命周期，不镜像 restart storm / process churn 计数。
+- signal 命中后，watchdog 不再盲目快速重拉 AI，而是写出 `manager_bootstrap_handoff` 并进入低频观察窗口，等待 manager `auto-loop` 裁决。
+- `live-status` / `fleet-status` 已能稳定暴露 restart storm 摘要，便于主管巡检和人工插话。
+- 本次 issue 的 IBM `pre-tests.md` 已逐项满足；issue 完成，但 worktree 仍需后续 merge / cleanup / retirement 链闭合后才可删除。
