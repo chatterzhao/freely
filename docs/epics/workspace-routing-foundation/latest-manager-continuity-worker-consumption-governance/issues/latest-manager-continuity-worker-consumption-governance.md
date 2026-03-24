@@ -46,6 +46,7 @@
    - manager handoff 默认写 machine-readable `Worktree:` / `Branch:` header
    - runtime 在兼容期内也要能解析当前自然语言句式 `You are the worker for ... in ...`
 7. 若同一 continuity 的 prompt 曾被记录为 consumed，但对应 worker 当前并未运行，runtime 必须把它视为 stale consumed state，并允许重新 launch / reentry，而不是要求先生成一轮新的 continuity。
+8. 当 delegated continuation 已被当前活跃 prompt 吸收时，runtime 必须在 cycle completion 之前就把 consumed truth 写入 session state / live-status，并从实时 pending 视图中剔除这些 ids；但若当前 AI 已退出，这些 ids 必须重新回到 pending 视图，供 recovery 继续接管。
 
 ## Acceptance
 
@@ -57,6 +58,7 @@
   - latest worker prompt set consumed
 - 若 worker 已活跃，reentry 走最新 prompt；若 worker 未运行，launch 走最新 prompt。
 - 若 worker 已停止，但当前 continuity / prompt set 仍是最新真相，runtime 会忽略 stale consumed marker 并重新 launch。
+- 若 delegated continuation 已进入当前活跃 prompt，`live-status` 会立刻显示 consumed ids，并且不会再把同一批 ids 同时显示为 pending；当前 AI 停止后，这些 ids 会重新回到 pending 视图。
 - `baseline-status` / `live-status` 能显示上述 generated/consumed truth。
 - regression tests 覆盖：
   - stale continuity state 被更新到最新 continuity
@@ -69,6 +71,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
+- `docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
 - `docs/system/workspace/scripts/tests/test-freely-worker-prompt-natural-language-contract-compat`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md`
@@ -80,6 +83,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
+- `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
 - `./bin/governance-check`
 
 ## Next
