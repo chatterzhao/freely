@@ -466,6 +466,17 @@ routing_policy:
 - next_action: 保持 active candidate；先让 manager watchdog 能识别并恢复 active worker delegated-continuation stall，再继续真实 dogfood 验证 retained worker 能否自动收口、cleanup 并回到 next patrol
 - revisit_trigger: 当再次复现 active worker 已收到 delegated continuation 但 cycle log / closeout 长时间不推进，或当前 runtime 补丁验证稳定后需要冻结独立 issue contract 时，重新进入 materialization 判断
 
+12. `C-20260324-0415-A`
+- title: Application-native runtime observation contract and observability planes
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://application-native-runtime-observation-contract-and-observability-planes`
+- source_brainstorm: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md`
+- next_action: 保持 active candidate；先冻结 `current-state/session/stream/fleet/artifact` 五类 observation planes、progress/stall/acceptance evidence 的最小 schema，以及 Freely self-host concrete profile；同时明确它与 `live-status`、`pre-test-merge acceptance stall`、frontend probe 三条线的承接关系，在这些边界稳定前不直接跳到 runtime patch 或 UI 实现
+- revisit_trigger: 当 application-native observation contract、Freely self-host concrete profile 与多平面状态面边界都足够稳定，且完成独立 acceptance review 后，重新进入 materialization 判断
+
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛
 - milestone_state: candidate
