@@ -23,6 +23,7 @@
 - 本轮继续吸收 fresh-session verification 新暴露出的收口缺口：
   - `test-freely-rate-limit-defers-to-watchdog` 的整秒计时断言存在秒边界抖动，已改成 monotonic 毫秒阈值
   - `ensure-manager` 与 earliest-reset 回归已补 manager bootstrap handoff artifact 断言，锁住 `trigger/account/reason/next_action` 契约
+  - 手工或自动账号切换 sweep 期间，watchdog/ensure-manager 之前仍可能并发触发 `whoami/list/switch/codex exec`；当前已补 shared switch lock，让 watchdog 在 sweep 结束前延迟 probe/bootstrap，避免误把切号中间态当成新的限流/授权恢复信号
 
 ## Verification
 
@@ -33,6 +34,8 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog`
 - `bash docs/system/workspace/scripts/tests/test-watchdog-control-plane-skills`
 - `./bin/governance-check`
+- `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-serialization`
+- `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-defers-during-account-switch`
 
 ### Latest rerun
 

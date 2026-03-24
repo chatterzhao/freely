@@ -83,6 +83,84 @@ write_codex_active_slot() {
   printf '%s\n' "$slot" >"$file"
 }
 
+codex_switch_lock_dir() {
+  printf '%s\n' "${AI_CLI_SWITCH_LOCK_DIR:-$HOME/.codex/account-switch.lock}"
+}
+
+codex_switch_lock_state_file() {
+  printf '%s\n' "$(codex_switch_lock_dir)/state.env"
+}
+
+codex_switch_lock_owner_pid() {
+  local state_file
+  state_file="$(codex_switch_lock_state_file)"
+  [[ -f "$state_file" ]] || return 0
+  sed -n 's/^owner_pid=//p' "$state_file" | tail -n 1
+}
+
+codex_switch_lock_cleanup_if_stale() {
+  local lock_dir owner_pid
+  lock_dir="$(codex_switch_lock_dir)"
+  [[ -d "$lock_dir" ]] || return 0
+  owner_pid="$(codex_switch_lock_owner_pid)"
+  if [[ -z "$owner_pid" ]] || ! kill -0 "$owner_pid" 2>/dev/null; then
+    rm -rf "$lock_dir"
+  fi
+}
+
+codex_switch_lock_acquire() {
+  local reason="$1" command_name="${2:-switch}" target="${3:-}"
+  local lock_dir state_file timeout_secs start_ts now owner_pid inherited_owner_pid
+  lock_dir="$(codex_switch_lock_dir)"
+  state_file="$(codex_switch_lock_state_file)"
+  inherited_owner_pid="${AI_CLI_SWITCH_LOCK_OWNER_PID:-}"
+  timeout_secs="${AI_CLI_SWITCH_LOCK_WAIT_SECS:-60}"
+  [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=60
+  mkdir -p "$(dirname "$lock_dir")"
+  start_ts="$(date +%s)"
+
+  while true; do
+    codex_switch_lock_cleanup_if_stale
+    if mkdir "$lock_dir" 2>/dev/null; then
+      cat >"$state_file" <<EOF
+owner_pid=$$
+started_at=$(date +%s)
+reason=$reason
+command=$command_name
+target=$target
+EOF
+      export AI_CLI_SWITCH_LOCK_OWNER_PID="$$"
+      return 0
+    fi
+
+    owner_pid="$(codex_switch_lock_owner_pid)"
+    if [[ -n "$owner_pid" && ( "$owner_pid" == "$$" || ( -n "$inherited_owner_pid" && "$owner_pid" == "$inherited_owner_pid" ) ) ]]; then
+      export AI_CLI_SWITCH_LOCK_OWNER_PID="$owner_pid"
+      return 0
+    fi
+
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout_secs )); then
+      log_error "timed out waiting for an existing codex account switch to finish"
+      return 1
+    fi
+    sleep 1
+  done
+}
+
+codex_switch_lock_release() {
+  local lock_dir owner_pid inherited_owner_pid
+  lock_dir="$(codex_switch_lock_dir)"
+  [[ -d "$lock_dir" ]] || return 0
+  owner_pid="$(codex_switch_lock_owner_pid)"
+  inherited_owner_pid="${AI_CLI_SWITCH_LOCK_OWNER_PID:-}"
+  if [[ -z "$owner_pid" || "$owner_pid" == "$$" ]]; then
+    rm -rf "$lock_dir"
+  elif [[ -n "$inherited_owner_pid" && "$owner_pid" == "$inherited_owner_pid" && "$$" == "$inherited_owner_pid" ]]; then
+    rm -rf "$lock_dir"
+  fi
+}
+
 json_string_or_null() {
   local value="${1:-}"
   if [[ -n "$value" ]]; then
@@ -311,41 +389,11 @@ cmd_switch() {
         _cmd_switch_auto_codex
         return $?
       fi
-
-      # 指定了账号，直接切换
-      local slot=$(account_to_dirname "$account")
-      local source_dir
-      source_dir="$(auth_slot_dir "codex" "$slot")"
-      local target_file="$HOME/.codex/auth.json"
-      local switched_account=""
-
-      if [[ ! -d "$source_dir" ]]; then
-        log_error "Account '$account' not found"
-        log_info "Available: $(list_tool_slots "codex" | tr '\n' ' ')"
-        exit 4
-      fi
-
-      # 切换前自动同步当前 token 到备份（保持备份最新）
-      if [[ -f "$target_file" ]]; then
-        sync_current_auth "$tool"
-      fi
-
-      [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch to $account"; return; }
-
-      cp "$source_dir/auth.json" "$target_file"
-      switched_account="$(extract_codex_account "$target_file")"
-      if [[ -z "$switched_account" ]]; then
-        log_error "Switch copied auth.json but could not verify the active codex account"
-        exit 5
-      fi
-      write_codex_active_slot "$slot"
-      log_info "Switched codex to slot: $slot"
-      log_info "Active codex account: $switched_account"
-      log_warn "Restart codex for the change to take effect"
-
-      if [[ "$FORMAT" == "json" ]]; then
-        echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$switched_account\", \"slot\": \"$slot\"}"
-      fi
+      codex_switch_lock_acquire "explicit_switch" "switch" "$account" || exit 1
+      _cmd_switch_codex_direct_unlocked "$tool" "$account"
+      local rc=$?
+      codex_switch_lock_release
+      return "$rc"
       ;;
     *)
       log_error "Unknown tool: $tool"
@@ -378,6 +426,7 @@ _cmd_switch_auto_codex() {
   local project="${PROJECT_ROOT:-$(pwd)}"
   local tool="codex"
   local actual_account=""
+  local result rc=0
 
   # Source watchdog functions
   local watchdog_script=""
@@ -392,17 +441,18 @@ _cmd_switch_auto_codex() {
     exit 3
   fi
 
+  codex_switch_lock_acquire "auto_probe_switch" "switch" "auto" || exit 1
+
   # shellcheck source=/dev/null
   source "$watchdog_script"
 
-  local result
-  result="$(probe_all_codex_accounts_and_update_cooldown "$project")"
+  result="$(probe_all_codex_accounts_and_update_cooldown "$project" || true)"
 
   case "$result" in
     usable:*)
       local slot="${result#usable:}"
       echo -e "${GREEN}[SWITCHED]${NC} -> $slot (usable)"
-      _do_switch_codex "$tool" "$slot"
+      _cmd_switch_codex_direct_unlocked "$tool" "$slot"
       actual_account="$(extract_codex_account "$HOME/.codex/auth.json")"
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": true, \"tool\": \"codex\", \"account\": $(json_string_or_null "$actual_account"), \"slot\": \"$slot\", \"status\": \"usable\"}"
@@ -415,7 +465,7 @@ _cmd_switch_auto_codex() {
       local human_time
       human_time="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo "$reset_at")"
       echo -e "${YELLOW}[SWITCHED]${NC} -> $slot (rate limited, resets at $human_time)"
-      _do_switch_codex "$tool" "$slot"
+      _cmd_switch_codex_direct_unlocked "$tool" "$slot"
       actual_account="$(extract_codex_account "$HOME/.codex/auth.json")"
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": true, \"tool\": \"codex\", \"account\": $(json_string_or_null "$actual_account"), \"slot\": \"$slot\", \"status\": \"rate_limited\", \"reset_at\": $reset_at, \"reset_at_human\": \"$human_time\"}"
@@ -426,24 +476,53 @@ _cmd_switch_auto_codex() {
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": false, \"status\": \"none\"}"
       fi
-      exit 4
+      rc=4
       ;;
     *)
       log_error "Unknown result: $result"
-      exit 1
+      rc=1
       ;;
   esac
+  codex_switch_lock_release
+  return "$rc"
 }
 
-# 实际执行切换（不包含探测逻辑），但复用显式切号路径的校验和 dry-run 语义。
-_do_switch_codex() {
+# 实际执行切换（不包含探测逻辑），由上层决定是否持有全局切号锁。
+_cmd_switch_codex_direct_unlocked() {
   local tool="$1" account="$2"
-  local old_format="$FORMAT"
-  FORMAT="text"
-  cmd_switch "$tool" "$account"
-  local rc=$?
-  FORMAT="$old_format"
-  return $rc
+  local slot source_dir target_file switched_account
+  slot="$(account_to_dirname "$account")"
+  source_dir="$(auth_slot_dir "codex" "$slot")"
+  target_file="$HOME/.codex/auth.json"
+  switched_account=""
+
+  if [[ ! -d "$source_dir" ]]; then
+    log_error "Account '$account' not found"
+    log_info "Available: $(list_tool_slots "codex" | tr '\n' ' ')"
+    exit 4
+  fi
+
+  if [[ -f "$target_file" ]]; then
+    sync_current_auth "$tool"
+  fi
+
+  [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch to $account"; return; }
+
+  cp "$source_dir/auth.json" "$target_file"
+  switched_account="$(extract_codex_account "$target_file")"
+  if [[ -z "$switched_account" ]]; then
+    log_error "Switch copied auth.json but could not verify the active codex account"
+    exit 5
+  fi
+
+  write_codex_active_slot "$slot"
+  log_info "Switched codex to slot: $slot"
+  log_info "Active codex account: $switched_account"
+  log_warn "Restart codex for the change to take effect"
+
+  if [[ "$FORMAT" == "json" ]]; then
+    echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$switched_account\", \"slot\": \"$slot\"}"
+  fi
 }
 
 # 列出 accounts
