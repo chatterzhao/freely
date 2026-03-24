@@ -212,6 +212,35 @@
   - candidate 继续保持 `needs_research`
   - cleanup 继续保持 `retain-for-followthrough`
 
+## continuity guard writeback（2026-03-24 02:18 PST）
+
+- 本轮再次先执行 worker-side `live-status` 复核，再决定是否还能沿用前几轮记录下来的 `consumed` 证据表述。
+- 当前 worker lane 的最新 `live-status` 显示：
+  - `role_hint=worker`
+  - `activity_state=ai_active`
+  - `last_ai_state=down`
+  - `last_exit_reason=starting`
+  - `intake_active_items=32`
+  - `intake_delegated_items=32`
+  - `current_prompt_has_delegated_continuation=1`
+  - `latest_manager_continuity_generated=unavailable`
+  - `latest_manager_worker_prompts_generated=none`
+  - `pending_delegated_continuation_ids` 继续包含当前 lane 的 `20260323-234407...`、`20260324-002656...` 与 `20260324-021757...`
+  - 但 `last_consumed_delegated_continuation_ids=none`
+  - 且 `last_consumed_delegated_continuation_at=unavailable`
+  - `current_focus.prompt_file=.freely/run/prompt-20260324-021757.txt`
+  - `deep_refs.last_tool_session_id=unavailable`
+- 这说明两件事：
+  - prompt-level absorption 与 active worker lane 仍然存在，当前 candidate 继续有 canonical owner，不能静默丢弃
+  - 但前几轮文档里记录的 “已有 partial consumed-id proof” 在当前 worker lane 上并不稳定；runtime 这轮已经退回到“只有 pending + prompt absorption proof，没有当前 consumed anchor”的状态
+- 因此当前 proof gap 需要进一步收紧：
+  - 不仅缺少 `specific stalled delegated continuation intake id -> current manager prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict` 的稳定绑定链
+  - 当前这一轮甚至不能假设 `consumed` truth 仍持续暴露在 live-status 上
+- 这也再次证明：
+  - 当前 route 仍应保持 `pre_brainstorm`
+  - 当前 worktree 仍应保持 `retain-for-followthrough`
+  - delete / retirement gate 仍不能打开
+
 ## 与相邻 issue 的边界
 
 - 不吸收到 `runtime-worker-launch-linkage-and-stall-recovery-governance`
