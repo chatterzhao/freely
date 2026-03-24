@@ -59,10 +59,13 @@
 - 若 worker 已活跃，reentry 走最新 prompt；若 worker 未运行，launch 走最新 prompt。
 - 若 worker 已停止，但当前 continuity / prompt set 仍是最新真相，runtime 会忽略 stale consumed marker 并重新 launch。
 - 若 delegated continuation 已进入当前活跃 prompt，`live-status` 会立刻显示 consumed ids，并且不会再把同一批 ids 同时显示为 pending；当前 AI 停止后，这些 ids 会重新回到 pending 视图。
+- 若 latest manager continuity 把 lane 明确放进 `Frozen Queue` / `desired-frozen`，runtime 不会再把该 prompt 计入 launchable generated/consumed inventory，也不会因 stale-consumed 或 worker local `DESIRED_RUNTIME_STATE=running` 而把该 lane 自动 relaunch / recovery。
 - `baseline-status` / `live-status` 能显示上述 generated/consumed truth。
 - regression tests 覆盖：
   - stale continuity state 被更新到最新 continuity
   - `ensure_manager_once` 在 supervisor 已运行时仍会触发最新 continuity 消费
+  - frozen-only prompt 不进入 launch/relaunch inventory
+  - manager recovery 不会复活 latest continuity 已冻结的 worker lane
 
 ## Completion
 
@@ -71,6 +74,8 @@
 - `docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
+- `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-frozen-prompt`
+- `docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-frozen-worker`
 - `docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
 - `docs/system/workspace/scripts/tests/test-freely-worker-prompt-natural-language-contract-compat`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
@@ -83,12 +88,15 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-frozen-prompt`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-frozen-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
 - `./bin/governance-check`
 
 ## Next
 
-- Canonical closeout is now frozen: this branch is `merge-ready` for verification-only writeback, but not `delete-ready`.
+- 2026-03-24 latest worker continuation absorbed one more runtime gap inside this same issue family: continuity parser previously treated every `worker-prompts/*.txt` path in manager continuity as launchable inventory, so prompts listed only under `Frozen Queue` / `desired-frozen` could stay in launched state and be relaunched via stale-consumed or expected-running recovery. Runtime now filters those prompts out of launchable generated/consumed/queued state and skips manager auto-recovery for worktrees explicitly frozen by the latest continuity.
+- Canonical closeout remains on the same issue family: this branch is `merge-ready` for the absorbed frozen-queue runtime fix plus verification writeback, but not `delete-ready`.
 - Remaining blocker is unchanged: one real post-merge `develop` acceptance via `freely chat` in the application-native real environment, confirming workers consume the newest manager continuity round and that active pending vs consumed delegated ids stay aligned.
 - Until that acceptance is recorded, keep this issue in `in_verification`, keep this feature tree scoped to doc-only closeout, and do not reopen implementation or research scope from this branch.
 - 2026-03-24 the latest fresh session still stayed on `lead-agent -> constitution-guard -> laws-enforcer -> context-source-skill`, kept this same delegated continuation worker lane as the top pool, and selected the same in-session route: `source_class=continuation`, `route_kind=dev_loop`, `target_skill=dev-loop-execution`, `selected_tool=codex`.

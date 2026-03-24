@@ -411,7 +411,7 @@ latest_generated_manager_continuity_file_for_project() {
 
 find_latest_manager_continuity_file_for_project() {
   local project="$1"
-  latest_launchable_manager_continuity_file_for_project "$project"
+  latest_generated_manager_continuity_file_for_project "$project"
 }
 
 ps_command_for_pid() {
@@ -1805,7 +1805,7 @@ request_local_continuation_reentry() {
 
 latest_manager_continuity_file_for_project() {
   local project="$1"
-  latest_launchable_manager_continuity_file_for_project "$project"
+  latest_generated_manager_continuity_file_for_project "$project"
 }
 
 latest_cycle_log_for_project() {
@@ -1819,10 +1819,81 @@ file_mtime_epoch() {
   stat -f '%m' "$path" 2>/dev/null || return 1
 }
 
-latest_manager_worker_prompt_paths_from_continuity() {
+all_manager_worker_prompt_paths_from_continuity() {
   local continuity_file="$1"
   [[ -f "$continuity_file" ]] || return 0
   rg -o '/[^` ]+/.freely/run/worker-prompts/[^` ]+\.txt' "$continuity_file" | sort -u
+}
+
+manager_worker_prompt_paths_from_continuity_by_mode() {
+  local continuity_file="$1" mode="${2:-launchable}"
+  [[ -f "$continuity_file" ]] || return 0
+  awk -v mode="$mode" '
+    function emit_prompt_paths(line,    remaining) {
+      remaining=line
+      while (match(remaining, /\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt/)) {
+        print substr(remaining, RSTART, RLENGTH)
+        remaining=substr(remaining, RSTART + RLENGTH)
+      }
+    }
+    /^## / {
+      section=tolower(substr($0, 4))
+      gsub(/[`[:space:]]+$/, "", section)
+      capture_runtime_worker_prompt=0
+      next
+    }
+    /^# / {
+      section=""
+      capture_runtime_worker_prompt=0
+      next
+    }
+    {
+      if (section == "queue") {
+        if ($0 ~ /prompt_path:/ && mode != "frozen") {
+          emit_prompt_paths($0)
+        }
+        next
+      }
+      if (section == "frozen queue") {
+        if ($0 ~ /prompt_path:/ && mode != "launchable") {
+          emit_prompt_paths($0)
+        }
+        next
+      }
+      if ($0 ~ /- worker_prompt: / || $0 ~ /- active_worker_prompt: / || $0 ~ /- queued_worker_prompt: / || $0 ~ /- refreshed_queued_worker_prompt: /) {
+        if (mode != "frozen") {
+          emit_prompt_paths($0)
+        }
+        next
+      }
+      if ($0 ~ /- runtime worker prompt:/) {
+        capture_runtime_worker_prompt=1
+        next
+      }
+      if (capture_runtime_worker_prompt == 1) {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt[[:space:]]*$/) {
+          if (mode != "frozen") {
+            emit_prompt_paths($0)
+          }
+          capture_runtime_worker_prompt=0
+          next
+        }
+        if ($0 !~ /^[[:space:]]*$/ && $0 !~ /^[[:space:]]*-[[:space:]]/) {
+          capture_runtime_worker_prompt=0
+        }
+      }
+    }
+  ' "$continuity_file" | sort -u
+}
+
+latest_manager_worker_prompt_paths_from_continuity() {
+  local continuity_file="$1"
+  manager_worker_prompt_paths_from_continuity_by_mode "$continuity_file" "launchable"
+}
+
+latest_frozen_manager_worker_prompt_paths_from_continuity() {
+  local continuity_file="$1"
+  manager_worker_prompt_paths_from_continuity_by_mode "$continuity_file" "frozen"
 }
 
 worker_prompt_target_branch() {
@@ -1972,6 +2043,19 @@ latest_manager_worker_prompt_csv_from_continuity() {
   local csv
   csv="$(latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | paste -sd, -)"
   printf '%s\n' "${csv:-}"
+}
+
+manager_continuity_explicitly_freezes_worker_project() {
+  local manager_project="$1" target_project="$2" continuity_file="${3:-}" prompt_file resolved_worktree
+  [[ -n "$target_project" && -d "$target_project" ]] || return 1
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 1
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+    [[ -n "$resolved_worktree" && "$resolved_worktree" == "$target_project" ]] || continue
+    return 0
+  done < <(latest_frozen_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  return 1
 }
 
 worker_prompt_target_worktree() {
@@ -2848,11 +2932,12 @@ manager_hygiene_alerts() {
 }
 
 manager_runtime_recover_workers_if_needed() {
-  local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered
+  local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered latest_continuity_file
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || return 0
   [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
 
+  latest_continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
   recovered="$(manager_runtime_launch_workers_from_latest_handoff "$project")"
   [[ "$recovered" =~ ^[0-9]+$ ]] || recovered=0
   while IFS='|' read -r wt_path branch; do
@@ -2882,9 +2967,18 @@ manager_runtime_recover_workers_if_needed() {
       fi
     fi
     if [[ "$supervisor_state" == "up" ]]; then
+      if manager_continuity_explicitly_freezes_worker_project "$project" "$wt_path" "$latest_continuity_file"; then
+        log_info "manager continuity keeps worker frozen; skipping active recovery: branch=${branch:-unknown} path=$wt_path"
+        continue
+      fi
       if recover_stalled_worker_ai_if_needed "$wt_path"; then
         recovered=$((recovered + 1))
       fi
+      continue
+    fi
+
+    if manager_continuity_explicitly_freezes_worker_project "$project" "$wt_path" "$latest_continuity_file"; then
+      log_info "manager continuity keeps worker frozen; skipping expected-running recovery: branch=${branch:-unknown} path=$wt_path"
       continue
     fi
 
