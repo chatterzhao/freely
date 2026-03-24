@@ -2,7 +2,8 @@
 
 - issue_id: `I-20260322-0445`
 - phase_state: `in_progress`
-- summary: `pre-test-merge` dogfood 暴露出新一层 handoff contract gap：manager 已生成 latest continuity 与 worker prompts，但 prompt 本体缺少 runtime 可稳定解析的 worker target header，导致 generated truth 未被消费成真实 worker launch。
+- summary: `pre-test-merge` dogfood 继续暴露 latest continuity consumption gap：prompt target header 已修通，但 manager stop/restart 后旧的 `manager-worker-launch-state.env` 仍会把 prompt 视为已消费，导致没有活跃 worker 时也不会从同一 continuity 重新 launch。
 - current_focus:
-  - harden worker prompt contract so runtime accepts both stable `Worktree/Branch` headers and the current natural-language worker sentence
-  - re-run dogfood after merge to verify latest continuity resumes launching worker runtimes
+  - keep latest continuity / prompt target contract stable across both machine-readable headers and natural-language compatibility
+  - make stale consumed launch-state recoverable when target worker is no longer running
+  - re-run dogfood after merge to verify latest continuity can re-launch stopped worker runtimes without minting a new continuity first
