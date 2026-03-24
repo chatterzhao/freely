@@ -1,5 +1,6 @@
 # 预研头脑风暴索引
 - 20260323-1705--manager-delegated-continuation-stall-recovery
+- 20260323-1835--worker-delegated-continuation-active-stall-recovery
 - 20260323-1435--interactive-init-bootstrap-and-force-governance
 - 20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion
 - 20260323-1135--codex-account-active-probe-governance
@@ -49,6 +50,9 @@
 - 20260323-1705--manager-delegated-continuation-stall-recovery
   - brainstorms: docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md
   - candidates: docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md
+- 20260323-1835--worker-delegated-continuation-active-stall-recovery
+  - brainstorms: docs/pre-brainstorms/20260323-1835--worker-delegated-continuation-active-stall-recovery/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260323-1835--worker-delegated-continuation-active-stall-recovery/candidates.md
 - 20260323-1435--interactive-init-bootstrap-and-force-governance
   - brainstorms: docs/pre-brainstorms/20260323-1435--interactive-init-bootstrap-and-force-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260323-1435--interactive-init-bootstrap-and-force-governance/candidates.md
