@@ -30,6 +30,8 @@
    - `skill:doc-pre-brainstorm-execution`
    - `skill:doc-ibm-execution`
    - `skill:dev-loop-execution`
+   - manager-owned `completion_verification / cleanup_governance`
+   - `skill:worktree-maintenance-governance`
    - 以及应由哪个外部 AI CLI 工具承接下一跳
 6. 当当前轮次承担项目级监督职责时，先判断哪些 worktree 应继续 dev-loop、哪些只做 doc-loop、哪些冻结等待上游、哪些进入 verification / cleanup / retirement judgement。
 7. 当问题本身是“检查 worktree 是否完成 / 哪些可 merge / 哪些只该 retire / 当前所有 worktree 这轮哪些该继续或 cleanup”时，调用 `skill:worktree-maintenance-governance`，而不是只靠 milestone 或 git graph 临时拼判断；若分支不是直接从 `develop` 派生，优先走其中的 `stacked_merge_chain` 模式；若问题是仓库级盘点，优先走 `fleet_closure`。
