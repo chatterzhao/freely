@@ -85,7 +85,10 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
   - 2026-03-23 当前 verification batch 在 dedicated feature worktree 中直接完成，无需引入 `pre-test-merge` 或提前要求 `post-merge acceptance`：
     - `freely ensure-manager --project <tmp-project>` 直接命令验证通过，确认 watchdog 会先切到可用账号，再发起 manager bootstrap
     - `freely start --project <tmp-project>` 最小 rate-limit 场景可直接写出 `LAST_ACCOUNT_SWITCH_REASON="primary_rate_limit_exhausted"`，证明 runtime 仍把恢复理由写回 watchdog 接管面
-    - `test-freely-rate-limit-defers-to-watchdog` 曾出现一次 3 秒边界失败，但随后单独复现与连续重跑均通过；当前判断为时间阈值边界上的 flaky，而非稳定功能回归
+  - `test-freely-rate-limit-defers-to-watchdog` 曾出现一次 3 秒边界失败，但随后单独复现与连续重跑均通过；当前判断为时间阈值边界上的 flaky，而非稳定功能回归
+  - 2026-03-24 verification continuation 又暴露出两处收口缺口，并已在当前 worktree 继续修补：
+    - `test-freely-rate-limit-defers-to-watchdog` 使用整秒计时，仍会偶发把 `<4s` 的正常退出误判成“本地睡眠”；当前已改成 monotonic 毫秒阈值，避免秒边界抖动
+    - `ensure-manager` / earliest-reset 回归此前没有直接断言 manager bootstrap handoff artifact；当前已把 trigger/account/reason/next_action 写入测试验收面
   - 2026-03-23 晚间狗粮 continuation 暴露出一条实现缺口：
     - `all_accounts_cooling_down -> earliest reset -> sleep` 路径没有显式 `reset_at + buffer`
     - wait 结束后没有重新 probe 所有 saved accounts 再决定 relaunch
@@ -101,6 +104,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 ## Next
 
 - 当前 continuation batch 已完成最小实现与 feature-worktree 验证，当前保持 `in_verification`，等待 manager merge review。
+- 当前 continuation batch 已补上 verification drift：稳定化 `rate-limit` 用例计时，并把 manager bootstrap handoff 契约收进 focused tests；本轮完成后继续保持 `in_verification`，等待 manager merge review。
 - 当前批次交付的 continuation contract：
   - wait 采用 `reset_at + buffer`
   - wait 期间周期性真实 probe saved accounts 是否已变得可工作

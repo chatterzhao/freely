@@ -201,6 +201,14 @@ fi
 grep -q 'switch codex fast@example-com --yes' "$AI_SWITCH_LOG"
 grep -q 'start --project '"$PROJECT"'$' "$LAUNCH_LOG"
 grep -q 'fast@example-com' "$AI_STATE"
+HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
+[[ -f "$HANDOFF_FILE" ]]
+grep -q '^## Manager Bootstrap Recovery$' "$HANDOFF_FILE"
+grep -q '^- trigger: cooldown_elapsed$' "$HANDOFF_FILE"
+grep -q '^- previous_account: fast@example-com$' "$HANDOFF_FILE"
+grep -q '^- active_account: fast@example-com$' "$HANDOFF_FILE"
+grep -q '^- reason: watchdog_resumed_after_wait$' "$HANDOFF_FILE"
+grep -q '^- next_action: inspect-fleet-and-recover-workers$' "$HANDOFF_FILE"
 
 pid_file="$PROJECT/.freely/run/ensure-manager.pid"
 if [[ ! -f "$pid_file" ]]; then

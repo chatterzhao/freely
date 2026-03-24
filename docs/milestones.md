@@ -97,7 +97,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
-- next_action: delegated continuation 已在当前 dedicated worktree 补齐 earliest-reset wait / periodic reprobe / stale `ensure-manager.pid` contract，并完成 issue / progress / code-review writeback。当前保持 `in_verification`，下一步由 manager 基于当前 feature worktree 做 merge review；若 `develop` replay 后仍暴露 outer-watchdog/productization 缺口，再从同一 issue 新开 dedicated continuation lane
+- next_action: delegated continuation 已在当前 dedicated worktree 补齐 earliest-reset wait / periodic reprobe / stale `ensure-manager.pid` contract，并在最新 verification continuation 中继续补上 manager bootstrap handoff 测试覆盖与 `rate-limit` 用例计时稳定性。当前保持 `in_verification`；待补丁后的聚焦验证再次通过后，由 manager 基于当前 feature worktree 做 merge review；若 `develop` replay 后仍暴露 outer-watchdog/productization 缺口，再从同一 issue 新开 dedicated continuation lane
 
 6. `I-20260318-1825`
 - title: Worktree hygiene supervision control plane

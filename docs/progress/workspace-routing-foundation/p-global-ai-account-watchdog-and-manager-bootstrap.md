@@ -20,6 +20,9 @@
   - cooldown elapsed 后先 reprobe/reselect，再决定 manager relaunch
 - 当前轮次主要补 canonical writeback，纠正 issue / milestone / code-review 与实际 continuation 状态之间的漂移。
 - 2026-03-24 fresh session 因上一轮 `context_compacted` 交接被重新拉起后，先按 continuity guard 重跑聚焦验证，再继续保持当前批次 `in_verification` / manager merge review 待处理结论。
+- 本轮继续吸收 fresh-session verification 新暴露出的收口缺口：
+  - `test-freely-rate-limit-defers-to-watchdog` 的整秒计时断言存在秒边界抖动，已改成 monotonic 毫秒阈值
+  - `ensure-manager` 与 earliest-reset 回归已补 manager bootstrap handoff artifact 断言，锁住 `trigger/account/reason/next_action` 契约
 
 ## Verification
 
@@ -39,11 +42,18 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog` pass
   - `bash docs/system/workspace/scripts/tests/test-watchdog-control-plane-skills` pass
   - `./bin/governance-check` pass with legacy pre-brainstorm naming warnings only
+- 2026-03-24 current continuation rerun:
+  - 首轮 `test-freely-rate-limit-defers-to-watchdog` 曾再次命中一次 `4s` 秒边界误报，确认问题出在测试计时口径而非 runtime 回退到本地睡眠
+  - 修复后重复验证：
+    - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-earliest-reset-wait-revive` pass，且同时验证 wait/reprobe、stale pid cleanup、manager bootstrap handoff
+    - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager` pass，且同时验证可用账号切换与 manager bootstrap handoff
+    - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog` 连跑 5 次全部 pass，使用 monotonic 毫秒阈值避免秒边界抖动
+    - `./bin/governance-check` pass with legacy pre-brainstorm naming warnings only
 
 ## Next Action
 
 - 当前批次已处于 manager merge review 前的 verification closeout。
-- 若上述聚焦验证继续通过，下一步由 manager 决定是否 promote 当前 branch；worker 不直接 merge 到 `develop`。
+- 若上述聚焦验证在补丁后继续通过，下一步由 manager 决定是否 promote 当前 branch；worker 不直接 merge 到 `develop`。
 
 ## Revisit Trigger
 

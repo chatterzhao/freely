@@ -29,12 +29,16 @@
    - wait 期间会周期性真实 probe saved accounts，任一账号变得可工作即可提前醒来
    - wait 结束后会重新 probe/select，再决定 relaunch manager
    - watchdog 不会因为单轮 readiness pass 失败而退出，也会覆盖 stale `ensure-manager.pid`
+6. 当前 verification continuation 再补两条 closeout 证据：
+   - `test-freely-rate-limit-defers-to-watchdog` 改成 monotonic 毫秒计时，避免 3 秒整秒边界造成误报
+   - `test-freely-ensure-manager*` 现在直接断言 manager bootstrap handoff artifact，锁住 `trigger/account/reason/next_action`
 
 ## Notes
 
 - 本批次是单个 dedicated feature worktree 上的 verification，不需要为了测试引入 `pre-test-merge`。
 - 当前 gate 是 feature worktree 内的 verification 与 writeback；`post-merge acceptance` 只在真正并入 `develop` 后才成立。
-- `test-freely-rate-limit-defers-to-watchdog` 首次运行曾出现一次 3 秒边界失败；随后单独复现与连续重跑通过，当前判断为时间阈值边界上的 flaky，而不是稳定回归。
+- `test-freely-rate-limit-defers-to-watchdog` 曾两次命中整秒边界误报；当前已把计时口径改成 monotonic 毫秒阈值，避免把正常快速退出误判成“本地睡眠”。
+- 当前补丁后，`test-freely-rate-limit-defers-to-watchdog` 连跑 5 次均通过；`test-freely-ensure-manager*` 也已把 manager bootstrap handoff 契约纳入断言。
 
 ## Remaining Acceptance
 

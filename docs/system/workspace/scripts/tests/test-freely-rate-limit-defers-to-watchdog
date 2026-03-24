@@ -5,6 +5,13 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-rate-limit-watchdog.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
+monotonic_ms() {
+  python3 - <<'PY'
+import time
+print(int(time.monotonic() * 1000))
+PY
+}
+
 PROJECT="$TMP_DIR/project"
 MOCK_BIN="$TMP_DIR/mock-bin"
 MOCK_HOME="$TMP_DIR/mock-home"
@@ -107,11 +114,11 @@ cat >"$MOCK_HOME/.codex/sessions/2026/03/16/rollout-2026-03-16T18-40-00-test-lim
 {"timestamp":"2026-03-17T01:40:00.000Z","type":"event_msg","payload":{"type":"token_count","info":null,"rate_limits":{"primary":{"used_percent":100.0,"window_minutes":300,"resets_at":$reset_at},"secondary":{"used_percent":0.0,"window_minutes":10080,"resets_at":$reset_at},"credits":{"has_credits":false,"unlimited":false,"balance":null},"plan_type":null}}}
 EOF
 
-start_epoch="$(date +%s)"
+start_epoch_ms="$(monotonic_ms)"
 HOME="$MOCK_HOME" PATH="$MOCK_BIN:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
-end_epoch="$(date +%s)"
+end_epoch_ms="$(monotonic_ms)"
 
-if [[ $((end_epoch - start_epoch)) -gt 3 ]]; then
+if (( end_epoch_ms - start_epoch_ms > 3500 )); then
   echo "[FAIL] expected local runtime to defer rate-limit recovery instead of sleeping locally"
   exit 1
 fi

@@ -151,5 +151,13 @@ PATH="$MOCK_BIN:$PATH" \
 grep -q 'switch codex worahe3971@outlook-com --yes' "$AI_SWITCH_LOG"
 grep -q 'start --project '"$PROJECT"'$' "$LAUNCH_LOG"
 grep -q 'worahe3971@outlook.com' "$AI_STATE"
+HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
+[[ -f "$HANDOFF_FILE" ]]
+grep -q '^## Manager Bootstrap Recovery$' "$HANDOFF_FILE"
+grep -q '^- trigger: account_unavailable$' "$HANDOFF_FILE"
+grep -q '^- previous_account: worahe3973@outlook.com$' "$HANDOFF_FILE"
+grep -q '^- active_account: worahe3971@outlook-com$' "$HANDOFF_FILE"
+grep -q '^- reason: watchdog_switched_to_available_account$' "$HANDOFF_FILE"
+grep -q '^- next_action: inspect-fleet-and-recover-workers$' "$HANDOFF_FILE"
 
 echo "[PASS] freely ensure-manager switches to an available codex account before bootstrapping manager"
