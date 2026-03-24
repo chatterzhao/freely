@@ -35,6 +35,43 @@
 3. 保留现有 `pending intake > cycle log` 检测，两条 stall contract 并存
 4. 这条能力属于 runtime control plane，不应只留在一次性 dogfood 结论里
 
+## 当前证据收敛
+
+- `freely live-status` 已能稳定暴露：
+  - `current_prompt_has_delegated_continuation=1`
+  - `latest_manager_worker_prompts_generated=none`
+  - `last_consumed_delegated_continuation_ids=none`
+- `docs/system/workspace/scripts/runtime/freely` 已有专门的
+  - `manager_ai_stalled_after_delegated_continuation_prompt`
+  - `recover_stalled_manager_ai_if_needed`
+- `docs/system/workspace/skills/watchdog-control-plane/SKILL.md` 已把这条 contract 写成 runtime watchdog 的职责边界
+- `docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-stall-recovery`
+  与 `docs/system/workspace/scripts/tests/test-freely-manager-generated-handoff-stall-recovery`
+  已覆盖：
+  - prompt 已吸收 delegated continuation 但无新 continuity / handoff 的 recovery
+  - prompt 之后已有新 continuity / worker prompt 但 launch-state 仍停旧锚点的 recovery
+
+## 与相邻 issue 的边界
+
+- 不吸收到 `runtime-worker-launch-linkage-and-stall-recovery-governance`
+  - 该 issue 冻结的是 `pending intake > cycle log` 的 stalled-AI recovery，与 manager prompt 已吸收 continuation 之后的假活不同
+- 不吸收到 `latest-manager-continuity-worker-consumption-governance`
+  - 该 issue 关注“已经生成了新的 continuity / prompt set，但 worker 仍消费旧轮次”
+  - 当前候选关注的是“manager prompt 已吸收 delegated continuation，但没有继续产出新的 continuity / handoff”
+- 不吸收到 `worker-active-reentry-for-manager-delegated-continuation-governance`
+  - 该 issue 关注 worker 已活着时如何消费 delegated continuation，不覆盖 manager 侧 prompt absorption 后的 stalled manager AI
+
+## 当前判断
+
+- 这条 contract 已经从“模糊现象”收敛为“可描述、可测试、可观测”的 runtime gap
+- 但本轮仍不直接 materialize：
+  - 仓库里已有 runtime / skill / test 证据，但尚未形成 milestone-owned issue 真源
+  - 仍需再做一轮真实 dogfood，确认该 contract 在 cleanup / retirement followthrough 上稳定，不会被吸收到更大的 manager recovery 家族
+- 因此当前继续保留在 `pre-brainstorm`
+  - route_kind: `pre_brainstorm`
+  - target_skill: `workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
+  - next_recommended_route: `doc-pre-brainstorm-execution`
+
 ## 建议承接位置
 
 - `docs/system/workspace/scripts/runtime/freely`
@@ -46,3 +83,7 @@
 - 这不是单条 cleanup issue 的业务阻塞
 - 这是 Freely 自举中暴露的通用 runtime orchestration gap
 - 应先留在 pre-brainstorm / candidate 队列，再根据边界稳定度决定是否 materialize 为独立 issue
+- 下一次重判重点：
+  - 真实 dogfood 是否再次命中相同假活
+  - runtime patch 是否把 cleanup / retirement followthrough 稳定推进到可关闭
+  - 是否出现一个更高层的 manager recovery issue 能自然吸收这条 contract，而不是事后硬并
