@@ -62,6 +62,7 @@ Freely 处于研究优先的整合阶段。
    - 如果是 Freely 自举中暴露的新共性问题，先判它是否应成为 Freely 能力发现；若边界未稳定，先进入 `docs/pre-brainstorms/`
    - 如果当前变更已落在现有 issue scope 内，优先吸收到既有 `issue / milestones / progress / code-review` 生命周期，不要为了一个新 worktree 再伪造新 candidate / issue
    - 只有当问题已经是“现有 lifecycle 走到 merge / verification / cleanup 哪一步”时，才切到 worktree promotion / retirement 判断
+   - 先判当前主题的 canonical owner 在 `pre-brainstorm/candidate` 还是 `issue/IBM/dev/verification`：若还停在前者，当前回合只能先改 `docs/pre-brainstorms/**`、`docs/milestones.md`、现有 issue materialization 相关文档；不得直接改 `docs/system/**`、`bin/**`、runtime/agent/skill 真源或 `docs/LAWS.md`
 3. **头脑风暴路由**：
    - 预研头脑风暴（不是基于 issue 文档）：文档放 `docs/pre-brainstorms/`
    - IBM 头脑风暴（基于 issue 文档）：文档放 `docs/epics/{epic-name}/{story-name}/brainstorms/b-{issue-name}.md`
@@ -79,6 +80,7 @@ Freely 开发 Freely 时，默认先问三件事：
 3. 这棵树是 research-only、merge-ready、companion-only，还是 verified-retirable？
    - 不要把“已经有 feature worktree”误当成“已经完成 issue materialization”
    - 不要把“已经 merge”误当成“cleanup 已完成”
+   - 不要把“某个 loop 已收口”或“issue 已 completed”误当成“agent/skill/topic 已 fully closed”
 
 ## 吃自己的狗粮规则（Freely 构建 Freely）
 Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外。
