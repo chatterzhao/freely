@@ -526,7 +526,7 @@ Validation batch governance:
 ## 最新 continuation 收紧
 
 - `20260324-001134-continuation-dogfood-watchdog-fr` 没有引入新的平行问题；它只是把 `C-20260322-1801-B` 的最小 contract 再钉实一层
-- 当前 worker lane 吸收的是 delegated continuation `20260324-030713-manager-worker-20260324-021853-worker-pre-test-merge-lifecycle-management-followthrough-codex`；它没有改写 route_kind，仍然是 `continuation -> pre_brainstorm`
+- 当前 worker lane 吸收的是同一条 human continuation 之下的 superseding delegated continuations `20260324-024942`、`20260324-025910`、`20260324-030713`；它们都没有改写 route_kind，仍然是 `continuation -> pre_brainstorm`
 - 当前稳定结论不是“这个能力落在某一个组件里”，而是：
   - `manager continuity` 作为唯一 stale-batch truth surface
   - `runtime launch state` / `live-status` 只做 mirror + hard gate

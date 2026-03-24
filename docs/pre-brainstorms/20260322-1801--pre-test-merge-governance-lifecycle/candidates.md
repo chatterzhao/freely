@@ -103,10 +103,10 @@
     verdict: `stay_pre_brainstorm`
 - priority: P1
 - status: needs_research
-- decision_reason: 这是治理规则落成工具能力的下一步，但当前稳定边界是 stale-batch combined minimal contract，而不是单点 runtime/status 补丁。delegated continuation `20260324-030713-manager-worker-20260324-021853-worker-pre-test-merge-lifecycle-management-followthrough-codex` 与 supporting pools 仍只证明应继续 pre-brainstorm；它们还没有把 manager truth surface、runtime gate、replay/retire evidence、acceptance bridge 与 delete gate 输入冻结成可直接 materialize 的单一 issue contract。
+- decision_reason: 这是治理规则落成工具能力的下一步，但当前稳定边界是 stale-batch combined minimal contract，而不是单点 runtime/status 补丁。human continuation `20260324-001134-continuation-dogfood-watchdog-fr` 及其 superseding delegated continuations `20260324-024942`、`20260324-025910`、`20260324-030713`，连同 supporting pools，仍只证明应继续 pre-brainstorm；它们还没有把 manager truth surface、runtime gate、replay/retire evidence、acceptance bridge 与 delete gate 输入冻结成可直接 materialize 的单一 issue contract。
 - promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
-- next_action: `C-20260322-1801-A` 已 materialize 成正式 issue；当前继续 pre-brainstorm，并保留 `combined minimal contract v0`。本轮进一步把最小下一步冻结为三件事：先把 manager continuity 的 `Validation batch governance:` `v1` 块与固定 key 顺序写实成唯一承载语法；再用 `specimen-S1/S2/S3` 的 refusal specimen/evidence 证明这组字段已足够支撑 runtime gate 与 cleanup/delete 判断；随后再确认 `retire_evidence_ref` / `remaining_cleanup_requirement` 是否还需额外补强来表达 fresh-batch absorption，最后才重新判断是否进入 IBM
+- next_action: `C-20260322-1801-A` 已 materialize 成正式 issue；当前继续 pre-brainstorm，并将 `20260324-001134-continuation-dogfood-watchdog-fr` 及其 superseding delegated continuations 明确吸收到 `C-20260322-1801-B` 的 canonical contract 中，继续保留 `combined minimal contract v0`。本轮进一步把最小下一步冻结为三件事：先把 manager continuity 的 `Validation batch governance:` `v1` 块与固定 key 顺序写实成唯一承载语法；再用 `specimen-S1/S2/S3` 的 refusal specimen/evidence 证明这组字段已足够支撑 runtime gate 与 cleanup/delete 判断；随后再确认 `retire_evidence_ref` / `remaining_cleanup_requirement` 是否还需额外补强来表达 fresh-batch absorption，最后才重新判断是否进入 IBM
 - revisit_trigger: 当 `Validation batch governance:` `v1` 固定块、runtime gate、replay/retire evidence、`acceptance_contract_state/source/blocker -> pre-tests.md` 质量 gate 的桥、pre-IBM validation matrix，以及“`completed` / cleanup gate / `verified-retirable` / `retired` / delete guard”组合和 `specimen-S1/S2/S3` 的 refusal evidence 都经独立 review 证实稳定，且未重新混入 `worker self-loop exit` 时，重新进入 materialization 判断
 - session_refs:
   - tool: codex
