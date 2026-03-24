@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-merged-clean-worker-guard.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKTREE_ROOT="$TMP_DIR/project-worktrees"
+WORKER="$WORKTREE_ROOT/feature-merged-clean-worker"
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$WORKTREE_ROOT"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/README.md" <<'EOF'
+# Test
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+
+git -C "$PROJECT" branch feature/test-worker
+git -C "$PROJECT" worktree add "$WORKER" feature/test-worker >/dev/null
+cat >"$WORKER/feature.txt" <<'EOF'
+worker change
+EOF
+git -C "$WORKER" add feature.txt
+git -C "$WORKER" commit -q -m "feature change"
+git -C "$PROJECT" merge --no-ff feature/test-worker -m "merge feature" >/dev/null
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260323-170438-worker-test-codex.txt"
+cat >"$PROMPT" <<EOF
+Worker prompt
+
+Worktree:
+- \`$WORKER\`
+
+Branch:
+- \`feature/test-worker\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260323-170438.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+- worker_prompt: \`$PROMPT\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+if worker_prompt_launchable_for_manager_project "$PROJECT" "$PROMPT"; then
+  echo "[FAIL] merged clean worker prompt should not be launchable" >&2
+  exit 1
+fi
+
+if [[ -n "$(latest_launchable_manager_continuity_file_for_project "$PROJECT")" ]]; then
+  echo "[FAIL] merged clean worker continuity should not be selected for launch" >&2
+  exit 1
+fi
+
+echo "[PASS] merged clean worker handoff is guarded from relaunch"
