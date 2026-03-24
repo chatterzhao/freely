@@ -36,6 +36,40 @@
 - Result stayed green. `governance-check` passed on 2026-03-23 with only pre-existing legacy pre-brainstorm naming warnings, so no new governance drift was introduced by this lane.
 - This round did not reopen implementation scope. The remaining acceptance is still one real `develop` post-merge `freely chat` dogfood run in the protected environment.
 
+## 2026-03-23 Lead-Agent First-Hop Closure
+
+- `constitution-guard` precheck passed: current branch is `feature/delegated-continuation-prompt-consumption-visibility-20260323`, this worker resumed inside the same existing dirty worktree with only issue-owned verification docs already modified, and the session stayed inside the declared worker write scope instead of attempting protected-branch edits.
+- `laws-enforcer` stayed on `LAWS.md` sections `2`, `2A`, `2B`, and `2C`: this input is a continuation source, the issue boundary is already stable, and `progress` remains a verification-stage dev-loop artifact instead of reopening IBM or pre-brainstorm routing.
+- `context-source-skill` result for this intake stayed:
+  - `source_class=continuation`
+  - `route_kind=dev_loop`
+  - `target_skill=dev-loop-execution`
+  - `workspace_action=resume-in-current-feature-worktree`
+  - `execution_base=develop`
+  - `integration_target=develop`
+- selected tool remained `codex` because the active issue is already materialized, the current lane is a repository-writing worker continuation, and `workspace/tools.md` marks Codex as the default tool for implementation / verification work inside a dedicated worktree.
+- `next_prompt` equivalent for runtime traceability: continue `dev-loop-execution` only for `I-20260322-0445` inside the current worktree; keep scope limited to delegated continuation prompt-consumption visibility, rerun the targeted verification suite, and leave the lane in `in_verification` pending one real post-merge `develop` acceptance.
+
+## 2026-03-23 Second-Hop Dev-Loop Verification
+
+- Stayed on the same `dev-loop-execution` continuation after first-hop closure because `selected_tool=codex` matched the active tool, so this round continued in-session instead of handing execution back to runtime.
+- Revalidated the active-prompt visibility behavior against the runtime/test truth sources before writeback:
+  - `docs/system/workspace/scripts/runtime/freely`
+  - `docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
+- Re-ran the full targeted verification suite and all checks passed again:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
+  - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
+  - `./bin/governance-check`
+- `governance-check` still passed with only the same 10 legacy pre-brainstorm naming warnings; this lane introduced no new governance drift.
+- Runtime truth-source inspection matched the test contract exactly:
+  - prompt build writes `LAST_DELEGATED_CONTINUATION_CONSUMED_IDS` / `..._AT` before the AI loop waits for exit
+  - active pending snapshots exclude ids returned by `active_prompt_consumed_delegation_ids_for_project`
+  - after stop, the active-prompt filter no longer applies, so the same delegated ids reappear in `pending_delegated_continuation_ids`
+- No new implementation gap surfaced in the declared write scope. This worktree remains verification-only until one real post-merge `develop` acceptance records the same behavior in the protected environment.
+
 ## Recovery Context
 
 - A later `context_compacted` rotation from Codex session `019d1e52-ccb2-7612-9538-87fd9df4eea5` re-entered the same worker lane in a fresh session, so the first action in the current round remained refreshing the dev-loop continuity artifacts instead of expanding runtime scope.

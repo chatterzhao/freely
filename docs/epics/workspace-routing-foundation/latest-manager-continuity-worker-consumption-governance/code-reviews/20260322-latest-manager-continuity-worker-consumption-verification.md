@@ -4,6 +4,9 @@
 
 - pre-merge verification passed
 - 2026-03-23 worker continuation reran the same verification suite and kept the issue in `in_verification`; only protected-environment post-merge acceptance remains.
+- 2026-03-23 first-hop closure rechecked `lead-agent -> constitution-guard -> laws-enforcer -> context-source-skill`, confirmed this intake is still a `continuation` routed to `dev-loop-execution`, and found no new implementation gap beyond the existing post-merge acceptance requirement.
+- 2026-03-23 second-hop dev-loop continuation revalidated the runtime/test truth source for delegated continuation active-prompt visibility and reran the full targeted suite; all checks remained green, so this lane still needs only post-merge `develop` acceptance.
+- 2026-03-23 direct runtime inspection confirmed why the visibility regression is closed: `freely` persists consumed delegated ids immediately after prompt build, filters those ids out of active pending snapshots while the same prompt is running, and exposes them again after AI exit.
 
 ## Evidence
 

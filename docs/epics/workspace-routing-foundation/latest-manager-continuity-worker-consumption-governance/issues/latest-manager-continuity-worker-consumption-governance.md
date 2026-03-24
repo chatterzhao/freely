@@ -89,5 +89,8 @@
 ## Next
 
 - 2026-03-23 worker continuation re-ran the full targeted verification suite in the feature worktree and confirmed the scope is still verification-only; no new implementation gap surfaced.
+- 2026-03-23 lead-agent first-hop closure revalidated the route as `continuation -> dev_loop`; because the selected tool remained `codex`, the worker continued in-session instead of emitting a handoff-only `next_prompt`.
+- 2026-03-23 second-hop `dev-loop-execution` rechecked the runtime/test truth source for active-prompt visibility and reran the full verification suite; all checks stayed green, so the worktree remains limited to verification writeback rather than reopening implementation scope.
+- 2026-03-23 runtime truth-source inspection confirmed the active-prompt visibility contract now matches acceptance: prompt build persists `last_consumed_delegated_continuation_ids`, active pending views suppress those same ids while the AI pid is still alive, and `live-status` shows them as pending again once the AI stops.
 - 当前 pre-merge verification 已完成，并补上 delegated continuation active-prompt visibility 回归，确认 consumed ids 会在 AI 活跃期间立刻进入 live-status、停止后重新回到 pending。
 - 仍需 merge 后在 `develop` 上做一次真实 `freely chat` post-merge acceptance，确认最新 manager continuity 会被 worker runtime 消费，且 active pending 视图与 consumed truth 保持一致。
