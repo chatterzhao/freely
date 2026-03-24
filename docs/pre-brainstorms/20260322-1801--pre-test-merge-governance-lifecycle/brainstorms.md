@@ -567,8 +567,8 @@ Validation batch governance:
   - human chat / session evidence 当前只体现为 delegated continuation intake 与当前 run 的 prompt evidence；这些证据都要求继续吸收进现有 candidate，而不是新开 lifecycle
   - 当前 `./bin/freely live-status --project <this-worktree>` 也只证明 continuation 已被当前 worker 吸收：`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024929/024942/025910/030713` 等 intake，`pending_delegated_continuation_ids=none`，而 `latest_manager_continuity_generated=unavailable` / `latest_manager_continuity_consumed=unavailable` 继续说明 manager truth artifact 仍未稳定到可直接拿来做 IBM 输入
   - handoff 要求读取的 `manager-continuity-20260324-021853.md` 在当前 worktree 中并不存在，因此本轮不能把某份缺失的 manager truth artifact 当成“已经稳定可消费”的 IBM 输入；它只能继续作为 contract freeze 的缺口记录
-- 当前 handoff 与 runtime 元数据在这一轮是一致的：`context_compacted -> fresh_with_handoff` 仍是当前 continuity guard，而不是已经过期的历史脚注。当前仓库事实是：`live-status` 显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`、`current_prompt_has_delegated_continuation=1`，同时 `pending_delegated_continuation_ids=none`、`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024929/024942/025910/030713`。这说明当前 worker 确实已消费 superseding delegated continuations，但也同样表明 `live-status` 这里只是当前 run 的消费镜像，而不是可替代 manager continuity 的长期 truth source
-- 当前 assigned worktree 的 hygiene 复核仍不改变路由：`git status --short --branch` 只显示 3 个 canonical doc 文件 dirty，`git rev-list --left-right --count develop...HEAD` 为 `46 14`。这说明本轮无需先切 checkpoint 或分流无关改动，但它只是 doc-loop continuity evidence，不是新的 promotion 信号
+- 当前 handoff 的 delegated continuation judgement 仍与 runtime 事实相容，且当前轮换元数据并未脱离 handoff 所描述的 continuity guard。当前仓库事实是：`live-status` 显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`、`current_prompt_has_delegated_continuation=1`，同时 `pending_delegated_continuation_ids=none`、`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024929/024942/025910/030713`。这说明当前 worker 确实已消费 superseding delegated continuations，但也同样表明 `live-status` 这里只是当前 run 的消费镜像，而不是可替代 manager continuity 的长期 truth source
+- 当前 assigned worktree 的 hygiene 复核仍不改变路由：本轮开始时 `git status --short --branch` 已显示当前 canonical doc-loop writeback 留下的 3 个 dirty 文件，`git rev-list --left-right --count develop...HEAD` 为 `46 15`，而 handoff 要求读取的 `.freely/run/manager-continuity-20260324-021853.md` 仍然缺失。这说明本轮无需先切 checkpoint 或分流无关改动，但它只是 doc-loop continuity evidence，不是新的 promotion 信号
 - 最新 supporting-pool ownership check 也没有改写 owner：
   - `I-20260322-1801` 与其 verification 只继续声明 lifecycle management capability 是后续独立 lifecycle
   - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md` 只拥有 latest manager continuity consumption timing，不拥有 stale-batch retire/rebuild governance
@@ -583,7 +583,7 @@ Validation batch governance:
 - 当前 fresh explorer canonical-owner recheck 也没有改写结论：
   - 只读复核再次确认 milestone、completed issue、semantic audit 与 progress 都没有生成新的 committed issue / IBM owner
   - 当前 `live-status` / runtime 仍只是 continuation-consumption mirror，而 `.freely/run/manager-continuity-20260324-021853.md` 继续缺失
-  - 当前 worktree 只脏 3 个 canonical doc-loop 文件，这只是 continuity writeback 压力，不构成 checkpoint / reroute 或更强 owner 证据
+  - 当前 worktree 只脏这 3 个 canonical doc-loop 文件，这只是 continuity writeback 压力，不构成 checkpoint / reroute 或更强 owner 证据
 - 当前 post-handoff read-only subagent reconfirmation 同样没有改写 owner：
   - semantic audit 仍只作为 supporting evidence，未把这条 lane 升级成 committed issue / IBM owner
   - progress 仍只拥有 latest manager continuity consumption timing，而不拥有 stale-batch retire / rebuild governance
@@ -747,7 +747,7 @@ Validation batch governance:
 
 ## 本轮独立 review 结论
 
-- `fresh_with_handoff` 续接后的 canonical 复核没有推翻上一轮 writeback：supporting pools 仍只支持 `stay_pre_brainstorm`
+- 最新只读 explorer IBM-readiness 复核没有推翻上一轮 writeback：supporting pools 仍只支持 `stay_pre_brainstorm`
 - 当前已经有一轮 supporting-pool 独立对读，但它给出的结论仍是“继续保留 `combined minimal contract v0`，不要直接开 IBM”
 - 新增的 explorer contract-freeze review 进一步收窄了顺序：应先冻结 manager continuity 固定语法与最小字段块，再用 delete gate refusal samples 证明其足以支撑 runtime gate 与 cleanup/delete 判断，而不是并行扩写更多子能力
 - 因此，`next_action` 不再是泛化的“先去做 review”，而是继续把 review 后仍未冻结的部分收紧成可 materialize 的 issue contract：
