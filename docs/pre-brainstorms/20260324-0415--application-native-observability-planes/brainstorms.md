@@ -160,6 +160,166 @@ Freely 当前 concrete profile：
   - application-native real-environment testing evidence 是否齐
   - 为什么 아직不能删 tree
 
+## Minimum Shared Schema
+
+本线若要接近 materialization，不能只停在“有五个 plane”的命名层；还要先冻结最小共享 schema。
+
+### 1. Plane identity block
+
+每条可观察记录至少应能回答：
+
+- `plane_kind`
+- `entity_kind`
+- `entity_ref`
+- `owner_kind`
+- `owner_ref`
+- `loop_kind`
+- `phase_state`
+- `topic_ref`
+- `deep_ref`
+
+解释：
+
+- `plane_kind`: `current-state | session | stream | fleet | artifact`
+- `entity_kind`: `project | worktree | lane | session | artifact | runtime`
+- `owner_kind`: `manager | worker | watchdog | human | runtime`
+- `loop_kind`: `auto-loop | doc-loop | dev-loop`
+- `deep_ref`: 允许 human-readable，但必须稳定指向 deeper surface
+
+### 2. Progress signal schema
+
+progress signal 不判断“已经完成”，只判断“仍在推进”。
+
+最小字段：
+
+- `signal_class=progress`
+- `progress_kind`
+- `progress_ref`
+- `observed_at`
+- `topic_ref`
+- `loop_kind`
+- `entity_ref`
+- `delta_summary`
+
+`progress_kind` 最小词典：
+
+- `state_transition`
+- `artifact_generated`
+- `artifact_consumed`
+- `stream_activity`
+- `test_step_completed`
+- `cleanup_step_completed`
+
+### 3. Stall signal schema
+
+stall signal 不直接裁决 dead loop，只暴露“需要主管进一步判断”的证据。
+
+最小字段：
+
+- `signal_class=stall`
+- `stall_kind`
+- `observed_at`
+- `topic_ref`
+- `loop_kind`
+- `entity_ref`
+- `evidence_ref`
+- `suspected_owner`
+
+`stall_kind` 最小词典：
+
+- `no_progress_delta`
+- `repeated_same_stage`
+- `stream_quiet_after_handoff`
+- `artifact_missing_or_not_consumed`
+- `restart_storm_suspected`
+- `state_surface_conflict`
+
+### 4. Acceptance evidence schema
+
+acceptance evidence 要回答“测试有没有真的跑过，为什么还不能判完成”。
+
+最小字段：
+
+- `signal_class=acceptance_evidence`
+- `acceptance_scope`
+- `acceptance_target`
+- `topic_ref`
+- `issue_ref`
+- `pre_tests_ref`
+- `evidence_ref`
+- `completion_state`
+- `delete_gate_state`
+
+`acceptance_scope` 最小词典：
+
+- `integration`
+- `application_native_real_environment`
+- `post_merge_acceptance`
+- `cleanup_closeout`
+
+`completion_state` 只表达 issue 层：
+
+- `not_ready`
+- `partially_evidenced`
+- `fully_evidenced`
+
+`delete_gate_state` 只表达 worktree 层：
+
+- `not_merge_ready`
+- `merge_ready_not_delete_ready`
+- `delete_eligible`
+
+## Product-facing State Exposure Contract
+
+CLI / TUI / GUI / API 不必同一天实现同一渲染层，但应共享一套最小状态暴露 contract。
+
+### Status card minimum fields
+
+每张状态卡片最少应暴露：
+
+- `summary`
+- `owner_ref`
+- `loop_kind`
+- `phase_state`
+- `current_activity`
+- `next_best_ref`
+- `interruption_anchor`
+- `risk_flag`
+
+其中：
+
+- `next_best_ref` 指向最值得继续深挖的 plane / deep ref
+- `interruption_anchor` 告诉用户应朝哪个 topic / lane / entity 插话
+- `risk_flag` 只暴露高层风险，如 `stalled | conflicted | waiting_for_test | cleanup_blocked`
+
+### Deep ref groups
+
+不同 surface 应共享同一组 deep ref 分类：
+
+- `session_ref`
+- `stream_ref`
+- `artifact_ref`
+- `fleet_ref`
+- `acceptance_ref`
+
+CLI 可只给摘要与 ref；TUI / GUI / API 可进一步展开 richer drill-down，但不应发明另一套 ref 分类。
+
+## Freely Self-host Concrete Profile Mapping
+
+Freely self-host 当前 concrete profile 应作为 profile 示例，而不是通用实现强约束。
+
+- `current-state plane`: `freely live-status`
+- `session plane`: `session_refs`、prompt refs、jsonl refs
+- `stream plane`: cycle log tail、session jsonl tail
+- `fleet plane`: `freely fleet-status`、milestone/progress/recovery ownership surfaces
+- `artifact plane`: interruption resolution、manager continuity、worker prompt/continuity、verification/cleanup evidence、`pre-tests.md`
+
+关键边界：
+
+- 其它应用不要求存在 `jsonl` 或 cycle log
+- 其它应用只需提供能映射到同一 shared schema 的 native surfaces
+- Freely 也不应把自己的 concrete profile 冒充成所有应用的唯一 contract
+
 ## Observation Order
 
 本线的核心不是时间阈值，而是先观察“是否有前进信号”。
@@ -205,6 +365,21 @@ Freely 当前 concrete profile：
 - Freely self-host concrete profile
 - product-facing state exposure contract
 - 与现有 `live-status` issue、stall candidate、frontend probe 的依赖关系
+
+当前仍不冻结：
+
+- richer UI 的具体交互设计
+- stream transport 的唯一实现方式
+- 非 Freely 应用必须暴露哪些具体命令/日志文件
+
+## Remaining Blockers Before Materialization
+
+进入 materialization 前，至少还要把下面几件事收死：
+
+1. `plane identity block` 是否已经足够承载多 worktree / 多 subagent / 多 topic 映射。
+2. `acceptance evidence schema` 到底是只存在于 artifact plane，还是还要求 current-state / API 同步镜像关键结果。
+3. CLI/TUI/GUI/API 是否统一暴露同一组 deep ref，还是允许 richer surfaces 扩展但必须兼容最小 ref 组。
+4. 独立 acceptance review 需要确认这条线是新 upstream contract，而不是对 `live-status` 或 stall candidate 的重复建模。
 
 ## Coordination With Existing Lines
 

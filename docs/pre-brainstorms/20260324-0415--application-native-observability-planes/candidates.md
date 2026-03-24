@@ -20,6 +20,9 @@
   - 明确多 worktree / 多 subagent / 多会话场景下，状态面与会话面之间的最小映射字段
   - 明确 testing closeout 中，哪些 observation surfaces 用来证明 application-native real-environment testing 已执行且有 evidence
   - 明确 product-facing 状态暴露 contract：状态卡片、deep refs、实时流展开、fleet drill-down、用户插话着力点如何跨 CLI/TUI/GUI/API 保持一致
+  - 冻结 `plane identity block` 的最小字段：`plane_kind / entity_kind / entity_ref / owner_kind / owner_ref / loop_kind / phase_state / topic_ref / deep_ref`
+  - 冻结 `progress signal schema`、`stall signal schema`、`acceptance evidence schema` 的最小字段与最小词典
+  - 冻结 CLI/TUI/GUI/API 共享的 `status card minimum fields` 与 `deep ref groups`
 - promotion_gate:
   - 冻结各 observation plane 的最小词典和职责
   - 冻结 progress signal / stall signal / acceptance evidence 的最小通用 schema
@@ -27,13 +30,13 @@
   - 冻结与既有 live-status、stall candidate、frontend probe 三条线的承接关系
   - 冻结 product-facing state exposure 的最小字段：status card summary、session deep refs、stream tail refs、artifact refs、fleet ownership refs
   - 明确这条线是上游 contract，不直接等于新 runtime patch 或新 UI 页面
+  - 冻结 `acceptance evidence` 如何同时回答 `issue completion` 与 `delete gate`，避免再次把 merge-ready 误当终态完成
+  - 完成至少一轮独立 acceptance review，确认这条线是新的 upstream contract，而不是 `live-status` 或 stall candidate 的扩写
 - open_questions:
-  - 对非 Freely 应用，哪些 signal 必须是 machine-readable，哪些允许只作为 human-readable deep refs
-  - `stream plane` 是统一 event surface，还是不同 transport 各自承载而只共享词典
   - 多 subagent 的会话是否应成为一级可见实体，还是继续只通过 lane/worktree 聚合暴露
   - 当前 `live-status` / `fleet-status` 是否已足够承接 `current-state plane` / `fleet plane`，还是仍需新的 surface
-  - testing closeout 的最低 observation evidence 应写在 `pre-tests.md`、verification evidence，还是未来 status API 中同步暴露
-  - CLI/TUI/GUI/API 是否都应暴露同一套五平面深链字段，还是允许仅在 richer surface 中暴露 session/stream drill-down
+  - `acceptance evidence schema` 是否只在 artifact plane 成为 canonical truth，还是还需 current-state/API 暴露关键摘要
+  - CLI/TUI/GUI/API 是否都必须暴露同一组 deep ref groups，还是 richer surface 可扩展但必须向下兼容最小 ref 组
 - acceptance_reviews:
   - reviewer: `codex`
     mode: `author pre-materialization review`
@@ -41,11 +44,11 @@
     verdict: `needs_independent_review`
 - priority: P1
 - status: proposed
-- decision_reason: 这条线已经从本次 Freely 自举现场中暴露出来，但当前仍应先停留在 pre-brainstorm，直到 plane 词典、signal schema 和与既有 issue/candidate 的承接边界稳定。
+- decision_reason: 这条线已经从本次 Freely 自举现场中暴露出来，而且 now clearly exceeds `live-status` / stall candidate 的原边界；但当前仍应停留在 pre-brainstorm，直到五个 plane 的 identity block、progress/stall/acceptance evidence schema、shared state exposure contract，以及与既有线的承接关系都冻结稳定。
 - promoted_issue_path: `pending://application-native-runtime-observation-contract-and-observability-planes`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
-- next_action: 继续 pre-brainstorm，先冻结五类 observation planes、观察顺序、progress/stall/evidence schema、product-facing state exposure contract，以及 Freely self-host concrete profile；随后再做一轮独立 acceptance review，判断是 materialize 新 issue，还是吸收到既有 observability/probe issue 族
-- revisit_trigger: 当 observation planes 词典、通用 signal schema 与 Freely self-host concrete profile 都足够稳定，且与 `live-status` / stall / frontend probe 三条线的关系已无歧义时，重新进入 materialization 判断
+- next_action: 继续 pre-brainstorm，先冻结 `plane identity block`、五类 observation planes 的最小词典、`progress/stall/acceptance evidence` schema、CLI/TUI/GUI/API 共享的 status card/deep ref contract，以及 Freely self-host concrete profile；随后补一轮独立 acceptance review，专门判断这些 contract 是否已足以 materialize 为 upstream issue
+- revisit_trigger: 当 `plane identity block`、三类 signal schema、shared state exposure contract、Freely self-host concrete profile 以及与 `live-status` / stall / frontend probe 的关系都足够稳定，且独立 acceptance review 不再提出新的 contract blocker 时，重新进入 materialization 判断
 - session_refs:
   - tool: codex
   - session_id: current-thread
