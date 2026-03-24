@@ -38,7 +38,7 @@
   - 也未发现 `docs/epics/**`、`docs/progress/**` 或 `docs/recovery/**` 接管该候选
   - 独立只读 owner scan 再次确认：仓库里没有其他 canonical artifact 接管这条 contract；当前唯一缺口仍是 prompt-cycle binding proof，而不是 owner 路由不清
 - hygiene_judgement:
-  - canonical writeback 已继续收敛到当前 `HEAD` `473075b docs: refresh delegated continuation evidence counts`，当前 worktree 为 `CLEAN`
+  - canonical writeback 已继续收敛到当前 `HEAD` `114a6a4 docs: refresh delegated continuation continuity state`，当前 worktree 为 `CLEAN`
   - 本轮无需把无关改动分流到其他 worktree；下一步 hygiene / cleanup 动作应是等待这些独有提交被上游吸收后再重判 retirement，而不是继续扩大 scope
 - next_action:
   - 保持 `C-20260323-1705-A` 在 `candidate_issues` / `needs_research`
