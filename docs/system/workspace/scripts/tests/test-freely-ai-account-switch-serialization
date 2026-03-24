@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ai-account-switch-serialization.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_auth_json() {
+  local email="$1" target="$2"
+  local payload
+  payload="$(python3 - <<'PY' "$email"
+import base64
+import json
+import sys
+
+payload = base64.urlsafe_b64encode(json.dumps({"email": sys.argv[1]}).encode()).decode().rstrip("=")
+print(payload)
+PY
+)"
+  printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$payload" >"$target"
+}
+
+setup_project() {
+  local project="$1"
+  mkdir -p \
+    "$project/.freely/run" \
+    "$project/docs/system/workspace/skills/watchdog-control-plane/scripts"
+  ln -sf \
+    "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+    "$project/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+}
+
+setup_home() {
+  local home_dir="$1"
+  mkdir -p "$home_dir/.ai-auth" "$home_dir/.codex"
+}
+
+MOCK_BIN="$TMP_DIR/mock-bin"
+mkdir -p "$MOCK_BIN"
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+auth_file="${HOME:?}/.codex/auth.json"
+lock_dir="${AI_CLI_SWITCH_LOCK_DIR:?}"
+output_file="${MOCK_CODEX_LOG:?}"
+
+email="$(python3 - <<'PY' "$auth_file"
+import base64
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    data = json.load(f)
+token = data["tokens"]["id_token"].split(".")[1]
+token += "=" * (-len(token) % 4)
+payload = json.loads(base64.urlsafe_b64decode(token.encode()))
+print(payload["email"])
+PY
+)"
+
+if [[ ! -d "$lock_dir" ]]; then
+  echo "missing-switch-lock-for-$email" >>"$output_file"
+  exit 9
+fi
+
+echo "locked-probe-$email" >>"$output_file"
+sleep 2
+
+case "$email" in
+  limited@example.com)
+    echo "You've hit your usage limit. Please try again at Jan 2nd, 2100 12:00 AM."
+    exit 1
+    ;;
+  work@example.com)
+    echo "hi"
+    exit 0
+    ;;
+  *)
+    echo "unexpected:$email"
+    exit 7
+    ;;
+esac
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+LOCK_DIR="$TMP_DIR/account-switch.lock"
+PROBE_LOG="$TMP_DIR/probe.log"
+setup_project "$PROJECT"
+setup_home "$HOME_DIR"
+mkdir -p "$HOME_DIR/.ai-auth/codex-limited@example-com-1" "$HOME_DIR/.ai-auth/codex-work@example-com-2"
+make_auth_json "limited@example.com" "$HOME_DIR/.ai-auth/codex-limited@example-com-1/auth.json"
+make_auth_json "work@example.com" "$HOME_DIR/.ai-auth/codex-work@example-com-2/auth.json"
+make_auth_json "old@example.com" "$HOME_DIR/.codex/auth.json"
+
+HOME="$HOME_DIR" \
+PROJECT_ROOT="$PROJECT" \
+PATH="$MOCK_BIN:$PATH" \
+AI_CLI_SWITCH_LOCK_DIR="$LOCK_DIR" \
+MOCK_CODEX_LOG="$PROBE_LOG" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/out.json" &
+
+switch_pid=$!
+for _ in {1..20}; do
+  if [[ -d "$LOCK_DIR" ]]; then
+    break
+  fi
+  sleep 0.2
+done
+
+if [[ ! -d "$LOCK_DIR" ]]; then
+  echo "[FAIL] expected account switch lock while auto-probe sweep is active" >&2
+  exit 1
+fi
+
+grep -q '^reason=auto_probe_switch$' "$LOCK_DIR/state.env"
+grep -q '^command=switch$' "$LOCK_DIR/state.env"
+grep -q '^target=auto$' "$LOCK_DIR/state.env"
+
+wait "$switch_pid"
+
+if [[ -d "$LOCK_DIR" ]]; then
+  echo "[FAIL] expected auto-probe switch lock to be released after switch completion" >&2
+  exit 1
+fi
+
+grep -q '"switched": true' "$TMP_DIR/out.json"
+grep -q '"account": "work@example.com"' "$TMP_DIR/out.json"
+grep -q 'locked-probe-limited@example.com' "$PROBE_LOG"
+grep -q 'locked-probe-work@example.com' "$PROBE_LOG"
+
+echo "[PASS] freely ai switch codex serializes the full auto-probe sweep with a shared switch lock"
