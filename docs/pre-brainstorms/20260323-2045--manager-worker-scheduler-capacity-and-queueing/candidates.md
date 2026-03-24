@@ -1,0 +1,28 @@
+# 候选：manager worker scheduler capacity and queueing
+
+- id: `C-20260323-2045-A`
+- title: Add capacity-aware queueing for manager worker prompt sets
+- source_brainstorm: `docs/pre-brainstorms/20260323-2045--manager-worker-scheduler-capacity-and-queueing/brainstorms.md`
+- status: `needs_research`
+- session_refs:
+  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "author"}
+- why_now:
+  - real dogfood showed manager could classify multiple lanes but not schedule them safely
+  - runtime currently launches worker prompts linearly without worker capacity or queued-lane state
+  - repeated manager relaunch against an already busy delegated worker is now a real blocker
+- expected_outcome:
+  - worker prompt set carries dispatch metadata
+  - runtime launches only capacity-safe prompts and persists the remainder as queue state
+  - active delegated worker lanes are not relaunched until the current handoff wave clears
+- likely_truth_sources:
+  - `docs/system/workspace/scripts/runtime/freely`
+  - `docs/system/workspace/scripts/start-lead-agent.sh`
+  - `docs/system/workspace/agents/manager-agent.md`
+  - `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`
+  - `docs/system/workspace/three-loop-capability-lifecycle.md`
+- next_action:
+  - implement queue-aware manager launch state and regression tests, then dogfood via `freely chat`
+- revisit_trigger:
+  - when manager can launch multiple parallel-safe worktree lanes, queue the rest, and avoid repeated launch spam into a busy delegated worker
+- promoted_issue_path: `pending://issue-materialization`
+- milestone: `pending://milestone-binding`
