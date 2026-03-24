@@ -430,8 +430,8 @@ routing_policy:
 - promoted_issue_path: `pending://pre-test-merge-acceptance-stall-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/candidates.md`
-- next_action: 保持 active candidate；先依赖 `pre-test-merge` 治理 issue 冻结 protected-env 生命周期语义，再把 delegated acceptance continuation stall materialize 成独立 runtime/orchestration issue
-- revisit_trigger: 当治理 issue 稳定 `pre-test-merge` 边界后，或真实 post-merge acceptance 再次复现 delegated continuation stall 时，重新进入 issue materialization 判断
+- next_action: 保持 active candidate；先依赖 `pre-test-merge` 治理 issue 冻结 protected-env 生命周期语义，并在真实 dogfood 中跑满 watchdog 阈值；只有 delegated continuation 已进 prompt 且超过阈值仍无新 manager continuity/decision 时，才 materialize 成独立 runtime/orchestration issue
+- revisit_trigger: 当治理 issue 稳定 `pre-test-merge` 边界后，或真实 post-merge acceptance 再次在超过 watchdog 阈值后仍复现 delegated continuation stall 时，重新进入 issue materialization 判断
 
 10. `C-20260323-1705-A`
 - title: Detect and recover manager delegated continuation stalls after prompt absorption
