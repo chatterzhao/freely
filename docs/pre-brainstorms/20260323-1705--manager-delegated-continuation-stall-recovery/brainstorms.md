@@ -100,12 +100,12 @@
   - `intake_delegated_items: 30`
   - `current_prompt_has_delegated_continuation: 1`
   - `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 仍全量重叠，且最新 delegated continuation intake 仍可见于 pending 集合
-  - `last_consumed_delegated_continuation_at: 2026-03-24T07:14:59Z`
-  - `current_focus.prompt_file: .freely/run/prompt-20260324-001922.txt`
+  - `last_consumed_delegated_continuation_at: 2026-03-24T07:19:27Z`
+  - `current_focus.prompt_file: .freely/run/prompt-20260324-002242.txt`
   - 当前 prompt excerpt 仍直接指向这条候选前一轮 writeback diff，说明 delegated continuation 语义仍在当前 worker prompt 上下文中，而不是只停留在历史 handoff；同时也说明 fresh session 仍沿用同一条 canonical writeback 线
 - 当前最新 `live-status` 还补足了两层 continuity 事实：
   - `active_processes` 中仍能看到当前 `codex exec` 进程，说明 runtime 继续把本工位当作 active worker lane 维护
-  - `deep_refs.last_tool_session_id=019d1eb2-615d-7fe2-a617-69b95a5758ee` 与 `deep_refs.last_tool_jsonl_path=/Users/zhaoyu/.codex/sessions/2026/03/24/rollout-2026-03-24T00-15-00-019d1eb2-615d-7fe2-a617-69b95a5758ee.jsonl` 把上一轮 `context_compacted -> fresh_with_handoff` 的来源再次固定下来
+  - `deep_refs.last_tool_session_id=019d1eb6-7620-75a2-a5d0-fdc12afa8a55` 与 `deep_refs.last_tool_jsonl_path=/Users/zhaoyu/.codex/sessions/2026/03/24/rollout-2026-03-24T00-19-27-019d1eb6-7620-75a2-a5d0-fdc12afa8a55.jsonl` 把上一轮 `context_compacted -> fresh_with_handoff` 的来源再次固定下来
 - 这层 worker-side `live-status` 说明 runtime 当前仍在沿用 `context_compacted -> fresh_with_handoff` 的 continuity 策略，而且 current process view 已经出现 `activity_state=ai_active` 与 `last_ai_state=down/ai_exit_rc_0` 并存；它证明运行态切面仍在推进或轮换，但仍不能替代当前候选所需的 manager-side prompt-cycle binding acceptance anchor
 - 当前 worktree hygiene 事实：
   - canonical writeback 已继续收敛为本分支上的最新 continuity anchor lineage，而不是未提交 dirty delta
@@ -151,6 +151,27 @@
   - route_kind 继续保持 `pre_brainstorm`
   - 当前分支的独有提交仍是 canonical candidate writeback，而不是可直接丢弃的噪音
   - 但在这些提交尚未被上游吸收前，这棵树不满足 `retire-now`
+
+## continuity guard writeback（2026-03-24 00:22 PST）
+
+- 本轮 fresh session 继续命中 handoff 中要求的 doc-loop continuity guard，因此先刷新 pre-brainstorm canonical artifacts，而不是扩大到 IBM / dev-loop
+- 最新 `live-status` 已把 continuity 锚点继续滚动到：
+  - `last_consumed_delegated_continuation_at: 2026-03-24T07:19:27Z`
+  - `current_focus.prompt_file: .freely/run/prompt-20260324-002242.txt`
+  - `deep_refs.last_tool_session_id: 019d1eb6-7620-75a2-a5d0-fdc12afa8a55`
+  - `deep_refs.last_tool_jsonl_path: /Users/zhaoyu/.codex/sessions/2026/03/24/rollout-2026-03-24T00-19-27-019d1eb6-7620-75a2-a5d0-fdc12afa8a55.jsonl`
+- 当前 worker 视图仍保持：
+  - `activity_state=ai_active`
+  - `last_ai_state=down`
+  - `last_exit_reason=ai_exit_rc_0`
+  - `latest_manager_continuity_generated=unavailable`
+  - `latest_manager_worker_prompts_generated=none`
+- `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 仍是 30/30 全量重叠，其中继续包含当前 lane 的 `20260323-225022...`、`20260323-225032...` 与 `20260323-234407...`
+- 这再次证明 runtime 仍在维护当前 continuation lane，并且 delegated continuation 仍位于当前 prompt 语义层；但它依旧没有给出稳定的 prompt-cycle binding proof，来说明哪个 consumed 事件对应当前 stalled intake
+- 因此本轮结论不变：
+  - current route 继续保持 `pre_brainstorm`
+  - candidate 继续保持 `needs_research`
+  - cleanup 继续保持 `retain-for-followthrough`
 
 ## 与相邻 issue 的边界
 
