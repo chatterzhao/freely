@@ -93,6 +93,38 @@
 2. manager escalation 触发后，watchdog 是完全暂停，还是进入低频观察模式
 3. manager continuity 最小需要哪些字段，才能既不重复 signal 真相，又足够驱动 runtime followthrough
 
+## 当前冻结结论
+
+### 1. signal 真相面只放 `session-state.env`
+
+- `session-state.env` 已经承载 runtime 原始观察信号，并被 `live-status` / `fleet-status` 消费
+- `workcell-state.env` 当前职责是 `desired_runtime_state / last_supervisor_state / last_ai_state / last_exit_reason`
+- restart storm / process churn 属于短窗口原始 signal，不应污染 `workcell-state.env` 的运行态镜像职责
+- 因此这条能力默认不把 signal 镜像到 `workcell-state.env`
+
+### 2. signal 命中后，watchdog 进入低频观察，不做盲重启
+
+- 命中 signal 后，watchdog 不再继续当前轮的高频 blind relaunch
+- 但也不应完全停死，否则人工插话、新 continuity、外部状态恢复都无法被及时吸收
+- 更稳的语义是：
+  - 先写 `session-state.env` signal
+  - 触发 manager escalation
+  - watchdog 进入低频观察/重查模式
+  - 等待 manager continuity / handoff 决定下一步是恢复、冻结 lane、kill/restart 还是 route 重判
+
+### 3. manager continuity 只带 signal ref 与治理裁决
+
+- manager continuity 不重复 `RESTART_STORM_COUNT`、`PROCESS_CHURN_PEAK` 这类原始计数
+- continuity 最小需要：
+  - `runtime_signal_ref=session-state.env`
+  - `runtime_signal_reason`
+  - `runtime_signal_observed_at`
+  - `restart_point`
+  - `next_action`
+  - `ownership`
+- 也就是说，continuity 只表达“主管看到了什么 signal，以及决定 runtime 接下来怎么做”
+- 原始 signal 数值仍回看 `session-state.env` 与 `live-status`
+
 ## 代码与真源落点候选
 
 - `docs/system/workspace/scripts/runtime/freely`
@@ -107,7 +139,10 @@
 - 这是 Freely 自举暴露出的 runtime control-plane 共性缺口
 - 它不是当前“三个 loop”语义重构 issue 的一部分实现
 - 它更接近 watchdog / manager supervision 家族的 follow-on implementation issue
-- 在进入 IBM 之前，需要先冻结：
-  - signal 真相面写在哪里
-  - signal 与 stall contract 如何并存
-  - manager judgement 与 watchdog pause/retry 的最小交互
+- 当前已冻结：
+  - signal 真相面写在 `session-state.env`
+  - manager judgement 与 watchdog 低频观察的最小交互
+  - continuity 只携带 signal ref 与 followthrough judgement
+- 进入 IBM 前最后还要收紧：
+  - signal 与现有 stall contract 如何并存
+  - counter/window 默认阈值与暴露格式
