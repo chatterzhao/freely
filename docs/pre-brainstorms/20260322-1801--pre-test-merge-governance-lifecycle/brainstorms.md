@@ -554,7 +554,7 @@ Validation batch governance:
 ## 最新 continuation 收紧
 
 - `20260324-001134-continuation-dogfood-watchdog-fr` 没有引入新的平行问题；它只是把 `C-20260322-1801-B` 的最小 contract 再钉实一层
-- 当前 worker lane 吸收的是同一条 human continuation 之下的 superseding delegated continuations `20260324-024942`、`20260324-025910`、`20260324-030713`；它们都没有改写 route_kind，仍然是 `continuation -> pre_brainstorm`
+- 当前 worker lane 吸收的是同一条 human continuation 之下的 superseding delegated continuations `20260324-024929`、`20260324-024942`、`20260324-025910`、`20260324-030713`；它们都没有改写 route_kind，仍然是 `continuation -> pre_brainstorm`
 - 当前稳定结论不是“这个能力落在某一个组件里”，而是：
   - `manager continuity` 作为唯一 stale-batch truth surface
   - `runtime launch state` / `live-status` 只做 mirror + hard gate
@@ -564,10 +564,43 @@ Validation batch governance:
   - 现有 completed issue `I-20260322-1801` 明确只负责职责定义，不负责 stale-batch capability materialization
   - 语义审计 pre-brainstorm 只把这条能力当 supporting evidence，没有把它升级成 IBM
   - 当前仓库没有专门的 `docs/recovery/**`，而 `docs/progress/**` / review / test 只提供 delete gate、`verified-retirable` 和 acceptance bridge 的 supporting evidence，没有给出足以进 IBM 的稳定 contract
-  - human chat / session evidence 当前只体现为 delegated continuation intake 与 `.freely/run/prompt-20260324-030714.txt`，它们都要求继续吸收进现有 candidate，而不是新开 lifecycle
-  - 当前 `./bin/freely live-status --project <this-worktree>` 也只证明 continuation 已被当前 worker 吸收：`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024942/025910/030713` 等 intake，而 `latest_manager_continuity_generated=unavailable` / `latest_manager_continuity_consumed=unavailable` 继续说明 manager truth artifact 仍未稳定到可直接拿来做 IBM 输入
+  - human chat / session evidence 当前只体现为 delegated continuation intake 与当前 run 的 prompt evidence；这些证据都要求继续吸收进现有 candidate，而不是新开 lifecycle
+  - 当前 `./bin/freely live-status --project <this-worktree>` 也只证明 continuation 已被当前 worker 吸收：`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024929/024942/025910/030713` 等 intake，`pending_delegated_continuation_ids=none`，而 `latest_manager_continuity_generated=unavailable` / `latest_manager_continuity_consumed=unavailable` 继续说明 manager truth artifact 仍未稳定到可直接拿来做 IBM 输入
   - handoff 要求读取的 `manager-continuity-20260324-021853.md` 在当前 worktree 中并不存在，因此本轮不能把某份缺失的 manager truth artifact 当成“已经稳定可消费”的 IBM 输入；它只能继续作为 contract freeze 的缺口记录
-  - 仓库内没有新的 github issue 落点把该问题升级成外部已定界 issue；`PROJECT_INTENT` 只继续要求扫描这些池，而没有改写本 candidate 的 owner
+- 当前 handoff 与 runtime 元数据在这一轮是一致的：`context_compacted -> fresh_with_handoff` 仍是当前 continuity guard，而不是已经过期的历史脚注。当前仓库事实是：`live-status` 显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`、`current_prompt_has_delegated_continuation=1`，同时 `pending_delegated_continuation_ids=none`、`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024929/024942/025910/030713`。这说明当前 worker 确实已消费 superseding delegated continuations，但也同样表明 `live-status` 这里只是当前 run 的消费镜像，而不是可替代 manager continuity 的长期 truth source
+- 当前 assigned worktree 的 hygiene 复核仍不改变路由：`git status --short --branch` 只显示 3 个 canonical doc 文件 dirty，`git rev-list --left-right --count develop...HEAD` 为 `46 14`。这说明本轮无需先切 checkpoint 或分流无关改动，但它只是 doc-loop continuity evidence，不是新的 promotion 信号
+- 最新 supporting-pool ownership check 也没有改写 owner：
+  - `I-20260322-1801` 与其 verification 只继续声明 lifecycle management capability 是后续独立 lifecycle
+  - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md` 只拥有 latest manager continuity consumption timing，不拥有 stale-batch retire/rebuild governance
+  - 当前 `live-status.current_focus.prompt_file` 指向的 run prompt 继续把这条 lane 路由回 `C-20260322-1801-B`，而不是给出更强的 IBM owner
+- 最新一轮独立 acceptance review 继续维持 `stay_pre_brainstorm`，并把 blocker 收窄为：`retire_evidence_ref` + `remaining_cleanup_requirement` 仍不足以单独证明 fresh-batch absorption 已闭合；若不新增 machine-readable pointer，至少也要把“无需额外 pointer”冻结成被 review 证实的 contract
+- 当前 run 的 `current_focus.prompt_file` 与 `live-status` 一起证明 superseding delegated continuation bundle 已在当前会话被消费，而不是仍停留在 queued/pending handoff；但它依旧只证明 worker consumption，不能替代缺失的 manager continuity truth artifact
+- 最新 explorer ownership scan 进一步坐实 supporting-pool 边界：
+  - `docs/milestones.md` 仍把 `C-20260322-1801-B` 保留为 `candidate / in_pre_brainstorm`
+  - completed issue 与其 IBM brainstorm 继续把 lifecycle management 留作后续独立 lifecycle
+  - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md` 只拥有 continuity consumption gap，不拥有 stale-batch governance owner
+  - `.freely/run/session-state.env` / prompt evidence 只证明 worker consumption mirror，不足以替代 manager continuity 成为 IBM 输入
+- 当前 fresh explorer canonical-owner recheck 也没有改写结论：
+  - 只读复核再次确认 milestone、completed issue、semantic audit 与 progress 都没有生成新的 committed issue / IBM owner
+  - 当前 `live-status` / runtime 仍只是 continuation-consumption mirror，而 `.freely/run/manager-continuity-20260324-021853.md` 继续缺失
+  - 当前 worktree 只脏 3 个 canonical doc-loop 文件，这只是 continuity writeback 压力，不构成 checkpoint / reroute 或更强 owner 证据
+- 当前 post-handoff read-only subagent reconfirmation 同样没有改写 owner：
+  - semantic audit 仍只作为 supporting evidence，未把这条 lane 升级成 committed issue / IBM owner
+  - progress 仍只拥有 latest manager continuity consumption timing，而不拥有 stale-batch retire / rebuild governance
+  - 最小 freeze gap 继续只剩 fresh-batch absorption 的 machine-readable pointer 是否需要额外落点，或“无需额外 pointer”的等价 contract 是否已足够稳定
+- 最新 supporting-pool boundary check 继续把 completed issue 的 `pre-tests.md` 与 verification review 留在 supporting pool：
+  - 它们只加强 `I-20260322-1801` 已完成 issue 的 acceptance / quality gate，不生成新的 stale-batch capability owner
+  - 这进一步说明当前 lane 还不能靠 completed issue 的下游验收文档被吸收到 IBM；canonical owner 仍然只能是 `C-20260322-1801-B`
+- 最新 fresh-session IBM-readiness check 继续维持同样结论：
+  - 最强 canonical owner 仍是 `C-20260322-1801-B` 与其 matching milestone candidate entry，而不是任何 completed issue / acceptance-first supporting pool
+  - freeze gap 仍未缩小到可 materialize：fresh-batch absorption 还需要额外 machine-readable pointer，或把“`retire_evidence_ref` + `remaining_cleanup_requirement` 已足够”的等价 contract 冻结并经独立 review 证实
+  - `specimen-S1/S2/S3` 仍要继续证明 delete-eligibility chain 与 issue completion chain 分离，runtime/live-status 也仍只是 continuation-consumption mirror
+- 仓库内没有新的 github issue 落点把该问题升级成外部已定界 issue；`PROJECT_INTENT` 只继续要求扫描这些池，而没有改写本 candidate 的 owner
+- 这轮按 `lead-agent -> context-source-skill -> doc-pre-brainstorm-execution` 重放首跳后，优先级仍然先落在 milestone + supporting pools，而不是 runtime 实现面：
+  - `milestones.md` 仍把 `C-20260322-1801-B` 保留在 `candidate_issues`
+  - completed issue、semantic audit、progress/review/test、human continuation 与 `live-status` 都只提供 supporting evidence，没有给出新的 canonical owner
+  - `tools.md` 也没有改写工具选择：当前最匹配的仍是 `codex`，因为本轮工作仍是当前 feature worktree 内的 canonical doc-loop writeback
+- 因此，这轮“下一跳”虽然仍会留下 `next_prompt` 作为可追溯中间产物，但真实执行不能停在 handoff 文本：`selected_tool=codex` 与当前 `AI_TOOL=codex` 相同，必须在当前会话内继续完成 `doc-pre-brainstorm-execution` writeback
 
 ## materialization 前仍缺的验证矩阵
 
@@ -709,7 +742,7 @@ Validation batch governance:
 ## 当前仍未冻结的点
 
 - `stale_reason` 与 `lifecycle_decision` 是否需要更细枚举，还是保持最小集合
-- `retire_evidence_ref` 与 `remaining_cleanup_requirement` 是否足够支撑 future delete guard / hook，还是仍需额外的 fresh-batch absorption 指针
+- `retire_evidence_ref` 与 `remaining_cleanup_requirement` 当前仍不足以支撑 future delete guard / hook 对 fresh-batch absorption 的稳定判断；下一轮要么补额外 machine-readable absorption pointer，要么把“无需额外 pointer”的 contract freeze 与 review evidence 写实，并证明 worker-consumption mirror 不会被误读成 absorption proof
 - 这份 v0 contract 是否已足够小到能单独 materialize 成 IBM，而不是还需再做一轮独立 acceptance review
 
 ## 本轮独立 review 结论
