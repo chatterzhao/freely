@@ -25,8 +25,8 @@
     jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T22-09-24-019d1e3f-644c-7de3-84be-3ec5f2552c74.jsonl`
     role: `context-compacted-handoff-source`
   - tool: `codex`
-    session_id: `019d1eaf-f86f-7003-9207-8e74d89af249`
-    jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/03/24/rollout-2026-03-24T00-12-22-019d1eaf-f86f-7003-9207-8e74d89af249.jsonl`
+    session_id: `019d1eb2-615d-7fe2-a617-69b95a5758ee`
+    jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/03/24/rollout-2026-03-24T00-15-00-019d1eb2-615d-7fe2-a617-69b95a5758ee.jsonl`
     role: `fresh-with-handoff-source-latest`
 - why_now:
   - 真实 dogfood 已复现 `cleanup continuation` 进入 manager prompt 后，AI 假活但不产出 continuity / handoff 的断点。
@@ -48,7 +48,7 @@
     - `intake_snapshot` 中存在当前 delegated continuation intake ids，可追溯到当前 prompt 周期
   - partial consumed-id proof:
     - `intake_delegated_items=30`，且 `last_consumed_delegated_continuation_ids` 已覆盖当前观察窗口中的全部 30 个 delegated continuation ids，其中包括 `20260323-204333...`、`20260323-204334...`、`20260323-205242...`、`20260323-205340...`、`20260323-220921...`、`20260323-222254...`、`20260323-222255...`、`20260323-225022...`、`20260323-225032...` 与 `20260323-234407...`
-    - 最新 `live-status` 还给出 `last_consumed_delegated_continuation_at=2026-03-24T07:12:22Z`
+    - 最新 `live-status` 还给出 `last_consumed_delegated_continuation_at=2026-03-24T07:14:59Z`
     - 说明 runtime 已经开始把 delegated continuation consumption 暴露为 canonical truth，而不是只剩 prompt excerpt 可读证据
   - stall-level proof:
     - `latest_manager_continuity_generated=unavailable`
@@ -60,8 +60,8 @@
     - `last_exit_reason=ai_exit_rc_0`
     - `last_launch_kind=fresh_with_handoff`
     - `last_rotation_reason=context_compacted`
-    - `current_focus.prompt_file=.freely/run/prompt-20260324-001455.txt`
-    - `deep_refs.last_tool_session_id=019d1eaf-f86f-7003-9207-8e74d89af249`
+    - `current_focus.prompt_file=.freely/run/prompt-20260324-001922.txt`
+    - `deep_refs.last_tool_session_id=019d1eb2-615d-7fe2-a617-69b95a5758ee`
     - 说明 runtime 当前同时暴露“本轮 worker 仍处于 active 视图”和“上一跳 AI 退出/轮换留痕”；这层 continuity surface 证明 runtime 还在维护当前 lane，但仍不等于当前 manager prompt cycle 对 stalled intake 的稳定 binding proof
   - runtime/test scope proof:
     - `docs/system/workspace/scripts/runtime/freely` 已把 `LAST_MANAGER_CONTINUITY_GENERATED/CONSUMED`、`LAST_MANAGER_WORKER_PROMPTS_GENERATED/CONSUMED` 与 delegated pending/consumed ids 写入状态面，并由 `live-status` 暴露
@@ -112,6 +112,14 @@
     mode: `worker-continuity-refresh`
     summary: `本轮 fresh session 先执行 doc-loop continuity guard，把最新 `live-status` 锚点写回 pre-brainstorm：`last_consumed_delegated_continuation_at=2026-03-24T07:12:22Z`、`current_focus.prompt_file=.freely/run/prompt-20260324-001455.txt`，且 `deep_refs.last_tool_session_id=019d1eaf-f86f-7003-9207-8e74d89af249` 再次固定上一轮 `fresh_with_handoff` 来源。这进一步证明 runtime 仍在维护当前 continuation lane，但仍未把 consumed truth 稳定绑定到当前 prompt cycle / stalled intake。`
     verdict: `keep-in-pre-brainstorm`
+  - reviewer: `codex:gpt-5.4`
+    mode: `worker-continuity-refresh`
+    summary: `本轮继续按 doc-loop continuity guard 刷新 canonical anchor：最新 `live-status` 已滚动到 `last_consumed_delegated_continuation_at=2026-03-24T07:14:59Z`、`current_focus.prompt_file=.freely/run/prompt-20260324-001922.txt`，且 `deep_refs.last_tool_session_id=019d1eb2-615d-7fe2-a617-69b95a5758ee` 指向新的 `fresh_with_handoff` 来源。runtime 仍保持 `activity_state=ai_active` 与 `last_ai_state=down/ai_exit_rc_0` 并存，说明 continuation lane 还在被维护，但 consumed truth 依旧没有稳定绑定到当前 prompt cycle / 当前 stalled intake。`
+    verdict: `keep-in-pre-brainstorm`
+  - reviewer: `codex-explorer:Linnaeus`
+    mode: `subagent-owner-boundary-review`
+    summary: `独立复核确认 `docs/milestones.md`、当前 candidate 与 worker continuity 仍把 `C-20260323-1705-A` 定位为 `candidate/in_pre_brainstorm`；相邻 issue family 只分别覆盖 delegated continuation pending/consumed evidence、latest continuity consumption、worker active reentry 或 generic stalled-AI recovery，并没有接管“manager prompt 已吸收 continuation 但无新 continuity / handoff”的 acceptance boundary。`
+    verdict: `keep-in-pre-brainstorm`
 - expected_outcome:
   - define a runtime-visible stall contract for `delegated continuation already absorbed into prompt`
   - trigger runtime-owned recovery when no new manager continuity / worker handoff is emitted in bounded time
@@ -129,7 +137,7 @@
   - 将当前 `fresh_with_handoff/context_compacted` 的 continuity 事实继续视为 supporting evidence：它证明 runtime 已因上下文压缩做过续接，但不证明当前 prompt cycle 对 stalled intake 的 binding 已稳定；因此后续仍要把续接事实与 prompt-cycle absorption proof 分开验收。
   - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 canonical writeback 已继续收敛为本分支上的最新 continuity anchor lineage，下一步应先把这些独有提交吸收到上游，再决定 retirement。
   - 若再次发生会话轮换或 `context_compacted`，先把最新 continuity 结论写回当前 pre-brainstorm canonical artifacts，再继续扩大实现或 cleanup 判断。
-  - 当前最新 continuity 锚点已经滚动到 `2026-03-24T07:12:22Z` / `.freely/run/prompt-20260324-001455.txt`；后续若再次轮换，优先沿这条 canonical writeback 线继续刷新 evidence，而不是切换 owner 或 loop。
+  - 当前最新 continuity 锚点已经滚动到 `2026-03-24T07:14:59Z` / `.freely/run/prompt-20260324-001922.txt`；后续若再次轮换，优先沿这条 canonical writeback 线继续刷新 evidence，而不是切换 owner 或 loop。
 - revisit_trigger:
   - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof 时，重新进入 materialization 判断。
   - 当当前 runtime 补丁在真实 followthrough 中验证稳定，且边界已可冻结成独立 issue contract 时，重新进入 materialization 判断。
