@@ -1823,6 +1823,7 @@ worker_prompt_target_worktree() {
   [[ -f "$prompt_file" ]] || return 0
   awk '
     /^你的 worktree：$/ { capture=1; next }
+    /^Worktree:$/ { capture=1; next }
     capture && /^- / {
       sub(/^- /, "", $0)
       gsub(/`/, "", $0)
