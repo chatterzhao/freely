@@ -1337,6 +1337,50 @@ rate_limit_exhausted() {
   awk -v used_percent="$used_percent" 'BEGIN { exit !(used_percent >= 100) }'
 }
 
+parse_try_again_time() {
+  local date_str="$1"
+  [[ -n "$date_str" ]] || return 1
+  python3 -c "
+import re
+from datetime import datetime, timedelta
+import sys
+
+date_str = sys.argv[1]
+cleaned = re.sub(r\"(\d+)(st|nd|rd|th)\", r\"\1\", date_str).strip()
+
+try:
+    dt = datetime.strptime(cleaned, \"%b %d, %Y %I:%M %p\")
+    print(int(dt.timestamp()))
+    sys.exit(0)
+except ValueError:
+    pass
+
+try:
+    time_only = datetime.strptime(cleaned, \"%I:%M %p\")
+    now = datetime.now()
+    dt = now.replace(hour=time_only.hour, minute=time_only.minute, second=0, microsecond=0)
+    if dt <= now:
+        dt += timedelta(days=1)
+    print(int(dt.timestamp()))
+    sys.exit(0)
+except ValueError:
+    pass
+
+sys.exit(1)
+" "$date_str" 2>/dev/null
+}
+
+extract_try_again_time_from_output() {
+  local output="$1"
+  local try_again_str
+  try_again_str="$(printf '%s\n' "$output" | grep -oiE 'try again at [^.]+\.' | sed 's/try again at //i' | sed 's/\.$//' | head -1)"
+  if [[ -z "$try_again_str" ]]; then
+    try_again_str="$(printf '%s\n' "$output" | grep -oiE 'try again at [A-Za-z0-9, :]+[AP]M' | sed 's/try again at //i' | head -1)"
+  fi
+  [[ -n "$try_again_str" ]] || return 1
+  parse_try_again_time "$try_again_str"
+}
+
 codex_rate_limit_reason_from_usage() {
   local primary_used_percent="$1" secondary_used_percent="$2"
   if rate_limit_exhausted "$secondary_used_percent"; then
@@ -1479,6 +1523,25 @@ log_has_auth_failure() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
   rg -qi '401|unauthorized|invalid.?token|token.?expired|authentication.?failed|请先登录|subscription.?expired' "$log_file"
+}
+
+log_has_codex_usage_limit() {
+  local log_file="$1"
+  [[ -f "$log_file" ]] || return 1
+  rg -qi 'usage limit|try again' "$log_file"
+}
+
+log_codex_rate_limit_reset_at() {
+  local log_file="$1" reset_at="" fallback_seconds
+  [[ -f "$log_file" ]] || return 1
+  reset_at="$(extract_try_again_time_from_output "$(cat "$log_file")" || true)"
+  if [[ -n "$reset_at" ]]; then
+    printf '%s\n' "$reset_at"
+    return 0
+  fi
+  fallback_seconds="${CODEX_RATE_LIMIT_FALLBACK_COOLDOWN_SECS:-300}"
+  [[ "$fallback_seconds" =~ ^[0-9]+$ ]] || fallback_seconds=300
+  date -v+"${fallback_seconds}"S +%s 2>/dev/null || date -d "@$(( $(date +%s) + fallback_seconds ))" +%s 2>/dev/null || printf '%s\n' "$(( $(date +%s) + fallback_seconds ))"
 }
 
 tool_prefers_resume_evidence() {
@@ -3800,6 +3863,10 @@ cmd_start() {
       rate_limit_reset_at="$(codex_rate_limit_reset_at_for_reason "${rate_limit_reason:-}" "${primary_rate_limit_resets_at:-}" "${secondary_rate_limit_resets_at:-}")"
       if [[ -n "$rate_limit_reason" ]]; then
         account_switch_reason="$rate_limit_reason"
+        codex_record_account_cooldown "$PROJECT_ROOT" "$active_account" "${rate_limit_reset_at:-}"
+      elif log_has_codex_usage_limit "$cycle_log"; then
+        account_switch_reason="primary_rate_limit_exhausted"
+        rate_limit_reset_at="$(log_codex_rate_limit_reset_at "$cycle_log" || true)"
         codex_record_account_cooldown "$PROJECT_ROOT" "$active_account" "${rate_limit_reset_at:-}"
       elif log_has_auth_failure "$cycle_log"; then
         account_switch_reason="auth_failure"
