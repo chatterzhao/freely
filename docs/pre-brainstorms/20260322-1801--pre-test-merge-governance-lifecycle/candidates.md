@@ -110,6 +110,10 @@
     mode: `independent route verification`
     summary: `This worker-round rescan found no stronger canonical owner outside pre-brainstorm: milestone still keeps only a candidate, I-20260322-1801 remains explicitly bounded, the 20260322-1802 audit is only supporting evidence, no docs/recovery owner exists, and no docs/progress artifact absorbs the lane. The missing handoff-referenced manager continuity file in this worktree reinforces that the contract freeze is still not stable enough to treat as IBM input.`
     verdict: `stay_pre_brainstorm`
+  - reviewer: `codex fresh-session first-jump revalidation`
+    mode: `independent candidate acceptance review`
+    summary: `After replaying the first-jump chain in a fresh session against AGENTS, CONSTITUTION, LAWS, PROJECT_INTENT, lead-agent, context-source-skill, milestones, and the current worktree state, the lane still resolves to continuation -> pre_brainstorm -> doc-pre-brainstorm-execution. Current hygiene does not force checkpoint or reroute, but no new canonical owner or stable IBM boundary appeared; the missing manager continuity artifact remains a freeze gap, not promotion evidence.`
+    verdict: `stay_pre_brainstorm`
 - priority: P1
 - status: needs_research
 - decision_reason: 这是治理规则落成工具能力的下一步，但当前稳定边界是 stale-batch combined minimal contract，而不是单点 runtime/status 补丁。human continuation `20260324-001134-continuation-dogfood-watchdog-fr` 及其 superseding delegated continuations `20260324-024942`、`20260324-025910`、`20260324-030713`，连同本轮 supporting-pool rescan，仍只证明应继续 pre-brainstorm：没有更强的 milestone/issue/progress/recovery/github-issue owner 吸收该 lane，而 handoff 要求读取的 `manager-continuity-20260324-021853.md` 在当前 worktree 中缺失，不能被当成已稳定的 IBM 输入。本轮已把 manager truth surface、runtime gate、delete gate 输入组合和 `specimen-S1/S2/S3` refusal evidence 收紧到更接近 materializable，但 `retire_evidence_ref` / `remaining_cleanup_requirement` 对 fresh-batch absorption 的 sufficiency 与独立 acceptance review 仍未收口。
