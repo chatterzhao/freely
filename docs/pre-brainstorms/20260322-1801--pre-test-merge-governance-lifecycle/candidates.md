@@ -48,6 +48,7 @@
   - `pre-tests.md` 质量检查与 testing closeout 必须分开建模：前者确认 acceptance contract 是否完整，后者确认 acceptance 是否已真实执行并留痕
   - testing closeout 默认优先 integration / end-to-end 与 application-native real-environment testing evidence；若缺少这些证据，不得把 lane 判成 `completion_verification done` 或允许 worktree retirement
   - 必须固定一条最终完成检查顺序：`done_ibm` 之后先过 `pre-tests.md` 质量 gate，再做 dev / verification / testing closeout，逐项完成 `pre-tests.md` 后 issue 才可 `completed`；此后仍需继续经过 merge / cleanup evidence / `verified-retirable`，并且仅当 `pre-tests.md` 显式声明时才追加 `post-merge acceptance`，最后才允许 delete worktree / branch
+  - 必须把三层 loop 的跳出语义固定下来：doc-loop 只负责把 candidate/IBM 推到可交给下一层；dev-loop 只负责把 issue 推到 `completed` 或回流新边界；cleanup/auto-loop governance 才负责把 worktree/branch 推到 `retired`，任何局部 loop 收口都不得冒充主题最终完成
   - `can merge to develop` 必须与 `issue completed` / `worktree retired` 分离：merge gate 只回答“当前 feature 是否可提升”，不能被误读成“任务已完成”
   - 若 merge 已发生但 delete eligibility chain 尚未闭合，manager 必须显式把后续 closeout materialize 为 delegated continuation / cleanup lane，或把 issue 挂回 milestone/owner queue 并写清 `next_action` / `revisit_trigger`；不得在 merge 后静默消失
   - 若 merge / cleanup / `verified-retirable` / `retired` 链条尚未闭合，即使 issue 已 `completed`，也不得删除最后一个 owner worktree
@@ -63,6 +64,7 @@
   - 冻结 `Validation batch governance:` `v1` specimen 与 key 顺序，并证明 runtime / cleanup skill 只靠该块就能稳定读到最小治理字段
   - 明确 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链与 stale governance 的连接点，避免把 acceptance contract 缺失误修成纯 runtime stale 判定
   - 冻结 issue completion chain 与 delete eligibility chain 的分段语义，证明 `completed` 只表示 issue 完成，不表示 worktree / branch 已可删除
+  - 冻结三层 loop 的进入/跳出/最外层结束条件，证明只有 cleanup/auto-loop governance 闭合并到 `retired`，当前主题才从 active lifecycle 中退出
   - 冻结 testing closeout 的最低 evidence bar，明确 application-native real-environment testing 属于主验证面；Freely self-host 时其当前实例才是 `freely chat`
   - 冻结最终 delete worktree / branch 门禁的最小输入组合与拒绝语义，并判断它是否应由现有 hook / guard 投影兜住
   - 用 `specimen-S1/S2/S3` 的 field audit/evidence 证明 delete gate 会拦住至少三类误删：`merged + clean` 误删、issue `completed` 误删、stale batch source/replay evidence 尚未吸收时的误删
