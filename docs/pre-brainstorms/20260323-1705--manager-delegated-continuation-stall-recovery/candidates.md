@@ -88,7 +88,7 @@
     verdict: `keep-in-pre-brainstorm`
   - reviewer: `codex:gpt-5.4`
     mode: `worker-closeout`
-    summary: `本轮首跳复核发现旧 handoff 的“已 clean”前提已过时；当前工位仍有 canonical pre-brainstorm writeback 脏项，branch 也仍未被 develop 吸收，且独有提交仍只回写 pre-brainstorm continuity，没有 issue/progress/recovery 真源接管该候选；因此 route 继续保持 pre_brainstorm，同时 cleanup 不能判定为 retire-now。`
+    summary: `本轮首跳复核确认 canonical pre-brainstorm writeback 已在 `7fc7b24` checkpoint commit 落盘，当前工位已 clean；但 branch 仍未被 develop 吸收，且独有提交仍只回写 pre-brainstorm continuity，没有 issue/progress/recovery 真源接管该候选；因此 route 继续保持 pre_brainstorm，同时 cleanup 仍不能判定为 retire-now。`
     verdict: `keep-and-merge-writeback-first`
 - expected_outcome:
   - define a runtime-visible stall contract for `delegated continuation already absorbed into prompt`
@@ -104,7 +104,7 @@
 - next_action:
   - 保持 active candidate；继续用真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被 runtime recovery 稳定推进到 cleanup / retirement followthrough，然后再判断是 materialize 为独立 issue，还是吸收到更高层 stall/recovery issue 族。
   - 下一轮优先验证 runtime 能否把当前 `pending/consumed` 并存状态绑定到当前 prompt cycle，明确哪一个 stalled delegated continuation 真的被本轮 prompt 吸收；若不能，至少冻结一个不依赖人工解释 prompt excerpt 的等价 proof。
-  - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 worktree 的 dirty 仅是 canonical pre-brainstorm writeback，应先把这些 writeback checkpoint/commit 并吸收到上游，再决定 retirement。
+  - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 canonical writeback 已在 `7fc7b24` checkpoint commit 落盘，下一步应先把这些独有提交吸收到上游，再决定 retirement。
   - 若再次发生会话轮换或 `context_compacted`，先把最新 continuity 结论写回当前 pre-brainstorm canonical artifacts，再继续扩大实现或 cleanup 判断。
 - revisit_trigger:
   - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof 时，重新进入 materialization 判断。
