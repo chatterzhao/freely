@@ -99,7 +99,7 @@
     verdict: `keep-in-pre-brainstorm`
   - reviewer: `codex:gpt-5.4`
     mode: `worker-closeout`
-    summary: `本轮首跳复核确认 canonical pre-brainstorm writeback 已继续收敛到当前 `HEAD` `114a6a4`，当前工位已 clean；最新 `live-status` 同时显示 `activity_state=ai_active` 与 `last_ai_state=down/ai_exit_rc_0`，并保持 `fresh_with_handoff/context_compacted`、`pending`/`consumed` delegated continuation ids 30/30 全量重叠。结合独立 owner scan 与 `HEAD...develop = 8 28`，结论仍是 route 保持 pre_brainstorm，cleanup 不能判定为 retire-now。`
+    summary: `本轮首跳复核确认 canonical pre-brainstorm writeback 已继续收敛到当前 `HEAD` `16182d6`，当前工位已 clean；最新 `live-status` 同时显示 `activity_state=ai_active` 与 `last_ai_state=down/ai_exit_rc_0`，并保持 `fresh_with_handoff/context_compacted`、`pending`/`consumed` delegated continuation ids 30/30 全量重叠。结合独立 owner scan 与 `HEAD...develop = 9 28`，结论仍是 route 保持 pre_brainstorm，cleanup 不能判定为 retire-now。`
     verdict: `keep-and-merge-writeback-first`
 - expected_outcome:
   - define a runtime-visible stall contract for `delegated continuation already absorbed into prompt`
@@ -116,7 +116,7 @@
   - 保持 active candidate；继续用真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被 runtime recovery 稳定推进到 cleanup / retirement followthrough，然后再判断是 materialize 为独立 issue，还是吸收到更高层 stall/recovery issue 族。
   - 下一轮优先验证 runtime 能否把当前 `pending/consumed` 并存状态绑定到当前 prompt cycle，明确哪一个 stalled delegated continuation 真的被本轮 prompt 吸收；若不能，至少冻结一个不依赖人工解释 prompt excerpt 的等价 proof。
   - 将当前 `fresh_with_handoff/context_compacted` 的 continuity 事实继续视为 supporting evidence：它证明 runtime 已因上下文压缩做过续接，但不证明当前 prompt cycle 对 stalled intake 的 binding 已稳定；因此后续仍要把续接事实与 prompt-cycle absorption proof 分开验收。
-  - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 canonical writeback 已继续收敛到 `114a6a4`，下一步应先把这些独有提交吸收到上游，再决定 retirement。
+  - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 canonical writeback 已继续收敛到 `16182d6`，下一步应先把这些独有提交吸收到上游，再决定 retirement。
   - 若再次发生会话轮换或 `context_compacted`，先把最新 continuity 结论写回当前 pre-brainstorm canonical artifacts，再继续扩大实现或 cleanup 判断。
 - revisit_trigger:
   - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof 时，重新进入 materialization 判断。
