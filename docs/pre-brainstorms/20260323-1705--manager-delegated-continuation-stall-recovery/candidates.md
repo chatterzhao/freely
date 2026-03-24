@@ -44,6 +44,7 @@
     - `intake_snapshot` 中存在当前 delegated continuation intake ids，可追溯到当前 prompt 周期
   - partial consumed-id proof:
     - `intake_delegated_items=30`，且 `last_consumed_delegated_continuation_ids` 已覆盖当前观察窗口中的全部 30 个 delegated continuation ids，其中包括 `20260323-204333...`、`20260323-204334...`、`20260323-205242...`、`20260323-205340...`、`20260323-220921...`、`20260323-222254...`、`20260323-222255...`、`20260323-225022...`、`20260323-225032...` 与 `20260323-234407...`
+    - 最新 `live-status` 还给出 `last_consumed_delegated_continuation_at=2026-03-24T07:07:07Z`
     - 说明 runtime 已经开始把 delegated continuation consumption 暴露为 canonical truth，而不是只剩 prompt excerpt 可读证据
   - stall-level proof:
     - `latest_manager_continuity_generated=unavailable`
@@ -55,6 +56,7 @@
     - `last_exit_reason=ai_exit_rc_0`
     - `last_launch_kind=fresh_with_handoff`
     - `last_rotation_reason=context_compacted`
+    - `current_focus.prompt_file=.freely/run/prompt-20260324-001217.txt`
     - 说明 runtime 当前同时暴露“本轮 worker 仍处于 active 视图”和“上一跳 AI 退出/轮换留痕”；这层 continuity surface 证明 runtime 还在维护当前 lane，但仍不等于当前 manager prompt cycle 对 stalled intake 的稳定 binding proof
   - runtime/test scope proof:
     - `docs/system/workspace/scripts/runtime/freely` 已把 `LAST_MANAGER_CONTINUITY_GENERATED/CONSUMED`、`LAST_MANAGER_WORKER_PROMPTS_GENERATED/CONSUMED` 与 delegated pending/consumed ids 写入状态面，并由 `live-status` 暴露

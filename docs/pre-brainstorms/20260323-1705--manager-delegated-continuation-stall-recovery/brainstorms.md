@@ -100,8 +100,9 @@
   - `intake_delegated_items: 30`
   - `current_prompt_has_delegated_continuation: 1`
   - `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 仍全量重叠，且最新 delegated continuation intake 仍可见于 pending 集合
-  - `last_consumed_delegated_continuation_at: 2026-03-24T07:02:21Z`
-  - 当前 prompt excerpt 仍直接指向这条候选前一轮 writeback diff，说明 delegated continuation 语义仍在当前 worker prompt 上下文中
+  - `last_consumed_delegated_continuation_at: 2026-03-24T07:07:07Z`
+  - `current_focus.prompt_file: .freely/run/prompt-20260324-001217.txt`
+  - 当前 prompt excerpt 仍直接指向这条候选前一轮 writeback diff，说明 delegated continuation 语义仍在当前 worker prompt 上下文中，而不是只停留在历史 handoff
 - 这层 worker-side `live-status` 说明 runtime 当前仍在沿用 `context_compacted -> fresh_with_handoff` 的 continuity 策略，而且 current process view 已经出现 `activity_state=ai_active` 与 `last_ai_state=down/ai_exit_rc_0` 并存；它证明运行态切面仍在推进或轮换，但仍不能替代当前候选所需的 manager-side prompt-cycle binding acceptance anchor
 - 当前 worktree hygiene 事实：
   - canonical writeback 已继续收敛为本分支上的最新 continuity anchor lineage，而不是未提交 dirty delta
