@@ -43,12 +43,19 @@
     - `current_focus.prompt_excerpt` 包含 `Delegated continuation handoff`
     - `intake_snapshot` 中存在当前 delegated continuation intake ids，可追溯到当前 prompt 周期
   - partial consumed-id proof:
-    - `last_consumed_delegated_continuation_ids` 已覆盖当前观察窗口中的一批 delegated continuation ids，其中包括 `20260323-204333...`、`20260323-204334...`、`20260323-205242...`、`20260323-205340...`、`20260323-220921...`、`20260323-222254...` 与 `20260323-222255...`
+    - `intake_delegated_items=30`，且 `last_consumed_delegated_continuation_ids` 已覆盖当前观察窗口中的全部 30 个 delegated continuation ids，其中包括 `20260323-204333...`、`20260323-204334...`、`20260323-205242...`、`20260323-205340...`、`20260323-220921...`、`20260323-222254...`、`20260323-222255...`、`20260323-225022...`、`20260323-225032...` 与 `20260323-234407...`
     - 说明 runtime 已经开始把 delegated continuation consumption 暴露为 canonical truth，而不是只剩 prompt excerpt 可读证据
   - stall-level proof:
     - `latest_manager_continuity_generated=unavailable`
     - `latest_manager_worker_prompts_generated=none`
     - manager prompt 进入 delegated continuation 后仍无新的 continuity / handoff / launch-state 前进
+  - current runtime continuity surface:
+    - `activity_state=ai_active`
+    - `last_ai_state=down`
+    - `last_exit_reason=ai_exit_rc_0`
+    - `last_launch_kind=fresh_with_handoff`
+    - `last_rotation_reason=context_compacted`
+    - 说明 runtime 当前同时暴露“本轮 worker 仍处于 active 视图”和“上一跳 AI 退出/轮换留痕”；这层 continuity surface 证明 runtime 还在维护当前 lane，但仍不等于当前 manager prompt cycle 对 stalled intake 的稳定 binding proof
   - runtime/test scope proof:
     - `docs/system/workspace/scripts/runtime/freely` 已把 `LAST_MANAGER_CONTINUITY_GENERATED/CONSUMED`、`LAST_MANAGER_WORKER_PROMPTS_GENERATED/CONSUMED` 与 delegated pending/consumed ids 写入状态面，并由 `live-status` 暴露
     - `manager_ai_stalled_after_delegated_continuation_prompt` 仍主要依据 prompt 已含 delegated continuation，且 prompt / cycle log 之后没有更新的 manager continuity 继续推进
@@ -86,9 +93,13 @@
     mode: `subagent-owner-scan`
     summary: `独立只读扫描确认 `docs/epics/**`、`docs/progress/**` 与缺失的 `docs/recovery/**` 中都没有接管 `C-20260323-1705-A` 的 canonical owner；当前最关键缺口仍是把 consumed truth 稳定绑定到当前 manager prompt cycle / 当前 stalled intake 的 runtime-visible anchor。`
     verdict: `keep-in-pre-brainstorm`
+  - reviewer: `codex-explorer:Ramanujan`
+    mode: `subagent-owner-scan`
+    summary: `本轮 fresh session 的独立只读 owner scan 再次确认：`docs/milestones.md` 仍把 `C-20260323-1705-A` 保留为 `candidate/in_pre_brainstorm`，`docs/recovery/` 目录也尚未启用；最接近的相邻 issue 仍只是 worker active reentry、latest manager continuity consumption 与 worker launch linkage 这些前置/相邻控制面，不构成对当前 prompt-absorbed stall contract 的 canonical 接管。`
+    verdict: `keep-in-pre-brainstorm`
   - reviewer: `codex:gpt-5.4`
     mode: `worker-closeout`
-    summary: `本轮首跳复核确认 canonical pre-brainstorm writeback 已在 `7fc7b24` checkpoint commit 落盘，当前工位已 clean；最新 `live-status` 仍显示 `fresh_with_handoff/context_compacted` 且 `pending`/`consumed` delegated continuation ids 全量重叠，branch 也仍未被 develop 吸收，并且没有 issue/progress/recovery 真源接管该候选；因此 route 继续保持 pre_brainstorm，同时 cleanup 仍不能判定为 retire-now。`
+    summary: `本轮首跳复核确认 canonical pre-brainstorm writeback 已继续收敛到当前 `HEAD` `473075b`，当前工位已 clean；最新 `live-status` 同时显示 `activity_state=ai_active` 与 `last_ai_state=down/ai_exit_rc_0`，并保持 `fresh_with_handoff/context_compacted`、`pending`/`consumed` delegated continuation ids 30/30 全量重叠。结合独立 owner scan 与 `HEAD...develop = 7 28`，结论仍是 route 保持 pre_brainstorm，cleanup 不能判定为 retire-now。`
     verdict: `keep-and-merge-writeback-first`
 - expected_outcome:
   - define a runtime-visible stall contract for `delegated continuation already absorbed into prompt`
@@ -105,7 +116,7 @@
   - 保持 active candidate；继续用真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被 runtime recovery 稳定推进到 cleanup / retirement followthrough，然后再判断是 materialize 为独立 issue，还是吸收到更高层 stall/recovery issue 族。
   - 下一轮优先验证 runtime 能否把当前 `pending/consumed` 并存状态绑定到当前 prompt cycle，明确哪一个 stalled delegated continuation 真的被本轮 prompt 吸收；若不能，至少冻结一个不依赖人工解释 prompt excerpt 的等价 proof。
   - 将当前 `fresh_with_handoff/context_compacted` 的 continuity 事实继续视为 supporting evidence：它证明 runtime 已因上下文压缩做过续接，但不证明当前 prompt cycle 对 stalled intake 的 binding 已稳定；因此后续仍要把续接事实与 prompt-cycle absorption proof 分开验收。
-  - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 canonical writeback 已在 `7fc7b24` checkpoint commit 落盘，下一步应先把这些独有提交吸收到上游，再决定 retirement。
+  - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 canonical writeback 已继续收敛到 `473075b`，下一步应先把这些独有提交吸收到上游，再决定 retirement。
   - 若再次发生会话轮换或 `context_compacted`，先把最新 continuity 结论写回当前 pre-brainstorm canonical artifacts，再继续扩大实现或 cleanup 判断。
 - revisit_trigger:
   - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof 时，重新进入 materialization 判断。

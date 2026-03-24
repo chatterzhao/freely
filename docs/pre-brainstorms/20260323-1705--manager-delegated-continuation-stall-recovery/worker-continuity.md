@@ -31,14 +31,14 @@
 - why:
   - 本轮已按 `AGENTS -> CONSTITUTION -> LAWS -> lead-agent -> context-source-skill` 重新复核，结论仍是当前输入属于 worker continuation，而不是 project-level supervisor 巡检或 recovery-owned restart
   - 当前 `live-status` 已证明 delegated continuation 进入当前 prompt 语义层：`current_prompt_has_delegated_continuation=1` 且 `prompt_excerpt` 包含 `Delegated continuation handoff`
-  - 当前 worker runtime 仍显示 `last_launch_kind=fresh_with_handoff` / `last_rotation_reason=context_compacted`，且 `intake_active_items=30`、`intake_delegated_items=30`；这说明本轮先执行 continuity writeback 的治理判断是必要的，但这层续接事实本身仍不等于 prompt-cycle absorption 已被稳定锚定
+  - 当前 worker runtime 同时显示 `activity_state=ai_active` 与 `last_ai_state=down` / `last_exit_reason=ai_exit_rc_0`，并维持 `last_launch_kind=fresh_with_handoff` / `last_rotation_reason=context_compacted`，且 `intake_active_items=30`、`intake_delegated_items=30`；这说明 runtime 仍在维护当前 continuation lane，但这层续接/轮换事实本身仍不等于 prompt-cycle absorption 已被稳定锚定
   - 当前 delegated continuation ids 仍全量同时出现在 `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids`，说明 runtime 已开始暴露 canonical consumed truth，但仍缺 prompt-cycle 绑定
   - 当前 runtime / tests 还额外暴露了 continuity generated/consumed truth，但整体仍只冻结到“prompt 已吸收 delegated continuation 且之后没有新的 continuity / handoff”这层 recovery contract，尚未证明 consumed truth 与当前 prompt cycle / stalled intake 的稳定绑定
   - runtime 还没有暴露足以冻结 promotion gate 的 prompt-bound consumed anchor，因此无法证明当前 stalled intake 已被当前 prompt cycle 稳定吸收
   - 也未发现 `docs/epics/**`、`docs/progress/**` 或 `docs/recovery/**` 接管该候选
   - 独立只读 owner scan 再次确认：仓库里没有其他 canonical artifact 接管这条 contract；当前唯一缺口仍是 prompt-cycle binding proof，而不是 owner 路由不清
 - hygiene_judgement:
-  - canonical writeback 已在 `7fc7b24 docs: checkpoint delegated continuation stall writeback` 落盘，当前 worktree 为 `CLEAN`
+  - canonical writeback 已继续收敛到当前 `HEAD` `473075b docs: refresh delegated continuation evidence counts`，当前 worktree 为 `CLEAN`
   - 本轮无需把无关改动分流到其他 worktree；下一步 hygiene / cleanup 动作应是等待这些独有提交被上游吸收后再重判 retirement，而不是继续扩大 scope
 - next_action:
   - 保持 `C-20260323-1705-A` 在 `candidate_issues` / `needs_research`
