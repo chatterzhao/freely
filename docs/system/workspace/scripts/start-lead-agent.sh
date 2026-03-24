@@ -169,12 +169,26 @@ manager_mode="false"
 execution_rule_15="15. 默认不要在首跳结束时只输出 \`next_prompt\` 就停下。"
 execution_rule_16="16. 若 \`selected_tool\` 与当前运行中的 \`AI_TOOL\` 相同，你必须在当前会话内继续执行第二跳 skill，直接完成对应的 doc-loop / dev-loop 工作，并修改仓库产物；\`next_prompt\` 只作为中间可追溯产物保留。"
 execution_rule_17="17. 只有当 \`selected_tool\` 与当前 \`AI_TOOL\` 不同，或你明确判断必须把执行权交回外层 runtime 时，才允许把 \`next_prompt\` 作为 handoff 输出结束当前轮次；此时必须说明为什么不能在当前会话继续执行。"
+artifact_stamp="$(date '+%Y%m%d-%H%M%S')"
+manager_continuity_path="$project/.freely/run/manager-continuity-${artifact_stamp}.md"
+worker_prompt_dir="$project/.freely/run/worker-prompts"
+worker_prompt_path_example="$worker_prompt_dir/${artifact_stamp}-worker-<slug>-${ai_tool}.txt"
+manager_artifact_rule=""
 
 if is_manager_branch "$current_branch"; then
   manager_mode="true"
   execution_rule_15="15. 当前分支是受保护主管工位；你不得在当前 worktree 直接修改受版本管理的仓库产物。"
   execution_rule_16="16. 若 \`selected_tool\` 与当前运行中的 \`AI_TOOL\` 相同，也不要在当前会话内直接执行第二跳实现；你必须先选择或创建对应 feature worktree，并把执行权委派到那个工位的 worker AI/tool 进程。"
   execution_rule_17="17. 你在当前会话中的交付应是监督判断、delegation handoff、需要启动的 worker 命令与 continuity 留痕；只有 worker 工位可以继续实际 doc-loop / dev-loop。"
+  manager_artifact_rule="$(cat <<EOF
+18. 当前轮次若形成了 manager judgement / worker delegation / cleanup queue，你必须把它 materialize 成 runtime 可消费的非版本化产物，不能只停在自然语言回答。
+19. 至少创建一个 manager continuity 文件：\`$manager_continuity_path\`。
+20. 若需要委派 worker，再在 \`$worker_prompt_dir\` 下创建 worker prompt 文件；命名格式参考：\`$worker_prompt_path_example\`。
+21. manager continuity 必须显式引用每个 worker prompt 的绝对路径；runtime 只会从 continuity 中消费这些 \`.freely/run/worker-prompts/*.txt\` 路径，不会从普通回答里自动提炼 handoff。
+22. 若本轮结论是 manager-only cleanup queue、暂不发 worker，也仍然必须写 manager continuity，至少包含：fleet inventory、route_kind / restart_point / ownership / next_action、cleanup queue 或 frozen queue、以及 next supervision priority。
+23. 你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径；若没有写这些产物，就不算完成主管交付。
+EOF
+)"
 fi
 
 cat <<EOF
@@ -257,6 +271,7 @@ cat <<EOF
 ${execution_rule_15}
 ${execution_rule_16}
 ${execution_rule_17}
+${manager_artifact_rule}
 
 主管模式要求：
 - 若当前轮次承担项目级监督职责，先基于工位快照安排继续开发、冻结、验证、合并和清理顺序。

@@ -77,6 +77,11 @@ case "$current_branch" in
     printf '%s\n' "$prompt" | grep -q 'MANAGER_MODE=true'
     printf '%s\n' "$prompt" | grep -q '当前分支是受保护主管工位'
     printf '%s\n' "$prompt" | grep -q '只做主管，不做实现'
+    printf '%s\n' "$prompt" | grep -q 'runtime 可消费的非版本化产物'
+    printf '%s\n' "$prompt" | grep -q '.freely/run/manager-continuity-'
+    printf '%s\n' "$prompt" | grep -q '.freely/run/worker-prompts'
+    printf '%s\n' "$prompt" | grep -q '不会从普通回答里自动提炼 handoff'
+    printf '%s\n' "$prompt" | grep -q '你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径'
     ;;
   *)
     printf '%s\n' "$prompt" | grep -q 'MANAGER_MODE=false'
