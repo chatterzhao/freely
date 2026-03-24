@@ -71,6 +71,7 @@
   - 当前 delegated continuation ids 仍会同时停留在 `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids`
   - 仍缺少一个稳定、可验收的 runtime-visible anchor，用来严格证明“哪个 consumed 事件对应当前 manager prompt cycle / 当前 stalled intake”，而不是只知道 runtime 曾经记录过 consumed truth
   - 当前还缺少一个可重复的等价 proof，来说明在 `pending/consumed` 长期并存时，为什么本轮可以确认“当前 stalled intake 已被当前 prompt cycle 吸收”
+  - 精确缺口应表述为：`specific stalled delegated continuation intake id -> current manager prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict` 这条链还不能被稳定、重复地从 runtime state surface 中读出
 - acceptance_criteria:
   - 明确区分当前候选与 `pending intake > cycle log`、latest continuity consumption、worker active reentry 这几条相邻治理 issue 的边界。
   - 冻结这条候选的最小 contract：`delegated continuation` 已进入 manager prompt，但在有界时间内没有新的 manager continuity / worker handoff 产出。
@@ -82,6 +83,7 @@
   - 冻结用于 issue-level acceptance 的 runtime-visible absorption anchor；若 `pending` 与 `consumed` 仍并存，至少要明确一个可重复的 prompt-cycle binding proof，而不是只靠人工读 prompt excerpt 或只看 consumed 列表命中。
   - 明确区分“watchdog 已能基于 prompt-level signal 触发 recovery”与“candidate 已具备可 materialize 的 issue-level acceptance anchor”；前者不能自动替代后者。
   - 若准备 promotion，需要至少一轮独立 acceptance review，而不是仅凭当前 worktree 的自我判断直接 materialize。
+  - 在上述 proof 通过前，这棵 worktree 只允许 `retain-for-followthrough`，不得进入 delete / retirement。
 - open_questions:
   - 这条 contract 最终应独立 materialize，还是并入更高层的 manager recovery issue family？
   - 真实 cleanup / retirement followthrough 是否还会再次命中同一类“prompt 已吸收 continuation 但无新 continuity / handoff”的假活？
@@ -146,6 +148,7 @@
   - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 canonical writeback 已继续收敛为本分支上的最新 continuity anchor lineage，下一步应先把这些独有提交吸收到上游，再决定 retirement。
   - 若再次发生会话轮换或 `context_compacted`，先把最新 continuity 结论写回当前 pre-brainstorm canonical artifacts，再继续扩大实现或 cleanup 判断。
   - 当前最新 continuity 锚点已经滚动到 `2026-03-24T07:19:27Z` / `.freely/run/prompt-20260324-002242.txt`；后续若再次轮换，优先沿这条 canonical writeback 线继续刷新 evidence，而不是切换 owner 或 loop。
+  - delete / retirement gate 当前仍明确阻塞：只有在真实 dogfood 复现中固定 `current stalled intake id -> current prompt cycle -> consumed event anchor` 的 binding proof，并确认 recovery 继续推进到 followthrough 后，才允许重新判断 cleanup。
 - revisit_trigger:
   - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof 时，重新进入 materialization 判断。
   - 当当前 runtime 补丁在真实 followthrough 中验证稳定，且边界已可冻结成独立 issue contract 时，重新进入 materialization 判断。
