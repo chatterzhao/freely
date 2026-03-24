@@ -97,7 +97,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
-- next_action: `freely ensure-manager --watch`、坏号后真实 probe、过时 cooldown 账本兜底、manager bootstrap handoff 与 live recovery 测试均已通过；`feature/codex-account-cooldown-active-probe` 已把主动 probe / cooldown 写回收敛到 `freely ai switch codex` 主路径，并已 replay 到 `develop`。当前这条 feature lifecycle 已进入 `verified-retirable`；后续若继续扩 outer watchdog/productization，需新开 dedicated feature worktree
+- next_action: delegated continuation 已在当前 dedicated worktree 补齐 earliest-reset wait / periodic reprobe / stale `ensure-manager.pid` contract，并完成 issue / progress / code-review writeback。当前保持 `in_verification`，下一步由 manager 基于当前 feature worktree 做 merge review；若 `develop` replay 后仍暴露 outer-watchdog/productization 缺口，再从同一 issue 新开 dedicated continuation lane
 
 6. `I-20260318-1825`
 - title: Worktree hygiene supervision control plane

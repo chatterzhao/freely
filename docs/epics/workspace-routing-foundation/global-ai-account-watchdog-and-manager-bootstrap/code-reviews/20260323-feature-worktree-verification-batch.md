@@ -38,5 +38,6 @@
 
 ## Remaining Acceptance
 
-- 暂存并提交当前 verification batch。
+- 当前 continuation commit 已存在于本分支祖先；本轮补的是 canonical writeback，而不是重新提交实现。
+- 当前结论更新为：feature worktree 已 ready for manager merge review。
 - 若决定 promote，再按 `develop` gate 判断是否需要 merge 后验收。
