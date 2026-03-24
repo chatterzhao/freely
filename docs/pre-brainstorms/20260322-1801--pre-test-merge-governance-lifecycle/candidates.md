@@ -48,6 +48,8 @@
   - `pre-tests.md` 质量检查与 testing closeout 必须分开建模：前者确认 acceptance contract 是否完整，后者确认 acceptance 是否已真实执行并留痕
   - testing closeout 默认优先 integration / end-to-end 与 application-native real-environment testing evidence；若缺少这些证据，不得把 lane 判成 `completion_verification done` 或允许 worktree retirement
   - 必须固定一条最终完成检查顺序：`done_ibm` 之后先过 `pre-tests.md` 质量 gate，再做 dev / verification / testing closeout，逐项完成 `pre-tests.md` 后 issue 才可 `completed`；此后仍需继续经过 merge / cleanup evidence / `verified-retirable`，并且仅当 `pre-tests.md` 显式声明时才追加 `post-merge acceptance`，最后才允许 delete worktree / branch
+  - `can merge to develop` 必须与 `issue completed` / `worktree retired` 分离：merge gate 只回答“当前 feature 是否可提升”，不能被误读成“任务已完成”
+  - 若 merge 已发生但 delete eligibility chain 尚未闭合，manager 必须显式把后续 closeout materialize 为 delegated continuation / cleanup lane，或把 issue 挂回 milestone/owner queue 并写清 `next_action` / `revisit_trigger`；不得在 merge 后静默消失
   - 若 merge / cleanup / `verified-retirable` / `retired` 链条尚未闭合，即使 issue 已 `completed`，也不得删除最后一个 owner worktree
   - 最终 delete worktree / branch 必须有单独删除门；若未来以 hook / guard 投影执行，该门只能消费已有状态与 evidence 组合，不得重造一套平行 completion 状态
   - 当前字段级冻结草案以 `combined minimal contract v0` 为准：manager continuity 最少承载 `validation_batch_id`、`validation_batch_state`、`validation_batch_mode`、`stale_reason`、`lifecycle_decision`、`integration_target`、`source_batch_base`、`replay_source_manifest`、`replay_order`、`retire_evidence_ref`、`remaining_cleanup_requirement`、`acceptance_contract_state/source/blocker`、`superseded_worker_prompts`、`superseded_worker_prompts_applied_at`
