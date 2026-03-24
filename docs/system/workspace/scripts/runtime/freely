@@ -2725,6 +2725,15 @@ launch_interruption_dispatcher() {
   disown "$!" 2>/dev/null || true
 }
 
+launch_manager_watchdog() {
+  local project="$1"
+  local launch_bin watch_interval
+  launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
+  watch_interval="${MANAGER_WATCHDOG_INTERVAL_SECS:-${CHECK_INTERVAL:-5}}"
+  bash "$launch_bin" ensure-manager --project "$project" --watch --interval "$watch_interval" >/dev/null 2>&1 &
+  disown "$!" 2>/dev/null || true
+}
+
 manager_supervisor_pid_for_project() {
   local project="$1" run_dir sp
   run_dir="$(run_dir_for_project "$project")"
@@ -2768,6 +2777,18 @@ ensure_interruption_dispatcher_ready_or_fail() {
   for attempts in 1 2 3 4 5; do
     dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
     if [[ -n "$dispatcher_pid" ]]; then
+      return 0
+    fi
+    sleep 1
+  done
+  return 1
+}
+
+ensure_manager_watchdog_ready_or_fail() {
+  local project="$1" watchdog_pid attempts
+  for attempts in 1 2 3 4 5; do
+    watchdog_pid="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$watchdog_pid"; then
       return 0
     fi
     sleep 1
@@ -3520,6 +3541,14 @@ cmd_start() {
   trap cleanup_supervisor EXIT
   trap request_stop INT TERM
   launch_interruption_dispatcher "$project"
+  if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
+    launch_manager_watchdog "$project"
+    ensure_manager_watchdog_ready_or_fail "$project" || {
+      log_error "freely manager watchdog did not become ready for project: $project"
+      log_error "try: ./bin/freely ensure-manager --project \"$project\" --watch"
+      exit 1
+    }
+  fi
 
   local restart_count=0
   local FIRST_ROUND=true
