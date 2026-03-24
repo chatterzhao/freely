@@ -20,6 +20,7 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 - auth failure / rate limit detection
 - account switch
 - earliest-reset wait / recheck
+- reset buffer 与 cooldown_elapsed 后的真实 re-probe
 - 产出结构化恢复状态，交给上层 orchestration
 
 代码真源：

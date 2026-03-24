@@ -11,3 +11,4 @@
 - [x] write structured manager bootstrap handoff before watchdog relaunches the manager
 - [x] let the live test discover a usable account by real probe when no good account is provided
 - [x] make `freely ai switch codex` reuse the same active probe / cooldown update contract as the watchdog path
+- [x] make `ensure-manager --watch` survive all-accounts-cooling waits, retry after failed readiness passes, and re-probe before relaunch

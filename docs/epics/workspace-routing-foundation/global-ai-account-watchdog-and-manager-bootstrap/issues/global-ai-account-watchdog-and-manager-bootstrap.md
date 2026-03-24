@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- phase_state: `completed`
+- phase_state: `in_progress`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-ai-account-watchdog-and-manager-bootstrap`
@@ -86,6 +86,10 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `freely ensure-manager --project <tmp-project>` 直接命令验证通过，确认 watchdog 会先切到可用账号，再发起 manager bootstrap
     - `freely start --project <tmp-project>` 最小 rate-limit 场景可直接写出 `LAST_ACCOUNT_SWITCH_REASON="primary_rate_limit_exhausted"`，证明 runtime 仍把恢复理由写回 watchdog 接管面
     - `test-freely-rate-limit-defers-to-watchdog` 曾出现一次 3 秒边界失败，但随后单独复现与连续重跑均通过；当前判断为时间阈值边界上的 flaky，而非稳定功能回归
+  - 2026-03-23 晚间狗粮 continuation 暴露出一条实现缺口：
+    - `all_accounts_cooling_down -> earliest reset -> sleep` 路径没有显式 `reset_at + buffer`
+    - wait 结束后没有重新 probe 所有 saved accounts 再决定 relaunch
+    - `ensure-manager --watch` 会因为单轮 readiness pass 失败而退出控制面，现场留下 stale `ensure-manager.pid`
   - `test-freely-global-account-watchdog-live` 已真实通过：
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
@@ -93,7 +97,12 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 ## Next
 
-- 当前 verification batch 已在 dedicated feature worktree 中完成并具备 promote 条件。
+- 当前 continuation batch 聚焦把 earliest-reset wait / wakeup contract 从“设计存在”补到“真实狗粮稳定可用”：
+  - wait 采用 `reset_at + buffer`
+  - wait 期间周期性真实 probe saved accounts 是否已变得可工作
+  - wait 结束后重新 probe/select，再拉起 manager
+  - `ensure-manager --watch` 单轮失败后继续留在控制面重试
+  - stale `ensure-manager.pid` 在 watchdog 下次启动时会被覆盖，并在 watchdog 退出时清理
 - 当前 watchdog 已作为 Freely 正式能力落地：CLI 入口、runtime orchestration、availability watchdog skill 模块与角色/测试接线均已存在。
 - 当前 feature worktree `feature/codex-account-cooldown-active-probe` 承接的是同一 issue 的 verification batch，不再单独 materialize 新 issue；该 batch 已 replay 到 `develop` 并通过 post-merge acceptance，后续若继续扩 outer watchdog/productization，需新开 dedicated feature worktree。
 - 当前 batch 的下一步是：

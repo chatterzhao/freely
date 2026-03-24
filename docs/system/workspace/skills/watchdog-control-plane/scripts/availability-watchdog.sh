@@ -187,6 +187,12 @@ select_any_available_codex_account() {
   done < <(codex_saved_accounts "$project")
 }
 
+watchdog_reset_buffer_seconds() {
+  local buffer="${WATCHDOG_RESET_BUFFER_SECS:-60}"
+  [[ "$buffer" =~ ^[0-9]+$ ]] || buffer=60
+  printf '%s\n' "$buffer"
+}
+
 select_earliest_reset_codex_account_any() {
   local project="$1" candidate reset_at best_account="" best_reset=""
   while IFS= read -r candidate; do
@@ -473,7 +479,8 @@ switch_to_next_codex_account() {
 
 ensure_codex_account_ready_for_manager() {
   local project="$1"
-  local current_account available_account probed_account earliest_info earliest_account earliest_reset wait_seconds
+  local current_account available_account probed_account earliest_info earliest_account earliest_reset wait_seconds wait_buffer
+  local post_wait_probe_result post_wait_status post_wait_account post_wait_reset
 
   current_account="$(codex_current_account "$project")"
   if [[ -n "$current_account" ]] && codex_account_is_available_now "$project" "$current_account"; then
@@ -504,18 +511,39 @@ ensure_codex_account_ready_for_manager() {
     fi
     write_manager_bootstrap_handoff "$project" "all_accounts_cooling_down" "$current_account" "$earliest_account" "watchdog_waiting_for_earliest_reset" "recheck-account-availability-before-manager-bootstrap"
     wait_seconds="$(seconds_until_epoch "$earliest_reset")"
+    wait_buffer="$(watchdog_reset_buffer_seconds)"
+    if [[ "${wait_seconds:-0}" =~ ^[0-9]+$ ]]; then
+      wait_seconds=$((wait_seconds + wait_buffer))
+    fi
     if [[ "${wait_seconds:-0}" =~ ^[0-9]+$ ]] && (( wait_seconds > 0 )); then
-      log_warn "all codex accounts cooling down before manager bootstrap; sleeping until reset_at=${earliest_reset} (sleep=${wait_seconds}s)"
-      sleep_with_rate_limit_recheck "$project" "$wait_seconds"
+      log_warn "all codex accounts cooling down before manager bootstrap; sleeping until reset_at=${earliest_reset} plus buffer=${wait_buffer}s (sleep=${wait_seconds}s)"
+      sleep_with_rate_limit_recheck "$project" "$wait_seconds" 1
     fi
-    available_account="$(select_any_available_codex_account "$project")"
-    if [[ -n "$available_account" ]]; then
-      if [[ -z "$current_account" || "$available_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
-        switch_to_codex_account "$project" "$available_account" "ensure_manager" >/dev/null || true
-      fi
-      write_manager_bootstrap_handoff "$project" "cooldown_elapsed" "$earliest_account" "$available_account" "watchdog_resumed_after_wait" "inspect-fleet-and-recover-workers"
-      return 0
-    fi
+    post_wait_probe_result="$(probe_all_codex_accounts_and_update_cooldown "$project" || true)"
+    post_wait_status="${post_wait_probe_result%%:*}"
+    case "$post_wait_status" in
+      usable)
+        post_wait_account="${post_wait_probe_result#usable:}"
+        if [[ -n "$post_wait_account" ]]; then
+          if [[ -z "$current_account" || "$post_wait_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
+            switch_to_codex_account "$project" "$post_wait_account" "ensure_manager" >/dev/null || true
+          fi
+          write_manager_bootstrap_handoff "$project" "cooldown_elapsed" "$earliest_account" "$post_wait_account" "watchdog_resumed_after_wait" "inspect-fleet-and-recover-workers"
+          return 0
+        fi
+        ;;
+      earliest)
+        post_wait_account="${post_wait_probe_result#earliest:}"
+        post_wait_reset="${post_wait_account##*|}"
+        post_wait_account="${post_wait_account%%|*}"
+        if [[ -n "$post_wait_account" && -n "$post_wait_reset" ]]; then
+          if [[ -z "$current_account" || "$post_wait_account" != "$(normalize_codex_account_name "$current_account")" ]]; then
+            switch_to_codex_account "$project" "$post_wait_account" "all_accounts_cooling_down" >/dev/null || true
+          fi
+          write_manager_bootstrap_handoff "$project" "all_accounts_cooling_down" "$earliest_account" "$post_wait_account" "watchdog_still_waiting_after_probe" "recheck-account-availability-before-manager-bootstrap"
+        fi
+        ;;
+    esac
   fi
 
   log_error "no codex account is currently available for manager bootstrap"
