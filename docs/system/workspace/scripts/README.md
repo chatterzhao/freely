@@ -8,7 +8,7 @@
 - `bin/`、`.githooks/` 是运行时投影位置，不是主定义源
 - `docs/system/workspace/scripts/` 是系统真源
 - `docs/user/workspace/scripts/` 预留给用户覆盖或补充能力
-- 三层循环下脚本能力在整个系统中的归宿、owner 边界与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
+- 三个 loop 下脚本能力在整个系统中的归宿、owner 边界与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
 
 ## 目录分层
 
