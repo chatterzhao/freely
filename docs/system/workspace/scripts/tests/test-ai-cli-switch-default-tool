@@ -19,14 +19,15 @@ print(payload)
 PY
 )"
 
-mkdir -p "$TMP_HOME/.ai-auth/codex-work@example-com" "$TMP_HOME/.codex"
-printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$work_payload" >"$TMP_HOME/.ai-auth/codex-work@example-com/auth.json"
+mkdir -p "$TMP_HOME/.ai-auth/codex-work@example-com-1" "$TMP_HOME/.codex"
+printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$work_payload" >"$TMP_HOME/.ai-auth/codex-work@example-com-1/auth.json"
 printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$old_payload" >"$TMP_HOME/.codex/auth.json"
 
-HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" switch work@example.com --yes >"$OUTPUT_FILE"
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" switch work@example.com-1 --yes >"$OUTPUT_FILE"
 
 grep -q 'No ai tool name provided; defaulting to codex' "$OUTPUT_FILE"
-grep -q 'Switched codex to account: work@example.com' "$OUTPUT_FILE"
+grep -q 'Switched codex to slot: work@example-com-1' "$OUTPUT_FILE"
 grep -q 'work@example.com' <(HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
+grep -q '"slot": "work@example-com-1"' <(HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
 
 echo "[PASS] ai switch defaults tool to codex when only account is provided"

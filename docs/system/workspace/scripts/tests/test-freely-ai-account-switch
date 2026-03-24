@@ -113,9 +113,9 @@ HOME_USABLE="$TMP_DIR/home-usable"
 LOG_USABLE="$TMP_DIR/probe-usable.log"
 setup_project "$PROJECT_USABLE"
 setup_home "$HOME_USABLE"
-mkdir -p "$HOME_USABLE/.ai-auth/codex-limited@example-com" "$HOME_USABLE/.ai-auth/codex-work@example-com"
-make_auth_json "limited@example.com" "$HOME_USABLE/.ai-auth/codex-limited@example-com/auth.json"
-make_auth_json "work@example.com" "$HOME_USABLE/.ai-auth/codex-work@example-com/auth.json"
+mkdir -p "$HOME_USABLE/.ai-auth/codex-limited@example-com-1" "$HOME_USABLE/.ai-auth/codex-work@example-com-2"
+make_auth_json "limited@example.com" "$HOME_USABLE/.ai-auth/codex-limited@example-com-1/auth.json"
+make_auth_json "work@example.com" "$HOME_USABLE/.ai-auth/codex-work@example-com-2/auth.json"
 make_auth_json "old@example.com" "$HOME_USABLE/.codex/auth.json"
 
 HOME="$HOME_USABLE" \
@@ -127,9 +127,11 @@ MOCK_CODEX_LOG="$LOG_USABLE" \
 
 grep -q '"switched": true' "$TMP_DIR/usable.out"
 grep -q '"account": "work@example.com"' "$TMP_DIR/usable.out"
+grep -q '"slot": "work@example-com-2"' "$TMP_DIR/usable.out"
 grep -q '"status": "usable"' "$TMP_DIR/usable.out"
+grep -q '"slot": "work@example-com-2"' <(HOME="$HOME_USABLE" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
 grep -q 'work@example.com' <(HOME="$HOME_USABLE" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
-grep -q '^limited@example-com[[:space:]]' "$PROJECT_USABLE/.freely/run/codex-account-cooldowns.tsv"
+grep -q '^limited@example-com-1[[:space:]]' "$PROJECT_USABLE/.freely/run/codex-account-cooldowns.tsv"
 grep -q 'usable|limited@example.com|http://127.0.0.1:7890|http://127.0.0.1:7890' "$LOG_USABLE"
 grep -q 'usable|work@example.com|http://127.0.0.1:7890|http://127.0.0.1:7890' "$LOG_USABLE"
 
@@ -140,9 +142,9 @@ HOME_EARLIEST="$TMP_DIR/home-earliest"
 LOG_EARLIEST="$TMP_DIR/probe-earliest.log"
 setup_project "$PROJECT_EARLIEST"
 setup_home "$HOME_EARLIEST"
-mkdir -p "$HOME_EARLIEST/.ai-auth/codex-slow@example-com" "$HOME_EARLIEST/.ai-auth/codex-fast@example-com"
-make_auth_json "slow@example.com" "$HOME_EARLIEST/.ai-auth/codex-slow@example-com/auth.json"
-make_auth_json "fast@example.com" "$HOME_EARLIEST/.ai-auth/codex-fast@example-com/auth.json"
+mkdir -p "$HOME_EARLIEST/.ai-auth/codex-slow@example-com-3" "$HOME_EARLIEST/.ai-auth/codex-fast@example-com-1"
+make_auth_json "slow@example.com" "$HOME_EARLIEST/.ai-auth/codex-slow@example-com-3/auth.json"
+make_auth_json "fast@example.com" "$HOME_EARLIEST/.ai-auth/codex-fast@example-com-1/auth.json"
 make_auth_json "old@example.com" "$HOME_EARLIEST/.codex/auth.json"
 
 HOME="$HOME_EARLIEST" \
@@ -154,10 +156,12 @@ MOCK_CODEX_LOG="$LOG_EARLIEST" \
 
 grep -q '"switched": true' "$TMP_DIR/earliest.out"
 grep -q '"account": "fast@example.com"' "$TMP_DIR/earliest.out"
+grep -q '"slot": "fast@example-com-1"' "$TMP_DIR/earliest.out"
 grep -q '"status": "rate_limited"' "$TMP_DIR/earliest.out"
+grep -q '"slot": "fast@example-com-1"' <(HOME="$HOME_EARLIEST" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
 grep -q 'fast@example.com' <(HOME="$HOME_EARLIEST" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
-grep -q '^slow@example-com[[:space:]]' "$PROJECT_EARLIEST/.freely/run/codex-account-cooldowns.tsv"
-grep -q '^fast@example-com[[:space:]]' "$PROJECT_EARLIEST/.freely/run/codex-account-cooldowns.tsv"
+grep -q '^slow@example-com-3[[:space:]]' "$PROJECT_EARLIEST/.freely/run/codex-account-cooldowns.tsv"
+grep -q '^fast@example-com-1[[:space:]]' "$PROJECT_EARLIEST/.freely/run/codex-account-cooldowns.tsv"
 grep -q 'earliest|slow@example.com|http://127.0.0.1:7890|http://127.0.0.1:7890' "$LOG_EARLIEST"
 grep -q 'earliest|fast@example.com|http://127.0.0.1:7890|http://127.0.0.1:7890' "$LOG_EARLIEST"
 
