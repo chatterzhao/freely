@@ -273,6 +273,35 @@
   - cleanup 继续保持 `retain-for-followthrough`
   - delete / retirement gate 仍不能打开
 
+## continuity guard writeback（2026-03-24 02:28 PT）
+
+- 本轮 fresh session 继续遵守 `context_compacted -> 先更新 doc-loop continuity artifact`，因此再次先跑 worker-side `live-status`，只刷新当前 candidate 的 canonical 锚点，不扩大到 IBM / dev-loop。
+- 最新 worker lane 的 `live-status` 现在显示：
+  - `last_state_updated_at=2026-03-24T09:28:58Z`
+  - `activity_state=ai_active`
+  - `last_ai_state=down`
+  - `last_exit_reason=ai_exit_rc_0`
+  - `last_launch_kind=fresh_with_handoff`
+  - `last_rotation_reason=context_compacted`
+  - `intake_active_items=32`
+  - `intake_delegated_items=32`
+  - `current_prompt_has_delegated_continuation=1`
+  - `latest_manager_continuity_generated=unavailable`
+  - `latest_manager_worker_prompts_generated=none`
+  - `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 继续 32/32 全量重叠，其中仍包含当前 lane 的 `20260323-234407...`、`20260324-002656...` 与 `20260324-021757...`
+  - `last_consumed_delegated_continuation_at=2026-03-24T09:23:35Z`
+  - `current_focus.prompt_file=.freely/run/prompt-20260324-022858.txt`
+  - `deep_refs.last_tool_session_id=019d1f28-1cc7-71d0-8c09-ee89cf6a25cd`
+  - `deep_refs.last_tool_jsonl_path=/Users/zhaoyu/.codex/sessions/2026/03/24/rollout-2026-03-24T02-23-35-019d1f28-1cc7-71d0-8c09-ee89cf6a25cd.jsonl`
+- 这进一步说明：
+  - 当前 worker continuation lane 仍被 runtime 维护，且最新 prompt 仍直接承接同一条 delegated continuation canonical writeback 线
+  - `consumed` truth 目前又重新出现，并且继续与 `pending` 全量并存；因此缺口仍不是“有没有 consumed surface”，而是“这个 consumed surface 是否稳定绑定到当前 prompt cycle / 当前 stalled intake”
+  - `fresh_with_handoff` 与 `context_compacted` 只证明 runtime 正在做 continuity rotation，不证明 `specific stalled intake id -> current manager prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict` 这条链已经稳定
+- 因此这轮仍应保持：
+  - route_kind: `pre_brainstorm`
+  - cleanup_disposition: `retain-for-followthrough`
+  - safe_for_retirement: `false`
+
 ## 与相邻 issue 的边界
 
 - 不吸收到 `runtime-worker-launch-linkage-and-stall-recovery-governance`
