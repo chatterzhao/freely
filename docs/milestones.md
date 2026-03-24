@@ -259,16 +259,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
 - next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
 
-21. `I-20260322-0445`
-- title: Latest manager continuity worker consumption governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
-- next_action: 保持 issue 在 completed_issues，并把 later canonical patrol 作为 closeout evidence 吸收：2026-03-24 早些时候 `034106`/`032208` 与 `051509` 已显示 latest generated/consumed truth 对齐；随后 `052308`、`091023`、`091352`、`091713` 继续推进到 `latest_manager_worker_prompts_generated/consumed = none` 且 `ACTIVE_RUNNING_WORKER_COUNT = 3`。该分裂由 fleet-wide running-worker truth 与 latest-continuity prompt truth 的语义差异解释，不重新打开 issue；cleanup 继续显式保留，不得提前宣称 retire-ready。
-
 ### completed_issues
 
 1. `I-20260322-1801`
@@ -287,6 +277,16 @@ routing_policy:
 - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
 - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
 - completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
+
+2. `I-20260322-0445`
+- title: Latest manager continuity worker consumption governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
+- next_action: 保持 issue 在 completed_issues 收口。2026-03-24 早些时候 `034106`/`032208` 与 `051509` 已显示 latest generated/consumed truth 对齐；后续 canonical manager continuity 先推进到 reopen-shaped 的 `092109`，再由 `093617` 吸收 delegated continuations `20260324-092430-continuation-for-i-20260322-0445` 与 `20260324-093551-continuation-for-i-20260322-0445` 的更正结论，`093913`、`094320`、`094700`、`095024`、`095720`、`095734`、`100038`、`100348`、`100715`、`101053`、`102539`、`103203`、`103454`、`120941`、`122611`、`122935`、`123608` 与当前 fully consumed continuity `123901` 继续保持同一 non-reopen judgement。当前 writeback reread 下 `latest_manager_continuity_generated/consumed` 与 launch-state/env 的 `LAST_MANAGER_CONTINUITY_GENERATED/CONSUMED` 都已对齐到 `123901`；由于本轮未生成新的 worker prompt，`latest_manager_worker_prompts_generated/consumed = none` 且 `ACTIVE_RUNNING_WORKER_COUNT = 3` 仍只表示 latest launchable prompt truth 与 fleet-wide running-worker truth 的分层，不单独构成 reopen。cleanup 继续显式保留给 supervisor/runtime followthrough；本 worker round 不得提前宣称 retire-ready 或代执行 cleanup。
 
 ### candidate_issues
 
