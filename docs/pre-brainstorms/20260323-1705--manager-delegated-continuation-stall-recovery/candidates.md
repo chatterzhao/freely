@@ -70,8 +70,8 @@
     - 最新 `live-status` 显示 `intake_delegated_items=32`
     - `pending_delegated_continuation_ids` 继续包含当前 lane 的 `20260323-234407...`、`20260324-002656...` 与 `20260324-021757...`
     - `last_consumed_delegated_continuation_ids` 当前再次覆盖同一批 32 个 delegated continuation ids
-    - `last_consumed_delegated_continuation_at=2026-03-24T09:37:25Z`
-    - `current_focus.prompt_file=.freely/run/prompt-20260324-024120.txt`
+    - `last_consumed_delegated_continuation_at=2026-03-24T09:41:25Z`
+    - `current_focus.prompt_file=.freely/run/prompt-20260324-024527.txt`
     - 说明当前 lane 依然有 prompt-level absorption、pending intake 与 consumed surface 证据，但 consumed surface 仍未绑定到当前 stalled intake
   - historical-but-non-stable consumed surface:
     - 前几轮 `live-status` 曾短暂暴露过 `last_consumed_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_at`
@@ -88,8 +88,8 @@
     - `last_exit_reason=ai_exit_rc_0`
     - `last_launch_kind=fresh_with_handoff`
     - `last_rotation_reason=context_compacted`
-    - `current_focus.prompt_file=.freely/run/prompt-20260324-024120.txt`
-    - `deep_refs.last_tool_session_id=019d1f34-c62c-7870-8a3f-480204537963`
+    - `current_focus.prompt_file=.freely/run/prompt-20260324-024527.txt`
+    - `deep_refs.last_tool_session_id=019d1f38-6e78-7e62-af16-547d3eb16ea5`
     - 说明 runtime 当前仍把本轮 worker 视为 active lane，并且最新 continuity anchor 已继续滚动；但这层 continuity surface 仍只够证明 lane 被维护，不足以证明当前 prompt cycle 对 stalled intake 的稳定 binding proof
   - runtime/test scope proof:
     - `docs/system/workspace/scripts/runtime/freely` 已把 `LAST_MANAGER_CONTINUITY_GENERATED/CONSUMED`、`LAST_MANAGER_WORKER_PROMPTS_GENERATED/CONSUMED` 与 delegated pending/consumed ids 写入状态面，并由 `live-status` 暴露
@@ -194,9 +194,9 @@
     mode: `worker-continuity-refresh`
     summary: `本轮 fresh session 再次先执行 doc-loop continuity guard：最新 `live-status` 已滚动到 `.freely/run/prompt-20260324-024120.txt`，`deep_refs.last_tool_session_id=019d1f34-c62c-7870-8a3f-480204537963`，且 `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 继续 32/32 全量重叠，`last_consumed_delegated_continuation_at=2026-03-24T09:37:25Z`。这说明 runtime 仍在维护当前 continuation lane，但 `consumed` truth 依旧只是在当前 prompt cycle 旁边并存出现，尚未形成当前 stalled intake 的稳定 binding anchor。`
     verdict: `keep-in-pre-brainstorm`
-  - reviewer: `codex-explorer:Dewey`
-    mode: `subagent-owner-scan`
-    summary: `最新独立只读扫描确认目前没有 superseding owner：`docs/milestones.md` 仍将 `C-20260323-1705-A` 保留为 `candidate/in_pre_brainstorm`；最接近的 `latest-manager-continuity-worker-consumption-governance` issue 与对应 progress 只覆盖 latest continuity / prompt-set 的 generated-consumed truth 和 running manager consumption，不接管“specific stalled intake id -> current prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict”这条 acceptance boundary；仓库中也仍不存在 `docs/recovery/**` owner。`
+  - reviewer: `codex:gpt-5.4`
+    mode: `worker-continuity-refresh`
+    summary: `本轮 fresh session 再次按 doc-loop continuity guard 刷新 canonical anchor：最新 `live-status` 已滚动到 `.freely/run/prompt-20260324-024527.txt`，`deep_refs.last_tool_session_id=019d1f38-6e78-7e62-af16-547d3eb16ea5`，且 `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 继续 32/32 全量重叠，`last_consumed_delegated_continuation_at=2026-03-24T09:41:25Z`。这说明 runtime 仍在维护当前 continuation lane，但 `consumed` truth 依旧只是在当前 prompt cycle 旁边并存出现，尚未形成当前 stalled intake 的稳定 binding anchor。`
     verdict: `keep-in-pre-brainstorm`
   - reviewer: `codex-explorer:Bacon`
     mode: `subagent-owner-scan`
@@ -205,6 +205,10 @@
   - reviewer: `codex-explorer:Rawls`
     mode: `subagent-owner-scan`
     summary: `独立只读扫描再次确认不存在 superseding owner：`C-20260323-1705-A` 仍是 `needs_research`，`promoted_issue_path` 仍为 `pending://...`，且仓库中没有 `docs/recovery/**` owner。最接近但不接管的 artifact 仍是 `latest-manager-continuity-worker-consumption-governance`、`worker-active-reentry-for-manager-delegated-continuation-governance`、`runtime-worker-launch-linkage-and-stall-recovery-governance` 与已收口的 `manager-continuation-handoff-consumption-governance`；它们分别覆盖 latest continuity 消费、active worker reentry、pending-intake stalled-AI recovery 或 handoff generated/consumed evidence，不接管当前 prompt-absorbed stall contract。`
+    verdict: `keep-in-pre-brainstorm`
+  - reviewer: `codex-explorer:Dewey`
+    mode: `subagent-owner-scan`
+    summary: `最新独立只读扫描再次确认不存在 superseding owner：`docs/milestones.md` 仍将 `C-20260323-1705-A` 保留为 `candidate/in_pre_brainstorm`，`promoted_issue_path` 仍是 `pending://...`，且仓库中没有 `docs/recovery/**`。最接近但不接管的 artifacts 仍是 `latest-manager-continuity-worker-consumption-governance`、`worker-active-reentry-for-manager-delegated-continuation-governance`、`runtime-worker-launch-linkage-and-stall-recovery-governance` 与 `manager-continuation-handoff-consumption-governance`；它们分别覆盖 latest continuity consumption、active worker reentry、pending-intake stall recovery 或 handoff generated/consumed evidence，不接管“specific stalled intake id -> current prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict”这条 acceptance boundary。`
     verdict: `keep-in-pre-brainstorm`
 - expected_outcome:
   - define a runtime-visible stall contract for `delegated continuation already absorbed into prompt`
@@ -223,7 +227,7 @@
   - 将当前 `fresh_with_handoff/context_compacted` 的 continuity 事实继续视为 supporting evidence：它证明 runtime 已因上下文压缩做过续接，但不证明当前 prompt cycle 对 stalled intake 的 binding 已稳定；因此后续仍要把续接事实与 prompt-cycle absorption proof 分开验收。
   - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 canonical writeback 已继续收敛为本分支上的最新 continuity anchor lineage，下一步应先把这些独有提交吸收到上游，再决定 retirement。
   - 若再次发生会话轮换或 `context_compacted`，先把最新 continuity 结论写回当前 pre-brainstorm canonical artifacts，再继续扩大实现或 cleanup 判断。
-  - 当前最新 continuity 锚点已经滚动到 `.freely/run/prompt-20260324-024120.txt`；后续若再次轮换，优先沿这条 canonical writeback 线继续刷新 evidence，而不是切换 owner 或 loop。
+  - 当前最新 continuity 锚点已经滚动到 `.freely/run/prompt-20260324-024527.txt`；后续若再次轮换，优先沿这条 canonical writeback 线继续刷新 evidence，而不是切换 owner 或 loop。
   - delete / retirement gate 当前仍明确阻塞：只有在真实 dogfood 复现中固定 `current stalled intake id -> current prompt cycle -> consumed event anchor` 的 binding proof，并确认 recovery 继续推进到 followthrough 后，才允许重新判断 cleanup。
 - revisit_trigger:
   - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof 时，重新进入 materialization 判断。
