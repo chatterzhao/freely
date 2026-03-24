@@ -493,8 +493,8 @@ routing_policy:
 - promoted_issue_path: `pending://manager-delegated-continuation-stall-recovery-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`
-- next_action: 保持 active candidate；先用 runtime 补丁和真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被恢复，再决定是 materialize 为独立 issue，还是吸收到现有 stall/recovery issue 族
-- revisit_trigger: 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，或当前 runtime 补丁验证稳定后需要冻结独立 issue contract 时，重新进入 materialization 判断
+- next_action: 保持 active candidate；先用 runtime 补丁和真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被恢复，再决定是 materialize 为独立 issue，还是吸收到现有 stall/recovery issue 族。在 cleanup 判断上，不再沿用“该 worktree 已被 develop 吸收、只剩 dirty delta”的旧前提；当前 canonical writeback 仍停留在该分支独有提交里，应先被上游吸收，再判断 retirement。
+- revisit_trigger: 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，或当前 runtime 补丁验证稳定后需要冻结独立 issue contract 时，重新进入 materialization 判断；以及当 manager 已吸收当前分支上的 canonical writeback 提交并重新做 cleanup 巡检时，重新判断该 worktree 是否满足 retirement。
 
 11. `C-20260323-1835-A`
 - title: Detect and recover active worker delegated-continuation stalls

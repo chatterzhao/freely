@@ -62,6 +62,24 @@
 - 当前仓库扫描未发现 `docs/progress/**`、`docs/epics/**` 或其他 issue/progress/recovery 真源已经接管本候选；因此这轮 continuity 仍应写回 pre-brainstorm，而不是误切到 IBM、dev-loop 或 recovery
 - 当前分支 `feature/manager-delegated-continuation-stall-materialization-20260323` 仍未被 `develop` 吸收；这说明 worktree cleanup 与 candidate materialization 仍应分开判断，不能因为已有 canonical writeback 提交就把该候选视为已关闭
 
+## 本轮首跳复核（2026-03-23）
+
+- 当前 handoff 中“这棵树已被 `develop` 吸收、只剩 dirty writeback”的前提已失效：
+  - 当前 worktree `git status` 为 clean
+  - `git merge-base --is-ancestor HEAD develop` 返回非零
+  - 当前分支仍有独有提交：
+    - `a4f31f3 docs: preserve delegated continuation stall candidate`
+    - `b6f5e6a docs: refresh delegated continuation continuity`
+- 因此当前真实问题不是“是否保留 dirty delta”，而是“这两次 canonical pre-brainstorm writeback 是否仍应保留为独有分支提交，还是应该冻结/丢弃”
+- 本轮再次核对：
+  - `docs/milestones.md` 仍把 `C-20260323-1705-A` 保留在 `candidate_issues`
+  - 未发现 `docs/progress/**`、`docs/recovery/**`、`docs/epics/**` 的 issue/progress/recovery 真源接管该候选
+  - `freely live-status` 仍显示 `role_hint: worker`、`last_launch_kind: fresh_with_handoff`、`last_rotation_reason: context_compacted`，且 delegated continuation 仍在当前 prompt 上下文中
+- 结论：
+  - route_kind 继续保持 `pre_brainstorm`
+  - 当前分支的独有提交仍是 canonical candidate writeback，而不是可直接丢弃的噪音
+  - 但在这些提交尚未被上游吸收前，这棵树不满足 `retire-now`
+
 ## 与相邻 issue 的边界
 
 - 不吸收到 `runtime-worker-launch-linkage-and-stall-recovery-governance`
