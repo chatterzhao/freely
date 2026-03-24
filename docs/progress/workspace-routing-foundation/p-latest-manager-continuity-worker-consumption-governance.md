@@ -41,11 +41,16 @@
   - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt`
   - `queued_worker_prompts = none`
   - `LAUNCHED_WORKER_PROMPTS` matched that same latest prompt path
-  - `ACTIVE_RUNNING_WORKER_COUNT = 1`
+  - `ACTIVE_RUNNING_WORKER_COUNT = 1` in that sampled patrol round only; the value is fleet-wide and can later increase if unrelated worker lanes stay active
 - After the pass judgement, manager generated the dedicated closeout continuity/prompt for this writeback lane and the current truth surface also stayed aligned:
   - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-051509.md`
   - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-051509-worker-i-20260322-0445-closeout-codex.txt`
   - `queued_worker_prompts = none`
+- Follow-up patrol later observed `ACTIVE_RUNNING_WORKER_COUNT = 3` while three other worker lanes remained active fleet-wide:
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough`
+- That later fleet-wide count does not fail this issue's post-merge acceptance because the acceptance contract is about same-round latest continuity / worker prompt truth, not a permanent global worker-count invariant.
 - Cleanup disposition remains explicit:
   - current closeout worktree is retained until this docs-only writeback is absorbed through the develop-facing path
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile` remains retained as the active same-family worker lane
