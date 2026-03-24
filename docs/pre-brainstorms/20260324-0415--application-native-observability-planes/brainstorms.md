@@ -259,6 +259,30 @@ acceptance evidence 要回答“测试有没有真的跑过，为什么还不能
 
 `completion_state` 只表达 issue 层：
 
+## Materialization boundary
+
+这条线进入 IBM 时，冻结的是 shared observation contract，而不是一次性把所有状态面实现完。
+
+- IBM 应冻结：
+  - 五类 plane 的最小词典与职责
+  - `plane identity block`
+  - `progress / stall / acceptance evidence` 三类 schema
+  - CLI / TUI / GUI / API 共享的 `status card minimum fields` 与 `deep ref groups`
+  - Freely self-host concrete profile 如何把现有 `live-status` / `fleet-status` / session / artifact surfaces 映射到共享 contract
+- IBM 不应直接要求：
+  - 新建并替换现有 `live-status` / `fleet-status`
+  - day-1 把 subagent 做成一等后端实体
+  - 一次性完成 richer runtime UI / transport / stream 产品化
+- 因此当前最小剩余 blocker 已收窄为两类：
+  1. `acceptance evidence schema` 的 canonical 落点，以及它如何被 current-state / API 摘要消费
+  2. CLI / TUI / GUI / API 共享的 `deep ref groups` 最小兼容规则
+
+其余边界当前已冻结：
+
+- `current-state plane` / `fleet plane` day-1 继续由既有 `live-status` / `fleet-status` 承接
+- 多 subagent day-1 继续聚合在 lane / worktree / session surfaces 下，而不是成为新的强实体
+- richer runtime / UI observability productization 若超出 shared contract，应进入 follow-on issue，而不是继续阻塞本线 materialization
+
 - `not_ready`
 - `partially_evidenced`
 - `fully_evidenced`
