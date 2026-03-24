@@ -14,8 +14,9 @@
   - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt`
   - `queued_worker_prompts = none`
   - `LAUNCHED_WORKER_PROMPTS` on that same prompt path
-  - `ACTIVE_RUNNING_WORKER_COUNT = 1`
+  - `ACTIVE_RUNNING_WORKER_COUNT = 1` in that patrol sample; later fleet-wide counts may differ when unrelated worker lanes stay active
 - 2026-03-24 closeout writeback dispatch then generated `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-051509.md` and `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-051509-worker-i-20260322-0445-closeout-codex.txt`, and current truth surfaces show those newer artifacts are also already the latest generated/consumed truth
+- 2026-03-24 later manager patrol reopened the issue incorrectly after observing `ACTIVE_RUNNING_WORKER_COUNT = 3`; the follow-up audit determined those three running workers belonged to mixed issue families / runtime-owned followthrough and did not violate this issue's same-round latest continuity/prompt consumption contract
 - reran:
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
   - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`

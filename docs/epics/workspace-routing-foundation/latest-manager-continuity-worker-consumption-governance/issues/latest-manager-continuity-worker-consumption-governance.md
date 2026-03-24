@@ -106,11 +106,12 @@
   - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt`
   - `queued_worker_prompts = none`
   - `LAUNCHED_WORKER_PROMPTS` matched the same latest prompt path
-  - `ACTIVE_RUNNING_WORKER_COUNT = 1`
+  - `ACTIVE_RUNNING_WORKER_COUNT = 1` in that sampled patrol round, but this value is fleet-wide and not a lasting acceptance invariant for the issue family
 - 2026-03-24 manager then generated the dedicated closeout continuity/prompt for this writeback lane, and the current canonical truth surfaces also show latest-truth consumption for that newer round:
   - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-051509.md`
   - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-051509-worker-i-20260322-0445-closeout-codex.txt`
   - `queued_worker_prompts = none`
+- 2026-03-24 follow-up patrol later saw `ACTIVE_RUNNING_WORKER_COUNT = 3` while unrelated worker lanes remained active in other issue families. That observation does not by itself reopen this issue because the fleet-wide worker count is not scoped to this issue family and the post-merge contract only requires same-round latest continuity / prompt consumption alignment.
 - This confirms the issue family acceptance is closed on canonical `develop`: workers consumed the newest manager continuity / worker prompt truth instead of staying on an older delegated continuation, and active pending vs consumed delegated ids remained aligned.
 - Cleanup is intentionally not executed from manager in this round. Keep the disposition explicit instead of pretending the lifecycle is retired:
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`: retain until this docs-only closeout commit is absorbed by the develop-facing path; `merge-ready`, not `delete-ready`
