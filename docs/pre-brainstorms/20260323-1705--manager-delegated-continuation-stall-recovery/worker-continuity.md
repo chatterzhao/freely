@@ -1,0 +1,52 @@
+# Worker Continuity
+
+- selected_tool: `codex`
+- why_selected:
+  - 当前轮次已经命中 `continuation -> pre_brainstorm`，且需要在本 worktree 直接回写 canonical candidate artifacts
+  - `codex` 与当前运行工具一致，按 `workspace/tools.md` 必须在当前会话继续执行第二跳，而不是只输出 handoff prompt
+- source_class: `continuation`
+- route_kind: `pre_brainstorm`
+- target_skill_or_loop: `doc-pre-brainstorm-execution`
+- status: `needs_research`
+- prioritized_pool: `docs/pre-brainstorms/** + docs/milestones.md#candidate_issues`
+- why_this_pool_first:
+  - delegated continuation handoff 已直接命中 `C-20260323-1705-A`
+  - `docs/milestones.md` 仍将该条目标记为 `candidate` / `in_pre_brainstorm`
+  - 未发现 `docs/epics/**`、`docs/progress/**` 或 `docs/recovery/**` 的 canonical owner 接管该 contract
+- restart_point: `continuation`
+- workspace_action: `reuse-current-feature-worktree`
+- execution_base: `develop`
+- integration_target: `develop`
+- depends_on:
+  - `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
+  - `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`
+  - `docs/milestones.md`
+- ownership: `worker-canonical-pre-brainstorm-writeback`
+- canonical_writeback_decision: `keep-and-commit`
+- next_recommended_route: `doc-pre-brainstorm-execution`
+- why_not_doc_ibm_yet:
+  - 当前只冻结到 prompt-level absorption proof 与 `pending/consumed` 并存 truth，尚未冻结“哪个 consumed 事件绑定当前 prompt cycle / 当前 stalled intake”的稳定 runtime-visible anchor
+  - 现有 runtime / tests 已提供 pending/consumed ids 与 continuity generated/consumed 的状态面证据，但它们仍只足以支撑 watchdog recovery，不是 candidate promotion 所需的 prompt-cycle binding acceptance anchor
+  - IBM promotion gate 仍缺 issue-level acceptance 可复用的最小 absorption proof，因此不能把相邻 issue/test 证据误当成 materialization 完成
+- why:
+  - 本轮已按 `AGENTS -> CONSTITUTION -> LAWS -> lead-agent -> context-source-skill` 重新复核，结论仍是当前输入属于 worker continuation，而不是 project-level supervisor 巡检或 recovery-owned restart
+  - 当前 `live-status` 已证明 delegated continuation 进入当前 prompt 语义层：`current_prompt_has_delegated_continuation=1` 且 `prompt_excerpt` 包含 `Delegated continuation handoff`
+  - 当前 worker runtime 已重新起在 `last_launch_kind=fresh` / `last_rotation_reason=initial_start`；这说明此处记录的是最新 worker continuation 事实，不再沿用旧的 `fresh_with_handoff` 运行态判断
+  - 当前 delegated continuation ids 仍同时出现在 `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids`，说明 runtime 已开始暴露 canonical consumed truth，但仍缺 prompt-cycle 绑定
+  - 当前 runtime / tests 还额外暴露了 continuity generated/consumed truth，但整体仍只冻结到“prompt 已吸收 delegated continuation 且之后没有新的 continuity / handoff”这层 recovery contract，尚未证明 consumed truth 与当前 prompt cycle / stalled intake 的稳定绑定
+  - runtime 还没有暴露足以冻结 promotion gate 的 prompt-bound consumed anchor，因此无法证明当前 stalled intake 已被当前 prompt cycle 稳定吸收
+  - 也未发现 `docs/epics/**`、`docs/progress/**` 或 `docs/recovery/**` 接管该候选
+  - 独立只读 owner scan 再次确认：仓库里没有其他 canonical artifact 接管这条 contract；当前唯一缺口仍是 prompt-cycle binding proof，而不是 owner 路由不清
+- hygiene_judgement:
+  - 当前 worktree 为 `DIRTY`，但脏项仅限本候选 canonical writeback：`docs/milestones.md`、`brainstorms.md`、`candidates.md` 与新增 `worker-continuity.md`
+  - 本轮无需把无关改动分流到其他 worktree；下一步 hygiene 动作应是 checkpoint/commit 当前 writeback，而不是扩大 scope
+- next_action:
+  - 保持 `C-20260323-1705-A` 在 `candidate_issues` / `needs_research`
+  - 下一轮优先验证 runtime 是否能为当前 prompt cycle / 当前 stalled delegated continuation 提供稳定的 binding proof，再决定是否进入 IBM materialization
+- revisit_trigger:
+  - 当再次复现 manager prompt 已吸收 delegated continuation 且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof 时，重判 promotion
+  - 当真实 cleanup / retirement followthrough 验证稳定后，重判是否进入 `doc-ibm-execution`
+- cleanup_disposition: `retain-for-followthrough`
+- safe_for_retirement: `false`
+- next_prompt: |
+    Continue `skill:doc-pre-brainstorm-execution` for `C-20260323-1705-A`. Keep the candidate in `needs_research` until runtime-visible proof cleanly distinguishes prompt-absorbed delegated continuation from older pending-intake symptoms and from the current `pending/consumed` overlap. Require the next round to verify whether runtime can bind consumed truth to the current manager prompt cycle and stalled intake before promoting to IBM.
