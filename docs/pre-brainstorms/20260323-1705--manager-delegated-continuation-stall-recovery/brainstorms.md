@@ -331,6 +331,35 @@
   - cleanup_disposition: `retain-for-followthrough`
   - safe_for_retirement: `false`
 
+## continuity guard writeback（2026-03-24 02:37 PT）
+
+- 本轮 fresh session 继续先执行 worker-side `live-status` 复核，再决定是否能把这条候选从 canonical pre-brainstorm writeback 转交给别的 loop。
+- 最新 worker lane 的 `live-status` 现在显示：
+  - `last_state_updated_at=2026-03-24T09:37:20Z`
+  - `activity_state=ai_active`
+  - `last_ai_state=down`
+  - `last_exit_reason=ai_exit_rc_0`
+  - `last_launch_kind=fresh_with_handoff`
+  - `last_rotation_reason=context_compacted`
+  - `intake_active_items=32`
+  - `intake_delegated_items=32`
+  - `current_prompt_has_delegated_continuation=1`
+  - `latest_manager_continuity_generated=unavailable`
+  - `latest_manager_worker_prompts_generated=none`
+  - `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 继续 32/32 全量重叠，其中仍包含当前 lane 的 `20260323-234407...`、`20260324-002656...` 与 `20260324-021757...`
+  - `last_consumed_delegated_continuation_at=2026-03-24T09:33:04Z`
+  - `current_focus.prompt_file=.freely/run/prompt-20260324-023720.txt`
+  - `deep_refs.last_tool_session_id=019d1f30-ca23-7eb2-bbf8-95d50650f4c1`
+  - `deep_refs.last_tool_jsonl_path=/Users/zhaoyu/.codex/sessions/2026/03/24/rollout-2026-03-24T02-33-04-019d1f30-ca23-7eb2-bbf8-95d50650f4c1.jsonl`
+- 这轮新增事实仍只加强同一个结论：
+  - runtime 继续把当前 worker lane 当作 active continuation 维护，说明 canonical owner 仍是当前 candidate
+  - `consumed` truth 仍与 `pending` 全量并存，并随 prompt/cycle 前移继续滚动；它依旧没有冻结成 `specific stalled intake id -> current manager prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict` 这条稳定绑定链
+  - 因此这轮仍不能转去 IBM、dev-loop 或 cleanup retirement 判定
+- 所以当前仍应保持：
+  - route_kind: `pre_brainstorm`
+  - cleanup_disposition: `retain-for-followthrough`
+  - safe_for_retirement: `false`
+
 ## 与相邻 issue 的边界
 
 - 不吸收到 `runtime-worker-launch-linkage-and-stall-recovery-governance`
