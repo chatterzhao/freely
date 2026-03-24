@@ -1089,10 +1089,11 @@ intake_snapshot_for_project() {
 
 delegated_continuation_snapshot_for_project() {
   local project="$1" limit="${2:-3}"
-  local intake_root item_dir meta_file message_file resolution_file status absorption_target delegated_worktree message summary count project_real delegated_real session_refs
+  local intake_root item_dir meta_file message_file resolution_file status absorption_target delegated_worktree message summary count project_real delegated_real session_refs active_consumed_ids intake_id
   intake_root="$(intake_dir_for_project "$project")"
   [[ -d "$intake_root" ]] || return 0
   project_real="$(cd "$project" && pwd -P)"
+  active_consumed_ids="$(active_prompt_consumed_delegation_ids_for_project "$project")"
   count=0
   while IFS= read -r item_dir; do
     meta_file="$item_dir/meta.env"
@@ -1111,8 +1112,12 @@ delegated_continuation_snapshot_for_project() {
     if [[ -n "$delegated_real" && "$delegated_real" != "$project_real" ]]; then
       continue
     fi
+    intake_id="$(basename "$item_dir")"
+    if [[ -n "$active_consumed_ids" ]] && csv_contains_exact_item "$active_consumed_ids" "$intake_id"; then
+      continue
+    fi
     message="$(tr '\n' ' ' <"$message_file" | sed 's/  */ /g')"
-    printf -- '- intake_id=%s message=%s\n' "$(basename "$item_dir")" "$message"
+    printf -- '- intake_id=%s message=%s\n' "$intake_id" "$message"
     if [[ -n "$session_refs" && "$session_refs" != "[]" ]]; then
       printf '  session_refs=%s\n' "$session_refs"
     fi
@@ -1128,13 +1133,27 @@ delegated_continuation_snapshot_for_project() {
   done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort -r)
 }
 
+active_prompt_consumed_delegation_ids_for_project() {
+  local project="$1"
+  local prompt_file ai_pid
+  load_session_state_or_defaults "$project"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  [[ -n "$ai_pid" ]] || return 0
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 0
+  grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null || return 0
+  [[ -n "${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-}" ]] || return 0
+  printf '%s\n' "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS"
+}
+
 delegated_continuation_ids_for_project() {
   local project="$1"
   local intake_root item_dir meta_file status absorption_target delegated_worktree intake_id
-  local project_real delegated_real ids=()
+  local project_real delegated_real active_consumed_ids ids=()
   intake_root="$(intake_dir_for_project "$project")"
   [[ -d "$intake_root" ]] || return 0
   project_real="$(cd "$project" && pwd -P)"
+  active_consumed_ids="$(active_prompt_consumed_delegation_ids_for_project "$project")"
   while IFS= read -r item_dir; do
     meta_file="$item_dir/meta.env"
     [[ -f "$meta_file" ]] || continue
@@ -1151,6 +1170,9 @@ delegated_continuation_ids_for_project() {
       continue
     fi
     intake_id="$(basename "$item_dir")"
+    if [[ -n "$active_consumed_ids" ]] && csv_contains_exact_item "$active_consumed_ids" "$intake_id"; then
+      continue
+    fi
     ids+=("$intake_id")
   done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort)
   if ((${#ids[@]})); then
@@ -3927,6 +3949,11 @@ cmd_start() {
       delegated_consumed_ids="$delegated_pending_ids"
       delegated_consumed_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
     fi
+    LAST_DELEGATED_CONTINUATION_PENDING_IDS="$delegated_pending_ids"
+    LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
+    LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
+    LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT"
     if [[ "$mode_name" == "fresh" || "$mode_name" == "fresh_with_handoff" ]]; then
       rm -f "$(handoff_file "$PROJECT_ROOT")"
     fi
