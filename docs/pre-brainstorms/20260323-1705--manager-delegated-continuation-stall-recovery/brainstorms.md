@@ -51,6 +51,17 @@
   - prompt 已吸收 delegated continuation 但无新 continuity / handoff 的 recovery
   - prompt 之后已有新 continuity / worker prompt 但 launch-state 仍停旧锚点的 recovery
 
+## continuity guard writeback
+
+- 本轮由 `fresh_with_handoff` 重新进入，直接原因是上一轮 `codex` 会话命中 `context_compacted`
+- 当前 worker 工位重新核对后，`live-status` 仍显示：
+  - `role_hint: worker`
+  - `last_rotation_reason: context_compacted`
+  - `current_prompt_has_delegated_continuation: 1`
+  - `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 对齐，说明 delegated continuation 已被吸收，但没有新的 canonical artifact 接管这条线
+- 当前仓库扫描未发现 `docs/progress/**`、`docs/epics/**` 或其他 issue/progress/recovery 真源已经接管本候选；因此这轮 continuity 仍应写回 pre-brainstorm，而不是误切到 IBM、dev-loop 或 recovery
+- 当前分支 `feature/manager-delegated-continuation-stall-materialization-20260323` 仍未被 `develop` 吸收；这说明 worktree cleanup 与 candidate materialization 仍应分开判断，不能因为已有 canonical writeback 提交就把该候选视为已关闭
+
 ## 与相邻 issue 的边界
 
 - 不吸收到 `runtime-worker-launch-linkage-and-stall-recovery-governance`

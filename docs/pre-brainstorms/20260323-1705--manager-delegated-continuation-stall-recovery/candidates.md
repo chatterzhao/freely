@@ -13,9 +13,13 @@
     jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T18-16-28-019d1d6a-2319-7952-9c01-8606f51dc59c.jsonl`
     role: `author-handoff`
   - tool: `codex`
+    session_id: `019d1da9-7cc2-7421-8849-5aa0a9a9a0c9`
+    jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T19-25-40-019d1da9-7cc2-7421-8849-5aa0a9a9a0c9.jsonl`
+    role: `continuity-review-before-compaction`
+  - tool: `codex`
     session_id: `current-thread`
     jsonl_path: `unavailable://fresh-session-thread-id-not-exposed`
-    role: `author-continuation`
+    role: `fresh-with-handoff-continuation`
 - why_now:
   - 真实 dogfood 已复现 `cleanup continuation` 进入 manager prompt 后，AI 假活但不产出 continuity / handoff 的断点。
   - 当前 `live-status` 已能稳定暴露 `current_prompt_has_delegated_continuation=1`、`latest_manager_worker_prompts_generated=none` 与 `last_consumed_delegated_continuation_ids=none`，说明这不是纯会话内现象，而是 runtime control plane 可观测的 gap。
@@ -44,8 +48,10 @@
   - 这次 gap 已超出单条 cleanup lifecycle；它属于 Freely runtime control plane 的通用自治缺口。
   - 当前已有 runtime / skill / test 证据，但还缺少一轮真实 dogfood followthrough 来冻结边界，因此不应因为仓库里已经有补丁就直接提升到 IBM。
   - 与 `I-20260322-0445` 的边界仍然清楚：后者处理“已生成新 continuity / prompt set 但 worker 仍消费旧轮次”，当前候选处理的是“manager prompt 已吸收 delegated continuation，但没有继续产出新的 continuity / handoff”。
+  - `fresh_with_handoff` 续接后的当前仓库复核仍未发现 issue/progress/recovery 真源接管该候选；因此这轮只能补 continuity writeback，不能把 route_kind 提前改成 `ibm`、`dev_loop` 或 `recovery`。
 - next_action:
   - 保持 active candidate；继续用真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被 runtime recovery 稳定推进到 cleanup / retirement followthrough，然后再判断是 materialize 为独立 issue，还是吸收到更高层 stall/recovery issue 族。
+  - 若再次发生会话轮换或 `context_compacted`，先把最新 continuity 结论写回当前 pre-brainstorm canonical artifacts，再继续扩大实现或 cleanup 判断。
 - revisit_trigger:
   - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活时，重新进入 materialization 判断。
   - 当当前 runtime 补丁在真实 followthrough 中验证稳定，且边界已可冻结成独立 issue contract 时，重新进入 materialization 判断。
