@@ -267,7 +267,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
-- next_action: canonical verification writeback 已完成，当前 branch 只剩 `develop` 上一次真实 `freely chat` post-merge acceptance 作为 completion blocker；在此之前保持 `in_verification`，视为 merge-ready 但不是 delete-ready，不要重新扩成实现或 research scope
+- next_action: 本轮 active-worker launch-state followthrough 仍未复现新的 repo gap；`develop` 上 canonical truth 先对齐到 continuity `20260324-033747`，随后又继续前进到 `20260324-034106`，且 `live-status` 与 `manager-worker-launch-state.env` 在两个时间切片都保持一致。最新 surface 已把同一 worker prompt `20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt` 记录为 generated+consumed，`queued_worker_prompts=none`，`active_running_worker_count=1`；fleet 中分离出来的 stale-batch lane 继续归 `C-20260322-1801-B` / runtime-owned。当前 branch 仍只剩 canonical `develop` acceptance 的最终 closeout 作为 completion blocker；在此之前保持 `in_verification`，视为 merge-ready 但不是 delete-ready，不要重新扩成实现或 research scope
 
 ### completed_issues
 

@@ -4,17 +4,18 @@
 - title: Latest manager continuity worker consumption governance
 - phase_state: `in_verification`
 - runtime_state: `restart_required`
-- branch: `feature/manager-launch-state-consumed-truth-reconcile-20260324`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
+- branch: `feature/manager-active-worker-launch-state-reconcile-20260324`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile`
 - issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "verification-writeback"}
   - {tool: codex, session_id: "019d1e52-ccb2-7612-9538-87fd9df4eea5", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T22-30-36-019d1e52-ccb2-7612-9538-87fd9df4eea5.jsonl", role: "context_compacted_handoff_source"}
   - {tool: codex, session_id: "019d1e4e-709f-7571-a958-b79828dc38f4", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T22-25-50-019d1e4e-709f-7571-a958-b79828dc38f4.jsonl", role: "fresh_with_handoff_source"}
-- summary: `pre-test-merge` dogfood 暴露的 latest continuity consumption gap 已补齐到 verification：delegated continuation consumed truth 会在 prompt build 后立即写入 session/live status，active prompt 期间不会再把同一 intake 同时显示为 pending，AI 停止后相同 ids 会重新回到 pending 供 recovery 接管；2026-03-24 又补上 frozen-queue drift 及其 same-continuity reconciliation 尾巴，确保 latest continuity 标记为 `Frozen Queue` / `desired-frozen` 的 prompt 不再进入 launchable generated/consumed inventory，也不会因旧 launch-state 残留而继续显示为 consumed/launched 或被 manager recovery 复活。
+- summary: `pre-test-merge` dogfood 暴露的 latest continuity consumption gap 已补齐到 verification：delegated continuation consumed truth 会在 prompt build 后立即写入 session/live status，active prompt 期间不会再把同一 intake 同时显示为 pending，AI 停止后相同 ids 会重新回到 pending 供 recovery 接管；2026-03-24 又补上 frozen-queue drift 及其 same-continuity reconciliation 尾巴，确保 latest continuity 标记为 `Frozen Queue` / `desired-frozen` 的 prompt 不再进入 launchable generated/consumed inventory，也不会因旧 launch-state 残留而继续显示为 consumed/launched 或被 manager recovery 复活。本轮 active-worker followthrough 仍未复现新的 repo-side gap：`develop` truth surface 先对齐到 continuity `20260324-033747`，随后又继续前进到 `20260324-034106`，且 `live-status` 与 `manager-worker-launch-state.env` 在两个时间切片都保持一致。最新 canonical surface now shows both generated and consumed truth pointing to `20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt`, `queued_worker_prompts=none`, and `active_running_worker_count=1`. Remaining separate degraded state is still the stale-batch lane under `C-20260322-1801-B` / runtime-owned, not a new gap inside `I-20260322-0445`.
 - current_focus:
   - keep the issue in `in_verification` until one real `develop` post-merge `freely chat` acceptance confirms the same behavior in the application-native real environment
   - preserve recovery semantics so prompt-consumed delegated ids only stay hidden while the current AI is actually running
+  - keep the worker writeback scoped to truthful verification artifacts: current truth-surface alignment is `live-status == manager-worker-launch-state.env`, and the newest canonical `develop` snapshot at `20260324-034106` now shows the same-family worker prompt as both generated and consumed with one active running worker while the stale-batch lane remains separately owned by `C-20260322-1801-B`
   - treat this worktree as `merge-ready` for the absorbed frozen-queue runtime fix plus verification writeback, but not `delete-ready` until that develop acceptance is recorded through the native closeout path
 - verification:
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
@@ -25,7 +26,28 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reconciles-stale-frozen-consumed-prompt`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-frozen-worker`
   - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+  - `bash /Users/zhaoyu/Downloads/code/my-freely/freely/bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `bash /Users/zhaoyu/Downloads/code/my-freely/freely/bin/freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `cat /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-worker-launch-state.env`
   - `./bin/governance-check`
+
+## 2026-03-24 Active Worker Launch-State Reconcile Followthrough
+
+- Reproduced the reported control-plane drift as a time-sliced acceptance snapshot rather than a new repo regression:
+  - manager continuity `20260324-032208` recorded an earlier `develop` surface where `live-status` still showed `latest_manager_continuity_generated=/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-031409.md`, `latest_manager_worker_prompts_generated=none`, `latest_manager_worker_prompts_consumed=none`, and `active_running_worker_count=1`
+  - a later refresh at `2026-03-24T10:42Z` shows the truth surfaces moved forward again but still stayed aligned with each other: `live-status` and `.freely/run/manager-worker-launch-state.env` both point to continuity `20260324-033747`, keep the same prompt path `20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt`, show `latest_manager_worker_prompts_consumed=none`, `queued_worker_prompts` on that same prompt, and `ACTIVE_RUNNING_WORKER_COUNT=2`
+  - `fleet-status` still lists two running workers at that earlier slice: this followthrough worktree plus dirty stale-batch worktree `feature/pre-test-merge-lifecycle-management-followthrough-20260324` with `launch=fresh_with_handoff`
+  - a final canonical recheck at `2026-03-24T12:15:17Z` shows the truth surfaces advanced again and still stayed aligned: `live-status` and `.freely/run/manager-worker-launch-state.env` now both point to continuity `20260324-034106`, set generated and consumed truth to the same `20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt` prompt, keep `queued_worker_prompts=none`, and report `ACTIVE_RUNNING_WORKER_COUNT=1`
+- Conclusion: no new repo-side runtime gap was reproduced inside `docs/system/workspace/scripts/runtime/freely`. The launch-state truth for `I-20260322-0445` continues to track the latest manager continuity even as the protected-surface state keeps moving. The only separate degraded discrepancy is the stale-batch lane, which still belongs to `C-20260322-1801-B` / runtime recovery rather than this issue's latest-continuity contract.
+- Focused verification on 2026-03-24:
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+  - `bash /Users/zhaoyu/Downloads/code/my-freely/freely/bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `bash /Users/zhaoyu/Downloads/code/my-freely/freely/bin/freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `cat /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-worker-launch-state.env`
+  - `./bin/governance-check`
+- Result: current `develop` truth surfaces are aligned across both observed slices. The earlier `033747` state was truthfully an in-flight queued/running slice, and the later canonical `034106` recheck advanced to generated+consumed truth for the same prompt without surfacing any new repo-side implementation gap. This worker lane therefore stays `in_verification` without a new code change. Remaining work is still the same manager-owned protected-environment closeout plus separate runtime handling of the stale-batch lane.
+- Final worker-side judgement after the `20260324-034106` recheck: this feature worktree should not reopen implementation scope. It should remain verification-only and hand final completion / cleanup judgement back to manager-owned canonical `develop` acceptance once that closeout artifact is written.
 
 ## 2026-03-24 Same-Continuity Reconcile Followthrough
 
