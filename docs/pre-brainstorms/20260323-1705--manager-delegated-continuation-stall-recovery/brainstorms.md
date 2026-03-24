@@ -241,6 +241,38 @@
   - 当前 worktree 仍应保持 `retain-for-followthrough`
   - delete / retirement gate 仍不能打开
 
+## continuity guard writeback（2026-03-24 02:23 PST）
+
+- 本轮 fresh session 继续先执行 worker-side `live-status` 复核，再决定 canonical writeback 是否需要沿用上一轮“当前 consumed truth 缺席”的表述。
+- 最新 worker lane 的 `live-status` 现在显示：
+  - `last_state_updated_at=2026-03-24T09:23:30Z`
+  - `activity_state=ai_active`
+  - `last_ai_state=down`
+  - `last_exit_reason=ai_exit_rc_0`
+  - `last_launch_kind=fresh`
+  - `last_rotation_reason=initial_start`
+  - `intake_active_items=32`
+  - `intake_delegated_items=32`
+  - `current_prompt_has_delegated_continuation=1`
+  - `latest_manager_continuity_generated=unavailable`
+  - `latest_manager_worker_prompts_generated=none`
+  - `pending_delegated_continuation_ids` 继续包含当前 lane 的 `20260323-234407...`、`20260324-002656...` 与 `20260324-021757...`
+  - `last_consumed_delegated_continuation_ids` 也再次覆盖同一批 32 个 delegated continuation ids
+  - `last_consumed_delegated_continuation_at=2026-03-24T09:18:01Z`
+  - `current_focus.prompt_file=.freely/run/prompt-20260324-022330.txt`
+  - `deep_refs.last_tool_session_id=019d1f23-0255-7c83-b56f-cffe2c64ab40`
+- 这说明当前 proof gap 需要进一步被精确表述成“摇摆而非单向缺失”：
+  - 上一轮 worker lane 一度退回到 `last_consumed_delegated_continuation_ids=none`
+  - 本轮又重新回到 `pending` / `consumed` 32/32 全量重叠
+  - 因此问题不再只是“consumed truth 当前缺席”，而是“consumed truth 既不稳定，也没有被稳定绑定到当前 prompt cycle / 当前 stalled intake”
+- 所以当前 canonical 结论依旧不变：
+  - prompt-level absorption 仍可见，candidate 继续有 canonical owner，不能静默丢弃
+  - consumed truth 即使再次出现，也仍只能证明 runtime 记录过某批 consumed ids；它还不能稳定回答“当前 prompt cycle 真正吸收的是哪个 stalled intake”
+  - `specific stalled intake id -> current manager prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict` 这条绑定链仍未冻结成稳定 acceptance anchor
+  - 当前 route 继续保持 `pre_brainstorm`
+  - cleanup 继续保持 `retain-for-followthrough`
+  - delete / retirement gate 仍不能打开
+
 ## 与相邻 issue 的边界
 
 - 不吸收到 `runtime-worker-launch-linkage-and-stall-recovery-governance`
