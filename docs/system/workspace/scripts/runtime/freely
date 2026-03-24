@@ -1987,10 +1987,47 @@ manager_ai_stalled_with_pending_intake() {
   (( now - log_mtime >= threshold_secs )) || return 1
 }
 
+latest_active_intake_meta_mtime_for_project() {
+  local project="$1"
+  local intake_root meta_file status mtime latest_mtime=""
+  intake_root="$(intake_dir_for_project "$project")"
+  [[ -d "$intake_root" ]] || return 1
+  while IFS= read -r meta_file; do
+    [[ -f "$meta_file" ]] || continue
+    status="$(meta_env_value "$meta_file" "STATUS")"
+    case "$status" in
+      absorbed|dropped) continue ;;
+    esac
+    mtime="$(file_mtime_epoch "$meta_file" 2>/dev/null || true)"
+    [[ -n "$mtime" ]] || continue
+    if [[ -z "$latest_mtime" ]] || (( mtime > latest_mtime )); then
+      latest_mtime="$mtime"
+    fi
+  done < <(find "$intake_root" -mindepth 2 -maxdepth 2 -type f -name meta.env | sort)
+  [[ -n "$latest_mtime" ]] || return 1
+  printf '%s\n' "$latest_mtime"
+}
+
 prompt_file_has_delegated_continuation() {
   local prompt_file="$1"
   [[ -f "$prompt_file" ]] || return 1
   grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null
+}
+
+manager_ai_prompt_superseded_by_new_intake() {
+  local project="$1" threshold_secs="${2:-20}"
+  local ai_pid prompt_file prompt_mtime latest_intake_mtime now
+  ai_pid="$(manager_ai_pid_for_project "$project")"
+  [[ -n "$ai_pid" ]] || return 1
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  prompt_file_has_delegated_continuation "$prompt_file" || return 1
+  prompt_mtime="$(file_mtime_epoch "$prompt_file" 2>/dev/null || true)"
+  latest_intake_mtime="$(latest_active_intake_meta_mtime_for_project "$project" 2>/dev/null || true)"
+  [[ -n "$prompt_mtime" && -n "$latest_intake_mtime" ]] || return 1
+  (( latest_intake_mtime > prompt_mtime )) || return 1
+  now="$(date +%s)"
+  (( now - latest_intake_mtime >= threshold_secs )) || return 1
 }
 
 manager_ai_stalled_after_delegated_continuation_prompt() {
@@ -2030,6 +2067,10 @@ manager_ai_runtime_recovery_reason() {
   local project="$1" threshold_secs="${2:-90}"
   if manager_ai_stalled_with_pending_intake "$project" "$threshold_secs"; then
     printf 'manager_ai_stalled_with_pending_intake\n'
+    return 0
+  fi
+  if manager_ai_prompt_superseded_by_new_intake "$project"; then
+    printf 'manager_ai_prompt_superseded_by_new_intake\n'
     return 0
   fi
   if manager_ai_stalled_after_delegated_continuation_prompt "$project" "$threshold_secs"; then
