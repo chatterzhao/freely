@@ -224,9 +224,36 @@ Freely 后续应具备能力去判断：
   - `manager-worker-launch-state.env`：runtime 消费镜像
   - `live-status`：可观察镜像
 - 也就是说，stale `pre-test-merge` 不是先发明“新 watchdog 状态”，而是先让 manager continuity 写出可消费字段，再由 runtime 镜像到 launch state / live-status
-- 承载语法也要冻结成固定可解析块，而不是自由叙述。当前建议在 manager continuity 内加入固定标题块：
-  - `Validation batch governance:`
-  - 后续每行固定 `- key: value`
+- 承载语法也要冻结成固定可解析块，而不是自由叙述。当前先把候选语法冻结成 `Validation batch governance:` `v1`：
+  - 固定标题：`Validation batch governance:`
+  - 标题下方紧跟连续的 `- key: value` 行；遇到空行即视为块结束
+  - 第一行固定为 `- block_format_version: v1`
+  - key 顺序固定，避免 runtime / cleanup skill 靠全文搜索或无序匹配推理
+  - 缺失但必须保留的值统一写字面量 `unavailable`，而不是省略该 key
+  - 多值字段先保持单行字符串：`replay_source_manifest` / `replay_order` / `superseded_worker_prompts` 用 `; ` 连接，避免与绝对路径中的 `:` 冲突
+- 当前建议 specimen：
+
+```text
+Validation batch governance:
+- block_format_version: v1
+- validation_batch_id: pre-test-merge@20260324-001322
+- validation_batch_state: stale
+- validation_batch_mode: read_only_cleanup
+- stale_reason: develop_advanced
+- lifecycle_decision: rebuild
+- integration_target: develop
+- source_batch_base: refs/heads/develop@abc1234
+- replay_source_manifest: /abs/feature-a;/abs/feature-b
+- replay_order: feature/a -> feature/b
+- retire_evidence_ref: unavailable
+- remaining_cleanup_requirement: post_merge_acceptance;verified-retirable;retired
+- acceptance_contract_state: incomplete
+- acceptance_contract_source: /abs/docs/epics/.../pre-tests.md
+- acceptance_contract_blocker: missing_post_merge_acceptance
+- superseded_worker_prompts: /abs/.freely/run/worker-prompts/old-a.txt
+- superseded_worker_prompts_applied_at: unavailable
+```
+
 - runtime 只解析这个块，不从普通自然语言段落推理
 
 ### E. IBM 到 manager continuity 的最小桥
@@ -435,6 +462,144 @@ Freely 后续应具备能力去判断：
 - 这轮还补清了一个容易误判的边界：milestone 里的 issue `completed` 不等于 worktree 已可删除；若 merge / cleanup / `verified-retirable` / `retired` 链条未闭合，仍不得删除最后一个 owner worktree
 - 在 machine-readable stale state、manager lifecycle transaction、runtime consumption gate 还没冻结前，不应直接实现局部 patch，否则很容易继续出现“修了 watchdog，又退回 manager/worker 自环”的倒退
 
+## 最新 continuation 收紧
+
+- `20260324-001134-continuation-dogfood-watchdog-fr` 没有引入新的平行问题；它只是把 `C-20260322-1801-B` 的最小 contract 再钉实一层
+- 当前 worker lane 吸收的是 delegated continuation `20260324-030713-manager-worker-20260324-021853-worker-pre-test-merge-lifecycle-management-followthrough-codex`；它没有改写 route_kind，仍然是 `continuation -> pre_brainstorm`
+- 当前稳定结论不是“这个能力落在某一个组件里”，而是：
+  - `manager continuity` 作为唯一 stale-batch truth surface
+  - `runtime launch state` / `live-status` 只做 mirror + hard gate
+  - `branch/worktree governance` 只消费已有 judgement/evidence 做 replay / retire / delete gate
+- 因此，这条能力现在应被理解成一个 combined minimal contract，而不是单点 `runtime status` 补丁、单点 `manager patrol` 补丁，或单点 `branch-management` 文案增强
+- supporting pools 也都在强化同一个结论：
+  - 现有 completed issue `I-20260322-1801` 明确只负责职责定义，不负责 stale-batch capability materialization
+  - 语义审计 pre-brainstorm 只把这条能力当 supporting evidence，没有把它升级成 IBM
+  - 当前仓库没有专门的 `docs/recovery/**`，而 `docs/progress/**` / review / test 只提供 delete gate、`verified-retirable` 和 acceptance bridge 的 supporting evidence，没有给出足以进 IBM 的稳定 contract
+  - human chat / session evidence 当前只体现为 delegated continuation intake 与 `.freely/run/prompt-20260324-030714.txt`，它们都要求继续吸收进现有 candidate，而不是新开 lifecycle
+  - 当前 `./bin/freely live-status --project <this-worktree>` 也只证明 continuation 已被当前 worker 吸收：`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024942/025910/030713` 等 intake，而 `latest_manager_continuity_generated=unavailable` / `latest_manager_continuity_consumed=unavailable` 继续说明 manager truth artifact 仍未稳定到可直接拿来做 IBM 输入
+  - handoff 要求读取的 `manager-continuity-20260324-021853.md` 在当前 worktree 中并不存在，因此本轮不能把某份缺失的 manager truth artifact 当成“已经稳定可消费”的 IBM 输入；它只能继续作为 contract freeze 的缺口记录
+  - 仓库内没有新的 github issue 落点把该问题升级成外部已定界 issue；`PROJECT_INTENT` 只继续要求扫描这些池，而没有改写本 candidate 的 owner
+
+## materialization 前仍缺的验证矩阵
+
+- manager 侧验证：
+  - stale batch 一旦被判定，manager continuity 必须输出 `retire/rebuild/freeze` 一类 lifecycle decision，而不是继续普通 verification
+  - `acceptance_contract_state/source/blocker` 必须能把 `pre-tests.md` 质量缺口投影出来，而不是让 runtime 自己猜
+- runtime 侧验证：
+  - stale batch 不能再正常 boot 成 active verification surface
+  - superseded queued worker prompt 会留下 machine-readable consumed/applied evidence
+- branch/worktree 侧验证：
+  - 若同一能力仍需验证，必须 replay 来源 feature 到 fresh `pre-test-merge` batch
+  - delete gate 必须能拒绝至少三类误删：`merged + clean`、issue `completed`、stale batch stopped 但仍承载 replay/source evidence
+- 在这些验证矩阵没有冻结前，仍不应进入 IBM materialization
+
+## combined minimal contract v0
+
+- 这轮先冻结到字段级草案，但仍保留在 pre-brainstorm：
+  - manager continuity 是唯一 stale-batch truth surface
+  - runtime launch state / `live-status` 只能 mirror manager judgement，并负责 hard gate
+  - branch/worktree governance 只能消费 manager 已写出的 judgement / evidence，不得自行重算 stale legitimacy
+- manager continuity 最小字段块：
+  - `validation_batch_id`
+  - `validation_batch_state=active|stale|retired`
+  - `validation_batch_mode=normal|read_only_cleanup|rebuild_planning`
+  - `stale_reason=develop_advanced|protected_env_diverged|cleanup_chain_broken|superseded`
+  - `lifecycle_decision=continue_verification|freeze|retire|rebuild|replay_sources`
+  - `integration_target`
+  - `source_batch_base`
+  - `replay_source_manifest`
+  - `replay_order`
+  - `retire_evidence_ref`
+  - `remaining_cleanup_requirement`
+  - `acceptance_contract_state=grounded|incomplete|not_applicable|unavailable`
+  - `acceptance_contract_source`
+  - `acceptance_contract_blocker`
+  - `superseded_worker_prompts`
+  - `superseded_worker_prompts_applied_at`
+- runtime mirror / hard gate 最小消费面：
+  - 只镜像 `validation_batch_state`
+  - 只镜像 `validation_batch_mode`
+  - 只镜像 `lifecycle_decision`
+  - 只镜像 `acceptance_contract_state`
+  - 当 `validation_batch_state=stale` 且 `validation_batch_mode!=normal` 时，拒绝把该 batch 作为普通 active verification surface 启动
+  - 当 `superseded_worker_prompts_applied_at` 缺失时，不得宣称旧 queued prompt 已被完全吸收
+- branch/worktree governance 最小消费面：
+  - `replay_source_manifest`
+  - `replay_order`
+  - `retire_evidence_ref`
+  - `remaining_cleanup_requirement`
+  - `lifecycle_decision`
+  - `validation_batch_state`
+  - 只在 manager 已判定 `rebuild|replay_sources|retire` 后，继续做 replay / cleanup / delete gate 判断
+
+## delete gate refusal samples
+
+- `specimen-S1 merged-clean-only`
+  - 最小输入：
+    - worktree `merged + clean`
+    - issue 可为 `completed` 或 `in_verification`
+    - `retire_evidence_ref=unavailable`
+    - `remaining_cleanup_requirement` 仍包含 `cleanup_evidence`、`verified-retirable` 或 `retired`
+  - 必要 supporting evidence：
+    - 当前 manager continuity `Validation batch governance:` `v1` 块
+    - closeout / cleanup 证据中不存在 `verified-retirable` 与 `retired`
+  - 期望结论：`delete_denied`
+- `specimen-S2 completed-only`
+  - 最小输入：
+    - issue `phase_state=completed`
+    - merge 已发生或已计划，但 `acceptance_contract_blocker!=none`，或 `remaining_cleanup_requirement` 仍包含 `post_merge_acceptance` / `cleanup_chain`
+    - 没有 `verified-retirable` 或 `retired` 证据
+  - 必要 supporting evidence：
+    - issue / pre-tests / code-review 指针能证明 `completed` 不是 delete 放行条件
+    - 当前 continuity 块能把 acceptance 缺口或 cleanup 缺口投影出来
+  - 期望结论：`delete_denied`
+- `specimen-S3 stale-stopped-source-not-absorbed`
+  - 最小输入：
+    - `validation_batch_state=stale|retired`
+    - `lifecycle_decision=rebuild|replay_sources|retire`
+    - `replay_source_manifest` 非空
+    - `retire_evidence_ref=unavailable`，或现有 evidence 仍不能证明 fresh batch 已吸收 source manifest
+  - 必要 supporting evidence：
+    - stale batch continuity 块
+    - fresh batch / replay closeout 证据不存在，或未能指向 manifest absorption
+  - 期望结论：`delete_denied`
+- 当前 delete gate specimen 不另造新状态词；它们只证明 `Validation batch governance:` `v1` 块与既有 `completed` / cleanup gate / `verified-retirable` / `retired` 组合足以拒绝三类误删
+
+## pre-IBM validation matrix draft
+
+- manager truth surface:
+  - stale 判定后 continuity 必须从 `continue_verification` 切到 `freeze|retire|rebuild|replay_sources`
+  - acceptance bridge 缺失时必须输出 `acceptance_contract_state=incomplete`
+- runtime gate:
+  - stale batch 不能以 normal verification mode 启动
+  - superseded prompt 必须留下 applied evidence
+- replay / retire governance:
+  - 同能力续验时必须产出 fresh batch 计划，而不是继续消费旧 batch
+  - replay source manifest / replay order / retire evidence 至少可被 manager 与 cleanup skill 共读
+- delete guard:
+  - 三类误删样例都能被拒绝
+  - `completed` 只能作为 delete gate 输入之一，不能独立放行
+- acceptance bridge:
+  - `Issue + Brainstorm + PRD -> pre-tests.md` 缺口可稳定投影到 `acceptance_contract_state/source/blocker`
+  - testing closeout 仍与 `pre-tests.md` 质量 gate 分离，不混成单一完成态
+
+## 当前仍未冻结的点
+
+- `stale_reason` 与 `lifecycle_decision` 是否需要更细枚举，还是保持最小集合
+- `retire_evidence_ref` 与 `remaining_cleanup_requirement` 是否足够支撑 future delete guard / hook，还是仍需额外的 fresh-batch absorption 指针
+- 这份 v0 contract 是否已足够小到能单独 materialize 成 IBM，而不是还需再做一轮独立 acceptance review
+
+## 本轮独立 review 结论
+
+- `fresh_with_handoff` 续接后的 canonical 复核没有推翻上一轮 writeback：supporting pools 仍只支持 `stay_pre_brainstorm`
+- 当前已经有一轮 supporting-pool 独立对读，但它给出的结论仍是“继续保留 `combined minimal contract v0`，不要直接开 IBM”
+- 新增的 explorer contract-freeze review 进一步收窄了顺序：应先冻结 manager continuity 固定语法与最小字段块，再用 delete gate refusal samples 证明其足以支撑 runtime gate 与 cleanup/delete 判断，而不是并行扩写更多子能力
+- 因此，`next_action` 不再是泛化的“先去做 review”，而是继续把 review 后仍未冻结的部分收紧成可 materialize 的 issue contract：
+  - manager continuity 的 `Validation batch governance:` `v1` 固定承载语法与最小字段块
+  - `specimen-S1/S2/S3` 对应的 refusal specimen / evidence 组合，用于证明这组字段已足够支撑 runtime gate 与 cleanup/delete 判断
+  - `retire_evidence_ref` / `remaining_cleanup_requirement` 是否仍需额外补强，才能支撑 cleanup skill、future hook 与 fresh-batch absorption 共读
+- 在这三块还没冻结前，当前 lane 仍应停在 `continuation -> pre_brainstorm`
+
 ## 需要冻结的开放问题
 
 1. `pre-test-merge` 的唯一职责是什么。
@@ -445,3 +610,5 @@ Freely 后续应具备能力去判断：
 6. `worker self-loop exit` 是否应单开 candidate，并用什么 phase-progress 规则定义停滞。
 7. 哪些现有状态与证据组合才表示“继续推进三层 loop”，哪些组合才表示“可以进入 delete worktree”。
 8. 最终 delete worktree / delete branch 门禁若要由 hook / guard 兜底，应该投影到哪一层，以及最小拒绝语义是什么。
+9. combined minimal contract 的边界是否已经足够稳定，可以作为单一 issue materialization，而不是继续分散在 manager/runtime/cleanup 三处叙述里。
+10. 独立 acceptance review 是否已经足够证明 supporting pools 都只支持 `stay pre_brainstorm`，而不是隐含要求现在就开 IBM。
