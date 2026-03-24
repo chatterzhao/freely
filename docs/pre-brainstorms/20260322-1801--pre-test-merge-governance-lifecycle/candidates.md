@@ -28,20 +28,91 @@
   - role: author
 
 ### C-20260322-1801-B
+- candidate_format_version: v2
 - title: pre-test-merge lifecycle management capability for Freely
-- problem: 即使治理规则写清了，Freely 仍缺少能够自动识别 `pre-test-merge` 是否 stale、是否需要 retire、是否能 promote、以及是否必须 replay 来源 feature 的能力。
+- problem: 即使治理规则写清了，Freely 仍缺少把 stale `pre-test-merge` 收口成治理事务的能力：它需要 machine-readable stale state、manager lifecycle transaction、runtime gate，以及可追溯的 replay/retire evidence，而不是继续靠人工判断。
 - why_now: 这次问题已经证明“只靠人记住规则”不够。Freely 作为未来的开发工具，需要把这套判断 materialize 成可执行能力，才能避免下一次再次手工误用。
-- acceptance_hint:
-  - runtime 或 status surface 能暴露当前 `pre-test-merge` 批次状态
-  - branch-management 相关能力能识别 `pre-test-merge` 的角色和失效边界
-  - patrol / promotion 判断能提示 stale batch、replay requirement 和 cleanup requirement
-  - 该能力不改变现有实现语义，只补判定与可见性
+- acceptance_criteria:
+  - manager 在 stale `pre-test-merge` 上写出唯一 machine-readable stale state，且真相面可被 continuity / status surface / runtime gate 一致消费
+  - stale 后 manager 继续使用既有 `ownership / restart_point / next_action` 词典，但必须补齐 `replay source manifest`、`replay order`、`retire evidence`、`remaining cleanup requirement`
+  - runtime 对 stale batch 只允许 read-only patrol、cleanup handoff、rebuild/replay handoff，不再把它恢复成普通 verification 会话
+  - 所有指向 stale batch 的旧 queued worker prompts / delegated launches 都会被 supersede 或失效，不再继续消费旧 prompt 池
+  - 上述 contract 优先落在现有真源：manager continuity 为唯一治理真相面，`manager-worker-launch-state.env` 与 `live-status` 仅做消费镜像，不新增平行状态文件
+  - manager continuity 必须带批次身份锚点与固定承载语法，至少包括 `validation_batch_id`、`integration_target`、`source_batch_base`，并以固定可解析块承载，而不是自由文本
+  - manager continuity 还必须固定承载 `acceptance_contract_state`、`acceptance_contract_source`、`acceptance_contract_blocker`，把 IBM acceptance 完整性桥接成 runtime 可消费字段，而不是让 runtime 读取 issue/brainstorm/prd 自行推理
+  - runtime 在应用旧 prompt supersede 后，必须留下 machine-readable `superseded_worker_prompts_applied_at` 或等价信号，证明旧 prompt 已停止被消费
+  - 当 issue 的 `I + B + PRD -> pre-tests.md` 派生链不足以恢复 issue-level acceptance、`post-merge acceptance` 或目标验证环境时，manager 必须写出 `acceptance_contract_state=incomplete` 与 blocker，而不是让 stale/retire 流程伪装成“只剩执行”
+  - `pre-tests.md` 质量检查与 testing closeout 必须分开建模：前者确认 acceptance contract 是否完整，后者确认 acceptance 是否已真实执行并留痕
+  - testing closeout 默认优先 integration / end-to-end 与 application-native real-environment testing evidence；若缺少这些证据，不得把 lane 判成 `completion_verification done` 或允许 worktree retirement
+- promotion_gate:
+  - 冻结 stale 判定的最低 machine-readable 字段、真相面和消费路径
+  - 冻结 manager lifecycle transaction 与现有 patrol 词典的映射，不新增平行状态系统
+  - 冻结 replay source manifest / replay order / retire evidence 的最小 schema
+  - 冻结 `superseded_worker_prompts` 与 stale batch gate 的联动，保证旧 queued prompt 不会继续被 runtime 消费
+  - 冻结 `validation_batch_mode=read_only_cleanup|rebuild_planning`，确保 `collect_cleanup_evidence` 不会被误读成恢复普通 verification
+  - 明确 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链与 stale governance 的连接点，避免把 acceptance contract 缺失误修成纯 runtime stale 判定
+  - 冻结 testing closeout 的最低 evidence bar，明确 application-native real-environment testing 属于主验证面；Freely self-host 时其当前实例才是 `freely chat`
+- open_questions:
+  - `develop` 前进、protected-env 独有差异、cleanup/replay 证据未齐三者的优先级如何定义
+  - stale 后哪些过渡动作被允许保留在 manager-owned lane 中，哪些必须直接进入 rebuild/cleanup
+  - 固定语法块最终采用 markdown bullet block、front-matter，还是其他 bash 易解析格式
+  - `replay_plan_state=pending|complete` 是否足够表达 manifest 已冻结但仍待执行的状态
+  - manager 识别 IBM acceptance 缺口时，是否只消费已有 issue/brainstorm/prd/pre-tests artifact，还是需要额外的 IBM completion signal
+  - `acceptance_contract_blocker` 的枚举是否还要覆盖 `missing_pre_merge_acceptance` 或 `missing_protected_env_boundary`
+  - testing closeout 的 machine-readable evidence 应落在 issue / code-review / progress / runtime 哪个组合面，才能既可恢复又不制造平行真相
+- acceptance_reviews:
+  - reviewer: `codex + subagent panel (Erdos/James/Singer)`
+    mode: `independent candidate acceptance review`
+    summary: `Direction valid; contract had to be narrowed to stale-batch governance, then frozen further around manager continuity truth surface, IBM-to-manager acceptance bridge, replay/retire evidence, and testing closeout bar.`
+    verdict: `needs_more_contract_work_before_materialization`
 - priority: P1
 - status: proposed
-- decision_reason: 这是治理规则落成工具能力的下一步，不应和职责定义混在同一个 issue 中。
+- decision_reason: 这是治理规则落成工具能力的下一步，但 scope 应收窄到 stale `pre-test-merge` lifecycle transaction，不应继续绑入一般性的 worker self-loop exit。
 - promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
-- next_action: `C-20260322-1801-A` 已 materialize 成正式 issue；当前保持在 pre-brainstorm，等职责定义 issue 写稳后，再决定 stale-batch detection、batch retirement、replay requirement 和 promote visibility 应落在 runtime/status、branch-management、manager patrol 还是组合能力中
+- next_action: `C-20260322-1801-A` 已 materialize 成正式 issue；当前继续 pre-brainstorm，但 focus 收窄为三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`。在 replay/retire manifest 及状态真相面冻结前，不直接实现
+- revisit_trigger: 当 stale state 的 canonical 落点、manager lifecycle transaction 字段、runtime gate 消费路径，以及 `acceptance_contract_state/source/blocker` 如何桥接 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链都能冻结为 issue contract 时，重新进入 materialization 判断
+- session_refs:
+  - tool: codex
+  - session_id: current-thread
+  - jsonl_path: unavailable://codex-thread-only
+  - role: author
+
+### C-20260322-1801-C
+- candidate_format_version: v2
+- title: worker self-loop exit and scheduler closeout governance
+- problem: Freely 缺少识别 worker verification-only / continuity-refresh 低价值自环并把 lane 回交 manager 的通用调度能力，导致 worker 槽位被长期占住，新的 lane 无法起跑。
+- why_now: 这次 dogfood 里真正堵塞新 lane 的不是默认并发数 2，而是两个 worker 都停在低价值循环中。如果不把它独立建模，未来即使 stale `pre-test-merge` 被治理，其他 lane 仍会复现同类占槽问题。
+- acceptance_criteria:
+  - 定义 machine-readable `phase progress` 与 `loop stall` 判据，能区分正常 verification 收口与低价值自环
+  - worker 达到阈值后会回交 manager，由 manager 重新决定 merge / freeze / cleanup / queue，而不是 worker 自行做生命周期决策
+  - manager 在接收 self-loop exit 后会释放容量或重新排队，避免同一 lane 立刻以新 prompt 重占原槽位
+  - 若当前 lane 被回交，manager continuity / runtime launch state 能把旧 prompt 标记为 superseded，而不是继续留在 active/queued 集合里
+  - worker continuity 必须先作为 stall 真相面，runtime launch state 只镜像 manager 已采纳的 supersede / capacity 结果
+  - 若 lane 的上游 `Issue + Brainstorm + PRD -> pre-tests.md` acceptance 面不完整，manager 必须允许把问题回交为 IBM/acceptance contract 缺失，而不是仅按 scheduling stall 处理
+  - 若 lane 还没跑完 integration / application-native real-environment testing closeout，manager 不得把“低活动”误判成可退休；它必须区分“未测完”与“测完后自环”
+- promotion_gate:
+  - 冻结 phase progress 的最小证据标准
+  - 冻结 loop stall 阈值与排除误伤正常验证/研究的保护条件
+  - 冻结回交 manager 后的容量释放和 supersede 规则
+  - 冻结 worker continuity 到 manager continuity 的最小承载语法，避免 stall 判断停留在自由叙述
+- open_questions:
+  - 哪些 artifact diff 或 phase_state 变化算真正推进
+  - 连续多少轮、哪类重复 writeback 才能判为低价值自环
+  - 与 `fresh_with_handoff`、resume/rotate 的关系如何定义
+  - lane 回交 manager 后，如何区分“runtime 自环”与“上游 `I + B + PRD -> pre-tests.md` acceptance 面本来就不完整”
+- acceptance_reviews:
+  - reviewer: `codex + subagent panel (Erdos/James/Singer)`
+    mode: `independent candidate acceptance review`
+    summary: `This capability should remain split from stale pre-test-merge governance to keep regression surface smaller and force a separate machine-readable stall/handback contract.`
+    verdict: `split_confirmed_but_not_ready_to_materialize`
+- priority: P1
+- status: proposed
+- decision_reason: 这是通用 scheduling / closeout 能力，不应继续隐含在 `pre-test-merge` stale governance 里。
+- promoted_issue_path: `pending://worker-self-loop-exit-and-scheduler-closeout-governance`
+- milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
+- next_action: 继续 pre-brainstorm，先冻结 phase-progress、loop-stall 与 capacity release 的 machine-readable 规则，再决定是否 materialize
+- revisit_trigger: 当 loop stall 判据、manager 回交 contract 与容量释放规则都能冻结成 issue contract 时，重新进入 materialization 判断
 - session_refs:
   - tool: codex
   - session_id: current-thread
