@@ -22,6 +22,10 @@
 7. 脚本提示词真源与高层 active truth 一致：
    - `compose-context-source-prompt.sh` 不再把 `auto-loop` 写成“第二层”
    - `scripts/README.md` 不再暗示脚本入口仍沿用旧层级包含语义
+8. 其余 runtime-facing active truth / prompt contract 与高层语义一致：
+   - `worker-agent` / `lead-agent` / `context-source-skill` / `dev-loop-execution` / `doc-pre-brainstorm-execution` / `watchdog-control-plane`
+   - `start-lead-agent.sh`
+   - 不残留“局部 loop 自宣 terminal completion / cleanup / retire”的语义
 
 ## Verification
 
@@ -33,6 +37,7 @@
    - local loop exit equals outer terminal completion
    - worker can declare `completed / cleanup / retire` without `auto-loop` judgement
    - watchdog alone can keep blindly relaunching forever after short-window restart churn without manager judgement
+4. manual audit of runtime-facing contract files to confirm prompt/script entrypoints and role docs do not drift from the sibling-loop model
 
 ## Non-goals
 
