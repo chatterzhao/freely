@@ -78,7 +78,7 @@
     - `current prompt cycle`: anchored to `.freely/run/prompt-20260324-024527.txt`
     - `consumed event anchor`: only partially anchored through `last_consumed_delegated_continuation_at=2026-03-24T09:41:25Z` plus the overlapping id surface
     - `no-new-continuity/handoff verdict`: observable, because `latest_manager_continuity_generated=unavailable` and `latest_manager_worker_prompts_generated=none` still hold
-    - net result: the chain currently stops at `prompt cycle + consumed surface`, not at `prompt cycle + consumed event bound to specific stalled intake`
+    - net result: the chain currently stops at `prompt cycle + consumed surface`, not at the full specimen-chain `specific stalled intake -> current prompt cycle -> consumed event anchor -> no-new-continuity/handoff verdict`
   - historical-but-non-stable consumed surface:
     - 前几轮 `live-status` 曾短暂暴露过 `last_consumed_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_at`
     - 随后 worker lane 一度退回 `last_consumed_delegated_continuation_ids=none`
@@ -238,11 +238,12 @@
 - next_action:
   - 保持 active candidate；继续用真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被 runtime recovery 稳定推进到 cleanup / retirement followthrough，然后再判断是 materialize 为独立 issue，还是吸收到更高层 stall/recovery issue 族。
   - 下一轮优先验证 runtime 能否在当前 `consumed` truth 摇摆的情况下，仍把 stalled intake 稳定绑定到当前 prompt cycle；若后续继续出现 `pending/consumed` 并存，也仍要明确哪一个 stalled delegated continuation 真的被本轮 prompt 吸收。若两条路径都做不到，至少冻结一个不依赖人工解释 prompt excerpt 的等价 proof。
-  - 下一轮 dogfood writeback 必须显式写出一条 specimen chain，而不是只复述聚合 surface：
+  - 下一轮 dogfood writeback 必须显式写出一条 specimen-chain，而不是只复述聚合 surface，并把三个并列证明点都固定到同一链上：
     - `specific stalled intake id=<...>`
     - `current prompt cycle=<prompt file / session ref>`
     - `consumed event anchor=<timestamp / ids / equivalent proof>`
     - `stall verdict=no-new-continuity/handoff for that same chain`
+  - 在这三段 specimen-chain 没被同轮证据固定之前，本树继续视为 active canonical owner，不降级为 evidence-only，也不进入 IBM。
   - 将当前 `fresh_with_handoff/context_compacted` 的 continuity 事实继续视为 supporting evidence：它证明 runtime 已因上下文压缩做过续接，但不证明当前 prompt cycle 对 stalled intake 的 binding 已稳定；因此后续仍要把续接事实与 prompt-cycle absorption proof 分开验收。
   - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 canonical writeback 已继续收敛为本分支上的最新 continuity anchor lineage，下一步应先把这些独有提交吸收到上游，再决定 retirement。
   - 若再次发生会话轮换或 `context_compacted`，先把最新 continuity 结论写回当前 pre-brainstorm canonical artifacts，再继续扩大实现或 cleanup 判断。

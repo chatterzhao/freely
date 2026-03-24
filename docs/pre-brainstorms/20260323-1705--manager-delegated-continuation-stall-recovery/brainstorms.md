@@ -101,6 +101,18 @@
   - missing proof: `current stalled intake id -> current prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict`
   - 只要这条链还不能稳定观察，本候选就不能进入 IBM，也不能被 cleanup/retirement 视为已完成 proof
 
+### 这条 proof gap 现在应按三段 specimen-chain 理解
+
+- 当前真正未冻结的不是一个模糊“大 gap”，而是同一条 specimen-chain 上的三个并列证明点：
+  1. `specific stalled intake specimen`
+     - 必须先从 `20260323-234407...`、`20260324-002656...`、`20260324-021757...` 等并存 pending ids 中固定本轮 stall specimen。
+  2. `current prompt-cycle / consumed-anchor binding`
+     - 必须证明 `.freely/run/prompt-20260324-024527.txt` 与 `last_consumed_delegated_continuation_at=2026-03-24T09:41:25Z` 代表的是同一当前 prompt cycle，而不是历史 surface 的再次显现。
+  3. `same-chain stall verdict`
+     - 必须把 `latest_manager_continuity_generated=unavailable`、`latest_manager_worker_prompts_generated=none` 这类 no-new-continuity/handoff verdict 绑定回同一 specimen-chain，而不是仅作为背景性 supporting evidence。
+
+- 只要三段里任意一段还不能稳定复核，这条候选就仍然是 active pre-brainstorm owner，而不是 evidence-only 历史树。
+
 ## binding proof chain（当前冻结版本）
 
 - 目标不是证明 “某次 delegated continuation 曾被 consumed 过”，而是冻结一条可重复复核的单链：
