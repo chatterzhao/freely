@@ -4,8 +4,8 @@
 
 - 这轮 Freely 自举里，用户明确指出“固定 90 秒观察窗口”不如先看会话 `jsonl`、cycle log 和当前态末尾信号。
 - 现有 `live-status` 已经解决了“当前谁在跑、在做什么”的最小 CLI 面，但还没有把“如何判断仍在推进 / 已经空转 / 已具备插话着力点”收成统一协议。
-- Freely 未来要开发任意应用，不能把 `live-status / fleet-status / jsonl / cycle log` 写死成通用观察法；但 Freely 自己这些信号又确实是第一份有价值的 concrete profile。
-- CLI / TUI / GUI / future API 都需要暴露 Freely 的运行态给用户观察、插话和回放；多个 worktree、多个 subagent、多个会话/日志也要能被同一控制面解释。
+- Freely 未来要开发任意应用，不能把 `live-status / fleet-status / jsonl / cycle log` 写死成通用观察法；这些只是 Freely 自举时最先落地的 concrete profile。
+- CLI / TUI / GUI / future API 都需要暴露当前应用的运行态给用户观察、插话和回放；多个 worktree、多个 subagent、多个会话/日志也要能被同一控制面解释，但不同应用的具体 surface 可以不同。
 
 ## Problem
 
@@ -78,6 +78,7 @@ Freely 当前 concrete profile：
 - 当前有哪些实时日志 / 事件流可看
 - 默认展示多少，何时展开
 - 如何从“状态卡片”跳到实时流
+- 具体 transport 可以是日志、事件流、trace、console 或其他应用原生 stream，只要能提供 tail 和 deep ref
 
 Freely 当前 concrete profile：
 

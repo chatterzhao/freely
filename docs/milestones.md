@@ -378,17 +378,6 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，单独冻结 `phase progress`、`loop stall`、`manager handback`、`capacity release / supersede` 规则；同时补清 lane 回交后如何识别“其实是上游 `Issue + Brainstorm + PRD -> pre-tests.md` acceptance 面不完整”以及“其实还没完成 integration / application-native real-environment testing closeout”；在 machine-readable 阈值稳定前，不与 stale `pre-test-merge` gate 绑在一起实现
 - revisit_trigger: 当 low-value self-loop 的判据、manager 回交 contract、容量释放规则，以及与 IBM/`Issue + Brainstorm + PRD -> pre-tests.md` 缺口和 testing closeout 缺口的分流条件都能冻结成独立 issue contract 时，重新进入 materialization 判断
 
-12. `C-20260324-0406-A`
-- title: application-native runtime observation contract and observability planes for Freely
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
-- priority: P1
-- promoted_issue_path: `pending://application-native-runtime-observation-contract-and-observability-planes`
-- source_brainstorm: `docs/pre-brainstorms/20260324-0406--application-native-runtime-observation-contract/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260324-0406--application-native-runtime-observation-contract/candidates.md`
-- next_action: 继续 pre-brainstorm，先冻结四块 contract：`observation surface taxonomy`、`progress/stall/acceptance evidence order`、`Freely self-host profile mapping`、以及与 `C-20260322-0715-A` / `I-20260320-1945` / frontend probe lifecycle 的协作边界；在这些 contract 稳定前不进入实现，也不把 Freely 自身 `jsonl/cycle log` 规则硬编码成跨应用通用判据
-- revisit_trigger: 当 application-native observation contract、plane taxonomy、Freely self-host profile、以及多 worktree / 多 subagent 投影规则都能冻结成独立 issue contract 时，重新进入 materialization 判断
-
 6. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec
 - milestone_state: candidate
@@ -474,8 +463,8 @@ routing_policy:
 - promoted_issue_path: `pending://application-native-runtime-observation-contract-and-observability-planes`
 - source_brainstorm: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md`
-- next_action: 保持 active candidate；先冻结 `current-state/session/stream/fleet/artifact` 五类 observation planes、progress/stall/acceptance evidence 的最小 schema，以及 Freely self-host concrete profile；同时明确它与 `live-status`、`pre-test-merge acceptance stall`、frontend probe 三条线的承接关系，在这些边界稳定前不直接跳到 runtime patch 或 UI 实现
-- revisit_trigger: 当 application-native observation contract、Freely self-host concrete profile 与多平面状态面边界都足够稳定，且完成独立 acceptance review 后，重新进入 materialization 判断
+- next_action: 保持 active candidate；先冻结 `current-state/session/stream/fleet/artifact` 五类 observation planes、progress/stall/acceptance evidence 的最小 schema，以及 Freely self-host concrete profile 对这些 plane 的映射；同时明确它与 `live-status`、`pre-test-merge acceptance stall`、frontend probe 三条线的承接关系，在这些边界稳定前不直接跳到 runtime patch 或 UI 实现
+- revisit_trigger: 当 application-native observation contract、Freely self-host concrete profile 与多平面状态面边界都足够稳定，且完成独立 acceptance review 后，重新进入 materialization 判断；若需要保留其它应用的实现自由度，再进入 issue/IBM contract 冻结
 
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛
