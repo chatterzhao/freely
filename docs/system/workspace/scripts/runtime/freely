@@ -1693,13 +1693,17 @@ EOF
 }
 
 write_manager_worker_launch_state() {
-  local project="$1" continuity_generated="$2" prompts_generated_csv="$3" continuity_consumed="$4" launched_prompts_csv="$5"
+  local project="$1" continuity_generated="$2" prompts_generated_csv="$3" continuity_consumed="$4" launched_prompts_csv="$5" queued_prompts_csv="${6:-}" max_parallel_workers="${7:-}" active_worker_count="${8:-}" available_worker_slots="${9:-}"
   cat >"$(manager_worker_launch_state_file "$project")" <<EOF
 LAST_MANAGER_CONTINUITY_GENERATED="$continuity_generated"
 LAST_MANAGER_WORKER_PROMPTS_GENERATED="$prompts_generated_csv"
 LAST_MANAGER_CONTINUITY_CONSUMED="$continuity_consumed"
 LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$launched_prompts_csv"
 LAUNCHED_WORKER_PROMPTS="$launched_prompts_csv"
+QUEUED_WORKER_PROMPTS="$queued_prompts_csv"
+MAX_PARALLEL_WORKERS="$max_parallel_workers"
+ACTIVE_RUNNING_WORKER_COUNT="$active_worker_count"
+AVAILABLE_NEW_WORKER_SLOTS="$available_worker_slots"
 UPDATED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 EOF
 }
@@ -1724,6 +1728,16 @@ csv_append_unique_item() {
   else
     printf '%s\n' "$needle"
   fi
+}
+
+csv_conflicts_with_item() {
+  local csv="$1" needle="$2" item
+  [[ -n "$csv" && -n "$needle" ]] || return 1
+  IFS=',' read -r -a __csv_conflict_items <<<"$csv"
+  for item in "${__csv_conflict_items[@]}"; do
+    [[ -n "$item" && "$item" == "$needle" ]] && return 0
+  done
+  return 1
 }
 
 request_local_continuation_reentry() {
@@ -1947,6 +1961,129 @@ worker_prompt_target_worktree() {
   ' "$prompt_file"
 }
 
+worker_prompt_dispatch_metadata_value() {
+  local prompt_file="$1" key="$2"
+  [[ -f "$prompt_file" && -n "$key" ]] || return 0
+  awk -v desired_key="$key" '
+    function trim(value) {
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+      gsub(/`/, "", value)
+      return value
+    }
+    {
+      line=$0
+      gsub(/^[[:space:]]*-[[:space:]]*/, "", line)
+      if (line ~ /^[[:space:]]*$/) next
+      split(line, parts, ":")
+      if (length(parts) < 2) next
+      key_part=trim(parts[1])
+      gsub(/[[:space:]-]/, "_", key_part)
+      if (tolower(key_part) != tolower(desired_key)) next
+      sub(/^[^:]+:[[:space:]]*/, "", line)
+      print trim(line)
+      exit
+    }
+  ' "$prompt_file"
+}
+
+worker_prompt_dispatch_priority() {
+  local prompt_file="$1" value
+  value="$(worker_prompt_dispatch_metadata_value "$prompt_file" "dispatch_priority")"
+  if [[ -z "$value" ]]; then
+    value="$(worker_prompt_dispatch_metadata_value "$prompt_file" "priority")"
+  fi
+  value="$(printf '%s' "$value" | tr '[:lower:]' '[:upper:]')"
+  case "$value" in
+    P0) printf '0\n' ;;
+    P1) printf '1\n' ;;
+    P2) printf '2\n' ;;
+    P3) printf '3\n' ;;
+    P4) printf '4\n' ;;
+    *) printf '5\n' ;;
+  esac
+}
+
+worker_prompt_parallel_safe() {
+  local prompt_file="$1" value
+  value="$(worker_prompt_dispatch_metadata_value "$prompt_file" "parallel_safe")"
+  value="$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')"
+  case "$value" in
+    false|no|0) printf 'false\n' ;;
+    *) printf 'true\n' ;;
+  esac
+}
+
+worker_prompt_write_scope() {
+  local manager_project="$1" prompt_file="$2"
+  local value resolved_worktree
+  value="$(worker_prompt_dispatch_metadata_value "$prompt_file" "write_scope")"
+  if [[ -n "$value" ]]; then
+    printf '%s\n' "$value"
+    return 0
+  fi
+  resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+  printf '%s\n' "${resolved_worktree:-$prompt_file}"
+}
+
+manager_max_parallel_workers() {
+  local value="${FREELY_MANAGER_MAX_PARALLEL_WORKERS:-2}"
+  if [[ "$value" =~ ^[0-9]+$ ]] && (( value >= 1 )); then
+    printf '%s\n' "$value"
+  else
+    printf '2\n'
+  fi
+}
+
+all_repo_worktrees_for_project() {
+  local project="$1"
+  git -C "$project" worktree list --porcelain 2>/dev/null | awk '
+    /^worktree / { print substr($0, 10) }
+  '
+}
+
+worker_project_is_actively_running() {
+  local project="$1"
+  local supervisor_pid ai_pid
+  [[ "$(role_hint_for_project "$project")" == "worker" ]] || return 1
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  [[ -n "$supervisor_pid" || -n "$ai_pid" ]]
+}
+
+count_active_running_workers_for_manager_project() {
+  local project="$1" wt_path count=0
+  while IFS= read -r wt_path; do
+    [[ -n "$wt_path" && -d "$wt_path" ]] || continue
+    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    if worker_project_is_actively_running "$wt_path"; then
+      count=$((count + 1))
+    fi
+  done < <(all_repo_worktrees_for_project "$project")
+  printf '%s\n' "$count"
+}
+
+worker_project_busy_with_delegated_continuation() {
+  local project="$1" prompt_file
+  worker_project_is_actively_running "$project" || return 1
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  prompt_file_has_delegated_continuation "$prompt_file"
+}
+
+manager_worker_launch_available_slots() {
+  local project="$1" max_parallel active_running
+  max_parallel="$(manager_max_parallel_workers)"
+  active_running="$(count_active_running_workers_for_manager_project "$project")"
+  if ! [[ "$active_running" =~ ^[0-9]+$ ]]; then
+    active_running="0"
+  fi
+  if (( active_running >= max_parallel )); then
+    printf '0\n'
+  else
+    printf '%s\n' "$((max_parallel - active_running))"
+  fi
+}
+
 manager_worker_launch_intake_id_for_prompt() {
   local prompt_file="$1"
   local base
@@ -2015,7 +2152,10 @@ launch_worker_from_manager_prompt_if_needed() {
 
 manager_runtime_launch_workers_from_latest_handoff() {
   local project="$1"
-  local continuity_file continuity_generated prompt_generated_csv launched_csv launched_count prompt_file
+  local continuity_file continuity_generated prompt_generated_csv launched_csv queued_csv
+  local launched_count prompt_file prompt_rank prompt_index target_project write_scope
+  local parallel_safe consumes_slot active_running_workers available_new_slots max_parallel_workers
+  local selected_write_scopes_csv worker_is_active worker_is_busy prompt_queue_file
   continuity_file="$(latest_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
     printf '0\n'
@@ -2025,6 +2165,7 @@ manager_runtime_launch_workers_from_latest_handoff() {
   prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
 
   launched_csv=""
+  queued_csv=""
   if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
     # shellcheck disable=SC1090
     source "$(manager_worker_launch_state_file "$project")"
@@ -2034,19 +2175,73 @@ manager_runtime_launch_workers_from_latest_handoff() {
     fi
   fi
 
+  max_parallel_workers="$(manager_max_parallel_workers)"
+  active_running_workers="$(count_active_running_workers_for_manager_project "$project")"
+  available_new_slots="$(manager_worker_launch_available_slots "$project")"
   launched_count=0
+  selected_write_scopes_csv=""
+  prompt_queue_file="$(mktemp "${TMPDIR:-/tmp}/freely-manager-launch-queue.XXXXXX")"
+  prompt_index=0
   while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    prompt_rank="$(worker_prompt_dispatch_priority "$prompt_file")"
+    printf '%s\t%06d\t%s\n' "$prompt_rank" "$prompt_index" "$prompt_file" >>"$prompt_queue_file"
+    prompt_index=$((prompt_index + 1))
+  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+
+  while IFS=$'\t' read -r _prompt_rank _prompt_index prompt_file; do
     [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
     if csv_contains_exact_item "$launched_csv" "$prompt_file"; then
       continue
     fi
+
+    target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
+    [[ -n "$target_project" && -d "$target_project" ]] || continue
+    write_scope="$(worker_prompt_write_scope "$project" "$prompt_file")"
+    parallel_safe="$(worker_prompt_parallel_safe "$prompt_file")"
+    worker_is_active="0"
+    worker_is_busy="0"
+    consumes_slot="1"
+    if worker_project_is_actively_running "$target_project"; then
+      worker_is_active="1"
+      consumes_slot="0"
+      if worker_project_busy_with_delegated_continuation "$target_project"; then
+        worker_is_busy="1"
+      fi
+    fi
+
+    if [[ "$worker_is_busy" == "1" ]]; then
+      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+      continue
+    fi
+    if [[ "$parallel_safe" != "true" && $launched_count -gt 0 ]]; then
+      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+      continue
+    fi
+    if csv_conflicts_with_item "$selected_write_scopes_csv" "$write_scope"; then
+      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+      continue
+    fi
+    if [[ "$consumes_slot" == "1" ]] && (( available_new_slots <= 0 )); then
+      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+      continue
+    fi
+
     if launch_worker_from_manager_prompt_if_needed "$project" "$prompt_file"; then
       launched_csv="$(csv_append_unique_item "$launched_csv" "$prompt_file")"
+      selected_write_scopes_csv="$(csv_append_unique_item "$selected_write_scopes_csv" "$write_scope")"
       launched_count=$((launched_count + 1))
+      if [[ "$consumes_slot" == "1" ]]; then
+        available_new_slots=$((available_new_slots - 1))
+        active_running_workers=$((active_running_workers + 1))
+      fi
+    else
+      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
     fi
-  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  done < <(sort -t $'\t' -k1,1n -k2,2n "$prompt_queue_file")
+  rm -f "$prompt_queue_file"
 
-  write_manager_worker_launch_state "$project" "$continuity_generated" "$prompt_generated_csv" "$continuity_file" "$launched_csv"
+  write_manager_worker_launch_state "$project" "$continuity_generated" "$prompt_generated_csv" "$continuity_file" "$launched_csv" "$queued_csv" "$max_parallel_workers" "$active_running_workers" "$available_new_slots"
   printf '%s\n' "$launched_count"
 }
 
@@ -4288,6 +4483,10 @@ cmd_baseline_status() {
     echo "latest_manager_continuity_consumed: ${LAST_MANAGER_CONTINUITY_CONSUMED:-unavailable}"
     echo "latest_manager_worker_prompts_generated: ${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-none}"
     echo "latest_manager_worker_prompts_consumed: ${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}"
+    echo "queued_worker_prompts: ${QUEUED_WORKER_PROMPTS:-none}"
+    echo "max_parallel_workers: ${MAX_PARALLEL_WORKERS:-unknown}"
+    echo "active_running_worker_count: ${ACTIVE_RUNNING_WORKER_COUNT:-unknown}"
+    echo "available_new_worker_slots: ${AVAILABLE_NEW_WORKER_SLOTS:-unknown}"
   fi
   echo "intake_active_items: $(count_active_intake_items "$PROJECT_ROOT")"
   echo "intake_new_items: $(count_intake_items_by_status "$PROJECT_ROOT" "new")"
@@ -4391,6 +4590,7 @@ cmd_live_status() {
   last_role_hint="$role_hint"
   last_state_updated_at="unknown"
   local latest_manager_continuity_generated latest_manager_continuity_consumed latest_manager_worker_prompts_generated latest_manager_worker_prompts_consumed
+  local queued_worker_prompts max_parallel_workers active_running_worker_count available_new_worker_slots
   if [[ -f "$(workcell_state_file "$project")" ]]; then
     # shellcheck disable=SC1090
     source "$(workcell_state_file "$project")"
@@ -4405,6 +4605,10 @@ cmd_live_status() {
   latest_manager_continuity_consumed="unavailable"
   latest_manager_worker_prompts_generated="none"
   latest_manager_worker_prompts_consumed="none"
+  queued_worker_prompts="none"
+  max_parallel_workers="unknown"
+  active_running_worker_count="unknown"
+  available_new_worker_slots="unknown"
   if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
     # shellcheck disable=SC1090
     source "$(manager_worker_launch_state_file "$project")"
@@ -4412,6 +4616,10 @@ cmd_live_status() {
     latest_manager_continuity_consumed="${LAST_MANAGER_CONTINUITY_CONSUMED:-unavailable}"
     latest_manager_worker_prompts_generated="${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-none}"
     latest_manager_worker_prompts_consumed="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}"
+    queued_worker_prompts="${QUEUED_WORKER_PROMPTS:-none}"
+    max_parallel_workers="${MAX_PARALLEL_WORKERS:-unknown}"
+    active_running_worker_count="${ACTIVE_RUNNING_WORKER_COUNT:-unknown}"
+    available_new_worker_slots="${AVAILABLE_NEW_WORKER_SLOTS:-unknown}"
   fi
   local latest_generated_continuity latest_generated_prompts_csv
   latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
@@ -4448,6 +4656,10 @@ cmd_live_status() {
   echo "latest_manager_continuity_consumed: ${latest_manager_continuity_consumed}"
   echo "latest_manager_worker_prompts_generated: ${latest_manager_worker_prompts_generated}"
   echo "latest_manager_worker_prompts_consumed: ${latest_manager_worker_prompts_consumed}"
+  echo "queued_worker_prompts: ${queued_worker_prompts}"
+  echo "max_parallel_workers: ${max_parallel_workers}"
+  echo "active_running_worker_count: ${active_running_worker_count}"
+  echo "available_new_worker_slots: ${available_new_worker_slots}"
 
   if [[ -n "$supervisor_pid" || -n "$dispatcher_pid" || -n "$ai_pid" ]]; then
     echo "active_processes:"

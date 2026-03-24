@@ -47,6 +47,12 @@ description: 当需要像项目负责人一样同时监督多个 Freely worktree
    - `retire-only / retire-now` -> cleanup / retirement handoff worker
    - `continue-dev` -> verification / dev continuation worker
    - 只有关键事实仍缺失或 blocker 未明时，主管才继续停留在 manager-only supervision
+9. 若同轮存在多个互不冲突 lane，主管必须先做排班而不是串行化所有动作：
+   - 为每条 lane 写清 `dispatch_priority`
+   - 标记是否 `parallel_safe`
+   - 标记最小 `write_scope`
+   - 有剩余 worker capacity 时并发推进
+   - 无剩余 capacity 时进入 queue，并在 continuity 中保留 `next_action` / `revisit_trigger`
 
 ## 边界
 
