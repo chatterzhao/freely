@@ -60,6 +60,10 @@ flowchart TD
   - 是否进入 `completion_verification`
   - 是否进入 `cleanup_governance`
   - 或是否已经到 `retired` / next-task patrol
+- 若同一 `doc-loop` / `dev-loop` 内部出现 worker 死掉、死循环、或 route / restart point 走位错误，也不由该 loop 自判；必须回到 `auto-loop` 让主管介入：
+  - 主管可通过 patrol 或 human interruption 重新判定 `ownership + restart_point + next_action`
+  - 若只是治理纠偏，主管写新的 continuity / worker handoff
+  - 若进程已失效或错误 worker 持续占位，则交回 runtime kill / restart / re-entry
 
 ## 2. Whole-System Flow
 
