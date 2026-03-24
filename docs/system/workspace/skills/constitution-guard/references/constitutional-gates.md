@@ -10,7 +10,7 @@
 8. 恢复策略：续接优先，不支持续接时桥接恢复；恢复记录保留 branch/worktree/session。
 9. 约束面：除最小输入面外，其余上下文从项目文件发现，不走隐式配置注入。
 10. 工程纪律：代码/文档冲突时优先代码/测试修正；规范文档改动需专用 feature/worktree 且绑定实现或门禁证据。
-11. 三层循环：`auto -> doc -> dev` 闭环必须可追溯，`PRE_TEST` 仅作基线，提升门禁使用已执行的 `TEST`。
+11. 三个 loop：`auto-loop` 编排并进入 sibling 的 `doc-loop` / `dev-loop`；worker 只推进并产出 evidence，completion / cleanup judgment 必须回到 `auto-loop`，且整体闭环必须可追溯。`PRE_TEST` 仅作基线，提升门禁使用已执行的 `TEST`。
 12. 子代理：委托前定义边界与完成标准，批次未收敛不得宣告成功。
 13. 并行开发：并行任务必须使用独立 worktree，存在明确 ownership 边界，热点有串行窗口或排序策略。
 14. 模块接口：破坏性变更具备版本化、迁移与回滚路径；第三方 API 契约为外部事实源。

@@ -1,6 +1,12 @@
 # Three-Loop Capability Lifecycle
 
-Freely 三层 loop 的应用级事件地图真源。
+Freely 三个 loop 的应用级事件地图真源。
+
+核心关系：
+- `auto-loop` 是 outer orchestration / governance loop
+- `doc-loop` 与 `dev-loop` 是 sibling execution loops
+- `verification`、`recovery`、`cleanup governance` 是 route / phase / governance path，不是新增 loop
+- `doc-loop` / `dev-loop` 负责产出文档、实现、测试与 verification evidence；`auto-loop` 负责完成判定、验证裁决与 cleanup / retirement 路由
 
 边界：
 - `CONSTITUTION.md`: 边界与硬约束
@@ -9,12 +15,58 @@ Freely 三层 loop 的应用级事件地图真源。
 
 本文件只保留：
 - 全应用流向图
+- 三个 loop 的站位、职责与回流关系
 - `signal -> lifecycle record -> worktree execution cell` 联动
 - owner / artifact / route 决策表
 - worktree 生命周期与 completion / cleanup 回路
 - 省周期关键点
 
-## 1. Whole-System Flow
+## 1. Loop Positioning Map
+
+```mermaid
+flowchart TD
+    A[auto-loop<br/>outer orchestration / governance] -->|route to discovery or issue docs| B[doc-loop<br/>boundary / IBM / acceptance contract]
+    A -->|route to implementation or repair| C[dev-loop<br/>implementation / local test / verification evidence]
+
+    B -->|canonical doc writeback| A
+    C -->|code + tests + verification evidence| A
+
+    A -->|completion_verification| D[verification route]
+    A -->|cleanup_governance| E[cleanup route]
+    A -->|recovery| F[recovery route]
+
+    D -->|same issue needs more work| C
+    D -->|new boundary exposed| B
+    D -->|verification passed| E
+
+    E -->|cleanup incomplete / retained tree| A
+    E -->|retired / closure evidence written| G[next task patrol]
+    F -->|runtime/session recovered| A
+```
+
+站位说明：
+- `auto-loop` 是唯一 outer loop，负责 notice、routing、completion judgment、verification judgment、cleanup / retirement routing。
+- `doc-loop` 与 `dev-loop` 是 sibling loops，不互相包含；它们都只把事项推进到“到达下一门”。
+- `verification`、`cleanup governance`、`recovery` 是 `auto-loop` 触发的 route / phase，不是第四个或第五个 loop。
+- worker 可在 `doc-loop` / `dev-loop` 中执行并产出 evidence，但不能自己宣布 terminal completion。
+- 只有 `auto-loop` 看到 evidence 已足够，且 cleanup / retirement 已闭合，当前主题才算真正退出本轮循环。
+
+跳出与回流：
+- `doc-loop` 跳出：边界收敛、IBM 就绪、或明确 reroute；然后回 `auto-loop`。
+- `dev-loop` 跳出：实现批次、局部测试、verification evidence 已到下一门；然后回 `auto-loop`。
+- `auto-loop` 不因任一局部 loop 跳出就判定结束；它必须继续决定：
+  - 是否再次进入 `doc-loop`
+  - 是否再次进入 `dev-loop`
+  - 是否进入 `completion_verification`
+  - 是否进入 `cleanup_governance`
+  - 或是否已经到 `retired` / next-task patrol
+- 若同一 `doc-loop` / `dev-loop` 内部出现 worker 死掉、死循环、或 route / restart point 走位错误，也不由该 loop 自判；而是由主管在 `auto-loop` 侧通过监督发现后介入：
+  - 主管可通过 patrol、live-status / session evidence，或 human interruption 重新判定 `ownership + restart_point + next_action`
+  - 若只是治理纠偏，主管写新的 continuity / worker handoff
+  - 若进程已失效或错误 worker 持续占位，则交回 runtime kill / restart / re-entry
+  - 若 watchdog 观察到短窗口内反复启动 AI 工具进程、异常重启次数、或进程总数异常膨胀，这同样属于 `auto-loop` supervision signal：watchdog 负责暴露 churn，主管负责判断这是正常恢复、prompt/continuity 漂移，还是 dead-loop / thrash
+
+## 2. Whole-System Flow
 
 ```mermaid
 flowchart TD
@@ -60,12 +112,14 @@ flowchart TD
 
 说明：
 - 任何一轮都先同步三元组，而不是只看 issue 或只看 worktree。
-- `completion verification` 不是 cleanup；它是 promote 前后的验收回路。
+- `auto-loop` 负责 route 与 outer governance，不包含 `doc-loop` / `dev-loop` 的实现细节。
+- `doc-loop` 与 `dev-loop` 是 sibling execution loops；它们都可能把结果回流给 `auto-loop`。
+- `completion verification` 不是 cleanup，也不是第四个 loop；它是 `auto-loop` 消费 worker evidence 后做出的 promote 前后验收路径。
 - cleanup 完成后才算 lifecycle 真正闭环，不允许停在 `merged-not-cleaned`。
 - `route_kind` 与 `worktree action` 是两个并列判断，不允许只判 loop 不判执行容器。
 - 新 discovery 可以先被 intake 接住，但若存在唯一 canonical retained tree 仍未收口，manager 可以先延后 create，直到旧树 closeout 完成。
 
-## 2. Execution Triad Map
+## 3. Execution Triad Map
 
 ```mermaid
 flowchart LR
@@ -88,7 +142,7 @@ flowchart LR
 - 只看 `lifecycle record` 会丢掉“该在哪棵树执行”。
 - 只看 `worktree execution cell` 会把 dirty/clean 误判成业务完成度。
 
-## 3. Front-Door Flow
+## 4. Front-Door Flow
 
 ```mermaid
 flowchart LR
@@ -113,7 +167,7 @@ flowchart LR
     K --> L[choose route and worktree action]
 ```
 
-## 4. Runtime Artifact Chain
+## 5. Runtime Artifact Chain
 
 ```mermaid
 flowchart LR
@@ -133,7 +187,7 @@ flowchart LR
 - 文档真相写回后，还要再经过 `verification / cleanup evidence` 才算真正回到下一轮 patrol。
 - `worker prompt set` 不是无序列表；每条 worker handoff 至少要带 `dispatch_priority`、`parallel_safe`、`write_scope`，供 runtime 做 capacity-aware 排班与 queueing。
 
-## 5. Manager Routing Map
+## 6. Manager Routing Map
 
 ```mermaid
 flowchart TD
@@ -178,7 +232,7 @@ flowchart TD
     W --> X
 ```
 
-## 6. Worktree Lifecycle Map
+## 7. Worktree Lifecycle Map
 
 ```mermaid
 stateDiagram-v2
@@ -210,8 +264,9 @@ stateDiagram-v2
 - `retire-ready` 只表示 cleanup gate 已过，还差正式删除与留痕。
 - `retained_dirty` 表示“树已经被目标分支吸收，但该树仍持有 canonical writeback 或 closeout 责任”。
 - `operator stop`、`usage limit`、AI 崩溃这类运行时异常不会直接改写 lifecycle；它们只会让 worktree 暂停在当前状态，等待 manager recovery judgement。
+- worker 从 `doc-loop` / `dev-loop` 跳出只表示“到达下一门”；只有 `auto-loop` 接住 evidence 并做出 completion / cleanup judgment 后，主题才可能外层收口。
 
-## 7. Completion And Cleanup Flow
+## 8. Completion And Cleanup Flow
 
 ```mermaid
 flowchart LR
@@ -230,7 +285,7 @@ flowchart LR
     L --> M[next patrol sees lifecycle closed]
 ```
 
-## 8. Ownership And Boundary Map
+## 9. Ownership And Boundary Map
 
 ```mermaid
 flowchart LR
@@ -257,7 +312,7 @@ flowchart LR
 - worker 负责 canonical 文档或代码写回，不负责自己决定 retirement。
 - queue / capacity 判断属于 `manager decision + runtime enforcement` 联动：manager 写 lane metadata，runtime 按 worker capacity 与 active lane 实际执行。
 
-## 8A. Dispatch Scheduling Map
+## 9A. Dispatch Scheduling Map
 
 ```mermaid
 flowchart TD
@@ -279,7 +334,7 @@ flowchart TD
 - `write_scope` 冲突的 lane 不应同 wave 并发。
 - 没有空余 worker capacity 时，未派发 lane 必须保留在 queue，而不是静默丢失或被挤回单一 continuation。
 
-## 9. Loop Ownership Table
+## 10. Loop Ownership Table
 
 | Node | Primary owner | Main modules | Canonical artifacts |
 | --- | --- | --- | --- |
@@ -294,7 +349,7 @@ flowchart TD
 | fleet supervision | manager | `multi-worktree-supervision`, `worktree-maintenance-governance` | fleet snapshot, disposition |
 | cleanup governance | manager -> worker | `worktree-maintenance-governance`, `branch-management` | cleanup evidence |
 
-## 10. Route Decision Table
+## 11. Route Decision Table
 
 | Condition | Route | Worktree default | Why |
 | --- | --- | --- | --- |
@@ -308,7 +363,7 @@ flowchart TD
 | operator-stopped worker with unresolved lifecycle | `recovery` or manager-only hold | freeze | 不擅自自动复活，要先重新判定 ownership |
 | AI tool usage limit / auth unavailable | `recovery` | freeze/manager-only | 这是 runtime-owned 暂停，不是业务状态改变 |
 
-## 11. Worktree Action Table
+## 12. Worktree Action Table
 
 | Action | Chosen by | Meaning | Next hop |
 | --- | --- | --- | --- |
@@ -323,7 +378,7 @@ flowchart TD
 - 只有边界变化、树已退休、树不可安全继续、或需要独立 repair/research cell 时才新开树。
 - 若唯一 retained dirty tree 仍持有 canonical closeout，默认先完成它，再决定是否新开 discovery worktree。
 
-## 12. Worktree State Table
+## 13. Worktree State Table
 
 | Worktree state | Meaning | Usual owner |
 | --- | --- | --- |
@@ -338,7 +393,7 @@ flowchart TD
 | `retire-ready` | cleanup gate passed; delete/retain disposition remains to execute | manager |
 | `retired` | local tree and branch removed; remote handled or retained-with-reason | manager |
 
-## 13. Lifecycle Record Map
+## 14. Lifecycle Record Map
 
 | Record | Main loop | Purpose |
 | --- | --- | --- |
@@ -349,7 +404,7 @@ flowchart TD
 | `milestones.md` | auto-loop + doc-loop | queue, index, orchestration |
 | cleanup evidence | auto-loop | closure proof |
 
-## 14. Event Matrix
+## 15. Event Matrix
 
 | Event | Source | First owner | Loop entry | Lifecycle record update | Worktree action | Next hop |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -375,9 +430,9 @@ flowchart TD
 | `cleanup_completed` | cleanup worker | manager | auto-loop governance | cleanup evidence | retired | patrol |
 | `post_merge_new_finding` | review/test/patrol after promote | manager | discovery or dev-loop | new candidate / issue / blocker continuity | create/reuse | new repair route |
 
-## 15. Standard Chains
+## 16. Standard Chains
 
-### 15.1 Chat To Worker Execution
+### 16.1 Chat To Worker Execution
 
 ```mermaid
 flowchart LR
@@ -396,7 +451,7 @@ flowchart LR
     L --> M[next patrol]
 ```
 
-### 15.2 Verification To Retirement
+### 16.2 Verification To Retirement
 
 ```mermaid
 flowchart LR

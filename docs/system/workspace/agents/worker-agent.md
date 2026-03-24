@@ -1,6 +1,6 @@
 # worker-agent
 
-`worker-agent` 是 Freely 在 feature worktree 上承担 doc-loop / dev-loop / verification 的执行角色。
+`worker-agent` 是 Freely 在 feature worktree 上承担 doc-loop / dev-loop / verification evidence 的执行角色。
 
 ## 位置
 
@@ -11,16 +11,16 @@
   - `skill:doc-ibm-execution`
   - `skill:dev-loop-execution`
   - `skill:worktree-hygiene-supervision`
-- worker 角色在三层循环中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
+- worker 角色在三个 loop 中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
   - `skill:continuity-watchdog`
 
 ## 职责
 
-1. 在自己工位上推进明确 issue 的 doc-loop / dev-loop / verification。
+1. 在自己工位上推进明确 issue 的 doc-loop / dev-loop，并产出 verification evidence。
 2. 在达到 checkpoint 边界时优先 continuity、验证与原子提交，而不是继续扩 scope。
 3. 若 runtime 已将当前轮次升级为 hygiene intervention，先按 hygiene 收口再继续实现。
 4. 遇到本地运行时异常时，把恢复职责交回本工位 runtime / scripts。
-5. 把状态、验证、阻塞和下一跳回写到 issue / milestone / continuity 产物。
+5. 把状态、验证 evidence、阻塞和下一跳回写到 issue / milestone / continuity 产物。
 
 ## 不负责
 
@@ -33,9 +33,11 @@
 ## 与其他角色的边界
 
 - `manager-agent` 负责任务编排与委派
+- `manager-agent` 负责 completion / verification / cleanup judgment
 - `runtime` 负责账号切换、sleep/recheck、进程重启
 - `continuity-watchdog` 负责 `context warn`、`fresh_with_handoff` 与 continuity artifact 边界
 - `worker-agent` 只对自己的 issue 执行结果负责
+- `worker-agent` 不宣布 terminal completion；只把 evidence 交回 `auto-loop`
 - 当发生进程退出、账号限额、认证失败、`context compacted` 需要新进程续接时，worker 只负责记录 blocker / continuity，不负责恢复本身
 
 ## 完成标志

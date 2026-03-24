@@ -468,7 +468,7 @@ flowchart LR
 - 法律只定义门与证据，不定义操作步骤。
 - 操作步骤以 `docs/system/workspace/skills/` 为唯一执行事实源。
 
-## 附录 B. 三层职责边界（宪法 / 法律 / skills）
+## 附录 B. 三个 Loop 的职责边界（宪法 / 法律 / skills）
 
 1. 宪法（What/Why）：边界与原则，不写执行步骤。
 2. 法律（Check/Accept/Route）：判定门、证据口径、技能路由，不写执行步骤。

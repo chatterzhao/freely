@@ -1,12 +1,12 @@
 ---
 name: auto-loop-orchestrator
-description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 lead-agent、上下文判定，再接入 pre-brainstorm/doc-loop/dev-loop，并回到发现阶段。当 AI 运行自主持续交付循环时使用。
+description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 lead-agent、上下文判定，再进入 sibling 的 doc-loop 或 dev-loop，并回到发现阶段。当 AI 运行自主持续交付循环时使用。
 ---
 
 # skill:auto-loop-orchestrator
 
 ## 首段闭环主链
-`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> doc-pre-brainstorm-execution | doc-ibm-execution | dev-loop-execution`
+`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> doc-pre-brainstorm-execution | doc-ibm-execution | dev-loop-execution | manager-owned verification / cleanup route`
 
 约束：
 - Freely 当前编排的是外部 AI CLI 工具，而不是自研 AI CLI runtime。
@@ -19,7 +19,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 - `docs/system/workspace/` 是能力真源；`bin/`、`.githooks/` 等是运行时落点。
 - `sh` / `ps1` 的定义源应位于 `docs/system/workspace/scripts/`。
 - hook 的定义源应位于 `docs/system/workspace/hooks/`，根目录 `.githooks/` 作为安装产物。
-- 三层循环下各能力的归宿、owner 边界和生命周期细节以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准；本 skill 只定义 auto-loop 编排步骤。
+- 三个 loop 下各能力的归宿、owner 边界和生命周期细节以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准；本 skill 只定义 auto-loop 编排步骤。
 
 ## 工作流
 1. 先执行固定前置门禁：`skill:constitution-guard` -> `skill:laws-enforcer`。
@@ -29,6 +29,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - 无稳定 issue 边界 -> `skill:doc-pre-brainstorm-execution`
    - issue-bound brainstorm / mapping / governance -> `skill:doc-ibm-execution`
    - ready issue / in-progress -> `skill:dev-loop-execution`
+   - `completion_verification` / `cleanup_governance` -> 留在 `auto-loop` 侧做 manager-owned judgement / handoff，必要时委派 worker 或 `skill:worktree-maintenance-governance`
 5. 各 loop skill 在环内完成自己的工作，并把状态、阻塞、完成或恢复上下文回流给 `auto-loop`；不要求下游 skill 直接“调用 auto-loop 的某个子 skill”。
 6. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
 7. 当状态跨环迁移时，按 `docs/LAWS.md` 第 2C 章同步更新候选项 / milestone / issue / progress / recovery / session evidence。
@@ -73,35 +74,41 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - `verification`
    - `progress / recovery`
    - `runtime supervision / cleanup`
-14. verification / writeback / cleanup 不是第四层 loop；它们要么属于 worker 在 `dev-loop` 中产出的证据，要么属于主管在 `auto-loop` 中做出的治理判断与收口委派。
-15. 对 `human interruption`，runtime interruption dispatcher 可先做 durable 接住与及时 notice，但不替代主主管完成完整路由。
-16. 主管不把 raw signal 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
-17. 当 standing source 的重点问题是 sequencing / queue drift / state maintenance，而不是业务边界本身时，主管应优先委派 `skill:milestone-planning-state-maintenance`，而不是让业务 worker 顺手补 milestone。
-18. 对 worker 工位的 `human interruption`：
+14. verification / writeback / cleanup 不是第四层 loop；它们要么属于 worker 在 `doc-loop` / `dev-loop` 中产出的证据，要么属于主管在 `auto-loop` 中做出的治理判断与收口委派。
+15. worker 在 `doc-loop` / `dev-loop` 中只能把事项推进到“到达下一门”的状态：
+   - 文档边界已收敛
+   - 实现与局部测试已完成
+   - verification evidence 已写回
+   但“是否完成、是否通过验证、是否进入 cleanup / retirement”必须由 `auto-loop` 基于 canonical evidence 裁决。
+16. 若 runtime watchdog 发现短时间内反复启动 AI 工具进程、异常重启次数、或短窗口进程总数异常增长，这不是 worker 自行回流；主管必须把它视为 `event-driven` dead-loop suspicion signal，先判断是正常恢复、prompt/continuity 漂移，还是需要 freeze / kill / restart / reroute。
+17. 对 `human interruption`，runtime interruption dispatcher 可先做 durable 接住与及时 notice，但不替代主主管完成完整路由。
+18. 主管不把 raw signal 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
+19. 当 standing source 的重点问题是 sequencing / queue drift / state maintenance，而不是业务边界本身时，主管应优先委派 `skill:milestone-planning-state-maintenance`，而不是让业务 worker 顺手补 milestone。
+20. 对 worker 工位的 `human interruption`：
   - `freely chat` 先完成 durable intake 与 interruption classification
   - 若结果已收敛成当前工位的 worker-owned `continuation` / `verification` handoff，且当前 worker runtime 因 `operator_stop` 停止
   - runtime 应重激活该 worker 主循环，而不是让 delegated intake 悬空
-19. 对 manager continuation handoff：
+21. 对 manager continuation handoff：
   - interruption resolution 生成 `handoff://continuation` 只是第一步
   - runtime 还必须留下 generated-vs-consumed evidence
   - 若后续命中 `fresh_with_handoff`、`auth_failure` 或其他 failure boundary，不能把 handoff 是否已消费变成不可见状态
-20. `freely` 是唯一正式 front-door command：
+22. `freely` 是唯一正式 front-door command：
   - `chat` 是 canonical high-level submit primitive
   - `tui` 只是交互壳，必须复用同一 post-submit runtime chain
   - 未来 GUI 也应复用同一 backend contract，而不是另造提交语义
-21. 当项目级 patrol 已经把某条线稳定判成 `retire-only`、`retire-now` 或 `continue-dev` 时，主管下一步必须进入 concrete execution routing：
+23. 当项目级 patrol 已经把某条线稳定判成 `retire-only`、`retire-now` 或 `continue-dev` 时，主管下一步必须进入 concrete execution routing：
   - `retire-only / retire-now` -> cleanup / retirement worker
   - `continue-dev` -> verification / dev continuation worker
   - 只有在关键事实缺失、上游依赖不明或 blocker 未冻结时，才允许继续 manager-only patrol
-22. 当主管已经生成更新的一轮 manager continuity 和 worker prompt set 时，runtime 必须以后者为最新 truth：
-   - latest continuity generated
-   - latest prompt set generated
-   - latest continuity / prompt set consumed
-   主管 watchdog 不得仅因为 supervisor 已在运行就停留在旧 continuity；要持续把最新一轮监督结果推进成 worker launch / reentry。
-23. manager handoff 中的每个 worker prompt 都必须同时满足两层契约：
-   - continuity 中显式引用 worker prompt 绝对路径
-   - worker prompt 本体携带 machine-readable `Worktree:` / `Branch:` header
-   否则 manager 虽然完成了排班判断，runtime 仍可能无法把 handoff 推进成真实 worker launch。
+24. 当主管已经生成更新的一轮 manager continuity 和 worker prompt set 时，runtime 必须以后者为最新 truth：
+  - latest continuity generated
+  - latest prompt set generated
+  - latest continuity / prompt set consumed
+  主管 watchdog 不得仅因为 supervisor 已在运行就停留在旧 continuity；要持续把最新一轮监督结果推进成 worker launch / reentry。
+25. manager handoff 中的每个 worker prompt 都必须同时满足两层契约：
+  - continuity 中显式引用 worker prompt 绝对路径
+  - worker prompt 本体携带 machine-readable `Worktree:` / `Branch:` header
+  否则 manager 虽然完成了排班判断，runtime 仍可能无法把 handoff 推进成真实 worker launch。
 
 ## 角色组织
 
