@@ -41,7 +41,7 @@
   - `current_prompt_has_delegated_continuation=1`
   - 当前 `prompt_excerpt` 明确包含 `Delegated continuation handoff`
   - `latest_manager_worker_prompts_generated=none`
-  - `last_consumed_delegated_continuation_ids` 已包含当前 19 个 delegated continuation ids，但这些 ids 同时仍保留在 `pending_delegated_continuation_ids`
+  - `intake_delegated_items=30`，且 `last_consumed_delegated_continuation_ids` 已覆盖当前观察窗口中的全部 30 个 delegated continuation ids；这些 ids 仍同时保留在 `pending_delegated_continuation_ids`
 - `docs/system/workspace/scripts/runtime/freely` 已有专门的
   - `manager_ai_stalled_after_delegated_continuation_prompt`
   - `recover_stalled_manager_ai_if_needed`
@@ -75,7 +75,7 @@
   - `current_focus.prompt_excerpt` 包含 `Delegated continuation handoff`
   - `intake_snapshot` 中对应 delegated continuation 仍可追溯到当前 prompt 上下文
 - 本轮 `live-status` 也已经给出部分 id-level consumption：
-  - `last_consumed_delegated_continuation_ids` 已覆盖当前 19 个 delegated continuation ids，其中包括 `20260323-204333...`、`20260323-204334...`、`20260323-205242...`、`20260323-205340...`、`20260323-220921...`、`20260323-222254...` 与 `20260323-222255...`
+  - `intake_delegated_items=30`，且 `last_consumed_delegated_continuation_ids` 已覆盖当前观察窗口中的全部 30 个 delegated continuation ids，其中包括 `20260323-204333...`、`20260323-204334...`、`20260323-205242...`、`20260323-205340...`、`20260323-220921...`、`20260323-222254...`、`20260323-222255...`、`20260323-225022...`、`20260323-225032...` 与 `20260323-234407...`
   - 说明“runtime 完全没有暴露 consumed truth”这个旧缺口已经失效
 - 但当前 promotion gate 仍未收口：
   - 同一批 delegated continuation ids 现在同时出现在 `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids`
@@ -93,8 +93,10 @@
   - `role_hint: worker`
   - `last_launch_kind: fresh_with_handoff`
   - `last_rotation_reason: context_compacted`
+  - `intake_active_items: 30`
+  - `intake_delegated_items: 30`
   - `current_prompt_has_delegated_continuation: 1`
-  - `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 仍大面积重叠，且最新 delegated continuation intake 仍可见于 pending 集合
+  - `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 仍全量重叠，且最新 delegated continuation intake 仍可见于 pending 集合
   - 当前 prompt excerpt 已证明 delegated continuation 语义仍在当前 worker prompt 上下文中
 - 这层 worker-side `live-status` 说明 runtime 当前仍在沿用 `context_compacted -> fresh_with_handoff` 的 continuity 策略，delegated continuation 也仍处于活跃交接面；但它仍不能替代当前候选所需的 manager-side prompt-cycle binding acceptance anchor
 - 当前 worktree hygiene 事实：
