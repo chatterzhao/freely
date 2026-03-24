@@ -377,6 +377,20 @@ Validation batch governance:
 
 这轮并行审计把一个关键事实钉死了：`merged + clean` 不是 delete gate，甚至连“接近可删”都不稳定。
 
+## 误用根因补充
+
+- `pre-test-merge` 的职责在 `CONSTITUTION` / `LAWS` / `pre-test-merge-flow` 中其实已经写清，但控制面默认值仍不够稳，导致它经常被误当成“高显著性的默认验证面”
+- 造成滥用的根因不是缺职责定义，而是三类默认值长期漂移：
+  - protected canonical worktree 很显眼，manager/supervisor 容易把它误读成“当前权威验证面”
+  - `pre-tests.md` 没有先被读取时，系统容易把 `pre-test-merge` 当成默认 acceptance 环境，而不是先看 `integration_target`
+  - stale 批次虽已在文档中定义为必须 retire/rebuild，但 runtime / patrol 仍缺足够硬的反向拒绝，因此旧批次会残留成“看起来还能继续消费”的 surface
+- 因而后续 contract 必须补一条比“何时可以启用”更硬的默认规则：
+  - 默认路径仍是 `feature/* -> develop`
+  - 只有当 `pre-tests.md` 或明确的主线前组合验证需求要求时，才进入 `pre-test-merge`
+  - 若 `pre-tests.md` 未显式声明 `integration_target=pre-test-merge`，manager 不得把它当成默认 acceptance 面
+  - 若批次已 stale，默认动作是 retire/rebuild，不是继续消费旧批次
+- 换句话说，`pre-test-merge` 的问题更像“反滥用 contract 不够硬”，而不是“职责从未定义”
+
 当前最有代表性的 worktree 现状如下：
 
 1. `pre-test-merge`
