@@ -10,6 +10,7 @@
 - `bash docs/system/workspace/scripts/tests/test-watchdog-control-plane-skills`
 - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog`
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
+- `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-earliest-reset-wait-revive`
 - `./bin/governance-check`
 - direct CLI verification:
   - `./bin/freely ensure-manager --project <tmp-project>`
@@ -23,6 +24,11 @@
 4. 直接 `freely` 命令验证确认：
    - `ensure-manager` 仍由 watchdog 先恢复账号，再 bootstrap manager
    - `start` 仍会把 rate-limit 理由写入 session state，交给 watchdog / manager control plane 接管
+5. earliest-reset wait continuation 现在补上了 runtime 常驻性与 wakeup 契约：
+   - wait 采用 `reset_at + buffer`
+   - wait 期间会周期性真实 probe saved accounts，任一账号变得可工作即可提前醒来
+   - wait 结束后会重新 probe/select，再决定 relaunch manager
+   - watchdog 不会因为单轮 readiness pass 失败而退出，也会覆盖 stale `ensure-manager.pid`
 
 ## Notes
 

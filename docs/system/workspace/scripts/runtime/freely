@@ -3663,16 +3663,20 @@ cmd_ensure_manager_watch() {
       log_info "ensure-manager watchdog already running (pid=$existing_pid)"
       return 0
     fi
+    rm -f "$pid_file"
   fi
 
   echo "$$" >"$pid_file"
+  trap "rm -f '$pid_file'; exit 0" INT TERM HUP
   trap "rm -f '$pid_file'" EXIT
 
   while true; do
     if [[ -f "$(stop_marker_file "$project")" ]]; then
       exit 0
     fi
-    ensure_manager_once "$project"
+    if ! ensure_manager_once "$project"; then
+      log_warn "ensure-manager watchdog will retry after a failed readiness pass"
+    fi
     sleep "$interval"
   done
 }
@@ -4826,19 +4830,25 @@ cmd_status() {
 }
 
 sleep_with_rate_limit_recheck() {
-  local project="$1" total_sleep="$2"
-  local remaining chunk stop_file
+  local project="$1" total_sleep="$2" active_probe_mode="${3:-0}"
+  local remaining chunk stop_file recheck_interval workable_account
   remaining="${total_sleep:-0}"
   stop_file="$(stop_marker_file "$project")"
   [[ "$remaining" =~ ^[0-9]+$ ]] || remaining=0
+  recheck_interval="${WATCHDOG_RECHECK_INTERVAL_SECS:-60}"
+  [[ "$recheck_interval" =~ ^[0-9]+$ ]] || recheck_interval=60
+  (( recheck_interval > 0 )) || recheck_interval=60
   while (( remaining > 0 )); do
     if [[ -f "$stop_file" ]]; then
       return 0
     fi
-    if [[ "$AI_TOOL" == "codex" ]] && codex_any_saved_account_available_now "$project"; then
-      return 0
+    if [[ "$AI_TOOL" == "codex" && "$active_probe_mode" == "1" ]]; then
+      workable_account="$(probe_any_usable_codex_account_now "$project" || true)"
+      if [[ -n "$workable_account" ]]; then
+        return 0
+      fi
     fi
-    chunk=60
+    chunk="$recheck_interval"
     if (( remaining < chunk )); then
       chunk="$remaining"
     fi
