@@ -80,7 +80,8 @@ Freely 开发 Freely 时，默认先问三件事：
 3. 这棵树是 research-only、merge-ready、companion-only，还是 verified-retirable？
    - 不要把“已经有 feature worktree”误当成“已经完成 issue materialization”
    - 不要把“已经 merge”误当成“cleanup 已完成”
-   - 不要把“某个 loop 已收口”或“issue 已 completed”误当成“agent/skill/topic 已 fully closed”
+   - 不要把 issue 已 `completed` 误当成已经可以删除 worktree/branch；删除前还必须继续核对 testing closeout、cleanup gate、`verified-retirable`、`retired`，若存在删除 guard / hook 也必须通过
+   - 不要把“某个 loop 已收口”或“issue 已 completed”误当成“已经可以删最后一个 owner worktree”；还必须继续核对 cleanup gate、`verified-retirable` 与 `retired`
 
 ## 吃自己的狗粮规则（Freely 构建 Freely）
 Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外。

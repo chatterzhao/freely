@@ -364,8 +364,8 @@ routing_policy:
 - promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
-- next_action: 继续 pre-brainstorm，但 scope 已收窄为 `stale pre-test-merge governance`，先冻结三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`；同时补齐 `replay source manifest / replay order / retire evidence`，把 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链桥接成固定的 `acceptance_contract_state/source/blocker` 字段，写死 testing closeout 的集成测试 / application-native real-environment testing evidence bar，并补清 `issue completed`、`loop closed`、`topic fully closed` 的区分；在这些真源稳定前不进入实现
-- revisit_trigger: 当 stale state 的 canonical 落点、manager lifecycle transaction 字段、runtime gate 消费路径、replay/retire manifest、`acceptance_contract_state/source/blocker` 桥、testing closeout evidence bar，以及三层完成语义都能冻结成独立 issue contract 时，重新进入 materialization 判断
+- next_action: 继续 pre-brainstorm，但 scope 已收窄为 `stale pre-test-merge governance`，先冻结三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`；同时补齐 `replay source manifest / replay order / retire evidence`，把 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链桥接成固定的 `acceptance_contract_state/source/blocker` 字段，写死 testing closeout 的集成测试 / application-native real-environment testing evidence bar，补清从 `done_ibm` 到 delete worktree 的完成检查顺序，并判断最终 delete worktree / branch 是否应由 hook / guard 兜住；在这些真源稳定前不进入实现
+- revisit_trigger: 当 stale state 的 canonical 落点、manager lifecycle transaction 字段、runtime gate 消费路径、replay/retire manifest、`acceptance_contract_state/source/blocker` 桥、testing closeout evidence bar、从 `done_ibm` 到 delete worktree 的检查顺序，以及“`completed` / cleanup gate / `verified-retirable` / `retired`”组合与最终 delete guard 最小输入都能冻结成独立 issue contract 时，重新进入 materialization 判断
 
 11. `C-20260322-1801-C`
 - title: worker self-loop exit and scheduler closeout governance
@@ -375,8 +375,8 @@ routing_policy:
 - promoted_issue_path: `pending://worker-self-loop-exit-and-scheduler-closeout-governance`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
-- next_action: 继续 pre-brainstorm，单独冻结 `phase progress`、`loop stall`、`manager handback`、`capacity release / supersede` 规则；同时补清 lane 回交后如何识别“其实是上游 `Issue + Brainstorm + PRD -> pre-tests.md` acceptance 面不完整”以及“其实还没完成 integration / application-native real-environment testing closeout”，并明确 worker/skill 的局部完成不等于 issue/topic 完成；在 machine-readable 阈值稳定前，不与 stale `pre-test-merge` gate 绑在一起实现
-- revisit_trigger: 当 low-value self-loop 的判据、manager 回交 contract、容量释放规则，以及与 IBM/`Issue + Brainstorm + PRD -> pre-tests.md` 缺口、testing closeout 缺口、三层完成语义的分流条件都能冻结成独立 issue contract 时，重新进入 materialization 判断
+- next_action: 继续 pre-brainstorm，单独冻结 `phase progress`、`loop stall`、`manager handback`、`capacity release / supersede` 规则；同时补清 lane 回交后如何识别“其实是上游 `Issue + Brainstorm + PRD -> pre-tests.md` acceptance 面不完整”以及“其实还没完成 integration / application-native real-environment testing closeout”，并明确 worker/skill 的局部完成只代表本 lane 局部推进，不等于 issue `completed`、也不等于 delete worktree / branch 条件成立；在 machine-readable 阈值稳定前，不与 stale `pre-test-merge` gate 绑在一起实现
+- revisit_trigger: 当 low-value self-loop 的判据、manager 回交 contract、容量释放规则，以及与 IBM/`Issue + Brainstorm + PRD -> pre-tests.md` 缺口、testing closeout 缺口、“`completed` / cleanup gate / `verified-retirable` / `retired` / delete guard”组合的分流条件都能冻结成独立 issue contract 时，重新进入 materialization 判断
 
 6. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec
