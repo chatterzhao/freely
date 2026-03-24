@@ -38,8 +38,8 @@
   - 也未发现 `docs/epics/**`、`docs/progress/**` 或 `docs/recovery/**` 接管该候选
   - 独立只读 owner scan 再次确认：仓库里没有其他 canonical artifact 接管这条 contract；当前唯一缺口仍是 prompt-cycle binding proof，而不是 owner 路由不清
 - hygiene_judgement:
-  - 当前 worktree 为 `DIRTY`，但脏项仅限本候选 canonical writeback：`docs/milestones.md`、`brainstorms.md`、`candidates.md` 与新增 `worker-continuity.md`
-  - 本轮无需把无关改动分流到其他 worktree；下一步 hygiene 动作应是 checkpoint/commit 当前 writeback，而不是扩大 scope
+  - canonical writeback 已在 `7fc7b24 docs: checkpoint delegated continuation stall writeback` 落盘，当前 worktree 为 `CLEAN`
+  - 本轮无需把无关改动分流到其他 worktree；下一步 hygiene / cleanup 动作应是等待这些独有提交被上游吸收后再重判 retirement，而不是继续扩大 scope
 - next_action:
   - 保持 `C-20260323-1705-A` 在 `candidate_issues` / `needs_research`
   - 下一轮优先验证 runtime 是否能为当前 prompt cycle / 当前 stalled delegated continuation 提供稳定的 binding proof，再决定是否进入 IBM materialization

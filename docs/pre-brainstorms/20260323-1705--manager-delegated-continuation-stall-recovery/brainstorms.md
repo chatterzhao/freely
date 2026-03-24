@@ -98,8 +98,9 @@
   - 当前 prompt excerpt 已证明 delegated continuation 语义仍在当前 worker prompt 上下文中
 - 这层 worker-side `live-status` 只说明 delegated continuation continuation 仍处于活跃交接面；它不能替代当前候选所需的 manager-side prompt-cycle binding acceptance anchor
 - 当前 worktree hygiene 事实：
-  - `git status --short` 仅显示 `docs/milestones.md`、当前 pre-brainstorm 的 `brainstorms.md` / `candidates.md` 与新增 `worker-continuity.md`
-  - 当前 dirty 仅来自 canonical continuity writeback，没有发现超出本候选 write scope 的无关改动；因此这轮不需要分流到其他 worktree，但后续 promote / retirement 判断仍应先以 checkpoint/commit 吸收这些 writeback
+  - canonical writeback 已在提交 `7fc7b24 docs: checkpoint delegated continuation stall writeback` 中落盘
+  - 当前 `git status --short` 已 clean，没有发现超出本候选 write scope 的残留脏项
+  - 因此这轮不再需要额外 checkpoint/commit；后续 cleanup 判断的关键前提改为“这些提交何时被上游吸收”，而不是“是否还有未提交 dirty delta”
 - 当前仓库扫描未发现 `docs/progress/**`、`docs/epics/**` 或其他 issue/progress/recovery 真源已经接管本候选；因此这轮 continuity 仍应写回 pre-brainstorm，而不是误切到 IBM、dev-loop 或 recovery
 - 当前分支 `feature/manager-delegated-continuation-stall-materialization-20260323` 仍未被 `develop` 吸收；这说明 worktree cleanup 与 candidate materialization 仍应分开判断，不能因为已有 canonical writeback 提交就把该候选视为已关闭
 
@@ -122,13 +123,14 @@
 ## 本轮首跳复核（2026-03-23）
 
 - 当前 handoff 中“这棵树已被 `develop` 吸收、只剩 dirty writeback”的前提已失效：
-  - 当前 worktree `git status` 仍为 `DIRTY`，但 dirty 范围只落在 canonical pre-brainstorm writeback
+  - 当前 worktree 已 clean，但该 clean 状态来自本地 checkpoint commit，而不是 `develop` 已吸收当前分支
   - `git merge-base --is-ancestor HEAD develop` 返回非零
   - 当前分支仍有独有提交：
     - `a4f31f3 docs: preserve delegated continuation stall candidate`
     - `b6f5e6a docs: refresh delegated continuation continuity`
     - `80526aa docs: close delegated continuation writeback routing`
-- 因此当前真实问题不是“是否保留 dirty delta”，而是“这两次 canonical pre-brainstorm writeback 是否仍应保留为独有分支提交，还是应该冻结/丢弃”
+    - `7fc7b24 docs: checkpoint delegated continuation stall writeback`
+- 因此当前真实问题不是“是否保留 dirty delta”，而是“这些 canonical pre-brainstorm writeback 提交是否仍应保留为独有分支提交，还是应该冻结/丢弃”
 - 本轮再次核对：
   - `docs/milestones.md` 仍把 `C-20260323-1705-A` 保留在 `candidate_issues`
   - 未发现 `docs/progress/**`、`docs/recovery/**`、`docs/epics/**` 的 issue/progress/recovery 真源接管该候选
