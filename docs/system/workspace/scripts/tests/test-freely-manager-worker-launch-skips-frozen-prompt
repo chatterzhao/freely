@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-frozen-prompt.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER="$WT_ROOT/feature-worker"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+cd "$PROJECT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m init
+git branch feature/worker
+git worktree add "$WORKER" feature/worker >/dev/null
+
+for wt in "$PROJECT" "$WORKER"; do
+  mkdir -p "$wt/.freely/run" "$wt/.freely/logs"
+done
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260324-010001-worker-acceptance-codex.txt"
+cat >"$PROMPT" <<EOF
+Dispatch metadata:
+- dispatch_priority: P0
+- parallel_safe: true
+- write_scope: $WORKER
+
+Branch:
+- \`feature/worker\`
+
+Worktree:
+- \`$WORKER\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260324-010100.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+
+## Frozen Queue
+- lane: manager-owned develop acceptance
+- desired_state: desired-frozen
+- worker_prompt: \`$PROMPT\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$PROJECT/.freely/run/manager-continuity-20260324-000000.md"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$PROMPT"
+LAST_MANAGER_CONTINUITY_CONSUMED="$PROJECT/.freely/run/manager-continuity-20260324-000000.md"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$PROMPT"
+LAUNCHED_WORKER_PROMPTS="$PROMPT"
+QUEUED_WORKER_PROMPTS=""
+MAX_PARALLEL_WORKERS="2"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="2"
+UPDATED_AT="2026-03-24T00:00:00Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+LAUNCH_LOG="$TMP_DIR/launch.log"
+launch_worker_from_manager_prompt_if_needed() {
+  local _manager_project="$1" prompt_file="$2"
+  basename "$prompt_file" >>"$LAUNCH_LOG"
+  return 0
+}
+
+COUNT="$(FREELY_MANAGER_MAX_PARALLEL_WORKERS=2 manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$COUNT" == "0" ]]
+[[ ! -f "$LAUNCH_LOG" ]]
+
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "${LAST_MANAGER_CONTINUITY_GENERATED:-}" == "$CONTINUITY" ]]
+[[ "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" == "$CONTINUITY" ]]
+[[ -z "${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-}" ]]
+[[ -z "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" ]]
+[[ -z "${LAUNCHED_WORKER_PROMPTS:-}" ]]
+[[ -z "${QUEUED_WORKER_PROMPTS:-}" ]]
+
+BASELINE="$(cmd_baseline_status --project "$PROJECT")"
+LIVE="$(cmd_live_status --project "$PROJECT")"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_continuity_generated: $CONTINUITY"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_continuity_consumed: $CONTINUITY"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_generated: none"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_consumed: none"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_continuity_generated: $CONTINUITY"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_continuity_consumed: $CONTINUITY"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_generated: none"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_consumed: none"
+
+echo "[PASS] frozen-queue worker prompt is excluded from launchable manager inventory"
