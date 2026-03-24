@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-reconcile-frozen-consumed.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+QUEUE_WORKER="$WT_ROOT/feature-queued"
+FROZEN_WORKER="$WT_ROOT/feature-frozen"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+cd "$PROJECT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m init
+git branch feature/queued
+git branch feature/frozen
+git worktree add "$QUEUE_WORKER" feature/queued >/dev/null
+git worktree add "$FROZEN_WORKER" feature/frozen >/dev/null
+
+for wt in "$QUEUE_WORKER" "$FROZEN_WORKER"; do
+  mkdir -p "$wt/.freely/run" "$wt/.freely/logs"
+  cat >"$wt/.freely/run/workcell-state.env" <<'EOF'
+ROLE_HINT="worker"
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+UPDATED_AT="2026-03-24T00:00:00Z"
+EOF
+done
+
+QUEUE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260324-010001-worker-queued-codex.txt"
+cat >"$QUEUE_PROMPT" <<EOF
+Dispatch metadata:
+- dispatch_priority: P0
+- parallel_safe: true
+- write_scope: $QUEUE_WORKER
+
+Branch:
+- \`feature/queued\`
+
+Worktree:
+- \`$QUEUE_WORKER\`
+EOF
+
+FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260324-010002-worker-frozen-codex.txt"
+cat >"$FROZEN_PROMPT" <<EOF
+Dispatch metadata:
+- dispatch_priority: P0
+- parallel_safe: true
+- write_scope: $FROZEN_WORKER
+
+Branch:
+- \`feature/frozen\`
+
+Worktree:
+- \`$FROZEN_WORKER\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260324-010100.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+
+## Queue
+- lane: \`dispatchable\`
+  - prompt_path: \`$QUEUE_PROMPT\`
+
+## Frozen Queue
+- lane: \`keep-frozen\`
+  - prompt_path: \`$FROZEN_PROMPT\`
+  - desired_state: desired-frozen
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$QUEUE_PROMPT"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$FROZEN_PROMPT"
+LAUNCHED_WORKER_PROMPTS="$FROZEN_PROMPT"
+QUEUED_WORKER_PROMPTS=""
+MAX_PARALLEL_WORKERS="2"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="2"
+UPDATED_AT="2026-03-24T00:00:00Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+LAUNCH_LOG="$TMP_DIR/launch.log"
+launch_worker_from_manager_prompt_if_needed() {
+  local _manager_project="$1" prompt_file="$2"
+  basename "$prompt_file" >>"$LAUNCH_LOG"
+  return 0
+}
+
+COUNT="$(FREELY_MANAGER_MAX_PARALLEL_WORKERS=2 manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$COUNT" == "1" ]]
+grep -q '^20260324-010001-worker-queued-codex.txt$' "$LAUNCH_LOG"
+if grep -q 'frozen' "$LAUNCH_LOG"; then
+  echo "[FAIL] stale frozen prompt should have been purged before launch reconciliation" >&2
+  exit 1
+fi
+
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" == "$CONTINUITY" ]]
+[[ "${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-}" == "$QUEUE_PROMPT" ]]
+[[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" == "$QUEUE_PROMPT" ]]
+[[ "${LAUNCHED_WORKER_PROMPTS:-}" == "$QUEUE_PROMPT" ]]
+[[ -z "${QUEUED_WORKER_PROMPTS:-}" ]]
+
+echo "[PASS] stale frozen prompts are purged from launch-state before same-continuity relaunch reconciliation"
