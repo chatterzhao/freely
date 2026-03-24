@@ -57,6 +57,7 @@
      - handoff consumed into prompt
      - handoff still pending after failure boundary
    - 若本轮已生成新的 worker prompt set，还要保证 watchdog/runtime 后续能以最新 continuity 为基准继续消费，而不是停留在旧 consumed snapshot
+   - 每个 worker prompt 除了任务正文外，还必须包含 machine-readable `Worktree:` 与 `Branch:` header；runtime worker launch 依赖这两个 header（或其兼容句式）解析目标工位
 11. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff / 这轮哪些该 cleanup”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff` 之一。
 12. 对 `milestones / candidates / issue / progress / recovery` 这类 standing source，除了普通路由外，还要判断是否需要专门的 milestone planning / state maintenance worker 做 sequencing 与 drift reconcile。
 
