@@ -37,6 +37,7 @@
   - stale 后 manager 继续使用既有 `ownership / restart_point / next_action` 词典，但必须补齐 `replay source manifest`、`replay order`、`retire evidence`、`remaining cleanup requirement`
   - runtime 对 stale batch 只允许 read-only patrol、cleanup handoff、rebuild/replay handoff，不再把它恢复成普通 verification 会话
   - 所有指向 stale batch 的旧 queued worker prompts / delegated launches 都会被 supersede 或失效，不再继续消费旧 prompt 池
+  - `issue completed`、`loop closed`、`topic fully closed` 三层完成语义必须被明确区分；stale retire/rebuild 不得只依据 issue `completed` 或局部 loop 收口
   - 上述 contract 优先落在现有真源：manager continuity 为唯一治理真相面，`manager-worker-launch-state.env` 与 `live-status` 仅做消费镜像，不新增平行状态文件
   - manager continuity 必须带批次身份锚点与固定承载语法，至少包括 `validation_batch_id`、`integration_target`、`source_batch_base`，并以固定可解析块承载，而不是自由文本
   - manager continuity 还必须固定承载 `acceptance_contract_state`、`acceptance_contract_source`、`acceptance_contract_blocker`，把 IBM acceptance 完整性桥接成 runtime 可消费字段，而不是让 runtime 读取 issue/brainstorm/prd 自行推理
@@ -44,6 +45,7 @@
   - 当 issue 的 `I + B + PRD -> pre-tests.md` 派生链不足以恢复 issue-level acceptance、`post-merge acceptance` 或目标验证环境时，manager 必须写出 `acceptance_contract_state=incomplete` 与 blocker，而不是让 stale/retire 流程伪装成“只剩执行”
   - `pre-tests.md` 质量检查与 testing closeout 必须分开建模：前者确认 acceptance contract 是否完整，后者确认 acceptance 是否已真实执行并留痕
   - testing closeout 默认优先 integration / end-to-end 与 application-native real-environment testing evidence；若缺少这些证据，不得把 lane 判成 `completion_verification done` 或允许 worktree retirement
+  - 若 merge / cleanup / next owner continuity 尚未闭合，即使 issue 已 `completed`，也不得删除最后一个 owner worktree
 - promotion_gate:
   - 冻结 stale 判定的最低 machine-readable 字段、真相面和消费路径
   - 冻结 manager lifecycle transaction 与现有 patrol 词典的映射，不新增平行状态系统
@@ -60,6 +62,7 @@
   - manager 识别 IBM acceptance 缺口时，是否只消费已有 issue/brainstorm/prd/pre-tests artifact，还是需要额外的 IBM completion signal
   - `acceptance_contract_blocker` 的枚举是否还要覆盖 `missing_pre_merge_acceptance` 或 `missing_protected_env_boundary`
   - testing closeout 的 machine-readable evidence 应落在 issue / code-review / progress / runtime 哪个组合面，才能既可恢复又不制造平行真相
+  - `issue completed`、`loop closed`、`topic fully closed` 应否分别写成独立 machine-readable field，还是仅由固定 artifact 组合推导
 - acceptance_reviews:
   - reviewer: `codex + subagent panel (Erdos/James/Singer)`
     mode: `independent candidate acceptance review`
@@ -71,7 +74,7 @@
 - promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - next_action: `C-20260322-1801-A` 已 materialize 成正式 issue；当前继续 pre-brainstorm，但 focus 收窄为三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`。在 replay/retire manifest 及状态真相面冻结前，不直接实现
-- revisit_trigger: 当 stale state 的 canonical 落点、manager lifecycle transaction 字段、runtime gate 消费路径，以及 `acceptance_contract_state/source/blocker` 如何桥接 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链都能冻结为 issue contract 时，重新进入 materialization 判断
+- revisit_trigger: 当 stale state 的 canonical 落点、manager lifecycle transaction 字段、runtime gate 消费路径、`acceptance_contract_state/source/blocker` 如何桥接 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链，以及 `issue completed / loop closed / topic fully closed` 的完成语义都能冻结为 issue contract 时，重新进入 materialization 判断
 - session_refs:
   - tool: codex
   - session_id: current-thread
@@ -88,6 +91,7 @@
   - worker 达到阈值后会回交 manager，由 manager 重新决定 merge / freeze / cleanup / queue，而不是 worker 自行做生命周期决策
   - manager 在接收 self-loop exit 后会释放容量或重新排队，避免同一 lane 立刻以新 prompt 重占原槽位
   - 若当前 lane 被回交，manager continuity / runtime launch state 能把旧 prompt 标记为 superseded，而不是继续留在 active/queued 集合里
+  - worker/skill lane 的局部完成不得直接升级为 issue `completed` 或 topic closeout；manager 必须显式判断后续 merge / cleanup / next owner continuity
   - worker continuity 必须先作为 stall 真相面，runtime launch state 只镜像 manager 已采纳的 supersede / capacity 结果
   - 若 lane 的上游 `Issue + Brainstorm + PRD -> pre-tests.md` acceptance 面不完整，manager 必须允许把问题回交为 IBM/acceptance contract 缺失，而不是仅按 scheduling stall 处理
   - 若 lane 还没跑完 integration / application-native real-environment testing closeout，manager 不得把“低活动”误判成可退休；它必须区分“未测完”与“测完后自环”
@@ -112,7 +116,7 @@
 - promoted_issue_path: `pending://worker-self-loop-exit-and-scheduler-closeout-governance`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - next_action: 继续 pre-brainstorm，先冻结 phase-progress、loop-stall 与 capacity release 的 machine-readable 规则，再决定是否 materialize
-- revisit_trigger: 当 loop stall 判据、manager 回交 contract 与容量释放规则都能冻结成 issue contract 时，重新进入 materialization 判断
+- revisit_trigger: 当 loop stall 判据、manager 回交 contract、容量释放规则，以及“worker/skill 局部完成不等于 issue/topic 完成”的分流规则都能冻结成 issue contract 时，重新进入 materialization 判断
 - session_refs:
   - tool: codex
   - session_id: current-thread
