@@ -33,10 +33,9 @@
   - 冻结 `acceptance evidence` 如何同时回答 `issue completion` 与 `delete gate`，避免再次把 merge-ready 误当终态完成
   - 完成至少一轮独立 acceptance review，确认这条线是新的 upstream contract，而不是 `live-status` 或 stall candidate 的扩写
 - open_questions:
-  - 多 subagent 的会话是否应成为一级可见实体，还是继续只通过 lane/worktree 聚合暴露
-  - 当前 `live-status` / `fleet-status` 是否已足够承接 `current-state plane` / `fleet plane`，还是仍需新的 surface
   - `acceptance evidence schema` 是否只在 artifact plane 成为 canonical truth，还是还需 current-state/API 暴露关键摘要
   - CLI/TUI/GUI/API 是否都必须暴露同一组 deep ref groups，还是 richer surface 可扩展但必须向下兼容最小 ref 组
+  - 当前 `current-state plane` / `fleet plane` 若继续由 `live-status` / `fleet-status` 承接，最小兼容字段是否只需在 shared `status card minimum fields` / `deep ref groups` 上补齐，而无需新建 parallel surface
 - acceptance_reviews:
   - reviewer: `codex`
     mode: `author pre-materialization review`
@@ -48,11 +47,11 @@
     verdict: `stay_pre_brainstorm`
 - priority: P1
 - status: proposed
-- decision_reason: 这条线已经从本次 Freely 自举现场中暴露出来，而且 now clearly exceeds `live-status` / stall candidate 的原边界；但当前仍应停留在 pre-brainstorm，直到五个 plane 的 identity block、progress/stall/acceptance evidence schema、shared state exposure contract，以及与既有线的承接关系都冻结稳定。
+- decision_reason: 这条线已经从本次 Freely 自举现场中暴露出来，而且 now clearly exceeds `live-status` / stall candidate 的原边界；但当前仍应停留在 pre-brainstorm，直到五个 plane 的 identity block、progress/stall/acceptance evidence schema、shared state exposure contract，以及与既有线的承接关系都冻结稳定。当前有两项 blocker 已可按既有真源收口：`current-state plane` / `fleet plane` 默认继续承接现有 `live-status` / `fleet-status`，不另造平行 surface；多 subagent 默认继续通过 lane/worktree 暴露活动痕迹，而不是 day-1 backend 一等实体。剩余未收口 blocker 主要是 `acceptance evidence schema` 的 canonical 落点与 CLI/TUI/GUI/API deep ref 兼容规则。
 - promoted_issue_path: `pending://application-native-runtime-observation-contract-and-observability-planes`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
-- next_action: 继续 pre-brainstorm，先冻结 `plane identity block`、五类 observation planes 的最小词典、`progress/stall/acceptance evidence` schema、CLI/TUI/GUI/API 共享的 status card/deep ref contract，以及 Freely self-host concrete profile。第二轮独立 acceptance review 已确认当前仍不能 materialize；最小剩余下一步收窄为冻结 `acceptance evidence schema` 的 canonical 落点、确认现有 `live-status` / `fleet-status` 是否足够承接 `current-state` / `fleet plane`、冻结 CLI/TUI/GUI/API deep ref 兼容规则，并决定 subagent 是否是一等可观察实体
-- revisit_trigger: 当 `plane identity block`、三类 signal schema、shared state exposure contract、Freely self-host concrete profile 以及与 `live-status` / stall / frontend probe 的关系都足够稳定，且上述四个 contract blocker 经独立 acceptance review 收口后，重新进入 materialization 判断
+- next_action: 继续 pre-brainstorm，先冻结 `plane identity block`、五类 observation planes 的最小词典、`progress/stall/acceptance evidence` schema、CLI/TUI/GUI/API 共享的 status card/deep ref contract，以及 Freely self-host concrete profile。当前默认收口为：`current-state plane` / `fleet plane` 继续由既有 `live-status` / `fleet-status` 承接，多 subagent 继续聚合在 lane/worktree surfaces 下。最小剩余下一步收窄为冻结 `acceptance evidence schema` 的 canonical 落点、补齐 shared `status card minimum fields` / `deep ref groups` 的兼容规则，并完成一轮新的独立 acceptance review。
+- revisit_trigger: 当 `plane identity block`、三类 signal schema、shared state exposure contract、Freely self-host concrete profile 以及与 `live-status` / stall / frontend probe 的关系都足够稳定，且剩余 `acceptance evidence` canonical 落点与 CLI/TUI/GUI/API deep ref 兼容规则经独立 acceptance review 收口后，重新进入 materialization 判断
 - session_refs:
   - tool: codex
   - session_id: current-thread

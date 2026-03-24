@@ -376,10 +376,14 @@ Freely self-host 当前 concrete profile 应作为 profile 示例，而不是通
 
 进入 materialization 前，至少还要把下面几件事收死：
 
-1. `plane identity block` 是否已经足够承载多 worktree / 多 subagent / 多 topic 映射。
-2. `acceptance evidence schema` 到底是只存在于 artifact plane，还是还要求 current-state / API 同步镜像关键结果。
-3. CLI/TUI/GUI/API 是否统一暴露同一组 deep ref，还是允许 richer surfaces 扩展但必须兼容最小 ref 组。
-4. 独立 acceptance review 需要确认这条线是新 upstream contract，而不是对 `live-status` 或 stall candidate 的重复建模。
+1. `acceptance evidence schema` 到底是只存在于 artifact plane，还是还要求 current-state / API 同步镜像关键结果。
+2. CLI/TUI/GUI/API 是否统一暴露同一组 deep ref，还是允许 richer surfaces 扩展但必须兼容最小 ref 组。
+3. 独立 acceptance review 需要确认这条线是新 upstream contract，而不是对 `live-status` 或 stall candidate 的重复建模。
+
+已提前收口、暂不再作为 blocker 的边界：
+
+- `current-state plane` / `fleet plane` 默认继续承接现有 `live-status` / `fleet-status`；若后续要扩 richer product surfaces，应建立在 shared `status card minimum fields` 与 `deep ref groups` 之上，而不是另造平行 current-state surface。
+- 多 subagent 默认继续通过 lane/worktree surface 暴露活动痕迹与结果，不要求 day-1 backend 把每个 subagent 做成一等可观察实体。
 
 ## Coordination With Existing Lines
 
