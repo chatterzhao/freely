@@ -175,8 +175,15 @@ if [[ -f "$AI_SWITCH_LOG" ]] && grep -q ' switch ' "$AI_SWITCH_LOG"; then
   exit 1
 fi
 
+if [[ -f "$AI_SWITCH_LOG" ]] && grep -qE ' whoami | list$' "$AI_SWITCH_LOG"; then
+  echo "[FAIL] expected ensure-manager to avoid ai whoami/list reads while account switch lock is active" >&2
+  exit 1
+fi
+
 wait "$ensure_pid"
 
+grep -q 'whoami codex' "$AI_SWITCH_LOG"
+grep -q ' list$' "$AI_SWITCH_LOG"
 grep -q 'switch codex worahe3971@outlook-com --yes' "$AI_SWITCH_LOG"
 grep -q 'start --project '"$PROJECT"'$' "$LAUNCH_LOG"
 grep -q 'worahe3971@outlook.com' "$AI_STATE"

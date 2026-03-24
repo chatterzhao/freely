@@ -87,6 +87,11 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `ensure-manager` / availability watchdog 在 probe、切号、manager bootstrap 前会先等待现有 switch sweep 完成，避免 transient unauthorized / unavailable 账号被误当成新的恢复信号
     - `test-freely-ai-account-switch-serialization` 覆盖 auto-probe sweep 全程持锁
     - `test-freely-ensure-manager-defers-during-account-switch` 覆盖 switch lock 活跃时 watchdog 延迟 probe/bootstrap，待切号结束后再恢复
+  - 2026-03-24 continuation 又补齐 switch sweep 期间的剩余 race：
+    - `ensure_manager_once()` 先前仍可能在 wait 之前触发 `whoami`
+    - `codex_saved_accounts()` / `whoami` / `list` 读路径现在也会等待正在进行中的 switch sweep
+    - `codex_probe_current_account_now()` 现在会持有同一把 shared switch lock 覆盖整个 `codex exec` probe，避免 wait-return 后被新的手工 sweep 插入
+    - `test-freely-codex-probe-defers-during-account-switch` 覆盖 watchdog probe 自身的 defer + serialization
   - 2026-03-23 当前 verification batch 在 dedicated feature worktree 中直接完成，无需引入 `pre-test-merge` 或提前要求 `post-merge acceptance`：
     - `freely ensure-manager --project <tmp-project>` 直接命令验证通过，确认 watchdog 会先切到可用账号，再发起 manager bootstrap
     - `freely start --project <tmp-project>` 最小 rate-limit 场景可直接写出 `LAST_ACCOUNT_SWITCH_REASON="primary_rate_limit_exhausted"`，证明 runtime 仍把恢复理由写回 watchdog 接管面

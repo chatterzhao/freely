@@ -24,6 +24,10 @@
   - `test-freely-rate-limit-defers-to-watchdog` 的整秒计时断言存在秒边界抖动，已改成 monotonic 毫秒阈值
   - `ensure-manager` 与 earliest-reset 回归已补 manager bootstrap handoff artifact 断言，锁住 `trigger/account/reason/next_action` 契约
   - 手工或自动账号切换 sweep 期间，watchdog/ensure-manager 之前仍可能并发触发 `whoami/list/switch/codex exec`；当前已补 shared switch lock，让 watchdog 在 sweep 结束前延迟 probe/bootstrap，避免误把切号中间态当成新的限流/授权恢复信号
+  - 当前 continuation 又补了一轮锁边界：
+    - `whoami/list` 读路径也受 shared switch lock 保护，不再只靠 `switch`/bootstrap 本身等待
+    - watchdog `codex exec` probe 现在会持有 shared lock 直到 probe 结束，避免 manual sweep 在 wait-return 后立刻插入
+    - focused tests 已覆盖 `ensure-manager` defer 期间不触发 `whoami/list`，以及 probe 自身的 defer + serialization
 
 ## Verification
 
@@ -36,6 +40,7 @@
 - `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-serialization`
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-defers-during-account-switch`
+- `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-defers-during-account-switch`
 
 ### Latest rerun
 
