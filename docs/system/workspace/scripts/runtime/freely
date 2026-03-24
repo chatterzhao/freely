@@ -1768,6 +1768,21 @@ csv_remove_exact_item() {
   printf '%s\n' "$result"
 }
 
+csv_retain_exact_items() {
+  local csv="$1" allowed_csv="$2" item result=""
+  [[ -n "$csv" && -n "$allowed_csv" ]] || {
+    printf '\n'
+    return 0
+  }
+  IFS=',' read -r -a __csv_retain_items <<<"$csv"
+  for item in "${__csv_retain_items[@]}"; do
+    [[ -n "$item" ]] || continue
+    csv_contains_exact_item "$allowed_csv" "$item" || continue
+    result="$(csv_append_unique_item "$result" "$item")"
+  done
+  printf '%s\n' "$result"
+}
+
 csv_conflicts_with_item() {
   local csv="$1" needle="$2" item
   [[ -n "$csv" && -n "$needle" ]] || return 1
@@ -2000,6 +2015,8 @@ manager_continuity_has_unconsumed_launchable_worker_prompt() {
     launched_csv="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
     if [[ -n "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" && "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" != "$continuity_file" ]]; then
       launched_csv=""
+    else
+      launched_csv="$(csv_retain_exact_items "$launched_csv" "$prompt_generated_csv")"
     fi
   fi
   while IFS= read -r prompt_file; do

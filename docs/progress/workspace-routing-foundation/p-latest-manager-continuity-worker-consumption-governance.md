@@ -4,14 +4,14 @@
 - title: Latest manager continuity worker consumption governance
 - phase_state: `in_verification`
 - runtime_state: `restart_required`
-- branch: `feature/manager-launch-state-frozen-queue-drift-20260324`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-frozen-queue-drift`
+- branch: `feature/manager-launch-state-frozen-prompt-state-reconcile-20260324`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-frozen-prompt-state-reconcile`
 - issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "verification-writeback"}
   - {tool: codex, session_id: "019d1e52-ccb2-7612-9538-87fd9df4eea5", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T22-30-36-019d1e52-ccb2-7612-9538-87fd9df4eea5.jsonl", role: "context_compacted_handoff_source"}
   - {tool: codex, session_id: "019d1e4e-709f-7571-a958-b79828dc38f4", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T22-25-50-019d1e4e-709f-7571-a958-b79828dc38f4.jsonl", role: "fresh_with_handoff_source"}
-- summary: `pre-test-merge` dogfood 暴露的 latest continuity consumption gap 已补齐到 verification：delegated continuation consumed truth 会在 prompt build 后立即写入 session/live status，active prompt 期间不会再把同一 intake 同时显示为 pending，AI 停止后相同 ids 会重新回到 pending 供 recovery 接管；2026-03-24 又补上 frozen-queue drift，确保 latest continuity 标记为 `Frozen Queue` / `desired-frozen` 的 prompt 不再进入 launchable generated/consumed inventory，也不会被 manager recovery 复活。
+- summary: `pre-test-merge` dogfood 暴露的 latest continuity consumption gap 已补齐到 verification：delegated continuation consumed truth 会在 prompt build 后立即写入 session/live status，active prompt 期间不会再把同一 intake 同时显示为 pending，AI 停止后相同 ids 会重新回到 pending 供 recovery 接管；2026-03-24 又补上 frozen-queue drift 及其 same-continuity reconciliation 尾巴，确保 latest continuity 标记为 `Frozen Queue` / `desired-frozen` 的 prompt 不再进入 launchable generated/consumed inventory，也不会因旧 launch-state 残留而继续显示为 consumed/launched 或被 manager recovery 复活。
 - current_focus:
   - keep the issue in `in_verification` until one real `develop` post-merge `freely chat` acceptance confirms the same behavior in the application-native real environment
   - preserve recovery semantics so prompt-consumed delegated ids only stay hidden while the current AI is actually running
@@ -22,9 +22,21 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-frozen-prompt`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reconciles-stale-frozen-consumed-prompt`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-frozen-worker`
   - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
   - `./bin/governance-check`
+
+## 2026-03-24 Same-Continuity Reconcile Followthrough
+
+- Real post-merge dogfood on `develop` surfaced one narrower follow-up bug inside the same issue family: after the frozen-queue parser fix merged, `.freely/run/manager-worker-launch-state.env` could still retain an old frozen prompt in `LAST_MANAGER_WORKER_PROMPTS_CONSUMED` / `LAUNCHED_WORKER_PROMPTS` when the latest continuity file path itself had not changed. The stale entry survived because launch reconciliation only mutated prompts iterated from the current launchable set, instead of first pruning no-longer-launchable prompts from the carried-over csv.
+- Followthrough stayed inside the same issue scope rather than opening a new lifecycle. Runtime now reconciles carried-over consumed/launched prompt csv against the latest continuity's launchable prompt set before relaunch decisions, so stale frozen remnants are dropped even when `LAST_MANAGER_CONTINUITY_CONSUMED` already equals the current continuity file.
+- Focused verification rerun on 2026-03-24:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reconciles-stale-frozen-consumed-prompt`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-frozen-prompt`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-frozen-worker`
+- Result: same-continuity stale frozen prompt remnants are now purged before relaunch reconciliation; remaining scope is still the unchanged real `develop` post-merge acceptance via `freely chat`.
 
 ## 2026-03-23 Continuation Writeback
 
