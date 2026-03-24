@@ -70,6 +70,23 @@
   - after stop, the active-prompt filter no longer applies, so the same delegated ids reappear in `pending_delegated_continuation_ids`
 - No new implementation gap surfaced in the declared write scope. This worktree remains verification-only until one real post-merge `develop` acceptance records the same behavior in the protected environment.
 
+## 2026-03-23 Active-Prompt Visibility Revalidation
+
+- Re-ran the complete targeted verification suite again in the current feature worktree:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
+  - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
+  - `./bin/governance-check`
+- All checks stayed green. `governance-check` still passed with only the same legacy pre-brainstorm naming warnings, so this lane introduced no new governance drift.
+- Runtime truth-source inspection stayed aligned with acceptance:
+  - prompt-build persistence is still written into `LAST_DELEGATED_CONTINUATION_CONSUMED_IDS` / `LAST_DELEGATED_CONTINUATION_CONSUMED_AT`
+  - `active_prompt_consumed_delegation_ids_for_project` still gates active pending visibility on a live AI pid plus the delegated-continuation prompt header
+  - `delegated_continuation_snapshot_for_project` and `delegated_continuation_ids_for_project` still suppress those ids only while the same prompt is active, so they reappear after stop for recovery-owned relaunch
+- Route selection did not change in this round: the input remained `source_class=continuation`, `route_kind=dev_loop`, `target_skill=dev-loop-execution`, and `selected_tool=codex`, so the correct action stayed in-session verification writeback rather than a handoff-only `next_prompt`.
+- Remaining acceptance is unchanged: one real post-merge `develop` dogfood run via `freely chat`, not more feature-branch implementation.
+
 ## Recovery Context
 
 - A later `context_compacted` rotation from Codex session `019d1e52-ccb2-7612-9538-87fd9df4eea5` re-entered the same worker lane in a fresh session, so the first action in the current round remained refreshing the dev-loop continuity artifacts instead of expanding runtime scope.
