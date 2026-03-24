@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260322-0445`
 - title: Latest manager continuity worker consumption governance
-- phase_state: `in_verification`
+- phase_state: `in_progress`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `latest-manager-continuity-worker-consumption-governance`
@@ -45,6 +45,7 @@
 6. worker prompt contract 必须保持 runtime-launchable：
    - manager handoff 默认写 machine-readable `Worktree:` / `Branch:` header
    - runtime 在兼容期内也要能解析当前自然语言句式 `You are the worker for ... in ...`
+7. 若同一 continuity 的 prompt 曾被记录为 consumed，但对应 worker 当前并未运行，runtime 必须把它视为 stale consumed state，并允许重新 launch / reentry，而不是要求先生成一轮新的 continuity。
 
 ## Acceptance
 
@@ -55,6 +56,7 @@
   - latest worker prompt set generated
   - latest worker prompt set consumed
 - 若 worker 已活跃，reentry 走最新 prompt；若 worker 未运行，launch 走最新 prompt。
+- 若 worker 已停止，但当前 continuity / prompt set 仍是最新真相，runtime 会忽略 stale consumed marker 并重新 launch。
 - `baseline-status` / `live-status` 能显示上述 generated/consumed truth。
 - regression tests 覆盖：
   - stale continuity state 被更新到最新 continuity
@@ -66,6 +68,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
 - `docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
+- `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
 - `docs/system/workspace/scripts/tests/test-freely-worker-prompt-natural-language-contract-compat`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md`
@@ -76,6 +79,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
 - `./bin/governance-check`
 
 ## Next

@@ -1730,6 +1730,22 @@ csv_append_unique_item() {
   fi
 }
 
+csv_remove_exact_item() {
+  local csv="$1" needle="$2" item result=""
+  [[ -n "$csv" && -n "$needle" ]] || {
+    printf '%s\n' "$csv"
+    return 0
+  }
+  IFS=',' read -r -a __csv_remove_items <<<"$csv"
+  for item in "${__csv_remove_items[@]}"; do
+    [[ -n "$item" && "$item" == "$needle" ]] && continue
+    if [[ -n "$item" ]]; then
+      result="$(csv_append_unique_item "$result" "$item")"
+    fi
+  done
+  printf '%s\n' "$result"
+}
+
 csv_conflicts_with_item() {
   local csv="$1" needle="$2" item
   [[ -n "$csv" && -n "$needle" ]] || return 1
@@ -2191,12 +2207,14 @@ manager_runtime_launch_workers_from_latest_handoff() {
 
   while IFS=$'\t' read -r _prompt_rank _prompt_index prompt_file; do
     [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
-    if csv_contains_exact_item "$launched_csv" "$prompt_file"; then
-      continue
-    fi
-
     target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
     [[ -n "$target_project" && -d "$target_project" ]] || continue
+    if csv_contains_exact_item "$launched_csv" "$prompt_file"; then
+      if worker_project_is_actively_running "$target_project"; then
+        continue
+      fi
+      launched_csv="$(csv_remove_exact_item "$launched_csv" "$prompt_file")"
+    fi
     write_scope="$(worker_prompt_write_scope "$project" "$prompt_file")"
     parallel_safe="$(worker_prompt_parallel_safe "$prompt_file")"
     worker_is_active="0"
