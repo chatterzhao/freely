@@ -711,6 +711,10 @@ CONTEXT_ROTATE_RATIO=0.70
 CHECKPOINT_WARN_DIRTY_ENTRIES=40
 CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
 CHECKPOINT_DRIFT_STREAK_THRESHOLD=2
+RESTART_STORM_WINDOW_SECS=30
+RESTART_STORM_COUNT=4
+PROCESS_CHURN_PEAK=3
+RESTART_STORM_OBSERVE_DELAY_SECS=30
 EOF
 }
 
@@ -1634,6 +1638,13 @@ load_session_state_or_defaults() {
   LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0"
   LAST_DELEGATED_CONTINUATION_CONSUMED_IDS=""
   LAST_DELEGATED_CONTINUATION_CONSUMED_AT=""
+  LAST_RESTART_STORM_WINDOW_SECS="0"
+  LAST_RESTART_STORM_COUNT="0"
+  LAST_PROCESS_CHURN_PEAK="0"
+  LAST_RESTART_STORM_SIGNAL_AT=""
+  LAST_RESTART_STORM_SIGNAL_REASON=""
+  LAST_RESTART_STORM_ESCALATED_AT=""
+  LAST_RESTART_STORM_ESCALATION_TARGET=""
   CHECKPOINT_DRIFT_STREAK_CURRENT="0"
   ROUTE_ONLY_STREAK_CURRENT="0"
   RESUME_STREAK_CURRENT="0"
@@ -2594,7 +2605,7 @@ recover_stalled_worker_ai_if_needed() {
 }
 
 write_session_state() {
-  local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" context_compacted="$8" context_ratio="$9" primary_used_percent="${10}" primary_resets_at="${11}" secondary_used_percent="${12}" secondary_resets_at="${13}" route_only_handoff="${14}" route_only_streak="${15}" resume_streak="${16}" active_account="${17}" account_switch_reason="${18}" account_switch_at="${19}" cycle_debug_log="${20}" claude_jsonl_path="${21}" codex_mcp_used="${22}" codex_mcp_thread_id="${23}" codex_mcp_jsonl_path="${24}" claude_session_id_current="${25}" claude_session_id_previous="${26}" project_dirty_entries="${27}" worktree_summary_total="${28}" worktree_summary_dirty="${29}" checkpoint_drift_streak="${30}" delegated_pending_ids="${31}" delegated_pending_count="${32}" delegated_consumed_ids="${33}" delegated_consumed_at="${34}"
+  local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" context_compacted="$8" context_ratio="$9" primary_used_percent="${10}" primary_resets_at="${11}" secondary_used_percent="${12}" secondary_resets_at="${13}" route_only_handoff="${14}" route_only_streak="${15}" resume_streak="${16}" active_account="${17}" account_switch_reason="${18}" account_switch_at="${19}" cycle_debug_log="${20}" claude_jsonl_path="${21}" codex_mcp_used="${22}" codex_mcp_thread_id="${23}" codex_mcp_jsonl_path="${24}" claude_session_id_current="${25}" claude_session_id_previous="${26}" project_dirty_entries="${27}" worktree_summary_total="${28}" worktree_summary_dirty="${29}" checkpoint_drift_streak="${30}" delegated_pending_ids="${31}" delegated_pending_count="${32}" delegated_consumed_ids="${33}" delegated_consumed_at="${34}" restart_storm_window_secs="${35}" restart_storm_count="${36}" process_churn_peak="${37}" restart_storm_signal_at="${38}" restart_storm_signal_reason="${39}" restart_storm_escalated_at="${40}" restart_storm_escalation_target="${41}"
   local state_file
   state_file="$(session_state_file "$project")"
   cat >"$state_file" <<EOF
@@ -2628,10 +2639,112 @@ LAST_DELEGATED_CONTINUATION_PENDING_IDS="$delegated_pending_ids"
 LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
 LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
 LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
+LAST_RESTART_STORM_WINDOW_SECS="$restart_storm_window_secs"
+LAST_RESTART_STORM_COUNT="$restart_storm_count"
+LAST_PROCESS_CHURN_PEAK="$process_churn_peak"
+LAST_RESTART_STORM_SIGNAL_AT="$restart_storm_signal_at"
+LAST_RESTART_STORM_SIGNAL_REASON="$restart_storm_signal_reason"
+LAST_RESTART_STORM_ESCALATED_AT="$restart_storm_escalated_at"
+LAST_RESTART_STORM_ESCALATION_TARGET="$restart_storm_escalation_target"
 CHECKPOINT_DRIFT_STREAK_CURRENT="$checkpoint_drift_streak"
 ROUTE_ONLY_STREAK_CURRENT="$route_only_streak"
 RESUME_STREAK_CURRENT="$resume_streak"
 EOF
+}
+
+runtime_active_process_count_for_project() {
+  local project="$1"
+  local count=0 pid=""
+
+  pid="$(manager_supervisor_pid_for_project "$project")"
+  [[ -n "$pid" ]] && count=$((count + 1))
+
+  pid="$(interruption_dispatcher_pid_for_project "$project")"
+  [[ -n "$pid" ]] && count=$((count + 1))
+
+  pid="$(runtime_ai_pid_hint_for_project "$project")"
+  [[ -n "$pid" ]] && count=$((count + 1))
+
+  printf '%s\n' "$count"
+}
+
+restart_storm_window_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/restart-storm-window.tsv"
+}
+
+update_restart_storm_window() {
+  local project="$1" now_epoch="$2" active_process_count="$3"
+  local window_file tmp_file window_secs
+  window_file="$(restart_storm_window_file "$project")"
+  mkdir -p "$(dirname "$window_file")"
+  tmp_file="$(mktemp "$(dirname "$window_file")/restart-storm-window.XXXXXX")"
+  window_secs="${RESTART_STORM_WINDOW_SECS:-30}"
+  {
+    if [[ -f "$window_file" ]]; then
+      awk -F '\t' -v now="$now_epoch" -v window="$window_secs" '
+        NF >= 2 && $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ {
+          if ((now - $1) <= window) {
+            print $1 "\t" $2
+          }
+        }
+      ' "$window_file"
+    fi
+    printf '%s\t%s\n' "$now_epoch" "${active_process_count:-0}"
+  } >"$tmp_file"
+  mv "$tmp_file" "$window_file"
+}
+
+restart_storm_window_stats() {
+  local project="$1"
+  local window_file count peak
+  window_file="$(restart_storm_window_file "$project")"
+  if [[ ! -f "$window_file" ]]; then
+    printf '0|0\n'
+    return 0
+  fi
+  read -r count peak < <(
+    awk -F '\t' '
+      NF >= 2 && $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ {
+        count += 1
+        if ($2 > peak) {
+          peak = $2
+        }
+      }
+      END {
+        if (count == 0) {
+          peak = 0
+        }
+        printf "%d %d\n", count, peak
+      }
+    ' "$window_file"
+  )
+  printf '%s|%s\n' "${count:-0}" "${peak:-0}"
+}
+
+restart_storm_signal_reason_for_window() {
+  local restart_count="$1" process_peak="$2"
+  if (( ${restart_count:-0} >= ${RESTART_STORM_COUNT:-4} )); then
+    printf 'restart_storm_count_threshold\n'
+    return 0
+  fi
+  if (( ${process_peak:-0} >= ${PROCESS_CHURN_PEAK:-3} )); then
+    printf 'process_churn_peak_threshold\n'
+    return 0
+  fi
+  return 1
+}
+
+record_restart_storm_signal() {
+  local project="$1" signal_reason="$2" restart_count="$3" process_peak="$4"
+  LAST_RESTART_STORM_WINDOW_SECS="${RESTART_STORM_WINDOW_SECS:-30}"
+  LAST_RESTART_STORM_COUNT="${restart_count:-0}"
+  LAST_PROCESS_CHURN_PEAK="${process_peak:-0}"
+  LAST_RESTART_STORM_SIGNAL_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  LAST_RESTART_STORM_SIGNAL_REASON="$signal_reason"
+  LAST_RESTART_STORM_ESCALATED_AT="$LAST_RESTART_STORM_SIGNAL_AT"
+  LAST_RESTART_STORM_ESCALATION_TARGET="manager_bootstrap_handoff"
+  write_manager_bootstrap_handoff "$project" "restart_storm_detected" "${LAST_ACTIVE_ACCOUNT:-unknown}" "${LAST_ACTIVE_ACCOUNT:-unknown}" "$signal_reason" "inspect-runtime-restart-storm-before-relaunch"
 }
 
 write_session_handoff() {
@@ -4111,7 +4224,7 @@ cmd_start() {
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
     LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
     LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}"
     if [[ "$mode_name" == "fresh" || "$mode_name" == "fresh_with_handoff" ]]; then
       rm -f "$(handoff_file "$PROJECT_ROOT")"
     fi
@@ -4292,7 +4405,20 @@ cmd_start() {
       fi
     fi
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT"
+    local restart_signal_reason active_process_count now_epoch observe_delay restart_window_stats restart_window_count restart_window_peak
+    restart_signal_reason=""
+    active_process_count="$(runtime_active_process_count_for_project "$PROJECT_ROOT")"
+    now_epoch="$(date +%s)"
+    update_restart_storm_window "$PROJECT_ROOT" "$now_epoch" "${active_process_count:-0}"
+    restart_window_stats="$(restart_storm_window_stats "$PROJECT_ROOT")"
+    restart_window_count="${restart_window_stats%%|*}"
+    restart_window_peak="${restart_window_stats##*|}"
+    if restart_storm_signal_reason_for_window "${restart_window_count:-0}" "${restart_window_peak:-0}" >/dev/null 2>&1; then
+      restart_signal_reason="$(restart_storm_signal_reason_for_window "${restart_window_count:-0}" "${restart_window_peak:-0}")"
+      record_restart_storm_signal "$PROJECT_ROOT" "$restart_signal_reason" "${restart_window_count:-0}" "${restart_window_peak:-0}"
+    fi
+
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_ACCOUNT" "$LAST_ACCOUNT_SWITCH_REASON" "$LAST_ACCOUNT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}"
     LAST_WORKCELL_EXIT_REASON="${account_switch_reason:-${rate_limit_reason:-ai_exit_rc_${rc}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
 
@@ -4308,6 +4434,13 @@ cmd_start() {
     if [[ -n "$account_switch_reason" ]]; then
       log_warn "${account_switch_reason} detected for this workcell; local runtime is deferring global account recovery to the global watchdog / manager control plane and will now stop"
       exit 0
+    fi
+    if [[ -n "$restart_signal_reason" ]]; then
+      observe_delay="${RESTART_STORM_OBSERVE_DELAY_SECS:-30}"
+      restart_count=0
+      log_warn "restart storm / process churn detected for this workcell; pausing blind relaunch for ${observe_delay}s while waiting for manager auto-loop judgement (reason=$restart_signal_reason count=${LAST_RESTART_STORM_COUNT:-0} peak=${LAST_PROCESS_CHURN_PEAK:-0})"
+      sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$observe_delay"
+      continue
     fi
     sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$next_restart_delay"
   done
@@ -4682,6 +4815,13 @@ cmd_baseline_status() {
   echo "last_delegated_continuation_pending_count: ${LAST_DELEGATED_CONTINUATION_PENDING_COUNT:-0}"
   echo "last_delegated_continuation_consumed_ids: ${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-none}"
   echo "last_delegated_continuation_consumed_at: ${LAST_DELEGATED_CONTINUATION_CONSUMED_AT:-unavailable}"
+  echo "last_restart_storm_window_secs: ${LAST_RESTART_STORM_WINDOW_SECS:-0}"
+  echo "last_restart_storm_count: ${LAST_RESTART_STORM_COUNT:-0}"
+  echo "last_process_churn_peak: ${LAST_PROCESS_CHURN_PEAK:-0}"
+  echo "last_restart_storm_signal_at: ${LAST_RESTART_STORM_SIGNAL_AT:-unavailable}"
+  echo "last_restart_storm_signal_reason: ${LAST_RESTART_STORM_SIGNAL_REASON:-unavailable}"
+  echo "last_restart_storm_escalated_at: ${LAST_RESTART_STORM_ESCALATED_AT:-unavailable}"
+  echo "last_restart_storm_escalation_target: ${LAST_RESTART_STORM_ESCALATION_TARGET:-unavailable}"
   if [[ -f "$(manager_worker_launch_state_file "$PROJECT_ROOT")" ]]; then
     # shellcheck disable=SC1090
     source "$(manager_worker_launch_state_file "$PROJECT_ROOT")"
@@ -4858,6 +4998,10 @@ cmd_live_status() {
   echo "pending_delegated_continuation_ids: ${delegated_pending_ids:-none}"
   echo "last_consumed_delegated_continuation_ids: ${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-none}"
   echo "last_consumed_delegated_continuation_at: ${LAST_DELEGATED_CONTINUATION_CONSUMED_AT:-unavailable}"
+  echo "restart_storm_signal_at: ${LAST_RESTART_STORM_SIGNAL_AT:-unavailable}"
+  echo "restart_storm_signal_reason: ${LAST_RESTART_STORM_SIGNAL_REASON:-unavailable}"
+  echo "restart_storm_signal_summary: window=${LAST_RESTART_STORM_WINDOW_SECS:-0}s count=${LAST_RESTART_STORM_COUNT:-0} peak=${LAST_PROCESS_CHURN_PEAK:-0}"
+  echo "restart_storm_escalation_target: ${LAST_RESTART_STORM_ESCALATION_TARGET:-unavailable}"
   echo "current_prompt_has_delegated_continuation: ${prompt_has_delegated}"
   echo "latest_manager_continuity_generated: ${latest_manager_continuity_generated}"
   echo "latest_manager_continuity_consumed: ${latest_manager_continuity_consumed}"
@@ -5013,7 +5157,7 @@ sleep_with_rate_limit_recheck() {
 }
 
 cmd_fleet_status() {
-  local project="" repo_root entries wt_path wt_branch wt_state cfg run_dir session_state supervisor_pid ai_pid last_launch last_dirty checkpoint_json checkpoint_required
+  local project="" repo_root entries wt_path wt_branch wt_state cfg run_dir session_state supervisor_pid ai_pid last_launch last_dirty checkpoint_json checkpoint_required restart_signal_reason restart_signal_at restart_summary
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -5041,6 +5185,9 @@ cmd_fleet_status() {
     last_launch="-"
     last_dirty="-"
     checkpoint_required="false"
+    restart_signal_reason="-"
+    restart_signal_at="-"
+    restart_summary="-"
     if [[ -f "$cfg" ]]; then
       run_dir="$(run_dir_for_project "$wt_path")"
       session_state="$(session_state_file "$wt_path")"
@@ -5061,6 +5208,9 @@ cmd_fleet_status() {
         source "$session_state"
         last_launch="${LAST_LAUNCH_KIND:--}"
         last_dirty="${LAST_PROJECT_DIRTY_ENTRIES:-0}"
+        restart_signal_reason="${LAST_RESTART_STORM_SIGNAL_REASON:--}"
+        restart_signal_at="${LAST_RESTART_STORM_SIGNAL_AT:--}"
+        restart_summary="storm=${restart_signal_reason} window=${LAST_RESTART_STORM_WINDOW_SECS:-0}s count=${LAST_RESTART_STORM_COUNT:-0} peak=${LAST_PROCESS_CHURN_PEAK:-0}"
       fi
     fi
     checkpoint_json="$(checkpoint_guard_json_for_project "$wt_path")"
@@ -5068,6 +5218,9 @@ cmd_fleet_status() {
     printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "$wt_branch" "$wt_state" "$supervisor_pid" "$ai_pid" "$last_dirty" "${checkpoint_required:-false}" "$wt_path"
     if [[ "$last_launch" != "-" ]]; then
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "launch=$last_launch" "" ""
+    fi
+    if [[ "$restart_signal_at" != "-" && -n "$restart_signal_at" ]]; then
+      printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "$restart_signal_reason" "" "$restart_summary"
     fi
   done < <(printf '%s\n' "$entries" | awk '
     BEGIN { wt=""; br="(detached)" }

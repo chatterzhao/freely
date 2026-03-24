@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260324-0405--watchdog-restart-storm-and-process-churn-detection
 - 20260323-2045--manager-worker-scheduler-capacity-and-queueing
 - 20260323-1705--manager-delegated-continuation-stall-recovery
 - 20260323-1835--worker-delegated-continuation-active-stall-recovery
@@ -48,6 +49,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260324-0405--watchdog-restart-storm-and-process-churn-detection
+  - brainstorms: docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/candidates.md
 - 20260323-2045--manager-worker-scheduler-capacity-and-queueing
   - brainstorms: docs/pre-brainstorms/20260323-2045--manager-worker-scheduler-capacity-and-queueing/brainstorms.md
   - candidates: docs/pre-brainstorms/20260323-2045--manager-worker-scheduler-capacity-and-queueing/candidates.md
