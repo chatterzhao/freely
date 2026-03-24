@@ -25,11 +25,13 @@
   - `workcell-state.env` should not mirror restart-storm/process-churn counters
   - watchdog should stop blind relaunch after signal and enter low-frequency observation while waiting for manager judgement
   - manager continuity should carry signal refs plus `ownership/restart_point/next_action`, not duplicate raw counters
+  - stall detection and restart-storm detection should remain separate contracts: stall for live-but-not-advancing AI; restart storm for short-window exit/relaunch churn
+  - provisional defaults: `RESTART_STORM_WINDOW_SECS=30`, `RESTART_STORM_COUNT=4`, `PROCESS_CHURN_PEAK=3`
 - decision_reason:
   - 这是 runtime/watchdog 实现缺口，不是当前三个 loop 语义重构 issue 的附带 patch
   - 但它又已经被 active truth 明确依赖，不能继续只停留在口头 follow-on
 - next_action:
-  - 继续 pre-brainstorm，收紧 stall coexistence 与 counter/window 默认阈值；若这两项冻结完成，就 materialize 为独立 issue
+  - 已可 materialize 为独立 issue；IBM 里继续冻结 `live-status` / `fleet-status` 暴露格式与测试矩阵
 - promotion_gate:
   - signal truth surface frozen
   - manager escalation path frozen
@@ -38,8 +40,8 @@
   - stall coexistence frozen
   - counter/window default contract frozen
 - open_questions:
-  - restart storm 与现有 stalled manager/worker recovery 谁先判，还是各自独立命中
-  - `RESTART_STORM_WINDOW_SECS` / `RESTART_STORM_COUNT` / `PROCESS_CHURN_PEAK` 默认阈值应是多少
+  - `live-status` / `fleet-status` 是输出原始计数，还是输出摘要+deep refs
+  - runtime tests 是按 manager/worker 分别覆盖，还是先做 shared helper fixture
 - revisit_trigger:
   - 需要真正修改 `runtime/freely` 与 watchdog scripts 时
   - 或再次观察到短窗口反复拉起 AI 进程却缺少 manager-level judgement

@@ -125,6 +125,29 @@
 - 也就是说，continuity 只表达“主管看到了什么 signal，以及决定 runtime 接下来怎么做”
 - 原始 signal 数值仍回看 `session-state.env` 与 `live-status`
 
+### 4. stall 与 restart storm 各判各的，不共用同一命中面
+
+- `stall` 处理的是：AI 进程仍活着，但 prompt / cycle / continuity 已停止推进
+- `restart storm / process churn` 处理的是：AI 或 supervisor 在短窗口内反复退出并被重拉
+- 因此两者不应共用同一阈值或同一判据
+- 建议顺序：
+  1. 若 AI 仍活着，优先走现有 stall detection / recovery
+  2. 若 AI 已反复退出并进入 supervisor restart churn，改由 restart storm signal 命中
+  3. signal 命中后，watchdog 停止继续盲重启，把裁决权交给 manager `auto-loop`
+
+### 5. 默认阈值先冻结成保守版本
+
+- `RESTART_STORM_WINDOW_SECS=30`
+- `RESTART_STORM_COUNT=4`
+- `PROCESS_CHURN_PEAK=3`
+
+冻结理由：
+
+- 当前 runtime 本地 restart delay 默认是 `2s`
+- 正常单次恢复或偶发两三次波动不应直接判成 thrash
+- `30s / 4 次` 足以覆盖“短时间内明显重复拉起”
+- `PROCESS_CHURN_PEAK=3` 则用于捕捉 supervisor / ai 异常并行膨胀，而不是单个正常 supervisor+ai 组合
+
 ## 代码与真源落点候选
 
 - `docs/system/workspace/scripts/runtime/freely`
@@ -143,6 +166,7 @@
   - signal 真相面写在 `session-state.env`
   - manager judgement 与 watchdog 低频观察的最小交互
   - continuity 只携带 signal ref 与 followthrough judgement
+  - stall 与 restart storm 的判定面分离
+  - counter/window 默认阈值
 - 进入 IBM 前最后还要收紧：
-  - signal 与现有 stall contract 如何并存
-  - counter/window 默认阈值与暴露格式
+  - signal 在 `live-status` / `fleet-status` 的具体展示格式
