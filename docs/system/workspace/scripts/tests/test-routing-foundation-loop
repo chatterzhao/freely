@@ -82,6 +82,8 @@ case "$current_branch" in
     printf '%s\n' "$prompt" | grep -q '.freely/run/worker-prompts'
     printf '%s\n' "$prompt" | grep -q '不会从普通回答里自动提炼 handoff'
     printf '%s\n' "$prompt" | grep -q '你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径'
+    printf '%s\n' "$prompt" | grep -q '在主 handoff artifact 落盘前不要先 spawn subagent'
+    printf '%s\n' "$prompt" | grep -q 'subagent 只能用于不阻塞首个 handoff 的二次核对'
     ;;
   *)
     printf '%s\n' "$prompt" | grep -q 'MANAGER_MODE=false'
