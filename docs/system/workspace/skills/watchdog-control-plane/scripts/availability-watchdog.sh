@@ -69,6 +69,14 @@ codex_current_account() {
   printf '%s\n' "$output" | sed -n 's/.*"account": *"\([^"]*\)".*/\1/p' | tail -n 1
 }
 
+codex_current_slot() {
+  local project="$1" ai_bin output
+  ai_bin="$(ai_cli_bin_for_project "$project")"
+  [[ -x "$ai_bin" ]] || return 0
+  output="$("$ai_bin" --quiet --format json whoami codex 2>/dev/null || true)"
+  printf '%s\n' "$output" | sed -n 's/.*"slot": *"\([^"]*\)".*/\1/p' | tail -n 1
+}
+
 codex_saved_accounts() {
   local project="$1" ai_bin output
   ai_bin="$(ai_cli_bin_for_project "$project")"
@@ -447,14 +455,15 @@ probe_all_codex_accounts_and_update_cooldown() {
 
 switch_to_codex_account() {
   local project="$1" account="$2" reason="$3"
-  local ai_bin output actual_account requested_normalized actual_normalized
+  local ai_bin output actual_account actual_slot requested_normalized actual_normalized
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" && -n "$account" ]] || return 1
   output="$("$ai_bin" --quiet --format json switch codex "$account" --yes 2>/dev/null || true)"
   requested_normalized="$(normalize_codex_account_name "$account")"
   actual_account="$(codex_current_account "$project")"
-  actual_normalized="$(normalize_codex_account_name "$actual_account")"
-  if printf '%s\n' "$output" | grep -qE '"switched": *true' && [[ -n "$actual_account" && "$actual_normalized" == "$requested_normalized" ]]; then
+  actual_slot="$(codex_current_slot "$project")"
+  actual_normalized="$(normalize_codex_account_name "$actual_slot")"
+  if printf '%s\n' "$output" | grep -qE '"switched": *true' && [[ -n "$actual_slot" && "$actual_normalized" == "$requested_normalized" ]]; then
     # Only log if not a probe operation (probe logs are handled by caller)
     if [[ "$reason" != probe_all_accounts ]]; then
       log_warn "auto-switched codex account to $account (reason=$reason)" >&2
