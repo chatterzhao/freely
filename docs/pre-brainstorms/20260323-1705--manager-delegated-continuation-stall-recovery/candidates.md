@@ -40,6 +40,10 @@
     mode: `subagent-review`
     summary: `独立复核确认当前 evidence 只足以支撑继续留在 pre_brainstorm：promotion_gate 仍要求真实 dogfood followthrough，open_questions 尚未收口，当前 dirty delta 是 canonical candidate writeback，不应丢弃。`
     verdict: `keep-in-pre-brainstorm`
+  - reviewer: `codex:gpt-5.4`
+    mode: `fresh-with-handoff-closeout`
+    summary: `本轮首跳复核发现旧 handoff 已过时：当前 worktree 已 clean，但 branch 仍未被 develop 吸收，且独有提交仍只回写 pre-brainstorm continuity，没有 issue/progress/recovery 真源接管该候选；因此 route 继续保持 pre_brainstorm，同时 cleanup 不能判定为 retire-now。`
+    verdict: `keep-and-merge-writeback-first`
 - expected_outcome:
   - define a runtime-visible stall contract for `delegated continuation already absorbed into prompt`
   - trigger runtime-owned recovery when no new manager continuity / worker handoff is emitted in bounded time
@@ -51,7 +55,14 @@
   - `fresh_with_handoff` 续接后的当前仓库复核仍未发现 issue/progress/recovery 真源接管该候选；因此这轮只能补 continuity writeback，不能把 route_kind 提前改成 `ibm`、`dev_loop` 或 `recovery`。
 - next_action:
   - 保持 active candidate；继续用真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被 runtime recovery 稳定推进到 cleanup / retirement followthrough，然后再判断是 materialize 为独立 issue，还是吸收到更高层 stall/recovery issue 族。
+  - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；应先把当前分支上的 canonical pre-brainstorm writeback 提交吸收到上游，再决定 retirement。
   - 若再次发生会话轮换或 `context_compacted`，先把最新 continuity 结论写回当前 pre-brainstorm canonical artifacts，再继续扩大实现或 cleanup 判断。
 - revisit_trigger:
   - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活时，重新进入 materialization 判断。
   - 当当前 runtime 补丁在真实 followthrough 中验证稳定，且边界已可冻结成独立 issue contract 时，重新进入 materialization 判断。
+  - 当 manager 已吸收当前分支上的 canonical writeback 提交并重新做 cleanup 巡检时，重新判断该 worktree 是否满足 `retire-now`。
+- route_kind: `pre_brainstorm`
+- restart_point: `continuation`
+- ownership: `worker-canonical-pre-brainstorm-writeback`
+- cleanup_disposition: `retain-for-followthrough`
+- safe_for_retirement: `false`
