@@ -101,36 +101,41 @@
 
 ## Next
 
-- 2026-03-24 canonical `develop` post-merge acceptance is now recorded as `pass`. During manager patrol, `live-status`, `fleet-status`, and `.freely/run/manager-worker-launch-state.env` agreed on the acceptance truth surface:
-  - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-034106.md`
-  - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt`
+- 2026-03-24 canonical `develop` post-merge acceptance remains recorded as `pass`, and later same-day patrols do not reopen this issue family.
+- Earlier acceptance evidence remains valid:
+  - `034106` continuity and `032208` worker prompt aligned as latest generated/consumed truth with `queued_worker_prompts = none`
+  - the dedicated closeout round `051509` also appeared aligned as latest generated/consumed truth
+- Later patrols advanced canonical truth again to `052308`, `091023`, `091352`, and `091713`, and the latest surfaces now show:
+  - `latest_manager_continuity_generated == latest_manager_continuity_consumed`
+  - `latest_manager_worker_prompts_generated = none`
+  - `latest_manager_worker_prompts_consumed = none`
+  - `LAUNCHED_WORKER_PROMPTS = ""`
   - `queued_worker_prompts = none`
-  - `LAUNCHED_WORKER_PROMPTS` matched the same latest prompt path
-  - `ACTIVE_RUNNING_WORKER_COUNT = 1`
-- 2026-03-24 manager then generated the dedicated closeout continuity/prompt for this writeback lane, and the current canonical truth surfaces also show latest-truth consumption for that newer round:
-  - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-051509.md`
-  - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-051509-worker-i-20260322-0445-closeout-codex.txt`
-  - `queued_worker_prompts = none`
-- This confirms the issue family acceptance is closed on canonical `develop`: workers consumed the newest manager continuity / worker prompt truth instead of staying on an older delegated continuation, and active pending vs consumed delegated ids remained aligned.
-- Cleanup is intentionally not executed from manager in this round. Keep the disposition explicit instead of pretending the lifecycle is retired:
-  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`: retain until this docs-only closeout commit is absorbed by the develop-facing path; `merge-ready`, not `delete-ready`
-  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile`: retain; active same-family implementation lane still owns ongoing worker state
-  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough`: retain as separate `runtime-owned` recovery lane after `secondary_rate_limit_exhausted`; do not fold it into this issue's acceptance result
-- No further implementation or research scope remains inside `I-20260322-0445`. Any new regression after this closeout should reopen as a new continuation or new lifecycle based on the then-current truth source.
+  - `ACTIVE_RUNNING_WORKER_COUNT = 3`
+- This does not reopen verification. The later surface split is semantic, not a new repo-side bug:
+  - worker-prompt fields describe only the latest continuity's launchable prompt set
+  - `ACTIVE_RUNNING_WORKER_COUNT` is fleet-wide running-worker truth
+  - `fleet-status` explains the three running workers directly, including this closeout lane, sibling same-family lane, and separate stale-batch followthrough
+- Keep the issue family closed and the cleanup disposition explicit:
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`: retain until this docs-only closeout writeback is absorbed by the develop-facing path; `merge-ready`, not `delete-ready`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile`: retain as the active same-family closeout lane until absorption and cleanup sequencing progress
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough`: retain as separate `runtime-owned` recovery/followthrough; do not fold it into this issue's cleanup result
+- No further implementation or research scope remains inside `I-20260322-0445`. Any real new regression after this closeout should reopen as a new continuation or new lifecycle based on the then-current truth source.
 
 ## Retirement Audit
 
 - audit_date: `2026-03-24`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
-- worktree_state: `clean`
+- worktree_state: `dirty`
 - classification: `retire-only`
 - cleanup_gate: `retained-with-reason`
 - why_not_verified_retirable:
   - current worktree still owns canonical closeout writeback for this issue family; writeback must be absorbed through the develop-facing path before branch/worktree cleanup
-  - same-family worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile` remains active and dirty, so this issue family is closed but not yet fully retired as a fleet unit
+  - current closeout lane itself is dirty because this writeback is still uncommitted; it cannot truthfully claim cleanup-readiness yet
+  - same-family worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile` remains active, so this issue family is completed but not yet fully retired as a fleet unit
   - separate worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough` remains `runtime-owned` recovery and must stay outside this issue's cleanup claim
 - local_branch_disposition: `retained-with-reason`
-- local_branch_reason: keep the branch/worktree until the docs-only closeout writeback is absorbed and supervisor/runtime runs the normal cleanup followthrough; do not delete from this worker round
+- local_branch_reason: keep the branch/worktree until canonical issue-family writeback is absorbed and supervisor/runtime runs the normal cleanup followthrough; do not delete from this worker round
 - remote_branch_disposition: `not_checked`
 - remote_branch_reason: remote cleanup is outside this worker's closeout-writeback scope
 - revisit_trigger:

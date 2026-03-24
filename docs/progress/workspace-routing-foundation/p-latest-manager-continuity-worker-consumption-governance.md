@@ -11,7 +11,7 @@
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "closeout-writeback"}
   - {tool: codex, session_id: "019d1e52-ccb2-7612-9538-87fd9df4eea5", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T22-30-36-019d1e52-ccb2-7612-9538-87fd9df4eea5.jsonl", role: "context_compacted_handoff_source"}
   - {tool: codex, session_id: "019d1e4e-709f-7571-a958-b79828dc38f4", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T22-25-50-019d1e4e-709f-7571-a958-b79828dc38f4.jsonl", role: "fresh_with_handoff_source"}
-- summary: canonical `develop` post-merge acceptance for `I-20260322-0445` passed on 2026-03-24. Manager patrol first proved the acceptance truth surface on `develop` (`034106` continuity and `032208` worker prompt both consumed as latest truth with no queued worker prompts), then generated the dedicated closeout continuity/prompt (`051509`) and that newer round was also immediately reflected as latest generated/consumed truth. This issue family is now closed for this batch; remaining cleanup stays explicit and runtime/supervisor-owned rather than silently implied.
+- summary: canonical `develop` post-merge acceptance for `I-20260322-0445` remains passed on 2026-03-24. Later same-day patrols advanced continuity truth to `052308`, `091023`, `091352`, and `091713` while worker-prompt generated/consumed fields stayed `none` and `ACTIVE_RUNNING_WORKER_COUNT = 3`; this does not reopen verification because worker-prompt fields describe only the latest continuity's launchable prompt set, while running-worker count remains fleet-wide process truth. The issue family stays completed for this batch and only explicit cleanup sequencing remains.
 - current_focus:
   - keep this worktree scoped to docs-only closeout writeback; do not reopen implementation or research scope
   - preserve explicit cleanup disposition: this worktree is `merge-ready` for closeout absorption, but not `delete-ready` until supervisor/runtime executes normal cleanup followthrough
@@ -30,24 +30,25 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
   - `./bin/governance-check`
 
-## 2026-03-24 Canonical Develop Closeout
+## 2026-03-24 Canonical Develop Recheck
 
 - Re-read the required truth surfaces before writeback:
   - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
   - `./bin/freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
   - `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-worker-launch-state.env`
-- Canonical acceptance result is `pass` on `develop`. The patrol evidence was:
-  - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-034106.md`
-  - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt`
+- Earlier same-day acceptance evidence remains valid:
+  - `034106` continuity and `032208` worker prompt were aligned as latest generated/consumed truth with `queued_worker_prompts = none`
+  - the dedicated closeout continuity/prompt `051509` also briefly appeared aligned
+- Later same-day patrols advanced canonical truth again through `052308`, `091023`, `091352`, and `091713`:
+  - `latest_manager_continuity_generated == latest_manager_continuity_consumed`
+  - `latest_manager_worker_prompts_generated = none`
+  - `latest_manager_worker_prompts_consumed = none`
+  - `LAUNCHED_WORKER_PROMPTS = ""`
   - `queued_worker_prompts = none`
-  - `LAUNCHED_WORKER_PROMPTS` matched that same latest prompt path
-  - `ACTIVE_RUNNING_WORKER_COUNT = 1`
-- After the pass judgement, manager generated the dedicated closeout continuity/prompt for this writeback lane and the current truth surface also stayed aligned:
-  - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-051509.md`
-  - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-051509-worker-i-20260322-0445-closeout-codex.txt`
-  - `queued_worker_prompts = none`
-- Cleanup disposition remains explicit:
-  - current closeout worktree is retained until this docs-only writeback is absorbed through the develop-facing path
-  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile` remains retained as the active same-family worker lane
-  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough` remains separate runtime-owned recovery after `secondary_rate_limit_exhausted`
-- Result: this progress artifact is closed for this batch. No further blocker remains inside `I-20260322-0445`; only normal cleanup sequencing remains.
+  - `ACTIVE_RUNNING_WORKER_COUNT = 3`
+- `fleet-status` explains that later split directly: the three running workers are this closeout lane, sibling same-family lane `feature/manager-active-worker-launch-state-reconcile-20260324`, and separate stale-batch followthrough `feature/pre-test-merge-lifecycle-management-followthrough-20260324`.
+- Current judgement:
+  - keep `I-20260322-0445` completed for this batch
+  - do not reopen implementation scope
+  - treat the later surface split as fleet-wide running-worker truth versus latest-continuity prompt truth, not as a reopened repo-side bug
+  - keep cleanup explicit and supervisor/runtime-owned rather than implying retirement
