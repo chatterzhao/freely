@@ -47,6 +47,7 @@ Freely 当前已经把 `auto-loop`、`doc-loop`、`dev-loop` 写进多个 active
    - `dev-loop` 跳出只表示 issue 实现/验证到达下一门
    - completion / verification / cleanup 的最终裁决属于 `auto-loop`
    - 只有 outer governance 看到 cleanup / retirement 闭环，当前主题才退出 active lifecycle
+   - watchdog 发现的 restart storm / process churn 属于 `auto-loop` supervision signal，由主管裁决 dead-loop / thrash，而不是让 worker 或 watchdog 自行宣布 terminal judgement
 4. 明确 active truth、active lifecycle、historical evidence 的改写边界，避免全仓盲替。
 5. 只改 active truth，不回写历史已完成 issue 的历史语义。
 
@@ -65,6 +66,7 @@ Freely 当前已经把 `auto-loop`、`doc-loop`、`dev-loop` 写进多个 active
 - `three-loop-capability-lifecycle.md`、`manager-agent.md`、`auto-loop-orchestrator/SKILL.md` 明确一致：
   - worker 负责在 `doc-loop` / `dev-loop` 中产出文档、实现、测试与 verification evidence
   - `auto-loop` 负责完成判定、验证裁决、cleanup / retirement 路由
+  - restart storm / process churn 由 watchdog 暴露为 signal，再由主管在 `auto-loop` 中判断是否 dead-loop / thrash
 - `PROJECT_INTENT.md` 的图和路由表不再暗示 `doc-loop` 包含 `dev-loop`
 - 本 issue 的 dev 改动只覆盖 active truth，不试图重写历史 evidence
 

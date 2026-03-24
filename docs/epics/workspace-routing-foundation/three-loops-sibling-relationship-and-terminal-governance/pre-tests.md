@@ -14,7 +14,11 @@
    - phase / lifecycle state
    - terminal retirement
 4. `manager-agent.md` 与 `auto-loop-orchestrator/SKILL.md` 的 manager wording 不再暗示 `doc-loop` / `dev-loop` 的层级包含。
-5. milestone / candidate promoted traceability 已回写，当前 lifecycle 不再停留在纯 pre-brainstorm。
+5. watchdog / manager active truth 对“死循环”职责一致：
+   - 短窗口反复启动 AI 工具进程、异常重启风暴、或进程总数异常增长属于 watchdog signal
+   - watchdog 负责暴露 signal，不负责独自宣布 dead-loop 业务结论
+   - 主管在 `auto-loop` 中基于该 signal 裁决是正常 recovery、prompt/continuity 漂移，还是 dead-loop / thrash
+6. milestone / candidate promoted traceability 已回写，当前 lifecycle 不再停留在纯 pre-brainstorm。
 
 ## Verification
 
@@ -25,6 +29,7 @@
    - verification / cleanup is a fourth loop
    - local loop exit equals outer terminal completion
    - worker can declare `completed / cleanup / retire` without `auto-loop` judgement
+   - watchdog alone can keep blindly relaunching forever after short-window restart churn without manager judgement
 
 ## Non-goals
 

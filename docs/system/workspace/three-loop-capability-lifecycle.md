@@ -64,6 +64,7 @@ flowchart TD
   - 主管可通过 patrol、live-status / session evidence，或 human interruption 重新判定 `ownership + restart_point + next_action`
   - 若只是治理纠偏，主管写新的 continuity / worker handoff
   - 若进程已失效或错误 worker 持续占位，则交回 runtime kill / restart / re-entry
+  - 若 watchdog 观察到短窗口内反复启动 AI 工具进程、异常重启次数、或进程总数异常膨胀，这同样属于 `auto-loop` supervision signal：watchdog 负责暴露 churn，主管负责判断这是正常恢复、prompt/continuity 漂移，还是 dead-loop / thrash
 
 ## 2. Whole-System Flow
 

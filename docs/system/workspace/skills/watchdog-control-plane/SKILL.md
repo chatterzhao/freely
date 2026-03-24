@@ -40,6 +40,7 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 - if the target worker is already active, trigger local continuation reentry instead of relaunching a second supervisor
 - detect stalled AI processes when newer intake/continuation is pending, or when delegated continuation has already entered the manager prompt but no new continuity / handoff is emitted, then trigger runtime-owned recovery
 - detect stalled active workers after delegated continuation has already entered the worker prompt but cycle log / closeout no longer advances, then trigger worker-side runtime recovery
+- detect restart storms / rapid relaunch churn / unexpected short-window process-count growth as dead-loop suspicion signals, then escalate the signal to manager-owned `auto-loop` judgement instead of blindly relaunching forever
 - 消费 availability watchdog 结果
 - 触发 Freely 专有 manager bootstrap handoff
 - 暴露当前态控制面，让主管能直接看到活跃 pid、当前 prompt/continuity 聚焦点与 deep refs
@@ -51,6 +52,7 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 不负责：
 - 重写账号可用性策略
 - 替 AI 做语义压缩
+- 独自判定“这条 lane 是否业务上已死循环”；watchdog 只负责发现 churn / stall signal，terminal judgement 仍回到 manager
 
 ### 3. Continuity Watchdog
 
@@ -74,6 +76,7 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 2. 可复用脚本优先落在 skill 下，而不是散落到多个 runtime entrypoint。
 3. Freely 专有 orchestration 继续留在 runtime 层，不塞回 skill。
 4. 新增 watchdog 能力时，先判断它属于 `availability / runtime / continuity` 哪一类，再决定代码落点。
+5. restart storm / process churn 是 runtime watchdog 的 signal，不是 worker 自报；一旦命中阈值，应交由主管在 `auto-loop` 中判断是正常 recovery、旧 prompt 漂移，还是 dead-loop / thrash。
 
 ## 当前模块
 

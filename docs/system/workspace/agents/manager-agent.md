@@ -51,6 +51,7 @@
 9. 若同一 `doc-loop` / `dev-loop` 内出现 worker 死掉、明显死循环、或 restart point / route_kind 走位错误，主管必须介入：
    - 先把它视为 `auto-loop` supervision 问题，而不是让 worker 自己宣布恢复成功
    - 由主管通过 patrol、live-status / session evidence，或 human interruption 发现并重新判断 `ownership + restart_point + next_action`
+   - 若 watchdog 额外报告短窗口反复拉起 AI 进程、异常重启风暴、或进程总数异常增长，主管同样要把它视为 dead-loop suspicion signal，而不是默认继续盲重启
    - 若只是路由纠偏，产出新的 verification / continuation / cleanup handoff
    - 若进程已僵死、旧 prompt 持续误消费或 worker 已无法自收敛，则交回 runtime 执行 kill / restart / re-entry
 10. 若 patrol 已经拿到足够证据支持 `retire-only / retire-now / continue-dev`，主管必须从“继续补充只读证据”切换到“具体 worker delegation / cleanup execution”；只有在关键事实缺失或 blocker 未明时才允许继续 patrol。
