@@ -346,7 +346,7 @@ Validation batch governance:
 ## 必须单独冻结的测试收尾 contract
 
 - 不能再把“测试”写成一个泛词；至少要拆成两道门：
-  - `pre-tests.md` 质量 gate：是否已经把 issue-level acceptance、integration target、`pre-merge` / `post-merge acceptance`、protected branch 只做验证的边界写清
+  - `pre-tests.md` 质量 gate：是否已经把 issue-level acceptance、integration target、以及若适用时的 `pre-merge` / `post-merge acceptance`、protected branch 只做验证的边界写清
   - testing closeout gate：这些 acceptance 是否真的被执行并留下可恢复 evidence
 - testing closeout 默认优先：
   - integration / end-to-end evidence
@@ -354,10 +354,11 @@ Validation batch governance:
   - 最后才是局部代码级或纯单测证据
 - `phase_state=completed` 是 issue 唯一的最终态，但它只说明 issue 生命周期完成；它本身不等于 worktree 已可删除
 - `done_ibm`、单轮 verification 收口、单个 agent/skill 的局部完成，都不是任务最终完成
-- 删除 worktree 还要继续看现有 lifecycle gate 是否凑齐：merge / post-merge acceptance / cleanup evidence / `verified-retirable` / `retired`
+- 删除 worktree 还要继续看现有 lifecycle gate 是否凑齐：merge / cleanup evidence / `verified-retirable` / `retired`；若 `pre-tests.md` 显式声明 `post-merge acceptance`，则它是 delete eligibility chain 的附加必经 gate
 - 因而完成检查顺序必须固定为两段：
   - issue completion chain：`done_ibm` -> `pre-tests.md` 质量 gate -> dev / verification -> testing closeout -> `phase_state=completed`
-  - delete eligibility chain：merge -> `post-merge acceptance` -> cleanup evidence -> `verified-retirable` -> delete branch/worktree guard -> `retired`
+  - delete eligibility chain：merge -> cleanup evidence -> `verified-retirable` -> delete branch/worktree guard -> `retired`
+- 若 `pre-tests.md` 显式声明 `post-merge acceptance`，则它插在 delete eligibility chain 中的 merge 之后、cleanup evidence 之前；未显式声明时，不得把它误用成默认必经项
 - 其中 `completed` 只表示 issue 完成，不表示 delete-eligible；只有 delete eligibility chain 闭合后，worktree/branch 才能进入 `retired`
 - “application-native real-environment testing” 指当前应用自己的真实入口、真实交互面、真实集成路径，而不是抽象脚本替身
 - 在 Freely 自举场景里，它当前的具体形态才是：
@@ -386,7 +387,7 @@ Validation batch governance:
 2. `feature/delegated-continuation-prompt-consumption-visibility-20260323`
 - 已收敛成 verification-only closeout lane
 - 当前可以视为 merge-ready
-- 但仍不可 delete；唯一剩余 gate 是 merge 后在 `develop` 上跑一次真实 post-merge acceptance，并按 `pre-tests.md` 留下 application-native real-environment testing evidence
+- 但仍不可 delete；当前 specimen 的唯一剩余 gate 是 `pre-tests.md` 已显式声明的 merge 后 `develop` post-merge acceptance，并按 `pre-tests.md` 留下 application-native real-environment testing evidence；这只是当前 specimen 的剩余 gate，不是通用默认链路
 
 3. `feature/manager-scheduler-capacity-and-queueing-20260323`
 - 仍是 active pre-brainstorm candidate
