@@ -101,6 +101,38 @@
   - missing proof: `current stalled intake id -> current prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict`
   - 只要这条链还不能稳定观察，本候选就不能进入 IBM，也不能被 cleanup/retirement 视为已完成 proof
 
+## binding proof chain（当前冻结版本）
+
+- 目标不是证明 “某次 delegated continuation 曾被 consumed 过”，而是冻结一条可重复复核的单链：
+  1. `specific stalled intake id`
+     - 先固定本轮 stall 关注的 delegated continuation intake id，而不是只看聚合计数。
+     - 当前可追踪的 stalled intake specimen 仍包括 `20260323-234407...`、`20260324-002656...` 与 `20260324-021757...`，因为它们在最新 worker `live-status` 中继续位于 `pending_delegated_continuation_ids`。
+  2. `current prompt cycle`
+     - 再固定当前真正承载 delegated continuation 语义的 prompt cycle。
+     - 当前锚点是 `current_focus.prompt_file=.freely/run/prompt-20260324-024527.txt`，并且 `current_prompt_has_delegated_continuation=1`。
+  3. `consumed event anchor`
+     - 然后需要一个稳定锚点，说明“当前 prompt cycle 吸收 stalled intake”对应哪一次 consumed 事件，而不是仅仅看到历史 `consumed` truth 又出现了。
+     - 当前最接近的 surface 只有 `last_consumed_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_at=2026-03-24T09:41:25Z`；但它们仍只是并存 surface，尚未把某个 stalled intake id 一一绑定到当前 prompt cycle。
+  4. `no-new-continuity/handoff stall verdict`
+     - 最后才是 stall 裁决：在上述 intake / prompt / consumed anchor 已绑定之后，仍然没有新的 manager continuity / worker handoff / launch-state 前进，才能判成当前 prompt-absorbed stall。
+- 这条链的关键在顺序：
+  - 不能从 “没有新 continuity/handoff” 倒推出 intake 已被当前 prompt 吸收；
+  - 也不能从 `pending/consumed` 并存倒推出当前 stalled intake 已拥有 consumed anchor；
+  - 必须先固定 `specific intake -> current prompt cycle -> consumed event anchor`，再允许进入 stall verdict。
+
+## 当前 specimen 链为何仍不足
+
+- 当前证据最多只能稳定回答两件事：
+  - 当前 delegated continuation 语义确实已经进入当前 prompt cycle；
+  - `consumed` surface 当前再次出现，并与 `pending` 32/32 全量重叠。
+- 但它仍无法稳定回答这两个 acceptance 关键问题：
+  - 当前 `pending` 集合里的哪一个 stalled intake id，真正被 `.freely/run/prompt-20260324-024527.txt` 这一轮 prompt 吸收？
+  - `2026-03-24T09:41:25Z` 这次 consumed anchor 与当前 prompt cycle 的关系，是当前吸收事件，还是历史 surface 再次暴露？
+- 因而当前 verdict 只能保持：
+  - `prompt absorption visible`
+  - `consumed surface visible but unbound`
+  - `stall verdict not yet promotable`
+
 ## next dogfood experiment required
 
 - 下一轮必须做的不是脚本级回归，而是一轮真实 Freely dogfood：
@@ -109,7 +141,7 @@
   - 在 manager prompt 已吸收该 intake 后，持续抓取 `live-status` / continuity / worker prompt surface
   - 要求这轮证据能同时回答四件事：
     - 哪个 stalled intake id 被当前 prompt cycle 吸收
-    - 哪个 consumed 事件与这个 prompt cycle 绑定
+    - 哪个 consumed 事件与这个 prompt cycle 绑定，而不是历史 surface 再次出现
     - 在无新 continuity / handoff 的窗口内，watchdog 是否按这条绑定触发 recovery
     - recovery 后 cleanup / followthrough 是否继续推进，而不是只留下历史 consumed truth
 - 若这轮 dogfood 仍只能看到 `pending/consumed` 并存，却无法稳定回答上述四件事，则本候选继续留在 pre-brainstorm

@@ -73,6 +73,12 @@
     - `last_consumed_delegated_continuation_at=2026-03-24T09:41:25Z`
     - `current_focus.prompt_file=.freely/run/prompt-20260324-024527.txt`
     - 说明当前 lane 依然有 prompt-level absorption、pending intake 与 consumed surface 证据，但 consumed surface 仍未绑定到当前 stalled intake
+  - current proof chain status:
+    - `specific stalled intake id`: only partially anchored; stalled specimen ids remain visible in `pending_delegated_continuation_ids`, but the canonical “current stalled intake” has not been singled out by runtime
+    - `current prompt cycle`: anchored to `.freely/run/prompt-20260324-024527.txt`
+    - `consumed event anchor`: only partially anchored through `last_consumed_delegated_continuation_at=2026-03-24T09:41:25Z` plus the overlapping id surface
+    - `no-new-continuity/handoff verdict`: observable, because `latest_manager_continuity_generated=unavailable` and `latest_manager_worker_prompts_generated=none` still hold
+    - net result: the chain currently stops at `prompt cycle + consumed surface`, not at `prompt cycle + consumed event bound to specific stalled intake`
   - historical-but-non-stable consumed surface:
     - 前几轮 `live-status` 曾短暂暴露过 `last_consumed_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_at`
     - 随后 worker lane 一度退回 `last_consumed_delegated_continuation_ids=none`
@@ -100,10 +106,18 @@
   - 仍缺少一个稳定、可验收的 runtime-visible anchor，用来严格证明“哪个 consumed 事件对应当前 manager prompt cycle / 当前 stalled intake”；当前也不能假设 consumed truth 会稳定停留在 live-status 上，因为它在最近几轮已出现过缺席与重现的摇摆
   - 当前还缺少一个可重复的等价 proof，来说明在 consumed surface 摇摆或与 pending 并存的情况下，为什么本轮可以确认“当前 stalled intake 已被当前 prompt cycle 吸收”
   - 精确缺口应表述为：`specific stalled delegated continuation intake id -> current manager prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict` 这条链还不能被稳定、重复地从 runtime state surface 中读出
+  - 当前最小缺口不是 “再有一个 consumed timestamp”，而是把下面两点同时钉住：
+    - `20260323-234407...` / `20260324-002656...` / `20260324-021757...` 中，哪一个才是当前 stalled intake id
+    - `2026-03-24T09:41:25Z` 这次 consumed anchor 与 `.freely/run/prompt-20260324-024527.txt` 的关系，是当前 prompt cycle 的吸收事件，还是历史 surface 再次显现
 - acceptance_criteria:
   - 明确区分当前候选与 `pending intake > cycle log`、latest continuity consumption、worker active reentry 这几条相邻治理 issue 的边界。
   - 冻结这条候选的最小 contract：`delegated continuation` 已进入 manager prompt，但在有界时间内没有新的 manager continuity / worker handoff 产出。
   - 冻结最小 runtime-visible evidence：至少要有 prompt-level absorption proof；若 `consumed` truth 缺席或与 `pending` 并存，都必须明确记录当前仍缺“consumed truth 绑定到当前 prompt cycle / stalled intake”的稳定 anchor，而不是把历史观测或并存状态直接当作已完成吸收。
+  - 下一次进入 materialization 判断前，必须能用同一轮 dogfood 证据回答：
+    - which stalled intake id is current
+    - which prompt cycle is current
+    - which consumed event anchor belongs to that pair
+    - why `no-new-continuity/handoff` applies to that same pair rather than to a historical consumed echo
   - 保持 `docs/pre-brainstorms/**` 与 `docs/milestones.md` 对 candidate 状态、下一跳和重判条件的一致性，不让该研究项从扫描面消失。
 - promotion_gate:
   - 至少再有一轮真实 dogfood 证明这条 stall contract 能稳定解释 cleanup / retirement followthrough 中的假活，而不是一次性偶发现象。
@@ -224,6 +238,11 @@
 - next_action:
   - 保持 active candidate；继续用真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被 runtime recovery 稳定推进到 cleanup / retirement followthrough，然后再判断是 materialize 为独立 issue，还是吸收到更高层 stall/recovery issue 族。
   - 下一轮优先验证 runtime 能否在当前 `consumed` truth 摇摆的情况下，仍把 stalled intake 稳定绑定到当前 prompt cycle；若后续继续出现 `pending/consumed` 并存，也仍要明确哪一个 stalled delegated continuation 真的被本轮 prompt 吸收。若两条路径都做不到，至少冻结一个不依赖人工解释 prompt excerpt 的等价 proof。
+  - 下一轮 dogfood writeback 必须显式写出一条 specimen chain，而不是只复述聚合 surface：
+    - `specific stalled intake id=<...>`
+    - `current prompt cycle=<prompt file / session ref>`
+    - `consumed event anchor=<timestamp / ids / equivalent proof>`
+    - `stall verdict=no-new-continuity/handoff for that same chain`
   - 将当前 `fresh_with_handoff/context_compacted` 的 continuity 事实继续视为 supporting evidence：它证明 runtime 已因上下文压缩做过续接，但不证明当前 prompt cycle 对 stalled intake 的 binding 已稳定；因此后续仍要把续接事实与 prompt-cycle absorption proof 分开验收。
   - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 canonical writeback 已继续收敛为本分支上的最新 continuity anchor lineage，下一步应先把这些独有提交吸收到上游，再决定 retirement。
   - 若再次发生会话轮换或 `context_compacted`，先把最新 continuity 结论写回当前 pre-brainstorm canonical artifacts，再继续扩大实现或 cleanup 判断。
