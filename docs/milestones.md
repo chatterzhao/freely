@@ -99,7 +99,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
 - next_action: `freely ensure-manager --watch`、坏号后真实 probe、过时 cooldown 账本兜底、manager bootstrap handoff 与 live recovery 测试均已通过；`feature/codex-account-cooldown-active-probe` 已把主动 probe / cooldown 写回收敛到 `freely ai switch codex` 主路径，并已 replay 到 `develop`。当前这条 feature lifecycle 已进入 `verified-retirable`；后续若继续扩 outer watchdog/productization，需新开 dedicated feature worktree
 
-6. `I-20260318-1825`
+6. `C-20260324-0405-A`
+- title: Watchdog restart-storm and process-churn signal implementation
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- source_brainstorm: `docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/candidates.md`
+- next_action: 继续 pre-brainstorm，先冻结短窗口 restart / relaunch / process-count signal 的真相面、manager escalation 路径、以及 watchdog 暂停盲重启的最小规则；在这些边界稳定前，不直接往 `runtime/freely` 塞实现补丁
+
+7. `I-20260318-1825`
 - title: Worktree hygiene supervision control plane
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -109,7 +118,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1825--autonomous-worktree-hygiene-and-checkpoint-supervision/candidates.md`
 - next_action: 新增 hygiene skill、checkpoint drift streak、manager hygiene alert 与回归测试已落盘；当前先做 review 与 promote 判断。若后续仍需专门 hygiene worker，再从同一预研线 materialize，不在本批次越界扩 scope
 
-7. `I-20260319-0018`
+8. `I-20260319-0018`
 - title: Token-efficient session continuity and rotation governance
 - milestone_state: committed
 - phase_state: `done_ibm`
