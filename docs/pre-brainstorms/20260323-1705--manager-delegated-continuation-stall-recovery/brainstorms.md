@@ -91,12 +91,12 @@
 - 上一轮确实经历过 `fresh_with_handoff`，直接原因是旧 `codex` 会话命中 `context_compacted`
 - 但本轮重新核对当前 worker 工位的最新 `live-status` 后，当前运行态已经变成：
   - `role_hint: worker`
-  - `last_launch_kind: fresh`
-  - `last_rotation_reason: initial_start`
+  - `last_launch_kind: fresh_with_handoff`
+  - `last_rotation_reason: context_compacted`
   - `current_prompt_has_delegated_continuation: 1`
   - `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids` 仍大面积重叠，且最新 delegated continuation intake 仍可见于 pending 集合
   - 当前 prompt excerpt 已证明 delegated continuation 语义仍在当前 worker prompt 上下文中
-- 这层 worker-side `live-status` 只说明 delegated continuation continuation 仍处于活跃交接面；它不能替代当前候选所需的 manager-side prompt-cycle binding acceptance anchor
+- 这层 worker-side `live-status` 说明 runtime 当前仍在沿用 `context_compacted -> fresh_with_handoff` 的 continuity 策略，delegated continuation 也仍处于活跃交接面；但它仍不能替代当前候选所需的 manager-side prompt-cycle binding acceptance anchor
 - 当前 worktree hygiene 事实：
   - canonical writeback 已在提交 `7fc7b24 docs: checkpoint delegated continuation stall writeback` 中落盘
   - 当前 `git status --short` 已 clean，没有发现超出本候选 write scope 的残留脏项
@@ -134,7 +134,7 @@
 - 本轮再次核对：
   - `docs/milestones.md` 仍把 `C-20260323-1705-A` 保留在 `candidate_issues`
   - 未发现 `docs/progress/**`、`docs/recovery/**`、`docs/epics/**` 的 issue/progress/recovery 真源接管该候选
-  - `freely live-status` 当前显示 `role_hint: worker`、`last_launch_kind: fresh`、`last_rotation_reason: initial_start`，且 delegated continuation 仍在当前 prompt 上下文中
+  - `freely live-status` 当前显示 `role_hint: worker`、`last_launch_kind: fresh_with_handoff`、`last_rotation_reason: context_compacted`，且 delegated continuation 仍在当前 prompt 上下文中
 - 结论：
   - route_kind 继续保持 `pre_brainstorm`
   - 当前分支的独有提交仍是 canonical candidate writeback，而不是可直接丢弃的噪音

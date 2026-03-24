@@ -31,7 +31,7 @@
 - why:
   - 本轮已按 `AGENTS -> CONSTITUTION -> LAWS -> lead-agent -> context-source-skill` 重新复核，结论仍是当前输入属于 worker continuation，而不是 project-level supervisor 巡检或 recovery-owned restart
   - 当前 `live-status` 已证明 delegated continuation 进入当前 prompt 语义层：`current_prompt_has_delegated_continuation=1` 且 `prompt_excerpt` 包含 `Delegated continuation handoff`
-  - 当前 worker runtime 已重新起在 `last_launch_kind=fresh` / `last_rotation_reason=initial_start`；这说明此处记录的是最新 worker continuation 事实，不再沿用旧的 `fresh_with_handoff` 运行态判断
+  - 当前 worker runtime 仍显示 `last_launch_kind=fresh_with_handoff` / `last_rotation_reason=context_compacted`；这说明本轮先执行 continuity writeback 的治理判断是必要的，但这层续接事实本身仍不等于 prompt-cycle absorption 已被稳定锚定
   - 当前 delegated continuation ids 仍同时出现在 `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids`，说明 runtime 已开始暴露 canonical consumed truth，但仍缺 prompt-cycle 绑定
   - 当前 runtime / tests 还额外暴露了 continuity generated/consumed truth，但整体仍只冻结到“prompt 已吸收 delegated continuation 且之后没有新的 continuity / handoff”这层 recovery contract，尚未证明 consumed truth 与当前 prompt cycle / stalled intake 的稳定绑定
   - runtime 还没有暴露足以冻结 promotion gate 的 prompt-bound consumed anchor，因此无法证明当前 stalled intake 已被当前 prompt cycle 稳定吸收
@@ -43,6 +43,7 @@
 - next_action:
   - 保持 `C-20260323-1705-A` 在 `candidate_issues` / `needs_research`
   - 下一轮优先验证 runtime 是否能为当前 prompt cycle / 当前 stalled delegated continuation 提供稳定的 binding proof，再决定是否进入 IBM materialization
+  - 若再次因为 `context compacted` 轮换，先继续把最新 runtime-visible evidence 写回当前 pre-brainstorm canonical artifacts，再扩大 scope
 - revisit_trigger:
   - 当再次复现 manager prompt 已吸收 delegated continuation 且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof 时，重判 promotion
   - 当真实 cleanup / retirement followthrough 验证稳定后，重判是否进入 `doc-ibm-execution`
