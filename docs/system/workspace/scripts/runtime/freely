@@ -1783,6 +1783,47 @@ csv_retain_exact_items() {
   printf '%s\n' "$result"
 }
 
+manager_worker_launch_state_reconcile_same_continuity_prompts() {
+  local project="$1" continuity_file="$2"
+  local state_file prompt_generated_csv launched_csv normalized_launched_csv queued_csv max_parallel_workers active_running_workers available_new_slots
+  state_file="$(manager_worker_launch_state_file "$project")"
+  [[ -f "$state_file" && -n "$continuity_file" && -f "$continuity_file" ]] || return 1
+  # shellcheck disable=SC1090
+  source "$state_file"
+  [[ -n "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" && "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" == "$continuity_file" ]] || return 1
+
+  prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
+  launched_csv="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
+  normalized_launched_csv="$(csv_retain_exact_items "$launched_csv" "$prompt_generated_csv")"
+
+  if [[ "$normalized_launched_csv" != "$launched_csv" || "${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-}" != "$prompt_generated_csv" ]]; then
+    queued_csv="${QUEUED_WORKER_PROMPTS:-}"
+    max_parallel_workers="${MAX_PARALLEL_WORKERS:-}"
+    active_running_workers="${ACTIVE_RUNNING_WORKER_COUNT:-}"
+    available_new_slots="${AVAILABLE_NEW_WORKER_SLOTS:-}"
+    write_manager_worker_launch_state \
+      "$project" \
+      "${LAST_MANAGER_CONTINUITY_GENERATED:-$continuity_file}" \
+      "$prompt_generated_csv" \
+      "${LAST_MANAGER_CONTINUITY_CONSUMED:-$continuity_file}" \
+      "$normalized_launched_csv" \
+      "$queued_csv" \
+      "$max_parallel_workers" \
+      "$active_running_workers" \
+      "$available_new_slots"
+  fi
+
+  printf '%s\n' "$normalized_launched_csv"
+}
+
+manager_worker_launch_state_refresh_for_status() {
+  local project="$1" continuity_file=""
+  [[ -n "$project" && -f "$(manager_worker_launch_state_file "$project")" ]] || return 0
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
+  manager_worker_launch_state_reconcile_same_continuity_prompts "$project" "$continuity_file" >/dev/null 2>&1 || true
+}
+
 csv_conflicts_with_item() {
   local csv="$1" needle="$2" item
   [[ -n "$csv" && -n "$needle" ]] || return 1
@@ -2311,6 +2352,8 @@ manager_runtime_launch_workers_from_latest_handoff() {
     launched_csv="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
     if [[ -n "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" && "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" != "$continuity_file" ]]; then
       launched_csv=""
+    else
+      launched_csv="$(manager_worker_launch_state_reconcile_same_continuity_prompts "$project" "$continuity_file")"
     fi
   fi
 
@@ -4773,6 +4816,7 @@ cmd_live_status() {
   active_running_worker_count="unknown"
   available_new_worker_slots="unknown"
   if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
+    manager_worker_launch_state_refresh_for_status "$project"
     # shellcheck disable=SC1090
     source "$(manager_worker_launch_state_file "$project")"
     latest_manager_continuity_generated="${LAST_MANAGER_CONTINUITY_GENERATED:-unavailable}"

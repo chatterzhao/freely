@@ -80,6 +80,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reconciles-stale-frozen-consumed-prompt`
 - `docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-frozen-worker`
 - `docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
+- `docs/system/workspace/scripts/tests/test-freely-live-status`
 - `docs/system/workspace/scripts/tests/test-freely-worker-prompt-natural-language-contract-compat`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md`
@@ -95,6 +96,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reconciles-stale-frozen-consumed-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-frozen-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 - `./bin/governance-check`
 
 ## Next

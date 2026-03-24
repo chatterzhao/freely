@@ -4,8 +4,8 @@
 - title: Latest manager continuity worker consumption governance
 - phase_state: `in_verification`
 - runtime_state: `restart_required`
-- branch: `feature/manager-launch-state-frozen-prompt-state-reconcile-20260324`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-frozen-prompt-state-reconcile`
+- branch: `feature/manager-launch-state-consumed-truth-reconcile-20260324`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
 - issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "verification-writeback"}
@@ -36,7 +36,9 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-frozen-prompt`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-frozen-worker`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 - Result: same-continuity stale frozen prompt remnants are now purged before relaunch reconciliation; remaining scope is still the unchanged real `develop` post-merge acceptance via `freely chat`.
+- Follow-up tightening on the same day: `live-status` now runs the same same-continuity reconcile before reading manager launch-state, so a stop/restart gap cannot keep surfacing a stale frozen prompt as current consumed truth while the latest continuity already excludes it from the launchable prompt set.
 
 ## 2026-03-23 Continuation Writeback
 
