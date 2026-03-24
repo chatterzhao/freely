@@ -463,8 +463,8 @@ routing_policy:
 - promoted_issue_path: `pending://issue-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md`
-- next_action: 继续 pre-brainstorm，先验证 `docs/system/workspace/three-loop-capability-lifecycle.md` 是否足以成为唯一细节真源；若仍需更多行为约束，再 materialize 为独立 IBM issue，而不是继续把细节散落到 `CONSTITUTION`、`PROJECT_INTENT` 和多个 skills 中
-- revisit_trigger: 当 lifecycle 真源之外仍出现新的行为约束必须落到独立 issue，或 manager/doc/dev-loop 继续出现无法由当前真源解释的冲突时，重新进入 materialization 判断
+- next_action: 继续 pre-brainstorm，并吸收 `docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/` 作为 active continuation；先完成“三个 loop 而非三层”的关系纠偏与全仓 active truth 审计，确认 `auto-loop` 与 `doc-loop` / `dev-loop` 的并列 sibling 关系、verification / cleanup 的非-loop 定位、以及哪些文档必须改写，之后再决定是否 materialize 为独立 IBM issue，而不是继续把细节散落到 `CONSTITUTION`、`PROJECT_INTENT` 和多个 skills 中
+- revisit_trigger: 当 active truth 审计已经证明现有 lifecycle 真源不足以承载“三个 loop 的并列关系 + 全应用事件地图”，或 manager/doc/dev routing 继续出现由“层级/包含关系”误读导致的冲突时，重新进入 materialization 判断
 
 11. `C-20260320-0252-A`
 - title: Signal restart-point routing across interruption, review, test, and recovery
