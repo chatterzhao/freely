@@ -4129,10 +4129,13 @@ cmd_ensure_manager() {
   }
 
   branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
-  if [[ "$branch" != "develop" ]]; then
-    log_error "ensure-manager only supports the develop manager worktree (current branch: ${branch:-unknown})"
-    exit 1
-  fi
+  case "$branch" in
+    develop|main|pre-test-merge) ;;
+    *)
+      log_error "ensure-manager only supports protected manager worktrees (current branch: ${branch:-unknown})"
+      exit 1
+      ;;
+  esac
 
   if [[ "$watch_mode" == "1" ]]; then
     cmd_ensure_manager_watch "$project" "$watch_interval"

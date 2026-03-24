@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-pre-test-merge.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/mock-bin"
+LAUNCH_LOG="$TMP_DIR/launch.log"
+AI_STATE="$TMP_DIR/active-account"
+AI_SWITCH_LOG="$TMP_DIR/ai-switch.log"
+mkdir -p \
+  "$PROJECT/bin" \
+  "$PROJECT/docs/pre-brainstorms/20260318-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$MOCK_BIN"
+
+git init -q -b pre-test-merge "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260318-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260318-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260318-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+MAX_ROUTE_ONLY_STREAK=1
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+CHECKPOINT_WARN_DIRTY_ENTRIES=40
+CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
+EOF
+
+cat >"$PROJECT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+state_file="${AI_SWITCH_STATE:?}"
+log_file="${AI_SWITCH_LOG:?}"
+printf '%s\n' "$*" >>"$log_file"
+
+cmd=""
+for arg in "$@"; do
+  case "$arg" in
+    switch|whoami|list)
+      cmd="$arg"
+      break
+      ;;
+  esac
+done
+
+case "$cmd" in
+  whoami)
+    if [[ -f "$state_file" ]]; then
+      account="$(cat "$state_file")"
+    else
+      account="worahe3973@outlook.com"
+    fi
+    echo "{\"tool\":\"codex\",\"account\":\"$account\"}"
+    ;;
+  list)
+    echo '{"accounts":["codex-worahe3971@outlook-com","codex-worahe3972@outlook-com","codex-worahe3973@outlook-com"]}'
+    ;;
+  switch)
+    args=("$@")
+    for ((i=0; i<${#args[@]}; i++)); do
+      if [[ "${args[$i]}" == "switch" ]]; then
+        printf '%s' "${args[$((i+2))]}" >"$state_file"
+        echo "{\"switched\": true, \"tool\": \"${args[$((i+1))]}\", \"account\": \"${args[$((i+2))]}\"}"
+        exit 0
+      fi
+    done
+    ;;
+esac
+
+echo '{}'
+EOF
+
+cat >"$MOCK_BIN/launch-freely" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >>"${LAUNCH_LOG:?}"
+EOF
+
+chmod +x "$PROJECT/bin/ai" "$MOCK_BIN/launch-freely"
+
+cat >"$PROJECT/.freely/run/codex-account-cooldowns.tsv" <<'EOF'
+worahe3972@outlook-com	4102444800
+worahe3973@outlook-com	4102444800
+EOF
+printf 'worahe3973@outlook.com' >"$AI_STATE"
+
+AI_SWITCH_STATE="$AI_STATE" \
+AI_SWITCH_LOG="$AI_SWITCH_LOG" \
+LAUNCH_LOG="$LAUNCH_LOG" \
+FREELY_ENSURE_MANAGER_LAUNCH_BIN="$MOCK_BIN/launch-freely" \
+PATH="$MOCK_BIN:$PATH" \
+  bash "$ROOT_DIR/bin/freely" ensure-manager --project "$PROJECT" >/dev/null
+
+grep -q 'switch codex worahe3971@outlook-com --yes' "$AI_SWITCH_LOG"
+grep -q 'start --project '"$PROJECT"'$' "$LAUNCH_LOG"
+grep -q 'worahe3971@outlook.com' "$AI_STATE"
+
+echo "[PASS] freely ensure-manager accepts pre-test-merge as a protected manager worktree"
