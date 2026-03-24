@@ -463,8 +463,8 @@ routing_policy:
 - promoted_issue_path: `pending://application-native-runtime-observation-contract-and-observability-planes`
 - source_brainstorm: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md`
-- next_action: 保持 active candidate；先冻结 `plane identity block`、`current-state/session/stream/fleet/artifact` 五类 observation planes 的最小词典、`progress/stall/acceptance evidence` 三类 schema、CLI/TUI/GUI/API 共享的 status card/deep ref contract，以及 Freely self-host concrete profile 对这些 contract 的映射；同时明确它与 `live-status`、`pre-test-merge acceptance stall`、frontend probe 三条线的承接关系，在这些边界稳定前不直接跳到 runtime patch 或 UI 实现
-- revisit_trigger: 当 `plane identity block`、三类 schema、shared state exposure contract、Freely self-host concrete profile 与多平面状态面边界都足够稳定，且完成独立 acceptance review 后，重新进入 materialization 判断；若仍需保留其它应用的实现自由度，再进入 issue/IBM contract 冻结
+- next_action: 保持 active candidate；先冻结 `plane identity block`、`current-state/session/stream/fleet/artifact` 五类 observation planes 的最小词典、`progress/stall/acceptance evidence` 三类 schema、CLI/TUI/GUI/API 共享的 status card/deep ref contract，以及 Freely self-host concrete profile 对这些 contract 的映射；同时明确它与 `live-status`、`pre-test-merge acceptance stall`、frontend probe 三条线的承接关系，在这些边界稳定前不直接跳到 runtime patch 或 UI 实现。第二轮独立 acceptance review 已确认当前仍不能 materialize；最小剩余 blocker 收窄为 `acceptance evidence schema` 的 canonical 落点、`live-status/fleet-status` 是否足够承接 `current-state/fleet plane`、CLI/TUI/GUI/API deep ref 兼容规则，以及 subagent 是否是一等可观察实体
+- revisit_trigger: 当 `plane identity block`、三类 schema、shared state exposure contract、Freely self-host concrete profile 与多平面状态面边界都足够稳定，且上述四个 blocker 经独立 acceptance review 收口后，重新进入 materialization 判断；若仍需保留其它应用的实现自由度，再进入 issue/IBM contract 冻结
 
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛

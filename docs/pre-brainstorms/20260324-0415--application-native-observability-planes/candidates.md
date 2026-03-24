@@ -42,13 +42,17 @@
     mode: `author pre-materialization review`
     summary: `This should be treated as a new upstream contract line, not a patch to the old stall candidate and not a duplicate of live-status. It coordinates existing observation surfaces and generalizes them for future application-native testing.`
     verdict: `needs_independent_review`
+  - reviewer: `codex + explorer second-round acceptance review`
+    mode: `independent candidate acceptance review`
+    summary: `This still stays at pre-brainstorm. The contract direction is valid, but four blockers remain before IBM: canonical home of acceptance evidence schema, whether current live-status/fleet-status can carry current-state/fleet planes, CLI/TUI/GUI/API deep-ref compatibility rules, and whether subagents are first-class observable entities or stay aggregated under lane/worktree surfaces.`
+    verdict: `stay_pre_brainstorm`
 - priority: P1
 - status: proposed
 - decision_reason: 这条线已经从本次 Freely 自举现场中暴露出来，而且 now clearly exceeds `live-status` / stall candidate 的原边界；但当前仍应停留在 pre-brainstorm，直到五个 plane 的 identity block、progress/stall/acceptance evidence schema、shared state exposure contract，以及与既有线的承接关系都冻结稳定。
 - promoted_issue_path: `pending://application-native-runtime-observation-contract-and-observability-planes`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
-- next_action: 继续 pre-brainstorm，先冻结 `plane identity block`、五类 observation planes 的最小词典、`progress/stall/acceptance evidence` schema、CLI/TUI/GUI/API 共享的 status card/deep ref contract，以及 Freely self-host concrete profile；随后补一轮独立 acceptance review，专门判断这些 contract 是否已足以 materialize 为 upstream issue
-- revisit_trigger: 当 `plane identity block`、三类 signal schema、shared state exposure contract、Freely self-host concrete profile 以及与 `live-status` / stall / frontend probe 的关系都足够稳定，且独立 acceptance review 不再提出新的 contract blocker 时，重新进入 materialization 判断
+- next_action: 继续 pre-brainstorm，先冻结 `plane identity block`、五类 observation planes 的最小词典、`progress/stall/acceptance evidence` schema、CLI/TUI/GUI/API 共享的 status card/deep ref contract，以及 Freely self-host concrete profile。第二轮独立 acceptance review 已确认当前仍不能 materialize；最小剩余下一步收窄为冻结 `acceptance evidence schema` 的 canonical 落点、确认现有 `live-status` / `fleet-status` 是否足够承接 `current-state` / `fleet plane`、冻结 CLI/TUI/GUI/API deep ref 兼容规则，并决定 subagent 是否是一等可观察实体
+- revisit_trigger: 当 `plane identity block`、三类 signal schema、shared state exposure contract、Freely self-host concrete profile 以及与 `live-status` / stall / frontend probe 的关系都足够稳定，且上述四个 contract blocker 经独立 acceptance review 收口后，重新进入 materialization 判断
 - session_refs:
   - tool: codex
   - session_id: current-thread
