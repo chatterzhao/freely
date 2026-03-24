@@ -12,7 +12,7 @@
   - `skill:multi-worktree-supervision`
   - `skill:worktree-hygiene-supervision`
   - `skill:worktree-maintenance-governance`
-- 主管角色在三层循环中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
+- 主管角色在三个 loop 中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
   - `skill:watchdog-control-plane`
   - `skill:continuity-watchdog`
 

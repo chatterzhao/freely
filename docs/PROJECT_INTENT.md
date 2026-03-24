@@ -9,58 +9,33 @@
 - AI 从项目意图、story-scoped code-reviews、test、chat 输入与会话证据（人类或自治）、github-issue、治理漂移、运行时异常中发现新问题，并先收敛为 candidate；从里程碑文档获取已接纳 issue，从进度/恢复文档续接已有 issue；而非固定从单一任务列表
 - AI 自主管理：获取 Issue → 文档 → 开发 → 验收 → 获取 Issue 的闭环
 - AI 持续运行（自己监控ai工具崩溃/阻塞自动触发续接），除非明确停止。或找不到需求，或者出现重大事故 AI 自己已经无力自己解决。
-- Freely 开发 Freely 时暴露的可复现共性问题，默认先判断是否应成为 Freely 能力发现；若可泛化到用户项目，应进入三层循环 materialize 为可复用能力，而不是停留成一次性项目经验。
+- Freely 开发 Freely 时暴露的可复现共性问题，默认先判断是否应成为 Freely 能力发现；若可泛化到用户项目，应进入三个 loop 的 canonical lifecycle materialize 为可复用能力，而不是停留成一次性项目经验。
 
 ## 方法论总述
 
-### 三层循环方法论
+### 三个 Loop 方法论
 
 说明：
-- 本节定义 Freely 为什么需要三层循环，以及高层闭环结构。
-- 三层循环下的能力归宿、owner 边界与生命周期细节真源统一收敛到 `docs/system/workspace/three-loop-capability-lifecycle.md`，避免在多个高层文档中重复维护。
+- 本节定义 Freely 为什么需要三个 loop，以及高层闭环结构。
+- 三个 loop 的能力归宿、owner 边界与生命周期细节真源统一收敛到 `docs/system/workspace/three-loop-capability-lifecycle.md`，避免在多个高层文档中重复维护。
 
 ```text
-A:auto-loop（外循环）
-│
+A:auto-loop（外层编排 / 治理 loop）
 ├── lead-agent（首跳代理）
 │   └── 调用 context-source-skill
-│
 ├── context-source-skill（路由决策）
 │   ├── 扫描需求池：milestones/progress/code-reviews/test/chat/github-issue
-│   ├── 判定 route_kind
+│   ├── 判定 route_kind / worktree action
 │   └── 组装下一跳提示词
-│
-├── D:doc-pre-brainstorm-execution（前置收敛环）
-│   ├── 触发条件：无稳定 issue 边界
-│   └── 产出：
-│       - docs/pre-brainstorms/<id>/brainstorms.md
-│       - docs/pre-brainstorms/<id>/candidates.md
-│       - docs/milestones.md（candidate 同步）
-│
-├── D:doc-ibm-execution（Issue-bound 文档收敛环）
-│   ├── 触发条件：issue-bound brainstorm / docs incomplete
-│   └── 产出（IBM + G）：
-│       - docs/epics/{epic}/{story}/issues/{issue-name}.md
-│       - docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md
-│       - docs/epics/{epic}/{story}/prd.md
-│       - docs/epics/{epic}/{story}/pre-tests.md
-│       - docs/epics/{epic}/{story}/tasks.md
-│       - docs/milestones.md（issue 同步）
-│       - （按需）docs/CONSTITUTION.md, docs/LAWS.md, docs/system/workspace/skills/**
-│
-├── D:dev-loop-execution（开发实现环）
-│   ├── 触发条件：ready issue / in-progress
-│   └── 产出：
-│       - AI-native capability artifacts（如 code / tests / agents / skills / runtime scripts / hooks / implementation docs）
-│       - docs/epics/{epic}/{story}/code-reviews/*.md
-│       - docs/progress/{epic}/p-{issue}.md
-│       - docs/milestones.md（状态更新）
-│
-└── 回流（状态交还 auto-loop）
-    └── status / next_recommended_route / recovery_context
+├── sibling loop 1: doc-loop
+│   ├── D:doc-pre-brainstorm-execution（前置收敛）
+│   └── D:doc-ibm-execution（Issue-bound 文档收敛）
+├── sibling loop 2: dev-loop-execution（开发实现）
+├── verification / recovery / cleanup evidence 回流
+└── 状态交还 auto-loop，进入下一轮 orchestration 或结束当前 lifecycle
 ```
 
-### 补充图：三层循环架构
+### 补充图：三个 Loop 架构
 
 ```mermaid
 flowchart TD
@@ -77,9 +52,12 @@ flowchart TD
         A2{"route_kind?"}
     end
 
-    subgraph INNER["inner execution loops"]
+    subgraph DOC["sibling loop: doc-loop"]
         D0["doc-pre-brainstorm-execution"]
         D1["doc-ibm-execution"]
+    end
+
+    subgraph DEV["sibling loop: dev-loop"]
         D2["dev-loop-execution"]
     end
 
@@ -118,7 +96,7 @@ flowchart TD
 说明：
 - 本节保留高层来源到下一跳的方向性约束。
 - 详细 capability -> loop -> owner -> artifact -> transition 映射以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准。
-- 其中 `dev-loop` 是 AI-native 能力实现层，不限于传统“写代码”；凡是在既有 issue 边界内把能力真正 materialize 出来的工作，都属于 `dev-loop`。
+- 其中 `doc-loop` 与 `dev-loop` 是 sibling execution loops；`dev-loop` 是 AI-native 能力实现层，不限于传统“写代码”；凡是在既有 issue 边界内把能力真正 materialize 出来的工作，都属于 `dev-loop`。
 
 | 来源 | 路由起点 | 说明 |
 |-----------|---------|------|

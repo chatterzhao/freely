@@ -219,7 +219,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/candidates.md`
 - next_action: `three-loop-capability-lifecycle` 与 `PROJECT_INTENT` 的边界 wording 已落盘；当前进入 consistency verification，确认“历史 vs 当前”与狗粮能力发现原则不会与既有真源冲突
 
-17. `I-20260322-0115`
+17. `I-20260324-0405`
+- title: 三个 loop 的并列关系与 terminal governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md`, `docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/candidates.md`
+- next_action: IBM 已 materialize，当前进入 active truth dev 改写：统一 `auto-loop` outer、`doc-loop` / `dev-loop` sibling、verification / cleanup / recovery 非-loop、以及 terminal closure 必须由 outer governance 收口；只改当前真源，不回写历史 evidence
+
+18. `I-20260322-0115`
 - title: CLI-first entrypoint and observability surface unification
 - milestone_state: committed
 - phase_state: `completed`
@@ -229,7 +239,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md`
 - next_action: 已完成 `chat` / `tui` 的 shared front-door submit helper，并把 CLI-first backend contract 写回真源；若后续继续做 Tauri 渲染层，需新开 lifecycle
 
-18. `I-20260322-0135`
+19. `I-20260322-0135`
 - title: Integration-acceptance-first IBM and verification governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -239,7 +249,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/candidates.md`
 - next_action: 已将 `pre-tests.md` 收敛为 issue-level acceptance 控制面，并把 integration / acceptance-first 口径写回 IBM、three-loop 与 `LAWS`；后续若要继续结构化 verification review 模板，应通过新 lifecycle 承接
 
-19. `I-20260322-0228`
+20. `I-20260322-0228`
 - title: Manager delegation after sufficient patrol evidence governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -249,7 +259,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/candidates.md`
 - next_action: 已把 patrol evidence 充足后必须切到 concrete worker delegation 的阈值语义写回主管真源；若后续仍观察到主管只巡检不委派，应通过新 lifecycle 进入 runtime / delegation mechanism 层修复
 
-20. `I-20260322-0412`
+21. `I-20260322-0412`
 - title: Worker active reentry for manager-delegated continuation governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -259,7 +269,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
 - next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
 
-21. `I-20260322-0445`
+22. `I-20260322-0445`
 - title: Latest manager continuity worker consumption governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -454,17 +464,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260323-1835--worker-delegated-continuation-active-stall-recovery/candidates.md`
 - next_action: 保持 active candidate；先让 manager watchdog 能识别并恢复 active worker delegated-continuation stall，再继续真实 dogfood 验证 retained worker 能否自动收口、cleanup 并回到 next patrol
 - revisit_trigger: 当再次复现 active worker 已收到 delegated continuation 但 cycle log / closeout 长时间不推进，或当前 runtime 补丁验证稳定后需要冻结独立 issue contract 时，重新进入 materialization 判断
-
-9. `C-20260319-1105-A`
-- title: 三层循环能力映射、owner 边界与生命周期真源收敛
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
-- priority: P0
-- promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md`
-- next_action: 继续 pre-brainstorm，并吸收 `docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/` 作为 active continuation；先完成“三个 loop 而非三层”的关系纠偏与全仓 active truth 审计，确认 `auto-loop` 与 `doc-loop` / `dev-loop` 的并列 sibling 关系、verification / cleanup 的非-loop 定位、以及哪些文档必须改写，之后再决定是否 materialize 为独立 IBM issue，而不是继续把细节散落到 `CONSTITUTION`、`PROJECT_INTENT` 和多个 skills 中
-- revisit_trigger: 当 active truth 审计已经证明现有 lifecycle 真源不足以承载“三个 loop 的并列关系 + 全应用事件地图”，或 manager/doc/dev routing 继续出现由“层级/包含关系”误读导致的冲突时，重新进入 materialization 判断
 
 11. `C-20260320-0252-A`
 - title: Signal restart-point routing across interruption, review, test, and recovery

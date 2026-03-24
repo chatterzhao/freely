@@ -227,24 +227,23 @@ CLI (核心) → API (可选) → UI (可选)
 
 ## 11. 方法论总述（硬性要求）
 
-Freely 遵循三层循环方法论。
+Freely 遵循三个 loop 的方法论。
 
-### 11.1 三层循环结构
+### 11.1 三个 Loop 结构
 
 ```text
 A:auto-loop（外循环）
 ├── 发现与路由 Issue
-├── D:doc-pre-brainstorm-execution（前置收敛环）
-├── D:doc-ibm-execution（Issue-bound 文档收敛环）
-├── D:dev-loop-execution（开发实现环）
-└── 回流并进入下一轮
+├── 进入 D:doc-loop（前置收敛 / IBM 文档收敛）
+├── 或进入 D:dev-loop-execution（开发实现环）
+└── 吸收结果并进入下一轮
 ```
 
 说明：
 - 宪法仅定义循环边界与必须闭环，不定义产物模板、验收门细则或执行步骤。
 - 产物目录、门禁口径与路由细则由 `docs/LAWS.md` 同章节定义。
 - 实际执行步骤由 `docs/system/workspace/skills/` 定义。
-- 三层循环下的能力归宿、owner 边界与生命周期细节真源见 `docs/system/workspace/three-loop-capability-lifecycle.md`；本章只保留不可越界边界。
+- 三个 loop 的能力归宿、owner 边界与生命周期细节真源见 `docs/system/workspace/three-loop-capability-lifecycle.md`；本章只保留不可越界边界。
 
 ### 11.2 核心原则
 
@@ -258,7 +257,7 @@ A:auto-loop（外循环）
 详细规则见 [`docs/LAWS.md`](./LAWS.md)：
 - 与宪法同序的法律章节：`LAWS.md` 第 1~16 章
 - 执行路由：`LAWS.md` 附录 A
-- 三层职责边界：`LAWS.md` 附录 B
+- 三个 loop 的职责边界：`LAWS.md` 附录 B
 
 ## 12. 子代理规划与委托（硬性要求）
 

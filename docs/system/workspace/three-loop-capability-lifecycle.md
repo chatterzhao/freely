@@ -1,6 +1,11 @@
 # Three-Loop Capability Lifecycle
 
-Freely 三层 loop 的应用级事件地图真源。
+Freely 三个 loop 的应用级事件地图真源。
+
+核心关系：
+- `auto-loop` 是 outer orchestration / governance loop
+- `doc-loop` 与 `dev-loop` 是 sibling execution loops
+- `verification`、`recovery`、`cleanup governance` 是 route / phase / governance path，不是新增 loop
 
 边界：
 - `CONSTITUTION.md`: 边界与硬约束
@@ -60,7 +65,9 @@ flowchart TD
 
 说明：
 - 任何一轮都先同步三元组，而不是只看 issue 或只看 worktree。
-- `completion verification` 不是 cleanup；它是 promote 前后的验收回路。
+- `auto-loop` 负责 route 与 outer governance，不包含 `doc-loop` / `dev-loop` 的实现细节。
+- `doc-loop` 与 `dev-loop` 是 sibling execution loops；它们都可能把结果回流给 `auto-loop`。
+- `completion verification` 不是 cleanup，也不是第四个 loop；它是 promote 前后的验收路径。
 - cleanup 完成后才算 lifecycle 真正闭环，不允许停在 `merged-not-cleaned`。
 - `route_kind` 与 `worktree action` 是两个并列判断，不允许只判 loop 不判执行容器。
 - 新 discovery 可以先被 intake 接住，但若存在唯一 canonical retained tree 仍未收口，manager 可以先延后 create，直到旧树 closeout 完成。
