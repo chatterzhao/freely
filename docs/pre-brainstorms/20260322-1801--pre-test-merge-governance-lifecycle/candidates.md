@@ -37,6 +37,7 @@
   - stale 后 manager 继续使用既有 `ownership / restart_point / next_action` 词典，但必须补齐 `replay source manifest`、`replay order`、`retire evidence`、`remaining cleanup requirement`
   - runtime 对 stale batch 只允许 read-only patrol、cleanup handoff、rebuild/replay handoff，不再把它恢复成普通 verification 会话
   - 所有指向 stale batch 的旧 queued worker prompts / delegated launches 都会被 supersede 或失效，不再继续消费旧 prompt 池
+  - 反滥用默认值必须固定：默认提升路径仍是 `feature/* -> develop`；只有当 `pre-tests.md` 显式声明 `integration_target=pre-test-merge` 或当前问题确属主线前组合验证时，manager 才可把 lane 路由到 `pre-test-merge`
   - 只能使用现有状态与 gate 组合判断是否继续推进或删树：`done_ibm`、`completed`、cleanup gate、`verified-retirable`、`retired`；其中 `completed` 只代表 issue completion，不代表 delete-eligible，stale retire/rebuild 不得只依据 issue `completed` 或局部 loop 收口
   - 上述 contract 优先落在现有真源：manager continuity 为唯一治理真相面，`manager-worker-launch-state.env` 与 `live-status` 仅做消费镜像，不新增平行状态文件
   - manager continuity 必须带批次身份锚点与固定承载语法，至少包括 `validation_batch_id`、`integration_target`、`source_batch_base`，并以固定可解析块承载，而不是自由文本
@@ -54,6 +55,7 @@
   - 冻结 stale 判定的最低 machine-readable 字段、真相面和消费路径
   - 冻结 manager lifecycle transaction 与现有 patrol 词典的映射，不新增平行状态系统
   - 冻结 replay source manifest / replay order / retire evidence 的最小 schema
+  - 冻结 `pre-test-merge` 的反滥用默认路由：未命中显式 `integration_target=pre-test-merge` 或主线前组合验证需求时，不得把它当默认验证面
   - 冻结 `superseded_worker_prompts` 与 stale batch gate 的联动，保证旧 queued prompt 不会继续被 runtime 消费
   - 冻结 `validation_batch_mode=read_only_cleanup|rebuild_planning`，确保 `collect_cleanup_evidence` 不会被误读成恢复普通 verification
   - 冻结 `Validation batch governance:` `v1` specimen 与 key 顺序，并证明 runtime / cleanup skill 只靠该块就能稳定读到最小治理字段
