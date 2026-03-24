@@ -68,6 +68,59 @@ wait_for_codex_account_switch_idle() {
   return 0
 }
 
+codex_account_switch_probe_lock_acquire() {
+  local reason="${1:-watchdog_probe}"
+  local timeout_secs="${AI_CLI_SWITCH_LOCK_WAIT_SECS:-60}"
+  local lock_dir state_file start_ts now owner_pid inherited_owner_pid
+  lock_dir="$(codex_account_switch_lock_dir)"
+  state_file="$(codex_account_switch_lock_state_file)"
+  inherited_owner_pid="${AI_CLI_SWITCH_LOCK_OWNER_PID:-}"
+  [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=60
+  mkdir -p "$(dirname "$lock_dir")"
+  start_ts="$(date +%s)"
+
+  while true; do
+    codex_account_switch_lock_cleanup_if_stale
+    if mkdir "$lock_dir" 2>/dev/null; then
+      cat >"$state_file" <<EOF
+owner_pid=$$
+started_at=$(date +%s)
+reason=$reason
+command=probe
+target=codex-exec
+EOF
+      export AI_CLI_SWITCH_LOCK_OWNER_PID="$$"
+      return 0
+    fi
+
+    owner_pid="$(codex_account_switch_lock_owner_pid)"
+    if [[ -n "$owner_pid" && ( "$owner_pid" == "$$" || ( -n "$inherited_owner_pid" && "$owner_pid" == "$inherited_owner_pid" ) ) ]]; then
+      export AI_CLI_SWITCH_LOCK_OWNER_PID="$owner_pid"
+      return 0
+    fi
+
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout_secs )); then
+      log_warn "timed out waiting to serialize watchdog codex probe behind account switch activity"
+      return 1
+    fi
+    sleep 1
+  done
+}
+
+codex_account_switch_probe_lock_release() {
+  local lock_dir owner_pid inherited_owner_pid
+  lock_dir="$(codex_account_switch_lock_dir)"
+  [[ -d "$lock_dir" ]] || return 0
+  owner_pid="$(codex_account_switch_lock_owner_pid)"
+  inherited_owner_pid="${AI_CLI_SWITCH_LOCK_OWNER_PID:-}"
+  if [[ -z "$owner_pid" || "$owner_pid" == "$$" ]]; then
+    rm -rf "$lock_dir"
+  elif [[ -n "$inherited_owner_pid" && "$owner_pid" == "$inherited_owner_pid" && "$$" == "$inherited_owner_pid" ]]; then
+    rm -rf "$lock_dir"
+  fi
+}
+
 # Parse various time formats from codex output
 # Supported formats:
 #   - "Mar 23rd, 2026 3:51 PM" (full date)
@@ -127,6 +180,7 @@ extract_try_again_time_from_output() {
 
 codex_current_account() {
   local project="$1" ai_bin output
+  wait_for_codex_account_switch_idle "$project" || return 1
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" ]] || return 0
   output="$("$ai_bin" --quiet --format json whoami codex 2>/dev/null || true)"
@@ -135,6 +189,7 @@ codex_current_account() {
 
 codex_current_slot() {
   local project="$1" ai_bin output
+  wait_for_codex_account_switch_idle "$project" || return 1
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" ]] || return 0
   output="$("$ai_bin" --quiet --format json whoami codex 2>/dev/null || true)"
@@ -143,6 +198,7 @@ codex_current_slot() {
 
 codex_saved_accounts() {
   local project="$1" ai_bin output
+  wait_for_codex_account_switch_idle "$project" || return 1
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" ]] || return 0
   output="$("$ai_bin" --quiet --format json list 2>/dev/null || true)"
@@ -293,8 +349,10 @@ select_earliest_reset_codex_account_any() {
 #   0 for usable or rate limited
 #   1 for other probe failures
 codex_probe_current_account_now() {
-  local project="$1" prompt_file output_file rc timeout_secs="${CODEX_PROBE_TIMEOUT:-15}"
+  local project="$1" prompt_file output_file rc timeout_secs="${CODEX_PROBE_TIMEOUT:-15}" probe_lock_held=0
   wait_for_codex_account_switch_idle "$project" || return 1
+  codex_account_switch_probe_lock_acquire "watchdog_probe_current_account" || return 1
+  probe_lock_held=1
   prompt_file="$(mktemp)"
   output_file="$(mktemp)"
   printf 'hi\n' >"$prompt_file"
@@ -342,6 +400,9 @@ codex_probe_current_account_now() {
     kill "$pid" 2>/dev/null
     wait "$pid" 2>/dev/null
     rm -f "$prompt_file" "$output_file"
+    if [[ "$probe_lock_held" == "1" ]]; then
+      codex_account_switch_probe_lock_release
+    fi
     printf 'timeout\n'
     return 0
   fi
@@ -352,6 +413,9 @@ codex_probe_current_account_now() {
   local output
   output="$(cat "$output_file")"
   rm -f "$output_file"
+  if [[ "$probe_lock_held" == "1" ]]; then
+    codex_account_switch_probe_lock_release
+  fi
 
   # Strip ANSI escape codes for reliable grep matching
   # Handle various escape sequences: ESC[...m, ESC]...BEL, ESC[?...h/l, etc.

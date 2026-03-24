@@ -161,6 +161,30 @@ codex_switch_lock_release() {
   fi
 }
 
+codex_switch_lock_wait_for_idle() {
+  local timeout_secs="${AI_CLI_SWITCH_LOCK_WAIT_SECS:-60}"
+  local lock_dir start_ts now owner_pid inherited_owner_pid
+  lock_dir="$(codex_switch_lock_dir)"
+  inherited_owner_pid="${AI_CLI_SWITCH_LOCK_OWNER_PID:-}"
+  [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=60
+  start_ts="$(date +%s)"
+
+  while true; do
+    codex_switch_lock_cleanup_if_stale
+    [[ -d "$lock_dir" ]] || return 0
+    owner_pid="$(codex_switch_lock_owner_pid)"
+    if [[ -n "$owner_pid" && ( "$owner_pid" == "$$" || ( -n "$inherited_owner_pid" && "$owner_pid" == "$inherited_owner_pid" ) ) ]]; then
+      return 0
+    fi
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout_secs )); then
+      log_error "timed out waiting for an existing codex account switch to finish"
+      return 1
+    fi
+    sleep 1
+  done
+}
+
 json_string_or_null() {
   local value="${1:-}"
   if [[ -n "$value" ]]; then
@@ -528,6 +552,7 @@ _cmd_switch_codex_direct_unlocked() {
 # 列出 accounts
 cmd_list() {
   local accounts=()
+  codex_switch_lock_wait_for_idle || exit 1
   
   while IFS= read -r line; do
     [[ -z "$line" ]] && continue
@@ -563,6 +588,7 @@ cmd_whoami() {
   
   case "$tool" in
     codex)
+      codex_switch_lock_wait_for_idle || exit 1
       local auth_file="$HOME/.codex/auth.json"
       local slot=""
       if [[ ! -f "$auth_file" ]]; then
