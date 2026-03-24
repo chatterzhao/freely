@@ -6,6 +6,8 @@
 2. `PROJECT_INTENT.md` 的方法论、图和路由表彼此一致：
    - “三个 loop”而非“三层”
    - verification / cleanup / recovery 不是新增 loop
+   - `auto-loop` 负责完成判定、验证裁决、cleanup / retirement 路由
+   - `doc-loop` / `dev-loop` 负责产出 evidence，不负责最终宣布 terminal completion
 3. `three-loop-capability-lifecycle.md` 清楚区分：
    - loop
    - route_kind
@@ -22,6 +24,7 @@
    - `doc-loop` contains `dev-loop`
    - verification / cleanup is a fourth loop
    - local loop exit equals outer terminal completion
+   - worker can declare `completed / cleanup / retire` without `auto-loop` judgement
 
 ## Non-goals
 

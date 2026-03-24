@@ -32,6 +32,7 @@ A:auto-loop（外层编排 / 治理 loop）
 │   └── D:doc-ibm-execution（Issue-bound 文档收敛）
 ├── sibling loop 2: dev-loop-execution（开发实现）
 ├── verification / recovery / cleanup evidence 回流
+├── auto-loop 基于 canonical evidence 做完成判定 / 验证裁决 / cleanup 路由
 └── 状态交还 auto-loop，进入下一轮 orchestration 或结束当前 lifecycle
 ```
 
@@ -97,6 +98,7 @@ flowchart TD
 - 本节保留高层来源到下一跳的方向性约束。
 - 详细 capability -> loop -> owner -> artifact -> transition 映射以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准。
 - 其中 `doc-loop` 与 `dev-loop` 是 sibling execution loops；`dev-loop` 是 AI-native 能力实现层，不限于传统“写代码”；凡是在既有 issue 边界内把能力真正 materialize 出来的工作，都属于 `dev-loop`。
+- `doc-loop` / `dev-loop` 负责推进与产出 evidence；最终的 completion / verification / cleanup judgment 由 `auto-loop` 负责。
 
 | 来源 | 路由起点 | 说明 |
 |-----------|---------|------|

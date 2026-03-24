@@ -46,10 +46,11 @@
 
 Freely 需要一份唯一真源文档，明确三件事：
 
-1. 三层循环本身的职责边界：
-   - `auto-loop` 负责编排、监督、恢复、委派与多工位治理
+1. 三个 loop 本身的职责边界：
+   - `auto-loop` 负责编排、监督、恢复、委派、多工位治理，以及 completion / cleanup / retirement 的最终裁决
    - `doc-loop` 负责发现收敛、candidate、milestone intake、IBM 与文档 continuity
-   - `dev-loop` 负责实现、测试、review、verification、promotion/cleanup readiness
+   - `dev-loop` 负责实现、局部测试、review、verification evidence、promotion/cleanup readiness evidence
+   - worker 可以执行测试并产出 evidence，但“是否已经完成、是否通过验证、是否该 cleanup / retire”必须回交 `auto-loop` 裁决
 2. 每个能力挂在哪一层、由哪种 owner 承担：
    - `runtime/scripts`
    - `manager-agent` / `worker-agent`

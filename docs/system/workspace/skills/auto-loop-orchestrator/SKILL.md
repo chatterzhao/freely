@@ -73,32 +73,37 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - `verification`
    - `progress / recovery`
    - `runtime supervision / cleanup`
-14. verification / writeback / cleanup 不是第四层 loop；它们要么属于 worker 在 `dev-loop` 中产出的证据，要么属于主管在 `auto-loop` 中做出的治理判断与收口委派。
-15. 对 `human interruption`，runtime interruption dispatcher 可先做 durable 接住与及时 notice，但不替代主主管完成完整路由。
-16. 主管不把 raw signal 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
-17. 当 standing source 的重点问题是 sequencing / queue drift / state maintenance，而不是业务边界本身时，主管应优先委派 `skill:milestone-planning-state-maintenance`，而不是让业务 worker 顺手补 milestone。
-18. 对 worker 工位的 `human interruption`：
+14. verification / writeback / cleanup 不是第四层 loop；它们要么属于 worker 在 `doc-loop` / `dev-loop` 中产出的证据，要么属于主管在 `auto-loop` 中做出的治理判断与收口委派。
+15. worker 在 `doc-loop` / `dev-loop` 中只能把事项推进到“到达下一门”的状态：
+   - 文档边界已收敛
+   - 实现与局部测试已完成
+   - verification evidence 已写回
+   但“是否完成、是否通过验证、是否进入 cleanup / retirement”必须由 `auto-loop` 基于 canonical evidence 裁决。
+16. 对 `human interruption`，runtime interruption dispatcher 可先做 durable 接住与及时 notice，但不替代主主管完成完整路由。
+17. 主管不把 raw signal 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
+18. 当 standing source 的重点问题是 sequencing / queue drift / state maintenance，而不是业务边界本身时，主管应优先委派 `skill:milestone-planning-state-maintenance`，而不是让业务 worker 顺手补 milestone。
+19. 对 worker 工位的 `human interruption`：
   - `freely chat` 先完成 durable intake 与 interruption classification
   - 若结果已收敛成当前工位的 worker-owned `continuation` / `verification` handoff，且当前 worker runtime 因 `operator_stop` 停止
   - runtime 应重激活该 worker 主循环，而不是让 delegated intake 悬空
-19. 对 manager continuation handoff：
+20. 对 manager continuation handoff：
   - interruption resolution 生成 `handoff://continuation` 只是第一步
   - runtime 还必须留下 generated-vs-consumed evidence
   - 若后续命中 `fresh_with_handoff`、`auth_failure` 或其他 failure boundary，不能把 handoff 是否已消费变成不可见状态
-20. `freely` 是唯一正式 front-door command：
+21. `freely` 是唯一正式 front-door command：
   - `chat` 是 canonical high-level submit primitive
   - `tui` 只是交互壳，必须复用同一 post-submit runtime chain
   - 未来 GUI 也应复用同一 backend contract，而不是另造提交语义
-21. 当项目级 patrol 已经把某条线稳定判成 `retire-only`、`retire-now` 或 `continue-dev` 时，主管下一步必须进入 concrete execution routing：
+22. 当项目级 patrol 已经把某条线稳定判成 `retire-only`、`retire-now` 或 `continue-dev` 时，主管下一步必须进入 concrete execution routing：
   - `retire-only / retire-now` -> cleanup / retirement worker
   - `continue-dev` -> verification / dev continuation worker
   - 只有在关键事实缺失、上游依赖不明或 blocker 未冻结时，才允许继续 manager-only patrol
-22. 当主管已经生成更新的一轮 manager continuity 和 worker prompt set 时，runtime 必须以后者为最新 truth：
+23. 当主管已经生成更新的一轮 manager continuity 和 worker prompt set 时，runtime 必须以后者为最新 truth：
    - latest continuity generated
    - latest prompt set generated
    - latest continuity / prompt set consumed
    主管 watchdog 不得仅因为 supervisor 已在运行就停留在旧 continuity；要持续把最新一轮监督结果推进成 worker launch / reentry。
-23. manager handoff 中的每个 worker prompt 都必须同时满足两层契约：
+24. manager handoff 中的每个 worker prompt 都必须同时满足两层契约：
    - continuity 中显式引用 worker prompt 绝对路径
    - worker prompt 本体携带 machine-readable `Worktree:` / `Branch:` header
    否则 manager 虽然完成了排班判断，runtime 仍可能无法把 handoff 推进成真实 worker launch。

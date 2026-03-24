@@ -34,6 +34,7 @@
    - dispatch metadata：`dispatch_priority`、`parallel_safe`、`write_scope`
    - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
    - 一旦 `ownership + restart_point + next_action` 已经稳定，优先产出具体 worker handoff；不要继续停留在 manager-only patrol
+   - completion / verification / cleanup 的最终裁决仍留在主管；worker 只负责带回 evidence，不负责宣布 terminal completion
 5. 对任意新 signal：
    - 识别它来自 `event source` 还是 `standing source`
    - 先做最小 `intent understanding`
@@ -79,8 +80,8 @@
 
 - `runtime` 管生存：切号、等待、重启、恢复
 - `watchdog-control-plane` 管 watchdog owner taxonomy：availability / runtime / continuity
-- `worker-agent` 管执行：doc-loop / dev-loop / verification
-- `manager-agent` 管编排：发现、判断、委派、合并、清理
+- `worker-agent` 管执行：doc-loop / dev-loop / verification evidence
+- `manager-agent` 管编排与裁决：发现、判断、委派、完成判定、合并、清理
 - milestone 排期与状态维护属于 manager 编排下的专门委派，不应长期靠临时补写
 
 ## Signal Routing Contract
