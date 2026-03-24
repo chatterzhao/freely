@@ -355,15 +355,10 @@ Validation batch governance:
 - `phase_state=completed` 是 issue 唯一的最终态，但它只说明 issue 生命周期完成；它本身不等于 worktree 已可删除
 - `done_ibm`、单轮 verification 收口、单个 agent/skill 的局部完成，都不是任务最终完成
 - 删除 worktree 还要继续看现有 lifecycle gate 是否凑齐：merge / post-merge acceptance / cleanup evidence / `verified-retirable` / `retired`
-- 因而完成检查顺序至少应固定为：
-  - IBM 产物达标，且 `pre-tests.md` 质量 gate 通过
-  - dev / verification 执行完成
-  - testing closeout gate 通过，且 `pre-tests.md` 项目逐项执行并留痕
-  - issue 才允许进入 `phase_state=completed`
-  - 之后继续检查 merge / post-merge acceptance / cleanup evidence
-  - 当前树达到 `verified-retirable`
-  - 执行最终 delete branch/worktree guard
-  - 最后才进入 `retired`
+- 因而完成检查顺序必须固定为两段：
+  - issue completion chain：`done_ibm` -> `pre-tests.md` 质量 gate -> dev / verification -> testing closeout -> `phase_state=completed`
+  - delete eligibility chain：merge -> `post-merge acceptance` -> cleanup evidence -> `verified-retirable` -> delete branch/worktree guard -> `retired`
+- 其中 `completed` 只表示 issue 完成，不表示 delete-eligible；只有 delete eligibility chain 闭合后，worktree/branch 才能进入 `retired`
 - “application-native real-environment testing” 指当前应用自己的真实入口、真实交互面、真实集成路径，而不是抽象脚本替身
 - 在 Freely 自举场景里，它当前的具体形态才是：
   - `./bin/freely start`
@@ -374,7 +369,7 @@ Validation batch governance:
   - 集成测试
   - application-native real-environment testing
 - 若缺少这些 evidence，manager 不应把 lane 判成 `completion_verification done` 或允许 worktree retirement
-- 因此，`completed` 之前要有测试门，最终 delete worktree / delete branch 之前还要有最后一道删除门；两者不能混成一次判断
+- 因此，`completed` 前要有测试门，`completed` 后仍要有删除门；两者不能混成一次判断
 - 最终删除门若未来可以由 hook / guard 投影执行，应以现有状态与 evidence 组合作为输入，而不是重新发明平行状态
 
 ## 最新 field audit
