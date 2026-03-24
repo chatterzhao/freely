@@ -1763,6 +1763,28 @@ manager_continuity_has_worker_prompts() {
   [[ -n "$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")" ]]
 }
 
+manager_continuity_has_unconsumed_launchable_worker_prompt() {
+  local project="$1" continuity_file="$2"
+  local prompt_file launched_csv=""
+  [[ -f "$continuity_file" ]] || return 1
+  if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
+    # shellcheck disable=SC1090
+    source "$(manager_worker_launch_state_file "$project")"
+    launched_csv="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
+    if [[ -n "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" && "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" != "$continuity_file" ]]; then
+      launched_csv=""
+    fi
+  fi
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    worker_prompt_launchable_for_manager_project "$project" "$prompt_file" || continue
+    if ! csv_contains_exact_item "$launched_csv" "$prompt_file"; then
+      return 0
+    fi
+  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  return 1
+}
+
 manager_continuity_is_launchable_for_project() {
   local project="$1" continuity_file="$2" prompt_file
   [[ -f "$continuity_file" ]] || return 1
@@ -1961,6 +1983,9 @@ manager_ai_stalled_after_delegated_continuation_prompt() {
   if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
     continuity_mtime="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
     if [[ -n "$continuity_mtime" ]] && (( continuity_mtime > prompt_mtime )); then
+      if manager_continuity_has_unconsumed_launchable_worker_prompt "$project" "$continuity_file"; then
+        return 0
+      fi
       return 1
     fi
   fi
@@ -4133,6 +4158,17 @@ cmd_live_status() {
     latest_manager_continuity_consumed="${LAST_MANAGER_CONTINUITY_CONSUMED:-unavailable}"
     latest_manager_worker_prompts_generated="${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-none}"
     latest_manager_worker_prompts_consumed="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}"
+  fi
+  local latest_generated_continuity latest_generated_prompts_csv
+  latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
+  latest_generated_prompts_csv="none"
+  if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
+    latest_generated_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_generated_continuity")"
+    [[ -n "$latest_generated_prompts_csv" ]] || latest_generated_prompts_csv="none"
+    if [[ "$latest_manager_continuity_generated" == "unavailable" || "$latest_manager_continuity_generated" != "$latest_generated_continuity" ]]; then
+      latest_manager_continuity_generated="$latest_generated_continuity"
+      latest_manager_worker_prompts_generated="$latest_generated_prompts_csv"
+    fi
   fi
 
   echo "project: $project"
