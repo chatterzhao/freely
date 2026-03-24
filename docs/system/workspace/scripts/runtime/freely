@@ -2959,7 +2959,7 @@ merged_feature_worktree_entries_for_project() {
 }
 
 write_cleanup_followthrough_resolution_file() {
-  local intake_id="$1" out_file="$2" cleaned="$3" retained="$4" blocked_reason="$5"
+  local intake_id="$1" out_file="$2" cleaned="$3" retained="$4" blocked_reason="$5" next_restart_point="$6" next_ownership="$7" next_handoff="$8"
   cat >"$out_file" <<EOF
 # Interruption Resolution
 - intake_id: \`$intake_id\`
@@ -2970,6 +2970,9 @@ write_cleanup_followthrough_resolution_file() {
 $(if [[ -n "$cleaned" ]]; then printf '%s\n' "$cleaned" | sed 's/^/  - /'; else printf '  - none\n'; fi)
 - retained_items:
 $(if [[ -n "$retained" ]]; then printf '%s\n' "$retained" | sed 's/^/  - /'; else printf '  - none\n'; fi)
+- next_restart_point: ${next_restart_point:-none}
+- next_ownership: ${next_ownership:-none}
+- next_handoff_summary: ${next_handoff:-none}
 EOF
 }
 
@@ -2986,9 +2989,13 @@ run_cleanup_followthrough() {
   local project="$1" intake_id="$2" classification="$3" reaction="$4" why_text="$5" handoff_text="$6"
   local resolution_file blocked_reason cleaned retained wt_path branch dirty supervisor ai
   local remote_name remote_fetch_state remote_note remote_ref
+  local resolution_status absorption_target linked_artifact next_restart_point next_ownership next_handoff
   blocked_reason=""
   cleaned=""
   retained=""
+  next_restart_point=""
+  next_ownership=""
+  next_handoff=""
   remote_name="$(cleanup_followthrough_remote_name "$project")"
   if [[ -n "$remote_name" ]]; then
     if git -C "$project" fetch "$remote_name" --prune >/dev/null 2>&1; then
@@ -3057,8 +3064,21 @@ run_cleanup_followthrough() {
     fi
   done < <(merged_feature_worktree_entries_for_project "$project")
 
+  resolution_status="absorbed"
+  absorption_target="cleanup://merged-worktree-followthrough"
+  linked_artifact="cleanup://merged-worktree-followthrough"
+  if [[ -n "$retained" ]]; then
+    blocked_reason="${blocked_reason:-cleanup_followthrough_incomplete}"
+    next_restart_point="continuation"
+    next_ownership="manager"
+    next_handoff="仍有 retained merged worktree 需要 fleet_closure / retirement_handoff 继续收口；先处理 retained_items，再重跑 cleanup followthrough。"
+    resolution_status="delegated"
+    absorption_target="handoff://continuation"
+    linked_artifact="pending://cleanup-followthrough-continuation"
+  fi
+
   resolution_file="$(mktemp /tmp/freely-interruption-cleanup-followthrough.XXXXXX)"
-  write_cleanup_followthrough_resolution_file "$intake_id" "$resolution_file" "$cleaned" "$retained" "$blocked_reason"
+  write_cleanup_followthrough_resolution_file "$intake_id" "$resolution_file" "$cleaned" "$retained" "$blocked_reason" "$next_restart_point" "$next_ownership" "$next_handoff"
   cmd_intake_resolve \
     --project "$project" \
     --intake-id "$intake_id" \
@@ -3066,8 +3086,9 @@ run_cleanup_followthrough() {
     --reaction "${reaction:-followup}" \
     --classification "${classification:-control}" \
     --resolution-file "$resolution_file" \
-    --absorption-target cleanup://merged-worktree-followthrough \
-    --linked-artifact cleanup://merged-worktree-followthrough >/dev/null
+    --absorption-target "$absorption_target" \
+    --status "$resolution_status" \
+    --linked-artifact "$linked_artifact" >/dev/null
   rm -f "$resolution_file"
 }
 

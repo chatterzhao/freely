@@ -33,6 +33,7 @@
 - 清理的分支名与 worktree 路径
 - 本地/远程删除结果
 - 若保留分支，记录原因与预计清理时机
+- 若 cleanup worker 只完成了部分删除，当前 round 不能直接吸收到完成态；必须继续产出下一跳 handoff，把 retained worktree 交回 fleet closure / retirement handoff 继续收口
 
 ## Remote branch check
 

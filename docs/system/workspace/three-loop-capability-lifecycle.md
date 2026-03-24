@@ -302,6 +302,8 @@ flowchart LR
     C --> F[merged-not-cleaned]
     F --> G[cleanup gate]
     G -->|pass| H[retire-ready]
+    G -->|partial / retained| G2[continuation handoff]
+    G2 --> F
     H --> I[delete branch/worktree]
     I --> J[cleanup evidence]
     J --> K[closed lifecycle visible to patrol]
