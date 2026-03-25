@@ -775,3 +775,71 @@ Validation batch governance:
 8. 最终 delete worktree / delete branch 门禁若要由 hook / guard 兜底，应该投影到哪一层，以及最小拒绝语义是什么。
 9. combined minimal contract 的边界是否已经足够稳定，可以作为单一 issue materialization，而不是继续分散在 manager/runtime/cleanup 三处叙述里。
 10. 独立 acceptance review 是否已经足够证明 supporting pools 都只支持 `stay pre_brainstorm`，而不是隐含要求现在就开 IBM。
+
+## 当前 fleet 分类快照
+
+- 这轮再次按当前仓库事实核对后，`develop` 根 runtime 仍显示 `activity_state=stalled_without_runtime`、`active_processes=none`；因此当前问题不是“没有剩余任务”，而是“剩余任务尚未被 runtime 继续消费”。
+- 当前 worktree 不能再按 `merged + clean` 或 issue `completed` 直接判完成，必须继续按 canonical owner、issue completion chain、delete eligibility chain 三层分类。
+
+### active owner，必须继续
+
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough`
+  - canonical owner: `C-20260322-1801-B`
+  - loop: `doc-loop`
+  - current state: `in_pre_brainstorm`
+  - reason to continue: stale batch governance、delete gate、fresh-batch absorption 仍未冻结到可 IBM
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-application-native-observability-planes`
+  - canonical owner: `C-20260324-0415-A`
+  - loop: `doc-loop`
+  - current state: `in_pre_brainstorm`
+  - reason to continue: acceptance-evidence schema canonical home、shared deep-ref compatibility rules 仍未冻结
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-scheduler-capacity-candidate-replay`
+  - canonical owner: scheduler capacity replay candidate
+  - loop: `doc-loop`
+  - current state: `in_pre_brainstorm`
+  - reason to continue: fresh `develop`-based dogfood proof 仍未做完，不能直接 IBM
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260323-feature-manager-delegated-continuation-stall-materialization`
+  - canonical owner: stalled continuation candidate
+  - loop: `doc-loop`
+  - current state: `in_pre_brainstorm`
+  - reason to continue: explicit stalled specimen -> prompt cycle -> consumed anchor 证明链仍未冻结
+
+### completed issue / in-verification，但还不能删树
+
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260323-feature-delegated-continuation-prompt-consumption-visibility`
+  - canonical issue: `I-20260322-0445`
+  - issue state: `completed`
+  - delete state: not delete-eligible
+  - reason: cleanup followthrough 仍未闭合；`completed` 只代表 issue completion，不代表 `verified-retirable` / `retired`
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260323-feature-global-watchdog-earliest-reset-sleep-revive`
+  - canonical issue: `I-20260318-1630`
+  - issue state: `in_verification`
+  - delete state: not delete-eligible
+  - reason: manager merge review / verification closeout 仍是当前 canonical next action
+
+### evidence-only / stale batch，不再作为执行面
+
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/pre-test-merge`
+  - lifecycle role: stale evidence-only validation batch
+  - allowed role: replay/source/retire evidence
+  - forbidden role: active verification surface
+  - reason not to delete: stale source manifest / replay evidence 仍未被 fresh owner 明确吸收
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260323-feature-manager-scheduler-capacity-and-queueing`
+  - lifecycle role: replay source / historical evidence
+  - reason not to treat as active: replay 已转到 `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-scheduler-capacity-candidate-replay`
+
+### merged to develop，但只进入 cleanup-pending pool
+
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260323-feature-manager-worker-launch-idempotency-queue-promotion`
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260323-feature-manager-worker-launch-state-relaunch-recovery`
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260323-feature-manager-worker-prompt-contract-and-launch-consumption`
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260323-feature-three-loop-dogfood-flow-alignment`
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260323-feature-worker-stall-recovery-during-active-ai`
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-frozen-prompt-state-reconcile`
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-frozen-queue-drift`
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-primary-handoff-materialization-stall`
+- `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-worker-count-fleet-truth-reconcile`
+- rule:
+  - 这些树已被 `develop` 吸收，但当前只可进入 cleanup-pending / evidence-only pool
+  - 未经 `cleanup evidence`、`verified-retirable`、delete guard、`retired` 组合校验前，不得删除
