@@ -618,6 +618,10 @@ Validation batch governance:
   - handoff 要求读取的 `manager-continuity-20260324-021853.md` 在当前 worktree 中并不存在，因此本轮不能把某份缺失的 manager truth artifact 当成“已经稳定可消费”的 IBM 输入；它只能继续作为 contract freeze 的缺口记录
 - 当前 handoff 的 delegated continuation judgement 仍与 runtime 事实相容，且当前轮换元数据并未脱离 handoff 所描述的 continuity guard。当前仓库事实是：`live-status` 显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`、`current_prompt_has_delegated_continuation=1`，同时 `pending_delegated_continuation_ids=none`、`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024929/024942/025910/030713`。这说明当前 worker 确实已消费 superseding delegated continuations，但也同样表明 `live-status` 这里只是当前 run 的消费镜像，而不是可替代 manager continuity 的长期 truth source
 - 当前 assigned worktree 的 hygiene 复核仍不改变路由：本轮开始时 `git status --short --branch` 已显示当前 canonical doc-loop writeback 留下的 3 个 dirty 文件，`git rev-list --left-right --count develop...HEAD` 为 `46 15`，而 handoff 要求读取的 `.freely/run/manager-continuity-20260324-021853.md` 仍然缺失。这说明本轮无需先切 checkpoint 或分流无关改动，但它只是 doc-loop continuity evidence，不是新的 promotion 信号
+- 当前 same-session continuity refresh 继续把 runtime 事实收窄为“delegated continuation 已消费，但 runtime 仍只是 mirror”：
+  - `git status --short --branch` 当前仍显示 3 个 canonical doc-loop 文件 dirty，`git rev-list --left-right --count develop...HEAD` 现为 `53 18`
+  - 当前 `live-status` 仍显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`，同时 `current_prompt_has_delegated_continuation=1`、`pending_delegated_continuation_ids=none` 与同一组 consumed delegated ids 保持不变
+  - 因此 handoff 里的 `context_compacted` 既是历史 continuity guard 输入，也是当前 runtime run 仍在暴露的事实；这不会改变 owner，只会再次证明 runtime mirror 不能替代缺失的 manager continuity truth artifact
 - 最新 supporting-pool ownership check 也没有改写 owner：
   - `I-20260322-1801` 与其 verification 只继续声明 lifecycle management capability 是后续独立 lifecycle
   - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md` 只拥有 latest manager continuity consumption timing，不拥有 stale-batch retire/rebuild governance
@@ -632,7 +636,7 @@ Validation batch governance:
 - 当前 fresh explorer canonical-owner recheck 也没有改写结论：
   - 只读复核再次确认 milestone、completed issue、semantic audit 与 progress 都没有生成新的 committed issue / IBM owner
   - 当前 `live-status` / runtime 仍只是 continuation-consumption mirror，而 `.freely/run/manager-continuity-20260324-021853.md` 继续缺失
-  - 当前 worktree 只脏这 3 个 canonical doc-loop 文件，这只是 continuity writeback 压力，不构成 checkpoint / reroute 或更强 owner 证据
+  - 当前 worktree 仍只脏这 3 个 canonical doc-loop 文件；这说明当前 lane 只是在继续 continuity writeback，但 dirty 本身仍不构成 checkpoint / reroute 或更强 owner 证据
 - 当前 post-handoff read-only subagent reconfirmation 同样没有改写 owner：
   - semantic audit 仍只作为 supporting evidence，未把这条 lane 升级成 committed issue / IBM owner
   - progress 仍只拥有 latest manager continuity consumption timing，而不拥有 stale-batch retire / rebuild governance
