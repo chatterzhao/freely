@@ -187,6 +187,55 @@ flowchart LR
 - 文档真相写回后，还要再经过 `verification / cleanup evidence` 才算真正回到下一轮 patrol。
 - `worker prompt set` 不是无序列表；每条 worker handoff 至少要带 `dispatch_priority`、`parallel_safe`、`write_scope`，供 runtime 做 capacity-aware 排班与 queueing。
 
+## 5A. Observability Planes
+
+Day-1 观察面不新造平行控制面，而是先复用现有 `live-status` / `fleet-status` / artifact deep refs：
+
+- `current-state plane`
+  - 回答“现在谁在干活、在哪个 loop / phase、当前聚焦什么”
+  - day-1 由 `live-status` 承接
+- `fleet plane`
+  - 回答“所有 worktree / lane / runtime 当前分别处于什么状态”
+  - day-1 由 `fleet-status` 承接
+- `session plane`
+  - 指向当前 prompt、jsonl、cycle log、pid / runtime state 等 session deep refs
+- `stream plane`
+  - 指向实时或近实时输出面，例如 cycle log tail、session jsonl tail
+- `artifact plane`
+  - 指向 continuity、worker prompts、issue / progress / review / cleanup evidence
+  - `acceptance evidence` 的 canonical home 在此，不散落到 `current-state` / `fleet` 文本摘要里
+
+最小 plane identity block：
+
+- `plane_kind`
+- `entity_kind`
+- `entity_ref`
+- `owner_kind`
+- `owner_ref`
+- `loop_kind`
+- `phase_state`
+- `topic_ref`
+- `deep_ref`
+
+共享 deep ref 组：
+
+- `session_ref`
+- `stream_ref`
+- `artifact_ref`
+- `fleet_ref`
+- `acceptance_ref`
+
+day-1 mirror 规则：
+
+- `current-state plane` 与 `fleet plane` 只镜像最小 acceptance 摘要：
+  - `completion_state`
+  - `delete_gate_state`
+  - `acceptance_scope`
+  - `acceptance_target`
+  - `acceptance_ref`
+- stall / progress / restart-storm 这类 signal 只提供 supervision signal，不直接宣告 completed / delete-ready
+- 主管若要判断完成、删除门、或 acceptance 是否已闭合，必须沿 `acceptance_ref` 回到 `artifact plane`
+
 ## 6. Manager Routing Map
 
 ```mermaid

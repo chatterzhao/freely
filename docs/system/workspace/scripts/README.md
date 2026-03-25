@@ -52,8 +52,9 @@
   - 负责 project dirty budget / checkpoint governance 提示
   - 提供 `baseline-status` 基线快照视图
   - 提供 `status` family 聚合入口，可切 `baseline / live / fleet`
-  - 提供 `live-status` 当前态监督视图
-  - 提供 `fleet-status` 项目级 worktree 监督视图
+  - 提供 `live-status` 当前态监督视图，承接 day-1 `current-state plane`
+  - 提供 `fleet-status` 项目级 worktree 监督视图，承接 day-1 `fleet plane`
+  - 两者只镜像最小 acceptance 摘要与 shared deep refs，不替代 artifact plane 上的 acceptance evidence 真相
   - 根目录 `bin/freely` 只是投影包装层
 - `worktree/*`
   - worktree / merge / status 相关命令真源
@@ -84,6 +85,33 @@
 - 不在这里硬编码“走 IBM 还是走 pre-brainstorm”
 - prompt 中仍可保留项目绝对路径用于定位仓库根和 `docs/milestones.md`
 - `monitor-ai-cli.sh` 会将真实 AI CLI pid 写入 pid 文件，并持续阻塞到该 AI CLI 退出
+
+## Observability Contract
+
+day-1 共享观察面：
+
+- `current-state plane`
+  - 由 `live-status` 承接
+  - 回答“当前谁在运行、处于哪个 loop / phase、现在在做什么”
+- `fleet plane`
+  - 由 `fleet-status` 承接
+  - 回答“整个 worktree fleet 当前分别处于什么状态”
+- `artifact plane`
+  - 由 continuity、worker prompts、issue / progress / review / cleanup evidence 承接
+  - `acceptance evidence` 的 canonical home 在此
+
+shared deep ref groups：
+
+- `session_ref`
+- `stream_ref`
+- `artifact_ref`
+- `fleet_ref`
+- `acceptance_ref`
+
+约束：
+
+- `live-status` / `fleet-status` 可以展示 signal 与最小 acceptance 摘要，但不直接宣告 `completed` / `delete-ready`
+- 主管若要判断完成、cleanup gate、delete gate，必须顺着 `acceptance_ref` 回到 artifact plane
 
 ## 投影规则
 
