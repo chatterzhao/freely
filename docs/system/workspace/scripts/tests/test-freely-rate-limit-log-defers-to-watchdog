@@ -5,6 +5,13 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-rate-limit-log-watchdog.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
+monotonic_ms() {
+  python3 - <<'PY'
+import time
+print(int(time.monotonic() * 1000))
+PY
+}
+
 PROJECT="$TMP_DIR/project"
 MOCK_BIN="$TMP_DIR/mock-bin"
 mkdir -p \
@@ -82,7 +89,7 @@ cat >"$PROJECT/bin/ai" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 case "$*" in
-  *"whoami"*) echo '{"tool":"codex","account":"limited@example.com"}' ;;
+  *"whoami"*) echo '{"tool":"codex","account":"limited@example.com","slot":"limited@example-com-1"}' ;;
   *"list"*) echo '{"accounts":[]}' ;;
   *"switch"*) echo '{"switched": false, "tool":"codex","account":"unavailable"}' ;;
   *) echo '{}' ;;
@@ -98,16 +105,16 @@ exit 1
 EOF
 chmod +x "$MOCK_BIN/codex"
 
-start_epoch="$(date +%s)"
+start_epoch_ms="$(monotonic_ms)"
 PATH="$MOCK_BIN:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
-end_epoch="$(date +%s)"
+end_epoch_ms="$(monotonic_ms)"
 
-if [[ $((end_epoch - start_epoch)) -gt 3 ]]; then
+if (( end_epoch_ms - start_epoch_ms > 4500 )); then
   echo "[FAIL] expected local runtime to defer textual codex rate-limit recovery instead of sleeping locally"
   exit 1
 fi
 
-grep -q 'LAST_ACCOUNT_SWITCH_REASON="primary_rate_limit_exhausted"' "$PROJECT/.freely/run/session-state.env"
-grep -Eq '^limited@example-com[[:space:]][0-9]+' "$PROJECT/.freely/run/codex-account-cooldowns.tsv"
+grep -q 'LAST_SLOT_SWITCH_REASON="primary_rate_limit_exhausted"' "$PROJECT/.freely/run/session-state.env"
+grep -Eq '^limited@example-com-1[[:space:]][0-9]+' "$PROJECT/.freely/run/codex-slot-cooldowns.tsv"
 
 echo "[PASS] freely defers textual codex rate-limit recovery to the watchdog path"

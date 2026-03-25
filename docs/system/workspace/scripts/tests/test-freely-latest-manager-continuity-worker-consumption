@@ -110,7 +110,7 @@ manager_ai_pid_for_project() {
 codex_current_account() {
   return 0
 }
-ensure_codex_account_ready_for_manager() {
+ensure_codex_slot_ready_for_manager() {
   return 0
 }
 launch_manager_supervisor() {

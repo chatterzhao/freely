@@ -104,7 +104,7 @@ done
 case "$cmd" in
   whoami)
     account="$(cat "$state_file")"
-    echo "{\"tool\":\"codex\",\"account\":\"$account\"}"
+    echo "{\"tool\":\"codex\",\"account\":\"$account\",\"slot\":\"$account\"}"
     ;;
   list)
     echo '{"accounts":["codex-fast@example-com","codex-slow@example-com"]}'
@@ -152,14 +152,14 @@ exit 1
 EOF
 chmod +x "$MOCK_BIN/codex"
 
-printf 'slow@example.com' >"$AI_STATE"
+printf 'slow@example-com' >"$AI_STATE"
 start_epoch="$(date +%s)"
 fast_reset_at=$((start_epoch + 2))
 fast_ready_at=$((start_epoch + 4))
 slow_reset_at=$((start_epoch + 120))
 printf '%s' "$fast_ready_at" >"$FAST_READY_AT_FILE"
 
-cat >"$PROJECT/.freely/run/codex-account-cooldowns.tsv" <<EOF
+cat >"$PROJECT/.freely/run/codex-slot-cooldowns.tsv" <<EOF
 fast@example-com	$fast_reset_at
 slow@example-com	$slow_reset_at
 EOF
@@ -205,8 +205,8 @@ HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
 [[ -f "$HANDOFF_FILE" ]]
 grep -q '^## Manager Bootstrap Recovery$' "$HANDOFF_FILE"
 grep -q '^- trigger: cooldown_elapsed$' "$HANDOFF_FILE"
-grep -q '^- previous_account: fast@example-com$' "$HANDOFF_FILE"
-grep -q '^- active_account: fast@example-com$' "$HANDOFF_FILE"
+grep -q '^- previous_slot: fast@example-com$' "$HANDOFF_FILE"
+grep -q '^- active_slot: fast@example-com$' "$HANDOFF_FILE"
 grep -q '^- reason: watchdog_resumed_after_wait$' "$HANDOFF_FILE"
 grep -q '^- next_action: inspect-fleet-and-recover-workers$' "$HANDOFF_FILE"
 

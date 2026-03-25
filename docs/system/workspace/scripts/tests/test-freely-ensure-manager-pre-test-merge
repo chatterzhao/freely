@@ -105,9 +105,9 @@ case "$cmd" in
     if [[ -f "$state_file" ]]; then
       account="$(cat "$state_file")"
     else
-      account="worahe3973@outlook.com"
+      account="worahe3973@outlook-com"
     fi
-    echo "{\"tool\":\"codex\",\"account\":\"$account\"}"
+    echo "{\"tool\":\"codex\",\"account\":\"$account\",\"slot\":\"$account\"}"
     ;;
   list)
     echo '{"accounts":["codex-worahe3971@outlook-com","codex-worahe3972@outlook-com","codex-worahe3973@outlook-com"]}'
@@ -135,11 +135,11 @@ EOF
 
 chmod +x "$PROJECT/bin/ai" "$MOCK_BIN/launch-freely"
 
-cat >"$PROJECT/.freely/run/codex-account-cooldowns.tsv" <<'EOF'
+cat >"$PROJECT/.freely/run/codex-slot-cooldowns.tsv" <<'EOF'
 worahe3972@outlook-com	4102444800
 worahe3973@outlook-com	4102444800
 EOF
-printf 'worahe3973@outlook.com' >"$AI_STATE"
+printf 'worahe3973@outlook-com' >"$AI_STATE"
 
 AI_SWITCH_STATE="$AI_STATE" \
 AI_SWITCH_LOG="$AI_SWITCH_LOG" \
@@ -150,6 +150,6 @@ PATH="$MOCK_BIN:$PATH" \
 
 grep -q 'switch codex worahe3971@outlook-com --yes' "$AI_SWITCH_LOG"
 grep -q 'start --project '"$PROJECT"'$' "$LAUNCH_LOG"
-grep -q 'worahe3971@outlook.com' "$AI_STATE"
+grep -q 'worahe3971@outlook-com' "$AI_STATE"
 
 echo "[PASS] freely ensure-manager accepts pre-test-merge as a protected manager worktree"

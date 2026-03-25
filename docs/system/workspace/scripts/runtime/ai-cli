@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# AI CLI Availability Manager
+# AI CLI Slot Manager
 # Usage: freely ai <command> [options]
 
 # 配置
@@ -43,11 +43,6 @@ confirm() {
   [[ "$response" =~ ^[Yy]$ ]]
 }
 
-# 账号名转安全目录名
-account_to_dirname() {
-  echo "$1" | sed 's/\./-/g'
-}
-
 auth_slot_prefix() {
   local tool="$1"
   printf '%s\n' "$AUTH_DIR/${tool}-"
@@ -84,7 +79,7 @@ write_codex_active_slot() {
 }
 
 codex_switch_lock_dir() {
-  printf '%s\n' "${AI_CLI_SWITCH_LOCK_DIR:-$HOME/.codex/account-switch.lock}"
+  printf '%s\n' "${AI_CLI_SWITCH_LOCK_DIR:-$HOME/.codex/slot-switch.lock}"
 }
 
 codex_switch_lock_state_file() {
@@ -141,7 +136,7 @@ EOF
 
     now="$(date +%s)"
     if (( now - start_ts >= timeout_secs )); then
-      log_error "timed out waiting for an existing codex account switch to finish"
+      log_error "timed out waiting for an existing codex slot switch to finish"
       return 1
     fi
     sleep 1
@@ -178,7 +173,7 @@ codex_switch_lock_wait_for_idle() {
     fi
     now="$(date +%s)"
     if (( now - start_ts >= timeout_secs )); then
-      log_error "timed out waiting for an existing codex account switch to finish"
+      log_error "timed out waiting for an existing codex slot switch to finish"
       return 1
     fi
     sleep 1
@@ -196,7 +191,7 @@ json_string_or_null() {
 
 next_slot_name() {
   local tool="$1" base="$2"
-  local slot="$base" i=1
+  local slot="${base}-1" i=2
   while [[ -d "$(auth_slot_dir "$tool" "$slot")" ]]; do
     slot="${base}-${i}"
     ((i++))
@@ -208,12 +203,12 @@ resolve_codex_slot_name() {
   local auth_file="$1" requested_slot="${2:-}"
   local account base_slot
   if [[ -n "$requested_slot" ]]; then
-    printf '%s\n' "$(account_to_dirname "$requested_slot")"
+    printf '%s\n' "$requested_slot"
     return 0
   fi
   account="$(extract_codex_account "$auth_file")"
   [[ -n "$account" ]] || return 1
-  base_slot="$(account_to_dirname "$account")"
+  base_slot="$(printf '%s' "$account" | sed 's/\./-/g')"
   next_slot_name "codex" "$base_slot"
 }
 
@@ -266,7 +261,7 @@ EOF
     log_info "Created config: $CONFIG_FILE"
   fi
   
-  log_info "Initialized AI CLI account manager"
+  log_info "Initialized AI CLI slot manager"
   log_info "Auth directory: $AUTH_DIR"
 }
 
@@ -303,7 +298,7 @@ cmd_login() {
       ;;
     iflow)
       log_info "iflow uses environment variables."
-      log_info "Set IFLOW_API_KEY in your shell config, then run: freely ai save iflow <account>"
+      log_info "Set IFLOW_API_KEY in your shell config, then run: freely ai save iflow <slot>"
       ;;
     *)
       log_error "Unknown tool: $tool"
@@ -315,7 +310,8 @@ cmd_login() {
 # 保存当前登录
 cmd_save() {
   local tool="$1"
-  local account="${2:-}"
+  local slot="${2:-}"
+  local explicit_slot_arg="$slot"
   
   case "$tool" in
     codex)
@@ -325,12 +321,12 @@ cmd_save() {
         exit 3
       fi
 
-      local actual_account slot
+      local actual_account
       actual_account="$(extract_codex_account "$auth_file")"
 
-      if [[ -z "$account" && -z "$actual_account" ]]; then
-        log_error "Cannot extract account from auth.json. Please specify account name."
-          log_info "Usage: freely ai save codex <account>"
+      if [[ -z "$slot" && -z "$actual_account" ]]; then
+        log_error "Cannot extract account from auth.json. Please specify slot name."
+          log_info "Usage: freely ai save codex <slot>"
           exit 2
       fi
 
@@ -338,12 +334,12 @@ cmd_save() {
         log_info "Detected account: $actual_account"
       fi
 
-      slot="$(resolve_codex_slot_name "$auth_file" "$account")"
+      slot="$(resolve_codex_slot_name "$auth_file" "$slot")"
       local target_dir
       target_dir="$(auth_slot_dir "codex" "$slot")"
 
-      if [[ -n "$account" ]] && [[ -d "$target_dir" ]] && [[ "$YES_MODE" != "true" ]]; then
-        confirm "Account slot '$slot' exists. Overwrite?" || exit 1
+      if [[ -n "$explicit_slot_arg" ]] && [[ -d "$target_dir" ]] && [[ "$YES_MODE" != "true" ]]; then
+        confirm "Slot '$slot' exists. Overwrite?" || exit 1
       fi
 
       [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would save to $target_dir"; return; }
@@ -353,7 +349,8 @@ cmd_save() {
       chmod 600 "$target_dir/auth.json"
       write_codex_active_slot "$slot"
 
-      log_info "Saved codex account: ${actual_account:-$slot}"
+      log_info "Saved codex slot: $slot"
+      [[ -n "$actual_account" ]] && log_info "Slot account: $actual_account"
       log_info "Slot: $slot"
       log_info "Location: $target_dir"
 
@@ -362,7 +359,7 @@ cmd_save() {
       fi
       ;;
     iflow)
-      log_error "iflow uses environment variables. Set IFLOW_${account^^}_KEY in your shell config."
+      log_error "iflow uses environment variables. Set IFLOW_${slot^^}_KEY in your shell config."
       exit 2
       ;;
     *)
@@ -398,23 +395,23 @@ sync_current_auth() {
   fi
 }
 
-# 切换 account
+# 切换 slot
 # Usage:
-#   switch <tool> <account>  - 切换到指定账号
-#   switch <tool>            - 自动探测，切换到可用的或最早恢复的
+#   switch <tool> <slot>  - 切换到指定 slot
+#   switch <tool>         - 自动探测，切换到可用的或最早恢复的
 cmd_switch() {
   local tool="$1"
-  local account="${2:-}"
+  local slot="${2:-}"
 
   case "$tool" in
     codex)
-      # 如果没有指定账号，自动探测
-      if [[ -z "$account" ]]; then
+      # 如果没有指定 slot，自动探测
+      if [[ -z "$slot" ]]; then
         _cmd_switch_auto_codex
         return $?
       fi
-      codex_switch_lock_acquire "explicit_switch" "switch" "$account" || exit 1
-      _cmd_switch_codex_direct_unlocked "$tool" "$account"
+      codex_switch_lock_acquire "explicit_switch" "switch" "$slot" || exit 1
+      _cmd_switch_codex_direct_unlocked "$tool" "$slot"
       local rc=$?
       codex_switch_lock_release
       return "$rc"
@@ -426,15 +423,15 @@ cmd_switch() {
   esac
 }
 
-# 自动探测并切换 codex 账号
+# 自动探测并切换 codex slot
 run_dir_for_project() {
   local project="$1"
   printf '%s\n' "$project/.freely/run"
 }
 
-codex_account_cooldown_file() {
+codex_slot_cooldown_file() {
   local project="$1"
-  printf '%s\n' "$(run_dir_for_project "$project")/codex-account-cooldowns.tsv"
+  printf '%s\n' "$(run_dir_for_project "$project")/codex-slot-cooldowns.tsv"
 }
 
 ai_cli_bin_for_project() {
@@ -470,7 +467,7 @@ _cmd_switch_auto_codex() {
   # shellcheck source=/dev/null
   source "$watchdog_script"
 
-  result="$(probe_all_codex_accounts_and_update_cooldown "$project" || true)"
+  result="$(probe_all_codex_slots_and_update_cooldown "$project" || true)"
 
   case "$result" in
     usable:*)
@@ -496,7 +493,7 @@ _cmd_switch_auto_codex() {
       fi
       ;;
     none)
-      log_error "No accounts found or all probing failed"
+      log_error "No slots found or all probing failed"
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": false, \"status\": \"none\"}"
       fi
@@ -513,15 +510,14 @@ _cmd_switch_auto_codex() {
 
 # 实际执行切换（不包含探测逻辑），由上层决定是否持有全局切号锁。
 _cmd_switch_codex_direct_unlocked() {
-  local tool="$1" account="$2"
-  local slot source_dir target_file switched_account
-  slot="$(account_to_dirname "$account")"
+  local tool="$1" slot="$2"
+  local source_dir target_file switched_account
   source_dir="$(auth_slot_dir "codex" "$slot")"
   target_file="$HOME/.codex/auth.json"
   switched_account=""
 
   if [[ ! -d "$source_dir" ]]; then
-    log_error "Account '$account' not found"
+    log_error "Slot '$slot' not found"
     log_info "Available: $(list_tool_slots "codex" | tr '\n' ' ')"
     exit 4
   fi
@@ -530,18 +526,18 @@ _cmd_switch_codex_direct_unlocked() {
     sync_current_auth "$tool"
   fi
 
-  [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch to $account"; return; }
+  [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch to $slot"; return; }
 
   cp "$source_dir/auth.json" "$target_file"
   switched_account="$(extract_codex_account "$target_file")"
   if [[ -z "$switched_account" ]]; then
-    log_error "Switch copied auth.json but could not verify the active codex account"
+    log_error "Switch copied auth.json but could not verify the active codex slot auth"
     exit 5
   fi
 
   write_codex_active_slot "$slot"
   log_info "Switched codex to slot: $slot"
-  log_info "Active codex account: $switched_account"
+  log_info "Active codex identity: $switched_account"
   log_warn "Restart codex for the change to take effect"
 
   if [[ "$FORMAT" == "json" ]]; then
@@ -549,7 +545,7 @@ _cmd_switch_codex_direct_unlocked() {
   fi
 }
 
-# 列出 accounts
+# 列出 slots
 cmd_list() {
   local accounts=()
   codex_switch_lock_wait_for_idle || exit 1
@@ -560,7 +556,7 @@ cmd_list() {
   done < <(list_tool_slots "codex")
   
   if [[ ${#accounts[@]} -eq 0 ]]; then
-    log_info "No accounts found. Run 'freely ai login codex' to create one."
+    log_info "No slots found. Run 'freely ai login codex' to create one."
     return
   fi
   
@@ -582,7 +578,7 @@ cmd_list() {
   esac
 }
 
-# 显示当前账号
+# 显示当前 slot
 cmd_whoami() {
   local tool="${1:-codex}"
   
@@ -660,21 +656,19 @@ cmd_status() {
   esac
 }
 
-# 删除 account
+# 删除 slot
 cmd_delete() {
   local tool="$1"
-  local account="$2"
-  local slot
-  slot="$(account_to_dirname "$account")"
+  local slot="$2"
   local target_dir
   target_dir="$(auth_slot_dir "$tool" "$slot")"
 
   if [[ ! -d "$target_dir" ]]; then
-    log_error "Account '$account' not found"
+    log_error "Slot '$slot' not found"
     exit 4
   fi
 
-  confirm "Delete account '$slot'?" || exit 1
+  confirm "Delete slot '$slot'?" || exit 1
 
   [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would delete $target_dir"; return; }
 
@@ -682,7 +676,7 @@ cmd_delete() {
   if [[ "$tool" == "codex" ]] && [[ "$(read_codex_active_slot)" == "$slot" ]]; then
     rm -f "$(codex_active_slot_file)"
   fi
-  log_info "Deleted account: $slot"
+  log_info "Deleted slot: $slot"
 
   if [[ "$FORMAT" == "json" ]]; then
     echo "{\"deleted\": true, \"tool\": \"$tool\", \"slot\": \"$slot\"}"
@@ -695,14 +689,14 @@ show_help() {
 Usage: freely ai <command> [options]
 
 Commands:
-  init                    Initialize account manager
-  login <tool>            Login and auto-save account
-  save <tool> [account]   Save current login (auto-detect account if not specified)
-  switch [tool] [account] Switch to account. No account = auto-probe and switch to usable/earliest
-  list                    List all accounts
-  whoami [tool]           Show current logged-in account
+  init                    Initialize slot manager
+  login <tool>            Login and auto-save auth slot
+  save <tool> [slot]      Save current login (auto-detect next slot if not specified)
+  switch [tool] [slot]    Switch to slot. No slot = auto-probe and switch to usable/earliest
+  list                    List all saved slots
+  whoami [tool]           Show current logged-in slot
   status [tool]           Show current status
-  delete <tool> <account> Delete an account
+  delete <tool> <slot>    Delete a slot
 
 Options:
   --yes, -y               Skip confirmations (non-interactive)
@@ -722,8 +716,8 @@ Examples:
   freely ai login codex
   freely ai whoami
   freely ai switch codex                    # Auto-probe, switch to usable/earliest
-  freely ai switch codex other@email.com    # Switch to specific account
-  freely ai switch other@email.com --yes    # Switch to specific account (default tool: codex)
+  freely ai switch codex other@email-com-2  # Switch to specific slot
+  freely ai switch other@email-com-2 --yes  # Switch to specific slot (default tool: codex)
   freely ai list --format json
 EOF
 }
@@ -768,7 +762,7 @@ main() {
           cmd_switch "codex" ""
           ;;
         *)
-          log_warn "No ai tool name provided; defaulting to codex. If the target account belongs to another tool, switch may fail."
+          log_warn "No ai tool name provided; defaulting to codex. If the target slot belongs to another tool, switch may fail."
           cmd_switch "codex" "${ARGS[0]}"
           ;;
       esac

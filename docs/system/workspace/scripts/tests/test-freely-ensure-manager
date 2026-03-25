@@ -105,9 +105,9 @@ case "$cmd" in
     if [[ -f "$state_file" ]]; then
       account="$(cat "$state_file")"
     else
-      account="worahe3973@outlook.com"
+      account="worahe3973@outlook-com"
     fi
-    echo "{\"tool\":\"codex\",\"account\":\"$account\"}"
+    echo "{\"tool\":\"codex\",\"account\":\"$account\",\"slot\":\"$account\"}"
     ;;
   list)
     echo '{"accounts":["codex-worahe3971@outlook-com","codex-worahe3972@outlook-com","codex-worahe3973@outlook-com"]}'
@@ -135,11 +135,11 @@ printf '%s\n' "$*" >>"${LAUNCH_LOG:?}"
 EOF
 chmod +x "$MOCK_BIN/launch-freely"
 
-cat >"$PROJECT/.freely/run/codex-account-cooldowns.tsv" <<'EOF'
+cat >"$PROJECT/.freely/run/codex-slot-cooldowns.tsv" <<'EOF'
 worahe3972@outlook-com	4102444800
 worahe3973@outlook-com	4102444800
 EOF
-printf 'worahe3973@outlook.com' >"$AI_STATE"
+printf 'worahe3973@outlook-com' >"$AI_STATE"
 
 AI_SWITCH_STATE="$AI_STATE" \
 AI_SWITCH_LOG="$AI_SWITCH_LOG" \
@@ -150,14 +150,14 @@ PATH="$MOCK_BIN:$PATH" \
 
 grep -q 'switch codex worahe3971@outlook-com --yes' "$AI_SWITCH_LOG"
 grep -q 'start --project '"$PROJECT"'$' "$LAUNCH_LOG"
-grep -q 'worahe3971@outlook.com' "$AI_STATE"
+grep -q 'worahe3971@outlook-com' "$AI_STATE"
 HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
 [[ -f "$HANDOFF_FILE" ]]
 grep -q '^## Manager Bootstrap Recovery$' "$HANDOFF_FILE"
-grep -q '^- trigger: account_unavailable$' "$HANDOFF_FILE"
-grep -q '^- previous_account: worahe3973@outlook.com$' "$HANDOFF_FILE"
-grep -q '^- active_account: worahe3971@outlook-com$' "$HANDOFF_FILE"
-grep -q '^- reason: watchdog_switched_to_available_account$' "$HANDOFF_FILE"
+grep -q '^- trigger: slot_unavailable$' "$HANDOFF_FILE"
+grep -q '^- previous_slot: worahe3973@outlook-com$' "$HANDOFF_FILE"
+grep -q '^- active_slot: worahe3971@outlook-com$' "$HANDOFF_FILE"
+grep -q '^- reason: watchdog_switched_to_available_slot$' "$HANDOFF_FILE"
 grep -q '^- next_action: inspect-fleet-and-recover-workers$' "$HANDOFF_FILE"
 
-echo "[PASS] freely ensure-manager switches to an available codex account before bootstrapping manager"
+echo "[PASS] freely ensure-manager switches to an available codex slot before bootstrapping manager"
