@@ -85,8 +85,9 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
   - 由 `runtime/freely` source 使用
 - `freely live-status`
   - 提供 watchdog / runtime 当前态视图
-  - 默认只展示活跃 supervisor / dispatcher / ai 与 prompt excerpt、continuity excerpt、deep refs
+  - 作为 day-1 `current-state plane`，默认只展示活跃 supervisor / dispatcher / ai、prompt excerpt、continuity excerpt、最小 acceptance 摘要与 deep refs
   - 供主管 supervision 轮次优先读取，而不是继续人肉拼 `ps + prompt + jsonl`
+  - signal surface 可以暴露 stall / churn / dead-loop suspicion，但 terminal completion / delete judgement 仍必须沿 `acceptance_ref` 回 artifact plane
 
 ## 下一跳
 

@@ -15,12 +15,13 @@ description: 当需要像项目负责人一样同时监督多个 Freely worktree
 
 1. 先看项目级当前态。
    - `./bin/freely live-status --project <主管工位>`
-   - 先用它看当前活跃 supervisor / dispatcher / ai、prompt excerpt、continuity excerpt 与 deep refs
+   - 先用它看 day-1 `current-state plane`：当前活跃 supervisor / dispatcher / ai、prompt excerpt、continuity excerpt、最小 acceptance 摘要与 deep refs
    - 它负责回答“现在谁在干活、在干什么”
 
 2. 再看项目级工位总览。
    - `./bin/wt-fleet-status`
    - 或 `./bin/freely fleet-status --project <任一该仓库 worktree>`
+   - 这里承接 day-1 `fleet plane`，只镜像最小 acceptance 摘要；若要判断 issue 是否真的完成或工位是否可删，必须继续顺着 `acceptance_ref` 回 artifact evidence
 
 3. 看单个工位 checkpoint 压力。
    - `./bin/checkpoint-guard`
@@ -57,4 +58,5 @@ description: 当需要像项目负责人一样同时监督多个 Freely worktree
 ## 边界
 
 - 本 skill 负责监督和调度，不代替具体 issue 的 doc/dev skill
+- `live-status` / `fleet-status` 只承担 day-1 `current-state plane` / `fleet plane`；completion / delete judgement 仍以 artifact plane 上的 acceptance evidence 为准
 - 最终 promote / cleanup 前仍必须过 `./bin/wt-status-all`
