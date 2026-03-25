@@ -102,13 +102,10 @@
     - `manager_ai_stalled_after_delegated_continuation_prompt` 仍主要依据 prompt 已含 delegated continuation，且 prompt / cycle log 之后没有更新的 manager continuity 继续推进
     - 对应脚本测试已证明 pending/consumed ids 与 generated/consumed continuity truth 会进入 state surface，也证明“prompt-absorbed stall 会触发 recovery”；但仍没有冻结 `consumed` truth 与当前 prompt cycle / 当前 stalled intake 的绑定语义
 - missing_evidence:
-  - 当前 delegated continuation ids 仍同时停留在 `pending_delegated_continuation_ids` 与 `last_consumed_delegated_continuation_ids`
-  - 仍缺少一个稳定、可验收的 runtime-visible anchor，用来严格证明“哪个 consumed 事件对应当前 manager prompt cycle / 当前 stalled intake”；当前也不能假设 consumed truth 会稳定停留在 live-status 上，因为它在最近几轮已出现过缺席与重现的摇摆
-  - 当前还缺少一个可重复的等价 proof，来说明在 consumed surface 摇摆或与 pending 并存的情况下，为什么本轮可以确认“当前 stalled intake 已被当前 prompt cycle 吸收”
-  - 精确缺口应表述为：`specific stalled delegated continuation intake id -> current manager prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict` 这条链还不能被稳定、重复地从 runtime state surface 中读出
-  - 当前最小缺口不是 “再有一个 consumed timestamp”，而是把下面两点同时钉住：
-    - `20260323-234407...` / `20260324-002656...` / `20260324-021757...` 中，哪一个才是当前 stalled intake id
-    - `2026-03-24T09:41:25Z` 这次 consumed anchor 与 `.freely/run/prompt-20260324-024527.txt` 的关系，是当前 prompt cycle 的吸收事件，还是历史 surface 再次显现
+  - 当前最小 blocker 只剩两点：
+    - `specimen-chain binding proof` 仍未固定：还不能稳定读出 `specific stalled delegated continuation intake id -> current manager prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict`
+    - `real dogfood followthrough proof` 仍未完成：还没有一轮真实 recovery/cleanup 推进，证明这条 specimen-chain 不只是静态状态面，而能继续驱动 followthrough
+  - 上述 blocker 不是要求“再多一个 timestamp”或“再多一条 supporting note”；要求的是把当前 stalled specimen、当前 prompt cycle 与 consumed anchor 一一绑定，或明确冻结一个可重复的等价 proof
 - acceptance_criteria:
   - 明确区分当前候选与 `pending intake > cycle log`、latest continuity consumption、worker active reentry 这几条相邻治理 issue 的边界。
   - 冻结这条候选的最小 contract：`delegated continuation` 已进入 manager prompt，但在有界时间内没有新的 manager continuity / worker handoff 产出。
@@ -233,25 +230,21 @@
   - 当前已有 runtime / skill / test 证据，但还缺少一轮真实 dogfood followthrough 来冻结边界，因此不应因为仓库里已经有补丁就直接提升到 IBM。
   - 与 `I-20260322-0445` 的边界仍然清楚：后者处理“已生成新 continuity / prompt set 但 worker 仍消费旧轮次”，当前候选处理的是“manager prompt 已吸收 delegated continuation，但没有继续产出新的 continuity / handoff”。
   - 当前仓库复核仍未发现 issue/progress/recovery 真源接管该候选；因此这轮只能补 continuity writeback，不能把 route_kind 提前改成 `ibm`、`dev_loop` 或 `recovery`。
-  - 当前 runtime 已给出 prompt-level absorption proof，但 delegated continuation consumed truth 在当前 worker lane 上仍不稳定；它会在缺席与 `pending` / `consumed` 全量重叠之间摇摆，既没有稳定绑定到当前 prompt cycle / 当前 stalled intake，也没有形成独立于这种摇摆的 acceptance anchor，所以 promotion 后的 acceptance anchor 仍不稳定，candidate 继续保持 `needs_research`。
-  - 当前 watchdog/runtime/tests 证明的是“prompt-level absorption 加 runtime state surface 足以触发 recovery”，不是“prompt-cycle binding 已经稳定到足以 materialize issue”；这两层证据不能混用。
+  - 当前 runtime 已给出 prompt-level absorption proof，但 delegated continuation consumed truth 在当前 worker lane 上仍不稳定；它会在缺席与 `pending` / `consumed` 全量重叠之间摇摆，既没有稳定绑定到当前 prompt cycle / 当前 stalled intake，也没有形成独立 acceptance anchor。
+  - 当前 watchdog/runtime/tests 证明的是“prompt-level absorption 加 runtime state surface 足以触发 recovery”，不是“specimen-chain binding proof 已稳定到足以 materialize issue”；这两层证据不能混用。
+  - 因此当前 remaining blockers 已收窄为两个，而且都属于 promotion blocker：`specimen-chain binding proof` 与 `one real dogfood followthrough`。
 - next_action:
-  - 保持 active candidate；继续用真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被 runtime recovery 稳定推进到 cleanup / retirement followthrough，然后再判断是 materialize 为独立 issue，还是吸收到更高层 stall/recovery issue 族。
-  - 下一轮优先验证 runtime 能否在当前 `consumed` truth 摇摆的情况下，仍把 stalled intake 稳定绑定到当前 prompt cycle；若后续继续出现 `pending/consumed` 并存，也仍要明确哪一个 stalled delegated continuation 真的被本轮 prompt 吸收。若两条路径都做不到，至少冻结一个不依赖人工解释 prompt excerpt 的等价 proof。
+  - 保持 active candidate；下一轮只收两件事：
+    - 固定 `specimen-chain binding proof`
+    - 完成一轮真实 dogfood followthrough，证明 recovery/cleanup 会沿同一链继续推进
   - 下一轮 dogfood writeback 必须显式写出一条 specimen-chain，而不是只复述聚合 surface，并把三个并列证明点都固定到同一链上：
     - `specific stalled intake id=<...>`
     - `current prompt cycle=<prompt file / session ref>`
     - `consumed event anchor=<timestamp / ids / equivalent proof>`
     - `stall verdict=no-new-continuity/handoff for that same chain`
-  - 在这三段 specimen-chain 没被同轮证据固定之前，本树继续视为 active canonical owner，不降级为 evidence-only，也不进入 IBM。
-  - 将当前 `fresh_with_handoff/context_compacted` 的 continuity 事实继续视为 supporting evidence：它证明 runtime 已因上下文压缩做过续接，但不证明当前 prompt cycle 对 stalled intake 的 binding 已稳定；因此后续仍要把续接事实与 prompt-cycle absorption proof 分开验收。
-  - 在 manager/runtime cleanup 判断中，不再沿用“本树已被 develop 吸收、只剩 dirty writeback”的旧前提；当前 canonical writeback 已继续收敛为本分支上的最新 continuity anchor lineage，下一步应先把这些独有提交吸收到上游，再决定 retirement。
-  - 若再次发生会话轮换或 `context_compacted`，先把最新 continuity 结论写回当前 pre-brainstorm canonical artifacts，再继续扩大实现或 cleanup 判断。
-  - 当前最新 continuity 锚点已经滚动到 `.freely/run/prompt-20260324-024527.txt`；后续若再次轮换，优先沿这条 canonical writeback 线继续刷新 evidence，而不是切换 owner 或 loop。
-  - delete / retirement gate 当前仍明确阻塞：只有在真实 dogfood 复现中固定 `current stalled intake id -> current prompt cycle -> consumed event anchor` 的 binding proof，并确认 recovery 继续推进到 followthrough 后，才允许重新判断 cleanup。
+  - 在这两件事没完成之前，本树继续视为 active canonical owner，不降级为 evidence-only，也不进入 IBM。
 - revisit_trigger:
-  - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof 时，重新进入 materialization 判断。
-  - 当当前 runtime 补丁在真实 followthrough 中验证稳定，且边界已可冻结成独立 issue contract 时，重新进入 materialization 判断。
+  - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof，并附带一轮真实 followthrough 时，重新进入 materialization 判断。
   - 当 manager 已吸收当前分支上的 canonical writeback 提交并重新做 cleanup 巡检时，重新判断该 worktree 是否满足 `retire-now`。
 - route_kind: `pre_brainstorm`
 - next_recommended_route: `doc-pre-brainstorm-execution`

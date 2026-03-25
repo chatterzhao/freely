@@ -101,6 +101,15 @@
   - missing proof: `current stalled intake id -> current prompt cycle -> consumed event anchor -> no-new-continuity/handoff stall verdict`
   - 只要这条链还不能稳定观察，本候选就不能进入 IBM，也不能被 cleanup/retirement 视为已完成 proof
 
+### 当前最小 blocker 集合
+
+- `specimen-chain binding proof`
+  - 需要把具体 stalled intake、当前 prompt cycle、consumed anchor 与 stall verdict 固定到同一条可复核链上
+- `one real dogfood followthrough`
+  - 需要一轮真实 recovery/cleanup 推进，证明这条链不只是静态状态面，而能继续驱动 followthrough
+
+- 在这两个 blocker 没完成前，本候选继续保持 active pre-brainstorm owner
+
 ### 这条 proof gap 现在应按三段 specimen-chain 理解
 
 - 当前真正未冻结的不是一个模糊“大 gap”，而是同一条 specimen-chain 上的三个并列证明点：
