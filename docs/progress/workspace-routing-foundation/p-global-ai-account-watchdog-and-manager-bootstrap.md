@@ -4,14 +4,28 @@
 - title: Global AI account watchdog and manager bootstrap
 - phase_state: `in_verification`
 - runtime_state: `closed_for_this_batch`
-- branch: `feature/watchdog-account-slot-cooldown-identity-reconcile-20260325`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-account-slot-cooldown-identity-reconcile`
+- branch: `feature/watchdog-slot-sweep-without-cooldown-governance-20260325`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-slot-sweep-without-cooldown-governance`
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "continuation-worker"}
 
 ## Summary
 
+- 2026-03-25 新 pre-brainstorm `C-20260325-0525-A` 已完成首跳判断，并作为 supporting evidence 被本 issue 吸收：
+  - 当前恢复 contract 的主问题不再是“slot-first cooldown 写回是否对齐”，而是 cooldown 本身是否还应继续充当控制面真相
+  - 当前判断：`rate limit`、`deactivated_workspace`、auth failure / invalid auth file、slot probe failure，都应统一进入 failure-driven full slot sweep
+  - `all slots unavailable` 时允许保留 earliest-reset 作为 debug / 排序提示，但恢复主路径应基于低频真实 reprobe，而不是继续依赖 cooldown ledger
+  - 这意味着本 issue 的下一跳不是直接 merge review，而是先在同 issue family 内重开 doc-loop / dev-loop，完成 contract rewrite
+- 2026-03-25 当前 worktree 已完成这一轮 doc-loop + dev-loop + focused verification：
+  - `availability-watchdog.sh` 不再以 cooldown/earliest-reset 作为主恢复 gate；`ensure_codex_slot_ready_for_manager()` 现改为 current-slot probe + full saved-slot sweep
+  - `probe_all_codex_slots_and_update_cooldown()` 在 sweep 失败时恢复原 auth/active-slot，不再把最后一个失败 slot 留在真实 Codex 工作位；找到 usable slot 时会在返回前把 active slot 推回该 usable slot
+  - `ai-cli switch codex` 自动模式现在只会切到真实 probe 成功的 usable slot；`all_unavailable` 仅返回 debug hint，不再把 earliest-reset slot 强行切进真实工作位
+  - focused regressions 已重写为 slot-sweep-first contract：
+    - `test-freely-ai-account-switch`
+    - `test-freely-ensure-manager`
+    - `test-freely-ensure-manager-earliest-reset-wait-revive`
+  - 这一轮验证已通过，当前保持 `in_verification`，等待后续 code review / manager merge judgement
 - 本轮 continuation 已吸收 delegated handoff 中的五点 contract，并确认对应实现已经落在当前分支祖先：
   - all accounts unusable 时选择最早 reset 账号
   - wait 采用 `reset_at + 60s` 等价 buffer 契约，可由 watchdog buffer 环境变量调节
@@ -61,6 +75,7 @@
 - `./bin/ai --quiet --format json whoami codex`
 - `./bin/ai --quiet --format json list`
 - compare canonical `.freely/run/codex-slot-cooldowns.tsv` entries against saved slot inventory
+- `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
 
 ### Latest rerun
 
@@ -87,14 +102,23 @@
     - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-slot-alias-cooldown` pass
     - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-idle-unavailable-slot-restart` pass，锁住 idle supervisor unavailable branch 的 slot-first restart 判定
     - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-cooldown-falls-back-to-active-slot` pass，锁住 `whoami.slot` 缺失时的 active-slot fallback
+- 2026-03-25 06:05 PDT current slot-sweep-first continuation rerun:
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` pass，且显式验证：
+    - 有 usable slot 时才切换
+    - `all_unavailable` 时不再切到 earliest-reset slot
+    - probe 失败后会恢复原 auth，而不是把无效 slot 留在真实 Codex 工作位
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager` pass，且显式验证 manager bootstrap 之前会先 full sweep 并 promote 真实 usable slot
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-earliest-reset-wait-revive` pass，且显式验证 all-slots-unavailable 后走低频真实 reprobe，而不是 cooldown-driven sleep-until-reset
+  - `./bin/governance-check` pass，只有 10 条 legacy pre-brainstorm naming warning
 
 ## Next Action
 
-- 当前批次已处于 manager merge review 前的 verification closeout。
-- 若上述聚焦验证在补丁后继续通过，下一步由 manager 决定是否 promote 当前 branch；worker 不直接 merge 到 `develop`。
+- 当前批次已经把 slot-sweep-first contract 真正落到 runtime / watchdog / ai-cli / focused tests，不再只是 pre-brainstorm 结论。
+- 下一步进入同 issue family 的 code review / manager merge judgement；在 manager 吸收前，不把本 worktree 判成 completed。
 
 ## Revisit Trigger
 
 - 任一 watchdog wait/reprobe 或 stale `ensure-manager.pid` 回归失败
 - manager review 发现当前 doc/code/test 证据仍不一致
 - `develop` 真实环境在 replay 后暴露新的 outer-watchdog/productization 缺口
+- live replay 再次证明 cooldown 仍在主恢复路径上制造错误等待或错误可用性判断

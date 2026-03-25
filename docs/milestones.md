@@ -97,7 +97,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
-- next_action: delegated continuation 已在当前 dedicated worktree 补齐 earliest-reset wait / periodic reprobe / stale `ensure-manager.pid` contract，并在最新 verification continuation 中继续补上 manager bootstrap handoff、`rate-limit` 计时稳定性、slot-first cooldown writeback、idle-manager unavailable restart 判定、以及 `whoami.slot` 缺失时的 active-slot fallback。2026-03-25 develop live replay 又确认 shared switch wait contract 仍在，但 canonical cooldown ledger 与 saved slot inventory 漂移：15 个 slot 中 6 个缺 cooldown entry，另有 7 条无后缀旧 identity 残留。当前继续保持 `in_verification`；下一步优先把 slot inventory / cooldown ledger reconcile 收口到同一 issue family，再由 manager 基于当前 feature worktree 做 merge review；不要把问题误扩成新的 process-lifecycle candidate
+- next_action: 当前 dedicated worktree 已把 slot-sweep-first continuation 真正落到 `availability-watchdog.sh`、`ai-cli` 与 focused regressions：manager/bootstrap 与 `freely ai switch codex` 现在只会信真实 probe 成功的 usable slot，`all_unavailable` 时不再切 earliest-reset slot，probe 失败后也会恢复原 auth/active-slot。focused rerun 与 `./bin/governance-check` 已通过，当前继续保持 `in_verification`；下一步进入同 issue family 的 code review / manager merge judgement，并在 develop replay 前继续避免把它误判成 completed
 
 6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation
@@ -374,6 +374,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，但已冻结一条硬规则：`pre-test-merge` 是 shadow batch，只做测试 merge，不直接 merge 到 `develop`。剩余要收口的是 `develop-only completion verification` 与 `pre-test-merge batch acceptance` 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
 - revisit_trigger: 当 protected verification environment 的 replay policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
+
+9. `C-20260325-0525-A`
+- title: Retire cooldown-driven recovery and make slot sweep canonical
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- source_brainstorm: `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`
+- completion_note: 当前 candidate 生命周期已通过 pre-brainstorm 收口为 same-family supporting evidence；不新开平行 issue，直接把 “cooldown 退出主恢复 contract、failure-driven full slot sweep 成为 canonical” 的边界改写回 `I-20260318-1630`
 
 10. `C-20260322-1801-B`
 - title: pre-test-merge lifecycle management capability for Freely

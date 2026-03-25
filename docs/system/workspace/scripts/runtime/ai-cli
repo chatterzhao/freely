@@ -479,18 +479,17 @@ _cmd_switch_auto_codex() {
         echo "{\"switched\": true, \"tool\": \"codex\", \"account\": $(json_string_or_null "$actual_account"), \"slot\": \"$slot\", \"status\": \"usable\"}"
       fi
       ;;
-    earliest:*)
-      local info="${result#earliest:}"
-      local slot="${info%%|*}"
+    all_unavailable:*)
+      local info="${result#all_unavailable:}"
+      local earliest_slot="${info%%|*}"
       local reset_at="${info##*|}"
       local human_time
       human_time="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo "$reset_at")"
-      echo -e "${YELLOW}[SWITCHED]${NC} -> $slot (rate limited, resets at $human_time)"
-      _cmd_switch_codex_direct_unlocked "$tool" "$slot"
-      actual_account="$(extract_codex_account "$HOME/.codex/auth.json")"
+      log_warn "No usable codex slot right now; earliest reset hint is $earliest_slot at $human_time"
       if [[ "$FORMAT" == "json" ]]; then
-        echo "{\"switched\": true, \"tool\": \"codex\", \"account\": $(json_string_or_null "$actual_account"), \"slot\": \"$slot\", \"status\": \"rate_limited\", \"reset_at\": $reset_at, \"reset_at_human\": \"$human_time\"}"
+        echo "{\"switched\": false, \"tool\": \"codex\", \"status\": \"all_unavailable\", \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"reset_at\": $reset_at, \"reset_at_human\": \"$human_time\"}"
       fi
+      rc=4
       ;;
     none)
       log_error "No slots found or all probing failed"
@@ -692,7 +691,7 @@ Commands:
   init                    Initialize slot manager
   login <tool>            Login and auto-save auth slot
   save <tool> [slot]      Save current login (auto-detect next slot if not specified)
-  switch [tool] [slot]    Switch to slot. No slot = auto-probe and switch to usable/earliest
+  switch [tool] [slot]    Switch to slot. No slot = auto-probe and switch only to a usable slot
   list                    List all saved slots
   whoami [tool]           Show current logged-in slot
   status [tool]           Show current status
@@ -715,7 +714,7 @@ Examples:
   freely ai init
   freely ai login codex
   freely ai whoami
-  freely ai switch codex                    # Auto-probe, switch to usable/earliest
+  freely ai switch codex                    # Auto-probe, switch only if a slot is currently usable
   freely ai switch codex other@email-com-2  # Switch to specific slot
   freely ai switch other@email-com-2 --yes  # Switch to specific slot (default tool: codex)
   freely ai list --format json

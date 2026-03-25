@@ -184,7 +184,7 @@ for _ in $(seq 1 12); do
 done
 
 if [[ ! -f "$LAUNCH_LOG" ]]; then
-  echo "[FAIL] expected ensure-manager watchdog to bootstrap manager after earliest reset + buffer" >&2
+  echo "[FAIL] expected ensure-manager watchdog to bootstrap manager after a later reprobe found a usable slot" >&2
   kill "$watchdog_pid" 2>/dev/null || true
   wait "$watchdog_pid" 2>/dev/null || true
   exit 1
@@ -192,7 +192,7 @@ fi
 
 launch_epoch="$(cut -d'|' -f1 "$LAUNCH_LOG" | tail -n 1)"
 if (( launch_epoch - start_epoch < 3 )); then
-  echo "[FAIL] expected launch to wait for earliest reset buffer / recheck window" >&2
+  echo "[FAIL] expected launch to wait for a later real reprobe instead of switching to the earliest reset slot immediately" >&2
   kill "$watchdog_pid" 2>/dev/null || true
   wait "$watchdog_pid" 2>/dev/null || true
   exit 1
@@ -204,10 +204,10 @@ grep -q 'fast@example-com' "$AI_STATE"
 HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
 [[ -f "$HANDOFF_FILE" ]]
 grep -q '^## Manager Bootstrap Recovery$' "$HANDOFF_FILE"
-grep -q '^- trigger: cooldown_elapsed$' "$HANDOFF_FILE"
-grep -q '^- previous_slot: fast@example-com$' "$HANDOFF_FILE"
+grep -q '^- trigger: stale_or_missing_cooldown_probe$' "$HANDOFF_FILE"
+grep -q '^- previous_slot: slow@example-com$' "$HANDOFF_FILE"
 grep -q '^- active_slot: fast@example-com$' "$HANDOFF_FILE"
-grep -q '^- reason: watchdog_resumed_after_wait$' "$HANDOFF_FILE"
+grep -q '^- reason: watchdog_probed_and_found_usable_slot$' "$HANDOFF_FILE"
 grep -q '^- next_action: inspect-fleet-and-recover-workers$' "$HANDOFF_FILE"
 
 pid_file="$PROJECT/.freely/run/ensure-manager.pid"
@@ -234,4 +234,4 @@ if [[ -f "$pid_file" ]]; then
   exit 1
 fi
 
-echo "[PASS] ensure-manager waits through earliest reset recovery, replaces stale pid files, and cleans up on exit"
+echo "[PASS] ensure-manager keeps reprobeing until a slot is truly usable, replaces stale pid files, and cleans up on exit"
