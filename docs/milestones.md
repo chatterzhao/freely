@@ -477,12 +477,12 @@ routing_policy:
 12. `I-20260324-0415`
 - title: Application-native runtime observation contract and observability planes
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
 - source_brainstorm: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md`
-- next_action: IBM 已冻结完成；下一步进入 dev，把最小 `plane identity block`、`progress / stall / acceptance evidence` contract、以及 shared `deep ref groups` 写进 active truth 与 runtime-facing references，同时保持 richer runtime / UI observability productization 为后续 follow-on scope
+- next_action: 当前最小 observability contract slice 已进入 verification closeout；manager 下一步应判断这批 active truth / runtime-facing references 是否可 merge，同时继续把 richer runtime / UI observability productization 保持为 follow-on scope
 
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛

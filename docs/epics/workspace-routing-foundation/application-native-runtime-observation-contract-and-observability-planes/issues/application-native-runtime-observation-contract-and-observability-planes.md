@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260324-0415`
 - title: Application-native runtime observation contract and observability planes
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `application-native-runtime-observation-contract-and-observability-planes`
@@ -77,6 +77,7 @@ Freely 已经具备多种观察面：
 - `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/prd.md`
 - `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/tasks.md`
+- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
