@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-idle-slot.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260325-0000--sample" "$PROJECT/.freely/run"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260325-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260325-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260325-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+load_config "$PROJECT"
+
+printf '12345\n' >"$PROJECT/.freely/run/supervisor.pid"
+
+QUERY_LOG="$TMP_DIR/query.log"
+HANDOFF_LOG="$TMP_DIR/handoff.log"
+RESTART_LOG="$TMP_DIR/restart.log"
+LAUNCH_LOG="$TMP_DIR/launch.log"
+
+valid_supervisor_pid_for_project() {
+  [[ "$2" == "12345" ]]
+}
+discover_supervisor_pid() {
+  return 0
+}
+manager_ai_pid_for_project() {
+  return 0
+}
+recover_stalled_manager_ai_if_needed() {
+  return 1
+}
+codex_current_account() {
+  printf 'same@example.com\n'
+}
+codex_current_slot() {
+  printf 'same@example-com-2\n'
+}
+read_codex_active_slot() {
+  return 0
+}
+codex_slot_is_available_now() {
+  printf '%s\n' "$2" >>"$QUERY_LOG"
+  [[ "$2" != "same@example-com-2" ]]
+}
+write_manager_bootstrap_handoff() {
+  printf '%s|%s|%s|%s|%s|%s\n' "$1" "$2" "$3" "$4" "$5" "$6" >>"$HANDOFF_LOG"
+}
+restart_manager_supervisor_preserving_handoff() {
+  printf '%s\n' "$1" >>"$RESTART_LOG"
+}
+ensure_codex_slot_ready_for_manager() {
+  return 0
+}
+manager_runtime_recover_workers_if_needed() {
+  return 0
+}
+launch_manager_supervisor() {
+  printf '%s\n' "$1" >>"$LAUNCH_LOG"
+}
+log_info() { :; }
+log_warn() { :; }
+log_error() { printf '%s\n' "$*" >&2; }
+
+ensure_manager_once "$PROJECT" >/dev/null
+
+grep -q '^same@example-com-2$' "$QUERY_LOG"
+grep -q "^$PROJECT\$" "$RESTART_LOG"
+grep -q "^$PROJECT\$" "$LAUNCH_LOG"
+grep -q 'manager_limit_detected|same@example-com-2|same@example-com-2|manager_process_ended_on_unavailable_slot|relaunch-manager-after-slot-recovery' "$HANDOFF_LOG"
+
+echo "[PASS] ensure-manager restarts idle manager supervision using slot cooldown identity"

@@ -972,7 +972,7 @@ if [[ $((end_epoch - start_epoch)) -gt 3 ]]; then
   echo "[FAIL] expected local runtime to defer rate-limit recovery instead of sleeping locally"
   exit 1
 fi
-grep -q 'LAST_ACCOUNT_SWITCH_REASON="primary_rate_limit_exhausted"' "$PROJECT_LIMIT/.freely/run/session-state.env"
+grep -q 'LAST_SLOT_SWITCH_REASON="primary_rate_limit_exhausted"' "$PROJECT_LIMIT/.freely/run/session-state.env"
 
 echo "[PASS] freely defers rate-limit recovery from local runtime to global watchdog"
 

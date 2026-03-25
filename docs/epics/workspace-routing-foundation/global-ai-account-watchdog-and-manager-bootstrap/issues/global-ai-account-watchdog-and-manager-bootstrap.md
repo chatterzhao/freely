@@ -90,22 +90,38 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
   - 2026-03-24 continuation 又补齐 switch sweep 期间的剩余 race：
     - `ensure_manager_once()` 先前仍可能在 wait 之前触发 `whoami`
     - `codex_saved_accounts()` / `whoami` / `list` 读路径现在也会等待正在进行中的 switch sweep
-    - `codex_probe_current_account_now()` 现在会持有同一把 shared switch lock 覆盖整个 `codex exec` probe，避免 wait-return 后被新的手工 sweep 插入
+    - `codex_probe_current_slot_now()` 现在会持有同一把 shared switch lock 覆盖整个 `codex exec` probe，避免 wait-return 后被新的手工 sweep 插入
     - `test-freely-codex-probe-defers-during-account-switch` 覆盖 watchdog probe 自身的 defer + serialization
   - 2026-03-23 当前 verification batch 在 dedicated feature worktree 中直接完成，无需引入 `pre-test-merge` 或提前要求 `post-merge acceptance`：
     - `freely ensure-manager --project <tmp-project>` 直接命令验证通过，确认 watchdog 会先切到可用账号，再发起 manager bootstrap
-    - `freely start --project <tmp-project>` 最小 rate-limit 场景可直接写出 `LAST_ACCOUNT_SWITCH_REASON="primary_rate_limit_exhausted"`，证明 runtime 仍把恢复理由写回 watchdog 接管面
+    - `freely start --project <tmp-project>` 最小 rate-limit 场景可直接写出 `LAST_SLOT_SWITCH_REASON="primary_rate_limit_exhausted"`，证明 runtime 仍把恢复理由写回 watchdog 接管面
   - `test-freely-rate-limit-defers-to-watchdog` 曾出现一次 3 秒边界失败，但随后单独复现与连续重跑均通过；当前判断为时间阈值边界上的 flaky，而非稳定功能回归
   - 2026-03-24 verification continuation 又暴露出两处收口缺口，并已在当前 worktree 继续修补：
     - `test-freely-rate-limit-defers-to-watchdog` 使用整秒计时，仍会偶发把 `<4s` 的正常退出误判成“本地睡眠”；当前已改成 monotonic 毫秒阈值，避免秒边界抖动
     - `ensure-manager` / earliest-reset 回归此前没有直接断言 manager bootstrap handoff artifact；当前已把 trigger/account/reason/next_action 写入测试验收面
   - 2026-03-23 晚间狗粮 continuation 暴露出一条实现缺口：
-    - `all_accounts_cooling_down -> earliest reset -> sleep` 路径没有显式 `reset_at + buffer`
+    - `all_slots_cooling_down -> earliest reset -> sleep` 路径没有显式 `reset_at + buffer`
     - wait 结束后没有重新 probe 所有 saved accounts 再决定 relaunch
     - `ensure-manager --watch` 会因为单轮 readiness pass 失败而退出控制面，现场留下 stale `ensure-manager.pid`
   - 2026-03-24 continuation writeback 已把 canonical 状态重新对齐到当前 feature worktree：
     - issue / milestone / progress / code-review 现统一表达为“continuation batch 已实现并处于 `in_verification`”
     - 当前批次不再沿用“verified-retirable”或“仍待提交”旧结论
+  - 2026-03-24 slot-only cooldown identity continuation 进一步收紧了 identity 语义：
+    - `ensure_codex_slot_ready_for_manager` 现在只认 `whoami.slot` 作为 cooldown identity，`whoami.account` 仅保留展示用途
+    - `select_any_available_codex_slot` 只排除当前精确 slot，不再做同 family exclusion，避免把同邮箱的 `-x` 兄弟 slot 误伤
+    - 已验证 `ai-cli` 的 `login`/`switch` 入口遵守显式 suffixed slot contract，不再生成或消费无后缀目录
+    - 新的 focused regression `docs/system/workspace/scripts/tests/test-freely-ensure-manager-slot-alias-cooldown` 覆盖了 slot selector / manager bootstrap 路径以及 slot-only cooldown identity
+  - 2026-03-25 develop live replay 进一步确认，本轮重启抖动不是 “wait for old switch/process” contract 缺失：
+    - `wait_for_codex_slot_switch_idle()` 仍在 `availability-watchdog.sh` 真源里，并被 `whoami/list/probe/ensure-manager bootstrap` 路径复用
+    - develop 当前 `./bin/ai whoami codex` 返回的 active slot 是 `worahe3976@outlook-com`
+    - develop 当前 `./bin/ai list` 返回 15 个保存 slot，但 `.freely/run/codex-slot-cooldowns.tsv` 里只有 16 条 cooldown entry，其中 6 个真实 slot 缺账本、7 条账本 entry 指向已不存在的无后缀/旧 identity
+    - 当前现场更像是 cooldown truth 没跟上 slot-first contract，watchdog 因此可能把缺记录 slot 当成“立即可用”，持续 probe/relaunch，而不是稳定进入 `all_slots_cooling_down` handoff
+  - 2026-03-25 当前 dedicated continuation 又补了一条直接锁 runtime 写回的 focused regression：
+    - `test-freely-rate-limit-defers-to-watchdog` 与 `test-freely-rate-limit-log-defers-to-watchdog` 现都显式断言 cooldown ledger 写入的是 suffixed slot key，而不是无后缀 account key
+    - 这让 “runtime 退出后按 slot 记录 cooldown” 不再只是 `ensure-manager`/selector 间接覆盖，而是由 rate-limit supervisor 路径直接验收
+  - 2026-03-25 review continuation 又补上两处边界：
+    - `ensure_manager_once()` 的 idle-manager unavailable branch 现也改为按 slot cooldown identity 判断，避免 manager AI 已退场时仍用 account key 误判“当前账号可用”
+    - 当 `whoami.slot` 临时缺失时，cooldown identity 会回退到 `~/.codex/active-slot`，避免 textual/structured rate-limit 退出把 cooldown 记录直接丢失
   - `test-freely-global-account-watchdog-live` 已真实通过：
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
     - `worahe3973@outlook.com -> worahe3971@outlook.com`

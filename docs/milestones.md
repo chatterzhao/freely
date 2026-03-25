@@ -97,7 +97,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
-- next_action: delegated continuation 已在当前 dedicated worktree 补齐 earliest-reset wait / periodic reprobe / stale `ensure-manager.pid` contract，并在最新 verification continuation 中继续补上 manager bootstrap handoff 测试覆盖与 `rate-limit` 用例计时稳定性。当前保持 `in_verification`；待补丁后的聚焦验证再次通过后，由 manager 基于当前 feature worktree 做 merge review；若 `develop` replay 后仍暴露 outer-watchdog/productization 缺口，再从同一 issue 新开 dedicated continuation lane
+- next_action: delegated continuation 已在当前 dedicated worktree 补齐 earliest-reset wait / periodic reprobe / stale `ensure-manager.pid` contract，并在最新 verification continuation 中继续补上 manager bootstrap handoff、`rate-limit` 计时稳定性、slot-first cooldown writeback、idle-manager unavailable restart 判定、以及 `whoami.slot` 缺失时的 active-slot fallback。2026-03-25 develop live replay 又确认 shared switch wait contract 仍在，但 canonical cooldown ledger 与 saved slot inventory 漂移：15 个 slot 中 6 个缺 cooldown entry，另有 7 条无后缀旧 identity 残留。当前继续保持 `in_verification`；下一步优先把 slot inventory / cooldown ledger reconcile 收口到同一 issue family，再由 manager 基于当前 feature worktree 做 merge review；不要把问题误扩成新的 process-lifecycle candidate
 
 6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation
