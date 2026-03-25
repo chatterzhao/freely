@@ -455,16 +455,15 @@ routing_policy:
 - next_action: 保持 active candidate；先让 manager watchdog 能识别并恢复 active worker delegated-continuation stall，再继续真实 dogfood 验证 retained worker 能否自动收口、cleanup 并回到 next patrol
 - revisit_trigger: 当再次复现 active worker 已收到 delegated continuation 但 cycle log / closeout 长时间不推进，或当前 runtime 补丁验证稳定后需要冻结独立 issue contract 时，重新进入 materialization 判断
 
-12. `C-20260324-0415-A`
+12. `I-20260324-0415`
 - title: Application-native runtime observation contract and observability planes
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+- milestone_state: committed
+- phase_state: `done_ibm`
 - priority: P1
-- promoted_issue_path: `pending://application-native-runtime-observation-contract-and-observability-planes`
+- issue_path: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
 - source_brainstorm: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md`
-- next_action: 保持 active candidate，但不再扩 contract 面。当前只需完成一轮独立 acceptance review，确认以下两点可直接作为 IBM 输入：`acceptance evidence schema` 的 canonical truth 固定落在 artifact plane 且 current-state/fleet/API 只镜像最小摘要与 `acceptance_ref`；CLI/TUI/GUI/API 共享同一组最小 `deep ref groups`，richer surface 只能扩展不能替换。`current-state/fleet plane` day-1 继续由既有 `live-status/fleet-status` 承接，多 subagent day-1 继续聚合在 lane/worktree/session surfaces 下，不再作为 blocker。
-- revisit_trigger: 当最终独立 acceptance review 认可当前 shared contract 已足够稳定，尤其是 artifact-plane canonical acceptance evidence 与 shared deep-ref compatibility rule 已成立后，重新进入 materialization 判断；若仍需 richer runtime/UI productization，则进入 follow-on issue，而不是继续阻塞 shared contract materialization
+- next_action: IBM 已冻结完成；下一步进入 dev，把最小 `plane identity block`、`progress / stall / acceptance evidence` contract、以及 shared `deep ref groups` 写进 active truth 与 runtime-facing references，同时保持 richer runtime / UI observability productization 为后续 follow-on scope
 
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛

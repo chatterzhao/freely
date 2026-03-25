@@ -49,13 +49,21 @@
     mode: `narrow blocker review`
     summary: `Acceptance evidence should remain canonical in the artifact plane, with current-state/fleet/API mirroring only a minimal summary plus acceptance_ref. Shared deep ref groups should be fixed across CLI/TUI/GUI/API, while richer surfaces may extend drill-down without replacing the minimum ref vocabulary. With these two points frozen, the remaining gate is one more independent acceptance review rather than further contract invention.`
     verdict: `ready_for_final_pre_ibm_review`
+  - reviewer: `gpt-5.4-mini explorer acceptance review`
+    mode: `independent candidate acceptance review`
+    summary: `The candidate no longer has four blockers. It is ready to leave pre-brainstorm once one final independent acceptance review confirms the same two frozen points: artifact-plane canonical acceptance evidence with minimal mirrored summaries, and one minimum deep-ref vocabulary shared across CLI/TUI/GUI/API. Existing day-1 live-status/fleet-status and lane/worktree/session aggregation are explicitly no longer blockers.`
+    verdict: `ready_for_ibm`
+  - reviewer: `gpt-5.4-mini explorer final acceptance review`
+    mode: `independent candidate acceptance review`
+    summary: `The minimal remaining blocker set has collapsed to one procedural gate, and that gate is now satisfied: the candidate is ready for IBM with two confirmed constraints carried forward as IBM inputs, not as fresh pre-brainstorm blockers.`
+    verdict: `ready_for_ibm`
 - priority: P1
-- status: proposed
-- decision_reason: 这条线已经从本次 Freely 自举现场中暴露出来，而且 clearly exceeds `live-status` / stall candidate 的原边界；但当前仍应停留在 pre-brainstorm，直到五个 plane 的 identity block、progress/stall/acceptance evidence schema、shared state exposure contract，以及与既有线的承接关系都冻结稳定。当前已有四项边界已经收口：`current-state plane` / `fleet plane` 默认继续承接现有 `live-status` / `fleet-status`，不另造平行 surface；多 subagent 默认继续通过 lane/worktree/session 暴露活动痕迹，而不是 day-1 backend 一等实体；`acceptance evidence schema` 的 canonical truth 固定落在 artifact plane，而 current-state/fleet/API 仅镜像最小摘要与 `acceptance_ref`；CLI/TUI/GUI/API 共享同一组最小 `deep ref groups`，richer surface 只能扩展不能替换。剩余 gate 已收窄为再做一轮独立 acceptance review，确认这条线足以进入 IBM shared contract materialization。
-- promoted_issue_path: `pending://application-native-runtime-observation-contract-and-observability-planes`
+- status: promoted
+- decision_reason: 这条线已经从本次 Freely 自举现场中暴露出来，而且 clearly exceeds `live-status` / stall candidate 的原边界。当前 shared contract 已冻结到足以进入 IBM：`current-state plane` / `fleet plane` day-1 继续承接既有 `live-status` / `fleet-status`，不另造平行 surface；多 subagent day-1 继续通过 lane/worktree/session 暴露活动痕迹，而不是 backend 一等实体；`acceptance evidence schema` 的 canonical truth 固定落在 artifact plane，而 current-state/fleet/API 仅镜像最小摘要与 `acceptance_ref`；CLI/TUI/GUI/API 共享同一组最小 `deep ref groups`，richer surface 只能扩展不能替换。两轮独立 acceptance review 均已确认：剩余 gate 不再是 contract invention，而是将这套最小 shared contract 正式 materialize 为 IBM 输入。
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
-- next_action: 继续 pre-brainstorm，但不再扩 contract 面。当前只需完成一轮独立 acceptance review，确认以下两点可直接作为 IBM 输入：`acceptance evidence schema` 的 canonical truth 固定落在 artifact plane 且 current-state/fleet/API 只镜像最小摘要与 `acceptance_ref`；CLI/TUI/GUI/API 共享同一组最小 `deep ref groups`，richer surface 只能扩展不能替换。通过后再进入 IBM shared contract materialization，而不是直接跳到 runtime patch 或 richer UI 实现。
-- revisit_trigger: 当最终独立 acceptance review 认可当前 shared contract 已足够稳定，尤其是 artifact-plane canonical acceptance evidence 与 shared deep-ref compatibility rule 已成立后，重新进入 materialization 判断；若仍需 richer runtime/UI observability productization，则另起 follow-on issue
+- next_action: 进入 IBM。将当前 shared contract materialize 为正式 issue / PRD / pre-tests / tasks，并把后续 dev 约束写死：先实现 contract-required truth surfaces 与 machine-readable deep refs，再由后续 follow-on issue 承接 richer runtime / UI observability productization。
+- revisit_trigger: IBM materialization 完成后，转入 `done_ibm -> in_dev` handoff；若后续要扩 richer runtime/TUI/GUI/API observability productization，则在本 shared contract 上游冻结后另起 follow-on issue
 - session_refs:
   - tool: codex
   - session_id: current-thread
