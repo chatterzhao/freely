@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260324-0415`
 - title: Application-native runtime observation contract and observability planes
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `application-native-runtime-observation-contract-and-observability-planes`
@@ -82,3 +82,13 @@ Freely 已经具备多种观察面：
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/system/workspace/scripts/README.md`
+
+## Completion Evidence
+
+- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
+- `./bin/governance-check`
+- `rg -n "current-state plane|fleet plane|artifact plane|acceptance evidence|acceptance_ref|deep ref|progress signal|stall signal" docs/system/workspace/three-loop-capability-lifecycle.md docs/system/workspace/skills/multi-worktree-supervision/SKILL.md docs/system/workspace/skills/watchdog-control-plane/SKILL.md docs/system/workspace/scripts/README.md docs/LAWS.md`
+
+## Completion Note
+
+本 issue 的最小 contract slice 已完成：`artifact plane` 固定为 acceptance evidence canonical truth，`current-state` / `fleet` surfaces 只镜像最小 acceptance 摘要与 shared `deep ref groups`，Freely self-host concrete profile 也已写清。更丰富的 CLI / TUI / GUI / API 产品化与多 subagent 一等可视化留作 follow-on scope，不阻塞本 issue 完成。

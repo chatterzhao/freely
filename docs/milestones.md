@@ -474,16 +474,6 @@ routing_policy:
 - next_action: 保持 active candidate；先让 manager watchdog 能识别并恢复 active worker delegated-continuation stall，再继续真实 dogfood 验证 retained worker 能否自动收口、cleanup 并回到 next patrol
 - revisit_trigger: 当再次复现 active worker 已收到 delegated continuation 但 cycle log / closeout 长时间不推进，或当前 runtime 补丁验证稳定后需要冻结独立 issue contract 时，重新进入 materialization 判断
 
-12. `I-20260324-0415`
-- title: Application-native runtime observation contract and observability planes
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
-- source_brainstorm: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md`
-- next_action: 当前最小 observability contract slice 已进入 verification closeout；manager 下一步应判断这批 active truth / runtime-facing references 是否可 merge，同时继续把 richer runtime / UI observability productization 保持为 follow-on scope
-
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛
 - milestone_state: candidate
@@ -972,7 +962,16 @@ routing_policy:
 
 ### completed_issues
 
-- none currently
+1. `I-20260324-0415`
+- title: Application-native runtime observation contract and observability planes
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+- source_brainstorm: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md`
+- evidence: `docs/system/workspace/three-loop-capability-lifecycle.md`, `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`, `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`, `docs/system/workspace/scripts/README.md`, `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
+- completion_note: 最小 application-native runtime observation contract 已被 active truth 与 runtime-facing references 吸收，`pre-tests.md` 中声明的最小 contract checks 已通过。更丰富的 CLI / TUI / GUI / API 产品化与多 subagent 一等可视化继续留作 follow-on scope，不阻塞本 issue 完成。
 
 ## M-20260321-ai-native-doc-loop
 
