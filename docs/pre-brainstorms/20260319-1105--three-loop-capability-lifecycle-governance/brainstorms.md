@@ -19,14 +19,38 @@
 3. 当前文档更像“组件说明”，不够像“生命周期状态机 + 能力挂载图”，导致后续新能力容易漂移到错误位置。
 4. `Freely 产品方法论` 与 `Freely 当前用此方法论开发自己` 两层语义容易混淆。
 
+## 2026-03-24 Continuation: sibling-loop 关系仍未收稳
+
+本轮继续审计发现，当前真源虽然已经把 `auto-loop / doc-loop / dev-loop` 摆出来，但还存在一个新的语义风险：
+
+1. 中文经常说“**三层循环**”，会把 `doc-loop` / `dev-loop` 误听成被 `auto-loop` 包含的“内层”。
+2. `PROJECT_INTENT` 和若干 pre-brainstorm / issue 文档里的 `outer / inner` 词面，会进一步强化这种包含关系错觉。
+3. 一旦把它理解成层级包含，就会继续长出这些误用：
+   - 把 `doc-loop` 当 `dev-loop` 的父层
+   - 把 verification / cleanup 写成第四层
+   - 把某次局部 loop 的跳出误判成整个主题终止
+
+本轮收敛要求：
+
+- 把模型统一描述为“**三个 loop**”，不是“**三层**”。
+- `auto-loop` 是外层编排 / patrol / routing / governance loop。
+- `doc-loop` 与 `dev-loop` 是并列 sibling loop。
+- verification / recovery / cleanup 是 `auto-loop` 路由和收口的阶段，不是新增 loop，也不是 `doc/dev` 的子层。
+- 要先完成全仓 active truth 审计，再修改系统真源，避免直接全量替词造成历史证据面混乱。
+
+对应 continuation 研究面为：
+- `docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/`
+- 该 continuation 不再形成平行 milestone owner，而是作为本 candidate 的 active continuation 吸收。
+
 ## 收敛判断
 
 Freely 需要一份唯一真源文档，明确三件事：
 
-1. 三层循环本身的职责边界：
-   - `auto-loop` 负责编排、监督、恢复、委派与多工位治理
+1. 三个 loop 本身的职责边界：
+   - `auto-loop` 负责编排、监督、恢复、委派、多工位治理，以及 completion / cleanup / retirement 的最终裁决
    - `doc-loop` 负责发现收敛、candidate、milestone intake、IBM 与文档 continuity
-   - `dev-loop` 负责实现、测试、review、verification、promotion/cleanup readiness
+   - `dev-loop` 负责实现、局部测试、review、verification evidence、promotion/cleanup readiness evidence
+   - worker 可以执行测试并产出 evidence，但“是否已经完成、是否通过验证、是否该 cleanup / retire”必须回交 `auto-loop` 裁决
 2. 每个能力挂在哪一层、由哪种 owner 承担：
    - `runtime/scripts`
    - `manager-agent` / `worker-agent`

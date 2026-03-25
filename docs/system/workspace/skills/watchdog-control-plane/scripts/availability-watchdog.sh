@@ -4,6 +4,123 @@ normalize_codex_account_name() {
   printf '%s' "$1" | sed 's/\./-/g'
 }
 
+codex_account_switch_lock_dir() {
+  printf '%s\n' "${AI_CLI_SWITCH_LOCK_DIR:-$HOME/.codex/account-switch.lock}"
+}
+
+codex_account_switch_lock_state_file() {
+  printf '%s\n' "$(codex_account_switch_lock_dir)/state.env"
+}
+
+codex_account_switch_lock_owner_pid() {
+  local state_file
+  state_file="$(codex_account_switch_lock_state_file)"
+  [[ -f "$state_file" ]] || return 0
+  sed -n 's/^owner_pid=//p' "$state_file" | tail -n 1
+}
+
+codex_account_switch_lock_cleanup_if_stale() {
+  local lock_dir owner_pid
+  lock_dir="$(codex_account_switch_lock_dir)"
+  [[ -d "$lock_dir" ]] || return 0
+  owner_pid="$(codex_account_switch_lock_owner_pid)"
+  if [[ -z "$owner_pid" ]] || ! kill -0 "$owner_pid" 2>/dev/null; then
+    rm -rf "$lock_dir"
+  fi
+}
+
+codex_account_switch_in_progress() {
+  local lock_dir owner_pid inherited_owner_pid
+  codex_account_switch_lock_cleanup_if_stale
+  lock_dir="$(codex_account_switch_lock_dir)"
+  [[ -d "$lock_dir" ]] || return 1
+  owner_pid="$(codex_account_switch_lock_owner_pid)"
+  inherited_owner_pid="${AI_CLI_SWITCH_LOCK_OWNER_PID:-}"
+  [[ -n "$owner_pid" ]] || return 1
+  [[ "$owner_pid" != "$$" ]] || return 1
+  [[ -z "$inherited_owner_pid" || "$owner_pid" != "$inherited_owner_pid" ]] || return 1
+  kill -0 "$owner_pid" 2>/dev/null
+}
+
+wait_for_codex_account_switch_idle() {
+  local project="$1"
+  local timeout_secs="${FREELY_ACCOUNT_SWITCH_WAIT_SECS:-60}"
+  local interval_secs="${FREELY_ACCOUNT_SWITCH_WAIT_INTERVAL_SECS:-1}"
+  local start_ts now owner_pid waiting_logged=0
+  [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=60
+  [[ "$interval_secs" =~ ^[0-9]+$ ]] || interval_secs=1
+  start_ts="$(date +%s)"
+
+  while codex_account_switch_in_progress; do
+    if [[ "$waiting_logged" == "0" ]]; then
+      owner_pid="$(codex_account_switch_lock_owner_pid)"
+      log_warn "codex account switch is already in progress (owner_pid=${owner_pid:-unknown}); waiting before watchdog probe/relaunch"
+      waiting_logged=1
+    fi
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout_secs )); then
+      log_warn "timed out waiting for codex account switch to finish before watchdog recovery"
+      return 1
+    fi
+    sleep "$interval_secs"
+  done
+
+  return 0
+}
+
+codex_account_switch_probe_lock_acquire() {
+  local reason="${1:-watchdog_probe}"
+  local timeout_secs="${AI_CLI_SWITCH_LOCK_WAIT_SECS:-60}"
+  local lock_dir state_file start_ts now owner_pid inherited_owner_pid
+  lock_dir="$(codex_account_switch_lock_dir)"
+  state_file="$(codex_account_switch_lock_state_file)"
+  inherited_owner_pid="${AI_CLI_SWITCH_LOCK_OWNER_PID:-}"
+  [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=60
+  mkdir -p "$(dirname "$lock_dir")"
+  start_ts="$(date +%s)"
+
+  while true; do
+    codex_account_switch_lock_cleanup_if_stale
+    if mkdir "$lock_dir" 2>/dev/null; then
+      cat >"$state_file" <<EOF
+owner_pid=$$
+started_at=$(date +%s)
+reason=$reason
+command=probe
+target=codex-exec
+EOF
+      export AI_CLI_SWITCH_LOCK_OWNER_PID="$$"
+      return 0
+    fi
+
+    owner_pid="$(codex_account_switch_lock_owner_pid)"
+    if [[ -n "$owner_pid" && ( "$owner_pid" == "$$" || ( -n "$inherited_owner_pid" && "$owner_pid" == "$inherited_owner_pid" ) ) ]]; then
+      export AI_CLI_SWITCH_LOCK_OWNER_PID="$owner_pid"
+      return 0
+    fi
+
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout_secs )); then
+      log_warn "timed out waiting to serialize watchdog codex probe behind account switch activity"
+      return 1
+    fi
+    sleep 1
+  done
+}
+
+codex_account_switch_probe_lock_release() {
+  local lock_dir owner_pid inherited_owner_pid
+  lock_dir="$(codex_account_switch_lock_dir)"
+  [[ -d "$lock_dir" ]] || return 0
+  owner_pid="$(codex_account_switch_lock_owner_pid)"
+  inherited_owner_pid="${AI_CLI_SWITCH_LOCK_OWNER_PID:-}"
+  if [[ -z "$owner_pid" || "$owner_pid" == "$$" ]]; then
+    rm -rf "$lock_dir"
+  elif [[ -n "$inherited_owner_pid" && "$owner_pid" == "$inherited_owner_pid" && "$$" == "$inherited_owner_pid" ]]; then
+    rm -rf "$lock_dir"
+  fi
+}
+
 # Parse various time formats from codex output
 # Supported formats:
 #   - "Mar 23rd, 2026 3:51 PM" (full date)
@@ -63,14 +180,25 @@ extract_try_again_time_from_output() {
 
 codex_current_account() {
   local project="$1" ai_bin output
+  wait_for_codex_account_switch_idle "$project" || return 1
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" ]] || return 0
   output="$("$ai_bin" --quiet --format json whoami codex 2>/dev/null || true)"
   printf '%s\n' "$output" | sed -n 's/.*"account": *"\([^"]*\)".*/\1/p' | tail -n 1
 }
 
+codex_current_slot() {
+  local project="$1" ai_bin output
+  wait_for_codex_account_switch_idle "$project" || return 1
+  ai_bin="$(ai_cli_bin_for_project "$project")"
+  [[ -x "$ai_bin" ]] || return 0
+  output="$("$ai_bin" --quiet --format json whoami codex 2>/dev/null || true)"
+  printf '%s\n' "$output" | sed -n 's/.*"slot": *"\([^"]*\)".*/\1/p' | tail -n 1
+}
+
 codex_saved_accounts() {
   local project="$1" ai_bin output
+  wait_for_codex_account_switch_idle "$project" || return 1
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" ]] || return 0
   output="$("$ai_bin" --quiet --format json list 2>/dev/null || true)"
@@ -221,7 +349,10 @@ select_earliest_reset_codex_account_any() {
 #   0 for usable or rate limited
 #   1 for other probe failures
 codex_probe_current_account_now() {
-  local project="$1" prompt_file output_file rc timeout_secs="${CODEX_PROBE_TIMEOUT:-15}"
+  local project="$1" prompt_file output_file rc timeout_secs="${CODEX_PROBE_TIMEOUT:-15}" probe_lock_held=0
+  wait_for_codex_account_switch_idle "$project" || return 1
+  codex_account_switch_probe_lock_acquire "watchdog_probe_current_account" || return 1
+  probe_lock_held=1
   prompt_file="$(mktemp)"
   output_file="$(mktemp)"
   printf 'hi\n' >"$prompt_file"
@@ -269,6 +400,9 @@ codex_probe_current_account_now() {
     kill "$pid" 2>/dev/null
     wait "$pid" 2>/dev/null
     rm -f "$prompt_file" "$output_file"
+    if [[ "$probe_lock_held" == "1" ]]; then
+      codex_account_switch_probe_lock_release
+    fi
     printf 'timeout\n'
     return 0
   fi
@@ -279,6 +413,9 @@ codex_probe_current_account_now() {
   local output
   output="$(cat "$output_file")"
   rm -f "$output_file"
+  if [[ "$probe_lock_held" == "1" ]]; then
+    codex_account_switch_probe_lock_release
+  fi
 
   # Strip ANSI escape codes for reliable grep matching
   # Handle various escape sequences: ESC[...m, ESC]...BEL, ESC[?...h/l, etc.
@@ -447,14 +584,18 @@ probe_all_codex_accounts_and_update_cooldown() {
 
 switch_to_codex_account() {
   local project="$1" account="$2" reason="$3"
-  local ai_bin output actual_account requested_normalized actual_normalized
+  local ai_bin output actual_account actual_slot requested_normalized actual_slot_normalized actual_account_normalized
+  wait_for_codex_account_switch_idle "$project" || return 1
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" && -n "$account" ]] || return 1
   output="$("$ai_bin" --quiet --format json switch codex "$account" --yes 2>/dev/null || true)"
   requested_normalized="$(normalize_codex_account_name "$account")"
   actual_account="$(codex_current_account "$project")"
-  actual_normalized="$(normalize_codex_account_name "$actual_account")"
-  if printf '%s\n' "$output" | grep -qE '"switched": *true' && [[ -n "$actual_account" && "$actual_normalized" == "$requested_normalized" ]]; then
+  actual_slot="$(codex_current_slot "$project")"
+  actual_slot_normalized="$(normalize_codex_account_name "$actual_slot")"
+  actual_account_normalized="$(normalize_codex_account_name "$actual_account")"
+  if printf '%s\n' "$output" | grep -qE '"switched": *true' && \
+    { [[ -n "$actual_slot" && "$actual_slot_normalized" == "$requested_normalized" ]] || [[ -n "$actual_account" && "$actual_account_normalized" == "$requested_normalized" ]]; }; then
     # Only log if not a probe operation (probe logs are handled by caller)
     if [[ "$reason" != probe_all_accounts ]]; then
       log_warn "auto-switched codex account to $account (reason=$reason)" >&2
@@ -482,6 +623,7 @@ ensure_codex_account_ready_for_manager() {
   local current_account available_account probed_account earliest_info earliest_account earliest_reset wait_seconds wait_buffer
   local post_wait_probe_result post_wait_status post_wait_account post_wait_reset
 
+  wait_for_codex_account_switch_idle "$project" || return 1
   current_account="$(codex_current_account "$project")"
   if [[ -n "$current_account" ]] && codex_account_is_available_now "$project" "$current_account"; then
     return 0

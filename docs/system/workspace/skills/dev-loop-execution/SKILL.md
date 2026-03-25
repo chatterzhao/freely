@@ -11,13 +11,14 @@ description: 执行 milestone-owned ready issue 的 AI-native 实现、测试与
 - 在正确 worktree 中实现、测试并回写状态。
 - `dev-loop` 中的“实现”不限于传统代码；也可以是 agent、skill、runtime script、hook、reference 或其他能力产物，只要它们属于已收敛 issue 的交付实现。
 - 让 `progress` 只承载 dev-loop 的执行态。
-- dev-loop 在整个三层循环中的归宿、owner 边界与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`。
+- dev-loop 在整个三个 loop 中的归宿、owner 边界与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`。
 
 ## 不负责
 
 - 不重新发明 issue 边界。
 - 不把边界外新问题伪装成当前 issue 的实现细节。
 - 不承担 pre-brainstorm / IBM 主工作。
+- 不自己宣布 terminal completion、cleanup 或 retirement。
 
 ## 情景步骤
 
@@ -31,7 +32,7 @@ description: 执行 milestone-owned ready issue 的 AI-native 实现、测试与
    - 独立 issue -> 通常基于 `develop`
    - 依赖父分支 -> 基于 `execution_base`
 5. 在当前 dedicated worktree 中实现变更。
-6. 持续补齐测试与 code-review 证据。
+6. 持续补齐测试、verification evidence 与 code-review 证据。
 
 ### 情景 B：回写执行进度
 
@@ -78,5 +79,6 @@ description: 执行 milestone-owned ready issue 的 AI-native 实现、测试与
 
 ## 完成判定
 
-- 代码、测试、issue、milestone、progress 已一致。
+- 当前 dev-loop 产物、测试、issue、milestone、progress 已一致，并已把 evidence 交回外层判断。
 - 若有依赖父分支，已明确后续 restack / promote 要求。
+- terminal completion / cleanup / retirement 仍由 `auto-loop` 判定。

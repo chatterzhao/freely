@@ -55,7 +55,7 @@ description: 在 manager routing 之前，先把 signal 想推进什么、是否
 - 先 `analysis` 再 `execution`
 - 决定 restart point 与 canonical absorption target
 
-## 三层职责边界
+## 三个 loop 下的职责边界
 
 ### manager
 
@@ -118,7 +118,7 @@ signal:
 - 不要把未来场景全部提前枚举成类型表
 - 不要替主管直接拍板最终 restart point
 - 不要把 execution worker 变成“先分析再决定”的混合角色
-- 不要把这层做成另一套与三层循环脱节的新系统
+- 不要把这层做成另一套与三个 loop 脱节的新系统
 
 ## 完成标志
 

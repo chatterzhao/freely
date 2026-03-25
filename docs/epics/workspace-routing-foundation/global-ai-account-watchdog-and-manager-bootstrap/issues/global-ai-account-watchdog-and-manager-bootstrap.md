@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- phase_state: `in_progress`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-ai-account-watchdog-and-manager-bootstrap`
@@ -82,14 +82,30 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
   - `watchdog-control-plane` 与 `ai-cli-availability-manager` 已把 availability watchdog 定义成可复用 skill 层；`runtime/freely` 现通过 `source "$WATCHDOG_AVAILABILITY_LIB"` 复用同一套 account cooldown / probe / switch / ensure-manager readiness 逻辑
   - `test-watchdog-control-plane-skills` 已覆盖 watchdog skill 是否被 runtime 与 agent 角色正式接线
   - `freely ensure-manager` 当前在 watchdog 拉起主管前，会写 manager bootstrap handoff，告知 limit/切号/恢复原因及主管优先检查面
+  - 2026-03-24 continuation 新增 shared account-switch serialization：
+    - 手工或自动 `freely ai switch codex` sweep 期间会持有全局 switch lock，而不是边切边让 watchdog 误 probe/误 bootstrap
+    - `ensure-manager` / availability watchdog 在 probe、切号、manager bootstrap 前会先等待现有 switch sweep 完成，避免 transient unauthorized / unavailable 账号被误当成新的恢复信号
+    - `test-freely-ai-account-switch-serialization` 覆盖 auto-probe sweep 全程持锁
+    - `test-freely-ensure-manager-defers-during-account-switch` 覆盖 switch lock 活跃时 watchdog 延迟 probe/bootstrap，待切号结束后再恢复
+  - 2026-03-24 continuation 又补齐 switch sweep 期间的剩余 race：
+    - `ensure_manager_once()` 先前仍可能在 wait 之前触发 `whoami`
+    - `codex_saved_accounts()` / `whoami` / `list` 读路径现在也会等待正在进行中的 switch sweep
+    - `codex_probe_current_account_now()` 现在会持有同一把 shared switch lock 覆盖整个 `codex exec` probe，避免 wait-return 后被新的手工 sweep 插入
+    - `test-freely-codex-probe-defers-during-account-switch` 覆盖 watchdog probe 自身的 defer + serialization
   - 2026-03-23 当前 verification batch 在 dedicated feature worktree 中直接完成，无需引入 `pre-test-merge` 或提前要求 `post-merge acceptance`：
     - `freely ensure-manager --project <tmp-project>` 直接命令验证通过，确认 watchdog 会先切到可用账号，再发起 manager bootstrap
     - `freely start --project <tmp-project>` 最小 rate-limit 场景可直接写出 `LAST_ACCOUNT_SWITCH_REASON="primary_rate_limit_exhausted"`，证明 runtime 仍把恢复理由写回 watchdog 接管面
-    - `test-freely-rate-limit-defers-to-watchdog` 曾出现一次 3 秒边界失败，但随后单独复现与连续重跑均通过；当前判断为时间阈值边界上的 flaky，而非稳定功能回归
+  - `test-freely-rate-limit-defers-to-watchdog` 曾出现一次 3 秒边界失败，但随后单独复现与连续重跑均通过；当前判断为时间阈值边界上的 flaky，而非稳定功能回归
+  - 2026-03-24 verification continuation 又暴露出两处收口缺口，并已在当前 worktree 继续修补：
+    - `test-freely-rate-limit-defers-to-watchdog` 使用整秒计时，仍会偶发把 `<4s` 的正常退出误判成“本地睡眠”；当前已改成 monotonic 毫秒阈值，避免秒边界抖动
+    - `ensure-manager` / earliest-reset 回归此前没有直接断言 manager bootstrap handoff artifact；当前已把 trigger/account/reason/next_action 写入测试验收面
   - 2026-03-23 晚间狗粮 continuation 暴露出一条实现缺口：
     - `all_accounts_cooling_down -> earliest reset -> sleep` 路径没有显式 `reset_at + buffer`
     - wait 结束后没有重新 probe 所有 saved accounts 再决定 relaunch
     - `ensure-manager --watch` 会因为单轮 readiness pass 失败而退出控制面，现场留下 stale `ensure-manager.pid`
+  - 2026-03-24 continuation writeback 已把 canonical 状态重新对齐到当前 feature worktree：
+    - issue / milestone / progress / code-review 现统一表达为“continuation batch 已实现并处于 `in_verification`”
+    - 当前批次不再沿用“verified-retirable”或“仍待提交”旧结论
   - `test-freely-global-account-watchdog-live` 已真实通过：
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
@@ -97,15 +113,14 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 ## Next
 
-- 当前 continuation batch 聚焦把 earliest-reset wait / wakeup contract 从“设计存在”补到“真实狗粮稳定可用”：
+- 当前 continuation batch 已完成最小实现与 feature-worktree 验证，当前保持 `in_verification`，等待 manager merge review。
+- 当前 continuation batch 已补上 verification drift：稳定化 `rate-limit` 用例计时，并把 manager bootstrap handoff 契约收进 focused tests；本轮完成后继续保持 `in_verification`，等待 manager merge review。
+- 当前批次交付的 continuation contract：
   - wait 采用 `reset_at + buffer`
   - wait 期间周期性真实 probe saved accounts 是否已变得可工作
   - wait 结束后重新 probe/select，再拉起 manager
   - `ensure-manager --watch` 单轮失败后继续留在控制面重试
   - stale `ensure-manager.pid` 在 watchdog 下次启动时会被覆盖，并在 watchdog 退出时清理
-- 当前 watchdog 已作为 Freely 正式能力落地：CLI 入口、runtime orchestration、availability watchdog skill 模块与角色/测试接线均已存在。
-- 当前 feature worktree `feature/codex-account-cooldown-active-probe` 承接的是同一 issue 的 verification batch，不再单独 materialize 新 issue；该 batch 已 replay 到 `develop` 并通过 post-merge acceptance，后续若继续扩 outer watchdog/productization，需新开 dedicated feature worktree。
-- 当前 batch 的下一步是：
-  - replay 到 `develop`
-  - 若 `develop` 真实环境再暴露新问题，则新开 dedicated feature worktree 承接，而不是在 protected worktree 直接修实现
-- 后续若继续演进，应聚焦更外层 target registry / independent daemon 产品化，而不是回退到“watchdog 只等于切号器”的旧模型。
+- 下一步：
+  - 由 manager 复核当前 feature worktree 的 doc/code/test 证据并决定是否 promote
+  - 若 `develop` 真实环境再暴露新的 outer-watchdog/productization 缺口，再从同一 issue 新开 dedicated continuation lane，而不是回退到 protected worktree 直接修实现

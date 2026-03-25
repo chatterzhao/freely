@@ -75,6 +75,71 @@
 - 也没告诉它“下一跳是谁负责”
 - 更没告诉它“这类事件属于哪层 loop、走哪条分支、何时回流”
 
+## 2026-03-24 Continuation: 不是“三层”，而是“三个 loop”
+
+本轮继续研究发现，当前不只是地图不够全，还存在一个更基础的表述漂移：
+
+1. “三层循环”这个中文说法很容易把 `doc-loop` 和 `dev-loop` 听成被 `auto-loop` 包含的内层。
+2. `PROJECT_INTENT`、部分 pre-brainstorm、以及若干 issue / verification 文档里出现了 `outer / inner`、`三层`、`层级` 之类的口径，会进一步强化这种误读。
+3. 一旦 AI 读成“包含关系”，就更容易继续犯这些错：
+   - 把 `doc-loop` 当成 `dev-loop` 的上游父层，而不是并列 sibling loop
+   - 把 verification / writeback / cleanup 误说成第四层，或误挂到错误 loop
+   - 把某个局部 loop 的跳出误判成整个主题已完成
+
+当前需要冻结的更正是：
+
+- 应称为“**三个 loop**”，不是“**三层**”。
+- `auto-loop` 是外层编排 / patrol / routing / governance loop。
+- `doc-loop` 与 `dev-loop` 是两个并列执行 loop，不是上下包含关系。
+- `completion verification`、`recovery`、`cleanup governance` 是 `auto-loop` 负责路由和收口的阶段/路径，不是新增 loop，也不是 `doc/dev` 的子层。
+- 某个 loop 的一次内循环跳出，只代表这一轮要回交给 `auto-loop` 重判；不代表主题已经终止。
+- 只有当 `auto-loop` 观察到：
+  - 当前 issue lifecycle 已闭合
+  - 必要 testing closeout 已完成
+  - worktree / branch lifecycle 已进入 `retired`
+  - 且没有待续接的 canonical owner
+  才能判当前主题从 active lifecycle 退出。
+
+## 2026-03-24 Continuation: 改动范围与 owner 收敛
+
+这次改动面很大，不能直接全仓替换 `三层` / `inner` / `outer`。
+
+初步词面审计结果：
+
+- `rg -l "三层|three-loop|Three-Loop|three loop|three loops|doc-loop|dev-loop|auto-loop" docs AGENTS.md`
+- 当前命中约 `221` 个文件
+- 其中同时混有：
+  - 产品真源
+  - 当前仍 active 的 pre-brainstorm / issue / pre-tests / code review
+  - 已吸收的历史研究、历史验证与旧日志说明
+
+因此这次不能做“全仓统一替换”；必须先区分“仍会影响当前自治判断的真相面”与“只保留历史语境的证据面”。
+
+先按三类分层：
+
+1. 必须改的 active truth
+- `docs/PROJECT_INTENT.md`
+- `docs/system/workspace/three-loop-capability-lifecycle.md`
+- 当前仍 active 的 pre-brainstorm / candidate / issue / pre-tests / skill 真源
+- 这些地方若继续保留“层级/包含关系”暗示，会直接误导后续自治
+
+2. 应同步改的 active lifecycle 文档
+- 当前 milestone 仍在跟踪的 candidate
+- 当前 issue family 的 IBM / PRD / pre-tests / code review
+- 这些地方不一定都要大改图，但至少要与新的 sibling-loop 口径一致
+
+3. 历史证据面
+- 已关闭/已吸收的老 brainstorm、老 code review、历史日志说明
+- 原则上不做全量词面清洗
+- 只有当它们仍在被当作现行真相引用时，才补必要澄清
+
+owner 上也要先收清：
+
+- 这条“地图补全 + 三个 loop 关系纠偏”不应再开并行 milestone owner。
+- 当前最合适的 milestone owner 仍是 `C-20260319-1105-A`。
+- `20260323-0241` 继续作为该 owner 下的 active continuation 研究面，承接“地图补全、事件链、sibling-loop 关系和 terminal 语义”这些更细的收敛。
+- 在 milestone 未明确吸收前，不应直接把这条 continuation 当成独立待 materialize 主线。
+
 ## Proposed Model
 
 ### 1. 三层 loop 必须升级为全应用事件地图

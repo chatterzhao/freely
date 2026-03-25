@@ -15,7 +15,7 @@ cat >"$with_issue_chat" <<'EOF'
 EOF
 
 cat >"$no_issue_chat" <<'EOF'
-我只是想到一个新问题：human chat 输入如何进入第二层工具编排？这个还没有现成 issue，先帮我研究和收敛。
+我只是想到一个新问题：human chat 输入如何进入 auto-loop 首段编排，并正确路由到 doc-loop 或 dev-loop？这个还没有现成 issue，先帮我研究和收敛。
 EOF
 
 cat >"$with_issue_milestone" <<'EOF'
@@ -42,23 +42,27 @@ prompt_with_issue="$(
   bash "$ROOT_DIR/docs/system/workspace/scripts/compose-context-source-prompt.sh" \
     --project "$ROOT_DIR" \
     --source-input-file "$with_issue_chat" \
-    --milestone "$with_issue_milestone"
+    --milestone "$with_issue_milestone" \
+    2>"$TMP_DIR/with-issue.stderr"
 )"
 
 prompt_no_issue="$(
   bash "$ROOT_DIR/docs/system/workspace/scripts/compose-context-source-prompt.sh" \
     --project "$ROOT_DIR" \
     --source-input-file "$no_issue_chat" \
-    --milestone "$no_issue_milestone"
+    --milestone "$no_issue_milestone" \
+    2>"$TMP_DIR/no-issue.stderr"
 )"
 
 printf '%s\n' "$prompt_with_issue" | grep -q "$with_issue_chat"
 printf '%s\n' "$prompt_with_issue" | grep -q 'workspace/skills/doc-ibm-execution/SKILL.md'
 printf '%s\n' "$prompt_with_issue" | grep -q 'issue-bound 文档收敛'
 printf '%s\n' "$prompt_with_issue" | grep -q 'workspace/skills/dev-loop-execution/SKILL.md'
+test ! -s "$TMP_DIR/with-issue.stderr"
 
 printf '%s\n' "$prompt_no_issue" | grep -q "$no_issue_chat"
 printf '%s\n' "$prompt_no_issue" | grep -q 'workspace/skills/doc-pre-brainstorm-execution/SKILL.md'
 printf '%s\n' "$prompt_no_issue" | grep -q '不要把路由理解成脚本硬编码分支'
+test ! -s "$TMP_DIR/no-issue.stderr"
 
 echo "[PASS] human chat routing prompt assembly scenarios are connected"

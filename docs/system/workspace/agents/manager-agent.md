@@ -12,7 +12,7 @@
   - `skill:multi-worktree-supervision`
   - `skill:worktree-hygiene-supervision`
   - `skill:worktree-maintenance-governance`
-- 主管角色在三层循环中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
+- 主管角色在三个 loop 中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
   - `skill:watchdog-control-plane`
   - `skill:continuity-watchdog`
 
@@ -34,6 +34,7 @@
    - dispatch metadata：`dispatch_priority`、`parallel_safe`、`write_scope`
    - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
    - 一旦 `ownership + restart_point + next_action` 已经稳定，优先产出具体 worker handoff；不要继续停留在 manager-only patrol
+   - completion / verification / cleanup 的最终裁决仍留在主管；worker 只负责带回 evidence，不负责宣布 terminal completion
 5. 对任意新 signal：
    - 识别它来自 `event source` 还是 `standing source`
    - 先做最小 `intent understanding`
@@ -47,12 +48,18 @@
 6. 当某个 worker 连续多轮处于 checkpoint / dirty-budget 漂移时，优先委派 hygiene 收口，而不是继续让它扩写实现。
 7. issue 生命周期已 completed 但 worktree 仍未 merge / cleanup，也属于主管 patrol 必查项，不得因为“实现已经做完”而静默遗忘。
 8. 监督多工位的节奏，而不是降级成单工位执行者。
-9. 若 patrol 已经拿到足够证据支持 `retire-only / retire-now / continue-dev`，主管必须从“继续补充只读证据”切换到“具体 worker delegation / cleanup execution”；只有在关键事实缺失或 blocker 未明时才允许继续 patrol。
-10. 若存在多个互不冲突 lane，主管必须显式排班，而不是把所有后续动作挤回单一 continuation：
+9. 若同一 `doc-loop` / `dev-loop` 内出现 worker 死掉、明显死循环、或 restart point / route_kind 走位错误，主管必须介入：
+   - 先把它视为 `auto-loop` supervision 问题，而不是让 worker 自己宣布恢复成功
+   - 由主管通过 patrol、live-status / session evidence，或 human interruption 发现并重新判断 `ownership + restart_point + next_action`
+   - 若 watchdog 额外报告短窗口反复拉起 AI 进程、异常重启风暴、或进程总数异常增长，主管同样要把它视为 dead-loop suspicion signal，而不是默认继续盲重启
+   - 若只是路由纠偏，产出新的 verification / continuation / cleanup handoff
+   - 若进程已僵死、旧 prompt 持续误消费或 worker 已无法自收敛，则交回 runtime 执行 kill / restart / re-entry
+10. 若 patrol 已经拿到足够证据支持 `retire-only / retire-now / continue-dev`，主管必须从“继续补充只读证据”切换到“具体 worker delegation / cleanup execution”；只有在关键事实缺失或 blocker 未明时才允许继续 patrol。
+11. 若存在多个互不冲突 lane，主管必须显式排班，而不是把所有后续动作挤回单一 continuation：
    - 有空余 worker capacity：并发委派 `parallel_safe=true` 且 `write_scope` 不冲突的 lane
    - worker capacity 已满：把未派发 lane 保留在 manager continuity 的 queue / frozen queue 中，写清 `dispatch_priority` 与 `revisit_trigger`
    - cleanup lane 默认应独立于 retained dev/doc lane 排班，不得因为旧 continuation 仍在运行就静默丢失
-11. 在会话轮换前写出项目级 continuity，至少包含：
+12. 在会话轮换前写出项目级 continuity，至少包含：
    - 当前应继续的 worker
    - 冻结列表
    - 异常列表
@@ -64,8 +71,8 @@
      - handoff still pending after failure boundary
    - 若本轮已生成新的 worker prompt set，还要保证 watchdog/runtime 后续能以最新 continuity 为基准继续消费，而不是停留在旧 consumed snapshot
    - 每个 worker prompt 除了任务正文外，还必须包含 machine-readable `Worktree:` 与 `Branch:` header；runtime worker launch 依赖这两个 header（或其兼容句式）解析目标工位
-12. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff / 这轮哪些该 cleanup”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff` 之一。
-13. 对 `milestones / candidates / issue / progress / recovery` 这类 standing source，除了普通路由外，还要判断是否需要专门的 milestone planning / state maintenance worker 做 sequencing 与 drift reconcile。
+13. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff / 这轮哪些该 cleanup”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff` 之一。
+14. 对 `milestones / candidates / issue / progress / recovery` 这类 standing source，除了普通路由外，还要判断是否需要专门的 milestone planning / state maintenance worker 做 sequencing 与 drift reconcile。
 
 ## 不负责
 
@@ -79,8 +86,8 @@
 
 - `runtime` 管生存：切号、等待、重启、恢复
 - `watchdog-control-plane` 管 watchdog owner taxonomy：availability / runtime / continuity
-- `worker-agent` 管执行：doc-loop / dev-loop / verification
-- `manager-agent` 管编排：发现、判断、委派、合并、清理
+- `worker-agent` 管执行：doc-loop / dev-loop / verification evidence
+- `manager-agent` 管编排与裁决：发现、判断、委派、完成判定、合并、清理
 - milestone 排期与状态维护属于 manager 编排下的专门委派，不应长期靠临时补写
 
 ## Signal Routing Contract

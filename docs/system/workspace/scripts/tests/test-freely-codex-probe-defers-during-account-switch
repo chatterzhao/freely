@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-codex-probe-defer-switch.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+LOCK_DIR="$TMP_DIR/account-switch.lock"
+CODEX_LOG="$TMP_DIR/codex.log"
+mkdir -p "$PROJECT/.freely/run" "$LOCK_DIR"
+
+cat >"$TMP_DIR/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >>"${CODEX_LOG:?}"
+printf 'hi\n'
+EOF
+chmod +x "$TMP_DIR/codex"
+
+sleep 4 &
+lock_pid=$!
+cat >"$LOCK_DIR/state.env" <<EOF
+owner_pid=$lock_pid
+started_at=$(date +%s)
+reason=manual_switch_sweep
+command=switch
+target=auto
+EOF
+
+HOME="$TMP_DIR/home" \
+PATH="$TMP_DIR:$PATH" \
+PROJECT_ROOT="$PROJECT" \
+AI_CLI_SWITCH_LOCK_DIR="$LOCK_DIR" \
+CODEX_LOG="$CODEX_LOG" \
+bash -lc '
+  set -euo pipefail
+  log_warn(){ :; }
+  log_error(){ :; }
+  seconds_until_epoch(){ printf "0\n"; }
+  ai_cli_bin_for_project(){ printf "%s\n" "'"$ROOT_DIR"'/bin/ai"; }
+  source "'"$ROOT_DIR"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  codex_probe_current_account_now "'"$PROJECT"'" >/dev/null
+' &
+
+probe_pid=$!
+sleep 1
+
+if [[ -s "$CODEX_LOG" ]]; then
+  echo "[FAIL] expected watchdog codex probe to defer execution while account switch lock is active" >&2
+  exit 1
+fi
+
+wait "$probe_pid"
+
+grep -q -- '--skip-git-repo-check' "$CODEX_LOG"
+[[ ! -d "$LOCK_DIR" ]]
+
+echo "[PASS] watchdog codex probe waits for an in-progress account switch sweep and serializes the probe itself"

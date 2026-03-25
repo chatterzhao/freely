@@ -42,7 +42,7 @@ done
 [[ -f "$source_input_file" ]] || { echo "[ERROR] source input file not found: $source_input_file" >&2; exit 1; }
 
 cat <<EOF
-你现在在 Freely 的第二层 auto-loop 编排阶段。
+你现在在 Freely 的 \`auto-loop\` 首段编排阶段。
 
 请阅读：
 - source input：$source_input_file
@@ -67,5 +67,6 @@ cat <<EOF
    - 先判断当前是 issue-bound 文档收敛，还是 ready/in-progress 的实现延续
    - 文档收敛时阅读 workspace/skills/doc-ibm-execution/SKILL.md
    - 实现延续时阅读 workspace/skills/dev-loop-execution/SKILL.md
+   - 若当前事项已收敛为 manager-owned 的 \`completion_verification\` / \`cleanup_governance\`，不要伪装成新的 doc-loop / dev-loop
 7. 不要把路由理解成脚本硬编码分支；应由你基于输入和文档理解后决定。
 EOF
