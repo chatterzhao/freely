@@ -128,6 +128,23 @@ echo '{}'
 EOF
 chmod +x "$PROJECT/bin/ai"
 
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+state_file="${AI_SWITCH_STATE:?}"
+current_account="$(cat "$state_file")"
+
+if [[ "$current_account" == "worahe3971@outlook-com" ]]; then
+  echo "hi"
+  exit 0
+fi
+
+echo "warming up"
+exit 1
+EOF
+chmod +x "$MOCK_BIN/codex"
+
 cat >"$MOCK_BIN/launch-freely" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -154,10 +171,10 @@ grep -q 'worahe3971@outlook-com' "$AI_STATE"
 HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
 [[ -f "$HANDOFF_FILE" ]]
 grep -q '^## Manager Bootstrap Recovery$' "$HANDOFF_FILE"
-grep -q '^- trigger: slot_unavailable$' "$HANDOFF_FILE"
+grep -q '^- trigger: stale_or_missing_cooldown_probe$' "$HANDOFF_FILE"
 grep -q '^- previous_slot: worahe3973@outlook-com$' "$HANDOFF_FILE"
 grep -q '^- active_slot: worahe3971@outlook-com$' "$HANDOFF_FILE"
-grep -q '^- reason: watchdog_switched_to_available_slot$' "$HANDOFF_FILE"
+grep -q '^- reason: watchdog_probed_and_found_usable_slot$' "$HANDOFF_FILE"
 grep -q '^- next_action: inspect-fleet-and-recover-workers$' "$HANDOFF_FILE"
 
-echo "[PASS] freely ensure-manager switches to an available codex slot before bootstrapping manager"
+echo "[PASS] freely ensure-manager probes saved slots and promotes a truly usable codex slot before bootstrapping manager"

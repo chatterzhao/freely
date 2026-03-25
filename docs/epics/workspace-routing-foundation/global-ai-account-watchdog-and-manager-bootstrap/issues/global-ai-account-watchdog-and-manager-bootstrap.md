@@ -53,6 +53,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 - `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/*`
 - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/tasks.md`
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
@@ -122,6 +123,17 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
   - 2026-03-25 review continuation 又补上两处边界：
     - `ensure_manager_once()` 的 idle-manager unavailable branch 现也改为按 slot cooldown identity 判断，避免 manager AI 已退场时仍用 account key 误判“当前账号可用”
     - 当 `whoami.slot` 临时缺失时，cooldown identity 会回退到 `~/.codex/active-slot`，避免 textual/structured rate-limit 退出把 cooldown 记录直接丢失
+  - 2026-03-25 pre-brainstorm 收口又冻结了一条更上层的 contract rewrite：
+    - 这次边界变化不再被视为“把 cooldown 账本记准一点”，而是要把 cooldown 从主恢复决策中降级出去
+    - `rate limit`、`deactivated_workspace`、auth failure / invalid auth file、slot probe failure，都应统一进入 failure-driven full slot sweep
+    - 真实 probe 成功前，不允许把某个 slot 的授权文件切进真实 Codex 工作位；否则无效授权会直接阻塞正在执行的 `codex exec`
+    - `all slots unavailable` 时允许保留 earliest-reset 作为 debug / 排序提示，但恢复主路径应基于低频真实 reprobe，而不是继续以 cooldown ledger 为控制面真相
+    - 该结论来自 `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/*`，并已明确判定为同族 supporting evidence，由本 issue 吸收，不新开平行 issue
+  - 2026-03-25 当前 continuation 已把上述 contract 写入能力真源并通过 focused verification：
+    - `availability-watchdog.sh` 的 `ensure_codex_slot_ready_for_manager()` 现改为 current-slot probe + full saved-slot sweep；不再先信 cooldown ledger 再决定 manager bootstrap
+    - `probe_all_codex_slots_and_update_cooldown()` sweep 失败时会恢复原 auth / active-slot，避免把最后一个失败 slot 留在真实 Codex 工作位；返回 usable 结果前会把 active slot 对齐回该 usable slot
+    - `freely ai switch codex` 自动模式只会切到真实 probe 成功的 usable slot；`all_unavailable` 仅返回 debug hint，不再切 earliest-reset slot
+    - `test-freely-ai-account-switch`、`test-freely-ensure-manager`、`test-freely-ensure-manager-earliest-reset-wait-revive` 已重写并通过，当前 focused acceptance 已对齐 slot-sweep-first recovery
   - `test-freely-global-account-watchdog-live` 已真实通过：
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
@@ -129,8 +141,9 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 ## Next
 
-- 当前 continuation batch 已完成最小实现与 feature-worktree 验证，当前保持 `in_verification`，等待 manager merge review。
+- 当前 continuation batch 已完成 slot-sweep-first contract 的最小实现与 feature-worktree focused 验证，当前保持 `in_verification`，等待 manager merge review。
 - 当前 continuation batch 已补上 verification drift：稳定化 `rate-limit` 用例计时，并把 manager bootstrap handoff 契约收进 focused tests；本轮完成后继续保持 `in_verification`，等待 manager merge review。
+- 同族 pre-brainstorm 已把恢复 contract 进一步收紧为 `failure-driven full slot sweep`，而本轮 continuation 已把这条 contract 的最小主路径真正写回能力真源。下一轮不再是重做 contract 改写，而是继续做 code review / merge judgement / develop replay。
 - 当前批次交付的 continuation contract：
   - wait 采用 `reset_at + buffer`
   - wait 期间周期性真实 probe saved accounts 是否已变得可工作
@@ -138,5 +151,6 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
   - `ensure-manager --watch` 单轮失败后继续留在控制面重试
   - stale `ensure-manager.pid` 在 watchdog 下次启动时会被覆盖，并在 watchdog 退出时清理
 - 下一步：
-  - 由 manager 复核当前 feature worktree 的 doc/code/test 证据并决定是否 promote
-  - 若 `develop` 真实环境再暴露新的 outer-watchdog/productization 缺口，再从同一 issue 新开 dedicated continuation lane，而不是回退到 protected worktree 直接修实现
+  - 先按新 pre-brainstorm 结论重写 watchdog contract：failure taxonomy、slot sweep 主路径、all-slots-unavailable 等待语义、以及 cooldown 的降级角色
+  - 再进入 dedicated dev-loop，把 runtime / watchdog / ai-cli / tests 从 cooldown-driven recovery 改到 slot-sweep-first recovery
+  - contract 改写与代码验证完成后，再由 manager 复核当前 feature worktree 的 doc/code/test 证据并决定是否 promote

@@ -13,3 +13,7 @@
 - [x] make `freely ai switch codex` reuse the same active probe / cooldown update contract as the watchdog path
 - [x] make `ensure-manager --watch` survive all-accounts-cooling waits, retry after failed readiness passes, and re-probe before relaunch
 - [x] serialize manual/auto account switch sweeps so watchdog probe/bootstrap waits for the shared switch lock instead of racing a transient bad account
+- [x] retire cooldown ledger from primary recovery decisions; keep it only as debug evidence or secondary ordering hint
+- [x] route `rate limit`, `deactivated_workspace`, auth failure / invalid auth file, and slot probe failure into one failure-driven full slot sweep path
+- [x] change the all-slots-unavailable path from cooldown-ledger-driven waiting to low-frequency real reprobe, with earliest-reset remaining non-authoritative
+- [x] update runtime / watchdog / ai-cli regressions and live acceptance so they assert slot-sweep-first recovery instead of cooldown-first recovery

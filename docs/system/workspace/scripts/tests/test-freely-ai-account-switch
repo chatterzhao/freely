@@ -152,17 +152,16 @@ PROJECT_ROOT="$PROJECT_EARLIEST" \
 PATH="$MOCK_BIN:$PATH" \
 MOCK_CODEX_SCENARIO="earliest" \
 MOCK_CODEX_LOG="$LOG_EARLIEST" \
-  bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/earliest.out"
+  bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/earliest.out" || true
 
-grep -q '"switched": true' "$TMP_DIR/earliest.out"
-grep -q '"account": "fast@example.com"' "$TMP_DIR/earliest.out"
-grep -q '"slot": "fast@example-com-1"' "$TMP_DIR/earliest.out"
-grep -q '"status": "rate_limited"' "$TMP_DIR/earliest.out"
-grep -q '"slot": "fast@example-com-1"' <(HOME="$HOME_EARLIEST" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
-grep -q 'fast@example.com' <(HOME="$HOME_EARLIEST" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
+grep -q '"switched": false' "$TMP_DIR/earliest.out"
+grep -q '"status": "all_unavailable"' "$TMP_DIR/earliest.out"
+grep -q '"earliest_slot": "fast@example-com-1"' "$TMP_DIR/earliest.out"
+grep -q '"slot": null' <(HOME="$HOME_EARLIEST" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
 grep -q '^slow@example-com-3[[:space:]]' "$PROJECT_EARLIEST/.freely/run/codex-slot-cooldowns.tsv"
 grep -q '^fast@example-com-1[[:space:]]' "$PROJECT_EARLIEST/.freely/run/codex-slot-cooldowns.tsv"
 grep -q 'earliest|slow@example.com|http://127.0.0.1:7890|http://127.0.0.1:7890' "$LOG_EARLIEST"
 grep -q 'earliest|fast@example.com|http://127.0.0.1:7890|http://127.0.0.1:7890' "$LOG_EARLIEST"
+grep -q 'old@example.com' <(current_codex_email "$HOME_EARLIEST/.codex/auth.json")
 
-echo "[PASS] freely ai switch codex falls back to the earliest reset account when all accounts are rate limited"
+echo "[PASS] freely ai switch codex refuses to switch when all slots are currently unavailable"
