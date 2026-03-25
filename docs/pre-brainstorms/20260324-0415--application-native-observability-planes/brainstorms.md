@@ -400,14 +400,16 @@ Freely self-host 当前 concrete profile 应作为 profile 示例，而不是通
 
 进入 materialization 前，至少还要把下面几件事收死：
 
-1. `acceptance evidence schema` 到底是只存在于 artifact plane，还是还要求 current-state / API 同步镜像关键结果。
-2. CLI/TUI/GUI/API 是否统一暴露同一组 deep ref，还是允许 richer surfaces 扩展但必须兼容最小 ref 组。
-3. 独立 acceptance review 需要确认这条线是新 upstream contract，而不是对 `live-status` 或 stall candidate 的重复建模。
+1. `acceptance evidence schema` 的 canonical truth 固定落在 artifact plane；current-state / fleet / API 只允许镜像最小摘要字段与 `acceptance_ref`，不得复制完整 acceptance payload。
+2. CLI/TUI/GUI/API 共享同一组最小 `deep ref groups`；richer surface 可以扩展 drill-down，但不得替换或重命名最小 ref 组。
+3. 独立 acceptance review 只需再确认这条线确实是新的 upstream contract，而不是对 `live-status` 或 stall candidate 的重复建模。
 
 已提前收口、暂不再作为 blocker 的边界：
 
 - `current-state plane` / `fleet plane` 默认继续承接现有 `live-status` / `fleet-status`；若后续要扩 richer product surfaces，应建立在 shared `status card minimum fields` 与 `deep ref groups` 之上，而不是另造平行 current-state surface。
 - 多 subagent 默认继续通过 lane/worktree surface 暴露活动痕迹与结果，不要求 day-1 backend 把每个 subagent 做成一等可观察实体。
+- `acceptance evidence schema` 的 canonical home 固定为 artifact plane；current-state / fleet / API 只镜像 `completion_state`、`delete_gate_state`、`acceptance_scope`、`acceptance_target` 与 `acceptance_ref` 这一最小摘要。
+- CLI / TUI / GUI / API 的最小 `deep ref groups` 固定为：`session_ref`、`stream_ref`、`artifact_ref`、`fleet_ref`、`acceptance_ref`；允许 richer surface 扩展，但不得删除或改名这些共享 ref 组。
 
 ## Coordination With Existing Lines
 

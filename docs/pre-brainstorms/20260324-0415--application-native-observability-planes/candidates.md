@@ -33,9 +33,9 @@
   - 冻结 `acceptance evidence` 如何同时回答 `issue completion` 与 `delete gate`，避免再次把 merge-ready 误当终态完成
   - 完成至少一轮独立 acceptance review，确认这条线是新的 upstream contract，而不是 `live-status` 或 stall candidate 的扩写
 - open_questions:
-  - `acceptance evidence schema` 是否只在 artifact plane 成为 canonical truth，还是还需 current-state/API 暴露关键摘要
-  - CLI/TUI/GUI/API 是否都必须暴露同一组 deep ref groups，还是 richer surface 可扩展但必须向下兼容最小 ref 组
-  - 当前 `current-state plane` / `fleet plane` 若继续由 `live-status` / `fleet-status` 承接，最小兼容字段是否只需在 shared `status card minimum fields` / `deep ref groups` 上补齐，而无需新建 parallel surface
+  - 独立 acceptance review 是否认可：`acceptance evidence schema` 的 canonical truth 固定落在 artifact plane，而 current-state/fleet/API 只镜像最小摘要与 `acceptance_ref`
+  - 独立 acceptance review 是否认可：CLI/TUI/GUI/API 共享同一组最小 `deep ref groups`，richer surface 只能扩展不能替换
+  - 当前 `current-state plane` / `fleet plane` 若继续由 `live-status` / `fleet-status` 承接，shared `status card minimum fields` / `deep ref groups` 是否已经足够支撑 IBM materialization
 - acceptance_reviews:
   - reviewer: `codex`
     mode: `author pre-materialization review`
@@ -45,13 +45,17 @@
     mode: `independent candidate acceptance review`
     summary: `This still stays at pre-brainstorm. The contract direction is valid, but the remaining IBM blockers are now narrow: canonical home and consumer contract for acceptance evidence schema, plus minimal CLI/TUI/GUI/API deep-ref compatibility rules. Existing live-status/fleet-status continue to carry current-state/fleet day-1, and subagents stay aggregated under lane/worktree/session surfaces rather than becoming first-class backend entities.`
     verdict: `stay_pre_brainstorm`
+  - reviewer: `codex + explorer focused follow-up review`
+    mode: `narrow blocker review`
+    summary: `Acceptance evidence should remain canonical in the artifact plane, with current-state/fleet/API mirroring only a minimal summary plus acceptance_ref. Shared deep ref groups should be fixed across CLI/TUI/GUI/API, while richer surfaces may extend drill-down without replacing the minimum ref vocabulary. With these two points frozen, the remaining gate is one more independent acceptance review rather than further contract invention.`
+    verdict: `ready_for_final_pre_ibm_review`
 - priority: P1
 - status: proposed
-- decision_reason: 这条线已经从本次 Freely 自举现场中暴露出来，而且 now clearly exceeds `live-status` / stall candidate 的原边界；但当前仍应停留在 pre-brainstorm，直到五个 plane 的 identity block、progress/stall/acceptance evidence schema、shared state exposure contract，以及与既有线的承接关系都冻结稳定。当前已有两项 blocker 可以按既有真源收口：`current-state plane` / `fleet plane` 默认继续承接现有 `live-status` / `fleet-status`，不另造平行 surface；多 subagent 默认继续通过 lane/worktree/session 暴露活动痕迹，而不是 day-1 backend 一等实体。剩余未收口 blocker 主要是 `acceptance evidence schema` 的 canonical 落点与 CLI/TUI/GUI/API deep ref 兼容规则；IBM 进入后只冻结 shared contract，不直接替代现有 surfaces 或一次性实现 richer UI/runtime productization。
+- decision_reason: 这条线已经从本次 Freely 自举现场中暴露出来，而且 clearly exceeds `live-status` / stall candidate 的原边界；但当前仍应停留在 pre-brainstorm，直到五个 plane 的 identity block、progress/stall/acceptance evidence schema、shared state exposure contract，以及与既有线的承接关系都冻结稳定。当前已有四项边界已经收口：`current-state plane` / `fleet plane` 默认继续承接现有 `live-status` / `fleet-status`，不另造平行 surface；多 subagent 默认继续通过 lane/worktree/session 暴露活动痕迹，而不是 day-1 backend 一等实体；`acceptance evidence schema` 的 canonical truth 固定落在 artifact plane，而 current-state/fleet/API 仅镜像最小摘要与 `acceptance_ref`；CLI/TUI/GUI/API 共享同一组最小 `deep ref groups`，richer surface 只能扩展不能替换。剩余 gate 已收窄为再做一轮独立 acceptance review，确认这条线足以进入 IBM shared contract materialization。
 - promoted_issue_path: `pending://application-native-runtime-observation-contract-and-observability-planes`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
-- next_action: 继续 pre-brainstorm，先冻结 `plane identity block`、五类 observation planes 的最小词典、`progress/stall/acceptance evidence` schema、CLI/TUI/GUI/API 共享的 status card/deep ref contract，以及 Freely self-host concrete profile。当前默认收口为：`current-state plane` / `fleet plane` 继续由既有 `live-status` / `fleet-status` 承接，多 subagent 继续聚合在 lane/worktree/session surfaces 下。最小剩余下一步收窄为冻结 `acceptance evidence schema` 的 canonical 落点、补齐 shared `status card minimum fields` / `deep ref groups` 的兼容规则，并再做一轮独立 acceptance review；进入 IBM 后只冻结 shared contract，不直接替换 day-1 surfaces。
-- revisit_trigger: 当 `plane identity block`、三类 signal schema、shared state exposure contract、Freely self-host concrete profile 以及与 `live-status` / stall / frontend probe 的关系都足够稳定，且剩余 `acceptance evidence` canonical 落点与 CLI/TUI/GUI/API deep ref 兼容规则经独立 acceptance review 收口后，重新进入 materialization 判断；若仍需 richer runtime/UI observability productization，则另起 follow-on issue
+- next_action: 继续 pre-brainstorm，但不再扩 contract 面。当前只需完成一轮独立 acceptance review，确认以下两点可直接作为 IBM 输入：`acceptance evidence schema` 的 canonical truth 固定落在 artifact plane 且 current-state/fleet/API 只镜像最小摘要与 `acceptance_ref`；CLI/TUI/GUI/API 共享同一组最小 `deep ref groups`，richer surface 只能扩展不能替换。通过后再进入 IBM shared contract materialization，而不是直接跳到 runtime patch 或 richer UI 实现。
+- revisit_trigger: 当最终独立 acceptance review 认可当前 shared contract 已足够稳定，尤其是 artifact-plane canonical acceptance evidence 与 shared deep-ref compatibility rule 已成立后，重新进入 materialization 判断；若仍需 richer runtime/UI observability productization，则另起 follow-on issue
 - session_refs:
   - tool: codex
   - session_id: current-thread
