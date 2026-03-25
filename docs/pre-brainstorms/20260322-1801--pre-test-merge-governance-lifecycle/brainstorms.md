@@ -619,14 +619,14 @@ Validation batch governance:
 - 当前 handoff 的 delegated continuation judgement 仍与 runtime 事实相容，且当前轮换元数据并未脱离 handoff 所描述的 continuity guard。当前仓库事实是：`live-status` 显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`、`current_prompt_has_delegated_continuation=1`，同时 `pending_delegated_continuation_ids=none`、`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024929/024942/025910/030713`。这说明当前 worker 确实已消费 superseding delegated continuations，但也同样表明 `live-status` 这里只是当前 run 的消费镜像，而不是可替代 manager continuity 的长期 truth source
 - 当前 assigned worktree 的 hygiene 复核仍不改变路由：本轮开始时 `git status --short --branch` 已显示当前 canonical doc-loop writeback 留下的 3 个 dirty 文件，`git rev-list --left-right --count develop...HEAD` 为 `46 15`，而 handoff 要求读取的 `.freely/run/manager-continuity-20260324-021853.md` 仍然缺失。这说明本轮无需先切 checkpoint 或分流无关改动，但它只是 doc-loop continuity evidence，不是新的 promotion 信号
 - 当前 same-session continuity refresh 继续把 runtime 事实收窄为“delegated continuation 已消费，但 runtime 仍只是 mirror”：
-  - `git status --short --branch` 当前仍显示 3 个 canonical doc-loop 文件 dirty，`git rev-list --left-right --count develop...HEAD` 现为 `53 18`
+  - `git status --short --branch` 当前只剩 2 个 canonical doc-loop 文件 dirty（`brainstorms.md` 与 `candidates.md`），`git rev-list --left-right --count develop...HEAD` 现为 `53 22`
   - 当前 `live-status` 仍显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`，同时 `current_prompt_has_delegated_continuation=1`、`pending_delegated_continuation_ids=none` 与同一组 consumed delegated ids 保持不变
   - 因此 handoff 里的 `context_compacted` 既是历史 continuity guard 输入，也是当前 runtime run 仍在暴露的事实；这不会改变 owner，只会再次证明 runtime mirror 不能替代缺失的 manager continuity truth artifact
 - 最新 supporting-pool ownership check 也没有改写 owner：
   - `I-20260322-1801` 与其 verification 只继续声明 lifecycle management capability 是后续独立 lifecycle
   - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md` 只拥有 latest manager continuity consumption timing，不拥有 stale-batch retire/rebuild governance
   - 当前 `live-status.current_focus.prompt_file` 指向的 run prompt 继续把这条 lane 路由回 `C-20260322-1801-B`，而不是给出更强的 IBM owner
-- 最新一轮独立 acceptance review 继续维持 `stay_pre_brainstorm`，并把 blocker 收窄为：`retire_evidence_ref` + `remaining_cleanup_requirement` 仍不足以单独证明 fresh-batch absorption 已闭合；若不新增 machine-readable pointer，至少也要把“无需额外 pointer”冻结成被 review 证实的 contract
+- 最新一轮独立 acceptance review 继续维持 `stay_pre_brainstorm`，并把 blocker 收窄为：当前选择“不新增 machine-readable pointer”这条路线时，必须先把“`retire_evidence_ref` + `remaining_cleanup_requirement` 就是 canonical machine-readable absorption pointer”显式冻结成 contract；冻结之后，还要再过一轮独立 acceptance review，确认 frozen minimal contract 才足以 materialize
 - 当前 run 的 `current_focus.prompt_file` 与 `live-status` 一起证明 superseding delegated continuation bundle 已在当前会话被消费，而不是仍停留在 queued/pending handoff；但它依旧只证明 worker consumption，不能替代缺失的 manager continuity truth artifact
 - 最新 explorer ownership scan 进一步坐实 supporting-pool 边界：
   - `docs/milestones.md` 仍把 `C-20260322-1801-B` 保留为 `candidate / in_pre_brainstorm`
@@ -636,7 +636,15 @@ Validation batch governance:
 - 当前 fresh explorer canonical-owner recheck 也没有改写结论：
   - 只读复核再次确认 milestone、completed issue、semantic audit 与 progress 都没有生成新的 committed issue / IBM owner
   - 当前 `live-status` / runtime 仍只是 continuation-consumption mirror，而 `.freely/run/manager-continuity-20260324-021853.md` 继续缺失
-  - 当前 worktree 仍只脏这 3 个 canonical doc-loop 文件；这说明当前 lane 只是在继续 continuity writeback，但 dirty 本身仍不构成 checkpoint / reroute 或更强 owner 证据
+  - 当前 worktree 只脏 2 个 canonical doc-loop 文件；这说明当前 lane 仍在进行受限 continuity writeback，但 dirty 本身仍不构成 checkpoint / reroute 或更强 owner 证据
+- 当前 fresh-session supporting-pool owner recheck 继续维持同样结论：
+  - `docs/milestones.md` 仍只把 `C-20260322-1801-B` 保留为 `candidate / in_pre_brainstorm`
+  - completed issue、semantic audit 与 `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md` 仍只提供 supporting evidence，不吸收 stale-batch governance owner
+  - `.freely/run/manager-continuity-20260324-021853.md` 仍缺失，因此本轮最新事实只说明当前 writeback 继续需要保留在 candidate truth 中，而不是升级成 IBM 输入
+- 当前 latest supporting-pool independent gap check 继续把边界压回同一点：
+  - supporting pools 里最强的正式 artifact 仍只是已完成的 `I-20260322-1801`，但它的 `Next` 仍明确把 lifecycle management capability 留作后续独立 lifecycle，而不是当前已 materialize 的 IBM owner
+  - semantic audit 继续只承担 absorbed supporting evidence，neighboring progress doc 继续只拥有 delegated-continuation consumption timing，因此 supporting pools 仍不足以绕过 `C-20260322-1801-B` 直接升格
+  - 这让最小剩余 gap 保持不变：仍需把 stale detection / retire / rebuild 如何 materialize 为 dedicated issue contract 冻结清楚，而不是从 supporting pools 反推
 - 当前 post-handoff read-only subagent reconfirmation 同样没有改写 owner：
   - semantic audit 仍只作为 supporting evidence，未把这条 lane 升级成 committed issue / IBM owner
   - progress 仍只拥有 latest manager continuity consumption timing，而不拥有 stale-batch retire / rebuild governance
@@ -795,7 +803,7 @@ Validation batch governance:
 ## 当前仍未冻结的点
 
 - `stale_reason` 与 `lifecycle_decision` 是否需要更细枚举，还是保持最小集合
-- `retire_evidence_ref` 与 `remaining_cleanup_requirement` 当前仍不足以支撑 future delete guard / hook 对 fresh-batch absorption 的稳定判断；下一轮要么补额外 machine-readable absorption pointer，要么把“无需额外 pointer”的 contract freeze 与 review evidence 写实，并证明 worker-consumption mirror 不会被误读成 absorption proof
+- `retire_evidence_ref` 与 `remaining_cleanup_requirement` 当前不能只靠默认理解支撑 future delete guard / hook 对 fresh-batch absorption 的稳定判断；当前已选路线是不新增额外 pointer，但必须把这组等价关系冻结成明确 contract，并补上独立 review evidence，证明 worker-consumption mirror 不会被误读成 absorption proof
 - 这份 v0 contract 是否已足够小到能单独 materialize 成 IBM，而不是还需再做一轮独立 acceptance review
 
 ## 本轮独立 review 结论
@@ -813,8 +821,8 @@ Validation batch governance:
   - delete gate 输入组合 v1
   - `specimen-S1/S2/S3` 的最小拒绝语义
 - 仍未冻结的只剩：
-  - `retire_evidence_ref` / `remaining_cleanup_requirement` 是否足够表达 fresh-batch absorption
-  - 独立 acceptance review 是否认为这三块已经足以 materialize
+  - `Frozen equivalence: retire_evidence_ref + remaining_cleanup_requirement is the canonical machine-readable absorption pointer for fresh-batch followthrough, and no extra machine-readable pointer is required.` 是否已经写定并被当前 candidate 真源吸收
+  - 冻结后的最小 contract 是否已再过一轮独立 acceptance review，足以 materialize
 
 ## 需要冻结的开放问题
 
