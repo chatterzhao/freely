@@ -47,6 +47,55 @@ Freely 正在用 Freely 开发 Freely。
 - 不能自动提示 stale batch
 - 不能自动给出 promote / replay / retire 建议
 
+## 当前 fleet 分类快照
+
+### 1. active owner，必须继续
+
+- `feature/pre-test-merge-lifecycle-management-followthrough-20260324`
+  - 当前 stale-batch governance 的 canonical owner
+- `feature/application-native-observability-planes-20260324`
+  - 仍在 pre-brainstorm，负责 future app 观察面 contract
+- `feature/manager-scheduler-capacity-candidate-replay-20260324`
+  - 仍在 pre-brainstorm，唯一剩余 blocker 是 fresh `develop`-based dogfood proof
+- `feature/manager-delegated-continuation-stall-materialization-20260323`
+  - 仍在 pre-brainstorm / continuation research，尚无更强 owner 吸收
+
+### 2. stale / evidence-only，不能当执行面
+
+- `pre-test-merge`
+  - stale evidence-only；可保留 replay/source evidence，但不能恢复成当前验证面
+- `feature/three-loop-dogfood-flow-alignment-20260323`
+  - 已被新的 three-loops canonical issue 吸收，当前只保留历史 evidence
+- `feature/worker-stall-recovery-during-active-ai-20260323`
+  - 仍只是 pre-brainstorm candidate evidence，尚无 issue / cleanup delete gate
+- `feature/manager-primary-handoff-materialization-stall-20260324`
+  - 仍只是 pre-brainstorm candidate evidence，尚无 issue / cleanup delete gate
+
+### 3. merged-clean cleanup candidates，但还不能直接删
+
+- `feature/delegated-continuation-prompt-consumption-visibility-20260323`
+- `feature/manager-worker-launch-idempotency-queue-promotion-20260323`
+- `feature/manager-worker-launch-state-relaunch-recovery-20260323`
+- `feature/manager-worker-prompt-contract-and-launch-consumption-20260323`
+- `feature/manager-launch-state-frozen-prompt-state-reconcile-20260324`
+- `feature/manager-launch-state-frozen-queue-drift-20260324`
+- `feature/manager-worker-count-fleet-truth-reconcile-20260324`
+
+这批树都满足同一组 git-level 事实：本地 clean、分支头已被 `develop` 吸收、且未见对应远程 branch。它们可以进入 cleanup gate 候选池，但仍不能只凭这些事实判 `delete-ready`。若 canonical issue / progress / cleanup truth 没有明确给出 `verified-retirable -> delete guard -> retired`，则最多只能记为 `cleanup-candidate`。
+
+### 4. merged 但仍 active / cleanup-pending
+
+- `feature/global-watchdog-earliest-reset-sleep-revive-20260323`
+  - 仍在 canonical `in_verification`，不能删
+- `feature/manager-launch-state-consumed-truth-reconcile-20260324`
+  - canonical issue/progress 明确写了 `retained-with-reason`，要等 closeout writeback 被 develop-facing path 吸收
+
+## 当前收敛结论
+
+- `merged + clean + ahead=0` 只足以进入 cleanup 候选池，不足以直接执行删除
+- 若 delete-ready 结论需要依赖“同 family 的其他 issue 已完成，所以这些旧树大概可删”的推断，该结论必须先回到 canonical issue / progress / cleanup truth 写成显式 gate，不能直接当执行依据
+- 这也是本预研线仍然 active 的原因：Freely 目前还缺把 `cleanup-candidate -> verified-retirable -> delete guard -> retired` 写成 machine-readable gate 的能力
+
 ## 问题定义
 
 需要一条更完整的治理路线，回答：

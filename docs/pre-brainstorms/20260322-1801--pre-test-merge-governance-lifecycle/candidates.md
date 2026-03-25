@@ -191,7 +191,9 @@
 - current_fleet_position:
   - this worktree remains the active canonical owner for stale-batch governance
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/pre-test-merge` remains stale evidence-only and cannot be treated as an active verification surface
-  - completed or merged trees in the same repo may enter cleanup-pending, but none of them supersede this candidate's ownership until stale-batch delete-gate semantics are frozen
+  - completed or merged trees in the same repo may enter cleanup-candidate / cleanup-pending pools, but none of them supersede this candidate's ownership until stale-batch delete-gate semantics are frozen
+  - local git facts such as `clean`, `ahead=0`, and `merged into develop` are sufficient only for cleanup candidacy; they are not by themselves enough to declare `delete-ready`
+  - any delete-ready conclusion that depends on family-level inference rather than an explicit canonical cleanup gate must be downgraded to `cleanup-candidate` until `verified-retirable -> delete guard -> retired` is written in issue/progress/cleanup truth
 - revisit_trigger: 当 `Validation batch governance:` `v1` 固定块、runtime gate、replay/retire evidence、`acceptance_contract_state/source/blocker -> pre-tests.md` 质量 gate 的桥、pre-IBM validation matrix，以及“`completed` / cleanup gate / `verified-retirable` / `retired` / delete guard”组合和 `specimen-S1/S2/S3` 的 refusal evidence 都经独立 review 证实稳定，且 `live-status`/runtime 侧只再作为 continuation consumption mirror 而不再暴露缺失 manager truth artifact，并且 fresh-batch absorption 已有额外 machine-readable pointer 或已冻结“无需额外 pointer”的等价 contract、未重新混入 `worker self-loop exit` 时，重新进入 materialization 判断
 - session_refs:
   - tool: codex
