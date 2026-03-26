@@ -12,6 +12,16 @@ codex_active_auth_file() {
   printf '%s\n' "$HOME/.codex/auth.json"
 }
 
+watchdog_run_dir_for_project() {
+  local project="$1"
+  printf '%s\n' "$project/.freely/run"
+}
+
+codex_probe_artifacts_dir_for_project() {
+  local project="$1"
+  printf '%s\n' "$(watchdog_run_dir_for_project "$project")/codex-probe-artifacts"
+}
+
 read_codex_active_slot() {
   local file
   file="$(codex_active_slot_file)"
@@ -53,6 +63,24 @@ codex_current_cooldown_identity() {
   active_slot="$(read_codex_active_slot)"
   [[ -n "$active_slot" ]] || return 0
   printf '%s\n' "$(normalize_codex_slot_name "$active_slot")"
+}
+
+write_codex_probe_artifact() {
+  local project="$1" slot="$2" status="$3" output="$4"
+  local artifacts_dir ts normalized_slot artifact
+  artifacts_dir="$(codex_probe_artifacts_dir_for_project "$project")"
+  ts="$(date '+%Y%m%d-%H%M%S')"
+  normalized_slot="$(normalize_codex_slot_name "${slot:-unknown-slot}")"
+  mkdir -p "$artifacts_dir"
+  artifact="$artifacts_dir/codex-probe-${ts}-${normalized_slot}-${status}.log"
+  {
+    printf 'timestamp=%s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')"
+    printf 'slot=%s\n' "${slot:-unknown}"
+    printf 'status=%s\n' "$status"
+    printf '\n'
+    printf '%s\n' "$output"
+  } >"$artifact"
+  printf '%s\n' "$artifact"
 }
 
 codex_slot_switch_lock_dir() {
@@ -428,9 +456,11 @@ select_earliest_reset_codex_slot_any() {
 #   1 for other probe failures
 codex_probe_current_slot_now() {
   local project="$1" prompt_file output_file rc timeout_secs="${CODEX_PROBE_TIMEOUT:-15}" probe_lock_held=0
+  local current_slot artifact_path
   wait_for_codex_slot_switch_idle "$project" || return 1
   codex_slot_switch_probe_lock_acquire "watchdog_probe_current_slot" || return 1
   probe_lock_held=1
+  current_slot="$(codex_current_slot "$project" || true)"
   prompt_file="$(mktemp)"
   output_file="$(mktemp)"
   printf 'hi\n' >"$prompt_file"
@@ -476,10 +506,14 @@ codex_probe_current_slot_now() {
   # Kill if still running
   if kill -0 "$pid" 2>/dev/null; then
     kill "$pid" 2>/dev/null
-    wait "$pid" 2>/dev/null
+    wait "$pid" 2>/dev/null || true
+    artifact_path="$(write_codex_probe_artifact "$project" "$current_slot" "timeout" "$(cat "$output_file" 2>/dev/null || true)")"
     rm -f "$prompt_file" "$output_file"
     if [[ "$probe_lock_held" == "1" ]]; then
       codex_slot_switch_probe_lock_release
+    fi
+    if [[ -n "$artifact_path" ]]; then
+      log_warn "codex probe timed out for slot ${current_slot:-unknown}; captured partial output at $artifact_path"
     fi
     printf 'timeout\n'
     return 0
@@ -528,6 +562,13 @@ codex_probe_current_slot_now() {
     # Fallback: rate limited but no time found, still report it
     printf 'rate_limited:0\n'
     return 0
+  fi
+
+  if printf '%s\n' "$output" | grep -qi "deactivated_workspace\|402 Payment Required"; then
+    artifact_path="$(write_codex_probe_artifact "$project" "$current_slot" "deactivated-workspace" "$output")"
+    if [[ -n "$artifact_path" ]]; then
+      log_warn "codex probe observed deactivated_workspace for slot ${current_slot:-unknown}; details captured at $artifact_path"
+    fi
   fi
 
   # Generic error

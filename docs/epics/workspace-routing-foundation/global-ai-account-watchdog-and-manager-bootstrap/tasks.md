@@ -24,3 +24,4 @@
 - [x] make slot switch / probe sweep a global launch gate for every new Codex manager/worker process, not just watchdog/bootstrap reads
 - [x] isolate warning/log output from machine-readable slot/session/launch state so switch-lock notices never pollute canonical truth
 - [x] verify that the first Codex launch after an auto-selected usable slot waits for switch completion and does not require a second manual switch to avoid `402`
+- [x] capture partial `codex exec` probe output into `.freely/run` artifacts when a slot probe times out or returns `deactivated_workspace`, so switch-time investigation no longer depends on reproducing the same transient failure interactively

@@ -51,6 +51,7 @@
 11. 至少一条 focused regression 明确锁住 “slot switch lock 活跃时，新的 Codex launch 会等待而不是直接 exec”。
 12. 至少一条 focused regression 明确锁住 “warning 文本不会污染 `LAST_ACTIVE_SLOT`、`last_active_slot` 或其他机器可读 slot 字段”。
 13. 至少一条 focused regression 或最小集成验证明确锁住 “auto switch 首次返回 `usable` 后，第一条新 Codex launch 不会继续命中 `402`/旧授权”。
+14. 至少一条 focused regression 明确锁住 “slot probe timeout 会把 partial probe output 落到 `.freely/run` 可追踪 artifact”，便于区分网络慢、CLI 卡死、还是 `402 deactivated_workspace` 已经返回但被 timeout 截断。
 
 ## Blocker taxonomy
 

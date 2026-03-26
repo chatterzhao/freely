@@ -51,6 +51,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - `ai-cli` / watchdog 对外暴露的 canonical identity 必须是 slot；auth email 只能作为 `auth_email` metadata，不能再被展示成当前身份。
 - slot switch / probe sweep 活跃时，任何新的 Codex AI launch 都必须等待同一把 shared lock，不得在切换窗口里抢跑到坏/瞬时授权。
 - warning / observability 文本不得污染 slot/session/launch 的机器可读状态面。
+- slot probe 如果因为超时被 watchdog 杀掉，partial probe output 也必须留在 `.freely/run` artifact 中，方便在 switch 结束后区分网络/代理慢、CLI 卡死、还是 `402 deactivated_workspace` 等真实返回已出现但被 timeout 截断。
 
 ## Completion
 
