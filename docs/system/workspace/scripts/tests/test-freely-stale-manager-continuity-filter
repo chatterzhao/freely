@@ -87,7 +87,7 @@ cat >"$STALE_RUNTIME_CONT" <<EOF
 - path: \`$RETIRED_WT\`
   - ownership: \`cleanup_queue\`
 
-## Cleanup Queue
+## Queue / Frozen / Cleanup
 - target_worktree: \`$RETIRED_WT\`
   - next_action: \`retire after gates confirm\`
 
