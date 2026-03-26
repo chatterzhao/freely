@@ -6,7 +6,10 @@ TMP_DIR="$(mktemp -d /tmp/freely-live-status.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/repo"
+QUEUE_WT="$TMP_DIR/queued-worktree"
+FROZEN_WT="$TMP_DIR/frozen-worktree"
 mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/intake/20260320-000001-demo" "$PROJECT/.freely/run/interruption-resolution/20260320-000000-demo" "$PROJECT/docs/pre-brainstorms"
+mkdir -p "$QUEUE_WT" "$FROZEN_WT"
 
 cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
@@ -59,16 +62,17 @@ QUEUE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260321-004000-worker-queued-
 FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260321-004100-worker-frozen-codex.txt"
 cat >"$QUEUE_PROMPT" <<'EOF'
 Worktree:
-- `/tmp/queued-worktree`
+- `__QUEUE_WT__`
 Branch:
 - `feature/queued`
 EOF
 cat >"$FROZEN_PROMPT" <<'EOF'
 Worktree:
-- `/tmp/frozen-worktree`
+- `__FROZEN_WT__`
 Branch:
 - `feature/frozen`
 EOF
+perl -0pi -e "s#__QUEUE_WT__#$QUEUE_WT#g; s#__FROZEN_WT__#$FROZEN_WT#g" "$QUEUE_PROMPT" "$FROZEN_PROMPT"
 cat >"$PROJECT/.freely/run/manager-continuity-20260321-004200.md" <<EOF
 # Manager Continuity
 - selected_pool: \`human chat / session evidence\`
@@ -81,10 +85,19 @@ cat >"$PROJECT/.freely/run/manager-continuity-20260321-004200.md" <<EOF
 - lane: \`keep-frozen\`
   - prompt_path: \`$FROZEN_PROMPT\`
 EOF
+STALE_CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260321-004300.md"
+cat >"$STALE_CONTINUITY" <<'EOF'
+# Manager Continuity
+- selected_pool: `stale runtime artifact`
+
+## Fleet Inventory
+- path: `/tmp/retired-worktree`
+  - ownership: `cleanup_queue`
+EOF
 cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
-LAST_MANAGER_CONTINUITY_GENERATED="$PROJECT/.freely/run/manager-continuity-20260321-004200.md"
+LAST_MANAGER_CONTINUITY_GENERATED="$STALE_CONTINUITY"
 LAST_MANAGER_WORKER_PROMPTS_GENERATED="$QUEUE_PROMPT"
-LAST_MANAGER_CONTINUITY_CONSUMED="$PROJECT/.freely/run/manager-continuity-20260321-004200.md"
+LAST_MANAGER_CONTINUITY_CONSUMED="$STALE_CONTINUITY"
 LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$FROZEN_PROMPT"
 LAUNCHED_WORKER_PROMPTS="$FROZEN_PROMPT"
 QUEUED_WORKER_PROMPTS=""
@@ -151,12 +164,19 @@ printf '%s\n' "$OUTPUT" | grep -q "role=ai pid=$AI_PID"
 printf '%s\n' "$OUTPUT" | grep -q 'prompt_file: '
 printf '%s\n' "$OUTPUT" | grep -q 'CURRENT_BRANCH=feature/research-codex-in-cc-mcp'
 printf '%s\n' "$OUTPUT" | grep -q 'selected_pool: `human chat / session evidence`'
+printf '%s\n' "$OUTPUT" | grep -q "manager_continuity_file: $PROJECT/.freely/run/manager-continuity-20260321-004200.md"
+printf '%s\n' "$OUTPUT" | grep -q "latest_manager_continuity_generated: $PROJECT/.freely/run/manager-continuity-20260321-004200.md"
+printf '%s\n' "$OUTPUT" | grep -q "latest_manager_continuity_consumed: $PROJECT/.freely/run/manager-continuity-20260321-004200.md"
 printf '%s\n' "$OUTPUT" | grep -q 'last_tool_jsonl_path: '
 printf '%s\n' "$OUTPUT" | grep -q 'latest_resolution:'
 printf '%s\n' "$OUTPUT" | grep -q "latest_manager_worker_prompts_generated: $QUEUE_PROMPT"
 printf '%s\n' "$OUTPUT" | grep -q 'latest_manager_worker_prompts_consumed: none'
 printf '%s\n' "$OUTPUT" | grep -q 'max_parallel_workers: unbounded'
 printf '%s\n' "$OUTPUT" | grep -q 'available_new_worker_slots: unbounded'
+if printf '%s\n' "$OUTPUT" | grep -q '/tmp/retired-worktree'; then
+  echo "[FAIL] live-status surfaced stale retired worktree continuity" >&2
+  exit 1
+fi
 # shellcheck disable=SC1090
 source "$PROJECT/.freely/run/manager-worker-launch-state.env"
 [[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}" == "none" || -z "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" ]]

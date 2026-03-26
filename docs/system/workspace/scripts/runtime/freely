@@ -411,7 +411,7 @@ latest_generated_manager_continuity_file_for_project() {
 
 find_latest_manager_continuity_file_for_project() {
   local project="$1"
-  latest_generated_manager_continuity_file_for_project "$project"
+  latest_manager_continuity_file_for_project "$project"
 }
 
 ps_command_for_pid() {
@@ -1871,8 +1871,14 @@ request_local_continuation_reentry() {
 }
 
 latest_manager_continuity_file_for_project() {
-  local project="$1"
-  latest_generated_manager_continuity_file_for_project "$project"
+  local project="$1" continuity_file
+  while IFS= read -r continuity_file; do
+    [[ -f "$continuity_file" ]] || continue
+    if manager_continuity_is_launchable_for_project "$project" "$continuity_file"; then
+      printf '%s\n' "$continuity_file"
+      return 0
+    fi
+  done < <(find "$(run_dir_for_project "$project")" -maxdepth 1 -type f -name 'manager-continuity-*.md' | sort -r)
 }
 
 latest_cycle_log_for_project() {
@@ -1890,6 +1896,72 @@ all_manager_worker_prompt_paths_from_continuity() {
   local continuity_file="$1"
   [[ -f "$continuity_file" ]] || return 0
   rg -o '/[^` ]+/.freely/run/worker-prompts/[^` ]+\.txt' "$continuity_file" | sort -u
+}
+
+fleet_worktree_paths_for_project() {
+  local project="$1"
+  git -C "$project" worktree list --porcelain 2>/dev/null | awk '/^worktree / {print substr($0, 10)}'
+}
+
+manager_continuity_worktree_paths_from_runtime_sections() {
+  local continuity_file="$1"
+  [[ -f "$continuity_file" ]] || return 0
+  awk '
+    function extract_backtick_path(line, value, start_idx, remainder, end_idx) {
+      start_idx=index(line, "`")
+      if (start_idx == 0) {
+        return
+      }
+      remainder=substr(line, start_idx + 1)
+      end_idx=index(remainder, "`")
+      if (end_idx == 0) {
+        return
+      }
+      value=substr(remainder, 1, end_idx - 1)
+      if (value ~ /^\/.*$/) {
+        print value
+      }
+    }
+    /^## / {
+      section=tolower(substr($0, 4))
+      gsub(/[`[:space:]]+$/, "", section)
+      next
+    }
+    /^# / {
+      section=""
+      next
+    }
+    section == "fleet inventory" && $0 ~ /^[[:space:]]*-[[:space:]]*path:[[:space:]]*`\/.*`[[:space:]]*$/ {
+      extract_backtick_path($0)
+      next
+    }
+    (section == "queue" || section == "frozen queue" || section == "cleanup queue") && $0 ~ /^[[:space:]]*-[[:space:]]*target_worktree:[[:space:]]*`\/.*`[[:space:]]*$/ {
+      extract_backtick_path($0)
+      next
+    }
+  ' "$continuity_file" | sort -u
+}
+
+project_has_worktree_path() {
+  local project="$1" target_path="$2" worktree_path
+  [[ -n "$target_path" ]] || return 1
+  while IFS= read -r worktree_path; do
+    [[ -n "$worktree_path" ]] || continue
+    if [[ "$worktree_path" == "$target_path" ]]; then
+      return 0
+    fi
+  done < <(fleet_worktree_paths_for_project "$project")
+  return 1
+}
+
+manager_continuity_has_stale_runtime_worktree_refs() {
+  local project="$1" continuity_file="$2" target_path
+  [[ -n "$project" && -f "$continuity_file" ]] || return 1
+  while IFS= read -r target_path; do
+    [[ -n "$target_path" ]] || continue
+    project_has_worktree_path "$project" "$target_path" || return 0
+  done < <(manager_continuity_worktree_paths_from_runtime_sections "$continuity_file")
+  return 1
 }
 
 manager_worker_prompt_paths_from_continuity_by_mode() {
@@ -1941,6 +2013,10 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         if (mode != "frozen") {
           emit_prompt_paths($0)
         }
+        next
+      }
+      if ($0 ~ /- delegated worker prompt:/) {
+        capture_worker_prompt_path_list=(mode != "frozen")
         next
       }
       if ($0 ~ /- runtime worker prompt:/) {
@@ -2116,6 +2192,9 @@ manager_continuity_has_unconsumed_launchable_worker_prompt() {
 manager_continuity_is_launchable_for_project() {
   local project="$1" continuity_file="$2" prompt_file
   [[ -f "$continuity_file" ]] || return 1
+  if manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file"; then
+    return 1
+  fi
   if ! manager_continuity_has_worker_prompts "$continuity_file"; then
     return 0
   fi
@@ -2132,6 +2211,9 @@ latest_launchable_manager_continuity_file_for_project() {
   local project="$1" continuity_file
   while IFS= read -r continuity_file; do
     [[ -f "$continuity_file" ]] || continue
+    if manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file"; then
+      continue
+    fi
     if manager_continuity_is_launchable_for_project "$project" "$continuity_file"; then
       printf '%s\n' "$continuity_file"
       return 0
@@ -4982,11 +5064,28 @@ cmd_live_status() {
   latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
   latest_generated_prompts_csv="none"
   if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
+    if manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_generated_continuity"; then
+      latest_generated_continuity="$(latest_manager_continuity_file_for_project "$project")"
+    fi
+  fi
+  if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
     latest_generated_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_generated_continuity")"
     [[ -n "$latest_generated_prompts_csv" ]] || latest_generated_prompts_csv="none"
     if [[ "$latest_manager_continuity_generated" == "unavailable" || "$latest_manager_continuity_generated" != "$latest_generated_continuity" ]]; then
       latest_manager_continuity_generated="$latest_generated_continuity"
       latest_manager_worker_prompts_generated="$latest_generated_prompts_csv"
+    fi
+  fi
+  if [[ -n "$latest_manager_continuity_consumed" && "$latest_manager_continuity_consumed" != "unavailable" ]]; then
+    if [[ ! -f "$latest_manager_continuity_consumed" ]] || manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_manager_continuity_consumed"; then
+      if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
+        latest_manager_continuity_consumed="$latest_generated_continuity"
+        latest_manager_worker_prompts_consumed="$(csv_retain_exact_items "${latest_manager_worker_prompts_consumed:-}" "$latest_generated_prompts_csv")"
+        [[ -n "$latest_manager_worker_prompts_consumed" ]] || latest_manager_worker_prompts_consumed="none"
+      else
+        latest_manager_continuity_consumed="unavailable"
+        latest_manager_worker_prompts_consumed="none"
+      fi
     fi
   fi
 
