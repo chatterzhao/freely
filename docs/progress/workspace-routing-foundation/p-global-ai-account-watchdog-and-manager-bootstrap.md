@@ -120,6 +120,20 @@
 - 当前批次的 strict probe-gating contract replay 与 focused verification 已完成。
 - no-launch gate、all-unavailable hold、inventory-change wake evidence 已补齐；当前 worktree 已进入 manager merge judgement / develop replay followthrough 前的 review-ready 状态，但仍保持 `in_verification`，等待 manager 吸收。
 
+## 2026-03-25 Source Lane Retirement Audit
+
+- Re-audited the remaining same-family source/supporting worktrees against this replay owner:
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-interruption-handler-account-recovery`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-family-integration`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-strict-slot-probe-gating`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-slot-sweep-without-cooldown-governance`
+- Their remaining local-only deltas are not missing desired capability in the replay owner:
+  - `interruption-handler-account-recovery` still points the interruption handler at the older account-ready path instead of the current slot-first contract
+  - `watchdog-family-integration` still carries older availability-state / logging behavior that predates the current replay owner
+  - `watchdog-strict-slot-probe-gating` still drops the broadened auth-failure detection and the no-launch test coverage now required by this replay owner
+  - `watchdog-slot-sweep-without-cooldown-governance` is already an absorbed supporting-evidence lane; its remaining local commit is only retirement writeback, not a new owner path
+- This round therefore treats all four branches as superseded local source/supporting lanes whose remaining unique commits should not be replayed onto the canonical owner.
+
 ## Revisit Trigger
 
 - 任一 watchdog wait/reprobe 或 stale `ensure-manager.pid` 回归失败
