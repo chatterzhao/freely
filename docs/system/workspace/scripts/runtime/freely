@@ -1925,6 +1925,7 @@ manager_continuity_worktree_paths_from_runtime_sections() {
     /^## / {
       section=tolower(substr($0, 4))
       gsub(/[`[:space:]]+$/, "", section)
+      gsub(/[[:space:]]+\/[[:space:]]+/, "|", section)
       next
     }
     /^# / {
@@ -1935,7 +1936,7 @@ manager_continuity_worktree_paths_from_runtime_sections() {
       extract_backtick_path($0)
       next
     }
-    (section == "queue" || section == "frozen queue" || section == "cleanup queue") && $0 ~ /^[[:space:]]*-[[:space:]]*target_worktree:[[:space:]]*`\/.*`[[:space:]]*$/ {
+    (section == "queue" || section == "frozen queue" || section == "cleanup queue" || section == "queue|frozen|cleanup") && $0 ~ /^[[:space:]]*-[[:space:]]*target_worktree:[[:space:]]*`\/.*`[[:space:]]*$/ {
       extract_backtick_path($0)
       next
     }
