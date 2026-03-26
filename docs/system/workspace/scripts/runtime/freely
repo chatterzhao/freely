@@ -1903,6 +1903,39 @@ fleet_worktree_paths_for_project() {
   git -C "$project" worktree list --porcelain 2>/dev/null | awk '/^worktree / {print substr($0, 10)}'
 }
 
+normalize_runtime_worktree_path() {
+  local target_path="$1"
+  [[ -n "$target_path" ]] || return 0
+  if [[ -d "$target_path" ]]; then
+    (
+      cd "$target_path" 2>/dev/null && pwd -P
+    ) || printf '%s\n' "$target_path"
+  else
+    printf '%s\n' "$target_path"
+  fi
+}
+
+fleet_worktree_branch_rows_for_project() {
+  local project="$1"
+  git -C "$project" worktree list --porcelain 2>/dev/null | awk '
+    BEGIN { wt=""; br="(detached)" }
+    /^worktree / { wt=substr($0, 10); br="(detached)" }
+    /^branch / { br=$2; sub(/^refs\/heads\//, "", br) }
+    /^$/ {
+      if (wt != "") {
+        print wt "|" br
+        wt=""
+        br="(detached)"
+      }
+    }
+    END {
+      if (wt != "") {
+        print wt "|" br
+      }
+    }
+  '
+}
+
 manager_continuity_worktree_paths_from_runtime_sections() {
   local continuity_file="$1"
   [[ -f "$continuity_file" ]] || return 0
@@ -1944,11 +1977,13 @@ manager_continuity_worktree_paths_from_runtime_sections() {
 }
 
 project_has_worktree_path() {
-  local project="$1" target_path="$2" worktree_path
+  local project="$1" target_path="$2" worktree_path normalized_target normalized_worktree
   [[ -n "$target_path" ]] || return 1
+  normalized_target="$(normalize_runtime_worktree_path "$target_path")"
   while IFS= read -r worktree_path; do
     [[ -n "$worktree_path" ]] || continue
-    if [[ "$worktree_path" == "$target_path" ]]; then
+    normalized_worktree="$(normalize_runtime_worktree_path "$worktree_path")"
+    if [[ "$normalized_worktree" == "$normalized_target" ]]; then
       return 0
     fi
   done < <(fleet_worktree_paths_for_project "$project")
@@ -1963,6 +1998,75 @@ manager_continuity_has_stale_runtime_worktree_refs() {
     project_has_worktree_path "$project" "$target_path" || return 0
   done < <(manager_continuity_worktree_paths_from_runtime_sections "$continuity_file")
   return 1
+}
+
+manager_continuity_missing_runtime_worktree_refs() {
+  local project="$1" continuity_file="$2" target_path
+  [[ -n "$project" && -f "$continuity_file" ]] || return 0
+  while IFS= read -r target_path; do
+    [[ -n "$target_path" ]] || continue
+    project_has_worktree_path "$project" "$target_path" && continue
+    printf '%s\n' "$target_path"
+  done < <(manager_continuity_worktree_paths_from_runtime_sections "$continuity_file")
+}
+
+manager_prompt_fleet_truth_markdown_for_project() {
+  local project="$1"
+  local latest_generated_continuity latest_launchable_continuity generated_stale missing_refs wt_path wt_branch wt_state
+  latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
+  latest_launchable_continuity="$(latest_manager_continuity_file_for_project "$project")"
+  generated_stale="false"
+  missing_refs=""
+
+  if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
+    if manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_generated_continuity"; then
+      generated_stale="true"
+      missing_refs="$(manager_continuity_missing_runtime_worktree_refs "$project" "$latest_generated_continuity")"
+    fi
+  fi
+
+  cat <<EOF
+项目级工位真相：
+- authoritative_source: \`git worktree list --porcelain\`
+- latest_generated_manager_continuity: \`${latest_generated_continuity:-none}\`
+- latest_launchable_manager_continuity: \`${latest_launchable_continuity:-none}\`
+- latest_generated_manager_continuity_stale: \`${generated_stale}\`
+
+## Current Worktree Inventory
+EOF
+
+  while IFS='|' read -r wt_path wt_branch; do
+    [[ -n "$wt_path" ]] || continue
+    if [[ -n "$(git -C "$wt_path" status --porcelain 2>/dev/null)" ]]; then
+      wt_state="DIRTY"
+    else
+      wt_state="CLEAN"
+    fi
+    cat <<EOF
+- path: \`$wt_path\`
+  - branch: \`${wt_branch:-unknown}\`
+  - clean_state: \`${wt_state}\`
+EOF
+  done < <(fleet_worktree_branch_rows_for_project "$project")
+
+  if [[ -n "$missing_refs" ]]; then
+    cat <<EOF
+
+## Stale Runtime Refs
+EOF
+    while IFS= read -r wt_path; do
+      [[ -n "$wt_path" ]] || continue
+      printf -- '- missing_worktree: `%s`\n' "$wt_path"
+    done <<<"$missing_refs"
+  fi
+
+  cat <<'EOF'
+
+Manager continuity truth guard:
+- Treat `Current Worktree Inventory` as the authoritative active fleet for this round.
+- If any continuity references a path absent from that inventory, treat it as stale history, not as current queue/fleet truth.
+- Before writing a new manager continuity, rebuild fleet inventory / queue / cleanup sections from the current worktree inventory rather than copying stale historical paths.
+EOF
 }
 
 manager_worker_prompt_paths_from_continuity_by_mode() {
@@ -3058,17 +3162,29 @@ EOF
 }
 
 append_fleet_supervision_if_needed() {
-  local fleet_snapshot
+  local fleet_snapshot fleet_truth_markdown
   fleet_snapshot="$(fleet_status_text_for_project "$PROJECT_ROOT")"
-  [[ -n "$fleet_snapshot" ]] || return 0
+  fleet_truth_markdown="$(manager_prompt_fleet_truth_markdown_for_project "$PROJECT_ROOT")"
+  [[ -n "$fleet_snapshot" || -n "$fleet_truth_markdown" ]] || return 0
 
-  cat <<EOF
+  if [[ -n "$fleet_truth_markdown" ]]; then
+    cat <<EOF
+
+$fleet_truth_markdown
+EOF
+  fi
+
+  if [[ -n "$fleet_snapshot" ]]; then
+    cat <<EOF
 
 项目级工位快照：
 \`\`\`
 $fleet_snapshot
 \`\`\`
+EOF
+  fi
 
+  cat <<EOF
 主管模式要求：
 - 若当前轮次承担项目级监督职责，先基于工位快照安排继续开发、冻结、验证、合并和清理顺序。
 - 可并行且互不阻塞的任务，使用 subagent 提高效率。
