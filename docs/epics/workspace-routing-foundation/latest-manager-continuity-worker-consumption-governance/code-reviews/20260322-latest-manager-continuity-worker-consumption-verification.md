@@ -59,4 +59,4 @@
 
 - no further acceptance blocker remains inside `I-20260322-0445` after absorbing the current canonical `123901` generated-and-consumed truth into the same issue family writeback
 - keep this feature worktree scoped to docs-only closeout absorption and cleanup disposition only
-- treat the branch as retained-with-reason and not `delete-ready`; do not merge or delete from this worker round
+- keep this integration owner retained-with-reason for cleanup followthrough, but retire the superseded local companions `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile` and `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile` in this worker round
