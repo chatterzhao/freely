@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-unconsumed-launchable.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER_WT="$WT_ROOT/feature-worker"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m init
+git -C "$PROJECT" branch feature/worker
+git -C "$PROJECT" worktree add "$WORKER_WT" feature/worker >/dev/null
+echo worker >"$WORKER_WT/worker.txt"
+git -C "$WORKER_WT" add worker.txt
+git -C "$WORKER_WT" commit -q -m "worker change"
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260324-235900-worker-launchable-codex.txt"
+cat >"$PROMPT" <<EOF
+Dispatch metadata:
+- dispatch_priority: P0
+- parallel_safe: true
+- write_scope: $WORKER_WT
+
+Branch:
+- \`feature/worker\`
+
+Worktree:
+- \`$WORKER_WT\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260324-235901.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+
+- runtime worker prompt:
+  - $PROMPT
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$PROMPT"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED=""
+LAUNCHED_WORKER_PROMPTS=""
+UPDATED_AT="2026-03-24T23:59:01Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+if ! manager_continuity_has_unconsumed_launchable_worker_prompt "$PROJECT" "$CONTINUITY"; then
+  echo "[FAIL] expected same-continuity launch-state to report an unconsumed launchable worker prompt" >&2
+  exit 1
+fi
+
+echo "[PASS] same-continuity launch-state does not trip set -u and still exposes unconsumed launchable worker prompts"

@@ -74,7 +74,7 @@ launch_worker_from_manager_prompt_if_needed() {
   return 0
 }
 
-COUNT="$(FREELY_MANAGER_MAX_PARALLEL_WORKERS=2 manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+COUNT="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
 [[ "$COUNT" == "1" ]]
 grep -q '^20260324-000001-worker-relaunch-codex.txt$' "$LAUNCH_LOG"
 
@@ -82,7 +82,8 @@ grep -q '^20260324-000001-worker-relaunch-codex.txt$' "$LAUNCH_LOG"
 source "$PROJECT/.freely/run/manager-worker-launch-state.env"
 [[ "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" == "$CONTINUITY" ]]
 [[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" == "$PROMPT" ]]
+[[ "${MAX_PARALLEL_WORKERS:-}" == "unbounded" ]]
 [[ "${ACTIVE_RUNNING_WORKER_COUNT:-}" == "1" ]]
-[[ "${AVAILABLE_NEW_WORKER_SLOTS:-}" == "1" ]]
+[[ "${AVAILABLE_NEW_WORKER_SLOTS:-}" == "unbounded" ]]
 
 echo "[PASS] stale consumed prompt is relaunched when the target worker is no longer running"

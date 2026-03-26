@@ -4,20 +4,22 @@
 - title: Latest manager continuity worker consumption governance
 - phase_state: `completed`
 - runtime_state: `resumable`
-- branch: `feature/manager-launch-state-consumed-truth-reconcile-20260324`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
+- branch: `feature/manager-family-integration-20260325`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-family-integration`
 - issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - session_refs:
   - {tool: codex, session_id: "019d220d-ce3c-7b42-a5b1-a5ed6b44b905", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/24/rollout-2026-03-24T15-53-43-019d220d-ce3c-7b42-a5b1-a5ed6b44b905.jsonl", role: "closeout-writeback"}
   - {tool: codex, session_id: "019d220f-37e7-7212-9346-55708074bb27", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/24/rollout-2026-03-24T15-55-15-019d220f-37e7-7212-9346-55708074bb27.jsonl", role: "context_compacted_handoff_source"}
   - {tool: codex, session_id: "019d1e52-ccb2-7612-9538-87fd9df4eea5", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T22-30-36-019d1e52-ccb2-7612-9538-87fd9df4eea5.jsonl", role: "context_compacted_handoff_source"}
   - {tool: codex, session_id: "019d1e4e-709f-7571-a958-b79828dc38f4", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T22-25-50-019d1e4e-709f-7571-a958-b79828dc38f4.jsonl", role: "fresh_with_handoff_source"}
-- summary: canonical `develop` post-merge acceptance for `I-20260322-0445` remains passed on 2026-03-24. At this writeback reread, the current canonical manager continuity and launch-state/env consumed truth are both aligned at `123901`; the manager-only cleanup-governance line first corrected at `093617`, then reaffirmed through `122611`, `122935`, and `123608`, still holds as the current non-reopen judgement. Because `123901` created no new worker prompt, `prompt = none` with `ACTIVE_RUNNING_WORKER_COUNT = 3` still reflects latest-launchable-set truth versus fleet-wide running-worker truth, not a fresh regression against `pre-tests.md`. The issue stays completed and only cleanup followthrough remains explicit.
+- summary: canonical `develop` post-merge acceptance for `I-20260322-0445` remains passed on 2026-03-24, but the same family has now reproduced two tightly bounded runtime regressions in latest continuity worker-prompt consumption. First, `manager_continuity_has_unconsumed_launchable_worker_prompt` crashed under `set -u` with `prompt_generated_csv: unbound variable` when launch-state `LAST_MANAGER_CONTINUITY_CONSUMED` already matched the current continuity. Second, canonical continuities such as `manager-continuity-20260324-232554.md` wrote launchable prompt truth under `worker_prompt_paths_created_this_round` / `worker_prompt_paths_referenced` and bare launch-queue prompt bullets, while the continuity parser ignored those forms and therefore surfaced `latest_manager_worker_prompts_generated = none` despite a real prompt file existing. The runtime truth source now derives `prompt_generated_csv` before same-continuity reconciliation and parses these manager-authored prompt list forms as launchable while still excluding `worker_prompt_paths_superseded`. Focused regression tests now prove both paths. This does not reopen the issue family; cleanup followthrough remains the only open tail. The integration branch also absorbs the no-fixed-cap dispatch capability lane in the same shared runtime/control-plane surface.
 - current_focus:
-  - keep this worktree scoped to docs-only closeout writeback; do not reopen implementation or research scope
+  - keep this continuation scoped to the reproduced same-family runtime regressions and branch-level merge absorption; do not expand beyond launch-state consumption governance
   - preserve explicit cleanup disposition: this worktree remains retained-with-reason and is not `delete-ready` until supervisor/runtime executes normal cleanup followthrough
   - keep `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough` separate as runtime-owned recovery context rather than this issue's blocker
 - verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-unconsumed-launchable-worker-prompt-same-continuity`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-created-worker-prompt-parsing`
   - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
   - `./bin/freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
   - `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-worker-launch-state.env`
@@ -39,6 +41,7 @@
   - `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-worker-launch-state.env`
 - This closeout round only re-read canonical truth surfaces for writeback confidence; it did not rerun runtime tests because no implementation scope changed in this worktree.
 - This fresh session absorbed the `context_compacted` handoff from Codex session `019d220f-37e7-7212-9346-55708074bb27` before continuing the same closeout writeback, so the continuity chain stays explicit even though this round still remained docs-only.
+- This integration worktree now absorbs both the no-fixed-cap dispatch capability lane and the same-family launch-state/parser regression lane, so the branch-level writeback remains merge-oriented rather than reopening issue scope.
 - Earlier same-day acceptance evidence remains valid:
   - `034106` continuity and `032208` worker prompt were aligned as latest generated/consumed truth with `queued_worker_prompts = none`
   - the dedicated closeout continuity/prompt `051509` also briefly appeared aligned

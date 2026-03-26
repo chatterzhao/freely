@@ -1907,22 +1907,32 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
       section=tolower(substr($0, 4))
       gsub(/[`[:space:]]+$/, "", section)
       capture_runtime_worker_prompt=0
+      capture_worker_prompt_path_list=0
       next
     }
     /^# / {
       section=""
       capture_runtime_worker_prompt=0
+      capture_worker_prompt_path_list=0
       next
     }
     {
       if (section == "queue") {
-        if ($0 ~ /prompt_path:/ && mode != "frozen") {
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "frozen") {
+          emit_prompt_paths($0)
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/ && mode != "frozen") {
           emit_prompt_paths($0)
         }
         next
       }
       if (section == "frozen queue") {
-        if ($0 ~ /prompt_path:/ && mode != "launchable") {
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "launchable") {
+          emit_prompt_paths($0)
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/ && mode != "launchable") {
           emit_prompt_paths($0)
         }
         next
@@ -1937,8 +1947,16 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         capture_runtime_worker_prompt=1
         next
       }
+      if ($0 ~ /- worker_prompt_paths_created_this_round:/ || $0 ~ /- worker_prompt_paths_referenced:/) {
+        capture_worker_prompt_path_list=(mode != "frozen")
+        next
+      }
+      if ($0 ~ /- worker_prompt_paths_superseded:/) {
+        capture_worker_prompt_path_list=0
+        next
+      }
       if (capture_runtime_worker_prompt == 1) {
-        if ($0 ~ /^[[:space:]]*-[[:space:]]*\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt[[:space:]]*$/) {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
           if (mode != "frozen") {
             emit_prompt_paths($0)
           }
@@ -1947,6 +1965,19 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         }
         if ($0 !~ /^[[:space:]]*$/ && $0 !~ /^[[:space:]]*-[[:space:]]/) {
           capture_runtime_worker_prompt=0
+        }
+      }
+      if (capture_worker_prompt_path_list == 1) {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+          emit_prompt_paths($0)
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`none`[[:space:]]*$/ || $0 ~ /^[[:space:]]*`none`[[:space:]]*$/) {
+          capture_worker_prompt_path_list=0
+          next
+        }
+        if ($0 !~ /^[[:space:]]*$/ && $0 !~ /^[[:space:]]*-[[:space:]]/) {
+          capture_worker_prompt_path_list=0
         }
       }
     }
@@ -2059,8 +2090,9 @@ manager_continuity_has_worker_prompts() {
 
 manager_continuity_has_unconsumed_launchable_worker_prompt() {
   local project="$1" continuity_file="$2"
-  local prompt_file launched_csv=""
+  local prompt_file prompt_generated_csv launched_csv=""
   [[ -f "$continuity_file" ]] || return 1
+  prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
   if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
     # shellcheck disable=SC1090
     source "$(manager_worker_launch_state_file "$project")"
@@ -2217,12 +2249,7 @@ worker_prompt_write_scope() {
 }
 
 manager_max_parallel_workers() {
-  local value="${FREELY_MANAGER_MAX_PARALLEL_WORKERS:-2}"
-  if [[ "$value" =~ ^[0-9]+$ ]] && (( value >= 1 )); then
-    printf '%s\n' "$value"
-  else
-    printf '2\n'
-  fi
+  printf 'unbounded\n'
 }
 
 all_repo_worktrees_for_project() {
@@ -2262,17 +2289,8 @@ worker_project_busy_with_delegated_continuation() {
 }
 
 manager_worker_launch_available_slots() {
-  local project="$1" max_parallel active_running
-  max_parallel="$(manager_max_parallel_workers)"
-  active_running="$(count_active_running_workers_for_manager_project "$project")"
-  if ! [[ "$active_running" =~ ^[0-9]+$ ]]; then
-    active_running="0"
-  fi
-  if (( active_running >= max_parallel )); then
-    printf '0\n'
-  else
-    printf '%s\n' "$((max_parallel - active_running))"
-  fi
+  local _project="$1"
+  printf 'unbounded\n'
 }
 
 manager_worker_launch_intake_id_for_prompt() {
@@ -2345,7 +2363,7 @@ manager_runtime_launch_workers_from_latest_handoff() {
   local project="$1"
   local continuity_file continuity_generated prompt_generated_csv launched_csv queued_csv
   local launched_count prompt_file prompt_rank prompt_index target_project write_scope
-  local parallel_safe consumes_slot active_running_workers available_new_slots max_parallel_workers
+  local parallel_safe active_running_workers available_new_slots max_parallel_workers
   local selected_write_scopes_csv worker_is_active worker_is_busy prompt_queue_file
   continuity_file="$(latest_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
@@ -2396,10 +2414,8 @@ manager_runtime_launch_workers_from_latest_handoff() {
     parallel_safe="$(worker_prompt_parallel_safe "$prompt_file")"
     worker_is_active="0"
     worker_is_busy="0"
-    consumes_slot="1"
     if worker_project_is_actively_running "$target_project"; then
       worker_is_active="1"
-      consumes_slot="0"
       if worker_project_busy_with_delegated_continuation "$target_project"; then
         worker_is_busy="1"
       fi
@@ -2417,17 +2433,11 @@ manager_runtime_launch_workers_from_latest_handoff() {
       queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
       continue
     fi
-    if [[ "$consumes_slot" == "1" ]] && (( available_new_slots <= 0 )); then
-      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
-      continue
-    fi
-
     if launch_worker_from_manager_prompt_if_needed "$project" "$prompt_file"; then
       launched_csv="$(csv_append_unique_item "$launched_csv" "$prompt_file")"
       selected_write_scopes_csv="$(csv_append_unique_item "$selected_write_scopes_csv" "$write_scope")"
       launched_count=$((launched_count + 1))
-      if [[ "$consumes_slot" == "1" ]]; then
-        available_new_slots=$((available_new_slots - 1))
+      if [[ "$worker_is_active" != "1" ]]; then
         active_running_workers=$((active_running_workers + 1))
       fi
     else
