@@ -61,6 +61,9 @@
     - `review/test`: 仅提供 supporting evidence，不改变 canonical route
     - `human chat/session evidence`: 仅证明 continuation 来源，不替代 candidate 真源
     - `github issue`: 未发现外部 issue 接管
+- retention_audit:
+  - `2026-03-25`: this candidate still has no promoted issue, no `progress` owner, and no `recovery` artifact that absorbs the prompt-absorbed manager delegated-continuation stall acceptance boundary.
+  - `2026-03-25`: keep this dedicated worktree retained-with-reason even though adjacent manager continuity / handoff consumption issues have advanced; those issue families do not own the missing `specific stalled intake id -> current manager prompt cycle -> consumed-event binding -> no-new-continuity/handoff stall verdict` chain.
 - runtime_visible_evidence:
   - prompt-level proof:
     - `current_prompt_has_delegated_continuation=1`
