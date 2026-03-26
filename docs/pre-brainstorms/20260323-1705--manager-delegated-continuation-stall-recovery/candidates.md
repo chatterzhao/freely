@@ -243,6 +243,7 @@
     - `consumed event anchor=<timestamp / ids / equivalent proof>`
     - `stall verdict=no-new-continuity/handoff for that same chain`
   - 在这两件事没完成之前，本树继续视为 active canonical owner，不降级为 evidence-only，也不进入 IBM。
+  - 当前 owner worktree 已 clean，但这只说明 hygiene 已恢复；branch 仍未被 `develop` 吸收，specimen-chain binding proof 也还没稳定到可 materialize 的 contract，所以 cleanup disposition 继续保持 `retain-for-followthrough`。
 - revisit_trigger:
   - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof，并附带一轮真实 followthrough 时，重新进入 materialization 判断。
   - 当 manager 已吸收当前分支上的 canonical writeback 提交并重新做 cleanup 巡检时，重新判断该 worktree 是否满足 `retire-now`。
