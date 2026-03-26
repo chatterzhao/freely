@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260325-0333--testing-evidence-ladder-and-real-environment-gates
 - 20260324-0405--watchdog-restart-storm-and-process-churn-detection
 - 20260324-0415--application-native-observability-planes
 - 20260323-2045--manager-worker-scheduler-capacity-and-queueing
@@ -50,6 +51,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260325-0333--testing-evidence-ladder-and-real-environment-gates
+  - brainstorms: docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md
 - 20260324-0405--watchdog-restart-storm-and-process-churn-detection
   - brainstorms: docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/brainstorms.md
   - candidates: docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/candidates.md
