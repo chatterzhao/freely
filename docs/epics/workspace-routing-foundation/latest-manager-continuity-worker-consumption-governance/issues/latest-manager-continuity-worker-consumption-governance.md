@@ -124,7 +124,7 @@
   - the pre-test-merge followthrough lane remains runtime-owned context and stays outside this issue's canonical acceptance result
 - Keep cleanup disposition explicit rather than premature:
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`: docs-only closeout writeback has now been absorbed by the integration owner; retire the local companion instead of keeping a second closeout owner alive
-  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile`: retain as the active same-family lane until supervisor/runtime completes normal followthrough
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile`: parser/live-status/stalled-recovery capability is now canonically owned by `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-family-integration`; retire the companion instead of replaying its residual verification narration
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough`: keep separate as `runtime-owned` recovery/followthrough; do not absorb it into this issue's acceptance or cleanup result
 - Revisit trigger:
   - reproduce a fresh canonical develop-side regression against `pre-tests.md`, or receive new same-family supervisor/runtime evidence that materially contradicts the current canonical manager judgement in `manager-continuity-20260324-123901.md`
@@ -132,16 +132,16 @@
 ## Retirement Audit
 
 - audit_date: `2026-03-24`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
-- worktree_state: `dirty`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-family-integration`
+- worktree_state: `clean`
 - classification: `verified-retirable`
 - cleanup_gate: `retire-now`
 - why_not_verified_retirable:
-  - none; the docs-only closeout writeback formerly owned here is now canonically absorbed by `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-family-integration`
-  - same-family followthrough remains active elsewhere, but this companion no longer owns unique lifecycle truth
+- none for the two retired 20260324 companions; their runtime/test and docs-only closeout payload is now canonically absorbed by `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-family-integration`
+- this owner itself is still retained separately for develop-facing absorption and is not the retirement target of this audit
 - local_branch_disposition: `retire-now`
-- local_branch_reason: local commits `8035fcf`, `fcc66ca`, `f7f5e93`, `c46da2f`, and `73dc2ba` are docs-only writebacks already absorbed by the integration owner; delete this local companion branch/worktree
+- local_branch_reason: local companion commits `8035fcf`, `fcc66ca`, `f7f5e93`, `c46da2f`, `73dc2ba`, `1548d6e`, `e04cefd`, `389615f`, and `39e04ee` are already absorbed by the integration owner in canonical runtime/tests/writeback form; delete the two 20260324 companion branch/worktree lanes
 - remote_branch_disposition: `not_checked`
 - remote_branch_reason: remote cleanup is outside this worker's closeout-writeback scope
 - revisit_trigger:
-  - supervisor/runtime re-enters cleanup followthrough for this worktree
+  - supervisor/runtime re-enters cleanup followthrough for this owner after the companion retirements

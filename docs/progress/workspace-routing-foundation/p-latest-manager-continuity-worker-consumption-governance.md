@@ -70,15 +70,22 @@
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-no-fixed-cap-dispatch`
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-unconsumed-launchable-prompt-fix`
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-continuity-prompt-path-contract-reconcile`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
 - Their remaining non-ancestor commits are not missing desired capability in the owner:
   - `manager-no-fixed-cap-dispatch` and `manager-unconsumed-launchable-prompt-fix` still carry older account-based readiness / cooldown hunks that would regress the current canonical truth if replayed directly
   - `manager-continuity-prompt-path-contract-reconcile` still carries one local-only parser/test commit (`0d88f3d`), but this owner already includes the same launchable-prompt parsing coverage and passing regressions in canonical form
-- This round therefore treats all three branches as superseded local source lanes whose remaining unique commits should not be replayed onto the canonical owner.
+  - `manager-active-worker-launch-state-reconcile` still shows non-ancestor commits in `git cherry`, but its remaining value is already canonically owned here: parser coverage for `worker_prompt_paths_referenced_this_round`, stalled-recovery helper coverage, and live-status capacity refresh all exist in the current owner runtime/tests, while the rest of the delta is verification/writeback narration only
+  - `manager-launch-state-consumed-truth-reconcile` now carries docs-only closeout/retirement writeback; it no longer owns any unique runtime, agent, skill, prompt-contract, or test capability
+- This round therefore treats all five branches as superseded local source lanes whose remaining unique commits should not be replayed onto the canonical owner.
 - After this writeback is committed, the local source worktrees/branches are retirement candidates even though their historical commits were never merged directly.
 
 ## 2026-03-25 Companion Retirement Audit
 
-- Re-audited `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile` against this integration owner.
-- Its remaining local commits (`8035fcf`, `fcc66ca`, `f7f5e93`, `c46da2f`, `73dc2ba`) are docs-only closeout writebacks; they do not carry runtime/test capability missing from the owner.
-- This companion therefore no longer owns an independent lifecycle for `I-20260322-0445`.
-- Retirement action should delete that local branch/worktree, while `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile` remains the only retained same-family companion because it still carries followthrough context outside this docs-only closeout lane.
+- Re-audited both surviving 20260324 companions against this integration owner:
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile`
+- `manager-launch-state-consumed-truth-reconcile` remaining local commits (`8035fcf`, `fcc66ca`, `f7f5e93`, `c46da2f`, `73dc2ba`) are docs-only closeout writebacks; they do not carry runtime/test capability missing from the owner.
+- `manager-active-worker-launch-state-reconcile` remaining local commits (`1548d6e`, `e04cefd`, `389615f`, `39e04ee`) are also now absorbed here in canonical form: the owner runtime parses `worker_prompt_paths_referenced_this_round`, the stalled-recovery helper no longer hits the `prompt_generated_csv` `set -u` bug, and `live-status` refresh now persists capacity truth on read.
+- These companions therefore no longer own an independent lifecycle for `I-20260322-0445`.
+- Retirement action should delete both local branch/worktree companions and keep only this integration owner plus the separate `runtime-owned` `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough`.
