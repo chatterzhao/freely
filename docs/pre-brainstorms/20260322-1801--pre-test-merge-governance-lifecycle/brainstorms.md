@@ -609,6 +609,16 @@ Validation batch governance:
   - `runtime launch state` / `live-status` 只做 mirror + hard gate
   - `branch/worktree governance` 只消费已有 judgement/evidence 做 replay / retire / delete gate
 - 因此，这条能力现在应被理解成一个 combined minimal contract，而不是单点 `runtime status` 补丁、单点 `manager patrol` 补丁，或单点 `branch-management` 文案增强
+- 本轮 superseding delegated continuation 又把 combined minimal contract 收紧成 5 条最小语义：
+  - stale `pre-test-merge` 一旦被 manager 判定，就不得再充当 active verification truth surface
+  - manager patrol 必须输出 `stale_batch -> retire/rebuild` 或等价 lifecycle decision，不能静默继续普通 verification
+  - runtime 只消费 manager 已写出的 stale judgement，并以 hard gate 拒绝 stale batch 按普通 active validation surface 启动
+  - watchdog 仍只负责 runtime recovery，不负责裁决 validation batch legitimacy
+  - 若同一能力仍需继续验证，必须 replay 来源 feature 集合到 fresh `pre-test-merge` batch，而不是复用旧 stale batch
+- 因此当前问题的实现落点也继续保持为 combined minimal contract，而不是在 `runtime status`、`manager patrol`、`branch-management` 三者中单选其一：
+  - `manager continuity` 负责唯一 machine-readable 真相块
+  - `runtime launch state` / `live-status` 负责 mirror 与 hard gate
+  - `branch/worktree governance` 负责 replay / retire / delete gate 消费
 - supporting pools 也都在强化同一个结论：
   - 现有 completed issue `I-20260322-1801` 明确只负责职责定义，不负责 stale-batch capability materialization
   - 语义审计 pre-brainstorm 只把这条能力当 supporting evidence，没有把它升级成 IBM
@@ -616,10 +626,14 @@ Validation batch governance:
   - human chat / session evidence 当前只体现为 delegated continuation intake 与当前 run 的 prompt evidence；这些证据都要求继续吸收进现有 candidate，而不是新开 lifecycle
   - 当前 `./bin/freely live-status --project <this-worktree>` 也只证明 continuation 已被当前 worker 吸收：`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024929/024942/025910/030713` 等 intake，`pending_delegated_continuation_ids=none`，而 `latest_manager_continuity_generated=unavailable` / `latest_manager_continuity_consumed=unavailable` 继续说明 manager truth artifact 仍未稳定到可直接拿来做 IBM 输入
   - handoff 要求读取的 `manager-continuity-20260324-021853.md` 在当前 worktree 中并不存在，因此本轮不能把某份缺失的 manager truth artifact 当成“已经稳定可消费”的 IBM 输入；它只能继续作为 contract freeze 的缺口记录
-- 当前 handoff 的 delegated continuation judgement 仍与 runtime 事实相容，且当前轮换元数据并未脱离 handoff 所描述的 continuity guard。当前仓库事实是：`live-status` 显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`、`current_prompt_has_delegated_continuation=1`，同时 `pending_delegated_continuation_ids=none`、`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024929/024942/025910/030713`。这说明当前 worker 确实已消费 superseding delegated continuations，但也同样表明 `live-status` 这里只是当前 run 的消费镜像，而不是可替代 manager continuity 的长期 truth source
-- 当前 assigned worktree 的 hygiene 复核仍不改变路由：本轮开始时 `git status --short --branch` 已显示当前 canonical doc-loop writeback 留下的 3 个 dirty 文件，`git rev-list --left-right --count develop...HEAD` 为 `46 15`，而 handoff 要求读取的 `.freely/run/manager-continuity-20260324-021853.md` 仍然缺失。这说明本轮无需先切 checkpoint 或分流无关改动，但它只是 doc-loop continuity evidence，不是新的 promotion 信号
+- 当前 handoff 的 delegated continuation judgement 仍与 runtime 事实相容，但最新 runtime 真值已经落到新的 fresh run，而不是继续停留在 handoff 中的旧轮换元数据：
+  - handoff 里的 `context_compacted` / `402 deactivated_workspace` 仍应视为 runtime-owned 历史触发信号，而不是新的 canonical owner
+  - 当前 `./bin/freely live-status --project <this-worktree>` 仍显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`、`current_prompt_has_delegated_continuation=1`
+  - 同时 `pending_delegated_continuation_ids=none`、`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024929/024942/025910/030713` 等 superseding intake，且 `latest_manager_continuity_generated/consumed=unavailable`
+  - 这说明当前 worker 的确已消费 superseding delegated continuations，但 `live-status` 仍只是当前 run 的消费镜像，而不是可替代 manager continuity 的长期 truth source
+- 当前 assigned worktree 的 hygiene 复核仍不改变路由：本轮开始时 `git status --short --branch` 已显示当前 canonical doc-loop writeback 留下的 3 个 dirty 文件（`docs/milestones.md`、`brainstorms.md`、`candidates.md`），`git rev-list --left-right --count develop...HEAD` 为 `74 26`，而 handoff 要求读取的 `.freely/run/manager-continuity-20260324-021853.md` 仍然缺失。这说明本轮无需先切 checkpoint 或分流无关改动，但它只是 doc-loop continuity evidence，不是新的 promotion 信号
 - 当前 same-session continuity refresh 继续把 runtime 事实收窄为“delegated continuation 已消费，但 runtime 仍只是 mirror”：
-  - `git status --short --branch` 当前只剩 2 个 canonical doc-loop 文件 dirty（`brainstorms.md` 与 `candidates.md`），`git rev-list --left-right --count develop...HEAD` 现为 `53 22`
+  - `git status --short --branch` 当前仍是 3 个 canonical doc-loop 文件 dirty，`git rev-list --left-right --count develop...HEAD` 现为 `74 26`
   - 当前 `live-status` 仍显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`，同时 `current_prompt_has_delegated_continuation=1`、`pending_delegated_continuation_ids=none` 与同一组 consumed delegated ids 保持不变
   - 因此 handoff 里的 `context_compacted` 既是历史 continuity guard 输入，也是当前 runtime run 仍在暴露的事实；这不会改变 owner，只会再次证明 runtime mirror 不能替代缺失的 manager continuity truth artifact
 - 最新 supporting-pool ownership check 也没有改写 owner：
@@ -805,11 +819,15 @@ Validation batch governance:
 - `stale_reason` 与 `lifecycle_decision` 是否需要更细枚举，还是保持最小集合
 - `retire_evidence_ref` 与 `remaining_cleanup_requirement` 当前不能只靠默认理解支撑 future delete guard / hook 对 fresh-batch absorption 的稳定判断；当前已选路线是不新增额外 pointer，但必须把这组等价关系冻结成明确 contract，并补上独立 review evidence，证明 worker-consumption mirror 不会被误读成 absorption proof
 - 这份 v0 contract 是否已足够小到能单独 materialize 成 IBM，而不是还需再做一轮独立 acceptance review
+- 当前 fresh-session 对 `constitution-guard` / `laws-enforcer` 与 `I-20260322-1801` 的再读取也继续收紧同一个结论：宪法/法律只允许当前 worker 在 assigned feature worktree 里继续维护 candidate / milestone truth，而已完成的职责定义 issue 与其 `pre-tests.md` 只提供 acceptance bridge 的 source truth，不会把 stale-batch capability 直接升级成 IBM owner
 
 ## 本轮独立 review 结论
 
 - 最新只读 explorer IBM-readiness 复核没有推翻上一轮 writeback：supporting pools 仍只支持 `stay_pre_brainstorm`
 - 当前已经有一轮 supporting-pool 独立对读，但它给出的结论仍是“继续保留 `combined minimal contract v0`，不要直接开 IBM”
+- 最新 concrete supporting-pool patrol 还把证据源钉得更实：`docs/milestones.md` 继续把 `C-20260322-1801-B` 保持在 `candidate/in_pre_brainstorm`，`I-20260322-1801` 继续只作为已完成的职责定义 issue，`20260322-1802` 继续只是 supporting evidence，相邻 progress 文档只拥有 continuity/launch/cleanup-closeout lane，缺失的 `.freely/run/manager-continuity-20260324-021853.md` 仍只是 provenance gap
+- 当前 fresh session 的首跳闭环复核也没有改写这个结论：重新读取治理入口、workspace agent/skills、candidate/issue/supporting pools、`git status --short --branch`、`git rev-list --left-right --count develop...HEAD` 与 `./bin/freely live-status --project ...` 后，当前 worktree 仍只脏 3 个 canonical doc-loop 文件，`develop...HEAD` 仍是 `74 26`，runtime 仍只暴露 `fresh_with_handoff + context_compacted` 的 continuation-consumption mirror，而不是新的 canonical owner
+- 最新并行 explorer 又把 completed issue 栈的边界钉得更死：`I-20260322-1801` 的 `issue + brainstorm + prd + pre-tests` 一起复核后，仍明确把 runtime/status freshness、stale-batch detection capability 与 machine-readable surfacing排除在当前 IBM scope 外，只把它们留给 follow-on lifecycle；因此这条 lane 仍不能被 completed issue 栈吸收
 - 新增的 explorer contract-freeze review 进一步收窄了顺序：应先冻结 manager continuity 固定语法与最小字段块，再用 delete gate refusal samples 证明其足以支撑 runtime gate 与 cleanup/delete 判断，而不是并行扩写更多子能力
 - 因此，`next_action` 不再是泛化的“先去做 review”，而是继续把 review 后仍未冻结的部分收紧成可 materialize 的 issue contract：
   - manager continuity 的 `Validation batch governance:` `v1` 固定承载语法与最小字段块
@@ -820,6 +838,7 @@ Validation batch governance:
   - `Validation batch governance:` `v1` 固定块与 key 顺序
   - delete gate 输入组合 v1
   - `specimen-S1/S2/S3` 的最小拒绝语义
+- 当前首跳工具选择也未变化：`tools.md` 继续把 `codex` 定位为同 worktree 的 repo read/write 工具，而当前任务仍是 candidate/milestone canonical doc-loop 写回，所以这轮必须在当前 `codex` 会话内继续第二跳，而不是把 `next_prompt` 当作结束信号
 - 仍未冻结的只剩：
   - `Frozen equivalence: retire_evidence_ref + remaining_cleanup_requirement is the canonical machine-readable absorption pointer for fresh-batch followthrough, and no extra machine-readable pointer is required.` 是否已经写定并被当前 candidate 真源吸收
   - 冻结后的最小 contract 是否已再过一轮独立 acceptance review，足以 materialize
