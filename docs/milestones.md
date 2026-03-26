@@ -59,26 +59,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md`
 - next_action: review 与最小验证已落盘，但 `./bin/wt-status-all` 仍为 `Summary: total=6, dirty=1`；当前需先按 ownership 收束或分流 dirty 改动，其中 `docs/system/workspace/**` / `tests/**` 与 session-lifecycle 相关产物更像上游未提交批次，应先处理，再补 promote / cleanup 证据后移入 completed_issues
 
-2. `I-20260308-0101`
-- title: 状态联动、流程标识词典与 session evidence 传播治理
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md`
-- next_action: review 与 verification 已落盘，但 `./bin/wt-status-all` 仍为 `Summary: total=6, dirty=1`；当前需先按 ownership 收束或分流 dirty 改动，其中 `docs/system/workspace/**` / `tests/**` 与 session-lifecycle 相关产物更像上游未提交批次，应先处理，再补 completion verification / cleanup 证据后移入 completed_issues
-
-7. `I-20260318-1825`
-- title: Worktree hygiene supervision control plane
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/issues/worktree-hygiene-supervision-control-plane.md`
-- source_brainstorm: `docs/pre-brainstorms/20260318-1825--autonomous-worktree-hygiene-and-checkpoint-supervision/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260318-1825--autonomous-worktree-hygiene-and-checkpoint-supervision/candidates.md`
-- next_action: 新增 hygiene skill、checkpoint drift streak、manager hygiene alert 与回归测试已落盘；当前先做 review 与 promote 判断。若后续仍需专门 hygiene worker，再从同一预研线 materialize，不在本批次越界扩 scope
-
 8. `I-20260319-0018`
 - title: Token-efficient session continuity and rotation governance
 - milestone_state: committed
@@ -360,6 +340,32 @@ routing_policy:
 - evidence:
   - `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/code-reviews/20260326-manager-self-supervision-canonical-replay-verification.md`
 - completion_note: manager self-supervision alert、runtime-owned recovery、PID ownership 与 account-boundary contract 已在 canonical `develop` 通过 replay；更外层 manager ensure / watchdog 由 `I-20260318-1630` 继续承接
+
+15. `I-20260308-0101`
+- title: 状态联动、流程标识词典与 session evidence 传播治理
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260316-state-sync-verification.md`
+  - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260317-lead-agent-reentry-verification.md`
+  - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260326-state-sync-canonical-replay-verification.md`
+- completion_note: 状态词典、session evidence 传播与 milestone handoff policy 已在 canonical truth 中稳定存在；旧 dirty snapshot 与当时的环境兼容性问题不再构成未完成项
+
+16. `I-20260318-1825`
+- title: Worktree hygiene supervision control plane
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/issues/worktree-hygiene-supervision-control-plane.md`
+- source_brainstorm: `docs/pre-brainstorms/20260318-1825--autonomous-worktree-hygiene-and-checkpoint-supervision/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260318-1825--autonomous-worktree-hygiene-and-checkpoint-supervision/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/code-reviews/20260326-worktree-hygiene-canonical-replay-verification.md`
+- completion_note: hygiene skill、checkpoint drift escalation 与 manager hygiene alert 已在 canonical `develop` 通过 replay；若需专门 hygiene worker delegation flow，应通过新 lifecycle 承接
 
 ### candidate_issues
 
