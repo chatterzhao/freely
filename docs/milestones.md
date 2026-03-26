@@ -97,7 +97,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
-- next_action: 当前 dedicated worktree 已把 slot-sweep-first continuation 真正落到 `availability-watchdog.sh`、`ai-cli` 与 focused regressions：manager/bootstrap 与 `freely ai switch codex` 现在只会信真实 probe 成功的 usable slot，`all_unavailable` 时不再切 earliest-reset slot，probe 失败后也会恢复原 auth/active-slot。focused rerun 与 `./bin/governance-check` 已通过，当前继续保持 `in_verification`；下一步进入同 issue family 的 code review / manager merge judgement，并在 develop replay 前继续避免把它误判成 completed
+- next_action: 当前 dedicated worktree 又补上 `auth_failure` 后 detached watchdog control-plane 仍需存活的 same-family recovery gap：`runtime/freely` 已改成 `nohup` detached launch，并新增 focused regression 锁住 `ensure-manager.pid` / `interruption-dispatch.pid` 在 manager `auth_failure` 后仍为 live processes。focused rerun 与 `./bin/governance-check` 已通过，当前继续保持 `in_verification`；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再掉到 `stalled_without_runtime`
 
 6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation

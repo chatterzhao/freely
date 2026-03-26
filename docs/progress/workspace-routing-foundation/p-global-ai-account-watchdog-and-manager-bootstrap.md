@@ -3,9 +3,9 @@
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
 - phase_state: `in_verification`
-- runtime_state: `closed_for_this_batch`
-- branch: `feature/watchdog-slot-sweep-without-cooldown-governance-20260325`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-slot-sweep-without-cooldown-governance`
+- runtime_state: `in_verification`
+- branch: `feature/watchdog-auth-failure-control-plane-recovery-20260326`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-auth-failure-control-plane-recovery`
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "continuation-worker"}
@@ -26,6 +26,14 @@
     - `test-freely-ensure-manager`
     - `test-freely-ensure-manager-earliest-reset-wait-revive`
   - 这一轮验证已通过，当前保持 `in_verification`，等待后续 code review / manager merge judgement
+- 2026-03-26 canonical develop replay 暴露出同族控制面缺口：
+  - 最新 delegated continuations 已进入 `.freely/intake/` 的 `delegated` 状态
+  - 但 canonical runtime 因 manager `auth_failure` 掉到 `stalled_without_runtime`，现场没有任何存活的 `ensure-manager --watch` / interruption dispatcher 继续消化这些 intake
+  - 当前判断：不是新 issue，而是本 issue 的 script-owned recovery contract 仍缺一条 detached control-plane survival gate
+- 2026-03-26 当前 continuation 已补上这条控制面恢复：
+  - `runtime/freely` 里的 `launch_manager_supervisor()`、`launch_interruption_dispatcher()`、`launch_manager_watchdog()` 已改为 `nohup` detached launch，避免父 supervisor 因 `auth_failure` 退出时把控制面一起带掉
+  - 新增 focused regression `test-freely-auth-failure-keeps-control-plane-alive`
+  - 继续复跑 `test-freely-manager-watchdog-live-during-active-ai` 与 `test-freely-rate-limit-defers-to-watchdog`，证明 detached launch 没有破坏既有 watchdog 生命周期或 rate-limit 委派路径
 - 本轮 continuation 已吸收 delegated handoff 中的五点 contract，并确认对应实现已经落在当前分支祖先：
   - all accounts unusable 时选择最早 reset 账号
   - wait 采用 `reset_at + 60s` 等价 buffer 契约，可由 watchdog buffer 环境变量调节
@@ -76,6 +84,8 @@
 - `./bin/ai --quiet --format json list`
 - compare canonical `.freely/run/codex-slot-cooldowns.tsv` entries against saved slot inventory
 - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
+- `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-watchdog-live-during-active-ai`
 
 ### Latest rerun
 
@@ -110,11 +120,16 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager` pass，且显式验证 manager bootstrap 之前会先 full sweep 并 promote 真实 usable slot
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-earliest-reset-wait-revive` pass，且显式验证 all-slots-unavailable 后走低频真实 reprobe，而不是 cooldown-driven sleep-until-reset
   - `./bin/governance-check` pass，只有 10 条 legacy pre-brainstorm naming warning
+- 2026-03-26 auth-failure control-plane continuation rerun:
+  - `bash -n docs/system/workspace/scripts/runtime/freely` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-watchdog-live-during-active-ai` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog` pass
+  - `./bin/governance-check` pass，只有 10 条 legacy pre-brainstorm naming warning
 
 ## Next Action
 
-- 当前批次已经把 slot-sweep-first contract 真正落到 runtime / watchdog / ai-cli / focused tests，不再只是 pre-brainstorm 结论。
-- 下一步进入同 issue family 的 code review / manager merge judgement；在 manager 吸收前，不把本 worktree 判成 completed。
+- 当前批次又补上了 `auth_failure` 后 detached control-plane 存活契约；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再掉到 `stalled_without_runtime`。
 
 ## Revisit Trigger
 

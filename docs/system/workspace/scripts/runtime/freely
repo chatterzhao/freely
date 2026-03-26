@@ -3406,16 +3406,14 @@ launch_manager_supervisor() {
   local project="$1"
   local launch_bin
   launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
-  bash "$launch_bin" start --project "$project" >/dev/null 2>&1 &
-  disown "$!" 2>/dev/null || true
+  nohup bash "$launch_bin" start --project "$project" >/dev/null 2>&1 </dev/null &
 }
 
 launch_interruption_dispatcher() {
   local project="$1"
   local launch_bin
   launch_bin="${FREELY_INTERRUPTION_DISPATCH_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
-  bash "$launch_bin" ensure-interruption-dispatch --project "$project" --watch >/dev/null 2>&1 &
-  disown "$!" 2>/dev/null || true
+  nohup bash "$launch_bin" ensure-interruption-dispatch --project "$project" --watch >/dev/null 2>&1 </dev/null &
 }
 
 launch_manager_watchdog() {
@@ -3423,8 +3421,7 @@ launch_manager_watchdog() {
   local launch_bin watch_interval
   launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
   watch_interval="${MANAGER_WATCHDOG_INTERVAL_SECS:-${CHECK_INTERVAL:-5}}"
-  bash "$launch_bin" ensure-manager --project "$project" --watch --interval "$watch_interval" >/dev/null 2>&1 &
-  disown "$!" 2>/dev/null || true
+  nohup bash "$launch_bin" ensure-manager --project "$project" --watch --interval "$watch_interval" >/dev/null 2>&1 </dev/null &
 }
 
 manager_supervisor_pid_for_project() {

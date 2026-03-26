@@ -139,6 +139,14 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `slot` 才是 `.ai-auth/<slot>` 的唯一身份，但 `bin/ai whoami` 仍把 auth JWT email 输出成 `Current account`
     - 现场已出现 `Current slot != Current account` 的情形；这不是 slot 选择错误，而是 CLI 把 auth metadata 错报成了身份
     - 当前 continuation 已把 `whoami` / `switch` / `status` / `save` / `login` 的对外 contract 改成 slot-first，并新增 focused regression 锁住 “slot 标签与 auth email 不一致” 的场景
+  - 2026-03-26 develop replay 又暴露出一条同族控制面缺口：
+    - canonical runtime 在 manager 命中 `auth_failure` 后会停在 `stalled_without_runtime`
+    - delegated interruption intake 继续堆积，但现场没有任何存活的 `ensure-manager --watch` / interruption dispatcher 继续恢复和消化
+    - 当前判断：不是新 candidate，而是本 issue 的 script-owned recovery contract 仍缺一条 detached control-plane survival gate
+  - 2026-03-26 当前 continuation 已补上 detached control-plane recovery：
+    - `launch_manager_supervisor()`、`launch_interruption_dispatcher()`、`launch_manager_watchdog()` 已改用 `nohup ... </dev/null >/dev/null 2>&1 &`，不再依赖父 supervisor 退出后仍能保留的脆弱 background/disown 语义
+    - 新增 `docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive`，显式验证 manager 命中 `auth_failure` 后 `ensure-manager.pid` 与 `interruption-dispatch.pid` 仍代表 live process，且 `freely stop` 能清理
+    - `test-freely-manager-watchdog-live-during-active-ai` 与 `test-freely-rate-limit-defers-to-watchdog` 继续通过，证明 detached launch 没有破坏既有 watchdog 生命周期
   - `test-freely-global-account-watchdog-live` 已真实通过：
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
@@ -148,6 +156,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 - 当前 continuation batch 已完成 slot-sweep-first contract 的最小实现与 feature-worktree focused 验证，当前保持 `in_verification`，等待 manager merge review。
 - 当前 continuation batch 已补上 verification drift：稳定化 `rate-limit` 用例计时，并把 manager bootstrap handoff 契约收进 focused tests；本轮完成后继续保持 `in_verification`，等待 manager merge review。
+- 当前 continuation batch 又补上 `auth_failure` 后 detached control-plane 存活契约；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再掉到 `stalled_without_runtime`。
 - 同族 pre-brainstorm 已把恢复 contract 进一步收紧为 `failure-driven full slot sweep`，而本轮 continuation 已把这条 contract 的最小主路径真正写回能力真源。下一轮不再是重做 contract 改写，而是继续做 code review / merge judgement / develop replay。
 - 当前批次交付的 continuation contract：
   - wait 采用 `reset_at + buffer`

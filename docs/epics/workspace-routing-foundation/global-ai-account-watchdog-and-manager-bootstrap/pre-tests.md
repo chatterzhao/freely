@@ -8,6 +8,7 @@
 4. 当所有保存 slot 都不可用时，恢复链会进入低频真实 reprobe；`earliest reset` 最多作为 debug evidence 或排序提示，不再主导恢复决策。
 5. 这条恢复 contract 由纯脚本 watchdog / runtime 完成，不依赖 manager AI 或 worker AI 的语义判断。
 6. `whoami`/`switch`/`status`/`save`/`login` 的对外契约必须以 slot 为唯一身份，auth email 仅作为 `auth_email` 元数据暴露。
+7. manager 因 `auth_failure` 退出后，detached `ensure-manager --watch` 与 interruption dispatcher 仍必须留在控制面继续恢复和消化 intake，不能一起掉光。
 
 ## Testing layers
 
@@ -17,6 +18,7 @@
    - focused tests 必须覆盖 failure taxonomy 到 full slot sweep 的统一路由，而不是只验证 cooldown 写回。
 3. Runtime integration gate
    - `freely ensure-manager` 与 `freely ai switch codex` 必须共享同一套 slot probe / switch 主路径。
+   - `freely start` 在 manager 触发 `auth_failure` 后，控制面进程仍需存活并可被 `freely stop` 清理。
 4. Real-environment gate
    - live 验收必须证明：当前活跃 slot 失效后，watchdog 能扫到另一个真实可用 slot 并恢复监督；若所有 slot 都不可用，也不会因为旧 cooldown 账本而错误睡死或错误判可用。
 
@@ -35,6 +37,7 @@
 5. `watchdog-control-plane`、`runtime/freely`、`ai-cli` 的真源说明不再把 cooldown 描述为 canonical recovery owner。
 6. live evidence 能说明真实 `.ai-auth/<slot>` inventory 与实际 probe/switch 行为一致。
 7. 至少一条 focused regression 明确锁住 “slot 标签与 auth email 不一致时，CLI 仍以 slot 为身份、仅把 email 作为 metadata”。
+8. 至少一条 focused regression 明确锁住 “manager `auth_failure` 后 watchdog control-plane 仍存活并继续接管恢复”。
 
 ## Blocker taxonomy
 

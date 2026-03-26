@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-auth-failure-control-plane.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/mock-bin"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$PROJECT/bin" \
+  "$MOCK_BIN"
+
+cd "$PROJECT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=1
+IFLOW_MAX_TURNS=100
+EOF
+
+cat >"$PROJECT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+case "$*" in
+  *"whoami"*) echo '{"tool":"codex","account":"broken@example.com","slot":"broken@example-com-1"}' ;;
+  *"list"*) echo '{"accounts":[]}' ;;
+  *"switch"*) echo '{"switched": false, "tool":"codex","account":"unavailable"}' ;;
+  *) echo '{}' ;;
+esac
+EOF
+chmod +x "$PROJECT/bin/ai"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+echo "ERROR: 401 Unauthorized"
+echo "auth failure"
+exit 1
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+PATH="$MOCK_BIN:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
+
+for _ in $(seq 1 10); do
+  watchdog_pid="$(cat "$PROJECT/.freely/run/ensure-manager.pid" 2>/dev/null || true)"
+  dispatcher_pid="$(cat "$PROJECT/.freely/run/interruption-dispatch.pid" 2>/dev/null || true)"
+  if [[ -n "$watchdog_pid" && -n "$dispatcher_pid" ]] && kill -0 "$watchdog_pid" 2>/dev/null && kill -0 "$dispatcher_pid" 2>/dev/null; then
+    break
+  fi
+  sleep 1
+done
+
+watchdog_pid="$(cat "$PROJECT/.freely/run/ensure-manager.pid" 2>/dev/null || true)"
+dispatcher_pid="$(cat "$PROJECT/.freely/run/interruption-dispatch.pid" 2>/dev/null || true)"
+
+[[ -n "$watchdog_pid" ]] || {
+  echo "[FAIL] expected ensure-manager watchdog pid after auth_failure supervisor exit" >&2
+  exit 1
+}
+[[ -n "$dispatcher_pid" ]] || {
+  echo "[FAIL] expected interruption dispatcher pid after auth_failure supervisor exit" >&2
+  exit 1
+}
+kill -0 "$watchdog_pid" 2>/dev/null || {
+  echo "[FAIL] ensure-manager watchdog is not alive after auth_failure supervisor exit" >&2
+  exit 1
+}
+kill -0 "$dispatcher_pid" 2>/dev/null || {
+  echo "[FAIL] interruption dispatcher is not alive after auth_failure supervisor exit" >&2
+  exit 1
+}
+
+grep -q 'LAST_EXIT_REASON="auth_failure"' "$PROJECT/.freely/run/workcell-state.env"
+
+bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+
+echo "[PASS] auth_failure leaves detached watchdog control-plane alive for recovery"
