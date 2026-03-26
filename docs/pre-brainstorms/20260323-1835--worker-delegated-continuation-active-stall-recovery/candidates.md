@@ -21,6 +21,9 @@
 - decision_reason:
   - 这条 gap 属于 runtime orchestration，而不是单个 worker issue 的局部 closeout
   - 但仍需通过 runtime patch + dogfood 验证边界，确认它应 materialize 为独立 issue，还是吸收到既有 worker/runtime recovery issue 族
+- retention_audit:
+  - `2026-03-25`: the original runtime patch from this tree is already contained by `develop`, but that does not close the owner lifecycle. `C-20260323-1835-A` is still a candidate with `promoted_issue_path: pending://...`, no milestone-owned issue owner, and no surviving issue/progress artifact has absorbed the active-worker delegated-continuation stall acceptance boundary.
+  - `2026-03-25`: keep this dedicated worktree retained-with-reason until real dogfood either freezes the boundary into a promoted issue or explicitly reroutes the candidate into another runtime recovery owner.
 - next_action:
   - 先给 manager watchdog 补 worker active-stall recovery，并继续真实 dogfood 验证 retained worker 是否能自动收口、cleanup、再继续找新任务
 - revisit_trigger:
