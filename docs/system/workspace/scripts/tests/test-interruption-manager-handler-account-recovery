@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-interruption-handler-account-recovery.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+FAKE_BIN="$TMP_DIR/bin"
+INTAKE_ID="20260325-000000-test"
+AI_STATE="$TMP_DIR/active-account"
+AI_LOG="$TMP_DIR/ai.log"
+CODEX_LOG="$TMP_DIR/codex.log"
+PROMPT_CAPTURE="$TMP_DIR/prompt.txt"
+
+mkdir -p \
+  "$PROJECT/bin" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/intake/$INTAKE_ID" \
+  "$FAKE_BIN"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_REASONING_EFFORT="medium"
+EOF
+
+cat >"$PROJECT/.freely/intake/$INTAKE_ID/meta.env" <<'EOF'
+INTAKE_ID="20260325-000000-test"
+STATUS="classified"
+EOF
+
+cat >"$PROJECT/.freely/intake/$INTAKE_ID/message.txt" <<'EOF'
+检查 codex 当前账号不可用时是否会先走 account readiness 再继续。
+EOF
+
+cat >"$PROJECT/.freely/run/codex-account-cooldowns.tsv" <<'EOF'
+limited@example-com	4102444800
+EOF
+
+printf 'limited@example-com' >"$AI_STATE"
+
+cat >"$PROJECT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+printf '%s\n' "$*" >>"${AI_LOG:?}"
+
+case "$1" in
+  --quiet)
+    shift
+    ;;
+esac
+
+case "${1:-}" in
+  --format)
+    shift 2
+    ;;
+esac
+
+case "${1:-}" in
+  list)
+    cat <<'OUT'
+{"accounts":["codex-limited@example-com","codex-ready@example-com"]}
+OUT
+    ;;
+  whoami)
+    current="$(cat "${AI_STATE:?}")"
+    printf '{"tool":"codex","account":"%s","slot":"%s"}\n' "$current" "$current"
+    ;;
+  switch)
+    if [[ "${2:-}" != "codex" || -z "${3:-}" ]]; then
+      echo '{}'
+      exit 1
+    fi
+    printf '%s' "$3" >"${AI_STATE:?}"
+    printf '{"switched": true, "tool": "codex", "account": "%s", "slot": "%s"}\n' "$3" "$3"
+    ;;
+  *)
+    echo '{}'
+    ;;
+esac
+EOF
+chmod +x "$PROJECT/bin/ai"
+
+cat >"$FAKE_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+current_account="$(cat "${AI_STATE:?}")"
+printf 'current_account=%s\n' "$current_account" >>"${CODEX_LOG:?}"
+
+if [[ "$current_account" == "limited@example-com" ]]; then
+  echo "You've hit your usage limit. Please try again at Jan 1st, 2100 12:00 AM."
+  exit 1
+fi
+
+cat >"${PROMPT_CAPTURE:?}"
+cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=continuation
+OWNERSHIP=manager
+WHY=codex 路径先完成 account readiness 再继续
+HANDOFF=账号恢复后继续主管路由
+ANSWER=
+OUT
+EOF
+chmod +x "$FAKE_BIN/codex"
+
+OUTPUT="$(
+  AI_LOG="$AI_LOG" AI_STATE="$AI_STATE" CODEX_LOG="$CODEX_LOG" PROMPT_CAPTURE="$PROMPT_CAPTURE" \
+    PATH="$FAKE_BIN:$PATH" \
+    bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/interruption-manager-handler" \
+      --project "$PROJECT" \
+      --intake-id "$INTAKE_ID"
+)"
+
+grep -q '^DECISION=delegate$' <<<"$OUTPUT"
+grep -q '^RESTART_POINT=continuation$' <<<"$OUTPUT"
+grep -q '^OWNERSHIP=manager$' <<<"$OUTPUT"
+grep -q 'switch codex ready@example-com --yes' "$AI_LOG"
+grep -q '^current_account=ready@example-com$' "$CODEX_LOG"
+grep -q 'interruption manager agent' "$PROMPT_CAPTURE"
+
+echo "[PASS] interruption manager handler waits for codex account readiness before launching codex"

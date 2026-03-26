@@ -3,7 +3,66 @@ set -euo pipefail
 
 SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 # shellcheck disable=SC1091
+source "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely"
+# shellcheck disable=SC1091
 source "$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-launchers.sh"
+WATCHDOG_AVAILABILITY_LIB="$SELF_ROOT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+ai_cli_bin_for_project() {
+  local project="$1"
+  if [[ -x "$project/bin/ai" ]]; then
+    printf '%s\n' "$project/bin/ai"
+  else
+    printf '%s\n' "$SELF_ROOT/bin/ai"
+  fi
+}
+
+codex_account_cooldown_file() {
+  local project="$1"
+  printf '%s\n' "$project/.freely/run/codex-account-cooldowns.tsv"
+}
+
+seconds_until_epoch() {
+  local target_epoch="${1:-0}" now_epoch
+  [[ "$target_epoch" =~ ^[0-9]+$ ]] || target_epoch=0
+  now_epoch="$(date +%s)"
+  if (( target_epoch <= now_epoch )); then
+    printf '0\n'
+  else
+    printf '%s\n' "$((target_epoch - now_epoch))"
+  fi
+}
+
+write_manager_bootstrap_handoff() {
+  local project="$1" trigger="$2" previous_account="$3" active_account="$4" reason="$5" next_action="$6"
+  local handoff_path branch
+  handoff_path="$project/.freely/run/session-handoff.txt"
+  branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
+  mkdir -p "$(dirname "$handoff_path")"
+  cat >"$handoff_path" <<EOF
+# Session Handoff
+
+- rotation_reason: manager_bootstrap_watchdog
+- previous_launch_kind: ensure-manager
+- previous_tool_session_id: unavailable://manager-relaunched-by-script
+- previous_tool_jsonl_path: unavailable://manager-relaunched-by-script
+- previous_cycle_log: unavailable://manager-relaunched-by-script
+- previous_context_ratio: unavailable
+- previous_route_only_handoff: 0
+- previous_project_dirty_entries: 0
+- previous_worktree_summary_total: 0
+- previous_worktree_summary_dirty: 0
+- branch: ${branch:-unknown}
+- worktree_path: $project
+
+## Manager Bootstrap Recovery
+- trigger: ${trigger:-unknown}
+- previous_account: ${previous_account:-unavailable}
+- active_account: ${active_account:-unavailable}
+- reason: ${reason:-unavailable}
+- next_action: ${next_action:-check-fleet-and-continue}
+EOF
+}
 
 usage() {
   cat <<'EOF'
@@ -55,6 +114,17 @@ codex_capability_model="${AI_CAPABILITY_CODEX_MODEL:-gpt-5.4}"
 codex_capability_sandbox="${AI_CAPABILITY_CODEX_SANDBOX:-workspace-write}"
 codex_capability_approval_policy="${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-never}"
 codex_capability_cwd_mode="${AI_CAPABILITY_CODEX_CWD_MODE:-project-root}"
+
+if [[ "$tool" == "codex" ]]; then
+  [[ -f "$WATCHDOG_AVAILABILITY_LIB" ]] || {
+    echo "[ERROR] missing watchdog availability module: $WATCHDOG_AVAILABILITY_LIB" >&2
+    exit 1
+  }
+  # shellcheck disable=SC1090
+  source "$WATCHDOG_AVAILABILITY_LIB"
+  ensure_codex_slot_ready_for_manager "$project"
+fi
+
 prompt_file="$(mktemp /tmp/freely-interruption-manager-prompt.XXXXXX)"
 trap 'rm -f "$prompt_file"' EXIT
 
