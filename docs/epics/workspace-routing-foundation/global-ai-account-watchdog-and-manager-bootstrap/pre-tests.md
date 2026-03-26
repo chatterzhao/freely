@@ -9,6 +9,8 @@
 5. 这条恢复 contract 由纯脚本 watchdog / runtime 完成，不依赖 manager AI 或 worker AI 的语义判断。
 6. `whoami`/`switch`/`status`/`save`/`login` 的对外契约必须以 slot 为唯一身份，auth email 仅作为 `auth_email` 元数据暴露。
 7. manager 因 `auth_failure` 退出后，detached `ensure-manager --watch` 与 interruption dispatcher 仍必须留在控制面继续恢复和消化 intake，不能一起掉光。
+8. `freely start` 不能在 interruption dispatcher 尚未 ready 时继续跑出“半个控制面”；要么 ready，要么 fail fast。
+9. `live-status` 必须把 live watchdog 算入 control-plane，并在 `active_processes` 中显式展示，而不是把 watchdog-only 状态误报成 `stalled_without_runtime`。
 
 ## Testing layers
 
@@ -21,6 +23,7 @@
    - `freely start` 在 manager 触发 `auth_failure` 后，控制面进程仍需存活并可被 `freely stop` 清理。
 4. Real-environment gate
    - live 验收必须证明：当前活跃 slot 失效后，watchdog 能扫到另一个真实可用 slot 并恢复监督；若所有 slot 都不可用，也不会因为旧 cooldown 账本而错误睡死或错误判可用。
+   - canonical `live-status` 与 `baseline-status` 至少要能反映“watchdog 仍在控制面中存活”这一事实，不能把 status surface 自己做成假阴性。
 
 ## Target environments
 
@@ -38,6 +41,8 @@
 6. live evidence 能说明真实 `.ai-auth/<slot>` inventory 与实际 probe/switch 行为一致。
 7. 至少一条 focused regression 明确锁住 “slot 标签与 auth email 不一致时，CLI 仍以 slot 为身份、仅把 email 作为 metadata”。
 8. 至少一条 focused regression 明确锁住 “manager `auth_failure` 后 watchdog control-plane 仍存活并继续接管恢复”。
+9. 至少一条 focused regression 明确锁住 “interruption dispatcher 未 ready 时 `freely start` 会 fail fast”。
+10. 至少一条 focused regression 明确锁住 “watchdog + dispatcher 仍存活时，`live-status` 不会误报 `stalled_without_runtime`”。
 
 ## Blocker taxonomy
 

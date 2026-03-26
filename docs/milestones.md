@@ -97,7 +97,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
-- next_action: 当前 dedicated worktree 又补上 `auth_failure` 后 detached watchdog control-plane 仍需存活的 same-family recovery gap：`runtime/freely` 已改成 `nohup` detached launch，并新增 focused regression 锁住 `ensure-manager.pid` / `interruption-dispatch.pid` 在 manager `auth_failure` 后仍为 live processes。focused rerun 与 `./bin/governance-check` 已通过，当前继续保持 `in_verification`；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再掉到 `stalled_without_runtime`
+- next_action: 当前 dedicated worktree 继续补上同 issue family 的两个 control-plane acceptance gap：`cmd_start()` 现已把 interruption dispatcher ready 作为硬门禁，`live-status` / `activity_state` 现已把 `ensure-manager --watch` surface 成 `manager_watchdog` 并纳入 control-plane 计算。focused rerun 已通过，当前继续保持 `in_verification`；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical status surface 与控制面真相重新对齐
 
 6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation

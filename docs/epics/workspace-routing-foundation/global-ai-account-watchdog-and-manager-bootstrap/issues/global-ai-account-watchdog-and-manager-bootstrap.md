@@ -147,6 +147,14 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `launch_manager_supervisor()`、`launch_interruption_dispatcher()`、`launch_manager_watchdog()` 已改用 `nohup ... </dev/null >/dev/null 2>&1 &`，不再依赖父 supervisor 退出后仍能保留的脆弱 background/disown 语义
     - 新增 `docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive`，显式验证 manager 命中 `auth_failure` 后 `ensure-manager.pid` 与 `interruption-dispatch.pid` 仍代表 live process，且 `freely stop` 能清理
     - `test-freely-manager-watchdog-live-during-active-ai` 与 `test-freely-rate-limit-defers-to-watchdog` 继续通过，证明 detached launch 没有破坏既有 watchdog 生命周期
+  - 2026-03-26 同轮 canonical replay 又暴露出两条 control-plane acceptance drift：
+    - `cmd_start()` 会启动 interruption dispatcher，但没有像 manager watchdog 那样等待其 ready；这允许 fresh start 在 dispatcher 没真正起来时继续向下运行
+    - `live-status` 只看 supervisor / dispatcher / ai，不看 `ensure-manager --watch`，因此 watchdog-only control-plane 会被误报成 `stalled_without_runtime` 或漏出 `active_processes`
+  - 2026-03-26 当前 continuation 已补上这两个 same-family gap：
+    - `cmd_start()` 现在在 `launch_interruption_dispatcher()` 后立即调用 `ensure_interruption_dispatcher_ready_or_fail()`
+    - `live_status_activity_state_for_project()` 与 `cmd_live_status()` 现在都把 live manager watchdog 算入 control-plane，并在 `active_processes` 中展示 `role=manager_watchdog`
+    - 新增 `test-freely-start-requires-interruption-dispatcher-ready` 与 `test-freely-live-status-watchdog-survival`
+    - 现有 `test-freely-live-status` 也已扩展为显式断言 watchdog surface
   - `test-freely-global-account-watchdog-live` 已真实通过：
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
@@ -157,6 +165,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - 当前 continuation batch 已完成 slot-sweep-first contract 的最小实现与 feature-worktree focused 验证，当前保持 `in_verification`，等待 manager merge review。
 - 当前 continuation batch 已补上 verification drift：稳定化 `rate-limit` 用例计时，并把 manager bootstrap handoff 契约收进 focused tests；本轮完成后继续保持 `in_verification`，等待 manager merge review。
 - 当前 continuation batch 又补上 `auth_failure` 后 detached control-plane 存活契约；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再掉到 `stalled_without_runtime`。
+- 当前 continuation batch 继续补上 `start` 的 dispatcher ready gate 与 `live-status` 的 watchdog surface；本轮完成后继续保持 `in_verification`，等待 merge judgement 与 canonical replay。
 - 同族 pre-brainstorm 已把恢复 contract 进一步收紧为 `failure-driven full slot sweep`，而本轮 continuation 已把这条 contract 的最小主路径真正写回能力真源。下一轮不再是重做 contract 改写，而是继续做 code review / merge judgement / develop replay。
 - 当前批次交付的 continuation contract：
   - wait 采用 `reset_at + buffer`

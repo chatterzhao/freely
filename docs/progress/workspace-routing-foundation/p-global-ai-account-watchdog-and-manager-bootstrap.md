@@ -4,8 +4,8 @@
 - title: Global AI account watchdog and manager bootstrap
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
-- branch: `feature/watchdog-auth-failure-control-plane-recovery-20260326`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-auth-failure-control-plane-recovery`
+- branch: `feature/watchdog-live-status-and-dispatcher-ready-20260326`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-live-status-and-dispatcher-ready`
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "continuation-worker"}
@@ -34,6 +34,16 @@
   - `runtime/freely` 里的 `launch_manager_supervisor()`、`launch_interruption_dispatcher()`、`launch_manager_watchdog()` 已改为 `nohup` detached launch，避免父 supervisor 因 `auth_failure` 退出时把控制面一起带掉
   - 新增 focused regression `test-freely-auth-failure-keeps-control-plane-alive`
   - 继续复跑 `test-freely-manager-watchdog-live-during-active-ai` 与 `test-freely-rate-limit-defers-to-watchdog`，证明 detached launch 没有破坏既有 watchdog 生命周期或 rate-limit 委派路径
+- 2026-03-26 紧接的 canonical replay 又暴露出两个 same-family 尾巴：
+  - `cmd_start()` 启动 interruption dispatcher 后没有等待 ready，因此 fresh start 允许带着“半个控制面”继续向下执行
+  - `live-status` / `activity_state` 不把 `ensure-manager --watch` 算入 control-plane，watchdog-only 现场会被误报成 `stalled_without_runtime`
+- 2026-03-26 当前 continuation 已补上这两个 acceptance gap：
+  - `cmd_start()` 现在在 `launch_interruption_dispatcher()` 后强制 `ensure_interruption_dispatcher_ready_or_fail()`
+  - `live_status_activity_state_for_project()` 与 `cmd_live_status()` 现在都会 surface `role=manager_watchdog`
+  - 新增 focused regressions：
+    - `test-freely-start-requires-interruption-dispatcher-ready`
+    - `test-freely-live-status-watchdog-survival`
+  - 现有 `test-freely-live-status` 也已扩展为断言 watchdog surface
 - 本轮 continuation 已吸收 delegated handoff 中的五点 contract，并确认对应实现已经落在当前分支祖先：
   - all accounts unusable 时选择最早 reset 账号
   - wait 采用 `reset_at + 60s` 等价 buffer 契约，可由 watchdog buffer 环境变量调节
@@ -86,6 +96,9 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
 - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-watchdog-live-during-active-ai`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`
+- `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
 
 ### Latest rerun
 
@@ -126,6 +139,12 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-watchdog-live-during-active-ai` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog` pass
   - `./bin/governance-check` pass，只有 10 条 legacy pre-brainstorm naming warning
+- 2026-03-26 live-status / dispatcher-ready continuation rerun:
+  - `bash -n docs/system/workspace/scripts/runtime/freely` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive` pass
 
 ## Next Action
 
