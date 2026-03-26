@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260326-0445--manager-delegated-intake-absorption-closure
 - 20260325-0525--watchdog-slot-sweep-without-cooldown-governance
 - 20260324-0405--watchdog-restart-storm-and-process-churn-detection
 - 20260324-0415--application-native-observability-planes
@@ -51,6 +52,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260326-0445--manager-delegated-intake-absorption-closure
+  - brainstorms: docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/candidates.md
 - 20260325-0525--watchdog-slot-sweep-without-cooldown-governance
   - brainstorms: docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md

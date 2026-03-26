@@ -1205,6 +1205,37 @@ delegated_continuation_ids_for_project() {
   fi
 }
 
+resolve_manager_delegated_continuations_as_absorbed() {
+  local project="$1" intake_ids_csv="$2" continuity_file="$3"
+  local intake_id resolution_file
+  [[ -n "$project" && -n "$intake_ids_csv" && -n "$continuity_file" && -f "$continuity_file" ]] || return 0
+
+  IFS=',' read -r -a __delegated_absorb_ids <<<"$intake_ids_csv"
+  for intake_id in "${__delegated_absorb_ids[@]}"; do
+    [[ -n "$intake_id" ]] || continue
+    resolution_file="$(mktemp "${TMPDIR:-/tmp}/freely-intake-absorbed.XXXXXX.md")"
+    cat >"$resolution_file" <<EOF
+manager continuity absorbed delegated continuation into canonical supervision output.
+
+- intake_id: $intake_id
+- continuity_file: $continuity_file
+- branch: $(branch_name_for_project "$project")
+- absorbed_at: $(date -u '+%Y-%m-%dT%H:%M:%SZ')
+EOF
+    cmd_intake_resolve \
+      --project "$project" \
+      --intake-id "$intake_id" \
+      --resolved-by manager-runtime-supervisor \
+      --reaction followup \
+      --classification continuation \
+      --linked-artifact "$continuity_file" \
+      --resolution-file "$resolution_file" \
+      --absorption-target "continuity://manager-supervision" \
+      --status absorbed >/dev/null
+    rm -f "$resolution_file"
+  done
+}
+
 csv_item_count() {
   local value="$1"
   [[ -n "$value" ]] || {
@@ -4273,6 +4304,7 @@ cmd_start() {
   while true; do
     local ts prompt_file cycle_log cycle_debug_log mode_name watchdog_script workspace_root
     local delegated_pending_ids delegated_pending_count delegated_consumed_ids delegated_consumed_at
+    local continuity_before_round continuity_after_round round_delegated_consumed_ids
     ts="$(date '+%Y%m%d-%H%M%S')"
     prompt_file="$run_dir/prompt-$ts.txt"
     cycle_log="$logs_dir/cycle-$ts.log"
@@ -4289,6 +4321,7 @@ cmd_start() {
       log_info "manager runtime auto-recovered $recovered_workers expected-running worker(s) before prompt build"
       sleep "${RESTART_DELAY:-2}"
     fi
+    continuity_before_round="$(latest_generated_manager_continuity_file_for_project "$PROJECT_ROOT")"
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
     ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name"
@@ -4296,6 +4329,7 @@ cmd_start() {
     delegated_pending_count="$(csv_item_count "$delegated_pending_ids")"
     delegated_consumed_ids="${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-}"
     delegated_consumed_at="${LAST_DELEGATED_CONTINUATION_CONSUMED_AT:-}"
+    round_delegated_consumed_ids=""
 
     if [[ "$mode_name" == "fresh_with_handoff" ]]; then
       write_session_handoff "$PROJECT_ROOT" "$LAUNCH_ROTATION_REASON"
@@ -4305,6 +4339,7 @@ cmd_start() {
     if [[ -n "$delegated_pending_ids" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
       delegated_consumed_ids="$delegated_pending_ids"
       delegated_consumed_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+      round_delegated_consumed_ids="$delegated_pending_ids"
     fi
     LAST_DELEGATED_CONTINUATION_PENDING_IDS="$delegated_pending_ids"
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
@@ -4527,6 +4562,10 @@ cmd_start() {
       log_warn "restart storm / process churn detected for this workcell; pausing blind relaunch for ${observe_delay}s while waiting for manager auto-loop judgement (reason=$restart_signal_reason count=${LAST_RESTART_STORM_COUNT:-0} peak=${LAST_PROCESS_CHURN_PEAK:-0})"
       sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$observe_delay"
       continue
+    fi
+    continuity_after_round="$(latest_generated_manager_continuity_file_for_project "$PROJECT_ROOT")"
+    if [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" && -n "$round_delegated_consumed_ids" && -n "$continuity_after_round" && -f "$continuity_after_round" && "$continuity_after_round" != "${continuity_before_round:-}" ]]; then
+      resolve_manager_delegated_continuations_as_absorbed "$PROJECT_ROOT" "$round_delegated_consumed_ids" "$continuity_after_round"
     fi
     sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$next_restart_delay"
   done

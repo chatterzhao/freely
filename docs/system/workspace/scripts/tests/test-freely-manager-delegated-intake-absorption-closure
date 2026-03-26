@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-delegated-intake-closure.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+git init "$PROJECT" >/dev/null 2>&1
+git -C "$PROJECT" checkout -b develop >/dev/null 2>&1
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-once"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=1
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+INTAKE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake chat --project "$PROJECT" --author human --channel chat --message "主管继续收束历史 delegated interruption 并写新 continuity")"
+INTAKE_ID="$(printf '%s\n' "$INTAKE_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID" ]] || {
+  echo "[FAIL] expected intake id"
+  exit 1
+}
+
+RESOLUTION_FILE="$TMP_DIR/manager-resolution.md"
+cat >"$RESOLUTION_FILE" <<'EOF'
+restart_point: `continuation`
+ownership: `manager`
+handoff_summary: 本轮主管应先吸收 delegated continuation，再写新的 continuity
+EOF
+
+bash "$ROOT_DIR/bin/freely" intake resolve \
+  --project "$PROJECT" \
+  --intake-id "$INTAKE_ID" \
+  --resolved-by interruption-manager-agent \
+  --reaction followup \
+  --classification continuation \
+  --resolution-file "$RESOLUTION_FILE" \
+  --absorption-target handoff://continuation \
+  --status delegated >/dev/null
+
+CONTINUITY_FILE="$PROJECT/.freely/run/manager-continuity-20260326-050000.md"
+cat >"$CONTINUITY_FILE" <<CONTINUITY
+# Manager Continuity
+
+- absorbed_intake_ids:
+  - $INTAKE_ID
+- continuity_note: delegated continuation absorbed into new manager supervision round
+CONTINUITY
+
+bash -lc 'source "$1/docs/system/workspace/scripts/runtime/freely"; resolve_manager_delegated_continuations_as_absorbed "$2" "$3" "$4"' _ \
+  "$ROOT_DIR" "$PROJECT" "$INTAKE_ID" "$CONTINUITY_FILE"
+
+META_FILE="$PROJECT/.freely/intake/$INTAKE_ID/meta.env"
+[[ -f "$META_FILE" ]] || {
+  echo "[FAIL] expected intake meta file"
+  exit 1
+}
+
+grep -q '^STATUS="absorbed"$' "$META_FILE"
+grep -q '^ABSORPTION_TARGET="continuity://manager-supervision"$' "$META_FILE"
+grep -q '^LINKED_ARTIFACT="'"$PROJECT"'/.freely/run/manager-continuity-' "$META_FILE"
+
+echo "[PASS] manager delegated continuation closes intake lifecycle after new continuity publication"
