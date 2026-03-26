@@ -16,3 +16,8 @@
 - next:
   - merge this worktree into `develop`
   - continue cleanup / retirement gating before deleting the worktree or branch
+- source_lane_audit_2026_03_25:
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-runtime-process-churn-state-reconcile` still holds one local-only continuation commit (`d2ef386`)
+  - the replay owner already preserves that lane's desired capability in canonical form: broadened `402 payment required` / `deactivated_workspace` auth-failure detection plus no-launch coverage while no slot is ready
+  - disposition: `superseded local source lane`
+  - replay_decision: `do_not_replay_remaining_unique_commit`

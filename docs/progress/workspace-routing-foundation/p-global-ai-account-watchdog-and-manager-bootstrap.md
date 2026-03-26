@@ -123,16 +123,18 @@
 ## 2026-03-25 Source Lane Retirement Audit
 
 - Re-audited the remaining same-family source/supporting worktrees against this replay owner:
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-runtime-process-churn-state-reconcile`
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-interruption-handler-account-recovery`
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-family-integration`
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-strict-slot-probe-gating`
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-slot-sweep-without-cooldown-governance`
 - Their remaining local-only deltas are not missing desired capability in the replay owner:
+  - `manager-runtime-process-churn-state-reconcile` still carries one local-only continuation commit (`d2ef386`), but this replay owner already preserves its broadened auth-failure detection plus the skip-launch/no-slot-ready regressions in canonical slot-first form
   - `interruption-handler-account-recovery` still points the interruption handler at the older account-ready path instead of the current slot-first contract
   - `watchdog-family-integration` still carries older availability-state / logging behavior that predates the current replay owner
   - `watchdog-strict-slot-probe-gating` still drops the broadened auth-failure detection and the no-launch test coverage now required by this replay owner
   - `watchdog-slot-sweep-without-cooldown-governance` is already an absorbed supporting-evidence lane; its remaining local commit is only retirement writeback, not a new owner path
-- This round therefore treats all four branches as superseded local source/supporting lanes whose remaining unique commits should not be replayed onto the canonical owner.
+- This round therefore treats all five branches as superseded local source/supporting lanes whose remaining unique commits should not be replayed onto the canonical owner.
 
 ## Revisit Trigger
 
