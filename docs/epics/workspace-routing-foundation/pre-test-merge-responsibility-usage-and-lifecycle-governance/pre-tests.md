@@ -10,7 +10,12 @@
    - 何时当前批次仍有效
    - 何时当前批次必须 stale / retire
    - 何时 promotion 默认应回到来源 feature replay
-4. `docs/milestones.md` 与本 issue 的下一跳一致：本 issue 只收敛职责定义，不直接承担能力实现。
+4. 若某个 story 的 `pre-tests.md` 本身未通过 story-level 质量 gate，则不得把 `pre-test-merge` 批次上的测试执行误记为充分 acceptance：
+   - 至少要能区分 `definition_missing`
+   - `commands_only`
+   - `evidence_plan_missing`
+   - `execution_pending_or_failed`
+5. `docs/milestones.md` 与本 issue 的下一跳一致：本 issue 只收敛职责定义，不直接承担能力实现。
 
 ## Non-goals
 

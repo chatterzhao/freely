@@ -390,9 +390,9 @@ flowchart TD
 | front-door intake | runtime | `freely init/start/chat`, runtime scripts | `.freely/intake/**`, runtime state |
 | manager routing | manager-agent | `auto-loop-orchestrator`, `context-source-skill` | routing output, continuity |
 | pre-brainstorm | worker | `doc-pre-brainstorm-execution` | `docs/pre-brainstorms/**` |
-| IBM | worker | `doc-ibm-execution` | `docs/epics/**` |
+| IBM | worker | `doc-ibm-execution` | `docs/epics/**`; story-level `pre-tests.md` must already distinguish acceptance-definition blockers from execution blockers |
 | dev-loop | worker | `dev-loop-execution` | code, tests, reviews, progress |
-| completion verification | manager -> worker | issue verification sections, review artifacts, protected acceptance evidence | issue, progress, milestone, cleanup pending truth |
+| completion verification | manager -> worker | issue verification sections, review artifacts, protected acceptance evidence | issue, progress, milestone, cleanup pending truth; do not treat `execution_pending_or_failed` as interchangeable with `definition_missing` / `commands_only` / `evidence_plan_missing` |
 | recovery | runtime + manager | runtime scripts, `recovery-subagent-governance` | `docs/recovery/**`, continuity |
 | worktree action | manager + runtime | `branch-management`, worktree scripts | branch/worktree state |
 | fleet supervision | manager | `multi-worktree-supervision`, `worktree-maintenance-governance` | fleet snapshot, disposition |

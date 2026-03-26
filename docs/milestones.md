@@ -49,7 +49,18 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260307-1201`
+1. `I-20260325-0410`
+- title: Story-level pre-tests quality gate governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
+- next_action: story-level `pre-tests.md` 质量 gate 已写回 IBM / lifecycle / `pre-test-merge` truth，当前保持 `in_verification`，等待 manager merge review / canonical absorption。更上层的 testing evidence ladder、gate mapping 与 real-environment harness 继续由 `C-20260325-0333-A` 作为 umbrella candidate 承接，不在本 issue 内越界扩 scope
+- revisit_trigger: 当 `I-20260325-0410` 被吸收为 completed 后，再回到 `C-20260325-0333-A` 评估 ladder / gate mapping / real-environment harness 的下一跳；若 merge review 发现 truth wording 冲突，则先修正 doc-loop 真源，再决定是否继续 materialize
+
+2. `I-20260307-1201`
 - title: 源分类、milestone-owned issue 与派生 worktree 路由治理
 - milestone_state: committed
 - phase_state: `completed`
@@ -59,7 +70,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md`
 - next_action: review 与最小验证已落盘，但 `./bin/wt-status-all` 仍为 `Summary: total=6, dirty=1`；当前需先按 ownership 收束或分流 dirty 改动，其中 `docs/system/workspace/**` / `tests/**` 与 session-lifecycle 相关产物更像上游未提交批次，应先处理，再补 promote / cleanup 证据后移入 completed_issues
 
-2. `I-20260308-0101`
+3. `I-20260308-0101`
 - title: 状态联动、流程标识词典与 session evidence 传播治理
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -69,7 +80,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md`
 - next_action: review 与 verification 已落盘，但 `./bin/wt-status-all` 仍为 `Summary: total=6, dirty=1`；当前需先按 ownership 收束或分流 dirty 改动，其中 `docs/system/workspace/**` / `tests/**` 与 session-lifecycle 相关产物更像上游未提交批次，应先处理，再补 completion verification / cleanup 证据后移入 completed_issues
 
-3. `I-20260318-0930`
+4. `I-20260318-0930`
 - title: Checkpoint commit and multi-worktree supervision governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -79,7 +90,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/candidates.md`
 - next_action: runtime/status 的 dirty budget、project-level worktree summary、脚本级测试与 review 已落盘；当前保持 `in_verification`。本轮 `wt-status-all` 为 `Summary: total=6, dirty=1`，且唯一 dirty 工位就是当前 issue 的 verification continuity，因此无需分流无关改动，但仍未满足 promote / cleanup 前提；完成当前收口后再回到 `I-20260307-1201` 与 `I-20260308-0101` 做 completion verification / cleanup
 
-4. `I-20260318-1408`
+5. `I-20260318-1408`
 - title: Manager self-supervision and autonomous recovery
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -89,7 +100,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md`
 - next_action: 主管自治的最小实现、PID 归属修复、fleet supervision alert、角色文档与“manager/worker runtime 不直接切全局账号”的回归均已落盘；当前保持 `in_verification`。下一步先做 review 与 promote/cleanup 判断，再决定是否并回 `develop`。更外层的 manager watchdog/ensure 仍是边界外后续问题，不在本批次继续扩 scope。
 
-5. `I-20260318-1630`
+6. `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -99,7 +110,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`, `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`, `docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md`
 - next_action: 当前同族 replay 已完成 strict probe-gating + wake-only recovery 的 contract / code / test 闭环，当前处于 manager merge judgement / develop replay followthrough 前的 review-ready 状态。2026-03-25 23:41 PDT 为了推进 `C-20260323-2045-A` 的 canonical scheduler proof，`develop` fresh manager cycle `.freely/logs/cycle-20260325-234105.log` 又连续命中 `402 Payment Required` / `deactivated_workspace`，并且没有 materialize 新 continuity / worker prompt。这说明本 issue 的 auth-failure / no-launch replay 仍未被 canonical `develop` 吸收，且已经开始阻塞其他 develop-facing dogfood；接下来应优先由 manager 吸收这批证据并决定 promote / cleanup，而不是继续等待 `develop` 在旧 contract 上自行恢复
 
-6. `C-20260324-0405-A`
+7. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -109,7 +120,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/candidates.md`
 - next_action: IBM 已 materialize，并冻结了 signal 真相面、manager escalation 边界、stall 分离语义与默认阈值；下一步进入 dev，实现 `runtime/freely` 的 signal helper、`session-state.env` 字段、`live-status`/`fleet-status` 暴露与 manager escalation followthrough
 
-7. `I-20260318-1825`
+8. `I-20260318-1825`
 - title: Worktree hygiene supervision control plane
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -119,7 +130,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1825--autonomous-worktree-hygiene-and-checkpoint-supervision/candidates.md`
 - next_action: 新增 hygiene skill、checkpoint drift streak、manager hygiene alert 与回归测试已落盘；当前先做 review 与 promote 判断。若后续仍需专门 hygiene worker，再从同一预研线 materialize，不在本批次越界扩 scope
 
-8. `I-20260319-0018`
+9. `I-20260319-0018`
 - title: Token-efficient session continuity and rotation governance
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -129,7 +140,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md`
 - next_action: IBM 产物已补齐，下一跳进入 `dev-loop-execution`，把 runtime / prompt / skill 的 continuity 触发边界统一收敛到 trigger matrix，并保持旧会话证据默认按需引用
 
-8. `I-20260319-0148`
+10. `I-20260319-0148`
 - title: Context-compaction continuity guard salvage
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -139,7 +150,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
-9. `I-20260321-0345`
+11. `I-20260321-0345`
 - title: Manager reactivation and fleet patrol governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -149,7 +160,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/candidates.md`
 - next_action: manager reactivation patrol 协议、reference、首跳提示与 routing 回归已落盘；当前进入 verification，后续若需要真正脚本级 patrol tick 或自动派单，再基于同一 issue 继续进入新的 runtime/dev 增量
 
-10. `I-20260321-1045`
+12. `I-20260321-1045`
 - title: Stacked worktree merge-chain governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -159,7 +170,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/candidates.md`
 - next_action: 已将 stacked merge-chain 判定正式并入 `worktree-maintenance-governance` skill，并补了 lead/start prompt 与回归；下一步在真实 worktree 收口时优先按 `child -> parent -> merge-prep-from-develop -> develop` 链路使用该 skill，而不是直接在 develop 工位试合
 
-11. `I-20260320-1945`
+13. `I-20260320-1945`
 - title: Watchdog live status surface and manager supervision
 - milestone_state: committed
 - phase_state: `completed`
@@ -169,7 +180,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/candidates.md`
 - next_action: 已在 `develop` 完成 `freely live-status`、主管监督接线与脚本回归；后续若要扩 `--format json`、`--watch` 或 stall scoring，再回到同一 issue 继续推进
 
-11. `I-20260320-2105`
+14. `I-20260320-2105`
 - title: Baseline-status command and status family governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -179,7 +190,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/candidates.md`
 - next_action: 已在 `develop` 完成 `baseline-status` 命名迁移与 `status` family 聚合入口，并通过 checkpoint / pid ownership / routing 回归；后续若要扩 JSON family 输出或 watch 模式，再回到同一 issue 继续推进
 
-12. `I-20260321-0217`
+15. `I-20260321-0217`
 - title: Claude Code tool profiles and Codex MCP session evidence governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -189,7 +200,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md`, `docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md`
 - next_action: `cc` / `cc-use-codex-cli` runtime、skill、双层会话证据与 live smoke 已落盘，且当前 sweep 已完成 fleet 收口。剩余动作是完成最终 review，然后按保护规则从当前 develop-facing sweep 分支推进正式 promote
 
-13. `I-20260321-0257`
+16. `I-20260321-0257`
 - title: Worktree fleet governance closure
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -199,7 +210,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md`
 - next_action: `fleet_closure` 已收编到 worktree-maintenance skill，并已把 `post-merge acceptance` 的 protected-environment 缺口回流到新的 pre-brainstorm `C-20260322-1615-A`。当前 fleet 快照是 `total=9, dirty=3`：`cli-first`、`manager-handoff` 与 `manager-watchdog-trigger` 已 clean，其中前两者已完成 closeout 并 ready for manager merge，但尚未被上游吸收；`runtime-worker-launch-linkage` 与当前 `fleet-closure` / `fleet-audit` 工位仍需完成最终 verification / evidence write-back。待这些尾项收口后，再由 manager 做统一 promote / cleanup 判断
 
-14. `I-20260321-1515`
+17. `I-20260321-1515`
 - title: Remote branch retirement governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -209,7 +220,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md`
 - next_action: 把 remote branch deletion / retained reason 纳入 `worktree-maintenance-governance` 与 `cleanup-followthrough`，并用真实 cleanup 测试和 Freely 插话验证主管能够把这层收口做完
 
-15. `I-20260321-1715`
+18. `I-20260321-1715`
 - title: Manager watchdog trigger and drift reconcile governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -363,6 +374,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/candidates.md`
 - next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize
 - revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
+
+7. `C-20260325-0333-A`
+- title: Testing evidence ladder and real-environment gates for Freely
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://testing-evidence-ladder-and-real-environment-gates`
+- source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
+- next_action: 保持 umbrella candidate active。首个切口 `story-level pre-tests quality gate` 已 materialize 成 `I-20260325-0410`；下一步等待该 issue 完成后，再判断 ladder / gate mapping / real-environment harness 的后续 materialization 顺序。
+- revisit_trigger: 当 `I-20260325-0410` 已完成并写回 quality gate truth 后，重新判断下一跳是 ladder / gate mapping 还是 real-environment harness contract
 
 8. `C-20260322-1615-A`
 - title: Protected post-merge acceptance route and promotion guard governance
