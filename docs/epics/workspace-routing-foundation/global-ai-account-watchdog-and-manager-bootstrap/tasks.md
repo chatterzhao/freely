@@ -17,4 +17,9 @@
 - [x] route `rate limit`, `deactivated_workspace`, auth failure / invalid auth file, and slot probe failure into one failure-driven full slot sweep path
 - [x] change the all-slots-unavailable path from cooldown-ledger-driven waiting to low-frequency real reprobe, with earliest-reset remaining non-authoritative
 - [x] update runtime / watchdog / ai-cli regressions and live acceptance so they assert slot-sweep-first recovery instead of cooldown-first recovery
-- [x] make `ai-cli` expose slot as the only identity and report JWT email only as `auth_email` metadata, even when slot label and auth email differ
+- [x] remove cooldown from all recovery logic, not just primary decision branches
+- [x] enforce a strict no-launch gate while watchdog is sweeping or holding for availability
+- [x] keep manager and workers down when all slots are unavailable, while leaving watchdog alive and observable
+- [x] re-check availability on low-frequency probe and `.ai-auth` inventory changes, then wake manager only after writing handoff
+- [x] rewrite focused regressions and minimal integration coverage around strict probe gating and wake-only recovery
+- [x] correct `ai-cli` slot-facing contract so slot is the only identity and auth email is metadata only

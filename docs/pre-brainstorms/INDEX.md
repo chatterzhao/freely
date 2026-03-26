@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance
 - 20260325-0525--watchdog-slot-sweep-without-cooldown-governance
 - 20260324-0405--watchdog-restart-storm-and-process-churn-detection
 - 20260324-0415--application-native-observability-planes
@@ -51,6 +52,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance
+  - brainstorms: docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md
 - 20260325-0525--watchdog-slot-sweep-without-cooldown-governance
   - brainstorms: docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md
