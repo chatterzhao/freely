@@ -1828,11 +1828,53 @@ manager_worker_launch_state_reconcile_same_continuity_prompts() {
 }
 
 manager_worker_launch_state_refresh_for_status() {
-  local project="$1" continuity_file=""
-  [[ -n "$project" && -f "$(manager_worker_launch_state_file "$project")" ]] || return 0
+  local project="$1" continuity_file="" state_file
+  local max_parallel_workers active_running_workers available_new_slots
+  local generated_continuity generated_prompts consumed_continuity consumed_prompts queued_prompts
+  state_file="$(manager_worker_launch_state_file "$project")"
+  [[ -n "$project" && -f "$state_file" ]] || return 0
   continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
   manager_worker_launch_state_reconcile_same_continuity_prompts "$project" "$continuity_file" >/dev/null 2>&1 || true
+
+  # Refresh runtime capacity truth on read so live-status reflects running worker lanes
+  # even when the latest continuity did not itself enqueue or consume a prompt.
+  # shellcheck disable=SC1090
+  source "$state_file"
+  generated_continuity="${LAST_MANAGER_CONTINUITY_GENERATED:-$continuity_file}"
+  generated_prompts="${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-}"
+  consumed_continuity="${LAST_MANAGER_CONTINUITY_CONSUMED:-$continuity_file}"
+  consumed_prompts="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
+  queued_prompts="${QUEUED_WORKER_PROMPTS:-}"
+  max_parallel_workers="$(manager_max_parallel_workers)"
+  active_running_workers="$(count_active_running_workers_for_manager_project "$project")"
+  if [[ "$max_parallel_workers" == "unbounded" ]]; then
+    available_new_slots="unbounded"
+  else
+    if ! [[ "$active_running_workers" =~ ^[0-9]+$ ]]; then
+      active_running_workers="0"
+    fi
+    if (( active_running_workers >= max_parallel_workers )); then
+      available_new_slots="0"
+    else
+      available_new_slots="$((max_parallel_workers - active_running_workers))"
+    fi
+  fi
+
+  if [[ "${MAX_PARALLEL_WORKERS:-}" != "$max_parallel_workers" \
+    || "${ACTIVE_RUNNING_WORKER_COUNT:-}" != "$active_running_workers" \
+    || "${AVAILABLE_NEW_WORKER_SLOTS:-}" != "$available_new_slots" ]]; then
+    write_manager_worker_launch_state \
+      "$project" \
+      "$generated_continuity" \
+      "$generated_prompts" \
+      "$consumed_continuity" \
+      "$consumed_prompts" \
+      "$queued_prompts" \
+      "$max_parallel_workers" \
+      "$active_running_workers" \
+      "$available_new_slots"
+  fi
 }
 
 csv_conflicts_with_item() {
@@ -2128,7 +2170,7 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         capture_runtime_worker_prompt=1
         next
       }
-      if ($0 ~ /- worker_prompt_paths_created_this_round:/ || $0 ~ /- worker_prompt_paths_referenced:/) {
+      if ($0 ~ /- worker_prompt_paths_created_this_round:/ || $0 ~ /- worker_prompt_paths_referenced_this_round:/ || $0 ~ /- worker_prompt_paths_referenced:/) {
         capture_worker_prompt_path_list=(mode != "frozen")
         next
       }

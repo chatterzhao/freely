@@ -7,11 +7,26 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/freely"
 mkdir -p "$PROJECT/.freely/run/worker-prompts"
+mkdir -p "$TMP_DIR/freely-worktrees/feature-created" "$TMP_DIR/freely-worktrees/feature-referenced"
 
 PROMPT_CREATED="$PROJECT/.freely/run/worker-prompts/20260324-232554-worker-manager-no-fixed-cap-dispatch-codex.txt"
 PROMPT_REFERENCED="$PROJECT/.freely/run/worker-prompts/20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt"
 PROMPT_SUPERSEDED="$PROJECT/.freely/run/worker-prompts/20260324-180122-worker-manager-scheduler-capacity-candidate-replay-codex.txt"
-touch "$PROMPT_CREATED" "$PROMPT_REFERENCED" "$PROMPT_SUPERSEDED"
+cat >"$PROMPT_CREATED" <<EOF
+Worktree:
+- \`$TMP_DIR/freely-worktrees/feature-created\`
+
+Branch:
+- \`feature/created\`
+EOF
+cat >"$PROMPT_REFERENCED" <<EOF
+Worktree:
+- \`$TMP_DIR/freely-worktrees/feature-referenced\`
+
+Branch:
+- \`feature/referenced\`
+EOF
+touch "$PROMPT_SUPERSEDED"
 
 CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260324-232554.md"
 cat >"$CONTINUITY" <<EOF
@@ -26,7 +41,7 @@ cat >"$CONTINUITY" <<EOF
 - manager_continuity_file: \`$CONTINUITY\`
 - worker_prompt_paths_created_this_round:
   - \`$PROMPT_CREATED\`
-- worker_prompt_paths_referenced:
+- worker_prompt_paths_referenced_this_round:
   - \`$PROMPT_CREATED\`
   - \`$PROMPT_REFERENCED\`
 - worker_prompt_paths_superseded:
@@ -37,9 +52,13 @@ EOF
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 
 launchable_csv="$(latest_manager_worker_prompt_csv_from_continuity "$CONTINUITY")"
+has_unconsumed="0"
+if manager_continuity_has_unconsumed_launchable_worker_prompt "$PROJECT" "$CONTINUITY"; then
+  has_unconsumed="1"
+fi
 
 if [[ "$launchable_csv" != "$PROMPT_CREATED,$PROMPT_REFERENCED" && "$launchable_csv" != "$PROMPT_REFERENCED,$PROMPT_CREATED" ]]; then
-  echo "[FAIL] expected created/referenced worker prompts to be parsed as launchable; got: $launchable_csv" >&2
+  echo "[FAIL] expected created/referenced_this_round worker prompts to be parsed as launchable; got: $launchable_csv" >&2
   exit 1
 fi
 
@@ -48,4 +67,9 @@ if [[ "$launchable_csv" == *"$PROMPT_SUPERSEDED"* ]]; then
   exit 1
 fi
 
-echo "[PASS] continuity parser recognizes created/referenced worker prompt lists and excludes superseded paths"
+if [[ "$has_unconsumed" != "1" ]]; then
+  echo "[FAIL] expected continuity helper to see the referenced_this_round prompt set as launchable" >&2
+  exit 1
+fi
+
+echo "[PASS] continuity parser recognizes created/referenced_this_round worker prompt lists and excludes superseded paths"

@@ -29,6 +29,15 @@ AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"
 EOF
+git init -q "$PROJECT"
+git -C "$PROJECT" config user.email "test@example.com"
+git -C "$PROJECT" config user.name "Test User"
+cat >"$PROJECT/README.md" <<'EOF'
+# repo
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" branch -m develop
 cat >"$PROJECT/.freely/run/session-state.env" <<EOF
 LAST_TOOL_SESSION_ID="session-123"
 LAST_TOOL_JSONL_PATH="$TMP_DIR/session.jsonl"
@@ -58,6 +67,10 @@ cat >"$PROJECT/.freely/run/manager-continuity-20260321-003954.md" <<'EOF'
   - runtime 创建或进入 dedicated worktree
 EOF
 mkdir -p "$PROJECT/.freely/run/worker-prompts"
+WORKTREE_ROOT="$TMP_DIR/repo-worktrees"
+WORKER_PROJECT="$WORKTREE_ROOT/feature-queued"
+git -C "$PROJECT" worktree add -q -b feature/queued "$WORKER_PROJECT"
+mkdir -p "$WORKER_PROJECT/.freely/run"
 QUEUE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260321-004000-worker-queued-codex.txt"
 FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260321-004100-worker-frozen-codex.txt"
 cat >"$QUEUE_PROMPT" <<'EOF'
@@ -149,11 +162,17 @@ bash -c "exec -a 'runtime/freely ensure-interruption-dispatch --project $PROJECT
 DISPATCH_PID=$!
 bash -c "exec -a 'codex exec -C $PROJECT -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
 AI_PID=$!
-trap 'kill "$SUP_PID" "$DISPATCH_PID" "$AI_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+bash -c "exec -a 'runtime/freely start --project $WORKER_PROJECT' sleep 30" >/dev/null 2>&1 &
+WORKER_SUP_PID=$!
+bash -c "exec -a 'codex exec -C $WORKER_PROJECT -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+WORKER_AI_PID=$!
+trap 'kill "$SUP_PID" "$DISPATCH_PID" "$AI_PID" "$WORKER_SUP_PID" "$WORKER_AI_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
 
 printf '%s' "$SUP_PID" >"$PROJECT/.freely/run/supervisor.pid"
 printf '%s' "$DISPATCH_PID" >"$PROJECT/.freely/run/interruption-dispatch.pid"
 printf '%s' "$AI_PID" >"$PROJECT/.freely/run/ai.pid"
+printf '%s' "$WORKER_SUP_PID" >"$WORKER_PROJECT/.freely/run/supervisor.pid"
+printf '%s' "$WORKER_AI_PID" >"$WORKER_PROJECT/.freely/run/ai.pid"
 
 OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
 
@@ -164,14 +183,14 @@ printf '%s\n' "$OUTPUT" | grep -q "role=ai pid=$AI_PID"
 printf '%s\n' "$OUTPUT" | grep -q 'prompt_file: '
 printf '%s\n' "$OUTPUT" | grep -q 'CURRENT_BRANCH=feature/research-codex-in-cc-mcp'
 printf '%s\n' "$OUTPUT" | grep -q 'selected_pool: `human chat / session evidence`'
-printf '%s\n' "$OUTPUT" | grep -q "manager_continuity_file: $PROJECT/.freely/run/manager-continuity-20260321-004200.md"
-printf '%s\n' "$OUTPUT" | grep -q "latest_manager_continuity_generated: $PROJECT/.freely/run/manager-continuity-20260321-004200.md"
-printf '%s\n' "$OUTPUT" | grep -q "latest_manager_continuity_consumed: $PROJECT/.freely/run/manager-continuity-20260321-004200.md"
+printf '%s\n' "$OUTPUT" | grep -q "manager_continuity_file: $PROJECT/.freely/run/manager-continuity-20260321-003954.md"
+printf '%s\n' "$OUTPUT" | grep -q "latest_manager_continuity_generated: $PROJECT/.freely/run/manager-continuity-20260321-003954.md"
+printf '%s\n' "$OUTPUT" | grep -q "latest_manager_continuity_consumed: $PROJECT/.freely/run/manager-continuity-20260321-003954.md"
 printf '%s\n' "$OUTPUT" | grep -q 'last_tool_jsonl_path: '
 printf '%s\n' "$OUTPUT" | grep -q 'latest_resolution:'
-printf '%s\n' "$OUTPUT" | grep -q "latest_manager_worker_prompts_generated: $QUEUE_PROMPT"
+printf '%s\n' "$OUTPUT" | grep -q 'latest_manager_worker_prompts_generated: none'
 printf '%s\n' "$OUTPUT" | grep -q 'latest_manager_worker_prompts_consumed: none'
-printf '%s\n' "$OUTPUT" | grep -q 'max_parallel_workers: unbounded'
+printf '%s\n' "$OUTPUT" | grep -q 'active_running_worker_count: 1'
 printf '%s\n' "$OUTPUT" | grep -q 'available_new_worker_slots: unbounded'
 if printf '%s\n' "$OUTPUT" | grep -q '/tmp/retired-worktree'; then
   echo "[FAIL] live-status surfaced stale retired worktree continuity" >&2
@@ -180,10 +199,14 @@ fi
 # shellcheck disable=SC1090
 source "$PROJECT/.freely/run/manager-worker-launch-state.env"
 [[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}" == "none" || -z "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" ]]
+[[ "${ACTIVE_RUNNING_WORKER_COUNT:-unknown}" == "1" ]]
+[[ "${AVAILABLE_NEW_WORKER_SLOTS:-unknown}" == "unbounded" ]]
 
-kill "$SUP_PID" "$DISPATCH_PID" "$AI_PID" 2>/dev/null || true
+kill "$SUP_PID" "$DISPATCH_PID" "$AI_PID" "$WORKER_SUP_PID" "$WORKER_AI_PID" 2>/dev/null || true
 wait "$SUP_PID" 2>/dev/null || true
 wait "$DISPATCH_PID" 2>/dev/null || true
 wait "$AI_PID" 2>/dev/null || true
+wait "$WORKER_SUP_PID" 2>/dev/null || true
+wait "$WORKER_AI_PID" 2>/dev/null || true
 
 echo "[PASS] freely live-status shows current active runtime surface with prompt and deep refs"
