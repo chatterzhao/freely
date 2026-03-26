@@ -456,7 +456,7 @@ select_earliest_reset_codex_slot_any() {
 #   1 for other probe failures
 codex_probe_current_slot_now() {
   local project="$1" prompt_file output_file rc timeout_secs="${CODEX_PROBE_TIMEOUT:-15}" probe_lock_held=0
-  local current_slot artifact_path
+  local current_slot artifact_path partial_output
   wait_for_codex_slot_switch_idle "$project" || return 1
   codex_slot_switch_probe_lock_acquire "watchdog_probe_current_slot" || return 1
   probe_lock_held=1
@@ -496,6 +496,21 @@ codex_probe_current_slot_now() {
   # Wait with timeout
   local slept=0
   while [[ $slept -lt $timeout_secs ]]; do
+    partial_output="$(cat "$output_file" 2>/dev/null || true)"
+    if printf '%s\n' "$partial_output" | grep -qi "deactivated_workspace\|402 Payment Required"; then
+      kill "$pid" 2>/dev/null || true
+      wait "$pid" 2>/dev/null || true
+      artifact_path="$(write_codex_probe_artifact "$project" "$current_slot" "deactivated-workspace" "$partial_output")"
+      rm -f "$prompt_file" "$output_file"
+      if [[ "$probe_lock_held" == "1" ]]; then
+        codex_slot_switch_probe_lock_release
+      fi
+      if [[ -n "$artifact_path" ]]; then
+        log_warn "codex probe observed deactivated_workspace for slot ${current_slot:-unknown}; details captured at $artifact_path"
+      fi
+      printf 'deactivated_workspace\n'
+      return 0
+    fi
     if ! kill -0 "$pid" 2>/dev/null; then
       break
     fi
@@ -674,6 +689,11 @@ probe_all_codex_slots_and_update_cooldown() {
         status_icon="💳"
         status_text="subscription"
         details="plan expired or quota exceeded"
+        ;;
+      deactivated_workspace)
+        status_icon="🚫"
+        status_text="deactivated"
+        details="workspace deactivated (402)"
         ;;
       unauthorized)
         status_icon="🔒"

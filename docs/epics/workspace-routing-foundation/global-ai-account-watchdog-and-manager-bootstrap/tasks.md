@@ -25,3 +25,4 @@
 - [x] isolate warning/log output from machine-readable slot/session/launch state so switch-lock notices never pollute canonical truth
 - [x] verify that the first Codex launch after an auto-selected usable slot waits for switch completion and does not require a second manual switch to avoid `402`
 - [x] capture partial `codex exec` probe output into `.freely/run` artifacts when a slot probe times out or returns `deactivated_workspace`, so switch-time investigation no longer depends on reproducing the same transient failure interactively
+- [x] stop treating already-observed `402/deactivated_workspace` probe output as generic timeout; return hard-unavailable immediately so slot sweep can move on without waiting for Codex retry fallback to finish

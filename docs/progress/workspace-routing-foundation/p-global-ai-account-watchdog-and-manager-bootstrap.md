@@ -4,8 +4,8 @@
 - title: Global AI account watchdog and manager bootstrap
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
-- branch: `feature/watchdog-switch-stability-and-probe-freeze-20260326`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-switch-stability-and-probe-freeze`
+- branch: `feature/watchdog-probe-early-deactivated-workspace-detect-20260326`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-probe-early-deactivated-workspace-detect`
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "continuation-worker"}
@@ -58,6 +58,10 @@
   - `bin/ai switch codex` 的单 slot probe 现在默认只给 `CODEX_PROBE_TIMEOUT=15` 秒；超时后 watchdog 只回 `timeout`，现场无法区分网络/代理慢、CLI 卡住，还是 `402 deactivated_workspace` 已经返回但被 timeout 截断
   - 当前 continuation 已把 timeout/deactivated-workspace probe output 落到 `.freely/run/codex-probe-artifacts/`，并新增 focused regression `test-freely-codex-probe-timeout-artifact`
   - 同轮 verification 已补 `20260326-slot-probe-timeout-observability-verification.md`，明确本轮只把 timeout observability 与 probe lock contract 作为 merge 证据，不把旧工位里未收干净的 `test-freely-ensure-manager` 漂移误算为本次回归
+- 2026-03-26 live artifact 继续暴露出一条同族行为缺口：
+  - 新的 `.freely/run/codex-probe-artifacts/*` 已证明多轮所谓 `timeout` 在 15 秒窗口内其实已经拿到了 `402 Payment Required` 和 `deactivated_workspace`
+  - 当前实现仍会继续等到 Codex 自己的 websocket/https fallback/retry 全部拖过 timeout，才把该 slot 记成 `timeout`
+  - 当前 continuation 已把这条判定前移：probe 轮询期一旦看见 `402/deactivated_workspace`，立刻落 artifact、返回 `deactivated_workspace`，并让 slot sweep 继续，而不是再额外浪费一个 timeout 周期
 - 本轮 continuation 已吸收 delegated handoff 中的五点 contract，并确认对应实现已经落在当前分支祖先：
   - all accounts unusable 时选择最早 reset 账号
   - wait 采用 `reset_at + 60s` 等价 buffer 契约，可由 watchdog buffer 环境变量调节
@@ -117,6 +121,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-codex-current-slot-does-not-capture-switch-warning`
 - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact`
 - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-defers-during-account-switch`
+- `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-detects-deactivated-workspace-before-timeout`
 
 ### Latest rerun
 
@@ -179,10 +184,17 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-defers-during-account-switch` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` pass
   - `./bin/governance-check` pass with 10 legacy pre-brainstorm naming warnings only
+- 2026-03-26 early deactivated-workspace detect continuation rerun:
+  - `bash -n docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact`
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-detects-deactivated-workspace-before-timeout`
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-defers-during-account-switch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
+  - `./bin/governance-check`
 
 ## Next Action
 
-- 当前批次已把 slot switch 的全局 launch gate、warning/stdout 污染隔离，以及 timed-out probe partial-output artifact 补齐；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再出现 “first switch still 402” / slot truth 被 warning 污染 / timeout 无证据可查的漂移。
+- 当前批次已把 slot switch 的全局 launch gate、warning/stdout 污染隔离、timed-out probe partial-output artifact，以及 `402/deactivated_workspace` 的早判定补齐；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再把已知 `deactivated_workspace` slot 继续拖成 generic timeout。
 
 ## Revisit Trigger
 
