@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-ai-account-watchdog-and-manager-bootstrap`
@@ -171,21 +171,29 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
   - live 测试口径已收紧为：监控脚本先启动，切到坏账号后等待当前 AI 进程结束，再验证 watchdog 是否切回脚本真实探测出的可用账号并拉起新 Codex
 
-## Next
+## Verification Summary
 
-- 当前 continuation batch 已完成 slot-sweep-first contract 的最小实现与 feature-worktree focused 验证，当前保持 `in_verification`，等待 manager merge review。
-- 当前 continuation batch 已补上 verification drift：稳定化 `rate-limit` 用例计时，并把 manager bootstrap handoff 契约收进 focused tests；本轮完成后继续保持 `in_verification`，等待 manager merge review。
-- 当前 continuation batch 又补上 `auth_failure` 后 detached control-plane 存活契约；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再掉到 `stalled_without_runtime`。
-- 当前 continuation batch 继续补上 `start` 的 dispatcher ready gate 与 `live-status` 的 watchdog surface；本轮完成后继续保持 `in_verification`，等待 merge judgement 与 canonical replay。
-- 当前 continuation batch 已补上 slot switch 的全局 launch gate、warning/stdout 污染隔离，以及 “first switch still 402” 的 focused replay 验收；当前保持 `in_verification`，等待 commit / merge judgement 与 canonical replay。
-- 同族 pre-brainstorm 已把恢复 contract 进一步收紧为 `failure-driven full slot sweep`，而本轮 continuation 已把这条 contract 的最小主路径真正写回能力真源。下一轮不再是重做 contract 改写，而是继续做 code review / merge judgement / develop replay。
-- 当前批次交付的 continuation contract：
-  - wait 采用 `reset_at + buffer`
-  - wait 期间周期性真实 probe saved accounts 是否已变得可工作
-  - wait 结束后重新 probe/select，再拉起 manager
-  - `ensure-manager --watch` 单轮失败后继续留在控制面重试
-  - stale `ensure-manager.pid` 在 watchdog 下次启动时会被覆盖，并在 watchdog 退出时清理
-- 下一步：
-  - 先按新 pre-brainstorm 结论重写 watchdog contract：failure taxonomy、slot sweep 主路径、all-slots-unavailable 等待语义、以及 cooldown 的降级角色
-  - 再进入 dedicated dev-loop，把 runtime / watchdog / ai-cli / tests 从 cooldown-driven recovery 改到 slot-sweep-first recovery
-  - contract 改写与代码验证完成后，再由 manager 复核当前 feature worktree 的 doc/code/test 证据并决定是否 promote
+- Canonical `develop` now contains the same-family implementation batches that define this capability:
+  - `78a5320` slot-sweep-first manager recovery
+  - `3b27e24` detached control-plane survival after `auth_failure`
+  - `ca9e307` watchdog surface and dispatcher-ready gate
+  - `062e0d2` global Codex launch gate behind shared slot switch lock
+  - `d6a5fee` timed-out probe artifact preservation
+  - `b22df5e` early `402/deactivated_workspace` detection before generic timeout
+- Focused canonical replay passes:
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
+  - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
+  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-defers-during-account-switch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-current-slot-does-not-capture-switch-warning`
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact`
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-detects-deactivated-workspace-before-timeout`
+  - `bash docs/system/workspace/scripts/tests/test-watchdog-control-plane-skills`
+  - `./bin/governance-check`
+- Current status surfaces also confirm canonical machine-readable truth is no longer polluted:
+  - `last_active_slot` remains a slot identity
+  - `last_slot_switch_reason` is still machine-readable
+  - latest manager continuity / worker prompt generated-consumed truth remains aligned
+- A current live snapshot may still show `stalled_without_runtime` when no control-plane process is presently running, but that is not evidence that this capability is missing; the script-owned recovery contracts above are implemented and regression-covered.

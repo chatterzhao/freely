@@ -89,16 +89,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md`
 - next_action: 主管自治的最小实现、PID 归属修复、fleet supervision alert、角色文档与“manager/worker runtime 不直接切全局账号”的回归均已落盘；当前保持 `in_verification`。下一步先做 review 与 promote/cleanup 判断，再决定是否并回 `develop`。更外层的 manager watchdog/ensure 仍是边界外后续问题，不在本批次继续扩 scope。
 
-5. `I-20260318-1630`
-- title: Global AI account watchdog and manager bootstrap
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-- source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
-- next_action: 当前 dedicated worktree 已继续补上同 issue family 的 slot-switch 全局 launch gate 与机器可读状态隔离：`tool-launchers.sh` 现会在 `exec codex` 前等待 shared switch lock，`availability-watchdog.sh` 的 switch-wait warning 现强制走 stderr。focused rerun 已通过，当前继续保持 `in_verification`；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再出现 “first switch still 402” / slot truth 被 warning 污染的漂移
-
 6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation
 - milestone_state: committed
@@ -298,7 +288,26 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
 - completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
 
-2. `I-20260322-0445`
+2. `I-20260318-1630`
+- title: Global AI account watchdog and manager bootstrap
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/code-reviews/20260325-slot-sweep-first-verification-batch.md`
+  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/code-reviews/20260326-auth-failure-control-plane-survival-verification.md`
+  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/code-reviews/20260326-live-status-and-dispatcher-ready-verification.md`
+  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/code-reviews/20260326-slot-switch-global-launch-gate-verification.md`
+  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/code-reviews/20260326-slot-probe-timeout-observability-verification.md`
+  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/code-reviews/20260326-early-deactivated-workspace-detect-verification.md`
+  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/code-reviews/20260326-global-ai-account-watchdog-canonical-replay-verification.md`
+- completion_note: global watchdog / manager bootstrap 的 slot-sweep-first recovery、detached control-plane survival、dispatcher ready gate、watchdog status surface、global launch gate、timeout artifact 与 early `deactivated_workspace` detect 已全部进入 canonical `develop` 并通过 focused replay；后续 backlog convergence 不再回到本 issue
+
+3. `I-20260322-0445`
 - title: Latest manager continuity worker consumption governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -312,7 +321,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260326-latest-manager-continuity-worker-consumption-canonical-replay-verification.md`
 - completion_note: canonical `develop` 已重新对齐 latest continuity / latest worker prompt generated-consumed truth，并通过当前 continuity parser focused regression；后续 queue / frozen / reentry 演进另开 lifecycle
 
-3. `I-20260326-0445`
+4. `I-20260326-0445`
 - title: Manager-delegated intake absorption closure governance
 - milestone_state: completed
 - phase_state: `completed`
