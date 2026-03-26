@@ -66,9 +66,12 @@
 
 ## 2026-03-25 Source Lane Retirement Audit
 
-- Re-audited `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-no-fixed-cap-dispatch` and `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-unconsumed-launchable-prompt-fix` against the current integration owner.
-- Both source branches still carry non-ancestor commits, but the remaining runtime deltas are not missing desired capability:
-  - their unreplayed `runtime/freely` hunks revert this family back toward the older account-based readiness / cooldown path instead of the current canonical truth
-  - their focused regressions are already present in this integration owner and remain part of the verification set
-- This round therefore treats both branches as superseded local source lanes whose remaining unique commits should not be replayed onto the canonical owner.
+- Re-audited the remaining same-family source worktrees against this integration owner:
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-no-fixed-cap-dispatch`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-unconsumed-launchable-prompt-fix`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-continuity-prompt-path-contract-reconcile`
+- Their remaining non-ancestor commits are not missing desired capability in the owner:
+  - `manager-no-fixed-cap-dispatch` and `manager-unconsumed-launchable-prompt-fix` still carry older account-based readiness / cooldown hunks that would regress the current canonical truth if replayed directly
+  - `manager-continuity-prompt-path-contract-reconcile` still carries one local-only parser/test commit (`0d88f3d`), but this owner already includes the same launchable-prompt parsing coverage and passing regressions in canonical form
+- This round therefore treats all three branches as superseded local source lanes whose remaining unique commits should not be replayed onto the canonical owner.
 - After this writeback is committed, the local source worktrees/branches are retirement candidates even though their historical commits were never merged directly.
