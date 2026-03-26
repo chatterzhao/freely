@@ -105,12 +105,12 @@ wait_for_codex_slot_switch_idle() {
   while codex_slot_switch_in_progress; do
     if [[ "$waiting_logged" == "0" ]]; then
       owner_pid="$(codex_slot_switch_lock_owner_pid)"
-      log_warn "codex slot switch is already in progress (owner_pid=${owner_pid:-unknown}); waiting before watchdog probe/relaunch"
+      log_warn "codex slot switch is already in progress (owner_pid=${owner_pid:-unknown}); waiting before watchdog probe/relaunch" >&2
       waiting_logged=1
     fi
     now="$(date +%s)"
     if (( now - start_ts >= timeout_secs )); then
-      log_warn "timed out waiting for codex slot switch to finish before watchdog recovery"
+      log_warn "timed out waiting for codex slot switch to finish before watchdog recovery" >&2
       return 1
     fi
     sleep "$interval_secs"

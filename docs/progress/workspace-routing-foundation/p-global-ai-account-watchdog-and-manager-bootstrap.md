@@ -4,8 +4,8 @@
 - title: Global AI account watchdog and manager bootstrap
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
-- branch: `feature/watchdog-live-status-and-dispatcher-ready-20260326`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-live-status-and-dispatcher-ready`
+- branch: `feature/watchdog-slot-switch-global-launch-gate-20260326`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-slot-switch-global-launch-gate`
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "continuation-worker"}
@@ -44,6 +44,16 @@
     - `test-freely-start-requires-interruption-dispatcher-ready`
     - `test-freely-live-status-watchdog-survival`
   - 现有 `test-freely-live-status` 也已扩展为断言 watchdog surface
+- 2026-03-26 最新 live continuation 又补上两条同族 gap：
+  - 当前 shared switch lock 之前只冻结 `switch` / `whoami` / `list` / watchdog probe / `ensure-manager`，没有冻结真正的 `codex exec` 启动面；这会让 auto switch 选出 `usable` slot 后，第一条真实 launch 仍可能踩在切换窗口里命中 `402`
+  - `wait_for_codex_slot_switch_idle()` 的 warning 之前写到 stdout，进而污染 `codex_current_slot()`、`LAST_ACTIVE_SLOT`、`baseline-status` 一类机器可读 truth
+- 2026-03-26 当前 continuation 已补上 slot switch global launch gate：
+  - `tool-launchers.sh` 现在在 `exec codex` 前显式等待 shared switch lock 释放，manager / worker / monitor launch 不再绕过切换窗口
+  - `availability-watchdog.sh` 里的 switch-wait warning 现强制走 stderr，避免 slot/session/launch truth 被提示文本污染
+  - 新增 focused regressions：
+    - `test-monitor-ai-cli-codex-defers-during-account-switch`
+    - `test-freely-codex-current-slot-does-not-capture-switch-warning`
+  - 既有 `test-freely-ensure-manager-defers-during-account-switch` 已同步升级到 slot-sweep-first contract，并通过新的真实 probe mock 继续验证 defer + relaunch 路径
 - 本轮 continuation 已吸收 delegated handoff 中的五点 contract，并确认对应实现已经落在当前分支祖先：
   - all accounts unusable 时选择最早 reset 账号
   - wait 采用 `reset_at + 60s` 等价 buffer 契约，可由 watchdog buffer 环境变量调节
@@ -99,6 +109,8 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
+- `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-defers-during-account-switch`
+- `bash docs/system/workspace/scripts/tests/test-freely-codex-current-slot-does-not-capture-switch-warning`
 
 ### Latest rerun
 
@@ -145,10 +157,20 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive` pass
+- 2026-03-26 slot-switch global launch gate continuation rerun:
+  - `bash -n docs/system/workspace/scripts/runtime/tool-launchers.sh` pass
+  - `bash -n docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-current-slot-does-not-capture-switch-warning` pass
+  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-defers-during-account-switch` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-serialization` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-defers-during-account-switch` pass
+  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args` pass
+  - `./bin/governance-check` pass，只有 10 条 legacy pre-brainstorm naming warning
 
 ## Next Action
 
-- 当前批次又补上了 `auth_failure` 后 detached control-plane 存活契约；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再掉到 `stalled_without_runtime`。
+- 当前批次已把 slot switch 的全局 launch gate 与 warning/stdout 污染隔离补齐；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再出现 “first switch still 402” / slot truth 被 warning 污染的漂移。
 
 ## Revisit Trigger
 

@@ -136,6 +136,27 @@ printf '%s\n' "$*" >>"${LAUNCH_LOG:?}"
 EOF
 chmod +x "$MOCK_BIN/launch-freely"
 
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+current_slot="$(cat "${AI_SWITCH_STATE:?}" 2>/dev/null || true)"
+case "$current_slot" in
+  worahe3971@outlook-com)
+    echo "hi"
+    exit 0
+    ;;
+  worahe3972@outlook-com|worahe3973@outlook-com)
+    echo "You've hit your usage limit. Please try again at Jan 2nd, 2100 12:00 AM."
+    exit 1
+    ;;
+  *)
+    echo "unexpected:$current_slot"
+    exit 7
+    ;;
+esac
+EOF
+chmod +x "$MOCK_BIN/codex"
+
 cat >"$PROJECT/.freely/run/codex-slot-cooldowns.tsv" <<'EOF'
 worahe3972@outlook-com	4102444800
 worahe3973@outlook-com	4102444800

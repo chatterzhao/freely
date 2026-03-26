@@ -21,3 +21,6 @@
 - [x] make `freely start` fail fast when interruption dispatcher does not become ready, instead of silently continuing with a partial control-plane
 - [x] make `live-status` treat a live manager watchdog as active control-plane and surface it in `active_processes`
 - [x] keep detached `ensure-manager --watch` and interruption dispatcher alive after manager `auth_failure`, so intake absorption and slot recovery remain script-owned
+- [x] make slot switch / probe sweep a global launch gate for every new Codex manager/worker process, not just watchdog/bootstrap reads
+- [x] isolate warning/log output from machine-readable slot/session/launch state so switch-lock notices never pollute canonical truth
+- [x] verify that the first Codex launch after an auto-selected usable slot waits for switch completion and does not require a second manual switch to avoid `402`
