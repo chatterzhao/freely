@@ -842,7 +842,7 @@ Validation batch governance:
   - `specimen-S1/S2/S3` 的最小拒绝语义
 - 当前首跳工具选择也未变化：`tools.md` 继续把 `codex` 定位为同 worktree 的 repo read/write 工具，而当前任务仍是 candidate/milestone canonical doc-loop 写回，所以这轮必须在当前 `codex` 会话内继续第二跳，而不是把 `next_prompt` 当作结束信号
 - 仍未冻结的只剩：
-  - `Frozen equivalence: retire_evidence_ref + remaining_cleanup_requirement is the canonical machine-readable absorption pointer for fresh-batch followthrough, and no extra machine-readable pointer is required.` 是否已经写定并被当前 candidate 真源吸收
+  - `Frozen equivalence: retire_evidence_ref + remaining_cleanup_requirement is the canonical machine-readable absorption pointer for fresh-batch followthrough, and no extra machine-readable pointer is required.` 已经写定并被当前 candidate 与 milestone 真源吸收；当前不再把它当成开放问题
   - 冻结后的最小 contract 是否已再过一轮独立 acceptance review，足以 materialize
 
 ## 需要冻结的开放问题
