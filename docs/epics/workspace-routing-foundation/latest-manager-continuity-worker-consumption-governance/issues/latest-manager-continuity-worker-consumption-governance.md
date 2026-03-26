@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260322-0445`
 - title: Latest manager continuity worker consumption governance
-- phase_state: `completed`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `latest-manager-continuity-worker-consumption-governance`
@@ -75,6 +75,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
 - `docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
+- `docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-frozen-prompt`
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reconciles-stale-frozen-consumed-prompt`
@@ -91,6 +92,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-frozen-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reconciles-stale-frozen-consumed-prompt`
@@ -101,27 +103,17 @@
 
 ## Next
 
-- Keep `I-20260322-0445` in `completed` on canonical `develop` as of 2026-03-24. Earlier same-day patrols showed pass-shaped truth surfaces (`034106`/`032208`, then `051509`).
-- The current canonical `develop` reread is now fully aligned again:
-  - at writeback time, `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123901.md`
-  - at writeback time, `LAST_MANAGER_CONTINUITY_GENERATED == LAST_MANAGER_CONTINUITY_CONSUMED == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123901.md`
-  - `latest_manager_worker_prompts_generated = none`
-  - `latest_manager_worker_prompts_consumed = none`
-  - `LAUNCHED_WORKER_PROMPTS = ""`
-  - `queued_worker_prompts = none`
-  - `ACTIVE_RUNNING_WORKER_COUNT = 3`
-- Earlier `092109` was the reopen-shaped patrol result, but canonical continuity `093617` absorbed the later delegated continuations `20260324-092430-continuation-for-i-20260322-0445` and `20260324-093551-continuation-for-i-20260322-0445`; then `093913`, `094320`, `094700`, `095024`, `095720`, `095734`, `100038`, `100348`, `100715`, `101053`, `102539`, `103203`, `103454`, `120941`, `122611`, `122935`, `123608`, and the now-fully-consumed `123901` all carried that same corrected non-reopen judgement forward:
-  - `123901` is the current latest continuity for that same manager-only non-reopen line; it created no new worker prompt and explicitly kept `I-20260322-0445` on completed/closeout tracking
-  - because launch-state/env truth has now also advanced to `123901`, there is no remaining same-round prompt-consumption ambiguity against this issue family's `pre-tests.md`
-  - worker-prompt fields still describe only the latest continuity's launchable prompt set, while `ACTIVE_RUNNING_WORKER_COUNT` remains fleet-wide runtime truth
-  - `fleet-status` still explains the three running lanes directly, including this closeout lane, the sibling same-family reconcile lane, and the separate pre-test-merge followthrough lane
-  - the pre-test-merge followthrough lane remains runtime-owned context and stays outside this issue's canonical acceptance result
-- Keep cleanup disposition explicit rather than premature:
-  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`: retain-with-reason until this docs-only closeout writeback is absorbed by the develop-facing path; not `delete-ready`
-  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile`: retain as the active same-family lane until supervisor/runtime completes normal followthrough
-  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough`: keep separate as `runtime-owned` recovery/followthrough; do not absorb it into this issue's acceptance or cleanup result
-- Revisit trigger:
-  - reproduce a fresh canonical develop-side regression against `pre-tests.md`, or receive new same-family supervisor/runtime evidence that materially contradicts the current canonical manager judgement in `manager-continuity-20260324-123901.md`
+- Reopen the same issue family as `in_verification` on 2026-03-26 because canonical `develop` produced a fresh continuity `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260326-003102.md` with two launchable worker prompts, but `manager-worker-launch-state.env` still recorded:
+  - `LAST_MANAGER_WORKER_PROMPTS_GENERATED=""`
+  - `LAST_MANAGER_WORKER_PROMPTS_CONSUMED=""`
+  - `LAUNCHED_WORKER_PROMPTS=""`
+  - `QUEUED_WORKER_PROMPTS=""`
+- Treat this as the same-family runtime contract regression against `pre-tests.md` item 2, not a new candidate and not the delegated-continuation-stall issue family.
+- Narrow the repair to the current continuity contract:
+  - `## Worker Prompts -> launched / queue / frozen_queue`
+  - `## Queue / Frozen / Cleanup -> launch queue / queue / frozen queue`
+  - `## Worker Prompt Materialization -> worker_prompt_paths_created_this_round`
+- Keep cleanup and retirement claims suspended until canonical `develop` again shows aligned latest continuity generated/consumed truth and latest worker prompt generated/consumed truth for the same round.
 
 ## Retirement Audit
 
