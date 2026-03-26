@@ -16,7 +16,7 @@ CLI (核心) → API (可选) → UI (可选)
 
 ```bash
 # 直接执行，无确认提示
-freely ai-cli switch codex work@company.com --yes
+freely ai-cli switch codex work@company.com-1 --yes
 
 # 输出结构化数据
 freely ai-cli list --format json
@@ -39,16 +39,16 @@ freely ai-cli whoami --format json
 freely ai-cli switch codex work@company.com
 
 # 输出：
-# 当前账号: personal@outlook.com
-# 切换到: work@company.com
+# 当前 slot: personal@outlook-com-1
+# 切换到: work@company.com-1
 # 确认? [y/N] y
 # 已切换到 work@company.com
 
 # 选择菜单
 freely ai-cli switch codex
-# > personal@outlook.com
-#   work@company.com
-#   backup@gmail.com
+# > personal@outlook-com-1
+#   work@company.com-1
+#   backup@gmail.com-2
 ```
 
 ## CLI 调用者类型
@@ -79,17 +79,17 @@ freely ai-cli <command> [options]
 # 初始化
 freely ai-cli init [--yes]
 
-# 显示当前账号
+# 显示当前 slot
 freely ai-cli whoami [tool]
 
-# 保存当前登录（自动检测账号）
+# 保存当前登录（自动检测 auth email 并生成 slot）
 freely ai-cli save codex [--yes]
 
-# 切换账号
-freely ai-cli switch codex [account] [--yes]
-# account 省略时显示选择菜单
+# 切换 slot
+freely ai-cli switch codex [slot] [--yes]
+# slot 省略时自动 probe 并只切到当前真实可用的 slot
 
-# 列出账号
+# 列出 slot
 freely ai-cli list [--format json|yaml|text]
 
 # 状态
@@ -99,15 +99,15 @@ freely ai-cli status [--format json|yaml|text]
 freely ai-cli delete codex <account> [--yes]
 ```
 
-## 账号自动检测
+## Slot 与 auth 元数据
 
-`save` 和 `whoami` 命令自动从 auth.json 提取账号邮箱：
+`.ai-auth/<slot>` 是唯一身份；`save` 和 `whoami` 会从 auth.json 提取 `auth_email` 作为元数据：
 
 ```bash
 # codex: 从 JWT id_token 提取 email
 freely ai-cli save codex
-# Detected account: worahe3973@outlook.com
-# Saved to: ~/.ai-auth/codex-worahe3973@outlook.com/
+# Detected auth email: worahe3973@outlook.com
+# Saved to: ~/.ai-auth/codex-worahe3973@outlook-com-1/
 
 # iflow: 从环境变量读取（需配置）
 freely ai-cli save iflow
@@ -121,7 +121,8 @@ freely ai-cli save iflow
 ```
 Tool: codex
 Auth: present
-Account: worahe3973@outlook.com
+Slot: worahe3973@outlook-com-1
+Auth email: worahe3973@outlook.com
 Last modified: Mar 16 15:50:34 2026
 ```
 
@@ -131,6 +132,8 @@ Last modified: Mar 16 15:50:34 2026
 {
   "tool": "codex",
   "auth": "present",
+  "slot": "worahe3973@outlook-com-1",
+  "auth_email": "worahe3973@outlook.com",
   "account": "worahe3973@outlook.com",
   "last_modified": "Mar 16 15:50:34 2026"
 }
@@ -140,19 +143,19 @@ Last modified: Mar 16 15:50:34 2026
 
 ```
 ~/.ai-auth/
-├── codex-personal@outlook-com/auth.json
-├── codex-work@company-com/auth.json
-└── codex-backup@gmail-com/auth.json
+├── codex-personal@outlook-com-1/auth.json
+├── codex-work@company-com-1/auth.json
+└── codex-backup@gmail-com-2/auth.json
 ```
 
 ## AI Agent 集成示例
 
 ```bash
-# 检测当前账号
-ACCOUNT=$(freely ai-cli whoami --format json --quiet | jq -r '.account')
+# 检测当前 slot
+SLOT=$(freely ai-cli whoami --format json --quiet | jq -r '.slot')
 
 # 检测到限流后切换
 if echo "$output" | grep -qE "5-hour.*limit|rate.?limit"; then
-  freely ai-cli switch codex backup@company.com --yes --format json
+  freely ai-cli switch codex --yes --format json
 fi
 ```

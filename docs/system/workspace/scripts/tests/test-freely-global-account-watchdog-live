@@ -67,7 +67,7 @@ discover_good_account() {
   local candidate
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
-    if [[ " ${BAD_ACCOUNTS[*]} " == *" ${candidate} "* ]]; then
+    if (( ${#BAD_ACCOUNTS[@]} > 0 )) && [[ " ${BAD_ACCOUNTS[*]} " == *" ${candidate} "* ]]; then
       continue
     fi
     switch_account "$candidate" >/dev/null 2>&1 || continue
@@ -79,10 +79,10 @@ discover_good_account() {
   return 1
 }
 
-whoami_account() {
+whoami_auth_email() {
   local output
   output="$(bash "$ROOT_DIR/bin/ai" whoami 2>/dev/null || true)"
-  printf '%s\n' "$output" | sed -n 's/.*Current account: //p'
+  printf '%s\n' "$output" | sed -n 's/.*Current auth email: //p'
 }
 
 status_field() {
@@ -125,7 +125,7 @@ loop_launch_count() {
 trace_event() {
   local event="$1"
   local account supervisor_pid ai_pid latest_log latest_session launch_count
-  account="$(whoami_account || true)"
+  account="$(whoami_auth_email || true)"
   supervisor_pid="$(status_field supervisor_pid)"
   ai_pid="$(status_field ai_pid)"
   latest_log="$(latest_cycle_log || true)"

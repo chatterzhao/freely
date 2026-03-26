@@ -48,6 +48,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - live 集成测试脚本能验证“切号 -> 新 Codex 进程启动 -> resume/续接 -> 继续监督”的真实链路。
 - 主管恢复后继续只承担监督和委派，不接管全局账号切换。
 - watchdog 在拉起主管前会写结构化恢复交接，而不是让主管盲启动。
+- `ai-cli` / watchdog 对外暴露的 canonical identity 必须是 slot；auth email 只能作为 `auth_email` metadata，不能再被展示成当前身份。
 
 ## Completion
 
@@ -134,6 +135,10 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `probe_all_codex_slots_and_update_cooldown()` sweep 失败时会恢复原 auth / active-slot，避免把最后一个失败 slot 留在真实 Codex 工作位；返回 usable 结果前会把 active slot 对齐回该 usable slot
     - `freely ai switch codex` 自动模式只会切到真实 probe 成功的 usable slot；`all_unavailable` 仅返回 debug hint，不再切 earliest-reset slot
     - `test-freely-ai-account-switch`、`test-freely-ensure-manager`、`test-freely-ensure-manager-earliest-reset-wait-revive` 已重写并通过，当前 focused acceptance 已对齐 slot-sweep-first recovery
+  - 2026-03-25 live 狗粮又暴露出一条 CLI/metadata 漂移：
+    - `slot` 才是 `.ai-auth/<slot>` 的唯一身份，但 `bin/ai whoami` 仍把 auth JWT email 输出成 `Current account`
+    - 现场已出现 `Current slot != Current account` 的情形；这不是 slot 选择错误，而是 CLI 把 auth metadata 错报成了身份
+    - 当前 continuation 已把 `whoami` / `switch` / `status` / `save` / `login` 的对外 contract 改成 slot-first，并新增 focused regression 锁住 “slot 标签与 auth email 不一致” 的场景
   - `test-freely-global-account-watchdog-live` 已真实通过：
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
