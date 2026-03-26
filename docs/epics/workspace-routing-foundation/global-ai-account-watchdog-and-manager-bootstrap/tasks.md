@@ -18,4 +18,6 @@
 - [x] change the all-slots-unavailable path from cooldown-ledger-driven waiting to low-frequency real reprobe, with earliest-reset remaining non-authoritative
 - [x] update runtime / watchdog / ai-cli regressions and live acceptance so they assert slot-sweep-first recovery instead of cooldown-first recovery
 - [x] make `ai-cli` expose slot as the only identity and report JWT email only as `auth_email` metadata, even when slot label and auth email differ
+- [x] make `freely start` fail fast when interruption dispatcher does not become ready, instead of silently continuing with a partial control-plane
+- [x] make `live-status` treat a live manager watchdog as active control-plane and surface it in `active_processes`
 - [x] keep detached `ensure-manager --watch` and interruption dispatcher alive after manager `auth_failure`, so intake absorption and slot recovery remain script-owned

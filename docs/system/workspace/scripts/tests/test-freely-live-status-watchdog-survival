@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-watchdog.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/repo"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/intake/20260326-000001-demo" "$PROJECT/docs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="auth_failure"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-03-26T08:34:24Z"
+EOF
+cat >"$PROJECT/.freely/intake/20260326-000001-demo/meta.env" <<'EOF'
+INTAKE_ID="20260326-000001-demo"
+CREATED_AT="2026-03-26T08:34:30Z"
+AUTHOR="user"
+CHANNEL="chat"
+STATUS="delegated"
+CLASSIFICATION="continuation"
+REACTION="followup"
+LINKED_ARTIFACT="pending://continuation"
+DELEGATED_WORKTREE=""
+SESSION_REFS="[]"
+CLAIMED_BY="interruption-manager-agent"
+CLAIMED_AT="2026-03-26T08:34:31Z"
+ABSORPTION_TARGET="handoff://continuation"
+RESOLUTION_ARTIFACT=""
+EOF
+cat >"$PROJECT/.freely/intake/20260326-000001-demo/message.txt" <<'EOF'
+continue
+EOF
+
+bash -c "exec -a 'runtime/freely ensure-interruption-dispatch --project $PROJECT --watch' sleep 30" >/dev/null 2>&1 &
+DISPATCH_PID=$!
+bash -c "exec -a 'runtime/freely ensure-manager --project $PROJECT --watch --interval 10' sleep 30" >/dev/null 2>&1 &
+WATCHDOG_PID=$!
+trap 'kill "$DISPATCH_PID" "$WATCHDOG_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+
+printf '%s' "$DISPATCH_PID" >"$PROJECT/.freely/run/interruption-dispatch.pid"
+printf '%s' "$WATCHDOG_PID" >"$PROJECT/.freely/run/ensure-manager.pid"
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+
+printf '%s\n' "$OUTPUT" | grep -q 'activity_state: supervising_with_pending_intake'
+printf '%s\n' "$OUTPUT" | grep -q "role=interruption_dispatcher pid=$DISPATCH_PID"
+printf '%s\n' "$OUTPUT" | grep -q "role=manager_watchdog pid=$WATCHDOG_PID"
+! printf '%s\n' "$OUTPUT" | grep -q 'activity_state: stalled_without_runtime'
+
+kill "$DISPATCH_PID" "$WATCHDOG_PID" 2>/dev/null || true
+wait "$DISPATCH_PID" 2>/dev/null || true
+wait "$WATCHDOG_PID" 2>/dev/null || true
+
+echo "[PASS] live-status treats watchdog+dispatcher as active control-plane instead of stalled runtime"
