@@ -119,6 +119,11 @@
 
 - 当前批次的 strict probe-gating contract replay 与 focused verification 已完成。
 - no-launch gate、all-unavailable hold、inventory-change wake evidence 已补齐；当前 worktree 已进入 manager merge judgement / develop replay followthrough 前的 review-ready 状态，但仍保持 `in_verification`，等待 manager 吸收。
+- 2026-03-25 23:41 PDT 为了推进 `C-20260323-2045-A` 的 canonical `develop` supervisor proof，又触发了一次 fresh manager cycle：`.freely/logs/cycle-20260325-234105.log`
+  - 该 cycle 在真正产出新 continuity / worker prompt 之前就连续命中 `402 Payment Required` / `deactivated_workspace`
+  - 结果是 `develop` 没能为 scheduler replay owner materialize 新的 proof artifacts，`live-status` 仍停在旧 continuity truth
+  - 这说明本 issue replay owner 已经实现的 broadened auth-failure + no-launch-until-usable-slot contract 仍未被 canonical `develop` 吸收，且现在已经反过来阻塞其他 candidate 的 develop-facing dogfood
+  - 当前 closeout 优先级因此上升：先把这条 replay owner absorb 到 canonical `develop`，再期待 scheduler / manager side 的上游 proof 正常进行
 
 ## 2026-03-25 Source Lane Retirement Audit
 

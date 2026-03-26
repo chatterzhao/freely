@@ -97,7 +97,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`, `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`, `docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md`
-- next_action: 当前同族 replay 已完成 strict probe-gating + wake-only recovery 的 contract / code / test 闭环，当前处于 manager merge judgement / develop replay followthrough 前的 review-ready 状态；接下来由 manager 吸收这批证据并决定 promote / cleanup
+- next_action: 当前同族 replay 已完成 strict probe-gating + wake-only recovery 的 contract / code / test 闭环，当前处于 manager merge judgement / develop replay followthrough 前的 review-ready 状态。2026-03-25 23:41 PDT 为了推进 `C-20260323-2045-A` 的 canonical scheduler proof，`develop` fresh manager cycle `.freely/logs/cycle-20260325-234105.log` 又连续命中 `402 Payment Required` / `deactivated_workspace`，并且没有 materialize 新 continuity / worker prompt。这说明本 issue 的 auth-failure / no-launch replay 仍未被 canonical `develop` 吸收，且已经开始阻塞其他 develop-facing dogfood；接下来应优先由 manager 吸收这批证据并决定 promote / cleanup，而不是继续等待 `develop` 在旧 contract 上自行恢复
 
 6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation
