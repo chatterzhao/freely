@@ -631,9 +631,9 @@ Validation batch governance:
   - 当前 `./bin/freely live-status --project <this-worktree>` 仍显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`、`current_prompt_has_delegated_continuation=1`
   - 同时 `pending_delegated_continuation_ids=none`、`last_consumed_delegated_continuation_ids` 已覆盖 `20260324-024929/024942/025910/030713` 等 superseding intake，且 `latest_manager_continuity_generated/consumed=unavailable`
   - 这说明当前 worker 的确已消费 superseding delegated continuations，但 `live-status` 仍只是当前 run 的消费镜像，而不是可替代 manager continuity 的长期 truth source
-- 当前 assigned worktree 的 hygiene 复核仍不改变路由：本轮开始时 `git status --short --branch` 已显示当前 canonical doc-loop writeback 留下的 3 个 dirty 文件（`docs/milestones.md`、`brainstorms.md`、`candidates.md`），`git rev-list --left-right --count develop...HEAD` 为 `74 26`，而 handoff 要求读取的 `.freely/run/manager-continuity-20260324-021853.md` 仍然缺失。这说明本轮无需先切 checkpoint 或分流无关改动，但它只是 doc-loop continuity evidence，不是新的 promotion 信号
+- 当前 assigned worktree 的 hygiene 复核仍不改变路由：本轮开始时 `git status --short --branch` 一度显示当前 canonical doc-loop writeback 留下的 3 个 dirty 文件（`docs/milestones.md`、`brainstorms.md`、`candidates.md`），随后经 `git update-index --refresh` 校正回 clean；`git rev-list --left-right --count develop...HEAD` 当前为 `74 27`，而 handoff 要求读取的 `.freely/run/manager-continuity-20260324-021853.md` 仍然缺失。这说明本轮无需先切 checkpoint 或分流无关改动，但它只是 doc-loop continuity evidence，不是新的 promotion 信号
 - 当前 same-session continuity refresh 继续把 runtime 事实收窄为“delegated continuation 已消费，但 runtime 仍只是 mirror”：
-  - `git status --short --branch` 当前仍是 3 个 canonical doc-loop 文件 dirty，`git rev-list --left-right --count develop...HEAD` 现为 `74 26`
+  - `git status --short --branch` 的假脏信号已被 `git update-index --refresh` 校正，`git rev-list --left-right --count develop...HEAD` 现为 `74 27`
   - 当前 `live-status` 仍显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=context_compacted`，同时 `current_prompt_has_delegated_continuation=1`、`pending_delegated_continuation_ids=none` 与同一组 consumed delegated ids 保持不变
   - 因此 handoff 里的 `context_compacted` 既是历史 continuity guard 输入，也是当前 runtime run 仍在暴露的事实；这不会改变 owner，只会再次证明 runtime mirror 不能替代缺失的 manager continuity truth artifact
 - 最新 supporting-pool ownership check 也没有改写 owner：
@@ -826,9 +826,11 @@ Validation batch governance:
 - 最新只读 explorer IBM-readiness 复核没有推翻上一轮 writeback：supporting pools 仍只支持 `stay_pre_brainstorm`
 - 当前已经有一轮 supporting-pool 独立对读，但它给出的结论仍是“继续保留 `combined minimal contract v0`，不要直接开 IBM”
 - 最新 concrete supporting-pool patrol 还把证据源钉得更实：`docs/milestones.md` 继续把 `C-20260322-1801-B` 保持在 `candidate/in_pre_brainstorm`，`I-20260322-1801` 继续只作为已完成的职责定义 issue，`20260322-1802` 继续只是 supporting evidence，相邻 progress 文档只拥有 continuity/launch/cleanup-closeout lane，缺失的 `.freely/run/manager-continuity-20260324-021853.md` 仍只是 provenance gap
-- 当前 fresh session 的首跳闭环复核也没有改写这个结论：重新读取治理入口、workspace agent/skills、candidate/issue/supporting pools、`git status --short --branch`、`git rev-list --left-right --count develop...HEAD` 与 `./bin/freely live-status --project ...` 后，当前 worktree 仍只脏 3 个 canonical doc-loop 文件，`develop...HEAD` 仍是 `74 26`，runtime 仍只暴露 `fresh_with_handoff + context_compacted` 的 continuation-consumption mirror，而不是新的 canonical owner
+- 当前 fresh session 的首跳闭环复核也没有改写这个结论：重新读取治理入口、workspace agent/skills、candidate/issue/supporting pools、`git status --short --branch`、`git rev-list --left-right --count develop...HEAD` 与 `./bin/freely live-status --project ...` 后，当前 worktree 的假脏信号已被 `git update-index --refresh` 校正，`develop...HEAD` 当前为 `74 27`，runtime 仍只暴露 `fresh_with_handoff + context_compacted` 的 continuation-consumption mirror，而不是新的 canonical owner
 - 最新并行 explorer 又把 completed issue 栈的边界钉得更死：`I-20260322-1801` 的 `issue + brainstorm + prd + pre-tests` 一起复核后，仍明确把 runtime/status freshness、stale-batch detection capability 与 machine-readable surfacing排除在当前 IBM scope 外，只把它们留给 follow-on lifecycle；因此这条 lane 仍不能被 completed issue 栈吸收
+- 当前同轮 hygiene 预检还纠正了一个索引漂移假象：`git status --short --branch` 最初显示 3 个 canonical doc-loop 文件 dirty，但 `git update-index --refresh` 后 worktree 回到 clean，因此当前不存在需要先切 checkpoint commit 或分流无关改动的 hygiene blocker；这只收窄了“可以继续写 canonical doc-loop”的前提，不改变 route / owner 结论
 - 新增的 explorer contract-freeze review 进一步收窄了顺序：应先冻结 manager continuity 固定语法与最小字段块，再用 delete gate refusal samples 证明其足以支撑 runtime gate 与 cleanup/delete 判断，而不是并行扩写更多子能力
+- 最新 current-turn sufficiency-closeout explorer 也把 blocker 进一步压成单点：当前不再缺 owner 归属判断，也没有新的 IBM-ready competing owner；剩余最高价值 blocker 只剩一件事，即证明 frozen five-part proof bundle 是否已经足以把这条 combined minimal contract materialize 成单一 IBM issue
 - 因此，`next_action` 不再是泛化的“先去做 review”，而是继续把 review 后仍未冻结的部分收紧成可 materialize 的 issue contract：
   - manager continuity 的 `Validation batch governance:` `v1` 固定承载语法与最小字段块
   - `specimen-S1/S2/S3` 对应的 refusal specimen / evidence 组合，用于证明这组字段已足够支撑 runtime gate 与 cleanup/delete 判断
