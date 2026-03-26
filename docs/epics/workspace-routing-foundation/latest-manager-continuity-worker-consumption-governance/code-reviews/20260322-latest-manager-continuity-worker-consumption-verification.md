@@ -2,61 +2,25 @@
 
 ## Result
 
-- pre-merge verification passed
-- 2026-03-24 canonical `develop` post-merge acceptance passed
-- no remaining implementation gap was found inside the declared runtime/test scope
-- canonical review disposition: keep this tree retained-with-reason for docs-only closeout absorption, but not `delete-ready` until supervisor/runtime executes normal cleanup followthrough after the writeback is absorbed
+- same-family reopen required
+- fresh canonical `develop` evidence on 2026-03-26 shows a real implementation gap inside the declared runtime/test scope
+- review disposition: keep this issue family in `in_verification` until the current continuity contract is parsed and consumed again on canonical `develop`
 
 ## Evidence
 
-- 2026-03-24 manager patrol on canonical `develop` recorded post-merge acceptance `pass` with:
-  - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-034106.md`
-  - `latest_manager_worker_prompts_generated == latest_manager_worker_prompts_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-032208-worker-manager-active-worker-launch-state-reconcile-codex.txt`
-  - `queued_worker_prompts = none`
-  - `LAUNCHED_WORKER_PROMPTS` on that same prompt path
-  - `ACTIVE_RUNNING_WORKER_COUNT = 1`
-- 2026-03-24 closeout writeback dispatch then generated `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-051509.md` and `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-051509-worker-i-20260322-0445-closeout-codex.txt`, and those artifacts briefly appeared as the latest generated/consumed truth
-- The required canonical reread later the same day first advanced to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-094700.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-095024.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-095720.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-095734.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-100038.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-100348.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-100715.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-101053.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-102539.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-103203.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-103454.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-120941.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-122611.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-122935.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123608.md`, and the current truth surfaces have now fully converged on `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123901.md`:
-  - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123901.md`
-  - `LAST_MANAGER_CONTINUITY_GENERATED == LAST_MANAGER_CONTINUITY_CONSUMED == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123901.md`
-  - `latest_manager_worker_prompts_generated = none`
-  - `latest_manager_worker_prompts_consumed = none`
-  - `LAUNCHED_WORKER_PROMPTS = ""`
-  - `queued_worker_prompts = none`
-  - `ACTIVE_RUNNING_WORKER_COUNT = 3`
-- earlier `092109` was the reopen-shaped patrol, but canonical continuity `093617` absorbed the later delegated continuations `20260324-092430-continuation-for-i-20260322-0445` and `20260324-093551-continuation-for-i-20260322-0445`, and `093913`, `094320`, `094700`, `095024`, `095720`, `095734`, `100038`, `100348`, `100715`, `101053`, `102539`, `103203`, `103454`, `120941`, `122611`, `122935`, `123608`, and the now-fully-consumed `123901` carry that same manager non-reopen judgement forward
-- `123901` created no new worker prompt and only refreshes manager-owned supervision/cleanup disposition, so the current surface still reflects latest-launchable-set truth versus fleet-wide runtime truth rather than a fresh post-merge acceptance failure
-- earlier implementation verification reran:
-  - `ACTIVE_RUNNING_WORKER_COUNT = 1` in that sampled patrol round; later fleet-wide counts may differ when unrelated worker lanes stay active
-- 2026-03-24 closeout writeback dispatch then generated `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-051509.md` and `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-051509-worker-i-20260322-0445-closeout-codex.txt`, and those artifacts briefly appeared as the latest generated/consumed truth
-- The required canonical reread later the same day first advanced to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-094700.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-095024.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-095720.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-095734.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-100038.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-100348.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-100715.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-101053.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-102539.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-103203.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-103454.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-120941.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-122611.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-122935.md`, then to `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123608.md`, and the current truth surfaces have now fully converged on `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123901.md`:
-  - `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123901.md`
-  - `LAST_MANAGER_CONTINUITY_GENERATED == LAST_MANAGER_CONTINUITY_CONSUMED == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123901.md`
-  - `latest_manager_worker_prompts_generated = none`
-  - `latest_manager_worker_prompts_consumed = none`
-  - `LAUNCHED_WORKER_PROMPTS = ""`
-  - `queued_worker_prompts = none`
-  - `ACTIVE_RUNNING_WORKER_COUNT = 3`
-- earlier `092109` was the reopen-shaped patrol, but canonical continuity `093617` absorbed the later delegated continuations `20260324-092430-continuation-for-i-20260322-0445` and `20260324-093551-continuation-for-i-20260322-0445`, and `093913`, `094320`, `094700`, `095024`, `095720`, `095734`, `100038`, `100348`, `100715`, `101053`, `102539`, `103203`, `103454`, `120941`, `122611`, `122935`, `123608`, and the now-fully-consumed `123901` carry that same manager non-reopen judgement forward
-- `123901` created no new worker prompt and only refreshes manager-owned supervision/cleanup disposition, so the current surface still reflects latest-launchable-set truth versus fleet-wide runtime truth rather than a fresh post-merge acceptance failure
-- earlier implementation verification reran:
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
-  - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
-  - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-consumed-prompt`
-  - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
-  - `./bin/governance-check`
-- this closeout writeback round re-read only:
-  - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-  - `./bin/freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-  - `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-worker-launch-state.env`
-- sidecar runtime/test audit rechecked:
-  - `docs/system/workspace/scripts/runtime/freely`
-  - `docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
-- `git diff --name-only` remained limited to the issue-owned continuity docs during closeout writeback
+- canonical `develop` now produces a fresh manager continuity `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260326-003102.md`
+- that continuity lists two launchable worker prompts under `## Worker Prompts -> launched`
+- runtime consumed the continuity itself:
+  - `LAST_MANAGER_CONTINUITY_GENERATED == LAST_MANAGER_CONTINUITY_CONSUMED == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260326-003102.md`
+- but runtime failed to consume the prompt set from that same continuity:
+  - `LAST_MANAGER_WORKER_PROMPTS_GENERATED=""`
+  - `LAST_MANAGER_WORKER_PROMPTS_CONSUMED=""`
+  - `LAUNCHED_WORKER_PROMPTS=""`
+  - `QUEUED_WORKER_PROMPTS=""`
+- this directly contradicts `pre-tests.md` item 2 and proves the remaining gap is still inside the continuity parser / launch-state consumption scope
 
 ## Remaining Acceptance
 
-- no further acceptance blocker remains inside `I-20260322-0445` after absorbing the current canonical `123901` generated-and-consumed truth into the same issue family writeback
-- keep this feature worktree scoped to docs-only closeout absorption and cleanup disposition only
-- treat the branch as retained-with-reason and not `delete-ready`; do not merge or delete from this worker round
+- parse the current continuity contract into launchable/frozen prompt truth again
+- rerun focused runtime tests against the modern `## Worker Prompts` and `## Queue / Frozen / Cleanup` shapes
+- replay the fix on canonical `develop` before restoring any completed/cleanup judgement

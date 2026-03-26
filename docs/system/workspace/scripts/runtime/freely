@@ -1872,7 +1872,20 @@ request_local_continuation_reentry() {
 
 latest_manager_continuity_file_for_project() {
   local project="$1"
-  latest_generated_manager_continuity_file_for_project "$project"
+  local continuity_file latest_generated
+  while IFS= read -r continuity_file; do
+    [[ -n "$continuity_file" ]] || continue
+    if ! manager_continuity_has_worker_prompts "$continuity_file"; then
+      printf '%s\n' "$continuity_file"
+      return 0
+    fi
+    if manager_continuity_has_any_resolved_worker_prompt "$project" "$continuity_file"; then
+      printf '%s\n' "$continuity_file"
+      return 0
+    fi
+  done < <(find "$(run_dir_for_project "$project")" -maxdepth 1 -type f -name 'manager-continuity-*.md' | sort -r)
+  latest_generated="$(latest_generated_manager_continuity_file_for_project "$project")"
+  [[ -n "$latest_generated" ]] && printf '%s\n' "$latest_generated"
 }
 
 latest_cycle_log_for_project() {
@@ -1903,29 +1916,71 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         remaining=substr(remaining, RSTART + RLENGTH)
       }
     }
+    function normalize_key(text,    value) {
+      value=tolower(text)
+      gsub(/[`[:space:]]+$/, "", value)
+      return value
+    }
+    function mode_allows_current_bucket(    bucket) {
+      bucket=current_bucket
+      if (bucket == "frozen queue" || bucket == "frozen_queue") {
+        return (mode != "launchable")
+      }
+      if (bucket == "cleanup queue") {
+        return 0
+      }
+      return (mode != "frozen")
+    }
     /^## / {
-      section=tolower(substr($0, 4))
-      gsub(/[`[:space:]]+$/, "", section)
+      section=normalize_key(substr($0, 4))
+      current_bucket=""
       capture_runtime_worker_prompt=0
       next
     }
     /^# / {
       section=""
+      current_bucket=""
       capture_runtime_worker_prompt=0
       next
     }
     {
       if (section == "queue") {
-        if ($0 ~ /prompt_path:/ && mode != "frozen") {
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt:/) && mode != "frozen") {
           emit_prompt_paths($0)
         }
         next
       }
       if (section == "frozen queue") {
-        if ($0 ~ /prompt_path:/ && mode != "launchable") {
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt:/) && mode != "launchable") {
           emit_prompt_paths($0)
         }
         next
+      }
+      if (section == "queue / frozen / cleanup" || section == "worker prompts" || section == "worker prompt materialization") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*(launched|launch queue|queue|frozen queue|frozen_queue|cleanup queue|worker_prompt_paths_created_this_round|worker_prompt_paths_referenced|worker_prompt_paths_superseded):/) {
+          current_bucket=$0
+          sub(/^[[:space:]]*-[[:space:]]*/, "", current_bucket)
+          sub(/:.*/, "", current_bucket)
+          current_bucket=normalize_key(current_bucket)
+          if ($0 ~ /\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt/) {
+            if ((section != "worker prompt materialization" || current_bucket == "worker_prompt_paths_created_this_round") && mode_allows_current_bucket()) {
+              emit_prompt_paths($0)
+            }
+          }
+          next
+        }
+        if ($0 ~ /worker_prompt_path:/ || $0 ~ /prompt_path:/) {
+          if ((section != "worker prompt materialization" || current_bucket == "worker_prompt_paths_created_this_round") && mode_allows_current_bucket()) {
+            emit_prompt_paths($0)
+          }
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt[[:space:]]*$/) {
+          if ((section != "worker prompt materialization" || current_bucket == "worker_prompt_paths_created_this_round") && mode_allows_current_bucket()) {
+            emit_prompt_paths($0)
+          }
+          next
+        }
       }
       if ($0 ~ /- worker_prompt: / || $0 ~ /- active_worker_prompt: / || $0 ~ /- queued_worker_prompt: / || $0 ~ /- refreshed_queued_worker_prompt: /) {
         if (mode != "frozen") {
@@ -1933,7 +1988,7 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         }
         next
       }
-      if ($0 ~ /- runtime worker prompt:/) {
+      if ($0 ~ /- runtime worker prompt:/ || $0 ~ /- delegated worker prompt:/) {
         capture_runtime_worker_prompt=1
         next
       }
@@ -2055,6 +2110,18 @@ worker_prompt_launchable_for_manager_project() {
 manager_continuity_has_worker_prompts() {
   local continuity_file="$1"
   [[ -n "$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")" ]]
+}
+
+manager_continuity_has_any_resolved_worker_prompt() {
+  local project="$1" continuity_file="$2" prompt_file
+  [[ -f "$continuity_file" ]] || return 1
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" ]] || continue
+    if [[ -n "$(worker_prompt_resolved_worktree "$project" "$prompt_file")" ]]; then
+      return 0
+    fi
+  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  return 1
 }
 
 manager_continuity_has_unconsumed_launchable_worker_prompt() {
