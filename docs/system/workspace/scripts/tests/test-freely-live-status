@@ -88,9 +88,9 @@ LAST_MANAGER_CONTINUITY_CONSUMED="$PROJECT/.freely/run/manager-continuity-202603
 LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$FROZEN_PROMPT"
 LAUNCHED_WORKER_PROMPTS="$FROZEN_PROMPT"
 QUEUED_WORKER_PROMPTS=""
-MAX_PARALLEL_WORKERS="2"
+MAX_PARALLEL_WORKERS="unbounded"
 ACTIVE_RUNNING_WORKER_COUNT="0"
-AVAILABLE_NEW_WORKER_SLOTS="2"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
 UPDATED_AT="2026-03-20T19:47:46Z"
 EOF
 cat >"$PROJECT/.freely/intake/20260320-000001-demo/meta.env" <<'EOF'
@@ -155,6 +155,8 @@ printf '%s\n' "$OUTPUT" | grep -q 'last_tool_jsonl_path: '
 printf '%s\n' "$OUTPUT" | grep -q 'latest_resolution:'
 printf '%s\n' "$OUTPUT" | grep -q "latest_manager_worker_prompts_generated: $QUEUE_PROMPT"
 printf '%s\n' "$OUTPUT" | grep -q 'latest_manager_worker_prompts_consumed: none'
+printf '%s\n' "$OUTPUT" | grep -q 'max_parallel_workers: unbounded'
+printf '%s\n' "$OUTPUT" | grep -q 'available_new_worker_slots: unbounded'
 # shellcheck disable=SC1090
 source "$PROJECT/.freely/run/manager-worker-launch-state.env"
 [[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}" == "none" || -z "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" ]]

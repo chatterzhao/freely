@@ -91,19 +91,16 @@ launch_worker_from_manager_prompt_if_needed() {
   return 0
 }
 
-COUNT="$(FREELY_MANAGER_MAX_PARALLEL_WORKERS=2 manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
-[[ "$COUNT" == "1" ]]
+COUNT="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$COUNT" == "2" ]]
 grep -q '^20260323-210001-worker-b-codex.txt$' "$LAUNCH_LOG"
-if grep -q 'worker-c' "$LAUNCH_LOG"; then
-  echo "[FAIL] lower-priority worker should have been queued instead of launched" >&2
-  exit 1
-fi
+grep -q '^20260323-210002-worker-c-codex.txt$' "$LAUNCH_LOG"
 
 # shellcheck disable=SC1090
 source "$PROJECT/.freely/run/manager-worker-launch-state.env"
-[[ "${QUEUED_WORKER_PROMPTS:-}" == "$PROMPT_C" ]]
-[[ "${MAX_PARALLEL_WORKERS:-}" == "2" ]]
-[[ "${ACTIVE_RUNNING_WORKER_COUNT:-}" == "2" ]]
-[[ "${AVAILABLE_NEW_WORKER_SLOTS:-}" == "0" ]]
+[[ -z "${QUEUED_WORKER_PROMPTS:-}" ]]
+[[ "${MAX_PARALLEL_WORKERS:-}" == "unbounded" ]]
+[[ "${ACTIVE_RUNNING_WORKER_COUNT:-}" == "3" ]]
+[[ "${AVAILABLE_NEW_WORKER_SLOTS:-}" == "unbounded" ]]
 
-echo "[PASS] manager worker launch respects capacity and queues lower-priority prompts"
+echo "[PASS] manager worker launch directly launches parallel-safe prompts without a fixed numeric cap"

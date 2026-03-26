@@ -68,6 +68,8 @@
   - frozen-only prompt 不进入 launch/relaunch inventory
   - same-continuity stale frozen prompt 会从 launch-state consumed/launched csv 中被清掉
   - manager recovery 不会复活 latest continuity 已冻结的 worker lane
+  - same-continuity consumed launch-state path 在 `set -u` 下不会因未声明的 `prompt_generated_csv` 崩溃，并且仍能识别未消费的 launchable worker prompt
+  - manager continuity 把 prompt 写在 `worker_prompt_paths_created_this_round` / `worker_prompt_paths_referenced` 或 launch-queue 裸路径 bullet 时，runtime 仍能把它们纳入 launchable generated truth，且不会把 `worker_prompt_paths_superseded` 误算进去
 
 ## Completion
 
@@ -96,12 +98,16 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reconciles-stale-frozen-consumed-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-frozen-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-unconsumed-launchable-worker-prompt-same-continuity`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-created-worker-prompt-parsing`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 - `./bin/governance-check`
 
 ## Next
 
 - Keep `I-20260322-0445` in `completed` on canonical `develop` as of 2026-03-24. Earlier same-day patrols showed pass-shaped truth surfaces (`034106`/`032208`, then `051509`).
+- Same-family continuation on 2026-03-24 reproduced a focused runtime bug in `manager_continuity_has_unconsumed_launchable_worker_prompt`: when launch-state `LAST_MANAGER_CONTINUITY_CONSUMED` already matched the current continuity, the helper referenced `prompt_generated_csv` before defining it and crashed under `set -u` with `prompt_generated_csv: unbound variable`. The runtime fix now derives `prompt_generated_csv` from the current continuity before reconciling consumed csv state, and the new focused regression script proves the same-continuity path still returns launchable/unconsumed truth instead of aborting.
+- A later same-family runtime patrol on 2026-03-24 narrowed an adjacent parser defect instead of a reopen: canonical manager continuity `manager-continuity-20260324-232554.md` created `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260324-232554-worker-manager-no-fixed-cap-dispatch-codex.txt`, but `latest_manager_worker_prompt_csv_from_continuity` still returned empty because the parser only recognized a subset of manager-authored prompt shapes. The runtime fix now treats bare launch-queue prompt bullets plus `worker_prompt_paths_created_this_round` / `worker_prompt_paths_referenced` as launchable prompt inventories while continuing to exclude `worker_prompt_paths_superseded`. Focused regression coverage proves the created/referenced forms now surface correctly.
 - The current canonical `develop` reread is now fully aligned again:
   - at writeback time, `latest_manager_continuity_generated == latest_manager_continuity_consumed == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123901.md`
   - at writeback time, `LAST_MANAGER_CONTINUITY_GENERATED == LAST_MANAGER_CONTINUITY_CONSUMED == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260324-123901.md`
