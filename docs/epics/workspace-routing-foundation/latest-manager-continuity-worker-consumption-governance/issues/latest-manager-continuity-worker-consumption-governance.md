@@ -123,7 +123,7 @@
   - `fleet-status` still explains the three running lanes directly, including this closeout lane, the sibling same-family reconcile lane, and the separate pre-test-merge followthrough lane
   - the pre-test-merge followthrough lane remains runtime-owned context and stays outside this issue's canonical acceptance result
 - Keep cleanup disposition explicit rather than premature:
-  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`: retain-with-reason until this docs-only closeout writeback is absorbed by the develop-facing path; not `delete-ready`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`: docs-only closeout writeback has now been absorbed by the integration owner; retire the local companion instead of keeping a second closeout owner alive
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile`: retain as the active same-family lane until supervisor/runtime completes normal followthrough
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough`: keep separate as `runtime-owned` recovery/followthrough; do not absorb it into this issue's acceptance or cleanup result
 - Revisit trigger:
@@ -134,17 +134,14 @@
 - audit_date: `2026-03-24`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
 - worktree_state: `dirty`
-- classification: `retained-with-reason`
-- cleanup_gate: `retained-with-reason`
+- classification: `verified-retirable`
+- cleanup_gate: `retire-now`
 - why_not_verified_retirable:
-  - current worktree still owns canonical closeout writeback for this issue family; writeback must be absorbed through the develop-facing path before branch/worktree cleanup
-  - current closeout lane itself is dirty because this writeback is still uncommitted; it cannot truthfully claim cleanup-readiness yet
-  - same-family worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile` remains active, so this issue family is completed but not yet fully retired as a fleet unit
-  - separate worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough` remains `runtime-owned` recovery and must stay outside this issue's cleanup claim
-- local_branch_disposition: `retained-with-reason`
-- local_branch_reason: keep the branch/worktree until canonical issue-family writeback is absorbed and supervisor/runtime runs the normal cleanup followthrough; do not delete from this worker round
+  - none; the docs-only closeout writeback formerly owned here is now canonically absorbed by `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-family-integration`
+  - same-family followthrough remains active elsewhere, but this companion no longer owns unique lifecycle truth
+- local_branch_disposition: `retire-now`
+- local_branch_reason: local commits `8035fcf`, `fcc66ca`, `f7f5e93`, `c46da2f`, and `73dc2ba` are docs-only writebacks already absorbed by the integration owner; delete this local companion branch/worktree
 - remote_branch_disposition: `not_checked`
 - remote_branch_reason: remote cleanup is outside this worker's closeout-writeback scope
 - revisit_trigger:
-  - current docs-only closeout writeback is absorbed by the develop-facing path
   - supervisor/runtime re-enters cleanup followthrough for this worktree
