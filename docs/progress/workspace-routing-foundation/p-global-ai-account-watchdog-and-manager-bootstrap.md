@@ -4,8 +4,8 @@
 - title: Global AI account watchdog and manager bootstrap
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
-- branch: `feature/watchdog-live-status-and-dispatcher-ready-20260326`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-live-status-and-dispatcher-ready`
+- branch: `feature/watchdog-switch-stability-and-probe-freeze-20260326`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-switch-stability-and-probe-freeze`
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "continuation-worker"}
@@ -44,6 +44,10 @@
     - `test-freely-start-requires-interruption-dispatcher-ready`
     - `test-freely-live-status-watchdog-survival`
   - 现有 `test-freely-live-status` 也已扩展为断言 watchdog surface
+- 2026-03-26 当前现场又补出一条 switch observability 缺口：
+  - `bin/ai switch codex` 的单 slot probe 现在默认只给 `CODEX_PROBE_TIMEOUT=15` 秒；超时后 watchdog 只回 `timeout`，现场无法区分网络/代理慢、CLI 卡住，还是 `402 deactivated_workspace` 已经返回但被 timeout 截断
+  - 当前 continuation 已把 timeout/deactivated-workspace probe output 落到 `.freely/run/codex-probe-artifacts/`，并新增 focused regression `test-freely-codex-probe-timeout-artifact`
+  - 同轮 verification 已补 `20260326-slot-probe-timeout-observability-verification.md`，明确本轮只把 timeout observability 与 probe lock contract 作为 merge 证据，不把旧工位里未收干净的 `test-freely-ensure-manager` 漂移误算为本次回归
 - 本轮 continuation 已吸收 delegated handoff 中的五点 contract，并确认对应实现已经落在当前分支祖先：
   - all accounts unusable 时选择最早 reset 账号
   - wait 采用 `reset_at + 60s` 等价 buffer 契约，可由 watchdog buffer 环境变量调节
@@ -99,6 +103,8 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
+- `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact`
+- `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-defers-during-account-switch`
 
 ### Latest rerun
 
@@ -145,6 +151,12 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive` pass
+- 2026-03-26 slot probe timeout observability continuation rerun:
+  - `bash -n docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-defers-during-account-switch` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` pass
+  - `./bin/governance-check` pass with 10 legacy pre-brainstorm naming warnings only
 
 ## Next Action
 

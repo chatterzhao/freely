@@ -21,3 +21,4 @@
 - [x] make `freely start` fail fast when interruption dispatcher does not become ready, instead of silently continuing with a partial control-plane
 - [x] make `live-status` treat a live manager watchdog as active control-plane and surface it in `active_processes`
 - [x] keep detached `ensure-manager --watch` and interruption dispatcher alive after manager `auth_failure`, so intake absorption and slot recovery remain script-owned
+- [x] capture partial `codex exec` probe output into `.freely/run` artifacts when a slot probe times out or returns `deactivated_workspace`, so switch-time investigation no longer depends on reproducing the same transient failure interactively

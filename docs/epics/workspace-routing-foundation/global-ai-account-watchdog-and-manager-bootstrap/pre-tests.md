@@ -43,6 +43,7 @@
 8. 至少一条 focused regression 明确锁住 “manager `auth_failure` 后 watchdog control-plane 仍存活并继续接管恢复”。
 9. 至少一条 focused regression 明确锁住 “interruption dispatcher 未 ready 时 `freely start` 会 fail fast”。
 10. 至少一条 focused regression 明确锁住 “watchdog + dispatcher 仍存活时，`live-status` 不会误报 `stalled_without_runtime`”。
+11. 至少一条 focused regression 明确锁住 “slot probe timeout 会把 partial probe output 落到 `.freely/run` 可追踪 artifact”，便于区分网络慢、CLI 卡死、还是 `402 deactivated_workspace` 已经返回但被 timeout 截断。
 
 ## Blocker taxonomy
 
