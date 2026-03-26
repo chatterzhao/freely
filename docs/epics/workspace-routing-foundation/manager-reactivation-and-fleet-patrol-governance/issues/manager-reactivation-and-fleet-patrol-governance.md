@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260321-0345`
 - title: Manager reactivation and fleet patrol governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-reactivation-and-fleet-patrol-governance`
@@ -62,8 +62,10 @@ Freely 现在已经能通过 runtime watchdog 拉起主管，也能通过 `live-
 
 - `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
+- `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/code-reviews/20260326-manager-reactivation-and-fleet-patrol-canonical-replay-verification.md`
 
-## Next
+## Verification Summary
 
-- 当前协议、reference、首跳提示与 routing 回归已落盘，下一步进入 verification / review，而不是继续停留在 IBM。
-- 后续若需要真正脚本级的“定时重新唤醒并自动派单”，再作为 runtime / watchdog 增量继续 materialize，不在本 issue 直接越界。
+- canonical replay 继续证明：主管重激活后先 patrol fleet、从 `live-status -> fleet-status -> milestone / issue / progress / recovery` 取输入、并显式检查 stalled/orphaned/completed-without-closure 情况的协议仍在真源中成立。
+- 当前剩下的只是“以后若要做真正定时巡检或自动派单”的增量方向，不是当前 issue 的未完成项。
+- 当前批次据此把本 issue 从 `in_verification` 关闭为 `completed`。

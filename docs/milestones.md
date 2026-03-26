@@ -79,26 +79,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
-9. `I-20260321-0345`
-- title: Manager reactivation and fleet patrol governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/candidates.md`
-- next_action: manager reactivation patrol 协议、reference、首跳提示与 routing 回归已落盘；当前进入 verification，后续若需要真正脚本级 patrol tick 或自动派单，再基于同一 issue 继续进入新的 runtime/dev 增量
-
-10. `I-20260321-1045`
-- title: Stacked worktree merge-chain governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/candidates.md`
-- next_action: 已将 stacked merge-chain 判定正式并入 `worktree-maintenance-governance` skill，并补了 lead/start prompt 与回归；下一步在真实 worktree 收口时优先按 `child -> parent -> merge-prep-from-develop -> develop` 链路使用该 skill，而不是直接在 develop 工位试合
-
 12. `I-20260321-0217`
 - title: Claude Code tool profiles and Codex MCP session evidence governance
 - milestone_state: committed
@@ -366,6 +346,31 @@ routing_policy:
 - evidence:
   - `docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/code-reviews/20260326-worktree-hygiene-canonical-replay-verification.md`
 - completion_note: hygiene skill、checkpoint drift escalation 与 manager hygiene alert 已在 canonical `develop` 通过 replay；若需专门 hygiene worker delegation flow，应通过新 lifecycle 承接
+
+17. `I-20260321-0345`
+- title: Manager reactivation and fleet patrol governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/code-reviews/20260321-manager-reactivation-and-fleet-patrol-verification.md`
+  - `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/code-reviews/20260326-manager-reactivation-and-fleet-patrol-canonical-replay-verification.md`
+- completion_note: manager reactivation 后先 patrol fleet 的协议、reference 与首跳提示已在 canonical truth 中稳定存在；真正脚本级巡检/自动派单应通过新 lifecycle 承接
+
+18. `I-20260321-1045`
+- title: Stacked worktree merge-chain governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/code-reviews/20260326-stacked-merge-chain-canonical-replay-verification.md`
+- completion_note: stacked merge-chain 的 skill/reference/prompt truth 已在 canonical truth 中稳定存在；CLI/脚本级自动决策属于后续增量，不再阻塞当前 issue 收口
 
 ### candidate_issues
 
