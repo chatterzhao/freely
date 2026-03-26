@@ -157,6 +157,18 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
   - live 测试口径已收紧为：监控脚本先启动，切到坏账号后等待当前 AI 进程结束，再验证 watchdog 是否切回脚本真实探测出的可用账号并拉起新 Codex
+  - 2026-03-26 closeout audit 追加了当前 verification gate 的 fleet / merge truth：
+    - `git worktree list --porcelain` 与 `./bin/wt-status-all` 当前 authoritative fleet truth 只剩 5 棵 active worktree，旧 prompt 注入的 6-tree inventory 与更早 9-tree closeout snapshot 不再构成当前 cleanup 真相
+    - 当前 dedicated replay owner 相对最新 `develop` 为 `2` 左 / `161` 右，因此这批证据只能支持 `review-ready`，不能直接支持 promote-complete / cleanup-ready
+    - 2026-03-25 23:41 PDT 的 develop-side fresh manager cycle 曾在新 continuity / worker prompt materialize 之前命中 `402 Payment Required` / `deactivated_workspace`；这仍是 broadened auth-failure contract 需要存在的历史证据，但在 2026-03-26 canonical proof wave 与 latest manager-continuity worker-consumption repair 之后，已不再构成当前 closeout 的主 blocker
+
+## Closure Judgment
+
+- 当前 issue family 的稳定结论是：`review-ready but not promote-closed`
+- manager merge judgement 仍是第一道未完成 gate
+- manager judgement 之后还必须先把当前 replay owner 吸收最新 `develop` 并完成 canonical replay / completion verification
+- 在 canonical `develop` 能稳定产出 fresh continuity / worker prompt、且 completion verification 写回之前，不得把本 issue 标成 `completed`，也不得进入 cleanup / retirement judgement
+- `C-20260323-2045-A` 当前是独立 candidate owner 的后续预研面；本 issue 只提供同族支持证据，不再代替该 candidate 写当前 blocker judgment
 
 ## Next
 

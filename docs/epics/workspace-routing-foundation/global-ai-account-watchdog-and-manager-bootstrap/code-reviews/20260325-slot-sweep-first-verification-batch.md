@@ -23,8 +23,14 @@
 
 - This batch absorbs the `20260325-0525` pre-brainstorm contract rewrite as same-family continuation under `I-20260318-1630`; it is not a parallel issue.
 - The current gate is still feature-worktree verification plus manager merge judgement. This worktree is not `completed` yet.
+- 2026-03-26 closeout audit rechecked fleet truth and merge position before declaring closure:
+  - authoritative active fleet truth is now `git worktree list --porcelain` plus `./bin/wt-status-all => Summary: total=5, dirty=0`
+  - the older prompt-injected 6-tree inventory and earlier 9-tree fleet snapshot are stale history, not current cleanup truth
+  - this replay owner is still `2` commits behind latest `develop`, so the verified batch is review-ready but not yet promote-closed
 
 ## Remaining Acceptance
 
 - Manager needs to absorb this verified continuation and decide merge judgement for the dedicated worktree.
-- After merge, `develop` replay still has to confirm the runtime uses the new slot-sweep-first path under canonical supervision.
+- After manager judgement, the branch still has to absorb latest `develop`, replay onto canonical `develop`, and confirm the runtime uses the new slot-sweep-first path under canonical supervision.
+- The 2026-03-25 23:41 PDT develop-side `402 Payment Required` / `deactivated_workspace` cycle remains relevant as historical evidence for why this replay owner had to broaden auth-failure and no-launch handling, but it is no longer the primary closeout blocker after the 2026-03-26 canonical proof wave and latest manager-continuity worker-consumption repair.
+- Cleanup / retirement remains closed until canonical `develop` completion verification exists.

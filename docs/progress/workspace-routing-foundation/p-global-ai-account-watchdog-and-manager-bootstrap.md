@@ -119,11 +119,14 @@
 
 - 当前批次的 strict probe-gating contract replay 与 focused verification 已完成。
 - no-launch gate、all-unavailable hold、inventory-change wake evidence 已补齐；当前 worktree 已进入 manager merge judgement / develop replay followthrough 前的 review-ready 状态，但仍保持 `in_verification`，等待 manager 吸收。
-- 2026-03-25 23:41 PDT 为了推进 `C-20260323-2045-A` 的 canonical `develop` supervisor proof，又触发了一次 fresh manager cycle：`.freely/logs/cycle-20260325-234105.log`
-  - 该 cycle 在真正产出新 continuity / worker prompt 之前就连续命中 `402 Payment Required` / `deactivated_workspace`
-  - 结果是 `develop` 没能为 scheduler replay owner materialize 新的 proof artifacts，`live-status` 仍停在旧 continuity truth
-  - 这说明本 issue replay owner 已经实现的 broadened auth-failure + no-launch-until-usable-slot contract 仍未被 canonical `develop` 吸收，且现在已经反过来阻塞其他 candidate 的 develop-facing dogfood
-  - 当前 closeout 优先级因此上升：先把这条 replay owner absorb 到 canonical `develop`，再期待 scheduler / manager side 的上游 proof 正常进行
+- 2026-03-26 当前首跳 closeout audit 进一步收窄了 closure judgement：
+  - `git worktree list --porcelain` 与 `./bin/wt-status-all` 当前 authoritative fleet truth 只有 5 棵 active worktree，旧 prompt 注入的 6-tree inventory 与更早的 9-tree snapshot 都只应视为 stale history
+  - 当前 replay owner 分支相对最新 `develop` 仍是 `2` 左 / `161` 右，因此即便 manager 认可当前 worktree 的 review-ready 状态，也还不能直接写成 “ready to merge and cleanup”；必须先吸收最新 `develop`，再做 canonical replay / completion verification
+  - 这让本 issue 当前固定结论变成：`review-ready but not promote-closed; cleanup not yet admissible`
+- 2026-03-25 23:41 PDT 的 `402 Payment Required` / `deactivated_workspace` cycle 仍保留为历史 closeout evidence：`.freely/logs/cycle-20260325-234105.log`
+  - 它解释了为什么本 issue 需要 broadened auth-failure + no-launch-until-usable-slot contract
+  - 但在 2026-03-26 canonical proof wave 与 latest manager-continuity worker-consumption repair 之后，它已不再是当前 closeout 的直接 blocker
+  - 当前 blocker 已收窄为 manager merge judgement、吸收最新 `develop`、canonical replay，以及 develop-side completion verification
 
 ## 2026-03-25 Source Lane Retirement Audit
 
