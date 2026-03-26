@@ -75,3 +75,10 @@
   - `manager-continuity-prompt-path-contract-reconcile` still carries one local-only parser/test commit (`0d88f3d`), but this owner already includes the same launchable-prompt parsing coverage and passing regressions in canonical form
 - This round therefore treats all three branches as superseded local source lanes whose remaining unique commits should not be replayed onto the canonical owner.
 - After this writeback is committed, the local source worktrees/branches are retirement candidates even though their historical commits were never merged directly.
+
+## 2026-03-25 Companion Retirement Audit
+
+- Re-audited `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile` against this integration owner.
+- Its remaining local commits (`8035fcf`, `fcc66ca`, `f7f5e93`, `c46da2f`, `73dc2ba`) are docs-only closeout writebacks; they do not carry runtime/test capability missing from the owner.
+- This companion therefore no longer owns an independent lifecycle for `I-20260322-0445`.
+- Retirement action should delete that local branch/worktree, while `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile` remains the only retained same-family companion because it still carries followthrough context outside this docs-only closeout lane.
