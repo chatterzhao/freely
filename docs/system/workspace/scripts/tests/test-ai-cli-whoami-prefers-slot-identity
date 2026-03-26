@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_HOME="$(mktemp -d /tmp/freely-ai-cli-whoami-slot-identity.XXXXXX)"
+trap 'rm -rf "$TMP_HOME"' EXIT
+
+slot_name="slot-label-does-not-match-auth-7"
+auth_email="metadata@example.com"
+payload="$(python3 - <<'PY' "$auth_email"
+import base64
+import json
+import sys
+
+payload = base64.urlsafe_b64encode(json.dumps({"email": sys.argv[1]}).encode()).decode().rstrip("=")
+print(payload)
+PY
+)"
+
+mkdir -p "$TMP_HOME/.ai-auth/codex-$slot_name" "$TMP_HOME/.codex"
+printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$payload" >"$TMP_HOME/.ai-auth/codex-$slot_name/auth.json"
+cp "$TMP_HOME/.ai-auth/codex-$slot_name/auth.json" "$TMP_HOME/.codex/auth.json"
+printf '%s\n' "$slot_name" >"$TMP_HOME/.codex/active-slot"
+
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex >"$TMP_HOME/whoami.json"
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" whoami codex >"$TMP_HOME/whoami.txt"
+
+grep -q '"slot": "'"$slot_name"'"' "$TMP_HOME/whoami.json"
+grep -q '"auth_email": "'"$auth_email"'"' "$TMP_HOME/whoami.json"
+grep -q 'Current slot: '"$slot_name" "$TMP_HOME/whoami.txt"
+grep -q 'Current auth email: '"$auth_email" "$TMP_HOME/whoami.txt"
+if grep -q 'Current account:' "$TMP_HOME/whoami.txt"; then
+  echo "[FAIL] whoami text output should not label auth metadata as current account" >&2
+  exit 1
+fi
+
+echo "[PASS] ai whoami treats slot as identity and auth email as metadata"

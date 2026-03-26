@@ -286,12 +286,12 @@ cmd_login() {
           cp "$HOME/.codex/auth.json" "$target_dir/"
           chmod 600 "$target_dir/auth.json"
           write_codex_active_slot "$slot"
-          log_info "Auto-saved account: $account"
+          log_info "Auto-saved auth email: $account"
           log_info "Slot: $slot"
           log_info "Location: $target_dir"
           
           if [[ "$FORMAT" == "json" ]]; then
-            echo "{\"logged_in\": true, \"tool\": \"codex\", \"account\": \"$account\", \"slot\": \"$slot\", \"saved\": true}"
+            echo "{\"logged_in\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"auth_email\": \"$account\", \"account\": \"$account\", \"saved\": true}"
           fi
         fi
       fi
@@ -331,7 +331,7 @@ cmd_save() {
       fi
 
       if [[ -n "$actual_account" ]]; then
-        log_info "Detected account: $actual_account"
+        log_info "Detected auth email: $actual_account"
       fi
 
       slot="$(resolve_codex_slot_name "$auth_file" "$slot")"
@@ -350,12 +350,12 @@ cmd_save() {
       write_codex_active_slot "$slot"
 
       log_info "Saved codex slot: $slot"
-      [[ -n "$actual_account" ]] && log_info "Slot account: $actual_account"
+      [[ -n "$actual_account" ]] && log_info "Slot auth email: $actual_account"
       log_info "Slot: $slot"
       log_info "Location: $target_dir"
 
       if [[ "$FORMAT" == "json" ]]; then
-        echo "{\"saved\": true, \"tool\": \"codex\", \"account\": $(json_string_or_null "$actual_account"), \"slot\": \"$slot\", \"path\": \"$target_dir\"}"
+        echo "{\"saved\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"auth_email\": $(json_string_or_null "$actual_account"), \"account\": $(json_string_or_null "$actual_account"), \"path\": \"$target_dir\"}"
       fi
       ;;
     iflow)
@@ -476,7 +476,7 @@ _cmd_switch_auto_codex() {
       _cmd_switch_codex_direct_unlocked "$tool" "$slot"
       actual_account="$(extract_codex_account "$HOME/.codex/auth.json")"
       if [[ "$FORMAT" == "json" ]]; then
-        echo "{\"switched\": true, \"tool\": \"codex\", \"account\": $(json_string_or_null "$actual_account"), \"slot\": \"$slot\", \"status\": \"usable\"}"
+        echo "{\"switched\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"auth_email\": $(json_string_or_null "$actual_account"), \"account\": $(json_string_or_null "$actual_account"), \"status\": \"usable\"}"
       fi
       ;;
     all_unavailable:*)
@@ -485,9 +485,9 @@ _cmd_switch_auto_codex() {
       local reset_at="${info##*|}"
       local human_time
       human_time="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo "$reset_at")"
-      log_warn "No usable codex slot right now; earliest reset hint is $earliest_slot at $human_time"
+      log_warn "No usable codex slot right now; earliest reset hint is $earliest_slot at $human_time; leaving current auth untouched and keeping launch blocked"
       if [[ "$FORMAT" == "json" ]]; then
-        echo "{\"switched\": false, \"tool\": \"codex\", \"status\": \"all_unavailable\", \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"reset_at\": $reset_at, \"reset_at_human\": \"$human_time\"}"
+        echo "{\"switched\": false, \"tool\": \"codex\", \"status\": \"all_unavailable\", \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"reset_at\": $reset_at, \"reset_at_human\": \"$human_time\", \"launch_blocked\": true}"
       fi
       rc=4
       ;;
@@ -536,11 +536,11 @@ _cmd_switch_codex_direct_unlocked() {
 
   write_codex_active_slot "$slot"
   log_info "Switched codex to slot: $slot"
-  log_info "Active codex identity: $switched_account"
+  log_info "Switched codex auth email: $switched_account"
   log_warn "Restart codex for the change to take effect"
 
   if [[ "$FORMAT" == "json" ]]; then
-    echo "{\"switched\": true, \"tool\": \"codex\", \"account\": \"$switched_account\", \"slot\": \"$slot\"}"
+    echo "{\"switched\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"auth_email\": \"$switched_account\", \"account\": \"$switched_account\"}"
   fi
 }
 
@@ -588,7 +588,7 @@ cmd_whoami() {
       local slot=""
       if [[ ! -f "$auth_file" ]]; then
         case "$FORMAT" in
-          json) echo "{\"tool\": \"codex\", \"account\": null, \"slot\": null}" ;;
+          json) echo "{\"tool\": \"codex\", \"slot\": null, \"auth_email\": null, \"account\": null}" ;;
           *) log_warn "Not logged in" ;;
         esac
         exit 0
@@ -598,15 +598,18 @@ cmd_whoami() {
       slot="$(read_codex_active_slot)"
       if [[ -z "$account" ]]; then
         case "$FORMAT" in
-          json) echo "{\"tool\": \"codex\", \"account\": null, \"slot\": $(json_string_or_null "$slot")}" ;;
-          *) log_warn "Cannot determine account" ;;
+          json) echo "{\"tool\": \"codex\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": null, \"account\": null}" ;;
+          *) [[ -n "$slot" ]] && log_info "Current slot: $slot"; log_warn "Cannot determine auth email metadata" ;;
         esac
         exit 0
       fi
       
       case "$FORMAT" in
-        json) echo "{\"tool\": \"codex\", \"account\": \"$account\", \"slot\": $(json_string_or_null "$slot")}" ;;
-        *) log_info "Current account: $account"; [[ -n "$slot" ]] && log_info "Current slot: $slot" ;;
+        json) echo "{\"tool\": \"codex\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": \"$account\", \"account\": \"$account\"}" ;;
+        *)
+          [[ -n "$slot" ]] && log_info "Current slot: $slot"
+          log_info "Current auth email: $account"
+          ;;
       esac
       ;;
     *)
@@ -631,13 +634,13 @@ cmd_status() {
         
         case "$FORMAT" in
           json)
-            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"account\": \"$account\", \"slot\": $(json_string_or_null "$slot"), \"last_modified\": \"$mtime\"}"
+            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"last_modified\": \"$mtime\"}"
             ;;
           *)
             log_info "Tool: codex"
             log_info "Auth: present"
-            log_info "Account: ${account:-unknown}"
             [[ -n "$slot" ]] && log_info "Slot: $slot"
+            log_info "Auth email: ${account:-unknown}"
             log_info "Last modified: $mtime"
             ;;
         esac

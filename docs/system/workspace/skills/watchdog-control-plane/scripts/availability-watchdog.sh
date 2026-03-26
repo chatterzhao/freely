@@ -235,7 +235,7 @@ codex_current_account() {
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" ]] || return 0
   output="$("$ai_bin" --quiet --format json whoami codex 2>/dev/null || true)"
-  printf '%s\n' "$output" | sed -n 's/.*"account": *"\([^"]*\)".*/\1/p' | tail -n 1
+  printf '%s\n' "$output" | sed -n 's/.*"auth_email": *"\([^"]*\)".*/\1/p' | tail -n 1
 }
 
 codex_current_slot() {

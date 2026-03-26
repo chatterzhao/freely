@@ -7,6 +7,7 @@
 3. 只有真实 probe 证明某个 slot 当前可用后，watchdog 才允许把该 slot 的授权文件切进真实 Codex 工作位并继续 manager / worker 恢复。
 4. 当所有保存 slot 都不可用时，恢复链会进入低频真实 reprobe；`earliest reset` 最多作为 debug evidence 或排序提示，不再主导恢复决策。
 5. 这条恢复 contract 由纯脚本 watchdog / runtime 完成，不依赖 manager AI 或 worker AI 的语义判断。
+6. `whoami`/`switch`/`status`/`save`/`login` 的对外契约必须以 slot 为唯一身份，auth email 仅作为 `auth_email` 元数据暴露。
 
 ## Testing layers
 
@@ -33,6 +34,7 @@
 4. 至少一条 focused regression 明确锁住 `all slots unavailable -> low-frequency reprobe`，并证明 `earliest reset` 不是主恢复 gate。
 5. `watchdog-control-plane`、`runtime/freely`、`ai-cli` 的真源说明不再把 cooldown 描述为 canonical recovery owner。
 6. live evidence 能说明真实 `.ai-auth/<slot>` inventory 与实际 probe/switch 行为一致。
+7. 至少一条 focused regression 明确锁住 “slot 标签与 auth email 不一致时，CLI 仍以 slot 为身份、仅把 email 作为 metadata”。
 
 ## Blocker taxonomy
 
