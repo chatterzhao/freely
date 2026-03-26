@@ -52,7 +52,7 @@ routing_policy:
 1. `I-20260307-1201`
 - title: 源分类、milestone-owned issue 与派生 worktree 路由治理
 - milestone_state: committed
-- phase_state: `completed`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md`
@@ -88,16 +88,6 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md`
 - next_action: 主管自治的最小实现、PID 归属修复、fleet supervision alert、角色文档与“manager/worker runtime 不直接切全局账号”的回归均已落盘；当前保持 `in_verification`。下一步先做 review 与 promote/cleanup 判断，再决定是否并回 `develop`。更外层的 manager watchdog/ensure 仍是边界外后续问题，不在本批次继续扩 scope。
-
-6. `C-20260324-0405-A`
-- title: Watchdog restart-storm and process-churn signal implementation
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/issues/watchdog-restart-storm-and-process-churn-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/candidates.md`
-- next_action: IBM 已 materialize，并冻结了 signal 真相面、manager escalation 边界、stall 分离语义与默认阈值；下一步进入 dev，实现 `runtime/freely` 的 signal helper、`session-state.env` 字段、`live-status`/`fleet-status` 暴露与 manager escalation followthrough
 
 7. `I-20260318-1825`
 - title: Worktree hygiene supervision control plane
@@ -149,26 +139,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/candidates.md`
 - next_action: 已将 stacked merge-chain 判定正式并入 `worktree-maintenance-governance` skill，并补了 lead/start prompt 与回归；下一步在真实 worktree 收口时优先按 `child -> parent -> merge-prep-from-develop -> develop` 链路使用该 skill，而不是直接在 develop 工位试合
 
-11. `I-20260320-1945`
-- title: Watchdog live status surface and manager supervision
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
-- source_brainstorm: `docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/candidates.md`
-- next_action: 已在 `develop` 完成 `freely live-status`、主管监督接线与脚本回归；后续若要扩 `--format json`、`--watch` 或 stall scoring，再回到同一 issue 继续推进
-
-11. `I-20260320-2105`
-- title: Baseline-status command and status family governance
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/candidates.md`
-- next_action: 已在 `develop` 完成 `baseline-status` 命名迁移与 `status` family 聚合入口，并通过 checkpoint / pid ownership / routing 回归；后续若要扩 JSON family 输出或 watch 模式，再回到同一 issue 继续推进
-
 12. `I-20260321-0217`
 - title: Claude Code tool profiles and Codex MCP session evidence governance
 - milestone_state: committed
@@ -218,56 +188,6 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/candidates.md`
 - next_action: `three-loop-capability-lifecycle` 与 `PROJECT_INTENT` 的边界 wording 已落盘；当前进入 consistency verification，确认“历史 vs 当前”与狗粮能力发现原则不会与既有真源冲突
-
-17. `I-20260324-0405`
-- title: 三个 loop 的并列关系与 terminal governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md`, `docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/candidates.md`
-- next_action: IBM 已 materialize，当前进入 active truth dev 改写：统一 `auto-loop` outer、`doc-loop` / `dev-loop` sibling、verification / cleanup / recovery 非-loop、以及 terminal closure 必须由 outer governance 收口；只改当前真源，不回写历史 evidence
-
-18. `I-20260322-0115`
-- title: CLI-first entrypoint and observability surface unification
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
-- source_brainstorm: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md`
-- next_action: 已完成 `chat` / `tui` 的 shared front-door submit helper，并把 CLI-first backend contract 写回真源；若后续继续做 Tauri 渲染层，需新开 lifecycle
-
-19. `I-20260322-0135`
-- title: Integration-acceptance-first IBM and verification governance
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/candidates.md`
-- next_action: 已将 `pre-tests.md` 收敛为 issue-level acceptance 控制面，并把 integration / acceptance-first 口径写回 IBM、three-loop 与 `LAWS`；后续若要继续结构化 verification review 模板，应通过新 lifecycle 承接
-
-20. `I-20260322-0228`
-- title: Manager delegation after sufficient patrol evidence governance
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/candidates.md`
-- next_action: 已把 patrol evidence 充足后必须切到 concrete worker delegation 的阈值语义写回主管真源；若后续仍观察到主管只巡检不委派，应通过新 lifecycle 进入 runtime / delegation mechanism 层修复
-
-21. `I-20260322-0412`
-- title: Worker active reentry for manager-delegated continuation governance
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
-- next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
 
 ### completed_issues
 
@@ -333,6 +253,108 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-manager-delegated-intake-absorption-closure-governance.md`
   - `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/code-reviews/20260326-manager-delegated-intake-absorption-closure-verification.md`
 - completion_note: manager-owned delegated intake absorbed closure 已进入 canonical `develop`，focused regressions 与 live-status surface 均未回退；worker-side delegated lifecycle 仍按既有 issue family 独立推进
+
+5. `C-20260324-0405-A`
+- title: Watchdog restart-storm and process-churn signal implementation
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/issues/watchdog-restart-storm-and-process-churn-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-watchdog-restart-storm-and-process-churn-governance.md`
+  - `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/code-reviews/20260324-watchdog-restart-storm-and-process-churn-verification.md`
+- completion_note: restart-storm / process-churn signal 的 runtime helper、`session-state.env` 真相面、manager escalation 与 `live-status` / `fleet-status` 暴露已在 same-family issue 中完成并验证；该 candidate 不再保留为 active dev handoff
+
+6. `I-20260320-1945`
+- title: Watchdog live status surface and manager supervision
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
+- completion_note: `freely live-status` 的主管监督接线与 status surface 已进入 canonical truth；后续若继续扩 JSON / watch / scoring，应新开 lifecycle
+
+7. `I-20260320-2105`
+- title: Baseline-status command and status family governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md`
+- completion_note: `baseline-status` 命名迁移与 `status` family 聚合入口已经完成；后续 JSON family 输出或 watch 模式应通过新 lifecycle 承接
+
+8. `I-20260324-0405`
+- title: 三个 loop 的并列关系与 terminal governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md`, `docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-three-loops-sibling-relationship-and-terminal-governance.md`
+  - `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/code-reviews/20260324-three-loops-sibling-relationship-verification.md`
+- completion_note: active truth、agent / skill 与 runtime-facing contract 已统一到 `auto-loop` outer + `doc-loop` / `dev-loop` sibling 的模型；继续把它留在 `in_dev` 会制造假待办
+
+9. `I-20260322-0115`
+- title: CLI-first entrypoint and observability surface unification
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-cli-first-entrypoint-and-observability-surface-unification.md`
+  - `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
+- completion_note: shared front-door submit helper 与 CLI-first backend contract 已完成并验证；后续若继续扩 Tauri 渲染层，应新开 lifecycle
+
+10. `I-20260322-0135`
+- title: Integration-acceptance-first IBM and verification governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-integration-acceptance-first-verification-governance.md`
+  - `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/code-reviews/20260322-integration-acceptance-first-verification-governance-verification.md`
+- completion_note: `pre-tests.md` 作为 issue-level acceptance 控制面与 integration-first 口径已收回真源；结构化 verification review 模板若继续扩展，应另开 lifecycle
+
+11. `I-20260322-0228`
+- title: Manager delegation after sufficient patrol evidence governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-manager-delegation-after-sufficient-patrol-evidence-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/code-reviews/20260322-manager-delegation-after-sufficient-patrol-evidence-governance-verification.md`
+- completion_note: patrol evidence 充足后必须切 concrete worker delegation 的阈值语义已经稳定落盘；后续若 runtime 仍出现只巡检不委派，应进入新的 delegation-mechanism lifecycle
+
+12. `I-20260322-0412`
+- title: Worker active reentry for manager-delegated continuation governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-worker-active-reentry-for-manager-delegated-continuation-governance.md`
+  - `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/code-reviews/20260322-worker-active-reentry-for-manager-delegated-continuation-verification.md`
+- completion_note: active-worker local reentry 修复、脚本级验收与 post-merge acceptance 已完成；后续 consumed-id 可见性增强应通过新 lifecycle 承接
 
 ### candidate_issues
 
