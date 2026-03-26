@@ -97,7 +97,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
-- next_action: 当前 dedicated worktree 继续补上同 issue family 的两个 control-plane acceptance gap：`cmd_start()` 现已把 interruption dispatcher ready 作为硬门禁，`live-status` / `activity_state` 现已把 `ensure-manager --watch` surface 成 `manager_watchdog` 并纳入 control-plane 计算。focused rerun 已通过，当前继续保持 `in_verification`；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical status surface 与控制面真相重新对齐
+- next_action: 当前 dedicated worktree 已继续补上同 issue family 的 slot-switch 全局 launch gate 与机器可读状态隔离：`tool-launchers.sh` 现会在 `exec codex` 前等待 shared switch lock，`availability-watchdog.sh` 的 switch-wait warning 现强制走 stderr。focused rerun 已通过，当前继续保持 `in_verification`；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再出现 “first switch still 402” / slot truth 被 warning 污染的漂移
 
 6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation

@@ -49,6 +49,8 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - 主管恢复后继续只承担监督和委派，不接管全局账号切换。
 - watchdog 在拉起主管前会写结构化恢复交接，而不是让主管盲启动。
 - `ai-cli` / watchdog 对外暴露的 canonical identity 必须是 slot；auth email 只能作为 `auth_email` metadata，不能再被展示成当前身份。
+- slot switch / probe sweep 活跃时，任何新的 Codex AI launch 都必须等待同一把 shared lock，不得在切换窗口里抢跑到坏/瞬时授权。
+- warning / observability 文本不得污染 slot/session/launch 的机器可读状态面。
 
 ## Completion
 
@@ -155,6 +157,13 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `live_status_activity_state_for_project()` 与 `cmd_live_status()` 现在都把 live manager watchdog 算入 control-plane，并在 `active_processes` 中展示 `role=manager_watchdog`
     - 新增 `test-freely-start-requires-interruption-dispatcher-ready` 与 `test-freely-live-status-watchdog-survival`
     - 现有 `test-freely-live-status` 也已扩展为显式断言 watchdog surface
+  - 2026-03-26 最新 live continuation 又暴露出两条同族 gap：
+    - `freely ai switch codex` / watchdog probe 已做部分 serialization，但真正的 Codex launch path 仍可能在 switch/probe window 中抢跑，导致 “auto switch 选到 usable slot 后第一次真实使用仍报 `402`，再 switch 一次才恢复”
+    - `wait_for_codex_slot_switch_idle()` 的 warning 当前会混入 stdout，进而污染 `LAST_ACTIVE_SLOT` / `last_active_slot` 等机器可读状态字段
+  - 当前 continuation 正把上述 gap 吸收到同 issue：
+    - 新 contract 是 “switch/probe window = 全局 Codex launch gate”，而不只是 watchdog/bootstrap 层 defer
+    - 机器可读状态与 warning/log 文本必须完全隔离
+    - focused verification 将新增对真实 launch gate 与状态面无污染的直接断言
   - `test-freely-global-account-watchdog-live` 已真实通过：
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
@@ -166,6 +175,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - 当前 continuation batch 已补上 verification drift：稳定化 `rate-limit` 用例计时，并把 manager bootstrap handoff 契约收进 focused tests；本轮完成后继续保持 `in_verification`，等待 manager merge review。
 - 当前 continuation batch 又补上 `auth_failure` 后 detached control-plane 存活契约；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再掉到 `stalled_without_runtime`。
 - 当前 continuation batch 继续补上 `start` 的 dispatcher ready gate 与 `live-status` 的 watchdog surface；本轮完成后继续保持 `in_verification`，等待 merge judgement 与 canonical replay。
+- 当前 continuation batch 已补上 slot switch 的全局 launch gate、warning/stdout 污染隔离，以及 “first switch still 402” 的 focused replay 验收；当前保持 `in_verification`，等待 commit / merge judgement 与 canonical replay。
 - 同族 pre-brainstorm 已把恢复 contract 进一步收紧为 `failure-driven full slot sweep`，而本轮 continuation 已把这条 contract 的最小主路径真正写回能力真源。下一轮不再是重做 contract 改写，而是继续做 code review / merge judgement / develop replay。
 - 当前批次交付的 continuation contract：
   - wait 采用 `reset_at + buffer`

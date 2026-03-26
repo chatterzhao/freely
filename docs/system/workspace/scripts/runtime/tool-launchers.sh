@@ -1,5 +1,66 @@
 #!/usr/bin/env bash
 
+codex_slot_switch_lock_dir_for_launch() {
+  printf '%s\n' "${AI_CLI_SWITCH_LOCK_DIR:-$HOME/.codex/slot-switch.lock}"
+}
+
+codex_slot_switch_lock_state_file_for_launch() {
+  printf '%s\n' "$(codex_slot_switch_lock_dir_for_launch)/state.env"
+}
+
+codex_slot_switch_lock_owner_pid_for_launch() {
+  local state_file
+  state_file="$(codex_slot_switch_lock_state_file_for_launch)"
+  [[ -f "$state_file" ]] || return 0
+  sed -n 's/^owner_pid=//p' "$state_file" | tail -n 1
+}
+
+codex_slot_switch_lock_cleanup_if_stale_for_launch() {
+  local lock_dir owner_pid
+  lock_dir="$(codex_slot_switch_lock_dir_for_launch)"
+  [[ -d "$lock_dir" ]] || return 0
+  owner_pid="$(codex_slot_switch_lock_owner_pid_for_launch)"
+  if [[ -z "$owner_pid" ]] || ! kill -0 "$owner_pid" 2>/dev/null; then
+    rm -rf "$lock_dir"
+  fi
+}
+
+codex_slot_switch_in_progress_for_launch() {
+  local lock_dir owner_pid inherited_owner_pid
+  codex_slot_switch_lock_cleanup_if_stale_for_launch
+  lock_dir="$(codex_slot_switch_lock_dir_for_launch)"
+  [[ -d "$lock_dir" ]] || return 1
+  owner_pid="$(codex_slot_switch_lock_owner_pid_for_launch)"
+  inherited_owner_pid="${AI_CLI_SWITCH_LOCK_OWNER_PID:-}"
+  [[ -n "$owner_pid" ]] || return 1
+  [[ "$owner_pid" != "$$" ]] || return 1
+  [[ -z "$inherited_owner_pid" || "$owner_pid" != "$inherited_owner_pid" ]] || return 1
+  kill -0 "$owner_pid" 2>/dev/null
+}
+
+wait_for_codex_slot_switch_idle_before_launch() {
+  local timeout_secs="${FREELY_ACCOUNT_SWITCH_WAIT_SECS:-60}"
+  local interval_secs="${FREELY_ACCOUNT_SWITCH_WAIT_INTERVAL_SECS:-1}"
+  local start_ts now owner_pid waiting_logged=0
+  [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=60
+  [[ "$interval_secs" =~ ^[0-9]+$ ]] || interval_secs=1
+  start_ts="$(date +%s)"
+
+  while codex_slot_switch_in_progress_for_launch; do
+    if [[ "$waiting_logged" == "0" ]]; then
+      owner_pid="$(codex_slot_switch_lock_owner_pid_for_launch)"
+      echo "[WARN] codex slot switch is already in progress (owner_pid=${owner_pid:-unknown}); waiting before codex launch" >&2
+      waiting_logged=1
+    fi
+    now="$(date +%s)"
+    if (( now - start_ts >= timeout_secs )); then
+      echo "[ERROR] timed out waiting for codex slot switch to finish before codex launch" >&2
+      return 1
+    fi
+    sleep "$interval_secs"
+  done
+}
+
 tool_default_capabilities() {
   local tool="$1"
   case "$tool" in
@@ -82,6 +143,7 @@ tool_run_from_prompt_file() {
 
   case "$tool" in
     codex)
+      wait_for_codex_slot_switch_idle_before_launch || return 1
       local -a args=(exec --skip-git-repo-check -C "$project")
       if [[ "$launch_kind" == "resume" ]]; then
         [[ -n "$tool_resume_target" ]] || {
