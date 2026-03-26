@@ -99,6 +99,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
 - next_action: 当前 dedicated worktree 已继续补上同 issue family 的 slot-switch 全局 launch gate 与机器可读状态隔离：`tool-launchers.sh` 现会在 `exec codex` 前等待 shared switch lock，`availability-watchdog.sh` 的 switch-wait warning 现强制走 stderr。focused rerun 已通过，当前继续保持 `in_verification`；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再出现 “first switch still 402” / slot truth 被 warning 污染的漂移
 
+6. `I-20260326-0445`
+- title: Manager-delegated intake absorption closure governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/candidates.md`
+- next_action: 当前 dedicated worktree 已完成 manager-side absorbed reconciler 与 focused verification；下一步进入 review / develop merge judgement，并在 develop replay 中确认历史 delegated intake 元数据开始真实收口
+
 6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation
 - milestone_state: committed
