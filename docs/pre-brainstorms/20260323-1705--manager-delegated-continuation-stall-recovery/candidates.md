@@ -63,7 +63,7 @@
     - `github issue`: 未发现外部 issue 接管
 - retention_audit:
   - `2026-03-25`: this candidate still has no promoted issue, no `progress` owner, and no `recovery` artifact that absorbs the prompt-absorbed manager delegated-continuation stall acceptance boundary.
-  - `2026-03-25`: keep this dedicated worktree retained-with-reason even though adjacent manager continuity / handoff consumption issues have advanced; those issue families do not own the missing `specific stalled intake id -> current manager prompt cycle -> consumed-event binding -> no-new-continuity/handoff stall verdict` chain.
+  - `2026-03-25`: the source worktree `feature/manager-delegated-continuation-stall-materialization-20260323` no longer needs to stay alive as a separate owner surface once its canonical pre-brainstorm writeback is absorbed into the develop-facing merge-prep chain; the candidate remains retained-with-reason on that absorbed owner line because adjacent manager continuity / handoff consumption issues still do not own the missing `specific stalled intake id -> current manager prompt cycle -> consumed-event binding -> no-new-continuity/handoff stall verdict` chain.
 - runtime_visible_evidence:
   - prompt-level proof:
     - `current_prompt_has_delegated_continuation=1`
@@ -245,11 +245,11 @@
     - `current prompt cycle=<prompt file / session ref>`
     - `consumed event anchor=<timestamp / ids / equivalent proof>`
     - `stall verdict=no-new-continuity/handoff for that same chain`
-  - 在这两件事没完成之前，本树继续视为 active canonical owner，不降级为 evidence-only，也不进入 IBM。
-  - 当前 owner worktree 已 clean，但这只说明 hygiene 已恢复；branch 仍未被 `develop` 吸收，specimen-chain binding proof 也还没稳定到可 materialize 的 contract，所以 cleanup disposition 继续保持 `retain-for-followthrough`。
+  - 在这两件事没完成之前，candidate 继续视为 active canonical owner，不降级为 evidence-only，也不进入 IBM；但 owner surface 现在以 develop-facing merge-prep 吸收链为准，不再要求原 source worktree 继续单独保留。
+  - 当前 canonical writeback 已被 develop-facing merge-prep 吸收，说明 source-tree hygiene gate 已经闭合；真正未闭合的只剩 specimen-chain binding proof 与 real dogfood followthrough，因此 retained-with-reason 继续落在合并后的 owner 线上，而不是旧 source worktree 本身。
 - revisit_trigger:
   - 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，且 runtime 能给出当前 prompt cycle / stalled intake 的 binding proof，并附带一轮真实 followthrough 时，重新进入 materialization 判断。
-  - 当 manager 已吸收当前分支上的 canonical writeback 提交并重新做 cleanup 巡检时，重新判断该 worktree 是否满足 `retire-now`。
+  - 当 canonical manager surface 已吸收这条 merge-prep owner 线上的 writeback 并重新做 cleanup 巡检时，重新判断当前 owner 是否满足 `retire-now`。
 - route_kind: `pre_brainstorm`
 - next_recommended_route: `doc-pre-brainstorm-execution`
 - restart_point: `continuation`

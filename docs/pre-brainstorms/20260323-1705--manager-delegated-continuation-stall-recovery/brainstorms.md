@@ -244,6 +244,17 @@
   - 当前分支的独有提交仍是 canonical candidate writeback，而不是可直接丢弃的噪音
   - 但在这些提交尚未被上游吸收前，这棵树不满足 `retire-now`
 
+## 吸收更新（2026-03-25）
+
+- 当前 source tree `feature/manager-delegated-continuation-stall-materialization-20260323` 上的 canonical pre-brainstorm writeback 已被 develop-facing merge-prep owner line 吸收。
+- 这次吸收只关闭 source-tree 独有提交的 cleanup gate，不关闭 candidate 本身：
+  - `C-20260323-1705-A` 仍然是 `candidate / in_pre_brainstorm`
+  - `specimen-chain binding proof` 与 `one real dogfood followthrough` 仍然是 promotion blocker
+  - retained-with-reason 继续挂在 merge-prep owner line，而不是旧 source tree
+- 因此后续 cleanup/retirement 判断要拆开看：
+  - 旧 source tree 现在可以按 absorbed source lane 退休
+  - candidate owner 仍继续存在，直到 canonical manager surface 吸收 merge-prep owner line 并补完真实 dogfood followthrough
+
 ## continuity guard writeback（2026-03-24 00:22 PST）
 
 - 本轮 fresh session 继续命中 handoff 中要求的 doc-loop continuity guard，因此先刷新 pre-brainstorm canonical artifacts，而不是扩大到 IBM / dev-loop

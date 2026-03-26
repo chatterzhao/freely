@@ -41,8 +41,8 @@
   - 也未发现 `docs/epics/**`、`docs/progress/**` 或 `docs/recovery/**` 接管该候选
   - 独立只读 owner scan 再次确认：仓库里没有其他 canonical artifact 接管这条 contract；当前唯一缺口仍是 prompt-cycle binding proof，而不是 owner 路由不清
 - hygiene_judgement:
-  - canonical writeback 已继续收敛为本分支上的最新 continuity anchor lineage，当前 worktree 为 `CLEAN`
-  - 本轮无需把无关改动分流到其他 worktree；下一步 hygiene / cleanup 动作应是等待这些独有提交被上游吸收后再重判 retirement，而不是继续扩大 scope
+  - canonical writeback 已继续收敛到 develop-facing merge-prep owner line，当前 worktree 为 `CLEAN`
+  - 原 source worktree 的独有提交已被上游吸收进当前 owner line，因此 source-tree retirement 可以与 candidate followthrough 分开处理；下一步不再是保留旧 source tree，而是等待 canonical manager surface 吸收当前 owner line 后再重判 owner retirement
 - next_action:
   - 保持 `C-20260323-1705-A` 在 `candidate_issues` / `needs_research`
   - 下一轮优先验证 runtime 是否能为当前 prompt cycle / 当前 stalled delegated continuation 提供稳定的 binding proof，再决定是否进入 IBM materialization
