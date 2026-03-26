@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260322-0445`
 - title: Latest manager continuity worker consumption governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `latest-manager-continuity-worker-consumption-governance`
@@ -101,19 +101,15 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 - `./bin/governance-check`
 
-## Next
+## Verification Summary
 
-- Reopen the same issue family as `in_verification` on 2026-03-26 because canonical `develop` produced a fresh continuity `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260326-003102.md` with two launchable worker prompts, but `manager-worker-launch-state.env` still recorded:
-  - `LAST_MANAGER_WORKER_PROMPTS_GENERATED=""`
-  - `LAST_MANAGER_WORKER_PROMPTS_CONSUMED=""`
-  - `LAUNCHED_WORKER_PROMPTS=""`
-  - `QUEUED_WORKER_PROMPTS=""`
-- Treat this as the same-family runtime contract regression against `pre-tests.md` item 2, not a new candidate and not the delegated-continuation-stall issue family.
-- Narrow the repair to the current continuity contract:
-  - `## Worker Prompts -> launched / queue / frozen_queue`
-  - `## Queue / Frozen / Cleanup -> launch queue / queue / frozen queue`
-  - `## Worker Prompt Materialization -> worker_prompt_paths_created_this_round`
-- Keep cleanup and retirement claims suspended until canonical `develop` again shows aligned latest continuity generated/consumed truth and latest worker prompt generated/consumed truth for the same round.
+- The same-family reopen condition from 2026-03-26 is no longer present on canonical `develop`.
+- Current canonical runtime truth now shows aligned continuity and prompt consumption for the same round:
+  - `LAST_MANAGER_CONTINUITY_GENERATED == LAST_MANAGER_CONTINUITY_CONSUMED == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260326-064827.md`
+  - `LAST_MANAGER_WORKER_PROMPTS_GENERATED == LAST_MANAGER_WORKER_PROMPTS_CONSUMED == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260326-064827-worker-i-20260318-1630-closeout-followthrough-codex.txt`
+- `./bin/freely status --project /Users/zhaoyu/Downloads/code/my-freely/freely` now surfaces the same generated/consumed truth in the canonical status surface.
+- `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption` passes on canonical `develop`, proving the current `## Worker Prompts` / queue parsing contract is consumed correctly while the supervisor is already running.
+- The repair is already present in `develop` through same-family commit `c80cb34` (`fix: reconcile latest manager continuity prompt parsing`), so this issue should close as canonical writeback, not reopen as new implementation work.
 
 ## Retirement Audit
 

@@ -99,16 +99,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
 - next_action: 当前 dedicated worktree 已继续补上同 issue family 的 slot-switch 全局 launch gate 与机器可读状态隔离：`tool-launchers.sh` 现会在 `exec codex` 前等待 shared switch lock，`availability-watchdog.sh` 的 switch-wait warning 现强制走 stderr。focused rerun 已通过，当前继续保持 `in_verification`；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再出现 “first switch still 402” / slot truth 被 warning 污染的漂移
 
-6. `I-20260326-0445`
-- title: Manager-delegated intake absorption closure governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/candidates.md`
-- next_action: 当前 dedicated worktree 已完成 manager-side absorbed reconciler 与 focused verification；下一步进入 review / develop merge judgement，并在 develop replay 中确认历史 delegated intake 元数据开始真实收口
-
 6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation
 - milestone_state: committed
@@ -289,16 +279,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md`
 - next_action: 已完成 active-worker local reentry 修复、脚本级验收与 develop 上的真实 post-merge acceptance；后续若要把 consumed-id snapshot 改成更及时的运行态可见性，应通过新 lifecycle 承接
 
-22. `I-20260322-0445`
-- title: Latest manager continuity worker consumption governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
-- next_action: canonical `develop` on 2026-03-26 wrote fresh continuity `manager-continuity-20260326-003102.md` plus two launchable worker prompts, but `manager-worker-launch-state.env` still kept generated/consumed prompt truth empty. Keep this issue back in `in_verification` and repair the current continuity parser/consumption contract before any further closeout claim.
-
 ### completed_issues
 
 1. `I-20260322-1801`
@@ -317,6 +297,33 @@ routing_policy:
   - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
   - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
 - completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
+
+2. `I-20260322-0445`
+- title: Latest manager continuity worker consumption governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md`
+  - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260322-latest-manager-continuity-worker-consumption-verification.md`
+  - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260326-latest-manager-continuity-worker-consumption-canonical-replay-verification.md`
+- completion_note: canonical `develop` 已重新对齐 latest continuity / latest worker prompt generated-consumed truth，并通过当前 continuity parser focused regression；后续 queue / frozen / reentry 演进另开 lifecycle
+
+3. `I-20260326-0445`
+- title: Manager-delegated intake absorption closure governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-manager-delegated-intake-absorption-closure-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/code-reviews/20260326-manager-delegated-intake-absorption-closure-verification.md`
+- completion_note: manager-owned delegated intake absorbed closure 已进入 canonical `develop`，focused regressions 与 live-status surface 均未回退；worker-side delegated lifecycle 仍按既有 issue family 独立推进
 
 ### candidate_issues
 
