@@ -27,28 +27,37 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 1. 物化 `global watchdog` 的正式职责边界。
 2. 提供 CLI-first 的主管拉起入口，例如 `freely ensure-manager`。
 3. 把全局账号恢复与主管拉起从 manager/worker 职责中剥离出来。
-4. 提供一条 live 集成测试脚本，验证：
-   - 先由脚本自己探测当前可用账号并启动监控/主管链
-   - 监控链已运行后，故意切到不可用账号
+4. 冻结 strict probe-gating contract：
+   - `.ai-auth/<slot>` 与实时 probe 才是恢复真相
+   - `cooldown` 不再参与任何恢复逻辑
+   - slot sweep / reprobe 期间禁止拉起任何 manager / worker / AI 进程
+   - 只有 watchdog 明确找到可用 slot 后，才允许恢复主管链
+   - CLI / runtime 对外展示必须把 slot 作为唯一 identity；邮箱 / `account_id` 只允许作为授权元数据
+5. 提供一条 live 集成测试脚本，验证：
+   - 先由脚本自己探测当前可用 slot 并启动监控/主管链
+   - 监控链已运行后，故意切到不可用 slot
    - 当前 AI 进程结束后，由 watchdog 负责恢复；不要把恢复动作交给 AI
-   - 每次切号后都由脚本重新拉起新的 Codex 进程，并优先 `resume` 恢复会话
-   - 最终自动切回脚本真实探测出的可用账号并恢复主管；若所有账号都不可用，则切到最早恢复账号并等待唤醒
-5. 在 watchdog 拉起主管前，写入结构化 handoff，说明：
-   - 哪个账号触发了 limit/不可用
-   - 当前切到了哪个账号
-   - 这次是立即恢复还是等待最早 reset 后恢复
+   - 恢复过程中只有真实 probe 成功的 slot 才会被切进真实 Codex 工作位
+   - 若所有 slot 都不可用，则保持 AI launch 阻塞，并等待 watchdog 低频检查或 inventory 变化后再唤醒主管
+6. 在 watchdog 拉起主管前，写入结构化 handoff，说明：
+   - 哪个 slot / 哪类失败触发了 blocked
+   - 这次恢复是 probe sweep 成功还是 all-unavailable 后被唤醒
+   - 当前恢复到了哪个 slot
    - 主管起来后优先检查哪些工位、该先判定 resume 还是 fresh_with_handoff
 
 ## Acceptance
 
 - 文档明确区分三类 AI powerless 场景及其 owner。
 - 至少存在一个纯脚本入口，可在没有任何 AI 帮助时恢复账号并拉起主管。
-- live 集成测试脚本能验证“切到坏账号后自动切回好账号”的真实链路。
-- live 集成测试脚本在未显式给出好账号时，也能通过真实 probe 发现当前可用账号。
+- `cooldown` 不再参与任何恢复判定、等待、排序或切换逻辑。
+- 任何 slot sweep / reprobe 窗口内，都不会拉起 manager / worker / 其他 AI 进程。
+- live 集成测试脚本能验证“切到坏 slot 后自动切回好 slot”的真实链路。
+- live 集成测试脚本在未显式给出好 slot 时，也能通过真实 probe 发现当前可用 slot。
 - live 集成测试脚本能验证“切号 -> 新 Codex 进程启动 -> resume/续接 -> 继续监督”的真实链路。
+- 当所有 slot 都不可用时，watchdog 仍保持存活和可观察，但 AI launch 保持阻塞；只有后续真实 probe 或 inventory 变化发现可用 slot 后，才写 handoff 并唤醒主管。
 - 主管恢复后继续只承担监督和委派，不接管全局账号切换。
 - watchdog 在拉起主管前会写结构化恢复交接，而不是让主管盲启动。
-- `ai-cli` / watchdog 对外暴露的 canonical identity 必须是 slot；auth email 只能作为 `auth_email` metadata，不能再被展示成当前身份。
+- `whoami` / `switch` / `status` / `save` / `login` 的展示与 JSON 输出不会再把授权邮箱误报成“当前身份”；slot 才是当前身份锚点。
 
 ## Completion
 
@@ -68,9 +77,10 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 - 当前验证重点：
   - `freely ensure-manager` 是否是纯脚本，不依赖 AI
-  - 当当前账号不可用时，是否能自动切到可用账号并拉起主管
-  - 当 cooldown 账本过时或错误时，是否会真实 probe 所有已保存账号，而不是盲信旧账本
-  - live 测试是否能覆盖两个坏账号回切到一个好账号的真实链路
+  - 当当前 slot 不可用时，是否会先阻塞 AI launch，再真实 probe 所有保存 slot，找到可用 slot 后才拉起主管
+  - 当所有 slot 都不可用时，watchdog 是否保持存活与可观察，同时维持 no-launch gate
+  - auth inventory 变化或后续真实 probe 命中可用 slot 时，是否会写 handoff 并唤醒主管
+  - live 测试是否能覆盖两个坏 slot 回切到一个好 slot 的真实链路
   - availability watchdog 是否已经从 `runtime/freely` 中抽成可复用 skill 模块，而不是继续散落在 Freely 专有 orchestration 中
 - 最新验证事实：
   - 官方帮助中心与 rate-limit 文档没有提供“多个本地保存 Codex 账号当前可用性查询”的直接接口，因此 Freely 采用脚本真实 probe 方案
@@ -109,7 +119,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - issue / milestone / progress / code-review 现统一表达为“continuation batch 已实现并处于 `in_verification`”
     - 当前批次不再沿用“verified-retirable”或“仍待提交”旧结论
   - 2026-03-24 slot-only cooldown identity continuation 进一步收紧了 identity 语义：
-    - `ensure_codex_slot_ready_for_manager` 现在只认 `whoami.slot` 作为 cooldown identity，`whoami.account` 仅保留展示用途
+    - `ensure_codex_slot_ready_for_manager` 现在只认 `whoami.slot` 作为 cooldown identity；授权邮箱只允许作为 `auth_email` 元数据存在
     - `select_any_available_codex_slot` 只排除当前精确 slot，不再做同 family exclusion，避免把同邮箱的 `-x` 兄弟 slot 误伤
     - 已验证 `ai-cli` 的 `login`/`switch` 入口遵守显式 suffixed slot contract，不再生成或消费无后缀目录
     - 新的 focused regression `docs/system/workspace/scripts/tests/test-freely-ensure-manager-slot-alias-cooldown` 覆盖了 slot selector / manager bootstrap 路径以及 slot-only cooldown identity
@@ -135,10 +145,14 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `probe_all_codex_slots_and_update_cooldown()` sweep 失败时会恢复原 auth / active-slot，避免把最后一个失败 slot 留在真实 Codex 工作位；返回 usable 结果前会把 active slot 对齐回该 usable slot
     - `freely ai switch codex` 自动模式只会切到真实 probe 成功的 usable slot；`all_unavailable` 仅返回 debug hint，不再切 earliest-reset slot
     - `test-freely-ai-account-switch`、`test-freely-ensure-manager`、`test-freely-ensure-manager-earliest-reset-wait-revive` 已重写并通过，当前 focused acceptance 已对齐 slot-sweep-first recovery
-  - 2026-03-25 live 狗粮又暴露出一条 CLI/metadata 漂移：
-    - `slot` 才是 `.ai-auth/<slot>` 的唯一身份，但 `bin/ai whoami` 仍把 auth JWT email 输出成 `Current account`
-    - 现场已出现 `Current slot != Current account` 的情形；这不是 slot 选择错误，而是 CLI 把 auth metadata 错报成了身份
-    - 当前 continuation 已把 `whoami` / `switch` / `status` / `save` / `login` 的对外 contract 改成 slot-first，并新增 focused regression 锁住 “slot 标签与 auth email 不一致” 的场景
+  - 2026-03-25 `20260325-0921` supporting evidence 继续暴露出上一轮验证仍不够硬：
+    - pre-tests 尚未把 “probe 期间禁止任何 AI 拉起” 与 “all-unavailable 时 watchdog alive 但 manager/worker down” 写成 acceptance hard gate
+    - issue / tasks / progress / milestone 仍默认把本 story 当成“slot-sweep-first 已基本完成、等待 merge judgement”，与最新 contract 不一致
+    - 当前批次因此先回 doc-loop，重写 hard gate，再进入 dev-loop 修复
+  - 2026-03-25 focused verification 已补齐并通过：
+    - `test-freely-ensure-manager-earliest-reset-wait-revive` 证明 all-unavailable hold 会先落到 durable availability state，再在后续真实 reprobe 找到 usable slot 后 wake manager
+    - `test-freely-ensure-manager-inventory-change-wakes-watchdog` 证明 `.ai-auth` inventory 变化会触发重新检查并在写 handoff 后唤醒主管
+    - `test-ai-cli-whoami-prefers-slot-identity`、`test-freely-ai-account-switch`、`test-freely-ensure-manager` 一起锁住 slot-first identity、no-launch gate 和 manager bootstrap handoff contract
   - `test-freely-global-account-watchdog-live` 已真实通过：
     - `worahe3972@outlook.com -> worahe3971@outlook.com`
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
@@ -146,16 +160,14 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 ## Next
 
-- 当前 continuation batch 已完成 slot-sweep-first contract 的最小实现与 feature-worktree focused 验证，当前保持 `in_verification`，等待 manager merge review。
-- 当前 continuation batch 已补上 verification drift：稳定化 `rate-limit` 用例计时，并把 manager bootstrap handoff 契约收进 focused tests；本轮完成后继续保持 `in_verification`，等待 manager merge review。
-- 同族 pre-brainstorm 已把恢复 contract 进一步收紧为 `failure-driven full slot sweep`，而本轮 continuation 已把这条 contract 的最小主路径真正写回能力真源。下一轮不再是重做 contract 改写，而是继续做 code review / merge judgement / develop replay。
+- 当前 replay batch 已完成 strict probe-gating + wake-only recovery 的 contract / code / test 闭环，当前进入 manager merge judgement / develop replay followthrough 前的 review-ready 状态。
+- 这个 issue family 若后续还要动，只会是 manager review 暴露出的局部修补，不再是 contract 重写或 dev-loop 主线。
 - 当前批次交付的 continuation contract：
-  - wait 采用 `reset_at + buffer`
-  - wait 期间周期性真实 probe saved accounts 是否已变得可工作
-  - wait 结束后重新 probe/select，再拉起 manager
-  - `ensure-manager --watch` 单轮失败后继续留在控制面重试
-  - stale `ensure-manager.pid` 在 watchdog 下次启动时会被覆盖，并在 watchdog 退出时清理
+  - probe 才是真理，cooldown 不再参与恢复逻辑
+  - sweep / reprobe 窗口内所有 AI launch 都必须被阻塞
+  - all-unavailable 时 watchdog 继续活着，但 manager / worker 保持 down
+  - inventory 变化或后续 probe 命中 usable slot 后，先写 handoff，再恢复主管
 - 下一步：
-  - 先按新 pre-brainstorm 结论重写 watchdog contract：failure taxonomy、slot sweep 主路径、all-slots-unavailable 等待语义、以及 cooldown 的降级角色
-  - 再进入 dedicated dev-loop，把 runtime / watchdog / ai-cli / tests 从 cooldown-driven recovery 改到 slot-sweep-first recovery
-  - contract 改写与代码验证完成后，再由 manager 复核当前 feature worktree 的 doc/code/test 证据并决定是否 promote
+  - 已完成 strict probe gating、all-unavailable wake contract、inventory-change monitoring，以及 cooldown 的彻底退役
+  - 已完成 runtime / watchdog / ai-cli / tests 的 no-launch probe-gating recovery replay
+  - 当前只剩 manager 复核当前 feature worktree 的 doc/code/test 证据并决定是否 promote，随后按 develop replay followthrough 收口

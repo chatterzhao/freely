@@ -96,8 +96,8 @@ routing_policy:
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
-- next_action: 当前 dedicated worktree 已把 slot-sweep-first continuation 真正落到 `availability-watchdog.sh`、`ai-cli` 与 focused regressions：manager/bootstrap 与 `freely ai switch codex` 现在只会信真实 probe 成功的 usable slot，`all_unavailable` 时不再切 earliest-reset slot，probe 失败后也会恢复原 auth/active-slot。focused rerun 与 `./bin/governance-check` 已通过，当前继续保持 `in_verification`；下一步进入同 issue family 的 code review / manager merge judgement，并在 develop replay 前继续避免把它误判成 completed
+- source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`, `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`, `docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md`
+- next_action: 当前同族 replay 已完成 strict probe-gating + wake-only recovery 的 contract / code / test 闭环，当前处于 manager merge judgement / develop replay followthrough 前的 review-ready 状态；接下来由 manager 吸收这批证据并决定 promote / cleanup
 
 6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation

@@ -5,8 +5,8 @@ TOOL_NAME="freely"
 STATE_DIR_NAME=".freely"
 SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 
-log_info() { echo "[INFO] $*"; }
-log_warn() { echo "[WARN] $*"; }
+log_info() { echo "[INFO] $*" >&2; }
+log_warn() { echo "[WARN] $*" >&2; }
 log_error() { echo "[ERROR] $*" >&2; }
 
 WATCHDOG_CONTROL_PLANE_SKILL_ROOT="$SELF_ROOT/docs/system/workspace/skills/watchdog-control-plane"
@@ -1548,7 +1548,7 @@ cc_debug_log_has_codex_tool_call() {
 log_has_auth_failure() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
-  rg -qi '401|unauthorized|invalid.?token|token.?expired|authentication.?failed|请先登录|subscription.?expired' "$log_file"
+  rg -qi '401|402 payment required|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired' "$log_file"
 }
 
 log_has_codex_usage_limit() {
@@ -3471,7 +3471,7 @@ restart_manager_supervisor_preserving_handoff() {
 
 ensure_manager_once() {
   local project="$1"
-  local run_dir sup_pid_file current_pid current_identity current_ai_pid
+  local run_dir sup_pid_file current_pid current_ai_pid
 
   run_dir="$(run_dir_for_project "$project")"
   sup_pid_file="$run_dir/supervisor.pid"
@@ -3488,7 +3488,6 @@ ensure_manager_once() {
   fi
 
   if [[ "$AI_TOOL" == "codex" ]]; then
-    current_identity="$(codex_current_cooldown_identity "$project")"
     current_ai_pid="$(manager_ai_pid_for_project "$project")"
     if [[ -n "$current_pid" ]] && [[ -n "$current_ai_pid" ]]; then
       if recover_stalled_manager_ai_if_needed "$project"; then
@@ -3496,13 +3495,16 @@ ensure_manager_once() {
         current_ai_pid=""
       fi
     fi
-    if [[ -n "$current_pid" ]] && [[ -n "$current_identity" ]] && ! codex_slot_is_available_now "$project" "$current_identity" && [[ -z "$current_ai_pid" ]]; then
-      log_warn "manager supervisor is idle on an unavailable codex slot ($current_identity); restarting manager under watchdog control"
-      write_manager_bootstrap_handoff "$project" "manager_limit_detected" "$current_identity" "$current_identity" "manager_process_ended_on_unavailable_slot" "relaunch-manager-after-slot-recovery"
+    if ! ensure_codex_slot_ready_for_manager "$project"; then
+      log_warn "manager bootstrap skipped because no codex slot is ready"
+      return 0
+    fi
+    current_ai_pid="$(manager_ai_pid_for_project "$project")"
+    if [[ -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
+      log_warn "manager supervisor is idle after watchdog recovery gate passed; restarting manager with the latest handoff"
       restart_manager_supervisor_preserving_handoff "$project"
       current_pid=""
     fi
-    ensure_codex_slot_ready_for_manager "$project"
   fi
 
   if [[ -n "$current_pid" ]]; then

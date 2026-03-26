@@ -147,7 +147,12 @@ if [[ "$current_account" == "fast@example-com" && "$now" -ge "$fast_ready_at" ]]
   exit 0
 fi
 
-echo "warming up"
+if [[ "$current_account" == "fast@example-com" ]]; then
+  echo "You've hit your usage limit. Please try again at Jan 1st, 2100 12:00 AM."
+  exit 1
+fi
+
+echo "You've hit your usage limit. Please try again at Jan 3rd, 2100 12:00 AM."
 exit 1
 EOF
 chmod +x "$MOCK_BIN/codex"
@@ -156,14 +161,10 @@ printf 'slow@example-com' >"$AI_STATE"
 start_epoch="$(date +%s)"
 fast_reset_at=$((start_epoch + 2))
 fast_ready_at=$((start_epoch + 4))
-slow_reset_at=$((start_epoch + 120))
 printf '%s' "$fast_ready_at" >"$FAST_READY_AT_FILE"
-
-cat >"$PROJECT/.freely/run/codex-slot-cooldowns.tsv" <<EOF
-fast@example-com	$fast_reset_at
-slow@example-com	$slow_reset_at
-EOF
 printf '999999\n' >"$PROJECT/.freely/run/ensure-manager.pid"
+HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
+STATE_FILE="$PROJECT/.freely/run/codex-availability-state.env"
 
 WATCHDOG_RESET_BUFFER_SECS=2 \
 WATCHDOG_RECHECK_INTERVAL_SECS=1 \
@@ -176,8 +177,22 @@ PATH="$MOCK_BIN:$PATH" \
   bash "$ROOT_DIR/bin/freely" ensure-manager --project "$PROJECT" --watch --interval 1 >/dev/null 2>&1 &
 watchdog_pid="$!"
 
+for _ in $(seq 1 8); do
+  if [[ -f "$STATE_FILE" ]] && grep -q '^AVAILABILITY_PHASE="all_unavailable"$' "$STATE_FILE"; then
+    break
+  fi
+  sleep 1
+done
+
+if [[ ! -f "$STATE_FILE" ]] || ! grep -q '^AVAILABILITY_PHASE="all_unavailable"$' "$STATE_FILE"; then
+  echo "[FAIL] expected ensure-manager watchdog to first enter all-slots-unavailable hold before a later reprobe recovery" >&2
+  kill "$watchdog_pid" 2>/dev/null || true
+  wait "$watchdog_pid" 2>/dev/null || true
+  exit 1
+fi
+
 for _ in $(seq 1 12); do
-  if [[ -f "$LAUNCH_LOG" ]]; then
+  if [[ -f "$LAUNCH_LOG" ]] && grep -q 'switch codex fast@example-com --yes' "$AI_SWITCH_LOG" && grep -q 'fast@example-com' "$AI_STATE"; then
     break
   fi
   sleep 1
@@ -201,10 +216,9 @@ fi
 grep -q 'switch codex fast@example-com --yes' "$AI_SWITCH_LOG"
 grep -q 'start --project '"$PROJECT"'$' "$LAUNCH_LOG"
 grep -q 'fast@example-com' "$AI_STATE"
-HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
 [[ -f "$HANDOFF_FILE" ]]
 grep -q '^## Manager Bootstrap Recovery$' "$HANDOFF_FILE"
-grep -q '^- trigger: stale_or_missing_cooldown_probe$' "$HANDOFF_FILE"
+grep -q '^- trigger: all_slots_unavailable$' "$HANDOFF_FILE"
 grep -q '^- previous_slot: slow@example-com$' "$HANDOFF_FILE"
 grep -q '^- active_slot: fast@example-com$' "$HANDOFF_FILE"
 grep -q '^- reason: watchdog_probed_and_found_usable_slot$' "$HANDOFF_FILE"
@@ -234,4 +248,4 @@ if [[ -f "$pid_file" ]]; then
   exit 1
 fi
 
-echo "[PASS] ensure-manager keeps reprobeing until a slot is truly usable, replaces stale pid files, and cleans up on exit"
+echo "[PASS] ensure-manager keeps launch blocked while all slots are unavailable, later reprobes a usable slot, and cleans up watchdog pid state"

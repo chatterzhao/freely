@@ -152,10 +152,6 @@ printf '%s\n' "$*" >>"${LAUNCH_LOG:?}"
 EOF
 chmod +x "$MOCK_BIN/launch-freely"
 
-cat >"$PROJECT/.freely/run/codex-slot-cooldowns.tsv" <<'EOF'
-worahe3972@outlook-com	4102444800
-worahe3973@outlook-com	4102444800
-EOF
 printf 'worahe3973@outlook-com' >"$AI_STATE"
 
 AI_SWITCH_STATE="$AI_STATE" \
@@ -171,10 +167,10 @@ grep -q 'worahe3971@outlook-com' "$AI_STATE"
 HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
 [[ -f "$HANDOFF_FILE" ]]
 grep -q '^## Manager Bootstrap Recovery$' "$HANDOFF_FILE"
-grep -q '^- trigger: stale_or_missing_cooldown_probe$' "$HANDOFF_FILE"
+grep -q '^- trigger: slot_probe_blocked$' "$HANDOFF_FILE"
 grep -q '^- previous_slot: worahe3973@outlook-com$' "$HANDOFF_FILE"
 grep -q '^- active_slot: worahe3971@outlook-com$' "$HANDOFF_FILE"
 grep -q '^- reason: watchdog_probed_and_found_usable_slot$' "$HANDOFF_FILE"
 grep -q '^- next_action: inspect-fleet-and-recover-workers$' "$HANDOFF_FILE"
 
-echo "[PASS] freely ensure-manager probes saved slots and promotes a truly usable codex slot before bootstrapping manager"
+echo "[PASS] freely ensure-manager blocks launch until watchdog probes a truly usable codex slot and writes bootstrap handoff"

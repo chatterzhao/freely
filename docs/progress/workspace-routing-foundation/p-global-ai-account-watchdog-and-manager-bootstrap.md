@@ -4,35 +4,32 @@
 - title: Global AI account watchdog and manager bootstrap
 - phase_state: `in_verification`
 - runtime_state: `closed_for_this_batch`
-- branch: `feature/watchdog-slot-sweep-without-cooldown-governance-20260325`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-slot-sweep-without-cooldown-governance`
+- branch: `feature/watchdog-family-replay-20260325`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-family-replay`
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "continuation-worker"}
 
 ## Summary
 
-- 2026-03-25 新 pre-brainstorm `C-20260325-0525-A` 已完成首跳判断，并作为 supporting evidence 被本 issue 吸收：
-  - 当前恢复 contract 的主问题不再是“slot-first cooldown 写回是否对齐”，而是 cooldown 本身是否还应继续充当控制面真相
-  - 当前判断：`rate limit`、`deactivated_workspace`、auth failure / invalid auth file、slot probe failure，都应统一进入 failure-driven full slot sweep
-  - `all slots unavailable` 时允许保留 earliest-reset 作为 debug / 排序提示，但恢复主路径应基于低频真实 reprobe，而不是继续依赖 cooldown ledger
-  - 这意味着本 issue 的下一跳不是直接 merge review，而是先在同 issue family 内重开 doc-loop / dev-loop，完成 contract rewrite
-- 2026-03-25 当前 worktree 已完成这一轮 doc-loop + dev-loop + focused verification：
-  - `availability-watchdog.sh` 不再以 cooldown/earliest-reset 作为主恢复 gate；`ensure_codex_slot_ready_for_manager()` 现改为 current-slot probe + full saved-slot sweep
-  - `probe_all_codex_slots_and_update_cooldown()` 在 sweep 失败时恢复原 auth/active-slot，不再把最后一个失败 slot 留在真实 Codex 工作位；找到 usable slot 时会在返回前把 active slot 推回该 usable slot
-  - `ai-cli switch codex` 自动模式现在只会切到真实 probe 成功的 usable slot；`all_unavailable` 仅返回 debug hint，不再把 earliest-reset slot 强行切进真实工作位
-  - focused regressions 已重写为 slot-sweep-first contract：
-    - `test-freely-ai-account-switch`
-    - `test-freely-ensure-manager`
-    - `test-freely-ensure-manager-earliest-reset-wait-revive`
-  - 这一轮验证已通过，当前保持 `in_verification`，等待后续 code review / manager merge judgement
+- 2026-03-25 新 pre-brainstorm `C-20260325-0921-A` 已完成首跳判断，并作为 supporting evidence 被本 issue 吸收：
+  - 当前恢复 contract 的主问题不再只是“slot-sweep-first 是否建立”，而是 probe 窗口是否真正独占、是否仍残留 cooldown 逻辑、以及 all-unavailable 时是否还会错误拉起 AI
+  - 当前判断：`cooldown` 应彻底退出恢复逻辑；slot sweep / reprobe 期间必须阻塞 AI launch；all-unavailable 时 watchdog 保持活着，但 manager / worker 保持 down，直到 inventory 变化或低频 probe 找到 usable slot
+  - 这意味着本 issue 当前不进入 merge judgement，而是先回到 doc-loop + dev-loop 完成 strict probe-gating rewrite
+- 2026-03-25 当前 worktree 正在做这一轮 stricter rewrite：
+  - 已先更新 pre-brainstorm、issue、pre-tests、tasks、progress、milestones，把 no-launch probe-gating 和 wake-only recovery 固定为 acceptance contract
+  - 已完成 `availability-watchdog.sh`、`runtime/freely`、`ai-cli` 和 focused regressions 的收口，去掉 cooldown 逻辑残留并补上 all-unavailable / inventory-change wake 验证
+- 2026-03-25 live 调查又暴露出一条更底层的 identity 漂移，当前已吸收到同一 issue：
+  - `./bin/ai switch` / `whoami` 现场出现 `Current slot = worahe3977@outlook-com-2`，但 `Current account = worahe3976@outlook.com`
+  - 逐个解码 `~/.ai-auth/codex-*/auth.json` 后确认，这不是 runtime 读错 active slot，而是 slot 目录本身可以承载与目录名不同的授权邮箱；同一个邮箱/`account_id` 也可出现在多个 slot
+  - 结论是 slot 仍然正确，错的是 CLI 把授权邮箱元数据冒充成“当前身份”；当前批次已把 `ai-cli` 的 `whoami`/`switch`/`status`/`save`/`login` contract 改回 slot-first，邮箱仅保留为 `auth_email` 元数据
 - 本轮 continuation 已吸收 delegated handoff 中的五点 contract，并确认对应实现已经落在当前分支祖先：
   - all accounts unusable 时选择最早 reset 账号
   - wait 采用 `reset_at + 60s` 等价 buffer 契约，可由 watchdog buffer 环境变量调节
   - wait 期间周期性真实 reprobe，任一已保存账号恢复可用即可提前唤醒
   - `ensure-manager.pid` 只代表 live watchdog，stale pid 会被覆盖并在退出时清理
   - cooldown elapsed 后先 reprobe/reselect，再决定 manager relaunch
-- 当前轮次主要补 canonical writeback，纠正 issue / milestone / code-review 与实际 continuation 状态之间的漂移。
+- 当前轮次已经补齐 canonical writeback，纠正 issue / milestone / code-review 与实际 continuation 状态之间的漂移。
 - 2026-03-24 fresh session 因上一轮 `context_compacted` 交接被重新拉起后，先按 continuity guard 重跑聚焦验证，再继续保持当前批次 `in_verification` / manager merge review 待处理结论。
 - 本轮继续吸收 fresh-session verification 新暴露出的收口缺口：
   - `test-freely-rate-limit-defers-to-watchdog` 的整秒计时断言存在秒边界抖动，已改成 monotonic 毫秒阈值
@@ -43,7 +40,7 @@
     - watchdog `codex exec` probe 现在会持有 shared lock 直到 probe 结束，避免 manual sweep 在 wait-return 后立刻插入
     - focused tests 已覆盖 `ensure-manager` defer 期间不触发 `whoami/list`，以及 probe 自身的 defer + serialization
   - 2026-03-24 slot-only cooldown writeback：
-    - `ensure_codex_slot_ready_for_manager` 现在只认 `whoami.slot` 作为 cooldown identity，`whoami.account` 仅保留展示用途
+    - `ensure_codex_slot_ready_for_manager` 现在只认 `whoami.slot` 作为 cooldown identity；授权邮箱只允许作为 `auth_email` 元数据存在
     - `select_any_available_codex_slot` 只排除当前精确 slot，不再做同 family exclusion，避免把同邮箱的 `-x` 兄弟 slot 误伤
     - 已验证 `ai-cli` 的 `login`/`switch` 入口遵守显式 suffixed slot contract，不再生成或消费无后缀目录
     - 新的 focused regression `docs/system/workspace/scripts/tests/test-freely-ensure-manager-slot-alias-cooldown` 覆盖了 slot selector / manager bootstrap 路径以及 slot-only cooldown identity
@@ -76,6 +73,8 @@
 - `./bin/ai --quiet --format json list`
 - compare canonical `.freely/run/codex-slot-cooldowns.tsv` entries against saved slot inventory
 - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
+- `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
+- `bash docs/system/workspace/scripts/tests/test-ai-cli-whoami-prefers-slot-identity`
 
 ### Latest rerun
 
@@ -110,11 +109,16 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager` pass，且显式验证 manager bootstrap 之前会先 full sweep 并 promote 真实 usable slot
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-earliest-reset-wait-revive` pass，且显式验证 all-slots-unavailable 后走低频真实 reprobe，而不是 cooldown-driven sleep-until-reset
   - `./bin/governance-check` pass，只有 10 条 legacy pre-brainstorm naming warning
+- 2026-03-25 current slot-identity correction rerun:
+  - `bash -n docs/system/workspace/scripts/runtime/ai-cli` pass
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool` pass
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-whoami-prefers-slot-identity` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` pass
 
 ## Next Action
 
-- 当前批次已经把 slot-sweep-first contract 真正落到 runtime / watchdog / ai-cli / focused tests，不再只是 pre-brainstorm 结论。
-- 下一步进入同 issue family 的 code review / manager merge judgement；在 manager 吸收前，不把本 worktree 判成 completed。
+- 当前批次的 strict probe-gating contract replay 与 focused verification 已完成。
+- no-launch gate、all-unavailable hold、inventory-change wake evidence 已补齐；当前 worktree 已进入 manager merge judgement / develop replay followthrough 前的 review-ready 状态，但仍保持 `in_verification`，等待 manager 吸收。
 
 ## Revisit Trigger
 

@@ -67,7 +67,7 @@ codex_slot_switch_lock_owner_pid() {
   local state_file
   state_file="$(codex_slot_switch_lock_state_file)"
   [[ -f "$state_file" ]] || return 0
-  sed -n 's/^owner_pid=//p' "$state_file" | tail -n 1
+  sed -n 's/^owner_pid=//p' "$state_file" 2>/dev/null | tail -n 1
 }
 
 codex_slot_switch_lock_cleanup_if_stale() {
@@ -254,6 +254,53 @@ codex_saved_slots() {
   [[ -x "$ai_bin" ]] || return 0
   output="$("$ai_bin" --quiet --format json list 2>/dev/null || true)"
   printf '%s\n' "$output" | grep -o '"codex-[^"]*"' | tr -d '"' | sed 's/^codex-//'
+}
+
+codex_availability_state_file() {
+  local project="$1"
+  printf '%s\n' "$(run_dir_for_project "$project")/codex-availability-state.env"
+}
+
+codex_saved_slots_fingerprint() {
+  local project="$1"
+  local slots
+  slots="$(codex_saved_slots "$project" | sed '/^$/d')"
+  if [[ -z "$slots" ]]; then
+    printf 'none\n'
+    return 0
+  fi
+  printf '%s\n' "$slots" | shasum -a 256 | awk '{print $1}'
+}
+
+codex_load_availability_state() {
+  local project="$1" state_file
+  state_file="$(codex_availability_state_file "$project")"
+  [[ -f "$state_file" ]] || return 1
+  # shellcheck disable=SC1090
+  source "$state_file"
+}
+
+codex_write_availability_state() {
+  local project="$1" phase="$2" blocked_reason="$3" previous_slot="$4" active_slot="$5" inventory_fingerprint="$6" wake_trigger="$7" earliest_slot="$8" earliest_reset="$9"
+  local state_file
+  state_file="$(codex_availability_state_file "$project")"
+  mkdir -p "$(dirname "$state_file")"
+  cat >"$state_file" <<EOF
+AVAILABILITY_PHASE="${phase:-unknown}"
+BLOCKED_REASON="${blocked_reason:-}"
+PREVIOUS_SLOT="${previous_slot:-}"
+ACTIVE_SLOT="${active_slot:-}"
+SAVED_SLOTS_FINGERPRINT="${inventory_fingerprint:-}"
+WAKE_TRIGGER="${wake_trigger:-}"
+EARLIEST_SLOT_HINT="${earliest_slot:-}"
+EARLIEST_RESET_HINT="${earliest_reset:-}"
+LAST_PROBE_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+EOF
+}
+
+codex_clear_availability_state() {
+  local project="$1"
+  rm -f "$(codex_availability_state_file "$project")"
 }
 
 codex_prune_stale_slot_cooldowns() {
@@ -553,15 +600,10 @@ probe_any_usable_codex_slot_now() {
     probe_result="$(codex_probe_current_slot_now "$project")" || continue
     case "$probe_result" in
       usable)
-      codex_clear_slot_cooldown "$project" "$candidate"
       [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
       printf '%s\n' "$candidate"
       return 0
       ;;
-      rate_limited:*)
-        reset_at="${probe_result#rate_limited:}"
-        codex_record_slot_cooldown "$project" "$candidate" "$reset_at"
-        ;;
     esac
   done < <(codex_saved_slots "$project")
 
@@ -574,7 +616,7 @@ probe_any_usable_codex_slot_now() {
   [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
 }
 
-# Probe ALL saved slots and update cooldown file
+# Probe ALL saved slots and report the first usable slot.
 # Output format:
 #   usable:<slot>           - Found a usable slot
 #   all_unavailable:<slot>|<reset_at>  - No usable slot right now; earliest reset is debug-only hint
@@ -610,7 +652,6 @@ probe_all_codex_slots_and_update_cooldown() {
 
     case "$probe_result" in
       usable)
-        codex_clear_slot_cooldown "$project" "$candidate"
         usable_slot="$candidate"
         status_icon="✅"
         status_text="usable"
@@ -618,7 +659,6 @@ probe_all_codex_slots_and_update_cooldown() {
         ;;
       rate_limited:*)
         reset_at="${probe_result#rate_limited:}"
-        codex_record_slot_cooldown "$project" "$candidate" "$reset_at"
         if [[ -z "$earliest_reset" || "$reset_at" -lt "$earliest_reset" ]]; then
           earliest_slot="$candidate"
           earliest_reset="$reset_at"
@@ -727,23 +767,47 @@ switch_to_next_codex_slot() {
 
 ensure_codex_slot_ready_for_manager() {
   local project="$1"
-  local current_slot current_identity current_probe_result current_probe_reset probe_result probe_status probe_slot
+  local current_slot current_identity current_probe_result probe_result probe_status probe_slot
   local all_unavailable_info earliest_slot earliest_reset
+  local current_fingerprint previous_phase="" previous_blocked_reason="" previous_slot="" previous_fingerprint="" wake_reason="" wake_trigger="" recovery_trigger=""
 
   wait_for_codex_slot_switch_idle "$project" || return 1
   current_slot="$(codex_current_slot "$project")"
   current_identity="$current_slot"
+  current_fingerprint="$(codex_saved_slots_fingerprint "$project")"
+
+  if codex_load_availability_state "$project"; then
+    previous_phase="${AVAILABILITY_PHASE:-}"
+    previous_blocked_reason="${BLOCKED_REASON:-}"
+    previous_slot="${PREVIOUS_SLOT:-}"
+    previous_fingerprint="${SAVED_SLOTS_FINGERPRINT:-}"
+  fi
+
+  codex_write_availability_state "$project" "probing" "${previous_blocked_reason:-probe_pending}" "${previous_slot:-$current_identity}" "$current_identity" "$current_fingerprint" "" "" ""
 
   if [[ -n "$current_identity" ]]; then
     current_probe_result="$(codex_probe_current_slot_now "$project" || true)"
     case "$current_probe_result" in
       usable)
-        codex_clear_slot_cooldown "$project" "$current_identity"
+        if [[ "$previous_phase" == "all_unavailable" || "$previous_phase" == "probing" ]]; then
+          recovery_trigger="${previous_blocked_reason:-slot_probe_blocked}"
+          wake_reason="watchdog_probed_current_slot_usable"
+          if [[ -n "$previous_fingerprint" && "$previous_fingerprint" != "$current_fingerprint" ]]; then
+            wake_reason="watchdog_inventory_change_found_usable_slot"
+            wake_trigger="inventory_change"
+          elif [[ "$previous_phase" == "all_unavailable" || "$previous_blocked_reason" == "all_slots_unavailable" ]]; then
+            wake_reason="watchdog_probed_and_found_usable_slot"
+            wake_trigger="periodic_reprobe"
+          else
+            wake_trigger="periodic_reprobe"
+          fi
+          log_info "watchdog found a usable current codex slot for manager bootstrap (trigger=$recovery_trigger reason=$wake_reason previous_slot=${previous_slot:-$current_identity} active_slot=$current_identity)"
+          write_manager_bootstrap_handoff "$project" "$recovery_trigger" "${previous_slot:-$current_identity}" "$current_identity" "$wake_reason" "inspect-fleet-and-recover-workers"
+          codex_write_availability_state "$project" "ready" "" "${previous_slot:-$current_identity}" "$current_identity" "$current_fingerprint" "$wake_trigger" "" ""
+        else
+          codex_clear_availability_state "$project"
+        fi
         return 0
-        ;;
-      rate_limited:*)
-        current_probe_reset="${current_probe_result#rate_limited:}"
-        codex_record_slot_cooldown "$project" "$current_identity" "$current_probe_reset"
         ;;
     esac
   fi
@@ -754,7 +818,17 @@ ensure_codex_slot_ready_for_manager() {
     usable)
       probe_slot="${probe_result#usable:}"
       if [[ -n "$probe_slot" ]]; then
-        write_manager_bootstrap_handoff "$project" "stale_or_missing_cooldown_probe" "$current_identity" "$probe_slot" "watchdog_probed_and_found_usable_slot" "inspect-fleet-and-recover-workers"
+        recovery_trigger="${previous_blocked_reason:-slot_probe_blocked}"
+        wake_reason="watchdog_probed_and_found_usable_slot"
+        if [[ -n "$previous_fingerprint" && "$previous_fingerprint" != "$current_fingerprint" ]]; then
+          wake_reason="watchdog_inventory_change_found_usable_slot"
+          wake_trigger="inventory_change"
+        else
+          wake_trigger="periodic_reprobe"
+        fi
+        log_info "watchdog found a usable saved codex slot for manager bootstrap (trigger=$recovery_trigger reason=$wake_reason previous_slot=${current_identity:-${previous_slot:-unknown}} active_slot=$probe_slot)"
+        write_manager_bootstrap_handoff "$project" "$recovery_trigger" "${current_identity:-${previous_slot:-unknown}}" "$probe_slot" "$wake_reason" "inspect-fleet-and-recover-workers"
+        codex_write_availability_state "$project" "ready" "" "${current_identity:-${previous_slot:-unknown}}" "$probe_slot" "$current_fingerprint" "$wake_trigger" "" ""
         return 0
       fi
       ;;
@@ -762,19 +836,19 @@ ensure_codex_slot_ready_for_manager() {
       all_unavailable_info="${probe_result#all_unavailable:}"
       earliest_slot="${all_unavailable_info%%|*}"
       earliest_reset="${all_unavailable_info##*|}"
+      codex_write_availability_state "$project" "all_unavailable" "all_slots_unavailable" "${current_identity:-unknown}" "${current_identity:-unknown}" "$current_fingerprint" "" "$earliest_slot" "$earliest_reset"
+      write_manager_bootstrap_handoff "$project" "all_slots_unavailable" "${current_identity:-unknown}" "${current_identity:-unknown}" "watchdog_hold_until_slot_is_usable" "keep-manager-down-until-watchdog-finds-usable-slot"
       if [[ -n "$earliest_slot" && -n "$earliest_reset" && "$all_unavailable_info" == *"|"* ]]; then
-        write_manager_bootstrap_handoff "$project" "all_slots_unavailable" "$current_identity" "$current_identity" "watchdog_reprobe_pending" "retry-slot-sweep-on-next-watch-cycle"
-        log_warn "no codex slot is usable for manager bootstrap; earliest_reset=${earliest_reset} is only a hint and watchdog will reprobe on the next cycle"
-        return 1
+        log_warn "no codex slot is usable for manager bootstrap; earliest_reset=${earliest_reset} remains a hint only while watchdog keeps probing"
+      else
+        log_warn "no codex slot is usable for manager bootstrap; watchdog will keep manager down until a later probe succeeds"
       fi
+      return 1
       ;;
   esac
 
-  if [[ -n "$current_identity" ]]; then
-    log_error "no codex slot is currently available for manager bootstrap"
-    return 1
-  fi
-
+  codex_write_availability_state "$project" "all_unavailable" "slot_probe_failed" "${current_identity:-unknown}" "${current_identity:-unknown}" "$current_fingerprint" "" "" ""
+  write_manager_bootstrap_handoff "$project" "slot_probe_failed" "${current_identity:-unknown}" "${current_identity:-unknown}" "watchdog_hold_until_slot_is_usable" "keep-manager-down-until-watchdog-finds-usable-slot"
   log_error "no codex slot is currently available for manager bootstrap"
   return 1
 }
