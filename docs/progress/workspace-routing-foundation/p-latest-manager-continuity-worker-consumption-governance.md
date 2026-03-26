@@ -63,3 +63,12 @@
   - do not reopen implementation or research scope
   - treat `123901` as the current canonical manager non-reopen judgement and latest consumed launch-state truth, with `093617` as the first corrected carry-forward continuity, `093913`, `094320`, `094700`, `095024`, `095720`, `095734`, `100038`, `100348`, `100715`, `101053`, `102539`, `103203`, `103454`, `120941`, `122611`, `122935`, and `123608` as prior same-day reaffirmations, and `092109` only as the earlier superseded reopen-shaped patrol, not as a fresh repo-side regression
   - keep cleanup explicit and supervisor/runtime-owned rather than implying retirement
+
+## 2026-03-25 Source Lane Retirement Audit
+
+- Re-audited `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-no-fixed-cap-dispatch` and `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-unconsumed-launchable-prompt-fix` against the current integration owner.
+- Both source branches still carry non-ancestor commits, but the remaining runtime deltas are not missing desired capability:
+  - their unreplayed `runtime/freely` hunks revert this family back toward the older account-based readiness / cooldown path instead of the current canonical truth
+  - their focused regressions are already present in this integration owner and remain part of the verification set
+- This round therefore treats both branches as superseded local source lanes whose remaining unique commits should not be replayed onto the canonical owner.
+- After this writeback is committed, the local source worktrees/branches are retirement candidates even though their historical commits were never merged directly.
