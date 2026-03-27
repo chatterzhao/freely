@@ -1,5 +1,10 @@
 # 预研头脑风暴：pre-test-merge-post-merge-acceptance-stall
 
+## 兼容说明
+
+- 本预研目录与历史候选名继续保留 `pre-test-merge` 命名，避免破坏既有留痕与引用。
+- 当前 canonical 语义已经改成 `test-pre-merge-*` 测试批次前缀族；下文出现的 `pre-test-merge` 都按这个前缀族理解，而不是单例长期分支。
+
 ## 背景
 
 在 `feature/completed-worktree-closeout-merge-prep-20260322` 吸收 `I-20260322-0445` 后，专门创建了 `pre-test-merge` 经理工位做真实 post-merge acceptance：

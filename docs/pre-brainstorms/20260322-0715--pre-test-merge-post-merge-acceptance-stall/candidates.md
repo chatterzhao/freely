@@ -2,6 +2,7 @@
 
 - id: `C-20260322-0715-A`
 - title: Detect and recover pre-test-merge manager acceptance stalls after delegated continuation
+- note: 历史候选名保留 `pre-test-merge`，当前 canonical 语义按 `test-pre-merge-*` 测试批次前缀族解释
 - source_brainstorm: `docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/brainstorms.md`
 - status: `needs_research`
 - milestone: `M-20260306-workspace-routing-foundation`
@@ -31,9 +32,9 @@
   - boundary-governance for `pre-test-merge` now routes through the dedicated governance issue
   - this candidate remains active because the concrete acceptance-stall detection and recovery contract is still unresolved
 - next_action:
-  - keep this candidate visible while the governance issue stabilizes protected-env lifecycle semantics
+  - keep this candidate visible while the governance issue stabilizes `test-pre-merge-*` protected-env lifecycle semantics
   - rerun canonical dogfood long enough to cross the watchdog stall threshold before deciding a runtime patch is needed
   - if the same shape still persists past threshold, materialize a separate runtime/orchestration issue for delegated acceptance stall detection and recovery
 - revisit_trigger:
-  - after the governance issue freezes `pre-test-merge` role/stale semantics
+  - after the governance issue freezes `test-pre-merge-*` role/stale semantics
   - or earlier if another post-merge acceptance run reproduces the same delegated-continuation stall
