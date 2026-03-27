@@ -320,7 +320,18 @@ routing_policy:
 
 ### candidate_issues
 
-1. `C-20260323-1435-A`
+1. `C-20260326-1810-A`
+- title: Freely layered architecture and tooling topology
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://freely-layered-architecture-and-tooling-topology-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md`
+- next_action: 继续 pre-brainstorm，先冻结最小楼层图：loop/lifecycle、interaction entry、host form factor、external AI tooling、runtime/agent orchestration、autonomy evals、harness/support substrate 这些层各自的边界与命名；同时决定是新增 topology 真源还是改写 `three-loop` 的局部引用，不在边界未稳前直接改现有系统文档
+- revisit_trigger: 当新拓扑文档与 `three-loop` / `tools.md` 的分工、层命名，以及 `chat` vs `CLI/TUI/GUI` 与 AI tooling 归属都能冻结成独立 issue scope 时，重新进入 materialization 判断
+
+2. `C-20260323-1435-A`
 - title: Interactive init bootstrap and fine-grained force/skip governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
