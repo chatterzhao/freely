@@ -17,9 +17,10 @@
   - 形成 resolution artifact，并把 intake 回写为 absorbed
   - 第一版至少支持“后台 AI 进程在做什么”这类查询
 - priority: P0
-- status: needs_research
-- decision_reason: 范围已收紧到 runtime direct answer，可直接实现最小链路并用真实插话验证。
-- promoted_issue_path: pending://issue-materialization
+- status: absorbed
+- adoption_type: supporting_evidence
+- decision_reason: direct-answer runtime path、resolution artifact 与 writeback 行为已被 `I-20260321-1925` 的 interruption governance 吸收；该候选不再需要独立 materialization。
+- promoted_issue_path: docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex

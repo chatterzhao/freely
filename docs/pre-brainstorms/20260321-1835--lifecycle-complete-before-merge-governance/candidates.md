@@ -18,12 +18,13 @@
   - 明确真实集成测试下，新 signal 不得被旧 continuity 错误吸收后直接推进 merge/cleanup
   - 落点优先放在 `three-loop-capability-lifecycle`、`worktree-maintenance-governance`、`milestone-planning-state-maintenance`
 - priority: P0
-- status: proposed
-- decision_reason: 这是 Freely 用 Freely 自举时直接暴露的治理缺口，而且会影响所有后续 worktree 的 promote/cleanup 判断，值得先作为能力缺口固定。
-- next_action: 判断它应作为对现有 worktree/lifecycle 真源的增强来 materialize，而不是新增平行 merge skill。
-- revisit_trigger: 当 merge readiness、research closure 与 lifecycle closure 的关系能被稳定写成统一 gate wording 时。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: absorbed
+- adoption_type: supporting_evidence
+- decision_reason: lifecycle closure、research closure 与 terminal retirement judgement 已由 `I-20260324-0405` 和现有 worktree maintenance truth 显式吸收，这条候选不再需要独立 materialization。
+- next_action: 后续若出现新的 merge-before-closure 漏洞，应围绕新的 gate regression 新开 lifecycle，而不是重开本候选。
+- revisit_trigger: canonical truth 再次把“实现差不多了”误当成“可以 merge / cleanup”时。
+- promoted_issue_path: docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex
   - session_id: current-thread

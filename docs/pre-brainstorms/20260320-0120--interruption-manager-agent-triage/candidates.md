@@ -17,9 +17,10 @@
   - “看看后台 AI 进程都在做什么”应被快速直答
   - 非直答问题至少要被及时 claim 并留待后续委派
 - priority: P0
-- status: needs_research
-- decision_reason: 这是现有 interruption control plane 的自然下一步，可在不重写主管主循环的前提下先实现最小 AI triage。
-- promoted_issue_path: pending://issue-materialization
+- status: absorbed
+- adoption_type: supporting_evidence
+- decision_reason: manager answer-vs-delegation triage 已进入 interruption handler、manager route 与 `I-20260321-1925` 的 canonical owner surface，不再单开平行 issue。
+- promoted_issue_path: docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex
