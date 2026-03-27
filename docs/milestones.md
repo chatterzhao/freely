@@ -49,17 +49,19 @@ routing_policy:
 
 ### committed_issues
 
+### completed_issues
+
 1. `I-20260327-1115`
 - title: OAuth slot inventory sweep and launch-time confirmation governance
-- milestone_state: committed
-- phase_state: `in_dev`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md`
-- next_action: 当前已进入 dev-loop 第一刀，实现 unified OAuth sweep、availability cache、cooldown overwrite，并继续把 watchdog recovery 收紧到 launch-time confirmation
-
-### completed_issues
+- evidence:
+  - `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/code-reviews/20260327-oauth-sweep-launch-confirmation-verification.md`
+- completion_note: OAuth `wham/usage` sweep 已成为 canonical inventory truth surface；status、switch auto、ensure-manager 共用 cache/sweep/launch-time-confirmation contract，旧的全量串行真实 probe 不再是主路径
 
 1. `I-20260307-1201`
 - title: 源分类、milestone-owned issue 与派生 worktree 路由治理

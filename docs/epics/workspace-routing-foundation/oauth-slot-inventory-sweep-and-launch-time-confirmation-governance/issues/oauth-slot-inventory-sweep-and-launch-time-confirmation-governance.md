@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260327-1115`
 - title: OAuth slot inventory sweep and launch-time confirmation governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `oauth-slot-inventory-sweep-and-launch-time-confirmation-governance`
@@ -84,3 +84,4 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
 - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog`
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
+- `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/code-reviews/20260327-oauth-sweep-launch-confirmation-verification.md`
