@@ -320,7 +320,18 @@ routing_policy:
 
 ### candidate_issues
 
-1. `C-20260323-1435-A`
+1. `C-20260326-1733-A`
+- title: IBM pre-tests executable real-environment acceptance quality governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://ibm-pretests-real-environment-acceptance-quality`
+- source_brainstorm: `docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/candidates.md`
+- next_action: 继续 pre-brainstorm，先收敛 executable acceptance contract 的最小结构：哪些字段必须写进 `pre-tests.md`，如何显式覆盖 integration / application-native real-environment / end-to-end dogfood 三类验收面，以及 governance issue 在真 runtime 中最小应跑哪些场景；在这些边界稳定前，不把问题退化成单条 issue 的 wording 修补
+- revisit_trigger: 当 executable acceptance contract 的固定结构、证据面、失败判据，以及与 verification closeout 的边界都能冻结成独立 issue scope 时，重新进入 materialization 判断
+
+2. `C-20260323-1435-A`
 - title: Interactive init bootstrap and fine-grained force/skip governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
