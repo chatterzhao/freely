@@ -903,6 +903,28 @@ routing_policy:
 - evidence: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`, `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/tasks.md`, `docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`, `docs/system/workspace/scripts/quality/governance-check`
 - completion_note: future candidate v2 schema、独立 acceptance review、IBM acceptance deepening 与治理门禁已稳定落盘；高风险 candidate 的双审策略保留为后续治理演进，不阻塞当前 issue 完成
 
+12. `C-20260323-2045-A`
+- title: Add capacity-aware queueing for manager worker prompt sets
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260323-2045--manager-worker-scheduler-capacity-and-queueing/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260323-2045--manager-worker-scheduler-capacity-and-queueing/candidates.md`
+- evidence:
+  - `AGENTS.md`
+  - `docs/system/workspace/scripts/start-lead-agent.sh`
+  - `docs/system/workspace/agents/manager-agent.md`
+  - `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`
+  - `docs/system/workspace/three-loop-capability-lifecycle.md`
+  - `docs/system/workspace/scripts/runtime/freely`
+  - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-capacity-queue`
+  - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-busy-worker-queue`
+  - `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
+  - `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
+  - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- completion_note: 当前 candidate 的旧 blocker 已被 canonical `develop` 否定并吸收：dispatch metadata 已成为 runtime contract，固定 numeric launch cap 已退场，parallel-safe prompts 会直接 launch，queue 只保留给 same-lane busy、单 wave 非并行限制与 `write_scope` 冲突。后续若要继续做更强的 scheduler fairness / quota / transaction 语义，应新开 lifecycle，而不是复活这条已收口的 research。
+
 ## M-20260312-control-surface-runtime-convergence
 
 - title: Control surface, runtime, and intervention architecture convergence

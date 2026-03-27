@@ -38,6 +38,27 @@
 3. lifecycle 真源：
    - 把 queue/capacity 联动写进 `three-loop-capability-lifecycle`
 
+## 2026-03-27 Canonical Develop Recheck
+
+- 这轮直接重读了当前 canonical truth，而不是继续依赖 2026-03-26 replay owner 上的旧冻结结论：
+  - `AGENTS.md`
+  - `docs/system/workspace/scripts/start-lead-agent.sh`
+  - `docs/system/workspace/agents/manager-agent.md`
+  - `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`
+  - `docs/system/workspace/three-loop-capability-lifecycle.md`
+  - `docs/system/workspace/scripts/runtime/freely`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-capacity-queue`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-busy-worker-queue`
+- 当前 canonical `develop` 已具备这条研究原本要求的最小 contract：
+  - worker prompt dispatch metadata 已被要求为 machine-readable runtime contract，而不是补充说明
+  - runtime 不再使用固定 numeric worker cap；`manager_max_parallel_workers()` 与 `manager_worker_launch_available_slots()` 当前都返回 `unbounded`
+  - launch path 会按 `dispatch_priority` 排序，只在 same-lane busy、`parallel_safe=false` 的单 wave 限制、或 `write_scope` 冲突时把 prompt 留在 queue
+  - busy delegated worker 会被 queue，而不是重复 relaunch
+- 结论：
+  - 这条 pre-brainstorm 的原始问题已经被 canonical `develop` 吸收
+  - 当前未收口的不是产品能力，而是旧候选文档还保留着过时 blocker
+  - 因此下一跳不是新开平行 issue，而是把 research 真相回写为 `absorbed` supporting evidence；未来若还要继续扩 scheduler，只能以新的、更高阶的 queue/fairness/transaction lifecycle 再开题
+
 ## Why now
 
 这不是提速优化，而是自治闭环正确性问题：
