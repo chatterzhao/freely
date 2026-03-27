@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260327-1115`
 - title: OAuth slot inventory sweep and launch-time confirmation governance
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `oauth-slot-inventory-sweep-and-launch-time-confirmation-governance`

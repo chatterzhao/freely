@@ -289,6 +289,20 @@ codex_availability_state_file() {
   printf '%s\n' "$(run_dir_for_project "$project")/codex-availability-state.env"
 }
 
+codex_availability_cache_file() {
+  local project="$1"
+  printf '%s\n' "$(run_dir_for_project "$project")/codex-availability-cache.tsv"
+}
+
+codex_oauth_usage_url() {
+  printf '%s\n' "${CODEX_OAUTH_USAGE_URL:-https://chatgpt.com/backend-api/wham/usage}"
+}
+
+codex_saved_slot_auth_file() {
+  local slot="$1"
+  printf '%s\n' "${AUTH_DIR:-$HOME/.ai-auth}/codex-${slot}/auth.json"
+}
+
 codex_saved_slots_fingerprint() {
   local project="$1"
   local slots
@@ -329,6 +343,218 @@ EOF
 codex_clear_availability_state() {
   local project="$1"
   rm -f "$(codex_availability_state_file "$project")"
+}
+
+codex_overwrite_slot_cooldowns_from_sweep_results() {
+  local project="$1" results_file="$2"
+  local file tmp
+  file="$(codex_slot_cooldown_file "$project")"
+  mkdir -p "$(dirname "$file")"
+  tmp="${file}.tmp"
+  awk -F '\t' '
+    $2 == "rate_limited" && $4 ~ /^[0-9]+$/ && $4 > 0 {
+      print $1 "\t" $4 "\t" $6
+    }
+  ' "$results_file" >"$tmp"
+  mv "$tmp" "$file"
+}
+
+codex_write_availability_cache_from_sweep_results() {
+  local project="$1" results_file="$2"
+  local file tmp refreshed_at
+  file="$(codex_availability_cache_file "$project")"
+  mkdir -p "$(dirname "$file")"
+  tmp="${file}.tmp"
+  refreshed_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  {
+    printf 'slot\tstatus\tauth_email\treset_at\thttp_code\tdetail\trefreshed_at\n'
+    awk -F '\t' -v refreshed_at="$refreshed_at" '
+      NF >= 6 {
+        print $1 "\t" $2 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" refreshed_at
+      }
+    ' "$results_file"
+  } >"$tmp"
+  mv "$tmp" "$file"
+}
+
+codex_oauth_probe_single_slot() {
+  local slot="$1" auth_file="$2" output_file="$3"
+  local usage_url token auth_email response_file http_code response_body
+  usage_url="$(codex_oauth_usage_url)"
+  if [[ ! -f "$auth_file" ]]; then
+    printf '%s\tmissing_auth\t\t0\t0\tauth file missing\n' "$slot" >"$output_file"
+    return 0
+  fi
+
+  read -r token auth_email < <(python3 - <<'PY' "$auth_file"
+import base64
+import json
+import sys
+
+path = sys.argv[1]
+token = ""
+email = ""
+with open(path, "r", encoding="utf-8") as f:
+    data = json.load(f)
+token = data.get("tokens", {}).get("access_token", "") or data.get("access_token", "")
+id_token = data.get("tokens", {}).get("id_token", "")
+if id_token:
+    try:
+        payload = id_token.split(".")[1]
+        payload += "=" * (-len(payload) % 4)
+        email = json.loads(base64.urlsafe_b64decode(payload.encode())).get("email", "")
+    except Exception:
+        email = ""
+print(token, email)
+PY
+)
+
+  if [[ -z "$token" ]]; then
+    printf '%s\tmissing_token\t%s\t0\t0\taccess token missing\n' "$slot" "$auth_email" >"$output_file"
+    return 0
+  fi
+
+  response_file="$(mktemp)"
+  if ! http_code="$(curl -sS -o "$response_file" -w '%{http_code}' -H "Authorization: Bearer $token" "$usage_url" 2>/dev/null)"; then
+    rm -f "$response_file"
+    printf '%s\tcurl_error\t%s\t0\t0\toauth query failed\n' "$slot" "$auth_email" >"$output_file"
+    return 0
+  fi
+  response_body="$(cat "$response_file" 2>/dev/null || true)"
+  rm -f "$response_file"
+
+  python3 - <<'PY' "$slot" "$auth_email" "$http_code" "$response_body" >"$output_file"
+import json
+import sys
+
+slot, auth_email, http_code, response_body = sys.argv[1:5]
+status = "unknown"
+reset_at = "0"
+detail = ""
+
+def numeric_reset(value):
+    if isinstance(value, (int, float)):
+        return str(int(value))
+    if isinstance(value, str) and value.isdigit():
+        return value
+    return "0"
+
+try:
+    payload = json.loads(response_body) if response_body else {}
+except Exception:
+    payload = {}
+
+detail_code = ""
+detail_obj = payload.get("detail")
+if isinstance(detail_obj, dict):
+    detail_code = detail_obj.get("code", "") or ""
+elif isinstance(detail_obj, str):
+    detail_code = detail_obj
+
+rate_limits = payload.get("rate_limits", {}) if isinstance(payload, dict) else {}
+primary = rate_limits.get("primary", {}) if isinstance(rate_limits, dict) else {}
+secondary = rate_limits.get("secondary", {}) if isinstance(rate_limits, dict) else {}
+primary_used = primary.get("used_percent")
+secondary_used = secondary.get("used_percent")
+primary_reset = numeric_reset(primary.get("resets_at"))
+secondary_reset = numeric_reset(secondary.get("resets_at"))
+
+if detail_code == "deactivated_workspace":
+    status = "deactivated_workspace"
+    detail = "workspace deactivated"
+elif http_code in {"401", "403"}:
+    status = "unauthorized"
+    detail = "auth rejected"
+elif http_code == "429" or primary_used == 100.0 or secondary_used == 100.0 or primary_used == 100 or secondary_used == 100:
+    status = "rate_limited"
+    reset_candidates = [x for x in (primary_reset, secondary_reset) if x.isdigit() and int(x) > 0]
+    reset_at = min(reset_candidates, key=lambda x: int(x)) if reset_candidates else "0"
+    detail = "oauth usage limit reached"
+elif http_code.startswith("2"):
+    status = "usable"
+    detail = "oauth inventory usable"
+else:
+    status = "unknown"
+    detail = detail_code or f"http {http_code}"
+
+human = ""
+if reset_at.isdigit() and int(reset_at) > 0:
+    from datetime import datetime, timezone
+    human = datetime.fromtimestamp(int(reset_at), timezone.utc).strftime("%Y.%m.%d %H:%M:%S")
+else:
+    human = detail
+
+print("\t".join([
+    slot,
+    status,
+    auth_email,
+    reset_at,
+    http_code,
+    human,
+]))
+PY
+}
+
+codex_oauth_sweep_all_slots() {
+  local project="$1"
+  local candidate auth_file tmp_dir results_file result_file
+  local usable_slot="" earliest_slot="" earliest_reset=""
+  local saw_result=0 current_identity
+  current_identity="$(codex_current_cooldown_identity "$project")"
+  tmp_dir="$(mktemp -d)"
+  results_file="$tmp_dir/results.tsv"
+
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    auth_file="$(codex_saved_slot_auth_file "$candidate")"
+    result_file="$tmp_dir/${candidate}.tsv"
+    codex_oauth_probe_single_slot "$candidate" "$auth_file" "$result_file" &
+  done < <(codex_saved_slots "$project")
+  wait || true
+
+  cat "$tmp_dir"/*.tsv 2>/dev/null >"$results_file" || true
+  if [[ ! -s "$results_file" ]]; then
+    rm -rf "$tmp_dir"
+    printf 'none\n'
+    return 1
+  fi
+
+  codex_write_availability_cache_from_sweep_results "$project" "$results_file"
+  codex_overwrite_slot_cooldowns_from_sweep_results "$project" "$results_file"
+
+  printf '\n%-30s  %-20s  %s\n' "Slot" "OAuth status" "Details" >&2
+  printf '%s\n' "$(printf '%-30s  %-20s  %s' '' '' '' | tr ' ' '-')" >&2
+  while IFS=$'\t' read -r candidate status auth_email reset_at http_code detail; do
+    [[ -n "$candidate" ]] || continue
+    saw_result=1
+    if [[ "$status" == "usable" && -z "$usable_slot" ]]; then
+      usable_slot="$candidate"
+    fi
+    if [[ "$status" == "rate_limited" && "$reset_at" =~ ^[0-9]+$ && "$reset_at" -gt 0 ]]; then
+      if [[ -z "$earliest_reset" || "$reset_at" -lt "$earliest_reset" ]]; then
+        earliest_slot="$candidate"
+        earliest_reset="$reset_at"
+      fi
+    fi
+    if [[ "$(normalize_codex_slot_name "$candidate")" == "$current_identity" ]]; then
+      candidate="${candidate} *"
+    fi
+    printf '%-30s  %-20s  %s\n' "$candidate" "$status" "$detail" >&2
+  done <"$results_file"
+  printf '\n' >&2
+
+  rm -rf "$tmp_dir"
+  if [[ -n "$usable_slot" ]]; then
+    printf 'usable:%s\n' "$usable_slot"
+    return 0
+  fi
+  if [[ -n "$earliest_slot" && -n "$earliest_reset" ]]; then
+    printf 'all_unavailable:%s|%s\n' "$earliest_slot" "$earliest_reset"
+    return 0
+  fi
+  [[ "$saw_result" == "1" ]] || return 1
+  printf 'none\n'
+  return 1
 }
 
 codex_prune_stale_slot_cooldowns() {
@@ -693,6 +919,25 @@ probe_all_codex_slots_and_update_cooldown() {
     auth_backup="$(mktemp)"
     cp "$auth_file" "$auth_backup"
   fi
+
+  probe_result="$(codex_oauth_sweep_all_slots "$project" || true)"
+  case "$probe_result" in
+    usable:*)
+      usable_slot="${probe_result#usable:}"
+      if [[ -n "$usable_slot" ]]; then
+        switch_to_codex_slot "$project" "$usable_slot" "oauth_sweep_promote_usable_slot" >/dev/null || true
+        [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
+        printf 'usable:%s\n' "$usable_slot"
+        return 0
+      fi
+      ;;
+    all_unavailable:*)
+      restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
+      [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
+      printf '%s\n' "$probe_result"
+      return 0
+      ;;
+  esac
 
   # Print header
   printf '\n%-30s  %-15s  %s\n' "Slot" "Status" "Details" >&2

@@ -6,7 +6,7 @@ TMP_DIR="$(mktemp -d /tmp/freely-ai-account-switch.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 make_auth_json() {
-  local email="$1" target="$2"
+  local email="$1" target="$2" access_token="${3:-token-$1}"
   local payload
   payload="$(python3 - <<'PY' "$email"
 import base64
@@ -17,7 +17,7 @@ payload = base64.urlsafe_b64encode(json.dumps({"email": sys.argv[1]}).encode()).
 print(payload)
 PY
 )"
-  printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$payload" >"$target"
+  printf '{"tokens":{"id_token":"x.%s.y","access_token":"%s"}}\n' "$payload" "$access_token" >"$target"
 }
 
 setup_project() {
@@ -54,59 +54,65 @@ PY
 
 MOCK_BIN="$TMP_DIR/mock-bin"
 mkdir -p "$MOCK_BIN"
-cat >"$MOCK_BIN/codex" <<'EOF'
+cat >"$MOCK_BIN/curl" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-auth_file="${HOME:?}/.codex/auth.json"
-scenario="${MOCK_CODEX_SCENARIO:?}"
-log_file="${MOCK_CODEX_LOG:?}"
+scenario="${MOCK_OAUTH_SCENARIO:?}"
+log_file="${MOCK_OAUTH_LOG:?}"
+output_file=""
+auth_header=""
 
-if [[ "${ALL_PROXY:-}" != "http://127.0.0.1:7890" || "${HTTP_PROXY:-}" != "http://127.0.0.1:7890" || "${HTTPS_PROXY:-}" != "http://127.0.0.1:7890" ]]; then
-  echo "proxy-missing"
-  exit 9
-fi
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -o)
+      output_file="$2"
+      shift 2
+      ;;
+    -H)
+      auth_header="$2"
+      shift 2
+      ;;
+    -w)
+      shift 2
+      ;;
+    -s|-S|-sS)
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
 
-email="$(python3 - <<'PY' "$auth_file"
-import base64
-import json
-import sys
+token="${auth_header#Authorization: Bearer }"
+printf '%s|%s\n' "$scenario" "$token" >>"$log_file"
 
-with open(sys.argv[1], "r", encoding="utf-8") as f:
-    data = json.load(f)
-token = data["tokens"]["id_token"].split(".")[1]
-token += "=" * (-len(token) % 4)
-payload = json.loads(base64.urlsafe_b64decode(token.encode()))
-print(payload["email"])
-PY
-)"
-
-printf '%s|%s|%s|%s\n' "$scenario" "$email" "${ALL_PROXY:-}" "${HTTP_PROXY:-}" >>"$log_file"
-
-case "$scenario:$email" in
-  usable:limited@example.com)
-    echo "You've hit your usage limit. Please try again at Jan 2nd, 2100 12:00 AM."
-    exit 1
+case "$scenario:$token" in
+  usable:token-limited)
+    printf '{"rate_limits":{"primary":{"used_percent":100.0,"resets_at":4102444800},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
     ;;
-  usable:work@example.com)
-    echo "hi"
-    exit 0
+  usable:token-work)
+    printf '{"rate_limits":{"primary":{"used_percent":25.0,"resets_at":0},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
     ;;
-  earliest:slow@example.com)
-    echo "You've hit your usage limit. Please try again at Jan 3rd, 2100 12:00 AM."
-    exit 1
+  earliest:token-slow)
+    printf '{"rate_limits":{"primary":{"used_percent":100.0,"resets_at":4102531200},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
     ;;
-  earliest:fast@example.com)
-    echo "You've hit your usage limit. Please try again at Jan 1st, 2100 12:00 AM."
-    exit 1
+  earliest:token-fast)
+    printf '{"rate_limits":{"primary":{"used_percent":100.0,"resets_at":4102358400},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
     ;;
   *)
-    echo "unexpected:$scenario:$email"
+    printf '{"detail":"unexpected"}\n' >"$output_file"
+    printf '500'
     exit 7
     ;;
 esac
 EOF
-chmod +x "$MOCK_BIN/codex"
+chmod +x "$MOCK_BIN/curl"
 
 PROJECT_USABLE="$TMP_DIR/project-usable"
 HOME_USABLE="$TMP_DIR/home-usable"
@@ -114,15 +120,15 @@ LOG_USABLE="$TMP_DIR/probe-usable.log"
 setup_project "$PROJECT_USABLE"
 setup_home "$HOME_USABLE"
 mkdir -p "$HOME_USABLE/.ai-auth/codex-limited@example-com-1" "$HOME_USABLE/.ai-auth/codex-work@example-com-2"
-make_auth_json "limited@example.com" "$HOME_USABLE/.ai-auth/codex-limited@example-com-1/auth.json"
-make_auth_json "work@example.com" "$HOME_USABLE/.ai-auth/codex-work@example-com-2/auth.json"
-make_auth_json "old@example.com" "$HOME_USABLE/.codex/auth.json"
+make_auth_json "limited@example.com" "$HOME_USABLE/.ai-auth/codex-limited@example-com-1/auth.json" "token-limited"
+make_auth_json "work@example.com" "$HOME_USABLE/.ai-auth/codex-work@example-com-2/auth.json" "token-work"
+make_auth_json "old@example.com" "$HOME_USABLE/.codex/auth.json" "token-old"
 
 HOME="$HOME_USABLE" \
 PROJECT_ROOT="$PROJECT_USABLE" \
 PATH="$MOCK_BIN:$PATH" \
-MOCK_CODEX_SCENARIO="usable" \
-MOCK_CODEX_LOG="$LOG_USABLE" \
+MOCK_OAUTH_SCENARIO="usable" \
+MOCK_OAUTH_LOG="$LOG_USABLE" \
   bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/usable.out"
 
 grep -q '"switched": true' "$TMP_DIR/usable.out"
@@ -131,8 +137,9 @@ grep -q '"slot": "work@example-com-2"' "$TMP_DIR/usable.out"
 grep -q '"status": "usable"' "$TMP_DIR/usable.out"
 grep -q '"slot": "work@example-com-2"' <(HOME="$HOME_USABLE" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
 grep -q '"auth_email": "work@example.com"' <(HOME="$HOME_USABLE" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
-grep -q 'usable|limited@example.com|http://127.0.0.1:7890|http://127.0.0.1:7890' "$LOG_USABLE"
-grep -q 'usable|work@example.com|http://127.0.0.1:7890|http://127.0.0.1:7890' "$LOG_USABLE"
+grep -q 'usable|token-limited' "$LOG_USABLE"
+grep -q 'usable|token-work' "$LOG_USABLE"
+grep -Eq '"availability_cache":[[:space:]]*\{"present":[[:space:]]*true' <(HOME="$HOME_USABLE" PROJECT_ROOT="$PROJECT_USABLE" bash "$ROOT_DIR/bin/ai" --quiet --format json status codex)
 
 echo "[PASS] freely ai switch codex auto-probes and switches to a usable account"
 
@@ -142,15 +149,15 @@ LOG_EARLIEST="$TMP_DIR/probe-earliest.log"
 setup_project "$PROJECT_EARLIEST"
 setup_home "$HOME_EARLIEST"
 mkdir -p "$HOME_EARLIEST/.ai-auth/codex-slow@example-com-3" "$HOME_EARLIEST/.ai-auth/codex-fast@example-com-1"
-make_auth_json "slow@example.com" "$HOME_EARLIEST/.ai-auth/codex-slow@example-com-3/auth.json"
-make_auth_json "fast@example.com" "$HOME_EARLIEST/.ai-auth/codex-fast@example-com-1/auth.json"
-make_auth_json "old@example.com" "$HOME_EARLIEST/.codex/auth.json"
+make_auth_json "slow@example.com" "$HOME_EARLIEST/.ai-auth/codex-slow@example-com-3/auth.json" "token-slow"
+make_auth_json "fast@example.com" "$HOME_EARLIEST/.ai-auth/codex-fast@example-com-1/auth.json" "token-fast"
+make_auth_json "old@example.com" "$HOME_EARLIEST/.codex/auth.json" "token-old"
 
 HOME="$HOME_EARLIEST" \
 PROJECT_ROOT="$PROJECT_EARLIEST" \
 PATH="$MOCK_BIN:$PATH" \
-MOCK_CODEX_SCENARIO="earliest" \
-MOCK_CODEX_LOG="$LOG_EARLIEST" \
+MOCK_OAUTH_SCENARIO="earliest" \
+MOCK_OAUTH_LOG="$LOG_EARLIEST" \
   bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/earliest.out" || true
 
 grep -q '"switched": false' "$TMP_DIR/earliest.out"
@@ -158,8 +165,9 @@ grep -q '"status": "all_unavailable"' "$TMP_DIR/earliest.out"
 grep -q '"earliest_slot": "fast@example-com-1"' "$TMP_DIR/earliest.out"
 grep -q '"launch_blocked": true' "$TMP_DIR/earliest.out"
 grep -q '"slot": null' <(HOME="$HOME_EARLIEST" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
-grep -q 'earliest|slow@example.com|http://127.0.0.1:7890|http://127.0.0.1:7890' "$LOG_EARLIEST"
-grep -q 'earliest|fast@example.com|http://127.0.0.1:7890|http://127.0.0.1:7890' "$LOG_EARLIEST"
+grep -q 'earliest|token-slow' "$LOG_EARLIEST"
+grep -q 'earliest|token-fast' "$LOG_EARLIEST"
 grep -q 'old@example.com' <(current_codex_email "$HOME_EARLIEST/.codex/auth.json")
+grep -Eq '^fast@example-com-1[[:space:]]+4102358400' "$PROJECT_EARLIEST/.freely/run/codex-slot-cooldowns.tsv"
 
 echo "[PASS] freely ai switch codex keeps launch blocked and leaves the current auth untouched when all slots are unavailable"

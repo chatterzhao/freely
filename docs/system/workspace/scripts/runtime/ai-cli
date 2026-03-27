@@ -442,6 +442,11 @@ run_dir_for_project() {
   printf '%s\n' "$project/.freely/run"
 }
 
+codex_availability_cache_file() {
+  local project="$1"
+  printf '%s\n' "$(run_dir_for_project "$project")/codex-availability-cache.tsv"
+}
+
 codex_slot_cooldown_file() {
   local project="$1"
   printf '%s\n' "$(run_dir_for_project "$project")/codex-slot-cooldowns.tsv"
@@ -480,7 +485,12 @@ _cmd_switch_auto_codex() {
   # shellcheck source=/dev/null
   source "$watchdog_script"
 
-  result="$(probe_all_codex_slots_and_update_cooldown "$project" || true)"
+  result="$(codex_oauth_sweep_all_slots "$project" || true)"
+  case "$result" in
+    none)
+      result="$(probe_all_codex_slots_and_update_cooldown "$project" || true)"
+      ;;
+  esac
 
   case "$result" in
     usable:*)
@@ -635,19 +645,32 @@ cmd_whoami() {
 # 状态
 cmd_status() {
   local tool="${1:-codex}"
+  local project="${PROJECT_ROOT:-$(pwd)}"
   
   case "$tool" in
     codex)
       local auth_file="$HOME/.codex/auth.json"
+      local cache_file=""
+      cache_file="$(codex_availability_cache_file "$project")"
       if [[ -f "$auth_file" ]]; then
         local mtime=$(stat -f "%Sm" "$auth_file" 2>/dev/null || stat -c "%y" "$auth_file" 2>/dev/null || echo "unknown")
         local account=$(extract_codex_account "$auth_file")
         local slot
         slot="$(read_codex_active_slot)"
+        local usable_count=""
+        local limited_count=""
+        local deactivated_count=""
+        local cache_refreshed=""
+        if [[ -f "$cache_file" ]]; then
+          usable_count="$(awk -F '\t' 'NR>1 && $2=="usable" {count++} END {print count+0}' "$cache_file")"
+          limited_count="$(awk -F '\t' 'NR>1 && $2=="rate_limited" {count++} END {print count+0}' "$cache_file")"
+          deactivated_count="$(awk -F '\t' 'NR>1 && $2=="deactivated_workspace" {count++} END {print count+0}' "$cache_file")"
+          cache_refreshed="$(awk -F '\t' 'NR==2 {print $7}' "$cache_file")"
+        fi
         
         case "$FORMAT" in
           json)
-            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"last_modified\": \"$mtime\"}"
+            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"last_modified\": \"$mtime\", \"availability_cache\": {\"present\": $([[ -f "$cache_file" ]] && printf true || printf false), \"usable\": ${usable_count:-0}, \"rate_limited\": ${limited_count:-0}, \"deactivated_workspace\": ${deactivated_count:-0}, \"refreshed_at\": $(json_string_or_null "$cache_refreshed")}}"
             ;;
           *)
             log_info "Tool: codex"
@@ -655,6 +678,10 @@ cmd_status() {
             [[ -n "$slot" ]] && log_info "Slot: $slot"
             log_info "Auth email: ${account:-unknown}"
             log_info "Last modified: $mtime"
+            if [[ -f "$cache_file" ]]; then
+              log_info "Availability cache: usable=${usable_count:-0} rate_limited=${limited_count:-0} deactivated_workspace=${deactivated_count:-0}"
+              [[ -n "$cache_refreshed" ]] && log_info "Availability cache refreshed: $cache_refreshed"
+            fi
             ;;
         esac
       else

@@ -52,12 +52,12 @@ routing_policy:
 1. `I-20260327-1115`
 - title: OAuth slot inventory sweep and launch-time confirmation governance
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md`
-- next_action: 当前 OAuth `wham/usage` 预研已完成 materialization；下一步进入 dev-loop，把 unified sweep、availability cache、cooldown overwrite 和 launch-time confirmation 写回 capability truth，不再停留在 pre-brainstorm
+- next_action: 当前已进入 dev-loop 第一刀，实现 unified OAuth sweep、availability cache、cooldown overwrite，并继续把 watchdog recovery 收紧到 launch-time confirmation
 
 ### completed_issues
 
