@@ -7,7 +7,7 @@
 1. `./bin/freely live-status --project <develop>`
 2. `./bin/freely fleet-status --project <develop>` 或等价工位总览
 3. `docs/milestones.md`
-4. 当前 relevant issue / progress / recovery / candidate artifacts
+4. 当前 relevant interruption / issue / progress / recovery / candidate / pre-brainstorm artifacts
 
 ## 巡检目标
 
@@ -48,13 +48,18 @@
 - restart_point 应回到 `runtime supervision / cleanup`，并在需要继续验证时把 `replay source feature` 作为下一跳委派给对应 feature worktree
 - stale 批次不得继续作为当前真相面；它必须先 retire，再决定是否 rebuild
 
+8. `unclosed interruption or unsynced pre-brainstorm`
+- human interruption 已 durable 落盘，但仍未完成分类、吸收、写回或 resolution note
+- 或 pre-brainstorm 已形成稳定结论，但尚未产出 candidate / 未写回 milestone / 缺少 `next_action` 与 `revisit_trigger`
+- 主管应把这类点位视为 standing-source completeness drift，而不是“以后再看”
+
 ## Trigger Model
 
 主管 patrol 不应被理解成只有单一轮询入口。
 
 - `patrol-driven`
   - 来源：standing-source scan
-  - 典型输入：`live-status` / `fleet-status` / milestone / issue / progress / recovery
+  - 典型输入：`live-status` / `fleet-status` / interruption / milestone / issue / progress / recovery / pre-brainstorm
 
 - `event-driven`
   - 来源：human interruption / worker result / runtime anomaly / review/test signal
@@ -88,6 +93,8 @@
 补充：
 - 主管先输出状态解释与 ownership 判断，再委派对应 owner。
 - delegated owner 返回结果后，主管继续决定下一跳 restart point，直到当前问题被正确吸收或完成收口。
+- 对 `progress`，续接前优先读取，确认是否已有主动记录。
+- 对 `pre-brainstorm`，主管不只检查“有没有这个目录”，还要检查 candidate 与 milestone 同步是否完整。
 
 ## 硬规则
 

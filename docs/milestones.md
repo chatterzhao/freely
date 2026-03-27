@@ -299,16 +299,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
 - next_action: canonical `develop` on 2026-03-26 wrote fresh continuity `manager-continuity-20260326-003102.md` plus two launchable worker prompts, but `manager-worker-launch-state.env` still kept generated/consumed prompt truth empty. Keep this issue back in `in_verification` and repair the current continuity parser/consumption contract before any further closeout claim.
 
-23. `I-20260326-1835`
-- title: Manager owner stance and source-patrol completeness governance
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/candidates.md`
-- next_action: IBM 已完成，下一步进入 dev-loop，只改写 `docs/system/workspace/**` 中的 manager / worker / interruption / patrol 产品能力真源；若实现阶段发现必须改动 `PROJECT_INTENT / CONSTITUTION / LAWS`，则新开 lifecycle，不扩大当前 issue。
-
 ### completed_issues
 
 1. `I-20260322-1801`
@@ -327,6 +317,26 @@ routing_policy:
   - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
   - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
 - completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
+
+2. `I-20260326-1835`
+- title: Manager owner stance and source-patrol completeness governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/candidates.md`
+- evidence:
+  - `docs/system/workspace/agents/manager-agent.md`
+  - `docs/system/workspace/agents/worker-agent.md`
+  - `docs/system/workspace/skills/human-interruption-manager-triage/SKILL.md`
+  - `docs/system/workspace/skills/signal-intent-understanding/SKILL.md`
+  - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
+  - `docs/system/workspace/skills/context-source-skill/references/continuation-recovery-routing.md`
+  - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
+  - `docs/progress/workspace-routing-foundation/p-manager-owner-stance-and-source-patrol-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/code-reviews/20260326-manager-owner-stance-and-source-patrol-governance-verification.md`
+- completion_note: 已把开发治理输入与运行期能力真源的边界写清，并把 manager owner stance、advisory interruption semantics、以及 interruption / milestone / progress / pre-brainstorm 的 standing-source completeness 直接收敛进产品能力真源；后续若要继续把这套 contract 扩成更强的 runtime 事务面，应通过新 lifecycle 承接。
 
 ### candidate_issues
 

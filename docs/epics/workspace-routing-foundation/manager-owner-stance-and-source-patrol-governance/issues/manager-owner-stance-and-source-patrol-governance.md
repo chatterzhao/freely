@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260326-1835`
 - title: Manager owner stance and source-patrol completeness governance
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-owner-stance-and-source-patrol-governance`
@@ -73,6 +73,15 @@ Freely 在自举开发中已经形成了两层真源：
 - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/prd.md`
 - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/tasks.md`
+- `docs/system/workspace/agents/manager-agent.md`
+- `docs/system/workspace/agents/worker-agent.md`
+- `docs/system/workspace/skills/human-interruption-manager-triage/SKILL.md`
+- `docs/system/workspace/skills/signal-intent-understanding/SKILL.md`
+- `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
+- `docs/system/workspace/skills/context-source-skill/references/continuation-recovery-routing.md`
+- `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
+- `docs/progress/workspace-routing-foundation/p-manager-owner-stance-and-source-patrol-governance.md`
+- `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/code-reviews/20260326-manager-owner-stance-and-source-patrol-governance-verification.md`
 
 ## Verification
 
@@ -83,5 +92,5 @@ Freely 在自举开发中已经形成了两层真源：
 
 ## Next
 
-- 当前 IBM 已完成，下一步进入 dev-loop，改写 `docs/system/workspace/**` 中的 agent / skill / patrol truth sources。
-- 若实现阶段发现还需要修改开发治理输入，应新开 lifecycle 承接，不扩大当前 issue scope。
+- 当前 lifecycle 已完成 truth-source 改写与 verification。
+- 若后续还要把 source completeness 进一步脚本化、状态面 machine-readable 化，或让 runtime / manager 自动消费更强的 patrol transaction，应通过新的 lifecycle 承接，不扩大当前 issue scope。
