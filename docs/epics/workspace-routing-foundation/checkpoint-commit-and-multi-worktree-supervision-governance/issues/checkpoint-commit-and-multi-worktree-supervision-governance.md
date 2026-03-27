@@ -54,7 +54,7 @@ Freely 当前已经会 worktree 隔离、session handoff、rate-limit account sw
   - `checkpoint-guard` 是否对当前 worktree 和 staged scope 正确给出 checkpoint 结论
   - `wt-fleet-status` 与 `freely fleet-status` 是否能按工位展示 dirty / checkpoint / runtime 摘要
   - `freely baseline-status` / 首跳 prompt 是否已暴露 project dirty budget 与 project-level worktree summary
-  - `develop/main/pre-test-merge` 上的主管首跳是否只做监督与委派，不直接执行第二跳实现
+  - `develop/main/test-pre-merge-*` 上的主管首跳是否只做监督与委派，不直接执行第二跳实现
 - 已执行 `TEST`：
   - `bash docs/system/workspace/scripts/tests/test-checkpoint-guard`
   - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status`

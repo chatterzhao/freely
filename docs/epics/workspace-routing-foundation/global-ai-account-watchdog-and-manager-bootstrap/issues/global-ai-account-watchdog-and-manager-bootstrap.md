@@ -117,7 +117,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `codex_saved_accounts()` / `whoami` / `list` 读路径现在也会等待正在进行中的 switch sweep
     - `codex_probe_current_slot_now()` 现在会持有同一把 shared switch lock 覆盖整个 `codex exec` probe，避免 wait-return 后被新的手工 sweep 插入
     - `test-freely-codex-probe-defers-during-account-switch` 覆盖 watchdog probe 自身的 defer + serialization
-  - 2026-03-23 当前 verification batch 在 dedicated feature worktree 中直接完成，无需引入 `pre-test-merge` 或提前要求 `post-merge acceptance`：
+  - 2026-03-23 当前 verification batch 在 dedicated feature worktree 中直接完成，无需引入 `test-pre-merge-*` 测试批次或提前要求 `post-merge acceptance`：
     - `freely ensure-manager --project <tmp-project>` 直接命令验证通过，确认 watchdog 会先切到可用账号，再发起 manager bootstrap
     - `freely start --project <tmp-project>` 最小 rate-limit 场景可直接写出 `LAST_SLOT_SWITCH_REASON="primary_rate_limit_exhausted"`，证明 runtime 仍把恢复理由写回 watchdog 接管面
   - `test-freely-rate-limit-defers-to-watchdog` 曾出现一次 3 秒边界失败，但随后单独复现与连续重跑均通过；当前判断为时间阈值边界上的 flaky，而非稳定功能回归

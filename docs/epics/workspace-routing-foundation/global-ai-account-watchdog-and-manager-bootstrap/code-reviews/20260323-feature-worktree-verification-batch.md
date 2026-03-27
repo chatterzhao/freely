@@ -35,7 +35,7 @@
 
 ## Notes
 
-- 本批次是单个 dedicated feature worktree 上的 verification，不需要为了测试引入 `pre-test-merge`。
+- 本批次是单个 dedicated feature worktree 上的 verification，不需要为了测试引入 `test-pre-merge-*` 测试批次。
 - 当前 gate 是 feature worktree 内的 verification 与 writeback；`post-merge acceptance` 只在真正并入 `develop` 后才成立。
 - `test-freely-rate-limit-defers-to-watchdog` 曾两次命中整秒边界误报；当前已把计时口径改成 monotonic 毫秒阈值，避免把正常快速退出误判成“本地睡眠”。
 - 当前补丁后，`test-freely-rate-limit-defers-to-watchdog` 连跑 5 次均通过；`test-freely-ensure-manager*` 也已把 manager bootstrap handoff 契约纳入断言。
