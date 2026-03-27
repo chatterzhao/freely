@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-pretests-gate.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality" "$REPO/docs/epics/sample/story/issues" "$REPO/docs/epics/sample/story"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+cp "$ROOT_DIR/bin/pretests-gate" "$REPO/bin/pretests-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/pretests-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
+chmod +x "$REPO/bin/pretests-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
+
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-sample`
+- phase_state: `in_dev`
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout1" 2>"$TMP_DIR/stderr1"; then
+  echo "[FAIL] pretests-gate should reject an issue without binding" >&2
+  exit 1
+fi
+grep -q 'missing pre_tests_path' "$TMP_DIR/stderr1"
+
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-sample`
+- phase_state: `completed`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pending`
+- artifact_ref: `pending://sample`
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout2" 2>"$TMP_DIR/stderr2"; then
+  echo "[FAIL] pretests-gate should reject pending acceptance items" >&2
+  exit 1
+fi
+grep -q 'must be pass or not_applicable' "$TMP_DIR/stderr2"
+grep -q 'pending artifact_ref' "$TMP_DIR/stderr2"
+
+mkdir -p "$REPO/docs/epics/sample/story/code-reviews"
+cat > "$REPO/docs/epics/sample/story/code-reviews/pt-1.md" <<'EOF'
+# Verification artifact
+EOF
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+EOF
+
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md
+
+echo "[PASS] pretests-gate enforces issue binding and acceptance evidence"

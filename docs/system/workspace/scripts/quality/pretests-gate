@@ -1,0 +1,247 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT="$(pwd -P)"
+ISSUE_PATH=""
+STAGED_ONLY=0
+
+usage() {
+  cat <<'EOF'
+Usage:
+  pretests-gate [--project <abs_path>] [--issue <issue_path>] [--staged-only]
+
+Purpose:
+  - enforce issue-bound pre-tests acceptance items before an issue is marked completed
+  - reuse the same verdict for standalone checks and git hook gating
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) PROJECT="$2"; shift 2 ;;
+    --issue) ISSUE_PATH="$2"; shift 2 ;;
+    --staged-only) STAGED_ONLY=1; shift ;;
+    -h|--help) usage; exit 0 ;;
+    *)
+      echo "unknown arg: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+[[ -d "$PROJECT" ]] || { echo "project not found: $PROJECT" >&2; exit 1; }
+git -C "$PROJECT" rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
+  echo "not a git worktree: $PROJECT" >&2
+  exit 1
+}
+
+if [[ -n "$ISSUE_PATH" && "$STAGED_ONLY" -eq 1 ]]; then
+  echo "cannot combine --issue with --staged-only" >&2
+  exit 1
+fi
+
+python3 - "$PROJECT" "$ISSUE_PATH" "$STAGED_ONLY" <<'PY'
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+project = Path(sys.argv[1]).resolve()
+issue_arg = sys.argv[2]
+staged_only = sys.argv[3] == "1"
+
+ISSUE_RE = re.compile(r"^docs/epics/.+/issues/[^/]+\.md$")
+
+
+def git_output(*args: str, check: bool = True) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(project), *args],
+        text=True,
+        capture_output=True,
+    )
+    if check and result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or result.stdout.strip() or f"git {' '.join(args)} failed")
+    return result.stdout
+
+
+def get_head_text(path: str) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(project), "show", f"HEAD:{path}"],
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        return ""
+    return result.stdout
+
+
+def get_staged_text(path: str) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(project), "show", f":{path}"],
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        return ""
+    return result.stdout
+
+
+def get_worktree_text(path: str) -> str:
+    target = project / path
+    if not target.exists():
+        return ""
+    return target.read_text()
+
+
+def phase_state(text: str) -> str:
+    match = re.search(r"^- phase_state:\s*`?([^`\n]+)`?\s*$", text, re.MULTILINE)
+    return match.group(1).strip() if match else ""
+
+
+def parse_issue_binding(issue_path: str, text: str) -> tuple[str, str]:
+    def extract(field: str) -> str:
+        match = re.search(rf"^- {re.escape(field)}:\s*`?([^`\n]+)`?\s*$", text, re.MULTILINE)
+        return match.group(1).strip() if match else ""
+
+    pre_tests_path = extract("pre_tests_path")
+    verification_dir = extract("verification_artifact_dir")
+    errors: list[str] = []
+    if not pre_tests_path:
+        errors.append(f"{issue_path}: missing pre_tests_path")
+    elif not Path(pre_tests_path).is_relative_to(Path("docs")) and not pre_tests_path.startswith(".freely/"):
+        errors.append(f"{issue_path}: pre_tests_path must point inside repo, got {pre_tests_path}")
+    if not verification_dir:
+        errors.append(f"{issue_path}: missing verification_artifact_dir")
+    if errors:
+        raise ValueError("\n".join(errors))
+    return pre_tests_path, verification_dir
+
+
+def extract_acceptance_sections(text: str) -> list[str]:
+    marker = "## Acceptance Items"
+    if marker not in text:
+        return []
+    acceptance_text = text.split(marker, 1)[1]
+    parts = re.split(r"^###\s+", acceptance_text, flags=re.MULTILINE)
+    sections = []
+    for part in parts[1:]:
+        sections.append("### " + part.strip())
+    return sections
+
+
+def parse_fields(section: str) -> dict[str, str]:
+    fields: dict[str, str] = {}
+    for key in ("id", "requirement", "evidence_level", "status", "artifact_ref"):
+        match = re.search(rf"^- {key}:\s*`?([^`\n]+)`?\s*$", section, re.MULTILINE)
+        if match:
+            fields[key] = match.group(1).strip()
+    return fields
+
+
+def artifact_exists(path: str) -> bool:
+    if not path:
+        return False
+    if path.startswith("pending://"):
+        return False
+    fs_path = project / path
+    if fs_path.exists():
+        return True
+    result = subprocess.run(
+        ["git", "-C", str(project), "cat-file", "-e", f":{path}"],
+        text=True,
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
+def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
+    errors: list[str] = []
+    try:
+        pre_tests_path, _verification_dir = parse_issue_binding(issue_path, issue_text)
+    except ValueError as exc:
+        return str(exc).splitlines()
+
+    pretests_text = get_staged_text(pre_tests_path) if source == "staged" else get_worktree_text(pre_tests_path)
+    if not pretests_text:
+        return [f"{issue_path}: bound pre-tests file missing or unreadable: {pre_tests_path}"]
+
+    sections = extract_acceptance_sections(pretests_text)
+    if not sections:
+        return [f"{pre_tests_path}: missing Acceptance Items"]
+
+    valid_statuses = {"pass", "not_applicable"}
+    valid_levels = {"mock", "integration", "real_env", "post_merge_dogfood"}
+
+    for section in sections:
+        fields = parse_fields(section)
+        title_line = section.splitlines()[0] if section.splitlines() else "### <unknown>"
+        for key in ("id", "requirement", "evidence_level", "status", "artifact_ref"):
+            if not fields.get(key):
+                errors.append(f"{pre_tests_path}: {title_line} missing {key}")
+        if not fields:
+            continue
+        evidence_level = fields.get("evidence_level", "")
+        if evidence_level and evidence_level not in valid_levels:
+            errors.append(f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported evidence_level {evidence_level}")
+        status = fields.get("status", "")
+        if status and status not in valid_statuses:
+            errors.append(
+                f"{pre_tests_path}: {fields.get('id', title_line)} must be pass or not_applicable before completion, got {status}"
+            )
+        artifact_ref = fields.get("artifact_ref", "")
+        if artifact_ref.startswith("pending://"):
+            errors.append(f"{pre_tests_path}: {fields.get('id', title_line)} still points to pending artifact_ref {artifact_ref}")
+        elif artifact_ref and not artifact_exists(artifact_ref):
+            errors.append(f"{pre_tests_path}: {fields.get('id', title_line)} references missing artifact {artifact_ref}")
+    return errors
+
+
+def staged_completed_issues() -> list[str]:
+    paths = []
+    output = git_output("diff", "--cached", "--name-only", "--diff-filter=ACMR")
+    for raw in output.splitlines():
+        path = raw.strip()
+        if not ISSUE_RE.match(path):
+            continue
+        staged_text = get_staged_text(path)
+        if not staged_text:
+            continue
+        staged_phase = phase_state(staged_text)
+        if staged_phase != "completed":
+            continue
+        head_phase = phase_state(get_head_text(path))
+        if head_phase == "completed":
+            continue
+        paths.append(path)
+    return paths
+
+
+if issue_arg:
+    targets = [issue_arg]
+    source = "worktree"
+elif staged_only:
+    targets = staged_completed_issues()
+    source = "staged"
+else:
+    print("must provide --issue or --staged-only", file=sys.stderr)
+    sys.exit(1)
+
+if not targets:
+    sys.exit(0)
+
+failures: list[str] = []
+for issue_path in targets:
+    issue_text = get_staged_text(issue_path) if source == "staged" else get_worktree_text(issue_path)
+    if not issue_text:
+        failures.append(f"{issue_path}: issue file missing or unreadable")
+        continue
+    failures.extend(validate_issue(issue_path, issue_text, source))
+
+if failures:
+    print("[pretests-gate] blocked completion due to pre-tests evidence failures:", file=sys.stderr)
+    for failure in failures:
+        print(f"- {failure}", file=sys.stderr)
+    sys.exit(1)
+PY

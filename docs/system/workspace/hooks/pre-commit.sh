@@ -68,6 +68,23 @@ MSG
       exit "$checkpoint_rc"
     fi
   fi
+  if [[ -x "./bin/pretests-gate" ]]; then
+    set +e
+    pretests_output="$(./bin/pretests-gate --staged-only 2>&1)"
+    pretests_rc=$?
+    set -e
+    if [[ "$pretests_rc" -ne 0 ]]; then
+      cat <<MSG
+[HOOK] Commit blocked: staged issue completion does not satisfy bound pre-tests evidence.
+
+$pretests_output
+
+Keep the issue in a non-completed phase until its bound pre-tests acceptance items are passed and artifact-backed.
+Policy source: docs/LAWS.md §2D
+MSG
+      exit "$pretests_rc"
+    fi
+  fi
   exit 0
 fi
 

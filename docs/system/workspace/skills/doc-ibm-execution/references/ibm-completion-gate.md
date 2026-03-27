@@ -17,6 +17,8 @@
 - `pre-tests.md` 默认以 executable integration / acceptance 为主，而不是只列代码检查点或 wording review 清单
 - `pre-tests.md` 至少明确 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
 - `pre-tests.md` 能恢复关键 acceptance 面的 `environment`、`evidence`、`failure signal`、`failure handling / replay expectation`
+- issue 已显式声明 `pre_tests_path` 与 `verification_artifact_dir`
+- `pre-tests.md` 已包含 completion gate 可消费的 machine-readable acceptance items：`id` / `requirement` / `evidence_level` / `status` / `artifact_ref`
 - `tasks.md` 来自 `prd.md` 的 decomposition / execution slices
 
 并保持：

@@ -27,6 +27,11 @@
 - `docs/epics/{epic-name}/{story-name}/pre-tests.md`
 - `docs/epics/{epic-name}/{story-name}/tasks.md`
 
+Issue front matter 还应显式绑定：
+
+- `pre_tests_path`
+- `verification_artifact_dir`
+
 写完后仍需按 [prd-quality-bar.md](prd-quality-bar.md) 检查 `prd.md` 是否达到 AI-ready 最小结构；未达标时不得宣称 `done_ibm`。
 
 ## Required write-back
@@ -57,6 +62,12 @@
   - target environment
   - required evidence
   - blocker taxonomy
+- 在 `pre-tests.md` 中为 completion gate 写出 machine-readable acceptance items：
+  - `id`
+  - `requirement`
+  - `evidence_level`
+  - `status`
+  - `artifact_ref`
 - 最小 blocker taxonomy 至少区分：
   - `definition_missing`
   - `commands_only`
