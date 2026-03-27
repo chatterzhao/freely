@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260327-0651--pretests-gate-and-network-proxy-config
 - 20260326-1705--manager-owner-stance-and-source-patrol
 - 20260327-1115--oauth-api-usage-query-refactor
 - 20260326-1825--deep-refactor-fleet-sequencing
@@ -61,6 +62,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260327-0651--pretests-gate-and-network-proxy-config
+  - brainstorms: docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/candidates.md
 - 20260327-1115--oauth-api-usage-query-refactor
   - brainstorms: docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md
   - candidates: docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md
