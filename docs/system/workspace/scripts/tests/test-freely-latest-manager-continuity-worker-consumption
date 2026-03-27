@@ -56,6 +56,8 @@ AI_MODE="auto"
 EOF
 
 NEW_PROMPT="$PROJECT/.freely/run/worker-prompts/20260322-0445-worker-runtime-linkage-verify-codex.txt"
+QUEUED_PROMPT="$PROJECT/.freely/run/worker-prompts/20260322-0445-worker-runtime-linkage-queued-codex.txt"
+FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260322-0445-worker-runtime-linkage-frozen-codex.txt"
 cat >"$NEW_PROMPT" <<EOF
 你现在运行在 Freely 的 worker 工位，不是主管工位。
 
@@ -65,13 +67,36 @@ cat >"$NEW_PROMPT" <<EOF
 
 验证最新 continuity 消费。
 EOF
+cat >"$QUEUED_PROMPT" <<EOF
+你现在运行在 Freely 的 worker 工位，不是主管工位。
+
+你的 worktree：
+- \`$PROJECT\`
+- branch: \`develop\`
+
+验证排队 prompt 可见性。
+EOF
+cat >"$FROZEN_PROMPT" <<EOF
+你现在运行在 Freely 的 worker 工位，不是主管工位。
+
+你的 worktree：
+- \`$PROJECT\`
+- branch: \`develop\`
+
+验证冻结 prompt 不进入 launchable set。
+EOF
 
 NEW_CONT="$PROJECT/.freely/run/manager-continuity-20260322-0445.md"
 cat >"$NEW_CONT" <<EOF
 # Manager Continuity
 
-- runtime worker prompt:
+## Worker Prompts
+- launched:
   - $NEW_PROMPT
+- queue:
+  - $QUEUED_PROMPT
+- frozen_queue:
+  - $FROZEN_PROMPT
 EOF
 
 cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
@@ -88,9 +113,10 @@ source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 load_config "$PROJECT"
 
 RECOVER_LOG="$TMP_DIR/recover.log"
+RESTART_LOG="$TMP_DIR/restart.log"
 manager_runtime_recover_workers_if_needed() {
   echo "$1" >>"$RECOVER_LOG"
-  write_manager_worker_launch_state "$1" "$NEW_CONT" "$NEW_PROMPT" "$NEW_CONT" "$NEW_PROMPT"
+  write_manager_worker_launch_state "$1" "$NEW_CONT" "$NEW_PROMPT,$QUEUED_PROMPT" "$NEW_CONT" "$NEW_PROMPT,$QUEUED_PROMPT"
 }
 valid_supervisor_pid_for_project() {
   [[ "$2" == "12345" ]]
@@ -113,9 +139,15 @@ codex_current_account() {
 ensure_codex_slot_ready_for_manager() {
   return 0
 }
+restart_manager_supervisor_preserving_handoff() {
+  local project="$1"
+  echo "$project" >>"$RESTART_LOG"
+  printf '12345\n' >"$project/.freely/run/supervisor.pid"
+  manager_runtime_recover_workers_if_needed "$project"
+}
 launch_manager_supervisor() {
-  echo "[FAIL] should not relaunch manager supervisor" >&2
-  exit 1
+  local project="$1"
+  printf '12345\n' >"$project/.freely/run/supervisor.pid"
 }
 
 mkdir -p "$PROJECT/.freely/run"
@@ -124,13 +156,20 @@ printf '12345\n' >"$PROJECT/.freely/run/supervisor.pid"
 ensure_manager_once "$PROJECT" >/dev/null
 
 grep -q "^$PROJECT$" "$RECOVER_LOG"
+grep -q "^$PROJECT$" "$RESTART_LOG"
 BASELINE="$(cmd_baseline_status --project "$PROJECT")"
 LIVE="$(cmd_live_status --project "$PROJECT")"
 printf '%s\n' "$BASELINE" | grep -q "latest_manager_continuity_generated: $NEW_CONT"
 printf '%s\n' "$BASELINE" | grep -q "latest_manager_continuity_consumed: $NEW_CONT"
-printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_generated: $NEW_PROMPT"
-printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_consumed: $NEW_PROMPT"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_generated: .*20260322-0445-worker-runtime-linkage-verify-codex.txt"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_generated: .*20260322-0445-worker-runtime-linkage-queued-codex.txt"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_consumed: .*20260322-0445-worker-runtime-linkage-verify-codex.txt"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_consumed: .*20260322-0445-worker-runtime-linkage-queued-codex.txt"
 printf '%s\n' "$LIVE" | grep -q "latest_manager_continuity_generated: $NEW_CONT"
 printf '%s\n' "$LIVE" | grep -q "latest_manager_continuity_consumed: $NEW_CONT"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_generated: .*20260322-0445-worker-runtime-linkage-verify-codex.txt"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_generated: .*20260322-0445-worker-runtime-linkage-queued-codex.txt"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_consumed: .*20260322-0445-worker-runtime-linkage-verify-codex.txt"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_consumed: .*20260322-0445-worker-runtime-linkage-queued-codex.txt"
 
-echo "[PASS] ensure-manager consumes latest manager continuity while supervisor is already running"
+echo "[PASS] ensure-manager consumes current-format worker prompts across the watchdog recovery gate"

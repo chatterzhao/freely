@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-codex-probe-deactivated-workspace.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+  "$HOME_DIR/.codex" \
+  "$MOCK_BIN"
+
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+cat >"$PROJECT/bin-ai-mock" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cmd=""
+for arg in "$@"; do
+  case "$arg" in
+    whoami)
+      cmd="whoami"
+      break
+      ;;
+  esac
+done
+case "$cmd" in
+  whoami)
+    echo '{"tool":"codex","slot":"dead-slot-1","auth_email":"dead@example.com"}'
+    ;;
+  *)
+    echo '{}'
+    ;;
+esac
+EOF
+chmod +x "$PROJECT/bin-ai-mock"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+echo 'ERROR: unexpected status 402 Payment Required: {"detail":{"code":"deactivated_workspace"}}'
+sleep 3
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+RESULT="$(
+  HOME="$HOME_DIR" \
+  PATH="$MOCK_BIN:$PATH" \
+  CODEX_PROBE_TIMEOUT=5 \
+  PROJECT_ROOT="$PROJECT" \
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+    ai_cli_bin_for_project() { printf "%s\n" "'"$PROJECT"'/bin-ai-mock"; }
+    log_warn() { printf "%s\n" "$*" >&2; }
+    log_error() { printf "%s\n" "$*" >&2; }
+    codex_probe_current_slot_now "'"$PROJECT"'"
+  ' 2>"$TMP_DIR/stderr.log"
+)"
+
+[[ "$RESULT" == "deactivated_workspace" ]]
+ARTIFACT="$(find "$PROJECT/.freely/run/codex-probe-artifacts" -maxdepth 1 -type f -name 'codex-probe-*-dead-slot-1-deactivated-workspace.log' | head -n 1)"
+[[ -n "$ARTIFACT" ]]
+grep -q 'status=deactivated-workspace' "$ARTIFACT"
+grep -q 'slot=dead-slot-1' "$ARTIFACT"
+grep -q 'deactivated_workspace' "$ARTIFACT"
+grep -q 'details captured at ' "$TMP_DIR/stderr.log"
+
+echo "[PASS] codex probe returns deactivated_workspace as soon as 402 evidence appears"

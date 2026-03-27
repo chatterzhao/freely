@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-dispatcher-ready.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/repo"
+mkdir -p "$PROJECT/.freely" "$PROJECT/docs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+mkdir -p "$PROJECT/docs/pre-brainstorms"
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+FAKE_BIN="$TMP_DIR/fake-freely"
+cat >"$FAKE_BIN" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+RUNTIME_BIN="$ROOT_DIR/bin/freely"
+cmd="\${1:-}"
+shift || true
+case "\$cmd" in
+  ensure-interruption-dispatch)
+    exit 0
+    ;;
+  ensure-manager)
+    exec bash "\$RUNTIME_BIN" ensure-manager "\$@"
+    ;;
+  *)
+    exec bash "\$RUNTIME_BIN" "\$cmd" "\$@"
+    ;;
+esac
+EOF
+chmod +x "$FAKE_BIN"
+
+if FREELY_INTERRUPTION_DISPATCH_LAUNCH_BIN="$FAKE_BIN" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >"$TMP_DIR/start.log" 2>&1; then
+  echo "[FAIL] freely start unexpectedly succeeded without a live interruption dispatcher" >&2
+  cat "$TMP_DIR/start.log" >&2
+  exit 1
+fi
+
+grep -q 'freely interruption dispatcher did not become ready' "$TMP_DIR/start.log"
+! test -f "$PROJECT/.freely/run/interruption-dispatch.pid"
+
+echo "[PASS] freely start fails fast when interruption dispatcher does not become ready"

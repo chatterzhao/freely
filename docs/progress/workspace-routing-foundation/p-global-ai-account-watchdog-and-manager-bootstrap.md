@@ -146,7 +146,7 @@
   - intake absorption closure lane 当前 `develop...HEAD = 3/0`、supervisor/AI 都 down、worktree clean；canonical docs 仍缺准确 owner/phase，因此本轮 fleet closure 只能把它视为 `supervision-needed`
   - 当前 replay owner 分支相对最新 `develop` 的分叉真相已前移到 `ahead 162 / behind 12`，因此即便 manager 认可当前 worktree 的 review-ready 状态，也还不能直接写成 “ready to merge and cleanup”；必须先吸收最新 `develop`，再做 canonical replay / completion verification
   - 两棵 develop-absorbed 20260326 watchdog companion trees 的 disposition 也已拆开：`feature/watchdog-auth-failure-control-plane-recovery-20260326` 当前仍缺 canonical branch owner/phase，因此是 `ownership-followthrough-needed`；`feature/watchdog-live-status-and-dispatcher-ready-20260326` 已有 completed canonical issue、但缺 branch/worktree cleanup 留痕，因此是 `cleanup-followthrough-needed`
-  - `feature/watchdog-probe-early-deactivated-workspace-detect-20260326` 也已出现在 authoritative fleet 中，当前 `develop...HEAD = 1/1`；canonical owner/phase 仍缺，因此同样保持 `supervision-needed`
+  - `feature/watchdog-probe-early-deactivated-workspace-detect-20260326` 的 `deactivated_workspace` early-detect capability、focused regression 与 verification evidence 现已被当前 owner 吸收；后续只剩 cleanup followthrough，不再维持独立 owner/phase
   - `feature/watchdog-slot-switch-global-launch-gate-20260326` 与 `feature/watchdog-switch-stability-and-probe-freeze-20260326` 当前虽 clean，但 canonical owner/phase 仍缺，且当前分别 `develop...HEAD = 5/0` 与 `6/1`，只能继续保持 `supervision-needed`
   - 这让本 issue 当前固定结论变成：`review-ready but not promote-closed; cleanup not yet admissible`
   - `./bin/freely live-status --project ...` 已确认 delegated continuation wave 被当前工位吸收，`pending_delegated_continuation_ids=none`，所以这一轮继续是 manager-owned completion verification / fleet closure writeback，而不是新 worker lane

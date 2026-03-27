@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-continuity-current-parsing.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run/worker-prompts"
+
+LAUNCHED_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000001-worker-launched-codex.txt"
+QUEUED_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000002-worker-queued-codex.txt"
+FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000003-worker-frozen-codex.txt"
+CREATED_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000004-worker-created-codex.txt"
+DELEGATED_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000005-worker-delegated-codex.txt"
+
+touch "$LAUNCHED_PROMPT" "$QUEUED_PROMPT" "$FROZEN_PROMPT" "$CREATED_PROMPT" "$DELEGATED_PROMPT"
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260326-000000.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+
+- delegated worker prompt:
+  - $DELEGATED_PROMPT
+
+## Worker Prompts
+- launched:
+  - $LAUNCHED_PROMPT
+
+## Queue / Frozen / Cleanup
+- queue:
+  - worker_prompt_path: \`$QUEUED_PROMPT\`
+- frozen queue:
+  - worker_prompt_path: \`$FROZEN_PROMPT\`
+
+## Frozen Queue
+- worker_prompt: \`$FROZEN_PROMPT\`
+
+## Worker Prompt Materialization
+- worker_prompt_paths_created_this_round:
+  - $CREATED_PROMPT
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+LAUNCHABLE="$(latest_manager_worker_prompt_paths_from_continuity "$CONTINUITY" | paste -sd, -)"
+FROZEN="$(latest_frozen_manager_worker_prompt_paths_from_continuity "$CONTINUITY" | paste -sd, -)"
+
+[[ "$LAUNCHABLE" == "$CREATED_PROMPT,$DELEGATED_PROMPT,$LAUNCHED_PROMPT,$QUEUED_PROMPT" ]]
+[[ "$FROZEN" == "$FROZEN_PROMPT" ]]
+
+echo "[PASS] continuity parser recognizes legacy and current worker prompt contracts"

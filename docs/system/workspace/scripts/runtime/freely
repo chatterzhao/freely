@@ -439,15 +439,20 @@ trimmed_file_excerpt() {
 }
 
 live_status_activity_state_for_project() {
-  local project="$1" supervisor_pid ai_pid dispatcher_pid intake_active
+  local project="$1" supervisor_pid ai_pid dispatcher_pid watchdog_pid intake_active
   supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
   ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
   dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
   intake_active="$(count_active_intake_items "$project")"
   if [[ -n "$ai_pid" ]]; then
     printf 'ai_active\n'
+  elif [[ -n "$watchdog_pid" && -n "$dispatcher_pid" && "${intake_active:-0}" -gt 0 ]]; then
+    printf 'supervising_with_pending_intake\n'
   elif [[ -n "$supervisor_pid" && -n "$dispatcher_pid" && "${intake_active:-0}" -gt 0 ]]; then
     printf 'supervising_with_pending_intake\n'
+  elif [[ -n "$watchdog_pid" ]]; then
+    printf 'supervising\n'
   elif [[ -n "$supervisor_pid" ]]; then
     printf 'supervising\n'
   elif [[ -n "$dispatcher_pid" ]]; then
@@ -520,6 +525,18 @@ interruption_dispatcher_pid_for_project() {
   if [[ -f "$pid_file" ]]; then
     pid="$(cat "$pid_file" 2>/dev/null || true)"
     if valid_interruption_dispatcher_pid_for_project "$project" "$pid"; then
+      printf '%s\n' "$pid"
+      return 0
+    fi
+  fi
+}
+
+manager_watchdog_pid_for_project() {
+  local project="$1" pid_file pid
+  pid_file="$(ensure_manager_watchdog_pid_file "$project")"
+  if [[ -f "$pid_file" ]]; then
+    pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$pid"; then
       printf '%s\n' "$pid"
       return 0
     fi
@@ -2127,15 +2144,43 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
       gsub(/[`[:space:]]+$/, "", section)
       capture_runtime_worker_prompt=0
       capture_worker_prompt_path_list=0
+      worker_prompts_subsection=""
       next
     }
     /^# / {
       section=""
       capture_runtime_worker_prompt=0
       capture_worker_prompt_path_list=0
+      worker_prompts_subsection=""
       next
     }
     {
+      if (section == "worker prompts") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*launched:[[:space:]]*$/) {
+          worker_prompts_subsection="launched"
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*queue:[[:space:]]*$/) {
+          worker_prompts_subsection="queue"
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*frozen_queue:[[:space:]]*$/) {
+          worker_prompts_subsection="frozen"
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+          if (worker_prompts_subsection == "frozen") {
+            if (mode != "launchable") {
+              emit_prompt_paths($0)
+            }
+          } else if (worker_prompts_subsection == "launched" || worker_prompts_subsection == "queue") {
+            if (mode != "frozen") {
+              emit_prompt_paths($0)
+            }
+          }
+          next
+        }
+      }
       if (section == "queue") {
         if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "frozen") {
           emit_prompt_paths($0)
@@ -2770,6 +2815,33 @@ manager_ai_stalled_after_delegated_continuation_prompt() {
       return 1
     fi
   fi
+}
+
+resolve_manager_delegated_continuations_as_absorbed() {
+  local project="$1" intake_ids_csv="$2" continuity_file="$3"
+  local intake_id resolution_file
+  [[ -n "$project" && -n "$intake_ids_csv" && -n "$continuity_file" ]] || return 0
+  resolution_file="$(mktemp /tmp/freely-manager-delegated-absorption.XXXXXX)"
+  cat >"$resolution_file" <<EOF
+restart_point: \`continuation\`
+ownership: \`manager\`
+handoff_summary: 本轮 delegated continuation 已被主管吸收到新 continuity 中。
+EOF
+  IFS=',' read -r -a __manager_delegated_ids <<<"$intake_ids_csv"
+  for intake_id in "${__manager_delegated_ids[@]}"; do
+    [[ -n "$intake_id" ]] || continue
+    cmd_intake_resolve \
+      --project "$project" \
+      --intake-id "$intake_id" \
+      --resolved-by interruption-manager-agent \
+      --reaction followup \
+      --classification continuation \
+      --resolution-file "$resolution_file" \
+      --absorption-target "continuity://manager-supervision" \
+      --status absorbed \
+      --linked-artifact "$continuity_file" >/dev/null
+  done
+  rm -f "$resolution_file"
 }
 
 manager_ai_runtime_recovery_reason() {
@@ -4424,6 +4496,11 @@ cmd_start() {
   trap cleanup_supervisor EXIT
   trap request_stop INT TERM
   launch_interruption_dispatcher "$project"
+  ensure_interruption_dispatcher_ready_or_fail "$project" || {
+    log_error "freely interruption dispatcher did not become ready for project: $project"
+    log_error "try: ./bin/freely ensure-interruption-dispatch --project \"$project\" --watch"
+    exit 1
+  }
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
     launch_manager_watchdog "$project"
     ensure_manager_watchdog_ready_or_fail "$project" || {
@@ -5153,8 +5230,8 @@ cmd_live_status() {
   load_session_state_or_defaults "$project"
 
   local run_dir branch role_hint activity_state
-  local supervisor_pid ai_pid dispatcher_pid
-  local supervisor_cmd ai_cmd dispatcher_cmd
+  local supervisor_pid ai_pid dispatcher_pid watchdog_pid
+  local supervisor_cmd ai_cmd dispatcher_cmd watchdog_cmd
   local prompt_file continuity_file prompt_excerpt continuity_excerpt
   local intake_snapshot latest_resolution_snapshot
   local delegated_pending_ids prompt_has_delegated
@@ -5167,9 +5244,11 @@ cmd_live_status() {
   supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
   ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
   dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
   supervisor_cmd="$(ps_command_for_pid "$supervisor_pid")"
   ai_cmd="$(ps_command_for_pid "$ai_pid")"
   dispatcher_cmd="$(ps_command_for_pid "$dispatcher_pid")"
+  watchdog_cmd="$(ps_command_for_pid "$watchdog_pid")"
   prompt_file="$(find_latest_prompt_file_for_project "$project")"
   continuity_file="$(find_latest_manager_continuity_file_for_project "$project")"
   prompt_excerpt="$(trimmed_file_excerpt "$prompt_file" tail 12)"
@@ -5282,10 +5361,13 @@ cmd_live_status() {
   echo "active_running_worker_count: ${active_running_worker_count}"
   echo "available_new_worker_slots: ${available_new_worker_slots}"
 
-  if [[ -n "$supervisor_pid" || -n "$dispatcher_pid" || -n "$ai_pid" ]]; then
+  if [[ -n "$supervisor_pid" || -n "$watchdog_pid" || -n "$dispatcher_pid" || -n "$ai_pid" ]]; then
     echo "active_processes:"
     if [[ -n "$supervisor_pid" ]]; then
       echo "- role=supervisor pid=$supervisor_pid command=${supervisor_cmd:-unavailable}"
+    fi
+    if [[ -n "$watchdog_pid" ]]; then
+      echo "- role=manager_watchdog pid=$watchdog_pid command=${watchdog_cmd:-unavailable}"
     fi
     if [[ -n "$dispatcher_pid" ]]; then
       echo "- role=interruption_dispatcher pid=$dispatcher_pid command=${dispatcher_cmd:-unavailable}"
