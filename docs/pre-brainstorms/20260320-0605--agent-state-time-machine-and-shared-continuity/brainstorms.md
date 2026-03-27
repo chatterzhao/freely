@@ -24,7 +24,7 @@
 
 ### 2. “从某时刻 fork 一套实验环境” 是真实需求
 - 文章把这一点描述成“基于某时间点瞬间克隆与分支”。
-- Freely 已经有 worktree / feature branch / pre-test-merge，但主要解决的是代码隔离。
+- Freely 已经有 worktree / feature branch / `test-pre-merge-*` 临时测试批次，但主要解决的是代码隔离。
 - 未来如果要让多个 worker 或多个设备共享更强的连续性，可能还需要“状态级 fork”，而不只是代码级 fork。
 
 ### 3. 多 Agent 共享的不应只是目录，而是 canonical coordination state
