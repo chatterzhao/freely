@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260327-1003--prebrainstorm-materialization-audit
 - 20260327-0651--pretests-gate-and-network-proxy-config
 - 20260326-1705--manager-owner-stance-and-source-patrol
 - 20260327-1115--oauth-api-usage-query-refactor
@@ -62,6 +63,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260327-1003--prebrainstorm-materialization-audit
+  - brainstorms: docs/pre-brainstorms/20260327-1003--prebrainstorm-materialization-audit/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260327-1003--prebrainstorm-materialization-audit/candidates.md
 - 20260327-0651--pretests-gate-and-network-proxy-config
   - brainstorms: docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/brainstorms.md
   - candidates: docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/candidates.md
@@ -375,6 +379,7 @@
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
 - 20260322-0049--manager-continuation-handoff-consumption
+- `20260327-1003--prebrainstorm-materialization-audit`: prebrainstorm-materialization-audit
 - `20260322-0135--integration-acceptance-first-ibm-and-verification`: integration-acceptance-first-ibm-and-verification
 - `20260326-1733--ibm-pretests-real-environment-acceptance-quality`: ibm-pretests-real-environment-acceptance-quality
 - `20260326-1810--freely-layered-architecture-and-tooling-topology`: freely-layered-architecture-and-tooling-topology
