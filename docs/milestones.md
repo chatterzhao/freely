@@ -49,21 +49,21 @@ routing_policy:
 
 ### committed_issues
 
+### completed_issues
+
 1. `I-20260327-0701`
 - title: Pre-tests evidence binding and completion gate governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/candidates.md`
 - evidence:
   - `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews/20260327-pretests-gate-feature-verification.md`
-- completion_note: 第一阶段 completed gate 已在 feature lane 中实现并验证；合入 `develop` 后，其他 active worktree 将在 issue 进入 `completed` 时被同一 gate 约束。
+- completion_note: 第一阶段 issue-bound completed gate 已在 `develop` 吸收；后续 active worktree 在 issue 进入 `completed` 时会被同一 gate 约束，retirement enforcement 留给 follow-on lifecycle。
 
-### completed_issues
-
-1. `I-20260327-1115`
+2. `I-20260327-1115`
 - title: OAuth slot inventory sweep and launch-time confirmation governance
 - milestone_state: completed
 - phase_state: `completed`

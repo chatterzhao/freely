@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260327-0701`
 - title: Pre-tests evidence binding and completion gate governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `pre-tests-evidence-binding-and-completion-gate-governance`
@@ -107,5 +107,5 @@ Freely 已经冻结了两层上游真源：
 
 ## Next
 
-- next_action: 将这一批合入 `develop`，然后让仍在推进中的 feature worktree 吸收新的 completed gate；若 cleanup / retirement 仍可能绕过该 gate，再以 follow-on issue 承接 retirement enforcement。
-- revisit_trigger: 当这条 gate 进入 `develop` 后，若任何 worktree 仍能在缺失 artifact-backed acceptance 时 closeout，则补 runtime cleanup / retirement gate。
+- next_action: `completed`
+- revisit_trigger: 当 merged worktree cleanup / retirement 仍可能绕过 issue-bound acceptance evidence 时，再以 follow-on issue 承接 retirement enforcement。
