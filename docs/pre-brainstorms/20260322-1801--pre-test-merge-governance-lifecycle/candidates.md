@@ -8,6 +8,7 @@
 
 ### C-20260322-1801-A
 - title: pre-test-merge responsibility, usage, and lifecycle governance
+- note: 历史候选名保留 `pre-test-merge`，当前 canonical 语义按 `test-pre-merge-*` 测试批次前缀族解释
 - problem: `pre-test-merge` 现在同时被用作临时预集成验证批次、真实验收环境的比较基线，以及旧实现回收的中间站，但职责边界、允许操作、失效条件和退休条件都没有被明确收束。
 - why_now: 这次分叉直接暴露出 `pre-test-merge` 的生命周期管理不足。如果不先收口，它会继续把“验证批次”和“事实主线”混在一起，造成有效实现难以判断该保留还是该回收。
 - acceptance_hint:
@@ -30,6 +31,7 @@
 ### C-20260322-1801-B
 - candidate_format_version: v2
 - title: pre-test-merge lifecycle management capability for Freely
+- note: 历史候选名保留 `pre-test-merge`，当前 canonical 语义按 `test-pre-merge-*` 测试批次前缀族解释
 - problem: 即使治理规则写清了，Freely 仍缺少把 stale `pre-test-merge` 收口成治理事务的能力：它需要 machine-readable stale state、manager lifecycle transaction、runtime gate，以及可追溯的 replay/retire evidence，而不是继续靠人工判断。
 - why_now: 这次问题已经证明“只靠人记住规则”不够。Freely 作为未来的开发工具，需要把这套判断 materialize 成可执行能力，才能避免下一次再次手工误用。
 - acceptance_criteria:
@@ -483,6 +485,7 @@
 ### C-20260322-1801-C
 - candidate_format_version: v2
 - title: worker self-loop exit and scheduler closeout governance
+- note: 本候选里凡是提到 stale `pre-test-merge` governance，均指向 `test-pre-merge-*` 测试批次族，不再指单例 branch
 - problem: Freely 缺少识别 worker verification-only / continuity-refresh 低价值自环并把 lane 回交 manager 的通用调度能力，导致 worker 槽位被长期占住，新的 lane 无法起跑。
 - why_now: 这次 dogfood 里真正堵塞新 lane 的不是默认并发数 2，而是两个 worker 都停在低价值循环中。如果不把它独立建模，未来即使 stale `pre-test-merge` 被治理，其他 lane 仍会复现同类占槽问题。
 - acceptance_criteria:

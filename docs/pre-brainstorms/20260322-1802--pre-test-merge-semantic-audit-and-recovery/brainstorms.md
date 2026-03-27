@@ -1,5 +1,11 @@
 # Pre-test-merge semantic audit and recovery
 
+## Compatibility Note
+
+- 历史 audit/path 保留 `pre-test-merge` 命名，避免破坏既有引用。
+- 当前 canonical 语义已经升级为 `test-pre-merge-*` 测试批次前缀族。
+- 下文出现的 `pre-test-merge` 都按 `test-pre-merge-*` 前缀族理解。
+
 ## Context
 
 This audit compares the pre-test-merge-only history against the current `develop` branch, centered on:

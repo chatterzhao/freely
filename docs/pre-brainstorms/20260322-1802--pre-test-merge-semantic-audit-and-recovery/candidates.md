@@ -1,5 +1,9 @@
 # Candidates - 20260322-1802--pre-test-merge-semantic-audit-and-recovery
 
+## Compatibility Note
+
+- 历史 candidate/path 保留 `pre-test-merge` 命名，当前 canonical 语义按 `test-pre-merge-*` 测试批次前缀族解释。
+
 ## Audit results
 
 - `already absorbed by develop`
