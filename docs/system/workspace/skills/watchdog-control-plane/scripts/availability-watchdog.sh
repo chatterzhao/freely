@@ -377,6 +377,151 @@ codex_write_availability_cache_from_sweep_results() {
   mv "$tmp" "$file"
 }
 
+codex_availability_cache_ttl_seconds() {
+  local ttl="${CODEX_AVAILABILITY_CACHE_TTL_SECS:-1800}"
+  [[ "$ttl" =~ ^[0-9]+$ ]] || ttl=1800
+  printf '%s\n' "$ttl"
+}
+
+codex_availability_cache_refreshed_at() {
+  local project="$1" file
+  file="$(codex_availability_cache_file "$project")"
+  [[ -f "$file" ]] || return 1
+  awk -F '\t' 'NR==2 {print $7}' "$file"
+}
+
+codex_timestamp_to_epoch() {
+  local timestamp="$1"
+  [[ -n "$timestamp" ]] || return 1
+  python3 - <<'PY' "$timestamp" 2>/dev/null
+from datetime import datetime
+import sys
+
+timestamp = sys.argv[1]
+if timestamp.endswith("Z"):
+    timestamp = timestamp[:-1] + "+00:00"
+try:
+    print(int(datetime.fromisoformat(timestamp).timestamp()))
+except Exception:
+    raise SystemExit(1)
+PY
+}
+
+codex_availability_cache_is_fresh() {
+  local project="$1" refreshed_at refreshed_epoch ttl now
+  refreshed_at="$(codex_availability_cache_refreshed_at "$project" || true)"
+  [[ -n "$refreshed_at" ]] || return 1
+  refreshed_epoch="$(codex_timestamp_to_epoch "$refreshed_at" || true)"
+  [[ -n "$refreshed_epoch" && "$refreshed_epoch" =~ ^[0-9]+$ ]] || return 1
+  ttl="$(codex_availability_cache_ttl_seconds)"
+  now="$(date +%s)"
+  (( now - refreshed_epoch <= ttl ))
+}
+
+codex_cached_slot_status() {
+  local project="$1" slot="$2" file normalized
+  file="$(codex_availability_cache_file "$project")"
+  normalized="$(normalize_codex_slot_name "$slot")"
+  [[ -f "$file" && -n "$normalized" ]] || return 1
+  awk -F '\t' -v slot="$normalized" 'NR>1 && $1 == slot {print $2; exit}' "$file"
+}
+
+codex_cached_inventory_truth() {
+  local project="$1" file
+  local usable_slot="" earliest_slot="" earliest_reset=""
+  file="$(codex_availability_cache_file "$project")"
+  [[ -f "$file" ]] || { printf 'none\n'; return 1; }
+
+  while IFS=$'\t' read -r slot status auth_email reset_at http_code detail refreshed_at; do
+    [[ -n "$slot" ]] || continue
+    if [[ "$status" == "usable" && -z "$usable_slot" ]]; then
+      usable_slot="$slot"
+    fi
+    if [[ "$status" == "rate_limited" && "$reset_at" =~ ^[0-9]+$ && "$reset_at" -gt 0 ]]; then
+      if [[ -z "$earliest_reset" || "$reset_at" -lt "$earliest_reset" ]]; then
+        earliest_slot="$slot"
+        earliest_reset="$reset_at"
+      fi
+    fi
+  done < <(tail -n +2 "$file")
+
+  if [[ -n "$usable_slot" ]]; then
+    printf 'usable:%s\n' "$usable_slot"
+    return 0
+  fi
+  if [[ -n "$earliest_slot" && -n "$earliest_reset" ]]; then
+    printf 'all_unavailable:%s|%s\n' "$earliest_slot" "$earliest_reset"
+    return 0
+  fi
+  printf 'none\n'
+  return 1
+}
+
+codex_inventory_truth() {
+  local project="$1" refresh_mode="${2:-stale_ok}" result=""
+  if [[ "$refresh_mode" != "refresh" ]] && codex_availability_cache_is_fresh "$project"; then
+    codex_cached_inventory_truth "$project"
+    return $?
+  fi
+
+  result="$(codex_oauth_sweep_all_slots "$project" || true)"
+  case "$result" in
+    usable:*|all_unavailable:*)
+      printf '%s\n' "$result"
+      return 0
+      ;;
+  esac
+
+  if codex_availability_cache_is_fresh "$project"; then
+    codex_cached_inventory_truth "$project"
+    return $?
+  fi
+
+  printf 'none\n'
+  return 1
+}
+
+codex_confirm_launch_candidate_slot() {
+  local project="$1" candidate="$2" reason="$3"
+  local original_slot original_active_slot auth_backup="" auth_file probe_result reset_at
+
+  [[ -n "$candidate" ]] || { printf 'none\n'; return 1; }
+  original_slot="$(codex_current_slot "$project")"
+  original_active_slot="$(read_codex_active_slot)"
+  auth_file="$(codex_active_auth_file)"
+  if [[ -f "$auth_file" ]]; then
+    auth_backup="$(mktemp)"
+    cp "$auth_file" "$auth_backup"
+  fi
+
+  if ! switch_to_codex_slot "$project" "$candidate" "$reason" >/dev/null; then
+    restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
+    [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
+    printf 'switch_failed\n'
+    return 1
+  fi
+
+  probe_result="$(codex_probe_current_slot_now "$project" || true)"
+  case "$probe_result" in
+    usable)
+      [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
+      printf 'usable:%s\n' "$candidate"
+      return 0
+      ;;
+    rate_limited:*)
+      reset_at="${probe_result#rate_limited:}"
+      if [[ -n "$reset_at" && "$reset_at" =~ ^[0-9]+$ && "$reset_at" -gt 0 ]]; then
+        codex_record_slot_cooldown "$project" "$candidate" "$reset_at"
+      fi
+      ;;
+  esac
+
+  restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
+  [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
+  printf '%s\n' "${probe_result:-none}"
+  return 1
+}
+
 codex_oauth_probe_single_slot() {
   local slot="$1" auth_file="$2" output_file="$3"
   local usage_url token auth_email response_file http_code response_body
@@ -920,15 +1065,20 @@ probe_all_codex_slots_and_update_cooldown() {
     cp "$auth_file" "$auth_backup"
   fi
 
-  probe_result="$(codex_oauth_sweep_all_slots "$project" || true)"
+  probe_result="$(codex_inventory_truth "$project" "refresh" || true)"
   case "$probe_result" in
     usable:*)
       usable_slot="${probe_result#usable:}"
       if [[ -n "$usable_slot" ]]; then
-        switch_to_codex_slot "$project" "$usable_slot" "oauth_sweep_promote_usable_slot" >/dev/null || true
-        [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
-        printf 'usable:%s\n' "$usable_slot"
-        return 0
+        probe_result="$(codex_confirm_launch_candidate_slot "$project" "$usable_slot" "oauth_sweep_promote_usable_slot" || true)"
+        case "$probe_result" in
+          usable:*)
+            [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
+            printf '%s\n' "$probe_result"
+            return 0
+            ;;
+        esac
+        restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
       fi
       ;;
     all_unavailable:*)
@@ -1073,7 +1223,7 @@ switch_to_next_codex_slot() {
 
 ensure_codex_slot_ready_for_manager() {
   local project="$1"
-  local current_slot current_identity current_probe_result probe_result probe_status probe_slot
+  local current_slot current_identity current_probe_result probe_result probe_status probe_slot cached_current_status
   local all_unavailable_info earliest_slot earliest_reset
   local current_fingerprint previous_phase="" previous_blocked_reason="" previous_slot="" previous_fingerprint="" wake_reason="" wake_trigger="" recovery_trigger=""
 
@@ -1091,7 +1241,10 @@ ensure_codex_slot_ready_for_manager() {
 
   codex_write_availability_state "$project" "probing" "${previous_blocked_reason:-probe_pending}" "${previous_slot:-$current_identity}" "$current_identity" "$current_fingerprint" "" "" ""
 
-  if [[ -n "$current_identity" ]]; then
+  probe_result="$(codex_inventory_truth "$project" || true)"
+  cached_current_status="$(codex_cached_slot_status "$project" "$current_identity" || true)"
+
+  if [[ -n "$current_identity" && "$cached_current_status" == "usable" ]]; then
     current_probe_result="$(codex_probe_current_slot_now "$project" || true)"
     case "$current_probe_result" in
       usable)
@@ -1118,7 +1271,23 @@ ensure_codex_slot_ready_for_manager() {
     esac
   fi
 
-  probe_result="$(probe_all_codex_slots_and_update_cooldown "$project" || true)"
+  case "$probe_result" in
+    usable:*)
+      probe_slot="${probe_result#usable:}"
+      if [[ -n "$probe_slot" ]]; then
+        probe_result="$(codex_confirm_launch_candidate_slot "$project" "$probe_slot" "ensure_manager_launch_time_confirmation" || true)"
+      fi
+      ;;
+  esac
+
+  probe_status="${probe_result%%:*}"
+  case "$probe_status" in
+    usable|all_unavailable)
+      ;;
+    *)
+      probe_result="$(probe_all_codex_slots_and_update_cooldown "$project" || true)"
+      ;;
+  esac
   probe_status="${probe_result%%:*}"
   case "$probe_status" in
     usable)

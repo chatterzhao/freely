@@ -143,6 +143,32 @@ grep -Eq '"availability_cache":[[:space:]]*\{"present":[[:space:]]*true' <(HOME=
 
 echo "[PASS] freely ai switch codex auto-probes and switches to a usable account"
 
+PROJECT_STATUS="$TMP_DIR/project-status"
+HOME_STATUS="$TMP_DIR/home-status"
+LOG_STATUS="$TMP_DIR/probe-status.log"
+setup_project "$PROJECT_STATUS"
+setup_home "$HOME_STATUS"
+mkdir -p "$HOME_STATUS/.ai-auth/codex-limited@example-com-1" "$HOME_STATUS/.ai-auth/codex-work@example-com-2"
+make_auth_json "limited@example.com" "$HOME_STATUS/.ai-auth/codex-limited@example-com-1/auth.json" "token-limited"
+make_auth_json "work@example.com" "$HOME_STATUS/.ai-auth/codex-work@example-com-2/auth.json" "token-work"
+make_auth_json "old@example.com" "$HOME_STATUS/.codex/auth.json" "token-old"
+
+HOME="$HOME_STATUS" \
+PROJECT_ROOT="$PROJECT_STATUS" \
+PATH="$MOCK_BIN:$PATH" \
+MOCK_OAUTH_SCENARIO="usable" \
+MOCK_OAUTH_LOG="$LOG_STATUS" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json status codex >"$TMP_DIR/status.out"
+
+grep -Eq '"availability_cache":[[:space:]]*\{"present":[[:space:]]*true' "$TMP_DIR/status.out"
+grep -q '"usable": 1' "$TMP_DIR/status.out"
+grep -q '"rate_limited": 1' "$TMP_DIR/status.out"
+grep -q 'usable|token-limited' "$LOG_STATUS"
+grep -q 'usable|token-work' "$LOG_STATUS"
+[[ -f "$PROJECT_STATUS/.freely/run/codex-availability-cache.tsv" ]]
+
+echo "[PASS] freely ai status refreshes stale codex inventory via oauth sweep before reporting cache summary"
+
 PROJECT_EARLIEST="$TMP_DIR/project-earliest"
 HOME_EARLIEST="$TMP_DIR/home-earliest"
 LOG_EARLIEST="$TMP_DIR/probe-earliest.log"

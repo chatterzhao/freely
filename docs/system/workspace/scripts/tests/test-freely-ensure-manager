@@ -10,12 +10,15 @@ MOCK_BIN="$TMP_DIR/mock-bin"
 LAUNCH_LOG="$TMP_DIR/launch.log"
 AI_STATE="$TMP_DIR/active-account"
 AI_SWITCH_LOG="$TMP_DIR/ai-switch.log"
+MOCK_HOME="$TMP_DIR/mock-home"
 mkdir -p \
   "$PROJECT/bin" \
   "$PROJECT/docs/pre-brainstorms/20260318-0000--sample" \
   "$PROJECT/.freely/run" \
   "$PROJECT/.freely/logs" \
-  "$MOCK_BIN"
+  "$MOCK_BIN" \
+  "$MOCK_HOME/.ai-auth" \
+  "$MOCK_HOME/.codex"
 
 git init -q -b develop "$PROJECT"
 
@@ -152,8 +155,82 @@ printf '%s\n' "$*" >>"${LAUNCH_LOG:?}"
 EOF
 chmod +x "$MOCK_BIN/launch-freely"
 
+cat >"$MOCK_BIN/curl" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+output_file=""
+auth_header=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -o)
+      output_file="$2"
+      shift 2
+      ;;
+    -H)
+      auth_header="$2"
+      shift 2
+      ;;
+    -w)
+      shift 2
+      ;;
+    -s|-S|-sS)
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+token="${auth_header#Authorization: Bearer }"
+case "$token" in
+  token-3971)
+    printf '{"rate_limits":{"primary":{"used_percent":5.0,"resets_at":0},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
+    ;;
+  token-3972)
+    printf '{"detail":{"code":"deactivated_workspace"}}\n' >"$output_file"
+    printf '402'
+    ;;
+  token-3973)
+    printf '{"rate_limits":{"primary":{"used_percent":100.0,"resets_at":4102444800},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
+    ;;
+  *)
+    printf '{"detail":"unexpected"}\n' >"$output_file"
+    printf '500'
+    ;;
+esac
+EOF
+chmod +x "$MOCK_BIN/curl"
+
+python3 - <<'PY' "$MOCK_HOME"
+import base64
+import json
+import os
+import sys
+
+home = sys.argv[1]
+slots = {
+    "worahe3971@outlook-com": "token-3971",
+    "worahe3972@outlook-com": "token-3972",
+    "worahe3973@outlook-com": "token-3973",
+}
+for email, token in slots.items():
+    payload = base64.urlsafe_b64encode(json.dumps({"email": email}).encode()).decode().rstrip("=")
+    path = os.path.join(home, ".ai-auth", f"codex-{email}", "auth.json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({"tokens": {"id_token": f"x.{payload}.y", "access_token": token}}, f)
+with open(os.path.join(home, ".codex", "auth.json"), "w", encoding="utf-8") as f:
+    payload = base64.urlsafe_b64encode(json.dumps({"email": "worahe3973@outlook-com"}).encode()).decode().rstrip("=")
+    json.dump({"tokens": {"id_token": f"x.{payload}.y", "access_token": "token-3973"}}, f)
+PY
+
 printf 'worahe3973@outlook-com' >"$AI_STATE"
 
+HOME="$MOCK_HOME" \
 AI_SWITCH_STATE="$AI_STATE" \
 AI_SWITCH_LOG="$AI_SWITCH_LOG" \
 LAUNCH_LOG="$LAUNCH_LOG" \
@@ -172,5 +249,7 @@ grep -q '^- previous_slot: worahe3973@outlook-com$' "$HANDOFF_FILE"
 grep -q '^- active_slot: worahe3971@outlook-com$' "$HANDOFF_FILE"
 grep -q '^- reason: watchdog_probed_and_found_usable_slot$' "$HANDOFF_FILE"
 grep -q '^- next_action: inspect-fleet-and-recover-workers$' "$HANDOFF_FILE"
+grep -q '^worahe3971@outlook-com[[:space:]]usable' "$PROJECT/.freely/run/codex-availability-cache.tsv"
+grep -q '^worahe3973@outlook-com[[:space:]]4102444800' "$PROJECT/.freely/run/codex-slot-cooldowns.tsv"
 
-echo "[PASS] freely ensure-manager blocks launch until watchdog probes a truly usable codex slot and writes bootstrap handoff"
+echo "[PASS] freely ensure-manager uses oauth inventory sweep for slot selection, confirms the chosen slot at launch time, and writes bootstrap handoff"

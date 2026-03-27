@@ -461,13 +461,8 @@ ai_cli_bin_for_project() {
   printf '%s\n' "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)/bin/ai"
 }
 
-_cmd_switch_auto_codex() {
-  local project="${PROJECT_ROOT:-$(pwd)}"
-  local tool="codex"
-  local actual_account=""
-  local result rc=0
-
-  # Source watchdog functions
+source_watchdog_script_or_fail() {
+  local project="$1"
   local watchdog_script=""
   if [[ -f "$project/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" ]]; then
     watchdog_script="$project/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
@@ -480,12 +475,20 @@ _cmd_switch_auto_codex() {
     exit 3
   fi
 
-  codex_switch_lock_acquire "auto_probe_switch" "switch" "auto" || exit 1
-
   # shellcheck source=/dev/null
   source "$watchdog_script"
+}
 
-  result="$(codex_oauth_sweep_all_slots "$project" || true)"
+_cmd_switch_auto_codex() {
+  local project="${PROJECT_ROOT:-$(pwd)}"
+  local tool="codex"
+  local actual_account=""
+  local result rc=0
+
+  codex_switch_lock_acquire "auto_probe_switch" "switch" "auto" || exit 1
+  source_watchdog_script_or_fail "$project"
+
+  result="$(codex_inventory_truth "$project" || true)"
   case "$result" in
     none)
       result="$(probe_all_codex_slots_and_update_cooldown "$project" || true)"
@@ -651,7 +654,11 @@ cmd_status() {
     codex)
       local auth_file="$HOME/.codex/auth.json"
       local cache_file=""
+      source_watchdog_script_or_fail "$project"
       cache_file="$(codex_availability_cache_file "$project")"
+      if ! codex_availability_cache_is_fresh "$project"; then
+        codex_inventory_truth "$project" >/dev/null 2>&1 || true
+      fi
       if [[ -f "$auth_file" ]]; then
         local mtime=$(stat -f "%Sm" "$auth_file" 2>/dev/null || stat -c "%y" "$auth_file" 2>/dev/null || echo "unknown")
         local account=$(extract_codex_account "$auth_file")
