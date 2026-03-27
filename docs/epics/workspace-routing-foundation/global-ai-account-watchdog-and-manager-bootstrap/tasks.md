@@ -7,7 +7,7 @@
 - [x] verify manager restarts and resumes supervision after recovery
 - [x] add script-level regression for account selection before manager bootstrap
 - [x] verify each account switch causes a new codex process launch before continuing
-- [x] probe saved accounts when cooldown records are stale before falling back to earliest reset
+- [x] probe the current slot and then full saved-slot inventory before any manager bootstrap decision; earliest-reset may remain as debug context but never as the authoritative recovery fallback
 - [x] write structured manager bootstrap handoff before watchdog relaunches the manager
 - [x] let the live test discover a usable account by real probe when no good account is provided
 - [x] make `freely ai switch codex` reuse the same active probe / cooldown update contract as the watchdog path

@@ -108,7 +108,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`, `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`, `docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md`
-- next_action: 当前同族 replay 已完成 strict probe-gating + wake-only recovery 的 contract / code / test 闭环，但本 issue 仍只到 `review-ready`，不是 promote-closed。2026-03-26 首跳 closeout audit 重新核对后确认：`git worktree list --porcelain` / `./bin/wt-status-all` 当前只认 5 棵 active worktree，旧 6-tree/9-tree inventory 已不能再作为 cleanup 真相；同时当前 owner 分支相对最新 `develop` 仍是 `2` 左 / `161` 右，说明 manager merge judgement 后还必须先吸收最新 `develop` 再做 replay。2026-03-25 23:41 PDT 的 `402 Payment Required` / `deactivated_workspace` cycle 继续保留为历史证据，用来解释 broadened auth-failure contract 的来源，但在 2026-03-26 canonical proof wave 与 latest manager-continuity worker-consumption repair 之后，它已不再构成当前 closeout 的直接 blocker。本轮下一步固定为：先由 manager 吸收当前 verified replay owner 并决定 merge judgement，再在 canonical `develop` 上完成 replay / completion verification；在 develop 写回 completion verification 前，不得进入 cleanup / retirement judgement
+- next_action: 当前同族 replay 已完成 strict probe-gating + wake-only recovery 的 contract / code / test 闭环，但本 issue 仍只到 `review-ready`，不是 promote-closed。2026-03-26 17:04 PDT 当前 authoritative refresh 再次确认：authoritative fleet truth 必须回到 `git worktree list --porcelain`、`./bin/wt-status-all` 与相关 worktree `git status`，当前 inventory 已前移到 12 棵树，latest stable recheck 为 `Summary: total=12, dirty=1`。当前唯一 dirty worktree 只剩 `feature/develop-merge-prep-fleet-closure-20260325`；`feature/manager-scheduler-capacity-candidate-replay-20260324` 已 clean，继续保持 `needs_research / retained-with-reason`，其 blocker 仍是 canonical `develop` proof writeback，而不是 replay-owner-local evidence。`feature/intake-absorption-closure-governance-20260326` 现已 clean，且 `develop...HEAD = 3/0`、supervisor/AI 都 down；当前 canonical docs 仍缺准确 owner/phase 吸收，因此这轮继续保持 `supervision-needed`。`feature/latest-manager-continuity-worker-consumption-reconcile-20260326` 当前 clean 且 `develop...HEAD = 11/0`，继续作为独立 verification/cleanup followthrough；`feature/watchdog-auth-failure-control-plane-recovery-20260326` 与 `feature/watchdog-live-status-and-dispatcher-ready-20260326` 当前 clean 且分别 `develop...HEAD = 9/0`、`7/0`，继续保持 `ownership-followthrough-needed` / `cleanup-followthrough-needed`；`feature/watchdog-probe-early-deactivated-workspace-detect-20260326` 当前 clean 且 `develop...HEAD = 1/1`，以及 `feature/watchdog-slot-switch-global-launch-gate-20260326` / `feature/watchdog-switch-stability-and-probe-freeze-20260326` 当前 clean 且分别 `develop...HEAD = 5/0` / `6/1`，都因 canonical docs 仍缺准确 owner/phase 继续保持 `supervision-needed`。此前 continuity 里的 5-tree / 7-tree / 10-tree snapshot 与更早 6-tree / 9-tree prompt 注入历史都不能再作为 cleanup 真相。同时当前 owner 分支相对最新 `develop` 的分叉真相仍是 `ahead 162 / behind 12`，说明 manager merge judgement 后还必须先吸收最新 `develop` 再做 canonical replay。`live-status` 已确认 delegated continuation wave 被当前工位吸收，`pending_delegated_continuation_ids=none`，因此本轮不新开 worker lane，只继续 manager-owned completion verification / fleet closure writeback。2026-03-25 23:41 PDT 的 `402 Payment Required` / `deactivated_workspace` cycle 继续保留为历史证据，用来解释 broadened auth-failure contract 的来源，但在 2026-03-26 canonical proof wave 与后续 develop 前进之后，它已不再构成当前 closeout 的直接 blocker。本轮下一步固定为：先由 manager 吸收当前 verified replay owner 并决定 merge judgement，再在 canonical `develop` 上完成 replay / completion verification；在 develop 写回 completion verification 前，不得进入 cleanup / retirement judgement
 
 7. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation
@@ -208,7 +208,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
 - source_brainstorm: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md`
-- next_action: `fleet_closure` 已收编到 worktree-maintenance skill，但 2026-03-26 当前首跳 audit 发现此前的 6-tree/9-tree inventory 已经 stale；authoritative truth 必须回到 `git worktree list --porcelain` 与 `./bin/wt-status-all`。本轮写回前的 audit snapshot 是 `Summary: total=5, dirty=0`，对应 active fleet 仅 5 棵：protected/control trees 为 `develop` 与 `pre-test-merge`；active feature owners 是 `feature/manager-scheduler-capacity-candidate-replay-20260324`、`feature/develop-merge-prep-fleet-closure-20260325`、`feature/latest-manager-continuity-worker-consumption-reconcile-20260326`。当前 canonical writeback 落盘后，dirty 预算已自然变成 `Summary: total=5, dirty=1`，且唯一 dirty owner 就是本 closeout-audit worktree；这不改变 fleet disposition。当前没有新的 `retire-now` 对象，但 `feature/develop-merge-prep-fleet-closure-20260325` 仍只到 closeout audit / merge-prep judgement，`feature/manager-scheduler-capacity-candidate-replay-20260324` 仍是 blocked research owner，而 `feature/latest-manager-continuity-worker-consumption-reconcile-20260326` 仍需独立 verification/cleanup followthrough。下一步由 manager 先按这份 5-tree truth 维护 continuity / queue / cleanup judgement，而不是继续消费旧 fleet snapshot
+- next_action: `fleet_closure` 已收编到 worktree-maintenance skill，但 2026-03-26 当前首跳 audit 发现此前 continuity 里的 5-tree / 7-tree / 10-tree snapshot 与更早的 6-tree / 9-tree inventory 都已 stale；authoritative truth 必须回到 `git worktree list --porcelain`、`./bin/wt-status-all` 与相关 worktree `git status`。当前 inventory 已前移到 12 棵树，latest stable recheck 为 `Summary: total=12, dirty=1`：protected/control trees 为 `develop` 与 `pre-test-merge`；dirty worktree 仅剩 `feature/develop-merge-prep-fleet-closure-20260325`。`feature/manager-scheduler-capacity-candidate-replay-20260324` 当前 clean，继续保持 `needs_research / retained-with-reason`，但不再是 dirty research owner；当前 closeout owner 仍是 develop-facing merge-prep worktree。`feature/intake-absorption-closure-governance-20260326` 当前 clean 且 `develop...HEAD = 3/0`，但 canonical docs 仍缺准确 owner/phase，因此本轮只能保持 `supervision-needed`。当前仍需主管持续判断的 active or followthrough lanes 是 `feature/manager-scheduler-capacity-candidate-replay-20260324`、`feature/develop-merge-prep-fleet-closure-20260325`、`feature/intake-absorption-closure-governance-20260326`、`feature/latest-manager-continuity-worker-consumption-reconcile-20260326`、`feature/watchdog-probe-early-deactivated-workspace-detect-20260326` 与 `feature/watchdog-switch-stability-and-probe-freeze-20260326`；两棵 develop-absorbed companion trees `feature/watchdog-auth-failure-control-plane-recovery-20260326` 与 `feature/watchdog-live-status-and-dispatcher-ready-20260326` 继续分别保持 `ownership-followthrough-needed` / `cleanup-followthrough-needed`；`feature/watchdog-slot-switch-global-launch-gate-20260326` 当前 clean，但 canonical docs 仍缺准确 owner/phase，暂列 `supervision-needed`。当前没有新的 `retire-now` 对象；`feature/develop-merge-prep-fleet-closure-20260325` 仍只到 closeout audit / merge-prep judgement，`feature/manager-scheduler-capacity-candidate-replay-20260324` 仍是 retained research owner，而 `feature/latest-manager-continuity-worker-consumption-reconcile-20260326` 仍需独立 verification/cleanup followthrough。`live-status` 当前同时表明 delegated continuation 已被吸收，`pending_delegated_continuation_ids=none`，所以这一轮仍应由 manager 在当前 auto-loop 面维护 continuity / queue / cleanup judgement，而不是继续消费旧 fleet snapshot 或误开新的 worker lane
 
 17. `I-20260321-1515`
 - title: Remote branch retirement governance
@@ -331,7 +331,18 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 `init` 的 step graph、bootstrap commit 豁免边界，以及每个 managed item 的 skip/force contract；在这些边界稳定前，不直接往现有 `init` 继续堆局部 patch
 - revisit_trigger: 当 `init` 的交互入口、repo bootstrap 语义与细粒度 skip/force 输出 contract 可以被冻结成独立 issue scope 时，重新进入 materialization 判断
 
-2. `C-20260318-0715-A`
+2. `C-20260323-2045-A`
+- title: Add capacity-aware queueing for manager worker prompt sets
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260323-2045--manager-worker-scheduler-capacity-and-queueing/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260323-2045--manager-worker-scheduler-capacity-and-queueing/candidates.md`
+- next_action: 保持 `needs_research / retained-with-reason` 可见，当前继续冻结在 candidate 阶段；虽然 `I-20260318-1630` 的 closeout writeback 已稳定到可交给 protected manager merge judgement，但这个 candidate 仍缺 canonical `develop` 上关于 direct dispatch、queued-lane retention 与 busy-worker no-duplicate-launch behavior 的证明面，因此不得因为 replay owner 已 review-ready 就被静默吸收或提升
+- revisit_trigger: 当 `I-20260318-1630` 完成 manager merge judgement、latest-`develop` absorption、canonical replay 与 develop-side completion verification，并且 canonical `develop` 能提供 direct-dispatch / queue-retention / no-duplicate-launch proof 时，再重新进入 issue materialization 判断
+
+3. `C-20260318-0715-A`
 - title: `commit-first after checkpoint-ready` 自治治理
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -342,7 +353,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 3 个边界：`checkpoint-ready` 的结构化输出、`LAWS/runtime/checkpoint-guard/supervisor` 的职责分层、以及进入 IBM 前的 promotion gate；在这些边界稳定前不得直接写成 IBM issue 或塞回 `I-20260318-0930`
 - revisit_trigger: 当 `checkpoint-ready` 的结构化输出、supervisor 职责边界与 promotion gate 可以被稳定写成最小 issue contract 时，重新进入 materialization 判断
 
-3. `C-20260319-0402-01`
+4. `C-20260319-0402-01`
 - title: 定义 Freely 的 harness engineering 分层与缺口图
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -353,7 +364,7 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，先验证 Freely 是否需要一份更明确的 harness 分层与缺口图；若边界稳定，再 materialize 成 issue，而不是直接把外部文章结论塞进现有主线
 - revisit_trigger: 当 harness 分层、缺口图与 Freely 自身的最小吸收面可以冻结成独立 issue contract 时，重新进入 materialization 判断
 
-4. `C-20260319-0402-02`
+5. `C-20260319-0402-02`
 - title: 把 worktree 级验证信号统一暴露成 agent 可消费接口
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`

@@ -24,9 +24,15 @@
 - This batch absorbs the `20260325-0525` pre-brainstorm contract rewrite as same-family continuation under `I-20260318-1630`; it is not a parallel issue.
 - The current gate is still feature-worktree verification plus manager merge judgement. This worktree is not `completed` yet.
 - 2026-03-26 closeout audit rechecked fleet truth and merge position before declaring closure:
-  - authoritative active fleet truth is now `git worktree list --porcelain` plus `./bin/wt-status-all => Summary: total=5, dirty=0`
-  - the older prompt-injected 6-tree inventory and earlier 9-tree fleet snapshot are stale history, not current cleanup truth
-  - this replay owner is still `2` commits behind latest `develop`, so the verified batch is review-ready but not yet promote-closed
+  - authoritative fleet truth is now a 12-worktree inventory from `git worktree list --porcelain`, cross-checked by `./bin/wt-status-all` and relevant worktree `git status`, and the latest stable recheck has moved again to `Summary: total=12, dirty=1`
+  - the older continuity 5-tree / 7-tree / 10-tree snapshots, the older prompt-injected 6-tree / 9-tree fleet snapshots, and the 04:47 PDT `dirty=3` closeout note are stale history, not current cleanup truth
+  - this replay owner is currently `ahead 162 / behind 12` relative to latest `develop`, so the verified batch is review-ready but not yet promote-closed
+  - `feature/manager-scheduler-capacity-candidate-replay-20260324` remains frozen as `needs_research / retained-with-reason`, and is now clean again; its blocker remains canonical `develop` proof writeback, not replay-owner-local evidence
+  - `feature/intake-absorption-closure-governance-20260326` is clean and sits `develop...HEAD = 3/0`, but canonical docs still lack explicit owner/phase absorption for it, so it remains `supervision-needed`
+  - two additional 20260326 watchdog-related feature worktrees are now visible in the fleet and already absorbed by `develop`, but their dispositions differ: `feature/watchdog-auth-failure-control-plane-recovery-20260326` is still `ownership-followthrough-needed`, while `feature/watchdog-live-status-and-dispatcher-ready-20260326` is `cleanup-followthrough-needed`
+  - `feature/latest-manager-continuity-worker-consumption-reconcile-20260326` remains an unresolved verification/cleanup followthrough lane and currently sits `develop...HEAD = 11/0`
+  - three other 20260326 watchdog-related clean trees remain `supervision-needed`: `feature/watchdog-probe-early-deactivated-workspace-detect-20260326`, `feature/watchdog-slot-switch-global-launch-gate-20260326`, and `feature/watchdog-switch-stability-and-probe-freeze-20260326` still lack canonical owner/phase binding, and now sit `develop...HEAD = 1/1`, `5/0`, and `6/1`
+  - `./bin/freely live-status --project ...` reports `pending_delegated_continuation_ids=none`, so the closeout lane stays manager-owned in the current worktree instead of emitting a new worker prompt
 
 ## Remaining Acceptance
 

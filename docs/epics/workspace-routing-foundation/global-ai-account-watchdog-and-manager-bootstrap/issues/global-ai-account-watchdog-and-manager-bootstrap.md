@@ -12,7 +12,18 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
-- session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
+- session_refs:
+  - {tool: codex, session_id: "019d29a9-5895-74b0-aee5-b3d44d9f2390", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-20-57-019d29a9-5895-74b0-aee5-b3d44d9f2390.jsonl", role: "manager-closeout-audit"}
+  - {tool: codex, session_id: "019d29b2-d89b-7393-9704-c7ea6cd0b526", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-31-19-019d29b2-d89b-7393-9704-c7ea6cd0b526.jsonl", role: "manager-closeout-audit-refresh"}
+  - {tool: codex, session_id: "019d29b7-4cf6-7f23-a8d0-39f1176fad36", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-36-11-019d29b7-4cf6-7f23-a8d0-39f1176fad36.jsonl", role: "manager-closeout-audit-current"}
+  - {tool: codex, session_id: "019d29bb-9572-74f0-99dd-3b066647ea6a", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-40-52-019d29bb-9572-74f0-99dd-3b066647ea6a.jsonl", role: "manager-closeout-audit-fresh-recheck"}
+  - {tool: codex, session_id: "019d29c0-a278-7833-be12-65efef7889cd", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-46-23-019d29c0-a278-7833-be12-65efef7889cd.jsonl", role: "manager-closeout-audit-current-fresh-session"}
+  - {tool: codex, session_id: "019d29f2-3953-75f2-9be9-34822f55f374", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T04-40-33-019d29f2-3953-75f2-9be9-34822f55f374.jsonl", role: "manager-closeout-audit-fleet-refresh"}
+  - {tool: codex, session_id: "019d29f6-6f39-71e1-ae7a-1676f191b63c", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T04-45-09-019d29f6-6f39-71e1-ae7a-1676f191b63c.jsonl", role: "manager-closeout-audit-authoritative-refresh"}
+  - {tool: codex, session_id: "019d2a17-0762-7720-80f2-03ea4786077b", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T05-20-45-019d2a17-0762-7720-80f2-03ea4786077b.jsonl", role: "manager-closeout-audit-first-jump-refresh"}
+  - {tool: codex, session_id: "019d2a66-1e0b-7563-a4b7-e38b2d5d971b", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T06-47-08-019d2a66-1e0b-7563-a4b7-e38b2d5d971b.jsonl", role: "manager-closeout-audit-current-refresh"}
+  - {tool: codex, session_id: "019d2c8b-59c1-7713-9f67-8ff2a6455a8c", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T16-47-03-019d2c8b-59c1-7713-9f67-8ff2a6455a8c.jsonl", role: "manager-closeout-audit-continuity-stabilization"}
+  - {tool: codex, session_id: "019d2c94-db34-7012-b942-129dc5dfa98e", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T16-57-26-019d2c94-db34-7012-b942-129dc5dfa98e.jsonl", role: "manager-closeout-audit-authoritative-fleet-refresh"}
 
 ## Why
 
@@ -85,10 +96,11 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - 最新验证事实：
   - 官方帮助中心与 rate-limit 文档没有提供“多个本地保存 Codex 账号当前可用性查询”的直接接口，因此 Freely 采用脚本真实 probe 方案
   - `test-ai-cli-switch-default-tool` 已覆盖默认 `codex` 切号 UX 与切后真实账号校验
-  - `test-freely-ai-account-switch` 已覆盖 `freely ai switch codex` 在未显式指定账号时主动 probe 所有已保存账号，并验证：
+  - `test-freely-ai-account-switch` 的较早验证批次曾覆盖 `freely ai switch codex` 在未显式指定账号时主动 probe 所有已保存账号，并验证：
     - 找到可用账号时切到可用账号
-    - 全部限流时切到最早恢复账号
+    - 当时的旧 contract 仍会在“全部限流”场景回到 earliest-reset 语义
     - probe 期间显式带代理并写回 cooldown 账本
+  - 上述 earliest-reset / cooldown-driven wording 现在只保留为被后续 slot-sweep-first rewrite 吸收的历史背景；当前 canonical contract 以 2026-03-25 strict probe-gating rewrite 及其后续 closeout judgement 为准
   - `test-freely-ensure-manager` 已覆盖“先选可用账号再拉主管”的脚本回归
   - `test-freely-rate-limit-defers-to-watchdog` 继续通过，证明主动 probe 收敛后，本地 runtime 仍把 rate-limit 恢复交给 watchdog，而不是回退到本地睡眠
   - `watchdog-control-plane` 与 `ai-cli-availability-manager` 已把 availability watchdog 定义成可复用 skill 层；`runtime/freely` 现通过 `source "$WATCHDOG_AVAILABILITY_LIB"` 复用同一套 account cooldown / probe / switch / ensure-manager readiness 逻辑
@@ -158,9 +170,22 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
   - live 测试口径已收紧为：监控脚本先启动，切到坏账号后等待当前 AI 进程结束，再验证 watchdog 是否切回脚本真实探测出的可用账号并拉起新 Codex
   - 2026-03-26 closeout audit 追加了当前 verification gate 的 fleet / merge truth：
-    - `git worktree list --porcelain` 与 `./bin/wt-status-all` 当前 authoritative fleet truth 只剩 5 棵 active worktree，旧 prompt 注入的 6-tree inventory 与更早 9-tree closeout snapshot 不再构成当前 cleanup 真相
-    - 当前 dedicated replay owner 相对最新 `develop` 为 `2` 左 / `161` 右，因此这批证据只能支持 `review-ready`，不能直接支持 promote-complete / cleanup-ready
+    - `git worktree list --porcelain`、`./bin/wt-status-all` 与相关 worktree `git status` 当前 authoritative fleet truth 已继续前移到 12 棵 worktree，latest stable recheck 为 `Summary: total=12, dirty=1`；当前唯一 dirty owner 只剩 `feature/develop-merge-prep-fleet-closure-20260325`。此前 continuity 里的 5-tree / 7-tree / 10-tree snapshot、旧 prompt 注入的 6-tree / 9-tree closeout inventory，以及 04:47 PDT 写下的 `dirty=3` 都不再构成当前 cleanup 真相
+    - `feature/manager-scheduler-capacity-candidate-replay-20260324` 当前已 clean，继续保持 `needs_research / retained-with-reason`，但 blocker 仍是 canonical `develop` proof writeback，而不是 replay-owner-local review readiness
+    - `feature/intake-absorption-closure-governance-20260326` 当前 `develop...HEAD = 3/0`、supervisor/AI 都 down 且 worktree clean；因为 canonical docs 仍缺准确 owner/phase 吸收，这轮只能保持 `supervision-needed`
+    - 当前 dedicated replay owner 相对最新 `develop` 的分叉真相已前移到 `ahead 162 / behind 12`，因此这批证据只能支持 `review-ready`，不能直接支持 promote-complete / cleanup-ready
+    - `feature/watchdog-auth-failure-control-plane-recovery-20260326` 与 `feature/watchdog-live-status-and-dispatcher-ready-20260326` 现已出现在 authoritative fleet 中，且提交都被 `develop` 吸收；但 disposition 不能再混写：前者当前仍缺 canonical branch owner/phase，因此是 `ownership-followthrough-needed`；后者已有 completed canonical issue、但缺 branch/worktree cleanup 留痕，因此是 `cleanup-followthrough-needed`。两者都还不能直接宣告 retired
+    - `feature/latest-manager-continuity-worker-consumption-reconcile-20260326` 当前 `develop...HEAD = 11/0`，继续作为 unresolved verification/cleanup followthrough
+    - `feature/watchdog-probe-early-deactivated-workspace-detect-20260326` 当前已出现在 authoritative fleet 中，且 `develop...HEAD = 1/1`；canonical docs 仍缺准确 owner/phase，因此暂列 `supervision-needed`
+    - `feature/watchdog-slot-switch-global-launch-gate-20260326` 与 `feature/watchdog-switch-stability-and-probe-freeze-20260326` 当前分别 `develop...HEAD = 5/0` 与 `6/1`，但 canonical docs 仍缺准确 owner/phase，因此这轮只能继续保持 `supervision-needed`
     - 2026-03-25 23:41 PDT 的 develop-side fresh manager cycle 曾在新 continuity / worker prompt materialize 之前命中 `402 Payment Required` / `deactivated_workspace`；这仍是 broadened auth-failure contract 需要存在的历史证据，但在 2026-03-26 canonical proof wave 与 latest manager-continuity worker-consumption repair 之后，已不再构成当前 closeout 的主 blocker
+    - `./bin/freely live-status --project ...` 已确认 delegated continuation wave 被当前工位吸收，`pending_delegated_continuation_ids=none`；因此这一轮保持 manager-owned completion verification / cleanup governance，而不是新开 replay worker
+    - 2026-03-26 03:49 PDT 的 fresh recheck 再次确认 `live-status` 仍是 `last_launch_kind=fresh`、`last_rotation_reason=initial_start`，且最新 continuity 已刷新到 `.freely/run/manager-continuity-20260326-034902.md`；更早的 prompt / continuity snapshot 现在只保留 provenance 价值，不再参与当前 closeout judgement
+    - 2026-03-26 03:53 PDT current fresh session 再次复核 `live-status`、`fleet-status`、`git worktree list --porcelain`、`./bin/wt-status-all` 与 `git rev-list --left-right --count develop...HEAD`，结果仍保持 7-tree / dirty=1 / `ahead 162 / behind 6`，因此路由继续固定为 manager-owned `completion_verification -> worktree-maintenance-governance`，并把最新 continuity 前移到 `.freely/run/manager-continuity-20260326-035319.md`
+    - 2026-03-26 04:47 PDT current fleet-refresh session 曾把 closeout truth 更新到 10-tree / dirty=3 / `ahead 162 / behind 8`，但这一步现已被 04:57 PDT authoritative refresh supersede
+    - 2026-03-26 04:57 PDT current authoritative refresh 再次复核 `live-status`、`fleet-status`、`git worktree list --porcelain`、`./bin/wt-status-all`、targeted sibling `git status --short` 与 `git rev-list --left-right --count develop...HEAD`，结果已更新为 10-tree / dirty=2 / `ahead 162 / behind 10`；因此 continuity 与 prompt 也必须前移到新的 `.freely/run/manager-continuity-20260326-045718.md` / `.freely/run/prompt-20260326-045718.txt`，避免后续会话继续消费 04:47 PDT 的 stale snapshot
+    - 2026-03-26 05:26 PDT current first-jump refresh 再次复核 `live-status`、`fleet-status`、`git worktree list --porcelain`、`./bin/wt-status-all`、targeted sibling `git status --short` 与 `git rev-list --left-right --count develop...HEAD`，结果继续稳定在 10-tree / dirty=2 / `ahead 162 / behind 10`；新的 continuity / prompt 应以前移到 `.freely/run/manager-continuity-20260326-052623.md` / `.freely/run/prompt-20260326-052623.txt` 为准，并明确 scheduler candidate 当前缺的是 canonical `develop` proof writeback，而不是 replay-owner-local evidence
+    - 2026-03-26 16:38 PDT current refresh 再次复核 `live-status`、`fleet-status`、`git worktree list --porcelain`、`./bin/wt-status-all`、targeted sibling `git status --short` 与 `git rev-list --left-right --count develop...HEAD`，结果继续保持 10-tree / dirty=2，但当前 replay owner 已前移到 `ahead 162 / behind 12`；新的 continuity 应以前移到 `.freely/run/manager-continuity-20260326-163850.md` 为准，并继续把 scheduler candidate 缺口固定为 canonical `develop` proof writeback blocker，而不是 replay-owner-local evidence
 
 ## Closure Judgment
 
@@ -169,6 +194,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - manager judgement 之后还必须先把当前 replay owner 吸收最新 `develop` 并完成 canonical replay / completion verification
 - 在 canonical `develop` 能稳定产出 fresh continuity / worker prompt、且 completion verification 写回之前，不得把本 issue 标成 `completed`，也不得进入 cleanup / retirement judgement
 - `C-20260323-2045-A` 当前是独立 candidate owner 的后续预研面；本 issue 只提供同族支持证据，不再代替该 candidate 写当前 blocker judgment
+- 当前 delegated continuation 已被吸收，closeout writeback 继续留在当前 feature worktree；runtime 不需要为这条 lane 再发新 worker prompt
 
 ## Next
 
