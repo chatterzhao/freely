@@ -747,6 +747,7 @@ codex_oauth_sweep_all_slots() {
   printf '\n%-30s  %-20s  %s\n' "Slot" "OAuth status" "Details" >&2
   printf '%s\n' "$(printf '%-30s  %-20s  %s' '' '' '' | tr ' ' '-')" >&2
   while IFS=$'\t' read -r candidate status auth_email reset_at http_code detail; do
+    local status_icon="❓"
     [[ -n "$candidate" ]] || continue
     saw_result=1
     if [[ "$status" == "curl_error" ]]; then
@@ -764,7 +765,30 @@ codex_oauth_sweep_all_slots() {
     if [[ "$(normalize_codex_slot_name "$candidate")" == "$current_identity" ]]; then
       candidate="${candidate} *"
     fi
-    printf '%-30s  %-20s  %s\n' "$candidate" "$status" "$detail" >&2
+    case "$status" in
+      usable)
+        status_icon="✅"
+        ;;
+      rate_limited)
+        status_icon="⏳"
+        ;;
+      subscription_expired)
+        status_icon="💳"
+        ;;
+      deactivated_workspace)
+        status_icon="🚫"
+        ;;
+      unauthorized|missing_token)
+        status_icon="🔒"
+        ;;
+      timeout)
+        status_icon="⏱️"
+        ;;
+      curl_error|missing_auth|error)
+        status_icon="❌"
+        ;;
+    esac
+    printf '%s %-28s  %-20s  %s\n' "$status_icon" "$candidate" "$status" "$detail" >&2
   done <"$results_file"
   printf '\n' >&2
 
