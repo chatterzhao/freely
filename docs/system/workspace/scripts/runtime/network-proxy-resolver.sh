@@ -1,23 +1,80 @@
 #!/usr/bin/env bash
 
-freely_network_proxy_config_file() {
+freely_network_proxy_project_config_file() {
   local project="$1"
   printf '%s\n' "$project/.freely/config.env"
 }
 
-freely_network_proxy_load_project_config() {
-  local project="$1" cfg
-  FREELY_NETWORK_PROXY_MODE=""
+freely_network_proxy_global_config_file() {
+  local freely_home="${FREELY_HOME:-$HOME/.freely}"
+  printf '%s\n' "$freely_home/config.env"
+}
+
+freely_network_proxy_read_config_values() {
+  local cfg="$1"
+  (
+    unset FREELY_NETWORK_PROXY_MODE FREELY_NETWORK_PROXY_URL FREELY_ALL_PROXY FREELY_HTTP_PROXY FREELY_HTTPS_PROXY FREELY_NO_PROXY
+    [[ -f "$cfg" ]] || exit 0
+    # shellcheck disable=SC1090
+    source "$cfg"
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "${FREELY_NETWORK_PROXY_MODE:-}" \
+      "${FREELY_NETWORK_PROXY_URL:-}" \
+      "${FREELY_ALL_PROXY:-}" \
+      "${FREELY_HTTP_PROXY:-}" \
+      "${FREELY_HTTPS_PROXY:-}" \
+      "${FREELY_NO_PROXY:-}"
+  )
+}
+
+freely_network_proxy_resolve_config() {
+  local project="$1"
+  local project_cfg global_cfg
+  local project_mode="" project_url="" project_all="" project_http="" project_https="" project_no=""
+  local global_mode="" global_url="" global_all="" global_http="" global_https="" global_no=""
+
+  project_cfg="$(freely_network_proxy_project_config_file "$project")"
+  global_cfg="$(freely_network_proxy_global_config_file)"
+
+  IFS=$'\t' read -r project_mode project_url project_all project_http project_https project_no < <(
+    freely_network_proxy_read_config_values "$project_cfg"
+  )
+  IFS=$'\t' read -r global_mode global_url global_all global_http global_https global_no < <(
+    freely_network_proxy_read_config_values "$global_cfg"
+  )
+
+  FREELY_NETWORK_PROXY_MODE="inherit"
   FREELY_NETWORK_PROXY_URL=""
   FREELY_ALL_PROXY=""
   FREELY_HTTP_PROXY=""
   FREELY_HTTPS_PROXY=""
   FREELY_NO_PROXY=""
 
-  cfg="$(freely_network_proxy_config_file "$project")"
-  [[ -f "$cfg" ]] || return 0
-  # shellcheck disable=SC1090
-  source "$cfg"
+  case "${project_mode:-inherit}" in
+    explicit|disabled)
+      FREELY_NETWORK_PROXY_MODE="$project_mode"
+      FREELY_NETWORK_PROXY_URL="$project_url"
+      FREELY_ALL_PROXY="$project_all"
+      FREELY_HTTP_PROXY="$project_http"
+      FREELY_HTTPS_PROXY="$project_https"
+      FREELY_NO_PROXY="$project_no"
+      return 0
+      ;;
+  esac
+
+  case "${global_mode:-inherit}" in
+    explicit|disabled)
+      FREELY_NETWORK_PROXY_MODE="$global_mode"
+      FREELY_NETWORK_PROXY_URL="$global_url"
+      FREELY_ALL_PROXY="$global_all"
+      FREELY_HTTP_PROXY="$global_http"
+      FREELY_HTTPS_PROXY="$global_https"
+      FREELY_NO_PROXY="$global_no"
+      return 0
+      ;;
+  esac
+
+  return 0
 }
 
 freely_network_proxy_mode() {
@@ -37,10 +94,16 @@ freely_network_proxy_resolved_value() {
   fi
 }
 
+freely_network_proxy_has_effective_explicit_config() {
+  local project="$1"
+  freely_network_proxy_resolve_config "$project"
+  [[ "$(freely_network_proxy_mode)" == "explicit" ]]
+}
+
 freely_apply_project_network_proxy_env() {
   local project="$1" mode base_proxy all_proxy http_proxy https_proxy no_proxy
 
-  freely_network_proxy_load_project_config "$project"
+  freely_network_proxy_resolve_config "$project"
   mode="$(freely_network_proxy_mode)"
 
   case "$mode" in
@@ -60,7 +123,7 @@ freely_apply_project_network_proxy_env() {
       no_proxy="${FREELY_NO_PROXY:-}"
 
       [[ -n "$all_proxy" || -n "$http_proxy" || -n "$https_proxy" || -n "$no_proxy" ]] || {
-        echo "[ERROR] FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set in $(freely_network_proxy_config_file "$project")" >&2
+        echo "[ERROR] FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set in $(freely_network_proxy_project_config_file "$project") or $(freely_network_proxy_global_config_file)" >&2
         return 1
       }
 

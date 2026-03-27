@@ -45,4 +45,33 @@ RESULT_DISABLED="$(
 
 [[ "$RESULT_DISABLED" == "|||" ]]
 
-echo "[PASS] network proxy resolver handles explicit base-url and disabled modes"
+FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$FREELY_HOME"
+cat >"$FREELY_HOME/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="explicit"
+FREELY_HTTP_PROXY="http://global-http.example:8080"
+FREELY_HTTPS_PROXY="http://global-https.example:8443"
+FREELY_NO_PROXY="localhost"
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="inherit"
+FREELY_NETWORK_PROXY_URL=""
+FREELY_ALL_PROXY=""
+FREELY_HTTP_PROXY=""
+FREELY_HTTPS_PROXY=""
+FREELY_NO_PROXY=""
+EOF
+
+RESULT_GLOBAL="$(
+  FREELY_HOME="$FREELY_HOME" bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+    freely_apply_project_network_proxy_env "'"$PROJECT"'"
+    printf "%s|%s|%s|%s\n" "${ALL_PROXY:-}" "${HTTP_PROXY:-}" "${HTTPS_PROXY:-}" "${NO_PROXY:-}"
+  '
+)"
+
+[[ "$RESULT_GLOBAL" == "http://global-https.example:8443|http://global-http.example:8080|http://global-https.example:8443|localhost" ]]
+
+echo "[PASS] network proxy resolver handles explicit base-url, disabled mode, and global fallback"

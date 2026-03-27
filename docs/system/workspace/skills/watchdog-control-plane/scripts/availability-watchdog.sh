@@ -721,7 +721,7 @@ codex_oauth_sweep_all_slots() {
   local project="$1"
   local candidate auth_file tmp_dir results_file result_file
   local usable_slot="" earliest_slot="" earliest_reset=""
-  local saw_result=0 current_identity
+  local saw_result=0 current_identity curl_error_count=0
   current_identity="$(codex_current_cooldown_identity "$project")"
   tmp_dir="$(mktemp -d)"
   results_file="$tmp_dir/results.tsv"
@@ -749,6 +749,9 @@ codex_oauth_sweep_all_slots() {
   while IFS=$'\t' read -r candidate status auth_email reset_at http_code detail; do
     [[ -n "$candidate" ]] || continue
     saw_result=1
+    if [[ "$status" == "curl_error" ]]; then
+      curl_error_count=$((curl_error_count + 1))
+    fi
     if [[ "$status" == "usable" && -z "$usable_slot" ]]; then
       usable_slot="$candidate"
     fi
@@ -773,6 +776,10 @@ codex_oauth_sweep_all_slots() {
   if [[ -n "$earliest_slot" && -n "$earliest_reset" ]]; then
     printf 'all_unavailable:%s|%s\n' "$earliest_slot" "$earliest_reset"
     return 0
+  fi
+  if [[ "$saw_result" == "1" && "$curl_error_count" -gt 0 && "$curl_error_count" -eq "$(wc -l <"$results_file" | tr -d ' ')" ]]; then
+    printf 'oauth_unreachable\n'
+    return 2
   fi
   [[ "$saw_result" == "1" ]] || return 1
   printf 'none\n'

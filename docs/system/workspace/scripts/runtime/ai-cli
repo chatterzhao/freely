@@ -490,6 +490,18 @@ _cmd_switch_auto_codex() {
 
   result="$(codex_inventory_truth "$project" "refresh" || true)"
   case "$result" in
+    oauth_unreachable)
+      if freely_network_proxy_has_effective_explicit_config "$project"; then
+        log_error "OAuth inventory refresh failed even though Freely proxy config is explicit. Check the configured proxy endpoint and network reachability."
+      else
+        log_error "OAuth inventory refresh failed before any slot could be classified. Configure proxy settings in $project/.freely/config.env or \$FREELY_HOME/config.env instead of relying on an outer shell."
+      fi
+      if [[ "$FORMAT" == "json" ]]; then
+        echo "{\"switched\": false, \"tool\": \"codex\", \"status\": \"oauth_unreachable\", \"launch_blocked\": true}"
+      fi
+      codex_switch_lock_release
+      return 5
+      ;;
     none)
       result="$(probe_all_codex_slots_and_update_cooldown "$project" || true)"
       ;;

@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ai-account-switch-oauth-unreachable.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+  "$PROJECT/docs/system/workspace/scripts/runtime" \
+  "$HOME_DIR/.ai-auth/codex-test@example-com-1" \
+  "$HOME_DIR/.codex" \
+  "$MOCK_BIN"
+
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="inherit"
+FREELY_NETWORK_PROXY_URL=""
+FREELY_ALL_PROXY=""
+FREELY_HTTP_PROXY=""
+FREELY_HTTPS_PROXY=""
+FREELY_NO_PROXY=""
+EOF
+
+python3 - <<'PY' "$HOME_DIR/.ai-auth/codex-test@example-com-1/auth.json"
+import base64
+import json
+import sys
+
+payload = base64.urlsafe_b64encode(json.dumps({"email": "test@example.com"}).encode()).decode().rstrip("=")
+with open(sys.argv[1], "w", encoding="utf-8") as f:
+    json.dump({"tokens": {"id_token": f"x.{payload}.y", "access_token": "token-test"}}, f)
+PY
+
+python3 - <<'PY' "$HOME_DIR/.codex/auth.json"
+import base64
+import json
+import sys
+
+payload = base64.urlsafe_b64encode(json.dumps({"email": "old@example.com"}).encode()).decode().rstrip("=")
+with open(sys.argv[1], "w", encoding="utf-8") as f:
+    json.dump({"tokens": {"id_token": f"x.{payload}.y", "access_token": "token-old"}}, f)
+PY
+
+cat >"$PROJECT/bin_ai_list.sh" <<'EOF'
+#!/usr/bin/env bash
+printf '{"codex-test@example-com-1":{}}\n'
+EOF
+chmod +x "$PROJECT/bin_ai_list.sh"
+
+cat >"$PROJECT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+case " $* " in
+  *" list "*)
+    printf '{"codex-test@example-com-1":{}}\n'
+    ;;
+  *)
+    printf '{}\n'
+    ;;
+esac
+EOF
+chmod +x "$PROJECT/bin/ai"
+
+cat >"$MOCK_BIN/curl" <<'EOF'
+#!/usr/bin/env bash
+exit 7
+EOF
+chmod +x "$MOCK_BIN/curl"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+echo "codex exec fallback must not run" >&2
+exit 99
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+set +e
+HOME="$HOME_DIR" \
+PROJECT_ROOT="$PROJECT" \
+PATH="$MOCK_BIN:$PROJECT/bin:$PATH" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/out.json" 2>"$TMP_DIR/err.log"
+rc=$?
+set -e
+
+[[ "$rc" == "5" ]]
+grep -q '"status": "oauth_unreachable"' "$TMP_DIR/out.json"
+grep -q 'Configure proxy settings' "$TMP_DIR/err.log"
+if grep -q 'codex exec fallback must not run' "$TMP_DIR/err.log"; then
+  echo "[FAIL] oauth_unreachable must not fall back to codex exec probe" >&2
+  exit 1
+fi
+
+echo "[PASS] freely ai switch codex blocks on oauth_unreachable instead of silently falling back to codex exec"
