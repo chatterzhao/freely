@@ -36,7 +36,21 @@
 - `phase_state=in_ibm`
 - 继承有效 `session_refs`
 - 在 issue / `prd.md` / `pre-tests.md` / `tasks.md` / issue-bound brainstorm 中继续深化 acceptance 边界
-- 在 `pre-tests.md` 中默认先写 integration / acceptance 行为；若存在 merge 后验收，显式标记 `post-merge acceptance`
+- 在 `pre-tests.md` 中默认先写 executable acceptance 行为，而不是 wording review / truth-source reading checklist
+- `pre-tests.md` 默认显式回答：
+  - pre-merge focused regression / smoke
+  - post-merge integration acceptance
+  - post-merge application-native real-environment acceptance
+  - post-merge end-to-end dogfood acceptance
+- 若某类 acceptance 不适用，必须同时写出：
+  - why_not_applicable
+  - replacement_evidence
+- 对每个关键 acceptance 面，默认写出：
+  - environment
+  - evidence
+  - failure signal
+  - failure handling / replay expectation
+- 若存在 merge 后验收，显式标记 `post-merge acceptance`
 - 对 `post-merge acceptance`，必须同时写出：
   - target environment: `develop` 或 `pre-test-merge`
   - environment type: `protected verification worktree`

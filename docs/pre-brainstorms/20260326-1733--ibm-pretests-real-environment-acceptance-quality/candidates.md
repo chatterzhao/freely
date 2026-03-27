@@ -21,24 +21,24 @@
   - 已确认 scope 不等同于某一条具体业务 issue 的 pre-tests 重写，而是修改通用 IBM 质量门槛
   - 已给出最小 landing zones，并能解释后续如何通过真实 runtime/dogfood 场景验证
 - open_questions:
-  - 需要新增固定 `pre-tests.md` 模板字段，还是只强化 quality bar 与 checklist
-  - verification review 模板是否要与 IBM 一起升级，防止 closeout 仍按弱验收进行
+  - 后续若要 machine-readable schema，应落在 `pre-tests.md` 还是独立 acceptance manifest
 - acceptance_reviews:
   - reviewer: `codex`
     mode: `fresh-process candidate acceptance review`
-    summary: `The problem is clearly distinct from the already-completed integration-acceptance-first governance issue: this follow-on is about making executable acceptance harder to under-specify for governance issues and other IBM outputs. The remaining uncertainty is about the minimal fixed structure and whether verification templates should be upgraded in the same lifecycle.`
-    verdict: `needs_more_research`
+    summary: `The issue boundary is now stable: keep the lifecycle focused on IBM truth-source enforcement, not verification-template unification. The minimal structure can be enforced through doc-ibm-execution, PRD quality, completion gate, and issue materialization checklist without introducing a new schema in this round.`
+    verdict: `ready_to_materialize`
 - acceptance_hint:
   - `pre-tests.md` 默认先写可执行 acceptance，而不是“只读某文档时应能看出什么”
   - 对 Freely 自治能力，必须写出至少一条真 runtime / dogfood 场景，而不是仅停在 wording review
   - 需要显式写出环境、证据、失败判据、post-merge replay expectation
   - 若某条 issue 不需要其中某类测试，必须写出不适用的理由和替代证据面
 - priority: P0
-- status: needs_research
-- decision_reason: 方向和优先级已经清楚，但是否要引入新的 `pre-tests.md` 固定字段、是否同步升级 verification review 模板、以及如何表达“真环境测试必做但不等于每次都写新脚本”这几个点仍需再收敛，先保持在 pre-brainstorm。
-- next_action: 继续 pre-brainstorm，先评审现有 IBM truth source、若干强/弱 `pre-tests.md` 样本，以及最小 runtime dogfood 场景表达方式；收敛后再决定是直接 materialize 成 issue，还是拆成 IBM gate 与 verification template 两条 issue。
-- revisit_trigger: 当 executable acceptance contract 的最小结构、环境/证据/失败判据字段，以及与 verification closeout 的边界都能冻结成独立 issue scope 时，重新进入 materialization 判断。
-- promoted_issue_path: `pending://ibm-pretests-real-environment-acceptance-quality-materialization`
+- status: promoted
+- decision_reason: 候选边界已稳定。当前最小可交付是收紧 IBM 真源本身，让 `pre-tests.md` 更难被写成弱验收；verification review 模板统一和 machine-readable schema 继续作为后续问题保留，不并入本轮。
+- next_action: materialize issue-bound IBM artifacts，冻结 `pre-tests.md` 的 executable acceptance contract 质量门槛，然后进入 truth-source dev 改写。
+- revisit_trigger: 当本 issue 完成后，若仍需要统一 verification review 模板或引入 machine-readable acceptance schema，通过新的 lifecycle 承接。
+- promoted_issue_id: `I-20260326-1815`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
 - milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
 - session_refs:
   - tool: codex

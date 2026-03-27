@@ -318,20 +318,26 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
 - completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
 
-### candidate_issues
-
-1. `C-20260326-1733-A`
-- title: IBM pre-tests executable real-environment acceptance quality governance
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+2. `I-20260326-1815`
+- title: IBM pre-tests executable acceptance quality governance
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
-- promoted_issue_path: `pending://ibm-pretests-real-environment-acceptance-quality`
+- issue_path: `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/candidates.md`
-- next_action: 继续 pre-brainstorm，先收敛 executable acceptance contract 的最小结构：哪些字段必须写进 `pre-tests.md`，如何显式覆盖 integration / application-native real-environment / end-to-end dogfood 三类验收面，以及 governance issue 在真 runtime 中最小应跑哪些场景；在这些边界稳定前，不把问题退化成单条 issue 的 wording 修补
-- revisit_trigger: 当 executable acceptance contract 的固定结构、证据面、失败判据，以及与 verification closeout 的边界都能冻结成独立 issue scope 时，重新进入 materialization 判断
+- evidence:
+  - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
+  - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
+  - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
+  - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
+  - `docs/progress/workspace-routing-foundation/p-ibm-pretests-executable-acceptance-quality-governance.md`
+  - `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/code-reviews/20260326-ibm-pretests-executable-acceptance-quality-governance-verification.md`
+- completion_note: IBM 真源现在要求 `pre-tests.md` 默认写出可恢复的 executable acceptance contract，并对 Freely 自治能力明确 integration、application-native real-environment、end-to-end dogfood 三类 post-merge 验收面；verification review 模板统一与 machine-readable schema 继续留给后续 lifecycle
 
-2. `C-20260323-1435-A`
+### candidate_issues
+
+1. `C-20260323-1435-A`
 - title: Interactive init bootstrap and fine-grained force/skip governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
