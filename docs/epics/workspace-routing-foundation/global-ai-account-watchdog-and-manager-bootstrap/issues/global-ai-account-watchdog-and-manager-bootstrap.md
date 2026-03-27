@@ -171,6 +171,8 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
     - `worahe3973@outlook.com -> worahe3971@outlook.com`
   - live 测试口径已收紧为：监控脚本先启动，切到坏账号后等待当前 AI 进程结束，再验证 watchdog 是否切回脚本真实探测出的可用账号并拉起新 Codex
   - 2026-03-26 closeout audit 追加了当前 verification gate 的 fleet / merge truth：
+    - 2026-03-26 upstream absorption followthrough 再次确认当前 authoritative owner 已切到 `feature/upstream-governance-merge-prep-20260327`：`feature/develop-merge-prep-fleet-closure-20260325` 已被当前上游吸收 owner 完整覆盖（`git merge-base --is-ancestor feature/develop-merge-prep-fleet-closure-20260325 HEAD` 成功，且 `feature/develop-merge-prep-fleet-closure-20260325...HEAD = 0/26`），随后对应 worktree 与 local branch 均已删除；当前 retained fleet 因而收缩到 4 棵，writeback 提交后 `./bin/wt-status-all` 与 `./bin/wt-fleet-status` 应回到 `Summary: total=4, dirty=0` 且全部 worktree 显式 `stopped`
+    - `feature/manager-scheduler-capacity-candidate-replay-20260324` 相对当前 absorption owner 仍保留未吸收本地历史（`feature/manager-scheduler-capacity-candidate-replay-20260324...HEAD = 24/266`），所以继续保持 `needs_research / retained-with-reason`，不能因为 fleet 已 clean 就误判为可直接退休
     - `git worktree list --porcelain`、`./bin/wt-status-all` 与相关 worktree `git status` 当前 authoritative fleet truth 已继续前移到 12 棵 worktree，latest stable recheck 为 `Summary: total=12, dirty=1`；当前唯一 dirty owner 只剩 `feature/develop-merge-prep-fleet-closure-20260325`。此前 continuity 里的 5-tree / 7-tree / 10-tree snapshot、旧 prompt 注入的 6-tree / 9-tree closeout inventory，以及 04:47 PDT 写下的 `dirty=3` 都不再构成当前 cleanup 真相
     - `feature/manager-scheduler-capacity-candidate-replay-20260324` 当前已 clean，继续保持 `needs_research / retained-with-reason`，但 blocker 仍是 canonical `develop` proof writeback，而不是 replay-owner-local review readiness
     - `feature/intake-absorption-closure-governance-20260326` 当前 `develop...HEAD = 3/0`、supervisor/AI 都 down 且 worktree clean；因为 canonical docs 仍缺准确 owner/phase 吸收，这轮只能保持 `supervision-needed`
@@ -201,6 +203,7 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 - 当前 replay batch 已完成 strict probe-gating + wake-only recovery 的 contract / code / test 闭环，当前进入 manager merge judgement / develop replay followthrough 前的 review-ready 状态。
 - 这个 issue family 若后续还要动，只会是 manager review 暴露出的局部修补，不再是 contract 重写或 dev-loop 主线。
+- 当前 develop-facing absorption owner 已切到 `feature/upstream-governance-merge-prep-20260327`；`feature/develop-merge-prep-fleet-closure-20260325` 只剩 branch/worktree retirement followthrough，不能继续被当成当前 closeout owner。
 - 当前批次交付的 continuation contract：
   - probe 才是真理，cooldown 不再参与恢复逻辑
   - sweep / reprobe 窗口内所有 AI launch 都必须被阻塞

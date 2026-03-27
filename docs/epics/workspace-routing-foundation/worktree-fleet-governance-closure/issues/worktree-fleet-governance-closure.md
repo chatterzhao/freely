@@ -72,14 +72,13 @@ Freely 已经具备单树 worktree audit、merge-prep、stacked merge-chain 和 
 
 ## Next
 
-- 本 issue 的模式与首轮 inventory 已完成，但最终 review 仍需跟上当前真实 fleet，而不是停留在旧的 `current sweep` 快照。
-- 当前 fleet 已收缩到 `./bin/wt-status-all => Summary: total=9, dirty=0`。
-- 剩余树的当前 disposition 已明确分层：
-  - protected: `develop`, `pre-test-merge`
-  - retained integration owners: `feature/manager-family-integration-20260325`, `feature/watchdog-family-replay-20260325`
-  - retained runtime-owned followthrough: `feature/pre-test-merge-lifecycle-management-followthrough-20260324`
-  - retained research / replay owners: `feature/manager-scheduler-capacity-candidate-replay-20260324`, `feature/manager-delegated-continuation-stall-materialization-20260323`, `feature/worker-stall-recovery-during-active-ai-20260323`
-  - retained verification/materialization owner: `feature/testing-evidence-ladder-and-real-environment-gates-20260325`
-- 本轮已准确退休一批 superseded companion/source 树；当前剩余 9 棵里没有新的 `retire-now` 对象。
-- 本轮新增的 `protected-post-merge-acceptance-route-governance` 已正确回流到 pre-brainstorm，说明 `fleet_closure` 已把“当前 issue 之外的新治理缺口”重新路由，而不是硬塞回原 issue。
-- 待 manager 完成剩余 worktree 的 merge / verification / cleanup 判断后，本 issue 才能从 `in_verification` 进入最终 promote / cleanup followthrough。
+- 本 issue 的模式与首轮 inventory 已完成；当前 followthrough 只剩把 disposition 写回到最新 4-tree fleet truth，并继续守住 retained-vs-retired judgement。
+- 当前 authoritative fleet 已收缩到 4 棵 retained worktree；本轮 writeback 提交后，`./bin/wt-status-all` 与 `./bin/wt-fleet-status` 应回到 `Summary: total=4, dirty=0` 且全部 worktree 都显式 `stopped`。
+- 当前 fleet 的有效分层如下：
+  - protected/control: `develop`, `pre-test-merge`
+  - retained research owner: `feature/manager-scheduler-capacity-candidate-replay-20260324`
+  - active develop-facing absorption owner: `feature/upstream-governance-merge-prep-20260327`
+  - retired after absorption writeback: `feature/develop-merge-prep-fleet-closure-20260325`
+- `feature/develop-merge-prep-fleet-closure-20260325` 已被 `feature/upstream-governance-merge-prep-20260327` 完整吸收：`git merge-base --is-ancestor feature/develop-merge-prep-fleet-closure-20260325 HEAD` 返回成功，且 `feature/develop-merge-prep-fleet-closure-20260325...HEAD = 0/26`；随后对应 worktree 与 local branch 均已删除。因此它不再属于 current fleet，只保留为 closeout provenance。
+- `feature/manager-scheduler-capacity-candidate-replay-20260324` 仍保留 `needs_research / retained-with-reason`：相对当前 absorption owner 仍有未吸收的本地 commits（`feature/manager-scheduler-capacity-candidate-replay-20260324...HEAD = 24/266`），因此本轮不能把它误判成可直接退休的 superseded tree。
+- 待当前 absorption owner 把 develop-facing promote / replay judgement 写回并继续守住 retained research owner 的边界后，本 issue 才能从 `in_verification` 进入最终 promote / cleanup followthrough。
