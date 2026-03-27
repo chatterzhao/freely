@@ -49,6 +49,16 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260327-0651`
+- title: Project-scoped network proxy configuration and launcher inheritance governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/candidates.md`
+- next_action: 先完成 project-scoped proxy config truth、shared resolver 与 launcher / OAuth path inheritance，再跑 focused regression 和 governance-check
+
 ### completed_issues
 
 1. `I-20260327-0701`

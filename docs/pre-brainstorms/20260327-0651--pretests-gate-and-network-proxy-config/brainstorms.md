@@ -42,18 +42,11 @@
 1. `.freely/config.env`
 - 已是项目级 runtime 配置真源
 - 目前承载 AI tool / model / cadence / restart 等字段
-- 还没有统一的网络配置 contract
+- 现在已吸收 project-scoped proxy config defaults，但其他 active worktree 仍需跟进新的 completed gate 后再进入 closeout
 
-2. `availability-watchdog.sh`
-- `codex_probe_current_slot_now()` 目前显式写死：
-  - `ALL_PROXY="${ALL_PROXY:-http://127.0.0.1:7890}"`
-  - `HTTP_PROXY="${HTTP_PROXY:-http://127.0.0.1:7890}"`
-  - `HTTPS_PROXY="${HTTPS_PROXY:-http://127.0.0.1:7890}"`
-- 这说明网络出口还停留在实现临时补丁层，不是产品配置能力
-
-3. OAuth sweep / `curl`
-- 当前没有同样的统一代理注入 contract
-- mock 测试可能通过，真实环境却会因为 `curl` 不走正确代理而失败
+2. runtime network resolver
+- 现在已在 dedicated proxy lane materialize 为统一 resolver
+- 目标是让 `codex exec`、`curl`/OAuth、watchdog 与 future tooling launcher 共用同一组 `inherit` / `explicit` / `disabled` 语义
 
 ## Desired Outcome
 
@@ -112,6 +105,7 @@
   - `inherit`
   - `explicit`
   - `disabled`
+- `FREELY_NETWORK_PROXY_URL`
 - `FREELY_ALL_PROXY`
 - `FREELY_HTTP_PROXY`
 - `FREELY_HTTPS_PROXY`
@@ -152,9 +146,7 @@
 
 ## Initial Direction
 
-先不要直接改所有实现；先把问题拆成两个可 materialize 的 follow-on 候选：
+这条研究入口现在已经拆成两条后续生命周期：
 
-1. `pre-tests evidence binding and retirement gate`
-2. `project-scoped network proxy configuration and launcher inheritance`
-
-这样不会把 testing gate 和 network config 混成一个超大 issue，但它们共享同一条研究入口和同一套 dogfood 证据。
+1. `I-20260327-0701` 负责 issue-bound pre-tests evidence gate，并已先把 `phase_state=completed` 的第一阶段 gate 合入 `develop`
+2. `I-20260327-0651` 负责 project-scoped network proxy configuration and launcher inheritance，并在当前 lane 继续推进实现、验证与 closeout
