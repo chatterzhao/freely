@@ -324,3 +324,35 @@
   - 某条异常经核对后应从本审计移出
   - 某条异常被确认需要新开的 follow-up pre-brainstorm
 - 若没有新的分类变化，这份 audit 应视为已收口，后续改动转入对应 lane 的执行文档，不再继续堆在本文件
+
+## Execution Update - 2026-03-27
+
+本轮已直接收口的条目：
+
+- `Lane B / normalization`
+  - `20260318-1818` 已从 legacy `done + pending://...` 改写为显式 `absorbed supporting evidence` / `dropped`
+  - `C-20260320-0052-A` 已归到 `I-20260321-1925`
+  - `C-20260320-0120-A` 已归到 `I-20260321-1925`
+  - `C-20260321-1835-A` 已归到 `I-20260324-0405`
+
+- `Lane C / absorption-or-drop`
+  - `C-20260309-1943` 已判定为 `superseded`
+  - `C-20260309-2345-A` 已判定为 `absorbed supporting evidence`
+  - `C-20260309-2345-B` 已判定为 `superseded`
+  - `C-20260310-0056-B` 已补 milestone 绑定并恢复 candidate queue 可见性
+  - `C-20260320-1745-A` 已补回 milestone candidate queue 可见性，继续保留 `candidate`
+  - `C-20260327-parked-worktree-retirement` 已补 milestone 绑定与 candidate queue 可见性，继续保留 `needs_research`
+
+当前仍保留 follow-up judgement 的条目：
+
+- `C-20260320-1745-A`
+- `C-20260303-001`, `C-20260303-002`
+- `C-20260304-202`
+- `C-20260304-501`
+- `C-20260304-605`, `C-20260304-607`
+- `C-20260305-803`
+- `C-20260305-703`
+- `C-20260306-002`
+- `C-20260309-2003-A`, `C-20260309-2003-B`, `C-20260309-2003-C`
+
+这些条目当前仍缺足够强的 canonical owner 或 drop judgement；后续若继续处理，应优先做“是否还有独立 owner 价值”而不是先补形式化 milestone。

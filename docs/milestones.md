@@ -641,6 +641,39 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先把本地可选 sidecar 的最小职责边界、review / validation / rollback gate 和不接管主 runtime 的约束写稳，再决定是否 materialize 成独立 issue
 - revisit_trigger: 当 sidecar 的职责边界、review/validation/rollback gate 与“不接管主 runtime”约束可以被冻结成最小 issue contract 时，重新进入 materialization 判断
 
+9. `C-20260310-0056-B`
+- title: Delay EvoMap Hub Integration Until Single-Node Autonomy Is Stable
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/candidates.md`
+- next_action: 保持在 pre-brainstorm，先把单机自治、自我优化原型与本地策略资产模型跑稳，再决定是否还需要外部 Hub / worker 网络方向
+- revisit_trigger: 当单机自治闭环已稳定，且外部协作语义、成本与 review gate 可以被冻结成独立 issue contract 时，重新进入 materialization 判断
+
+10. `C-20260320-1745-A`
+- title: Dirty worktree gate redesign for multi-worktree autonomy
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/candidates.md`
+- next_action: 保持 pre-brainstorm candidate；先继续冻结 `target_clean / fleet_busy / fleet_dirty_unrelated` 的最小 contract，再决定是否 materialize 成独立治理 issue
+- revisit_trigger: 再次出现 unrelated dirty tree 阻断 cleanup / audit / merge-prep，或需要为 `wt-status-all` / cleanup 增加显式绕过语义时
+
+11. `C-20260327-parked-worktree-retirement`
+- title: Milestone-coupled parked worktree retirement planning
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/candidates.md`
+- next_action: 继续 pre-brainstorm，先冻结“parked issue allows retirement”的最小契约，再决定是否 materialize 成 follow-on issue
+- revisit_trigger: 当某个 worktree 的剩余动作已退化为 milestone 排序维护，而不是近程 issue continuation 时重新唤起
+
 9. `C-20260322-0715-A`
 - title: Detect and recover pre-test-merge manager acceptance stalls after delegated continuation
 - milestone_state: candidate

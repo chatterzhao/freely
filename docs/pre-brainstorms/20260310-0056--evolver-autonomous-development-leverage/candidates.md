@@ -33,7 +33,7 @@
 - status: proposed
 - decision_reason: 先把本地自治质量跑稳，比提早连接外部 worker 网络更符合当前产品阶段。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex
   - session_id: unavailable://chat-session

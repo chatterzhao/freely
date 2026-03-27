@@ -35,7 +35,7 @@
 - status: `needs_research`
 - decision_reason: 这不是简单调整当前 milestone 排序，而是要把 milestone sequencing 与 worktree retirement 联动成 Freely 自维护能力；现有 `milestone-planning-state-maintenance` 与 `worktree-maintenance-governance` 已覆盖两端，但中间的“parked issue allows retirement”契约尚未显式冻结。
 - promoted_issue_path: `pending://issue-materialization`
-- milestone: `pending://milestone-binding`
+- milestone: `M-20260306-workspace-routing-foundation`
 - next_action: 先收敛最小契约：哪些 milestone 证据足以支持 research worktree retirement，哪些 phase_state / queue ordering 可以表达 `parked but not active`，以及 manager 应如何把这个判断交给 cleanup / retirement handoff。
 - revisit_trigger: 当某个 worktree 的剩余动作已退化为 milestone 排序维护，而不是近程 issue continuation 时重新唤起。
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
