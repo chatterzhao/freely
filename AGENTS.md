@@ -59,7 +59,12 @@ Freely 处于研究优先的整合阶段。
 每次会话开始：
 1. **分支/Worktree检查**：如在 `main`/`develop`/`pre-test-merge` 则禁止写入。先执行 `cd <your-project-path>`，再按标准 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base>` 创建 feature worktree，并 `cd` 到该 worktree 中工作。默认 `<base>` 为 `develop`；若当前 issue 依赖未合并父分支改动，可用父 `feature/*` 作为 `<base>`，但必须在 pre-brainstorm / milestone / issue 中记录依赖关系。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDD-HHMM/HHMMSS`，目录名改为日期前置，例：`feature/foo-20260307-1015` -> `20260307-1015-feature-foo`
 2. **首跳先判 loop，不要先判 cleanup**：
-   - 如果是 Freely 自举中暴露的新共性问题，先判它是否应成为 Freely 能力发现；若边界未稳定，先进入 `docs/pre-brainstorms/`
+   - 如果是 Freely 自举中暴露的新讨论，先判它属于：
+     - 现有 issue continuation
+     - Freely 自身产品架构
+     - Freely 开发治理
+     - Freely 可复用能力
+   - 若边界未稳定，先进入 `docs/pre-brainstorms/`
    - 如果当前变更已落在现有 issue scope 内，优先吸收到既有 `issue / milestones / progress / code-review` 生命周期，不要为了一个新 worktree 再伪造新 candidate / issue
    - 只有当问题已经是“现有 lifecycle 走到 merge / verification / cleanup 哪一步”时，才切到 worktree promotion / retirement 判断
 3. **头脑风暴路由**：
@@ -68,15 +73,20 @@ Freely 处于研究优先的整合阶段。
 
 ## Freely 自举首跳
 
-Freely 开发 Freely 时，默认先问三件事：
+Freely 开发 Freely 时，默认先问四件事：
 
 1. 这是新问题，还是现有 issue 的 continuation？
    - 新问题：先走 pre-brainstorm / candidate / milestone
    - 现有 issue continuation：直接回到该 issue 的 doc-loop / dev-loop / verification
-2. 这是能力边界问题，还是单纯 worktree 生命周期问题？
-   - 能力边界问题：先看 `PROJECT_INTENT`、`three-loop-capability-lifecycle`、现有 issue / milestone
+2. 这是 Freely 自身产品架构、开发治理、可复用能力，还是单纯 worktree 生命周期问题？
+   - Freely 自身产品架构：先看 `PROJECT_INTENT`、`CONSTITUTION`、`LAWS`，并在需要时回写 `AGENTS.md`
+   - 开发治理：先看 `CONSTITUTION`、`LAWS`、现有 milestone / issue
+   - 可复用能力：先看现有 `docs/system/**`、`bin/**`、实现目录与 milestone / issue 是否已吸收
    - worktree 生命周期问题：再看 `worktree-maintenance-governance` / `branch-management`
-3. 这棵树是 research-only、merge-ready、companion-only，还是 verified-retirable？
+3. 这次讨论首先应落到开发文档，还是已经稳定到应进入能力目录？
+   - Freely 自身产品架构与开发治理，先落开发文档
+   - 只有会被 runtime / agent / skill / CLI 长期消费的稳定定义，才进入能力目录
+4. 这棵树是 research-only、merge-ready、companion-only，还是 verified-retirable？
    - 不要把“已经有 feature worktree”误当成“已经完成 issue materialization”
    - 不要把“已经 merge”误当成“cleanup 已完成”
 
@@ -84,8 +94,10 @@ Freely 开发 Freely 时，默认先问三件事：
 Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外。
 
 “吃自己的狗粮”在本项目中的具体含义：
-- Freely 开发过程中暴露的问题，不只是在修当前仓库；要先判断它是否应沉淀为 Freely 对外可复用的能力。
+- Freely 开发过程中暴露的问题，不只是在修当前仓库；但不要把任何新讨论都自动沉淀为 Freely 对外可复用能力。
+- 先判断它是 Freely 自身产品架构、开发治理，还是 Freely 可复用能力。
 - 若某个解决方案最终会被 Freely runtime、agent、skill、CLI 或打包产物长期消费，它必须落到 Freely 能力目录中，例如 `docs/system/**`、`bin/**`、实现代码目录；不要把这类能力定义留在 `pre-brainstorms`、`epics`、`progress` 等过程文档里。
+- 若某个讨论首先只是在定义 Freely 自身的产品形态、宿主壳关系或开发入口判断，它应先落在 `PROJECT_INTENT / CONSTITUTION / LAWS / AGENTS.md`，而不是直接写进能力目录。
 - 过程文档可以记录“为什么要做、边界如何收敛、当前结论是什么”，但不能替代最终能力真源。
 - 对已经稳定、可复用的提示词编排、角色职责、执行约束，优先拆到 `agents/**` 或 `skills/**`；runtime 脚本只保留启动、上下文注入、状态托管和恢复动作。
 - 开发 Freely 时调用这些 `agents/**`、`skills/**`、runtime 真源来继续开发 Freely，自身就是 dogfooding；这不是目录混用，而是产品自举。

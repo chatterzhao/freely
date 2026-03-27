@@ -225,6 +225,17 @@ CLI (核心) → API (可选) → UI (可选)
 - 具体接口设计见各 skill 的 CLI 参考文档。
 - AI Agent 调用约定见 `skill:auto-loop-orchestrator`。
 
+### 10.2 Freely 产品形态边界（硬性要求）
+
+Freely 自身的产品形态必须满足以下硬边界：
+
+1. `Freely core` 是被各宿主壳复用的能力本体。
+2. `Freely CLI` 是 canonical product shell。
+3. `Freely TUI app` 与 `Freely GUI app` 若存在，只能作为复用同一 core 的 optional shells。
+4. `chat`、`init`、`start`、`baseline-status`、`live-status`、`fleet-status` 属于 command / semantic surface，不得与 `CLI shell`、`TUI shell`、`GUI app` 作为同层 product shell 并列。
+5. 外部 AI tools（如 `codex`、`Claude Code`、MCP 组合路径）属于 external AI tooling layer，由 Freely core 编排；execution-provider abstraction 只存在于该层的路由/选择语义中；它们不是 Freely 自身的 product shell。
+6. 任一 shell 不得引入绕开 core 的私有业务语义。
+
 ## 11. 方法论总述（硬性要求）
 
 Freely 遵循三个 loop 的方法论。

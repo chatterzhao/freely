@@ -11,6 +11,57 @@
 - AI 持续运行（自己监控ai工具崩溃/阻塞自动触发续接），除非明确停止。或找不到需求，或者出现重大事故 AI 自己已经无力自己解决。
 - Freely 开发 Freely 时暴露的可复现共性问题，默认先判断是否应成为 Freely 能力发现；若可泛化到用户项目，应进入三个 loop 的 canonical lifecycle materialize 为可复用能力，而不是停留成一次性项目经验。
 
+## Freely 产品/系统架构
+
+Freely 自身首先是一个产品，不应被拆成一堆并列的 shell、命令和工具名。
+
+当前高层关系定义为：
+
+- `Freely product`
+  - `Freely core`
+  - `Freely CLI`
+  - `Freely TUI app`
+  - `Freely GUI app`
+
+其中：
+
+- `Freely core`
+  - runtime / orchestration
+  - service contract / adapter boundary
+  - external AI tooling orchestration
+  - eval / harness / operational substrate
+- `Freely CLI`
+  - `Freely core`
+  - CLI command set
+- `Freely TUI app`
+  - `Freely core`
+  - TUI shell
+- `Freely GUI app`
+  - `Freely core`
+  - GUI shell
+
+还要显式区分两类不应再和 shell 并列的东西：
+
+1. semantic surfaces
+   - `init`
+   - `start`
+   - `chat`
+   - `baseline-status`
+   - `live-status`
+   - `fleet-status`
+2. external AI tooling layer
+   - `codex`
+   - `Claude Code`
+   - MCP-assisted tool usage
+   - 其他被 Freely 编排的外部 AI tools
+
+原则：
+
+- `chat` / `status` family 是 Freely 通过 shell 暴露的语义面，不是 shell 自身。
+- `CLI shell`、`TUI shell`、`GUI app` 是宿主壳，不是业务语义本体。
+- 外部 AI tools 是 Freely core 编排的执行提供层，不是 Freely 自己的 product shell。
+- 若未来要沉淀“通用产品形态方法”，应另开独立 lifecycle；本节只表达 Freely 自身产品架构。
+
 ## 方法论总述
 
 ### 三个 Loop 方法论
@@ -162,6 +213,89 @@ flowchart TD
      - 宪法路径
      - AI 规格 `tool:model:mode`
    - AI 自主发现其他项目文档
+
+## Freely 产品/系统架构总览
+
+这一节只回答 Freely 自身作为产品时的高层架构，不定义 Freely 未来给其他应用复用的通用产品形态方法。
+
+### 产品壳与核心
+
+Freely product 由以下部分组成：
+
+- `Freely core`
+- `Freely CLI`
+- `Freely TUI app`
+- `Freely GUI app`
+
+其中：
+
+- `Freely core`
+  - 负责 runtime orchestration、external AI tooling orchestration、service contract、state/evidence、three-loop routing
+- `Freely CLI`
+  - 是 Freely 当前的 canonical product shell
+  - 通过 CLI command set 暴露 front-door、observability 与 control semantics
+- `Freely TUI app`
+  - 是 terminal-hosted shell
+  - 若存在，只能复用同一 core 与 backend contract
+- `Freely GUI app`
+  - 是 graphical shell
+  - 若存在，只能复用同一 core 与 backend contract
+
+### 纵向架构
+
+Freely 自身产品/系统架构的当前高层拓扑可理解为：
+
+1. operational substrate
+2. evaluation harness
+3. autonomy evals / acceptance
+4. external AI tooling layer
+5. Freely runtime / orchestration
+6. service contract / adapter layer
+7. host shells
+
+对应含义：
+
+- external AI tooling layer
+  - `codex`
+  - `Claude Code`
+  - MCP-assisted tool paths
+  - 这些是 Freely 借力的 external AI tooling，不是 Freely 自身产品壳
+- Freely runtime / orchestration
+  - `freely` runtime scripts
+  - manager / worker / lead
+  - three-loop routing
+  - continuity / patrol / queue / recovery
+- service contract / adapter layer
+  - backend contract
+  - transport / adapter taxonomy
+- host shells
+  - CLI
+  - TUI app
+  - GUI app
+
+### 正交语义面
+
+下列概念不是和 `CLI shell`、`TUI shell`、`GUI app` 并列的产品壳，而是跨壳暴露的 semantic surfaces：
+
+- boot semantics
+  - `init`
+  - `start`
+- submit / intervention semantics
+  - `chat`
+  - future human interruption submit paths
+  - pause / retry / resume 等 control actions
+- observability semantics
+  - `baseline-status`
+  - `live-status`
+  - `fleet-status`
+  - deeper session / stream / artifact references
+
+因此：
+
+- `chat` 不是 `CLI shell`、`TUI shell`、`GUI app` 的 peer
+- status family 也不是 `CLI shell`、`TUI shell`、`GUI app` 的 peer
+- `CLI shell`、`TUI shell`、`GUI app` 是承载这些语义面的 host shells
+- Freely 自身的 `CLI-first` 选择，是 Freely 产品架构决策，不自动等于 Freely 通用能力
 
 ## 非目标
 
