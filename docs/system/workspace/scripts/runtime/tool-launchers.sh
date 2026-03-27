@@ -1,5 +1,34 @@
 #!/usr/bin/env bash
 
+_tool_launchers_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+freely_tool_launchers_repo_root() {
+  local script_dir="$1" root
+  root="$(git -C "$script_dir" rev-parse --show-toplevel 2>/dev/null || true)"
+  if [[ -n "$root" ]]; then
+    printf '%s\n' "$root"
+    return 0
+  fi
+  case "$script_dir" in
+    */docs/system/workspace/scripts/runtime)
+      printf '%s\n' "${script_dir%/docs/system/workspace/scripts/runtime}"
+      ;;
+    *)
+      printf '%s\n' "$script_dir"
+      ;;
+  esac
+}
+
+SELF_ROOT="$(freely_tool_launchers_repo_root "$_tool_launchers_dir")"
+
+NETWORK_PROXY_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+[[ -f "$NETWORK_PROXY_RESOLVER_LIB" ]] || {
+  echo "[ERROR] missing network proxy resolver module: $NETWORK_PROXY_RESOLVER_LIB" >&2
+  return 1
+}
+# shellcheck disable=SC1090
+source "$NETWORK_PROXY_RESOLVER_LIB"
+
 codex_slot_switch_lock_dir_for_launch() {
   printf '%s\n' "${AI_CLI_SWITCH_LOCK_DIR:-$HOME/.codex/slot-switch.lock}"
 }
@@ -144,6 +173,7 @@ tool_run_from_prompt_file() {
   case "$tool" in
     codex)
       wait_for_codex_slot_switch_idle_before_launch || return 1
+      freely_apply_project_network_proxy_env "$project"
       local -a args=(exec --skip-git-repo-check -C "$project")
       if [[ "$launch_kind" == "resume" ]]; then
         [[ -n "$tool_resume_target" ]] || {

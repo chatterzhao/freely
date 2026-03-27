@@ -9,6 +9,12 @@ make_project() {
   local project="$1"
   mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample"
   git init -q -b develop "$project"
+  mkdir -p "$project/.githooks"
+  cat >"$project/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+  chmod +x "$project/.githooks/pre-commit"
 
   cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
@@ -70,6 +76,12 @@ test -f "$CODEX_CONFIG_FILE"
 grep -q '^AI_TOOL="codex"$' "$CONFIG_FILE"
 grep -q '^AI_MODEL="gpt-5.4"$' "$CONFIG_FILE"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
+grep -q '^FREELY_NETWORK_PROXY_MODE="inherit"$' "$CONFIG_FILE"
+grep -q '^FREELY_NETWORK_PROXY_URL=""$' "$CONFIG_FILE"
+grep -q '^FREELY_ALL_PROXY=""$' "$CONFIG_FILE"
+grep -q '^FREELY_HTTP_PROXY=""$' "$CONFIG_FILE"
+grep -q '^FREELY_HTTPS_PROXY=""$' "$CONFIG_FILE"
+grep -q '^FREELY_NO_PROXY=""$' "$CONFIG_FILE"
 grep -Fq "writable_roots = [\"$PROJECT_WORKTREES_ROOT\"]" "$CODEX_CONFIG_FILE"
 
 cat >"$CONFIG_FILE" <<'EOF'
@@ -111,6 +123,12 @@ FORCE_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
 grep -q '^AI_TOOL="codex"$' "$CONFIG_FILE"
 grep -q '^AI_MODEL="gpt-5.4"$' "$CONFIG_FILE"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
+grep -q '^FREELY_NETWORK_PROXY_MODE="inherit"$' "$CONFIG_FILE"
+grep -q '^FREELY_NETWORK_PROXY_URL=""$' "$CONFIG_FILE"
+grep -q '^FREELY_ALL_PROXY=""$' "$CONFIG_FILE"
+grep -q '^FREELY_HTTP_PROXY=""$' "$CONFIG_FILE"
+grep -q '^FREELY_HTTPS_PROXY=""$' "$CONFIG_FILE"
+grep -q '^FREELY_NO_PROXY=""$' "$CONFIG_FILE"
 grep -q '^model_context_window = 200000$' "$CODEX_CONFIG_FILE"
 grep -q '^model_auto_compact_token_limit = 150000$' "$CODEX_CONFIG_FILE"
 grep -q '^project_doc_max_bytes = 32768$' "$CODEX_CONFIG_FILE"

@@ -9,6 +9,12 @@ make_project() {
   local project="$1"
   mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample"
   git init -q -b develop "$project"
+  mkdir -p "$project/.githooks"
+  cat >"$project/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+  chmod +x "$project/.githooks/pre-commit"
 
   cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
@@ -72,6 +78,12 @@ grep -q '^AI_CAPABILITY_CODEX_MODEL=""$' "$CONFIG_FILE"
 grep -q '^AI_CAPABILITY_CODEX_SANDBOX=""$' "$CONFIG_FILE"
 grep -q '^AI_CAPABILITY_CODEX_APPROVAL_POLICY=""$' "$CONFIG_FILE"
 grep -q '^AI_CAPABILITY_CODEX_CWD_MODE=""$' "$CONFIG_FILE"
+grep -q '^FREELY_NETWORK_PROXY_MODE="inherit"$' "$CONFIG_FILE"
+grep -q '^FREELY_NETWORK_PROXY_URL=""$' "$CONFIG_FILE"
+grep -q '^FREELY_ALL_PROXY=""$' "$CONFIG_FILE"
+grep -q '^FREELY_HTTP_PROXY=""$' "$CONFIG_FILE"
+grep -q '^FREELY_HTTPS_PROXY=""$' "$CONFIG_FILE"
+grep -q '^FREELY_NO_PROXY=""$' "$CONFIG_FILE"
 
 STATUS_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
 printf '%s\n' "$STATUS_OUTPUT" | grep -q '^ai: cc:default:auto$'
@@ -99,6 +111,12 @@ grep -q '^AI_CAPABILITY_CODEX_MODEL="gpt-5.4"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_CAPABILITY_CODEX_SANDBOX="workspace-write"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_CAPABILITY_CODEX_APPROVAL_POLICY="never"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_CAPABILITY_CODEX_CWD_MODE="project-root"$' "$CONFIG_FILE_CODEX"
+grep -q '^FREELY_NETWORK_PROXY_MODE="inherit"$' "$CONFIG_FILE_CODEX"
+grep -q '^FREELY_NETWORK_PROXY_URL=""$' "$CONFIG_FILE_CODEX"
+grep -q '^FREELY_ALL_PROXY=""$' "$CONFIG_FILE_CODEX"
+grep -q '^FREELY_HTTP_PROXY=""$' "$CONFIG_FILE_CODEX"
+grep -q '^FREELY_HTTPS_PROXY=""$' "$CONFIG_FILE_CODEX"
+grep -q '^FREELY_NO_PROXY=""$' "$CONFIG_FILE_CODEX"
 test -f "$CODEX_CONFIG_FILE"
 grep -Fq "writable_roots = [\"$PROJECT_CC_CODEX-worktrees\"]" "$CODEX_CONFIG_FILE"
 

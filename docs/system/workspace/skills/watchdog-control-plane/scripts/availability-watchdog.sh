@@ -1,5 +1,34 @@
 # shellcheck shell=bash
 
+_watchdog_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+freely_watchdog_repo_root() {
+  local script_dir="$1" root
+  root="$(git -C "$script_dir" rev-parse --show-toplevel 2>/dev/null || true)"
+  if [[ -n "$root" ]]; then
+    printf '%s\n' "$root"
+    return 0
+  fi
+  case "$script_dir" in
+    */docs/system/workspace/skills/watchdog-control-plane/scripts)
+      printf '%s\n' "${script_dir%/docs/system/workspace/skills/watchdog-control-plane/scripts}"
+      ;;
+    *)
+      printf '%s\n' "$script_dir"
+      ;;
+  esac
+}
+
+SELF_ROOT="$(freely_watchdog_repo_root "$_watchdog_dir")"
+
+NETWORK_PROXY_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+[[ -f "$NETWORK_PROXY_RESOLVER_LIB" ]] || {
+  echo "[ERROR] missing network proxy resolver module: $NETWORK_PROXY_RESOLVER_LIB" >&2
+  return 1
+}
+# shellcheck disable=SC1090
+source "$NETWORK_PROXY_RESOLVER_LIB"
+
 normalize_codex_slot_name() {
   printf '%s' "$1" | sed 's/\./-/g'
 }
@@ -15,6 +44,10 @@ codex_active_auth_file() {
 watchdog_run_dir_for_project() {
   local project="$1"
   printf '%s\n' "$project/.freely/run"
+}
+
+freely_apply_network_proxy_env_for_project() {
+  freely_apply_project_network_proxy_env "$1"
 }
 
 codex_probe_artifacts_dir_for_project() {
@@ -286,12 +319,12 @@ codex_saved_slots() {
 
 codex_availability_state_file() {
   local project="$1"
-  printf '%s\n' "$(run_dir_for_project "$project")/codex-availability-state.env"
+  printf '%s\n' "$(watchdog_run_dir_for_project "$project")/codex-availability-state.env"
 }
 
 codex_availability_cache_file() {
   local project="$1"
-  printf '%s\n' "$(run_dir_for_project "$project")/codex-availability-cache.tsv"
+  printf '%s\n' "$(watchdog_run_dir_for_project "$project")/codex-availability-cache.tsv"
 }
 
 codex_oauth_usage_url() {
@@ -523,7 +556,7 @@ codex_confirm_launch_candidate_slot() {
 }
 
 codex_oauth_probe_single_slot() {
-  local slot="$1" auth_file="$2" output_file="$3"
+  local project="$1" slot="$2" auth_file="$3" output_file="$4"
   local usage_url token auth_email response_file http_code response_body
   usage_url="$(codex_oauth_usage_url)"
   if [[ ! -f "$auth_file" ]]; then
@@ -560,7 +593,12 @@ PY
   fi
 
   response_file="$(mktemp)"
-  if ! http_code="$(curl -sS -o "$response_file" -w '%{http_code}' -H "Authorization: Bearer $token" "$usage_url" 2>/dev/null)"; then
+  if ! http_code="$(
+    (
+      freely_apply_project_network_proxy_env "$project"
+      curl -sS -o "$response_file" -w '%{http_code}' -H "Authorization: Bearer $token" "$usage_url"
+    ) 2>/dev/null
+  )"; then
     rm -f "$response_file"
     printf '%s\tcurl_error\t%s\t0\t0\toauth query failed\n' "$slot" "$auth_email" >"$output_file"
     return 0
@@ -653,7 +691,7 @@ codex_oauth_sweep_all_slots() {
     [[ -n "$candidate" ]] || continue
     auth_file="$(codex_saved_slot_auth_file "$candidate")"
     result_file="$tmp_dir/${candidate}.tsv"
-    codex_oauth_probe_single_slot "$candidate" "$auth_file" "$result_file" &
+    codex_oauth_probe_single_slot "$project" "$candidate" "$auth_file" "$result_file" &
   done < <(codex_saved_slots "$project")
   wait || true
 
@@ -884,13 +922,10 @@ codex_probe_current_slot_now() {
   printf 'hi\n' >"$prompt_file"
   rc=0
 
-  # Run codex exec with proxy and timeout
+  # Run codex exec with project-scoped proxy resolution and timeout.
   (
     cd "$project"
-    # Export proxy env for codex
-    export ALL_PROXY="${ALL_PROXY:-http://127.0.0.1:7890}"
-    export HTTP_PROXY="${HTTP_PROXY:-http://127.0.0.1:7890}"
-    export HTTPS_PROXY="${HTTPS_PROXY:-http://127.0.0.1:7890}"
+    freely_apply_project_network_proxy_env "$project"
 
     if [[ -n "${AI_MODEL:-}" ]]; then
       codex exec \

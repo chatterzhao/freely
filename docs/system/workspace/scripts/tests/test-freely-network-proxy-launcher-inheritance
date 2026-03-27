@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-network-proxy-launcher.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/mock-bin"
+PROMPT_FILE="$TMP_DIR/prompt.txt"
+LOG_FILE="$TMP_DIR/codex.log"
+mkdir -p "$PROJECT/.freely" "$MOCK_BIN"
+printf 'hello\n' >"$PROMPT_FILE"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="explicit"
+FREELY_ALL_PROXY="socks5://proxy.example:1080"
+FREELY_HTTP_PROXY="http://proxy.example:8080"
+FREELY_HTTPS_PROXY="http://proxy.example:8443"
+FREELY_NO_PROXY="localhost,127.0.0.1"
+EOF
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s|%s|%s|%s|%s\n' "${ALL_PROXY:-}" "${HTTP_PROXY:-}" "${HTTPS_PROXY:-}" "${NO_PROXY:-}" "$*" >>"${LOG_FILE:?}"
+cat >/dev/null
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+PATH="$MOCK_BIN:$PATH" \
+LOG_FILE="$LOG_FILE" \
+bash -lc '
+  set -euo pipefail
+  SELF_ROOT="'"$ROOT_DIR"'"
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/tool-launchers.sh"
+  wait_for_codex_slot_switch_idle_before_launch() { return 0; }
+  tool_run_from_prompt_file "'"$PROJECT"'" codex "gpt-5.4" "medium" "auto" "'"$PROMPT_FILE"'" "fresh"
+' >/dev/null 2>&1
+
+grep -Fq 'socks5://proxy.example:1080|http://proxy.example:8080|http://proxy.example:8443|localhost,127.0.0.1|' "$LOG_FILE"
+grep -Fq -- "--skip-git-repo-check -C $PROJECT" "$LOG_FILE"
+grep -Fq 'gpt-5.4' "$LOG_FILE"
+grep -Fq -- '--dangerously-bypass-approvals-and-sandbox' "$LOG_FILE"
+if grep -q '127.0.0.1:7890' "$LOG_FILE"; then
+  echo "[FAIL] launcher path must not inject localhost proxy defaults" >&2
+  exit 1
+fi
+
+echo "[PASS] codex launcher inherits project-scoped proxy config before exec"

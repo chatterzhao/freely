@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-network-proxy-resolver.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="explicit"
+FREELY_NETWORK_PROXY_URL="http://proxy.example:9000"
+FREELY_NO_PROXY="localhost,127.0.0.1"
+EOF
+
+RESULT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+    freely_apply_project_network_proxy_env "'"$PROJECT"'"
+    printf "%s|%s|%s|%s\n" "${ALL_PROXY:-}" "${HTTP_PROXY:-}" "${HTTPS_PROXY:-}" "${NO_PROXY:-}"
+  '
+)"
+
+[[ "$RESULT" == "http://proxy.example:9000|http://proxy.example:9000|http://proxy.example:9000|localhost,127.0.0.1" ]]
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="disabled"
+FREELY_NETWORK_PROXY_URL="http://proxy.example:9000"
+EOF
+
+RESULT_DISABLED="$(
+  bash -lc '
+    set -euo pipefail
+    export ALL_PROXY="http://should-clear:9999"
+    export HTTP_PROXY="http://should-clear:9999"
+    export HTTPS_PROXY="http://should-clear:9999"
+    export NO_PROXY="should-clear"
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+    freely_apply_project_network_proxy_env "'"$PROJECT"'"
+    printf "%s|%s|%s|%s\n" "${ALL_PROXY:-}" "${HTTP_PROXY:-}" "${HTTPS_PROXY:-}" "${NO_PROXY:-}"
+  '
+)"
+
+[[ "$RESULT_DISABLED" == "|||" ]]
+
+echo "[PASS] network proxy resolver handles explicit base-url and disabled modes"

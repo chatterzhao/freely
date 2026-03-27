@@ -24,10 +24,26 @@ setup_project() {
   local project="$1"
   mkdir -p \
     "$project/.freely/run" \
-    "$project/docs/system/workspace/skills/watchdog-control-plane/scripts"
+    "$project/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+    "$project/docs/system/workspace/scripts/runtime"
   ln -sf \
     "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
     "$project/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  ln -sf \
+    "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+    "$project/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+}
+
+write_proxy_config() {
+  local project="$1" mode="$2" all_proxy="$3" http_proxy="$4" https_proxy="$5" no_proxy="$6"
+  mkdir -p "$project/.freely"
+  cat >"$project/.freely/config.env" <<EOF
+FREELY_NETWORK_PROXY_MODE="$mode"
+FREELY_ALL_PROXY="$all_proxy"
+FREELY_HTTP_PROXY="$http_proxy"
+FREELY_HTTPS_PROXY="$https_proxy"
+FREELY_NO_PROXY="$no_proxy"
+EOF
 }
 
 setup_home() {
@@ -86,7 +102,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 token="${auth_header#Authorization: Bearer }"
-printf '%s|%s\n' "$scenario" "$token" >>"$log_file"
+printf '%s|%s|%s|%s|%s|%s\n' "${ALL_PROXY:-}" "${HTTP_PROXY:-}" "${HTTPS_PROXY:-}" "${NO_PROXY:-}" "$scenario" "$token" >>"$log_file"
 
 case "$scenario:$token" in
   usable:token-limited)
@@ -118,6 +134,7 @@ PROJECT_USABLE="$TMP_DIR/project-usable"
 HOME_USABLE="$TMP_DIR/home-usable"
 LOG_USABLE="$TMP_DIR/probe-usable.log"
 setup_project "$PROJECT_USABLE"
+write_proxy_config "$PROJECT_USABLE" "explicit" "socks5://proxy.example:1080" "http://proxy.example:8080" "http://proxy.example:8443" "localhost,127.0.0.1"
 setup_home "$HOME_USABLE"
 mkdir -p "$HOME_USABLE/.ai-auth/codex-limited@example-com-1" "$HOME_USABLE/.ai-auth/codex-work@example-com-2"
 make_auth_json "limited@example.com" "$HOME_USABLE/.ai-auth/codex-limited@example-com-1/auth.json" "token-limited"
@@ -137,16 +154,17 @@ grep -q '"slot": "work@example-com-2"' "$TMP_DIR/usable.out"
 grep -q '"status": "usable"' "$TMP_DIR/usable.out"
 grep -q '"slot": "work@example-com-2"' <(HOME="$HOME_USABLE" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
 grep -q '"auth_email": "work@example.com"' <(HOME="$HOME_USABLE" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
-grep -q 'usable|token-limited' "$LOG_USABLE"
-grep -q 'usable|token-work' "$LOG_USABLE"
+grep -q 'socks5://proxy.example:1080|http://proxy.example:8080|http://proxy.example:8443|localhost,127.0.0.1|usable|token-limited' "$LOG_USABLE"
+grep -q 'socks5://proxy.example:1080|http://proxy.example:8080|http://proxy.example:8443|localhost,127.0.0.1|usable|token-work' "$LOG_USABLE"
 grep -Eq '"availability_cache":[[:space:]]*\{"present":[[:space:]]*true' <(HOME="$HOME_USABLE" PROJECT_ROOT="$PROJECT_USABLE" bash "$ROOT_DIR/bin/ai" --quiet --format json status codex)
 
-echo "[PASS] freely ai switch codex auto-probes and switches to a usable account"
+echo "[PASS] freely ai switch codex auto-probes a usable account through project-scoped proxy config"
 
 PROJECT_STATUS="$TMP_DIR/project-status"
 HOME_STATUS="$TMP_DIR/home-status"
 LOG_STATUS="$TMP_DIR/probe-status.log"
 setup_project "$PROJECT_STATUS"
+write_proxy_config "$PROJECT_STATUS" "explicit" "socks5://proxy.example:1080" "http://proxy.example:8080" "http://proxy.example:8443" "localhost,127.0.0.1"
 setup_home "$HOME_STATUS"
 mkdir -p "$HOME_STATUS/.ai-auth/codex-limited@example-com-1" "$HOME_STATUS/.ai-auth/codex-work@example-com-2"
 make_auth_json "limited@example.com" "$HOME_STATUS/.ai-auth/codex-limited@example-com-1/auth.json" "token-limited"
@@ -163,11 +181,11 @@ MOCK_OAUTH_LOG="$LOG_STATUS" \
 grep -Eq '"availability_cache":[[:space:]]*\{"present":[[:space:]]*true' "$TMP_DIR/status.out"
 grep -q '"usable": 1' "$TMP_DIR/status.out"
 grep -q '"rate_limited": 1' "$TMP_DIR/status.out"
-grep -q 'usable|token-limited' "$LOG_STATUS"
-grep -q 'usable|token-work' "$LOG_STATUS"
+grep -q 'socks5://proxy.example:1080|http://proxy.example:8080|http://proxy.example:8443|localhost,127.0.0.1|usable|token-limited' "$LOG_STATUS"
+grep -q 'socks5://proxy.example:1080|http://proxy.example:8080|http://proxy.example:8443|localhost,127.0.0.1|usable|token-work' "$LOG_STATUS"
 [[ -f "$PROJECT_STATUS/.freely/run/codex-availability-cache.tsv" ]]
 
-echo "[PASS] freely ai status refreshes stale codex inventory via oauth sweep before reporting cache summary"
+echo "[PASS] freely ai status refreshes stale codex inventory through project-scoped proxy config before reporting cache summary"
 
 PROJECT_EARLIEST="$TMP_DIR/project-earliest"
 HOME_EARLIEST="$TMP_DIR/home-earliest"
