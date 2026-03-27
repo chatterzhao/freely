@@ -28,9 +28,9 @@
 判定规则：
 1. 分支来源、merge 方向、保护分支策略符合宪法分支表。
 2. `feature/*` 默认从 `develop` 创建并在 worktree 内开发；若 issue 明确依赖未合并父分支改动，可从父 `feature/*` 派生 dedicated worktree，但必须记录依赖关系与最终集成目标。
-3. `main/develop/pre-test-merge` 保持 add/commit 禁止。
-4. `develop` 合并前，`TEST`（含集成验收）通过；若走 `pre-test-merge` 路径，验证批次必须可追溯，且 `develop` 只吸收来源 `feature/*` 的 replay，不直接吸收 `pre-test-merge`。
-4b. `pre-test-merge` 只承担主线前的临时验证职责，不承担“在 `develop` 上先预测试”的替代语义；需要主线前验证时，应进入 `pre-test-merge`，需要主线后真实环境验收时，才进入 `develop` 的 completion verification。
+3. `main/develop/test-pre-merge-*` 保持 add/commit 禁止；`test-pre-merge-*` 还必须禁止 push。
+4. `develop` 合并前，`TEST`（含集成验收）通过；若走 `test-pre-merge-*` 路径，验证批次必须可追溯，且 `develop` 只吸收来源 `feature/*` 的 replay，不直接吸收测试批次。
+4b. `test-pre-merge-*` 只承担主线前的临时验证职责，不承担“在 `develop` 上先预测试”的替代语义；需要主线前验证时，应进入新的 `test-pre-merge-*` 批次，需要主线后真实环境验收时，才进入 `develop` 的 completion verification。
 4a. 当 issue 已有 `pre-tests.md` 时，develop 合并 gate 默认优先看其中定义的 integration / acceptance evidence；代码评审完成度不得替代这层验收。
 4c. `pre-tests.md` 若不能恢复 acceptance contract，则不得被视为“测试已定义”。最低质量线至少包括：
    - acceptance target
@@ -42,18 +42,18 @@
 5. `PRE_TEST` 仅作为开发前基线，不得替代提升测试结果。
 6. 提升前必须有评审记录、祖先可追溯证据、进度/恢复更新证据。
 7. merge/promotion/release 前执行 `./bin/wt-status-all`，结果全 `CLEAN`；cleanup 前至少要求 target worktree 自身安全。若存在 unrelated dirty 或 busy worktree，必须显式跳过并在 cleanup 证据中留痕，不得误删。
-8. premerge 仅作冲突收敛，来源与回并目标均为当前活跃的 `pre-test-merge`。
+8. premerge 仅作冲突收敛，来源与回并目标均为当前活跃的 `test-pre-merge-*` 批次。
 9. 清理动作只能在 `verified-retirable` 后执行，且必须留痕。
 10. 派生 worktree 的 issue 在提升前必须对齐其父分支结果：父分支先进入要求路径，子分支再 restack/rebase/merge 上游并重新验证。
 11. `in_dev` issue 不得无限期累积脏树；当当前 worktree 进入 checkpoint 预警或阻断预算时，下一轮必须先更新对应 continuity artifact，并优先切出 checkpoint commit 或按 ownership 分流到其他 dedicated worktree。
 12. runtime/status 必须暴露当前 project dirty entries 与项目级 worktree dirty summary，供多 worktree 监督与 promotion 决策使用。
 13. 若当前工位已通过最小验证门，但仍持续扩写实现而不形成 checkpoint commit / checkpoint note，视为自治治理退化，不得宣称“工作正常”。
-14. `pre-test-merge` 作为临时预集成批次时，若 `develop` 已前进到使其不再权威、或批次出现 protected-env 独有差异、或 promotion/cleanup 证据断裂，则该批次应被判定为 stale 并进入退役/重建流程。
-15. `pre-test-merge` 的 promotion 默认回到来源 feature 的已验证结果；保留旧批次快照不是默认真相面，只有在当前批次仍然权威时才可继续消费。
-16. 若 stale 的 `pre-test-merge` 仍需继续验证，必须先 retire 当前批次，再 replay 来源 feature 或当前已验证上游重建新的验证批次。
+14. `test-pre-merge-*` 作为临时预集成批次时，若 `develop` 已前进到使其不再权威、或批次出现 protected-env 独有差异、或 promotion/cleanup 证据断裂，则该批次应被判定为 stale 并立即删除；若仍需继续验证，必须从当前 `develop` 重建新批次。
+15. `test-pre-merge-*` 的 promotion 默认回到来源 feature 的已验证结果；保留旧批次快照不是默认真相面，只有在当前批次仍然权威时才可继续消费。
+16. `test-pre-merge-*` 不得承载 owner truth、issue continuation、milestone truth 或长期 cleanup 决策；若因为这些内容导致测试批次不能删除，默认判定为 misuse。
 
 最小验收证据：
-- 分支来源与合并路径记录（若经过 `pre-test-merge`，需包含 replay 到 `develop` 的来源 feature 顺序，以及该批次的 retire / rebuild 结论）
+- 分支来源与合并路径记录（若经过 `test-pre-merge-*`，需包含 replay 到 `develop` 的来源 feature 顺序，以及该批次的删除 / 重建结论）
 - `execution_base` / `integration_target` / `depends_on` 记录（如存在派生 worktree）
 - `wt-status-all` 输出记录
 - project dirty budget / worktree dirty summary 记录（如进入 checkpoint 治理）

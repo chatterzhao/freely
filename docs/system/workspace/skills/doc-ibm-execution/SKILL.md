@@ -32,7 +32,7 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
    - 至少要能恢复 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
    - 最小 blocker taxonomy 至少区分：`definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`
    - 若存在 merge 后才能验证的能力，显式标记 `post-merge acceptance`
-   - 并明确目标验证环境：`develop` 或 `pre-test-merge`
+   - 并明确目标验证环境：`develop` 或某个 `test-pre-merge-*` 批次
    - 对每个关键 acceptance 面，写出最小 `environment`、`evidence`、`failure signal`、`failure handling / replay expectation`
    - 对 Freely 自治能力，默认回答：
      - pre-merge focused regression / smoke

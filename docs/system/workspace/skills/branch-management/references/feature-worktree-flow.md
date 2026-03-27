@@ -26,4 +26,4 @@
 
 - 独立 issue：通常对齐 `develop`
 - 派生 issue：先跟随父 feature 结果，再对齐 `develop`
-- `feature/premerge-*`：默认上游是当前 `pre-test-merge`
+- `feature/premerge-*`：默认上游是当前活跃的 `test-pre-merge-*` 批次

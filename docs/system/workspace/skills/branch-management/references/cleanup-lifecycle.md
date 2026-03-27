@@ -9,7 +9,7 @@
 - `issue phase_state=completed` 只表示业务实现/验收已收口；若 cleanup / continuity / verification write-back 仍停留在该 feature worktree 的 dirty 改动中，则这条 branch lifecycle 仍未完成
 - 若存在 unrelated dirty 或 busy worktree，不作为全局阻断；必须在 cleanup evidence 中显式记录为 retained / skipped
 - 合并后不要立即删除分支/worktree
-- 对 `pre-test-merge` 而言，`stale` 是“该批次不再权威”的治理信号，不是可长期保留的 active state；若同一能力仍要继续验证，先 retire 当前批次，再用来源 feature replay 出新的验证批次。
+- 对 `test-pre-merge-*` 而言，`stale` 是“该批次不再权威”的治理信号，不是可长期保留的 active state；若同一能力仍要继续验证，先 retire 当前批次，再用来源 feature replay 出新的验证批次。
 
 ## State progression
 
@@ -26,7 +26,7 @@
 - 若存在远程 branch，其 disposition 已明确：
   - merged and deleted
   - or retained with reason
-- 对 `pre-test-merge` 的 retire / rebuild，cleanup evidence 还应记录 replay target，避免把 stale 批次误留成当前事实来源。
+- 对 `test-pre-merge-*` 的 retire / rebuild，cleanup evidence 还应记录 replay target，避免把 stale 批次误留成当前事实来源。
 
 ## Required evidence
 

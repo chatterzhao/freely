@@ -57,15 +57,12 @@ Freely 处于研究优先的整合阶段。
 ## 会话启动检查
 
 每次会话开始：
-1. **分支/Worktree检查**：如在 `main`/`develop`/`pre-test-merge` 则禁止写入。先执行 `cd <your-project-path>`，再按标准 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base>` 创建 feature worktree，并 `cd` 到该 worktree 中工作。默认 `<base>` 为 `develop`；若当前 issue 依赖未合并父分支改动，可用父 `feature/*` 作为 `<base>`，但必须在 pre-brainstorm / milestone / issue 中记录依赖关系。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDD-HHMM/HHMMSS`，目录名改为日期前置，例：`feature/foo-20260307-1015` -> `20260307-1015-feature-foo`
+1. **分支/Worktree检查**：如在 `main`/`develop`/`test-pre-merge-*` 则禁止写入。先执行 `cd <your-project-path>`，再按标准 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base>` 创建 feature worktree，并 `cd` 到该 worktree 中工作。默认 `<base>` 为 `develop`；若当前 issue 依赖未合并父分支改动，可用父 `feature/*` 作为 `<base>`，但必须在 pre-brainstorm / milestone / issue 中记录依赖关系。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDD-HHMM/HHMMSS`，目录名改为日期前置，例：`feature/foo-20260307-1015` -> `20260307-1015-feature-foo`
+   - 先确认 `git config --get core.hooksPath` 返回 `.githooks`。仓库中“存在 hook 脚本”不代表 Git 已启用它们；只有 `core.hooksPath=.githooks` 时，根目录 `.githooks/` 包装层才会实际转发到 `docs/system/workspace/hooks/*.sh` 执行门禁。
+   - `test-pre-merge-*` 是一次性本地测试批次：必须从当前 `develop` 新建，只允许 merge 装配验证，不允许普通写入/提交/push，不允许承载 owner / milestone / continuation 真相，测试结束后立即删除。
 2. **大重构先做 fleet sequencing audit**：若当前任务会同时改多层真源、跨多个现有 worktree / issue，或可能重排架构主干，先运行 `git worktree list --porcelain`、`./bin/wt-fleet-status`、`./bin/freely live-status --project <project-root>`、`./bin/freely fleet-status --project <project-root>`，并把结果与 `docs/milestones.md` / 相关 `progress` 对齐。优先收束 `dirty` 或仍在 `desired=running` 的 worktree，识别必须先合并的上游治理树，再决定是否开大重构 lane；不要在 fleet 状态模糊时直接开始深层重构。
 3. **首跳先判 loop，不要先判 cleanup**：
-   - 如果是 Freely 自举中暴露的新讨论，先判它属于：
-     - 现有 issue continuation
-     - Freely 自身产品架构
-     - Freely 开发治理
-     - Freely 可复用能力
-   - 若边界未稳定，先进入 `docs/pre-brainstorms/`
+   - 如果是 Freely 自举中暴露的新共性问题，先判它是否应成为 Freely 能力发现；若边界未稳定，先进入 `docs/pre-brainstorms/`
    - 如果当前变更已落在现有 issue scope 内，优先吸收到既有 `issue / milestones / progress / code-review` 生命周期，不要为了一个新 worktree 再伪造新 candidate / issue
    - 只有当问题已经是“现有 lifecycle 走到 merge / verification / cleanup 哪一步”时，才切到 worktree promotion / retirement 判断
 4. **头脑风暴路由**：

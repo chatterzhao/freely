@@ -8,7 +8,7 @@
 ## Worktree rules
 
 - 当前已承载该问题上下文的 dedicated worktree：可继续
-- 当前位于 `main/develop/pre-test-merge` 或主 worktree：必须先创建/进入 dedicated feature worktree
+- 当前位于 `main/develop/test-pre-merge-*` 或主 worktree：必须先创建/进入 dedicated feature worktree
 - 若问题依赖未合并父分支：优先在父分支上下文或其派生 worktree 中继续
 
 ## Stop conditions

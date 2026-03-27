@@ -11,7 +11,7 @@
 
 ## Rules
 
-- 当前在 `main/develop/pre-test-merge` 或主 worktree：`workspace_action=create_or_enter_worktree`
+- 当前在 `main/develop/test-pre-merge-*` 或主 worktree：`workspace_action=create_or_enter_worktree`
 - 已在承载该问题上下文的 dedicated worktree：`workspace_action=continue_current_worktree`
 
 ## Execution base

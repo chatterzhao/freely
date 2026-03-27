@@ -13,7 +13,7 @@
 1. 从 `main` 创建 `hotfix/*`
 2. 在 `hotfix/*` dedicated worktree 中完成修复
 3. 合并到 `main` 和 `develop`
-4. 若 `pre-test-merge` 当前活跃，同步热修复结果到该临时分支
+4. 若某个 `test-pre-merge-*` 批次当前活跃，同步热修复结果到该临时测试分支
 
 ## Failure rule
 
