@@ -44,6 +44,7 @@ chmod +x "$PROJECT/bin-ai-mock"
 cat >"$MOCK_BIN/codex" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+echo 'ERROR: unexpected status 402 Payment Required: {"detail":{"code":"deactivated_workspace"}}'
 sleep 3
 EOF
 chmod +x "$MOCK_BIN/codex"
@@ -68,6 +69,7 @@ ARTIFACT="$(find "$PROJECT/.freely/run/codex-probe-artifacts" -maxdepth 1 -type 
 [[ -n "$ARTIFACT" ]]
 grep -q 'status=timeout' "$ARTIFACT"
 grep -q 'slot=slow-slot-1' "$ARTIFACT"
+grep -q 'deactivated_workspace' "$ARTIFACT"
 grep -q 'captured partial output at ' "$TMP_DIR/stderr.log"
 
 echo "[PASS] codex probe timeout preserves partial output for later inspection"

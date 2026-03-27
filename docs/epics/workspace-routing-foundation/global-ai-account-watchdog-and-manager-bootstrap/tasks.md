@@ -22,4 +22,8 @@
 - [x] keep manager and workers down when all slots are unavailable, while leaving watchdog alive and observable
 - [x] re-check availability on low-frequency probe and `.ai-auth` inventory changes, then wake manager only after writing handoff
 - [x] rewrite focused regressions and minimal integration coverage around strict probe gating and wake-only recovery
-- [x] correct `ai-cli` slot-facing contract so slot is the only identity and auth email is metadata only
+- [x] make `ai-cli` expose slot as the only identity and report JWT email only as `auth_email` metadata, even when slot label and auth email differ
+- [x] make `freely start` fail fast when interruption dispatcher does not become ready, instead of silently continuing with a partial control-plane
+- [x] make `live-status` treat a live manager watchdog as active control-plane and surface it in `active_processes`
+- [x] keep detached `ensure-manager --watch` and interruption dispatcher alive after manager `auth_failure`, so intake absorption and slot recovery remain script-owned
+- [x] capture partial `codex exec` probe output into `.freely/run` artifacts when a slot probe times out or returns `deactivated_workspace`, so switch-time investigation no longer depends on reproducing the same transient failure interactively

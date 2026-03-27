@@ -38,6 +38,10 @@
 6. `watchdog-control-plane`、`runtime/freely`、`ai-cli` 的真源说明不再把 cooldown 描述为任何恢复逻辑 owner。
 7. 至少一条 focused regression 明确锁住 `whoami` / `switch` 的输出以 slot 为 identity，并允许 `auth_email` 与 slot 名不一致而不被误解释为当前身份漂移。
 8. live evidence 能说明真实 `.ai-auth/<slot>` inventory 与实际 probe/switch/no-launch 行为一致。
+9. 至少一条 focused regression 明确锁住 “manager `auth_failure` 后 watchdog control-plane 仍存活并继续接管恢复”。
+10. 至少一条 focused regression 明确锁住 “interruption dispatcher 未 ready 时 `freely start` 会 fail fast”。
+11. 至少一条 focused regression 明确锁住 “watchdog + dispatcher 仍存活时，`live-status` 不会误报 `stalled_without_runtime`”。
+12. 至少一条 focused regression 明确锁住 “slot probe timeout 会把 partial probe output 落到 `.freely/run` 可追踪 artifact”，便于区分网络慢、CLI 卡死、还是 `402 deactivated_workspace` 已经返回但被 timeout 截断。
 
 ## Latest focused verification
 
@@ -46,6 +50,10 @@
 3. `test-freely-ensure-manager` pass，锁住 manager bootstrap 前的真实 probe 和 handoff 写回。
 4. `test-freely-ensure-manager-earliest-reset-wait-revive` pass，锁住 all-unavailable hold、低频 reprobe、以及后续 wake。
 5. `test-freely-ensure-manager-inventory-change-wakes-watchdog` pass，锁住 `.ai-auth` inventory 变化 wake contract。
+6. `test-freely-auth-failure-keeps-control-plane-alive` pass，锁住 manager `auth_failure` 后 detached watchdog / dispatcher 继续存活。
+7. `test-freely-live-status-watchdog-survival` 与 `test-freely-live-status` pass，锁住 watchdog-only control-plane 不再误报 `stalled_without_runtime`。
+8. `test-freely-start-requires-interruption-dispatcher-ready` pass，锁住 dispatcher 未 ready 时的 fail-fast gate。
+9. `test-freely-codex-probe-timeout-artifact` pass，锁住 timeout / deactivated workspace probe output artifact 写回。
 
 ## Blocker taxonomy
 

@@ -68,7 +68,8 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - 当所有 slot 都不可用时，watchdog 仍保持存活和可观察，但 AI launch 保持阻塞；只有后续真实 probe 或 inventory 变化发现可用 slot 后，才写 handoff 并唤醒主管。
 - 主管恢复后继续只承担监督和委派，不接管全局账号切换。
 - watchdog 在拉起主管前会写结构化恢复交接，而不是让主管盲启动。
-- `whoami` / `switch` / `status` / `save` / `login` 的展示与 JSON 输出不会再把授权邮箱误报成“当前身份”；slot 才是当前身份锚点。
+- `whoami` / `switch` / `status` / `save` / `login` 的展示与 JSON 输出不会再把授权邮箱误报成“当前身份”；slot 才是当前身份锚点，auth email 只能作为 `auth_email` metadata。
+- slot probe 如果因为超时被 watchdog 杀掉，partial probe output 也必须留在 `.freely/run` artifact 中，方便在 switch 结束后区分网络/代理慢、CLI 卡死、还是 `402 deactivated_workspace` 等真实返回已出现但被 timeout 截断。
 
 ## Completion
 

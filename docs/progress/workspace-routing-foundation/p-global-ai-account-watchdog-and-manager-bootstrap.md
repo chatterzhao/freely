@@ -96,6 +96,12 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-whoami-prefers-slot-identity`
+- `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-watchdog-live-during-active-ai`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`
+- `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
+- `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact`
 
 ### Latest rerun
 
@@ -135,6 +141,24 @@
   - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool` pass
   - `bash docs/system/workspace/scripts/tests/test-ai-cli-whoami-prefers-slot-identity` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` pass
+- 2026-03-26 auth-failure control-plane continuation rerun:
+  - `bash -n docs/system/workspace/scripts/runtime/freely` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-watchdog-live-during-active-ai` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog` pass
+  - `./bin/governance-check` pass，只有 10 条 legacy pre-brainstorm naming warning
+- 2026-03-26 live-status / dispatcher-ready continuation rerun:
+  - `bash -n docs/system/workspace/scripts/runtime/freely` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive` pass
+- 2026-03-26 slot probe timeout observability continuation rerun:
+  - `bash -n docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-defers-during-account-switch` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` pass
+  - `./bin/governance-check` pass with 10 legacy pre-brainstorm naming warnings only
 
 ## Next Action
 
