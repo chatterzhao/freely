@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260321-1745`
 - title: Active lifecycle boundary and dogfooding capability discovery
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `active-lifecycle-boundary-and-dogfooding-capability-discovery`
@@ -71,7 +71,9 @@ Freely 当前仍缺少一条稳定的生命周期边界语义，导致团队会�
 
 - `./bin/governance-check`
 - wording review of lifecycle boundary and dogfooding principle for contradiction / overlap / residual ambiguity
+- `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/code-reviews/20260326-active-lifecycle-boundary-canonical-replay-verification.md`
 
 ## Next
 
-- 当前以文档真源收敛为主；若后续需要把“狗粮问题 -> 能力发现”的判断脚本化或路由化，再由新的 runtime/agent 增量承接。
+- 当前文档真源收敛与 contradiction review 已完成，本 issue 正式完成。
+- 若后续需要把“狗粮问题 -> 能力发现”的判断脚本化或路由化，再由新的 runtime/agent 增量承接。

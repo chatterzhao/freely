@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260307-1201`
 - title: 源分类、milestone-owned issue 与派生 worktree 路由治理
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `source-routing-and-derived-worktree-governance`
@@ -69,8 +69,10 @@
   - `bash tests/test_doc_gate.sh`
 - 已写入 review 证据：
   - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/code-reviews/20260316-first-hop-second-hop-verification.md`
+  - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/code-reviews/20260326-source-routing-canonical-replay-verification.md`
 - 当前研究阶段尚未启用正式 `docs/progress/**`，本轮 dev-loop 等价执行证据写入 `docs/pre-brainstorms/CONVERGENCE.md`。
 
 ## Next
 
-- 保持 `in_verification`。`./bin/wt-status-all` 已确认当前 `feature/dogfood-codex-auto-20260316` worktree 仍为 `DIRTY`，因此本轮不能进入 promote / cleanup；待 worktree 清洁并补齐 promote / cleanup 证据后再进入 `completed`。
+- canonical replay 已确认旧的 dirty sibling blocker 不再存在，当前 fleet truth 已收敛到 `Summary: total=4, dirty=0`。
+- 本 issue 已完成；后续若继续调整首跳分类或派生 worktree 策略，应通过新的 lifecycle 承接。

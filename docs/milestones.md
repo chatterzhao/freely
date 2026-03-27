@@ -49,16 +49,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260307-1201`
-- title: 源分类、milestone-owned issue 与派生 worktree 路由治理
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md`
-- next_action: review 与最小验证已落盘，但 `./bin/wt-status-all` 仍为 `Summary: total=6, dirty=1`；当前需先按 ownership 收束或分流 dirty 改动，其中 `docs/system/workspace/**` / `tests/**` 与 session-lifecycle 相关产物更像上游未提交批次，应先处理，再补 promote / cleanup 证据后移入 completed_issues
-
 8. `I-20260319-0018`
 - title: Token-efficient session continuity and rotation governance
 - milestone_state: committed
@@ -78,16 +68,6 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
-
-12. `I-20260321-0217`
-- title: Claude Code tool profiles and Codex MCP session evidence governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md`, `docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md`
-- next_action: `cc` / `cc-use-codex-cli` runtime、skill、双层会话证据与 live smoke 已落盘，且当前 sweep 已完成 fleet 收口。剩余动作是完成最终 review，然后按保护规则从当前 develop-facing sweep 分支推进正式 promote
 
 13. `I-20260321-0257`
 - title: Worktree fleet governance closure
@@ -129,19 +109,48 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/candidates.md`, `docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/candidates.md`
 - next_action: 已补上 cleanup signal 的最小 routing 修复：`restart_point=cleanup` 先保留为 `handoff://cleanup`，不再直接吸收到旧 `cleanup://merged-worktree-followthrough` continuity。下一步继续做真实 manager/develop 工位回归，确认新项目级 signal 会先进入 notice/claim/restart-point routing，再决定最终 absorption target
 
-16. `I-20260321-1745`
+### completed_issues
+
+1. `I-20260307-1201`
+- title: 源分类、milestone-owned issue 与派生 worktree 路由治理
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/code-reviews/20260316-first-hop-second-hop-verification.md`
+  - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/code-reviews/20260326-source-routing-canonical-replay-verification.md`
+- completion_note: 首跳来源分层、IBM/progress 边界、derived worktree 规则与同工具第二跳 contract 已收口；旧 dirty sibling blocker 已被 canonical 4-tree fleet truth 消除，不再构成未完成项
+
+2. `I-20260321-0217`
+- title: Claude Code tool profiles and Codex MCP session evidence governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md`, `docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/code-reviews/20260321-cc-codex-runtime-governance-verification.md`
+  - `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/code-reviews/20260326-cc-codex-runtime-canonical-replay-verification.md`
+- completion_note: `cc` / `cc-use-codex-cli` fixed top-level profiles、双层 session evidence 与 focused regressions 已在当前 develop-facing absorption owner 上保持通过；后续 protected replay 属于 sweep-level promote，不再阻塞 issue 完成
+
+3. `I-20260321-1745`
 - title: Active lifecycle boundary and dogfooding capability discovery
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
 - source_brainstorm: `docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/candidates.md`
-- next_action: `three-loop-capability-lifecycle` 与 `PROJECT_INTENT` 的边界 wording 已落盘；当前进入 consistency verification，确认“历史 vs 当前”与狗粮能力发现原则不会与既有真源冲突
+- evidence:
+  - `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/code-reviews/20260321-active-lifecycle-boundary-and-dogfooding-capability-discovery-verification.md`
+  - `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/code-reviews/20260326-active-lifecycle-boundary-canonical-replay-verification.md`
+- completion_note: active-vs-historical lifecycle 边界与狗粮能力发现原则已稳定写回 `three-loop-capability-lifecycle` 和 `PROJECT_INTENT`；后续更高层产品架构讨论另开 lifecycle，不回灌此 issue
 
-### completed_issues
-
-1. `I-20260322-1801`
+4. `I-20260322-1801`
 - title: pre-test-merge responsibility, usage, and lifecycle governance
 - milestone_state: completed
 - phase_state: `completed`

@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260321-0217`
 - title: Claude Code tool profiles and Codex MCP session evidence governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `claude-code-codex-mcp-runtime-governance`
@@ -86,6 +86,7 @@ Freely 已经支持多个顶层 AI tool，但 `Claude Code` 仍缺两类关键�
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-cc-args`
 - `bash docs/system/workspace/scripts/tests/test-session-evidence-resolver`
 - `bash docs/system/workspace/scripts/tests/test-freely-cc-codex-evidence-status`
+- `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/code-reviews/20260326-cc-codex-runtime-canonical-replay-verification.md`
 - live smoke:
   - `./bin/freely init --ai cc-use-codex-cli:auto`
   - `./bin/freely start`
@@ -93,5 +94,5 @@ Freely 已经支持多个顶层 AI tool，但 `Claude Code` 仍缺两类关键�
 
 ## Next
 
-- 当前 issue 的实现、验证与 live smoke 证据已被当前 develop-facing sweep 分支吸收，父链收口工作已完成。
-- 剩余动作是完成最终 review，并在通过 promote gate 后随当前 sweep 一起正式提升到 `develop`。
+- 当前 issue 的实现、验证与 live smoke 证据已被当前 develop-facing sweep 分支吸收，focused regressions 在当前 absorption owner 上继续通过。
+- 本 issue 已完成；后续 protected branch promote / replay 是 sweep-level followthrough，不再构成此 issue 的未完成项。
