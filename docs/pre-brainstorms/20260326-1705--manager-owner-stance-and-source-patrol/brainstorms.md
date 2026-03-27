@@ -16,11 +16,24 @@
 
 ## Existing Truth Already Present
 
-当前真源已经有重要基础，但分散在多个位置：
+这里要先明确两层真源，不要混淆：
+
+1. `docs/CONSTITUTION.md` / `docs/LAWS.md` / `docs/PROJECT_INTENT.md`
+- 这些属于“指导开发 Freely”的治理输入
+- 它们约束 Freely 如何自举开发自己
+- 它们可以定义产品方向、开发规则和狗粮原则
+- 但它们不应被直接当成 Freely 完成后的 manager / worker 能力真源
+
+2. `docs/system/workspace/**`
+- 这些属于 Freely 产品能力目录
+- 其中的 `agents / skills / runtime references` 才是完成后会被长期消费的能力真源
+
+在这个前提下，当前重要基础分散在以下位置：
 
 1. `docs/PROJECT_INTENT.md`
-- Freely 的产品身份已经是 “AI 担任项目 owner 的自主工程循环系统”
-- 主管本来就应从 milestone / progress / review / test / human chat / runtime anomaly 等多种输入发现工作
+- 它提供的是产品方向和狗粮期的开发目标
+- 可以说明 Freely 要朝 “AI 担任项目 owner 的自主工程循环系统” 收敛
+- 但不能直接充当产品化后的 manager / worker prompt contract
 
 2. `docs/system/workspace/agents/manager-agent.md`
 - 主管是项目级 owner
@@ -43,6 +56,7 @@
 - 单个 pre-brainstorm 的生命周期、candidate 写回和 acceptance review 已有规范
 
 因此，缺口不是“完全没设计”，而是：
+- 开发治理文档与产品能力真源之间还缺少更清楚的分层提醒
 - 主管人格只被隐含在职责合同里，没有被直接写成主人姿态
 - source patrol 的完成定义还不够事务化，导致 interruption / pre-brainstorm 更容易漏扫或漏补账
 
@@ -88,9 +102,9 @@
 - 某次聊天里已经讨论过
 
 更完整的完成定义应包括：
-- 主管人格写入正式真源
-- source patrol 范围写入正式真源
-- 对 interruption / milestone / progress / pre-brainstorm 的补账语义写入正式真源
+- 主管人格写入产品能力真源，而不是只停留在开发治理文档
+- source patrol 范围写入产品能力真源
+- 对 interruption / milestone / progress / pre-brainstorm 的补账语义写入产品能力真源
 - 必要时能委派一个或多个 worker 去核实“做到哪一步、是否只缺更新、是否需要新的下一跳”
 
 ## Research Question
@@ -190,20 +204,27 @@ Freely 应如何把下列能力收束成一条清晰的主管治理 contract：
 
 更合理的承接方式是：
 
-1. 主人格真源：
+1. 开发治理输入：
+- `docs/PROJECT_INTENT.md`
+- `docs/CONSTITUTION.md`
+- `docs/LAWS.md`
+
+它们只负责约束 Freely 自举开发时必须朝哪个方向收敛，不直接充当产品化后的角色真源。
+
+2. 主人格能力真源：
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/agents/worker-agent.md`
 
-2. 插话治理真源：
+3. 插话治理能力真源：
 - `docs/system/workspace/skills/human-interruption-manager-triage/SKILL.md`
 - `docs/system/workspace/skills/signal-intent-understanding/SKILL.md`
 
-3. standing-source / patrol 真源：
+4. standing-source / patrol 能力真源：
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
 - `docs/system/workspace/skills/context-source-skill/references/continuation-recovery-routing.md`
 
-4. 预研生命周期真源：
+5. 预研生命周期治理真源：
 - `docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
 - `docs/milestones.md`
 
@@ -211,8 +232,9 @@ Freely 应如何把下列能力收束成一条清晰的主管治理 contract：
 
 本条预研应最终收敛成：
 
-1. 主管“项目主人”姿态被正式写回真源，而不是只靠上下文体会。
-2. human interruption 被正式定义为 advisory signal，而非自带调度权的命令。
-3. 主管对 interruption / milestone / progress / pre-brainstorm 的 standing patrol 范围被写清。
-4. 对 source drift 的默认动作被写清：补账、核实、重排、续接，而不是等待人类澄清。
-5. worker 的人格边界同步收紧：负责核实和执行，不接管项目级方向裁决。
+1. 开发治理文档与产品能力真源的边界被明确写清，不再互相代替。
+2. 主管“项目主人”姿态被正式写回产品能力真源，而不是只靠治理文档或上下文体会。
+3. human interruption 被正式定义为 advisory signal，而非自带调度权的命令。
+4. 主管对 interruption / milestone / progress / pre-brainstorm 的 standing patrol 范围被写清。
+5. 对 source drift 的默认动作被写清：补账、核实、重排、续接，而不是等待人类澄清。
+6. worker 的人格边界同步收紧：负责核实和执行，不接管项目级方向裁决。
