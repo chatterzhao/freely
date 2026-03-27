@@ -1,5 +1,9 @@
 # Pre-tests: pre-test-merge-responsibility-usage-and-lifecycle-governance
 
+## Compatibility Note
+
+- 历史 pre-tests/path 保留 `pre-test-merge` 命名，当前 canonical 语义按 `test-pre-merge-*` 测试批次前缀族解释。
+
 ## Pre-merge acceptance
 
 1. `CONSTITUTION.md` 明确 `pre-test-merge` 是临时预集成验证批次，而不是长期开发父分支。

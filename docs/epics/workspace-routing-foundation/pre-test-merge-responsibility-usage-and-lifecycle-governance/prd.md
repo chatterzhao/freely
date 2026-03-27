@@ -1,5 +1,11 @@
 # PRD: pre-test-merge-responsibility-usage-and-lifecycle-governance
 
+## Compatibility Note
+
+- 历史 PRD/path 保留 `pre-test-merge` 命名，避免破坏既有引用。
+- 当前 canonical 语义已经升级为 `test-pre-merge-*` 测试批次前缀族。
+- 下文出现的 `pre-test-merge` 都按 `test-pre-merge-*` 前缀族理解。
+
 ## Problem
 
 Freely 已经把 `pre-test-merge` 定位成临时预集成验证分支，但当前真源还没有把它的职责边界、允许操作、stale/retire 条件和 promotion 默认语义写成一致的治理定义，导致狗粮过程中不断出现：

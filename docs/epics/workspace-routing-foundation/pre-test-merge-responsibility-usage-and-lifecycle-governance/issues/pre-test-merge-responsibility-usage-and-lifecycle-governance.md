@@ -24,6 +24,12 @@
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 
+## Compatibility Note
+
+- 历史 issue/story/path 保留 `pre-test-merge` 命名，避免破坏既有引用。
+- 当前 canonical 语义已经升级为 `test-pre-merge-*` 测试批次前缀族。
+- 本文提到的 `pre-test-merge`，都应按 `test-pre-merge-*` 前缀族解释，而不是单例长期分支。
+
 ## Why
 
 Freely 这次不是遇到一次性 merge 事故，而是暴露出 `pre-test-merge` 作为治理对象的定义不完整：
