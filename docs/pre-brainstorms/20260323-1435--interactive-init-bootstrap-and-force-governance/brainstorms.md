@@ -12,7 +12,7 @@
   - `init` 还没有覆盖“目录确认 -> 空仓 bootstrap -> 细粒度 skip/force”这条完整链路
 - `init` 也还没有形成可稳定供 AI 使用的非交互参数面
 - Freely 的 hook 又带来一个特殊约束：
-  - `main` / `develop` / `pre-test-merge` 上禁止常规开发提交
+  - `main` / `develop` / `test-pre-merge-*` 上禁止常规开发提交
   - 但空仓库如果没有 bootstrap commit，又会因为缺少 `HEAD` 让分支、hook 与后续治理流程都无法稳定成立
 - 这次狗粮还额外暴露了一个配置分层偏差：
   - 项目级 `.codex/config.toml` 应作为版本化项目资产随 worktree 一起出现

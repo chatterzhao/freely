@@ -131,7 +131,7 @@ routing_policy:
   - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
   - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
   - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
-- completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
+- completion_note: 历史 issue/path 仍沿用 `pre-test-merge` 命名，但当前 canonical 真义已收敛为 `test-pre-merge-*` 测试批次前缀族；其职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源，后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
 
 5. `I-20260321-1515`
 - title: Remote branch retirement governance
@@ -493,7 +493,7 @@ routing_policy:
 - promoted_issue_path: `pending://protected-post-merge-acceptance-route-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/candidates.md`
-- next_action: 继续 pre-brainstorm，但已冻结一条硬规则：`pre-test-merge` 是 shadow batch，只做测试 merge，不直接 merge 到 `develop`。剩余要收口的是 `develop-only completion verification` 与 `pre-test-merge batch acceptance` 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
+- next_action: 继续 pre-brainstorm，但已冻结一条硬规则：历史文案中的 `pre-test-merge` 现在一律按 `test-pre-merge-*` shadow batch 解释，只做测试 merge，不直接 merge 到 `develop`。剩余要收口的是 `develop-only completion verification` 与测试批次 acceptance 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
 - revisit_trigger: 当 protected verification environment 的 replay policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
 
 9. `C-20260325-0525-A`
@@ -514,7 +514,7 @@ routing_policy:
 - promoted_issue_path: `pending://pre-test-merge-lifecycle-management-capability`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
-- next_action: 继续 pre-brainstorm，但 scope 已收窄为 `stale pre-test-merge governance`，先冻结三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`；同时补齐 `replay source manifest / replay order / retire evidence`，把 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链桥接成固定的 `acceptance_contract_state/source/blocker` 字段，并把 testing closeout 的集成测试 / application-native real-environment testing evidence bar 写死，在这些真源稳定前不进入实现
+- next_action: 继续 pre-brainstorm，但 scope 已收窄为 `stale test-pre-merge batch governance`；历史候选名仍保留 `pre-test-merge`，语义上一律指向 `test-pre-merge-*` 前缀族。先冻结三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`；同时补齐 `replay source manifest / replay order / retire evidence`，把 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链桥接成固定的 `acceptance_contract_state/source/blocker` 字段，并把 testing closeout 的集成测试 / application-native real-environment testing evidence bar 写死，在这些真源稳定前不进入实现
 - revisit_trigger: 当 stale state 的 canonical 落点、manager lifecycle transaction 字段、runtime gate 消费路径、replay/retire manifest、`acceptance_contract_state/source/blocker` 桥，以及 testing closeout evidence bar 都能冻结成独立 issue contract 时，重新进入 materialization 判断
 
 11. `C-20260322-1801-C`
@@ -525,7 +525,7 @@ routing_policy:
 - promoted_issue_path: `pending://worker-self-loop-exit-and-scheduler-closeout-governance`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
-- next_action: 继续 pre-brainstorm，单独冻结 `phase progress`、`loop stall`、`manager handback`、`capacity release / supersede` 规则；同时补清 lane 回交后如何识别“其实是上游 `Issue + Brainstorm + PRD -> pre-tests.md` acceptance 面不完整”以及“其实还没完成 integration / application-native real-environment testing closeout”；在 machine-readable 阈值稳定前，不与 stale `pre-test-merge` gate 绑在一起实现
+- next_action: 继续 pre-brainstorm，单独冻结 `phase progress`、`loop stall`、`manager handback`、`capacity release / supersede` 规则；同时补清 lane 回交后如何识别“其实是上游 `Issue + Brainstorm + PRD -> pre-tests.md` acceptance 面不完整”以及“其实还没完成 integration / application-native real-environment testing closeout”；这里提到的 stale `pre-test-merge` gate 同样按 `test-pre-merge-*` 前缀族解释，在 machine-readable 阈值稳定前，不把两条能力线绑在一起实现
 - revisit_trigger: 当 low-value self-loop 的判据、manager 回交 contract、容量释放规则，以及与 IBM/`Issue + Brainstorm + PRD -> pre-tests.md` 缺口和 testing closeout 缺口的分流条件都能冻结成独立 issue contract 时，重新进入 materialization 判断
 
 6. `C-20260319-0500-01`
@@ -580,8 +580,8 @@ routing_policy:
 - promoted_issue_path: `pending://pre-test-merge-acceptance-stall-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/candidates.md`
-- next_action: 保持 active candidate；先依赖 `pre-test-merge` 治理 issue 冻结 protected-env 生命周期语义，并在真实 dogfood 中跑满 watchdog 阈值；只有 delegated continuation 已进 prompt 且超过阈值仍无新 manager continuity/decision 时，才 materialize 成独立 runtime/orchestration issue
-- revisit_trigger: 当治理 issue 稳定 `pre-test-merge` 边界后，或真实 post-merge acceptance 再次在超过 watchdog 阈值后仍复现 delegated continuation stall 时，重新进入 issue materialization 判断
+- next_action: 保持 active candidate；先依赖测试批次治理 issue 冻结 protected-env 生命周期语义。历史文案中的 `pre-test-merge` 统一按 `test-pre-merge-*` 前缀族理解，并在真实 dogfood 中跑满 watchdog 阈值；只有 delegated continuation 已进 prompt 且超过阈值仍无新 manager continuity/decision 时，才 materialize 成独立 runtime/orchestration issue
+- revisit_trigger: 当治理 issue 稳定 `test-pre-merge-*` 边界后，或真实 post-merge acceptance 再次在超过 watchdog 阈值后仍复现 delegated continuation stall 时，重新进入 issue materialization 判断
 
 10. `C-20260323-1705-A`
 - title: Detect and recover manager delegated continuation stalls after prompt absorption
