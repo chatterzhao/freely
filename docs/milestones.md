@@ -335,6 +335,26 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/code-reviews/20260326-ibm-pretests-executable-acceptance-quality-governance-verification.md`
 - completion_note: IBM 真源现在要求 `pre-tests.md` 默认写出可恢复的 executable acceptance contract，并对 Freely 自治能力明确 integration、application-native real-environment、end-to-end dogfood 三类 post-merge 验收面；verification review 模板统一与 machine-readable schema 继续留给后续 lifecycle
 
+3. `I-20260326-1835`
+- title: Manager owner stance and source-patrol completeness governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/candidates.md`
+- evidence:
+  - `docs/system/workspace/agents/manager-agent.md`
+  - `docs/system/workspace/agents/worker-agent.md`
+  - `docs/system/workspace/skills/human-interruption-manager-triage/SKILL.md`
+  - `docs/system/workspace/skills/signal-intent-understanding/SKILL.md`
+  - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
+  - `docs/system/workspace/skills/context-source-skill/references/continuation-recovery-routing.md`
+  - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
+  - `docs/progress/workspace-routing-foundation/p-manager-owner-stance-and-source-patrol-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/code-reviews/20260326-manager-owner-stance-and-source-patrol-governance-verification.md`
+- completion_note: 已把开发治理输入与运行期能力真源的边界写清，并把 manager owner stance、advisory interruption semantics、以及 interruption / milestone / progress / pre-brainstorm 的 standing-source completeness 直接收敛进产品能力真源；后续若要继续把这套 contract 扩成更强的 runtime 事务面，应通过新 lifecycle 承接。
+
 ### candidate_issues
 
 1. `C-20260323-1435-A`
