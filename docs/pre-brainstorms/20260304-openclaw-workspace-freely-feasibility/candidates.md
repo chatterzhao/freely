@@ -12,8 +12,9 @@
 - why_now: 可作为快速验证后端能力的过渡方案。
 - acceptance_hint: 形成 AGENTS/skills/hooks/cron 的可执行配置模板。
 - priority: P1
-- status: needs_research
-- decision_reason: 可作为过渡方案但依赖外部运行时假设，需结合当前架构再评估。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: absorbed
+- adoption_type: supporting_evidence
+- decision_reason: 后续 canonical contract 已把 OpenClaw 明确压回 optional adapter/profile；这条候选只保留为早期 supporting evidence，不再单独 materialize。
+- promoted_issue_path: docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md
+- milestone: M-20260312-control-surface-runtime-convergence
 - session_refs: []

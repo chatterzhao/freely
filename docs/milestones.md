@@ -1188,6 +1188,16 @@ routing_policy:
   - `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/code-reviews/20260326-backend-service-contract-and-adapter-taxonomy-canonical-verification.md`
 - completion_note: contract layer 与 adapter layer 的冻结已经成为下游 frontend-probe architecture / boundary contract 的引用真源；因此本 issue 已从单纯 IBM 包提升为 canonical completion，后续 control surface、standalone runtime 与 intervention transport 直接复用该边界，不再阻塞在 `done_ibm`
 
+2. `C-20260304-501`
+- title: Freely-on-OpenClaw profile 最小落地
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- promoted_issue_path: `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
+- source_brainstorm: `docs/pre-brainstorms/20260304-openclaw-workspace-freely-feasibility/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260304-openclaw-workspace-freely-feasibility/candidates.md`
+- completion_note: 这条候选的独立 owner 价值已被后续架构真源吸收；当前 canonical 边界明确 OpenClaw 只是 optional adapter/profile，而不是 Freely 主定义
+
 ## M-20260326-freely-product-architecture
 
 - title: Freely product architecture convergence
