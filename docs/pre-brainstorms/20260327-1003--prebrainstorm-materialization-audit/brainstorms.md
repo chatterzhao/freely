@@ -356,3 +356,23 @@
 - `C-20260309-2003-A`, `C-20260309-2003-B`, `C-20260309-2003-C`
 
 这些条目当前仍缺足够强的 canonical owner 或 drop judgement；后续若继续处理，应优先做“是否还有独立 owner 价值”而不是先补形式化 milestone。
+
+## Execution Update - 2026-03-27 legacy owner sweep
+
+第二轮 legacy owner sweep 的进一步结论：
+
+- `C-20260304-501` 已改判为 `absorbed supporting evidence`
+  - canonical owner: `I-20260312-0011 backend-service-contract-and-adapter-taxonomy`
+  - reason: 后续架构真源已把 OpenClaw 冻结为 optional adapter/profile，不再需要保留这条旧候选单独承接
+
+- `C-20260304-607` 已改判为 `absorbed supporting evidence`
+  - canonical owner: `I-20260326-1815 ibm-pretests-executable-acceptance-quality-governance`
+  - reason: executable acceptance / checklist / pre-tests gate 已进入当前 IBM 真源
+
+- `C-20260305-803`、`C-20260306-002`、`C-20260309-2003-A`、`C-20260309-2003-B`
+  - 已改判为 `superseded`
+  - reason: 当前 canonical 目录模型、hooks 架构、workspace skill 边界与治理入口已经替代旧候选假设
+
+- `C-20260303-001`、`C-20260303-002`、`C-20260304-202`、`C-20260304-605`、`C-20260305-703`、`C-20260309-2003-C`
+  - 当前仍保留 active research 价值
+  - 本轮先补 milestone queue 可见性，不伪造 owner 吸收

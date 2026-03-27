@@ -28,8 +28,12 @@
 - why_now: 没有退出路径会让 hooks 治理显得侵入性过强，不利于用户接受。
 - acceptance_hint: 前端开关支持切换到 `.git/hooks`；切换时提供复制指引或复制动作；进入用户接管模式后，Freely 停止自动覆盖。
 - priority: P0
-- status: needs_research
-- decision_reason: 用户接管/退出路径仍可能有价值，但依赖的安装模式前提已失效，需以新候选重开。
+- status: dropped
+- adoption_type: superseded
+- decision_reason: 这条候选依赖的 hooks 安装模式前提已经失效；若未来需要用户接管退出路径，应基于当前 canonical hooks 架构新开候选，而不是继续沿用这条旧 owner。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
+- superseded_by:
+  - docs/system/workspace/hooks/README.md
+  - docs/system/workspace/scripts/README.md
 - session_refs: []

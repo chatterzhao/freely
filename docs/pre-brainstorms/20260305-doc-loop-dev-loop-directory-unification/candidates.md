@@ -44,8 +44,12 @@
 - why_now: 用于后续按需迁移，而非继续保留旧目录负债。
 - acceptance_hint: 基于 issue 需要逐项迁移并补全新目录引用。
 - priority: P1
-- status: needs_research
-- decision_reason: 旧目录已清理，后续迁移策略改为按需重建。
+- status: dropped
+- adoption_type: superseded
+- decision_reason: 旧目录迁移债已被当前 canonical 目录模型取代；若未来还需补某类资产，只应按具体 issue 在新目录中重建，而不是复活这条泛化执行器候选。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
+- superseded_by:
+  - AGENTS.md
+  - docs/system/workspace/scripts/README.md
 - session_refs: []
