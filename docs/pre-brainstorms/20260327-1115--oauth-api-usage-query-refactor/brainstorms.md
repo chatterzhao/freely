@@ -2,27 +2,79 @@
 
 ## 问题陈述
 
-当前 Freely 的 slot 可用性治理还绑在“切活跃 auth -> 真实 probe -> 恢复”的老路径上，这有四个明显问题：
+当前 Freely 的问题，不是“有没有 OAuth API 可接”，而是 `limit` 后的恢复闭环不够清楚：
 
-1. **消耗 token**：全量扫描会消耗真实 Codex probe
-2. **速度慢**：串行扫描所有 slots，时延随 slot 数线性增长
-3. **入侵活跃工作位**：扫描时会复制授权文件到 `~/.codex/auth.json`
-4. **账本稀疏**：`codex-slot-cooldowns.tsv` 目前更多是被动残留，而不是持续维护的 inventory 状态
+1. 什么时候应立即切换到别的 slot
+2. 什么时候才允许睡眠
+3. `cooldown` 在决策里到底是什么角色
+4. `~/.codex/` 变化代表“现在可运行”，还是只是在为最近恢复做 parking
 
-## 新发现
+如果这几个点不钉死，就会出现两种坏结果：
 
-OpenAI 的 `wham/usage` 接口可以直接基于 `.ai-auth/codex-*/auth.json` 中的 `access_token` 查询账号状态，不需要切换活跃 auth：
+1. 本来有 `usable` slot，却还去看最近恢复，恢复变慢
+2. 为最近恢复做的 `.codex` parking 被 watcher 当成 wake signal，形成假唤醒 / 死循环
+
+## 主恢复闭环
+
+正确闭环应只有一条：
+
+```text
+current slot hits limit
+  -> query inventory truth
+  -> if any usable slot exists:
+       switch to usable slot
+       restart AI tool
+  -> else:
+       choose earliest reset slot
+       optionally park that auth into ~/.codex/
+       sleep until reset_at
+  -> wake
+  -> continue same recovery loop
+```
+
+### 关键决策顺序
+
+1. **先看 `usable`**
+- 只要 inventory 里存在任何 `usable` slot
+- 就立即切换
+- 不允许先看 cooldown
+
+2. **只有全部不可用时才看 cooldown**
+- `cooldown` 不是孤立旧账本
+- 它是 recovery ledger 的 reset 面
+- 但它只在 “all unavailable” 时提供 earliest-reset 决策
+
+3. **sleep 不是常规动作**
+- 只有确认所有 slot 当前都不可用，且存在最近 `reset_at`
+- 才允许进入 `sleep_until_reset`
+
+4. **limit 时优先读取维护好的账本**
+- 不能默认每次命中 limit 才现场重扫
+- 正常路径应先读最近 30 分钟维护好的 recovery ledger
+- 只有账本缺失、过期、或结果不可信时，才触发即时 refresh
+
+## OAuth usage API 的真正位置
+
+通过研究 CodexBar 项目，发现 OpenAI 的 `wham/usage` 可直接基于 `.ai-auth/codex-*/auth.json` 中的 `access_token` 查询账号状态：
 
 ```text
 GET https://chatgpt.com/backend-api/wham/usage
 Authorization: Bearer <access_token>
+ChatGPT-Account-Id: <account_id>
+User-Agent: codex-cli
 ```
 
-这条路径有三个决定性价值：
+它的作用不是替代整个恢复 contract，而是让 Freely 能提前知道：
 
-1. **不消耗 token**
-2. **不需要复制 auth.json 到 `~/.codex/auth.json`**
-3. **可以并行扫全部 `.ai-auth` inventory**
+1. 哪些 auth **现在就是 `usable`**
+2. 哪些 auth **rate-limited 且何时恢复**
+3. 哪些 auth 已经是 `deactivated_workspace`
+
+所以 OAuth sweep 应被定义为：
+
+- `limit` 恢复闭环的 inventory truth layer
+- 负责半小时维护 recovery ledger，并在无参 `switch codex` 时做即时 refresh
+- 负责加快选择，不负责改变恢复主链的语义
 
 ## 本轮实测
 
@@ -35,74 +87,58 @@ Authorization: Bearer <access_token>
   - `rate_limited`: 1
   - `deactivated_workspace`: 16
 
-因此这条 API 已经不仅能看 quota，还能直接提供不少 hard-failure 信号。
+这证明 OAuth 路径适合承担“提前知道谁能切、谁该等”的职责。
 
-## 关键设计判断
+## `.codex` 变化的正确语义
 
-### 1. OAuth sweep 应取代“全量真实 probe”成为一级真相层
+问题不是“自己写的还是外部写的”，而是这次变化在恢复闭环里代表什么。
 
-以后“全量扫所有 slots”的动作应该是：
+### A. `usable switch`
 
-```text
-scan ~/.ai-auth/codex-*/auth.json
-  -> extract access_token
-  -> parallel OAuth usage requests
-  -> classify all slots
-  -> overwrite cache + cooldown ledger
-```
+语义：
 
-而不应该再是：
+- watchdog 已找到当前可用的 slot
+- 把该 auth 切入 `~/.codex/auth.json`
+- 下一步应重启 AI tool 并恢复运行
 
-```text
-for each slot:
-  copy auth -> ~/.codex/auth.json
-  run codex exec probe
-  parse result
-  restore auth
-```
+结果：
 
-### 2. cooldown 要保留，但职责要重构
+- 这类变化不能继续睡
+- 它是恢复成功链条的一部分
 
-`codex-slot-cooldowns.tsv` 不应删除，因为它仍然是 watchdog 的重要账本。但它不再承担“直接决定切哪个号”的职责，而应变成 sweep 驱动的 ledger：
+### B. `earliest-reset parking`
 
-- 由 OAuth sweep 全量覆盖写回
-- 只保留需要 reset 的 slot
-- 保存 normalized slot 与 reset 时间
-- 作为 earliest-reset hint / inventory ledger，而不是单独的恢复真相
+语义：
 
-这意味着 cooldown 不再是“过期猜测”，而是“由 30 分钟周期 sweep 持续维护的状态面”。
+- 所有 slot 当前都不可用
+- 只是把最近恢复的 auth 预停到 `~/.codex/`
+- 目的是到点后更快恢复
 
-### 3. 活跃 auth 切换只保留到 launch-time
+结果：
 
-只有以下场景才允许把某个 slot 的授权文件复制到 `~/.codex/auth.json`：
+- 这类变化不能被 watcher 误当成 wake signal
+- 否则就会自唤醒死循环
 
-1. watchdog 已经从 OAuth sweep 选定一个 `usable` candidate
-2. `freely ai switch codex auto` 最终决定切到该 slot
-3. launch-time 需要最小真实确认
+所以 `.codex` watcher 必须按 “当前恢复意图” 解释变化，而不是只要变了就 wake。
 
-也就是说：
+## 分层重构
 
-- inventory sweep 不碰活跃 auth
-- final launch/switch 才碰活跃 auth
-
-## 建议的新分层
-
-### A. Inventory sweep layer
+### 1. Inventory sweep layer
 
 统一入口，例如：
 
 ```bash
 codex_oauth_sweep_all_slots() {
   # 1. 遍历 ~/.ai-auth/codex-*/auth.json
-  # 2. 并行请求 wham/usage
-  # 3. 分类 usable / rate_limited / deactivated_workspace / unauthorized / unknown
-  # 4. 一次性写 availability cache
-  # 5. 一次性覆盖写 cooldown ledger
-  # 6. 输出 machine-readable summary
+  # 2. 提取 access_token / account_id
+  # 3. 并行请求 wham/usage
+  # 4. 分类 usable / rate_limited / deactivated_workspace / unauthorized / unknown
+  # 5. 覆盖写 availability cache
+  # 6. 覆盖写 cooldown ledger
 }
 ```
 
-这个函数是共享真相入口，供：
+这个函数的职责是“提前知道所有 slot 的现在状态”，供：
 
 - watchdog recovery
 - `freely ai status`
@@ -110,29 +146,31 @@ codex_oauth_sweep_all_slots() {
 
 共同消费。
 
-### B. Availability cache layer
+### 2. Availability cache layer
 
-新增或强化：
+维护：
 
 ```text
-$project/.freely/run/codex-availability-cache.env
+$project/.freely/run/codex-availability-cache.tsv
 ```
 
-记录每个 slot 的：
+记录至少这些字段：
 
+- `slot`
 - `status`
-- `email`
-- `plan`
-- `primary_used`
-- `primary_reset`
-- `secondary_used`
-- `secondary_reset`
-- `last_refresh_at`
+- `auth_email`
+- `primary_reset_at`
+- `secondary_reset_at`
+- `refreshed_at`
 - `source=oauth_usage`
 
-TTL 建议 30 分钟，因为这条路径不消耗 token。
+它的用途是：
 
-### C. Cooldown ledger layer
+- `limit` 发生时直接读取当前可用候选
+- `switch codex` 无参时快速选目标
+- `freely ai status` 有统一输出面
+
+### 3. Cooldown ledger layer
 
 保留：
 
@@ -140,84 +178,106 @@ TTL 建议 30 分钟，因为这条路径不消耗 token。
 $project/.freely/run/codex-slot-cooldowns.tsv
 ```
 
-但改成 sweep overwrite 模式，而不是增量残留。建议格式至少保持兼容：
+但职责要明确：
 
-```text
-<normalized_slot>\t<reset_at>\t<human_readable>
-```
+- 它应是持续维护的 recovery ledger 的 reset 面，不是偶然残留
+- 至少每 30 分钟全量更新一次
+- 无参 `switch codex` 时也会即时更新一次
+- 只在 “all unavailable” 时直接参与决策
+- 用于 earliest-reset 选择
+- 不应单独覆盖 availability truth，但要和 availability cache 保持同轮刷新
 
-必要时可追加 source/status 列，但第一阶段可先兼容旧格式。
+### 4. Active auth switch layer
 
-### D. Launch-time confirmation layer
+只有两种合法写入 `~/.codex/auth.json` 的理由：
 
-真实 probe 不删，但降级为最终确认层，只处理：
+1. **切到 `usable` slot**
+2. **全部不可用时，为 earliest-reset slot 做 parking**
 
-1. OAuth 不能表达的故障
-2. 被选中 slot 的真实 exec-path 可用性
-3. launch 前最小确认
+除此之外，inventory sweep 不应触碰活跃 auth。
 
-它不再负责扫全量 inventory。
+### 5. Launch continuation layer
 
-## 关键调用路径重构
+切到 `usable` slot 后，要继续完成：
+
+1. 更新 active slot
+2. 重启 AI tool 进程
+3. 让 manager/worker 恢复推进
+
+所以“切号”不是终点；“切号后恢复运行”才是终点。
+
+### 6. Switch auto layer
+
+`freely ai switch codex` 无参应成为统一入口：
+
+1. 刷新所有授权文件目录的 inventory truth
+2. 更新 availability cache + cooldown ledger
+3. 若存在 `usable`，直接选一个并替换到 `~/.codex/auth.json`
+4. 若全部不可用，则返回最近恢复信息，而不是假装切换成功
+
+## 关键调用路径
 
 ### watchdog
 
-遇到 limit / auth failure / inventory change 时：
+遇到 `limit` / `deactivated_workspace` / 明确不可继续时：
 
-1. 调 `codex_oauth_sweep_all_slots`
-2. 更新 availability cache 与 cooldown ledger
-3. 选择 `usable` candidate
-4. 若存在 candidate，才执行 launch-time auth copy
-5. 若没有 `usable`，保持 manager/worker down，靠后续周期 sweep 再判
+1. 先读 recovery ledger
+2. 若账本 stale/missing，再调 `codex_oauth_sweep_all_slots`
+3. 先找 `usable`
+3. 若存在 `usable`：
+   - 切换 auth
+   - 重启 AI tool
+   - 退出 recovery loop
+4. 若不存在 `usable`：
+   - 选 earliest reset
+   - 可选 parking 到 `~/.codex/`
+   - 睡到 `reset_at`
 
 ### `freely ai status`
 
 1. 默认读 availability cache
 2. cache 过期时触发一次 OAuth sweep
-3. 直接展示 sweep 结果，而不是临时触发重型真实 probe
+3. 展示：
+   - `usable` 数量
+   - `rate_limited` 数量
+   - `deactivated_workspace` 数量
+   - 最近恢复时间
 
 ### `freely ai switch codex auto`
 
-1. 调用同一个 OAuth sweep / cache 入口
-2. 选最佳 `usable` slot
-3. 仅在最终切换时复制对应 `auth.json` 到 `~/.codex/auth.json`
+1. 刷新所有授权文件目录并更新账本
+2. 若存在 `usable`，切到最佳 `usable`
+3. 若全部不可用，返回最近恢复提示，而不是假装切换成功
 
 ## 兼容边界
 
 ### `deactivated_workspace`
 
-本轮实测表明 `wham/usage` 已经能直接返回：
-
-```json
-{"detail":{"code":"deactivated_workspace"}}
-```
-
-因此这类 slot 可以直接在 inventory 层判为 hard unavailable，无需先切到活跃 auth 再发现。
-
-### rate-limited slot
-
-rate-limited slot 不应被直接切换，只应：
-
-- 写回 cooldown ledger
-- 在 availability cache 中记录 reset 时间
-- 作为排序 / hint 使用
+这类 slot 应在 inventory 层直接判为 hard unavailable，不应再进入可切换候选。
 
 ### fallback
 
-若 OAuth 接口异常或返回无法识别的结构：
+如果 OAuth 接口异常或结构变化：
 
 - 当前 sweep 可标记 `unknown`
-- 由 launch-time confirmation 或 fallback probe 兜底
-- 但不应把 fallback 重新升级为默认全量扫描路径
+- 允许 launch-time confirmation / fallback probe 兜底
+- 但 fallback 不应重新升级为默认全量扫描路径
 
 ## 推荐落地顺序
 
-1. 在 `availability-watchdog.sh` 新增 `codex_oauth_sweep_all_slots`
-2. 增加 availability cache 写回函数
-3. 改造 cooldown ledger 为 sweep overwrite 模式
-4. 改写 `probe_all_codex_slots_and_update_cooldown()`，让它从“全量真实 probe”转成“OAuth inventory sweep + launch-time confirmation”
-5. 改写 `freely ai status` 与 `switch codex auto` 共用同一套结果
+1. 先重写 watchdog 恢复状态机，明确：
+   - `usable` 优先
+   - `all unavailable -> earliest reset -> sleep`
+   - `.codex` 变化的 `usable switch` / `parking` 语义
+2. 再把 OAuth sweep 接成 30 分钟维护 + switch-on-demand refresh 的 inventory truth
+3. 再让 cooldown 成为和 availability cache 同步更新的 recovery ledger reset 面
+4. 最后补真实环境验证：
+   - 命中 limit 后切到 `usable`
+   - 无参 `switch codex` 会刷新全部 auth 目录并直接切一个可用 slot
+   - 全部不可用时进入 sleep
+   - parking 不会造成假 wake
 
 ## 结论
 
-这次 OAuth 方案不是小优化，而是值得重构 control plane 的新主路径。真正应该保留的旧能力，不是“全量串行真实 probe”，而是“最终 launch-time 确认”。前者该被 OAuth sweep 吸收，后者继续作为最后一道守门。 
+OAuth 不是这个 lane 的中心；`limit` 后如何最快恢复服务才是中心。  
+正确重构应围绕 recovery loop 展开，再把 OAuth sweep、cooldown、`~/.codex/` watcher 都降成服务这条主链的辅助层。
