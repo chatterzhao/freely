@@ -79,7 +79,7 @@
 - status: needs_research
 - decision_reason: 方向重要但需先明确当前阶段并发范围与最小可行边界。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs: []
 
 ### C-20260304-606
@@ -104,8 +104,9 @@
 - why_now: 是从“文档约束”走向“机器可执行门禁”的关键转换点。
 - acceptance_hint: 将验收项映射为检查任务，并接入集成测试门禁与放行流程。
 - priority: P0
-- status: proposed
-- decision_reason: 原研究 P0 能力明确列出，且直接支撑 Gate Contract 的可执行化。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: absorbed
+- adoption_type: supporting_evidence
+- decision_reason: issue-level acceptance、pre-tests executable contract 与相关 checklist/gate 已被后续 IBM acceptance 真源吸收，这条旧候选不再需要独立 materialization。
+- promoted_issue_path: docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs: []

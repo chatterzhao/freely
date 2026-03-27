@@ -47,7 +47,7 @@
 - status: needs_research
 - decision_reason: 方向可能仍有价值，但当前没有 CLI-first 配置内核；不应直接 materialize 成 UI issue。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs: []
 
 ### C-20260305-704

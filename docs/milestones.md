@@ -674,6 +674,61 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结“parked issue allows retirement”的最小契约，再决定是否 materialize 成 follow-on issue
 - revisit_trigger: 当某个 worktree 的剩余动作已退化为 milestone 排序维护，而不是近程 issue continuation 时重新唤起
 
+12. `C-20260303-001`
+- title: Ring + SSOT 规则契约化
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/candidates.md`
+- next_action: 保持在 pre-brainstorm，先把 Ring/SSOT 冲突决议规则与检查点清单收敛成当前治理链可消费的最小 contract
+- revisit_trigger: 当规则契约与检查点清单可以冻结成独立 issue contract 时，重新进入 materialization 判断
+
+13. `C-20260303-002`
+- title: 独立监理 Gate 接入 auto-loop
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/candidates.md`
+- next_action: 保持在 pre-brainstorm，先定义最小独立审查放行边界，再判断是否值得进入正式治理 issue
+- revisit_trigger: 当独立监理 gate 的输入输出、放行条件与 owner 边界可以被冻结成 issue scope 时，重新进入 materialization 判断
+
+14. `C-20260304-605`
+- title: Sub-agent 批次编排器
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260304-research-redo-owner-tool-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260304-research-redo-owner-tool-alignment/candidates.md`
+- next_action: 保持在 pre-brainstorm，继续判断当前 dispatch metadata、queue/frozen queue 与失败回退是否已足够，还是仍需要独立 batch orchestration owner
+- revisit_trigger: 当并发批次等待、失败回退与审计记录 contract 无法继续由现有 dispatch truth 承接时，重新进入 materialization 判断
+
+15. `C-20260305-703`
+- title: Governance UI for Hooks/Worktree Constraints
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260305-freely-dogfooding-governance-worktree-policy/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260305-freely-dogfooding-governance-worktree-policy/candidates.md`
+- next_action: 继续 pre-brainstorm，先判断 CLI-first 配置内核是否已经足够稳定，再决定是否值得补 UI 层
+- revisit_trigger: 当 hook/worktree 约束已有稳定 machine-readable config 面，且确实需要用户可视化治理入口时重新唤起
+
+16. `C-20260309-2003-C`
+- title: Review Alignment Recovery and Loop Boundary Governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/candidates.md`
+- next_action: 保持在 pre-brainstorm，继续收敛 review 分流、直接修补 vs 重开、以及 worktree 续用/新建的统一 gate
+- revisit_trigger: 当 review alignment 与 loop boundary 的最小治理 contract 可以冻结成独立 issue scope 时，重新进入 materialization 判断
+
 9. `C-20260322-0715-A`
 - title: Detect and recover pre-test-merge manager acceptance stalls after delegated continuation
 - milestone_state: candidate

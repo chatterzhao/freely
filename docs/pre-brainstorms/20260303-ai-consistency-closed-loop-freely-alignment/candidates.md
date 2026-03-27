@@ -15,7 +15,7 @@
 - status: needs_research
 - decision_reason: 方向仍有价值，但当前没有一条精确 issue 对其进行独立承接；不应伪装成已 promotion。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs: []
 
 ### C-20260303-002
@@ -27,7 +27,7 @@
 - status: needs_research
 - decision_reason: 方向合理但缺少与当前执行链路的最小实现边界，需补方案再晋升。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs: []
 
 ### C-20260303-003
