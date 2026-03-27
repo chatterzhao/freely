@@ -49,7 +49,30 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260325-0410`
+- title: Story-level pre-tests quality gate governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
+- next_action: 保持在当前 milestone 的 committed queue，直到 verification evidence 明确写回并把 `C-20260325-0333-B` 的完成态同步到正式 closeout；umbrella candidate `C-20260325-0333-A` 继续单独留在 candidate queue
+
 ### completed_issues
+
+1. `I-20260324-0415`
+- title: Application-native runtime observation contract and observability planes
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+- source_brainstorm: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-application-native-runtime-observation-contract-and-observability-planes.md`
+  - `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
+- completion_note: application-native runtime observation contract、observability plane 分层与共享状态卡片 deep refs 已在 canonical issue/progress/verification 栈中闭合；当前缺口只是 milestone 编排写回，非 IBM/dev 真源缺失
 
 1. `I-20260327-0651`
 - title: Project-scoped network proxy configuration and launcher inheritance governance
@@ -1076,6 +1099,31 @@ routing_policy:
   - `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/code-reviews/20260320-backend-service-contract-and-adapter-taxonomy-ibm-completion.md`
   - `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/code-reviews/20260326-backend-service-contract-and-adapter-taxonomy-canonical-verification.md`
 - completion_note: contract layer 与 adapter layer 的冻结已经成为下游 frontend-probe architecture / boundary contract 的引用真源；因此本 issue 已从单纯 IBM 包提升为 canonical completion，后续 control surface、standalone runtime 与 intervention transport 直接复用该边界，不再阻塞在 `done_ibm`
+
+## M-20260326-freely-product-architecture
+
+- title: Freely product architecture convergence
+- status: active
+- source_brainstorm: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md`
+- intent: 把 Freely 自身的产品/系统分层拓扑收敛进正式 milestone，避免高层架构 issue 只有 pre-brainstorm/issue 真源而没有主动扫描入口
+- why_now: `PROJECT_INTENT / CONSTITUTION / LAWS / AGENTS.md` 的高层分工已经通过独立 issue 写回，需要 milestone 保留同一条 canonical traceability
+
+### committed_issues
+
+### completed_issues
+
+1. `I-20260326-1810`
+- title: Freely layered architecture and tooling topology
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/issues/freely-layered-architecture-and-tooling-topology.md`
+- source_brainstorm: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md`
+- evidence:
+  - `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/code-reviews/20260326-freely-layered-architecture-and-tooling-topology-verification.md`
+- completion_note: Freely 自身产品架构、command family、observability semantic、host shell / form factor、external AI tooling layer 与 loop/lifecycle 真源的分层职责已在高层真源中完成首轮收敛；后续若继续泛化成通用产品形态方法，必须另开 lifecycle
 
 ## M-20260308-frontend-probe-dogfooding-loop
 
