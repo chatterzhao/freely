@@ -792,6 +792,8 @@ codex_oauth_sweep_all_slots() {
   done <"$results_file"
   printf '\n' >&2
 
+  local total_results=0
+  total_results="$(wc -l <"$results_file" | tr -d ' ')"
   rm -rf "$tmp_dir"
   if [[ -n "$usable_slot" ]]; then
     printf 'usable:%s\n' "$usable_slot"
@@ -801,7 +803,7 @@ codex_oauth_sweep_all_slots() {
     printf 'all_unavailable:%s|%s\n' "$earliest_slot" "$earliest_reset"
     return 0
   fi
-  if [[ "$saw_result" == "1" && "$curl_error_count" -gt 0 && "$curl_error_count" -eq "$(wc -l <"$results_file" | tr -d ' ')" ]]; then
+  if [[ "$saw_result" == "1" && "$curl_error_count" -gt 0 && "$curl_error_count" -eq "$total_results" ]]; then
     printf 'oauth_unreachable\n'
     return 2
   fi
