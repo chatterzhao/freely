@@ -15,10 +15,11 @@
   - 对于不支持的工具，确定替代方案（如软链接、配置文件路径参数）
   - 产出 `references/tool-config-matrix.md`
 - priority: P0
-- status: done
-- decision_reason: 这一步决定了 skill 的实现路径。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: absorbed
+- adoption_type: supporting_evidence
+- decision_reason: 工具配置矩阵已作为 `ai-cli-availability-manager` 的 supporting evidence 被 `I-20260318-1630` 吸收，不再单独 materialize 平行 issue。
+- promoted_issue_path: docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs: []
 - sequencing_rank: 1
 - resolution: |
@@ -38,10 +39,11 @@
   - `references/profile-management.md` 记录 profile 配置规范
   - 与 constitution-guard、laws-enforcer、recovery-subagent-governance 集成
 - priority: P0
-- status: done
-- decision_reason: 这是核心功能，必须实现。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: absorbed
+- adoption_type: supporting_evidence
+- decision_reason: skill 与 references 已作为 `I-20260318-1630` 的 canonical completion surface 落盘，这条 pre-brainstorm 只保留 supporting provenance。
+- promoted_issue_path: docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs: []
 - sequencing_rank: 2
 - depends_on:
@@ -61,10 +63,11 @@
   - 定义配置格式（profile 名称、config_dir 路径、active 标记）
   - 考虑多项目场景下的配置共享与隔离
 - priority: P0
-- status: done
-- decision_reason: 配置格式影响 skill 的输入接口设计。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: absorbed
+- adoption_type: supporting_evidence
+- decision_reason: profile 配置格式已作为 `ai-cli-availability-manager` 的 supporting contract 被当前 canonical owner 吸收。
+- promoted_issue_path: docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs: []
 - sequencing_rank: 2
 - depends_on:
@@ -85,10 +88,11 @@
   - 定义 profile 耗尽时的兜底行为（暂停循环 / 报警 / 等待冷却）
   - 与 recovery-subagent-governance 集成
 - priority: P1
-- status: done
-- decision_reason: 可以先实现手动切换验证框架，再逐步完善自动化。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: absorbed
+- adoption_type: supporting_evidence
+- decision_reason: 限流检测、双限额归因与切换验证现已属于 `I-20260318-1630` 的 canonical verification surface，不再单开 follow-on issue。
+- promoted_issue_path: docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs: []
 - sequencing_rank: 3
 - depends_on:
@@ -116,10 +120,13 @@
   - 宪法中添加 CLI First 章节
   - 定义 CLI 接口设计规范
 - priority: P0
-- status: done
-- decision_reason: 架构层面原则，必须在实现前确定。
+- status: dropped
+- adoption_type: superseded
+- decision_reason: `CLI First` 已直接进入宪法真源，作为架构原则独立成立，不再保留为这组 availability manager 子候选的 active owner。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
+- superseded_by:
+  - docs/CONSTITUTION.md
 - session_refs: []
 - sequencing_rank: 1
 - resolution: |
@@ -134,10 +141,11 @@
   - `freely ai login codex` 一键完成登录和保存
   - 自动检测账号并保存授权文件
 - priority: P0
-- status: done
-- decision_reason: 用户体验核心改进。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- status: absorbed
+- adoption_type: supporting_evidence
+- decision_reason: `freely ai login codex` 已进入 `runtime/ai-cli` 与 `I-20260318-1630` 的 canonical completion，不再需要单独 owner。
+- promoted_issue_path: docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs: []
 - sequencing_rank: 4
 - depends_on:
@@ -155,8 +163,11 @@
   - 确定哪些字符需要替换
   - 保持可读性
 - priority: P1
-- status: done
+- status: absorbed
+- adoption_type: supporting_evidence
 - decision_reason: 实现细节，但影响用户体验。
+- promoted_issue_path: docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md
+- milestone: M-20260306-workspace-routing-foundation
 - resolution: |
     - 测试确认 macOS/Linux 支持 `@`
     - 只替换 `.` 为 `-`
