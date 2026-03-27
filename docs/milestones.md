@@ -318,6 +318,23 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
 - completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
 
+2. `I-20260326-1815`
+- title: IBM pre-tests executable acceptance quality governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/candidates.md`
+- evidence:
+  - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
+  - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
+  - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
+  - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
+  - `docs/progress/workspace-routing-foundation/p-ibm-pretests-executable-acceptance-quality-governance.md`
+  - `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/code-reviews/20260326-ibm-pretests-executable-acceptance-quality-governance-verification.md`
+- completion_note: IBM 真源现在要求 `pre-tests.md` 默认写出可恢复的 executable acceptance contract，并对 Freely 自治能力明确 integration、application-native real-environment、end-to-end dogfood 三类 post-merge 验收面；verification review 模板统一与 machine-readable schema 继续留给后续 lifecycle
+
 ### candidate_issues
 
 1. `C-20260323-1435-A`

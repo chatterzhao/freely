@@ -337,8 +337,12 @@
 - 20260322-1615--protected-post-merge-acceptance-route-governance
   - brainstorms: docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/candidates.md
+- 20260326-1733--ibm-pretests-real-environment-acceptance-quality
+  - brainstorms: docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
 - 20260322-0049--manager-continuation-handoff-consumption
 - `20260322-0135--integration-acceptance-first-ibm-and-verification`: integration-acceptance-first-ibm-and-verification
+- `20260326-1733--ibm-pretests-real-environment-acceptance-quality`: ibm-pretests-real-environment-acceptance-quality

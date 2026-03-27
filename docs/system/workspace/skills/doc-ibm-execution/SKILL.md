@@ -27,9 +27,17 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
    - 把 candidate-level acceptance 转成 issue-level acceptance
    - 让 `pre-tests.md`、`tasks.md` 和 issue-bound brainstorm 体现这层深化
 6. `pre-tests.md` 不是附属清单，而是 issue-level acceptance 的主控制面：
-   - 默认优先表达 integration / acceptance 行为
+   - 默认先写 executable acceptance contract，而不是 wording review / truth-source reading checklist
+   - 默认优先表达 focused regression、integration、real-environment、dogfood 这些行为验收面
    - 若存在 merge 后才能验证的能力，显式标记 `post-merge acceptance`
    - 并明确目标验证环境：`develop` 或 `pre-test-merge`
+   - 对每个关键 acceptance 面，写出最小 `environment`、`evidence`、`failure signal`、`failure handling / replay expectation`
+   - 对 Freely 自治能力，默认回答：
+     - pre-merge focused regression / smoke
+     - post-merge integration acceptance
+     - post-merge application-native real-environment acceptance
+     - post-merge end-to-end dogfood acceptance
+   - 若某类测试面不适用，显式写出不适用理由与替代证据，而不是省略
    - 写清该环境只用于验证，不用于继续实现
    - 不要让后续 verification 只能靠口头解释或代码阅读来恢复验收标准
 7. 若文档已经足够驱动实现，按同一 gate 把 `phase_state` 切到 `done_ibm`，并返回最小实现上下文。
@@ -52,5 +60,5 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 - 关键 IBM 产物完整，或已明确为什么必须 reroute。
 - `prd.md` 已达到 AI-ready quality bar，且 `pre-tests.md`、`tasks.md` 与之对齐。
 - candidate acceptance 已被深化为 issue-level acceptance。
-- `pre-tests.md` 已明确本 issue 的主验收面，且默认以 integration / acceptance evidence 为主。
+- `pre-tests.md` 已明确本 issue 的主验收面，且默认以 executable acceptance evidence 为主，而不是 wording review 为主。
 - 进入 dev-loop 所需的最小上下文已备齐。
