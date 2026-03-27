@@ -10,6 +10,7 @@ HOME_DIR="$TMP_DIR/home"
 MOCK_BIN="$TMP_DIR/mock-bin"
 mkdir -p \
   "$PROJECT/.freely/run" \
+  "$PROJECT/bin" \
   "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts" \
   "$PROJECT/docs/system/workspace/scripts/runtime" \
   "$HOME_DIR/.ai-auth/codex-test@example-com-1" \
