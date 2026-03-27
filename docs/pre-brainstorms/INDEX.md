@@ -1,5 +1,6 @@
 # 预研头脑风暴索引
 - 20260326-1705--manager-owner-stance-and-source-patrol
+- 20260327-1115--oauth-api-usage-query-refactor
 - 20260326-1825--deep-refactor-fleet-sequencing
 - 20260326-0445--manager-delegated-intake-absorption-closure
 - 20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance
@@ -60,6 +61,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260327-1115--oauth-api-usage-query-refactor
+  - brainstorms: docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md
 - 20260326-1705--manager-owner-stance-and-source-patrol
   - brainstorms: docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/brainstorms.md
   - candidates: docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/candidates.md
