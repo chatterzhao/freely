@@ -49,19 +49,21 @@ routing_policy:
 
 ### committed_issues
 
+### completed_issues
+
 1. `I-20260327-0651`
 - title: Project-scoped network proxy configuration and launcher inheritance governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/candidates.md`
-- next_action: focused regression、governance-check 与 verification artifact 已齐备；下一步将这条 lane 合入 `develop`，写回 completed closeout evidence，并退休 proxy worktree
+- evidence:
+  - `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/20260327-project-scoped-network-proxy-verification.md`
+- completion_note: project-scoped proxy config truth、shared resolver、OAuth inheritance 与 no-arg switch refresh contract 已合到同一能力面；后续前端只需改 `.freely/config.env` 即可驱动同一网络策略。
 
-### completed_issues
-
-1. `I-20260327-0701`
+2. `I-20260327-0701`
 - title: Pre-tests evidence binding and completion gate governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -73,7 +75,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews/20260327-pretests-gate-feature-verification.md`
 - completion_note: 第一阶段 issue-bound completed gate 已在 `develop` 吸收；后续 active worktree 在 issue 进入 `completed` 时会被同一 gate 约束，retirement enforcement 留给 follow-on lifecycle。
 
-2. `I-20260327-1115`
+3. `I-20260327-1115`
 - title: OAuth slot inventory sweep and launch-time confirmation governance
 - milestone_state: completed
 - phase_state: `completed`

@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260327-0651`
 - title: Project-scoped network proxy configuration and launcher inheritance governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `project-scoped-network-proxy-configuration-and-launcher-inheritance-governance`
