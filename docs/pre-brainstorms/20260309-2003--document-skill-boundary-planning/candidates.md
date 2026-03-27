@@ -12,10 +12,14 @@
 - why_now: Freely 把 skill 当作产品能力接口，如果上层文档和 skill 边界不稳，后续能力设计会持续混层。
 - acceptance_hint: 明确六层信息架构；压缩 `README` 与 `AGENTS` 到入口职责；把 How 层内容回收到 skills/references；保持 `LAWS` 作为规则语义唯一事实源。
 - priority: P0
-- status: proposed
-- decision_reason: 这是后续 skill 重构与治理入口设计的前提。
+- status: dropped
+- adoption_type: superseded
+- decision_reason: 文档入口职责、workspace skill 暴露面与治理入口已经落到当前 canonical truth；继续保留这条旧候选只会重复已完成的边界收敛。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
+- superseded_by:
+  - AGENTS.md
+  - docs/system/workspace/skills/README.md
 - session_refs: []
 - sequencing_rank: 1
 
@@ -25,10 +29,14 @@
 - why_now: 不先重组 skill 架构，Freely 的能力暴露面就会继续停留在“项目流程文档”而不是“产品能力包”。
 - acceptance_hint: 按 `guard/capability/governance` 三类整理；为核心 skill 增加 references 拆分；新增 `workspace-skill-governance` 或等效治理入口。
 - priority: P0
-- status: proposed
-- decision_reason: 直接影响 Freely 如何通过 skill 暴露、组织和治理自身能力。
+- status: dropped
+- adoption_type: superseded
+- decision_reason: workspace skill 架构重组、references 拆分与专用 skill 治理入口已经进入当前 canonical skill truth，不再需要这条旧候选单独承接。
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
+- superseded_by:
+  - docs/system/workspace/skills/README.md
+  - docs/system/workspace/skills/workspace-skill-governance/SKILL.md
 - session_refs: []
 - sequencing_rank: 2
 - depends_on:
@@ -43,7 +51,7 @@
 - status: proposed
 - decision_reason: 这是控制重构与实现边界、避免“不断修改掉进地狱”的前置治理能力。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs: []
 - capability_class: governance
 - rollout_mode:

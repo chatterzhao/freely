@@ -30,7 +30,7 @@
 - status: proposed
 - decision_reason: 与多项目隔离交互主线一致，已形成明确实现边界。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: M-20260308-frontend-probe-dogfooding-loop
 - session_refs: []
 
 ### C-20260304-203

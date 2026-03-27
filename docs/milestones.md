@@ -1285,6 +1285,17 @@ routing_policy:
 
 ### candidate_issues
 
+1. `C-20260304-202`
+- title: 多项目 UI 隔离规则实现
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260304-architecture-backend-first-and-frontend-decoupling/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260304-architecture-backend-first-and-frontend-decoupling/candidates.md`
+- next_action: 继续 pre-brainstorm，先判断 frontend probe 当前是否需要真正的多项目工作台，再决定是否 materialize
+- revisit_trigger: 当 frontend/control-surface 确认需要 `activeProject` 隔离、Focus/Overview 与项目级输入隔离 contract 时，重新进入 materialization 判断
+
 1. `C-20260317-1101`
 - title: Frontend Runtime Baseline for Probe
 - milestone_state: candidate
