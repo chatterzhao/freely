@@ -29,6 +29,7 @@
 
 说明：
 
+- `C-{issue-id}` 是 pre-brainstorm candidate 身份；当它进入 milestone 时，必须用同一个 `{issue-id}` 建立 `M-{issue-id}` 候选位
 - `acceptance_criteria` 记录 candidate 在 pre-brainstorm 阶段何时算完成
 - `promotion_gate` 记录进入 IBM materialization 前必须满足的边界
 - `open_questions` 记录当前仍未收敛的关键问题
@@ -62,7 +63,7 @@
 
 必须原子同步：
 
-- 建立 candidate 映射
+- 建立 `C-{issue-id} -> M-{issue-id}` 映射
 - 放入 `candidate_issues`
 - 写清下一动作
 - 若未收口，补 `revisit_trigger` 或同等的下一次重启条件

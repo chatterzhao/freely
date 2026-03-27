@@ -157,17 +157,23 @@
    - `route_kind`: `pre_brainstorm | ibm | dev_loop | completion_verification | recovery`
    - `phase_state`: `todo_pre_brainstorm | in_pre_brainstorm | done_pre_brainstorm | todo_ibm | in_ibm | done_ibm | in_dev | blocked_dev | in_verification | in_recovery | completed`
    - `runtime_state`: `attachable | resumable | restart_required | unavailable`
-2. `candidate.status` 只用于 pre-brainstorm 阶段，建议值保持为 `proposed | needs_research | promoted | dropped`；不得拿它替代 issue 或 dev-loop 状态。
+2. `candidate.status` 只用于 pre-brainstorm 阶段，建议值保持为 `proposed | needs_research | blocked | promoted | absorbed | dropped`；不得拿它替代 issue 或 dev-loop 状态。
+2a. merge 到 `develop` 前，candidate 是否允许“没有下一环”只能由当前 `candidate.status` 判定：
+   - `proposed | needs_research | blocked`：允许暂时没有正式 IBM issue，但必须继续保留在 `docs/milestones.md.candidate_issues`，并写清 `next_action` 与 `revisit_trigger`
+   - `promoted`：不允许缺下一环；必须已经 materialize 为一个或多个 `I-{issue-id}*`
+   - `absorbed`：允许不新开独立 issue，但必须明确写出吸收它的 owner issue 或等价 canonical owner
+   - `dropped`：允许不进入下一环，但必须写清 `decision_reason`
 3. `milestone_state` 只表达 milestone 队列归属，建议值保持为 `candidate | committed | completed`；不得再拿它表达 IBM / dev / verification 阶段。
 4. 任何跨环迁移都必须同步更新对应产物，最少遵循：
    - `discovery -> pre_brainstorm`：更新 `brainstorms.md`、`candidates.md`、`milestones.md.candidate_issues`，并使用 `phase_state=todo_pre_brainstorm | in_pre_brainstorm`
-   - `candidate -> milestone-owned issue`：更新 `candidates.md.promoted_issue_path`、`docs/milestones.md.issue_path`、正式 `issue` 路径，并进入 `phase_state=in_ibm`
+   - `candidate -> milestone-owned issue`：先把 `C-{issue-id}` 接入 milestone 的 `M-{issue-id}`；进入 IBM 时，`B` 必须把该 `M-{issue-id}` materialize 成一个或多个 `I-{issue-id}*`，并同步更新 `candidates.md.promoted_issue_path`、`docs/milestones.md.issue_path`、正式 `issue` 路径，以及这些 `I-*` 在 milestone 中的阶段与顺序，然后进入 `phase_state=in_ibm`
    - `in_ibm -> done_ibm`：更新 `issue`、`docs/milestones.md`，不得强制创建 `progress`
    - `done_ibm -> in_dev`：更新 `issue`、`docs/milestones.md`、`progress`
    - `in_dev -> blocked_dev`：更新 `issue`、`progress`、`docs/milestones.md`，并记录 blocker
    - `recovery`：更新 `progress` 或 `recovery`，并带回当前 `runtime_state` 与 `phase_state=in_recovery`
    - `in_verification -> completed`：更新 `issue`、`docs/milestones.md`、必要的 `progress/recovery` 完结记录，以及后续清理证据
 4a. 对 `pre-brainstorm -> candidate -> milestone -> issue -> progress/recovery -> completed/cleanup` 这条链，应按“治理事务”理解：只有相关 canonical artifacts 都同步后，当前迁移才算完成；不得只改其中一个文档就声称已完成收口。
+4b. `M-{issue-id}` 是 milestone candidate 身份，不等于最终执行编排身份；一旦 IBM materialization 产出一个或多个 `I-{issue-id}*`，milestone 的正式编排必须切到这些 `I-*`，原始 `M-*` 只保留来源与追溯语义。
 5. `session_refs` 是跨环证据字段；当 candidate 进入 issue、issue 进入 dev-loop、或进入 recovery 时，必须把当前有效会话证据继续写入下一层产物。
 6. `session_refs` 的最小字段为：
    - `tool`

@@ -14,6 +14,7 @@ description: 扫描 `docs/milestones.md` 与关联 candidate / issue / progress 
 - 规划 active candidate / committed issue 的顺序
 - 识别 milestone 与关联产物的状态漂移
 - 回写 milestone 与相关摘要，让治理事务收口
+- 当 IBM materialization 已产出一个或多个 `I-{issue-id}*` 时，把正式编排从 `M-{issue-id}` 候选位切到这些 `I-*`
 
 ## 输入
 
@@ -35,6 +36,7 @@ description: 扫描 `docs/milestones.md` 与关联 candidate / issue / progress 
 - committed issue 的依赖顺序不再清楚
 - candidate / issue / progress / recovery / cleanup 之间出现漂移
 - verification / cleanup 完成后，需要回写 completed queue
+- IBM 已从某个 milestone candidate 物化出正式 issue，但 milestone 还没切换到 `I-*` 编排
 - standing-source scan 发现排期或状态维护问题
 
 ## 不负责
@@ -53,6 +55,12 @@ description: 扫描 `docs/milestones.md` 与关联 candidate / issue / progress 
 - issue / progress / recovery
 - completed / cleanup evidence
 
+其中同一条治理线默认共享同一个 `{issue-id}`：
+
+- `C-{issue-id}`：pre-brainstorm candidate 身份
+- `M-{issue-id}`：milestone candidate 身份
+- `I-{issue-id}*`：IBM materialization 后的正式 issue 身份
+
 事务完成条件是：
 
 - 当前阶段相关 canonical artifacts 已同步，而不是只改了其中一个文件
@@ -61,4 +69,5 @@ description: 扫描 `docs/milestones.md` 与关联 candidate / issue / progress 
 
 - milestone 队列顺序清楚
 - 状态漂移已回写或显式留痕
+- 已 materialize 的 `I-{issue-id}*` 已被放入正确的 milestone 阶段，并且顺序清楚
 - 下一轮 manager 可以基于 milestone 继续委派

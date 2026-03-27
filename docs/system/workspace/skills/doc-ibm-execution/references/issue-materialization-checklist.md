@@ -2,9 +2,18 @@
 
 ## Entry checks
 
-- 当前输入已经是 milestone-owned issue，或 candidate 已被 milestone 接纳
+- 当前输入已经是 milestone-owned issue，或 candidate 已被 milestone 接纳并进入某个 `M-{issue-id}`
 - 若仍只是未绑定 milestone 的 pre-brainstorm candidate：回到 `doc-pre-brainstorm-execution`
 - 若来源 candidate 是 `candidate_format_version: v2`，先读取其 `acceptance_criteria`、`promotion_gate`、`open_questions`、`acceptance_reviews`
+
+## Identity and materialization contract
+
+- `C-{issue-id}` 表示 pre-brainstorm candidate 身份
+- `M-{issue-id}` 表示 candidate 已进入 milestone `candidate_issues`
+- `I-{issue-id}*` 表示 IBM materialization 后的正式 milestone-owned issue 身份
+- `B` 的职责不是只写目录；`B` 必须把 `M-{issue-id}` materialize 成一个或多个 `I-{issue-id}*`
+- 若拆成多个正式 issue，所有 `I-*` 都必须保留同一个 `{issue-id}` 主键片段，确保能回溯到同一个候选来源
+- materialization 完成后，milestone 的正式编排区应挂这些 `I-*`，而不是继续只靠 `M-{issue-id}` 代表执行态
 
 ## Stable ownership required
 
@@ -13,6 +22,8 @@
 - `epic-name`
 - `story-name`
 - `issue-name`
+- 当前 `M-{issue-id}` 是否需要拆成多个 `I-{issue-id}*`
+- 若拆成多个 issue，它们在 milestone 中的阶段归属与排序
 
 任一未稳定：
 
@@ -38,6 +49,8 @@ Issue front matter 还应显式绑定：
 
 - `candidates.md.promoted_issue_path`
 - `docs/milestones.md.issue_path`
+- 若从一个 `M-{issue-id}` 拆出多个 `I-{issue-id}*`，则 milestone 的正式编排区必须写回这些 `I-*` 的顺序与阶段归属
+- 原始 `M-{issue-id}` 只保留来源/追溯语义，不继续代替正式执行编排
 - `phase_state=in_ibm`
 - 继承有效 `session_refs`
 - 在 issue / `prd.md` / `pre-tests.md` / `tasks.md` / issue-bound brainstorm 中继续深化 acceptance 边界
