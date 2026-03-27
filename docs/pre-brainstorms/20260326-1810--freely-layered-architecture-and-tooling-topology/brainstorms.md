@@ -147,6 +147,84 @@ Freely 现在缺一份更总览的 architecture/topology 真源，导致几个�
 
 当前项目更像“有了多张局部正确的工程图”，但还没有“一张完整楼层图”。
 
+## Provisional Topology Draft
+
+注意：这不是最终 frozen 命名，只是当前证据下最稳的一版草图。
+
+### Vertical stack
+
+1. operational substrate
+   - git / branch / worktree
+   - filesystem / prompts / jsonl / logs / session-state
+   - process control / watchdog / shell runtime
+2. evaluation harness
+   - test runners
+   - replay scripts
+   - evidence collection
+   - environment setup
+3. autonomy evals / acceptance
+   - integration acceptance
+   - real-environment dogfooding
+   - e2e runtime replay
+   - verification / regression expectations
+4. external execution provider layer
+   - `codex`
+   - `cc`
+   - `cc-use-codex-cli`
+   - `iflow`
+   - `kiro-cli`
+   - MCP-assisted tool usage
+5. Freely runtime / orchestration
+   - `freely` runtime scripts
+   - lead / manager / worker
+   - three-loop routing
+   - continuity / handoff / patrol / queue / recovery
+6. service contract / adapter layer
+   - `ClientCommand`
+   - `ServerEvent`
+   - `Snapshot`
+   - `tauri_adapter`
+   - `ws_adapter`
+   - `local_process_adapter`
+7. host shell / product surface
+   - CLI shell
+   - TUI shell
+   - GUI / probe / future control surface
+
+### Orthogonal semantic surfaces
+
+这些不是 vertical peer layer，而是跨层暴露给 host shell 的语义面：
+
+- boot semantics
+  - `init`
+  - `start`
+- submit / intervention semantics
+  - `chat`
+  - future human intervention submit path
+  - control actions such as pause / retry / resume
+- observability semantics
+  - `baseline-status`
+  - `live-status`
+  - `fleet-status`
+  - session / stream / artifact deep refs
+
+### Mapping back to current truth sources
+
+| Current truth source | Best-fit place in topology | Why |
+| --- | --- | --- |
+| `three-loop-capability-lifecycle.md` | Freely runtime / orchestration | 它讲 loop、route、ownership、front-door flow、observability planes，但不等于 whole-system atlas |
+| `tools.md` | external execution provider layer | 它定义 Freely 如何编排外部 AI tools，而不是 UI 或 lifecycle atlas |
+| `cli-first-entrypoint-and-observability-surface-unification` | semantic surfaces + host shell relation | 它说明 `chat` submit primitive、status family backend interface、TUI/GUI render relation |
+| `backend-service-contract-and-adapter-taxonomy` | service contract / adapter layer | 它冻结 contract vs adapter，而不是 front-door 或 tooling |
+| frontend probe / control-surface issues | host shell / product surface | 它们是具体 render shell 与 interaction composition，不是 runtime 本体 |
+
+### Current mismatch markers
+
+- mismatch: repo 已经把 `chat` 写成 canonical submit primitive，但还没有在 architecture 总图里把它与 host shell 分离
+- mismatch: repo 已经把 status family 写成 observability/backend interface，但还没有在 architecture 总图里把它与 CLI/TUI/GUI 分离
+- mismatch: repo 已经把 external AI tools 写成正式 runtime 编排对象，但缺少一份总图说明它们处在 runtime 之下、宿主壳之外
+- mismatch: repo 已经把 contract vs adapter 与 Tauri/WS 分离，但这条边界仍主要停留在 control-surface 线，没有回写到全局 architecture 层
+
 ## Open Questions
 
 1. 最终文档应采用“单轴层级图 + 正交语义面注释”，还是直接采用“两轴拓扑图”？
