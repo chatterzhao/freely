@@ -3,10 +3,10 @@
 - id: `C-20260326-1825-A`
 - title: 大重构前的 fleet sequencing audit 与 upstream merge order
 - source_brainstorm: `docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/brainstorms.md`
-- status: `needs_research`
+- status: `candidate`
 - adoption_type: `planning_truth`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `pending://only-if-sequencing-gap-needs-dedicated-governance-issue`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -36,8 +36,15 @@
   - `feature/closeout-canonical-replay-20260326`
   - clean/stopped watchdog companion worktrees already absorbed by `develop`
   - `pre-test-merge`
+- acceptance_reviews:
+  - reviewer: `codex`
+    mode: `fresh-process candidate acceptance review`
+    summary: `The sequencing gap has already produced concrete fleet drift and now has a stable smallest fix: a pre-refactor audit gate plus explicit upstream merge ordering in development governance.`
+    verdict: `ready_to_materialize`
 - next_action:
-  - 按此顺序完成前置 worktree / runtime judgement
-  - 若后续反复暴露“广义重构前缺 sequencing gate”问题，再将其 materialize 为独立治理 issue，而不是直接进入 capability 目录
+  - materialize 成独立治理 issue，冻结 AGENTS-level pre-refactor sequencing gate、issue-bound IBM 文档与 verification evidence
+  - 保持 scope 在开发 Freely 的治理真源，不把这条 planning gate 误写进 `docs/system/**`
 - revisit_trigger:
   - 当再次出现多棵 dirty/running/closeout owner 与上游治理树同时并存、且团队准备开 broad/deep refactor 时，重新检查是否需要独立治理 issue 或更高等级规则
+- promoted_issue_id: `I-20260326-1915`
+- milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`

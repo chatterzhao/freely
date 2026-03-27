@@ -318,6 +318,20 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
 - completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
 
+2. `I-20260326-1915`
+- title: Deep-refactor fleet sequencing governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/candidates.md`
+- evidence:
+  - `AGENTS.md`
+  - `docs/progress/workspace-routing-foundation/p-deep-refactor-fleet-sequencing-governance.md`
+  - `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/code-reviews/20260326-deep-refactor-fleet-sequencing-governance-verification.md`
+- completion_note: broad/deep refactor 前的 fleet sequencing audit 已固定为开发 Freely 的入口 gate，并已用真实 stop、merge-prep 与 governance-check 结果验证；后续若要升级成自动化或更高等级规则，应由新的 lifecycle 承接
+
 ### candidate_issues
 
 1. `C-20260323-1435-A`
