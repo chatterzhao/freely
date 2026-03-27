@@ -17,9 +17,13 @@ source ./bin/worktree-common.sh
 branch="$(freely_wt_current_branch)"
 [[ -n "$branch" ]] || exit 0
 
-# main/develop/pre-test-merge 不需要 worktree，直接退出
+# main/develop/test-pre-merge-* 不需要 worktree，直接退出
+if freely_wt_is_test_pre_merge_branch "$branch"; then
+  exit 0
+fi
+
 case "$branch" in
-  main|develop|pre-test-merge)
+  main|develop)
     exit 0
     ;;
 esac
@@ -39,7 +43,7 @@ if ! freely_wt_validate_branch_base "$branch"; then
 [HOOK] Branch '$branch' base check failed.
 Expected:
   feature/* from develop (or from dependent feature when the issue explicitly depends on unmerged parent changes)
-  feature/premerge-* from pre-test-merge (or develop when pre-test-merge is not active)
+  feature/premerge-* from an active test-pre-merge-* batch (or develop when no test batch is active)
   release/* from develop
   hotfix/* from main
 Primary worktree switched back to '$parking_branch'.

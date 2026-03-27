@@ -5,6 +5,15 @@ freely_wt_current_branch() {
   git symbolic-ref --quiet --short HEAD || true
 }
 
+freely_wt_is_test_pre_merge_branch() {
+  local branch="${1:-}"
+  [[ "$branch" == test-pre-merge-* ]]
+}
+
+freely_wt_first_test_pre_merge_branch() {
+  git for-each-ref --format='%(refname:short)' 'refs/heads/test-pre-merge-*' 2>/dev/null | head -n 1
+}
+
 freely_wt_primary_worktree() {
   git worktree list --porcelain | awk '/^worktree / {print $2; exit}'
 }
@@ -21,10 +30,11 @@ freely_wt_is_primary_worktree() {
 }
 
 freely_wt_pick_parking_branch() {
+  local test_pre_merge_branch=""
   if git show-ref --verify --quiet refs/heads/develop; then
     echo "develop"
-  elif git show-ref --verify --quiet refs/heads/pre-test-merge; then
-    echo "pre-test-merge"
+  elif test_pre_merge_branch="$(freely_wt_first_test_pre_merge_branch)" && [[ -n "$test_pre_merge_branch" ]]; then
+    echo "$test_pre_merge_branch"
   else
     echo "main"
   fi
@@ -146,8 +156,10 @@ freely_wt_validate_branch_base() {
   local b="$1"
   case "$b" in
     feature/premerge-*)
-      if git show-ref --verify --quiet refs/heads/pre-test-merge; then
-        git merge-base --is-ancestor pre-test-merge "$b"
+      local test_pre_merge_branch=""
+      test_pre_merge_branch="$(freely_wt_first_test_pre_merge_branch)"
+      if [[ -n "$test_pre_merge_branch" ]]; then
+        git merge-base --is-ancestor "$test_pre_merge_branch" "$b"
       else
         git merge-base --is-ancestor develop "$b"
       fi

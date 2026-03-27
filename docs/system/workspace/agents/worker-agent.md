@@ -33,7 +33,7 @@
 - 不做项目级工位排班
 - 不判断其他 worktree 的合并/冻结/清理策略
 - 不接管其他 worker 的恢复
-- 不在 `develop` / `main` / `pre-test-merge` 上直接执行
+- 不在 `develop` / `main` / `test-pre-merge-*` 上直接执行
 - 不假定自己能在响应结束、进程退出或限额后继续“自我恢复”
 - 不把人类插话当成可以直接改写项目级优先级的命令；worker 只消费主管已经加工过的 handoff
 - 不用开发 Freely 的治理输入文档替代当前运行期角色边界

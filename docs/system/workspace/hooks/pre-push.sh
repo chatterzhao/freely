@@ -9,8 +9,18 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   local_branch="${local_ref#refs/heads/}"
   remote_branch="${remote_ref#refs/heads/}"
 
+  if [[ "$local_branch" == test-pre-merge-* ]]; then
+    cat >&2 <<MSG
+[HOOK] Push blocked: test pre-merge batch '$local_branch' is local-only.
+Create the batch from current develop, use it for temporary verification, then delete it.
+Do not publish test-pre-merge branches to remote.
+Policy source: $policy_ref
+MSG
+    exit 1
+  fi
+
   case "$local_branch" in
-    main|develop|pre-test-merge)
+    main|develop)
       continue
       ;;
     feature/*|release/*|hotfix/*)

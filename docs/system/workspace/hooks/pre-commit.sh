@@ -8,8 +8,21 @@ source ./bin/worktree-common.sh
 branch="$(freely_wt_current_branch)"
 [[ -n "$branch" ]] || exit 0
 
+if freely_wt_is_test_pre_merge_branch "$branch"; then
+  cat <<MSG
+[HOOK] Commit blocked: direct development on '$branch' is forbidden.
+Test pre-merge batches are ephemeral verification surfaces.
+- merge feature branches into this batch for testing
+- fix failures back in the source feature worktree
+- delete the batch when testing ends
+
+Policy source: docs/CONSTITUTION.md §2
+MSG
+  exit 1
+fi
+
 case "$branch" in
-  main|develop|pre-test-merge)
+  main|develop)
     cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
 This repo enforces worktree mode for feature development.
@@ -63,7 +76,7 @@ if ! freely_wt_validate_branch_base "$branch"; then
 [HOOK] Commit blocked: branch '$branch' base check failed.
 Expected:
   feature/* from develop
-  feature/premerge-* from pre-test-merge (or develop when pre-test-merge is not active)
+  feature/premerge-* from the active test-pre-merge-* batch (or develop when no test batch is active)
   release/* from develop
   hotfix/* from main
 Policy source: docs/CONSTITUTION.md §2

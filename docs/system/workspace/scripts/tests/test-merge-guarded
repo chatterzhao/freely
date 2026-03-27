@@ -20,7 +20,7 @@ git add README.md
 git commit -q -m "init"
 
 git branch main
-git branch pre-test-merge
+git branch test-pre-merge-20260327-demo
 git branch feature/demo
 git branch hotfix/demo main
 git branch release/demo develop
@@ -38,15 +38,15 @@ git checkout -q develop
 "$REPO/bin-merge-guarded" develop feature/demo >/dev/null
 git merge-base --is-ancestor feature/demo develop
 
-if "$REPO/bin-merge-guarded" develop pre-test-merge >/dev/null 2>"$TEST_TMP/pretestmerge-blocked.err"; then
-  echo "[FAIL] invalid pre-test-merge -> develop merge unexpectedly allowed" >&2
+if "$REPO/bin-merge-guarded" develop test-pre-merge-20260327-demo >/dev/null 2>"$TEST_TMP/pretestmerge-blocked.err"; then
+  echo "[FAIL] invalid test-pre-merge -> develop merge unexpectedly allowed" >&2
   exit 1
 fi
 grep -q "blocked merge" "$TEST_TMP/pretestmerge-blocked.err"
 
-git checkout -q pre-test-merge
-"$REPO/bin-merge-guarded" pre-test-merge hotfix/demo >/dev/null
-git merge-base --is-ancestor hotfix/demo pre-test-merge
+git checkout -q test-pre-merge-20260327-demo
+"$REPO/bin-merge-guarded" test-pre-merge-20260327-demo hotfix/demo >/dev/null
+git merge-base --is-ancestor hotfix/demo test-pre-merge-20260327-demo
 
 git checkout -q main
 if "$REPO/bin-merge-guarded" main feature/demo >/dev/null 2>"$TEST_TMP/blocked.err"; then

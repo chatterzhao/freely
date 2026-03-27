@@ -6,7 +6,7 @@
 
 ## 位置
 
-- 默认运行工位：`develop` / `main` / `pre-test-merge`
+- 默认运行工位：`develop` / `main` / `test-pre-merge-*`
 - 上游：`workspace/scripts/start-lead-agent.sh`
 - 下游：
   - `skill:auto-loop-orchestrator`

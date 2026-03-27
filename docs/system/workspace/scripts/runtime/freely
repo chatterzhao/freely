@@ -82,6 +82,50 @@ check_doc_gate_or_fail() {
   log_info "doc gate PASS"
 }
 
+check_hook_gate_or_fail() {
+  local project="$1"
+  local repo_root current_hooks_path
+
+  repo_root="$(git_root_for_path "$project")"
+  if [[ -z "$repo_root" ]]; then
+    log_error "hook gate failed: not a git repo: $project"
+    return 1
+  fi
+
+  if [[ ! -d "$repo_root/.githooks" ]]; then
+    log_error "hook gate failed: missing $repo_root/.githooks"
+    return 1
+  fi
+
+  current_hooks_path="$(git -C "$repo_root" config --get core.hooksPath 2>/dev/null || true)"
+  if [[ "$current_hooks_path" != ".githooks" ]]; then
+    log_error "hook gate failed: core.hooksPath is '${current_hooks_path:-<unset>}' (expected .githooks)"
+    log_error "run: git -C \"$repo_root\" config core.hooksPath .githooks"
+    return 1
+  fi
+
+  log_info "hook gate PASS"
+}
+
+ensure_repo_hooks_enabled_or_fail() {
+  local project="$1"
+  local repo_root
+
+  repo_root="$(git_root_for_path "$project")"
+  if [[ -z "$repo_root" ]]; then
+    log_error "cannot enable hooks outside a git repo: $project"
+    exit 1
+  fi
+
+  if [[ ! -d "$repo_root/.githooks" ]]; then
+    log_error "cannot enable hooks: missing $repo_root/.githooks"
+    exit 1
+  fi
+
+  git -C "$repo_root" config core.hooksPath .githooks
+  log_info "enabled git hooks: $repo_root/.githooks"
+}
+
 abs_path_or_fail() {
   local p="$1"
   if [[ "$p" != /* ]]; then
@@ -1680,8 +1724,9 @@ branch_name_for_project() {
 role_hint_for_project() {
   local project="$1" branch
   branch="$(branch_name_for_project "$project")"
+  [[ "$branch" == test-pre-merge-* ]] && { printf 'manager\n'; return 0; }
   case "$branch" in
-    develop|main|pre-test-merge) printf 'manager\n' ;;
+    develop|main) printf 'manager\n' ;;
     *) printf 'worker\n' ;;
   esac
 }
@@ -4379,6 +4424,7 @@ cmd_init() {
   fi
 
   ensure_project_agents_md "$project"
+  ensure_repo_hooks_enabled_or_fail "$project"
   write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$force"
   if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
     write_project_codex_config "$project" "$force"
@@ -4795,13 +4841,17 @@ cmd_ensure_manager() {
   }
 
   branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
+  if [[ "$branch" == test-pre-merge-* ]]; then
+    :
+  else
   case "$branch" in
-    develop|main|pre-test-merge) ;;
+    develop|main) ;;
     *)
       log_error "ensure-manager only supports protected manager worktrees (current branch: ${branch:-unknown})"
       exit 1
       ;;
   esac
+  fi
 
   if [[ "$watch_mode" == "1" ]]; then
     cmd_ensure_manager_watch "$project" "$watch_interval"
@@ -4845,6 +4895,7 @@ cmd_doctor() {
   done
   project="$(resolve_project_or_fail "$project" 1)"
   check_doc_gate_or_fail "$project"
+  check_hook_gate_or_fail "$project"
 }
 
 cmd_chat() {

@@ -39,8 +39,13 @@ fi
 
 [[ -n "$branch" ]] || { echo "No branch detected." >&2; return 1; }
 
+if freely_wt_is_test_pre_merge_branch "$branch"; then
+  echo "Add blocked: '$branch' is a test pre-merge batch. Merge source branches for testing, do not stage direct edits here." >&2
+  return 1
+fi
+
 case "$branch" in
-  main|develop|pre-test-merge)
+  main|develop)
     echo "Add blocked: '$branch' is protected. Use feature/release/hotfix worktree." >&2
     return 1
     ;;

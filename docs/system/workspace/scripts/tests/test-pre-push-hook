@@ -50,7 +50,7 @@ expect_rc() {
 
 expect_rc "T-003-01 empty input pass" 0 ""
 expect_rc "T-003-02 block remote develop" 1 "refs/heads/feature/x abc refs/heads/develop def"
-expect_rc "T-003-03 allow local pre-test-merge push" 0 "refs/heads/pre-test-merge abc refs/heads/pre-test-merge def"
+expect_rc "T-003-03 block test-pre-merge batch push" 1 "refs/heads/test-pre-merge-20260327-demo abc refs/heads/test-pre-merge-20260327-demo def"
 expect_rc "T-003-04 block main by default" 1 "refs/heads/feature/x abc refs/heads/main def"
 expect_rc "T-003-05 allow feature same-name push" 0 "refs/heads/feature/x abc refs/heads/feature/x def"
 expect_rc "T-003-06 block feature cross-push to develop" 1 "refs/heads/feature/x abc refs/heads/develop def"

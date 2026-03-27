@@ -25,12 +25,12 @@ if [[ "$current_branch" != "$target" ]]; then
 fi
 
 allowed=0
-case "$target" in
-  pre-test-merge)
-    case "$source_branch" in
-      feature/*|hotfix/*) allowed=1 ;;
-    esac
-    ;;
+if [[ "$target" == test-pre-merge-* ]]; then
+  case "$source_branch" in
+    feature/*|hotfix/*) allowed=1 ;;
+  esac
+else
+  case "$target" in
   develop)
     if [[ "$source_branch" == feature/* ]]; then
       allowed=1
@@ -48,7 +48,8 @@ case "$target" in
   *)
     allowed=0
     ;;
-esac
+  esac
+fi
 
 if [[ "$allowed" != "1" ]]; then
   cat <<MSG >&2
@@ -57,8 +58,8 @@ if [[ "$allowed" != "1" ]]; then
   source: $source_branch
 
 Allowed:
-  feature/* -> pre-test-merge
-  hotfix/* -> pre-test-merge
+  feature/* -> test-pre-merge-*
+  hotfix/* -> test-pre-merge-*
   feature/* -> develop
   hotfix/* -> develop
   release/* -> main

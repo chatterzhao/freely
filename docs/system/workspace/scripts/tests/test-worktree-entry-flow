@@ -5,7 +5,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TEST_TMP="$(mktemp -d /tmp/freely-wt-entry.XXXXXX)"
 trap 'rm -rf "$TEST_TMP"' EXIT
 
-REPO="$TEST_TMP/repo"
+TEST_TMP_REAL="$(cd "$TEST_TMP" && pwd -P)"
+REPO="$TEST_TMP_REAL/repo"
 mkdir -p "$REPO"
 cd "$REPO"
 
@@ -16,7 +17,7 @@ git config user.email tester@example.com
 echo base > README.md
 git add README.md
 git commit -q -m "init"
-git branch pre-test-merge
+git branch test-pre-merge-20260327-demo
 
 mkdir -p "$REPO/bin"
 cp -R "$ROOT_DIR/.githooks" "$REPO/.githooks"
@@ -36,7 +37,7 @@ RESULT="$(
 )"
 
 PRIMARY_BRANCH="$(git -C "$REPO" rev-parse --abbrev-ref HEAD)"
-FEATURE_WT="$TEST_TMP/repo-worktrees/feature-demo"
+FEATURE_WT="$TEST_TMP_REAL/repo-worktrees/feature-demo"
 
 [[ "$PRIMARY_BRANCH" == "develop" ]]
 [[ -d "$FEATURE_WT" ]]
@@ -57,7 +58,7 @@ RESULT_DATED="$(
   ' _ "$REPO"
 )"
 
-DATED_WT="$TEST_TMP/repo-worktrees/20260307-1015-feature-demo"
+DATED_WT="$TEST_TMP_REAL/repo-worktrees/20260307-1015-feature-demo"
 
 [[ -d "$DATED_WT" ]]
 printf '%s\n' "$RESULT_DATED" | grep -q "cwd=$DATED_WT"

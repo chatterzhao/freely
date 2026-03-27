@@ -73,7 +73,7 @@ printf '%s\n' "$prompt" | grep -q 'state maintenance'
 printf '%s\n' "$prompt" | grep -q '脚本只负责启动和托管 AI'
 
 case "$current_branch" in
-  develop|main|pre-test-merge)
+  develop|main|test-pre-merge-*)
     printf '%s\n' "$prompt" | grep -q 'MANAGER_MODE=true'
     printf '%s\n' "$prompt" | grep -q '当前分支是受保护主管工位'
     printf '%s\n' "$prompt" | grep -q '只做主管，不做实现'

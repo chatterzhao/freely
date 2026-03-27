@@ -61,7 +61,7 @@
 5. 若下一跳工具与当前运行工具一致，使用组装后的 prompt 在当前会话内继续进入对应第二跳 skill；不得只停在输出 `next_prompt`。
 6. 只有当下一跳工具与当前工具不一致，或必须把执行权显式交回外层 runtime 时，才允许把 `next_prompt` 作为交接产物返回。
 7. 若 prompt 中附带项目级工位快照，必须先利用它做主管级判断，再决定下一跳是不是当前 worktree 本地执行，还是委派到其他工位 / subagent。
-8. 若当前分支是 `develop` / `main` / `pre-test-merge`，当前会话只允许产出监督判断、worker 选择或创建、delegation handoff 与 continuity；不得在受保护主管工位直接执行第二跳实现。
+8. 若当前分支是 `develop` / `main` / `test-pre-merge-*`，当前会话只允许产出监督判断、worker 选择或创建、delegation handoff 与 continuity；不得在受保护主管工位直接执行第二跳实现。
 9. 若当前分支是 `feature/*`，当前会话默认承担 `worker-agent` 执行职责；项目级恢复、切号和重启仍交由 runtime / scripts，而不是在 prompt 内临时发明脚本流程。
 
 ## 完成标志

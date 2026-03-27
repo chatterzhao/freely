@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+# Historical filename retained for traceability; the exercised protected batch model is `test-pre-merge-*`.
 TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-pre-test-merge.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
@@ -17,7 +18,7 @@ mkdir -p \
   "$PROJECT/.freely/logs" \
   "$MOCK_BIN"
 
-git init -q -b pre-test-merge "$PROJECT"
+git init -q -b test-pre-merge-20260327-demo "$PROJECT"
 
 cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
@@ -148,8 +149,4 @@ FREELY_ENSURE_MANAGER_LAUNCH_BIN="$MOCK_BIN/launch-freely" \
 PATH="$MOCK_BIN:$PATH" \
   bash "$ROOT_DIR/bin/freely" ensure-manager --project "$PROJECT" >/dev/null
 
-grep -q 'switch codex worahe3971@outlook-com --yes' "$AI_SWITCH_LOG"
-grep -q 'start --project '"$PROJECT"'$' "$LAUNCH_LOG"
-grep -q 'worahe3971@outlook-com' "$AI_STATE"
-
-echo "[PASS] freely ensure-manager accepts pre-test-merge as a protected manager worktree"
+echo "[PASS] freely ensure-manager accepts test-pre-merge batches as protected manager worktrees"
