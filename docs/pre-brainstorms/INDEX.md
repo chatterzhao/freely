@@ -1,5 +1,6 @@
 # 预研头脑风暴索引
 - 20260326-1705--manager-owner-stance-and-source-patrol
+- 20260326-1825--deep-refactor-fleet-sequencing
 - 20260326-0445--manager-delegated-intake-absorption-closure
 - 20260325-0525--watchdog-slot-sweep-without-cooldown-governance
 - 20260324-0405--watchdog-restart-storm-and-process-churn-detection
@@ -56,6 +57,9 @@
 - 20260326-1705--manager-owner-stance-and-source-patrol
   - brainstorms: docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/brainstorms.md
   - candidates: docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/candidates.md
+- 20260326-1825--deep-refactor-fleet-sequencing
+  - brainstorms: docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/candidates.md
 - 20260326-0445--manager-delegated-intake-absorption-closure
   - brainstorms: docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/brainstorms.md
   - candidates: docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/candidates.md
@@ -354,3 +358,4 @@
 - `20260322-0135--integration-acceptance-first-ibm-and-verification`: integration-acceptance-first-ibm-and-verification
 - `20260326-1733--ibm-pretests-real-environment-acceptance-quality`: ibm-pretests-real-environment-acceptance-quality
 - `20260326-1810--freely-layered-architecture-and-tooling-topology`: freely-layered-architecture-and-tooling-topology
+- `20260326-1825--deep-refactor-fleet-sequencing`: deep-refactor-fleet-sequencing

@@ -335,7 +335,21 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/code-reviews/20260326-ibm-pretests-executable-acceptance-quality-governance-verification.md`
 - completion_note: IBM 真源现在要求 `pre-tests.md` 默认写出可恢复的 executable acceptance contract，并对 Freely 自治能力明确 integration、application-native real-environment、end-to-end dogfood 三类 post-merge 验收面；verification review 模板统一与 machine-readable schema 继续留给后续 lifecycle
 
-3. `I-20260326-1835`
+3. `I-20260326-1915`
+- title: Deep-refactor fleet sequencing governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/candidates.md`
+- evidence:
+  - `AGENTS.md`
+  - `docs/progress/workspace-routing-foundation/p-deep-refactor-fleet-sequencing-governance.md`
+  - `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/code-reviews/20260326-deep-refactor-fleet-sequencing-governance-verification.md`
+- completion_note: broad/deep refactor 前的 fleet sequencing audit 已固定为开发 Freely 的入口 gate，并已用真实 stop、merge-prep 与 governance-check 结果验证；后续若要升级成自动化或更高等级规则，应由新的 lifecycle 承接
+
+4. `I-20260326-1835`
 - title: Manager owner stance and source-patrol completeness governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -354,6 +368,8 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-manager-owner-stance-and-source-patrol-governance.md`
   - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/code-reviews/20260326-manager-owner-stance-and-source-patrol-governance-verification.md`
 - completion_note: 已把开发治理输入与运行期能力真源的边界写清，并把 manager owner stance、advisory interruption semantics、以及 interruption / milestone / progress / pre-brainstorm 的 standing-source completeness 直接收敛进产品能力真源；后续若要继续把这套 contract 扩成更强的 runtime 事务面，应通过新 lifecycle 承接。
+
+### candidate_issues
 
 ### candidate_issues
 1. `C-20260323-1435-A`
