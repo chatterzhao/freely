@@ -18,8 +18,8 @@
   - continue cleanup / retirement gating before deleting the worktree or branch
 - fresh_develop_evidence_2026_03_25:
   - a fresh canonical `develop` manager cycle (`.freely/logs/cycle-20260325-234105.log`) retried OpenAI transport and failed repeatedly with `402 Payment Required` / `{"detail":{"code":"deactivated_workspace"}}`
-  - that live failure happened while `develop` was supposed to advance scheduler replay candidate `C-20260323-2045-A`, so the missing replay is now blocking unrelated canonical-supervisor proof work, not only watchdog closeout
-  - this does not reopen `I-20260324-0405`; it tightens the merge urgency for the already-completed replay owner because canonical `develop` still lacks the broadened auth-failure/no-launch handling
+  - at the time, that live failure happened while `develop` was still expected to advance scheduler replay candidate `C-20260323-2045-A`, so it temporarily blocked unrelated canonical-supervisor proof work, not only watchdog closeout
+  - this note is now historical provenance only. Current canonical `develop` already absorbed the same-family scheduler contract, so the old replay owner no longer carries the missing watchdog capability and should not stay alive just because this historical failure once referenced it
 - source_lane_audit_2026_03_25:
   - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-runtime-process-churn-state-reconcile` still holds one local-only continuation commit (`d2ef386`)
   - the replay owner already preserves that lane's desired capability in canonical form: broadened `402 payment required` / `deactivated_workspace` auth-failure detection plus no-launch coverage while no slot is ready
