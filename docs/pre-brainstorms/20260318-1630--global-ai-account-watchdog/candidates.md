@@ -2,6 +2,7 @@
 
 ### C-20260318-A
 - title: 全局 AI 账号 watchdog 与主管拉起
+- status: promoted
 - why:
   - 当全局账号限额导致所有 AI 都不可用时，不能再依赖 manager/worker/project runtime 自行恢复。
   - Freely 需要纯脚本先切号，再启动主管，由主管继续监督所有工位。
@@ -24,6 +25,6 @@
   - 本地 cooldown 账本只作为提示，真实可用性由脚本逐账号 probe
   - 主管恢复后继续负责 worker fleet 监督
   - 所有账号都不可用时，会切到最早恢复账号并等待唤醒，而不是要求 AI 持续存活
-- promoted_issue_path: pending://issue-materialization
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs: []
-- milestone: pending://milestone-binding
+- milestone: M-20260306-workspace-routing-foundation

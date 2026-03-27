@@ -17,7 +17,7 @@
 - next_action: 继续收敛 sidecar 的最小职责边界与验证门，优先判断是否需要在本地自治优化层落地，而不是扩展为主 runtime 或 Hub 依赖。
 - revisit_trigger: 当 Freely 需要系统性减少重复失败、且已有明确可审计的策略进化输入输出时，再推进到 IBM materialization。
 - promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+- milestone: M-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex
   - session_id: unavailable://chat-session
