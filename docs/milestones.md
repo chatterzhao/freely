@@ -49,36 +49,6 @@ routing_policy:
 
 ### committed_issues
 
-8. `I-20260319-0018`
-- title: Token-efficient session continuity and rotation governance
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md`
-- next_action: IBM 产物已补齐，下一跳进入 `dev-loop-execution`，把 runtime / prompt / skill 的 continuity 触发边界统一收敛到 trigger matrix，并保持旧会话证据默认按需引用
-
-8. `I-20260319-0148`
-- title: Context-compaction continuity guard salvage
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md`
-- source_brainstorm: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
-- next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
-
-15. `I-20260321-1715`
-- title: Manager watchdog trigger and drift reconcile governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/candidates.md`, `docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/candidates.md`
-- next_action: 已补上 cleanup signal 的最小 routing 修复：`restart_point=cleanup` 先保留为 `handoff://cleanup`，不再直接吸收到旧 `cleanup://merged-worktree-followthrough` continuity。下一步继续做真实 manager/develop 工位回归，确认新项目级 signal 会先进入 notice/claim/restart-point routing，再决定最终 absorption target
-
 ### completed_issues
 
 1. `I-20260307-1201`
@@ -93,6 +63,32 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/code-reviews/20260316-first-hop-second-hop-verification.md`
   - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/code-reviews/20260326-source-routing-canonical-replay-verification.md`
 - completion_note: 首跳来源分层、IBM/progress 边界、derived worktree 规则与同工具第二跳 contract 已收口；旧 dirty sibling blocker 已被 canonical 4-tree fleet truth 消除，不再构成未完成项
+
+2. `I-20260319-0018`
+- title: Token-efficient session continuity and rotation governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-token-efficient-session-continuity-and-rotation-governance.md`
+  - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/code-reviews/20260326-token-efficient-session-continuity-and-rotation-canonical-verification.md`
+- completion_note: continuity trigger matrix、manager-vs-worker continuity targets、fallback-only session evidence refs 与 warn/rotate/fresh-with-handoff 边界已共同写回 canonical truth sources；后续官方 compaction primitive 或 continuity schema 演进另开 lifecycle
+
+3. `I-20260319-0148`
+- title: Context-compaction continuity guard salvage
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-context-compaction-continuity-guard-salvage.md`
+  - `docs/epics/workspace-routing-foundation/context-compaction-continuity-guard-salvage/code-reviews/20260326-context-compaction-continuity-guard-salvage-canonical-verification.md`
+- completion_note: 旧 context-compaction 分支独有的 continuity guard 字段、prompt 提醒与测试锁定已被 canonical `develop` 吸收；本地也不再保留旧 feature branch，后续 continuity 演进回到主线 issue family
 
 2. `I-20260321-0217`
 - title: Claude Code tool profiles and Codex MCP session evidence governance
@@ -712,6 +708,20 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/runtime/tool-launchers.sh`, `docs/system/workspace/scripts/monitor-ai-cli.sh`, `docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`, `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/code-reviews/20260321-explicit-session-addressed-resume-verification.md`
 - completion_note: 显式 session-addressed resume 已成为 Freely 的 canonical continuity model；`codex` 默认路径不再依赖 `--last`，worker-scoped target evidence 与 preemption fallback 也已闭环
 
+6. `I-20260321-1715`
+- title: Manager watchdog trigger and drift reconcile governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/candidates.md`, `docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-manager-watchdog-trigger-and-drift-reconcile-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/code-reviews/20260321-manager-watchdog-trigger-and-drift-reconcile-verification.md`
+  - `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/code-reviews/20260326-manager-watchdog-trigger-and-drift-reconcile-canonical-replay-verification.md`
+- completion_note: cleanup reroute contract 已在 canonical `develop` 通过 replay，cleanup-only signal 保持 `handoff://cleanup`，broad supervisor signal 保持 manager-owned continuation reentry；authoritative fleet truth 也已稳定到 4-tree / dirty=0 / all stopped。scheduler retained research owner 继续独立保留，不并入本条完成判断
+
 4. `I-20260321-1706`
 - title: Chat-triggered worker runtime reactivation governance
 - milestone_state: completed
@@ -904,16 +914,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260312-0011`
-- title: Backend Service Contract and Adapter Taxonomy
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P0
-- issue_path: `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
-- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
-- next_action: contract 与 adapter taxonomy 的 IBM 已冻结完成；下一步按 sequencing 推进 `C-20260312-0011-E/G/H` 等后续 issue，复用这条 contract 真源，而不是再次回到架构总论预研
-
 ### candidate_issues
 
 1. `C-20260312-0011-E`
@@ -993,6 +993,22 @@ routing_policy:
 - next_action: 在 standalone mode 与 skill projection 明确后进入 IBM，正式定义 OpenClaw 只作为 optional adapter/profile 的边界
 - revisit_trigger: 当 OpenClaw 借力边界必须被正式冻结或替换时重新唤起
 
+### completed_issues
+
+1. `I-20260312-0011`
+- title: Backend Service Contract and Adapter Taxonomy
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
+- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
+- evidence:
+  - `docs/progress/control-surface-runtime-convergence/p-backend-service-contract-and-adapter-taxonomy.md`
+  - `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/code-reviews/20260320-backend-service-contract-and-adapter-taxonomy-ibm-completion.md`
+  - `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/code-reviews/20260326-backend-service-contract-and-adapter-taxonomy-canonical-verification.md`
+- completion_note: contract layer 与 adapter layer 的冻结已经成为下游 frontend-probe architecture / boundary contract 的引用真源；因此本 issue 已从单纯 IBM 包提升为 canonical completion，后续 control surface、standalone runtime 与 intervention transport 直接复用该边界，不再阻塞在 `done_ibm`
+
 ## M-20260308-frontend-probe-dogfooding-loop
 
 - title: Frontend probe + backend increment dogfooding loop
@@ -1023,26 +1039,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260308-1245`
-- title: Freely 内部前后端架构复评与可插拔协议边界
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P0
-- issue_path: `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
-- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: IBM 已完成最小边界收敛；下一跳把 `C-20260308-1244-02` `Frontend/Backend Boundary Contract v1 for Frontend Probe` 提升到 issue-bound IBM，基于当前 issue 冻结更细的 boundary contract 与事件语义
-
-2. `I-20260317-1001`
-- title: Frontend/Backend Boundary Contract v1 for Frontend Probe
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P0
-- issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
-- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: boundary contract v1 已完成最小 IBM 收敛；下一跳把 `C-20260308-1244-03` `Frontend Probe v0` 提升为 issue-bound IBM，基于当前 contract 收紧最小产品面与验收边界
-
 3. `I-20260317-1002`
 - title: Frontend Probe v0
 - milestone_state: committed
@@ -1053,26 +1049,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
 - next_action: frontend 侧 contract、transport、manifest 和错误面已基本收敛；backend bridge 缺口仍由 `I-20260317-1005` 承接。当前 Rust bridge 的本地 `cargo check` / `cargo test`、前端 `typecheck` / `build` 与公开 manifest 对齐验证都已通过；下一步等待真实 Tauri 宿主启动联调结果，再回到本 issue 收紧 frontend host integration 与 blocker 描述
 
-5. `I-20260317-1004`
-- title: Frontend Runtime Baseline for Probe
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P0
-- issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md`
-- source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md`
-- next_action: runtime baseline 已完成最小 IBM 收敛；下一跳回到 `I-20260317-1002`，把 baseline 真正接入 Probe v0 并尝试解除 `blocked_dev`
-
-4. `I-20260317-1003`
-- title: Incremental Dogfooding Gate for Backend Increments
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P0
-- issue_path: `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md`
-- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: Probe 验证门禁已完成最小 IBM 收敛；后续实现与评审阶段直接按该门禁检查后端增量，不再把验证当成可选项
-
 6. `I-20260317-1005`
 - title: Rust/Tauri Probe Bridge v1
 - milestone_state: committed
@@ -1082,6 +1058,26 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
 - next_action: lead-agent 首跳重入后继续命中 `milestones` 池里的当前 committed `in_dev` issue，并在同一 `codex` 会话内进入 `dev-loop-execution`。当前已补齐 `src-tauri/icons/icon.png`，`bun run rust:preflight`、`bun run cargo:check:probe` 与 `cargo test -p freely-probe-bridge` 已通过；先前的 Rust toolchain / icon blocker 和 `dead_code` warning 均已解除。下一步继续围绕真实 Tauri 宿主启动联调推进，确认前端 `Transport=tauri` 不再停在 `bridge offline`
+
+5. `I-20260317-1004`
+- title: Frontend Runtime Baseline for Probe
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md`
+- source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md`
+- next_action: 这条 baseline 已完成最小 IBM 收敛，但当前不在近程执行窗；先让 `I-20260317-1002` / `I-20260317-1005` 消化真实宿主与 bridge 联调成本。若当前 research/merge-prep worktree 只剩这类远期排序项，应先完成 milestone 写回并走 retirement handoff，而不是为了挂住未来 queue 长期保留 worktree。
+
+4. `I-20260317-1003`
+- title: Incremental Dogfooding Gate for Backend Increments
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- next_action: 这条验证门禁先保持 parked completed-IBM owner，作为后续 backend increment review gate 复用；当前不需要单独挂住 research worktree。等活跃 `in_dev` 主线逼近该成本窗口时，再决定是否补 canonical closeout 或 issue-bound continuation。
 
 ### candidate_issues
 
@@ -1097,16 +1093,31 @@ routing_policy:
 
 ### completed_issues
 
-1. `I-20260324-0415`
-- title: Application-native runtime observation contract and observability planes
+1. `I-20260308-1245`
+- title: Freely 内部前后端架构复评与可插拔协议边界
 - milestone_state: completed
 - phase_state: `completed`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
-- source_brainstorm: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md`
-- evidence: `docs/system/workspace/three-loop-capability-lifecycle.md`, `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`, `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`, `docs/system/workspace/scripts/README.md`, `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
-- completion_note: 最小 application-native runtime observation contract 已被 active truth 与 runtime-facing references 吸收，`pre-tests.md` 中声明的最小 contract checks 已通过。更丰富的 CLI / TUI / GUI / API 产品化与多 subagent 一等可视化继续留作 follow-on scope，不阻塞本 issue 完成。
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- evidence:
+  - `docs/progress/frontend-probe-dogfooding-loop/p-internal-frontend-backend-architecture-review.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/code-reviews/20260326-internal-frontend-backend-architecture-canonical-verification.md`
+- completion_note: frontend/backend 总体边界、状态归属矩阵、协议分层、输入仲裁与 MVP autonomy milestone 已被下游 boundary contract 与 control-surface issue 直接复用，故本 issue 已完成 canonical closeout；后续 probe / bridge / runtime 实现沿该边界推进，不再回灌为总论争议
+
+2. `I-20260317-1001`
+- title: Frontend/Backend Boundary Contract v1 for Frontend Probe
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- evidence:
+  - `docs/progress/frontend-probe-dogfooding-loop/p-frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/code-reviews/20260326-frontend-backend-boundary-contract-v1-canonical-verification.md`
+- completion_note: Probe day-1 boundary contract 已冻结到 object family、error surface、ordering 与 adapter compatibility 字段面，并被 `frontend-probe-v0` 与 `rust-tauri-probe-bridge-v1` 直接复用；因此本 issue 已完成 canonical closeout，后续真实宿主与 bridge 联调留给 active `in_dev` 主线承接
 
 ## M-20260321-ai-native-doc-loop
 

@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260308-1245`
 - title: Freely 内部前后端架构复评与可插拔协议边界
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `internal-frontend-backend-architecture-review`
@@ -245,10 +245,21 @@
 - why_selected_tool: 当前工作是仓库内 issue-bound 文档收敛与里程碑回写，`codex` 更适合直接修改现有 IBM 产物，且与当前 `AI_TOOL` 一致。
 - next_prompt: `继续承接 I-20260308-1245 的 issue-bound IBM 收口。确认 frontend/backend 边界、状态归属矩阵、协议分层、ClientCommand/ServerEvent/Snapshot、input arbitration、team visibility 与 MVP autonomy milestone 已足够驱动后续接口细化；把 issue 与 milestone 从 in_ibm 推进到 done_ibm，并把下一跳指向 Frontend/Backend Boundary Contract v1 的 issue-bound materialization。`
 
+## Verification
+
+- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|frontend contract|transport adapter|backend service contract|MVP autonomy milestone|Input arbitration|AI team visibility" docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy -g '*.md'`
+- `rg -n "I-20260308-1245|internal-frontend-backend-architecture-review" docs -g '*.md'`
+- `./bin/governance-check`
+
+## Closure Judgment
+
+- 本 issue 的交付物是前后端边界、协议分层、输入仲裁与团队态势 UI 的总体 contract freeze，而不是具体 probe 或 bridge 实现；这些边界已经在当前 issue 中完整冻结。
+- 下游 `Frontend/Backend Boundary Contract v1 for Frontend Probe` 与后续 control-surface contract 文档已经直接引用并复用这条边界，说明它已成为 canonical architecture truth source，而不再只是 IBM 中间态。
+- 因此 `I-20260308-1245` 可以按真实写回推进到 `completed`；后续 frontend probe、runtime baseline 与 bridge 联调继续沿这条边界推进，不回灌到本 issue 重开总论。
+
 ## Next
 
-- 当前 issue 已完成 IBM 收敛，下一跳不再继续扩写边界争论。
-- 建议把 `C-20260308-1244-02` `Frontend/Backend Boundary Contract v1 for Frontend Probe` 提升为下一条 issue-bound IBM 工作，直接基于本 issue 冻结最小 boundary contract。
+- 当前 issue 已完成 canonical closeout，后续 Probe v1/v0、runtime baseline 与 bridge work 直接复用该边界；若未来需要改写更高层系统拓扑或自治 milestone 定义，另开新的 lifecycle。
 
 ## Human interaction policy
 

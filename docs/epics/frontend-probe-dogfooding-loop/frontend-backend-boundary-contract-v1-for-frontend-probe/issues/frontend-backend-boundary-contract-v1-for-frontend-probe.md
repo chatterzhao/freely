@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260317-1001`
 - title: Frontend/Backend Boundary Contract v1 for Frontend Probe
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `frontend-backend-boundary-contract-v1-for-frontend-probe`
@@ -138,7 +138,18 @@
   - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/pre-tests.md`
   - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/tasks.md`
 
+## Verification
+
+- `rg -n "CreateOrResumeSession|SendChatIntervention|ControlRun|AttachTerminal|RequestSnapshot|SessionUpserted|RunStatusChanged|AgentStatusChanged|TerminalChunkAppended|GovernanceDecisionRecorded|InputArbitrationRecorded|RecoveryStatusChanged|project_summary|active_sessions|active_runs|active_agents|terminal_targets|governance_summary|recovery_summary|last_event_id" docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0 docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1 -g '*.md'`
+- `rg -n "I-20260317-1001|frontend-backend-boundary-contract-v1-for-frontend-probe" docs -g '*.md'`
+- `./bin/governance-check`
+
+## Closure Judgment
+
+- 本 issue 的交付物是 Probe day-1 boundary contract v1 本身，不是 Probe host integration 或 Rust/Tauri bridge 实装；当前 issue 已把 command、event、snapshot、ordering、error surface 与 adapter compatibility 冻结到对象级别。
+- 下游 `Frontend Probe v0` 与 `Rust/Tauri Probe Bridge v1` 已直接消费这套 object family 和字段面，说明它已经成为 canonical contract source，而不是停留在 issue-bound IBM 草案。
+- 因此 `I-20260317-1001` 可以按真实写回推进到 `completed`；后续实现与联调继续由 `I-20260317-1002` / `I-20260317-1005` 承接。
+
 ## Next
 
-- 当前 issue 已到 `done_ibm`，后续不再继续扩写 contract 归属争论。
-- 建议把 `C-20260308-1244-03` `Frontend Probe v0` 提升为下一条 issue-bound IBM 工作，直接基于本 contract 继续收敛最小产品面。
+- 当前 issue 已完成 canonical closeout，后续 Probe v0 与 bridge work 继续复用该 v1 contract；若未来需要 v2 schema、额外 domain object 或 transport 扩展，另开新的 lifecycle。

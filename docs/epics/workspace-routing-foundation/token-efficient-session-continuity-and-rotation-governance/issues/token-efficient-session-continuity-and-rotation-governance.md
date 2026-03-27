@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260319-0018`
 - title: Token-efficient session continuity and rotation governance
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `token-efficient-session-continuity-and-rotation-governance`
@@ -76,6 +76,22 @@ Freely 现在已经有：
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`
 
+## Verification
+
+- `bash docs/system/workspace/scripts/tests/test-freely-session-rotation`
+- `./bin/governance-check`
+- review of `docs/system/workspace/tools.md`
+- review of `docs/system/workspace/skills/continuity-watchdog/SKILL.md`
+- review of `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
+- review of `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`
+- review of `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
+
+## Closure Judgment
+
+- 当前 issue 不再停留在 `done_ibm`：trigger matrix 已被 `continuity-watchdog`、`watchdog-control-plane`、`recovery-subagent-governance`、`tools.md` 与 `runtime/freely` 共同消费，warn/rotate/fresh-with-handoff 边界已成为 canonical contract。
+- `test-freely-session-rotation` 已覆盖 context-compaction、resume evidence 缺失、高 context usage、manager continuity target、rate-limit defer-to-watchdog 与 route-only second-hop recovery；当前不存在要求继续停在 doc-loop 的缺口。
+- manager continuity 与 worker continuity 的目标对象、以及旧 session/jsonl/log 仅作 fallback evidence ref 的规则，已被正式写进 trigger matrix 与 continuity skill；因此本 issue 可以直接收口为 `completed`。
+
 ## Ready For Dev
 
 当前 IBM 已补齐正式 issue-bound brainstorm、PRD、pre-tests、tasks 与 trigger matrix 引用，足以驱动后续实现收口：
@@ -86,5 +102,4 @@ Freely 现在已经有：
 
 ## Next
 
-- 当前转入 `done_ibm`。
-- 下一跳应进入 `dev-loop-execution`，把现有 runtime / skill / prompt 细节统一到本 issue 的 trigger matrix 与 owner boundary。
+- 本 issue 已完成；后续若要采用官方非交互 compaction 能力，或继续演进 continuity payload / trigger schema，应作为新的 runtime/dev lifecycle 承接。

@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260312-0011`
 - title: Backend Service Contract and Adapter Taxonomy
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - milestone: `M-20260312-control-surface-runtime-convergence`
 - epic-name: `control-surface-runtime-convergence`
 - story-name: `backend-service-contract-and-adapter-taxonomy`
@@ -58,6 +58,18 @@ Freely 已经接受 `ClientCommand`、`ServerEvent`、`Snapshot` 的方向，但
   - `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
   - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
 
+## Verification
+
+- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|local_process_adapter|openclaw_adapter|openclaw_adapter/profile" docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy docs/epics/frontend-probe-dogfooding-loop -g '*.md'`
+- `rg -n "I-20260312-0011|backend-service-contract-and-adapter-taxonomy" docs -g '*.md'`
+- `./bin/governance-check`
+
+## Closure Judgment
+
+- 本 issue 的交付物是 contract freeze 本身，不是后续 adapter 或 runtime 实现；当前 issue、PRD、pre-tests 与 IBM review 已把 contract layer、adapter layer 与 OpenClaw optional profile 的边界冻结为单一真源。
+- 下游 probe / frontend backend boundary 文档已经在消费同一组 `ClientCommand`、`ServerEvent`、`Snapshot` 与 adapter 兼容原则，说明这条 contract 不再停留在孤立 IBM 包，而是已成为 canonical 引用边界。
+- 当前 milestone 中待推进的是基于这条真源的后续候选 materialization，而不是继续让 `I-20260312-0011` 停在 `done_ibm`。
+
 ## Next
 
-- IBM 已完成，下一步按 sequencing 拆到后续 control surface / runtime / intervention issue，而不是再回头扩写 pre-brainstorm 或重复争论 contract/adaptor 边界。
+- 后续 control surface、standalone runtime、human intervention transport 等 issue 直接复用这条 contract 真源；若未来需要上升到更高层系统拓扑或新增 adapter family，另开新的 lifecycle。

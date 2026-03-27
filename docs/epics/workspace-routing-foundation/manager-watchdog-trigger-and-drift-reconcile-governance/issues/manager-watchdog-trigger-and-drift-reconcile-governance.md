@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260321-1715`
 - title: Manager watchdog trigger and drift reconcile governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-watchdog-trigger-and-drift-reconcile-governance`
@@ -89,10 +89,18 @@ Freely 当前已经分别定义了：
 - `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler`
 - `bash docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
+- `git merge-base --is-ancestor bed0832 develop`
+- `./bin/wt-status-all`
+- `./bin/wt-fleet-status`
 - review of the updated truth-source wording and cleanup restart-point routing for contradiction / overlap / residual ambiguity
+
+## Closure Judgment
+
+- 当前最小 acceptance delta 已不再只是 branch-local verification：`bed0832` 已被 canonical `develop` 吸收，cleanup signal 继续先进入 manager `notice -> claim -> restart-point routing`，产出 `handoff://cleanup`，不再被旧 `cleanup://merged-worktree-followthrough` continuity 直接吸收。
+- develop-side focused replay 继续确认 cleanup 之外的广义主管监督 signal 会回到 manager-owned continuation reentry，而不是被误吸收到 direct cleanup followthrough。
+- 当前 authoritative fleet truth 已稳定收敛到 4-tree / dirty=0 / all stopped；因此本 issue 所需的 routing clarification、manager/develop replay、与 fleet-side contradiction check 已全部补齐，可以从 `in_verification` 收口为 `completed`。
+- `feature/manager-scheduler-capacity-candidate-replay-20260324` 继续作为独立 retained research owner 存在，但它属于后续 scheduler/materialization judgement，不再阻塞本 issue 完成。
 
 ## Next
 
-- 当前最小 acceptance delta 已 materialize：新的项目级 cleanup signal 先进入 manager `notice -> claim -> restart-point routing`，产出 `handoff://cleanup`，不再被旧 `cleanup://merged-worktree-followthrough` continuity 直接吸收。
-- issue 继续保持 `in_verification`；下一步做真实 manager/develop 工位回归，确认 cleanup 之外的新项目级 signal 也会先走同一 restart-point routing，再决定最终 absorption target。
-- 后续若还需把 patrol cadence、event emission 或自动派单脚本化，再基于本 issue 继续进入新的 runtime/dev 增量；当前不回写历史已完成 issue。
+- 本 issue 已完成；后续若还需把 patrol cadence、event emission 或自动派单脚本化，应作为新的 runtime/dev 增量承接，不回写当前 closeout。

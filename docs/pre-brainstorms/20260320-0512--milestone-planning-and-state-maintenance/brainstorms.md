@@ -122,3 +122,24 @@ pre-brainstorm
 - 主管有明确的 milestone planning / state maintenance 委派路径
 - 真源里明确这是一种 standing-source maintenance worker
 - 事务性约束从“隐含”变成可读的治理规则
+
+## 2026-03-27 补充：milestone 远期项与 worktree 收口
+
+新增一个现实缺口：
+
+- 有些 research / merge-prep worktree 在写完 milestone 调整后，只剩“把若干 issue 排到后面”的治理动作
+- 这些 issue 并不是当前近程要完成的 active batch，却会因为 milestone 没表达清楚，导致团队倾向继续保留对应 worktree / branch
+- 结果是 worktree 被当成未来 queue 的占位符，而不是当前执行单元，fleet 压力会持续变大
+
+更合理的策略应是：
+
+- 若当前 worktree 的剩余价值只是 milestone sequencing / parking writeback，而不是近程 issue continuation，就优先把 milestone 改对
+- 把远期 issue 明确写成 parked / later batch / wait-for-cost-window 的 committed sequencing
+- 然后把当前 research worktree 交回 cleanup / retirement handoff，而不是长期 retained
+- 等成本真正逼近对应 issue 时，再从 canonical `develop` 或最新上游重新开 dedicated worktree
+
+这说明：
+
+- `milestone-planning-state-maintenance` 需要和 `worktree-maintenance-governance` 有显式联动
+- milestone 不是只决定“下一个做谁”，还决定“哪些 worktree 不该继续因为未来 queue 而挂着”
+- “远期 queue 已稳定表达” 本身就是 research worktree 可以先收口的重要证据
