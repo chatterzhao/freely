@@ -35,8 +35,8 @@
   - stay frozen while `I-20260318-1630` remains `review-ready but not promote-closed` and canonical `develop` still lacks manager-facing proof writeback for direct dispatch, queued-lane retention, and busy-worker no-duplicate-launch behavior on the develop-facing proof surface
   - after manager merge judgement plus canonical develop replay / completion verification for `I-20260318-1630`, re-check canonical `develop` instead of replay-owner-local evidence
   - once that proof exists, resume issue materialization around queue-aware manager launch state, queued-lane persistence, and capacity-safe worker dispatch
-  - 2026-03-26 17:04 PDT authoritative fleet refresh confirms this owner worktree is clean again while the broader fleet now sits at `Summary: total=12, dirty=1`; it stays retained-with-reason and is still not a cleanup target until the runtime contract is either materialized or explicitly dropped
-  - 2026-03-26 16:53 PDT continuity stabilization confirms the closeout lane is now coherent enough for protected manager merge judgement, but that does not change this candidate's blocker: it still waits for canonical `develop` proof writeback rather than replay-owner-local review readiness
+  - 2026-03-26 current authoritative patrol confirms this owner worktree is still clean while the active fleet now sits at `Summary: total=5, dirty=1`; it stays retained-with-reason and is still not a cleanup target until the runtime contract is either materialized or explicitly dropped
+  - 2026-03-26 current `live-status` again shows delegated continuations pending in the closeout lane, so replay-owner-local review readiness still does not satisfy this candidate's proof surface
 - revisit_trigger:
   - after manager merge judgement plus canonical develop replay / completion verification for `I-20260318-1630`, re-check canonical `develop` for the required direct-dispatch / queue-retention / no-duplicate-launch proof
   - manager can then launch multiple parallel-safe worktree lanes, queue the rest, and avoid repeated launch spam into an already busy delegated worker
