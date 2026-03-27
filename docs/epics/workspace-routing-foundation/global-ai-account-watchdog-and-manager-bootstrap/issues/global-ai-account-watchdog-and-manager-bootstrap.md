@@ -195,13 +195,13 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 - 当前 issue family 已完成 canonical replay closeout。
 - `20260326-global-ai-account-watchdog-canonical-replay-verification` 已确认能力在 canonical `develop` 上 materialize，focused replay 覆盖 slot-sweep-first recovery、detached control-plane survival、dispatcher-ready gating、slot-first identity、timeout artifact preservation 与 early `deactivated_workspace` detection，未发现 reopen 证据。
 - 当前 authoritative fleet truth 已收敛到 4-tree / dirty=0 / all stopped；旧的 7-tree / 10-tree / 12-tree continuity snapshot 仅保留 provenance，不再构成 blocker。
-- `C-20260323-2045-A` 继续作为独立 retained research owner 存在，但它是后续 scheduler/materialization 问题，不再阻塞本 issue 完成。
+- historical note: `C-20260323-2045-A` was previously kept as an independent retained research owner while canonical `develop` still lacked the scheduler proof wave. That is no longer the current truth. Canonical candidate/milestone/progress artifacts now record it as absorbed supporting evidence, so the replay branch is retirement followthrough only, not an active owner surface.
 
 ## Next
 
 - 本 issue 已完成；后续若 watchdog/account bootstrap 还出现新缺口，只能作为新的 runtime/dev 增量承接，不回写当前 issue。
 - 当前同族后续只剩：
-  - `C-20260323-2045-A` 的 retained research/materialization judgement
+  - 若 scheduler 未来出现 fairness / quota / transaction 等新边界，则新开 lifecycle
   - 更广义的 interruption backlog / manager-owned absorption followthrough
 - 当前批次固定下来的 contract 为：
   - probe 才是真理，cooldown 不再参与恢复逻辑

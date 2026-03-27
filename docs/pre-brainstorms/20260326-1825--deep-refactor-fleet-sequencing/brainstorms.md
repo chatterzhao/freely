@@ -72,7 +72,7 @@
 
 ## Open Questions
 
-- `feature/manager-scheduler-capacity-candidate-replay-20260324` 当前 clean 但仍 `desired=running`；它是否应在大重构前显式 freeze / retire？
+- `feature/manager-scheduler-capacity-candidate-replay-20260324` 当前 clean 但仍 `desired=running`；这一问现已收口：canonical `develop` 已吸收 `C-20260323-2045-A`，因此它应在大重构前显式 retire，而不是继续作为 retained research owner 留在 fleet 里。
 - `develop` runtime 的 `stalled_without_runtime` 是单纯 backlog continuation 积压，还是需要单独恢复动作后才能承接下一轮自治开发？
 - 是否要把“pre-refactor fleet sequencing audit”上升为 `LAWS` 级硬约束，而不是只放在 `AGENTS.md` 入口？
 
@@ -83,4 +83,3 @@
   - dirty merge-prep closeout resolved
   - canonical manager runtime healthy or intentionally frozen
   - upstream governance merges absorbed on `develop`
-

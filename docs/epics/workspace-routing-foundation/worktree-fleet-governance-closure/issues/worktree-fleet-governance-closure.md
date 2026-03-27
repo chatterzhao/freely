@@ -74,10 +74,9 @@ Freely 已经具备单树 worktree audit、merge-prep、stacked merge-chain 和 
 ## Next
 
 - 当前 `fleet_closure` 能力与 canonical inventory writeback 已完成。
-- authoritative fleet 已稳定收敛到 4 棵 retained worktree，`./bin/wt-status-all` 与 `./bin/wt-fleet-status` 均显示 `Summary: total=4, dirty=0` 且全部 `stopped`。
-- 当前 fleet 的有效分层已固定：
-  - protected/control: `develop`, `pre-test-merge`
-  - retained research owner: `feature/manager-scheduler-capacity-candidate-replay-20260324`
-  - active develop-facing absorption owner: `feature/upstream-governance-merge-prep-20260327`
+- historical stable snapshot: authoritative fleet once stabilized at 4 retained worktrees with `feature/manager-scheduler-capacity-candidate-replay-20260324` as the remaining retained research owner while the candidate boundary was still unresolved.
+- current canonical cleanup judgement has moved again:
+  - protected/control: `develop`
+  - historical retained research owner now superseded and delete-ready after canonical cleanup writeback: `feature/manager-scheduler-capacity-candidate-replay-20260324`
   - retired after absorption writeback: `feature/develop-merge-prep-fleet-closure-20260325`
-- `feature/manager-scheduler-capacity-candidate-replay-20260324` 的 `needs_research / retained-with-reason` judgement 已作为当前 fleet truth 的一部分冻结；后续是否 materialize `C-20260323-2045-A` 属于独立 research lifecycle，不再阻塞本 issue 完成。
+- `feature/manager-scheduler-capacity-candidate-replay-20260324` should no longer be treated as active fleet truth. Its branch-local history is now only replay-owner provenance because canonical `develop` already records `C-20260323-2045-A` as absorbed supporting evidence; if future scheduler work is needed, it must open a new lifecycle instead of reviving this replay owner.

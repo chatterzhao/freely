@@ -99,7 +99,7 @@ Freely 当前已经分别定义了：
 - 当前最小 acceptance delta 已不再只是 branch-local verification：`bed0832` 已被 canonical `develop` 吸收，cleanup signal 继续先进入 manager `notice -> claim -> restart-point routing`，产出 `handoff://cleanup`，不再被旧 `cleanup://merged-worktree-followthrough` continuity 直接吸收。
 - develop-side focused replay 继续确认 cleanup 之外的广义主管监督 signal 会回到 manager-owned continuation reentry，而不是被误吸收到 direct cleanup followthrough。
 - 当前 authoritative fleet truth 已稳定收敛到 4-tree / dirty=0 / all stopped；因此本 issue 所需的 routing clarification、manager/develop replay、与 fleet-side contradiction check 已全部补齐，可以从 `in_verification` 收口为 `completed`。
-- `feature/manager-scheduler-capacity-candidate-replay-20260324` 继续作为独立 retained research owner 存在，但它属于后续 scheduler/materialization judgement，不再阻塞本 issue 完成。
+- historical note: earlier closeout rounds kept `feature/manager-scheduler-capacity-candidate-replay-20260324` as a separate retained research owner. That is no longer the live judgement: canonical `develop` has since absorbed `C-20260323-2045-A` as supporting evidence, so the old replay branch is now retirement followthrough, not an active owner surface.
 
 ## Next
 
