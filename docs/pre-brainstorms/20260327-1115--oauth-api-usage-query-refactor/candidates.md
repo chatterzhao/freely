@@ -3,13 +3,13 @@
 - id: `C-20260327-1115-A`
 - title: Promote OAuth parallel sweep to canonical slot inventory truth
 - source_brainstorm: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md`
-- status: `needs_research`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - decision_reason:
   - 当前本机实测已经证明 `wham/usage` 可以在约 3.7 秒内并行扫描 25 个 `.ai-auth` slots，且不触碰 `~/.codex/auth.json`
   - sweep 返回不只包含 `usable` / `rate_limited`，还直接暴露了大量 `deactivated_workspace`，因此它已经具备承担 inventory truth 的能力潜力
-  - 但当前 canonical runtime 仍绑在串行真实 probe / auth-copy 模型上，尚未完成统一函数、cache/ledger overwrite 和 launch-time confirmation 的重构，所以 candidate 继续保持 `needs_research`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - 这已经超出已完成 `I-20260318-1630` 的 closeout contract，应以新的 follow-on lifecycle 物化，而不是继续把旧 completed issue 当作 reopen owner
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -31,6 +31,6 @@
   - `.freely/run/codex-slot-cooldowns.tsv`
   - `.freely/run/codex-availability-state.env`
 - next_action:
-  - keep this as pre-brainstorm until the OAuth sweep, availability cache, cooldown overwrite, and launch-time confirmation layering are written back into canonical issue / progress / capability truth
+  - 当前 pre-brainstorm 已完成 materialization judgement；后续由 `I-20260327-1115` 承接 issue-bound IBM 与 dev-loop，实现 OAuth sweep、availability cache、cooldown overwrite 和 launch-time confirmation 分层
 - revisit_trigger:
   - if implementation proves `wham/usage` unstable or insufficient for inventory truth, fall back to keeping it as supporting evidence instead of canonicalizing the refactor

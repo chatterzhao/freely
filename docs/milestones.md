@@ -49,6 +49,16 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260327-1115`
+- title: OAuth slot inventory sweep and launch-time confirmation governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md`
+- next_action: 当前 OAuth `wham/usage` 预研已完成 materialization；下一步进入 dev-loop，把 unified sweep、availability cache、cooldown overwrite 和 launch-time confirmation 写回 capability truth，不再停留在 pre-brainstorm
+
 ### completed_issues
 
 1. `I-20260307-1201`
@@ -429,6 +439,16 @@ routing_policy:
 - completion_note: stacked merge-chain 的 skill/reference/prompt truth 已在 canonical truth 中稳定存在；CLI/脚本级自动决策属于后续增量，不再阻塞当前 issue 收口
 
 ### candidate_issues
+
+1. `C-20260327-1115-A`
+- title: Promote OAuth parallel sweep to canonical slot inventory truth
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md`
+- next_action: 已提升为新的 follow-on issue；后续由 `I-20260327-1115` 承接 issue-bound IBM closeout 与 dev-loop 执行
 
 1. `C-20260323-1435-A`
 - title: Interactive init bootstrap and fine-grained force/skip governance
