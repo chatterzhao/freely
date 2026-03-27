@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260308-0101`
 - title: 状态联动、流程标识词典与 session evidence 传播治理
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `state-sync-and-session-evidence-governance`
@@ -68,22 +68,12 @@
 - 已写入 review 证据：
   - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260316-state-sync-verification.md`
   - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260317-lead-agent-reentry-verification.md`
+  - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260326-state-sync-canonical-replay-verification.md`
 - 当前研究阶段尚未启用正式 `docs/progress/**`，本轮等价执行证据写入 `docs/pre-brainstorms/CONVERGENCE.md`。
 
-## Next
+## Verification Summary
 
-- 2026-03-17 首跳闭环复核已再次执行 `constitution-guard -> laws-enforcer -> lead-agent -> context-source-skill`。
-- 需求池优先级仍为 `milestones > progress/recovery(等价 continuity) > review/test > human chat/session evidence > github issue > PROJECT_INTENT`。
-- 当前问题继续判定为 `issue continuation`，不回退到 `pre-brainstorm` 或 issue-bound brainstorm。
-- `selected_tool=codex`，因为当前动作仍是仓库内 verification continuity 回写；`target_skill_or_loop=skill:dev-loop-execution`，具体 route 为 `completion_verification`。
-- 本轮新增检查结果：
-  - `./bin/wt-status-all` 仍返回 `Summary: total=6, dirty=1`
-  - `./bin/governance-check` 当前在本机环境下因 `mapfile` / `find -printf` 兼容性失败，不能计作通过证据
-- 需求池缺席/未命中事实：
-  - `progress/recovery`: `find docs -maxdepth 2 \( -type d -name progress -o -type d -name recovery \) -print` 无输出，说明研究阶段仍未启用正式 continuity 目录
-  - `github issue`: 仓库内仅存在 policy / brainstorm 对 `github-issue` 的规则描述，当前没有比 milestone continuation 更高优先的本地 issue 落点
-- 当前 dirty blocker 不是单个零散文件，而是仍包含多类未提交改动：
-  - `docs/system/workspace/**` 与 `tests/**` 下的 runtime / monitor / tests 改动
-  - `docs/epics/workspace-routing-foundation/**` 下的 verification / review / issue 文档改动
-  - `docs/pre-brainstorms/**` 下的新 session-rotation / first-hop 研究与 continuity 留痕
-- 保持 `in_verification`。`./bin/wt-status-all` 已确认当前 `feature/dogfood-codex-auto-20260316` worktree 仍为 `DIRTY`，因此本轮不能进入 promote / cleanup；待 worktree 清洁并补齐 completion verification / cleanup 证据后再进入 `completed`。
+- canonical replay 证明 `LAWS`、`PROJECT_INTENT`、`milestones.md` 与核心 skills 仍一致引用 `source_class / route_kind / phase_state / runtime_state / session_refs`，且 `done_ibm -> in_dev -> in_verification -> completed` 的 handoff 口径没有回退。
+- 早先把 issue 卡在 `in_verification` 的两个理由都已失效：`governance-check` 现已在当前环境通过，`dirty=1` 也只是旧 verification worktree 的现场快照，不是当前 canonical truth 的能力缺口。
+- 研究阶段未启用正式 `docs/progress/**` 属于当批次的治理现实，不再构成阻塞；当前收口证据由 issue 和 code review 补齐即可。
+- 当前批次据此把本 issue 关闭为 `completed`；后续若要继续扩状态词典或 session evidence contract，应通过新 lifecycle 承接。

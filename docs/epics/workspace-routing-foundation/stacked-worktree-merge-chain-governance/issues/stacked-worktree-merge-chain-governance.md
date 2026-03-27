@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260321-1045`
 - title: Stacked worktree merge-chain governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `stacked-worktree-merge-chain-governance`
@@ -62,7 +62,10 @@
 
 - `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
+- `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/code-reviews/20260326-stacked-merge-chain-canonical-replay-verification.md`
 
-## Next
+## Verification Summary
 
-- 后续若要把 stacked merge-chain 再自动化成 CLI/脚本层决策，不在本 issue 中扩 scope；应从同一主题继续开新 candidate。
+- canonical replay 继续证明：`worktree-maintenance-governance` 已支持 `stacked_merge_chain`，并保留 child -> parent -> merge-prep -> develop 的逐层 gate、parent-first merge rule 和 integration-fix attribution。
+- 当前 issue 要求的是 skill/reference/prompt truth 收敛，不是 CLI 自动决策；后者若要继续推进，应从同一主题新开 candidate，而不是把当前 issue 继续留在 active queue。
+- 当前批次据此把本 issue 从 `in_verification` 关闭为 `completed`。

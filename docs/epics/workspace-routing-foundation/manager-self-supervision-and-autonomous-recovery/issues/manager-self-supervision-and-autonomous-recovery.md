@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260318-1408`
 - title: Manager self-supervision and autonomous recovery
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-self-supervision-and-autonomous-recovery`
@@ -68,6 +68,8 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
   - `bash docs/system/workspace/scripts/tests/test-freely-status-pid-ownership`
   - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status`
   - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
+- 已写入 review 证据：
+  - `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/code-reviews/20260326-manager-self-supervision-canonical-replay-verification.md`
 - 当前验证重点：
   - 主管是否在 worker 掉线时优先进入 supervision alert
   - 工位状态是否能正确保留 `desired runtime` 和 `exit reason`
@@ -77,7 +79,9 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
   - `test-freely-manager-runtime-does-not-switch-accounts` 已覆盖 worker 命中 auth failure 时不再执行 `ai switch`，而是留下 `runtime-owned` 退出原因并退出本地 supervisor
   - 主管/worker 的全局账号恢复 owner 已进一步收紧到外层 global watchdog / account controller
 
-## Next
+## Verification Summary
 
-- 保持 `in_verification`。当前最小实现、测试和角色文档已落盘。
-- 后续仍需一个更外层的 watchdog/ensure 机制，处理“主管 supervisor 自己整个进程消失”的自复活问题；这不在本 issue 当前批次内扩 scope。
+- canonical replay 继续证明：主管会先看到 `expected running but down` worker 告警，runtime 会优先做脚本级恢复，而不是把 supervisor 掉线直接甩给 AI 即兴处理。
+- PID 归属、fleet desired runtime / exit reason 暴露、manager/worker 角色文档，以及“runtime 不直接切全局账号”的边界均未回退。
+- 更外层的 global watchdog / ensure 仍是边界外后续能力，已由同族 issue `I-20260318-1630` 承接，不再阻塞当前 issue 收口。
+- 当前批次据此把本 issue 从 `in_verification` 关闭为 `completed`。

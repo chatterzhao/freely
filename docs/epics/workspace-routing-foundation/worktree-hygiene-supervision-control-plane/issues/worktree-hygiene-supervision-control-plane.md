@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260318-1825`
 - title: Worktree hygiene supervision control plane
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `worktree-hygiene-supervision-control-plane`
@@ -55,8 +55,11 @@ Freely 已有 checkpoint-guard、fleet-status 与 manager/worker 角色边界，
 - `bash docs/system/workspace/scripts/tests/test-freely-worktree-hygiene-alert`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert`
 - `./bin/governance-check`
+- `docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/code-reviews/20260326-worktree-hygiene-canonical-replay-verification.md`
 
-## Next
+## Verification Summary
 
-- 先保持 `in_verification`，等待 review 与 promote 判断。
-- 若后续仍发现仅靠 intervention 提示不足，再从同一问题线 materialize `dedicated hygiene worker delegation flow`，不要在当前 issue 中提前扩 scope。
+- canonical replay 继续证明：`checkpoint_drift_streak` 会升级成 hygiene intervention，manager prompt 会把 drift worker 暴露成可委派的 hygiene alert，`baseline-status` 也仍保留相关可见性。
+- 当前阻塞只剩历史上的 review / promote 表述，没有新的实现缺口；继续保留 `in_verification` 会把已落盘能力误当成待开发。
+- 若后续仍发现 intervention 提示不足，再从同一问题线 materialize `dedicated hygiene worker delegation flow`，不要回退到当前 issue 再重复实现。
+- 当前批次据此把本 issue 关闭为 `completed`。

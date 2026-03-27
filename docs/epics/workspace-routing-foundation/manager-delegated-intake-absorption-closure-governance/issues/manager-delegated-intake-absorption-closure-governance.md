@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260326-0445`
 - title: Manager-delegated intake absorption closure governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-delegated-intake-absorption-closure-governance`
@@ -82,7 +82,12 @@ Freely 已经解决了 manager delegated continuation 的：
 - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 
-## Next
+## Verification Summary
 
-- 当前 feature worktree 已完成实现与 focused verification。
-- 下一步进入 code review / develop merge judgement，不把 intake lifecycle absorbed 误判为 issue completed。
+- The implementation is already present on canonical `develop` through same-family commit `93375c8` (`fix: close manager delegated intake lifecycle`).
+- Focused regression still passes after replay:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-intake-absorption-closure`
+  - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+  - `./bin/governance-check`
+- This closes only the manager-owned delegated intake lifecycle contract. It does not claim completion for unrelated worker-side delegated continuation or broader owner lifecycle families.

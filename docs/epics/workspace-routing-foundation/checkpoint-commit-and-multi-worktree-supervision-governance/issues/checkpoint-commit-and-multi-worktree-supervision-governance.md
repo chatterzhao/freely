@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260318-0930`
 - title: Checkpoint commit and multi-worktree supervision governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `checkpoint-commit-and-multi-worktree-supervision-governance`
@@ -63,6 +63,7 @@ Freely 当前已经会 worktree 隔离、session handoff、rate-limit account sw
   - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
 - 已写入 review 证据：
   - `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/code-reviews/20260318-checkpoint-and-fleet-verification.md`
+  - `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/code-reviews/20260326-checkpoint-and-fleet-canonical-replay-verification.md`
 - 当前研究阶段尚未启用正式 `docs/progress/**`，本轮 dev-loop 等价执行证据写入 `docs/pre-brainstorms/CONVERGENCE.md`。
 - 本轮补充验证：
   - `./bin/checkpoint-guard` -> `checkpoint_required: no`
@@ -70,10 +71,9 @@ Freely 当前已经会 worktree 隔离、session handoff、rate-limit account sw
   - `./bin/governance-check` -> `passed with 10 warning(s)`（均为 legacy pre-brainstorm naming 提示，非阻断）
   - `start-lead-agent.sh --project <develop>` -> `MANAGER_MODE=true`，且提示主管工位不得直接修改受版本管理产物
 
-## Next
+## Verification Summary
 
-- 保持 `in_verification`。当前实现、脚本测试与 review 已落盘，但 promote / cleanup 证据尚未形成。
-- 当前项目级工位快照已更新到 `Summary: total=8, dirty=1`；新增的其他工位仍为 `CLEAN` 且 phase/issue 缺失，因此继续冻结待核对。当前唯一 dirty 工位仍是本 issue 所在 worktree，且脏改动属于 verification continuity，自主治理上无需分流到其他 worktree，但仍未满足 promote / cleanup 前提。
-- 本轮 verification 暴露出一个边界外新问题：`commit-first after checkpoint-ready` 自治治理。该问题已按法律要求回写到 `docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/` 并同步进入 `docs/milestones.md` 的 `candidate_issues`，不再混入当前 issue scope。
-- 本轮首跳重新扫描 `milestones / progress-recovery / review-test / human chat-session evidence / github issue / PROJECT_INTENT` 后，仍判定最高优先池为当前 milestone continuation；`C-20260318-0715-A` 继续保留在 pre-brainstorm，不抢占当前 issue 的 verification continuity。
-- 项目级监督排序保持为：其他 CLEAN 工位继续冻结待核对；当前工位先完成本 issue 的 verification continuity，然后再回到 `I-20260307-1201` 与 `I-20260308-0101` 做 completion verification / cleanup 收口。
+- canonical `develop` 仍保留 `checkpoint-guard`、`wt-fleet-status`、`freely baseline-status` dirty-budget 暴露，以及 `pre-commit` 的 staged scope gate，focused replay 全部通过。
+- 早先阻塞 closeout 的 `dirty=1` / promote-cleanup 叙述属于当时 verification worktree 的现场快照，不再能代表当前 canonical truth；继续把该 issue 留在 active queue 只会制造假待办。
+- `commit-first after checkpoint-ready` 已按边界外候选回流到 `C-20260318-0715-A`，不再阻止当前 issue 收口。
+- 当前批次据此把本 issue 视为 completed；后续若继续扩自治 commit/promotion contract，应通过新 lifecycle 承接。

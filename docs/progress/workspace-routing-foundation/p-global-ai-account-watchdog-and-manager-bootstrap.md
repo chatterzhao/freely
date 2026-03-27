@@ -2,8 +2,8 @@
 
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- phase_state: `in_verification`
-- runtime_state: `in_verification`
+- phase_state: `completed`
+- runtime_state: `closed_for_this_batch`
 - branch: `feature/watchdog-probe-early-deactivated-workspace-detect-20260326`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-probe-early-deactivated-workspace-detect`
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
@@ -194,7 +194,9 @@
 
 ## Next Action
 
-- 当前批次已把 slot switch 的全局 launch gate、warning/stdout 污染隔离、timed-out probe partial-output artifact，以及 `402/deactivated_workspace` 的早判定补齐；下一步进入同 issue family 的 commit / merge judgement，并在 develop replay 中确认 canonical runtime 不再把已知 `deactivated_workspace` slot 继续拖成 generic timeout。
+- canonical replay on 2026-03-26 confirms the same-family watchdog/bootstrap batches are already in `develop` and continue to satisfy focused acceptance.
+- This issue closes as `completed` canonical writeback.
+- Future interruption backlog convergence or productization followthrough should route through their own issue families instead of reopening this capability issue.
 
 ## Revisit Trigger
 

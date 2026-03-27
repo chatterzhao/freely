@@ -1,7 +1,8 @@
 # Progress: manager-delegated-intake-absorption-closure-governance
 
 - issue_id: `I-20260326-0445`
-- current_phase: `in_verification`
+- phase_state: `completed`
+- runtime_state: `closed_for_this_batch`
 - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-intake-absorption-closure-governance`
 - branch: `feature/intake-absorption-closure-governance-20260326`
 
@@ -22,6 +23,6 @@
 
 ## Current Judgment
 
-- feature worktree 内实现和 focused verification 已完成。
-- 当前进入 `in_verification`，等待 code review 和 develop merge judgement。
-- 该 absorbed closure 只代表 interruption lifecycle 收口，不代表相关 issue / owner 已完成。
+- same-family fix 已进入 canonical `develop`，且 focused verification 在本轮 closeout replay 继续通过。
+- 当前将本 issue 收口为 `completed`。
+- 该 completed 仅代表 manager-owned delegated intake absorbed closure 达标，不代表相关 owner / worker-side lifecycle 全部完成。
