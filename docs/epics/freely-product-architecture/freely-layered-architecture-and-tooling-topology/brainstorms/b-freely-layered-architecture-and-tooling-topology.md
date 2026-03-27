@@ -20,7 +20,7 @@
 - `Freely GUI app`
 - `host shell`
 - `semantic surface`
-- `external execution provider layer`
+- `external AI tooling layer`
 
 ## Core mapping
 
@@ -50,7 +50,7 @@
 - `live-status`
 - `fleet-status`
 
-它们通过 CLI/TUI/GUI 等 shell 暴露，但本身属于 command / submit / observability semantics。
+它们通过 `CLI shell`、`TUI shell`、`GUI app` 等 host shell 暴露，但本身属于 command / submit / observability semantics。
 
 ## Guard rails
 

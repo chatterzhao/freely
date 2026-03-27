@@ -24,7 +24,7 @@
 
 Freely 已经在多个局部真源里分别写对了部分边界，例如 `three-loop`、`tools.md`、CLI-first 与 contract/adaptor taxonomy，但仍缺一份统一的 Freely 自身产品/系统架构表达。这导致：
 
-- `chat`、`init`、`start`、`status` family 容易和 `CLI/TUI/GUI` 被错误并列
+- `chat`、`init`、`start`、`status` family 容易和 `CLI shell / TUI shell / GUI app` 被错误并列
 - 外部 AI tooling layer 缺少明确站位
 - `AGENTS.md` 仍偏向“先想是不是能力”，而缺少“先判断这是 Freely 自身产品架构，还是可复用能力”的入口分流
 
@@ -50,7 +50,7 @@ Freely 已经在多个局部真源里分别写对了部分边界，例如 `three
 
 ## Acceptance
 
-- `PROJECT_INTENT` 明确表达 Freely product / core / CLI / TUI / GUI / semantic surfaces / external execution provider 的关系
+- `PROJECT_INTENT` 明确表达 Freely product / core / CLI shell / TUI shell / GUI app / semantic surfaces / external AI tooling layer 的关系
 - `CONSTITUTION` 明确把这些关系收成硬边界，尤其 shell、command、semantic surface 不再混层
 - `LAWS` 明确新讨论出现时，先判断 continuation、Freely 自身产品架构、开发治理、可复用能力，再决定落点
 - `AGENTS.md` 对齐上述思考顺序，但保持“入口指引”身份，不升格为架构真源

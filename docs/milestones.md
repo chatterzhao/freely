@@ -319,8 +319,7 @@ routing_policy:
 - completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
 
 ### candidate_issues
-
-2. `C-20260323-1435-A`
+1. `C-20260323-1435-A`
 - title: Interactive init bootstrap and fine-grained force/skip governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -804,7 +803,7 @@ routing_policy:
   - `docs/LAWS.md`
   - `AGENTS.md`
   - `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/code-reviews/20260326-freely-layered-architecture-and-tooling-topology-verification.md`
-- completion_note: Freely product / core / shell / semantic surface / external execution provider 的高层关系已先回写开发期高层真源，并把 `AGENTS.md` 的入口判断对齐到同一分类顺序；若未来要泛化“通用产品形态方法”，需另开独立 lifecycle
+- completion_note: Freely product / core / shell / semantic surface / external AI tooling layer 的高层关系已先回写开发期高层真源，并把 `AGENTS.md` 的入口判断对齐到同一分类顺序；若未来要泛化“通用产品形态方法”，需另开独立 lifecycle
 
 ## M-20260312-control-surface-runtime-convergence
 

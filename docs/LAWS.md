@@ -110,6 +110,38 @@
 
 ---
 
+## 2B.1 Freely 自身产品架构讨论的分类与对齐（硬性要求）
+
+判定规则：
+1. Freely 自举中出现的新讨论，先判定它属于：
+   - 现有 issue continuation
+   - Freely 自身产品架构
+   - Freely 开发治理
+   - Freely 可复用能力
+2. 若属于 Freely 自身产品架构，首轮正式落点应为：
+   - `PROJECT_INTENT.md`
+   - `CONSTITUTION.md`
+   - `LAWS.md`
+   - `AGENTS.md`
+3. Freely 自身产品架构 discussion 默认不得直接写入 `docs/system/**`；只有当后续被独立抽象成可复用能力后，才另开生命周期进入能力目录。
+4. 当 Freely 自身产品架构表达更新时，必须至少检查：
+   - 当前 pre-brainstorm / candidate / issue / progress 是否与新的职责分工一致
+   - 是否仍有文档把 semantic surfaces 与 host shells 混层
+   - 是否仍有文档把 Freely 自身产品形态直接写成 Freely 通用能力
+5. `AGENTS.md` 在这类变更中只承担开发入口判断，不替代 `PROJECT_INTENT / CONSTITUTION / LAWS` 的架构本体职责。
+
+最小验收证据：
+- 分类记录
+- `PROJECT_INTENT / CONSTITUTION / LAWS / AGENTS.md` 对齐记录
+- 至少一轮相关 repo 文档 sweep 记录
+
+执行技能：
+- `skill:laws-enforcer`
+- `skill:doc-pre-brainstorm-execution`
+- `skill:doc-ibm-execution`
+
+---
+
 ## 2C. 状态同步与流程标识（硬性要求）
 
 判定规则：

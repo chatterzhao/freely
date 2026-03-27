@@ -11,10 +11,12 @@
 
 ## Checks
 
+1. Collected and absorbed three independent reviews before final writeback: scope / placement review, terminology / topology review, development-entry / `AGENTS.md` review.
 1. Verified the topic is now routed as Freely product architecture rather than `docs/system/workspace/**` capability truth.
 2. Verified `PROJECT_INTENT` carries the architecture expression, `CONSTITUTION` carries hard boundaries, `LAWS` carries classification/alignment rules, and `AGENTS.md` carries development-entry reasoning.
-3. Verified the candidate is promoted and moved off the old `workspace-routing-foundation` candidate queue.
-4. Ran `./bin/governance-check`.
+3. Verified shell terminology is normalized to `CLI shell` / `TUI shell` / `GUI app`, and external AI tools are expressed as `external AI tooling layer`.
+4. Verified the candidate is promoted and moved off the old `workspace-routing-foundation` candidate queue.
+5. Ran `./bin/governance-check`.
 
 ## Verdict
 

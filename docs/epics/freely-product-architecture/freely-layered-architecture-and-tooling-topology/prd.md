@@ -8,13 +8,13 @@
 
 当前局部真源已分别写对部分边界，但缺统一总图，导致：
 
-- `chat` / `status` family 被错误拿去和 `CLI/TUI/GUI` 并列
+- `chat` / `status` family 被错误拿去和 `CLI shell`、`TUI shell`、`GUI app` 并列
 - `tools.md` 的外部 AI tooling layer 没被放回产品架构
 - `AGENTS.md` 开发入口仍缺“先判断这是 Freely 自身产品架构还是可复用能力”的前置分流
 
 ## Requirements
 
-1. `PROJECT_INTENT` 必须表达 Freely product / core / shell / semantic surface / external execution provider 的总关系。
+1. `PROJECT_INTENT` 必须表达 Freely product / core / shell / semantic surface / external AI tooling layer 的总关系。
 2. `CONSTITUTION` 必须冻结以下硬边界：
    - CLI 是 canonical shell
    - TUI / GUI 是 optional shells
@@ -26,9 +26,9 @@
 ## Product rules
 
 1. Freely 的产品形态表达首先属于开发 Freely 的高层真源，而不是能力目录。
-2. `Freely core` 是被 CLI / TUI / GUI 复用的能力本体。
+2. `Freely core` 是被 CLI shell、TUI shell、GUI app 复用的能力本体。
 3. `chat`、`init`、`start`、`status family` 是 semantic surfaces，不是 shell。
-4. `codex`、`Claude Code`、MCP 组合路径属于 external execution provider layer。
+4. `codex`、`Claude Code`、MCP 组合路径属于 external AI tooling layer。
 5. 若未来要泛化出“通用产品形态方法”，必须另开独立 lifecycle。
 
 ## Eval Plan

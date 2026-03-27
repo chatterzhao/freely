@@ -6,26 +6,26 @@
 - related_signals:
   - 当前 `three-loop-capability-lifecycle` 能解释 loop / route / lifecycle，但不等于整套 Freely 产品/系统分层图。
   - 当前 `docs/system/workspace/tools.md` 已经定义 `codex`、`cc`、`cc-use-codex-cli`、`iflow` 等 AI tool/runtime 使用方式，但这些工具层还没有被放进一张更上位的体系拓扑图里。
-  - 用户明确指出上一版方块图有两个错误：`chat` 不应和 `CLI/TUI/GUI` 并列；AI tool usage layer 不能缺席，尤其 Freely 如何使用 `codex cli`、`claude code` 等是系统本体的一部分。
+  - 用户明确指出上一版方块图有两个错误：`chat` 不应和 `CLI shell / TUI shell / GUI app` 并列；AI tool usage layer 不能缺席，尤其 Freely 如何使用 `codex cli`、`claude code` 等是系统本体的一部分。
 
 ## Problem
 
 Freely 现在缺一套更总览的高层 architecture/topology 表达，导致几个层面容易混在一起：
 
 - loop/lifecycle 真源
-- 产品交互入口与操作语义
+- command family 与其暴露的语义
 - 状态/观测语义
-- 终端/界面载体
-- 外部 AI tool orchestration layer
+- host shell / form factor
+- external AI tooling layer
 - runtime/agent orchestration layer
 - backend contract / adapter boundary
-- eval/harness/supporting substrate
+- evaluation harness + autonomy evals / acceptance
 
 结果是：
 
 - `three-loop-capability-lifecycle` 容易被误当成整栋系统地图
-- `chat`、`start`、`init` 这种交互入口会和 `CLI/TUI/GUI` 这种载体/表面形态并列
-- `status`、`live-status`、`fleet-status` 这种观测入口也容易被误放到和 `CLI/TUI/GUI` 同一层
+- `chat`、`start`、`init` 这些 command family 成员容易和 `CLI shell / TUI shell / GUI app` 这类 host shell 并列
+- `status`、`live-status`、`fleet-status` 这种观测入口也容易被误放到和 `CLI shell / TUI shell / GUI app` 同一层
 - `codex cli`、`Claude Code`、`codex MCP` 这种“Freely 如何借力外部 AI 工具”没有稳定层级归属
 - `backend contract`、`adapter`、`control surface` 的边界虽然在局部 issue 中存在，但没被放回整张总图
 
@@ -36,9 +36,9 @@ Freely 现在缺一套更总览的高层 architecture/topology 表达，导致�
 1. 哪些层是 Freely 产品本体
 2. 哪些层是 Freely 借力外部 AI 的工具编排层
 3. 哪些层是 eval / harness / evidence / replay 支撑层
-4. `chat`、`start`、`tui`、`cli`、`gui` 到底分别属于“入口”、“交互模式”还是“表面载体”
+4. `chat`、`start`、`init` 分别属于哪些 command family，以及这些 command family 如何映射到 host shells
 5. `three-loop-capability-lifecycle` 应是这张图的一部分，还是只被它引用
-6. `status` family 应属于哪一层，以及它与 `CLI/TUI/GUI` 的关系是什么
+6. `status` family 应属于哪一层，以及它与 `CLI shell / TUI shell / GUI app` 的关系是什么
 7. `backend contract` / `adapter` / `host shell` 是否应被显式拆层，而不是继续口头区分
 
 这轮预研的首个正式产物应优先落在：
@@ -102,13 +102,13 @@ Freely 现在缺一套更总览的高层 architecture/topology 表达，导致�
 1. operational substrate
 2. harness / eval support
 3. autonomy evals / acceptance plane
-4. external AI tooling / execution provider layer
+4. external AI tooling layer
 5. Freely runtime / orchestration layer
 6. service contract layer
 7. adapter layer
 8. host shell / form factor layer
 
-横向上，至少有两组不该再被误画成纵向并列层的语义面：
+横向上，至少有三组不该再被误画成纵向并列层的语义面：
 
 - boot / control command family
   - `init`
@@ -124,9 +124,9 @@ Freely 现在缺一套更总览的高层 architecture/topology 表达，导致�
 
 也就是说：
 
-- `chat` 不是 `CLI/TUI/GUI` 的 peer；它是 submit / intervention command family 的一部分
-- `status` family 也不是 `CLI/TUI/GUI` 的 peer；它是 observability semantic
-- `CLI/TUI/GUI` 更像 host shell / form factor，承载这些 command family 与语义面
+- `chat` 不是 `CLI shell / TUI shell / GUI app` 的 peer；它是 submit / intervention command family 的一部分
+- `status` family 也不是 `CLI shell / TUI shell / GUI app` 的 peer；它是 observability semantic
+- `CLI shell / TUI shell / GUI app` 更像 host shell / form factor，承载这些 command family 与语义面
 - backend service contract 与 adapter taxonomy 也是独立层，不该被并入 `GUI` 或 `status`
 
 这里还要额外守住一个边界：
@@ -144,20 +144,20 @@ Freely 现在缺一套更总览的高层 architecture/topology 表达，导致�
    - 例如 external AI tooling、runtime orchestration、service contract、adapter、host shell
 2. semantic surface
    - 例如 `chat` submit、`status` family、human intervention、control actions
-3. rendering / carrier
-   - 例如 CLI、TUI、GUI、probe、未来其他 control surface
+3. host shell / form factor
+   - 例如 CLI shell、TUI shell、GUI app、probe surfaces、未来其他 control surfaces
 
 如果只画单轴楼层图，不额外标出 semantic surface，就会自然犯两个错误：
 
-- 把 `chat` 和 `CLI/TUI/GUI` 并列
-- 把 `status` family 和 `CLI/TUI/GUI` 并列
+- 把 `chat` 和 `CLI shell / TUI shell / GUI app` 并列
+- 把 `status` family 和 `CLI shell / TUI shell / GUI app` 并列
 
 但项目现有真源已经部分证明它们不应这样站位：
 
 - `auto-loop-orchestrator` 已明确 `freely` 是唯一 front-door command，`chat` 是 canonical high-level submit primitive，而未来 GUI 必须复用同一 backend contract。
 - `cli-first-entrypoint-and-observability-surface-unification` 已明确 CLI status family 是未来 TUI/GUI 的 canonical backend interface，而不是和 TUI/GUI 同类的宿主壳。
 - `backend-service-contract-and-adapter-taxonomy` 已明确 contract layer 与 adapter layer 分离，说明 UI/transport 也不是语义本体。
-- `tools.md` 已明确 `codex`、`cc`、`cc-use-codex-cli` 是 Freely runtime 编排的外部 AI tool，而不是零散工具清单。
+- `tools.md` 已明确 `codex`、`cc`、`cc-use-codex-cli` 是 Freely runtime 编排的 external AI tooling，而不是零散工具清单。
 - `three-loop` 已明确 front-door flow 与 observability planes，但它的职责仍是 lifecycle / route / ownership，不是整栋楼的 architecture atlas。
 
 因此这里真正缺的不是局部定义，而是一份统一总图，能把“层”和“跨层语义面”同时表达出来。
@@ -241,7 +241,7 @@ Freely 现在缺一套更总览的高层 architecture/topology 表达，导致�
    - CLI shell
    - TUI shell
    - GUI app
-   - probe / future control surface
+  - probe surfaces / future control surfaces
 
 ### Orthogonal semantic surfaces
 
@@ -287,7 +287,7 @@ Freely 现在缺一套更总览的高层 architecture/topology 表达，导致�
 | Current truth source | Best-fit place in topology | Why |
 | --- | --- | --- |
 | `three-loop-capability-lifecycle.md` | Freely runtime / orchestration | 它讲 loop、route、ownership、front-door flow、observability planes，但不等于 whole-system atlas |
-| `tools.md` | external AI tooling layer | 它定义 Freely 如何编排外部 AI tools，而不是 UI 或 lifecycle atlas |
+| `tools.md` | external AI tooling layer | 它定义 Freely 如何编排 external AI tooling，而不是 UI 或 lifecycle atlas |
 | `PROJECT_INTENT.md` | Freely product/system high-level topology | 它最适合先承接 Freely 自身产品/系统架构总图 |
 | `CONSTITUTION.md` | hard architecture constraints | 它应冻结技术栈、CLI-first、终端边界等硬约束 |
 | `LAWS.md` | alignment and acceptance rules | 它应定义新架构表达形成后，哪些文档和验收口径必须同步对齐 |
@@ -299,7 +299,7 @@ Freely 现在缺一套更总览的高层 architecture/topology 表达，导致�
 ### Current mismatch markers
 
 - mismatch: repo 已经把 `chat` 写成 canonical submit primitive，但还没有在 architecture 总图里把它与 host shell 分离
-- mismatch: repo 已经把 status family 写成 observability/backend interface，但还没有在 architecture 总图里把它与 CLI/TUI/GUI 分离
+- mismatch: repo 已经把 status family 写成 observability/backend interface，但还没有在 architecture 总图里把它与 CLI shell / TUI shell / GUI app 分离
 - mismatch: repo 已经把 external AI tools 写成正式 runtime 编排对象，但缺少一份总图说明它们处在 runtime 之下、宿主壳之外
 - mismatch: repo 已经把 contract vs adapter 与 Tauri/WS 分离，但这条边界仍主要停留在 control-surface 线，没有回写到全局 architecture 层
 - mismatch: `PROJECT_INTENT / CONSTITUTION / LAWS` 各自已有局部正确内容，但还没有统一表达“Freely 自身产品架构先落这三份高层开发文档，再要求其他文档跟随对齐”
@@ -310,8 +310,8 @@ Freely 现在缺一套更总览的高层 architecture/topology 表达，导致�
 
 1. 最终文档应采用“单轴层级图 + 正交语义面注释”，还是直接采用“两轴拓扑图”？
 2. `chat`、`start`、`init` 应归入统一 front-door semantic，还是区分 boot / submit / control 三类？
-3. `CLI / TUI / GUI / probe` 应命名为 host shell、product surface，还是 shell + surface 分两层？
-4. `codex cli`、`Claude Code`、`iflow`、`kiro-cli` 是“tooling layer”，还是“execution provider layer”更贴切？
+3. `CLI shell / TUI shell / GUI app / probe surfaces` 应命名为 host shell / form factor，还是 shell + surface 分两层？
+4. `codex cli`、`Claude Code`、`iflow`、`kiro-cli` 是否统一收敛到 `external AI tooling layer`，并把 execution-provider abstraction 仅作为层内路由语义？
 5. `autonomy evals` 与 `harness` 应否分成两层，而不是合成一层？
 6. 新架构表达形成后，repo 对齐范围应止于 `PROJECT_INTENT / CONSTITUTION / LAWS / AGENTS.md`，还是要继续 sweep 到相关 epic / issue / system 引用文档？
 7. “产品形态抽象方法”是否值得另开独立 pre-brainstorm，而不是继续绑在这条 Freely 自身架构线上？
