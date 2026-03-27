@@ -42,20 +42,21 @@ AI_REASONING_EFFORT="medium"
 EOF
 
 FAKE_BIN="$TMP_DIR/fake-freely"
-cat >"$FAKE_BIN" <<'EOF'
+cat >"$FAKE_BIN" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
-cmd="${1:-}"
+RUNTIME_BIN="$ROOT_DIR/bin/freely"
+cmd="\${1:-}"
 shift || true
-case "$cmd" in
+case "\$cmd" in
   ensure-interruption-dispatch)
     exit 0
     ;;
   ensure-manager)
-    exec bash /Users/zhaoyu/Downloads/code/my-freely/freely/bin/freely ensure-manager "$@"
+    exec bash "\$RUNTIME_BIN" ensure-manager "\$@"
     ;;
   *)
-    exec bash /Users/zhaoyu/Downloads/code/my-freely/freely/bin/freely "$cmd" "$@"
+    exec bash "\$RUNTIME_BIN" "\$cmd" "\$@"
     ;;
 esac
 EOF

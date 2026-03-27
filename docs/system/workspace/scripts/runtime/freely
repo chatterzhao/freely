@@ -5,8 +5,8 @@ TOOL_NAME="freely"
 STATE_DIR_NAME=".freely"
 SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 
-log_info() { echo "[INFO] $*"; }
-log_warn() { echo "[WARN] $*"; }
+log_info() { echo "[INFO] $*" >&2; }
+log_warn() { echo "[WARN] $*" >&2; }
 log_error() { echo "[ERROR] $*" >&2; }
 
 WATCHDOG_CONTROL_PLANE_SKILL_ROOT="$SELF_ROOT/docs/system/workspace/skills/watchdog-control-plane"
@@ -411,7 +411,7 @@ latest_generated_manager_continuity_file_for_project() {
 
 find_latest_manager_continuity_file_for_project() {
   local project="$1"
-  latest_generated_manager_continuity_file_for_project "$project"
+  latest_manager_continuity_file_for_project "$project"
 }
 
 ps_command_for_pid() {
@@ -443,17 +443,17 @@ live_status_activity_state_for_project() {
   supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
   ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
   dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
-  watchdog_pid="$(ensure_manager_watchdog_pid_for_project "$project")"
+  watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
   intake_active="$(count_active_intake_items "$project")"
   if [[ -n "$ai_pid" ]]; then
     printf 'ai_active\n'
-  elif [[ -n "$supervisor_pid" && -n "$dispatcher_pid" && "${intake_active:-0}" -gt 0 ]]; then
-    printf 'supervising_with_pending_intake\n'
   elif [[ -n "$watchdog_pid" && -n "$dispatcher_pid" && "${intake_active:-0}" -gt 0 ]]; then
     printf 'supervising_with_pending_intake\n'
-  elif [[ -n "$supervisor_pid" ]]; then
-    printf 'supervising\n'
+  elif [[ -n "$supervisor_pid" && -n "$dispatcher_pid" && "${intake_active:-0}" -gt 0 ]]; then
+    printf 'supervising_with_pending_intake\n'
   elif [[ -n "$watchdog_pid" ]]; then
+    printf 'supervising\n'
+  elif [[ -n "$supervisor_pid" ]]; then
     printf 'supervising\n'
   elif [[ -n "$dispatcher_pid" ]]; then
     printf 'dispatch_only\n'
@@ -514,18 +514,6 @@ valid_ensure_manager_watchdog_pid_for_project() {
   pid_matches_project "$pid" "$project" "runtime/freely ensure-manager --project"
 }
 
-ensure_manager_watchdog_pid_for_project() {
-  local project="$1" pid_file pid
-  pid_file="$(ensure_manager_watchdog_pid_file "$project")"
-  if [[ -f "$pid_file" ]]; then
-    pid="$(cat "$pid_file" 2>/dev/null || true)"
-    if valid_ensure_manager_watchdog_pid_for_project "$project" "$pid"; then
-      printf '%s\n' "$pid"
-      return 0
-    fi
-  fi
-}
-
 valid_interruption_dispatcher_pid_for_project() {
   local project="$1" pid="$2"
   pid_matches_project "$pid" "$project" "runtime/freely ensure-interruption-dispatch --project"
@@ -537,6 +525,18 @@ interruption_dispatcher_pid_for_project() {
   if [[ -f "$pid_file" ]]; then
     pid="$(cat "$pid_file" 2>/dev/null || true)"
     if valid_interruption_dispatcher_pid_for_project "$project" "$pid"; then
+      printf '%s\n' "$pid"
+      return 0
+    fi
+  fi
+}
+
+manager_watchdog_pid_for_project() {
+  local project="$1" pid_file pid
+  pid_file="$(ensure_manager_watchdog_pid_file "$project")"
+  if [[ -f "$pid_file" ]]; then
+    pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$pid"; then
       printf '%s\n' "$pid"
       return 0
     fi
@@ -1205,37 +1205,6 @@ delegated_continuation_ids_for_project() {
   fi
 }
 
-resolve_manager_delegated_continuations_as_absorbed() {
-  local project="$1" intake_ids_csv="$2" continuity_file="$3"
-  local intake_id resolution_file
-  [[ -n "$project" && -n "$intake_ids_csv" && -n "$continuity_file" && -f "$continuity_file" ]] || return 0
-
-  IFS=',' read -r -a __delegated_absorb_ids <<<"$intake_ids_csv"
-  for intake_id in "${__delegated_absorb_ids[@]}"; do
-    [[ -n "$intake_id" ]] || continue
-    resolution_file="$(mktemp "${TMPDIR:-/tmp}/freely-intake-absorbed.XXXXXX.md")"
-    cat >"$resolution_file" <<EOF
-manager continuity absorbed delegated continuation into canonical supervision output.
-
-- intake_id: $intake_id
-- continuity_file: $continuity_file
-- branch: $(branch_name_for_project "$project")
-- absorbed_at: $(date -u '+%Y-%m-%dT%H:%M:%SZ')
-EOF
-    cmd_intake_resolve \
-      --project "$project" \
-      --intake-id "$intake_id" \
-      --resolved-by manager-runtime-supervisor \
-      --reaction followup \
-      --classification continuation \
-      --linked-artifact "$continuity_file" \
-      --resolution-file "$resolution_file" \
-      --absorption-target "continuity://manager-supervision" \
-      --status absorbed >/dev/null
-    rm -f "$resolution_file"
-  done
-}
-
 csv_item_count() {
   local value="$1"
   [[ -n "$value" ]] || {
@@ -1596,7 +1565,7 @@ cc_debug_log_has_codex_tool_call() {
 log_has_auth_failure() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
-  rg -qi '401|unauthorized|invalid.?token|token.?expired|authentication.?failed|请先登录|subscription.?expired' "$log_file"
+  rg -qi '401|402 payment required|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired' "$log_file"
 }
 
 log_has_codex_usage_limit() {
@@ -1876,11 +1845,53 @@ manager_worker_launch_state_reconcile_same_continuity_prompts() {
 }
 
 manager_worker_launch_state_refresh_for_status() {
-  local project="$1" continuity_file=""
-  [[ -n "$project" && -f "$(manager_worker_launch_state_file "$project")" ]] || return 0
+  local project="$1" continuity_file="" state_file
+  local max_parallel_workers active_running_workers available_new_slots
+  local generated_continuity generated_prompts consumed_continuity consumed_prompts queued_prompts
+  state_file="$(manager_worker_launch_state_file "$project")"
+  [[ -n "$project" && -f "$state_file" ]] || return 0
   continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
   manager_worker_launch_state_reconcile_same_continuity_prompts "$project" "$continuity_file" >/dev/null 2>&1 || true
+
+  # Refresh runtime capacity truth on read so live-status reflects running worker lanes
+  # even when the latest continuity did not itself enqueue or consume a prompt.
+  # shellcheck disable=SC1090
+  source "$state_file"
+  generated_continuity="${LAST_MANAGER_CONTINUITY_GENERATED:-$continuity_file}"
+  generated_prompts="${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-}"
+  consumed_continuity="${LAST_MANAGER_CONTINUITY_CONSUMED:-$continuity_file}"
+  consumed_prompts="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
+  queued_prompts="${QUEUED_WORKER_PROMPTS:-}"
+  max_parallel_workers="$(manager_max_parallel_workers)"
+  active_running_workers="$(count_active_running_workers_for_manager_project "$project")"
+  if [[ "$max_parallel_workers" == "unbounded" ]]; then
+    available_new_slots="unbounded"
+  else
+    if ! [[ "$active_running_workers" =~ ^[0-9]+$ ]]; then
+      active_running_workers="0"
+    fi
+    if (( active_running_workers >= max_parallel_workers )); then
+      available_new_slots="0"
+    else
+      available_new_slots="$((max_parallel_workers - active_running_workers))"
+    fi
+  fi
+
+  if [[ "${MAX_PARALLEL_WORKERS:-}" != "$max_parallel_workers" \
+    || "${ACTIVE_RUNNING_WORKER_COUNT:-}" != "$active_running_workers" \
+    || "${AVAILABLE_NEW_WORKER_SLOTS:-}" != "$available_new_slots" ]]; then
+    write_manager_worker_launch_state \
+      "$project" \
+      "$generated_continuity" \
+      "$generated_prompts" \
+      "$consumed_continuity" \
+      "$consumed_prompts" \
+      "$queued_prompts" \
+      "$max_parallel_workers" \
+      "$active_running_workers" \
+      "$available_new_slots"
+  fi
 }
 
 csv_conflicts_with_item() {
@@ -1919,21 +1930,14 @@ request_local_continuation_reentry() {
 }
 
 latest_manager_continuity_file_for_project() {
-  local project="$1"
-  local continuity_file latest_generated
+  local project="$1" continuity_file
   while IFS= read -r continuity_file; do
-    [[ -n "$continuity_file" ]] || continue
-    if ! manager_continuity_has_worker_prompts "$continuity_file"; then
-      printf '%s\n' "$continuity_file"
-      return 0
-    fi
-    if manager_continuity_has_any_resolved_worker_prompt "$project" "$continuity_file"; then
+    [[ -f "$continuity_file" ]] || continue
+    if manager_continuity_is_launchable_for_project "$project" "$continuity_file"; then
       printf '%s\n' "$continuity_file"
       return 0
     fi
   done < <(find "$(run_dir_for_project "$project")" -maxdepth 1 -type f -name 'manager-continuity-*.md' | sort -r)
-  latest_generated="$(latest_generated_manager_continuity_file_for_project "$project")"
-  [[ -n "$latest_generated" ]] && printf '%s\n' "$latest_generated"
 }
 
 latest_cycle_log_for_project() {
@@ -1953,6 +1957,177 @@ all_manager_worker_prompt_paths_from_continuity() {
   rg -o '/[^` ]+/.freely/run/worker-prompts/[^` ]+\.txt' "$continuity_file" | sort -u
 }
 
+fleet_worktree_paths_for_project() {
+  local project="$1"
+  git -C "$project" worktree list --porcelain 2>/dev/null | awk '/^worktree / {print substr($0, 10)}'
+}
+
+normalize_runtime_worktree_path() {
+  local target_path="$1"
+  [[ -n "$target_path" ]] || return 0
+  if [[ -d "$target_path" ]]; then
+    (
+      cd "$target_path" 2>/dev/null && pwd -P
+    ) || printf '%s\n' "$target_path"
+  else
+    printf '%s\n' "$target_path"
+  fi
+}
+
+fleet_worktree_branch_rows_for_project() {
+  local project="$1"
+  git -C "$project" worktree list --porcelain 2>/dev/null | awk '
+    BEGIN { wt=""; br="(detached)" }
+    /^worktree / { wt=substr($0, 10); br="(detached)" }
+    /^branch / { br=$2; sub(/^refs\/heads\//, "", br) }
+    /^$/ {
+      if (wt != "") {
+        print wt "|" br
+        wt=""
+        br="(detached)"
+      }
+    }
+    END {
+      if (wt != "") {
+        print wt "|" br
+      }
+    }
+  '
+}
+
+manager_continuity_worktree_paths_from_runtime_sections() {
+  local continuity_file="$1"
+  [[ -f "$continuity_file" ]] || return 0
+  awk '
+    function extract_backtick_path(line, value, start_idx, remainder, end_idx) {
+      start_idx=index(line, "`")
+      if (start_idx == 0) {
+        return
+      }
+      remainder=substr(line, start_idx + 1)
+      end_idx=index(remainder, "`")
+      if (end_idx == 0) {
+        return
+      }
+      value=substr(remainder, 1, end_idx - 1)
+      if (value ~ /^\/.*$/) {
+        print value
+      }
+    }
+    /^## / {
+      section=tolower(substr($0, 4))
+      gsub(/[`[:space:]]+$/, "", section)
+      gsub(/[[:space:]]+\/[[:space:]]+/, "|", section)
+      next
+    }
+    /^# / {
+      section=""
+      next
+    }
+    section == "fleet inventory" && $0 ~ /^[[:space:]]*-[[:space:]]*path:[[:space:]]*`\/.*`[[:space:]]*$/ {
+      extract_backtick_path($0)
+      next
+    }
+    (section == "queue" || section == "frozen queue" || section == "cleanup queue" || section == "queue|frozen|cleanup") && $0 ~ /^[[:space:]]*-[[:space:]]*target_worktree:[[:space:]]*`\/.*`[[:space:]]*$/ {
+      extract_backtick_path($0)
+      next
+    }
+  ' "$continuity_file" | sort -u
+}
+
+project_has_worktree_path() {
+  local project="$1" target_path="$2" worktree_path normalized_target normalized_worktree
+  [[ -n "$target_path" ]] || return 1
+  normalized_target="$(normalize_runtime_worktree_path "$target_path")"
+  while IFS= read -r worktree_path; do
+    [[ -n "$worktree_path" ]] || continue
+    normalized_worktree="$(normalize_runtime_worktree_path "$worktree_path")"
+    if [[ "$normalized_worktree" == "$normalized_target" ]]; then
+      return 0
+    fi
+  done < <(fleet_worktree_paths_for_project "$project")
+  return 1
+}
+
+manager_continuity_has_stale_runtime_worktree_refs() {
+  local project="$1" continuity_file="$2" target_path
+  [[ -n "$project" && -f "$continuity_file" ]] || return 1
+  while IFS= read -r target_path; do
+    [[ -n "$target_path" ]] || continue
+    project_has_worktree_path "$project" "$target_path" || return 0
+  done < <(manager_continuity_worktree_paths_from_runtime_sections "$continuity_file")
+  return 1
+}
+
+manager_continuity_missing_runtime_worktree_refs() {
+  local project="$1" continuity_file="$2" target_path
+  [[ -n "$project" && -f "$continuity_file" ]] || return 0
+  while IFS= read -r target_path; do
+    [[ -n "$target_path" ]] || continue
+    project_has_worktree_path "$project" "$target_path" && continue
+    printf '%s\n' "$target_path"
+  done < <(manager_continuity_worktree_paths_from_runtime_sections "$continuity_file")
+}
+
+manager_prompt_fleet_truth_markdown_for_project() {
+  local project="$1"
+  local latest_generated_continuity latest_launchable_continuity generated_stale missing_refs wt_path wt_branch wt_state
+  latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
+  latest_launchable_continuity="$(latest_manager_continuity_file_for_project "$project")"
+  generated_stale="false"
+  missing_refs=""
+
+  if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
+    if manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_generated_continuity"; then
+      generated_stale="true"
+      missing_refs="$(manager_continuity_missing_runtime_worktree_refs "$project" "$latest_generated_continuity")"
+    fi
+  fi
+
+  cat <<EOF
+项目级工位真相：
+- authoritative_source: \`git worktree list --porcelain\`
+- latest_generated_manager_continuity: \`${latest_generated_continuity:-none}\`
+- latest_launchable_manager_continuity: \`${latest_launchable_continuity:-none}\`
+- latest_generated_manager_continuity_stale: \`${generated_stale}\`
+
+## Current Worktree Inventory
+EOF
+
+  while IFS='|' read -r wt_path wt_branch; do
+    [[ -n "$wt_path" ]] || continue
+    if [[ -n "$(git -C "$wt_path" status --porcelain 2>/dev/null)" ]]; then
+      wt_state="DIRTY"
+    else
+      wt_state="CLEAN"
+    fi
+    cat <<EOF
+- path: \`$wt_path\`
+  - branch: \`${wt_branch:-unknown}\`
+  - clean_state: \`${wt_state}\`
+EOF
+  done < <(fleet_worktree_branch_rows_for_project "$project")
+
+  if [[ -n "$missing_refs" ]]; then
+    cat <<EOF
+
+## Stale Runtime Refs
+EOF
+    while IFS= read -r wt_path; do
+      [[ -n "$wt_path" ]] || continue
+      printf -- '- missing_worktree: `%s`\n' "$wt_path"
+    done <<<"$missing_refs"
+  fi
+
+  cat <<'EOF'
+
+Manager continuity truth guard:
+- Treat `Current Worktree Inventory` as the authoritative active fleet for this round.
+- If any continuity references a path absent from that inventory, treat it as stale history, not as current queue/fleet truth.
+- Before writing a new manager continuity, rebuild fleet inventory / queue / cleanup sections from the current worktree inventory rather than copying stale historical paths.
+EOF
+}
+
 manager_worker_prompt_paths_from_continuity_by_mode() {
   local continuity_file="$1" mode="${2:-launchable}"
   [[ -f "$continuity_file" ]] || return 0
@@ -1964,71 +2139,67 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         remaining=substr(remaining, RSTART + RLENGTH)
       }
     }
-    function normalize_key(text,    value) {
-      value=tolower(text)
-      gsub(/[`[:space:]]+$/, "", value)
-      return value
-    }
-    function mode_allows_current_bucket(    bucket) {
-      bucket=current_bucket
-      if (bucket == "frozen queue" || bucket == "frozen_queue") {
-        return (mode != "launchable")
-      }
-      if (bucket == "cleanup queue") {
-        return 0
-      }
-      return (mode != "frozen")
-    }
     /^## / {
-      section=normalize_key(substr($0, 4))
-      current_bucket=""
+      section=tolower(substr($0, 4))
+      gsub(/[`[:space:]]+$/, "", section)
       capture_runtime_worker_prompt=0
+      capture_worker_prompt_path_list=0
+      worker_prompts_subsection=""
       next
     }
     /^# / {
       section=""
-      current_bucket=""
       capture_runtime_worker_prompt=0
+      capture_worker_prompt_path_list=0
+      worker_prompts_subsection=""
       next
     }
     {
-      if (section == "queue") {
-        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt:/) && mode != "frozen") {
-          emit_prompt_paths($0)
+      if (section == "worker prompts") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*launched:[[:space:]]*$/) {
+          worker_prompts_subsection="launched"
+          next
         }
-        next
-      }
-      if (section == "frozen queue") {
-        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt:/) && mode != "launchable") {
-          emit_prompt_paths($0)
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*queue:[[:space:]]*$/) {
+          worker_prompts_subsection="queue"
+          next
         }
-        next
-      }
-      if (section == "queue / frozen / cleanup" || section == "worker prompts" || section == "worker prompt materialization") {
-        if ($0 ~ /^[[:space:]]*-[[:space:]]*(launched|launch queue|queue|frozen queue|frozen_queue|cleanup queue|worker_prompt_paths_created_this_round|worker_prompt_paths_referenced|worker_prompt_paths_superseded):/) {
-          current_bucket=$0
-          sub(/^[[:space:]]*-[[:space:]]*/, "", current_bucket)
-          sub(/:.*/, "", current_bucket)
-          current_bucket=normalize_key(current_bucket)
-          if ($0 ~ /\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt/) {
-            if ((section != "worker prompt materialization" || current_bucket == "worker_prompt_paths_created_this_round") && mode_allows_current_bucket()) {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*frozen_queue:[[:space:]]*$/) {
+          worker_prompts_subsection="frozen"
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+          if (worker_prompts_subsection == "frozen") {
+            if (mode != "launchable") {
+              emit_prompt_paths($0)
+            }
+          } else if (worker_prompts_subsection == "launched" || worker_prompts_subsection == "queue") {
+            if (mode != "frozen") {
               emit_prompt_paths($0)
             }
           }
           next
         }
-        if ($0 ~ /worker_prompt_path:/ || $0 ~ /prompt_path:/) {
-          if ((section != "worker prompt materialization" || current_bucket == "worker_prompt_paths_created_this_round") && mode_allows_current_bucket()) {
-            emit_prompt_paths($0)
-          }
+      }
+      if (section == "queue") {
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "frozen") {
+          emit_prompt_paths($0)
           next
         }
-        if ($0 ~ /^[[:space:]]*-[[:space:]]*\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt[[:space:]]*$/) {
-          if ((section != "worker prompt materialization" || current_bucket == "worker_prompt_paths_created_this_round") && mode_allows_current_bucket()) {
-            emit_prompt_paths($0)
-          }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/ && mode != "frozen") {
+          emit_prompt_paths($0)
+        }
+        next
+      }
+      if (section == "frozen queue") {
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "launchable") {
+          emit_prompt_paths($0)
           next
         }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/ && mode != "launchable") {
+          emit_prompt_paths($0)
+        }
+        next
       }
       if ($0 ~ /- worker_prompt: / || $0 ~ /- active_worker_prompt: / || $0 ~ /- queued_worker_prompt: / || $0 ~ /- refreshed_queued_worker_prompt: /) {
         if (mode != "frozen") {
@@ -2036,12 +2207,24 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         }
         next
       }
-      if ($0 ~ /- runtime worker prompt:/ || $0 ~ /- delegated worker prompt:/) {
+      if ($0 ~ /- delegated worker prompt:/) {
+        capture_worker_prompt_path_list=(mode != "frozen")
+        next
+      }
+      if ($0 ~ /- runtime worker prompt:/) {
         capture_runtime_worker_prompt=1
         next
       }
+      if ($0 ~ /- worker_prompt_paths_created_this_round:/ || $0 ~ /- worker_prompt_paths_referenced_this_round:/ || $0 ~ /- worker_prompt_paths_referenced:/) {
+        capture_worker_prompt_path_list=(mode != "frozen")
+        next
+      }
+      if ($0 ~ /- worker_prompt_paths_superseded:/) {
+        capture_worker_prompt_path_list=0
+        next
+      }
       if (capture_runtime_worker_prompt == 1) {
-        if ($0 ~ /^[[:space:]]*-[[:space:]]*\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt[[:space:]]*$/) {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
           if (mode != "frozen") {
             emit_prompt_paths($0)
           }
@@ -2050,6 +2233,19 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         }
         if ($0 !~ /^[[:space:]]*$/ && $0 !~ /^[[:space:]]*-[[:space:]]/) {
           capture_runtime_worker_prompt=0
+        }
+      }
+      if (capture_worker_prompt_path_list == 1) {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+          emit_prompt_paths($0)
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`none`[[:space:]]*$/ || $0 ~ /^[[:space:]]*`none`[[:space:]]*$/) {
+          capture_worker_prompt_path_list=0
+          next
+        }
+        if ($0 !~ /^[[:space:]]*$/ && $0 !~ /^[[:space:]]*-[[:space:]]/) {
+          capture_worker_prompt_path_list=0
         }
       }
     }
@@ -2160,22 +2356,11 @@ manager_continuity_has_worker_prompts() {
   [[ -n "$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")" ]]
 }
 
-manager_continuity_has_any_resolved_worker_prompt() {
-  local project="$1" continuity_file="$2" prompt_file
-  [[ -f "$continuity_file" ]] || return 1
-  while IFS= read -r prompt_file; do
-    [[ -n "$prompt_file" ]] || continue
-    if [[ -n "$(worker_prompt_resolved_worktree "$project" "$prompt_file")" ]]; then
-      return 0
-    fi
-  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
-  return 1
-}
-
 manager_continuity_has_unconsumed_launchable_worker_prompt() {
   local project="$1" continuity_file="$2"
-  local prompt_file launched_csv=""
+  local prompt_file prompt_generated_csv launched_csv=""
   [[ -f "$continuity_file" ]] || return 1
+  prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
   if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
     # shellcheck disable=SC1090
     source "$(manager_worker_launch_state_file "$project")"
@@ -2199,6 +2384,9 @@ manager_continuity_has_unconsumed_launchable_worker_prompt() {
 manager_continuity_is_launchable_for_project() {
   local project="$1" continuity_file="$2" prompt_file
   [[ -f "$continuity_file" ]] || return 1
+  if manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file"; then
+    return 1
+  fi
   if ! manager_continuity_has_worker_prompts "$continuity_file"; then
     return 0
   fi
@@ -2215,6 +2403,9 @@ latest_launchable_manager_continuity_file_for_project() {
   local project="$1" continuity_file
   while IFS= read -r continuity_file; do
     [[ -f "$continuity_file" ]] || continue
+    if manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file"; then
+      continue
+    fi
     if manager_continuity_is_launchable_for_project "$project" "$continuity_file"; then
       printf '%s\n' "$continuity_file"
       return 0
@@ -2332,12 +2523,7 @@ worker_prompt_write_scope() {
 }
 
 manager_max_parallel_workers() {
-  local value="${FREELY_MANAGER_MAX_PARALLEL_WORKERS:-2}"
-  if [[ "$value" =~ ^[0-9]+$ ]] && (( value >= 1 )); then
-    printf '%s\n' "$value"
-  else
-    printf '2\n'
-  fi
+  printf 'unbounded\n'
 }
 
 all_repo_worktrees_for_project() {
@@ -2377,17 +2563,8 @@ worker_project_busy_with_delegated_continuation() {
 }
 
 manager_worker_launch_available_slots() {
-  local project="$1" max_parallel active_running
-  max_parallel="$(manager_max_parallel_workers)"
-  active_running="$(count_active_running_workers_for_manager_project "$project")"
-  if ! [[ "$active_running" =~ ^[0-9]+$ ]]; then
-    active_running="0"
-  fi
-  if (( active_running >= max_parallel )); then
-    printf '0\n'
-  else
-    printf '%s\n' "$((max_parallel - active_running))"
-  fi
+  local _project="$1"
+  printf 'unbounded\n'
 }
 
 manager_worker_launch_intake_id_for_prompt() {
@@ -2460,7 +2637,7 @@ manager_runtime_launch_workers_from_latest_handoff() {
   local project="$1"
   local continuity_file continuity_generated prompt_generated_csv launched_csv queued_csv
   local launched_count prompt_file prompt_rank prompt_index target_project write_scope
-  local parallel_safe consumes_slot active_running_workers available_new_slots max_parallel_workers
+  local parallel_safe active_running_workers available_new_slots max_parallel_workers
   local selected_write_scopes_csv worker_is_active worker_is_busy prompt_queue_file
   continuity_file="$(latest_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
@@ -2511,10 +2688,8 @@ manager_runtime_launch_workers_from_latest_handoff() {
     parallel_safe="$(worker_prompt_parallel_safe "$prompt_file")"
     worker_is_active="0"
     worker_is_busy="0"
-    consumes_slot="1"
     if worker_project_is_actively_running "$target_project"; then
       worker_is_active="1"
-      consumes_slot="0"
       if worker_project_busy_with_delegated_continuation "$target_project"; then
         worker_is_busy="1"
       fi
@@ -2532,17 +2707,11 @@ manager_runtime_launch_workers_from_latest_handoff() {
       queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
       continue
     fi
-    if [[ "$consumes_slot" == "1" ]] && (( available_new_slots <= 0 )); then
-      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
-      continue
-    fi
-
     if launch_worker_from_manager_prompt_if_needed "$project" "$prompt_file"; then
       launched_csv="$(csv_append_unique_item "$launched_csv" "$prompt_file")"
       selected_write_scopes_csv="$(csv_append_unique_item "$selected_write_scopes_csv" "$write_scope")"
       launched_count=$((launched_count + 1))
-      if [[ "$consumes_slot" == "1" ]]; then
-        available_new_slots=$((available_new_slots - 1))
+      if [[ "$worker_is_active" != "1" ]]; then
         active_running_workers=$((active_running_workers + 1))
       fi
     else
@@ -2646,6 +2815,33 @@ manager_ai_stalled_after_delegated_continuation_prompt() {
       return 1
     fi
   fi
+}
+
+resolve_manager_delegated_continuations_as_absorbed() {
+  local project="$1" intake_ids_csv="$2" continuity_file="$3"
+  local intake_id resolution_file
+  [[ -n "$project" && -n "$intake_ids_csv" && -n "$continuity_file" ]] || return 0
+  resolution_file="$(mktemp /tmp/freely-manager-delegated-absorption.XXXXXX)"
+  cat >"$resolution_file" <<EOF
+restart_point: \`continuation\`
+ownership: \`manager\`
+handoff_summary: 本轮 delegated continuation 已被主管吸收到新 continuity 中。
+EOF
+  IFS=',' read -r -a __manager_delegated_ids <<<"$intake_ids_csv"
+  for intake_id in "${__manager_delegated_ids[@]}"; do
+    [[ -n "$intake_id" ]] || continue
+    cmd_intake_resolve \
+      --project "$project" \
+      --intake-id "$intake_id" \
+      --resolved-by interruption-manager-agent \
+      --reaction followup \
+      --classification continuation \
+      --resolution-file "$resolution_file" \
+      --absorption-target "continuity://manager-supervision" \
+      --status absorbed \
+      --linked-artifact "$continuity_file" >/dev/null
+  done
+  rm -f "$resolution_file"
 }
 
 manager_ai_runtime_recovery_reason() {
@@ -3080,17 +3276,29 @@ EOF
 }
 
 append_fleet_supervision_if_needed() {
-  local fleet_snapshot
+  local fleet_snapshot fleet_truth_markdown
   fleet_snapshot="$(fleet_status_text_for_project "$PROJECT_ROOT")"
-  [[ -n "$fleet_snapshot" ]] || return 0
+  fleet_truth_markdown="$(manager_prompt_fleet_truth_markdown_for_project "$PROJECT_ROOT")"
+  [[ -n "$fleet_snapshot" || -n "$fleet_truth_markdown" ]] || return 0
 
-  cat <<EOF
+  if [[ -n "$fleet_truth_markdown" ]]; then
+    cat <<EOF
+
+$fleet_truth_markdown
+EOF
+  fi
+
+  if [[ -n "$fleet_snapshot" ]]; then
+    cat <<EOF
 
 项目级工位快照：
 \`\`\`
 $fleet_snapshot
 \`\`\`
+EOF
+  fi
 
+  cat <<EOF
 主管模式要求：
 - 若当前轮次承担项目级监督职责，先基于工位快照安排继续开发、冻结、验证、合并和清理顺序。
 - 可并行且互不阻塞的任务，使用 subagent 提高效率。
@@ -3454,14 +3662,16 @@ launch_manager_supervisor() {
   local project="$1"
   local launch_bin
   launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
-  nohup bash "$launch_bin" start --project "$project" >/dev/null 2>&1 </dev/null &
+  bash "$launch_bin" start --project "$project" >/dev/null 2>&1 &
+  disown "$!" 2>/dev/null || true
 }
 
 launch_interruption_dispatcher() {
   local project="$1"
   local launch_bin
   launch_bin="${FREELY_INTERRUPTION_DISPATCH_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
-  nohup bash "$launch_bin" ensure-interruption-dispatch --project "$project" --watch >/dev/null 2>&1 </dev/null &
+  bash "$launch_bin" ensure-interruption-dispatch --project "$project" --watch >/dev/null 2>&1 &
+  disown "$!" 2>/dev/null || true
 }
 
 launch_manager_watchdog() {
@@ -3469,7 +3679,8 @@ launch_manager_watchdog() {
   local launch_bin watch_interval
   launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
   watch_interval="${MANAGER_WATCHDOG_INTERVAL_SECS:-${CHECK_INTERVAL:-5}}"
-  nohup bash "$launch_bin" ensure-manager --project "$project" --watch --interval "$watch_interval" >/dev/null 2>&1 </dev/null &
+  bash "$launch_bin" ensure-manager --project "$project" --watch --interval "$watch_interval" >/dev/null 2>&1 &
+  disown "$!" 2>/dev/null || true
 }
 
 manager_supervisor_pid_for_project() {
@@ -3583,7 +3794,7 @@ restart_manager_supervisor_preserving_handoff() {
 
 ensure_manager_once() {
   local project="$1"
-  local run_dir sup_pid_file current_pid current_identity current_ai_pid
+  local run_dir sup_pid_file current_pid current_ai_pid
 
   run_dir="$(run_dir_for_project "$project")"
   sup_pid_file="$run_dir/supervisor.pid"
@@ -3600,7 +3811,6 @@ ensure_manager_once() {
   fi
 
   if [[ "$AI_TOOL" == "codex" ]]; then
-    current_identity="$(codex_current_cooldown_identity "$project")"
     current_ai_pid="$(manager_ai_pid_for_project "$project")"
     if [[ -n "$current_pid" ]] && [[ -n "$current_ai_pid" ]]; then
       if recover_stalled_manager_ai_if_needed "$project"; then
@@ -3608,13 +3818,16 @@ ensure_manager_once() {
         current_ai_pid=""
       fi
     fi
-    if [[ -n "$current_pid" ]] && [[ -n "$current_identity" ]] && ! codex_slot_is_available_now "$project" "$current_identity" && [[ -z "$current_ai_pid" ]]; then
-      log_warn "manager supervisor is idle on an unavailable codex slot ($current_identity); restarting manager under watchdog control"
-      write_manager_bootstrap_handoff "$project" "manager_limit_detected" "$current_identity" "$current_identity" "manager_process_ended_on_unavailable_slot" "relaunch-manager-after-slot-recovery"
+    if ! ensure_codex_slot_ready_for_manager "$project"; then
+      log_warn "manager bootstrap skipped because no codex slot is ready"
+      return 0
+    fi
+    current_ai_pid="$(manager_ai_pid_for_project "$project")"
+    if [[ -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
+      log_warn "manager supervisor is idle after watchdog recovery gate passed; restarting manager with the latest handoff"
       restart_manager_supervisor_preserving_handoff "$project"
       current_pid=""
     fi
-    ensure_codex_slot_ready_for_manager "$project"
   fi
 
   if [[ -n "$current_pid" ]]; then
@@ -4304,7 +4517,6 @@ cmd_start() {
   while true; do
     local ts prompt_file cycle_log cycle_debug_log mode_name watchdog_script workspace_root
     local delegated_pending_ids delegated_pending_count delegated_consumed_ids delegated_consumed_at
-    local continuity_before_round continuity_after_round round_delegated_consumed_ids
     ts="$(date '+%Y%m%d-%H%M%S')"
     prompt_file="$run_dir/prompt-$ts.txt"
     cycle_log="$logs_dir/cycle-$ts.log"
@@ -4321,7 +4533,6 @@ cmd_start() {
       log_info "manager runtime auto-recovered $recovered_workers expected-running worker(s) before prompt build"
       sleep "${RESTART_DELAY:-2}"
     fi
-    continuity_before_round="$(latest_generated_manager_continuity_file_for_project "$PROJECT_ROOT")"
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
     ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name"
@@ -4329,7 +4540,6 @@ cmd_start() {
     delegated_pending_count="$(csv_item_count "$delegated_pending_ids")"
     delegated_consumed_ids="${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-}"
     delegated_consumed_at="${LAST_DELEGATED_CONTINUATION_CONSUMED_AT:-}"
-    round_delegated_consumed_ids=""
 
     if [[ "$mode_name" == "fresh_with_handoff" ]]; then
       write_session_handoff "$PROJECT_ROOT" "$LAUNCH_ROTATION_REASON"
@@ -4339,7 +4549,6 @@ cmd_start() {
     if [[ -n "$delegated_pending_ids" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
       delegated_consumed_ids="$delegated_pending_ids"
       delegated_consumed_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-      round_delegated_consumed_ids="$delegated_pending_ids"
     fi
     LAST_DELEGATED_CONTINUATION_PENDING_IDS="$delegated_pending_ids"
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
@@ -4562,10 +4771,6 @@ cmd_start() {
       log_warn "restart storm / process churn detected for this workcell; pausing blind relaunch for ${observe_delay}s while waiting for manager auto-loop judgement (reason=$restart_signal_reason count=${LAST_RESTART_STORM_COUNT:-0} peak=${LAST_PROCESS_CHURN_PEAK:-0})"
       sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$observe_delay"
       continue
-    fi
-    continuity_after_round="$(latest_generated_manager_continuity_file_for_project "$PROJECT_ROOT")"
-    if [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" && -n "$round_delegated_consumed_ids" && -n "$continuity_after_round" && -f "$continuity_after_round" && "$continuity_after_round" != "${continuity_before_round:-}" ]]; then
-      resolve_manager_delegated_continuations_as_absorbed "$PROJECT_ROOT" "$round_delegated_consumed_ids" "$continuity_after_round"
     fi
     sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$next_restart_delay"
   done
@@ -5025,8 +5230,8 @@ cmd_live_status() {
   load_session_state_or_defaults "$project"
 
   local run_dir branch role_hint activity_state
-  local supervisor_pid ai_pid dispatcher_pid
-  local supervisor_cmd ai_cmd dispatcher_cmd
+  local supervisor_pid ai_pid dispatcher_pid watchdog_pid
+  local supervisor_cmd ai_cmd dispatcher_cmd watchdog_cmd
   local prompt_file continuity_file prompt_excerpt continuity_excerpt
   local intake_snapshot latest_resolution_snapshot
   local delegated_pending_ids prompt_has_delegated
@@ -5039,9 +5244,11 @@ cmd_live_status() {
   supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
   ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
   dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
   supervisor_cmd="$(ps_command_for_pid "$supervisor_pid")"
   ai_cmd="$(ps_command_for_pid "$ai_pid")"
   dispatcher_cmd="$(ps_command_for_pid "$dispatcher_pid")"
+  watchdog_cmd="$(ps_command_for_pid "$watchdog_pid")"
   prompt_file="$(find_latest_prompt_file_for_project "$project")"
   continuity_file="$(find_latest_manager_continuity_file_for_project "$project")"
   prompt_excerpt="$(trimmed_file_excerpt "$prompt_file" tail 12)"
@@ -5097,11 +5304,28 @@ cmd_live_status() {
   latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
   latest_generated_prompts_csv="none"
   if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
+    if manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_generated_continuity"; then
+      latest_generated_continuity="$(latest_manager_continuity_file_for_project "$project")"
+    fi
+  fi
+  if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
     latest_generated_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_generated_continuity")"
     [[ -n "$latest_generated_prompts_csv" ]] || latest_generated_prompts_csv="none"
     if [[ "$latest_manager_continuity_generated" == "unavailable" || "$latest_manager_continuity_generated" != "$latest_generated_continuity" ]]; then
       latest_manager_continuity_generated="$latest_generated_continuity"
       latest_manager_worker_prompts_generated="$latest_generated_prompts_csv"
+    fi
+  fi
+  if [[ -n "$latest_manager_continuity_consumed" && "$latest_manager_continuity_consumed" != "unavailable" ]]; then
+    if [[ ! -f "$latest_manager_continuity_consumed" ]] || manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_manager_continuity_consumed"; then
+      if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
+        latest_manager_continuity_consumed="$latest_generated_continuity"
+        latest_manager_worker_prompts_consumed="$(csv_retain_exact_items "${latest_manager_worker_prompts_consumed:-}" "$latest_generated_prompts_csv")"
+        [[ -n "$latest_manager_worker_prompts_consumed" ]] || latest_manager_worker_prompts_consumed="none"
+      else
+        latest_manager_continuity_consumed="unavailable"
+        latest_manager_worker_prompts_consumed="none"
+      fi
     fi
   fi
 
@@ -5137,20 +5361,16 @@ cmd_live_status() {
   echo "active_running_worker_count: ${active_running_worker_count}"
   echo "available_new_worker_slots: ${available_new_worker_slots}"
 
-  local watchdog_pid watchdog_cmd
-  watchdog_pid="$(ensure_manager_watchdog_pid_for_project "$project")"
-  watchdog_cmd="$(ps_command_for_pid "$watchdog_pid")"
-
-  if [[ -n "$supervisor_pid" || -n "$dispatcher_pid" || -n "$watchdog_pid" || -n "$ai_pid" ]]; then
+  if [[ -n "$supervisor_pid" || -n "$watchdog_pid" || -n "$dispatcher_pid" || -n "$ai_pid" ]]; then
     echo "active_processes:"
     if [[ -n "$supervisor_pid" ]]; then
       echo "- role=supervisor pid=$supervisor_pid command=${supervisor_cmd:-unavailable}"
     fi
-    if [[ -n "$dispatcher_pid" ]]; then
-      echo "- role=interruption_dispatcher pid=$dispatcher_pid command=${dispatcher_cmd:-unavailable}"
-    fi
     if [[ -n "$watchdog_pid" ]]; then
       echo "- role=manager_watchdog pid=$watchdog_pid command=${watchdog_cmd:-unavailable}"
+    fi
+    if [[ -n "$dispatcher_pid" ]]; then
+      echo "- role=interruption_dispatcher pid=$dispatcher_pid command=${dispatcher_cmd:-unavailable}"
     fi
     if [[ -n "$ai_pid" ]]; then
       echo "- role=ai pid=$ai_pid command=${ai_cmd:-unavailable}"

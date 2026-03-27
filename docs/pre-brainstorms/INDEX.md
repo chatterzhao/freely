@@ -2,7 +2,9 @@
 - 20260326-1705--manager-owner-stance-and-source-patrol
 - 20260326-1825--deep-refactor-fleet-sequencing
 - 20260326-0445--manager-delegated-intake-absorption-closure
+- 20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance
 - 20260325-0525--watchdog-slot-sweep-without-cooldown-governance
+- 20260325-0333--testing-evidence-ladder-and-real-environment-gates
 - 20260324-0405--watchdog-restart-storm-and-process-churn-detection
 - 20260324-0415--application-native-observability-planes
 - 20260323-2045--manager-worker-scheduler-capacity-and-queueing
@@ -63,9 +65,15 @@
 - 20260326-0445--manager-delegated-intake-absorption-closure
   - brainstorms: docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/brainstorms.md
   - candidates: docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/candidates.md
+- 20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance
+  - brainstorms: docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md
 - 20260325-0525--watchdog-slot-sweep-without-cooldown-governance
   - brainstorms: docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md
+- 20260325-0333--testing-evidence-ladder-and-real-environment-gates
+  - brainstorms: docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md
 - 20260324-0405--watchdog-restart-storm-and-process-churn-detection
   - brainstorms: docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/brainstorms.md
   - candidates: docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/candidates.md

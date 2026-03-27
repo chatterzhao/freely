@@ -5,32 +5,26 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_HOME="$(mktemp -d /tmp/freely-ai-cli-whoami-slot-identity.XXXXXX)"
 trap 'rm -rf "$TMP_HOME"' EXIT
 
-slot_name="slot-label-does-not-match-auth-7"
-auth_email="metadata@example.com"
-payload="$(python3 - <<'PY' "$auth_email"
-import base64
-import json
-import sys
-
-payload = base64.urlsafe_b64encode(json.dumps({"email": sys.argv[1]}).encode()).decode().rstrip("=")
-print(payload)
+payload="$(python3 - <<'PY'
+import base64, json
+print(base64.urlsafe_b64encode(json.dumps({"email":"metadata@example.com"}).encode()).decode().rstrip("="))
 PY
 )"
 
-mkdir -p "$TMP_HOME/.ai-auth/codex-$slot_name" "$TMP_HOME/.codex"
-printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$payload" >"$TMP_HOME/.ai-auth/codex-$slot_name/auth.json"
-cp "$TMP_HOME/.ai-auth/codex-$slot_name/auth.json" "$TMP_HOME/.codex/auth.json"
-printf '%s\n' "$slot_name" >"$TMP_HOME/.codex/active-slot"
+mkdir -p "$TMP_HOME/.ai-auth/codex-slot-label-does-not-match-auth-7" "$TMP_HOME/.codex"
+printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$payload" >"$TMP_HOME/.ai-auth/codex-slot-label-does-not-match-auth-7/auth.json"
+cp "$TMP_HOME/.ai-auth/codex-slot-label-does-not-match-auth-7/auth.json" "$TMP_HOME/.codex/auth.json"
+printf 'slot-label-does-not-match-auth-7\n' >"$TMP_HOME/.codex/active-slot"
 
-HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex >"$TMP_HOME/whoami.json"
-HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" whoami codex >"$TMP_HOME/whoami.txt"
+json_out="$(HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)"
+text_out="$(HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" whoami codex)"
 
-grep -q '"slot": "'"$slot_name"'"' "$TMP_HOME/whoami.json"
-grep -q '"auth_email": "'"$auth_email"'"' "$TMP_HOME/whoami.json"
-grep -q 'Current slot: '"$slot_name" "$TMP_HOME/whoami.txt"
-grep -q 'Current auth email: '"$auth_email" "$TMP_HOME/whoami.txt"
-if grep -q 'Current account:' "$TMP_HOME/whoami.txt"; then
-  echo "[FAIL] whoami text output should not label auth metadata as current account" >&2
+grep -q '"slot": "slot-label-does-not-match-auth-7"' <(printf '%s\n' "$json_out")
+grep -q '"auth_email": "metadata@example.com"' <(printf '%s\n' "$json_out")
+grep -q 'Current slot: slot-label-does-not-match-auth-7' <(printf '%s\n' "$text_out")
+grep -q 'Current auth email: metadata@example.com' <(printf '%s\n' "$text_out")
+if printf '%s\n' "$text_out" | grep -q 'Current account:'; then
+  echo "[FAIL] whoami should not describe auth email metadata as the current account identity" >&2
   exit 1
 fi
 

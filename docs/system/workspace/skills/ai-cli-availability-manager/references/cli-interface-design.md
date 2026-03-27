@@ -16,7 +16,7 @@ CLI (核心) → API (可选) → UI (可选)
 
 ```bash
 # 直接执行，无确认提示
-freely ai-cli switch codex work@company.com-1 --yes
+freely ai-cli switch codex work@company.com --yes
 
 # 输出结构化数据
 freely ai-cli list --format json
@@ -39,16 +39,16 @@ freely ai-cli whoami --format json
 freely ai-cli switch codex work@company.com
 
 # 输出：
-# 当前 slot: personal@outlook-com-1
-# 切换到: work@company.com-1
+# 当前账号: personal@outlook.com
+# 切换到: work@company.com
 # 确认? [y/N] y
 # 已切换到 work@company.com
 
 # 选择菜单
 freely ai-cli switch codex
-# > personal@outlook-com-1
-#   work@company.com-1
-#   backup@gmail.com-2
+# > personal@outlook.com
+#   work@company.com
+#   backup@gmail.com
 ```
 
 ## CLI 调用者类型
@@ -82,14 +82,14 @@ freely ai-cli init [--yes]
 # 显示当前 slot
 freely ai-cli whoami [tool]
 
-# 保存当前登录（自动检测 auth email 并生成 slot）
+# 保存当前登录（自动检测授权邮箱元数据）
 freely ai-cli save codex [--yes]
 
 # 切换 slot
 freely ai-cli switch codex [slot] [--yes]
-# slot 省略时自动 probe 并只切到当前真实可用的 slot
+# slot 省略时自动 probe 并只切到当前可用 slot
 
-# 列出 slot
+# 列出账号
 freely ai-cli list [--format json|yaml|text]
 
 # 状态
@@ -99,15 +99,15 @@ freely ai-cli status [--format json|yaml|text]
 freely ai-cli delete codex <account> [--yes]
 ```
 
-## Slot 与 auth 元数据
+## 授权元数据自动检测
 
-`.ai-auth/<slot>` 是唯一身份；`save` 和 `whoami` 会从 auth.json 提取 `auth_email` 作为元数据：
+`save` 和 `whoami` 命令自动从 auth.json 提取授权邮箱元数据，但该邮箱不是当前 slot identity：
 
 ```bash
 # codex: 从 JWT id_token 提取 email
 freely ai-cli save codex
 # Detected auth email: worahe3973@outlook.com
-# Saved to: ~/.ai-auth/codex-worahe3973@outlook-com-1/
+# Saved to: ~/.ai-auth/codex-worahe3973@outlook.com/
 
 # iflow: 从环境变量读取（需配置）
 freely ai-cli save iflow
@@ -134,7 +134,6 @@ Last modified: Mar 16 15:50:34 2026
   "auth": "present",
   "slot": "worahe3973@outlook-com-1",
   "auth_email": "worahe3973@outlook.com",
-  "account": "worahe3973@outlook.com",
   "last_modified": "Mar 16 15:50:34 2026"
 }
 ```
@@ -144,8 +143,8 @@ Last modified: Mar 16 15:50:34 2026
 ```
 ~/.ai-auth/
 ├── codex-personal@outlook-com-1/auth.json
-├── codex-work@company-com-1/auth.json
-└── codex-backup@gmail-com-2/auth.json
+├── codex-work@company-com-2/auth.json
+└── codex-backup@gmail-com-1/auth.json
 ```
 
 ## AI Agent 集成示例

@@ -51,6 +51,17 @@
   - failure signal
   - failure handling / replay expectation
 - 若存在 merge 后验收，显式标记 `post-merge acceptance`
+- 在 `pre-tests.md` 中写清 story-level 质量 gate 最低字段：
+  - acceptance target
+  - testing layer
+  - target environment
+  - required evidence
+  - blocker taxonomy
+- 最小 blocker taxonomy 至少区分：
+  - `definition_missing`
+  - `commands_only`
+  - `evidence_plan_missing`
+  - `execution_pending_or_failed`
 - 对 `post-merge acceptance`，必须同时写出：
   - target environment: `develop` 或 `pre-test-merge`
   - environment type: `protected verification worktree`

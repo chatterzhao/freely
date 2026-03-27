@@ -2,73 +2,58 @@
 
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- phase_state: `completed`
-- runtime_state: `closed_for_this_batch`
-- branch: `feature/watchdog-probe-early-deactivated-workspace-detect-20260326`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-probe-early-deactivated-workspace-detect`
+- phase_state: `in_verification`
+- runtime_state: `stalled_without_runtime`
+- branch: `feature/develop-merge-prep-fleet-closure-20260325`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-develop-merge-prep-fleet-closure`
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
-  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "continuation-worker"}
+  - {tool: codex, session_id: "019d29a9-5895-74b0-aee5-b3d44d9f2390", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-20-57-019d29a9-5895-74b0-aee5-b3d44d9f2390.jsonl", role: "manager-closeout-audit"}
+  - {tool: codex, session_id: "019d29b2-d89b-7393-9704-c7ea6cd0b526", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-31-19-019d29b2-d89b-7393-9704-c7ea6cd0b526.jsonl", role: "manager-closeout-audit-refresh"}
+  - {tool: codex, session_id: "019d29b7-4cf6-7f23-a8d0-39f1176fad36", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-36-11-019d29b7-4cf6-7f23-a8d0-39f1176fad36.jsonl", role: "manager-closeout-audit-current"}
+  - {tool: codex, session_id: "019d29bb-9572-74f0-99dd-3b066647ea6a", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-40-52-019d29bb-9572-74f0-99dd-3b066647ea6a.jsonl", role: "manager-closeout-audit-fresh-recheck"}
+  - {tool: codex, session_id: "019d29c0-a278-7833-be12-65efef7889cd", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-46-23-019d29c0-a278-7833-be12-65efef7889cd.jsonl", role: "manager-closeout-audit-current-fresh-session"}
+  - {tool: codex, session_id: "019d29f2-3953-75f2-9be9-34822f55f374", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T04-40-33-019d29f2-3953-75f2-9be9-34822f55f374.jsonl", role: "manager-closeout-audit-fleet-refresh"}
+  - {tool: codex, session_id: "019d29f6-6f39-71e1-ae7a-1676f191b63c", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T04-45-09-019d29f6-6f39-71e1-ae7a-1676f191b63c.jsonl", role: "manager-closeout-audit-authoritative-refresh"}
+  - {tool: codex, session_id: "019d2a17-0762-7720-80f2-03ea4786077b", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T05-20-45-019d2a17-0762-7720-80f2-03ea4786077b.jsonl", role: "manager-closeout-audit-first-jump-refresh"}
+  - {tool: codex, session_id: "019d2a66-1e0b-7563-a4b7-e38b2d5d971b", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T06-47-08-019d2a66-1e0b-7563-a4b7-e38b2d5d971b.jsonl", role: "manager-closeout-audit-current-refresh"}
+  - {tool: codex, session_id: "019d2c8b-59c1-7713-9f67-8ff2a6455a8c", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T16-47-03-019d2c8b-59c1-7713-9f67-8ff2a6455a8c.jsonl", role: "manager-closeout-audit-continuity-stabilization"}
+  - {tool: codex, session_id: "019d2c94-db34-7012-b942-129dc5dfa98e", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T16-57-26-019d2c94-db34-7012-b942-129dc5dfa98e.jsonl", role: "manager-closeout-audit-authoritative-fleet-refresh"}
 
 ## Summary
 
-- 2026-03-25 新 pre-brainstorm `C-20260325-0525-A` 已完成首跳判断，并作为 supporting evidence 被本 issue 吸收：
-  - 当前恢复 contract 的主问题不再是“slot-first cooldown 写回是否对齐”，而是 cooldown 本身是否还应继续充当控制面真相
-  - 当前判断：`rate limit`、`deactivated_workspace`、auth failure / invalid auth file、slot probe failure，都应统一进入 failure-driven full slot sweep
-  - `all slots unavailable` 时允许保留 earliest-reset 作为 debug / 排序提示，但恢复主路径应基于低频真实 reprobe，而不是继续依赖 cooldown ledger
-  - 这意味着本 issue 的下一跳不是直接 merge review，而是先在同 issue family 内重开 doc-loop / dev-loop，完成 contract rewrite
-- 2026-03-25 当前 worktree 已完成这一轮 doc-loop + dev-loop + focused verification：
-  - `availability-watchdog.sh` 不再以 cooldown/earliest-reset 作为主恢复 gate；`ensure_codex_slot_ready_for_manager()` 现改为 current-slot probe + full saved-slot sweep
-  - `probe_all_codex_slots_and_update_cooldown()` 在 sweep 失败时恢复原 auth/active-slot，不再把最后一个失败 slot 留在真实 Codex 工作位；找到 usable slot 时会在返回前把 active slot 推回该 usable slot
-  - `ai-cli switch codex` 自动模式现在只会切到真实 probe 成功的 usable slot；`all_unavailable` 仅返回 debug hint，不再把 earliest-reset slot 强行切进真实工作位
-  - focused regressions 已重写为 slot-sweep-first contract：
-    - `test-freely-ai-account-switch`
-    - `test-freely-ensure-manager`
-    - `test-freely-ensure-manager-earliest-reset-wait-revive`
-  - 这一轮验证已通过，当前保持 `in_verification`，等待后续 code review / manager merge judgement
-- 2026-03-26 canonical develop replay 暴露出同族控制面缺口：
-  - 最新 delegated continuations 已进入 `.freely/intake/` 的 `delegated` 状态
-  - 但 canonical runtime 因 manager `auth_failure` 掉到 `stalled_without_runtime`，现场没有任何存活的 `ensure-manager --watch` / interruption dispatcher 继续消化这些 intake
-  - 当前判断：不是新 issue，而是本 issue 的 script-owned recovery contract 仍缺一条 detached control-plane survival gate
-- 2026-03-26 当前 continuation 已补上这条控制面恢复：
-  - `runtime/freely` 里的 `launch_manager_supervisor()`、`launch_interruption_dispatcher()`、`launch_manager_watchdog()` 已改为 `nohup` detached launch，避免父 supervisor 因 `auth_failure` 退出时把控制面一起带掉
-  - 新增 focused regression `test-freely-auth-failure-keeps-control-plane-alive`
-  - 继续复跑 `test-freely-manager-watchdog-live-during-active-ai` 与 `test-freely-rate-limit-defers-to-watchdog`，证明 detached launch 没有破坏既有 watchdog 生命周期或 rate-limit 委派路径
-- 2026-03-26 紧接的 canonical replay 又暴露出两个 same-family 尾巴：
-  - `cmd_start()` 启动 interruption dispatcher 后没有等待 ready，因此 fresh start 允许带着“半个控制面”继续向下执行
-  - `live-status` / `activity_state` 不把 `ensure-manager --watch` 算入 control-plane，watchdog-only 现场会被误报成 `stalled_without_runtime`
-- 2026-03-26 当前 continuation 已补上这两个 acceptance gap：
-  - `cmd_start()` 现在在 `launch_interruption_dispatcher()` 后强制 `ensure_interruption_dispatcher_ready_or_fail()`
-  - `live_status_activity_state_for_project()` 与 `cmd_live_status()` 现在都会 surface `role=manager_watchdog`
-  - 新增 focused regressions：
-    - `test-freely-start-requires-interruption-dispatcher-ready`
-    - `test-freely-live-status-watchdog-survival`
-  - 现有 `test-freely-live-status` 也已扩展为断言 watchdog surface
-- 2026-03-26 最新 live continuation 又补上两条同族 gap：
-  - 当前 shared switch lock 之前只冻结 `switch` / `whoami` / `list` / watchdog probe / `ensure-manager`，没有冻结真正的 `codex exec` 启动面；这会让 auto switch 选出 `usable` slot 后，第一条真实 launch 仍可能踩在切换窗口里命中 `402`
-  - `wait_for_codex_slot_switch_idle()` 的 warning 之前写到 stdout，进而污染 `codex_current_slot()`、`LAST_ACTIVE_SLOT`、`baseline-status` 一类机器可读 truth
-- 2026-03-26 当前 continuation 已补上 slot switch global launch gate：
-  - `tool-launchers.sh` 现在在 `exec codex` 前显式等待 shared switch lock 释放，manager / worker / monitor launch 不再绕过切换窗口
-  - `availability-watchdog.sh` 里的 switch-wait warning 现强制走 stderr，避免 slot/session/launch truth 被提示文本污染
-  - 新增 focused regressions：
-    - `test-monitor-ai-cli-codex-defers-during-account-switch`
-    - `test-freely-codex-current-slot-does-not-capture-switch-warning`
-  - 既有 `test-freely-ensure-manager-defers-during-account-switch` 已同步升级到 slot-sweep-first contract，并通过新的真实 probe mock 继续验证 defer + relaunch 路径
-- 2026-03-26 当前现场又补出一条 switch observability 缺口：
-  - `bin/ai switch codex` 的单 slot probe 现在默认只给 `CODEX_PROBE_TIMEOUT=15` 秒；超时后 watchdog 只回 `timeout`，现场无法区分网络/代理慢、CLI 卡住，还是 `402 deactivated_workspace` 已经返回但被 timeout 截断
-  - 当前 continuation 已把 timeout/deactivated-workspace probe output 落到 `.freely/run/codex-probe-artifacts/`，并新增 focused regression `test-freely-codex-probe-timeout-artifact`
-  - 同轮 verification 已补 `20260326-slot-probe-timeout-observability-verification.md`，明确本轮只把 timeout observability 与 probe lock contract 作为 merge 证据，不把旧工位里未收干净的 `test-freely-ensure-manager` 漂移误算为本次回归
-- 2026-03-26 live artifact 继续暴露出一条同族行为缺口：
-  - 新的 `.freely/run/codex-probe-artifacts/*` 已证明多轮所谓 `timeout` 在 15 秒窗口内其实已经拿到了 `402 Payment Required` 和 `deactivated_workspace`
-  - 当前实现仍会继续等到 Codex 自己的 websocket/https fallback/retry 全部拖过 timeout，才把该 slot 记成 `timeout`
-  - 当前 continuation 已把这条判定前移：probe 轮询期一旦看见 `402/deactivated_workspace`，立刻落 artifact、返回 `deactivated_workspace`，并让 slot sweep 继续，而不是再额外浪费一个 timeout 周期
-- 本轮 continuation 已吸收 delegated handoff 中的五点 contract，并确认对应实现已经落在当前分支祖先：
-  - all accounts unusable 时选择最早 reset 账号
-  - wait 采用 `reset_at + 60s` 等价 buffer 契约，可由 watchdog buffer 环境变量调节
+- 2026-03-26 current authoritative patrol re-ran `./bin/freely live-status --project ...`, `git worktree list --porcelain`, `./bin/wt-status-all`, `git status --short --branch`, and `git rev-list --left-right --count develop...HEAD`. The route still stays `continuation -> completion_verification -> worktree-maintenance-governance`, but the current truth now supersedes every older 7-tree / 10-tree / 12-tree snapshot: `live-status` reports `activity_state=stalled_without_runtime`, `desired_runtime_state=stopped`, `last_exit_reason=operator_stop`, and non-empty `pending_delegated_continuation_ids`; `git worktree list --porcelain` plus `./bin/wt-status-all` show 5 worktrees with `Summary: total=5, dirty=1`; the only dirty owner remains `feature/develop-merge-prep-fleet-closure-20260325`; and this branch now sits `ahead 167 / behind 1` relative to current `develop`.
+- 2026-03-26 same-family continuation absorbed additional watchdog/control-plane evidence without opening a new issue: slot-only identity with `auth_email` as metadata, detached manager/watchdog/dispatcher survival after manager `auth_failure`, watchdog-only `live-status` surfacing plus dispatcher-ready start gate, and slot probe timeout / `deactivated_workspace` partial-output artifacts in `.freely/run`.
+- `C-20260323-2045-A` remains frozen as `needs_research / retained-with-reason`; its blocker is still canonical `develop` proof writeback for direct dispatch, queued-lane retention, and busy-worker no-duplicate-launch behavior, not replay-owner-local evidence.
+- Current closeout judgement: the lane is review-ready enough for manager-owned continuity writeback, but not promote-closed and not cleanup-admissible. Protected manager merge judgement, canonical `develop` replay, develop-side completion verification, and explicit delegated-continuation absorption/closure still remain outstanding.
+- 2026-03-26 16:53 PDT current continuity stabilization rechecked the delegated continuation handoff, current `live-status`, and the six-file dirty set, and confirmed no new scope drift: all remaining edits are still same-family closeout evidence for `I-20260318-1630` plus the explicit `C-20260323-2045-A` blocker carry-forward. No additional fleet truth changed after the 16:38 PDT refresh; the closeout lane therefore stays `review-ready but not promote-closed`, and the writeback is now coherent enough for protected manager merge judgement. This worktree still cannot claim cleanup, because latest-`develop` absorption, canonical replay, and develop-side completion verification remain outstanding.
+- 2026-03-26 16:38 PDT current refresh re-read `AGENTS.md` / `PROJECT_INTENT.md` / `CONSTITUTION.md` / `LAWS.md`, re-ran `./bin/freely live-status --project ...`、`./bin/freely fleet-status --project ...`、`git worktree list --porcelain`、`./bin/wt-status-all`、targeted sibling `git status --short` 与 `git rev-list --left-right --count develop...HEAD`, and confirmed the route still stays `continuation -> completion_verification -> worktree-maintenance-governance`. The authoritative fleet truth still remains a 10-worktree inventory with `Summary: total=10, dirty=2`; only `feature/manager-scheduler-capacity-candidate-replay-20260324` and `feature/develop-merge-prep-fleet-closure-20260325` are dirty, and the clean sibling dispositions remain unchanged. The only new truth drift is branch divergence: this replay owner now sits `ahead 162 / behind 12` relative to latest `develop`, so manager merge judgement, latest-develop absorption, canonical replay, and develop-side completion verification remain mandatory before cleanup. The scheduler candidate blocker also stays unchanged: it is still blocked on canonical `develop` proof writeback from `I-20260318-1630`, not on replay-owner-local evidence.
+- 2026-03-26 05:26 PDT current first-jump refresh re-read `AGENTS.md` / `PROJECT_INTENT.md` / `CONSTITUTION.md` / `LAWS.md`, re-ran `./bin/freely live-status --project ...`、`./bin/freely fleet-status --project ...`、`git worktree list --porcelain`、`./bin/wt-status-all`、targeted sibling `git status --short` 与 `git rev-list --left-right --count develop...HEAD`, and confirmed the route still stays `continuation -> completion_verification -> worktree-maintenance-governance`. The authoritative fleet truth remains a 10-worktree inventory with `Summary: total=10, dirty=2`; only `feature/manager-scheduler-capacity-candidate-replay-20260324` and `feature/develop-merge-prep-fleet-closure-20260325` are dirty. The clean sibling dispositions remain unchanged: intake stays `supervision-needed`, latest-manager-continuity stays unresolved verification/cleanup followthrough, watchdog auth-failure stays `ownership-followthrough-needed`, watchdog live-status stays `cleanup-followthrough-needed`, and the two slot-gating trees stay `supervision-needed`. This branch still sits `ahead 162 / behind 10` relative to latest `develop`, so manager merge judgement, latest-develop absorption, canonical replay, and develop-side completion verification remain mandatory before cleanup. The scheduler candidate blocker also stays unchanged: it is still blocked on canonical `develop` proof writeback from `I-20260318-1630`, not on replay-owner-local evidence.
+- 2026-03-26 04:57 PDT current authoritative refresh re-read `AGENTS.md` / `PROJECT_INTENT.md` / `CONSTITUTION.md` / `LAWS.md`, re-ran `./bin/freely live-status --project ...`、`./bin/freely fleet-status --project ...`、`git worktree list --porcelain`、`./bin/wt-status-all`、targeted sibling `git status --short` 与 `git rev-list --left-right --count develop...HEAD`, and confirmed the route still stays `continuation -> completion_verification -> worktree-maintenance-governance`. The authoritative fleet truth remains a 10-worktree inventory, but the latest stable recheck has moved from `Summary: total=10, dirty=3` to `Summary: total=10, dirty=2`: only `feature/manager-scheduler-capacity-candidate-replay-20260324` and `feature/develop-merge-prep-fleet-closure-20260325` are still dirty. `feature/intake-absorption-closure-governance-20260326` is now clean and sits `develop...HEAD = 1/0`, so it no longer qualifies as a dirty unpublished lane or this issue's cleanup blocker; because canonical docs still lack explicit owner/phase absorption for that branch, it stays `supervision-needed`. This branch now sits `ahead 162 / behind 10` relative to latest `develop`, so manager merge judgement plus latest-develop absorption remain mandatory before any canonical replay or cleanup claim.
+- 2026-03-26 04:47 PDT current fleet-refresh session re-read `AGENTS.md` / `PROJECT_INTENT.md` / `CONSTITUTION.md` / `LAWS.md`, re-ran `./bin/freely live-status --project ...`、`./bin/freely fleet-status --project ...`、`git worktree list --porcelain`、`./bin/wt-status-all`、`git status --short` 与 `git rev-list --left-right --count develop...HEAD`, and confirmed the route still stays `continuation -> completion_verification -> worktree-maintenance-governance`. The authoritative truth has moved again: fleet inventory is now 10 worktrees with `Summary: total=10, dirty=3`; dirty owners are `feature/manager-scheduler-capacity-candidate-replay-20260324`, `feature/develop-merge-prep-fleet-closure-20260325`, and `feature/intake-absorption-closure-governance-20260326`. The scheduler lane remains `needs_research / retained-with-reason` but is no longer clean, while the intake lane is currently a stopped dirty unpublished lane whose candidate / issue / milestone materialization exists only in its local uncommitted docs. This branch now sits `ahead 162 / behind 8` relative to latest `develop`, so manager merge judgement plus latest-develop absorption remain mandatory before any canonical replay or cleanup claim.
+- 2026-03-26 03:53 PDT current fresh session re-read `AGENTS.md` / `PROJECT_INTENT.md` / `CONSTITUTION.md` / `LAWS.md`, re-ran `./bin/freely live-status --project ...`、`./bin/freely fleet-status --project ...`、`git worktree list --porcelain`、`./bin/wt-status-all`、`git status --short` 与 `git rev-list --left-right --count develop...HEAD`, and confirmed the route still stays `continuation -> completion_verification -> worktree-maintenance-governance`. The current truth is unchanged: authoritative fleet inventory remains 7 worktrees, `Summary: total=7, dirty=1`, the only dirty owner remains `feature/develop-merge-prep-fleet-closure-20260325`, and this branch still sits `ahead 162 / behind 6` relative to latest `develop`. A fresh manager continuity / prompt pair is therefore required, but no new worker prompt is admissible.
+- 2026-03-26 03:49 PDT current live recheck re-read `AGENTS.md` / `PROJECT_INTENT.md` / `CONSTITUTION.md` / `LAWS.md`, re-ran `./bin/freely live-status --project ...`、`./bin/freely fleet-status --project ...`、`git worktree list --porcelain`、`./bin/wt-status-all` 与 `git rev-list --left-right --count develop...HEAD`, and confirmed the route still stays `continuation -> completion_verification -> worktree-maintenance-governance`. `live-status` remains `last_launch_kind=fresh`, `last_rotation_reason=initial_start`, and `pending_delegated_continuation_ids=none`, so the current lane continues manager-owned closeout writeback instead of reopening doc/dev-loop or emitting a new worker prompt.
+- 2026-03-26 03:43 PDT current continuation re-ran `live-status`、`fleet-status`、`git worktree list --porcelain`、`./bin/wt-status-all` 与 `git rev-list --left-right --count develop...HEAD` after absorbing the latest manager continuity, and the route still stays `continuation -> completion_verification -> worktree-maintenance-governance` with no new worker lane.
+- 2026-03-26 03:33 PDT current fresh session re-ran `live-status`、`fleet-status`、`git worktree list --porcelain`、`./bin/wt-status-all` 与 `git rev-list --left-right --count develop...HEAD`，确认 closeout judgement 仍与 03:28 manager continuity 一致：route 继续保持 `continuation -> completion_verification -> worktree-maintenance-governance`，当前 lane 不释放新 worker prompt，也不降级回新的 doc/dev-loop。
+- 2026-03-26 当前 manager-owned closeout audit 已切到 authoritative active fleet 中唯一 dirty owner `feature/develop-merge-prep-fleet-closure-20260325` 继续写回；旧的 `feature/watchdog-family-replay-20260325` 已不在当前 7-tree inventory 中，因此不再作为本轮 continuation 的 branch/worktree truth。
+- 2026-03-25 新 pre-brainstorm `C-20260325-0921-A` 已完成首跳判断，并作为 supporting evidence 被本 issue 吸收：
+  - 当前恢复 contract 的主问题不再只是“slot-sweep-first 是否建立”，而是 probe 窗口是否真正独占、是否仍残留 cooldown 逻辑、以及 all-unavailable 时是否还会错误拉起 AI
+  - 当前判断：`cooldown` 应彻底退出恢复逻辑；slot sweep / reprobe 期间必须阻塞 AI launch；all-unavailable 时 watchdog 保持活着，但 manager / worker 保持 down，直到 inventory 变化或低频 probe 找到 usable slot
+  - 这意味着本 issue 当前不进入 merge judgement，而是先回到 doc-loop + dev-loop 完成 strict probe-gating rewrite
+- 2026-03-25 当前 worktree 正在做这一轮 stricter rewrite：
+  - 已先更新 pre-brainstorm、issue、pre-tests、tasks、progress、milestones，把 no-launch probe-gating 和 wake-only recovery 固定为 acceptance contract
+  - 已完成 `availability-watchdog.sh`、`runtime/freely`、`ai-cli` 和 focused regressions 的收口，去掉 cooldown 逻辑残留并补上 all-unavailable / inventory-change wake 验证
+- 2026-03-25 live 调查又暴露出一条更底层的 identity 漂移，当前已吸收到同一 issue：
+  - `./bin/ai switch` / `whoami` 现场出现 `Current slot = worahe3977@outlook-com-2`，但 `Current account = worahe3976@outlook.com`
+  - 逐个解码 `~/.ai-auth/codex-*/auth.json` 后确认，这不是 runtime 读错 active slot，而是 slot 目录本身可以承载与目录名不同的授权邮箱；同一个邮箱/`account_id` 也可出现在多个 slot
+  - 结论是 slot 仍然正确，错的是 CLI 把授权邮箱元数据冒充成“当前身份”；当前批次已把 `ai-cli` 的 `whoami`/`switch`/`status`/`save`/`login` contract 改回 slot-first，邮箱仅保留为 `auth_email` 元数据
+- 本轮 continuation 吸收过 delegated handoff 中一组较早的恢复 contract，并确认这些旧语义已落在当前分支祖先、随后又被更严格的 slot-sweep-first rewrite 吸收：
+  - 较早版本曾在 all accounts unusable 时回到 earliest-reset 语义
+  - 较早版本曾使用 `reset_at + 60s` buffer 与 cooldown elapsed 后 reprobe/reselect 的等待逻辑
   - wait 期间周期性真实 reprobe，任一已保存账号恢复可用即可提前唤醒
   - `ensure-manager.pid` 只代表 live watchdog，stale pid 会被覆盖并在退出时清理
-  - cooldown elapsed 后先 reprobe/reselect，再决定 manager relaunch
-- 当前轮次主要补 canonical writeback，纠正 issue / milestone / code-review 与实际 continuation 状态之间的漂移。
+  - 当前 canonical contract 不再把 earliest-reset / cooldown wait 当作主恢复决策；它们仅保留为被 strict probe-gating rewrite 吸收的历史背景
+- 当前轮次已经补齐 canonical writeback，纠正 issue / milestone / code-review 与实际 continuation 状态之间的漂移。
 - 2026-03-24 fresh session 因上一轮 `context_compacted` 交接被重新拉起后，先按 continuity guard 重跑聚焦验证，再继续保持当前批次 `in_verification` / manager merge review 待处理结论。
 - 本轮继续吸收 fresh-session verification 新暴露出的收口缺口：
   - `test-freely-rate-limit-defers-to-watchdog` 的整秒计时断言存在秒边界抖动，已改成 monotonic 毫秒阈值
@@ -79,16 +64,16 @@
     - watchdog `codex exec` probe 现在会持有 shared lock 直到 probe 结束，避免 manual sweep 在 wait-return 后立刻插入
     - focused tests 已覆盖 `ensure-manager` defer 期间不触发 `whoami/list`，以及 probe 自身的 defer + serialization
   - 2026-03-24 slot-only cooldown writeback：
-    - `ensure_codex_slot_ready_for_manager` 现在只认 `whoami.slot` 作为 cooldown identity，`whoami.account` 仅保留展示用途
+    - `ensure_codex_slot_ready_for_manager` 现在只认 `whoami.slot` 作为 cooldown identity；授权邮箱只允许作为 `auth_email` 元数据存在
     - `select_any_available_codex_slot` 只排除当前精确 slot，不再做同 family exclusion，避免把同邮箱的 `-x` 兄弟 slot 误伤
     - 已验证 `ai-cli` 的 `login`/`switch` 入口遵守显式 suffixed slot contract，不再生成或消费无后缀目录
     - 新的 focused regression `docs/system/workspace/scripts/tests/test-freely-ensure-manager-slot-alias-cooldown` 覆盖了 slot selector / manager bootstrap 路径以及 slot-only cooldown identity
-  - 2026-03-25 develop live investigation 追加了新的生产现场证据：
+  - 2026-03-25 develop live investigation 追加了新的生产现场证据；这一段解释了为什么后续要做 slot-sweep-first rewrite，但它不再代表当前 closeout blocker：
     - canonical `whoami.slot` 当前为 `worahe3976@outlook-com`
     - canonical `ai list` 共返回 15 个保存 slot
     - canonical `.freely/run/codex-slot-cooldowns.tsv` 中有 6 个保存 slot 缺失 cooldown entry：`worahe3976@outlook-com`、`worahe3976@outlook-com-3`、`worahe3977@outlook-com-1`、`worahe3978@outlook-com-1`、`worahe3978@outlook-com-2`、`worahe3978@outlook-com-4`
     - 同时还残留 7 条不再对应保存 slot 的旧 identity entry，均为无后缀旧命名
-    - 因此当前 P0 不是“切号前不等待旧动作结束”，而是 watchdog cooldown truth 与 `.ai-auth` slot reality 漂移，导致 limit 后无法稳定收敛到 `all_slots_cooling_down` / earliest-reset hold
+    - 当时的现场判断是 cooldown truth 与 `.ai-auth` slot reality 漂移会阻止旧恢复路径稳定收敛；该判断后来被 strict probe-gating rewrite 吸收，现在已退为历史成因，而非当前 closeout blocker
   - 同轮还补了一条测试 tightening：
     - `test-freely-rate-limit-defers-to-watchdog` 与 `test-freely-rate-limit-log-defers-to-watchdog` 现在都直接断言 cooldown ledger 写入的是 suffixed slot key `limited@example-com-1`
     - 这把 `runtime/freely` supervisor 在 rate-limit 退出后的 slot-first 写回契约也锁住了，不再只依赖 `ensure-manager` focused regression 间接覆盖
@@ -112,16 +97,14 @@
 - `./bin/ai --quiet --format json list`
 - compare canonical `.freely/run/codex-slot-cooldowns.tsv` entries against saved slot inventory
 - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
+- `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
+- `bash docs/system/workspace/scripts/tests/test-ai-cli-whoami-prefers-slot-identity`
 - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-watchdog-live-during-active-ai`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
-- `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-defers-during-account-switch`
-- `bash docs/system/workspace/scripts/tests/test-freely-codex-current-slot-does-not-capture-switch-warning`
 - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact`
-- `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-defers-during-account-switch`
-- `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-detects-deactivated-workspace-before-timeout`
 
 ### Latest rerun
 
@@ -156,6 +139,11 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager` pass，且显式验证 manager bootstrap 之前会先 full sweep 并 promote 真实 usable slot
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-earliest-reset-wait-revive` pass，且显式验证 all-slots-unavailable 后走低频真实 reprobe，而不是 cooldown-driven sleep-until-reset
   - `./bin/governance-check` pass，只有 10 条 legacy pre-brainstorm naming warning
+- 2026-03-25 current slot-identity correction rerun:
+  - `bash -n docs/system/workspace/scripts/runtime/ai-cli` pass
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool` pass
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-whoami-prefers-slot-identity` pass
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` pass
 - 2026-03-26 auth-failure control-plane continuation rerun:
   - `bash -n docs/system/workspace/scripts/runtime/freely` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive` pass
@@ -168,35 +156,41 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive` pass
-- 2026-03-26 slot-switch global launch gate continuation rerun:
-  - `bash -n docs/system/workspace/scripts/runtime/tool-launchers.sh` pass
-  - `bash -n docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh` pass
-  - `bash docs/system/workspace/scripts/tests/test-freely-codex-current-slot-does-not-capture-switch-warning` pass
-  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-defers-during-account-switch` pass
-  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` pass
-  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-serialization` pass
-  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-defers-during-account-switch` pass
-  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args` pass
-  - `./bin/governance-check` pass，只有 10 条 legacy pre-brainstorm naming warning
 - 2026-03-26 slot probe timeout observability continuation rerun:
   - `bash -n docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-defers-during-account-switch` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` pass
   - `./bin/governance-check` pass with 10 legacy pre-brainstorm naming warnings only
-- 2026-03-26 early deactivated-workspace detect continuation rerun:
-  - `bash -n docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
-  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact`
-  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-detects-deactivated-workspace-before-timeout`
-  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-defers-during-account-switch`
-  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
-  - `./bin/governance-check`
 
 ## Next Action
 
-- canonical replay on 2026-03-26 confirms the same-family watchdog/bootstrap batches are already in `develop` and continue to satisfy focused acceptance.
-- This issue closes as `completed` canonical writeback.
-- Future interruption backlog convergence or productization followthrough should route through their own issue families instead of reopening this capability issue.
+- 当前批次的 strict probe-gating contract replay 与 focused verification 已完成。
+- no-launch gate、all-unavailable hold、inventory-change wake evidence 已补齐；当前 worktree 已进入 manager merge judgement / develop replay followthrough 前的 review-ready 状态，但仍保持 `in_verification`，等待 manager 吸收。
+- 本轮 closeout judgement 已前移到新的 fleet truth：authoritative inventory 现为 5 棵 worktree、`Summary: total=5, dirty=1`，只有当前 closeout lane dirty；旧的 7-tree / 10-tree / 12-tree closeout snapshot 只保留 provenance 价值，不再作为 cleanup 真相。
+- 当前 replay owner 分支相对最新 `develop` 的分叉已变成 `ahead 167 / behind 1`。这说明最新 `develop` 基线几乎已追平，但当前 lane 仍不能直接宣告 merge-ready/cleanup-ready；仍需 protected manager merge judgement、canonical `develop` replay、develop-side completion verification。
+- `live-status` 当前不再支持“delegated continuation 已完全吸收”的旧说法：当前 `pending_delegated_continuation_ids` 再次非空，因此 manager continuity 需要明确把这批 continuation 留在当前 closeout lane 下，而不是误写成已清零。
+- scheduler replay candidate 继续保持 `needs_research / retained-with-reason`，并且要等 canonical `develop` proof writeback，而不是继续消费 replay-owner-local evidence。
+- 2026-03-25 23:41 PDT 的 `402 Payment Required` / `deactivated_workspace` cycle 仍保留为历史 closeout evidence：`.freely/logs/cycle-20260325-234105.log`
+  - 它解释了为什么本 issue 需要 broadened auth-failure + no-launch-until-usable-slot contract
+  - 但在 2026-03-26 canonical proof wave 与 latest manager-continuity worker-consumption repair 之后，它已不再是当前 closeout 的直接 blocker
+  - 当前 blocker 已收窄为 manager merge judgement、吸收最新 `develop`、canonical replay，以及 develop-side completion verification
+
+## 2026-03-25 Source Lane Retirement Audit
+
+- Re-audited the remaining same-family source/supporting worktrees against this replay owner:
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-runtime-process-churn-state-reconcile`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-interruption-handler-account-recovery`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-family-integration`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-strict-slot-probe-gating`
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-watchdog-slot-sweep-without-cooldown-governance`
+- Their remaining local-only deltas are not missing desired capability in the replay owner:
+  - `manager-runtime-process-churn-state-reconcile` still carries one local-only continuation commit (`d2ef386`), but this replay owner already preserves its broadened auth-failure detection plus the skip-launch/no-slot-ready regressions in canonical slot-first form
+  - `interruption-handler-account-recovery` still points the interruption handler at the older account-ready path instead of the current slot-first contract
+  - `watchdog-family-integration` still carries older availability-state / logging behavior that predates the current replay owner
+  - `watchdog-strict-slot-probe-gating` still drops the broadened auth-failure detection and the no-launch test coverage now required by this replay owner
+  - `watchdog-slot-sweep-without-cooldown-governance` is already an absorbed supporting-evidence lane; its remaining local commit is only retirement writeback, not a new owner path
+- This round therefore treats all five branches as superseded local source/supporting lanes whose remaining unique commits should not be replayed onto the canonical owner.
 
 ## Revisit Trigger
 

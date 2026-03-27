@@ -64,14 +64,14 @@
    - 若进程已僵死、旧 prompt 持续误消费或 worker 已无法自收敛，则交回 runtime 执行 kill / restart / re-entry
 10. 若 patrol 已经拿到足够证据支持 `retire-only / retire-now / continue-dev`，主管必须从“继续补充只读证据”切换到“具体 worker delegation / cleanup execution”；只有在关键事实缺失或 blocker 未明时才允许继续 patrol。
 11. 若存在多个互不冲突 lane，主管必须显式排班，而不是把所有后续动作挤回单一 continuation：
-   - 有空余 worker capacity：并发委派 `parallel_safe=true` 且 `write_scope` 不冲突的 lane
-   - worker capacity 已满：把未派发 lane 保留在 manager continuity 的 queue / frozen queue 中，写清 `dispatch_priority` 与 `revisit_trigger`
+   - 对 `parallel_safe=true` 且 `write_scope` 不冲突的 lane，直接并发委派
+   - 只有 same-lane busy guard、显式 freeze、写域冲突、或 supersede 时，才把未派发 lane 保留在 manager continuity 的 queue / frozen queue 中，并写清 `dispatch_priority` 与 `revisit_trigger`
    - cleanup lane 默认应独立于 retained dev/doc lane 排班，不得因为旧 continuation 仍在运行就静默丢失
 12. 在会话轮换前写出项目级 continuity，至少包含：
    - 当前应继续的 worker
    - 冻结列表
    - 异常列表
-   - queued worker list / remaining capacity
+   - queued worker list / current launch blockers
    - 下一轮监督优先级
    - 若存在 delegated manager continuation handoff，还要保证 runtime 至少留下：
      - handoff generated

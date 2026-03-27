@@ -80,7 +80,7 @@ launch_worker_from_manager_prompt_if_needed() {
   return 0
 }
 
-COUNT="$(FREELY_MANAGER_MAX_PARALLEL_WORKERS=2 manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+COUNT="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
 [[ "$COUNT" == "0" ]]
 [[ ! -f "$LAUNCH_LOG" ]]
 
@@ -92,6 +92,8 @@ source "$PROJECT/.freely/run/manager-worker-launch-state.env"
 [[ -z "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" ]]
 [[ -z "${LAUNCHED_WORKER_PROMPTS:-}" ]]
 [[ -z "${QUEUED_WORKER_PROMPTS:-}" ]]
+[[ "${MAX_PARALLEL_WORKERS:-}" == "unbounded" ]]
+[[ "${AVAILABLE_NEW_WORKER_SLOTS:-}" == "unbounded" ]]
 
 BASELINE="$(cmd_baseline_status --project "$PROJECT")"
 LIVE="$(cmd_live_status --project "$PROJECT")"

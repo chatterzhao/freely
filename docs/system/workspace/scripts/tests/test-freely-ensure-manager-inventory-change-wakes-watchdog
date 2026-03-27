@@ -1,0 +1,212 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-inventory-change.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/mock-bin"
+LAUNCH_LOG="$TMP_DIR/launch.log"
+AI_STATE="$TMP_DIR/active-account"
+AI_SWITCH_LOG="$TMP_DIR/ai-switch.log"
+LIST_MODE_FILE="$TMP_DIR/list-mode"
+mkdir -p \
+  "$PROJECT/bin" \
+  "$PROJECT/docs/pre-brainstorms/20260318-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$MOCK_BIN"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260318-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260318-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260318-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+MAX_ROUTE_ONLY_STREAK=1
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+CHECKPOINT_WARN_DIRTY_ENTRIES=40
+CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
+EOF
+
+cat >"$PROJECT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+state_file="${AI_SWITCH_STATE:?}"
+log_file="${AI_SWITCH_LOG:?}"
+list_mode_file="${LIST_MODE_FILE:?}"
+printf '%s\n' "$*" >>"$log_file"
+
+cmd=""
+for arg in "$@"; do
+  case "$arg" in
+    switch|whoami|list)
+      cmd="$arg"
+      break
+      ;;
+  esac
+done
+
+case "$cmd" in
+  whoami)
+    account="$(cat "$state_file")"
+    echo "{\"tool\":\"codex\",\"account\":\"$account\",\"slot\":\"$account\"}"
+    ;;
+  list)
+    mode="$(cat "$list_mode_file")"
+    if [[ "$mode" == "initial" ]]; then
+      echo '{"accounts":["codex-old@example-com"]}'
+    else
+      echo '{"accounts":["codex-old@example-com","codex-new@example-com"]}'
+    fi
+    ;;
+  switch)
+    args=("$@")
+    for ((i=0; i<${#args[@]}; i++)); do
+      if [[ "${args[$i]}" == "switch" ]]; then
+        printf '%s' "${args[$((i+2))]}" >"$state_file"
+        echo "{\"switched\": true, \"tool\": \"${args[$((i+1))]}\", \"account\": \"${args[$((i+2))]}\"}"
+        exit 0
+      fi
+    done
+    ;;
+esac
+
+echo '{}'
+EOF
+chmod +x "$PROJECT/bin/ai"
+
+cat >"$MOCK_BIN/launch-freely" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s|%s\n' "$(date +%s)" "$*" >>"${LAUNCH_LOG:?}"
+EOF
+chmod +x "$MOCK_BIN/launch-freely"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+state_file="${AI_SWITCH_STATE:?}"
+current_account="$(cat "$state_file")"
+
+if [[ "$current_account" == "new@example-com" ]]; then
+  echo "hi"
+  exit 0
+fi
+
+echo "You've hit your usage limit. Please try again at Jan 3rd, 2100 12:00 AM."
+exit 1
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+printf 'old@example-com' >"$AI_STATE"
+printf 'initial' >"$LIST_MODE_FILE"
+HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
+STATE_FILE="$PROJECT/.freely/run/codex-availability-state.env"
+
+AI_SWITCH_STATE="$AI_STATE" \
+AI_SWITCH_LOG="$AI_SWITCH_LOG" \
+LIST_MODE_FILE="$LIST_MODE_FILE" \
+LAUNCH_LOG="$LAUNCH_LOG" \
+FREELY_ENSURE_MANAGER_LAUNCH_BIN="$MOCK_BIN/launch-freely" \
+PATH="$MOCK_BIN:$PATH" \
+  bash "$ROOT_DIR/bin/freely" ensure-manager --project "$PROJECT" --watch --interval 1 >/dev/null 2>&1 &
+watchdog_pid="$!"
+
+for _ in $(seq 1 8); do
+  if [[ -f "$STATE_FILE" ]] && grep -q '^AVAILABILITY_PHASE="all_unavailable"$' "$STATE_FILE"; then
+    break
+  fi
+  sleep 1
+done
+
+if [[ ! -f "$STATE_FILE" ]] || ! grep -q '^AVAILABILITY_PHASE="all_unavailable"$' "$STATE_FILE"; then
+  echo "[FAIL] expected inventory-change test to first reach all-slots-unavailable hold before expanding saved slots" >&2
+  kill "$watchdog_pid" 2>/dev/null || true
+  wait "$watchdog_pid" 2>/dev/null || true
+  exit 1
+fi
+
+printf 'expanded' >"$LIST_MODE_FILE"
+
+for _ in $(seq 1 12); do
+  if [[ -f "$LAUNCH_LOG" ]] && grep -q 'switch codex new@example-com --yes' "$AI_SWITCH_LOG" && grep -q 'new@example-com' "$AI_STATE"; then
+    break
+  fi
+  sleep 1
+done
+
+if [[ ! -f "$LAUNCH_LOG" ]]; then
+  echo "[FAIL] expected inventory expansion to wake watchdog and launch manager" >&2
+  kill "$watchdog_pid" 2>/dev/null || true
+  wait "$watchdog_pid" 2>/dev/null || true
+  exit 1
+fi
+
+grep -q 'switch codex new@example-com --yes' "$AI_SWITCH_LOG"
+grep -q 'start --project '"$PROJECT"'$' "$LAUNCH_LOG"
+grep -q 'new@example-com' "$AI_STATE"
+[[ -f "$HANDOFF_FILE" ]]
+grep -q '^- trigger: all_slots_unavailable$' "$HANDOFF_FILE"
+grep -q '^- reason: watchdog_inventory_change_found_usable_slot$' "$HANDOFF_FILE"
+
+kill "$watchdog_pid" 2>/dev/null || true
+wait "$watchdog_pid" 2>/dev/null || true
+
+echo "[PASS] ensure-manager wakes from all-unavailable hold when slot inventory changes and a new slot probes usable"

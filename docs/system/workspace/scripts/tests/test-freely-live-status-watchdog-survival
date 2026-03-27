@@ -3,7 +3,14 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-live-status-watchdog.XXXXXX)"
-trap 'rm -rf "$TMP_DIR"' EXIT
+
+cleanup() {
+  kill "${DISPATCH_PID:-}" "${WATCHDOG_PID:-}" 2>/dev/null || true
+  wait "${DISPATCH_PID:-}" 2>/dev/null || true
+  wait "${WATCHDOG_PID:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
 
 PROJECT="$TMP_DIR/repo"
 mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/intake/20260326-000001-demo" "$PROJECT/docs"
@@ -56,9 +63,10 @@ EOF
 
 bash -c "exec -a 'runtime/freely ensure-interruption-dispatch --project $PROJECT --watch' sleep 30" >/dev/null 2>&1 &
 DISPATCH_PID=$!
+disown "$DISPATCH_PID" 2>/dev/null || true
 bash -c "exec -a 'runtime/freely ensure-manager --project $PROJECT --watch --interval 10' sleep 30" >/dev/null 2>&1 &
 WATCHDOG_PID=$!
-trap 'kill "$DISPATCH_PID" "$WATCHDOG_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+disown "$WATCHDOG_PID" 2>/dev/null || true
 
 printf '%s' "$DISPATCH_PID" >"$PROJECT/.freely/run/interruption-dispatch.pid"
 printf '%s' "$WATCHDOG_PID" >"$PROJECT/.freely/run/ensure-manager.pid"
@@ -73,5 +81,7 @@ printf '%s\n' "$OUTPUT" | grep -q "role=manager_watchdog pid=$WATCHDOG_PID"
 kill "$DISPATCH_PID" "$WATCHDOG_PID" 2>/dev/null || true
 wait "$DISPATCH_PID" 2>/dev/null || true
 wait "$WATCHDOG_PID" 2>/dev/null || true
+DISPATCH_PID=""
+WATCHDOG_PID=""
 
 echo "[PASS] live-status treats watchdog+dispatcher as active control-plane instead of stalled runtime"

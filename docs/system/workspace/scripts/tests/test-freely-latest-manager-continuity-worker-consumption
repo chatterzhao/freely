@@ -113,6 +113,7 @@ source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 load_config "$PROJECT"
 
 RECOVER_LOG="$TMP_DIR/recover.log"
+RESTART_LOG="$TMP_DIR/restart.log"
 manager_runtime_recover_workers_if_needed() {
   echo "$1" >>"$RECOVER_LOG"
   write_manager_worker_launch_state "$1" "$NEW_CONT" "$NEW_PROMPT,$QUEUED_PROMPT" "$NEW_CONT" "$NEW_PROMPT,$QUEUED_PROMPT"
@@ -138,9 +139,15 @@ codex_current_account() {
 ensure_codex_slot_ready_for_manager() {
   return 0
 }
+restart_manager_supervisor_preserving_handoff() {
+  local project="$1"
+  echo "$project" >>"$RESTART_LOG"
+  printf '12345\n' >"$project/.freely/run/supervisor.pid"
+  manager_runtime_recover_workers_if_needed "$project"
+}
 launch_manager_supervisor() {
-  echo "[FAIL] should not relaunch manager supervisor" >&2
-  exit 1
+  local project="$1"
+  printf '12345\n' >"$project/.freely/run/supervisor.pid"
 }
 
 mkdir -p "$PROJECT/.freely/run"
@@ -149,6 +156,7 @@ printf '12345\n' >"$PROJECT/.freely/run/supervisor.pid"
 ensure_manager_once "$PROJECT" >/dev/null
 
 grep -q "^$PROJECT$" "$RECOVER_LOG"
+grep -q "^$PROJECT$" "$RESTART_LOG"
 BASELINE="$(cmd_baseline_status --project "$PROJECT")"
 LIVE="$(cmd_live_status --project "$PROJECT")"
 printf '%s\n' "$BASELINE" | grep -q "latest_manager_continuity_generated: $NEW_CONT"
@@ -164,4 +172,4 @@ printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_generated: .*2026
 printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_consumed: .*20260322-0445-worker-runtime-linkage-verify-codex.txt"
 printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_consumed: .*20260322-0445-worker-runtime-linkage-queued-codex.txt"
 
-echo "[PASS] ensure-manager consumes current-format worker prompts while supervisor is already running"
+echo "[PASS] ensure-manager consumes current-format worker prompts across the watchdog recovery gate"

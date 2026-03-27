@@ -5,7 +5,13 @@
 - source_brainstorm: `docs/pre-brainstorms/20260323-2045--manager-worker-scheduler-capacity-and-queueing/brainstorms.md`
 - status: `needs_research`
 - session_refs:
-  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "author"}
+  - {tool: codex, session_id: "019d29b2-d89b-7393-9704-c7ea6cd0b526", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-31-19-019d29b2-d89b-7393-9704-c7ea6cd0b526.jsonl", role: "manager-proof-surface-followthrough"}
+  - {tool: codex, session_id: "019d29c0-a278-7833-be12-65efef7889cd", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-46-23-019d29c0-a278-7833-be12-65efef7889cd.jsonl", role: "manager-proof-surface-current-fresh-session"}
+  - {tool: codex, session_id: "019d29f6-6f39-71e1-ae7a-1676f191b63c", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T04-45-09-019d29f6-6f39-71e1-ae7a-1676f191b63c.jsonl", role: "manager-proof-surface-authoritative-refresh"}
+  - {tool: codex, session_id: "019d2a17-0762-7720-80f2-03ea4786077b", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T05-20-45-019d2a17-0762-7720-80f2-03ea4786077b.jsonl", role: "manager-proof-surface-first-jump-refresh"}
+  - {tool: codex, session_id: "019d2a66-1e0b-7563-a4b7-e38b2d5d971b", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T06-47-08-019d2a66-1e0b-7563-a4b7-e38b2d5d971b.jsonl", role: "manager-proof-surface-current-refresh"}
+  - {tool: codex, session_id: "019d2c8b-59c1-7713-9f67-8ff2a6455a8c", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T16-47-03-019d2c8b-59c1-7713-9f67-8ff2a6455a8c.jsonl", role: "manager-proof-surface-continuity-stabilization"}
+  - {tool: codex, session_id: "019d2c94-db34-7012-b942-129dc5dfa98e", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T16-57-26-019d2c94-db34-7012-b942-129dc5dfa98e.jsonl", role: "manager-proof-surface-authoritative-fleet-refresh"}
 - why_now:
   - real dogfood showed manager could classify multiple lanes but not schedule them safely
   - runtime currently launches worker prompts linearly without worker capacity or queued-lane state
@@ -20,9 +26,19 @@
   - `docs/system/workspace/agents/manager-agent.md`
   - `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`
   - `docs/system/workspace/three-loop-capability-lifecycle.md`
+- gating_dependency:
+  - `I-20260318-1630`
+- proof_gap:
+  - `canonical develop` still lacks manager-facing proof writeback for direct dispatch, queued-lane retention, and busy-worker no-duplicate-launch behavior
+  - replay-owner-local evidence and older continuity snapshots do not satisfy this candidate's required proof surface
 - next_action:
-  - implement queue-aware manager launch state and regression tests, then dogfood via `freely chat`
+  - stay frozen while `I-20260318-1630` remains `review-ready but not promote-closed` and canonical `develop` still lacks manager-facing proof writeback for direct dispatch, queued-lane retention, and busy-worker no-duplicate-launch behavior on the develop-facing proof surface
+  - after manager merge judgement plus canonical develop replay / completion verification for `I-20260318-1630`, re-check canonical `develop` instead of replay-owner-local evidence
+  - once that proof exists, resume issue materialization around queue-aware manager launch state, queued-lane persistence, and capacity-safe worker dispatch
+  - 2026-03-26 current authoritative patrol confirms this owner worktree is still clean while the active fleet now sits at `Summary: total=5, dirty=1`; it stays retained-with-reason and is still not a cleanup target until the runtime contract is either materialized or explicitly dropped
+  - 2026-03-26 current `live-status` again shows delegated continuations pending in the closeout lane, so replay-owner-local review readiness still does not satisfy this candidate's proof surface
 - revisit_trigger:
-  - when manager can launch multiple parallel-safe worktree lanes, queue the rest, and avoid repeated launch spam into a busy delegated worker
+  - after manager merge judgement plus canonical develop replay / completion verification for `I-20260318-1630`, re-check canonical `develop` for the required direct-dispatch / queue-retention / no-duplicate-launch proof
+  - manager can then launch multiple parallel-safe worktree lanes, queue the rest, and avoid repeated launch spam into an already busy delegated worker
 - promoted_issue_path: `pending://issue-materialization`
-- milestone: `pending://milestone-binding`
+- milestone: `M-20260306-workspace-routing-foundation`

@@ -6,7 +6,10 @@ TMP_DIR="$(mktemp -d /tmp/freely-stale-manager-continuity.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
-mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample" "$PROJECT/.freely/run/worker-prompts"
+WT_ROOT="$TMP_DIR/project-worktrees"
+RETAINED_WT="$WT_ROOT/feature-retained"
+RETIRED_WT="$WT_ROOT/feature-retired"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample" "$PROJECT/.freely/run/worker-prompts" "$WT_ROOT"
 
 git init -q -b develop "$PROJECT"
 git -C "$PROJECT" config user.name "Freely Test"
@@ -46,6 +49,8 @@ EOF
 
 git -C "$PROJECT" add .
 git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" branch feature/retained
+git -C "$PROJECT" worktree add "$RETAINED_WT" feature/retained >/dev/null
 
 STALE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260323-stale-worker-codex.txt"
 cat >"$STALE_PROMPT" <<'EOF'
@@ -72,14 +77,40 @@ cat >"$NONWORKER_CONT" <<'EOF'
 - no worker launch yet; first refresh patrol and regenerate continuity.
 EOF
 
+STALE_RUNTIME_CONT="$PROJECT/.freely/run/manager-continuity-20260323-runtime-stale.md"
+cat >"$STALE_RUNTIME_CONT" <<EOF
+# Manager Continuity
+
+## Fleet Inventory
+- path: \`$PROJECT\`
+  - ownership: \`manager\`
+- path: \`$RETIRED_WT\`
+  - ownership: \`cleanup_queue\`
+
+## Queue / Frozen / Cleanup
+- target_worktree: \`$RETIRED_WT\`
+  - next_action: \`retire after gates confirm\`
+
+## Queue
+- target_worktree: \`$RETAINED_WT\`
+  - current_state: \`launchable_when_capacity_frees\`
+EOF
+
 # shellcheck disable=SC1090
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 
 LATEST="$(latest_manager_continuity_file_for_project "$PROJECT")"
 [[ "$LATEST" == "$NONWORKER_CONT" ]] || {
-  echo "[FAIL] expected stale continuity with only missing worker targets to be skipped" >&2
+  echo "[FAIL] expected stale continuity with missing worker/runtime targets to be skipped" >&2
   echo "latest=$LATEST" >&2
   exit 1
 }
 
-echo "[PASS] stale manager continuity is skipped when all worker prompts target missing worktrees"
+FINDER_LATEST="$(find_latest_manager_continuity_file_for_project "$PROJECT")"
+[[ "$FINDER_LATEST" == "$NONWORKER_CONT" ]] || {
+  echo "[FAIL] expected live-status continuity lookup to skip stale runtime references" >&2
+  echo "finder_latest=$FINDER_LATEST" >&2
+  exit 1
+}
+
+echo "[PASS] stale manager continuity is skipped when worker or runtime sections target missing worktrees"

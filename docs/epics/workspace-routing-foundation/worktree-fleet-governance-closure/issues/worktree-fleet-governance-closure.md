@@ -73,7 +73,13 @@ Freely 已经具备单树 worktree audit、merge-prep、stacked merge-chain 和 
 ## Next
 
 - 本 issue 的模式与首轮 inventory 已完成，但最终 review 仍需跟上当前真实 fleet，而不是停留在旧的 `current sweep` 快照。
-- `cli-first`、`manager-handoff` 已完成 closeout 且 worktree clean，当前是 `ready for manager merge`，但在被上游吸收前仍不能 cleanup。
-- `manager-watchdog-trigger` worktree 也已 clean，并进入单独的 manager disposition；`runtime-worker-launch-linkage` 仍保持 `in_verification`。
+- 当前 fleet 已收缩到 `./bin/wt-status-all => Summary: total=9, dirty=0`。
+- 剩余树的当前 disposition 已明确分层：
+  - protected: `develop`, `pre-test-merge`
+  - retained integration owners: `feature/manager-family-integration-20260325`, `feature/watchdog-family-replay-20260325`
+  - retained runtime-owned followthrough: `feature/pre-test-merge-lifecycle-management-followthrough-20260324`
+  - retained research / replay owners: `feature/manager-scheduler-capacity-candidate-replay-20260324`, `feature/manager-delegated-continuation-stall-materialization-20260323`, `feature/worker-stall-recovery-during-active-ai-20260323`
+  - retained verification/materialization owner: `feature/testing-evidence-ladder-and-real-environment-gates-20260325`
+- 本轮已准确退休一批 superseded companion/source 树；当前剩余 9 棵里没有新的 `retire-now` 对象。
 - 本轮新增的 `protected-post-merge-acceptance-route-governance` 已正确回流到 pre-brainstorm，说明 `fleet_closure` 已把“当前 issue 之外的新治理缺口”重新路由，而不是硬塞回原 issue。
 - 待 manager 完成剩余 worktree 的 merge / verification / cleanup 判断后，本 issue 才能从 `in_verification` 进入最终 promote / cleanup followthrough。

@@ -212,6 +212,19 @@ resolve_codex_slot_name() {
   next_slot_name "codex" "$base_slot"
 }
 
+json_string_or_null() {
+  local value="${1-}"
+  if [[ -z "${value}" ]]; then
+    printf 'null'
+  else
+    python3 - <<'PY' "$value"
+import json
+import sys
+print(json.dumps(sys.argv[1]))
+PY
+  fi
+}
+
 # 从 auth.json 提取账号信息
 extract_codex_account() {
   local auth_file="$1"
@@ -476,7 +489,7 @@ _cmd_switch_auto_codex() {
       _cmd_switch_codex_direct_unlocked "$tool" "$slot"
       actual_account="$(extract_codex_account "$HOME/.codex/auth.json")"
       if [[ "$FORMAT" == "json" ]]; then
-        echo "{\"switched\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"auth_email\": $(json_string_or_null "$actual_account"), \"account\": $(json_string_or_null "$actual_account"), \"status\": \"usable\"}"
+        echo "{\"switched\": true, \"tool\": \"codex\", \"account\": $(json_string_or_null "$actual_account"), \"slot\": \"$slot\", \"status\": \"usable\"}"
       fi
       ;;
     all_unavailable:*)
@@ -485,7 +498,7 @@ _cmd_switch_auto_codex() {
       local reset_at="${info##*|}"
       local human_time
       human_time="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo "$reset_at")"
-      log_warn "No usable codex slot right now; earliest reset hint is $earliest_slot at $human_time; leaving current auth untouched and keeping launch blocked"
+      log_warn "No usable codex slot right now; leaving current auth untouched and keeping launch blocked. Earliest reset hint: $earliest_slot at $human_time"
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": false, \"tool\": \"codex\", \"status\": \"all_unavailable\", \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"reset_at\": $reset_at, \"reset_at_human\": \"$human_time\", \"launch_blocked\": true}"
       fi

@@ -185,7 +185,7 @@ flowchart LR
 - 运行时真正消费的是 artifact 链，而不是聊天里的自然语言。
 - `intake -> resolution -> continuity -> worker prompt` 任何一环缺失，都会造成“看起来路由过了，实际上下游无从续跑”。
 - 文档真相写回后，还要再经过 `verification / cleanup evidence` 才算真正回到下一轮 patrol。
-- `worker prompt set` 不是无序列表；每条 worker handoff 至少要带 `dispatch_priority`、`parallel_safe`、`write_scope`，供 runtime 做 capacity-aware 排班与 queueing。
+- `worker prompt set` 不是无序列表；每条 worker handoff 至少要带 `dispatch_priority`、`parallel_safe`、`write_scope`，供 runtime 判断直接 launch、same-lane busy guard、写域冲突与 queue/frozen 保留。
 
 ## 5A. Observability Planes
 
@@ -359,16 +359,16 @@ flowchart LR
 - runtime 只负责托管、恢复、handoff artifact 与进程态，不替 worker 做语义 closeout。
 - manager 负责决定“先收哪棵树、何时新建树、何时只冻结/等待”，不直接在 protected branch 上实现。
 - worker 负责 canonical 文档或代码写回，不负责自己决定 retirement。
-- queue / capacity 判断属于 `manager decision + runtime enforcement` 联动：manager 写 lane metadata，runtime 按 worker capacity 与 active lane 实际执行。
+- queue / launch 判断属于 `manager decision + runtime enforcement` 联动：manager 写 lane metadata，runtime 对 launchable lane 直接执行，只把 same-lane busy guard、显式 freeze、写域冲突或 supersede 保留为 queue/frozen truth。
 
 ## 9A. Dispatch Scheduling Map
 
 ```mermaid
 flowchart TD
     A[manager continuity with worker prompt set] --> B[rank by dispatch_priority]
-    B --> C{worker capacity available?}
+    B --> C{lane launchable now?}
     C -->|yes| D{parallel_safe and write_scope conflict-free?}
-    C -->|no| E[queue remaining prompts]
+    C -->|no| E[queue or freeze remaining prompts]
     D -->|yes| F[launch worker runtime]
     D -->|no| E
     F --> G[active running worker lane]
@@ -381,7 +381,7 @@ flowchart TD
 - `dispatch_priority` 决定先派谁，不决定 route_kind 本身。
 - `parallel_safe=false` 的 lane 默认单独占一个 dispatch wave。
 - `write_scope` 冲突的 lane 不应同 wave 并发。
-- 没有空余 worker capacity 时，未派发 lane 必须保留在 queue，而不是静默丢失或被挤回单一 continuation。
+- same-lane busy guard、显式 freeze、写域冲突或 supersede 出现时，未派发 lane 必须保留在 queue / frozen truth，而不是静默丢失或被挤回单一 continuation。
 
 ## 10. Loop Ownership Table
 
@@ -390,9 +390,9 @@ flowchart TD
 | front-door intake | runtime | `freely init/start/chat`, runtime scripts | `.freely/intake/**`, runtime state |
 | manager routing | manager-agent | `auto-loop-orchestrator`, `context-source-skill` | routing output, continuity |
 | pre-brainstorm | worker | `doc-pre-brainstorm-execution` | `docs/pre-brainstorms/**` |
-| IBM | worker | `doc-ibm-execution` | `docs/epics/**` |
+| IBM | worker | `doc-ibm-execution` | `docs/epics/**`; story-level `pre-tests.md` must already distinguish acceptance-definition blockers from execution blockers |
 | dev-loop | worker | `dev-loop-execution` | code, tests, reviews, progress |
-| completion verification | manager -> worker | issue verification sections, review artifacts, protected acceptance evidence | issue, progress, milestone, cleanup pending truth |
+| completion verification | manager -> worker | issue verification sections, review artifacts, protected acceptance evidence | issue, progress, milestone, cleanup pending truth; do not treat `execution_pending_or_failed` as interchangeable with `definition_missing` / `commands_only` / `evidence_plan_missing` |
 | recovery | runtime + manager | runtime scripts, `recovery-subagent-governance` | `docs/recovery/**`, continuity |
 | worktree action | manager + runtime | `branch-management`, worktree scripts | branch/worktree state |
 | fleet supervision | manager | `multi-worktree-supervision`, `worktree-maintenance-governance` | fleet snapshot, disposition |

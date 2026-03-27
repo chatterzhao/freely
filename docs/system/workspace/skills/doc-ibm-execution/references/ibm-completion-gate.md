@@ -14,7 +14,8 @@
 
 - `prd.md` 满足 [prd-quality-bar.md](prd-quality-bar.md)
 - `pre-tests.md` 来自 `prd.md` 的 eval / acceptance 结构
-- `pre-tests.md` 默认以 executable acceptance 为主，而不是只列代码检查点或 wording review 清单
+- `pre-tests.md` 默认以 executable integration / acceptance 为主，而不是只列代码检查点或 wording review 清单
+- `pre-tests.md` 至少明确 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
 - `pre-tests.md` 能恢复关键 acceptance 面的 `environment`、`evidence`、`failure signal`、`failure handling / replay expectation`
 - `tasks.md` 来自 `prd.md` 的 decomposition / execution slices
 
@@ -33,6 +34,7 @@
 - issue scope 与 acceptance 稳定
 - `pre-tests.md` 与 `tasks.md` 已体现 issue-level acceptance
 - `pre-tests.md` 没有把 wording review 当成主验收面
+- `pre-tests.md` 已能区分最小 blocker taxonomy：`definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`
 - 若存在 merge 后才能验证的关键路径，`pre-tests.md` 已显式区分 `pre-merge` 与 `post-merge`
 - 对 Freely 自治能力，`pre-tests.md` 默认已覆盖：
   - post-merge integration acceptance
@@ -47,6 +49,7 @@
 - implementation 所需文档引用齐备
 - `prd.md` 已达到 AI-ready quality bar，而不是只剩人类摘要
 - `pre-tests.md` 与 `tasks.md` 已被 `prd.md` 稳定约束
+- issue 不再需要额外口头补充来区分 acceptance 定义失败与测试执行失败
 
 ## Return package
 

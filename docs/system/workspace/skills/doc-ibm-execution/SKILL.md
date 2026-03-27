@@ -29,6 +29,8 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 6. `pre-tests.md` 不是附属清单，而是 issue-level acceptance 的主控制面：
    - 默认先写 executable acceptance contract，而不是 wording review / truth-source reading checklist
    - 默认优先表达 focused regression、integration、real-environment、dogfood 这些行为验收面
+   - 至少要能恢复 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
+   - 最小 blocker taxonomy 至少区分：`definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`
    - 若存在 merge 后才能验证的能力，显式标记 `post-merge acceptance`
    - 并明确目标验证环境：`develop` 或 `pre-test-merge`
    - 对每个关键 acceptance 面，写出最小 `environment`、`evidence`、`failure signal`、`failure handling / replay expectation`
@@ -61,4 +63,5 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 - `prd.md` 已达到 AI-ready quality bar，且 `pre-tests.md`、`tasks.md` 与之对齐。
 - candidate acceptance 已被深化为 issue-level acceptance。
 - `pre-tests.md` 已明确本 issue 的主验收面，且默认以 executable acceptance evidence 为主，而不是 wording review 为主。
+- `pre-tests.md` 质量 gate 已足够区分“定义不完整”和“执行未完成/失败”。
 - 进入 dev-loop 所需的最小上下文已备齐。

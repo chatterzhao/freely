@@ -60,6 +60,7 @@
 - `pre-tests.md` 能直接表达 issue-level acceptance，且默认以 smoke / integration / regression / non-goals 这类行为视角组织
 - `pre-tests.md` 能恢复每个关键 acceptance 面的 `environment`、`evidence`、`failure signal`、`failure handling / replay expectation`
 - 对 Freely 自治能力，`pre-tests.md` 默认不能缺少 integration / application-native real-environment / end-to-end dogfood 这些 post-merge 验收面；若缺少，必须显式写明不适用理由与替代证据
+- `pre-tests.md` 所需的 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy 能从 `prd.md` 推导出来
 - `tasks.md` 能从 `prd.md` 的 decomposition / execution slices 派生，而不是与 PRD 脱节
 - AI 读取 `prd.md` 后，能回答：
   - 目标是什么
@@ -76,5 +77,6 @@
 - `pre-tests.md` 与 `tasks.md` 需要额外聊天解释才能成立
 - `pre-tests.md` 主要还是 wording review / “读代码后再判断怎么测”，而不是先表达 acceptance 行为
 - `Eval Plan` 没有写 environment / evidence / failure signal，导致 merge 后该怎么验证无法恢复
+- `pre-tests.md` 的 blocker taxonomy 仍要靠聊天解释，无法区分定义不完整与执行失败
 - 没有写出 non-goals / non-negotiables
 - 没有写出 revisit trigger，默认旧 workaround 永久有效

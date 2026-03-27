@@ -67,7 +67,7 @@ discover_good_account() {
   local candidate
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
-    if (( ${#BAD_ACCOUNTS[@]} > 0 )) && [[ " ${BAD_ACCOUNTS[*]} " == *" ${candidate} "* ]]; then
+    if [[ " ${BAD_ACCOUNTS[*]} " == *" ${candidate} "* ]]; then
       continue
     fi
     switch_account "$candidate" >/dev/null 2>&1 || continue
@@ -225,7 +225,7 @@ wait_for_manager_session_ready() {
     if [[ -n "$latest_session" ]]; then
       return 0
     fi
-    if latest_cycle_has_usage_limit && [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]]; then
+    if latest_cycle_has_usage_limit && [[ "$(whoami_auth_email)" == "$GOOD_ACCOUNT" ]]; then
       return 2
     fi
     now="$(date +%s)"
@@ -241,7 +241,7 @@ wait_for_good_account() {
   local start_ts now
   start_ts="$(date +%s)"
   while true; do
-    if [[ "$(normalize_account "$(whoami_account)")" == "$(normalize_account "$GOOD_ACCOUNT")" ]]; then
+    if [[ "$(normalize_account "$(whoami_auth_email)")" == "$(normalize_account "$GOOD_ACCOUNT")" ]]; then
       return 0
     fi
     now="$(date +%s)"
@@ -259,14 +259,14 @@ wait_for_manager_status() {
   while true; do
     supervisor_pid="$(status_field supervisor_pid)"
     launch_count="$(loop_launch_count)"
-    if [[ "$(normalize_account "$(whoami_account)")" == "$(normalize_account "$GOOD_ACCOUNT")" ]] &&
+    if [[ "$(normalize_account "$(whoami_auth_email)")" == "$(normalize_account "$GOOD_ACCOUNT")" ]] &&
       [[ -n "$supervisor_pid" && "$supervisor_pid" != "none" ]] &&
       kill -0 "$supervisor_pid" 2>/dev/null &&
       [[ "$launch_count" =~ ^[0-9]+$ ]] &&
       (( launch_count > previous_launch_count )); then
       return 0
     fi
-    if latest_cycle_has_usage_limit && [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]]; then
+    if latest_cycle_has_usage_limit && [[ "$(whoami_auth_email)" == "$GOOD_ACCOUNT" ]]; then
       return 2
     fi
     now="$(date +%s)"
@@ -299,7 +299,7 @@ wait_for_relaunched_manager_launch() {
       printf '%s\n' "$launch_count"
       return 0
     fi
-    if latest_cycle_has_usage_limit && [[ "$(whoami_account)" == "$GOOD_ACCOUNT" ]]; then
+    if latest_cycle_has_usage_limit && [[ "$(whoami_auth_email)" == "$GOOD_ACCOUNT" ]]; then
       return 2
     fi
     now="$(date +%s)"
@@ -311,7 +311,7 @@ wait_for_relaunched_manager_launch() {
 }
 
 dump_failure_context() {
-  echo "[DEBUG] whoami=$(whoami_account)" >&2
+  echo "[DEBUG] whoami_auth_email=$(whoami_auth_email)" >&2
   echo "[DEBUG] freely baseline-status:" >&2
   bash "$ROOT_DIR/bin/freely" baseline-status --project "$MANAGER_PROJECT" >&2 || true
   echo "[DEBUG] trace:" >&2
@@ -372,7 +372,7 @@ current_after_bad_switch=""
   switch_account "$bad"
   trace_event "after_switch_to_${bad//@/_}"
 
-  current_after_bad_switch="$(whoami_account)"
+  current_after_bad_switch="$(whoami_auth_email)"
   if [[ "$(normalize_account "$current_after_bad_switch")" == "$(normalize_account "$bad")" ]]; then
     :
   elif [[ "$(normalize_account "$current_after_bad_switch")" == "$(normalize_account "$GOOD_ACCOUNT")" ]]; then
