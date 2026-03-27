@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-ai-account-watchdog-and-manager-bootstrap`
@@ -192,24 +192,19 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 
 ## Closure Judgment
 
-- 当前 issue family 的稳定结论是：`review-ready but not promote-closed`
-- manager merge judgement 仍是第一道未完成 gate
-- manager judgement 之后还必须先把当前 replay owner 吸收最新 `develop` 并完成 canonical replay / completion verification
-- 在 canonical `develop` 能稳定产出 fresh continuity / worker prompt、且 completion verification 写回之前，不得把本 issue 标成 `completed`，也不得进入 cleanup / retirement judgement
-- `C-20260323-2045-A` 当前是独立 candidate owner 的后续预研面；本 issue 只提供同族支持证据，不再代替该 candidate 写当前 blocker judgment
-- 当前 delegated continuation 已被吸收，closeout writeback 继续留在当前 feature worktree；runtime 不需要为这条 lane 再发新 worker prompt
+- 当前 issue family 已完成 canonical replay closeout。
+- `20260326-global-ai-account-watchdog-canonical-replay-verification` 已确认能力在 canonical `develop` 上 materialize，focused replay 覆盖 slot-sweep-first recovery、detached control-plane survival、dispatcher-ready gating、slot-first identity、timeout artifact preservation 与 early `deactivated_workspace` detection，未发现 reopen 证据。
+- 当前 authoritative fleet truth 已收敛到 4-tree / dirty=0 / all stopped；旧的 7-tree / 10-tree / 12-tree continuity snapshot 仅保留 provenance，不再构成 blocker。
+- `C-20260323-2045-A` 继续作为独立 retained research owner 存在，但它是后续 scheduler/materialization 问题，不再阻塞本 issue 完成。
 
 ## Next
 
-- 当前 replay batch 已完成 strict probe-gating + wake-only recovery 的 contract / code / test 闭环，当前进入 manager merge judgement / develop replay followthrough 前的 review-ready 状态。
-- 这个 issue family 若后续还要动，只会是 manager review 暴露出的局部修补，不再是 contract 重写或 dev-loop 主线。
-- 当前 develop-facing absorption owner 已切到 `feature/upstream-governance-merge-prep-20260327`；`feature/develop-merge-prep-fleet-closure-20260325` 只剩 branch/worktree retirement followthrough，不能继续被当成当前 closeout owner。
-- 当前批次交付的 continuation contract：
+- 本 issue 已完成；后续若 watchdog/account bootstrap 还出现新缺口，只能作为新的 runtime/dev 增量承接，不回写当前 issue。
+- 当前同族后续只剩：
+  - `C-20260323-2045-A` 的 retained research/materialization judgement
+  - 更广义的 interruption backlog / manager-owned absorption followthrough
+- 当前批次固定下来的 contract 为：
   - probe 才是真理，cooldown 不再参与恢复逻辑
   - sweep / reprobe 窗口内所有 AI launch 都必须被阻塞
   - all-unavailable 时 watchdog 继续活着，但 manager / worker 保持 down
   - inventory 变化或后续 probe 命中 usable slot 后，先写 handoff，再恢复主管
-- 下一步：
-  - 已完成 strict probe gating、all-unavailable wake contract、inventory-change monitoring，以及 cooldown 的彻底退役
-  - 已完成 runtime / watchdog / ai-cli / tests 的 no-launch probe-gating recovery replay
-  - 当前只剩 manager 复核当前 feature worktree 的 doc/code/test 证据并决定是否 promote，随后按 develop replay followthrough 收口

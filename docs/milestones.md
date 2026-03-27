@@ -69,26 +69,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 - next_action: 只收编旧 context-compaction 分支独有的 continuity guard 小能力，然后退休旧 worktree；不要重复主线已有的 continuity/rotation 设计
 
-13. `I-20260321-0257`
-- title: Worktree fleet governance closure
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
-- source_brainstorm: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md`
-- next_action: `fleet_closure` 已收编到 worktree-maintenance skill，当前 authoritative truth 已继续前移到 4-tree retained fleet；本轮 writeback 提交后 `./bin/wt-status-all` 与 `./bin/wt-fleet-status` 应回到 `Summary: total=4, dirty=0` 且全部 `stopped`。当前 fleet 只剩三类 disposition：protected/control `develop` 与 `pre-test-merge`、retained research owner `feature/manager-scheduler-capacity-candidate-replay-20260324`、active develop-facing absorption owner `feature/upstream-governance-merge-prep-20260327`。`feature/develop-merge-prep-fleet-closure-20260325` 已被上游完整吸收并退休；后续继续保持 scheduler replay candidate 的 `needs_research / retained-with-reason` 判定，直到 canonical `develop` proof writeback 发生。旧 continuity 中的 7-tree / 10-tree / 12-tree snapshot 一律只保留 provenance，不再参与当前 cleanup judgement
-
-14. `I-20260318-1630`
-- title: Global AI account watchdog and manager bootstrap
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-- source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`, `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`, `docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md`
-- next_action: 当前同族 replay 已完成 strict probe-gating、wake-only recovery、slot-only identity、watchdog-only `live-status` surfacing、dispatcher-ready start gate，以及 slot probe timeout artifact 的 contract / code / test 闭环，但本 issue 仍只到 `review-ready`，不是 promote-closed。当前 authoritative fleet truth 已进一步收敛到 4-tree retained fleet；本轮 writeback 提交后 `git worktree list --porcelain` / `./bin/wt-status-all` / `./bin/wt-fleet-status` 应对齐到 `Summary: total=4, dirty=0` 且全部 `stopped`。active owner 已切到 `feature/upstream-governance-merge-prep-20260327`，而 `feature/develop-merge-prep-fleet-closure-20260325` 已被完整吸收并退休。`feature/manager-scheduler-capacity-candidate-replay-20260324` 继续保持 `needs_research / retained-with-reason`，其 blocker 仍是 canonical `develop` proof writeback，而不是 replay-owner-local evidence。旧的 7-tree / 10-tree / 12-tree continuity 与“delegated continuation 已吸收完毕”的说法都已失效。当前 `live-status` 再次显示 `pending_delegated_continuation_ids` 非空，因此本轮仍由 manager 在当前 auto-loop 面维护 continuity / queue / cleanup judgement，而不是误写成已清零或误开新 worker lane。2026-03-25 23:41 PDT 的 `402 Payment Required` / `deactivated_workspace` cycle 继续保留为历史证据，用来解释 broadened auth-failure contract 的来源，但它已不再构成当前 closeout 的直接 blocker。本轮下一步固定为：先由 manager 在当前 upstream absorption owner 上完成 protected merge judgement，再在 canonical `develop` 上完成 replay / completion verification；在 develop 写回 completion verification 前，不得进入 cleanup / retirement judgement
-
 15. `I-20260321-1715`
 - title: Manager watchdog trigger and drift reconcile governance
 - milestone_state: committed
@@ -169,6 +149,32 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/code-reviews/20260321-remote-branch-retirement-governance-verification.md`
   - `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/code-reviews/20260326-remote-branch-retirement-canonical-replay-verification.md`
 - completion_note: remote branch disposition 已并入 cleanup/retirement contract，并在当前 absorption owner 上继续通过 focused interruption cleanup regression；后续 status surface 扩展另开 lifecycle
+
+6. `I-20260321-0257`
+- title: Worktree fleet governance closure
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/code-reviews/20260321-worktree-fleet-governance-closure-verification.md`
+  - `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/code-reviews/20260326-worktree-fleet-governance-closure-canonical-replay-verification.md`
+- completion_note: `fleet_closure` 能力与 canonical inventory writeback 已稳定收敛到 4-tree / dirty=0 / all stopped；retained-vs-retired judgement 已冻结为 protected/control、retained research owner、active develop-facing absorption owner 三类，后续 research materialization 不再阻塞本 issue 完成
+
+7. `I-20260318-1630`
+- title: Global AI account watchdog and manager bootstrap
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`, `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`, `docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/code-reviews/20260326-global-ai-account-watchdog-canonical-replay-verification.md`
+  - `docs/progress/workspace-routing-foundation/p-global-ai-account-watchdog-and-manager-bootstrap.md`
+- completion_note: global watchdog/bootstrap contract 已在 canonical `develop` 通过 replay，slot-sweep-first recovery、no-launch gate、all-unavailable hold、inventory-change wake、slot-only identity、dispatcher-ready gate 与 timeout/deactivated-workspace artifact 全部稳定；scheduler retained research 与更广义 interruption followthrough 另由后续 lifecycle 承接
 
 2. `I-20260326-1815`
 - title: IBM pre-tests executable acceptance quality governance

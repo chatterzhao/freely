@@ -2,8 +2,8 @@
 
 - issue_id: `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- phase_state: `in_verification`
-- runtime_state: `stalled_without_runtime`
+- phase_state: `completed`
+- runtime_state: `stopped`
 - branch: `feature/upstream-governance-merge-prep-20260327`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260327-feature-upstream-governance-merge-prep`
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
@@ -22,6 +22,7 @@
 
 ## Summary
 
+- 2026-03-26 22:58 PDT canonical closeout writeback rechecked `20260326-global-ai-account-watchdog-canonical-replay-verification`, `./bin/wt-status-all`, `./bin/wt-fleet-status`, and current branch ancestry. The closeout judgement is now frozen as `completed`: canonical replay already passed on `develop`, the authoritative fleet truth is now 4 worktrees / dirty=0 / all stopped, and the previous `review-ready but not promote-closed` wording is now stale. `C-20260323-2045-A` remains an independent retained research owner, but it no longer blocks this issue's completion.
 - 2026-03-26 upstream absorption followthrough re-ran `./bin/wt-fleet-status`, `git merge-base --is-ancestor feature/develop-merge-prep-fleet-closure-20260325 HEAD`, `git rev-list --left-right --count feature/develop-merge-prep-fleet-closure-20260325...HEAD`, and `git rev-list --left-right --count feature/manager-scheduler-capacity-candidate-replay-20260324...HEAD`, then retired the absorbed closeout owner by deleting both its worktree and local branch. The current route still stays `continuation -> completion_verification -> worktree-maintenance-governance`, but the active owner has moved for good: authoritative retained fleet is now 4 worktrees, every remaining worktree is explicitly `stopped`, `feature/develop-merge-prep-fleet-closure-20260325` is no longer part of current inventory, and the only retained non-protected sibling is `feature/manager-scheduler-capacity-candidate-replay-20260324`, which still carries unresolved local-only history (`... = 24/266`) and therefore remains `needs_research / retained-with-reason`. Current closeout judgement stays `review-ready but not promote-closed`: canonical `develop` replay and develop-side completion verification still remain outstanding, but old closeout-owner cleanup has finished and no longer blocks current truth.
 - 2026-03-26 current authoritative patrol re-ran `./bin/freely live-status --project ...`, `git worktree list --porcelain`, `./bin/wt-status-all`, `git status --short --branch`, and `git rev-list --left-right --count develop...HEAD`. The route still stays `continuation -> completion_verification -> worktree-maintenance-governance`, but the current truth now supersedes every older 7-tree / 10-tree / 12-tree snapshot: `live-status` reports `activity_state=stalled_without_runtime`, `desired_runtime_state=stopped`, `last_exit_reason=operator_stop`, and non-empty `pending_delegated_continuation_ids`; `git worktree list --porcelain` plus `./bin/wt-status-all` show 5 worktrees with `Summary: total=5, dirty=1`; the only dirty owner remains `feature/develop-merge-prep-fleet-closure-20260325`; and this branch now sits `ahead 167 / behind 1` relative to current `develop`.
 - 2026-03-26 same-family continuation absorbed additional watchdog/control-plane evidence without opening a new issue: slot-only identity with `auth_email` as metadata, detached manager/watchdog/dispatcher survival after manager `auth_failure`, watchdog-only `live-status` surfacing plus dispatcher-ready start gate, and slot probe timeout / `deactivated_workspace` partial-output artifacts in `.freely/run`.
@@ -166,16 +167,10 @@
 
 ## Next Action
 
-- 当前批次的 strict probe-gating contract replay 与 focused verification 已完成。
-- no-launch gate、all-unavailable hold、inventory-change wake evidence 已补齐；当前 worktree 已进入 manager merge judgement / develop replay followthrough 前的 review-ready 状态，但仍保持 `in_verification`，等待 manager 吸收。
-- 本轮 closeout judgement 已继续前移到新的 absorption truth：authoritative retained inventory 现为 4 棵 worktree，active owner 已从 `feature/develop-merge-prep-fleet-closure-20260325` 切到 `feature/upstream-governance-merge-prep-20260327`，且旧 closeout owner 的 branch/worktree retirement followthrough 已完成。旧的 7-tree / 10-tree / 12-tree closeout snapshot 只保留 provenance 价值，不再作为 cleanup 真相。
-- 当前 develop-facing absorption owner 分支相对最新 `develop` 的 promote truth 已改由当前 upstream owner 承担；旧 owner 已被完整吸收（`feature/develop-merge-prep-fleet-closure-20260325...feature/upstream-governance-merge-prep-20260327 = 0/26`），因此不再能作为 canonical closeout truth。当前 lane 仍不能直接宣告 merge-ready/cleanup-ready；仍需 protected manager merge judgement、canonical `develop` replay、develop-side completion verification。
-- `live-status` 当前不再支持“delegated continuation 已完全吸收”的旧说法：当前 `pending_delegated_continuation_ids` 再次非空，因此 manager continuity 需要明确把这批 continuation 留在当前 closeout lane 下，而不是误写成已清零。
-- scheduler replay candidate 继续保持 `needs_research / retained-with-reason`，并且要等 canonical `develop` proof writeback，而不是继续消费 replay-owner-local evidence。
-- 2026-03-25 23:41 PDT 的 `402 Payment Required` / `deactivated_workspace` cycle 仍保留为历史 closeout evidence：`.freely/logs/cycle-20260325-234105.log`
-  - 它解释了为什么本 issue 需要 broadened auth-failure + no-launch-until-usable-slot contract
-  - 但在 2026-03-26 canonical proof wave 与 latest manager-continuity worker-consumption repair 之后，它已不再是当前 closeout 的直接 blocker
-  - 当前 blocker 已收窄为 manager merge judgement、吸收最新 `develop`、canonical replay，以及 develop-side completion verification
+- 当前 issue 已完成 canonical closeout writeback。
+- 后续若同族还要继续推进，只保留两类下一跳：
+  - `C-20260323-2045-A` 的 retained research/materialization judgement
+  - 新的 runtime/dev 缺口以新 lifecycle 承接
 
 ## 2026-03-25 Source Lane Retirement Audit
 
