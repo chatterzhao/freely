@@ -15,7 +15,7 @@
   - 首跳 prompt 注入项目级 fleet snapshot
   - handoff 附带项目级 fleet snapshot
 - priority: P0
-- status: proposed
+- status: promoted
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: []
@@ -29,7 +29,7 @@
   - `auto-loop-orchestrator/SKILL.md` 补 manager-worker 模式
   - `multi-worktree-supervision/SKILL.md` 对齐主管工位工作流
 - priority: P0
-- status: proposed
+- status: promoted
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: []
