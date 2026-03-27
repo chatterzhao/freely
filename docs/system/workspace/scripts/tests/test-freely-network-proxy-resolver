@@ -72,6 +72,6 @@ RESULT_GLOBAL="$(
   '
 )"
 
-[[ "$RESULT_GLOBAL" == "http://global-https.example:8443|http://global-http.example:8080|http://global-https.example:8443|localhost" ]]
+[[ "$RESULT_GLOBAL" == "http://global-http.example:8080|http://global-http.example:8080|http://global-https.example:8443|localhost" ]]
 
 echo "[PASS] network proxy resolver handles explicit base-url, disabled mode, and global fallback"

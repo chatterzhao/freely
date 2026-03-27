@@ -17,7 +17,7 @@ freely_network_proxy_read_config_values() {
     [[ -f "$cfg" ]] || exit 0
     # shellcheck disable=SC1090
     source "$cfg"
-    printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+    printf '%s\x1f%s\x1f%s\x1f%s\x1f%s\x1f%s\n' \
       "${FREELY_NETWORK_PROXY_MODE:-}" \
       "${FREELY_NETWORK_PROXY_URL:-}" \
       "${FREELY_ALL_PROXY:-}" \
@@ -36,10 +36,10 @@ freely_network_proxy_resolve_config() {
   project_cfg="$(freely_network_proxy_project_config_file "$project")"
   global_cfg="$(freely_network_proxy_global_config_file)"
 
-  IFS=$'\t' read -r project_mode project_url project_all project_http project_https project_no < <(
+  IFS=$'\x1f' read -r project_mode project_url project_all project_http project_https project_no < <(
     freely_network_proxy_read_config_values "$project_cfg"
   )
-  IFS=$'\t' read -r global_mode global_url global_all global_http global_https global_no < <(
+  IFS=$'\x1f' read -r global_mode global_url global_all global_http global_https global_no < <(
     freely_network_proxy_read_config_values "$global_cfg"
   )
 
