@@ -499,7 +499,7 @@ codex_inventory_truth() {
 
   result="$(codex_oauth_sweep_all_slots "$project" || true)"
   case "$result" in
-    usable:*|all_unavailable:*)
+    usable:*|all_unavailable:*|oauth_unreachable)
       printf '%s\n' "$result"
       return 0
       ;;
