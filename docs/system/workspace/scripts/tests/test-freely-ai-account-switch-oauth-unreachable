@@ -7,6 +7,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
 HOME_DIR="$TMP_DIR/home"
+FREELY_HOME_DIR="$TMP_DIR/freely-home"
 MOCK_BIN="$TMP_DIR/mock-bin"
 mkdir -p \
   "$PROJECT/.freely/run" \
@@ -15,6 +16,7 @@ mkdir -p \
   "$PROJECT/docs/system/workspace/scripts/runtime" \
   "$HOME_DIR/.ai-auth/codex-test@example-com-1" \
   "$HOME_DIR/.codex" \
+  "$FREELY_HOME_DIR" \
   "$MOCK_BIN"
 
 ln -sf \
@@ -88,6 +90,7 @@ chmod +x "$MOCK_BIN/codex"
 
 set +e
 HOME="$HOME_DIR" \
+FREELY_HOME="$FREELY_HOME_DIR" \
 PROJECT_ROOT="$PROJECT" \
 PATH="$MOCK_BIN:$PROJECT/bin:$PATH" \
   bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/out.json" 2>"$TMP_DIR/err.log"
