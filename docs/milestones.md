@@ -89,16 +89,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`, `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`, `docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md`
 - next_action: 当前同族 replay 已完成 strict probe-gating、wake-only recovery、slot-only identity、watchdog-only `live-status` surfacing、dispatcher-ready start gate，以及 slot probe timeout artifact 的 contract / code / test 闭环，但本 issue 仍只到 `review-ready`，不是 promote-closed。当前 authoritative fleet truth 已进一步收敛到 4-tree retained fleet；本轮 writeback 提交后 `git worktree list --porcelain` / `./bin/wt-status-all` / `./bin/wt-fleet-status` 应对齐到 `Summary: total=4, dirty=0` 且全部 `stopped`。active owner 已切到 `feature/upstream-governance-merge-prep-20260327`，而 `feature/develop-merge-prep-fleet-closure-20260325` 已被完整吸收并退休。`feature/manager-scheduler-capacity-candidate-replay-20260324` 继续保持 `needs_research / retained-with-reason`，其 blocker 仍是 canonical `develop` proof writeback，而不是 replay-owner-local evidence。旧的 7-tree / 10-tree / 12-tree continuity 与“delegated continuation 已吸收完毕”的说法都已失效。当前 `live-status` 再次显示 `pending_delegated_continuation_ids` 非空，因此本轮仍由 manager 在当前 auto-loop 面维护 continuity / queue / cleanup judgement，而不是误写成已清零或误开新 worker lane。2026-03-25 23:41 PDT 的 `402 Payment Required` / `deactivated_workspace` cycle 继续保留为历史证据，用来解释 broadened auth-failure contract 的来源，但它已不再构成当前 closeout 的直接 blocker。本轮下一步固定为：先由 manager 在当前 upstream absorption owner 上完成 protected merge judgement，再在 canonical `develop` 上完成 replay / completion verification；在 develop 写回 completion verification 前，不得进入 cleanup / retirement judgement
 
-15. `I-20260321-1515`
-- title: Remote branch retirement governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/issues/remote-branch-retirement-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md`
-- next_action: 把 remote branch deletion / retained reason 纳入 `worktree-maintenance-governance` 与 `cleanup-followthrough`，并用真实 cleanup 测试和 Freely 插话验证主管能够把这层收口做完
-
 15. `I-20260321-1715`
 - title: Manager watchdog trigger and drift reconcile governance
 - milestone_state: committed
@@ -166,6 +156,19 @@ routing_policy:
   - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
   - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews/20260322-pre-test-merge-responsibility-usage-and-lifecycle-governance-verification.md`
 - completion_note: `pre-test-merge` 的职责边界、stale / retire / rebuild 语义与 replay 默认策略已写回真源；后续 lifecycle management capability 保持独立，不与职责定义混成同一 issue
+
+5. `I-20260321-1515`
+- title: Remote branch retirement governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/issues/remote-branch-retirement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/code-reviews/20260321-remote-branch-retirement-governance-verification.md`
+  - `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/code-reviews/20260326-remote-branch-retirement-canonical-replay-verification.md`
+- completion_note: remote branch disposition 已并入 cleanup/retirement contract，并在当前 absorption owner 上继续通过 focused interruption cleanup regression；后续 status surface 扩展另开 lifecycle
 
 2. `I-20260326-1815`
 - title: IBM pre-tests executable acceptance quality governance

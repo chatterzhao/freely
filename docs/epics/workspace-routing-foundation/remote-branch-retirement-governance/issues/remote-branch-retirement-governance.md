@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260321-1515`
 - title: Remote branch retirement governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `remote-branch-retirement-governance`
@@ -63,8 +63,9 @@ Freely 当前已经能：
 
 - `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
+- `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/code-reviews/20260326-remote-branch-retirement-canonical-replay-verification.md`
 
 ## Next
 
-- 当前目标是把 remote branch retirement check 变成 worktree cleanup 的标准一部分。
+- remote branch retirement check 已成为 worktree cleanup 的标准一部分，本 issue 正式完成。
 - 后续若要扩成独立 `fleet-status` / `live-status` 可见字段，再基于同一主题继续，不在本 issue 内平行新增 skill。
