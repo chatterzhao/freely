@@ -22,9 +22,9 @@
 - `develop`
   - disposition: `protected manager environment`
   - reason: clean；只承担监督、集成扫描与 post-merge acceptance，不承担 feature 开发
-- `pre-test-merge`
-  - disposition: `protected integration buffer`
-  - reason: clean；仍领先 `develop`，但当前只作为受保护验证环境保留
+- `test-pre-merge-*`
+  - disposition: `protected integration buffer family`
+  - reason: 历史记录中的 `pre-test-merge` 现按 `test-pre-merge-*` 测试批次前缀族解释；clean 时只作为受保护验证环境保留
 
 ### Retained Integration / Verification Owners
 

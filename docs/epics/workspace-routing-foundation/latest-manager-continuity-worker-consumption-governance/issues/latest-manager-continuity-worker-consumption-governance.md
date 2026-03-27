@@ -122,7 +122,7 @@
   - current worktree still owns canonical closeout writeback for this issue family; writeback must be absorbed through the develop-facing path before branch/worktree cleanup
   - current closeout lane itself is dirty because this writeback is still uncommitted; it cannot truthfully claim cleanup-readiness yet
   - same-family worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile` remains active, so this issue family is completed but not yet fully retired as a fleet unit
-  - separate worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-pre-test-merge-lifecycle-management-followthrough` remains `runtime-owned` recovery and must stay outside this issue's cleanup claim
+  - separate worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-test-pre-merge-lifecycle-management-followthrough` remains `runtime-owned` recovery and must stay outside this issue's cleanup claim
 - local_branch_disposition: `retained-with-reason`
 - local_branch_reason: keep the branch/worktree until canonical issue-family writeback is absorbed and supervisor/runtime runs the normal cleanup followthrough; do not delete from this worker round
 - remote_branch_disposition: `not_checked`
