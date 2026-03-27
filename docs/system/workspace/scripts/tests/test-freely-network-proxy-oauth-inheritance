@@ -48,12 +48,17 @@ auth_header=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --connect-timeout|--max-time)
+      shift 2
+      ;;
     -o)
       output_file="$2"
       shift 2
       ;;
     -H)
-      auth_header="$2"
+      if [[ "$2" == Authorization:\ Bearer* ]]; then
+        auth_header="$2"
+      fi
       shift 2
       ;;
     -w)

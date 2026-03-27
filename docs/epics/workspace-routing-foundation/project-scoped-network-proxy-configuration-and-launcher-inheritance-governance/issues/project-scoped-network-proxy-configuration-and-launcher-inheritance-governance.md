@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260327-0651`
 - title: Project-scoped network proxy configuration and launcher inheritance governance
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `project-scoped-network-proxy-configuration-and-launcher-inheritance-governance`
@@ -12,6 +12,8 @@
 - source_brainstorm: `docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
+- pre_tests_path: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/pre-tests.md`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews`
 - depends_on:
   - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
   - `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
@@ -34,7 +36,8 @@ Freely runtime 里和代理有关的默认值目前仍然分散在脚本内部�
 2. 新增一个最小、可复用的 resolver，统一处理 `inherit` / `explicit` / `disabled`。
 3. 让 codex exec launcher 和 watchdog 里的 OAuth/curl path 共用同一个 resolver。
 4. 清理 runtime 里的硬编码 localhost proxy defaults。
-5. 增加 focused tests，锁住 config write、resolver 行为与 launcher inheritance。
+5. 让无参 `freely ai switch codex` 每次都刷新保存的 auth inventory，再基于最新 sweep 结果选 usable slot。
+6. 增加 focused tests，锁住 config write、resolver 行为、launcher inheritance 与 switch refresh contract。
 
 ## Non-Goals
 
@@ -52,11 +55,13 @@ Freely runtime 里和代理有关的默认值目前仍然分散在脚本内部�
    - `disabled`：清空 proxy env
 3. codex launcher 与 watchdog 的 OAuth/curl path 都从同一个 resolver 继承 proxy env。
 4. runtime 里不再出现 hardcoded `127.0.0.1:7890` 作为代理默认值。
-5. focused tests 覆盖：
+5. 无参 `freely ai switch codex` 不会偷吃新鲜 cache，而是先刷新所有保存的 auth inventory，再决定是否切换。
+6. focused tests 覆盖：
    - init config defaults
    - resolver mode handling
    - codex launcher inheritance
    - OAuth/curl inheritance
+   - no-arg switch refreshes inventory before selecting a usable slot
 
 ## Completion
 
@@ -74,6 +79,7 @@ Freely runtime 里和代理有关的默认值目前仍然分散在脚本内部�
 - `docs/system/workspace/scripts/tests/test-freely-network-proxy-resolver`
 - `docs/system/workspace/scripts/tests/test-freely-network-proxy-launcher-inheritance`
 - `docs/system/workspace/scripts/tests/test-freely-network-proxy-oauth-inheritance`
+- `docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
 
 ## Verification
 
@@ -81,4 +87,5 @@ Freely runtime 里和代理有关的默认值目前仍然分散在脚本内部�
 - `bash docs/system/workspace/scripts/tests/test-freely-network-proxy-resolver`
 - `bash docs/system/workspace/scripts/tests/test-freely-network-proxy-launcher-inheritance`
 - `bash docs/system/workspace/scripts/tests/test-freely-network-proxy-oauth-inheritance`
+- `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
 - `./bin/governance-check`

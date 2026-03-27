@@ -557,14 +557,14 @@ codex_confirm_launch_candidate_slot() {
 
 codex_oauth_probe_single_slot() {
   local project="$1" slot="$2" auth_file="$3" output_file="$4"
-  local usage_url token auth_email response_file http_code response_body
+  local usage_url token auth_email account_id response_file http_code response_body
   usage_url="$(codex_oauth_usage_url)"
   if [[ ! -f "$auth_file" ]]; then
     printf '%s\tmissing_auth\t\t0\t0\tauth file missing\n' "$slot" >"$output_file"
     return 0
   fi
 
-  read -r token auth_email < <(python3 - <<'PY' "$auth_file"
+  read -r token auth_email account_id < <(python3 - <<'PY' "$auth_file"
 import base64
 import json
 import sys
@@ -572,9 +572,12 @@ import sys
 path = sys.argv[1]
 token = ""
 email = ""
+account_id = ""
 with open(path, "r", encoding="utf-8") as f:
     data = json.load(f)
-token = data.get("tokens", {}).get("access_token", "") or data.get("access_token", "")
+tokens = data.get("tokens", {}) if isinstance(data.get("tokens", {}), dict) else {}
+token = tokens.get("access_token", "") or data.get("access_token", "")
+account_id = tokens.get("account_id", "") or data.get("account_id", "")
 id_token = data.get("tokens", {}).get("id_token", "")
 if id_token:
     try:
@@ -583,7 +586,7 @@ if id_token:
         email = json.loads(base64.urlsafe_b64decode(payload.encode())).get("email", "")
     except Exception:
         email = ""
-print(token, email)
+print(token, email, account_id)
 PY
 )
 
@@ -596,7 +599,24 @@ PY
   if ! http_code="$(
     (
       freely_apply_project_network_proxy_env "$project"
-      curl -sS -o "$response_file" -w '%{http_code}' -H "Authorization: Bearer $token" "$usage_url"
+      if [[ -n "$account_id" ]]; then
+        curl --connect-timeout 10 --max-time 30 -sS \
+          -o "$response_file" \
+          -w '%{http_code}' \
+          -H "Authorization: Bearer $token" \
+          -H "ChatGPT-Account-Id: $account_id" \
+          -H "User-Agent: codex-cli" \
+          -H "Accept: application/json" \
+          "$usage_url"
+      else
+        curl --connect-timeout 10 --max-time 30 -sS \
+          -o "$response_file" \
+          -w '%{http_code}' \
+          -H "Authorization: Bearer $token" \
+          -H "User-Agent: codex-cli" \
+          -H "Accept: application/json" \
+          "$usage_url"
+      fi
     ) 2>/dev/null
   )"; then
     rm -f "$response_file"
@@ -634,13 +654,32 @@ if isinstance(detail_obj, dict):
 elif isinstance(detail_obj, str):
     detail_code = detail_obj
 
-rate_limits = payload.get("rate_limits", {}) if isinstance(payload, dict) else {}
-primary = rate_limits.get("primary", {}) if isinstance(rate_limits, dict) else {}
-secondary = rate_limits.get("secondary", {}) if isinstance(rate_limits, dict) else {}
+rate_limits = {}
+if isinstance(payload, dict):
+    if isinstance(payload.get("rate_limits"), dict):
+        rate_limits = payload.get("rate_limits", {})
+    elif isinstance(payload.get("rate_limit"), dict):
+        legacy = payload.get("rate_limit", {})
+        rate_limits = {
+            "primary": legacy.get("primary"),
+            "secondary": legacy.get("secondary"),
+            "primary_window": legacy.get("primary_window"),
+            "secondary_window": legacy.get("secondary_window"),
+        }
+
+primary = {}
+secondary = {}
+if isinstance(rate_limits, dict):
+    primary = rate_limits.get("primary", {}) if isinstance(rate_limits.get("primary"), dict) else {}
+    secondary = rate_limits.get("secondary", {}) if isinstance(rate_limits.get("secondary"), dict) else {}
+    if not primary:
+        primary = rate_limits.get("primary_window", {}) if isinstance(rate_limits.get("primary_window"), dict) else {}
+    if not secondary:
+        secondary = rate_limits.get("secondary_window", {}) if isinstance(rate_limits.get("secondary_window"), dict) else {}
 primary_used = primary.get("used_percent")
 secondary_used = secondary.get("used_percent")
-primary_reset = numeric_reset(primary.get("resets_at"))
-secondary_reset = numeric_reset(secondary.get("resets_at"))
+primary_reset = numeric_reset(primary.get("resets_at") if "resets_at" in primary else primary.get("reset_at"))
+secondary_reset = numeric_reset(secondary.get("resets_at") if "resets_at" in secondary else secondary.get("reset_at"))
 
 if detail_code == "deactivated_workspace":
     status = "deactivated_workspace"
