@@ -11,6 +11,57 @@
 - AI 持续运行（自己监控ai工具崩溃/阻塞自动触发续接），除非明确停止。或找不到需求，或者出现重大事故 AI 自己已经无力自己解决。
 - Freely 开发 Freely 时暴露的可复现共性问题，默认先判断是否应成为 Freely 能力发现；若可泛化到用户项目，应进入三个 loop 的 canonical lifecycle materialize 为可复用能力，而不是停留成一次性项目经验。
 
+## Freely 产品/系统架构
+
+Freely 自身首先是一个产品，不应被拆成一堆并列的 shell、命令和工具名。
+
+当前高层关系定义为：
+
+- `Freely product`
+  - `Freely core`
+  - `Freely CLI`
+  - `Freely TUI app`
+  - `Freely GUI app`
+
+其中：
+
+- `Freely core`
+  - runtime / orchestration
+  - service contract / adapter boundary
+  - external AI tooling orchestration
+  - eval / harness / operational substrate
+- `Freely CLI`
+  - `Freely core`
+  - CLI command set
+- `Freely TUI app`
+  - `Freely core`
+  - TUI shell
+- `Freely GUI app`
+  - `Freely core`
+  - GUI shell
+
+还要显式区分两类不应再和 shell 并列的东西：
+
+1. semantic surfaces
+   - `init`
+   - `start`
+   - `chat`
+   - `baseline-status`
+   - `live-status`
+   - `fleet-status`
+2. external execution provider layer
+   - `codex`
+   - `Claude Code`
+   - MCP-assisted tool usage
+   - 其他被 Freely 编排的外部 AI tools
+
+原则：
+
+- `chat` / `status` family 是 Freely 通过 shell 暴露的语义面，不是 shell 自身。
+- `CLI/TUI/GUI` 是宿主壳，不是业务语义本体。
+- 外部 AI tools 是 Freely core 编排的执行提供层，不是 Freely 自己的 product shell。
+- 若未来要沉淀“通用产品形态方法”，应另开独立 lifecycle；本节只表达 Freely 自身产品架构。
+
 ## 方法论总述
 
 ### 三个 Loop 方法论

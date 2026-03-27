@@ -320,17 +320,6 @@ routing_policy:
 
 ### candidate_issues
 
-1. `C-20260326-1810-A`
-- title: Freely layered architecture and tooling topology
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
-- priority: P0
-- promoted_issue_path: `pending://freely-layered-architecture-and-tooling-topology-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md`
-- next_action: 继续 pre-brainstorm，先冻结最小楼层图：loop/lifecycle、interaction entry、host form factor、external AI tooling、runtime/agent orchestration、autonomy evals、harness/support substrate 这些层各自的边界与命名；同时决定是新增 topology 真源还是改写 `three-loop` 的局部引用，不在边界未稳前直接改现有系统文档
-- revisit_trigger: 当新拓扑文档与 `three-loop` / `tools.md` 的分工、层命名，以及 `chat` vs `CLI/TUI/GUI` 与 AI tooling 归属都能冻结成独立 issue scope 时，重新进入 materialization 判断
-
 2. `C-20260323-1435-A`
 - title: Interactive init bootstrap and fine-grained force/skip governance
 - milestone_state: candidate
@@ -789,6 +778,33 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/candidates.md`
 - evidence: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`, `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/tasks.md`, `docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`, `docs/system/workspace/scripts/quality/governance-check`
 - completion_note: future candidate v2 schema、独立 acceptance review、IBM acceptance deepening 与治理门禁已稳定落盘；高风险 candidate 的双审策略保留为后续治理演进，不阻塞当前 issue 完成
+
+## M-20260326-freely-product-architecture
+
+- title: Freely product architecture convergence
+- status: active
+- source_brainstorm: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md`
+- intent: 把 Freely 自身产品/系统架构先收敛到开发期高层真源，再要求开发入口与后续文档按同一分类顺序对齐
+- why_now: 当前局部真源已经部分写对 shell、semantic surface、tooling layer 与 contract 边界，但缺统一总图，且 `AGENTS.md` 的开发入口判断仍容易把 Freely 自身产品架构误推向能力目录
+
+### completed_issues
+
+1. `I-20260326-1810`
+- title: Freely layered architecture and tooling topology
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/issues/freely-layered-architecture-and-tooling-topology.md`
+- source_brainstorm: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md`
+- evidence:
+  - `docs/PROJECT_INTENT.md`
+  - `docs/CONSTITUTION.md`
+  - `docs/LAWS.md`
+  - `AGENTS.md`
+  - `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/code-reviews/20260326-freely-layered-architecture-and-tooling-topology-verification.md`
+- completion_note: Freely product / core / shell / semantic surface / external execution provider 的高层关系已先回写开发期高层真源，并把 `AGENTS.md` 的入口判断对齐到同一分类顺序；若未来要泛化“通用产品形态方法”，需另开独立 lifecycle
 
 ## M-20260312-control-surface-runtime-convergence
 

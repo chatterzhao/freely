@@ -350,6 +350,34 @@ flowchart LR
 
 ---
 
+## 10A. Freely 自身产品架构分类与对齐
+
+判定规则：
+1. Freely 自举中出现新讨论时，先判断它是：
+   - 现有 issue continuation
+   - Freely 自身产品架构
+   - Freely 开发治理
+   - Freely 可复用能力
+2. 若是 Freely 自身产品架构，首个正式产物必须先回写：
+   - `docs/PROJECT_INTENT.md`
+   - `docs/CONSTITUTION.md`
+   - `docs/LAWS.md`
+   - `AGENTS.md`
+3. `AGENTS.md` 只负责开发入口判断顺序，不得替代高层架构真源。
+4. 不得把 Freely 自身产品架构讨论直接写入 `docs/system/**`，除非已经另外收敛成可复用能力。
+5. 若从产品架构讨论中发现潜在通用能力，必须新开独立 pre-brainstorm，不得在原产品架构 issue 中偷渡泛化。
+
+最小验收证据：
+- `PROJECT_INTENT / CONSTITUTION / LAWS / AGENTS.md` 对齐写回
+- milestone / issue / candidate 路径回写
+- 如存在能力化分流，提供独立 pre-brainstorm 证据
+
+执行技能：
+- `skill:laws-enforcer`
+- `skill:constitution-guard`
+
+---
+
 ## 11. 方法论总述（硬性要求）
 
 判定规则：
