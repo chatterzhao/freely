@@ -299,6 +299,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md`
 - next_action: canonical `develop` on 2026-03-26 wrote fresh continuity `manager-continuity-20260326-003102.md` plus two launchable worker prompts, but `manager-worker-launch-state.env` still kept generated/consumed prompt truth empty. Keep this issue back in `in_verification` and repair the current continuity parser/consumption contract before any further closeout claim.
 
+23. `I-20260326-1835`
+- title: Manager owner stance and source-patrol completeness governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/candidates.md`
+- next_action: IBM 已完成，下一步进入 dev-loop，只改写 `docs/system/workspace/**` 中的 manager / worker / interruption / patrol 产品能力真源；若实现阶段发现必须改动 `PROJECT_INTENT / CONSTITUTION / LAWS`，则新开 lifecycle，不扩大当前 issue。
+
 ### completed_issues
 
 1. `I-20260322-1801`
@@ -417,17 +427,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
 - next_action: 继续 pre-brainstorm，单独冻结 `phase progress`、`loop stall`、`manager handback`、`capacity release / supersede` 规则；同时补清 lane 回交后如何识别“其实是上游 `Issue + Brainstorm + PRD -> pre-tests.md` acceptance 面不完整”以及“其实还没完成 integration / application-native real-environment testing closeout”；在 machine-readable 阈值稳定前，不与 stale `pre-test-merge` gate 绑在一起实现
 - revisit_trigger: 当 low-value self-loop 的判据、manager 回交 contract、容量释放规则，以及与 IBM/`Issue + Brainstorm + PRD -> pre-tests.md` 缺口和 testing closeout 缺口的分流条件都能冻结成独立 issue contract 时，重新进入 materialization 判断
-
-12. `C-20260326-1705-A`
-- title: Manager owner stance and source-patrol completeness governance
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
-- priority: P0
-- promoted_issue_path: `pending://manager-owner-stance-and-source-patrol-governance`
-- source_brainstorm: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/candidates.md`
-- next_action: 继续 pre-brainstorm，先冻结三块边界：主管主人姿态 wording、advisory interruption semantics、以及 interruption / milestone / progress / pre-brainstorm 的 source-patrol completeness transaction；在这些边界稳定前，不把它拆散塞回已有 manager-trigger 或 interruption-triage issue。
-- revisit_trigger: 当主管人格、插话 owner semantics、standing-source completeness 范围与 worker handoff contract 可以被冻结成最小一致 issue scope 时，重新进入 materialization 判断
 
 6. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec
