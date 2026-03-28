@@ -65,11 +65,10 @@ echo "console.log('change');" > "$REPO/src/sample.js"
 git add src/sample.js
 
 if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout1" 2>"$TMP_DIR/stderr1"; then
-  echo "[FAIL] governance-merge-gate should reject develop merges without candidate-driven lifecycle evidence" >&2
+  echo "[FAIL] governance-merge-gate should reject develop merges that are not based on a specific issue" >&2
   exit 1
 fi
-grep -q 'no candidate-driven lifecycle evidence' "$TMP_DIR/stdout1"
-grep -q 'reopen_of_issue' "$TMP_DIR/stdout1"
+grep -q 'not based on a specific issue' "$TMP_DIR/stdout1"
 
 git reset -q HEAD src/sample.js
 rm -f "$REPO/src/sample.js"
@@ -79,8 +78,11 @@ cat >> "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
 - note: same candidate keeps being researched
 EOF
 git add docs/pre-brainstorms/sample/candidates.md
-"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout2" 2>"$TMP_DIR/stderr2"
-grep -q 'passed' "$TMP_DIR/stdout2"
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout2" 2>"$TMP_DIR/stderr2"; then
+  echo "[FAIL] governance-merge-gate should reject candidate-only develop merges without issue ownership in the diff" >&2
+  exit 1
+fi
+grep -q 'not based on a specific issue' "$TMP_DIR/stdout2"
 
 git reset -q HEAD docs/pre-brainstorms/sample/candidates.md
 git checkout -q -- docs/pre-brainstorms/sample/candidates.md
@@ -115,5 +117,51 @@ if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout4" 2>"$TMP_DIR/st
   exit 1
 fi
 grep -q 'cannot be resolved' "$TMP_DIR/stdout4"
+
+git reset -q HEAD docs/progress/sample/p-bad.md
+rm -f "$REPO/docs/progress/sample/p-bad.md"
+
+mkdir -p "$REPO/docs/pre-brainstorms/absorbed" "$REPO/docs/epics/absorbed/story/issues"
+cat > "$REPO/docs/pre-brainstorms/absorbed/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2301-A
+- status: absorbed
+- milestone: `M-sample`
+- decision_reason: folded into sample owner
+- promoted_issue_path: `docs/epics/absorbed/story/issues/owner.md`
+EOF
+cat > "$REPO/docs/epics/absorbed/story/issues/owner.md" <<'EOF'
+# Issue: owner
+
+- issue_id: `I-20260327-2301`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+EOF
+git add docs/pre-brainstorms/absorbed/candidates.md
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout5" 2>"$TMP_DIR/stderr5"; then
+  echo "[FAIL] governance-merge-gate should reject absorbed candidate-only merges without issue ownership in the diff" >&2
+  exit 1
+fi
+grep -q 'not based on a specific issue' "$TMP_DIR/stdout5"
+
+git reset -q HEAD docs/pre-brainstorms/absorbed/candidates.md
+
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/progress/sample/p-sample.md docs/pre-brainstorms/absorbed/candidates.md
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout6" 2>"$TMP_DIR/stderr6"; then
+  echo "[FAIL] governance-merge-gate should reject absorbed candidates that try to borrow an unrelated issue owner in the same diff" >&2
+  exit 1
+fi
+grep -q 'does not carry its concrete owner issue/progress/review' "$TMP_DIR/stdout6"
 
 echo "[PASS] governance-merge-gate enforces candidate-driven lifecycle evidence"

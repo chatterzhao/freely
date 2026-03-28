@@ -52,6 +52,20 @@
   - hook 因为把 `MERGE_HEAD` 当成前置守卫而直接 `exit 0`
 - 这说明 merge gate 不仅要“有规则”，还要覆盖真实 hook 时序；否则 develop-bound merge 仍会把 runtime/test 真源绕过 candidate-driven lifecycle evidence
 
+5. `absorbed` 候选被用成了过宽的 develop merge 通行证
+- 本轮修完 hook 后，又暴露出第二层门禁缺口：
+  - 只要 merge diff 里出现一个 `status: absorbed` 的候选
+  - 且它写了 `promoted_issue_path`
+  - gate 就会把它当成 develop-bound merge 的充分治理证据
+- 但这还不够：
+  - merge 可能根本没有基于任何具体 issue
+  - 即使 `promoted_issue_path` 存在，也可能只是“某个 owner 在仓库里存在”，而不是“本次 merge 真正基于该 owner issue”
+  - 这样会把 `candidate -> owner exists` 错当成 `candidate -> milestone -> issue` 已经对本次 merge 生效
+- 因此 develop merge 的判断顺序应收紧为：
+  - 先问：本次 merge 是否基于一个具体 issue（issue / progress / review owner 必须进入 diff）
+  - 再问：该 issue 的 `C/M/I` 链是否打通
+  - 最后才按允许状态判断能否放行
+
 ## Proposed Clarification
 
 ### 1. merge gate 应以 lifecycle closure 为准
@@ -113,3 +127,16 @@
 1. 明确实现型 worktree 必须 lifecycle complete 才能 merge
 2. 明确研究型 worktree 的收口例外
 3. 明确这层 gate 由主管判断，而不是 worker 凭感觉推进
+4. 对 develop-bound implementation merge 冻结更硬的 owner rule：
+   - merge diff 必须绑定到一个具体 issue（issue / progress / review owner）
+   - touched candidate 必须与同次 merge 中的 owner issue 处于同一条 `C/M/I` 线
+   - `absorbed` 不再能靠“仓库里存在某个 owner issue”单独放行
+
+## Materialization Decision
+
+- `C-20260321-1835-A` 不再继续作为 absorbed supporting evidence 留在 pre-brainstorm 层。
+- 该候选现已 materialize 为：
+  - `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
+- 原因：
+  - 这次 develop merge 漏口已经不是 wording 讨论，而是 active gate 真源缺口
+  - 若没有独立 issue owner，这次修复本身就会再次违反它要收紧的 merge rule

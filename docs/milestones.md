@@ -59,6 +59,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
 - next_action: 保持在当前 milestone 的 committed queue，直到 verification evidence 明确写回并把 `C-20260325-0333-B` 的完成态同步到正式 closeout；umbrella candidate `C-20260325-0333-A` 继续单独留在 candidate queue
 
+2. `I-20260321-1835-A`
+- title: Develop merge issue binding and C/M/I gate governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/candidates.md`
+- next_action: 收紧 `governance-merge-gate`，要求 develop merge 带具体 owner issue，且 touched candidate 与 touched owner issue 同属一条 `C/M/I` 线；随后用 focused regressions 与真实 hook 路径回放锁死。
+
 ### completed_issues
 
 1. `I-20260324-0415`

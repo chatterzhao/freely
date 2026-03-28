@@ -395,10 +395,18 @@ def main() -> int:
 
     touched_candidate_ids: Set[str] = {candidate.candidate_id for candidate in candidate_records if candidate.candidate_id}
     candidate_driven_evidence: Set[str] = set(touched_candidate_ids)
+    issue_bound_evidence: Set[str] = set()
+    issue_bound_issue_paths: Set[str] = set()
+    issue_bound_candidate_paths: Set[str] = set()
 
     for issue_path in sorted(issue_paths):
         issue = issues_index.get(issue_path)
         if issue and issue.source_candidate:
+            issue_bound_evidence.add(issue.issue_id or issue.path)
+            issue_bound_issue_paths.add(issue.path)
+            source_candidate_path = anchorless_source_candidate(issue.source_candidate)
+            if source_candidate_path:
+                issue_bound_candidate_paths.add(source_candidate_path)
             source_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
             if source_candidate:
                 candidate_driven_evidence.add(source_candidate.candidate_id)
@@ -417,6 +425,11 @@ def main() -> int:
             )
             continue
 
+        issue_bound_evidence.add(owner_issue.issue_id or owner_issue.path)
+        issue_bound_issue_paths.add(owner_issue.path)
+        source_candidate_path = anchorless_source_candidate(owner_issue.source_candidate)
+        if source_candidate_path:
+            issue_bound_candidate_paths.add(source_candidate_path)
         source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
         if not source_candidate:
             errors.append(
@@ -436,6 +449,11 @@ def main() -> int:
             )
             continue
 
+        issue_bound_evidence.add(owner_issue.issue_id or owner_issue.path)
+        issue_bound_issue_paths.add(owner_issue.path)
+        source_candidate_path = anchorless_source_candidate(owner_issue.source_candidate)
+        if source_candidate_path:
+            issue_bound_candidate_paths.add(source_candidate_path)
         source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
         if not source_candidate:
             errors.append(
@@ -452,12 +470,27 @@ def main() -> int:
             "Continue existing research by updating its candidate/issue/progress/review artifacts, or if this is a completed-family reopen, create a new candidate and new issue that records reopen_of_issue and reopen_reason before replaying the merge."
         )
 
+    if not issue_bound_evidence:
+        errors.append(
+            "This develop-bound merge is not based on a specific issue. Candidate-only evidence is not enough for a develop merge: the merge diff must carry a concrete issue/progress/review owner, and then the C/M/I chain must still validate."
+        )
+
     for candidate in candidate_records:
         status = (candidate.status or "").strip("`").strip()
         milestone = normalize_scalar(candidate.milestone or "")
         key = candidate_key(candidate.candidate_id)
         if not key:
             continue
+
+        owner_path = normalize_scalar(candidate.promoted_issue_path or "")
+        candidate_is_bound_to_touched_issue = candidate.path in issue_bound_candidate_paths
+        candidate_is_bound_to_touched_owner = bool(owner_path) and owner_path in issue_bound_issue_paths
+
+        if not candidate_is_bound_to_touched_issue and not (status == "absorbed" and candidate_is_bound_to_touched_owner):
+            errors.append(
+                f"{candidate.candidate_id} in {candidate.path} is touched by this develop merge, but the same merge does not carry its concrete owner issue/progress/review. "
+                f"Candidate-only evidence or an unrelated issue in the diff is not enough: bind the merge to this candidate's own I-* issue, or for an absorbed candidate include the canonical owner issue/progress/review in the same merge."
+            )
 
         active_statuses = {"proposed", "needs_research", "blocked", "promoted"}
         if status in active_statuses and (not milestone or milestone.startswith("pending://")):
@@ -486,13 +519,19 @@ def main() -> int:
                 )
 
         if status == "promoted":
-            issue_path = normalize_scalar(candidate.promoted_issue_path or "")
+            issue_path = owner_path
             if not issue_path or issue_path.startswith("pending://"):
                 errors.append(
                     f"{candidate.candidate_id} in {candidate.path} is marked promoted, but promoted_issue_path is still '{issue_path or 'missing'}'. "
                     f"Materialize it into one or more I-{key}* issues before merging to develop."
                 )
                 continue
+
+            if issue_path not in issue_bound_issue_paths:
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is marked promoted to {issue_path}, but this merge does not carry that issue or its linked progress/review. "
+                    f"Develop-bound implementation merges must bring the concrete owner issue into the same diff so the C/M/I chain is auditable."
+                )
 
             issue_record = issues_index.get(issue_path)
             if not issue_record:
@@ -531,7 +570,6 @@ def main() -> int:
                 )
 
         if status == "absorbed":
-            owner_path = normalize_scalar(candidate.promoted_issue_path or "")
             if not owner_path or owner_path.startswith("pending://"):
                 errors.append(
                     f"{candidate.candidate_id} in {candidate.path} is marked absorbed, but there is no canonical owner issue in promoted_issue_path. "
@@ -541,6 +579,11 @@ def main() -> int:
                 errors.append(
                     f"{candidate.candidate_id} in {candidate.path} is marked absorbed, but promoted_issue_path points to missing owner issue {owner_path}. "
                     f"Restore the owner issue path or choose a different final status."
+                )
+            elif owner_path not in issue_bound_issue_paths:
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is marked absorbed into {owner_path}, but this merge does not carry that canonical owner issue or its linked progress/review. "
+                    f"An absorbed candidate only counts when the absorbing owner is part of the same develop-bound diff."
                 )
             if not (candidate.decision_reason or "").strip():
                 errors.append(

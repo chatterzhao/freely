@@ -18,14 +18,15 @@
   - 明确真实集成测试下，新 signal 不得被旧 continuity 错误吸收后直接推进 merge/cleanup
   - 落点优先放在 `three-loop-capability-lifecycle`、`worktree-maintenance-governance`、`milestone-planning-state-maintenance`
 - priority: P0
-- status: absorbed
-- adoption_type: supporting_evidence
-- decision_reason: lifecycle closure、research closure 与 terminal retirement judgement 已由 `I-20260324-0405` 和现有 worktree maintenance truth 显式吸收，这条候选不再需要独立 materialization。
-- next_action: 后续若出现新的 merge-before-closure 漏洞，应围绕新的 gate regression 新开 lifecycle，而不是重开本候选。
-- revisit_trigger: canonical truth 再次把“实现差不多了”误当成“可以 merge / cleanup”时。
-- promoted_issue_path: docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md
+- status: promoted
+- decision_reason: 2026-03-27 的真实 develop merge replay 证明，这条候选不只是 supporting evidence，而是缺少独立 owner issue 的 active merge gate 缺口；必须 materialize 成 issue-bound C/M/I enforcement，才能把 “issue binding + C/M/I coherence + allowed statuses” 冻结成 develop gate。
+- next_action: 在 `I-20260321-1835-A` 中收紧 develop merge gate，要求 merge 绑定具体 issue，并确保 touched candidate 与 touched owner issue 处在同一条 C/M/I 线上。
+- revisit_trigger: 若后续仍出现 candidate-only merge、borrowed owner issue、或 allowed status 误判放行，则在本 issue 线继续追加 regression。
+- promoted_issue_id: I-20260321-1835-A
+- promoted_issue_path: docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md
 - milestone: M-20260306-workspace-routing-foundation
 - supporting_evidence: 2026-03-27 dogfood replay 确认 `pre-merge-commit` hook 虽已触发，但因为错误依赖 `MERGE_HEAD` 守卫而放过了 develop-bound runtime/test merge；修复方向应改为直接审查 staged merge 结果，并以真实 `git merge` 回归测试钉住该时序。
+- supporting_evidence: 同轮继续确认 `absorbed` 候选当前被判得过宽，只要 `promoted_issue_path` 指向某个现存 owner issue 就足以放行 develop merge；后续 gate 应先要求“本次 merge 基于一个具体 issue”，再验证该 issue 的 `C/M/I` 链与允许状态，而不是让 candidate-only supporting evidence 直接成为通行证。
 - session_refs:
   - tool: codex
   - session_id: current-thread
