@@ -75,7 +75,9 @@
   - do not auto-kill or auto-restart from this signal; it stays a supervision hint for manager/human judgement
 - Verification:
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
   - `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
 - Current judgement:
   - this remains same-family monitoring followthrough inside `I-20260322-0445`
+  - the surfaced reason is `manager_continuity_rewrite_without_state_advance`
   - the signal is intentionally conservative so normal waiting states like active worker execution or zero available slots do not trigger it
