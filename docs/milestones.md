@@ -59,6 +59,26 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
 - next_action: 保持在当前 milestone 的 committed queue，直到 verification evidence 明确写回并把 `C-20260325-0333-B` 的完成态同步到正式 closeout；umbrella candidate `C-20260325-0333-A` 继续单独留在 candidate queue
 
+2. `I-20260327-2006-A`
+- title: Project command semantics and explicit restore-work governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md`
+- next_action: IBM 已冻结单 project `start/stop/restart/start --force/restore-work` contract、safe repair set、attach/reuse -> local repair -> fresh bootstrap -> explicit global escalation 顺序，以及 interrupted-local-AI default。下一跳进入 `dev-loop-execution`，优先实现 project command family 与 dedicated `restore-work` surface，并保持 process discovery / kill scope 继续锚定 project identity。
+
+3. `I-20260327-2006-B`
+- title: Global restart restore memory governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md`
+- next_action: 保持 downstream `done_ibm` issue，明确依赖 `I-20260327-2006-A` 已冻结的 taxonomy。待 project command semantics 进入实现后，再进入本 issue 的 `dev-loop-execution`，实现 explicit global restart surface、`$FREELY_HOME/control-plane/restart/{latest.json,history/<timestamp>.json}` manifest durability、previously-running project set 与 operator-stopped exclusion。
+
 ### completed_issues
 
 1. `I-20260324-0415`
@@ -499,7 +519,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md`
 - next_action: 已提升为新的 follow-on issue；后续由 `I-20260327-1115` 承接 issue-bound IBM closeout 与 dev-loop 执行
 
-1. `C-20260323-1435-A`
+2. `C-20260323-1435-A`
 - title: Interactive init bootstrap and fine-grained force/skip governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -510,7 +530,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 `init` 的 step graph、bootstrap commit 豁免边界，以及每个 managed item 的 skip/force contract；在这些边界稳定前，不直接往现有 `init` 继续堆局部 patch
 - revisit_trigger: 当 `init` 的交互入口、repo bootstrap 语义与细粒度 skip/force 输出 contract 可以被冻结成独立 issue scope 时，重新进入 materialization 判断
 
-2. `C-20260318-0715-A`
+3. `C-20260318-0715-A`
 - title: `commit-first after checkpoint-ready` 自治治理
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
