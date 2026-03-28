@@ -2478,6 +2478,97 @@ latest_manager_worker_prompt_csv_from_continuity() {
   printf '%s\n' "${csv:-}"
 }
 
+manager_continuity_semantic_fingerprint() {
+  local continuity_file="$1"
+  [[ -f "$continuity_file" ]] || return 0
+  awk '
+    /^- timestamp: / { next }
+    /^- timestamp_utc: / { next }
+    /^- previous_manager_continuity: / { next }
+    { print }
+  ' "$continuity_file" | sed '/^[[:space:]]*$/d' | shasum -a 256 | awk '{print $1}'
+}
+
+manager_semantic_loop_repeat_state_for_project() {
+  local project="$1" continuity_file latest_continuity latest_prompt_csv latest_consumed
+  local continuity_prompt_csv repeat_count=0 active_running_workers max_parallel_workers
+  local continuity_fingerprint latest_fingerprint="" oldest_repeat="" available_new_slots
+  local threshold min_age oldest_mtime now desired_runtime_state="unknown"
+  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 1
+  if [[ -f "$(workcell_state_file "$project")" ]]; then
+    # shellcheck disable=SC1090
+    source "$(workcell_state_file "$project")"
+    desired_runtime_state="${DESIRED_RUNTIME_STATE:-unknown}"
+  fi
+  [[ "$desired_runtime_state" != "stopped" ]] || return 1
+  latest_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
+  [[ -n "$latest_continuity" && -f "$latest_continuity" ]] || return 1
+  if manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_continuity"; then
+    return 1
+  fi
+  latest_prompt_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_continuity")"
+  [[ -n "$latest_prompt_csv" ]] || return 1
+  manager_continuity_has_unconsumed_launchable_worker_prompt "$project" "$latest_continuity" || return 1
+  active_running_workers="$(count_active_running_workers_for_manager_project "$project" 2>/dev/null || true)"
+  [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
+  (( active_running_workers == 0 )) || return 1
+  available_new_slots="$(manager_worker_launch_available_slots "$project" 2>/dev/null || true)"
+  if [[ "$available_new_slots" =~ ^[0-9]+$ ]]; then
+    (( available_new_slots > 0 )) || return 1
+  fi
+  max_parallel_workers="$(manager_max_parallel_workers)"
+  if [[ "$max_parallel_workers" != "unbounded" ]]; then
+    [[ "$max_parallel_workers" =~ ^[0-9]+$ ]] || return 1
+    (( max_parallel_workers > active_running_workers )) || return 1
+  fi
+  latest_consumed="unavailable"
+  if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
+    # shellcheck disable=SC1090
+    source "$(manager_worker_launch_state_file "$project")"
+    latest_consumed="${LAST_MANAGER_CONTINUITY_CONSUMED:-unavailable}"
+  fi
+  [[ -n "$latest_consumed" && "$latest_consumed" != "unavailable" && "$latest_consumed" != "$latest_continuity" ]] || return 1
+  latest_fingerprint="$(manager_continuity_semantic_fingerprint "$latest_continuity")"
+  [[ -n "$latest_fingerprint" ]] || return 1
+  while IFS= read -r continuity_file; do
+    [[ -f "$continuity_file" ]] || continue
+    if manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file"; then
+      continue
+    fi
+    continuity_prompt_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
+    [[ -n "$continuity_prompt_csv" && "$continuity_prompt_csv" == "$latest_prompt_csv" ]] || break
+    manager_continuity_has_unconsumed_launchable_worker_prompt "$project" "$continuity_file" || break
+    continuity_fingerprint="$(manager_continuity_semantic_fingerprint "$continuity_file")"
+    [[ "$continuity_fingerprint" == "$latest_fingerprint" ]] || break
+    repeat_count=$((repeat_count + 1))
+    oldest_repeat="$continuity_file"
+  done < <(find "$(run_dir_for_project "$project")" -maxdepth 1 -type f -name 'manager-continuity-*.md' | sort -r)
+  threshold="${MANAGER_SEMANTIC_LOOP_REPEAT_THRESHOLD:-3}"
+  [[ "$threshold" =~ ^[0-9]+$ ]] || return 1
+  (( repeat_count >= threshold )) || return 1
+  [[ -n "$oldest_repeat" ]] || return 1
+  oldest_mtime="$(file_mtime_epoch "$oldest_repeat" 2>/dev/null || true)"
+  [[ -n "$oldest_mtime" ]] || return 1
+  now="$(date +%s)"
+  min_age="${MANAGER_SEMANTIC_LOOP_MIN_AGE_SECS:-120}"
+  [[ "$min_age" =~ ^[0-9]+$ ]] || return 1
+  (( now - oldest_mtime >= min_age )) || return 1
+  printf '%s|%s|%s|%s|%s\n' "$repeat_count" "$latest_continuity" "$latest_consumed" "$latest_prompt_csv" "$oldest_repeat"
+}
+
+manager_semantic_loop_signal_snapshot_for_project() {
+  local project="$1" repeat_count latest_continuity latest_consumed latest_prompt_csv oldest_repeat
+  IFS='|' read -r repeat_count latest_continuity latest_consumed latest_prompt_csv oldest_repeat \
+    <<<"$(manager_semantic_loop_repeat_state_for_project "$project" 2>/dev/null || true)"
+  [[ "$repeat_count" =~ ^[0-9]+$ ]] || return 1
+  printf 'manager_continuity_rewrite_without_state_advance|%s|%s|%s|%s|%s\n' \
+    "$repeat_count" \
+    "$latest_continuity" \
+    "$latest_consumed" \
+    "$latest_prompt_csv" \
+    "$oldest_repeat"
+}
+
 manager_continuity_explicitly_freezes_worker_project() {
   local manager_project="$1" target_project="$2" continuity_file="${3:-}" prompt_file resolved_worktree
   [[ -n "$target_project" && -d "$target_project" ]] || return 1
@@ -5164,9 +5255,17 @@ cmd_baseline_status() {
   project="$(resolve_project_or_fail "$project")"
   load_config "$project"
   local sdir run_dir
+  local semantic_loop_signal semantic_loop_signal_reason semantic_loop_signal_summary semantic_loop_repeat_count semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv
   sdir="$(state_dir "$project")"
   run_dir="$(run_dir_for_project "$project")"
   load_session_state_or_defaults "$project"
+  semantic_loop_signal_reason="unavailable"
+  semantic_loop_signal_summary="none"
+  semantic_loop_signal="$(manager_semantic_loop_signal_snapshot_for_project "$project" 2>/dev/null || true)"
+  if [[ -n "$semantic_loop_signal" ]]; then
+    IFS='|' read -r semantic_loop_signal_reason semantic_loop_repeat_count semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv _ <<<"$semantic_loop_signal"
+    semantic_loop_signal_summary="repeats=${semantic_loop_repeat_count:-0} latest=${semantic_loop_latest_continuity:-unavailable} consumed=${semantic_loop_latest_consumed:-unavailable} prompts=${semantic_loop_latest_prompt_csv:-none}"
+  fi
 
   echo "project: $PROJECT_ROOT"
   echo "intent: $INTENT_FILE"
@@ -5216,6 +5315,8 @@ cmd_baseline_status() {
   echo "last_restart_storm_signal_reason: ${LAST_RESTART_STORM_SIGNAL_REASON:-unavailable}"
   echo "last_restart_storm_escalated_at: ${LAST_RESTART_STORM_ESCALATED_AT:-unavailable}"
   echo "last_restart_storm_escalation_target: ${LAST_RESTART_STORM_ESCALATION_TARGET:-unavailable}"
+  echo "semantic_loop_signal_reason: ${semantic_loop_signal_reason}"
+  echo "semantic_loop_signal_summary: ${semantic_loop_signal_summary}"
   if [[ -f "$(manager_worker_launch_state_file "$PROJECT_ROOT")" ]]; then
     # shellcheck disable=SC1090
     source "$(manager_worker_launch_state_file "$PROJECT_ROOT")"
@@ -5300,6 +5401,8 @@ cmd_live_status() {
   local intake_snapshot latest_resolution_snapshot
   local delegated_pending_ids prompt_has_delegated
   local desired_runtime_state last_supervisor_state last_ai_state last_exit_reason last_role_hint last_state_updated_at
+  local semantic_loop_signal semantic_loop_signal_reason semantic_loop_signal_summary semantic_loop_repeat_count
+  local semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv
 
   run_dir="$(run_dir_for_project "$project")"
   branch="$(branch_name_for_project "$project")"
@@ -5392,6 +5495,13 @@ cmd_live_status() {
       fi
     fi
   fi
+  semantic_loop_signal_reason="unavailable"
+  semantic_loop_signal_summary="none"
+  semantic_loop_signal="$(manager_semantic_loop_signal_snapshot_for_project "$project" 2>/dev/null || true)"
+  if [[ -n "$semantic_loop_signal" ]]; then
+    IFS='|' read -r semantic_loop_signal_reason semantic_loop_repeat_count semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv _ <<<"$semantic_loop_signal"
+    semantic_loop_signal_summary="repeats=${semantic_loop_repeat_count:-0} latest=${semantic_loop_latest_continuity:-unavailable} consumed=${semantic_loop_latest_consumed:-unavailable} prompts=${semantic_loop_latest_prompt_csv:-none}"
+  fi
 
   echo "project: $project"
   echo "branch: $branch"
@@ -5415,6 +5525,8 @@ cmd_live_status() {
   echo "restart_storm_signal_reason: ${LAST_RESTART_STORM_SIGNAL_REASON:-unavailable}"
   echo "restart_storm_signal_summary: window=${LAST_RESTART_STORM_WINDOW_SECS:-0}s count=${LAST_RESTART_STORM_COUNT:-0} peak=${LAST_PROCESS_CHURN_PEAK:-0}"
   echo "restart_storm_escalation_target: ${LAST_RESTART_STORM_ESCALATION_TARGET:-unavailable}"
+  echo "semantic_loop_signal_reason: ${semantic_loop_signal_reason}"
+  echo "semantic_loop_signal_summary: ${semantic_loop_signal_summary}"
   echo "current_prompt_has_delegated_continuation: ${prompt_has_delegated}"
   echo "latest_manager_continuity_generated: ${latest_manager_continuity_generated}"
   echo "latest_manager_continuity_consumed: ${latest_manager_continuity_consumed}"
@@ -5573,7 +5685,7 @@ sleep_with_rate_limit_recheck() {
 }
 
 cmd_fleet_status() {
-  local project="" repo_root entries wt_path wt_branch wt_state cfg run_dir session_state supervisor_pid ai_pid last_launch last_dirty checkpoint_json checkpoint_required restart_signal_reason restart_signal_at restart_summary
+  local project="" repo_root entries wt_path wt_branch wt_state cfg run_dir session_state supervisor_pid ai_pid last_launch last_dirty checkpoint_json checkpoint_required restart_signal_reason restart_signal_at restart_summary semantic_loop_summary semantic_loop_signal
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -5604,9 +5716,13 @@ cmd_fleet_status() {
     restart_signal_reason="-"
     restart_signal_at="-"
     restart_summary="-"
+    semantic_loop_summary="-"
     if [[ -f "$cfg" ]]; then
       run_dir="$(run_dir_for_project "$wt_path")"
       session_state="$(session_state_file "$wt_path")"
+      if [[ -f "$(manager_worker_launch_state_file "$wt_path")" ]]; then
+        manager_worker_launch_state_refresh_for_status "$wt_path" >/dev/null 2>&1 || true
+      fi
       if [[ -f "$run_dir/supervisor.pid" ]]; then
         supervisor_pid="$(cat "$run_dir/supervisor.pid" 2>/dev/null || echo none)"
         if ! valid_supervisor_pid_for_project "$wt_path" "$supervisor_pid"; then
@@ -5628,6 +5744,12 @@ cmd_fleet_status() {
         restart_signal_at="${LAST_RESTART_STORM_SIGNAL_AT:--}"
         restart_summary="storm=${restart_signal_reason} window=${LAST_RESTART_STORM_WINDOW_SECS:-0}s count=${LAST_RESTART_STORM_COUNT:-0} peak=${LAST_PROCESS_CHURN_PEAK:-0}"
       fi
+      semantic_loop_signal="$(manager_semantic_loop_signal_snapshot_for_project "$wt_path" 2>/dev/null || true)"
+      if [[ -n "$semantic_loop_signal" ]]; then
+        local semantic_loop_reason semantic_loop_repeat_count
+        IFS='|' read -r semantic_loop_reason semantic_loop_repeat_count _ _ <<<"$semantic_loop_signal"
+        semantic_loop_summary="loop=${semantic_loop_reason} repeats=${semantic_loop_repeat_count:-0}"
+      fi
     fi
     checkpoint_json="$(checkpoint_guard_json_for_project "$wt_path")"
     checkpoint_required="$(checkpoint_guard_value "$checkpoint_json" checkpoint_required)"
@@ -5637,6 +5759,9 @@ cmd_fleet_status() {
     fi
     if [[ "$restart_signal_at" != "-" && -n "$restart_signal_at" ]]; then
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "$restart_signal_reason" "" "$restart_summary"
+    fi
+    if [[ "$semantic_loop_summary" != "-" ]]; then
+      printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "semantic_loop" "" "$semantic_loop_summary"
     fi
   done < <(printf '%s\n' "$entries" | awk '
     BEGIN { wt=""; br="(detached)" }
