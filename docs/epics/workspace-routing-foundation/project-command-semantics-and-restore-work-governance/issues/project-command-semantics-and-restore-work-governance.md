@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260327-2006-A`
 - title: Project command semantics and explicit restore-work governance
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `project-command-semantics-and-restore-work-governance`
@@ -15,7 +15,7 @@
 - integration_target: `develop`
 - depends_on: `none`
 - session_refs:
-  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
+  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-initial-slice"}
 
 ## Why
 
@@ -55,5 +55,6 @@ Freely 已经有 project-scoped pid ownership 与 `cmd_stop()` 的底层 blast r
 
 ## Next
 
-- 下一跳进入 `dev-loop-execution`，优先实现 project command family 与 `restore-work` surface。
+- 当前 issue 已进入 `dev-loop-execution`，先落最小 runtime command surface：`restart`、`start --force`、`restore-work` 与 shared stop-path extraction。
+- 同步补 focused regression，确保 command dispatch、project-local repair reason 与 restore anchor gate 不回退。
 - 下游 `I-20260327-2006-B` 只在本 issue taxonomy 稳定后继续展开 global restart manifest durability 与 fleet restore policy。

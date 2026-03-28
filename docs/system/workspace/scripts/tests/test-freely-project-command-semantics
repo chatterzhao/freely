@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-project-command-semantics.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+RESTART_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    log_info() { :; }
+    stop_project_runtime() { printf "stop:%s|reason:%s\n" "$1" "$2"; }
+    start_project_runtime() { printf "start:%s\n" "$1"; }
+    main restart --project /tmp/freely-project
+  '
+)"
+
+[[ "$RESTART_OUTPUT" == *"stop:/tmp/freely-project|reason:operator_restart"* ]]
+[[ "$RESTART_OUTPUT" == *"start:/tmp/freely-project"* ]]
+
+START_FORCE_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    log_info() { :; }
+    stop_project_runtime() { printf "stop:%s|reason:%s\n" "$1" "$2"; }
+    start_project_runtime() { printf "start:%s\n" "$1"; }
+    main start --project /tmp/freely-project --force
+  '
+)"
+
+[[ "$START_FORCE_OUTPUT" == *"stop:/tmp/freely-project|reason:start_force"* ]]
+[[ "$START_FORCE_OUTPUT" == *"start:/tmp/freely-project"* ]]
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-once"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=1
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+set +e
+MISSING_ANCHOR_OUTPUT="$(bash "$ROOT_DIR/bin/freely" restore-work --project "$PROJECT" 2>&1)"
+MISSING_ANCHOR_STATUS=$?
+set -e
+[[ $MISSING_ANCHOR_STATUS -ne 0 ]]
+grep -q 'restore-work requires mandatory project runtime intent anchor' <<<"$MISSING_ANCHOR_OUTPUT"
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+WORKCELL_DESIRED_RUNTIME_STATE="running"
+WORKCELL_ACTIVITY_STATE="ai_active"
+WORKCELL_LAST_EXIT_REASON="operator_restart"
+EOF
+
+cat >"$PROJECT/.freely/run/worker-continuity-20260328-sample.md" <<'EOF'
+# Worker Continuity
+- next_action: resume sample work
+EOF
+
+RESTORE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" restore-work --project "$PROJECT")"
+grep -q '^intake_id: ' <<<"$RESTORE_OUTPUT"
+grep -q '^restore_anchor_count: 1$' <<<"$RESTORE_OUTPUT"
+
+echo "[PASS] project command semantics dispatch restart/start --force and restore-work anchor rules hold"

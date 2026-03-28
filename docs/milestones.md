@@ -62,12 +62,12 @@ routing_policy:
 2. `I-20260327-2006-A`
 - title: Project command semantics and explicit restore-work governance
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md`
-- next_action: IBM 已冻结单 project `start/stop/restart/start --force/restore-work` contract、safe repair set、attach/reuse -> local repair -> fresh bootstrap -> explicit global escalation 顺序，以及 interrupted-local-AI default。下一跳进入 `dev-loop-execution`，优先实现 project command family 与 dedicated `restore-work` surface，并保持 process discovery / kill scope 继续锚定 project identity。
+- next_action: 当前已进入 `dev-loop-execution`。优先完成 runtime command dispatch、`restart` / `start --force` / `restore-work` surface、project-local stop/rebuild reuse，以及 focused regression；保持 process discovery / kill scope 继续锚定 project identity，并继续把 interrupted-local-AI restore 留在显式 `restore-work` surface。
 
 3. `I-20260327-2006-B`
 - title: Global restart restore memory governance

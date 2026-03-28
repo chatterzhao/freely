@@ -37,7 +37,9 @@ Usage:
   freely intake status [--project <abs_path>]
   freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
   freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
-  freely start [--project <abs_path>]
+  freely start [--project <abs_path>] [--force]
+  freely restart [--project <abs_path>]
+  freely restore-work [--project <abs_path>]
   freely baseline-status [--project <abs_path>]
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]
@@ -4657,15 +4659,77 @@ codex_capability_default_cwd_mode_for_runtime() {
   esac
 }
 
-cmd_start() {
-  local project=""
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
-      *) log_error "unknown arg: $1"; usage; exit 1 ;;
-    esac
-  done
-  project="$(resolve_project_or_fail "$project")"
+latest_worker_continuity_file_for_project() {
+  local project="$1"
+  latest_run_artifact_for_project "$project" 'worker-continuity-*.md'
+}
+
+latest_interruption_resolution_file_for_project() {
+  local project="$1" resolution_dir
+  resolution_dir="$(interruption_resolution_dir_for_project "$project")"
+  [[ -d "$resolution_dir" ]] || return 0
+  find "$resolution_dir" -mindepth 2 -maxdepth 2 -type f -name 'resolution.md' | sort | tail -n 1
+}
+
+stop_project_runtime() {
+  local project="$1" stop_reason="${2:-operator_stop}"
+  local sdir run_dir
+  sdir="$(state_dir "$project")"
+  run_dir="$(run_dir_for_project "$project")"
+  mkdir -p "$run_dir"
+  : >"$(stop_marker_file "$project")"
+
+  if [[ -f "$run_dir/ai.pid" ]]; then
+    local ap
+    ap="$(cat "$run_dir/ai.pid" 2>/dev/null || true)"
+    [[ -n "$ap" ]] && kill "$ap" 2>/dev/null || true
+    rm -f "$run_dir/ai.pid"
+  fi
+  if [[ -f "$(ensure_manager_watchdog_pid_file "$project")" ]]; then
+    local wp
+    wp="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$wp"; then
+      [[ -n "$wp" ]] && kill "$wp" 2>/dev/null || true
+    fi
+    rm -f "$(ensure_manager_watchdog_pid_file "$project")"
+  fi
+  if [[ -f "$(interruption_dispatcher_pid_file "$project")" ]]; then
+    local dp
+    dp="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
+    if valid_interruption_dispatcher_pid_for_project "$project" "$dp"; then
+      [[ -n "$dp" ]] && kill "$dp" 2>/dev/null || true
+    fi
+    rm -f "$(interruption_dispatcher_pid_file "$project")"
+  fi
+  if [[ -f "$run_dir/supervisor.pid" ]]; then
+    local sp
+    sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
+    if valid_supervisor_pid_for_project "$project" "$sp"; then
+      [[ -n "$sp" ]] && kill "$sp" 2>/dev/null || true
+    fi
+    rm -f "$run_dir/supervisor.pid"
+  else
+    local sp
+    sp="$(discover_supervisor_pid "$project")"
+    [[ -n "$sp" ]] && kill "$sp" 2>/dev/null || true
+  fi
+  if [[ -f "$run_dir/supervisor.pid" ]]; then
+    local sp
+    sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
+    if [[ -n "$sp" ]]; then
+      for _ in $(seq 1 20); do
+        kill -0 "$sp" 2>/dev/null || break
+        sleep 0.2
+      done
+    fi
+  fi
+  rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
+  rm -f "$(stop_marker_file "$project")"
+  write_workcell_state "$project" "stopped" "down" "down" "$stop_reason"
+}
+
+start_project_runtime() {
+  local project="$1"
   load_config "$project"
   check_doc_gate_or_fail "$project" || {
     log_error "start blocked by doc gate"
@@ -4994,6 +5058,124 @@ cmd_start() {
     fi
     sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$next_restart_delay"
   done
+}
+
+cmd_start() {
+  local project="" force="0"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --force) force="1"; shift ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  if [[ "$force" == "1" ]]; then
+    log_info "forcing project-local runtime rebuild before start"
+    stop_project_runtime "$project" "start_force"
+  fi
+  start_project_runtime "$project"
+}
+
+cmd_restart() {
+  local project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  log_info "restarting current project runtime/control-plane without implicit work restore"
+  stop_project_runtime "$project" "operator_restart"
+  start_project_runtime "$project"
+}
+
+cmd_restore_work() {
+  local project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  load_config "$project"
+  check_doc_gate_or_fail "$project" || {
+    log_error "restore-work blocked by doc gate"
+    exit 1
+  }
+
+  local workcell_state launch_state manager_continuity worker_continuity prompt_file resolution_file intake_count
+  local anchor_lines="" operator_anchor_count=0 intake_output restore_message
+  workcell_state="$(workcell_state_file "$project")"
+  launch_state="$(manager_worker_launch_state_file "$project")"
+  manager_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
+  worker_continuity="$(latest_worker_continuity_file_for_project "$project")"
+  prompt_file="$(find_latest_prompt_file_for_project "$project")"
+  resolution_file="$(latest_interruption_resolution_file_for_project "$project")"
+  intake_count="$(count_active_intake_items "$project")"
+
+  [[ -f "$workcell_state" ]] || {
+    log_error "restore-work requires mandatory project runtime intent anchor: $workcell_state"
+    log_error "session-state/handoff are auxiliary only and cannot authorize restore-work by themselves"
+    exit 1
+  }
+  anchor_lines="${anchor_lines}- workcell-state.env: $workcell_state"$'\n'
+
+  if [[ -f "$launch_state" ]]; then
+    operator_anchor_count=$((operator_anchor_count + 1))
+    anchor_lines="${anchor_lines}- manager-worker-launch-state.env: $launch_state"$'\n'
+  fi
+  if [[ -n "$manager_continuity" && -f "$manager_continuity" ]]; then
+    operator_anchor_count=$((operator_anchor_count + 1))
+    anchor_lines="${anchor_lines}- manager continuity: $manager_continuity"$'\n'
+  fi
+  if [[ -n "$worker_continuity" && -f "$worker_continuity" ]]; then
+    operator_anchor_count=$((operator_anchor_count + 1))
+    anchor_lines="${anchor_lines}- worker continuity: $worker_continuity"$'\n'
+  fi
+  if [[ -n "$resolution_file" && -f "$resolution_file" ]]; then
+    operator_anchor_count=$((operator_anchor_count + 1))
+    anchor_lines="${anchor_lines}- interruption resolution: $resolution_file"$'\n'
+  fi
+  if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
+    operator_anchor_count=$((operator_anchor_count + 1))
+    anchor_lines="${anchor_lines}- delegated prompt evidence: $prompt_file"$'\n'
+  fi
+  if [[ "${intake_count:-0}" =~ ^[0-9]+$ ]] && (( intake_count > 0 )); then
+    operator_anchor_count=$((operator_anchor_count + 1))
+    anchor_lines="${anchor_lines}- active intake items: ${intake_count}"$'\n'
+  fi
+
+  if (( operator_anchor_count == 0 )); then
+    log_error "restore-work requires explicit project continuity anchors in addition to workcell-state.env"
+    log_error "expected at least one of: manager-worker launch state, continuity, interruption resolution, delegated prompt evidence, or intake"
+    log_error "session-state/handoff remain auxiliary and are not enough on their own"
+    exit 1
+  fi
+
+  restore_message="$(cat <<EOF
+Explicit project-scoped restore-work requested.
+
+Project: $project
+Contract:
+- restore only interrupted work for this project
+- do not infer global restart/reset from this command
+- project restart remains a fresh bootstrap surface; restore-work is the explicit operator intent
+
+Mandatory restore anchors:
+$anchor_lines
+Auxiliary artifacts intentionally not required:
+- $(session_state_file "$project")
+- $(handoff_file "$project")
+- $(run_dir_for_project "$project")/ai.pid
+- $(run_dir_for_project "$project")/supervisor.pid
+EOF
+)"
+  intake_output="$(submit_human_frontdoor_message "$project" operator restore-work "$restore_message")"
+  printf '%s\n' "$intake_output"
+  printf 'restore_anchor_count: %s\n' "$operator_anchor_count"
 }
 
 cmd_ensure_manager() {
@@ -5851,59 +6033,7 @@ cmd_stop() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
-  local sdir run_dir
-  sdir="$(state_dir "$project")"
-  run_dir="$(run_dir_for_project "$project")"
-  mkdir -p "$run_dir"
-  : >"$(stop_marker_file "$project")"
-
-  if [[ -f "$run_dir/ai.pid" ]]; then
-    local ap
-    ap="$(cat "$run_dir/ai.pid" 2>/dev/null || true)"
-    [[ -n "$ap" ]] && kill "$ap" 2>/dev/null || true
-    rm -f "$run_dir/ai.pid"
-  fi
-  if [[ -f "$(ensure_manager_watchdog_pid_file "$project")" ]]; then
-    local wp
-    wp="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
-    if valid_ensure_manager_watchdog_pid_for_project "$project" "$wp"; then
-      [[ -n "$wp" ]] && kill "$wp" 2>/dev/null || true
-    fi
-    rm -f "$(ensure_manager_watchdog_pid_file "$project")"
-  fi
-  if [[ -f "$(interruption_dispatcher_pid_file "$project")" ]]; then
-    local dp
-    dp="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
-    if valid_interruption_dispatcher_pid_for_project "$project" "$dp"; then
-      [[ -n "$dp" ]] && kill "$dp" 2>/dev/null || true
-    fi
-    rm -f "$(interruption_dispatcher_pid_file "$project")"
-  fi
-  if [[ -f "$run_dir/supervisor.pid" ]]; then
-    local sp
-    sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
-    if valid_supervisor_pid_for_project "$project" "$sp"; then
-      [[ -n "$sp" ]] && kill "$sp" 2>/dev/null || true
-    fi
-    rm -f "$run_dir/supervisor.pid"
-  else
-    local sp
-    sp="$(discover_supervisor_pid "$project")"
-    [[ -n "$sp" ]] && kill "$sp" 2>/dev/null || true
-  fi
-  if [[ -f "$run_dir/supervisor.pid" ]]; then
-    local sp
-    sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
-    if [[ -n "$sp" ]]; then
-      for _ in $(seq 1 20); do
-        kill -0 "$sp" 2>/dev/null || break
-        sleep 0.2
-      done
-    fi
-  fi
-  rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
-  rm -f "$(stop_marker_file "$project")"
-  write_workcell_state "$project" "stopped" "down" "down" "operator_stop"
+  stop_project_runtime "$project" "operator_stop"
   log_info "stopped (if running)"
 }
 
@@ -5930,6 +6060,8 @@ main() {
     ensure-manager) cmd_ensure_manager "$@" ;;
     ensure-interruption-dispatch) cmd_ensure_interruption_dispatch "$@" ;;
     start) cmd_start "$@" ;;
+    restart) cmd_restart "$@" ;;
+    restore-work) cmd_restore_work "$@" ;;
     baseline-status) cmd_baseline_status "$@" ;;
     status) cmd_status "$@" ;;
     live-status) cmd_live_status "$@" ;;
