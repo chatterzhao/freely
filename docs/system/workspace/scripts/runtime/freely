@@ -5700,6 +5700,19 @@ cmd_live_status() {
     last_role_hint="${LAST_ROLE_HINT:-$role_hint}"
     last_state_updated_at="${LAST_STATE_UPDATED_AT:-unknown}"
   fi
+  # Reconcile stale persisted state with current runtime discovery without
+  # inventing failures. We only override toward "up" when a live PID is
+  # positively owned by this project; absence of a PID does not rewrite the
+  # historical state file.
+  if [[ -n "$supervisor_pid" ]]; then
+    last_supervisor_state="up"
+  fi
+  if [[ -n "$ai_pid" ]]; then
+    last_ai_state="up"
+    if [[ "$last_exit_reason" == "starting" ]]; then
+      last_exit_reason="none"
+    fi
+  fi
   latest_manager_continuity_generated="unavailable"
   latest_manager_continuity_consumed="unavailable"
   latest_manager_worker_prompts_generated="none"

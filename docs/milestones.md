@@ -319,7 +319,20 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/code-reviews/20260326-manager-delegated-intake-absorption-closure-verification.md`
 - completion_note: manager-owned delegated intake absorbed closure 已进入 canonical `develop`，focused regressions 与 live-status surface 均未回退；worker-side delegated lifecycle 仍按既有 issue family 独立推进
 
-5. `C-20260324-0405-A`
+5. `I-20260328-0745-A`
+- title: Live-status current runtime state reconciliation governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/issues/live-status-current-runtime-state-reconciliation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260328-0745--live-status-current-runtime-state-reconciliation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260328-0745--live-status-current-runtime-state-reconciliation/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-live-status-current-runtime-state-reconciliation-governance.md`
+  - `docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/code-reviews/20260328-live-status-current-runtime-state-reconciliation-verification.md`
+- completion_note: `live-status` current-state surface 现在会把确认存活的 project-owned supervisor / AI PID 与 `last_*` 字段对齐，不再在 active AI 场景下同时显示 `ai_active` 与 `last_ai_state: down`；修复保持只读，不改变 recovery 持久化语义
+
+6. `C-20260324-0405-A`
 - title: Watchdog restart-storm and process-churn signal implementation
 - milestone_state: completed
 - phase_state: `completed`
@@ -332,7 +345,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/code-reviews/20260324-watchdog-restart-storm-and-process-churn-verification.md`
 - completion_note: restart-storm / process-churn signal 的 runtime helper、`session-state.env` 真相面、manager escalation 与 `live-status` / `fleet-status` 暴露已在 same-family issue 中完成并验证；该 candidate 不再保留为 active dev handoff
 
-6. `I-20260320-1945`
+7. `I-20260320-1945`
 - title: Watchdog live status surface and manager supervision
 - milestone_state: completed
 - phase_state: `completed`
@@ -344,7 +357,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
 - completion_note: `freely live-status` 的主管监督接线与 status surface 已进入 canonical truth；后续若继续扩 JSON / watch / scoring，应新开 lifecycle
 
-7. `I-20260320-2105`
+8. `I-20260320-2105`
 - title: Baseline-status command and status family governance
 - milestone_state: completed
 - phase_state: `completed`
