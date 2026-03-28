@@ -217,11 +217,12 @@ MOCK_OAUTH_LOG="$LOG_EARLIEST" \
 grep -q '"switched": false' "$TMP_DIR/earliest.out"
 grep -q '"status": "all_unavailable"' "$TMP_DIR/earliest.out"
 grep -q '"earliest_slot": "fast@example-com-1"' "$TMP_DIR/earliest.out"
+grep -q '"reset_at_human": "2099.12.31 00:00:00 UTC"' "$TMP_DIR/earliest.out"
 grep -q '"launch_blocked": true' "$TMP_DIR/earliest.out"
 grep -q '"slot": null' <(HOME="$HOME_EARLIEST" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
 grep -q 'earliest|token-slow' "$LOG_EARLIEST"
 grep -q 'earliest|token-fast' "$LOG_EARLIEST"
 grep -q 'old@example.com' <(current_codex_email "$HOME_EARLIEST/.codex/auth.json")
-grep -Eq '^fast@example-com-1[[:space:]]+4102358400' "$PROJECT_EARLIEST/.freely/run/codex-slot-cooldowns.tsv"
+grep -Fq $'fast@example-com-1\t4102358400\t2099.12.31 00:00:00 UTC' "$PROJECT_EARLIEST/.freely/run/codex-slot-cooldowns.tsv"
 
 echo "[PASS] freely ai switch codex keeps launch blocked and leaves the current auth untouched when all slots are unavailable"

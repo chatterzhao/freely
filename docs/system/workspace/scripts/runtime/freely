@@ -336,6 +336,15 @@ append_global_auth_change_event() {
   printf '%s event=auth_change tool=%q slot=%q reason=%q\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "${tool:-unknown}" "${slot:-}" "${reason:-unspecified}" >>"$log_file"
 }
 
+reset_project_auth_change_hold_state() {
+  local project="$1" tool="$2"
+  case "$tool" in
+    codex)
+      codex_clear_availability_state "$project"
+      ;;
+  esac
+}
+
 wake_registered_projects_for_auth_change() {
   local tool="$1" slot="$2" reason="$3"
   local project woke_count=0 skipped_count=0
@@ -350,7 +359,8 @@ wake_registered_projects_for_auth_change() {
       skipped_count=$((skipped_count + 1))
       continue
     fi
-    if ! ensure_manager_once "$project"; then
+    reset_project_auth_change_hold_state "$project" "$tool"
+    if ! FREELY_FORCE_WATCHDOG_REPROBE=1 ensure_manager_once "$project"; then
       skipped_count=$((skipped_count + 1))
       continue
     fi
