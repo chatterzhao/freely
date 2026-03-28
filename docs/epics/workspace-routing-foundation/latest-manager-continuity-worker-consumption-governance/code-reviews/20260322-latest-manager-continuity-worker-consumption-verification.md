@@ -60,3 +60,20 @@
 - no further acceptance blocker remains inside `I-20260322-0445` after absorbing the current canonical `123901` generated-and-consumed truth into the same issue family writeback
 - keep this feature worktree scoped to docs-only closeout absorption and cleanup disposition only
 - keep this integration owner retained-with-reason for cleanup followthrough, but retire the superseded local companions `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile` and `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-active-worker-launch-state-reconcile` in this worker round
+
+## 2026-03-27 Regression Addendum
+
+- A same-family regression appeared on canonical `develop` after the earlier closeout:
+  - the manager kept publishing newer continuity files, but runtime still selected the stale launchable continuity snapshot and never launched the retained closeout worker prompt
+  - this produced a patrol loop with repeated continuity rewrites and no worker progress
+- Root cause was not account availability:
+  - `a125064` correctly blocked relaunch of already-initialized merged clean workers
+  - but it also blocked newly created, never-initialized clean verification worktrees whose branch had not diverged from `develop` yet
+- Repair scope stays inside the original runtime/test contract:
+  - require runtime history on the target worker worktree before classifying a merged clean lane as retire-ready
+  - preserve the merged-clean relaunch guard for initialized workers
+  - add `test-freely-uninitialized-clean-worker-handoff-launchable`
+- 2026-03-27 verification passed:
+  - `bash docs/system/workspace/scripts/tests/test-freely-merged-clean-worker-handoff-guard`
+  - `bash docs/system/workspace/scripts/tests/test-freely-uninitialized-clean-worker-handoff-launchable`
+  - `./bin/governance-check`
