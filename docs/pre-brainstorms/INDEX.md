@@ -383,6 +383,9 @@
 - 20260326-1810--freely-layered-architecture-and-tooling-topology
   - brainstorms: docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md
   - candidates: docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md
+- 20260328-0154--manager-stall-reentry-false-positive-supervision-thrash
+  - brainstorms: docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

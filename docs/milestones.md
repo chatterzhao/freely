@@ -763,16 +763,15 @@ routing_policy:
 - next_action: 保持 active candidate；先依赖测试批次治理 issue 冻结 protected-env 生命周期语义。历史文案中的 `pre-test-merge` 统一按 `test-pre-merge-*` 前缀族理解，并在真实 dogfood 中跑满 watchdog 阈值；只有 delegated continuation 已进 prompt 且超过阈值仍无新 manager continuity/decision 时，才 materialize 成独立 runtime/orchestration issue
 - revisit_trigger: 当治理 issue 稳定 `test-pre-merge-*` 边界后，或真实 post-merge acceptance 再次在超过 watchdog 阈值后仍复现 delegated continuation stall 时，重新进入 issue materialization 判断
 
-10. `C-20260323-1705-A`
-- title: Detect and recover manager delegated continuation stalls after prompt absorption
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+10. `I-20260328-0154-A`
+- title: Manager delegated continuation stall recovery governance
+- milestone_state: committed
+- phase_state: `in_verification`
 - priority: P0
-- promoted_issue_path: `pending://manager-delegated-continuation-stall-recovery-materialization`
+- issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`
-- next_action: 保持 active candidate；先用 runtime 补丁和真实 dogfood 验证 prompt-absorbed delegated continuation stall 是否能被恢复，再决定是 materialize 为独立 issue，还是吸收到现有 stall/recovery issue 族
-- revisit_trigger: 当再次复现 manager prompt 已吸收 continuation 但无新 continuity / handoff 的假活，或当前 runtime 补丁验证稳定后需要冻结独立 issue contract 时，重新进入 materialization 判断
+- source_candidates: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`, `docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md`
+- next_action: 保持当前 research worktree 作为唯一写入 lane，完成 merge judgement 与写回；在补丁吸收到 `develop` 前，不恢复 pre-fix stalled dogfood runtime
 
 11. `C-20260323-1835-A`
 - title: Detect and recover active worker delegated-continuation stalls
