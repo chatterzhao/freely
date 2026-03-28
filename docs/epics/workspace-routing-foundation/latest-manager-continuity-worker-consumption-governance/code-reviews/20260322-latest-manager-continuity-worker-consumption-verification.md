@@ -91,3 +91,19 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
   - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
   - `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
+
+## 2026-03-27 Consumed Continuity Resume Drift Addendum
+
+- A later canonical replay exposed one more same-family routing gap after the semantic-loop surface was already present:
+  - `latest_manager_continuity_consumed` had already caught up to the newest continuity
+  - stale worker prompt references were already cleared
+  - but the active manager session still resumed through generic first-hop patrol and began scanning unrelated standing sources instead of continuing the consumed continuity's `active_lane / restart_point / next_action`
+- Review judgement:
+  - this remains inside the original continuity-consumption contract because the missing behavior is not new patrol semantics, but resume anchoring to already-consumed authoritative continuity
+  - the fix should therefore stay narrow: manager-only prompt narrowing on eligible resume paths, with explicit escape hatches for fresh delegated continuation, contradiction, or closed restart points
+- Required regression evidence:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
+  - supporting prompt-composition rechecks to ensure ordinary first-hop patrol still happens when the narrowing preconditions are not met
+- Residual risk observed during verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-session-rotation` still exits in the pre-existing `context_usage_threshold` scenario on both this branch and unchanged `develop`
+  - that path does not traverse the new manager consumed-continuity narrowing, so it should not block this same-family repair, but it remains a separate baseline test gap worth reopening independently if not already tracked

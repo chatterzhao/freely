@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260327-1845--manager-consumed-continuity-resume-routing-drift
 - 20260327-1003--prebrainstorm-materialization-audit
 - 20260327-0651--pretests-gate-and-network-proxy-config
 - 20260326-1705--manager-owner-stance-and-source-patrol
@@ -63,6 +64,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260327-1845--manager-consumed-continuity-resume-routing-drift
+  - brainstorms: docs/pre-brainstorms/20260327-1845--manager-consumed-continuity-resume-routing-drift/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260327-1845--manager-consumed-continuity-resume-routing-drift/candidates.md
 - 20260327-1003--prebrainstorm-materialization-audit
   - brainstorms: docs/pre-brainstorms/20260327-1003--prebrainstorm-materialization-audit/brainstorms.md
   - candidates: docs/pre-brainstorms/20260327-1003--prebrainstorm-materialization-audit/candidates.md

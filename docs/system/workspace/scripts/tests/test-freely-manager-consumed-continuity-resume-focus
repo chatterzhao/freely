@@ -1,0 +1,196 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-consumed-continuity-resume-focus.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260327-0000--sample" \
+  "$PROJECT/.freely/run"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260327-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260327-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260327-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" init -q -b develop
+git -C "$PROJECT" config user.name freely-test
+git -C "$PROJECT" config user.email freely-test@example.com
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260327-181023.md"
+cat >"$CONTINUITY" <<'EOF'
+# Manager Continuity
+
+## Queue And Dispatch
+- worker_prompt_paths_created_this_round: `none`
+- worker_prompt_paths_referenced_this_round: `none`
+- cleanup_queue:
+  - lane: `runtime-consumption-followthrough`
+  - state: `manager-only`
+  - ownership: `manager`
+  - route_kind: `cleanup_governance`
+  - restart_point: `consumed continuity needs one more runtime truth check`
+  - next_action: `verify the latest continuity remains consumed and stale prompt refs stay cleared`
+
+## Ownership And Restart Point
+- active_lane:
+  - ownership: `manager`
+  - route_kind: `completion_verification`
+  - restart_point: `runtime followthrough is the only remaining open thread`
+  - next_action: `stay on runtime followthrough instead of restarting milestone patrol`
+- next_supervision_priority:
+  - `1. verify live-status still points at this continuity`
+  - `2. only expand if current fleet truth contradicts this continuity`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="none"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"
+LAUNCHED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPTS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-03-27T18:10:24Z"
+EOF
+
+PROMPT_OUTPUT="$(
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+  LAUNCH_KIND_SELECTED="resume" \
+  LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0" \
+  LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY" \
+  bash -lc '
+    source "$1"
+    build_prompt
+  ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+)"
+
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '已消费 manager continuity 续接：'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '不要默认重做完整的主管首跳 patrol / 里程碑全扫描'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'route_kind: `completion_verification`'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'restart_point: `runtime followthrough is the only remaining open thread`'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'next_action: `stay on runtime followthrough instead of restarting milestone patrol`'
+
+PROMPT_OUTPUT_PENDING="$(
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+  LAUNCH_KIND_SELECTED="resume" \
+  LAST_DELEGATED_CONTINUATION_PENDING_COUNT="1" \
+  LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY" \
+  bash -lc '
+    source "$1"
+    build_prompt
+  ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+)"
+
+if printf '%s\n' "$PROMPT_OUTPUT_PENDING" | grep -q '已消费 manager continuity 续接：'; then
+  echo "[FAIL] consumed-continuity resume focus should not override fresh delegated continuation work" >&2
+  exit 1
+fi
+
+NEWER_CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260327-181024.md"
+cat >"$NEWER_CONTINUITY" <<'EOF'
+# Manager Continuity
+
+## Ownership And Restart Point
+- active_lane:
+  - ownership: `manager`
+  - route_kind: `completion_verification`
+  - restart_point: `a newer continuity superseded the previous lane`
+  - next_action: `use the newer continuity instead of the older consumed one`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$NEWER_CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="none"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"
+LAUNCHED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPTS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-03-27T18:10:25Z"
+EOF
+
+PROMPT_OUTPUT_STALE_CONSUMED="$(
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+  LAUNCH_KIND_SELECTED="resume" \
+  LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0" \
+  LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY" \
+  bash -lc '
+    source "$1"
+    build_prompt
+  ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+)"
+
+if printf '%s\n' "$PROMPT_OUTPUT_STALE_CONSUMED" | grep -q '已消费 manager continuity 续接：'; then
+  echo "[FAIL] consumed-continuity resume focus should not apply when consumed continuity is no longer the latest generated truth" >&2
+  exit 1
+fi
+
+echo "[PASS] manager resume prompt stays anchored to consumed manager continuity before reopening broad patrol"
