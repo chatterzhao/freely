@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-runtime-supervisor-event-log.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260327-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260327-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260327-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260327-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+IFLOW_MAX_TURNS=100
+EOF
+
+bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 &
+supervisor_pid=$!
+
+event_log="$PROJECT/.freely/logs/runtime-events.log"
+for _ in $(seq 1 20); do
+  [[ -f "$event_log" ]] && grep -q 'event=ai_cycle_finished' "$event_log" && break
+  sleep 1
+done
+
+if [[ ! -f "$event_log" ]]; then
+  echo "[FAIL] expected runtime-events.log to be created"
+  kill "$supervisor_pid" 2>/dev/null || true
+  wait "$supervisor_pid" 2>/dev/null || true
+  exit 1
+fi
+
+grep -q 'event=supervisor_started' "$event_log"
+grep -q 'event=ai_launch_begin' "$event_log"
+grep -q 'event=ai_cycle_finished' "$event_log"
+grep -q 'exit_reason=ai_exit_rc_0' "$event_log"
+
+bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+wait "$supervisor_pid" || true
+
+grep -q 'event=operator_stop_requested' "$event_log"
+grep -q 'event=supervisor_cleanup' "$event_log"
+grep -q 'event=supervisor_cleanup.*exit_reason=operator_stop' "$event_log"
+
+echo "[PASS] freely persists supervisor-side runtime events across launch, ai exit, and stop cleanup"
