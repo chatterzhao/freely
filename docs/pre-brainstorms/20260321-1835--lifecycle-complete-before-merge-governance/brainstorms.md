@@ -41,6 +41,17 @@
   - 而是被错误吸收到旧的 `cleanup://merged-worktree-followthrough` continuity
 - 这说明不能把“能启动 + 能 intake”误当成“merge gate / lifecycle gate 已正确生效”
 
+4. hook 名义存在，但真实 merge 仍可能漏拦
+- 本轮又复现到一条更具体的 develop merge 漏口：
+  - `pre-merge-commit` hook 已启用
+  - `governance-merge-gate --staged` 单独运行会失败
+  - 但真实 `git merge --no-ff <feature>` 仍能进入 `develop`
+- 追到 hook 现场后确认：
+  - `pre-merge-commit` 触发时，`git diff --cached` 已经能看到 merge 结果
+  - 但 `MERGE_HEAD` 在该时点为空
+  - hook 因为把 `MERGE_HEAD` 当成前置守卫而直接 `exit 0`
+- 这说明 merge gate 不仅要“有规则”，还要覆盖真实 hook 时序；否则 develop-bound merge 仍会把 runtime/test 真源绕过 candidate-driven lifecycle evidence
+
 ## Proposed Clarification
 
 ### 1. merge gate 应以 lifecycle closure 为准

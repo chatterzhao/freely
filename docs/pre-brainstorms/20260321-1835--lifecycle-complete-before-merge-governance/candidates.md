@@ -25,6 +25,7 @@
 - revisit_trigger: canonical truth 再次把“实现差不多了”误当成“可以 merge / cleanup”时。
 - promoted_issue_path: docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md
 - milestone: M-20260306-workspace-routing-foundation
+- supporting_evidence: 2026-03-27 dogfood replay 确认 `pre-merge-commit` hook 虽已触发，但因为错误依赖 `MERGE_HEAD` 守卫而放过了 develop-bound runtime/test merge；修复方向应改为直接审查 staged merge 结果，并以真实 `git merge` 回归测试钉住该时序。
 - session_refs:
   - tool: codex
   - session_id: current-thread
