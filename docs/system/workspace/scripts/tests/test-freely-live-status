@@ -177,6 +177,9 @@ printf '%s' "$WORKER_AI_PID" >"$WORKER_PROJECT/.freely/run/ai.pid"
 OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
 
 printf '%s\n' "$OUTPUT" | grep -q 'activity_state: ai_active'
+printf '%s\n' "$OUTPUT" | grep -q 'last_supervisor_state: up'
+printf '%s\n' "$OUTPUT" | grep -q 'last_ai_state: up'
+printf '%s\n' "$OUTPUT" | grep -q 'last_exit_reason: none'
 printf '%s\n' "$OUTPUT" | grep -q "role=supervisor pid=$SUP_PID"
 printf '%s\n' "$OUTPUT" | grep -q "role=interruption_dispatcher pid=$DISPATCH_PID"
 printf '%s\n' "$OUTPUT" | grep -q "role=ai pid=$AI_PID"
