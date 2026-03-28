@@ -84,9 +84,10 @@
   - process churn detection did not fire because the manager process remained healthy and kept publishing fresh continuity artifacts
   - the missing signal was semantic repetition: same launchable worker lane, same zero-progress state, new continuity files
 - Same-family followthrough stays conservative:
-  - `live-status` / `fleet-status` now surface `repeated_unconsumed_launchable_manager_continuity` when at least 3 consecutive continuity files keep the same launchable prompt family while no worker is actually running and manager capacity is still available
+  - `live-status` / `fleet-status` now surface `manager_continuity_rewrite_without_state_advance` when at least 3 consecutive continuity files keep the same launchable prompt family while no worker is actually running and manager capacity is still available
   - active worker execution suppresses the signal, so normal verification followthrough does not get mislabeled as a dead loop
   - the new signal is read-only; it does not auto-kill runtime or auto-rotate sessions
 - Verification for the new signal:
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
   - `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`

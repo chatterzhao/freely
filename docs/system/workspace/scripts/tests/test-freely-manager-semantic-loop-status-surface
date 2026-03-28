@@ -40,6 +40,14 @@ AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"
 EOF
+cat >"$REPO/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-03-27T18:02:00Z"
+EOF
 
 PROMPT="$REPO/.freely/run/worker-prompts/20260327-180000-worker-loop-codex.txt"
 cat >"$PROMPT" <<EOF
@@ -47,6 +55,9 @@ Worktree:
 - \`$WORKER\`
 Branch:
 - \`feature/loop-worker\`
+dispatch_priority: \`P0\`
+parallel_safe: \`true\`
+write_scope: \`$WORKER\`
 EOF
 
 for ts in 180000 180100 180200; do
@@ -54,11 +65,20 @@ for ts in 180000 180100 180200; do
 # Manager Continuity
 - timestamp: \`2026-03-27T${ts:0:2}:${ts:2:2}:${ts:4:2}Z\`
 
+## Governance Gates
+- route_kind: \`manager_patrol\`
+- restart_point: \`continuation\`
+- ownership: \`manager\`
+- next_action: \`consume retained worker prompt\`
+
 ## Queue
-- lane: \`testing-evidence-closeout\`
-  - prompt_path: \`$PROMPT\`
+- lane: \`dispatchable\`
+- prompt_path: \`$PROMPT\`
 EOF
 done
+touch -t 202603270001.00 "$REPO/.freely/run/manager-continuity-20260327-180000.md"
+touch -t 202603270002.00 "$REPO/.freely/run/manager-continuity-20260327-180100.md"
+touch -t 202603270003.00 "$REPO/.freely/run/manager-continuity-20260327-180200.md"
 
 cat >"$REPO/.freely/run/manager-worker-launch-state.env" <<EOF
 LAST_MANAGER_CONTINUITY_GENERATED="$REPO/.freely/run/manager-continuity-20260327-180200.md"
@@ -76,9 +96,9 @@ EOF
 LIVE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
 FLEET_OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$REPO")"
 
-printf '%s\n' "$LIVE_OUTPUT" | grep -q 'semantic_loop_signal_reason: repeated_unconsumed_launchable_manager_continuity'
-printf '%s\n' "$LIVE_OUTPUT" | grep -q 'semantic_loop_signal_summary: repeats=3'
-printf '%s\n' "$FLEET_OUTPUT" | grep -q 'loop=repeated_unconsumed_launchable_manager_continuity repeats=3'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'semantic_loop_signal_reason: manager_continuity_rewrite_without_state_advance'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'semantic_loop_signal_summary: repeats=3 latest='
+printf '%s\n' "$FLEET_OUTPUT" | grep -q 'loop=manager_continuity_rewrite_without_state_advance repeats=3'
 
 perl -0pi -e 's/ACTIVE_RUNNING_WORKER_COUNT="0"/ACTIVE_RUNNING_WORKER_COUNT="1"/; s/AVAILABLE_NEW_WORKER_SLOTS="unbounded"/AVAILABLE_NEW_WORKER_SLOTS="0"/' "$REPO/.freely/run/manager-worker-launch-state.env"
 
