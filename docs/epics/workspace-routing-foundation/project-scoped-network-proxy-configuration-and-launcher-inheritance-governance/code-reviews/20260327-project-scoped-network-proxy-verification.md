@@ -21,3 +21,14 @@
 - `network-proxy-resolver.sh` now drives both codex launcher inheritance and watchdog OAuth/curl inheritance without falling back to hardcoded localhost defaults.
 - OAuth sweep now sends the fuller CodexBar-style request contract, and no-arg `freely ai switch codex` refreshes saved auth inventory before choosing a usable slot.
 - Governance remains clean aside from the repository's pre-existing legacy naming warnings.
+
+## 2026-03-27 Missing Config Inherit Addendum
+
+- A later replay through `test-freely-session-rotation` found an untested same-family edge:
+  - when `HOME` points at an isolated directory with no `~/.freely/config.env`, the resolver's empty read path aborted under `set -e`
+  - codex launch then exited before any `session id` / jsonl evidence was captured, incorrectly forcing `missing_resume_evidence`
+- Verification update:
+  - `network-proxy-resolver.sh` now treats missing project/global config as empty inherited values rather than a fatal read failure
+  - `test-freely-network-proxy-resolver` now asserts missing-config inherit behavior
+  - `test-freely-network-proxy-launcher-inheritance` now asserts ambient proxy env survives when both project and global config are absent
+  - `test-freely-session-rotation` now completes past the former `context_usage_threshold` failure and passes end-to-end
