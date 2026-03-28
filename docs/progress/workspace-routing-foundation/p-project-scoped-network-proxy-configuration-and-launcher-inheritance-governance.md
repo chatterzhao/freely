@@ -17,3 +17,17 @@
 - 目前实现已补齐 project-scoped resolver、launcher inheritance、watchdog OAuth inheritance，并移除了 localhost proxy fallback。
 - 当前收口点是把无参 `freely ai switch codex` 固定为“先刷新保存的 auth inventory，再决定是否切换 usable slot”，并用 machine-readable `pre-tests.md` + verification artifact 收到可关闭状态。
 - 当前这棵树已经完成 focused regression、governance-check 与 feature-lane verification artifact，issue 已达到 completed closeout 边界；下一步是把这条 lane replay 到 `develop`，然后退休旧 proxy 工位、restack 工位和临时 test-pre-merge 批次。
+
+## 2026-03-27 Missing Config Inherit Followthrough
+
+- A later `test-freely-session-rotation` replay exposed a same-family proxy resolver edge:
+  - when `HOME` points at an isolated directory without `~/.freely/config.env`
+  - resolver reads for missing project/global config returned empty input under `set -e`
+  - codex launcher then exited before emitting `session id` / jsonl evidence, which degraded the intended `context_usage_threshold` path into `missing_resume_evidence`
+- Repair judgement:
+  - this stays inside `I-20260327-0651`, because resolver mode `inherit` is supposed to tolerate absent config files and preserve ambient env
+  - the minimal fix is to treat missing config reads as empty inherited values instead of hard failures
+- Verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-network-proxy-resolver`
+  - `bash docs/system/workspace/scripts/tests/test-freely-network-proxy-launcher-inheritance`
+  - `bash docs/system/workspace/scripts/tests/test-freely-session-rotation`

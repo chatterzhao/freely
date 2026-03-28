@@ -30,18 +30,22 @@ freely_network_proxy_read_config_values() {
 freely_network_proxy_resolve_config() {
   local project="$1"
   local project_cfg global_cfg
+  local project_values global_values
   local project_mode="" project_url="" project_all="" project_http="" project_https="" project_no=""
   local global_mode="" global_url="" global_all="" global_http="" global_https="" global_no=""
 
   project_cfg="$(freely_network_proxy_project_config_file "$project")"
   global_cfg="$(freely_network_proxy_global_config_file)"
 
-  IFS=$'\x1f' read -r project_mode project_url project_all project_http project_https project_no < <(
-    freely_network_proxy_read_config_values "$project_cfg"
-  )
-  IFS=$'\x1f' read -r global_mode global_url global_all global_http global_https global_no < <(
-    freely_network_proxy_read_config_values "$global_cfg"
-  )
+  project_values="$(freely_network_proxy_read_config_values "$project_cfg" || true)"
+  if [[ -n "$project_values" ]]; then
+    IFS=$'\x1f' read -r project_mode project_url project_all project_http project_https project_no <<<"$project_values"
+  fi
+
+  global_values="$(freely_network_proxy_read_config_values "$global_cfg" || true)"
+  if [[ -n "$global_values" ]]; then
+    IFS=$'\x1f' read -r global_mode global_url global_all global_http global_https global_no <<<"$global_values"
+  fi
 
   FREELY_NETWORK_PROXY_MODE="inherit"
   FREELY_NETWORK_PROXY_URL=""
