@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-governance-merge-gate.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+
+cp "$ROOT_DIR/bin/governance-merge-gate" "$REPO/bin/governance-merge-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-merge-gate" "$REPO/docs/system/workspace/scripts/quality/governance-merge-gate"
+chmod +x "$REPO/bin/governance-merge-gate" "$REPO/docs/system/workspace/scripts/quality/governance-merge-gate"
+
+mkdir -p "$REPO/docs"
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+
+mkdir -p "$REPO/docs/pre-brainstorms/sample"
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: proposed
+- milestone: `M-sample`
+- next_action: keep researching the same candidate
+- revisit_trigger: new evidence arrives
+EOF
+
+mkdir -p "$REPO/docs/epics/sample/story/issues"
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+EOF
+
+echo base > README.md
+git add README.md docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md bin/governance-merge-gate docs/system/workspace/scripts/quality/governance-merge-gate
+git commit -q -m "init"
+
+mkdir -p "$REPO/src"
+echo "console.log('change');" > "$REPO/src/sample.js"
+git add src/sample.js
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout1" 2>"$TMP_DIR/stderr1"; then
+  echo "[FAIL] governance-merge-gate should reject develop merges without candidate-driven lifecycle evidence" >&2
+  exit 1
+fi
+grep -q 'no candidate-driven lifecycle evidence' "$TMP_DIR/stdout1"
+grep -q 'reopen_of_issue' "$TMP_DIR/stdout1"
+
+git reset -q HEAD src/sample.js
+rm -f "$REPO/src/sample.js"
+
+cat >> "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+
+- note: same candidate keeps being researched
+EOF
+git add docs/pre-brainstorms/sample/candidates.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout2" 2>"$TMP_DIR/stderr2"
+grep -q 'passed' "$TMP_DIR/stdout2"
+
+git reset -q HEAD docs/pre-brainstorms/sample/candidates.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md
+
+mkdir -p "$REPO/docs/progress/sample"
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/progress/sample/p-sample.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout3" 2>"$TMP_DIR/stderr3"
+grep -q 'passed' "$TMP_DIR/stdout3"
+
+git reset -q HEAD docs/progress/sample/p-sample.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+mkdir -p "$REPO/docs/progress/sample"
+cat > "$REPO/docs/progress/sample/p-bad.md" <<'EOF'
+# Progress: bad
+
+- issue_id: `I-missing`
+- issue_path: `docs/epics/sample/story/issues/missing.md`
+- phase_state: `in_dev`
+EOF
+git add docs/progress/sample/p-bad.md
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout4" 2>"$TMP_DIR/stderr4"; then
+  echo "[FAIL] governance-merge-gate should reject unresolved progress owner issues" >&2
+  exit 1
+fi
+grep -q 'cannot be resolved' "$TMP_DIR/stdout4"
+
+echo "[PASS] governance-merge-gate enforces candidate-driven lifecycle evidence"
