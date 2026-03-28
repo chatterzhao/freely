@@ -88,6 +88,19 @@ class IssueRecord:
     source_candidate: Optional[str]
 
 
+@dataclass
+class ProgressRecord:
+    path: str
+    issue_id: Optional[str]
+    issue_path: Optional[str]
+
+
+@dataclass
+class ReviewRecord:
+    path: str
+    issue_id: Optional[str]
+
+
 def relative_path(path: str) -> str:
     return os.path.relpath(path, ROOT_DIR)
 
@@ -165,6 +178,32 @@ def parse_issue_file(rel_path: str) -> IssueRecord:
         milestone=grab("milestone"),
         source_candidate=grab("source_candidate"),
     )
+
+
+def parse_progress_file(rel_path: str) -> ProgressRecord:
+    full_path = os.path.join(ROOT_DIR, rel_path)
+    with open(full_path, "r", encoding="utf-8") as handle:
+        text = handle.read()
+
+    def grab(name: str) -> Optional[str]:
+        match = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
+        return normalize_scalar(match.group(1)) if match else None
+
+    return ProgressRecord(
+        path=rel_path,
+        issue_id=grab("issue_id"),
+        issue_path=grab("issue_path"),
+    )
+
+
+def parse_review_file(rel_path: str) -> ReviewRecord:
+    full_path = os.path.join(ROOT_DIR, rel_path)
+    with open(full_path, "r", encoding="utf-8") as handle:
+        text = handle.read()
+
+    match = re.search(r"^\s*-\s*issue_id:\s*(.+?)\s*$", text, re.MULTILINE)
+    issue_id = normalize_scalar(match.group(1)) if match else None
+    return ReviewRecord(path=rel_path, issue_id=issue_id)
 
 
 def parse_milestones() -> List[MilestoneEntry]:
@@ -246,6 +285,36 @@ def build_issue_index() -> Dict[str, IssueRecord]:
     return result
 
 
+def build_issue_id_index(issues_index: Dict[str, IssueRecord]) -> Dict[str, IssueRecord]:
+    result: Dict[str, IssueRecord] = {}
+    for issue in issues_index.values():
+        if issue.issue_id:
+            result[issue.issue_id] = issue
+    return result
+
+
+def resolve_source_candidate_record(
+    issue: Optional[IssueRecord], candidate_records_by_path: Dict[str, List[CandidateRecord]]
+) -> Optional[CandidateRecord]:
+    if not issue or not issue.source_candidate:
+        return None
+
+    source_candidate_path = anchorless_source_candidate(issue.source_candidate)
+    if not source_candidate_path:
+        return None
+
+    source_candidates = candidate_records_by_path.get(source_candidate_path, [])
+    if not source_candidates:
+        return None
+
+    issue_anchor = issue.source_candidate.split("#", 1)[1].lower() if "#" in issue.source_candidate else None
+    for candidate in source_candidates:
+        if issue_anchor and candidate.candidate_id.lower() == issue_anchor:
+            return candidate
+
+    return source_candidates[0]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Develop-merge governance gate for C/M/I materialization.")
     parser.add_argument("--staged", action="store_true", help="Validate the staged merge result.")
@@ -255,6 +324,8 @@ def main() -> int:
     changed_paths = changed_paths_from_args(args)
     candidate_paths: Set[str] = {p for p in changed_paths if p.startswith("docs/pre-brainstorms/") and p.endswith("/candidates.md")}
     issue_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/issues/.+\.md$", p)}
+    progress_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/progress/.+\.md$", p)}
+    review_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/code-reviews/.+\.md$", p)}
     milestones_changed = "docs/milestones.md" in changed_paths
 
     milestones = parse_milestones()
@@ -271,7 +342,10 @@ def main() -> int:
             milestone_entries_by_source_candidate.setdefault(source_candidate_path, []).append(entry)
 
     issues_index = build_issue_index()
+    issues_by_id = build_issue_id_index(issues_index)
     candidate_records: List[CandidateRecord] = []
+    progress_records: List[ProgressRecord] = [parse_progress_file(path) for path in sorted(progress_paths)]
+    review_records: List[ReviewRecord] = [parse_review_file(path) for path in sorted(review_paths)]
     for candidate_path in sorted(candidate_paths):
         candidate_records.extend(parse_candidate_file(candidate_path))
 
@@ -282,9 +356,31 @@ def main() -> int:
             if candidate_source_path:
                 candidate_paths.add(candidate_source_path)
 
+    for progress in progress_records:
+        owner_issue = None
+        if progress.issue_path:
+            owner_issue = issues_index.get(progress.issue_path)
+        if not owner_issue and progress.issue_id:
+            owner_issue = issues_by_id.get(progress.issue_id)
+        if owner_issue:
+            candidate_source_path = anchorless_source_candidate(owner_issue.source_candidate)
+            if candidate_source_path:
+                candidate_paths.add(candidate_source_path)
+
+    for review in review_records:
+        owner_issue = issues_by_id.get(review.issue_id or "")
+        if owner_issue:
+            candidate_source_path = anchorless_source_candidate(owner_issue.source_candidate)
+            if candidate_source_path:
+                candidate_paths.add(candidate_source_path)
+
     for candidate_path in sorted(candidate_paths):
         if all(record.path != candidate_path for record in candidate_records):
             candidate_records.extend(parse_candidate_file(candidate_path))
+
+    candidate_records_by_path: Dict[str, List[CandidateRecord]] = {}
+    for candidate in candidate_records:
+        candidate_records_by_path.setdefault(candidate.path, []).append(candidate)
 
     errors: List[str] = []
     warnings: List[str] = []
@@ -296,6 +392,65 @@ def main() -> int:
         "absorbed (允许不新开独立 issue，但必须指向吸收它的 canonical owner issue)",
         "dropped (允许不进入下一环，但必须写清不再推进的原因)",
     ]
+
+    touched_candidate_ids: Set[str] = {candidate.candidate_id for candidate in candidate_records if candidate.candidate_id}
+    candidate_driven_evidence: Set[str] = set(touched_candidate_ids)
+
+    for issue_path in sorted(issue_paths):
+        issue = issues_index.get(issue_path)
+        if issue and issue.source_candidate:
+            source_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
+            if source_candidate:
+                candidate_driven_evidence.add(source_candidate.candidate_id)
+
+    for progress in progress_records:
+        owner_issue = None
+        if progress.issue_path:
+            owner_issue = issues_index.get(progress.issue_path)
+        if not owner_issue and progress.issue_id:
+            owner_issue = issues_by_id.get(progress.issue_id)
+
+        if not owner_issue:
+            errors.append(
+                f"{progress.path} points to owner issue '{progress.issue_id or progress.issue_path or 'missing'}', but that issue cannot be resolved. "
+                f"Every develop-bound merge must stay on a candidate-driven lifecycle. Link progress to a real issue that already traces back to a pre-brainstorm candidate."
+            )
+            continue
+
+        source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
+        if not source_candidate:
+            errors.append(
+                f"{progress.path} points to owner issue {owner_issue.issue_id or owner_issue.path}, but that issue has no valid source_candidate. "
+                f"Restore the originating C-* candidate before merging develop-bound work."
+            )
+            continue
+
+        candidate_driven_evidence.add(source_candidate.candidate_id)
+
+    for review in review_records:
+        owner_issue = issues_by_id.get(review.issue_id or "")
+        if not owner_issue:
+            errors.append(
+                f"{review.path} points to owner issue '{review.issue_id or 'missing'}', but that issue cannot be resolved. "
+                f"Every develop-bound merge must stay on a candidate-driven lifecycle. Link the review to a real issue that traces back to a pre-brainstorm candidate."
+            )
+            continue
+
+        source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
+        if not source_candidate:
+            errors.append(
+                f"{review.path} points to owner issue {owner_issue.issue_id or owner_issue.path}, but that issue has no valid source_candidate. "
+                f"Restore the originating C-* candidate before merging develop-bound work."
+            )
+            continue
+
+        candidate_driven_evidence.add(source_candidate.candidate_id)
+
+    if not candidate_driven_evidence:
+        errors.append(
+            "This develop-bound merge has no candidate-driven lifecycle evidence. Every worktree must start from pre-brainstorm research and hit a traceable C-* candidate in the merge diff. "
+            "Continue existing research by updating its candidate/issue/progress/review artifacts, or if this is a completed-family reopen, create a new candidate and new issue that records reopen_of_issue and reopen_reason before replaying the merge."
+        )
 
     for candidate in candidate_records:
         status = (candidate.status or "").strip("`").strip()
@@ -437,16 +592,7 @@ def main() -> int:
                 )
 
         if source_candidate_path:
-            source_candidates = parse_candidate_file(source_candidate_path)
-            referenced_candidate = None
-            issue_anchor = issue.source_candidate.split("#", 1)[1].lower() if issue.source_candidate and "#" in issue.source_candidate else None
-            for candidate in source_candidates:
-                cid = candidate.candidate_id.lower()
-                if issue_anchor and cid == issue_anchor:
-                    referenced_candidate = candidate
-                    break
-            if not referenced_candidate and source_candidates:
-                referenced_candidate = source_candidates[0]
+            referenced_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
 
             if referenced_candidate:
                 c_key = candidate_key(referenced_candidate.candidate_id)
