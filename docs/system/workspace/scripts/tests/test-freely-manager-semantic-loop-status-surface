@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-semantic-loop-status.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+WORKER="$WT_ROOT/feature-loop-worker"
+
+mkdir -p "$REPO" "$WT_ROOT"
+cd "$REPO"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+git branch feature/loop-worker
+git worktree add "$WORKER" feature/loop-worker >/dev/null
+
+mkdir -p "$REPO/.freely/run/worker-prompts" "$REPO/docs"
+mkdir -p "$WORKER/.freely/run"
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+PROMPT="$REPO/.freely/run/worker-prompts/20260327-180000-worker-loop-codex.txt"
+cat >"$PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/loop-worker\`
+EOF
+
+for ts in 180000 180100 180200; do
+  cat >"$REPO/.freely/run/manager-continuity-20260327-$ts.md" <<EOF
+# Manager Continuity
+- timestamp: \`2026-03-27T${ts:0:2}:${ts:2:2}:${ts:4:2}Z\`
+
+## Queue
+- lane: \`testing-evidence-closeout\`
+  - prompt_path: \`$PROMPT\`
+EOF
+done
+
+cat >"$REPO/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$REPO/.freely/run/manager-continuity-20260327-180200.md"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$PROMPT"
+LAST_MANAGER_CONTINUITY_CONSUMED="$REPO/.freely/run/manager-continuity-20260327-180000.md"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED=""
+LAUNCHED_WORKER_PROMPTS=""
+QUEUED_WORKER_PROMPTS=""
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-03-27T18:02:00Z"
+EOF
+
+LIVE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+FLEET_OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$REPO")"
+
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'semantic_loop_signal_reason: repeated_unconsumed_launchable_manager_continuity'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'semantic_loop_signal_summary: repeats=3'
+printf '%s\n' "$FLEET_OUTPUT" | grep -q 'loop=repeated_unconsumed_launchable_manager_continuity repeats=3'
+
+perl -0pi -e 's/ACTIVE_RUNNING_WORKER_COUNT="0"/ACTIVE_RUNNING_WORKER_COUNT="1"/; s/AVAILABLE_NEW_WORKER_SLOTS="unbounded"/AVAILABLE_NEW_WORKER_SLOTS="0"/' "$REPO/.freely/run/manager-worker-launch-state.env"
+
+bash -c "exec -a 'runtime/freely start --project $WORKER' sleep 30" >/dev/null 2>&1 &
+WORKER_SUP_PID=$!
+bash -c "exec -a 'codex exec -C $WORKER -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+WORKER_AI_PID=$!
+trap 'kill "$WORKER_SUP_PID" "$WORKER_AI_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+printf '%s' "$WORKER_SUP_PID" >"$WORKER/.freely/run/supervisor.pid"
+printf '%s' "$WORKER_AI_PID" >"$WORKER/.freely/run/ai.pid"
+
+LIVE_OUTPUT_ACTIVE="$(bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+if ! printf '%s\n' "$LIVE_OUTPUT_ACTIVE" | grep -q 'semantic_loop_signal_reason: unavailable'; then
+  echo "[FAIL] semantic loop signal should clear when a worker is already running" >&2
+  exit 1
+fi
+
+kill "$WORKER_SUP_PID" "$WORKER_AI_PID" 2>/dev/null || true
+wait "$WORKER_SUP_PID" 2>/dev/null || true
+wait "$WORKER_AI_PID" 2>/dev/null || true
+
+echo "[PASS] live-status and fleet-status surface conservative manager semantic-loop suspicion without flagging active worker execution"

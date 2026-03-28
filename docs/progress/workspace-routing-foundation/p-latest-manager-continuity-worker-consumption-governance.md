@@ -63,3 +63,19 @@
 - Current judgement:
   - this is a same-family repair inside `I-20260322-0445` runtime launch/consumption scope, not a new milestone issue
   - after the repair, the retained prompt is launchable again and `latest_manager_continuity_file_for_project` resolves to the latest generated continuity instead of the stale consumed snapshot
+
+## 2026-03-27 Semantic Loop Suspicion Signal
+
+- Followthrough judgement:
+  - the repaired bootstrap-launch regression explained the immediate patrol loop, but it also exposed a monitoring gap
+  - existing watchdog signal surfaces covered restart storm / process churn and stalled AI, not manager-owned semantic repetition where continuity keeps changing timestamps while launchable worker progress stays unchanged
+- Conservative implementation:
+  - add a read-only semantic-loop detector to `freely live-status` / `freely fleet-status`
+  - only suspect a loop when the latest manager continuity keeps repeating the same launchable worker prompt family for at least 3 consecutive continuity files, runtime still has zero active workers, and capacity is still available
+  - do not auto-kill or auto-restart from this signal; it stays a supervision hint for manager/human judgement
+- Verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
+- Current judgement:
+  - this remains same-family monitoring followthrough inside `I-20260322-0445`
+  - the signal is intentionally conservative so normal waiting states like active worker execution or zero available slots do not trigger it
