@@ -2370,6 +2370,12 @@ worker_prompt_resolved_worktree() {
   fi
 }
 
+worker_worktree_has_runtime_history() {
+  local worktree_path="$1"
+  [[ -n "$worktree_path" && -d "$worktree_path" ]] || return 1
+  [[ -f "$(config_file "$worktree_path")" ]] || return 1
+}
+
 branch_is_merged_into_develop() {
   local project="$1" target_branch="$2"
   [[ -n "$target_branch" ]] || return 1
@@ -2384,6 +2390,7 @@ worker_prompt_targets_retire_ready_merged_worktree() {
   local resolved_worktree target_branch dirty_entries
   resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   [[ -n "$resolved_worktree" && -d "$resolved_worktree" ]] || return 1
+  worker_worktree_has_runtime_history "$resolved_worktree" || return 1
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
   [[ -n "$target_branch" ]] || return 1
   branch_is_merged_into_develop "$manager_project" "$target_branch" || return 1

@@ -27,6 +27,14 @@ worker change
 EOF
 git -C "$WORKER" add feature.txt
 git -C "$WORKER" commit -q -m "feature change"
+mkdir -p "$WORKER/.freely"
+cat >"$WORKER/.freely/config.env" <<'EOF'
+AI_TOOL="codex"
+AI_MODEL=""
+AI_MODE="auto"
+EOF
+git -C "$WORKER" add .freely/config.env
+git -C "$WORKER" commit -q -m "runtime init metadata"
 git -C "$PROJECT" merge --no-ff feature/test-worker -m "merge feature" >/dev/null
 
 PROMPT="$PROJECT/.freely/run/worker-prompts/20260323-170438-worker-test-codex.txt"

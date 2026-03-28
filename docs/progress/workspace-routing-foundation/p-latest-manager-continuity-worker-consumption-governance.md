@@ -41,3 +41,25 @@
 - Current judgement:
   - close `I-20260322-0445` as `completed`
   - keep future queue/frozen/reentry evolution in their own issue families rather than reopening this one
+
+## 2026-03-27 Same-Family Regression Repair
+
+- Canonical `develop` later exposed a same-family runtime regression during manager patrol:
+  - latest generated continuity advanced through `manager-continuity-20260327-164618.md`
+  - `latest_manager_continuity_consumed` stayed pinned to `manager-continuity-20260327-140745.md`
+  - retained prompt `20260327-145324-worker-testing-evidence-closeout-codex.txt` remained unconsumed while the manager loop kept rewriting near-identical continuity
+- Root cause:
+  - `a125064` added a guard that blocks relaunch of merged clean worker worktrees
+  - the guard treated a newly created but never-runtime-initialized clean worker worktree as retire-ready simply because its branch had no divergence from `develop`
+  - the retained verification lane `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260327-feature-testing-evidence-closeout-governance` matched that shape, so runtime marked the prompt non-launchable and fell back to stale consumed truth
+- Same-family repair:
+  - narrow the retire-ready guard so it only applies after the target worker worktree has runtime history (`.freely/config.env`)
+  - keep previously merged-and-clean initialized workers protected from pointless relaunch
+  - add regression coverage for both initialized merged-clean workers and uninitialized clean bootstrap workers
+- Verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-merged-clean-worker-handoff-guard`
+  - `bash docs/system/workspace/scripts/tests/test-freely-uninitialized-clean-worker-handoff-launchable`
+  - `./bin/governance-check`
+- Current judgement:
+  - this is a same-family repair inside `I-20260322-0445` runtime launch/consumption scope, not a new milestone issue
+  - after the repair, the retained prompt is launchable again and `latest_manager_continuity_file_for_project` resolves to the latest generated continuity instead of the stale consumed snapshot
