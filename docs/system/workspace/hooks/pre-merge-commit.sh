@@ -4,7 +4,7 @@ set -euo pipefail
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
 [[ "$branch" == "develop" ]] || exit 0
 
-if ! git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
+if git diff --cached --quiet --diff-filter=ACMR --; then
   exit 0
 fi
 
