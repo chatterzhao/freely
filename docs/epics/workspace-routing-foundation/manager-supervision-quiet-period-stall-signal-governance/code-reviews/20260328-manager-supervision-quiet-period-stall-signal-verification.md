@@ -1,6 +1,6 @@
 # Verification: manager-supervision-quiet-period-stall-signal-governance
 
-- issue: `I-20260328-0335-A`
+- issue_id: `I-20260328-0335-A`
 - title: `Manager supervision quiet-period stall-signal governance`
 - reviewer: `codex`
 - verdict: `pass_for_verification`
