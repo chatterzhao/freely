@@ -27,7 +27,7 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 1. `C-20260327-2205-A`
 
 ### committed_issues
-1. `I-20260327-2205`
+1. `I-20260327-2205-A`
    - issue_path: `docs/epics/sample/story/issues/sample.md`
    - source_candidates:
      - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
@@ -50,7 +50,7 @@ mkdir -p "$REPO/docs/epics/sample/story/issues"
 cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
 
-- issue_id: `I-20260327-2205`
+- issue_id: `I-20260327-2205-A`
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
@@ -91,7 +91,7 @@ mkdir -p "$REPO/docs/progress/sample"
 cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
 # Progress: sample
 
-- issue_id: `I-20260327-2205`
+- issue_id: `I-20260327-2205-A`
 - issue_path: `docs/epics/sample/story/issues/sample.md`
 - phase_state: `in_dev`
 EOF
@@ -101,6 +101,29 @@ grep -q 'passed' "$TMP_DIR/stdout3"
 
 git reset -q HEAD docs/progress/sample/p-sample.md
 rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat >> "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+
+## note
+
+- direct issue touch on the same promoted lifecycle line
+EOF
+git add docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout3b" 2>"$TMP_DIR/stderr3b"
+grep -q 'passed' "$TMP_DIR/stdout3b"
+
+git reset -q HEAD docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md
+git checkout -q -- docs/epics/sample/story/issues/sample.md
 
 mkdir -p "$REPO/docs/progress/sample"
 cat > "$REPO/docs/progress/sample/p-bad.md" <<'EOF'
@@ -152,7 +175,7 @@ git reset -q HEAD docs/pre-brainstorms/absorbed/candidates.md
 cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
 # Progress: sample
 
-- issue_id: `I-20260327-2205`
+- issue_id: `I-20260327-2205-A`
 - issue_path: `docs/epics/sample/story/issues/sample.md`
 - phase_state: `in_dev`
 EOF
@@ -163,5 +186,123 @@ if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout6" 2>"$TMP_DIR/st
   exit 1
 fi
 grep -q 'does not carry its concrete owner issue/progress/review' "$TMP_DIR/stdout6"
+
+git reset -q HEAD docs/progress/sample/p-sample.md docs/pre-brainstorms/absorbed/candidates.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+mkdir -p "$REPO/docs/pre-brainstorms/promoted" "$REPO/docs/epics/promoted/story/issues"
+cat > "$REPO/docs/pre-brainstorms/promoted/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2401-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2401-A`
+- promoted_issue_path: `docs/epics/promoted/story/issues/promoted.md`
+EOF
+cat > "$REPO/docs/epics/promoted/story/issues/promoted.md" <<'EOF'
+# Issue: promoted
+
+- issue_id: `I-20260327-2401-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/promoted/candidates.md#c-20260327-2401-a`
+EOF
+cat > "$REPO/docs/progress/sample/p-promoted.md" <<'EOF'
+# Progress: promoted
+
+- issue_id: `I-20260327-2401-A`
+- issue_path: `docs/epics/promoted/story/issues/promoted.md`
+- phase_state: `in_dev`
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+2. `I-20260327-2401-A`
+   - issue_path: `docs/epics/promoted/story/issues/promoted.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/promoted/candidates.md#c-20260327-2401-a`
+
+### completed_issues
+EOF
+git add docs/milestones.md docs/pre-brainstorms/promoted/candidates.md docs/epics/promoted/story/issues/promoted.md docs/progress/sample/p-promoted.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout7" 2>"$TMP_DIR/stderr7"
+grep -q 'passed' "$TMP_DIR/stdout7"
+
+git reset -q HEAD docs/milestones.md docs/pre-brainstorms/promoted/candidates.md docs/epics/promoted/story/issues/promoted.md docs/progress/sample/p-promoted.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-promoted.md"
+
+cat > "$REPO/docs/epics/absorbed/story/issues/owner.md" <<'EOF'
+# Issue: owner
+
+- issue_id: `I-20260327-2301-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/absorbed/candidates.md#c-20260327-2301-a`
+EOF
+cat > "$REPO/docs/progress/sample/p-owner.md" <<'EOF'
+# Progress: owner
+
+- issue_id: `I-20260327-2301-A`
+- issue_path: `docs/epics/absorbed/story/issues/owner.md`
+- phase_state: `in_dev`
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+2. `I-20260327-2301-A`
+   - issue_path: `docs/epics/absorbed/story/issues/owner.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/absorbed/candidates.md#c-20260327-2301-a`
+
+### completed_issues
+EOF
+git add docs/milestones.md docs/pre-brainstorms/absorbed/candidates.md docs/epics/absorbed/story/issues/owner.md docs/progress/sample/p-owner.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout8" 2>"$TMP_DIR/stderr8"
+grep -q 'passed' "$TMP_DIR/stdout8"
+
+git reset -q HEAD docs/milestones.md docs/pre-brainstorms/absorbed/candidates.md docs/epics/absorbed/story/issues/owner.md docs/progress/sample/p-owner.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-owner.md"
+
+cat > "$REPO/docs/progress/sample/p-crossed.md" <<'EOF'
+# Progress: crossed
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/pre-brainstorms/promoted/candidates.md docs/progress/sample/p-crossed.md
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout9" 2>"$TMP_DIR/stderr9"; then
+  echo "[FAIL] governance-merge-gate should reject promoted candidates that try to use a progress owner from a different lifecycle line" >&2
+  exit 1
+fi
+grep -q 'does not carry its concrete owner issue/progress/review' "$TMP_DIR/stdout9"
+
+git reset -q HEAD docs/pre-brainstorms/promoted/candidates.md docs/progress/sample/p-crossed.md
+rm -rf "$REPO/docs/pre-brainstorms/promoted" "$REPO/docs/epics/promoted"
+rm -f "$REPO/docs/progress/sample/p-crossed.md"
 
 echo "[PASS] governance-merge-gate enforces candidate-driven lifecycle evidence"

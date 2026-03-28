@@ -41,6 +41,11 @@
    - candidate-only merge
    - borrowed owner issue
    - absorbed candidate 试图借 unrelated issue 过门禁
+5. 正向放行矩阵也必须锁住：
+   - same-line direct issue touch
+   - promoted candidate 携带自己的 owner issue/progress
+   - absorbed candidate 携带 canonical owner issue/progress
+   - cross-line progress owner 仍被阻断
 
 ## Acceptance
 
@@ -49,6 +54,10 @@
 - `promoted` candidate 若 owner issue 未随同 merge diff 进入，不能放行
 - `absorbed` candidate 若 absorbing owner 未随同 merge diff 进入，不能放行
 - focused regressions 明确覆盖 borrowed owner issue 场景
+- same-line direct issue touch 会被放行
+- `promoted` candidate 携带同线 owner issue/progress 会被放行
+- `absorbed` candidate 携带 canonical owner issue/progress 会被放行
+- `promoted` candidate 若尝试借不同 lifecycle 线的 progress owner，会被拦截
 - `pre-merge-commit` 真实 `git merge` 路径继续命中同一 gate
 
 ## Ready For Dev
@@ -78,6 +87,7 @@
 - `docs/progress/workspace-routing-foundation/p-develop-merge-issue-binding-and-cmi-governance.md`
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
 - `docs/system/workspace/scripts/tests/test-governance-merge-gate`
+- `docs/system/workspace/scripts/tests/test-pre-push-hook`
 
 ## Verification
 
@@ -88,5 +98,5 @@
 
 ## Next
 
-- next_action: `implement and verify same-line issue binding enforcement`
-- revisit_trigger: 若后续仍发现无 issue owner、borrowed owner、或 absorbed candidate 借 unrelated issue 过 develop gate，则继续沿本 issue 追加 regression
+- next_action: `keep expanding the allow/deny matrix only when a new C/M/I loophole is observed`
+- revisit_trigger: 若后续仍发现无 issue owner、borrowed owner、cross-line owner、或 canonical absorbed owner 放行/误拦异常，则继续沿本 issue 追加 regression
