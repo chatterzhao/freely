@@ -37,6 +37,7 @@ Usage:
   freely intake status [--project <abs_path>]
   freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
   freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
   freely start [--project <abs_path>]
   freely baseline-status [--project <abs_path>]
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
@@ -283,6 +284,79 @@ read_single_registered_project() {
   count="$(awk 'END { print NR }' "$registry")"
   [[ "$count" == "1" ]] || return 0
   awk -F '\t' 'NR==1 { print $1; exit }' "$registry"
+}
+
+registered_projects() {
+  local registry
+  registry="$(projects_registry_file)"
+  [[ -f "$registry" ]] || return 0
+  awk -F '\t' 'NF > 0 && $1 != "" { print $1 }' "$registry"
+}
+
+project_desired_runtime_state() {
+  local project="$1"
+  local state_file
+  state_file="$(workcell_state_file "$project")"
+  [[ -f "$state_file" ]] || { printf 'unknown\n'; return 0; }
+  unset DESIRED_RUNTIME_STATE
+  # shellcheck disable=SC1090
+  source "$state_file"
+  printf '%s\n' "${DESIRED_RUNTIME_STATE:-unknown}"
+}
+
+project_role_hint() {
+  local project="$1"
+  local state_file
+  state_file="$(workcell_state_file "$project")"
+  [[ -f "$state_file" ]] || { printf '%s\n' "$(role_hint_for_project "$project")"; return 0; }
+  unset LAST_ROLE_HINT
+  # shellcheck disable=SC1090
+  source "$state_file"
+  printf '%s\n' "${LAST_ROLE_HINT:-$(role_hint_for_project "$project")}"
+}
+
+registered_projects_requiring_auth_change_wake() {
+  local project desired_state role_hint
+  while IFS= read -r project; do
+    [[ -n "$project" && -d "$project" ]] || continue
+    project_has_freely_config "$project" || continue
+    desired_state="$(project_desired_runtime_state "$project")"
+    [[ "$desired_state" == "running" ]] || continue
+    role_hint="$(project_role_hint "$project")"
+    [[ "$role_hint" == "manager" ]] || continue
+    printf '%s\n' "$project"
+  done < <(registered_projects)
+}
+
+append_global_auth_change_event() {
+  local tool="$1" slot="$2" reason="$3"
+  local log_file
+  log_file="$(global_state_dir)/auth-change-events.log"
+  mkdir -p "$(dirname "$log_file")"
+  printf '%s event=auth_change tool=%q slot=%q reason=%q\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "${tool:-unknown}" "${slot:-}" "${reason:-unspecified}" >>"$log_file"
+}
+
+wake_registered_projects_for_auth_change() {
+  local tool="$1" slot="$2" reason="$3"
+  local project woke_count=0 skipped_count=0
+  append_global_auth_change_event "$tool" "$slot" "$reason"
+  while IFS= read -r project; do
+    [[ -n "$project" ]] || continue
+    if ! load_config "$project"; then
+      skipped_count=$((skipped_count + 1))
+      continue
+    fi
+    if [[ "${AI_TOOL:-}" != "${tool:-}" ]]; then
+      skipped_count=$((skipped_count + 1))
+      continue
+    fi
+    if ! ensure_manager_once "$project"; then
+      skipped_count=$((skipped_count + 1))
+      continue
+    fi
+    woke_count=$((woke_count + 1))
+  done < <(registered_projects_requiring_auth_change_wake)
+  printf 'woke=%s skipped=%s\n' "$woke_count" "$skipped_count"
 }
 
 compose_ai_spec() {
@@ -5113,6 +5187,21 @@ cmd_ensure_manager() {
   ensure_manager_once "$project"
 }
 
+cmd_auth_change_wake() {
+  local tool="codex" slot="" reason="auth_change"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --tool) tool="${2:-}"; shift 2 ;;
+      --slot) slot="${2:-}"; shift 2 ;;
+      --reason) reason="${2:-}"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+
+  [[ -n "$tool" ]] || { log_error "auth-change-wake requires --tool"; exit 1; }
+  wake_registered_projects_for_auth_change "$tool" "$slot" "$reason"
+}
+
 cmd_ensure_interruption_dispatch() {
   local project="" watch_mode="0" watch_interval="2"
   while [[ $# -gt 0 ]]; do
@@ -6006,6 +6095,7 @@ main() {
       esac
       ;;
     ensure-manager) cmd_ensure_manager "$@" ;;
+    auth-change-wake) cmd_auth_change_wake "$@" ;;
     ensure-interruption-dispatch) cmd_ensure_interruption_dispatch "$@" ;;
     start) cmd_start "$@" ;;
     baseline-status) cmd_baseline_status "$@" ;;
