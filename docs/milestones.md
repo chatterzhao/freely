@@ -786,6 +786,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`, `docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md`
 - next_action: 保持当前 research worktree 作为唯一写入 lane，完成 merge judgement 与写回；在补丁吸收到 `develop` 前，不恢复 pre-fix stalled dogfood runtime
 
+2. `I-20260328-0335-A`
+- title: Manager supervision quiet-period stall-signal governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/candidates.md`
+- next_action: 保持当前最小行为修复包进入 merge judgement；restart-storm 复核与 runtime-owned recovery stop 的 observability 区分留作 follow-on，不与本 issue 混补
+
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛
 - milestone_state: candidate

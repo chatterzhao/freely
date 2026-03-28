@@ -3102,6 +3102,10 @@ manager_ai_stalled_after_delegated_continuation_prompt() {
   (( now - log_mtime >= threshold_secs )) || return 1
   (( now - prompt_mtime >= threshold_secs )) || return 1
 
+  if manager_delegated_supervision_quiet_period_waiting_on_active_worker "$project" "$prompt_mtime"; then
+    return 1
+  fi
+
   continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
   if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
     continuity_mtime="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
@@ -3116,6 +3120,53 @@ manager_ai_stalled_after_delegated_continuation_prompt() {
     fi
   fi
   return 0
+}
+
+manager_delegated_supervision_quiet_period_waiting_on_active_worker() {
+  local project="$1" prompt_mtime="$2"
+  local continuity_file continuity_mtime state_file consumed_csv prompt_file target_project saw_busy="0"
+  local active_running_workers
+
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
+    continuity_mtime="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
+    if [[ -n "$continuity_mtime" ]] && (( continuity_mtime >= prompt_mtime )); then
+      if manager_continuity_has_unconsumed_launchable_worker_prompt "$project" "$continuity_file"; then
+        return 1
+      fi
+      if manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file"; then
+        return 1
+      fi
+      if manager_continuity_waiting_on_active_busy_worker "$project" "$continuity_file"; then
+        return 0
+      fi
+      return 1
+    fi
+  fi
+
+  state_file="$(manager_worker_launch_state_file "$project")"
+  [[ -f "$state_file" ]] || return 1
+  # shellcheck disable=SC1090
+  source "$state_file"
+  active_running_workers="$(count_active_running_workers_for_manager_project "$project")"
+  [[ "$active_running_workers" =~ ^[0-9]+$ ]] || return 1
+  (( active_running_workers > 0 )) || return 1
+  [[ -z "${QUEUED_WORKER_PROMPTS:-}" ]] || return 1
+
+  consumed_csv="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
+  [[ -n "$consumed_csv" ]] || return 1
+
+  IFS=',' read -r -a __quiet_period_consumed_prompts <<<"$consumed_csv"
+  for prompt_file in "${__quiet_period_consumed_prompts[@]}"; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+    target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
+    [[ -n "$target_project" && -d "$target_project" ]] || return 1
+    worker_project_is_actively_running "$target_project" || return 1
+    worker_project_busy_with_delegated_continuation "$target_project" || return 1
+    saw_busy="1"
+  done
+
+  [[ "$saw_busy" == "1" ]]
 }
 
 resolve_manager_delegated_continuations_as_absorbed() {

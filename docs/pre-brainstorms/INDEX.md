@@ -386,6 +386,9 @@
 - 20260328-0154--manager-stall-reentry-false-positive-supervision-thrash
   - brainstorms: docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/brainstorms.md
   - candidates: docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md
+- 20260328-0335--operator-stop-runtime-stall-recovery-semantics
+  - brainstorms: docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
