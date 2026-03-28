@@ -2551,6 +2551,42 @@ manager_continuity_has_unconsumed_launchable_worker_prompt() {
   return 1
 }
 
+manager_continuity_waiting_on_active_busy_worker() {
+  local project="$1" continuity_file="$2"
+  local prompt_file target_project prompt_generated_csv launched_csv="" saw_active_busy="0"
+  [[ -f "$continuity_file" ]] || return 1
+  manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file" && return 1
+  prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
+  if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
+    # shellcheck disable=SC1090
+    source "$(manager_worker_launch_state_file "$project")"
+    launched_csv="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
+    if [[ -n "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" && "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" != "$continuity_file" ]]; then
+      launched_csv=""
+    else
+      launched_csv="$(csv_retain_exact_items "$launched_csv" "$prompt_generated_csv")"
+    fi
+  fi
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+    target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
+    [[ -n "$target_project" && -d "$target_project" ]] || return 1
+    if csv_contains_exact_item "$launched_csv" "$prompt_file"; then
+      if worker_project_is_actively_running "$target_project"; then
+        continue
+      fi
+      return 1
+    fi
+    if worker_project_is_actively_running "$target_project" \
+      && worker_project_busy_with_delegated_continuation "$target_project"; then
+      saw_active_busy="1"
+      continue
+    fi
+    return 1
+  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  [[ "$saw_active_busy" == "1" ]]
+}
+
 manager_continuity_is_launchable_for_project() {
   local project="$1" continuity_file="$2" prompt_file
   [[ -f "$continuity_file" ]] || return 1
@@ -3069,13 +3105,17 @@ manager_ai_stalled_after_delegated_continuation_prompt() {
   continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
   if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
     continuity_mtime="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
-    if [[ -n "$continuity_mtime" ]] && (( continuity_mtime > prompt_mtime )); then
+    if [[ -n "$continuity_mtime" ]] && (( continuity_mtime >= prompt_mtime )); then
+      if manager_continuity_waiting_on_active_busy_worker "$project" "$continuity_file"; then
+        return 1
+      fi
       if manager_continuity_has_unconsumed_launchable_worker_prompt "$project" "$continuity_file"; then
         return 0
       fi
       return 1
     fi
   fi
+  return 0
 }
 
 resolve_manager_delegated_continuations_as_absorbed() {

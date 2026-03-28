@@ -11,7 +11,7 @@ mkdir -p \
   "$PROJECT/docs/pre-brainstorms/20260322-0000--sample" \
   "$PROJECT/.freely/run/worker-prompts" \
   "$PROJECT/.freely/logs" \
-  "$WORKER"
+  "$WORKER/.freely/run"
 
 cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
