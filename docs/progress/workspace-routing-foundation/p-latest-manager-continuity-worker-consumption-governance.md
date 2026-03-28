@@ -81,3 +81,25 @@
   - this remains same-family monitoring followthrough inside `I-20260322-0445`
   - the surfaced reason is `manager_continuity_rewrite_without_state_advance`
   - the signal is intentionally conservative so normal waiting states like active worker execution or zero available slots do not trigger it
+
+## 2026-03-27 Consumed Continuity Resume Drift
+
+- Followthrough judgement:
+  - a later canonical `develop` replay showed a second same-family gap after cleanup followthrough had already converged
+  - delegated backlog was absorbed, latest manager continuity advanced and was consumed, stale worker prompt references were cleared, but the still-running manager resumed into generic first-hop patrol instead of continuing from the consumed continuity's owner chain
+- Why this is same-family:
+  - this is not a new product surface and not a new milestone issue
+  - it is another contract gap inside latest manager continuity consumption: after runtime proves which continuity is current truth, manager resume still needs to stay anchored to that truth until contradiction or fresh intake appears
+- Repair direction:
+  - inject a manager-only resume narrowing contract when `LAUNCH_KIND_SELECTED=resume`, no fresh delegated continuation is pending, and the latest consumed continuity still matches latest generated truth
+  - scope the narrowing to manager-owned `completion_verification` / `cleanup_governance` closeout chains so ordinary discovery patrol is not suppressed
+  - immediately fall back to full patrol when fresh delegated continuation appears, authoritative fleet truth contradicts the consumed continuity, or the restart point has already been closed
+- Verification target:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
+  - regression rechecks around `live-status` / session rotation / prompt composition after the narrowing lands
+- Current judgement:
+  - absorb pre-brainstorm `C-20260327-1845-A` as supporting evidence into `I-20260322-0445`
+  - keep this worktree scoped to the current runtime prompt/routing repair only; merge-gate lifecycle policy remains outside the scope of this branch
+- Residual verification note:
+  - `bash docs/system/workspace/scripts/tests/test-freely-session-rotation` still fails in both this worktree and pristine `develop`, at the existing `context_usage_threshold` subcase before the new manager-only narrowing is even consulted
+  - treat that failure as a pre-existing unrelated gap unless a later reduced reproduction shows otherwise
