@@ -4,9 +4,9 @@
 - id: `C-20260323-1705-A`
 - title: Detect and recover manager delegated continuation stalls after prompt absorption
 - source_brainstorm: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
-- status: `needs_research`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `pending://manager-delegated-continuation-stall-recovery-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `019d1d6a-2319-7952-9c01-8606f51dc59c`
