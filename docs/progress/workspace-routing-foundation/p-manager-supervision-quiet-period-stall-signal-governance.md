@@ -1,8 +1,10 @@
 # Progress: manager-supervision-quiet-period-stall-signal-governance
 
+- issue_id: `I-20260328-0335-A`
 - title: Manager supervision quiet-period stall-signal governance
-- issue: `I-20260328-0335-A`
+- issue_path: `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md`
 - phase_state: `in_verification`
+- runtime_state: `ready-for-merge-judgement`
 - summary: `2026-03-28` 的 dogfood 现场已确认：`operator_stop_requested` 在当前案例里不是产品 stop 需求，而是 `runtime-stalled-ai-recovery -> local_continuation_reentry -> supervisor trap` 的外显事件。primary gap 是 manager delegated-supervision quiet-period 被当前 stall detector 过度近似成强 stall。
 
 ## Current findings
