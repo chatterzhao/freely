@@ -79,6 +79,12 @@ write_codex_active_slot() {
   printf '%s\n' "$slot" >"$file"
 }
 
+format_epoch_utc() {
+  local epoch="$1"
+  [[ -n "$epoch" ]] || return 1
+  TZ=UTC date -r "$epoch" '+%Y.%m.%d %H:%M:%S UTC' 2>/dev/null || TZ=UTC date -d "@$epoch" '+%Y.%m.%d %H:%M:%S UTC' 2>/dev/null || printf '%s\n' "$epoch"
+}
+
 notify_freely_auth_change() {
   local tool="$1" slot="${2:-}" reason="${3:-auth_change}"
   local freely_bin
@@ -425,18 +431,23 @@ sync_current_auth() {
 cmd_switch() {
   local tool="$1"
   local slot="${2:-}"
+  local rc=0
 
   case "$tool" in
     codex)
       # 如果没有指定 slot，自动探测
       if [[ -z "$slot" ]]; then
         _cmd_switch_auto_codex
-        return $?
+        rc=$?
+        return "$rc"
       fi
       codex_switch_lock_acquire "explicit_switch" "switch" "$slot" || exit 1
       _cmd_switch_codex_direct_unlocked "$tool" "$slot"
-      local rc=$?
+      rc=$?
       codex_switch_lock_release
+      if [[ "$rc" -eq 0 ]]; then
+        notify_freely_auth_change "codex" "$slot" "switch_success"
+      fi
       return "$rc"
       ;;
     *)
@@ -493,7 +504,7 @@ _cmd_switch_auto_codex() {
   local project="${PROJECT_ROOT:-$(pwd)}"
   local tool="codex"
   local actual_account=""
-  local result rc=0
+  local result rc=0 notified_slot=""
 
   codex_switch_lock_acquire "auto_probe_switch" "switch" "auto" || exit 1
   source_watchdog_script_or_fail "$project"
@@ -522,6 +533,7 @@ _cmd_switch_auto_codex() {
       local slot="${result#usable:}"
       echo -e "${GREEN}[SWITCHED]${NC} -> $slot (usable)"
       _cmd_switch_codex_direct_unlocked "$tool" "$slot"
+      notified_slot="$slot"
       actual_account="$(extract_codex_account "$HOME/.codex/auth.json")"
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": true, \"tool\": \"codex\", \"account\": $(json_string_or_null "$actual_account"), \"slot\": \"$slot\", \"status\": \"usable\"}"
@@ -532,7 +544,7 @@ _cmd_switch_auto_codex() {
       local earliest_slot="${info%%|*}"
       local reset_at="${info##*|}"
       local human_time
-      human_time="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo "$reset_at")"
+      human_time="$(format_epoch_utc "$reset_at")"
       log_warn "No usable codex slot right now; leaving current auth untouched and keeping launch blocked. Earliest reset hint: $earliest_slot at $human_time"
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": false, \"tool\": \"codex\", \"status\": \"all_unavailable\", \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"reset_at\": $reset_at, \"reset_at_human\": \"$human_time\", \"launch_blocked\": true}"
@@ -552,6 +564,9 @@ _cmd_switch_auto_codex() {
       ;;
   esac
   codex_switch_lock_release
+  if [[ "$rc" -eq 0 && -n "$notified_slot" ]]; then
+    notify_freely_auth_change "codex" "$notified_slot" "switch_success"
+  fi
   return "$rc"
 }
 

@@ -33,6 +33,12 @@ normalize_codex_slot_name() {
   printf '%s' "$1" | sed 's/\./-/g'
 }
 
+format_epoch_utc() {
+  local epoch="$1"
+  [[ -n "$epoch" ]] || return 1
+  TZ=UTC date -r "$epoch" '+%Y.%m.%d %H:%M:%S UTC' 2>/dev/null || TZ=UTC date -d "@$epoch" '+%Y.%m.%d %H:%M:%S UTC' 2>/dev/null || printf '%s\n' "$epoch"
+}
+
 codex_active_slot_file() {
   printf '%s\n' "$HOME/.codex/active-slot"
 }
@@ -356,7 +362,7 @@ codex_load_availability_state() {
 }
 
 codex_write_availability_state() {
-  local project="$1" phase="$2" blocked_reason="$3" previous_slot="$4" active_slot="$5" inventory_fingerprint="$6" wake_trigger="$7" earliest_slot="$8" earliest_reset="$9"
+  local project="$1" phase="$2" blocked_reason="$3" previous_slot="$4" active_slot="$5" inventory_fingerprint="$6" wake_trigger="$7" earliest_slot="$8" earliest_reset="$9" reprobe_next_at="${10:-}" reprobe_attempts="${11:-}" reprobe_max_attempts="${12:-}"
   local state_file
   state_file="$(codex_availability_state_file "$project")"
   mkdir -p "$(dirname "$state_file")"
@@ -369,6 +375,9 @@ SAVED_SLOTS_FINGERPRINT="${inventory_fingerprint:-}"
 WAKE_TRIGGER="${wake_trigger:-}"
 EARLIEST_SLOT_HINT="${earliest_slot:-}"
 EARLIEST_RESET_HINT="${earliest_reset:-}"
+EARLIEST_REPROBE_NEXT_AT="${reprobe_next_at:-}"
+EARLIEST_REPROBE_ATTEMPTS="${reprobe_attempts:-}"
+EARLIEST_REPROBE_MAX_ATTEMPTS="${reprobe_max_attempts:-}"
 LAST_PROBE_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 EOF
 }
@@ -702,7 +711,7 @@ else:
 human = ""
 if reset_at.isdigit() and int(reset_at) > 0:
     from datetime import datetime, timezone
-    human = datetime.fromtimestamp(int(reset_at), timezone.utc).strftime("%Y.%m.%d %H:%M:%S")
+    human = datetime.fromtimestamp(int(reset_at), timezone.utc).strftime("%Y.%m.%d %H:%M:%S UTC")
 else:
     human = detail
 
@@ -838,7 +847,7 @@ codex_record_slot_cooldown() {
   [[ -n "$slot" && -n "$reset_at" ]] || return 0
   normalized="$(normalize_codex_slot_name "$slot")"
   # Convert timestamp to human-readable format
-  human_readable="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo '')"
+  human_readable="$(format_epoch_utc "$reset_at")"
   file="$(codex_slot_cooldown_file "$project")"
   mkdir -p "$(dirname "$file")"
   codex_prune_stale_slot_cooldowns "$project"
@@ -950,9 +959,75 @@ select_any_available_codex_slot() {
 }
 
 watchdog_reset_buffer_seconds() {
-  local buffer="${WATCHDOG_RESET_BUFFER_SECS:-60}"
-  [[ "$buffer" =~ ^[0-9]+$ ]] || buffer=60
+  local buffer="${WATCHDOG_RESET_BUFFER_SECS:-30}"
+  [[ "$buffer" =~ ^[0-9]+$ ]] || buffer=30
   printf '%s\n' "$buffer"
+}
+
+watchdog_reset_reprobe_interval_seconds() {
+  local interval="${WATCHDOG_REPROBE_INTERVAL_SECS:-30}"
+  [[ "$interval" =~ ^[0-9]+$ ]] || interval=30
+  (( interval > 0 )) || interval=30
+  printf '%s\n' "$interval"
+}
+
+watchdog_reset_reprobe_max_attempts() {
+  local max_attempts="${WATCHDOG_REPROBE_MAX_ATTEMPTS:-5}"
+  [[ "$max_attempts" =~ ^[0-9]+$ ]] || max_attempts=5
+  (( max_attempts > 0 )) || max_attempts=5
+  printf '%s\n' "$max_attempts"
+}
+
+watchdog_force_reprobe_requested() {
+  [[ "${FREELY_FORCE_WATCHDOG_REPROBE:-0}" == "1" ]]
+}
+
+compute_all_unavailable_reprobe_schedule() {
+  local earliest_reset="$1" previous_earliest_reset="${2:-}" previous_next_at="${3:-}" previous_attempts="${4:-}"
+  local now buffer due_at interval max_attempts next_at attempts schedule_from
+
+  [[ "$earliest_reset" =~ ^[0-9]+$ ]] || return 1
+  now="$(date +%s)"
+  buffer="$(watchdog_reset_buffer_seconds)"
+  interval="$(watchdog_reset_reprobe_interval_seconds)"
+  max_attempts="$(watchdog_reset_reprobe_max_attempts)"
+  due_at=$((earliest_reset + buffer))
+  next_at="$due_at"
+  attempts="0"
+
+  if [[ "$previous_earliest_reset" =~ ^[0-9]+$ && "$previous_earliest_reset" == "$earliest_reset" ]]; then
+    if [[ "$previous_attempts" =~ ^[0-9]+$ ]]; then
+      attempts="$previous_attempts"
+    fi
+    if [[ "$previous_next_at" =~ ^[0-9]+$ && "$previous_next_at" -gt "$next_at" ]]; then
+      next_at="$previous_next_at"
+    fi
+    schedule_from="$next_at"
+    if (( now >= schedule_from )); then
+      attempts=$((attempts + 1))
+      next_at=$((now + interval))
+    fi
+  fi
+
+  printf '%s|%s|%s|%s\n' "$due_at" "$next_at" "$attempts" "$max_attempts"
+}
+
+should_defer_all_unavailable_reprobe() {
+  local previous_phase="$1" previous_blocked_reason="$2" previous_fingerprint="$3" current_fingerprint="$4" previous_earliest_reset="$5" previous_next_at="${6:-}"
+  local due_at next_at now
+
+  watchdog_force_reprobe_requested && return 1
+  [[ "$previous_phase" == "all_unavailable" && "$previous_blocked_reason" == "all_slots_unavailable" ]] || return 1
+  [[ -n "$previous_fingerprint" && "$previous_fingerprint" == "$current_fingerprint" ]] || return 1
+  [[ "$previous_earliest_reset" =~ ^[0-9]+$ ]] || return 1
+
+  due_at=$((previous_earliest_reset + $(watchdog_reset_buffer_seconds)))
+  next_at="$due_at"
+  if [[ "$previous_next_at" =~ ^[0-9]+$ && "$previous_next_at" -gt "$next_at" ]]; then
+    next_at="$previous_next_at"
+  fi
+  now="$(date +%s)"
+  (( now < next_at ))
 }
 
 select_earliest_reset_codex_slot_any() {
@@ -1224,7 +1299,7 @@ probe_all_codex_slots_and_update_cooldown() {
         status_icon="⏳"
         status_text="rate_limited"
         local human_time
-        human_time="$(date -r "$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$reset_at" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo "$reset_at")"
+        human_time="$(format_epoch_utc "$reset_at")"
         details="resets at $human_time"
         ;;
       subscription_expired)
@@ -1331,8 +1406,9 @@ switch_to_next_codex_slot() {
 ensure_codex_slot_ready_for_manager() {
   local project="$1"
   local current_slot current_identity current_probe_result probe_result probe_status probe_slot cached_current_status
-  local all_unavailable_info earliest_slot earliest_reset
+  local all_unavailable_info earliest_slot earliest_reset inventory_refresh_mode="stale_ok"
   local current_fingerprint previous_phase="" previous_blocked_reason="" previous_slot="" previous_fingerprint="" wake_reason="" wake_trigger="" recovery_trigger=""
+  local previous_earliest_reset="" previous_reprobe_next_at="" previous_reprobe_attempts="" reprobe_due_at="" reprobe_next_at="" reprobe_attempts="" reprobe_max_attempts="" now=""
 
   wait_for_codex_slot_switch_idle "$project" || return 1
   current_slot="$(codex_current_slot "$project")"
@@ -1344,11 +1420,23 @@ ensure_codex_slot_ready_for_manager() {
     previous_blocked_reason="${BLOCKED_REASON:-}"
     previous_slot="${PREVIOUS_SLOT:-}"
     previous_fingerprint="${SAVED_SLOTS_FINGERPRINT:-}"
+    previous_earliest_reset="${EARLIEST_RESET_HINT:-}"
+    previous_reprobe_next_at="${EARLIEST_REPROBE_NEXT_AT:-}"
+    previous_reprobe_attempts="${EARLIEST_REPROBE_ATTEMPTS:-}"
+  fi
+
+  if should_defer_all_unavailable_reprobe "$previous_phase" "$previous_blocked_reason" "$previous_fingerprint" "$current_fingerprint" "$previous_earliest_reset" "$previous_reprobe_next_at"; then
+    log_info "watchdog defers codex reprobe until earliest-reset window matures (earliest_reset=${previous_earliest_reset:-unknown} next_reprobe_at=${previous_reprobe_next_at:-unknown})"
+    return 1
+  fi
+
+  if watchdog_force_reprobe_requested || [[ "$previous_phase" == "all_unavailable" ]]; then
+    inventory_refresh_mode="refresh"
   fi
 
   codex_write_availability_state "$project" "probing" "${previous_blocked_reason:-probe_pending}" "${previous_slot:-$current_identity}" "$current_identity" "$current_fingerprint" "" "" ""
 
-  probe_result="$(codex_inventory_truth "$project" || true)"
+  probe_result="$(codex_inventory_truth "$project" "$inventory_refresh_mode" || true)"
   cached_current_status="$(codex_cached_slot_status "$project" "$current_identity" || true)"
 
   if [[ -n "$current_identity" && "$cached_current_status" == "usable" ]]; then
@@ -1418,10 +1506,27 @@ ensure_codex_slot_ready_for_manager() {
       all_unavailable_info="${probe_result#all_unavailable:}"
       earliest_slot="${all_unavailable_info%%|*}"
       earliest_reset="${all_unavailable_info##*|}"
-      codex_write_availability_state "$project" "all_unavailable" "all_slots_unavailable" "${current_identity:-unknown}" "${current_identity:-unknown}" "$current_fingerprint" "" "$earliest_slot" "$earliest_reset"
+      if [[ "$earliest_reset" =~ ^[0-9]+$ ]]; then
+        IFS='|' read -r reprobe_due_at reprobe_next_at reprobe_attempts reprobe_max_attempts <<<"$(compute_all_unavailable_reprobe_schedule "$earliest_reset" "$previous_earliest_reset" "$previous_reprobe_next_at" "$previous_reprobe_attempts")"
+      else
+        reprobe_due_at=""
+        reprobe_next_at=""
+        reprobe_attempts=""
+        reprobe_max_attempts=""
+      fi
+      codex_write_availability_state "$project" "all_unavailable" "all_slots_unavailable" "${current_identity:-unknown}" "${current_identity:-unknown}" "$current_fingerprint" "" "$earliest_slot" "$earliest_reset" "$reprobe_next_at" "$reprobe_attempts" "$reprobe_max_attempts"
       write_manager_bootstrap_handoff "$project" "all_slots_unavailable" "${current_identity:-unknown}" "${current_identity:-unknown}" "watchdog_hold_until_slot_is_usable" "keep-manager-down-until-watchdog-finds-usable-slot"
       if [[ -n "$earliest_slot" && -n "$earliest_reset" && "$all_unavailable_info" == *"|"* ]]; then
-        log_warn "no codex slot is usable for manager bootstrap; earliest_reset=${earliest_reset} remains a hint only while watchdog keeps probing"
+        now="$(date +%s)"
+        if [[ "$reprobe_due_at" =~ ^[0-9]+$ && "$reprobe_next_at" =~ ^[0-9]+$ && "$reprobe_attempts" =~ ^[0-9]+$ && "$reprobe_max_attempts" =~ ^[0-9]+$ ]]; then
+          if (( now < reprobe_due_at )); then
+            log_warn "no codex slot is usable for manager bootstrap; earliest_reset=${earliest_reset} buffered_until=${reprobe_due_at} next_reprobe_at=${reprobe_next_at}"
+          else
+            log_warn "no codex slot is usable for manager bootstrap; post-reset reprobe_attempt=${reprobe_attempts}/${reprobe_max_attempts} next_reprobe_at=${reprobe_next_at}"
+          fi
+        else
+          log_warn "no codex slot is usable for manager bootstrap; earliest_reset=${earliest_reset} will be retried after buffer"
+        fi
       else
         log_warn "no codex slot is usable for manager bootstrap; watchdog will keep manager down until a later probe succeeds"
       fi

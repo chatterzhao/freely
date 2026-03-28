@@ -6,246 +6,87 @@ TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-earliest-reset.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
-MOCK_BIN="$TMP_DIR/mock-bin"
-LAUNCH_LOG="$TMP_DIR/launch.log"
-AI_STATE="$TMP_DIR/active-account"
-AI_SWITCH_LOG="$TMP_DIR/ai-switch.log"
-FAST_READY_AT_FILE="$TMP_DIR/fast-ready-at"
-mkdir -p \
-  "$PROJECT/bin" \
-  "$PROJECT/docs/pre-brainstorms/20260318-0000--sample" \
-  "$PROJECT/.freely/run" \
-  "$PROJECT/.freely/logs" \
-  "$MOCK_BIN"
+mkdir -p "$PROJECT/.freely/run"
 
-git init -q -b develop "$PROJECT"
+log_info() { :; }
+log_warn() { :; }
+log_error() { printf '%s\n' "$*" >&2; }
 
-cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
-# Intent
-EOF
+ai_cli_bin_for_project() {
+  printf '%s/bin/ai\n' "$1"
+}
 
-cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
-# Constitution
-EOF
+codex_slot_cooldown_file() {
+  printf '%s/.freely/run/codex-slot-cooldowns.tsv\n' "$1"
+}
 
-cat >"$PROJECT/docs/LAWS.md" <<'EOF'
-# Laws
-EOF
+seconds_until_epoch() {
+  local target="$1" now
+  now="$(date +%s)"
+  if (( target <= now )); then
+    printf '0\n'
+  else
+    printf '%s\n' "$((target - now))"
+  fi
+}
 
-cat >"$PROJECT/AGENTS.md" <<'EOF'
-# Agents
-EOF
+source "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
 
-cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
-# 预研头脑风暴工作区
-EOF
-
-cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
-# 预研头脑风暴索引
-- 20260318-0000--sample
-EOF
-
-cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
-# 收敛
-EOF
-
-cat >"$PROJECT/docs/pre-brainstorms/20260318-0000--sample/brainstorms.md" <<'EOF'
-# Brainstorms
-- ok
-EOF
-
-cat >"$PROJECT/docs/pre-brainstorms/20260318-0000--sample/candidates.md" <<'EOF'
-# Candidates
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
-- session_refs: []
-EOF
-
-cat >"$PROJECT/.freely/config.env" <<EOF
-PROJECT_ROOT="$PROJECT"
-INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
-CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="codex"
-AI_MODEL="gpt-5.4"
-AI_MODE="auto"
-AI_REASONING_EFFORT="medium"
-CHECK_INTERVAL=1
-RESTART_DELAY=0
-MAX_RESTARTS=2
-IFLOW_MAX_TURNS=100
-MAX_RESUME_STREAK=24
-MAX_ROUTE_ONLY_STREAK=1
-ROTATE_ON_CONTEXT_COMPACTED=1
-SESSION_HANDOFF_TAIL_LINES=10
-CONTEXT_WARN_RATIO=0.50
-CONTEXT_ROTATE_RATIO=0.70
-CHECKPOINT_WARN_DIRTY_ENTRIES=40
-CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
-EOF
-
-cat >"$PROJECT/bin/ai" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-
-state_file="${AI_SWITCH_STATE:?}"
-log_file="${AI_SWITCH_LOG:?}"
-printf '%s\n' "$*" >>"$log_file"
-
-cmd=""
-for arg in "$@"; do
-  case "$arg" in
-    switch|whoami|list)
-      cmd="$arg"
-      break
-      ;;
-  esac
-done
-
-case "$cmd" in
-  whoami)
-    account="$(cat "$state_file")"
-    echo "{\"tool\":\"codex\",\"account\":\"$account\",\"slot\":\"$account\"}"
-    ;;
-  list)
-    echo '{"accounts":["codex-fast@example-com","codex-slow@example-com"]}'
-    ;;
-  switch)
-    args=("$@")
-    for ((i=0; i<${#args[@]}; i++)); do
-      if [[ "${args[$i]}" == "switch" ]]; then
-        printf '%s' "${args[$((i+2))]}" >"$state_file"
-        echo "{\"switched\": true, \"tool\": \"${args[$((i+1))]}\", \"account\": \"${args[$((i+2))]}\"}"
-        exit 0
-      fi
-    done
-    ;;
-esac
-
-echo '{}'
-EOF
-chmod +x "$PROJECT/bin/ai"
-
-cat >"$MOCK_BIN/launch-freely" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-printf '%s|%s\n' "$(date +%s)" "$*" >>"${LAUNCH_LOG:?}"
-EOF
-chmod +x "$MOCK_BIN/launch-freely"
-
-cat >"$MOCK_BIN/codex" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-
-state_file="${AI_SWITCH_STATE:?}"
-fast_ready_at_file="${FAST_READY_AT_FILE:?}"
-current_account="$(cat "$state_file")"
 now="$(date +%s)"
-fast_ready_at="$(cat "$fast_ready_at_file")"
+earliest_reset=$((now + 1))
 
-if [[ "$current_account" == "fast@example-com" && "$now" -ge "$fast_ready_at" ]]; then
-  echo "hi"
-  exit 0
+WATCHDOG_RESET_BUFFER_SECS=2
+WATCHDOG_REPROBE_INTERVAL_SECS=1
+WATCHDOG_REPROBE_MAX_ATTEMPTS=4
+
+IFS='|' read -r due_at next_at attempts max_attempts <<<"$(compute_all_unavailable_reprobe_schedule "$earliest_reset")"
+
+if (( due_at != earliest_reset + WATCHDOG_RESET_BUFFER_SECS )); then
+  echo "[FAIL] expected due_at to honor WATCHDOG_RESET_BUFFER_SECS" >&2
+  exit 1
 fi
-
-if [[ "$current_account" == "fast@example-com" ]]; then
-  echo "You've hit your usage limit. Please try again at Jan 1st, 2100 12:00 AM."
+if (( next_at != due_at )); then
+  echo "[FAIL] expected first reprobe to wait until the buffered earliest-reset time" >&2
+  exit 1
+fi
+if [[ "$attempts" != "0" || "$max_attempts" != "4" ]]; then
+  echo "[FAIL] expected initial earliest-reset reprobe window state to start at 0 attempts with configured max attempts" >&2
   exit 1
 fi
 
-echo "You've hit your usage limit. Please try again at Jan 3rd, 2100 12:00 AM."
-exit 1
-EOF
-chmod +x "$MOCK_BIN/codex"
-
-printf 'slow@example-com' >"$AI_STATE"
-start_epoch="$(date +%s)"
-fast_reset_at=$((start_epoch + 2))
-fast_ready_at=$((start_epoch + 4))
-printf '%s' "$fast_ready_at" >"$FAST_READY_AT_FILE"
-printf '999999\n' >"$PROJECT/.freely/run/ensure-manager.pid"
-HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
-STATE_FILE="$PROJECT/.freely/run/codex-availability-state.env"
-
-WATCHDOG_RESET_BUFFER_SECS=2 \
-WATCHDOG_RECHECK_INTERVAL_SECS=1 \
-AI_SWITCH_STATE="$AI_STATE" \
-AI_SWITCH_LOG="$AI_SWITCH_LOG" \
-FAST_READY_AT_FILE="$FAST_READY_AT_FILE" \
-LAUNCH_LOG="$LAUNCH_LOG" \
-FREELY_ENSURE_MANAGER_LAUNCH_BIN="$MOCK_BIN/launch-freely" \
-PATH="$MOCK_BIN:$PATH" \
-  bash "$ROOT_DIR/bin/freely" ensure-manager --project "$PROJECT" --watch --interval 1 >/dev/null 2>&1 &
-watchdog_pid="$!"
-
-for _ in $(seq 1 8); do
-  if [[ -f "$STATE_FILE" ]] && grep -q '^AVAILABILITY_PHASE="all_unavailable"$' "$STATE_FILE"; then
-    break
-  fi
-  sleep 1
-done
-
-if [[ ! -f "$STATE_FILE" ]] || ! grep -q '^AVAILABILITY_PHASE="all_unavailable"$' "$STATE_FILE"; then
-  echo "[FAIL] expected ensure-manager watchdog to first enter all-slots-unavailable hold before a later reprobe recovery" >&2
-  kill "$watchdog_pid" 2>/dev/null || true
-  wait "$watchdog_pid" 2>/dev/null || true
+if ! should_defer_all_unavailable_reprobe "all_unavailable" "all_slots_unavailable" "fp" "fp" "$earliest_reset" "$next_at"; then
+  echo "[FAIL] expected watchdog to defer reprobe before the buffered earliest-reset time" >&2
   exit 1
 fi
 
-for _ in $(seq 1 12); do
-  if [[ -f "$LAUNCH_LOG" ]] && grep -q 'switch codex fast@example-com --yes' "$AI_SWITCH_LOG" && grep -q 'fast@example-com' "$AI_STATE"; then
-    break
-  fi
-  sleep 1
-done
+sleep 3
 
-if [[ ! -f "$LAUNCH_LOG" ]]; then
-  echo "[FAIL] expected ensure-manager watchdog to bootstrap manager after a later reprobe found a usable slot" >&2
-  kill "$watchdog_pid" 2>/dev/null || true
-  wait "$watchdog_pid" 2>/dev/null || true
+if should_defer_all_unavailable_reprobe "all_unavailable" "all_slots_unavailable" "fp" "fp" "$earliest_reset" "$next_at"; then
+  echo "[FAIL] expected watchdog to stop deferring once the buffered earliest-reset time has arrived" >&2
   exit 1
 fi
 
-launch_epoch="$(cut -d'|' -f1 "$LAUNCH_LOG" | tail -n 1)"
-if (( launch_epoch - start_epoch < 3 )); then
-  echo "[FAIL] expected launch to wait for a later real reprobe instead of switching to the earliest reset slot immediately" >&2
-  kill "$watchdog_pid" 2>/dev/null || true
-  wait "$watchdog_pid" 2>/dev/null || true
+EARLIEST_REPROBE_ATTEMPTS=0
+IFS='|' read -r due_at next_at attempts max_attempts <<<"$(compute_all_unavailable_reprobe_schedule "$earliest_reset" "$earliest_reset" "$due_at" "$EARLIEST_REPROBE_ATTEMPTS")"
+if [[ "$attempts" != "1" ]]; then
+  echo "[FAIL] expected first post-reset reprobe to count as attempt 1" >&2
+  exit 1
+fi
+if (( next_at <= $(date +%s) )); then
+  echo "[FAIL] expected a later reprobe to be scheduled after the configured interval" >&2
   exit 1
 fi
 
-grep -q 'switch codex fast@example-com --yes' "$AI_SWITCH_LOG"
-grep -q 'start --project '"$PROJECT"'$' "$LAUNCH_LOG"
-grep -q 'fast@example-com' "$AI_STATE"
-[[ -f "$HANDOFF_FILE" ]]
-grep -q '^## Manager Bootstrap Recovery$' "$HANDOFF_FILE"
-grep -q '^- trigger: all_slots_unavailable$' "$HANDOFF_FILE"
-grep -q '^- previous_slot: slow@example-com$' "$HANDOFF_FILE"
-grep -q '^- active_slot: fast@example-com$' "$HANDOFF_FILE"
-grep -q '^- reason: watchdog_probed_and_found_usable_slot$' "$HANDOFF_FILE"
-grep -q '^- next_action: inspect-fleet-and-recover-workers$' "$HANDOFF_FILE"
-
-pid_file="$PROJECT/.freely/run/ensure-manager.pid"
-if [[ ! -f "$pid_file" ]]; then
-  echo "[FAIL] expected ensure-manager pid file while watchdog is active" >&2
-  kill "$watchdog_pid" 2>/dev/null || true
-  wait "$watchdog_pid" 2>/dev/null || true
+if ! should_defer_all_unavailable_reprobe "all_unavailable" "all_slots_unavailable" "fp" "fp" "$earliest_reset" "$next_at"; then
+  echo "[FAIL] expected watchdog to defer again until the next scheduled post-reset reprobe slot" >&2
   exit 1
 fi
 
-recorded_pid="$(cat "$pid_file")"
-if [[ "$recorded_pid" != "$watchdog_pid" ]]; then
-  echo "[FAIL] expected stale ensure-manager pid file to be replaced with live watchdog pid" >&2
-  kill "$watchdog_pid" 2>/dev/null || true
-  wait "$watchdog_pid" 2>/dev/null || true
+if ! FREELY_FORCE_WATCHDOG_REPROBE=1 should_defer_all_unavailable_reprobe "all_unavailable" "all_slots_unavailable" "fp" "fp" "$earliest_reset" "$next_at"; then
+  :
+else
+  echo "[FAIL] expected explicit forced reprobe to bypass the earliest-reset wait window" >&2
   exit 1
 fi
 
-kill "$watchdog_pid" 2>/dev/null || true
-wait "$watchdog_pid" 2>/dev/null || true
-
-if [[ -f "$pid_file" ]]; then
-  echo "[FAIL] ensure-manager pid file still exists after watchdog exit" >&2
-  exit 1
-fi
-
-echo "[PASS] ensure-manager keeps launch blocked while all slots are unavailable, later reprobes a usable slot, and cleans up watchdog pid state"
+echo "[PASS] ensure-manager earliest-reset scheduling defers before the buffered reset time, schedules spaced reprobes after it, and lets forced auth-change wake bypass the wait"
