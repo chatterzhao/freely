@@ -262,16 +262,21 @@ git_root_for_path() {
 
 register_project_in_registry() {
   local project="$1"
-  local registry dir tmp now existing
+  local registry dir tmp now canonical_project
   registry="$(projects_registry_file)"
   dir="$(dirname "$registry")"
   now="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  if [[ -d "$project" ]]; then
+    canonical_project="$(cd "$project" && pwd -P)"
+  else
+    canonical_project="$project"
+  fi
   mkdir -p "$dir"
   tmp="$(mktemp "${dir}/projects.XXXXXX")"
   {
-    printf '%s\t%s\n' "$project" "$now"
+    printf '%s\t%s\n' "$canonical_project" "$now"
     if [[ -f "$registry" ]]; then
-      awk -F '\t' -v project="$project" '$1 != project { print $0 }' "$registry"
+      awk -F '\t' -v project="$canonical_project" '$1 != project { print $0 }' "$registry"
     fi
   } >"$tmp"
   mv "$tmp" "$registry"
@@ -4774,6 +4779,7 @@ cmd_start() {
   done
   project="$(resolve_project_or_fail "$project")"
   load_config "$project"
+  register_project_in_registry "$project"
   check_doc_gate_or_fail "$project" || {
     log_error "start blocked by doc gate"
     exit 1
@@ -5171,6 +5177,7 @@ cmd_ensure_manager() {
   project="$(resolve_project_or_fail "$project")"
   [[ "$watch_interval" =~ ^[0-9]+$ ]] || { log_error "ensure-manager --interval must be a positive integer"; exit 1; }
   load_config "$project"
+  register_project_in_registry "$project"
   check_doc_gate_or_fail "$project" || {
     log_error "ensure-manager blocked by doc gate"
     exit 1
