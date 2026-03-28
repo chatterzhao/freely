@@ -1,6 +1,6 @@
 # Issue: manager-delegated-continuation-stall-recovery-governance
 
-- issue_id: `I-20260328-0154-A`
+- issue_id: `I-20260323-1705-A`
 - title: Manager delegated continuation stall recovery governance
 - phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`

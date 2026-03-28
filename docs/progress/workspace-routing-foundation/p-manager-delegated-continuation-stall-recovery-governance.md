@@ -1,6 +1,6 @@
 # Progress: manager-delegated-continuation-stall-recovery-governance
 
-- issue_id: `I-20260328-0154-A`
+- issue_id: `I-20260323-1705-A`
 - title: Manager delegated continuation stall recovery governance
 - issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
 - phase_state: `in_verification`

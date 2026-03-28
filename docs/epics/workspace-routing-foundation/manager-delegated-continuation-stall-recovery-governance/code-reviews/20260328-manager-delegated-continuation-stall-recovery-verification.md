@@ -1,7 +1,7 @@
 # Verification - manager-delegated-continuation-stall-recovery-governance
 
 - date: `2026-03-28`
-- issue_id: `I-20260328-0154-A`
+- issue_id: `I-20260323-1705-A`
 - branch: `feature/manager-stall-local-continuation-reentry-research-20260328-0154`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260328-0154-feature-manager-stall-local-continuation-reentry-research`
 
