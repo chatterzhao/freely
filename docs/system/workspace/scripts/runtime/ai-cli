@@ -7,6 +7,7 @@ set -euo pipefail
 # 配置
 AUTH_DIR="$HOME/.ai-auth"
 CONFIG_FILE="$HOME/.config/freely/ai-cli-profiles.yaml"
+SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 
 # 全局选项
 YES_MODE=false
@@ -76,6 +77,14 @@ write_codex_active_slot() {
   file="$(codex_active_slot_file)"
   mkdir -p "$(dirname "$file")"
   printf '%s\n' "$slot" >"$file"
+}
+
+notify_freely_auth_change() {
+  local tool="$1" slot="${2:-}" reason="${3:-auth_change}"
+  local freely_bin
+  freely_bin="${FREELY_AUTH_CHANGE_WAKE_BIN:-$SELF_ROOT/bin/freely}"
+  [[ -x "$freely_bin" ]] || return 0
+  "$freely_bin" auth-change-wake --tool "$tool" --slot "$slot" --reason "$reason" >/dev/null 2>&1 || true
 }
 
 codex_switch_lock_dir() {
@@ -302,6 +311,7 @@ cmd_login() {
           log_info "Auto-saved auth email: $account"
           log_info "Slot: $slot"
           log_info "Location: $target_dir"
+          notify_freely_auth_change "codex" "$slot" "login_success"
           
           if [[ "$FORMAT" == "json" ]]; then
             echo "{\"logged_in\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"auth_email\": \"$account\", \"account\": \"$account\", \"saved\": true}"
