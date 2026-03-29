@@ -64,6 +64,7 @@
 - artifact_ref:
   - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
   - `docs/progress/workspace-routing-foundation/p-project-command-semantics-and-restore-work-governance.md`
+  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`
 
 ### PT-2
 - id: `PT-2`
@@ -73,6 +74,7 @@
 - artifact_ref:
   - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
   - `docs/progress/workspace-routing-foundation/p-project-command-semantics-and-restore-work-governance.md`
+  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`
 
 ### PT-3
 - id: `PT-3`
@@ -82,6 +84,7 @@
 - artifact_ref:
   - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
   - `docs/progress/workspace-routing-foundation/p-project-command-semantics-and-restore-work-governance.md`
+  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`
 
 ### PT-4
 - id: `PT-4`
@@ -91,6 +94,7 @@
 - artifact_ref:
   - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
   - `docs/progress/workspace-routing-foundation/p-project-command-semantics-and-restore-work-governance.md`
+  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`
 
 ### PT-5
 - id: `PT-5`
@@ -101,3 +105,4 @@
   - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
   - `docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
   - `docs/progress/workspace-routing-foundation/p-project-command-semantics-and-restore-work-governance.md`
+  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`

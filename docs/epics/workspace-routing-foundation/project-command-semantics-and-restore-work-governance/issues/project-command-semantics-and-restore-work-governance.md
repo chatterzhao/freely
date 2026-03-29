@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260327-2006-A`
 - title: Project command semantics and explicit restore-work governance
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `project-command-semantics-and-restore-work-governance`
@@ -15,7 +15,7 @@
 - integration_target: `develop`
 - depends_on: `none`
 - session_refs:
-  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-initial-slice"}
+  - {tool: codex, session_id: "019d3752-80a1-7773-808d-081375e06aa7", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/28/rollout-2026-03-28T19-00-47-019d3752-80a1-7773-808d-081375e06aa7.jsonl", role: "dev-loop-and-verification-writeback"}
 
 ## Why
 
@@ -55,6 +55,6 @@ Freely 已经有 project-scoped pid ownership 与 `cmd_stop()` 的底层 blast r
 
 ## Next
 
-- 当前 issue 已进入 `dev-loop-execution`，先落最小 runtime command surface：`restart`、`start --force`、`restore-work` 与 shared stop-path extraction。
-- 同步补 focused regression，确保 command dispatch、project-local repair reason 与 restore anchor gate 不回退。
-- 下游 `I-20260327-2006-B` 只在本 issue taxonomy 稳定后继续展开 global restart manifest durability 与 fleet restore policy。
+- next_action: 当前 feature lane 已完成 checkpoint `5bc3a86` 并补齐 feature-lane verification evidence，下一跳保持 manager-owned `completion_verification`；不在本 issue 内继续扩写 runtime patch，也不回退到 IBM/doc-loop。
+- revisit_trigger: 若 manager merge review 指出 verification artifact、milestone state、或 runtime/test truth 之间仍有 contract 漏洞，再回到当前 worktree做定点修补；否则由 manager 决定 closeout、merge sequencing 与后续 `I-20260327-2006-B` 的启动时机。
+- downstream_note: `I-20260327-2006-B` 继续保持 downstream `done_ibm` owner，等待本 issue 的 completion verification judgement，而不是被当前 worker提前拉进新的实现批次。

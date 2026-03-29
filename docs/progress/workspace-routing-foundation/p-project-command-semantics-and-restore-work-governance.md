@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260327-2006-A`
 - title: Project command semantics and explicit restore-work governance
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - runtime_state: `restart_required`
 - branch: `feature/start-restart-control-plane-semantics-20260327-200651`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260327-200651-feature-start-restart-control-plane-semantics`
@@ -13,6 +13,7 @@
 ## Summary
 
 - 2026-03-28 这条 lane 已从 `done_ibm` 正式切到 `in_dev`，因为 runtime 真源已经开始 materialize project command family。
+- `2026-03-28 19:20 PDT` 当前 worktree 已 clean，checkpoint `5bc3a86` 已落下，且 feature-lane verification artifact `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md` 已补齐。因此当前 branch-local truth 不再停留在 `checkpoint / verification-prep`，而是前移到 manager-owned `completion_verification` 收口；旧的 IBM handoff 继续只算 supervision history。
 - `2026-03-28 19:16 PDT` 在决定是否切 checkpoint 前，再次补跑 `bash -n docs/system/workspace/scripts/runtime/freely`、`bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`、`bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready` 与 `./bin/governance-check`。结果继续通过，`governance-check` 仍只有仓库既有的 legacy pre-brainstorm naming warnings，因此当前 5-file dirty slice 继续可视为同一 issue 的 checkpoint-ready implementation set，而不是需要回退到 IBM 的未定边界。
 - `2026-03-28 19:12 PDT` 再次读取 `live-status` 后，当前 worker 仍是同一条 active lane，且 `last_launch_kind` 已更新为 `resume`、`last_rotation_reason=unavailable`、`pending_delegated_continuation_ids=none`。同一份 readback 还带出了 `restart_storm_signal_reason=restart_storm_count_threshold`、`restart_storm_escalation_target=manager_bootstrap_handoff`，但由于 active AI / supervisor 进程和 branch-local `milestones -> issue -> progress -> worker continuity` 真相都未变化，这组信号继续只记为 runtime-owned 监督证据，不触发重新回 IBM 或扩 scope。
 - `2026-03-28 19:07:34 PDT` 再次读取 `live-status` 后，当前 session evidence 已从 `current-thread` 降级占位升级为显式 Codex session：`session_id=019d3752-80a1-7773-808d-081375e06aa7`，`jsonl_path=/Users/zhaoyu/.codex/sessions/2026/03/28/rollout-2026-03-28T19-00-47-019d3752-80a1-7773-808d-081375e06aa7.jsonl`。同一轮 `live-status` 继续显示 `last_launch_kind=fresh_with_handoff`、`last_rotation_reason=resume_streak_limit`、`pending_delegated_continuation_ids=none`，因此本 lane 仍应继续消费 branch-local `dev-loop` truth，而不是回退到旧 IBM handoff。
@@ -59,11 +60,10 @@
 - 保持 `restart` / `start --force` / `restore-work` 的 project-local taxonomy 不回退，不把 global restart manifest owner 提前拉进当前 issue
 - 保持 explicit `restore-work` 只消费 mandatory anchors，不把 transient pid/run-state 升格成 required truth
 - 维持 attach/reuse、safe repair set、project-identity anchored pid handling 与 wait ordering 的已通过 focused regressions 作为当前 implementation floor
-- 把本 issue 的下一步重点从“继续扩写新 runtime slice”收窄为 checkpoint / verification-prep，同步整理 continuity、progress 与后续 closeout 所需 evidence
+- 当前 issue 的 worker implementation 已 checkpoint 并补齐 verification artifact；下一步重点改为 manager-owned `completion_verification` closeout，而不是继续扩写 runtime slice
 - 为后续 `I-20260327-2006-B` 保留清晰的 downstream 依赖，不在当前 issue 提前混入 global restart manifest owner
-- 当前 worktree 仍是 dirty 且无 checkpoint commit；下一轮扩 scope 前先以 progress/continuity 固化本轮验证与 handoff 吸收结果
-- `restart_storm_signal_reason=restart_storm_count_threshold` 已被当前 first-hop 记入 continuity/progress，但它仍属于 runtime-owned 监督面；在 branch-local issue truth 未变化前，不把它升格成新的 doc-loop 或 cleanup route
-- 当前 dirty 5-file diff 仍全部位于本 issue 的 runtime/test/doc writeback 范围内，不需要分流到其他 worktree；但因为 checkpoint 仍未切出，继续扩 scope 前应先考虑切一笔 checkpoint commit
+- 当前 worktree 已 clean，checkpoint commit `5bc3a86` 已把 runtime/test/doc slice 固化；后续不应再把本 lane 伪装成继续开发中的 dirty worker
+- `restart_storm_signal_reason=restart_storm_count_threshold` 已被当前 first-hop 记入 continuity/progress，但它仍属于 runtime-owned 监督面；在 branch-local issue truth 已前移到 `completion_verification` 后，仍不把它升格成新的 doc-loop 或 cleanup route
 
 ## Verification
 
@@ -80,13 +80,14 @@
 - rerun after delegated-continuation absorption: `bash -n docs/system/workspace/scripts/runtime/freely && bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics && bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready && ./bin/governance-check`
 - fresh-session rerun after current first-hop closure: `bash -n docs/system/workspace/scripts/runtime/freely && bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics && bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready && ./bin/governance-check`
 - checkpoint-prep rerun: `bash -n docs/system/workspace/scripts/runtime/freely && bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics && bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready && ./bin/governance-check`
+- feature-lane verification artifact: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`
 
 ## Next Action
 
-- 保持当前 route 为 `dev-loop-execution`，但下一轮优先做 checkpoint / verification-prep，而不是再把同一 issue 重新伪装成 IBM 或无界扩 scope
-- 如需继续实现，只允许在不突破当前 owner 边界的前提下做小幅收口；默认先把已通过的 focused runtime/test slice 固化为 checkpoint commit
+- 当前 route 已从 worker `dev-loop-execution` 收敛到 manager-owned `completion_verification`；本 worktree 默认不再继续实现，除非 merge review 明确指出需要 feature-lane fixup
+- checkpoint `5bc3a86` 与 feature-lane verification artifact 已经构成当前批次的 worker closeout 证据；下一步由 manager 判断 merge review / canonical absorption
 - 若后续实现再次暴露 project-vs-global owner 混层，再回 `doc-pre-brainstorm` / `doc-ibm`；在此之前保持当前 issue 作为唯一 project command owner
 - 继续把 `20260328-050900`、`20260328-050923`、`20260328-061034`、`20260328-062715`、`20260328-062728`、`20260328-062746` 这组 IBM-style relaunch handoff 视为 stale supervision history；除非 branch-local `milestones/issue/progress` 再次退回 docs 缺口，否则不要回退到 IBM
-- 继续扩写实现前先评估是否切 checkpoint commit；至少不要在 continuity/progress 已过期的状态下继续加新 scope
+- 当前 branch-local continuity/progress 已跟上 checkpoint 与 verification artifact，不再保留“先 checkpoint”这类过期 next action
 - 若 runtime 后续真的把 `restart_storm` 升格成 manager-owned 恢复动作，再由 runtime/manager continuity 接管；当前 worker 只保留 evidence writeback，不把它误写成新的 issue owner
-- 当前 issue 保持 `in_dev`，直到 focused regressions、continuity 与后续 verification 准备共同表明已可交回 manager-owned `completion_verification`
+- 当前 issue 保持 `in_verification`，等待 manager-owned completion verification judgement；下游 `I-20260327-2006-B` 继续留在 downstream `done_ibm`
