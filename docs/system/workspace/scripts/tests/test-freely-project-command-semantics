@@ -35,6 +35,525 @@ START_FORCE_OUTPUT="$(
 [[ "$START_FORCE_OUTPUT" == *"stop:/tmp/freely-project|reason:start_force"* ]]
 [[ "$START_FORCE_OUTPUT" == *"start:/tmp/freely-project"* ]]
 
+START_ATTACH_TMP="$(mktemp -d /tmp/freely-project-command-attach.XXXXXX)"
+trap 'rm -rf "$TMP_DIR" "$START_ATTACH_TMP"' EXIT
+
+START_ATTACH_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$START_ATTACH_TMP"'/project"
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir" "$project/.freely/logs"
+    printf "%s\n" "22222" >"$run_dir/supervisor.pid"
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    load_config() { :; }
+    check_doc_gate_or_fail() { return 0; }
+    state_dir() { printf "%s\n" "$1/.freely"; }
+    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
+    logs_dir_for_project() { printf "%s\n" "$1/.freely/logs"; }
+    stop_marker_file() { printf "%s\n" "$1/.freely/run/stop.marker"; }
+    valid_supervisor_pid_for_project() { [[ "$2" == "22222" ]]; }
+    valid_ai_pid_for_project() { return 1; }
+    ensure_interruption_dispatcher_ready_or_fail() { return 0; }
+    write_workcell_state() { printf "state:%s|%s|%s|%s\n" "$2" "$3" "$4" "$5"; }
+    launch_interruption_dispatcher() { printf "unexpected-dispatcher-launch\n"; }
+    role_hint_for_project() { printf "%s\n" worker; }
+    launch_manager_watchdog() { printf "unexpected-watchdog-launch\n"; }
+    ensure_manager_watchdog_ready_or_fail() { return 0; }
+    load_session_state_or_defaults() { :; }
+    log_info() { printf "info:%s\n" "$*"; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    main start --project "$project"
+  '
+)"
+
+[[ "$START_ATTACH_OUTPUT" == *"info:project runtime/control-plane already up; reusing supervisor pid=22222"* ]]
+[[ "$START_ATTACH_OUTPUT" == *"state:running|up|up|already_running_attach"* ]]
+[[ "$START_ATTACH_OUTPUT" != *"unexpected-dispatcher-launch"* ]]
+[[ "$START_ATTACH_OUTPUT" != *"unexpected-watchdog-launch"* ]]
+
+START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$START_ATTACH_TMP"'/attach-discovered-supervisor-project"
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir" "$project/.freely/logs"
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    load_config() { :; }
+    check_doc_gate_or_fail() { return 0; }
+    state_dir() { printf "%s\n" "$1/.freely"; }
+    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
+    logs_dir_for_project() { printf "%s\n" "$1/.freely/logs"; }
+    stop_marker_file() { printf "%s\n" "$1/.freely/run/stop.marker"; }
+    discover_supervisor_pid() { printf "%s\n" "27272"; }
+    valid_supervisor_pid_for_project() { [[ "$2" == "27272" ]]; }
+    valid_ai_pid_for_project() { return 1; }
+    ensure_interruption_dispatcher_ready_or_fail() { return 0; }
+    write_workcell_state() { printf "state:%s|%s|%s|%s\n" "$2" "$3" "$4" "$5"; }
+    launch_interruption_dispatcher() { printf "unexpected-dispatcher-launch\n"; }
+    role_hint_for_project() { printf "%s\n" worker; }
+    launch_manager_watchdog() { printf "unexpected-watchdog-launch\n"; }
+    ensure_manager_watchdog_ready_or_fail() { return 0; }
+    load_session_state_or_defaults() { :; }
+    log_info() { printf "info:%s\n" "$*"; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    main start --project "$project"
+    printf "recovered_supervisor_pid:%s\n" "$(cat "$run_dir/supervisor.pid")"
+  '
+)"
+
+[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"warn:recovered live project supervisor after supervisor.pid drift: 27272"* ]]
+[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"info:project runtime/control-plane already up; reusing supervisor pid=27272"* ]]
+[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"state:running|up|up|already_running_attach"* ]]
+[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"recovered_supervisor_pid:27272"* ]]
+[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" != *"unexpected-dispatcher-launch"* ]]
+[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" != *"unexpected-watchdog-launch"* ]]
+
+DISCOVER_SUPERVISOR_EXCLUDES_SELF_AND_PARENT_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="/tmp/freely-project-discover-exclusion"
+    self_pid="${BASHPID:-$$}"
+    parent_pid="${PPID:-0}"
+
+    ps() {
+      cat <<EOF
+  $self_pid bash /tmp/runtime/freely start --project $project
+  $parent_pid bash /tmp/runtime/freely start --project $project
+  28282 bash /tmp/runtime/freely start --project $project
+EOF
+    }
+
+    printf "discovered:%s\n" "$(discover_supervisor_pid "$project" "$self_pid,$parent_pid")"
+  '
+)"
+
+[[ "$DISCOVER_SUPERVISOR_EXCLUDES_SELF_AND_PARENT_OUTPUT" == *"discovered:28282"* ]]
+
+DISCOVER_SUPERVISOR_REJECTS_SELF_ONLY_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="/tmp/freely-project-discover-self-only"
+    self_pid="${BASHPID:-$$}"
+    parent_pid="${PPID:-0}"
+
+    ps() {
+      cat <<EOF
+  $self_pid bash /tmp/runtime/freely start --project $project
+  $parent_pid bash /tmp/runtime/freely start --project $project
+EOF
+    }
+
+    discovered="$(discover_supervisor_pid "$project" "$self_pid,$parent_pid")"
+    if [[ -n "$discovered" ]]; then
+      printf "discovered:%s\n" "$discovered"
+    else
+      printf "discovered:none\n"
+    fi
+  '
+)"
+
+[[ "$DISCOVER_SUPERVISOR_REJECTS_SELF_ONLY_OUTPUT" == *"discovered:none"* ]]
+
+START_ATTACH_CLEARS_STALE_AI_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$START_ATTACH_TMP"'/attach-stale-ai-project"
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir" "$project/.freely/logs"
+    printf "%s\n" "25252" >"$run_dir/supervisor.pid"
+    printf "%s\n" "26262" >"$run_dir/ai.pid"
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    load_config() { :; }
+    check_doc_gate_or_fail() { return 0; }
+    state_dir() { printf "%s\n" "$1/.freely"; }
+    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
+    logs_dir_for_project() { printf "%s\n" "$1/.freely/logs"; }
+    stop_marker_file() { printf "%s\n" "$1/.freely/run/stop.marker"; }
+    valid_supervisor_pid_for_project() { [[ "$2" == "25252" ]]; }
+    valid_ai_pid_for_project() { return 1; }
+    ensure_interruption_dispatcher_ready_or_fail() { return 0; }
+    write_workcell_state() { printf "state:%s|%s|%s|%s\n" "$2" "$3" "$4" "$5"; }
+    launch_interruption_dispatcher() { printf "unexpected-dispatcher-launch\n"; }
+    role_hint_for_project() { printf "%s\n" worker; }
+    launch_manager_watchdog() { printf "unexpected-watchdog-launch\n"; }
+    ensure_manager_watchdog_ready_or_fail() { return 0; }
+    load_session_state_or_defaults() { :; }
+    log_info() { printf "info:%s\n" "$*"; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    main start --project "$project"
+    if [[ -f "$run_dir/ai.pid" ]]; then
+      printf "stale_ai_pid_left\n"
+    else
+      printf "stale_ai_pid_removed\n"
+    fi
+  '
+)"
+
+[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"warn:clearing stale ai.pid while reusing healthy project supervisor: 26262"* ]]
+[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"info:project runtime/control-plane already up; reusing supervisor pid=25252"* ]]
+[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"stale_ai_pid_removed"* ]]
+[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" != *"unexpected-dispatcher-launch"* ]]
+[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" != *"unexpected-watchdog-launch"* ]]
+
+START_ATTACH_WITH_MISSING_DISPATCHER_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$START_ATTACH_TMP"'/attach-repair-project"
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir"
+    printf "%s\n" "23232" >"$run_dir/supervisor.pid"
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    valid_supervisor_pid_for_project() { [[ "$2" == "23232" ]]; }
+    valid_ai_pid_for_project() { return 1; }
+    ensure_interruption_dispatcher_ready_or_fail() { return 1; }
+    role_hint_for_project() { printf "%s\n" worker; }
+    ensure_manager_watchdog_ready_or_fail() { return 0; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    terminate_pid_with_graceful_wait() { printf "terminate:%s|label:%s\n" "$1" "$2"; }
+
+    ensure_no_active_supervisor_conflict "$project" "$run_dir/supervisor.pid" "$run_dir/ai.pid" "1"
+    if [[ -f "$run_dir/supervisor.pid" ]]; then
+      printf "attach_repair_supervisor_pid_left\n"
+    else
+      printf "attach_repair_supervisor_pid_removed\n"
+    fi
+  '
+)"
+
+[[ "$START_ATTACH_WITH_MISSING_DISPATCHER_OUTPUT" == *"warn:project supervisor pid=23232 is live but interruption dispatcher is not ready; falling back to project-local repair"* ]]
+[[ "$START_ATTACH_WITH_MISSING_DISPATCHER_OUTPUT" == *"warn:repairing partial project control-plane before supervisor restart: 23232"* ]]
+[[ "$START_ATTACH_WITH_MISSING_DISPATCHER_OUTPUT" == *"terminate:23232|label:partial project control-plane before supervisor restart"* ]]
+[[ "$START_ATTACH_WITH_MISSING_DISPATCHER_OUTPUT" == *"attach_repair_supervisor_pid_removed"* ]]
+
+START_ATTACH_WITH_MISSING_WATCHDOG_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$START_ATTACH_TMP"'/attach-repair-manager-project"
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir"
+    printf "%s\n" "24242" >"$run_dir/supervisor.pid"
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    valid_supervisor_pid_for_project() { [[ "$2" == "24242" ]]; }
+    valid_ai_pid_for_project() { return 1; }
+    ensure_interruption_dispatcher_ready_or_fail() { return 0; }
+    role_hint_for_project() { printf "%s\n" manager; }
+    ensure_manager_watchdog_ready_or_fail() { return 1; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    terminate_pid_with_graceful_wait() { printf "terminate:%s|label:%s\n" "$1" "$2"; }
+
+    ensure_no_active_supervisor_conflict "$project" "$run_dir/supervisor.pid" "$run_dir/ai.pid" "1"
+    if [[ -f "$run_dir/supervisor.pid" ]]; then
+      printf "manager_attach_repair_supervisor_pid_left\n"
+    else
+      printf "manager_attach_repair_supervisor_pid_removed\n"
+    fi
+  '
+)"
+
+[[ "$START_ATTACH_WITH_MISSING_WATCHDOG_OUTPUT" == *"warn:project supervisor pid=24242 is live but manager watchdog is not ready; falling back to project-local repair"* ]]
+[[ "$START_ATTACH_WITH_MISSING_WATCHDOG_OUTPUT" == *"warn:repairing partial project control-plane before supervisor restart: 24242"* ]]
+[[ "$START_ATTACH_WITH_MISSING_WATCHDOG_OUTPUT" == *"terminate:24242|label:partial project control-plane before supervisor restart"* ]]
+[[ "$START_ATTACH_WITH_MISSING_WATCHDOG_OUTPUT" == *"manager_attach_repair_supervisor_pid_removed"* ]]
+
+STALE_PID_TMP="$(mktemp -d /tmp/freely-project-command-stale-pid.XXXXXX)"
+trap 'rm -rf "$TMP_DIR" "$START_ATTACH_TMP" "$STALE_PID_TMP"' EXIT
+FOREIGN_PID="$(sleep 30 >/dev/null 2>&1 & echo $!)"
+trap 'kill "$FOREIGN_PID" 2>/dev/null || true; rm -rf "$TMP_DIR" "$START_ATTACH_TMP" "$STALE_PID_TMP"' EXIT
+
+STALE_PID_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$STALE_PID_TMP"'/project"
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir"
+    printf "%s\n" "'"$FOREIGN_PID"'" >"$run_dir/ai.pid"
+    printf "%s\n" "'"$FOREIGN_PID"'" >"$run_dir/supervisor.pid"
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    load_config() { :; }
+    check_doc_gate_or_fail() { return 0; }
+    state_dir() { printf "%s\n" "$1/.freely"; }
+    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
+    logs_dir_for_project() { printf "%s\n" "$1/.freely/logs"; }
+    stop_marker_file() { printf "%s\n" "$1/.freely/run/stop.marker"; }
+    session_state_file() { printf "%s\n" "$1/.freely/run/session-state.env"; }
+    handoff_file() { printf "%s\n" "$1/.freely/run/session-handoff.txt"; }
+    write_workcell_state() { :; }
+    launch_interruption_dispatcher() { :; }
+    ensure_interruption_dispatcher_ready_or_fail() { return 0; }
+    role_hint_for_project() { printf "%s\n" worker; }
+    launch_manager_watchdog() { :; }
+    ensure_manager_watchdog_ready_or_fail() { return 0; }
+    load_session_state_or_defaults() { :; }
+    valid_ai_pid_for_project() { return 1; }
+    valid_supervisor_pid_for_project() { return 1; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    main stop --project "$project"
+    if kill -0 "'"$FOREIGN_PID"'" 2>/dev/null; then
+      printf "foreign_pid_alive\n"
+    else
+      printf "foreign_pid_killed\n"
+    fi
+    if [[ -f "$run_dir/ai.pid" || -f "$run_dir/supervisor.pid" ]]; then
+      printf "stale_pid_files_left\n"
+    else
+      printf "stale_pid_files_removed\n"
+    fi
+  '
+)"
+
+[[ "$STALE_PID_OUTPUT" == *"warn:ignoring stale ai.pid that is not owned by project: $FOREIGN_PID"* ]]
+[[ "$STALE_PID_OUTPUT" == *"foreign_pid_alive"* ]]
+[[ "$STALE_PID_OUTPUT" == *"stale_pid_files_removed"* ]]
+
+START_WITH_STALE_SUPERVISOR_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$STALE_PID_TMP"'/start-project"
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir" "$project/.freely/logs"
+    printf "%s\n" "'"$FOREIGN_PID"'" >"$run_dir/supervisor.pid"
+    printf "%s\n" "33333" >"$run_dir/ai.pid"
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    valid_supervisor_pid_for_project() { return 1; }
+    valid_ai_pid_for_project() { [[ "$2" == "33333" ]]; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    kill() { printf "kill:%s\n" "$1"; }
+    ensure_no_active_supervisor_conflict "$project" "$run_dir/supervisor.pid" "$run_dir/ai.pid"
+    if [[ -f "$run_dir/supervisor.pid" || -f "$run_dir/ai.pid" ]]; then
+      printf "start_repair_pid_files_left\n"
+    else
+      printf "start_repair_pid_files_removed\n"
+    fi
+  '
+)"
+
+[[ "$START_WITH_STALE_SUPERVISOR_OUTPUT" == *"warn:ignoring stale supervisor.pid that is not owned by project: $FOREIGN_PID"* ]]
+[[ "$START_WITH_STALE_SUPERVISOR_OUTPUT" == *"warn:repairing orphaned project ai pid before supervisor restart: 33333"* ]]
+[[ "$START_WITH_STALE_SUPERVISOR_OUTPUT" == *"kill:33333"* ]]
+[[ "$START_WITH_STALE_SUPERVISOR_OUTPUT" == *"start_repair_pid_files_removed"* ]]
+
+START_REPAIR_WAITS_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$STALE_PID_TMP"'/wait-project"
+    run_dir="$project/.freely/run"
+    wait_state="$run_dir/wait-state"
+    mkdir -p "$run_dir"
+    printf "%s\n" "44444" >"$run_dir/ai.pid"
+    : >"$wait_state"
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    valid_supervisor_pid_for_project() { return 1; }
+    valid_ai_pid_for_project() { [[ "$2" == "44444" ]]; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    kill() {
+      if [[ "${1:-}" == "-0" ]]; then
+        local pid="${2:-}"
+        if [[ "$pid" != "44444" ]]; then
+          return 1
+        fi
+        local polls
+        polls="$(wc -l <"$wait_state")"
+        if (( polls == 0 )); then
+          printf "poll-1\n" >>"$wait_state"
+          return 0
+        fi
+        return 1
+      fi
+      printf "term:%s\n" "$1"
+      return 0
+    }
+    sleep() { printf "sleep:%s\n" "$1"; }
+
+    ensure_no_active_supervisor_conflict "$project" "$run_dir/supervisor.pid" "$run_dir/ai.pid"
+    printf "wait_polls:%s\n" "$(wc -l <"$wait_state")"
+  '
+)"
+
+[[ "$START_REPAIR_WAITS_OUTPUT" == *"term:44444"* ]]
+[[ "$START_REPAIR_WAITS_OUTPUT" == *"sleep:0.1"* ]]
+[[ "$START_REPAIR_WAITS_OUTPUT" == *"wait_polls:1"* ]]
+
+STOP_REPAIR_WAITS_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$STALE_PID_TMP"'/stop-wait-project"
+    run_dir="$project/.freely/run"
+    wait_state_ai="$run_dir/ai.wait-state"
+    wait_state_sup="$run_dir/supervisor.wait-state"
+    mkdir -p "$run_dir"
+    printf "%s\n" "55555" >"$run_dir/ai.pid"
+    printf "%s\n" "66666" >"$run_dir/supervisor.pid"
+    : >"$wait_state_ai"
+    : >"$wait_state_sup"
+
+    state_dir() { printf "%s\n" "$1/.freely"; }
+    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
+    stop_marker_file() { printf "%s\n" "$1/.freely/run/stop.marker"; }
+    session_state_file() { printf "%s\n" "$1/.freely/run/session-state.env"; }
+    handoff_file() { printf "%s\n" "$1/.freely/run/session-handoff.txt"; }
+    ensure_manager_watchdog_pid_file() { printf "%s\n" "$1/.freely/run/manager-watchdog.pid"; }
+    interruption_dispatcher_pid_file() { printf "%s\n" "$1/.freely/run/interruption-dispatcher.pid"; }
+    valid_ai_pid_for_project() { [[ "$2" == "55555" ]]; }
+    valid_supervisor_pid_for_project() { [[ "$2" == "66666" ]]; }
+    valid_ensure_manager_watchdog_pid_for_project() { return 1; }
+    valid_interruption_dispatcher_pid_for_project() { return 1; }
+    discover_supervisor_pid() { return 1; }
+    write_workcell_state() { printf "state:%s|%s|%s|%s\n" "$2" "$3" "$4" "$5"; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    kill() {
+      if [[ "${1:-}" == "-0" ]]; then
+        local pid="${2:-}" state_file=""
+        case "$pid" in
+          55555) state_file="$wait_state_ai" ;;
+          66666) state_file="$wait_state_sup" ;;
+          *) return 1 ;;
+        esac
+        local polls
+        polls="$(wc -l <"$state_file")"
+        if (( polls == 0 )); then
+          printf "poll-%s\n" "$pid" >>"$state_file"
+          return 0
+        fi
+        return 1
+      fi
+      printf "term:%s\n" "$1"
+      return 0
+    }
+    sleep() { printf "sleep:%s\n" "$1"; }
+
+    stop_project_runtime "$project" "operator_restart"
+    printf "ai_wait_polls:%s\n" "$(wc -l <"$wait_state_ai")"
+    printf "supervisor_wait_polls:%s\n" "$(wc -l <"$wait_state_sup")"
+  '
+)"
+
+[[ "$STOP_REPAIR_WAITS_OUTPUT" == *"term:55555"* ]]
+[[ "$STOP_REPAIR_WAITS_OUTPUT" == *"term:66666"* ]]
+[[ "$STOP_REPAIR_WAITS_OUTPUT" == *"sleep:0.1"* ]]
+[[ "$STOP_REPAIR_WAITS_OUTPUT" == *"ai_wait_polls:1"* ]]
+[[ "$STOP_REPAIR_WAITS_OUTPUT" == *"supervisor_wait_polls:1"* ]]
+[[ "$STOP_REPAIR_WAITS_OUTPUT" == *"state:stopped|down|down|operator_restart"* ]]
+
+SAME_PROJECT_SHELL_PID="$(bash -lc 'cd "'"$STALE_PID_TMP"'"; sleep 30 >/dev/null 2>&1' & echo $!)"
+trap 'kill "$FOREIGN_PID" "$SAME_PROJECT_SHELL_PID" 2>/dev/null || true; rm -rf "$TMP_DIR" "$STALE_PID_TMP"' EXIT
+
+SAME_PROJECT_UNRELATED_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$STALE_PID_TMP"'/owned-check-project"
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir" "$project/.freely"
+    printf "%s\n" "'"$SAME_PROJECT_SHELL_PID"'" >"$run_dir/ai.pid"
+    printf "%s\n" "'"$SAME_PROJECT_SHELL_PID"'" >"$run_dir/supervisor.pid"
+
+    cat >"$project/.freely/config.env" <<EOF
+AI_TOOL="codex"
+EOF
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    load_config() { :; }
+    check_doc_gate_or_fail() { return 0; }
+    state_dir() { printf "%s\n" "$1/.freely"; }
+    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
+    logs_dir_for_project() { printf "%s\n" "$1/.freely/logs"; }
+    stop_marker_file() { printf "%s\n" "$1/.freely/run/stop.marker"; }
+    session_state_file() { printf "%s\n" "$1/.freely/run/session-state.env"; }
+    handoff_file() { printf "%s\n" "$1/.freely/run/session-handoff.txt"; }
+    write_workcell_state() { :; }
+    launch_interruption_dispatcher() { :; }
+    ensure_interruption_dispatcher_ready_or_fail() { return 0; }
+    role_hint_for_project() { printf "%s\n" worker; }
+    launch_manager_watchdog() { :; }
+    ensure_manager_watchdog_ready_or_fail() { return 0; }
+    load_session_state_or_defaults() { :; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+
+    if valid_ai_pid_for_project "$project" "'"$SAME_PROJECT_SHELL_PID"'"; then
+      printf "same_project_shell_misclassified_as_ai\n"
+    else
+      printf "same_project_shell_rejected_as_ai\n"
+    fi
+    if valid_supervisor_pid_for_project "$project" "'"$SAME_PROJECT_SHELL_PID"'"; then
+      printf "same_project_shell_misclassified_as_supervisor\n"
+    else
+      printf "same_project_shell_rejected_as_supervisor\n"
+    fi
+    main stop --project "$project"
+    if kill -0 "'"$SAME_PROJECT_SHELL_PID"'" 2>/dev/null; then
+      printf "same_project_shell_alive\n"
+    else
+      printf "same_project_shell_killed\n"
+    fi
+    if [[ -f "$run_dir/ai.pid" || -f "$run_dir/supervisor.pid" ]]; then
+      printf "same_project_pid_files_left\n"
+    else
+      printf "same_project_pid_files_removed\n"
+    fi
+  '
+)"
+
+[[ "$SAME_PROJECT_UNRELATED_OUTPUT" == *"same_project_shell_rejected_as_ai"* ]]
+[[ "$SAME_PROJECT_UNRELATED_OUTPUT" == *"same_project_shell_rejected_as_supervisor"* ]]
+[[ "$SAME_PROJECT_UNRELATED_OUTPUT" == *"warn:ignoring stale ai.pid that is not owned by project: $SAME_PROJECT_SHELL_PID"* ]]
+[[ "$SAME_PROJECT_UNRELATED_OUTPUT" == *"same_project_shell_alive"* ]]
+[[ "$SAME_PROJECT_UNRELATED_OUTPUT" == *"same_project_pid_files_removed"* ]]
+
+FOREIGN_HINT_PID="$(sleep 30 >/dev/null 2>&1 & echo $!)"
+trap 'kill "$FOREIGN_PID" "$SAME_PROJECT_SHELL_PID" "$FOREIGN_HINT_PID" 2>/dev/null || true; rm -rf "$TMP_DIR" "$STALE_PID_TMP"' EXIT
+
+RUNTIME_AI_HINT_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$STALE_PID_TMP"'/runtime-ai-hint-project"
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir" "$project/.freely"
+    printf "%s\n" "'"$FOREIGN_HINT_PID"'" >"$run_dir/ai.pid"
+
+    cat >"$project/.freely/config.env" <<EOF
+AI_TOOL="codex"
+EOF
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    count_active_intake_items() { printf "0\n"; }
+    if live_status_activity_state_for_project "$project" | grep -qx "ai_active"; then
+      printf "foreign_live_pid_misclassified_as_ai_active\n"
+    else
+      printf "foreign_live_pid_rejected_for_activity_state\n"
+    fi
+    request_local_continuation_reentry "$project" "foreign-pid-check"
+    if kill -0 "'"$FOREIGN_HINT_PID"'" 2>/dev/null; then
+      printf "foreign_hint_pid_alive\n"
+    else
+      printf "foreign_hint_pid_killed\n"
+    fi
+  '
+)"
+
+[[ "$RUNTIME_AI_HINT_OUTPUT" == *"foreign_live_pid_rejected_for_activity_state"* ]]
+[[ "$RUNTIME_AI_HINT_OUTPUT" == *"foreign_hint_pid_alive"* ]]
+
 PROJECT="$TMP_DIR/project"
 mkdir -p \
   "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
