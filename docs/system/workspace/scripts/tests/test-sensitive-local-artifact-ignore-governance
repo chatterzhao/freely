@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+cd "$ROOT_DIR"
+
+assert_ignored() {
+  local path="$1"
+  if ! git check-ignore --no-index -q "$path"; then
+    echo "[FAIL] expected ignored path: $path" >&2
+    exit 1
+  fi
+}
+
+assert_not_ignored() {
+  local path="$1"
+  if git check-ignore --no-index -q "$path"; then
+    echo "[FAIL] expected tracked/visible path: $path" >&2
+    exit 1
+  fi
+}
+
+assert_ignored "auth.json"
+assert_ignored "secrets.json"
+assert_ignored "credentials.json"
+assert_ignored ".npmrc"
+assert_ignored ".pypirc"
+assert_ignored "id_rsa"
+assert_ignored "id_ed25519"
+assert_ignored "local/dev-cert.pem"
+assert_ignored "local/dev-key.key"
+assert_ignored "local/bundle.p12"
+assert_ignored "local/cert.pfx"
+assert_ignored "local/root.crt"
+assert_ignored "local/root.cer"
+assert_ignored "local/root.der"
+assert_ignored "local/root.csr"
+
+assert_not_ignored "docs/system/workspace/scripts/runtime/ai-cli"
+assert_not_ignored "docs/pre-brainstorms/INDEX.md"
+assert_not_ignored "README.md"
+
+echo "[PASS] common local sensitive artifacts are ignored without hiding normal repo paths"
