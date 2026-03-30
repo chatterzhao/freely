@@ -59,7 +59,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/candidates.md`
 - next_action: 完成 IBM，先冻结 `switch/login` success-path 的退出 contract、wake acknowledgement 边界与 re-entrancy cut point，再进入 regression-first 修复；第一阶段禁止把真实 `login` 和 slot 删除纳入回归。
 
-1. `I-20260325-0410`
+2. `I-20260329-2155-A`
+- title: Sensitive local artifact ignore governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P2
+- issue_path: `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/issues/sensitive-local-artifact-ignore-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/candidates.md`
+- next_action: 落保守 `.gitignore` 规则、focused `git check-ignore --no-index` regression，并确认 `develop` 已清除 stray `auth.json`。
+
+3. `I-20260325-0410`
 - title: Story-level pre-tests quality gate governance
 - milestone_state: committed
 - phase_state: `in_verification`
