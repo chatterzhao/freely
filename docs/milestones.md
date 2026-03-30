@@ -49,6 +49,16 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260329-2045-A`
+- title: AI auth-change wake command lifecycle governance
+- milestone_state: committed
+- phase_state: `in_ibm`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/issues/ai-auth-change-wake-command-lifecycle-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/candidates.md`
+- next_action: 完成 IBM，先冻结 `switch/login` success-path 的退出 contract、wake acknowledgement 边界与 re-entrancy cut point，再进入 regression-first 修复；第一阶段禁止把真实 `login` 和 slot 删除纳入回归。
+
 1. `I-20260325-0410`
 - title: Story-level pre-tests quality gate governance
 - milestone_state: committed
