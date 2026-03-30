@@ -7,6 +7,26 @@
 .env.*
 !.env.example
 
+# Local sensitive artifacts that may be miswritten into the repo root.
+# Keep these patterns narrow; add explicit exceptions if a fixture must be tracked.
+/auth.json
+/secrets.json
+/credentials.json
+/.npmrc
+/.pypirc
+/id_rsa
+/id_dsa
+/id_ecdsa
+/id_ed25519
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.csr
+
 # Track .env/ directory for versioned templates
 !.env/
 !.env/**
