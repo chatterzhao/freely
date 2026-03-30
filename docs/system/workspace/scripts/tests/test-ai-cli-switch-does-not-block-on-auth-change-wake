@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/ai-cli-switch-nonblocking-wake.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+HOME_DIR="$TMP_DIR/home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+WAKE_LOG="$TMP_DIR/wake.log"
+WAKE_PID_FILE="$TMP_DIR/wake.pid"
+mkdir -p "$HOME_DIR/.codex" "$HOME_DIR/.ai-auth/codex-target@example-com-1" "$HOME_DIR/.ai-auth/codex-current@example-com-1" "$MOCK_BIN"
+
+cat >"$HOME_DIR/.ai-auth/codex-target@example-com-1/auth.json" <<'JSON'
+{"tokens":{"access_token":"token","id_token":"x.eyJlbWFpbCI6InRhcmdldEBleGFtcGxlLmNvbSJ9.y"}}
+JSON
+cat >"$HOME_DIR/.ai-auth/codex-current@example-com-1/auth.json" <<'JSON'
+{"tokens":{"access_token":"token","id_token":"x.eyJlbWFpbCI6ImN1cnJlbnRAZXhhbXBsZS5jb20ifQ.y"}}
+JSON
+cp "$HOME_DIR/.ai-auth/codex-current@example-com-1/auth.json" "$HOME_DIR/.codex/auth.json"
+printf 'current@example-com-1\n' >"$HOME_DIR/.codex/active-slot"
+
+cat >"$MOCK_BIN/freely-auth-wake" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+trap '' HUP INT TERM
+printf '%s\n' "$$" >"${WAKE_PID_FILE:?}"
+printf '%s\n' "$*" >>"${WAKE_LOG:?}"
+sleep 5
+EOF
+chmod +x "$MOCK_BIN/freely-auth-wake"
+
+start_ts="$(date +%s)"
+HOME="$HOME_DIR" WAKE_LOG="$WAKE_LOG" WAKE_PID_FILE="$WAKE_PID_FILE" FREELY_AUTH_CHANGE_WAKE_BIN="$MOCK_BIN/freely-auth-wake" PATH="$MOCK_BIN:$PATH" \
+  bash "$ROOT_DIR/bin/ai" --yes switch codex target@example-com-1 >/dev/null
+elapsed="$(( $(date +%s) - start_ts ))"
+
+for _ in $(seq 1 20); do
+  [[ -f "$WAKE_LOG" ]] && break
+  sleep 0.1
+done
+
+grep -q '^auth-change-wake --tool codex --slot target@example-com-1 --reason switch_success$' "$WAKE_LOG"
+if (( elapsed >= 5 )); then
+  echo "[FAIL] ai switch remained blocked on auth-change wake for ${elapsed}s" >&2
+  exit 1
+fi
+
+if [[ -f "$WAKE_PID_FILE" ]]; then
+  kill "$(cat "$WAKE_PID_FILE")" 2>/dev/null || true
+fi
+
+echo "[PASS] ai switch codex exits before a slow auth-change wake completes"

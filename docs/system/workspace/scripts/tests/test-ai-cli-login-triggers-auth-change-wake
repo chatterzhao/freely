@@ -33,6 +33,11 @@ chmod +x "$MOCK_BIN/freely-auth-wake"
 HOME="$HOME_DIR" WAKE_LOG="$WAKE_LOG" FREELY_AUTH_CHANGE_WAKE_BIN="$MOCK_BIN/freely-auth-wake" PATH="$MOCK_BIN:$PATH" \
   bash "$ROOT_DIR/bin/ai" --yes login codex >/dev/null
 
+for _ in $(seq 1 20); do
+  [[ -f "$WAKE_LOG" ]] && break
+  sleep 0.1
+done
+
 test -f "$HOME_DIR/.ai-auth/codex-login@example-com-1/auth.json"
 grep -q '^auth-change-wake --tool codex --slot login@example-com-1 --reason login_success$' "$WAKE_LOG"
 
