@@ -1376,7 +1376,7 @@ switch_to_codex_slot() {
   wait_for_codex_slot_switch_idle "$project" || return 1
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" && -n "$slot" ]] || return 1
-  output="$("$ai_bin" --quiet --format json switch codex "$slot" --yes 2>/dev/null || true)"
+  output="$(AI_CLI_SUPPRESS_AUTH_CHANGE_WAKE=1 "$ai_bin" --quiet --format json switch codex "$slot" --yes 2>/dev/null || true)"
   requested_normalized="$(normalize_codex_slot_name "$slot")"
   actual_slot="$(codex_current_slot "$project")"
   actual_slot_normalized="$(normalize_codex_slot_name "$actual_slot")"
