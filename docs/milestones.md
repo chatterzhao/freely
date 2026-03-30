@@ -89,15 +89,15 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md`
 - next_action: 当前 feature lane 已完成 checkpoint `5bc3a86`，并在 verification fixup 中收紧了 `test-freely-project-command-semantics` 的 cleanup/timeout contract；下一跳继续保持 manager-owned `completion_verification`，不回退到 IBM，也不提前拉动 downstream global restart issue。
 
-5. `I-20260327-2006-B`
+5. `I-20260327-2006-A-global-restart`
 - title: Global restart restore memory governance
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md`
-- next_action: 继续保持 downstream `done_ibm`，等待 `I-20260327-2006-A` 完成 merge review / canonical absorption 后，再进入 explicit global restart surface、manifest durability、previously-running project set 与 operator-stopped exclusion 的 dev-loop。
+- next_action: 当前 fresh continuation 已 materialize `restart --all-projects` manifest durability 与 focused regression；下一跳继续做 merge-ready judgement，并保持实现只覆盖 explicit global restart restore memory owner。
 
 6. `I-20260321-1835-A`
 - title: Develop merge issue binding and C/M/I gate governance

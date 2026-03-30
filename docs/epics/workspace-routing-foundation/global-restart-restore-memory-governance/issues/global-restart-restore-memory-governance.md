@@ -1,8 +1,8 @@
 # Issue: global-restart-restore-memory-governance
 
-- issue_id: `I-20260327-2006-B`
+- issue_id: `I-20260327-2006-A-global-restart`
 - title: Global restart restore memory governance
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-restart-restore-memory-governance`
@@ -48,6 +48,6 @@
 
 ## Next
 
-- 2026-03-29 23:25 PDT fresh-session 首跳再次确认：虽然当前 worker lane 的 runtime 状态已经变成 `last_ai_state=down` / `last_exit_reason=ai_exit_rc_1`，但 branch-local route 仍未变化，`I-20260327-2006-A` 继续先等 manager-owned `completion_verification`，本 issue 仍保持 downstream `done_ibm` 而不提前进入实现。
-- 下一跳在 `I-20260327-2006-A` 的 dev-loop 启动后，再进入本 issue 的 dev-loop，实现 global restart manifest durability 与 fleet restore policy。
+- `2026-03-30 17:10 PDT` `I-20260327-2006-A` 已合入 `develop`，本 issue 从 `done_ibm` 升为 `in_dev`，并切到新的 clean continuation worktree 继续实现。
+- 下一跳在当前 continuation 上 materialize global restart manifest durability、last-20 retention 与 fleet restore selection focused regression，不复用旧 stale runtime worktree。
 - 若后续 global reset surface 需要更大 owner，需新开 lifecycle，不能回写为 project force 语义。
