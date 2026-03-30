@@ -73,8 +73,8 @@
     verdict: `supports two-issue sequencing`
 - priority: P0
 - status: promoted
-- decision_reason: 当前 lane 已完成 `doc-ibm-execution` materialization，并把原始 candidate 明确拆成两个紧邻的 milestone-owned issue：`I-20260327-2006-A` 负责 project-scoped `start/stop/restart/start --force/restore-work` command family、repair order、safe repair set 与 interrupted-local-AI default；`I-20260327-2006-B` 负责 downstream 的 explicit global restart restore memory、manifest durability、previously-running project set 与 operator-stopped exclusion。这样既保留了同一来源主键，又避免 IBM 再次把 project `force` 与 global reset 混层，同时让较近程的 project command owner 先进入 dev-loop。
-- next_action: milestone 正式编排已切到 `I-20260327-2006-A` / `I-20260327-2006-B`。下一跳进入 `dev-loop-execution`，先实现 `I-20260327-2006-A` 的 project command semantics 与 dedicated `restore-work` surface；`I-20260327-2006-B` 保持 downstream `done_ibm` owner，等前者的 command taxonomy 进入实现后再展开 global restart manifest durability 与 fleet restore policy。
+- decision_reason: 当前 lane 已完成 `doc-ibm-execution` materialization，并把原始 candidate 明确拆成两个紧邻的 milestone-owned issue：`I-20260327-2006-A` 负责 project-scoped `start/stop/restart/start --force/restore-work` command family、repair order、safe repair set 与 interrupted-local-AI default；`I-20260327-2006-B` 负责 downstream 的 explicit global restart restore memory、manifest durability、previously-running project set 与 operator-stopped exclusion。这样既保留了同一来源主键，又避免 IBM 再次把 project `force` 与 global reset 混层。当前更晚的 branch-local truth 还显示 `I-20260327-2006-A` 已完成 worker implementation slice、feature-lane verification artifact 已落下，并已前移到 manager-owned `completion_verification`。
+- next_action: milestone 正式编排已切到 `I-20260327-2006-A` / `I-20260327-2006-B`。当前 active route 保持 `I-20260327-2006-A` 的 manager-owned `completion_verification`，由 manager 消费现有 feature-lane verification evidence 做 merge review / canonical absorption judgement；即使本轮 fresh-session `live-status` 已变成 `last_ai_state=down`、`last_exit_reason=ai_exit_rc_1`，这也仍是 runtime-owned 恢复信号，而不是回退到 IBM 的依据。`I-20260327-2006-B` 继续保持 downstream `done_ibm` owner，等待前者完成 closeout 后再进入 `dev-loop-execution`。
 - revisit_trigger: 当 IBM materialization 再次试图把 project command blast radius 与 global restore owner 混成同一 issue，或 live incident 暴露 project command 误杀其他项目进程 / 误清 shared state / global restart 丢失此前 running project 集合 / 误恢复 operator 已停止的 project / interrupted AI work 被 silent discard 或 cross-project restore / durable continuity 被 project force 误清 / stale supervisor 被误判为健康 attach / manager continuity 或 worker prompt consumption memory 被 project force 误删时，回到本 candidate 重新校正边界。
 - promoted_issue_path:
   - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
@@ -82,6 +82,10 @@
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex
-  - session_id: current-thread
-  - jsonl_path: unavailable://codex-thread-only
+  - session_id: 019d377f-37b7-7cf2-8b76-d6a4a36a4a7f
+  - jsonl_path: /Users/zhaoyu/.codex/sessions/2026/03/28/rollout-2026-03-28T19-49-37-019d377f-37b7-7cf2-8b76-d6a4a36a4a7f.jsonl
   - role: author
+  - tool: codex
+  - session_id: 019d3d46-4e39-7020-afdc-cd2f6822ae30
+  - jsonl_path: unavailable://live-status-deep-ref-only
+  - role: fresh-session-first-hop-recheck

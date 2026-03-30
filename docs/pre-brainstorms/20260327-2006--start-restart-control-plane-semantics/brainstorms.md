@@ -4,8 +4,10 @@
 
 - 2026-03-28 当前 pre-brainstorm 已完成它的职责：`C-20260327-2006-A` 已 materialize 为 `I-20260327-2006-A` 与 `I-20260327-2006-B` 两个紧邻 issue。
 - 当前 canonical route 不再是 `pre_brainstorm`，而是：
-  - `I-20260327-2006-A` -> `in_dev`
+  - `I-20260327-2006-A` -> `in_verification`
   - `I-20260327-2006-B` -> downstream `done_ibm`
+- 2026-03-29 23:25 PDT fresh session 首跳再次复核后，当前 worker lane 的 runtime 状态虽然已变成 `last_ai_state=down`、`last_exit_reason=ai_exit_rc_1`，但 branch-local route 仍未变化：`I-20260327-2006-A` 继续等待 manager-owned `completion_verification`，`I-20260327-2006-B` 继续保持 downstream `done_ibm`。
+- 2026-03-29 22:47 PDT 再次按 `AGENTS.md -> constitution-guard -> laws-enforcer -> lead-agent -> context-source-skill -> live-status` 复核后，当前 active truth 仍是 `I-20260327-2006-A` 等待 manager-owned `completion_verification`。旧的 delegated IBM relaunch prompts 继续只算 supervision history，不再代表当前 lane route。
 - 下文保留的是 promotion 前的研究证据与边界推导，用于追溯为什么最初不能直接跳过 pre-brainstorm / IBM；它不再代表当前 active route。
 
 ## 背景
