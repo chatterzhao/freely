@@ -9,9 +9,14 @@
 - issue_path: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
 - session_refs:
   - {tool: codex, session_id: "019d3752-80a1-7773-808d-081375e06aa7", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/28/rollout-2026-03-28T19-00-47-019d3752-80a1-7773-808d-081375e06aa7.jsonl", role: "dev-loop-progress-refresh"}
+  - {tool: codex, session_id: "019d377f-37b7-7cf2-8b76-d6a4a36a4a7f", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/28/rollout-2026-03-28T19-49-37-019d377f-37b7-7cf2-8b76-d6a4a36a4a7f.jsonl", role: "completion-verification-continuity-refresh"}
+  - {tool: codex, session_id: "019d3d46-4e39-7020-afdc-cd2f6822ae30", jsonl_path: "unavailable://live-status-deep-ref-only", role: "fresh-session-first-hop-recheck"}
 
 ## Summary
 
+- `2026-03-30 15:47 PDT` 本轮 manager-side merge review 先把 feature-lane verification 做实：`bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics` 重新通过，wall time 从此前实测约 `46.24s` 收敛到 `13.76s`，因为测试里的两个 background pid probe 不再把 `sleep 30` 的 stdout fd 留在 command substitution 上。同时该测试新增 signal-aware cleanup：若在 `ALRM/TERM/INT/HUP` 下被打断，会先对 late-bound `PROJECT` 执行 project-local `freely stop`，再清掉辅助 pid 与 temp dirs，故意用 `perl -e 'alarm ...' 5` 打断时现在返回 `RC=142` 且不再遗留 `ensure-interruption-dispatch --watch` orphan。当前 dirty slice 因此不再是“5-file verification writeback only”，而是“verification/progress writeback + focused regression cleanup hardening”，仍属于同一 issue 的 verification fixup，而不是 reopen IBM 或重开下游 `I-20260327-2006-B` 的理由。
+- `2026-03-29 23:25 PDT` 当前轮 fresh session 再次按 `AGENTS.md -> constitution-guard -> laws-enforcer -> lead-agent -> context-source-skill -> live-status` 复核。`live-status` 现在显示本 worker lane `last_ai_state=down`、`last_exit_reason=ai_exit_rc_1`、`last_launch_kind=resume`，同时 `pending_delegated_continuation_ids=none` 仍保持为空，`last_consumed_delegated_continuation_ids` 继续覆盖到 `20260328-062746`。因此这次变化仍然是 runtime-owned recovery/supervision evidence，而不是 route 变化；更强的 branch-local truth 仍是 `milestones -> issue -> progress -> verification artifact -> worker continuity`，所以本 lane 继续停在 manager-owned `completion_verification`。当前 worktree 的 5-file dirty slice 只是在补齐这层 verification/continuity writeback，不代表要回退到 IBM 或重开 dev-loop。
+- `2026-03-29 22:47 PDT` 当前轮再次按 `AGENTS.md -> constitution-guard -> laws-enforcer -> lead-agent -> context-source-skill -> live-status` 复核。`live-status` 继续显示当前工位 `role_hint=worker`、`activity_state=ai_active`、`current_prompt_has_delegated_continuation=1`、`pending_delegated_continuation_ids=none`，且 `last_consumed_delegated_continuation_ids` 已覆盖到 `20260328-062746`；因此当前 prompt 中残留的 IBM delegated continuation 继续只算 supervision history。更强的 branch-local truth 仍是 `milestones -> issue -> progress -> verification artifact -> worker continuity`，所以本 lane 继续停在 manager-owned `completion_verification`，不回退到 IBM，也不重新宣称 worker `in_dev`。
 - 2026-03-28 这条 lane 已从 `done_ibm` 正式切到 `in_dev`，因为 runtime 真源已经开始 materialize project command family。
 - `2026-03-28 19:20 PDT` 当前 worktree 已 clean，checkpoint `5bc3a86` 已落下，且 feature-lane verification artifact `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md` 已补齐。因此当前 branch-local truth 不再停留在 `checkpoint / verification-prep`，而是前移到 manager-owned `completion_verification` 收口；旧的 IBM handoff 继续只算 supervision history。
 - `2026-03-28 19:16 PDT` 在决定是否切 checkpoint 前，再次补跑 `bash -n docs/system/workspace/scripts/runtime/freely`、`bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`、`bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready` 与 `./bin/governance-check`。结果继续通过，`governance-check` 仍只有仓库既有的 legacy pre-brainstorm naming warnings，因此当前 5-file dirty slice 继续可视为同一 issue 的 checkpoint-ready implementation set，而不是需要回退到 IBM 的未定边界。
@@ -60,15 +65,17 @@
 - 保持 `restart` / `start --force` / `restore-work` 的 project-local taxonomy 不回退，不把 global restart manifest owner 提前拉进当前 issue
 - 保持 explicit `restore-work` 只消费 mandatory anchors，不把 transient pid/run-state 升格成 required truth
 - 维持 attach/reuse、safe repair set、project-identity anchored pid handling 与 wait ordering 的已通过 focused regressions 作为当前 implementation floor
+- 补齐 feature-lane verification harness 自身的 cleanup contract，避免短超时/中断把 `ensure-interruption-dispatch --watch` 留成 orphan，避免 manager verification 再次被假 hang 误导
 - 当前 issue 的 worker implementation 已 checkpoint 并补齐 verification artifact；下一步重点改为 manager-owned `completion_verification` closeout，而不是继续扩写 runtime slice
 - 为后续 `I-20260327-2006-B` 保留清晰的 downstream 依赖，不在当前 issue 提前混入 global restart manifest owner
-- 当前 worktree 已 clean，checkpoint commit `5bc3a86` 已把 runtime/test/doc slice 固化；后续不应再把本 lane 伪装成继续开发中的 dirty worker
+- 当前 branch-local merge base 仍是 checkpoint commit `5bc3a86`，但 worktree 已进入 verification fixup 脏态；后续应把它当作同一 issue 的 closeout 清理，而不是伪装成“仍然 clean at checkpoint”
 - `restart_storm_signal_reason=restart_storm_count_threshold` 已被当前 first-hop 记入 continuity/progress，但它仍属于 runtime-owned 监督面；在 branch-local issue truth 已前移到 `completion_verification` 后，仍不把它升格成新的 doc-loop 或 cleanup route
 
 ## Verification
 
 - `bash -n docs/system/workspace/scripts/runtime/freely`
 - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+- interruption cleanup probe: `perl -e 'alarm shift @ARGV; exec @ARGV' 5 bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics` -> expected `RC=142` with no `/tmp/freely-project-command-semantics*` watcher residue
 - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
 - `./bin/governance-check`
 - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260327-200651-feature-start-restart-control-plane-semantics`
@@ -84,6 +91,7 @@
 
 ## Next Action
 
+- 当前 fresh session 继续停在 manager-owned `completion_verification`，但 merge review 已经指出 test-harness cleanup 需要同 issue fixup；本 worktree 当前脏改动因此属于 verification/writeback + focused regression cleanup hardening，而不是新的 runtime feature batch
 - 当前 route 已从 worker `dev-loop-execution` 收敛到 manager-owned `completion_verification`；本 worktree 默认不再继续实现，除非 merge review 明确指出需要 feature-lane fixup
 - checkpoint `5bc3a86` 与 feature-lane verification artifact 已经构成当前批次的 worker closeout 证据；下一步由 manager 判断 merge review / canonical absorption
 - 若后续实现再次暴露 project-vs-global owner 混层，再回 `doc-pre-brainstorm` / `doc-ibm`；在此之前保持当前 issue 作为唯一 project command owner

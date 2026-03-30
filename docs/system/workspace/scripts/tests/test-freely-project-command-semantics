@@ -3,7 +3,55 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-project-command-semantics.XXXXXX)"
-trap 'rm -rf "$TMP_DIR"' EXIT
+PROJECT=""
+START_ATTACH_TMP=""
+STALE_PID_TMP=""
+FOREIGN_PID=""
+SAME_PROJECT_SHELL_PID=""
+FOREIGN_HINT_PID=""
+
+cleanup_with_code() {
+  local exit_code="${1:-$?}"
+  trap - EXIT INT TERM HUP ALRM
+  if [[ -n "${PROJECT:-}" && -d "${PROJECT:-}" ]]; then
+    bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+  fi
+  if [[ -n "${FOREIGN_PID:-}" ]]; then
+    kill "$FOREIGN_PID" 2>/dev/null || true
+  fi
+  if [[ -n "${SAME_PROJECT_SHELL_PID:-}" ]]; then
+    kill "$SAME_PROJECT_SHELL_PID" 2>/dev/null || true
+  fi
+  if [[ -n "${FOREIGN_HINT_PID:-}" ]]; then
+    kill "$FOREIGN_HINT_PID" 2>/dev/null || true
+  fi
+  rm -rf "$TMP_DIR"
+  if [[ -n "${START_ATTACH_TMP:-}" ]]; then
+    rm -rf "$START_ATTACH_TMP"
+  fi
+  if [[ -n "${STALE_PID_TMP:-}" ]]; then
+    rm -rf "$STALE_PID_TMP"
+  fi
+  exit "$exit_code"
+}
+
+cleanup() {
+  cleanup_with_code "$?"
+}
+
+signal_cleanup() {
+  local signal_name="${1:-TERM}"
+  case "$signal_name" in
+    ALRM) cleanup_with_code 142 ;;
+    *) cleanup_with_code 130 ;;
+  esac
+}
+
+trap cleanup EXIT
+trap 'signal_cleanup INT' INT
+trap 'signal_cleanup TERM' TERM
+trap 'signal_cleanup HUP' HUP
+trap 'signal_cleanup ALRM' ALRM
 
 RESTART_OUTPUT="$(
   bash -lc '
@@ -36,7 +84,6 @@ START_FORCE_OUTPUT="$(
 [[ "$START_FORCE_OUTPUT" == *"start:/tmp/freely-project"* ]]
 
 START_ATTACH_TMP="$(mktemp -d /tmp/freely-project-command-attach.XXXXXX)"
-trap 'rm -rf "$TMP_DIR" "$START_ATTACH_TMP"' EXIT
 
 START_ATTACH_OUTPUT="$(
   bash -lc '
@@ -269,9 +316,7 @@ START_ATTACH_WITH_MISSING_WATCHDOG_OUTPUT="$(
 [[ "$START_ATTACH_WITH_MISSING_WATCHDOG_OUTPUT" == *"manager_attach_repair_supervisor_pid_removed"* ]]
 
 STALE_PID_TMP="$(mktemp -d /tmp/freely-project-command-stale-pid.XXXXXX)"
-trap 'rm -rf "$TMP_DIR" "$START_ATTACH_TMP" "$STALE_PID_TMP"' EXIT
 FOREIGN_PID="$(sleep 30 >/dev/null 2>&1 & echo $!)"
-trap 'kill "$FOREIGN_PID" 2>/dev/null || true; rm -rf "$TMP_DIR" "$START_ATTACH_TMP" "$STALE_PID_TMP"' EXIT
 
 STALE_PID_OUTPUT="$(
   bash -lc '
@@ -454,8 +499,10 @@ STOP_REPAIR_WAITS_OUTPUT="$(
 [[ "$STOP_REPAIR_WAITS_OUTPUT" == *"supervisor_wait_polls:1"* ]]
 [[ "$STOP_REPAIR_WAITS_OUTPUT" == *"state:stopped|down|down|operator_restart"* ]]
 
-SAME_PROJECT_SHELL_PID="$(bash -lc 'cd "'"$STALE_PID_TMP"'"; sleep 30 >/dev/null 2>&1' & echo $!)"
-trap 'kill "$FOREIGN_PID" "$SAME_PROJECT_SHELL_PID" 2>/dev/null || true; rm -rf "$TMP_DIR" "$STALE_PID_TMP"' EXIT
+SAME_PROJECT_SHELL_PID="$(
+  bash -lc 'cd "'"$STALE_PID_TMP"'"; exec >/dev/null 2>&1; sleep 300' </dev/null >/dev/null 2>&1 &
+  echo $!
+)"
 
 SAME_PROJECT_UNRELATED_OUTPUT="$(
   bash -lc '
@@ -519,8 +566,10 @@ EOF
 [[ "$SAME_PROJECT_UNRELATED_OUTPUT" == *"same_project_shell_alive"* ]]
 [[ "$SAME_PROJECT_UNRELATED_OUTPUT" == *"same_project_pid_files_removed"* ]]
 
-FOREIGN_HINT_PID="$(sleep 30 >/dev/null 2>&1 & echo $!)"
-trap 'kill "$FOREIGN_PID" "$SAME_PROJECT_SHELL_PID" "$FOREIGN_HINT_PID" 2>/dev/null || true; rm -rf "$TMP_DIR" "$STALE_PID_TMP"' EXIT
+FOREIGN_HINT_PID="$(
+  bash -lc 'exec >/dev/null 2>&1; sleep 300' </dev/null >/dev/null 2>&1 &
+  echo $!
+)"
 
 RUNTIME_AI_HINT_OUTPUT="$(
   bash -lc '
