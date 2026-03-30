@@ -39,7 +39,7 @@ Usage:
   freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
   freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
   freely start [--project <abs_path>] [--force]
-  freely restart [--project <abs_path>]
+  freely restart [--project <abs_path>] [--all-projects]
   freely restore-work [--project <abs_path>]
   freely baseline-status [--project <abs_path>]
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
@@ -189,6 +189,34 @@ global_config_file() {
 
 projects_registry_file() {
   echo "$(global_state_dir)/projects.tsv"
+}
+
+global_control_plane_dir() {
+  echo "$(global_state_dir)/control-plane"
+}
+
+global_restart_manifest_dir() {
+  echo "$(global_control_plane_dir)/restart"
+}
+
+global_restart_manifest_latest_file() {
+  echo "$(global_restart_manifest_dir)/latest.json"
+}
+
+global_restart_manifest_history_dir() {
+  echo "$(global_restart_manifest_dir)/history"
+}
+
+global_restart_manifest_history_file() {
+  local timestamp="$1" history_dir candidate suffix=0
+  history_dir="$(global_restart_manifest_history_dir)"
+  mkdir -p "$history_dir"
+  candidate="$history_dir/${timestamp}.json"
+  while [[ -e "$candidate" ]]; do
+    suffix=$((suffix + 1))
+    candidate="$history_dir/${timestamp}-${suffix}.json"
+  done
+  echo "$candidate"
 }
 
 run_dir_for_project() {
@@ -2160,6 +2188,14 @@ all_manager_worker_prompt_paths_from_continuity() {
 fleet_worktree_paths_for_project() {
   local project="$1"
   git -C "$project" worktree list --porcelain 2>/dev/null | awk '/^worktree / {print substr($0, 10)}'
+}
+
+global_restart_project_paths() {
+  local project="$1"
+  {
+    fleet_worktree_paths_for_project "$project"
+    registered_projects
+  } | awk 'NF > 0 && !seen[$0]++ { print $0 }'
 }
 
 normalize_runtime_worktree_path() {
@@ -4902,6 +4938,352 @@ latest_worker_continuity_file_for_project() {
   latest_run_artifact_for_project "$project" 'worker-continuity-*.md'
 }
 
+count_restore_operator_anchors_for_project() {
+  local project="$1" launch_state manager_continuity worker_continuity resolution_file prompt_file intake_count count=0
+  launch_state="$(manager_worker_launch_state_file "$project")"
+  manager_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
+  worker_continuity="$(latest_worker_continuity_file_for_project "$project")"
+  resolution_file="$(latest_interruption_resolution_file_for_project "$project")"
+  prompt_file="$(find_latest_prompt_file_for_project "$project")"
+  intake_count="$(count_active_intake_items "$project")"
+
+  [[ -f "$launch_state" ]] && count=$((count + 1))
+  [[ -n "$manager_continuity" && -f "$manager_continuity" ]] && count=$((count + 1))
+  [[ -n "$worker_continuity" && -f "$worker_continuity" ]] && count=$((count + 1))
+  [[ -n "$resolution_file" && -f "$resolution_file" ]] && count=$((count + 1))
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] && count=$((count + 1))
+  if [[ "${intake_count:-0}" =~ ^[0-9]+$ ]] && (( intake_count > 0 )); then
+    count=$((count + 1))
+  fi
+  printf '%s\n' "$count"
+}
+
+global_restart_history_retention() {
+  printf '20\n'
+}
+
+retain_latest_global_restart_history() {
+  local history_dir="$1" keep_count="${2:-20}" path total_count=0
+  [[ -d "$history_dir" ]] || return 0
+  while IFS= read -r path; do
+    [[ -n "$path" ]] || continue
+    total_count=$((total_count + 1))
+    if (( total_count > keep_count )); then
+      rm -f "$path"
+    fi
+  done < <(find "$history_dir" -maxdepth 1 -type f -name '*.json' | sort -r)
+}
+
+global_restart_manifest_timestamp() {
+  date -u '+%Y%m%dT%H%M%SZ'
+}
+
+collect_global_restart_snapshot_rows() {
+  local repo_root="$1" wt_path declared_project_root branch workcell_state launch_state manager_continuity worker_continuity
+  local resolution_file prompt_file intake_count desired_state last_exit_reason operator_anchor_count
+  local restore_candidate restore_ready restore_blocker
+  while IFS= read -r wt_path; do
+    [[ -n "$wt_path" ]] || continue
+    [[ -f "$(config_file "$wt_path")" ]] || continue
+    declared_project_root="$wt_path"
+    unset PROJECT_ROOT
+    # shellcheck disable=SC1090
+    source "$(config_file "$wt_path")"
+    declared_project_root="${PROJECT_ROOT:-$wt_path}"
+    branch="$(git -C "$wt_path" branch --show-current 2>/dev/null || true)"
+    workcell_state="$(workcell_state_file "$wt_path")"
+    launch_state="$(manager_worker_launch_state_file "$wt_path")"
+    manager_continuity="$(latest_generated_manager_continuity_file_for_project "$wt_path")"
+    worker_continuity="$(latest_worker_continuity_file_for_project "$wt_path")"
+    resolution_file="$(latest_interruption_resolution_file_for_project "$wt_path")"
+    prompt_file="$(find_latest_prompt_file_for_project "$wt_path")"
+    intake_count="$(count_active_intake_items "$wt_path")"
+    desired_state="unknown"
+    last_exit_reason="unavailable"
+    if [[ -f "$workcell_state" ]]; then
+      unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
+      # shellcheck disable=SC1090
+      source "$workcell_state"
+      desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+      last_exit_reason="${LAST_EXIT_REASON:-unavailable}"
+    fi
+    operator_anchor_count="$(count_restore_operator_anchors_for_project "$wt_path")"
+    restore_candidate="0"
+    restore_ready="0"
+    restore_blocker=""
+    if [[ -f "$workcell_state" && "$desired_state" == "running" ]]; then
+      restore_candidate="1"
+      if (( operator_anchor_count > 0 )); then
+        restore_ready="1"
+      else
+        restore_blocker="missing_operator_anchor"
+      fi
+    elif [[ ! -f "$workcell_state" ]]; then
+      restore_blocker="missing_workcell_state"
+    elif [[ "$desired_state" != "running" ]]; then
+      restore_blocker="operator_stopped_or_not_desired_running"
+    fi
+
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "$declared_project_root" \
+      "$branch" \
+      "$desired_state" \
+      "$last_exit_reason" \
+      "$workcell_state" \
+      "$launch_state" \
+      "$manager_continuity" \
+      "$worker_continuity" \
+      "$resolution_file" \
+      "$prompt_file" \
+      "$intake_count" \
+      "$restore_candidate" \
+      "$restore_ready" \
+      "$restore_blocker"
+  done < <(global_restart_project_paths "$repo_root")
+}
+
+write_global_restart_manifest() {
+  local repo_root="$1" manifest_timestamp="$2" history_file="$3" latest_file="$4" rows_file="$5"
+  local history_dir latest_dir retention_count
+  history_dir="$(dirname "$history_file")"
+  latest_dir="$(dirname "$latest_file")"
+  mkdir -p "$history_dir" "$latest_dir"
+  retention_count="$(global_restart_history_retention)"
+  python3 - "$repo_root" "$manifest_timestamp" "$history_file" "$latest_file" "$retention_count" "$rows_file" <<'PY'
+import json
+import os
+import sys
+
+repo_root, manifest_timestamp, history_file, latest_file, retention_count, rows_file = sys.argv[1:]
+projects = []
+previously_running = []
+operator_stopped_projects = []
+blocked_restore = []
+
+with open(rows_file, "r", encoding="utf-8") as rows:
+    for raw in rows:
+        raw = raw.rstrip("\n")
+        if not raw:
+            continue
+        fields = raw.split("\t")
+        while len(fields) < 14:
+            fields.append("")
+        (
+            project_root,
+            branch,
+            desired_state,
+            last_exit_reason,
+            workcell_state,
+            launch_state,
+            manager_continuity,
+            worker_continuity,
+            resolution_file,
+            prompt_file,
+            intake_count,
+            restore_candidate,
+            restore_ready,
+            restore_blocker,
+        ) = fields[:14]
+
+        intake_dir = os.path.join(project_root, ".freely", "intake")
+        continuity_artifacts = [path for path in (manager_continuity, worker_continuity) if path]
+        has_intake_dir = os.path.isdir(intake_dir) and bool(os.listdir(intake_dir))
+        mandatory_restore_anchors = [
+            path
+            for path in (
+                workcell_state,
+                launch_state,
+                *continuity_artifacts,
+                resolution_file,
+                prompt_file,
+                intake_dir if has_intake_dir else "",
+            )
+            if path
+        ]
+        auxiliary_evidence = [
+            path
+            for path in (
+                os.path.join(project_root, ".freely", "run", "session-state.env"),
+                os.path.join(project_root, ".freely", "run", "session-handoff.txt"),
+                os.path.join(project_root, ".freely", "run", "ai.pid"),
+                os.path.join(project_root, ".freely", "run", "supervisor.pid"),
+                os.path.join(project_root, ".freely", "run", "stop.requested"),
+                os.path.join(project_root, ".freely", "run", "restart-storm-window.tsv"),
+                os.path.join(project_root, ".freely", "run", "codex-slot-cooldowns.tsv"),
+            )
+            if os.path.exists(path)
+        ]
+        restore_candidate_bool = restore_candidate == "1"
+        restore_selected = restore_ready == "1"
+        operator_stopped = last_exit_reason == "operator_stop" or desired_state != "running"
+        continuity_anchor = next(
+            (
+                path
+                for path in (
+                    manager_continuity,
+                    worker_continuity,
+                    resolution_file,
+                    prompt_file,
+                    launch_state,
+                    workcell_state,
+                )
+                if path
+            ),
+            "",
+        )
+
+        entry = {
+            "project_root": project_root,
+            "project_path": project_root,
+            "branch": branch,
+            "desired_runtime_state": desired_state,
+            "last_exit_reason": last_exit_reason,
+            "restore_candidate": restore_candidate_bool,
+            "restore_ready": restore_selected,
+            "restore_selected": restore_selected,
+            "restore_blocker": restore_blocker or None,
+            "operator_stopped": operator_stopped,
+            "continuity_anchor": continuity_anchor,
+            "mandatory_restore_anchors": mandatory_restore_anchors,
+            "auxiliary_evidence": auxiliary_evidence,
+            "mandatory_restore_anchor_details": {
+                "workcell_state": workcell_state or None,
+                "launch_state": launch_state or None,
+                "continuity_artifacts": continuity_artifacts,
+                "interruption_resolution": resolution_file or None,
+                "delegated_prompt_evidence": prompt_file or None,
+                "active_intake_dir": intake_dir if has_intake_dir else None,
+            },
+        }
+        projects.append(entry)
+        if restore_candidate_bool:
+            if restore_selected:
+                previously_running.append(project_root)
+            else:
+                blocked_restore.append({"project_root": project_root, "reason": entry["restore_blocker"]})
+        if operator_stopped:
+            operator_stopped_projects.append(project_root)
+
+payload = {
+    "manifest_version": "global-restart-v1",
+    "action": "global_restart",
+    "operator_scope": "all-projects",
+    "repo_root": repo_root,
+    "generated_at": manifest_timestamp,
+    "durable_home": {
+        "latest": latest_file,
+        "history": history_file,
+        "retention": f"keep_last_{retention_count}",
+    },
+    "restore_policy": {
+        "surface": "explicit_global_restart",
+        "previously_running_projects": previously_running,
+        "operator_stopped_exclusion": operator_stopped_projects,
+        "blocked_restore_candidates": blocked_restore,
+    },
+    "projects": projects,
+}
+
+encoded = json.dumps(payload, indent=2, sort_keys=True)
+with open(history_file, "w", encoding="utf-8") as f:
+    f.write(encoded)
+    f.write("\n")
+with open(latest_file, "w", encoding="utf-8") as f:
+    f.write(encoded)
+    f.write("\n")
+PY
+}
+
+prune_global_restart_manifest_history() {
+  local history_dir
+  history_dir="$(global_restart_manifest_history_dir)"
+  [[ -d "$history_dir" ]] || return 0
+  retain_latest_global_restart_history "$history_dir" "$(global_restart_history_retention)"
+}
+
+cmd_global_restart() {
+  local project="" repo_root manifest_dir history_file latest_file manifest_timestamp rows_file
+  local selection_output selected_csv="" blocked_csv=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  repo_root="$(git_root_for_path "$project")"
+  [[ -n "$repo_root" ]] || {
+    log_error "global restart requires a git-backed project root"
+    exit 1
+  }
+
+  manifest_dir="$(global_restart_manifest_dir)"
+  mkdir -p "$manifest_dir"
+  rows_file="$(mktemp "$manifest_dir/rows.XXXXXX")"
+  collect_global_restart_snapshot_rows "$repo_root" >"$rows_file"
+  latest_file="$(global_restart_manifest_latest_file)"
+  manifest_timestamp="$(global_restart_manifest_timestamp)"
+  history_file="$(global_restart_manifest_history_file "$manifest_timestamp")"
+  write_global_restart_manifest "$repo_root" "$manifest_timestamp" "$history_file" "$latest_file" "$rows_file"
+  retain_latest_global_restart_history "$(global_restart_manifest_history_dir)" "$(global_restart_history_retention)"
+
+  selection_output="$(python3 - "$rows_file" <<'PY'
+import sys
+
+rows_file = sys.argv[1]
+selected = []
+blocked = []
+with open(rows_file, encoding="utf-8") as handle:
+    for raw in handle:
+        raw = raw.rstrip("\n")
+        if not raw:
+            continue
+        fields = raw.split("\t")
+        while len(fields) < 14:
+            fields.append("")
+        project_path = fields[0]
+        restore_candidate = fields[11]
+        restore_ready = fields[12]
+        if restore_candidate == "1" and restore_ready == "1":
+            selected.append(project_path)
+        elif restore_candidate == "1":
+            blocked.append(project_path)
+print(",".join(selected))
+print(",".join(blocked))
+PY
+)"
+  selected_csv="$(printf '%s\n' "$selection_output" | sed -n '1p')"
+  blocked_csv="$(printf '%s\n' "$selection_output" | sed -n '2p')"
+  rm -f "$rows_file"
+
+  if [[ -n "$blocked_csv" ]]; then
+    log_error "global restart blocked: one or more previously-running projects are missing mandatory restore anchors"
+    printf 'global_restart_manifest: %s\n' "$history_file"
+    printf 'blocked_restore_projects: %s\n' "$blocked_csv"
+    exit 1
+  fi
+
+  if [[ -z "$selected_csv" ]]; then
+    log_info "global restart manifest recorded with no previously-running projects to restore"
+    printf 'global_restart_manifest: %s\n' "$history_file"
+    printf 'restored_projects: none\n'
+    return 0
+  fi
+
+  IFS=',' read -r -a __restart_projects <<<"$selected_csv"
+  for project_path in "${__restart_projects[@]}"; do
+    [[ -n "$project_path" ]] || continue
+    stop_project_runtime "$project_path" "global_restart"
+  done
+  for project_path in "${__restart_projects[@]}"; do
+    [[ -n "$project_path" ]] || continue
+    start_project_runtime "$project_path"
+  done
+
+  printf 'global_restart_manifest: %s\n' "$history_file"
+  printf 'restored_projects: %s\n' "$selected_csv"
+}
+
 latest_interruption_resolution_file_for_project() {
   local project="$1" resolution_dir
   resolution_dir="$(interruption_resolution_dir_for_project "$project")"
@@ -5430,14 +5812,19 @@ cmd_start() {
 }
 
 cmd_restart() {
-  local project=""
+  local project="" all_projects="0"
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --all-projects) all_projects="1"; shift ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  if [[ "$all_projects" == "1" ]]; then
+    cmd_global_restart --project "$project"
+    return 0
+  fi
   log_info "restarting current project runtime/control-plane without implicit work restore"
   stop_project_runtime "$project" "operator_restart"
   start_project_runtime "$project"
