@@ -109,6 +109,22 @@ def path_exists(rel_path: Optional[str]) -> bool:
     return bool(rel_path) and os.path.isfile(os.path.join(ROOT_DIR, rel_path))
 
 
+def normalized_phase(value: Optional[str]) -> str:
+    return (value or "").strip("`").strip()
+
+
+def is_governance_only_path(rel_path: str) -> bool:
+    if rel_path in {
+        "AGENTS.md",
+        "docs/CONSTITUTION.md",
+        "docs/LAWS.md",
+        "docs/PROJECT_INTENT.md",
+        "docs/milestones.md",
+    }:
+        return True
+    return rel_path.startswith(("docs/pre-brainstorms/", "docs/epics/", "docs/progress/"))
+
+
 def changed_paths_from_args(args: argparse.Namespace) -> List[str]:
     if args.staged:
         output = git("diff", "--cached", "--name-only", "--diff-filter=ACMR")
@@ -398,6 +414,8 @@ def main() -> int:
     issue_bound_evidence: Set[str] = set()
     issue_bound_issue_paths: Set[str] = set()
     issue_bound_candidate_paths: Set[str] = set()
+    progress_owner_issue_paths: Set[str] = set()
+    review_owner_issue_paths: Set[str] = set()
 
     for issue_path in sorted(issue_paths):
         issue = issues_index.get(issue_path)
@@ -427,6 +445,7 @@ def main() -> int:
 
         issue_bound_evidence.add(owner_issue.issue_id or owner_issue.path)
         issue_bound_issue_paths.add(owner_issue.path)
+        progress_owner_issue_paths.add(owner_issue.path)
         source_candidate_path = anchorless_source_candidate(owner_issue.source_candidate)
         if source_candidate_path:
             issue_bound_candidate_paths.add(source_candidate_path)
@@ -451,6 +470,7 @@ def main() -> int:
 
         issue_bound_evidence.add(owner_issue.issue_id or owner_issue.path)
         issue_bound_issue_paths.add(owner_issue.path)
+        review_owner_issue_paths.add(owner_issue.path)
         source_candidate_path = anchorless_source_candidate(owner_issue.source_candidate)
         if source_candidate_path:
             issue_bound_candidate_paths.add(source_candidate_path)
@@ -652,6 +672,35 @@ def main() -> int:
                         f"{issue.issue_id} in {issue.path} is already in phase '{issue.phase_state}', but its source candidate {referenced_candidate.candidate_id} still says '{candidate_status}'. "
                         f"Update the candidate to the promoted/materialized state instead of leaving upstream status stale."
                     )
+
+    capability_changed_paths = [path for path in changed_paths if not is_governance_only_path(path)]
+    if capability_changed_paths:
+        capability_owner_phases = {"in_dev", "blocked_dev", "in_verification"}
+        for owner_issue_path in sorted(issue_bound_issue_paths):
+            owner_issue = issues_index.get(owner_issue_path)
+            if not owner_issue:
+                continue
+            phase = normalized_phase(owner_issue.phase_state)
+            if phase not in capability_owner_phases:
+                errors.append(
+                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} has phase_state '{owner_issue.phase_state}', which cannot own capability/implementation changes in a develop-bound merge. "
+                    f"First advance the lifecycle to an execution phase like in_dev / blocked_dev / in_verification, or keep this merge governance-only."
+                )
+
+        for issue in touched_issue_records:
+            phase = normalized_phase(issue.phase_state)
+            has_progress = issue.path in progress_owner_issue_paths
+            has_review = issue.path in review_owner_issue_paths
+            if phase in {"in_dev", "blocked_dev"} and not has_progress:
+                errors.append(
+                    f"{issue.issue_id} in {issue.path} touches capability/implementation changes while still in phase '{phase}', but the same develop-bound diff carries no same-line progress artifact. "
+                    f"Runtime or product-surface changes must bring the concrete progress owner into the same diff, not just the bare issue document."
+                )
+            if phase == "in_verification" and not (has_progress or has_review):
+                errors.append(
+                    f"{issue.issue_id} in {issue.path} touches capability/implementation changes while in_verification, but the same develop-bound diff carries neither same-line progress nor review evidence. "
+                    f"Verification-phase merges must include the concrete verification/progress artifact that justifies the closeout state."
+                )
 
     if milestones_changed:
         for entry in milestones:
