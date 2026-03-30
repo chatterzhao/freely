@@ -2,6 +2,7 @@
 - 20260329-2155--sensitive-local-artifact-ignore-governance
 - 20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle
 - 20260328-0745--live-status-current-runtime-state-reconciliation
+- 20260327-2006--start-restart-control-plane-semantics
 - 20260327-1845--manager-consumed-continuity-resume-routing-drift
 - 20260327-1003--prebrainstorm-materialization-audit
 - 20260327-0651--pretests-gate-and-network-proxy-config
@@ -76,6 +77,9 @@
 - 20260328-0745--live-status-current-runtime-state-reconciliation
   - brainstorms: docs/pre-brainstorms/20260328-0745--live-status-current-runtime-state-reconciliation/brainstorms.md
   - candidates: docs/pre-brainstorms/20260328-0745--live-status-current-runtime-state-reconciliation/candidates.md
+- 20260327-2006--start-restart-control-plane-semantics
+  - brainstorms: docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md
 - 20260327-1845--manager-consumed-continuity-resume-routing-drift
   - brainstorms: docs/pre-brainstorms/20260327-1845--manager-consumed-continuity-resume-routing-drift/brainstorms.md
   - candidates: docs/pre-brainstorms/20260327-1845--manager-consumed-continuity-resume-routing-drift/candidates.md

@@ -79,7 +79,27 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
 - next_action: 保持在当前 milestone 的 committed queue，直到 verification evidence 明确写回并把 `C-20260325-0333-B` 的完成态同步到正式 closeout；umbrella candidate `C-20260325-0333-A` 继续单独留在 candidate queue
 
-2. `I-20260321-1835-A`
+4. `I-20260327-2006-A`
+- title: Project command semantics and explicit restore-work governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md`
+- next_action: 当前 feature lane 已完成 checkpoint `5bc3a86`，并在 verification fixup 中收紧了 `test-freely-project-command-semantics` 的 cleanup/timeout contract；下一跳继续保持 manager-owned `completion_verification`，不回退到 IBM，也不提前拉动 downstream global restart issue。
+
+5. `I-20260327-2006-B`
+- title: Global restart restore memory governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md`
+- next_action: 继续保持 downstream `done_ibm`，等待 `I-20260327-2006-A` 完成 merge review / canonical absorption 后，再进入 explicit global restart surface、manifest durability、previously-running project set 与 operator-stopped exclusion 的 dev-loop。
+
+6. `I-20260321-1835-A`
 - title: Develop merge issue binding and C/M/I gate governance
 - milestone_state: committed
 - phase_state: `in_dev`
