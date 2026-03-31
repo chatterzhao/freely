@@ -665,7 +665,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`
 - completion_note: 当前 candidate 生命周期已通过 pre-brainstorm 收口为 same-family supporting evidence；不新开平行 issue，直接把 “cooldown 退出主恢复 contract、failure-driven full slot sweep 成为 canonical” 的边界改写回 `I-20260318-1630`
 
-10. `C-20260322-1801-B`
+10. `C-20260328-1856-A`
+- title: Runtime auth repro and ownership classification follow-on
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260328-1856--runtime-auth-repro/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260328-1856--runtime-auth-repro/candidates.md`
+- completion_note: 当前 candidate 生命周期已通过 pre-brainstorm 收口为 broader continuity/rotation same-family supporting evidence；`resume_streak_limit`、`fresh_with_handoff`、`context compacted`、transport failure 与 state-reconciliation drift 共同说明这不是新的 auth/bootstrap owner，也不应回灌到 global restart owner。旧 `feature/runtime-auth-repro-20260328-185604` 只保留 retirement-only provenance。
+
+11. `C-20260322-1801-B`
 - title: pre-test-merge lifecycle management capability for Freely
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -676,7 +686,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，但 scope 已收窄为 `stale test-pre-merge batch governance`；历史候选名仍保留 `pre-test-merge`，语义上一律指向 `test-pre-merge-*` 前缀族。先冻结三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`；同时补齐 `replay source manifest / replay order / retire evidence`，把 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链桥接成固定的 `acceptance_contract_state/source/blocker` 字段，并把 testing closeout 的集成测试 / application-native real-environment testing evidence bar 写死，在这些真源稳定前不进入实现
 - revisit_trigger: 当 stale state 的 canonical 落点、manager lifecycle transaction 字段、runtime gate 消费路径、replay/retire manifest、`acceptance_contract_state/source/blocker` 桥，以及 testing closeout evidence bar 都能冻结成独立 issue contract 时，重新进入 materialization 判断
 
-11. `C-20260322-1801-C`
+12. `C-20260322-1801-C`
 - title: worker self-loop exit and scheduler closeout governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`

@@ -1,4 +1,5 @@
 # 预研头脑风暴索引
+- 20260328-1856--runtime-auth-repro
 - 20260329-2155--sensitive-local-artifact-ignore-governance
 - 20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle
 - 20260328-2105--resume-evidence-strength-and-false-positive-resume-governance
@@ -69,6 +70,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260328-1856--runtime-auth-repro
+  - brainstorms: docs/pre-brainstorms/20260328-1856--runtime-auth-repro/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260328-1856--runtime-auth-repro/candidates.md
 - 20260329-2155--sensitive-local-artifact-ignore-governance
   - brainstorms: docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/candidates.md
