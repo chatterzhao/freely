@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260321-1835-A`
 - title: Develop merge issue binding and C/M/I gate governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `develop-merge-issue-binding-and-cmi-governance`
@@ -123,5 +123,7 @@
 
 ## Next
 
-- next_action: `merge the strengthened gate, then use it to close out the already-merged stale lifecycle issues on develop`
-- revisit_trigger: 若后续仍发现 capability change 借 pre-execution phase、bare issue、borrowed owner、cross-line owner、或 canonical absorbed owner 放行/误拦异常，则继续沿本 issue 追加 regression
+- `2026-03-30 16:41 PDT` the strengthened gate landed on `develop` as commit `5e3ec97`.
+- Follow-on runtime closeout replay then proved the new boundary in real use: initial merge attempts were blocked for completed-owner and absorbed-candidate misuse, and the corrected same-line execution-owner merge passed as `544e1dd`.
+- Canonical verification truth is now `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/code-reviews/20260330-develop-merge-cmi-gate-verification.md`.
+- Future regressions that bypass owner issue binding, same-line `C/M/I`, execution-phase ownership, or same-line progress/review must reopen as new lifecycle work instead of mutating this completed owner.

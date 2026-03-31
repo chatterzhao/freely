@@ -69,17 +69,22 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
 - next_action: 保持在当前 milestone 的 committed queue，直到 verification evidence 明确写回并把 `C-20260325-0333-B` 的完成态同步到正式 closeout；umbrella candidate `C-20260325-0333-A` 继续单独留在 candidate queue
 
-2. `I-20260321-1835-A`
+### completed_issues
+
+1. `I-20260321-1835-A`
 - title: Develop merge issue binding and C/M/I gate governance
-- milestone_state: committed
-- phase_state: `in_dev`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/candidates.md`
-- next_action: 收紧 `governance-merge-gate`，要求 develop merge 带具体 owner issue，且 touched candidate 与 touched owner issue 同属一条 `C/M/I` 线；随后用 focused regressions 与真实 hook 路径回放锁死。
-
-### completed_issues
+- evidence:
+  - `develop` commit `5e3ec97`
+  - `develop` merge replay `544e1dd`
+  - `docs/progress/workspace-routing-foundation/p-develop-merge-issue-binding-and-cmi-governance.md`
+  - `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/code-reviews/20260330-develop-merge-cmi-gate-verification.md`
+- completion_note: strengthened gate 现在不仅在 focused regressions 与 hook wrapper 路径上通过，还在真实 runtime closeout merge 中阻断了 completed-owner / absorbed-candidate misuse，并在修正为 same-line execution owner 后放行；因此本 owner 已完成 closeout。
 
 1. `I-20260324-0415`
 - title: Application-native runtime observation contract and observability planes
