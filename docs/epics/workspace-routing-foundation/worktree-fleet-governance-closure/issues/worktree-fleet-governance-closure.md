@@ -79,7 +79,4 @@ Freely 已经具备单树 worktree audit、merge-prep、stacked merge-chain 和 
   - protected/control: `develop`
   - historical retained research owner now superseded and delete-ready after canonical cleanup writeback: `feature/manager-scheduler-capacity-candidate-replay-20260324`
   - retired after absorption writeback: `feature/develop-merge-prep-fleet-closure-20260325`
-- current develop-facing absorption owner for the active runtime closeout batch is now `feature/runtime-closeout-merge-prep-20260330`, which carries both `I-20260328-2105-A` and the stale runtime-worktree closeout writeback on top of current `develop`.
-- `feature/runtime-auth-repro-closeout-20260330` is now a superseded local closeout lane, because its runtime-auth writeback is strictly contained by `feature/runtime-closeout-merge-prep-20260330` and the broader merge-prep branch adds the current global-restart retirement note.
-- `feature/runtime-auth-repro-20260328-185604` and `feature/global-restart-restore-memory-governance-20260328-194636` remain branch-local stale residue, not active implementation owners; they should stay retirement-pending until the merge-prep absorption path lands, then be deleted rather than continued.
 - `feature/manager-scheduler-capacity-candidate-replay-20260324` should no longer be treated as active fleet truth. Its branch-local history is now only replay-owner provenance because canonical `develop` already records `C-20260323-2045-A` as absorbed supporting evidence; if future scheduler work is needed, it must open a new lifecycle instead of reviving this replay owner.

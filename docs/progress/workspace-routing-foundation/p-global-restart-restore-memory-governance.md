@@ -15,7 +15,6 @@
 
 - `2026-03-30 17:34 PDT` global restart restore-memory owner closeout is complete. The implementation landed at `8441b92` and was absorbed by merge `2467cc7`.
 - Verification is anchored by `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`, which locks explicit `restart --all-projects` manifest durability, retention, and fleet restore selection.
-- `2026-03-30 18:05 PDT` stale worker lane `feature/global-restart-restore-memory-governance-20260328-194636` was re-audited against current `develop` truth. Its remaining branch-local dirty docs are superseded by the canonical `20260330` verification/progress closeout on `develop`, so that older worktree is now `retire-ready` and should not be treated as an unfinished implementation owner.
 
 ## Current Focus
 
