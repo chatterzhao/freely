@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260327-2006-A-global-restart`
 - title: Global restart restore memory governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-restart-restore-memory-governance`
@@ -48,6 +48,5 @@
 
 ## Next
 
-- `2026-03-30 17:10 PDT` `I-20260327-2006-A` 已合入 `develop`，本 issue 从 `done_ibm` 升为 `in_dev`，并切到新的 clean continuation worktree 继续实现。
-- 下一跳在当前 continuation 上 materialize global restart manifest durability、last-20 retention 与 fleet restore selection focused regression，不复用旧 stale runtime worktree。
-- 若后续 global reset surface 需要更大 owner，需新开 lifecycle，不能回写为 project force 语义。
+- `2026-03-30 17:34 PDT` owner implementation and verification are already absorbed by `develop` commits `8441b92` and merge `2467cc7`. Completion evidence is anchored by `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`.
+- Any broader global reset surface must open a new lifecycle rather than rewriting this completed owner.

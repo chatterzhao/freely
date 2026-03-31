@@ -60,49 +60,33 @@
 - id: `PT-1`
 - requirement: `project command family has explicit single-project semantics for start stop restart start --force and restore-work`
 - evidence_level: `integration`
-- status: `passed`
-- artifact_ref:
-  - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
-  - `docs/progress/workspace-routing-foundation/p-project-command-semantics-and-restore-work-governance.md`
-  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
 
 ### PT-2
 - id: `PT-2`
 - requirement: `restart does not silently restore interrupted local AI work`
 - evidence_level: `integration`
-- status: `passed`
-- artifact_ref:
-  - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
-  - `docs/progress/workspace-routing-foundation/p-project-command-semantics-and-restore-work-governance.md`
-  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
 
 ### PT-3
 - id: `PT-3`
 - requirement: `start --force only touches the safe project-local repair set and never escalates into shared/global cleanup`
 - evidence_level: `integration`
-- status: `passed`
-- artifact_ref:
-  - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
-  - `docs/progress/workspace-routing-foundation/p-project-command-semantics-and-restore-work-governance.md`
-  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
 
 ### PT-4
 - id: `PT-4`
 - requirement: `restore-work consumes mandatory continuity anchors while auxiliary evidence remains optional`
 - evidence_level: `integration`
-- status: `passed`
-- artifact_ref:
-  - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
-  - `docs/progress/workspace-routing-foundation/p-project-command-semantics-and-restore-work-governance.md`
-  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
 
 ### PT-5
 - id: `PT-5`
 - requirement: `process discovery and kill scope remain anchored to project identity`
 - evidence_level: `integration`
-- status: `passed`
-- artifact_ref:
-  - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
-  - `docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
-  - `docs/progress/workspace-routing-foundation/p-project-command-semantics-and-restore-work-governance.md`
-  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
