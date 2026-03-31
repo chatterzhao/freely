@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260329-2155-A`
 - title: Sensitive local artifact ignore governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `sensitive-local-artifact-ignore-governance`
@@ -62,6 +62,5 @@
 
 ## Next
 
-- Land the minimal ignore contract.
-- Lock it with a focused regression.
-- Keep any future expansion separate unless new sensitive artifact families are reproduced in the field.
+- `2026-03-30 17:34 PDT` the minimal ignore contract is already absorbed by `develop` commit `208c591`, with completion evidence recorded in `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/code-reviews/20260330-sensitive-local-artifact-ignore-verification.md`.
+- Any broader sensitive-artifact family should open a new lifecycle instead of reopening this completed owner.

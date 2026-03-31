@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260329-2045-A`
 - title: AI auth-change wake command lifecycle governance
-- phase_state: `in_ibm`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `ai-auth-change-wake-command-lifecycle-governance`
@@ -80,5 +80,5 @@
 
 ## Next
 
-- Complete IBM by freezing `switch` exit semantics, wake acknowledgement policy, and re-entrancy guard boundaries.
-- Then enter dev-loop with regression-first repair, avoiding real `login` and slot-deletion execution in the first implementation pass.
+- `2026-03-30 17:34 PDT` owner implementation and verification are already absorbed by `develop` commit `44bb13c`. The canonical closeout evidence is the focused regression set plus `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/code-reviews/20260330-ai-auth-change-wake-command-lifecycle-verification.md`.
+- Future auth UX or helper-process expansion must open a new lifecycle rather than reopening this completed owner.

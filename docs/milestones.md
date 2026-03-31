@@ -49,27 +49,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260329-2045-A`
-- title: AI auth-change wake command lifecycle governance
-- milestone_state: committed
-- phase_state: `in_ibm`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/issues/ai-auth-change-wake-command-lifecycle-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/candidates.md`
-- next_action: 完成 IBM，先冻结 `switch/login` success-path 的退出 contract、wake acknowledgement 边界与 re-entrancy cut point，再进入 regression-first 修复；第一阶段禁止把真实 `login` 和 slot 删除纳入回归。
-
-2. `I-20260329-2155-A`
-- title: Sensitive local artifact ignore governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P2
-- issue_path: `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/issues/sensitive-local-artifact-ignore-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/candidates.md`
-- next_action: 落保守 `.gitignore` 规则、focused `git check-ignore --no-index` regression，并确认 `develop` 已清除 stray `auth.json`。
-
-3. `I-20260325-0410`
+1. `I-20260325-0410`
 - title: Story-level pre-tests quality gate governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -79,27 +59,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
 - next_action: 保持在当前 milestone 的 committed queue，直到 verification evidence 明确写回并把 `C-20260325-0333-B` 的完成态同步到正式 closeout；umbrella candidate `C-20260325-0333-A` 继续单独留在 candidate queue
 
-4. `I-20260327-2006-A`
-- title: Project command semantics and explicit restore-work governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md`
-- next_action: 当前 feature lane 已完成 checkpoint `5bc3a86`，并在 verification fixup 中收紧了 `test-freely-project-command-semantics` 的 cleanup/timeout contract；下一跳继续保持 manager-owned `completion_verification`，不回退到 IBM，也不提前拉动 downstream global restart issue。
-
-5. `I-20260327-2006-A-global-restart`
-- title: Global restart restore memory governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md`
-- next_action: 当前 fresh continuation 已 materialize `restart --all-projects` manifest durability 与 focused regression；下一跳继续做 merge-ready judgement，并保持实现只覆盖 explicit global restart restore memory owner。
-
-6. `I-20260321-1835-A`
+2. `I-20260321-1835-A`
 - title: Develop merge issue binding and C/M/I gate governance
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -267,6 +227,63 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/code-reviews/20260321-worktree-fleet-governance-closure-verification.md`
   - `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/code-reviews/20260326-worktree-fleet-governance-closure-canonical-replay-verification.md`
 - completion_note: `fleet_closure` 能力与 canonical inventory writeback 已稳定收敛到 4-tree / dirty=0 / all stopped；retained-vs-retired judgement 已冻结为 protected/control、retained research owner、active develop-facing absorption owner 三类，后续 research materialization 不再阻塞本 issue 完成
+
+7. `I-20260329-2045-A`
+- title: AI auth-change wake command lifecycle governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/issues/ai-auth-change-wake-command-lifecycle-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/candidates.md`
+- evidence:
+  - `develop` commit `44bb13c`
+  - `docs/progress/workspace-routing-foundation/p-ai-auth-change-wake-command-lifecycle-governance.md`
+  - `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/code-reviews/20260330-ai-auth-change-wake-command-lifecycle-verification.md`
+- completion_note: `switch/login` success-path wake lifecycle 已收口到“成功后及时退出 + suppress watchdog self-reentry”，且本轮未执行真实登录或 slot 删除。
+
+8. `I-20260329-2155-A`
+- title: Sensitive local artifact ignore governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P2
+- issue_path: `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/issues/sensitive-local-artifact-ignore-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/candidates.md`
+- evidence:
+  - `develop` commit `208c591`
+  - `docs/progress/workspace-routing-foundation/p-sensitive-local-artifact-ignore-governance.md`
+  - `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/code-reviews/20260330-sensitive-local-artifact-ignore-verification.md`
+- completion_note: 保守 sensitive-local-artifact ignore contract 与 focused regression 已合入 `develop`，并清除了根目录 stray `auth.json`。
+
+9. `I-20260327-2006-A`
+- title: Project command semantics and explicit restore-work governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md`
+- evidence:
+  - `develop` merge `b93efd2`
+  - `docs/progress/workspace-routing-foundation/p-project-command-semantics-and-restore-work-governance.md`
+  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`
+- completion_note: project command family taxonomy、verification cleanup hardening 与 closeout 写回已完成；后续 global restart 继续留在拆分 owner。
+
+10. `I-20260327-2006-A-global-restart`
+- title: Global restart restore memory governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md`
+- evidence:
+  - `develop` commit `8441b92`
+  - `develop` merge `2467cc7`
+  - `docs/progress/workspace-routing-foundation/p-global-restart-restore-memory-governance.md`
+  - `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`
+- completion_note: explicit global restart restore-memory owner 已完成，实现覆盖 manifest durability、retention 与 fleet restore selection。
 
 7. `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
@@ -826,16 +843,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`, `docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md`
 - next_action: 保持当前 research worktree 作为唯一写入 lane，完成 merge judgement 与写回；在补丁吸收到 `develop` 前，不恢复 pre-fix stalled dogfood runtime
 
-2. `I-20260328-0335-A`
-- title: Manager supervision quiet-period stall-signal governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/candidates.md`
-- next_action: 保持当前最小行为修复包进入 merge judgement；restart-storm 复核与 runtime-owned recovery stop 的 observability 区分留作 follow-on，不与本 issue 混补
-
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛
 - milestone_state: candidate
@@ -952,6 +959,20 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/code-reviews/20260321-manager-watchdog-trigger-and-drift-reconcile-verification.md`
   - `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/code-reviews/20260326-manager-watchdog-trigger-and-drift-reconcile-canonical-replay-verification.md`
 - completion_note: cleanup reroute contract 已在 canonical `develop` 通过 replay，cleanup-only signal 保持 `handoff://cleanup`，broad supervisor signal 保持 manager-owned continuation reentry；authoritative fleet truth 也已稳定到 4-tree / dirty=0 / all stopped。scheduler retained research owner 继续独立保留，不并入本条完成判断
+
+7. `I-20260328-0335-A`
+- title: Manager supervision quiet-period stall-signal governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/candidates.md`
+- evidence:
+  - `develop` commit `82ea1e6`
+  - `docs/progress/workspace-routing-foundation/p-manager-supervision-quiet-period-stall-signal-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/code-reviews/20260328-manager-supervision-quiet-period-stall-signal-verification.md`
+- completion_note: quiet-period false-positive stall recovery 的最小行为修复已完成；restart-storm 与 observability 区分留作 follow-on。
 
 4. `I-20260321-1706`
 - title: Chat-triggered worker runtime reactivation governance
