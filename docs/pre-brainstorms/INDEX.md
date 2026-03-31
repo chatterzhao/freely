@@ -3,6 +3,7 @@
   - brainstorms: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/candidates.md
 - 20260331-1837--worker-first-hop-role-boundary-regression
+- 20260330-2318--live-status-already-running-attach-regression
 - 20260329-2155--sensitive-local-artifact-ignore-governance
 - 20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle
 - 20260328-2105--resume-evidence-strength-and-false-positive-resume-governance
@@ -79,6 +80,9 @@
 - 20260331-1837--worker-first-hop-role-boundary-regression
   - brainstorms: docs/pre-brainstorms/20260331-1837--worker-first-hop-role-boundary-regression/brainstorms.md
   - candidates: docs/pre-brainstorms/20260331-1837--worker-first-hop-role-boundary-regression/candidates.md
+- 20260330-2318--live-status-already-running-attach-regression
+  - brainstorms: docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/candidates.md
 - 20260329-2155--sensitive-local-artifact-ignore-governance
   - brainstorms: docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/candidates.md
