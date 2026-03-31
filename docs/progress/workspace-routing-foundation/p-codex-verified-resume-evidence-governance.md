@@ -4,8 +4,8 @@
 - title: Codex verified resume evidence governance
 - phase_state: `in_dev`
 - runtime_state: `stopped`
-- branch: `feature/runtime-invalid-resume-repro-20260328-2020`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260328-2020-feature-runtime-invalid-resume-repro`
+- branch: `feature/runtime-closeout-merge-prep-20260330`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260330-feature-runtime-closeout-merge-prep`
 - issue_path: `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-implementation"}
@@ -15,6 +15,7 @@
 - The lane has now moved from IBM into dev-loop.
 - The current implementation narrows the repair to the proven `codex` chain: a bare observed `session_id` no longer becomes resumable truth unless Freely can also trace rollout/jsonl evidence for that target.
 - Healthy explicit `resume` remains allowed when persisted or newly observed rollout/jsonl evidence is present.
+- `2026-03-30 18:18 PDT` the repaired lane was absorbed into develop-based merge-prep branch `feature/runtime-closeout-merge-prep-20260330`, so the canonical owner truth no longer lives only in the earlier isolated repro worktree.
 
 ## Implemented slice
 
@@ -28,11 +29,13 @@
 ## Verification
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
-2. `bash docs/system/workspace/scripts/tests/test-freely-session-rotation`
-   - the run still passes the earlier rotation/continuity assertions up to the pre-existing late failure `expected local runtime to defer rate-limit recovery instead of sleeping locally`
+2. `bash -n docs/system/workspace/scripts/runtime/freely`
+3. `./bin/governance-check`
+4. `bash docs/system/workspace/scripts/tests/test-freely-session-rotation`
+   - the earlier isolated repro still passed the rotation/continuity assertions up to the pre-existing late failure `expected local runtime to defer rate-limit recovery instead of sleeping locally`
 
 ## Next Action
 
-1. Restack this lane onto current `develop` so the materialized candidate / issue / progress truth stops living only in a behind worktree.
-2. Re-run the narrow resume-evidence regressions after restack.
-3. If the restacked lane stays green, add the checkpoint commit that canonically materializes `I-20260328-2105-A` plus the runtime/test repair.
+1. Keep `feature/runtime-closeout-merge-prep-20260330` as the active absorption owner for this repair.
+2. Preserve the narrow verification set while the merge-prep branch stays ahead of `develop`.
+3. Treat the older repro worktree as source provenance only; further continuity cleanup should route through merge-prep instead of reviving the isolated branch-local lane.

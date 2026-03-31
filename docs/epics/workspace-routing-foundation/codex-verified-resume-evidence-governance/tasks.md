@@ -21,5 +21,5 @@
 - [x] Update focused runtime tests
   - cover invalid `session_id` with missing rollout/jsonl
   - keep valid rollout-backed `resume` green
-- [ ] Run governance and focused regressions
+- [x] Run governance and focused regressions
   - confirm no regression to auth/watchdog semantics

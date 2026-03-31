@@ -86,4 +86,5 @@ Freely 已经把 `codex` 的 canonical continuity model 收敛为显式 session-
 
 - IBM is complete; this owner is now in dev-loop.
 - Current implementation stays deliberately narrow: verified rollout/jsonl evidence is now required before the `codex` path can reuse explicit `resume`.
-- Next checkpoint is to restack onto current `develop`, re-run the narrow regressions, and then checkpoint the canonical materialization plus runtime/test repair.
+- The restack/materialization checkpoint is already complete on `feature/runtime-closeout-merge-prep-20260330`, which currently sits `develop...HEAD = 0 2`.
+- Next checkpoint is to keep this merge-prep branch as the canonical absorption owner, not to reopen the earlier isolated repro worktree.
