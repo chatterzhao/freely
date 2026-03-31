@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260325-0410`
 - title: Story-level pre-tests quality gate governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `story-level-pre-tests-quality-gate-governance`
@@ -12,6 +12,8 @@
 - source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
+- pre_tests_path: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/pre-tests.md`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews`
 - depends_on:
   - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
   - `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`

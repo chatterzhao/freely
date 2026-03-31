@@ -59,19 +59,25 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260328-2105--resume-evidence-strength-and-false-positive-resume-governance/candidates.md`
 - next_action: Keep the codex-scoped owner in verification on `feature/runtime-closeout-merge-prep-20260330`. The current slice remains intentionally narrow: require rollout/jsonl-backed evidence before reusing `resume`, preserve healthy explicit resume, and keep auth/watchdog plus observability scope out of band. Verification truth is now the feature artifact on this merge-prep lane; older repro and duplicate closeout branches are provenance or superseded lanes, not active owners.
 
+### completed_issues
+
 1. `I-20260325-0410`
 - title: Story-level pre-tests quality gate governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
-- next_action: 保持在当前 milestone 的 committed queue，直到 verification evidence 明确写回并把 `C-20260325-0333-B` 的完成态同步到正式 closeout；umbrella candidate `C-20260325-0333-A` 继续单独留在 candidate queue
+- evidence:
+  - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
+  - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
+  - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
+  - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
+  - `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`
+- completion_note: Story-level `pre-tests.md` 质量 gate 已进入 capability truth，最小 blocker taxonomy 已冻结为 `definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`，verification 已 pass
 
-### completed_issues
-
-1. `I-20260321-1835-A`
+2. `I-20260321-1835-A`
 - title: Develop merge issue binding and C/M/I gate governance
 - milestone_state: completed
 - phase_state: `completed`
