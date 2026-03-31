@@ -584,7 +584,18 @@ routing_policy:
 
 ### candidate_issues
 
-1. `C-20260327-1115-A`
+1. `C-20260330-2318-A`
+- title: Live-status false already-running-attach regression
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/candidates.md`
+- next_action: Build a minimal repro lane for false `already_running_attach` and pin the precise write/read mismatch. This is inverse direction from `I-20260328-0745-A`: no live runtime exists, but persisted state claims up/up
+- revisit_trigger: Promote once a repro shows the exact attach path that writes optimistic `up/up` without a surviving project-owned supervisor or AI
+
+2. `C-20260327-1115-A`
 - title: Promote OAuth parallel sweep to canonical slot inventory truth
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -594,7 +605,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md`
 - next_action: 已提升为新的 follow-on issue；后续由 `I-20260327-1115` 承接 issue-bound IBM closeout 与 dev-loop 执行
 
-1. `C-20260323-1435-A`
+3. `C-20260323-1435-A`
 - title: Interactive init bootstrap and fine-grained force/skip governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -605,7 +616,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 `init` 的 step graph、bootstrap commit 豁免边界，以及每个 managed item 的 skip/force contract；在这些边界稳定前，不直接往现有 `init` 继续堆局部 patch
 - revisit_trigger: 当 `init` 的交互入口、repo bootstrap 语义与细粒度 skip/force 输出 contract 可以被冻结成独立 issue scope 时，重新进入 materialization 判断
 
-2. `C-20260318-0715-A`
+4. `C-20260318-0715-A`
 - title: `commit-first after checkpoint-ready` 自治治理
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -616,7 +627,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 3 个边界：`checkpoint-ready` 的结构化输出、`LAWS/runtime/checkpoint-guard/supervisor` 的职责分层、以及进入 IBM 前的 promotion gate；在这些边界稳定前不得直接写成 IBM issue 或塞回 `I-20260318-0930`
 - revisit_trigger: 当 `checkpoint-ready` 的结构化输出、supervisor 职责边界与 promotion gate 可以被稳定写成最小 issue contract 时，重新进入 materialization 判断
 
-3. `C-20260319-0402-01`
+5. `C-20260319-0402-01`
 - title: 定义 Freely 的 harness engineering 分层与缺口图
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -627,7 +638,7 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，先验证 Freely 是否需要一份更明确的 harness 分层与缺口图；若边界稳定，再 materialize 成 issue，而不是直接把外部文章结论塞进现有主线
 - revisit_trigger: 当 harness 分层、缺口图与 Freely 自身的最小吸收面可以冻结成独立 issue contract 时，重新进入 materialization 判断
 
-4. `C-20260319-0402-02`
+6. `C-20260319-0402-02`
 - title: 把 worktree 级验证信号统一暴露成 agent 可消费接口
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -638,7 +649,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先盘点现有 status / wt-status-all / runtime 输出，再决定要不要 materialize 成统一 machine-readable 汇总接口
 - revisit_trigger: 当 worktree 级验证信号的 canonical 输入、输出与 machine-readable summary contract 可以被冻结成 issue scope 时，重新进入 materialization 判断
 
-5. `C-20260319-0402-03`
+7. `C-20260319-0402-03`
 - title: 建立文档园艺与 AI 残渣清理的周期性后台循环
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
