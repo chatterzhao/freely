@@ -1,6 +1,7 @@
 # 预研头脑风暴索引
 - 20260329-2155--sensitive-local-artifact-ignore-governance
 - 20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle
+- 20260328-2105--resume-evidence-strength-and-false-positive-resume-governance
 - 20260328-0745--live-status-current-runtime-state-reconciliation
 - 20260327-2006--start-restart-control-plane-semantics
 - 20260327-1845--manager-consumed-continuity-resume-routing-drift
@@ -74,6 +75,9 @@
 - 20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle
   - brainstorms: docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/brainstorms.md
   - candidates: docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/candidates.md
+- 20260328-2105--resume-evidence-strength-and-false-positive-resume-governance
+  - brainstorms: docs/pre-brainstorms/20260328-2105--resume-evidence-strength-and-false-positive-resume-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260328-2105--resume-evidence-strength-and-false-positive-resume-governance/candidates.md
 - 20260328-0745--live-status-current-runtime-state-reconciliation
   - brainstorms: docs/pre-brainstorms/20260328-0745--live-status-current-runtime-state-reconciliation/brainstorms.md
   - candidates: docs/pre-brainstorms/20260328-0745--live-status-current-runtime-state-reconciliation/candidates.md

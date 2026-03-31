@@ -804,14 +804,32 @@ tool_runtime_resume_target_before_launch() {
   esac
 }
 
+resolve_codex_jsonl_path_for_resume_target() {
+  local resume_target="$1" persisted_jsonl_path="${2:-}"
+  if [[ -n "$persisted_jsonl_path" && -f "$persisted_jsonl_path" ]]; then
+    printf '%s\n' "$persisted_jsonl_path"
+    return 0
+  fi
+  find_codex_jsonl_path_for_session "$resume_target"
+}
+
+codex_has_verified_resume_evidence() {
+  local resume_target="${1:-}" persisted_jsonl_path="${2:-}" resolved_jsonl_path
+  [[ -n "$resume_target" ]] || return 1
+  resolved_jsonl_path="$(resolve_codex_jsonl_path_for_resume_target "$resume_target" "$persisted_jsonl_path")"
+  [[ -n "$resolved_jsonl_path" && -f "$resolved_jsonl_path" ]]
+}
+
 tool_runtime_resume_target_after_cycle() {
-  local tool="$1" observed_tool_session_id="$2" launch_resume_target="$3"
+  local tool="$1" observed_tool_session_id="$2" observed_tool_jsonl_path="$3" launch_resume_target="$4" persisted_jsonl_path="${5:-}"
   case "$tool" in
     codex)
-      if [[ -n "$observed_tool_session_id" ]]; then
+      if [[ -n "$observed_tool_session_id" && -n "$observed_tool_jsonl_path" && -f "$observed_tool_jsonl_path" ]]; then
         printf '%s\n' "$observed_tool_session_id"
-      else
+      elif codex_has_verified_resume_evidence "$launch_resume_target" "$persisted_jsonl_path"; then
         printf '%s\n' "$launch_resume_target"
+      else
+        printf '\n'
       fi
       ;;
     cc|cc-use-codex-cli)
@@ -1805,7 +1823,14 @@ tool_has_resume_evidence() {
   local resume_target
   resume_target="$(tool_runtime_resume_target_before_launch "$tool")"
   if tool_prefers_explicit_resume_target "$tool"; then
-    [[ -n "$resume_target" ]]
+    case "$tool" in
+      codex)
+        codex_has_verified_resume_evidence "$resume_target" "${LAST_TOOL_JSONL_PATH:-}"
+        ;;
+      *)
+        [[ -n "$resume_target" ]]
+        ;;
+    esac
   else
     return 0
   fi
@@ -5628,7 +5653,7 @@ start_project_runtime() {
     if log_has_same_tool_route_only_handoff "$cycle_log" "$AI_TOOL"; then
       route_only_handoff="1"
     fi
-    tool_resume_target="$(tool_runtime_resume_target_after_cycle "$AI_TOOL" "$tool_session_id" "$launch_resume_target")"
+    tool_resume_target="$(tool_runtime_resume_target_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_jsonl_path" "$launch_resume_target" "${LAST_TOOL_JSONL_PATH:-}")"
     tool_session_id="$(tool_persisted_session_id_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_resume_target")"
     if tool_uses_claude_session_id "$AI_TOOL" && [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
       local resolved_cc_evidence

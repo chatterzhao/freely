@@ -2,11 +2,18 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-explicit-resume-contract.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+export HOME="$TMP_DIR/home"
+export CODEX_HOME="$HOME/.codex"
+mkdir -p "$CODEX_HOME/sessions/2026/03/30"
 
 # shellcheck disable=SC1090
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 
 LAST_TOOL_RESUME_TARGET="codex-known-session"
+LAST_TOOL_JSONL_PATH=""
 CLAUDE_SESSION_ID_CURRENT="11111111-2222-4333-8444-555555555555"
 
 [[ "$(tool_runtime_resume_target_before_launch codex)" == "codex-known-session" ]] || {
@@ -14,13 +21,23 @@ CLAUDE_SESSION_ID_CURRENT="11111111-2222-4333-8444-555555555555"
   exit 1
 }
 
-[[ "$(tool_runtime_resume_target_after_cycle codex "codex-new-session" "codex-known-session")" == "codex-new-session" ]] || {
-  echo "[FAIL] codex should prefer the observed session id after a cycle" >&2
+observed_jsonl="$CODEX_HOME/sessions/2026/03/30/rollout-2026-03-30T00-00-00-codex-new-session.jsonl"
+printf '{"type":"token_count","total_tokens":100,"model_context_window":1000}\n' >"$observed_jsonl"
+[[ "$(tool_runtime_resume_target_after_cycle codex "codex-new-session" "$observed_jsonl" "codex-known-session" "")" == "codex-new-session" ]] || {
+  echo "[FAIL] codex should prefer the observed session id only when rollout evidence exists" >&2
   exit 1
 }
 
-[[ "$(tool_runtime_resume_target_after_cycle codex "" "codex-known-session")" == "codex-known-session" ]] || {
-  echo "[FAIL] codex should fall back to the launch resume target when output does not emit a fresh session id" >&2
+[[ "$(tool_runtime_resume_target_after_cycle codex "codex-weak-session" "" "codex-known-session" "")" == "" ]] || {
+  echo "[FAIL] codex should reject session-id-only evidence as a resumable target" >&2
+  exit 1
+}
+
+persisted_jsonl="$CODEX_HOME/sessions/2026/03/30/rollout-2026-03-30T00-00-00-codex-known-session.jsonl"
+printf '{"type":"token_count","total_tokens":100,"model_context_window":1000}\n' >"$persisted_jsonl"
+LAST_TOOL_JSONL_PATH="$persisted_jsonl"
+[[ "$(tool_runtime_resume_target_after_cycle codex "" "" "codex-known-session" "$persisted_jsonl")" == "codex-known-session" ]] || {
+  echo "[FAIL] codex should keep a prior launch target only when persisted rollout evidence is still valid" >&2
   exit 1
 }
 
@@ -34,13 +51,20 @@ CLAUDE_SESSION_ID_CURRENT="11111111-2222-4333-8444-555555555555"
   exit 1
 }
 
-[[ "$(tool_runtime_resume_target_after_cycle cc "" "ignored-codex-target")" == "11111111-2222-4333-8444-555555555555" ]] || {
+[[ "$(tool_runtime_resume_target_after_cycle cc "" "" "ignored-codex-target")" == "11111111-2222-4333-8444-555555555555" ]] || {
   echo "[FAIL] cc should keep using the explicit claude session id after a cycle" >&2
   exit 1
 }
 
 if ! tool_has_resume_evidence codex; then
-  echo "[FAIL] codex should report resume evidence when explicit target exists" >&2
+  echo "[FAIL] codex should report resume evidence when explicit target has verified rollout evidence" >&2
+  exit 1
+fi
+
+LAST_TOOL_RESUME_TARGET="codex-weak-session"
+LAST_TOOL_JSONL_PATH=""
+if tool_has_resume_evidence codex; then
+  echo "[FAIL] codex should not report resume evidence for session-id-only state without rollout evidence" >&2
   exit 1
 fi
 
@@ -49,4 +73,4 @@ if ! tool_has_resume_evidence cc; then
   exit 1
 fi
 
-echo "[PASS] freely uses explicit per-tool resume targets instead of implicit last-session lookup"
+echo "[PASS] freely requires verified rollout evidence before codex explicit resume can be reused"
