@@ -791,7 +791,18 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，先把 Ring/SSOT 冲突决议规则与检查点清单收敛成当前治理链可消费的最小 contract
 - revisit_trigger: 当规则契约与检查点清单可以冻结成独立 issue contract 时，重新进入 materialization 判断
 
-13. `C-20260303-002`
+13. `C-20260330-2318-A`
+- title: Live-status false already-running-attach regression
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://live-status-already-running-attach-regression`
+- source_brainstorm: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/candidates.md`
+- next_action: Build a minimal repro lane for false `already_running_attach` and pin the precise write/read mismatch. Focus on identifying the write path that rewrites `workcell-state.env` to `already_running_attach` after the last real cleanup.
+- revisit_trigger: Promote once a repro shows the exact attach path that writes optimistic `up/up` without a surviving project-owned supervisor or AI.
+
+14. `C-20260303-002`
 - title: 独立监理 Gate 接入 auto-loop
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
