@@ -1,26 +1,51 @@
 # Pre-tests: ai-auth-change-wake-command-lifecycle-governance
 
-1. Freeze the field contract:
-   - `ai list/whoami/status` exit normally, while `ai switch` success-path can remain alive behind synchronous `auth-change-wake`
-2. Reproduce the narrowest real failure:
-   - no-op `ai switch codex <current-slot>` prints success and still remains alive after a bounded wait
-3. Inspect the process tree:
-   - the stuck parent is `ai-cli`
-   - the immediate child is `freely auth-change-wake --reason switch_success`
-4. Add a focused regression:
-   - success-path wake must not keep `ai switch` alive indefinitely
-5. Add a focused re-entrancy regression:
-   - watchdog-triggered slot handling must not recurse through the same notify loop forever
-6. Preserve orthogonal behavior:
-   - manager/watchdog auth recovery still works
-7. Preserve test safety:
-   - do not require real `login`
-   - do not require slot deletion
+## Acceptance Structure
 
-## Blocker Taxonomy
+### Pre-merge acceptance
 
-- `definition_missing`: exit semantics or wake acknowledgement policy is still ambiguous
-- `repro_gap`: no stable no-op switch reproduction exists
-- `reentrancy_gap`: issue does not yet define where recursion must be cut, or whether the full closed loop is still only a high-confidence hypothesis
-- `commands_only`: only ad hoc shell evidence exists and no regression has been added yet
-- `execution_pending_or_failed`: focused tests are not yet passing
+- acceptance target: `ai auth-change wake command lifecycle`
+- testing layer: `focused regression + command replay`
+- target environment: `feature worktree`
+- required evidence: focused switch/login lifecycle regressions and verification artifact
+- blocker taxonomy:
+  - `definition_missing`
+  - `repro_gap`
+  - `reentrancy_gap`
+  - `commands_only`
+  - `execution_pending_or_failed`
+
+1. `ai switch codex <current-slot>` 成功后必须及时退出。
+2. `ai switch` success-path 不得被同步 `auth-change-wake` 长时间拖住。
+3. watchdog-triggered slot handling 不得重新回流到同一 notify loop。
+4. 修复不得要求真实 `login` 或 slot 删除。
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `ai switch codex exits before auth-change wake completes`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-ai-cli-same-slot-switch-does-not-block-on-auth-change-wake`
+
+### PT-2
+- id: `PT-2`
+- requirement: `successful login-path notify semantics no longer block the foreground command lifecycle`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-ai-cli-login-does-not-block-on-auth-change-wake`
+
+### PT-3
+- id: `PT-3`
+- requirement: `watchdog-triggered slot handling suppresses the recursive auth-change wake loop`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-watchdog-switch-to-codex-slot-suppresses-auth-change-wake`
+
+### PT-4
+- id: `PT-4`
+- requirement: `repair preserves adjacent auth inventory behavior without requiring real login or slot deletion`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/code-reviews/20260330-ai-auth-change-wake-command-lifecycle-verification.md`

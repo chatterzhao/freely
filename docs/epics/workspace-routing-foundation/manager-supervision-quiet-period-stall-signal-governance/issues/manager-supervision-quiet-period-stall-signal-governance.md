@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260328-0335-A`
 - title: Manager supervision quiet-period stall-signal governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-supervision-quiet-period-stall-signal-governance`
@@ -94,5 +94,5 @@
 
 ## Next
 
-- Treat restart-storm contract revalidation as a separate follow-on verification lane if needed.
-- Keep broader delegated backlog absorption and observability productization as separate lifecycles unless the implementation proves they are inseparable.
+- `2026-03-30 17:34 PDT` the minimal behavior repair and verification closeout are already absorbed by `develop` commit `82ea1e6`, with canonical evidence in `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/code-reviews/20260328-manager-supervision-quiet-period-stall-signal-verification.md`.
+- Restart-storm revalidation or broader observability changes remain follow-on work and must open their own lifecycle if they need implementation.
