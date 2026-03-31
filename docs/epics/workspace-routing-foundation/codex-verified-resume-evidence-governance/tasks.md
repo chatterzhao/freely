@@ -23,3 +23,8 @@
   - keep valid rollout-backed `resume` green
 - [x] Run governance and focused regressions
   - confirm no regression to auth/watchdog semantics
+
+## Verification
+
+- [x] Write feature verification artifact on the canonical merge-prep branch
+- [x] Keep duplicate closeout lanes out of the active absorption path

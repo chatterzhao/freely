@@ -52,12 +52,12 @@ routing_policy:
 1. `I-20260328-2105-A`
 - title: Codex verified resume evidence governance
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260328-2105--resume-evidence-strength-and-false-positive-resume-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260328-2105--resume-evidence-strength-and-false-positive-resume-governance/candidates.md`
-- next_action: Keep the codex-scoped owner in dev-loop. The current slice is limited to verified resume evidence on the proven `codex` path: require rollout/jsonl-backed evidence before reusing `resume`, preserve healthy explicit resume, and keep auth/watchdog plus observability scope out of band. Next checkpoint is progress writeback plus narrow regressions on the runtime script and focused tests, then restack onto current `develop`.
+- next_action: Keep the codex-scoped owner in verification on `feature/runtime-closeout-merge-prep-20260330`. The current slice remains intentionally narrow: require rollout/jsonl-backed evidence before reusing `resume`, preserve healthy explicit resume, and keep auth/watchdog plus observability scope out of band. Verification truth is now the feature artifact on this merge-prep lane; older repro and duplicate closeout branches are provenance or superseded lanes, not active owners.
 
 1. `I-20260325-0410`
 - title: Story-level pre-tests quality gate governance
