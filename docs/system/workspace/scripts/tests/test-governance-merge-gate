@@ -89,6 +89,122 @@ grep -q 'not based on a specific issue' "$TMP_DIR/stdout2"
 git reset -q HEAD docs/pre-brainstorms/sample/candidates.md
 git checkout -q -- docs/pre-brainstorms/sample/candidates.md
 
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: needs_research
+- milestone: `M-sample`
+- next_action: bind the active candidate to the right milestone queue
+- revisit_trigger: new evidence arrives
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+   - next_action: keep researching the same candidate
+   - revisit_trigger: new evidence arrives
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+mkdir -p "$REPO/docs/progress/sample"
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/pre-brainstorms/sample/candidates.md docs/milestones.md docs/progress/sample/p-sample.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout2b" 2>"$TMP_DIR/stderr2b"
+grep -q 'passed' "$TMP_DIR/stdout2b"
+
+git reset -q HEAD docs/pre-brainstorms/sample/candidates.md docs/milestones.md docs/progress/sample/p-sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+mkdir -p "$REPO/docs/pre-brainstorms/queuefix"
+cat > "$REPO/docs/pre-brainstorms/queuefix/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2215-A
+- status: needs_research
+- milestone: `M-sample`
+- next_action: bind the active candidate to the right milestone queue
+- revisit_trigger: new evidence arrives
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+   - next_action: keep researching the same candidate
+   - revisit_trigger: new evidence arrives
+2. `C-20260327-2215-A`
+   - next_action: bind the active candidate to the right milestone queue
+   - revisit_trigger: new evidence arrives
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+mkdir -p "$REPO/docs/progress/sample"
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/pre-brainstorms/queuefix/candidates.md docs/milestones.md docs/progress/sample/p-sample.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout2c" 2>"$TMP_DIR/stderr2c"
+grep -q 'passed' "$TMP_DIR/stdout2c"
+
+git reset -q HEAD docs/pre-brainstorms/queuefix/candidates.md docs/milestones.md docs/progress/sample/p-sample.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+mkdir -p "$REPO/docs/progress/sample" "$REPO/src"
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+echo "console.log('mixed implementation change');" > "$REPO/src/mixed.js"
+git add docs/pre-brainstorms/queuefix/candidates.md docs/milestones.md docs/progress/sample/p-sample.md src/mixed.js
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout2d" 2>"$TMP_DIR/stderr2d"; then
+  echo "[FAIL] governance-merge-gate should reject unresolved candidate metadata borrowing an unrelated owner when implementation files are in the same diff" >&2
+  exit 1
+fi
+grep -q 'does not carry its concrete owner issue/progress/review' "$TMP_DIR/stdout2d"
+
+git reset -q HEAD docs/pre-brainstorms/queuefix/candidates.md docs/milestones.md docs/progress/sample/p-sample.md src/mixed.js
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-sample.md" "$REPO/src/mixed.js"
+
 mkdir -p "$REPO/docs/progress/sample"
 cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
 # Progress: sample

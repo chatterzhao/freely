@@ -360,6 +360,7 @@ def main() -> int:
 
     changed_paths = changed_paths_from_args(args)
     candidate_paths: Set[str] = {p for p in changed_paths if p.startswith("docs/pre-brainstorms/") and p.endswith("/candidates.md")}
+    touched_candidate_paths: Set[str] = set(candidate_paths)
     issue_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/issues/.+\.md$", p)}
     progress_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/progress/.+\.md$", p)}
     review_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/code-reviews/.+\.md$", p)}
@@ -519,6 +520,8 @@ def main() -> int:
             "This develop-bound merge is not based on a specific issue. Candidate-only evidence is not enough for a develop merge: the merge diff must carry a concrete issue/progress/review owner, and then the C/M/I chain must still validate."
         )
 
+    governance_only_merge = all(is_governance_only_path(path) for path in changed_paths)
+
     for candidate in candidate_records:
         status = (candidate.status or "").strip("`").strip()
         milestone = normalize_milestone_ref(candidate.milestone or "")
@@ -529,8 +532,19 @@ def main() -> int:
         owner_path = normalize_scalar(candidate.promoted_issue_path or "")
         candidate_is_bound_to_touched_issue = candidate.path in issue_bound_candidate_paths
         candidate_is_bound_to_touched_owner = bool(owner_path) and owner_path in issue_bound_issue_paths
+        candidate_is_unresolved_pre_ibm = status in {"proposed", "needs_research", "blocked"}
+        unresolved_metadata_fix_is_absorbed_by_governance_owner = (
+            candidate.path in touched_candidate_paths
+            and candidate_is_unresolved_pre_ibm
+            and governance_only_merge
+            and bool(issue_bound_evidence)
+        )
 
-        if not candidate_is_bound_to_touched_issue and not (status == "absorbed" and candidate_is_bound_to_touched_owner):
+        if (
+            not candidate_is_bound_to_touched_issue
+            and not (status == "absorbed" and candidate_is_bound_to_touched_owner)
+            and not unresolved_metadata_fix_is_absorbed_by_governance_owner
+        ):
             errors.append(
                 f"{candidate.candidate_id} in {candidate.path} is touched by this develop merge, but the same merge does not carry its concrete owner issue/progress/review. "
                 f"Candidate-only evidence or an unrelated issue in the diff is not enough: bind the merge to this candidate's own I-* issue, or for an absorbed candidate include the canonical owner issue/progress/review in the same merge."
