@@ -204,7 +204,7 @@ tool_run_from_prompt_file() {
       fi
       ;;
     kiro-cli)
-      local selected_model="${model:-claude-opus-4.6}"
+      local selected_model="${model:-auto}"
       if [[ "$launch_kind" == "resume" ]]; then
         if [[ "$mode" == "auto" ]]; then
           exec kiro-cli chat --resume --no-interactive --trust-all-tools --model "$selected_model" "继续上次未完成工作，按项目意图和宪法持续推进。"

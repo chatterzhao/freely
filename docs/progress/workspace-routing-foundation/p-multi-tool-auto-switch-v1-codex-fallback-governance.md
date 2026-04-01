@@ -15,12 +15,14 @@
 ## Evidence
 
 - `docs/system/workspace/scripts/runtime/freely`
+- `docs/system/workspace/scripts/runtime/tool-launchers.sh`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-kiro-to-codex-fallback`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
 - `docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
+- `docs/system/workspace/scripts/tests/test-tool-launchers-kiro-default-model`
 - `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews/20260331-multi-tool-auto-switch-v1-codex-fallback-verification.md`
 - live repro on `develop`: `kiro-cli` exits with `kiro_monthly_request_limit`, then supervisor cleanup re-triggers one-shot manager control-plane evaluation so the persisted `desired=running + tool-local failure` state is consumed even if long-lived watchers drift
 

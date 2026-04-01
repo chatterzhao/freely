@@ -14,7 +14,8 @@
    - `kiro_monthly_request_limit` / `kiro_subscription_status_service_error` 在 `AUTO_SWITCH_TOOL=true` 时仍可通过 ordered fallback 选到 Codex
    - auto-switch 未开启时，Kiro availability failure 继续 stop/defer
    - fallback 目标若是 Codex，仍必须通过既有 no-account-ready guard
-6. cleanup-time one-shot `ensure-manager` recheck 仍保留，因此 tool-local failure 被写入 state 后，不会因为 watcher 漂移而卡在无人消费的中间态。
+6. live follow-up surfaced a separate Kiro launch blocker inside the same owner: when `AI_MODEL` is empty, the launcher had still been defaulting to stale `claude-opus-4.6`, causing `ai_exit_rc_1` before availability classification. The runtime now falls back to Kiro `model=auto`, so live repro returns to canonical `kiro_monthly_request_limit` instead of looping on invalid-model failure.
+7. cleanup-time one-shot `ensure-manager` recheck 仍保留，因此 tool-local failure 被写入 state 后，不会因为 watcher 漂移而卡在无人消费的中间态。
 
 ## Commands
 
@@ -24,7 +25,8 @@
 4. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
 5. `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
 6. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
-7. `./bin/governance-check`
+7. `bash docs/system/workspace/scripts/tests/test-tool-launchers-kiro-default-model`
+8. `./bin/governance-check`
 
 ## Residual Risk
 

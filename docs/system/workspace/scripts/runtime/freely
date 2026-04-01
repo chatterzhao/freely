@@ -1007,6 +1007,7 @@ runtime_default_model_for_tool() {
   local tool="$1"
   case "$tool" in
     codex) printf 'gpt-5.4\n' ;;
+    kiro-cli) printf 'auto\n' ;;
     *) printf '\n' ;;
   esac
 }
