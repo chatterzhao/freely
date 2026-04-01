@@ -10,6 +10,7 @@
 - 冻结 runtime-owned availability config：`AUTO_SWITCH_SLOT`、`AUTO_SWITCH_TOOL`、`AI_FALLBACK_TOOLS`
 - 保持 Codex same-tool recovery truth，并把它提升成通用 availability manager 的 first-hop invariant
 - 让 manager control plane 按配置顺序扫描 fallback tools，而不是硬编码 `kiro-cli -> codex`
+- cross-tool fallback 一旦开始，总是从 `AI_FALLBACK_TOOLS` 最左侧重新扫描；`AI_TOOL` / `LAST_ACTIVE_SLOT` 继续只承担 current tool/current slot 真相
 - cross-tool fallback 一律降级为 `fresh_with_handoff`，并在 all-tools-unavailable 时保留 earliest-reset waiting truth
 - 把 cleanup-time one-shot recheck 变成 teardown-aware：state 已写成 down/down 时，先等旧 supervisor 真的退出，再做 fallback / relaunch
 
@@ -22,6 +23,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-waits-for-supervisor-teardown-before-fallback`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-cross-tool-restarts-from-leftmost-priority`
 - `docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
 - `docs/system/workspace/scripts/tests/test-tool-launchers-kiro-default-model`
@@ -32,3 +34,4 @@
 
 - merge absorption into `develop`
 - one clean post-merge live confirmation on canonical manager runtime with ordered fallback, teardown-aware recheck, and explicit all-tools-unavailable truth
+- one clean post-merge live confirmation on canonical manager runtime with current-tool slot-first, then leftmost-priority cross-tool fallback, teardown-aware recheck, and explicit all-tools-unavailable truth
