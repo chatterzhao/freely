@@ -81,15 +81,13 @@ routing_policy:
 
 1. `I-20260331-1840-A`
 - title: Multi-tool availability manager governance
-- milestone_state: completed
-- phase_state: `completed`
+- milestone_state: committed
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews/20260331-multi-tool-auto-switch-v1-codex-fallback-verification.md`
-- completion_note: v1 ordered cross-tool fallback, Codex same-tool parity, and explicit all-tools-unavailable waiting truth are complete. All-tools unified slot parity moves to `I-20260401-0840-A`.
+- next_action: Keep this bounded v1 owner in verification until the develop-bound merge lands cleanly. This line now explicitly stops at ordered fallback v1 plus Codex parity; all-tools unified slot parity belongs to `I-20260401-0840-A`.
 
 1. `I-20260401-0840-A`
 - title: All-tools unified slot contract governance

@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260331-1840-A`
 - title: Multi-tool availability manager governance
-- phase_state: `completed`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 
 ## Current Slice
@@ -32,4 +32,5 @@
 
 ## Remaining
 
-- v1 slice is complete; follow-on unified slot work moves to `C-20260401-0840-A`
+- keep the bounded v1 owner in verification until the develop-bound merge lands cleanly
+- follow-on unified slot work moves to `C-20260401-0840-A` / `I-20260401-0840-A`

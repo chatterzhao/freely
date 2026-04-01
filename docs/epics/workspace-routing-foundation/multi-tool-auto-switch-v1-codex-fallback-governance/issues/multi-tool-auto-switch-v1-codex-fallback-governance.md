@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260331-1840-A`
 - title: Multi-tool availability manager governance
-- phase_state: `completed`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `multi-tool-auto-switch-v1-codex-fallback-governance`
