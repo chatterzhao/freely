@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance
+  - brainstorms: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/candidates.md
 - 20260329-2155--sensitive-local-artifact-ignore-governance
 - 20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle
 - 20260328-2105--resume-evidence-strength-and-false-positive-resume-governance
