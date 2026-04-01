@@ -446,7 +446,7 @@ def main() -> int:
     candidate_driven_evidence: Set[str] = set(touched_candidate_ids)
     issue_bound_evidence: Set[str] = set()
     issue_bound_issue_paths: Set[str] = set()
-    issue_bound_candidate_paths: Set[str] = set()
+    issue_bound_candidate_ids: Set[str] = set()
     progress_owner_issue_paths: Set[str] = set()
     review_owner_issue_paths: Set[str] = set()
 
@@ -455,11 +455,9 @@ def main() -> int:
         if issue and issue.source_candidate:
             issue_bound_evidence.add(issue.issue_id or issue.path)
             issue_bound_issue_paths.add(issue.path)
-            source_candidate_path = anchorless_source_candidate(issue.source_candidate)
-            if source_candidate_path:
-                issue_bound_candidate_paths.add(source_candidate_path)
             source_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
             if source_candidate:
+                issue_bound_candidate_ids.add(source_candidate.candidate_id)
                 candidate_driven_evidence.add(source_candidate.candidate_id)
 
     for progress in progress_records:
@@ -479,9 +477,6 @@ def main() -> int:
         issue_bound_evidence.add(owner_issue.issue_id or owner_issue.path)
         issue_bound_issue_paths.add(owner_issue.path)
         progress_owner_issue_paths.add(owner_issue.path)
-        source_candidate_path = anchorless_source_candidate(owner_issue.source_candidate)
-        if source_candidate_path:
-            issue_bound_candidate_paths.add(source_candidate_path)
         source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
         if not source_candidate:
             errors.append(
@@ -490,6 +485,7 @@ def main() -> int:
             )
             continue
 
+        issue_bound_candidate_ids.add(source_candidate.candidate_id)
         candidate_driven_evidence.add(source_candidate.candidate_id)
 
     for review in review_records:
@@ -504,9 +500,6 @@ def main() -> int:
         issue_bound_evidence.add(owner_issue.issue_id or owner_issue.path)
         issue_bound_issue_paths.add(owner_issue.path)
         review_owner_issue_paths.add(owner_issue.path)
-        source_candidate_path = anchorless_source_candidate(owner_issue.source_candidate)
-        if source_candidate_path:
-            issue_bound_candidate_paths.add(source_candidate_path)
         source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
         if not source_candidate:
             errors.append(
@@ -515,6 +508,7 @@ def main() -> int:
             )
             continue
 
+        issue_bound_candidate_ids.add(source_candidate.candidate_id)
         candidate_driven_evidence.add(source_candidate.candidate_id)
 
     if not candidate_driven_evidence:
@@ -538,15 +532,24 @@ def main() -> int:
             continue
 
         owner_path = normalize_scalar(candidate.promoted_issue_path or "")
-        candidate_is_bound_to_touched_issue = candidate.path in issue_bound_candidate_paths
+        candidate_is_directly_touched = candidate.path in touched_candidate_paths
+        candidate_is_bound_to_touched_issue = candidate.candidate_id in issue_bound_candidate_ids
         candidate_is_bound_to_touched_owner = bool(owner_path) and owner_path in issue_bound_issue_paths
+        candidate_is_relevant = (
+            candidate_is_directly_touched
+            or candidate_is_bound_to_touched_issue
+            or candidate_is_bound_to_touched_owner
+        )
         candidate_is_unresolved_pre_ibm = status in {"proposed", "needs_research", "blocked"}
         unresolved_metadata_fix_is_absorbed_by_governance_owner = (
-            candidate.path in touched_candidate_paths
+            candidate_is_directly_touched
             and candidate_is_unresolved_pre_ibm
             and governance_only_merge
             and bool(issue_bound_evidence)
         )
+
+        if not candidate_is_relevant and not unresolved_metadata_fix_is_absorbed_by_governance_owner:
+            continue
 
         if (
             not candidate_is_bound_to_touched_issue
