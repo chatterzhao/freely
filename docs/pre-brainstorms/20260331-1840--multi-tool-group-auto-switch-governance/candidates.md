@@ -34,7 +34,7 @@
     summary: `The feature direction is valid, but it is not yet safe to implement until continuity downgrade rules, control-plane invariants, and config precedence are frozen.`
     verdict: `needs_research`
 - status: `needs_research`
-- milestone: `M-20260306-workspace-routing-foundation`
+- milestone: `unassigned`
 - promoted_issue_path: `pending://issue-materialization`
 - session_refs:
   - tool: `codex`

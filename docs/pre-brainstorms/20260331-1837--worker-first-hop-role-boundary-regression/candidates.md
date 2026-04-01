@@ -34,7 +34,7 @@
 - status: needs_research
 - decision_reason: This is not a mere UX polish item. The feature-worktree worker crossed a frozen role boundary and produced manager-only artifacts. However, the exact repair owner is still ambiguous between prompt-generation and worker reentry semantics, so the safe next step is a focused research lifecycle rather than an immediate code patch.
 - promoted_issue_path: `pending://issue-materialization`
-- milestone: `M-20260306-workspace-routing-foundation`
+- milestone: `pending://milestone-binding`
 - next_action: Trace the worker prompt-generation path and the worker follow-on relaunch path together, then decide whether this becomes a same-family focused repair issue or two narrower runtime-facing fixes.
 - revisit_trigger: Revisit immediately if another worker lane writes manager-only artifacts, performs project-level patrol after completing delegated work, or if `MANAGER_MODE=false` prompts continue entering `lead-agent` without a clean worker-only second-hop boundary.
 - session_refs:
