@@ -1,7 +1,7 @@
 # Issue: multi-tool-auto-switch-v1-codex-fallback-governance
 
 - issue_id: `I-20260331-1840-A`
-- title: Multi-tool auto-switch v1 codex fallback governance
+- title: Multi-tool availability manager governance
 - phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
@@ -16,42 +16,39 @@
 
 ## Why
 
-Freely 现在已经有两条不对称的真相：
+Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都要求同一条恢复状态机：
 
-- `codex` 已有 canonical slot sweep / no-launch watchdog contract
-- `kiro-cli` 已能把月度限额与订阅校验失败分类成 tool-local availability failure
+- 先做当前工具内部的 slot / profile family 恢复
+- 当前工具 exhausted 后，再按项目定义的工具顺序尝试下一个工具
+- 所有工具都不可用时，保持 no-launch，并把最早恢复提示写成显式控制面真相
 
-但当前 manager control plane 仍只认单一 `AI_TOOL`，所以 `kiro-cli` 故障后只会停下，不会在开启 auto-switch 时切到可用的 `codex`。v1 要补的是这条最窄、最安全的桥，而不是一口气做泛化的多工具编排。
+后来物化时把这条 contract 收窄成了 `kiro-cli -> codex` bridge。当前 owner 要把它抬回原始设计，但保留 Codex watchdog 的 probe-first / shared-lock / no-launch invariants。
 
 ## Scope
 
-1. 冻结 runtime-owned fallback config：`AUTO_SWITCH_SLOT`、`AUTO_SWITCH_TOOL`、`AI_FALLBACK_TOOLS`。
-2. 保持 `AI_TOOL` 仍是单一 active tool pointer；v1 不改成完整 tool-group state machine。
-3. 保持 same-tool automatic slot recovery 只对已存在 canonical truth 的 `codex` 生效。
-4. 让 `ensure-manager` 在以下条件下把 protected manager 项目从 `kiro-cli` 切到 `codex`：
-   - 项目仍 `desired=running`
-   - 当前没有活着的 manager supervisor / AI
-   - `AUTO_SWITCH_TOOL=true`
-   - 上次退出是 `kiro_monthly_request_limit` 或 `kiro_subscription_status_service_error`
-   - Codex readiness 成功
-5. 冻结 cross-tool continuity downgrade：v1 一律强制 `fresh_with_handoff`，不保留 resume 语义。
+1. 冻结 runtime-owned availability config：`AUTO_SWITCH_SLOT`、`AUTO_SWITCH_TOOL`、`AI_FALLBACK_TOOLS`。
+2. 保持 `AI_TOOL` 仍是 active tool pointer，但把 `AI_FALLBACK_TOOLS` 变成真正的 ordered recovery list，而不是单一 target hint。
+3. 保持 same-tool automatic recovery 优先于 cross-tool fallback；当前已有 canonical truth 的 `codex` 必须先走既有 watchdog contract。
+4. 让 `ensure-manager` 在当前工具 exhausted 或 tool-local failure 后，按配置顺序尝试下一个工具，而不是只做 `kiro-cli -> codex`。
+5. 当所有工具都不可用时，保持 no-launch，并把 earliest-reset target 写成 machine-readable control-plane truth。
+6. 冻结 cross-tool continuity downgrade：一律强制 `fresh_with_handoff`，不保留 resume 语义。
 
 ## Non-Goals
 
 1. 不把 `tools.md` 的任务路由优先级直接复用成 runtime fallback order。
-2. 不让 `cc`、`cc-use-codex-cli`、`iflow` 进入自动 fallback v1。
-3. 不把 host/network-global failures 误当成 cross-tool fallback 触发器。
-4. 不把 worker lane、多工具 generic slot family、或完整 tool-group persisted state 一起塞进本 owner。
+2. 不把 host/network-global failures 误当成 cross-tool fallback 触发器。
+3. 不要求所有工具在本轮都拥有和 Codex 等价的 probe/slot truth；能力缺口要显式标注，不能假装等价。
+4. 不把 worker lane 或完整结构化 tool-group config 文件迁移一起塞进本 owner。
 
 ## Acceptance
 
 1. `write_config()` 为新项目写出 `AUTO_SWITCH_SLOT`、`AUTO_SWITCH_TOOL`、`AI_FALLBACK_TOOLS` 默认字段。
-2. `ensure-manager` 每轮都重新读取项目 config，因此 control plane 可以消费最新 active tool truth。
-3. 当 manager 项目上次因 `kiro_monthly_request_limit` 或 `kiro_subscription_status_service_error` 退出，且 `AUTO_SWITCH_TOOL=true` 时，`ensure-manager` 会把 config 中的 active tool 切到 `codex`，再走既有 Codex readiness gate。
-4. 上述 fallback 会写出 machine-readable runtime event，包含 `previous_tool`、`active_tool`、`reason` 与 `launch_kind=fresh_with_handoff`。
-5. 现有 Kiro defer contract 不回退：当 auto-switch 未开启时，runtime 仍在本地 stop 并 defer 给 control plane。
-6. 现有 Codex no-account-ready guard 不回退：Codex readiness 失败时，`ensure-manager` 仍跳过 launch。
-7. manager supervisor 在 `desired=running` 下退出后，必须重新触发一次 control-plane recheck；不能把 `kiro_monthly_request_limit` 留在已写入 state 但无人消费的中间态。
+2. `ensure-manager` 每轮都重新读取 project config，因此 control plane 可以消费最新 active tool truth。
+3. 当当前工具具备 canonical same-tool recovery truth 时，control plane 必须先走同工具恢复；Codex 继续受既有 watchdog readiness gate 约束。
+4. 若 same-tool recovery exhausted，且 `AUTO_SWITCH_TOOL=true`，`ensure-manager` 会按 `AI_FALLBACK_TOOLS` 的顺序尝试下一个工具，而不是硬编码 `codex`。
+5. cross-tool fallback 必须显式记录 `previous_tool`、`active_tool`、`reason` 与 `launch_kind=fresh_with_handoff`。
+6. 当所有配置中的工具都不可用时，manager launch 继续 blocked，并写出 machine-readable waiting event 与 earliest-reset hint。
+7. 现有 Kiro defer contract 不回退：当 auto-switch 未开启时，runtime 仍在本地 stop 并 defer 给 control plane。
 
 ## Completion
 
@@ -60,22 +57,28 @@ Freely 现在已经有两条不对称的真相：
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-kiro-to-codex-fallback`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
 - `docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
-- live validation on `develop` with local `kiro-cli` unavailable and `AUTO_SWITCH_TOOL=true`
+- live validation on `develop` with ordered fallback enabled and at least one non-current tool available
 
 ## Verification
 
 - Focused regressions:
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-kiro-to-codex-fallback`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
   - `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
 - Governance:
   - `./bin/governance-check`
 - Live repro:
-  - Start on `develop`, confirm `kiro_monthly_request_limit`, then verify the manager watchdog survives supervisor exit long enough to rewrite `AI_TOOL=codex` and emit `tool_auto_switch_selected`
+  - Start on `develop`, force current-tool unavailability, and verify manager control plane first consumes same-tool recovery truth, then walks the configured fallback order, and finally emits waiting truth instead of blind relaunch when every tool is unavailable
 
 ## Next
 
-- 若 v1 合并后继续验证稳定，再决定是否把 `AI_FALLBACK_TOOLS` 扩到 `cc` / `iflow` 或完整 tool-group persisted state。
+- 若后续要让 `kiro-cli` / `iflow` / `cc` 拥有和 Codex 等价的 same-tool probe truth，需要再开生命周期冻结 per-tool capability surface。
 - 若要支持跨工具保留 resume 语义，必须先新开 lifecycle 冻结 continuity equivalence contract；本 owner 不预支这条能力。

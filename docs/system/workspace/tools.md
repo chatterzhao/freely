@@ -11,10 +11,12 @@
 ## Runtime Availability Note
 
 - `tools.md` 继续只定义任务路由与工具选择参考，不直接充当 runtime availability fallback 顺序真源。
-- 当前 runtime-owned auto-switch v1 仅支持：
-  - `codex` 的 same-tool slot recovery
-  - 在 project config 开启 `AUTO_SWITCH_TOOL` 时，把 `kiro-cli` 的 tool-local availability failure 降级到 `codex + fresh_with_handoff`
-- 更广义的 tool-group fallback order 由 project config 中的 `AI_FALLBACK_TOOLS` 承接，而不是复用本文件的 routing priority。
+- 当前 runtime-owned availability manager 使用 project config 中的 `AI_FALLBACK_TOOLS` 作为 ordered recovery list，而不是复用本文件的 routing priority。
+- canonical recovery order 是：
+  - 同工具 slot / profile recovery first
+  - same-tool exhausted 后再按 `AI_FALLBACK_TOOLS` 尝试其他工具
+  - 全部不可用时保持 no-launch，并把 earliest-reset target 写成显式 waiting truth
+- 当前已存在 canonical same-tool watchdog truth 的工具仍主要是 `codex`；其他工具若缺 probe / slot family truth，会以较弱 readiness contract 参与 cross-tool fallback，但不能冒充与 Codex 等价。
 
 ## Available Tools
 

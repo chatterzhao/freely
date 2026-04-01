@@ -80,14 +80,14 @@ routing_policy:
 - next_action: Keep the new placement-correctness owner in verification on `feature/milestone-candidate-placement-gate-20260331` until manager merge review absorbs the gate into canonical `develop`. This slice is complete for active-milestone placement enforcement; broader scheduling or auto-rehome mechanisms stay out of scope.
 
 1. `I-20260331-1840-A`
-- title: Multi-tool auto-switch v1 codex fallback governance
+- title: Multi-tool availability manager governance
 - milestone_state: committed
 - phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md`
-- next_action: Keep the v1 owner in verification on `feature/multi-tool-auto-switch-governance-20260331` until manager merge review absorbs the runtime/config fallback slice into canonical `develop`. Generic tool groups and broader cross-tool scheduling remain out of scope.
+- next_action: Keep this owner in verification on `feature/multi-tool-availability-manager-20260331` until merge review absorbs the generalized availability-manager slice into canonical `develop`, then run one clean live confirmation on the protected manager runtime.
 
 ### completed_issues
 
@@ -619,15 +619,15 @@ routing_policy:
 ### candidate_issues
 
 1. `C-20260331-1840-A`
-- title: Multi-tool auto-switch v1 codex fallback governance
+- title: Materialize generic multi-tool availability manager with same-tool-first recovery
 - milestone_state: candidate
 - phase_state: `todo_ibm`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md`
-- next_action: This candidate is now materialized as `I-20260331-1840-A`. Keep broader generic tool-group fallback questions out of the v1 owner; the current execution slice is limited to Codex same-tool recovery plus `kiro-cli -> codex` control-plane fallback.
-- revisit_trigger: Re-open candidate-level research only if v1 proves insufficient and generic multi-tool group persistence or non-Codex fallback targets need a new lifecycle.
+- next_action: This candidate is now materialized as `I-20260331-1840-A`. The active owner restores same-tool-first recovery, ordered `AI_FALLBACK_TOOLS` scanning, and explicit all-tools-unavailable waiting truth while keeping per-tool capability gaps explicit.
+- revisit_trigger: Re-open candidate-level research only if follow-on work needs structured tool-group persistence, richer non-Codex same-tool watchdog truth, or cross-tool resume semantics.
 
 2. `C-20260330-2318-A`
 - title: Live-status false already-running-attach regression
