@@ -89,6 +89,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md`
 - next_action: Keep this owner in verification on `feature/unified-slot-contract-governance-20260401` until merge review absorbs the unified slot contract into `develop`; focused regressions and live `kiro-cli -> codex dead-slot -> later usable Codex slot` validation are complete.
 
+1. `I-20260330-2358-A`
+- title: Runtime network failure taxonomy and bounded recovery governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/candidates.md`
+- next_action: Keep this owner in verification until the runtime classifier, bounded retry/cooldown guard, focused network regressions, and truth-source updates merge into `develop`. This slice intentionally stays narrow: classify execution-time network failures, retry in place on the current tool/slot, and block slot/tool fallback for network-local failures.
+
 ### completed_issues
 
 1. `I-20260325-0333-B`

@@ -18,6 +18,10 @@
   - same-tool exhausted 后再从 `AI_FALLBACK_TOOLS` 最左侧开始重新扫描其他工具，而不是把 current tool 隐式插到最前
   - 每进入一个 fallback tool，先继续扫该工具自己的 slot family，再决定是否进入下一个工具
   - 全部不可用时保持 no-launch，并把 earliest-reset target 写成显式 `tool + slot` waiting truth
+- execution-time network taxonomy 也是 runtime-owned truth：
+  - `oauth_unreachable` 继续只表示 preflight / inventory 阶段的 launch blocker
+  - `execution_network_transient`、`execution_network_persistent`、`proxy_config_invalid` 表示运行中的 network-local failure
+  - 这三类 network-local failure 默认不触发 slot rotation 或 cross-tool fallback，而是在当前 `tool + slot` 上执行 bounded retry / cooldown
 - 当前已存在 canonical probe-first / switch-lock / no-launch watchdog truth 的工具仍主要是 `codex`；其他工具现已进入统一 slot inventory / current-slot scheduler，但若缺 probe parity，仍以较弱 readiness contract 参与 slot-first recovery，不能冒充与 Codex 等价。
 
 ## Available Tools

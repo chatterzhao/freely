@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-network-failure-blocks-fallback.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME="$TMP_DIR/home"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260401-0001--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$HOME/.ai-auth/codex-slot-1"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260401-0001--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260401-0001--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260401-0001--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AUTO_SWITCH_TOOL="true"
+AUTO_SWITCH_SLOT="true"
+AI_FALLBACK_TOOLS="iflow,codex"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+SUPERVISOR_STATE="down"
+AI_STATE="down"
+LAST_EXIT_REASON="execution_network_transient"
+EOF
+
+# shellcheck disable=SC1090
+HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+runtime_write_tool_current_slot "codex" "slot-1"
+persist_execution_network_state "$PROJECT" "execution_network_transient" 1 "$(( $(date +%s) + 120 ))" "$(date +%s)"
+
+LAUNCH_LOG="$TMP_DIR/launch.log"
+
+valid_supervisor_pid_for_project() { return 1; }
+discover_supervisor_pid() { return 0; }
+manager_ai_pid_for_project() { return 0; }
+manager_supervisor_pid_for_project() { return 0; }
+recover_stalled_manager_ai_if_needed() { return 1; }
+ensure_codex_slot_ready_for_manager() {
+  runtime_write_tool_current_slot "codex" "slot-2"
+  return 0
+}
+tool_binary_available_for_auto_recovery() { return 0; }
+manager_runtime_recover_workers_if_needed() { return 0; }
+launch_manager_supervisor() {
+  printf '%s|%s\n' "$AI_TOOL" "$(runtime_read_tool_current_slot "$1" "$AI_TOOL")" >>"$LAUNCH_LOG"
+}
+log_info() { :; }
+log_warn() { :; }
+log_error() { :; }
+
+HOME="$HOME" ensure_manager_once "$PROJECT" >/dev/null
+
+[[ ! -f "$LAUNCH_LOG" ]] || {
+  echo "[FAIL] bounded network retry window should block manager relaunch" >&2
+  cat "$LAUNCH_LOG" >&2
+  exit 1
+}
+grep -q '^AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] network failure must not cross-tool fallback during backoff window" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+[[ "$(runtime_read_tool_current_slot "$PROJECT" "codex")" == "slot-1" ]] || {
+  echo "[FAIL] network failure must not same-tool switch slots during backoff window" >&2
+  exit 1
+}
+if grep -q 'event=tool_auto_switch_selected' "$PROJECT/.freely/logs/runtime-events.log" 2>/dev/null; then
+  echo "[FAIL] network recovery gate should not emit slot/tool switch events while launch is blocked" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+fi
+
+echo "[PASS] ensure-manager blocks slot and tool fallback while bounded network backoff is active"

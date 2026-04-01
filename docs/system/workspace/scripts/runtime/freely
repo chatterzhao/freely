@@ -1166,10 +1166,19 @@ tool_failure_scope_for_auto_recovery() {
     kiro-cli:kiro_monthly_request_limit|kiro-cli:kiro_subscription_status_service_error)
       printf 'slot_local\n'
       ;;
+    *:execution_network_transient|*:execution_network_persistent|*:proxy_config_invalid)
+      printf 'network_local\n'
+      ;;
     *)
       printf 'unknown\n'
       ;;
   esac
+}
+
+tool_failure_allows_same_tool_slot_recovery() {
+  local tool="$1" failure_reason="$2" scope
+  scope="$(tool_failure_scope_for_auto_recovery "$tool" "$failure_reason")"
+  [[ "$scope" == "slot_local" ]]
 }
 
 tool_failure_allows_cross_tool_auto_recovery() {
@@ -1315,6 +1324,7 @@ prepare_manager_same_tool_slot_recovery_if_needed() {
   [[ -z "$supervisor_pid" && -z "$ai_pid" ]] || return 1
 
   if [[ -n "$last_exit_reason" ]]; then
+    tool_failure_allows_same_tool_slot_recovery "$current_tool" "$last_exit_reason" || return 1
     if tool_select_ready_slot_for_manager_auto_recovery "$project" "$current_tool" "after_failure"; then
       record_tool_auto_switch_event "$project" "$current_tool" "$current_tool" "${TOOL_AUTO_RECOVERY_SLOT:-}" "same_tool_slot_recovery"
       return 0
@@ -2228,6 +2238,18 @@ log_has_auth_failure() {
   rg -qi '401|402 payment required|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired' "$log_file"
 }
 
+log_has_proxy_config_invalid() {
+  local log_file="$1"
+  [[ -f "$log_file" ]] || return 1
+  rg -qi 'FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set|OAuth inventory refresh failed even though Freely proxy config is explicit' "$log_file"
+}
+
+log_has_execution_network_failure() {
+  local log_file="$1"
+  [[ -f "$log_file" ]] || return 1
+  rg -qi 'curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error|502|503|504' "$log_file"
+}
+
 log_has_kiro_monthly_request_limit() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
@@ -2250,6 +2272,137 @@ kiro_availability_reason_from_log() {
     printf 'kiro_subscription_status_service_error\n'
     return 0
   fi
+}
+
+execution_network_state_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/execution-network-recovery.env"
+}
+
+execution_network_budget() {
+  local value="${FREELY_EXECUTION_NETWORK_RETRY_BUDGET:-2}"
+  [[ "$value" =~ ^[0-9]+$ ]] || value=2
+  printf '%s\n' "$value"
+}
+
+execution_network_window_secs() {
+  local value="${FREELY_EXECUTION_NETWORK_WINDOW_SECS:-300}"
+  [[ "$value" =~ ^[0-9]+$ ]] || value=300
+  printf '%s\n' "$value"
+}
+
+execution_network_transient_base_delay_secs() {
+  local value="${FREELY_EXECUTION_NETWORK_TRANSIENT_BASE_DELAY_SECS:-5}"
+  [[ "$value" =~ ^[0-9]+$ ]] || value=5
+  printf '%s\n' "$value"
+}
+
+execution_network_transient_max_delay_secs() {
+  local value="${FREELY_EXECUTION_NETWORK_TRANSIENT_MAX_DELAY_SECS:-60}"
+  [[ "$value" =~ ^[0-9]+$ ]] || value=60
+  printf '%s\n' "$value"
+}
+
+execution_network_persistent_cooldown_secs() {
+  local value="${FREELY_EXECUTION_NETWORK_PERSISTENT_COOLDOWN_SECS:-300}"
+  [[ "$value" =~ ^[0-9]+$ ]] || value=300
+  printf '%s\n' "$value"
+}
+
+proxy_config_invalid_retry_secs() {
+  local value="${FREELY_PROXY_CONFIG_INVALID_RETRY_SECS:-60}"
+  [[ "$value" =~ ^[0-9]+$ ]] || value=60
+  printf '%s\n' "$value"
+}
+
+persist_execution_network_state() {
+  local project="$1" reason="$2" failure_count="$3" next_retry_epoch="$4" last_failure_epoch="$5"
+  local state_file
+  state_file="$(execution_network_state_file "$project")"
+  mkdir -p "$(dirname "$state_file")"
+  cat >"$state_file" <<EOF
+EXECUTION_NETWORK_REASON="$reason"
+EXECUTION_NETWORK_FAILURE_COUNT="$failure_count"
+EXECUTION_NETWORK_NEXT_RETRY_EPOCH="$next_retry_epoch"
+EXECUTION_NETWORK_LAST_FAILURE_EPOCH="$last_failure_epoch"
+EOF
+}
+
+clear_execution_network_state() {
+  local project="$1"
+  rm -f "$(execution_network_state_file "$project")"
+}
+
+runtime_network_failure_reason_from_log() {
+  local project="$1" log_file="$2"
+  local state_file now_epoch last_epoch last_count next_retry_epoch reason failure_count window_secs budget base_delay max_delay backoff cooldown
+  [[ -f "$log_file" ]] || return 1
+
+  if log_has_proxy_config_invalid "$log_file"; then
+    now_epoch="$(date +%s)"
+    next_retry_epoch="$((now_epoch + $(proxy_config_invalid_retry_secs)))"
+    persist_execution_network_state "$project" "proxy_config_invalid" 1 "$next_retry_epoch" "$now_epoch"
+    printf 'proxy_config_invalid\n'
+    return 0
+  fi
+
+  log_has_execution_network_failure "$log_file" || return 1
+
+  state_file="$(execution_network_state_file "$project")"
+  last_epoch=0
+  last_count=0
+  if [[ -f "$state_file" ]]; then
+    unset EXECUTION_NETWORK_REASON EXECUTION_NETWORK_FAILURE_COUNT EXECUTION_NETWORK_NEXT_RETRY_EPOCH EXECUTION_NETWORK_LAST_FAILURE_EPOCH
+    # shellcheck disable=SC1090
+    source "$state_file"
+    last_epoch="${EXECUTION_NETWORK_LAST_FAILURE_EPOCH:-0}"
+    last_count="${EXECUTION_NETWORK_FAILURE_COUNT:-0}"
+  fi
+
+  now_epoch="$(date +%s)"
+  window_secs="$(execution_network_window_secs)"
+  if [[ "$last_epoch" =~ ^[0-9]+$ ]] && (( now_epoch - last_epoch <= window_secs )); then
+    failure_count=$((last_count + 1))
+  else
+    failure_count=1
+  fi
+
+  budget="$(execution_network_budget)"
+  if (( failure_count > budget )); then
+    cooldown="$(execution_network_persistent_cooldown_secs)"
+    next_retry_epoch="$((now_epoch + cooldown))"
+    reason="execution_network_persistent"
+  else
+    base_delay="$(execution_network_transient_base_delay_secs)"
+    max_delay="$(execution_network_transient_max_delay_secs)"
+    backoff=$((base_delay << (failure_count - 1)))
+    if (( backoff > max_delay )); then
+      backoff="$max_delay"
+    fi
+    next_retry_epoch="$((now_epoch + backoff))"
+    reason="execution_network_transient"
+  fi
+
+  persist_execution_network_state "$project" "$reason" "$failure_count" "$next_retry_epoch" "$now_epoch"
+  printf '%s\n' "$reason"
+}
+
+execution_network_launch_block_active() {
+  local project="$1" failure_reason="$2"
+  local state_file now_epoch next_retry_epoch
+  case "$failure_reason" in
+    execution_network_transient|execution_network_persistent|proxy_config_invalid) ;;
+    *) return 1 ;;
+  esac
+  state_file="$(execution_network_state_file "$project")"
+  [[ -f "$state_file" ]] || return 1
+  unset EXECUTION_NETWORK_REASON EXECUTION_NETWORK_FAILURE_COUNT EXECUTION_NETWORK_NEXT_RETRY_EPOCH EXECUTION_NETWORK_LAST_FAILURE_EPOCH
+  # shellcheck disable=SC1090
+  source "$state_file"
+  next_retry_epoch="${EXECUTION_NETWORK_NEXT_RETRY_EPOCH:-0}"
+  [[ "$next_retry_epoch" =~ ^[0-9]+$ ]] || return 1
+  now_epoch="$(date +%s)"
+  (( now_epoch < next_retry_epoch ))
 }
 
 log_has_codex_usage_limit() {
@@ -4642,6 +4795,7 @@ launch_manager_supervisor() {
   local project="$1"
   local launch_bin
   launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
+  clear_execution_network_state "$project"
   nohup bash "$launch_bin" start --project "$project" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
 }
@@ -4837,7 +4991,7 @@ restart_manager_supervisor_preserving_handoff() {
 
 ensure_manager_once() {
   local project="$1"
-  local run_dir sup_pid_file current_pid current_ai_pid same_tool_blocked
+  local run_dir sup_pid_file current_pid current_ai_pid same_tool_blocked desired_state last_exit_reason
 
   load_config "$project"
   run_dir="$(run_dir_for_project "$project")"
@@ -4855,6 +5009,20 @@ ensure_manager_once() {
   fi
   if [[ -n "$current_pid" ]]; then
     current_pid="$(manager_recheck_wait_for_supervisor_teardown_if_needed "$project" "$current_pid")"
+  fi
+
+  desired_state="unknown"
+  last_exit_reason=""
+  if [[ -f "$(workcell_state_file "$project")" ]]; then
+    unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
+    # shellcheck disable=SC1090
+    source "$(workcell_state_file "$project")"
+    desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+    last_exit_reason="${LAST_EXIT_REASON:-}"
+  fi
+  if [[ "$desired_state" == "running" ]] && execution_network_launch_block_active "$project" "$last_exit_reason"; then
+    log_warn "manager bootstrap paused by bounded network-recovery gate (reason=${last_exit_reason})"
+    return 0
   fi
 
   same_tool_blocked="0"
@@ -6176,7 +6344,7 @@ start_project_runtime() {
     local codex_mcp_used codex_mcp_thread_id codex_mcp_jsonl_path
     local claude_jsonl_path
     local primary_rate_limit_used_percent primary_rate_limit_resets_at secondary_rate_limit_used_percent secondary_rate_limit_resets_at next_restart_delay
-    local active_slot active_cooldown_identity slot_switch_reason
+    local active_slot active_cooldown_identity slot_switch_reason network_failure_reason
     local rate_limit_reason rate_limit_reset_at
     local dirty_entries worktree_total worktree_dirty summary
     local launch_resume_target
@@ -6303,6 +6471,7 @@ start_project_runtime() {
     else
       ROUTE_ONLY_STREAK_CURRENT=0
     fi
+    network_failure_reason=""
     if [[ "$AI_TOOL" == "codex" ]]; then
       rate_limit_reason="$(codex_rate_limit_reason_from_usage "${primary_rate_limit_used_percent:-}" "${secondary_rate_limit_used_percent:-}")"
       rate_limit_reset_at="$(codex_rate_limit_reset_at_for_reason "${rate_limit_reason:-}" "${primary_rate_limit_resets_at:-}" "${secondary_rate_limit_resets_at:-}")"
@@ -6327,6 +6496,11 @@ start_project_runtime() {
         LAST_SLOT_SWITCH_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
       fi
     fi
+    if [[ -z "$slot_switch_reason" && -z "$rate_limit_reason" ]]; then
+      network_failure_reason="$(runtime_network_failure_reason_from_log "$PROJECT_ROOT" "$cycle_log" || true)"
+    else
+      clear_execution_network_state "$PROJECT_ROOT"
+    fi
 
     local restart_signal_reason active_process_count now_epoch observe_delay restart_window_stats restart_window_count restart_window_peak
     restart_signal_reason=""
@@ -6342,7 +6516,7 @@ start_project_runtime() {
     fi
 
     write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}"
-    LAST_WORKCELL_EXIT_REASON="${slot_switch_reason:-${rate_limit_reason:-ai_exit_rc_${rc}}}"
+    LAST_WORKCELL_EXIT_REASON="${slot_switch_reason:-${rate_limit_reason:-${network_failure_reason:-ai_exit_rc_${rc}}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     append_runtime_event "$project" "ai_cycle_finished" \
       "supervisor_pid=$$" \
@@ -6360,6 +6534,7 @@ start_project_runtime() {
       "route_only_handoff=$route_only_handoff" \
       "slot_switch_reason=${slot_switch_reason:-none}" \
       "rate_limit_reason=${rate_limit_reason:-none}" \
+      "network_failure_reason=${network_failure_reason:-none}" \
       "exit_reason=$LAST_WORKCELL_EXIT_REASON"
 
     log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, secondary_rate_limit_used_percent=${secondary_rate_limit_used_percent:-unavailable}, secondary_rate_limit_resets_at=${secondary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
