@@ -60,6 +60,12 @@
 - 当前 milestone 已经确定不会消费它，但也没有后移到更合适的 active milestone，或显式标记为 `dropped`
 - 主管应将其分流给 `milestone-planning-state-maintenance` 或新的 pre-brainstorm/materialization worker，而不是继续让它停留在静态可见状态
 
+10. `develop push followthrough drift`
+- canonical `develop` 本地已经领先 tracked remote
+- 但没有显式 defer reason，或 defer window 长期未被重新消费
+- 主管应将其视为 `manager-owned` 的 standing-source followthrough，而不是把本地 merge 误判为远端 canonical closure
+- 若当前只是合法的 `post_merge_acceptance` / cleanup window，应要求留下结构化 defer reason 与下一跳 followthrough，再决定是否 push / 继续验收 / cleanup
+
 ## Trigger Model
 
 主管 patrol 不应被理解成只有单一轮询入口。

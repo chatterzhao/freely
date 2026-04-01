@@ -680,7 +680,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260401-0840-A`. The active owner absorbs unified slot inventory, current-slot truth, generic slot-first scheduling, and earliest tool+slot waiting truth.
 - revisit_trigger: Re-open candidate-level research only if generic slot inventory proves insufficient and a structured auth-material schema is required.
 
-2. `C-20260330-2318-A`
+3. `C-20260330-2318-A`
 - title: Live-status false already-running-attach regression
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -964,6 +964,17 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`, `docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md`
 - next_action: 保持当前 research worktree 作为唯一写入 lane，完成 merge judgement 与写回；在补丁吸收到 `develop` 前，不恢复 pre-fix stalled dogfood runtime
+
+2. `I-20260401-1035-A`
+- title: Materialize develop push-pending governance after protected-branch merge
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/candidates.md`
+- next_action: The first bounded slice is implemented and verified locally. Next step is merge judgment plus write-back, not more scope expansion inside this lane.
+- revisit_trigger: Re-open candidate-level research only if `develop`-scoped push debt proves too narrow and the state model must expand to other protected branch families.
 
 ### candidate_issues
 

@@ -54,6 +54,7 @@
   - 提供 `status` family 聚合入口，可切 `baseline / live / fleet`
   - 提供 `live-status` 当前态监督视图，承接 day-1 `current-state plane`
   - 提供 `fleet-status` 项目级 worktree 监督视图，承接 day-1 `fleet plane`
+  - 提供 `develop-push` followthrough truth 的读取 / defer / clear 入口，供主管在 merge 后显式记录合法延迟窗口
   - 两者只镜像最小 acceptance 摘要与 shared deep refs，不替代 artifact plane 上的 acceptance evidence 真相
   - 根目录 `bin/freely` 只是投影包装层
 - `worktree/*`
@@ -67,7 +68,7 @@
   - 路由、监控、worktree、merge 等脚本测试真源
 - `worktree/wt-fleet-status`
   - 以项目级视图展示所有 worktree 的 branch / dirty / checkpoint / runtime 状态
-  - 同时暴露 `desired runtime` / `role` / `exit reason`，供主管判断哪些工位是正常冻结，哪些是应运行但已掉线
+  - 同时暴露 `desired runtime` / `role` / `exit reason`，以及 canonical `develop` 的 push followthrough 摘要，供主管判断哪些工位是正常冻结，哪些是应运行但已掉线
 
 ## 输入面
 

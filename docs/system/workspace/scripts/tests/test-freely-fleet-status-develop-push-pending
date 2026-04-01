@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-fleet-status-develop-push.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+WT="$WT_ROOT/feature-demo"
+REMOTE="$TMP_DIR/remote.git"
+
+mkdir -p "$REPO" "$WT_ROOT"
+git init -q -b develop "$REPO"
+git -C "$REPO" config user.name tester
+git -C "$REPO" config user.email tester@example.com
+
+mkdir -p "$REPO/docs" "$REPO/.freely/run"
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+echo base >"$REPO/README.md"
+git -C "$REPO" add README.md
+git -C "$REPO" commit -q -m "init"
+git init -q --bare "$REMOTE"
+git -C "$REPO" remote add origin "$REMOTE"
+git -C "$REPO" push -q -u origin develop
+
+git -C "$REPO" worktree add -q -b feature/demo "$WT" develop
+
+echo local >"$REPO/local.txt"
+git -C "$REPO" add local.txt
+git -C "$REPO" commit -q -m "local merge result"
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$REPO")"
+printf '%s\n' "$OUTPUT" | grep -q 'develop'
+printf '%s\n' "$OUTPUT" | grep -q 'develop_push'
+printf '%s\n' "$OUTPUT" | grep -q 'push_pending ahead=1'
+printf '%s\n' "$OUTPUT" | grep -q 'feature/demo'
+
+echo "[PASS] freely fleet-status mirrors develop push followthrough drift"

@@ -29,6 +29,7 @@
 2. 若本轮是主管被 runtime 重新激活后的第一轮，先做一轮 fleet patrol，而不是被动等待下一条 signal：
    - `live-status -> fleet-status -> interruption / milestone / issue / progress / recovery / relevant pre-brainstorm`
    - 主动检查 `candidate stuck / phase orphaned / completion without closure / source drift`
+   - 若 canonical `develop` 本地领先 tracked remote，还要判断这是合法的 `post_merge_acceptance` defer window，还是已经悬空的 push followthrough drift
    - 对 milestone 里的 unresolved candidate，不只检查“是否可见”，还要检查它是否处在正确且仍 active 的消费队列
    - 把发现结果加工为 `ownership + restart_point + next_action`
 3. 识别异常并给出清晰的所有权判断：

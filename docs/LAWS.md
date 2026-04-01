@@ -31,6 +31,7 @@
 3. `main/develop/test-pre-merge-*` 保持 add/commit 禁止；`test-pre-merge-*` 还必须禁止 push。
 4. `develop` 合并前，`TEST`（含集成验收）通过；若走 `test-pre-merge-*` 路径，验证批次必须可追溯，且 `develop` 只吸收来源 `feature/*` 的 replay，不直接吸收测试批次。
 4b. `test-pre-merge-*` 只承担主线前的临时验证职责，不承担“在 `develop` 上先预测试”的替代语义；需要主线前验证时，应进入新的 `test-pre-merge-*` 批次，需要主线后真实环境验收时，才进入 `develop` 的 completion verification。
+4d. `develop` 在本地 merge 后允许存在短暂的 post-merge acceptance / cleanup followthrough 窗口；但若本地 `develop` 已领先其 tracked remote，这段窗口必须以显式的 status / patrol truth 暴露，不得静默假装已经完成远端 canonical followthrough。
 4a. 当 issue 已有 `pre-tests.md` 时，develop 合并 gate 默认优先看其中定义的 integration / acceptance evidence；代码评审完成度不得替代这层验收。
 4c. `pre-tests.md` 若不能恢复 acceptance contract，则不得被视为“测试已定义”。最低质量线至少包括：
    - acceptance target

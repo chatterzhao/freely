@@ -437,6 +437,9 @@
 - 20260328-0335--operator-stop-runtime-stall-recovery-semantics
   - brainstorms: docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/brainstorms.md
   - candidates: docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/candidates.md
+- 20260401-1035--develop-push-pending-guard-governance
+  - brainstorms: docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

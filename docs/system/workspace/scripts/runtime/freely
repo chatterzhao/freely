@@ -45,6 +45,9 @@ Usage:
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]
   freely fleet-status [--project <abs_path>]
+  freely develop-push status [--project <abs_path>]
+  freely develop-push defer [--project <abs_path>] --reason <post_merge_acceptance|cleanup_followthrough|remote_delivery_hold> [--note <text>]
+  freely develop-push clear [--project <abs_path>]
   freely stop [--project <abs_path>]
 
 AI mode:
@@ -2576,6 +2579,100 @@ preemption_state_file() {
 manager_worker_launch_state_file() {
   local project="$1"
   printf '%s/run/manager-worker-launch-state.env\n' "$(state_dir "$project")"
+}
+
+develop_push_followthrough_state_file() {
+  local project="$1"
+  printf '%s/run/develop-push-followthrough.env\n' "$(state_dir "$project")"
+}
+
+develop_push_defer_reason_is_valid() {
+  local reason="${1:-}"
+  case "$reason" in
+    post_merge_acceptance|cleanup_followthrough|remote_delivery_hold) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+develop_push_followthrough_upstream_for_project() {
+  local project="$1"
+  git -C "$project" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true
+}
+
+write_develop_push_followthrough_state() {
+  local project="$1" reason="$2" note="${3:-}"
+  local state_file updated_at
+  state_file="$(develop_push_followthrough_state_file "$project")"
+  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  mkdir -p "$(dirname "$state_file")"
+  cat >"$state_file" <<EOF
+DEVELOP_PUSH_DEFER_REASON="$reason"
+DEVELOP_PUSH_DEFER_NOTE="$note"
+DEVELOP_PUSH_DEFER_UPDATED_AT="$updated_at"
+EOF
+}
+
+clear_develop_push_followthrough_state() {
+  local project="$1"
+  rm -f "$(develop_push_followthrough_state_file "$project")"
+}
+
+develop_push_followthrough_snapshot_for_project() {
+  local project="$1"
+  local branch upstream counts ahead behind state summary defer_reason defer_note defer_updated_at state_file
+  branch="$(branch_name_for_project "$project")"
+  state="not_applicable"
+  summary="branch_not_develop"
+  upstream="none"
+  ahead="0"
+  behind="0"
+  defer_reason="none"
+  defer_note="none"
+  defer_updated_at="unavailable"
+  state_file="$(develop_push_followthrough_state_file "$project")"
+
+  if [[ -f "$state_file" ]]; then
+    # shellcheck disable=SC1090
+    source "$state_file"
+    defer_reason="${DEVELOP_PUSH_DEFER_REASON:-none}"
+    defer_note="${DEVELOP_PUSH_DEFER_NOTE:-none}"
+    defer_updated_at="${DEVELOP_PUSH_DEFER_UPDATED_AT:-unavailable}"
+    if [[ -n "$defer_reason" ]] && ! develop_push_defer_reason_is_valid "$defer_reason"; then
+      defer_reason="invalid:${defer_reason}"
+    fi
+    [[ -n "$defer_note" ]] || defer_note="none"
+  fi
+
+  if [[ "$branch" == "develop" ]]; then
+    upstream="$(develop_push_followthrough_upstream_for_project "$project")"
+    if [[ -z "$upstream" ]]; then
+      state="not_applicable"
+      summary="no_upstream"
+      upstream="none"
+    else
+      counts="$(git -C "$project" rev-list --left-right --count "HEAD...$upstream" 2>/dev/null || true)"
+      if [[ -n "$counts" ]]; then
+        ahead="$(printf '%s\n' "$counts" | awk '{print $1}')"
+        behind="$(printf '%s\n' "$counts" | awk '{print $2}')"
+      fi
+      [[ "$ahead" =~ ^[0-9]+$ ]] || ahead="0"
+      [[ "$behind" =~ ^[0-9]+$ ]] || behind="0"
+      if (( ahead > 0 )); then
+        if develop_push_defer_reason_is_valid "${DEVELOP_PUSH_DEFER_REASON:-}"; then
+          state="push_deferred"
+          summary="ahead=${ahead} behind=${behind} upstream=${upstream} defer=${DEVELOP_PUSH_DEFER_REASON}"
+        else
+          state="push_pending"
+          summary="ahead=${ahead} behind=${behind} upstream=${upstream} defer=none"
+        fi
+      else
+        state="clean"
+        summary="ahead=0 behind=${behind} upstream=${upstream}"
+      fi
+    fi
+  fi
+
+  printf '%s|%s|%s|%s|%s|%s|%s\n' "$state" "$summary" "$upstream" "$ahead" "$behind" "$defer_reason" "$defer_updated_at"
 }
 
 write_preemption_state() {
@@ -7191,6 +7288,7 @@ cmd_live_status() {
   local desired_runtime_state last_supervisor_state last_ai_state last_exit_reason last_role_hint last_state_updated_at
   local semantic_loop_signal semantic_loop_signal_reason semantic_loop_signal_summary semantic_loop_repeat_count
   local semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv
+  local develop_push_snapshot develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at
 
   run_dir="$(run_dir_for_project "$project")"
   branch="$(branch_name_for_project "$project")"
@@ -7303,6 +7401,8 @@ cmd_live_status() {
     IFS='|' read -r semantic_loop_signal_reason semantic_loop_repeat_count semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv _ <<<"$semantic_loop_signal"
     semantic_loop_signal_summary="repeats=${semantic_loop_repeat_count:-0} latest=${semantic_loop_latest_continuity:-unavailable} consumed=${semantic_loop_latest_consumed:-unavailable} prompts=${semantic_loop_latest_prompt_csv:-none}"
   fi
+  develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
+  IFS='|' read -r develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at <<<"$develop_push_snapshot"
 
   echo "project: $project"
   echo "branch: $branch"
@@ -7328,6 +7428,8 @@ cmd_live_status() {
   echo "restart_storm_escalation_target: ${LAST_RESTART_STORM_ESCALATION_TARGET:-unavailable}"
   echo "semantic_loop_signal_reason: ${semantic_loop_signal_reason}"
   echo "semantic_loop_signal_summary: ${semantic_loop_signal_summary}"
+  echo "develop_push_followthrough_state: ${develop_push_state}"
+  echo "develop_push_followthrough_summary: ${develop_push_summary}"
   echo "current_prompt_has_delegated_continuation: ${prompt_has_delegated}"
   echo "latest_manager_continuity_generated: ${latest_manager_continuity_generated}"
   echo "latest_manager_continuity_consumed: ${latest_manager_continuity_consumed}"
@@ -7388,6 +7490,12 @@ cmd_live_status() {
   echo "- last_tool_session_id: ${LAST_TOOL_SESSION_ID:-unavailable}"
   echo "- last_tool_resume_target: ${LAST_TOOL_RESUME_TARGET:-unavailable}"
   echo "- last_cycle_log: ${LAST_CYCLE_LOG:-unavailable}"
+  echo "- develop_push_followthrough_state_file: $(develop_push_followthrough_state_file "$project")"
+  echo "- develop_push_followthrough_upstream: ${develop_push_upstream}"
+  echo "- develop_push_followthrough_ahead: ${develop_push_ahead}"
+  echo "- develop_push_followthrough_behind: ${develop_push_behind}"
+  echo "- develop_push_followthrough_defer_reason: ${develop_push_defer_reason}"
+  echo "- develop_push_followthrough_defer_updated_at: ${develop_push_defer_updated_at}"
 }
 
 cmd_status() {
@@ -7487,6 +7595,7 @@ sleep_with_rate_limit_recheck() {
 
 cmd_fleet_status() {
   local project="" repo_root entries wt_path wt_branch wt_state cfg run_dir session_state supervisor_pid ai_pid last_launch last_dirty checkpoint_json checkpoint_required restart_signal_reason restart_signal_at restart_summary semantic_loop_summary semantic_loop_signal
+  local develop_push_snapshot develop_push_state develop_push_summary
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -7551,6 +7660,11 @@ cmd_fleet_status() {
         IFS='|' read -r semantic_loop_reason semantic_loop_repeat_count _ _ <<<"$semantic_loop_signal"
         semantic_loop_summary="loop=${semantic_loop_reason} repeats=${semantic_loop_repeat_count:-0}"
       fi
+      develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$wt_path")"
+      IFS='|' read -r develop_push_state develop_push_summary _ _ _ _ _ <<<"$develop_push_snapshot"
+    else
+      develop_push_state="not_applicable"
+      develop_push_summary="config_missing"
     fi
     checkpoint_json="$(checkpoint_guard_json_for_project "$wt_path")"
     checkpoint_required="$(checkpoint_guard_value "$checkpoint_json" checkpoint_required)"
@@ -7564,6 +7678,9 @@ cmd_fleet_status() {
     if [[ "$semantic_loop_summary" != "-" ]]; then
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "semantic_loop" "" "$semantic_loop_summary"
     fi
+    if [[ "$develop_push_state" != "not_applicable" ]]; then
+      printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "develop_push" "" "${develop_push_state} ${develop_push_summary}"
+    fi
   done < <(printf '%s\n' "$entries" | awk '
     BEGIN { wt=""; br="(detached)" }
     /^worktree / { wt=substr($0, 10); br="(detached)" }
@@ -7571,6 +7688,62 @@ cmd_fleet_status() {
     /^$/ { if (wt != "") { print wt "|" br; wt=""; br="(detached)" } }
     END { if (wt != "") print wt "|" br }
   ')
+}
+
+cmd_develop_push() {
+  local subcmd="${1:-}"
+  [[ -n "$subcmd" ]] || { log_error "missing develop-push subcommand"; usage; exit 1; }
+  shift || true
+
+  local project="" reason="" note=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --reason) reason="${2:-}"; shift 2 ;;
+      --note) note="${2:-}"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+
+  case "$subcmd" in
+    status)
+      local snapshot state summary upstream ahead behind defer_reason defer_updated_at
+      snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
+      IFS='|' read -r state summary upstream ahead behind defer_reason defer_updated_at <<<"$snapshot"
+      echo "project: $project"
+      echo "develop_push_followthrough_state: $state"
+      echo "develop_push_followthrough_summary: $summary"
+      echo "develop_push_followthrough_upstream: $upstream"
+      echo "develop_push_followthrough_ahead: $ahead"
+      echo "develop_push_followthrough_behind: $behind"
+      echo "develop_push_followthrough_defer_reason: $defer_reason"
+      echo "develop_push_followthrough_defer_updated_at: $defer_updated_at"
+      ;;
+    defer)
+      if ! develop_push_defer_reason_is_valid "$reason"; then
+        log_error "unsupported --reason: ${reason:-<empty>}"
+        log_error "supported reasons: post_merge_acceptance cleanup_followthrough remote_delivery_hold"
+        exit 1
+      fi
+      write_develop_push_followthrough_state "$project" "$reason" "$note"
+      echo "project: $project"
+      echo "defer_reason: $reason"
+      echo "defer_note: ${note:-none}"
+      echo "state_file: $(develop_push_followthrough_state_file "$project")"
+      ;;
+    clear)
+      clear_develop_push_followthrough_state "$project"
+      echo "project: $project"
+      echo "state_file: $(develop_push_followthrough_state_file "$project")"
+      echo "status: cleared"
+      ;;
+    *)
+      log_error "unknown develop-push subcommand: $subcmd"
+      usage
+      exit 1
+      ;;
+  esac
 }
 
 cmd_stop() {
@@ -7616,6 +7789,7 @@ main() {
     status) cmd_status "$@" ;;
     live-status) cmd_live_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;
+    develop-push) cmd_develop_push "$@" ;;
     stop) cmd_stop "$@" ;;
     *) log_error "unknown command: $cmd"; usage; exit 1 ;;
   esac
