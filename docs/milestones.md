@@ -87,7 +87,17 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md`
-- next_action: Keep this owner in verification on `feature/multi-tool-availability-manager-20260331` until merge review absorbs the generalized availability-manager slice into canonical `develop`, then run one clean live confirmation on the protected manager runtime.
+- next_action: Keep this bounded v1 owner in verification until the develop-bound merge lands cleanly. This line now explicitly stops at ordered fallback v1 plus Codex parity; all-tools unified slot parity belongs to `I-20260401-0840-A`.
+
+1. `I-20260401-0840-A`
+- title: All-tools unified slot contract governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md`
+- next_action: Keep this owner in verification on `feature/unified-slot-contract-governance-20260401` until merge review absorbs the unified slot contract into `develop`; focused regressions and live `kiro-cli -> codex dead-slot -> later usable Codex slot` validation are complete.
 
 1. `I-20260330-2318-A`
 - title: Manager attach reuse missing-AI repair governance
@@ -629,7 +639,7 @@ routing_policy:
 ### candidate_issues
 
 1. `C-20260331-1840-A`
-- title: Materialize generic multi-tool availability manager with same-tool-first recovery
+- title: Materialize ordered multi-tool fallback v1 with Codex slot parity
 - milestone_state: candidate
 - phase_state: `todo_ibm`
 - priority: P0
@@ -637,7 +647,18 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md`
 - next_action: This candidate is now materialized as `I-20260331-1840-A`. The active owner restores same-tool-first recovery, ordered `AI_FALLBACK_TOOLS` scanning, and explicit all-tools-unavailable waiting truth while keeping per-tool capability gaps explicit.
-- revisit_trigger: Re-open candidate-level research only if follow-on work needs structured tool-group persistence, richer non-Codex same-tool watchdog truth, or cross-tool resume semantics.
+- revisit_trigger: Re-open only if the completed ordered-fallback v1 regresses; all-tools unified slot parity now belongs to `C-20260401-0840-A`.
+
+1. `C-20260401-0840-A`
+- title: Materialize unified slot contract across all runtime tools
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md`
+- next_action: This candidate is now materialized as `I-20260401-0840-A`. The active owner absorbs unified slot inventory, current-slot truth, generic slot-first scheduling, and earliest tool+slot waiting truth.
+- revisit_trigger: Re-open candidate-level research only if generic slot inventory proves insufficient and a structured auth-material schema is required.
 
 2. `C-20260330-2318-A`
 - title: Live-status false already-running-attach regression

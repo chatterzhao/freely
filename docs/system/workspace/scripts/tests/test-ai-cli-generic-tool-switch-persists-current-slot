@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_HOME="$(mktemp -d /tmp/freely-ai-cli-generic-switch.XXXXXX)"
+trap 'rm -rf "$TMP_HOME"' EXIT
+
+mkdir -p "$TMP_HOME/.ai-auth/iflow-default-1" "$TMP_HOME/.ai-auth/iflow-default-2"
+
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json switch iflow default-2 >"$TMP_HOME/switch.json"
+
+grep -q '"tool": "iflow"' "$TMP_HOME/switch.json"
+grep -q '"slot": "default-2"' "$TMP_HOME/switch.json"
+grep -q '^default-2$' "$TMP_HOME/.ai-auth/.iflow-current-slot"
+grep -q '"slot": "default-2"' <(HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami iflow)
+
+echo "[PASS] ai switch persists current slot truth for non-codex tools"

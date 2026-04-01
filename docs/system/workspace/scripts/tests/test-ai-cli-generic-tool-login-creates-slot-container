@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_HOME="$(mktemp -d /tmp/freely-ai-cli-generic-login.XXXXXX)"
+trap 'rm -rf "$TMP_HOME"' EXIT
+
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json login kiro-cli >"$TMP_HOME/login.json"
+
+grep -q '"tool": "kiro-cli"' "$TMP_HOME/login.json"
+grep -q '"slot": "default-1"' "$TMP_HOME/login.json"
+test -d "$TMP_HOME/.ai-auth/kiro-cli-default-1"
+grep -q '^default-1$' "$TMP_HOME/.ai-auth/.kiro-cli-current-slot"
+
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json save iflow default-2 >"$TMP_HOME/save.json"
+
+grep -q '"tool": "iflow"' "$TMP_HOME/save.json"
+grep -q '"slot": "default-2"' "$TMP_HOME/save.json"
+test -d "$TMP_HOME/.ai-auth/iflow-default-2"
+grep -q '^default-2$' "$TMP_HOME/.ai-auth/.iflow-current-slot"
+
+echo "[PASS] ai login/save create generic tool slot containers and persist current slot"
