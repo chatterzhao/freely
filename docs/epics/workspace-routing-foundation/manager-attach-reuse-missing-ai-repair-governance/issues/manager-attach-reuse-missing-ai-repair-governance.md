@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260330-2318-A`
 - title: Manager attach reuse missing-AI repair governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-attach-reuse-missing-ai-repair-governance`
@@ -67,7 +67,9 @@ The smallest correct owner is therefore a manager-only attach gate repair, not a
 
 - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
 - `./bin/governance-check`
+- `develop` live validation: `kiro-cli` monthly-limit recovery reaches `tool_auto_switch_selected ... active_tool=codex` and `ai_launch_begin ... tool=codex` without `supervisor_attach_reuse ... ai_pid_state=missing role_hint=manager`
 
 ## Next
 
-- Finish the issue-bound writeback and keep this owner in `in_dev` until the patch merges and one real `develop` recovery run confirms the false attach path is gone.
+- `2026-04-01 01:14 PDT` completion: `develop` merge `9b89fb3` absorbed the narrow manager attach gate repair, focused regression stayed green, and protected live validation confirmed the old false-attach path is gone on the `kiro_monthly_request_limit -> codex` recovery chain.
+- Re-open only if false optimistic `already_running_attach` truth still appears after this write-side repair, which would justify a broader `live-status` reconciliation lifecycle.

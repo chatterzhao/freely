@@ -51,6 +51,6 @@
 ### PT-3
 - id: `PT-3`
 - requirement: `develop live recovery no longer lands in false already_running_attach`
-- evidence_level: `application_native_real_environment`
-- status: `pending`
-- artifact_ref: `pending://develop-live-validation`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/code-reviews/20260401-manager-attach-reuse-missing-ai-verification.md`
