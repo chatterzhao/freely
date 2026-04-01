@@ -2,6 +2,15 @@
 
 ## C-20260318-1246：把 URL 内容摄取能力显式化为 Freely skill
 
+- candidate_id: `C-20260318-1246`
+- status: `completed`
+- milestone: `M-20260318-url-content-intake-skill-and-wechat-fetch-governance`
+- promoted_issue_id: `I-20260318-1908`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
+- decision_reason: 这条研究已经完成 materialization，canonical skill、bundled scripts、focused regression 与 owner closeout 均已进入 `develop`；不再保留为活跃待消费 candidate。
+- next_action: 保持收口态；若后续扩大到更多站点、browser/MCP fallback 或统一顶层路由，再新开 lifecycle。
+- revisit_trigger: 当 URL intake 的 bounded skill materialization contract 被证明过窄、必须进入新的能力面时，再重新进入 pre-brainstorm 判断。
+
 - problem: 当前“AI 直接解读链接”更像工具私有能力，Freely 尚未把它定义成可追溯、可失败、可替换的正式能力。
 - change:
   - 新增 `url-content-intake` 能力层，识别普通网页、微信公众号文章、PDF/文档页等 URL
