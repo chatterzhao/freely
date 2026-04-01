@@ -91,7 +91,11 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md`
-- next_action: Keep the new placement-correctness owner in verification on `feature/milestone-candidate-placement-gate-20260331` until manager merge review absorbs the gate into canonical `develop`. This slice is complete for active-milestone placement enforcement; broader scheduling or auto-rehome mechanisms stay out of scope.
+- evidence:
+  - `develop` commits `79f8bba`, `b279330`, `8972f7c`
+  - `docs/progress/workspace-routing-foundation/p-active-milestone-placement-and-consumption-gate-governance.md`
+  - `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/code-reviews/20260331-active-milestone-placement-gate-verification.md`
+- completion_note: active milestone placement correctness 已经进入 canonical gate truth。`governance-check` 与 `governance-merge-gate` 现在共同拦截 unresolved candidate 的 `unassigned` / `pending://...` / wrong milestone / completed milestone placement，并允许同一 governance owner 吸收 unresolved placement metadata 修正；这条 owner 不再保留在 verification。
 
 1. `I-20260331-1840-A`
 - title: Multi-tool availability manager governance
