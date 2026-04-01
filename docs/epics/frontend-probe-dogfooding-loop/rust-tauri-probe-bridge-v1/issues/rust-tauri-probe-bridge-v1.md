@@ -1,8 +1,8 @@
 # Issue: rust-tauri-probe-bridge-v1
 
-- issue_id: `I-20260317-1005`
+- issue_id: `I-20260317-0332`
 - title: Rust/Tauri Probe Bridge v1
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `rust-tauri-probe-bridge-v1`
@@ -34,7 +34,7 @@
 - 文档明确 day-1 工程落点为根目录 `src-tauri/ + Cargo.toml`。
 - 文档明确 `probe_request_snapshot` / `probe_send_command` / `probe_server_event` 的最小签名。
 - 文档明确 day-1 最小 snapshot/event 子集，而不是要求完整 backend 语义。
-- 文档明确与 `I-20260317-1002` 的边界：本 issue 负责 bridge，本体前端 issue 不再继续假装 backend bridge 已存在。
+- 文档明确与 `I-20260308-1244-03` 的边界：本 issue 负责 bridge，本体前端 issue 不再继续假装 backend bridge 已存在。
 
 ## Minimal bridge contract
 
@@ -125,7 +125,7 @@
 - 2026-03-17 当前轮又把 `bin/check-rust-toolchain` 从“只报缺失”推进成“可操作的预检入口”：现在会列出缺失命令、给出 `rustup` 安装建议、提示重新加载 `~/.cargo/env`，并明确要求回跑 `bun run rust:preflight` / `bun run cargo:check:probe`。这样当前 issue 即使仍被本机环境阻塞，也不再停留在模糊 blocker。
 - 2026-03-17 当前轮还补了 `bin/test-rust-toolchain-preflight`，用 PATH 隔离方式固定验证 preflight 在缺少 Rust toolchain 时会输出缺失命令汇总、`rustup` 安装建议、shell reload 提示与重跑命令，避免后续脚本回退到“只会报错、不会给下一步”。
 - 2026-03-17 当前轮又把这条回归测试接进 `package.json`，统一为 `bun run rust:preflight:test`；后续不论是 runtime 还是人工验证，都不需要再单独记 shell 测试文件路径。
-- 2026-03-17 lead-agent 首跳重入后再次按 `milestones > progress/recovery > review/test > human chat/session evidence > github issue > PROJECT_INTENT` 扫描需求池；由于当前仓库仍无正式 `docs/progress/**` / `docs/recovery/**`，且不存在比 committed `in_dev` issue 更高优先的新 discovery 输入，本轮继续命中 `I-20260317-1005` 的 `issue continuation`，并在当前 `codex` 会话内直接进入 `dev-loop-execution`。
+- 2026-03-17 lead-agent 首跳重入后再次按 `milestones > progress/recovery > review/test > human chat/session evidence > github issue > PROJECT_INTENT` 扫描需求池；由于当前仓库仍无正式 `docs/progress/**` / `docs/recovery/**`，且不存在比 committed `in_dev` issue 更高优先的新 discovery 输入，本轮继续命中 `I-20260317-0332` 的 `issue continuation`，并在当前 `codex` 会话内直接进入 `dev-loop-execution`。
 - 2026-03-17 这轮已再次执行验证：`bun run typecheck` 通过，`bun run build` 通过，`bun run rust:preflight:test` 通过；`bun run rust:preflight` 与 `bun run cargo:check:probe` 仍因环境缺少 `cargo/rustc/rustup` 失败。结论保持不变：当前 blocker 是 Rust toolchain 缺失，不需要 reroute 回 `doc-pre-brainstorm-execution` 或 `doc-ibm-execution`。
 - 2026-03-17 当前轮继续向前推进了一步：已通过 `rustup` 安装把 `cargo` / `rustc` / `rustup` 命令层落到 `~/.cargo/bin`，并执行 `rustup default stable`；`bun run rust:preflight` 现已通过，说明“本机缺少 Rust 命令”这一层 blocker 已解除。
 - 2026-03-17 当前最小编译验证也因此进入了下一层真实问题：`bun run cargo:check:probe` 不再卡在“缺命令”，而是失败于 `rustc -vV`，报错 `Missing manifest in toolchain 'stable-aarch64-apple-darwin'`。这说明当前 blocker 已收窄为 rustup partial install / stable toolchain manifest 缺失，而不是 bridge contract 或前端边界漂移。
@@ -134,4 +134,6 @@
 - 2026-03-18 当前轮继续把 bridge contract 与真实宿主接缝再收紧一步：`src-tauri/src/event_payload.rs` 已统一改用 `src-tauri/src/event_kind.rs` 的最小事件事实源；`src-tauri/src/bridge_manifest.rs` 现已提供 Rust 侧可消费的 contract 入口，并新增测试直接校验 Rust 常量与 `public/freely-probe-bridge-manifest.json` 保持一致，避免前端公开 manifest 与后端命令/事件名漂移。
 - 2026-03-18 当前轮还修正了两条已经落后于当前默认 snapshot 行为的 Rust 单测断言：`last_event_id` 现在按默认 `event-1 -> event-2` 递增，`CreateOrResumeSession` 后的 `governance_summary` 也保留初始 `"bridge connected"` 再前插新条目，而不是错误地假设 summary 被整段覆盖。
 - 2026-03-18 当前轮已实际完成本地 bridge 验证闭环：`bun run cargo:check:probe` 通过、`cargo test -p freely-probe-bridge` 24 项通过、`bun run typecheck` 通过、`bun run build` 通过。当前剩余缺口不再是 contract/warning，而是尚未执行真正的 Tauri 宿主启动联调。
-- `I-20260317-1002` 继续保持 frontend dev issue 身份，但 backend bridge blocker 现由本 issue 承接，直到真实 bridge 可联调。
+- 2026-04-01 当前轮继续把真实宿主 blocker 正式收掉：根目录 `package.json` 新增 `tauri:preflight:probe` / `tauri:dev:probe`，`vite.config.ts` 与 `src-tauri/tauri.conf.json` 统一冻结到 `127.0.0.1:4173`，并补了 `bin/check-tauri-probe-host` / `bin/tauri-probe-dev` 作为 canonical host-validation 入口。随后已实际执行 `bun run tauri:preflight:probe` 与 `bun run tauri:dev:probe`，确认真实 Tauri 宿主能稳定完成 Vite `BeforeDevCommand`、Rust bridge 编译并进入 `target/debug/freely-probe-bridge` 运行态，不再停在 host mismatch 或 toolchain 缺失。
+- 2026-04-01 当前轮也把验证基线重新回放到最新入口：`bun run typecheck`、`bun run build`、`bun run cargo:check:probe`、`cargo test -p freely-probe-bridge` 再次通过。当前 `I-20260317-0332` 已不再被“真实 Tauri 宿主无法启动”阻塞，生命周期进入 `in_verification`；剩余待写实的验收点只剩真实 `Transport=tauri` 下的最小 start / session create-resume / chat intervention 闭环证据。
+- `I-20260308-1244-03` 继续保持 frontend dev issue 身份，但 backend bridge blocker 现由本 issue 承接，直到真实 bridge 可联调。

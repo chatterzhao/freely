@@ -18,6 +18,8 @@ Run these from the repository root:
 bun run rust:preflight
 bun run rust:preflight:test
 bun run cargo:check:probe
+bun run tauri:preflight:probe
+bun run tauri:dev:probe
 ```
 
 `rust:preflight` verifies that `cargo`, `rustc`, and `rustup` are available.
@@ -32,7 +34,16 @@ Preferred bootstrap path is `skill:rust-tauri-toolchain-bootstrap`, which uses `
 cargo check -p freely-probe-bridge
 ```
 
-## Current blocker
+`tauri:preflight:probe` extends the Rust preflight with host-validation dependencies:
 
-At the moment this workspace does not have `cargo`, `rustc`, or `rustup`, so Rust-side compilation cannot yet be verified locally.
-Use the preflight output as the canonical install/retry guidance before attempting real Tauri bridge checks.
+- `bun`
+- `node_modules`
+- `cargo tauri`
+
+`tauri:dev:probe` runs that host preflight first, then starts the real Tauri dev host from `src-tauri/`.
+
+## Host validation contract
+
+- Vite dev host is fixed to `127.0.0.1:4173`.
+- `src-tauri/tauri.conf.json` uses the same `devUrl`.
+- Real host validation must use `bun run tauri:dev:probe`, not ad-hoc `bun run dev`.

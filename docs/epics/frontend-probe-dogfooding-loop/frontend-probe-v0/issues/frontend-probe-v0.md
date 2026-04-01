@@ -1,6 +1,6 @@
 # Issue: frontend-probe-v0
 
-- issue_id: `I-20260317-1002`
+- issue_id: `I-20260308-1244-03`
 - title: Frontend Probe v0
 - phase_state: `in_dev`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
@@ -180,10 +180,10 @@
   - 现在不需要额外注入脚本也能验证失败面：`?transport=tauri-broken` 会直接进入 tauri-shaped error path，并显示 `Runtime error: bridge offline`
   - shell 现已具备内建 `Transport` 下拉；切换到 `tauri-broken` 会直接把 URL 改成 `?transport=tauri-broken` 并进入对应 transport，无需手改地址栏
 - current_blocker:
-  - frontend 侧 bridge contract、transport、manifest 与错误面已收敛到足够位置；当前真正 blocker 仍是 backend 执行态问题，并已由 `I-20260317-1005` 承接：Rust/Tauri bridge 的本地 `cargo check` / `cargo test`、前端 `typecheck` / `build` 与公开 manifest 对齐验证都已通过，但真实 Tauri 宿主尚未实际启动联调，因此 `Transport=tauri` 仍待用真 backend 复核
+  - frontend 侧 bridge contract、transport、manifest 与错误面已收敛到足够位置；真实 Tauri 宿主现已稳定启动，backend host-up blocker 已由 `I-20260317-0332` 消化。当前剩余缺口已收窄为真实 `Transport=tauri` 下的最小 start、session create/resume、chat intervention 闭环证据仍待 `I-20260317-0332` 写回，因此本 issue 仍不能提前宣称 frontend host integration 已完成
 - reroute_required:
   - `next_recommended_route=dev-loop-execution`
-  - reason: `Rust/Tauri Probe Bridge v1` 已完成最小 IBM 收敛，后续应由 `I-20260317-1005` 进入 backend dev-loop 实现
+  - reason: `Rust/Tauri Probe Bridge v1` 已完成最小 IBM 收敛，后续应由 `I-20260317-0332` 进入 backend dev-loop 实现
 - unblock_status:
   - `I-20260317-1004` 已完成最小 IBM 收敛，frontend runtime baseline 现已成为可引用依赖
   - 当前 issue 可从 `blocked_dev` 返回 `in_dev`
