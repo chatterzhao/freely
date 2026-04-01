@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260317-0332`
 - title: Rust/Tauri Probe Bridge v1
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `rust-tauri-probe-bridge-v1`
@@ -141,3 +141,8 @@
 - 2026-04-01 当前轮已把真实 `Transport=tauri` 的最小交互闭环实际打通：新增 `bin/tauri-validate-probe-interactions` 作为 canonical live validation 入口，前端 `useTauriValidationSequence` 在 validation mode 下会真实发出 `ControlRun(start)`、`CreateOrResumeSession`、`SendChatIntervention`，Rust 侧 `validation_report.rs` 会把 snapshot request、command ack、event subset 与 snapshot writeback 记录成结构化 report。实测 `bun run tauri:validate:probe` 已返回 `status=passed`，确认真实 Tauri transport 下最小 start / session create-resume / chat intervention 闭环成立。
 - 2026-04-01 当前轮也顺手收掉了两条真实 seam bug：`TauriProbeAdapter.requestSnapshot()` 现按 Rust 命令参数名传递 `{ payload: { projectId } }`，不再在真实宿主里因为 invoke 参数形状错误而丢失初始 snapshot；validation sequence 则不再把成功与否绑死在前端事件订阅 race 上，而是通过真实 `requestSnapshot` 轮询确认 run/session/chat 写回，确保 live validation 反映的是真 bridge state，而不是 React effect 时序。
 - `I-20260308-1244-03` 继续保持 frontend dev issue 身份，但 backend bridge blocker 现由本 issue 承接，直到真实 bridge 可联调。
+
+## Closeout
+
+- 当前 owner 已完成 canonical closeout：真实宿主 bring-up 与真实 `Transport=tauri` 最小交互闭环都已取得 live evidence，并已被 `develop` 吸收。
+- 后续 frontier 不再停留在 backend bridge day-1 subset，而是继续由 active `I-20260308-1244-03` 承接 frontend host integration / UX 收口；若要扩展 bridge beyond day-1 subset，另开新 lifecycle。
