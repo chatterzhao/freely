@@ -51,6 +51,7 @@ Freely 现在已经有两条不对称的真相：
 4. 上述 fallback 会写出 machine-readable runtime event，包含 `previous_tool`、`active_tool`、`reason` 与 `launch_kind=fresh_with_handoff`。
 5. 现有 Kiro defer contract 不回退：当 auto-switch 未开启时，runtime 仍在本地 stop 并 defer 给 control plane。
 6. 现有 Codex no-account-ready guard 不回退：Codex readiness 失败时，`ensure-manager` 仍跳过 launch。
+7. `ensure-manager --watch` 与 `ensure-interruption-dispatch --watch` 必须在 supervisor 退出后继续存活，否则 `desired=running` 的 manager 项目无法真正执行后续 fallback。
 
 ## Completion
 
@@ -61,6 +62,7 @@ Freely 现在已经有两条不对称的真相：
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-kiro-to-codex-fallback`
 - `docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
+- live validation on `develop` with local `kiro-cli` unavailable and `AUTO_SWITCH_TOOL=true`
 
 ## Verification
 
@@ -70,6 +72,8 @@ Freely 现在已经有两条不对称的真相：
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
 - Governance:
   - `./bin/governance-check`
+- Live repro:
+  - Start on `develop`, confirm `kiro_monthly_request_limit`, then verify the manager watchdog survives supervisor exit long enough to rewrite `AI_TOOL=codex` and emit `tool_auto_switch_selected`
 
 ## Next
 
