@@ -91,7 +91,7 @@ routing_policy:
 
 ### completed_issues
 
-1. `I-20260325-0410`
+1. `I-20260325-0333-B`
 - title: Story-level pre-tests quality gate governance
 - milestone_state: completed
 - phase_state: `completed`
