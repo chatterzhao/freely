@@ -5394,10 +5394,12 @@ stop_project_runtime() {
 resolve_active_supervisor_pid_for_start() {
   local project="$1" sup_pid_file="$2"
   local candidate_pid="" excluded_pids=""
+  LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
   excluded_pids="${BASHPID:-$$},${PPID:-}"
   if [[ -f "$sup_pid_file" ]]; then
     candidate_pid="$(cat "$sup_pid_file" 2>/dev/null || true)"
     if valid_supervisor_pid_for_project "$project" "$candidate_pid"; then
+      LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="supervisor_pid_file"
       printf '%s\n' "$candidate_pid"
       return 0
     fi
@@ -5410,6 +5412,7 @@ resolve_active_supervisor_pid_for_start() {
   candidate_pid="$(discover_supervisor_pid "$project" "$excluded_pids")"
   if valid_supervisor_pid_for_project "$project" "$candidate_pid"; then
     log_warn "recovered live project supervisor after supervisor.pid drift: $candidate_pid"
+    LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="process_discovery"
     printf '%s\n' "$candidate_pid" >"$sup_pid_file"
     printf '%s\n' "$candidate_pid"
   fi
@@ -5417,7 +5420,9 @@ resolve_active_supervisor_pid_for_start() {
 
 ensure_no_active_supervisor_conflict() {
   local project="$1" sup_pid_file="$2" child_pid_file="$3" allow_attach="${4:-0}"
-  local old_pid=""
+  local old_pid="" attach_ai_pid_state="missing"
+  LAST_ATTACH_REUSE_SUPERVISOR_PID=""
+  LAST_ATTACH_REUSE_AI_PID_STATE="missing"
   old_pid="$(resolve_active_supervisor_pid_for_start "$project" "$sup_pid_file")"
   if [[ -n "$old_pid" ]]; then
     if [[ "$allow_attach" == "1" ]]; then
@@ -5425,8 +5430,11 @@ ensure_no_active_supervisor_conflict() {
         local active_ai_pid
         active_ai_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
         if [[ -n "$active_ai_pid" ]] && ! valid_ai_pid_for_project "$project" "$active_ai_pid"; then
+          attach_ai_pid_state="stale_pid_cleared"
           log_warn "clearing stale ai.pid while reusing healthy project supervisor: $active_ai_pid"
           rm -f "$child_pid_file"
+        elif [[ -n "$active_ai_pid" ]]; then
+          attach_ai_pid_state="confirmed_running"
         fi
       fi
       if ! ensure_interruption_dispatcher_ready_or_fail "$project"; then
@@ -5434,6 +5442,8 @@ ensure_no_active_supervisor_conflict() {
       elif [[ "$(role_hint_for_project "$project")" == "manager" ]] && ! ensure_manager_watchdog_ready_or_fail "$project"; then
         log_warn "project supervisor pid=$old_pid is live but manager watchdog is not ready; falling back to project-local repair"
       else
+        LAST_ATTACH_REUSE_SUPERVISOR_PID="$old_pid"
+        LAST_ATTACH_REUSE_AI_PID_STATE="$attach_ai_pid_state"
         log_info "project runtime/control-plane already up; reusing supervisor pid=$old_pid"
         return 10
       fi
@@ -5477,10 +5487,18 @@ start_project_runtime() {
   loop_log="$logs_dir/loop.log"
   mkdir -p "$run_dir" "$logs_dir"
   rm -f "$(stop_marker_file "$project")"
+  LAST_ATTACH_REUSE_SUPERVISOR_PID=""
+  LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
+  LAST_ATTACH_REUSE_AI_PID_STATE="missing"
   local supervisor_conflict_rc=0
   ensure_no_active_supervisor_conflict "$project" "$sup_pid_file" "$child_pid_file" "1" || supervisor_conflict_rc=$?
   if [[ "$supervisor_conflict_rc" -eq 10 ]]; then
     write_workcell_state "$project" "running" "up" "up" "already_running_attach"
+    append_runtime_event "$project" "supervisor_attach_reuse" \
+      "supervisor_pid=${LAST_ATTACH_REUSE_SUPERVISOR_PID:-unknown}" \
+      "supervisor_pid_source=${LAST_ATTACH_REUSE_SUPERVISOR_SOURCE:-unknown}" \
+      "ai_pid_state=${LAST_ATTACH_REUSE_AI_PID_STATE:-missing}" \
+      "role_hint=$(role_hint_for_project "$project")"
     return 0
   elif [[ "$supervisor_conflict_rc" -ne 0 ]]; then
     exit "$supervisor_conflict_rc"
