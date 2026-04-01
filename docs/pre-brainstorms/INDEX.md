@@ -7,6 +7,7 @@
   - candidates: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/candidates.md
 - 20260331-1837--worker-first-hop-role-boundary-regression
 - 20260330-2318--live-status-already-running-attach-regression
+- 20260330-2358--network-failure-recovery-governance
 - 20260331-1840--multi-tool-group-auto-switch-governance
 - 20260401-0840--all-tools-unified-slot-contract-governance
 - 20260329-2155--sensitive-local-artifact-ignore-governance
@@ -91,6 +92,9 @@
 - 20260330-2318--live-status-already-running-attach-regression
   - brainstorms: docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/brainstorms.md
   - candidates: docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/candidates.md
+- 20260330-2358--network-failure-recovery-governance
+  - brainstorms: docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/candidates.md
 - 20260329-2155--sensitive-local-artifact-ignore-governance
   - brainstorms: docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/candidates.md
