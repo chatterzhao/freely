@@ -6,7 +6,7 @@ TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-no-account-ready.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
-mkdir -p "$PROJECT/docs/pre-brainstorms/20260318-0000--sample" "$PROJECT/.freely/run"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260318-0000--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
 
 git init -q -b develop "$PROJECT"
 
@@ -50,6 +50,14 @@ CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
 AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
+AUTO_SWITCH_TOOL="true"
+AUTO_SWITCH_SLOT="true"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+SUPERVISOR_STATE="down"
+AI_STATE="down"
 EOF
 
 # shellcheck disable=SC1090
@@ -85,6 +93,11 @@ grep -q "^$PROJECT$" "$readiness_log"
 if [[ -s "$launch_log" ]]; then
   echo "[FAIL] ensure-manager should not launch when no codex slot is ready" >&2
   cat "$launch_log" >&2
+  exit 1
+fi
+if [[ -f "$PROJECT/.freely/logs/runtime-events.log" ]]; then
+  echo "[FAIL] no-account-ready guard should stay blocked without emitting a switch event" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
   exit 1
 fi
 

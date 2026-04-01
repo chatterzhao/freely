@@ -1031,10 +1031,110 @@ runtime_cross_tool_fallback_order_for_current_tool() {
   fi
 }
 
+runtime_tool_auth_dir() {
+  printf '%s\n' "$HOME/.ai-auth"
+}
+
+runtime_tool_active_slot_file() {
+  local tool="$1"
+  printf '%s\n' "$(runtime_tool_auth_dir)/.${tool}-current-slot"
+}
+
+runtime_codex_legacy_active_slot_file() {
+  printf '%s\n' "$HOME/.codex/active-slot"
+}
+
+runtime_read_tool_current_slot() {
+  local project="$1" tool="$2" file
+  file="$(runtime_tool_active_slot_file "$tool")"
+  if [[ -f "$file" ]]; then
+    tr -d '\n' <"$file"
+    return 0
+  fi
+  if [[ "$tool" == "codex" ]]; then
+    file="$(runtime_codex_legacy_active_slot_file)"
+    [[ -f "$file" ]] || return 0
+    tr -d '\n' <"$file"
+  fi
+}
+
+runtime_write_tool_current_slot() {
+  local tool="$1" slot="$2" file
+  file="$(runtime_tool_active_slot_file "$tool")"
+  mkdir -p "$(dirname "$file")"
+  printf '%s\n' "$slot" >"$file"
+  if [[ "$tool" == "codex" ]]; then
+    mkdir -p "$(dirname "$(runtime_codex_legacy_active_slot_file)")"
+    printf '%s\n' "$slot" >"$(runtime_codex_legacy_active_slot_file)"
+  fi
+}
+
+runtime_tool_slot_dir() {
+  local tool="$1" slot="$2"
+  printf '%s\n' "$(runtime_tool_auth_dir)/${tool}-${slot}"
+}
+
+runtime_list_tool_slots() {
+  local tool="$1" auth_dir prefix
+  auth_dir="$(runtime_tool_auth_dir)"
+  prefix="${tool}-"
+  [[ -d "$auth_dir" ]] || return 0
+  ls -1 "$auth_dir" 2>/dev/null | grep "^${prefix}" | sed "s/^${prefix}//" || true
+}
+
+runtime_default_singleton_slot_for_tool() {
+  printf 'default-1\n'
+}
+
+runtime_ensure_tool_singleton_slot_dir() {
+  local tool="$1" slot dir
+  slot="$(runtime_default_singleton_slot_for_tool)"
+  dir="$(runtime_tool_slot_dir "$tool" "$slot")"
+  mkdir -p "$dir"
+  printf '%s\n' "$slot"
+}
+
+runtime_first_tool_slot_or_singleton() {
+  local tool="$1" first_slot
+  first_slot="$(runtime_list_tool_slots "$tool" | head -n 1)"
+  if [[ -n "$first_slot" ]]; then
+    printf '%s\n' "$first_slot"
+    return 0
+  fi
+  runtime_ensure_tool_singleton_slot_dir "$tool"
+}
+
+runtime_current_or_first_tool_slot() {
+  local project="$1" tool="$2" current_slot candidate
+  current_slot="$(runtime_read_tool_current_slot "$project" "$tool")"
+  if [[ -n "$current_slot" ]]; then
+    while IFS= read -r candidate; do
+      [[ "$candidate" == "$current_slot" ]] && { printf '%s\n' "$candidate"; return 0; }
+    done < <(runtime_list_tool_slots "$tool")
+  fi
+  runtime_first_tool_slot_or_singleton "$tool"
+}
+
+runtime_next_tool_slot_after_current() {
+  local project="$1" tool="$2" current_slot seen_current=0 candidate first_slot=""
+  current_slot="$(runtime_read_tool_current_slot "$project" "$tool")"
+  [[ -n "$current_slot" ]] || return 1
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    [[ -n "$first_slot" ]] || first_slot="$candidate"
+    if [[ "$seen_current" == "1" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+    [[ "$candidate" == "$current_slot" ]] && seen_current=1
+  done < <(runtime_list_tool_slots "$tool")
+  return 1
+}
+
 tool_supports_auto_same_tool_slot_recovery() {
   local tool="$1"
   case "$tool" in
-    codex) return 0 ;;
+    codex|kiro-cli|iflow|cc|cc-use-codex-cli|opencode) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -1060,11 +1160,11 @@ tool_binary_available_for_auto_recovery() {
 tool_failure_scope_for_auto_recovery() {
   local tool="$1" failure_reason="$2"
   case "$tool:$failure_reason" in
-    codex:primary_rate_limit_exhausted|codex:secondary_rate_limit_exhausted|codex:auth_failure)
+    *:primary_rate_limit_exhausted|*:secondary_rate_limit_exhausted|*:auth_failure)
       printf 'slot_local\n'
       ;;
     kiro-cli:kiro_monthly_request_limit|kiro-cli:kiro_subscription_status_service_error)
-      printf 'tool_local\n'
+      printf 'slot_local\n'
       ;;
     *)
       printf 'unknown\n'
@@ -1132,29 +1232,47 @@ tool_earliest_recovery_hint_for_project() {
   esac
 }
 
-tool_ready_for_manager_auto_recovery() {
-  local project="$1" tool="$2"
+tool_select_ready_slot_for_manager_auto_recovery() {
+  local project="$1" tool="$2" mode="${3:-entry}" selected_slot=""
+  TOOL_AUTO_RECOVERY_SLOT=""
   case "$tool" in
     codex)
-      ensure_codex_slot_ready_for_manager "$project"
+      ensure_codex_slot_ready_for_manager "$project" || return 1
+      selected_slot="$(runtime_read_tool_current_slot "$project" "$tool")"
       ;;
     *)
-      tool_binary_available_for_auto_recovery "$tool"
+      if [[ "$mode" == "after_failure" ]]; then
+        selected_slot="$(runtime_next_tool_slot_after_current "$project" "$tool" || true)"
+      else
+        selected_slot="$(runtime_current_or_first_tool_slot "$project" "$tool" || true)"
+      fi
+      [[ -n "$selected_slot" ]] || return 1
+      tool_binary_available_for_auto_recovery "$tool" || return 1
+      runtime_write_tool_current_slot "$tool" "$selected_slot"
       ;;
   esac
+  TOOL_AUTO_RECOVERY_SLOT="$selected_slot"
+  return 0
+}
+
+tool_ready_for_manager_auto_recovery() {
+  local project="$1" tool="$2"
+  tool_select_ready_slot_for_manager_auto_recovery "$project" "$tool" "entry"
 }
 
 record_tool_auto_switch_event() {
-  local project="$1" previous_tool="$2" active_tool="$3" reason="$4" earliest_reset="${5:-}" launch_blocked="${6:-false}" kind="${7:-selected}"
+  local project="$1" previous_tool="$2" active_tool="$3" active_slot="$4" reason="$5" earliest_reset="${6:-}" launch_blocked="${7:-false}" kind="${8:-selected}" earliest_slot="${9:-}"
   local event_name="tool_auto_switch_selected"
   [[ "$kind" == "waiting" ]] && event_name="tool_auto_switch_waiting_for_recovery"
   append_runtime_event "$project" "$event_name" \
     "previous_tool=$previous_tool" \
     "active_tool=$active_tool" \
+    "active_slot=${active_slot:-none}" \
     "reason=$reason" \
     "launch_kind=fresh_with_handoff" \
     "launch_blocked=$launch_blocked" \
     "earliest_reset=${earliest_reset:-none}" \
+    "earliest_slot=${earliest_slot:-none}" \
     "owner=ensure_manager_control_plane"
 }
 
@@ -1172,10 +1290,50 @@ persist_project_tool_selection() {
   upsert_config_key "$project" "AI_TOOL_POLICY" "$tool_policy"
 }
 
+prepare_manager_same_tool_slot_recovery_if_needed() {
+  local project="$1"
+  local desired_state current_tool last_exit_reason supervisor_pid ai_pid
+  TOOL_AUTO_RECOVERY_SAME_TOOL_EXHAUSTED="0"
+  TOOL_AUTO_RECOVERY_ENTRY_BLOCKED="0"
+  TOOL_AUTO_RECOVERY_SLOT=""
+  desired_state="unknown"
+  last_exit_reason=""
+  if [[ -f "$(workcell_state_file "$project")" ]]; then
+    unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
+    # shellcheck disable=SC1090
+    source "$(workcell_state_file "$project")"
+    desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+    last_exit_reason="${LAST_EXIT_REASON:-}"
+  fi
+  [[ "$desired_state" == "running" ]] || return 1
+  config_bool_enabled "${AUTO_SWITCH_SLOT:-false}" || return 1
+  current_tool="${AI_TOOL:-}"
+  [[ -n "$current_tool" ]] || return 1
+  tool_supports_auto_same_tool_slot_recovery "$current_tool" || return 1
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  ai_pid="$(manager_ai_pid_for_project "$project")"
+  [[ -z "$supervisor_pid" && -z "$ai_pid" ]] || return 1
+
+  if [[ -n "$last_exit_reason" ]]; then
+    if tool_select_ready_slot_for_manager_auto_recovery "$project" "$current_tool" "after_failure"; then
+      record_tool_auto_switch_event "$project" "$current_tool" "$current_tool" "${TOOL_AUTO_RECOVERY_SLOT:-}" "same_tool_slot_recovery"
+      return 0
+    fi
+    TOOL_AUTO_RECOVERY_SAME_TOOL_EXHAUSTED="1"
+    return 1
+  fi
+
+  if tool_select_ready_slot_for_manager_auto_recovery "$project" "$current_tool" "entry"; then
+    return 0
+  fi
+  TOOL_AUTO_RECOVERY_ENTRY_BLOCKED="1"
+  return 1
+}
+
 prepare_manager_cross_tool_fallback_if_needed() {
   local project="$1" same_tool_exhausted="${2:-0}"
   local desired_state current_tool fallback_tool last_exit_reason supervisor_pid ai_pid
-  local candidate earliest_tool earliest_reset hint_reset hint_info hint_slot
+  local candidate earliest_tool earliest_slot fallback_slot hint_reset hint_info hint_slot
   TOOL_AUTO_RECOVERY_DECISION="none"
   desired_state="unknown"
   last_exit_reason=""
@@ -1193,15 +1351,19 @@ prepare_manager_cross_tool_fallback_if_needed() {
   supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
   ai_pid="$(manager_ai_pid_for_project "$project")"
   [[ -z "$supervisor_pid" && -z "$ai_pid" ]] || return 1
-  tool_failure_allows_cross_tool_auto_recovery "$current_tool" "$last_exit_reason" "$same_tool_exhausted" || return 1
+  if [[ "$same_tool_exhausted" != "1" && "${TOOL_AUTO_RECOVERY_ENTRY_BLOCKED:-0}" != "1" ]]; then
+    tool_failure_allows_cross_tool_auto_recovery "$current_tool" "$last_exit_reason" "$same_tool_exhausted" || return 1
+  fi
 
   earliest_tool=""
   earliest_reset=""
+  earliest_slot=""
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
     [[ "$candidate" != "$current_tool" ]] || continue
     if tool_ready_for_manager_auto_recovery "$project" "$candidate"; then
       fallback_tool="$candidate"
+      fallback_slot="${TOOL_AUTO_RECOVERY_SLOT:-}"
       break
     fi
     if hint_info="$(tool_earliest_recovery_hint_for_project "$project" "$candidate" 2>/dev/null || true)" && [[ -n "$hint_info" ]]; then
@@ -1209,6 +1371,7 @@ prepare_manager_cross_tool_fallback_if_needed() {
       hint_reset="${hint_info##*|}"
       if [[ "$hint_reset" =~ ^[0-9]+$ ]] && [[ -z "$earliest_reset" || "$hint_reset" -lt "$earliest_reset" ]]; then
         earliest_tool="$candidate"
+        earliest_slot="$hint_slot"
         earliest_reset="$hint_reset"
       fi
     fi
@@ -1216,7 +1379,7 @@ prepare_manager_cross_tool_fallback_if_needed() {
 
   if [[ -n "${fallback_tool:-}" ]]; then
     persist_project_tool_selection "$project" "$fallback_tool"
-    record_tool_auto_switch_event "$project" "$current_tool" "$fallback_tool" "$last_exit_reason"
+    record_tool_auto_switch_event "$project" "$current_tool" "$fallback_tool" "${fallback_slot:-}" "$last_exit_reason"
     load_config "$project"
     TOOL_AUTO_RECOVERY_DECISION="selected"
     return 0
@@ -1224,7 +1387,8 @@ prepare_manager_cross_tool_fallback_if_needed() {
 
   if [[ -n "$earliest_tool" && -n "$earliest_reset" ]]; then
     persist_project_tool_selection "$project" "$earliest_tool"
-    record_tool_auto_switch_event "$project" "$current_tool" "$earliest_tool" "all_tools_unavailable" "$earliest_reset" "true" "waiting"
+    [[ -n "$earliest_slot" ]] && runtime_write_tool_current_slot "$earliest_tool" "$earliest_slot"
+    record_tool_auto_switch_event "$project" "$current_tool" "$earliest_tool" "${earliest_slot:-}" "all_tools_unavailable" "$earliest_reset" "true" "waiting" "${earliest_slot:-}"
     load_config "$project"
     TOOL_AUTO_RECOVERY_DECISION="waiting"
   fi
@@ -2166,6 +2330,7 @@ load_session_state_or_defaults() {
   LAST_SECONDARY_RATE_LIMIT_RESETS_AT=""
   LAST_ROUTE_ONLY_HANDOFF="0"
   LAST_ACTIVE_SLOT=""
+  CURRENT_TOOL_SLOT=""
   LAST_SLOT_SWITCH_REASON=""
   LAST_SLOT_SWITCH_AT=""
   LAST_CYCLE_DEBUG_LOG=""
@@ -2197,6 +2362,7 @@ load_session_state_or_defaults() {
     # shellcheck disable=SC1090
     source "$state_file"
   fi
+  CURRENT_TOOL_SLOT="${CURRENT_TOOL_SLOT:-${LAST_ACTIVE_SLOT:-}}"
 }
 
 branch_name_for_project() {
@@ -3677,6 +3843,7 @@ LAST_PRIMARY_RATE_LIMIT_RESETS_AT="$primary_resets_at"
 LAST_SECONDARY_RATE_LIMIT_USED_PERCENT="$secondary_used_percent"
 LAST_SECONDARY_RATE_LIMIT_RESETS_AT="$secondary_resets_at"
 LAST_ROUTE_ONLY_HANDOFF="$route_only_handoff"
+CURRENT_TOOL_SLOT="$active_slot"
 LAST_ACTIVE_SLOT="$active_slot"
 LAST_SLOT_SWITCH_REASON="$slot_switch_reason"
 LAST_SLOT_SWITCH_AT="$slot_switch_at"
@@ -4670,7 +4837,7 @@ restart_manager_supervisor_preserving_handoff() {
 
 ensure_manager_once() {
   local project="$1"
-  local run_dir sup_pid_file current_pid current_ai_pid codex_same_tool_blocked
+  local run_dir sup_pid_file current_pid current_ai_pid same_tool_blocked
 
   load_config "$project"
   run_dir="$(run_dir_for_project "$project")"
@@ -4690,41 +4857,43 @@ ensure_manager_once() {
     current_pid="$(manager_recheck_wait_for_supervisor_teardown_if_needed "$project" "$current_pid")"
   fi
 
-  codex_same_tool_blocked="0"
-
-  if [[ "$AI_TOOL" == "codex" ]]; then
-    current_ai_pid="$(manager_ai_pid_for_project "$project")"
-    if [[ -n "$current_pid" ]] && [[ -n "$current_ai_pid" ]]; then
-      if recover_stalled_manager_ai_if_needed "$project"; then
-        current_pid=""
-        current_ai_pid=""
-      fi
-    fi
-    if ! ensure_codex_slot_ready_for_manager "$project"; then
-      codex_same_tool_blocked="1"
-      log_warn "no codex slot is ready for manager bootstrap; checking cross-tool fallback policy"
-    fi
-    current_ai_pid="$(manager_ai_pid_for_project "$project")"
-    if [[ "$codex_same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
-      log_warn "manager supervisor is idle after watchdog recovery gate passed; restarting manager with the latest handoff"
-      restart_manager_supervisor_preserving_handoff "$project"
+  same_tool_blocked="0"
+  current_ai_pid="$(manager_ai_pid_for_project "$project")"
+  if [[ -n "$current_pid" ]] && [[ -n "$current_ai_pid" ]]; then
+    if recover_stalled_manager_ai_if_needed "$project"; then
       current_pid=""
+      current_ai_pid=""
     fi
   fi
+  if tool_supports_auto_same_tool_slot_recovery "${AI_TOOL:-}"; then
+    if ! prepare_manager_same_tool_slot_recovery_if_needed "$project"; then
+      if [[ "${TOOL_AUTO_RECOVERY_SAME_TOOL_EXHAUSTED:-0}" == "1" ]]; then
+        same_tool_blocked="1"
+        log_warn "no ${AI_TOOL:-unknown} slot is ready for manager bootstrap; checking cross-tool fallback policy"
+      elif [[ "${TOOL_AUTO_RECOVERY_ENTRY_BLOCKED:-0}" == "1" ]]; then
+        same_tool_blocked="1"
+        log_warn "current ${AI_TOOL:-unknown} slot entry is unavailable; holding manager bootstrap until recovery path is ready"
+      fi
+    fi
+  fi
+  current_ai_pid="$(manager_ai_pid_for_project "$project")"
+  if [[ "$same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
+    log_warn "manager supervisor is idle after recovery gate passed; restarting manager with the latest handoff"
+    restart_manager_supervisor_preserving_handoff "$project"
+    current_pid=""
+  fi
 
-  prepare_manager_cross_tool_fallback_if_needed "$project" "$codex_same_tool_blocked" >/dev/null || true
+  prepare_manager_cross_tool_fallback_if_needed "$project" "$same_tool_blocked" >/dev/null || true
 
   if [[ "${TOOL_AUTO_RECOVERY_DECISION:-none}" == "waiting" ]]; then
     log_warn "manager bootstrap remains blocked while every configured recovery path is unavailable"
     return 0
   fi
 
-  if [[ "$codex_same_tool_blocked" == "1" ]]; then
-    if [[ "$AI_TOOL" == "codex" ]]; then
-      log_warn "manager bootstrap skipped because no recovery-capable tool is ready"
-      return 0
-    fi
+  if [[ "$same_tool_blocked" == "1" && "${TOOL_AUTO_RECOVERY_DECISION:-none}" != "selected" ]]; then
+    log_warn "manager bootstrap skipped because no recovery-capable tool is ready"
     current_pid=""
+    return 0
   fi
 
   if [[ -n "$current_pid" ]]; then
@@ -5963,7 +6132,7 @@ start_project_runtime() {
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
     LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
     LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_SLOT" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}"
     if [[ "$mode_name" == "fresh" || "$mode_name" == "fresh_with_handoff" ]]; then
       rm -f "$(handoff_file "$PROJECT_ROOT")"
     fi
@@ -6036,8 +6205,9 @@ start_project_runtime() {
       secondary_rate_limit_used_percent="$(extract_latest_codex_secondary_rate_limit_used_percent_from_jsonl "$tool_jsonl_path")"
       secondary_rate_limit_resets_at="$(extract_latest_codex_secondary_rate_limit_reset_at_from_jsonl "$tool_jsonl_path")"
     fi
+    active_slot="$(runtime_read_tool_current_slot "$PROJECT_ROOT" "$AI_TOOL")"
     if [[ "$AI_TOOL" == "codex" ]]; then
-      active_slot="$(codex_current_slot "$PROJECT_ROOT")"
+      [[ -n "$active_slot" ]] || active_slot="$(codex_current_slot "$PROJECT_ROOT")"
       active_cooldown_identity="$(codex_current_cooldown_identity "$PROJECT_ROOT")"
     fi
     dirty_entries="$(project_dirty_entries "$PROJECT_ROOT")"
@@ -6091,6 +6261,7 @@ start_project_runtime() {
     LAST_SECONDARY_RATE_LIMIT_USED_PERCENT="$secondary_rate_limit_used_percent"
     LAST_SECONDARY_RATE_LIMIT_RESETS_AT="$secondary_rate_limit_resets_at"
     LAST_ROUTE_ONLY_HANDOFF="$route_only_handoff"
+    CURRENT_TOOL_SLOT="$active_slot"
     LAST_ACTIVE_SLOT="$active_slot"
     LAST_SLOT_SWITCH_REASON=""
     LAST_SLOT_SWITCH_AT=""
@@ -6170,7 +6341,7 @@ start_project_runtime() {
       record_restart_storm_signal "$PROJECT_ROOT" "$restart_signal_reason" "${restart_window_count:-0}" "${restart_window_peak:-0}"
     fi
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$LAST_ACTIVE_SLOT" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}"
     LAST_WORKCELL_EXIT_REASON="${slot_switch_reason:-${rate_limit_reason:-ai_exit_rc_${rc}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     append_runtime_event "$project" "ai_cycle_finished" \
@@ -6732,6 +6903,7 @@ cmd_baseline_status() {
   echo "last_secondary_rate_limit_used_percent: ${LAST_SECONDARY_RATE_LIMIT_USED_PERCENT:-unavailable}"
   echo "last_secondary_rate_limit_resets_at: ${LAST_SECONDARY_RATE_LIMIT_RESETS_AT:-unavailable}"
   echo "last_route_only_handoff: ${LAST_ROUTE_ONLY_HANDOFF:-0}"
+  echo "current_slot: ${CURRENT_TOOL_SLOT:-unavailable}"
   echo "last_active_slot: ${LAST_ACTIVE_SLOT:-unavailable}"
   echo "last_slot_switch_reason: ${LAST_SLOT_SWITCH_REASON:-unavailable}"
   echo "last_slot_switch_at: ${LAST_SLOT_SWITCH_AT:-unavailable}"

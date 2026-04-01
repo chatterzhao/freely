@@ -13,11 +13,12 @@
 - `tools.md` 继续只定义任务路由与工具选择参考，不直接充当 runtime availability fallback 顺序真源。
 - 当前 runtime-owned availability manager 使用 project config 中的 `AI_FALLBACK_TOOLS` 作为 ordered recovery list，而不是复用本文件的 routing priority。
 - canonical recovery order 是：
-  - `AI_TOOL` 是 current tool 真相；`LAST_ACTIVE_SLOT` 是 current slot 真相
+  - `AI_TOOL` 是 current tool 真相；runtime `current_slot` 是 current slot 真相，并继续镜像到 legacy `LAST_ACTIVE_SLOT`
   - 同工具 slot / profile recovery first
   - same-tool exhausted 后再从 `AI_FALLBACK_TOOLS` 最左侧开始重新扫描其他工具，而不是把 current tool 隐式插到最前
-  - 全部不可用时保持 no-launch，并把 earliest-reset target 写成显式 waiting truth
-- 当前已存在 canonical same-tool watchdog truth 的工具仍主要是 `codex`；其他工具若缺 probe / slot family truth，会以较弱 readiness contract 参与 cross-tool fallback，但不能冒充与 Codex 等价。
+  - 每进入一个 fallback tool，先继续扫该工具自己的 slot family，再决定是否进入下一个工具
+  - 全部不可用时保持 no-launch，并把 earliest-reset target 写成显式 `tool + slot` waiting truth
+- 当前已存在 canonical probe-first / switch-lock / no-launch watchdog truth 的工具仍主要是 `codex`；其他工具现已进入统一 slot inventory / current-slot scheduler，但若缺 probe parity，仍以较弱 readiness contract 参与 slot-first recovery，不能冒充与 Codex 等价。
 
 ## Available Tools
 

@@ -60,6 +60,41 @@ list_tool_slots() {
   ls -1 "$AUTH_DIR" 2>/dev/null | grep "^${prefix}" | sed "s/^${prefix}//" || true
 }
 
+tool_active_slot_file() {
+  local tool="$1"
+  printf '%s\n' "$AUTH_DIR/.${tool}-current-slot"
+}
+
+read_tool_active_slot() {
+  local tool="$1" file
+  file="$(tool_active_slot_file "$tool")"
+  if [[ -f "$file" ]]; then
+    tr -d '\n' <"$file"
+    return 0
+  fi
+  if [[ "$tool" == "codex" ]]; then
+    read_codex_active_slot
+  fi
+}
+
+write_tool_active_slot() {
+  local tool="$1" slot="$2" file
+  file="$(tool_active_slot_file "$tool")"
+  mkdir -p "$(dirname "$file")"
+  printf '%s\n' "$slot" >"$file"
+  if [[ "$tool" == "codex" ]]; then
+    write_codex_active_slot "$slot"
+  fi
+}
+
+clear_tool_active_slot() {
+  local tool="$1"
+  rm -f "$(tool_active_slot_file "$tool")"
+  if [[ "$tool" == "codex" ]]; then
+    rm -f "$(codex_active_slot_file)"
+  fi
+}
+
 codex_active_slot_file() {
   printf '%s\n' "$HOME/.codex/active-slot"
 }
@@ -305,6 +340,90 @@ EOF
   log_info "Auth directory: $AUTH_DIR"
 }
 
+tool_default_singleton_slot() {
+  printf 'default-1\n'
+}
+
+ensure_tool_singleton_slot_dir() {
+  local tool="$1" slot target_dir
+  slot="$(tool_default_singleton_slot)"
+  target_dir="$(auth_slot_dir "$tool" "$slot")"
+  [[ -d "$target_dir" ]] || mkdir -p "$target_dir"
+  printf '%s\n' "$slot"
+}
+
+first_tool_slot_or_singleton() {
+  local tool="$1" first_slot
+  first_slot="$(list_tool_slots "$tool" | head -n 1)"
+  if [[ -n "$first_slot" ]]; then
+    printf '%s\n' "$first_slot"
+    return 0
+  fi
+  ensure_tool_singleton_slot_dir "$tool"
+}
+
+tool_switch_direct_generic() {
+  local tool="$1" slot="$2" target_dir
+  target_dir="$(auth_slot_dir "$tool" "$slot")"
+  if [[ ! -d "$target_dir" ]]; then
+    log_error "Slot '$slot' not found for $tool"
+    log_info "Available: $(list_tool_slots "$tool" | tr '\n' ' ')"
+    exit 4
+  fi
+  [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch $tool to $slot"; return 0; }
+  write_tool_active_slot "$tool" "$slot"
+  log_info "Switched $tool to slot: $slot"
+  if [[ "$FORMAT" == "json" ]]; then
+    echo "{\"switched\": true, \"tool\": \"$tool\", \"slot\": \"$slot\", \"auth_email\": null, \"account\": null}"
+  fi
+}
+
+tool_switch_auto_generic() {
+  local tool="$1" slot
+  slot="$(read_tool_active_slot "$tool")"
+  [[ -n "$slot" ]] || slot="$(first_tool_slot_or_singleton "$tool")"
+  tool_switch_direct_generic "$tool" "$slot"
+}
+
+tool_login_generic() {
+  local tool="$1" slot target_dir
+  slot="$(first_tool_slot_or_singleton "$tool")"
+  target_dir="$(auth_slot_dir "$tool" "$slot")"
+  [[ "$DRY_RUN" == "true" ]] && {
+    log_info "[DRY-RUN] Would create $tool slot container at $target_dir"
+    return 0
+  }
+  mkdir -p "$target_dir"
+  write_tool_active_slot "$tool" "$slot"
+  log_info "Created $tool slot container: $slot"
+  log_info "Location: $target_dir"
+  if [[ "$FORMAT" == "json" ]]; then
+    echo "{\"logged_in\": false, \"tool\": \"$tool\", \"slot\": \"$slot\", \"auth_email\": null, \"account\": null, \"saved\": false, \"path\": \"$target_dir\"}"
+  fi
+}
+
+tool_save_generic() {
+  local tool="$1" slot="${2:-}" target_dir
+  if [[ -n "$slot" ]]; then
+    target_dir="$(auth_slot_dir "$tool" "$slot")"
+  else
+    slot="$(read_tool_active_slot "$tool")"
+    [[ -n "$slot" ]] || slot="$(first_tool_slot_or_singleton "$tool")"
+    target_dir="$(auth_slot_dir "$tool" "$slot")"
+  fi
+  [[ "$DRY_RUN" == "true" ]] && {
+    log_info "[DRY-RUN] Would save $tool slot container at $target_dir"
+    return 0
+  }
+  mkdir -p "$target_dir"
+  write_tool_active_slot "$tool" "$slot"
+  log_info "Saved $tool slot container: $slot"
+  log_info "Location: $target_dir"
+  if [[ "$FORMAT" == "json" ]]; then
+    echo "{\"saved\": true, \"tool\": \"$tool\", \"slot\": \"$slot\", \"auth_email\": null, \"account\": null, \"path\": \"$target_dir\"}"
+  fi
+}
+
 # 登录
 cmd_login() {
   local tool="$1"
@@ -325,7 +444,7 @@ cmd_login() {
           mkdir -p "$target_dir"
           cp "$HOME/.codex/auth.json" "$target_dir/"
           chmod 600 "$target_dir/auth.json"
-          write_codex_active_slot "$slot"
+          write_tool_active_slot "codex" "$slot"
           log_info "Auto-saved auth email: $account"
           log_info "Slot: $slot"
           log_info "Location: $target_dir"
@@ -338,8 +457,11 @@ cmd_login() {
       fi
       ;;
     iflow)
-      log_info "iflow uses environment variables."
-      log_info "Set IFLOW_API_KEY in your shell config, then run: freely ai save iflow <slot>"
+      tool_login_generic "$tool"
+      log_info "iflow auth material still comes from environment/config; slot container created for scheduler compatibility."
+      ;;
+    kiro-cli|cc|cc-use-codex-cli|opencode)
+      tool_login_generic "$tool"
       ;;
     *)
       log_error "Unknown tool: $tool"
@@ -388,7 +510,7 @@ cmd_save() {
       mkdir -p "$target_dir"
       cp "$auth_file" "$target_dir/"
       chmod 600 "$target_dir/auth.json"
-      write_codex_active_slot "$slot"
+      write_tool_active_slot "codex" "$slot"
 
       log_info "Saved codex slot: $slot"
       [[ -n "$actual_account" ]] && log_info "Slot auth email: $actual_account"
@@ -400,8 +522,11 @@ cmd_save() {
       fi
       ;;
     iflow)
-      log_error "iflow uses environment variables. Set IFLOW_${slot^^}_KEY in your shell config."
-      exit 2
+      tool_save_generic "$tool" "$slot"
+      log_info "iflow auth material still comes from environment/config; saved slot container for scheduler compatibility."
+      ;;
+    kiro-cli|cc|cc-use-codex-cli|opencode)
+      tool_save_generic "$tool" "$slot"
       ;;
     *)
       log_error "Unknown tool: $tool"
@@ -420,7 +545,7 @@ sync_current_auth() {
   fi
   
   local current_slot
-  current_slot="$(read_codex_active_slot)"
+  current_slot="$(read_tool_active_slot "$tool")"
   if [[ -z "$current_slot" ]]; then
     return 0
   fi
@@ -461,6 +586,13 @@ cmd_switch() {
         notify_freely_auth_change "codex" "$slot" "switch_success"
       fi
       return "$rc"
+      ;;
+    iflow|kiro-cli|cc|cc-use-codex-cli|opencode)
+      if [[ -z "$slot" ]]; then
+        tool_switch_auto_generic "$tool"
+      else
+        tool_switch_direct_generic "$tool" "$slot"
+      fi
       ;;
     *)
       log_error "Unknown tool: $tool"
@@ -609,7 +741,7 @@ _cmd_switch_codex_direct_unlocked() {
     exit 5
   fi
 
-  write_codex_active_slot "$slot"
+  write_tool_active_slot "codex" "$slot"
   log_info "Switched codex to slot: $slot"
   log_info "Switched codex auth email: $switched_account"
   log_warn "Restart codex for the change to take effect"
@@ -621,16 +753,19 @@ _cmd_switch_codex_direct_unlocked() {
 
 # 列出 slots
 cmd_list() {
+  local tool="${1:-codex}"
   local accounts=()
-  codex_switch_lock_wait_for_idle || exit 1
+  if [[ "$tool" == "codex" ]]; then
+    codex_switch_lock_wait_for_idle || exit 1
+  fi
   
   while IFS= read -r line; do
     [[ -z "$line" ]] && continue
-    accounts+=("codex-$line")
-  done < <(list_tool_slots "codex")
+    accounts+=("$tool-$line")
+  done < <(list_tool_slots "$tool")
   
   if [[ ${#accounts[@]} -eq 0 ]]; then
-    log_info "No slots found. Run 'freely ai login codex' to create one."
+    log_info "No slots found for $tool."
     return
   fi
   
@@ -670,7 +805,7 @@ cmd_whoami() {
       fi
       
       local account=$(extract_codex_account "$auth_file")
-      slot="$(read_codex_active_slot)"
+      slot="$(read_tool_active_slot "codex")"
       if [[ -z "$account" ]]; then
         case "$FORMAT" in
           json) echo "{\"tool\": \"codex\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": null, \"account\": null}" ;;
@@ -684,6 +819,16 @@ cmd_whoami() {
         *)
           [[ -n "$slot" ]] && log_info "Current slot: $slot"
           log_info "Current auth email: $account"
+          ;;
+      esac
+      ;;
+    iflow|kiro-cli|cc|cc-use-codex-cli|opencode)
+      local slot=""
+      slot="$(read_tool_active_slot "$tool")"
+      case "$FORMAT" in
+        json) echo "{\"tool\": \"$tool\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": null, \"account\": null}" ;;
+        *)
+          [[ -n "$slot" ]] && log_info "Current slot: $slot" || log_warn "No active slot selected for $tool"
           ;;
       esac
       ;;
@@ -712,7 +857,7 @@ cmd_status() {
         local mtime=$(stat -f "%Sm" "$auth_file" 2>/dev/null || stat -c "%y" "$auth_file" 2>/dev/null || echo "unknown")
         local account=$(extract_codex_account "$auth_file")
         local slot
-        slot="$(read_codex_active_slot)"
+        slot="$(read_tool_active_slot "codex")"
         local usable_count=""
         local limited_count=""
         local deactivated_count=""
@@ -770,6 +915,26 @@ cmd_status() {
         esac
       fi
       ;;
+    iflow|kiro-cli|cc|cc-use-codex-cli|opencode)
+      local slot path
+      slot="$(read_tool_active_slot "$tool")"
+      path=""
+      [[ -n "$slot" ]] && path="$(auth_slot_dir "$tool" "$slot")"
+      case "$FORMAT" in
+        json)
+          echo "{\"tool\": \"$tool\", \"auth\": $(json_string_or_null "${slot:+slot_inventory}"), \"slot\": $(json_string_or_null "$slot"), \"path\": $(json_string_or_null "$path")}"
+          ;;
+        *)
+          log_info "Tool: $tool"
+          if [[ -n "$slot" ]]; then
+            log_info "Slot: $slot"
+            log_info "Path: $path"
+          else
+            log_warn "No active slot selected for $tool"
+          fi
+          ;;
+      esac
+      ;;
     *)
       log_error "Unknown tool: $tool"
       exit 2
@@ -794,8 +959,8 @@ cmd_delete() {
   [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would delete $target_dir"; return; }
 
   rm -rf "$target_dir"
-  if [[ "$tool" == "codex" ]] && [[ "$(read_codex_active_slot)" == "$slot" ]]; then
-    rm -f "$(codex_active_slot_file)"
+  if [[ "$(read_tool_active_slot "$tool")" == "$slot" ]]; then
+    clear_tool_active_slot "$tool"
   fi
   log_info "Deleted slot: $slot"
 
@@ -876,7 +1041,7 @@ main() {
     save) cmd_save "${ARGS[0]}" "${ARGS[1]:-}" ;;
     switch)
       case "${ARGS[0]:-}" in
-        codex|iflow)
+        codex|iflow|kiro-cli|cc|cc-use-codex-cli|opencode)
           cmd_switch "${ARGS[0]}" "${ARGS[1]:-}"
           ;;
         "")
@@ -888,7 +1053,7 @@ main() {
           ;;
       esac
       ;;
-    list) cmd_list ;;
+    list) cmd_list "${ARGS[0]:-codex}" ;;
     whoami) cmd_whoami "${ARGS[0]:-codex}" ;;
     status) cmd_status "${ARGS[0]:-codex}" ;;
     delete) cmd_delete "${ARGS[0]}" "${ARGS[1]}" ;;
