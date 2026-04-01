@@ -73,6 +73,7 @@
   - `kiro-cli --resume` 当前只恢复当前目录最近会话，不是 canonical 的 explicit session-addressed resume。
   - `--resume-picker` 只是人工交互 fallback，不能作为 supervisor/runtime 默认重入路径。
   - 因此 `kiro-cli` 当前不应被标记为并发安全的 canonical continuity tool。
+  - 当 cycle log 出现 `Monthly request limit reached` 或 `Unable to verify subscription status: service error` 时，Freely 当前会把它们视为 Kiro availability failure，写入 canonical reason 并停止本地盲目 relaunch，后续 recovery 交回 watchdog / manager control plane。
 
 ### cc
 

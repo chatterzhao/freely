@@ -71,6 +71,20 @@ routing_policy:
 
 ### completed_issues
 
+1. `I-20260331-1830-A`
+- title: Kiro CLI runtime availability failure governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/issues/kiro-cli-runtime-availability-failure-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/candidates.md`
+- evidence:
+  - `develop` commit `3a6b0e0`
+  - `docs/progress/workspace-routing-foundation/p-kiro-cli-runtime-availability-failure-governance.md`
+  - `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/code-reviews/20260331-kiro-cli-runtime-availability-verification.md`
+- completion_note: Kiro monthly-limit / subscription-status-service-error 这条已证实 failure family 已被 narrow runtime owner 吸收：runtime 不再把它们记成 `ai_exit_rc_0`，而是写入 canonical Kiro availability reason 并停止本地盲目 relaunch。更广的 same-tool slot recovery 或 cross-tool fallback 继续留给后续 lifecycle，不回灌本 owner。
+
 1. `I-20260321-1835-A`
 - title: Develop merge issue binding and C/M/I gate governance
 - milestone_state: completed

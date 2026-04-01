@@ -38,8 +38,12 @@ rate.?limit|429|quota.?exceeded|limit.?reached|too.?many.?requests|usage.?limit
 ### kiro
 
 ```regex
-rate.?limit|429|quota.?exceeded|limit.?reached
+rate.?limit|429|quota.?exceeded|limit.?reached|monthly request limit reached|unable to verify subscription status:\s*service error
 ```
+
+匹配示例：
+- `Monthly request limit reached`
+- `Unable to verify subscription status: service error`
 
 ## 认证失败模式
 

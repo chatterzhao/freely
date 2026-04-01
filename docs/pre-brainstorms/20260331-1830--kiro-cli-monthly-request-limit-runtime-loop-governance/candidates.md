@@ -31,13 +31,17 @@
     mode: `author review`
     summary: `The repository already documents Kiro limit patterns in the availability skill, but the live runtime still misclassifies the observed failure. This suggests a real taxonomy-to-runtime gap rather than a documentation-only gap.`
     verdict: `needs_more_research`
+  - reviewer: `codex`
+    mode: `closeout review`
+    summary: `The runtime classifier and focused regression are now already present on develop, so the remaining work is lifecycle materialization and canonical truth writeback. This should close as a narrow Kiro-scoped owner instead of reopening the broader availability architecture.`
+    verdict: `ready_for_ibm`
 - priority: P1
-- status: needs_research
-- decision_reason: This is a live runtime misclassification with observable churn. It should be researched as an availability/failure-taxonomy bug before any classifier or supervisor change is attempted.
-- promoted_issue_path: `pending://issue-materialization`
-- milestone: `pending://milestone-binding`
-- next_action: Compare the observed Kiro failure path against current runtime classifiers, then decide whether the minimal issue is a Kiro-specific availability bucket or a broader AI-tool recovery contract update.
-- revisit_trigger: Revisit immediately if another dogfood run shows the same Kiro limit string being relabeled as a healthy exit and relaunched without a cooldown or block.
+- status: promoted
+- decision_reason: The observed Kiro failure family has now been proven narrow and already absorbed by a focused runtime fix on `develop`: detect the two observed strings early, write a canonical slot-switch reason, stop local blind relaunch, and defer availability recovery back to the control plane. The correct owner is therefore a dedicated Kiro-scoped closeout issue, not a reopened generic AI-tool redesign.
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/issues/kiro-cli-runtime-availability-failure-governance.md`
+- milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
+- next_action: Materialize the narrow owner issue, write canonical verification/progress evidence around develop commit `3a6b0e0`, and close this candidate as promoted instead of leaving it in `needs_research`.
+- revisit_trigger: Reopen only if future field evidence shows additional Kiro failure strings still being recorded as healthy exits, or if same-family failures on other tools force a broader cross-tool availability owner.
 - session_refs:
   - tool: `kiro-cli`
   - session_id: `current-thread`
