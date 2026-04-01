@@ -24,8 +24,20 @@
 - open_questions:
   - does the root cause live in `ensure-manager` attach detection, stale supervisor PID reuse, or read-path trust of persisted attach state
   - should attach-only writes emit runtime events as observability anchors
+- acceptance_reviews:
+  - reviewer: `codex`
+    mode: `author review`
+    summary: `The symptom is real, but the trigger is still unproven. Evidence instrumentation is acceptable now; corrective behavior changes still need a focused repro.`
+    verdict: `needs_more_research`
 - priority: P1
 - status: needs_research
 - decision_reason: The symptom is real and current, but the exact root cause is not yet proven. The next lawful step is a focused repro and code-path audit, not a speculative fix.
+- promoted_issue_path: `pending://issue-materialization`
+- milestone: `pending://milestone-binding`
 - next_action: Build a minimal repro lane for false `already_running_attach` and pin the precise write/read mismatch.
 - revisit_trigger: Promote once a repro shows the exact attach path that writes optimistic `up/up` without a surviving project-owned supervisor or AI.
+- session_refs:
+  - tool: `codex`
+  - session_id: `current-thread`
+  - jsonl_path: `unavailable://codex-thread-only`
+  - role: `author`
