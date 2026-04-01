@@ -1535,17 +1535,17 @@ routing_policy:
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
 - source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: frontend 侧 contract、transport、manifest 和错误面已基本收敛；backend bridge 缺口仍由 `I-20260317-1005` 承接。当前 Rust bridge 的本地 `cargo check` / `cargo test`、前端 `typecheck` / `build` 与公开 manifest 对齐验证都已通过；下一步等待真实 Tauri 宿主启动联调结果，再回到本 issue 收紧 frontend host integration 与 blocker 描述
+- next_action: frontend 侧 contract、transport、manifest 和错误面已基本收敛；真实 Tauri 宿主已由 `I-20260317-1005` 成功拉起，backend host-up blocker 不再成立。下一步等待 `I-20260317-1005` 把真实 `Transport=tauri` 下的最小 start / session create-resume / chat intervention 验证证据写回，再回到本 issue 收紧 frontend host integration 与 blocker 描述
 
 2. `I-20260317-1005`
 - title: Rust/Tauri Probe Bridge v1
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
 - source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
-- next_action: lead-agent 首跳重入后继续命中 `milestones` 池里的当前 committed `in_dev` issue，并在同一 `codex` 会话内进入 `dev-loop-execution`。当前已补齐 `src-tauri/icons/icon.png`，`bun run rust:preflight`、`bun run cargo:check:probe` 与 `cargo test -p freely-probe-bridge` 已通过；先前的 Rust toolchain / icon blocker 和 `dead_code` warning 均已解除。下一步继续围绕真实 Tauri 宿主启动联调推进，确认前端 `Transport=tauri` 不再停在 `bridge offline`
+- next_action: 当前已新增 `tauri:preflight:probe` / `tauri:dev:probe` 与统一 host-validation 脚本，并已实际完成真实 Tauri 宿主启动：Vite `BeforeDevCommand`、Rust bridge 编译、`target/debug/freely-probe-bridge` 运行态都已通过。下一步在 verification 中补齐真实 `Transport=tauri` 下最小 start / session create-resume / chat intervention 闭环证据，再决定是否 `completed`
 
 3. `I-20260317-1004`
 - title: Frontend Runtime Baseline for Probe
