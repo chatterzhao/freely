@@ -1535,19 +1535,9 @@ routing_policy:
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
 - source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: frontend 侧 contract、transport、manifest 和错误面已基本收敛；真实 Tauri 宿主已由 `I-20260317-0332` 成功拉起，backend host-up blocker 不再成立。下一步等待 `I-20260317-0332` 把真实 `Transport=tauri` 下的最小 start / session create-resume / chat intervention 验证证据写回，再回到本 issue 收紧 frontend host integration 与 blocker 描述
+- next_action: backend bridge 的真实 `Transport=tauri` 最小闭环证据现已由 `I-20260317-0332` 写回；当前不再等待 bridge blocker，而是继续收紧 frontend host integration / UX 自身还缺的验收面
 
-2. `I-20260317-0332`
-- title: Rust/Tauri Probe Bridge v1
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
-- source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
-- next_action: 当前已新增 `tauri:preflight:probe` / `tauri:dev:probe` 与统一 host-validation 脚本，并已实际完成真实 Tauri 宿主启动：Vite `BeforeDevCommand`、Rust bridge 编译、`target/debug/freely-probe-bridge` 运行态都已通过。下一步在 verification 中补齐真实 `Transport=tauri` 下最小 start / session create-resume / chat intervention 闭环证据，再决定是否 `completed`
-
-3. `I-20260317-1004`
+2. `I-20260317-1004`
 - title: Frontend Runtime Baseline for Probe
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -1557,7 +1547,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md`
 - next_action: 这条 baseline 已完成最小 IBM 收敛，但当前不在近程执行窗；先让 `I-20260308-1244-03` / `I-20260317-0332` 消化真实宿主与 bridge 联调成本。若当前 research/merge-prep worktree 只剩这类远期排序项，应先完成 milestone 写回并走 retirement handoff，而不是为了挂住未来 queue 长期保留 worktree。
 
-4. `I-20260317-1003`
+3. `I-20260317-1003`
 - title: Incremental Dogfooding Gate for Backend Increments
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -1617,6 +1607,20 @@ routing_policy:
   - `docs/progress/frontend-probe-dogfooding-loop/p-frontend-backend-boundary-contract-v1-for-frontend-probe.md`
   - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/code-reviews/20260326-frontend-backend-boundary-contract-v1-canonical-verification.md`
 - completion_note: Probe day-1 boundary contract 已冻结到 object family、error surface、ordering 与 adapter compatibility 字段面，并被 `frontend-probe-v0` 与 `rust-tauri-probe-bridge-v1` 直接复用；因此本 issue 已完成 canonical closeout，后续真实宿主与 bridge 联调留给 active `in_dev` 主线承接
+
+3. `I-20260317-0332`
+- title: Rust/Tauri Probe Bridge v1
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+- source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
+- evidence:
+  - `docs/progress/frontend-probe-dogfooding-loop/p-rust-tauri-probe-bridge-v1.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-host-validation-verification.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
+- completion_note: 真实 Tauri 宿主已不再只是能启动；当前已通过 `bun run tauri:validate:probe` 实测写回 `RequestSnapshot`、`ControlRun`、`CreateOrResumeSession`、`SendChatIntervention` 以及对应 event/snapshot 证据，因此 backend bridge v1 已完成 canonical closeout。后续 frontend host integration / UX 收口继续留在 `I-20260308-1244-03`
 
 ## M-20260318-url-content-intake-skill-and-wechat-fetch-governance
 
