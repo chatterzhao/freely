@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { ProbeAdapter } from "./adapter";
 import {
+  createAttachTerminalCommand,
   createChatInterventionCommand,
   createOrResumeSessionCommand,
   createRunControlCommand,
@@ -9,7 +10,7 @@ import {
 import type { ServerEvent, ProbeSnapshot } from "./contracts";
 
 type ValidationStatus = "idle" | "running" | "passed" | "failed";
-type ValidationStepName = "start" | "session" | "chat";
+type ValidationStepName = "start" | "session" | "attach" | "chat";
 type ValidationStepState = "pending" | "passed" | "failed";
 
 type ValidationSequenceState = {
@@ -33,6 +34,7 @@ const defaultState = (): ValidationSequenceState => ({
   steps: {
     start: "pending",
     session: "pending",
+    attach: "pending",
     chat: "pending",
   },
 });
@@ -65,6 +67,7 @@ export function useTauriValidationSequence({
     startedRef.current = true;
     const runId = snapshot.activeRuns[0]?.runId ?? `${projectId}-run-1`;
     const sessionId = `${projectId}-validation-session`;
+    const terminalTarget = `${runId}:pty-0`;
     const validationMessage = "tauri validation ping";
 
     const refreshSnapshotUntil = async (
@@ -114,6 +117,21 @@ export function useTauriValidationSequence({
       setState((current) => ({
         ...current,
         steps: { ...current.steps, session: "passed" },
+      }));
+
+      await adapter.sendCommand(
+        createAttachTerminalCommand(projectId, sessionId, terminalTarget, runId),
+      );
+      await refreshSnapshotUntil(
+        (nextSnapshot) =>
+          nextSnapshot.governanceSummary.some((summary) =>
+            summary.includes(`terminal attached to ${terminalTarget}`),
+          ),
+        "snapshot refresh after terminal attach",
+      );
+      setState((current) => ({
+        ...current,
+        steps: { ...current.steps, attach: "passed" },
       }));
 
       await adapter.sendCommand(

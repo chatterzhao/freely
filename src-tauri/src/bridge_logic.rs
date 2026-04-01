@@ -1,6 +1,7 @@
 use crate::command_kind::ProbeCommandKind;
 use crate::command_payload::{
-    parse_chat_intervention_payload, parse_control_run_payload, parse_session_command_payload,
+    parse_attach_terminal_payload, parse_chat_intervention_payload,
+    parse_control_run_payload, parse_session_command_payload,
 };
 use crate::event_payload::{
     build_agent_status_event, build_input_arbitration_event, build_run_status_event,
@@ -61,6 +62,10 @@ fn ack_message(
             "session accepted: {}",
             session_detail.unwrap_or("probe-ui")
         ),
+        ProbeCommandKind::AttachTerminal => format!(
+            "terminal attached: {}",
+            session_detail.unwrap_or("unknown-target")
+        ),
         ProbeCommandKind::SendChatIntervention => format!(
             "chat intervention accepted: {}",
             truncate_detail(chat_detail)
@@ -77,6 +82,7 @@ pub fn apply_command(
     let command_kind = ProbeCommandKind::from(envelope.command.as_str());
     let control_payload = parse_control_run_payload(&envelope.payload);
     let session_payload = parse_session_command_payload(&envelope.payload);
+    let attach_payload = parse_attach_terminal_payload(&envelope.payload);
     let chat_payload = parse_chat_intervention_payload(&envelope.payload);
     snapshot.last_event_id = next_event_id(&snapshot.last_event_id);
 
@@ -172,6 +178,72 @@ pub fn apply_command(
             );
             vec![build_session_upserted_event(snapshot, project_id, session_source)]
         }
+        ProbeCommandKind::AttachTerminal => {
+            let session_id = attach_payload
+                .session_id
+                .clone()
+                .or_else(|| {
+                    snapshot
+                        .active_sessions
+                        .first()
+                        .map(|session| session.session_id.clone())
+                })
+                .unwrap_or_else(|| default_session_id(project_id));
+            let run_id = attach_payload
+                .run_id
+                .clone()
+                .or_else(|| snapshot.active_runs.first().map(|run| run.run_id.clone()))
+                .unwrap_or_else(|| default_run_id(project_id));
+            let terminal_target = attach_payload
+                .terminal_target
+                .clone()
+                .unwrap_or_else(|| format!("{}:pty-0", run_id));
+
+            snapshot.active_sessions = vec![SessionStatus {
+                session_id: session_id.clone(),
+                status: "running".to_string(),
+            }];
+            if let Some(run) = snapshot
+                .active_runs
+                .iter_mut()
+                .find(|run| run.run_id == run_id)
+            {
+                run.status = "in_dev".to_string();
+            } else {
+                snapshot.active_runs = vec![crate::model::RunInfo {
+                    run_id: run_id.clone(),
+                    status: "in_dev".to_string(),
+                }];
+            }
+            let mut next_terminal_targets = snapshot
+                .terminal_targets
+                .iter()
+                .filter(|target| target.terminal_target != terminal_target)
+                .cloned()
+                .collect::<Vec<_>>();
+            next_terminal_targets.insert(
+                0,
+                crate::model::TerminalTarget {
+                    terminal_target: terminal_target.clone(),
+                    session_id: session_id.clone(),
+                },
+            );
+            snapshot.terminal_targets = next_terminal_targets;
+            prepend_summary(
+                &mut snapshot.governance_summary,
+                format!("terminal attached to {}", terminal_target),
+            );
+            vec![build_terminal_chunk_event(
+                snapshot,
+                project_id,
+                format!(
+                    "[rust:attach:{}] session {} attached",
+                    attach_payload.cursor.as_deref().unwrap_or("tail"),
+                    session_id
+                ),
+                "human-control",
+            )]
+        }
         ProbeCommandKind::SendChatIntervention => {
             let chat_detail = truncate_detail(chat_payload.content.as_deref()).to_string();
             let message_id = chat_payload
@@ -254,7 +326,10 @@ pub fn apply_command(
         message: ack_message(
             &command_kind,
             control_payload.action.as_deref(),
-            session_payload.resume_hint.as_deref(),
+            match &command_kind {
+                ProbeCommandKind::AttachTerminal => attach_payload.terminal_target.as_deref(),
+                _ => session_payload.resume_hint.as_deref(),
+            },
             chat_payload.content.as_deref(),
         ),
     };
@@ -321,6 +396,38 @@ mod contract_default_id_tests {
         assert_eq!(snapshot.active_runs[0].run_id, "freely-run-1");
         assert_eq!(applied.events[0]["sessionId"], "freely-session-1");
         assert_eq!(applied.events[0]["details"], "hold here [message-1] -> lead-agent @ freely-run-1");
+    }
+
+    #[test]
+    fn attach_terminal_updates_target_and_governance_summary() {
+        let mut snapshot = default_snapshot("freely");
+
+        let applied = apply_command(
+            &mut snapshot,
+            "freely",
+            CommandEnvelope {
+                command: "AttachTerminal".to_string(),
+                payload: json!({
+                    "projectId": "freely",
+                    "type": "AttachTerminal",
+                    "sessionId": "freely-session-2",
+                    "terminalTarget": "freely-run-2:pty-0",
+                    "runId": "freely-run-2",
+                    "cursor": "tail"
+                }),
+            },
+        );
+
+        assert_eq!(applied.ack.message, "terminal attached: freely-run-2:pty-0");
+        assert_eq!(snapshot.active_sessions[0].session_id, "freely-session-2");
+        assert_eq!(snapshot.active_runs[0].run_id, "freely-run-2");
+        assert_eq!(snapshot.terminal_targets[0].terminal_target, "freely-run-2:pty-0");
+        assert_eq!(snapshot.terminal_targets[0].session_id, "freely-session-2");
+        assert_eq!(
+            snapshot.governance_summary[0],
+            "terminal attached to freely-run-2:pty-0"
+        );
+        assert_eq!(applied.events[0]["type"], "TerminalChunkAppended");
     }
 }
 
