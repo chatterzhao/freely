@@ -69,6 +69,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
 - next_action: 保持在当前 milestone 的 committed queue，直到 verification evidence 明确写回并把 `C-20260325-0333-B` 的完成态同步到正式 closeout；umbrella candidate `C-20260325-0333-A` 继续单独留在 candidate queue
 
+1. `I-20260331-2012-A`
+- title: Active milestone placement and consumption gate governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md`
+- next_action: Keep the new placement-correctness owner in verification on `feature/milestone-candidate-placement-gate-20260331` until manager merge review absorbs the gate into canonical `develop`. This slice is complete for active-milestone placement enforcement; broader scheduling or auto-rehome mechanisms stay out of scope.
+
 ### completed_issues
 
 1. `I-20260331-1830-A`
@@ -598,7 +608,18 @@ routing_policy:
 
 ### candidate_issues
 
-1. `C-20260330-2318-A`
+1. `C-20260331-1840-A`
+- title: Multi-tool group auto-switch governance
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md`
+- next_action: Keep this in the active milestone queue while freezing the minimum control-plane contract for `auto_switch_slot` and `auto_switch_tool`: config truth, tool-vs-slot failure taxonomy, same-tool-before-cross-tool recovery order, and continuity downgrade rules.
+- revisit_trigger: Promote once the minimum v1 contract is frozen for same-tool slot sweep, controlled cross-tool fallback, and explicit all-tools-unavailable surfacing
+
+2. `C-20260330-2318-A`
 - title: Live-status false already-running-attach regression
 - milestone_state: candidate
 - phase_state: `needs_research`
@@ -609,7 +630,7 @@ routing_policy:
 - next_action: Build a minimal repro lane for false `already_running_attach` and pin the precise write/read mismatch. This is inverse direction from `I-20260328-0745-A`: no live runtime exists, but persisted state claims up/up
 - revisit_trigger: Promote once a repro shows the exact attach path that writes optimistic `up/up` without a surviving project-owned supervisor or AI
 
-2. `C-20260327-1115-A`
+3. `C-20260327-1115-A`
 - title: Promote OAuth parallel sweep to canonical slot inventory truth
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -619,7 +640,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md`
 - next_action: 已提升为新的 follow-on issue；后续由 `I-20260327-1115` 承接 issue-bound IBM closeout 与 dev-loop 执行
 
-3. `C-20260323-1435-A`
+4. `C-20260323-1435-A`
 - title: Interactive init bootstrap and fine-grained force/skip governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -630,7 +651,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 `init` 的 step graph、bootstrap commit 豁免边界，以及每个 managed item 的 skip/force contract；在这些边界稳定前，不直接往现有 `init` 继续堆局部 patch
 - revisit_trigger: 当 `init` 的交互入口、repo bootstrap 语义与细粒度 skip/force 输出 contract 可以被冻结成独立 issue scope 时，重新进入 materialization 判断
 
-4. `C-20260318-0715-A`
+5. `C-20260318-0715-A`
 - title: `commit-first after checkpoint-ready` 自治治理
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -641,7 +662,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 3 个边界：`checkpoint-ready` 的结构化输出、`LAWS/runtime/checkpoint-guard/supervisor` 的职责分层、以及进入 IBM 前的 promotion gate；在这些边界稳定前不得直接写成 IBM issue 或塞回 `I-20260318-0930`
 - revisit_trigger: 当 `checkpoint-ready` 的结构化输出、supervisor 职责边界与 promotion gate 可以被稳定写成最小 issue contract 时，重新进入 materialization 判断
 
-5. `C-20260319-0402-01`
+6. `C-20260319-0402-01`
 - title: 定义 Freely 的 harness engineering 分层与缺口图
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -652,7 +673,7 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，先验证 Freely 是否需要一份更明确的 harness 分层与缺口图；若边界稳定，再 materialize 成 issue，而不是直接把外部文章结论塞进现有主线
 - revisit_trigger: 当 harness 分层、缺口图与 Freely 自身的最小吸收面可以冻结成独立 issue contract 时，重新进入 materialization 判断
 
-6. `C-20260319-0402-02`
+7. `C-20260319-0402-02`
 - title: 把 worktree 级验证信号统一暴露成 agent 可消费接口
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -663,7 +684,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先盘点现有 status / wt-status-all / runtime 输出，再决定要不要 materialize 成统一 machine-readable 汇总接口
 - revisit_trigger: 当 worktree 级验证信号的 canonical 输入、输出与 machine-readable summary contract 可以被冻结成 issue scope 时，重新进入 materialization 判断
 
-7. `C-20260319-0402-03`
+8. `C-20260319-0402-03`
 - title: 建立文档园艺与 AI 残渣清理的周期性后台循环
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -674,7 +695,7 @@ routing_policy:
 - next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize
 - revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
 
-8. `C-20260322-1615-A`
+10. `C-20260322-1615-A`
 - title: Protected post-merge acceptance route and promotion guard governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -685,7 +706,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，但已冻结一条硬规则：历史文案中的 `pre-test-merge` 现在一律按 `test-pre-merge-*` shadow batch 解释，只做测试 merge，不直接 merge 到 `develop`。剩余要收口的是 `develop-only completion verification` 与测试批次 acceptance 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
 - revisit_trigger: 当 protected verification environment 的 replay policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
 
-9. `C-20260325-0525-A`
+11. `C-20260325-0525-A`
 - title: Retire cooldown-driven recovery and make slot sweep canonical
 - milestone_state: completed
 - phase_state: `completed`
@@ -695,7 +716,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`
 - completion_note: 当前 candidate 生命周期已通过 pre-brainstorm 收口为 same-family supporting evidence；不新开平行 issue，直接把 “cooldown 退出主恢复 contract、failure-driven full slot sweep 成为 canonical” 的边界改写回 `I-20260318-1630`
 
-10. `C-20260322-1801-B`
+12. `C-20260322-1801-B`
 - title: pre-test-merge lifecycle management capability for Freely
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -706,7 +727,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，但 scope 已收窄为 `stale test-pre-merge batch governance`；历史候选名仍保留 `pre-test-merge`，语义上一律指向 `test-pre-merge-*` 前缀族。先冻结三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`；同时补齐 `replay source manifest / replay order / retire evidence`，把 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链桥接成固定的 `acceptance_contract_state/source/blocker` 字段，并把 testing closeout 的集成测试 / application-native real-environment testing evidence bar 写死，在这些真源稳定前不进入实现
 - revisit_trigger: 当 stale state 的 canonical 落点、manager lifecycle transaction 字段、runtime gate 消费路径、replay/retire manifest、`acceptance_contract_state/source/blocker` 桥，以及 testing closeout evidence bar 都能冻结成独立 issue contract 时，重新进入 materialization 判断
 
-11. `C-20260322-1801-C`
+13. `C-20260322-1801-C`
 - title: worker self-loop exit and scheduler closeout governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -717,7 +738,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，单独冻结 `phase progress`、`loop stall`、`manager handback`、`capacity release / supersede` 规则；同时补清 lane 回交后如何识别“其实是上游 `Issue + Brainstorm + PRD -> pre-tests.md` acceptance 面不完整”以及“其实还没完成 integration / application-native real-environment testing closeout”；这里提到的 stale `pre-test-merge` gate 同样按 `test-pre-merge-*` 前缀族解释，在 machine-readable 阈值稳定前，不把两条能力线绑在一起实现
 - revisit_trigger: 当 low-value self-loop 的判据、manager 回交 contract、容量释放规则，以及与 IBM/`Issue + Brainstorm + PRD -> pre-tests.md` 缺口和 testing closeout 缺口的分流条件都能冻结成独立 issue contract 时，重新进入 materialization 判断
 
-6. `C-20260319-0500-01`
+14. `C-20260319-0500-01`
 - title: 为 Freely 补一份更强的 orchestrator executable spec
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -728,7 +749,7 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，先确认 Freely 是否真的缺一份更集中、可执行的 orchestrator spec；若结论稳定，再 materialize 成 issue，而不是直接把 Symphony 当成架构模板
 - revisit_trigger: 当 orchestrator executable spec 的缺口、职责边界与最小验收可以冻结成独立 issue contract 时，重新进入 materialization 判断
 
-6. `C-20260319-0500-02`
+15. `C-20260319-0500-02`
 - title: 统一 issue-level continuity artifact 设计
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -739,7 +760,7 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，先确认哪些 continuity 信息必须跨环持续存在、哪些仍应按 loop 分层存放；未稳定前不要 materialize
 - revisit_trigger: 当 issue-level continuity artifact 的最小字段、跨环写回边界与 canonical 落点可以被冻结成 issue scope 时，重新进入 materialization 判断
 
-7. `C-20260319-0500-03`
+16. `C-20260319-0500-03`
 - title: 评估远程 worker / SSH 执行扩展对 Freely 的适用性
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -750,7 +771,7 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，优先只收集远程 worker 对 workspace ownership、cleanup、resume、host health 的新增要求
 - revisit_trigger: 当远程 worker / SSH 扩展的 ownership、cleanup、resume 与 host health 新约束可以冻结成最小 issue contract 时，重新进入 materialization 判断
 
-8. `C-20260310-0056-A`
+17. `C-20260310-0056-A`
 - title: Evolver Sidecar for Freely Strategy Evolution
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -894,6 +915,19 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`, `docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md`
 - next_action: 保持当前 research worktree 作为唯一写入 lane，完成 merge judgement 与写回；在补丁吸收到 `develop` 前，不恢复 pre-fix stalled dogfood runtime
 
+### candidate_issues
+
+8. `C-20260319-0018-B`
+- title: session evidence references as fallback, not prompt payload
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md`
+- next_action: Keep this supporting candidate visible while the same-family continuity owner narrows the fallback-reference contract.
+- revisit_trigger: Revisit when the owner issue either absorbs the fallback-reference contract explicitly or proves it unnecessary as a separate candidate.
+
 9. `C-20260319-1105-A`
 - title: 三层循环能力映射、owner 边界与生命周期真源收敛
 - milestone_state: candidate
@@ -935,6 +969,28 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260320-0605--agent-state-time-machine-and-shared-continuity/candidates.md`
 - next_action: 继续 pre-brainstorm，先冻结四个边界：Freely 当前哪些关键状态不在 Git/worktree 治理内、哪些状态必须一起 snapshot/rollback、共享连续性与 worker 私有状态如何分层、以及最小实现是否应先从本地 snapshot index / continuity metadata 开始；在这些边界稳定前不要把 PGFS 或 PostgreSQL 直接定成默认架构
 - revisit_trigger: 当 Freely 的多设备或多人协作场景需要统一共享连续性控制面，且本地 snapshot index 方案边界稳定后，再进入 IBM。
+
+14. `C-20260325-0333-A`
+- title: Testing evidence ladder and real-environment gates for Freely
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://testing-evidence-ladder-and-real-environment-gates`
+- source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
+- next_action: Keep the umbrella candidate visible while the first story-level `pre-tests.md` quality gate owner closes, then choose the next testing slice.
+- revisit_trigger: Revisit once `C-20260325-0333-B` closes and writes back whether the next slice should be evidence ladder mapping, real-environment harness, or another testing governance cut.
+
+15. `C-20260331-1837-A`
+- title: Worker first-hop role boundary regression in prompt generation and follow-on reentry
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260331-1837--worker-first-hop-role-boundary-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260331-1837--worker-first-hop-role-boundary-regression/candidates.md`
+- next_action: Trace the worker prompt-generation path and the worker follow-on relaunch path together, then decide whether this becomes one focused repair issue or two narrower runtime-facing fixes.
+- revisit_trigger: Revisit immediately if another worker lane writes manager-only artifacts, performs project-level patrol after delegated completion, or `MANAGER_MODE=false` prompts still enter `lead-agent` without a worker-only second hop boundary.
 ### completed_issues
 
 1. `I-20260322-0115`
@@ -1378,28 +1434,9 @@ routing_policy:
 - intent: 把“backend-core-first + frontend-probe-from-day-1”收敛为 Freely 自举开发自己的正式候选批次，避免继续只有后端结论、没有产品面验证闭环
 - why_now: Freely 的目标本身就是防止 AI 跑偏；如果自举开发中每个后端增量都不能立刻被前端观察、打断和回放，狗粮链路仍然不完整
 
-## M-20260318-url-content-intake-skill-and-wechat-fetch-governance
-
-- status: active
-- linked_issue: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
-- intent: 把公众号链接抓取研究转成可分享的 skill、脚本和最小测试
-- why_now: 研究已经证明本地浏览器 UA 抓取可行；如果不把脚本放进 skill，分享 skill 时能力仍然是不完整的
-
 ### committed_issues
 
-1. `I-20260318-1908`
-- title: URL 内容摄取 skill 与微信公众号抓取治理
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md`
-- next_action: 把 `url-content-intake` skill、自带抓取脚本与最小测试一起落齐，再评审是否并回 `develop`
-
-### committed_issues
-
-3. `I-20260317-1002`
+1. `I-20260317-1002`
 - title: Frontend Probe v0
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -1409,7 +1446,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
 - next_action: frontend 侧 contract、transport、manifest 和错误面已基本收敛；backend bridge 缺口仍由 `I-20260317-1005` 承接。当前 Rust bridge 的本地 `cargo check` / `cargo test`、前端 `typecheck` / `build` 与公开 manifest 对齐验证都已通过；下一步等待真实 Tauri 宿主启动联调结果，再回到本 issue 收紧 frontend host integration 与 blocker 描述
 
-6. `I-20260317-1005`
+2. `I-20260317-1005`
 - title: Rust/Tauri Probe Bridge v1
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -1419,7 +1456,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
 - next_action: lead-agent 首跳重入后继续命中 `milestones` 池里的当前 committed `in_dev` issue，并在同一 `codex` 会话内进入 `dev-loop-execution`。当前已补齐 `src-tauri/icons/icon.png`，`bun run rust:preflight`、`bun run cargo:check:probe` 与 `cargo test -p freely-probe-bridge` 已通过；先前的 Rust toolchain / icon blocker 和 `dead_code` warning 均已解除。下一步继续围绕真实 Tauri 宿主启动联调推进，确认前端 `Transport=tauri` 不再停在 `bridge offline`
 
-5. `I-20260317-1004`
+3. `I-20260317-1004`
 - title: Frontend Runtime Baseline for Probe
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -1452,7 +1489,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先判断 frontend probe 当前是否需要真正的多项目工作台，再决定是否 materialize
 - revisit_trigger: 当 frontend/control-surface 确认需要 `activeProject` 隔离、Focus/Overview 与项目级输入隔离 contract 时，重新进入 materialization 判断
 
-1. `C-20260317-1101`
+2. `C-20260317-1101`
 - title: Frontend Runtime Baseline for Probe
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -1489,6 +1526,33 @@ routing_policy:
   - `docs/progress/frontend-probe-dogfooding-loop/p-frontend-backend-boundary-contract-v1-for-frontend-probe.md`
   - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/code-reviews/20260326-frontend-backend-boundary-contract-v1-canonical-verification.md`
 - completion_note: Probe day-1 boundary contract 已冻结到 object family、error surface、ordering 与 adapter compatibility 字段面，并被 `frontend-probe-v0` 与 `rust-tauri-probe-bridge-v1` 直接复用；因此本 issue 已完成 canonical closeout，后续真实宿主与 bridge 联调留给 active `in_dev` 主线承接
+
+## M-20260318-url-content-intake-skill-and-wechat-fetch-governance
+
+- status: active
+- linked_issue: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
+- intent: 把公众号链接抓取研究转成可分享的 skill、脚本和最小测试
+- why_now: 研究已经证明本地浏览器 UA 抓取可行；如果不把脚本放进 skill，分享 skill 时能力仍然是不完整的
+
+### committed_issues
+
+1. `I-20260318-1908`
+- title: URL 内容摄取 skill 与微信公众号抓取治理
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md`
+- next_action: 把 `url-content-intake` skill、自带抓取脚本与最小测试一起落齐，再评审是否并回 `develop`
+
+### candidate_issues
+
+- none currently
+
+### completed_issues
+
+- none currently
 
 ## M-20260321-ai-native-doc-loop
 
