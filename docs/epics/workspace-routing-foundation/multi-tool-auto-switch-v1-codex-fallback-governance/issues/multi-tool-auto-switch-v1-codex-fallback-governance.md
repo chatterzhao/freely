@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260331-1840-A`
 - title: Multi-tool availability manager governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `multi-tool-auto-switch-v1-codex-fallback-governance`
@@ -11,6 +11,8 @@
 - source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
+- pre_tests_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/pre-tests.md`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -91,5 +93,8 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
 
 ## Next
 
-- 若后续要让 `kiro-cli` / `iflow` / `cc` 拥有和 Codex 等价的 same-tool probe truth，需要再开生命周期冻结 per-tool capability surface。
-- 若要支持跨工具保留 resume 语义，必须先新开 lifecycle 冻结 continuity equivalence contract；本 owner 不预支这条能力。
+- `2026-04-01 09:55 PDT` ordered fallback v1 is closed: canonical `develop` now carries the left-to-right fallback list, Kiro default-model repair, and teardown-aware recheck required for the bounded v1 contract.
+- Follow-on work stays out of scope here:
+  - per-tool same-tool probe parity belongs to new per-tool capability lifecycles
+  - all-tools slot parity already moved to and closed under `I-20260401-0840-A`
+  - cross-tool resume equivalence still requires a separate lifecycle

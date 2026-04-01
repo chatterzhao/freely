@@ -95,23 +95,31 @@ routing_policy:
 
 1. `I-20260331-1840-A`
 - title: Multi-tool availability manager governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md`
-- next_action: Keep this bounded v1 owner in verification until the develop-bound merge lands cleanly. This line now explicitly stops at ordered fallback v1 plus Codex parity; all-tools unified slot parity belongs to `I-20260401-0840-A`.
+- evidence:
+  - `develop` commits `7252ed8`, `f5addf3`, `795fe8d`, `12a56bc`
+  - `docs/progress/workspace-routing-foundation/p-multi-tool-auto-switch-v1-codex-fallback-governance.md`
+  - `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews/20260331-multi-tool-auto-switch-v1-codex-fallback-verification.md`
+- completion_note: ordered fallback v1 已经落到 canonical runtime truth：current tool same-tool recovery first、cross-tool fallback 从 `AI_FALLBACK_TOOLS` 最左侧重新开始、Kiro live path 不再被 stale default model 或 supervisor teardown race 卡住。更广的 all-tools slot parity 已移交 `I-20260401-0840-A` 并完成，不再由本 owner 持续占用 verification。
 
 1. `I-20260401-0840-A`
 - title: All-tools unified slot contract governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md`
-- next_action: Keep this owner in verification on `feature/unified-slot-contract-governance-20260401` until merge review absorbs the unified slot contract into `develop`; focused regressions and live `kiro-cli -> codex dead-slot -> later usable Codex slot` validation are complete.
+- evidence:
+  - `develop` commit `e8b5e0a`
+  - `docs/progress/workspace-routing-foundation/p-all-tools-unified-slot-contract-governance.md`
+  - `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`
+- completion_note: unified slot contract 已进入主线：所有工具进入统一 `~/.ai-auth/<tool>-<slot>/` inventory、runtime 维护 generic current-slot truth、每个 fallback tool 先扫 own slots，再继续跨工具，并且 canonical `develop` live validation 已确认 `kiro-cli` 不可用 + dead Codex slot 时仍能落到后续可用 Codex slot。
 
 1. `I-20260330-2358-A`
 - title: Runtime network failure taxonomy and bounded recovery governance
