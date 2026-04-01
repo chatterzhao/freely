@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-leftmost-priority.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260331-0000--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260331-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260331-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260331-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="iflow"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+AUTO_SWITCH_TOOL="true"
+AUTO_SWITCH_SLOT="true"
+AI_FALLBACK_TOOLS="codex,cc,kiro-cli,iflow"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+SUPERVISOR_STATE="down"
+AI_STATE="down"
+LAST_EXIT_REASON="tool_temporarily_unavailable"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+launch_log="$TMP_DIR/launch.log"
+readiness_log="$TMP_DIR/readiness.log"
+
+valid_supervisor_pid_for_project() { return 1; }
+discover_supervisor_pid() { return 0; }
+manager_ai_pid_for_project() { return 0; }
+manager_supervisor_pid_for_project() { return 0; }
+recover_stalled_manager_ai_if_needed() { return 1; }
+tool_failure_allows_cross_tool_auto_recovery() { return 0; }
+ensure_codex_slot_ready_for_manager() {
+  printf 'codex:%s\n' "$1" >>"$readiness_log"
+  return 1
+}
+tool_binary_available_for_auto_recovery() {
+  printf '%s\n' "$1" >>"$readiness_log"
+  [[ "$1" == "cc" ]]
+}
+manager_runtime_recover_workers_if_needed() { return 0; }
+launch_manager_supervisor() {
+  printf '%s tool=%s\n' "$1" "$AI_TOOL" >>"$launch_log"
+}
+log_info() { :; }
+log_warn() { :; }
+log_error() { :; }
+
+ensure_manager_once "$PROJECT" >/dev/null
+
+grep -q '^AI_TOOL="cc"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected cross-tool fallback to restart from the leftmost configured priority and select cc" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q '^AI_REASONING_EFFORT="medium"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected cc fallback to install its runtime default reasoning effort" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q "^$PROJECT tool=cc$" "$launch_log" || {
+  echo "[FAIL] expected manager launch to happen with cc after restarting priority scan from the leftmost configured tool" >&2
+  cat "$launch_log" >&2
+  exit 1
+}
+grep -q '^codex:' "$readiness_log" || {
+  echo "[FAIL] expected leftmost priority scan to probe codex before falling through to cc" >&2
+  cat "$readiness_log" >&2
+  exit 1
+}
+if grep -q '^iflow$' "$readiness_log"; then
+  echo "[FAIL] expected current tool iflow to be skipped during cross-tool fallback after same-tool recovery already failed" >&2
+  cat "$readiness_log" >&2
+  exit 1
+fi
+
+echo "[PASS] cross-tool fallback restarts from the leftmost configured priority after current-tool recovery is exhausted"
