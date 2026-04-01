@@ -21,7 +21,7 @@ description: 执行 pre-brainstorm 前置收敛环，负责把新问题收敛为
 ## 工作流
 
 1. 写入前先读取 [entry-and-worktree-checks.md](references/entry-and-worktree-checks.md)。
-2. 若是首次进入 pre-brainstorm，按 [candidate-recording.md](references/candidate-recording.md) 写 `brainstorms.md`、`candidates.md` 和 `docs/milestones.md`。
+2. 若是首次进入 pre-brainstorm，按 [candidate-recording.md](references/candidate-recording.md) 与 [milestone-placement.md](references/milestone-placement.md) 写 `brainstorms.md`、`candidates.md` 和 `docs/milestones.md`。
 3. 若是继续研究 milestone 里的 `candidate_issues`，继续沿用同一 reference 补边界、依赖、下一动作和重启触发条件；若本轮仍不能收口，必须显式保留它的可见状态，而不是跳过。
 4. future candidate 默认使用 `candidate_format_version: v2`，并补齐 candidate-level acceptance boundary：
    - `acceptance_criteria`
@@ -49,6 +49,6 @@ description: 执行 pre-brainstorm 前置收敛环，负责把新问题收敛为
 
 - `brainstorms.md` 与 `candidates.md` 已更新。
 - `v2` candidate 的 acceptance boundary 已写清。
-- candidate 已以共享 `{issue-id}` 同步到 milestone 的候选编排位。
+- candidate 已以共享 `{issue-id}` 同步到正确且仍 active 的 milestone 候选编排位。
 - 已明确它继续 pre-brainstorm，还是进入 IBM。
 - 若本轮未进入 IBM，已显式标记 `needs_research` / `blocked` 等状态，并写清 `next_action` 与 `revisit_trigger`。

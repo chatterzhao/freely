@@ -36,6 +36,18 @@ def normalize_scalar(value: str) -> str:
     return value
 
 
+def normalize_milestone(value: Optional[str]) -> str:
+    normalized = normalize_scalar(value or "")
+    match = re.search(r"(M-[A-Za-z0-9-]+)$", normalized, re.IGNORECASE)
+    if match:
+        return "M-" + match.group(1)[2:]
+    return normalized
+
+
+def normalize_milestone_ref(value: Optional[str]) -> str:
+    return normalize_milestone(value)
+
+
 def extract_inline_refs(text: str) -> List[str]:
     refs = re.findall(r"`([^`]+)`", text)
     if refs:
@@ -73,6 +85,7 @@ class CandidateRecord:
 @dataclass
 class MilestoneEntry:
     milestone_id: str
+    milestone_status: Optional[str]
     queue: str
     item_id: str
     issue_path: Optional[str] = None
@@ -167,7 +180,7 @@ def parse_candidate_file(rel_path: str) -> List[CandidateRecord]:
                 path=rel_path,
                 candidate_id=candidate_id_value,
                 status=grab("status"),
-                milestone=grab("milestone"),
+                milestone=normalize_milestone(grab("milestone")),
                 promoted_issue_path=grab("promoted_issue_path"),
                 promoted_issue_id=grab("promoted_issue_id"),
                 decision_reason=grab("decision_reason"),
@@ -191,7 +204,7 @@ def parse_issue_file(rel_path: str) -> IssueRecord:
         path=rel_path,
         issue_id=grab("issue_id"),
         phase_state=grab("phase_state"),
-        milestone=grab("milestone"),
+        milestone=normalize_milestone(grab("milestone")),
         source_candidate=grab("source_candidate"),
     )
 
@@ -229,6 +242,7 @@ def parse_milestones() -> List[MilestoneEntry]:
 
     entries: List[MilestoneEntry] = []
     current_milestone = None
+    current_milestone_status = None
     current_queue = None
     current_item: Optional[MilestoneEntry] = None
     current_list_field = None
@@ -238,9 +252,15 @@ def parse_milestones() -> List[MilestoneEntry]:
         heading = re.match(r"^##\s+(M-[A-Za-z0-9-]+)\s*$", line.strip())
         if heading:
             current_milestone = heading.group(1)
+            current_milestone_status = None
             current_queue = None
             current_item = None
             current_list_field = None
+            continue
+
+        milestone_status = re.match(r"^\s*-\s*status:\s*(.+?)\s*$", line)
+        if milestone_status and current_milestone:
+            current_milestone_status = normalize_scalar(milestone_status.group(1))
             continue
 
         queue = re.match(r"^###\s+(candidate_issues|committed_issues|completed_issues)\s*$", line.strip())
@@ -254,6 +274,7 @@ def parse_milestones() -> List[MilestoneEntry]:
         if item and current_milestone and current_queue:
             current_item = MilestoneEntry(
                 milestone_id=current_milestone,
+                milestone_status=current_milestone_status,
                 queue=current_queue,
                 item_id=item.group(1),
             )
@@ -348,8 +369,11 @@ def main() -> int:
     milestone_by_issue_path: Dict[str, List[MilestoneEntry]] = {}
     milestone_candidate_entries: Dict[str, List[MilestoneEntry]] = {}
     milestone_entries_by_source_candidate: Dict[str, List[MilestoneEntry]] = {}
+    milestone_status_by_id: Dict[str, str] = {}
 
     for entry in milestones:
+        if entry.milestone_status:
+            milestone_status_by_id[entry.milestone_id] = entry.milestone_status
         if entry.issue_path:
             milestone_by_issue_path.setdefault(entry.issue_path, []).append(entry)
         if entry.queue == "candidate_issues":
@@ -497,7 +521,7 @@ def main() -> int:
 
     for candidate in candidate_records:
         status = (candidate.status or "").strip("`").strip()
-        milestone = normalize_scalar(candidate.milestone or "")
+        milestone = normalize_milestone_ref(candidate.milestone or "")
         key = candidate_key(candidate.candidate_id)
         if not key:
             continue
@@ -513,7 +537,7 @@ def main() -> int:
             )
 
         active_statuses = {"proposed", "needs_research", "blocked", "promoted"}
-        if status in active_statuses and (not milestone or milestone.startswith("pending://")):
+        if status in active_statuses and (not milestone or milestone == "unassigned" or milestone.startswith("pending://")):
             errors.append(
                 f"{candidate.candidate_id} in {candidate.path} is active with status '{status}', but milestone binding is missing. "
                 f"Create milestone identity M-{key} and place the candidate in docs/milestones.md candidate_issues before merging to develop."
@@ -521,6 +545,27 @@ def main() -> int:
             continue
 
         candidate_queue_entries = milestone_candidate_entries.get(candidate.candidate_id, [])
+        if status in active_statuses:
+            declared_milestone_status = milestone_status_by_id.get(milestone, "missing")
+            if declared_milestone_status != "active":
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is active with status '{status}', but declared milestone {milestone} has status '{declared_milestone_status}'. "
+                    f"Active unresolved candidates must bind to an active milestone."
+                )
+            if status in {"proposed", "needs_research", "blocked"} and candidate_queue_entries:
+                entry_milestones = {entry.milestone_id for entry in candidate_queue_entries}
+                if milestone not in entry_milestones:
+                    errors.append(
+                        f"{candidate.candidate_id} in {candidate.path} declares milestone {milestone}, but docs/milestones.md currently places it in {', '.join(sorted(entry_milestones))}. "
+                        f"Keep the candidate metadata aligned with the milestone queue that actually carries it."
+                    )
+                for entry in candidate_queue_entries:
+                    if entry.milestone_status != "active":
+                        errors.append(
+                            f"{candidate.candidate_id} in {candidate.path} is still queued under milestone {entry.milestone_id}, but that milestone has status '{entry.milestone_status or 'missing'}'. "
+                            f"Unresolved active candidates cannot stay in completed or non-active milestone queues."
+                        )
+
         if status in {"proposed", "needs_research", "blocked"} and not candidate_queue_entries:
             errors.append(
                 f"{candidate.candidate_id} in {candidate.path} stays at pre-IBM status '{status}', but docs/milestones.md has no candidate_issues entry for it. "
@@ -582,6 +627,19 @@ def main() -> int:
                     f"{candidate.candidate_id} in {candidate.path} already materialized to {issue_path}, but docs/milestones.md still has no committed/completed issue entry for it. "
                     f"Move the work from milestone candidate_issues into formal issue orchestration before merging to develop."
                 )
+            else:
+                formal_milestones = {entry.milestone_id for entry in formal_entries}
+                if milestone not in formal_milestones:
+                    errors.append(
+                        f"{candidate.candidate_id} in {candidate.path} declares milestone {milestone}, but docs/milestones.md sequences {issue_path} under {', '.join(sorted(formal_milestones))}. "
+                        f"Keep candidate metadata aligned with the active milestone that owns the formal issue."
+                    )
+                for entry in formal_entries:
+                    if entry.milestone_status != "active":
+                        errors.append(
+                            f"{candidate.candidate_id} in {candidate.path} is materialized under milestone {entry.milestone_id}, but that milestone has status '{entry.milestone_status or 'missing'}'. "
+                            f"Promoted candidates must sequence their formal issues under an active milestone."
+                        )
 
             if candidate_queue_entries and not formal_entries:
                 errors.append(

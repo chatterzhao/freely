@@ -23,6 +23,8 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 
 ## M-sample
 
+- status: active
+
 ### candidate_issues
 1. `C-20260327-2205-A`
 
@@ -220,6 +222,8 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 
 ## M-sample
 
+- status: active
+
 ### candidate_issues
 1. `C-20260327-2205-A`
 
@@ -262,6 +266,8 @@ cat > "$REPO/docs/milestones.md" <<'EOF'
 # Milestones
 
 ## M-sample
+
+- status: active
 
 ### candidate_issues
 1. `C-20260327-2205-A`
@@ -457,5 +463,112 @@ echo "console.log('verification with review');" > "$REPO/src/sample.js"
 git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md
 "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout14" 2>"$TMP_DIR/stderr14"
 grep -q 'passed' "$TMP_DIR/stdout14"
+
+git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/milestones.md
+rm -f "$REPO/src/sample.js"
+
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-other
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+EOF
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout15" 2>"$TMP_DIR/stderr15"; then
+  echo "[FAIL] governance-merge-gate should reject candidates whose declared milestone does not match the milestone queue entry" >&2
+  exit 1
+fi
+grep -q 'declares milestone M-sample' "$TMP_DIR/stdout15"
+grep -q 'M-other' "$TMP_DIR/stdout15"
+
+git reset -q HEAD docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: completed
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+EOF
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout16" 2>"$TMP_DIR/stderr16"; then
+  echo "[FAIL] governance-merge-gate should reject active candidates placed in completed milestones" >&2
+  exit 1
+fi
+grep -q "declared milestone M-sample has status 'completed'" "$TMP_DIR/stdout16"
 
 echo "[PASS] governance-merge-gate enforces candidate-driven lifecycle evidence"
