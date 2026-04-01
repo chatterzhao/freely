@@ -1537,17 +1537,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
 - next_action: backend bridge 的真实 `Transport=tauri` 最小闭环证据现已由 `I-20260317-0332` 写回；当前不再等待 bridge blocker，而是继续收紧 frontend host integration / UX 自身还缺的验收面
 
-2. `I-20260317-0332`
-- title: Rust/Tauri Probe Bridge v1
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
-- source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
-- next_action: 真实 `Transport=tauri` 的最小 start / session create-resume / chat intervention 闭环证据已具备，当前先把实现 merge 到 `develop`；随后走纯治理 closeout，把 owner 移到 `completed_issues`
-
-3. `I-20260317-1004`
+2. `I-20260317-1004`
 - title: Frontend Runtime Baseline for Probe
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -1617,6 +1607,20 @@ routing_policy:
   - `docs/progress/frontend-probe-dogfooding-loop/p-frontend-backend-boundary-contract-v1-for-frontend-probe.md`
   - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/code-reviews/20260326-frontend-backend-boundary-contract-v1-canonical-verification.md`
 - completion_note: Probe day-1 boundary contract 已冻结到 object family、error surface、ordering 与 adapter compatibility 字段面，并被 `frontend-probe-v0` 与 `rust-tauri-probe-bridge-v1` 直接复用；因此本 issue 已完成 canonical closeout，后续真实宿主与 bridge 联调留给 active `in_dev` 主线承接
+
+3. `I-20260317-0332`
+- title: Rust/Tauri Probe Bridge v1
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+- source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
+- evidence:
+  - `docs/progress/frontend-probe-dogfooding-loop/p-rust-tauri-probe-bridge-v1.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-host-validation-verification.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
+- completion_note: Rust/Tauri Probe bridge 的 day-1 contract、真实宿主启动验证、以及真实 `Transport=tauri` 下的最小 `start -> create/resume session -> chat intervention` 闭环已写成 live evidence 并随实现吸收到 `develop`；后续 frontend host integration / UX 收口继续由 active `I-20260308-1244-03` 承接，bridge beyond day-1 subset 若需扩展则另开 lifecycle
 
 
 ## M-20260318-url-content-intake-skill-and-wechat-fetch-governance
