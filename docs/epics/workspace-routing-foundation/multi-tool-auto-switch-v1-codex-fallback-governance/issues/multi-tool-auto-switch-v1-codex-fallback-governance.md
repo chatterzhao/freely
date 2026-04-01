@@ -46,9 +46,10 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
 2. `ensure-manager` 每轮都重新读取 project config，因此 control plane 可以消费最新 active tool truth。
 3. 当当前工具具备 canonical same-tool recovery truth 时，control plane 必须先走同工具恢复；Codex 继续受既有 watchdog readiness gate 约束。
 4. 若 same-tool recovery exhausted，且 `AUTO_SWITCH_TOOL=true`，`ensure-manager` 会按 `AI_FALLBACK_TOOLS` 的顺序尝试下一个工具，而不是硬编码 `codex`。
-5. cross-tool fallback 必须显式记录 `previous_tool`、`active_tool`、`reason` 与 `launch_kind=fresh_with_handoff`。
-6. 当所有配置中的工具都不可用时，manager launch 继续 blocked，并写出 machine-readable waiting event 与 earliest-reset hint。
-7. 现有 Kiro defer contract 不回退：当 auto-switch 未开启时，runtime 仍在本地 stop 并 defer 给 control plane。
+5. cross-tool fallback 一旦开始，扫描总是从 `AI_FALLBACK_TOOLS` 最左侧重新开始；current tool 只作为 active pointer / same-tool recovery truth，不会被隐式插回 fallback 顺序最前。
+6. cross-tool fallback 必须显式记录 `previous_tool`、`active_tool`、`reason` 与 `launch_kind=fresh_with_handoff`。
+7. 当所有配置中的工具都不可用时，manager launch 继续 blocked，并写出 machine-readable waiting event 与 earliest-reset hint。
+8. 现有 Kiro defer contract 不回退：当 auto-switch 未开启时，runtime 仍在本地 stop 并 defer 给 control plane。
 
 ## Completion
 
@@ -61,6 +62,7 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-cross-tool-restarts-from-leftmost-priority`
 - `docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
 - `docs/system/workspace/scripts/tests/test-tool-launchers-kiro-default-model`
@@ -73,6 +75,7 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-cross-tool-restarts-from-leftmost-priority`
   - `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
   - `bash docs/system/workspace/scripts/tests/test-tool-launchers-kiro-default-model`
