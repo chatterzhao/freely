@@ -15,6 +15,14 @@ pub struct SessionCommandPayload {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AttachTerminalPayload {
+    pub session_id: Option<String>,
+    pub terminal_target: Option<String>,
+    pub run_id: Option<String>,
+    pub cursor: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChatInterventionPayload {
     pub session_id: Option<String>,
     pub message_id: Option<String>,
@@ -57,6 +65,27 @@ pub fn parse_session_command_payload(payload: &Value) -> SessionCommandPayload {
     }
 }
 
+pub fn parse_attach_terminal_payload(payload: &Value) -> AttachTerminalPayload {
+    AttachTerminalPayload {
+        session_id: payload
+            .get("sessionId")
+            .and_then(|value| value.as_str())
+            .map(str::to_string),
+        terminal_target: payload
+            .get("terminalTarget")
+            .and_then(|value| value.as_str())
+            .map(str::to_string),
+        run_id: payload
+            .get("runId")
+            .and_then(|value| value.as_str())
+            .map(str::to_string),
+        cursor: payload
+            .get("cursor")
+            .and_then(|value| value.as_str())
+            .map(str::to_string),
+    }
+}
+
 pub fn parse_chat_intervention_payload(payload: &Value) -> ChatInterventionPayload {
     ChatInterventionPayload {
         session_id: payload
@@ -87,7 +116,8 @@ mod tests {
     use serde_json::json;
 
     use super::{
-        parse_chat_intervention_payload, parse_control_run_payload, parse_session_command_payload,
+        parse_attach_terminal_payload, parse_chat_intervention_payload,
+        parse_control_run_payload, parse_session_command_payload,
     };
 
     #[test]
@@ -112,6 +142,20 @@ mod tests {
         assert_eq!(payload.session_id.as_deref(), Some("session-1"));
         assert_eq!(payload.resume_hint.as_deref(), Some("probe-ui"));
         assert_eq!(payload.command_source.as_deref(), Some("human-control"));
+    }
+
+    #[test]
+    fn parses_attach_terminal_fields() {
+        let payload = parse_attach_terminal_payload(&json!({
+            "sessionId": "session-1",
+            "terminalTarget": "run-1:pty-0",
+            "runId": "run-1",
+            "cursor": "cursor-1"
+        }));
+        assert_eq!(payload.session_id.as_deref(), Some("session-1"));
+        assert_eq!(payload.terminal_target.as_deref(), Some("run-1:pty-0"));
+        assert_eq!(payload.run_id.as_deref(), Some("run-1"));
+        assert_eq!(payload.cursor.as_deref(), Some("cursor-1"));
     }
 
     #[test]

@@ -154,7 +154,12 @@ impl ValidationReportRecorder {
             governance_summary: snapshot.governance_summary.clone(),
         });
 
-        let required_commands = ["ControlRun", "CreateOrResumeSession", "SendChatIntervention"];
+        let required_commands = [
+            "ControlRun",
+            "CreateOrResumeSession",
+            "AttachTerminal",
+            "SendChatIntervention",
+        ];
         let required_events = ["RunStatusChanged", "SessionUpserted", "InputArbitrationRecorded"];
         let commands_ready = required_commands.iter().all(|required| {
             report

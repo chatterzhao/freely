@@ -2,6 +2,7 @@
 pub enum ProbeCommandKind {
     ControlRun,
     CreateOrResumeSession,
+    AttachTerminal,
     SendChatIntervention,
     Other(String),
 }
@@ -11,6 +12,7 @@ impl From<&str> for ProbeCommandKind {
         match value {
             "ControlRun" => Self::ControlRun,
             "CreateOrResumeSession" => Self::CreateOrResumeSession,
+            "AttachTerminal" => Self::AttachTerminal,
             "SendChatIntervention" => Self::SendChatIntervention,
             other => Self::Other(other.to_string()),
         }
@@ -30,6 +32,10 @@ mod tests {
         assert!(matches!(
             ProbeCommandKind::from("CreateOrResumeSession"),
             ProbeCommandKind::CreateOrResumeSession
+        ));
+        assert!(matches!(
+            ProbeCommandKind::from("AttachTerminal"),
+            ProbeCommandKind::AttachTerminal
         ));
         assert!(matches!(
             ProbeCommandKind::from("SendChatIntervention"),

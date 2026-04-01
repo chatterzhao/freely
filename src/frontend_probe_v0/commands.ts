@@ -49,3 +49,18 @@ export function createChatInterventionCommand(
     runId,
   };
 }
+
+export function createAttachTerminalCommand(
+  projectId: string,
+  sessionId: string,
+  terminalTarget: string,
+  runId?: string,
+): ClientCommand {
+  return {
+    type: "AttachTerminal",
+    projectId,
+    sessionId,
+    terminalTarget,
+    runId,
+  };
+}

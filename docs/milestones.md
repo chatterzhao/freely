@@ -1530,12 +1530,12 @@ routing_policy:
 1. `I-20260308-1244-03`
 - title: Frontend Probe v0
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
 - source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: backend bridge 的真实 `Transport=tauri` 最小闭环证据现已由 `I-20260317-0332` 写回；当前不再等待 bridge blocker，而是继续收紧 frontend host integration / UX 自身还缺的验收面
+- next_action: backend bridge blocker 与 embedded terminal attach 缺口都已解除；当前轮已把真实 `Transport=tauri` 的 frontend flow 扩到 `start -> session -> attach -> chat`。下一步先让实现与验证证据合入 `develop`，再决定是否走 `frontend-probe-v0` 的纯治理 closeout
 
 2. `I-20260317-1004`
 - title: Frontend Runtime Baseline for Probe

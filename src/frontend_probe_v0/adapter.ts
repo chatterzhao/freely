@@ -77,6 +77,42 @@ export class MockProbeAdapter implements ProbeAdapter {
       return;
     }
 
+    if (command.type === "AttachTerminal") {
+      const snapshot = this.getSnapshot(command.projectId);
+      const nextTerminalTargets = [
+        {
+          terminalTarget: command.terminalTarget,
+          sessionId: command.sessionId,
+        },
+        ...snapshot.terminalTargets.filter(
+          (target) => target.terminalTarget !== command.terminalTarget,
+        ),
+      ];
+
+      this.snapshots.set(command.projectId, {
+        ...snapshot,
+        terminalTargets: nextTerminalTargets,
+        governanceSummary: [
+          `terminal attached to ${command.terminalTarget}`,
+          ...snapshot.governanceSummary,
+        ].slice(0, 4),
+        lastEventId: `event-${Date.now()}`,
+      });
+
+      const nextSnapshot = this.getSnapshot(command.projectId);
+      this.emit({
+        eventId: nextSnapshot.lastEventId,
+        occurredAt: new Date().toISOString(),
+        projectId: command.projectId,
+        sessionId: command.sessionId,
+        source: "human-control",
+        type: "TerminalChunkAppended",
+        terminalTarget: command.terminalTarget,
+        chunk: `[mock:attach] attached to ${command.terminalTarget}`,
+      });
+      return;
+    }
+
     if (command.type !== "ControlRun") {
       return;
     }

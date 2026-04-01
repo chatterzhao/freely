@@ -7,6 +7,7 @@ import { useProbeChatIntervention } from "./useProbeChatIntervention";
 import { useProbeEvents } from "./useProbeEvents";
 import { useProbeControls } from "./useProbeControls";
 import { useProbeSessionLifecycle } from "./useProbeSessionLifecycle";
+import { useProbeTerminalAttach } from "./useProbeTerminalAttach";
 import { useTauriValidationSequence } from "./useTauriValidationSequence";
 import { useProbeRuntime } from "./useProbeRuntime";
 
@@ -130,8 +131,22 @@ export function AppShell({
     snapshot?.activeSessions[0]?.sessionId,
     resolvedAdapter,
   );
+  const terminalAttach = useProbeTerminalAttach(
+    selectedProjectId,
+    snapshot?.activeSessions[0]?.sessionId,
+    activeRun?.runId,
+    snapshot?.terminalTargets ?? [],
+    resolvedAdapter,
+  );
   const recentTerminalEvents = events
-    .filter((event) => event.type === "TerminalChunkAppended")
+    .filter(
+      (
+        event,
+      ): event is Extract<ServerEvent, { type: "TerminalChunkAppended" }> =>
+        event.type === "TerminalChunkAppended" &&
+        (!terminalAttach.attachedTarget ||
+          event.terminalTarget === terminalAttach.attachedTarget),
+    )
     .slice(-3)
     .reverse();
   const recentDecisionEvents = events
@@ -274,6 +289,7 @@ export function AppShell({
                 <li style={listItemStyle}>{`status: ${validation.status}`}</li>
                 <li style={listItemStyle}>{`start: ${validation.steps.start}`}</li>
                 <li style={listItemStyle}>{`session: ${validation.steps.session}`}</li>
+                <li style={listItemStyle}>{`attach: ${validation.steps.attach}`}</li>
                 <li style={listItemStyle}>{`chat: ${validation.steps.chat}`}</li>
                 <li style={listItemStyle}>{`error: ${validation.error ?? "none"}`}</li>
               </ul>
@@ -441,20 +457,55 @@ export function AppShell({
                 <ul style={listStyle}>
                   {(snapshot?.terminalTargets ?? []).map((target) => (
                     <li key={target.terminalTarget} style={listItemStyle}>
-                      {target.terminalTarget} · {target.sessionId}
+                      <div>{target.terminalTarget} · {target.sessionId}</div>
+                      <button
+                        disabled={terminalAttach.submitting}
+                        onClick={() => {
+                          void terminalAttach.attach(target.terminalTarget);
+                        }}
+                        style={{
+                          borderRadius: "999px",
+                          border: "1px solid rgba(23, 33, 31, 0.18)",
+                          background:
+                            terminalAttach.attachedTarget === target.terminalTarget
+                              ? "#d5e6df"
+                              : "#fff7e8",
+                          marginTop: "8px",
+                          padding: "6px 10px",
+                        }}
+                      >
+                        {terminalAttach.attachedTarget === target.terminalTarget
+                          ? "attached"
+                          : terminalAttach.submitting
+                            ? "attaching..."
+                            : "attach"}
+                      </button>
                     </li>
                   ))}
                 </ul>
+                {terminalAttach.error ? (
+                  <p style={{ color: "#7b1f1f", marginTop: "12px" }}>{terminalAttach.error}</p>
+                ) : null}
                 <p style={sectionTitleStyle}>Recent Stream</p>
+                {terminalAttach.attachedTarget ? (
+                  <p style={{ marginTop: 0 }}>
+                    Attached target: <strong>{terminalAttach.attachedTarget}</strong>
+                  </p>
+                ) : null}
                 <ul style={listStyle}>
                   {recentTerminalEvents.length > 0 ? (
                     recentTerminalEvents.map((event) => (
                       <li key={event.eventId} style={listItemStyle}>
-                        {event.chunk}
+                        <strong>{event.terminalTarget}</strong>
+                        <div>{event.chunk}</div>
                       </li>
                     ))
                   ) : (
-                    <li style={listItemStyle}>No terminal stream events yet.</li>
+                    <li style={listItemStyle}>
+                      {terminalAttach.attachedTarget
+                        ? "No terminal stream events yet for the attached target."
+                        : "Attach a terminal target to start observing stream output."}
+                    </li>
                   )}
                 </ul>
               </>
