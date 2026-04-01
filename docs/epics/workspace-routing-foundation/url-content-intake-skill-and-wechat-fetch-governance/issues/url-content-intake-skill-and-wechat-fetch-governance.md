@@ -1,4 +1,23 @@
-# I-20260318-1908 URL 内容摄取 skill 与微信公众号抓取治理
+# I-20260318-1246 URL 内容摄取 skill 与微信公众号抓取治理
+
+- issue_id: `I-20260318-1246`
+- title: `URL 内容摄取 skill 与微信公众号抓取治理`
+- phase_state: `completed`
+- milestone: `M-20260318-url-content-intake-skill-and-wechat-fetch-governance`
+- epic-name: `workspace-routing-foundation`
+- story-name: `url-content-intake-skill-and-wechat-fetch-governance`
+- issue-name: `url-content-intake-skill-and-wechat-fetch-governance`
+- priority: P1
+- source_candidate: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md`
+- source_brainstorm: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md`
+- execution_base: `develop`
+- integration_target: `develop`
+- pre_tests_path: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/pre-tests.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-url-content-intake-skill-and-wechat-fetch-governance.md`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/code-reviews`
+- depends_on: `none`
+- session_refs:
+  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
 ## Why
 
@@ -31,7 +50,28 @@
 - 至少一条测试证明脚本按平台模式选择正确的 curl 参数
 - pre-brainstorm candidate 已绑定到正式 issue 和 milestone
 
-## Status
+## Completion
 
-- phase: `in_dev`
-- owner: `feature/url-content-intake-skill-materialization-20260318`
+- `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md`
+- `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md`
+- `docs/milestones.md`
+- `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
+- `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/pre-tests.md`
+- `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/code-reviews/20260401-url-content-intake-skill-verification.md`
+- `docs/progress/workspace-routing-foundation/p-url-content-intake-skill-and-wechat-fetch-governance.md`
+- `docs/system/workspace/skills/url-content-intake/SKILL.md`
+- `docs/system/workspace/skills/url-content-intake/references/capability-matrix.md`
+- `docs/system/workspace/skills/url-content-intake/references/platform-patterns.md`
+- `docs/system/workspace/skills/url-content-intake/scripts/fetch-url.sh`
+- `docs/system/workspace/skills/url-content-intake/scripts/extract-readable-content.sh`
+- `docs/system/workspace/scripts/tests/test-url-content-intake-skill`
+
+## Verification
+
+- `bash docs/system/workspace/scripts/tests/test-url-content-intake-skill`
+- `./bin/governance-check`
+
+## Next
+
+- `2026-04-01` 该能力已经在 canonical `develop` 中存在并通过最小 skill regression；本轮仅补齐 lifecycle 真源，owner 关闭。
+- 后续如果要把 URL intake 扩到更多站点、browser/MCP fallback 或统一路由接入，应新开 lifecycle，而不是重开这个 bounded skill materialization owner。

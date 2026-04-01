@@ -1620,28 +1620,34 @@ routing_policy:
 
 ## M-20260318-url-content-intake-skill-and-wechat-fetch-governance
 
-- status: active
+- status: completed
 - linked_issue: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
 - intent: 把公众号链接抓取研究转成可分享的 skill、脚本和最小测试
 - why_now: 研究已经证明本地浏览器 UA 抓取可行；如果不把脚本放进 skill，分享 skill 时能力仍然是不完整的
 
 ### committed_issues
 
-1. `I-20260318-1908`
-- title: URL 内容摄取 skill 与微信公众号抓取治理
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md`
-- next_action: 把 `url-content-intake` skill、自带抓取脚本与最小测试一起落齐，再评审是否并回 `develop`
+- none currently
 
 ### candidate_issues
 
 - none currently
 
 ### completed_issues
+
+1. `I-20260318-1246`
+- title: URL 内容摄取 skill 与微信公众号抓取治理
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md`
+- evidence:
+  - `develop` commits `fb1044f`, `232b273`
+  - `docs/progress/workspace-routing-foundation/p-url-content-intake-skill-and-wechat-fetch-governance.md`
+  - `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/code-reviews/20260401-url-content-intake-skill-verification.md`
+- completion_note: `url-content-intake` skill 已在 canonical `develop` 提供 bundled fetch/extract scripts 与最小回归，微信公众号与通用 HTTP(S) URL 的 bounded intake contract 已 materialize；更广的 URL routing/browser fallback 另开 lifecycle。
 
 - none currently
 
