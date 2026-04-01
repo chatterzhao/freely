@@ -135,7 +135,15 @@ def is_governance_only_path(rel_path: str) -> bool:
         "docs/milestones.md",
     }:
         return True
-    return rel_path.startswith(("docs/pre-brainstorms/", "docs/epics/", "docs/progress/"))
+    if rel_path.startswith(("docs/pre-brainstorms/", "docs/epics/", "docs/progress/")):
+        return True
+    if rel_path.startswith(("docs/system/workspace/agents/", "docs/system/workspace/skills/")):
+        return True
+    if rel_path.startswith("docs/system/workspace/scripts/quality/"):
+        return True
+    if re.match(r"docs/system/workspace/scripts/tests/test-governance-[^/]+$", rel_path):
+        return True
+    return False
 
 
 def changed_paths_from_args(args: argparse.Namespace) -> List[str]:
