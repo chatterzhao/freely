@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260331-1840-A`
 - title: Multi-tool availability manager governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 
 ## Current Slice
@@ -32,6 +32,4 @@
 
 ## Remaining
 
-- merge absorption into `develop`
-- one clean post-merge live confirmation on canonical manager runtime with ordered fallback, teardown-aware recheck, and explicit all-tools-unavailable truth
-- one clean post-merge live confirmation on canonical manager runtime with current-tool slot-first, then leftmost-priority cross-tool fallback, teardown-aware recheck, and explicit all-tools-unavailable truth
+- v1 slice is complete; follow-on unified slot work moves to `C-20260401-0840-A`

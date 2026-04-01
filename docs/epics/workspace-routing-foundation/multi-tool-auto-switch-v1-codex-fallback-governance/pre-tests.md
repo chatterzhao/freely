@@ -1,15 +1,55 @@
 # Pre-Tests: multi-tool-availability-manager-governance
 
-## Acceptance Contract
+## Acceptance Items
 
-1. 新项目 config 默认写出 `AUTO_SWITCH_SLOT=false`、`AUTO_SWITCH_TOOL=false`、`AI_FALLBACK_TOOLS=""`，并保持 `AI_TOOL` 仍是 active tool pointer。
-2. `ensure-manager` 会重新读取 project config，不依赖旧进程启动时缓存的 `AI_TOOL`。
-3. 当当前工具具备 canonical same-tool recovery truth 时，control plane 必须先走同工具恢复，再考虑 cross-tool fallback。
-4. 当当前工具 tool-local failure 或 same-tool recovery exhausted 且 `AUTO_SWITCH_TOOL=true` 时，control plane 会按 `AI_FALLBACK_TOOLS` 顺序挑选下一个可用工具，而不是硬编码 `codex`。
-5. 每次跨工具 fallback 必须显式记录 `launch_kind=fresh_with_handoff`，不得冒充 resume。
-6. 若所有配置中的工具都不可用，`ensure-manager` 仍保持 no-launch，并显式记录 earliest-reset hint。
-7. 当 auto-switch 未开启时，Kiro availability failure 仍应保持“本地 stop + defer control plane”的旧 contract。
-8. 当 project config 没有显式 Kiro model 时，launcher 必须回退到当前仍受支持的默认模型；不能因为过期默认值在 availability classification 之前就进入 `ai_exit_rc_1` loop。
+### A1. ordered fallback config truth is written and reloaded
+- id: `A1`
+- requirement: write_config emits ordered fallback fields and ensure-manager reloads project config before each selection cycle.
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews/20260331-multi-tool-auto-switch-v1-codex-fallback-verification.md`
+
+### A2. Codex remains same-tool-first before cross-tool fallback
+- id: `A2`
+- requirement: When the current tool has canonical same-tool recovery truth, control plane keeps same-tool recovery ahead of cross-tool fallback.
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
+
+### A3. cross-tool fallback uses ordered list and fresh handoff
+- id: `A3`
+- requirement: When same-tool recovery is exhausted or a compatible tool-local failure occurs, ensure-manager scans AI_FALLBACK_TOOLS in order and records launch_kind=fresh_with_handoff.
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
+
+### A4. all-tools-unavailable keeps no-launch waiting truth
+- id: `A4`
+- requirement: If every configured tool is unavailable, launch stays blocked and waiting truth records earliest-reset rather than blind relaunch.
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
+
+### A5. auto-switch-off Kiro path still stops and defers
+- id: `A5`
+- requirement: When auto-switch is disabled, Kiro availability failures keep the local stop-plus-defer contract instead of relaunching locally.
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
+
+### A6. cleanup-time recheck waits for teardown and live fallback works
+- id: `A6`
+- requirement: Teardown-aware one-shot recheck waits for exiting supervisor state to clear, then ordered fallback can still select a non-current tool on canonical develop.
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews/20260331-multi-tool-auto-switch-v1-codex-fallback-verification.md`
+
+### A7. Kiro launcher keeps a supported default model
+- id: `A7`
+- requirement: If project config leaves AI_MODEL empty for Kiro, launcher falls back to a supported model instead of failing before availability classification.
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-tool-launchers-kiro-default-model`
 
 ## Focused Tests
 
