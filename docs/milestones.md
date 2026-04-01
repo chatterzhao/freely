@@ -89,6 +89,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md`
 - next_action: Keep this owner in verification on `feature/multi-tool-availability-manager-20260331` until merge review absorbs the generalized availability-manager slice into canonical `develop`, then run one clean live confirmation on the protected manager runtime.
 
+1. `I-20260330-2318-A`
+- title: Manager attach reuse missing-AI repair governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/candidates.md`
+- next_action: Keep this new owner on `feature/live-status-already-running-attach-regression-20260330-231827` until the manager-only attach gate repair lands with focused regression coverage, then rerun one protected `develop` recovery to verify the false `already_running_attach` state is gone.
+
 ### completed_issues
 
 1. `I-20260331-1830-A`
@@ -632,13 +642,13 @@ routing_policy:
 2. `C-20260330-2318-A`
 - title: Live-status false already-running-attach regression
 - milestone_state: candidate
-- phase_state: `needs_research`
+- phase_state: `todo_ibm`
 - priority: P1
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/candidates.md`
-- next_action: Build a minimal repro lane for false `already_running_attach` and pin the precise write/read mismatch. This is inverse direction from `I-20260328-0745-A`: no live runtime exists, but persisted state claims up/up
-- revisit_trigger: Promote once a repro shows the exact attach path that writes optimistic `up/up` without a surviving project-owned supervisor or AI
+- next_action: This candidate is now materialized as `I-20260330-2318-A`. The active owner keeps the slice narrow: manager attach reuse now requires a confirmed AI child before writing attach success, while worker attach reuse stays unchanged.
+- revisit_trigger: Re-open candidate-level research only if the manager-only attach gate repair still leaves stale optimistic truth and forces a broader `live-status` or observability redesign.
 
 3. `C-20260327-1115-A`
 - title: Promote OAuth parallel sweep to canonical slot inventory truth
@@ -835,17 +845,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/candidates.md`
 - next_action: 保持在 pre-brainstorm，先把 Ring/SSOT 冲突决议规则与检查点清单收敛成当前治理链可消费的最小 contract
 - revisit_trigger: 当规则契约与检查点清单可以冻结成独立 issue contract 时，重新进入 materialization 判断
-
-13. `C-20260330-2318-A`
-- title: Live-status false already-running-attach regression
-- milestone_state: candidate
-- phase_state: `needs_research`
-- priority: P1
-- promoted_issue_path: `pending://live-status-already-running-attach-regression`
-- source_brainstorm: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/candidates.md`
-- next_action: Build a minimal repro lane for false `already_running_attach` and pin the precise write/read mismatch. Focus on identifying the write path that rewrites `workcell-state.env` to `already_running_attach` after the last real cleanup.
-- revisit_trigger: Promote once a repro shows the exact attach path that writes optimistic `up/up` without a surviving project-owned supervisor or AI.
 
 14. `C-20260303-002`
 - title: 独立监理 Gate 接入 auto-loop

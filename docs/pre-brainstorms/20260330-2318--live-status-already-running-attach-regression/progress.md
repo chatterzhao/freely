@@ -9,9 +9,9 @@
 
 ## Current Status
 
-**Phase**: Root cause analysis complete, focused repro attempted but not yet successful
+**Phase**: Trigger proven from real dogfood evidence; narrow attach-gating repair in progress
 
-**Last Update**: 2026-03-31T18:00:00-07:00
+**Last Update**: 2026-04-01T08:20:00-07:00
 
 ## Work Completed
 
@@ -32,7 +32,7 @@
 - Created `test-live-status-attach-false-positive-repro` script
 - Attempted to reproduce the false-positive by exercising real `runtime/freely` attach path
 - Encountered complexity in setting up isolated test project with full Freely structure
-- Decision: Defer complex repro harness until next real occurrence provides more trigger evidence
+- Decision at the time: Defer complex repro harness until next real occurrence provides more trigger evidence
 
 ### 4. Code Path Analysis ✓
 Identified three key functions in the problematic path:
@@ -44,6 +44,18 @@ Identified three key functions in the problematic path:
 - `test-freely-project-command-semantics` passes and confirms attach reuse is an intentional contract
 - `test-freely-status-pid-ownership` passes and confirms stale foreign supervisor PIDs are filtered elsewhere
 
+### 6. Real Trigger Proven on `develop` ✓
+- Live validation of the multi-tool fallback lane produced a valid `tool_auto_switch_selected previous_tool=kiro-cli active_tool=codex`
+- Immediately after that valid selection, manager bootstrap emitted `supervisor_attach_reuse ... ai_pid_state=missing role_hint=manager`
+- `live-status` then showed the false optimistic truth: `desired_runtime_state=running`, `last_supervisor_state=up`, `last_ai_state=up`, `last_exit_reason=already_running_attach`
+- This proves the regression is not generic PID reuse; it is the manager attach-reuse path accepting a live supervisor without a confirmed running AI child
+
+### 7. Narrow Repair Chosen ✓
+- Keep worker attach-reuse semantics unchanged
+- Restrict manager attach reuse so it only succeeds when `ai_pid_state=confirmed_running`
+- When manager sees `ai_pid_state=missing` or stale, fall back to project-local repair instead of writing optimistic `already_running_attach`
+- Add focused regression coverage in `test-freely-project-command-semantics`
+
 ## Root Causes Identified
 
 1. **Optimistic State Write**: Attach success writes `up/up` without any stronger health/observability gate
@@ -53,64 +65,40 @@ Identified three key functions in the problematic path:
 ## Next Steps
 
 ### Immediate (Before Promotion to Issue)
-1. **Wait for Next Real Occurrence**: Rather than force a complex repro, wait for the next time this false-positive appears in real dogfooding
-2. **Collect More Trigger Evidence**: When it occurs again, capture:
-   - Exact timeline of `ensure-manager` bootstrap attempts
-   - Process table snapshot showing what owned the "reused" PID
-   - Whether concurrent `start` attempts were racing
-   - Whether the PID was truly a short-lived supervisor or something else
-
-### After Trigger is Confirmed
-3. **Choose Fix Strategy**: Based on confirmed trigger, select from:
-   - Option 1: Make attach writes less optimistic (verify supervisor health)
-   - Option 2: Downgrade attach state to soft/stale (defensive read-side)
-   - Option 3: Always emit runtime event for attach (observability)
-   - Option 4: Combination of above
-
-4. **Implement and Test**: Once fix strategy is chosen, implement with focused regression test
-
-5. **Promote to Issue**: Only promote to full issue once:
-   - Trigger mechanism is confirmed
-   - Fix strategy is validated
-   - Regression test passes
+1. **Finish Focused Regression**: Keep worker attach-reuse coverage green while the manager-only missing-AI repair-path test lands
+2. **Drive the Materialized Owner**: The candidate is now materialized as `I-20260330-2318-A`; keep execution and verification on that issue chain
+3. **Rerun Live Validation**: Validate on `develop` that manager no longer lands in `already_running_attach` after the valid fallback handoff
 
 ## Promotion Gate
 
 This candidate should be promoted to a milestone-owned issue when:
-- [ ] A focused repro successfully demonstrates the exact attach path that writes false-positive state
-- [ ] The trigger mechanism (concurrent start / short-lived supervisor / stale PID discovery) is confirmed
-- [ ] A fix strategy is validated against the confirmed trigger
-- [ ] The fix preserves existing valid attach-reuse contract
+- [x] A focused repro or equivalent real trigger demonstrates the exact attach path that writes false-positive state
+- [x] The trigger mechanism is confirmed as manager attach reuse with `ai_pid_state!=confirmed_running`
+- [x] A narrow fix strategy is selected against the confirmed trigger
+- [ ] The fix preserves existing valid worker attach-reuse contract and passes regression tests
 
 ## Blocker
 
-Current blocker: **Trigger mechanism not yet reproduced in isolation**
-
-The symptom is real and the code paths are identified, but the exact sequence that causes the false-positive write is not yet proven. Rather than speculate with a complex repro harness, we should wait for the next real occurrence and collect more evidence at that time.
-4. **Trigger Mechanism Still Unproven**: earlier "random PID reuse / stale pid file" explanations are not yet demonstrated by a focused repro
+Current blocker: **Repair still needs merge and one protected live verification pass**
 
 ## Fix Proposal
 
-Do not choose a fix yet. First reproduce the real trigger in a focused harness, then decide between:
+Chosen fix:
 
-1. **Write-side hardening**
-   - Gate attach reuse more strictly
-   - Avoid writing `last_ai_state=up` without a confirmed AI PID
-
-2. **Read-side downgrade for attach-specific history**
-   - Treat `already_running_attach` as a softer persisted hint
-   - Let `live-status` downgrade when no current owned runtime remains
-
-3. **Attach observability**
-   - Emit an explicit runtime event for attach-only success
+1. **Manager-only write-side hardening**
+   - Gate manager attach reuse more strictly
+   - Avoid writing `last_ai_state=up` without a confirmed manager AI PID
+   - Preserve worker attach reuse so the earlier valid contract does not regress
 
 ## Next Actions
 
 ### Immediate (Current Session)
 - [ ] Build a focused repro that hits the real `start_project_runtime()` attach path
-- [ ] Distinguish same-project short-window attach from broader PID validation failures
-- [ ] Decide whether repair belongs in write-side attach semantics, read-side downgrade, or both
+- [x] Distinguish same-project short-window attach from broader PID validation failures
+- [x] Decide whether repair belongs in write-side attach semantics, read-side downgrade, or both
 - [ ] Keep existing attach and stale-ownership tests green
+- [x] Materialize owner issue
+- [ ] Rerun live validation
 
 ### Follow-up
 - [ ] Verify fix prevents regression
@@ -120,9 +108,9 @@ Do not choose a fix yet. First reproduce the real trigger in a focused harness, 
 
 ## Open Questions
 
-1. Should `live-status` treat `already_running_attach` as soft/stale unless current PIDs confirm?
+1. Should `live-status` still treat `already_running_attach` as soft/stale unless current PIDs confirm, even after the manager write-side fix?
 2. Should attach-only writes use a different exit reason like `attach_pending_verification`?
-3. Is the real trigger a same-project concurrent start boundary rather than generic PID reuse?
+3. Are there any non-manager roles besides worker that should share the stricter attach gate?
 4. Should attach-only success ever write `last_ai_state=up` without a valid AI PID?
 
 ## Evidence Trail
@@ -137,6 +125,9 @@ Do not choose a fix yet. First reproduce the real trigger in a focused harness, 
 - `2026-03-30 23:00:25 PDT`: Last runtime event (supervisor_cleanup)
 - `2026-03-30 23:17:30 PDT`: workcell-state.env rewritten to `running/up/up/already_running_attach`
 - No runtime event emitted for this state change
+- `2026-04-01 08:03:14 PDT`: `tool_auto_switch_selected previous_tool=kiro-cli active_tool=codex`
+- `2026-04-01 08:03:14 PDT`: immediate `supervisor_attach_reuse ... ai_pid_state=missing role_hint=manager`
+- `2026-04-01 08:03:xx PDT`: `live-status` again reports `running/up/up/already_running_attach` with no surviving project-owned AI PID
 
 ## Related Work
 

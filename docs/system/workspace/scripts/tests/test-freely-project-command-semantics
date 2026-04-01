@@ -321,6 +321,44 @@ START_ATTACH_WITH_MISSING_WATCHDOG_OUTPUT="$(
 [[ "$START_ATTACH_WITH_MISSING_WATCHDOG_OUTPUT" == *"terminate:24242|label:partial project control-plane before supervisor restart"* ]]
 [[ "$START_ATTACH_WITH_MISSING_WATCHDOG_OUTPUT" == *"manager_attach_repair_supervisor_pid_removed"* ]]
 
+START_ATTACH_MANAGER_WITH_MISSING_AI_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$START_ATTACH_TMP"'/attach-manager-missing-ai-project"
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir"
+    printf "%s\n" "29292" >"$run_dir/supervisor.pid"
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    valid_supervisor_pid_for_project() { [[ "$2" == "29292" ]]; }
+    valid_ai_pid_for_project() { return 1; }
+    ensure_interruption_dispatcher_ready_or_fail() { return 0; }
+    role_hint_for_project() { printf "%s\n" manager; }
+    ensure_manager_watchdog_ready_or_fail() { return 0; }
+    log_info() { printf "info:%s\n" "$*"; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    terminate_pid_with_graceful_wait() { printf "terminate:%s|label:%s\n" "$1" "$2"; }
+
+    if ensure_no_active_supervisor_conflict "$project" "$run_dir/supervisor.pid" "$run_dir/ai.pid" "1"; then
+      printf "manager_missing_ai_attach_reused:no\n"
+    else
+      printf "manager_missing_ai_attach_reused:unexpected_rc_%s\n" "$?"
+    fi
+    if [[ -f "$run_dir/supervisor.pid" ]]; then
+      printf "manager_missing_ai_supervisor_pid_left\n"
+    else
+      printf "manager_missing_ai_supervisor_pid_removed\n"
+    fi
+  '
+)"
+
+[[ "$START_ATTACH_MANAGER_WITH_MISSING_AI_OUTPUT" == *"warn:project supervisor pid=29292 is live but manager ai pid is missing; falling back to project-local repair"* ]]
+[[ "$START_ATTACH_MANAGER_WITH_MISSING_AI_OUTPUT" == *"warn:repairing partial project control-plane before supervisor restart: 29292"* ]]
+[[ "$START_ATTACH_MANAGER_WITH_MISSING_AI_OUTPUT" == *"terminate:29292|label:partial project control-plane before supervisor restart"* ]]
+[[ "$START_ATTACH_MANAGER_WITH_MISSING_AI_OUTPUT" == *"manager_missing_ai_attach_reused:no"* ]]
+[[ "$START_ATTACH_MANAGER_WITH_MISSING_AI_OUTPUT" == *"manager_missing_ai_supervisor_pid_removed"* ]]
+
 STALE_PID_TMP="$(mktemp -d /tmp/freely-project-command-stale-pid.XXXXXX)"
 FOREIGN_PID="$(sleep 30 >/dev/null 2>&1 & echo $!)"
 
