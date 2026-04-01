@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260323-1705-A`
 - title: Manager delegated continuation stall recovery governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-delegated-continuation-stall-recovery-governance`
@@ -75,6 +75,5 @@ Freely 已经具备 manager delegated continuation stall recovery 的基础 cont
 
 ## Next
 
-- Merge the narrow runtime repair into `develop`.
-- Keep `develop` runtime stopped until this merge decision is finished; do not resume live dogfood from the pre-fix stalled state.
-- Leave broader control-plane command semantics and restart surface evolution to separate lifecycles.
+- `2026-04-01 10:45 PDT` the narrow runtime repair is already present on `develop`; this owner is closed.
+- Future work may deepen live post-merge dogfood acceptance or broader control-plane command semantics, but those belong to separate lifecycles rather than reopening this completed stall-recovery owner.

@@ -979,23 +979,31 @@ routing_policy:
 
 1. `I-20260323-1705-A`
 - title: Manager delegated continuation stall recovery governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`, `docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md`
-- next_action: 保持当前 research worktree 作为唯一写入 lane，完成 merge judgement 与写回；在补丁吸收到 `develop` 前，不恢复 pre-fix stalled dogfood runtime
+- evidence:
+  - `develop` commit `ce17a17`
+  - `docs/progress/workspace-routing-foundation/p-manager-delegated-continuation-stall-recovery-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
+- completion_note: manager delegated continuation stall recovery 的 idle-safe repair 已进入主线；older continuity、stale runtime refs、missing prompt target 不再把坏态伪装成 lawful wait，stale queued worker prompts 也会重新回到 launchable recovery。
 
 2. `I-20260401-1035-A`
 - title: Materialize develop push-pending governance after protected-branch merge
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/candidates.md`
-- next_action: The first bounded slice is implemented and verified locally. Next step is merge judgment plus write-back, not more scope expansion inside this lane.
+- evidence:
+  - `develop` commits `08fb096`, `8feae13`, `11f310b`
+  - `docs/progress/workspace-routing-foundation/p-develop-push-pending-guard-governance.md`
+  - `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/code-reviews/20260401-develop-push-pending-guard-verification.md`
+- completion_note: develop push followthrough truth 已进入 canonical status/patrol surfaces；`push_pending` / `push_deferred` 现在是显式 machine-readable state，而不是 merge 之后的隐式本地遗忘窗口。
 - revisit_trigger: Re-open candidate-level research only if `develop`-scoped push debt proves too narrow and the state model must expand to other protected branch families.
 
 ### candidate_issues

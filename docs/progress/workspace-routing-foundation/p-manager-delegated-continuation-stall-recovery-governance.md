@@ -3,10 +3,10 @@
 - issue_id: `I-20260323-1705-A`
 - title: Manager delegated continuation stall recovery governance
 - issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
-- phase_state: `in_verification`
-- runtime_state: `ready-for-merge-judgement`
-- branch: `feature/manager-stall-local-continuation-reentry-research-20260328-0154`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260328-0154-feature-manager-stall-local-continuation-reentry-research`
+- phase_state: `completed`
+- runtime_state: `stopped`
+- branch: `develop`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely`
 
 ## Summary
 
@@ -28,8 +28,15 @@
 - review artifact:
   - `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
 
-## Next
+## Closure Evidence
 
-- Keep this issue as the sole owner for the patch until merge judgement is complete.
-- Treat implementation and targeted verification as complete; only merge/writeback judgement remains.
-- Do not restart `develop` dogfood yet.
+- closure_status: `merged-and-verified`
+- closure_evidence:
+  - `develop` commit `ce17a17`
+  - `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-active-worker-wait-does-not-recover`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-busy-and-stale-prompt-recovers`
+
+## Next Action
+
+1. Keep this owner closed; any new live-acceptance or broader control-plane follow-on must open a separate lifecycle.
