@@ -50,6 +50,7 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
 6. cross-tool fallback 必须显式记录 `previous_tool`、`active_tool`、`reason` 与 `launch_kind=fresh_with_handoff`。
 7. 当所有配置中的工具都不可用时，manager launch 继续 blocked，并写出 machine-readable waiting event 与 earliest-reset hint。
 8. 现有 Kiro defer contract 不回退：当 auto-switch 未开启时，runtime 仍在本地 stop 并 defer 给 control plane。
+9. cleanup-time one-shot `ensure-manager` recheck 若撞到旧 supervisor 正在退出的窗口，必须先等待 teardown 完成，再进入 fallback selection / relaunch；不能把 exiting supervisor 误判成“already running”。
 
 ## Completion
 
@@ -62,6 +63,7 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-waits-for-supervisor-teardown-before-fallback`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-cross-tool-restarts-from-leftmost-priority`
 - `docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
@@ -75,6 +77,7 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-waits-for-supervisor-teardown-before-fallback`
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-cross-tool-restarts-from-leftmost-priority`
   - `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
@@ -84,6 +87,7 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
 - Live repro:
   - Start on `develop`, force current-tool unavailability, and verify manager control plane first consumes same-tool recovery truth, then walks the configured fallback order, and finally emits waiting truth instead of blind relaunch when every tool is unavailable
   - Guard the live Kiro launch path from stale default-model drift: when `AI_MODEL` is empty, Kiro launcher must fall back to a supported model instead of aborting before availability recovery can classify the cycle
+  - Guard the cleanup/recheck boundary from false `already_running_attach`-style attach reuse: if cleanup has already written `desired=running + supervisor=down + ai=down`, the one-shot recheck must wait for the old supervisor to disappear before deciding whether fallback or relaunch is needed
 
 ## Next
 

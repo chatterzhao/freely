@@ -4504,6 +4504,61 @@ launch_manager_control_plane_recheck() {
   disown "$!" 2>/dev/null || true
 }
 
+manager_recheck_wait_for_supervisor_teardown_if_needed() {
+  local project="$1" current_pid="$2"
+  local desired_state supervisor_state ai_state last_exit_reason
+  local wait_attempts wait_sleep attempt refreshed_pid
+
+  [[ -n "$current_pid" ]] || return 0
+
+  desired_state="unknown"
+  supervisor_state="unknown"
+  ai_state="unknown"
+  last_exit_reason=""
+  if [[ -f "$(workcell_state_file "$project")" ]]; then
+    unset DESIRED_RUNTIME_STATE SUPERVISOR_STATE AI_STATE LAST_EXIT_REASON
+    # shellcheck disable=SC1090
+    source "$(workcell_state_file "$project")"
+    desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+    supervisor_state="${SUPERVISOR_STATE:-unknown}"
+    ai_state="${AI_STATE:-unknown}"
+    last_exit_reason="${LAST_EXIT_REASON:-}"
+  fi
+
+  if [[ "$desired_state" != "running" || "$supervisor_state" != "down" || "$ai_state" != "down" ]]; then
+    printf '%s\n' "$current_pid"
+    return 0
+  fi
+
+  wait_attempts="${FREELY_MANAGER_RECHECK_SUPERVISOR_EXIT_ATTEMPTS:-5}"
+  wait_sleep="${FREELY_MANAGER_RECHECK_SUPERVISOR_EXIT_SLEEP_SECS:-1}"
+  [[ "$wait_attempts" =~ ^[0-9]+$ ]] || wait_attempts=5
+  [[ "$wait_sleep" =~ ^[0-9]+([.][0-9]+)?$ ]] || wait_sleep=1
+
+  append_runtime_event "$project" "manager_recheck_waiting_for_supervisor_teardown" \
+    "supervisor_pid=$current_pid" \
+    "last_exit_reason=${last_exit_reason:-unknown}" \
+    "attempts=$wait_attempts"
+
+  refreshed_pid="$current_pid"
+  for ((attempt = 1; attempt <= wait_attempts; attempt++)); do
+    if ! valid_supervisor_pid_for_project "$project" "$refreshed_pid"; then
+      refreshed_pid=""
+      break
+    fi
+    sleep "$wait_sleep"
+    refreshed_pid="$(manager_supervisor_pid_for_project "$project")"
+    [[ -n "$refreshed_pid" ]] || break
+  done
+
+  if [[ -z "$refreshed_pid" ]]; then
+    append_runtime_event "$project" "manager_recheck_supervisor_teardown_observed" \
+      "last_exit_reason=${last_exit_reason:-unknown}"
+  fi
+
+  printf '%s\n' "$refreshed_pid"
+}
+
 manager_supervisor_pid_for_project() {
   local project="$1" run_dir sp
   run_dir="$(run_dir_for_project "$project")"
@@ -4630,6 +4685,9 @@ ensure_manager_once() {
   fi
   if [[ -z "$current_pid" ]]; then
     current_pid="$(discover_supervisor_pid "$project")"
+  fi
+  if [[ -n "$current_pid" ]]; then
+    current_pid="$(manager_recheck_wait_for_supervisor_teardown_if_needed "$project" "$current_pid")"
   fi
 
   codex_same_tool_blocked="0"
