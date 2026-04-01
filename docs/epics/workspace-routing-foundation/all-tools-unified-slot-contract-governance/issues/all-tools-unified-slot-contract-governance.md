@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-0840-A`
 - title: All-tools unified slot contract governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `all-tools-unified-slot-contract-governance`
@@ -11,6 +11,8 @@
 - source_brainstorm: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
+- pre_tests_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/pre-tests.md`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -72,3 +74,8 @@ Ordered cross-tool fallback v1 is already in place, but Freely still lacks the f
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-single-slot-failure-falls-through-to-cross-tool`
 - `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`
 - live validation on `develop`
+
+## Next
+
+- `2026-04-01 09:55 PDT` canonical develop validation and merge absorption are complete; this owner is closed.
+- Future work may deepen per-tool probe/reset parity, but the shared slot contract and scheduler semantics should not be reopened here.

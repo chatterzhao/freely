@@ -1,6 +1,18 @@
 # Pre-Tests: multi-tool-availability-manager-governance
 
-## Acceptance Contract
+## Acceptance Structure
+
+### Pre-merge focused gate acceptance
+
+- acceptance target: `ordered fallback v1 with codex parity`
+- testing layer: `focused regression`
+- target environment: `feature worktree`
+- required evidence: config reload, ordered fallback, codex slot-first, and all-tools-unavailable coverage
+- blocker taxonomy:
+  - `definition_missing`
+  - `commands_only`
+  - `evidence_plan_missing`
+  - `execution_pending_or_failed`
 
 1. 新项目 config 默认写出 `AUTO_SWITCH_SLOT=false`、`AUTO_SWITCH_TOOL=false`、`AI_FALLBACK_TOOLS=""`，并保持 `AI_TOOL` 仍是 active tool pointer。
 2. `ensure-manager` 会重新读取 project config，不依赖旧进程启动时缓存的 `AI_TOOL`。
@@ -11,20 +23,63 @@
 7. 当 auto-switch 未开启时，Kiro availability failure 仍应保持“本地 stop + defer control plane”的旧 contract。
 8. 当 project config 没有显式 Kiro model 时，launcher 必须回退到当前仍受支持的默认模型；不能因为过期默认值在 availability classification 之前就进入 `ai_exit_rc_1` loop。
 
-## Focused Tests
+### Post-merge canonical truth acceptance
 
-1. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-kiro-to-codex-fallback`
-   - 锁住兼容性路径：Kiro tool-local failure 仍能在 order 中选到 Codex
-2. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
-   - 锁住 fallback 会继续扫描配置顺序，而不是把 Codex 硬编码成唯一 target
-3. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
-   - 锁住 Codex 先 same-tool recovery，穷尽后才 cross-tool
-4. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
-   - 锁住 all-tools-unavailable 时 no-launch 与 earliest-reset waiting truth
-5. `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
-   - 锁住 auto-switch 未开启时，Kiro availability failure 仍只 stop/defer，不在本地 blind relaunch
-6. `bash docs/system/workspace/scripts/tests/test-tool-launchers-kiro-default-model`
-   - 锁住 Kiro launcher 在 `AI_MODEL=""` 时仍会使用受支持的默认模型，而不是过期的 `claude-opus-4.6`
+- acceptance target: `develop carries bounded ordered fallback v1`
+- testing layer: `develop truth replay`
+- target environment: `develop`
+- required evidence: progress closeout, verification artifact, and develop commit provenance
+- blocker taxonomy:
+  - `definition_missing`
+  - `evidence_plan_missing`
+  - `execution_pending_or_failed`
+
+1. This owner must close as v1 once develop contains the ordered fallback implementation and follow-up fixes.
+2. Broader all-tools slot parity must remain delegated to `I-20260401-0840-A`, not stay ambiguous here.
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `kiro tool-local failure can still choose codex through ordered fallback`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-ensure-manager-kiro-to-codex-fallback`
+
+### PT-2
+- id: `PT-2`
+- requirement: `fallback scans configured priority order instead of hardcoding codex as the only target`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
+
+### PT-3
+- id: `PT-3`
+- requirement: `codex remains same-tool slot-first before cross-tool fallback`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
+
+### PT-4
+- id: `PT-4`
+- requirement: `all-tools-unavailable path keeps no-launch and earliest-reset waiting truth`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
+
+### PT-5
+- id: `PT-5`
+- requirement: `auto-switch disabled keeps kiro availability failure on stop plus defer control-plane contract`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
+
+### PT-6
+- id: `PT-6`
+- requirement: `kiro launcher falls back to a supported default model when AI_MODEL is empty`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-tool-launchers-kiro-default-model`
 
 ## Regression Risks
 

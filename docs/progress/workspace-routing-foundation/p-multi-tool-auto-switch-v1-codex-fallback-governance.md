@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260331-1840-A`
 - title: Multi-tool availability manager governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 
 ## Current Slice
@@ -30,8 +30,9 @@
 - `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews/20260331-multi-tool-auto-switch-v1-codex-fallback-verification.md`
 - live repro on `develop` surfaced a narrow race: cleanup could write `desired=running + down/down + kiro_monthly_request_limit`, but an immediate one-shot recheck could still see the exiting supervisor pid and bail out as `already running`; this slice now adds teardown-aware waiting before fallback selection
 
-## Remaining
-
-- merge absorption into `develop`
-- one clean post-merge live confirmation on canonical manager runtime with ordered fallback, teardown-aware recheck, and explicit all-tools-unavailable truth
-- one clean post-merge live confirmation on canonical manager runtime with current-tool slot-first, then leftmost-priority cross-tool fallback, teardown-aware recheck, and explicit all-tools-unavailable truth
+- closure_status: `merged-and-verified`
+- closure_evidence:
+  - `merge_commits: 7252ed8, f5addf3, 795fe8d, 12a56bc`
+  - `tests: bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback && bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool && bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
+  - `review: docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews/20260331-multi-tool-auto-switch-v1-codex-fallback-verification.md`
+  - `live_validation: canonical develop runtime confirmed ordered fallback selection and teardown-aware recovery`

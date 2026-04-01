@@ -49,57 +49,23 @@ routing_policy:
 
 ### committed_issues
 
+- none right now; active workspace-routing owners have either moved to candidate_issues elsewhere or completed with evidence below
+
+### completed_issues
+
 1. `I-20260328-2105-A`
 - title: Codex verified resume evidence governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260328-2105--resume-evidence-strength-and-false-positive-resume-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260328-2105--resume-evidence-strength-and-false-positive-resume-governance/candidates.md`
-- next_action: Keep the codex-scoped owner in verification on `feature/runtime-closeout-merge-prep-20260330`. The current slice remains intentionally narrow: require rollout/jsonl-backed evidence before reusing `resume`, preserve healthy explicit resume, and keep auth/watchdog plus observability scope out of band. Verification truth is now the feature artifact on this merge-prep lane; older repro and duplicate closeout branches are provenance or superseded lanes, not active owners.
-
-1. `I-20260331-2012-A`
-- title: Active milestone placement and consumption gate governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md`
-- next_action: Keep the new placement-correctness owner in verification on `feature/milestone-candidate-placement-gate-20260331` until manager merge review absorbs the gate into canonical `develop`. This slice is complete for active-milestone placement enforcement; broader scheduling or auto-rehome mechanisms stay out of scope.
-
-1. `I-20260331-1840-A`
-- title: Multi-tool availability manager governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md`
-- next_action: Keep this bounded v1 owner in verification until the develop-bound merge lands cleanly. This line now explicitly stops at ordered fallback v1 plus Codex parity; all-tools unified slot parity belongs to `I-20260401-0840-A`.
-
-1. `I-20260401-0840-A`
-- title: All-tools unified slot contract governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md`
-- next_action: Keep this owner in verification on `feature/unified-slot-contract-governance-20260401` until merge review absorbs the unified slot contract into `develop`; focused regressions and live `kiro-cli -> codex dead-slot -> later usable Codex slot` validation are complete.
-
-1. `I-20260330-2358-A`
-- title: Runtime network failure taxonomy and bounded recovery governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/candidates.md`
-- next_action: Keep this owner in verification until the runtime classifier, bounded retry/cooldown guard, focused network regressions, and truth-source updates merge into `develop`. This slice intentionally stays narrow: classify execution-time network failures, retry in place on the current tool/slot, and block slot/tool fallback for network-local failures.
-
-### completed_issues
+- evidence:
+  - `develop` commit `20574fa`
+  - `docs/progress/workspace-routing-foundation/p-codex-verified-resume-evidence-governance.md`
+  - `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`
+- completion_note: verified-resume evidence contract 已进入主线：`codex` 只有在 rollout/jsonl evidence 可追踪时才会继续 explicit `resume`，单独观察到的 `session_id` 不再被误升格为可恢复 truth，也不会继续制造 false-positive resume storm。
 
 1. `I-20260325-0333-B`
 - title: Story-level pre-tests quality gate governance
@@ -116,6 +82,62 @@ routing_policy:
   - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
   - `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`
 - completion_note: Story-level `pre-tests.md` 质量 gate 已进入 capability truth，最小 blocker taxonomy 已冻结为 `definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`，verification 已 pass
+
+1. `I-20260331-2012-A`
+- title: Active milestone placement and consumption gate governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md`
+- evidence:
+  - `develop` commits `79f8bba`, `b279330`, `8972f7c`
+  - `docs/progress/workspace-routing-foundation/p-active-milestone-placement-and-consumption-gate-governance.md`
+  - `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/code-reviews/20260331-active-milestone-placement-gate-verification.md`
+- completion_note: active milestone placement correctness 已经进入 canonical gate truth。`governance-check` 与 `governance-merge-gate` 现在共同拦截 unresolved candidate 的 `unassigned` / `pending://...` / wrong milestone / completed milestone placement，并允许同一 governance owner 吸收 unresolved placement metadata 修正；这条 owner 不再保留在 verification。
+
+1. `I-20260331-1840-A`
+- title: Multi-tool availability manager governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md`
+- evidence:
+  - `develop` commits `7252ed8`, `f5addf3`, `795fe8d`, `12a56bc`
+  - `docs/progress/workspace-routing-foundation/p-multi-tool-auto-switch-v1-codex-fallback-governance.md`
+  - `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews/20260331-multi-tool-auto-switch-v1-codex-fallback-verification.md`
+- completion_note: ordered fallback v1 已经落到 canonical runtime truth：current tool same-tool recovery first、cross-tool fallback 从 `AI_FALLBACK_TOOLS` 最左侧重新开始、Kiro live path 不再被 stale default model 或 supervisor teardown race 卡住。更广的 all-tools slot parity 已移交 `I-20260401-0840-A` 并完成，不再由本 owner 持续占用 verification。
+
+1. `I-20260401-0840-A`
+- title: All-tools unified slot contract governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md`
+- evidence:
+  - `develop` commit `e8b5e0a`
+  - `docs/progress/workspace-routing-foundation/p-all-tools-unified-slot-contract-governance.md`
+  - `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`
+- completion_note: unified slot contract 已进入主线：所有工具进入统一 `~/.ai-auth/<tool>-<slot>/` inventory、runtime 维护 generic current-slot truth、每个 fallback tool 先扫 own slots，再继续跨工具，并且 canonical `develop` live validation 已确认 `kiro-cli` 不可用 + dead Codex slot 时仍能落到后续可用 Codex slot。
+
+1. `I-20260330-2358-A`
+- title: Runtime network failure taxonomy and bounded recovery governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/candidates.md`
+- evidence:
+  - `develop` commit `1a632bd`
+  - `docs/progress/workspace-routing-foundation/p-runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/code-reviews/20260401-runtime-network-failure-taxonomy-and-bounded-recovery-verification.md`
+- completion_note: execution-time network failure taxonomy 已被 narrow runtime owner 吸收：`execution_network_transient` / `execution_network_persistent` / `proxy_config_invalid` 不再落回 generic `ai_exit_rc_*`，也不会误触发 slot/tool fallback，而是在当前 `tool + slot` 上执行 bounded retry/cooldown。
 
 1. `I-20260331-1830-A`
 - title: Kiro CLI runtime availability failure governance

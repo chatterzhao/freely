@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260328-2105-A`
 - title: Codex verified resume evidence governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `codex-verified-resume-evidence-governance`
@@ -84,7 +84,7 @@ Freely 已经把 `codex` 的 canonical continuity model 收敛为显式 session-
 
 ## Next
 
-- IBM and dev-loop implementation are complete; this owner is now in verification.
+- IBM, dev-loop, and verification are complete; this owner is closed.
 - Current implementation stays deliberately narrow: verified rollout/jsonl evidence is now required before the `codex` path can reuse explicit `resume`.
-- The restack/materialization checkpoint is complete on `feature/runtime-closeout-merge-prep-20260330`, which is the canonical absorption owner while it remains ahead of `develop`.
-- Verification truth now lives in `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`; the earlier isolated repro worktree remains provenance only.
+- Develop already contains the repair in commit `20574fa`; the earlier merge-prep lane is provenance only, not an active owner.
+- Verification truth remains in `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`.
