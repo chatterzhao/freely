@@ -1537,7 +1537,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
 - next_action: backend bridge 的真实 `Transport=tauri` 最小闭环证据现已由 `I-20260317-0332` 写回；当前不再等待 bridge blocker，而是继续收紧 frontend host integration / UX 自身还缺的验收面
 
-2. `I-20260317-1004`
+2. `I-20260317-0332`
+- title: Rust/Tauri Probe Bridge v1
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+- source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
+- next_action: 真实 `Transport=tauri` 的最小 start / session create-resume / chat intervention 闭环证据已具备，当前先把实现 merge 到 `develop`；随后走纯治理 closeout，把 owner 移到 `completed_issues`
+
+3. `I-20260317-1004`
 - title: Frontend Runtime Baseline for Probe
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -1547,7 +1557,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md`
 - next_action: 这条 baseline 已完成最小 IBM 收敛，但当前不在近程执行窗；先让 `I-20260308-1244-03` / `I-20260317-0332` 消化真实宿主与 bridge 联调成本。若当前 research/merge-prep worktree 只剩这类远期排序项，应先完成 milestone 写回并走 retirement handoff，而不是为了挂住未来 queue 长期保留 worktree。
 
-3. `I-20260317-1003`
+4. `I-20260317-1003`
 - title: Incremental Dogfooding Gate for Backend Increments
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -1608,19 +1618,6 @@ routing_policy:
   - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/code-reviews/20260326-frontend-backend-boundary-contract-v1-canonical-verification.md`
 - completion_note: Probe day-1 boundary contract 已冻结到 object family、error surface、ordering 与 adapter compatibility 字段面，并被 `frontend-probe-v0` 与 `rust-tauri-probe-bridge-v1` 直接复用；因此本 issue 已完成 canonical closeout，后续真实宿主与 bridge 联调留给 active `in_dev` 主线承接
 
-3. `I-20260317-0332`
-- title: Rust/Tauri Probe Bridge v1
-- milestone_state: completed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
-- source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
-- evidence:
-  - `docs/progress/frontend-probe-dogfooding-loop/p-rust-tauri-probe-bridge-v1.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-host-validation-verification.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
-- completion_note: 真实 Tauri 宿主已不再只是能启动；当前已通过 `bun run tauri:validate:probe` 实测写回 `RequestSnapshot`、`ControlRun`、`CreateOrResumeSession`、`SendChatIntervention` 以及对应 event/snapshot 证据，因此 backend bridge v1 已完成 canonical closeout。后续 frontend host integration / UX 收口继续留在 `I-20260308-1244-03`
 
 ## M-20260318-url-content-intake-skill-and-wechat-fetch-governance
 
