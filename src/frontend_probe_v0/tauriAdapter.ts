@@ -13,15 +13,29 @@ type TauriListen = (
 ) => Promise<() => void>;
 
 export class TauriProbeAdapter implements ProbeAdapter {
+  private readonly listeners = new Set<EventListener>();
+  private unlisten: (() => void) | null = null;
+  private readonly listenerReady: Promise<void>;
+
   constructor(
     private readonly invoke: TauriInvoke,
     private readonly listen: TauriListen,
     private readonly bindings: ProbeBridgeBindings = defaultProbeBridgeBindings,
-  ) {}
+  ) {
+    this.listenerReady = this.listen(this.bindings.serverEventName, (event) => {
+      this.listeners.forEach((listener) => {
+        listener(event.payload);
+      });
+    }).then((cleanup) => {
+      this.unlisten = cleanup;
+    });
+  }
 
   requestSnapshot(projectId: string): Promise<ProbeSnapshot> {
     return this.invoke<ProbeSnapshot>(this.bindings.requestSnapshotCommand, {
-      projectId,
+      payload: {
+        projectId,
+      },
     });
   }
 
@@ -32,23 +46,10 @@ export class TauriProbeAdapter implements ProbeAdapter {
   }
 
   subscribe(listener: EventListener): () => void {
-    let disposed = false;
-    let unlisten: (() => void) | null = null;
-
-    void this.listen(this.bindings.serverEventName, (event) => {
-      listener(event.payload);
-    }).then((cleanup) => {
-      if (disposed) {
-        cleanup();
-        return;
-      }
-
-      unlisten = cleanup;
-    });
+    this.listeners.add(listener);
 
     return () => {
-      disposed = true;
-      unlisten?.();
+      this.listeners.delete(listener);
     };
   }
 }

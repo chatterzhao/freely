@@ -10,9 +10,11 @@
     "rust:preflight:test": "bash bin/test-rust-toolchain-preflight",
     "cargo:check:probe": "bash bin/cargo-check-probe-bridge",
     "tauri:preflight:probe": "bash bin/check-tauri-probe-host",
-    "tauri:dev:probe": "bash bin/tauri-probe-dev"
+    "tauri:dev:probe": "bash bin/tauri-probe-dev",
+    "tauri:validate:probe": "bash bin/tauri-validate-probe-interactions"
   },
   "dependencies": {
+    "@tauri-apps/api": "^2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

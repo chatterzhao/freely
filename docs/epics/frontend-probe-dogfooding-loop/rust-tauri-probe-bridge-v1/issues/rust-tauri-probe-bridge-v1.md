@@ -11,6 +11,8 @@
 - source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
+- pre_tests_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/pre-tests.md`
+- verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
@@ -136,4 +138,6 @@
 - 2026-03-18 当前轮已实际完成本地 bridge 验证闭环：`bun run cargo:check:probe` 通过、`cargo test -p freely-probe-bridge` 24 项通过、`bun run typecheck` 通过、`bun run build` 通过。当前剩余缺口不再是 contract/warning，而是尚未执行真正的 Tauri 宿主启动联调。
 - 2026-04-01 当前轮继续把真实宿主 blocker 正式收掉：根目录 `package.json` 新增 `tauri:preflight:probe` / `tauri:dev:probe`，`vite.config.ts` 与 `src-tauri/tauri.conf.json` 统一冻结到 `127.0.0.1:4173`，并补了 `bin/check-tauri-probe-host` / `bin/tauri-probe-dev` 作为 canonical host-validation 入口。随后已实际执行 `bun run tauri:preflight:probe` 与 `bun run tauri:dev:probe`，确认真实 Tauri 宿主能稳定完成 Vite `BeforeDevCommand`、Rust bridge 编译并进入 `target/debug/freely-probe-bridge` 运行态，不再停在 host mismatch 或 toolchain 缺失。
 - 2026-04-01 当前轮也把验证基线重新回放到最新入口：`bun run typecheck`、`bun run build`、`bun run cargo:check:probe`、`cargo test -p freely-probe-bridge` 再次通过。当前 `I-20260317-0332` 已不再被“真实 Tauri 宿主无法启动”阻塞，生命周期进入 `in_verification`；剩余待写实的验收点只剩真实 `Transport=tauri` 下的最小 start / session create-resume / chat intervention 闭环证据。
+- 2026-04-01 当前轮已把真实 `Transport=tauri` 的最小交互闭环实际打通：新增 `bin/tauri-validate-probe-interactions` 作为 canonical live validation 入口，前端 `useTauriValidationSequence` 在 validation mode 下会真实发出 `ControlRun(start)`、`CreateOrResumeSession`、`SendChatIntervention`，Rust 侧 `validation_report.rs` 会把 snapshot request、command ack、event subset 与 snapshot writeback 记录成结构化 report。实测 `bun run tauri:validate:probe` 已返回 `status=passed`，确认真实 Tauri transport 下最小 start / session create-resume / chat intervention 闭环成立。
+- 2026-04-01 当前轮也顺手收掉了两条真实 seam bug：`TauriProbeAdapter.requestSnapshot()` 现按 Rust 命令参数名传递 `{ payload: { projectId } }`，不再在真实宿主里因为 invoke 参数形状错误而丢失初始 snapshot；validation sequence 则不再把成功与否绑死在前端事件订阅 race 上，而是通过真实 `requestSnapshot` 轮询确认 run/session/chat 写回，确保 live validation 反映的是真 bridge state，而不是 React effect 时序。
 - `I-20260308-1244-03` 继续保持 frontend dev issue 身份，但 backend bridge blocker 现由本 issue 承接，直到真实 bridge 可联调。

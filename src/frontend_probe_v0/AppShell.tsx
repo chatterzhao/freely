@@ -7,6 +7,7 @@ import { useProbeChatIntervention } from "./useProbeChatIntervention";
 import { useProbeEvents } from "./useProbeEvents";
 import { useProbeControls } from "./useProbeControls";
 import { useProbeSessionLifecycle } from "./useProbeSessionLifecycle";
+import { useTauriValidationSequence } from "./useTauriValidationSequence";
 import { useProbeRuntime } from "./useProbeRuntime";
 
 const appShellStyle: Record<string, string | number> = {
@@ -80,6 +81,7 @@ export type AppShellProps = {
   projectId?: string;
   runtimeMode?: "mock" | "tauri";
   transportMode?: "mock" | "tauri-mock" | "tauri-broken";
+  validationMode?: "off" | "tauri-smoke";
   bridgeBindings?: {
     requestSnapshotCommand: string;
     sendCommandCommand: string;
@@ -93,6 +95,7 @@ export function AppShell({
   projectId = "freely",
   runtimeMode = "mock",
   transportMode = "mock",
+  validationMode = "off",
   bridgeBindings,
 }: AppShellProps) {
   const [selectedProjectId, setSelectedProjectId] = useState(projectId);
@@ -108,6 +111,14 @@ export function AppShell({
     resolvedAdapter,
   );
   const events = useProbeEvents(resolvedAdapter);
+  const validation = useTauriValidationSequence({
+    adapter: resolvedAdapter,
+    events,
+    projectId: selectedProjectId,
+    runtimeMode,
+    snapshot,
+    validationMode,
+  });
   const chat = useProbeChatIntervention(
     selectedProjectId,
     snapshot?.activeSessions[0]?.sessionId,
@@ -213,6 +224,7 @@ export function AppShell({
         <p>{`Buffered event count: ${events.length}`}</p>
         <p>{`Last event id: ${snapshot?.lastEventId ?? "n/a"}`}</p>
         <p>{`Runtime mode: ${runtimeMode}`}</p>
+        <p>{`Validation mode: ${validationMode}`}</p>
         <p>{`Bridge contract: ${bridgeContractVersion ?? "n/a"}`}</p>
         <p>
           {`Bridge: ${bridgeBindings?.requestSnapshotCommand ?? "n/a"} / ${
@@ -255,6 +267,18 @@ export function AppShell({
               )}
             </ul>
           </div>
+          {validationMode !== "off" ? (
+            <div>
+              <p style={sectionTitleStyle}>Validation Report</p>
+              <ul style={listStyle}>
+                <li style={listItemStyle}>{`status: ${validation.status}`}</li>
+                <li style={listItemStyle}>{`start: ${validation.steps.start}`}</li>
+                <li style={listItemStyle}>{`session: ${validation.steps.session}`}</li>
+                <li style={listItemStyle}>{`chat: ${validation.steps.chat}`}</li>
+                <li style={listItemStyle}>{`error: ${validation.error ?? "none"}`}</li>
+              </ul>
+            </div>
+          ) : null}
           <div>
             <p style={sectionTitleStyle}>Recent Activity</p>
             <ul style={listStyle}>

@@ -9,6 +9,7 @@ type RootLike = {
 type HostOptions = {
   projectId?: string;
   transportMode?: "mock" | "tauri-mock" | "tauri-broken";
+  validationMode?: "off" | "tauri-smoke";
 };
 
 export function mountProbeIntoRoot(root: RootLike, options?: HostOptions) {

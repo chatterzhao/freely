@@ -6,10 +6,20 @@ use tauri::State;
 use crate::model::{
     AgentInfo, ProjectSummary, RunInfo, SessionStatus, Snapshot, TerminalTarget,
 };
+use crate::validation_report::ValidationReportRecorder;
 
-#[derive(Default)]
 pub struct AppState {
     pub snapshots: Mutex<HashMap<String, Snapshot>>,
+    pub validation_reporter: ValidationReportRecorder,
+}
+
+impl Default for AppState {
+    fn default() -> Self {
+        Self {
+            snapshots: Mutex::new(HashMap::new()),
+            validation_reporter: ValidationReportRecorder::default(),
+        }
+    }
 }
 
 pub fn default_session_id(project_id: &str) -> String {

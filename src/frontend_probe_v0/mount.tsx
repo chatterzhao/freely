@@ -7,6 +7,7 @@ type RenderFn = (node: unknown) => void;
 type MountOptions = {
   projectId?: string;
   transportMode?: "mock" | "tauri-mock" | "tauri-broken";
+  validationMode?: "off" | "tauri-smoke";
 };
 
 export function mountProbeApp(render: RenderFn, options?: MountOptions) {

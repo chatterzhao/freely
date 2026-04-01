@@ -1535,7 +1535,7 @@ routing_policy:
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
 - source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: frontend 侧 contract、transport、manifest 和错误面已基本收敛；真实 Tauri 宿主已由 `I-20260317-0332` 成功拉起，backend host-up blocker 不再成立。下一步等待 `I-20260317-0332` 把真实 `Transport=tauri` 下的最小 start / session create-resume / chat intervention 验证证据写回，再回到本 issue 收紧 frontend host integration 与 blocker 描述
+- next_action: backend bridge 的真实 `Transport=tauri` 最小闭环证据现已由 `I-20260317-0332` 写回；当前不再等待 bridge blocker，而是继续收紧 frontend host integration / UX 自身还缺的验收面
 
 2. `I-20260317-0332`
 - title: Rust/Tauri Probe Bridge v1
@@ -1545,7 +1545,7 @@ routing_policy:
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
 - source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md`
-- next_action: 当前已新增 `tauri:preflight:probe` / `tauri:dev:probe` 与统一 host-validation 脚本，并已实际完成真实 Tauri 宿主启动：Vite `BeforeDevCommand`、Rust bridge 编译、`target/debug/freely-probe-bridge` 运行态都已通过。下一步在 verification 中补齐真实 `Transport=tauri` 下最小 start / session create-resume / chat intervention 闭环证据，再决定是否 `completed`
+- next_action: 真实 `Transport=tauri` 的最小 start / session create-resume / chat intervention 闭环证据已具备，当前先把实现 merge 到 `develop`；随后走纯治理 closeout，把 owner 移到 `completed_issues`
 
 3. `I-20260317-1004`
 - title: Frontend Runtime Baseline for Probe
@@ -1617,6 +1617,7 @@ routing_policy:
   - `docs/progress/frontend-probe-dogfooding-loop/p-frontend-backend-boundary-contract-v1-for-frontend-probe.md`
   - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/code-reviews/20260326-frontend-backend-boundary-contract-v1-canonical-verification.md`
 - completion_note: Probe day-1 boundary contract 已冻结到 object family、error surface、ordering 与 adapter compatibility 字段面，并被 `frontend-probe-v0` 与 `rust-tauri-probe-bridge-v1` 直接复用；因此本 issue 已完成 canonical closeout，后续真实宿主与 bridge 联调留给 active `in_dev` 主线承接
+
 
 ## M-20260318-url-content-intake-skill-and-wechat-fetch-governance
 

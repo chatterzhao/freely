@@ -9,6 +9,7 @@ type BootstrapOptions = {
   projectId?: string;
   bridgeBindings?: ProbeBridgeBindings;
   transportMode?: "mock" | "tauri-mock" | "tauri-broken";
+  validationMode?: "off" | "tauri-smoke";
 };
 
 export function bootstrapProbeApp(
@@ -20,6 +21,7 @@ export function bootstrapProbeApp(
   const projectId = options.projectId ?? "freely";
   const runtimeMode = runtime ? "tauri" : "mock";
   const transportMode = options.transportMode ?? "mock";
+  const validationMode = options.validationMode ?? "off";
 
   function BoundAppShell() {
     return (
@@ -30,6 +32,7 @@ export function bootstrapProbeApp(
         projectId={projectId}
         runtimeMode={runtimeMode}
         transportMode={transportMode}
+        validationMode={validationMode}
       />
     );
   }
@@ -42,5 +45,6 @@ export function bootstrapProbeApp(
     projectId,
     runtimeMode,
     transportMode,
+    validationMode,
   };
 }

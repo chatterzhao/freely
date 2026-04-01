@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+report_path="$(mktemp -t freely-tauri-probe-validation-report).json"
+log_path="$(mktemp -t freely-tauri-probe-validation-log).txt"
+
+cleanup() {
+  if [[ -n "${dev_pid:-}" ]]; then
+    kill "${dev_pid}" >/dev/null 2>&1 || true
+    wait "${dev_pid}" >/dev/null 2>&1 || true
+  fi
+}
+
+trap cleanup EXIT
+
+export FREELY_PROBE_VALIDATION_REPORT_PATH="$report_path"
+export VITE_FREELY_PROBE_VALIDATION_MODE="tauri-smoke"
+
+cd "$repo_root"
+bash "$repo_root/bin/tauri-probe-dev" >"$log_path" 2>&1 &
+dev_pid=$!
+
+deadline=$((SECONDS + 90))
+while (( SECONDS < deadline )); do
+  if [[ -s "$report_path" ]]; then
+    status="$(node -e 'const fs=require("fs"); const path=process.argv[1]; const report=JSON.parse(fs.readFileSync(path,"utf8")); process.stdout.write(report.status || "");' "$report_path")"
+    if [[ "$status" == "passed" ]]; then
+      cat "$report_path"
+      exit 0
+    fi
+  fi
+  sleep 1
+done
+
+echo "[FAIL] timed out waiting for real Tauri validation report" >&2
+if [[ -s "$report_path" ]]; then
+  echo "[report]" >&2
+  cat "$report_path" >&2
+fi
+echo "[log]" >&2
+cat "$log_path" >&2
+exit 1
