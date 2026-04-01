@@ -4,6 +4,7 @@
 - title: Story-level pre-tests quality gate governance
 - phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
+- completion_date: 2026-03-31
 - epic-name: `workspace-routing-foundation`
 - story-name: `story-level-pre-tests-quality-gate-governance`
 - issue-name: `story-level-pre-tests-quality-gate-governance`
