@@ -74,7 +74,7 @@ That means the problem is not just one bad output command. There is a write/read
 - `live-status`
 - `fleet-status`
 
-## Narrow Suspected Path
+## Proven So Far
 
 `docs/system/workspace/scripts/runtime/freely` currently contains this write path:
 
@@ -86,22 +86,48 @@ That means the problem is not just one bad output command. There is a write/read
 
 This is lawful only if a real project-owned supervisor is currently alive.
 
-Current suspicion:
+What is already proven from code inspection and focused tests:
 
-1. `ensure-manager --watch` repeatedly attempts manager bootstrap
-2. one of those attempts decides `already_running_attach`
+1. attach-only success writes optimistic persisted truth:
+   - `DESIRED_RUNTIME_STATE="running"`
+   - `LAST_SUPERVISOR_STATE="up"`
+   - `LAST_AI_STATE="up"`
+   - `LAST_EXIT_REASON="already_running_attach"`
+2. the attach-only path returns before entering the normal supervisor loop and does not append a runtime event
+3. `live-status` only reconciles upward when it finds current project-owned PIDs; it does not downgrade stale optimistic state when no current PID exists
+4. the valid attach contract is real and already covered by `test-freely-project-command-semantics`, so this family cannot be "fixed" by simply removing attach reuse
+
+## Current Best Hypothesis
+
+Current best hypothesis is narrower than the first-pass root-cause draft:
+
+1. a later `start` / bootstrap attempt runs after an earlier runtime has already written cleanup truth or while another `start` process is in a short-lived boundary window
+2. that later attempt decides `already_running_attach`
 3. it rewrites `workcell-state.env` and `supervisor.pid`
-4. the supervisor it attached to is already gone, or the detection was too weak / racy
-5. no fresh `runtime-events.log` line is emitted for that attach-only writeback
-6. `live-status` later trusts the optimistic persisted state because no current PID exists to reconcile downward
+4. the process it reused does not survive long enough to leave matching fresh runtime events or a durable AI PID
+5. `live-status` later surfaces that optimistic persisted state because read-time reconciliation is one-way
+
+This hypothesis is more consistent with the code than a generic "random PID reuse" story.
+
+## Not Yet Proven
 
 ## Open Questions
 
 1. Why is `already_running_attach` being written after the last recorded `supervisor_cleanup`?
-2. Is `ensure_no_active_supervisor_conflict()` racing against a short-lived `freely start` child, or is `discover_supervisor_pid()` matching the wrong process window?
+2. Is `ensure_no_active_supervisor_conflict()` racing against a short-lived same-project `freely start` window, or is `discover_supervisor_pid()` matching a process that is technically owned but no longer healthy?
 3. Should attach-only success be allowed to rewrite `last_ai_state=up` when there is no confirmed project AI PID?
 4. Should attach-only state writes emit a runtime event so patrol can distinguish real supervisor loop activity from optimistic reuse?
 5. Should `live-status` treat persisted `already_running_attach` as soft/stale unless a current supervisor or AI PID is still confirmed?
+6. Is the real repair on the write side, the read side, or both?
+
+## Ruled Out Or Weakened Hypotheses
+
+- "random unrelated PID reuse" is not yet supported:
+  - `valid_supervisor_pid_for_project()` requires both liveness and a matching project-owned `runtime/freely start --project` command / cwd shape
+- "cleanup always leaves stale supervisor.pid behind" is weakened:
+  - `cleanup_supervisor()` explicitly removes `supervisor.pid` and `ai.pid`
+- "the attach regression can be fixed by killing attach reuse" is ruled out:
+  - existing start/attach semantics are intentional and covered by focused tests
 
 ## Boundary
 

@@ -4,11 +4,19 @@
 2026-03-31
 
 ## Status
-Root cause identified, fix proposal pending
+Write/read mismatch identified; trigger mechanism still needs focused repro
 
 ## Summary
 
-The regression occurs when `start_project_runtime()` writes optimistic `already_running_attach` state without verifying that the detected supervisor PID is actually a live project-owned supervisor. This creates a false-positive scenario where:
+The regression family currently proven is narrower than the original draft. What is proven is:
+
+1. `start_project_runtime()` can write optimistic `already_running_attach` state
+2. that attach-only write does not emit a matching runtime event
+3. `live-status` does not reconcile that optimistic state downward when no current project-owned PID exists
+
+The still-unproven part is the exact trigger that caused the stale attach write observed on `develop`.
+
+This creates a false-positive status scenario where:
 
 1. A supervisor exits cleanly and writes `down/down` state
 2. The `supervisor.pid` file is not cleaned up (or is rewritten later)
@@ -92,15 +100,7 @@ resolve_active_supervisor_pid_for_start() {
 
 ## Root Causes
 
-### 1. Weak PID Validation
-
-`valid_supervisor_pid_for_project()` may not be strong enough to distinguish:
-- A real project supervisor that is still in its main loop
-- A short-lived supervisor that is in cleanup phase
-- An unrelated process that happens to match the validation criteria
-- A PID that was reused by the OS after the original supervisor exited
-
-### 2. Optimistic State Write Without Verification
+### 1. Optimistic State Write Without Verification
 
 When `ensure_no_active_supervisor_conflict()` returns 10, `start_project_runtime()` immediately writes:
 ```bash
@@ -113,7 +113,7 @@ This is optimistic because:
 - It doesn't check if the supervisor's child AI process exists
 - It doesn't emit a runtime event for observability
 
-### 3. No Runtime Event for Attach-Only Case
+### 2. No Runtime Event for Attach-Only Case
 
 The attach-only path returns immediately without emitting a runtime event:
 ```bash
@@ -125,14 +125,28 @@ fi
 
 This breaks the observability contract where every state change should have a corresponding runtime event.
 
-### 4. Stale PID File Not Cleaned Up
+### 3. One-Way Read Reconciliation
 
-The `supervisor.pid` file may persist after:
-- Supervisor cleanup (if cleanup fails or is interrupted)
-- System crash or kill -9
-- Race conditions during shutdown
+`cmd_live_status()` only reconciles stale persisted state upward:
 
-If this file contains a PID that gets reused, the next bootstrap attempt may falsely detect it as a live supervisor.
+- if a current project-owned supervisor PID exists, it upgrades `last_supervisor_state` to `up`
+- if a current project-owned AI PID exists, it upgrades `last_ai_state` to `up`
+- absence of a PID does not downgrade previously persisted optimistic state
+
+This means an optimistic attach write can outlive the real process truth on the status surface.
+
+### 4. Trigger Mechanism Still Not Reproduced
+
+The exact trigger that produced the observed stale attach write is still not pinned down.
+
+Possible candidates:
+- a same-project concurrent or delayed `start` / `ensure-manager` bootstrap window
+- attach reuse of a short-lived supervisor process that soon exits
+- a still-owned but no-longer-healthy process window
+
+Not yet proven:
+- generic unrelated PID reuse
+- cleanup routinely leaving stale `supervisor.pid`
 
 ## Evidence from Production
 
@@ -155,15 +169,15 @@ From the frozen evidence in `brainstorms.md`:
    - `fleet-status` correctly reports `sup=none ai=none`
    - `live-status` incorrectly reports `last_supervisor_state=up last_ai_state=up`
 
-## Fix Proposals
+## Design Directions
 
-### Option 1: Strengthen PID Validation (Conservative)
+### Option 1: Make Attach Writes Less Optimistic (Conservative)
 
 Before writing `already_running_attach`, verify:
 1. The supervisor PID is alive
-2. The supervisor is actually in its main loop (not in cleanup)
+2. The supervisor is actually healthy enough to be reused
 3. The supervisor owns the expected project path
-4. The AI child process exists and is valid
+4. If `last_ai_state=up` is going to be written, the AI child process exists and is valid
 
 ```bash
 if [[ "$supervisor_conflict_rc" -eq 10 ]]; then
@@ -224,40 +238,30 @@ This allows patrol to distinguish:
 - Real supervisor loop activity (has recent events)
 - Optimistic attach reuse (has attach event but no subsequent activity)
 
-### Option 4: Clean Up PID Files More Aggressively (Preventive)
+### Option 4: Focused Trigger Repro Before Fix Selection
 
-Ensure `supervisor.pid` is always cleaned up:
-1. In `cleanup_supervisor()` trap
-2. In `ensure_no_active_supervisor_conflict()` when PID is invalid
-3. In watchdog when detecting stale state
+Before choosing between write-side hardening and read-side downgrade, reproduce one of these concrete triggers in a focused harness:
 
-```bash
-cleanup_supervisor() {
-  append_runtime_event "$project" "supervisor_cleanup" ...
-  rm -f "$sup_pid_file" "$child_pid_file" "$(stop_marker_file "$project")"
-  write_workcell_state "$project" "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" "down" "down" "${LAST_WORKCELL_EXIT_REASON:-supervisor_exit}"
-}
-```
+1. same-project concurrent `start` / attach race
+2. attach to a still-live supervisor that has no live AI yet
+3. attach to a soon-to-exit supervisor where no subsequent runtime event lands
 
 ## Recommended Fix
 
-Combine Options 1, 3, and 4:
+Current recommendation is to delay implementation choice until the trigger is reproduced.
 
-1. **Strengthen PID validation** before claiming attach success
-2. **Always emit runtime event** for attach-only case
-3. **Clean up PID files** more aggressively
+The strongest currently supported conclusions are:
 
-This provides:
-- Defense in depth (validation + cleanup)
-- Observability (runtime events)
-- Clear contract (attach success requires health check)
+1. attach-only writes are too optimistic for their current observability contract
+2. `live-status` intentionally avoids rewriting historical state downward, which makes this family visible
+3. any fix must preserve the valid attach-reuse contract already covered by `test-freely-project-command-semantics`
 
 ## Next Steps
 
-1. Implement the recommended fix in a focused branch
-2. Add integration test that reproduces the false-positive scenario
-3. Verify the fix prevents the regression
-4. Ensure existing valid attach cases still work
+1. Build a focused repro that exercises the real `start_project_runtime()` attach path, not a hand-written symptom simulation
+2. Distinguish "same-project short window attach" from "bad PID ownership match"
+3. After the trigger is reproduced, decide whether repair belongs on write-side gating, read-side downgrade, or both
+4. Keep existing valid attach semantics and stale-ownership protections passing
 5. Update documentation for attach semantics
 
 ## Related Issues
