@@ -4,8 +4,8 @@
 - title: Active milestone placement and consumption gate governance
 - phase_state: `in_verification`
 - runtime_state: `stopped`
-- branch: `feature/milestone-candidate-placement-gate-20260331`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260331-feature-milestone-candidate-placement-gate`
+- branch: `feature/milestone-placement-merge-gate-followup-20260331`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260331-feature-milestone-placement-merge-gate-followup`
 - issue_path: `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-closeout"}
@@ -17,6 +17,9 @@
   - `LAWS`、pre-brainstorm skill、milestone-planning skill 与 manager patrol guidance 已统一写明 `needs_research` 的 keep / cautious rehome / dropped 合同
   - 当前 backlog 中暴露出的 candidate placement drift 已一并对齐回 active milestone
 - 当前批次已通过 focused tests 与 `./bin/governance-check`，保持 `in_verification`，等待 manager merge review / canonical absorption；如果后续要继续做更强的 milestone 排期或自动迁移，应另开 lifecycle。
+- post-merge replay 又暴露一个窄 follow-up：`governance-merge-gate` 仍把 unresolved candidate 的 milestone metadata 修正误判成“必须同批携带该 candidate 自己的 I-* owner”。本 follow-up 收窄为两件事：
+  - 允许 unresolved `proposed|needs_research|blocked` candidate 在已有治理 owner 的 develop merge 中一起修 placement metadata
+  - 把 develop 中仍残留的 `C-20260330-2318-A`、`C-20260331-1837-A`、`C-20260331-1840-A` milestone 绑定补回 active milestone
 
 ## Verification
 
