@@ -55,7 +55,7 @@ So the current prompt contract and the role truth are not aligned.
 
 `cycle-20260331-180927.log` shows the worker did real delegated work:
 
-- verified `I-20260325-0410`
+- verified `I-20260325-0333-B`
 - updated issue/progress state
 - committed `adc87b4`
 - reran `./bin/governance-check`

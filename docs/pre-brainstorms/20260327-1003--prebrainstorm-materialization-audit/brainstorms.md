@@ -157,7 +157,7 @@
 - refined verdict: `milestone-only gap`
 
 2. `C-20260325-0333-B`
-- owner chain 已存在：`I-20260325-0410 -> issue/prd/pre-tests/tasks -> progress`
+- owner chain 已存在：`I-20260325-0333-B -> issue/prd/pre-tests/tasks -> progress`
 - 当前 issue 仍是 `in_verification`
 - refined verdict: `milestone-only gap`
 
@@ -249,7 +249,7 @@
 
 ### Step 1. 先修 milestone 可见性，不先扩写新候选
 - 只针对 refined analysis 第 1 类处理：
-  - 把 `I-20260324-0415`、`I-20260325-0410` 补回 `M-20260306-workspace-routing-foundation`
+  - 把 `I-20260324-0415`、`I-20260325-0333-B` 补回 `M-20260306-workspace-routing-foundation`
   - 对 `20260326-1810` 先补建 `M-20260326-freely-product-architecture` section，再挂 `I-20260326-1810`
 - 不要把“已有其他形态吸收”的条目和“完全没 owner”的条目混成同一种修法
 
@@ -294,7 +294,7 @@
 ### Lane A. milestone reconciliation
 - 范围只含 refined analysis 第 1 类：
   - `I-20260324-0415`
-  - `I-20260325-0410`
+  - `I-20260325-0333-B`
   - `I-20260326-1810`
 - 目标：修复 `docs/milestones.md` 的正式编排缺口
 - 完成标志：issue 已在对应 milestone section 中可见，且 provenance 不再断裂

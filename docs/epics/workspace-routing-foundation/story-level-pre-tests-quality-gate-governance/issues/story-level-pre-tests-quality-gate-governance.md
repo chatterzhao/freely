@@ -1,9 +1,10 @@
 # Issue: story-level-pre-tests-quality-gate-governance
 
-- issue_id: `I-20260325-0410`
+- issue_id: `I-20260325-0333-B`
 - title: Story-level pre-tests quality gate governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
+- completion_date: 2026-03-31
 - epic-name: `workspace-routing-foundation`
 - story-name: `story-level-pre-tests-quality-gate-governance`
 - issue-name: `story-level-pre-tests-quality-gate-governance`
@@ -12,6 +13,8 @@
 - source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
+- pre_tests_path: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/pre-tests.md`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews`
 - depends_on:
   - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
   - `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
@@ -104,4 +107,4 @@ Freely 已经明确 `pre-tests.md` 是 issue-level acceptance 控制面，但还
 ## Next
 
 - next_action: 当前 dev-loop 已在 dedicated feature worktree 写回 capability truth，当前保持 `in_verification`，等待 manager merge review / canonical absorption；不在本 issue 内继续扩写 testing ladder、gate mapping 或 real-environment harness scope。
-- revisit_trigger: 当 `I-20260325-0410` 被 manager 视为 completed / absorbed 后，再回到 `C-20260325-0333-A` 判断 ladder / gate mapping / real-environment harness 的下一跳；若 merge review 指出 story-level `pre-tests.md` 质量线与 `LAWS.md` / `three-loop-capability-lifecycle.md` 仍有冲突，先回 doc-loop 修正，不进入新 dev 扩写。
+- revisit_trigger: 当 `I-20260325-0333-B` 被 manager 视为 completed / absorbed 后，再回到 `C-20260325-0333-A` 判断 ladder / gate mapping / real-environment harness 的下一跳；若 merge review 指出 story-level `pre-tests.md` 质量线与 `LAWS.md` / `three-loop-capability-lifecycle.md` 仍有冲突，先回 doc-loop 修正，不进入新 dev 扩写。
