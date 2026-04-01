@@ -1,5 +1,10 @@
 # Code Review: story-level-pre-tests-quality-gate-governance
 
+- issue_id: `I-20260325-0333-B`
+- reviewed_branch: `feature/story-level-pretests-closeout-merge-prep-20260401`
+- reviewed_commit: `b2ba154`
+- verifier: `codex`
+
 ## Scope
 
 - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
