@@ -4,27 +4,54 @@
 
 ### Pre-merge acceptance
 
-1. Freely 真源明确：story-level `pre-tests.md` 至少必须表达
-   - acceptance target
-   - testing layer
-   - target environment
-   - required evidence
-   - blocker taxonomy
-2. Freely 真源明确：commands-only `pre-tests.md` 不合格。
-3. Freely 真源明确：最小 blocker taxonomy 至少包括
-   - `definition_missing`
-   - `commands_only`
-   - `evidence_plan_missing`
-   - `execution_pending_or_failed`
-4. Freely 真源明确：`pre-tests.md` 质量失败与测试执行失败是两类不同 blocker。
-5. 相关 truth sources 与既有 `integration-acceptance-first`、artifact-plane acceptance evidence、`pre-test-merge` / post-merge verification 口径一致。
-
-### Post-merge acceptance
-
-1. 本 issue 不要求单独的 post-merge acceptance 环境。
-2. 若后续 follow-on 把 testing ladder 扩到 protected/post-merge acceptance，必须复用本 issue 冻结的质量 gate，而不是绕过它。
+- acceptance target: `story-level pre-tests.md quality gate`
+- testing layer: `capability truth integration`
+- target environment: `develop`
+- required evidence: `governance check + capability truth verification`
+- blocker taxonomy:
+  - `definition_missing`
+  - `commands_only`
+  - `evidence_plan_missing`
+  - `execution_pending_or_failed`
 
 ### Non-goals
 
 1. 不要求在本 issue 中统一所有 story 模板格式。
 2. 不要求在本 issue 中引入新的真实环境测试 harness。
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `Freely truth sources explicitly require story-level pre-tests.md to express acceptance target, testing layer, target environment, required evidence, and blocker taxonomy`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
+
+### PT-2
+- id: `PT-2`
+- requirement: `Freely truth sources explicitly reject commands-only pre-tests.md as non-compliant`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
+
+### PT-3
+- id: `PT-3`
+- requirement: `Freely truth sources freeze minimum blocker taxonomy including definition_missing, commands_only, evidence_plan_missing, execution_pending_or_failed`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
+
+### PT-4
+- id: `PT-4`
+- requirement: `Freely truth sources distinguish pre-tests.md quality failure from test execution failure as separate blocker categories`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
+
+### PT-5
+- id: `PT-5`
+- requirement: `Quality gate aligns with existing integration-acceptance-first, artifact-plane acceptance evidence, and protected/post-merge verification contracts`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`
