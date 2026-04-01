@@ -9,6 +9,7 @@ mod event_kind;
 mod event_payload;
 mod model;
 mod state;
+mod validation_report;
 
 use bridge_logic::apply_command;
 use bridge_manifest::{bridge_contract, PROBE_SERVER_EVENT};
@@ -32,7 +33,11 @@ fn emit_server_event(app: &AppHandle, event: Value) -> Result<(), String> {
 #[tauri::command]
 fn probe_request_snapshot(payload: Value, state: State<AppState>) -> Result<Snapshot, String> {
     let project_id = parse_project_id(&payload)?;
-    Ok(with_snapshot(&state, &project_id, |snapshot| snapshot.clone()))
+    let snapshot = with_snapshot(&state, &project_id, |snapshot| snapshot.clone());
+    state
+        .validation_reporter
+        .record_snapshot_request(&project_id, &snapshot)?;
+    Ok(snapshot)
 }
 
 #[tauri::command]
@@ -48,16 +53,26 @@ fn probe_send_command(
         .ok_or_else(|| "missing command.type".to_string())?
         .to_string();
 
-    let applied = with_snapshot(&state, &project_id, |snapshot| {
-        apply_command(
+    let (applied, snapshot_after_command) = with_snapshot(&state, &project_id, |snapshot| {
+        let applied = apply_command(
             snapshot,
             &project_id,
             CommandEnvelope {
                 command: command_type,
                 payload: command,
             },
-        )
+        );
+        (applied, snapshot.clone())
     });
+
+    state
+        .validation_reporter
+        .record_command(
+            &project_id,
+            &applied.ack,
+            &snapshot_after_command,
+            &applied.events,
+        )?;
 
     for event in applied.events {
         emit_server_event(&app, event)?;

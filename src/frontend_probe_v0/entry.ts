@@ -23,6 +23,7 @@ declare global {
 
 type DefaultProbeAppOptions = {
   projectId?: string;
+  validationMode?: "off" | "tauri-smoke";
 };
 
 export function createDefaultProbeApp(options?: DefaultProbeAppOptions) {

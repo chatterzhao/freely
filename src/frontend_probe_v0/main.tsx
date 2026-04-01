@@ -21,6 +21,10 @@ const requestedTransport =
     : transportParam === "tauri-broken"
       ? "tauri-broken"
       : "mock");
+const requestedValidationMode =
+  import.meta.env.VITE_FREELY_PROBE_VALIDATION_MODE === "tauri-smoke"
+    ? "tauri-smoke"
+    : "off";
 
 window.__FREELY_PROBE_MANIFEST__ = probeBridgeManifest;
 
@@ -35,4 +39,5 @@ if (requestedTransport === "tauri-broken" && !window.__TAURI__) {
 mountProbeIntoRoot(root, {
   projectId: "freely",
   transportMode: requestedTransport,
+  validationMode: requestedValidationMode,
 });

@@ -1,4 +1,6 @@
 import type { ServerEvent } from "./contracts";
+import { invoke, isTauri } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 
 export type TauriInvoke = <T>(
   command: string,
@@ -27,15 +29,25 @@ type TauriGlobalLike = {
 };
 
 export function resolveTauriRuntime(runtime?: TauriGlobalLike): TauriRuntime | null {
-  const invoke = runtime?.invoke ?? runtime?.core?.invoke;
-  const listen = runtime?.listen ?? runtime?.event?.listen;
+  const resolvedInvoke = runtime?.invoke ?? runtime?.core?.invoke;
+  const resolvedListen = runtime?.listen ?? runtime?.event?.listen;
 
-  if (!invoke || !listen) {
+  if (resolvedInvoke && resolvedListen) {
+    return {
+      invoke: resolvedInvoke,
+      listen: resolvedListen,
+    };
+  }
+
+  if (!isTauri()) {
     return null;
   }
 
   return {
     invoke,
-    listen,
+    listen: async (eventName, listener) =>
+      listen<ServerEvent>(eventName, (event) =>
+        listener({ payload: event.payload }),
+      ),
   };
 }
