@@ -8,7 +8,7 @@
 - story-name: `url-content-intake-skill-and-wechat-fetch-governance`
 - issue-name: `url-content-intake-skill-and-wechat-fetch-governance`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md`
+- source_candidate: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md#c-20260318-1246`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
