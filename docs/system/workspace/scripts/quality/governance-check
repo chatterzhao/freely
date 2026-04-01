@@ -54,6 +54,167 @@ check_v2_candidate_fields() {
   fi
 }
 
+check_candidate_milestone_bindings() {
+  python3 - <<'PY'
+import pathlib
+import re
+import sys
+
+root = pathlib.Path(".")
+milestones_path = root / "docs/milestones.md"
+lines = milestones_path.read_text(encoding="utf-8").splitlines()
+
+def normalize_milestone(value: str) -> str:
+    value = value.strip().strip("`").strip("'").strip('"').strip()
+    anchor = re.search(r"(M-[A-Za-z0-9-]+)$", value, re.IGNORECASE)
+    if anchor:
+        value = "M-" + anchor.group(1)[2:]
+    return value
+
+milestone_status = {}
+candidate_entries = {}
+formal_issue_entries = {}
+current_milestone = None
+current_queue = None
+current_item = None
+
+for raw in lines:
+    line = raw.strip()
+    m = re.match(r"^##\s+(M-[A-Za-z0-9-]+)\s*$", line)
+    if m:
+        current_milestone = m.group(1)
+        current_queue = None
+        current_item = None
+        continue
+    m = re.match(r"^-+\s*status:\s*([A-Za-z0-9_-]+)\s*$", line)
+    if m and current_milestone:
+        milestone_status[current_milestone] = m.group(1)
+        continue
+    m = re.match(r"^###\s+(candidate_issues|committed_issues|completed_issues)\s*$", line)
+    if m:
+        current_queue = m.group(1)
+        current_item = None
+        continue
+    m = re.match(r"^\d+\.\s+`(C-[^`]+)`\s*$", line)
+    if m and current_milestone and current_queue == "candidate_issues":
+        candidate_entries.setdefault(m.group(1), []).append(current_milestone)
+        current_item = None
+        continue
+    m = re.match(r"^\d+\.\s+`(I-[^`]+)`\s*$", line)
+    if m and current_milestone and current_queue in {"committed_issues", "completed_issues"}:
+        current_item = (current_milestone, current_queue)
+        continue
+    m = re.match(r"^\s*-\s*issue_path:\s*(.+?)\s*$", raw)
+    if m and current_item:
+        issue_path = m.group(1).strip().strip("`").strip("'").strip('"').strip()
+        formal_issue_entries.setdefault(issue_path, []).append(current_item)
+        continue
+    m = re.match(r"^\s*-\s*source_candidates:\s*(.+?)\s*$", raw)
+    if m and current_item:
+        refs = re.findall(r"`([^`]+)`", m.group(1))
+        if not refs:
+            refs = [m.group(1).split(":", 1)[-1].strip()]
+        for ref in refs:
+            normalized_ref = ref.strip().strip("`").strip("'").strip('"').strip()
+            if normalized_ref:
+                formal_issue_entries.setdefault(normalized_ref, []).append(current_item)
+        continue
+    m = re.match(r"^\s*-\s+(.+?)\s*$", raw)
+    if m and current_item:
+        refs = re.findall(r"`([^`]+)`", m.group(1))
+        if refs:
+            for ref in refs:
+                formal_issue_entries.setdefault(ref.split("#", 1)[0].strip(), []).append(current_item)
+
+errors = []
+
+candidate_files = sorted((root / "docs/pre-brainstorms").glob("*/candidates.md"))
+for path in candidate_files:
+    text = path.read_text(encoding="utf-8")
+    starts = []
+    for idx, line in enumerate(text.splitlines()):
+        m = re.match(r"^\s*###\s+(C-[A-Za-z0-9-]+)\s*$", line.strip())
+        if m:
+            starts.append((idx, m.group(1)))
+            continue
+        m = re.match(r"^\s*-\s*(candidate_id|id):\s*`?(C-[A-Za-z0-9-]+)`?\s*$", line)
+        if m:
+            starts.append((idx, m.group(2)))
+    if not starts:
+        continue
+    lines = text.splitlines()
+    for pos, (start_idx, candidate_id) in enumerate(starts):
+        end_idx = starts[pos + 1][0] if pos + 1 < len(starts) else len(lines)
+        block = "\n".join(lines[start_idx:end_idx])
+        def grab(name):
+            m = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", block, re.MULTILINE)
+            if not m:
+                return ""
+            value = m.group(1).strip().strip("`").strip("'").strip('"').strip()
+            return value
+        def grab_list(name):
+            values = []
+            inline = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", block, re.MULTILINE)
+            if inline:
+                inline_value = inline.group(1).strip()
+                if inline_value:
+                    values.append(inline_value.strip("`").strip("'").strip('"').strip())
+            list_block = re.search(rf"^\s*-\s*{re.escape(name)}:\s*$([\s\S]*?)(?=^\s*-\s*[A-Za-z0-9_-]+:|\Z)", block, re.MULTILINE)
+            if list_block:
+                for raw_line in list_block.group(1).splitlines():
+                    item = re.match(r"^\s*-\s+(.+?)\s*$", raw_line)
+                    if item:
+                        values.append(item.group(1).strip().strip("`").strip("'").strip('"').strip())
+            return [value for value in values if value]
+        status = grab("status")
+        milestone = normalize_milestone(grab("milestone"))
+        promoted_issue_paths = grab_list("promoted_issue_path")
+        active_statuses = {"proposed", "needs_research", "blocked", "promoted"}
+        if status not in active_statuses:
+            continue
+        if not milestone or milestone == "unassigned" or milestone.startswith("pending://"):
+            errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} is active with status '{status}', but milestone is '{milestone or 'missing'}'. Bind it to an active milestone instead of leaving it unassigned.")
+            continue
+        if milestone_status.get(milestone) != "active":
+            actual = milestone_status.get(milestone, "missing")
+            errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} is active with status '{status}', but declared milestone {milestone} has status '{actual}'. Active unresolved candidates must bind to an active milestone.")
+        if status in {"proposed", "needs_research", "blocked"}:
+            actual_entries = candidate_entries.get(candidate_id, [])
+            if milestone not in actual_entries:
+                if actual_entries:
+                    errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} declares milestone {milestone}, but docs/milestones.md places it in {', '.join(sorted(set(actual_entries)))}. Keep candidate metadata and milestone queue placement aligned.")
+                else:
+                    errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} declares milestone {milestone}, but docs/milestones.md has no candidate_issues entry for it.")
+        elif status == "promoted":
+            if not promoted_issue_paths:
+                errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} is marked promoted, but promoted_issue_path is missing. Materialize it into a real issue before merge.")
+                continue
+            if all(issue_path.startswith("pending://") for issue_path in promoted_issue_paths):
+                rendered = ", ".join(promoted_issue_paths)
+                errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} is marked promoted, but promoted_issue_path is still '{rendered}'. Materialize it into a real issue before merge.")
+                continue
+            formal_entries = []
+            rendered_paths = []
+            for promoted_issue_path in promoted_issue_paths:
+                if promoted_issue_path.startswith("pending://"):
+                    continue
+                rendered_paths.append(promoted_issue_path)
+                formal_entries.extend(formal_issue_entries.get(promoted_issue_path, []))
+            if not formal_entries:
+                rendered = ", ".join(rendered_paths or promoted_issue_paths)
+                errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} is promoted to {rendered or 'missing'}, but docs/milestones.md has no committed/completed issue entry for that issue.")
+                continue
+            actual_entries = sorted({entry_milestone for entry_milestone, _queue in formal_entries})
+            if milestone not in actual_entries:
+                rendered = ", ".join(rendered_paths or promoted_issue_paths)
+                errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} declares milestone {milestone}, but docs/milestones.md sequences promoted issue {rendered} under {', '.join(actual_entries)}. Keep candidate metadata and milestone queue placement aligned.")
+
+if errors:
+    print("\n".join(errors))
+    sys.exit(1)
+PY
+}
+
 check_file_exists() {
   local file="$1"
   [[ -f "$file" ]] || fail "missing file: $file"
@@ -157,6 +318,8 @@ for entry in "${entries[@]}"; do
   rg -n "session_refs:" "$candidates" >/dev/null 2>&1 || fail "missing session_refs in $candidates"
   check_v2_candidate_fields "$candidates"
 done
+
+check_candidate_milestone_bindings || errors=$((errors + 1))
 
 if [[ "$errors" -gt 0 ]]; then
   echo

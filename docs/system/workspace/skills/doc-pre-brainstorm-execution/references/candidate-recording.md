@@ -64,9 +64,17 @@
 必须原子同步：
 
 - 建立 `C-{issue-id} -> M-{issue-id}` 映射
-- 放入 `candidate_issues`
+- 放入正确 active milestone 的 `candidate_issues`
 - 写清下一动作
 - 若未收口，补 `revisit_trigger` 或同等的下一次重启条件
+
+放置约束：
+
+- active candidate 不得保持 `milestone: unassigned`
+- 不得挂进已 `completed` 的 milestone
+- `candidates.md.milestone` 必须与 `docs/milestones.md` 中实际承接它的 `M-*` 一致
+- milestone 选择应服从“最早会真正消费它的 active milestone”，而不是任意可见队列
+- 若当前 milestone 已明确不消费某条 `needs_research`，必须显式决定：继续留当前 milestone、谨慎后移到更合适的 active milestone，或直接 `dropped`
 
 ## Derived worktree fields
 

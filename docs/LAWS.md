@@ -163,6 +163,11 @@
    - `promoted`：不允许缺下一环；必须已经 materialize 为一个或多个 `I-{issue-id}*`
    - `absorbed`：允许不新开独立 issue，但必须明确写出吸收它的 owner issue 或等价 canonical owner
    - `dropped`：允许不进入下一环，但必须写清 `decision_reason`
+2b. active unresolved candidate 的 milestone 放置也属于硬性治理要求：
+   - `proposed | needs_research | blocked` 不得保持 `milestone: unassigned`、`pending://milestone-binding`，也不得挂入已 `completed` 的 milestone
+   - `candidates.md.milestone` 必须与 `docs/milestones.md` 中实际承接它的 `M-*` 一致
+   - 若当前 milestone 已明确不消费某条 `needs_research` candidate，必须显式决定：继续留在当前 milestone、谨慎后移到更合适且仍 active 的 milestone，或直接 `dropped`
+   - 后移只允许发生在“已知更早会消费它的后续 active milestone”上；不得为了保持表面可见而把 candidate 长期停放到模糊远期 milestone
 3. `milestone_state` 只表达 milestone 队列归属，建议值保持为 `candidate | committed | completed`；不得再拿它表达 IBM / dev / verification 阶段。
 4. 任何跨环迁移都必须同步更新对应产物，最少遵循：
    - `discovery -> pre_brainstorm`：更新 `brainstorms.md`、`candidates.md`、`milestones.md.candidate_issues`，并使用 `phase_state=todo_pre_brainstorm | in_pre_brainstorm`
@@ -208,6 +213,7 @@
    - `recovery` 写 `recovery` 或允许的等价恢复留痕
 20. 若 runtime 无法直接知道当前 loop 的精确文档路径，至少必须把 `summary_target_hint` 写入 prompt / handoff，由当前 AI 在下一跳先补 continuity，再继续业务推进。
 21. `needs_research` 或其他未收口 candidate 不得脱离 milestone 可见队列；除非显式写成 `dropped` 或已 materialize 为 milestone-owned issue，否则必须保留在 `milestones.md.candidate_issues`，并具备可执行的 `next_action` 与 `revisit_trigger` 或等价字段。
+21a. `needs_research` 保持可见不等于可以永久挂起；若当前 milestone 已确认本轮不会消费，必须在当前轮明确做出“留当前 milestone / 后移到更合适的 active milestone / dropped”三选一决策，并把原因写回 canonical artifacts。
 
 状态词图例：
 - `todo_*`：下一阶段已确定，但尚未开始

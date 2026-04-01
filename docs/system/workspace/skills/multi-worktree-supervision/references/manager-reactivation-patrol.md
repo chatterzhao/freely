@@ -7,7 +7,8 @@
 1. `./bin/freely live-status --project <develop>`
 2. `./bin/freely fleet-status --project <develop>` 或等价工位总览
 3. `docs/milestones.md`
-4. 当前 relevant interruption / issue / progress / recovery / candidate / pre-brainstorm artifacts
+4. 当前 active milestone 阶段对应的 worktree / issue / progress / recovery
+5. interruption backlog、resume / handoff 证据、以及 relevant candidate / pre-brainstorm artifacts
 
 ## 巡检目标
 
@@ -53,6 +54,12 @@
 - 或 pre-brainstorm 已形成稳定结论，但尚未产出 candidate / 未写回 milestone / 缺少 `next_action` 与 `revisit_trigger`
 - 主管应把这类点位视为 standing-source completeness drift，而不是“以后再看”
 
+9. `candidate visible but not consumable`
+- candidate 虽然已经出现在 milestone，但仍处于 `unassigned` 思维、错误 milestone、或当前 milestone 中长期无人继续研究
+- `next_action` / `revisit_trigger` 无法指向近期消费节奏
+- 当前 milestone 已经确定不会消费它，但也没有后移到更合适的 active milestone，或显式标记为 `dropped`
+- 主管应将其分流给 `milestone-planning-state-maintenance` 或新的 pre-brainstorm/materialization worker，而不是继续让它停留在静态可见状态
+
 ## Trigger Model
 
 主管 patrol 不应被理解成只有单一轮询入口。
@@ -95,6 +102,7 @@
 - delegated owner 返回结果后，主管继续决定下一跳 restart point，直到当前问题被正确吸收或完成收口。
 - 对 `progress`，续接前优先读取，确认是否已有主动记录。
 - 对 `pre-brainstorm`，主管不只检查“有没有这个目录”，还要检查 candidate 与 milestone 同步是否完整。
+- 对 `milestone`，主管不只检查“candidate 在不在队列里”，还要检查它是否被放进了正确且仍 active 的消费队列。
 
 ## 硬规则
 

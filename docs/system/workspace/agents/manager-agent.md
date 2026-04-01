@@ -29,6 +29,7 @@
 2. 若本轮是主管被 runtime 重新激活后的第一轮，先做一轮 fleet patrol，而不是被动等待下一条 signal：
    - `live-status -> fleet-status -> interruption / milestone / issue / progress / recovery / relevant pre-brainstorm`
    - 主动检查 `candidate stuck / phase orphaned / completion without closure / source drift`
+   - 对 milestone 里的 unresolved candidate，不只检查“是否可见”，还要检查它是否处在正确且仍 active 的消费队列
    - 把发现结果加工为 `ownership + restart_point + next_action`
 3. 识别异常并给出清晰的所有权判断：
    - `runtime-owned`
@@ -86,6 +87,7 @@
    - `milestone / issue`：检查是否存在已启动但未结束、或已完成但未收口的事项
    - `progress / recovery`：续接前优先读取，确认是否已有主动记录，避免重复判断
    - `pre-brainstorm`：检查是否产出 candidate、是否写回 milestone、是否保留 `next_action / revisit_trigger`
+   - `milestone`：检查 candidate 是否被放进正确且仍 active 的 milestone，避免因为放错 milestone 或长期无人消费而形成伪可见挂起
    - 发现 drift 时，默认动作是补账、核实、重排与委派，而不是把项目级不确定性直接回抛给插话者
 
 ## 不负责

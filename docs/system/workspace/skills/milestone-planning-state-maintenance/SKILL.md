@@ -12,6 +12,8 @@ description: 扫描 `docs/milestones.md` 与关联 candidate / issue / progress 
 它负责：
 
 - 规划 active candidate / committed issue 的顺序
+- 确保 unresolved candidate 被放在会真正消费它的 active milestone，而不是 `unassigned`、错误 milestone 或已完成 milestone
+- 当当前 milestone 已确认不消费某条 `needs_research` candidate 时，负责判断它应继续留当前 milestone、后移到更合适的 active milestone，还是直接 dropped
 - 识别 milestone 与关联产物的状态漂移
 - 回写 milestone 与相关摘要，让治理事务收口
 - 当 IBM materialization 已产出一个或多个 `I-{issue-id}*` 时，把正式编排从 `M-{issue-id}` 候选位切到这些 `I-*`
@@ -33,6 +35,8 @@ description: 扫描 `docs/milestones.md` 与关联 candidate / issue / progress 
 ## 适用场景
 
 - 多个 candidate 同时可推进，需要排序
+- active candidate 已可见，但 placement 不正确，导致长期不被消费
+- unresolved candidate 已在当前 milestone 停留过久，需要判断是继续保留、后移，还是 dropped
 - committed issue 的依赖顺序不再清楚
 - candidate / issue / progress / recovery / cleanup 之间出现漂移
 - verification / cleanup 完成后，需要回写 completed queue
@@ -68,6 +72,8 @@ description: 扫描 `docs/milestones.md` 与关联 candidate / issue / progress 
 ## 完成标志
 
 - milestone 队列顺序清楚
+- unresolved candidate 的消费 milestone 与重启条件清楚，没有 `unassigned` 或明显不可消费的挂起状态
+- 对当前 milestone 已不再消费的 `needs_research` candidate，已显式做出留置、后移或 dropped 决策
 - 状态漂移已回写或显式留痕
 - 已 materialize 的 `I-{issue-id}*` 已被放入正确的 milestone 阶段，并且顺序清楚
 - 下一轮 manager 可以基于 milestone 继续委派
