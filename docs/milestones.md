@@ -977,35 +977,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260323-1705-A`
-- title: Manager delegated continuation stall recovery governance
-- milestone_state: completed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`, `docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md`
-- evidence:
-  - `develop` commit `ce17a17`
-  - `docs/progress/workspace-routing-foundation/p-manager-delegated-continuation-stall-recovery-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
-- completion_note: manager delegated continuation stall recovery 的 idle-safe repair 已进入主线；older continuity、stale runtime refs、missing prompt target 不再把坏态伪装成 lawful wait，stale queued worker prompts 也会重新回到 launchable recovery。
-
-2. `I-20260401-1035-A`
-- title: Materialize develop push-pending governance after protected-branch merge
-- milestone_state: completed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/candidates.md`
-- evidence:
-  - `develop` commits `08fb096`, `8feae13`, `11f310b`
-  - `docs/progress/workspace-routing-foundation/p-develop-push-pending-guard-governance.md`
-  - `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/code-reviews/20260401-develop-push-pending-guard-verification.md`
-- completion_note: develop push followthrough truth 已进入 canonical status/patrol surfaces；`push_pending` / `push_deferred` 现在是显式 machine-readable state，而不是 merge 之后的隐式本地遗忘窗口。
-- revisit_trigger: Re-open candidate-level research only if `develop`-scoped push debt proves too narrow and the state model must expand to other protected branch families.
-
 ### candidate_issues
 
 8. `C-20260319-0018-B`
@@ -1084,7 +1055,36 @@ routing_policy:
 - revisit_trigger: Revisit immediately if another worker lane writes manager-only artifacts, performs project-level patrol after delegated completion, or `MANAGER_MODE=false` prompts still enter `lead-agent` without a worker-only second hop boundary.
 ### completed_issues
 
-1. `I-20260322-0115`
+1. `I-20260323-1705-A`
+- title: Manager delegated continuation stall recovery governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md`, `docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md`
+- evidence:
+  - `develop` commit `ce17a17`
+  - `docs/progress/workspace-routing-foundation/p-manager-delegated-continuation-stall-recovery-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
+- completion_note: manager delegated continuation stall recovery 的 idle-safe repair 已进入主线；older continuity、stale runtime refs、missing prompt target 不再把坏态伪装成 lawful wait，stale queued worker prompts 也会重新回到 launchable recovery。
+
+2. `I-20260401-1035-A`
+- title: Materialize develop push-pending governance after protected-branch merge
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/candidates.md`
+- evidence:
+  - `develop` commits `08fb096`, `8feae13`, `11f310b`
+  - `docs/progress/workspace-routing-foundation/p-develop-push-pending-guard-governance.md`
+  - `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/code-reviews/20260401-develop-push-pending-guard-verification.md`
+- completion_note: develop push followthrough truth 已进入 canonical status/patrol surfaces；`push_pending` / `push_deferred` 现在是显式 machine-readable state，而不是 merge 之后的隐式本地遗忘窗口。
+- revisit_trigger: Re-open candidate-level research only if `develop`-scoped push debt proves too narrow and the state model must expand to other protected branch families.
+
+3. `I-20260322-0115`
 - title: CLI-first entrypoint and observability surface unification
 - milestone_state: completed
 - phase_state: `completed`
@@ -1100,7 +1100,7 @@ routing_policy:
 - remote_branch_disposition: `deleted`
 - completion_note: issue 实现能力已被 `develop` 吸收，当前 feature branch 也已 rebase 到最新 `develop` 之上，但 branch tip 仍保留未被主线吸收的 canonical closure writeback。`2026-03-22` 的 post-merge acceptance 再次确认：milestone 队列已经保持 canonical `completed_issues`，远程同名 branch 仍不存在，但 `git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` 仍为 `3 0`，因此当前 disposition 继续是 `retire-only`，cleanup gate 只能保持 `merged-pending-verify`；先把这些收口提交吸收到 canonical `develop`，再由 supervisor/runtime 在 worktree 外执行最终 branch/worktree 删除。
 
-2. `I-20260321-1925`
+4. `I-20260321-1925`
 - title: Manager chat reentry and cleanup misrouting governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -1111,7 +1111,7 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/interruption-manager-handler`, `docs/system/workspace/scripts/tests/test-interruption-manager-handler`, `docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`, `docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/code-reviews/20260321-manager-chat-reentry-and-cleanup-misrouting-verification.md`
 - completion_note: broad supervisor chat signal 已不再默认误落 cleanup followthrough；纯 cleanup 请求仍保持 worker cleanup 路径，主管级广义巡检请求则回到 `handoff://continuation` 与 manager ownership
 
-3. `I-20260322-0049`
+5. `I-20260322-0049`
 - title: Manager continuation handoff consumption governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -1122,7 +1122,7 @@ routing_policy:
 - evidence: `docs/progress/workspace-routing-foundation/p-manager-continuation-handoff-consumption-governance.md`, `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/code-reviews/20260322-manager-continuation-handoff-consumption-verification.md`, `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/code-reviews/20260322-manager-continuation-handoff-consumption-cleanup-verification.md`
 - completion_note: 当前 worktree 已确认 `retire-only`，历史 anomaly 仅保留追溯语义，不再 materialize 新实现 scope；milestone 队列已纠正到 `completed_issues`。fresh session after `context_compacted` 已再次复核 canonical closeout，结论未变：当前分支还保留一个已被 `feature/completed-worktree-closeout-merge-prep-20260322` 吸收的 cleanup/closure 提交且无远程同名分支；本地 branch/worktree 删除应走 closeout chain，而不是重新打开本 issue 的实现范围
 
-4. `I-20260322-0245`
+6. `I-20260322-0245`
 - title: Runtime worker launch linkage and stall recovery governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -1133,7 +1133,7 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/runtime/manager-watchdog.sh`, `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`, `docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery`, `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/code-reviews/20260322-runtime-worker-launch-linkage-and-stall-recovery-verification.md`
 - completion_note: manager-generated worker handoff 已可直接转成 target worker continuation launch，stall recovery 也已进入 runtime-owned 控制面；当前 issue 已完成 verification closure，本轮 canonical writeback 固化后工位会恢复 clean，但本地 docs-only closure commits 仍待经 develop-facing 路径吸收，因此 cleanup gate 继续为 `retained-with-reason`
 
-5. `I-20260321-2010`
+7. `I-20260321-2010`
 - title: Explicit session-addressed resume governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -1144,7 +1144,7 @@ routing_policy:
 - evidence: `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/runtime/tool-launchers.sh`, `docs/system/workspace/scripts/monitor-ai-cli.sh`, `docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`, `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/code-reviews/20260321-explicit-session-addressed-resume-verification.md`
 - completion_note: 显式 session-addressed resume 已成为 Freely 的 canonical continuity model；`codex` 默认路径不再依赖 `--last`，worker-scoped target evidence 与 preemption fallback 也已闭环
 
-6. `I-20260321-1715`
+8. `I-20260321-1715`
 - title: Manager watchdog trigger and drift reconcile governance
 - milestone_state: completed
 - phase_state: `completed`
