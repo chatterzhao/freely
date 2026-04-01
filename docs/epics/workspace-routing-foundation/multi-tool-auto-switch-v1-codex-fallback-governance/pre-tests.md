@@ -1,23 +1,27 @@
-# Pre-Tests: multi-tool-auto-switch-v1-codex-fallback-governance
+# Pre-Tests: multi-tool-availability-manager-governance
 
 ## Acceptance Contract
 
-1. 新项目 config 默认写出 `AUTO_SWITCH_SLOT=false`、`AUTO_SWITCH_TOOL=false`、`AI_FALLBACK_TOOLS=""`，并保持 `AI_TOOL` 仍是单一 active tool pointer。
+1. 新项目 config 默认写出 `AUTO_SWITCH_SLOT=false`、`AUTO_SWITCH_TOOL=false`、`AI_FALLBACK_TOOLS=""`，并保持 `AI_TOOL` 仍是 active tool pointer。
 2. `ensure-manager` 会重新读取 project config，不依赖旧进程启动时缓存的 `AI_TOOL`。
-3. 当 manager 项目上次退出原因是 `kiro_monthly_request_limit` 或 `kiro_subscription_status_service_error`，且 `AUTO_SWITCH_TOOL=true` 时，control plane 会把 active tool 切到 `codex`，再执行既有 Codex readiness gate。
-4. 这次跨工具 fallback 必须显式记录 `launch_kind=fresh_with_handoff`，不得冒充 resume。
-5. 若 Codex readiness 失败，`ensure-manager` 仍保持 no-launch；不得因为切换到 fallback tool 就跳过 readiness guard。
-6. 当 auto-switch 未开启时，Kiro availability failure 仍应保持“本地 stop + defer control plane”的旧 contract。
+3. 当当前工具具备 canonical same-tool recovery truth 时，control plane 必须先走同工具恢复，再考虑 cross-tool fallback。
+4. 当当前工具 tool-local failure 或 same-tool recovery exhausted 且 `AUTO_SWITCH_TOOL=true` 时，control plane 会按 `AI_FALLBACK_TOOLS` 顺序挑选下一个可用工具，而不是硬编码 `codex`。
+5. 每次跨工具 fallback 必须显式记录 `launch_kind=fresh_with_handoff`，不得冒充 resume。
+6. 若所有配置中的工具都不可用，`ensure-manager` 仍保持 no-launch，并显式记录 earliest-reset hint。
+7. 当 auto-switch 未开启时，Kiro availability failure 仍应保持“本地 stop + defer control plane”的旧 contract。
 
 ## Focused Tests
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-kiro-to-codex-fallback`
-   - 锁住 `kiro-cli tool-local failure -> config active tool switches to codex -> codex readiness -> manager launch`
-   - 同时要求 event log 写出 `previous_tool`、`active_tool`、`reason`
-2. `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
+   - 锁住兼容性路径：Kiro tool-local failure 仍能在 order 中选到 Codex
+2. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
+   - 锁住 fallback 会继续扫描配置顺序，而不是把 Codex 硬编码成唯一 target
+3. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
+   - 锁住 Codex 先 same-tool recovery，穷尽后才 cross-tool
+4. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
+   - 锁住 all-tools-unavailable 时 no-launch 与 earliest-reset waiting truth
+5. `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
    - 锁住 auto-switch 未开启时，Kiro availability failure 仍只 stop/defer，不在本地 blind relaunch
-3. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
-   - 锁住 fallback 目标仍受 Codex no-account-ready guard 约束
 
 ## Regression Risks
 

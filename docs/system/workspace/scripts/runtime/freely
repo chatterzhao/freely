@@ -1030,7 +1030,7 @@ runtime_cross_tool_fallback_order_for_current_tool() {
   fi
 }
 
-tool_supports_auto_cross_tool_fallback_v1() {
+tool_supports_auto_same_tool_slot_recovery() {
   local tool="$1"
   case "$tool" in
     codex) return 0 ;;
@@ -1038,10 +1038,47 @@ tool_supports_auto_cross_tool_fallback_v1() {
   esac
 }
 
-tool_failure_is_tool_local_auto_switch_candidate() {
+tool_command_name_for_auto_recovery() {
+  local tool="$1"
+  case "$tool" in
+    codex) printf 'codex\n' ;;
+    kiro-cli) printf 'kiro-cli\n' ;;
+    iflow) printf 'iflow\n' ;;
+    cc|cc-use-codex-cli) printf 'claude\n' ;;
+    *) printf '\n' ;;
+  esac
+}
+
+tool_binary_available_for_auto_recovery() {
+  local tool="$1" command_name
+  command_name="$(tool_command_name_for_auto_recovery "$tool")"
+  [[ -n "$command_name" ]] || return 1
+  command -v "$command_name" >/dev/null 2>&1
+}
+
+tool_failure_scope_for_auto_recovery() {
   local tool="$1" failure_reason="$2"
   case "$tool:$failure_reason" in
+    codex:primary_rate_limit_exhausted|codex:secondary_rate_limit_exhausted|codex:auth_failure)
+      printf 'slot_local\n'
+      ;;
     kiro-cli:kiro_monthly_request_limit|kiro-cli:kiro_subscription_status_service_error)
+      printf 'tool_local\n'
+      ;;
+    *)
+      printf 'unknown\n'
+      ;;
+  esac
+}
+
+tool_failure_allows_cross_tool_auto_recovery() {
+  local tool="$1" failure_reason="$2" same_tool_exhausted="${3:-0}" scope
+  scope="$(tool_failure_scope_for_auto_recovery "$tool" "$failure_reason")"
+  case "$scope" in
+    slot_local)
+      [[ "$same_tool_exhausted" == "1" ]]
+      ;;
+    tool_local)
       return 0
       ;;
     *)
@@ -1050,19 +1087,75 @@ tool_failure_is_tool_local_auto_switch_candidate() {
   esac
 }
 
-select_runtime_cross_tool_fallback_target() {
-  local current_tool="$1" failure_reason="$2"
-  local candidate
-  tool_failure_is_tool_local_auto_switch_candidate "$current_tool" "$failure_reason" || return 1
+append_unique_tool_to_stream() {
+  local candidate="$1" seen="$2"
+  [[ -n "$candidate" ]] || return 1
+  case ",$seen," in
+    *",$candidate,"*) return 1 ;;
+  esac
+  printf '%s\n' "$candidate"
+}
+
+runtime_auto_recovery_tool_order() {
+  local current_tool="$1"
+  local seen="" candidate
+  append_unique_tool_to_stream "$current_tool" "$seen" || true
+  seen="${seen}${seen:+,}$current_tool"
   while IFS= read -r candidate; do
-    candidate="${candidate// /}"
+    candidate="$(printf '%s' "$candidate" | tr -d '[:space:]')"
     [[ -n "$candidate" ]] || continue
-    [[ "$candidate" != "$current_tool" ]] || continue
-    tool_supports_auto_cross_tool_fallback_v1 "$candidate" || continue
-    printf '%s\n' "$candidate"
-    return 0
+    append_unique_tool_to_stream "$candidate" "$seen" || continue
+    seen="${seen}${seen:+,}$candidate"
   done < <(printf '%s\n' "$(runtime_cross_tool_fallback_order_for_current_tool "$current_tool")" | tr ',' '\n')
+}
+
+codex_earliest_recovery_hint_for_project() {
+  local project="$1"
+  if codex_load_availability_state "$project"; then
+    if [[ "${AVAILABILITY_PHASE:-}" == "all_unavailable" && "${EARLIEST_RESET_HINT:-}" =~ ^[0-9]+$ ]]; then
+      printf '%s|%s\n' "${EARLIEST_SLOT_HINT:-}" "${EARLIEST_RESET_HINT:-}"
+      return 0
+    fi
+  fi
   return 1
+}
+
+tool_earliest_recovery_hint_for_project() {
+  local project="$1" tool="$2"
+  case "$tool" in
+    codex)
+      codex_earliest_recovery_hint_for_project "$project"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+tool_ready_for_manager_auto_recovery() {
+  local project="$1" tool="$2"
+  case "$tool" in
+    codex)
+      ensure_codex_slot_ready_for_manager "$project"
+      ;;
+    *)
+      tool_binary_available_for_auto_recovery "$tool"
+      ;;
+  esac
+}
+
+record_tool_auto_switch_event() {
+  local project="$1" previous_tool="$2" active_tool="$3" reason="$4" earliest_reset="${5:-}" launch_blocked="${6:-false}" kind="${7:-selected}"
+  local event_name="tool_auto_switch_selected"
+  [[ "$kind" == "waiting" ]] && event_name="tool_auto_switch_waiting_for_recovery"
+  append_runtime_event "$project" "$event_name" \
+    "previous_tool=$previous_tool" \
+    "active_tool=$active_tool" \
+    "reason=$reason" \
+    "launch_kind=fresh_with_handoff" \
+    "launch_blocked=$launch_blocked" \
+    "earliest_reset=${earliest_reset:-none}" \
+    "owner=ensure_manager_control_plane"
 }
 
 persist_project_tool_selection() {
@@ -1080,8 +1173,10 @@ persist_project_tool_selection() {
 }
 
 prepare_manager_cross_tool_fallback_if_needed() {
-  local project="$1"
+  local project="$1" same_tool_exhausted="${2:-0}"
   local desired_state current_tool fallback_tool last_exit_reason supervisor_pid ai_pid
+  local candidate earliest_tool earliest_reset hint_reset hint_info hint_slot
+  TOOL_AUTO_RECOVERY_DECISION="none"
   desired_state="unknown"
   last_exit_reason=""
   if [[ -f "$(workcell_state_file "$project")" ]]; then
@@ -1098,17 +1193,42 @@ prepare_manager_cross_tool_fallback_if_needed() {
   supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
   ai_pid="$(manager_ai_pid_for_project "$project")"
   [[ -z "$supervisor_pid" && -z "$ai_pid" ]] || return 1
-  fallback_tool="$(select_runtime_cross_tool_fallback_target "$current_tool" "$last_exit_reason" || true)"
-  [[ -n "$fallback_tool" ]] || return 1
-  persist_project_tool_selection "$project" "$fallback_tool"
-  append_runtime_event "$project" "tool_auto_switch_selected" \
-    "previous_tool=$current_tool" \
-    "active_tool=$fallback_tool" \
-    "reason=$last_exit_reason" \
-    "launch_kind=fresh_with_handoff" \
-    "owner=ensure_manager_control_plane"
-  load_config "$project"
-  return 0
+  tool_failure_allows_cross_tool_auto_recovery "$current_tool" "$last_exit_reason" "$same_tool_exhausted" || return 1
+
+  earliest_tool=""
+  earliest_reset=""
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    [[ "$candidate" != "$current_tool" ]] || continue
+    if tool_ready_for_manager_auto_recovery "$project" "$candidate"; then
+      fallback_tool="$candidate"
+      break
+    fi
+    if hint_info="$(tool_earliest_recovery_hint_for_project "$project" "$candidate" 2>/dev/null || true)" && [[ -n "$hint_info" ]]; then
+      hint_slot="${hint_info%%|*}"
+      hint_reset="${hint_info##*|}"
+      if [[ "$hint_reset" =~ ^[0-9]+$ ]] && [[ -z "$earliest_reset" || "$hint_reset" -lt "$earliest_reset" ]]; then
+        earliest_tool="$candidate"
+        earliest_reset="$hint_reset"
+      fi
+    fi
+  done < <(runtime_auto_recovery_tool_order "$current_tool")
+
+  if [[ -n "${fallback_tool:-}" ]]; then
+    persist_project_tool_selection "$project" "$fallback_tool"
+    record_tool_auto_switch_event "$project" "$current_tool" "$fallback_tool" "$last_exit_reason"
+    load_config "$project"
+    TOOL_AUTO_RECOVERY_DECISION="selected"
+    return 0
+  fi
+
+  if [[ -n "$earliest_tool" && -n "$earliest_reset" ]]; then
+    persist_project_tool_selection "$project" "$earliest_tool"
+    record_tool_auto_switch_event "$project" "$current_tool" "$earliest_tool" "all_tools_unavailable" "$earliest_reset" "true" "waiting"
+    load_config "$project"
+    TOOL_AUTO_RECOVERY_DECISION="waiting"
+  fi
+  return 1
 }
 
 tool_requires_project_codex_config() {
@@ -4495,7 +4615,7 @@ restart_manager_supervisor_preserving_handoff() {
 
 ensure_manager_once() {
   local project="$1"
-  local run_dir sup_pid_file current_pid current_ai_pid
+  local run_dir sup_pid_file current_pid current_ai_pid codex_same_tool_blocked
 
   load_config "$project"
   run_dir="$(run_dir_for_project "$project")"
@@ -4512,7 +4632,7 @@ ensure_manager_once() {
     current_pid="$(discover_supervisor_pid "$project")"
   fi
 
-  prepare_manager_cross_tool_fallback_if_needed "$project" >/dev/null || true
+  codex_same_tool_blocked="0"
 
   if [[ "$AI_TOOL" == "codex" ]]; then
     current_ai_pid="$(manager_ai_pid_for_project "$project")"
@@ -4523,15 +4643,30 @@ ensure_manager_once() {
       fi
     fi
     if ! ensure_codex_slot_ready_for_manager "$project"; then
-      log_warn "manager bootstrap skipped because no codex slot is ready"
-      return 0
+      codex_same_tool_blocked="1"
+      log_warn "no codex slot is ready for manager bootstrap; checking cross-tool fallback policy"
     fi
     current_ai_pid="$(manager_ai_pid_for_project "$project")"
-    if [[ -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
+    if [[ "$codex_same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
       log_warn "manager supervisor is idle after watchdog recovery gate passed; restarting manager with the latest handoff"
       restart_manager_supervisor_preserving_handoff "$project"
       current_pid=""
     fi
+  fi
+
+  prepare_manager_cross_tool_fallback_if_needed "$project" "$codex_same_tool_blocked" >/dev/null || true
+
+  if [[ "${TOOL_AUTO_RECOVERY_DECISION:-none}" == "waiting" ]]; then
+    log_warn "manager bootstrap remains blocked while every configured recovery path is unavailable"
+    return 0
+  fi
+
+  if [[ "$codex_same_tool_blocked" == "1" ]]; then
+    if [[ "$AI_TOOL" == "codex" ]]; then
+      log_warn "manager bootstrap skipped because no recovery-capable tool is ready"
+      return 0
+    fi
+    current_pid=""
   fi
 
   if [[ -n "$current_pid" ]]; then
