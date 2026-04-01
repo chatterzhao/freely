@@ -1100,8 +1100,7 @@ append_unique_tool_to_stream() {
 runtime_auto_recovery_tool_order() {
   local current_tool="$1"
   local seen="" candidate
-  append_unique_tool_to_stream "$current_tool" "$seen" || true
-  seen="${seen}${seen:+,}$current_tool"
+  seen="$current_tool"
   while IFS= read -r candidate; do
     candidate="$(printf '%s' "$candidate" | tr -d '[:space:]')"
     [[ -n "$candidate" ]] || continue
