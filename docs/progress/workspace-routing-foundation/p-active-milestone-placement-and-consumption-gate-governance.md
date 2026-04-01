@@ -20,6 +20,7 @@
 - post-merge replay 又暴露一个窄 follow-up：`governance-merge-gate` 仍把 unresolved candidate 的 milestone metadata 修正误判成“必须同批携带该 candidate 自己的 I-* owner”。本 follow-up 收窄为两件事：
   - 允许 unresolved `proposed|needs_research|blocked` candidate 在已有治理 owner 的 develop merge 中一起修 placement metadata
   - 把 develop 中仍残留的 `C-20260330-2318-A`、`C-20260331-1837-A`、`C-20260331-1840-A` milestone 绑定补回 active milestone
+- 当前分支继续承接这条 post-merge replay：第二阶段 develop absorption 会把 candidate binding writeback 与本 owner 的 issue/progress evidence 一起带入 merge diff，避免再次退化成 candidate-only develop merge。
 
 ## Verification
 
