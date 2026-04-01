@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260401-1303--freely-product-security-baseline-governance
+  - brainstorms: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md
 - 20260331-2012--active-milestone-placement-and-consumption-gate
   - brainstorms: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md
   - candidates: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md

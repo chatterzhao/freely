@@ -778,6 +778,17 @@ routing_policy:
 - next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize
 - revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
 
+9. `C-20260401-1303-A`
+- title: Freeze Freely product security baseline across init, doctor, runtime, and status surfaces
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
+- next_action: Compare current `init` / `doctor` / runtime / status surfaces against the four proposed baseline domains, then split the smallest product-owned security owner without collapsing into reusable skill design.
+- revisit_trigger: Revisit materialization when the default baseline responsibilities are frozen tightly enough to promote one or more focused owners.
+
 10. `C-20260322-1615-A`
 - title: Protected post-merge acceptance route and promotion guard governance
 - milestone_state: candidate
