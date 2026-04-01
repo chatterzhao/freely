@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+bash "$repo_root/bin/check-rust-toolchain"
+
+missing=0
+
+if ! command -v bun >/dev/null 2>&1; then
+  echo "[missing] bun"
+  missing=1
+else
+  echo "[ok] bun -> $(command -v bun) ($(bun --version 2>/dev/null || echo version-unavailable))"
+fi
+
+if [[ ! -d "$repo_root/node_modules" ]]; then
+  echo "[missing] node_modules"
+  missing=1
+else
+  echo "[ok] node_modules -> present"
+fi
+
+if cargo tauri --version >/tmp/freely-tauri-probe-host-version.log 2>&1; then
+  echo "[ok] cargo tauri -> $(tr '\n' ' ' </tmp/freely-tauri-probe-host-version.log)"
+else
+  echo "[missing] cargo tauri"
+  missing=1
+fi
+rm -f /tmp/freely-tauri-probe-host-version.log
+
+if [[ "$missing" -ne 0 ]]; then
+  echo "Tauri probe host preflight failed."
+  echo
+  echo "Suggested next step:"
+  echo "  1. Install frontend dependencies:"
+  echo "     bun install"
+  echo "  2. Install the Tauri CLI:"
+  echo "     cargo install tauri-cli --locked"
+  echo "  3. Re-run:"
+  echo "     bun run tauri:preflight:probe"
+  echo "     bun run tauri:dev:probe"
+  exit 1
+fi
+
+echo "Tauri probe host preflight passed."
