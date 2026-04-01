@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.freely.probebridge",
   "build": {
-    "beforeDevCommand": "bun run dev",
+    "beforeDevCommand": "bun run dev -- --host 127.0.0.1 --port 4173",
     "beforeBuildCommand": "bun run build",
     "frontendDist": "../dist",
     "devUrl": "http://127.0.0.1:4173"
@@ -19,4 +19,3 @@
     ]
   }
 }
-

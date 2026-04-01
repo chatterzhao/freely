@@ -8,7 +8,9 @@
     "typecheck": "tsc --noEmit",
     "rust:preflight": "bash bin/check-rust-toolchain",
     "rust:preflight:test": "bash bin/test-rust-toolchain-preflight",
-    "cargo:check:probe": "bash bin/cargo-check-probe-bridge"
+    "cargo:check:probe": "bash bin/cargo-check-probe-bridge",
+    "tauri:preflight:probe": "bash bin/check-tauri-probe-host",
+    "tauri:dev:probe": "bash bin/tauri-probe-dev"
   },
   "dependencies": {
     "react": "^18.3.1",
