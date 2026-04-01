@@ -846,8 +846,18 @@ routing_policy:
 - next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize
 - revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
 
-9. `C-20260322-1615-A`
-9. `C-20260401-1545-A`
+9. `C-20260401-1308-A`
+- title: Define reusable workspace security capabilities instead of burying all security logic inside runtime
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
+- next_action: Compare the proposed capability families against the current skill inventory, then choose the smallest first materialization slice instead of treating all security capability work as one giant runtime concern.
+- revisit_trigger: Revisit materialization when the first reusable security capability split is narrow enough to promote without conflating product baseline with skill contracts.
+
+10. `C-20260401-1545-A`
 - title: Materialize ACP as an optional adapter boundary between Freely and external code agents
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -858,7 +868,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260401-1545-A`. The issue freezes `ACP = optional adapter layer`, `direct = first-class path`, and the follow-on implementation order: extract adapter axis before any first-tool ACP prototype.
 - revisit_trigger: Re-open candidate-level research only if issue-bound materialization fails to hold a stable ACP adapter boundary, or if ACP no longer fits Freely's external code-agent integration layer.
 
-10. `C-20260401-1703-A`
+11. `C-20260401-1703-A`
 - title: Materialize runtime adapter axis and per-tool adapter selection
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -869,7 +879,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260401-1703-A`. The owner isolates `adapter axis` extraction as the first implementation slice before any ACP bridge work.
 - revisit_trigger: Re-open candidate-level research only if `adapter axis` extraction proves inseparable from a broader runtime redesign, or if the ACP boundary assumptions materially change.
 
-11. `C-20260322-1615-A`
+12. `C-20260322-1615-A`
 - title: Protected post-merge acceptance route and promotion guard governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
