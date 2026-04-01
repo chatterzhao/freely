@@ -51,7 +51,7 @@ Freely 现在已经有两条不对称的真相：
 4. 上述 fallback 会写出 machine-readable runtime event，包含 `previous_tool`、`active_tool`、`reason` 与 `launch_kind=fresh_with_handoff`。
 5. 现有 Kiro defer contract 不回退：当 auto-switch 未开启时，runtime 仍在本地 stop 并 defer 给 control plane。
 6. 现有 Codex no-account-ready guard 不回退：Codex readiness 失败时，`ensure-manager` 仍跳过 launch。
-7. `ensure-manager --watch` 与 `ensure-interruption-dispatch --watch` 必须在 supervisor 退出后继续存活，否则 `desired=running` 的 manager 项目无法真正执行后续 fallback。
+7. manager supervisor 在 `desired=running` 下退出后，必须重新触发一次 control-plane recheck；不能把 `kiro_monthly_request_limit` 留在已写入 state 但无人消费的中间态。
 
 ## Completion
 

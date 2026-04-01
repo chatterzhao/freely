@@ -19,7 +19,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
 - `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews/20260331-multi-tool-auto-switch-v1-codex-fallback-verification.md`
-- live repro on `develop`: `kiro-cli` exits with `kiro_monthly_request_limit`, then launcher persistence keeps control-plane watchdogs alive for post-exit fallback work instead of losing the runtime-owned recovery path at supervisor teardown
+- live repro on `develop`: `kiro-cli` exits with `kiro_monthly_request_limit`, then supervisor cleanup re-triggers one-shot manager control-plane evaluation so the persisted `desired=running + tool-local failure` state is consumed even if long-lived watchers drift
 
 ## Remaining
 

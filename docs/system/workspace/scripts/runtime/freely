@@ -4376,6 +4376,14 @@ launch_manager_watchdog() {
   disown "$!" 2>/dev/null || true
 }
 
+launch_manager_control_plane_recheck() {
+  local project="$1"
+  local launch_bin
+  launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
+  nohup bash "$launch_bin" ensure-manager --project "$project" </dev/null >/dev/null 2>&1 &
+  disown "$!" 2>/dev/null || true
+}
+
 manager_supervisor_pid_for_project() {
   local project="$1" run_dir sp
   run_dir="$(run_dir_for_project "$project")"
@@ -5683,6 +5691,10 @@ start_project_runtime() {
       "stop_requested=$stop_requested"
     rm -f "$sup_pid_file" "$child_pid_file" "$(stop_marker_file "$project")"
     write_workcell_state "$project" "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" "down" "down" "${LAST_WORKCELL_EXIT_REASON:-supervisor_exit}"
+    if [[ "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" == "running" ]] && [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
+      launch_interruption_dispatcher "$project"
+      launch_manager_control_plane_recheck "$project"
+    fi
   }
 
   echo "$$" >"$sup_pid_file"

@@ -11,7 +11,7 @@
 3. 旧合同仍保持：
    - Kiro availability failure 在未启用 auto-switch 时继续 stop/defer
    - Codex readiness 失败时继续 no-launch
-4. Live repro surfaced one verification follow-up inside the same owner: the fallback contract was correct, but `ensure-manager --watch` and interruption dispatch had been launched as ordinary background jobs that died with the supervisor shell. Re-launching them via `nohup` keeps the control plane alive long enough to consume `desired=running + kiro_monthly_request_limit` after supervisor teardown.
+4. Live repro surfaced one verification follow-up inside the same owner: the fallback contract was correct, but post-exit recovery could still be stranded if long-lived watchers drifted. The supervisor cleanup path now re-triggers a one-shot `ensure-manager` control-plane evaluation for `desired=running` manager workcells, so persisted tool-local failure state is actually consumed after teardown.
 
 ## Commands
 
@@ -24,4 +24,4 @@
 
 1. v1 仍只允许 `codex` 作为 automatic cross-tool fallback target；`cc` / `iflow` / generic tool groups 继续留在后续 lifecycle。
 2. cross-tool fallback 当前只通过 runtime event 固化 `previous_tool` / `active_tool`；更完整的 persisted tool-switch handoff 仍可在 follow-on 中加强。
-3. Live repro still needs one clean post-merge confirmation on canonical `develop` showing `tool_auto_switch_selected` and rewritten `AI_TOOL=codex`; this review now covers the persistence fix required to make that repro meaningful.
+3. Live repro still needs one clean post-merge confirmation on canonical `develop` showing `tool_auto_switch_selected` and rewritten `AI_TOOL=codex`; this review now covers the cleanup-time recheck needed to make that repro deterministic.
