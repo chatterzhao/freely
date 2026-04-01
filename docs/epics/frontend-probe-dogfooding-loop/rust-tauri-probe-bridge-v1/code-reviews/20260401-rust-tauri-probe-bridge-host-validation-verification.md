@@ -1,6 +1,6 @@
 # Code Review: rust-tauri-probe-bridge-host-validation-verification
 
-- issue_id: `I-20260317-1005`
+- issue_id: `I-20260317-0332`
 - issue: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
 - reviewer: `codex`
 - phase: `in_verification`
@@ -41,5 +41,5 @@
 
 ## Writeback
 
-- `I-20260317-1005` 可以从 `in_dev` 推进到 `in_verification`
-- `I-20260317-1002` 的 blocker 应从“真实 Tauri 宿主尚未实际启动”收窄为“等待真实 tauri transport 最小交互闭环写回”
+- `I-20260317-0332` 可以从 `in_dev` 推进到 `in_verification`
+- `I-20260308-1244-03` 的 blocker 应从“真实 Tauri 宿主尚未实际启动”收窄为“等待真实 tauri transport 最小交互闭环写回”
