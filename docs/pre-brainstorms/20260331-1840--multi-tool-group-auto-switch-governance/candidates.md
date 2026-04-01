@@ -2,7 +2,7 @@
 
 - id: `C-20260331-1840-A`
 - candidate_format_version: `v2`
-- title: Materialize ordered multi-tool fallback v1 with Codex slot parity
+- title: Materialize generic multi-tool availability manager with same-tool-first recovery
 - source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
 - problem: Freely's current runtime config and watchdog recovery model remain effectively single-tool even though workspace truth already exposes multiple tools with different continuity and availability contracts. As a result, failures such as tool-specific limits or auth exhaustion can only be handled with ad hoc per-tool logic instead of a canonical recovery order of same-tool slot sweep, controlled cross-tool fallback, and explicit all-tools-unavailable surfacing.
 - why_now:
@@ -52,11 +52,12 @@
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
   - `docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/brainstorms.md`
- - decision_reason:
-  - 原始 brainstorm 与更早的 availability-manager 研究都要求“同工具先恢复，再按工具顺序 fallback”；本 candidate 实际落地的是 v1 ordered fallback 与 Codex parity，不再继续冒充 all-tools unified slot contract。
+- decision_reason:
+  - 原始 brainstorm 与更早的 availability-manager 研究都要求“同工具先恢复，再按工具顺序 fallback”；窄 v1 只是中间桥接，不应覆盖更大的 contract。
   - `tools.md` 仍然只负责任务路由，不直接充当 runtime fallback 顺序真源；因此 recovery order 继续由 project config 的 `AI_FALLBACK_TOOLS` 承接。
   - continuity truth 目前仍不支持跨工具保留 resume 语义，所以 cross-tool fallback 继续明确降级为 `fresh_with_handoff`。
 - next_action:
-  - keep this candidate closed at v1 scope and materialize the follow-on all-tools unified slot contract as a new lifecycle
+  - widen the active owner from narrow `kiro-cli -> codex` bridge logic into a generic manager availability state machine
+  - keep unsupported tool families explicit via capability gaps, but do not keep hard-coded single-target fallback in the runtime
 - revisit_trigger:
-  - reopen only if ordered fallback v1 regresses; broader all-tools slot parity now belongs to `C-20260401-0840-A`
+  - 当 v1 证明 `kiro-cli -> codex` fallback 与 Codex no-launch truth稳定后，再决定是否扩成更泛化的多工具组 contract
