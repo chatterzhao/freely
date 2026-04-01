@@ -1527,7 +1527,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260317-1002`
+1. `I-20260308-1244-03`
 - title: Frontend Probe v0
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -1535,9 +1535,9 @@ routing_policy:
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
 - source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: frontend 侧 contract、transport、manifest 和错误面已基本收敛；真实 Tauri 宿主已由 `I-20260317-1005` 成功拉起，backend host-up blocker 不再成立。下一步等待 `I-20260317-1005` 把真实 `Transport=tauri` 下的最小 start / session create-resume / chat intervention 验证证据写回，再回到本 issue 收紧 frontend host integration 与 blocker 描述
+- next_action: frontend 侧 contract、transport、manifest 和错误面已基本收敛；真实 Tauri 宿主已由 `I-20260317-0332` 成功拉起，backend host-up blocker 不再成立。下一步等待 `I-20260317-0332` 把真实 `Transport=tauri` 下的最小 start / session create-resume / chat intervention 验证证据写回，再回到本 issue 收紧 frontend host integration 与 blocker 描述
 
-2. `I-20260317-1005`
+2. `I-20260317-0332`
 - title: Rust/Tauri Probe Bridge v1
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -1555,7 +1555,7 @@ routing_policy:
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md`
 - source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md`
-- next_action: 这条 baseline 已完成最小 IBM 收敛，但当前不在近程执行窗；先让 `I-20260317-1002` / `I-20260317-1005` 消化真实宿主与 bridge 联调成本。若当前 research/merge-prep worktree 只剩这类远期排序项，应先完成 milestone 写回并走 retirement handoff，而不是为了挂住未来 queue 长期保留 worktree。
+- next_action: 这条 baseline 已完成最小 IBM 收敛，但当前不在近程执行窗；先让 `I-20260308-1244-03` / `I-20260317-0332` 消化真实宿主与 bridge 联调成本。若当前 research/merge-prep worktree 只剩这类远期排序项，应先完成 milestone 写回并走 retirement handoff，而不是为了挂住未来 queue 长期保留 worktree。
 
 4. `I-20260317-1003`
 - title: Incremental Dogfooding Gate for Backend Increments
