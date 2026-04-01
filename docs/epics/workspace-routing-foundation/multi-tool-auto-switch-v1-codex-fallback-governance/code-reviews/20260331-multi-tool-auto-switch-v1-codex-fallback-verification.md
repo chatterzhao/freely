@@ -1,6 +1,6 @@
 # Verification: multi-tool-auto-switch-v1-codex-fallback-governance
 
-- issue: `I-20260331-1840-A`
+- issue_id: `I-20260331-1840-A`
 - reviewer: `codex`
 - verdict: `pass`
 
