@@ -9,8 +9,6 @@
 - issue-name: `multi-tool-auto-switch-v1-codex-fallback-governance`
 - source_candidate: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md#c-20260331-1840-a`
 - source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews`
 - execution_base: `develop`
 - integration_target: `develop`
 - session_refs:
@@ -18,13 +16,13 @@
 
 ## Why
 
-Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都要求同一条更大的恢复状态机：
+Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都要求同一条恢复状态机：
 
 - 先做当前工具内部的 slot / profile family 恢复
 - 当前工具 exhausted 后，再按项目定义的工具顺序尝试下一个工具
 - 所有工具都不可用时，保持 no-launch，并把最早恢复提示写成显式控制面真相
 
-后来物化时把这条 contract 收窄成了 v1：ordered cross-tool fallback + Codex same-tool slot parity。该 owner 的完成态就是这条 v1，不再继续冒充 all-tools unified slot contract；后者已移交 follow-on lifecycle。
+后来物化时把这条 contract 收窄成了 `kiro-cli -> codex` bridge。当前 owner 要把它抬回原始设计，但保留 Codex watchdog 的 probe-first / shared-lock / no-launch invariants。
 
 ## Scope
 
@@ -41,7 +39,6 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
 2. 不把 host/network-global failures 误当成 cross-tool fallback 触发器。
 3. 不要求所有工具在本轮都拥有和 Codex 等价的 probe/slot truth；能力缺口要显式标注，不能假装等价。
 4. 不把 worker lane 或完整结构化 tool-group config 文件迁移一起塞进本 owner。
-5. 不把 all-tools unified slot contract 塞回本 owner；follow-on lifecycle 单独承接。
 
 ## Acceptance
 
@@ -94,6 +91,5 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
 
 ## Next
 
-- `C-20260401-0840-A` / follow-on owner 负责 all-tools unified slot contract、generic current-slot truth 与 per-tool capability matrix。
-- 若后续要让 `kiro-cli` / `iflow` / `cc` 拥有和 Codex 等价的 same-tool probe truth，需要在 follow-on lifecycle 中显式冻结 per-tool capability surface。
+- 若后续要让 `kiro-cli` / `iflow` / `cc` 拥有和 Codex 等价的 same-tool probe truth，需要再开生命周期冻结 per-tool capability surface。
 - 若要支持跨工具保留 resume 语义，必须先新开 lifecycle 冻结 continuity equivalence contract；本 owner 不预支这条能力。

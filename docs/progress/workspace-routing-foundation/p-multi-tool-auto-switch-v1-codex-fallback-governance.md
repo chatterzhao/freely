@@ -32,5 +32,6 @@
 
 ## Remaining
 
-- keep the bounded v1 owner in verification until the develop-bound merge lands cleanly
-- follow-on unified slot work moves to `C-20260401-0840-A` / `I-20260401-0840-A`
+- merge absorption into `develop`
+- one clean post-merge live confirmation on canonical manager runtime with ordered fallback, teardown-aware recheck, and explicit all-tools-unavailable truth
+- one clean post-merge live confirmation on canonical manager runtime with current-tool slot-first, then leftmost-priority cross-tool fallback, teardown-aware recheck, and explicit all-tools-unavailable truth
