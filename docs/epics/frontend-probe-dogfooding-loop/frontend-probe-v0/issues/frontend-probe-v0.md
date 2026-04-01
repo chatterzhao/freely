@@ -180,7 +180,7 @@
   - 现在不需要额外注入脚本也能验证失败面：`?transport=tauri-broken` 会直接进入 tauri-shaped error path，并显示 `Runtime error: bridge offline`
   - shell 现已具备内建 `Transport` 下拉；切换到 `tauri-broken` 会直接把 URL 改成 `?transport=tauri-broken` 并进入对应 transport，无需手改地址栏
 - current_blocker:
-  - frontend 侧 bridge contract、transport、manifest 与错误面已收敛到足够位置；真实 Tauri 宿主现已稳定启动，backend host-up blocker 已由 `I-20260317-0332` 消化。当前剩余缺口已收窄为真实 `Transport=tauri` 下的最小 start、session create/resume、chat intervention 闭环证据仍待 `I-20260317-0332` 写回，因此本 issue 仍不能提前宣称 frontend host integration 已完成
+  - frontend 侧 bridge contract、transport、manifest 与错误面已收敛到足够位置；`I-20260317-0332` 现已实际写回真实 `Transport=tauri` 下的最小 start、session create/resume、chat intervention 闭环证据，因此 backend bridge blocker 已解除。当前剩余缺口回到 frontend host integration / UX 本身，本 issue 仍不能提前宣称整体产品面已完成
 - reroute_required:
   - `next_recommended_route=dev-loop-execution`
   - reason: `Rust/Tauri Probe Bridge v1` 已完成最小 IBM 收敛，后续应由 `I-20260317-0332` 进入 backend dev-loop 实现
