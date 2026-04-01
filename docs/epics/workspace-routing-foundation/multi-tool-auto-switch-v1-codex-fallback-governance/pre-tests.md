@@ -9,6 +9,7 @@
 5. 每次跨工具 fallback 必须显式记录 `launch_kind=fresh_with_handoff`，不得冒充 resume。
 6. 若所有配置中的工具都不可用，`ensure-manager` 仍保持 no-launch，并显式记录 earliest-reset hint。
 7. 当 auto-switch 未开启时，Kiro availability failure 仍应保持“本地 stop + defer control plane”的旧 contract。
+8. 当 project config 没有显式 Kiro model 时，launcher 必须回退到当前仍受支持的默认模型；不能因为过期默认值在 availability classification 之前就进入 `ai_exit_rc_1` loop。
 
 ## Focused Tests
 
@@ -22,6 +23,8 @@
    - 锁住 all-tools-unavailable 时 no-launch 与 earliest-reset waiting truth
 5. `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
    - 锁住 auto-switch 未开启时，Kiro availability failure 仍只 stop/defer，不在本地 blind relaunch
+6. `bash docs/system/workspace/scripts/tests/test-tool-launchers-kiro-default-model`
+   - 锁住 Kiro launcher 在 `AI_MODEL=""` 时仍会使用受支持的默认模型，而不是过期的 `claude-opus-4.6`
 
 ## Regression Risks
 

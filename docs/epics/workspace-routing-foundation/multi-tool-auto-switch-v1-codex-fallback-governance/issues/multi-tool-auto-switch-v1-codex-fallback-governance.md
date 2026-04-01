@@ -56,12 +56,14 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
 - `docs/milestones.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/freely`
+- `docs/system/workspace/scripts/runtime/tool-launchers.sh`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-kiro-to-codex-fallback`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
 - `docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
+- `docs/system/workspace/scripts/tests/test-tool-launchers-kiro-default-model`
 - live validation on `develop` with ordered fallback enabled and at least one non-current tool available
 
 ## Verification
@@ -73,10 +75,12 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
   - `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-skips-launch-when-no-account-ready`
+  - `bash docs/system/workspace/scripts/tests/test-tool-launchers-kiro-default-model`
 - Governance:
   - `./bin/governance-check`
 - Live repro:
   - Start on `develop`, force current-tool unavailability, and verify manager control plane first consumes same-tool recovery truth, then walks the configured fallback order, and finally emits waiting truth instead of blind relaunch when every tool is unavailable
+  - Guard the live Kiro launch path from stale default-model drift: when `AI_MODEL` is empty, Kiro launcher must fall back to a supported model instead of aborting before availability recovery can classify the cycle
 
 ## Next
 

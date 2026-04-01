@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-tool-launchers-kiro-default-model.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+PROMPT_FILE="$TMP_DIR/prompt.txt"
+MOCK_BIN="$TMP_DIR/bin"
+mkdir -p "$PROJECT" "$MOCK_BIN"
+printf 'test prompt\n' >"$PROMPT_FILE"
+
+cat >"$MOCK_BIN/kiro-cli" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >"${TEST_CAPTURE_FILE:?missing capture file}"
+exit 0
+EOF
+chmod +x "$MOCK_BIN/kiro-cli"
+
+export PATH="$MOCK_BIN:$PATH"
+export TEST_CAPTURE_FILE="$TMP_DIR/kiro-argv.txt"
+
+bash -lc '
+  set -euo pipefail
+  # shellcheck disable=SC1090
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/tool-launchers.sh"
+  tool_run_from_prompt_file \
+    "'"$PROJECT"'" \
+    "kiro-cli" \
+    "" \
+    "" \
+    "auto" \
+    "'"$PROMPT_FILE"'" \
+    "fresh" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "" \
+    ""
+' >/dev/null
+
+grep -q -- '--model auto' "$TMP_DIR/kiro-argv.txt" || {
+  echo "[FAIL] expected kiro launcher to fall back to a supported default model" >&2
+  cat "$TMP_DIR/kiro-argv.txt" >&2
+  exit 1
+}
+
+echo "[PASS] kiro launcher defaults to model=auto when project config leaves AI_MODEL empty"
