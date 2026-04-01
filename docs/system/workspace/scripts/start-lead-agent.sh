@@ -175,12 +175,26 @@ manager_continuity_path="$project/.freely/run/manager-continuity-${artifact_stam
 worker_prompt_dir="$project/.freely/run/worker-prompts"
 worker_prompt_path_example="$worker_prompt_dir/${artifact_stamp}-worker-<slug>-${ai_tool}.txt"
 manager_artifact_rule=""
+role_scope_rule_5a="5A. 当 \`MANAGER_MODE=false\` 且当前分支是 \`feature/*\` 时，不要把 \`./bin/freely live-status --project $project\`、\`./bin/freely fleet-status --project $project\`、根 \`develop\` 的 live-status/fleet-state，或项目级 patrol 当作默认首跳；保持 worker reentry scope，只在当前工位问题直接需要时读取最小必要证据。"
+role_scope_rule_5b="5B. 当 \`MANAGER_MODE=false\` 且当前分支是 \`feature/*\` 时，不要写 \`.freely/run/manager-continuity-*.md\`、\`.freely/run/worker-prompts/*.txt\`、cleanup queue 或其他 manager-only handoff 产物；worker 只回写本工位 issue / progress / recovery / worker continuity / verification evidence。"
+additional_requirements="$(cat <<'EOF'
+- 若 `MANAGER_MODE=false` 且当前分支是 `feature/*`，当前会话保持 worker scope：不要升级成项目级监督者；若发现需要主管裁决的 fleet / merge / cleanup 问题，只记录 evidence 与 reroute 建议。
+EOF
+)"
 
 if is_manager_branch "$current_branch"; then
   manager_mode="true"
   execution_rule_15="15. 当前分支是受保护主管工位；你不得在当前 worktree 直接修改受版本管理的仓库产物。"
   execution_rule_16="16. 若 \`selected_tool\` 与当前运行中的 \`AI_TOOL\` 相同，也不要在当前会话内直接执行第二跳实现；你必须先选择或创建对应 feature worktree，并把执行权委派到那个工位的 worker AI/tool 进程。"
   execution_rule_17="17. 你在当前会话中的交付应是监督判断、delegation handoff、需要启动的 worker 命令与 continuity 留痕；只有 worker 工位可以继续实际 doc-loop / dev-loop。"
+  role_scope_rule_5a="5A. 若当前轮次承担项目级监督职责，先读取 \`./bin/freely live-status --project $project\`，把它当作 supervisor / dispatcher / AI 当前态入口；只有在它提示需要继续深挖时，才展开 \`fleet-status\`、prompt、continuity、jsonl 等细节。"
+  role_scope_rule_5b="$(cat <<'EOF'
+5B. 若本轮是主管被 runtime 重新激活后的第一轮，先做一轮 patrol：
+   - `live-status -> fleet-status -> milestone / issue / progress / recovery`
+   - 主动寻找 `candidate stuck`、`phase orphaned`、`completion without closure`
+   - 把发现结果加工为 `ownership + restart_point + next_action`
+EOF
+)"
   manager_artifact_rule="$(cat <<EOF
 18. 当前轮次若形成了 manager judgement / worker delegation / cleanup queue，你必须把它 materialize 成 runtime 可消费的非版本化产物，不能只停在自然语言回答。
 19. 至少创建一个 manager continuity 文件：\`$manager_continuity_path\`。
@@ -197,6 +211,15 @@ if is_manager_branch "$current_branch"; then
 25. 你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径；若没有写这些产物，就不算完成主管交付。
 26. 若当前输入包含 delegated continuation、cleanup followthrough、或明确的 project-level restart point，在主 handoff artifact 落盘前不要先 spawn subagent，也不要先等待子任务结果。
 27. 先用当前已足够的现场证据写出 primary manager continuity / worker prompts；subagent 只能用于不阻塞首个 handoff 的二次核对或次优先研究。
+EOF
+)"
+  additional_requirements="$(cat <<'EOF'
+- 若当前轮次承担项目级监督职责，先基于工位快照安排继续开发、冻结、验证、合并和清理顺序。
+- 可并行且互不阻塞的任务，使用 subagent 提高效率。
+- 若 `CURRENT_BRANCH` 是 `develop/main/test-pre-merge-*`，当前会话只做主管，不做实现；实现必须委派到 feature worktree。
+- 若工位视图缺少准确 issue/phase，不要伪造；先把该工位视为需要进一步核对的监督对象。
+- 若当前 AI 响应已经结束、目标进程已退出、命中限额/认证失败、或发生 `context compacted` 需要新进程续接，这类问题一律视为 `runtime-owned`。
+- 主管只输出恢复判定和委派；worker 只回写 blocker / continuity；真正的切号、sleep/recheck 和新进程启动由 Freely runtime / scripts 处理。
 EOF
 )"
 fi
@@ -245,11 +268,8 @@ cat <<EOF
 3. 进入 \`lead-agent\`，不要绕过首跳代理。
 4. 由 \`lead-agent\` 委托 \`skill:context-source-skill\` 进行需求池扫描、优先级判断与下一跳提示词组装。
 5. 若当前轮次承担项目级监督职责，先基于项目级工位视图做排班、冻结、集成与 cleanup 判断；不要直接把自己降级成单工位写代码代理。
-5A. 若当前轮次承担项目级监督职责，先读取 \`./bin/freely live-status --project $project\`，把它当作 supervisor / dispatcher / AI 当前态入口；只有在它提示需要继续深挖时，才展开 \`fleet-status\`、prompt、continuity、jsonl 等细节。
-5B. 若本轮是主管被 runtime 重新激活后的第一轮，先做一轮 patrol：
-   - \`live-status -> fleet-status -> milestone / issue / progress / recovery\`
-   - 主动寻找 \`candidate stuck\`、\`phase orphaned\`、\`completion without closure\`
-   - 把发现结果加工为 \`ownership + restart_point + next_action\`
+${role_scope_rule_5a}
+${role_scope_rule_5b}
 6. 在可并行的 doc-loop、verification、review、日志诊断或互不冲突的代码任务上，使用 subagent 提高效率。
 7. 你的需求池至少包括：
    - \`docs/milestones.md\`
@@ -284,11 +304,6 @@ ${execution_rule_16}
 ${execution_rule_17}
 ${manager_artifact_rule}
 
-主管模式要求：
-- 若当前轮次承担项目级监督职责，先基于工位快照安排继续开发、冻结、验证、合并和清理顺序。
-- 可并行且互不阻塞的任务，使用 subagent 提高效率。
-- 若 \`CURRENT_BRANCH\` 是 \`develop/main/test-pre-merge-*\`，当前会话只做主管，不做实现；实现必须委派到 feature worktree。
-- 若工位视图缺少准确 issue/phase，不要伪造；先把该工位视为需要进一步核对的监督对象。
-- 若当前 AI 响应已经结束、目标进程已退出、命中限额/认证失败、或发生 \`context compacted\` 需要新进程续接，这类问题一律视为 \`runtime-owned\`。
-- 主管只输出恢复判定和委派；worker 只回写 blocker / continuity；真正的切号、sleep/recheck 和新进程启动由 Freely runtime / scripts 处理。
+补充要求：
+${additional_requirements}
 EOF

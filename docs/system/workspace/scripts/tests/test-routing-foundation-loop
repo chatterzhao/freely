@@ -65,9 +65,6 @@ printf '%s\n' "$prompt" | grep -q 'child -> parent -> merge-prep-from-develop ->
 printf '%s\n' "$prompt" | grep -q '不允许因为本轮不继续实现就跳过'
 printf '%s\n' "$prompt" | grep -q 'revisit_trigger'
 printf '%s\n' "$prompt" | grep -q 'worktree 维护'
-printf '%s\n' "$prompt" | grep -q 'candidate stuck'
-printf '%s\n' "$prompt" | grep -q 'phase orphaned'
-printf '%s\n' "$prompt" | grep -q 'completion without closure'
 printf '%s\n' "$prompt" | grep -q 'acceptance review'
 printf '%s\n' "$prompt" | grep -q 'state maintenance'
 printf '%s\n' "$prompt" | grep -q '脚本只负责启动和托管 AI'
@@ -84,11 +81,24 @@ case "$current_branch" in
     printf '%s\n' "$prompt" | grep -q '你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径'
     printf '%s\n' "$prompt" | grep -q '在主 handoff artifact 落盘前不要先 spawn subagent'
     printf '%s\n' "$prompt" | grep -q 'subagent 只能用于不阻塞首个 handoff 的二次核对'
+    printf '%s\n' "$prompt" | grep -q 'candidate stuck'
+    printf '%s\n' "$prompt" | grep -q 'phase orphaned'
+    printf '%s\n' "$prompt" | grep -q 'completion without closure'
     ;;
   *)
     printf '%s\n' "$prompt" | grep -q 'MANAGER_MODE=false'
     printf '%s\n' "$prompt" | grep -q '默认不要在首跳结束时只输出'
     printf '%s\n' "$prompt" | grep -q '必须在当前会话内继续执行第二跳'
+    printf '%s\n' "$prompt" | grep -q '保持 worker reentry scope'
+    printf '%s\n' "$prompt" | grep -q '不要写 `.freely/run/manager-continuity-\*.md`'
+    if printf '%s\n' "$prompt" | grep -q '至少创建一个 manager continuity 文件'; then
+      echo "[FAIL] worker prompt should not require manager continuity generation" >&2
+      exit 1
+    fi
+    if printf '%s\n' "$prompt" | grep -q 'candidate stuck'; then
+      echo "[FAIL] worker prompt should not include manager patrol checklist" >&2
+      exit 1
+    fi
     ;;
 esac
 

@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-lead-agent-worker-reentry.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs"
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+EOF
+
+git init -q "$PROJECT"
+git -C "$PROJECT" config user.name test
+git -C "$PROJECT" config user.email test@example.com
+git -C "$PROJECT" add AGENTS.md docs
+git -C "$PROJECT" commit -qm "init"
+git -C "$PROJECT" checkout -qb feature/worker-reentry-scope
+
+PROMPT="$(
+  bash "$ROOT_DIR/docs/system/workspace/scripts/start-lead-agent.sh" \
+    --project "$PROJECT" \
+    --intent "$PROJECT/docs/PROJECT_INTENT.md" \
+    --constitution "$PROJECT/docs/CONSTITUTION.md" \
+    --workspace-root "$ROOT_DIR/docs/system/workspace" \
+    --ai codex:auto
+)"
+
+printf '%s\n' "$PROMPT" | grep -q 'MANAGER_MODE=false'
+printf '%s\n' "$PROMPT" | grep -q '保持 worker reentry scope'
+printf '%s\n' "$PROMPT" | grep -q '不要把 `./bin/freely live-status --project '"$PROJECT"'`'
+printf '%s\n' "$PROMPT" | grep -q '不要写 `.freely/run/manager-continuity-\*.md`'
+printf '%s\n' "$PROMPT" | grep -q 'worker 只回写本工位 issue / progress / recovery / worker continuity / verification evidence'
+
+if printf '%s\n' "$PROMPT" | grep -q '至少创建一个 manager continuity 文件'; then
+  echo "[FAIL] worker reentry prompt should not require manager continuity generation" >&2
+  exit 1
+fi
+
+if printf '%s\n' "$PROMPT" | grep -q '你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径'; then
+  echo "[FAIL] worker reentry prompt should not require manager handoff artifacts" >&2
+  exit 1
+fi
+
+if printf '%s\n' "$PROMPT" | grep -q 'candidate stuck'; then
+  echo "[FAIL] worker reentry prompt should not run manager patrol checklist" >&2
+  exit 1
+fi
+
+if printf '%s\n' "$PROMPT" | grep -q '本轮是主管被 runtime 重新激活后的第一轮'; then
+  echo "[FAIL] worker reentry prompt should not include manager reactivation patrol instructions" >&2
+  exit 1
+fi
+
+echo "[PASS] feature worker reentry prompt stays worker-scoped"
