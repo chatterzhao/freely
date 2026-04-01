@@ -1,6 +1,6 @@
 # Verification: url-content-intake-skill-and-wechat-fetch-governance
 
-- issue_id: `I-20260318-1908`
+- issue_id: `I-20260318-1246`
 - reviewer: `codex`
 - verdict: `pass_for_verification`
 

@@ -5,7 +5,7 @@
 - candidate_id: `C-20260318-1246`
 - status: `completed`
 - milestone: `M-20260318-url-content-intake-skill-and-wechat-fetch-governance`
-- promoted_issue_id: `I-20260318-1908`
+- promoted_issue_id: `I-20260318-1246`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
 - decision_reason: 这条研究已经完成 materialization，canonical skill、bundled scripts、focused regression 与 owner closeout 均已进入 `develop`；不再保留为活跃待消费 candidate。
 - next_action: 保持收口态；若后续扩大到更多站点、browser/MCP fallback 或统一顶层路由，再新开 lifecycle。

@@ -1,6 +1,6 @@
-# I-20260318-1908 URL 内容摄取 skill 与微信公众号抓取治理
+# I-20260318-1246 URL 内容摄取 skill 与微信公众号抓取治理
 
-- issue_id: `I-20260318-1908`
+- issue_id: `I-20260318-1246`
 - title: `URL 内容摄取 skill 与微信公众号抓取治理`
 - phase_state: `completed`
 - milestone: `M-20260318-url-content-intake-skill-and-wechat-fetch-governance`

@@ -1635,7 +1635,7 @@ routing_policy:
 
 ### completed_issues
 
-1. `I-20260318-1908`
+1. `I-20260318-1246`
 - title: URL 内容摄取 skill 与微信公众号抓取治理
 - milestone_state: completed
 - phase_state: `completed`
