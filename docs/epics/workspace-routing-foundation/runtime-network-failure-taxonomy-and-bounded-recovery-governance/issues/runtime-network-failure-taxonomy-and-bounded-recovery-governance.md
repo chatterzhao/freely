@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260330-2358-A`
 - title: Runtime network failure taxonomy and bounded recovery governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-network-failure-taxonomy-and-bounded-recovery-governance`
@@ -90,3 +90,8 @@ This owner fixes that narrow gap without redesigning the broader availability sy
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
 - `./bin/governance-check`
+
+## Next
+
+- `2026-04-01 09:55 PDT` bounded network-local recovery has been absorbed into canonical `develop` and verified; this owner is closed.
+- Any future work that widens from bounded in-place retry/cooldown into broader dependency-health orchestration or shared reset prediction must open a new lifecycle.

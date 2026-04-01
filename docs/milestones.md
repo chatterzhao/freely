@@ -123,31 +123,17 @@ routing_policy:
 
 1. `I-20260330-2358-A`
 - title: Runtime network failure taxonomy and bounded recovery governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/candidates.md`
-- next_action: Keep this owner in verification until the runtime classifier, bounded retry/cooldown guard, focused network regressions, and truth-source updates merge into `develop`. This slice intentionally stays narrow: classify execution-time network failures, retry in place on the current tool/slot, and block slot/tool fallback for network-local failures.
-
-### completed_issues
-
-1. `I-20260325-0333-B`
-- title: Story-level pre-tests quality gate governance
-- milestone_state: completed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
 - evidence:
-  - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
-  - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
-  - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
-  - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
-  - `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`
-- completion_note: Story-level `pre-tests.md` 质量 gate 已进入 capability truth，最小 blocker taxonomy 已冻结为 `definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`，verification 已 pass
+  - `develop` commit `1a632bd`
+  - `docs/progress/workspace-routing-foundation/p-runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/code-reviews/20260401-runtime-network-failure-taxonomy-and-bounded-recovery-verification.md`
+- completion_note: execution-time network failure taxonomy 已被 narrow runtime owner 吸收：`execution_network_transient` / `execution_network_persistent` / `proxy_config_invalid` 不再落回 generic `ai_exit_rc_*`，也不会误触发 slot/tool fallback，而是在当前 `tool + slot` 上执行 bounded retry/cooldown。
 
 1. `I-20260331-1830-A`
 - title: Kiro CLI runtime availability failure governance
