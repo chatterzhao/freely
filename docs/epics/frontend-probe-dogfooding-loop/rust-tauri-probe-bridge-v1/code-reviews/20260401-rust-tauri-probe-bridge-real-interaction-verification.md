@@ -3,7 +3,7 @@
 - issue_id: `I-20260317-0332`
 - issue: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
 - reviewer: `codex`
-- phase: `completed`
+- phase: `in_verification`
 - date: `2026-04-01`
 
 ## Verdict
@@ -41,5 +41,5 @@
 
 ## Writeback
 
-- `I-20260317-0332` 可从 `in_verification` 推进到 `completed`
+- `I-20260317-0332` 已具备推进到 `completed` 的证据；当前先随实现 merge 到 `develop`，随后应走纯治理 closeout 把 milestone / issue / progress 正式收口
 - `I-20260308-1244-03` 的 blocker 应从“等待 backend 真实 tauri transport 最小闭环证据”改写为“backend bridge 已就绪，继续 frontend host integration / UX 收口”

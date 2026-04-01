@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260317-0332`
 - title: Rust/Tauri Probe Bridge v1
-- phase_state: `completed`
+- phase_state: `in_verification`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `rust-tauri-probe-bridge-v1`

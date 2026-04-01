@@ -3,7 +3,7 @@
 - issue_id: `I-20260317-0332`
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
 - title: `Rust/Tauri Probe Bridge v1`
-- phase_state: `completed`
+- phase_state: `in_verification`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - updated_at: `2026-04-01`
 - summary:
@@ -13,4 +13,4 @@
   - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-host-validation-verification.md`
   - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
 - next:
-  - backend bridge owner 已完成 canonical closeout；后续继续由 `I-20260308-1244-03` 承接 frontend host integration / UX 收口，而不是重新打开 bridge contract scope
+  - 这条 owner 的 real-host evidence 已足够；下一步先把实现 merge 到 `develop`，再走纯治理 closeout 把 owner 从 `in_verification` 推进到 `completed`
