@@ -935,6 +935,9 @@ AI_CAPABILITY_CODEX_MODEL="$codex_capability_model"
 AI_CAPABILITY_CODEX_SANDBOX="$codex_capability_sandbox"
 AI_CAPABILITY_CODEX_APPROVAL_POLICY="$codex_capability_approval_policy"
 AI_CAPABILITY_CODEX_CWD_MODE="$codex_capability_cwd_mode"
+AUTO_SWITCH_SLOT="false"
+AUTO_SWITCH_TOOL="false"
+AI_FALLBACK_TOOLS=""
 CHECK_INTERVAL=10
 RESTART_DELAY=2
 MAX_RESTARTS=0
@@ -959,6 +962,153 @@ FREELY_HTTP_PROXY=""
 FREELY_HTTPS_PROXY=""
 FREELY_NO_PROXY=""
 EOF
+}
+
+config_bool_enabled() {
+  local value="${1:-}"
+  value="$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')"
+  case "$value" in
+    1|true|yes|on) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+config_env_escaped_value() {
+  local value="${1:-}"
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  printf '%s\n' "$value"
+}
+
+upsert_config_key() {
+  local project="$1" key="$2" value="${3:-}"
+  local cfg tmp escaped
+  cfg="$(config_file "$project")"
+  tmp="$(mktemp "${cfg}.XXXXXX")"
+  escaped="$(config_env_escaped_value "$value")"
+  awk -v key="$key" -v value="$escaped" '
+    BEGIN { written=0 }
+    index($0, key "=") == 1 {
+      print key "=\"" value "\""
+      written=1
+      next
+    }
+    { print }
+    END {
+      if (!written) {
+        print key "=\"" value "\""
+      }
+    }
+  ' "$cfg" >"$tmp"
+  mv "$tmp" "$cfg"
+}
+
+runtime_default_model_for_tool() {
+  local tool="$1"
+  case "$tool" in
+    codex) printf 'gpt-5.4\n' ;;
+    *) printf '\n' ;;
+  esac
+}
+
+runtime_default_reasoning_effort_for_tool() {
+  local tool="$1"
+  case "$tool" in
+    codex|cc|cc-use-codex-cli) printf 'medium\n' ;;
+    *) printf '\n' ;;
+  esac
+}
+
+runtime_cross_tool_fallback_order_for_current_tool() {
+  local current_tool="$1"
+  if [[ -n "${AI_FALLBACK_TOOLS:-}" ]]; then
+    printf '%s\n' "$AI_FALLBACK_TOOLS"
+    return 0
+  fi
+  if [[ "$current_tool" != "codex" ]]; then
+    printf 'codex\n'
+  fi
+}
+
+tool_supports_auto_cross_tool_fallback_v1() {
+  local tool="$1"
+  case "$tool" in
+    codex) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+tool_failure_is_tool_local_auto_switch_candidate() {
+  local tool="$1" failure_reason="$2"
+  case "$tool:$failure_reason" in
+    kiro-cli:kiro_monthly_request_limit|kiro-cli:kiro_subscription_status_service_error)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+select_runtime_cross_tool_fallback_target() {
+  local current_tool="$1" failure_reason="$2"
+  local candidate
+  tool_failure_is_tool_local_auto_switch_candidate "$current_tool" "$failure_reason" || return 1
+  while IFS= read -r candidate; do
+    candidate="${candidate// /}"
+    [[ -n "$candidate" ]] || continue
+    [[ "$candidate" != "$current_tool" ]] || continue
+    tool_supports_auto_cross_tool_fallback_v1 "$candidate" || continue
+    printf '%s\n' "$candidate"
+    return 0
+  done < <(printf '%s\n' "$(runtime_cross_tool_fallback_order_for_current_tool "$current_tool")" | tr ',' '\n')
+  return 1
+}
+
+persist_project_tool_selection() {
+  local project="$1" tool="$2"
+  local model reasoning_effort tool_capabilities tool_policy
+  model="$(runtime_default_model_for_tool "$tool")"
+  reasoning_effort="$(runtime_default_reasoning_effort_for_tool "$tool")"
+  tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
+  tool_policy="$(tool_default_policy_for_runtime "$tool")"
+  upsert_config_key "$project" "AI_TOOL" "$tool"
+  upsert_config_key "$project" "AI_MODEL" "$model"
+  upsert_config_key "$project" "AI_REASONING_EFFORT" "$reasoning_effort"
+  upsert_config_key "$project" "AI_TOOL_CAPABILITIES" "$tool_capabilities"
+  upsert_config_key "$project" "AI_TOOL_POLICY" "$tool_policy"
+}
+
+prepare_manager_cross_tool_fallback_if_needed() {
+  local project="$1"
+  local desired_state current_tool fallback_tool last_exit_reason supervisor_pid ai_pid
+  desired_state="unknown"
+  last_exit_reason=""
+  if [[ -f "$(workcell_state_file "$project")" ]]; then
+    unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
+    # shellcheck disable=SC1090
+    source "$(workcell_state_file "$project")"
+    desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+    last_exit_reason="${LAST_EXIT_REASON:-}"
+  fi
+  [[ "$desired_state" == "running" ]] || return 1
+  config_bool_enabled "${AUTO_SWITCH_TOOL:-false}" || return 1
+  current_tool="${AI_TOOL:-}"
+  [[ -n "$current_tool" ]] || return 1
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  ai_pid="$(manager_ai_pid_for_project "$project")"
+  [[ -z "$supervisor_pid" && -z "$ai_pid" ]] || return 1
+  fallback_tool="$(select_runtime_cross_tool_fallback_target "$current_tool" "$last_exit_reason" || true)"
+  [[ -n "$fallback_tool" ]] || return 1
+  persist_project_tool_selection "$project" "$fallback_tool"
+  append_runtime_event "$project" "tool_auto_switch_selected" \
+    "previous_tool=$current_tool" \
+    "active_tool=$fallback_tool" \
+    "reason=$last_exit_reason" \
+    "launch_kind=fresh_with_handoff" \
+    "owner=ensure_manager_control_plane"
+  load_config "$project"
+  return 0
 }
 
 tool_requires_project_codex_config() {
@@ -4339,6 +4489,7 @@ ensure_manager_once() {
   local project="$1"
   local run_dir sup_pid_file current_pid current_ai_pid
 
+  load_config "$project"
   run_dir="$(run_dir_for_project "$project")"
   sup_pid_file="$run_dir/supervisor.pid"
   mkdir -p "$run_dir"
@@ -4352,6 +4503,8 @@ ensure_manager_once() {
   if [[ -z "$current_pid" ]]; then
     current_pid="$(discover_supervisor_pid "$project")"
   fi
+
+  prepare_manager_cross_tool_fallback_if_needed "$project" >/dev/null || true
 
   if [[ "$AI_TOOL" == "codex" ]]; then
     current_ai_pid="$(manager_ai_pid_for_project "$project")"

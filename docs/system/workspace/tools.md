@@ -8,6 +8,14 @@
 - Freely 不在脚本里硬编码“命中某条件就必须走某工具”。
 - AI 必须读取当前输入、任务强度、工具优先级、工具可用性，再自主决定下一跳工具。
 
+## Runtime Availability Note
+
+- `tools.md` 继续只定义任务路由与工具选择参考，不直接充当 runtime availability fallback 顺序真源。
+- 当前 runtime-owned auto-switch v1 仅支持：
+  - `codex` 的 same-tool slot recovery
+  - 在 project config 开启 `AUTO_SWITCH_TOOL` 时，把 `kiro-cli` 的 tool-local availability failure 降级到 `codex + fresh_with_handoff`
+- 更广义的 tool-group fallback order 由 project config 中的 `AI_FALLBACK_TOOLS` 承接，而不是复用本文件的 routing priority。
+
 ## Available Tools
 
 ### iflow
