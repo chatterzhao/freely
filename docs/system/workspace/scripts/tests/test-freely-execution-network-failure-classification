@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-execution-network-classification.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME="$TMP_DIR/home"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260401-0000--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$HOME"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260401-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260401-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260401-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+# shellcheck disable=SC1090
+HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+TRANSIENT_LOG="$TMP_DIR/transient.log"
+PROXY_LOG="$TMP_DIR/proxy.log"
+printf 'curl: (28) Operation timed out after 30000 milliseconds\n' >"$TRANSIENT_LOG"
+printf '[ERROR] FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set\n' >"$PROXY_LOG"
+
+reason_one="$(runtime_network_failure_reason_from_log "$PROJECT" "$TRANSIENT_LOG")"
+reason_two="$(runtime_network_failure_reason_from_log "$PROJECT" "$TRANSIENT_LOG")"
+reason_three="$(runtime_network_failure_reason_from_log "$PROJECT" "$TRANSIENT_LOG")"
+
+[[ "$reason_one" == "execution_network_transient" ]] || {
+  echo "[FAIL] first execution-time network failure should be transient" >&2
+  exit 1
+}
+[[ "$reason_two" == "execution_network_transient" ]] || {
+  echo "[FAIL] second execution-time network failure should still be transient inside budget" >&2
+  exit 1
+}
+[[ "$reason_three" == "execution_network_persistent" ]] || {
+  echo "[FAIL] repeated execution-time network failures should escalate to persistent" >&2
+  exit 1
+}
+
+STATE_FILE="$PROJECT/.freely/run/execution-network-recovery.env"
+grep -q '^EXECUTION_NETWORK_REASON="execution_network_persistent"$' "$STATE_FILE" || {
+  echo "[FAIL] expected persistent reason to be written to state file" >&2
+  cat "$STATE_FILE" >&2
+  exit 1
+}
+grep -q '^EXECUTION_NETWORK_FAILURE_COUNT="3"$' "$STATE_FILE" || {
+  echo "[FAIL] expected failure count to accumulate inside network window" >&2
+  cat "$STATE_FILE" >&2
+  exit 1
+}
+
+clear_execution_network_state "$PROJECT"
+proxy_reason="$(runtime_network_failure_reason_from_log "$PROJECT" "$PROXY_LOG")"
+[[ "$proxy_reason" == "proxy_config_invalid" ]] || {
+  echo "[FAIL] explicit proxy misconfiguration should classify as proxy_config_invalid" >&2
+  exit 1
+}
+grep -q '^EXECUTION_NETWORK_REASON="proxy_config_invalid"$' "$STATE_FILE" || {
+  echo "[FAIL] expected proxy_config_invalid to persist to recovery state" >&2
+  cat "$STATE_FILE" >&2
+  exit 1
+}
+
+echo "[PASS] runtime network failure classification separates transient, persistent, and proxy config failures"
