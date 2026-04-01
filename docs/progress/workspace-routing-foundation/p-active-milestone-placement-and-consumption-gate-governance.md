@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260331-2012-A`
 - title: Active milestone placement and consumption gate governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - branch: `feature/milestone-placement-merge-gate-followup-20260331`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260331-feature-milestone-placement-merge-gate-followup`
@@ -23,8 +23,9 @@
 - 当前分支继续承接这条 post-merge replay：第二阶段 develop absorption 会把 candidate binding writeback 与本 owner 的 issue/progress evidence 一起带入 merge diff，避免再次退化成 candidate-only develop merge。
 - 第二阶段 replay 还补了一个同 scope 的 gate 归类修正：`docs/system/workspace/agents/**`、`skills/**`、`scripts/quality/**` 与 `test-governance-*` 属于 governance-only path，不应被 capability-phase 限制误判成产品实现改动。
 
-## Verification
-
-- `bash docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`
-- `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
-- `./bin/governance-check`
+- closure_status: `merged-and-verified`
+- closure_evidence:
+  - `merge_commits: 79f8bba, b279330, 8972f7c`
+  - `tests: bash docs/system/workspace/scripts/tests/test-governance-check-candidate-v2 && bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `governance: ./bin/governance-check`
+  - `review: docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/code-reviews/20260331-active-milestone-placement-gate-verification.md`

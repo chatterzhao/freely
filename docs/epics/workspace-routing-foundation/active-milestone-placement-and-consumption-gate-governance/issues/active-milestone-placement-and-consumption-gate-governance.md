@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260331-2012-A`
 - title: Active milestone placement and consumption gate governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `active-milestone-placement-and-consumption-gate-governance`
@@ -97,6 +97,5 @@ Freely 已经把两条规则写成 canonical truth：
 
 ## Next
 
-- 当前 owner 已完成最小 gate 与 truth-source writeback，保持 `in_verification`，等待 manager merge review / canonical absorption。
-- `2026-03-31 22:00 PDT` post-merge replay 暴露 develop-bound follow-up：unresolved candidate 的 placement metadata 修正仍需要和本 owner 的 issue/progress/review 一起吸收，不能作为裸 candidate 变更单独 merge。当前 follow-up 继续留在同一 owner 下，先更新 merge gate，再把残留 active candidate milestone bindings 回填到 canonical truth。
-- 若后续需要更精细的 milestone 排期优先级或自动迁移机制，应另开 lifecycle，不重开当前 gate owner。
+- `2026-04-01 09:55 PDT` canonical absorption is complete: placement correctness now lives in `develop`, verification has passed, and this owner is closed.
+- Any future work that adds milestone scheduling heuristics, automatic rehome, or richer sequencing policy must open a new lifecycle instead of reopening this completed gate owner.
