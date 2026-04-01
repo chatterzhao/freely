@@ -21,6 +21,7 @@
   - 允许 unresolved `proposed|needs_research|blocked` candidate 在已有治理 owner 的 develop merge 中一起修 placement metadata
   - 把 develop 中仍残留的 `C-20260330-2318-A`、`C-20260331-1837-A`、`C-20260331-1840-A` milestone 绑定补回 active milestone
 - 当前分支继续承接这条 post-merge replay：第二阶段 develop absorption 会把 candidate binding writeback 与本 owner 的 issue/progress evidence 一起带入 merge diff，避免再次退化成 candidate-only develop merge。
+- 第二阶段 replay 还补了一个同 scope 的 gate 归类修正：`docs/system/workspace/agents/**`、`skills/**`、`scripts/quality/**` 与 `test-governance-*` 属于 governance-only path，不应被 capability-phase 限制误判成产品实现改动。
 
 ## Verification
 
