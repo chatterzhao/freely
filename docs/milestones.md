@@ -89,16 +89,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md`
 - next_action: Keep this owner in verification on `feature/multi-tool-availability-manager-20260331` until merge review absorbs the generalized availability-manager slice into canonical `develop`, then run one clean live confirmation on the protected manager runtime.
 
-1. `I-20260330-2318-A`
-- title: Manager attach reuse missing-AI repair governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/candidates.md`
-- next_action: Keep this new owner on `feature/live-status-already-running-attach-regression-20260330-231827` until the manager-only attach gate repair lands with focused regression coverage, then rerun one protected `develop` recovery to verify the false `already_running_attach` state is gone.
-
 ### completed_issues
 
 1. `I-20260331-1830-A`
@@ -114,6 +104,20 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-kiro-cli-runtime-availability-failure-governance.md`
   - `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/code-reviews/20260331-kiro-cli-runtime-availability-verification.md`
 - completion_note: Kiro monthly-limit / subscription-status-service-error 这条已证实 failure family 已被 narrow runtime owner 吸收：runtime 不再把它们记成 `ai_exit_rc_0`，而是写入 canonical Kiro availability reason 并停止本地盲目 relaunch。更广的 same-tool slot recovery 或 cross-tool fallback 继续留给后续 lifecycle，不回灌本 owner。
+
+1. `I-20260330-2318-A`
+- title: Manager attach reuse missing-AI repair governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/candidates.md`
+- evidence:
+  - `develop` merge `9b89fb3`
+  - `docs/progress/workspace-routing-foundation/p-manager-attach-reuse-missing-ai-repair-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/code-reviews/20260401-manager-attach-reuse-missing-ai-verification.md`
+- completion_note: `develop` real recovery validation now confirms the manager attach path no longer rewrites runtime truth to `already_running_attach` when only the supervisor is present. On the same `kiro_monthly_request_limit -> codex` chain that previously reproduced the bug, runtime now records `tool_auto_switch_selected` followed by `ai_launch_begin tool=codex` without `supervisor_attach_reuse ... ai_pid_state=missing role_hint=manager`; worker attach reuse remains unchanged.
 
 1. `I-20260321-1835-A`
 - title: Develop merge issue binding and C/M/I gate governance

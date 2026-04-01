@@ -34,8 +34,8 @@
 - decision_reason: Live evidence on `develop` proved the exact bad attach path: manager-role attach reuse accepted a live supervisor while `ai_pid_state=missing`, then rewrote workcell state to `already_running_attach`. The repair can now stay narrow and test-backed.
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
-- next_action: Materialize a narrow owner issue for manager attach reuse gating, add focused regression coverage, then rerun live validation on `develop`.
-- revisit_trigger: Reopen broader status-surface discussion only if the narrow attach-gating repair still leaves stale optimistic truth after manager repair.
+- next_action: Owner `I-20260330-2318-A` is complete on `develop`. Keep this candidate only as provenance unless false optimistic attach truth reappears and proves the write-side repair insufficient.
+- revisit_trigger: Reopen broader status-surface discussion only if false optimistic `already_running_attach` truth still appears after the manager-only attach gate repair.
 - session_refs:
   - tool: `codex`
   - session_id: `current-thread`
