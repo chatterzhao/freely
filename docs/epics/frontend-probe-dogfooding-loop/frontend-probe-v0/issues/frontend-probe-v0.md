@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260308-1244-03`
 - title: Frontend Probe v0
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `frontend-probe-v0`
@@ -11,6 +11,8 @@
 - source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
+- pre_tests_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/pre-tests.md`
+- verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
@@ -123,8 +125,8 @@
 
 ## Next
 
-- 已进入 `in_dev`，当前最小实现骨架落在 `src/frontend_probe_v0/`。
-- 下一步继续把 Tauri/React shell 与 boundary contract 接起来，而不是回退到范围争论。
+- 已进入 `in_verification`，当前最小实现骨架与真实 `AttachTerminal` 交互都已落在 `src/frontend_probe_v0/`。
+- 下一步先把实现与验证证据吸收到 `develop`，再决定是否走纯治理 closeout，而不是回退到范围争论。
 
 ## Dev Loop
 
@@ -141,6 +143,7 @@
   - `src/frontend_probe_v0/useProbeControls.ts`
   - `src/frontend_probe_v0/events.ts`
   - `src/frontend_probe_v0/useProbeEvents.ts`
+  - `src/frontend_probe_v0/useProbeTerminalAttach.ts`
   - `src/frontend_probe_v0/bootstrap.tsx`
   - `src/frontend_probe_v0/entry.ts`
   - `src/frontend_probe_v0/mount.tsx`
@@ -179,11 +182,14 @@
   - 失败面也已验证：当宿主提供了 Tauri 形状但 `invoke` 抛错时，header 会直接显示 `Runtime error: bridge offline`，不再静默卡在 loading
   - 现在不需要额外注入脚本也能验证失败面：`?transport=tauri-broken` 会直接进入 tauri-shaped error path，并显示 `Runtime error: bridge offline`
   - shell 现已具备内建 `Transport` 下拉；切换到 `tauri-broken` 会直接把 URL 改成 `?transport=tauri-broken` 并进入对应 transport，无需手改地址栏
+  - embedded terminal 现已不再只展示 `terminalTargets`；UI 可对当前 target 真实发送 `AttachTerminal`，并把附着中的 target 置为当前观察面
+  - `MockProbeAdapter` 与 Rust bridge 现都已消费 `AttachTerminal`：attach 会把目标 target 置顶、写回 `governanceSummary`，并发出新的 `TerminalChunkAppended`
+  - 真实 `bun run tauri:validate:probe` 现已扩到 `start -> create/resume session -> attach terminal -> chat intervention`；validation report 的 `observedCommands` 已包含 `AttachTerminal`
 - current_blocker:
-  - frontend 侧 bridge contract、transport、manifest 与错误面已收敛到足够位置；`I-20260317-0332` 现已实际写回真实 `Transport=tauri` 下的最小 start、session create/resume、chat intervention 闭环证据，因此 backend bridge blocker 已解除。当前剩余缺口回到 frontend host integration / UX 本身，本 issue 仍不能提前宣称整体产品面已完成
+  - backend bridge blocker 与 embedded terminal attach 缺口都已解除；当前剩余工作主要是 canonical verification / closeout 判断，而不是继续补 day-1 command surface
 - reroute_required:
   - `next_recommended_route=dev-loop-execution`
   - reason: `Rust/Tauri Probe Bridge v1` 已完成最小 IBM 收敛，后续应由 `I-20260317-0332` 进入 backend dev-loop 实现
 - unblock_status:
   - `I-20260317-1004` 已完成最小 IBM 收敛，frontend runtime baseline 现已成为可引用依赖
-  - 当前 issue 可从 `blocked_dev` 返回 `in_dev`
+  - 当前 issue 可从 `in_dev` 推进到 `in_verification`
