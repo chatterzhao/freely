@@ -9,6 +9,7 @@ PROJECT="$TMP_DIR/repo"
 mkdir -p "$PROJECT/.freely/run" "$PROJECT/.codex" "$PROJECT/.githooks" "$PROJECT/docs/pre-brainstorms"
 git -C "$TMP_DIR" init -q "$PROJECT"
 git -C "$PROJECT" config core.hooksPath .githooks
+mkdir -p "$PROJECT/docs/system/workspace"
 
 cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
@@ -30,6 +31,10 @@ cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
 EOF
 cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
 # CONVERGENCE
+EOF
+
+cat >"$PROJECT/docs/system/workspace/install-lifecycle-allowlist.txt" <<'EOF'
+# empty by default
 EOF
 
 cat >"$PROJECT/.freely/config.env" <<EOF
