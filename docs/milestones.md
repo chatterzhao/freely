@@ -49,24 +49,19 @@ routing_policy:
 
 ### committed_issues
 
-- none right now; the bounded residual worker-runtime owner below is now verified and closed in this lane
-
-### completed_issues
-
 1. `I-20260401-1831-A`
 - title: Worker reactivation and local reentry residual runtime governance
-- milestone_state: completed
-- phase_state: `completed`
+- milestone_state: committed
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/code-reviews/20260401-worker-reactivation-and-local-reentry-residual-runtime-verification.md`
-  - `docs/progress/workspace-routing-foundation/p-worker-reactivation-and-local-reentry-residual-runtime-governance.md`
-- completion_note: bounded worker-runtime residual closeout is now explicit: attach reuse requires confirmed AI ownership/running truth, worker local reentry shares the frozen active-worker predicate, and this follow-up no longer leaves hidden debt inside the security/materialization lane.
+- next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
 
-2. `I-20260328-2105-A`
+### completed_issues
+
+1. `I-20260328-2105-A`
 - title: Codex verified resume evidence governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -1515,37 +1510,29 @@ routing_policy:
 
 ### committed_issues
 
-- none right now; the current product-architecture security split below is verified and closed in this lane
-
-### completed_issues
-
 1. `I-20260401-1303-A`
 - title: Default autonomy activation consent and posture truth governance
-- milestone_state: completed
-- phase_state: `completed`
+- milestone_state: committed
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
-- evidence:
-  - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/code-reviews/20260401-default-autonomy-activation-consent-verification.md`
-  - `docs/progress/freely-product-architecture/p-default-autonomy-activation-consent-and-tool-policy-governance.md`
-- completion_note: the bounded product contract is now explicitly closed: Freely defaults to high autonomy, activation consent is blocking, safeguards remain strongly recommended but non-blocking by default, and runtime escalation stays AI-first rather than restoring step-by-step human approvals.
+- next_action: keep the product contract owner in `in_verification` until develop merge and post-merge acceptance confirm the canonical autonomy posture truth.
 
-2. `I-20260401-1303-B`
+2. `I-20260401-1303-A-2`
 - title: Freely tool autonomy policy materialization governance
-- milestone_state: completed
-- phase_state: `completed`
+- milestone_state: committed
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
-- evidence:
-  - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/code-reviews/20260401-freely-tool-autonomy-policy-materialization-verification.md`
-  - `docs/progress/freely-product-architecture/p-freely-tool-autonomy-policy-materialization-governance.md`
-- completion_note: the bounded materialization owner is now explicitly closed in this lane: project-level Codex config follows Freely auto posture for `approval_policy`, Claude Code surfaces are documented as launch-time materialization, and remaining runtime debt was split away rather than silently hidden here.
+- next_action: keep the first materialization slice in `in_verification` until develop merge and post-merge acceptance confirm the launcher/project-config/tool-doc truth on canonical develop.
 
-3. `I-20260326-1810`
+### completed_issues
+
+1. `I-20260326-1810`
 - title: Freely layered architecture and tooling topology
 - milestone_state: completed
 - phase_state: `completed`
@@ -1559,7 +1546,7 @@ routing_policy:
 
 ### candidate_issues
 
-- none right now; the 20260401-1303 product-security candidate is now split across `I-20260401-1303-A` and `I-20260401-1303-B`
+- none right now; the 20260401-1303 product-security candidate is now split across `I-20260401-1303-A` and `I-20260401-1303-A-2`
 
 ## M-20260308-frontend-probe-dogfooding-loop
 
