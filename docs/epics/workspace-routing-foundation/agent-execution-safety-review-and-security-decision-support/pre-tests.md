@@ -1,24 +1,70 @@
 # Pre-Tests: agent-execution-safety-review-and-security-decision-support
 
-## Story-Level Acceptance Items
+## Acceptance Structure
 
-1. `id: execution-boundary-review-contract`
-- requirement: issue artifacts clearly define that tool flags, project-local config, launch-time injection, and observed posture must be comparable under one capability contract
-- evidence_level: `doc-read`
-- status: `pending`
+### Pre-merge focused regression / smoke
+
+1. `execution-boundary-contract` 明确：
+   - tool flags、project-local config、launch-time injection、observed posture 需要在同一 capability contract 下可比对
+   - execution-boundary review 属于可复用 capability，而不是单个产品 consent surface
+2. `reviewer-committee-contract` 明确：
+   - reviewer / committee semantics 是内部 AI 决策增强
+   - 不把用户拉回逐步审批链路
+3. `nonblocking-guidance-boundary` 明确：
+   - safeguard recommendation 属于 capability 输出
+   - safeguard 不完整默认不直接升级成 runtime blocker
+
+### Post-merge integration acceptance
+
+1. follow-on implementation owner 必须能直接引用这一条 owner 作为：
+   - execution-boundary review 的 contract source
+   - reviewer / committee semantics 的 contract source
+2. capability owner 与 product owner 的边界必须保持稳定：
+   - 不接管 activation consent
+   - 不重写 Freely 默认 autonomy posture
+3. follow-on skill / reference / runtime-helper 实现不应重新定义这条 owner 已冻结的最小 contract。
+
+### Post-merge application-native real-environment acceptance
+
+1. future runtime implementation 应能基于这条 owner：
+   - 输出 execution-boundary review summary
+   - 拉起 reviewer / committee support
+   - 写回 reviewer-backed continuation evidence
+2. future runtime implementation 若缺 capability 实现，可以暂不适用，但不允许回退到“用户逐步审批才是默认主路”的表述。
+
+### Post-merge end-to-end dogfood acceptance
+
+1. future dogfood sessions 讨论 reviewer / committee semantics 时，应能直接引用这条 owner，而不是每轮重新口头定义。
+2. future security capability splits 继续拆 supply-chain、secret/artifact exposure、incident remediation 时，不得回灌并重写这条 owner 的边界。
+
+### Non-Goals
+
+1. 本轮不实现真实 security skill / runtime helper。
+2. 本轮不定义 Freely 默认强制 sandbox 或强制交互批准。
+3. 本轮不把 supply-chain、secret scanning、artifact exposure、incident remediation 一次性并入同一个 owner。
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `issue artifacts freeze one reusable execution-boundary review contract across tool flags, project config, launch-time injection, and observed posture`
+- evidence_level: `mock`
+- status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
 
-2. `id: security-decision-support-contract`
-- requirement: issue artifacts clearly define reviewer/committee support as internal AI decision enhancement rather than user approval replacement
-- evidence_level: `doc-read`
-- status: `pending`
+### PT-2
+- id: `PT-2`
+- requirement: `issue artifacts freeze reviewer and committee semantics as internal AI decision enhancement rather than user approval replacement`
+- evidence_level: `mock`
+- status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/prd.md`
 
-3. `id: safeguard-recommendation-nonblocking`
-- requirement: issue artifacts clearly state that safeguard recommendation is supported output, but safeguard incompleteness does not automatically block runtime continuation
-- evidence_level: `doc-read`
-- status: `pending`
-- artifact_ref: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/prd.md`
+### PT-3
+- id: `PT-3`
+- requirement: `issue artifacts state that safeguard recommendation is supported output without turning safeguard incompleteness into the default blocker`
+- evidence_level: `mock`
+- status: `pass`
+- artifact_ref: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
 
 ## Pre-merge Focused Regression / Smoke
 
