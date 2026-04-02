@@ -1,0 +1,199 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+log_info() { echo "[INFO] $*" >&2; }
+log_error() { echo "[ERROR] $*" >&2; }
+
+usage() {
+  cat <<'EOF'
+Usage:
+  check-supply-chain-baseline --project <abs_or_rel_path> [--lifecycle-allowlist <abs_or_rel_path>]
+EOF
+}
+
+abs_path() {
+  local path="$1"
+  if [[ "$path" = /* ]]; then
+    printf '%s\n' "$path"
+  else
+    printf '%s\n' "$(cd "$path" 2>/dev/null && pwd -P)"
+  fi
+}
+
+has_root_package_manifest() {
+  [[ -f "$1/package.json" ]]
+}
+
+has_recognized_root_lockfile() {
+  local project="$1"
+  [[ -f "$project/bun.lock" ]] \
+    || [[ -f "$project/bun.lockb" ]] \
+    || [[ -f "$project/package-lock.json" ]] \
+    || [[ -f "$project/pnpm-lock.yaml" ]] \
+    || [[ -f "$project/yarn.lock" ]]
+}
+
+abs_path_allow_missing() {
+  local base="$1" path="$2"
+  if [[ "$path" = /* ]]; then
+    printf '%s\n' "$path"
+  else
+    printf '%s\n' "$base/$path"
+  fi
+}
+
+load_lifecycle_allowlist() {
+  local file="$1" line
+  LIFECYCLE_ALLOWLIST=()
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    case "$line" in
+      ''|[[:space:]]*'#'*) continue ;;
+    esac
+    LIFECYCLE_ALLOWLIST+=("$line")
+  done < "$file"
+}
+
+lifecycle_is_allowlisted() {
+  local name="$1" allowed
+  for allowed in "${LIFECYCLE_ALLOWLIST[@]:-}"; do
+    [[ "$name" == "$allowed" ]] && return 0
+  done
+  return 1
+}
+
+emit_root_package_manifest_findings() {
+  local project="$1"
+  node - "$project" <<'NODE'
+const fs = require("fs");
+const path = require("path");
+
+const project = process.argv[2];
+const packageJson = path.join(project, "package.json");
+const lifecycleScripts = new Set(["preinstall", "install", "postinstall", "prepare"]);
+const dependencyFields = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"];
+const disallowedPrefixes = ["git+", "github:", "http:", "https:", "file:", "link:"];
+
+if (!fs.existsSync(packageJson)) {
+  process.exit(0);
+}
+
+const rel = "package.json";
+const raw = fs.readFileSync(packageJson, "utf8");
+const pkg = JSON.parse(raw);
+
+const scripts = pkg.scripts || {};
+for (const [name, command] of Object.entries(scripts)) {
+  if (!lifecycleScripts.has(name)) continue;
+  if (typeof command !== "string" || command.trim() === "") continue;
+  console.log(["SCRIPT", rel, name, command.replace(/\s+/g, " ").trim()].join("\t"));
+}
+
+for (const field of dependencyFields) {
+  const deps = pkg[field] || {};
+  for (const [name, spec] of Object.entries(deps)) {
+    if (typeof spec !== "string") continue;
+    const trimmed = spec.trim();
+    if (disallowedPrefixes.some((prefix) => trimmed.startsWith(prefix))) {
+      console.log(["DEPENDENCY", rel, field, name, trimmed].join("\t"));
+    }
+  }
+}
+NODE
+}
+
+emit_workflow_findings() {
+  local project="$1"
+  local workflow_dir="$project/.github/workflows"
+  local file uses_line ref rel
+  [[ -d "$workflow_dir" ]] || return 0
+
+  while IFS= read -r -d '' file; do
+    rel="${file#$project/}"
+    while IFS= read -r uses_line; do
+      if [[ "$uses_line" =~ uses:[[:space:]]*([^#[:space:]]+) ]]; then
+        ref="${BASH_REMATCH[1]}"
+      else
+        continue
+      fi
+      [[ -n "$ref" ]] || continue
+      case "$ref" in
+        ./*|docker://*|docker:* ) continue ;;
+      esac
+      if [[ "$ref" != *@* ]]; then
+        printf 'WORKFLOW\t%s\t%s\n' "$rel" "$ref"
+        continue
+      fi
+      if [[ ! "$ref" =~ @([0-9a-fA-F]{40})$ ]]; then
+        printf 'WORKFLOW\t%s\t%s\n' "$rel" "$ref"
+      fi
+    done < <(grep -nE '^[[:space:]]*(-[[:space:]]*)?uses:[[:space:]]*[^#[:space:]].*$' "$file" || true)
+  done < <(find "$workflow_dir" -type f \( -name '*.yml' -o -name '*.yaml' \) -print0 | sort -z)
+}
+
+main() {
+  local project="" allowlist_file="" failed=0 finding kind rest
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$2"; shift 2 ;;
+      --lifecycle-allowlist) allowlist_file="$2"; shift 2 ;;
+      --help|-h) usage; exit 0 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+
+  [[ -n "$project" ]] || { log_error "--project is required"; usage; exit 1; }
+  project="$(abs_path "$project")"
+  [[ -n "$allowlist_file" ]] || allowlist_file="docs/system/workspace/install-lifecycle-allowlist.txt"
+  allowlist_file="$(abs_path_allow_missing "$project" "$allowlist_file")"
+
+  if [[ ! -f "$allowlist_file" ]]; then
+    log_error "supply-chain baseline failed: missing install lifecycle allowlist $allowlist_file"
+    exit 1
+  fi
+  load_lifecycle_allowlist "$allowlist_file"
+
+  if has_root_package_manifest "$project" && ! has_recognized_root_lockfile "$project"; then
+    log_error "supply-chain baseline failed: root package.json requires a recognized root lockfile"
+    failed=1
+  fi
+
+  while IFS= read -r finding || [[ -n "$finding" ]]; do
+    [[ -n "$finding" ]] || continue
+    kind="${finding%%$'\t'*}"
+    rest="${finding#*$'\t'}"
+    case "$kind" in
+      SCRIPT)
+        IFS=$'\t' read -r rel script_name command <<<"$rest"
+        if lifecycle_is_allowlisted "$script_name"; then
+          log_info "supply-chain baseline allowlisted install lifecycle script $script_name in $rel"
+        else
+          log_error "supply-chain baseline failed: install lifecycle script $script_name in $rel -> $command"
+          failed=1
+        fi
+        ;;
+      DEPENDENCY)
+        IFS=$'\t' read -r rel field dep_name spec <<<"$rest"
+        log_error "supply-chain baseline failed: disallowed dependency source $dep_name=$spec in $rel ($field)"
+        failed=1
+        ;;
+    esac
+  done < <(emit_root_package_manifest_findings "$project")
+
+  while IFS= read -r finding || [[ -n "$finding" ]]; do
+    [[ -n "$finding" ]] || continue
+    IFS=$'\t' read -r kind rel detail <<<"$finding"
+    if [[ "$kind" == "WORKFLOW" ]]; then
+      log_error "supply-chain baseline failed: mutable external GitHub Action ref in $rel -> $detail"
+      failed=1
+    fi
+  done < <(emit_workflow_findings "$project")
+
+  if [[ "$failed" -ne 0 ]]; then
+    exit 1
+  fi
+
+  log_info "supply-chain baseline PASS"
+}
+
+main "$@"
