@@ -59,6 +59,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
 - next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
 
+2. `I-20260401-2245-A`
+- title: Build artifact exposure and release allowlist audit governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/candidates.md`
+- next_action: keep the first automation-first security slice in `in_verification` until develop merge and post-merge acceptance confirm the build artifact audit, allowlist truth, and explicit production sourcemap posture landed cleanly on canonical truth.
+
 ### completed_issues
 
 1. `I-20260401-1545-A`
