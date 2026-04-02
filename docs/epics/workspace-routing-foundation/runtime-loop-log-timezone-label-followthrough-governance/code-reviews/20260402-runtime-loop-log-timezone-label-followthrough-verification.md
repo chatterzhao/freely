@@ -2,8 +2,8 @@
 
 - issue_id: `I-20260402-0540-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md`
-- branch: `feature/repo-time-display-audit-20260402`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-repo-time-display-audit`
+- branch: `feature/runtime-loop-log-timezone-closeout-20260402-0648`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-0648-feature-runtime-loop-log-timezone-closeout`
 - verification_date: `2026-04-02`
 - verifier: `codex`
 
@@ -18,6 +18,14 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-cooldown-falls-back-to-active-slot`
 2. `./bin/governance-check`
+
+## Develop Absorption
+
+- canonical_merge_commit: `5537a7e`
+- canonical_merge_target: `develop`
+- post_merge_replay:
+  - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-cooldown-falls-back-to-active-slot`
+  - `./bin/governance-check`
 
 ## Implementation Decision Note
 

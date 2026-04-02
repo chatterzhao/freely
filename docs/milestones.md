@@ -69,17 +69,23 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md`
 - next_action: keep this owner in `in_verification` until a post-gate develop-bound implementation lane carries the new issue-bound decision note from start to merge; older security lanes that landed before the gate became canonical do not count as proof.
 
-3. `I-20260402-0540-A`
+### completed_issues
+1. `I-20260402-0540-A`
 - title: Runtime loop log timezone label followthrough governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/candidates.md`
-- next_action: replay the narrow develop-bound merge for the loop log timezone label followthrough, then close the owner with the canonical merge commit and focused regression evidence.
+- evidence:
+  - `develop` merge `5537a7e`
+  - `docs/progress/workspace-routing-foundation/p-runtime-loop-log-timezone-label-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-cooldown-falls-back-to-active-slot`
+  - `./bin/governance-check`
+- completion_note: The final runtime time-display tail is now closed on `develop`: loop log headers remain host-local and now carry timezone labels, while stored truth and UTC naming truth stay unchanged.
 
-### completed_issues
 1. `I-20260401-1545-A`
 - title: ACP optional adapter boundary governance
 - milestone_state: completed
