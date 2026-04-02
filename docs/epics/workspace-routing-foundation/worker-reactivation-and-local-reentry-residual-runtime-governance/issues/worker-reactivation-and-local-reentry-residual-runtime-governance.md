@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1831-A`
 - title: Worker reactivation and local reentry residual runtime governance
-- phase_state: `completed`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `worker-reactivation-and-local-reentry-residual-runtime-governance`
@@ -24,7 +24,7 @@
 
 ## Why
 
-完成 `I-20260401-1303-B` 后，当前 worktree 只剩两条红测，而且它们都不再属于 security/materialization：
+完成 `I-20260401-1303-A-2` 的当前 materialization slice 后，当前 worktree 只剩两条红测，而且它们都不再属于 security/materialization：
 
 1. `test-freely-chat-worker-reactivation` 仍可能在 worker `operator_stop` 后走到 attach reuse，写出 optimistic `already_running_attach`，但没有 durable `ai.pid`。
 2. `test-freely-interruption-direct-answer` 暴露出 worker-side local continuation reentry 的 canonical active-worker predicate 仍未冻结，导致 completed owner 的验证口径与现行 runtime/test truth 不再完全一致。
@@ -86,7 +86,7 @@
 
 ## Next
 
-- 当前 worktree 已有 focused runtime/test evidence，并已完成这条 bounded owner 的 closeout。
+- 当前 worktree 已有 focused runtime/test evidence，并已进入这条 bounded owner 的 develop-bound verification。
 - 若后续再出现新的 worker-runtime residual 漂移，应另开更窄的 residual follow-on，而不是重新扩大当前 issue。
 
 - 记录或单独吸收旁路 repro，例如 `test-live-status-attach-false-positive-repro`，但它不再属于本 owner 的 closure 前提。

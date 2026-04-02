@@ -3,7 +3,7 @@
 - issue_id: `I-20260401-1831-A`
 - issue_path: `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md`
 - title: `Worker reactivation and local reentry residual runtime governance`
-- phase_state: `completed`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - updated_at: `2026-04-01`
 - summary:

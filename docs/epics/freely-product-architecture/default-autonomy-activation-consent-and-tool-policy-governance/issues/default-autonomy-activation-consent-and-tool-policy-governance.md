@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1303-A`
 - title: Default autonomy activation consent and posture truth governance
-- phase_state: `completed`
+- phase_state: `in_verification`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `default-autonomy-activation-consent-and-tool-policy-governance`
@@ -57,7 +57,7 @@ Freely 当前的产品真相还分裂着：
    - 先走内部 AI 决策升级
    - 可引入一个或多个 security-focused subagent / reviewer committee
    - 仅在无法产出可信下一步时进入 minimal risk state
-6. 明确把更细的 tool materialization 和当前 Codex split 收口工作切给 sibling owner `I-20260401-1303-B`
+6. 明确把更细的 tool materialization 和当前 Codex split 收口工作切给 sibling owner `I-20260401-1303-A-2`
 
 ## Non-Goals
 
@@ -78,11 +78,11 @@ Freely 当前的产品真相还分裂着：
 4. `init`、`doctor`、runtime、`baseline-status`、`live-status` 的 autonomy/safety responsibility set 被写成可继续实现的 contract。
 5. 文档明确高风险/高不确定场景的主路是内部 AI 决策升级，而不是恢复用户逐步批准。
 6. issue artifacts 明确写出 autonomous escalation ladder、security-focused reviewer / committee、以及 minimal risk state 作为“最后手段”的 contract。
-7. sibling owner `I-20260401-1303-B` 被明确承接 tool adapter injection、tool-local config materialization、以及当前 Codex split 的具体收口。
+7. sibling owner `I-20260401-1303-A-2` 被明确承接 tool adapter injection、tool-local config materialization、以及当前 Codex split 的具体收口。
 
 ## Current Follow-through
 
-1. `I-20260401-1303-B` 的第一条 implementation slice 已落地：`auto` 模式的项目级 `.codex/config.toml` 现在写入 `approval_policy = "never"`。
+1. `I-20260401-1303-A-2` 的第一条 implementation slice 已落地：`auto` 模式的项目级 `.codex/config.toml` 现在写入 `approval_policy = "never"`。
 2. 因此本 owner 保留的是产品 contract truth，而不是继续把“`.codex/config.toml` 仍然 guarded”当作当前现状。
 
 ## Current Artifact Set
@@ -108,7 +108,7 @@ Freely 当前的产品真相还分裂着：
 
 ## Next
 
-- 这条 issue 先冻结默认高自治 posture、activation consent、runtime decision ladder、minimal risk semantics、和产品级 posture truth surfaces。
-- tool policy materialization、launcher/config split、以及 ACP follow-up adapter seam 改由 sibling owner `I-20260401-1303-B` 承接。
+- 这条 issue 已冻结默认高自治 posture、activation consent、runtime decision ladder、minimal risk semantics、和产品级 posture truth surfaces，并进入 develop-bound verification。
+- tool policy materialization、launcher/config split、以及 ACP follow-up adapter seam 改由 sibling owner `I-20260401-1303-A-2` 承接。
 - 更宽的 baseline domains，例如 supply chain、secret materialization、artifact exposure、security decision support，应由后续 issue 或 capability lane 继续拆分，不回灌本 issue 重新变成 umbrella。
-- 本 owner 的 bounded product contract closeout 已完成；后续若再出现 autonomy posture / activation consent / owner boundary drift，应新开 follow-on，而不是重开本 owner。
+- 待 develop 合流与 post-merge acceptance 写回后，再把本 owner 从 `in_verification` 推进到 `completed`；后续若再出现 autonomy posture / activation consent / owner boundary drift，应新开 follow-on，而不是重开本 owner。

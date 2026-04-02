@@ -54,6 +54,6 @@
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 - next_action:
-  - `I-20260401-1303-A` now owns default autonomy posture, activation consent, runtime decision escalation, minimal-risk-state semantics, and product-level posture truth; sibling owner `I-20260401-1303-B` owns tool policy materialization, project-local versus launch-time config mapping, and the current Codex posture split.
+  - `I-20260401-1303-A` now owns default autonomy posture, activation consent, runtime decision escalation, minimal-risk-state semantics, and product-level posture truth; sibling owner `I-20260401-1303-A-2` owns tool policy materialization, project-local versus launch-time config mapping, and the current Codex posture split.
 - revisit_trigger:
   - revisit or expand if a current runtime incident shows that one of the proposed baseline domains is still too broad or belongs under an already-active owner issue

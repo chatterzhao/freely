@@ -1,8 +1,8 @@
 # Issue: freely-tool-autonomy-policy-materialization-governance
 
-- issue_id: `I-20260401-1303-B`
+- issue_id: `I-20260401-1303-A-2`
 - title: Freely tool autonomy policy materialization governance
-- phase_state: `completed`
+- phase_state: `in_verification`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `freely-tool-autonomy-policy-materialization-governance`
@@ -109,5 +109,5 @@ Freely 已经明确选择默认高自治方向，但“这份姿势如何被具�
 
 ## Next
 
-- 这条 issue 的当前 contract、第一条 project-local slice、以及 tool-doc/readback follow-through 已经在当前 worktree bounded closeout。
+- 这条 issue 的当前 contract、第一条 project-local slice、以及 tool-doc/readback follow-through 已经在当前 worktree 完成 feature-bound验证，当前进入 develop-bound verification。
 - 若后续再出现新的 materialization drift，应只针对新增工具 / ACP adapter seam 开更窄的 follow-on，而不是重新把本 owner 扩回 umbrella。

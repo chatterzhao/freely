@@ -1,9 +1,9 @@
 # Progress: freely-tool-autonomy-policy-materialization-governance
 
-- issue_id: `I-20260401-1303-B`
+- issue_id: `I-20260401-1303-A-2`
 - issue_path: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
 - title: `Freely tool autonomy policy materialization governance`
-- phase_state: `completed`
+- phase_state: `in_verification`
 - milestone: `M-20260326-freely-product-architecture`
 - updated_at: `2026-04-01`
 - summary:
