@@ -49,17 +49,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260401-1308-A`
-- title: Agent execution safety review and security decision support
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
-- next_action: implement the smallest capability slice that compares execution-boundary truth and enables reviewer-backed internal decision support without reintroducing user-step approvals
-
-2. `I-20260401-1831-A`
+1. `I-20260401-1831-A`
 - title: Worker reactivation and local reentry residual runtime governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -68,6 +58,16 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
 - next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
+
+2. `I-20260401-0115-A`
+- title: Supply-chain baseline and install-intake audit governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md`
+- next_action: keep the narrow supply-chain baseline slice in `in_verification` until develop absorbs the audit script, doctor integration, tests, and closeout writeback.
 
 3. `I-20260401-1308-A`
 - title: Agent execution safety review and security decision support
@@ -134,13 +134,17 @@ routing_policy:
   - `develop` merge `e72ff86`
   - `docs/progress/workspace-routing-foundation/p-agent-execution-safety-review-and-security-decision-support.md`
   - `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/code-reviews/20260401-agent-execution-safety-review-and-security-decision-support-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-doctor-execution-boundary-audit`
   - `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
   - `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
   - `bash docs/system/workspace/scripts/tests/test-freely-hook-gate`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit`
   - `bash docs/system/workspace/scripts/tests/test-freely-live-status-security-review-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-security-review-brief`
+  - `bash docs/system/workspace/scripts/tests/test-agent-execution-safety-review-skill`
   - `bin/pretests-gate --issue docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
   - `./bin/governance-check`
-- completion_note: The first advisory-only security review capability slice is now canonical on `develop`: project-local security review truth, baseline/live/doctor introspection, and the workspace skill expose execution-boundary review evidence without rewriting launch blocking, approval posture, or fallback behavior. A real reviewer committee runtime remains a follow-on owner rather than unfinished scope inside this slice.
+- completion_note: The first advisory-only security review capability slice is now canonical on `develop`: project-local execution-boundary truth, machine-readable `security-review-brief` guidance, and the workspace skill expose reviewer/committee escalation evidence without rewriting launch blocking, approval posture, or fallback behavior. A real reviewer committee runtime remains a follow-on owner rather than unfinished scope inside this slice.
 
 2. `I-20260401-1703-A`
 - title: Runtime adapter axis and per-tool adapter selection
@@ -1641,25 +1645,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260401-1303-A`
-- title: Default autonomy activation consent and posture truth governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
-- next_action: keep the product contract owner in `in_verification` until develop merge and post-merge acceptance confirm the canonical autonomy posture truth.
-
-2. `I-20260401-1303-A-2`
-- title: Freely tool autonomy policy materialization governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
-- next_action: keep the first materialization slice in `in_verification` until develop merge and post-merge acceptance confirm the launcher/project-config/tool-doc truth on canonical develop.
+- none right now
 
 ### completed_issues
 
@@ -1691,9 +1677,45 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: Canonical `develop` now matches the already-frozen activation-consent contract on the `cc:auto + adapter=acp` init path; this owner closed as a strict test-only followthrough without reopening runtime semantics or ACP scope.
 
+3. `I-20260401-1303-A`
+- title: Default autonomy activation consent and posture truth governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
+- evidence:
+  - `develop` commit `3f462c6`
+  - `docs/progress/freely-product-architecture/p-default-autonomy-activation-consent-and-tool-policy-governance.md`
+  - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/code-reviews/20260401-default-autonomy-activation-consent-verification.md`
+  - `./bin/governance-check`
+- completion_note: The bounded product contract is now canonical on `develop`: Freely defaults to unattended automatic approval, activation consent is the explicit blocking posture gate, safeguard guidance remains strongly recommended but non-blocking by default, and runtime decision escalation stays AI-first rather than reverting to user step approvals.
+
+4. `I-20260401-1303-A-2`
+- title: Freely tool autonomy policy materialization governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
+- evidence:
+  - `develop` commit `641cb55`
+  - `docs/progress/freely-product-architecture/p-freely-tool-autonomy-policy-materialization-governance.md`
+  - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/code-reviews/20260401-freely-tool-autonomy-policy-materialization-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-codex-project-config-force`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
+  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-cc-args`
+  - `./bin/governance-check`
+- completion_note: The first tool materialization slice is now canonical on `develop`: project-local Codex posture, launch-time auto injection, and Claude/Claude-via-Codex launcher semantics are explicitly separated from the higher-level product contract instead of remaining an implicit split.
+
 ### candidate_issues
 
-- none right now; the 20260401-1303 product-security candidate is now split across `I-20260401-1303-A` and `I-20260401-1303-A-2`
+- none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.
+  - `I-20260401-2245-A` owns build artifact exposure and release allowlist audit.
+  - `I-20260401-0115-A` owns supply-chain baseline and install-intake audit.
 
 ## M-20260308-frontend-probe-dogfooding-loop
 

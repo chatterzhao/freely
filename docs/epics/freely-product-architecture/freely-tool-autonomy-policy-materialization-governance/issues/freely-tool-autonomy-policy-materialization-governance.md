@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1303-A-2`
 - title: Freely tool autonomy policy materialization governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `freely-tool-autonomy-policy-materialization-governance`

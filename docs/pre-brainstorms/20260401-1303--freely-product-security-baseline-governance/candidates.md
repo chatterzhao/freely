@@ -55,5 +55,6 @@
     role: `author`
 - next_action:
   - `I-20260401-1303-A` now owns default autonomy posture, activation consent, runtime decision escalation, minimal-risk-state semantics, and product-level posture truth; sibling owner `I-20260401-1303-A-2` owns tool policy materialization, project-local versus launch-time config mapping, and the current Codex posture split.
+  - Reusable security-capability follow-ons now materialize separately: `I-20260401-2245-A` covers build artifact exposure/release allowlist audit, and `I-20260401-0115-A` covers supply-chain baseline/install-intake audit.
 - revisit_trigger:
-  - revisit or expand if a current runtime incident shows that one of the proposed baseline domains is still too broad or belongs under an already-active owner issue
+  - reopen only if a remaining baseline domain still lacks a dedicated owner after these split follow-ons, or if a current runtime incident shows the product-level split is still too broad

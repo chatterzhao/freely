@@ -25,6 +25,7 @@ SESSION_EVIDENCE_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/
 source "$SESSION_EVIDENCE_RESOLVER_LIB"
 
 BUILD_ARTIFACT_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-build-artifact-exposure"
+SUPPLY_CHAIN_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-supply-chain-baseline"
 
 usage() {
   cat <<'EOF'
@@ -125,6 +126,15 @@ check_build_artifact_gate_or_fail() {
     return 1
   fi
   bash "$BUILD_ARTIFACT_AUDIT_SCRIPT" --project "$project"
+}
+
+check_supply_chain_gate_or_fail() {
+  local project="$1"
+  if [[ ! -x "$SUPPLY_CHAIN_AUDIT_SCRIPT" ]]; then
+    log_error "supply-chain gate failed: missing audit script $SUPPLY_CHAIN_AUDIT_SCRIPT"
+    exit 1
+  fi
+  bash "$SUPPLY_CHAIN_AUDIT_SCRIPT" --project "$project"
 }
 
 ensure_repo_hooks_enabled_or_fail() {
@@ -3179,6 +3189,19 @@ Rules:
 - Reusable Freely capabilities live under `docs/system/workspace/**` and `bin/**`.
 - Capability docs must not replace this project-level governance file.
 - If this project ships Freely capabilities, consume them from `docs/system/workspace/**` after reading this file.
+EOF
+}
+
+ensure_install_lifecycle_allowlist_file() {
+  local project="$1"
+  local allowlist_file="$project/docs/system/workspace/install-lifecycle-allowlist.txt"
+  [[ -f "$allowlist_file" ]] && return 0
+
+  mkdir -p "$(dirname "$allowlist_file")"
+  cat >"$allowlist_file" <<'EOF'
+# Repo-scoped allowlist for install-time lifecycle scripts.
+# Keep this empty by default; add exact script names only when an exception is
+# intentionally accepted and separately reviewed.
 EOF
 }
 
@@ -6341,6 +6364,7 @@ cmd_init() {
   require_default_autonomy_activation_consent "$project" "$accept_default_autonomy"
 
   ensure_project_agents_md "$project"
+  ensure_install_lifecycle_allowlist_file "$project"
   ensure_repo_hooks_enabled_or_fail "$project"
   write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_adapter" "$tool_adapter_policy" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$force"
   record_default_autonomy_contract "$project" "$mode" "$FREELY_INIT_CONSENT_STATUS" "$FREELY_INIT_CONSENT_RECORDED_AT" "$FREELY_INIT_CONSENT_RECORDED_VIA"
@@ -7618,6 +7642,7 @@ cmd_doctor() {
   check_hook_gate_or_fail "$project"
   load_config "$project"
   check_execution_boundary_audit_or_fail "$project"
+  check_supply_chain_gate_or_fail "$project"
   check_build_artifact_gate_or_fail "$project"
   echo "project: $project"
   cfg="$(config_file "$project")"

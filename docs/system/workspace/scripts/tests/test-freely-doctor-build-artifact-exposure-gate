@@ -7,7 +7,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 make_project() {
   local project="$1"
-  mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample" "$project/.githooks" "$project/docs/system/workspace" "$project/dist/assets"
+  mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample" "$project/.githooks" "$project/docs/system/workspace" "$project/dist/assets" "$project/.freely/run" "$project/.codex"
   git init -q -b develop "$project"
   git -C "$project" config core.hooksPath .githooks
 
@@ -47,37 +47,78 @@ EOF
 index.html
 assets/*
 EOF
+  cat >"$project/docs/system/workspace/install-lifecycle-allowlist.txt" <<'EOF'
+# empty by default
+EOF
   cat >"$project/dist/index.html" <<'EOF'
 <html></html>
 EOF
   cat >"$project/dist/assets/app.js" <<'EOF'
 console.log("ok");
 EOF
+  cat >"$project/package.json" <<'EOF'
+{
+  "name": "sample",
+  "private": true,
+  "dependencies": {
+    "react": "^18.3.1"
+  }
+}
+EOF
+  cat >"$project/bun.lock" <<'EOF'
+{
+  "lockfileVersion": 1
+}
+EOF
+  cat >"$project/.freely/config.env" <<EOF
+PROJECT_ROOT="$project"
+INTENT_FILE="$project/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$project/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="high"
+AI_TOOL_ADAPTER="direct"
+AI_TOOL_ADAPTER_POLICY="direct"
+AI_CAPABILITY_CODEX_MODEL="gpt-5.4"
+AI_CAPABILITY_CODEX_SANDBOX="workspace-write"
+AI_CAPABILITY_CODEX_APPROVAL_POLICY="never"
+AI_CAPABILITY_CODEX_CWD_MODE="project-root"
+FREELY_ACTIVATION_CONSENT_STATUS="accepted"
+FREELY_ACTIVATION_CONSENT_RECORDED_AT="2026-04-01T00:00:00Z"
+FREELY_ACTIVATION_CONSENT_RECORDED_VIA="test"
+EOF
+  cat >"$project/.codex/config.toml" <<'EOF'
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+[sandbox_workspace_write]
+network_access = false
+EOF
 }
 
 PROJECT="$TMP_DIR/project"
 make_project "$PROJECT"
 
-bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-pass.stdout" 2>"$TMP_DIR/doctor-pass.stderr"
-grep -q 'build artifact audit PASS' "$TMP_DIR/doctor-pass.stderr"
+bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-pass.out" 2>&1
+grep -q 'build artifact audit PASS' "$TMP_DIR/doctor-pass.out"
 
 cat >"$PROJECT/dist/assets/app.js.map" <<'EOF'
 {}
 EOF
-if bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-fail.stdout" 2>"$TMP_DIR/doctor-fail.stderr"; then
+if bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-fail.out" 2>&1; then
   echo "[FAIL] expected doctor to fail on forbidden build artifact" >&2
   exit 1
 fi
-grep -q 'forbidden output artifact assets/app.js.map' "$TMP_DIR/doctor-fail.stderr"
+grep -q 'forbidden output artifact assets/app.js.map' "$TMP_DIR/doctor-fail.out"
 rm -f "$PROJECT/dist/assets/app.js.map"
 
 cat >"$PROJECT/dist/debug.txt" <<'EOF'
 debug
 EOF
-if bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-allow.stdout" 2>"$TMP_DIR/doctor-allow.stderr"; then
+if bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-allow.out" 2>&1; then
   echo "[FAIL] expected doctor to fail on non-allowlisted build artifact" >&2
   exit 1
 fi
-grep -q 'non-allowlisted output artifact debug.txt' "$TMP_DIR/doctor-allow.stderr"
+grep -q 'non-allowlisted output artifact debug.txt' "$TMP_DIR/doctor-allow.out"
 
 echo "[PASS] freely doctor enforces build artifact exposure and release allowlist audit"

@@ -1,4 +1,10 @@
 # 预研头脑风暴索引
+- 20260401-0040--supply-chain-audit-and-install-intake-capability
+  - brainstorms: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/candidates.md
+- 20260401-0115--supply-chain-baseline-and-install-intake-audit-capability
+  - brainstorms: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md
 - 20260401-2354--implementation-decision-notes-in-review-artifacts
   - brainstorms: docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md
@@ -104,6 +110,12 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260401-0040--supply-chain-audit-and-install-intake-capability
+  - brainstorms: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/candidates.md
+- 20260401-0115--supply-chain-baseline-and-install-intake-audit-capability
+  - brainstorms: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md
 - 20260401-2354--implementation-decision-notes-in-review-artifacts
   - brainstorms: docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md

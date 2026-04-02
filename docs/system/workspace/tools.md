@@ -50,6 +50,7 @@
 ## Runtime Security Review Note
 
 - Freely runtime 现在开始显式暴露 project-local security review truth，但这一层仍然是 advisory capability，不是新的 launch blocker。
+- `freely doctor` 现在也承接 machine-enforced baseline security audit slices，而不只靠人工记忆；当前已 canonical 的自动化 slice 包括 execution-boundary audit、build artifact exposure audit、以及 supply-chain/install-intake baseline audit。
 - 当前 canonical truth 是：
   - `FREELY_SECURITY_REVIEW_POLICY` 表示项目希望如何触发内部安全评审，首批默认值为 `advisory-on-high-risk-or-uncertainty`
   - `FREELY_SECURITY_REVIEW_SCOPE` 表示当前冻结的 review scope，首批默认值为 `execution-boundary-and-reviewer-support`

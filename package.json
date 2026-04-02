@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && bash bin/check-build-artifact-exposure --project .",
+    "security:supply-chain": "bash bin/check-supply-chain-baseline --project .",
     "typecheck": "tsc --noEmit",
     "rust:preflight": "bash bin/check-rust-toolchain",
     "rust:preflight:test": "bash bin/test-rust-toolchain-preflight",
