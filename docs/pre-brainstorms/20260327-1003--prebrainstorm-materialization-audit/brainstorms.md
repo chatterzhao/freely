@@ -84,27 +84,27 @@
 
 这类条目不是“正常旧档案”。它们仍是 active candidate，却没有进入任何 milestone 可见队列，违反当前 `candidate persistence` 规则。
 
-1. `docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/candidates.md`
+1. `docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/candidates.md`
 - candidates: `C-20260303-001`, `C-20260303-002`
 - current state: `needs_research`，但 `milestone=pending://milestone-binding`
 
-2. `docs/pre-brainstorms/20260304-architecture-backend-first-and-frontend-decoupling/candidates.md`
+2. `docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/candidates.md`
 - candidate: `C-20260304-202`
 - current state: `proposed`，但 `milestone=pending://milestone-binding`
 
-3. `docs/pre-brainstorms/20260304-openclaw-workspace-freely-feasibility/candidates.md`
+3. `docs/pre-brainstorms/20260304-0000--openclaw-workspace-freely-feasibility/candidates.md`
 - candidate: `C-20260304-501`
 - current state: `needs_research`，但 `milestone=pending://milestone-binding`
 
-4. `docs/pre-brainstorms/20260304-research-redo-owner-tool-alignment/candidates.md`
+4. `docs/pre-brainstorms/20260304-0000--research-redo-owner-tool-alignment/candidates.md`
 - candidates: `C-20260304-605`, `C-20260304-607`
 - current state: active candidate 仍未绑定 milestone
 
-5. `docs/pre-brainstorms/20260305-doc-loop-dev-loop-directory-unification/candidates.md`
+5. `docs/pre-brainstorms/20260305-0000--doc-loop-dev-loop-directory-unification/candidates.md`
 - candidate: `C-20260305-803`
 - current state: `needs_research`，但没有正式 milestone queue
 
-6. `docs/pre-brainstorms/20260305-freely-dogfooding-governance-worktree-policy/candidates.md`
+6. `docs/pre-brainstorms/20260305-0000--freely-dogfooding-governance-worktree-policy/candidates.md`
 - candidate: `C-20260305-703`
 - current state: `needs_research`，但没有正式 milestone queue
 

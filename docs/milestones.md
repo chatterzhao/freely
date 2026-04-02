@@ -1082,8 +1082,8 @@ routing_policy:
 - phase_state: `in_pre_brainstorm`
 - priority: P0
 - promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/candidates.md`
+- source_brainstorm: `docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/candidates.md`
 - next_action: 保持在 pre-brainstorm，先把 Ring/SSOT 冲突决议规则与检查点清单收敛成当前治理链可消费的最小 contract
 - revisit_trigger: 当规则契约与检查点清单可以冻结成独立 issue contract 时，重新进入 materialization 判断
 
@@ -1093,8 +1093,8 @@ routing_policy:
 - phase_state: `in_pre_brainstorm`
 - priority: P1
 - promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260303-ai-consistency-closed-loop-freely-alignment/candidates.md`
+- source_brainstorm: `docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/candidates.md`
 - next_action: 保持在 pre-brainstorm，先定义最小独立审查放行边界，再判断是否值得进入正式治理 issue
 - revisit_trigger: 当独立监理 gate 的输入输出、放行条件与 owner 边界可以被冻结成 issue scope 时，重新进入 materialization 判断
 
@@ -1104,8 +1104,8 @@ routing_policy:
 - phase_state: `in_pre_brainstorm`
 - priority: P1
 - promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260304-research-redo-owner-tool-alignment/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260304-research-redo-owner-tool-alignment/candidates.md`
+- source_brainstorm: `docs/pre-brainstorms/20260304-0000--research-redo-owner-tool-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260304-0000--research-redo-owner-tool-alignment/candidates.md`
 - next_action: 保持在 pre-brainstorm，继续判断当前 dispatch metadata、queue/frozen queue 与失败回退是否已足够，还是仍需要独立 batch orchestration owner
 - revisit_trigger: 当并发批次等待、失败回退与审计记录 contract 无法继续由现有 dispatch truth 承接时，重新进入 materialization 判断
 
@@ -1115,8 +1115,8 @@ routing_policy:
 - phase_state: `in_pre_brainstorm`
 - priority: P1
 - promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260305-freely-dogfooding-governance-worktree-policy/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260305-freely-dogfooding-governance-worktree-policy/candidates.md`
+- source_brainstorm: `docs/pre-brainstorms/20260305-0000--freely-dogfooding-governance-worktree-policy/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260305-0000--freely-dogfooding-governance-worktree-policy/candidates.md`
 - next_action: 继续 pre-brainstorm，先判断 CLI-first 配置内核是否已经足够稳定，再决定是否值得补 UI 层
 - revisit_trigger: 当 hook/worktree 约束已有稳定 machine-readable config 面，且确实需要用户可视化治理入口时重新唤起
 
@@ -1505,8 +1505,8 @@ routing_policy:
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260303-cli-orchestration-architecture/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260303-cli-orchestration-architecture/candidates.md`
+- source_brainstorm: `docs/pre-brainstorms/20260303-0000--cli-orchestration-architecture/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260303-0000--cli-orchestration-architecture/candidates.md`
 - evidence: `docs/LAWS.md`, `docs/system/workspace/scripts/runtime/freely`, `docs/system/workspace/scripts/monitor-ai-cli.sh`, `docs/system/workspace/scripts/tests/test-freely-session-rotation`, `bin/test-freely-session-rotation`
 - completion_note: 已把 `resume` 与 `fresh_with_handoff` 区分为显式 runtime 行为，并固定 Codex 默认模型为 `gpt-5.4`、默认 reasoning effort 为 `medium`
 
@@ -1665,8 +1665,8 @@ routing_policy:
 - phase_state: `completed`
 - priority: P1
 - promoted_issue_path: `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
-- source_brainstorm: `docs/pre-brainstorms/20260304-openclaw-workspace-freely-feasibility/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260304-openclaw-workspace-freely-feasibility/candidates.md`
+- source_brainstorm: `docs/pre-brainstorms/20260304-0000--openclaw-workspace-freely-feasibility/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260304-0000--openclaw-workspace-freely-feasibility/candidates.md`
 - completion_note: 这条候选的独立 owner 价值已被后续架构真源吸收；当前 canonical 边界明确 OpenClaw 只是 optional adapter/profile，而不是 Freely 主定义
 
 ## M-20260326-freely-product-architecture
@@ -1820,8 +1820,8 @@ routing_policy:
 - phase_state: `in_pre_brainstorm`
 - priority: P1
 - promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260304-architecture-backend-first-and-frontend-decoupling/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260304-architecture-backend-first-and-frontend-decoupling/candidates.md`
+- source_brainstorm: `docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/candidates.md`
 - next_action: 继续 pre-brainstorm，先判断 frontend probe 当前是否需要真正的多项目工作台，再决定是否 materialize
 - revisit_trigger: 当 frontend/control-surface 确认需要 `activeProject` 隔离、Focus/Overview 与项目级输入隔离 contract 时，重新进入 materialization 判断
 
