@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-recovery-conflicting-recorded-promotion.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+trap 'rm -rf "$TMP_DIR_REAL"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER_A="$WT_ROOT/feature-a"
+WORKER_B="$WT_ROOT/feature-b"
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260324-0000--sample" "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+cd "$PROJECT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m init
+git branch feature/a
+git branch feature/b
+git worktree add "$WORKER_A" feature/a >/dev/null
+git worktree add "$WORKER_B" feature/b >/dev/null
+
+for wt in "$PROJECT" "$WORKER_A" "$WORKER_B"; do
+  mkdir -p "$wt/docs/pre-brainstorms/20260324-0000--sample" "$wt/.freely/run" "$wt/.freely/logs"
+  cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$wt/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$wt/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+  cat >"$wt/AGENTS.md" <<'EOF'
+# Agents
+EOF
+  cat >"$wt/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+  cat >"$wt/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260324-0000--sample
+EOF
+  cat >"$wt/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+  cat >"$wt/docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+  cat >"$wt/docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+done
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+for wt in "$WORKER_A" "$WORKER_B"; do
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+done
+
+cat >"$WORKER_A/.freely/run/prompt-20260402-183000.txt" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$WORKER_A\`
+EOF
+
+cat >"$WORKER_B/.freely/run/prompt-20260402-183100.txt" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$WORKER_B\`
+EOF
+
+cat >"$WORKER_A/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-02T18:30:00Z"
+EOF
+
+cat >"$WORKER_B/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-02T18:31:00Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+START_LOG="$TMP_DIR_REAL/start.log"
+manager_runtime_launch_workers_from_latest_handoff() {
+  echo "0"
+}
+start_workcell_supervisor_async() {
+  printf '%s\n' "$1" >>"$START_LOG"
+  return 0
+}
+
+OUTPUT="$(manager_runtime_recover_workers_if_needed "$PROJECT" 2>&1)"
+RECOVERED="$(printf '%s\n' "$OUTPUT" | tail -n 1)"
+[[ "$RECOVERED" == "0" ]]
+[[ ! -f "$START_LOG" ]]
+grep -q "manager runtime skips expected-running recovery due to ownership conflict" <<<"$OUTPUT"
+if grep -q "manager runtime recovering expected-running worker" <<<"$OUTPUT"; then
+  echo "unexpected recovery log despite conflicting recorded promotion owner" >&2
+  exit 1
+fi
+
+echo "[PASS] manager runtime does not auto-recover a worker that conflicts with a recorded promotion owner"

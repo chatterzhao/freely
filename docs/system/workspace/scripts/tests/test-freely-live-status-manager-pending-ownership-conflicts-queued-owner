@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-manager-pending-ownership-queued-owner.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+trap 'rm -rf "$TMP_DIR_REAL"' EXIT
+
+PROJECT="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+FIRST_WT="$WT_ROOT/feature-first"
+SECOND_WT="$WT_ROOT/feature-second"
+
+mkdir -p "$PROJECT/docs" "$PROJECT/.freely/run/worker-prompts" "$WT_ROOT"
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+git init -q "$PROJECT"
+git -C "$PROJECT" config user.email "test@example.com"
+git -C "$PROJECT" config user.name "Test User"
+cat >"$PROJECT/README.md" <<'EOF'
+# repo
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" branch -m develop
+git -C "$PROJECT" worktree add -q -b feature/first "$FIRST_WT"
+git -C "$PROJECT" worktree add -q -b feature/second "$SECOND_WT"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-02T19:20:00Z"
+EOF
+
+for wt in "$FIRST_WT" "$SECOND_WT"; do
+  mkdir -p "$wt/docs" "$wt/.freely/run"
+  cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$wt/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$wt/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+done
+
+PROMPT_FIRST="$PROJECT/.freely/run/worker-prompts/20260402-192100-worker-first-codex.txt"
+PROMPT_SECOND="$PROJECT/.freely/run/worker-prompts/20260402-192101-worker-second-codex.txt"
+cat >"$PROMPT_FIRST" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$FIRST_WT\`
+
+Branch:
+- \`feature/first\`
+EOF
+cat >"$PROMPT_SECOND" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$SECOND_WT\`
+
+Branch:
+- \`feature/second\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-continuity-20260402-192200.md" <<EOF
+# Manager Continuity
+## Queue
+- lane: \`first-promotion\`
+  - prompt_path: \`$PROMPT_FIRST\`
+- lane: \`second-promotion\`
+  - prompt_path: \`$PROMPT_SECOND\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$PROJECT/.freely/run/manager-continuity-20260402-192200.md"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$PROMPT_FIRST,$PROMPT_SECOND"
+LAST_MANAGER_CONTINUITY_CONSUMED="$PROJECT/.freely/run/manager-continuity-20260402-192200.md"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"
+LAUNCHED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPTS="$PROMPT_FIRST,$PROMPT_SECOND"
+QUEUED_WORKER_PROMPT_BLOCKERS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-04-02T19:22:00Z"
+EOF
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+
+grep -q "manager_pending_ownership_conflicts: queued:feature/second=promotion@I-20260402-0455-A -> develop blocked_by=feature/first@$PROMPT_FIRST state=queued-owner" <<<"$OUTPUT"
+if grep -q "queued:feature/first=promotion@I-20260402-0455-A -> develop blocked_by=" <<<"$OUTPUT"; then
+  echo "[FAIL] first queued prompt must not be marked as blocked by a later queued owner" >&2
+  exit 1
+fi
+
+echo "[PASS] live-status surfaces queued-owner blockers for later duplicate queued prompts"
