@@ -31,5 +31,5 @@
 
 ## Next Action
 
-1. Keep this owner in `in_verification` until it is merged and the first real develop-bound lane uses the new note successfully.
+1. Keep this owner in `in_verification` until a post-gate develop-bound implementation lane uses the new note successfully; lanes merged before `cdb8278` should not be counted retroactively.
 2. Observe whether the initial implementation-bearing path heuristic needs tightening or expansion before adding any stronger enforcement.

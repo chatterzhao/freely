@@ -28,5 +28,6 @@
 ## Notes
 
 - Advisory-only execution-boundary review was already canonical on `develop`; this lane adds the reusable machine-readable brief and evidence-writeback contract rather than reopening product-owner scope.
+- Later draft continuations that attempted to rematerialize the same execution-boundary audit plus `security-review-brief` surface were reviewed post-merge and classified as absorbed duplicates rather than unmet requirements.
 - This slice intentionally keeps reviewer/committee support at brief + skill level; full multi-reviewer runtime orchestration remains follow-on work under the same owner.
 - Broader security automation such as supply-chain, secret/artifact exposure, and remediation remains a follow-on capability split rather than a late scope expansion of this owner.

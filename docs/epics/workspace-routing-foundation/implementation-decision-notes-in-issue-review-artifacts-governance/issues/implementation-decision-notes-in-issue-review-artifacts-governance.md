@@ -109,5 +109,5 @@ Freely 已经在 pre-brainstorm 和 IBM 层解决了“为什么值得做”和�
 
 ## Next
 
-- Keep this owner in `in_verification` until develop merge proves the gate is usable in real develop-bound review flow.
+- Keep this owner in `in_verification` until a post-gate develop-bound implementation lane proves the gate is usable in real review flow; implementation merged before `cdb8278` should not be retroactively counted as that proof.
 - If field usage shows the initial implementation-bearing path detection is too broad or too narrow, follow-on work should adjust the detection boundary without reopening the canonical decision-note surface.
