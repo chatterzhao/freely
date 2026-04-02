@@ -1799,27 +1799,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260308-1244-03`
-- title: Frontend Probe v0
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
-- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: backend bridge blocker 与 embedded terminal attach 缺口都已解除；当前轮已把真实 `Transport=tauri` 的 frontend flow 扩到 `start -> session -> attach -> chat`。下一步先让实现与验证证据合入 `develop`，再决定是否走 `frontend-probe-v0` 的纯治理 closeout
-
-2. `I-20260317-1004`
-- title: Frontend Runtime Baseline for Probe
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P0
-- issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md`
-- source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md`
-- next_action: 这条 baseline 已完成最小 IBM 收敛，但当前不在近程执行窗；先让 `I-20260308-1244-03` / `I-20260317-0332` 消化真实宿主与 bridge 联调成本。若当前 research/merge-prep worktree 只剩这类远期排序项，应先完成 milestone 写回并走 retirement handoff，而不是为了挂住未来 queue 长期保留 worktree。
-
-4. `I-20260317-1003`
+1. `I-20260317-1003`
 - title: Incremental Dogfooding Gate for Backend Increments
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -1892,7 +1872,33 @@ routing_policy:
   - `docs/progress/frontend-probe-dogfooding-loop/p-rust-tauri-probe-bridge-v1.md`
   - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-host-validation-verification.md`
   - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
-- completion_note: Rust/Tauri Probe bridge 的 day-1 contract、真实宿主启动验证、以及真实 `Transport=tauri` 下的最小 `start -> create/resume session -> chat intervention` 闭环已写成 live evidence 并随实现吸收到 `develop`；后续 frontend host integration / UX 收口继续由 active `I-20260308-1244-03` 承接，bridge beyond day-1 subset 若需扩展则另开 lifecycle
+- completion_note: Rust/Tauri Probe bridge 的 day-1 contract、真实宿主启动验证、以及真实 `Transport=tauri` 下的最小 `start -> create/resume session -> chat intervention` 闭环已写成 live evidence 并随实现吸收到 `develop`；其 day-1 下游 frontend host integration / UX 收口随后也已由 `I-20260308-1244-03` 完成，bridge beyond day-1 subset 若需扩展则另开 lifecycle
+
+4. `I-20260308-1244-03`
+- title: Frontend Probe v0
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- evidence:
+  - `docs/progress/frontend-probe-dogfooding-loop/p-frontend-probe-v0.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/code-reviews/20260401-frontend-probe-v0-terminal-attach-validation.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/code-reviews/20260402-frontend-probe-v0-closeout-verification.md`
+- completion_note: Frontend Probe v0 的 day-1 product surface、真实 `Transport=tauri` 下的 `start -> create/resume session -> attach terminal -> chat intervention` 闭环、以及 Recent Activity 的本地时区显示层都已吸收到 `develop`；后续更宽的 frontend UX、multi-project shell 与复用 gate enforcement 若需推进，另开 lifecycle
+
+5. `I-20260317-1004`
+- title: Frontend Runtime Baseline for Probe
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md`
+- source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md`
+- evidence:
+  - `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/code-reviews/20260402-frontend-runtime-baseline-for-probe-absorption-verification.md`
+- completion_note: frontend host entry、renderer mount、runtime injection 与最小 build/test baseline 已被 `frontend-probe-v0` 和 `rust-tauri-probe-bridge-v1` 的真实 develop 实现吸收，因此本 owner 不再作为 parked committed issue 保留；若未来再出现新的宿主/runtime 基线缺口，另开 lifecycle
 
 
 ## M-20260318-url-content-intake-skill-and-wechat-fetch-governance
