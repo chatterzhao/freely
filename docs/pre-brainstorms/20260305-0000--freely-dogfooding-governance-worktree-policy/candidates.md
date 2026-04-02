@@ -1,4 +1,4 @@
-# Candidates - 20260305-freely-dogfooding-governance-worktree-policy
+# Candidates - 20260305-0000--freely-dogfooding-governance-worktree-policy
 
 ## Context
 - Source brainstorm: ./brainstorms.md
