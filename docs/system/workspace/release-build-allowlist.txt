@@ -1,0 +1,4 @@
+# Release-facing files permitted in the current repo build output.
+index.html
+assets/*
+freely-probe-bridge-manifest.json

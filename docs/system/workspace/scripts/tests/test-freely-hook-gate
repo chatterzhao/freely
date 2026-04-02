@@ -74,6 +74,7 @@ bash "$ROOT_DIR/bin/freely" init \
   --intent "$PROJECT_INIT/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT_INIT/docs/CONSTITUTION.md" \
   --ai codex:gpt-5.4:auto \
+  --accept-default-autonomy \
   >"$TMP_DIR/init.stdout" 2>"$TMP_DIR/init.stderr"
 test "$(git -C "$PROJECT_INIT" config --get core.hooksPath)" = ".githooks"
 grep -q '\[INFO\] enabled git hooks:' "$TMP_DIR/init.stdout" || \

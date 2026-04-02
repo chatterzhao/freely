@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-build-artifact-audit.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/dist/assets" "$PROJECT/docs/system/workspace"
+
+cat >"$PROJECT/docs/system/workspace/release-build-allowlist.txt" <<'EOF'
+index.html
+assets/*
+freely-probe-bridge-manifest.json
+EOF
+
+cat >"$PROJECT/dist/index.html" <<'EOF'
+<html></html>
+EOF
+cat >"$PROJECT/dist/assets/app.js" <<'EOF'
+console.log("ok");
+EOF
+cat >"$PROJECT/dist/freely-probe-bridge-manifest.json" <<'EOF'
+{}
+EOF
+
+bash "$ROOT_DIR/bin/check-build-artifact-exposure" --project "$PROJECT" >/dev/null
+
+cat >"$PROJECT/dist/assets/app.js.map" <<'EOF'
+{}
+EOF
+if bash "$ROOT_DIR/bin/check-build-artifact-exposure" --project "$PROJECT" >"$TMP_DIR/stdout-map" 2>"$TMP_DIR/stderr-map"; then
+  echo "[FAIL] expected forbidden source map to fail audit" >&2
+  exit 1
+fi
+grep -q 'forbidden output artifact assets/app.js.map' "$TMP_DIR/stderr-map"
+rm -f "$PROJECT/dist/assets/app.js.map"
+
+cat >"$PROJECT/dist/.env.production" <<'EOF'
+SECRET=value
+EOF
+if bash "$ROOT_DIR/bin/check-build-artifact-exposure" --project "$PROJECT" >"$TMP_DIR/stdout-env" 2>"$TMP_DIR/stderr-env"; then
+  echo "[FAIL] expected forbidden env artifact to fail audit" >&2
+  exit 1
+fi
+grep -q 'forbidden output artifact .env.production' "$TMP_DIR/stderr-env"
+rm -f "$PROJECT/dist/.env.production"
+
+cat >"$PROJECT/dist/notes.txt" <<'EOF'
+debug
+EOF
+if bash "$ROOT_DIR/bin/check-build-artifact-exposure" --project "$PROJECT" >"$TMP_DIR/stdout-allow" 2>"$TMP_DIR/stderr-allow"; then
+  echo "[FAIL] expected non-allowlisted artifact to fail audit" >&2
+  exit 1
+fi
+grep -q 'non-allowlisted output artifact notes.txt' "$TMP_DIR/stderr-allow"
+
+echo "[PASS] build artifact exposure audit rejects forbidden and non-allowlisted output files"
