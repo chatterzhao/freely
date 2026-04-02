@@ -1,6 +1,6 @@
 # Progress: codex-acp-fresh-path-prototype
 
-- issue_id: `I-20260401-2350-A`
+- issue_id: `I-20260401-1545-A-01`
 - title: Codex ACP fresh-path prototype
 - phase_state: `in_verification`
 - runtime_state: `stopped`
