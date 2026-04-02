@@ -7184,7 +7184,7 @@ start_project_runtime() {
       "cycle_log=$cycle_log"
     set +e
     {
-      echo "===== $(date '+%F %T') mode=$mode_name tool=$AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
+      echo "===== $(date '+%F %T %Z') mode=$mode_name tool=$AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
       local workspace_root
       workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
       bash "$workspace_root/scripts/monitor-ai-cli.sh" \

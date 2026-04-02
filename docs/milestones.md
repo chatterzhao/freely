@@ -69,6 +69,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md`
 - next_action: keep this owner in `in_verification` until a post-gate develop-bound implementation lane carries the new issue-bound decision note from start to merge; older security lanes that landed before the gate became canonical do not count as proof.
 
+3. `I-20260402-0540-A`
+- title: Runtime loop log timezone label followthrough governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/candidates.md`
+- next_action: replay the narrow develop-bound merge for the loop log timezone label followthrough, then close the owner with the canonical merge commit and focused regression evidence.
+
 ### completed_issues
 1. `I-20260401-1545-A`
 - title: ACP optional adapter boundary governance
