@@ -24,6 +24,29 @@
   - 这三类 network-local failure 默认不触发 slot rotation 或 cross-tool fallback，而是在当前 `tool + slot` 上执行 bounded retry / cooldown
 - 当前已存在 canonical probe-first / switch-lock / no-launch watchdog truth 的工具仍主要是 `codex`；其他工具现已进入统一 slot inventory / current-slot scheduler，但若缺 probe parity，仍以较弱 readiness contract 参与 slot-first recovery，不能冒充与 Codex 等价。
 
+## Runtime Adapter Note
+
+- Freely runtime 正在把“工具选择”和“adapter 选择”拆成两个独立轴。
+- 当前 canonical truth 是：
+  - `AI_TOOL` 继续表示选中的外部工具
+  - `AI_TOOL_ADAPTER_POLICY` 表示该工具期望采用哪条接入策略，例如 `direct`、`acp`、`prefer_acp_fallback_direct`
+  - `AI_TOOL_ADAPTER` 表示 runtime 依据 policy 和当前支持面解析出的实际 adapter
+  - status / introspection 还会暴露当前工具的 `tool_supported_adapters`，作为当前 runtime 支持矩阵
+- 本阶段所有现有工具的默认 adapter 仍然是 `direct`。
+- 当前 runtime 已冻结一条选择语义：
+  - 同工具重选时，继续保留当前 `AI_TOOL_ADAPTER_POLICY` 和 `AI_TOOL_ADAPTER` truth，不因重写 config 或恢复写回而静默回到默认值
+  - 同工具 mutation 时，继续保留该工具当前 `AI_MODEL` / `AI_REASONING_EFFORT` truth，不因只换 adapter 或重写选择而回到工具默认值
+  - 只有跨工具切换时，才回落到目标工具自己的 default adapter policy，除非显式给出 adapter / policy override
+- 当前显式配置入口包括：
+  - `freely init --tool-adapter <adapter> [--tool-adapter-policy <policy>]`
+  - `freely set-tool --tool <tool> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]`
+- 当前 runtime 对 policy 的解析语义是：
+  - `direct` -> `AI_TOOL_ADAPTER=direct`
+  - `acp` -> `AI_TOOL_ADAPTER=acp`
+  - `prefer_acp_fallback_direct` -> 若该工具存在受支持 ACP path 则取 `acp`，否则解析为 `direct`
+- `acp` 目前只处于 boundary/materialization 阶段，不是已实现 runtime adapter；若配置到未实现 adapter，runtime 应显式 fail fast，而不是静默回退。
+- 后续若新增工具原生支持 ACP，或现有工具出现高质量 ACP bridge，Freely 可以按工具逐个启用 `acp`，但 `direct` 继续是一等路径。
+
 ## Available Tools
 
 ### iflow
@@ -64,6 +87,10 @@
   - resume/auto: `codex exec resume <SESSION_ID> --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
   - fresh_with_handoff/auto: `codex exec --skip-git-repo-check -C <project-root> --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
 - runtime_notes:
+  - current adapter matrix is `direct,acp`; first ACP prototype is intentionally scoped to fresh-path validation, not resume parity.
+  - `adapter=acp` now launches through Freely's one-shot ACP client plus the external `codex-acp` adapter binary; first launch will download the pinned release into the Freely ACP cache unless `FREELY_CODEX_ACP_BIN` overrides it.
+  - current ACP fresh path supports `fresh` / `fresh_with_handoff`; `resume` remains explicitly blocked so ACP does not pretend direct-equivalent session-addressed continuity.
+  - current ACP bridge can auto-answer ACP permission requests in `mode=auto`; `AI_REASONING_EFFORT` does not yet have an ACP-side mapping.
   - Freely treats `codex` as an explicit session-addressed resume tool: canonical continuity target is the concrete `SESSION_ID`, not `resume --last`.
   - Codex posture is now split into two layers on purpose:
     - project-local baseline: `freely init` materializes a project-scoped `.codex/config.toml`; in `auto` mode this baseline now writes `approval_policy = "never"` while keeping `sandbox_mode = "workspace-write"` and `network_access = false` as the recommended local defaults

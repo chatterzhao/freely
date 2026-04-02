@@ -11,6 +11,7 @@ Usage:
   monitor-ai-cli.sh \
     --project <abs_path> \
     --tool <tool> \
+    --tool-adapter <adapter> \
     --model <model_or_empty> \
     --reasoning-effort <effort_or_empty> \
     --tool-capabilities <csv_or_empty> \
@@ -30,6 +31,13 @@ Usage:
 EOF
 }
 
+preflight_error() {
+  local message="$1"
+  [[ -n "$log_file" ]] && printf '%s\n' "$message" >>"$log_file"
+  printf '%s\n' "$message" >&2
+  exit 1
+}
+
 abs_path_or_fail() {
   local p="$1"
   [[ "$p" == /* ]] || {
@@ -41,6 +49,7 @@ abs_path_or_fail() {
 
 project=""
 tool=""
+tool_adapter=""
 model=""
 reasoning_effort=""
 mode=""
@@ -62,6 +71,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
     --tool) tool="${2:-}"; shift 2 ;;
+    --tool-adapter) tool_adapter="${2:-}"; shift 2 ;;
     --model) model="${2:-}"; shift 2 ;;
     --reasoning-effort) reasoning_effort="${2:-}"; shift 2 ;;
     --mode) mode="${2:-}"; shift 2 ;;
@@ -87,17 +97,20 @@ done
   exit 1
 }
 
-[[ -d "$project" ]] || { echo "[ERROR] project not found: $project" >&2; exit 1; }
-[[ -f "$prompt_file" ]] || { echo "[ERROR] prompt file not found: $prompt_file" >&2; exit 1; }
-if [[ "$launch_kind" == "resume" ]] && tool_requires_explicit_resume_target "$tool" && [[ -z "$tool_resume_target" ]]; then
-  echo "[ERROR] $tool resume requires --tool-resume-target" >&2
-  exit 1
-fi
 mkdir -p "$(dirname "$pid_file")" "$(dirname "$log_file")"
+[[ -d "$project" ]] || preflight_error "[ERROR] project not found: $project"
+[[ -f "$prompt_file" ]] || preflight_error "[ERROR] prompt file not found: $prompt_file"
+[[ -n "$tool_adapter" ]] || tool_adapter="$(tool_default_adapter "$tool")"
+if ! tool_adapter_supports_launch_kind "$tool" "$tool_adapter" "$launch_kind"; then
+  preflight_error "[ERROR] launch kind '$launch_kind' is not supported for tool '$tool' with adapter '$tool_adapter' (supported: $(tool_supported_launch_kinds_for_adapter "$tool" "$tool_adapter" | tr '\n' ',' | sed 's/,$//'))"
+fi
+if [[ "$launch_kind" == "resume" ]] && tool_requires_explicit_resume_target "$tool" && [[ -z "$tool_resume_target" ]]; then
+  preflight_error "[ERROR] $tool resume requires --tool-resume-target"
+fi
 
 (
   cd "$project"
-  tool_run_from_prompt_file "$project" "$tool" "$model" "$reasoning_effort" "$mode" "$prompt_file" "$launch_kind" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$debug_log_file" "$claude_session_id" "$tool_resume_target"
+  tool_run_from_prompt_file "$project" "$tool" "$tool_adapter" "$model" "$reasoning_effort" "$mode" "$prompt_file" "$launch_kind" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$debug_log_file" "$claude_session_id" "$tool_resume_target"
 ) >>"$log_file" 2>&1 &
 
 child_pid=$!

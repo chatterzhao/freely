@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-codex-acp-fresh.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+state_file="$TMP_DIR/fake-agent.state"
+fake_agent="$TMP_DIR/fake-codex-acp"
+
+cat >"$fake_agent" <<'EOF'
+#!/usr/bin/env python3
+import json
+import os
+import sys
+
+state_file = os.environ["FAKE_ACP_STATE_FILE"]
+
+def write_state(line):
+    with open(state_file, "a", encoding="utf-8") as fh:
+        fh.write(line + "\n")
+
+def send(message):
+    sys.stdout.write(json.dumps(message, separators=(",", ":")) + "\n")
+    sys.stdout.flush()
+
+def read_message():
+    line = sys.stdin.readline()
+    if not line:
+        raise SystemExit("stdin closed")
+    return json.loads(line)
+
+message = read_message()
+assert message["method"] == "initialize"
+send({
+    "jsonrpc": "2.0",
+    "id": message["id"],
+    "result": {
+        "protocolVersion": 1,
+        "agentCapabilities": {},
+        "agentInfo": {"name": "fake-codex-acp", "version": "test"},
+    },
+})
+
+message = read_message()
+assert message["method"] == "session/new"
+write_state(f"cwd={message['params']['cwd']}")
+send({
+    "jsonrpc": "2.0",
+    "id": message["id"],
+    "result": {
+        "sessionId": "fake-codex-acp-session",
+        "models": {
+            "currentModelId": "default-model",
+            "availableModels": [{"modelId": "gpt-5.4", "name": "gpt-5.4"}],
+        },
+    },
+})
+
+while True:
+    message = read_message()
+    if message["method"] == "session/set_model":
+      write_state(f"set_model={message['params']['modelId']}")
+      send({"jsonrpc": "2.0", "id": message["id"], "result": {}})
+      continue
+    assert message["method"] == "session/prompt"
+    prompt = message["params"]["prompt"][0]["text"]
+    write_state(f"prompt={prompt}")
+    send({
+        "jsonrpc": "2.0",
+        "id": 99,
+        "method": "session/request_permission",
+        "params": {
+            "sessionId": "fake-codex-acp-session",
+            "toolCall": {"toolCallId": "tc-1", "title": "fake write"},
+            "options": [
+                {"optionId": "allow-once", "kind": "allow_once", "name": "Allow once"},
+                {"optionId": "reject-once", "kind": "reject_once", "name": "Reject once"},
+            ],
+        },
+    })
+    permission_response = read_message()
+    write_state(f"permission_outcome={permission_response['result']['outcome']['outcome']}")
+    write_state(f"permission_option={permission_response['result']['outcome'].get('optionId', '')}")
+    send({
+        "jsonrpc": "2.0",
+        "method": "session/update",
+        "params": {
+            "sessionId": "fake-codex-acp-session",
+            "update": {
+                "sessionUpdate": "agent_message_chunk",
+                "content": {"type": "text", "text": "Hello from fake ACP"},
+            },
+        },
+    })
+    send({
+        "jsonrpc": "2.0",
+        "id": message["id"],
+        "result": {"stopReason": "end_turn"},
+    })
+    break
+EOF
+chmod +x "$fake_agent"
+
+run_launch_kind() {
+  local launch_kind="$1"
+  local label="$2"
+  local run_dir="$TMP_DIR/$label"
+  local project_dir="$run_dir/project"
+  local prompt_file="$run_dir/prompt.txt"
+  local pid_file="$run_dir/ai.pid"
+  local log_file="$run_dir/ai.log"
+  mkdir -p "$project_dir"
+  : >"$state_file"
+
+  cat >"$prompt_file" <<EOF
+test prompt for $launch_kind
+EOF
+
+  FAKE_ACP_STATE_FILE="$state_file" FREELY_CODEX_ACP_BIN="$fake_agent" \
+    bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+      --project "$project_dir" \
+      --tool codex \
+      --tool-adapter acp \
+      --model gpt-5.4 \
+      --reasoning-effort medium \
+      --mode auto \
+      --prompt-file "$prompt_file" \
+      --pid-file "$pid_file" \
+      --log-file "$log_file" \
+      --launch-kind "$launch_kind" \
+      >/dev/null
+
+  grep -q '^session id: fake-codex-acp-session$' "$log_file"
+  grep -q 'Hello from fake ACP' "$log_file"
+  grep -q "does not map reasoning_effort='medium' yet" "$log_file"
+  grep -q "^cwd=$project_dir$" "$state_file"
+  grep -q '^set_model=gpt-5.4$' "$state_file"
+  grep -q "^prompt=test prompt for $launch_kind$" "$state_file"
+  grep -q '^permission_outcome=selected$' "$state_file"
+  grep -q '^permission_option=allow-once$' "$state_file"
+}
+
+run_launch_kind fresh fresh
+run_launch_kind fresh_with_handoff fresh-with-handoff
+
+echo "[PASS] codex acp fresh and fresh_with_handoff paths run through the ACP client bridge"
