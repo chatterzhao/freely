@@ -24,6 +24,8 @@ SESSION_EVIDENCE_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/
 }
 source "$SESSION_EVIDENCE_RESOLVER_LIB"
 
+BUILD_ARTIFACT_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-build-artifact-exposure"
+
 usage() {
   cat <<'EOF'
 Usage:
@@ -112,6 +114,15 @@ check_hook_gate_or_fail() {
   fi
 
   log_info "hook gate PASS"
+}
+
+check_build_artifact_gate_or_fail() {
+  local project="$1"
+  if [[ ! -x "$BUILD_ARTIFACT_AUDIT_SCRIPT" ]]; then
+    log_error "build artifact gate failed: missing audit script $BUILD_ARTIFACT_AUDIT_SCRIPT"
+    return 1
+  fi
+  bash "$BUILD_ARTIFACT_AUDIT_SCRIPT" --project "$project"
 }
 
 ensure_repo_hooks_enabled_or_fail() {
@@ -7429,6 +7440,7 @@ cmd_doctor() {
   project="$(resolve_project_or_fail "$project" 1)"
   check_doc_gate_or_fail "$project"
   check_hook_gate_or_fail "$project"
+  check_build_artifact_gate_or_fail "$project"
 }
 
 cmd_chat() {
