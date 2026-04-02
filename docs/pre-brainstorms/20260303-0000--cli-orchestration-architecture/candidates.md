@@ -1,4 +1,4 @@
-# Candidates - 20260303-cli-orchestration-architecture
+# Candidates - 20260303-0000--cli-orchestration-architecture
 
 ## Context
 - Source brainstorm: ./brainstorms.md

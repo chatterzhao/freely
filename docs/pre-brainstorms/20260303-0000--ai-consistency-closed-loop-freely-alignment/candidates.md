@@ -1,4 +1,4 @@
-# Candidates - 20260303-ai-consistency-closed-loop-freely-alignment
+# Candidates - 20260303-0000--ai-consistency-closed-loop-freely-alignment
 
 ## Context
 - Source brainstorm: ./brainstorms.md
