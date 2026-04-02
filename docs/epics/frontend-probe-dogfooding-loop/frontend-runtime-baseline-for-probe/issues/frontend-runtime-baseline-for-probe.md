@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260317-1004`
 - title: Frontend Runtime Baseline for Probe
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `frontend-runtime-baseline-for-probe`
@@ -11,6 +11,8 @@
 - source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
+- pre_tests_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/pre-tests.md`
+- verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
@@ -71,5 +73,10 @@
 
 ## Next
 
-- 当前 issue 已到 `done_ibm`，后续不再继续争论 baseline 边界。
-- 下一步应回到 `I-20260317-1002`，把已定义的 runtime baseline 真正接入 Probe v0，并解除其 `blocked_dev`。
+- 当前 owner 已完成 absorption closeout；后续若 Probe 或其他 frontend shell 再暴露新的宿主/build/runtime 基线缺口，应另开新 lifecycle，而不是重新挂住本 owner。
+
+## Closeout
+
+- 当前 owner 的作用是把 frontend host entry、renderer mount、runtime injection 与最小 build/test baseline 从 `Frontend Probe v0` 中拆出来单独冻结边界。
+- 这些基线现在已经不再停留在 IBM 文档层：`src/frontend_probe_v0/`、`index.html`、`vite.config.ts`、根目录 `package.json` 与 `src-tauri/` 的真实宿主/bridge 路径都已在 `develop` 存在，并被 `I-20260308-1244-03` 与 `I-20260317-0332` 实际消费。
+- 因此本 owner 不再需要继续作为 parked committed issue 占住近程执行窗；它的边界已经被下游实现吸收，当前合适的生命周期动作是 canonical closeout。
