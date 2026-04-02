@@ -59,17 +59,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
 - next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
 
-2. `I-20260401-0115-A`
-- title: Supply-chain baseline and install-intake audit governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md`
-- next_action: keep the narrow supply-chain baseline slice in `in_verification` until develop absorbs the audit script, doctor integration, tests, and closeout writeback.
-
-3. `I-20260401-1308-A`
+2. `I-20260401-1308-A`
 - title: Agent execution safety review and security decision support
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -79,7 +69,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
 - next_action: keep this owner in `in_verification` until the advisory-only boundary and focused runtime evidence are accepted as canonical, then decide whether to merge as-is or split a narrower follow-on for real reviewer runtime
 
-4. `I-20260401-2354-A`
+3. `I-20260401-2354-A`
 - title: Implementation decision notes in issue-bound review artifacts
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -121,6 +111,26 @@ routing_policy:
   - `bun run build`
 - `./bin/governance-check`
 - completion_note: Canonical truth now enforces automation-first release artifact safety: forbidden build outputs and non-allowlisted files fail the audit, `freely doctor` replays that audit when build output exists, and production sourcemaps are explicitly disabled by default in repo builds.
+
+3. `I-20260401-0115-A`
+- title: Supply-chain baseline and install-intake audit governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md`
+- evidence:
+  - `develop` commit `1d082fc`
+  - `docs/progress/workspace-routing-foundation/p-supply-chain-baseline-and-install-intake-audit-governance.md`
+  - `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/code-reviews/20260401-supply-chain-baseline-and-install-intake-audit-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-check-supply-chain-baseline`
+  - `bash docs/system/workspace/scripts/tests/test-freely-doctor-supply-chain-gate`
+  - `bash docs/system/workspace/scripts/tests/test-freely-doctor-execution-boundary-audit`
+  - `bash docs/system/workspace/scripts/tests/test-freely-hook-gate`
+  - `bash docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
+  - `./bin/governance-check`
+- completion_note: Supply-chain baseline is now canonical on `develop`: lockfile presence, disallowed direct dependency intake, explicit install lifecycle allowlist enforcement, mutable workflow pin rejection, and shared `doctor` replay no longer depend on reviewer memory; `freely init` also seeds the repo-scoped lifecycle allowlist so new repos start aligned with the baseline.
 
 3. `I-20260401-1308-A`
 - title: Agent execution safety review and security decision support

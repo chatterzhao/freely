@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-0115-A`
 - title: Supply-chain baseline and install-intake audit governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `supply-chain-baseline-and-install-intake-audit-governance`
@@ -103,3 +103,4 @@ This owner closes that narrow gap without reopening the broader security umbrell
 
 - This owner stays intentionally narrow: baseline lockfile, direct dependency intake, explicit lifecycle allowlist enforcement, workflow pinning, and doctor enforcement only.
 - Follow-on owners should absorb minimum package age, provenance, transitive scanning, and broader remediation rather than stretching this owner into another umbrella.
+- Merged to `develop` via commit `1d082fc`, and closeout writeback now records the owner as completed.
