@@ -20,15 +20,50 @@
 - status: `pending`
 - artifact_ref: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/prd.md`
 
+4. `id: doctor-execution-boundary-audit`
+- requirement: `freely doctor` automatically fails when auto-mode activation consent remains legacy/unknown or when project-level Codex approval posture drifts from Freely policy
+- evidence_level: `script-test`
+- status: `pending`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-doctor-execution-boundary-audit`
+
+5. `id: baseline-status-exposes-audit-truth`
+- requirement: baseline observability exposes execution-boundary audit truth so operators do not need session memory to know whether the current project posture is aligned
+- evidence_level: `script-test`
+- status: `pending`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-baseline-status`
+
+6. `id: live-status-exposes-audit-truth`
+- requirement: live runtime observability exposes execution-boundary audit truth so the active posture is visible without relying on session memory
+- evidence_level: `script-test`
+- status: `pending`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit`
+
+7. `id: security-review-brief-machine-readable`
+- requirement: `freely security-review-brief` emits machine-readable review and committee guidance derived from execution-boundary audit truth
+- evidence_level: `script-test`
+- status: `pending`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-security-review-brief`
+
+8. `id: security-review-skill-materialized`
+- requirement: a reusable product skill exists for consuming the runtime brief and freezing reviewer/committee decision ladder semantics
+- evidence_level: `script-test`
+- status: `pending`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-agent-execution-safety-review-skill`
+
 ## Pre-merge Focused Regression / Smoke
 
 1. acceptance target:
    - IBM artifacts are internally consistent and clearly separate capability owner from product owner
 2. testing layer:
-   - wording / structure review
+   - shell regression
 3. target environment:
    - feature worktree
 4. required evidence:
+   - `bash docs/system/workspace/scripts/tests/test-freely-doctor-execution-boundary-audit`
+   - `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
+   - `bash docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit`
+   - `bash docs/system/workspace/scripts/tests/test-freely-security-review-brief`
+   - `bash docs/system/workspace/scripts/tests/test-agent-execution-safety-review-skill`
    - `./bin/governance-check`
 5. blocker taxonomy:
    - `definition_missing`
@@ -67,9 +102,9 @@
 4. required evidence:
    - follow-on implementation cites this owner
 5. why_not_applicable:
-   - this IBM slice only freezes capability contract; it does not yet ship live runtime behavior
+   - this slice now ships machine-readable runtime brief + skill, but not full multi-reviewer runtime orchestration
 6. replacement_evidence:
-   - stable owner contract exists for the next implementation slice
+   - runtime brief and skill materially freeze reviewer/committee semantics for future orchestration
 
 ## Post-merge End-to-End Dogfood Acceptance
 
@@ -82,6 +117,6 @@
 4. required evidence:
    - follow-on implementation points to this owner for reviewer/committee behavior
 5. why_not_applicable:
-   - this IBM slice does not yet ship the actual skill/runtime helper
+   - this slice ships the first runtime helper + skill, but not full live multi-reviewer execution
 6. replacement_evidence:
-   - issue / prd / pre-tests / tasks define the contract for the next implementation slice
+   - `freely security-review-brief` and `skill:agent-execution-safety-review` provide canonical dogfood entrypoints
