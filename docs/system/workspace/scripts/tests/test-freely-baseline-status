@@ -58,6 +58,12 @@ LAST_TOOL_JSONL_PATH="/tmp/session.jsonl"
 LAST_LAUNCH_KIND="resume"
 LAST_ROTATION_REASON="none"
 CHECKPOINT_DRIFT_STREAK_CURRENT="2"
+LAST_PRIMARY_RATE_LIMIT_RESETS_AT="2026-04-01T03:00:00Z"
+LAST_SECONDARY_RATE_LIMIT_RESETS_AT="2026-04-01T04:00:00Z"
+LAST_SLOT_SWITCH_AT="2026-04-01T05:00:00Z"
+LAST_DELEGATED_CONTINUATION_CONSUMED_AT="2026-04-01T06:00:00Z"
+LAST_RESTART_STORM_SIGNAL_AT="2026-04-01T07:00:00Z"
+LAST_RESTART_STORM_ESCALATED_AT="2026-04-01T08:00:00Z"
 EOF
 
 BASELINE_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")"
@@ -71,6 +77,12 @@ printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'security_review_scope: execution-bou
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'reasoning_effort: high'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'checkpoint_drift_streak: 2'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'activation_consent_recorded_at: 2026.03.31 17:00:00 PDT'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'last_primary_rate_limit_resets_at: 2026.03.31 20:00:00 PDT'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'last_secondary_rate_limit_resets_at: 2026.03.31 21:00:00 PDT'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'last_slot_switch_at: 2026.03.31 22:00:00 PDT'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'last_delegated_continuation_consumed_at: 2026.03.31 23:00:00 PDT'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'last_restart_storm_signal_at: 2026.04.01 00:00:00 PDT'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'last_restart_storm_escalated_at: 2026.04.01 01:00:00 PDT'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'execution_boundary_audit_status: pass'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'execution_boundary_audit_detail: aligned'
 
