@@ -32,6 +32,7 @@ Usage:
   freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--reasoning-effort <effort>] [--accept-default-autonomy] [--force]
   freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
   freely doctor [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
   freely chat [--project <abs_path>] <message>
   freely tui [--project <abs_path>] [--once]
   freely intake chat [--project <abs_path>] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
@@ -45,6 +46,7 @@ Usage:
   freely restart [--project <abs_path>] [--all-projects]
   freely restore-work [--project <abs_path>]
   freely baseline-status [--project <abs_path>]
+  freely security-review-brief [--project <abs_path>]
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]
   freely fleet-status [--project <abs_path>]
@@ -1203,8 +1205,242 @@ freely_codex_boundary_summary_for_loaded_config() {
   printf 'codex_sandbox=%s codex_approval=%s codex_cwd=%s\n' "$sandbox" "$approval" "$cwd"
 }
 
+project_codex_config_value() {
+  local project="$1" key="$2" cfg line
+  cfg="$(project_codex_config_file "$project")"
+  [[ -f "$cfg" ]] || return 1
+  line="$(rg -n "^${key}[[:space:]]*=" "$cfg" -m 1 --no-heading 2>/dev/null | cut -d: -f2- || true)"
+  [[ -n "$line" ]] || return 1
+  line="${line#*=}"
+  line="$(printf '%s' "$line" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+  line="${line#\"}"
+  line="${line%\"}"
+  printf '%s\n' "$line"
+}
+
+freely_execution_boundary_audit_summary_for_loaded_config() {
+  local project="$1"
+  local consent_required consent_status expected_approval codex_cfg actual_approval
+  local warnings=()
+  local failures=()
+
+  consent_required="$(freely_activation_consent_required_for_mode "${AI_MODE:-}")"
+  consent_status="$(freely_activation_consent_status_for_loaded_config)"
+  if [[ "$consent_required" == "true" && "$consent_status" != "accepted" ]]; then
+    failures+=("activation_consent_status=${consent_status}")
+  fi
+
+  if tool_requires_project_codex_config "${AI_TOOL:-}" "${AI_TOOL_CAPABILITIES:-}"; then
+    codex_cfg="$(project_codex_config_file "$project")"
+    if [[ ! -f "$codex_cfg" ]]; then
+      failures+=("missing_project_codex_config")
+    else
+      expected_approval="on-request"
+      [[ "${AI_MODE:-}" == "auto" ]] && expected_approval="never"
+      actual_approval="$(project_codex_config_value "$project" "approval_policy" || true)"
+      if [[ "$actual_approval" != "$expected_approval" ]]; then
+        failures+=("codex_approval_policy=${actual_approval:-missing} expected=${expected_approval}")
+      fi
+      if [[ "$(project_codex_config_value "$project" "sandbox_mode" || true)" != "workspace-write" ]]; then
+        warnings+=("codex_sandbox_mode_drift")
+      fi
+      if [[ "$(project_codex_config_value "$project" "network_access" || true)" != "false" ]]; then
+        warnings+=("codex_network_access_drift")
+      fi
+    fi
+  fi
+
+  if [[ "${#failures[@]}" -gt 0 ]]; then
+    printf 'fail %s\n' "$(IFS='; '; echo "${failures[*]}")"
+    return 0
+  fi
+  if [[ "${#warnings[@]}" -gt 0 ]]; then
+    printf 'warn %s\n' "$(IFS='; '; echo "${warnings[*]}")"
+    return 0
+  fi
+  printf 'pass aligned\n'
+}
+
+freely_execution_boundary_audit_status_for_loaded_config() {
+  local summary="$1"
+  printf '%s\n' "${summary%% *}"
+}
+
+freely_execution_boundary_audit_detail_for_loaded_config() {
+  local summary="$1"
+  case "$summary" in
+    *" "*) printf '%s\n' "${summary#* }" ;;
+    *) printf 'aligned\n' ;;
+  esac
+}
+
+freely_security_review_scope_for_audit_detail() {
+  local detail="${1:-}"
+  local scopes=()
+  [[ "$detail" == *"activation_consent_status="* ]] && scopes+=("activation-consent")
+  [[ "$detail" == *"missing_project_codex_config"* ]] && scopes+=("project-codex-config")
+  [[ "$detail" == *"codex_approval_policy="* ]] && scopes+=("codex-approval-policy")
+  [[ "$detail" == *"codex_sandbox_mode_drift"* ]] && scopes+=("codex-sandbox")
+  [[ "$detail" == *"codex_network_access_drift"* ]] && scopes+=("codex-network-access")
+  if [[ "${#scopes[@]}" -eq 0 ]]; then
+    printf 'execution-boundary\n'
+  else
+    printf '%s\n' "$(IFS=,; echo "${scopes[*]}")"
+  fi
+}
+
+freely_security_review_decision_fields_for_loaded_config() {
+  local project="$1"
+  local audit_summary audit_status audit_detail review_scope
+  local review_mode reviewer_count decision continuation_guidance minimal_risk_state
+
+  audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
+  audit_status="$(freely_execution_boundary_audit_status_for_loaded_config "$audit_summary")"
+  audit_detail="$(freely_execution_boundary_audit_detail_for_loaded_config "$audit_summary")"
+  review_scope="$(freely_security_review_scope_for_audit_detail "$audit_detail")"
+
+  case "$audit_status" in
+    pass)
+      review_mode="none"
+      reviewer_count="0"
+      decision="continue-current-agent"
+      continuation_guidance="continue_current_plan"
+      minimal_risk_state="not-needed"
+      ;;
+    warn)
+      review_mode="single-reviewer"
+      reviewer_count="1"
+      decision="reviewer-guided-continue"
+      continuation_guidance="continue_with_reviewer_guidance"
+      minimal_risk_state="not-needed"
+      ;;
+    fail)
+      review_mode="decision-committee"
+      reviewer_count="2"
+      decision="repair-boundary-before-continue"
+      continuation_guidance="repair_boundary_then_recheck"
+      minimal_risk_state="$(freely_minimal_risk_posture_for_loaded_config)"
+      ;;
+    *)
+      review_mode="single-reviewer"
+      reviewer_count="1"
+      decision="reviewer-guided-continue"
+      continuation_guidance="continue_with_reviewer_guidance"
+      minimal_risk_state="not-needed"
+      ;;
+  esac
+
+  printf '%s|%s|%s|%s|%s|%s|%s\n' \
+    "$review_mode" \
+    "$reviewer_count" \
+    "$review_scope" \
+    "$decision" \
+    "$continuation_guidance" \
+    "$minimal_risk_state" \
+    "$audit_status"
+}
+
+freely_security_review_decision_for_audit_status() {
+  local status="$1"
+  case "$status" in
+    pass) printf 'continue_with_current_agent\n' ;;
+    warn) printf 'add_security_reviewer\n' ;;
+    fail) printf 'form_internal_security_committee\n' ;;
+    *) printf 'review_status_unknown\n' ;;
+  esac
+}
+
+freely_security_review_reviewer_count_for_audit_status() {
+  local status="$1"
+  case "$status" in
+    pass) printf '0\n' ;;
+    warn) printf '1\n' ;;
+    fail) printf '2\n' ;;
+    *) printf '1\n' ;;
+  esac
+}
+
+freely_security_review_scope_for_audit_status() {
+  local status="$1"
+  case "$status" in
+    pass) printf 'none\n' ;;
+    warn) printf 'observed_posture_warning\n' ;;
+    fail) printf 'execution_boundary_mismatch\n' ;;
+    *) printf 'unknown\n' ;;
+  esac
+}
+
+freely_security_review_continuation_guidance_for_audit_status() {
+  local status="$1"
+  case "$status" in
+    pass) printf 'continue_normally\n' ;;
+    warn) printf 'continue_with_reviewer_brief\n' ;;
+    fail) printf 'pause_new_runtime_work_fix_boundary_then_resume\n' ;;
+    *) printf 'collect_more_evidence\n' ;;
+  esac
+}
+
+freely_security_review_minimal_risk_state_for_audit_status() {
+  local status="$1"
+  case "$status" in
+    pass) printf 'aligned_runtime_continue\n' ;;
+    warn) printf 'continue_with_recommended_safeguards\n' ;;
+    fail) printf 'last_resort_safe_stop_until_boundary_aligned\n' ;;
+    *) printf 'last_resort_safe_stop\n' ;;
+  esac
+}
+
+print_security_review_brief() {
+  local project="$1"
+  local audit_summary audit_status audit_detail
+  audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
+  audit_status="$(freely_execution_boundary_audit_status_for_loaded_config "$audit_summary")"
+  audit_detail="$(freely_execution_boundary_audit_detail_for_loaded_config "$audit_summary")"
+
+  echo "project: $project"
+  echo "tool: ${AI_TOOL:-none}"
+  echo "mode: ${AI_MODE:-none}"
+  echo "current_slot: ${CURRENT_TOOL_SLOT:-unavailable}"
+  echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
+  echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
+  echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
+  echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
+  echo "execution_boundary_audit_status: ${audit_status}"
+  echo "execution_boundary_audit_detail: ${audit_detail}"
+  echo "security_review_decision: $(freely_security_review_decision_for_audit_status "$audit_status")"
+  echo "recommended_reviewer_count: $(freely_security_review_reviewer_count_for_audit_status "$audit_status")"
+  echo "recommended_review_scope: $(freely_security_review_scope_for_audit_status "$audit_status")"
+  echo "continuation_guidance: $(freely_security_review_continuation_guidance_for_audit_status "$audit_status")"
+  echo "minimal_risk_state: $(freely_security_review_minimal_risk_state_for_audit_status "$audit_status")"
+  echo "recommended_safeguards: sandbox,container-or-vm,dedicated-device-or-account,restricted-network"
+}
+
+check_execution_boundary_audit_or_fail() {
+  local project="$1"
+  local summary status detail
+  summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
+  status="$(freely_execution_boundary_audit_status_for_loaded_config "$summary")"
+  detail="$(freely_execution_boundary_audit_detail_for_loaded_config "$summary")"
+  echo "execution_boundary_audit_status: $status"
+  echo "execution_boundary_audit_detail: $detail"
+  case "$status" in
+    fail)
+      log_error "execution-boundary audit failed: $detail"
+      return 1
+      ;;
+    warn)
+      log_info "execution-boundary audit WARN: $detail"
+      ;;
+    *)
+      log_info "execution-boundary audit PASS: $detail"
+      ;;
+  esac
+}
+
 print_autonomy_posture_summary() {
   local project="$1"
+  local audit_summary
+  audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
   echo "autonomy_profile: $(freely_autonomy_profile_for_mode "${AI_MODE:-}")"
   echo "interaction_posture: $(freely_interaction_posture_for_mode "${AI_MODE:-}")"
   echo "approval_posture: $(freely_approval_posture_for_mode "${AI_MODE:-}")"
@@ -1213,6 +1449,8 @@ print_autonomy_posture_summary() {
   echo "runtime_decision_posture: internal-ai-escalation-before-stop"
   echo "minimal_risk_posture: last-resort-safe-stop"
   echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
+  echo "execution_boundary_audit_status: $(freely_execution_boundary_audit_status_for_loaded_config "$audit_summary")"
+  echo "execution_boundary_audit_detail: $(freely_execution_boundary_audit_detail_for_loaded_config "$audit_summary")"
   echo "recommended_safeguards: sandbox,container-or-vm,dedicated-device-or-account,restricted-network"
   echo "project: $project"
 }
@@ -7440,7 +7678,23 @@ cmd_doctor() {
   project="$(resolve_project_or_fail "$project" 1)"
   check_doc_gate_or_fail "$project"
   check_hook_gate_or_fail "$project"
+  load_config "$project"
+  check_execution_boundary_audit_or_fail "$project"
   check_build_artifact_gate_or_fail "$project"
+}
+
+cmd_security_review_brief() {
+  local project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  load_config "$project"
+  load_session_state_or_defaults "$project"
+  print_security_review_brief "$project"
 }
 
 cmd_chat() {
@@ -7729,6 +7983,10 @@ cmd_baseline_status() {
   echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
   echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
   echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
+  local execution_boundary_audit_summary
+  execution_boundary_audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
+  echo "execution_boundary_audit_status: $(freely_execution_boundary_audit_status_for_loaded_config "$execution_boundary_audit_summary")"
+  echo "execution_boundary_audit_detail: $(freely_execution_boundary_audit_detail_for_loaded_config "$execution_boundary_audit_summary")"
   echo "codex_capability_model: ${AI_CAPABILITY_CODEX_MODEL:-none}"
   echo "codex_capability_sandbox: ${AI_CAPABILITY_CODEX_SANDBOX:-none}"
   echo "codex_capability_approval_policy: ${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-none}"
@@ -7836,6 +8094,44 @@ cmd_baseline_status() {
   else
     echo "interruption_dispatcher_pid: none"
   fi
+}
+
+cmd_security_review_brief() {
+  local project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  load_config "$project"
+  load_session_state_or_defaults "$project"
+
+  local audit_summary audit_status audit_detail
+  local review_fields review_mode reviewer_count review_scope decision continuation_guidance minimal_risk_state
+  audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
+  audit_status="$(freely_execution_boundary_audit_status_for_loaded_config "$audit_summary")"
+  audit_detail="$(freely_execution_boundary_audit_detail_for_loaded_config "$audit_summary")"
+  review_fields="$(freely_security_review_decision_fields_for_loaded_config "$project")"
+  IFS='|' read -r review_mode reviewer_count review_scope decision continuation_guidance minimal_risk_state _ <<<"$review_fields"
+
+  echo "project: $project"
+  echo "current_tool: ${AI_TOOL:-none}"
+  echo "current_slot: ${CURRENT_TOOL_SLOT:-${LAST_ACTIVE_SLOT:-unavailable}}"
+  echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
+  echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
+  echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
+  echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
+  echo "execution_boundary_audit_status: $audit_status"
+  echo "execution_boundary_audit_detail: $audit_detail"
+  echo "security_review_mode: $review_mode"
+  echo "recommended_reviewer_count: $reviewer_count"
+  echo "recommended_review_scope: $review_scope"
+  echo "security_review_decision: $decision"
+  echo "continuation_guidance: $continuation_guidance"
+  echo "minimal_risk_state: $minimal_risk_state"
+  echo "evidence_writeback_fields: execution_boundary_audit_status,execution_boundary_audit_detail,security_review_mode,recommended_reviewer_count,recommended_review_scope,security_review_decision,continuation_guidance,minimal_risk_state"
 }
 
 cmd_live_status() {
@@ -7996,6 +8292,10 @@ cmd_live_status() {
   echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
   echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
   echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
+  local execution_boundary_audit_summary
+  execution_boundary_audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
+  echo "execution_boundary_audit_status: $(freely_execution_boundary_audit_status_for_loaded_config "$execution_boundary_audit_summary")"
+  echo "execution_boundary_audit_detail: $(freely_execution_boundary_audit_detail_for_loaded_config "$execution_boundary_audit_summary")"
   echo "intake_active_items: $(count_active_intake_items "$project")"
   echo "intake_classified_items: $(count_intake_items_by_status "$project" "classified")"
   echo "intake_delegated_items: $(count_intake_items_by_status "$project" "delegated")"
@@ -8349,6 +8649,7 @@ main() {
     init) cmd_init "$@" ;;
     set-tool) cmd_set_tool "$@" ;;
     doctor) cmd_doctor "$@" ;;
+    security-review-brief) cmd_security_review_brief "$@" ;;
     chat) cmd_chat "$@" ;;
     tui) cmd_tui "$@" ;;
     intake)
@@ -8369,6 +8670,7 @@ main() {
     restart) cmd_restart "$@" ;;
     restore-work) cmd_restore_work "$@" ;;
     baseline-status) cmd_baseline_status "$@" ;;
+    security-review-brief) cmd_security_review_brief "$@" ;;
     status) cmd_status "$@" ;;
     live-status) cmd_live_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;

@@ -38,6 +38,7 @@
 - `skill:watchdog-control-plane` -> `watchdog-control-plane/SKILL.md`
 - `skill:continuity-watchdog` -> `continuity-watchdog/SKILL.md`
 - `skill:ai-cli-availability-manager` -> `ai-cli-availability-manager/SKILL.md`
+- `skill:agent-execution-safety-review` -> `agent-execution-safety-review/SKILL.md`
 - `skill:human-interruption-handling` -> `human-interruption-handling/SKILL.md`
 - `skill:human-interruption-direct-answer` -> `human-interruption-direct-answer/SKILL.md`
 - `skill:human-interruption-manager-triage` -> `human-interruption-manager-triage/SKILL.md`
@@ -45,6 +46,7 @@
 - `skill:url-content-intake` -> `url-content-intake/SKILL.md`
 - `skill:mem9-continuity-bridge` -> `mem9-continuity-bridge/SKILL.md`
 - `skill:tool-cc-codex-mcp-runtime` -> `tool-cc-codex-mcp-runtime/SKILL.md`
+- `skill:agent-execution-safety-review` -> `agent-execution-safety-review/SKILL.md`
 
 执行顺序（默认）：
 1. `constitution-guard`（预检门禁）

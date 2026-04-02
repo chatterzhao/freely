@@ -17,6 +17,7 @@
 - 主管角色在三个 loop 中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
   - `skill:watchdog-control-plane`
   - `skill:continuity-watchdog`
+  - `skill:agent-execution-safety-review`
 
 ## 职责
 
