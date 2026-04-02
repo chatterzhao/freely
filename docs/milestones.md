@@ -58,6 +58,16 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
 - next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
+
+2. `I-20260401-0115-A`
+- title: Supply-chain baseline and install-intake audit governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md`
+- next_action: keep the narrow supply-chain baseline slice in `in_verification` until develop absorbs the audit script, doctor integration, tests, and closeout writeback.
 ### completed_issues
 
 1. `I-20260401-1545-A`
@@ -1683,7 +1693,9 @@ routing_policy:
 
 ### candidate_issues
 
-- none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while wider reusable security capability follow-ons must reopen as new owners instead of being carried implicitly inside this completed split.
+- none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.
+  - `I-20260401-2245-A` owns build artifact exposure and release allowlist audit.
+  - `I-20260401-0115-A` owns supply-chain baseline and install-intake audit.
 
 ## M-20260308-frontend-probe-dogfooding-loop
 
