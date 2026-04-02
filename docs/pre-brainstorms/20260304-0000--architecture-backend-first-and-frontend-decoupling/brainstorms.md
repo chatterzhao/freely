@@ -439,6 +439,6 @@ interface WorkspaceState {
 
 本研究承接以下结论：
 
-- [20260304-openclaw-workspace-freely-feasibility.md](./20260304-openclaw-workspace-freely-feasibility.md)
+- [20260304-0000--openclaw-workspace-freely-feasibility.md](./20260304-0000--openclaw-workspace-freely-feasibility.md)
 
 即：在不改 OpenClaw 源码前提下，可通过配置+workspace 方式承载 Freely 的主要能力；本篇进一步将其产品化路线明确为“后端优先、前后端解耦、前端后置接入”。

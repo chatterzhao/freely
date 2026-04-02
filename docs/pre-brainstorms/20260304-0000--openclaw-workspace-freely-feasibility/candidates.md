@@ -1,4 +1,4 @@
-# Candidates - 20260304-openclaw-workspace-freely-feasibility
+# Candidates - 20260304-0000--openclaw-workspace-freely-feasibility
 
 ## Context
 - Source brainstorm: ./brainstorms.md

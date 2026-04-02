@@ -16,17 +16,17 @@
 
 架构主文档：
 
-- `docs/pre-brainstorms/20260303-cli-orchestration-architecture/brainstorms.md`
-- `docs/pre-brainstorms/20260304-architecture-backend-first-and-frontend-decoupling/brainstorms.md`
+- `docs/pre-brainstorms/20260303-0000--cli-orchestration-architecture/brainstorms.md`
+- `docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/brainstorms.md`
 - `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/prd.md`
 - `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
 
 第三方生态与扩展研究：
 
-- `docs/pre-brainstorms/20260304-openclaw-workspace-freely-feasibility/brainstorms.md`
-- `docs/pre-brainstorms/20260304-evolver-integration/brainstorms.md`
-- `docs/pre-brainstorms/20260304-evomap-ecosystem-freely/brainstorms.md`
+- `docs/pre-brainstorms/20260304-0000--openclaw-workspace-freely-feasibility/brainstorms.md`
+- `docs/pre-brainstorms/20260304-0000--evolver-integration/brainstorms.md`
+- `docs/pre-brainstorms/20260304-0000--evomap-ecosystem-freely/brainstorms.md`
 
 ## 先给统一结论
 
