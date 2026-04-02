@@ -33,6 +33,9 @@ description: 执行 milestone-owned ready issue 的 AI-native 实现、测试与
    - 依赖父分支 -> 基于 `execution_base`
 5. 在当前 dedicated worktree 中实现变更。
 6. 持续补齐测试、verification evidence 与 code-review 证据。
+7. 若本轮是 develop-bound implementation-bearing 变更，在当前 owner issue 的 `verification_artifact_dir` 下写 implementation decision note。
+   - 最小字段见 [implementation-decision-note.md](references/implementation-decision-note.md)
+   - 不要把这份 note 改写到 `progress`、`prd.md` 或新目录里当成平行真源
 
 ### 情景 B：回写执行进度
 

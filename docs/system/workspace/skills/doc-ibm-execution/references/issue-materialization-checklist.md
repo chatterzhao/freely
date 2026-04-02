@@ -42,6 +42,8 @@ Issue front matter 还应显式绑定：
 
 - `pre_tests_path`
 - `verification_artifact_dir`
+- 若后续会进入 develop-bound implementation materialization，默认约定该目录下的 review / verification artifact 还要承载 `## Implementation Decision Note`
+  - 最小字段：`decision`、`why_this`、`alternatives_considered`、`boundary_non_goals`、`residual_risk`
 
 写完后仍需按 [prd-quality-bar.md](prd-quality-bar.md) 检查 `prd.md` 是否达到 AI-ready 最小结构；未达标时不得宣称 `done_ibm`。
 

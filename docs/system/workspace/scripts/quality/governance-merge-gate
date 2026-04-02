@@ -9,6 +9,35 @@ from typing import Dict, List, Optional, Set
 
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../"))
+IMPLEMENTATION_DECISION_NOTE_FIELDS = (
+    "decision",
+    "why_this",
+    "alternatives_considered",
+    "boundary_non_goals",
+    "residual_risk",
+)
+IMPLEMENTATION_PATH_PREFIXES = (
+    "bin/",
+    "docs/system/",
+    "src/",
+    "apps/",
+    "crates/",
+    "packages/",
+    "frontend/",
+    "gui/",
+    "tui/",
+    "tauri/",
+)
+IMPLEMENTATION_PATH_FILES = {
+    "Cargo.toml",
+    "Cargo.lock",
+    "package.json",
+    "bun.lock",
+    "bun.lockb",
+    "tsconfig.json",
+    "vite.config.ts",
+    "vite.config.js",
+}
 
 
 def git(*args: str) -> str:
@@ -99,6 +128,7 @@ class IssueRecord:
     phase_state: Optional[str]
     milestone: Optional[str]
     source_candidate: Optional[str]
+    verification_artifact_dir: Optional[str]
 
 
 @dataclass
@@ -112,6 +142,7 @@ class ProgressRecord:
 class ReviewRecord:
     path: str
     issue_id: Optional[str]
+    decision_note_fields: Set[str] = field(default_factory=set)
 
 
 def relative_path(path: str) -> str:
@@ -144,6 +175,12 @@ def is_governance_only_path(rel_path: str) -> bool:
     if re.match(r"docs/system/workspace/scripts/tests/test-governance-[^/]+$", rel_path):
         return True
     return False
+
+
+def is_implementation_bearing_path(rel_path: str) -> bool:
+    if rel_path in IMPLEMENTATION_PATH_FILES:
+        return True
+    return rel_path.startswith(IMPLEMENTATION_PATH_PREFIXES)
 
 
 def changed_paths_from_args(args: argparse.Namespace) -> List[str]:
@@ -214,6 +251,7 @@ def parse_issue_file(rel_path: str) -> IssueRecord:
         phase_state=grab("phase_state"),
         milestone=normalize_milestone(grab("milestone")),
         source_candidate=grab("source_candidate"),
+        verification_artifact_dir=grab("verification_artifact_dir"),
     )
 
 
@@ -240,7 +278,18 @@ def parse_review_file(rel_path: str) -> ReviewRecord:
 
     match = re.search(r"^\s*-\s*issue_id:\s*(.+?)\s*$", text, re.MULTILINE)
     issue_id = normalize_scalar(match.group(1)) if match else None
-    return ReviewRecord(path=rel_path, issue_id=issue_id)
+    decision_note_fields: Set[str] = set()
+    section_match = re.search(
+        r"^##\s+Implementation Decision Note\s*$([\s\S]*?)(?=^##\s+|\Z)",
+        text,
+        re.MULTILINE,
+    )
+    if section_match:
+        section = section_match.group(1)
+        for field_name in IMPLEMENTATION_DECISION_NOTE_FIELDS:
+            if re.search(rf"^\s*-\s*{re.escape(field_name)}:\s*(.+?)\s*$", section, re.MULTILINE):
+                decision_note_fields.add(field_name)
+    return ReviewRecord(path=rel_path, issue_id=issue_id, decision_note_fields=decision_note_fields)
 
 
 def parse_milestones() -> List[MilestoneEntry]:
@@ -449,12 +498,14 @@ def main() -> int:
     issue_bound_candidate_ids: Set[str] = set()
     progress_owner_issue_paths: Set[str] = set()
     review_owner_issue_paths: Set[str] = set()
+    owner_issue_records: Dict[str, IssueRecord] = {}
 
     for issue_path in sorted(issue_paths):
         issue = issues_index.get(issue_path)
         if issue and issue.source_candidate:
             issue_bound_evidence.add(issue.issue_id or issue.path)
             issue_bound_issue_paths.add(issue.path)
+            owner_issue_records[issue.path] = issue
             source_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
             if source_candidate:
                 issue_bound_candidate_ids.add(source_candidate.candidate_id)
@@ -477,6 +528,7 @@ def main() -> int:
         issue_bound_evidence.add(owner_issue.issue_id or owner_issue.path)
         issue_bound_issue_paths.add(owner_issue.path)
         progress_owner_issue_paths.add(owner_issue.path)
+        owner_issue_records[owner_issue.path] = owner_issue
         source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
         if not source_candidate:
             errors.append(
@@ -500,6 +552,7 @@ def main() -> int:
         issue_bound_evidence.add(owner_issue.issue_id or owner_issue.path)
         issue_bound_issue_paths.add(owner_issue.path)
         review_owner_issue_paths.add(owner_issue.path)
+        owner_issue_records[owner_issue.path] = owner_issue
         source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
         if not source_candidate:
             errors.append(
@@ -757,6 +810,7 @@ def main() -> int:
                     )
 
     capability_changed_paths = [path for path in changed_paths if not is_governance_only_path(path)]
+    implementation_changed_paths = [path for path in changed_paths if is_implementation_bearing_path(path)]
     if capability_changed_paths:
         capability_owner_phases = {"in_dev", "blocked_dev", "in_verification"}
         for owner_issue_path in sorted(issue_bound_issue_paths):
@@ -784,6 +838,54 @@ def main() -> int:
                     f"{issue.issue_id} in {issue.path} touches capability/implementation changes while in_verification, but the same develop-bound diff carries neither same-line progress nor review evidence. "
                     f"Verification-phase merges must include the concrete verification/progress artifact that justifies the closeout state."
                 )
+
+    if implementation_changed_paths:
+        for owner_issue_path in sorted(issue_bound_issue_paths):
+            owner_issue = owner_issue_records.get(owner_issue_path) or issues_index.get(owner_issue_path)
+            if not owner_issue:
+                continue
+
+            verification_dir = normalize_scalar(owner_issue.verification_artifact_dir or "")
+            if not verification_dir:
+                errors.append(
+                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} owns implementation-bearing changes, but verification_artifact_dir is missing. "
+                    f"Set the canonical review/verification directory on the issue before merging develop-bound implementation work."
+                )
+                continue
+
+            normalized_dir = verification_dir.rstrip("/")
+            owner_reviews = [review for review in review_records if review.path.startswith(f"{normalized_dir}/")]
+            if not owner_reviews:
+                errors.append(
+                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} owns implementation-bearing changes, but no staged review artifact was added under {verification_dir}. "
+                    f"Stage an issue-bound review/verification artifact there and record the implementation decision note."
+                )
+                continue
+
+            complete_review = None
+            for review in owner_reviews:
+                missing_fields = [
+                    field_name
+                    for field_name in IMPLEMENTATION_DECISION_NOTE_FIELDS
+                    if field_name not in review.decision_note_fields
+                ]
+                if not missing_fields:
+                    complete_review = review
+                    break
+
+            if complete_review:
+                continue
+
+            first_review = owner_reviews[0]
+            missing_fields = [
+                field_name
+                for field_name in IMPLEMENTATION_DECISION_NOTE_FIELDS
+                if field_name not in first_review.decision_note_fields
+            ]
+            errors.append(
+                f"{first_review.path} is the staged review artifact for {owner_issue.issue_id or owner_issue.path}, but its implementation decision note is incomplete. "
+                f"Missing fields: {', '.join(missing_fields)}."
+            )
 
     if milestones_changed:
         for entry in milestones:

@@ -69,7 +69,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
 - next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
 
-2. `I-20260401-1308-A`
+3. `I-20260401-1308-A`
 - title: Agent execution safety review and security decision support
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -78,6 +78,16 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
 - next_action: keep this owner in `in_verification` until the advisory-only boundary and focused runtime evidence are accepted as canonical, then decide whether to merge as-is or split a narrower follow-on for real reviewer runtime
+
+4. `I-20260401-2354-A`
+- title: Implementation decision notes in issue-bound review artifacts
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md`
+- next_action: keep this owner in `in_verification` until the merge gate is merged to develop and the first real implementation lane proves the new note contract is usable without parallel truth.
 ### completed_issues
 
 1. `I-20260401-1545-A`
