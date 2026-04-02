@@ -111,5 +111,6 @@ Freely 的产品面已经在收口“默认高自治 + activation consent + 非�
 ## Next
 
 - Advisory-only execution-boundary review is already canonical on `develop`; this lane extends that capability with a reusable runtime brief and writeback contract rather than reopening product-owner scope.
+- Later draft continuations that rematerialize the same execution-boundary audit plus `security-review-brief` surface, including the narrower `2246/2325` follow-on attempts, should be treated as absorbed by this completed owner rather than reopened as parallel ownership.
 - If Freely later needs true multi-reviewer runtime orchestration, it should continue under this owner and consume the same brief keys rather than inventing a second security-review vocabulary.
 - Broader capability families such as artifact exposure, supply-chain review, secret scanning, and incident remediation should continue as dedicated owners rather than widening this owner into another umbrella.
