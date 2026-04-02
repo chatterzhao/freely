@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1545-A`
 - title: ACP optional adapter boundary governance
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `acp-optional-adapter-boundary-governance`
@@ -132,6 +132,6 @@ ACP 预研现在已经有稳定边界：
 
 ## Next
 
-- 当前 ACP 研究已经完成 issue-bound IBM materialization。
+- 当前 ACP 研究已经完成 issue-bound IBM materialization，并已进入同线 dev-loop merge 准备。
 - `I-20260401-1703-A` 已承接第一刀 implementation slice：先抽 `adapter axis`，再为 future ACP prototype 准备 config / dispatch / status truth。
-- 等 `I-20260401-1703-A` 完成后，再决定首个 first-tool ACP prototype target。
+- 当前 follow-on prototype owner 为 `I-20260401-1545-A-01`；本 issue 保持 `in_dev`，直到 develop absorption 完成后再进入 closeout。

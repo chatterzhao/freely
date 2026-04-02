@@ -62,24 +62,24 @@ routing_policy:
 2. `I-20260401-1545-A`
 - title: ACP optional adapter boundary governance
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md`
-- next_action: ACP 的 issue-bound IBM 已完成。`I-20260401-1703-A` 已把 runtime `adapter axis` 抽到可消费状态；当前下一跳是 `I-20260401-2350-A`，用 `codex` 落第一条 ACP fresh-path prototype。
+- next_action: ACP 的 issue-bound IBM 已完成并进入同线 dev-loop merge 准备。`I-20260401-1703-A` 已把 runtime `adapter axis` 抽到可消费状态；当前同线 prototype owner 是 `I-20260401-1545-A-01`，用 `codex` 落第一条 ACP fresh-path prototype。
 
 3. `I-20260401-1703-A`
 - title: Runtime adapter axis and per-tool adapter selection
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/candidates.md`
-- next_action: 这条 owner 的 config / dispatch / status truth 已可供 follow-on owner 消费。下一步转入 `I-20260401-2350-A`，为 `codex` 增加第一条真实 ACP fresh path。
+- next_action: 这条 owner 的 config / dispatch / status truth 已可供 follow-on owner 消费。下一步转入 `I-20260401-1545-A-01`，为 `codex` 增加第一条真实 ACP fresh path。
 
-4. `I-20260401-2350-A`
+4. `I-20260401-1545-A-01`
 - title: Codex ACP fresh-path prototype
 - milestone_state: committed
 - phase_state: `in_verification`
