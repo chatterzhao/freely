@@ -13,4 +13,4 @@
   - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-host-validation-verification.md`
   - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
 - next:
-  - backend bridge owner 已完成 canonical closeout；后续 frontend host integration / UX 收口由 `I-20260308-1244-03` 继续承接，若要扩展到 day-1 之外的 bridge capability，另开 lifecycle
+  - backend bridge owner 已完成 canonical closeout；其 day-1 下游 frontend host integration / UX 收口也已由 `I-20260308-1244-03` 完成。若要扩展到 day-1 之外的 bridge capability，另开 lifecycle

@@ -140,9 +140,9 @@
 - 2026-04-01 当前轮也把验证基线重新回放到最新入口：`bun run typecheck`、`bun run build`、`bun run cargo:check:probe`、`cargo test -p freely-probe-bridge` 再次通过。当前 `I-20260317-0332` 已不再被“真实 Tauri 宿主无法启动”阻塞，生命周期进入 `in_verification`；剩余待写实的验收点只剩真实 `Transport=tauri` 下的最小 start / session create-resume / chat intervention 闭环证据。
 - 2026-04-01 当前轮已把真实 `Transport=tauri` 的最小交互闭环实际打通：新增 `bin/tauri-validate-probe-interactions` 作为 canonical live validation 入口，前端 `useTauriValidationSequence` 在 validation mode 下会真实发出 `ControlRun(start)`、`CreateOrResumeSession`、`SendChatIntervention`，Rust 侧 `validation_report.rs` 会把 snapshot request、command ack、event subset 与 snapshot writeback 记录成结构化 report。实测 `bun run tauri:validate:probe` 已返回 `status=passed`，确认真实 Tauri transport 下最小 start / session create-resume / chat intervention 闭环成立。
 - 2026-04-01 当前轮也顺手收掉了两条真实 seam bug：`TauriProbeAdapter.requestSnapshot()` 现按 Rust 命令参数名传递 `{ payload: { projectId } }`，不再在真实宿主里因为 invoke 参数形状错误而丢失初始 snapshot；validation sequence 则不再把成功与否绑死在前端事件订阅 race 上，而是通过真实 `requestSnapshot` 轮询确认 run/session/chat 写回，确保 live validation 反映的是真 bridge state，而不是 React effect 时序。
-- `I-20260308-1244-03` 继续保持 frontend dev issue 身份，但 backend bridge blocker 现由本 issue 承接，直到真实 bridge 可联调。
+- `I-20260308-1244-03` 曾作为 frontend dev issue 承接本 bridge closeout 之后的 host integration / UX 收口；当前两条 owner 都已完成，后续若要扩展 bridge beyond day-1 subset，应另开新 lifecycle。
 
 ## Closeout
 
 - 当前 owner 已完成 canonical closeout：真实宿主 bring-up 与真实 `Transport=tauri` 最小交互闭环都已取得 live evidence，并已被 `develop` 吸收。
-- 后续 frontier 不再停留在 backend bridge day-1 subset，而是继续由 active `I-20260308-1244-03` 承接 frontend host integration / UX 收口；若要扩展 bridge beyond day-1 subset，另开新 lifecycle。
+- 后续 frontier 不再停留在 backend bridge day-1 subset；相关 frontend host integration / UX day-1 收口已由 `I-20260308-1244-03` 完成 closeout。若要扩展 bridge beyond day-1 subset，另开新 lifecycle。
