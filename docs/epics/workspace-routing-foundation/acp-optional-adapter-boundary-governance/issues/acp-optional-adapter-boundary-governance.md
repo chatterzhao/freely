@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1545-A`
 - title: ACP optional adapter boundary governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `acp-optional-adapter-boundary-governance`
@@ -132,6 +132,6 @@ ACP 预研现在已经有稳定边界：
 
 ## Next
 
-- 当前 ACP 研究已经完成 issue-bound IBM materialization，并已进入同线 dev-loop merge 准备。
-- `I-20260401-1703-A` 已承接第一刀 implementation slice：先抽 `adapter axis`，再为 future ACP prototype 准备 config / dispatch / status truth。
-- 当前 follow-on prototype owner 为 `I-20260401-1545-A-01`；本 issue 保持 `in_dev`，直到 develop absorption 完成后再进入 closeout。
+- `2026-04-01 21:26 PDT` completion: `develop` merge `a0f9a48` absorbed the ACP boundary governance line, so `ACP = optional adapter layer` and `direct = first-class path` are now canonical truth rather than branch-local research.
+- `I-20260401-1703-A` and `I-20260401-1545-A-01` completed the same lifecycle line by materializing the runtime adapter axis and the first Codex ACP fresh-path prototype on top of this boundary.
+- Re-open only if future ACP rollout pressures this boundary to absorb governance concerns that should remain in Freely runtime/lifecycle truth.

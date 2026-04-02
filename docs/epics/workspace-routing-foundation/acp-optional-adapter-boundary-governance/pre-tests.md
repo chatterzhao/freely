@@ -51,3 +51,26 @@
 1. 本轮不执行具体 ACP bridge。
 2. 本轮不要求真实工具端到端测试已经跑通。
 3. 本轮不要求决定最终 first-tool prototype 一定是谁。
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `ACP boundary freezes ACP as optional adapter layer and direct as first-class path`
+- evidence_level: `mock`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+
+### PT-2
+- id: `PT-2`
+- requirement: `issue-bound truth keeps communication concerns in ACP and governance concerns in Freely`
+- evidence_level: `mock`
+- status: `pass`
+- artifact_ref: `docs/progress/workspace-routing-foundation/p-acp-optional-adapter-boundary-governance.md`
+
+### PT-3
+- id: `PT-3`
+- requirement: `follow-on implementation order is frozen before any first-tool ACP prototype`
+- evidence_level: `mock`
+- status: `pass`
+- artifact_ref: `docs/milestones.md`
