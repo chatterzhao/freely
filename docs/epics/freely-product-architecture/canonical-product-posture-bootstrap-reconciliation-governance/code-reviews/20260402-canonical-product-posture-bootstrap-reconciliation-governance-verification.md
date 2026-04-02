@@ -14,6 +14,7 @@ Verify the narrow follow-on that reconciles canonical tracked `.codex/config.tom
 1. Updated tracked `.codex/config.toml` to `approval_policy = "never"` for canonical `auto` posture.
 2. Ran:
    - `./bin/freely init --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation --intent /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation/docs/PROJECT_INTENT.md --constitution /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation/docs/CONSTITUTION.md --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
+   - `bash docs/system/workspace/scripts/tests/test-freely-init-codex-project-config-force`
    - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation`
    - `./bin/freely doctor --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation`
    - `./bin/governance-check`
@@ -27,6 +28,7 @@ Verify the narrow follow-on that reconciles canonical tracked `.codex/config.tom
   - `execution_boundary_audit_status: pass`
   - `execution_boundary_audit_detail: aligned`
 - `freely doctor` exited successfully and reported `execution_boundary_audit_status: pass`
+- focused regression proved that running `freely init` from a sibling feature worktree still writes `writable_roots` back to the canonical `.../freely-worktrees` root instead of a worktree-specific `.../<branch>-worktrees` path
 - `governance-check` passed with legacy naming warnings only
 
 ## Notes

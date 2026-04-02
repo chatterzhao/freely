@@ -311,6 +311,10 @@ project_worktrees_root_for_path() {
   local project="$1"
   local project_parent project_name
   project_parent="$(dirname "$project")"
+  if [[ "$(basename "$project_parent")" == *-worktrees ]]; then
+    echo "$project_parent"
+    return 0
+  fi
   project_name="$(basename "$project")"
   echo "${project_parent}/${project_name}-worktrees"
 }

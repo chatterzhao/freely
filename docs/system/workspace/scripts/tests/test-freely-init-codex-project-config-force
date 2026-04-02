@@ -52,6 +52,9 @@ EOF
 - milestone: pending://milestone-binding
 - session_refs: []
 EOF
+
+  git -C "$project" add .
+  git -C "$project" -c user.name="Freely Test" -c user.email="freely-test@example.com" commit -q -m "Initial test project"
 }
 
 FREELY_HOME="$TMP_DIR/freely-home"
@@ -141,5 +144,23 @@ grep -q '^network_access = false$' "$CODEX_CONFIG_FILE"
 grep -Fq "writable_roots = [\"$PROJECT_WORKTREES_ROOT\"]" "$CODEX_CONFIG_FILE"
 
 printf '%s\n' "$FORCE_OUTPUT" | grep -Fq "initialized: $CONFIG_FILE"
+
+CANONICAL_PROJECT="$TMP_DIR/canonical-project"
+make_project "$CANONICAL_PROJECT"
+CANONICAL_WORKTREES_ROOT="${CANONICAL_PROJECT}-worktrees"
+CANONICAL_WORKTREE="$CANONICAL_WORKTREES_ROOT/20260402-feature-init-proof"
+mkdir -p "$CANONICAL_WORKTREES_ROOT"
+git -C "$CANONICAL_PROJECT" worktree add -q -b feature/init-proof "$CANONICAL_WORKTREE" develop
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --project "$CANONICAL_WORKTREE" \
+  --intent "$CANONICAL_WORKTREE/docs/PROJECT_INTENT.md" \
+  --constitution "$CANONICAL_WORKTREE/docs/CONSTITUTION.md" \
+  --ai codex:gpt-5.4:auto \
+  --accept-default-autonomy \
+  >/dev/null
+
+WORKTREE_CODEX_CONFIG_FILE="$CANONICAL_WORKTREE/.codex/config.toml"
+grep -Fq "writable_roots = [\"$CANONICAL_WORKTREES_ROOT\"]" "$WORKTREE_CODEX_CONFIG_FILE"
 
 echo "[PASS] freely init keeps project config non-destructive by default and rewrites it with --force"

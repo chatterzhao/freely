@@ -33,4 +33,4 @@ sandbox_mode = "workspace-write"
 
 [sandbox_workspace_write]
 network_access = false
-writable_roots = ["/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation-worktrees"]
+writable_roots = ["/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees"]
