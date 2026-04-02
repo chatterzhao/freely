@@ -59,6 +59,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
 - next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
 
+2. `I-20260401-1308-A`
+- title: Agent execution safety review and security decision support
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
+- next_action: keep this owner in `in_verification` until the advisory-only boundary and focused runtime evidence are accepted as canonical, then decide whether to merge as-is or split a narrower follow-on for real reviewer runtime
+
 ### completed_issues
 
 1. `I-20260401-1545-A`
@@ -759,7 +769,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260331-1840-A`. The active owner restores same-tool-first recovery, ordered `AI_FALLBACK_TOOLS` scanning, and explicit all-tools-unavailable waiting truth while keeping per-tool capability gaps explicit.
 - revisit_trigger: Re-open only if the completed ordered-fallback v1 regresses; all-tools unified slot parity now belongs to `C-20260401-0840-A`.
 
-1. `C-20260401-0840-A`
+3. `C-20260401-0840-A`
 - title: Materialize unified slot contract across all runtime tools
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -770,7 +780,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260401-0840-A`. The active owner absorbs unified slot inventory, current-slot truth, generic slot-first scheduling, and earliest tool+slot waiting truth.
 - revisit_trigger: Re-open candidate-level research only if generic slot inventory proves insufficient and a structured auth-material schema is required.
 
-3. `C-20260330-2318-A`
+4. `C-20260330-2318-A`
 - title: Live-status false already-running-attach regression
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -781,7 +791,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260330-2318-A`. The active owner keeps the slice narrow: manager attach reuse now requires a confirmed AI child before writing attach success, while worker attach reuse stays unchanged.
 - revisit_trigger: Re-open candidate-level research only if the manager-only attach gate repair still leaves stale optimistic truth and forces a broader `live-status` or observability redesign.
 
-3. `C-20260327-1115-A`
+5. `C-20260327-1115-A`
 - title: Promote OAuth parallel sweep to canonical slot inventory truth
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -791,7 +801,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md`
 - next_action: 已提升为新的 follow-on issue；后续由 `I-20260327-1115` 承接 issue-bound IBM closeout 与 dev-loop 执行
 
-4. `C-20260323-1435-A`
+6. `C-20260323-1435-A`
 - title: Interactive init bootstrap and fine-grained force/skip governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -802,7 +812,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 `init` 的 step graph、bootstrap commit 豁免边界，以及每个 managed item 的 skip/force contract；在这些边界稳定前，不直接往现有 `init` 继续堆局部 patch
 - revisit_trigger: 当 `init` 的交互入口、repo bootstrap 语义与细粒度 skip/force 输出 contract 可以被冻结成独立 issue scope 时，重新进入 materialization 判断
 
-5. `C-20260318-0715-A`
+7. `C-20260318-0715-A`
 - title: `commit-first after checkpoint-ready` 自治治理
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -813,7 +823,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，先冻结 3 个边界：`checkpoint-ready` 的结构化输出、`LAWS/runtime/checkpoint-guard/supervisor` 的职责分层、以及进入 IBM 前的 promotion gate；在这些边界稳定前不得直接写成 IBM issue 或塞回 `I-20260318-0930`
 - revisit_trigger: 当 `checkpoint-ready` 的结构化输出、supervisor 职责边界与 promotion gate 可以被稳定写成最小 issue contract 时，重新进入 materialization 判断
 
-6. `C-20260319-0402-01`
+8. `C-20260319-0402-01`
 - title: 定义 Freely 的 harness engineering 分层与缺口图
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -824,7 +834,7 @@ routing_policy:
 - next_action: 保持在 pre-brainstorm，先验证 Freely 是否需要一份更明确的 harness 分层与缺口图；若边界稳定，再 materialize 成 issue，而不是直接把外部文章结论塞进现有主线
 - revisit_trigger: 当 harness 分层、缺口图与 Freely 自身的最小吸收面可以冻结成独立 issue contract 时，重新进入 materialization 判断
 
-7. `C-20260319-0402-02`
+9. `C-20260319-0402-02`
 - title: 把 worktree 级验证信号统一暴露成 agent 可消费接口
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -846,8 +856,7 @@ routing_policy:
 - next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize
 - revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
 
-9. `C-20260322-1615-A`
-9. `C-20260401-1545-A`
+10. `C-20260401-1545-A`
 - title: Materialize ACP as an optional adapter boundary between Freely and external code agents
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -858,7 +867,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260401-1545-A`. The issue freezes `ACP = optional adapter layer`, `direct = first-class path`, and the follow-on implementation order: extract adapter axis before any first-tool ACP prototype.
 - revisit_trigger: Re-open candidate-level research only if issue-bound materialization fails to hold a stable ACP adapter boundary, or if ACP no longer fits Freely's external code-agent integration layer.
 
-10. `C-20260401-1703-A`
+11. `C-20260401-1703-A`
 - title: Materialize runtime adapter axis and per-tool adapter selection
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -869,7 +878,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260401-1703-A`. The owner isolates `adapter axis` extraction as the first implementation slice before any ACP bridge work.
 - revisit_trigger: Re-open candidate-level research only if `adapter axis` extraction proves inseparable from a broader runtime redesign, or if the ACP boundary assumptions materially change.
 
-11. `C-20260322-1615-A`
+12. `C-20260322-1615-A`
 - title: Protected post-merge acceptance route and promotion guard governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`

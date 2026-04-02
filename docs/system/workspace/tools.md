@@ -47,6 +47,24 @@
 - `acp` 目前只处于 boundary/materialization 阶段，不是已实现 runtime adapter；若配置到未实现 adapter，runtime 应显式 fail fast，而不是静默回退。
 - 后续若新增工具原生支持 ACP，或现有工具出现高质量 ACP bridge，Freely 可以按工具逐个启用 `acp`，但 `direct` 继续是一等路径。
 
+## Runtime Security Review Note
+
+- Freely runtime 现在开始显式暴露 project-local security review truth，但这一层仍然是 advisory capability，不是新的 launch blocker。
+- 当前 canonical truth 是：
+  - `FREELY_SECURITY_REVIEW_POLICY` 表示项目希望如何触发内部安全评审，首批默认值为 `advisory-on-high-risk-or-uncertainty`
+  - `FREELY_SECURITY_REVIEW_SCOPE` 表示当前冻结的 review scope，首批默认值为 `execution-boundary-and-reviewer-support`
+- 这两个 truth 目前只进入：
+  - project-local config
+  - `freely baseline-status`
+  - `freely live-status`
+  - `freely doctor`
+- 它们当前不直接改变：
+  - launch flags
+  - approval posture
+  - adapter selection
+  - fallback routing
+- 真正的 reviewer / committee runtime 若要 materialize，应以后续 owner 单独承接，而不是在这条 advisory baseline 里偷渡。
+
 ## Available Tools
 
 ### iflow

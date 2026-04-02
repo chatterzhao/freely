@@ -64,6 +64,8 @@ git -C "$PROJECT_DOCTOR" config core.hooksPath .githooks
 bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT_DOCTOR" >"$TMP_DIR/doctor-fixed.stdout" 2>"$TMP_DIR/doctor-fixed.stderr"
 grep -q '\[INFO\] hook gate PASS' "$TMP_DIR/doctor-fixed.stdout" || \
   grep -q '\[INFO\] hook gate PASS' "$TMP_DIR/doctor-fixed.stderr"
+grep -q '^security_review_policy: unavailable-uninitialized$' "$TMP_DIR/doctor-fixed.stdout"
+grep -q '^security_review_scope: unavailable-uninitialized$' "$TMP_DIR/doctor-fixed.stdout"
 
 PROJECT_INIT="$TMP_DIR/project-init"
 FREELY_HOME="$TMP_DIR/freely-home"
@@ -79,5 +81,8 @@ bash "$ROOT_DIR/bin/freely" init \
 test "$(git -C "$PROJECT_INIT" config --get core.hooksPath)" = ".githooks"
 grep -q '\[INFO\] enabled git hooks:' "$TMP_DIR/init.stdout" || \
   grep -q '\[INFO\] enabled git hooks:' "$TMP_DIR/init.stderr"
+bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT_INIT" >"$TMP_DIR/doctor-init.stdout" 2>"$TMP_DIR/doctor-init.stderr"
+grep -q '^security_review_policy: advisory-on-high-risk-or-uncertainty$' "$TMP_DIR/doctor-init.stdout"
+grep -q '^security_review_scope: execution-boundary-and-reviewer-support$' "$TMP_DIR/doctor-init.stdout"
 
 echo "[PASS] freely doctor enforces hook gate and init enables repo hooks"
