@@ -1615,25 +1615,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260401-1303-A`
-- title: Default autonomy activation consent and posture truth governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
-- next_action: keep the product contract owner in `in_verification` until develop merge and post-merge acceptance confirm the canonical autonomy posture truth.
-
-2. `I-20260401-1303-A-2`
-- title: Freely tool autonomy policy materialization governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
-- next_action: keep the first materialization slice in `in_verification` until develop merge and post-merge acceptance confirm the launcher/project-config/tool-doc truth on canonical develop.
+- none right now
 
 ### completed_issues
 
@@ -1665,9 +1647,43 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: Canonical `develop` now matches the already-frozen activation-consent contract on the `cc:auto + adapter=acp` init path; this owner closed as a strict test-only followthrough without reopening runtime semantics or ACP scope.
 
+3. `I-20260401-1303-A`
+- title: Default autonomy activation consent and posture truth governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
+- evidence:
+  - `develop` commit `3f462c6`
+  - `docs/progress/freely-product-architecture/p-default-autonomy-activation-consent-and-tool-policy-governance.md`
+  - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/code-reviews/20260401-default-autonomy-activation-consent-verification.md`
+  - `./bin/governance-check`
+- completion_note: The bounded product contract is now canonical on `develop`: Freely defaults to unattended automatic approval, activation consent is the explicit blocking posture gate, safeguard guidance remains strongly recommended but non-blocking by default, and runtime decision escalation stays AI-first rather than reverting to user step approvals.
+
+4. `I-20260401-1303-A-2`
+- title: Freely tool autonomy policy materialization governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
+- evidence:
+  - `develop` commit `641cb55`
+  - `docs/progress/freely-product-architecture/p-freely-tool-autonomy-policy-materialization-governance.md`
+  - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/code-reviews/20260401-freely-tool-autonomy-policy-materialization-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-codex-project-config-force`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
+  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-cc-args`
+  - `./bin/governance-check`
+- completion_note: The first tool materialization slice is now canonical on `develop`: project-local Codex posture, launch-time auto injection, and Claude/Claude-via-Codex launcher semantics are explicitly separated from the higher-level product contract instead of remaining an implicit split.
+
 ### candidate_issues
 
-- none right now; the 20260401-1303 product-security candidate is now split across `I-20260401-1303-A` and `I-20260401-1303-A-2`
+- none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while wider reusable security capability follow-ons must reopen as new owners instead of being carried implicitly inside this completed split.
 
 ## M-20260308-frontend-probe-dogfooding-loop
 

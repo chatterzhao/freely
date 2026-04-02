@@ -3,7 +3,7 @@
 - issue_id: `I-20260401-1303-A`
 - issue_path: `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
 - title: `Default autonomy activation consent and posture truth governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
 - updated_at: `2026-04-01`
 - summary:
@@ -22,8 +22,9 @@
 
 ## Closure Evidence
 
-- closure_status: `verified-in-feature-lane`
+- closure_status: `merged-and-verified`
 - closure_evidence:
+  - `merge_commit: 3f462c6`
   - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/code-reviews/20260401-default-autonomy-activation-consent-verification.md`
   - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
   - `./bin/governance-check`
