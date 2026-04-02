@@ -59,16 +59,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
 - next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
 
-2. `I-20260401-2245-A`
-- title: Build artifact exposure and release allowlist audit governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/candidates.md`
-- next_action: keep the first automation-first security slice in `in_verification` until develop merge and post-merge acceptance confirm the build artifact audit, allowlist truth, and explicit production sourcemap posture landed cleanly on canonical truth.
-
 ### completed_issues
 
 1. `I-20260401-1545-A`
@@ -84,6 +74,24 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-acp-optional-adapter-boundary-governance.md`
   - `./bin/governance-check`
 - completion_note: ACP adapter boundary is now canonical on `develop`: ACP stays an optional communication-layer adapter, `direct` remains the first-class path, and governance concerns remain in Freely rather than being collapsed into ACP.
+
+2. `I-20260401-2245-A`
+- title: Build artifact exposure and release allowlist audit governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/candidates.md`
+- evidence:
+  - `develop` commit `e085bda`
+  - `docs/progress/workspace-routing-foundation/p-build-artifact-exposure-and-release-allowlist-audit-governance.md`
+  - `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/code-reviews/20260401-build-artifact-exposure-and-release-allowlist-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-build-artifact-exposure-audit`
+  - `bash docs/system/workspace/scripts/tests/test-freely-doctor-build-artifact-exposure-gate`
+  - `bun run build`
+  - `./bin/governance-check`
+- completion_note: Canonical truth now enforces automation-first release artifact safety: forbidden build outputs and non-allowlisted files fail the audit, `freely doctor` replays that audit when build output exists, and production sourcemaps are explicitly disabled by default in repo builds.
 
 2. `I-20260401-1703-A`
 - title: Runtime adapter axis and per-tool adapter selection

@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-2245-A`
 - title: Build artifact exposure and release allowlist audit governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `build-artifact-exposure-and-release-allowlist-audit-governance`
