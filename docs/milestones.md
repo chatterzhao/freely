@@ -59,6 +59,36 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
 - next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
 
+2. `I-20260401-1545-A`
+- title: ACP optional adapter boundary governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md`
+- next_action: ACP 的 issue-bound IBM 已完成。`I-20260401-1703-A` 已把 runtime `adapter axis` 抽到可消费状态；当前下一跳是 `I-20260401-2350-A`，用 `codex` 落第一条 ACP fresh-path prototype。
+
+3. `I-20260401-1703-A`
+- title: Runtime adapter axis and per-tool adapter selection
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/candidates.md`
+- next_action: 这条 owner 的 config / dispatch / status truth 已可供 follow-on owner 消费。下一步转入 `I-20260401-2350-A`，为 `codex` 增加第一条真实 ACP fresh path。
+
+4. `I-20260401-2350-A`
+- title: Codex ACP fresh-path prototype
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md`
+- next_action: 真实环境 `codex + adapter=acp` fresh-path 样本已通过，focused fake ACP coverage 也已补齐 `fresh_with_handoff`；当前只剩 merge/closeout，ACP `resume` parity 不在本 owner 中继续扩。
+
 ### completed_issues
 
 1. `I-20260328-2105-A`
@@ -787,6 +817,29 @@ routing_policy:
 - revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
 
 9. `C-20260322-1615-A`
+9. `C-20260401-1545-A`
+- title: Materialize ACP as an optional adapter boundary between Freely and external code agents
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md`
+- next_action: This candidate is now materialized as `I-20260401-1545-A`. The issue freezes `ACP = optional adapter layer`, `direct = first-class path`, and the follow-on implementation order: extract adapter axis before any first-tool ACP prototype.
+- revisit_trigger: Re-open candidate-level research only if issue-bound materialization fails to hold a stable ACP adapter boundary, or if ACP no longer fits Freely's external code-agent integration layer.
+
+10. `C-20260401-1703-A`
+- title: Materialize runtime adapter axis and per-tool adapter selection
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/candidates.md`
+- next_action: This candidate is now materialized as `I-20260401-1703-A`. The owner isolates `adapter axis` extraction as the first implementation slice before any ACP bridge work.
+- revisit_trigger: Re-open candidate-level research only if `adapter axis` extraction proves inseparable from a broader runtime redesign, or if the ACP boundary assumptions materially change.
+
+11. `C-20260322-1615-A`
 - title: Protected post-merge acceptance route and promotion guard governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
