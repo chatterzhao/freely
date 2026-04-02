@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1308-A`
 - title: Agent execution safety review and security decision support
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `agent-execution-safety-review-and-security-decision-support`
@@ -97,6 +97,6 @@ Freely 的产品面已经在收口“默认高自治 + activation consent + 非�
 
 ## Next
 
-- 这条 issue 先承接 execution-boundary review 和 security decision support。
-- 第一刀 execution slice 保持 advisory-only：只落 project-local policy truth、runtime introspection、workspace skill 和 focused tests，不重写 launch gate / approval gate / fallback gate。
-- 更宽的 capability families，例如 supply-chain、secret/artifact exposure、incident remediation，应由后续 owner 继续拆分，不回灌本 issue 变成另一个 umbrella。
+- `2026-04-01 22:42 PDT` completion: `develop` merge `e72ff86` absorbed the first advisory-only execution-boundary review slice, so project-local security review truth, baseline/live/doctor introspection, and the workspace skill are now canonical rather than branch-local.
+- This owner intentionally stops short of launch blocking, approval posture rewrite, fallback mutation, or real reviewer committee runtime; those remain follow-on work, not missing completion criteria for this slice.
+- Broader capability families such as artifact exposure, supply-chain review, secret scanning, and incident remediation should continue as dedicated owners rather than widening this owner into another umbrella.
