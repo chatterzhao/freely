@@ -33,6 +33,11 @@
      - `observedCommands` 包含 `ControlRun`、`CreateOrResumeSession`、`AttachTerminal`、`SendChatIntervention`
      - `AttachTerminal` ack 为 `terminal attached: freely-run-1:pty-0`
      - attach 后 snapshot `governanceSummary` 包含 `terminal attached to freely-run-1:pty-0`
+6. `bun test src/frontend_probe_v0/timeDisplay.test.ts`
+   - result: passed
+   - evidence:
+     - RFC3339 event timestamps are rendered through host-system local timezone formatting with timezone label
+     - unparseable values still pass through unchanged instead of displaying a fake local time
 
 ## Findings
 
@@ -44,3 +49,11 @@
 
 - `I-20260308-1244-03` 已不再卡在 backend bridge blocker 或 embedded terminal attach 缺口，当前可从 `in_dev` 推进到 `in_verification`
 - 当前轮不要把 owner 提前标成 `completed`；先让实现与验证证据进入 `develop`，再决定是否走纯治理 closeout
+
+## Implementation Decision Note
+
+- decision: `Keep frontend-probe-v0 time rendering narrowly at the display layer by formatting Recent Activity timestamps in the host system timezone, while leaving machine/store timestamps and backup/governance naming truth unchanged.`
+- why_this: `The active user-facing gap is in Probe's Recent Activity readability. Formatting at the display edge fixes that without destabilizing RFC3339/epoch truth, backup naming order, or broader runtime governance semantics.`
+- alternatives_considered: `Considered widening the same patch into ai-cli and watchdog human-readable fields or introducing a repo-wide time-governance owner first. That would mix frontend continuation with broader runtime surfaces before a shared contract and owner boundary are frozen.`
+- boundary_non_goals: `This continuation does not rewrite backup naming to local time, does not change stored event/reset truth away from RFC3339 or epoch values, and does not claim repo-wide timezone unification across CLI, watchdog, and future TUI surfaces.`
+- residual_risk: `Other human-readable runtime surfaces still show mixed timezone conventions. If that inconsistency becomes product-significant, the absorbed pre-brainstorm should be materialized later as a dedicated cross-surface owner rather than extended ad hoc from frontend-probe-v0.`
