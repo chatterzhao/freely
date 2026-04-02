@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260308-1244-03`
 - title: Frontend Probe v0
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `frontend-probe-v0`
@@ -125,8 +125,7 @@
 
 ## Next
 
-- 已进入 `in_verification`，当前最小实现骨架与真实 `AttachTerminal` 交互都已落在 `src/frontend_probe_v0/`。
-- 下一步先把实现与验证证据吸收到 `develop`，再决定是否走纯治理 closeout，而不是回退到范围争论。
+- 当前 owner 已完成 canonical closeout；后续若继续扩大 frontend UX、multi-project workbench 或更高保真 control surface，另开新 lifecycle。
 
 ## Dev Loop
 
@@ -192,4 +191,10 @@
   - reason: `Rust/Tauri Probe Bridge v1` 已完成最小 IBM 收敛，后续应由 `I-20260317-0332` 进入 backend dev-loop 实现
 - unblock_status:
   - `I-20260317-1004` 已完成最小 IBM 收敛，frontend runtime baseline 现已成为可引用依赖
-  - 当前 issue 可从 `in_dev` 推进到 `in_verification`
+  - 当前 issue 不再只是可从 `in_dev` 推进到 `in_verification`；最小 Probe product surface 与真实 Tauri interaction evidence 已被 `develop` 吸收
+
+## Closeout
+
+- 当前 owner 已完成 canonical closeout：`src/frontend_probe_v0/` 的 day-1 product surface、真实 `Transport=tauri` 下的 `start -> create/resume session -> attach terminal -> chat intervention` 证据，以及 Recent Activity 的本地时区显示层收口都已落在 `develop`。
+- `I-20260317-0332` 与 `I-20260317-1004` 的下游依赖都已被消化，不再需要保留 `frontend-probe-v0` 为 active verification owner。
+- 后续如果要继续扩大到更完整 UX、multi-project shell、history/memory surface 或新的 backend increment gate enforcement，应另开新 lifecycle，而不是重新打开本 owner。
