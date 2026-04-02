@@ -3,7 +3,7 @@
 - issue_id: `I-20260401-1831-A`
 - issue_path: `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md`
 - title: `Worker reactivation and local reentry residual runtime governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - updated_at: `2026-04-01`
 - summary:
@@ -22,10 +22,11 @@
 
 ## Closure Evidence
 
-- closure_status: `verified-in-feature-lane`
+- closure_status: `closed`
 - closure_evidence:
   - `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/code-reviews/20260401-worker-reactivation-and-local-reentry-residual-runtime-verification.md`
   - `docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`
   - `docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
   - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
   - `./bin/governance-check`
+  - `develop` commit `e3cce23`

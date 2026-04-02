@@ -49,27 +49,43 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260401-1831-A`
-- title: Worker reactivation and local reentry residual runtime governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
-- next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
-
-2. `I-20260401-2354-A`
+### completed_issues
+1. `I-20260401-2354-A`
 - title: Implementation decision notes in issue-bound review artifacts
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md`
-- next_action: keep this owner in `in_verification` until a post-gate develop-bound implementation lane carries the new issue-bound decision note from start to merge; older security lanes that landed before the gate became canonical do not count as proof.
+- evidence:
+  - `develop` commit `cdb8278`
+  - `develop` merge `5537a7e`
+  - `docs/progress/workspace-routing-foundation/p-implementation-decision-notes-in-issue-review-artifacts-governance.md`
+  - `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+- completion_note: The decision-note gate is now closed on canonical `develop`: implementation-bearing develop-bound diffs require a staged owner review artifact, and the `runtime-loop-log-timezone-label-followthrough` owner provides the first post-gate real proof that the complete note path works end to end.
 
-### completed_issues
+2. `I-20260401-1831-A`
+- title: Worker reactivation and local reentry residual runtime governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
+- evidence:
+  - `develop` commit `e3cce23`
+  - `docs/progress/workspace-routing-foundation/p-worker-reactivation-and-local-reentry-residual-runtime-governance.md`
+  - `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/code-reviews/20260401-worker-reactivation-and-local-reentry-residual-runtime-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`
+  - `bash docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
+  - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+  - `./bin/governance-check`
+- completion_note: The bounded worker residual owner is now closed on canonical `develop`: attach-reuse false-success and local reentry predicate drift are both frozen into runtime truth, and future worker-runtime drift must reopen as narrower follow-on owners instead of lingering in verification.
+
 1. `I-20260402-0540-A`
 - title: Runtime loop log timezone label followthrough governance
 - milestone_state: completed

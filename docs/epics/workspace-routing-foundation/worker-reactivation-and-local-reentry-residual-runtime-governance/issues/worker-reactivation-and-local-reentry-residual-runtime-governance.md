@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1831-A`
 - title: Worker reactivation and local reentry residual runtime governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `worker-reactivation-and-local-reentry-residual-runtime-governance`
@@ -90,3 +90,14 @@
 - 若后续再出现新的 worker-runtime residual 漂移，应另开更窄的 residual follow-on，而不是重新扩大当前 issue。
 
 - 记录或单独吸收旁路 repro，例如 `test-live-status-attach-false-positive-repro`，但它不再属于本 owner 的 closure 前提。
+
+## Closeout
+
+- canonical_merge_target: `develop`
+- canonical_merge_commit: `e3cce23`
+- post_merge_acceptance:
+  - `bash docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`
+  - `bash docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
+  - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+  - `./bin/governance-check`
+- closeout_note: Focused worker-runtime residual verification now holds on canonical `develop`; any future drift should reopen as a narrower follow-on instead of keeping this owner in verification.

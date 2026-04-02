@@ -25,3 +25,13 @@
 - `docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`
 - `docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
 - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+
+## Develop Absorption
+
+- canonical_merge_commit: `e3cce23`
+- canonical_merge_target: `develop`
+- post_merge_replay:
+  - `bash docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`
+  - `bash docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
+  - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+  - `./bin/governance-check`

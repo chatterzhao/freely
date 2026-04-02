@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-2354-A`
 - title: Implementation decision notes in issue-bound review artifacts
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - branch: `feature/review-decision-notes-governance-20260401-2354`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260401-2354-feature-review-decision-notes-governance`
@@ -31,5 +31,15 @@
 
 ## Next Action
 
-1. Keep this owner in `in_verification` until a post-gate develop-bound implementation lane uses the new note successfully; lanes merged before `cdb8278` should not be counted retroactively.
-2. Observe whether the initial implementation-bearing path heuristic needs tightening or expansion before adding any stronger enforcement.
+1. Observe whether the initial implementation-bearing path heuristic needs tightening or expansion before adding any stronger enforcement.
+2. Treat future wording or field-shape refinements as narrower follow-on owners; this canonical landing-surface owner is closed.
+
+## Closure Evidence
+
+- closure_status: `closed`
+- closure_evidence:
+  - `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+  - `develop` merge `5537a7e`

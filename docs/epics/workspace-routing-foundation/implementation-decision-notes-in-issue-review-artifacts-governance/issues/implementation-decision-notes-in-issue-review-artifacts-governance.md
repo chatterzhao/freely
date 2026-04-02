@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-2354-A`
 - title: Implementation decision notes in issue-bound review artifacts
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `implementation-decision-notes-in-issue-review-artifacts-governance`
@@ -109,5 +109,13 @@ Freely 已经在 pre-brainstorm 和 IBM 层解决了“为什么值得做”和�
 
 ## Next
 
-- Keep this owner in `in_verification` until a post-gate develop-bound implementation lane proves the gate is usable in real review flow; implementation merged before `cdb8278` should not be retroactively counted as that proof.
-- If field usage shows the initial implementation-bearing path detection is too broad or too narrow, follow-on work should adjust the detection boundary without reopening the canonical decision-note surface.
+- Observe whether the initial implementation-bearing path detection is too broad or too narrow; if so, reopen as a narrower follow-on without changing the canonical landing surface.
+
+## Closeout
+
+- canonical_merge_target: `develop`
+- gate_commit: `cdb8278`
+- proof_owner: `I-20260402-0540-A`
+- proof_artifact: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
+- post_gate_proof: The `runtime-loop-log-timezone-label-followthrough` owner merged to `develop` after `cdb8278` and its staged review artifact carries a complete `Implementation Decision Note` with all required minimum fields.
+- closeout_note: The canonical gate is no longer waiting on hypothetical future usage; a real post-gate develop-bound owner has already exercised the required note path end to end.

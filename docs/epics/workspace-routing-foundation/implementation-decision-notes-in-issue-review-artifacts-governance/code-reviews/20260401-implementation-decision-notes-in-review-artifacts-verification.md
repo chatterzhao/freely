@@ -30,3 +30,13 @@
 ## Notes
 
 - This owner intentionally keeps the note small and owner-bound. Future field use should tell us whether path detection needs adjustment before any stronger quality heuristics are added.
+
+## Develop Absorption
+
+- gate_commit: `cdb8278`
+- proof_owner: `I-20260402-0540-A`
+- proof_merge_commit: `5537a7e`
+- proof_artifact: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
+- proof_verdict:
+  - post-gate develop-bound implementation lane carried a complete `Implementation Decision Note`
+  - required fields `decision`, `why_this`, `alternatives_considered`, `boundary_non_goals`, and `residual_risk` are all present in the proof artifact

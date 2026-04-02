@@ -19,7 +19,7 @@
 ### AT-3 laws and execution guidance stay aligned
 - id: `decision-note-governance-alignment`
 - requirement: `LAWS, dev-loop execution guidance, and IBM materialization checklist all point to the same canonical landing surface and minimum decision-note fields.`
-- evidence_level: `smoke`
+- evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
 
