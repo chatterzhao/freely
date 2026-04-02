@@ -68,6 +68,16 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md`
 - next_action: keep this owner in `in_verification` until a post-gate develop-bound implementation lane carries the new issue-bound decision note from start to merge; older security lanes that landed before the gate became canonical do not count as proof.
+
+3. `I-20260402-0308-A`
+- title: Runtime human-readable time display governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/candidates.md`
+- next_action: keep this owner in `in_verification` until the runtime/status local-time display contract, tests, and writeback merge to `develop`; `frontend-probe-v0` remains only the Probe slice while this owner absorbs the runtime/status/CLI/watchdog display surfaces.
 ### completed_issues
 
 1. `I-20260401-1545-A`
