@@ -23,3 +23,4 @@
 6. `freely init` now seeds the repo-scoped lifecycle allowlist file, so new repos do not depend on operator memory to satisfy the baseline contract.
 7. Adjacent `doctor` and intake regressions still pass after the new gate, so the slice does not break existing execution-boundary or chat/bootstrap flows.
 8. The slice remains intentionally narrow and does not claim minimum package age, provenance, or transitive vulnerability intelligence.
+9. The implementation is merged on `develop` at commit `1d082fc`.
