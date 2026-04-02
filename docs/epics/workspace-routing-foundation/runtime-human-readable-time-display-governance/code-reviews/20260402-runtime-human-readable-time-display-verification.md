@@ -1,34 +1,43 @@
 # Verification: runtime-human-readable-time-display-governance
 
 - issue_id: `I-20260402-0308-A`
-- reviewer: `codex`
-- verdict: `pass_for_verification`
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
+- verification_date: `2026-04-02`
+- verification_scope: `focused regression + develop writeback replay`
+
+## Verified Outcomes
+
+1. `freely ai status` preserves raw cache refresh truth while also surfacing `refreshed_at_human` in host-local display time.
+2. `freely baseline-status` and `freely live-status` render activation consent and runtime freshness timestamps in host-local time with timezone label.
+3. Intake status renders human-facing `created_at` in host-local time while leaving intake metadata truth on disk unchanged.
+4. `freely develop-push status` and the matching live-status summary render defer timestamps in host-local time with timezone label.
+5. Existing watchdog cooldown behavior continues to emit host-local human-readable reset strings while raw epoch truth stays unchanged.
+6. `develop` commit `af0be7c` is the canonical merge that materializes the runtime/status time display contract.
 
 ## Commands
 
-- `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
-- `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
-- `bash docs/system/workspace/scripts/tests/test-freely-human-chat-intake`
-- `bash docs/system/workspace/scripts/tests/test-freely-live-status`
-- `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
-- `bash docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit`
-- `bash docs/system/workspace/scripts/tests/test-freely-develop-push-status-time-display`
-- `./bin/governance-check`
+```bash
+bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch
+bash docs/system/workspace/scripts/tests/test-freely-baseline-status
+bash docs/system/workspace/scripts/tests/test-freely-human-chat-intake
+bash docs/system/workspace/scripts/tests/test-freely-live-status
+bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending
+bash docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit
+bash docs/system/workspace/scripts/tests/test-freely-develop-push-status-time-display
+./bin/governance-check
+```
 
-## Results
+## Evidence
 
-1. `freely ai status` now preserves raw cache refresh truth and also surfaces `refreshed_at_human` as host-local display time.
-2. `freely baseline-status` and `freely live-status` render activation consent and runtime freshness timestamps in host-local time with timezone label.
-3. Intake status now renders human-facing `created_at` in host-local time while leaving the underlying intake metadata truth untouched.
-4. `freely develop-push status` and the matching live-status summary render defer timestamps in host-local time with timezone label.
-5. Existing watchdog cooldown behavior continues to emit host-local human-readable reset strings while raw epoch truth stays unchanged.
-6. The implementation keeps UTC naming truth and RFC3339/epoch storage truth intact; only display surfaces were reformatted.
+1. Focused regressions passed in the feature lane before merge and replayed on `develop` for `test-freely-live-status` plus the direct `develop-push` status regression.
+2. `freely ai status` now dual-surfaces raw refresh truth and host-local human display without mutating the underlying cache timestamp.
+3. Baseline, live-status, and intake status surfaces now use host-local display timestamps with timezone labels while keeping UTC/RFC3339/epoch truth intact.
+4. `./bin/governance-check` passed on `develop` with only the existing legacy naming warnings.
 
-## Findings
+## Residual Risks
 
-- no_blocking_findings_for_current_scope: `true`
-- residual_gap:
-  - user-selectable timezone preferences and shared formatter parity across future TUI/GUI surfaces remain outside this owner
+1. User-selectable timezone preferences and shared formatter parity across future TUI/GUI surfaces remain outside this owner.
+2. This owner intentionally preserves UTC naming truth and RFC3339/epoch machine truth; future work should not reinterpret it as permission to localize storage or filenames.
 
 ## Implementation Decision Note
 
