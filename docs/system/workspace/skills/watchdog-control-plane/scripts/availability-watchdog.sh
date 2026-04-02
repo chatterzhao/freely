@@ -33,10 +33,10 @@ normalize_codex_slot_name() {
   printf '%s' "$1" | sed 's/\./-/g'
 }
 
-format_epoch_utc() {
+format_epoch_local() {
   local epoch="$1"
   [[ -n "$epoch" ]] || return 1
-  TZ=UTC date -r "$epoch" '+%Y.%m.%d %H:%M:%S UTC' 2>/dev/null || TZ=UTC date -d "@$epoch" '+%Y.%m.%d %H:%M:%S UTC' 2>/dev/null || printf '%s\n' "$epoch"
+  date -r "$epoch" '+%Y.%m.%d %H:%M:%S %Z' 2>/dev/null || date -d "@$epoch" '+%Y.%m.%d %H:%M:%S %Z' 2>/dev/null || printf '%s\n' "$epoch"
 }
 
 codex_active_slot_file() {
@@ -711,7 +711,7 @@ else:
 human = ""
 if reset_at.isdigit() and int(reset_at) > 0:
     from datetime import datetime, timezone
-    human = datetime.fromtimestamp(int(reset_at), timezone.utc).strftime("%Y.%m.%d %H:%M:%S UTC")
+    human = datetime.fromtimestamp(int(reset_at), timezone.utc).astimezone().strftime("%Y.%m.%d %H:%M:%S %Z")
 else:
     human = detail
 
@@ -847,7 +847,7 @@ codex_record_slot_cooldown() {
   [[ -n "$slot" && -n "$reset_at" ]] || return 0
   normalized="$(normalize_codex_slot_name "$slot")"
   # Convert timestamp to human-readable format
-  human_readable="$(format_epoch_utc "$reset_at")"
+  human_readable="$(format_epoch_local "$reset_at")"
   file="$(codex_slot_cooldown_file "$project")"
   mkdir -p "$(dirname "$file")"
   codex_prune_stale_slot_cooldowns "$project"
@@ -1299,7 +1299,7 @@ probe_all_codex_slots_and_update_cooldown() {
         status_icon="⏳"
         status_text="rate_limited"
         local human_time
-        human_time="$(format_epoch_utc "$reset_at")"
+        human_time="$(format_epoch_local "$reset_at")"
         details="resets at $human_time"
         ;;
       subscription_expired)
