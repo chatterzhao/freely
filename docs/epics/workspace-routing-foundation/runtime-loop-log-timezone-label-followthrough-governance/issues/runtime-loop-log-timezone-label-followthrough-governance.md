@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260402-0540-A`
 - title: Runtime loop log timezone label followthrough governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-loop-log-timezone-label-followthrough-governance`
@@ -54,6 +54,15 @@ Because the develop merge gate requires candidate-driven lifecycle evidence even
 - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-cooldown-falls-back-to-active-slot`
 - `./bin/governance-check`
 
+## Completion Status
+
+- canonical_merge_commit: `5537a7e`
+- canonical_merge_target: `develop`
+- post_merge_acceptance:
+  - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-cooldown-falls-back-to-active-slot`
+  - `./bin/governance-check`
+
 ## Next
 
-- After develop absorption, close this owner immediately rather than keeping it as a long-lived runtime family branch.
+- Closed on canonical `develop`.
+- Any future human-readable log-surface drift should reopen as a new narrow followthrough owner rather than widening this one.
