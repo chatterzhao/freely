@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && bash bin/check-build-artifact-exposure --project .",
     "typecheck": "tsc --noEmit",
     "rust:preflight": "bash bin/check-rust-toolchain",
     "rust:preflight:test": "bash bin/test-rust-toolchain-preflight",
