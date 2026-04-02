@@ -60,7 +60,7 @@ LAST_ROTATION_REASON="none"
 CHECKPOINT_DRIFT_STREAK_CURRENT="2"
 EOF
 
-BASELINE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")"
+BASELINE_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")"
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'project: '
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'last_tool_session_id: session-123'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'tool_adapter: direct'
@@ -70,6 +70,7 @@ printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'security_review_policy: advisory-on-
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'security_review_scope: execution-boundary-and-reviewer-support'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'reasoning_effort: high'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'checkpoint_drift_streak: 2'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'activation_consent_recorded_at: 2026.03.31 17:00:00 PDT'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'execution_boundary_audit_status: pass'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'execution_boundary_audit_detail: aligned'
 

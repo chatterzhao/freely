@@ -27,6 +27,24 @@ source "$SESSION_EVIDENCE_RESOLVER_LIB"
 BUILD_ARTIFACT_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-build-artifact-exposure"
 SUPPLY_CHAIN_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-supply-chain-baseline"
 
+format_timestamp_local_for_display() {
+  local value="${1:-}" epoch=""
+  [[ -n "$value" ]] || return 1
+  case "$value" in
+    unknown|unavailable|none) printf '%s\n' "$value"; return 0 ;;
+  esac
+  if [[ "$value" =~ ^[0-9]+$ ]]; then
+    format_epoch_local "$value"
+    return 0
+  fi
+  epoch="$(codex_timestamp_to_epoch "$value" 2>/dev/null || true)"
+  if [[ -n "$epoch" ]]; then
+    format_epoch_local "$epoch"
+    return 0
+  fi
+  printf '%s\n' "$value"
+}
+
 usage() {
   cat <<'EOF'
 Usage:
@@ -2394,7 +2412,7 @@ intake_snapshot_for_project() {
     absorption_target="$(awk -F '"' '/^ABSORPTION_TARGET=/{print $2; exit}' "$meta_file")"
     first_line="$(sed -n '1p' "$message_file" 2>/dev/null || true)"
     printf -- '- id=%s status=%s classification=%s reaction=%s claimed_by=%s author=%s channel=%s created_at=%s linked_artifact=%s absorption_target=%s message=%s\n' \
-      "${intake_id:-unknown}" "${status:-unknown}" "${classification:-unclassified}" "${reaction:-pending}" "${claimed_by:-unclaimed}" "${author:-unknown}" "${channel:-unknown}" "${created_at:-unknown}" "${linked_artifact:-none}" "${absorption_target:-pending}" "${first_line:-}"
+      "${intake_id:-unknown}" "${status:-unknown}" "${classification:-unclassified}" "${reaction:-pending}" "${claimed_by:-unclaimed}" "${author:-unknown}" "${channel:-unknown}" "$(format_timestamp_local_for_display "${created_at:-unknown}")" "${linked_artifact:-none}" "${absorption_target:-pending}" "${first_line:-}"
     count=$((count + 1))
     if (( count >= limit )); then
       break
@@ -6377,7 +6395,7 @@ cmd_init() {
   log_info "initialized: $(config_file "$project")"
   load_config "$project"
   echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
-  echo "activation_consent_recorded_at: $(freely_activation_consent_recorded_at_for_loaded_config)"
+  echo "activation_consent_recorded_at: $(format_timestamp_local_for_display "$(freely_activation_consent_recorded_at_for_loaded_config)")"
   echo "activation_consent_recorded_via: $(freely_activation_consent_recorded_via_for_loaded_config)"
   echo "autonomy_profile: ${FREELY_AUTONOMY_PROFILE:-$(freely_autonomy_profile_for_mode "${AI_MODE:-}")}"
   echo "interaction_posture: ${FREELY_INTERACTION_POSTURE:-$(freely_interaction_posture_for_mode "${AI_MODE:-}")}"
@@ -7950,7 +7968,7 @@ cmd_baseline_status() {
   echo "approval_posture: ${FREELY_APPROVAL_POSTURE:-$(freely_approval_posture_for_mode "${AI_MODE:-}")}"
   echo "activation_consent_required: ${FREELY_ACTIVATION_CONSENT_REQUIRED:-$(freely_activation_consent_required_for_mode "${AI_MODE:-}")}"
   echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
-  echo "activation_consent_recorded_at: $(freely_activation_consent_recorded_at_for_loaded_config)"
+  echo "activation_consent_recorded_at: $(format_timestamp_local_for_display "$(freely_activation_consent_recorded_at_for_loaded_config)")"
   echo "activation_consent_recorded_via: $(freely_activation_consent_recorded_via_for_loaded_config)"
   echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
   echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
@@ -8255,13 +8273,13 @@ cmd_live_status() {
   echo "last_ai_state: $last_ai_state"
   echo "last_exit_reason: $last_exit_reason"
   echo "last_role_hint: $last_role_hint"
-  echo "last_state_updated_at: $last_state_updated_at"
+  echo "last_state_updated_at: $(format_timestamp_local_for_display "$last_state_updated_at")"
   echo "autonomy_profile: ${FREELY_AUTONOMY_PROFILE:-$(freely_autonomy_profile_for_mode "${AI_MODE:-}")}"
   echo "interaction_posture: ${FREELY_INTERACTION_POSTURE:-$(freely_interaction_posture_for_mode "${AI_MODE:-}")}"
   echo "approval_posture: ${FREELY_APPROVAL_POSTURE:-$(freely_approval_posture_for_mode "${AI_MODE:-}")}"
   echo "activation_consent_required: ${FREELY_ACTIVATION_CONSENT_REQUIRED:-$(freely_activation_consent_required_for_mode "${AI_MODE:-}")}"
   echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
-  echo "activation_consent_recorded_at: $(freely_activation_consent_recorded_at_for_loaded_config)"
+  echo "activation_consent_recorded_at: $(format_timestamp_local_for_display "$(freely_activation_consent_recorded_at_for_loaded_config)")"
   echo "activation_consent_recorded_via: $(freely_activation_consent_recorded_via_for_loaded_config)"
   echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
   echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
@@ -8354,7 +8372,7 @@ cmd_live_status() {
   echo "- develop_push_followthrough_ahead: ${develop_push_ahead}"
   echo "- develop_push_followthrough_behind: ${develop_push_behind}"
   echo "- develop_push_followthrough_defer_reason: ${develop_push_defer_reason}"
-  echo "- develop_push_followthrough_defer_updated_at: ${develop_push_defer_updated_at}"
+  echo "- develop_push_followthrough_defer_updated_at: $(format_timestamp_local_for_display "${develop_push_defer_updated_at}")"
 }
 
 cmd_status() {
@@ -8577,7 +8595,7 @@ cmd_develop_push() {
       echo "develop_push_followthrough_ahead: $ahead"
       echo "develop_push_followthrough_behind: $behind"
       echo "develop_push_followthrough_defer_reason: $defer_reason"
-      echo "develop_push_followthrough_defer_updated_at: $defer_updated_at"
+      echo "develop_push_followthrough_defer_updated_at: $(format_timestamp_local_for_display "$defer_updated_at")"
       ;;
     defer)
       if ! develop_push_defer_reason_is_valid "$reason"; then

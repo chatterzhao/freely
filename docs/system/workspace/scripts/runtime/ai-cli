@@ -120,6 +120,36 @@ format_epoch_local() {
   date -r "$epoch" '+%Y.%m.%d %H:%M:%S %Z' 2>/dev/null || date -d "@$epoch" '+%Y.%m.%d %H:%M:%S %Z' 2>/dev/null || printf '%s\n' "$epoch"
 }
 
+format_timestamp_local() {
+  local value="${1:-}" epoch=""
+  [[ -n "$value" ]] || return 1
+  case "$value" in
+    unknown|unavailable|none) printf '%s\n' "$value"; return 0 ;;
+  esac
+  if [[ "$value" =~ ^[0-9]+$ ]]; then
+    format_epoch_local "$value"
+    return 0
+  fi
+  epoch="$(python3 - <<'PY' "$value" 2>/dev/null || true
+from datetime import datetime
+import sys
+
+value = sys.argv[1]
+if value.endswith("Z"):
+    value = value[:-1] + "+00:00"
+try:
+    print(int(datetime.fromisoformat(value).timestamp()))
+except Exception:
+    pass
+PY
+)"
+  if [[ -n "$epoch" ]]; then
+    format_epoch_local "$epoch"
+    return 0
+  fi
+  printf '%s\n' "$value"
+}
+
 notify_freely_auth_change() {
   local tool="$1" slot="${2:-}" reason="${3:-auth_change}"
   local freely_bin
@@ -863,6 +893,7 @@ cmd_status() {
         local deactivated_count=""
         local unknown_count=""
         local cache_refreshed=""
+        local cache_refreshed_human=""
         local earliest_slot=""
         local earliest_reset=""
         local earliest_reset_human=""
@@ -887,11 +918,14 @@ cmd_status() {
           if [[ -n "$earliest_reset" && "$earliest_reset" =~ ^[0-9]+$ && "$earliest_reset" -gt 0 ]]; then
             earliest_reset_human="$(format_epoch_local "$earliest_reset")"
           fi
+          if [[ -n "$cache_refreshed" ]]; then
+            cache_refreshed_human="$(format_timestamp_local "$cache_refreshed")"
+          fi
         fi
         
         case "$FORMAT" in
           json)
-            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"last_modified\": \"$mtime\", \"availability_cache\": {\"present\": $([[ -f "$cache_file" ]] && printf true || printf false), \"usable\": ${usable_count:-0}, \"rate_limited\": ${limited_count:-0}, \"deactivated_workspace\": ${deactivated_count:-0}, \"other\": ${unknown_count:-0}, \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"earliest_reset_at\": ${earliest_reset:-0}, \"earliest_reset_human\": $(json_string_or_null "$earliest_reset_human"), \"refreshed_at\": $(json_string_or_null "$cache_refreshed")}}"
+            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"last_modified\": \"$mtime\", \"availability_cache\": {\"present\": $([[ -f "$cache_file" ]] && printf true || printf false), \"usable\": ${usable_count:-0}, \"rate_limited\": ${limited_count:-0}, \"deactivated_workspace\": ${deactivated_count:-0}, \"other\": ${unknown_count:-0}, \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"earliest_reset_at\": ${earliest_reset:-0}, \"earliest_reset_human\": $(json_string_or_null "$earliest_reset_human"), \"refreshed_at\": $(json_string_or_null "$cache_refreshed"), \"refreshed_at_human\": $(json_string_or_null "$cache_refreshed_human")}}"
             ;;
           *)
             log_info "Tool: codex"
@@ -904,7 +938,7 @@ cmd_status() {
               if [[ -n "$earliest_slot" && -n "$earliest_reset_human" ]]; then
                 log_info "Earliest reset: ${earliest_slot} at ${earliest_reset_human}"
               fi
-              [[ -n "$cache_refreshed" ]] && log_info "Availability cache refreshed: $cache_refreshed"
+              [[ -n "$cache_refreshed_human" ]] && log_info "Availability cache refreshed: $cache_refreshed_human"
             fi
             ;;
         esac

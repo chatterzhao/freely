@@ -28,6 +28,7 @@ AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"
+FREELY_ACTIVATION_CONSENT_RECORDED_AT="2026-03-20T19:47:46Z"
 EOF
 git init -q "$PROJECT"
 git -C "$PROJECT" config user.email "test@example.com"
@@ -174,12 +175,14 @@ printf '%s' "$AI_PID" >"$PROJECT/.freely/run/ai.pid"
 printf '%s' "$WORKER_SUP_PID" >"$WORKER_PROJECT/.freely/run/supervisor.pid"
 printf '%s' "$WORKER_AI_PID" >"$WORKER_PROJECT/.freely/run/ai.pid"
 
-OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
 
 printf '%s\n' "$OUTPUT" | grep -q 'activity_state: ai_active'
 printf '%s\n' "$OUTPUT" | grep -q 'last_supervisor_state: up'
 printf '%s\n' "$OUTPUT" | grep -q 'last_ai_state: up'
 printf '%s\n' "$OUTPUT" | grep -q 'last_exit_reason: none'
+printf '%s\n' "$OUTPUT" | grep -q 'last_state_updated_at: 2026.03.20 12:47:46 PDT'
+printf '%s\n' "$OUTPUT" | grep -q 'activation_consent_recorded_at: 2026.03.20 12:47:46 PDT'
 printf '%s\n' "$OUTPUT" | grep -q "role=supervisor pid=$SUP_PID"
 printf '%s\n' "$OUTPUT" | grep -q "role=interruption_dispatcher pid=$DISPATCH_PID"
 printf '%s\n' "$OUTPUT" | grep -q "role=ai pid=$AI_PID"
@@ -191,6 +194,7 @@ printf '%s\n' "$OUTPUT" | grep -q "latest_manager_continuity_generated: $PROJECT
 printf '%s\n' "$OUTPUT" | grep -q "latest_manager_continuity_consumed: $PROJECT/.freely/run/manager-continuity-20260321-004200.md"
 printf '%s\n' "$OUTPUT" | grep -q 'last_tool_jsonl_path: '
 printf '%s\n' "$OUTPUT" | grep -q 'latest_resolution:'
+printf '%s\n' "$OUTPUT" | grep -q 'created_at=2026.03.20 12:47:46 PDT'
 printf '%s\n' "$OUTPUT" | grep -q "latest_manager_worker_prompts_generated: $QUEUE_PROMPT"
 printf '%s\n' "$OUTPUT" | grep -q 'latest_manager_worker_prompts_consumed: none'
 printf '%s\n' "$OUTPUT" | grep -q 'active_running_worker_count: 1'
