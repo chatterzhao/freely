@@ -1,4 +1,4 @@
-# Candidates - 20260304-research-redo-owner-tool-alignment
+# Candidates - 20260304-0000--research-redo-owner-tool-alignment
 
 ## Context
 - Source brainstorm: ./brainstorms.md

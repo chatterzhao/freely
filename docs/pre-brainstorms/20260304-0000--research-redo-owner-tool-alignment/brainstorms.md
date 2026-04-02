@@ -28,7 +28,7 @@ Freely 的产品身份已经足够清晰：
 
 ## 2. 现有研究复盘（按对齐度）
 
-### A. `20260303-ai-consistency-closed-loop-freely-alignment.md`
+### A. `20260303-0000--ai-consistency-closed-loop-freely-alignment.md`
 
 可保留：
 - Ring/SSOT/自包含/测试围栏/独立监理这些机制，与意图+宪法高度兼容。
@@ -38,7 +38,7 @@ Freely 的产品身份已经足够清晰：
 - 外部文章是社区讨论整理，不是正式规范；可作启发，不可直接当硬标准。
 - 应明确：Freely 的硬标准来源仍是本项目宪法和文档法（LAWS），外部文章仅作设计输入。
 
-### B. `20260303-cli-orchestration-architecture.md`
+### B. `20260303-0000--cli-orchestration-architecture.md`
 
 可保留：
 - CLI 编排、会话恢复、验收先行这些方向正确。
@@ -47,7 +47,7 @@ Freely 的产品身份已经足够清晰：
 - “品味.md”作为中心约束文件容易弱化宪法权威，应该改为“宪法+项目意图+规范文档”的分层输入。
 - 将外部工具当“主要执行体”存在风险：Freely 需要先有自有的治理内核，再决定工具接入边界。
 
-### C. `20260304-evolver-integration.md` 与 `20260304-evomap-ecosystem-freely.md`
+### C. `20260304-0000--evolver-integration.md` 与 `20260304-0000--evomap-ecosystem-freely.md`
 
 结论：**方向可研究，但当前阶段优先级过高且部分事实已过时/不严谨。**
 
