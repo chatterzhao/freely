@@ -56,6 +56,7 @@ cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
 EOF
 
 echo base > README.md
@@ -279,6 +280,7 @@ cat > "$REPO/docs/epics/absorbed/story/issues/owner.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/absorbed/story/code-reviews`
 EOF
 git add docs/pre-brainstorms/absorbed/candidates.md
 
@@ -325,6 +327,7 @@ cat > "$REPO/docs/epics/promoted/story/issues/promoted.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/promoted/candidates.md#c-20260327-2401-a`
+- verification_artifact_dir: `docs/epics/promoted/story/code-reviews`
 EOF
 cat > "$REPO/docs/progress/sample/p-promoted.md" <<'EOF'
 # Progress: promoted
@@ -370,6 +373,7 @@ cat > "$REPO/docs/epics/absorbed/story/issues/owner.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/absorbed/candidates.md#c-20260327-2301-a`
+- verification_artifact_dir: `docs/epics/absorbed/story/code-reviews`
 EOF
 cat > "$REPO/docs/progress/sample/p-owner.md" <<'EOF'
 # Progress: owner
@@ -443,6 +447,7 @@ cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_ibm`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
 EOF
 echo "console.log('ibm');" > "$REPO/src/sample.js"
 git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
@@ -472,6 +477,7 @@ cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
 
 ## note
 
@@ -532,6 +538,7 @@ cat > "$REPO/docs/epics/sample/story/issues/sample-a.md" <<'EOF'
 - phase_state: `in_verification`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
 EOF
 cat > "$REPO/docs/epics/sample/story/issues/sample-b.md" <<'EOF'
 # Issue: sample-b
@@ -540,27 +547,43 @@ cat > "$REPO/docs/epics/sample/story/issues/sample-b.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-b`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
 EOF
 mkdir -p "$REPO/docs/progress/sample"
+mkdir -p "$REPO/docs/epics/sample/story/code-reviews"
 cat > "$REPO/docs/progress/sample/p-sample-a.md" <<'EOF'
 # Progress: sample-a
 
 - issue_id: `I-20260327-2205-A`
 - issue_path: `docs/epics/sample/story/issues/sample-a.md`
 EOF
+cat > "$REPO/docs/epics/sample/story/code-reviews/r-sample-a.md" <<'EOF'
+# Review: sample-a
+
+- issue_id: `I-20260327-2205-A`
+
+## Implementation Decision Note
+
+- decision: `Keep implementation decision notes in the issue-bound review artifact.`
+- why_this: `Verification-phase implementation work should carry the decision in the same artifact that records review evidence.`
+- alternatives_considered: `Relying on progress alone would not capture the chosen implementation path and rejected options.`
+- boundary_non_goals: `This review note does not replace candidate or IBM rationale.`
+- residual_risk: `Path heuristics may still need calibration when more capability roots are added.`
+EOF
 echo "console.log('verification owner');" > "$REPO/src/sample.js"
-git add src/sample.js docs/milestones.md docs/epics/sample/story/issues/sample-a.md docs/progress/sample/p-sample-a.md
+git add src/sample.js docs/milestones.md docs/epics/sample/story/issues/sample-a.md docs/progress/sample/p-sample-a.md docs/epics/sample/story/code-reviews/r-sample-a.md
 if ! "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout11b" 2>"$TMP_DIR/stderr11b"; then
   echo "[FAIL] governance-merge-gate should ignore sibling candidates loaded only as source-candidate context" >&2
   cat "$TMP_DIR/stdout11b" >&2
   exit 1
 fi
 
-git reset -q HEAD src/sample.js docs/milestones.md docs/epics/sample/story/issues/sample-a.md docs/progress/sample/p-sample-a.md
+git reset -q HEAD src/sample.js docs/milestones.md docs/epics/sample/story/issues/sample-a.md docs/progress/sample/p-sample-a.md docs/epics/sample/story/code-reviews/r-sample-a.md
 rm -f "$REPO/src/sample.js" \
   "$REPO/docs/epics/sample/story/issues/sample-a.md" \
   "$REPO/docs/epics/sample/story/issues/sample-b.md" \
-  "$REPO/docs/progress/sample/p-sample-a.md"
+  "$REPO/docs/progress/sample/p-sample-a.md" \
+  "$REPO/docs/epics/sample/story/code-reviews/r-sample-a.md"
 git checkout -q -- docs/milestones.md
 
 cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
@@ -579,6 +602,7 @@ cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_verification`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
 EOF
 echo "console.log('verification without evidence');" > "$REPO/src/sample.js"
 git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
@@ -609,6 +633,7 @@ cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
 EOF
 cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
 # Progress: sample
@@ -619,8 +644,11 @@ cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
 EOF
 echo "console.log('dev with progress');" > "$REPO/src/sample.js"
 git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
-"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout13" 2>"$TMP_DIR/stderr13"
-grep -q 'passed' "$TMP_DIR/stdout13"
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout13" 2>"$TMP_DIR/stderr13"; then
+  echo "[FAIL] governance-merge-gate should reject implementation-bearing changes without a staged review artifact under verification_artifact_dir" >&2
+  exit 1
+fi
+grep -q 'no staged review artifact' "$TMP_DIR/stdout13"
 
 git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
 git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
@@ -643,6 +671,7 @@ cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_verification`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
 EOF
 cat > "$REPO/docs/epics/sample/story/code-reviews/r-sample.md" <<'EOF'
 # Review: sample
@@ -651,8 +680,51 @@ cat > "$REPO/docs/epics/sample/story/code-reviews/r-sample.md" <<'EOF'
 EOF
 echo "console.log('verification with review');" > "$REPO/src/sample.js"
 git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md
-"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout14" 2>"$TMP_DIR/stderr14"
-grep -q 'passed' "$TMP_DIR/stdout14"
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout14" 2>"$TMP_DIR/stderr14"; then
+  echo "[FAIL] governance-merge-gate should reject review artifacts whose implementation decision note is incomplete" >&2
+  exit 1
+fi
+grep -q 'implementation decision note is incomplete' "$TMP_DIR/stdout14"
+
+git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/milestones.md
+rm -f "$REPO/src/sample.js"
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat > "$REPO/docs/epics/sample/story/code-reviews/r-sample.md" <<'EOF'
+# Review: sample
+
+- issue_id: `I-20260327-2205-A`
+
+## Implementation Decision Note
+
+- decision: `Keep the canonical implementation note inside the issue-bound review artifact.`
+- why_this: `The review artifact already owns verification evidence and residual implementation risk.`
+- alternatives_considered: `A separate decision-summary directory would duplicate lifecycle truth.`
+- boundary_non_goals: `This does not replace candidate or PRD rationale.`
+- residual_risk: `Implementation-bearing path heuristics may need tuning after field use.`
+EOF
+echo "console.log('verification with complete review');" > "$REPO/src/sample.js"
+git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout14b" 2>"$TMP_DIR/stderr14b"
+grep -q 'passed' "$TMP_DIR/stdout14b"
 
 git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md
 git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/milestones.md
