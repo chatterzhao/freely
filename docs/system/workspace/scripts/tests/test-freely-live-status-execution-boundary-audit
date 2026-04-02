@@ -67,10 +67,12 @@ LAST_STATE_UPDATED_AT="2026-04-01T00:00:00Z"
 DESIRED_RUNTIME_STATE="stopped"
 EOF
 
-LIVE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+LIVE_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
 
 printf '%s\n' "$LIVE_OUTPUT" | grep -q 'execution_boundary_audit_status: pass'
 printf '%s\n' "$LIVE_OUTPUT" | grep -q 'execution_boundary_audit_detail: aligned'
 printf '%s\n' "$LIVE_OUTPUT" | grep -q 'activation_consent_status: accepted'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'activation_consent_recorded_at: 2026.03.31 17:00:00 PDT'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'last_state_updated_at: 2026.03.31 17:00:00 PDT'
 
 echo "[PASS] freely live-status surfaces execution-boundary audit truth"

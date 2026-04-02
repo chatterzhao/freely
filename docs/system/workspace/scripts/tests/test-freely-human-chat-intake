@@ -7,6 +7,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
 mkdir -p "$PROJECT/docs/pre-brainstorms/20260319-0000--sample"
+mkdir -p "$PROJECT/.freely"
 
 git init -q -b develop "$PROJECT"
 
@@ -51,7 +52,17 @@ cat >"$PROJECT/docs/pre-brainstorms/20260319-0000--sample/candidates.md" <<'EOF'
 - session_refs: []
 EOF
 
-INTAKE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake chat --project "$PROJECT" --message "现在需要检查前端技术栈，并研究 human chat intake 闭环")"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+INTAKE_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" intake chat --project "$PROJECT" --message "现在需要检查前端技术栈，并研究 human chat intake 闭环")"
 INTAKE_ID="$(printf '%s\n' "$INTAKE_OUTPUT" | sed -n 's/^intake_id: //p')"
 INTAKE_PATH="$(printf '%s\n' "$INTAKE_OUTPUT" | sed -n 's/^intake_path: //p')"
 
@@ -72,10 +83,11 @@ grep -q 'STATUS="new"' "$INTAKE_PATH/meta.env"
 grep -q 'CHANNEL="chat"' "$INTAKE_PATH/meta.env"
 grep -q '现在需要检查前端技术栈' "$INTAKE_PATH/message.txt"
 
-STATUS_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake status --project "$PROJECT")"
+STATUS_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" intake status --project "$PROJECT")"
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'active_items: 1'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'new_items: 1'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q "$INTAKE_ID"
+printf '%s\n' "$STATUS_OUTPUT" | grep -Eq 'created_at=.*(PST|PDT)'
 
 PROMPT_OUTPUT="$(
   PROJECT_ROOT="$PROJECT" \
@@ -122,7 +134,7 @@ grep -q 'ABSORPTION_TARGET="docs/pre-brainstorms/20260319-0000--sample"' "$INTAK
 grep -q 'RESOLUTION_ARTIFACT="' "$INTAKE_PATH/meta.env"
 grep -q 'absorption_recommendation' "$RESOLUTION_ARTIFACT"
 
-STATUS_AFTER_RESOLVE="$(bash "$ROOT_DIR/bin/freely" intake status --project "$PROJECT")"
+STATUS_AFTER_RESOLVE="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" intake status --project "$PROJECT")"
 printf '%s\n' "$STATUS_AFTER_RESOLVE" | grep -q 'active_items: 0'
 printf '%s\n' "$STATUS_AFTER_RESOLVE" | grep -q 'absorbed_items: 1'
 

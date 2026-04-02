@@ -506,3 +506,6 @@
 - 20260402-0130--backup-time-rendering-and-storage-boundary
   - brainstorms: docs/pre-brainstorms/20260402-0130--backup-time-rendering-and-storage-boundary/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-0130--backup-time-rendering-and-storage-boundary/candidates.md
+- 20260402-0308--runtime-status-time-display-audit
+  - brainstorms: docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/candidates.md

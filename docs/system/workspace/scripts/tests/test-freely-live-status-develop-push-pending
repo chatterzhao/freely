@@ -45,15 +45,16 @@ echo local >"$REPO/local.txt"
 git -C "$REPO" add local.txt
 git -C "$REPO" commit -q -m "local merge result"
 
-PENDING_OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+PENDING_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
 printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_state: push_pending'
 printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_summary: ahead=1 '
 printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_defer_reason: none'
 
-bash "$ROOT_DIR/bin/freely" develop-push defer --project "$REPO" --reason post_merge_acceptance --note "post-merge smoke" >/dev/null
-DEFERRED_OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" develop-push defer --project "$REPO" --reason post_merge_acceptance --note "post-merge smoke" >/dev/null
+DEFERRED_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
 printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_state: push_deferred'
 printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_defer_reason: post_merge_acceptance'
+printf '%s\n' "$DEFERRED_OUTPUT" | grep -Eq 'develop_push_followthrough_defer_updated_at: .*(PST|PDT)'
 printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_summary: ahead=1 '
 
 echo "[PASS] freely live-status surfaces develop push followthrough and explicit defer windows"

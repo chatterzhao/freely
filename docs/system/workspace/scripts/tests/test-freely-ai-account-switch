@@ -181,6 +181,7 @@ make_auth_json "limited@example.com" "$HOME_STATUS/.ai-auth/codex-limited@exampl
 make_auth_json "work@example.com" "$HOME_STATUS/.ai-auth/codex-work@example-com-2/auth.json" "token-work"
 make_auth_json "old@example.com" "$HOME_STATUS/.codex/auth.json" "token-old"
 
+TZ="America/Los_Angeles" \
 HOME="$HOME_STATUS" \
 PROJECT_ROOT="$PROJECT_STATUS" \
 PATH="$MOCK_BIN:$PATH" \
@@ -191,6 +192,8 @@ MOCK_OAUTH_LOG="$LOG_STATUS" \
 grep -Eq '"availability_cache":[[:space:]]*\{"present":[[:space:]]*true' "$TMP_DIR/status.out"
 grep -q '"usable": 1' "$TMP_DIR/status.out"
 grep -q '"rate_limited": 1' "$TMP_DIR/status.out"
+grep -Eq '"refreshed_at": ".*Z"' "$TMP_DIR/status.out"
+grep -Eq '"refreshed_at_human": ".*(PST|PDT)"' "$TMP_DIR/status.out"
 grep -q 'socks5://proxy.example:1080|http://proxy.example:8080|http://proxy.example:8443|localhost,127.0.0.1|usable|token-limited' "$LOG_STATUS"
 grep -q 'socks5://proxy.example:1080|http://proxy.example:8080|http://proxy.example:8443|localhost,127.0.0.1|usable|token-work' "$LOG_STATUS"
 [[ -f "$PROJECT_STATUS/.freely/run/codex-availability-cache.tsv" ]]
