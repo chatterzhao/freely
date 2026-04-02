@@ -62,12 +62,12 @@ routing_policy:
 2. `I-20260401-1308-A`
 - title: Agent execution safety review and security decision support
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
-- next_action: implement the smallest capability slice that compares execution-boundary truth and enables reviewer-backed internal decision support without reintroducing user-step approvals
+- next_action: keep the first advisory-only capability slice in `in_dev` until project-local security review policy truth, runtime status surfaces, and the minimal workspace skill are all landed with focused tests and progress evidence
 
 ### completed_issues
 

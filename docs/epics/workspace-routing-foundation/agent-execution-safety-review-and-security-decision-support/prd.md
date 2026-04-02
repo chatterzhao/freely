@@ -50,6 +50,13 @@ execution-boundary review 和 security decision support 正好承接中间层：
 
 先冻结 IBM issue artifacts，说明 capability contract 应如何被后续 skill / reference / runtime helper materialize。
 
+当前第一刀 follow-on 维持 advisory-only：
+
+- project-local `security review policy` / `scope` truth
+- `baseline-status` / `live-status` / `doctor` introspection
+- workspace skill entry for execution-boundary review and reviewer-backed guidance
+- no launch blocking, no approval posture rewrite, no forced committee runtime
+
 ## Eval Plan
 
 成功：

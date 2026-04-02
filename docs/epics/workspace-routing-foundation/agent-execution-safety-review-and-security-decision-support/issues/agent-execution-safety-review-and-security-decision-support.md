@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1308-A`
 - title: Agent execution safety review and security decision support
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `agent-execution-safety-review-and-security-decision-support`
@@ -75,6 +75,10 @@ Freely 的产品面已经在收口“默认高自治 + activation consent + 非�
 - `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/prd.md`
 - `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/tasks.md`
+- `docs/progress/workspace-routing-foundation/p-agent-execution-safety-review-and-security-decision-support.md`
+- `docs/system/workspace/skills/agent-execution-safety-review/SKILL.md`
+- `docs/system/workspace/tools.md`
+- `docs/system/workspace/scripts/runtime/freely`
 - `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
 - `docs/milestones.md`
 
@@ -89,4 +93,5 @@ Freely 的产品面已经在收口“默认高自治 + activation consent + 非�
 ## Next
 
 - 这条 issue 先承接 execution-boundary review 和 security decision support。
+- 第一刀 execution slice 保持 advisory-only：只落 project-local policy truth、runtime introspection、workspace skill 和 focused tests，不重写 launch gate / approval gate / fallback gate。
 - 更宽的 capability families，例如 supply-chain、secret/artifact exposure、incident remediation，应由后续 owner 继续拆分，不回灌本 issue 变成另一个 umbrella。

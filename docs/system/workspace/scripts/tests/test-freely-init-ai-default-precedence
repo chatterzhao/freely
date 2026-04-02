@@ -72,6 +72,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --project "$PROJECT_GLOBAL" \
   --intent "$PROJECT_GLOBAL/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT_GLOBAL/docs/CONSTITUTION.md" \
+  --accept-default-autonomy \
   >/dev/null
 PROJECT_GLOBAL_CANON="$(cd "$PROJECT_GLOBAL" && pwd -P)"
 
@@ -80,6 +81,8 @@ grep -q '^# Project Agent Entry$' "$PROJECT_GLOBAL_CANON/AGENTS.md"
 grep -q '^AI_TOOL="cc"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
 grep -q '^AI_TOOL_ADAPTER="acp"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
 grep -q '^AI_TOOL_ADAPTER_POLICY="acp"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
+grep -q '^FREELY_SECURITY_REVIEW_POLICY="advisory-on-high-risk-or-uncertainty"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
+grep -q '^FREELY_SECURITY_REVIEW_SCOPE="execution-boundary-and-reviewer-support"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
 grep -q '^AI_TOOL_CAPABILITIES=""$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
 
 PROJECT_OVERRIDE="$TMP_DIR/project-override"
@@ -90,6 +93,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --intent "$PROJECT_OVERRIDE/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT_OVERRIDE/docs/CONSTITUTION.md" \
   --ai iflow:auto \
+  --accept-default-autonomy \
   >/dev/null
 PROJECT_OVERRIDE_CANON="$(cd "$PROJECT_OVERRIDE" && pwd -P)"
 
@@ -107,12 +111,14 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --constitution "$PROJECT_REINIT/docs/CONSTITUTION.md" \
   --ai codex:gpt-5.4:auto \
   --tool-adapter acp \
+  --accept-default-autonomy \
   >/dev/null
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --project "$PROJECT_REINIT" \
   --intent "$PROJECT_REINIT/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT_REINIT/docs/CONSTITUTION.md" \
   --force \
+  --accept-default-autonomy \
   >/dev/null
 PROJECT_REINIT_CANON="$(cd "$PROJECT_REINIT" && pwd -P)"
 
