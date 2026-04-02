@@ -12,7 +12,7 @@
 
 1. the product-owned contract now clearly states that Freely defaults to unattended, automatically approved autonomy; this is framed as core product posture rather than a downgraded optional mode.
 2. activation consent is explicitly blocking, while safeguard guidance such as sandboxing, isolated devices, VM usage, and restricted networks remains strongly recommended but non-blocking by default.
-3. the issue cleanly splits product-owned posture truth from tool-owned materialization: sibling owner `I-20260401-1303-B` now carries the concrete adapter/config writeback and the first landed Codex materialization slice.
+3. the issue cleanly splits product-owned posture truth from tool-owned materialization: sibling owner `I-20260401-1303-A-2` now carries the concrete adapter/config writeback and the first landed Codex materialization slice.
 4. runtime escalation is still documented as AI-first, with internal reviewer / committee escalation and minimal-risk-state semantics treated as fallback behavior rather than restoring per-step human approvals.
 
 ## Evidence
