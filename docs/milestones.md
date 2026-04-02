@@ -69,16 +69,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md`
 - next_action: keep this owner in `in_verification` until a post-gate develop-bound implementation lane carries the new issue-bound decision note from start to merge; older security lanes that landed before the gate became canonical do not count as proof.
 
-3. `I-20260402-0308-A`
-- title: Runtime human-readable time display governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/candidates.md`
-- next_action: keep this owner in `in_verification` until the residual baseline/live status time-display closeout lane merges to `develop` and post-merge verification rewrites the completion evidence.
-
 ### completed_issues
 1. `I-20260401-1545-A`
 - title: ACP optional adapter boundary governance
@@ -111,6 +101,25 @@ routing_policy:
   - `bun run build`
 - `./bin/governance-check`
 - completion_note: Canonical truth now enforces automation-first release artifact safety: forbidden build outputs and non-allowlisted files fail the audit, `freely doctor` replays that audit when build output exists, and production sourcemaps are explicitly disabled by default in repo builds.
+
+3. `I-20260402-0308-A`
+- title: Runtime human-readable time display governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/candidates.md`
+- evidence:
+  - `develop` commit `af0be7c`
+  - `develop` commit `eca4c79`
+  - `docs/progress/workspace-routing-foundation/p-runtime-human-readable-time-display-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/code-reviews/20260402-runtime-human-readable-time-display-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-develop-push-status-time-display`
+  - `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
+  - `./bin/governance-check`
+- completion_note: Human-readable runtime status surfaces now render in the host system timezone with timezone labels across the original runtime slice and the residual baseline/live status tail fields, while UTC naming truth and RFC3339/epoch machine truth stay unchanged; `frontend-probe-v0` remains limited to the Probe display slice.
 
 3. `I-20260401-0115-A`
 - title: Supply-chain baseline and install-intake audit governance
