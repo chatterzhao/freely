@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1308-A`
 - title: Agent execution safety review and security decision support
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - branch: `feature/security-capability-execution-boundary-audit-20260401-2230`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260401-2230-feature-security-capability-execution-boundary-audit`
@@ -35,7 +35,12 @@
 6. `bash docs/system/workspace/scripts/tests/test-agent-execution-safety-review-skill`
 7. `./bin/governance-check`
 
-## Next Action
+## Closure Evidence
 
-1. Keep this owner in `in_verification` until the feature branch is merged and post-merge acceptance is written back.
-2. Follow-on capability work should absorb full multi-reviewer runtime orchestration here and split wider supply-chain / artifact / remediation work into new owners.
+- closure_status: `merged-and-verified`
+- closure_evidence:
+  - `merge_commit: e72ff86`
+  - `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/code-reviews/20260401-agent-execution-safety-review-and-security-decision-support-verification.md`
+  - `./bin/governance-check`
+- next:
+  - follow-on capability work should materialize new owners for multi-reviewer runtime orchestration and wider supply-chain / artifact / remediation domains instead of reopening this completed slice.

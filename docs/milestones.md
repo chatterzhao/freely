@@ -49,17 +49,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260401-1308-A`
-- title: Agent execution safety review and security decision support
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
-- next_action: implement the smallest capability slice that compares execution-boundary truth and enables reviewer-backed internal decision support without reintroducing user-step approvals
-
-2. `I-20260401-1831-A`
+1. `I-20260401-1831-A`
 - title: Worker reactivation and local reentry residual runtime governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -68,16 +58,6 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
 - next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
-
-2. `I-20260401-1308-A`
-- title: Agent execution safety review and security decision support
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
-- next_action: keep this owner in `in_verification` until the advisory-only boundary and focused runtime evidence are accepted as canonical, then decide whether to merge as-is or split a narrower follow-on for real reviewer runtime
 ### completed_issues
 
 1. `I-20260401-1545-A`
@@ -124,13 +104,17 @@ routing_policy:
   - `develop` merge `e72ff86`
   - `docs/progress/workspace-routing-foundation/p-agent-execution-safety-review-and-security-decision-support.md`
   - `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/code-reviews/20260401-agent-execution-safety-review-and-security-decision-support-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-doctor-execution-boundary-audit`
   - `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
   - `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
   - `bash docs/system/workspace/scripts/tests/test-freely-hook-gate`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit`
   - `bash docs/system/workspace/scripts/tests/test-freely-live-status-security-review-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-security-review-brief`
+  - `bash docs/system/workspace/scripts/tests/test-agent-execution-safety-review-skill`
   - `bin/pretests-gate --issue docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
   - `./bin/governance-check`
-- completion_note: The first advisory-only security review capability slice is now canonical on `develop`: project-local security review truth, baseline/live/doctor introspection, and the workspace skill expose execution-boundary review evidence without rewriting launch blocking, approval posture, or fallback behavior. A real reviewer committee runtime remains a follow-on owner rather than unfinished scope inside this slice.
+- completion_note: The first advisory-only security review capability slice is now canonical on `develop`: project-local execution-boundary truth, machine-readable `security-review-brief` guidance, and the workspace skill expose reviewer/committee escalation evidence without rewriting launch blocking, approval posture, or fallback behavior. A real reviewer committee runtime remains a follow-on owner rather than unfinished scope inside this slice.
 
 2. `I-20260401-1703-A`
 - title: Runtime adapter axis and per-tool adapter selection
