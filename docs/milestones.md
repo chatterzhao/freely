@@ -69,26 +69,18 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md`
 - next_action: keep this owner in `in_verification` until a post-gate develop-bound implementation lane carries the new issue-bound decision note from start to merge; older security lanes that landed before the gate became canonical do not count as proof.
 
-### completed_issues
-
-1. `I-20260402-0308-A`
+3. `I-20260402-0308-A`
 - title: Runtime human-readable time display governance
-- milestone_state: completed
-- phase_state: `completed`
+- milestone_state: committed
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/candidates.md`
-- evidence:
-  - `develop` commit `af0be7c`
-  - `docs/progress/workspace-routing-foundation/p-runtime-human-readable-time-display-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/code-reviews/20260402-runtime-human-readable-time-display-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
-  - `bash docs/system/workspace/scripts/tests/test-freely-develop-push-status-time-display`
-  - `./bin/governance-check`
-- completion_note: Human-readable runtime status surfaces now render in the host system timezone with timezone labels while UTC naming truth and RFC3339/epoch machine truth stay unchanged; `frontend-probe-v0` remains limited to the Probe display slice.
+- next_action: keep this owner in `in_verification` until the residual baseline/live status time-display closeout lane merges to `develop` and post-merge verification rewrites the completion evidence.
 
-2. `I-20260401-1545-A`
+### completed_issues
+1. `I-20260401-1545-A`
 - title: ACP optional adapter boundary governance
 - milestone_state: completed
 - phase_state: `completed`

@@ -59,10 +59,11 @@ LAST_ROLE_HINT="worker"
 LAST_STATE_UPDATED_AT="2026-03-24T04:30:00Z"
 EOF
 
-LIVE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$WT")"
+LIVE_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$WT")"
 FLEET_OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$WT")"
 
-printf '%s\n' "$LIVE_OUTPUT" | grep -q 'restart_storm_signal_at: 2026-03-24T04:30:00Z'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'restart_storm_signal_at: 2026.03.23 21:30:00 PDT'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'last_state_updated_at: 2026.03.23 21:30:00 PDT'
 printf '%s\n' "$LIVE_OUTPUT" | grep -q 'restart_storm_signal_reason: restart_storm_count_threshold'
 printf '%s\n' "$LIVE_OUTPUT" | grep -q 'restart_storm_signal_summary: window=30s count=4 peak=3'
 printf '%s\n' "$LIVE_OUTPUT" | grep -q 'restart_storm_escalation_target: manager_bootstrap_handoff'
