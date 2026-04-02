@@ -59,14 +59,15 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md`
 - evidence:
-  - `develop` commit `cdb8278`
+  - `develop` merge `d4c9474`
   - `develop` merge `5537a7e`
   - `docs/progress/workspace-routing-foundation/p-implementation-decision-notes-in-issue-review-artifacts-governance.md`
   - `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/code-reviews/20260402-runtime-human-readable-time-display-verification.md`
   - `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
   - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
   - `./bin/governance-check`
-- completion_note: The decision-note gate is now closed on canonical `develop`: implementation-bearing develop-bound diffs require a staged owner review artifact, and the `runtime-loop-log-timezone-label-followthrough` owner provides the first post-gate real proof that the complete note path works end to end.
+- completion_note: The decision-note gate is now closed on canonical `develop`: implementation-bearing develop-bound diffs require a staged owner review artifact, and post-gate owners such as `runtime-human-readable-time-display` and `runtime-loop-log-timezone-label-followthrough` prove that the complete note path works end to end.
 
 2. `I-20260401-1831-A`
 - title: Worker reactivation and local reentry residual runtime governance

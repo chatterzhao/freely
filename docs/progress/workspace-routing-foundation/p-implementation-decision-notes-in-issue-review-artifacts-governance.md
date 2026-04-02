@@ -4,8 +4,8 @@
 - title: Implementation decision notes in issue-bound review artifacts
 - phase_state: `completed`
 - runtime_state: `stopped`
-- branch: `feature/review-decision-notes-governance-20260401-2354`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260401-2354-feature-review-decision-notes-governance`
+- branch: `feature/workspace-routing-in-verification-closeout-20260402-0835`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-0835-feature-workspace-routing-in-verification-closeout`
 - issue_path: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -36,10 +36,12 @@
 
 ## Closure Evidence
 
-- closure_status: `closed`
+- closure_status: `completed-on-develop`
 - closure_evidence:
   - `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/code-reviews/20260402-runtime-human-readable-time-display-verification.md`
   - `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
   - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
   - `./bin/governance-check`
+  - `develop` merge `d4c9474`
   - `develop` merge `5537a7e`
