@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-doctor-build-artifact-gate.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_project() {
+  local project="$1"
+  mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample" "$project/.githooks" "$project/docs/system/workspace" "$project/dist/assets"
+  git init -q -b develop "$project"
+  git -C "$project" config core.hooksPath .githooks
+
+  cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$project/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$project/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+  cat >"$project/AGENTS.md" <<'EOF'
+# Agents
+EOF
+  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0018--sample
+EOF
+  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+  cat >"$project/docs/system/workspace/release-build-allowlist.txt" <<'EOF'
+index.html
+assets/*
+EOF
+  cat >"$project/dist/index.html" <<'EOF'
+<html></html>
+EOF
+  cat >"$project/dist/assets/app.js" <<'EOF'
+console.log("ok");
+EOF
+}
+
+PROJECT="$TMP_DIR/project"
+make_project "$PROJECT"
+
+bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-pass.stdout" 2>"$TMP_DIR/doctor-pass.stderr"
+grep -q 'build artifact audit PASS' "$TMP_DIR/doctor-pass.stderr"
+
+cat >"$PROJECT/dist/assets/app.js.map" <<'EOF'
+{}
+EOF
+if bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-fail.stdout" 2>"$TMP_DIR/doctor-fail.stderr"; then
+  echo "[FAIL] expected doctor to fail on forbidden build artifact" >&2
+  exit 1
+fi
+grep -q 'forbidden output artifact assets/app.js.map' "$TMP_DIR/doctor-fail.stderr"
+rm -f "$PROJECT/dist/assets/app.js.map"
+
+cat >"$PROJECT/dist/debug.txt" <<'EOF'
+debug
+EOF
+if bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-allow.stdout" 2>"$TMP_DIR/doctor-allow.stderr"; then
+  echo "[FAIL] expected doctor to fail on non-allowlisted build artifact" >&2
+  exit 1
+fi
+grep -q 'non-allowlisted output artifact debug.txt' "$TMP_DIR/doctor-allow.stderr"
+
+echo "[PASS] freely doctor enforces build artifact exposure and release allowlist audit"

@@ -464,6 +464,9 @@
 - 20260401-1035--develop-push-pending-guard-governance
   - brainstorms: docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/candidates.md
+- 20260401-2245--build-artifact-exposure-and-release-allowlist-capability
+  - brainstorms: docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
