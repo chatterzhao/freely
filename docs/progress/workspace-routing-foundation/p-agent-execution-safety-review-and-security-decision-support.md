@@ -12,26 +12,28 @@
 
 ## Summary
 
-- Capability candidate `C-20260401-1308-A` is now materialized on top of current `develop`.
-- The first shipped slice turns execution-boundary review into automation instead of relying on operator memory.
-- Reviewer / committee first-use semantics now exist as a runtime brief plus a reusable product skill, so they are no longer doc-only.
+- The advisory-only execution-boundary review slice is already canonical on `develop`.
+- This lane extends that capability with a machine-readable `security-review-brief` and explicit evidence-writeback contract so reviewer / committee semantics are no longer implied only by conversation.
+- Product-owner scope remains unchanged: no launch blocking, no approval posture rewrite, no forced user-step approval.
 
 ## Implemented Slice
 
-1. `freely doctor` now audits activation-consent truth for auto-mode projects.
-2. `freely doctor` now checks project-level Codex approval posture drift against Freely policy.
-3. `baseline-status` and `live-status` now expose `execution_boundary_audit_status` and `execution_boundary_audit_detail`.
-4. `freely security-review-brief` now emits machine-readable reviewer / committee guidance from execution-boundary truth.
-5. `skill:agent-execution-safety-review` now freezes the pass/warn/fail decision ladder for future reviewer-backed continuation.
+1. `freely doctor` audits activation-consent truth for auto-mode projects.
+2. `freely doctor` checks project-level Codex approval posture drift against Freely policy.
+3. `baseline-status` and `live-status` expose `execution_boundary_audit_status` and `execution_boundary_audit_detail`.
+4. `live-status` exposes advisory security review policy / scope truth.
+5. `freely security-review-brief` emits machine-readable reviewer / committee guidance from execution-boundary truth.
+6. `skill:agent-execution-safety-review` freezes the `none -> single-reviewer -> decision-committee` ladder and evidence writeback fields for future reviewer-backed continuation.
 
 ## Verification Evidence
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-doctor-execution-boundary-audit`
 2. `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
 3. `bash docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit`
-4. `bash docs/system/workspace/scripts/tests/test-freely-security-review-brief`
-5. `bash docs/system/workspace/scripts/tests/test-agent-execution-safety-review-skill`
-6. `./bin/governance-check`
+4. `bash docs/system/workspace/scripts/tests/test-freely-live-status-security-review-surface`
+5. `bash docs/system/workspace/scripts/tests/test-freely-security-review-brief`
+6. `bash docs/system/workspace/scripts/tests/test-agent-execution-safety-review-skill`
+7. `./bin/governance-check`
 
 ## Next Action
 

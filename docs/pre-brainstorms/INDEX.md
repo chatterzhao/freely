@@ -8,6 +8,9 @@
 - 20260401-1545--acp-client-agent-protocol-runtime-adoption
   - brainstorms: docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md
+- 20260401-1308--workspace-security-capability-baseline-governance
+  - brainstorms: docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md
 - 20260401-1303--freely-product-security-baseline-governance
   - brainstorms: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md

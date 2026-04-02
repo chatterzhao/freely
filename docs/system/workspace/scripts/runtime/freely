@@ -1085,6 +1085,8 @@ FREELY_ALL_PROXY=""
 FREELY_HTTP_PROXY=""
 FREELY_HTTPS_PROXY=""
 FREELY_NO_PROXY=""
+FREELY_SECURITY_REVIEW_POLICY="advisory-on-high-risk-or-uncertainty"
+FREELY_SECURITY_REVIEW_SCOPE="execution-boundary-and-reviewer-support"
 EOF
 }
 
@@ -1195,6 +1197,14 @@ freely_runtime_decision_posture_for_loaded_config() {
 
 freely_minimal_risk_posture_for_loaded_config() {
   printf '%s\n' "${FREELY_MINIMAL_RISK_POSTURE:-last-resort-safe-stop}"
+}
+
+freely_security_review_policy_for_loaded_config() {
+  printf '%s\n' "${FREELY_SECURITY_REVIEW_POLICY:-advisory-on-high-risk-or-uncertainty}"
+}
+
+freely_security_review_scope_for_loaded_config() {
+  printf '%s\n' "${FREELY_SECURITY_REVIEW_SCOPE:-execution-boundary-and-reviewer-support}"
 }
 
 freely_codex_boundary_summary_for_loaded_config() {
@@ -1373,6 +1383,8 @@ print_autonomy_posture_summary() {
   echo "safeguard_guidance_posture: recommended-nonblocking"
   echo "runtime_decision_posture: internal-ai-escalation-before-stop"
   echo "minimal_risk_posture: last-resort-safe-stop"
+  echo "security_review_policy: $(freely_security_review_policy_for_loaded_config)"
+  echo "security_review_scope: $(freely_security_review_scope_for_loaded_config)"
   echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
   echo "execution_boundary_audit_status: $(freely_execution_boundary_audit_status_for_loaded_config "$audit_summary")"
   echo "execution_boundary_audit_detail: $(freely_execution_boundary_audit_detail_for_loaded_config "$audit_summary")"
@@ -7594,6 +7606,7 @@ cmd_ensure_interruption_dispatch() {
 
 cmd_doctor() {
   local project=""
+  local cfg=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -7606,6 +7619,16 @@ cmd_doctor() {
   load_config "$project"
   check_execution_boundary_audit_or_fail "$project"
   check_build_artifact_gate_or_fail "$project"
+  echo "project: $project"
+  cfg="$(config_file "$project")"
+  if [[ -f "$cfg" ]]; then
+    load_config "$project"
+    echo "security_review_policy: $(freely_security_review_policy_for_loaded_config)"
+    echo "security_review_scope: $(freely_security_review_scope_for_loaded_config)"
+  else
+    echo "security_review_policy: unavailable-uninitialized"
+    echo "security_review_scope: unavailable-uninitialized"
+  fi
 }
 
 cmd_security_review_brief() {
@@ -7907,6 +7930,8 @@ cmd_baseline_status() {
   echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
   echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
   echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
+  echo "security_review_policy: $(freely_security_review_policy_for_loaded_config)"
+  echo "security_review_scope: $(freely_security_review_scope_for_loaded_config)"
   echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
   local execution_boundary_audit_summary
   execution_boundary_audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
@@ -8216,6 +8241,8 @@ cmd_live_status() {
   echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
   echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
   echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
+  echo "security_review_policy: $(freely_security_review_policy_for_loaded_config)"
+  echo "security_review_scope: $(freely_security_review_scope_for_loaded_config)"
   echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
   local execution_boundary_audit_summary
   execution_boundary_audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"

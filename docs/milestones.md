@@ -69,6 +69,15 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
 - next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
 
+2. `I-20260401-1308-A`
+- title: Agent execution safety review and security decision support
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
+- next_action: keep this owner in `in_verification` until the advisory-only boundary and focused runtime evidence are accepted as canonical, then decide whether to merge as-is or split a narrower follow-on for real reviewer runtime
 ### completed_issues
 
 1. `I-20260401-1545-A`
@@ -100,8 +109,28 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-build-artifact-exposure-audit`
   - `bash docs/system/workspace/scripts/tests/test-freely-doctor-build-artifact-exposure-gate`
   - `bun run build`
-  - `./bin/governance-check`
+- `./bin/governance-check`
 - completion_note: Canonical truth now enforces automation-first release artifact safety: forbidden build outputs and non-allowlisted files fail the audit, `freely doctor` replays that audit when build output exists, and production sourcemaps are explicitly disabled by default in repo builds.
+
+3. `I-20260401-1308-A`
+- title: Agent execution safety review and security decision support
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
+- evidence:
+  - `develop` merge `e72ff86`
+  - `docs/progress/workspace-routing-foundation/p-agent-execution-safety-review-and-security-decision-support.md`
+  - `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/code-reviews/20260401-agent-execution-safety-review-and-security-decision-support-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
+  - `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-hook-gate`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-security-review-surface`
+  - `bin/pretests-gate --issue docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
+  - `./bin/governance-check`
+- completion_note: The first advisory-only security review capability slice is now canonical on `develop`: project-local security review truth, baseline/live/doctor introspection, and the workspace skill expose execution-boundary review evidence without rewriting launch blocking, approval posture, or fallback behavior. A real reviewer committee runtime remains a follow-on owner rather than unfinished scope inside this slice.
 
 2. `I-20260401-1703-A`
 - title: Runtime adapter axis and per-tool adapter selection
@@ -856,8 +885,7 @@ routing_policy:
 - next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize
 - revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
 
-9. `C-20260322-1615-A`
-9. `C-20260401-1545-A`
+10. `C-20260401-1545-A`
 - title: Materialize ACP as an optional adapter boundary between Freely and external code agents
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -868,7 +896,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260401-1545-A`. The issue freezes `ACP = optional adapter layer`, `direct = first-class path`, and the follow-on implementation order: extract adapter axis before any first-tool ACP prototype.
 - revisit_trigger: Re-open candidate-level research only if issue-bound materialization fails to hold a stable ACP adapter boundary, or if ACP no longer fits Freely's external code-agent integration layer.
 
-10. `C-20260401-1703-A`
+11. `C-20260401-1703-A`
 - title: Materialize runtime adapter axis and per-tool adapter selection
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -879,7 +907,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260401-1703-A`. The owner isolates `adapter axis` extraction as the first implementation slice before any ACP bridge work.
 - revisit_trigger: Re-open candidate-level research only if `adapter axis` extraction proves inseparable from a broader runtime redesign, or if the ACP boundary assumptions materially change.
 
-11. `C-20260322-1615-A`
+12. `C-20260322-1615-A`
 - title: Protected post-merge acceptance route and promotion guard governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`

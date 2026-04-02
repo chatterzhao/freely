@@ -78,32 +78,38 @@ Freely 的产品面已经在收口“默认高自治 + activation consent + 非�
 - `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/prd.md`
 - `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/tasks.md`
+- `docs/progress/workspace-routing-foundation/p-agent-execution-safety-review-and-security-decision-support.md`
 - `docs/system/workspace/skills/agent-execution-safety-review/SKILL.md`
 - `docs/system/workspace/skills/agent-execution-safety-review/references/decision-ladder.md`
 - `docs/system/workspace/skills/agent-execution-safety-review/references/evidence-writeback.md`
+- `docs/system/workspace/tools.md`
+- `docs/system/workspace/scripts/runtime/freely`
 - `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
 - `docs/milestones.md`
 
 ## Verification
 
+- `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-freely-doctor-execution-boundary-audit`
 - `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-security-review-surface`
 - `bash docs/system/workspace/scripts/tests/test-freely-security-review-brief`
 - `bash docs/system/workspace/scripts/tests/test-agent-execution-safety-review-skill`
-- `./bin/governance-check`
+- `bin/pretests-gate --issue docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
 
 ## Implementation Status
 
-- `2026-04-01`: first execution-boundary automation slice landed in runtime.
-  - `freely doctor` now audits activation-consent truth and project-scoped Codex posture drift instead of only checking docs/hooks.
-  - `baseline-status` and `live-status` now expose `execution_boundary_audit_status` and `execution_boundary_audit_detail`.
-  - focused regressions cover legacy auto consent drift, Codex approval-policy drift, and the aligned baseline snapshot.
-- `2026-04-01`: reviewer/committee first-use slice landed as reusable runtime brief + skill.
-  - `freely security-review-brief` now emits machine-readable decision support derived from execution-boundary truth.
-  - `skill:agent-execution-safety-review` consumes that brief and freezes the pass/warn/fail decision ladder for future reviewer/committee orchestration.
+- `2026-04-01`: advisory-only execution-boundary review slice landed on `develop`.
+  - project-local security review truth is visible in status surfaces.
+  - `baseline-status`, `live-status`, and `doctor` expose canonical execution-boundary posture.
+  - the workspace skill exists as a reusable advisory capability instead of doc-only prose.
+- `2026-04-01`: reviewer/committee first-use slice landed in this lane as runtime brief + writeback references.
+  - `freely security-review-brief` emits machine-readable reviewer / committee guidance from execution-boundary truth.
+  - `skill:agent-execution-safety-review` now freezes the decision ladder and evidence writeback fields for future reviewer-backed continuation.
 
 ## Next
 
-- 当前 first slice 已把 execution-boundary review materialize 成自动化 runtime audit；本轮又补了 reviewer/committee first-use brief。后续若要加入真正的 multi-reviewer runtime orchestration，应继续吸收到本 owner，而不是回退成对话习惯。
-- 更宽的 capability families，例如 supply-chain、secret/artifact exposure、incident remediation，应由后续 owner 继续拆分，不回灌本 issue 变成另一个 umbrella。
+- Advisory-only execution-boundary review is already canonical on `develop`; this lane extends that capability with a reusable runtime brief and writeback contract rather than reopening product-owner scope.
+- If Freely later needs true multi-reviewer runtime orchestration, it should continue under this owner and consume the same brief keys rather than inventing a second security-review vocabulary.
+- Broader capability families such as artifact exposure, supply-chain review, secret scanning, and incident remediation should continue as dedicated owners rather than widening this owner into another umbrella.
