@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-ownership-conflict.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+
+cleanup() {
+  set +e
+  kill "${SUP_A:-}" "${AI_A:-}" "${SUP_B:-}" "${AI_B:-}" 2>/dev/null || true
+  wait "${SUP_A:-}" 2>/dev/null || true
+  wait "${AI_A:-}" 2>/dev/null || true
+  wait "${SUP_B:-}" 2>/dev/null || true
+  wait "${AI_B:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR_REAL"
+}
+
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+WORKER_A="$WT_ROOT/feature-a"
+WORKER_B="$WT_ROOT/feature-b"
+WORKER_A_REAL="$TMP_DIR_REAL/repo-worktrees/feature-a"
+WORKER_B_REAL="$TMP_DIR_REAL/repo-worktrees/feature-b"
+
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/docs" "$WT_ROOT"
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+git init -q "$PROJECT"
+git -C "$PROJECT" config user.email "test@example.com"
+git -C "$PROJECT" config user.name "Test User"
+cat >"$PROJECT/README.md" <<'EOF'
+# repo
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" branch -m develop
+git -C "$PROJECT" worktree add -q -b feature/a "$WORKER_A"
+git -C "$PROJECT" worktree add -q -b feature/b "$WORKER_B"
+
+for wt in "$WORKER_A" "$WORKER_B"; do
+  mkdir -p "$wt/.freely/run" "$wt/docs"
+  cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$wt/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+  cat >"$wt/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-02T16:10:00Z"
+EOF
+done
+
+cat >"$WORKER_A/.freely/run/prompt-20260402-161000.txt" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$WORKER_A\`
+EOF
+
+cat >"$WORKER_B/.freely/run/prompt-20260402-161100.txt" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$WORKER_B\`
+EOF
+
+bash -c "exec -a 'runtime/freely start --project $WORKER_A_REAL' sleep 30" >/dev/null 2>&1 &
+SUP_A=$!
+bash -c "exec -a 'codex exec -C $WORKER_A_REAL -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+AI_A=$!
+bash -c "exec -a 'runtime/freely start --project $WORKER_B_REAL' sleep 30" >/dev/null 2>&1 &
+SUP_B=$!
+bash -c "exec -a 'codex exec -C $WORKER_B_REAL -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+AI_B=$!
+
+printf '%s' "$SUP_A" >"$WORKER_A/.freely/run/supervisor.pid"
+printf '%s' "$AI_A" >"$WORKER_A/.freely/run/ai.pid"
+printf '%s' "$SUP_B" >"$WORKER_B/.freely/run/supervisor.pid"
+printf '%s' "$AI_B" >"$WORKER_B/.freely/run/ai.pid"
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$WORKER_B")"
+
+grep -q 'ownership_conflict_state: active' <<<"$OUTPUT"
+grep -q "ownership_conflict_summary: signature=promotion@I-20260402-0455-A -> develop holder_branch=feature/a holder_path=$WORKER_A_REAL holder_state=active-owner" <<<"$OUTPUT"
+grep -q 'ownership_conflict_signature: promotion@I-20260402-0455-A -> develop' <<<"$OUTPUT"
+grep -q "ownership_conflict_with: $WORKER_A_REAL" <<<"$OUTPUT"
+
+echo "[PASS] live-status surfaces active ownership conflicts for conflicting worker intents"

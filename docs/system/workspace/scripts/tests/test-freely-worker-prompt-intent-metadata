@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-prompt-intent-metadata.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER="$TMP_DIR/project-worktrees/feature-worker"
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$WORKER"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260402-070000-worker-intent-codex.txt"
+cat >"$PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/worker-intent-metadata-20260402\`
+dispatch_priority: P0
+parallel_safe: true
+write_scope: \`$WORKER\`
+intent_kind: cleanup
+intent_target: \`feature/worker-intent-metadata-20260402 -> develop\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+[[ "$(worker_prompt_intent_kind "$PROMPT")" == "cleanup" ]]
+[[ "$(worker_prompt_intent_target "$PROJECT" "$PROMPT")" == "feature/worker-intent-metadata-20260402 -> develop" ]]
+[[ "$(worker_prompt_write_scope "$PROJECT" "$PROMPT")" == "$WORKER" ]]
+
+echo "[PASS] worker prompt parser reads phase-1 intent metadata without regressing write-scope parsing"

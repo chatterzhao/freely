@@ -136,6 +136,7 @@ flowchart LR
 - `signal`: 这轮为什么被唤醒，例如 human interruption、patrol、test failure、review finding、runtime anomaly。
 - `lifecycle record`: 当前 canonical 文档真相，例如 candidate、issue、progress、recovery、milestone。
 - `worktree execution cell`: 当前真实执行容器，即 `branch + worktree + runtime/session + ownership`。
+- 当 `worktree` 进入 ownership / queue / freeze / recovery 比较时，必须先 canonicalize 为真实路径；prompt header / continuity 文本中的原始字符串只作为输入线索，不作为最终判重键。
 
 判定原则：
 - 只看 `signal` 会丢掉当前做到哪一步。
@@ -186,6 +187,9 @@ flowchart LR
 - `intake -> resolution -> continuity -> worker prompt` 任何一环缺失，都会造成“看起来路由过了，实际上下游无从续跑”。
 - 文档真相写回后，还要再经过 `verification / cleanup evidence` 才算真正回到下一轮 patrol。
 - `worker prompt set` 不是无序列表；每条 worker handoff 至少要带 `dispatch_priority`、`parallel_safe`、`write_scope`，供 runtime 判断直接 launch、same-lane busy guard、写域冲突与 queue/frozen 保留。
+- 若该 handoff 会授予 mutate authority，还要显式带 `intent_kind` 与 `intent_target`；`write_scope` 只表达 launch-time 写域冲突，不替代长期 `edit / cleanup / promotion` ownership truth。
+- 对会产生 mutate authority 的 lane，worker handoff 还必须带 `intent_kind` 与 `intent_target`；`write_scope` 只负责 launch-time scheduling，不替代长期 ownership truth。
+- phase-1 launch scheduling 的 intent blocker 至少包含 `active-owner`、`recorded-owner` 与 `frozen-owner`；若目标 lane 只剩 recorded ownership，主管也必须先做 reclaim / handoff judgment，再决定是否重启或重派同 target lane。
 
 ## 5A. Observability Planes
 
@@ -204,6 +208,13 @@ Day-1 观察面不新造平行控制面，而是先复用现有 `live-status` / 
 - `artifact plane`
   - 指向 continuity、worker prompts、issue / progress / review / cleanup evidence
   - `acceptance evidence` 的 canonical home 在此，不散落到 `current-state` / `fleet` 文本摘要里
+- phase-1 ownership truth 也优先挂在这些既有观察面上，而不是新造平行控制面：
+  - `occupancy plane` 回答“谁在这里、最近是否 still-live”
+  - `intent lease plane` 回答“谁当前拥有 `edit` / `cleanup` / `promotion` mutate authority”
+  - 若当前 lane 因 duplicate `edit` / `cleanup` / `promotion` target 被挡住，`live-status` / `fleet-status` 还要直接暴露 machine-readable `ownership_holder_state`、`ownership_holder_status`、`ownership_conflict_state`、`ownership_conflict_signature`、`ownership_conflict_with`，避免只剩 cycle log / merge gate 文本可读
+  - 若主管 continuity 的 queued / frozen prompt 因 active、recorded、queued 或 frozen owner 被挡住，`live-status` 与 manager/root `fleet-status` row 都要直接暴露 `manager_pending_ownership_conflicts`，并带出 `status=`；phase-1 里 `soft_stale recorded-owner` 继续阻塞，`hard_stale recorded-owner` 进入 runtime reclaim allowed
+  - 若 cleanup followthrough 因 queued / recorded / frozen ownership retain 某棵 merged tree，resolution artifact 也要直接写出 canonical holder state、ref 与 holder status，而不是只留内部 claim 名称
+- 对 `edit` / `cleanup` 这类 worktree-local target，比较时使用 canonicalized `resolved worktree_path`，避免 `/tmp`、`/private/tmp`、symlink 等别名路径造成 owner 漂移或重复 launch。
 
 最小 plane identity block：
 
@@ -228,6 +239,8 @@ Day-1 观察面不新造平行控制面，而是先复用现有 `live-status` / 
 day-1 mirror 规则：
 
 - `current-state plane` 与 `fleet plane` 只镜像最小 acceptance 摘要：
+- 对 sibling dirty、cleanup followthrough、promotion in flight 这类跨 worktree signal，合法动作是 `inspect-anywhere`；真正跨树 mutate 仍必须回到 manager arbitration，并消费 machine-readable ownership truth。
+  - cleanup retain reason 也要回写最小 ownership snapshot，至少能区分 `active-owner`、`recorded-owner`、`queued-owner`、`frozen-owner`，避免把 continuity 中仍持有 cleanup/edit authority 的 merged tree 误删。
   - `completion_state`
   - `delete_gate_state`
   - `acceptance_scope`
@@ -381,6 +394,7 @@ flowchart TD
 - `dispatch_priority` 决定先派谁，不决定 route_kind 本身。
 - `parallel_safe=false` 的 lane 默认单独占一个 dispatch wave。
 - `write_scope` 冲突的 lane 不应同 wave 并发。
+- `intent_kind` / `intent_target` 决定 lane 取得的 mutate authority；worker 发现 sibling dirty 或 promotion blocker 时，必须先回 manager arbitration，而不是直接跨树获取 authority。
 - same-lane busy guard、显式 freeze、写域冲突或 supersede 出现时，未派发 lane 必须保留在 queue / frozen truth，而不是静默丢失或被挤回单一 continuation。
 
 ## 10. Loop Ownership Table
