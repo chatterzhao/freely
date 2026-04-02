@@ -62,12 +62,12 @@ routing_policy:
 2. `I-20260401-1308-A`
 - title: Agent execution safety review and security decision support
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md`
-- next_action: keep the first advisory-only capability slice in `in_dev` until project-local security review policy truth, runtime status surfaces, and the minimal workspace skill are all landed with focused tests and progress evidence
+- next_action: keep this owner in `in_verification` until the advisory-only boundary and focused runtime evidence are accepted as canonical, then decide whether to merge as-is or split a narrower follow-on for real reviewer runtime
 
 ### completed_issues
 

@@ -3,13 +3,13 @@
 - issue_id: `I-20260401-1308-A`
 - issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
 - title: `Agent execution safety review and security decision support`
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - updated_at: `2026-04-01`
 - summary:
   - 当前 lane 已从纯 IBM materialization 进入最小实现切片，并已把 execution-boundary review 和 reviewer-backed security support 的 advisory truth 接到 runtime 与 workspace skill surface。
   - 本轮落地了 project-local security review policy truth、baseline/live/doctor introspection 与最小 workspace skill；没有改 launch gating、approval posture，也没有把用户拉回 step approval。
-  - 当前工作已具备 focused runtime config/status evidence，下一步应进入 formal review 和后续 verification 判断；若要加入真实 reviewer committee runtime，再另开 follow-on。
+  - 当前工作已具备 focused runtime config/status evidence，并已进入 formal verification；若要加入真实 reviewer committee runtime，再另开 follow-on。
 - evidence:
   - `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
   - `docs/system/workspace/scripts/runtime/freely`
@@ -21,4 +21,4 @@
   - `./bin/governance-check`
   - `bin/pretests-gate --issue docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
 - next:
-  - keep this owner in `in_dev` until independent review confirms the advisory-only boundary is still clean, then decide whether to move to `in_verification` or split a narrower follow-on.
+  - keep this owner in `in_verification` until canonical acceptance decides whether to merge the advisory baseline as-is or reopen with a narrower real-runtime follow-on.

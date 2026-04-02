@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1308-A`
 - title: Agent execution safety review and security decision support
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `agent-execution-safety-review-and-security-decision-support`
@@ -85,6 +85,11 @@ Freely 的产品面已经在收口“默认高自治 + activation consent + 非�
 ## Verification
 
 - `./bin/governance-check`
+- `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
+- `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
+- `bash docs/system/workspace/scripts/tests/test-freely-hook-gate`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-security-review-surface`
+- `bin/pretests-gate --issue docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
 - wording review confirming:
   - capability boundary is distinct from Freely-self product baseline
   - internal reviewer / committee semantics are clear
