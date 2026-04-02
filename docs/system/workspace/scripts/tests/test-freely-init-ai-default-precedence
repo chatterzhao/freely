@@ -73,11 +73,13 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --intent "$PROJECT_GLOBAL/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT_GLOBAL/docs/CONSTITUTION.md" \
   --accept-default-autonomy \
-  >/dev/null
+  >"$TMP_DIR/project-global-init.stdout" 2>"$TMP_DIR/project-global-init.stderr"
 PROJECT_GLOBAL_CANON="$(cd "$PROJECT_GLOBAL" && pwd -P)"
 
 test -f "$PROJECT_GLOBAL_CANON/AGENTS.md"
 grep -q '^# Project Agent Entry$' "$PROJECT_GLOBAL_CANON/AGENTS.md"
+grep -q '^security_review_policy: advisory-on-high-risk-or-uncertainty$' "$TMP_DIR/project-global-init.stdout"
+grep -q '^security_review_scope: execution-boundary-and-reviewer-support$' "$TMP_DIR/project-global-init.stdout"
 grep -q '^AI_TOOL="cc"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
 grep -q '^AI_TOOL_ADAPTER="acp"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
 grep -q '^AI_TOOL_ADAPTER_POLICY="acp"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
