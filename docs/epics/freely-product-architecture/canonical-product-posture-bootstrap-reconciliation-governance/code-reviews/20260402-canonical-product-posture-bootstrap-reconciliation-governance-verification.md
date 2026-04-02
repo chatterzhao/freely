@@ -17,6 +17,9 @@ Verify the narrow follow-on that reconciles canonical tracked `.codex/config.tom
    - `bash docs/system/workspace/scripts/tests/test-freely-init-codex-project-config-force`
    - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation`
    - `./bin/freely doctor --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation`
+   - `./bin/freely init --project /Users/zhaoyu/Downloads/code/my-freely/freely --intent /Users/zhaoyu/Downloads/code/my-freely/freely/docs/PROJECT_INTENT.md --constitution /Users/zhaoyu/Downloads/code/my-freely/freely/docs/CONSTITUTION.md --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
+   - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+   - `./bin/freely doctor --project /Users/zhaoyu/Downloads/code/my-freely/freely`
    - `./bin/governance-check`
 
 ## Evidence
@@ -28,6 +31,10 @@ Verify the narrow follow-on that reconciles canonical tracked `.codex/config.tom
   - `execution_boundary_audit_status: pass`
   - `execution_boundary_audit_detail: aligned`
 - `freely doctor` exited successfully and reported `execution_boundary_audit_status: pass`
+- post-merge canonical `develop` replay also reported:
+  - `activation_consent_status: accepted`
+  - `execution_boundary_audit_status: pass`
+  - `execution_boundary_audit_detail: aligned`
 - focused regression proved that running `freely init` from a sibling feature worktree still writes `writable_roots` back to the canonical `.../freely-worktrees` root instead of a worktree-specific `.../<branch>-worktrees` path
 - `governance-check` passed with legacy naming warnings only
 

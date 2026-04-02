@@ -1680,19 +1680,27 @@ routing_policy:
 
 ### committed_issues
 
+### completed_issues
+
 1. `I-20260402-0403-A`
 - title: Canonical product posture bootstrap reconciliation governance
-- milestone_state: committed
-- phase_state: `in_dev`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/issues/canonical-product-posture-bootstrap-reconciliation-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/candidates.md`
 - evidence:
+  - `develop` commit `25aed6d`
+  - `develop` commit `77e1c76`
   - `docs/progress/freely-product-architecture/p-canonical-product-posture-bootstrap-reconciliation-governance.md`
-- completion_note: pending
-
-### completed_issues
+  - `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/code-reviews/20260402-canonical-product-posture-bootstrap-reconciliation-governance-verification.md`
+  - `./bin/freely init --project /Users/zhaoyu/Downloads/code/my-freely/freely --intent /Users/zhaoyu/Downloads/code/my-freely/freely/docs/PROJECT_INTENT.md --constitution /Users/zhaoyu/Downloads/code/my-freely/freely/docs/CONSTITUTION.md --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
+  - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `./bin/freely doctor --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-codex-project-config-force`
+  - `./bin/governance-check`
+- completion_note: Canonical `develop` now matches the already-frozen autonomy posture contract: tracked `.codex/config.toml` carries `approval_policy=never`, local bootstrap proof records activation consent in managed `.freely/config.env`, canonical `live-status` and `doctor` both report an aligned execution-boundary audit, and `freely init --force` preserves the canonical sibling `freely-worktrees` root even when invoked from a feature worktree.
 
 1. `I-20260326-1810`
 - title: Freely layered architecture and tooling topology

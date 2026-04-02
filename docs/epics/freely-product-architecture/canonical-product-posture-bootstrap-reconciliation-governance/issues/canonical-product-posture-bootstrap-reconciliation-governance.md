@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260402-0403-A`
 - title: Canonical product posture bootstrap reconciliation governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `canonical-product-posture-bootstrap-reconciliation-governance`
@@ -73,6 +73,10 @@ This owner reconciles canonical tracked `.codex/config.toml` plus canonical loca
 - `./bin/freely init --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation --intent /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation/docs/PROJECT_INTENT.md --constitution /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation/docs/CONSTITUTION.md --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
 - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation`
 - `./bin/freely doctor --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation`
+- `./bin/freely init --project /Users/zhaoyu/Downloads/code/my-freely/freely --intent /Users/zhaoyu/Downloads/code/my-freely/freely/docs/PROJECT_INTENT.md --constitution /Users/zhaoyu/Downloads/code/my-freely/freely/docs/CONSTITUTION.md --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
+- `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `./bin/freely doctor --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `bash docs/system/workspace/scripts/tests/test-freely-init-codex-project-config-force`
 - `./bin/governance-check`
 
 ## Next
