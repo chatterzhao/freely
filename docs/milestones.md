@@ -1651,16 +1651,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
 - next_action: keep the first materialization slice in `in_verification` until develop merge and post-merge acceptance confirm the launcher/project-config/tool-doc truth on canonical develop.
 
-3. `I-20260401-2316-A`
-- title: CC ACP init autonomy consent test followthrough governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/freely-product-architecture/cc-acp-init-autonomy-consent-test-followthrough-governance/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/candidates.md`
-- next_action: replay the narrow test-only followthrough into `develop`, then close it without widening the underlying materialization family.
-
 ### completed_issues
 
 1. `I-20260326-1810`
@@ -1674,6 +1664,22 @@ routing_policy:
 - evidence:
   - `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/code-reviews/20260326-freely-layered-architecture-and-tooling-topology-verification.md`
 - completion_note: Freely 自身产品架构、command family、observability semantic、host shell / form factor、external AI tooling layer 与 loop/lifecycle 真源的分层职责已在高层真源中完成首轮收敛；后续若继续泛化成通用产品形态方法，必须另开 lifecycle
+
+2. `I-20260401-2316-A`
+- title: CC ACP init autonomy consent test followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/freely-product-architecture/cc-acp-init-autonomy-consent-test-followthrough-governance/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/candidates.md`
+- evidence:
+  - `develop` merge `d5b7080`
+  - `docs/progress/freely-product-architecture/p-cc-acp-init-autonomy-consent-test-followthrough-governance.md`
+  - `docs/epics/freely-product-architecture/cc-acp-init-autonomy-consent-test-followthrough-governance/code-reviews/20260401-cc-acp-init-autonomy-consent-test-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+  - `./bin/governance-check`
+- completion_note: Canonical `develop` now matches the already-frozen activation-consent contract on the `cc:auto + adapter=acp` init path; this owner closed as a strict test-only followthrough without reopening runtime semantics or ACP scope.
 
 ### candidate_issues
 
