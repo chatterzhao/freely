@@ -67,6 +67,7 @@
 - 先定顺序，再谈冲突修复
 - 若已知存在 child/parent 依赖链，不得把它压平成“平面多棵树”直接谈顺序；必须先跑 stacked merge-chain 判断
 - completed 主线不得被 companion / candidate 视图回拉
+- merge-prep 可以合法检查 sibling worktree 的 dirty / readiness / conflict 面，但这不自动授予当前 actor 跨树 mutate authority；发现 blocker 后必须先回 manager arbitration
 - 当存在“两个分支都碰相近功能”时，默认先保留设计更优、验证更强、边界更清楚的那条；另一条只允许 salvage 差异，不允许把主线拉回旧设计
 - 若只是共享真源叠加语义，先按顺序 merge，不提前进入 `premerge`
 - 若已出现高风险冲突，再切 `skill:premerge-reconcile`

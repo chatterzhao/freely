@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260402-0455--worktree-exclusive-ownership-governance
+  - brainstorms: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/candidates.md
 - 20260402-0540--runtime-loop-log-timezone-label-followthrough
   - brainstorms: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/candidates.md
@@ -116,6 +119,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260402-0455--worktree-exclusive-ownership-governance
+  - brainstorms: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/candidates.md
 - 20260402-0540--runtime-loop-log-timezone-label-followthrough
   - brainstorms: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/candidates.md

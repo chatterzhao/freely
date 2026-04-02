@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-launch-duplicate-promotion-explainability.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+trap 'rm -rf "$TMP_DIR_REAL"' EXIT
+
+PROJECT="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+WORKER_A="$WT_ROOT/feature-a"
+WORKER_B="$WT_ROOT/feature-b"
+WORKER_A_REAL="$TMP_DIR_REAL/repo-worktrees/feature-a"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/docs" "$WT_ROOT"
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+git init -q "$PROJECT"
+git -C "$PROJECT" config user.email "test@example.com"
+git -C "$PROJECT" config user.name "Test User"
+cat >"$PROJECT/README.md" <<'EOF'
+# repo
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" branch -m develop
+git -C "$PROJECT" worktree add -q -b feature/a "$WORKER_A"
+git -C "$PROJECT" worktree add -q -b feature/b "$WORKER_B"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+for wt in "$WORKER_A" "$WORKER_B"; do
+  mkdir -p "$wt/.freely/run" "$wt/docs"
+  cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$wt/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+done
+
+cat >"$WORKER_A/.freely/run/prompt-20260402-172000.txt" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$WORKER_A\`
+
+Branch:
+- \`feature/a\`
+EOF
+
+bash -c "exec -a 'runtime/freely start --project $WORKER_A_REAL' sleep 30" >/dev/null 2>&1 &
+ACTIVE_SUP=$!
+bash -c "exec -a 'codex exec -C $WORKER_A_REAL -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+ACTIVE_AI=$!
+trap 'kill "$ACTIVE_SUP" "$ACTIVE_AI" 2>/dev/null || true; wait "$ACTIVE_SUP" "$ACTIVE_AI" 2>/dev/null || true; rm -rf "$TMP_DIR_REAL"' EXIT
+printf '%s' "$ACTIVE_SUP" >"$WORKER_A/.freely/run/supervisor.pid"
+printf '%s' "$ACTIVE_AI" >"$WORKER_A/.freely/run/ai.pid"
+
+PROMPT_A="$PROJECT/.freely/run/worker-prompts/20260402-172100-worker-a-codex.txt"
+PROMPT_B="$PROJECT/.freely/run/worker-prompts/20260402-172101-worker-b-codex.txt"
+cat >"$PROMPT_A" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$WORKER_A\`
+
+Branch:
+- \`feature/a\`
+EOF
+cat >"$PROMPT_B" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$WORKER_B\`
+
+Branch:
+- \`feature/b\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-continuity-20260402-172200.md" <<EOF
+# Manager Continuity
+## Queue
+- lane: \`a\`
+  - prompt_path: \`$PROMPT_A\`
+- lane: \`b\`
+  - prompt_path: \`$PROMPT_B\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+launch_worker_from_manager_prompt_if_needed() {
+  local _manager_project="$1" prompt_file="$2"
+  [[ "$prompt_file" == "$PROMPT_A" ]]
+  return 0
+}
+
+COUNT="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$COUNT" == "1" ]]
+
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "${QUEUED_WORKER_PROMPTS:-}" == "$PROMPT_B" ]]
+[[ "${QUEUED_WORKER_PROMPT_BLOCKERS:-}" == "queued:feature/b=promotion@I-20260402-0455-A -> develop blocked_by=feature/a@$WORKER_A_REAL state=active-owner" ]]
+
+echo "[PASS] manager worker launch writes queued ownership blocker explainability into launch state"

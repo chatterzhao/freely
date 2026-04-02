@@ -3343,7 +3343,7 @@ EOF
 }
 
 write_manager_worker_launch_state() {
-  local project="$1" continuity_generated="$2" prompts_generated_csv="$3" continuity_consumed="$4" launched_prompts_csv="$5" queued_prompts_csv="${6:-}" max_parallel_workers="${7:-}" active_worker_count="${8:-}" available_worker_slots="${9:-}"
+  local project="$1" continuity_generated="$2" prompts_generated_csv="$3" continuity_consumed="$4" launched_prompts_csv="$5" queued_prompts_csv="${6:-}" max_parallel_workers="${7:-}" active_worker_count="${8:-}" available_worker_slots="${9:-}" queued_prompt_blockers="${10:-}"
   cat >"$(manager_worker_launch_state_file "$project")" <<EOF
 LAST_MANAGER_CONTINUITY_GENERATED="$continuity_generated"
 LAST_MANAGER_WORKER_PROMPTS_GENERATED="$prompts_generated_csv"
@@ -3351,6 +3351,7 @@ LAST_MANAGER_CONTINUITY_CONSUMED="$continuity_consumed"
 LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$launched_prompts_csv"
 LAUNCHED_WORKER_PROMPTS="$launched_prompts_csv"
 QUEUED_WORKER_PROMPTS="$queued_prompts_csv"
+QUEUED_WORKER_PROMPT_BLOCKERS="$queued_prompt_blockers"
 MAX_PARALLEL_WORKERS="$max_parallel_workers"
 ACTIVE_RUNNING_WORKER_COUNT="$active_worker_count"
 AVAILABLE_NEW_WORKER_SLOTS="$available_worker_slots"
@@ -3413,7 +3414,7 @@ csv_retain_exact_items() {
 
 manager_worker_launch_state_reconcile_same_continuity_prompts() {
   local project="$1" continuity_file="$2"
-  local state_file prompt_generated_csv launched_csv normalized_launched_csv queued_csv max_parallel_workers active_running_workers available_new_slots
+  local state_file prompt_generated_csv launched_csv normalized_launched_csv queued_csv max_parallel_workers active_running_workers available_new_slots queued_prompt_blockers
   state_file="$(manager_worker_launch_state_file "$project")"
   [[ -f "$state_file" && -n "$continuity_file" && -f "$continuity_file" ]] || return 1
   # shellcheck disable=SC1090
@@ -3426,6 +3427,7 @@ manager_worker_launch_state_reconcile_same_continuity_prompts() {
 
   if [[ "$normalized_launched_csv" != "$launched_csv" || "${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-}" != "$prompt_generated_csv" ]]; then
     queued_csv="${QUEUED_WORKER_PROMPTS:-}"
+    queued_prompt_blockers="${QUEUED_WORKER_PROMPT_BLOCKERS:-}"
     max_parallel_workers="${MAX_PARALLEL_WORKERS:-}"
     active_running_workers="${ACTIVE_RUNNING_WORKER_COUNT:-}"
     available_new_slots="${AVAILABLE_NEW_WORKER_SLOTS:-}"
@@ -3438,7 +3440,8 @@ manager_worker_launch_state_reconcile_same_continuity_prompts() {
       "$queued_csv" \
       "$max_parallel_workers" \
       "$active_running_workers" \
-      "$available_new_slots"
+      "$available_new_slots" \
+      "$queued_prompt_blockers"
   fi
 
   printf '%s\n' "$normalized_launched_csv"
@@ -3447,7 +3450,7 @@ manager_worker_launch_state_reconcile_same_continuity_prompts() {
 manager_worker_launch_state_refresh_for_status() {
   local project="$1" continuity_file="" state_file
   local max_parallel_workers active_running_workers available_new_slots
-  local generated_continuity generated_prompts consumed_continuity consumed_prompts queued_prompts
+  local generated_continuity generated_prompts consumed_continuity consumed_prompts queued_prompts queued_prompt_blockers
   state_file="$(manager_worker_launch_state_file "$project")"
   [[ -n "$project" && -f "$state_file" ]] || return 0
   continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
@@ -3463,6 +3466,7 @@ manager_worker_launch_state_refresh_for_status() {
   consumed_continuity="${LAST_MANAGER_CONTINUITY_CONSUMED:-$continuity_file}"
   consumed_prompts="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
   queued_prompts="${QUEUED_WORKER_PROMPTS:-}"
+  queued_prompt_blockers="${QUEUED_WORKER_PROMPT_BLOCKERS:-}"
   max_parallel_workers="$(manager_max_parallel_workers)"
   active_running_workers="$(count_active_running_workers_for_manager_project "$project")"
   if [[ "$max_parallel_workers" == "unbounded" ]]; then
@@ -3490,7 +3494,8 @@ manager_worker_launch_state_refresh_for_status() {
       "$queued_prompts" \
       "$max_parallel_workers" \
       "$active_running_workers" \
-      "$available_new_slots"
+      "$available_new_slots" \
+      "$queued_prompt_blockers"
   fi
 }
 
@@ -3568,6 +3573,90 @@ file_mtime_epoch() {
   local path="$1"
   [[ -f "$path" ]] || return 1
   stat -f '%m' "$path" 2>/dev/null || return 1
+}
+
+timestamp_epoch_or_zero() {
+  local value="${1:-}" epoch=""
+  [[ -n "$value" ]] || {
+    printf '0\n'
+    return 0
+  }
+  epoch="$(codex_timestamp_to_epoch "$value" 2>/dev/null || true)"
+  printf '%s\n' "${epoch:-0}"
+}
+
+max_epoch_value() {
+  local best="0" candidate
+  for candidate in "$@"; do
+    [[ -n "$candidate" && "$candidate" =~ ^[0-9]+$ ]] || continue
+    if (( candidate > best )); then
+      best="$candidate"
+    fi
+  done
+  printf '%s\n' "$best"
+}
+
+recorded_worker_has_resume_evidence() {
+  local project="$1"
+  local state_file
+  state_file="$(session_state_file "$project")"
+  [[ -f "$state_file" ]] || return 1
+  # shellcheck disable=SC1090
+  source "$state_file"
+  [[ -n "${LAST_TOOL_JSONL_PATH:-}" && "${LAST_TOOL_JSONL_PATH:-}" != "unavailable" && -f "${LAST_TOOL_JSONL_PATH:-}" ]] && return 0
+  [[ -n "${LAST_CLAUDE_JSONL_PATH:-}" && "${LAST_CLAUDE_JSONL_PATH:-}" != "unavailable" && -f "${LAST_CLAUDE_JSONL_PATH:-}" ]] && return 0
+  [[ -n "${LAST_CODEX_MCP_JSONL_PATH:-}" && "${LAST_CODEX_MCP_JSONL_PATH:-}" != "unavailable" && -f "${LAST_CODEX_MCP_JSONL_PATH:-}" ]] && return 0
+  [[ -n "${LAST_TOOL_SESSION_ID:-}" && "${LAST_TOOL_SESSION_ID:-}" != "unavailable" ]] && return 0
+  [[ -n "${LAST_TOOL_RESUME_TARGET:-}" && "${LAST_TOOL_RESUME_TARGET:-}" != "unavailable" ]] && return 0
+  return 1
+}
+
+recorded_worker_latest_runtime_evidence_epoch() {
+  local project="$1"
+  local prompt_file session_file workcell_file prompt_epoch="0" session_epoch="0" workcell_epoch="0" state_updated_epoch="0"
+  local tool_jsonl_epoch="0" claude_jsonl_epoch="0" codex_mcp_jsonl_epoch="0"
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  session_file="$(session_state_file "$project")"
+  workcell_file="$(workcell_state_file "$project")"
+  prompt_epoch="$(file_mtime_epoch "$prompt_file" 2>/dev/null || true)"
+  session_epoch="$(file_mtime_epoch "$session_file" 2>/dev/null || true)"
+  workcell_epoch="$(file_mtime_epoch "$workcell_file" 2>/dev/null || true)"
+  if [[ -f "$workcell_file" ]]; then
+    # shellcheck disable=SC1090
+    source "$workcell_file"
+    state_updated_epoch="$(timestamp_epoch_or_zero "${LAST_STATE_UPDATED_AT:-}")"
+  fi
+  if [[ -f "$session_file" ]]; then
+    # shellcheck disable=SC1090
+    source "$session_file"
+    [[ -n "${LAST_TOOL_JSONL_PATH:-}" && -f "${LAST_TOOL_JSONL_PATH:-}" ]] && tool_jsonl_epoch="$(file_mtime_epoch "${LAST_TOOL_JSONL_PATH:-}" 2>/dev/null || true)"
+    [[ -n "${LAST_CLAUDE_JSONL_PATH:-}" && -f "${LAST_CLAUDE_JSONL_PATH:-}" ]] && claude_jsonl_epoch="$(file_mtime_epoch "${LAST_CLAUDE_JSONL_PATH:-}" 2>/dev/null || true)"
+    [[ -n "${LAST_CODEX_MCP_JSONL_PATH:-}" && -f "${LAST_CODEX_MCP_JSONL_PATH:-}" ]] && codex_mcp_jsonl_epoch="$(file_mtime_epoch "${LAST_CODEX_MCP_JSONL_PATH:-}" 2>/dev/null || true)"
+  fi
+  max_epoch_value "${prompt_epoch:-0}" "${session_epoch:-0}" "${workcell_epoch:-0}" "${state_updated_epoch:-0}" "${tool_jsonl_epoch:-0}" "${claude_jsonl_epoch:-0}" "${codex_mcp_jsonl_epoch:-0}"
+}
+
+recorded_worker_ownership_status() {
+  local project="$1"
+  local latest_evidence_epoch now_epoch hard_threshold
+  if recorded_worker_has_resume_evidence "$project"; then
+    printf 'soft_stale\n'
+    return 0
+  fi
+  latest_evidence_epoch="$(recorded_worker_latest_runtime_evidence_epoch "$project")"
+  [[ "$latest_evidence_epoch" =~ ^[0-9]+$ ]] || latest_evidence_epoch=0
+  (( latest_evidence_epoch > 0 )) || {
+    printf 'hard_stale\n'
+    return 0
+  }
+  now_epoch="$(date +%s)"
+  hard_threshold="${FREELY_OWNERSHIP_HARD_STALE_SECS:-${OWNERSHIP_HARD_STALE_THRESHOLD_SECS:-21600}}"
+  [[ "$hard_threshold" =~ ^[0-9]+$ ]] || hard_threshold=21600
+  if (( now_epoch - latest_evidence_epoch >= hard_threshold )); then
+    printf 'hard_stale\n'
+  else
+    printf 'soft_stale\n'
+  fi
 }
 
 all_manager_worker_prompt_paths_from_continuity() {
@@ -3889,6 +3978,64 @@ latest_frozen_manager_worker_prompt_paths_from_continuity() {
   manager_worker_prompt_paths_from_continuity_by_mode "$continuity_file" "frozen"
 }
 
+latest_queued_manager_worker_prompt_paths_from_continuity() {
+  local continuity_file="$1"
+  [[ -f "$continuity_file" ]] || return 0
+  awk '
+    function emit_prompt_paths(line,    remaining) {
+      remaining=line
+      while (match(remaining, /\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt/)) {
+        print substr(remaining, RSTART, RLENGTH)
+        remaining=substr(remaining, RSTART + RLENGTH)
+      }
+    }
+    /^## / {
+      section=tolower(substr($0, 4))
+      gsub(/[`[:space:]]+$/, "", section)
+      worker_prompts_subsection=""
+      next
+    }
+    /^# / {
+      section=""
+      worker_prompts_subsection=""
+      next
+    }
+    {
+      if (section == "worker prompts") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*launched:[[:space:]]*$/) {
+          worker_prompts_subsection="launched"
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*queue:[[:space:]]*$/) {
+          worker_prompts_subsection="queue"
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*frozen_queue:[[:space:]]*$/) {
+          worker_prompts_subsection="frozen"
+          next
+        }
+        if (worker_prompts_subsection == "queue" && $0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+          emit_prompt_paths($0)
+          next
+        }
+      }
+      if (section == "queue") {
+        if ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) {
+          emit_prompt_paths($0)
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+          emit_prompt_paths($0)
+        }
+        next
+      }
+      if ($0 ~ /- queued_worker_prompt: / || $0 ~ /- refreshed_queued_worker_prompt: /) {
+        emit_prompt_paths($0)
+      }
+    }
+  ' "$continuity_file"
+}
+
 worker_prompt_target_branch() {
   local prompt_file="$1"
   [[ -f "$prompt_file" ]] || return 0
@@ -3937,7 +4084,7 @@ worker_prompt_resolved_worktree() {
   local target_worktree target_branch
   target_worktree="$(worker_prompt_target_worktree "$prompt_file")"
   if [[ -n "$target_worktree" && -d "$target_worktree" ]]; then
-    printf '%s\n' "$target_worktree"
+    normalize_runtime_worktree_path "$target_worktree"
     return 0
   fi
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
@@ -4283,6 +4430,443 @@ worker_prompt_write_scope() {
   printf '%s\n' "${resolved_worktree:-$prompt_file}"
 }
 
+worker_prompt_intent_kind() {
+  local prompt_file="$1" value
+  value="$(worker_prompt_dispatch_metadata_value "$prompt_file" "intent_kind")"
+  value="$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')"
+  printf '%s\n' "$value"
+}
+
+worker_prompt_intent_target() {
+  local manager_project="$1" prompt_file="$2"
+  local value
+  value="$(worker_prompt_dispatch_metadata_value "$prompt_file" "intent_target")"
+  if [[ -n "$value" ]]; then
+    printf '%s\n' "$value"
+    return 0
+  fi
+  printf '%s\n' "$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+}
+
+worker_prompt_normalized_intent_kind() {
+  local prompt_file="$1" value
+  value="$(worker_prompt_intent_kind "$prompt_file")"
+  case "$value" in
+    edit|cleanup|promotion) printf '%s\n' "$value" ;;
+    *) printf 'unknown\n' ;;
+  esac
+}
+
+worker_prompt_effective_intent_target() {
+  local manager_project="$1" prompt_file="$2"
+  local kind value integration_target resolved_worktree
+  kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
+  value="$(worker_prompt_intent_target "$manager_project" "$prompt_file")"
+  resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+  case "$kind" in
+    edit|cleanup)
+      if [[ -n "$resolved_worktree" ]]; then
+        printf '%s\n' "$resolved_worktree"
+      elif [[ -n "$value" && "$value" != "$prompt_file" ]]; then
+        printf '%s\n' "$value"
+      else
+        printf 'none\n'
+      fi
+      ;;
+    promotion)
+      if [[ -n "$value" && "$value" != "$prompt_file" ]]; then
+        printf '%s\n' "$value"
+      else
+        integration_target="$(worker_prompt_dispatch_metadata_value "$prompt_file" "integration_target")"
+        [[ -n "$integration_target" ]] || integration_target="develop"
+        printf 'unknown -> %s\n' "$integration_target"
+      fi
+      ;;
+    *)
+      printf 'none\n'
+      ;;
+  esac
+}
+
+worker_prompt_blocking_intent_signature() {
+  local manager_project="$1" prompt_file="$2"
+  local kind target
+  kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
+  case "$kind" in
+    edit|cleanup|promotion) ;;
+    *)
+      printf '\n'
+      return 0
+      ;;
+  esac
+  target="$(worker_prompt_effective_intent_target "$manager_project" "$prompt_file")"
+  [[ -n "$target" && "$target" != "none" ]] || {
+    printf '\n'
+    return 0
+  }
+  printf '%s@%s\n' "$kind" "$target"
+}
+
+project_current_blocking_intent_signature() {
+  local project="$1" prompt_file
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || {
+    printf '\n'
+    return 0
+  }
+  worker_prompt_blocking_intent_signature "$project" "$prompt_file"
+}
+
+worker_prompt_targets_worktree() {
+  local manager_project="$1" prompt_file="$2" target_worktree="$3"
+  local resolved_worktree kind effective_target
+  [[ -n "$target_worktree" ]] || return 1
+  kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
+  case "$kind" in
+    edit|cleanup|promotion) ;;
+    *) return 1 ;;
+  esac
+  resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+  if [[ -n "$resolved_worktree" && "$resolved_worktree" == "$target_worktree" ]]; then
+    return 0
+  fi
+  effective_target="$(worker_prompt_effective_intent_target "$manager_project" "$prompt_file")"
+  [[ "$effective_target" == "$target_worktree" ]]
+}
+
+manager_active_blocking_intent_signatures_csv() {
+  local project="$1" exclude_project="${2:-}"
+  local wt_path signature csv=""
+  while IFS= read -r wt_path; do
+    [[ -n "$wt_path" && -d "$wt_path" ]] || continue
+    [[ "$wt_path" == "$exclude_project" ]] && continue
+    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    worker_project_is_actively_running "$wt_path" || continue
+    signature="$(project_current_blocking_intent_signature "$wt_path")"
+    [[ -n "$signature" ]] || continue
+    csv="$(csv_append_unique_item "$csv" "$signature")"
+  done < <(all_repo_worktrees_for_project "$project")
+  printf '%s\n' "$csv"
+}
+
+manager_recorded_blocking_intent_signatures_csv() {
+  local project="$1" exclude_project="${2:-}"
+  local wt_path signature csv="" recorded_status
+  while IFS= read -r wt_path; do
+    [[ -n "$wt_path" && -d "$wt_path" ]] || continue
+    [[ "$wt_path" == "$exclude_project" ]] && continue
+    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    worker_project_is_actively_running "$wt_path" && continue
+    recorded_status="$(recorded_worker_ownership_status "$wt_path")"
+    [[ "$recorded_status" == "hard_stale" ]] && continue
+    signature="$(project_current_blocking_intent_signature "$wt_path")"
+    [[ -n "$signature" ]] || continue
+    csv="$(csv_append_unique_item "$csv" "$signature")"
+  done < <(all_repo_worktrees_for_project "$project")
+  printf '%s\n' "$csv"
+}
+
+manager_other_worker_holds_blocking_intent_signature() {
+  local project="$1" exclude_project="$2" signature="$3" active_only="${4:-false}"
+  local wt_path current_signature recorded_status
+  [[ -n "$signature" ]] || return 1
+  while IFS= read -r wt_path; do
+    [[ -n "$wt_path" && -d "$wt_path" ]] || continue
+    [[ "$wt_path" == "$exclude_project" ]] && continue
+    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    if [[ "$active_only" == "true" ]]; then
+      worker_project_is_actively_running "$wt_path" || continue
+    elif ! worker_project_is_actively_running "$wt_path"; then
+      recorded_status="$(recorded_worker_ownership_status "$wt_path")"
+      [[ "$recorded_status" == "hard_stale" ]] && continue
+    fi
+    current_signature="$(project_current_blocking_intent_signature "$wt_path")"
+    [[ -n "$current_signature" && "$current_signature" == "$signature" ]] || continue
+    return 0
+  done < <(all_repo_worktrees_for_project "$project")
+  return 1
+}
+
+manager_other_worker_project_for_blocking_intent_signature() {
+  local project="$1" exclude_project="$2" signature="$3" active_only="${4:-false}"
+  local wt_path current_signature recorded_status
+  [[ -n "$signature" ]] || return 0
+  while IFS= read -r wt_path; do
+    [[ -n "$wt_path" && -d "$wt_path" ]] || continue
+    [[ "$wt_path" == "$exclude_project" ]] && continue
+    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    if [[ "$active_only" == "true" ]]; then
+      worker_project_is_actively_running "$wt_path" || continue
+    elif ! worker_project_is_actively_running "$wt_path"; then
+      recorded_status="$(recorded_worker_ownership_status "$wt_path")"
+      [[ "$recorded_status" == "hard_stale" ]] && continue
+    fi
+    current_signature="$(project_current_blocking_intent_signature "$wt_path")"
+    [[ -n "$current_signature" && "$current_signature" == "$signature" ]] || continue
+    printf '%s\n' "$wt_path"
+    return 0
+  done < <(all_repo_worktrees_for_project "$project")
+}
+
+project_active_ownership_conflict_snapshot() {
+  local project="$1"
+  local summary signature repo_root continuity_file holder_state holder_branch conflicting_project holder_signature holder_status
+  summary="$(project_active_ownership_conflict_summary "$project")"
+  signature="$(project_current_blocking_intent_signature "$project")"
+  if [[ -n "$summary" && -n "$signature" ]]; then
+    repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
+    continuity_file="$(latest_generated_manager_continuity_file_for_project "${repo_root:-$project}")"
+    IFS='|' read -r holder_state holder_branch conflicting_project holder_signature holder_status <<<"$(ownership_holder_snapshot_for_blocking_intent_signature "${repo_root:-$project}" "$project" "$continuity_file" "" "$signature")"
+    printf 'active|%s|%s|%s\n' "$summary" "$signature" "${conflicting_project:-none}"
+    return 0
+  fi
+  printf 'none|none|none|none\n'
+}
+
+manager_frozen_blocking_intent_signatures_csv() {
+  local project="$1" continuity_file="$2"
+  local prompt_file signature csv=""
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
+    printf '\n'
+    return 0
+  }
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    signature="$(worker_prompt_blocking_intent_signature "$project" "$prompt_file")"
+    [[ -n "$signature" ]] || continue
+    csv="$(csv_append_unique_item "$csv" "$signature")"
+  done < <(latest_frozen_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  printf '%s\n' "$csv"
+}
+
+manager_project_ownership_claim_for_worktree() {
+  local project="$1" target_worktree="$2"
+  local holder_state holder_branch holder_ref holder_status
+  IFS='|' read -r holder_state holder_branch holder_ref holder_status <<<"$(manager_worktree_ownership_claim_snapshot "$project" "$target_worktree")"
+  case "$holder_state" in
+    active-owner) printf 'runtime-active-owner\n' ;;
+    recorded-owner)
+      [[ "$holder_status" == "hard_stale" ]] || printf 'runtime-recorded-owner\n'
+      ;;
+    queued-owner) printf 'manager-queued-owner\n' ;;
+    frozen-owner) printf 'manager-frozen-owner\n' ;;
+    *) printf '\n' ;;
+  esac
+}
+
+manager_worktree_ownership_claim_snapshot() {
+  local project="$1" target_worktree="$2"
+  local continuity_file wt_path prompt_file holder_branch holder_status
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+
+  while IFS= read -r wt_path; do
+    [[ -n "$wt_path" && -d "$wt_path" ]] || continue
+    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    prompt_file="$(latest_prompt_file_for_project "$wt_path")"
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    worker_prompt_targets_worktree "$wt_path" "$prompt_file" "$target_worktree" || continue
+    holder_branch="$(branch_name_for_project "$wt_path")"
+    if worker_project_is_actively_running "$wt_path"; then
+      printf 'active-owner|%s|%s|active\n' "${holder_branch:-unknown}" "$wt_path"
+    else
+      holder_status="$(recorded_worker_ownership_status "$wt_path")"
+      printf 'recorded-owner|%s|%s|%s\n' "${holder_branch:-unknown}" "$wt_path" "${holder_status:-soft_stale}"
+    fi
+    return 0
+  done < <(all_repo_worktrees_for_project "$project")
+
+  if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
+    while IFS= read -r prompt_file; do
+      [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+      worker_prompt_targets_worktree "$project" "$prompt_file" "$target_worktree" || continue
+      holder_branch="$(worker_prompt_target_branch "$prompt_file")"
+      printf 'queued-owner|%s|%s|queued\n' "${holder_branch:-unknown}" "$prompt_file"
+      return 0
+    done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+
+    while IFS= read -r prompt_file; do
+      [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+      worker_prompt_targets_worktree "$project" "$prompt_file" "$target_worktree" || continue
+      holder_branch="$(worker_prompt_target_branch "$prompt_file")"
+      printf 'frozen-owner|%s|%s|frozen\n' "${holder_branch:-unknown}" "$prompt_file"
+      return 0
+    done < <(latest_frozen_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  fi
+
+  printf 'none|||\n'
+}
+
+worker_prompt_intent_summary_csv() {
+  local manager_project="$1" prompt_csv="$2"
+  local prompt_file intent_kind intent_target summary
+  [[ -n "$prompt_csv" && "$prompt_csv" != "none" ]] || {
+    printf 'none\n'
+    return 0
+  }
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    intent_kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
+    intent_target="$(worker_prompt_effective_intent_target "$manager_project" "$prompt_file")"
+    [[ -n "$intent_kind" ]] || intent_kind="unknown"
+    [[ -n "$intent_target" ]] || intent_target="none"
+    summary="${summary}${summary:+; }${intent_kind}@${intent_target}"
+  done < <(printf '%s\n' "$prompt_csv" | tr ',' '\n')
+  printf '%s\n' "${summary:-none}"
+}
+
+project_active_ownership_conflict_summary() {
+  local project="$1" repo_root continuity_file signature holder_state holder_branch holder_ref holder_signature holder_status
+  signature="$(project_current_blocking_intent_signature "$project")"
+  [[ -n "$signature" ]] || {
+    printf '\n'
+    return 0
+  }
+  repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
+  [[ -n "$repo_root" ]] || {
+    printf '\n'
+    return 0
+  }
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$repo_root")"
+  IFS='|' read -r holder_state holder_branch holder_ref holder_signature holder_status <<<"$(ownership_holder_snapshot_for_blocking_intent_signature "$repo_root" "$project" "$continuity_file" "" "$signature")"
+  [[ -n "$holder_state" && "$holder_state" != "none" ]] || {
+    printf '\n'
+    return 0
+  }
+  printf 'signature=%s holder_branch=%s holder_path=%s holder_state=%s holder_status=%s\n' \
+    "$signature" "${holder_branch:-unknown}" "$holder_ref" "$holder_state" "${holder_status:-unknown}"
+}
+
+project_active_ownership_conflict_state() {
+  local project="$1"
+  if [[ -n "$(project_active_ownership_conflict_summary "$project")" ]]; then
+    printf 'active\n'
+  else
+    printf 'none\n'
+  fi
+}
+
+fleet_active_ownership_conflicts_summary() {
+  local project="$1" repo_root continuity_file wt_path signature holder_state holder_branch holder_ref holder_signature holder_status summary=""
+  repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
+  [[ -n "$repo_root" ]] || {
+    printf 'none\n'
+    return 0
+  }
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$repo_root")"
+  while IFS= read -r wt_path; do
+    [[ -n "$wt_path" && -d "$wt_path" ]] || continue
+    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    signature="$(project_current_blocking_intent_signature "$wt_path")"
+    [[ -n "$signature" ]] || continue
+    IFS='|' read -r holder_state holder_branch holder_ref holder_signature holder_status <<<"$(ownership_holder_snapshot_for_blocking_intent_signature "$repo_root" "$wt_path" "$continuity_file" "" "$signature")"
+    [[ -n "$holder_state" && "$holder_state" != "none" ]] || continue
+    summary="${summary}${summary:+; }$(branch_name_for_project "$wt_path")=${signature} blocked_by=${holder_branch:-unknown}@${holder_ref} state=${holder_state} status=${holder_status:-unknown}"
+  done < <(all_repo_worktrees_for_project "$repo_root")
+  printf '%s\n' "${summary:-none}"
+}
+
+manager_frozen_prompt_for_blocking_intent_signature() {
+  local project="$1" continuity_file="$2" exclude_prompt="$3" signature="$4"
+  local prompt_file prompt_signature
+  [[ -n "$continuity_file" && -f "$continuity_file" && -n "$signature" ]] || return 0
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    [[ -n "$exclude_prompt" && "$prompt_file" == "$exclude_prompt" ]] && continue
+    prompt_signature="$(worker_prompt_blocking_intent_signature "$project" "$prompt_file")"
+    [[ -n "$prompt_signature" && "$prompt_signature" == "$signature" ]] || continue
+    printf '%s\n' "$prompt_file"
+    return 0
+  done < <(latest_frozen_manager_worker_prompt_paths_from_continuity "$continuity_file")
+}
+
+manager_queued_prompt_for_blocking_intent_signature() {
+  local project="$1" continuity_file="$2" exclude_prompt="$3" signature="$4"
+  local prompt_file prompt_signature
+  [[ -n "$continuity_file" && -f "$continuity_file" && -n "$signature" ]] || return 0
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    [[ -n "$exclude_prompt" && "$prompt_file" == "$exclude_prompt" ]] && return 0
+    prompt_signature="$(worker_prompt_blocking_intent_signature "$project" "$prompt_file")"
+    [[ -n "$prompt_signature" && "$prompt_signature" == "$signature" ]] || continue
+    printf '%s\n' "$prompt_file"
+    return 0
+  done < <(latest_queued_manager_worker_prompt_paths_from_continuity "$continuity_file")
+}
+
+ownership_holder_snapshot_for_blocking_intent_signature() {
+  local project="$1" exclude_project="$2" continuity_file="$3" exclude_prompt="$4" signature="$5"
+  local holder_project holder_prompt holder_branch holder_status
+  [[ -n "$signature" ]] || {
+    printf 'none||||\n'
+    return 0
+  }
+
+  holder_project="$(manager_other_worker_project_for_blocking_intent_signature "$project" "$exclude_project" "$signature")"
+  if [[ -n "$holder_project" ]]; then
+    holder_branch="$(branch_name_for_project "$holder_project")"
+    if worker_project_is_actively_running "$holder_project"; then
+      printf 'active-owner|%s|%s|%s|active\n' "${holder_branch:-unknown}" "$holder_project" "$signature"
+    else
+      holder_status="$(recorded_worker_ownership_status "$holder_project")"
+      printf 'recorded-owner|%s|%s|%s|%s\n' "${holder_branch:-unknown}" "$holder_project" "$signature" "${holder_status:-soft_stale}"
+    fi
+    return 0
+  fi
+
+  holder_prompt="$(manager_frozen_prompt_for_blocking_intent_signature "$project" "$continuity_file" "$exclude_prompt" "$signature")"
+  if [[ -n "$holder_prompt" ]]; then
+    holder_branch="$(worker_prompt_target_branch "$holder_prompt")"
+    printf 'frozen-owner|%s|%s|%s|frozen\n' "${holder_branch:-unknown}" "$holder_prompt" "$signature"
+    return 0
+  fi
+
+  printf 'none||||\n'
+}
+
+manager_prompt_ownership_conflict_summary() {
+  local project="$1" prompt_file="$2" continuity_file="$3" queue_kind="${4:-queued}"
+  local signature blocked_branch holder_branch holder_ref holder_state holder_signature holder_status target_project holder_prompt
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 0
+  signature="$(worker_prompt_blocking_intent_signature "$project" "$prompt_file")"
+  [[ -n "$signature" ]] || return 0
+  blocked_branch="$(worker_prompt_target_branch "$prompt_file")"
+  target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
+  IFS='|' read -r holder_state holder_branch holder_ref holder_signature holder_status <<<"$(ownership_holder_snapshot_for_blocking_intent_signature "$project" "$target_project" "$continuity_file" "$prompt_file" "$signature")"
+  if [[ -n "$holder_state" && "$holder_state" != "none" ]]; then
+    printf '%s:%s=%s blocked_by=%s@%s state=%s status=%s\n' \
+      "$queue_kind" "${blocked_branch:-unknown}" "$signature" "${holder_branch:-unknown}" "$holder_ref" "$holder_state" "${holder_status:-unknown}"
+    return 0
+  fi
+  holder_prompt="$(manager_queued_prompt_for_blocking_intent_signature "$project" "$continuity_file" "$prompt_file" "$signature")"
+  if [[ -n "$holder_prompt" ]]; then
+    holder_branch="$(worker_prompt_target_branch "$holder_prompt")"
+    printf '%s:%s=%s blocked_by=%s@%s state=%s status=%s\n' \
+      "$queue_kind" "${blocked_branch:-unknown}" "$signature" "${holder_branch:-unknown}" "$holder_prompt" "queued-owner" "queued"
+  fi
+}
+
+manager_pending_ownership_conflicts_summary() {
+  local project="$1" continuity_file="$2" queued_csv="$3"
+  local prompt_file summary="" prompt_summary
+  if [[ -n "$queued_csv" && "$queued_csv" != "none" ]]; then
+    while IFS= read -r prompt_file; do
+      [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+      prompt_summary="$(manager_prompt_ownership_conflict_summary "$project" "$prompt_file" "$continuity_file" "queued")"
+      [[ -n "$prompt_summary" ]] || continue
+      summary="${summary}${summary:+; }${prompt_summary}"
+    done < <(printf '%s\n' "$queued_csv" | tr ',' '\n')
+  fi
+  if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
+    while IFS= read -r prompt_file; do
+      [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+      prompt_summary="$(manager_prompt_ownership_conflict_summary "$project" "$prompt_file" "$continuity_file" "frozen")"
+      [[ -n "$prompt_summary" ]] || continue
+      summary="${summary}${summary:+; }${prompt_summary}"
+    done < <(latest_frozen_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  fi
+  printf '%s\n' "${summary:-none}"
+}
+
 manager_max_parallel_workers() {
   printf 'unbounded\n'
 }
@@ -4404,7 +4988,7 @@ manager_runtime_launch_workers_from_latest_handoff() {
   local continuity_file continuity_generated prompt_generated_csv launched_csv queued_csv
   local launched_count prompt_file prompt_rank prompt_index target_project write_scope
   local parallel_safe active_running_workers available_new_slots max_parallel_workers
-  local selected_write_scopes_csv worker_is_active worker_is_busy prompt_queue_file
+  local selected_write_scopes_csv selected_intent_signatures_csv frozen_intent_signatures_csv active_intent_signatures_csv recorded_intent_signatures_csv worker_is_active worker_is_busy prompt_queue_file prompt_signature queued_prompt_blockers
   continuity_file="$(latest_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
     printf '0\n'
@@ -4430,7 +5014,28 @@ manager_runtime_launch_workers_from_latest_handoff() {
   active_running_workers="$(count_active_running_workers_for_manager_project "$project")"
   available_new_slots="$(manager_worker_launch_available_slots "$project")"
   launched_count=0
+  queued_prompt_blockers="none"
   selected_write_scopes_csv=""
+  active_intent_signatures_csv="$(manager_active_blocking_intent_signatures_csv "$project")"
+  recorded_intent_signatures_csv="$(manager_recorded_blocking_intent_signatures_csv "$project")"
+  frozen_intent_signatures_csv="$(manager_frozen_blocking_intent_signatures_csv "$project" "$continuity_file")"
+  selected_intent_signatures_csv="$active_intent_signatures_csv"
+  if [[ -n "$recorded_intent_signatures_csv" ]]; then
+    IFS=',' read -r -a __freely_recorded_intents <<<"$recorded_intent_signatures_csv"
+    local recorded_signature
+    for recorded_signature in "${__freely_recorded_intents[@]}"; do
+      [[ -n "$recorded_signature" ]] || continue
+      selected_intent_signatures_csv="$(csv_append_unique_item "$selected_intent_signatures_csv" "$recorded_signature")"
+    done
+  fi
+  if [[ -n "$frozen_intent_signatures_csv" ]]; then
+    IFS=',' read -r -a __freely_frozen_intents <<<"$frozen_intent_signatures_csv"
+    local frozen_signature
+    for frozen_signature in "${__freely_frozen_intents[@]}"; do
+      [[ -n "$frozen_signature" ]] || continue
+      selected_intent_signatures_csv="$(csv_append_unique_item "$selected_intent_signatures_csv" "$frozen_signature")"
+    done
+  fi
   prompt_queue_file="$(mktemp "${TMPDIR:-/tmp}/freely-manager-launch-queue.XXXXXX")"
   prompt_index=0
   while IFS= read -r prompt_file; do
@@ -4473,9 +5078,21 @@ manager_runtime_launch_workers_from_latest_handoff() {
       queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
       continue
     fi
+    prompt_signature="$(worker_prompt_blocking_intent_signature "$project" "$prompt_file")"
+    if [[ -n "$prompt_signature" ]] && manager_other_worker_holds_blocking_intent_signature "$project" "$target_project" "$prompt_signature"; then
+      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+      continue
+    fi
+    if [[ -n "$prompt_signature" ]] && csv_conflicts_with_item "$selected_intent_signatures_csv" "$prompt_signature"; then
+      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+      continue
+    fi
     if launch_worker_from_manager_prompt_if_needed "$project" "$prompt_file"; then
       launched_csv="$(csv_append_unique_item "$launched_csv" "$prompt_file")"
       selected_write_scopes_csv="$(csv_append_unique_item "$selected_write_scopes_csv" "$write_scope")"
+      if [[ -n "$prompt_signature" ]]; then
+        selected_intent_signatures_csv="$(csv_append_unique_item "$selected_intent_signatures_csv" "$prompt_signature")"
+      fi
       launched_count=$((launched_count + 1))
       if [[ "$worker_is_active" != "1" ]]; then
         active_running_workers=$((active_running_workers + 1))
@@ -4486,7 +5103,8 @@ manager_runtime_launch_workers_from_latest_handoff() {
   done < <(sort -t $'\t' -k1,1n -k2,2n "$prompt_queue_file")
   rm -f "$prompt_queue_file"
 
-  write_manager_worker_launch_state "$project" "$continuity_generated" "$prompt_generated_csv" "$continuity_file" "$launched_csv" "$queued_csv" "$max_parallel_workers" "$active_running_workers" "$available_new_slots"
+  queued_prompt_blockers="$(manager_pending_ownership_conflicts_summary "$project" "$continuity_file" "$queued_csv")"
+  write_manager_worker_launch_state "$project" "$continuity_generated" "$prompt_generated_csv" "$continuity_file" "$launched_csv" "$queued_csv" "$max_parallel_workers" "$active_running_workers" "$available_new_slots" "$queued_prompt_blockers"
   printf '%s\n' "$launched_count"
 }
 
@@ -5320,6 +5938,7 @@ manager_hygiene_alerts() {
 
 manager_runtime_recover_workers_if_needed() {
   local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered latest_continuity_file
+  local worker_signature
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || return 0
   [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
@@ -5366,6 +5985,12 @@ manager_runtime_recover_workers_if_needed() {
 
     if manager_continuity_explicitly_freezes_worker_project "$project" "$wt_path" "$latest_continuity_file"; then
       log_info "manager continuity keeps worker frozen; skipping expected-running recovery: branch=${branch:-unknown} path=$wt_path"
+      continue
+    fi
+
+    worker_signature="$(project_current_blocking_intent_signature "$wt_path")"
+    if [[ -n "$worker_signature" ]] && manager_other_worker_holds_blocking_intent_signature "$project" "$wt_path" "$worker_signature"; then
+      log_info "manager runtime skips expected-running recovery due to ownership conflict: branch=${branch:-unknown} intent=${worker_signature} path=$wt_path"
       continue
     fi
 
@@ -5994,7 +6619,7 @@ run_cleanup_followthrough() {
   local project="$1" intake_id="$2" classification="$3" reaction="$4" why_text="$5" handoff_text="$6"
   local resolution_file blocked_reason cleaned retained wt_path branch dirty supervisor ai
   local remote_name remote_fetch_state remote_note remote_ref
-  local resolution_status absorption_target linked_artifact next_restart_point next_ownership next_handoff
+  local resolution_status absorption_target linked_artifact next_restart_point next_ownership next_handoff ownership_claim local_intent_signature ownership_state ownership_branch ownership_ref ownership_status local_intent_status
   blocked_reason=""
   cleaned=""
   retained=""
@@ -6020,6 +6645,28 @@ run_cleanup_followthrough() {
     dirty="$(git -C "$wt_path" status --porcelain 2>/dev/null || true)"
     if [[ -n "$dirty" ]]; then
       retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (dirty)"
+      continue
+    fi
+    local_intent_signature="$(project_current_blocking_intent_signature "$wt_path")"
+    if [[ -n "$local_intent_signature" ]]; then
+      if worker_project_is_actively_running "$wt_path"; then
+        retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (ownership:local-intent:${local_intent_signature}:status=active)"
+        continue
+      fi
+      local_intent_status="$(recorded_worker_ownership_status "$wt_path")"
+      if [[ "$local_intent_status" != "hard_stale" ]]; then
+        retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (ownership:local-intent:${local_intent_signature}:status=${local_intent_status:-soft_stale})"
+        continue
+      fi
+    fi
+    ownership_claim="$(manager_project_ownership_claim_for_worktree "$project" "$wt_path")"
+    if [[ -n "$ownership_claim" ]]; then
+      IFS='|' read -r ownership_state ownership_branch ownership_ref ownership_status <<<"$(manager_worktree_ownership_claim_snapshot "$project" "$wt_path")"
+      if [[ -n "$ownership_state" && "$ownership_state" != "none" ]]; then
+        retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (ownership:${ownership_state}:${ownership_branch:-unknown}@${ownership_ref}:status=${ownership_status:-unknown})"
+      else
+        retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (ownership:${ownership_claim})"
+      fi
       continue
     fi
     supervisor=""
@@ -8147,6 +8794,10 @@ cmd_live_status() {
   local supervisor_pid ai_pid dispatcher_pid watchdog_pid
   local supervisor_cmd ai_cmd dispatcher_cmd watchdog_cmd
   local prompt_file continuity_file prompt_excerpt continuity_excerpt
+  local prompt_intent_kind prompt_intent_target prompt_intent_target_raw
+  local ownership_conflict_state ownership_conflict_signature ownership_conflict_with ownership_conflict_summary
+  local ownership_holder_state ownership_holder_status
+  local manager_pending_ownership_conflicts
   local intake_snapshot latest_resolution_snapshot
   local delegated_pending_ids prompt_has_delegated
   local desired_runtime_state last_supervisor_state last_ai_state last_exit_reason last_role_hint last_state_updated_at
@@ -8170,6 +8821,33 @@ cmd_live_status() {
   continuity_file="$(find_latest_manager_continuity_file_for_project "$project")"
   prompt_excerpt="$(trimmed_file_excerpt "$prompt_file" tail 12)"
   continuity_excerpt="$(trimmed_file_excerpt "$continuity_file" head 12)"
+  prompt_intent_kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
+  prompt_intent_target_raw="$(worker_prompt_intent_target "$project" "$prompt_file")"
+  prompt_intent_target="$(worker_prompt_effective_intent_target "$project" "$prompt_file")"
+  IFS='|' read -r ownership_conflict_state ownership_conflict_summary ownership_conflict_signature ownership_conflict_with <<<"$(project_active_ownership_conflict_snapshot "$project")"
+  ownership_holder_state="none"
+  ownership_holder_status="none"
+  if [[ -n "$(project_current_blocking_intent_signature "$project")" ]]; then
+    if worker_project_is_actively_running "$project"; then
+      ownership_holder_state="active-owner"
+      ownership_holder_status="active"
+    elif [[ "$role_hint" == "worker" ]]; then
+      ownership_holder_state="recorded-owner"
+      ownership_holder_status="$(recorded_worker_ownership_status "$project")"
+    fi
+  fi
+  if [[ "$prompt_intent_kind" == "unknown" || -z "$prompt_intent_kind" ]]; then
+    prompt_intent_kind="none"
+    prompt_intent_target="none"
+  fi
+  if [[ "$ownership_conflict_state" != "active" ]]; then
+    ownership_conflict_summary="none"
+    if [[ "$role_hint" == "manager" ]]; then
+      ownership_conflict_summary="$(fleet_active_ownership_conflicts_summary "$project")"
+      [[ "$ownership_conflict_summary" == "none" ]] || ownership_conflict_state="active"
+    fi
+  fi
+  manager_pending_ownership_conflicts="none"
   intake_snapshot="$(intake_snapshot_for_project "$project" 3)"
   latest_resolution_snapshot="$(resolution_snapshot_for_project "$project" 1)"
   delegated_pending_ids="$(delegated_continuation_ids_for_project "$project")"
@@ -8185,7 +8863,8 @@ cmd_live_status() {
   last_role_hint="$role_hint"
   last_state_updated_at="unknown"
   local latest_manager_continuity_generated latest_manager_continuity_consumed latest_manager_worker_prompts_generated latest_manager_worker_prompts_consumed
-  local queued_worker_prompts max_parallel_workers active_running_worker_count available_new_worker_slots
+  local latest_manager_worker_prompt_intents_generated latest_manager_worker_prompt_intents_consumed
+  local queued_worker_prompts queued_worker_prompt_blockers max_parallel_workers active_running_worker_count available_new_worker_slots
   if [[ -f "$(workcell_state_file "$project")" ]]; then
     # shellcheck disable=SC1090
     source "$(workcell_state_file "$project")"
@@ -8213,7 +8892,10 @@ cmd_live_status() {
   latest_manager_continuity_consumed="unavailable"
   latest_manager_worker_prompts_generated="none"
   latest_manager_worker_prompts_consumed="none"
+  latest_manager_worker_prompt_intents_generated="none"
+  latest_manager_worker_prompt_intents_consumed="none"
   queued_worker_prompts="none"
+  queued_worker_prompt_blockers="none"
   max_parallel_workers="unknown"
   active_running_worker_count="unknown"
   available_new_worker_slots="unknown"
@@ -8226,6 +8908,7 @@ cmd_live_status() {
     latest_manager_worker_prompts_generated="${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-none}"
     latest_manager_worker_prompts_consumed="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}"
     queued_worker_prompts="${QUEUED_WORKER_PROMPTS:-none}"
+    queued_worker_prompt_blockers="${QUEUED_WORKER_PROMPT_BLOCKERS:-none}"
     max_parallel_workers="${MAX_PARALLEL_WORKERS:-unknown}"
     active_running_worker_count="${ACTIVE_RUNNING_WORKER_COUNT:-unknown}"
     available_new_worker_slots="${AVAILABLE_NEW_WORKER_SLOTS:-unknown}"
@@ -8256,6 +8939,12 @@ cmd_live_status() {
         latest_manager_continuity_consumed="unavailable"
         latest_manager_worker_prompts_consumed="none"
       fi
+    fi
+  fi
+  if [[ "$role_hint" == "manager" ]]; then
+    manager_pending_ownership_conflicts="${queued_worker_prompt_blockers:-none}"
+    if [[ -z "$manager_pending_ownership_conflicts" || "$manager_pending_ownership_conflicts" == "none" ]]; then
+      manager_pending_ownership_conflicts="$(manager_pending_ownership_conflicts_summary "$project" "${latest_generated_continuity:-$continuity_file}" "${queued_worker_prompts:-none}")"
     fi
   fi
   semantic_loop_signal_reason="unavailable"
@@ -8309,6 +8998,10 @@ cmd_live_status() {
   echo "restart_storm_escalation_target: ${LAST_RESTART_STORM_ESCALATION_TARGET:-unavailable}"
   echo "semantic_loop_signal_reason: ${semantic_loop_signal_reason}"
   echo "semantic_loop_signal_summary: ${semantic_loop_signal_summary}"
+  echo "ownership_holder_state: ${ownership_holder_state}"
+  echo "ownership_holder_status: ${ownership_holder_status}"
+  echo "ownership_conflict_state: ${ownership_conflict_state}"
+  echo "ownership_conflict_summary: ${ownership_conflict_summary}"
   echo "develop_push_followthrough_state: ${develop_push_state}"
   echo "develop_push_followthrough_summary: ${develop_push_summary}"
   echo "current_prompt_has_delegated_continuation: ${prompt_has_delegated}"
@@ -8316,10 +9009,18 @@ cmd_live_status() {
   echo "latest_manager_continuity_consumed: ${latest_manager_continuity_consumed}"
   echo "latest_manager_worker_prompts_generated: ${latest_manager_worker_prompts_generated}"
   echo "latest_manager_worker_prompts_consumed: ${latest_manager_worker_prompts_consumed}"
+  latest_manager_worker_prompt_intents_generated="$(worker_prompt_intent_summary_csv "$project" "$latest_manager_worker_prompts_generated")"
+  latest_manager_worker_prompt_intents_consumed="$(worker_prompt_intent_summary_csv "$project" "$latest_manager_worker_prompts_consumed")"
+  echo "latest_manager_worker_prompt_intents_generated: ${latest_manager_worker_prompt_intents_generated}"
+  echo "latest_manager_worker_prompt_intents_consumed: ${latest_manager_worker_prompt_intents_consumed}"
   echo "queued_worker_prompts: ${queued_worker_prompts}"
+  echo "queued_worker_prompt_blockers: ${queued_worker_prompt_blockers:-none}"
+  echo "manager_pending_ownership_conflicts: ${manager_pending_ownership_conflicts:-none}"
   echo "max_parallel_workers: ${max_parallel_workers}"
   echo "active_running_worker_count: ${active_running_worker_count}"
   echo "available_new_worker_slots: ${available_new_worker_slots}"
+  echo "ownership_conflict_signature: ${ownership_conflict_signature:-none}"
+  echo "ownership_conflict_with: ${ownership_conflict_with:-none}"
 
   if [[ -n "$supervisor_pid" || -n "$watchdog_pid" || -n "$dispatcher_pid" || -n "$ai_pid" ]]; then
     echo "active_processes:"
@@ -8342,6 +9043,9 @@ cmd_live_status() {
   echo "current_focus:"
   if [[ -n "$prompt_file" ]]; then
     echo "- prompt_file: $prompt_file"
+    echo "- prompt_intent_kind: ${prompt_intent_kind:-none}"
+    echo "- prompt_intent_target: ${prompt_intent_target:-none}"
+    echo "- prompt_intent_target_raw: ${prompt_intent_target_raw:-none}"
     echo "- prompt_excerpt:"
     emit_indented_block "  " "$prompt_excerpt"
   else
@@ -8475,8 +9179,8 @@ sleep_with_rate_limit_recheck() {
 }
 
 cmd_fleet_status() {
-  local project="" repo_root entries wt_path wt_branch wt_state cfg run_dir session_state supervisor_pid ai_pid last_launch last_dirty checkpoint_json checkpoint_required restart_signal_reason restart_signal_at restart_summary semantic_loop_summary semantic_loop_signal
-  local develop_push_snapshot develop_push_state develop_push_summary
+  local project="" repo_root entries wt_path wt_branch wt_state cfg run_dir session_state supervisor_pid ai_pid last_launch last_dirty checkpoint_json checkpoint_required restart_signal_reason restart_signal_at restart_summary semantic_loop_summary semantic_loop_signal ownership_conflict_summary manager_pending_ownership_conflicts role_hint
+  local develop_push_snapshot develop_push_state develop_push_summary prompt_file prompt_intent_kind prompt_intent_target manager_generated_intents manager_consumed_intents
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -8504,13 +9208,22 @@ cmd_fleet_status() {
     last_launch="-"
     last_dirty="-"
     checkpoint_required="false"
+    prompt_intent_kind="none"
+    prompt_intent_target="none"
+    ownership_holder_status="none"
+    manager_generated_intents="none"
+    manager_consumed_intents="none"
     restart_signal_reason="-"
     restart_signal_at="-"
     restart_summary="-"
     semantic_loop_summary="-"
+    ownership_conflict_summary="none"
+    manager_pending_ownership_conflicts="none"
+    role_hint="unknown"
     if [[ -f "$cfg" ]]; then
       run_dir="$(run_dir_for_project "$wt_path")"
       session_state="$(session_state_file "$wt_path")"
+      role_hint="$(role_hint_for_project "$wt_path")"
       if [[ -f "$(manager_worker_launch_state_file "$wt_path")" ]]; then
         manager_worker_launch_state_refresh_for_status "$wt_path" >/dev/null 2>&1 || true
       fi
@@ -8543,6 +9256,27 @@ cmd_fleet_status() {
       fi
       develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$wt_path")"
       IFS='|' read -r develop_push_state develop_push_summary _ _ _ _ _ <<<"$develop_push_snapshot"
+      prompt_file="$(find_latest_prompt_file_for_project "$wt_path")"
+      if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
+        prompt_intent_kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
+        prompt_intent_target="$(worker_prompt_effective_intent_target "$wt_path" "$prompt_file")"
+        if worker_project_is_actively_running "$wt_path"; then
+          ownership_holder_status="active"
+        elif [[ "$role_hint" == "worker" ]] && [[ -n "$(project_current_blocking_intent_signature "$wt_path")" ]]; then
+          ownership_holder_status="$(recorded_worker_ownership_status "$wt_path")"
+        fi
+      fi
+      if [[ -f "$(manager_worker_launch_state_file "$wt_path")" ]]; then
+        # shellcheck disable=SC1090
+        source "$(manager_worker_launch_state_file "$wt_path")"
+        manager_generated_intents="$(worker_prompt_intent_summary_csv "$wt_path" "${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-none}")"
+        manager_consumed_intents="$(worker_prompt_intent_summary_csv "$wt_path" "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}")"
+        if [[ "$role_hint" == "manager" ]]; then
+          manager_pending_ownership_conflicts="$(manager_pending_ownership_conflicts_summary "$wt_path" "$(latest_generated_manager_continuity_file_for_project "$wt_path")" "${QUEUED_WORKER_PROMPTS:-none}")"
+        fi
+      fi
+      ownership_conflict_summary="$(project_active_ownership_conflict_summary "$wt_path")"
+      [[ -n "$ownership_conflict_summary" ]] || ownership_conflict_summary="none"
     else
       develop_push_state="not_applicable"
       develop_push_summary="config_missing"
@@ -8550,6 +9284,21 @@ cmd_fleet_status() {
     checkpoint_json="$(checkpoint_guard_json_for_project "$wt_path")"
     checkpoint_required="$(checkpoint_guard_value "$checkpoint_json" checkpoint_required)"
     printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "$wt_branch" "$wt_state" "$supervisor_pid" "$ai_pid" "$last_dirty" "${checkpoint_required:-false}" "$wt_path"
+    if [[ "$prompt_intent_kind" != "unknown" && "$prompt_intent_kind" != "none" ]]; then
+      printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "intent" "" "${prompt_intent_kind}@${prompt_intent_target}"
+    fi
+    if [[ "$ownership_holder_status" != "none" ]]; then
+      printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "ownership_holder" "" "${ownership_holder_status}"
+    fi
+    if [[ "$manager_generated_intents" != "none" || "$manager_consumed_intents" != "none" ]]; then
+      printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "manager_intent" "" "generated=${manager_generated_intents} consumed=${manager_consumed_intents}"
+    fi
+    if [[ "$manager_pending_ownership_conflicts" != "none" ]]; then
+      printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "manager_pending_conflict" "" "${manager_pending_ownership_conflicts}"
+    fi
+    if [[ "$ownership_conflict_summary" != "none" ]]; then
+      printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "ownership_conflict" "" "${ownership_conflict_summary}"
+    fi
     if [[ "$last_launch" != "-" ]]; then
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "launch=$last_launch" "" ""
     fi

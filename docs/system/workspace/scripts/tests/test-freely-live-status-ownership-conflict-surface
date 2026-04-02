@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-ownership-conflict.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+
+cleanup() {
+  set +e
+  kill "${ACTIVE_SUP:-}" "${ACTIVE_AI:-}" 2>/dev/null || true
+  wait "${ACTIVE_SUP:-}" 2>/dev/null || true
+  wait "${ACTIVE_AI:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR_REAL"
+}
+
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+OWNER_WT="$WT_ROOT/feature-owner"
+BLOCKED_WT="$WT_ROOT/feature-blocked"
+
+PROJECT_REAL="$TMP_DIR_REAL/repo"
+OWNER_WT_REAL="$TMP_DIR_REAL/repo-worktrees/feature-owner"
+BLOCKED_WT_REAL="$TMP_DIR_REAL/repo-worktrees/feature-blocked"
+
+mkdir -p "$PROJECT/docs" "$PROJECT/.freely/run" "$WT_ROOT"
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+git init -q "$PROJECT"
+git -C "$PROJECT" config user.email "test@example.com"
+git -C "$PROJECT" config user.name "Test User"
+cat >"$PROJECT/README.md" <<'EOF'
+# repo
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" branch -m develop
+git -C "$PROJECT" worktree add -q -b feature/owner "$OWNER_WT"
+git -C "$PROJECT" worktree add -q -b feature/blocked "$BLOCKED_WT"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+for wt in "$OWNER_WT" "$BLOCKED_WT"; do
+  mkdir -p "$wt/docs" "$wt/.freely/run"
+  cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$wt/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$wt/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+done
+
+cat >"$OWNER_WT/.freely/run/prompt-20260402-161000.txt" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$OWNER_WT\`
+EOF
+
+cat >"$BLOCKED_WT/.freely/run/prompt-20260402-161100.txt" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$BLOCKED_WT\`
+EOF
+
+bash -c "exec -a 'runtime/freely start --project $OWNER_WT_REAL' sleep 30" >/dev/null 2>&1 &
+ACTIVE_SUP=$!
+bash -c "exec -a 'codex exec -C $OWNER_WT_REAL -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+ACTIVE_AI=$!
+printf '%s' "$ACTIVE_SUP" >"$OWNER_WT/.freely/run/supervisor.pid"
+printf '%s' "$ACTIVE_AI" >"$OWNER_WT/.freely/run/ai.pid"
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+
+grep -q 'ownership_conflict_state: active' <<<"$OUTPUT"
+grep -q "feature/blocked=promotion@I-20260402-0455-A -> develop" <<<"$OUTPUT"
+grep -q "blocked_by=feature/owner@$OWNER_WT_REAL" <<<"$OUTPUT"
+grep -q 'state=active-owner' <<<"$OUTPUT"
+
+echo "[PASS] live-status surfaces fleet ownership conflicts for manager patrol"

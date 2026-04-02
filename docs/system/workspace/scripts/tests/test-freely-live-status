@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-live-status.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
 
 cleanup() {
   set +e
@@ -93,12 +94,16 @@ Worktree:
 - `__QUEUE_WT__`
 Branch:
 - `feature/queued`
+intent_kind: cleanup
+intent_target: `feature/queued -> develop`
 EOF
 cat >"$FROZEN_PROMPT" <<'EOF'
 Worktree:
 - `__FROZEN_WT__`
 Branch:
 - `feature/frozen`
+intent_kind: promotion
+intent_target: `feature/frozen -> develop`
 EOF
 perl -0pi -e "s#__QUEUE_WT__#$QUEUE_WT#g; s#__FROZEN_WT__#$FROZEN_WT#g" "$QUEUE_PROMPT" "$FROZEN_PROMPT"
 cat >"$PROJECT/.freely/run/manager-continuity-20260321-004200.md" <<EOF
@@ -202,6 +207,9 @@ grep -q "role=supervisor pid=$SUP_PID" <<<"$OUTPUT"
 grep -q "role=interruption_dispatcher pid=$DISPATCH_PID" <<<"$OUTPUT"
 grep -q "role=ai pid=$AI_PID" <<<"$OUTPUT"
 grep -q 'prompt_file: ' <<<"$OUTPUT"
+grep -q 'prompt_intent_kind: none' <<<"$OUTPUT"
+grep -q 'prompt_intent_target: none' <<<"$OUTPUT"
+grep -q 'prompt_intent_target_raw: none' <<<"$OUTPUT"
 grep -q 'CURRENT_BRANCH=feature/research-codex-in-cc-mcp' <<<"$OUTPUT"
 grep -q 'selected_pool: `human chat / session evidence`' <<<"$OUTPUT"
 grep -q "manager_continuity_file: $PROJECT/.freely/run/manager-continuity-20260321-004200.md" <<<"$OUTPUT"
@@ -212,6 +220,10 @@ grep -q 'latest_resolution:' <<<"$OUTPUT"
 grep -q 'created_at=2026.03.20 12:47:46 PDT' <<<"$OUTPUT"
 grep -q "latest_manager_worker_prompts_generated: $QUEUE_PROMPT" <<<"$OUTPUT"
 grep -q 'latest_manager_worker_prompts_consumed: none' <<<"$OUTPUT"
+grep -q "latest_manager_worker_prompt_intents_generated: cleanup@$TMP_DIR_REAL/queued-worktree" <<<"$OUTPUT"
+grep -q 'latest_manager_worker_prompt_intents_consumed: none' <<<"$OUTPUT"
+grep -q 'ownership_conflict_state: none' <<<"$OUTPUT"
+grep -q 'ownership_conflict_summary: none' <<<"$OUTPUT"
 grep -q 'active_running_worker_count: 0' <<<"$OUTPUT"
 grep -q 'available_new_worker_slots: unbounded' <<<"$OUTPUT"
 if grep -q '/tmp/retired-worktree' <<<"$OUTPUT"; then

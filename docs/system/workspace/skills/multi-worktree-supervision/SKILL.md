@@ -52,8 +52,10 @@ description: 当需要像项目负责人一样同时监督多个 Freely worktree
    - 为每条 lane 写清 `dispatch_priority`
    - 标记是否 `parallel_safe`
    - 标记最小 `write_scope`
+   - 对 mutate lane 还要写清 `intent_kind` 与 `intent_target`
    - 对 `parallel_safe` 且 `write_scope` 不冲突的 lane 直接并发推进
    - 只有 same-lane busy guard、显式 freeze、写域冲突、或 supersede 时进入 queue，并在 continuity 中保留 `next_action` / `revisit_trigger`
+   - `write_scope` 只负责 launch-time scheduling；发现 sibling dirty、cleanup backlog 或 promotion blocker 后，真正跨树 mutate 仍要回到 manager ownership arbitration
 
 ## 边界
 

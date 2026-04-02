@@ -3,7 +3,16 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TEST_TMP="$(mktemp -d /tmp/freely-merge-guard.XXXXXX)"
-trap 'rm -rf "$TEST_TMP"' EXIT
+PIDS=()
+cleanup() {
+  local pid
+  for pid in "${PIDS[@]:-}"; do
+    kill "$pid" 2>/dev/null || true
+    wait "$pid" 2>/dev/null || true
+  done
+  rm -rf "$TEST_TMP"
+}
+trap cleanup EXIT
 
 REPO="$TEST_TMP/repo"
 mkdir -p "$REPO"
@@ -13,7 +22,15 @@ git init -q -b develop
 git config user.name tester
 git config user.email tester@example.com
 cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/merge-guarded" "$REPO/bin-merge-guarded"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality" "$REPO/docs/system/workspace/scripts/runtime" "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts"
+cp "$ROOT_DIR/bin/governance-promotion-gate" "$REPO/bin/governance-promotion-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-promotion-gate" "$REPO/docs/system/workspace/scripts/quality/governance-promotion-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" "$REPO/docs/system/workspace/scripts/runtime/freely"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+cp "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
 chmod +x "$REPO/bin-merge-guarded"
+chmod +x "$REPO/bin/governance-promotion-gate" "$REPO/docs/system/workspace/scripts/quality/governance-promotion-gate" "$REPO/docs/system/workspace/scripts/runtime/freely" "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
 
 echo base > README.md
 git add README.md
@@ -55,4 +72,63 @@ if "$REPO/bin-merge-guarded" main feature/demo >/dev/null 2>"$TEST_TMP/blocked.e
 fi
 grep -q "blocked merge" "$TEST_TMP/blocked.err"
 
-echo "[PASS] merge-guarded enforces replay-only develop paths"
+git checkout -q develop
+git checkout -q -b feature/promotion-owner
+echo promotion > PROMOTION.md
+git add PROMOTION.md
+git commit -q -m "promotion owner branch"
+
+git checkout -q develop
+SOURCE_WT="$TEST_TMP/source-worker"
+CONFLICT_WT="$TEST_TMP/conflict-worker"
+git worktree add -q "$SOURCE_WT" feature/promotion-owner
+git worktree add -q -b feature/promotion-conflict "$CONFLICT_WT" develop
+
+mkdir -p "$SOURCE_WT/.freely/run" "$CONFLICT_WT/.freely/run"
+cat > "$SOURCE_WT/.freely/run/prompt-20260402-080000.txt" <<EOF
+Worktree:
+- \`$SOURCE_WT\`
+Branch:
+- \`feature/promotion-owner\`
+- intent_kind: promotion
+- intent_target: \`I-20260327-2205 -> develop\`
+EOF
+cat > "$CONFLICT_WT/.freely/run/prompt-20260402-080100.txt" <<EOF
+Worktree:
+- \`$CONFLICT_WT\`
+Branch:
+- \`feature/promotion-conflict\`
+- intent_kind: promotion
+- intent_target: \`I-20260327-2205 -> develop\`
+EOF
+
+(
+  cd "$SOURCE_WT"
+  exec bash -lc 'exec -a "codex exec" sleep 300'
+) &
+SOURCE_PID=$!
+PIDS+=("$SOURCE_PID")
+printf '%s\n' "$SOURCE_PID" > "$SOURCE_WT/.freely/run/ai.pid"
+
+(
+  cd "$CONFLICT_WT"
+  exec bash -lc 'exec -a "codex exec" sleep 300'
+) &
+CONFLICT_PID=$!
+PIDS+=("$CONFLICT_PID")
+printf '%s\n' "$CONFLICT_PID" > "$CONFLICT_WT/.freely/run/ai.pid"
+
+if "$REPO/bin-merge-guarded" develop feature/promotion-owner >/dev/null 2>"$TEST_TMP/promotion-blocked.err"; then
+  echo "[FAIL] merge-guarded should block duplicate develop promotion ownership before merge" >&2
+  exit 1
+fi
+grep -q "duplicate develop promotion ownership is already active" "$TEST_TMP/promotion-blocked.err"
+
+kill "$CONFLICT_PID" 2>/dev/null || true
+wait "$CONFLICT_PID" 2>/dev/null || true
+rm -f "$CONFLICT_WT/.freely/run/ai.pid"
+
+"$REPO/bin-merge-guarded" develop feature/promotion-owner >/dev/null
+git merge-base --is-ancestor feature/promotion-owner develop
+
+echo "[PASS] merge-guarded enforces replay-only develop paths and duplicate promotion ownership"

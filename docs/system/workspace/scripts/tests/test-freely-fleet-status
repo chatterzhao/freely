@@ -44,5 +44,9 @@ printf '%s\n' "$OUTPUT" | grep -q 'feature/demo'
 printf '%s\n' "$OUTPUT" | grep -q 'DIRTY'
 printf '%s\n' "$OUTPUT" | grep -E 'feature/demo[[:space:]]+\|[[:space:]]+DIRTY[[:space:]]+\|[[:space:]]+none[[:space:]]+\|[[:space:]]+none' >/dev/null
 printf '%s\n' "$OUTPUT" | grep -q 'launch=resume'
+if printf '%s\n' "$OUTPUT" | grep -q 'ownership_conflict'; then
+  echo "[FAIL] fleet-status should not emit ownership_conflict detail when no duplicate owner exists" >&2
+  exit 1
+fi
 
 echo "[PASS] freely fleet-status hides stale runtime pid files"

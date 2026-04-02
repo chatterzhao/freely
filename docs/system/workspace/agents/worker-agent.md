@@ -27,12 +27,15 @@
    - worker 可以发现 blocker、缺口、漂移和更合适的下一跳
    - 但这些都应作为 evidence / handoff 回流给主管
    - worker 不应把自己升级成项目级调度者或最终裁决者
+   - 若 handoff 明确带 `intent_kind` / `intent_target`，worker 只能在该 delegated mutate authority 内行动；超出目标工位或目标 lane 的 cleanup / merge-prep / promotion 必须回 manager arbitration
+   - worker prompt 中的 `Worktree:` header 需要写出具体目标工位；但 runtime 会在 ownership / queue / freeze / recovery 比较前先把该路径 canonicalize，不能依赖 `/tmp`、symlink 或其他别名字符串保持一致
 
 ## 不负责
 
 - 不做项目级工位排班
 - 不判断其他 worktree 的合并/冻结/清理策略
 - 不接管其他 worker 的恢复
+- 不因观测到 sibling dirty、cleanup backlog 或 promotion blocker 就直接跨树 mutate
 - 不在 `develop` / `main` / `test-pre-merge-*` 上直接执行
 - 不假定自己能在响应结束、进程退出或限额后继续“自我恢复”
 - 不把人类插话当成可以直接改写项目级优先级的命令；worker 只消费主管已经加工过的 handoff
@@ -45,6 +48,7 @@
 - `runtime` 负责账号切换、sleep/recheck、进程重启
 - `continuity-watchdog` 负责 `context warn`、`fresh_with_handoff` 与 continuity artifact 边界
 - `worker-agent` 只对自己的 issue 执行结果负责
+- `worker-agent` 默认只在被委派的 `Worktree` / `Branch` / `intent_target` 内 mutate
 - `worker-agent` 不宣布 terminal completion；只把 evidence 交回 `auto-loop`
 - `worker-agent` 不负责决定 interruption / milestone / progress / pre-brainstorm 的项目级 completeness 是否已经成立；它只负责自己被委派的核实或执行范围
 - 当发生进程退出、账号限额、认证失败、`context compacted` 需要新进程续接时，worker 只负责记录 blocker / continuity，不负责恢复本身

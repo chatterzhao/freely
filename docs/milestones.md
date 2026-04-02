@@ -24,6 +24,7 @@ phase_state_policy:
 - `phase_state=blocked_dev`: keep the issue visible with blocker, next action, and current execution context
 - `phase_state=in_verification`: keep the issue visible until completion evidence is written back
 - `phase_state=completed`: move the issue to `completed_issues` with evidence
+- `phase_state=todo_ibm`: candidate mirror only; issue has already been materialized and remains authoritative in `committed_issues`. Do not route execution from the candidate mirror when `promoted_issue_path` is concrete.
 
 session_policy:
 - full `session_refs` live in candidate / issue / progress / recovery artifacts
@@ -48,6 +49,16 @@ routing_policy:
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
 ### committed_issues
+
+1. `I-20260402-0455-A`
+- title: Worktree exclusive ownership and promotion lease governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/candidates.md`
+- next_action: keep this owner in `in_verification` until the feature-lane ownership/stale evidence is written to the issue-bound verification artifact and the develop-bound post-merge acceptance is written back; current branch evidence is green but not yet canonical `develop`.
 
 ### completed_issues
 1. `I-20260401-2354-A`
@@ -983,6 +994,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/candidates.md`
 - next_action: 继续 pre-brainstorm，但已冻结一条硬规则：历史文案中的 `pre-test-merge` 现在一律按 `test-pre-merge-*` shadow batch 解释，只做测试 merge，不直接 merge 到 `develop`。剩余要收口的是 `develop-only completion verification` 与测试批次 acceptance 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
 - revisit_trigger: 当 protected verification environment 的 replay policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
+
+13. `C-20260402-0455-A`
+- title: Worktree exclusive ownership and promotion lease governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/candidates.md`
+- next_action: This candidate is now materialized as `I-20260402-0455-A`. The active owner freezes the phase-1 ownership contract and hook points before any runtime implementation slice starts.
+- revisit_trigger: Re-open candidate-level research only if the phase-1 ownership contract proves inseparable from a broader runtime orchestration redesign, or if cleanup/promotion ownership cannot be expressed with the proposed occupancy + lease split.
 
 10. `C-20260325-0525-A`
 - title: Retire cooldown-driven recovery and make slot sweep canonical
