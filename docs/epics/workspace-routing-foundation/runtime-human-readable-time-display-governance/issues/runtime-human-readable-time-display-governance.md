@@ -26,6 +26,10 @@ Freely already proved the correct boundary: keep naming truth in UTC, keep store
 
 This owner closes that gap without reopening the frontend owner or rewriting machine truth.
 
+## Continuation Note
+
+After the first merge, a follow-up review found a narrow tail of runtime status fields that still printed raw UTC/RFC3339 values in `baseline-status` and `live-status`. This issue continues to own that closeout because the remaining work stays inside the same boundary: localize human-readable runtime display only, preserve stored truth and naming truth unchanged.
+
 ## Scope
 
 1. Materialize a dedicated runtime/workspace owner for human-readable time display.
@@ -57,6 +61,11 @@ This owner closes that gap without reopening the frontend owner or rewriting mac
 5. `freely ai status` preserves raw refresh truth and also exposes `refreshed_at_human`.
 6. Watchdog cooldown human text remains host-local with timezone label.
 7. Tests prove the display layer changed while raw truth remains ISO/epoch/UTC-backed.
+8. Remaining runtime status tail fields also follow the same rule:
+   - baseline snapshot rate-limit reset timestamps
+   - slot switch timestamp
+   - delegated continuation consumed timestamps
+   - restart storm signal/escalation timestamps
 
 ## Completion
 
@@ -83,6 +92,7 @@ This owner closes that gap without reopening the frontend owner or rewriting mac
 - `docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
 - `docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit`
 - `docs/system/workspace/scripts/tests/test-freely-develop-push-status-time-display`
+- `docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
 
 ## Verification
 
@@ -93,6 +103,7 @@ This owner closes that gap without reopening the frontend owner or rewriting mac
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit`
 - `bash docs/system/workspace/scripts/tests/test-freely-develop-push-status-time-display`
+- `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
 - `./bin/governance-check`
 
 ## Next

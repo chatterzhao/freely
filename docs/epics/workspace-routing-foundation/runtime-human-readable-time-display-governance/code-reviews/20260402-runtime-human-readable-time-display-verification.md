@@ -12,7 +12,12 @@
 3. Intake status renders human-facing `created_at` in host-local time while leaving intake metadata truth on disk unchanged.
 4. `freely develop-push status` and the matching live-status summary render defer timestamps in host-local time with timezone label.
 5. Existing watchdog cooldown behavior continues to emit host-local human-readable reset strings while raw epoch truth stays unchanged.
-6. `develop` commit `af0be7c` is the canonical merge that materializes the runtime/status time display contract.
+6. The residual baseline/live status tail fields now also render in host-local display time:
+   - rate-limit reset timestamps
+   - slot switch timestamp
+   - delegated continuation consumed timestamps
+   - restart storm signal/escalation timestamps
+7. `develop` commit `af0be7c` materialized the first runtime/status time display contract, and this continuation closes the remaining status-tail gaps before merge replay.
 
 ## Commands
 
@@ -24,6 +29,7 @@ bash docs/system/workspace/scripts/tests/test-freely-live-status
 bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending
 bash docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit
 bash docs/system/workspace/scripts/tests/test-freely-develop-push-status-time-display
+bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface
 ./bin/governance-check
 ```
 
@@ -32,7 +38,8 @@ bash docs/system/workspace/scripts/tests/test-freely-develop-push-status-time-di
 1. Focused regressions passed in the feature lane before merge and replayed on `develop` for `test-freely-live-status` plus the direct `develop-push` status regression.
 2. `freely ai status` now dual-surfaces raw refresh truth and host-local human display without mutating the underlying cache timestamp.
 3. Baseline, live-status, and intake status surfaces now use host-local display timestamps with timezone labels while keeping UTC/RFC3339/epoch truth intact.
-4. `./bin/governance-check` passed on `develop` with only the existing legacy naming warnings.
+4. The residual baseline/live status tail fields are now covered by focused regressions for canonical baseline output, live-status, and restart-storm status surfacing.
+5. `./bin/governance-check` passed with only the existing legacy naming warnings.
 
 ## Residual Risks
 
