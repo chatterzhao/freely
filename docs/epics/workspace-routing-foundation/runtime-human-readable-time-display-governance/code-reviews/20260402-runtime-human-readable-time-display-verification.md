@@ -17,7 +17,7 @@
    - slot switch timestamp
    - delegated continuation consumed timestamps
    - restart storm signal/escalation timestamps
-7. `develop` commit `af0be7c` materialized the first runtime/status time display contract, and this continuation closes the remaining status-tail gaps before merge replay.
+7. `develop` commit `af0be7c` materialized the first runtime/status time display contract, and `develop` commit `eca4c79` closes the remaining status-tail gaps.
 
 ## Commands
 
