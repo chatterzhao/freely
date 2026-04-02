@@ -15,6 +15,7 @@ export * from "./panels";
 export * from "./AppShell";
 export * from "./tauriAdapter";
 export * from "./tauriRuntime";
+export * from "./timeDisplay";
 export * from "./useProbeChatIntervention";
 export * from "./useProbeControls";
 export * from "./useProbeEvents";
