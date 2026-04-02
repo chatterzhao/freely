@@ -43,3 +43,26 @@
 1. 本轮不要求任何 ACP bridge 已经跑通。
 2. 本轮不要求新增工具已经接入。
 3. 本轮不要求决定 first-tool ACP prototype 最终一定选谁。
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `runtime persists adapter truth and adapter policy through managed config surfaces`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-set-tool-command`
+
+### PT-2
+- id: `PT-2`
+- requirement: `adapter-aware dispatch keeps direct path canonical and fails fast for unsupported adapters`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-monitor-ai-cli-adapter-dispatch`
+
+### PT-3
+- id: `PT-3`
+- requirement: `status surface exposes actual adapter, policy, and per-tool support matrix`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-tool-adapter-policy-resolution`
