@@ -94,6 +94,11 @@ grep -q '^AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
   cat "$PROJECT/.freely/config.env" >&2
   exit 1
 }
+grep -q '^AI_TOOL_ADAPTER="direct"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected earliest-reset waiting truth to persist the codex default adapter" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
 grep -q '^slot-a$' "$HOME/.ai-auth/.codex-current-slot" || {
   echo "[FAIL] expected waiting truth to persist the earliest recovery slot" >&2
   cat "$HOME/.ai-auth/.codex-current-slot" >&2

@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-set-tool-command.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_project() {
+  local project="$1"
+  mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample"
+  git init -q -b develop "$project"
+  mkdir -p "$project/.githooks"
+  cat >"$project/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+  chmod +x "$project/.githooks/pre-commit"
+
+  cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+  cat >"$project/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+  cat >"$project/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0018--sample
+EOF
+
+  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+}
+
+FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$FREELY_HOME"
+PROJECT="$TMP_DIR/project"
+make_project "$PROJECT"
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --project "$PROJECT" \
+  --intent "$PROJECT/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT/docs/CONSTITUTION.md" \
+  --ai cc:auto \
+  >/dev/null
+
+CONFIG_FILE="$PROJECT/.freely/config.env"
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" set-tool \
+  --project "$PROJECT" \
+  --tool codex \
+  --tool-adapter acp \
+  --tool-adapter-policy acp \
+  >/dev/null
+
+grep -q '^AI_TOOL="codex"$' "$CONFIG_FILE"
+grep -q '^AI_MODEL="gpt-5.4"$' "$CONFIG_FILE"
+grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
+grep -q '^AI_MODE="auto"$' "$CONFIG_FILE"
+grep -q '^AI_TOOL_ADAPTER="acp"$' "$CONFIG_FILE"
+grep -q '^AI_TOOL_ADAPTER_POLICY="acp"$' "$CONFIG_FILE"
+test -f "$PROJECT/.codex/config.toml"
+
+perl -0pi -e 's/AI_MODEL="gpt-5\.4"/AI_MODEL="gpt-5.4-custom"/g; s/AI_REASONING_EFFORT="medium"/AI_REASONING_EFFORT="high"/g' "$CONFIG_FILE"
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" set-tool \
+  --project "$PROJECT" \
+  --tool codex \
+  >/dev/null
+
+grep -q '^AI_MODEL="gpt-5.4-custom"$' "$CONFIG_FILE"
+grep -q '^AI_REASONING_EFFORT="high"$' "$CONFIG_FILE"
+grep -q '^AI_TOOL_ADAPTER="acp"$' "$CONFIG_FILE"
+grep -q '^AI_TOOL_ADAPTER_POLICY="acp"$' "$CONFIG_FILE"
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" set-tool \
+  --project "$PROJECT" \
+  --tool iflow \
+  --tool-adapter-policy prefer_acp_fallback_direct \
+  >/dev/null
+
+grep -q '^AI_TOOL="iflow"$' "$CONFIG_FILE"
+grep -q '^AI_TOOL_ADAPTER="direct"$' "$CONFIG_FILE"
+grep -q '^AI_TOOL_ADAPTER_POLICY="prefer_acp_fallback_direct"$' "$CONFIG_FILE"
+
+STATUS_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status --project "$PROJECT")"
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^ai: iflow:default:auto$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_adapter: direct$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_adapter_policy: prefer_acp_fallback_direct$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_supported_adapters: direct$'
+
+echo "[PASS] freely set-tool applies managed tool and adapter selection semantics"

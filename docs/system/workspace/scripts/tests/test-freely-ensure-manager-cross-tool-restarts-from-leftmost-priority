@@ -98,6 +98,11 @@ grep -q '^AI_TOOL="cc"$' "$PROJECT/.freely/config.env" || {
   cat "$PROJECT/.freely/config.env" >&2
   exit 1
 }
+grep -q '^AI_TOOL_ADAPTER="direct"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected cc fallback to persist the direct adapter" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
 grep -q '^AI_REASONING_EFFORT="medium"$' "$PROJECT/.freely/config.env" || {
   echo "[FAIL] expected cc fallback to install its runtime default reasoning effort" >&2
   cat "$PROJECT/.freely/config.env" >&2
