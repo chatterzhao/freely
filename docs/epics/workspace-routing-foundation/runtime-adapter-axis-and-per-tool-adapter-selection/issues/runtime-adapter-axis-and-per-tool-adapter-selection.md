@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1703-A`
 - title: Runtime adapter axis and per-tool adapter selection
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-adapter-axis-and-per-tool-adapter-selection`
@@ -101,4 +101,4 @@ ACP boundary 已经收口，但 runtime 现在还没有 first-class `adapter axi
 ## Next
 
 - 当前 issue 已从 IBM materialization 进入 dev-loop，并已落下 config truth、adapter-aware dispatch、受管 mutation command、policy truth，以及 per-tool supported-adapter matrix 的最小切口。
-- 下一轮转入 `I-20260401-2350-A`：以 `codex` 为第一条 ACP fresh-path prototype target，先做 metadata / launch-kind guardrail，再实现真实 ACP launcher。
+- 下一轮转入 `I-20260401-1545-A-01`：以 `codex` 为第一条 ACP fresh-path prototype target，先做 metadata / launch-kind guardrail，再实现真实 ACP launcher。
