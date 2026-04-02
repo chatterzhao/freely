@@ -33,3 +33,26 @@
 1. 本轮不要求所有工具都进入 ACP。
 2. 本轮不要求 `codex + adapter=acp` 已实现 resume parity。
 3. 本轮不要求 ACP path 成为 `codex` 默认 adapter。
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `codex metadata and launcher dispatch expose a real ACP path instead of a placeholder`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-acp-fresh`
+
+### PT-2
+- id: `PT-2`
+- requirement: `codex ACP prototype keeps direct-path configuration and adapter policy surfaces canonical`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-freely-tool-adapter-policy-resolution`
+
+### PT-3
+- id: `PT-3`
+- requirement: `real-environment codex ACP fresh-path viability evidence is captured before closeout`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/code-reviews/20260401-codex-acp-fresh-path-prototype-verification.md`

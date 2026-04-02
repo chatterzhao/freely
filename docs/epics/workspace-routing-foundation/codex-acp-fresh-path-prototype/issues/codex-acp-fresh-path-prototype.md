@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-1545-A-01`
 - title: Codex ACP fresh-path prototype
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `codex-acp-fresh-path-prototype`
@@ -112,6 +112,6 @@ ACP 边界已经冻结，runtime `adapter axis` 也已经 materialize 到 config
 
 ## Next
 
-- 真实环境 `codex + adapter=acp` 最小 fresh-path 样本已通过，focused fake ACP coverage 也已补齐 `fresh_with_handoff`。
-- 当前 owner 的 scope-level verification 已收口；下一跳只剩 merge/closeout，不再继续扩 ACP parity、runtime dogfood 或其他 follow-on 主题。
-- 当前状态可视为 `merge-ready pending develop absorption`，但在真正 merge 到 `develop` 前不得提前写回 `completed`。
+- `2026-04-01 21:26 PDT` completion: `develop` merge `a0f9a48` absorbed the first real `codex + adapter=acp` prototype, and canonical develop rechecks kept the fresh-path bridge green.
+- This owner closes as a fresh-path prototype only: direct path still owns the strongest explicit `resume` contract, and ACP parity beyond `fresh` / `fresh_with_handoff` must reopen as new lifecycle work.
+- Re-open only if canonical develop evidence shows the Codex ACP bridge regressing, or if a later owner is ready to prove explicit resume parity rather than assuming it.

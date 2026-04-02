@@ -59,37 +59,49 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
 - next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
 
-2. `I-20260401-1545-A`
+### completed_issues
+
+1. `I-20260401-1545-A`
 - title: ACP optional adapter boundary governance
-- milestone_state: committed
-- phase_state: `in_dev`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md`
-- next_action: ACP 的 issue-bound IBM 已完成并进入同线 dev-loop merge 准备。`I-20260401-1703-A` 已把 runtime `adapter axis` 抽到可消费状态；当前同线 prototype owner 是 `I-20260401-1545-A-01`，用 `codex` 落第一条 ACP fresh-path prototype。
+- evidence:
+  - `develop` commit `a0f9a48`
+  - `docs/progress/workspace-routing-foundation/p-acp-optional-adapter-boundary-governance.md`
+  - `./bin/governance-check`
+- completion_note: ACP adapter boundary is now canonical on `develop`: ACP stays an optional communication-layer adapter, `direct` remains the first-class path, and governance concerns remain in Freely rather than being collapsed into ACP.
 
-3. `I-20260401-1703-A`
+2. `I-20260401-1703-A`
 - title: Runtime adapter axis and per-tool adapter selection
-- milestone_state: committed
-- phase_state: `in_dev`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/candidates.md`
-- next_action: 这条 owner 的 config / dispatch / status truth 已可供 follow-on owner 消费。下一步转入 `I-20260401-1545-A-01`，为 `codex` 增加第一条真实 ACP fresh path。
+- evidence:
+  - `develop` commit `a0f9a48`
+  - `docs/progress/workspace-routing-foundation/p-runtime-adapter-axis-and-per-tool-adapter-selection.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-tool-adapter-policy-resolution`
+- completion_note: The runtime now has a canonical adapter axis on `develop`, including adapter truth, adapter policy, adapter-aware dispatch, managed mutation, and a per-tool supported-adapter matrix.
 
-4. `I-20260401-1545-A-01`
+3. `I-20260401-1545-A-01`
 - title: Codex ACP fresh-path prototype
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md`
 - source_brainstorm: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md`
-- next_action: 真实环境 `codex + adapter=acp` fresh-path 样本已通过，focused fake ACP coverage 也已补齐 `fresh_with_handoff`；当前只剩 merge/closeout，ACP `resume` parity 不在本 owner 中继续扩。
-
-### completed_issues
+- evidence:
+  - `develop` commit `a0f9a48`
+  - `docs/progress/workspace-routing-foundation/p-codex-acp-fresh-path-prototype.md`
+  - `docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/code-reviews/20260401-codex-acp-fresh-path-prototype-verification.md`
+- completion_note: The first real `codex + adapter=acp` prototype is now merged on `develop` for `fresh` and `fresh_with_handoff`; direct path still owns the strongest explicit `resume` contract, so parity work must reopen as a new owner.
 
 1. `I-20260328-2105-A`
 - title: Codex verified resume evidence governance
