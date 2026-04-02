@@ -114,10 +114,10 @@ write_codex_active_slot() {
   printf '%s\n' "$slot" >"$file"
 }
 
-format_epoch_utc() {
+format_epoch_local() {
   local epoch="$1"
   [[ -n "$epoch" ]] || return 1
-  TZ=UTC date -r "$epoch" '+%Y.%m.%d %H:%M:%S UTC' 2>/dev/null || TZ=UTC date -d "@$epoch" '+%Y.%m.%d %H:%M:%S UTC' 2>/dev/null || printf '%s\n' "$epoch"
+  date -r "$epoch" '+%Y.%m.%d %H:%M:%S %Z' 2>/dev/null || date -d "@$epoch" '+%Y.%m.%d %H:%M:%S %Z' 2>/dev/null || printf '%s\n' "$epoch"
 }
 
 notify_freely_auth_change() {
@@ -688,7 +688,7 @@ _cmd_switch_auto_codex() {
       local earliest_slot="${info%%|*}"
       local reset_at="${info##*|}"
       local human_time
-      human_time="$(format_epoch_utc "$reset_at")"
+      human_time="$(format_epoch_local "$reset_at")"
       log_warn "No usable codex slot right now; leaving current auth untouched and keeping launch blocked. Earliest reset hint: $earliest_slot at $human_time"
       if [[ "$FORMAT" == "json" ]]; then
         echo "{\"switched\": false, \"tool\": \"codex\", \"status\": \"all_unavailable\", \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"reset_at\": $reset_at, \"reset_at_human\": \"$human_time\", \"launch_blocked\": true}"
@@ -885,7 +885,7 @@ cmd_status() {
             }
           ' "$cache_file")
           if [[ -n "$earliest_reset" && "$earliest_reset" =~ ^[0-9]+$ && "$earliest_reset" -gt 0 ]]; then
-            earliest_reset_human="$(date -r "$earliest_reset" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || date -d "@$earliest_reset" '+%Y.%m.%d %H:%M:%S' 2>/dev/null || echo "$earliest_reset")"
+            earliest_reset_human="$(format_epoch_local "$earliest_reset")"
           fi
         fi
         

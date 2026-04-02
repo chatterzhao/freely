@@ -8,6 +8,7 @@ import { useProbeEvents } from "./useProbeEvents";
 import { useProbeControls } from "./useProbeControls";
 import { useProbeSessionLifecycle } from "./useProbeSessionLifecycle";
 import { useProbeTerminalAttach } from "./useProbeTerminalAttach";
+import { formatTimestampForDisplay, getSystemTimeZone } from "./timeDisplay";
 import { useTauriValidationSequence } from "./useTauriValidationSequence";
 import { useProbeRuntime } from "./useProbeRuntime";
 
@@ -158,6 +159,7 @@ export function AppShell({
     .slice(-3)
     .reverse();
   const recentEvents = events.slice(-5).reverse();
+  const systemTimeZone = getSystemTimeZone();
   const updateTransportMode = (nextTransportMode: "mock" | "tauri-mock" | "tauri-broken") => {
     const url = new URL(window.location.href);
     if (nextTransportMode === "mock") {
@@ -238,6 +240,7 @@ export function AppShell({
         </p>
         <p>{`Buffered event count: ${events.length}`}</p>
         <p>{`Last event id: ${snapshot?.lastEventId ?? "n/a"}`}</p>
+        <p>{`Display timezone: ${systemTimeZone}`}</p>
         <p>{`Runtime mode: ${runtimeMode}`}</p>
         <p>{`Validation mode: ${validationMode}`}</p>
         <p>{`Bridge contract: ${bridgeContractVersion ?? "n/a"}`}</p>
@@ -302,7 +305,9 @@ export function AppShell({
                 recentEvents.map((event) => (
                   <li key={event.eventId} style={listItemStyle}>
                     {describeEvent(event)}
-                    <div>{event.occurredAt}</div>
+                    <div title={event.occurredAt}>
+                      {formatTimestampForDisplay(event.occurredAt)}
+                    </div>
                   </li>
                 ))
               ) : (
