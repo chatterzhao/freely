@@ -69,4 +69,7 @@ MSG
 fi
 
 echo "[MERGE-GUARD] allowed: $source_branch -> $target"
+if [[ "$target" == "develop" && -x "./bin/governance-promotion-gate" ]]; then
+  ./bin/governance-promotion-gate --project "$PWD" --target-branch "$target" --source-branch "$source_branch"
+fi
 git merge --no-ff "$source_branch"
