@@ -27,7 +27,7 @@ source "$SESSION_EVIDENCE_RESOLVER_LIB"
 usage() {
   cat <<'EOF'
 Usage:
-  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--reasoning-effort <effort>] [--force]
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--reasoning-effort <effort>] [--accept-default-autonomy] [--force]
   freely doctor [--project <abs_path>]
   freely chat [--project <abs_path>] <message>
   freely tui [--project <abs_path>] [--once]
@@ -684,21 +684,22 @@ discover_supervisor_pid() {
 
 pid_matches_project() {
   local pid="$1" project="$2" expected="$3"
-  local cmd cwd
+  local cmd cwd project_real
   [[ -n "$pid" ]] || return 1
   kill -0 "$pid" 2>/dev/null || return 1
   cmd="$(ps -p "$pid" -o command= 2>/dev/null || true)"
   [[ -n "$cmd" ]] || return 1
+  project_real="$(cd "$project" 2>/dev/null && pwd -P || true)"
   if [[ -n "$expected" ]] && [[ "$cmd" != *"$expected"* ]]; then
     return 1
   fi
-  awk -v p="$project" -v e="$expected" '
+  awk -v p="$project" -v pr="$project_real" -v e="$expected" '
     index($0, e) {
       for (i = 1; i <= NF; i++) {
-        if (($i == "--project" || $i == "-C") && (i + 1) <= NF && $(i + 1) == p) {
+        if (($i == "--project" || $i == "-C") && (i + 1) <= NF && ($(i + 1) == p || (pr != "" && $(i + 1) == pr))) {
           found=1
         }
-        if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+        if (index($i, "--project=") == 1 && (substr($i, 11) == p || (pr != "" && substr($i, 11) == pr))) {
           found=1
         }
       }
@@ -706,7 +707,7 @@ pid_matches_project() {
     END { exit found ? 0 : 1 }
   ' <<<"$cmd" && return 0
   cwd="$(lsof -a -d cwd -p "$pid" -Fn 2>/dev/null | sed -n 's/^n//p' | head -n 1)"
-  [[ "$cwd" == "$project" ]]
+  [[ "$cwd" == "$project" || (-n "$project_real" && "$cwd" == "$project_real") ]]
 }
 
 valid_supervisor_pid_for_project() {
@@ -1004,6 +1005,160 @@ upsert_config_key() {
     }
   ' "$cfg" >"$tmp"
   mv "$tmp" "$cfg"
+}
+
+freely_autonomy_profile_for_mode() {
+  local mode="${1:-}"
+  case "$mode" in
+    auto) printf 'autonomous-default\n' ;;
+    *) printf 'interactive-downgrade\n' ;;
+  esac
+}
+
+freely_interaction_posture_for_mode() {
+  local mode="${1:-}"
+  case "$mode" in
+    auto) printf 'non-interactive\n' ;;
+    *) printf 'interactive\n' ;;
+  esac
+}
+
+freely_approval_posture_for_mode() {
+  local mode="${1:-}"
+  case "$mode" in
+    auto) printf 'automatic-where-supported\n' ;;
+    *) printf 'user-step-approval\n' ;;
+  esac
+}
+
+freely_activation_consent_required_for_mode() {
+  local mode="${1:-}"
+  case "$mode" in
+    auto) printf 'true\n' ;;
+    *) printf 'false\n' ;;
+  esac
+}
+
+freely_activation_consent_status_for_loaded_config() {
+  if [[ -n "${FREELY_ACTIVATION_CONSENT_STATUS:-}" ]]; then
+    printf '%s\n' "$FREELY_ACTIVATION_CONSENT_STATUS"
+    return 0
+  fi
+  if [[ "${AI_MODE:-}" == "auto" ]]; then
+    printf 'unknown-legacy\n'
+  else
+    printf 'not-required\n'
+  fi
+}
+
+freely_activation_consent_recorded_at_for_loaded_config() {
+  printf '%s\n' "${FREELY_ACTIVATION_CONSENT_RECORDED_AT:-unavailable}"
+}
+
+freely_activation_consent_recorded_via_for_loaded_config() {
+  if [[ -n "${FREELY_ACTIVATION_CONSENT_RECORDED_VIA:-}" ]]; then
+    printf '%s\n' "$FREELY_ACTIVATION_CONSENT_RECORDED_VIA"
+  elif [[ "${AI_MODE:-}" == "auto" ]]; then
+    printf 'unknown-legacy\n'
+  else
+    printf 'not-required\n'
+  fi
+}
+
+freely_safeguard_guidance_posture_for_loaded_config() {
+  printf '%s\n' "${FREELY_SAFEGUARD_GUIDANCE_POSTURE:-recommended-nonblocking}"
+}
+
+freely_runtime_decision_posture_for_loaded_config() {
+  printf '%s\n' "${FREELY_RUNTIME_DECISION_POSTURE:-internal-ai-escalation-before-stop}"
+}
+
+freely_minimal_risk_posture_for_loaded_config() {
+  printf '%s\n' "${FREELY_MINIMAL_RISK_POSTURE:-last-resort-safe-stop}"
+}
+
+freely_codex_boundary_summary_for_loaded_config() {
+  local sandbox approval cwd
+  sandbox="${AI_CAPABILITY_CODEX_SANDBOX:-project-bootstrap-managed}"
+  approval="${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-project-bootstrap-managed}"
+  cwd="${AI_CAPABILITY_CODEX_CWD_MODE:-project-root}"
+  printf 'codex_sandbox=%s codex_approval=%s codex_cwd=%s\n' "$sandbox" "$approval" "$cwd"
+}
+
+print_autonomy_posture_summary() {
+  local project="$1"
+  echo "autonomy_profile: $(freely_autonomy_profile_for_mode "${AI_MODE:-}")"
+  echo "interaction_posture: $(freely_interaction_posture_for_mode "${AI_MODE:-}")"
+  echo "approval_posture: $(freely_approval_posture_for_mode "${AI_MODE:-}")"
+  echo "activation_consent_required: $(freely_activation_consent_required_for_mode "${AI_MODE:-}")"
+  echo "safeguard_guidance_posture: recommended-nonblocking"
+  echo "runtime_decision_posture: internal-ai-escalation-before-stop"
+  echo "minimal_risk_posture: last-resort-safe-stop"
+  echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
+  echo "recommended_safeguards: sandbox,container-or-vm,dedicated-device-or-account,restricted-network"
+  echo "project: $project"
+}
+
+record_default_autonomy_contract() {
+  local project="$1" mode="$2" consent_status="$3" consent_recorded_at="$4" consent_recorded_via="$5"
+  upsert_config_key "$project" "FREELY_AUTONOMY_PROFILE" "$(freely_autonomy_profile_for_mode "$mode")"
+  upsert_config_key "$project" "FREELY_INTERACTION_POSTURE" "$(freely_interaction_posture_for_mode "$mode")"
+  upsert_config_key "$project" "FREELY_APPROVAL_POSTURE" "$(freely_approval_posture_for_mode "$mode")"
+  upsert_config_key "$project" "FREELY_ACTIVATION_CONSENT_REQUIRED" "$(freely_activation_consent_required_for_mode "$mode")"
+  upsert_config_key "$project" "FREELY_ACTIVATION_CONSENT_STATUS" "$consent_status"
+  upsert_config_key "$project" "FREELY_ACTIVATION_CONSENT_RECORDED_AT" "$consent_recorded_at"
+  upsert_config_key "$project" "FREELY_ACTIVATION_CONSENT_RECORDED_VIA" "$consent_recorded_via"
+  upsert_config_key "$project" "FREELY_SAFEGUARD_GUIDANCE_POSTURE" "recommended-nonblocking"
+  upsert_config_key "$project" "FREELY_RUNTIME_DECISION_POSTURE" "internal-ai-escalation-before-stop"
+  upsert_config_key "$project" "FREELY_MINIMAL_RISK_POSTURE" "last-resort-safe-stop"
+}
+
+require_default_autonomy_activation_consent() {
+  local project="$1" accept_flag="${2:-false}"
+  local phrase="I UNDERSTAND FREELY DEFAULT AUTONOMY"
+  local first second recorded_at
+
+  if [[ "${AI_MODE:-}" != "auto" ]]; then
+    FREELY_INIT_CONSENT_STATUS="not-required"
+    FREELY_INIT_CONSENT_RECORDED_AT="unavailable"
+    FREELY_INIT_CONSENT_RECORDED_VIA="not-required"
+    return 0
+  fi
+
+  echo "Freely activation consent required:"
+  print_autonomy_posture_summary "$project"
+  echo "note: safeguards are strongly recommended and supported, but not default activation blockers"
+
+  recorded_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  if [[ "$accept_flag" == "true" ]]; then
+    FREELY_INIT_CONSENT_STATUS="accepted"
+    FREELY_INIT_CONSENT_RECORDED_AT="$recorded_at"
+    FREELY_INIT_CONSENT_RECORDED_VIA="flag"
+    return 0
+  fi
+
+  if [[ ! -t 0 || ! -t 1 ]]; then
+    log_error "default autonomy activation consent required for mode=auto"
+    log_error "rerun freely init with --accept-default-autonomy if you understand and accept the posture above"
+    exit 1
+  fi
+
+  printf 'Type exactly to continue: %s\n> ' "$phrase"
+  IFS= read -r first || true
+  [[ "$first" == "$phrase" ]] || {
+    log_error "activation consent mismatch"
+    exit 1
+  }
+  printf 'Type the same phrase again to confirm: %s\n> ' "$phrase"
+  IFS= read -r second || true
+  [[ "$second" == "$phrase" ]] || {
+    log_error "activation consent confirmation mismatch"
+    exit 1
+  }
+
+  FREELY_INIT_CONSENT_STATUS="accepted"
+  FREELY_INIT_CONSENT_RECORDED_AT="$recorded_at"
+  FREELY_INIT_CONSENT_RECORDED_VIA="tty-repeat"
 }
 
 runtime_default_model_for_tool() {
@@ -1417,10 +1572,12 @@ tool_requires_project_codex_config() {
 }
 
 write_project_codex_config() {
-  local project="$1" force="${2:-false}"
-  local cfg root
+  local project="$1" force="${2:-false}" mode="${3:-step}"
+  local cfg root approval_policy
   cfg="$(project_codex_config_file "$project")"
   root="$(project_worktrees_root_for_path "$project")"
+  approval_policy="on-request"
+  [[ "$mode" == "auto" ]] && approval_policy="never"
   mkdir -p "$(dirname "$cfg")"
 
   if [[ -f "$cfg" && "$force" != "true" ]]; then
@@ -1446,8 +1603,10 @@ write_project_codex_config() {
 #   long-running sessions compress predictably.
 # - `project_doc_max_bytes`: bound auto-loaded project docs so startup context is
 #   stable and large governance files do not dominate the prompt budget.
-# - `approval_policy` / `sandbox_mode`: keep repo work in the normal guarded
-#   workspace-write posture while still allowing explicit escalation paths.
+# - `approval_policy`: follow the Freely runtime posture for this project so
+#   auto mode stays non-interactive by default.
+# - `sandbox_mode`: keep the recommended workspace-write safeguard as a
+#   project-local Codex baseline without making it a Freely hard prerequisite.
 # - `sandbox_workspace_write.writable_roots`: allow direct access to the sibling
 #   `{project}-worktrees` root, which is outside the project root by design.
 
@@ -1459,7 +1618,7 @@ model_auto_compact_token_limit = 150000
 project_doc_max_bytes = 32768
 
 # Approval and sandbox defaults
-approval_policy = "on-request"
+approval_policy = "__FREELY_APPROVAL_POLICY__"
 sandbox_mode = "workspace-write"
 
 [sandbox_workspace_write]
@@ -1467,6 +1626,7 @@ network_access = false
 writable_roots = ["__FREELY_WORKTREES_ROOT__"]
 EOF
 )"
+  template="${template/__FREELY_APPROVAL_POLICY__/$approval_policy}"
   template="${template/__FREELY_WORKTREES_ROOT__/$root}"
   printf '%s\n' "$template" >"$cfg"
 
@@ -5666,7 +5826,7 @@ build_prompt() {
 }
 
 cmd_init() {
-  local project="" intent="" constitution="" ai_spec="" reasoning_effort="" force="false"
+  local project="" intent="" constitution="" ai_spec="" reasoning_effort="" force="false" accept_default_autonomy="false"
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -5674,6 +5834,7 @@ cmd_init() {
       --constitution) constitution="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --ai) ai_spec="${2:-}"; shift 2 ;;
       --reasoning-effort) reasoning_effort="${2:-}"; shift 2 ;;
+      --accept-default-autonomy) accept_default_autonomy="true"; shift ;;
       --force) force="true"; shift ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
@@ -5710,16 +5871,34 @@ cmd_init() {
     [[ -n "$reasoning_effort" ]] || reasoning_effort="medium"
   fi
 
+  AI_TOOL="$tool"
+  AI_MODE="$mode"
+  AI_CAPABILITY_CODEX_SANDBOX="$codex_capability_sandbox"
+  AI_CAPABILITY_CODEX_APPROVAL_POLICY="$codex_capability_approval_policy"
+  AI_CAPABILITY_CODEX_CWD_MODE="$codex_capability_cwd_mode"
+  require_default_autonomy_activation_consent "$project" "$accept_default_autonomy"
+
   ensure_project_agents_md "$project"
   ensure_repo_hooks_enabled_or_fail "$project"
   write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$force"
+  record_default_autonomy_contract "$project" "$mode" "$FREELY_INIT_CONSENT_STATUS" "$FREELY_INIT_CONSENT_RECORDED_AT" "$FREELY_INIT_CONSENT_RECORDED_VIA"
   if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
-    write_project_codex_config "$project" "$force"
+    write_project_codex_config "$project" "$force" "$mode"
   fi
   register_project_in_registry "$project"
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "initialized"
   log_info "initialized: $(config_file "$project")"
+  load_config "$project"
+  echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
+  echo "activation_consent_recorded_at: $(freely_activation_consent_recorded_at_for_loaded_config)"
+  echo "activation_consent_recorded_via: $(freely_activation_consent_recorded_via_for_loaded_config)"
+  echo "autonomy_profile: ${FREELY_AUTONOMY_PROFILE:-$(freely_autonomy_profile_for_mode "${AI_MODE:-}")}"
+  echo "interaction_posture: ${FREELY_INTERACTION_POSTURE:-$(freely_interaction_posture_for_mode "${AI_MODE:-}")}"
+  echo "approval_posture: ${FREELY_APPROVAL_POSTURE:-$(freely_approval_posture_for_mode "${AI_MODE:-}")}"
+  echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
+  echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
+  echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
 }
 
 tool_default_capabilities_for_runtime() {
@@ -6232,6 +6411,8 @@ ensure_no_active_supervisor_conflict() {
         log_warn "project supervisor pid=$old_pid is live but manager watchdog is not ready; falling back to project-local repair"
       elif [[ "$role_hint" == "manager" && "$attach_ai_pid_state" != "confirmed_running" ]]; then
         log_warn "project supervisor pid=$old_pid is live but manager ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
+      elif [[ "$role_hint" == "worker" && "$attach_ai_pid_state" != "confirmed_running" ]]; then
+        log_warn "project supervisor pid=$old_pid is live but worker ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
       else
         LAST_ATTACH_REUSE_SUPERVISOR_PID="$old_pid"
         LAST_ATTACH_REUSE_AI_PID_STATE="$attach_ai_pid_state"
@@ -7158,6 +7339,17 @@ cmd_baseline_status() {
   echo "reasoning_effort: ${AI_REASONING_EFFORT:-default}"
   echo "tool_capabilities: ${AI_TOOL_CAPABILITIES:-none}"
   echo "tool_policy: ${AI_TOOL_POLICY:-none}"
+  echo "autonomy_profile: ${FREELY_AUTONOMY_PROFILE:-$(freely_autonomy_profile_for_mode "${AI_MODE:-}")}"
+  echo "interaction_posture: ${FREELY_INTERACTION_POSTURE:-$(freely_interaction_posture_for_mode "${AI_MODE:-}")}"
+  echo "approval_posture: ${FREELY_APPROVAL_POSTURE:-$(freely_approval_posture_for_mode "${AI_MODE:-}")}"
+  echo "activation_consent_required: ${FREELY_ACTIVATION_CONSENT_REQUIRED:-$(freely_activation_consent_required_for_mode "${AI_MODE:-}")}"
+  echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
+  echo "activation_consent_recorded_at: $(freely_activation_consent_recorded_at_for_loaded_config)"
+  echo "activation_consent_recorded_via: $(freely_activation_consent_recorded_via_for_loaded_config)"
+  echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
+  echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
+  echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
+  echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
   echo "codex_capability_model: ${AI_CAPABILITY_CODEX_MODEL:-none}"
   echo "codex_capability_sandbox: ${AI_CAPABILITY_CODEX_SANDBOX:-none}"
   echo "codex_capability_approval_policy: ${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-none}"
@@ -7414,6 +7606,17 @@ cmd_live_status() {
   echo "last_exit_reason: $last_exit_reason"
   echo "last_role_hint: $last_role_hint"
   echo "last_state_updated_at: $last_state_updated_at"
+  echo "autonomy_profile: ${FREELY_AUTONOMY_PROFILE:-$(freely_autonomy_profile_for_mode "${AI_MODE:-}")}"
+  echo "interaction_posture: ${FREELY_INTERACTION_POSTURE:-$(freely_interaction_posture_for_mode "${AI_MODE:-}")}"
+  echo "approval_posture: ${FREELY_APPROVAL_POSTURE:-$(freely_approval_posture_for_mode "${AI_MODE:-}")}"
+  echo "activation_consent_required: ${FREELY_ACTIVATION_CONSENT_REQUIRED:-$(freely_activation_consent_required_for_mode "${AI_MODE:-}")}"
+  echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
+  echo "activation_consent_recorded_at: $(freely_activation_consent_recorded_at_for_loaded_config)"
+  echo "activation_consent_recorded_via: $(freely_activation_consent_recorded_via_for_loaded_config)"
+  echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
+  echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
+  echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
+  echo "execution_boundary_summary: tool=${AI_TOOL:-none} mode=${AI_MODE:-none} $(freely_codex_boundary_summary_for_loaded_config)"
   echo "intake_active_items: $(count_active_intake_items "$project")"
   echo "intake_classified_items: $(count_intake_items_by_status "$project" "classified")"
   echo "intake_delegated_items: $(count_intake_items_by_status "$project" "delegated")"

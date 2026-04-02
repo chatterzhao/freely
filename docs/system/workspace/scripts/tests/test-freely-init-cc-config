@@ -64,6 +64,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --intent "$PROJECT_CC/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT_CC/docs/CONSTITUTION.md" \
   --ai cc:auto \
+  --accept-default-autonomy \
   >/dev/null
 
 CONFIG_FILE="$PROJECT_CC/.freely/config.env"
@@ -98,6 +99,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --intent "$PROJECT_CC_CODEX/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT_CC_CODEX/docs/CONSTITUTION.md" \
   --ai cc-use-codex-cli:auto \
+  --accept-default-autonomy \
   >/dev/null
 
 CONFIG_FILE_CODEX="$PROJECT_CC_CODEX/.freely/config.env"
@@ -118,6 +120,7 @@ grep -q '^FREELY_HTTP_PROXY=""$' "$CONFIG_FILE_CODEX"
 grep -q '^FREELY_HTTPS_PROXY=""$' "$CONFIG_FILE_CODEX"
 grep -q '^FREELY_NO_PROXY=""$' "$CONFIG_FILE_CODEX"
 test -f "$CODEX_CONFIG_FILE"
+grep -q '^approval_policy = "never"$' "$CODEX_CONFIG_FILE"
 grep -Fq "writable_roots = [\"$PROJECT_CC_CODEX-worktrees\"]" "$CODEX_CONFIG_FILE"
 
 STATUS_OUTPUT_CODEX="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
