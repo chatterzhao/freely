@@ -503,3 +503,6 @@
 - `20260326-1733--ibm-pretests-real-environment-acceptance-quality`: ibm-pretests-real-environment-acceptance-quality
 - `20260326-1810--freely-layered-architecture-and-tooling-topology`: freely-layered-architecture-and-tooling-topology
 - `20260326-1825--deep-refactor-fleet-sequencing`: deep-refactor-fleet-sequencing
+- 20260402-0130--backup-time-rendering-and-storage-boundary
+  - brainstorms: docs/pre-brainstorms/20260402-0130--backup-time-rendering-and-storage-boundary/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0130--backup-time-rendering-and-storage-boundary/candidates.md
