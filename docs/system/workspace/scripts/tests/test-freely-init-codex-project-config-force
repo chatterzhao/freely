@@ -65,6 +65,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --intent "$PROJECT/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT/docs/CONSTITUTION.md" \
   --ai codex:gpt-5.4:auto \
+  --accept-default-autonomy \
   >/dev/null
 
 CONFIG_FILE="$PROJECT/.freely/config.env"
@@ -104,6 +105,7 @@ REINIT_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --intent "$PROJECT/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT/docs/CONSTITUTION.md" \
   --ai codex:gpt-5.4:auto \
+  --accept-default-autonomy \
   2>&1)"
 
 printf '%s\n' "$REINIT_OUTPUT" | grep -Fq "skip: $CONFIG_FILE already exists"
@@ -117,6 +119,7 @@ FORCE_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --intent "$PROJECT/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT/docs/CONSTITUTION.md" \
   --ai codex:gpt-5.4:auto \
+  --accept-default-autonomy \
   --force \
   2>&1)"
 
@@ -132,7 +135,7 @@ grep -q '^FREELY_NO_PROXY=""$' "$CONFIG_FILE"
 grep -q '^model_context_window = 200000$' "$CODEX_CONFIG_FILE"
 grep -q '^model_auto_compact_token_limit = 150000$' "$CODEX_CONFIG_FILE"
 grep -q '^project_doc_max_bytes = 32768$' "$CODEX_CONFIG_FILE"
-grep -q '^approval_policy = "on-request"$' "$CODEX_CONFIG_FILE"
+grep -q '^approval_policy = "never"$' "$CODEX_CONFIG_FILE"
 grep -q '^sandbox_mode = "workspace-write"$' "$CODEX_CONFIG_FILE"
 grep -q '^network_access = false$' "$CODEX_CONFIG_FILE"
 grep -Fq "writable_roots = [\"$PROJECT_WORKTREES_ROOT\"]" "$CODEX_CONFIG_FILE"

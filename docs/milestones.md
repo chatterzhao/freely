@@ -49,7 +49,15 @@ routing_policy:
 
 ### committed_issues
 
-- none right now; active workspace-routing owners have either moved to candidate_issues elsewhere or completed with evidence below
+1. `I-20260401-1831-A`
+- title: Worker reactivation and local reentry residual runtime governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
+- next_action: keep the focused worker-runtime repair in `in_verification` until develop merge and post-merge acceptance are written back; current feature/test-pre-merge evidence is already green.
 
 ### completed_issues
 
@@ -778,7 +786,7 @@ routing_policy:
 - next_action: 保持 `needs_research`，等前两个更基础的 harness 候选边界稳定后，再决定是否 materialize
 - revisit_trigger: 当 harness 分层图与 worktree 级验证接口都已稳定，且后台园艺循环不再扩大当前 scope 时，重新进入 materialization 判断
 
-10. `C-20260322-1615-A`
+9. `C-20260322-1615-A`
 - title: Protected post-merge acceptance route and promotion guard governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -789,7 +797,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，但已冻结一条硬规则：历史文案中的 `pre-test-merge` 现在一律按 `test-pre-merge-*` shadow batch 解释，只做测试 merge，不直接 merge 到 `develop`。剩余要收口的是 `develop-only completion verification` 与测试批次 acceptance 的分流、raw `git add` 无法 hook 时的最小可靠兜底，以及主环境验收发现问题后的 source replay / cleanup 证据模型；在这些边界稳定前不得直接写成 issue 或只靠 skill 文案宣告完成
 - revisit_trigger: 当 protected verification environment 的 replay policy、failure reroute、machine-readable evidence 与最小 guard 落点可以被冻结成独立 issue contract 时，重新进入 materialization 判断
 
-11. `C-20260325-0525-A`
+10. `C-20260325-0525-A`
 - title: Retire cooldown-driven recovery and make slot sweep canonical
 - milestone_state: completed
 - phase_state: `completed`
@@ -799,7 +807,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`
 - completion_note: 当前 candidate 生命周期已通过 pre-brainstorm 收口为 same-family supporting evidence；不新开平行 issue，直接把 “cooldown 退出主恢复 contract、failure-driven full slot sweep 成为 canonical” 的边界改写回 `I-20260318-1630`
 
-12. `C-20260322-1801-B`
+11. `C-20260322-1801-B`
 - title: pre-test-merge lifecycle management capability for Freely
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -810,7 +818,7 @@ routing_policy:
 - next_action: 继续 pre-brainstorm，但 scope 已收窄为 `stale test-pre-merge batch governance`；历史候选名仍保留 `pre-test-merge`，语义上一律指向 `test-pre-merge-*` 前缀族。先冻结三块 machine-readable contract：`stale state truth surface`、`manager-owned lifecycle transaction`、`runtime consumption gate`；同时补齐 `replay source manifest / replay order / retire evidence`，把 `Issue + Brainstorm + PRD -> pre-tests.md` 派生链桥接成固定的 `acceptance_contract_state/source/blocker` 字段，并把 testing closeout 的集成测试 / application-native real-environment testing evidence bar 写死，在这些真源稳定前不进入实现
 - revisit_trigger: 当 stale state 的 canonical 落点、manager lifecycle transaction 字段、runtime gate 消费路径、replay/retire manifest、`acceptance_contract_state/source/blocker` 桥，以及 testing closeout evidence bar 都能冻结成独立 issue contract 时，重新进入 materialization 判断
 
-13. `C-20260322-1801-C`
+12. `C-20260322-1801-C`
 - title: worker self-loop exit and scheduler closeout governance
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
@@ -1502,6 +1510,26 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260401-1303-A`
+- title: Default autonomy activation consent and posture truth governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
+- next_action: keep the product contract owner in `in_verification` until develop merge and post-merge acceptance confirm the canonical autonomy posture truth.
+
+2. `I-20260401-1303-A-2`
+- title: Freely tool autonomy policy materialization governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md`
+- next_action: keep the first materialization slice in `in_verification` until develop merge and post-merge acceptance confirm the launcher/project-config/tool-doc truth on canonical develop.
+
 ### completed_issues
 
 1. `I-20260326-1810`
@@ -1515,6 +1543,10 @@ routing_policy:
 - evidence:
   - `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/code-reviews/20260326-freely-layered-architecture-and-tooling-topology-verification.md`
 - completion_note: Freely 自身产品架构、command family、observability semantic、host shell / form factor、external AI tooling layer 与 loop/lifecycle 真源的分层职责已在高层真源中完成首轮收敛；后续若继续泛化成通用产品形态方法，必须另开 lifecycle
+
+### candidate_issues
+
+- none right now; the 20260401-1303 product-security candidate is now split across `I-20260401-1303-A` and `I-20260401-1303-A-2`
 
 ## M-20260308-frontend-probe-dogfooding-loop
 

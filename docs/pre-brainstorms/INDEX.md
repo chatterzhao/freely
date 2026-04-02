@@ -1,4 +1,10 @@
 # 预研头脑风暴索引
+- 20260401-1831--worker-reactivation-reentry-residual-runtime-gaps
+  - brainstorms: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md
+- 20260401-1303--freely-product-security-baseline-governance
+  - brainstorms: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md
 - 20260331-2012--active-milestone-placement-and-consumption-gate
   - brainstorms: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md
   - candidates: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md
@@ -80,6 +86,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260401-1831--worker-reactivation-reentry-residual-runtime-gaps
+  - brainstorms: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md
 - 20260331-2012--active-milestone-placement-and-consumption-gate
   - brainstorms: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md
   - candidates: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md

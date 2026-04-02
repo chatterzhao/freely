@@ -95,33 +95,26 @@ START_ATTACH_OUTPUT="$(
     printf "%s\n" "22222" >"$run_dir/supervisor.pid"
 
     resolve_project_or_fail() { printf "%s\n" "$1"; }
-    load_config() { :; }
-    check_doc_gate_or_fail() { return 0; }
-    state_dir() { printf "%s\n" "$1/.freely"; }
-    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
-    logs_dir_for_project() { printf "%s\n" "$1/.freely/logs"; }
-    stop_marker_file() { printf "%s\n" "$1/.freely/run/stop.marker"; }
     valid_supervisor_pid_for_project() { [[ "$2" == "22222" ]]; }
     valid_ai_pid_for_project() { return 1; }
     ensure_interruption_dispatcher_ready_or_fail() { return 0; }
-    write_workcell_state() { printf "state:%s|%s|%s|%s\n" "$2" "$3" "$4" "$5"; }
-    append_runtime_event() { printf "event:%s|%s|%s|%s|%s\n" "$2" "$3" "$4" "$5" "$6"; }
-    launch_interruption_dispatcher() { printf "unexpected-dispatcher-launch\n"; }
     role_hint_for_project() { printf "%s\n" worker; }
-    launch_manager_watchdog() { printf "unexpected-watchdog-launch\n"; }
     ensure_manager_watchdog_ready_or_fail() { return 0; }
-    load_session_state_or_defaults() { :; }
-    log_info() { printf "info:%s\n" "$*"; }
     log_warn() { printf "warn:%s\n" "$*"; }
-    main start --project "$project"
+    terminate_pid_with_graceful_wait() { printf "terminate:%s|label:%s\n" "$1" "$2"; }
+    ensure_no_active_supervisor_conflict "$project" "$run_dir/supervisor.pid" "$run_dir/ai.pid" "1"
+    if [[ -f "$run_dir/supervisor.pid" ]]; then
+      printf "attach_missing_ai_supervisor_pid_left\n"
+    else
+      printf "attach_missing_ai_supervisor_pid_removed\n"
+    fi
   '
 )"
 
-[[ "$START_ATTACH_OUTPUT" == *"info:project runtime/control-plane already up; reusing supervisor pid=22222"* ]]
-[[ "$START_ATTACH_OUTPUT" == *"state:running|up|up|already_running_attach"* ]]
-[[ "$START_ATTACH_OUTPUT" == *"event:supervisor_attach_reuse|supervisor_pid=22222|supervisor_pid_source=supervisor_pid_file|ai_pid_state=missing|role_hint=worker"* ]]
-[[ "$START_ATTACH_OUTPUT" != *"unexpected-dispatcher-launch"* ]]
-[[ "$START_ATTACH_OUTPUT" != *"unexpected-watchdog-launch"* ]]
+[[ "$START_ATTACH_OUTPUT" == *"warn:project supervisor pid=22222 is live but worker ai pid is missing; falling back to project-local repair"* ]]
+[[ "$START_ATTACH_OUTPUT" == *"warn:repairing partial project control-plane before supervisor restart: 22222"* ]]
+[[ "$START_ATTACH_OUTPUT" == *"terminate:22222|label:partial project control-plane before supervisor restart"* ]]
+[[ "$START_ATTACH_OUTPUT" == *"attach_missing_ai_supervisor_pid_removed"* ]]
 
 START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT="$(
   bash -lc '
@@ -132,37 +125,28 @@ START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT="$(
     mkdir -p "$run_dir" "$project/.freely/logs"
 
     resolve_project_or_fail() { printf "%s\n" "$1"; }
-    load_config() { :; }
-    check_doc_gate_or_fail() { return 0; }
-    state_dir() { printf "%s\n" "$1/.freely"; }
-    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
-    logs_dir_for_project() { printf "%s\n" "$1/.freely/logs"; }
-    stop_marker_file() { printf "%s\n" "$1/.freely/run/stop.marker"; }
     discover_supervisor_pid() { printf "%s\n" "27272"; }
     valid_supervisor_pid_for_project() { [[ "$2" == "27272" ]]; }
     valid_ai_pid_for_project() { return 1; }
     ensure_interruption_dispatcher_ready_or_fail() { return 0; }
-    write_workcell_state() { printf "state:%s|%s|%s|%s\n" "$2" "$3" "$4" "$5"; }
-    append_runtime_event() { printf "event:%s|%s|%s|%s|%s\n" "$2" "$3" "$4" "$5" "$6"; }
-    launch_interruption_dispatcher() { printf "unexpected-dispatcher-launch\n"; }
     role_hint_for_project() { printf "%s\n" worker; }
-    launch_manager_watchdog() { printf "unexpected-watchdog-launch\n"; }
     ensure_manager_watchdog_ready_or_fail() { return 0; }
-    load_session_state_or_defaults() { :; }
-    log_info() { printf "info:%s\n" "$*"; }
     log_warn() { printf "warn:%s\n" "$*"; }
-    main start --project "$project"
-    printf "recovered_supervisor_pid:%s\n" "$(cat "$run_dir/supervisor.pid")"
+    terminate_pid_with_graceful_wait() { printf "terminate:%s|label:%s\n" "$1" "$2"; }
+    ensure_no_active_supervisor_conflict "$project" "$run_dir/supervisor.pid" "$run_dir/ai.pid" "1"
+    if [[ -f "$run_dir/supervisor.pid" ]]; then
+      printf "recovered_supervisor_pid_left:%s\n" "$(cat "$run_dir/supervisor.pid")"
+    else
+      printf "recovered_supervisor_pid_removed\n"
+    fi
   '
 )"
 
 [[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"warn:recovered live project supervisor after supervisor.pid drift: 27272"* ]]
-[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"info:project runtime/control-plane already up; reusing supervisor pid=27272"* ]]
-[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"state:running|up|up|already_running_attach"* ]]
-[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"event:supervisor_attach_reuse|supervisor_pid=27272|supervisor_pid_source=process_discovery|ai_pid_state=missing|role_hint=worker"* ]]
-[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"recovered_supervisor_pid:27272"* ]]
-[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" != *"unexpected-dispatcher-launch"* ]]
-[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" != *"unexpected-watchdog-launch"* ]]
+[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"warn:project supervisor pid=27272 is live but worker ai pid is missing; falling back to project-local repair"* ]]
+[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"warn:repairing partial project control-plane before supervisor restart: 27272"* ]]
+[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"terminate:27272|label:partial project control-plane before supervisor restart"* ]]
+[[ "$START_ATTACH_RECOVERS_MISSING_SUPERVISOR_PID_OUTPUT" == *"recovered_supervisor_pid_removed"* ]]
 
 DISCOVER_SUPERVISOR_EXCLUDES_SELF_AND_PARENT_OUTPUT="$(
   bash -lc '
@@ -223,17 +207,64 @@ START_ATTACH_CLEARS_STALE_AI_OUTPUT="$(
     printf "%s\n" "26262" >"$run_dir/ai.pid"
 
     resolve_project_or_fail() { printf "%s\n" "$1"; }
+    valid_supervisor_pid_for_project() { [[ "$2" == "25252" ]]; }
+    valid_ai_pid_for_project() { return 1; }
+    ensure_interruption_dispatcher_ready_or_fail() { return 0; }
+    role_hint_for_project() { printf "%s\n" worker; }
+    ensure_manager_watchdog_ready_or_fail() { return 0; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    terminate_pid_with_graceful_wait() { printf "terminate:%s|label:%s\n" "$1" "$2"; }
+    ensure_no_active_supervisor_conflict "$project" "$run_dir/supervisor.pid" "$run_dir/ai.pid" "1"
+    if [[ -f "$run_dir/ai.pid" ]]; then
+      printf "stale_ai_pid_left\n"
+    else
+      printf "stale_ai_pid_removed\n"
+    fi
+    if [[ -f "$run_dir/supervisor.pid" ]]; then
+      printf "stale_ai_supervisor_pid_left\n"
+    else
+      printf "stale_ai_supervisor_pid_removed\n"
+    fi
+  '
+)"
+
+[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"warn:clearing stale ai.pid while reusing healthy project supervisor: 26262"* ]]
+[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"warn:project supervisor pid=25252 is live but worker ai pid is stale_pid_cleared; falling back to project-local repair"* ]]
+[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"warn:repairing partial project control-plane before supervisor restart: 25252"* ]]
+[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"terminate:25252|label:partial project control-plane before supervisor restart"* ]]
+[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"stale_ai_pid_removed"* ]]
+[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"stale_ai_supervisor_pid_removed"* ]]
+
+START_ATTACH_WORKER_WITH_CONFIRMED_AI_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$START_ATTACH_TMP"'/attach-worker-confirmed-ai-project"
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir" "$project/.freely/logs"
+    printf "%s\n" "30303" >"$run_dir/supervisor.pid"
+    printf "%s\n" "31313" >"$run_dir/ai.pid"
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
     load_config() { :; }
     check_doc_gate_or_fail() { return 0; }
     state_dir() { printf "%s\n" "$1/.freely"; }
     run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
     logs_dir_for_project() { printf "%s\n" "$1/.freely/logs"; }
     stop_marker_file() { printf "%s\n" "$1/.freely/run/stop.marker"; }
-    valid_supervisor_pid_for_project() { [[ "$2" == "25252" ]]; }
-    valid_ai_pid_for_project() { return 1; }
+    valid_supervisor_pid_for_project() { [[ "$2" == "30303" ]]; }
+    valid_ai_pid_for_project() { [[ "$2" == "31313" ]]; }
     ensure_interruption_dispatcher_ready_or_fail() { return 0; }
     write_workcell_state() { printf "state:%s|%s|%s|%s\n" "$2" "$3" "$4" "$5"; }
-    append_runtime_event() { printf "event:%s|%s|%s|%s|%s\n" "$2" "$3" "$4" "$5" "$6"; }
+    append_runtime_event() {
+      local event="${2:-}" arg
+      printf "event:%s" "$event"
+      shift 2 || true
+      for arg in "$@"; do
+        printf "|%s" "$arg"
+      done
+      printf "\n"
+    }
     launch_interruption_dispatcher() { printf "unexpected-dispatcher-launch\n"; }
     role_hint_for_project() { printf "%s\n" worker; }
     launch_manager_watchdog() { printf "unexpected-watchdog-launch\n"; }
@@ -242,20 +273,14 @@ START_ATTACH_CLEARS_STALE_AI_OUTPUT="$(
     log_info() { printf "info:%s\n" "$*"; }
     log_warn() { printf "warn:%s\n" "$*"; }
     main start --project "$project"
-    if [[ -f "$run_dir/ai.pid" ]]; then
-      printf "stale_ai_pid_left\n"
-    else
-      printf "stale_ai_pid_removed\n"
-    fi
   '
 )"
 
-[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"warn:clearing stale ai.pid while reusing healthy project supervisor: 26262"* ]]
-[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"info:project runtime/control-plane already up; reusing supervisor pid=25252"* ]]
-[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"event:supervisor_attach_reuse|supervisor_pid=25252|supervisor_pid_source=supervisor_pid_file|ai_pid_state=stale_pid_cleared|role_hint=worker"* ]]
-[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" == *"stale_ai_pid_removed"* ]]
-[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" != *"unexpected-dispatcher-launch"* ]]
-[[ "$START_ATTACH_CLEARS_STALE_AI_OUTPUT" != *"unexpected-watchdog-launch"* ]]
+[[ "$START_ATTACH_WORKER_WITH_CONFIRMED_AI_OUTPUT" == *"info:project runtime/control-plane already up; reusing supervisor pid=30303"* ]]
+[[ "$START_ATTACH_WORKER_WITH_CONFIRMED_AI_OUTPUT" == *"state:running|up|up|already_running_attach"* ]]
+[[ "$START_ATTACH_WORKER_WITH_CONFIRMED_AI_OUTPUT" == *"event:supervisor_attach_reuse|supervisor_pid=30303|supervisor_pid_source=supervisor_pid_file|ai_pid_state=confirmed_running|role_hint=worker"* ]]
+[[ "$START_ATTACH_WORKER_WITH_CONFIRMED_AI_OUTPUT" != *"unexpected-dispatcher-launch"* ]]
+[[ "$START_ATTACH_WORKER_WITH_CONFIRMED_AI_OUTPUT" != *"unexpected-watchdog-launch"* ]]
 
 START_ATTACH_WITH_MISSING_DISPATCHER_OUTPUT="$(
   bash -lc '
