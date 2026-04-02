@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-develop-push-status-time-display.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+REMOTE="$TMP_DIR/remote.git"
+
+git init -q --bare "$REMOTE"
+git init -q -b develop "$REPO"
+git -C "$REPO" config user.email "test@example.com"
+git -C "$REPO" config user.name "Test User"
+git -C "$REPO" remote add origin "$REMOTE"
+
+mkdir -p "$REPO/docs" "$REPO/.freely"
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+echo base >"$REPO/base.txt"
+git -C "$REPO" add .
+git -C "$REPO" commit -q -m "base"
+git -C "$REPO" push -q -u origin develop
+
+echo local >"$REPO/local.txt"
+git -C "$REPO" add local.txt
+git -C "$REPO" commit -q -m "local merge result"
+
+TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" develop-push defer --project "$REPO" --reason post_merge_acceptance --note "post-merge smoke" >/dev/null
+STATUS_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" develop-push status --project "$REPO")"
+
+printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_state: push_deferred'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_defer_reason: post_merge_acceptance'
+printf '%s\n' "$STATUS_OUTPUT" | grep -Eq 'develop_push_followthrough_defer_updated_at: .*(PST|PDT)'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_ahead: 1'
+
+echo "[PASS] freely develop-push status renders defer timestamps in host local time"
