@@ -49,6 +49,12 @@ cd "$TEST_PROJECT"
 git init -q
 git config user.email "test@example.com"
 git config user.name "Test User"
+mkdir -p .githooks
+cat > .githooks/pre-commit <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x .githooks/pre-commit
 
 # Create minimal project structure
 mkdir -p docs
@@ -62,13 +68,33 @@ cat > docs/CONSTITUTION.md <<'EOF'
 Minimal constitution for testing.
 EOF
 
+cat > docs/LAWS.md <<'EOF'
+# Test Laws
+Minimal laws for testing.
+EOF
+
+mkdir -p docs/pre-brainstorms/20260309-0000--sample
+cat > docs/pre-brainstorms/README.md <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat > docs/pre-brainstorms/INDEX.md <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat > docs/pre-brainstorms/CONVERGENCE.md <<'EOF'
+# 收敛
+EOF
+
 # Initialize freely
 log_step "Initializing freely for test project"
 INIT_OUTPUT=$("${ROOT_DIR}/bin/freely" init \
   --project "$TEST_PROJECT" \
   --intent "$TEST_PROJECT/docs/PROJECT_INTENT.md" \
   --constitution "$TEST_PROJECT/docs/CONSTITUTION.md" \
-  --ai codex:gpt-5-codex:auto 2>&1 || true)
+  --ai codex:gpt-5-codex:auto \
+  --accept-default-autonomy 2>&1 || true)
 
 # Verify initialization
 if [[ ! -d "$TEST_PROJECT/.freely" ]]; then

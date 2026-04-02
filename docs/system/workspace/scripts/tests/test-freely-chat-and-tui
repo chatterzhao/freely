@@ -13,6 +13,12 @@ HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
 mkdir -p "$PROJECT/docs/pre-brainstorms/20260319-0000--sample"
 
 git init -q -b develop "$PROJECT"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
 
 cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
@@ -66,11 +72,12 @@ OUT
 EOF
 chmod +x "$HANDLER_FIXTURE"
 
-INIT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto)"
+INIT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy 2>&1)"
+printf '%s\n' "$INIT_OUTPUT" | grep -q 'activation_consent_status: accepted'
 printf '%s\n' "$INIT_OUTPUT" | grep -q 'initialized:'
 CANON_PROJECT="$(cd "$PROJECT" && pwd -P)"
 
-DOCTOR_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" doctor)"
+DOCTOR_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" doctor 2>&1)"
 printf '%s\n' "$DOCTOR_OUTPUT" | grep -q 'doc gate PASS'
 
 STATUS_OUTPUT_BEFORE_START="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" baseline-status)"

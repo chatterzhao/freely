@@ -65,6 +65,9 @@
   - fresh_with_handoff/auto: `codex exec --skip-git-repo-check -C <project-root> --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
 - runtime_notes:
   - Freely treats `codex` as an explicit session-addressed resume tool: canonical continuity target is the concrete `SESSION_ID`, not `resume --last`.
+  - Codex posture is now split into two layers on purpose:
+    - project-local baseline: `freely init` materializes a project-scoped `.codex/config.toml`; in `auto` mode this baseline now writes `approval_policy = "never"` while keeping `sandbox_mode = "workspace-write"` and `network_access = false` as the recommended local defaults
+    - launch-time injection: runtime still adds `--dangerously-bypass-approvals-and-sandbox` for current non-interactive auto execution, so the effective CLI posture stays explicit and traceable in launcher/test truth
   - If the runtime lacks an explicit Codex session target, it must rotate to `fresh_with_handoff` instead of silently falling back to `--last`.
   - Freely runtime may choose `fresh_with_handoff` when the previous Codex session is technically resumable but no longer healthy to keep extending.
   - Current rotation triggers include `context compacted`, missing resume evidence, local `resume_streak` threshold, and high context-window usage.
@@ -105,6 +108,7 @@
   - resume/auto: `claude -p --permission-mode bypassPermissions --session-id <same-uuid> "<assembled prompt>"`
 - runtime_notes:
   - `cc` 不默认启用 `codex-cli` MCP；它是纯 Claude Code 顶层工具。
+  - `cc` 当前没有单独的 project-local tool config materialization；Freely 主要通过 launch-time flags 注入 non-interactive posture，例如 `--permission-mode bypassPermissions`、`--session-id`、以及可选 debug/model/effort parameters。
   - Freely 会为每个运行中的 workcell 分配独立 `session-id`，降低多 worker / 多 worktree 并发时串会话的风险。
   - `cc` 的 continuity 证据以 `Claude session-id + Claude jsonl + debug/cycle log` 为主。
 
@@ -123,6 +127,7 @@
   - resume/auto: `claude -p --permission-mode bypassPermissions --session-id <same-uuid> --append-system-prompt "<fixed codex-cli MCP policy>" "<assembled prompt>"`
 - runtime_notes:
   - `cc-use-codex-cli` 是固定 profile，不要求用户再单独配置 capability 参数。
+  - `cc-use-codex-cli` 当前也主要通过 launch-time materialization 工作，而不是写独立 project-local Claude config。
   - Freely 会固定注入：`model=gpt-5.4`、`sandbox=workspace-write`、`approval-policy=never`、`cwd=project-root`。
   - 每个 running workcell 使用独立 `Claude session-id`，降低多 worker / 多 worktree 并发时的会话串线风险。
   - 证据模型分两层：

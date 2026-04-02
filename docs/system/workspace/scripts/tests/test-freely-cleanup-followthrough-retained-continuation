@@ -14,6 +14,12 @@ mkdir -p "$PROJECT/docs/pre-brainstorms/20260323-0000--sample"
 git init -q -b develop "$PROJECT"
 git -C "$PROJECT" config user.name "Freely Test"
 git -C "$PROJECT" config user.email "freely@example.com"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
 
 cat >"$PROJECT/.gitignore" <<'EOF'
 .freely/
@@ -62,7 +68,7 @@ EOF
 git -C "$PROJECT" add .
 git -C "$PROJECT" commit -q -m "init"
 
-bash "$ROOT_DIR/bin/freely" init --project "$PROJECT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto >/dev/null
+bash "$ROOT_DIR/bin/freely" init --project "$PROJECT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
 
 git -C "$PROJECT" worktree add -q -b feature/cleanup-fixture "$CLEAN_WT" develop
 cat >"$CLEAN_WT/clean.txt" <<'EOF'
