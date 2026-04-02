@@ -1,6 +1,6 @@
 # Verification: freely-tool-autonomy-policy-materialization-governance
 
-- issue_id: `I-20260401-1303-B`
+- issue_id: `I-20260401-1303-A-2`
 - reviewer: `codex`
 - verdict: `pass_for_verification`
 
