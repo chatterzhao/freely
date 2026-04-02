@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260401-2316-A`
 - title: CC ACP init autonomy consent test followthrough governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `cc-acp-init-autonomy-consent-test-followthrough-governance`
@@ -68,8 +68,15 @@ Because the develop merge gate requires every develop-bound replay to remain can
 - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
 - `./bin/governance-check`
 
+## Completion Status
+
+- canonical_merge_commit: `d5b7080`
+- canonical_merge_target: `develop`
+- post_merge_acceptance:
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+  - `./bin/governance-check`
+
 ## Next
 
-- Merge this narrow followthrough into `develop`.
-- After canonical absorption, close the owner rather than widening it into another materialization umbrella.
-
+- Closed on canonical `develop`.
+- Any future stale tool-materialization fixture should reopen as a new narrow owner rather than widening this followthrough.
