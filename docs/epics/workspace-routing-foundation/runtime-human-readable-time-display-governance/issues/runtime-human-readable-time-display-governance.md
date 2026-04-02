@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260402-0308-A`
 - title: Runtime human-readable time display governance
-- phase_state: `completed`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-human-readable-time-display-governance`
