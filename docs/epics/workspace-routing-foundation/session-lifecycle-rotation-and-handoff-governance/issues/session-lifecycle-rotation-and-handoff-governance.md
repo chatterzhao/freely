@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `session-lifecycle-rotation-and-handoff-governance`
 - issue-name: `session-lifecycle-rotation-and-handoff-governance`
-- source_candidate: `docs/pre-brainstorms/20260303-cli-orchestration-architecture/candidates.md#c-20260303-103`
-- source_brainstorm: `docs/pre-brainstorms/20260303-cli-orchestration-architecture/brainstorms.md`
+- source_candidate: `docs/pre-brainstorms/20260303-0000--cli-orchestration-architecture/candidates.md#c-20260303-103`
+- source_brainstorm: `docs/pre-brainstorms/20260303-0000--cli-orchestration-architecture/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/business-block-vs-system-crash-recovery/issues/business-block-vs-system-crash-recovery.md`
