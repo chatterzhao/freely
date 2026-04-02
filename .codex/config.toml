@@ -13,8 +13,10 @@
 #   long-running sessions compress predictably.
 # - `project_doc_max_bytes`: bound auto-loaded project docs so startup context is
 #   stable and large governance files do not dominate the prompt budget.
-# - `approval_policy` / `sandbox_mode`: keep repo work in the normal guarded
-#   workspace-write posture while still allowing explicit escalation paths.
+# - `approval_policy`: follow the Freely runtime posture for this project so
+#   auto mode stays non-interactive by default.
+# - `sandbox_mode`: keep the recommended workspace-write safeguard as a
+#   project-local Codex baseline without making it a Freely hard prerequisite.
 # - `sandbox_workspace_write.writable_roots`: allow direct access to the sibling
 #   `{project}-worktrees` root, which is outside the project root by design.
 
@@ -26,9 +28,9 @@ model_auto_compact_token_limit = 150000
 project_doc_max_bytes = 32768
 
 # Approval and sandbox defaults
-approval_policy = "on-request"
+approval_policy = "never"
 sandbox_mode = "workspace-write"
 
 [sandbox_workspace_write]
 network_access = false
-writable_roots = ["/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees"]
+writable_roots = ["/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation-worktrees"]

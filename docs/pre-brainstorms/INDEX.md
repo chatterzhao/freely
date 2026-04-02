@@ -2,6 +2,9 @@
 - 20260402-0540--runtime-loop-log-timezone-label-followthrough
   - brainstorms: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/candidates.md
+- 20260402-0403--canonical-product-posture-bootstrap-reconciliation
+  - brainstorms: docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/candidates.md
 - 20260401-0040--supply-chain-audit-and-install-intake-capability
   - brainstorms: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/candidates.md
@@ -116,6 +119,9 @@
 - 20260402-0540--runtime-loop-log-timezone-label-followthrough
   - brainstorms: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/candidates.md
+- 20260402-0403--canonical-product-posture-bootstrap-reconciliation
+  - brainstorms: docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/candidates.md
 - 20260401-0040--supply-chain-audit-and-install-intake-capability
   - brainstorms: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/candidates.md

@@ -1680,7 +1680,17 @@ routing_policy:
 
 ### committed_issues
 
-- none right now
+1. `I-20260402-0403-A`
+- title: Canonical product posture bootstrap reconciliation governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/issues/canonical-product-posture-bootstrap-reconciliation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/candidates.md`
+- evidence:
+  - `docs/progress/freely-product-architecture/p-canonical-product-posture-bootstrap-reconciliation-governance.md`
+- completion_note: pending
 
 ### completed_issues
 
@@ -1751,6 +1761,7 @@ routing_policy:
 - none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.
   - `I-20260401-2245-A` owns build artifact exposure and release allowlist audit.
   - `I-20260401-0115-A` owns supply-chain baseline and install-intake audit.
+  - `I-20260402-0403-A` owns the narrower canonical repo bootstrap reconciliation follow-on for already-completed autonomy/consent posture truth.
 
 ## M-20260308-frontend-probe-dogfooding-loop
 
