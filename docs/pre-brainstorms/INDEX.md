@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260401-2316--cc-acp-init-autonomy-consent-test-followthrough
+  - brainstorms: docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/candidates.md
 - 20260401-1831--worker-reactivation-reentry-residual-runtime-gaps
   - brainstorms: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md
@@ -98,6 +101,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260401-2316--cc-acp-init-autonomy-consent-test-followthrough
+  - brainstorms: docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/candidates.md
 - 20260401-1831--worker-reactivation-reentry-residual-runtime-gaps
   - brainstorms: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md
