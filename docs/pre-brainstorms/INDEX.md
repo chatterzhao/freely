@@ -2,6 +2,12 @@
 - 20260401-1831--worker-reactivation-reentry-residual-runtime-gaps
   - brainstorms: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md
+- 20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection
+  - brainstorms: docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/candidates.md
+- 20260401-1545--acp-client-agent-protocol-runtime-adoption
+  - brainstorms: docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md
 - 20260401-1303--freely-product-security-baseline-governance
   - brainstorms: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md
@@ -89,6 +95,12 @@
 - 20260401-1831--worker-reactivation-reentry-residual-runtime-gaps
   - brainstorms: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md
+- 20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection
+  - brainstorms: docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/candidates.md
+- 20260401-1545--acp-client-agent-protocol-runtime-adoption
+  - brainstorms: docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md
 - 20260331-2012--active-milestone-placement-and-consumption-gate
   - brainstorms: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md
   - candidates: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md

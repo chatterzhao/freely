@@ -73,6 +73,8 @@ grep -q '^# Project Agent Entry$' "$PROJECT_CC/AGENTS.md"
 grep -q '^AI_TOOL="cc"$' "$CONFIG_FILE"
 grep -q '^AI_MODE="auto"$' "$CONFIG_FILE"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
+grep -q '^AI_TOOL_ADAPTER="direct"$' "$CONFIG_FILE"
+grep -q '^AI_TOOL_ADAPTER_POLICY="direct"$' "$CONFIG_FILE"
 grep -q '^AI_TOOL_CAPABILITIES=""$' "$CONFIG_FILE"
 grep -q '^AI_TOOL_POLICY=""$' "$CONFIG_FILE"
 grep -q '^AI_CAPABILITY_CODEX_MODEL=""$' "$CONFIG_FILE"
@@ -88,8 +90,33 @@ grep -q '^FREELY_NO_PROXY=""$' "$CONFIG_FILE"
 
 STATUS_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
 printf '%s\n' "$STATUS_OUTPUT" | grep -q '^ai: cc:default:auto$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_adapter: direct$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_adapter_policy: direct$'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_supported_adapters: direct$'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_capabilities: none$'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_policy: none$'
+
+PROJECT_CC_ACP="$TMP_DIR/project-cc-acp"
+make_project "$PROJECT_CC_ACP"
+cd "$PROJECT_CC_ACP"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --project "$PROJECT_CC_ACP" \
+  --intent "$PROJECT_CC_ACP/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT_CC_ACP/docs/CONSTITUTION.md" \
+  --ai cc:auto \
+  --tool-adapter acp \
+  >/dev/null
+
+CONFIG_FILE_ACP="$PROJECT_CC_ACP/.freely/config.env"
+grep -q '^AI_TOOL="cc"$' "$CONFIG_FILE_ACP"
+grep -q '^AI_TOOL_ADAPTER="acp"$' "$CONFIG_FILE_ACP"
+grep -q '^AI_TOOL_ADAPTER_POLICY="acp"$' "$CONFIG_FILE_ACP"
+
+STATUS_OUTPUT_ACP="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
+printf '%s\n' "$STATUS_OUTPUT_ACP" | grep -q '^ai: cc:default:auto$'
+printf '%s\n' "$STATUS_OUTPUT_ACP" | grep -q '^tool_adapter: acp$'
+printf '%s\n' "$STATUS_OUTPUT_ACP" | grep -q '^tool_adapter_policy: acp$'
+printf '%s\n' "$STATUS_OUTPUT_ACP" | grep -q '^tool_supported_adapters: direct$'
 
 PROJECT_CC_CODEX="$TMP_DIR/project-cc-codex"
 make_project "$PROJECT_CC_CODEX"
@@ -107,6 +134,8 @@ CODEX_CONFIG_FILE="$PROJECT_CC_CODEX/.codex/config.toml"
 grep -q '^AI_TOOL="cc-use-codex-cli"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_MODE="auto"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE_CODEX"
+grep -q '^AI_TOOL_ADAPTER="direct"$' "$CONFIG_FILE_CODEX"
+grep -q '^AI_TOOL_ADAPTER_POLICY="direct"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_TOOL_CAPABILITIES="codex-cli"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_TOOL_POLICY="prefer-codex-for-repo-work"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_CAPABILITY_CODEX_MODEL="gpt-5.4"$' "$CONFIG_FILE_CODEX"
@@ -125,6 +154,8 @@ grep -Fq "writable_roots = [\"$PROJECT_CC_CODEX-worktrees\"]" "$CODEX_CONFIG_FIL
 
 STATUS_OUTPUT_CODEX="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
 printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^ai: cc-use-codex-cli:default:auto$'
+printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^tool_adapter_policy: direct$'
+printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^tool_supported_adapters: direct$'
 printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^tool_capabilities: codex-cli$'
 printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^tool_policy: prefer-codex-for-repo-work$'
 printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^codex_capability_model: gpt-5.4$'

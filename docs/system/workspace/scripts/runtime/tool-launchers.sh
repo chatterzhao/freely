@@ -29,6 +29,8 @@ NETWORK_PROXY_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/net
 # shellcheck disable=SC1090
 source "$NETWORK_PROXY_RESOLVER_LIB"
 
+RUNTIME_ACP_PROMPT_CLIENT="$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py"
+
 codex_slot_switch_lock_dir_for_launch() {
   printf '%s\n' "${AI_CLI_SWITCH_LOCK_DIR:-$HOME/.codex/slot-switch.lock}"
 }
@@ -90,6 +92,82 @@ wait_for_codex_slot_switch_idle_before_launch() {
   done
 }
 
+codex_acp_version_for_launch() {
+  printf '%s\n' "${FREELY_CODEX_ACP_VERSION:-0.11.1}"
+}
+
+codex_acp_platform_triplet_for_launch() {
+  local uname_s uname_m
+  uname_s="$(uname -s)"
+  uname_m="$(uname -m)"
+  case "$uname_s:$uname_m" in
+    Darwin:arm64) printf 'aarch64-apple-darwin\n' ;;
+    Darwin:x86_64) printf 'x86_64-apple-darwin\n' ;;
+    Linux:aarch64|Linux:arm64) printf 'aarch64-unknown-linux-gnu\n' ;;
+    Linux:x86_64) printf 'x86_64-unknown-linux-gnu\n' ;;
+    *)
+      echo "[ERROR] unsupported platform for codex-acp binary: ${uname_s}:${uname_m}" >&2
+      return 1
+      ;;
+  esac
+}
+
+codex_acp_cache_dir_for_launch() {
+  printf '%s\n' "${FREELY_ACP_CACHE_DIR:-$HOME/.cache/freely/acp}"
+}
+
+codex_acp_download_url_for_launch() {
+  local version="$1" triplet="$2"
+  printf 'https://github.com/zed-industries/codex-acp/releases/download/v%s/codex-acp-%s-%s.tar.gz\n' "$version" "$version" "$triplet"
+}
+
+ensure_codex_acp_binary_for_launch() {
+  local override="${FREELY_CODEX_ACP_BIN:-}"
+  local version triplet cache_root install_dir binary_path archive_url tmp_archive
+
+  if [[ -n "$override" ]]; then
+    [[ -x "$override" ]] || {
+      echo "[ERROR] FREELY_CODEX_ACP_BIN is not executable: $override" >&2
+      return 1
+    }
+    printf '%s\n' "$override"
+    return 0
+  fi
+
+  version="$(codex_acp_version_for_launch)"
+  triplet="$(codex_acp_platform_triplet_for_launch)" || return 1
+  cache_root="$(codex_acp_cache_dir_for_launch)"
+  install_dir="$cache_root/codex-acp/$version/$triplet"
+  binary_path="$install_dir/codex-acp"
+
+  if [[ -x "$binary_path" ]]; then
+    printf '%s\n' "$binary_path"
+    return 0
+  fi
+
+  mkdir -p "$install_dir"
+  tmp_archive="$(mktemp "$install_dir/codex-acp.XXXXXX")"
+  archive_url="$(codex_acp_download_url_for_launch "$version" "$triplet")"
+  echo "[INFO] downloading codex-acp ${version} for ${triplet}" >&2
+  curl -fsSL "$archive_url" -o "$tmp_archive" || {
+    rm -f "$tmp_archive"
+    echo "[ERROR] failed to download codex-acp from $archive_url" >&2
+    return 1
+  }
+  tar -xzf "$tmp_archive" -C "$install_dir" || {
+    rm -f "$tmp_archive"
+    echo "[ERROR] failed to unpack codex-acp archive: $tmp_archive" >&2
+    return 1
+  }
+  rm -f "$tmp_archive"
+  [[ -x "$binary_path" ]] || chmod +x "$binary_path" 2>/dev/null || true
+  [[ -x "$binary_path" ]] || {
+    echo "[ERROR] codex-acp binary missing after install: $binary_path" >&2
+    return 1
+  }
+  printf '%s\n' "$binary_path"
+}
+
 tool_default_capabilities() {
   local tool="$1"
   case "$tool" in
@@ -104,6 +182,54 @@ tool_default_policy() {
     cc-use-codex-cli) printf 'prefer-codex-for-repo-work\n' ;;
     *) printf '\n' ;;
   esac
+}
+
+tool_default_adapter() {
+  local tool="$1"
+  [[ -n "$tool" ]] || {
+    printf '\n'
+    return 0
+  }
+  printf 'direct\n'
+}
+
+tool_supported_adapters() {
+  local tool="$1"
+  case "$tool" in
+    codex)
+      printf 'direct\nacp\n'
+      ;;
+    kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only)
+      printf 'direct\n'
+      ;;
+    *)
+      printf 'direct\n'
+      ;;
+  esac
+}
+
+tool_adapter_is_supported() {
+  local tool="$1" adapter="$2"
+  [[ -n "$tool" && -n "$adapter" ]] || return 1
+  printf '%s\n' "$(tool_supported_adapters "$tool")" | tr ',' '\n' | sed 's/^ *//; s/ *$//' | grep -Fxq "$adapter"
+}
+
+tool_supported_launch_kinds_for_adapter() {
+  local tool="$1" adapter="$2"
+  case "$tool:$adapter" in
+    codex:acp)
+      printf 'fresh\nfresh_with_handoff\n'
+      ;;
+    *)
+      printf 'fresh\nresume\nfresh_with_handoff\n'
+      ;;
+  esac
+}
+
+tool_adapter_supports_launch_kind() {
+  local tool="$1" adapter="$2" launch_kind="$3"
+  [[ -n "$tool" && -n "$adapter" && -n "$launch_kind" ]] || return 1
+  printf '%s\n' "$(tool_supported_launch_kinds_for_adapter "$tool" "$adapter")" | tr ',' '\n' | sed 's/^ *//; s/ *$//' | grep -Fxq "$launch_kind"
 }
 
 tool_has_capability() {
@@ -152,7 +278,7 @@ Freely runtime policy:
 EOF
 }
 
-tool_run_from_prompt_file() {
+tool_run_direct_from_prompt_file() {
   local project="$1"
   local tool="$2"
   local model="${3:-}"
@@ -262,6 +388,91 @@ sleep 1"
       ;;
     *)
       echo "[ERROR] unsupported tool: $tool" >&2
+      return 1
+      ;;
+  esac
+}
+
+tool_run_acp_from_prompt_file() {
+  local project="$1"
+  local tool="$2"
+  local model="${3:-}"
+  local reasoning_effort="${4:-}"
+  local mode="$5"
+  local prompt_file="$6"
+  local launch_kind="$7"
+  local tool_capabilities="${8:-}"
+  local tool_policy="${9:-}"
+  local codex_capability_model="${10:-gpt-5.4}"
+  local codex_capability_sandbox="${11:-workspace-write}"
+  local codex_capability_approval_policy="${12:-never}"
+  local codex_capability_cwd_mode="${13:-project-root}"
+  local debug_log_file="${14:-}"
+  local claude_session_id="${15:-}"
+  local tool_resume_target="${16:-}"
+
+  case "$tool" in
+    codex)
+      local codex_acp_bin
+      [[ -f "$RUNTIME_ACP_PROMPT_CLIENT" ]] || {
+        echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
+        return 1
+      }
+      codex_acp_bin="$(ensure_codex_acp_binary_for_launch)" || return 1
+      freely_apply_project_network_proxy_env "$project"
+      exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" \
+        --agent "$codex_acp_bin" \
+        --cwd "$project" \
+        --prompt-file "$prompt_file" \
+        --mode "$mode" \
+        --model "$model" \
+        --reasoning-effort "$reasoning_effort"
+      ;;
+    *)
+      echo "[ERROR] unsupported ACP launcher for tool: $tool" >&2
+      return 1
+      ;;
+  esac
+}
+
+tool_run_from_prompt_file() {
+  local project="$1"
+  local tool="$2"
+  local adapter="${3:-}"
+  local model="${4:-}"
+  local reasoning_effort="${5:-}"
+  local mode="$6"
+  local prompt_file="$7"
+  local launch_kind="$8"
+  local tool_capabilities="${9:-}"
+  local tool_policy="${10:-}"
+  local codex_capability_model="${11:-gpt-5.4}"
+  local codex_capability_sandbox="${12:-workspace-write}"
+  local codex_capability_approval_policy="${13:-never}"
+  local codex_capability_cwd_mode="${14:-project-root}"
+  local debug_log_file="${15:-}"
+  local claude_session_id="${16:-}"
+  local tool_resume_target="${17:-}"
+
+  [[ -n "$adapter" ]] || adapter="$(tool_default_adapter "$tool")"
+  if ! tool_adapter_is_supported "$tool" "$adapter"; then
+    echo "[ERROR] unsupported adapter '$adapter' for tool '$tool' (supported: $(tool_supported_adapters "$tool" | tr '\n' ',' | sed 's/,$//'))" >&2
+    return 1
+  fi
+  if ! tool_adapter_supports_launch_kind "$tool" "$adapter" "$launch_kind"; then
+    echo "[ERROR] launch kind '$launch_kind' is not supported for tool '$tool' with adapter '$adapter' (supported: $(tool_supported_launch_kinds_for_adapter "$tool" "$adapter" | tr '\n' ',' | sed 's/,$//'))" >&2
+    return 1
+  fi
+
+  case "$adapter" in
+    direct)
+      tool_run_direct_from_prompt_file "$project" "$tool" "$model" "$reasoning_effort" "$mode" "$prompt_file" "$launch_kind" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$debug_log_file" "$claude_session_id" "$tool_resume_target"
+      ;;
+    acp)
+      tool_run_acp_from_prompt_file "$project" "$tool" "$model" "$reasoning_effort" "$mode" "$prompt_file" "$launch_kind" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$debug_log_file" "$claude_session_id" "$tool_resume_target"
+      ;;
+    *)
+      echo "[ERROR] adapter '$adapter' is configured for tool '$tool' but has no runtime launcher implementation yet" >&2
       return 1
       ;;
   esac

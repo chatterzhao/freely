@@ -27,7 +27,8 @@ source "$SESSION_EVIDENCE_RESOLVER_LIB"
 usage() {
   cat <<'EOF'
 Usage:
-  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--reasoning-effort <effort>] [--accept-default-autonomy] [--force]
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--reasoning-effort <effort>] [--accept-default-autonomy] [--force]
+  freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
   freely doctor [--project <abs_path>]
   freely chat [--project <abs_path>] <message>
   freely tui [--project <abs_path>] [--once]
@@ -460,6 +461,110 @@ resolve_ai_spec_for_project_or_global() {
   fi
 
   return 1
+}
+
+resolve_tool_adapter_policy_for_project_or_global() {
+  local project="$1" tool="$2" explicit_tool_adapter_policy="${3:-}" explicit_tool_adapter="${4:-}"
+  local cfg current_tool current_policy current_adapter
+
+  if [[ -n "$explicit_tool_adapter_policy" ]]; then
+    printf '%s\n' "$explicit_tool_adapter_policy"
+    return 0
+  fi
+
+  if [[ -n "$explicit_tool_adapter" ]]; then
+    printf '%s\n' "$explicit_tool_adapter"
+    return 0
+  fi
+
+  cfg="$(config_file "$project")"
+  if [[ -f "$cfg" ]]; then
+    resolve_project_tool_adapter_policy_selection "$project" "$tool" "$explicit_tool_adapter_policy" "$explicit_tool_adapter"
+    return 0
+  fi
+
+  cfg="$(global_config_file)"
+  if [[ -f "$cfg" ]]; then
+    current_tool="$(
+      (
+        unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+        # shellcheck disable=SC1090
+        source "$cfg"
+        printf '%s' "${AI_TOOL:-}"
+      )
+    )"
+    current_policy="$(
+      (
+        unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+        # shellcheck disable=SC1090
+        source "$cfg"
+        printf '%s' "${AI_TOOL_ADAPTER_POLICY:-}"
+      )
+    )"
+    current_adapter="$(
+      (
+        unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+        # shellcheck disable=SC1090
+        source "$cfg"
+        printf '%s' "${AI_TOOL_ADAPTER:-}"
+      )
+    )"
+    if [[ "$current_tool" == "$tool" ]]; then
+      if [[ -n "$current_policy" ]]; then
+        printf '%s\n' "$current_policy"
+        return 0
+      fi
+      if [[ -n "$current_adapter" ]]; then
+        printf '%s\n' "$current_adapter"
+        return 0
+      fi
+    fi
+  fi
+
+  tool_default_adapter_policy_for_runtime "$tool"
+}
+
+resolve_tool_adapter_for_project_or_global() {
+  local project="$1" tool="$2" explicit_tool_adapter="${3:-}" explicit_tool_adapter_policy="${4:-}"
+  local cfg current_tool current_adapter resolved_policy
+
+  if [[ -n "$explicit_tool_adapter" ]]; then
+    printf '%s\n' "$explicit_tool_adapter"
+    return 0
+  fi
+
+  cfg="$(config_file "$project")"
+  if [[ -f "$cfg" ]]; then
+    resolve_project_tool_adapter_selection "$project" "$tool"
+    return 0
+  fi
+
+  cfg="$(global_config_file)"
+  if [[ -f "$cfg" ]]; then
+    current_tool="$(
+      (
+        unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+        # shellcheck disable=SC1090
+        source "$cfg"
+        printf '%s' "${AI_TOOL:-}"
+      )
+    )"
+    current_adapter="$(
+      (
+        unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+        # shellcheck disable=SC1090
+        source "$cfg"
+        printf '%s' "${AI_TOOL_ADAPTER:-}"
+      )
+    )"
+    if [[ -n "$current_adapter" && "$current_tool" == "$tool" ]]; then
+      printf '%s\n' "$current_adapter"
+      return 0
+    fi
+  fi
+
+  resolved_policy="$(resolve_tool_adapter_policy_for_project_or_global "$project" "$tool" "$explicit_tool_adapter_policy" "$explicit_tool_adapter")"
+  resolve_tool_adapter_from_policy_for_runtime "$tool" "$resolved_policy"
 }
 
 resolve_project_or_fail() {
@@ -913,7 +1018,7 @@ load_config() {
 }
 
 write_config() {
-  local project="$1" intent="$2" constitution="$3" tool="$4" model="$5" mode="$6" reasoning_effort="$7" tool_capabilities="$8" tool_policy="$9" codex_capability_model="${10}" codex_capability_sandbox="${11}" codex_capability_approval_policy="${12}" codex_capability_cwd_mode="${13}" force="${14:-false}"
+  local project="$1" intent="$2" constitution="$3" tool="$4" model="$5" mode="$6" reasoning_effort="$7" tool_adapter="$8" tool_adapter_policy="$9" tool_capabilities="${10}" tool_policy="${11}" codex_capability_model="${12}" codex_capability_sandbox="${13}" codex_capability_approval_policy="${14}" codex_capability_cwd_mode="${15}" force="${16:-false}"
   local sdir cfg
   sdir="$(state_dir "$project")"
   cfg="$(config_file "$project")"
@@ -933,6 +1038,8 @@ AI_TOOL="$tool"
 AI_MODEL="$model"
 AI_MODE="$mode"
 AI_REASONING_EFFORT="$reasoning_effort"
+AI_TOOL_ADAPTER="$tool_adapter"
+AI_TOOL_ADAPTER_POLICY="$tool_adapter_policy"
 AI_TOOL_CAPABILITIES="$tool_capabilities"
 AI_TOOL_POLICY="$tool_policy"
 AI_CAPABILITY_CODEX_MODEL="$codex_capability_model"
@@ -1444,17 +1551,175 @@ record_tool_auto_switch_event() {
 }
 
 persist_project_tool_selection() {
-  local project="$1" tool="$2"
-  local model reasoning_effort tool_capabilities tool_policy
-  model="$(runtime_default_model_for_tool "$tool")"
-  reasoning_effort="$(runtime_default_reasoning_effort_for_tool "$tool")"
+  local project="$1" tool="$2" requested_adapter="${3:-}" requested_adapter_policy="${4:-}"
+  local model reasoning_effort tool_adapter tool_adapter_policy tool_capabilities tool_policy
+  model="$(resolve_project_tool_model_selection "$project" "$tool")"
+  reasoning_effort="$(resolve_project_tool_reasoning_effort_selection "$project" "$tool")"
+  tool_adapter_policy="$(resolve_project_tool_adapter_policy_selection "$project" "$tool" "$requested_adapter_policy" "$requested_adapter")"
+  tool_adapter="$(resolve_project_tool_adapter_selection "$project" "$tool" "$requested_adapter" "$tool_adapter_policy")"
   tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
   tool_policy="$(tool_default_policy_for_runtime "$tool")"
   upsert_config_key "$project" "AI_TOOL" "$tool"
   upsert_config_key "$project" "AI_MODEL" "$model"
   upsert_config_key "$project" "AI_REASONING_EFFORT" "$reasoning_effort"
+  upsert_config_key "$project" "AI_TOOL_ADAPTER" "$tool_adapter"
+  upsert_config_key "$project" "AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
   upsert_config_key "$project" "AI_TOOL_CAPABILITIES" "$tool_capabilities"
   upsert_config_key "$project" "AI_TOOL_POLICY" "$tool_policy"
+}
+
+project_tool_selection_truth() {
+  local project="$1" cfg current_tool current_adapter current_adapter_policy
+  cfg="$(config_file "$project")"
+  [[ -f "$cfg" ]] || {
+    printf '||\n'
+    return 0
+  }
+  current_tool="$(
+    (
+      unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      # shellcheck disable=SC1090
+      source "$cfg"
+      printf '%s' "${AI_TOOL:-}"
+    )
+  )"
+  current_adapter="$(
+    (
+      unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      # shellcheck disable=SC1090
+      source "$cfg"
+      printf '%s' "${AI_TOOL_ADAPTER:-}"
+    )
+  )"
+  current_adapter_policy="$(
+    (
+      unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      # shellcheck disable=SC1090
+      source "$cfg"
+      printf '%s' "${AI_TOOL_ADAPTER_POLICY:-}"
+    )
+  )"
+  printf '%s|%s|%s\n' "$current_tool" "$current_adapter" "$current_adapter_policy"
+}
+
+resolve_project_tool_adapter_policy_selection() {
+  local project="$1" tool="$2" requested_policy="${3:-}" requested_adapter="${4:-}"
+  local current_tool current_adapter current_policy current_truth
+  if [[ -n "$requested_policy" ]]; then
+    printf '%s\n' "$requested_policy"
+    return 0
+  fi
+  if [[ -n "$requested_adapter" ]]; then
+    printf '%s\n' "$requested_adapter"
+    return 0
+  fi
+  current_truth="$(project_tool_selection_truth "$project")"
+  IFS='|' read -r current_tool current_adapter current_policy <<<"$current_truth"
+  if [[ "$current_tool" == "$tool" ]]; then
+    if [[ -n "$current_policy" ]]; then
+      printf '%s\n' "$current_policy"
+      return 0
+    fi
+    if [[ -n "$current_adapter" ]]; then
+      printf '%s\n' "$current_adapter"
+      return 0
+    fi
+  fi
+  tool_default_adapter_policy_for_runtime "$tool"
+}
+
+resolve_project_tool_adapter_selection() {
+  local project="$1" tool="$2" requested_adapter="${3:-}" resolved_policy="${4:-}"
+  local current_tool current_adapter _ current_truth
+  if [[ -n "$requested_adapter" ]]; then
+    printf '%s\n' "$requested_adapter"
+    return 0
+  fi
+  current_truth="$(project_tool_selection_truth "$project")"
+  IFS='|' read -r current_tool current_adapter _ <<<"$current_truth"
+  if [[ -n "$current_adapter" && "$current_tool" == "$tool" ]]; then
+    printf '%s\n' "$current_adapter"
+    return 0
+  fi
+  if [[ -z "$resolved_policy" ]]; then
+    resolved_policy="$(resolve_project_tool_adapter_policy_selection "$project" "$tool")"
+  fi
+  resolve_tool_adapter_from_policy_for_runtime "$tool" "$resolved_policy"
+}
+
+project_tool_runtime_selection_truth() {
+  local project="$1" cfg
+  local current_tool current_model current_reasoning current_adapter current_adapter_policy
+  cfg="$(config_file "$project")"
+  [[ -f "$cfg" ]] || {
+    printf '||||\n'
+    return 0
+  }
+  current_tool="$(
+    (
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      # shellcheck disable=SC1090
+      source "$cfg"
+      printf '%s' "${AI_TOOL:-}"
+    )
+  )"
+  current_model="$(
+    (
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      # shellcheck disable=SC1090
+      source "$cfg"
+      printf '%s' "${AI_MODEL:-}"
+    )
+  )"
+  current_reasoning="$(
+    (
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      # shellcheck disable=SC1090
+      source "$cfg"
+      printf '%s' "${AI_REASONING_EFFORT:-}"
+    )
+  )"
+  current_adapter="$(
+    (
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      # shellcheck disable=SC1090
+      source "$cfg"
+      printf '%s' "${AI_TOOL_ADAPTER:-}"
+    )
+  )"
+  current_adapter_policy="$(
+    (
+      unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
+      # shellcheck disable=SC1090
+      source "$cfg"
+      printf '%s' "${AI_TOOL_ADAPTER_POLICY:-}"
+    )
+  )"
+  printf '%s|%s|%s|%s|%s\n' "$current_tool" "$current_model" "$current_reasoning" "$current_adapter" "$current_adapter_policy"
+}
+
+resolve_project_tool_model_selection() {
+  local project="$1" tool="$2"
+  local current_tool current_model _ current_truth
+  current_truth="$(project_tool_runtime_selection_truth "$project")"
+  IFS='|' read -r current_tool current_model _ <<<"$current_truth"
+  if [[ -n "$current_model" && "$current_tool" == "$tool" ]]; then
+    printf '%s\n' "$current_model"
+    return 0
+  fi
+  runtime_default_model_for_tool "$tool"
+}
+
+resolve_project_tool_reasoning_effort_selection() {
+  local project="$1" tool="$2"
+  local current_tool _ current_reasoning _2 current_truth
+  current_truth="$(project_tool_runtime_selection_truth "$project")"
+  IFS='|' read -r current_tool _ current_reasoning _2 <<<"$current_truth"
+  if [[ -n "$current_reasoning" && "$current_tool" == "$tool" ]]; then
+    printf '%s\n' "$current_reasoning"
+    return 0
+  fi
+  runtime_default_reasoning_effort_for_tool "$tool"
 }
 
 prepare_manager_same_tool_slot_recovery_if_needed() {
@@ -3868,17 +4133,22 @@ write_manager_worker_launch_intake() {
 
 ensure_runtime_workcell_initialized_for_launch() {
   local target_project="$1"
+  local tool_adapter tool_adapter_policy
   local freely_bin
   [[ -d "$target_project" ]] || return 1
   if [[ -f "$(config_file "$target_project")" ]]; then
     return 0
   fi
+  tool_adapter="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AI_TOOL:-codex}")}"
+  tool_adapter_policy="${AI_TOOL_ADAPTER_POLICY:-${tool_adapter:-$(tool_default_adapter_policy_for_runtime "${AI_TOOL:-codex}")}}"
   freely_bin="$(freely_bin_for_project "$target_project")"
   bash "$freely_bin" init \
     --project "$target_project" \
     --intent "$target_project/docs/PROJECT_INTENT.md" \
     --constitution "$target_project/docs/CONSTITUTION.md" \
     --ai "${AI_TOOL:-codex}:${AI_MODEL:-}:${AI_MODE:-auto}" >/dev/null
+  upsert_config_key "$target_project" "AI_TOOL_ADAPTER" "$tool_adapter"
+  upsert_config_key "$target_project" "AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
 }
 
 launch_worker_from_manager_prompt_if_needed() {
@@ -5799,6 +6069,8 @@ reactivate_worker_runtime_if_needed_after_chat() {
 build_prompt() {
   local workspace_root
   workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
+  AI_TOOL_ADAPTER="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AI_TOOL:-}")}" \
+  AI_TOOL_ADAPTER_POLICY="${AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AI_TOOL:-}")}" \
   AI_TOOL_CAPABILITIES="${AI_TOOL_CAPABILITIES:-}" \
   AI_TOOL_POLICY="${AI_TOOL_POLICY:-}" \
   AI_CAPABILITY_CODEX_MODEL="${AI_CAPABILITY_CODEX_MODEL:-}" \
@@ -5826,13 +6098,15 @@ build_prompt() {
 }
 
 cmd_init() {
-  local project="" intent="" constitution="" ai_spec="" reasoning_effort="" force="false" accept_default_autonomy="false"
+  local project="" intent="" constitution="" ai_spec="" tool_adapter_arg="" tool_adapter_policy_arg="" reasoning_effort="" force="false" accept_default_autonomy="false"
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --intent) intent="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --constitution) constitution="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --ai) ai_spec="${2:-}"; shift 2 ;;
+      --tool-adapter) tool_adapter_arg="${2:-}"; shift 2 ;;
+      --tool-adapter-policy) tool_adapter_policy_arg="${2:-}"; shift 2 ;;
       --reasoning-effort) reasoning_effort="${2:-}"; shift 2 ;;
       --accept-default-autonomy) accept_default_autonomy="true"; shift ;;
       --force) force="true"; shift ;;
@@ -5854,10 +6128,12 @@ cmd_init() {
     exit 1
   }
 
-  local parsed tool model mode tool_capabilities tool_policy
+  local parsed tool model mode tool_adapter tool_adapter_policy tool_capabilities tool_policy
   local codex_capability_model codex_capability_sandbox codex_capability_approval_policy codex_capability_cwd_mode
   parsed="$(parse_ai_spec "$ai_spec")"
   IFS='|' read -r tool model mode <<<"$parsed"
+  tool_adapter_policy="$(resolve_tool_adapter_policy_for_project_or_global "$project" "$tool" "$tool_adapter_policy_arg" "$tool_adapter_arg")"
+  tool_adapter="$(resolve_tool_adapter_for_project_or_global "$project" "$tool" "$tool_adapter_arg" "$tool_adapter_policy")"
   tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
   tool_policy="$(tool_default_policy_for_runtime "$tool")"
   codex_capability_model="$(codex_capability_default_model_for_runtime "$tool")"
@@ -5880,7 +6156,7 @@ cmd_init() {
 
   ensure_project_agents_md "$project"
   ensure_repo_hooks_enabled_or_fail "$project"
-  write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$force"
+  write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_adapter" "$tool_adapter_policy" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$force"
   record_default_autonomy_contract "$project" "$mode" "$FREELY_INIT_CONSENT_STATUS" "$FREELY_INIT_CONSENT_RECORDED_AT" "$FREELY_INIT_CONSENT_RECORDED_VIA"
   if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
     write_project_codex_config "$project" "$force" "$mode"
@@ -5901,11 +6177,95 @@ cmd_init() {
   echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
 }
 
+cmd_set_tool() {
+  local project="" tool="" tool_adapter_arg="" tool_adapter_policy_arg=""
+  local tool_capabilities
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --tool) tool="${2:-}"; shift 2 ;;
+      --tool-adapter) tool_adapter_arg="${2:-}"; shift 2 ;;
+      --tool-adapter-policy) tool_adapter_policy_arg="${2:-}"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+
+  [[ -n "$tool" ]] || { log_error "missing --tool"; usage; exit 1; }
+  project="$(resolve_project_or_fail "$project")"
+  load_config "$project"
+  persist_project_tool_selection "$project" "$tool" "$tool_adapter_arg" "$tool_adapter_policy_arg"
+  tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
+  if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
+    write_project_codex_config "$project" "false"
+  fi
+  load_config "$project"
+  log_info "updated tool selection: ${AI_TOOL:-$tool} via ${AI_TOOL_ADAPTER:-unknown} (policy=${AI_TOOL_ADAPTER_POLICY:-unknown})"
+}
+
 tool_default_capabilities_for_runtime() {
   local tool="$1"
   case "$tool" in
     cc-use-codex-cli) printf 'codex-cli\n' ;;
     *) printf '\n' ;;
+  esac
+}
+
+tool_default_adapter_for_runtime() {
+  local tool="$1"
+  [[ -n "$tool" ]] || {
+    printf '\n'
+    return 0
+  }
+  printf 'direct\n'
+}
+
+tool_supported_adapters_for_runtime() {
+  local tool="$1"
+  case "$tool" in
+    codex)
+      printf 'direct\nacp\n'
+      ;;
+    kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only)
+      printf 'direct\n'
+      ;;
+    *)
+      printf 'direct\n'
+      ;;
+  esac
+}
+
+tool_adapter_is_supported_for_runtime() {
+  local tool="$1" adapter="${2:-}"
+  local supported
+  [[ -n "$adapter" ]] || return 1
+  supported="$(tool_supported_adapters_for_runtime "$tool")"
+  printf '%s\n' "$supported" | tr ',' '\n' | sed 's/^ *//; s/ *$//' | grep -Fxq "$adapter"
+}
+
+tool_default_adapter_policy_for_runtime() {
+  local tool="$1"
+  tool_default_adapter_for_runtime "$tool"
+}
+
+resolve_tool_adapter_from_policy_for_runtime() {
+  local tool="$1" policy="${2:-}"
+  case "$policy" in
+    ""|direct)
+      printf 'direct\n'
+      ;;
+    acp)
+      printf 'acp\n'
+      ;;
+    prefer_acp_fallback_direct)
+      if tool_adapter_is_supported_for_runtime "$tool" "acp"; then
+        printf 'acp\n'
+      else
+        printf 'direct\n'
+      fi
+      ;;
+    *)
+      printf '%s\n' "$policy"
+      ;;
   esac
 }
 
@@ -6583,22 +6943,26 @@ start_project_runtime() {
       rm -f "$(handoff_file "$PROJECT_ROOT")"
     fi
 
-    log_info "launching $AI_TOOL ($mode_name mode, ai_mode=$AI_MODE)"
+    local tool_adapter
+    tool_adapter="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "$AI_TOOL")}"
+    log_info "launching $AI_TOOL via ${tool_adapter:-unknown} ($mode_name mode, ai_mode=$AI_MODE)"
     append_runtime_event "$project" "ai_launch_begin" \
       "supervisor_pid=$$" \
       "tool=$AI_TOOL" \
+      "tool_adapter=${tool_adapter:-unknown}" \
       "launch_kind=$mode_name" \
       "rotation_reason=${LAUNCH_ROTATION_REASON:-none}" \
       "prompt_file=$prompt_file" \
       "cycle_log=$cycle_log"
     set +e
     {
-      echo "===== $(date '+%F %T') mode=$mode_name tool=$AI_TOOL ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
+      echo "===== $(date '+%F %T') mode=$mode_name tool=$AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
       local workspace_root
       workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
       bash "$workspace_root/scripts/monitor-ai-cli.sh" \
         --project "$PROJECT_ROOT" \
         --tool "$AI_TOOL" \
+        --tool-adapter "${tool_adapter:-}" \
         --model "${AI_MODEL:-}" \
         --reasoning-effort "${AI_REASONING_EFFORT:-}" \
         --tool-capabilities "${AI_TOOL_CAPABILITIES:-}" \
@@ -7336,6 +7700,9 @@ cmd_baseline_status() {
   echo "intent: $INTENT_FILE"
   echo "constitution: $CONSTITUTION_FILE"
   echo "ai: ${AI_TOOL}:${AI_MODEL:-default}:${AI_MODE}"
+  echo "tool_adapter: ${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AI_TOOL:-}")}"
+  echo "tool_adapter_policy: ${AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AI_TOOL:-}")}"
+  echo "tool_supported_adapters: $(tool_supported_adapters_for_runtime "${AI_TOOL:-}" | paste -sd ',' -)"
   echo "reasoning_effort: ${AI_REASONING_EFFORT:-default}"
   echo "tool_capabilities: ${AI_TOOL_CAPABILITIES:-none}"
   echo "tool_policy: ${AI_TOOL_POLICY:-none}"
@@ -7968,6 +8335,7 @@ main() {
   shift || true
   case "$cmd" in
     init) cmd_init "$@" ;;
+    set-tool) cmd_set_tool "$@" ;;
     doctor) cmd_doctor "$@" ;;
     chat) cmd_chat "$@" ;;
     tui) cmd_tui "$@" ;;

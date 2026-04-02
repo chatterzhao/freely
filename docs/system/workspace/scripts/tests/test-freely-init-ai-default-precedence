@@ -9,6 +9,12 @@ make_project() {
   local project="$1"
   mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample"
   git init -q -b develop "$project"
+  mkdir -p "$project/.githooks"
+  cat >"$project/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+  chmod +x "$project/.githooks/pre-commit"
 
   cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
 # Intent
@@ -55,6 +61,8 @@ cat >"$FREELY_HOME/config.env" <<'EOF'
 AI_TOOL="cc"
 AI_MODEL=""
 AI_MODE="auto"
+AI_TOOL_ADAPTER="acp"
+AI_TOOL_ADAPTER_POLICY="acp"
 EOF
 
 PROJECT_GLOBAL="$TMP_DIR/project-global"
@@ -70,6 +78,8 @@ PROJECT_GLOBAL_CANON="$(cd "$PROJECT_GLOBAL" && pwd -P)"
 test -f "$PROJECT_GLOBAL_CANON/AGENTS.md"
 grep -q '^# Project Agent Entry$' "$PROJECT_GLOBAL_CANON/AGENTS.md"
 grep -q '^AI_TOOL="cc"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
+grep -q '^AI_TOOL_ADAPTER="acp"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
+grep -q '^AI_TOOL_ADAPTER_POLICY="acp"$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
 grep -q '^AI_TOOL_CAPABILITIES=""$' "$PROJECT_GLOBAL_CANON/.freely/config.env"
 
 PROJECT_OVERRIDE="$TMP_DIR/project-override"
@@ -84,6 +94,8 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
 PROJECT_OVERRIDE_CANON="$(cd "$PROJECT_OVERRIDE" && pwd -P)"
 
 grep -q '^AI_TOOL="iflow"$' "$PROJECT_OVERRIDE_CANON/.freely/config.env"
+grep -q '^AI_TOOL_ADAPTER="direct"$' "$PROJECT_OVERRIDE_CANON/.freely/config.env"
+grep -q '^AI_TOOL_ADAPTER_POLICY="direct"$' "$PROJECT_OVERRIDE_CANON/.freely/config.env"
 grep -q '^AI_TOOL_CAPABILITIES=""$' "$PROJECT_OVERRIDE_CANON/.freely/config.env"
 
 PROJECT_REINIT="$TMP_DIR/project-reinit"
@@ -94,15 +106,19 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --intent "$PROJECT_REINIT/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT_REINIT/docs/CONSTITUTION.md" \
   --ai codex:gpt-5.4:auto \
+  --tool-adapter acp \
   >/dev/null
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --project "$PROJECT_REINIT" \
   --intent "$PROJECT_REINIT/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT_REINIT/docs/CONSTITUTION.md" \
+  --force \
   >/dev/null
 PROJECT_REINIT_CANON="$(cd "$PROJECT_REINIT" && pwd -P)"
 
 grep -q '^AI_TOOL="codex"$' "$PROJECT_REINIT_CANON/.freely/config.env"
 grep -q '^AI_MODEL="gpt-5.4"$' "$PROJECT_REINIT_CANON/.freely/config.env"
+grep -q '^AI_TOOL_ADAPTER="acp"$' "$PROJECT_REINIT_CANON/.freely/config.env"
+grep -q '^AI_TOOL_ADAPTER_POLICY="acp"$' "$PROJECT_REINIT_CANON/.freely/config.env"
 
 echo "[PASS] freely init resolves AI defaults with precedence: explicit > project > global"

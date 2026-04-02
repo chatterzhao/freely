@@ -26,6 +26,8 @@ AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 AI_REASONING_EFFORT="high"
+AI_TOOL_ADAPTER="direct"
+AI_TOOL_ADAPTER_POLICY="direct"
 EOF
 cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
 LAST_TOOL_SESSION_ID="session-123"
@@ -38,6 +40,9 @@ EOF
 BASELINE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")"
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'project: '
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'last_tool_session_id: session-123'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'tool_adapter: direct'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'tool_adapter_policy: direct'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'tool_supported_adapters: direct,acp'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'reasoning_effort: high'
 printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'checkpoint_drift_streak: 2'
 

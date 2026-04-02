@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+assert_eq() {
+  local actual="$1" expected="$2" message="$3"
+  if [[ "$actual" != "$expected" ]]; then
+    echo "[FAIL] $message: expected '$expected', got '$actual'" >&2
+    exit 1
+  fi
+}
+
+assert_eq "$(tool_supported_adapters_for_runtime codex)" "$(printf 'direct\nacp')" "codex supported adapter matrix"
+assert_eq "$(tool_supported_adapters_for_runtime cc)" "direct" "cc supported adapter matrix"
+assert_eq "$(tool_default_adapter_policy_for_runtime iflow)" "direct" "iflow default adapter policy"
+assert_eq "$(resolve_tool_adapter_from_policy_for_runtime codex direct)" "direct" "direct policy resolution"
+assert_eq "$(resolve_tool_adapter_from_policy_for_runtime codex acp)" "acp" "explicit acp policy should preserve requested adapter"
+assert_eq "$(resolve_tool_adapter_from_policy_for_runtime codex prefer_acp_fallback_direct)" "acp" "prefer_acp_fallback_direct should resolve to acp when acp is supported"
+
+echo "[PASS] runtime adapter policy resolution honors the current per-tool support matrix"
