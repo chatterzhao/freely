@@ -105,6 +105,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --constitution "$PROJECT_CC_ACP/docs/CONSTITUTION.md" \
   --ai cc:auto \
   --tool-adapter acp \
+  --accept-default-autonomy \
   >/dev/null
 
 CONFIG_FILE_ACP="$PROJECT_CC_ACP/.freely/config.env"
