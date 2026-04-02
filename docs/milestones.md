@@ -1830,7 +1830,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md`
 - source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md`
-- next_action: 已提升为独立 issue；后续由 `I-20260317-1004` 承接 issue-bound IBM 收敛
+- next_action: 已提升为独立 issue，且其 absorption closeout 已由 `I-20260317-1004` 写回 completed；此处只保留 candidate provenance
 
 ### completed_issues
 
