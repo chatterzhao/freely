@@ -7453,9 +7453,7 @@ cmd_doctor() {
   project="$(resolve_project_or_fail "$project" 1)"
   check_doc_gate_or_fail "$project"
   check_hook_gate_or_fail "$project"
-<<<<<<< HEAD
   check_build_artifact_gate_or_fail "$project"
-=======
   echo "project: $project"
   cfg="$(config_file "$project")"
   if [[ -f "$cfg" ]]; then
@@ -7466,7 +7464,6 @@ cmd_doctor() {
     echo "security_review_policy: unavailable-uninitialized"
     echo "security_review_scope: unavailable-uninitialized"
   fi
->>>>>>> 9291e28 (Land advisory security review capability baseline)
 }
 
 cmd_chat() {
