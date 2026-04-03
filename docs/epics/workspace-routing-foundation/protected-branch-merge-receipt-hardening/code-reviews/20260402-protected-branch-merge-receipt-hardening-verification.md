@@ -22,9 +22,11 @@
 2. `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
 3. `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
 4. `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
-5. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
-6. `git diff --check`
-7. `./bin/governance-check`
+5. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+6. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+7. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+8. `git diff --check`
+9. `./bin/governance-check`
 
 ## Implementation Decision Note
 
