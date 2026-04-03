@@ -54,6 +54,9 @@ git commit -q -m "hotfix change"
 git checkout -q develop
 "$REPO/bin-merge-guarded" develop feature/demo >/dev/null
 git merge-base --is-ancestor feature/demo develop
+git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Bypass-Mode: forbidden$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Source-Branch: feature/demo$'
 
 if "$REPO/bin-merge-guarded" develop test-pre-merge-20260327-demo >/dev/null 2>"$TEST_TMP/pretestmerge-blocked.err"; then
   echo "[FAIL] invalid test-pre-merge -> develop merge unexpectedly allowed" >&2
@@ -130,5 +133,67 @@ rm -f "$CONFLICT_WT/.freely/run/ai.pid"
 
 "$REPO/bin-merge-guarded" develop feature/promotion-owner >/dev/null
 git merge-base --is-ancestor feature/promotion-owner develop
+git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded$'
 
-echo "[PASS] merge-guarded enforces replay-only develop paths and duplicate promotion ownership"
+git checkout -q -b feature/conflict-normal
+printf 'feature-side\n' > CONFLICT.txt
+git add CONFLICT.txt
+git commit -q -m "seed conflict source"
+
+git checkout -q develop
+printf 'develop-side\n' > CONFLICT.txt
+git add CONFLICT.txt
+git commit -q -m "seed conflict target"
+
+set +e
+"$REPO/bin-merge-guarded" develop feature/conflict-normal >/dev/null 2>"$TEST_TMP/conflict-normal.err"
+conflict_normal_rc=$?
+set -e
+[[ "$conflict_normal_rc" -ne 0 ]] || {
+  echo "[FAIL] merge-guarded should stop on textual conflict and leave merge state for completion" >&2
+  exit 1
+}
+git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1
+printf 'resolved-normal\n' > CONFLICT.txt
+git add CONFLICT.txt
+"$REPO/bin-merge-guarded" complete develop feature/conflict-normal >/dev/null
+git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded-complete$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Bypass-Mode: forbidden$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Source-Branch: feature/conflict-normal$'
+
+git checkout -q -b feature/conflict-breakglass
+printf 'breakglass-source\n' > BREAKGLASS.txt
+git add BREAKGLASS.txt
+git commit -q -m "seed break-glass source"
+
+git checkout -q develop
+printf 'breakglass-target\n' > BREAKGLASS.txt
+git add BREAKGLASS.txt
+git commit -q -m "seed break-glass target"
+
+set +e
+"$REPO/bin-merge-guarded" develop feature/conflict-breakglass >/dev/null 2>"$TEST_TMP/conflict-breakglass.err"
+conflict_breakglass_rc=$?
+set -e
+[[ "$conflict_breakglass_rc" -ne 0 ]] || {
+  echo "[FAIL] merge-guarded should leave conflict state for break-glass completion test" >&2
+  exit 1
+}
+git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1
+printf 'resolved-breakglass\n' > BREAKGLASS.txt
+git add BREAKGLASS.txt
+"$REPO/bin-merge-guarded" complete develop feature/conflict-breakglass \
+  --break-glass \
+  --reason verified_false_negative \
+  --blocked-gate pre-merge-commit \
+  --evidence-ref docs/epics/sample/story/code-reviews/r-breakglass.md \
+  --follow-on-issue I-20260402-0020-A >/dev/null
+git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded-break-glass$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Bypass-Mode: break_glass$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Break-Glass-Reason: verified_false_negative$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Blocked-Gate: pre-merge-commit$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Operation-Scope: merge_completion_only$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Evidence-Ref: docs/epics/sample/story/code-reviews/r-breakglass.md$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Follow-On-Issue: I-20260402-0020-A$'
+
+echo "[PASS] merge-guarded enforces replay-only develop paths, duplicate promotion ownership, and controlled completion receipts"
