@@ -50,21 +50,19 @@ routing_policy:
 
 ### committed_issues
 
+### candidate_issues
+
+### completed_issues
 1. `I-20260402-0020-A`
 - title: Hook bypass break-glass governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-hook-bypass-breakglass-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md`
-- next_action: Keep the owner in verification until the guarded completion, hook handshake, and receipt-audit suite passes together with `git diff --check` and `./bin/governance-check`, then merge through the protected develop path.
-- revisit_trigger: Revisit issue scope only if protected-branch bypass requires server-side enforcement, a broader break-glass taxonomy, or a follow-on owner for merge-gate false-negative remediation.
-
-### candidate_issues
-
-### completed_issues
+- completion_note: `Canonical develop absorbed protected-branch break-glass governance through receipt-bearing merge 52f55c0, and the closeout lane recorded both historical break-glass receipts and post-merge verification evidence.`
 1. `I-20260402-0455-A`
 - title: Worktree exclusive ownership and promotion lease governance
 - milestone_state: completed
