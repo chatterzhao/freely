@@ -3,13 +3,13 @@
 - issue_id: `I-20260402-1912-A`
 - issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
 - title: `Protected-branch merge receipt hardening`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/protected-branch-merge-receipt-hardening-20260402-1912`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-1912-feature-protected-branch-merge-receipt-hardening`
+- branch: `feature/protected-branch-merge-receipt-hardening-closeout-20260402-2345`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-2345-feature-protected-branch-merge-receipt-hardening-closeout`
 - updated_at: `2026-04-02`
-- closure_status: `open`
+- closure_status: `closed`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -34,5 +34,16 @@
 
 ## Next Action
 
-1. Guardedly absorb this receipt-ledger parity slice into `develop`.
+1. Owner is complete on canonical `develop`.
 2. Keep watchdog revert out of scope, and reopen only if a later narrow follow-on is needed for handshake or staged merge-gate hardening.
+
+## Closure Evidence
+
+- closure_status: `completed-on-develop`
+- closure_evidence:
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/code-reviews/20260402-protected-branch-merge-receipt-hardening-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+  - `./bin/governance-check`
+  - `develop` merge `1ed8c57`

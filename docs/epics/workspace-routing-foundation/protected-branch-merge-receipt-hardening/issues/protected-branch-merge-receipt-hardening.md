@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260402-1912-A`
 - title: Protected-branch merge receipt hardening
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `protected-branch-merge-receipt-hardening`
@@ -107,5 +107,15 @@
 
 ## Next
 
-- Guardedly absorb this receipt-ledger parity slice into `develop`.
-- Treat any later handshake hardening or staged merge-gate guardrail expansion as a fresh narrow follow-on instead of widening this verification patch.
+- Closed on canonical `develop` through guarded merge `1ed8c57`.
+- Treat any later handshake hardening or staged merge-gate guardrail expansion as a fresh narrow follow-on instead of widening this completed parity owner.
+
+## Completion Status
+
+- canonical_merge_commit: `1ed8c57`
+- canonical_merge_target: `develop`
+- post_merge_acceptance:
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+  - `./bin/governance-check`
