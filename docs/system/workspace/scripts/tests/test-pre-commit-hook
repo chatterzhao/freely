@@ -40,6 +40,38 @@ cat "$TMP_DIR/stdout" "$TMP_DIR/stderr" | grep -q "ephemeral verification surfac
 echo "[PASS] pre-commit blocks direct commit on test-pre-merge batches"
 
 git checkout -q develop
+git checkout -q -b feature/merge-completion
+printf 'feature-side\n' > merge-conflict.txt
+git add merge-conflict.txt
+git commit -q -m "feature merge payload"
+
+git checkout -q develop
+printf 'develop-side\n' > merge-conflict.txt
+git add merge-conflict.txt
+git commit -q -m "develop merge payload"
+
+set +e
+git merge --no-commit feature/merge-completion >/dev/null 2>&1
+merge_rc=$?
+set -e
+if [[ "$merge_rc" -eq 0 ]]; then
+  echo "[FAIL] expected a conflict to keep MERGE_HEAD active for raw completion test" >&2
+  exit 1
+fi
+git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1
+
+if "$REPO/.githooks/pre-commit" >"$TMP_DIR/stdout-merge" 2>"$TMP_DIR/stderr-merge"; then
+  echo "[FAIL] pre-commit should block raw protected-branch merge completion" >&2
+  exit 1
+fi
+cat "$TMP_DIR/stdout-merge" "$TMP_DIR/stderr-merge" | grep -q "raw merge completion"
+
+FREELY_GUARDED_MERGE_COMPLETION=1 "$REPO/.githooks/pre-commit" >"$TMP_DIR/stdout-merge-allow" 2>"$TMP_DIR/stderr-merge-allow"
+git merge --abort >/dev/null 2>&1
+
+echo "[PASS] pre-commit only allows protected-branch merge completion through guarded path"
+
+git checkout -q develop
 git worktree add -q -b feature/pretests ../repo-worktrees/feature-pretests develop
 FEATURE_WT="$(cd ../repo-worktrees/feature-pretests && pwd -P)"
 mkdir -p "$FEATURE_WT/docs/epics/sample/story/issues" "$FEATURE_WT/docs/epics/sample/story"

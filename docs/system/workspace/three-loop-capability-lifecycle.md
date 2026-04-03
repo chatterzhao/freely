@@ -190,6 +190,9 @@ flowchart LR
 - 若该 handoff 会授予 mutate authority，还要显式带 `intent_kind` 与 `intent_target`；`write_scope` 只表达 launch-time 写域冲突，不替代长期 `edit / cleanup / promotion` ownership truth。
 - 对会产生 mutate authority 的 lane，worker handoff 还必须带 `intent_kind` 与 `intent_target`；`write_scope` 只负责 launch-time scheduling，不替代长期 ownership truth。
 - phase-1 launch scheduling 的 intent blocker 至少包含 `active-owner`、`recorded-owner` 与 `frozen-owner`；若目标 lane 只剩 recorded ownership，主管也必须先做 reclaim / handoff judgment，再决定是否重启或重派同 target lane。
+- protected-branch merge completion 也属于 artifact 链的一部分：正常 path 通过 `merge-guarded` 写 merge receipt，break-glass path 还必须额外携带 hook handshake env、issue-bound follow-on owner 与 post-hoc receipt ledger；没有这些 artifact 时，不得把一次 merge completion 解释为合法 lifecycle advancement。
+- protected-branch merge completion 也属于 artifact chain 的一段，而不是“冲突时可以手工收尾”的例外路径：`merge-guarded` 写 merge receipt、hooks 校验 guarded completion / break-glass 字段、`governance-check` 再做 post-merge audit，缺任一环都不能算 lifecycle 闭环。
+- break-glass 不是独立 loop；它只是 `dev-loop -> verification/cleanup` 之间的受控例外 route。命中时必须留下 machine-readable receipt、follow-on owner 和 evidence ref，随后仍要回到 doc-loop / verification artifact 把误报或工具缺口 materialize 成 canonical repair owner。
 
 ## 5A. Observability Planes
 
@@ -246,6 +249,7 @@ day-1 mirror 规则：
   - `acceptance_scope`
   - `acceptance_target`
   - `acceptance_ref`
+- protected-branch break-glass 不是平行 loop；它只是 `completion_verification -> cleanup_governance` 之间的一条例外 route。例外 route 只允许 `merge_completion_only`，并必须把 `blocked_gate + evidence_refs + follow_on_owner + receipt_ref` 全部写回 `artifact plane`，供后续 patrol、verification 与 governance-check 复盘。
 - stall / progress / restart-storm 这类 signal 只提供 supervision signal，不直接宣告 completed / delete-ready
 - 主管若要判断完成、删除门、或 acceptance 是否已闭合，必须沿 `acceptance_ref` 回到 `artifact plane`
 

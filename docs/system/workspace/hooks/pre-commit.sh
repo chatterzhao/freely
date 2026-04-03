@@ -9,6 +9,20 @@ branch="$(freely_wt_current_branch)"
 [[ -n "$branch" ]] || exit 0
 
 if freely_wt_is_test_pre_merge_branch "$branch"; then
+  if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
+    if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" == "1" ]]; then
+      exit 0
+    fi
+    cat <<MSG
+[HOOK] Commit blocked: raw merge completion on '$branch' is forbidden.
+Use the guarded completion path instead:
+
+  ./bin/merge-guarded complete "$branch" <source-branch>
+
+Policy source: docs/LAWS.md §2D
+MSG
+    exit 1
+  fi
   cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
 Test pre-merge batches are ephemeral verification surfaces.
@@ -23,6 +37,21 @@ fi
 
 case "$branch" in
   main|develop)
+    if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
+      if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" == "1" ]]; then
+        exit 0
+      fi
+      cat <<MSG
+[HOOK] Commit blocked: raw merge completion on '$branch' is forbidden.
+Use the guarded completion path instead:
+
+  ./bin/merge-guarded complete "$branch" <source-branch>
+
+Do not finish protected-branch merges with bare 'git commit' or equivalent bypass.
+Policy source: docs/LAWS.md §2D
+MSG
+      exit 1
+    fi
     cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
 This repo enforces worktree mode for feature development.

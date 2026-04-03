@@ -20,6 +20,7 @@ mkdir -p "$REPO/docs/system/workspace/skills/dev-loop-execution"
 mkdir -p "$REPO/docs/system/workspace/skills/auto-loop-orchestrator"
 mkdir -p "$REPO/docs/system/workspace/skills"
 mkdir -p "$REPO/docs/system/workspace/agents"
+mkdir -p "$REPO/docs/system/workspace/hooks"
 mkdir -p "$REPO/docs/pre-brainstorms"
 mkdir -p "$REPO/docs/epics/sample/issues"
 
@@ -44,6 +45,16 @@ EOF
 
 cat > "$REPO/docs/system/workspace/three-loop-capability-lifecycle.md" <<'EOF'
 # Three Loop Capability Lifecycle
+EOF
+
+cat > "$REPO/docs/system/workspace/hooks/README.md" <<'EOF'
+# Workspace Hooks
+EOF
+
+cat > "$REPO/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<'EOF'
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: `2099-01-01`
 EOF
 
 cat > "$REPO/docs/system/workspace/scripts/README.md" <<'EOF'

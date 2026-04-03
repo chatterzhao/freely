@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Set
 
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../"))
+USE_STAGED_VIEW = False
 IMPLEMENTATION_DECISION_NOTE_FIELDS = (
     "decision",
     "why_this",
@@ -102,6 +103,8 @@ def issue_key(issue_id: str) -> Optional[str]:
 class CandidateRecord:
     path: str
     candidate_id: str
+    start_line: int
+    end_line: int
     status: Optional[str]
     milestone: Optional[str]
     promoted_issue_path: Optional[str]
@@ -149,8 +152,32 @@ def relative_path(path: str) -> str:
     return os.path.relpath(path, ROOT_DIR)
 
 
+def staged_path_exists(rel_path: Optional[str]) -> bool:
+    if not rel_path:
+        return False
+    result = subprocess.run(
+        ["git", "cat-file", "-e", f":{rel_path}"],
+        cwd=ROOT_DIR,
+        text=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return result.returncode == 0
+
+
+def read_repo_text(rel_path: str) -> str:
+    full_path = os.path.join(ROOT_DIR, rel_path)
+    if USE_STAGED_VIEW and staged_path_exists(rel_path):
+        return git("show", f":{rel_path}")
+    with open(full_path, "r", encoding="utf-8") as handle:
+        return handle.read()
+
+
 def path_exists(rel_path: Optional[str]) -> bool:
-    return bool(rel_path) and os.path.isfile(os.path.join(ROOT_DIR, rel_path))
+    return bool(rel_path) and (
+        os.path.isfile(os.path.join(ROOT_DIR, rel_path))
+        or (USE_STAGED_VIEW and staged_path_exists(rel_path))
+    )
 
 
 def normalized_phase(value: Optional[str]) -> str:
@@ -193,10 +220,29 @@ def changed_paths_from_args(args: argparse.Namespace) -> List[str]:
     return [line.strip() for line in output.splitlines() if line.strip()]
 
 
+def changed_line_numbers(rel_path: str, args: argparse.Namespace) -> Set[int]:
+    if args.staged:
+        output = git("diff", "--cached", "--unified=0", "--", rel_path)
+    elif args.range:
+        output = git("diff", "--unified=0", args.range, "--", rel_path)
+    else:
+        return set()
+
+    changed: Set[int] = set()
+    for line in output.splitlines():
+        match = re.match(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@", line)
+        if not match:
+            continue
+        start = int(match.group(1))
+        length = int(match.group(2) or "1")
+        if length <= 0:
+            continue
+        changed.update(range(start, start + length))
+    return changed
+
+
 def parse_candidate_file(rel_path: str) -> List[CandidateRecord]:
-    full_path = os.path.join(ROOT_DIR, rel_path)
-    with open(full_path, "r", encoding="utf-8") as handle:
-        lines = handle.readlines()
+    lines = read_repo_text(rel_path).splitlines(keepends=True)
 
     starts = []
     for idx, line in enumerate(lines):
@@ -224,6 +270,8 @@ def parse_candidate_file(rel_path: str) -> List[CandidateRecord]:
             CandidateRecord(
                 path=rel_path,
                 candidate_id=candidate_id_value,
+                start_line=start_idx + 1,
+                end_line=end_idx,
                 status=grab("status"),
                 milestone=normalize_milestone(grab("milestone")),
                 promoted_issue_path=grab("promoted_issue_path"),
@@ -237,9 +285,7 @@ def parse_candidate_file(rel_path: str) -> List[CandidateRecord]:
 
 
 def parse_issue_file(rel_path: str) -> IssueRecord:
-    full_path = os.path.join(ROOT_DIR, rel_path)
-    with open(full_path, "r", encoding="utf-8") as handle:
-        text = handle.read()
+    text = read_repo_text(rel_path)
 
     def grab(name: str) -> Optional[str]:
         match = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
@@ -256,9 +302,7 @@ def parse_issue_file(rel_path: str) -> IssueRecord:
 
 
 def parse_progress_file(rel_path: str) -> ProgressRecord:
-    full_path = os.path.join(ROOT_DIR, rel_path)
-    with open(full_path, "r", encoding="utf-8") as handle:
-        text = handle.read()
+    text = read_repo_text(rel_path)
 
     def grab(name: str) -> Optional[str]:
         match = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
@@ -272,9 +316,7 @@ def parse_progress_file(rel_path: str) -> ProgressRecord:
 
 
 def parse_review_file(rel_path: str) -> ReviewRecord:
-    full_path = os.path.join(ROOT_DIR, rel_path)
-    with open(full_path, "r", encoding="utf-8") as handle:
-        text = handle.read()
+    text = read_repo_text(rel_path)
 
     match = re.search(r"^\s*-\s*issue_id:\s*(.+?)\s*$", text, re.MULTILINE)
     issue_id = normalize_scalar(match.group(1)) if match else None
@@ -293,9 +335,7 @@ def parse_review_file(rel_path: str) -> ReviewRecord:
 
 
 def parse_milestones() -> List[MilestoneEntry]:
-    full_path = os.path.join(ROOT_DIR, "docs/milestones.md")
-    with open(full_path, "r", encoding="utf-8") as handle:
-        lines = handle.readlines()
+    lines = read_repo_text("docs/milestones.md").splitlines(keepends=True)
 
     entries: List[MilestoneEntry] = []
     current_milestone = None
@@ -410,10 +450,12 @@ def resolve_source_candidate_record(
 
 
 def main() -> int:
+    global USE_STAGED_VIEW
     parser = argparse.ArgumentParser(description="Develop-merge governance gate for C/M/I materialization.")
     parser.add_argument("--staged", action="store_true", help="Validate the staged merge result.")
     parser.add_argument("--range", help="Validate changed governance artifacts in the given git revision range.")
     args = parser.parse_args()
+    USE_STAGED_VIEW = bool(args.staged)
 
     changed_paths = changed_paths_from_args(args)
     candidate_paths: Set[str] = {p for p in changed_paths if p.startswith("docs/pre-brainstorms/") and p.endswith("/candidates.md")}
@@ -491,11 +533,22 @@ def main() -> int:
         "dropped (允许不进入下一环，但必须写清不再推进的原因)",
     ]
 
-    touched_candidate_ids: Set[str] = {candidate.candidate_id for candidate in candidate_records if candidate.candidate_id}
+    candidate_changed_lines_by_path = {
+        path: changed_line_numbers(path, args) for path in sorted(touched_candidate_paths)
+    }
+    touched_candidate_ids: Set[str] = set()
+    for candidate in candidate_records:
+        changed_lines = candidate_changed_lines_by_path.get(candidate.path)
+        if not changed_lines:
+            continue
+        candidate_lines = set(range(candidate.start_line, candidate.end_line + 1))
+        if candidate_lines & changed_lines:
+            touched_candidate_ids.add(candidate.candidate_id)
     candidate_driven_evidence: Set[str] = set(touched_candidate_ids)
     issue_bound_evidence: Set[str] = set()
     issue_bound_issue_paths: Set[str] = set()
     issue_bound_candidate_ids: Set[str] = set()
+    issue_bound_candidate_paths: Set[str] = set()
     progress_owner_issue_paths: Set[str] = set()
     review_owner_issue_paths: Set[str] = set()
     owner_issue_records: Dict[str, IssueRecord] = {}
@@ -509,6 +562,7 @@ def main() -> int:
             source_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
             if source_candidate:
                 issue_bound_candidate_ids.add(source_candidate.candidate_id)
+                issue_bound_candidate_paths.add(source_candidate.path)
                 candidate_driven_evidence.add(source_candidate.candidate_id)
 
     for progress in progress_records:
@@ -538,6 +592,7 @@ def main() -> int:
             continue
 
         issue_bound_candidate_ids.add(source_candidate.candidate_id)
+        issue_bound_candidate_paths.add(source_candidate.path)
         candidate_driven_evidence.add(source_candidate.candidate_id)
 
     for review in review_records:
@@ -562,6 +617,7 @@ def main() -> int:
             continue
 
         issue_bound_candidate_ids.add(source_candidate.candidate_id)
+        issue_bound_candidate_paths.add(source_candidate.path)
         candidate_driven_evidence.add(source_candidate.candidate_id)
 
     if not candidate_driven_evidence:
@@ -585,12 +641,16 @@ def main() -> int:
             continue
 
         owner_path = normalize_scalar(candidate.promoted_issue_path or "")
-        candidate_is_directly_touched = candidate.path in touched_candidate_paths
+        candidate_is_directly_touched = candidate.candidate_id in touched_candidate_ids
         candidate_is_bound_to_touched_issue = candidate.candidate_id in issue_bound_candidate_ids
         candidate_is_bound_to_touched_owner = bool(owner_path) and owner_path in issue_bound_issue_paths
+        candidate_is_sibling_context_only = (
+            candidate_is_directly_touched
+            and not candidate_is_bound_to_touched_issue
+            and candidate.path in issue_bound_candidate_paths
+        )
         candidate_is_relevant = (
             candidate_is_directly_touched
-            or candidate_is_bound_to_touched_issue
             or candidate_is_bound_to_touched_owner
         )
         candidate_is_unresolved_pre_ibm = status in {"proposed", "needs_research", "blocked"}
@@ -600,6 +660,9 @@ def main() -> int:
             and governance_only_merge
             and bool(issue_bound_evidence)
         )
+
+        if candidate_is_sibling_context_only:
+            continue
 
         if not candidate_is_relevant and not unresolved_metadata_fix_is_absorbed_by_governance_owner:
             continue
