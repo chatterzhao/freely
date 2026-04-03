@@ -103,6 +103,8 @@ def issue_key(issue_id: str) -> Optional[str]:
 class CandidateRecord:
     path: str
     candidate_id: str
+    start_line: int
+    end_line: int
     status: Optional[str]
     milestone: Optional[str]
     promoted_issue_path: Optional[str]
@@ -218,6 +220,27 @@ def changed_paths_from_args(args: argparse.Namespace) -> List[str]:
     return [line.strip() for line in output.splitlines() if line.strip()]
 
 
+def changed_line_numbers(rel_path: str, args: argparse.Namespace) -> Set[int]:
+    if args.staged:
+        output = git("diff", "--cached", "--unified=0", "--", rel_path)
+    elif args.range:
+        output = git("diff", "--unified=0", args.range, "--", rel_path)
+    else:
+        return set()
+
+    changed: Set[int] = set()
+    for line in output.splitlines():
+        match = re.match(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@", line)
+        if not match:
+            continue
+        start = int(match.group(1))
+        length = int(match.group(2) or "1")
+        if length <= 0:
+            continue
+        changed.update(range(start, start + length))
+    return changed
+
+
 def parse_candidate_file(rel_path: str) -> List[CandidateRecord]:
     lines = read_repo_text(rel_path).splitlines(keepends=True)
 
@@ -247,6 +270,8 @@ def parse_candidate_file(rel_path: str) -> List[CandidateRecord]:
             CandidateRecord(
                 path=rel_path,
                 candidate_id=candidate_id_value,
+                start_line=start_idx + 1,
+                end_line=end_idx,
                 status=grab("status"),
                 milestone=normalize_milestone(grab("milestone")),
                 promoted_issue_path=grab("promoted_issue_path"),
@@ -508,11 +533,22 @@ def main() -> int:
         "dropped (允许不进入下一环，但必须写清不再推进的原因)",
     ]
 
-    touched_candidate_ids: Set[str] = {candidate.candidate_id for candidate in candidate_records if candidate.candidate_id}
+    candidate_changed_lines_by_path = {
+        path: changed_line_numbers(path, args) for path in sorted(touched_candidate_paths)
+    }
+    touched_candidate_ids: Set[str] = set()
+    for candidate in candidate_records:
+        changed_lines = candidate_changed_lines_by_path.get(candidate.path)
+        if not changed_lines:
+            continue
+        candidate_lines = set(range(candidate.start_line, candidate.end_line + 1))
+        if candidate_lines & changed_lines:
+            touched_candidate_ids.add(candidate.candidate_id)
     candidate_driven_evidence: Set[str] = set(touched_candidate_ids)
     issue_bound_evidence: Set[str] = set()
     issue_bound_issue_paths: Set[str] = set()
     issue_bound_candidate_ids: Set[str] = set()
+    issue_bound_candidate_paths: Set[str] = set()
     progress_owner_issue_paths: Set[str] = set()
     review_owner_issue_paths: Set[str] = set()
     owner_issue_records: Dict[str, IssueRecord] = {}
@@ -526,6 +562,7 @@ def main() -> int:
             source_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
             if source_candidate:
                 issue_bound_candidate_ids.add(source_candidate.candidate_id)
+                issue_bound_candidate_paths.add(source_candidate.path)
                 candidate_driven_evidence.add(source_candidate.candidate_id)
 
     for progress in progress_records:
@@ -555,6 +592,7 @@ def main() -> int:
             continue
 
         issue_bound_candidate_ids.add(source_candidate.candidate_id)
+        issue_bound_candidate_paths.add(source_candidate.path)
         candidate_driven_evidence.add(source_candidate.candidate_id)
 
     for review in review_records:
@@ -579,6 +617,7 @@ def main() -> int:
             continue
 
         issue_bound_candidate_ids.add(source_candidate.candidate_id)
+        issue_bound_candidate_paths.add(source_candidate.path)
         candidate_driven_evidence.add(source_candidate.candidate_id)
 
     if not candidate_driven_evidence:
@@ -602,12 +641,16 @@ def main() -> int:
             continue
 
         owner_path = normalize_scalar(candidate.promoted_issue_path or "")
-        candidate_is_directly_touched = candidate.path in touched_candidate_paths
+        candidate_is_directly_touched = candidate.candidate_id in touched_candidate_ids
         candidate_is_bound_to_touched_issue = candidate.candidate_id in issue_bound_candidate_ids
         candidate_is_bound_to_touched_owner = bool(owner_path) and owner_path in issue_bound_issue_paths
+        candidate_is_sibling_context_only = (
+            candidate_is_directly_touched
+            and not candidate_is_bound_to_touched_issue
+            and candidate.path in issue_bound_candidate_paths
+        )
         candidate_is_relevant = (
             candidate_is_directly_touched
-            or candidate_is_bound_to_touched_issue
             or candidate_is_bound_to_touched_owner
         )
         candidate_is_unresolved_pre_ibm = status in {"proposed", "needs_research", "blocked"}
@@ -617,6 +660,9 @@ def main() -> int:
             and governance_only_merge
             and bool(issue_bound_evidence)
         )
+
+        if candidate_is_sibling_context_only:
+            continue
 
         if not candidate_is_relevant and not unresolved_metadata_fix_is_absorbed_by_governance_owner:
             continue

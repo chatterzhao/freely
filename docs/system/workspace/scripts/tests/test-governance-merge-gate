@@ -499,16 +499,28 @@ cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
 # Candidates
 
 ### C-20260327-2205-A
+- status: proposed
+- milestone: `M-sample`
+
+### C-20260327-2205-B
+- status: proposed
+- milestone: `M-sample`
+EOF
+git add docs/pre-brainstorms/sample/candidates.md
+git commit -q -m "seed sibling candidate baseline"
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
 - status: promoted
 - milestone: `M-sample`
 - promoted_issue_id: `I-20260327-2205-A`
 - promoted_issue_path: `docs/epics/sample/story/issues/sample-a.md`
 
 ### C-20260327-2205-B
-- status: promoted
+- status: proposed
 - milestone: `M-sample`
-- promoted_issue_id: `I-20260327-2205-B`
-- promoted_issue_path: `docs/epics/sample/story/issues/sample-b.md`
 EOF
 cat > "$REPO/docs/milestones.md" <<'EOF'
 # Milestones
@@ -571,14 +583,14 @@ cat > "$REPO/docs/epics/sample/story/code-reviews/r-sample-a.md" <<'EOF'
 - residual_risk: `Path heuristics may still need calibration when more capability roots are added.`
 EOF
 echo "console.log('verification owner');" > "$REPO/src/sample.js"
-git add src/sample.js docs/milestones.md docs/epics/sample/story/issues/sample-a.md docs/progress/sample/p-sample-a.md docs/epics/sample/story/code-reviews/r-sample-a.md
+git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/milestones.md docs/epics/sample/story/issues/sample-a.md docs/progress/sample/p-sample-a.md docs/epics/sample/story/code-reviews/r-sample-a.md
 if ! "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout11b" 2>"$TMP_DIR/stderr11b"; then
   echo "[FAIL] governance-merge-gate should ignore sibling candidates loaded only as source-candidate context" >&2
   cat "$TMP_DIR/stdout11b" >&2
   exit 1
 fi
 
-git reset -q HEAD src/sample.js docs/milestones.md docs/epics/sample/story/issues/sample-a.md docs/progress/sample/p-sample-a.md docs/epics/sample/story/code-reviews/r-sample-a.md
+git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/milestones.md docs/epics/sample/story/issues/sample-a.md docs/progress/sample/p-sample-a.md docs/epics/sample/story/code-reviews/r-sample-a.md
 rm -f "$REPO/src/sample.js" \
   "$REPO/docs/epics/sample/story/issues/sample-a.md" \
   "$REPO/docs/epics/sample/story/issues/sample-b.md" \
@@ -832,5 +844,94 @@ if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout16" 2>"$TMP_DIR/s
   exit 1
 fi
 grep -q "declared milestone M-sample has status 'completed'" "$TMP_DIR/stdout16"
+
+git reset -q HEAD docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+mkdir -p \
+  "$REPO/docs/pre-brainstorms/staged-view" \
+  "$REPO/docs/epics/staged/view/issues" \
+  "$REPO/docs/epics/staged/view/code-reviews" \
+  "$REPO/docs/progress/staged" \
+  "$REPO/src"
+cat > "$REPO/docs/pre-brainstorms/staged-view/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260402-1400-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260402-1400-A`
+- promoted_issue_path: `docs/epics/staged/view/issues/staged-view.md`
+EOF
+cat > "$REPO/docs/epics/staged/view/issues/staged-view.md" <<'EOF'
+# Issue: staged-view
+
+- issue_id: `I-20260402-1400-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/staged-view/candidates.md#c-20260402-1400-a`
+- verification_artifact_dir: `docs/epics/staged/view/code-reviews`
+EOF
+cat > "$REPO/docs/progress/staged/p-staged-view.md" <<'EOF'
+# Progress: staged-view
+
+- issue_id: `I-20260402-1400-A`
+- issue_path: `docs/epics/staged/view/issues/staged-view.md`
+- phase_state: `in_verification`
+EOF
+cat > "$REPO/docs/epics/staged/view/code-reviews/20260402-staged-view-verification.md" <<'EOF'
+# Verification: staged-view
+
+- issue_id: `I-20260402-1400-A`
+
+## Implementation Decision Note
+
+- decision: `Use staged index data when governance-merge-gate validates staged develop merges.`
+- why_this: `Protected-branch pre-merge validation runs before new owner artifacts necessarily exist in the working tree.`
+- alternatives_considered: `Keep using working-tree reads only.`
+- boundary_non_goals: `This test only proves staged-path visibility.`
+- residual_risk: `More merge-state edge cases may still need dedicated follow-on coverage.`
+EOF
+cat > "$REPO/src/staged-view.js" <<'EOF'
+console.log('staged view');
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+2. `I-20260402-1400-A`
+   - issue_path: `docs/epics/staged/view/issues/staged-view.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/staged-view/candidates.md#c-20260402-1400-a`
+
+### completed_issues
+EOF
+git add \
+  docs/milestones.md \
+  docs/pre-brainstorms/staged-view/candidates.md \
+  docs/epics/staged/view/issues/staged-view.md \
+  docs/epics/staged/view/code-reviews/20260402-staged-view-verification.md \
+  docs/progress/staged/p-staged-view.md \
+  src/staged-view.js
+rm -f \
+  "$REPO/docs/pre-brainstorms/staged-view/candidates.md" \
+  "$REPO/docs/epics/staged/view/issues/staged-view.md" \
+  "$REPO/docs/epics/staged/view/code-reviews/20260402-staged-view-verification.md" \
+  "$REPO/docs/progress/staged/p-staged-view.md" \
+  "$REPO/src/staged-view.js"
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout17" 2>"$TMP_DIR/stderr17"
+grep -q 'passed' "$TMP_DIR/stdout17"
 
 echo "[PASS] governance-merge-gate enforces candidate-driven lifecycle evidence"
