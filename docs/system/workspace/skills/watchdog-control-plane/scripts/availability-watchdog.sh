@@ -1,25 +1,7 @@
 # shellcheck shell=bash
 
 _watchdog_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-
-freely_watchdog_repo_root() {
-  local script_dir="$1" root
-  root="$(git -C "$script_dir" rev-parse --show-toplevel 2>/dev/null || true)"
-  if [[ -n "$root" ]]; then
-    printf '%s\n' "$root"
-    return 0
-  fi
-  case "$script_dir" in
-    */docs/system/workspace/skills/watchdog-control-plane/scripts)
-      printf '%s\n' "${script_dir%/docs/system/workspace/skills/watchdog-control-plane/scripts}"
-      ;;
-    *)
-      printf '%s\n' "$script_dir"
-      ;;
-  esac
-}
-
-SELF_ROOT="$(freely_watchdog_repo_root "$_watchdog_dir")"
+SELF_ROOT="$(cd "$_watchdog_dir/../../../../../.." && pwd -P)"
 
 NETWORK_PROXY_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
 [[ -f "$NETWORK_PROXY_RESOLVER_LIB" ]] || {
