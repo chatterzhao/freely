@@ -173,14 +173,6 @@ write_merge_message_file() {
   printf '%s\n' "$content" >"$merge_msg"
 }
 
-write_guarded_merge_message_file() {
-  local content="$1"
-  local merge_msg
-  merge_msg="$(git_dir)/FREELY_GUARDED_MERGE_MSG"
-  printf '%s\n' "$content" >"$merge_msg"
-  printf '%s\n' "$merge_msg"
-}
-
 do_initial_merge() {
   local target="$1"
   local source_branch="$2"
@@ -193,9 +185,19 @@ do_initial_merge() {
 
   local merge_message
   merge_message="$(render_merge_message "merge-guarded" "forbidden" "$source_branch" "" "" "")"
-  local merge_message_file
-  merge_message_file="$(write_guarded_merge_message_file "$merge_message")"
-  git merge --no-ff -F "$merge_message_file" "$source_branch"
+
+  set +e
+  git merge --no-commit --no-ff "$source_branch"
+  local merge_rc=$?
+  set -e
+  if [[ "$merge_rc" -ne 0 ]]; then
+    return "$merge_rc"
+  fi
+
+  require_merge_in_progress
+  require_matching_merge_head "$source_branch"
+  write_merge_message_file "$merge_message"
+  FREELY_GUARDED_MERGE_COMPLETION=1 GIT_EDITOR=: git merge --continue
 }
 
 do_completion() {
