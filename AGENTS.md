@@ -108,6 +108,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - 若当前项目的 Freely runtime 已在运行，优先通过 `./bin/freely chat --project <project-root> <message>` 这类 human interruption / intake 入口指导它继续开发；不要绕过 runtime 另造一套平行调度。
 - 若在插话驱动的开发过程中发现 bug、缺口或新的能力沉淀点，仍按同一治理规则处理：必要时让 Freely 创建/进入 dedicated worktree 修复、验证、合并到 `develop`、重启 runtime，再继续通过 interruption 推进。
 - 优先使用预检 + 可操作的修复方案，而非重复的权限提示。
+- 不得自行决定 `--no-verify` 或其他 hook/gate bypass；若确实命中 break-glass，只能按 `docs/LAWS.md` §2D 的白名单理由、证据字段和最小作用域执行。
 - 当主管委派 worker 时，worker prompt 必须带稳定的 machine-readable `Worktree:` 与 `Branch:` header；自然语言说明可以补充，但不能替代 runtime 可消费的目标工位锚点。
 - 若主管同轮排多个 lane，worker prompt 还必须带 `dispatch_priority`、`parallel_safe`、`write_scope`；超出 capacity 或冲突的 lane 只能进入 queue / frozen queue，不得直接 launch。
 

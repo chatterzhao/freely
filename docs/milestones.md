@@ -50,6 +50,20 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260402-0020-A`
+- title: Hook bypass break-glass governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-hook-bypass-breakglass-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md`
+- next_action: Keep the owner in verification until the guarded completion, hook handshake, and receipt-audit suite passes together with `git diff --check` and `./bin/governance-check`, then merge through the protected develop path.
+- revisit_trigger: Revisit issue scope only if protected-branch bypass requires server-side enforcement, a broader break-glass taxonomy, or a follow-on owner for merge-gate false-negative remediation.
+
+### candidate_issues
+
 ### completed_issues
 1. `I-20260402-0455-A`
 - title: Worktree exclusive ownership and promotion lease governance
@@ -1280,6 +1294,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260331-1837--worker-first-hop-role-boundary-regression/candidates.md`
 - next_action: Trace the worker prompt-generation path and the worker follow-on relaunch path together, then decide whether this becomes one focused repair issue or two narrower runtime-facing fixes.
 - revisit_trigger: Revisit immediately if another worker lane writes manager-only artifacts, performs project-level patrol after delegated completion, or `MANAGER_MODE=false` prompts still enter `lead-agent` without a worker-only second hop boundary.
+
+16. `C-20260402-0020-A`
+- title: Hook bypass break-glass governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md`
+- next_action: Keep this candidate active while the break-glass whitelist, guarded merge completion path, and bypass audit contract are frozen in canonical governance sources; then materialize a focused owner to repair the protected-branch merge path without reopening unrelated branch governance.
+- revisit_trigger: Revisit immediately if protected-branch work uses `--no-verify` again, if a gate false negative again leaves no canonical bypass receipt, or if merge conflict completion still falls back to raw `git commit`.
 ### completed_issues
 
 1. `I-20260323-1705-A`
