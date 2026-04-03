@@ -50,6 +50,30 @@
 - required evidence: `issue + brainstorm`
 - blocker taxonomy: `definition_missing`
 
+### AT-007 guarded completion handshake enforced
+
+- acceptance target: protected-branch merge completion 只能通过 `merge-guarded complete` 的 hook handshake 继续，不能裸 `git commit`
+- testing layer: integration
+- target environment: isolated git repo with hooks enabled
+- required evidence: `test-pre-commit-hook + test-merge-guarded-breakglass-hook-completion`
+- blocker taxonomy: `execution_pending_or_failed`
+
+### AT-008 receipt audit enforced
+
+- acceptance target: `governance-check` 必须拒绝无 receipt 的 protected-branch merge，并接受带完整 receipt/ledger 的 merge
+- testing layer: integration
+- target environment: isolated git repo
+- required evidence: `test-governance-check-protected-branch-merge-receipt`
+- blocker taxonomy: `execution_pending_or_failed`
+
+### AT-009 guarded completion receipt path enforced
+
+- acceptance target: `merge-guarded` 正常 completion 和 break-glass completion 都会写入 machine-readable receipt
+- testing layer: integration
+- target environment: isolated git repo
+- required evidence: `test-merge-guarded`
+- blocker taxonomy: `execution_pending_or_failed`
+
 ## Acceptance Items
 
 ### AT-001
@@ -93,3 +117,24 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/brainstorms/b-protected-branch-hook-bypass-breakglass-governance.md`
+
+### AT-007
+- id: `AT-007`
+- requirement: `Protected-branch merge completion must go through the guarded hook handshake instead of a raw commit path.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+
+### AT-008
+- id: `AT-008`
+- requirement: `governance-check must audit protected-branch merge receipts and break-glass ledger entries.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
+
+### AT-009
+- id: `AT-009`
+- requirement: `merge-guarded normal and break-glass completion paths must both write machine-readable receipts.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-merge-guarded`
