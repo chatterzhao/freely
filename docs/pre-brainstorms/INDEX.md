@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260402-1912--protected-branch-merge-receipt-hardening
+  - brainstorms: docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md
 - 20260402-0020--hook-bypass-breakglass-governance
   - brainstorms: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md

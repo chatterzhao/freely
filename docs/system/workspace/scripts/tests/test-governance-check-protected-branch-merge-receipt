@@ -266,13 +266,15 @@ cat > "$REPO_BREAK/docs/system/workspace/hooks/protected-branch-breakglass-recei
 ## Receipt: $BREAK_COMMIT
 
 - target_branch: \`develop\`
+- source_branch: \`feature/breakglass\`
+- receipt_mode: \`trailer_parity\`
 - bypass_mode: \`break_glass\`
 - break_glass_reason: \`verified_false_negative\`
 - blocked_gate: \`pre-merge-commit\`
 - operation_scope: \`merge_completion_only\`
 - follow_on_owner: \`I-20260402-0020-A\`
 - evidence_refs:
-  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/epics/sample/code-reviews/r-breakglass.md\`
 EOF
 
 if ! ./bin/governance-check >"$TMP_DIR/break.out" 2>&1; then
@@ -280,5 +282,171 @@ if ! ./bin/governance-check >"$TMP_DIR/break.out" 2>&1; then
   exit 1
 fi
 grep -q "Governance check passed" "$TMP_DIR/break.out"
+
+REPO_LEGACY="$TMP_DIR/repo-legacy"
+make_repo "$REPO_LEGACY"
+cd "$REPO_LEGACY"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/legacy
+echo legacy > LEGACY.txt
+git add LEGACY.txt
+git commit -q -m "legacy feature"
+git checkout -q develop
+git merge --no-ff --no-edit feature/legacy >/dev/null
+
+LEGACY_COMMIT="$(git rev-parse HEAD)"
+cat > "$REPO_LEGACY/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<EOF
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: \`2026-04-02\`
+
+## Receipt: $LEGACY_COMMIT
+
+- target_branch: \`develop\`
+- source_branch: \`feature/legacy\`
+- receipt_mode: \`legacy_backfill\`
+- bypass_mode: \`break_glass\`
+- break_glass_reason: \`tooling_unavailable\`
+- blocked_gate: \`pre-commit\`
+- operation_scope: \`merge_completion_only\`
+- follow_on_owner: \`I-20260402-0020-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+git checkout -q -b feature/legacy-head-receipt
+echo head > HEAD.txt
+git add HEAD.txt
+git commit -q -m "head receipt feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/legacy-head-receipt' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/legacy-head-receipt
+EOF
+)" feature/legacy-head-receipt >/dev/null
+
+if ! ./bin/governance-check >"$TMP_DIR/legacy.out" 2>&1; then
+  cat "$TMP_DIR/legacy.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/legacy.out"
+
+REPO_MISMATCH="$TMP_DIR/repo-mismatch"
+make_repo "$REPO_MISMATCH"
+cd "$REPO_MISMATCH"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/mismatch
+echo mismatch > MISMATCH.txt
+git add MISMATCH.txt
+git commit -q -m "mismatch feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/mismatch' into develop
+
+Freely-Merge-Path: merge-guarded-break-glass
+Freely-Bypass-Mode: break_glass
+Freely-Source-Branch: feature/mismatch
+Freely-Break-Glass-Reason: verified_false_negative
+Freely-Blocked-Gate: pre-merge-commit
+Freely-Operation-Scope: merge_completion_only
+Freely-Evidence-Ref: docs/epics/sample/code-reviews/r-breakglass.md
+Freely-Follow-On-Issue: I-20260402-0020-A
+EOF
+)" feature/mismatch >/dev/null
+
+MISMATCH_COMMIT="$(git rev-parse HEAD)"
+cat > "$REPO_MISMATCH/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<EOF
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: \`2026-04-02\`
+
+## Receipt: $MISMATCH_COMMIT
+
+- target_branch: \`develop\`
+- source_branch: \`feature/not-the-same-branch\`
+- receipt_mode: \`trailer_parity\`
+- bypass_mode: \`break_glass\`
+- break_glass_reason: \`verified_false_negative\`
+- blocked_gate: \`pre-merge-commit\`
+- operation_scope: \`merge_completion_only\`
+- follow_on_owner: \`I-20260402-0020-A\`
+- evidence_refs:
+  - \`docs/epics/sample/code-reviews/r-breakglass.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/mismatch.out" 2>&1; then
+  echo "[FAIL] governance-check should reject break-glass receipts whose ledger fields do not match merge trailers" >&2
+  cat "$TMP_DIR/mismatch.out" >&2
+  exit 1
+fi
+grep -q "trailer/ledger mismatch for source_branch" "$TMP_DIR/mismatch.out"
+
+REPO_BACKFILL_MISUSE="$TMP_DIR/repo-backfill-misuse"
+make_repo "$REPO_BACKFILL_MISUSE"
+cd "$REPO_BACKFILL_MISUSE"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/backfill-misuse
+echo misuse > MISUSE.txt
+git add MISUSE.txt
+git commit -q -m "misuse feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/backfill-misuse' into develop
+
+Freely-Merge-Path: merge-guarded-break-glass
+Freely-Bypass-Mode: break_glass
+Freely-Source-Branch: feature/backfill-misuse
+Freely-Break-Glass-Reason: tooling_unavailable
+Freely-Blocked-Gate: pre-commit
+Freely-Operation-Scope: merge_completion_only
+Freely-Evidence-Ref: docs/epics/sample/issues/sample.md
+Freely-Follow-On-Issue: I-20260402-0020-A
+EOF
+)" feature/backfill-misuse >/dev/null
+
+BACKFILL_MISUSE_COMMIT="$(git rev-parse HEAD)"
+cat > "$REPO_BACKFILL_MISUSE/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<EOF
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: \`2026-04-02\`
+
+## Receipt: $BACKFILL_MISUSE_COMMIT
+
+- target_branch: \`develop\`
+- source_branch: \`feature/backfill-misuse\`
+- receipt_mode: \`legacy_backfill\`
+- bypass_mode: \`break_glass\`
+- break_glass_reason: \`tooling_unavailable\`
+- blocked_gate: \`pre-commit\`
+- operation_scope: \`merge_completion_only\`
+- follow_on_owner: \`I-20260402-0020-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/backfill-misuse.out" 2>&1; then
+  echo "[FAIL] governance-check should reject trailer-bearing break-glass merges that pretend to be legacy_backfill" >&2
+  cat "$TMP_DIR/backfill-misuse.out" >&2
+  exit 1
+fi
+grep -q "receipt_mode is legacy_backfill" "$TMP_DIR/backfill-misuse.out"
 
 echo "[PASS] governance-check audits protected-branch merge receipts and break-glass trailers"

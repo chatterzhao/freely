@@ -1303,6 +1303,31 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md`
 - next_action: Candidate is already materialized as `I-20260402-0020-A`; keep this mirror only for source traceability and route execution from the issue/progress pair.
 - revisit_trigger: Revisit immediately if protected-branch work uses `--no-verify` again, if a gate false negative again leaves no canonical bypass receipt, or if merge conflict completion still falls back to raw `git commit`.
+
+17. `C-20260402-1912-A`
+- title: Protected-branch merge receipt hardening
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
+- source_brainstorm: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md`
+- next_action: Candidate is already materialized as `I-20260402-1912-A`; keep this mirror only for source traceability and route execution from the issue/progress pair.
+- revisit_trigger: Revisit immediately if protected-branch completion semantics are widened beyond merge-completion-only, if receipt trailer and ledger truth drift apart, or if root `develop` again accumulates unowned merge-governance hardening.
+
+### committed_issues
+
+1. `I-20260402-1912-A`
+- title: Protected-branch merge receipt hardening
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-hardening.md`
+- source_brainstorm: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md`
+- next_action: Guardedly absorb the receipt-ledger parity slice into `develop`, then reopen any later handshake or staged merge-gate hardening as a fresh narrow follow-on if still needed.
+- revisit_trigger: Revisit issue scope only if receipt hardening proves inseparable from a larger protected-branch governance rewrite.
 ### completed_issues
 
 1. `I-20260323-1705-A`
