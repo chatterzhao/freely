@@ -30,3 +30,13 @@
 - alternatives_considered: `Considered mixing handshake hardening or merge-gate restaging into the same patch, and considered absorbing the root dirty patch directly. Both would have widened scope and reintroduced regressions by deleting existing receipt and staged-view guardrail tests.`
 - boundary_non_goals: `This slice does not change merge-guarded runtime behavior, does not relax completion-only scope, and does not absorb the unrelated watchdog revert.`
 - residual_risk: `Guarded completion handshake hardening and any additional staged merge-gate guardrails remain future follow-on work once this parity slice is absorbed.`
+
+## Develop Absorption
+
+- canonical_merge_commit: `1ed8c57`
+- canonical_merge_target: `develop`
+- post_merge_replay:
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+  - `./bin/governance-check`

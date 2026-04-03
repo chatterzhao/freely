@@ -1317,20 +1317,20 @@ routing_policy:
 
 ### committed_issues
 
+### completed_issues
+
 1. `I-20260402-1912-A`
 - title: Protected-branch merge receipt hardening
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-hardening.md`
 - source_brainstorm: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md`
-- next_action: Guardedly absorb the receipt-ledger parity slice into `develop`, then reopen any later handshake or staged merge-gate hardening as a fresh narrow follow-on if still needed.
-- revisit_trigger: Revisit issue scope only if receipt hardening proves inseparable from a larger protected-branch governance rewrite.
-### completed_issues
+- completion_note: receipt-ledger parity audit is absorbed on canonical `develop` through merge `1ed8c57`; any later handshake or staged merge-gate hardening must reopen as a narrower follow-on.
 
-1. `I-20260323-1705-A`
+2. `I-20260323-1705-A`
 - title: Manager delegated continuation stall recovery governance
 - milestone_state: completed
 - phase_state: `completed`
