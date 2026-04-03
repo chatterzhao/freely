@@ -4,6 +4,10 @@ set -euo pipefail
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
 [[ "$branch" == "develop" ]] || exit 0
 project_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd -P)"
+guarded_state_path="$(git rev-parse --git-dir 2>/dev/null || true)"
+if [[ -n "$guarded_state_path" ]]; then
+  guarded_state_path="$guarded_state_path/freely-guarded-merge-state"
+fi
 
 break_glass_reason="${FREELY_BREAK_GLASS_REASON:-}"
 break_glass_blocked_gate="${FREELY_BLOCKED_GATE:-}"
@@ -11,7 +15,68 @@ break_glass_follow_on_issue="${FREELY_FOLLOW_ON_ISSUE:-}"
 break_glass_operation_scope="${FREELY_OPERATION_SCOPE:-}"
 break_glass_evidence_refs="${FREELY_EVIDENCE_REFS:-}"
 
+load_guarded_state() {
+  [[ -n "$guarded_state_path" && -f "$guarded_state_path" ]] || return 1
+  guarded_state_target=""
+  guarded_state_source=""
+  guarded_state_bypass=""
+  while IFS='=' read -r key value; do
+    case "$key" in
+      target_branch) guarded_state_target="$value" ;;
+      source_branch) guarded_state_source="$value" ;;
+      bypass_mode) guarded_state_bypass="$value" ;;
+    esac
+  done <"$guarded_state_path"
+  [[ -n "$guarded_state_target" && -n "$guarded_state_source" && -n "$guarded_state_bypass" ]] || return 1
+}
+
+require_valid_guarded_completion_state() {
+  load_guarded_state || {
+    cat <<MSG
+[HOOK] Merge blocked: guarded merge completion state is missing or malformed.
+Re-run the merge through ./bin/merge-guarded so hooks can verify a canonical completion handshake.
+Policy source: docs/LAWS.md §2D
+MSG
+    exit 1
+  }
+
+  if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" != "1" ]]; then
+    cat <<MSG
+[HOOK] Merge blocked: guarded completion handshake marker is missing.
+Policy source: docs/LAWS.md §2D
+MSG
+    exit 1
+  fi
+
+  if ! git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
+    cat <<MSG
+[HOOK] Merge blocked: guarded completion requires an active MERGE_HEAD.
+Policy source: docs/LAWS.md §2D
+MSG
+    exit 1
+  fi
+
+  if [[ "$guarded_state_target" != "$branch" ]]; then
+    cat <<MSG
+[HOOK] Merge blocked: guarded merge completion target '$guarded_state_target' does not match current branch '$branch'.
+Policy source: docs/LAWS.md §2D
+MSG
+    exit 1
+  fi
+
+  merge_head="$(git rev-parse -q --verify MERGE_HEAD 2>/dev/null || true)"
+  source_sha="$(git rev-parse "$guarded_state_source" 2>/dev/null || true)"
+  if [[ -z "$merge_head" || -z "$source_sha" || "$merge_head" != "$source_sha" ]]; then
+    cat <<MSG
+[HOOK] Merge blocked: guarded merge completion source '$guarded_state_source' does not match MERGE_HEAD.
+Policy source: docs/LAWS.md §2D
+MSG
+    exit 1
+  fi
+}
+
 if [[ -n "$break_glass_reason$break_glass_blocked_gate$break_glass_follow_on_issue$break_glass_operation_scope$break_glass_evidence_refs" ]]; then
+  require_valid_guarded_completion_state
   case "$break_glass_reason" in
     tooling_unavailable|verified_false_negative) ;;
     *)
@@ -49,6 +114,14 @@ MSG
     cat <<MSG
 [HOOK] Merge blocked: break-glass requires follow-on issue and at least one evidence reference.
 
+Policy source: docs/LAWS.md §2D
+MSG
+    exit 1
+  fi
+
+  if [[ "$guarded_state_bypass" != "break_glass" ]]; then
+    cat <<MSG
+[HOOK] Merge blocked: guarded merge completion state does not authorize break-glass completion.
 Policy source: docs/LAWS.md §2D
 MSG
     exit 1

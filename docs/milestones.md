@@ -1328,7 +1328,7 @@ routing_policy:
 - progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-hardening.md`
 - source_brainstorm: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md`
-- completion_note: receipt-ledger parity audit is absorbed on canonical `develop` through merge `1ed8c57`; any later handshake or staged merge-gate hardening must reopen as a narrower follow-on.
+- completion_note: protected-branch merge receipt hardening is absorbed on canonical `develop`; any later receipt gap beyond parity audit, guarded completion handshake hardening, or the frozen staged merge-gate boundary must reopen as a narrower follow-on.
 
 2. `I-20260323-1705-A`
 - title: Manager delegated continuation stall recovery governance
