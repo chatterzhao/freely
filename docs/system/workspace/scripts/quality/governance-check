@@ -325,6 +325,7 @@ import pathlib
 import re
 import subprocess
 import sys
+from collections import Counter
 
 root = pathlib.Path(".")
 receipts_path = root / "docs/system/workspace/hooks/protected-branch-breakglass-receipts.md"
@@ -336,13 +337,16 @@ if not effective_match:
     sys.exit(1)
 
 effective_date = effective_match.group(1)
+effective_since = f"{effective_date} 00:00:00"
 starts = list(re.finditer(r"^##\s+Receipt:\s+([0-9a-f]{7,40})\s*$", text, re.MULTILINE))
 
 allowed_reasons = {"tooling_unavailable", "verified_false_negative"}
 allowed_scopes = {"merge_completion_only"}
 allowed_gates = {"pre-commit", "pre-merge-commit", "governance-merge-gate", "governance-promotion-gate", "pretests-gate", "checkpoint-guard"}
+allowed_receipt_modes = {"trailer_parity", "legacy_backfill"}
 receipts = {}
 errors = []
+observed_receipts = set()
 
 for idx, match in enumerate(starts):
     commit = match.group(1)
@@ -367,6 +371,8 @@ for idx, match in enumerate(starts):
         return values
 
     target_branch = grab("target_branch")
+    source_branch = grab("source_branch")
+    receipt_mode = grab("receipt_mode") or "trailer_parity"
     bypass_mode = grab("bypass_mode")
     reason = grab("break_glass_reason")
     blocked_gate = grab("blocked_gate")
@@ -376,6 +382,10 @@ for idx, match in enumerate(starts):
 
     if target_branch not in {"develop", "main"} and not (target_branch or "").startswith("test-pre-merge-"):
         errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} has invalid target_branch '{target_branch}'.")
+    if not source_branch:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} is missing source_branch.")
+    if receipt_mode not in allowed_receipt_modes:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} has invalid receipt_mode '{receipt_mode}'.")
     if bypass_mode != "break_glass":
         errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} must declare bypass_mode: `break_glass`.")
     if reason not in allowed_reasons:
@@ -389,7 +399,17 @@ for idx, match in enumerate(starts):
     if not evidence_refs:
         errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} must list at least one evidence_ref.")
 
-    receipts[commit] = target_branch
+    receipts[commit] = {
+        "target_branch": target_branch,
+        "source_branch": source_branch,
+        "receipt_mode": receipt_mode,
+        "bypass_mode": bypass_mode,
+        "break_glass_reason": reason,
+        "blocked_gate": blocked_gate,
+        "operation_scope": scope,
+        "follow_on_owner": follow_on_owner,
+        "evidence_refs": evidence_refs,
+    }
 
 branches = ["develop"]
 try:
@@ -409,7 +429,7 @@ for ref in extra_refs:
 for branch in branches:
     try:
         merge_output = subprocess.check_output(
-            ["git", "log", branch, "--merges", "--since", effective_date, "--format=%H%x00%B%x00"],
+            ["git", "log", branch, "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
             cwd=root,
             text=True,
         )
@@ -425,16 +445,67 @@ for branch in branches:
         if re.search(r"^Freely-Merge-Path:\s+(merge-guarded|merge-guarded-complete)\s*$", body, re.MULTILINE):
             continue
         if re.search(r"^Freely-Merge-Path:\s+merge-guarded-break-glass\s*$", body, re.MULTILINE):
-            if receipts.get(commit) == branch:
+            receipt = receipts.get(commit)
+            if receipt and receipt.get("target_branch") == branch:
+                observed_receipts.add(commit)
+                if receipt.get("receipt_mode") == "legacy_backfill":
+                    errors.append(
+                        f"[FAIL] protected branch break-glass merge {commit} on {branch} is trailer-bearing but receipt_mode is legacy_backfill."
+                    )
+                    continue
+                def grab_trailer(name: str):
+                    match = re.search(rf"^{re.escape(name)}:\s*(.+?)\s*$", body, re.MULTILINE)
+                    return match.group(1).strip() if match else ""
+
+                trailer_source_branch = grab_trailer("Freely-Source-Branch")
+                trailer_bypass_mode = grab_trailer("Freely-Bypass-Mode")
+                trailer_reason = grab_trailer("Freely-Break-Glass-Reason")
+                trailer_blocked_gate = grab_trailer("Freely-Blocked-Gate")
+                trailer_scope = grab_trailer("Freely-Operation-Scope")
+                trailer_follow_on_issue = grab_trailer("Freely-Follow-On-Issue")
+                trailer_evidence_refs = re.findall(r"^Freely-Evidence-Ref:\s*(.+?)\s*$", body, re.MULTILINE)
+
+                comparisons = [
+                    ("source_branch", trailer_source_branch, receipt.get("source_branch", "")),
+                    ("bypass_mode", trailer_bypass_mode, receipt.get("bypass_mode", "")),
+                    ("break_glass_reason", trailer_reason, receipt.get("break_glass_reason", "")),
+                    ("blocked_gate", trailer_blocked_gate, receipt.get("blocked_gate", "")),
+                    ("operation_scope", trailer_scope, receipt.get("operation_scope", "")),
+                    ("follow_on_owner", trailer_follow_on_issue, receipt.get("follow_on_owner", "")),
+                ]
+                for field_name, trailer_value, receipt_value in comparisons:
+                    if trailer_value != receipt_value:
+                        errors.append(
+                            f"[FAIL] protected branch break-glass merge {commit} on {branch} has trailer/ledger mismatch for {field_name}: trailer='{trailer_value}' ledger='{receipt_value}'."
+                        )
+
+                if Counter(trailer_evidence_refs) != Counter(receipt.get("evidence_refs", [])):
+                    errors.append(
+                        f"[FAIL] protected branch break-glass merge {commit} on {branch} has trailer/ledger mismatch for evidence_refs."
+                    )
                 continue
             errors.append(
                 f"[FAIL] protected branch break-glass merge {commit} on {branch} is missing a matching receipt in {receipts_path.as_posix()}."
             )
             continue
-        if receipts.get(commit) == branch:
-            continue
+        receipt = receipts.get(commit)
+        if receipt and receipt.get("target_branch") == branch:
+            observed_receipts.add(commit)
+            if receipt.get("receipt_mode") == "legacy_backfill":
+                continue
+            errors.append(
+                f"[FAIL] protected branch merge {commit} on {branch} has a trailer_parity receipt in {receipts_path.as_posix()} but the merge commit is missing canonical break-glass trailers."
+            )
+
+for commit, receipt in receipts.items():
+    if receipt.get("target_branch") not in branches:
         errors.append(
-            f"[FAIL] protected branch merge {commit} on {branch} is missing a merge receipt and is not covered by {receipts_path.as_posix()}."
+            f"[FAIL] {receipts_path.as_posix()} receipt {commit} targets unknown branch '{receipt.get('target_branch')}'."
+        )
+        continue
+    if commit not in observed_receipts:
+        errors.append(
+            f"[FAIL] {receipts_path.as_posix()} receipt {commit} does not match any protected-branch merge on {receipt.get('target_branch')} since {effective_since}."
         )
 
 if errors:

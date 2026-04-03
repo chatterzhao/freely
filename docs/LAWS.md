@@ -267,27 +267,29 @@ flowchart LR
 1. `main` / `develop` / `test-pre-merge-*` 上的 hook/gate bypass 默认违规；只有本章明确定义的 break-glass 白名单可以例外。
 2. `AGENTS.md`、skills、hook 提示文案都不是允许 bypass 的权威来源；它们只能引用本章，不得自行发明豁免场景。
 3. phase-1 允许的 bypass 仅限 `merge_completion_only`，且必须通过受控 completion path 完成；不得用裸 `git commit --no-verify`、`git merge --no-verify` 或等价手工跳过作为常规完成方式。
+4. 受控 completion path 不能只靠环境变量自报身份；必须同时留下 hook 可验证的 machine-readable guarded completion state。
 4. break-glass 的白名单 reason 仅有：
    - `tooling_unavailable`
    - `verified_false_negative`
 5. `tooling_unavailable` 只有在 required local gate 无法运行、且同等或更高层 gate 已独立保留证据时才成立；单纯“不想排查本地 hook”不成立。
 6. `verified_false_negative` 只有在当前 gate / hook 的失败已被保留、且当前操作面已收缩到最小 completion scope 时才成立；单纯“人工确认应该没问题”不成立。
-7. 合法 break-glass 必须同时满足：
+8. 合法 break-glass 必须同时满足：
    - machine-readable receipt 完整，且 canonical 落点是 `docs/system/workspace/hooks/protected-branch-breakglass-receipts.md`
+   - guarded completion state 与 `MERGE_HEAD` / target branch / source branch 一致
    - `operation_scope=merge_completion_only`
    - `blocked_gate` 在白名单内
    - `evidence_refs` 非空
    - `follow_on_owner` 非空
    - 当前提交面不夹带新的实现开发
-8. break-glass 之后必须 materialize 一个 follow-on owner 来修复对应 gate / hook / audit 缺口；不得把同一例外路径默认为今后常规流程。
-9. 下列情形永远不能构成合法 bypass：
+9. break-glass 之后必须 materialize 一个 follow-on owner 来修复对应 gate / hook / audit 缺口；不得把同一例外路径默认为今后常规流程。
+10. 下列情形永远不能构成合法 bypass：
    - 赶时间、想先合并再说
    - “我已经人工看过了”
    - 只是 docs / cleanup / writeback，小改动应该没关系
    - hook 文案看起来像误报，但没有保留失败证据
    - 为了继续在 protected branch 上开发或追加额外修改
-10. `merge-guarded` 是 protected-branch merge receipt 的 canonical 正常入口；若不是通过该受控路径完成 merge，后续审计必须能识别并阻断。
-11. `governance-check` 或等价 canonical quality gate 必须能审计当前 protected-branch merge receipt；缺少 receipt 或 receipt 不完整时，不得宣称治理完成。
+11. `merge-guarded` 是 protected-branch merge receipt 的 canonical 正常入口；若不是通过该受控路径完成 merge，后续审计必须能识别并阻断。
+12. `governance-check` 或等价 canonical quality gate 必须能审计当前 protected-branch merge receipt；缺少 receipt 或 receipt 不完整时，不得宣称治理完成。
 
 最小验收证据：
 - break-glass reason taxonomy 记录
@@ -303,12 +305,18 @@ phase-1 正常 merge receipt 字段（写入 protected-branch merge commit messa
 
 phase-1 break-glass receipt 字段（写入 `docs/system/workspace/hooks/protected-branch-breakglass-receipts.md`）：
 - `target_branch`
+- `source_branch`
+- `receipt_mode`
 - `bypass_mode`
 - `break_glass_reason`
 - `blocked_gate`
 - `operation_scope`
 - `evidence_refs`
 - `follow_on_owner`
+
+`receipt_mode` 只允许：
+- `trailer_parity`
+- `legacy_backfill`（仅历史补录；不能替代当前 trailer-bearing break-glass merge）
 
 phase-1 break-glass merge commit 仍应包含：
 - `Freely-Break-Glass-Reason`（仅 `break_glass` 时）
