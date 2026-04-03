@@ -17,6 +17,7 @@ description: 管理 Freely 风格开发的完整自主分支生命周期，支�
 
 ## 硬性规则
 - 绝不绕过要求的 `TEST`、评审和进度/恢复证据将功能分支直接推送或违规合并到 `develop`。
+- 绝不把裸 `--no-verify`、手工跳过 hook、或其他 protected-branch gate bypass 当成正常完成路径；若确实命中 break-glass，只能按 `docs/LAWS.md` §2D 的白名单与 receipt 要求执行。
 - 绝不跳过“先把上游合进当前分支并在本 worktree 里处理冲突”这一步，就直接把功能分支往上游目标提升。
 - 保持治理意图稳定：分支策略、worktree 约束、命名策略。
 - 如语义检查失败，不提升；返回协调流程。
