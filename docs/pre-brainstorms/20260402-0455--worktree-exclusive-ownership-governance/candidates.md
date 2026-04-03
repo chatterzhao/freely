@@ -54,9 +54,9 @@
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 - next_action:
-  - this candidate is now materialized as `I-20260402-0455-A`
-  - use the issue-bound IBM loop to freeze the phase-1 occupancy/lease contract, stale/takeover wording, and the first blocking scope
-  - keep the owner narrow: ownership-aware routing and machine-readable truth, not generic runtime orchestration redesign
+  - this candidate materialized as `I-20260402-0455-A` and is now closed on canonical `develop` via merge `a10f6d8`
+  - reopen only if a follow-on owner must extend ownership semantics beyond phase-1 `edit / cleanup / promotion`
+  - keep any reopen narrow: ownership-aware routing and machine-readable truth, not generic runtime orchestration redesign
 - revisit_trigger:
   - another same-worktree multi-AI collision
   - ambiguous cleanup ownership on a dirty worktree

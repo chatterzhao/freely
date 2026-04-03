@@ -1013,7 +1013,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/candidates.md`
-- next_action: This candidate is now materialized as `I-20260402-0455-A`. The active owner freezes the phase-1 ownership contract and hook points before any runtime implementation slice starts.
+- next_action: This candidate materialized as `I-20260402-0455-A`, and the owner is now closed on canonical `develop` via merge `a10f6d8`. Reopen candidate-level research only if a follow-on owner must extend ownership semantics beyond the completed phase-1 slice.
 - revisit_trigger: Re-open candidate-level research only if the phase-1 ownership contract proves inseparable from a broader runtime orchestration redesign, or if cleanup/promotion ownership cannot be expressed with the proposed occupancy + lease split.
 
 10. `C-20260325-0525-A`
