@@ -1,6 +1,6 @@
 # Candidates - 20260402-0020--hook-bypass-breakglass-governance
 
-## C-20260402-0020-A
+### C-20260402-0020-A
 
 - candidate_format_version: `v2`
 - title: Hook bypass break-glass governance
@@ -48,7 +48,7 @@
     role: `author`
 - next_action:
   - this candidate materialized as `I-20260402-0020-A`
-  - keep the owner focused on break-glass whitelist, guarded completion path, and bypass audit
+  - keep follow-through on `I-20260402-0020-A` focused on guarded completion, hook handshake, and receipt audit until verification closes
   - do not reopen the ownership feature itself unless future audit proves the absorbed functionality unsafe
 - revisit_trigger:
   - another use of `--no-verify` or equivalent gate bypass on a protected branch
