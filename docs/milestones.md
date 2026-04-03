@@ -1326,7 +1326,7 @@ routing_policy:
 - progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-hardening.md`
 - source_brainstorm: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md`
-- next_action: Guardedly absorb the receipt-ledger parity slice into `develop`, then reopen any later handshake or staged merge-gate hardening as a fresh narrow follow-on if still needed.
+- next_action: Guardedly absorb this residual hardening slice into `develop`; reopen only if a fresh receipt gap appears beyond parity audit, guarded completion handshake, and the already-frozen staged merge-gate regression boundary.
 - revisit_trigger: Revisit issue scope only if receipt hardening proves inseparable from a larger protected-branch governance rewrite.
 ### completed_issues
 

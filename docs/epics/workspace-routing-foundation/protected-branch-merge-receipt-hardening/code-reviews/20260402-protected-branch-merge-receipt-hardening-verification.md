@@ -10,23 +10,26 @@
 
 ## Scope Verdict
 
-- `PASS`: this owner stays inside the narrow receipt-ledger parity slice and does not reopen break-glass policy, merge-completion runtime semantics, or staged-view merge-gate behavior.
+- `PASS`: this owner stays inside the narrow residual hardening slice and does not reopen break-glass whitelist policy or unrelated watchdog behavior.
 - `PASS`: `governance-check` now enforces protected-branch break-glass trailer/ledger parity for trailer-bearing merges and rejects misuse of `legacy_backfill`.
 - `PASS`: the break-glass ledger now distinguishes grandfathered ledger-only receipts from current trailer-bearing merges through explicit `source_branch` and `receipt_mode` truth.
-- `PASS`: the focused regressions preserve the current completion-only and initial-receipt boundaries instead of deleting them to make the audit easier to satisfy.
+- `PASS`: protected-branch completion can no longer be spoofed by setting `FREELY_*` env alone; hooks now require git-dir scoped guarded state aligned with `MERGE_HEAD`.
+- `PASS`: the focused regressions preserve the current completion-only, initial-receipt, and staged merge-gate boundaries instead of deleting them to make the audit easier to satisfy.
 
 ## Commands
 
 1. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 2. `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
 3. `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
-4. `git diff --check`
-5. `./bin/governance-check`
+4. `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
+5. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+6. `git diff --check`
+7. `./bin/governance-check`
 
 ## Implementation Decision Note
 
-- decision: `Harden protected-branch break-glass audit truth by requiring trailer/ledger parity and explicit legacy_backfill classification.`
-- why_this: `The residual gap after the completed break-glass governance owner was no longer policy definition but audit truth drift; parity is the narrowest repair that closes that gap without widening runtime bypass semantics.`
-- alternatives_considered: `Considered mixing handshake hardening or merge-gate restaging into the same patch, and considered absorbing the root dirty patch directly. Both would have widened scope and reintroduced regressions by deleting existing receipt and staged-view guardrail tests.`
-- boundary_non_goals: `This slice does not change merge-guarded runtime behavior, does not relax completion-only scope, and does not absorb the unrelated watchdog revert.`
-- residual_risk: `Guarded completion handshake hardening and any additional staged merge-gate guardrails remain future follow-on work once this parity slice is absorbed.`
+- decision: `Close the residual protected-branch gap by pairing trailer/ledger parity audit with a harder guarded completion handshake, while leaving staged merge-gate coverage on its canonical regression rails.`
+- why_this: `The remaining risk was not policy definition but two narrow runtime truths: audit parity and env-only completion spoofing. Tightening those closes the real gap without widening break-glass semantics or deleting existing guardrails.`
+- alternatives_considered: `Considered stopping after parity alone and leaving handshake as future work, and considered restaging merge-gate runtime changes in the same patch. The former would leave a known spoof surface open; the latter would widen scope without new evidence because canonical staged/sibling regressions already pass.`
+- boundary_non_goals: `This slice does not rewrite break-glass whitelist policy, does not relax merge_completion_only scope, does not absorb the unrelated watchdog revert, and does not change staged merge-gate runtime behavior without failing regression evidence.`
+- residual_risk: `A future follow-on may still be needed only if new evidence shows a receipt gap beyond trailer parity, guarded completion handshake state, and the already-frozen staged merge-gate regression boundary.`

@@ -68,9 +68,10 @@
 1. IBM 产物必须明确这条 owner 只承接 residual hardening，而不是重新定义 bypass policy。
 2. issue-bound artifact 必须把 root staged patch 分成 `keep-as-signal`、`already-absorbed`、`drop-as-regression` 三类。
 3. `merge_completion_only` 的 boundary 必须写成可测试 contract，确保 break-glass 不扩张到 clean initial merge。
-4. `receipt_ledger_parity_audit` 的最小字段与 failure semantics 必须冻结。
-5. `governance-merge-gate` 的 staged/touched relevance 边界必须重新写清，避免 sibling candidate 与 staged-only owner 误伤或漏检。
-6. watchdog revert 必须被明确判定为 out-of-scope，且不得通过此 owner 吸收。
+4. `receipt_ledger_parity_audit` 的最小字段与 failure semantics 必须冻结并通过回归测试。
+5. guarded completion handshake 必须要求 canonical state 与当前 branch / `MERGE_HEAD` 一致，env-only spoof 不得放行。
+6. `governance-merge-gate` 的 staged/touched relevance 边界必须重新写清，避免 sibling candidate 与 staged-only owner 误伤或漏检。
+7. watchdog revert 必须被明确判定为 out-of-scope，且不得通过此 owner 吸收。
 
 ## Current Artifact Set
 
@@ -93,6 +94,9 @@
 - `docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
 - `docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
 - `docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
+- `docs/system/workspace/scripts/tests/test-pre-commit-hook`
+- `docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+- `docs/system/workspace/scripts/tests/test-merge-guarded`
 - `docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `./bin/governance-check`
 
@@ -101,11 +105,15 @@
 - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
 - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+- `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
+- `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+- `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+- `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `git diff --check`
 - `./bin/governance-check`
 - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/code-reviews/20260402-protected-branch-merge-receipt-hardening-verification.md`
 
 ## Next
 
-- Guardedly absorb this receipt-ledger parity slice into `develop`.
-- Treat any later handshake hardening or staged merge-gate guardrail expansion as a fresh narrow follow-on instead of widening this verification patch.
+- Guardedly absorb this parity-and-handshake slice into `develop`.
+- Reopen only if future evidence shows a new protected-branch merge receipt gap beyond parity audit, guarded completion handshake, and the already-frozen staged merge-gate regression boundary.

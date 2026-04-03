@@ -46,6 +46,7 @@
 - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
 - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+- `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
 - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `git diff --check`
 - `./bin/governance-check`
