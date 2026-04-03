@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-merge-guarded-initial.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p \
+  "$REPO/bin" \
+  "$REPO/.githooks" \
+  "$REPO/docs/system/workspace/hooks" \
+  "$REPO/docs/system/workspace/scripts/runtime" \
+  "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+git config core.hooksPath .githooks
+
+cp "$ROOT_DIR/.githooks/pre-merge-commit" "$REPO/.githooks/pre-merge-commit"
+cp "$ROOT_DIR/docs/system/workspace/hooks/pre-merge-commit.sh" "$REPO/docs/system/workspace/hooks/pre-merge-commit.sh"
+cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/merge-guarded" "$REPO/bin/merge-guarded"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" "$REPO/docs/system/workspace/scripts/runtime/freely"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+cp "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+chmod +x \
+  "$REPO/.githooks/pre-merge-commit" \
+  "$REPO/docs/system/workspace/hooks/pre-merge-commit.sh" \
+  "$REPO/bin/merge-guarded" \
+  "$REPO/docs/system/workspace/scripts/runtime/freely" \
+  "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" \
+  "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+echo base > README.md
+git add .
+git commit -q -m "seed guarded merge tooling"
+
+git checkout -q -b feature/receipt
+echo feature >> README.md
+git add README.md
+git commit -q -m "feature change"
+
+git checkout -q develop
+./bin/merge-guarded develop feature/receipt >/tmp/freely-merge-guarded-initial.out 2>/tmp/freely-merge-guarded-initial.err
+git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Bypass-Mode: forbidden$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Source-Branch: feature/receipt$'
+
+echo "[PASS] merge-guarded preserves initial merge receipts under real pre-merge hooks"
