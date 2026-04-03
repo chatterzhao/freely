@@ -76,6 +76,18 @@ if git commit -m "raw merge completion" >"$TMP_DIR/raw-complete.stdout" 2>"$TMP_
 fi
 cat "$TMP_DIR/raw-complete.stdout" "$TMP_DIR/raw-complete.stderr" | grep -q "raw merge completion"
 
+if FREELY_GUARDED_MERGE_COMPLETION=1 \
+  FREELY_BREAK_GLASS_REASON=verified_false_negative \
+  FREELY_BLOCKED_GATE=pre-merge-commit \
+  FREELY_OPERATION_SCOPE=merge_completion_only \
+  FREELY_FOLLOW_ON_ISSUE=I-20260402-0020-A \
+  FREELY_EVIDENCE_REFS="docs/epics/sample/issues/sample.md" \
+  git commit -m "spoofed break-glass merge completion" >"$TMP_DIR/spoof-complete.stdout" 2>"$TMP_DIR/spoof-complete.stderr"; then
+  echo "[FAIL] env-only protected-branch merge completion spoof should be blocked by hooks" >&2
+  exit 1
+fi
+cat "$TMP_DIR/spoof-complete.stdout" "$TMP_DIR/spoof-complete.stderr" | grep -Eq "guarded merge completion state is missing|raw merge completion"
+
 git merge --abort >/dev/null 2>&1
 
 set +e

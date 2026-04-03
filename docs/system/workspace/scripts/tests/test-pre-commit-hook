@@ -66,7 +66,19 @@ if "$REPO/.githooks/pre-commit" >"$TMP_DIR/stdout-merge" 2>"$TMP_DIR/stderr-merg
 fi
 cat "$TMP_DIR/stdout-merge" "$TMP_DIR/stderr-merge" | grep -q "raw merge completion"
 
+if FREELY_GUARDED_MERGE_COMPLETION=1 "$REPO/.githooks/pre-commit" >"$TMP_DIR/stdout-merge-spoof" 2>"$TMP_DIR/stderr-merge-spoof"; then
+  echo "[FAIL] pre-commit should reject guarded completion env spoof without canonical state" >&2
+  exit 1
+fi
+cat "$TMP_DIR/stdout-merge-spoof" "$TMP_DIR/stderr-merge-spoof" | grep -q "guarded merge completion state is missing or malformed"
+
+cat > "$(git rev-parse --git-dir)/freely-guarded-merge-state" <<EOF
+target_branch=develop
+source_branch=feature/merge-completion
+bypass_mode=forbidden
+EOF
 FREELY_GUARDED_MERGE_COMPLETION=1 "$REPO/.githooks/pre-commit" >"$TMP_DIR/stdout-merge-allow" 2>"$TMP_DIR/stderr-merge-allow"
+rm -f "$(git rev-parse --git-dir)/freely-guarded-merge-state"
 git merge --abort >/dev/null 2>&1
 
 echo "[PASS] pre-commit only allows protected-branch merge completion through guarded path"

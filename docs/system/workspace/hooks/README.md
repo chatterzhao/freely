@@ -46,6 +46,7 @@
 
 - `FREELY_GUARDED_MERGE_COMPLETION=1`
   - 表示当前提交是受控 merge completion，而不是裸 `git commit`
+  - 必须与 git-dir scoped guarded completion state 一起出现；单独设置环境变量不构成合法握手
 - `FREELY_BREAK_GLASS_REASON`
   - 仅 break-glass completion 使用；必须命中 `docs/LAWS.md` §2D 白名单
 - `FREELY_BLOCKED_GATE`
@@ -58,9 +59,9 @@
   - 以 `||` 连接的一组 evidence ref；hook 只消费 machine-readable payload，不从自然语言中猜
 
 运行时语义：
-- `merge-guarded complete ...` 负责写入 `MERGE_MSG` receipt，并设置上面这些变量
-- `pre-commit` 只接受带 `FREELY_GUARDED_MERGE_COMPLETION=1` 的 protected-branch merge completion
-- `pre-merge-commit` 在 break-glass 模式下只校验白名单 reason、blocked gate、scope、follow-on owner 与 evidence refs
+- `merge-guarded complete ...` 负责写入 `MERGE_MSG` receipt、设置上面这些变量，并写 git-dir scoped guarded completion state
+- `pre-commit` 只接受带 `FREELY_GUARDED_MERGE_COMPLETION=1` 且 guarded state 与 `MERGE_HEAD` / current branch 对齐的 protected-branch merge completion
+- `pre-merge-commit` 在 break-glass 模式下除了白名单字段，还会校验 guarded state 与 `MERGE_HEAD` / current branch / bypass mode 对齐
 - 事后 `governance-check` 还会审计 merge receipt 与 break-glass ledger；hook pass 不等于 post-hoc audit 免责
 
 ## 安装检查
@@ -79,7 +80,7 @@
 
 - `FREELY_GUARDED_MERGE_COMPLETION=1`
   - 表示这次提交是 `merge-guarded complete ...` 驱动的受控 merge completion
-  - `pre-commit` 只在该标记存在时放行 protected-branch merge completion
+  - `pre-commit` 只在该标记与 guarded completion state 同时存在时放行 protected-branch merge completion
 - `FREELY_BREAK_GLASS_REASON`
   - 仅 break-glass completion 使用
   - 当前只允许 `tooling_unavailable`、`verified_false_negative`
@@ -97,7 +98,7 @@
   - 必须是非空 evidence ref 列表，供 `pre-merge-commit` acknowledgement 与后续 `governance-check` receipt ledger 审计消费
 
 语义：
-- `merge-guarded` 负责写 merge receipt trailer，并在 `git merge --continue` 前设置这些环境变量
-- `pre-commit` 只负责挡住裸 completion，确保 protected branch completion 不会回落到自由提交
-- `pre-merge-commit` 负责验证 break-glass 白名单字段是否完整、是否合法，并在合法时打印 acknowledgement
+- `merge-guarded` 负责写 merge receipt trailer，并在 `git merge --continue` 前设置这些环境变量和 git-dir scoped guarded completion state
+- `pre-commit` 负责挡住裸 completion 与 env-only spoof，确保 protected branch completion 不会回落到自由提交
+- `pre-merge-commit` 负责验证 break-glass 白名单字段、guarded completion state 与 active merge context 是否一致，并在合法时打印 acknowledgement
 - `governance-check` 再用 merge commit trailer 和 `protected-branch-breakglass-receipts.md` 做 post-merge audit

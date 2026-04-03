@@ -8,9 +8,59 @@ source ./bin/worktree-common.sh
 branch="$(freely_wt_current_branch)"
 [[ -n "$branch" ]] || exit 0
 
+guarded_state_path="$(git rev-parse --git-dir 2>/dev/null || true)"
+if [[ -n "$guarded_state_path" ]]; then
+  guarded_state_path="$guarded_state_path/freely-guarded-merge-state"
+fi
+
+load_guarded_state() {
+  [[ -n "$guarded_state_path" && -f "$guarded_state_path" ]] || return 1
+  guarded_state_target=""
+  guarded_state_source=""
+  guarded_state_bypass=""
+  while IFS='=' read -r key value; do
+    case "$key" in
+      target_branch) guarded_state_target="$value" ;;
+      source_branch) guarded_state_source="$value" ;;
+      bypass_mode) guarded_state_bypass="$value" ;;
+    esac
+  done <"$guarded_state_path"
+  [[ -n "$guarded_state_target" && -n "$guarded_state_source" && -n "$guarded_state_bypass" ]] || return 1
+}
+
+require_valid_guarded_completion_state() {
+  load_guarded_state || {
+    cat <<MSG
+[HOOK] Commit blocked: guarded merge completion state is missing or malformed.
+Re-run the merge through ./bin/merge-guarded so hooks can verify a canonical completion handshake.
+Policy source: docs/LAWS.md §2D
+MSG
+    exit 1
+  }
+
+  if [[ "$guarded_state_target" != "$branch" ]]; then
+    cat <<MSG
+[HOOK] Commit blocked: guarded merge completion target '$guarded_state_target' does not match current branch '$branch'.
+Policy source: docs/LAWS.md §2D
+MSG
+    exit 1
+  fi
+
+  merge_head="$(git rev-parse -q --verify MERGE_HEAD 2>/dev/null || true)"
+  source_sha="$(git rev-parse "$guarded_state_source" 2>/dev/null || true)"
+  if [[ -z "$merge_head" || -z "$source_sha" || "$merge_head" != "$source_sha" ]]; then
+    cat <<MSG
+[HOOK] Commit blocked: guarded merge completion source '$guarded_state_source' does not match MERGE_HEAD.
+Policy source: docs/LAWS.md §2D
+MSG
+    exit 1
+  fi
+}
+
 if freely_wt_is_test_pre_merge_branch "$branch"; then
   if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
     if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" == "1" ]]; then
+      require_valid_guarded_completion_state
       exit 0
     fi
     cat <<MSG
@@ -39,6 +89,7 @@ case "$branch" in
   main|develop)
     if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
       if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" == "1" ]]; then
+        require_valid_guarded_completion_state
         exit 0
       fi
       cat <<MSG
