@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260402-0020-A`
 - title: Hook bypass break-glass governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - branch: `feature/hook-bypass-breakglass-governance-20260402-0020`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-0020-feature-hook-bypass-breakglass-governance`
@@ -37,5 +37,21 @@
 
 ## Next Action
 
-1. Replay this verified lane into `develop` through the protected merge path.
-2. After absorption, write canonical closeout evidence instead of reopening the owner.
+1. Owner is complete on canonical `develop`.
+2. Treat stronger host-side/server-side enforcement as a narrower follow-on owner instead of reopening this receipt-and-audit closeout lane.
+
+## Closure Evidence
+
+- closure_status: `completed-on-develop`
+- closure_evidence:
+  - `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/code-reviews/20260402-protected-branch-hook-bypass-breakglass-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
+  - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+  - `bash docs/system/workspace/scripts/tests/test-availability-watchdog-path-resolution`
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
+  - `./bin/governance-check`
+  - `develop` merge `52f55c0`

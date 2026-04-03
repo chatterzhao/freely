@@ -45,3 +45,15 @@
 - alternatives_considered: `Keeping bypass as an undocumented operator judgment, relying on hooks without receipt audit, or continuing to let conflict completion fall back to raw commits would all leave the same governance hole open.`
 - boundary_non_goals: `This owner does not make client-side bypass impossible, does not add host-level enforcement, and does not expand break-glass beyond protected-branch merge completion in phase-1.`
 - residual_risk: `A future owner may still need stronger server-side or host-side enforcement, but that is separate from this canonical receipt-and-audit slice.`
+
+## Develop Absorption
+
+- canonical_merge_commit: `52f55c0`
+- canonical_merge_target: `develop`
+- canonical_replay:
+  - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
+  - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+  - `bash docs/system/workspace/scripts/tests/test-availability-watchdog-path-resolution`
+  - `./bin/governance-check`

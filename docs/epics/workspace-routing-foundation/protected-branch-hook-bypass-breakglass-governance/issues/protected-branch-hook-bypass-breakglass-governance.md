@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260402-0020-A`
 - title: Hook bypass break-glass governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `protected-branch-hook-bypass-breakglass-governance`
@@ -94,4 +94,12 @@ Freely 当前已经有 protected-branch hooks、`merge-guarded`、develop-bound 
 - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
 - `bash docs/system/workspace/scripts/tests/test-merge-guarded`
 - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+- `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+- `bash docs/system/workspace/scripts/tests/test-availability-watchdog-path-resolution`
 - `./bin/governance-check`
+
+## Completion
+
+- canonical_merge_commit: `52f55c0`
+- canonical_merge_target: `develop`
+- closeout_note: `Protected-branch bypass governance is now absorbed into canonical develop with receipt-bearing merge replay, audited historical break-glass ledger, and canonical lifecycle writeback.`
