@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260402-0455-A`
 - title: Worktree exclusive ownership and promotion lease governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `worktree-exclusive-ownership-and-promotion-lease-governance`
@@ -93,7 +93,44 @@ Freely 已经有 manager-first worker scheduling、fleet patrol、hygiene alert�
 - `docs/system/workspace/scripts/runtime/freely`
 - `./bin/governance-check`
 
+## Verification
+
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+- `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-recorded-ownership-conflict`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-ownership-conflict-recorded-owner`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-hard-stale-recorded-owner-does-not-block`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-queue-recorded-owner`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-hard-stale-owner`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-conflicting-recorded-promotion`
+- `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
+- `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-hard-stale-intent-reclaim`
+- `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+- `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+- `git diff --check`
+- `./bin/governance-check`
+
+## Completion Status
+
+- canonical_merge_commit: `a10f6d8`
+- canonical_merge_target: `develop`
+- post_merge_acceptance:
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-recorded-ownership-conflict`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-ownership-conflict-recorded-owner`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-hard-stale-recorded-owner-does-not-block`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-queue-recorded-owner`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-hard-stale-owner`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-conflicting-recorded-promotion`
+  - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
+  - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-hard-stale-intent-reclaim`
+  - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+  - `git diff --check`
+  - `./bin/governance-check`
+
 ## Next
 
-- 先完成 IBM 边界冻结，尤其是 phase-1 gate 接入点与测试场景。
-- IBM 完成后再决定是否拆成 `status surfacing` 与 `blocking enforcement` 两个实现 slice。
+- Closed on canonical `develop`.
+- Any future anti-stomp drift should reopen as a narrower follow-on owner instead of widening this phase-1 closeout.

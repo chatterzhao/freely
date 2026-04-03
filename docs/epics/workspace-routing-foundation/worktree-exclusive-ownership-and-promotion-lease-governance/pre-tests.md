@@ -50,43 +50,49 @@
 - required evidence: `issue + prd + tasks` 一致枚举四类冲突
 - blocker taxonomy: `definition_missing`
 
-## Machine-Readable Acceptance Items
+## Acceptance Items
 
+### AT-001
 - id: `AT-001`
-  requirement: `Occupancy and intent lease schemas are frozen for phase-1.`
-  evidence_level: `artifact`
-  status: `pass`
-  artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/prd.md`
+- requirement: `Occupancy and intent lease schemas are frozen for phase-1.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/prd.md`
 
+### AT-002
 - id: `AT-002`
-  requirement: `Manager-only arbitration and worker locality default-deny are frozen as non-negotiable contracts.`
-  evidence_level: `artifact`
-  status: `pass`
-  artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
+- requirement: `Manager-only arbitration and worker locality default-deny are frozen as non-negotiable contracts.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
 
+### AT-003
 - id: `AT-003`
-  requirement: `Phase-1 blocking is limited to same-worktree edit, cleanup, and promotion.`
-  evidence_level: `artifact`
-  status: `pass`
-  artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/prd.md`
+- requirement: `Phase-1 blocking is limited to same-worktree edit, cleanup, and promotion.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/prd.md`
 
+### AT-004
 - id: `AT-004`
-  requirement: `Stale and takeover semantics are frozen: soft-stale requires manager review, hard-stale may be runtime-reclaimed, and blocked-but-owned cannot be stolen.`
-  evidence_level: `artifact`
-  status: `pass`
-  artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/prd.md`
+- requirement: `Stale and takeover semantics are frozen: soft-stale requires manager review, hard-stale may be runtime-reclaimed, and blocked-but-owned cannot be stolen.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/prd.md`
 
+### AT-005
 - id: `AT-005`
-  requirement: `Cleanup and promotion paths have explicit ownership-aware hook points for future runtime enforcement.`
-  evidence_level: `artifact`
-  status: `pass`
-  artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/brainstorms/b-worktree-exclusive-ownership-and-promotion-lease-governance.md`
+- requirement: `Cleanup and promotion paths have explicit ownership-aware hook points for future runtime enforcement.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/brainstorms/b-worktree-exclusive-ownership-and-promotion-lease-governance.md`
 
+### AT-006
 - id: `AT-006`
-  requirement: `The four phase-1 conflict scenarios are frozen as testable acceptance targets.`
-  evidence_level: `artifact`
-  status: `pass`
-  artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/tasks.md`
+- requirement: `The four phase-1 conflict scenarios are frozen as testable acceptance targets.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/tasks.md`
 
 ## Pre-Merge Focused Regression / Smoke
 

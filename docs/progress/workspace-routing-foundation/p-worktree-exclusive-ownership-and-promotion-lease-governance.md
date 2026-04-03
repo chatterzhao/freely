@@ -3,28 +3,42 @@
 - issue_id: `I-20260402-0455-A`
 - issue_path: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
 - title: `Worktree exclusive ownership and promotion lease governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
+- runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
+- branch: `feature/worktree-exclusive-ownership-governance-20260402-0455`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-0455-feature-worktree-exclusive-ownership-governance`
 - updated_at: `2026-04-02`
-- summary:
-  - 当前 worktree 已把 phase-1 anti-stomp 的 ownership truth 接进 runtime：same-worktree mutate、duplicate promotion、cleanup retain/reclaim、canonical worktree target 和 stale/takeover taxonomy 现在都有 machine-readable surface。
-  - `recorded-owner` 已区分 `soft_stale` 与 `hard_stale`；只有 `hard_stale` 进入 runtime reclaim allowed，`soft_stale` 仍保持 manager review required。
-  - 这条 owner 现在进入正式 verification；下一步只剩把 feature-lane evidence 固定进 verification artifact，并等待 develop merge 后的 post-merge acceptance writeback。
-- evidence:
-  - `docs/system/workspace/scripts/runtime/freely`
-  - `docs/system/workspace/hooks/pre-merge-commit.sh`
-  - `docs/system/workspace/scripts/worktree/merge-guarded`
-  - `docs/system/workspace/agents/manager-agent.md`
-  - `docs/system/workspace/agents/worker-agent.md`
-  - `docs/system/workspace/three-loop-capability-lifecycle.md`
-  - `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/code-reviews/20260402-worktree-exclusive-ownership-and-promotion-lease-verification.md`
-- next:
-  - post-merge acceptance still belongs on `develop`; do not mark this owner `completed` until the develop-bound verification writeback exists.
-- closure_status: `verified-in-feature-lane`
-- closure_evidence:
-  - `branch: feature/worktree-exclusive-ownership-governance-20260402-0455`
-  - `worktree_path: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-0455-feature-worktree-exclusive-ownership-governance`
-  - `scope: runtime ownership surfacing, manager launch gating, cleanup followthrough reclaim, promotion gate, and supporting docs/tests`
-  - `tests: bash docs/system/workspace/scripts/tests/test-freely-live-status-recorded-ownership-conflict; bash docs/system/workspace/scripts/tests/test-freely-live-status-ownership-conflict-recorded-owner; bash docs/system/workspace/scripts/tests/test-freely-live-status-hard-stale-recorded-owner-does-not-block; bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-queue-recorded-owner; bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-hard-stale-owner; bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain; bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-hard-stale-intent-reclaim; bash docs/system/workspace/scripts/tests/test-freely-live-status; bash docs/system/workspace/scripts/tests/test-freely-fleet-status; bash docs/system/workspace/scripts/tests/test-freely-fleet-status-recorded-ownership-conflict-surface; git diff --check; ./bin/governance-check`
-  - `notes: phase-1 now distinguishes soft_stale recorded owners from hard_stale recorded owners; only hard_stale enters runtime reclaim allowed for launch/recovery and cleanup followthrough`
+- closure_status: `closed`
+- session_refs:
+  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
+
+## Summary
+
+- This owner closed the phase-1 anti-stomp gap between occupancy truth and mutation ownership truth for `edit`, `cleanup`, and `promotion`.
+- Runtime status, manager launch/recovery, cleanup followthrough, and develop promotion now agree on canonical intent targets and stale-holder handling.
+- The feature lane has been absorbed into canonical `develop` via merge `a10f6d8`.
+
+## Verification Evidence
+
+1. `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+2. `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
+3. `bash docs/system/workspace/scripts/tests/test-freely-live-status-recorded-ownership-conflict`
+4. `bash docs/system/workspace/scripts/tests/test-freely-live-status-ownership-conflict-recorded-owner`
+5. `bash docs/system/workspace/scripts/tests/test-freely-live-status-hard-stale-recorded-owner-does-not-block`
+6. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-queue-recorded-owner`
+7. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-hard-stale-owner`
+8. `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-conflicting-recorded-promotion`
+9. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
+10. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-hard-stale-intent-reclaim`
+11. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+12. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+13. `git diff --check`
+14. `./bin/governance-check`
+15. `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/code-reviews/20260402-worktree-exclusive-ownership-and-promotion-lease-verification.md`
+16. canonical `develop` merge commit `a10f6d8`
+
+## Next Action
+
+1. Owner is complete on canonical `develop`.
+2. Future ownership/arbitration expansion should reopen as a narrower follow-on owner rather than reusing this closeout lane.

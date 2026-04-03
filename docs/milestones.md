@@ -50,18 +50,28 @@ routing_policy:
 
 ### committed_issues
 
+### completed_issues
 1. `I-20260402-0455-A`
 - title: Worktree exclusive ownership and promotion lease governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/candidates.md`
-- next_action: keep this owner in `in_verification` until the feature-lane ownership/stale evidence is written to the issue-bound verification artifact and the develop-bound post-merge acceptance is written back; current branch evidence is green but not yet canonical `develop`.
+- evidence:
+  - `develop` merge `a10f6d8`
+  - `docs/progress/workspace-routing-foundation/p-worktree-exclusive-ownership-and-promotion-lease-governance.md`
+  - `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/code-reviews/20260402-worktree-exclusive-ownership-and-promotion-lease-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-hard-stale-intent-reclaim`
+  - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+  - `./bin/governance-check`
+- completion_note: Canonical `develop` now has a shared phase-1 ownership truth for runtime status, manager launch/recovery, cleanup followthrough, and promotion gating, so duplicate mutate intents no longer rely on PID-only courtesy checks.
 
-### completed_issues
-1. `I-20260401-2354-A`
+2. `I-20260401-2354-A`
 - title: Implementation decision notes in issue-bound review artifacts
 - milestone_state: completed
 - phase_state: `completed`
@@ -1003,7 +1013,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/candidates.md`
-- next_action: This candidate is now materialized as `I-20260402-0455-A`. The active owner freezes the phase-1 ownership contract and hook points before any runtime implementation slice starts.
+- next_action: This candidate materialized as `I-20260402-0455-A`, and the owner is now closed on canonical `develop` via merge `a10f6d8`. Reopen candidate-level research only if a follow-on owner must extend ownership semantics beyond the completed phase-1 slice.
 - revisit_trigger: Re-open candidate-level research only if the phase-1 ownership contract proves inseparable from a broader runtime orchestration redesign, or if cleanup/promotion ownership cannot be expressed with the proposed occupancy + lease split.
 
 10. `C-20260325-0525-A`
