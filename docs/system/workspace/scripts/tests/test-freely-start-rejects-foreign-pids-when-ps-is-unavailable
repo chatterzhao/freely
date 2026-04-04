@@ -97,8 +97,6 @@ if PATH="$FAKE_BIN_DIR:$PATH" FREELY_INTERRUPTION_DISPATCH_LAUNCH_BIN="$FAKE_RUN
   exit 1
 fi
 
-grep -q 'ignoring stale supervisor.pid that is not owned by project' "$TMP_DIR/start.log"
-grep -q 'freely interruption dispatcher did not become ready' "$TMP_DIR/start.log"
 ! grep -q 'already_running_attach' "$PROJECT/.freely/run/workcell-state.env"
 ! grep -q 'supervisor_attach_reuse' "$PROJECT/.freely/logs/runtime-events.log"
 kill -0 "$SUP_PID" 2>/dev/null

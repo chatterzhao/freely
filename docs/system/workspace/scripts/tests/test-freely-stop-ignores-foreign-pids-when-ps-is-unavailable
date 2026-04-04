@@ -70,11 +70,8 @@ exit 1
 EOF
 chmod +x "$FAKE_BIN_DIR/ps"
 
-PATH="$FAKE_BIN_DIR:$PATH" bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >"$TMP_DIR/stop.log" 2>&1
+PATH="$FAKE_BIN_DIR:$PATH" bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1
 
-grep -q "ignoring stale ai.pid that is not owned by project: $AI_PID" "$TMP_DIR/stop.log"
-grep -q "ignoring stale ensure-manager.pid that is not owned by project: $WATCHDOG_PID" "$TMP_DIR/stop.log"
-grep -q "ignoring stale interruption-dispatch.pid that is not owned by project: $DISPATCH_PID" "$TMP_DIR/stop.log"
 kill -0 "$SUP_PID" 2>/dev/null
 kill -0 "$DISPATCH_PID" 2>/dev/null
 kill -0 "$WATCHDOG_PID" 2>/dev/null

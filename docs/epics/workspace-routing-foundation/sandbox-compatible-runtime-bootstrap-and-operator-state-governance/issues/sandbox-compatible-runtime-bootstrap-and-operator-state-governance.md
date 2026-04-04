@@ -71,6 +71,7 @@ That hidden dead-end pressures users and agents back toward protected-root edits
 - `docs/system/workspace/scripts/tests/test-freely-sandbox-operator-state-bootstrap-fallback`
 - `docs/system/workspace/scripts/tests/test-freely-status-degrades-when-ps-is-unavailable`
 - `docs/system/workspace/scripts/tests/test-freely-start-attaches-when-ps-is-unavailable`
+- `docs/system/workspace/scripts/tests/test-freely-start-refuses-unverified-attach-when-ps-is-unavailable`
 - `docs/system/workspace/scripts/tests/test-freely-start-rejects-foreign-pids-when-ps-is-unavailable`
 - `docs/system/workspace/scripts/tests/test-freely-stop-ignores-foreign-pids-when-ps-is-unavailable`
 
@@ -79,6 +80,7 @@ That hidden dead-end pressures users and agents back toward protected-root edits
 - `bash docs/system/workspace/scripts/tests/test-freely-sandbox-operator-state-bootstrap-fallback`
 - `bash docs/system/workspace/scripts/tests/test-freely-status-degrades-when-ps-is-unavailable`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-attaches-when-ps-is-unavailable`
+- `bash docs/system/workspace/scripts/tests/test-freely-start-refuses-unverified-attach-when-ps-is-unavailable`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-rejects-foreign-pids-when-ps-is-unavailable`
 - `bash docs/system/workspace/scripts/tests/test-freely-stop-ignores-foreign-pids-when-ps-is-unavailable`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`

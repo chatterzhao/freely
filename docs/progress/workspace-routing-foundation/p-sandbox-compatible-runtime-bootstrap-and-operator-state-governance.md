@@ -17,14 +17,15 @@
 
 ## Current Focus
 
-- Materialize the runtime contract into `docs/system/workspace/scripts/runtime/freely`.
-- Add focused regressions for fallback operator-state root, degraded process evidence, and foreign-pid refusal.
+- Materialize the degraded PID ownership tightening in `docs/system/workspace/scripts/runtime/freely`.
+- Add focused regressions for fallback operator-state root, degraded process evidence, and unverified pid-file refusal.
 
 ## Verification
 
 - `bash docs/system/workspace/scripts/tests/test-freely-sandbox-operator-state-bootstrap-fallback`
 - `bash docs/system/workspace/scripts/tests/test-freely-status-degrades-when-ps-is-unavailable`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-attaches-when-ps-is-unavailable`
+- `bash docs/system/workspace/scripts/tests/test-freely-start-refuses-unverified-attach-when-ps-is-unavailable`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-rejects-foreign-pids-when-ps-is-unavailable`
 - `bash docs/system/workspace/scripts/tests/test-freely-stop-ignores-foreign-pids-when-ps-is-unavailable`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
