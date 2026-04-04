@@ -207,7 +207,7 @@ EOF
    自然语言说明可以补充，但不能替代这两个 header。
 22. manager continuity 必须显式引用每个 worker prompt 的绝对路径；runtime 只会从 continuity 中消费这些 \`.freely/run/worker-prompts/*.txt\` 路径，不会从普通回答里自动提炼 handoff。
 23. 若本轮存在多个 lane，worker prompt 不能只写业务内容；每个 prompt 还必须附带最小 dispatch metadata：\`dispatch_priority\`、\`parallel_safe\`、\`write_scope\`。若该 prompt 会授予 mutate authority，还必须补 machine-readable \`intent_kind\` 与 \`intent_target\`，明确当前 lane 取得的是 \`edit\`、\`cleanup\` 还是 \`promotion\` authority。若 lane 因 same-lane busy guard、显式 freeze、写域冲突或 supersede 暂不派发，未派发 lane 也必须留在 manager continuity 的 queue / frozen queue 中。
-24. 对会产生 mutate authority 的 lane，worker prompt 还必须附带 machine-readable ownership metadata：\`intent_kind\`、\`intent_target\`。`write_scope` 只用于 launch-time scheduling，不替代长期 mutate ownership truth。
+24. 对会产生 mutate authority 的 lane，worker prompt 还必须附带 machine-readable ownership metadata：\`intent_kind\`、\`intent_target\`。\`write_scope\` 只用于 launch-time scheduling，不替代长期 mutate ownership truth。
 25. 若本轮结论是 manager-only cleanup queue、暂不发 worker，也仍然必须写 manager continuity，至少包含：fleet inventory、route_kind / restart_point / ownership / next_action、cleanup queue 或 frozen queue、以及 next supervision priority。
 26. 你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径；若没有写这些产物，就不算完成主管交付。
 27. 若当前输入包含 delegated continuation、cleanup followthrough、或明确的 project-level restart point，在主 handoff artifact 落盘前不要先 spawn subagent，也不要先等待子任务结果。
