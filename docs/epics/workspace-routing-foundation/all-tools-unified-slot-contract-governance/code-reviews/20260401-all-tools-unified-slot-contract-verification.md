@@ -58,3 +58,11 @@
 
 1. Codex still has the strongest probe/watchdog parity; `kiro-cli`, `cc`, `iflow`, and `opencode` now share the unified slot contract and generic scheduler path, but not yet Codex-equivalent auth/probe depth.
 2. earliest-recovery hints remain strongest where tools expose structured reset truth; tools without reset metadata still participate as unavailable targets without equally rich timing hints.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record
