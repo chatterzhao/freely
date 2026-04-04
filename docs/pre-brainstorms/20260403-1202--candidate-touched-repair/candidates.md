@@ -5,7 +5,7 @@
 - candidate_format_version: `v2`
 - title: Fix issue reference format in review files
 - status: `needs_research`
-- decision_reason: 该子切片尚未 materialize 为 milestone-owned issue，先保持在 pre-brainstorm 阶段并绑定父治理链，避免伪造 promoted 状态。
+- decision_reason: 该子切片已挂接到 materialized parent issue `I-20260403-1100-A`，但 absorbed 还是后续独立 materialize 尚未决定，因此继续保持 pre-brainstorm 状态，避免伪造 promoted。
 - promoted_issue_path: `pending://parent-routing-decision`
 - milestone: `M-20260306-workspace-routing-foundation`
 - parent_candidate_ref: `C-20260403-1100-A`
@@ -33,5 +33,5 @@
   - legacy 文档允许长期保留 `issue` 别名，还是必须全量迁移为 `issue_id`？
 - acceptance_reviews:
   - reviewer: `codex-self-review`
-  - verdict: `pass-with-fixups`
-  - notes: `候选内容边界已补齐，但在 issue materialization 前保持 needs_research 更符合治理语义。`
+    verdict: `supports`
+    note: `候选内容边界已补齐，当前维持 parent-linked needs_research 更符合已 materialized 的 1100 owner truth。`
