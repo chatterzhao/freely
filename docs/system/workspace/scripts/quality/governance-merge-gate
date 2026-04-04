@@ -102,6 +102,21 @@ def issue_key(issue_id: str) -> Optional[str]:
     return match.group(1) if match else None
 
 
+def issue_matches_candidate_identity(
+    issue_id: Optional[str],
+    candidate_id: Optional[str],
+    legacy_issue_id: Optional[str] = None,
+) -> bool:
+    c_key = candidate_key(candidate_id or "")
+    i_key = issue_key(issue_id or "")
+    legacy_key = issue_key(legacy_issue_id or "")
+    if c_key and i_key and i_key.startswith(c_key):
+        return True
+    if legacy_key and i_key and (i_key == legacy_key or i_key.startswith(legacy_key)):
+        return True
+    return False
+
+
 @dataclass
 class CandidateRecord:
     path: str
@@ -149,6 +164,7 @@ class ProgressRecord:
 class ReviewRecord:
     path: str
     issue_id: Optional[str]
+    issue_path: Optional[str]
     decision_note_fields: Set[str] = field(default_factory=set)
 
 
@@ -326,8 +342,12 @@ def parse_progress_file(rel_path: str) -> ProgressRecord:
 def parse_review_file(rel_path: str) -> ReviewRecord:
     text = read_repo_text(rel_path)
 
-    match = re.search(r"^\s*-\s*issue_id:\s*(.+?)\s*$", text, re.MULTILINE)
-    issue_id = normalize_scalar(match.group(1)) if match else None
+    def grab(name: str) -> Optional[str]:
+        match = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
+        return normalize_scalar(match.group(1)) if match else None
+
+    issue_id = grab("issue_id")
+    issue_path = grab("issue_path")
     decision_note_fields: Set[str] = set()
     section_match = re.search(
         r"^##\s+Implementation Decision Note\s*$([\s\S]*?)(?=^##\s+|\Z)",
@@ -339,7 +359,23 @@ def parse_review_file(rel_path: str) -> ReviewRecord:
         for field_name in IMPLEMENTATION_DECISION_NOTE_FIELDS:
             if re.search(rf"^\s*-\s*{re.escape(field_name)}:\s*(.+?)\s*$", section, re.MULTILINE):
                 decision_note_fields.add(field_name)
-    return ReviewRecord(path=rel_path, issue_id=issue_id, decision_note_fields=decision_note_fields)
+
+    if not decision_note_fields:
+        for field_name in IMPLEMENTATION_DECISION_NOTE_FIELDS:
+            legacy_section = re.search(
+                rf"^##\s+{re.escape(field_name)}\s*$([\s\S]*?)(?=^##\s+|\Z)",
+                text,
+                re.MULTILINE,
+            )
+            if legacy_section and legacy_section.group(1).strip():
+                decision_note_fields.add(field_name)
+
+    return ReviewRecord(
+        path=rel_path,
+        issue_id=issue_id,
+        issue_path=issue_path,
+        decision_note_fields=decision_note_fields,
+    )
 
 
 def parse_milestones() -> List[MilestoneEntry]:
@@ -455,6 +491,18 @@ def resolve_source_candidate_record(
             return candidate
 
     return source_candidates[0]
+
+
+def resolve_review_owner_issue(
+    review: ReviewRecord,
+    issues_by_id: Dict[str, IssueRecord],
+    issues_index: Dict[str, IssueRecord],
+) -> Optional[IssueRecord]:
+    if review.issue_id:
+        return issues_by_id.get(review.issue_id)
+    if review.issue_path:
+        return issues_index.get(review.issue_path)
+    return None
 
 
 def main() -> int:
@@ -601,10 +649,10 @@ def main() -> int:
         candidate_driven_evidence.add(source_candidate.candidate_id)
 
     for review in review_records:
-        owner_issue = issues_by_id.get(review.issue_id or "")
+        owner_issue = resolve_review_owner_issue(review, issues_by_id, issues_index)
         if not owner_issue:
             errors.append(
-                f"{review.path} points to owner issue '{review.issue_id or 'missing'}', but that issue cannot be resolved. "
+                f"{review.path} points to owner issue '{review.issue_id or review.issue_path or 'missing'}', but that issue cannot be resolved. "
                 f"Every develop-bound merge must stay on a candidate-driven lifecycle. Link the review to a real issue that traces back to a pre-brainstorm candidate."
             )
             continue
@@ -761,8 +809,11 @@ def main() -> int:
                 )
 
             issue_identifier = issue_record.issue_id or ""
-            issue_identifier_key = issue_key(issue_identifier)
-            if not issue_identifier_key or not issue_identifier_key.startswith(key):
+            if not issue_matches_candidate_identity(
+                issue_identifier,
+                candidate.candidate_id,
+                candidate.legacy_id_mapping,
+            ):
                 errors.append(
                     f"{candidate.candidate_id} in {candidate.path} promoted to issue '{issue_identifier or issue_path}', but it does not preserve the shared issue-id key '{key}'. "
                     f"Use an issue id like I-{key} or I-{key}-<split> so IBM splits still trace back to the same candidate."
@@ -864,14 +915,11 @@ def main() -> int:
 
             if referenced_candidate:
                 c_key = candidate_key(referenced_candidate.candidate_id)
-                i_key = issue_key(issue.issue_id)
-                legacy_id = referenced_candidate.legacy_id_mapping
-                legacy_key = issue_key(legacy_id) if legacy_id else None
-                
-                # 如果存在 legacy_id_mapping 且与当前 issue_id 匹配，则跳过验证
-                legacy_matches = legacy_key and i_key and (i_key == legacy_key or i_key.startswith(legacy_key))
-                
-                if c_key and i_key and not i_key.startswith(c_key) and not legacy_matches:
+                if not issue_matches_candidate_identity(
+                    issue.issue_id,
+                    referenced_candidate.candidate_id,
+                    referenced_candidate.legacy_id_mapping,
+                ):
                     errors.append(
                         f"{issue.issue_id} in {issue.path} comes from {referenced_candidate.candidate_id}, but the issue id does not preserve the shared issue-id key '{c_key}'. "
                         f"Rename it to I-{c_key} or I-{c_key}-<split> so milestone and IBM stay on the same lifecycle line."

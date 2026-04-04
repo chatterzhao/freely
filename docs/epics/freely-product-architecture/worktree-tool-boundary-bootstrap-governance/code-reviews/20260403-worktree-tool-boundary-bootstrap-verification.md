@@ -1,5 +1,6 @@
 # Verification: worktree-tool-boundary-bootstrap-governance
 
+- issue_id: `I-20260403-2041-A`
 - verifier: `codex`
 - branch: `feature/tool-sandbox-worktree-bootstrap-20260403-204147`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260403-204147-feature-tool-sandbox-worktree-bootstrap`
