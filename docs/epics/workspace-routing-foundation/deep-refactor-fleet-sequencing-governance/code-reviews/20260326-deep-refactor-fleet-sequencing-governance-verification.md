@@ -1,4 +1,5 @@
 # Verification Review: deep-refactor-fleet-sequencing-governance
+- issue_id: `I-20260326-1915`
 
 - date: `2026-03-26`
 - reviewer: `codex`
