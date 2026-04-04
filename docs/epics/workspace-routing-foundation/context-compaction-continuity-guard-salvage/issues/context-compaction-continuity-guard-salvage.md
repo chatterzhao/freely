@@ -2,6 +2,9 @@
 
 ## Metadata
 - issue_id: `I-20260319-0148`
+- epic-name: `workspace-routing-foundation`
+- story-name: `context-compaction-continuity-guard-salvage`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/context-compaction-continuity-guard-salvage/code-reviews`
 - milestone: `M-20260306-workspace-routing-foundation`
 - phase_state: `completed`
 - priority: P0
@@ -10,7 +13,7 @@
 - depends_on:
   - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
+- source_candidate: `docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md`
 
 ## Problem
 

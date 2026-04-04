@@ -22,3 +22,11 @@
 
 1. This closes the old-context-compaction salvage itself, not the broader continuity/rotation governance now owned by `I-20260319-0018`.
 2. If future prompt wording or continuity fields change, they should be re-verified under the current mainline continuity issue family rather than resurrecting the retired salvage branch.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record
