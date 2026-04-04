@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `worktree-fleet-governance-closure`
 - issue-name: `worktree-fleet-governance-closure`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md#c-20260321-0257-a`
 - source_brainstorm: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md`
 - execution_base: `develop`
