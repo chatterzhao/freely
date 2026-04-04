@@ -31,6 +31,8 @@
 - acceptance_hint: 在单机自我优化原型、review gate 和本地策略资产模型成形前，不进入 Hub 集成实现；仅保留为后续研究方向，并补充费用确认。
 - priority: P1
 - status: proposed
+- next_action: 调研 evolver 自主开发能力的利用方式
+- revisit_trigger: 当有新的 evolver 集成需求时
 - decision_reason: 先把本地自治质量跑稳，比提早连接外部 worker 网络更符合当前产品阶段。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260306-workspace-routing-foundation
