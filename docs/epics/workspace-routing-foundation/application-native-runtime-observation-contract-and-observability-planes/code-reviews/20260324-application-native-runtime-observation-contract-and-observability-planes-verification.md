@@ -1,6 +1,6 @@
 # Verification: application-native-runtime-observation-contract-and-observability-planes
 
-- issue: `I-20260324-0415`
+- issue_id: `I-20260324-0415`
 - title: `Application-native runtime observation contract and observability planes`
 - reviewer: `codex`
 - scope: active truth and runtime-facing references only

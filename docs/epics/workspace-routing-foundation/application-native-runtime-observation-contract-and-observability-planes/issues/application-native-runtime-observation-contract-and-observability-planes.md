@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `application-native-runtime-observation-contract-and-observability-planes`
 - issue-name: `application-native-runtime-observation-contract-and-observability-planes`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/code-reviews`
 - priority: P1
 - source_candidate: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md#c-20260324-0415-a`
 - source_brainstorm: `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/brainstorms.md`
