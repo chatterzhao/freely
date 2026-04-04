@@ -48,3 +48,14 @@
 - evidence_refs:
   - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
   - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
+
+## Receipt Gap: eec65f3a00586f64d47ecd441779690b3f729719
+
+- target_branch: `develop`
+- source_branch: `feature/protected-branch-merge-receipt-backfill-20260404-0710`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260404-0640-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
