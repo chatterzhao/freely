@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `milestone-planning-and-state-maintenance`
 - issue-name: `milestone-planning-and-state-maintenance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/milestone-planning-and-state-maintenance/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/candidates.md#c-20260320-0512-a`
 - source_brainstorm: `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/brainstorms.md`
 - execution_base: `develop`
