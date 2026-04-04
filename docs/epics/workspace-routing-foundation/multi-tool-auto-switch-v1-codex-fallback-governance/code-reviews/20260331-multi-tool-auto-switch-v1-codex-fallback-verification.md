@@ -36,3 +36,11 @@
 1. 只有 Codex 目前具备成熟的 same-tool watchdog truth；`kiro-cli` / `iflow` / `cc` 参与 cross-tool fallback 时仍使用较弱 readiness contract，后续需要单独冻结各自 capability surface。
 2. earliest-reset hint 当前主要来自 Codex availability state；其他工具若还没有结构化 reset truth，只能作为无 hint 的 unavailable target 参与排序。
 3. 这份 review 仍缺一条 post-merge live confirmation，用 canonical `develop` 验证 current-tool slot-first、随后从左到右的 ordered fallback、teardown-aware recheck 与 all-tools-unavailable waiting truth 在真实 manager runtime 上都可见。
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

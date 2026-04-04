@@ -42,3 +42,11 @@
 
 1. restart-storm / process-churn contract 未作为本 issue 的 blocking acceptance 重新验证；若要声明该面完全无回归，需要单开 follow-on 复核。
 2. `operator_stop_requested` 的 observability 区分尚未在本 issue 中实现；当前修复只处理行为，不处理事件命名。
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record
