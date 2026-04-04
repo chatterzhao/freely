@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `cli-tui-human-interruption-input`
 - issue-name: `cli-tui-human-interruption-input`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md#c-20260319-2315-a`
 - source_brainstorm: `docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md`
 - execution_base: `feature/cli-tui-input-interruption-20260319-2310`
