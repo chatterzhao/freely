@@ -7,7 +7,7 @@
 - decision_date: `2026-04-04`
 - author: `codex`
 
-## Decision
+## Implementation Decision Note
 
 - decision: `Keep the bounded bootstrap grace check in docs/system/workspace/scripts/runtime/freely and extend the continuity parser so ## Worker Dispatch prompt paths are treated as launchable worker handoff evidence.`
 - why_this: `The observed failure split cleanly into a startup race before ai.pid existed and a post-bootstrap handoff-truth gap where the delegated prompt was written but hidden behind an unparsed continuity heading. Fixing both inside the same runtime contract keeps the owner narrow and restores truthful continuity-to-worker materialization.`
