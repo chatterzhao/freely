@@ -1,4 +1,5 @@
 # Verification: pre-test-merge-responsibility-usage-and-lifecycle-governance
+- issue_id: `I-20260322-1801`
 
 ## Compatibility Note
 
