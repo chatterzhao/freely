@@ -1,4 +1,5 @@
 # Code Review: global-ai-account-watchdog-and-manager-bootstrap
+- issue_id: `I-20260318-1630`
 
 - date: 2026-03-26
 - reviewer: Codex

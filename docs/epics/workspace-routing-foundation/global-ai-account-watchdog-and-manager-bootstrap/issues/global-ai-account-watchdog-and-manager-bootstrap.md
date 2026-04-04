@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `global-ai-account-watchdog-and-manager-bootstrap`
 - issue-name: `global-ai-account-watchdog-and-manager-bootstrap`
+- verification_artifact_dir: `docs/epics/- epic-name: `workspace-routing-foundation`/- story-name: `global-ai-account-watchdog-and-manager-bootstrap`/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md#c-20260318-a`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
 - execution_base: `develop`
