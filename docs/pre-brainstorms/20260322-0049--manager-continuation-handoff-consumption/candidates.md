@@ -15,6 +15,7 @@
   - `live-status` shows pending vs consumed handoff state
   - `fresh_with_handoff` handoff generation remains shell-safe
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
+- legacy_id_mapping: I-20260322-0049  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:
   - `run:/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/intake/20260322-004126-develop-worktree-live-status-fle/meta.env`
