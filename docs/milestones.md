@@ -50,36 +50,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260403-1100-A`
-- title: Governance chain legacy repair for develop push unblock
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
-- source_brainstorm: `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/candidates.md`
-- next_action: Continue the legacy governance-chain repair from the now-materialized umbrella owner, keep `1200/1201/1202/1203` as lawful parent-linked child slices, then advance the actual artifact backfill and validation batch.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
-  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/prd.md`
-  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
-
 ### candidate_issues
-1. `C-20260402-1719-A`
-- title: Hook bypass break-glass governance and audit
-- milestone_state: candidate
-- candidate_path: `docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/candidates.md#c-20260402-1719-a`
-- source_brainstorm: `docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/brainstorms.md`
-- status: `needs_research`
-- priority: P0
-- next_action: Freeze the break-glass whitelist, evidence model, and audit surface before materializing a dedicated follow-on owner.
-- revisit_trigger:
-  - another protected-branch merge requires manual hook bypass
-  - merge-guarded still falls back to raw conflict-completion commit
-  - governance-check still cannot audit bypass receipts on develop
 
 ### completed_issues
 1. `I-20260402-0020-A`
