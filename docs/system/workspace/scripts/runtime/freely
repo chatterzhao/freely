@@ -226,7 +226,23 @@ state_dir() {
 }
 
 global_state_dir() {
-  echo "${FREELY_HOME:-$HOME/.freely}"
+  local requested project fallback_dir
+  requested="${FREELY_HOME:-$HOME/.freely}"
+  if [[ -n "${FREELY_HOME:-}" ]] || path_is_writable_or_creatable "$requested"; then
+    echo "$requested"
+    return 0
+  fi
+
+  project="$(effective_project_for_global_state || true)"
+  if [[ -n "$project" ]]; then
+    fallback_dir="$(state_dir "$project")/operator-state"
+    if path_is_writable_or_creatable "$fallback_dir"; then
+      echo "$fallback_dir"
+      return 0
+    fi
+  fi
+
+  echo "$requested"
 }
 
 global_config_file() {
@@ -263,6 +279,34 @@ global_restart_manifest_history_file() {
     candidate="$history_dir/${timestamp}-${suffix}.json"
   done
   echo "$candidate"
+}
+
+path_is_writable_or_creatable() {
+  local path="$1" parent
+  [[ -n "$path" ]] || return 1
+  if [[ -e "$path" ]]; then
+    [[ -w "$path" ]]
+    return
+  fi
+  parent="$(dirname "$path")"
+  while [[ ! -d "$parent" && "$parent" != "/" ]]; do
+    parent="$(dirname "$parent")"
+  done
+  [[ -d "$parent" && -w "$parent" ]]
+}
+
+effective_project_for_global_state() {
+  local candidate=""
+  if [[ -n "${PROJECT_ROOT:-}" && -d "${PROJECT_ROOT:-}" ]]; then
+    candidate="${PROJECT_ROOT}"
+  elif [[ -n "${FREELY_PROJECT:-}" && -d "${FREELY_PROJECT:-}" ]]; then
+    candidate="${FREELY_PROJECT}"
+  fi
+  [[ -n "$candidate" ]] || return 1
+  candidate="$(cd "$candidate" 2>/dev/null && pwd -P || true)"
+  [[ -n "$candidate" && -d "$candidate" ]] || return 1
+  looks_like_project_root "$candidate" || return 1
+  printf '%s\n' "$candidate"
 }
 
 run_dir_for_project() {
@@ -767,7 +811,23 @@ find_latest_manager_continuity_file_for_project() {
 ps_command_for_pid() {
   local pid="$1"
   [[ -n "$pid" ]] || return 0
+  if ! process_inspection_available; then
+    printf 'unavailable://process-inspection-blocked\n'
+    return 0
+  fi
   ps -p "$pid" -o command= 2>/dev/null | sed -n '1p'
+}
+
+process_inspection_available() {
+  ps -p "$$" -o pid= >/dev/null 2>&1
+}
+
+process_inspection_state() {
+  if process_inspection_available; then
+    printf 'available\n'
+  else
+    printf 'degraded\n'
+  fi
 }
 
 emit_indented_block() {
@@ -816,6 +876,7 @@ live_status_activity_state_for_project() {
 
 discover_supervisor_pid() {
   local project="$1" excluded_pids="${2:-}"
+  process_inspection_available || return 0
   ps -axo pid=,command= | awk -v p="$project" -v excluded="$excluded_pids" '
     BEGIN {
       split(excluded, raw, ",")
@@ -848,25 +909,28 @@ pid_matches_project() {
   local cmd cwd project_real
   [[ -n "$pid" ]] || return 1
   kill -0 "$pid" 2>/dev/null || return 1
-  cmd="$(ps -p "$pid" -o command= 2>/dev/null || true)"
-  [[ -n "$cmd" ]] || return 1
   project_real="$(cd "$project" 2>/dev/null && pwd -P || true)"
-  if [[ -n "$expected" ]] && [[ "$cmd" != *"$expected"* ]]; then
-    return 1
+  if process_inspection_available; then
+    cmd="$(ps -p "$pid" -o command= 2>/dev/null || true)"
+    if [[ -n "$cmd" ]]; then
+      if [[ -n "$expected" ]] && [[ "$cmd" != *"$expected"* ]]; then
+        return 1
+      fi
+      awk -v p="$project" -v pr="$project_real" -v e="$expected" '
+        (e == "" || index($0, e)) {
+          for (i = 1; i <= NF; i++) {
+            if (($i == "--project" || $i == "-C") && (i + 1) <= NF && ($(i + 1) == p || (pr != "" && $(i + 1) == pr))) {
+              found=1
+            }
+            if (index($i, "--project=") == 1 && (substr($i, 11) == p || (pr != "" && substr($i, 11) == pr))) {
+              found=1
+            }
+          }
+        }
+        END { exit found ? 0 : 1 }
+      ' <<<"$cmd" && return 0
+    fi
   fi
-  awk -v p="$project" -v pr="$project_real" -v e="$expected" '
-    index($0, e) {
-      for (i = 1; i <= NF; i++) {
-        if (($i == "--project" || $i == "-C") && (i + 1) <= NF && ($(i + 1) == p || (pr != "" && $(i + 1) == pr))) {
-          found=1
-        }
-        if (index($i, "--project=") == 1 && (substr($i, 11) == p || (pr != "" && substr($i, 11) == pr))) {
-          found=1
-        }
-      }
-    }
-    END { exit found ? 0 : 1 }
-  ' <<<"$cmd" && return 0
   cwd="$(lsof -a -d cwd -p "$pid" -Fn 2>/dev/null | sed -n 's/^n//p' | head -n 1)"
   [[ "$cwd" == "$project" || (-n "$project_real" && "$cwd" == "$project_real") ]]
 }
@@ -6659,7 +6723,11 @@ ai_process_snapshot_markdown() {
   prompt_file="$(latest_prompt_file_for_project "$project")"
   [[ -n "$prompt_file" ]] || prompt_file="unavailable"
   if [[ -n "$ai_pid" ]]; then
-    ai_ps_line="$(ps -p "$ai_pid" -o pid=,etime=,state=,command= 2>/dev/null | sed 's/^ *//')"
+    if process_inspection_available; then
+      ai_ps_line="$(ps -p "$ai_pid" -o pid=,etime=,state=,command= 2>/dev/null | sed 's/^ *//')"
+    else
+      ai_ps_line="unavailable://process-inspection-blocked"
+    fi
     cat <<EOF
 - direct_answer: 当前后台 AI 进程正在运行。
 - ai_process:
@@ -8824,6 +8892,8 @@ cmd_baseline_status() {
   execution_boundary_audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
   echo "execution_boundary_audit_status: $(freely_execution_boundary_audit_status_for_loaded_config "$execution_boundary_audit_summary")"
   echo "execution_boundary_audit_detail: $(freely_execution_boundary_audit_detail_for_loaded_config "$execution_boundary_audit_summary")"
+  echo "operator_state_root: $(global_state_dir)"
+  echo "process_inspection_state: $(process_inspection_state)"
   echo "codex_capability_model: ${AI_CAPABILITY_CODEX_MODEL:-none}"
   echo "codex_capability_sandbox: ${AI_CAPABILITY_CODEX_SANDBOX:-none}"
   echo "codex_capability_approval_policy: ${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-none}"
@@ -9154,6 +9224,7 @@ cmd_live_status() {
   echo "branch: $branch"
   echo "role_hint: $role_hint"
   echo "activity_state: $activity_state"
+  echo "process_inspection_state: $(process_inspection_state)"
   echo "desired_runtime_state: $desired_runtime_state"
   echo "last_supervisor_state: $last_supervisor_state"
   echo "last_ai_state: $last_ai_state"

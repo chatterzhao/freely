@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-sandbox-operator-state-bootstrap.XXXXXX)"
+cleanup() {
+  chmod 700 "$BLOCKED_HOME" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/repo"
+BLOCKED_HOME="$TMP_DIR/blocked-home"
+mkdir -p "$PROJECT/.freely" "$PROJECT/docs/pre-brainstorms" "$BLOCKED_HOME"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+chmod 500 "$BLOCKED_HOME"
+
+FAKE_BIN="$TMP_DIR/fake-freely"
+cat >"$FAKE_BIN" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+RUNTIME_BIN="$ROOT_DIR/bin/freely"
+cmd="\${1:-}"
+shift || true
+case "\$cmd" in
+  ensure-interruption-dispatch)
+    exit 0
+    ;;
+  ensure-manager)
+    exec bash "\$RUNTIME_BIN" ensure-manager "\$@"
+    ;;
+  *)
+    exec bash "\$RUNTIME_BIN" "\$cmd" "\$@"
+    ;;
+esac
+EOF
+chmod +x "$FAKE_BIN"
+
+if HOME="$BLOCKED_HOME" FREELY_INTERRUPTION_DISPATCH_LAUNCH_BIN="$FAKE_BIN" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >"$TMP_DIR/start.log" 2>&1; then
+  echo "[FAIL] expected start fixture to fail after fallback bootstrap because dispatcher never becomes ready" >&2
+  exit 1
+fi
+
+FALLBACK_ROOT="$PROJECT/.freely/operator-state"
+grep -q "^$(cd "$PROJECT" && pwd -P)[[:space:]]" "$FALLBACK_ROOT/projects.tsv"
+test ! -e "$BLOCKED_HOME/.freely/projects.tsv"
+
+echo "[PASS] freely falls back to a project-local operator-state root when the default home is unwritable"
