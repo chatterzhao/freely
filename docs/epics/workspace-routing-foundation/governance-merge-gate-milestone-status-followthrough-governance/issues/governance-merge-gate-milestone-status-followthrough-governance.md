@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260404-0119-A`
 - title: Governance merge gate milestone status followthrough governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `governance-merge-gate-milestone-status-followthrough-governance`
@@ -58,4 +58,5 @@
 
 ## Next
 
-- Replay this narrow merge-gate followthrough into canonical `develop`, then retry the blocked runtime bootstrap replay without mutating the runtime owner.
+- `2026-04-04` closeout: canonical `develop` already absorbed this narrow parser followthrough through merge `908a6ad`.
+- Keep this owner closed as the bounded milestone-status parsing record; any future merge-gate residuals must reopen as new owners on current `develop`.
