@@ -1,6 +1,6 @@
 # Code Review - project-resolution-defaults-verification
 
-- issue: `I-20260320-0018`
+- issue_id: `I-20260320-0018`
 - date: `2026-03-20`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`
