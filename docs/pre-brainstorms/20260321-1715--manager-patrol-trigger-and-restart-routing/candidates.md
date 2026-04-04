@@ -23,6 +23,7 @@
 - next_action: 完成 IBM 产物后，进入 dev-loop，对 `three-loop` / `manager-agent` / `auto-loop-orchestrator` / patrol reference 做一致性重构。
 - revisit_trigger: 当新的 truth-source wording 已落盘，需要 review 是否仍存在局部自相矛盾时。
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+- legacy_id_mapping: I-20260321-1715  # 历史遗留的 issue id
 - milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
 - session_refs:
   - tool: codex
