@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-wt-create-syncs-tooling.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_project() {
+  local project="$1"
+  mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample"
+  mkdir -p "$project/bin"
+  git init -q -b develop "$project"
+  mkdir -p "$project/.githooks"
+  cat >"$project/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+  chmod +x "$project/.githooks/pre-commit"
+
+  cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$project/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$project/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0018--sample
+EOF
+  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+  cat >"$project/.gitignore" <<'EOF'
+.freely/
+.codex/
+.claude/
+.iflow/
+EOF
+
+  cat >"$project/bin/worktree-common.sh" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+source "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "\$@"
+EOF
+  chmod +x "$project/bin/worktree-common.sh"
+
+  cat >"$project/bin/freely" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+exec bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" "\$@"
+EOF
+  chmod +x "$project/bin/freely"
+
+  git -C "$project" add .
+  git -C "$project" -c user.name="Freely Test" -c user.email="freely-test@example.com" commit -q -m "Initial test project"
+}
+
+FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$FREELY_HOME"
+
+PROJECT="$TMP_DIR/project"
+WORKTREES_ROOT="${PROJECT}-worktrees"
+BRANCH="feature/tooling-sync-20260403"
+WORKTREE="$WORKTREES_ROOT/20260403-feature-tooling-sync"
+make_project "$PROJECT"
+
+cd "$PROJECT"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --project "$PROJECT" \
+  --intent "$PROJECT/docs/PROJECT_INTENT.md" \
+  --constitution "$PROJECT/docs/CONSTITUTION.md" \
+  --ai codex:gpt-5.4:auto \
+  --accept-default-autonomy \
+  >/dev/null
+
+bash "$ROOT_DIR/bin/wt-create" "$BRANCH" >/dev/null
+
+WORKTREES_ROOT_REAL="$(cd "$WORKTREES_ROOT" && pwd -P)"
+WORKTREE_REAL="$(cd "$WORKTREE" && pwd -P)"
+
+test -d "$WORKTREE"
+test -f "$WORKTREE/.freely/config.env"
+test -f "$WORKTREE/.codex/config.toml"
+test -f "$WORKTREE/.freely/tool-boundary-bootstrap.md"
+test -x "$WORKTREE/.freely/bin/codex"
+grep -q '^AI_TOOL="codex"$' "$WORKTREE/.freely/config.env"
+grep -Fq "writable_roots = [\"$WORKTREES_ROOT_REAL\"]" "$WORKTREE/.codex/config.toml"
+grep -Fq -- "--add-dir \"$WORKTREES_ROOT_REAL\"" "$WORKTREE/.freely/bin/codex"
+grep -Fq "\`$WORKTREE_REAL\`" "$WORKTREE/.freely/tool-boundary-bootstrap.md"
+
+echo "[PASS] wt-create rematerializes managed tool boundaries into the new worktree"

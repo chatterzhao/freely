@@ -73,10 +73,17 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
 
 CONFIG_FILE="$PROJECT/.freely/config.env"
 CODEX_CONFIG_FILE="$PROJECT/.codex/config.toml"
+TOOL_BOOTSTRAP_FILE="$PROJECT/.freely/tool-boundary-bootstrap.md"
+WRAPPER_DIR="$PROJECT/.freely/bin"
 PROJECT_WORKTREES_ROOT="${PROJECT}-worktrees"
 
 test -f "$CONFIG_FILE"
 test -f "$CODEX_CONFIG_FILE"
+test -f "$TOOL_BOOTSTRAP_FILE"
+test -x "$WRAPPER_DIR/codex"
+test -x "$WRAPPER_DIR/claude"
+test -x "$WRAPPER_DIR/iflow"
+test -x "$WRAPPER_DIR/kiro-cli"
 grep -q '^AI_TOOL="codex"$' "$CONFIG_FILE"
 grep -q '^AI_MODEL="gpt-5.4"$' "$CONFIG_FILE"
 grep -q '^AI_REASONING_EFFORT="medium"$' "$CONFIG_FILE"
@@ -87,6 +94,10 @@ grep -q '^FREELY_HTTP_PROXY=""$' "$CONFIG_FILE"
 grep -q '^FREELY_HTTPS_PROXY=""$' "$CONFIG_FILE"
 grep -q '^FREELY_NO_PROXY=""$' "$CONFIG_FILE"
 grep -Fq "writable_roots = [\"$PROJECT_WORKTREES_ROOT\"]" "$CODEX_CONFIG_FILE"
+grep -Fq -- "--add-dir \"$PROJECT_WORKTREES_ROOT\"" "$WRAPPER_DIR/codex"
+grep -Fq -- "--add-dir \"$PROJECT_WORKTREES_ROOT\"" "$WRAPPER_DIR/claude"
+grep -Fq -- "--add-dir \"$PROJECT_WORKTREES_ROOT\"" "$WRAPPER_DIR/iflow"
+grep -Fq "\`$PROJECT_WORKTREES_ROOT\`" "$TOOL_BOOTSTRAP_FILE"
 
 cat >"$CONFIG_FILE" <<'EOF'
 AI_TOOL="sentinel"
@@ -161,6 +172,10 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   >/dev/null
 
 WORKTREE_CODEX_CONFIG_FILE="$CANONICAL_WORKTREE/.codex/config.toml"
+WORKTREE_BOOTSTRAP_FILE="$CANONICAL_WORKTREE/.freely/tool-boundary-bootstrap.md"
+WORKTREE_WRAPPER_DIR="$CANONICAL_WORKTREE/.freely/bin"
 grep -Fq "writable_roots = [\"$CANONICAL_WORKTREES_ROOT\"]" "$WORKTREE_CODEX_CONFIG_FILE"
+grep -Fq -- "--add-dir \"$CANONICAL_WORKTREES_ROOT\"" "$WORKTREE_WRAPPER_DIR/codex"
+grep -Fq "\`$CANONICAL_WORKTREES_ROOT\`" "$WORKTREE_BOOTSTRAP_FILE"
 
 echo "[PASS] freely init keeps project config non-destructive by default and rewrites it with --force"

@@ -11,6 +11,7 @@ pid_file="$TMP_DIR/ai.pid"
 log_file="$TMP_DIR/ai.log"
 debug_log_file="$TMP_DIR/ai.debug.log"
 mock_bin="$TMP_DIR/bin"
+project_worktrees_root="${project_dir}-worktrees"
 mkdir -p "$mock_bin" "$project_dir"
 project_real="$(cd "$project_dir" && pwd -P)"
 
@@ -51,6 +52,8 @@ bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
 grep -q -- '^-p$' "$TMP_DIR/claude.args"
 grep -q -- '^--permission-mode$' "$TMP_DIR/claude.args"
 grep -q -- '^bypassPermissions$' "$TMP_DIR/claude.args"
+grep -q -- '^--add-dir$' "$TMP_DIR/claude.args"
+grep -q -- "^$project_worktrees_root$" "$TMP_DIR/claude.args"
 grep -q -- '^--model$' "$TMP_DIR/claude.args"
 grep -q -- '^sonnet$' "$TMP_DIR/claude.args"
 grep -q -- '^--effort$' "$TMP_DIR/claude.args"
@@ -81,7 +84,7 @@ bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
   --codex-capability-model "gpt-5.4" \
   --codex-capability-sandbox "workspace-write" \
   --codex-capability-approval-policy "never" \
-  --codex-capability-cwd-mode "project-root" \
+  --codex-capability-cwd-mode "worktree-required-on-protected-branches" \
   --debug-log-file "$debug_log_file" \
   --claude-session-id "session-codex-1" \
   --mode auto \
@@ -93,12 +96,15 @@ bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
 
 grep -q -- '^--session-id$' "$TMP_DIR/claude.args"
 grep -q -- '^session-codex-1$' "$TMP_DIR/claude.args"
+grep -q -- '^--add-dir$' "$TMP_DIR/claude.args"
+grep -q -- "^$project_worktrees_root$" "$TMP_DIR/claude.args"
 grep -q -- '^--append-system-prompt$' "$TMP_DIR/claude.args"
 grep -q 'codex-cli MCP' "$TMP_DIR/claude.args"
 grep -q 'model=gpt-5.4' "$TMP_DIR/claude.args"
 grep -q 'sandbox=workspace-write' "$TMP_DIR/claude.args"
 grep -q 'approval-policy=never' "$TMP_DIR/claude.args"
-grep -q "cwd=$project_dir" "$TMP_DIR/claude.args"
+grep -q 'cwd policy: worktree-required-on-protected-branches' "$TMP_DIR/claude.args"
+grep -q "Allowed sibling worktrees root: $project_worktrees_root" "$TMP_DIR/claude.args"
 if grep -q -- '^--continue$' "$TMP_DIR/claude.args"; then
   echo "[FAIL] cc-use-codex-cli resume should use session-id instead of --continue" >&2
   exit 1

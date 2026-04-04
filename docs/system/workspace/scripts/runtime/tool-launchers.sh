@@ -254,6 +254,44 @@ tool_requires_explicit_resume_target() {
   esac
 }
 
+project_worktrees_root_for_launch() {
+  local project="$1"
+  local project_parent project_name
+  project_parent="$(dirname "$project")"
+  if [[ "$(basename "$project_parent")" == *-worktrees ]]; then
+    printf '%s\n' "$project_parent"
+    return 0
+  fi
+  project_name="$(basename "$project")"
+  printf '%s\n' "${project_parent}/${project_name}-worktrees"
+}
+
+tool_supports_add_dir_boundary() {
+  local tool="$1"
+  case "$tool" in
+    codex|iflow|cc|cc-use-codex-cli) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+tool_boundary_add_dir() {
+  local tool="$1" project="$2" worktrees_root
+  tool_supports_add_dir_boundary "$tool" || return 0
+  worktrees_root="$(project_worktrees_root_for_launch "$project")"
+  [[ -n "$worktrees_root" && "$worktrees_root" != "$project" ]] || return 0
+  printf '%s\n' "$worktrees_root"
+}
+
+project_branch_for_launch() {
+  local project="$1"
+  git -C "$project" branch --show-current 2>/dev/null || true
+}
+
+protected_branch_for_launch() {
+  local branch="$1"
+  [[ "$branch" == "main" || "$branch" == "develop" || "$branch" == test-pre-merge-* ]]
+}
+
 cc_codex_policy_prompt() {
   local policy="${1:-}"
   local project_root="${2:-}"
@@ -261,6 +299,13 @@ cc_codex_policy_prompt() {
   local codex_sandbox="${4:-workspace-write}"
   local codex_approval_policy="${5:-never}"
   local codex_cwd_mode="${6:-project-root}"
+  local worktrees_root="${7:-}"
+  local branch="${8:-}"
+  local cwd_guidance
+  cwd_guidance="- The repository project root (${project_root}) remains the primary integration cwd. When calling the Codex MCP tool for a new session, use cwd=${project_root} unless the task needs owner development on a protected branch."
+  if protected_branch_for_launch "$branch"; then
+    cwd_guidance="- The current branch is protected (${branch}). Keep ${project_root} for read/merge/integration work, but for any new owner-development or staged repository-writing Codex MCP session, first create or enter a dedicated worktree under ${worktrees_root} and use that worktree path as cwd instead of ${project_root}."
+  fi
   cat <<EOF
 Freely runtime policy:
 - You are running as Claude Code inside Freely.
@@ -271,7 +316,10 @@ Freely runtime policy:
   - model=${codex_model}
   - sandbox=${codex_sandbox}
   - approval-policy=${codex_approval_policy}
-  - cwd=${project_root} (cwd policy: ${codex_cwd_mode})
+  - cwd policy: ${codex_cwd_mode}
+- Repository integration root: ${project_root}
+- Allowed sibling worktrees root: ${worktrees_root:-unavailable}
+- ${cwd_guidance#- }
 - When continuing an existing Codex MCP thread, preserve the same repository-root cwd and the same non-interactive approval policy unless the task explicitly requires a stricter mode.
 - The current runtime is non-interactive when permission mode is bypassPermissions; do not ask the user for confirmations that the runtime has already pre-approved.
 - Current cc policy: ${policy:-default}
@@ -300,13 +348,17 @@ tool_run_direct_from_prompt_file() {
     codex)
       wait_for_codex_slot_switch_idle_before_launch || return 1
       freely_apply_project_network_proxy_env "$project"
+      local worktrees_root
+      worktrees_root="$(tool_boundary_add_dir "$tool" "$project")"
       local -a args=(exec --skip-git-repo-check -C "$project")
+      [[ -n "$worktrees_root" ]] && args+=(--add-dir "$worktrees_root")
       if [[ "$launch_kind" == "resume" ]]; then
         [[ -n "$tool_resume_target" ]] || {
           echo "[ERROR] codex resume requires an explicit session target" >&2
           return 1
         }
         args=(exec resume "$tool_resume_target" --skip-git-repo-check)
+        [[ -n "$worktrees_root" ]] && args+=(--add-dir "$worktrees_root")
       fi
       [[ -n "$model" ]] && args+=(-m "$model")
       [[ -n "$reasoning_effort" ]] && args+=(-c "model_reasoning_effort=\"$reasoning_effort\"")
@@ -314,7 +366,10 @@ tool_run_direct_from_prompt_file() {
       exec codex "${args[@]}" - <"$prompt_file"
       ;;
     iflow)
+      local worktrees_root
+      worktrees_root="$(tool_boundary_add_dir "$tool" "$project")"
       local -a args=()
+      [[ -n "$worktrees_root" ]] && args+=(--add-dir "$worktrees_root")
       [[ -n "$model" ]] && args+=(-m "$model")
       if [[ "$launch_kind" == "resume" ]]; then
         if [[ -n "$tool_resume_target" ]]; then
@@ -346,18 +401,21 @@ tool_run_direct_from_prompt_file() {
       fi
       ;;
     cc|cc-use-codex-cli)
-      local prompt_text system_prompt
+      local prompt_text system_prompt worktrees_root project_branch
       local -a args=(-p)
       prompt_text="$(cat "$prompt_file")"
+      worktrees_root="$(tool_boundary_add_dir "$tool" "$project")"
+      project_branch="$(project_branch_for_launch "$project")"
       if [[ "$mode" == "auto" ]]; then
         args+=(--permission-mode bypassPermissions)
       fi
+      [[ -n "$worktrees_root" ]] && args+=(--add-dir "$worktrees_root")
       [[ -n "$debug_log_file" ]] && args+=(--debug-file "$debug_log_file")
       [[ -n "$claude_session_id" ]] && args+=(--session-id "$claude_session_id")
       [[ -n "$model" && "$model" != "default" ]] && args+=(--model "$model")
       [[ -n "$reasoning_effort" ]] && args+=(--effort "$reasoning_effort")
       if tool_has_capability "$tool_capabilities" "codex-cli"; then
-        system_prompt="$(cc_codex_policy_prompt "$tool_policy" "$project" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode")"
+        system_prompt="$(cc_codex_policy_prompt "$tool_policy" "$project" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$worktrees_root" "$project_branch")"
         args+=(--append-system-prompt "$system_prompt")
       fi
       exec claude "${args[@]}" "$prompt_text"

@@ -1346,6 +1346,23 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260403-2041-A`
+- title: Worktree tool boundary bootstrap governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-worktree-tool-boundary-bootstrap-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260403-2041--worktree-tool-boundary-bootstrap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260403-2041--worktree-tool-boundary-bootstrap/candidates.md`
+- next_action: Replay the narrow tool-boundary bootstrap follow-on into `develop`, then confirm canonical repo and future sibling worktrees both materialize the managed tool boundary contract without writing implementation drift into protected roots.
+- evidence:
+  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/prd.md`
+  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/pre-tests.md`
+  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/tasks.md`
+  - `docs/progress/freely-product-architecture/p-worktree-tool-boundary-bootstrap-governance.md`
+
 ### completed_issues
 
 1. `I-20260402-1912-A`

@@ -110,10 +110,12 @@ Use the standard git worktree flow from the project root:
 
 Run:
   cd <your-project-name-path>
-  git worktree add -b feature/<task-name> ../<your-project-name>-worktrees/feature-<task-name> develop
-  cd ../<your-project-name>-worktrees/feature-<task-name>
+  ./bin/wt-create feature/<task-name> --base develop
+  cd ../<your-project-name>-worktrees/<derived-branch-dir>
 
-The final 'develop' argument already selects the correct base branch.
+`wt-create` derives the correct sibling worktree path and initializes managed tool boundaries there.
+If you must use raw 'git worktree add', immediately follow it with:
+  ./bin/freely sync-tooling --source-project <your-project-name-path> --project ../<your-project-name>-worktrees/<derived-branch-dir>
 
 When the work is finished and merged, clean up with:
   git worktree remove ../<your-project-name>-worktrees/feature-<task-name>
@@ -208,8 +210,12 @@ No dedicated sibling worktree found for '$branch'.
 
 Create it from the project root with the standard command:
   cd <your-project-name-path>
-  git worktree add ../<your-project-name>-worktrees/${branch//\//-} "$branch"
-  cd ../<your-project-name>-worktrees/${branch//\//-}
+  ./bin/wt-create "$branch"
+  cd ${rel_target}
+
+If you must create it manually instead:
+  git worktree add ${rel_target} "$branch"
+  ./bin/freely sync-tooling --source-project <your-project-name-path> --project ${rel_target}
 
 When the work is finished and merged:
   git worktree remove ${rel_target}

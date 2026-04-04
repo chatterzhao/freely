@@ -57,6 +57,7 @@ EOF
 FREELY_HOME="$TMP_DIR/freely-home"
 
 PROJECT_CC="$TMP_DIR/project-cc"
+PROJECT_CC_WORKTREES_ROOT="${PROJECT_CC}-worktrees"
 make_project "$PROJECT_CC"
 cd "$PROJECT_CC"
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
@@ -87,6 +88,8 @@ grep -q '^FREELY_ALL_PROXY=""$' "$CONFIG_FILE"
 grep -q '^FREELY_HTTP_PROXY=""$' "$CONFIG_FILE"
 grep -q '^FREELY_HTTPS_PROXY=""$' "$CONFIG_FILE"
 grep -q '^FREELY_NO_PROXY=""$' "$CONFIG_FILE"
+grep -Fq -- "--add-dir \"$PROJECT_CC_WORKTREES_ROOT\"" "$PROJECT_CC/.freely/bin/claude"
+grep -Fq "\`$PROJECT_CC_WORKTREES_ROOT\`" "$PROJECT_CC/.freely/tool-boundary-bootstrap.md"
 
 STATUS_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
 printf '%s\n' "$STATUS_OUTPUT" | grep -q '^ai: cc:default:auto$'
@@ -97,6 +100,7 @@ printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_capabilities: none$'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q '^tool_policy: none$'
 
 PROJECT_CC_ACP="$TMP_DIR/project-cc-acp"
+PROJECT_CC_ACP_WORKTREES_ROOT="${PROJECT_CC_ACP}-worktrees"
 make_project "$PROJECT_CC_ACP"
 cd "$PROJECT_CC_ACP"
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
@@ -118,8 +122,10 @@ printf '%s\n' "$STATUS_OUTPUT_ACP" | grep -q '^ai: cc:default:auto$'
 printf '%s\n' "$STATUS_OUTPUT_ACP" | grep -q '^tool_adapter: acp$'
 printf '%s\n' "$STATUS_OUTPUT_ACP" | grep -q '^tool_adapter_policy: acp$'
 printf '%s\n' "$STATUS_OUTPUT_ACP" | grep -q '^tool_supported_adapters: direct$'
+grep -Fq -- "--add-dir \"$PROJECT_CC_ACP_WORKTREES_ROOT\"" "$PROJECT_CC_ACP/.freely/bin/claude"
 
 PROJECT_CC_CODEX="$TMP_DIR/project-cc-codex"
+PROJECT_CC_CODEX_WORKTREES_ROOT="${PROJECT_CC_CODEX}-worktrees"
 make_project "$PROJECT_CC_CODEX"
 cd "$PROJECT_CC_CODEX"
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
@@ -142,7 +148,7 @@ grep -q '^AI_TOOL_POLICY="prefer-codex-for-repo-work"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_CAPABILITY_CODEX_MODEL="gpt-5.4"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_CAPABILITY_CODEX_SANDBOX="workspace-write"$' "$CONFIG_FILE_CODEX"
 grep -q '^AI_CAPABILITY_CODEX_APPROVAL_POLICY="never"$' "$CONFIG_FILE_CODEX"
-grep -q '^AI_CAPABILITY_CODEX_CWD_MODE="project-root"$' "$CONFIG_FILE_CODEX"
+grep -q '^AI_CAPABILITY_CODEX_CWD_MODE="worktree-required-on-protected-branches"$' "$CONFIG_FILE_CODEX"
 grep -q '^FREELY_NETWORK_PROXY_MODE="inherit"$' "$CONFIG_FILE_CODEX"
 grep -q '^FREELY_NETWORK_PROXY_URL=""$' "$CONFIG_FILE_CODEX"
 grep -q '^FREELY_ALL_PROXY=""$' "$CONFIG_FILE_CODEX"
@@ -152,6 +158,9 @@ grep -q '^FREELY_NO_PROXY=""$' "$CONFIG_FILE_CODEX"
 test -f "$CODEX_CONFIG_FILE"
 grep -q '^approval_policy = "never"$' "$CODEX_CONFIG_FILE"
 grep -Fq "writable_roots = [\"$PROJECT_CC_CODEX-worktrees\"]" "$CODEX_CONFIG_FILE"
+grep -Fq -- "--add-dir \"$PROJECT_CC_CODEX_WORKTREES_ROOT\"" "$PROJECT_CC_CODEX/.freely/bin/codex"
+grep -Fq -- "--add-dir \"$PROJECT_CC_CODEX_WORKTREES_ROOT\"" "$PROJECT_CC_CODEX/.freely/bin/claude"
+grep -Fq -- "--add-dir \"$PROJECT_CC_CODEX_WORKTREES_ROOT\"" "$PROJECT_CC_CODEX/.freely/bin/iflow"
 
 STATUS_OUTPUT_CODEX="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status)"
 printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^ai: cc-use-codex-cli:default:auto$'
@@ -162,6 +171,6 @@ printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^tool_policy: prefer-codex-for-r
 printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^codex_capability_model: gpt-5.4$'
 printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^codex_capability_sandbox: workspace-write$'
 printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^codex_capability_approval_policy: never$'
-printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^codex_capability_cwd_mode: project-root$'
+printf '%s\n' "$STATUS_OUTPUT_CODEX" | grep -q '^codex_capability_cwd_mode: worktree-required-on-protected-branches$'
 
 echo "[PASS] freely init writes separate plain-cc and cc-use-codex-cli profiles"

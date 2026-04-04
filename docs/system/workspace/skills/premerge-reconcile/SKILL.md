@@ -14,7 +14,8 @@ description: 在不回退治理的情况下协调高风险合并冲突。当临�
 - 创建专用分支：
   - `git branch feature/premerge-YYYYMMDD-HHMM--<topic> <active-test-pre-merge-branch>`
   - `cd <your-project-path>`
-  - `git worktree add ../<your-project-worktrees>/<branch-dir> feature/premerge-YYYYMMDD-HHMM--<topic>`
+  - 优先：`./bin/wt-create feature/premerge-YYYYMMDD-HHMM--<topic> --base <active-test-pre-merge-branch>`
+  - 手工兜底：`git worktree add ../<your-project-worktrees>/<branch-dir> feature/premerge-YYYYMMDD-HHMM--<topic> && ./bin/freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`
   - `cd ../<your-project-worktrees>/<branch-dir>`
   - 对 `feature/premerge-20260307-1015--topic`，`<branch-dir>` 应为 `20260307-1015-feature-premerge-topic`
 
