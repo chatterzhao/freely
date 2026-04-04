@@ -30,3 +30,11 @@
 6. The ACP path still warns that `reasoning_effort='medium'` is not yet mapped and that requested model `gpt-5.4` was not advertised by the agent; this is documented behavior, not a silent degradation.
 7. `resume` remains explicitly outside ACP parity for this owner, so direct path still owns the strongest explicit resume contract.
 8. Direct-path focused regressions still pass, including Codex fresh/resume argument handling, pid tracking, and the managed tool/adapter configuration surfaces.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record
