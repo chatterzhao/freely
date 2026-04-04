@@ -1,6 +1,6 @@
 # Code Review - first-hop-second-hop-verification
 
-- issue: `I-20260307-1201`
+- issue_id: `I-20260307-1201`
 - date: `2026-03-16`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`
