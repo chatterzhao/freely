@@ -15,5 +15,6 @@
   - canonical observability backend is CLI-first, not external tool TUI
   - truth sources clearly state TUI/GUI are render layers over the same backend contract
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
+- legacy_id_mapping: I-20260322-0115  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: []
