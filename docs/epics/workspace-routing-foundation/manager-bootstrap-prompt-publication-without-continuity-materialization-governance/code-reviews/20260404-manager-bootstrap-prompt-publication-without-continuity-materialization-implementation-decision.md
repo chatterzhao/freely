@@ -9,8 +9,11 @@
 
 ## Decision
 
-- keep the bounded bootstrap grace check in `docs/system/workspace/scripts/runtime/freely` so the watchdog does not restart a fresh supervisor solely because `ai.pid` has not appeared yet
-- extend the continuity parser to treat `## Worker Dispatch` prompt paths as launchable worker handoff evidence, because current manager continuity output uses that heading for the delegated prompt selected in the active round
+- decision: `Keep the bounded bootstrap grace check in docs/system/workspace/scripts/runtime/freely and extend the continuity parser so ## Worker Dispatch prompt paths are treated as launchable worker handoff evidence.`
+- why_this: `The observed failure split cleanly into a startup race before ai.pid existed and a post-bootstrap handoff-truth gap where the delegated prompt was written but hidden behind an unparsed continuity heading. Fixing both inside the same runtime contract keeps the owner narrow and restores truthful continuity-to-worker materialization.`
+- alternatives_considered: `Considered rewriting manager continuity generation to stop emitting ## Worker Dispatch, and considered a status-only fallback that would regex prompt paths without updating runtime parser helpers. Both options would leave either a broader schema migration or inconsistent manager-launch behavior.`
+- boundary_non_goals: `Do not redesign broader watchdog restart policy, operator-stop semantics, continuity schema wholesale, or unrelated worktree cleanup behavior.`
+- residual_risk: `If future manager continuities invent another new heading for delegated prompts, runtime status could drift again until the parser is explicitly taught that format. This fix only absorbs the currently observed Worker Dispatch contract.`
 
 ## Why
 
