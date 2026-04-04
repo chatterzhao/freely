@@ -830,6 +830,13 @@ process_inspection_state() {
   fi
 }
 
+pid_is_live_without_process_inspection() {
+  local pid="${1:-}"
+  [[ -n "$pid" ]] || return 1
+  process_inspection_available && return 1
+  kill -0 "$pid" 2>/dev/null
+}
+
 emit_indented_block() {
   local prefix="$1" text="$2"
   [[ -n "$text" ]] || return 0
@@ -959,6 +966,10 @@ interruption_dispatcher_pid_for_project() {
       printf '%s\n' "$pid"
       return 0
     fi
+    if pid_is_live_without_process_inspection "$pid"; then
+      printf '%s\n' "$pid"
+      return 0
+    fi
   fi
 }
 
@@ -968,6 +979,10 @@ manager_watchdog_pid_for_project() {
   if [[ -f "$pid_file" ]]; then
     pid="$(cat "$pid_file" 2>/dev/null || true)"
     if valid_ensure_manager_watchdog_pid_for_project "$project" "$pid"; then
+      printf '%s\n' "$pid"
+      return 0
+    fi
+    if pid_is_live_without_process_inspection "$pid"; then
       printf '%s\n' "$pid"
       return 0
     fi
@@ -6513,6 +6528,10 @@ manager_supervisor_pid_for_project() {
       printf '%s\n' "$sp"
       return 0
     fi
+    if pid_is_live_without_process_inspection "$sp"; then
+      printf '%s\n' "$sp"
+      return 0
+    fi
   fi
   discover_supervisor_pid "$project"
 }
@@ -6523,6 +6542,10 @@ manager_ai_pid_for_project() {
   if [[ -f "$run_dir/ai.pid" ]]; then
     ap="$(cat "$run_dir/ai.pid" 2>/dev/null || true)"
     if valid_ai_pid_for_project "$project" "$ap"; then
+      printf '%s\n' "$ap"
+      return 0
+    fi
+    if pid_is_live_without_process_inspection "$ap"; then
       printf '%s\n' "$ap"
       return 0
     fi
@@ -6557,8 +6580,8 @@ ensure_interruption_dispatcher_ready_or_fail() {
 ensure_manager_watchdog_ready_or_fail() {
   local project="$1" watchdog_pid attempts
   for attempts in 1 2 3 4 5; do
-    watchdog_pid="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
-    if valid_ensure_manager_watchdog_pid_for_project "$project" "$watchdog_pid"; then
+    watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
+    if [[ -n "$watchdog_pid" ]]; then
       return 0
     fi
     sleep 1
@@ -7107,7 +7130,7 @@ cmd_ensure_interruption_dispatch_watch() {
 
   if [[ -f "$pid_file" ]]; then
     existing_pid="$(cat "$pid_file" 2>/dev/null || true)"
-    if valid_interruption_dispatcher_pid_for_project "$project" "$existing_pid"; then
+    if [[ -n "$(interruption_dispatcher_pid_for_project "$project")" ]]; then
       log_info "interruption dispatcher already running (pid=$existing_pid)"
       return 0
     fi
@@ -7135,7 +7158,7 @@ cmd_ensure_manager_watch() {
 
   if [[ -f "$pid_file" ]]; then
     existing_pid="$(cat "$pid_file" 2>/dev/null || true)"
-    if valid_ensure_manager_watchdog_pid_for_project "$project" "$existing_pid"; then
+    if [[ -n "$(manager_watchdog_pid_for_project "$project")" ]]; then
       log_info "ensure-manager watchdog already running (pid=$existing_pid)"
       return 0
     fi
@@ -7828,7 +7851,7 @@ stop_project_runtime() {
   if [[ -f "$(ensure_manager_watchdog_pid_file "$project")" ]]; then
     local wp
     wp="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
-    if valid_ensure_manager_watchdog_pid_for_project "$project" "$wp"; then
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$wp" || pid_is_live_without_process_inspection "$wp"; then
       terminate_pid_with_graceful_wait "$wp" "project manager watchdog during stop"
     fi
     rm -f "$(ensure_manager_watchdog_pid_file "$project")"
@@ -7836,7 +7859,7 @@ stop_project_runtime() {
   if [[ -f "$(interruption_dispatcher_pid_file "$project")" ]]; then
     local dp
     dp="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
-    if valid_interruption_dispatcher_pid_for_project "$project" "$dp"; then
+    if valid_interruption_dispatcher_pid_for_project "$project" "$dp" || pid_is_live_without_process_inspection "$dp"; then
       terminate_pid_with_graceful_wait "$dp" "project interruption dispatcher during stop"
     fi
     rm -f "$(interruption_dispatcher_pid_file "$project")"
@@ -7861,13 +7884,19 @@ stop_project_runtime() {
 resolve_active_supervisor_pid_for_start() {
   local project="$1" sup_pid_file="$2"
   local candidate_pid="" excluded_pids=""
+  RESOLVED_ACTIVE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
   excluded_pids="${BASHPID:-$$},${PPID:-}"
   if [[ -f "$sup_pid_file" ]]; then
     candidate_pid="$(cat "$sup_pid_file" 2>/dev/null || true)"
     if valid_supervisor_pid_for_project "$project" "$candidate_pid"; then
       LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="supervisor_pid_file"
-      printf '%s\n' "$candidate_pid"
+      RESOLVED_ACTIVE_SUPERVISOR_PID="$candidate_pid"
+      return 0
+    fi
+    if pid_is_live_without_process_inspection "$candidate_pid"; then
+      LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="supervisor_pid_file_degraded"
+      RESOLVED_ACTIVE_SUPERVISOR_PID="$candidate_pid"
       return 0
     fi
     if [[ -n "$candidate_pid" ]]; then
@@ -7881,8 +7910,10 @@ resolve_active_supervisor_pid_for_start() {
     log_warn "recovered live project supervisor after supervisor.pid drift: $candidate_pid"
     LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="process_discovery"
     printf '%s\n' "$candidate_pid" >"$sup_pid_file"
-    printf '%s\n' "$candidate_pid"
+    RESOLVED_ACTIVE_SUPERVISOR_PID="$candidate_pid"
+    return 0
   fi
+  return 1
 }
 
 ensure_no_active_supervisor_conflict() {
@@ -7890,14 +7921,15 @@ ensure_no_active_supervisor_conflict() {
   local old_pid="" attach_ai_pid_state="missing" role_hint
   LAST_ATTACH_REUSE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_AI_PID_STATE="missing"
-  old_pid="$(resolve_active_supervisor_pid_for_start "$project" "$sup_pid_file")"
+  resolve_active_supervisor_pid_for_start "$project" "$sup_pid_file" || true
+  old_pid="${RESOLVED_ACTIVE_SUPERVISOR_PID:-}"
   if [[ -n "$old_pid" ]]; then
     if [[ "$allow_attach" == "1" ]]; then
       role_hint="$(role_hint_for_project "$project")"
       if [[ -f "$child_pid_file" ]]; then
         local active_ai_pid
         active_ai_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
-        if [[ -n "$active_ai_pid" ]] && ! valid_ai_pid_for_project "$project" "$active_ai_pid"; then
+        if [[ -n "$active_ai_pid" ]] && ! valid_ai_pid_for_project "$project" "$active_ai_pid" && ! pid_is_live_without_process_inspection "$active_ai_pid"; then
           attach_ai_pid_state="stale_pid_cleared"
           log_warn "clearing stale ai.pid while reusing healthy project supervisor: $active_ai_pid"
           rm -f "$child_pid_file"
@@ -7927,7 +7959,7 @@ ensure_no_active_supervisor_conflict() {
   if [[ -f "$child_pid_file" ]]; then
     local active_ai_pid
     active_ai_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
-    if valid_ai_pid_for_project "$project" "$active_ai_pid"; then
+    if valid_ai_pid_for_project "$project" "$active_ai_pid" || pid_is_live_without_process_inspection "$active_ai_pid"; then
       log_warn "repairing orphaned project ai pid before supervisor restart: $active_ai_pid"
       terminate_pid_with_graceful_wait "$active_ai_pid" "orphaned project ai pid before supervisor restart"
     elif [[ -n "$active_ai_pid" ]]; then
