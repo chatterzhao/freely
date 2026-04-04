@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-delegated-intake-absorption-closure-governance`
 - issue-name: `manager-delegated-intake-absorption-closure-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/candidates.md#c-20260326-0445-a`
 - source_brainstorm: `docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/brainstorms.md`
