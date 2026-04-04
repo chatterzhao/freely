@@ -25,7 +25,7 @@
   - 先完成全仓词面与关系审计，区分 active truth / active lifecycle / historical evidence 三类，再决定哪些真源必须改、哪些只补澄清
   - 落点优先放在 `three-loop-capability-lifecycle`、`LAWS`、`branch-management`、`worktree-maintenance-governance` 和项目级 `AGENTS.md`
 - priority: P0
-- status: promoted
+- status: absorbed
 - decision_reason: 这条 continuation 已被 milestone owner `C-20260319-1105-A` 吸收到正式 issue `I-20260324-0405` 中推进；后续不再作为平行 owner 单独 materialize，而是继续作为同一 issue family 的 scope/detail 输入。
 - next_action: 先把 pre-brainstorm 收敛为“全应用事件地图 + 三个 loop 的并列关系 + worktree-first execution map + completion / cleanup 回路 + cycle-saving gates”这一稳定边界；先完成 active truth / active lifecycle / historical evidence 的分层审计，再决定后续真源改写顺序，不要提前缩成单一 worktree completion 词典，也不要新开平行 milestone owner。
 - revisit_trigger: 当“按三个 loop 工作”已经足以单独驱动 agent 知道入口、循环、分支、回流与 terminal，且不再把 `doc-loop` / `dev-loop` 误解成层级包含关系时。
