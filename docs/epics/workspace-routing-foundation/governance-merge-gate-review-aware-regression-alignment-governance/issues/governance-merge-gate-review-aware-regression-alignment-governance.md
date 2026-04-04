@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260404-0232-A`
 - title: Governance merge gate review-aware regression alignment governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `governance-merge-gate-review-aware-regression-alignment-governance`
@@ -60,4 +60,5 @@ Post-merge acceptance on canonical `develop` therefore needs a narrow realignmen
 
 ## Next
 
-- Replay this narrow regression-alignment lane into canonical `develop`, then continue post-merge acceptance toward push.
+- `2026-04-04` closeout: canonical `develop` already absorbed this narrow review-aware regression alignment through merge `0bb78ce`.
+- Keep this owner closed as the bounded mixed-regression and borrowed-owner realignment record; future merge-gate residuals must reopen as new owners on current `develop`.

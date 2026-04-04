@@ -50,90 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260404-0119-A`
-- title: Governance merge gate milestone status followthrough governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md`
-- next_action: Keep the slice narrow to `parse_milestones()` queue scoping plus a focused regression so active milestone candidates no longer get blocked by nested item status fields.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
-
-2. `I-20260404-1405-A`
-- title: Manager bootstrap prompt publication without continuity materialization governance
-- milestone_state: committed
-- phase_state: `in_ibm`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization/candidates.md`
-- next_action: Freeze the exact bootstrap/control-plane failure path from prompt publication to continuity materialization, then repair startup semantics in a dedicated implementation batch.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
-  - `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
-
-3. `I-20260404-0232-A`
-- title: Governance merge gate review-aware regression alignment governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/candidates.md`
-- next_action: Keep the lane limited to making the mixed unresolved-candidate implementation regression review-aware and restoring same-file borrowed-owner blocking so `test-governance-merge-gate` matches current law after staged review artifacts became mandatory.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
-
-3. `I-20260403-2245-A`
-- title: Sandbox-compatible runtime bootstrap and operator-state governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/candidates.md`
-- next_action: Implement the narrow runtime slice that adds a lawful fallback operator-state root when the default `$FREELY_HOME` is unwritable and degrades process/readiness evidence cleanly when `ps` is unavailable.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
-  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
-
-4. `I-20260404-0640-A`
-- title: Protected-branch merge receipt gap followthrough
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/candidates.md`
-- next_action: Materialize the ancestry receipt-gap backfill ledger and focused governance-check regression so ordinary protected merges without canonical trailers cannot remain invisible in history.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/prd.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
-
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -170,6 +86,25 @@ routing_policy:
 - revisit_trigger: Re-open only if another ordinary protected merge is found without canonical trailers or the ancestry audit still misses such gaps after this followthrough lands.
 
 ### completed_issues
+1. `I-20260404-0640-A`
+- title: Protected-branch merge receipt gap followthrough
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/candidates.md`
+- evidence:
+  - `develop` merge `0c9701f`
+  - `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now audits trailerless protected-ancestry merges by their actual merge subject, so gap 70ef97d and the same-day receiptless ancestry set pass under the ordinary backfill ledger. The blocker-triage branch/worktree was retired after post-merge verification passed.`
+
 1. `I-20260402-0020-A`
 - title: Hook bypass break-glass governance
 - milestone_state: completed
@@ -196,6 +131,85 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/code-reviews/20260403-governance-chain-legacy-repair-implementation-decision.md`
   - `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
 - completion_note: The 2026-04-04 truth-repair merge restored the missing `1100` owner artifacts, retired deleted `1200/1201/1202/1203` slices to historical status, and cleared dangling canonical references. Any future governance-chain backfill must reopen from current `develop` as a new lifecycle instead of reviving `1100` as an active owner.
+3. `I-20260403-2245-A`
+- title: Sandbox-compatible runtime bootstrap and operator-state governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/candidates.md`
+- evidence:
+  - `develop` merge `1eddbcd`
+  - `develop` merge `45bed28`
+  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`
+  - `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-sandbox-operator-state-bootstrap-fallback`
+  - `bash docs/system/workspace/scripts/tests/test-freely-status-degrades-when-ps-is-unavailable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-attaches-when-ps-is-unavailable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-refuses-unverified-attach-when-ps-is-unavailable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-rejects-foreign-pids-when-ps-is-unavailable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-stop-ignores-foreign-pids-when-ps-is-unavailable`
+  - `./bin/governance-check`
+- completion_note: Canonical `develop` absorbed the sandbox-compatible operator-state fallback and the degraded PID ownership followthrough through merges `1eddbcd` and `45bed28`; this closeout lane only writes back completed lifecycle truth so future sandbox/runtime gaps reopen as new owners on current `develop`.
+4. `I-20260404-0119-A`
+- title: Governance merge gate milestone status followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md`
+- evidence:
+  - `develop` merge `908a6ad`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+- completion_note: Canonical `develop` absorbed the narrow `parse_milestones()` queue-scope repair through merge `908a6ad`; this closeout lane only writes back completed lifecycle truth so any future nested-field parser regressions reopen as new owners on current `develop`.
+5. `I-20260404-0232-A`
+- title: Governance merge gate review-aware regression alignment governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/candidates.md`
+- evidence:
+  - `develop` merge `0bb78ce`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+- completion_note: Canonical `develop` absorbed the review-aware mixed-regression fixture refresh and the same-file borrowed-owner block restoration through merge `0bb78ce`; this closeout lane only writes back completed lifecycle truth so future merge-gate residuals reopen as new owners on current `develop`.
+6. `I-20260404-1405-A`
+- title: Manager bootstrap prompt publication without continuity materialization governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization/candidates.md`
+- evidence:
+  - `develop` merge `8d29609`
+  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-verification.md`
+  - `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+- completion_note: Canonical `develop` absorbed the bounded bootstrap grace fix and the `## Worker Dispatch` continuity parser repair through merge `8d29609`; this closeout lane only realigns milestone, issue, and progress truth so future restart-churn work reopens as a new owner instead of reviving `1405`.
 1. `I-20260402-0455-A`
 - title: Worktree exclusive ownership and promotion lease governance
 - milestone_state: completed
