@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `worker-active-reentry-for-manager-delegated-continuation-governance`
 - issue-name: `worker-active-reentry-for-manager-delegated-continuation-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md#c-20260322-0412-a`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/brainstorms.md`
