@@ -1,4 +1,5 @@
 # Code Review: explicit-session-addressed-resume-governance verification
+- issue_id: `I-20260321-2010`
 
 - date: `2026-03-21`
 - scope:
