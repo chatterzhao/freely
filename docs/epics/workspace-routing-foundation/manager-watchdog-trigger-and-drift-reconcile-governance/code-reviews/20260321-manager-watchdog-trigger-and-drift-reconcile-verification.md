@@ -1,4 +1,5 @@
 # Code Review: manager-watchdog-trigger-and-drift-reconcile-governance
+- issue_id: `I-20260321-1715`
 
 ## Scope Reviewed
 

@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-watchdog-trigger-and-drift-reconcile-governance`
 - issue-name: `manager-watchdog-trigger-and-drift-reconcile-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/candidates.md#c-20260321-1715-a`
 - source_brainstorm: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/brainstorms.md`
 - execution_base: `develop`
