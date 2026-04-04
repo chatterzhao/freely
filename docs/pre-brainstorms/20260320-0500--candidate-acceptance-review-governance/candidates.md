@@ -20,5 +20,6 @@
 - status: `promoted`
 - decision_reason: schema、review 语义、门禁与 IBM 真源都已实现并有脚本回归，继续保留在 `pending://...materialization` 会让 canonical issue 落后于真实能力状态。
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
+- legacy_id_mapping: `I-20260320-0500`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
