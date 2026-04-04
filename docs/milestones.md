@@ -103,25 +103,6 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/tasks.md`
   - `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 
-4. `I-20260404-0640-A`
-- title: Protected-branch merge receipt gap followthrough
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/candidates.md`
-- next_action: Replay the verified ancestry-aware receipt-gap audit fix into `develop`, then retire the blocker-triage continuation once canonical protected ancestry stays green.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/prd.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-implementation-decision.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
-
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -158,6 +139,25 @@ routing_policy:
 - revisit_trigger: Re-open only if another ordinary protected merge is found without canonical trailers or the ancestry audit still misses such gaps after this followthrough lands.
 
 ### completed_issues
+1. `I-20260404-0640-A`
+- title: Protected-branch merge receipt gap followthrough
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/candidates.md`
+- evidence:
+  - `develop` merge `0c9701f`
+  - `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now audits trailerless protected-ancestry merges by their actual merge subject, so gap 70ef97d and the same-day receiptless ancestry set pass under the ordinary backfill ledger. The blocker-triage branch/worktree was retired after post-merge verification passed.`
+
 1. `I-20260402-0020-A`
 - title: Hook bypass break-glass governance
 - milestone_state: completed
