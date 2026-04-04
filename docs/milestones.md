@@ -120,6 +120,23 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/tasks.md`
   - `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 
+5. `I-20260404-0640-A`
+- title: Protected-branch merge receipt gap followthrough
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/candidates.md`
+- next_action: Materialize the ancestry receipt-gap backfill ledger and focused governance-check regression so ordinary protected merges without canonical trailers cannot remain invisible in history.
+- evidence:
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/prd.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
+
 ### candidate_issues
 1. `C-20260402-1719-A`
 - title: Hook bypass break-glass governance and audit
@@ -155,6 +172,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/candidates.md`
 - next_action: This candidate is now materialized as `I-20260404-0232-A`. Keep the owner scoped to making the mixed unresolved-candidate implementation regression review-aware and restoring same-file borrowed-owner blocking after staged review artifacts became mandatory.
 - revisit_trigger: Re-open only if a future guard again causes this mixed unresolved-candidate implementation regression to fail before it reaches the current allowed path, or if same-file borrowed-owner regressions start passing again.
+
+4. `C-20260404-0640-A`
+- title: Protected-branch merge receipt gap followthrough
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/candidates.md`
+- next_action: This candidate is now materialized as `I-20260404-0640-A`. Keep the owner scoped to ancestry receipt-gap backfill and audit for ordinary protected merges only.
+- revisit_trigger: Re-open only if another ordinary protected merge is found without canonical trailers or the ancestry audit still misses such gaps after this followthrough lands.
 
 ### completed_issues
 1. `I-20260402-0020-A`
