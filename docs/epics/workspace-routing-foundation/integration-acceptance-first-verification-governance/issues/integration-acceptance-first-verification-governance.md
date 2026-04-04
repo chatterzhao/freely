@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `integration-acceptance-first-verification-governance`
 - issue-name: `integration-acceptance-first-verification-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/candidates.md#c-20260322-0135-a`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/brainstorms.md`
