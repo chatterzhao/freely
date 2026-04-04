@@ -20,6 +20,9 @@
 - 20260402-1912--protected-branch-merge-receipt-hardening
   - brainstorms: docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md
+- 20260402-1719--hook-bypass-break-glass-governance
+  - brainstorms: docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/candidates.md
 - 20260402-0020--hook-bypass-breakglass-governance
   - brainstorms: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md
@@ -143,6 +146,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260402-1719--hook-bypass-break-glass-governance
+  - brainstorms: docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/candidates.md
 - 20260402-0020--hook-bypass-breakglass-governance
   - brainstorms: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md
