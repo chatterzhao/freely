@@ -206,6 +206,9 @@
 - 20260322-0115--cli-first-entrypoint-and-observability-surface-unification
   - brainstorms: docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md
   - candidates: docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md
+- 20260322-0135--integration-acceptance-first-ibm-and-verification
+  - brainstorms: docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/candidates.md
 - 20260321-1515--remote-branch-retirement-governance
   - brainstorms: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md
