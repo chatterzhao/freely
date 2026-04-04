@@ -44,6 +44,7 @@
 - revisit_trigger: 当 IBM 产物完成后，进入 `done_ibm` 并切到 dev-loop；若实现阶段发现仍需要改动开发治理输入，再回到新的 pre-brainstorm，而不是扩大当前 issue。
 - promoted_issue_id: `I-20260326-1835`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
+- legacy_id_mapping: I-20260326-1835  # 历史遗留的 issue id
 - milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
 - session_refs:
   - tool: codex
