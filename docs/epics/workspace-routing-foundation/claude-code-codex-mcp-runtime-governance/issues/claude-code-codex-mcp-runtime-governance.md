@@ -96,4 +96,5 @@ Freely 已经支持多个顶层 AI tool，但 `Claude Code` 仍缺两类关键�
 ## Next
 
 - 当前 issue 的实现、验证与 live smoke 证据已被当前 develop-facing sweep 分支吸收，focused regressions 在当前 absorption owner 上继续通过。
+- `C-20260320-2145-002` 继续作为 absorbed supporting source 由本 issue 承接；并发 continuity 不再拆分新的平行 owner。
 - 本 issue 已完成；后续 protected branch promote / replay 是 sweep-level followthrough，不再构成此 issue 的未完成项。
