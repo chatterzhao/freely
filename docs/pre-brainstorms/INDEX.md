@@ -1,4 +1,22 @@
 # 预研头脑风暴索引
+- 20260403-1203--issue-id-key-repair
+  - brainstorms: docs/pre-brainstorms/20260403-1203--issue-id-key-repair/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260403-1203--issue-id-key-repair/candidates.md
+- 20260403-1202--candidate-touched-repair
+  - brainstorms: docs/pre-brainstorms/20260403-1202--candidate-touched-repair/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260403-1202--candidate-touched-repair/candidates.md
+- 20260403-1201--implementation-decision-note-repair
+  - brainstorms: docs/pre-brainstorms/20260403-1201--implementation-decision-note-repair/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260403-1201--implementation-decision-note-repair/candidates.md
+- 20260403-1200--verification-artifact-dir-repair
+  - brainstorms: docs/pre-brainstorms/20260403-1200--verification-artifact-dir-repair/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260403-1200--verification-artifact-dir-repair/candidates.md
+- 20260403-1100--governance-chain-legacy-repair
+  - brainstorms: docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/candidates.md
+- 20260403-1000--external-issue-integration-and-self-evolution
+  - brainstorms: docs/pre-brainstorms/20260403-1000--external-issue-integration-and-self-evolution/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260403-1000--external-issue-integration-and-self-evolution/candidates.md
 - 20260402-1912--protected-branch-merge-receipt-hardening
   - brainstorms: docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md
