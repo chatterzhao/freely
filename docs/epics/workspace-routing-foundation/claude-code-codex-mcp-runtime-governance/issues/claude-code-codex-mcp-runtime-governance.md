@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `claude-code-codex-mcp-runtime-governance`
 - issue-name: `claude-code-codex-mcp-runtime-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md#c-20260320-2145-001`
 - additional_source_candidates:
   - `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md#c-20260320-2145-002`
