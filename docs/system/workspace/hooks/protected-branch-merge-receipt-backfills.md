@@ -1,0 +1,39 @@
+# Protected Branch Merge Receipt Backfills
+
+本文件记录普通 protected-branch merge 缺 canonical trailer 时的事后 backfill 证据。
+
+使用规则：
+- 只记录普通 `merge-guarded` / `merge-guarded-complete` merge commit 的 receipt gap
+- 不记录 break-glass merge；break-glass 仍使用 `protected-branch-breakglass-receipts.md`
+- 只用于“merge 已经发生，历史不可改写，但 canonical trailer 缺失”的例外修复
+- 不能把本 ledger 当成未来正常 merge 缺 trailer 的常规入口
+
+最小字段：
+- `audit_effective_date`
+- merge commit hash 标题
+- `target_branch`
+- `source_branch`
+- `canonical_merge_path`
+- `canonical_bypass_mode`
+- `follow_on_owner`
+- `evidence_refs`
+
+- audit_effective_date: `2026-04-04`
+
+## Contract
+
+- `governance-check` 会从 `audit_effective_date` 当日零点开始扫描 protected-branch merge ancestry
+- 普通 protected merge 若已经带 canonical Freely trailer，则不得在本 ledger 中声明 backfill
+- 普通 protected merge 若缺 canonical Freely trailer，则必须在本 ledger 有 matching backfill entry
+- backfill entry 只修复 auditability，不授予 bypass 权限
+
+## Receipt Gap: 908a6ad9f96a1a76a22f1f44f3b5438e23f6c6e0
+
+- target_branch: `develop`
+- source_branch: `feature/governance-merge-gate-milestone-status-followthrough-20260404-011904`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260404-0640-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`

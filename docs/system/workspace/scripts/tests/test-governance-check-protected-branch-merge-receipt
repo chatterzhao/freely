@@ -50,6 +50,11 @@ EOF
 
 - audit_effective_date: `2099-01-01`
 EOF
+  cat > "$repo/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2099-01-01`
+EOF
   cat > "$repo/docs/system/workspace/scripts/README.md" <<'EOF'
 # Scripts
 See docs/system/workspace/three-loop-capability-lifecycle.md
