@@ -4,69 +4,80 @@
 
 - 日期：2026-04-03
 - 触发：
-  - `governance-merge-gate` 对 legacy governance artifacts 的约束已收紧到当前 canonical 质量线
-  - `develop` 上暴露出一批历史遗留治理断裂，同时当前修复又裂成 `1100/1200/1201/1202/1203` 多个 lane
-  - 如果母链只停留在 promoted candidate，子切片就会继续用伪 owner 状态运行，形成新的治理失真
+  - `develop` 分支有 787 commits ahead of origin，无法 push
+  - `governance-merge-gate` 检测到 358 个治理链断裂问题
+  - 这些问题分为两类：
+    - 9 个 source_candidate 缺失或无法解析
+    - 46 个 issue 无法解析（missing）
+    - 其余为其他类型的引用断裂
 
 ## Current Repo Facts
 
-1. 当前 legacy drift 不是单一字段缺失，而是 candidate / issue / progress / review 多层真相长期未同步
-2. `feature/governance-chain-legacy-repair-20260403-1100` 与 `1200/1201/1202/1203` 共享旧基线，但这些子切片并不是 git ancestry 上的真实下游
-3. `1200/1201/1202/1203` 更像同一批次的 repair slices，需要 canonical parent owner 承接，而不是各自伪造独立 materialized issue
-4. 当前真正需要恢复的是 lawful governance chain，而不是为了 unblock push 临时降低 gate 强度
+1. `governance-merge-gate` 最近多次收紧检查（从 `936e56a` 到 `c2ca02b`）
+2. 历史遗留的 progress/review 文件引用了不存在的 issue 或 source_candidate
+3. 部分预研目录被删除但 issue/progress 仍引用它们
+4. 部分 issue 文件格式不符合当前解析器要求
 
 ## Problem
 
-- 历史遗留 drift 现在已经阻断 canonical chain，但当前 repair 自身也处于半失真的生命周期状态
-- 如果没有一个 materialized umbrella owner，child slices 会继续：
-  - 声称 promoted 到不存在的 issue
-  - 在 commit message 里暗示彼此关系，却不把关系写回 canonical docs
-  - 让后续 reviewer 无法判断哪些是同一批次的 repair、哪些是独立 owner
+### 核心问题
 
-## Boundary
+1. **历史遗留问题暴露**
+   - 之前 gate 检查不够严格，很多不完整治理链被合并到 develop
+   - 现在收紧后，这些历史问题阻塞了 push
 
-- In scope:
-  - 把 `1100` materialize 成当前 legacy governance-chain repair 的 canonical owner
-  - 在 canonical docs 中记录 `1200/1201/1202/1203` 的父子关系和当前状态
-  - 为后续 artifact backfill 先建立 lawful owner truth
-- Out of scope:
-  - 放宽 `governance-merge-gate`
-  - 仅凭“当前 push 被阻塞”就把所有 legacy drift 一次性揉成永久 mega-owner
-  - 用跨分支引用代替当前 worktree 内可审计的 canonical docs
+2. **source_candidate 缺失**
+   - 部分 issue 引用的 pre-brainstorm 目录不存在
+   - 部分 candidate 文件格式不符合解析器要求
 
-## Option Space
+3. **issue 缺失**
+   - 部分 progress/review 引用的 issue 不存在
+   - 部分引用格式不正确
 
-### Option A：weaken the gate
+## Solution Space
 
-- 优点：表面上最快解除阻塞
-- 缺点：直接回避当前 repair 的治理目标，也会继续制造 future drift
+### 方案 A：逐一修复所有治理链
 
-### Option B：先给每个子切片单独 materialize owner
+- 优点：彻底解决，符合规范
+- 缺点：工作量大，358 个问题
 
-- 优点：每条 repair slice 看起来都有完整 issue 链
-- 缺点：在 parent 还未合法化前，先把 authority 继续拆散
+### 方案 B：放宽 gate 检查范围
 
-### Option C：先 materialize umbrella owner，再吸收或合法化子切片
+- 优点：快速恢复 push
+- 缺点：治标不治本，积累更多技术债
 
-- 优点：先恢复 canonical authority，再决定 leaf-level 归属
-- 缺点：要求 parent lane 显式记录 child-slice truth，而不是把关系藏在口头说明里
+### 方案 C：分阶段修复
 
-## Route Decision
+- 先修复阻塞 push 的问题（已 staged 的改动相关）
+- 后续逐步修复历史遗留问题
+- 优点：平衡短期和长期目标
+- 缺点：需要明确定义优先级
 
-- 采用 Option C
-- 当前 `1100` 先负责：
-  - materialize umbrella owner
-  - 把 `1200/1201/1202/1203` 从伪 promoted 状态纠正为 lawful pre-brainstorm child slices
-  - 维持 gate 严格度不变，后续再做具体 legacy artifact backfill
+## Proposed Approach
 
-## Acceptance Targets (Pre-Brainstorm)
+采用方案 C，分阶段修复：
 
-- `1100` 的 candidate / issue / progress / milestone entry 必须形成单义 owner truth
-- `1200/1201/1202/1203` 在 canonical docs 中必须有可追溯 parent relation，且不再指向不存在 issue
-- 下一跳必须从“先把当前 repair 的治理链修好”开始，而不是先讨论如何豁免当前 gate
+### Phase 1：修复阻塞 push 的问题
+
+1. 修复已 staged 改动相关的治理链
+2. 恢复缺失的 pre-brainstorm 目录
+3. 确保当前改动可以 push
+
+### Phase 2：批量修复历史遗留问题
+
+1. 分析所有 358 个问题
+2. 分类修复：
+   - 缺失文件：从历史 commit 恢复或创建占位符
+   - 格式问题：修正格式
+   - 引用断裂：修正引用
+
+### Phase 3：加固治理检查
+
+1. 添加 pre-commit 检查防止新增断裂
+2. 添加批量修复工具
 
 ## Open Questions
 
-1. 这四个子切片最终应全部 absorbed 到 `I-20260403-1100-A`，还是其中部分后续独立 materialize？
-2. legacy drift 的实际 backfill 应按 field class 批量推进，还是按 owner lineage 分批推进？
-3. 完成这轮 canonical repair 后，哪些已完成或陈旧 worktree 应立即退休，避免继续污染 fleet 判断？
+1. 是否需要为每个断裂创建单独的 issue，还是批量处理？
+2. 历史遗留问题的修复优先级如何定义？
+3. 是否需要引入"legacy_backfill"标记来区分历史补录？
