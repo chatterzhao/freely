@@ -3,15 +3,15 @@
 ## Canonical Parent
 
 - issue_id: `I-20260403-1100-A`
-- current_repair_branch: `feature/governance-doc-truth-repair-20260404-1105`
-- current_repair_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-1105-feature-governance-doc-truth-repair`
+- closing_repair_branch: `feature/governance-1100-closeout-20260404-0648`
+- closing_repair_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-0648-feature-governance-1100-closeout`
 
 ## Relationship Facts
 
 1. `1200/1201/1202/1203` were historical repair slices created during the original governance-chain unblock batch.
 2. Those slice directories and worktrees are no longer present in the current filesystem, so they are not active execution lanes.
 3. Their relationship to `1100` remains historical governance ownership, not git ancestry.
-4. Therefore `1100` keeps the parent-child map as historical truth, while current execution stays in the dedicated doc-truth-repair lane.
+4. Therefore `1100` keeps the parent-child map as historical truth; there is no current execution lane under this owner after the 2026-04-04 closeout.
 
 ## Historical Child Slice Map
 
@@ -50,4 +50,4 @@
 ## Closure Rule
 
 - No retired historical slice may be reintroduced into canonical docs as active work without a fresh pre-brainstorm and lawful issue/progress chain.
-- `1100` remains the umbrella owner for the repaired governance truth until this followthrough merges and verification closes.
+- `1100` remains only the historical umbrella owner of record for the repaired governance truth. Any new work must open a fresh lifecycle instead of reactivating this owner.

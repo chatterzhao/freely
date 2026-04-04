@@ -50,24 +50,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260403-1100-A`
-- title: Governance chain legacy repair for develop push unblock
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
-- source_brainstorm: `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/candidates.md`
-- next_action: Continue the legacy governance-chain repair from the now-materialized umbrella owner, keep `1200/1201/1202/1203` as lawful parent-linked child slices, then advance the actual artifact backfill and validation batch.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
-  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/prd.md`
-  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
-
-2. `I-20260404-0119-A`
+1. `I-20260404-0119-A`
 - title: Governance merge gate milestone status followthrough governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -85,7 +68,7 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
   - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
 
-3. `I-20260404-0232-A`
+2. `I-20260404-0232-A`
 - title: Governance merge gate review-aware regression alignment governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -103,7 +86,7 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
   - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
 
-4. `I-20260403-2245-A`
+3. `I-20260403-2245-A`
 - title: Sandbox-compatible runtime bootstrap and operator-state governance
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -120,7 +103,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/tasks.md`
   - `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 
-5. `I-20260404-0640-A`
+4. `I-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -183,6 +166,22 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md`
 - completion_note: `Canonical develop absorbed protected-branch break-glass governance through receipt-bearing merge 52f55c0, and the closeout lane recorded both historical break-glass receipts and post-merge verification evidence.`
+2. `I-20260403-1100-A`
+- title: Governance chain legacy repair for develop push unblock
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
+- source_brainstorm: `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/candidates.md`
+- evidence:
+  - `develop` merge `1d87824`
+  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
+  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/child-slice-status.md`
+  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/code-reviews/20260403-governance-chain-legacy-repair-implementation-decision.md`
+  - `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
+- completion_note: The 2026-04-04 truth-repair merge restored the missing `1100` owner artifacts, retired deleted `1200/1201/1202/1203` slices to historical status, and cleared dangling canonical references. Any future governance-chain backfill must reopen from current `develop` as a new lifecycle instead of reviving `1100` as an active owner.
 1. `I-20260402-0455-A`
 - title: Worktree exclusive ownership and promotion lease governance
 - milestone_state: completed

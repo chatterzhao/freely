@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260403-1100-A`
 - title: Governance chain legacy repair for develop push unblock
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `governance-chain-legacy-repair`
@@ -35,7 +35,7 @@
 
 ## Scope
 
-1. Materialize this repair as the canonical umbrella owner for the current legacy governance-chain unblock effort.
+1. Materialize this repair as the canonical umbrella owner for the legacy governance-chain unblock effort that was completed on 2026-04-04.
 2. Enumerate the concrete legacy drift classes that are currently blocking `governance-merge-gate`.
 3. Normalize the historical repair-slice record for:
    - `20260403-1200--verification-artifact-dir-repair`
@@ -43,7 +43,7 @@
    - `20260403-1202--candidate-touched-repair`
    - `20260403-1203--issue-id-key-repair`
 4. Repair the governance artifacts and gate behavior without weakening the current standards just to get `develop` unstuck.
-5. Produce enough canonical issue/progress evidence that later promotion or cleanup decisions can refer to one lawful owner.
+5. Produce enough canonical issue/progress evidence that later promotion or cleanup decisions can refer to one lawful historical owner.
 
 ## Non-Goals
 
@@ -55,10 +55,10 @@
 
 ## Acceptance
 
-1. `I-20260403-1100-A` must exist as the canonical owner for the current legacy governance-chain unblock work.
+1. `I-20260403-1100-A` must exist as the canonical owner of record for the completed legacy governance-chain unblock work.
 2. Historical repair slices must not remain represented as active execution lanes without a current filesystem presence or a lawful issue/progress chain.
 3. The parent lane must keep the current gate strictness and repair legacy truth instead of broadening exemptions.
-4. `docs/milestones.md`, the issue, and the progress artifact must all agree that this owner is the current dev-loop authority.
+4. `docs/milestones.md`, the issue, and the progress artifact must all agree that this owner is completed historical traceability, not current dev-loop authority.
 5. The issue-bound decision note must explain why the current approach favors canonical repair and absorption over gate weakening.
 
 ## Current Artifact Set
@@ -88,4 +88,5 @@
 
 ## Next
 
-- Keep `1100` as the canonical umbrella owner while the restored owner docs, historical slice inventory, and dangling-reference cleanup converge back to current canonical truth.
+- `2026-04-04` closeout: canonical owner restoration, historical slice inventory, and dangling-reference cleanup are complete.
+- Future governance-chain drift must open from current `develop` as a new lifecycle instead of reopening `1100`.

@@ -10,18 +10,18 @@
 
 ## Current Repo Facts
 
-1. `1100` 在 `milestones` 与 candidate 中仍被当作 canonical umbrella owner 使用
-2. 当前树中缺失 `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/**` 与 `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
+1. `1100` 曾在 `milestones` 与 candidate 中被当作 canonical umbrella owner 使用
+2. 当前树中缺失的 `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/**` 与 `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md` 已在 2026-04-04 truth-repair 中恢复
 3. `20260402-1912` 已明确写明不要再复用已删除且 stale 的 `1719`
-4. 当前需要修的不是 gate 放宽，而是 canonical truth 对齐与残留引用清理
+4. 当前需要修的不是 gate 放宽，而是 canonical truth 对齐、残留引用清理，以及把 `1100` 从活跃 owner 语义收口为历史完成态
 
 ## Problem
 
 ### 核心问题
 
 1. **umbrella owner 真相断裂**
-   - `1100` 已经被写成 promoted / committed owner
-   - 但它对应的 issue / progress / epic 文档被误删，导致 owner 链只剩半套真相
+   - `1100` 曾被写成 promoted / committed owner
+   - 但它对应的 issue / progress / epic 文档被误删，导致 owner 链只剩半套真相，并留下错误的 active-owner 叙述
 
 2. **已删除 repair slices 仍被 canonical 文档消费**
    - `1200/1201/1202/1203` 与 `1719` 已删除
@@ -33,10 +33,10 @@
 
 ## Solution Space
 
-### 方案 A：恢复 `1100` 的 canonical owner 链并清理残留引用
+### 方案 A：恢复 `1100` 的 canonical owner 链，再把它收口为 historical/completed truth 并清理残留引用
 
-- 优点：保持当前 milestone / candidate / owner 语义一致，修复最少的 canonical truth 缺口
-- 缺点：需要补回误删的 owner artifact，并同步刷新叙述
+- 优点：先补齐最少 canonical truth 缺口，再合法关闭 active-owner 语义
+- 缺点：需要补回误删的 owner artifact，并同步刷新多处历史叙述
 
 ### 方案 B：把 `1100` 直接降级或退休，只保留 pre-brainstorm
 
@@ -50,9 +50,9 @@
 
 ## Proposed Approach
 
-采用方案 A，围绕 canonical owner 对齐修复：
+采用方案 A，并在 truth repair 完成后立即关闭活跃 owner 语义：
 
-### Phase 1：恢复 umbrella owner 真相
+### Phase 1：恢复 umbrella owner 真相并冻结 closeout 依据
 
 1. 恢复 `1100` 的 issue / progress / issue-bound artifacts
 2. 保持 candidate / milestone 对 `1100` 的 owner 叙述不再指向不存在目标
@@ -68,8 +68,9 @@
 1. `./bin/governance-check`
 2. targeted missing-path sweep
 3. merge back through guarded develop path
+4. 把 `1100` 写回 completed/historical truth，禁止后续把它当作 current umbrella owner 继续推进
 
 ## Open Questions
 
-1. `1100` 在本轮修复后是否应继续保留为 active owner，还是在下一轮 completion verification 里正式关闭？
-2. 未来若再出现 governance repair slices，是否需要专门的 cleanup gate 防止 owner artifact 被误删而 milestone truth 未同步？
+1. 结论：`1100` 不再保留为 active owner，而是作为 2026-04-04 truth-repair 的 completed historical owner 留痕。
+2. 未来若再出现 governance repair slices，应直接新开 lifecycle，并评估是否需要额外 cleanup gate 防止 owner artifact 被误删而 milestone truth 未同步。
