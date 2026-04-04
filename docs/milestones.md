@@ -85,6 +85,17 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260404-0640-A`. Keep the owner scoped to ancestry receipt-gap backfill and audit for ordinary protected merges only.
 - revisit_trigger: Re-open only if another ordinary protected merge is found without canonical trailers or the ancestry audit still misses such gaps after this followthrough lands.
 
+4. `C-20260404-1545-A`
+- title: Bound runtime supervision when websocket permission-denied failures block manager continuity and intake claim
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md`
+- next_action: Decide whether to promote this as a follow-on to runtime network failure governance or as a new supervision-owned lifecycle for blocked intake and continuity truth, using the prompt-visible-but-unclaimed evidence plus slot-switch and fork-exhaustion signals.
+- revisit_trigger: Revisit if a fresh root runtime can successfully claim the pending intake and write a new continuity despite websocket permission-denied churn, or if an existing owner is updated to absorb this exact blocked-state contract.
+
 ### completed_issues
 1. `I-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
