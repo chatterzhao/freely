@@ -16,15 +16,18 @@
 
 ## Commands
 
-1. `git push --dry-run origin develop`
+1. `git diff --check`
 2. `./bin/governance-check`
 3. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 4. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
+5. `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-implementation-decision.md`
 
-## Implementation Decision Note
+## Findings
 
-- decision: `Backfill the four same-day protected merge commits in the ordinary protected-merge receipt-gap ledger and verify them under the existing receipt-gap followthrough owner.`
-- why_this: `These merges already exist on protected-branch ancestry and the lawful repair is audit backfill rather than history rewrite or bypass, even when one of the gaps is a protected source-branch merge from develop into a feature worktree.`
-- alternatives_considered: `Considered leaving the newest gap for a later batch and considered opening a new owner just for the manager-bootstrap branch merge. The former leaves develop failing governance-check, and the latter duplicates an active owner that already exists for exactly this repair class.`
-- boundary_non_goals: `This continuation does not weaken merge trailer policy, does not alter merge history, and does not reopen broader protected-branch hardening work.`
-- residual_risk: `Any additional protected merges created without canonical trailers on the same day will still require their own backfill entries until the merge path is consistently emitting receipts.`
+1. `PASS`: governance-check now accepts the canonical backfill for `70ef97d` by validating its `develop -> feature/...` merge subject instead of rejecting non-protected ledger targets outright.
+2. `PASS`: the focused receipt-gap regression now covers a trailerless merge into `feature/*` that later becomes reachable from protected ancestry, matching the live blocker class instead of only direct `develop` merges.
+
+## Residual Risks
+
+- any future ancestry gap whose merge subject cannot be parsed still fails closed and will need a narrower repair path
+- this continuation still assumes the ledger remains limited to develop/main/test-pre-merge ancestry repair rather than becoming a generic merge exception table
