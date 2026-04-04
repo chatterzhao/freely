@@ -5,8 +5,8 @@
 - phase_state: `in_dev`
 - runtime_state: `in_feature_worktree`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/protected-branch-merge-receipt-gap-followthrough-20260404-0718`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-0718-feature-protected-branch-merge-receipt-gap-followthrough`
+- branch: `feature/protected-branch-merge-receipt-gap-followthrough-20260404-0732`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-0732-feature-protected-branch-merge-receipt-gap-followthrough`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "materialization-and-dev-loop"}
 
