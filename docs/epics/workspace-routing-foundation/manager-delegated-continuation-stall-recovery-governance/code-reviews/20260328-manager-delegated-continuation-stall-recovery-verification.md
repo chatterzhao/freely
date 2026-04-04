@@ -26,3 +26,11 @@
 
 - 真实 post-merge dogfood 还没重开，因此 `develop` 上的 live acceptance 仍待 merge 后执行。
 - broader control-plane command semantics 仍在独立冻结 lane，不属于本 issue。
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

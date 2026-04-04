@@ -18,3 +18,11 @@
 4. Current backlog drift was normalized: active candidates that were still `unassigned` or `pending://milestone-binding` are now bound back into the active milestone queue, so the new gate closes a real gap instead of only asserting a hypothetical one.
 5. `./bin/governance-check` passes in this worktree; the only residual output is the pre-existing legacy naming warnings, not placement or traceability failures.
 6. Post-merge replay exposed one narrow develop-merge follow-up: unresolved candidate placement repairs still hit the per-candidate owner requirement. The follow-up keeps `promoted` / `absorbed` strict, but allows unresolved `proposed|needs_research|blocked` candidate metadata repairs to travel inside the current governance owner while the same merge carries issue/progress/review evidence.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

@@ -31,6 +31,8 @@
 - decision_reason: 与多项目隔离交互主线一致，已形成明确实现边界。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260308-frontend-probe-dogfooding-loop
+- next_action: 继续预研，等待前端 probe 稳定后再推进多项目 UI 隔离实现。
+- revisit_trigger: 当前端 probe dogfooding 完成后需要多项目交互能力时，再推进到 IBM。
 - session_refs: []
 
 ### C-20260304-203

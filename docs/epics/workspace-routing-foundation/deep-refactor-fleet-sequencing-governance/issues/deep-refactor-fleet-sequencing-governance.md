@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `deep-refactor-fleet-sequencing-governance`
 - issue-name: `deep-refactor-fleet-sequencing-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/candidates.md#c-20260326-1825-a`
 - source_brainstorm: `docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/brainstorms.md`

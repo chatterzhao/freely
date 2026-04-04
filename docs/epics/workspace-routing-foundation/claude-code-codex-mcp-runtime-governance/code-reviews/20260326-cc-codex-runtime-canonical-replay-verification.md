@@ -1,6 +1,6 @@
 # Verification: claude-code-codex-mcp-runtime-governance canonical replay
 
-- issue: `I-20260321-0217`
+- issue_id: `I-20260321-0217`
 - date: `2026-03-26`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`

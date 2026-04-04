@@ -1,6 +1,6 @@
 # Code Review - milestone-planning-state-maintenance-verification
 
-- issue: `I-20260320-0512`
+- issue_id: `I-20260320-0512`
 - date: `2026-03-20`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`

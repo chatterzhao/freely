@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-chat-reentry-and-cleanup-misrouting-governance`
 - issue-name: `manager-chat-reentry-and-cleanup-misrouting-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/candidates.md#c-20260321-1925-a`
 - source_brainstorm: `docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/brainstorms.md`
 - execution_base: `develop`

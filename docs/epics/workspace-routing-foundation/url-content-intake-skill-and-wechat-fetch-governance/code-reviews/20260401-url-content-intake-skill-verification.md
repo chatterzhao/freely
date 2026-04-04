@@ -23,3 +23,11 @@
 - `docs/system/workspace/skills/url-content-intake/scripts/fetch-url.sh`
 - `docs/system/workspace/skills/url-content-intake/scripts/extract-readable-content.sh`
 - `docs/system/workspace/scripts/tests/test-url-content-intake-skill`
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

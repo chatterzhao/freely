@@ -1,4 +1,5 @@
 # Code Review: manager-delegation-after-sufficient-patrol-evidence-governance
+- issue_id: `I-20260322-0228`
 
 ## Scope
 

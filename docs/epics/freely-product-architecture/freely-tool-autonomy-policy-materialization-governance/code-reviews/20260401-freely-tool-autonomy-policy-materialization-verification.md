@@ -27,3 +27,11 @@
 - `docs/system/workspace/scripts/tests/test-freely-init-cc-config`
 - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
 - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-cc-args`
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

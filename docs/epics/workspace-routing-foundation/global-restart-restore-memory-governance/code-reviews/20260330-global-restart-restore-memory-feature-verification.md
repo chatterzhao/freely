@@ -20,3 +20,11 @@
 - replay 只 stop/start restart 前本来就应恢复的 projects，显式排除 operator-stopped worktree；如果某个 previously-running project 缺 mandatory anchors，则会写出 manifest 并 hard-block replay。
 - `session-state.env` 等 auxiliary runtime artifacts 仍不会被升格成 mandatory restore truth。
 - parent taxonomy regression `test-freely-project-command-semantics` 继续通过，说明这轮只扩了 global restart restore memory owner，没有把 `I-20260327-2006-A` 的 command semantics 打回去。
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260404-0119--governance-merge-gate-milestone-status-followthrough
+  - brainstorms: docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md
 - 20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state
   - brainstorms: docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/brainstorms.md
   - candidates: docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/candidates.md
@@ -38,15 +41,132 @@
 - 20260402-1912--protected-branch-merge-receipt-hardening
   - brainstorms: docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md
+- 20260402-1719--hook-bypass-break-glass-governance
+  - brainstorms: docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/candidates.md
+- 20260402-0020--hook-bypass-breakglass-governance
+  - brainstorms: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md
+- 20260402-0455--worktree-exclusive-ownership-governance
+  - brainstorms: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/candidates.md
+- 20260402-0540--runtime-loop-log-timezone-label-followthrough
+  - brainstorms: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/candidates.md
+- 20260402-0403--canonical-product-posture-bootstrap-reconciliation
+  - brainstorms: docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/candidates.md
+- 20260401-0040--supply-chain-audit-and-install-intake-capability
+  - brainstorms: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/candidates.md
+- 20260401-0115--supply-chain-baseline-and-install-intake-audit-capability
+  - brainstorms: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md
+- 20260401-2354--implementation-decision-notes-in-review-artifacts
+  - brainstorms: docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md
+- 20260401-2316--cc-acp-init-autonomy-consent-test-followthrough
+  - brainstorms: docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/candidates.md
+- 20260401-1831--worker-reactivation-reentry-residual-runtime-gaps
+  - brainstorms: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md
+- 20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection
+  - brainstorms: docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/candidates.md
+- 20260401-1545--acp-client-agent-protocol-runtime-adoption
+  - brainstorms: docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md
 - 20260401-1308--workspace-security-capability-baseline-governance
   - brainstorms: docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md
 - 20260401-1303--freely-product-security-baseline-governance
   - brainstorms: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md
-- 20260402-1719--hook-bypass-break-glass-governance
-  - brainstorms: docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/candidates.md
+- 20260401-1308--workspace-security-capability-baseline-governance
+  - brainstorms: docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md
+- 20260331-2012--active-milestone-placement-and-consumption-gate
+  - brainstorms: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md
+- 20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance
+  - brainstorms: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/candidates.md
+- 20260331-1837--worker-first-hop-role-boundary-regression
+- 20260330-2318--live-status-already-running-attach-regression
+- 20260330-2358--network-failure-recovery-governance
+- 20260331-1840--multi-tool-group-auto-switch-governance
+- 20260401-0840--all-tools-unified-slot-contract-governance
+- 20260329-2155--sensitive-local-artifact-ignore-governance
+- 20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle
+- 20260328-2105--resume-evidence-strength-and-false-positive-resume-governance
+- 20260328-0745--live-status-current-runtime-state-reconciliation
+- 20260327-2006--start-restart-control-plane-semantics
+- 20260327-1845--manager-consumed-continuity-resume-routing-drift
+- 20260327-1003--prebrainstorm-materialization-audit
+- 20260327-0651--pretests-gate-and-network-proxy-config
+- 20260326-1705--manager-owner-stance-and-source-patrol
+- 20260327-1115--oauth-api-usage-query-refactor
+- 20260326-1825--deep-refactor-fleet-sequencing
+- 20260326-0445--manager-delegated-intake-absorption-closure
+- 20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance
+- 20260325-0525--watchdog-slot-sweep-without-cooldown-governance
+- 20260325-0333--testing-evidence-ladder-and-real-environment-gates
+- 20260324-0405--watchdog-restart-storm-and-process-churn-detection
+- 20260324-0415--application-native-observability-planes
+- 20260323-2045--manager-worker-scheduler-capacity-and-queueing
+- 20260323-1705--manager-delegated-continuation-stall-recovery
+- 20260323-1835--worker-delegated-continuation-active-stall-recovery
+- 20260323-1435--interactive-init-bootstrap-and-force-governance
+- 20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion
+- 20260323-1135--codex-account-active-probe-governance
+- 20260322-1802--pre-test-merge-semantic-audit-and-recovery
+- 20260322-1801--pre-test-merge-governance-lifecycle
+- 20260321-1835--lifecycle-complete-before-merge-governance
+- 20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery
+- 20260321-1715--manager-patrol-trigger-and-restart-routing
+- 20260321-1430--external-drift-and-out-of-band-reconcile
+- 20260322-0715--pre-test-merge-post-merge-acceptance-stall
+- 20260322-0445--latest-manager-continuity-worker-consumption
+- 20260322-0245--runtime-worker-launch-linkage-and-stall-recovery
+- 20260322-0412--worker-active-reentry-for-manager-delegated-continuation
+- 20260322-0228--manager-delegation-after-sufficient-patrol-evidence
+- 20260321-1925--manager-chat-reentry-and-cleanup-misrouting
+- 20260321-1706--chat-triggered-worker-runtime-reactivation
+- 20260321-2010--explicit-session-addressed-resume-over-last-and-pty
+- 20260321-1515--remote-branch-retirement-governance
+- 20260321-1530--agent-ready-prd-for-freely-flow
+- 20260321-1435--legacy-promoted-candidate-normalization
+- 20260321-1045--stacked-worktree-merge-chain-governance
+- 20260321-0345--manager-reactivation-and-fleet-patrol
+- 20260321-0257--worktree-fleet-governance-closure
+- 20260320-1745--dirty-worktree-governance-redesign
+- 20260320-1628--claude-code-codex-mcp-tool-routing
+- 20260321-0148--cc-codex-session-evidence-resolution
+- 20260320-2145--cc-tool-profiles-and-concurrent-session-continuity
+- 20260320-1410--worktree-maintenance-skill-taxonomy
+- 20260320-0908--research-candidate-persistence-governance
+- 20260320-0605--agent-state-time-machine-and-shared-continuity
+- 20260320-0512--milestone-planning-and-state-maintenance
+- 20260320-0500--candidate-acceptance-review-governance
+- 20260320-0252--interruption-topology-and-manager-routing
+- 20260320-0152--chat-entrypoint-autobootstrap
+- 20260320-0138--interruption-entrypoint-runtime-preflight
+- 20260320-0120--interruption-manager-agent-triage
+- 20260320-0052--interruption-direct-answer-control-plane
+- 20260320-0018--default-project-resolution-and-authorized-project-memory
+
+本目录是 pre-brainstorm 记录的规范结构。
+
+兼容说明：
+- 若目录名、候选名或历史留痕仍出现 `pre-test-merge`，默认将其解释为当前 canonical 的 `test-pre-merge-*` 测试批次前缀族。
+- 为保持既有引用稳定，本索引不会因为语义升级而大规模重命名历史目录。
+
+## 命名规则
+- 新目录名必须使用 `YYYYMMDD-HHMM--<topic>` 格式。
+- 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
+
+## 条目
 - 20260402-0020--hook-bypass-breakglass-governance
   - brainstorms: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md
@@ -137,6 +257,9 @@
 - 20260326-0445--manager-delegated-intake-absorption-closure
   - brainstorms: docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/brainstorms.md
   - candidates: docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/candidates.md
+- 20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance
+  - brainstorms: docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md
 - 20260325-0525--watchdog-slot-sweep-without-cooldown-governance
   - brainstorms: docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md
@@ -167,12 +290,6 @@
 - 20260323-1135--codex-account-active-probe-governance
   - brainstorms: docs/pre-brainstorms/20260323-1135--codex-account-active-probe-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260323-1135--codex-account-active-probe-governance/candidates.md
-- 20260322-1802--pre-test-merge-semantic-audit-and-recovery
-  - brainstorms: docs/pre-brainstorms/20260322-1802--pre-test-merge-semantic-audit-and-recovery/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260322-1802--pre-test-merge-semantic-audit-and-recovery/candidates.md
-- 20260322-1801--pre-test-merge-governance-lifecycle
-  - brainstorms: docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md
 - 20260321-1835--lifecycle-complete-before-merge-governance
   - brainstorms: docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/candidates.md
@@ -191,9 +308,6 @@
 - 20260322-0445--latest-manager-continuity-worker-consumption
   - brainstorms: docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md
   - candidates: docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md
-- 20260322-0412--worker-active-reentry-for-manager-delegated-continuation
-  - brainstorms: docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md
 - 20260322-0245--runtime-worker-launch-linkage-and-stall-recovery
   - brainstorms: docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/brainstorms.md
   - candidates: docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/candidates.md
@@ -245,24 +359,6 @@
 - 20260320-1410--worktree-maintenance-skill-taxonomy
   - brainstorms: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/candidates.md
-- 20260320-0252--interruption-topology-and-manager-routing
-  - brainstorms: docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/candidates.md
-- 20260320-0152--chat-entrypoint-autobootstrap
-  - brainstorms: docs/pre-brainstorms/20260320-0152--chat-entrypoint-autobootstrap/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-0152--chat-entrypoint-autobootstrap/candidates.md
-- 20260320-0138--interruption-entrypoint-runtime-preflight
-  - brainstorms: docs/pre-brainstorms/20260320-0138--interruption-entrypoint-runtime-preflight/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-0138--interruption-entrypoint-runtime-preflight/candidates.md
-- 20260320-0120--interruption-manager-agent-triage
-  - brainstorms: docs/pre-brainstorms/20260320-0120--interruption-manager-agent-triage/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-0120--interruption-manager-agent-triage/candidates.md
-- 20260320-0052--interruption-direct-answer-control-plane
-  - brainstorms: docs/pre-brainstorms/20260320-0052--interruption-direct-answer-control-plane/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-0052--interruption-direct-answer-control-plane/candidates.md
-- 20260320-0018--default-project-resolution-and-authorized-project-memory
-  - brainstorms: docs/pre-brainstorms/20260320-0018--default-project-resolution-and-authorized-project-memory/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-0018--default-project-resolution-and-authorized-project-memory/candidates.md
 - 20260303-0000--ai-consistency-closed-loop-freely-alignment
   - brainstorms: docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/brainstorms.md
   - candidates: docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/candidates.md
@@ -467,9 +563,6 @@
 - 20260401-2245--build-artifact-exposure-and-release-allowlist-capability
   - brainstorms: docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/candidates.md
-- 20260404-0119--governance-merge-gate-milestone-status-followthrough
-  - brainstorms: docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md

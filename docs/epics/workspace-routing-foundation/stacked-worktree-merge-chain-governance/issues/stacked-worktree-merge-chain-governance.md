@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `stacked-worktree-merge-chain-governance`
 - issue-name: `stacked-worktree-merge-chain-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/candidates.md#c-20260321-1045-001`
 - source_brainstorm: `docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/brainstorms.md`
 - execution_base: `develop`

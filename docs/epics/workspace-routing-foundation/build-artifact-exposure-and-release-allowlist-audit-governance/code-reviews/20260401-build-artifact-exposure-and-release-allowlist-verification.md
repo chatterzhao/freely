@@ -41,3 +41,11 @@ bun run build
 
 1. This owner intentionally does not absorb broader supply-chain policy, generalized secret scanning outside build output, or external SaaS scanners.
 2. Repos without build output continue to skip this audit in `doctor`; that is intentional for this slice and avoids pretending every repo is a frontend build target.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

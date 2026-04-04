@@ -43,3 +43,11 @@
 
 - `I-20260317-0332` 可以从 `in_dev` 推进到 `in_verification`
 - `I-20260308-1244-03` 的 blocker 应从“真实 Tauri 宿主尚未实际启动”收窄为“等待真实 tauri transport 最小交互闭环写回”
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

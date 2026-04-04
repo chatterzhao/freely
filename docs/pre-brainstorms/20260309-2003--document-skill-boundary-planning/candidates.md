@@ -52,6 +52,8 @@
 - decision_reason: 这是控制重构与实现边界、避免“不断修改掉进地狱”的前置治理能力。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260306-workspace-routing-foundation
+- next_action: 继续预研，明确评审分流规则与循环提交粒度边界后再推进。
+- revisit_trigger: 当 Freely 需要显式治理评审与循环边界时，再推进到 IBM。
 - session_refs: []
 - capability_class: governance
 - rollout_mode:

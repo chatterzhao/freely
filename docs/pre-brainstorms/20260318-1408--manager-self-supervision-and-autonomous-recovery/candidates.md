@@ -25,5 +25,6 @@
   - 文档明确列出哪些情况属于“AI/manager/worker 无能为力”，并由 runtime / scripts 接管。
   - 至少有一个测试锁住“后台失活不需人工检查即可被主管发现”的行为。
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
+- legacy_id_mapping: I-20260318-1408  # 历史遗留的 issue id
 - session_refs: []
 - milestone: `M-20260306-workspace-routing-foundation`

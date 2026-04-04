@@ -55,6 +55,7 @@
 - next_action: 按已冻结的职责分工回写 `PROJECT_INTENT / CONSTITUTION / LAWS / AGENTS.md`，并完成 milestone、issue 与 verification evidence 收口。若过程中持续出现“通用产品形态方法”需求，再单独判断是否新开预研。
 - revisit_trigger: 若后续再次出现需要把 Freely 当前产品形态泛化成通用方法的需求，开新 pre-brainstorm，而不是回退本条已提升 issue。
 - promoted_issue_path: `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/issues/freely-layered-architecture-and-tooling-topology.md`
+- legacy_id_mapping: I-20260326-1810  # 历史遗留的 issue id
 - milestone: `docs/milestones.md#m-20260326-freely-product-architecture`
 - session_refs:
   - tool: codex

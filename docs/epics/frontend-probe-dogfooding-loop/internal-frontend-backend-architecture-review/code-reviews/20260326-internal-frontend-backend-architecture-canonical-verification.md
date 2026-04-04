@@ -1,6 +1,6 @@
 # Code Review - internal-frontend-backend-architecture-canonical-verification
 
-- issue: `I-20260308-1245`
+- issue_id: `I-20260308-1245`
 - date: `2026-03-26`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`

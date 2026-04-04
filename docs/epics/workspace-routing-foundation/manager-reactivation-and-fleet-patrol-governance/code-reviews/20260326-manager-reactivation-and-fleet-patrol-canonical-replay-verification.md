@@ -1,4 +1,5 @@
 # Code Review: manager-reactivation-and-fleet-patrol-governance canonical replay
+- issue_id: `I-20260321-0345`
 
 - verdict: pass
 - date: `2026-03-26`

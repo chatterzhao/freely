@@ -1,6 +1,6 @@
 # Code Review - human-chat-intake-and-manager-delegation-verification
 
-- issue: `I-20260319-1715`
+- issue_id: `I-20260319-1715`
 - date: `2026-03-20`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`

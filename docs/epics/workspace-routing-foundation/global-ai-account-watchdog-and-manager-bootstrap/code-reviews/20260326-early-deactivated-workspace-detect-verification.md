@@ -1,6 +1,6 @@
 # Code Review: early-deactivated-workspace-detect verification
 
-- issue: `I-20260318-1630`
+- issue_id: `I-20260318-1630`
 - branch: `feature/watchdog-probe-early-deactivated-workspace-detect-20260326`
 - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260326-feature-watchdog-probe-early-deactivated-workspace-detect`
 - status: `pass`

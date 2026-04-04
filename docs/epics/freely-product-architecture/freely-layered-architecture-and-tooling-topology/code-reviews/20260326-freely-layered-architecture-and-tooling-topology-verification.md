@@ -1,4 +1,5 @@
 # Verification Review: freely-layered-architecture-and-tooling-topology
+- issue_id: `I-20260326-1810`
 
 - date: `2026-03-26`
 - reviewer: `codex`

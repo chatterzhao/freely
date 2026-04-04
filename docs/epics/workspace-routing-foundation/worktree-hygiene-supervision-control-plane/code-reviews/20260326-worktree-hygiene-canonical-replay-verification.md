@@ -1,4 +1,5 @@
 # Code Review: worktree-hygiene-supervision-control-plane canonical replay
+- issue_id: `I-20260318-1825`
 
 - verdict: pass
 - date: `2026-03-26`

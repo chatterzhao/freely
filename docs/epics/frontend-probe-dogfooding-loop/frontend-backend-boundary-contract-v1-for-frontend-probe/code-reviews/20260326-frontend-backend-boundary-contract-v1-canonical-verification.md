@@ -1,6 +1,6 @@
 # Code Review - frontend-backend-boundary-contract-v1-canonical-verification
 
-- issue: `I-20260317-1001`
+- issue_id: `I-20260317-1001`
 - date: `2026-03-26`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`

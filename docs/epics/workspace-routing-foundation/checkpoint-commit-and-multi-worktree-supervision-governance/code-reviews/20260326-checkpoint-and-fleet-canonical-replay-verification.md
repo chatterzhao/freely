@@ -1,4 +1,5 @@
 # Code Review: checkpoint-commit-and-multi-worktree-supervision-governance canonical replay
+- issue_id: `I-20260318-0930`
 
 - verdict: pass
 - date: `2026-03-26`

@@ -1,6 +1,6 @@
 # Code Review - backend-service-contract-and-adapter-taxonomy-canonical-verification
 
-- issue: `I-20260312-0011`
+- issue_id: `I-20260312-0011`
 - date: `2026-03-26`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`

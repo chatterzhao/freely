@@ -15,5 +15,6 @@
 - status: promoted
 - decision_reason: 这条问题边界已经足够稳定，应直接提升为独立 issue-bound IBM，而不是继续停留在 pre-brainstorm。
 - promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md
+- legacy_id_mapping: I-20260317-1004  # 历史遗留的 issue id
 - milestone: M-20260308-frontend-probe-dogfooding-loop
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}]

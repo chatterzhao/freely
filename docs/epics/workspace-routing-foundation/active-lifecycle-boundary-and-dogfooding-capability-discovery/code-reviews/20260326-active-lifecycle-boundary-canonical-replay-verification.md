@@ -1,6 +1,6 @@
 # Verification: active-lifecycle-boundary-and-dogfooding-capability-discovery canonical replay
 
-- issue: `I-20260321-1745`
+- issue_id: `I-20260321-1745`
 - date: `2026-03-26`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`

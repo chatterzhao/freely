@@ -1,4 +1,5 @@
 # Code Review: chat-triggered-worker-runtime-reactivation-governance verification
+- issue_id: `I-20260321-1706`
 
 - date: `2026-03-21`
 - reviewer: `codex`

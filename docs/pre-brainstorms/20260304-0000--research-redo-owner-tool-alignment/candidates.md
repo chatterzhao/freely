@@ -80,6 +80,8 @@
 - decision_reason: 方向重要但需先明确当前阶段并发范围与最小可行边界。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260306-workspace-routing-foundation
+- next_action: 继续预研，确定 sub-agent 批次编排的最小边界后再决定是否 materialize。
+- revisit_trigger: 当 Freely 需要支持并行委托时，再推进到 IBM。
 - session_refs: []
 
 ### C-20260304-606

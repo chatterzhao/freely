@@ -1,4 +1,5 @@
 # Code Review: state-sync-and-session-evidence-governance canonical replay
+- issue_id: `I-20260308-0101`
 
 - verdict: pass
 - date: `2026-03-26`

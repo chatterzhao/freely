@@ -1,6 +1,6 @@
 # Code Review - checkpoint-and-fleet-verification
 
-- issue: `I-20260318-0930`
+- issue_id: `I-20260318-0930`
 - date: `2026-03-18`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`

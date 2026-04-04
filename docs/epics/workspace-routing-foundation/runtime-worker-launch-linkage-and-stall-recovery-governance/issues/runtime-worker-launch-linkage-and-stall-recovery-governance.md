@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-worker-launch-linkage-and-stall-recovery-governance`
 - issue-name: `runtime-worker-launch-linkage-and-stall-recovery-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/candidates.md#c-20260322-0245-a`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/brainstorms.md`

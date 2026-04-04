@@ -43,3 +43,11 @@ Live-status during the post-switch launch showed:
 - `last_exit_reason: starting`
 
 That is the expected transitional truth while `codex` is launching, and it replaces the earlier false `running/up/up/already_running_attach` state.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `explicit-session-addressed-resume-governance`
 - issue-name: `explicit-session-addressed-resume-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/code-reviews`
 - priority: P1
 - source_candidate: `docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/candidates.md#c-20260321-2010-a`
 - source_brainstorm: `docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/brainstorms.md`

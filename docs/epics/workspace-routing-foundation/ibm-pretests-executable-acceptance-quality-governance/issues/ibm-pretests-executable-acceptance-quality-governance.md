@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `ibm-pretests-executable-acceptance-quality-governance`
 - issue-name: `ibm-pretests-executable-acceptance-quality-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/candidates.md#c-20260326-1733-a`
 - source_brainstorm: `docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/brainstorms.md`

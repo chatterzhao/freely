@@ -16,6 +16,8 @@
 - decision_reason: 方向仍有价值，但当前没有一条精确 issue 对其进行独立承接；不应伪装成已 promotion。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260306-workspace-routing-foundation
+- next_action: 继续预研，确定 Ring/SSOT 规则契约化的最小边界后再决定是否 materialize。
+- revisit_trigger: 当 doc/dev skills 需要统一一致性检查契约时，再推进到 IBM。
 - session_refs: []
 
 ### C-20260303-002
@@ -28,6 +30,8 @@
 - decision_reason: 方向合理但缺少与当前执行链路的最小实现边界，需补方案再晋升。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260306-workspace-routing-foundation
+- next_action: 继续预研，明确独立监理 gate 与现有 auto-loop 的集成边界后再决定是否 materialize。
+- revisit_trigger: 当 auto-loop 需要外部质量门禁时，再推进到 IBM。
 - session_refs: []
 
 ### C-20260303-003

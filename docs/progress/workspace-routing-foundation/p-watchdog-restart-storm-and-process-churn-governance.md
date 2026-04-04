@@ -1,6 +1,6 @@
 # Progress: watchdog-restart-storm-and-process-churn-governance
 
-- issue: `I-20260324-0405`
+- issue_id: `I-20260324-0405`
 - title: Watchdog restart-storm and process-churn governance
 - phase_state: `completed`
 - runtime_state: `closed_for_this_batch`

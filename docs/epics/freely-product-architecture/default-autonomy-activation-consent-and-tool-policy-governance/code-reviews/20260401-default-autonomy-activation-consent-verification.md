@@ -22,3 +22,11 @@
 - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/pre-tests.md`
 - `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
 - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

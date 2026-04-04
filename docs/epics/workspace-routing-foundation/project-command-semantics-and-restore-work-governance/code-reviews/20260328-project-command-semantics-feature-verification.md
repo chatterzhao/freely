@@ -23,3 +23,11 @@
 - Focused regressions now lock project-identity anchored process handling, sidecar readiness gates, attach/reuse hygiene, and same-project repair ordering.
 - `governance-check` passes with only the repository's pre-existing legacy pre-brainstorm naming warnings.
 - The implementation merge base remains checkpoint `5bc3a86`; the current worktree has stayed within the same issue lane for verification/writeback plus focused regression cleanup hardening, so the next lawful route is still manager-owned `completion_verification`, not a return to IBM or a jump to downstream global-restart work.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

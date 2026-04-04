@@ -24,3 +24,11 @@
 - This owner exists only because the develop merge gate requires a candidate-driven lifecycle even for narrow completed-family followthrough.
 - The canonical contract still lives in `I-20260401-1303-A-2`; this followthrough only repairs one stale regression lock.
 
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

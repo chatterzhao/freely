@@ -19,6 +19,8 @@
   - Freely 主管位这类主环境验收场景被明确覆盖，而不是只处理普通 feature 测试
 - priority: P0
 - status: proposed
+- next_action: 调研 protected post-merge acceptance route 的治理方案
+- revisit_trigger: 当有新的 post-merge acceptance 需求时
 - decision_reason: 这是 integration-acceptance-first 落地后的下一层治理缺口。没有这层 route/promotion guard，`post-merge acceptance` 仍然容易退化成“在 protected env 里临时操作，然后靠记忆回来源分支修”。
 - promoted_issue_path: `pending://protected-post-merge-acceptance-route-materialization`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`

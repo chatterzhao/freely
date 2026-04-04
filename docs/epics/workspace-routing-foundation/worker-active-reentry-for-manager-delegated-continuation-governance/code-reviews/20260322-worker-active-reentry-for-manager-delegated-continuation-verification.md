@@ -1,4 +1,5 @@
 # Code Review: worker-active-reentry-for-manager-delegated-continuation-governance verification
+- issue_id: `I-20260322-0412`
 
 ## Findings
 

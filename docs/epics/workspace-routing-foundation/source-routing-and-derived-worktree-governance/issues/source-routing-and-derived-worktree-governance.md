@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `source-routing-and-derived-worktree-governance`
 - issue-name: `source-routing-and-derived-worktree-governance`
+- verification_artifact_dir: `docs/epics/- epic-name: `workspace-routing-foundation`/- story-name: `source-routing-and-derived-worktree-governance`/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md#c-20260307-1201`
 - source_brainstorm: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md`
 - execution_base: `develop`

@@ -21,3 +21,11 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
 - Independent subagent review reported no findings and accepted the remaining tradeoff that `live-status` is a current-state surface rather than a pure persisted snapshot dump.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

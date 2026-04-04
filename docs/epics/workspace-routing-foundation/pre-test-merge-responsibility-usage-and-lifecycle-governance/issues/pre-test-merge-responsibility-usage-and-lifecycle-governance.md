@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `pre-test-merge-responsibility-usage-and-lifecycle-governance`
 - issue-name: `pre-test-merge-responsibility-usage-and-lifecycle-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md#c-20260322-1801-a`
 - source_brainstorm: `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`

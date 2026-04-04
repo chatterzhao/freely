@@ -6,6 +6,7 @@
   why_now:
     - 当前 `cc` 语义需要和 `cc-use-codex-cli` 固定 profile 拆开，避免 capability 参数泄漏到用户侧。
   promoted_issue_path: docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md
+  legacy_id_mapping: I-20260321-0217  # 历史遗留的 issue id
   milestone: M-20260306-workspace-routing-foundation
   session_refs:
     - tool: cc-use-codex-cli

@@ -1,6 +1,6 @@
 # Progress: application-native-runtime-observation-contract-and-observability-planes
 
-- issue: `I-20260324-0415`
+- issue_id: `I-20260324-0415`
 - title: Application-native runtime observation contract and observability planes
 - phase_state: `completed`
 - runtime_state: `closed_for_this_batch`

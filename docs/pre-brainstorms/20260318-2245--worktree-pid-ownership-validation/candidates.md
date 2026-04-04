@@ -14,5 +14,6 @@
   - `freely fleet-status --project <wt>` 在同类场景下不显示错误 supervisor pid
   - `freely stop --project <wt>` 只停止真实属于该 worktree 的 supervisor
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
+- legacy_id_mapping: I-20260318-0930  # 历史遗留的 issue id
 - session_refs: []
 - milestone: M-20260306-workspace-routing-foundation

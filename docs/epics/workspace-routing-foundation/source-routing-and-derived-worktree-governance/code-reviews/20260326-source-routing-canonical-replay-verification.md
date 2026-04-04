@@ -1,6 +1,6 @@
 # Verification: source-routing-and-derived-worktree-governance canonical replay
 
-- issue: `I-20260307-1201`
+- issue_id: `I-20260307-1201`
 - date: `2026-03-26`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`

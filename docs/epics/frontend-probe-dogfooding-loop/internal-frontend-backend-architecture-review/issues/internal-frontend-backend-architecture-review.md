@@ -7,6 +7,7 @@
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `internal-frontend-backend-architecture-review`
 - issue-name: `internal-frontend-backend-architecture-review`
+- verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md#c-20260308-1244-01`
 - source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - execution_base: `develop`

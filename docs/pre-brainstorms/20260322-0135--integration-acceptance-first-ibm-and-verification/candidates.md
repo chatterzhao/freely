@@ -15,5 +15,6 @@
   - verification defaults prioritize integration/acceptance evidence before targeted code review
   - three-loop truth sources describe AI-native verification as behavior-first rather than line-by-line review-first
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
+- legacy_id_mapping: I-20260322-0135  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: []

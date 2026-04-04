@@ -1,6 +1,6 @@
 # Verification: remote-branch-retirement-governance canonical replay
 
-- issue: `I-20260321-1515`
+- issue_id: `I-20260321-1515`
 - date: `2026-03-26`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`

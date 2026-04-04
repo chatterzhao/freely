@@ -42,3 +42,11 @@ Verify the narrow follow-on that reconciles canonical tracked `.codex/config.tom
 
 - `.freely/config.env` remains ignored runtime state, not a tracked product artifact.
 - This owner does not redesign bootstrap semantics or require a clean clone to pass audit before `freely init`.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

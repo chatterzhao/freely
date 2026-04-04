@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `default-project-resolution-and-authorized-project-memory`
 - issue-name: `default-project-resolution-and-authorized-project-memory`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/default-project-resolution-and-authorized-project-memory/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260320-0018--default-project-resolution-and-authorized-project-memory/candidates.md`
 - source_brainstorm: `docs/pre-brainstorms/20260320-0018--default-project-resolution-and-authorized-project-memory/brainstorms.md`
 - execution_base: `feature/project-resolution-defaults-20260320-0005`

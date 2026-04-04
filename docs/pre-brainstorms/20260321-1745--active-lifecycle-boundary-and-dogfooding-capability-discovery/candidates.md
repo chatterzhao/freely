@@ -22,6 +22,7 @@
 - next_action: 完成 IBM 产物与真源 wording 收敛后，进入 consistency verification，确认不会再把“历史/当前”边界读错，也不会把狗粮问题降格成一次性经验。
 - revisit_trigger: 当新增 wording 落盘后，需要验证它与既有三层 loop / manager / worktree 治理仍一致时。
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
+- legacy_id_mapping: I-20260321-1745  # 历史遗留的 issue id
 - milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
 - session_refs:
   - tool: codex

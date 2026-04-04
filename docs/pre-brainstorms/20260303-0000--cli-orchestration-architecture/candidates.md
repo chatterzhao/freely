@@ -47,5 +47,6 @@
 - status: promoted
 - decision_reason: 与恢复优先和自治持续运行目标直接对齐，应纳入主线实现。
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
+- legacy_id_mapping: I-20260316-1801  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: []

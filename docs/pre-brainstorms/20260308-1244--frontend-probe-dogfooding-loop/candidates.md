@@ -15,6 +15,7 @@
 - status: promoted
 - decision_reason: 这是这轮重评项目架构的总入口，先把“前后端是解耦思想，不等于 day-1 分布式部署”落成正式 issue。
 - promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md
+- legacy_id_mapping: I-20260308-1245  # 历史遗留的 issue id
 - milestone: M-20260308-frontend-probe-dogfooding-loop
 - session_refs: []
 
@@ -27,6 +28,7 @@
 - status: promoted
 - decision_reason: 这是“前端从第一天可用”与“后端仍保持解耦”同时成立的最小契约，也避免把 day-1 方案误锁为某种网络部署形态。
 - promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md
+- legacy_id_mapping: I-20260317-1001  # 历史遗留的 issue id
 - milestone: M-20260308-frontend-probe-dogfooding-loop
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}]
 

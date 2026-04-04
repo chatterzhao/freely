@@ -7,6 +7,7 @@
 - epic-name: `freely-product-architecture`
 - story-name: `freely-layered-architecture-and-tooling-topology`
 - issue-name: `freely-layered-architecture-and-tooling-topology`
+- verification_artifact_dir: `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md#c-20260326-1810-a`
 - source_brainstorm: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md`

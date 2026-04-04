@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `session-lifecycle-rotation-and-handoff-governance`
 - issue-name: `session-lifecycle-rotation-and-handoff-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260303-0000--cli-orchestration-architecture/candidates.md#c-20260303-103`
 - source_brainstorm: `docs/pre-brainstorms/20260303-0000--cli-orchestration-architecture/brainstorms.md`
 - execution_base: `develop`

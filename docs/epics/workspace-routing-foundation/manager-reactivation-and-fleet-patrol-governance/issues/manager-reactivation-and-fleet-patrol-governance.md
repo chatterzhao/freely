@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-reactivation-and-fleet-patrol-governance`
 - issue-name: `manager-reactivation-and-fleet-patrol-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/candidates.md#c-20260321-0345-a`
 - source_brainstorm: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/brainstorms.md`
 - execution_base: `develop`

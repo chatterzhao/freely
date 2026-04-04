@@ -27,3 +27,11 @@
 
 - `governance-check` remains out of scope for this first slice; the new truth is observational and patrol-consumable, not a new global blocker.
 - `post_merge_acceptance` is explicitly supported as a structured defer window and is verified through the `live-status` regression.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

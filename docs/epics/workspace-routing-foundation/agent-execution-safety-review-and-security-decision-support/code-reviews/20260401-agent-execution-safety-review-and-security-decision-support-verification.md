@@ -31,3 +31,11 @@
 - Later draft continuations that attempted to rematerialize the same execution-boundary audit plus `security-review-brief` surface were reviewed post-merge and classified as absorbed duplicates rather than unmet requirements.
 - This slice intentionally keeps reviewer/committee support at brief + skill level; full multi-reviewer runtime orchestration remains follow-on work under the same owner.
 - Broader security automation such as supply-chain, secret/artifact exposure, and remediation remains a follow-on capability split rather than a late scope expansion of this owner.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

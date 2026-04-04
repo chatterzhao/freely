@@ -1,4 +1,5 @@
 # Code Review: manager-chat-reentry-and-cleanup-misrouting-governance
+- issue_id: `I-20260321-1925`
 
 - reviewer: `codex`
 - status: `pass`
