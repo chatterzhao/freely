@@ -50,27 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260404-0232-A`
-- title: Governance merge gate review-aware regression alignment governance
-- milestone_state: completed
-- phase_state: `completed`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/candidates.md`
-- evidence:
-  - `develop` merge `0bb78ce`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
-  - `./bin/governance-check`
-- completion_note: Canonical `develop` absorbed the review-aware mixed-regression fixture refresh and the same-file borrowed-owner block restoration through merge `0bb78ce`; this closeout lane only writes back completed lifecycle truth so future merge-gate residuals reopen as new owners on current `develop`.
-
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -195,7 +174,27 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
   - `./bin/governance-check`
 - completion_note: Canonical `develop` absorbed the narrow `parse_milestones()` queue-scope repair through merge `908a6ad`; this closeout lane only writes back completed lifecycle truth so any future nested-field parser regressions reopen as new owners on current `develop`.
-5. `I-20260404-1405-A`
+5. `I-20260404-0232-A`
+- title: Governance merge gate review-aware regression alignment governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/candidates.md`
+- evidence:
+  - `develop` merge `0bb78ce`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+- completion_note: Canonical `develop` absorbed the review-aware mixed-regression fixture refresh and the same-file borrowed-owner block restoration through merge `0bb78ce`; this closeout lane only writes back completed lifecycle truth so future merge-gate residuals reopen as new owners on current `develop`.
+6. `I-20260404-1405-A`
 - title: Manager bootstrap prompt publication without continuity materialization governance
 - milestone_state: completed
 - phase_state: `completed`
