@@ -1,6 +1,6 @@
 # Code Review - state-sync-verification
 
-- issue: `I-20260308-0101`
+- issue_id: `I-20260308-0101`
 - date: `2026-03-16`
 - reviewer_tool: `codex`
 - reviewer_session_id: `current-thread`
