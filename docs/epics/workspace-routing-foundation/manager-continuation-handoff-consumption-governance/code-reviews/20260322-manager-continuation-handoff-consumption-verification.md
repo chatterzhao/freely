@@ -1,4 +1,5 @@
 # Code Review: manager-continuation-handoff-consumption-governance
+- issue_id: `I-20260322-0049`
 
 ## Scope
 

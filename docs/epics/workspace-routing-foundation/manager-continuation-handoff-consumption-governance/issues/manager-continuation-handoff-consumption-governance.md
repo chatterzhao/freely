@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-continuation-handoff-consumption-governance`
 - issue-name: `manager-continuation-handoff-consumption-governance`
+- verification_artifact_dir: `docs/epics/- epic-name: `workspace-routing-foundation`/- story-name: `manager-continuation-handoff-consumption-governance`/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/candidates.md#c-20260322-0049-a`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/brainstorms.md`
