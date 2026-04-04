@@ -4184,6 +4184,16 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
           next
         }
       }
+      if (section == "worker dispatch") {
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "frozen") {
+          emit_prompt_paths($0)
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/ && mode != "frozen") {
+          emit_prompt_paths($0)
+        }
+        next
+      }
       if (section == "queue") {
         if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "frozen") {
           emit_prompt_paths($0)
@@ -4305,6 +4315,16 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
           emit_prompt_paths($0)
           next
         }
+      }
+      if (section == "worker dispatch") {
+        if ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) {
+          emit_prompt_paths($0)
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+          emit_prompt_paths($0)
+        }
+        next
       }
       if (section == "queue") {
         if ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) {
@@ -6550,6 +6570,32 @@ manager_recheck_wait_for_supervisor_teardown_if_needed() {
   printf '%s\n' "$refreshed_pid"
 }
 
+manager_bootstrap_launch_in_flight() {
+  local project="$1" supervisor_pid="$2" ai_pid="$3"
+  local desired_state last_exit_reason last_state_updated_at
+  local state_updated_epoch now_epoch grace_secs
+
+  [[ -n "$supervisor_pid" && -z "$ai_pid" ]] || return 1
+  [[ -f "$(workcell_state_file "$project")" ]] || return 1
+
+  unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON LAST_STATE_UPDATED_AT
+  # shellcheck disable=SC1090
+  source "$(workcell_state_file "$project")"
+  desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+  last_exit_reason="${LAST_EXIT_REASON:-}"
+  last_state_updated_at="${LAST_STATE_UPDATED_AT:-}"
+  [[ "$desired_state" == "running" && "$last_exit_reason" == "starting" ]] || return 1
+
+  state_updated_epoch="$(timestamp_epoch_or_zero "$last_state_updated_at")"
+  [[ "$state_updated_epoch" =~ ^[0-9]+$ ]] || state_updated_epoch=0
+  (( state_updated_epoch > 0 )) || return 0
+
+  now_epoch="$(date +%s)"
+  grace_secs="${FREELY_MANAGER_BOOTSTRAP_AI_GRACE_SECS:-15}"
+  [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=15
+  (( now_epoch - state_updated_epoch <= grace_secs ))
+}
+
 manager_supervisor_pid_for_project() {
   local project="$1" run_dir sp
   run_dir="$(run_dir_for_project "$project")"
@@ -6746,7 +6792,9 @@ ensure_manager_once() {
     fi
   fi
   current_ai_pid="$(manager_ai_pid_for_project "$project")"
-  if [[ "$same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
+  if manager_bootstrap_launch_in_flight "$project" "$current_pid" "$current_ai_pid"; then
+    log_info "manager bootstrap is still within ai launch grace; keeping supervisor pid=$current_pid alive"
+  elif [[ "$same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
     log_warn "manager supervisor is idle after recovery gate passed; restarting manager with the latest handoff"
     restart_manager_supervisor_preserving_handoff "$project"
     current_pid=""

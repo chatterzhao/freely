@@ -68,7 +68,21 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
   - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
 
-2. `I-20260404-0232-A`
+2. `I-20260404-1405-A`
+- title: Manager bootstrap prompt publication without continuity materialization governance
+- milestone_state: committed
+- phase_state: `in_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization/candidates.md`
+- next_action: Freeze the exact bootstrap/control-plane failure path from prompt publication to continuity materialization, then repair startup semantics in a dedicated implementation batch.
+- evidence:
+  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+  - `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+
+3. `I-20260404-0232-A`
 - title: Governance merge gate review-aware regression alignment governance
 - milestone_state: committed
 - phase_state: `in_verification`
