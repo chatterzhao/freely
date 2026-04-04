@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260404-0232--governance-merge-gate-review-aware-regression-alignment
+  - brainstorms: docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/candidates.md
 - 20260404-0119--governance-merge-gate-milestone-status-followthrough
   - brainstorms: docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md

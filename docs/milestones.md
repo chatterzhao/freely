@@ -85,7 +85,25 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
   - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
 
-3. `I-20260403-2245-A`
+3. `I-20260404-0232-A`
+- title: Governance merge gate review-aware regression alignment governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/candidates.md`
+- next_action: Keep the lane limited to making the mixed unresolved-candidate implementation regression review-aware and restoring same-file borrowed-owner blocking so `test-governance-merge-gate` matches current law after staged review artifacts became mandatory.
+- evidence:
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
+
+4. `I-20260403-2245-A`
 - title: Sandbox-compatible runtime bootstrap and operator-state governance
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -126,6 +144,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md`
 - next_action: This candidate is now materialized as `I-20260404-0119-A`. Keep the owner scoped to milestone-level status parsing so the merge gate stops reading nested queue item status lines as milestone truth.
 - revisit_trigger: Re-open only if active-milestone validation still misreads nested queue metadata after this parser-bound followthrough lands.
+
+3. `C-20260404-0232-A`
+- title: Governance merge gate review-aware regression alignment
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/candidates.md`
+- next_action: This candidate is now materialized as `I-20260404-0232-A`. Keep the owner scoped to making the mixed unresolved-candidate implementation regression review-aware and restoring same-file borrowed-owner blocking after staged review artifacts became mandatory.
+- revisit_trigger: Re-open only if a future guard again causes this mixed unresolved-candidate implementation regression to fail before it reaches the current allowed path, or if same-file borrowed-owner regressions start passing again.
 
 ### completed_issues
 1. `I-20260402-0020-A`

@@ -556,7 +556,6 @@ def main() -> int:
     issue_bound_evidence: Set[str] = set()
     issue_bound_issue_paths: Set[str] = set()
     issue_bound_candidate_ids: Set[str] = set()
-    issue_bound_candidate_paths: Set[str] = set()
     progress_owner_issue_paths: Set[str] = set()
     review_owner_issue_paths: Set[str] = set()
     owner_issue_records: Dict[str, IssueRecord] = {}
@@ -570,7 +569,6 @@ def main() -> int:
             source_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
             if source_candidate:
                 issue_bound_candidate_ids.add(source_candidate.candidate_id)
-                issue_bound_candidate_paths.add(source_candidate.path)
                 candidate_driven_evidence.add(source_candidate.candidate_id)
 
     for progress in progress_records:
@@ -600,7 +598,6 @@ def main() -> int:
             continue
 
         issue_bound_candidate_ids.add(source_candidate.candidate_id)
-        issue_bound_candidate_paths.add(source_candidate.path)
         candidate_driven_evidence.add(source_candidate.candidate_id)
 
     for review in review_records:
@@ -625,7 +622,6 @@ def main() -> int:
             continue
 
         issue_bound_candidate_ids.add(source_candidate.candidate_id)
-        issue_bound_candidate_paths.add(source_candidate.path)
         candidate_driven_evidence.add(source_candidate.candidate_id)
 
     if not candidate_driven_evidence:
@@ -652,11 +648,6 @@ def main() -> int:
         candidate_is_directly_touched = candidate.candidate_id in touched_candidate_ids
         candidate_is_bound_to_touched_issue = candidate.candidate_id in issue_bound_candidate_ids
         candidate_is_bound_to_touched_owner = bool(owner_path) and owner_path in issue_bound_issue_paths
-        candidate_is_sibling_context_only = (
-            candidate_is_directly_touched
-            and not candidate_is_bound_to_touched_issue
-            and candidate.path in issue_bound_candidate_paths
-        )
         candidate_is_relevant = (
             candidate_is_directly_touched
             or candidate_is_bound_to_touched_owner
@@ -677,19 +668,6 @@ def main() -> int:
         # 它们处于研究阶段，尚未决定是否 materialize
         pre_ibm_statuses = {"proposed", "needs_research", "blocked", "candidate"}
         if status in pre_ibm_statuses:
-            continue
-
-        # promoted 状态的 candidate 如果有有效的 promoted_issue_path，即使 issue 不在 merge 中也允许
-        # 这处理了历史遗留的 promoted candidate 问题
-        if status == "promoted" and owner_path and not owner_path.startswith("pending://"):
-            continue
-
-        # absorbed 状态的 candidate 如果有有效的 promoted_issue_path，即使 issue 不在 merge 中也允许
-        # 这处理了历史遗留的 absorbed candidate 问题
-        if status == "absorbed" and owner_path and not owner_path.startswith("pending://"):
-            continue
-
-        if candidate_is_sibling_context_only:
             continue
 
         if not candidate_is_relevant and not unresolved_metadata_fix_is_absorbed_by_governance_owner:
