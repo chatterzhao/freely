@@ -18,6 +18,7 @@ run_case() {
   local fake_bin="$case_dir/bin"
   local intake_id="20260320-000000-test"
   mkdir -p "$project/.freely/intake/$intake_id" "$fake_bin"
+  local worktrees_root="${project}-worktrees"
 
   cat >"$project/.freely/config.env" <<EOF
 AI_TOOL="$tool"
@@ -68,6 +69,8 @@ EOF
   grep -q -- '^bypassPermissions$' "$case_dir/claude.args"
 
   if [[ "$tool" == "cc-use-codex-cli" ]]; then
+    grep -q -- '^--add-dir$' "$case_dir/claude.args"
+    grep -q -- "^$worktrees_root$" "$case_dir/claude.args"
     grep -q -- '^--append-system-prompt$' "$case_dir/claude.args"
     grep -q 'approval-policy=never' "$case_dir/claude.args"
     grep -q 'sandbox=workspace-write' "$case_dir/claude.args"
@@ -80,6 +83,6 @@ EOF
 }
 
 run_case "cc" "" "" "" "" "" ""
-run_case "cc-use-codex-cli" "codex-cli" "prefer-codex-for-repo-work" "gpt-5.4" "workspace-write" "never" "project-root"
+run_case "cc-use-codex-cli" "codex-cli" "prefer-codex-for-repo-work" "gpt-5.4" "workspace-write" "never" "worktree-required-on-protected-branches"
 
 echo "[PASS] signal intent handler supports plain cc and cc-use-codex-cli profiles"

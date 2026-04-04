@@ -50,6 +50,7 @@ usage() {
 Usage:
   freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--reasoning-effort <effort>] [--accept-default-autonomy] [--force]
   freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
+  freely sync-tooling [--project <abs_path>] --source-project <abs_path>
   freely doctor [--project <abs_path>]
   freely security-review-brief [--project <abs_path>]
   freely chat [--project <abs_path>] <message>
@@ -317,6 +318,16 @@ project_worktrees_root_for_path() {
   fi
   project_name="$(basename "$project")"
   echo "${project_parent}/${project_name}-worktrees"
+}
+
+project_tool_wrapper_dir() {
+  local project="$1"
+  echo "$project/.freely/bin"
+}
+
+project_tool_boundary_bootstrap_file() {
+  local project="$1"
+  echo "$project/.freely/tool-boundary-bootstrap.md"
 }
 
 project_has_freely_config() {
@@ -2052,6 +2063,172 @@ tool_requires_project_codex_config() {
     codex|cc-use-codex-cli) return 0 ;;
   esac
   printf '%s\n' "$tool_capabilities" | tr ',' '\n' | sed 's/^ *//; s/ *$//' | grep -Fxq 'codex-cli'
+}
+
+managed_tool_boundary_tools() {
+  printf 'codex\nclaude\niflow\nkiro-cli\n'
+}
+
+tool_boundary_project_config_surface() {
+  local tool="$1"
+  case "$tool" in
+    codex) printf '.codex/config.toml\n' ;;
+    claude) printf 'none materialized by Freely yet\n' ;;
+    iflow) printf 'no verified project-local config surface found\n' ;;
+    kiro-cli) printf 'no verified sibling-worktree writable-root surface found\n' ;;
+    *) printf 'unknown\n' ;;
+  esac
+}
+
+tool_boundary_wrapper_relpath() {
+  local tool="$1"
+  printf '.freely/bin/%s\n' "$tool"
+}
+
+tool_boundary_launch_boundary_note() {
+  local tool="$1" worktrees_root="$2"
+  case "$tool" in
+    codex|claude|iflow) printf 'adds `--add-dir %s`\n' "$worktrees_root" ;;
+    kiro-cli) printf 'passthrough wrapper only; prefer entering the dedicated worktree before launch\n' ;;
+    *) printf 'unknown\n' ;;
+  esac
+}
+
+tool_boundary_sync_policy_note() {
+  local tool="$1"
+  case "$tool" in
+    codex) printf 'copy `.freely/config.env`, then rematerialize `.codex/config.toml` and wrapper in each new worktree\n' ;;
+    claude|iflow) printf 'copy `.freely/config.env`, then rematerialize wrapper in each new worktree\n' ;;
+    kiro-cli) printf 'copy `.freely/config.env`, then rematerialize wrapper/bootstrap only\n' ;;
+    *) printf 'unknown\n' ;;
+  esac
+}
+
+append_tool_boundary_manifest_markdown() {
+  local wrapper_dir="$1" worktrees_root="$2"
+  local tool wrapper_rel
+  while IFS= read -r tool; do
+    [[ -n "$tool" ]] || continue
+    wrapper_rel="$(tool_boundary_wrapper_relpath "$tool")"
+    cat <<EOF
+- \`$tool\`
+  - project config: $(tool_boundary_project_config_surface "$tool")
+  - wrapper: \`$wrapper_dir/${tool}\`
+  - launch boundary: $(tool_boundary_launch_boundary_note "$tool" "$worktrees_root")
+  - sync policy: $(tool_boundary_sync_policy_note "$tool")
+EOF
+  done < <(managed_tool_boundary_tools)
+}
+
+write_project_tool_wrapper_scripts() {
+  local project="$1"
+  local wrapper_dir worktrees_root marker
+  wrapper_dir="$(project_tool_wrapper_dir "$project")"
+  worktrees_root="$(project_worktrees_root_for_path "$project")"
+  marker="# Freely managed tool wrapper"
+  mkdir -p "$wrapper_dir"
+
+  cat >"$wrapper_dir/codex" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+$marker
+exec codex --add-dir "$worktrees_root" "\$@"
+EOF
+  chmod +x "$wrapper_dir/codex"
+
+  cat >"$wrapper_dir/claude" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+$marker
+exec claude --add-dir "$worktrees_root" "\$@"
+EOF
+  chmod +x "$wrapper_dir/claude"
+
+  cat >"$wrapper_dir/iflow" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+$marker
+exec iflow --add-dir "$worktrees_root" "\$@"
+EOF
+  chmod +x "$wrapper_dir/iflow"
+
+  cat >"$wrapper_dir/kiro-cli" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+$marker
+# kiro-cli currently exposes tool-trust flags but no verified sibling-worktree
+# writable-root/project-config switch, so this wrapper stays a passthrough.
+exec kiro-cli "\$@"
+EOF
+  chmod +x "$wrapper_dir/kiro-cli"
+}
+
+write_project_tool_boundary_bootstrap_file() {
+  local project="$1"
+  local file wrapper_dir worktrees_root manifest_block
+  file="$(project_tool_boundary_bootstrap_file "$project")"
+  wrapper_dir="$(project_tool_wrapper_dir "$project")"
+  worktrees_root="$(project_worktrees_root_for_path "$project")"
+  manifest_block="$(append_tool_boundary_manifest_markdown "$wrapper_dir" "$worktrees_root")"
+  mkdir -p "$(dirname "$file")"
+  cat >"$file" <<EOF
+# Tool Boundary Bootstrap
+
+- project_root: \`$project\`
+- worktrees_root: \`$worktrees_root\`
+- wrapper_bin_dir: \`$wrapper_dir\`
+
+## Managed Surfaces
+
+$manifest_block
+
+## Use
+
+- The project root remains the primary workspace and integration surface for the repository. These launch boundaries extend writable/trusted reach to the sibling worktrees root; they do not replace project-root access.
+- Protected roots such as \`develop\` remain valid for read/merge/integration flows, but owner development and staged implementation work must move into a dedicated sibling worktree.
+- Freely runtime will inject equivalent launch-time boundaries for supported tools.
+- For manual CLI use, prepend \`$wrapper_dir\` to \`PATH\` or invoke the wrapper directly so sibling worktrees stay reachable without falling back to editing \`develop\`.
+- Standard worktree creation paths call \`freely sync-tooling --source-project <root> --project <worktree>\`, so ignored or untracked local tool files do not have to be copied by Git.
+EOF
+}
+
+materialize_project_tooling_for_loaded_config() {
+  local project="$1" force="${2:-false}"
+  local tool="${AI_TOOL:-}"
+  local tool_capabilities="${AI_TOOL_CAPABILITIES:-$(tool_default_capabilities_for_runtime "$tool")}"
+  local mode="${AI_MODE:-auto}"
+
+  if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
+    write_project_codex_config "$project" "$force" "$mode"
+  fi
+  write_project_tool_wrapper_scripts "$project"
+  write_project_tool_boundary_bootstrap_file "$project"
+}
+
+sync_project_tooling_from_source() {
+  local source_project="$1" target_project="$2"
+  local source_cfg target_cfg
+  source_cfg="$(config_file "$source_project")"
+  target_cfg="$(config_file "$target_project")"
+
+  [[ -d "$source_project" ]] || {
+    log_error "source project not found: $source_project"
+    return 1
+  }
+  [[ -d "$target_project" ]] || {
+    log_error "target project not found: $target_project"
+    return 1
+  }
+  [[ -f "$source_cfg" ]] || {
+    log_warn "skip tooling sync: source config missing at $source_cfg"
+    return 0
+  }
+
+  mkdir -p "$(dirname "$target_cfg")"
+  cp "$source_cfg" "$target_cfg"
+  load_config "$target_project"
+  materialize_project_tooling_for_loaded_config "$target_project" "true"
+  log_info "synced project-local tooling: $source_project -> $target_project"
 }
 
 write_project_codex_config() {
@@ -7040,6 +7217,9 @@ cmd_init() {
   if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
     write_project_codex_config "$project" "$force" "$mode"
   fi
+  load_config "$project"
+  write_project_tool_wrapper_scripts "$project"
+  write_project_tool_boundary_bootstrap_file "$project"
   register_project_in_registry "$project"
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "initialized"
@@ -7073,12 +7253,25 @@ cmd_set_tool() {
   project="$(resolve_project_or_fail "$project")"
   load_config "$project"
   persist_project_tool_selection "$project" "$tool" "$tool_adapter_arg" "$tool_adapter_policy_arg"
-  tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
-  if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
-    write_project_codex_config "$project" "false"
-  fi
+  load_config "$project"
+  materialize_project_tooling_for_loaded_config "$project" "true"
   load_config "$project"
   log_info "updated tool selection: ${AI_TOOL:-$tool} via ${AI_TOOL_ADAPTER:-unknown} (policy=${AI_TOOL_ADAPTER_POLICY:-unknown})"
+}
+
+cmd_sync_tooling() {
+  local project="" source_project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --source-project) source_project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+
+  [[ -n "$source_project" ]] || { log_error "missing --source-project"; usage; exit 1; }
+  project="$(resolve_project_or_fail "$project" 1)"
+  sync_project_tooling_from_source "$source_project" "$project"
 }
 
 tool_default_capabilities_for_runtime() {
@@ -7183,7 +7376,7 @@ codex_capability_default_approval_policy_for_runtime() {
 codex_capability_default_cwd_mode_for_runtime() {
   local tool="$1"
   case "$tool" in
-    cc-use-codex-cli) printf 'project-root\n' ;;
+    cc-use-codex-cli) printf 'worktree-required-on-protected-branches\n' ;;
     *) printf '\n' ;;
   esac
 }
@@ -9396,6 +9589,7 @@ main() {
   case "$cmd" in
     init) cmd_init "$@" ;;
     set-tool) cmd_set_tool "$@" ;;
+    sync-tooling) cmd_sync_tooling "$@" ;;
     doctor) cmd_doctor "$@" ;;
     security-review-brief) cmd_security_review_brief "$@" ;;
     chat) cmd_chat "$@" ;;

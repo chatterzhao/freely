@@ -84,6 +84,9 @@ fi
 mkdir -p "$(freely_wt_root_dir)"
 FREELY_WT_AUTOCREATE_INTERNAL=1 git checkout "$parking_branch" >/dev/null 2>&1
 FREELY_WT_AUTOCREATE_INTERNAL=1 git worktree add "$target_path" "$branch" >/dev/null
+if [[ -x "./bin/freely" ]]; then
+  FREELY_WT_AUTOCREATE_INTERNAL=1 bash "./bin/freely" sync-tooling --source-project "$(freely_wt_primary_worktree)" --project "$target_path" >/dev/null 2>&1 || true
+fi
 
 cat <<MSG
 [HOOK] Auto-created worktree for branch '$branch':

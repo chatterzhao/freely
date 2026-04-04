@@ -51,6 +51,9 @@ fi
 target_path="$(freely_wt_resolve_target_path "$branch")"
 mkdir -p "$(freely_wt_root_dir)"
 git worktree add -b "$branch" "$target_path" "$base"
+if [[ -x "$ROOT_DIR/bin/freely" ]]; then
+  FREELY_WT_AUTOCREATE_INTERNAL=1 bash "$ROOT_DIR/bin/freely" sync-tooling --source-project "$ROOT_DIR" --project "$target_path" >/dev/null 2>&1 || true
+fi
 
 cat <<MSG
 Created worktree:
