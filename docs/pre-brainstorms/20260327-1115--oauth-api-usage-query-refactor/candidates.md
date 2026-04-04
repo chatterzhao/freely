@@ -11,6 +11,7 @@
   - `cooldown` 需要被升级成半小时维护的 recovery ledger reset 面，而不是临时残留；命中 limit 时必须先吃这份账本快速切换
   - 无参 `switch codex` 也应刷新所有 auth 目录并直接切一个可用 slot；这已经超出已完成 `I-20260318-1630` 的 closeout contract，应以新的 follow-on lifecycle 物化
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
+- legacy_id_mapping: I-20260327-1115  # 历史遗留的 issue id
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
