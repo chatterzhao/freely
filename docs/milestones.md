@@ -86,23 +86,6 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
   - `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
 
-3. `I-20260403-2245-A`
-- title: Sandbox-compatible runtime bootstrap and operator-state governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/candidates.md`
-- next_action: Implement the narrow runtime slice that adds a lawful fallback operator-state root when the default `$FREELY_HOME` is unwritable and degrades process/readiness evidence cleanly when `ps` is unavailable.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
-  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
-
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -184,7 +167,30 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/code-reviews/20260403-governance-chain-legacy-repair-implementation-decision.md`
   - `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
 - completion_note: The 2026-04-04 truth-repair merge restored the missing `1100` owner artifacts, retired deleted `1200/1201/1202/1203` slices to historical status, and cleared dangling canonical references. Any future governance-chain backfill must reopen from current `develop` as a new lifecycle instead of reviving `1100` as an active owner.
-3. `I-20260404-1405-A`
+3. `I-20260403-2245-A`
+- title: Sandbox-compatible runtime bootstrap and operator-state governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/candidates.md`
+- evidence:
+  - `develop` merge `1eddbcd`
+  - `develop` merge `45bed28`
+  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`
+  - `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-sandbox-operator-state-bootstrap-fallback`
+  - `bash docs/system/workspace/scripts/tests/test-freely-status-degrades-when-ps-is-unavailable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-attaches-when-ps-is-unavailable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-refuses-unverified-attach-when-ps-is-unavailable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-rejects-foreign-pids-when-ps-is-unavailable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-stop-ignores-foreign-pids-when-ps-is-unavailable`
+  - `./bin/governance-check`
+- completion_note: Canonical `develop` absorbed the sandbox-compatible operator-state fallback and the degraded PID ownership followthrough through merges `1eddbcd` and `45bed28`; this closeout lane only writes back completed lifecycle truth so future sandbox/runtime gaps reopen as new owners on current `develop`.
+4. `I-20260404-1405-A`
 - title: Manager bootstrap prompt publication without continuity materialization governance
 - milestone_state: completed
 - phase_state: `completed`

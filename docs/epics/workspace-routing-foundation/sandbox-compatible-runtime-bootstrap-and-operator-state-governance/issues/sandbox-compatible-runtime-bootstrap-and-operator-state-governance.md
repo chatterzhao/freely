@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260403-2245-A`
 - title: Sandbox-compatible runtime bootstrap and operator-state governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `sandbox-compatible-runtime-bootstrap-and-operator-state-governance`
@@ -13,6 +13,7 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews`
 - depends_on:
   - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
@@ -88,5 +89,5 @@ That hidden dead-end pressures users and agents back toward protected-root edits
 
 ## Next
 
-- Materialize the narrow runtime patch in this worktree without widening into unrelated restart or tool-boundary redesign.
-- Once the fallback and degraded-readiness contract are proven, close the owner through the normal progress and verification loop.
+- `2026-04-04` closeout: canonical `develop` already absorbed the narrow runtime bootstrap fallback through merge `1eddbcd` and the degraded PID ownership followthrough through merge `45bed28`.
+- Keep this owner closed as the bounded operator-state bootstrap and ps-less readiness record; any future sandbox gaps beyond these constraints must reopen as a new owner on current `develop`.
