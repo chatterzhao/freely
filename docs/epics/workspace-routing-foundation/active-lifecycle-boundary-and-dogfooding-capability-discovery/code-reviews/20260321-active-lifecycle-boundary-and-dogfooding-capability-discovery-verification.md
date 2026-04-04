@@ -1,4 +1,5 @@
 # Code Review: active-lifecycle-boundary-and-dogfooding-capability-discovery
+- issue_id: `I-20260321-1745`
 
 ## Scope Reviewed
 
