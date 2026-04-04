@@ -17,3 +17,11 @@
 4. The focused regression proves the contract on a minimal fixture path and fails if the event log records a healthy `ai_exit_rc_0`.
 5. `docs/system/workspace/tools.md` and `docs/system/workspace/skills/ai-cli-availability-manager/references/limit-patterns.md` now document the same Kiro failure family, so the behavior is no longer trapped only in runtime code.
 6. The implementation itself was already absorbed by `develop` commit `3a6b0e0`; this artifact closes the canonical owner lifecycle around that landed fix.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record
