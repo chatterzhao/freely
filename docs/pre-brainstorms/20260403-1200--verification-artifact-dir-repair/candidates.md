@@ -8,8 +8,7 @@
 - decision_reason: 该切片是 `C-20260403-1100-A` 的子问题，当前尚未 materialize 成独立 owner issue，不能宣称 promoted。
 - promoted_issue_path: `pending://owned-by-c-20260403-1100-a`
 - milestone: M-20260306-workspace-routing-foundation
-- parent_lane_branch: `feature/governance-chain-legacy-repair-20260403-1100`
-- parent_candidate_ref: `C-20260403-1100-A`
+- parent_candidate: `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/candidates.md#c-20260403-1100-a`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -32,7 +31,7 @@
 - next_action: 在 `1100` 主线下先落正式 owner issue；本切片只维护字段缺口清单与映射规则，等待 owner issue 吸收执行。
 - revisit_trigger: 当 `1100` owner issue 路径落盘，或 gate 输出再次出现 `verification_artifact_dir` 缺口时立即重启。
 - acceptance_reviews:
-  - reviewer: `codex-parent-sync`
+  - reviewer: `codex-subagent-review`
   - date: `2026-04-03`
   - result: `needs_research-kept-in-pre-brainstorm`
-  - notes: `母链已同步该子切片的治理状态，避免继续引用不存在的 promoted issue。`
+  - notes: `v2 字段已补全，并移除对不存在 promoted issue 的声明。`

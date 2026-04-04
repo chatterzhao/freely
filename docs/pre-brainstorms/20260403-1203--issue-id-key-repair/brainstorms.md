@@ -3,7 +3,7 @@
 ## Context
 
 - 日期：2026-04-03
-- 触发：`governance-merge-gate` 检测到 candidate 的 issue id key 不匹配问题
+- 触发：governance-merge-gate 检测到 candidate 的 issue id key 不匹配问题
 - 当前工位：`feature/issue-id-key-repair-20260403-1203`
 - 父治理链：`feature/governance-chain-legacy-repair-20260403-1100`
 
@@ -11,7 +11,7 @@
 
 1. `governance-merge-gate` 要求 candidate id 与 promoted issue 的 key 可追溯
 2. 历史候选项存在 id/key 不一致，需要通过 `legacy_id_mapping` 显式补录映射
-3. 本切片已批量补录 `legacy_id_mapping` 和部分 `next_action/revisit_trigger`，但尚未 materialize 对应 owner issue
+3. 本分支已批量补录 `legacy_id_mapping` 和部分 `next_action/revisit_trigger`，但尚未 materialize 对应 owner issue
 4. 当前 pre-brainstorm 若继续声称 promoted 到不存在路径，会形成新的治理链失真
 
 ## Problem

@@ -10,7 +10,7 @@
 ## Current Repo Facts
 
 1. `governance-merge-gate` 会校验 review 元数据字段，历史文档里同时存在 `issue:` 与 `issue_id:`
-2. 本切片已经批量修复了多份 review 文档字段命名，但尚未形成 issue/progress 生命周期锚点
+2. 本分支已经批量修复了多份 review 文档字段命名，但尚未形成 issue/progress 生命周期锚点
 3. 该问题属于 `20260403-1100` 的治理链修复子切片，不应独立伪装为已 materialized 的 owner issue
 
 ## Problem

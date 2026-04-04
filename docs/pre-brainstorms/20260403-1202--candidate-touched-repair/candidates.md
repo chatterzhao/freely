@@ -31,6 +31,6 @@
   - 该子切片应被吸收到单一 `governance-chain-legacy-repair` owner，还是拆分为独立 owner issue？
   - legacy 文档允许长期保留 `issue` 别名，还是必须全量迁移为 `issue_id`？
 - acceptance_reviews:
-  - reviewer: `codex-parent-sync`
+  - reviewer: `codex-self-review`
   - verdict: `pass-with-fixups`
-  - notes: `母链已同步该子切片的治理状态，后续是否独立 owner 仍由父治理链统一裁决。`
+  - notes: `候选内容边界已补齐，但在 issue materialization 前保持 needs_research 更符合治理语义。`

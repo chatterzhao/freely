@@ -32,7 +32,7 @@
 - next_action: 等待 `1100` owner issue 落盘；在此之前仅维护质量边界与样本判定，不独立推进 promoted lifecycle。
 - revisit_trigger: 当 `1100` owner issue 路径落盘，或 gate 再次报出 decision-note 缺口时立即重启。
 - acceptance_reviews:
-  - reviewer: `codex-parent-sync`
+  - reviewer: `codex-direct-fix`
   - date: `2026-04-03`
   - result: `needs_research-kept-in-pre-brainstorm`
-  - notes: `母链已同步该子切片的治理状态，避免继续引用不存在的 promoted issue。`
+  - notes: `已移除不存在 promoted issue 的声明，并显式挂接到 1100 母链。`

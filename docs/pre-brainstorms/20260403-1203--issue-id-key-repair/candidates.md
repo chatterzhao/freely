@@ -31,6 +31,6 @@
   - `legacy_id_mapping` 是否应升级为统一 schema 字段（而非临时补录）？
   - 对已 completed 的历史 candidate，是否需要单独定义“只补录不重开 issue”的标准流程？
 - acceptance_reviews:
-  - reviewer: `codex-parent-sync`
+  - reviewer: `codex-self-review`
   - verdict: `pass-with-fixups`
-  - notes: `母链已同步该子切片的治理状态，后续是否独立 owner 由父治理链统一裁决。`
+  - notes: `先修正状态真相并补齐 v2 字段，后续是否独立 issue 由父治理链统一裁决。`

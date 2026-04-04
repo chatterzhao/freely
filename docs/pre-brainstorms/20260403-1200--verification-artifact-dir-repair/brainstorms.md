@@ -10,7 +10,7 @@
 
 1. `governance-merge-gate` 会校验 issue front matter 是否声明 `verification_artifact_dir`
 2. 现有失败样本集中在历史 issue 文档，缺口形态是“issue 已有 review 目录但 front matter 缺字段”
-3. 当前切片只有 pre-brainstorm 证据，没有 materialized issue/progress，可见它仍处于 pre-brainstorm 收敛阶段
+3. 当前分支只有 pre-brainstorm 证据，没有 materialized issue/progress，可见它仍处于 pre-brainstorm 收敛阶段
 
 ## Problem
 
