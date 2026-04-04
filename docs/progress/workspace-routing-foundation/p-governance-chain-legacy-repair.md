@@ -47,14 +47,14 @@
   - `feature/frontend-runtime-baseline-lifecycle-alignment-20260402-frontend`
 - Retire now:
   - `feature/governance-chain-legacy-repair-promote-20260403-175428` because it is already a `develop` ancestor and has no additional unique cleanup work.
+- Also merged to canonical `develop` and retired after writeback:
+  - `feature/hook-bypass-break-glass-governance-20260402-1719`, whose follow-on pre-brainstorm candidate now lives in `docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/`
 - Research writeback then retire:
   - `feature/governance-chain-legacy-repair-20260403-1100`
   - `feature/verification-artifact-dir-repair-20260403-1200`
   - `feature/implementation-decision-note-repair-20260403-1201`
   - `feature/candidate-touched-repair-20260403-1202`
   - `feature/issue-id-key-repair-20260403-1203`
-- Keep active outside this owner:
-  - `feature/hook-bypass-break-glass-governance-20260402-1719`, now clean and carrying a real follow-on candidate that should remain available for future intake
 - Ignored as scratch/non-canonical in this round:
   - `/Users/zhaoyu/.cursor/worktrees/freely/c3tIe`
   - `/Users/zhaoyu/.cursor/worktrees/freely/E95vZ`
