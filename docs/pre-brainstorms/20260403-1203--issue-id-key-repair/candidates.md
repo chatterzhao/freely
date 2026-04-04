@@ -5,7 +5,7 @@
 - candidate_format_version: `v2`
 - title: Add legacy_id_mapping and next_action/revisit_trigger to candidates
 - status: `needs_research`
-- decision_reason: 当前子切片尚未 materialize 为 milestone-owned issue，先保留在 pre-brainstorm 并与父治理链绑定，避免伪 promoted。
+- decision_reason: 该子切片已挂接到 materialized parent issue `I-20260403-1100-A`，但 absorbed 还是后续独立 materialize 尚未决定，因此继续保留在 pre-brainstorm，避免伪 promoted。
 - promoted_issue_path: `pending://parent-routing-decision`
 - milestone: `M-20260306-workspace-routing-foundation`
 - parent_candidate_ref: `C-20260403-1100-A`
@@ -33,5 +33,5 @@
   - 对已 completed 的历史 candidate，是否需要单独定义“只补录不重开 issue”的标准流程？
 - acceptance_reviews:
   - reviewer: `codex-self-review`
-  - verdict: `pass-with-fixups`
-  - notes: `先修正状态真相并补齐 v2 字段，后续是否独立 issue 由父治理链统一裁决。`
+    verdict: `supports`
+    note: `先修正状态真相并补齐 v2 字段，当前维持 parent-linked needs_research 更符合已 materialized 的 1100 owner truth。`
