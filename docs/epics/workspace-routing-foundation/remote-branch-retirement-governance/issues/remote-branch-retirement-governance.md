@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `remote-branch-retirement-governance`
 - issue-name: `remote-branch-retirement-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md#c-20260321-1515-a`
 - source_brainstorm: `docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/brainstorms.md`
 - execution_base: `develop`
