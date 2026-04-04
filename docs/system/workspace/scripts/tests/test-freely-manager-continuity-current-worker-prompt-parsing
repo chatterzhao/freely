@@ -13,8 +13,9 @@ QUEUED_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000002-worker-queued
 FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000003-worker-frozen-codex.txt"
 CREATED_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000004-worker-created-codex.txt"
 DELEGATED_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000005-worker-delegated-codex.txt"
+DISPATCH_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000006-worker-dispatch-codex.txt"
 
-touch "$LAUNCHED_PROMPT" "$QUEUED_PROMPT" "$FROZEN_PROMPT" "$CREATED_PROMPT" "$DELEGATED_PROMPT"
+touch "$LAUNCHED_PROMPT" "$QUEUED_PROMPT" "$FROZEN_PROMPT" "$CREATED_PROMPT" "$DELEGATED_PROMPT" "$DISPATCH_PROMPT"
 
 CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260326-000000.md"
 cat >"$CONTINUITY" <<EOF
@@ -36,6 +37,9 @@ cat >"$CONTINUITY" <<EOF
 ## Frozen Queue
 - worker_prompt: \`$FROZEN_PROMPT\`
 
+## Worker Dispatch
+- prompt_path: \`$DISPATCH_PROMPT\`
+
 ## Worker Prompt Materialization
 - worker_prompt_paths_created_this_round:
   - $CREATED_PROMPT
@@ -47,7 +51,7 @@ source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 LAUNCHABLE="$(latest_manager_worker_prompt_paths_from_continuity "$CONTINUITY" | paste -sd, -)"
 FROZEN="$(latest_frozen_manager_worker_prompt_paths_from_continuity "$CONTINUITY" | paste -sd, -)"
 
-[[ "$LAUNCHABLE" == "$CREATED_PROMPT,$DELEGATED_PROMPT,$LAUNCHED_PROMPT,$QUEUED_PROMPT" ]]
+[[ "$LAUNCHABLE" == "$CREATED_PROMPT,$DELEGATED_PROMPT,$DISPATCH_PROMPT,$LAUNCHED_PROMPT,$QUEUED_PROMPT" ]]
 [[ "$FROZEN" == "$FROZEN_PROMPT" ]]
 
 echo "[PASS] continuity parser recognizes legacy and current worker prompt contracts"

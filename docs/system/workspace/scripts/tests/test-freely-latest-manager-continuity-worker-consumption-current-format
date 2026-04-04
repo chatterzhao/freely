@@ -74,10 +74,11 @@ NEW_CONT="$PROJECT/.freely/run/manager-continuity-20260325-023343.md"
 cat >"$NEW_CONT" <<EOF
 # Manager Continuity
 
+## Worker Dispatch
+- prompt_path: \`$PROMPT_P0\`
+- dispatch_priority: \`P0\`
+
 ## Queue / Frozen / Cleanup Judgement
-- launch queue:
-  - worker_prompt_path: \`$PROMPT_P0\`
-  - dispatch_priority: \`P0\`
 - merge-review queue:
   - path: \`$PROJECT/worktrees/p1\`
     - worker_prompt_path: \`$PROMPT_P1\`
