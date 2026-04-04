@@ -1,6 +1,8 @@
 # Candidate Issues
 
-## Candidate A
+### C-20260318-1825-A
+- status: promoted
+- legacy_id_mapping: I-20260318-1825
 - Title: worktree hygiene supervision control plane
 - Problem: Freely 缺少针对 dirty-budget / checkpoint drift 的自治监督控制面，manager 只能观察，不能稳定推动 worker 收口。
 - Expected outcome: 明确 manager/worker/runtime/hook 的 hygiene 分工，并新增可执行能力与测试。
