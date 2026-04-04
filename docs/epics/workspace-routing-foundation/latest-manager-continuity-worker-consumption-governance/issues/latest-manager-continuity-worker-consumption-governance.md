@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `latest-manager-continuity-worker-consumption-governance`
 - issue-name: `latest-manager-continuity-worker-consumption-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md#c-20260322-0445-a`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md`
