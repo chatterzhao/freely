@@ -1,4 +1,5 @@
 # Code Review: manager-self-supervision-and-autonomous-recovery canonical replay
+- issue_id: `I-20260318-1408`
 
 - verdict: pass
 - date: `2026-03-26`
