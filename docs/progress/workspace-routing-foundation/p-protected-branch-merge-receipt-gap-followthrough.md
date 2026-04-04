@@ -13,14 +13,14 @@
 ## Summary
 
 - This owner exists because ordinary protected merges can still carry a historical receipt gap even after the earlier receipt hardening owner closed.
-- The known concrete gaps are merge `908a6ad`, merge `5da463c`, and merge `eec65f3`, all of which lack canonical merge trailers.
+- The known concrete gaps now also include same-day follow-on merges `dfbca95`, `3de9c27`, `ec36ebe`, and protected source-branch merge `70ef97d`, all of which lack canonical merge trailers.
 - The lane stays narrow: add an ancestry backfill ledger and audit path for ordinary protected merges only.
 
 ## Current Focus
 
 - Materialize the ordinary protected-merge receipt-gap backfill contract.
 - Extend `governance-check` so ancestry gaps require matching backfill entries.
-- Backfill the newly created `5da463c` and `eec65f3` merges so the just-closed `1100` and receipt-gap followthrough owners remain lawful on canonical `develop`.
+- Keep backfilling newly discovered same-day ancestry gaps, including `70ef97d`, so canonical `develop` remains pushable without widening owner scope.
 
 ## Verification
 
@@ -30,4 +30,4 @@
 
 ## Next Action
 
-- Keep the ledger current for each discovered ordinary protected merge that lacks canonical trailers, including `908a6ad`, `5da463c`, and `eec65f3`, without reopening broader protected-branch merge governance.
+- Keep the ledger current for each discovered ordinary protected merge that lacks canonical trailers, including develop-sourced feature merges that later enter canonical ancestry, without reopening broader protected-branch merge governance.

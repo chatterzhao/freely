@@ -10,9 +10,9 @@
 
 ## Scope Verdict
 
-- `PASS`: this continuation stays inside ordinary protected-merge receipt-gap repair for three same-day `develop` merges created while clearing develop push governance blockers.
+- `PASS`: this continuation stays inside ordinary protected-merge receipt-gap repair for four same-day protected merges discovered while clearing develop push governance blockers, including the `develop -> feature/manager-bootstrap...` ancestry merge `70ef97d`.
 - `PASS`: the repair is limited to canonical backfill ledger entries and does not relax future trailer requirements for protected merges.
-- `PASS`: both missing-trailer merges now point to the existing receipt-gap followthrough owner instead of widening scope to unrelated governance policy.
+- `PASS`: each missing-trailer merge now points to the existing receipt-gap followthrough owner instead of widening scope to unrelated governance policy.
 
 ## Commands
 
@@ -23,8 +23,8 @@
 
 ## Implementation Decision Note
 
-- decision: `Backfill the three develop-push triage merge commits in the ordinary protected-merge receipt-gap ledger and verify them under the existing receipt-gap followthrough owner.`
-- why_this: `The merges already exist on protected-branch history and the develop push is otherwise complete, so the lawful repair is audit backfill rather than history rewrite or bypass.`
-- alternatives_considered: `Considered leaving the newest gap for a later batch and considered opening a new owner just for the triage branch merges. The former leaves develop failing governance-check, and the latter duplicates an active owner that already exists for exactly this repair class.`
+- decision: `Backfill the four same-day protected merge commits in the ordinary protected-merge receipt-gap ledger and verify them under the existing receipt-gap followthrough owner.`
+- why_this: `These merges already exist on protected-branch ancestry and the lawful repair is audit backfill rather than history rewrite or bypass, even when one of the gaps is a protected source-branch merge from develop into a feature worktree.`
+- alternatives_considered: `Considered leaving the newest gap for a later batch and considered opening a new owner just for the manager-bootstrap branch merge. The former leaves develop failing governance-check, and the latter duplicates an active owner that already exists for exactly this repair class.`
 - boundary_non_goals: `This continuation does not weaken merge trailer policy, does not alter merge history, and does not reopen broader protected-branch hardening work.`
 - residual_risk: `Any additional protected merges created without canonical trailers on the same day will still require their own backfill entries until the merge path is consistently emitting receipts.`

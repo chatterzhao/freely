@@ -92,3 +92,15 @@
 - evidence_refs:
   - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
   - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
+
+## Receipt Gap: 70ef97de795640b8e09d38090516f137c0574eda
+
+- target_branch: `feature/manager-bootstrap-prompt-publication-without-continuity-materialization-20260404-1405`
+- source_branch: `develop`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260404-0640-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
+  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
