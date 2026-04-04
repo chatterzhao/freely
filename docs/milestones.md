@@ -50,6 +50,23 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260403-1100-A`
+- title: Governance chain legacy repair for develop push unblock
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
+- source_brainstorm: `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/candidates.md`
+- next_action: Continue the legacy governance-chain repair from the now-materialized umbrella owner, keep `1200/1201/1202/1203` as lawful parent-linked child slices, then advance the actual artifact backfill and validation batch.
+- evidence:
+  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
+  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/prd.md`
+  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
+
 ### candidate_issues
 
 ### completed_issues
