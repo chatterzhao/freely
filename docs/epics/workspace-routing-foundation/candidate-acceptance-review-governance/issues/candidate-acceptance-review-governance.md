@@ -55,4 +55,5 @@ Freely 已经要求 pre-brainstorm candidate 进入 milestone，但 candidate �
 ## Completion
 
 - candidate acceptance review governance 已落盘并通过回归，future candidate 的 v2 schema、独立 review 记录、IBM acceptance deepening 与治理门禁都已稳定。
+- canonical owner 继续保留历史 issue identity `I-20260320-0500`；对应 candidate `C-20260320-0500-A` 通过 `legacy_id_mapping` 回绑这条已物化的 issue lineage，而不是重命名旧 issue。
 - 高风险 candidate 是否需要双审，保留为后续策略判断，不阻塞当前 canonical issue 完成。

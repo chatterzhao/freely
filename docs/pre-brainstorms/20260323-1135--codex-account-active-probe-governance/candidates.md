@@ -3,9 +3,10 @@
 - id: `C-20260323-1135-A`
 - title: Codex account active probe and cooldown recovery governance
 - source_brainstorm: `docs/pre-brainstorms/20260323-1135--codex-account-active-probe-governance/brainstorms.md`
-- status: `promoted`
+- status: `absorbed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- decision_reason: `I-20260318-1630` 已吸收 account active probe / cooldown recovery contract，当前候选只保留为该 canonical watchdog owner 的 supporting evidence，不再单独 materialize。
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

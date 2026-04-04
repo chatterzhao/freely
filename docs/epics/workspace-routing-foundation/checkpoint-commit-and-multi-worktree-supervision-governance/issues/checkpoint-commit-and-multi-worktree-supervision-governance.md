@@ -9,6 +9,9 @@
 - issue-name: `checkpoint-commit-and-multi-worktree-supervision-governance`
 - verification_artifact_dir: `docs/epics/- epic-name: `workspace-routing-foundation`/- story-name: `checkpoint-commit-and-multi-worktree-supervision-governance`/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/candidates.md#c-20260318-A`
+- additional_source_candidates:
+  - `docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/candidates.md#c-20260318-2358-a`
+  - `docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/candidates.md#c-20260318-2358-b`
 - source_brainstorm: `docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`

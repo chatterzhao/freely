@@ -20,10 +20,11 @@
 
 - id: C-20260320-2145-002
   title: Use per-workcell Claude session-id as cc concurrency anchor
-  status: promoted
+  status: absorbed
   why_now:
     - 多 worker / 多 worktree 并发必须立即稳定，不能阻塞在隐藏 `Codex threadId` 可见性上。
   promoted_issue_path: docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md
+  decision_reason: 当前并发 continuity 语义已经由 `I-20260321-0217` 作为 canonical owner 吸收，并在该 issue 的 `additional_source_candidates` 中显式记录；不再单独 materialize 平行 issue。
   milestone: M-20260306-workspace-routing-foundation
   session_refs:
     - tool: cc
