@@ -22,3 +22,11 @@
 4. While the bounded retry/cooldown window is active, `ensure_manager_once` holds launch on the current `tool + slot`.
 5. After the retry window expires, the manager relaunches the same current `tool + slot`, proving this slice is bounded in-place recovery rather than availability switching.
 6. Existing priority-list, Codex slot-first, and all-tools-unavailable regressions remain green, so the new network taxonomy does not regress the previously landed unified slot scheduler.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

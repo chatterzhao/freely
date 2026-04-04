@@ -32,3 +32,11 @@
   - `test-freely-network-proxy-resolver` now asserts missing-config inherit behavior
   - `test-freely-network-proxy-launcher-inheritance` now asserts ambient proxy env survives when both project and global config are absent
   - `test-freely-session-rotation` now completes past the former `context_usage_threshold` failure and passes end-to-end
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record
