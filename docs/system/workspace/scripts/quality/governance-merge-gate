@@ -355,8 +355,8 @@ def parse_milestones() -> List[MilestoneEntry]:
             current_list_field = None
             continue
 
-        milestone_status = re.match(r"^\s*-\s*status:\s*(.+?)\s*$", line)
-        if milestone_status and current_milestone:
+        milestone_status = re.match(r"^-\s*status:\s*(.+?)\s*$", line.strip())
+        if milestone_status and current_milestone and not current_queue and not current_item:
             current_milestone_status = normalize_scalar(milestone_status.group(1))
             continue
 
