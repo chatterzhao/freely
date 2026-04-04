@@ -10,20 +10,14 @@
 
 但 closeout 之后，canonical `develop` 根目录还留下一组未归属的 staged 改动，暴露出“仍有人试图继续修 merge gate / merge receipt”的 residual signal。当前先要判断这组信号到底是不是还没被吸收的新问题，而不是把根目录的 staged patch 直接当答案。
 
-## Historical Repo Facts At Brainstorm Time (`2026-04-02`)
+## Current Repo Facts
 
 当前可验证事实：
 
 - canonical `develop` HEAD 是 `33226d6`
 - `feature/hook-bypass-breakglass-governance-20260402-0020` 已经通过 `52f55c0` 合入 `develop`
 - closeout lane `feature/hook-bypass-breakglass-closeout-20260402-0235` 已通过 `33226d6` 写回 `completed`
-- `20260402-1719--hook-bypass-break-glass-governance` 当时只存在于 dirty worktree 文档里，既没 materialize 到 canonical `docs/`，也没形成当前 owner 真相
-
-## Current Canonical Note (`2026-04-03`)
-
-- canonical `develop` 已推进到 `61beab2`
-- `docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/` 现在已经存在于 canonical `docs/`，但它仍是更宽的 `needs_research` 候选，不是 receipt hardening 的现行 owner
-- 本文的边界裁决仍然成立：`1912` 之所以成立，是因为它把更宽的 break-glass 讨论窄化成 receipt hardening follow-on；后续 canonical history 也确实把它 materialize 成 `I-20260402-1912-A`
+- 旧的 `feature/hook-bypass-break-glass-governance-20260402-1719` worktree 仍在，但只有 dirty 的 pre-brainstorm 文档，既没 materialize 到 canonical `docs/`，也没形成当前 owner 真相
 
 当前根目录 staged 改动其实混了两类问题：
 
@@ -66,7 +60,7 @@
 - `I-20260402-0020-A` 是 completed
 - 若后续再出现 merge-gate false negative / stronger enforcement，需要开更窄的 follow-on owner，而不是 reopen 广义 break-glass 治理
 
-因此继续复用 `20260402-1719` 会把已关闭的 contract 再次搅混，也会让更宽的 break-glass candidate 误充当 receipt-hardening owner。
+因此继续复用 `20260402-1719` 会把已关闭的 contract 再次搅混，也会让 dirty stale worktree 伪装成 canonical owner。
 
 ## Candidate Direction
 
@@ -92,6 +86,6 @@
 
 结论是：
 
-- 在当时的 canonical `develop` 和其他现存 worktree 中，还没有正式承接这条更窄的 residual hardening
+- 现有 canonical `develop` 和其他现存 worktree 都没有正式承接这条更窄的 residual hardening
 - 根目录 staged patch 不是一个可直接吸收的答案，其中还混有对已吸收 watchdog 修复的回退
-- 因此当时应从当前 `develop` 新开 dedicated worktree，materialize 一个新的 pre-brainstorm / candidate，只承接 protected-branch merge receipt hardening
+- 因此应从当前 `develop` 新开 dedicated worktree，materialize 一个新的 pre-brainstorm / candidate，只承接 protected-branch merge receipt hardening
