@@ -1,4 +1,5 @@
 # Code Review: oauth-slot-inventory-sweep-and-launch-time-confirmation-governance
+- issue_id: `I-20260327-1115`
 
 - verdict: pass
 - date: `2026-03-27`
