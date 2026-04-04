@@ -26,5 +26,6 @@
   - 主管恢复后继续负责 worker fleet 监督
   - 所有账号都不可用时，会切到最早恢复账号并等待唤醒，而不是要求 AI 持续存活
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- legacy_id_mapping: I-20260318-1630  # 历史遗留的 issue id
 - session_refs: []
 - milestone: M-20260306-workspace-routing-foundation
