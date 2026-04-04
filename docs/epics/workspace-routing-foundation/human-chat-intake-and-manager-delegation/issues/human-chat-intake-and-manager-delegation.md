@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `human-chat-intake-and-manager-delegation`
 - issue-name: `human-chat-intake-and-manager-delegation`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md#c-20260319-1715-a`
 - source_brainstorm: `docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md`
