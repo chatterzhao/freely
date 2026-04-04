@@ -54,6 +54,7 @@ That hidden dead-end pressures users and agents back toward protected-root edits
 3. `start`, `status`, `live-status`, and interruption routing surfaces do not collapse into misleading generic failure when `/bin/ps` is unavailable.
 4. Degraded runtime mode is surfaced explicitly as degraded or unavailable process evidence instead of pretending the runtime is healthy.
 5. Focused regressions prove both fallback bootstrap and ps-less degraded readiness semantics.
+6. When `ps` is unavailable, Freely only reuses or terminates PID-file processes when it still has project ownership evidence; arbitrary live PIDs must be treated as stale.
 
 ## Completion
 
@@ -69,11 +70,17 @@ That hidden dead-end pressures users and agents back toward protected-root edits
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-sandbox-operator-state-bootstrap-fallback`
 - `docs/system/workspace/scripts/tests/test-freely-status-degrades-when-ps-is-unavailable`
+- `docs/system/workspace/scripts/tests/test-freely-start-attaches-when-ps-is-unavailable`
+- `docs/system/workspace/scripts/tests/test-freely-start-rejects-foreign-pids-when-ps-is-unavailable`
+- `docs/system/workspace/scripts/tests/test-freely-stop-ignores-foreign-pids-when-ps-is-unavailable`
 
 ## Verification
 
 - `bash docs/system/workspace/scripts/tests/test-freely-sandbox-operator-state-bootstrap-fallback`
 - `bash docs/system/workspace/scripts/tests/test-freely-status-degrades-when-ps-is-unavailable`
+- `bash docs/system/workspace/scripts/tests/test-freely-start-attaches-when-ps-is-unavailable`
+- `bash docs/system/workspace/scripts/tests/test-freely-start-rejects-foreign-pids-when-ps-is-unavailable`
+- `bash docs/system/workspace/scripts/tests/test-freely-stop-ignores-foreign-pids-when-ps-is-unavailable`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
 - `./bin/governance-check`
 
