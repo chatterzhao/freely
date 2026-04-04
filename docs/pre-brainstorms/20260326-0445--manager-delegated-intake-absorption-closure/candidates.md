@@ -8,6 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260326-0445`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md`
+- legacy_id_mapping: I-20260326-0445  # 历史遗留的 issue id
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
