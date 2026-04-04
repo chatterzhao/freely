@@ -48,6 +48,8 @@
 - decision_reason: 方向可能仍有价值，但当前没有 CLI-first 配置内核；不应直接 materialize 成 UI issue。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260306-workspace-routing-foundation
+- next_action: 继续预研，先完成 CLI-first 配置内核后再考虑 UI 层。
+- revisit_trigger: 当 CLI-first 配置内核稳定后需要可视化治理界面时，再推进到 IBM。
 - session_refs: []
 
 ### C-20260305-704
