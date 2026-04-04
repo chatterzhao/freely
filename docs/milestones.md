@@ -50,25 +50,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260404-0119-A`
-- title: Governance merge gate milestone status followthrough governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md`
-- next_action: Keep the slice narrow to `parse_milestones()` queue scoping plus a focused regression so active milestone candidates no longer get blocked by nested item status fields.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
-
-2. `I-20260404-0232-A`
+1. `I-20260404-0232-A`
 - title: Governance merge gate review-aware regression alignment governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -190,7 +172,27 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-freely-stop-ignores-foreign-pids-when-ps-is-unavailable`
   - `./bin/governance-check`
 - completion_note: Canonical `develop` absorbed the sandbox-compatible operator-state fallback and the degraded PID ownership followthrough through merges `1eddbcd` and `45bed28`; this closeout lane only writes back completed lifecycle truth so future sandbox/runtime gaps reopen as new owners on current `develop`.
-4. `I-20260404-1405-A`
+4. `I-20260404-0119-A`
+- title: Governance merge gate milestone status followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md`
+- evidence:
+  - `develop` merge `908a6ad`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+- completion_note: Canonical `develop` absorbed the narrow `parse_milestones()` queue-scope repair through merge `908a6ad`; this closeout lane only writes back completed lifecycle truth so any future nested-field parser regressions reopen as new owners on current `develop`.
+5. `I-20260404-1405-A`
 - title: Manager bootstrap prompt publication without continuity materialization governance
 - milestone_state: completed
 - phase_state: `completed`

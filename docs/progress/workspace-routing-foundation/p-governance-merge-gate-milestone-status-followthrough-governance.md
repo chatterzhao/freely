@@ -3,21 +3,22 @@
 - issue_id: `I-20260404-0119-A`
 - issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
 - title: `Governance merge gate milestone status followthrough governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/governance-merge-gate-milestone-status-followthrough-20260404-011904`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-011904-feature-governance-merge-gate-milestone-status-followthrough`
+- branch: `feature/governance-merge-gate-0119-closeout-20260404-1636`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-1636-feature-governance-merge-gate-0119-closeout`
 - updated_at: `2026-04-04`
-- closure_status: `open`
+- closure_status: `ready_for_merge`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
 ## Summary
 
 - This owner exists only because a real develop replay proved that `governance-merge-gate` misparsed nested queue item status as parent milestone status.
+- Merge `908a6ad` absorbed the narrow parser-bound repair so milestone status is only read from milestone-level fields and nested queue item status no longer poisons active-milestone validation.
 - The implementation slice stays narrow: parser boundary repair plus one focused regression in `test-governance-merge-gate`.
-- The blocked runtime bootstrap lane remains out of scope and should be replayed unchanged after this merge-gate followthrough lands.
+- This closeout lane only reconciles lifecycle truth so milestone, issue, and progress all record the owner as completed historical traceability on current `develop`.
 
 ## Verification Evidence
 
@@ -28,5 +29,5 @@
 
 ## Next Action
 
-1. Merge this narrow followthrough into canonical `develop`.
-2. Retry the blocked runtime bootstrap replay without widening its owner scope.
+1. Merge this closeout lane into canonical `develop` so the completed lifecycle truth becomes canonical.
+2. Keep the blocked runtime bootstrap lane out of scope for this completed record; any further replay should reopen separately on current `develop`.
