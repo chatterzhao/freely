@@ -648,9 +648,11 @@ for branch in branches:
             continue
 
         if not merge_path and not bypass_mode and not source_branch:
+            subject_match = re.search(r"^Merge branch '([^']+)' into ([^\n]+)$", body, re.MULTILINE)
+            if subject_match and subject_match.group(2).strip() != branch and not entry:
+                continue
             if entry:
                 observed.add(commit)
-                subject_match = re.search(r"^Merge branch '([^']+)' into ([^\n]+)$", body, re.MULTILINE)
                 if not subject_match:
                     errors.append(
                         f"[FAIL] protected branch merge {commit} on {branch} is missing canonical trailers and has no parseable merge subject for backfill validation."

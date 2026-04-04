@@ -358,4 +358,43 @@ if ./bin/governance-check >"$TMP_DIR/trailer.out" 2>&1; then
 fi
 grep -q "already has canonical trailers and must not declare a receipt-gap backfill" "$TMP_DIR/trailer.out"
 
+REPO_ANCESTRY="$TMP_DIR/repo-ancestry"
+make_repo "$REPO_ANCESTRY"
+cd "$REPO_ANCESTRY"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/subject-target
+echo nested > NESTED.txt
+git add NESTED.txt
+git commit -q -m "nested feature"
+git checkout -q develop
+echo upstream > UPSTREAM.txt
+git add UPSTREAM.txt
+git commit -q -m "develop advance"
+git checkout -q feature/subject-target
+git merge --no-ff --no-edit develop >/dev/null
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/subject-target' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/subject-target
+EOF
+)" feature/subject-target >/dev/null
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after ancestry merge"
+
+if ! ./bin/governance-check >"$TMP_DIR/ancestry.out" 2>&1; then
+  echo "[FAIL] governance-check should ignore non-protected-target merge subjects that only appear inside protected ancestry" >&2
+  cat "$TMP_DIR/ancestry.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/ancestry.out"
+
 echo "[PASS] governance-check audits ordinary protected-branch merge receipt backfills"

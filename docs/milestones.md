@@ -68,21 +68,7 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
   - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
 
-2. `I-20260404-1405-A`
-- title: Manager bootstrap prompt publication without continuity materialization governance
-- milestone_state: committed
-- phase_state: `in_ibm`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization/candidates.md`
-- next_action: Freeze the exact bootstrap/control-plane failure path from prompt publication to continuity materialization, then repair startup semantics in a dedicated implementation batch.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
-  - `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
-
-3. `I-20260404-0232-A`
+2. `I-20260404-0232-A`
 - title: Governance merge gate review-aware regression alignment governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -198,6 +184,22 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/code-reviews/20260403-governance-chain-legacy-repair-implementation-decision.md`
   - `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
 - completion_note: The 2026-04-04 truth-repair merge restored the missing `1100` owner artifacts, retired deleted `1200/1201/1202/1203` slices to historical status, and cleared dangling canonical references. Any future governance-chain backfill must reopen from current `develop` as a new lifecycle instead of reviving `1100` as an active owner.
+3. `I-20260404-1405-A`
+- title: Manager bootstrap prompt publication without continuity materialization governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization/candidates.md`
+- evidence:
+  - `develop` merge `8d29609`
+  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-verification.md`
+  - `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+- completion_note: Canonical `develop` absorbed the bounded bootstrap grace fix and the `## Worker Dispatch` continuity parser repair through merge `8d29609`; this closeout lane only realigns milestone, issue, and progress truth so future restart-churn work reopens as a new owner instead of reviving `1405`.
 1. `I-20260402-0455-A`
 - title: Worktree exclusive ownership and promotion lease governance
 - milestone_state: completed

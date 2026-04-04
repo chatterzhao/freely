@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260404-1405-A`
 - title: Manager bootstrap prompt publication without continuity materialization governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-bootstrap-prompt-publication-without-continuity-materialization-governance`
@@ -12,6 +12,7 @@
 - source_brainstorm: `docs/pre-brainstorms/20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
+- pre_tests_path: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews`
 - depends_on: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
@@ -48,6 +49,5 @@ Current canonical `develop` can reach manager prompt publication during `freely 
 
 ## Next
 
-- Merge this verified lane into `develop` without widening scope.
-- Re-run root `./bin/freely live-status --project <project-root>` after merge to confirm canonical runtime still surfaces consumed manager continuity and worker prompt truth.
-- Track the remaining `auth_failure / primary_rate_limit_exhausted` restart storm separately if it reproduces after this merge, because it is outside this owner boundary.
+- `2026-04-04` closeout: canonical `develop` already absorbed the runtime fix through merge `8d29609`, and this closeout lane only writes back completed lifecycle truth.
+- Keep this owner closed as the bounded bootstrap-and-worker-dispatch materialization record; future restart churn or auth-slot instability must reopen as a new owner on current `develop`.
