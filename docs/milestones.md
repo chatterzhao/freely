@@ -52,21 +52,24 @@ routing_policy:
 
 1. `I-20260404-0119-A`
 - title: Governance merge gate milestone status followthrough governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md`
-- next_action: Keep the slice narrow to `parse_milestones()` queue scoping plus a focused regression so active milestone candidates no longer get blocked by nested item status fields.
 - evidence:
+  - `develop` merge `908a6ad`
   - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
   - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/prd.md`
   - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/pre-tests.md`
   - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/tasks.md`
   - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
   - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+- completion_note: Canonical `develop` absorbed the narrow milestone-status parser fix and its focused regression through merge `908a6ad`; this closeout lane only writes back completed lifecycle truth so future merge-gate residuals reopen as new owners on current `develop`.
 
 2. `I-20260404-0232-A`
 - title: Governance merge gate review-aware regression alignment governance
