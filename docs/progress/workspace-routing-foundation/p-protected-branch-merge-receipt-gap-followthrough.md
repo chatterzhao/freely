@@ -13,7 +13,7 @@
 ## Summary
 
 - This owner exists because ordinary protected merges can still carry a historical receipt gap even after the earlier receipt hardening owner closed.
-- The first concrete gap is merge `908a6ad`, which lacks canonical merge trailers.
+- The canonical ledger now has to cover merge `908a6ad` and the newer `5da463c`, both of which lack canonical merge trailers.
 - The lane stays narrow: add an ancestry backfill ledger and audit path for ordinary protected merges only.
 
 ## Current Focus
@@ -29,4 +29,4 @@
 
 ## Next Action
 
-- Land the `908a6ad` backfill entry and the focused ancestry-audit regression without reopening broader protected-branch merge governance.
+- Keep the ledger current for discovered ordinary protected-merge receipt gaps, including `908a6ad` and `5da463c`, without reopening broader protected-branch merge governance.
