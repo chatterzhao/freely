@@ -1,4 +1,5 @@
 # Code Review: cli-first-entrypoint-and-observability-surface-unification
+- issue_id: `I-20260322-0115`
 
 ## Scope
 

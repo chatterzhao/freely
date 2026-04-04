@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `cli-first-entrypoint-and-observability-surface-unification`
 - issue-name: `cli-first-entrypoint-and-observability-surface-unification`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md#c-20260322-0115-a`
 - source_brainstorm: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md`
