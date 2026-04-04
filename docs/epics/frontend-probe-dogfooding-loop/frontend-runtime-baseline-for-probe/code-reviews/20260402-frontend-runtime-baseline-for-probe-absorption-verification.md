@@ -42,3 +42,11 @@
 
 - `I-20260317-1004` should move from parked `done_ibm` committed state to `completed`
 - milestone truth should stop listing this owner under `committed_issues`
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record
