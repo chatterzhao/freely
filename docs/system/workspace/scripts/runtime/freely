@@ -830,11 +830,12 @@ process_inspection_state() {
   fi
 }
 
-pid_is_live_without_process_inspection() {
+pid_hint_from_file_without_process_inspection() {
   local pid="${1:-}"
   [[ -n "$pid" ]] || return 1
   process_inspection_available && return 1
-  kill -0 "$pid" 2>/dev/null
+  kill -0 "$pid" 2>/dev/null || return 1
+  printf '%s\n' "$pid"
 }
 
 emit_indented_block() {
@@ -874,6 +875,8 @@ live_status_activity_state_for_project() {
     printf 'supervising\n'
   elif [[ -n "$dispatcher_pid" ]]; then
     printf 'dispatch_only\n'
+  elif [[ -n "$(runtime_unverified_pid_roles_for_project "$project")" ]]; then
+    printf 'degraded_unverified_pid_hints\n'
   elif [[ "${intake_active:-0}" -gt 0 ]]; then
     printf 'stalled_without_runtime\n'
   else
@@ -966,10 +969,6 @@ interruption_dispatcher_pid_for_project() {
       printf '%s\n' "$pid"
       return 0
     fi
-    if pid_is_live_without_process_inspection "$pid"; then
-      printf '%s\n' "$pid"
-      return 0
-    fi
   fi
 }
 
@@ -982,11 +981,43 @@ manager_watchdog_pid_for_project() {
       printf '%s\n' "$pid"
       return 0
     fi
-    if pid_is_live_without_process_inspection "$pid"; then
-      printf '%s\n' "$pid"
-      return 0
-    fi
   fi
+}
+
+manager_supervisor_pid_hint_for_project() {
+  local project="$1" run_dir sp
+  run_dir="$(run_dir_for_project "$project")"
+  [[ -f "$run_dir/supervisor.pid" ]] || return 0
+  sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
+  if valid_supervisor_pid_for_project "$project" "$sp"; then
+    printf '%s\n' "$sp"
+    return 0
+  fi
+  pid_hint_from_file_without_process_inspection "$sp"
+}
+
+manager_watchdog_pid_hint_for_project() {
+  local project="$1" pid_file pid
+  pid_file="$(ensure_manager_watchdog_pid_file "$project")"
+  [[ -f "$pid_file" ]] || return 0
+  pid="$(cat "$pid_file" 2>/dev/null || true)"
+  if valid_ensure_manager_watchdog_pid_for_project "$project" "$pid"; then
+    printf '%s\n' "$pid"
+    return 0
+  fi
+  pid_hint_from_file_without_process_inspection "$pid"
+}
+
+interruption_dispatcher_pid_hint_for_project() {
+  local project="$1" pid_file pid
+  pid_file="$(interruption_dispatcher_pid_file "$project")"
+  [[ -f "$pid_file" ]] || return 0
+  pid="$(cat "$pid_file" 2>/dev/null || true)"
+  if valid_interruption_dispatcher_pid_for_project "$project" "$pid"; then
+    printf '%s\n' "$pid"
+    return 0
+  fi
+  pid_hint_from_file_without_process_inspection "$pid"
 }
 
 valid_ai_pid_for_project() {
@@ -6528,10 +6559,6 @@ manager_supervisor_pid_for_project() {
       printf '%s\n' "$sp"
       return 0
     fi
-    if pid_is_live_without_process_inspection "$sp"; then
-      printf '%s\n' "$sp"
-      return 0
-    fi
   fi
   discover_supervisor_pid "$project"
 }
@@ -6545,11 +6572,19 @@ manager_ai_pid_for_project() {
       printf '%s\n' "$ap"
       return 0
     fi
-    if pid_is_live_without_process_inspection "$ap"; then
-      printf '%s\n' "$ap"
-      return 0
-    fi
   fi
+}
+
+manager_ai_pid_hint_for_project() {
+  local project="$1" run_dir ap
+  run_dir="$(run_dir_for_project "$project")"
+  [[ -f "$run_dir/ai.pid" ]] || return 0
+  ap="$(cat "$run_dir/ai.pid" 2>/dev/null || true)"
+  if valid_ai_pid_for_project "$project" "$ap"; then
+    printf '%s\n' "$ap"
+    return 0
+  fi
+  pid_hint_from_file_without_process_inspection "$ap"
 }
 
 runtime_ai_pid_hint_for_project() {
@@ -6563,6 +6598,25 @@ runtime_ai_pid_hint_for_project() {
     fi
   fi
   manager_ai_pid_for_project "$project"
+}
+
+runtime_unverified_pid_roles_for_project() {
+  local project="$1"
+  local roles=()
+  if [[ -n "$(manager_supervisor_pid_hint_for_project "$project")" ]] && [[ -z "$(manager_supervisor_pid_for_project "$project")" ]]; then
+    roles+=("supervisor")
+  fi
+  if [[ -n "$(manager_watchdog_pid_hint_for_project "$project")" ]] && [[ -z "$(manager_watchdog_pid_for_project "$project")" ]]; then
+    roles+=("manager_watchdog")
+  fi
+  if [[ -n "$(interruption_dispatcher_pid_hint_for_project "$project")" ]] && [[ -z "$(interruption_dispatcher_pid_for_project "$project")" ]]; then
+    roles+=("interruption_dispatcher")
+  fi
+  if [[ -n "$(manager_ai_pid_hint_for_project "$project")" ]] && [[ -z "$(manager_ai_pid_for_project "$project")" ]]; then
+    roles+=("ai")
+  fi
+  ((${#roles[@]} > 0)) || return 0
+  printf '%s\n' "$(IFS=,; printf '%s' "${roles[*]}")"
 }
 
 ensure_interruption_dispatcher_ready_or_fail() {
@@ -7851,16 +7905,24 @@ stop_project_runtime() {
   if [[ -f "$(ensure_manager_watchdog_pid_file "$project")" ]]; then
     local wp
     wp="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
-    if valid_ensure_manager_watchdog_pid_for_project "$project" "$wp" || pid_is_live_without_process_inspection "$wp"; then
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$wp"; then
       terminate_pid_with_graceful_wait "$wp" "project manager watchdog during stop"
+    elif [[ -n "$(pid_hint_from_file_without_process_inspection "$wp" 2>/dev/null || true)" ]]; then
+      log_warn "refusing to kill unverified manager watchdog pid without project ownership proof: $wp"
+    elif [[ -n "$wp" ]]; then
+      log_warn "ignoring stale ensure-manager.pid that is not owned by project: $wp"
     fi
     rm -f "$(ensure_manager_watchdog_pid_file "$project")"
   fi
   if [[ -f "$(interruption_dispatcher_pid_file "$project")" ]]; then
     local dp
     dp="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
-    if valid_interruption_dispatcher_pid_for_project "$project" "$dp" || pid_is_live_without_process_inspection "$dp"; then
+    if valid_interruption_dispatcher_pid_for_project "$project" "$dp"; then
       terminate_pid_with_graceful_wait "$dp" "project interruption dispatcher during stop"
+    elif [[ -n "$(pid_hint_from_file_without_process_inspection "$dp" 2>/dev/null || true)" ]]; then
+      log_warn "refusing to kill unverified interruption-dispatch.pid without project ownership proof: $dp"
+    elif [[ -n "$dp" ]]; then
+      log_warn "ignoring stale interruption-dispatch.pid that is not owned by project: $dp"
     fi
     rm -f "$(interruption_dispatcher_pid_file "$project")"
   fi
@@ -7894,11 +7956,6 @@ resolve_active_supervisor_pid_for_start() {
       RESOLVED_ACTIVE_SUPERVISOR_PID="$candidate_pid"
       return 0
     fi
-    if pid_is_live_without_process_inspection "$candidate_pid"; then
-      LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="supervisor_pid_file_degraded"
-      RESOLVED_ACTIVE_SUPERVISOR_PID="$candidate_pid"
-      return 0
-    fi
     if [[ -n "$candidate_pid" ]]; then
       log_warn "ignoring stale supervisor.pid that is not owned by project: $candidate_pid"
       rm -f "$sup_pid_file"
@@ -7918,18 +7975,26 @@ resolve_active_supervisor_pid_for_start() {
 
 ensure_no_active_supervisor_conflict() {
   local project="$1" sup_pid_file="$2" child_pid_file="$3" allow_attach="${4:-0}"
-  local old_pid="" attach_ai_pid_state="missing" role_hint
+  local old_pid="" attach_ai_pid_state="missing" role_hint unverified_roles=""
   LAST_ATTACH_REUSE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_AI_PID_STATE="missing"
   resolve_active_supervisor_pid_for_start "$project" "$sup_pid_file" || true
   old_pid="${RESOLVED_ACTIVE_SUPERVISOR_PID:-}"
+  if [[ -z "$old_pid" ]]; then
+    unverified_roles="$(runtime_unverified_pid_roles_for_project "$project")"
+    if [[ -n "$unverified_roles" ]]; then
+      log_error "process inspection is unavailable and runtime pid files remain unverified for: $unverified_roles"
+      log_error "refusing to reuse or replace the runtime without project ownership proof; rerun where process inspection works or clear the stale pid files after confirming the old runtime is gone"
+      return 12
+    fi
+  fi
   if [[ -n "$old_pid" ]]; then
     if [[ "$allow_attach" == "1" ]]; then
       role_hint="$(role_hint_for_project "$project")"
       if [[ -f "$child_pid_file" ]]; then
         local active_ai_pid
         active_ai_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
-        if [[ -n "$active_ai_pid" ]] && ! valid_ai_pid_for_project "$project" "$active_ai_pid" && ! pid_is_live_without_process_inspection "$active_ai_pid"; then
+        if [[ -n "$active_ai_pid" ]] && ! valid_ai_pid_for_project "$project" "$active_ai_pid"; then
           attach_ai_pid_state="stale_pid_cleared"
           log_warn "clearing stale ai.pid while reusing healthy project supervisor: $active_ai_pid"
           rm -f "$child_pid_file"
@@ -7959,9 +8024,11 @@ ensure_no_active_supervisor_conflict() {
   if [[ -f "$child_pid_file" ]]; then
     local active_ai_pid
     active_ai_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
-    if valid_ai_pid_for_project "$project" "$active_ai_pid" || pid_is_live_without_process_inspection "$active_ai_pid"; then
+    if valid_ai_pid_for_project "$project" "$active_ai_pid"; then
       log_warn "repairing orphaned project ai pid before supervisor restart: $active_ai_pid"
       terminate_pid_with_graceful_wait "$active_ai_pid" "orphaned project ai pid before supervisor restart"
+    elif [[ -n "$(pid_hint_from_file_without_process_inspection "$active_ai_pid" 2>/dev/null || true)" ]]; then
+      log_warn "refusing to kill unverified ai.pid before supervisor restart: $active_ai_pid"
     elif [[ -n "$active_ai_pid" ]]; then
       log_warn "ignoring stale ai.pid before supervisor restart: $active_ai_pid"
     fi
@@ -9000,6 +9067,10 @@ cmd_baseline_status() {
     sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
     if valid_supervisor_pid_for_project "$PROJECT_ROOT" "$sp"; then
       echo "supervisor_pid: ${sp:-none}"
+    elif [[ -n "$(pid_hint_from_file_without_process_inspection "$sp" 2>/dev/null || true)" ]]; then
+      echo "supervisor_pid: none"
+      echo "supervisor_pid_hint: ${sp:-none}"
+      echo "supervisor_pid_hint_evidence: unverified_pid_file"
     else
       sp="$(discover_supervisor_pid "$PROJECT_ROOT")"
       echo "supervisor_pid: ${sp:-none}"
@@ -9012,10 +9083,12 @@ cmd_baseline_status() {
   if [[ -f "$run_dir/ai.pid" ]]; then
     local ap
     ap="$(cat "$run_dir/ai.pid" 2>/dev/null || true)"
-    if [[ -n "$ap" ]] && kill -0 "$ap" 2>/dev/null; then
+    if valid_ai_pid_for_project "$PROJECT_ROOT" "$ap"; then
       echo "ai_pid: ${ap:-none}"
-    elif valid_ai_pid_for_project "$PROJECT_ROOT" "$ap"; then
-      echo "ai_pid: ${ap:-none}"
+    elif [[ -n "$(pid_hint_from_file_without_process_inspection "$ap" 2>/dev/null || true)" ]]; then
+      echo "ai_pid: none"
+      echo "ai_pid_hint: ${ap:-none}"
+      echo "ai_pid_hint_evidence: unverified_pid_file"
     else
       echo "ai_pid: none"
     fi
@@ -9027,6 +9100,10 @@ cmd_baseline_status() {
     dp="$(cat "$(interruption_dispatcher_pid_file "$PROJECT_ROOT")" 2>/dev/null || true)"
     if valid_interruption_dispatcher_pid_for_project "$PROJECT_ROOT" "$dp"; then
       echo "interruption_dispatcher_pid: ${dp:-none}"
+    elif [[ -n "$(pid_hint_from_file_without_process_inspection "$dp" 2>/dev/null || true)" ]]; then
+      echo "interruption_dispatcher_pid: none"
+      echo "interruption_dispatcher_pid_hint: ${dp:-none}"
+      echo "interruption_dispatcher_pid_hint_evidence: unverified_pid_file"
     else
       echo "interruption_dispatcher_pid: none"
     fi
@@ -9087,6 +9164,7 @@ cmd_live_status() {
 
   local run_dir branch role_hint activity_state
   local supervisor_pid ai_pid dispatcher_pid watchdog_pid
+  local supervisor_pid_evidence ai_pid_evidence dispatcher_pid_evidence watchdog_pid_evidence
   local supervisor_cmd ai_cmd dispatcher_cmd watchdog_cmd
   local prompt_file continuity_file prompt_excerpt continuity_excerpt
   local prompt_intent_kind prompt_intent_target prompt_intent_target_raw
@@ -9105,9 +9183,29 @@ cmd_live_status() {
   role_hint="$(role_hint_for_project "$project")"
   activity_state="$(live_status_activity_state_for_project "$project")"
   supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  supervisor_pid_evidence="authoritative"
+  if [[ -z "$supervisor_pid" ]]; then
+    supervisor_pid="$(manager_supervisor_pid_hint_for_project "$project")"
+    [[ -n "$supervisor_pid" ]] && supervisor_pid_evidence="unverified_pid_file"
+  fi
   ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  ai_pid_evidence="authoritative"
+  if [[ -z "$ai_pid" ]]; then
+    ai_pid="$(manager_ai_pid_hint_for_project "$project")"
+    [[ -n "$ai_pid" ]] && ai_pid_evidence="unverified_pid_file"
+  fi
   dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  dispatcher_pid_evidence="authoritative"
+  if [[ -z "$dispatcher_pid" ]]; then
+    dispatcher_pid="$(interruption_dispatcher_pid_hint_for_project "$project")"
+    [[ -n "$dispatcher_pid" ]] && dispatcher_pid_evidence="unverified_pid_file"
+  fi
   watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
+  watchdog_pid_evidence="authoritative"
+  if [[ -z "$watchdog_pid" ]]; then
+    watchdog_pid="$(manager_watchdog_pid_hint_for_project "$project")"
+    [[ -n "$watchdog_pid" ]] && watchdog_pid_evidence="unverified_pid_file"
+  fi
   supervisor_cmd="$(ps_command_for_pid "$supervisor_pid")"
   ai_cmd="$(ps_command_for_pid "$ai_pid")"
   dispatcher_cmd="$(ps_command_for_pid "$dispatcher_pid")"
@@ -9321,16 +9419,16 @@ cmd_live_status() {
   if [[ -n "$supervisor_pid" || -n "$watchdog_pid" || -n "$dispatcher_pid" || -n "$ai_pid" ]]; then
     echo "active_processes:"
     if [[ -n "$supervisor_pid" ]]; then
-      echo "- role=supervisor pid=$supervisor_pid command=${supervisor_cmd:-unavailable}"
+      echo "- role=supervisor pid=$supervisor_pid command=${supervisor_cmd:-unavailable} ownership=${supervisor_pid_evidence}"
     fi
     if [[ -n "$watchdog_pid" ]]; then
-      echo "- role=manager_watchdog pid=$watchdog_pid command=${watchdog_cmd:-unavailable}"
+      echo "- role=manager_watchdog pid=$watchdog_pid command=${watchdog_cmd:-unavailable} ownership=${watchdog_pid_evidence}"
     fi
     if [[ -n "$dispatcher_pid" ]]; then
-      echo "- role=interruption_dispatcher pid=$dispatcher_pid command=${dispatcher_cmd:-unavailable}"
+      echo "- role=interruption_dispatcher pid=$dispatcher_pid command=${dispatcher_cmd:-unavailable} ownership=${dispatcher_pid_evidence}"
     fi
     if [[ -n "$ai_pid" ]]; then
-      echo "- role=ai pid=$ai_pid command=${ai_cmd:-unavailable}"
+      echo "- role=ai pid=$ai_pid command=${ai_cmd:-unavailable} ownership=${ai_pid_evidence}"
     fi
   else
     echo "active_processes: none"

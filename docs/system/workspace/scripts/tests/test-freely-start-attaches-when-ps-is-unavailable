@@ -77,10 +77,19 @@ exit 1
 EOF
 chmod +x "$FAKE_BIN_DIR/ps"
 
+cat >"$FAKE_BIN_DIR/lsof" <<EOF
+#!/usr/bin/env bash
+cat <<'OUT'
+p${SUP_PID}
+n${PROJECT}
+OUT
+EOF
+chmod +x "$FAKE_BIN_DIR/lsof"
+
 PATH="$FAKE_BIN_DIR:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null
 
 grep -q 'LAST_EXIT_REASON="already_running_attach"' "$PROJECT/.freely/run/workcell-state.env"
 grep -q 'supervisor_attach_reuse' "$PROJECT/.freely/logs/runtime-events.log"
-grep -Eq 'supervisor_pid_source=supervisor_pid_file(_degraded)?' "$PROJECT/.freely/logs/runtime-events.log"
+grep -q 'supervisor_pid_source=supervisor_pid_file' "$PROJECT/.freely/logs/runtime-events.log"
 
-echo "[PASS] freely start reuses a healthy project runtime from pid files when ps is unavailable"
+echo "[PASS] freely start reuses a healthy project runtime when ps is unavailable but cwd ownership is still provable"
