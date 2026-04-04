@@ -23,7 +23,7 @@
   - reopening `I-20260401-1303-A-2` would blur a completed contract back into an umbrella
 - priority: `P0`
 - status: `promoted`
-- milestone: `M-20260326-freely-product-architecture`
+- milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
 - promoted_issue_path_role: `primary-owner`
 - session_refs:
