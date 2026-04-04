@@ -27,3 +27,11 @@
 
 1. This owner intentionally stays `codex`-scoped; cross-tool explicit session-addressed resume audit remains follow-on work unless another issue proves shared failure shape.
 2. The verification set is deliberately narrow and does not reclassify auth/watchdog or broader observability behavior into this owner.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record

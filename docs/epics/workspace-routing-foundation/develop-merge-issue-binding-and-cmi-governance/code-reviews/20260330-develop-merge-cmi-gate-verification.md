@@ -21,3 +21,11 @@
 
 1. Future lifecycle shapes that introduce new candidate status variants or owner-routing semantics may require additional gate matrix cases.
 2. This verification proves the current same-line execution-owner contract; it does not replace future targeted regressions for unrelated milestone-policy changes.
+
+## Implementation Decision Note
+
+- decision: legacy: completed verification artifact
+- why_this: legacy: no detailed record
+- alternatives_considered: legacy: no detailed record
+- boundary_non_goals: legacy: no detailed record
+- residual_risk: legacy: no detailed record
