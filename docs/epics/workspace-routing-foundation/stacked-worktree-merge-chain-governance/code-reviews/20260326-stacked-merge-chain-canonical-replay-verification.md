@@ -1,4 +1,5 @@
 # Code Review: stacked-worktree-merge-chain-governance canonical replay
+- issue_id: `I-20260321-1045`
 
 - verdict: pass
 - date: `2026-03-26`
