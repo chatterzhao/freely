@@ -7,6 +7,7 @@
 - epic-name: `control-surface-runtime-convergence`
 - story-name: `backend-service-contract-and-adapter-taxonomy`
 - issue-name: `backend-service-contract-and-adapter-taxonomy`
+- verification_artifact_dir: `docs/epics/- epic-name: `control-surface-runtime-convergence`/- story-name: `backend-service-contract-and-adapter-taxonomy`/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md#c-20260312-0011-a`
 - source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
 - execution_base: `develop`
