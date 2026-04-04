@@ -1,6 +1,13 @@
 # Candidates - 20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state
 
-## C-20260403-2245-A
+## Context
+
+- Source brainstorm: ./brainstorms.md
+- Status: reviewed
+
+## Candidates
+
+### C-20260403-2245-A
 
 - candidate_format_version: `v2`
 - title: Sandbox-compatible runtime bootstrap and operator-state governance
