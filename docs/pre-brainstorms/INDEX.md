@@ -26,18 +26,6 @@
 - 20260403-2041--worktree-tool-boundary-bootstrap
   - brainstorms: docs/pre-brainstorms/20260403-2041--worktree-tool-boundary-bootstrap/brainstorms.md
   - candidates: docs/pre-brainstorms/20260403-2041--worktree-tool-boundary-bootstrap/candidates.md
-- 20260403-1203--issue-id-key-repair
-  - brainstorms: docs/pre-brainstorms/20260403-1203--issue-id-key-repair/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260403-1203--issue-id-key-repair/candidates.md
-- 20260403-1202--candidate-touched-repair
-  - brainstorms: docs/pre-brainstorms/20260403-1202--candidate-touched-repair/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260403-1202--candidate-touched-repair/candidates.md
-- 20260403-1201--implementation-decision-note-repair
-  - brainstorms: docs/pre-brainstorms/20260403-1201--implementation-decision-note-repair/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260403-1201--implementation-decision-note-repair/candidates.md
-- 20260403-1200--verification-artifact-dir-repair
-  - brainstorms: docs/pre-brainstorms/20260403-1200--verification-artifact-dir-repair/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260403-1200--verification-artifact-dir-repair/candidates.md
 - 20260403-1100--governance-chain-legacy-repair
   - brainstorms: docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/brainstorms.md
   - candidates: docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/candidates.md
@@ -47,33 +35,33 @@
 - 20260402-1912--protected-branch-merge-receipt-hardening
   - brainstorms: docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md
-- 20260402-1719--hook-bypass-break-glass-governance
-  - brainstorms: docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/candidates.md
-- 20260402-0020--hook-bypass-breakglass-governance
-  - brainstorms: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md
-- 20260402-0455--worktree-exclusive-ownership-governance
-  - brainstorms: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/candidates.md
 - 20260402-0540--runtime-loop-log-timezone-label-followthrough
   - brainstorms: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/candidates.md
+- 20260402-0455--worktree-exclusive-ownership-governance
+  - brainstorms: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/candidates.md
 - 20260402-0403--canonical-product-posture-bootstrap-reconciliation
   - brainstorms: docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/brainstorms.md
   - candidates: docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/candidates.md
-- 20260401-0040--supply-chain-audit-and-install-intake-capability
-  - brainstorms: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/candidates.md
-- 20260401-0115--supply-chain-baseline-and-install-intake-audit-capability
-  - brainstorms: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md
+- 20260402-0308--runtime-status-time-display-audit
+  - brainstorms: docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/candidates.md
+- 20260402-0130--backup-time-rendering-and-storage-boundary
+  - brainstorms: docs/pre-brainstorms/20260402-0130--backup-time-rendering-and-storage-boundary/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0130--backup-time-rendering-and-storage-boundary/candidates.md
+- 20260402-0020--hook-bypass-breakglass-governance
+  - brainstorms: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md
 - 20260401-2354--implementation-decision-notes-in-review-artifacts
   - brainstorms: docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md
 - 20260401-2316--cc-acp-init-autonomy-consent-test-followthrough
   - brainstorms: docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/candidates.md
+- 20260401-2245--build-artifact-exposure-and-release-allowlist-capability
+  - brainstorms: docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/candidates.md
 - 20260401-1831--worker-reactivation-reentry-residual-runtime-gaps
   - brainstorms: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md
@@ -89,147 +77,39 @@
 - 20260401-1303--freely-product-security-baseline-governance
   - brainstorms: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/candidates.md
-- 20260401-1308--workspace-security-capability-baseline-governance
-  - brainstorms: docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-1308--workspace-security-capability-baseline-governance/candidates.md
-- 20260331-2012--active-milestone-placement-and-consumption-gate
-  - brainstorms: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md
-- 20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance
-  - brainstorms: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/candidates.md
-- 20260331-1837--worker-first-hop-role-boundary-regression
-- 20260330-2318--live-status-already-running-attach-regression
-- 20260330-2358--network-failure-recovery-governance
-- 20260331-1840--multi-tool-group-auto-switch-governance
-- 20260401-0840--all-tools-unified-slot-contract-governance
-- 20260329-2155--sensitive-local-artifact-ignore-governance
-- 20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle
-- 20260328-2105--resume-evidence-strength-and-false-positive-resume-governance
-- 20260328-0745--live-status-current-runtime-state-reconciliation
-- 20260327-2006--start-restart-control-plane-semantics
-- 20260327-1845--manager-consumed-continuity-resume-routing-drift
-- 20260327-1003--prebrainstorm-materialization-audit
-- 20260327-0651--pretests-gate-and-network-proxy-config
-- 20260326-1705--manager-owner-stance-and-source-patrol
-- 20260327-1115--oauth-api-usage-query-refactor
-- 20260326-1825--deep-refactor-fleet-sequencing
-- 20260326-0445--manager-delegated-intake-absorption-closure
-- 20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance
-- 20260325-0525--watchdog-slot-sweep-without-cooldown-governance
-- 20260325-0333--testing-evidence-ladder-and-real-environment-gates
-- 20260324-0405--watchdog-restart-storm-and-process-churn-detection
-- 20260324-0415--application-native-observability-planes
-- 20260323-2045--manager-worker-scheduler-capacity-and-queueing
-- 20260323-1705--manager-delegated-continuation-stall-recovery
-- 20260323-1835--worker-delegated-continuation-active-stall-recovery
-- 20260323-1435--interactive-init-bootstrap-and-force-governance
-- 20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion
-- 20260323-1135--codex-account-active-probe-governance
-- 20260322-1802--pre-test-merge-semantic-audit-and-recovery
-- 20260322-1801--pre-test-merge-governance-lifecycle
-- 20260321-1835--lifecycle-complete-before-merge-governance
-- 20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery
-- 20260321-1715--manager-patrol-trigger-and-restart-routing
-- 20260321-1430--external-drift-and-out-of-band-reconcile
-- 20260322-0715--pre-test-merge-post-merge-acceptance-stall
-- 20260322-0445--latest-manager-continuity-worker-consumption
-- 20260322-0245--runtime-worker-launch-linkage-and-stall-recovery
-- 20260322-0412--worker-active-reentry-for-manager-delegated-continuation
-- 20260322-0228--manager-delegation-after-sufficient-patrol-evidence
-- 20260321-1925--manager-chat-reentry-and-cleanup-misrouting
-- 20260321-1706--chat-triggered-worker-runtime-reactivation
-- 20260321-2010--explicit-session-addressed-resume-over-last-and-pty
-- 20260321-1515--remote-branch-retirement-governance
-- 20260321-1530--agent-ready-prd-for-freely-flow
-- 20260321-1435--legacy-promoted-candidate-normalization
-- 20260321-1045--stacked-worktree-merge-chain-governance
-- 20260321-0345--manager-reactivation-and-fleet-patrol
-- 20260321-0257--worktree-fleet-governance-closure
-- 20260320-1745--dirty-worktree-governance-redesign
-- 20260320-1628--claude-code-codex-mcp-tool-routing
-- 20260321-0148--cc-codex-session-evidence-resolution
-- 20260320-2145--cc-tool-profiles-and-concurrent-session-continuity
-- 20260320-1410--worktree-maintenance-skill-taxonomy
-- 20260320-0908--research-candidate-persistence-governance
-- 20260320-0605--agent-state-time-machine-and-shared-continuity
-- 20260320-0512--milestone-planning-and-state-maintenance
-- 20260320-0500--candidate-acceptance-review-governance
-- 20260320-0252--interruption-topology-and-manager-routing
-- 20260320-0152--chat-entrypoint-autobootstrap
-- 20260320-0138--interruption-entrypoint-runtime-preflight
-- 20260320-0120--interruption-manager-agent-triage
-- 20260320-0052--interruption-direct-answer-control-plane
-- 20260320-0018--default-project-resolution-and-authorized-project-memory
-
-本目录是 pre-brainstorm 记录的规范结构。
-
-兼容说明：
-- 若目录名、候选名或历史留痕仍出现 `pre-test-merge`，默认将其解释为当前 canonical 的 `test-pre-merge-*` 测试批次前缀族。
-- 为保持既有引用稳定，本索引不会因为语义升级而大规模重命名历史目录。
-
-## 命名规则
-- 新目录名必须使用 `YYYYMMDD-HHMM--<topic>` 格式。
-- 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
-
-## 条目
-- 20260402-0020--hook-bypass-breakglass-governance
-  - brainstorms: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/candidates.md
-- 20260402-0455--worktree-exclusive-ownership-governance
-  - brainstorms: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260402-0455--worktree-exclusive-ownership-governance/candidates.md
-- 20260402-0540--runtime-loop-log-timezone-label-followthrough
-  - brainstorms: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260402-0540--runtime-loop-log-timezone-label-followthrough/candidates.md
-- 20260402-0403--canonical-product-posture-bootstrap-reconciliation
-  - brainstorms: docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260402-0403--canonical-product-posture-bootstrap-reconciliation/candidates.md
-- 20260401-0040--supply-chain-audit-and-install-intake-capability
-  - brainstorms: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/candidates.md
-- 20260401-0115--supply-chain-baseline-and-install-intake-audit-capability
-  - brainstorms: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md
-- 20260401-2354--implementation-decision-notes-in-review-artifacts
-  - brainstorms: docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md
-- 20260401-2316--cc-acp-init-autonomy-consent-test-followthrough
-  - brainstorms: docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/candidates.md
-- 20260401-1831--worker-reactivation-reentry-residual-runtime-gaps
-  - brainstorms: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md
-- 20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection
-  - brainstorms: docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/candidates.md
-- 20260401-1545--acp-client-agent-protocol-runtime-adoption
-  - brainstorms: docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md
-- 20260331-2012--active-milestone-placement-and-consumption-gate
-  - brainstorms: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md
-- 20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance
-  - brainstorms: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/candidates.md
-- 20260331-1837--worker-first-hop-role-boundary-regression
-  - brainstorms: docs/pre-brainstorms/20260331-1837--worker-first-hop-role-boundary-regression/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260331-1837--worker-first-hop-role-boundary-regression/candidates.md
-- 20260330-2318--live-status-already-running-attach-regression
-  - brainstorms: docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/candidates.md
-- 20260330-2358--network-failure-recovery-governance
-  - brainstorms: docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/candidates.md
-- 20260329-2155--sensitive-local-artifact-ignore-governance
-  - brainstorms: docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/candidates.md
-- 20260331-1840--multi-tool-group-auto-switch-governance
-  - brainstorms: docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md
+- 20260401-1035--develop-push-pending-guard-governance
+  - brainstorms: docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/candidates.md
 - 20260401-0840--all-tools-unified-slot-contract-governance
   - brainstorms: docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md
+- 20260401-0115--supply-chain-baseline-and-install-intake-audit-capability
+  - brainstorms: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md
+- 20260401-0040--supply-chain-audit-and-install-intake-capability
+  - brainstorms: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260401-0040--supply-chain-audit-and-install-intake-capability/candidates.md
+- 20260331-2012--active-milestone-placement-and-consumption-gate
+  - brainstorms: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260331-2012--active-milestone-placement-and-consumption-gate/candidates.md
+- 20260331-1840--multi-tool-group-auto-switch-governance
+  - brainstorms: docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/candidates.md
+- 20260331-1837--worker-first-hop-role-boundary-regression
+  - brainstorms: docs/pre-brainstorms/20260331-1837--worker-first-hop-role-boundary-regression/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260331-1837--worker-first-hop-role-boundary-regression/candidates.md
+- 20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance
+  - brainstorms: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/candidates.md
+- 20260330-2358--network-failure-recovery-governance
+  - brainstorms: docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260330-2358--network-failure-recovery-governance/candidates.md
+- 20260330-2318--live-status-already-running-attach-regression
+  - brainstorms: docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260330-2318--live-status-already-running-attach-regression/candidates.md
+- 20260329-2155--sensitive-local-artifact-ignore-governance
+  - brainstorms: docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/candidates.md
 - 20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle
   - brainstorms: docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/brainstorms.md
   - candidates: docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/candidates.md
@@ -239,63 +119,111 @@
 - 20260328-0745--live-status-current-runtime-state-reconciliation
   - brainstorms: docs/pre-brainstorms/20260328-0745--live-status-current-runtime-state-reconciliation/brainstorms.md
   - candidates: docs/pre-brainstorms/20260328-0745--live-status-current-runtime-state-reconciliation/candidates.md
+- 20260328-0335--operator-stop-runtime-stall-recovery-semantics
+  - brainstorms: docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/candidates.md
+- 20260328-0154--manager-stall-reentry-false-positive-supervision-thrash
+  - brainstorms: docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md
 - 20260327-2006--start-restart-control-plane-semantics
   - brainstorms: docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md
   - candidates: docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md
 - 20260327-1845--manager-consumed-continuity-resume-routing-drift
   - brainstorms: docs/pre-brainstorms/20260327-1845--manager-consumed-continuity-resume-routing-drift/brainstorms.md
   - candidates: docs/pre-brainstorms/20260327-1845--manager-consumed-continuity-resume-routing-drift/candidates.md
+- 20260327-1115--oauth-api-usage-query-refactor
+  - brainstorms: docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md
 - 20260327-1003--prebrainstorm-materialization-audit
   - brainstorms: docs/pre-brainstorms/20260327-1003--prebrainstorm-materialization-audit/brainstorms.md
   - candidates: docs/pre-brainstorms/20260327-1003--prebrainstorm-materialization-audit/candidates.md
 - 20260327-0651--pretests-gate-and-network-proxy-config
   - brainstorms: docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/brainstorms.md
   - candidates: docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/candidates.md
-- 20260327-1115--oauth-api-usage-query-refactor
-  - brainstorms: docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md
-- 20260326-1705--manager-owner-stance-and-source-patrol
-  - brainstorms: docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/candidates.md
 - 20260326-1825--deep-refactor-fleet-sequencing
   - brainstorms: docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/brainstorms.md
   - candidates: docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/candidates.md
+- 20260326-1810--freely-layered-architecture-and-tooling-topology
+  - brainstorms: docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md
+- 20260326-1733--ibm-pretests-real-environment-acceptance-quality
+  - brainstorms: docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/candidates.md
+- 20260326-1705--manager-owner-stance-and-source-patrol
+  - brainstorms: docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/candidates.md
 - 20260326-0445--manager-delegated-intake-absorption-closure
   - brainstorms: docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/brainstorms.md
   - candidates: docs/pre-brainstorms/20260326-0445--manager-delegated-intake-absorption-closure/candidates.md
-- 20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance
-  - brainstorms: docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md
 - 20260325-0525--watchdog-slot-sweep-without-cooldown-governance
   - brainstorms: docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md
 - 20260325-0333--testing-evidence-ladder-and-real-environment-gates
   - brainstorms: docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md
   - candidates: docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md
-- 20260324-0405--watchdog-restart-storm-and-process-churn-detection
-  - brainstorms: docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/candidates.md
 - 20260324-0415--application-native-observability-planes
   - brainstorms: docs/pre-brainstorms/20260324-0415--application-native-observability-planes/brainstorms.md
   - candidates: docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md
+- 20260324-0405--watchdog-restart-storm-and-process-churn-detection
+  - brainstorms: docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260324-0405--watchdog-restart-storm-and-process-churn-detection/candidates.md
 - 20260323-2045--manager-worker-scheduler-capacity-and-queueing
   - brainstorms: docs/pre-brainstorms/20260323-2045--manager-worker-scheduler-capacity-and-queueing/brainstorms.md
   - candidates: docs/pre-brainstorms/20260323-2045--manager-worker-scheduler-capacity-and-queueing/candidates.md
-- 20260323-1705--manager-delegated-continuation-stall-recovery
-  - brainstorms: docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md
 - 20260323-1835--worker-delegated-continuation-active-stall-recovery
   - brainstorms: docs/pre-brainstorms/20260323-1835--worker-delegated-continuation-active-stall-recovery/brainstorms.md
   - candidates: docs/pre-brainstorms/20260323-1835--worker-delegated-continuation-active-stall-recovery/candidates.md
+- 20260323-1705--manager-delegated-continuation-stall-recovery
+  - brainstorms: docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md
 - 20260323-1435--interactive-init-bootstrap-and-force-governance
   - brainstorms: docs/pre-brainstorms/20260323-1435--interactive-init-bootstrap-and-force-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260323-1435--interactive-init-bootstrap-and-force-governance/candidates.md
-- 20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion
-  - brainstorms: docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/candidates.md
 - 20260323-1135--codex-account-active-probe-governance
   - brainstorms: docs/pre-brainstorms/20260323-1135--codex-account-active-probe-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260323-1135--codex-account-active-probe-governance/candidates.md
+- 20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion
+  - brainstorms: docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/candidates.md
+- 20260322-1802--pre-test-merge-semantic-audit-and-recovery
+  - brainstorms: docs/pre-brainstorms/20260322-1802--pre-test-merge-semantic-audit-and-recovery/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-1802--pre-test-merge-semantic-audit-and-recovery/candidates.md
+- 20260322-1801--pre-test-merge-governance-lifecycle
+  - brainstorms: docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md
+- 20260322-1615--protected-post-merge-acceptance-route-governance
+  - brainstorms: docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/candidates.md
+- 20260322-0715--pre-test-merge-post-merge-acceptance-stall
+  - brainstorms: docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/candidates.md
+- 20260322-0445--latest-manager-continuity-worker-consumption
+  - brainstorms: docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md
+- 20260322-0412--worker-active-reentry-for-manager-delegated-continuation
+  - brainstorms: docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0412--worker-active-reentry-for-manager-delegated-continuation/candidates.md
+- 20260322-0245--runtime-worker-launch-linkage-and-stall-recovery
+  - brainstorms: docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/candidates.md
+- 20260322-0228--manager-delegation-after-sufficient-patrol-evidence
+  - brainstorms: docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/candidates.md
+- 20260322-0135--integration-acceptance-first-ibm-and-verification
+  - brainstorms: docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/candidates.md
+- 20260322-0115--cli-first-entrypoint-and-observability-surface-unification
+  - brainstorms: docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md
+- 20260322-0049--manager-continuation-handoff-consumption
+  - brainstorms: docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260322-0049--manager-continuation-handoff-consumption/candidates.md
+- 20260321-2010--explicit-session-addressed-resume-over-last-and-pty
+  - brainstorms: docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/candidates.md
+- 20260321-1925--manager-chat-reentry-and-cleanup-misrouting
+  - brainstorms: docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/candidates.md
 - 20260321-1835--lifecycle-complete-before-merge-governance
   - brainstorms: docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/candidates.md
@@ -305,45 +233,21 @@
 - 20260321-1715--manager-patrol-trigger-and-restart-routing
   - brainstorms: docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/candidates.md
-- 20260321-1430--external-drift-and-out-of-band-reconcile
-  - brainstorms: docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/candidates.md
-- 20260322-0715--pre-test-merge-post-merge-acceptance-stall
-  - brainstorms: docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260322-0715--pre-test-merge-post-merge-acceptance-stall/candidates.md
-- 20260322-0445--latest-manager-continuity-worker-consumption
-  - brainstorms: docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md
-- 20260322-0245--runtime-worker-launch-linkage-and-stall-recovery
-  - brainstorms: docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260322-0245--runtime-worker-launch-linkage-and-stall-recovery/candidates.md
-- 20260322-0228--manager-delegation-after-sufficient-patrol-evidence
-  - brainstorms: docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260322-0228--manager-delegation-after-sufficient-patrol-evidence/candidates.md
-- 20260321-1925--manager-chat-reentry-and-cleanup-misrouting
-  - brainstorms: docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/candidates.md
 - 20260321-1706--chat-triggered-worker-runtime-reactivation
   - brainstorms: docs/pre-brainstorms/20260321-1706--chat-triggered-worker-runtime-reactivation/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1706--chat-triggered-worker-runtime-reactivation/candidates.md
-- 20260321-2010--explicit-session-addressed-resume-over-last-and-pty
-  - brainstorms: docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260321-2010--explicit-session-addressed-resume-over-last-and-pty/candidates.md
-- 20260322-0115--cli-first-entrypoint-and-observability-surface-unification
-  - brainstorms: docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md
-- 20260322-0135--integration-acceptance-first-ibm-and-verification
-  - brainstorms: docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/candidates.md
-- 20260321-1515--remote-branch-retirement-governance
-  - brainstorms: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md
 - 20260321-1530--agent-ready-prd-for-freely-flow
   - brainstorms: docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/candidates.md
+- 20260321-1515--remote-branch-retirement-governance
+  - brainstorms: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-1515--remote-branch-retirement-governance/candidates.md
 - 20260321-1435--legacy-promoted-candidate-normalization
   - brainstorms: docs/pre-brainstorms/20260321-1435--legacy-promoted-candidate-normalization/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1435--legacy-promoted-candidate-normalization/candidates.md
+- 20260321-1430--external-drift-and-out-of-band-reconcile
+  - brainstorms: docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/candidates.md
 - 20260321-1045--stacked-worktree-merge-chain-governance
   - brainstorms: docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-1045--stacked-worktree-merge-chain-governance/candidates.md
@@ -353,237 +257,228 @@
 - 20260321-0257--worktree-fleet-governance-closure
   - brainstorms: docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md
-- 20260320-1745--dirty-worktree-governance-redesign
-  - brainstorms: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/candidates.md
-- 20260320-1628--claude-code-codex-mcp-tool-routing
-  - brainstorms: docs/pre-brainstorms/20260320-1628--claude-code-codex-mcp-tool-routing/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-1628--claude-code-codex-mcp-tool-routing/candidates.md
 - 20260321-0148--cc-codex-session-evidence-resolution
   - brainstorms: docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/brainstorms.md
   - candidates: docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md
 - 20260320-2145--cc-tool-profiles-and-concurrent-session-continuity
   - brainstorms: docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md
+- 20260320-2105--status-family-baseline-rename-and-future-aggregation
+  - brainstorms: docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/candidates.md
+- 20260320-1945--watchdog-live-status-surface-and-manager-supervision
+  - brainstorms: docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/candidates.md
+- 20260320-1745--dirty-worktree-governance-redesign
+  - brainstorms: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/candidates.md
+- 20260320-1628--claude-code-codex-mcp-tool-routing
+  - brainstorms: docs/pre-brainstorms/20260320-1628--claude-code-codex-mcp-tool-routing/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-1628--claude-code-codex-mcp-tool-routing/candidates.md
 - 20260320-1410--worktree-maintenance-skill-taxonomy
   - brainstorms: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/brainstorms.md
   - candidates: docs/pre-brainstorms/20260320-1410--worktree-maintenance-skill-taxonomy/candidates.md
-- 20260303-0000--ai-consistency-closed-loop-freely-alignment
-  - brainstorms: docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/candidates.md
-- 20260303-0000--cli-orchestration-architecture
-  - brainstorms: docs/pre-brainstorms/20260303-0000--cli-orchestration-architecture/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260303-0000--cli-orchestration-architecture/candidates.md
-- 20260304-0000--architecture-backend-first-and-frontend-decoupling
-  - brainstorms: docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/candidates.md
-- 20260304-0000--evolver-integration
-  - brainstorms: docs/pre-brainstorms/20260304-0000--evolver-integration/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260304-0000--evolver-integration/candidates.md
-- 20260304-0000--evomap-ecosystem-freely
-  - brainstorms: docs/pre-brainstorms/20260304-0000--evomap-ecosystem-freely/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260304-0000--evomap-ecosystem-freely/candidates.md
-- 20260304-0000--openclaw-workspace-freely-feasibility
-  - brainstorms: docs/pre-brainstorms/20260304-0000--openclaw-workspace-freely-feasibility/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260304-0000--openclaw-workspace-freely-feasibility/candidates.md
-- 20260304-0000--research-redo-owner-tool-alignment
-  - brainstorms: docs/pre-brainstorms/20260304-0000--research-redo-owner-tool-alignment/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260304-0000--research-redo-owner-tool-alignment/candidates.md
-- 20260305-0000--freely-dogfooding-governance-worktree-policy
-  - brainstorms: docs/pre-brainstorms/20260305-0000--freely-dogfooding-governance-worktree-policy/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260305-0000--freely-dogfooding-governance-worktree-policy/candidates.md
-- 20260305-0000--doc-loop-dev-loop-directory-unification
-  - brainstorms: docs/pre-brainstorms/20260305-0000--doc-loop-dev-loop-directory-unification/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260305-0000--doc-loop-dev-loop-directory-unification/candidates.md
-- 20260305-1402--doc-loop-governance-maintenance
-  - brainstorms: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/candidates.md
-- 20260305-0000--worktree-policy-predevelop-exclusion
-  - brainstorms: docs/pre-brainstorms/20260305-0000--worktree-policy-predevelop-exclusion/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260305-0000--worktree-policy-predevelop-exclusion/candidates.md
-- 20260305-2338--governance-skill-hook-alignment
-  - brainstorms: docs/pre-brainstorms/20260305-2338--governance-skill-hook-alignment/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260305-2338--governance-skill-hook-alignment/candidates.md
-- 20260305-2355--pre-test-merge-duty-migration
-  - brainstorms: docs/pre-brainstorms/20260305-2355--pre-test-merge-duty-migration/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260305-2355--pre-test-merge-duty-migration/candidates.md
-- 20260306-0016--freely-githooks-install-mode
-  - brainstorms: docs/pre-brainstorms/20260306-0016--freely-githooks-install-mode/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260306-0016--freely-githooks-install-mode/candidates.md
-- 20260306-0113--standard-worktree-prompts-and-fallback-boundary
-  - brainstorms: docs/pre-brainstorms/20260306-0113--standard-worktree-prompts-and-fallback-boundary/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260306-0113--standard-worktree-prompts-and-fallback-boundary/candidates.md
-- 20260306-0248--issue-brainstorm-routing-guard
-  - brainstorms: docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/candidates.md
-- 20260307-0537--ai-tool-worktree-directory-access
-  - brainstorms: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/candidates.md
-- 20260307-0930--source-routing-and-derived-worktree-governance
-  - brainstorms: docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md
-- 20260308-0145--state-sync-and-session-evidence-governance
-  - brainstorms: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md
-- 20260308-1244--frontend-probe-dogfooding-loop
-  - brainstorms: docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md
-- 20260308-1500--milestone-state-identifier-refinement
-  - brainstorms: docs/pre-brainstorms/20260308-1500--milestone-state-identifier-refinement/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260308-1500--milestone-state-identifier-refinement/candidates.md
-- 20260308-1630--stage-prefixed-progress-identifier
-  - brainstorms: docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/candidates.md
-- 20260308-1930--business-block-vs-system-crash-recovery
-  - brainstorms: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/candidates.md
-- 20260309-1943--agent-skills-standard-compliance
-  - brainstorms: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/candidates.md
-- 20260309-2003--document-skill-boundary-planning
-  - brainstorms: docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/candidates.md
-- 20260309-2345--governance-check-naming-alignment
-  - brainstorms: docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/candidates.md
-- 20260316-1648--codex-reasoning-effort-runtime-alignment
-  - brainstorms: docs/pre-brainstorms/20260316-1648--codex-reasoning-effort-runtime-alignment/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260316-1648--codex-reasoning-effort-runtime-alignment/candidates.md
-- 20260316-1800--session-lifecycle-rotation-and-handoff
-  - brainstorms: docs/pre-brainstorms/20260316-1800--session-lifecycle-rotation-and-handoff/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260316-1800--session-lifecycle-rotation-and-handoff/candidates.md
-- 20260316-1838--context-window-aware-session-rotation
-  - brainstorms: docs/pre-brainstorms/20260316-1838--context-window-aware-session-rotation/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260316-1838--context-window-aware-session-rotation/candidates.md
-- 20260316-2202--first-hop-must-execute-second-hop
-  - brainstorms: docs/pre-brainstorms/20260316-2202--first-hop-must-execute-second-hop/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260316-2202--first-hop-must-execute-second-hop/candidates.md
-- 20260317-0332--rust-tauri-probe-bridge-v1
-  - brainstorms: docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md
-- 20260317-0735--account-aware-loop-and-checkpoint-commit-governance
-  - brainstorms: docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/candidates.md
-- 20260317-1101--frontend-runtime-baseline-for-probe
-  - brainstorms: docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md
-- 20260317-2248--rust-toolchain-bootstrap-skill
-  - brainstorms: docs/pre-brainstorms/20260317-2248--rust-toolchain-bootstrap-skill/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260317-2248--rust-toolchain-bootstrap-skill/candidates.md
-- 20260318-1818--ai-cli-availability-manager
-  - brainstorms: docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/candidates.md
-- 20260318-2245--worktree-pid-ownership-validation
-  - brainstorms: docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/candidates.md
+- 20260320-0908--research-candidate-persistence-governance
+  - brainstorms: docs/pre-brainstorms/20260320-0908--research-candidate-persistence-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0908--research-candidate-persistence-governance/candidates.md
+- 20260320-0605--agent-state-time-machine-and-shared-continuity
+  - brainstorms: docs/pre-brainstorms/20260320-0605--agent-state-time-machine-and-shared-continuity/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0605--agent-state-time-machine-and-shared-continuity/candidates.md
+- 20260320-0512--milestone-planning-and-state-maintenance
+  - brainstorms: docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/candidates.md
+- 20260320-0500--candidate-acceptance-review-governance
+  - brainstorms: docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/candidates.md
+- 20260320-0252--interruption-topology-and-manager-routing
+  - brainstorms: docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0252--interruption-topology-and-manager-routing/candidates.md
+- 20260320-0152--chat-entrypoint-autobootstrap
+  - brainstorms: docs/pre-brainstorms/20260320-0152--chat-entrypoint-autobootstrap/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0152--chat-entrypoint-autobootstrap/candidates.md
+- 20260320-0138--interruption-entrypoint-runtime-preflight
+  - brainstorms: docs/pre-brainstorms/20260320-0138--interruption-entrypoint-runtime-preflight/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0138--interruption-entrypoint-runtime-preflight/candidates.md
+- 20260320-0120--interruption-manager-agent-triage
+  - brainstorms: docs/pre-brainstorms/20260320-0120--interruption-manager-agent-triage/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0120--interruption-manager-agent-triage/candidates.md
+- 20260320-0052--interruption-direct-answer-control-plane
+  - brainstorms: docs/pre-brainstorms/20260320-0052--interruption-direct-answer-control-plane/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0052--interruption-direct-answer-control-plane/candidates.md
+- 20260320-0018--default-project-resolution-and-authorized-project-memory
+  - brainstorms: docs/pre-brainstorms/20260320-0018--default-project-resolution-and-authorized-project-memory/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-0018--default-project-resolution-and-authorized-project-memory/candidates.md
+- 20260319-2315--cli-tui-human-interruption-input
+  - brainstorms: docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md
+- 20260319-1715--human-chat-intake-and-manager-delegation
+  - brainstorms: docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md
+- 20260319-1105--three-loop-capability-lifecycle-governance
+  - brainstorms: docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md
+- 20260319-0500--openai-symphony-research
+  - brainstorms: docs/pre-brainstorms/20260319-0500--openai-symphony-research/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-0500--openai-symphony-research/candidates.md
+- 20260319-0402--openai-harness-engineering-research
+  - brainstorms: docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/candidates.md
+- 20260319-0220--watchdog-control-plane-governance
+  - brainstorms: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/candidates.md
+- 20260319-0148--context-compaction-salvage-and-retirement
+  - brainstorms: docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md
+- 20260319-0018--token-efficient-session-continuity-and-rotation
+  - brainstorms: docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md
 - 20260318-2358--manager-workcell-supervision-and-continuity
   - brainstorms: docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/candidates.md
+- 20260318-2245--worktree-pid-ownership-validation
+  - brainstorms: docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/candidates.md
 - 20260318-1825--autonomous-worktree-hygiene-and-checkpoint-supervision
   - brainstorms: docs/pre-brainstorms/20260318-1825--autonomous-worktree-hygiene-and-checkpoint-supervision/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-1825--autonomous-worktree-hygiene-and-checkpoint-supervision/candidates.md
-- 20260318-0009--multi-worktree-supervision-control-plane
-  - brainstorms: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/candidates.md
-- 20260318-0715--ai-autonomy-checkpoint-commit-governance
-  - brainstorms: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/candidates.md
-- 20260318-1210--rate-limit-recheck-and-wakeup
-  - brainstorms: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/candidates.md
+- 20260318-1818--ai-cli-availability-manager
+  - brainstorms: docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/candidates.md
+- 20260318-1630--global-ai-account-watchdog
+  - brainstorms: docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md
+- 20260318-1408--manager-self-supervision-and-autonomous-recovery
+  - brainstorms: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md
 - 20260318-1246--iflow-wechat-webfetch-capability
   - brainstorms: docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md
 - 20260318-1222--mem9-shared-memory-fit-for-freely
   - brainstorms: docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/brainstorms.md
   - candidates: docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/candidates.md
-- 20260318-1408--manager-self-supervision-and-autonomous-recovery
-  - brainstorms: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md
-- 20260318-1630--global-ai-account-watchdog
-  - brainstorms: docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md
-- 20260310-0056--evolver-autonomous-development-leverage
-  - brainstorms: docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/candidates.md
+- 20260318-1210--rate-limit-recheck-and-wakeup
+  - brainstorms: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-1210--rate-limit-recheck-and-wakeup/candidates.md
+- 20260318-0715--ai-autonomy-checkpoint-commit-governance
+  - brainstorms: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-0715--ai-autonomy-checkpoint-commit-governance/candidates.md
+- 20260318-0009--multi-worktree-supervision-control-plane
+  - brainstorms: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260318-0009--multi-worktree-supervision-control-plane/candidates.md
+- 20260317-2248--rust-toolchain-bootstrap-skill
+  - brainstorms: docs/pre-brainstorms/20260317-2248--rust-toolchain-bootstrap-skill/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260317-2248--rust-toolchain-bootstrap-skill/candidates.md
+- 20260317-1101--frontend-runtime-baseline-for-probe
+  - brainstorms: docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md
+- 20260317-0735--account-aware-loop-and-checkpoint-commit-governance
+  - brainstorms: docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/candidates.md
+- 20260317-0332--rust-tauri-probe-bridge-v1
+  - brainstorms: docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md
+- 20260316-2202--first-hop-must-execute-second-hop
+  - brainstorms: docs/pre-brainstorms/20260316-2202--first-hop-must-execute-second-hop/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260316-2202--first-hop-must-execute-second-hop/candidates.md
+- 20260316-1838--context-window-aware-session-rotation
+  - brainstorms: docs/pre-brainstorms/20260316-1838--context-window-aware-session-rotation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260316-1838--context-window-aware-session-rotation/candidates.md
+- 20260316-1800--session-lifecycle-rotation-and-handoff
+  - brainstorms: docs/pre-brainstorms/20260316-1800--session-lifecycle-rotation-and-handoff/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260316-1800--session-lifecycle-rotation-and-handoff/candidates.md
+- 20260316-1648--codex-reasoning-effort-runtime-alignment
+  - brainstorms: docs/pre-brainstorms/20260316-1648--codex-reasoning-effort-runtime-alignment/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260316-1648--codex-reasoning-effort-runtime-alignment/candidates.md
 - 20260312-0011--architecture-synthesis-and-api-boundary
   - brainstorms: docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md
   - candidates: docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md
-- 20260319-0018--token-efficient-session-continuity-and-rotation
-  - brainstorms: docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md
-- 20260319-0148--context-compaction-salvage-and-retirement
-  - brainstorms: docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260319-0148--context-compaction-salvage-and-retirement/candidates.md
-- 20260319-0402--openai-harness-engineering-research
-  - brainstorms: docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260319-0402--openai-harness-engineering-research/candidates.md
-- 20260319-0500--openai-symphony-research
-  - brainstorms: docs/pre-brainstorms/20260319-0500--openai-symphony-research/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260319-0500--openai-symphony-research/candidates.md
-- 20260319-1105--three-loop-capability-lifecycle-governance
-  - brainstorms: docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md
-- 20260319-1715--human-chat-intake-and-manager-delegation
-  - brainstorms: docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260319-1715--human-chat-intake-and-manager-delegation/candidates.md
-- 20260319-2315--cli-tui-human-interruption-input
-  - brainstorms: docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260319-2315--cli-tui-human-interruption-input/candidates.md
-- 20260320-0605--agent-state-time-machine-and-shared-continuity
-  - brainstorms: docs/pre-brainstorms/20260320-0605--agent-state-time-machine-and-shared-continuity/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-0605--agent-state-time-machine-and-shared-continuity/candidates.md
-- 20260319-0220--watchdog-control-plane-governance
-  - brainstorms: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/candidates.md
-- 20260320-1945--watchdog-live-status-surface-and-manager-supervision
-  - brainstorms: docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-1945--watchdog-live-status-surface-and-manager-supervision/candidates.md
-- 20260320-2105--status-family-baseline-rename-and-future-aggregation
-  - brainstorms: docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-2105--status-family-baseline-rename-and-future-aggregation/candidates.md
-- 20260320-0908--research-candidate-persistence-governance
-  - brainstorms: docs/pre-brainstorms/20260320-0908--research-candidate-persistence-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-0908--research-candidate-persistence-governance/candidates.md
-- 20260320-0500--candidate-acceptance-review-governance
-  - brainstorms: docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/candidates.md
-- 20260320-0512--milestone-planning-and-state-maintenance
-  - brainstorms: docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/candidates.md
-- 20260322-1615--protected-post-merge-acceptance-route-governance
-  - brainstorms: docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260322-1615--protected-post-merge-acceptance-route-governance/candidates.md
-- 20260326-1733--ibm-pretests-real-environment-acceptance-quality
-  - brainstorms: docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/candidates.md
-- 20260326-1810--freely-layered-architecture-and-tooling-topology
-  - brainstorms: docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md
-- 20260328-0154--manager-stall-reentry-false-positive-supervision-thrash
-  - brainstorms: docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260328-0154--manager-stall-reentry-false-positive-supervision-thrash/candidates.md
-- 20260328-0335--operator-stop-runtime-stall-recovery-semantics
-  - brainstorms: docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260328-0335--operator-stop-runtime-stall-recovery-semantics/candidates.md
-- 20260401-1035--develop-push-pending-guard-governance
-  - brainstorms: docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/candidates.md
-- 20260401-2245--build-artifact-exposure-and-release-allowlist-capability
-  - brainstorms: docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/candidates.md
+- 20260310-0056--evolver-autonomous-development-leverage
+  - brainstorms: docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/candidates.md
+- 20260309-2345--governance-check-naming-alignment
+  - brainstorms: docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/candidates.md
+- 20260309-2003--document-skill-boundary-planning
+  - brainstorms: docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/candidates.md
+- 20260309-1943--agent-skills-standard-compliance
+  - brainstorms: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/candidates.md
+- 20260308-1930--business-block-vs-system-crash-recovery
+  - brainstorms: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260308-1930--business-block-vs-system-crash-recovery/candidates.md
+- 20260308-1630--stage-prefixed-progress-identifier
+  - brainstorms: docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/candidates.md
+- 20260308-1500--milestone-state-identifier-refinement
+  - brainstorms: docs/pre-brainstorms/20260308-1500--milestone-state-identifier-refinement/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260308-1500--milestone-state-identifier-refinement/candidates.md
+- 20260308-1244--frontend-probe-dogfooding-loop
+  - brainstorms: docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md
+- 20260308-0145--state-sync-and-session-evidence-governance
+  - brainstorms: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md
+- 20260307-0930--source-routing-and-derived-worktree-governance
+  - brainstorms: docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md
+- 20260307-0537--ai-tool-worktree-directory-access
+  - brainstorms: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260307-0537--ai-tool-worktree-directory-access/candidates.md
+- 20260306-0248--issue-brainstorm-routing-guard
+  - brainstorms: docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/candidates.md
+- 20260306-0113--standard-worktree-prompts-and-fallback-boundary
+  - brainstorms: docs/pre-brainstorms/20260306-0113--standard-worktree-prompts-and-fallback-boundary/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260306-0113--standard-worktree-prompts-and-fallback-boundary/candidates.md
+- 20260306-0016--freely-githooks-install-mode
+  - brainstorms: docs/pre-brainstorms/20260306-0016--freely-githooks-install-mode/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260306-0016--freely-githooks-install-mode/candidates.md
+- 20260305-2355--pre-test-merge-duty-migration
+  - brainstorms: docs/pre-brainstorms/20260305-2355--pre-test-merge-duty-migration/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-2355--pre-test-merge-duty-migration/candidates.md
+- 20260305-2338--governance-skill-hook-alignment
+  - brainstorms: docs/pre-brainstorms/20260305-2338--governance-skill-hook-alignment/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-2338--governance-skill-hook-alignment/candidates.md
+- 20260305-1402--doc-loop-governance-maintenance
+  - brainstorms: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/candidates.md
+- 20260305-0000--worktree-policy-predevelop-exclusion
+  - brainstorms: docs/pre-brainstorms/20260305-0000--worktree-policy-predevelop-exclusion/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-0000--worktree-policy-predevelop-exclusion/candidates.md
+- 20260305-0000--freely-dogfooding-governance-worktree-policy
+  - brainstorms: docs/pre-brainstorms/20260305-0000--freely-dogfooding-governance-worktree-policy/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-0000--freely-dogfooding-governance-worktree-policy/candidates.md
+- 20260305-0000--doc-loop-dev-loop-directory-unification
+  - brainstorms: docs/pre-brainstorms/20260305-0000--doc-loop-dev-loop-directory-unification/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260305-0000--doc-loop-dev-loop-directory-unification/candidates.md
+- 20260304-0000--research-redo-owner-tool-alignment
+  - brainstorms: docs/pre-brainstorms/20260304-0000--research-redo-owner-tool-alignment/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260304-0000--research-redo-owner-tool-alignment/candidates.md
+- 20260304-0000--openclaw-workspace-freely-feasibility
+  - brainstorms: docs/pre-brainstorms/20260304-0000--openclaw-workspace-freely-feasibility/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260304-0000--openclaw-workspace-freely-feasibility/candidates.md
+- 20260304-0000--evomap-ecosystem-freely
+  - brainstorms: docs/pre-brainstorms/20260304-0000--evomap-ecosystem-freely/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260304-0000--evomap-ecosystem-freely/candidates.md
+- 20260304-0000--evolver-integration
+  - brainstorms: docs/pre-brainstorms/20260304-0000--evolver-integration/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260304-0000--evolver-integration/candidates.md
+- 20260304-0000--architecture-backend-first-and-frontend-decoupling
+  - brainstorms: docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/candidates.md
+- 20260303-0000--cli-orchestration-architecture
+  - brainstorms: docs/pre-brainstorms/20260303-0000--cli-orchestration-architecture/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260303-0000--cli-orchestration-architecture/candidates.md
+- 20260303-0000--ai-consistency-closed-loop-freely-alignment
+  - brainstorms: docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
-- 20260322-0049--manager-continuation-handoff-consumption
-- `20260327-1003--prebrainstorm-materialization-audit`: prebrainstorm-materialization-audit
-- `20260322-0135--integration-acceptance-first-ibm-and-verification`: integration-acceptance-first-ibm-and-verification
-- `20260326-1733--ibm-pretests-real-environment-acceptance-quality`: ibm-pretests-real-environment-acceptance-quality
-- `20260326-1810--freely-layered-architecture-and-tooling-topology`: freely-layered-architecture-and-tooling-topology
-- `20260326-1825--deep-refactor-fleet-sequencing`: deep-refactor-fleet-sequencing
-- 20260402-0130--backup-time-rendering-and-storage-boundary
-  - brainstorms: docs/pre-brainstorms/20260402-0130--backup-time-rendering-and-storage-boundary/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260402-0130--backup-time-rendering-and-storage-boundary/candidates.md
-- 20260402-0308--runtime-status-time-display-audit
-  - brainstorms: docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260402-0308--runtime-status-time-display-audit/candidates.md
+- `20260322-0049--manager-continuation-handoff-consumption`
+- `20260327-1003--prebrainstorm-materialization-audit`
+- `20260322-0135--integration-acceptance-first-ibm-and-verification`
+- `20260326-1733--ibm-pretests-real-environment-acceptance-quality`
+- `20260326-1810--freely-layered-architecture-and-tooling-topology`
+- `20260326-1825--deep-refactor-fleet-sequencing`

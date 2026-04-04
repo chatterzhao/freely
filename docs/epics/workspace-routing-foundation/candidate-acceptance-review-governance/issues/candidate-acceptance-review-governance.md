@@ -11,7 +11,7 @@
 - source_brainstorm: `docs/pre-brainstorms/20260320-0500--candidate-acceptance-review-governance/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/pre-brainstorms/20260320-0451--candidate-acceptance-boundary/candidates.md#c-20260320-0451-a`
+- depends_on: `none`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Why
