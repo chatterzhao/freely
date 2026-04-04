@@ -10,7 +10,7 @@
 2. 哪些 historical repair slices 只是 parent owner 的 implementation decomposition
 3. 如何在不降低 gate 严格度的前提下恢复 canonical chain
 
-## Current Repair Slice Map
+## Historical Repair Slice Map
 
 ### umbrella owner
 
@@ -61,11 +61,11 @@
 缺点：
 - 需要 parent owner 明确记录 child-slice relationship
 
-## Current Leaning
+## Decision
 
-先走 Option C：
+实际已执行 Option C，并在 closeout 中把 parent owner 写回历史完成态：
 
-1. 让 `1100` 成为当前 legacy governance-chain repair 的 canonical owner
+1. 让 `1100` 成为本次 legacy governance-chain repair 的 canonical owner
 2. 要求 `1200/1201/1202/1203` 不再以 active slice 身份出现在 canonical docs 中
 3. 对每个 child slice 做二选一：
    - absorbed into `I-20260403-1100-A`
@@ -76,3 +76,4 @@
 - 不能用 gate weakening 替代 legacy repair
 - 不能继续让 promoted candidate 指向不存在的 issue
 - 不能让 sibling worktree 关系只存在于 commit message 里，而不写进 canonical docs
+- 不能在 closeout 后继续把 `1100` 叙述成 current umbrella owner

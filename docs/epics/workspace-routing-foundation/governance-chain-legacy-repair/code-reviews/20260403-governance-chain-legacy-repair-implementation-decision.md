@@ -1,8 +1,8 @@
 # Implementation Decision: governance-chain-legacy-repair
 
 - issue_path: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
-- branch: `feature/governance-doc-truth-repair-20260404-1105`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-1105-feature-governance-doc-truth-repair`
+- branch: `historical://feature/governance-doc-truth-repair-20260404-1105`
+- worktree_path: `historical:///Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-1105-feature-governance-doc-truth-repair`
 
 ## decision
 
@@ -27,4 +27,4 @@ The real problem is a broken canonical governance chain, not merely a collection
 
 ## residual_risk
 
-Even after the umbrella owner is restored, promotion is still unsafe until dangling references are cleared and the repaired docs are verified against the current three-worktree fleet.
+This owner is historical after the 2026-04-04 closeout. Future governance-chain drift must open a new lifecycle on current `develop` instead of reusing this repair owner.
