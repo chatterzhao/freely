@@ -7,10 +7,11 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `token-efficient-session-continuity-and-rotation-governance`
 - issue-name: `token-efficient-session-continuity-and-rotation-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md#c-20260319-0018-a`
 - source_brainstorm: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md`
+- source_candidate: `docs/pre-brainstorms/20260319-0018--token-efficient-session-continuity-and-rotation/candidates.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
