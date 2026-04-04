@@ -4,80 +4,72 @@
 
 - 日期：2026-04-03
 - 触发：
-  - `develop` 分支有 787 commits ahead of origin，无法 push
-  - `governance-merge-gate` 检测到 358 个治理链断裂问题
-  - 这些问题分为两类：
-    - 9 个 source_candidate 缺失或无法解析
-    - 46 个 issue 无法解析（missing）
-    - 其余为其他类型的引用断裂
+  - `governance-merge-gate` 收紧后，暴露出一批历史治理链断裂与 repair-slice owner truth 漏写
+  - `1100` 曾经 materialize 为 umbrella owner，但后续清理时误删了 canonical issue/progress/epic 文档，只剩 pre-brainstorm truth
+  - `1200/1201/1202/1203` 与 `20260402-1719` 的目录已删除，但 `INDEX`、`milestones` 仍残留悬挂引用
 
 ## Current Repo Facts
 
-1. `governance-merge-gate` 最近多次收紧检查（从 `936e56a` 到 `c2ca02b`）
-2. 历史遗留的 progress/review 文件引用了不存在的 issue 或 source_candidate
-3. 部分预研目录被删除但 issue/progress 仍引用它们
-4. 部分 issue 文件格式不符合当前解析器要求
+1. `1100` 在 `milestones` 与 candidate 中仍被当作 canonical umbrella owner 使用
+2. 当前树中缺失 `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/**` 与 `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
+3. `20260402-1912` 已明确写明不要再复用已删除且 stale 的 `1719`
+4. 当前需要修的不是 gate 放宽，而是 canonical truth 对齐与残留引用清理
 
 ## Problem
 
 ### 核心问题
 
-1. **历史遗留问题暴露**
-   - 之前 gate 检查不够严格，很多不完整治理链被合并到 develop
-   - 现在收紧后，这些历史问题阻塞了 push
+1. **umbrella owner 真相断裂**
+   - `1100` 已经被写成 promoted / committed owner
+   - 但它对应的 issue / progress / epic 文档被误删，导致 owner 链只剩半套真相
 
-2. **source_candidate 缺失**
-   - 部分 issue 引用的 pre-brainstorm 目录不存在
-   - 部分 candidate 文件格式不符合解析器要求
+2. **已删除 repair slices 仍被 canonical 文档消费**
+   - `1200/1201/1202/1203` 与 `1719` 已删除
+   - `INDEX`、`milestones` 仍把它们当作当前条目继续引用
 
-3. **issue 缺失**
-   - 部分 progress/review 引用的 issue 不存在
-   - 部分引用格式不正确
+3. **历史悬挂引用继续误导后续治理判断**
+   - `20260325-0921` 等已删除路径仍残留在 milestone / inventory / issue depends_on 中
+   - 这些引用会让后续 review 错判哪些 owner 仍然 active
 
 ## Solution Space
 
-### 方案 A：逐一修复所有治理链
+### 方案 A：恢复 `1100` 的 canonical owner 链并清理残留引用
 
-- 优点：彻底解决，符合规范
-- 缺点：工作量大，358 个问题
+- 优点：保持当前 milestone / candidate / owner 语义一致，修复最少的 canonical truth 缺口
+- 缺点：需要补回误删的 owner artifact，并同步刷新叙述
 
-### 方案 B：放宽 gate 检查范围
+### 方案 B：把 `1100` 直接降级或退休，只保留 pre-brainstorm
 
-- 优点：快速恢复 push
-- 缺点：治标不治本，积累更多技术债
+- 优点：减少 active owner 数量
+- 缺点：需要重写 milestone / candidate 生命周期，并解释为何已 promoted owner 可以无 issue/progress 收场
 
-### 方案 C：分阶段修复
+### 方案 C：只修索引，不修 owner
 
-- 先修复阻塞 push 的问题（已 staged 的改动相关）
-- 后续逐步修复历史遗留问题
-- 优点：平衡短期和长期目标
-- 缺点：需要明确定义优先级
+- 优点：改动最小
+- 缺点：仍会留下 `1100` 自身的 canonical 断链，不符合当前法律质量线
 
 ## Proposed Approach
 
-采用方案 C，分阶段修复：
+采用方案 A，围绕 canonical owner 对齐修复：
 
-### Phase 1：修复阻塞 push 的问题
+### Phase 1：恢复 umbrella owner 真相
 
-1. 修复已 staged 改动相关的治理链
-2. 恢复缺失的 pre-brainstorm 目录
-3. 确保当前改动可以 push
+1. 恢复 `1100` 的 issue / progress / issue-bound artifacts
+2. 保持 candidate / milestone 对 `1100` 的 owner 叙述不再指向不存在目标
 
-### Phase 2：批量修复历史遗留问题
+### Phase 2：清理已删除 slice 与历史悬挂引用
 
-1. 分析所有 358 个问题
-2. 分类修复：
-   - 缺失文件：从历史 commit 恢复或创建占位符
-   - 格式问题：修正格式
-   - 引用断裂：修正引用
+1. 从 `INDEX` 移除 `1200/1201/1202/1203` 与 `1719` 幽灵条目
+2. 从 `milestones`、inventory、issue `depends_on` 中移除已删除路径
+3. 只保留仍存在于当前树中的 pre-brainstorm canonical 条目
 
-### Phase 3：加固治理检查
+### Phase 3：验证 owner 链重新闭合
 
-1. 添加 pre-commit 检查防止新增断裂
-2. 添加批量修复工具
+1. `./bin/governance-check`
+2. targeted missing-path sweep
+3. merge back through guarded develop path
 
 ## Open Questions
 
-1. 是否需要为每个断裂创建单独的 issue，还是批量处理？
-2. 历史遗留问题的修复优先级如何定义？
-3. 是否需要引入"legacy_backfill"标记来区分历史补录？
+1. `1100` 在本轮修复后是否应继续保留为 active owner，还是在下一轮 completion verification 里正式关闭？
+2. 未来若再出现 governance repair slices，是否需要专门的 cleanup gate 防止 owner artifact 被误删而 milestone truth 未同步？
