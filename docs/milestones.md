@@ -50,6 +50,20 @@ routing_policy:
 
 ### committed_issues
 
+### candidate_issues
+1. `C-20260402-1719-A`
+- title: Hook bypass break-glass governance and audit
+- milestone_state: candidate
+- candidate_path: `docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/candidates.md#c-20260402-1719-a`
+- source_brainstorm: `docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/brainstorms.md`
+- status: `needs_research`
+- priority: P0
+- next_action: Freeze the break-glass whitelist, evidence model, and audit surface before materializing a dedicated follow-on owner.
+- revisit_trigger:
+  - another protected-branch merge requires manual hook bypass
+  - merge-guarded still falls back to raw conflict-completion commit
+  - governance-check still cannot audit bypass receipts on develop
+
 ### completed_issues
 1. `I-20260402-0455-A`
 - title: Worktree exclusive ownership and promotion lease governance
