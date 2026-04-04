@@ -1,4 +1,5 @@
 # Code Review: manager-owner-stance-and-source-patrol-governance
+- issue_id: `I-20260326-1835`
 
 ## Scope
 

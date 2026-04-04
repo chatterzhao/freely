@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-owner-stance-and-source-patrol-governance`
 - issue-name: `manager-owner-stance-and-source-patrol-governance`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/candidates.md#c-20260326-1705-a`
 - source_brainstorm: `docs/pre-brainstorms/20260326-1705--manager-owner-stance-and-source-patrol/brainstorms.md`
