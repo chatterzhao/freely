@@ -12,6 +12,14 @@
 
 这说明当前失败已经不是“插话入口不可见”，而是“插话可见但 runtime 未能完成 claim/continuity/dispatch 消费”。
 
+继续监督后又补了三条关键证据：
+
+- `develop` 已实际 push 到 `origin/develop`，因此当前阻塞已不再是 protected-branch push gate
+- 在清掉大量历史孤儿 `freely start` / `manager-watchdog` / `ensure-*` 进程后，root runtime 能重新拉起单个 manager supervisor，并继续生成新 prompt
+- 最新 `.freely/run/prompt-20260404-153936.txt` 已带入新的人类插话 `20260404-153908-*`，但该 intake 的 `meta.env` 仍停在 `STATUS="new"` / `CLAIMED_BY=""`
+
+这把现场进一步缩窄为：prompt assembly 已恢复，但 supervision truth 仍停在 claim / continuity materialization 之前。
+
 ## 已确认事实
 
 ### 1. 当前主症状是执行期 websocket 连接被拒，而不是 manager watchdog 完全缺失
@@ -39,6 +47,24 @@
 
 结论：当前链路不是 intake durability 缺失，而是 manager runtime 无法完成 consume/claim/absorb 回写。
 
+### 2A. 最新证据显示“新插话可见于 prompt，但仍未被 claim”
+
+继续监督后又确认：
+
+- `.freely/intake/20260404-153908-supervisor-interruption-canonica/message.txt` 已被 durable 写入
+- 同一条消息已出现在 `.freely/run/prompt-20260404-153936.txt`
+- 但 `.freely/intake/20260404-153908-supervisor-interruption-canonica/meta.env` 仍是：
+  - `STATUS="new"`
+  - `CLAIMED_BY=""`
+  - `ABSORPTION_TARGET=""`
+- 最新 manager continuity 仍停在 `.freely/run/manager-continuity-20260404-143843.md`
+
+因此当前 contract gap 已能精确表达为：
+
+1. intake durability 正常
+2. prompt assembly 正常
+3. manager continuity / intake claim writeback 未收敛
+
 ### 3. 这不是 GitHub issue 自动化功能已经存在但没被正确调用
 
 现有证据仍支持：
@@ -61,6 +87,21 @@
 - 但 intake claim / continuity / dispatch 产物没有 materialize
 
 这已经超出“只是把网络故障分桶”本身，更接近“runtime 在 network-local failure 下如何保持监督闭环与 intake absorption truth”的 follow-on governance。
+
+### 5. 最新证据还叠加了 slot-switch 和进程容量层
+
+本轮继续监督时新增观察到：
+
+- `.freely/logs/cycle-20260404-153936.log` 首行就是：
+  - `[WARN] codex slot switch is already in progress (owner_pid=97028); waiting before codex launch`
+- root 仓库一度存在约 600+ repo-owned runtime 相关进程，包含历史 `freely start`、`manager-watchdog`、`ensure-manager --watch`、`ensure-interruption-dispatch --watch`
+- 这些孤儿进程会把现场推到 `fork: Resource temporarily unavailable`，并放大 prompt-only churn
+
+这说明当前 follow-on 不能只看“websocket permission denied”字符串，还要判断：
+
+- slot-switch busy 是否应进入同一 bounded blocked state
+- orphan process storm 是否属于同一 runtime-owned recovery family
+- intake/continuity blocked truth 应由哪一层统一 materialize
 
 ## 初步边界判断
 
@@ -105,6 +146,11 @@
 
 这更像 supervision contract 的 follow-on，而不是单纯 taxonomy 增补。
 
+补充判断：
+
+- `global-ai-account-watchdog-and-manager-bootstrap` 与 `watchdog-restart-storm-and-process-churn-governance` 都已 completed，只能提供边界，不能直接作为这轮新现象的 owner
+- 当前 `1545` lane 继续保持 pre-brainstorm 是合理的，因为还没完全冻结 websocket permission denied、slot-switch busy、resource exhaustion 三者是否共享一个 recovery owner
+
 ## 下一步研究问题
 
 1. `Operation not permitted` 应被归到 `execution_network_transient`、`execution_network_persistent`，还是新的不可恢复本地边界类 reason？
@@ -115,3 +161,5 @@
    - runtime network follow-on
    - manager supervision / intake absorption follow-on
    - 还是一个更窄的 manager continuity materialization regression
+6. `slot switch already in progress` 与 websocket `Operation not permitted` 是否应共享同一个 blocked-intake / blocked-continuity truth surface？
+7. 清掉历史孤儿 runtime 进程后，为什么 prompt 仍能前进而 claim/continuity 不前进？
