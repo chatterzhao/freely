@@ -39,7 +39,7 @@
   - GitHub 作为公开窗口，用户可以看到 Freely 正在做什么
 - priority: `P1`
 - status: `needs_research`
-- milestone: `M-20260306-workspace-routing-foundation` (待确认)
+- milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `pending://issue-materialization`
 - session_refs:
   - tool: `iflow`
@@ -93,7 +93,7 @@
   - 需要在确定流程后实现
 - priority: `P2`
 - status: `needs_research`
-- milestone: `M-20260306-workspace-routing-foundation` (待确认)
+- milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `pending://issue-materialization`
 - dependencies:
   - `C-20260403-1000-A`
@@ -142,7 +142,7 @@
   - 需要在确定流程后实现
 - priority: `P2`
 - status: `needs_research`
-- milestone: `M-20260306-workspace-routing-foundation` (待确认)
+- milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `pending://issue-materialization`
 - dependencies:
   - `C-20260403-1000-A`
@@ -191,7 +191,7 @@
   - 需要在流程和回流机制就位后实现
 - priority: `P2`
 - status: `needs_research`
-- milestone: `M-20260306-workspace-routing-foundation` (待确认)
+- milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `pending://issue-materialization`
 - dependencies:
   - `C-20260403-1000-A`
