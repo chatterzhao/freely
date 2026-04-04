@@ -66,6 +66,19 @@
   - fallback routing
 - 真正的 reviewer / committee runtime 若要 materialize，应以后续 owner 单独承接，而不是在这条 advisory baseline 里偷渡。
 
+## Local Boundary Contract
+
+- Freely 把“项目根目录”和“sibling worktrees 根目录”视为两个不同的本地边界：
+  - project root 是 integration / merge / runtime bootstrap surface
+  - sibling `{project}-worktrees` root 是 owner development surface
+- 项目级工具配置按工具解耦：
+  - `codex` 走 tool-native `.codex/config.toml`，并由 Freely 额外提供 `.freely/bin/codex` wrapper
+  - `claude`、`iflow` 当前没有 verified 的 project-local writable-root config surface，因此走 Freely wrapper + launch-time flag
+  - `kiro-cli` 当前只有 passthrough wrapper，不伪造 project-local writable-root truth
+- 新 worktree 不依赖 Git 复制 ignored / untracked local files：
+  - 标准入口 `wt-create` 和 protected-branch auto-worktree hook 会调用 `freely sync-tooling --source-project <root> --project <worktree>`
+  - `sync-tooling` 先复制最小 `.freely/config.env`，再在目标 worktree 重新 materialize 各工具本地边界
+
 ## Available Tools
 
 ### iflow
@@ -87,6 +100,8 @@
 - runtime_notes:
   - `iflow --continue` only means recent conversation, not workcell-scoped explicit session addressing.
   - `iflow --resume <session-file>` can target a specific session file, but Freely does not yet materialize it as a canonical per-workcell resume target.
+  - Freely now treats sibling worktree reachability as a boundary bootstrap concern for `iflow`: runtime launch adds `--add-dir <project-worktrees-root>`, and `freely init` writes a project-local `.freely/bin/iflow` wrapper with the same boundary. This extends the reachable workspace beyond the project root; it does not replace normal project-root access.
+  - When a new worktree is created, Freely can rematerialize these local boundaries with `freely sync-tooling --source-project <project-root> --project <worktree>`, so ignored or untracked tool-local files do not get stranded in the primary root.
   - Until that materialization exists, `iflow` remains a weaker continuity contract than `codex` / `cc`.
 
 ### codex
@@ -113,7 +128,9 @@
   - Freely treats `codex` as an explicit session-addressed resume tool: canonical continuity target is the concrete `SESSION_ID`, not `resume --last`.
   - Codex posture is now split into two layers on purpose:
     - project-local baseline: `freely init` materializes a project-scoped `.codex/config.toml`; in `auto` mode this baseline now writes `approval_policy = "never"` while keeping `sandbox_mode = "workspace-write"` and `network_access = false` as the recommended local defaults
-    - launch-time injection: runtime still adds `--dangerously-bypass-approvals-and-sandbox` for current non-interactive auto execution, so the effective CLI posture stays explicit and traceable in launcher/test truth
+    - launch-time injection: runtime still adds `--dangerously-bypass-approvals-and-sandbox` for current non-interactive auto execution, and now also injects `--add-dir <project-worktrees-root>` so sibling worktrees remain reachable without falling back to editing `develop`; this extends Codex reach beyond the project root, not away from it
+  - `freely init` also materializes project-local manual wrappers under `.freely/bin/` for `codex`, `claude`, `iflow`, and `kiro-cli`; for tools with verified extra-dir support, those wrappers inject the canonical sibling `{project}-worktrees` root.
+  - `wt-create` and the protected-branch auto-worktree hook now call `freely sync-tooling` after `git worktree add`, so local managed boundaries are regenerated in the new worktree even if `.gitignore` excludes the underlying directories.
   - If the runtime lacks an explicit Codex session target, it must rotate to `fresh_with_handoff` instead of silently falling back to `--last`.
   - Freely runtime may choose `fresh_with_handoff` when the previous Codex session is technically resumable but no longer healthy to keep extending.
   - Current rotation triggers include `context compacted`, missing resume evidence, local `resume_streak` threshold, and high context-window usage.
@@ -155,6 +172,8 @@
 - runtime_notes:
   - `cc` 不默认启用 `codex-cli` MCP；它是纯 Claude Code 顶层工具。
   - `cc` 当前没有单独的 project-local tool config materialization；Freely 主要通过 launch-time flags 注入 non-interactive posture，例如 `--permission-mode bypassPermissions`、`--session-id`、以及可选 debug/model/effort parameters。
+  - Freely runtime 现在会额外注入 `--add-dir <project-worktrees-root>`，并由 `freely init` 写出对应的 `.freely/bin/claude` wrapper，避免 Claude 在 repo root 会话里因为 sibling worktree 不可达而退回 protected branch 上写；项目根目录本身仍是合法的集成/merge 工作面。
+  - 如果新 worktree 是通过标准 Freely 入口创建的，Claude 对应的受管 wrapper 也会在目标 worktree 被重新 materialize，而不依赖 Git 复制 ignored local files。
   - Freely 会为每个运行中的 workcell 分配独立 `session-id`，降低多 worker / 多 worktree 并发时串会话的风险。
   - `cc` 的 continuity 证据以 `Claude session-id + Claude jsonl + debug/cycle log` 为主。
 
@@ -174,7 +193,7 @@
 - runtime_notes:
   - `cc-use-codex-cli` 是固定 profile，不要求用户再单独配置 capability 参数。
   - `cc-use-codex-cli` 当前也主要通过 launch-time materialization 工作，而不是写独立 project-local Claude config。
-  - Freely 会固定注入：`model=gpt-5.4`、`sandbox=workspace-write`、`approval-policy=never`、`cwd=project-root`。
+  - Freely 会固定注入：`model=gpt-5.4`、`sandbox=workspace-write`、`approval-policy=never`；当当前 branch 是 protected branch 时，system prompt 会明确区分 project root 的 read/merge/integration 用途，与 owner development 的 dedicated worktree 用途，并同步为 Claude 注入 `--add-dir <project-worktrees-root>`。
   - 每个 running workcell 使用独立 `Claude session-id`，降低多 worker / 多 worktree 并发时的会话串线风险。
   - 证据模型分两层：
     - 外层：`Claude session-id`、`Claude jsonl path` 与 `cycle/debug log`
