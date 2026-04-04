@@ -7,6 +7,7 @@ required_files=(
   "docs/LAWS.md"
   "AGENTS.md"
   "docs/system/workspace/hooks/README.md"
+  "docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md"
   "docs/system/workspace/hooks/protected-branch-breakglass-receipts.md"
   "docs/system/workspace/three-loop-capability-lifecycle.md"
   "docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md"
@@ -514,6 +515,179 @@ if errors:
 PY
 }
 
+audit_recorded_protected_branch_merge_receipt_backfills() {
+  python3 - <<'PY'
+import pathlib
+import re
+import subprocess
+import sys
+
+root = pathlib.Path(".")
+receipts_path = root / "docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md"
+text = receipts_path.read_text(encoding="utf-8")
+
+effective_match = re.search(r"^- audit_effective_date:\s*`?([0-9]{4}-[0-9]{2}-[0-9]{2})`?\s*$", text, re.MULTILINE)
+if not effective_match:
+    print(f"[FAIL] {receipts_path.as_posix()} must declare - audit_effective_date: `YYYY-MM-DD`")
+    sys.exit(1)
+
+effective_date = effective_match.group(1)
+effective_since = f"{effective_date} 00:00:00"
+starts = list(re.finditer(r"^##\s+Receipt Gap:\s+([0-9a-f]{7,40})\s*$", text, re.MULTILINE))
+
+entries = {}
+errors = []
+observed = set()
+
+for idx, match in enumerate(starts):
+    commit = match.group(1)
+    end = starts[idx + 1].start() if idx + 1 < len(starts) else len(text)
+    block = text[match.start():end]
+
+    def grab(name: str):
+        m = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", block, re.MULTILINE)
+        if not m:
+            return None
+        return m.group(1).strip().strip("`").strip()
+
+    def grab_list(name: str):
+        m = re.search(rf"^\s*-\s*{re.escape(name)}:\s*$([\s\S]*?)(?=^\s*-\s*[A-Za-z0-9_-]+:|^##\s+Receipt Gap:|\Z)", block, re.MULTILINE)
+        if not m:
+            return []
+        values = []
+        for raw in m.group(1).splitlines():
+            item = re.match(r"^\s*-\s+(.+?)\s*$", raw)
+            if item:
+                values.append(item.group(1).strip().strip("`").strip())
+        return values
+
+    target_branch = grab("target_branch")
+    source_branch = grab("source_branch")
+    canonical_merge_path = grab("canonical_merge_path")
+    canonical_bypass_mode = grab("canonical_bypass_mode")
+    follow_on_owner = grab("follow_on_owner")
+    evidence_refs = grab_list("evidence_refs")
+
+    if target_branch not in {"develop", "main"} and not (target_branch or "").startswith("test-pre-merge-"):
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid target_branch '{target_branch}'.")
+    if not source_branch:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} is missing source_branch.")
+    if canonical_merge_path not in {"merge-guarded", "merge-guarded-complete"}:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid canonical_merge_path '{canonical_merge_path}'.")
+    if canonical_bypass_mode != "forbidden":
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must declare canonical_bypass_mode: `forbidden`.")
+    if not follow_on_owner or not re.match(r"^I-[A-Za-z0-9-]+$", follow_on_owner):
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} is missing a valid follow_on_owner.")
+    if not evidence_refs:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must list at least one evidence_ref.")
+
+    entries[commit] = {
+        "target_branch": target_branch,
+        "source_branch": source_branch,
+        "canonical_merge_path": canonical_merge_path,
+        "canonical_bypass_mode": canonical_bypass_mode,
+    }
+
+branches = ["develop"]
+try:
+    extra_refs = subprocess.check_output(
+        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads/main", "refs/heads/test-pre-merge-*"],
+        cwd=root,
+        text=True,
+    ).splitlines()
+except subprocess.CalledProcessError:
+    extra_refs = []
+
+for ref in extra_refs:
+    ref = ref.strip()
+    if ref and ref not in branches:
+        branches.append(ref)
+
+for branch in branches:
+    try:
+        merge_output = subprocess.check_output(
+            ["git", "log", branch, "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
+            cwd=root,
+            text=True,
+        )
+    except subprocess.CalledProcessError:
+        continue
+
+    chunks = [chunk for chunk in merge_output.split("\x00") if chunk]
+    for idx in range(0, len(chunks), 2):
+        commit = chunks[idx].strip()
+        body = chunks[idx + 1] if idx + 1 < len(chunks) else ""
+        if not commit:
+            continue
+
+        merge_path_match = re.search(r"^Freely-Merge-Path:\s*(.+?)\s*$", body, re.MULTILINE)
+        bypass_mode_match = re.search(r"^Freely-Bypass-Mode:\s*(.+?)\s*$", body, re.MULTILINE)
+        source_branch_match = re.search(r"^Freely-Source-Branch:\s*(.+?)\s*$", body, re.MULTILINE)
+
+        merge_path = merge_path_match.group(1).strip() if merge_path_match else ""
+        bypass_mode = bypass_mode_match.group(1).strip() if bypass_mode_match else ""
+        source_branch = source_branch_match.group(1).strip() if source_branch_match else ""
+
+        if merge_path == "merge-guarded-break-glass":
+          continue
+
+        entry = entries.get(commit)
+        if merge_path in {"merge-guarded", "merge-guarded-complete"}:
+            if entry and entry.get("target_branch") == branch:
+                observed.add(commit)
+                errors.append(
+                    f"[FAIL] protected branch merge {commit} on {branch} already has canonical trailers and must not declare a receipt-gap backfill in {receipts_path.as_posix()}."
+                )
+            continue
+
+        if not merge_path and not bypass_mode and not source_branch:
+            if entry and entry.get("target_branch") == branch:
+                observed.add(commit)
+                subject_match = re.search(r"^Merge branch '([^']+)' into ([^\n]+)$", body, re.MULTILINE)
+                if not subject_match:
+                    errors.append(
+                        f"[FAIL] protected branch merge {commit} on {branch} is missing canonical trailers and has no parseable merge subject for backfill validation."
+                    )
+                    continue
+                subject_source = subject_match.group(1).strip()
+                subject_target = subject_match.group(2).strip()
+                if subject_source != entry.get("source_branch"):
+                    errors.append(
+                        f"[FAIL] protected branch merge {commit} on {branch} has backfill source_branch mismatch: subject='{subject_source}' ledger='{entry.get('source_branch')}'."
+                    )
+                if subject_target != branch:
+                    errors.append(
+                        f"[FAIL] protected branch merge {commit} subject targets '{subject_target}' but was audited on branch '{branch}'."
+                    )
+                continue
+            errors.append(
+                f"[FAIL] protected branch merge {commit} on {branch} is missing canonical Freely merge trailers and has no matching receipt-gap backfill in {receipts_path.as_posix()}."
+            )
+            continue
+
+        if entry and entry.get("target_branch") == branch:
+            observed.add(commit)
+            errors.append(
+                f"[FAIL] protected branch merge {commit} on {branch} has partial or malformed merge trailers and cannot rely on receipt-gap backfill."
+            )
+
+for commit, entry in entries.items():
+    if entry.get("target_branch") not in branches:
+        errors.append(
+            f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} targets unknown branch '{entry.get('target_branch')}'."
+        )
+        continue
+    if commit not in observed:
+        errors.append(
+            f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} does not match any protected-branch merge on {entry.get('target_branch')} since {effective_since}."
+        )
+
+if errors:
+    print("\n".join(errors))
+    sys.exit(1)
+PY
+}
+
 for file in "${required_files[@]}"; do
   check_file_exists "$file"
   check_no_tbd "$file"
@@ -577,6 +751,7 @@ done
 
 check_candidate_milestone_bindings || errors=$((errors + 1))
 audit_current_protected_branch_merge_receipt
+audit_recorded_protected_branch_merge_receipt_backfills || errors=$((errors + 1))
 audit_recorded_protected_branch_breakglass_receipts || errors=$((errors + 1))
 
 if [[ "$errors" -gt 0 ]]; then

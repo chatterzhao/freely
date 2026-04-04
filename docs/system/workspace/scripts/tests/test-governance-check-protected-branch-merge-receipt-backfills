@@ -1,0 +1,307 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-governance-protected-merge-backfill.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_repo() {
+  local repo="$1"
+  mkdir -p "$repo/bin" "$repo/docs/system/workspace/scripts/quality" "$repo/docs/system/workspace/hooks"
+  cd "$repo"
+
+  cp "$ROOT_DIR/bin/governance-check" "$repo/bin/governance-check"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-check" "$repo/docs/system/workspace/scripts/quality/governance-check"
+  chmod +x "$repo/bin/governance-check" "$repo/docs/system/workspace/scripts/quality/governance-check"
+
+  mkdir -p "$repo/docs/system/workspace/skills/doc-ibm-execution/references"
+  mkdir -p "$repo/docs/system/workspace/skills/doc-ibm-execution"
+  mkdir -p "$repo/docs/system/workspace/skills/doc-pre-brainstorm-execution"
+  mkdir -p "$repo/docs/system/workspace/skills/dev-loop-execution"
+  mkdir -p "$repo/docs/system/workspace/skills/auto-loop-orchestrator"
+  mkdir -p "$repo/docs/system/workspace/skills"
+  mkdir -p "$repo/docs/system/workspace/agents"
+  mkdir -p "$repo/docs/pre-brainstorms/20260404-0640--sample-receipt-gap"
+  mkdir -p "$repo/docs/epics/sample/issues"
+
+  cat > "$repo/AGENTS.md" <<'EOF'
+# Agent entry
+EOF
+  cat > "$repo/docs/PROJECT_INTENT.md" <<'EOF'
+# Project Intent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/LAWS.md" <<'EOF'
+# Laws
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/three-loop-capability-lifecycle.md" <<'EOF'
+# Three Loop Capability Lifecycle
+EOF
+  cat > "$repo/docs/system/workspace/hooks/README.md" <<'EOF'
+# Workspace Hooks
+EOF
+  cat > "$repo/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<'EOF'
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: `2099-01-01`
+EOF
+  cat > "$repo/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2026-04-04`
+EOF
+  cat > "$repo/docs/system/workspace/scripts/README.md" <<'EOF'
+# Scripts
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/README.md" <<'EOF'
+# Skills
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/agents/lead-agent.md" <<'EOF'
+# Lead Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/agents/manager-agent.md" <<'EOF'
+# Manager Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/agents/worker-agent.md" <<'EOF'
+# Worker Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+references/prd-quality-bar.md
+pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生
+EOF
+  cat > "$repo/docs/system/workspace/skills/dev-loop-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md" <<'EOF'
+# PRD Quality Bar
+## Minimum structure
+## Bar for `done_ibm`
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md" <<'EOF'
+# IBM Completion Gate
+prd-quality-bar.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md" <<'EOF'
+# Issue Materialization Checklist
+prd-quality-bar.md
+EOF
+  cat > "$repo/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+  cat > "$repo/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# Convergence
+EOF
+  cat > "$repo/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260404-0640--sample-receipt-gap
+  - brainstorms: docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md
+EOF
+  cat > "$repo/docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+  cat > "$repo/docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md" <<'EOF'
+# Candidates
+## C-20260404-0640-A
+- candidate_format_version: `v2`
+- title: sample
+- status: `promoted`
+- decision_reason: sample
+- acceptance_criteria:
+  - protected branch receipt gap is auditable
+- promotion_gate:
+  - issue is materialized
+- open_questions: []
+- acceptance_reviews:
+  - reviewer: `codex-mini`
+    verdict: `supports`
+    note: sample
+- promoted_issue_path: `docs/epics/sample/issues/sample.md`
+- milestone: `M-20260404-0640-sample`
+- session_refs: []
+EOF
+  cat > "$repo/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-20260404-0640-sample
+
+- status: active
+
+### committed_issues
+
+1. `I-20260404-0640-A`
+- title: sample owner
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/sample/issues/sample.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md`
+- next_action: implement sample owner
+
+### candidate_issues
+
+1. `C-20260404-0640-A`
+- title: sample
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/sample/issues/sample.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md`
+- next_action: sample
+- revisit_trigger: sample
+
+### completed_issues
+
+- none currently
+EOF
+  cat > "$repo/docs/epics/sample/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260404-0640-A`
+- phase_state: `in_dev`
+- milestone: `M-20260404-0640-sample`
+- source_candidate: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md#c-20260404-0640-a`
+EOF
+}
+
+REPO_BAD="$TMP_DIR/repo-bad"
+make_repo "$REPO_BAD"
+cd "$REPO_BAD"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/raw
+echo raw > RAW.txt
+git add RAW.txt
+git commit -q -m "raw feature"
+git checkout -q develop
+git merge --no-ff --no-edit feature/raw >/dev/null
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after raw merge"
+
+if ./bin/governance-check >"$TMP_DIR/bad.out" 2>&1; then
+  echo "[FAIL] governance-check should reject protected-branch merge commits without backfill after the audit effective date" >&2
+  cat "$TMP_DIR/bad.out" >&2
+  exit 1
+fi
+grep -q "missing canonical Freely merge trailers and has no matching receipt-gap backfill" "$TMP_DIR/bad.out"
+
+REPO_GOOD="$TMP_DIR/repo-good"
+make_repo "$REPO_GOOD"
+cd "$REPO_GOOD"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/gap
+echo gap > GAP.txt
+git add GAP.txt
+git commit -q -m "gap feature"
+git checkout -q develop
+git merge --no-ff --no-edit feature/gap >/dev/null
+GOOD_MERGE="$(git rev-parse HEAD)"
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after gap merge"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $GOOD_MERGE
+
+- target_branch: \`develop\`
+- source_branch: \`feature/gap\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/good.out" 2>&1; then
+  cat "$TMP_DIR/good.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/good.out"
+
+REPO_TRAILER="$TMP_DIR/repo-trailer"
+make_repo "$REPO_TRAILER"
+cd "$REPO_TRAILER"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/receipt
+echo receipt > RECEIPT.txt
+git add RECEIPT.txt
+git commit -q -m "receipt feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/receipt' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/receipt
+EOF
+)" feature/receipt >/dev/null
+TRAILER_MERGE="$(git rev-parse HEAD)"
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after trailer merge"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $TRAILER_MERGE
+
+- target_branch: \`develop\`
+- source_branch: \`feature/receipt\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/trailer.out" 2>&1; then
+  echo "[FAIL] governance-check should reject receipt-gap backfills for trailer-bearing protected merges" >&2
+  cat "$TMP_DIR/trailer.out" >&2
+  exit 1
+fi
+grep -q "already has canonical trailers and must not declare a receipt-gap backfill" "$TMP_DIR/trailer.out"
+
+echo "[PASS] governance-check audits ordinary protected-branch merge receipt backfills"
