@@ -120,19 +120,21 @@ routing_policy:
 4. `I-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
 - source_brainstorm: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/candidates.md`
-- next_action: Materialize the ancestry receipt-gap backfill ledger and focused governance-check regression so ordinary protected merges without canonical trailers cannot remain invisible in history.
+- next_action: Replay the verified ancestry-aware receipt-gap audit fix into `develop`, then retire the blocker-triage continuation once canonical protected ancestry stays green.
 - evidence:
   - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
   - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/prd.md`
   - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/pre-tests.md`
   - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/tasks.md`
   - `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
 
 ### candidate_issues
 

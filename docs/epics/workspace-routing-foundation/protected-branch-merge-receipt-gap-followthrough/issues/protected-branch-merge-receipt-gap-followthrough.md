@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `protected-branch-merge-receipt-gap-followthrough`
@@ -73,4 +73,6 @@ Freely 已经要求 protected-branch merge 写 canonical receipt trailer，也�
 
 ## Next
 
-- Keep this owner narrow to ancestry receipt-gap backfill and audit; do not reopen broader protected-branch merge governance.
+- Replay this verified continuation into `develop` with canonical merge receipts.
+- Retire the ad hoc blocker-triage worktree after develop absorbs the ancestry-aware receipt-gap audit fix.
+- Keep future follow-up limited to new trailerless ancestry gaps; do not widen this owner into generic merge-policy redesign.
