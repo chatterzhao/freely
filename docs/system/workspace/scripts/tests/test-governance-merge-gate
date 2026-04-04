@@ -849,6 +849,61 @@ git reset -q HEAD docs/milestones.md docs/pre-brainstorms/sample/candidates.md d
 git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/milestones.md
 rm -f "$REPO/docs/progress/sample/p-sample.md"
 
+mkdir -p "$REPO/docs/pre-brainstorms/statusscope" "$REPO/docs/progress/statusscope"
+cat > "$REPO/docs/pre-brainstorms/statusscope/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2225-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2225-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/statusscope.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/statusscope.md" <<'EOF'
+# Issue: statusscope
+
+- issue_id: `I-20260327-2225-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/statusscope/candidates.md#c-20260327-2225-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat > "$REPO/docs/progress/statusscope/p-statusscope.md" <<'EOF'
+# Progress: statusscope
+
+- issue_id: `I-20260327-2225-A`
+- issue_path: `docs/epics/sample/story/issues/statusscope.md`
+- phase_state: `in_verification`
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2225-A`
+   - status: needs_research
+   - next_action: keep researching adjacent backlog ordering
+   - revisit_trigger: another parser regression appears
+
+### committed_issues
+1. `I-20260327-2225-A`
+   - issue_path: `docs/epics/sample/story/issues/statusscope.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/statusscope/candidates.md#c-20260327-2225-a`
+
+### completed_issues
+EOF
+git add docs/pre-brainstorms/statusscope/candidates.md docs/epics/sample/story/issues/statusscope.md docs/progress/statusscope/p-statusscope.md docs/milestones.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout16b" 2>"$TMP_DIR/stderr16b"
+grep -q 'passed' "$TMP_DIR/stdout16b"
+
+git reset -q HEAD docs/pre-brainstorms/statusscope/candidates.md docs/epics/sample/story/issues/statusscope.md docs/progress/statusscope/p-statusscope.md docs/milestones.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/pre-brainstorms/statusscope/candidates.md" "$REPO/docs/epics/sample/story/issues/statusscope.md" "$REPO/docs/progress/statusscope/p-statusscope.md"
+
 mkdir -p \
   "$REPO/docs/pre-brainstorms/staged-view" \
   "$REPO/docs/epics/staged/view/issues" \

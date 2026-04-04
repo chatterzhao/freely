@@ -67,6 +67,24 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/tasks.md`
   - `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
 
+2. `I-20260404-0119-A`
+- title: Governance merge gate milestone status followthrough governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md`
+- next_action: Keep the slice narrow to `parse_milestones()` queue scoping plus a focused regression so active milestone candidates no longer get blocked by nested item status fields.
+- evidence:
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
+
 ### candidate_issues
 1. `C-20260402-1719-A`
 - title: Hook bypass break-glass governance and audit
@@ -80,6 +98,17 @@ routing_policy:
   - another protected-branch merge requires manual hook bypass
   - merge-guarded still falls back to raw conflict-completion commit
   - governance-check still cannot audit bypass receipts on develop
+
+2. `C-20260404-0119-A`
+- title: Governance merge gate milestone status followthrough
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md`
+- next_action: This candidate is now materialized as `I-20260404-0119-A`. Keep the owner scoped to milestone-level status parsing so the merge gate stops reading nested queue item status lines as milestone truth.
+- revisit_trigger: Re-open only if active-milestone validation still misreads nested queue metadata after this parser-bound followthrough lands.
 
 ### completed_issues
 1. `I-20260402-0020-A`

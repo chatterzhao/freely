@@ -464,6 +464,9 @@
 - 20260401-2245--build-artifact-exposure-and-release-allowlist-capability
   - brainstorms: docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-2245--build-artifact-exposure-and-release-allowlist-capability/candidates.md
+- 20260404-0119--governance-merge-gate-milestone-status-followthrough
+  - brainstorms: docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md
 
 ## 收敛
 - 摘要: docs/pre-brainstorms/CONVERGENCE.md
