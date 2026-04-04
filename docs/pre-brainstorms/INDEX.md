@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state
+  - brainstorms: docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/candidates.md
 - 20260403-2041--worktree-tool-boundary-bootstrap
   - brainstorms: docs/pre-brainstorms/20260403-2041--worktree-tool-boundary-bootstrap/brainstorms.md
   - candidates: docs/pre-brainstorms/20260403-2041--worktree-tool-boundary-bootstrap/candidates.md
