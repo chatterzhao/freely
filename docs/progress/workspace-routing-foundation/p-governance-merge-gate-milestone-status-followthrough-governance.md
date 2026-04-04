@@ -6,8 +6,8 @@
 - phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/governance-merge-gate-0119-closeout-20260404-1715`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-1715-feature-governance-merge-gate-0119-closeout`
+- branch: `feature/governance-merge-gate-0119-closeout-20260404-1636`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-1636-feature-governance-merge-gate-0119-closeout`
 - updated_at: `2026-04-04`
 - closure_status: `ready_for_merge`
 - session_refs:
@@ -16,7 +16,8 @@
 ## Summary
 
 - This owner exists only because a real develop replay proved that `governance-merge-gate` misparsed nested queue item status as parent milestone status.
-- Merge `908a6ad` absorbed the narrow parser boundary repair plus the focused regression in `test-governance-merge-gate` into canonical `develop`.
+- Merge `908a6ad` absorbed the narrow parser-bound repair so milestone status is only read from milestone-level fields and nested queue item status no longer poisons active-milestone validation.
+- The implementation slice stays narrow: parser boundary repair plus one focused regression in `test-governance-merge-gate`.
 - This closeout lane only reconciles lifecycle truth so milestone, issue, and progress all record the owner as completed historical traceability on current `develop`.
 
 ## Verification Evidence
@@ -33,5 +34,5 @@
 
 ## Next Action
 
-1. Merge this closeout lane into canonical `develop` so completed lifecycle truth becomes canonical.
-2. Retry the blocked runtime bootstrap replay only through its own owner, without reviving `0119`.
+1. Merge this closeout lane into canonical `develop` so the completed lifecycle truth becomes canonical.
+2. Keep the blocked runtime bootstrap lane out of scope for this completed record; any further replay should reopen separately on current `develop`.

@@ -58,5 +58,5 @@
 
 ## Next
 
-- `2026-04-04` closeout: canonical `develop` already absorbed this narrow parser followthrough through merge `908a6ad`.
-- Keep this owner closed as the bounded milestone-status parsing record; any future merge-gate residuals must reopen as new owners on current `develop`.
+- `2026-04-04` closeout: canonical `develop` already absorbed this narrow parser-bound followthrough through merge `908a6ad`.
+- Keep this owner closed as the milestone-status parsing repair record; if future merge-gate regressions surface in other nested fields, reopen from current `develop` as a new owner instead of reviving `0119`.
