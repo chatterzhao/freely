@@ -138,20 +138,8 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
 
 ### candidate_issues
-1. `C-20260402-1719-A`
-- title: Hook bypass break-glass governance and audit
-- milestone_state: candidate
-- candidate_path: `docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/candidates.md#c-20260402-1719-a`
-- source_brainstorm: `docs/pre-brainstorms/20260402-1719--hook-bypass-break-glass-governance/brainstorms.md`
-- status: `needs_research`
-- priority: P0
-- next_action: Freeze the break-glass whitelist, evidence model, and audit surface before materializing a dedicated follow-on owner.
-- revisit_trigger:
-  - another protected-branch merge requires manual hook bypass
-  - merge-guarded still falls back to raw conflict-completion commit
-  - governance-check still cannot audit bypass receipts on develop
 
-2. `C-20260404-0119-A`
+1. `C-20260404-0119-A`
 - title: Governance merge gate milestone status followthrough
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -162,7 +150,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260404-0119-A`. Keep the owner scoped to milestone-level status parsing so the merge gate stops reading nested queue item status lines as milestone truth.
 - revisit_trigger: Re-open only if active-milestone validation still misreads nested queue metadata after this parser-bound followthrough lands.
 
-3. `C-20260404-0232-A`
+2. `C-20260404-0232-A`
 - title: Governance merge gate review-aware regression alignment
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -173,7 +161,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260404-0232-A`. Keep the owner scoped to making the mixed unresolved-candidate implementation regression review-aware and restoring same-file borrowed-owner blocking after staged review artifacts became mandatory.
 - revisit_trigger: Re-open only if a future guard again causes this mixed unresolved-candidate implementation regression to fail before it reaches the current allowed path, or if same-file borrowed-owner regressions start passing again.
 
-4. `C-20260404-0640-A`
+3. `C-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -741,7 +729,7 @@ routing_policy:
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - source_brainstorm: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`, `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`, `docs/pre-brainstorms/20260325-0921--watchdog-strict-slot-probe-gating-and-wake-governance/candidates.md`
+- source_candidates: `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`, `docs/pre-brainstorms/20260325-0525--watchdog-slot-sweep-without-cooldown-governance/candidates.md`
 - evidence:
   - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/code-reviews/20260326-global-ai-account-watchdog-canonical-replay-verification.md`
   - `docs/progress/workspace-routing-foundation/p-global-ai-account-watchdog-and-manager-bootstrap.md`
