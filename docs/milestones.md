@@ -67,6 +67,23 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/tasks.md`
   - `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
 
+2. `I-20260403-2245-A`
+- title: Sandbox-compatible runtime bootstrap and operator-state governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/candidates.md`
+- next_action: Implement the narrow runtime slice that adds a lawful fallback operator-state root when the default `$FREELY_HOME` is unwritable and degrades process/readiness evidence cleanly when `ps` is unavailable.
+- evidence:
+  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+
 ### candidate_issues
 1. `C-20260402-1719-A`
 - title: Hook bypass break-glass governance and audit
