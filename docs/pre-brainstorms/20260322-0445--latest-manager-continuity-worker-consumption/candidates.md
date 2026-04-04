@@ -6,6 +6,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- legacy_id_mapping: I-20260322-0445  # 历史遗留的 issue id
 - session_refs: []
 - why_now:
   - real dogfooding shows manager can now produce correct worktree dispositions
