@@ -34,9 +34,9 @@
 
 ## Fleet Hygiene Snapshot
 
-- `./bin/wt-status-all` on `2026-04-03` reported `total=18, dirty=11`.
-- File-level governance repair is complete for `1100/1200/1201/1202/1203`; the remaining inability to commit or retire worktrees in this session is caused by sandbox denial on `.git/worktrees/*` writes (`index.lock`, worktree metadata removal).
-- Safe to retire now once an operator performs the cleanup action:
+- `./bin/wt-status-all` earlier on `2026-04-03` reported `total=18, dirty=11`; after the repair commits and cleanup pass, `./bin/wt-fleet-status` now shows the active governance-chain batch worktrees `1100/1200/1201/1202/1203` as `CLEAN`.
+- File-level governance repair and commit recording are complete for `1100/1200/1201/1202/1203`.
+- Retired in this session:
   - `feature/hook-bypass-breakglass-governance-20260402-0020`
   - `feature/hook-bypass-breakglass-closeout-20260402-0235`
   - `feature/protected-branch-merge-receipt-hardening-20260402-1912`
@@ -62,5 +62,5 @@
 
 ## Execution Constraint
 
-- File-level governance repair is complete in the active `1100/1200/1201/1202/1203` worktrees.
-- Actual `git worktree remove` retirement is blocked in the current sandbox because writes under `.git/worktrees/*` are denied, so retire-now branches are identified but not physically removed in this session.
+- File-level governance repair is complete in the active `1100/1200/1201/1202/1203` worktrees, and the corresponding commits are now recorded on each branch.
+- Further retirement decisions remain lifecycle questions, not environment-permission blockers.
