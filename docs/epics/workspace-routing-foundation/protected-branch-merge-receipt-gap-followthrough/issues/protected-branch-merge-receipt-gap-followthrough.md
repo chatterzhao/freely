@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `protected-branch-merge-receipt-gap-followthrough`
@@ -73,6 +73,6 @@ Freely 已经要求 protected-branch merge 写 canonical receipt trailer，也�
 
 ## Next
 
-- Replay this verified continuation into `develop` with canonical merge receipts.
-- Retire the ad hoc blocker-triage worktree after develop absorbs the ancestry-aware receipt-gap audit fix.
-- Keep future follow-up limited to new trailerless ancestry gaps; do not widen this owner into generic merge-policy redesign.
+- Completed on canonical `develop` via receipt-bearing merge `0c9701f`.
+- The blocker-triage continuation branch/worktree was retired after post-merge verification passed.
+- Reopen only for new trailerless protected-ancestry gaps that fall outside the current subject-matched backfill contract.
