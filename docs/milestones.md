@@ -2170,10 +2170,14 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md`
 - evidence:
-  - `feature/cli-output-style-closeout-20260405-1615` rebased onto current `develop`
+  - `develop` merge `e79e182`
   - `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
   - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
   - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-preserves-existing-agents-md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
+  - `git diff --check`
   - `./bin/governance-check`
 - completion_note: `Canonical develop still treats the output-style change as a narrow AGENTS-only experiment and explicitly points at the already-existing project-level AGENTS bootstrap/read-order contract, without widening this owner into reusable capability truth.`
 

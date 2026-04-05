@@ -12,16 +12,21 @@
 
 ## Summary
 
-- The closeout branch is rebased onto current canonical `develop` and is ready for guarded replay.
+- Canonical `develop` absorbed the truth-fixed closeout for this narrow `AGENTS.md` experiment through merge `e79e182`.
 - Canonical replay still presents the change as developer-entrypoint governance in `AGENTS.md`, not as a new reusable capability materialization.
 - `AGENTS.md`, runtime, and existing init coverage still agree that project-root `AGENTS.md` is the first governance surface and that `freely init` creates a minimal file only when missing.
+- Canonical verification is complete, so this owner can close as `merged-and-verified`.
 
 ## Verification
 
 1. `./bin/governance-check`
-2. reviewed `AGENTS.md`
-3. reviewed `docs/system/workspace/scripts/runtime/freely`
-4. reviewed `docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+2. `bash docs/system/workspace/scripts/tests/test-freely-init-preserves-existing-agents-md`
+3. `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+4. `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
+5. `git diff --check`
+6. reviewed `AGENTS.md`
+7. reviewed `docs/system/workspace/scripts/runtime/freely`
+8. reviewed `docs/system/workspace/scripts/tests/test-freely-init-cc-config`
 
 ## Findings
 
