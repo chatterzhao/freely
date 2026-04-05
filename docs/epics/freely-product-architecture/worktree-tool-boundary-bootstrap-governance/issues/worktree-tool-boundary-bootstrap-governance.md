@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260403-2041-A`
 - title: Worktree tool boundary bootstrap governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `worktree-tool-boundary-bootstrap-governance`
@@ -115,4 +115,5 @@ If that gap remains, the canonical workflow still tempts operators back toward p
 
 ## Next
 
-- Replay this narrow follow-on into `develop`, then verify the canonical repo continues to bootstrap sibling worktree boundaries without reopening the broader tool-materialization umbrella.
+- Completed on canonical `develop` after closeout verification recorded in `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`.
+- Reopen only if canonical `develop` regresses sibling-worktree boundary rematerialization, re-teaches raw `git worktree add` as the managed default, or weakens the per-tool split between project-local config, wrapper bootstrap, and launch-time boundary extension.

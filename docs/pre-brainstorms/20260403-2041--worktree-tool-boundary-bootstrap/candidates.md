@@ -23,7 +23,7 @@
   - reopening `I-20260401-1303-A-2` would blur a completed contract back into an umbrella
 - priority: `P0`
 - status: `promoted`
-- milestone: `M-20260306-workspace-routing-foundation`
+- milestone: `M-20260326-freely-product-architecture`
 - promoted_issue_path: `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
 - promoted_issue_path_role: `primary-owner`
 - session_refs:
@@ -32,8 +32,7 @@
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 - next_action:
-  - materialize the narrow follow-on owner
-  - keep the managed boundary contract split by tool surface
-  - replay to `develop` after focused boundary/bootstrap regressions pass
+  - owner completed on canonical `develop`
+  - reopen only if sibling-worktree boundary rematerialization or managed entrypoint guidance regresses
 - revisit_trigger:
   - reopen only if canonical `develop` still shows an unowned tool-boundary drift after this worktree-bootstrap slice lands
