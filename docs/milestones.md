@@ -2098,18 +2098,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260405-cli-output-style-A`
-- title: AGENTS project entry and output style governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P2
-- issue_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
-- progress_path: `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md`
-- next_action: Replay this narrow owner to `develop`, then verify canonical `develop` still treats the change as an `AGENTS.md` experiment plus an explicit note about the already-existing project-AGENTS generation contract rather than a silent capability promotion.
-
-2. `I-20260405-1130-A`
+1. `I-20260405-1130-A`
 - title: Project-level AGENTS bootstrap and management contract governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -2129,7 +2118,7 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now treats project-level AGENTS bootstrap and management as reusable capability truth: init creates AGENTS only when missing, preserves project-owned files when present, and runtime consumption still reads the project root entrypoint before reusable workspace capability docs.`
 
-3. `I-20260405-1235-A`
+2. `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -2171,7 +2160,24 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now rematerializes managed tool boundaries into sibling worktrees through sync-tooling plus standard worktree entrypoints, while keeping project root as the integration surface and reserving wrapper or launch-time boundary extension for tools that still lack a verified project-local config surface.`
 
-2. `I-20260402-0403-A`
+2. `I-20260405-cli-output-style-A`
+- title: AGENTS project entry and output style governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P2
+- issue_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md`
+- evidence:
+  - `develop` merge `c20c6bd`
+  - `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
+  - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
+  - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop still treats the output-style change as a narrow AGENTS-only experiment and explicitly points at the already-existing project-level AGENTS bootstrap/read-order contract, without widening this owner into reusable capability truth.`
+
+3. `I-20260402-0403-A`
 - title: Canonical product posture bootstrap reconciliation governance
 - milestone_state: completed
 - phase_state: `completed`

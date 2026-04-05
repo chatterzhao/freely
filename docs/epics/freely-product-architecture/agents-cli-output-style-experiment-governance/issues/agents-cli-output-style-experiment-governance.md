@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-cli-output-style-A`
 - title: AGENTS project entry and output style governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `agents-cli-output-style-experiment-governance`
@@ -79,4 +79,5 @@ That makes this a product-architecture/developer-entrypoint governance writeback
 
 ## Next
 
-- Replay this narrow owner to `develop`, then verify canonical `develop` still treats the change as an `AGENTS.md` experiment plus an explicit note about the already-existing project-AGENTS generation contract rather than a silent capability promotion.
+- Completed on canonical `develop` with closeout verification recorded in `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`.
+- Reopen only if canonical `develop` stops treating this as an `AGENTS.md`-only experiment or if project-level `AGENTS.md` entrypoint truth needs stronger capability-level materialization.

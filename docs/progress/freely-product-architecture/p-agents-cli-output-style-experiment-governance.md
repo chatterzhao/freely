@@ -3,12 +3,13 @@
 - issue_id: `I-20260405-cli-output-style-A`
 - issue_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
 - title: `AGENTS project entry and output style governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260326-freely-product-architecture`
-- branch: `feature/cli-output-style-optimization-20260405-1000`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-1000-feature-cli-output-style-optimization`
-- updated_at: `2026-04-04`
+- branch: `feature/cli-output-style-closeout-20260405-1615`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-1615-feature-cli-output-style-closeout`
+- updated_at: `2026-04-05`
+- closure_status: `merged-and-verified`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -17,9 +18,18 @@
 - `AGENTS.md` now carries a dedicated experimental rule set for developer-facing CLI/chat output while building Freely.
 - The experiment explicitly keeps concise plain Chinese as the default and rejects classical Chinese as the default style.
 - `AGENTS.md` now also states the current project-level contract: Freely init/runtime ensure a minimal project `AGENTS.md`, execution reads project `AGENTS.md` first, and Freely self-hosting follows the same rule.
-- The supporting pre-brainstorm, candidate, milestone, issue, and verification artifacts now treat this as a narrow product-architecture/developer-entrypoint owner rather than a reusable capability.
+- Canonical replay confirms the supporting lifecycle still treats this as a narrow product-architecture/developer-entrypoint owner rather than a reusable capability.
 
-## Verification Snapshot
+## Completion Evidence
 
-- Passed in this worktree:
-  - `./bin/governance-check`
+- `develop` merge `c20c6bd`
+- `./bin/governance-check`
+- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
+- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`
+- reviewed `AGENTS.md`
+- reviewed `docs/system/workspace/scripts/runtime/freely`
+- reviewed `docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+
+## Next Action
+
+- No further action unless canonical `develop` regresses the `AGENTS.md` experiment boundary or project-level `AGENTS.md` entrypoint truth itself.
