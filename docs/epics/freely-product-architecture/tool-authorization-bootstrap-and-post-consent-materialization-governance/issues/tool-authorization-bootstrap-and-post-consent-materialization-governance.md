@@ -91,6 +91,19 @@ Freely 已经冻结了 activation consent、默认自治 posture、以及一部�
 3. `docs/system/workspace/scripts/runtime/freely#submit_human_frontdoor_message` and `docs/system/workspace/scripts/runtime/freely#cmd_tui` already show CLI/TUI frontdoor unification at the submit layer.
 4. `docs/system/workspace/scripts/runtime/tool-launchers.sh#tool_supported_adapters` still reports `cc` as `direct` only.
 5. `docs/system/workspace/scripts/tests/test-freely-init-cc-config` still allows `cc + adapter=acp` to be persisted in project config, proving a config/runtime drift that this owner must classify but not prematurely “solve” in architecture docs.
+6. Codex has now proven a concrete product-layer case where project bootstrap and home-level auth/config truth are not the same thing; the detailed slot bundle, provider-aware probe, and cross-kind switch contract are owned by `I-20260405-0027-A`.
+7. The extraction timing for a future standalone backend is no longer operator memory; it is owned by `I-20260405-1415-A` and must not be re-decided in this architecture owner.
+
+## Delegated Tool-Auth Backend Truth
+
+This owner freezes the product boundary only. The following implementation-shaped truths are delegated and must be consumed by reference rather than redefined here:
+
+1. Codex `account-*` / `apikey-*` slot bundle shape, slot naming, cross-kind switch matrix, provider-aware probe routing, and backup-before-mutation behavior are owned by `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`.
+2. The threshold and repository disposition for any future standalone `ai-switch-cli` backend are owned by `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`.
+3. This architecture owner only requires that any backend chosen by follow-on owners preserve one cross-tool contract family:
+   - slot inventory remains tool-keyed rather than tool-specific ad hoc roots
+   - stronger capabilities such as switch, probe, and auto-rotation are claimed only when official tool surfaces are verified
+   - CLI, TUI, GUI, and future settings flows consume the same backend truth instead of inventing UI-local semantics
 
 ## Completion
 
