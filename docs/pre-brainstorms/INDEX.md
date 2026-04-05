@@ -11,6 +11,10 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260405-1000--cli-output-conciseness-and-token-efficiency
+  - brainstorms: docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md
+
 - 20260404-1545--runtime-websocket-permission-denied-recovery-governance
   - brainstorms: docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md

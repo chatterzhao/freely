@@ -117,6 +117,15 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - 将细节添加到规范文档中，然后在此引用。
 - 当出现不确定性时，打开/更新一个预研头脑风暴条目，先在那里收敛。
 
+## CLI 回复风格（当前实验）
+- 该实验只约束开发 Freely 过程中的人类可读 CLI 输出与 chat 回答，不把它当成 Freely 对外能力定义。
+- 默认使用精炼白话文，不使用文言文或刻意风格化表达。
+- 先行动后汇报；能直接执行就先执行，再给必要说明。
+- 结果优先，原因随后；没有必要时不要展开背景铺垫。
+- 不写寒暄、口头禅和重复性过渡句。
+- 代码、命令、路径、状态词和证据必须保持精确，不为了省字牺牲可判定性。
+- 需要枚举时优先列表、表格或代码块；能一句说清的，不扩成多段。
+
 ## 基本命令
 - `./bin/freely init|doctor|start|status|baseline-status|live-status|fleet-status|stop`
 - `./bin/freely sync-tooling --source-project <project-root> --project <worktree>`
