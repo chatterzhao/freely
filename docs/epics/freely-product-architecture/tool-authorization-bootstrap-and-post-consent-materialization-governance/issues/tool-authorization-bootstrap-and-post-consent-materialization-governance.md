@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
-- phase_state: `in_ibm`
+- phase_state: `done_ibm`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `tool-authorization-bootstrap-and-post-consent-materialization-governance`
@@ -126,7 +126,23 @@ This owner freezes the product boundary only. The following implementation-shape
   - per-tool automation claims do not outrun verified tool surfaces
   - CLI/TUI/GUI/settings reuse the same backend contract instead of inventing separate semantics
 
+## IBM Handoff
+
+- implementation_scope_summary:
+  - `I-20260405-1235-A` now freezes the product-layer contract for post-consent tool authorization/bootstrap, including the layer split between activation consent, project authorization bootstrap, tool trust, and adapter policy.
+  - The canonical IBM package now includes the per-tool matrix, shared degradation semantics, and runtime refactor seams required before any narrower implementation owner is opened.
+  - Follow-on work must consume this owner as architecture truth rather than reopening umbrella product-boundary debate inside runtime lanes.
+- required_doc_refs:
+  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/brainstorms/b-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/prd.md`
+  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/pre-tests.md`
+  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/tasks.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+
 ## Next
 
-- Finish the IBM slice by freezing the matrix, degradation semantics, and refactor seam as canonical issue truth.
-- After the contract is stable, split implementation into narrower follow-on owners instead of widening this architecture owner into runtime churn.
+- Current owner is now at `done_ibm`.
+- Future work should open narrower implementation or followthrough owners for persisted authorization-bootstrap state, per-tool repair/materialization cleanup, or adapter-specific drift correction rather than widening this architecture owner.
+- Reopen only if canonical product-boundary truth for post-consent authorization/bootstrap becomes inconsistent across CLI, TUI, GUI, settings, or sibling tool-routing owners.

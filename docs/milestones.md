@@ -2097,13 +2097,13 @@ routing_policy:
 3. `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
 - milestone_state: committed
-- phase_state: `in_ibm`
+- phase_state: `done_ibm`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - progress_path: `docs/progress/freely-product-architecture/p-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md`
-- next_action: Finish the IBM slice by freezing the authorization/bootstrap matrix, degradation semantics, and backend contract boundary before any runtime implementation follow-on is opened.
+- next_action: Keep this owner parked as the canonical IBM handoff for post-consent authorization/bootstrap semantics. Future work should open narrower follow-on owners for persisted state, per-tool repair/materialization cleanup, or adapter-specific drift rather than widening this architecture owner.
 
 ### completed_issues
 
