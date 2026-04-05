@@ -1611,23 +1611,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260403-2041-A`
-- title: Worktree tool boundary bootstrap governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
-- progress_path: `docs/progress/freely-product-architecture/p-worktree-tool-boundary-bootstrap-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260403-2041--worktree-tool-boundary-bootstrap/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260403-2041--worktree-tool-boundary-bootstrap/candidates.md`
-- next_action: Replay the narrow tool-boundary bootstrap follow-on into `develop`, then confirm canonical repo and future sibling worktrees both materialize the managed tool boundary contract without writing implementation drift into protected roots.
-- evidence:
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/prd.md`
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/pre-tests.md`
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/tasks.md`
-  - `docs/progress/freely-product-architecture/p-worktree-tool-boundary-bootstrap-governance.md`
-
 ### completed_issues
 
 1. `I-20260402-1912-A`
@@ -2132,7 +2115,36 @@ routing_policy:
 
 ### completed_issues
 
-1. `I-20260402-0403-A`
+1. `I-20260403-2041-A`
+- title: Worktree tool boundary bootstrap governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-worktree-tool-boundary-bootstrap-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260403-2041--worktree-tool-boundary-bootstrap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260403-2041--worktree-tool-boundary-bootstrap/candidates.md`
+- evidence:
+  - `develop` merge `eaddfc8`
+  - `docs/progress/freely-product-architecture/p-worktree-tool-boundary-bootstrap-governance.md`
+  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260403-worktree-tool-boundary-bootstrap-verification.md`
+  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-codex-project-config-force`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
+  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-cc-args`
+  - `bash docs/system/workspace/scripts/tests/test-tool-launchers-iflow-add-dir`
+  - `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler-cc`
+  - `bash docs/system/workspace/scripts/tests/test-signal-intent-handler-cc`
+  - `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-into-worktree`
+  - `bash docs/system/workspace/scripts/tests/test-wt-create-syncs-tooling`
+  - `bash docs/system/workspace/scripts/tests/test-post-checkout-syncs-tooling`
+  - `bash docs/system/workspace/scripts/tests/test-worktree-entry-flow`
+  - `git diff --check`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now rematerializes managed tool boundaries into sibling worktrees through sync-tooling plus standard worktree entrypoints, while keeping project root as the integration surface and reserving wrapper or launch-time boundary extension for tools that still lack a verified project-local config surface.`
+
+2. `I-20260402-0403-A`
 - title: Canonical product posture bootstrap reconciliation governance
 - milestone_state: completed
 - phase_state: `completed`
