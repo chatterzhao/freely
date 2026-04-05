@@ -5,7 +5,7 @@
 ### PT-1
 - id: `PT-1`
 - requirement: `workspace capability docs formally define project-level AGENTS bootstrap, read-order, preservation, and self-hosting semantics`
-- evidence_level: `doc-read`
+- evidence_level: `mock`
 - status: `pass`
 - artifact_ref: `docs/system/workspace/project-agents-contract.md`
 
