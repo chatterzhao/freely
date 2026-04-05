@@ -3,7 +3,7 @@
 - issue_id: `I-20260405-0027-A`
 - issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 - title: `Codex API-key slot bundle and provider-aware probe governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/tool-authorization-bootstrap-research-20260405-0335`
@@ -53,4 +53,4 @@
 
 ## Next Action
 
-- keep this owner in verification until merge / cleanup evidence exists, and treat standalone `ai-switch-cli` extraction as a follow-on owner rather than widening this Codex-first lane
+- treat this owner as closed. Any future multi-tool parity, standalone `ai-switch-cli` extraction, or stronger syntax-preserving config mutation must route through dedicated follow-on owners instead of reopening this Codex-first closeout.

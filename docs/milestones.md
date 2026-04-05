@@ -49,20 +49,7 @@ routing_policy:
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
 ### committed_issues
-
-1. `I-20260405-0027-A`
-- title: Codex API-key slot bundle and provider-aware probe governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md`
-- next_action: Keep the owner in verification until merge/cleanup evidence exists. Current verification already covers manifest + `auth.json/config-auth.toml` bundle save/switch, slot-kind-aware probe routing, apikey-to-apikey residue clearing, and single-envelope JSON auto-switch output.
-- revisit_trigger: Re-route only if another active owner absorbs the same auth+config slot bundle contract or if official Codex provider semantics invalidate the slot-kind split.
-
-2. `I-20260405-1415-A`
+1. `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -127,7 +114,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md`
-- next_action: Candidate mirror only. `I-20260405-0027-A` is authoritative and currently sits in verification; do not route execution from this mirror while the committed owner remains active.
+- next_action: Candidate mirror only. `I-20260405-0027-A` is authoritative and now closed as completed; future work should route through a new follow-on owner instead of reopening candidate-stage IBM from this mirror.
 - revisit_trigger: Revisit if another active owner absorbs the full auth+config slot bundle contract or if official Codex provider/auth semantics shift enough to invalidate the current slot-kind split.
 
 6. `C-20260405-1415-A`
@@ -142,6 +129,30 @@ routing_policy:
 - revisit_trigger: Revisit once the Codex-first lane is merged or once a second tool reaches verified backend-worthy maturity.
 
 ### completed_issues
+1. `I-20260405-0027-A`
+- title: Codex API-key slot bundle and provider-aware probe governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-creates-incremented-slot`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
+  - `bash -n docs/system/workspace/scripts/runtime/ai-cli`
+  - `bash -n docs/system/workspace/scripts/runtime/file-backup.sh`
+  - `bash -n docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
+  - `./bin/governance-check`
+- completion_note: `The Codex-first owner closed after verifying auth+config bundle persistence, kind-aware probe routing, stale provider residue clearing, single-envelope JSON auto-switch output, and backup-before-mutation for home-level config rewrites. Remaining governance-check failures are the two pre-existing protected-merge receipt gaps on develop, so any further expansion must route through follow-on owners rather than reopening this closeout.`
+
 1. `I-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
 - milestone_state: completed

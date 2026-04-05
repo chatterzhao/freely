@@ -52,7 +52,7 @@
 - decision_reason: The slot-bundle shape should be generic enough for `codex`, `cc`, `opencode`, `iflow`, and other supported tools, but Codex remains the first stronger slice because it has the clearest official auth/config/provider surfaces and existing watchdog truth.
 - decision_reason: Generic command compatibility does not imply equal runtime maturity; the first slice should explicitly preserve weaker non-Codex tools as `inventory_only` or `switchable` until verified probe/materialization adapters exist.
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
-- next_action: Candidate mirror only. `I-20260405-0027-A` is now the canonical verification owner for the Codex auth+config bundle contract; future work should route through the committed issue rather than reopening candidate-stage IBM.
+- next_action: Candidate mirror only. `I-20260405-0027-A` is now the canonical completed owner for the Codex auth+config bundle contract; future work should route through a new follow-on owner rather than reopening candidate-stage IBM.
 - revisit_trigger: Revisit if another existing owner absorbs the full `auth+config bundle` contract, or if official Codex auth/provider semantics change enough to invalidate the proposed slot-kind split.
 - session_refs:
   - tool: `codex`

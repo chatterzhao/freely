@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-0027-A`
 - title: Codex API-key slot bundle and provider-aware probe governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `codex-apikey-slot-bundle-and-provider-aware-probe-governance`
@@ -96,3 +96,11 @@ Freely 已经把 slot inventory、slot-first recovery、OAuth inventory sweep、
 - pass `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
 - pass `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
 - treat the two existing protected-merge receipt gaps on `develop` as historical governance debt unless this lane changes those merge commits
+
+## Verification Summary
+
+- Codex saved-slot truth now closes the auth/config gap that originally blocked this owner: saved state preserves bundle truth across auth payload, provider-aware config fragment, and manifest metadata rather than assuming `auth.json` alone is sufficient.
+- Switch, status, watchdog, and auto-switch behavior now respect slot kind. `account-*` can still consume OAuth inventory truth, while `apikey-*` falls back to exec-based usability truth when OAuth inventory is unreachable.
+- Home-level config mutation is no longer an unguarded Codex-only write path. The current slice routes it through a shared timestamped backup helper, which is the reusable safety boundary this lane needed to prove before any broader tool follow-on.
+- The only remaining `./bin/governance-check` failures are the two pre-existing protected-merge receipt gaps on `develop`; they are historical governance debt outside this lane, not a blocker on the Codex-first contract.
+- Current batch therefore closes this owner as `completed`. Future expansion to non-Codex tool parity or standalone `ai-switch-cli` extraction must route through dedicated follow-on owners rather than reopening this one.
