@@ -8,18 +8,18 @@
 
 ## Slice 2: Implement bounded startup preflight
 
-- [ ] Add shared lock snapshot helpers in `runtime/freely`.
-- [ ] Run startup preflight before supervisor bootstrap and clean only stale locks.
-- [ ] Fail or defer clearly when a live shared lock remains active.
+- [x] Add shared lock snapshot helpers in `runtime/freely`.
+- [x] Run startup preflight before supervisor bootstrap and clean only stale locks.
+- [x] Fail or defer clearly when a live shared lock remains active.
 
 ## Slice 3: Expose lock truth
 
-- [ ] Surface current slot-switch lock truth in `doctor`.
-- [ ] Surface current slot-switch lock truth in `baseline-status` and `live-status`.
-- [ ] Ensure missing or malformed `state.env` does not emit raw race noise as the only signal.
+- [x] Surface current slot-switch lock truth in `doctor`.
+- [x] Surface current slot-switch lock truth in `baseline-status` and `live-status`.
+- [x] Ensure missing or malformed `state.env` does not emit raw race noise as the only signal.
 
 ## Slice 4: Verify and write back
 
-- [ ] Add focused regression tests for stale cleanup, active timeout, and observability.
-- [ ] Add the issue-bound implementation decision note.
-- [ ] Run targeted tests and `./bin/governance-check`.
+- [x] Add focused regression tests for stale cleanup, active timeout, and observability.
+- [x] Add the issue-bound implementation decision note.
+- [x] Run targeted tests and `./bin/governance-check`.

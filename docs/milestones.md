@@ -53,13 +53,13 @@ routing_policy:
 1. `I-20260404-2148-A`
 - title: Slot-switch startup preflight and lock observability governance
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md`
-- next_action: Implement shared slot-switch lock snapshot helpers, startup preflight, and doctor/status visibility on the dedicated `2148` lane.
+- next_action: Merge the dedicated `2148` lane into `develop`, then confirm canonical root `doctor` and status still surface the same `current_slot_switch_lock_*` truth while keeping `auth_failure` as separate follow-on evidence.
 - revisit_trigger: If the narrow startup/status contract cannot be implemented without reopening broader supervision behavior, route that expansion back to pre-brainstorm instead of widening this owner silently.
 
 ### candidate_issues

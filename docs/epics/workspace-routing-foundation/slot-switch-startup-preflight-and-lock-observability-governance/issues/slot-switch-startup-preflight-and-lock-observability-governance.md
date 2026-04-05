@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260404-2148-A`
 - title: Slot-switch startup preflight and lock observability governance
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `slot-switch-startup-preflight-and-lock-observability-governance`
@@ -55,20 +55,28 @@ That combination means the immediate operator diagnosis is currently too implici
 - `bash docs/system/workspace/scripts/tests/test-freely-start-cleans-stale-slot-switch-lock`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-times-out-on-active-slot-switch-lock`
 - `bash docs/system/workspace/scripts/tests/test-freely-slot-switch-lock-status-surface`
+- `bash docs/system/workspace/scripts/tests/test-freely-status-family`
 - `./bin/governance-check`
 
-## Current Artifact Set
+## Completion
 
 - `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/brainstorms.md`
 - `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md`
 - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
 - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/brainstorms/b-slot-switch-startup-preflight-and-lock-observability-governance.md`
+- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-implementation-decision.md`
+- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
 - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/prd.md`
 - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
+- `docs/system/workspace/scripts/runtime/freely`
+- `docs/system/workspace/scripts/tests/test-freely-start-cleans-stale-slot-switch-lock`
+- `docs/system/workspace/scripts/tests/test-freely-start-times-out-on-active-slot-switch-lock`
+- `docs/system/workspace/scripts/tests/test-freely-slot-switch-lock-status-surface`
 
 ## Next
 
-- Materialize the bounded startup/doctor/status contract into runtime code and focused tests on this feature lane.
-- Keep the owner narrow; if canonical `develop` still shows blocked-intake or broader auth-loop regressions afterward, route those as separate follow-on governance.
+- Keep this owner in `in_verification` until the feature lane is merged into canonical `develop`.
+- After develop absorption, confirm canonical root runtime still reports the same startup-lock truth while leaving the separate `auth_failure` line of evidence outside this owner.
+- If canonical `develop` still shows blocked-intake or broader auth-loop regressions afterward, route those as separate follow-on governance instead of widening `2148`.
