@@ -96,6 +96,17 @@ routing_policy:
 - next_action: Decide whether to promote this as a follow-on to runtime network failure governance or as a new supervision-owned lifecycle for blocked intake and continuity truth, using the prompt-visible-but-unclaimed evidence plus slot-switch and fork-exhaustion signals.
 - revisit_trigger: Revisit if a fresh root runtime can successfully claim the pending intake and write a new continuity despite websocket permission-denied churn, or if an existing owner is updated to absorb this exact blocked-state contract.
 
+5. `C-20260404-2148-A`
+- title: Bound startup governance for stale or ambiguous codex slot-switch lock
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md`
+- next_action: Freeze startup-governance owner boundary separate from blocked-intake supervision candidate, then decide whether to promote a new issue for `freely start` preflight plus minimal status/doctor slot-switch lock truth.
+- revisit_trigger: Revisit when stale or ambiguous shared lock evidence is reproduced on current `develop`, or when `start` / `doctor` / status surfaces are updated to absorb this exact contract.
+
 ### completed_issues
 1. `I-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough

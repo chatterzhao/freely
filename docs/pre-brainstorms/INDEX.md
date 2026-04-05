@@ -17,7 +17,9 @@
 - 20260405-1000--cli-output-conciseness-and-token-efficiency
   - brainstorms: docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md
   - candidates: docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md
-
+- 20260404-2148--slot-switch-lock-startup-governance
+  - brainstorms: docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md
 - 20260404-1545--runtime-websocket-permission-denied-recovery-governance
   - brainstorms: docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md
