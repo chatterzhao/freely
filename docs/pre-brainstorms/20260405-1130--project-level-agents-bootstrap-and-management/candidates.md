@@ -4,7 +4,7 @@
 
 - candidate_format_version: `v2`
 - title: Project-level AGENTS bootstrap and management contract
-- status: `needs_research`
+- status: `promoted`
 - source_brainstorm: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/brainstorms.md`
 - problem: Freely 已存在“为项目补最小 `AGENTS.md` 并优先读取它”的行为，但缺少稳定 capability contract 来定义模板来源、已有文件保留策略、runtime 组合顺序和 self-hosting 管理边界。
 - why_now:
@@ -27,11 +27,11 @@
 - decision_reason:
   - 这是已存在行为的 contract 缺口，不是凭空新增需求
   - 它已经影响用户项目治理入口和 Freely 自举治理入口两条主线
-  - 但当前边界还不稳定，先停在 pre-brainstorm 更符合法律
-- next_action: 保持在 pre-brainstorm，待确认 milestone/epic 归属后再 materialize 独立 capability owner，并补 preserve-existing-AGENTS 测试。
-- revisit_trigger: 当需要把项目级 `AGENTS.md` 的生成/管理行为作为 Freely 对外长期消费能力冻结时。
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+  - 现有边界已经足够冻结第一轮 capability contract：读取优先级、默认模板层级、preserve-existing 语义与 self-hosting 关系
+- next_action: 以 `I-20260405-1130-A` materialize 第一轮 capability owner，补 capability doc 与 preserve-existing-AGENTS 回归测试，并 replay 到 `develop`。
+- revisit_trigger: 当需要把项目级 `AGENTS.md` 的模板注入、升级/merge 策略或更复杂的项目定制行为继续升级为长期能力时。
+- promoted_issue_path: `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
+- milestone: `M-20260326-freely-product-architecture`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

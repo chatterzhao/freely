@@ -26,5 +26,6 @@ Freely 已经会在 `init` 时为托管项目补一个最小根级 `AGENTS.md`�
 
 ## Next Routing
 
-- 先把这条能力缺口保留在 pre-brainstorm。
-- 若继续推进，下一步应 materialize 一个独立 capability owner，至少覆盖 capability doc、preserve-existing-AGENTS 回归测试、模板层级边界与 self-hosting 管理契约。
+- 这条能力缺口现在进入独立 owner materialization。
+- 第一轮 owner 只冻结 capability contract 的最小真源：capability doc、preserve-existing-AGENTS 回归测试、模板层级边界与 self-hosting 管理契约。
+- 若后续需要更丰富的模板注入、升级/merge 策略或交互式迁移，再从这个 owner 继续拆 follow-on。
