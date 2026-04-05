@@ -92,3 +92,14 @@
 - evidence_refs:
   - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
   - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-verification.md`
+
+## Receipt Gap: 9e35ed77f37a3f9ab77ff1e033c10bb376d6aac3
+
+- target_branch: `develop`
+- source_branch: `feature/cli-output-style-optimization-20260405-1000`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260405-cli-output-style-A`
+- evidence_refs:
+  - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
+  - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
