@@ -50,6 +50,18 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260405-1215-A`
+- title: Runtime audio notifier and sound semantics governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-audio-notifier-and-sound-semantics-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/candidates.md`
+- next_action: Promotion/merge review should consume the verification artifact and decide when to replay this standard-path lane into `develop`; do not widen the owner into fallback or broader notice ingestion during this lane.
+- active_session_ref: `codex/current-thread`
+
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -106,6 +118,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md`
 - next_action: This candidate is now materialized as `I-20260404-2148-A`. Keep the owner scoped to startup preflight and minimal lock observability; do not widen it back into blocked-intake supervision.
 - revisit_trigger: Re-open only if a future runtime change proves the startup/status lock contract still lacks a dedicated owner after this issue closes.
+
+6. `C-20260405-1215-A`
+- title: Runtime audio notifier and sound semantics
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/candidates.md`
+- next_action: This candidate is now materialized as `I-20260405-1215-A`. Keep the owner scoped to canonical audio cue events, four standard bundled sounds, and frontend/Tauri playback only.
+- revisit_trigger: Re-open only if future work adds blocked/failed/interruption semantics, native notice adapters for more tools, or headless/OS fallback playback.
 
 ### completed_issues
 1. `I-20260404-0640-A`

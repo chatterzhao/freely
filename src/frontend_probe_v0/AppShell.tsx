@@ -8,6 +8,7 @@ import { useProbeEvents } from "./useProbeEvents";
 import { useProbeControls } from "./useProbeControls";
 import { useProbeSessionLifecycle } from "./useProbeSessionLifecycle";
 import { useProbeTerminalAttach } from "./useProbeTerminalAttach";
+import { useAudioNotifier } from "./useAudioNotifier";
 import { formatTimestampForDisplay, getSystemTimeZone } from "./timeDisplay";
 import { useTauriValidationSequence } from "./useTauriValidationSequence";
 import { useProbeRuntime } from "./useProbeRuntime";
@@ -74,6 +75,8 @@ function describeEvent(event: ServerEvent) {
       return `${event.type} · ${event.source} · ${event.decision}`;
     case "RecoveryStatusChanged":
       return `${event.type} · ${event.source} · ${event.runtimeState}`;
+    case "AudioCueRequested":
+      return `${event.type} · ${event.actor} · ${event.lifecycle} · ${event.reason}`;
   }
 }
 
@@ -160,6 +163,7 @@ export function AppShell({
     .reverse();
   const recentEvents = events.slice(-5).reverse();
   const systemTimeZone = getSystemTimeZone();
+  const audioState = useAudioNotifier(resolvedAdapter);
   const updateTransportMode = (nextTransportMode: "mock" | "tauri-mock" | "tauri-broken") => {
     const url = new URL(window.location.href);
     if (nextTransportMode === "mock") {
@@ -239,6 +243,7 @@ export function AppShell({
             : `Loaded ${snapshot?.activeRuns.length ?? 0} run(s) from the probe adapter for ${selectedProjectId}.`}
         </p>
         <p>{`Buffered event count: ${events.length}`}</p>
+        <p>{`Audio cue status: ${audioState.status}`}</p>
         <p>{`Last event id: ${snapshot?.lastEventId ?? "n/a"}`}</p>
         <p>{`Display timezone: ${systemTimeZone}`}</p>
         <p>{`Runtime mode: ${runtimeMode}`}</p>

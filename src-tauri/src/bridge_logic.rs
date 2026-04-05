@@ -4,8 +4,8 @@ use crate::command_payload::{
     parse_control_run_payload, parse_session_command_payload,
 };
 use crate::event_payload::{
-    build_agent_status_event, build_input_arbitration_event, build_run_status_event,
-    build_session_upserted_event, build_terminal_chunk_event,
+    build_agent_status_event, build_audio_cue_event, build_input_arbitration_event,
+    build_run_status_event, build_session_upserted_event, build_terminal_chunk_event,
 };
 use crate::model::{CommandAck, CommandEnvelope, SessionStatus, Snapshot};
 use crate::state::{default_run_id, default_session_id};
@@ -35,6 +35,21 @@ fn control_run_status(action: Option<&str>) -> &'static str {
         Some("terminate") => "terminated",
         Some("start") | Some("resume") | Some("retry") => "in_dev",
         _ => "in_dev",
+    }
+}
+
+fn cue_lifecycle_for_action(action: Option<&str>) -> Option<&'static str> {
+    match action {
+        Some("start") | Some("resume") | Some("retry") => Some("started"),
+        Some("terminate") => Some("completed"),
+        _ => None,
+    }
+}
+
+fn cue_actor_from_snapshot(snapshot: &Snapshot) -> &'static str {
+    match snapshot.active_agents.first() {
+        Some(agent) if agent.agent_id.starts_with("worker") => "worker",
+        _ => "manager",
     }
 }
 
@@ -135,7 +150,7 @@ pub fn apply_command(
             } else {
                 snapshot.recovery_summary.clear();
             }
-            vec![
+            let mut events = vec![
                 build_run_status_event(snapshot, project_id, control_source),
                 build_agent_status_event(snapshot, project_id, control_source),
                 build_terminal_chunk_event(
@@ -150,7 +165,22 @@ pub fn apply_command(
                     ),
                     control_source,
                 ),
-            ]
+            ];
+            if let Some(lifecycle) = cue_lifecycle_for_action(control_payload.action.as_deref()) {
+                let actor = cue_actor_from_snapshot(snapshot);
+                events.push(build_audio_cue_event(
+                    snapshot,
+                    project_id,
+                    control_source,
+                    Some(actor),
+                    lifecycle,
+                    &format!(
+                        "run-{}",
+                        control_payload.action.as_deref().unwrap_or("unknown")
+                    ),
+                ));
+            }
+            events
         }
         ProbeCommandKind::CreateOrResumeSession => {
             let session_source = session_payload
@@ -176,7 +206,17 @@ pub fn apply_command(
                 &mut snapshot.governance_summary,
                 format!("session upserted via {}", session_detail),
             );
-            vec![build_session_upserted_event(snapshot, project_id, session_source)]
+            vec![
+                build_session_upserted_event(snapshot, project_id, session_source),
+                build_audio_cue_event(
+                    snapshot,
+                    project_id,
+                    session_source,
+                    Some("manager"),
+                    "started",
+                    "session-created-or-resumed",
+                ),
+            ]
         }
         ProbeCommandKind::AttachTerminal => {
             let session_id = attach_payload
@@ -298,18 +338,26 @@ pub fn apply_command(
                     session_id, snapshot.active_agents[0].agent_id
                 ),
             );
-            vec![build_input_arbitration_event(
-                snapshot,
-                project_id,
-                "human-chat",
-                &format!(
-                    "{} [{}] -> {} @ {}",
-                    chat_payload.content.as_deref().unwrap_or(""),
-                    message_id,
-                    snapshot.active_agents[0].agent_id,
-                    run_id
-                ),
-            )]
+            let details = format!(
+                "{} [{}] -> {} @ {}",
+                chat_payload.content.as_deref().unwrap_or(""),
+                message_id,
+                snapshot.active_agents[0].agent_id,
+                run_id
+            );
+            let mut events =
+                vec![build_input_arbitration_event(snapshot, project_id, "human-chat", &details)];
+            if snapshot.active_agents[0].agent_id.starts_with("worker") {
+                events.push(build_audio_cue_event(
+                    snapshot,
+                    project_id,
+                    "human-chat",
+                    Some("worker"),
+                    "started",
+                    "worker-targeted-chat-intervention",
+                ));
+            }
+            events
         }
         ProbeCommandKind::Other(_) => vec![build_terminal_chunk_event(
             snapshot,
@@ -435,7 +483,7 @@ mod contract_default_id_tests {
 mod tests {
     use serde_json::json;
 
-    use super::{apply_command, control_run_status, prepend_summary};
+    use super::{apply_command, control_run_status, cue_lifecycle_for_action, prepend_summary};
     use crate::model::CommandEnvelope;
     use crate::state::default_snapshot;
 
@@ -463,6 +511,15 @@ mod tests {
     }
 
     #[test]
+    fn maps_control_actions_to_audio_lifecycle() {
+        assert_eq!(cue_lifecycle_for_action(Some("start")), Some("started"));
+        assert_eq!(cue_lifecycle_for_action(Some("resume")), Some("started"));
+        assert_eq!(cue_lifecycle_for_action(Some("retry")), Some("started"));
+        assert_eq!(cue_lifecycle_for_action(Some("terminate")), Some("completed"));
+        assert_eq!(cue_lifecycle_for_action(Some("pause")), None);
+    }
+
+    #[test]
     fn control_run_updates_snapshot_and_emits_run_event() {
         let mut snapshot = default_snapshot("freely");
         let applied = apply_command(
@@ -477,8 +534,10 @@ mod tests {
         assert_eq!(snapshot.last_event_id, "event-2");
         assert_eq!(snapshot.active_runs[0].status, "in_dev");
         assert_eq!(snapshot.active_agents[0].phase, "dev_loop");
-        assert_eq!(applied.events.len(), 3);
+        assert_eq!(applied.events.len(), 4);
         assert_eq!(applied.events[0]["type"], "RunStatusChanged");
+        assert_eq!(applied.events[3]["type"], "AudioCueRequested");
+        assert_eq!(applied.events[3]["cueKey"], "manager-started");
         assert_eq!(applied.ack.command, "ControlRun");
         assert_eq!(applied.ack.message, "control action accepted: start");
     }
@@ -554,6 +613,8 @@ mod tests {
         );
         assert_eq!(applied.events[0]["type"], "SessionUpserted");
         assert_eq!(applied.events[0]["source"], "human-control");
+        assert_eq!(applied.events[1]["type"], "AudioCueRequested");
+        assert_eq!(applied.events[1]["cueKey"], "manager-started");
         assert_eq!(applied.ack.message, "session accepted: probe-ui");
     }
 
@@ -590,5 +651,28 @@ mod tests {
         assert_eq!(applied.events[0]["type"], "InputArbitrationRecorded");
         assert_eq!(applied.events[0]["details"], "hold here [msg-1] -> review-agent @ run-2");
         assert_eq!(applied.ack.message, "chat intervention accepted: hold here");
+    }
+
+    #[test]
+    fn worker_targeted_chat_emits_worker_started_audio_cue() {
+        let mut snapshot = default_snapshot("freely");
+        let applied = apply_command(
+            &mut snapshot,
+            "freely",
+            CommandEnvelope {
+                command: "SendChatIntervention".to_string(),
+                payload: json!({
+                    "sessionId": "session-2",
+                    "messageId": "msg-1",
+                    "content": "take this lane",
+                    "runId": "run-2",
+                    "targetAgentId": "worker-2"
+                }),
+            },
+        );
+
+        assert_eq!(applied.events.len(), 2);
+        assert_eq!(applied.events[1]["type"], "AudioCueRequested");
+        assert_eq!(applied.events[1]["cueKey"], "worker-started");
     }
 }

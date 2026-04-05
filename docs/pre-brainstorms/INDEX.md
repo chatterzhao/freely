@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260405-1215--runtime-audio-notifier-and-sound-semantics
+  - brainstorms: docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/candidates.md
 - 20260405-1130--project-level-agents-bootstrap-and-management
   - brainstorms: docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/brainstorms.md
   - candidates: docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md
