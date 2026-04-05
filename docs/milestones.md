@@ -1963,6 +1963,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md`
 - next_action: Replay this narrow owner to `develop`, then verify canonical `develop` still treats the change as an `AGENTS.md` experiment plus an explicit note about the already-existing project-AGENTS generation contract rather than a silent capability promotion.
 
+2. `I-20260405-1130-A`
+- title: Project-level AGENTS bootstrap and management contract governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-project-level-agents-bootstrap-and-management-contract-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md`
+- next_action: Replay this capability-contract owner to `develop`, then verify canonical `develop` preserves project-owned `AGENTS.md` while exposing the formal project-level AGENTS contract under `docs/system/workspace/**`.
+
 ### completed_issues
 
 1. `I-20260402-0403-A`
@@ -2059,6 +2070,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md`
 - next_action: This candidate is now materialized as `I-20260405-cli-output-style-A`. Keep the owner narrow: the current change freezes an `AGENTS.md` experiment for developer-facing CLI/chat output while also documenting the already-existing project-level `AGENTS.md` generation/consumption contract; it does not introduce a new Freely capability.
 - revisit_trigger: Re-open only if the AGENTS-only experiment proves insufficient or later needs to become a higher-priority canonical product/capability contract.
+
+2. `C-20260405-1130-A`
+- title: Project-level AGENTS bootstrap and management contract
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md`
+- next_action: This candidate is now materialized as `I-20260405-1130-A`. Keep the first slice narrow: freeze the reusable project-level AGENTS contract, add preserve-existing-AGENTS coverage, and document the self-hosting boundary without widening into richer template customization.
+- revisit_trigger: Re-open only if the first capability-contract slice proves insufficient or future project template management needs a broader product/capability split.
 
 - none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.
   - `I-20260401-2245-A` owns build artifact exposure and release allowlist audit.
