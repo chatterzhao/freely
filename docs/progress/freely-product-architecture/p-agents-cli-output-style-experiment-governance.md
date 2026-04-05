@@ -9,6 +9,7 @@
 - branch: `feature/cli-output-style-closeout-20260405-1615`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-1615-feature-cli-output-style-closeout`
 - updated_at: `2026-04-05`
+- closure_status: `merged-and-verified`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -17,11 +18,11 @@
 - `AGENTS.md` now carries a dedicated experimental rule set for developer-facing CLI/chat output while building Freely.
 - The experiment explicitly keeps concise plain Chinese as the default and rejects classical Chinese as the default style.
 - `AGENTS.md` now also states the current project-level contract: Freely init/runtime ensure a minimal project `AGENTS.md`, execution reads project `AGENTS.md` first, and Freely self-hosting follows the same rule.
-- Canonical replay confirms the supporting lifecycle still treats this as a narrow product-architecture/developer-entrypoint owner rather than a reusable capability.
+- Canonical `develop` absorbed the truth-fixed closeout through merge `e79e182`, and post-merge verification still treats this as a narrow product-architecture/developer-entrypoint owner rather than a reusable capability.
 
 ## Completion Evidence
 
-- `feature/cli-output-style-closeout-20260405-1615` rebased onto current `develop`
+- `develop` merge `e79e182`
 - `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-freely-init-preserves-existing-agents-md`
 - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
