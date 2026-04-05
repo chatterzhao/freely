@@ -1974,6 +1974,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md`
 - next_action: Replay this capability-contract owner to `develop`, then verify canonical `develop` preserves project-owned `AGENTS.md` while exposing the formal project-level AGENTS contract under `docs/system/workspace/**`.
 
+3. `I-20260405-1235-A`
+- title: Tool authorization bootstrap and post-consent materialization governance
+- milestone_state: committed
+- phase_state: `in_ibm`
+- priority: P1
+- issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md`
+- next_action: Finish the IBM slice by freezing the authorization/bootstrap matrix, degradation semantics, and backend contract boundary before any runtime implementation follow-on is opened.
+
 ### completed_issues
 
 1. `I-20260402-0403-A`
@@ -2081,6 +2092,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md`
 - next_action: This candidate is now materialized as `I-20260405-1130-A`. Keep the first slice narrow: freeze the reusable project-level AGENTS contract, add preserve-existing-AGENTS coverage, and document the self-hosting boundary without widening into richer template customization.
 - revisit_trigger: Re-open only if the first capability-contract slice proves insufficient or future project template management needs a broader product/capability split.
+
+3. `C-20260405-1235-A`
+- title: Tool authorization bootstrap and post-consent materialization contract
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md`
+- next_action: This candidate is now materialized as `I-20260405-1235-A`. Keep the owner documentation-first: freeze the layer split, per-tool matrix, degradation semantics, and backend contract boundary before opening narrower implementation follow-ons.
+- revisit_trigger: Re-open only if the IBM slice proves too broad, overlaps older owners, or new tool surfaces require a separate owner family instead of a follow-on implementation lane.
 
 - none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.
   - `I-20260401-2245-A` owns build artifact exposure and release allowlist audit.
