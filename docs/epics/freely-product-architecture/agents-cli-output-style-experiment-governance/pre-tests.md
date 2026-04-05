@@ -18,6 +18,13 @@
 
 ### PT-3
 - id: `PT-3`
+- requirement: `AGENTS.md states that project-level AGENTS.md is the first governance surface, and this remains aligned with the current runtime/init contract`
+- evidence_level: `doc-read`
+- status: `pass`
+- artifact_ref: `docs/system/workspace/scripts/runtime/freely`
+
+### PT-4
+- id: `PT-4`
 - requirement: `candidate, milestone, issue, progress, and verification artifacts form a lawful develop-bound chain`
 - evidence_level: `integration`
 - status: `pass`
@@ -26,7 +33,7 @@
 ## Pre-merge Focused Regression / Smoke
 
 1. acceptance target:
-   - the output-style experiment is recorded as developer-entrypoint governance rather than unowned candidate-only drift
+   - the output-style experiment plus project-AGENTS entry contract are recorded as developer-entrypoint governance rather than unowned candidate-only drift
 2. testing layer:
    - governance/document verification
 3. target environment:
