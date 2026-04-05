@@ -1,6 +1,6 @@
 # Issue: agents-cli-output-style-experiment-governance
 
-- issue_id: `I-20260405-1000-A`
+- issue_id: `I-20260405-cli-output-style-A`
 - title: AGENTS project entry and output style governance
 - phase_state: `in_verification`
 - milestone: `M-20260326-freely-product-architecture`

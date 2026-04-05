@@ -1,6 +1,6 @@
 # Verification: agents-cli-output-style-experiment-governance
 
-- issue_id: `I-20260405-1000-A`
+- issue_id: `I-20260405-cli-output-style-A`
 - reviewer: `codex`
 - date: `2026-04-04`
 - disposition: `pass_for_verification`

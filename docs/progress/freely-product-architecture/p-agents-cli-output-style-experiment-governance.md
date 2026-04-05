@@ -1,6 +1,6 @@
 # Progress: agents-cli-output-style-experiment-governance
 
-- issue_id: `I-20260405-1000-A`
+- issue_id: `I-20260405-cli-output-style-A`
 - issue_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
 - title: `AGENTS project entry and output style governance`
 - phase_state: `in_verification`
