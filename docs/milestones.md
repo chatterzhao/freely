@@ -48,6 +48,8 @@ routing_policy:
 - intent: 把首跳路由治理候选正式纳入 milestone，避免 Freely 自己继续依赖悬空 candidate 工作
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
+### committed_issues
+
 1. `I-20260405-0027-A`
 - title: Codex API-key slot bundle and provider-aware probe governance
 - milestone_state: committed
@@ -60,7 +62,16 @@ routing_policy:
 - next_action: Keep the owner in verification until merge/cleanup evidence exists. Current verification already covers manifest + `auth.json/config-auth.toml` bundle save/switch, slot-kind-aware probe routing, apikey-to-apikey residue clearing, and single-envelope JSON auto-switch output.
 - revisit_trigger: Re-route only if another active owner absorbs the same auth+config slot bundle contract or if official Codex provider semantics invalidate the slot-kind split.
 
-### committed_issues
+2. `I-20260405-1415-A`
+- title: ai-switch-cli extraction threshold and skeleton disposition governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md`
+- next_action: Keep this owner parked as the canonical IBM handoff for standalone extraction timing. Do not open an extraction worktree until the Codex-first owner is merged and a concrete follow-on lane can prove the extraction-start checklist is satisfied.
+- revisit_trigger: Re-open only if the Codex-first owner is reopened and invalidates the threshold/boundary package, or if a second tool reaches verified parity quickly enough to change the extraction economics.
 
 ### candidate_issues
 
@@ -106,6 +117,8 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md`
 - next_action: Decide whether to promote this as a follow-on to runtime network failure governance or as a new supervision-owned lifecycle for blocked intake and continuity truth, using the prompt-visible-but-unclaimed evidence plus slot-switch and fork-exhaustion signals.
+- revisit_trigger: Revisit if a fresh root runtime can successfully claim the pending intake and write a new continuity despite websocket permission-denied churn, or if an existing owner is updated to absorb this exact blocked-state contract.
+
 5. `C-20260405-0027-A`
 - title: Codex API-key slot bundle and provider-aware probe governance
 - milestone_state: candidate
@@ -117,7 +130,16 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260405-0027-A` is authoritative and currently sits in verification; do not route execution from this mirror while the committed owner remains active.
 - revisit_trigger: Revisit if another active owner absorbs the full auth+config slot bundle contract or if official Codex provider/auth semantics shift enough to invalidate the current slot-kind split.
 
-- revisit_trigger: Revisit if a fresh root runtime can successfully claim the pending intake and write a new continuity despite websocket permission-denied churn, or if an existing owner is updated to absorb this exact blocked-state contract.
+6. `C-20260405-1415-A`
+- title: ai-switch-cli extraction threshold and skeleton disposition governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md`
+- next_action: Candidate mirror only. `I-20260405-1415-A` is authoritative and now parked at `done_ibm`; use the committed owner as the canonical handoff package when a future extraction lane is justified.
+- revisit_trigger: Revisit once the Codex-first lane is merged or once a second tool reaches verified backend-worthy maturity.
 
 ### completed_issues
 1. `I-20260404-0640-A`
