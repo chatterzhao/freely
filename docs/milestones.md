@@ -50,18 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260405-1215-A`
-- title: Runtime audio notifier and sound semantics governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-audio-notifier-and-sound-semantics-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/candidates.md`
-- next_action: Promotion/merge review should consume the verification artifact and decide when to replay this standard-path lane into `develop`; do not widen the owner into fallback or broader notice ingestion during this lane.
-- active_session_ref: `codex/current-thread`
-
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -169,7 +157,29 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-freely-start-times-out-on-active-slot-switch-lock`
   - `bash docs/system/workspace/scripts/tests/test-freely-slot-switch-lock-status-surface`
   - `./bin/governance-check`
-- completion_note: `Canonical develop absorbed the bounded slot-switch startup preflight and observability contract through merge 9fa8ec3. The merge itself lacked canonical Freely trailers, so this closeout lane repaired that receipt gap through the ordinary protected-merge backfill ledger instead of widening runtime scope or rewriting history.`
+- completion_note: `Canonical develop now enforces bounded slot-switch startup preflight and lock observability, and the closeout lane recorded the ordinary protected-merge receipt gap repair plus post-merge verification before retirement.`
+3. `I-20260405-1215-A`
+- title: Runtime audio notifier and sound semantics governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-audio-notifier-and-sound-semantics-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/candidates.md`
+- evidence:
+  - `develop` merge `a9eba5b`
+  - `docs/progress/workspace-routing-foundation/p-runtime-audio-notifier-and-sound-semantics-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-canonical-closeout-verification.md`
+  - `bun test src/frontend_probe_v0`
+  - `bun run typecheck`
+  - `bun run build`
+  - `cargo test --manifest-path src-tauri/Cargo.toml`
+  - `bun run tauri:validate:probe`
+  - `git diff --check`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now emits stable AudioCueRequested events for the bounded manager/worker start-and-complete matrix, and the bundled probe host ships the four standard wav assets without widening into fallback playback or transcript-listener semantics.`
 
 1. `I-20260402-0020-A`
 - title: Hook bypass break-glass governance

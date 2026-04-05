@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-1215-A`
 - title: Runtime audio notifier and sound semantics governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-audio-notifier-and-sound-semantics-governance`
@@ -79,3 +79,9 @@ Freely 现在能把 runtime signal 暴露到 Tauri/frontend，但还没有一条
 - `bun run typecheck`
 - `cargo test --manifest-path src-tauri/Cargo.toml`
 - `./bin/governance-check`
+
+## Next
+
+- Completed on canonical `develop` via guarded merge `a9eba5b`.
+- Post-merge closeout verification is recorded in `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-canonical-closeout-verification.md`.
+- Reopen only for follow-on lifecycle expansion such as blocked/failed/interruption cues, native notice adapters for more tools, or explicit host-level fallback playback.
