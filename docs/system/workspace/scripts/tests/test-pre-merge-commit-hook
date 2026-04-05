@@ -51,6 +51,17 @@ chmod +x \
   "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
   "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
 
+write_guarded_state() {
+  local target="$1"
+  local source_branch="$2"
+  local bypass_mode="${3:-forbidden}"
+  cat >"$REPO/.git/freely-guarded-merge-state" <<EOF
+target_branch=$target
+source_branch=$source_branch
+bypass_mode=$bypass_mode
+EOF
+}
+
 mkdir -p "$REPO/docs"
 cat > "$REPO/docs/milestones.md" <<'EOF'
 # Milestones
@@ -122,14 +133,27 @@ git commit -q -m "runtime-only change"
 
 git checkout -q develop
 if git merge --no-ff feature/runtime-only-change >"$TMP_DIR/stdout" 2>"$TMP_DIR/stderr"; then
-  echo "[FAIL] pre-merge-commit hook should block develop merge without candidate evidence" >&2
+  echo "[FAIL] pre-merge-commit hook should block raw develop merge without guarded handshake" >&2
   exit 1
 fi
 
-grep -q "Merge blocked: develop-bound governance materialization gate failed" "$TMP_DIR/stderr"
-grep -q "no candidate-driven lifecycle evidence" "$TMP_DIR/stderr"
+cat "$TMP_DIR/stdout" "$TMP_DIR/stderr" >"$TMP_DIR/raw-merge-output"
+grep -q "Raw develop merges are not an allowed entrypoint" "$TMP_DIR/raw-merge-output"
+grep -q "./bin/merge-guarded" "$TMP_DIR/raw-merge-output"
 git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1
 git merge --abort >/dev/null 2>&1
+
+git merge --no-commit --no-ff feature/runtime-only-change >/dev/null 2>&1
+write_guarded_state develop feature/runtime-only-change
+if FREELY_GUARDED_MERGE_COMPLETION=1 .githooks/pre-merge-commit >"$TMP_DIR/guarded-governance-stdout" 2>"$TMP_DIR/guarded-governance-stderr"; then
+  echo "[FAIL] guarded develop merge should still fail governance materialization without candidate evidence" >&2
+  exit 1
+fi
+cat "$TMP_DIR/guarded-governance-stdout" "$TMP_DIR/guarded-governance-stderr" >"$TMP_DIR/guarded-governance-output"
+grep -q "Merge blocked: develop-bound governance materialization gate failed" "$TMP_DIR/guarded-governance-output"
+grep -q "no candidate-driven lifecycle evidence" "$TMP_DIR/guarded-governance-output"
+git merge --abort >/dev/null 2>&1
+rm -f "$REPO/.git/freely-guarded-merge-state"
 
 git checkout -q -b feature/promotion-owner
 mkdir -p docs/epics/sample/story/code-reviews src
@@ -216,7 +240,8 @@ if [[ "$merge_prepare_rc" -ne 0 ]] && ! git rev-parse -q --verify MERGE_HEAD >/d
   echo "[FAIL] could not prepare duplicate-ownership merge for pre-merge-commit hook" >&2
   exit 1
 fi
-if .githooks/pre-merge-commit >"$TMP_DIR/promotion-stdout" 2>"$TMP_DIR/promotion-stderr"; then
+write_guarded_state develop feature/promotion-owner
+if FREELY_GUARDED_MERGE_COMPLETION=1 .githooks/pre-merge-commit >"$TMP_DIR/promotion-stdout" 2>"$TMP_DIR/promotion-stderr"; then
   echo "[FAIL] pre-merge-commit hook should block duplicate develop promotion ownership" >&2
   exit 1
 fi
@@ -231,14 +256,17 @@ grep -q "duplicate develop promotion ownership is already active" "$TMP_DIR/prom
   exit 1
 }
 git merge --abort >/dev/null 2>&1
+rm -f "$REPO/.git/freely-guarded-merge-state"
 
 kill "$CONFLICT_PID" 2>/dev/null || true
 wait "$CONFLICT_PID" 2>/dev/null || true
 rm -f "$CONFLICT_WT/.freely/run/ai.pid"
 
 git merge --no-commit --no-ff feature/promotion-owner >/dev/null 2>&1
-.githooks/pre-merge-commit >"$TMP_DIR/promotion-success-stdout" 2>"$TMP_DIR/promotion-success-stderr"
-git commit -q --no-edit
+write_guarded_state develop feature/promotion-owner
+FREELY_GUARDED_MERGE_COMPLETION=1 .githooks/pre-merge-commit >"$TMP_DIR/promotion-success-stdout" 2>"$TMP_DIR/promotion-success-stderr"
+FREELY_GUARDED_MERGE_COMPLETION=1 git commit -q --no-edit
 git merge-base --is-ancestor feature/promotion-owner develop
+rm -f "$REPO/.git/freely-guarded-merge-state"
 
-echo "[PASS] pre-merge-commit hook enforces governance materialization and duplicate promotion ownership"
+echo "[PASS] pre-merge-commit hook enforces guarded develop entrypoint, governance materialization, and duplicate promotion ownership"

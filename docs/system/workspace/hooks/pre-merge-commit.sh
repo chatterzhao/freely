@@ -30,20 +30,21 @@ load_guarded_state() {
   [[ -n "$guarded_state_target" && -n "$guarded_state_source" && -n "$guarded_state_bypass" ]] || return 1
 }
 
-require_valid_guarded_completion_state() {
+require_valid_guarded_merge_state() {
   load_guarded_state || {
     cat <<MSG
-[HOOK] Merge blocked: guarded merge completion state is missing or malformed.
-Re-run the merge through ./bin/merge-guarded so hooks can verify a canonical completion handshake.
-Policy source: docs/LAWS.md §2D
+[HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
+Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/merge-guarded so hooks can verify the canonical handshake.
+Policy source: docs/LAWS.md §2, §2D
 MSG
     exit 1
   }
 
   if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" != "1" ]]; then
     cat <<MSG
-[HOOK] Merge blocked: guarded completion handshake marker is missing.
-Policy source: docs/LAWS.md §2D
+[HOOK] Merge blocked: canonical guarded merge handshake marker is missing.
+Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/merge-guarded.
+Policy source: docs/LAWS.md §2, §2D
 MSG
     exit 1
   fi
@@ -75,8 +76,9 @@ MSG
   fi
 }
 
+require_valid_guarded_merge_state
+
 if [[ -n "$break_glass_reason$break_glass_blocked_gate$break_glass_follow_on_issue$break_glass_operation_scope$break_glass_evidence_refs" ]]; then
-  require_valid_guarded_completion_state
   case "$break_glass_reason" in
     tooling_unavailable|verified_false_negative) ;;
     *)

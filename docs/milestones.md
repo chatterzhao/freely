@@ -1609,7 +1609,29 @@ routing_policy:
 - next_action: Candidate is already materialized as `I-20260402-1912-A`; keep this mirror only for source traceability and route execution from the issue/progress pair.
 - revisit_trigger: Revisit immediately if protected-branch completion semantics are widened beyond merge-completion-only, if receipt trailer and ledger truth drift apart, or if root `develop` again accumulates unowned merge-governance hardening.
 
+18. `C-20260405-0425-A`
+- title: Develop guarded merge entrypoint enforcement
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-0425--develop-guarded-merge-entrypoint-enforcement/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-0425--develop-guarded-merge-entrypoint-enforcement/candidates.md`
+- next_action: Candidate is already materialized as `I-20260405-0425-A`; keep this mirror only for source traceability and route execution from the issue/progress pair.
+- revisit_trigger: Revisit immediately if raw `git merge` on `develop` still reaches a merge commit without canonical guarded state, or if entrypoint enforcement suppresses governance/promotion gates after handshake validation.
+
 ### committed_issues
+
+1. `I-20260405-0425-A`
+- title: Develop guarded merge entrypoint enforcement governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-develop-guarded-merge-entrypoint-enforcement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-0425--develop-guarded-merge-entrypoint-enforcement/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-0425--develop-guarded-merge-entrypoint-enforcement/candidates.md`
+- next_action: Replay the verified owner worktree into `develop` through `./bin/merge-guarded`, then write closeout verification and completion evidence.
 
 ### completed_issues
 
