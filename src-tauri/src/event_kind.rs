@@ -5,6 +5,7 @@ pub enum ProbeEventKind {
     SessionUpserted,
     InputArbitrationRecorded,
     TerminalChunkAppended,
+    AudioCueRequested,
 }
 
 impl ProbeEventKind {
@@ -15,6 +16,7 @@ impl ProbeEventKind {
             Self::SessionUpserted => "SessionUpserted",
             Self::InputArbitrationRecorded => "InputArbitrationRecorded",
             Self::TerminalChunkAppended => "TerminalChunkAppended",
+            Self::AudioCueRequested => "AudioCueRequested",
         }
     }
 }
@@ -37,6 +39,10 @@ mod tests {
         assert_eq!(
             ProbeEventKind::TerminalChunkAppended.as_str(),
             "TerminalChunkAppended"
+        );
+        assert_eq!(
+            ProbeEventKind::AudioCueRequested.as_str(),
+            "AudioCueRequested"
         );
     }
 }

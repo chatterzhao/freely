@@ -46,6 +46,22 @@ fn base_event(
     event
 }
 
+fn cue_key(actor: &str, lifecycle: &str) -> String {
+    format!("{}-{}", actor, lifecycle)
+}
+
+fn primary_actor(snapshot: &Snapshot) -> &'static str {
+    let Some(agent) = snapshot.active_agents.first() else {
+        return "manager";
+    };
+
+    if agent.agent_id.starts_with("worker") {
+        "worker"
+    } else {
+        "manager"
+    }
+}
+
 pub fn build_session_upserted_event(snapshot: &Snapshot, project_id: &str, source: &str) -> Value {
     let mut event = base_event(
         snapshot,
@@ -168,9 +184,40 @@ pub fn build_terminal_chunk_event(
     Value::Object(event)
 }
 
+pub fn build_audio_cue_event(
+    snapshot: &Snapshot,
+    project_id: &str,
+    source: &str,
+    actor: Option<&str>,
+    lifecycle: &str,
+    reason: &str,
+) -> Value {
+    let actor = actor.unwrap_or_else(|| primary_actor(snapshot));
+    let mut event = base_event(
+        snapshot,
+        project_id,
+        ProbeEventKind::AudioCueRequested.as_str(),
+        source,
+    );
+    event.insert(
+        "cueKey".to_string(),
+        Value::String(cue_key(actor, lifecycle)),
+    );
+    event.insert("actor".to_string(), Value::String(actor.to_string()));
+    event.insert(
+        "lifecycle".to_string(),
+        Value::String(lifecycle.to_string()),
+    );
+    event.insert("reason".to_string(), Value::String(reason.to_string()));
+    Value::Object(event)
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{build_input_arbitration_event, build_run_status_event, build_session_upserted_event, build_terminal_chunk_event};
+    use super::{
+        build_audio_cue_event, build_input_arbitration_event, build_run_status_event,
+        build_session_upserted_event, build_terminal_chunk_event,
+    };
     use crate::model::{ProjectSummary, Snapshot};
     use crate::state::default_snapshot;
 
@@ -227,5 +274,24 @@ mod tests {
         assert_eq!(run_event["sessionId"], "freely-session-1");
         assert_eq!(run_event["runId"], "freely-run-1");
         assert_eq!(terminal_event["terminalTarget"], "freely-run-1:pty-0");
+    }
+
+    #[test]
+    fn builds_audio_cue_event_with_actor_and_lifecycle() {
+        let snapshot = default_snapshot("freely");
+        let event = build_audio_cue_event(
+            &snapshot,
+            "freely",
+            "system",
+            Some("worker"),
+            "completed",
+            "run-terminate",
+        );
+
+        assert_eq!(event["type"], "AudioCueRequested");
+        assert_eq!(event["cueKey"], "worker-completed");
+        assert_eq!(event["actor"], "worker");
+        assert_eq!(event["lifecycle"], "completed");
+        assert_eq!(event["reason"], "run-terminate");
     }
 }
