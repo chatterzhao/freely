@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-1130-A`
 - title: Project-level AGENTS bootstrap and management contract governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `project-level-agents-bootstrap-and-management-contract-governance`
@@ -88,4 +88,5 @@ But that behavior has been scattered across runtime code, tests, and high-level 
 
 ## Next
 
-- Replay this narrow capability-contract owner to `develop`, then verify canonical `develop` exposes the project-level AGENTS contract as reusable truth without widening into richer template-management behavior.
+- Completed on canonical `develop` with closeout verification recorded in `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-canonical-closeout-verification.md`.
+- Reopen only if canonical `develop` regresses the project-level `AGENTS.md` preservation contract or stops treating the project root entrypoint as authoritative before reusable workspace capability docs.

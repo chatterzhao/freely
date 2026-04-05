@@ -2085,14 +2085,23 @@ routing_policy:
 
 2. `I-20260405-1130-A`
 - title: Project-level AGENTS bootstrap and management contract governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
 - progress_path: `docs/progress/freely-product-architecture/p-project-level-agents-bootstrap-and-management-contract-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md`
-- next_action: Replay this capability-contract owner to `develop`, then verify canonical `develop` preserves project-owned `AGENTS.md` while exposing the formal project-level AGENTS contract under `docs/system/workspace/**`.
+- evidence:
+  - `docs/progress/freely-product-architecture/p-project-level-agents-bootstrap-and-management-contract-governance.md`
+  - `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-governance-verification.md`
+  - `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-preserves-existing-agents-md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
+  - `git diff --check`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now treats project-level AGENTS bootstrap and management as reusable capability truth: init creates AGENTS only when missing, preserves project-owned files when present, and runtime consumption still reads the project root entrypoint before reusable workspace capability docs.`
 
 3. `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
