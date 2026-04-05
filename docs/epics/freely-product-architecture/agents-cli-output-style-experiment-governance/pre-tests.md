@@ -19,7 +19,7 @@
 ### PT-3
 - id: `PT-3`
 - requirement: `AGENTS.md states that project-level AGENTS.md is the first governance surface, and this remains aligned with the current runtime/init contract`
-- evidence_level: `doc-read`
+- evidence_level: `mock`
 - status: `pass`
 - artifact_ref: `docs/system/workspace/scripts/runtime/freely`
 
