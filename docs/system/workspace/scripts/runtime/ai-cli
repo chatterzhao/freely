@@ -8,6 +8,13 @@ set -euo pipefail
 AUTH_DIR="$HOME/.ai-auth"
 CONFIG_FILE="$HOME/.config/freely/ai-cli-profiles.yaml"
 SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+FILE_BACKUP_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/file-backup.sh"
+
+[[ -f "$FILE_BACKUP_LIB" ]] || {
+  echo "[ERROR] missing file backup helper: $FILE_BACKUP_LIB" >&2
+  exit 1
+}
+source "$FILE_BACKUP_LIB"
 
 # 全局选项
 YES_MODE=false
@@ -272,15 +279,6 @@ codex_switch_lock_wait_for_idle() {
   done
 }
 
-json_string_or_null() {
-  local value="${1:-}"
-  if [[ -n "$value" ]]; then
-    printf '"%s"' "$value"
-  else
-    printf 'null'
-  fi
-}
-
 next_slot_name() {
   local tool="$1" base="$2"
   local slot="${base}-1" i=2
@@ -293,14 +291,24 @@ next_slot_name() {
 
 resolve_codex_slot_name() {
   local auth_file="$1" requested_slot="${2:-}"
-  local account base_slot
+  local kind account provider_id base_slot
   if [[ -n "$requested_slot" ]]; then
     printf '%s\n' "$requested_slot"
     return 0
   fi
-  account="$(extract_codex_account "$auth_file")"
-  [[ -n "$account" ]] || return 1
-  base_slot="$(printf '%s' "$account" | sed 's/\./-/g')"
+  kind="$(codex_live_auth_kind "$auth_file")"
+  case "$kind" in
+    apikey)
+      provider_id="$(codex_live_provider_id)"
+      [[ -n "$provider_id" ]] || provider_id="custom"
+      base_slot="apikey-$(printf '%s' "$provider_id" | sed 's/[^A-Za-z0-9._-]/-/g; s/\./-/g')"
+      ;;
+    *)
+      account="$(extract_codex_account "$auth_file")"
+      [[ -n "$account" ]] || return 1
+      base_slot="account-$(printf '%s' "$account" | sed 's/[^A-Za-z0-9._@-]/-/g; s/\./-/g')"
+      ;;
+  esac
   next_slot_name "codex" "$base_slot"
 }
 
@@ -340,6 +348,331 @@ except:
   fi
   
   echo "$email"
+}
+
+codex_live_auth_file() {
+  printf '%s\n' "$HOME/.codex/auth.json"
+}
+
+codex_live_config_file() {
+  printf '%s\n' "$HOME/.codex/config.toml"
+}
+
+codex_slot_manifest_file() {
+  local slot="$1"
+  printf '%s\n' "$(auth_slot_dir "codex" "$slot")/manifest.json"
+}
+
+codex_slot_config_fragment_file() {
+  local slot="$1"
+  printf '%s\n' "$(auth_slot_dir "codex" "$slot")/config-auth.toml"
+}
+
+codex_live_auth_kind() {
+  local auth_file="$1"
+  python3 - <<'PY' "$auth_file" 2>/dev/null || true
+import json
+import os
+import sys
+
+path = sys.argv[1]
+if not os.path.exists(path):
+    print("")
+    raise SystemExit(0)
+with open(path, "r", encoding="utf-8") as f:
+    data = json.load(f)
+if isinstance(data.get("OPENAI_API_KEY"), str) and data.get("OPENAI_API_KEY"):
+    print("apikey")
+elif isinstance(data.get("tokens"), dict) or isinstance(data.get("access_token"), str):
+    print("account")
+else:
+    print("legacy")
+PY
+}
+
+codex_live_provider_id() {
+  local config_file
+  config_file="$(codex_live_config_file)"
+  python3 - <<'PY' "$config_file" 2>/dev/null || true
+import os
+import sys
+import tomllib
+
+path = sys.argv[1]
+if not os.path.exists(path):
+    print("")
+    raise SystemExit(0)
+with open(path, "rb") as f:
+    data = tomllib.load(f)
+value = data.get("model_provider", "")
+print(value if isinstance(value, str) else "")
+PY
+}
+
+codex_infer_slot_kind_from_slot() {
+  local slot="${1:-}"
+  case "$slot" in
+    account-*) printf 'account\n' ;;
+    apikey-*) printf 'apikey\n' ;;
+    *) printf 'legacy\n' ;;
+  esac
+}
+
+codex_saved_slot_kind() {
+  local slot="$1"
+  local manifest_file auth_file kind=""
+  manifest_file="$(codex_slot_manifest_file "$slot")"
+  if [[ -f "$manifest_file" ]]; then
+    kind="$(python3 - <<'PY' "$manifest_file" 2>/dev/null || true
+import json
+import sys
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    data = json.load(f)
+value = data.get("slot_kind", "")
+print(value if isinstance(value, str) else "")
+PY
+)"
+  fi
+  if [[ -n "$kind" ]]; then
+    printf '%s\n' "$kind"
+    return 0
+  fi
+  kind="$(codex_infer_slot_kind_from_slot "$slot")"
+  if [[ "$kind" != "legacy" ]]; then
+    printf '%s\n' "$kind"
+    return 0
+  fi
+  auth_file="$(auth_slot_dir "codex" "$slot")/auth.json"
+  kind="$(codex_live_auth_kind "$auth_file")"
+  [[ -n "$kind" ]] || kind="legacy"
+  printf '%s\n' "$kind"
+}
+
+codex_saved_slot_provider_id() {
+  local slot="$1" manifest_file
+  manifest_file="$(codex_slot_manifest_file "$slot")"
+  [[ -f "$manifest_file" ]] || return 0
+  python3 - <<'PY' "$manifest_file" 2>/dev/null || true
+import json
+import sys
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    data = json.load(f)
+value = data.get("provider_id", "")
+print(value if isinstance(value, str) else "")
+PY
+}
+
+codex_write_slot_manifest() {
+  local slot="$1" slot_dir="$2" kind="$3" account="$4" provider_id="$5"
+  python3 - <<'PY' "$slot_dir/manifest.json" "$slot" "$kind" "$account" "$provider_id"
+import json
+import os
+import sys
+
+path, slot, kind, account, provider_id = sys.argv[1:6]
+payload = {
+    "manifest_version": "codex-slot-v1",
+    "tool": "codex",
+    "slot_id": slot,
+    "slot_kind": kind,
+}
+if account:
+    payload["auth_email"] = account
+if provider_id:
+    payload["provider_id"] = provider_id
+os.makedirs(os.path.dirname(path), exist_ok=True)
+with open(path, "w", encoding="utf-8") as f:
+    json.dump(payload, f, indent=2, sort_keys=True)
+    f.write("\n")
+PY
+}
+
+codex_write_fragment_toml_from_live_config() {
+  local target_file="$1"
+  local config_file
+  config_file="$(codex_live_config_file)"
+  python3 - <<'PY' "$config_file" "$target_file"
+import json
+import os
+import sys
+import tomllib
+
+config_path, target_path = sys.argv[1:3]
+
+def dump_value(value):
+    if isinstance(value, str):
+        return json.dumps(value)
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, list):
+        return "[" + ", ".join(dump_value(item) for item in value) + "]"
+    raise TypeError(type(value))
+
+def render_key(key):
+    if isinstance(key, str) and key and all(ch.isalnum() or ch in "-_" for ch in key):
+        return key
+    return json.dumps(key)
+
+def render_path(path):
+    return ".".join(render_key(segment) for segment in path)
+
+def emit_table(lines, path, mapping):
+    scalar_items = []
+    table_items = []
+    for key, value in mapping.items():
+        if isinstance(value, dict):
+            table_items.append((key, value))
+        else:
+            scalar_items.append((key, value))
+    if path:
+        lines.append(f"[{render_path(path)}]")
+    for key, value in scalar_items:
+        lines.append(f"{render_key(key)} = {dump_value(value)}")
+    if scalar_items and table_items:
+        lines.append("")
+    for idx, (key, value) in enumerate(table_items):
+        emit_table(lines, [*path, key], value)
+        if idx != len(table_items) - 1:
+            lines.append("")
+
+fragment = {}
+if os.path.exists(config_path) and os.path.getsize(config_path) > 0:
+    with open(config_path, "rb") as f:
+        data = tomllib.load(f)
+    provider_id = data.get("model_provider")
+    if isinstance(provider_id, str) and provider_id:
+        fragment["model_provider"] = provider_id
+        providers = data.get("model_providers", {})
+        if isinstance(providers, dict) and isinstance(providers.get(provider_id), dict):
+            fragment["model_providers"] = {provider_id: providers[provider_id]}
+    preferred_auth_method = data.get("preferred_auth_method")
+    if isinstance(preferred_auth_method, str) and preferred_auth_method:
+        fragment["preferred_auth_method"] = preferred_auth_method
+
+os.makedirs(os.path.dirname(target_path), exist_ok=True)
+lines = []
+emit_table(lines, [], fragment)
+with open(target_path, "w", encoding="utf-8") as f:
+    if lines:
+        f.write("\n".join(lines).rstrip() + "\n")
+PY
+}
+
+codex_apply_saved_slot_config_fragment() {
+  local slot="$1"
+  local live_config fragment_file slot_kind
+  live_config="$(codex_live_config_file)"
+  fragment_file="$(codex_slot_config_fragment_file "$slot")"
+  slot_kind="$(codex_saved_slot_kind "$slot")"
+  backup_file_with_timestamp "$live_config"
+  python3 - <<'PY' "$live_config" "$fragment_file" "$slot_kind"
+import json
+import os
+import sys
+import tomllib
+
+live_path, fragment_path, slot_kind = sys.argv[1:4]
+
+def load_toml(path):
+    if not os.path.exists(path) or os.path.getsize(path) == 0:
+        return {}
+    with open(path, "rb") as f:
+        return tomllib.load(f)
+
+def dump_value(value):
+    if isinstance(value, str):
+        return json.dumps(value)
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, list):
+        return "[" + ", ".join(dump_value(item) for item in value) + "]"
+    raise TypeError(type(value))
+
+def render_key(key):
+    if isinstance(key, str) and key and all(ch.isalnum() or ch in "-_" for ch in key):
+        return key
+    return json.dumps(key)
+
+def render_path(path):
+    return ".".join(render_key(segment) for segment in path)
+
+def emit_table(lines, path, mapping):
+    scalar_items = []
+    table_items = []
+    for key, value in mapping.items():
+        if isinstance(value, dict):
+            table_items.append((key, value))
+        else:
+            scalar_items.append((key, value))
+    if path:
+        lines.append(f"[{render_path(path)}]")
+    for key, value in scalar_items:
+        lines.append(f"{render_key(key)} = {dump_value(value)}")
+    if scalar_items and table_items:
+        lines.append("")
+    for idx, (key, value) in enumerate(table_items):
+        emit_table(lines, [*path, key], value)
+        if idx != len(table_items) - 1:
+            lines.append("")
+
+data = load_toml(live_path)
+previous_provider = data.get("model_provider") if isinstance(data.get("model_provider"), str) else ""
+data.pop("model_provider", None)
+data.pop("preferred_auth_method", None)
+fragment = load_toml(fragment_path)
+fragment_provider = fragment.get("model_provider") if isinstance(fragment.get("model_provider"), str) else ""
+providers = data.get("model_providers")
+if previous_provider and isinstance(providers, dict):
+    if slot_kind != "apikey" or not fragment_provider or fragment_provider != previous_provider:
+        providers.pop(previous_provider, None)
+        if not providers:
+            data.pop("model_providers", None)
+for key in ("model_provider", "preferred_auth_method"):
+    value = fragment.get(key)
+    if isinstance(value, str) and value:
+        data[key] = value
+if isinstance(fragment.get("model_providers"), dict):
+    existing = data.get("model_providers")
+    if not isinstance(existing, dict):
+        existing = {}
+    for key, value in fragment["model_providers"].items():
+        existing[key] = value
+    if existing:
+        data["model_providers"] = existing
+
+os.makedirs(os.path.dirname(live_path), exist_ok=True)
+lines = []
+emit_table(lines, [], data)
+with open(live_path, "w", encoding="utf-8") as f:
+    f.write("\n".join(lines).rstrip() + ("\n" if lines else ""))
+PY
+}
+
+codex_save_live_bundle_to_slot() {
+  local slot="$1" target_dir="$2"
+  local auth_file config_fragment kind account provider_id
+  auth_file="$(codex_live_auth_file)"
+  config_fragment="$target_dir/config-auth.toml"
+  kind="$(codex_live_auth_kind "$auth_file")"
+  account="$(extract_codex_account "$auth_file")"
+  provider_id=""
+
+  mkdir -p "$target_dir"
+  cp "$auth_file" "$target_dir/"
+  chmod 600 "$target_dir/auth.json"
+
+  if [[ "$kind" == "apikey" ]]; then
+    provider_id="$(codex_live_provider_id)"
+    codex_write_fragment_toml_from_live_config "$config_fragment"
+  else
+    : >"$config_fragment"
+  fi
+
+  codex_write_slot_manifest "$slot" "$target_dir" "$kind" "$account" "$provider_id"
 }
 
 # 初始化
@@ -456,33 +789,44 @@ tool_save_generic() {
 
 # 登录
 cmd_login() {
-  local tool="$1"
+  local tool="$1" auth_mode="${2:-}"
   
   case "$tool" in
     codex)
+      if [[ "$auth_mode" == "apikey" ]]; then
+        local auth_file
+        auth_file="$(codex_live_auth_file)"
+        if [[ ! -f "$auth_file" ]]; then
+          log_error "No codex auth found. Configure Codex API-key mode first, then rerun 'freely ai login codex apikey'."
+          exit 3
+        fi
+        cmd_save "codex"
+        return 0
+      fi
+
       log_info "Launching codex login..."
       codex login
       
       # 登录成功后自动保存
-      if [[ -f "$HOME/.codex/auth.json" ]]; then
-        local account=$(extract_codex_account "$HOME/.codex/auth.json")
-        if [[ -n "$account" ]]; then
-          local slot
-          slot="$(resolve_codex_slot_name "$HOME/.codex/auth.json")"
-          local target_dir
-          target_dir="$(auth_slot_dir "codex" "$slot")"
-          mkdir -p "$target_dir"
-          cp "$HOME/.codex/auth.json" "$target_dir/"
-          chmod 600 "$target_dir/auth.json"
-          write_tool_active_slot "codex" "$slot"
-          log_info "Auto-saved auth email: $account"
-          log_info "Slot: $slot"
-          log_info "Location: $target_dir"
-          notify_freely_auth_change "codex" "$slot" "login_success"
-          
-          if [[ "$FORMAT" == "json" ]]; then
-            echo "{\"logged_in\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"auth_email\": \"$account\", \"account\": \"$account\", \"saved\": true}"
-          fi
+      if [[ -f "$(codex_live_auth_file)" ]]; then
+        local auth_file slot target_dir account kind provider_id
+        auth_file="$(codex_live_auth_file)"
+        kind="$(codex_live_auth_kind "$auth_file")"
+        slot="$(resolve_codex_slot_name "$auth_file")"
+        target_dir="$(auth_slot_dir "codex" "$slot")"
+        account="$(extract_codex_account "$auth_file")"
+        provider_id="$(codex_live_provider_id)"
+        codex_save_live_bundle_to_slot "$slot" "$target_dir"
+        write_tool_active_slot "codex" "$slot"
+        [[ -n "$account" ]] && log_info "Auto-saved auth email: $account"
+        [[ -n "$provider_id" ]] && log_info "Provider: $provider_id"
+        log_info "Slot kind: $kind"
+        log_info "Slot: $slot"
+        log_info "Location: $target_dir"
+        notify_freely_auth_change "codex" "$slot" "login_success"
+
+        if [[ "$FORMAT" == "json" ]]; then
+          echo "{\"logged_in\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"slot_kind\": $(json_string_or_null "$kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"saved\": true}"
         fi
       fi
       ;;
@@ -508,17 +852,20 @@ cmd_save() {
   
   case "$tool" in
     codex)
-      local auth_file="$HOME/.codex/auth.json"
+      local auth_file
+      auth_file="$(codex_live_auth_file)"
       if [[ ! -f "$auth_file" ]]; then
         log_error "No codex auth found. Run 'freely ai login codex' first."
         exit 3
       fi
 
-      local actual_account
+      local actual_account kind provider_id
       actual_account="$(extract_codex_account "$auth_file")"
+      kind="$(codex_live_auth_kind "$auth_file")"
+      provider_id="$(codex_live_provider_id)"
 
-      if [[ -z "$slot" && -z "$actual_account" ]]; then
-        log_error "Cannot extract account from auth.json. Please specify slot name."
+      if [[ -z "$slot" && -z "$actual_account" && "$kind" != "apikey" ]]; then
+        log_error "Cannot derive Codex slot identity from current auth. Please specify slot name."
           log_info "Usage: freely ai save codex <slot>"
           exit 2
       fi
@@ -537,18 +884,18 @@ cmd_save() {
 
       [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would save to $target_dir"; return; }
 
-      mkdir -p "$target_dir"
-      cp "$auth_file" "$target_dir/"
-      chmod 600 "$target_dir/auth.json"
+      codex_save_live_bundle_to_slot "$slot" "$target_dir"
       write_tool_active_slot "codex" "$slot"
 
       log_info "Saved codex slot: $slot"
+      log_info "Slot kind: $kind"
       [[ -n "$actual_account" ]] && log_info "Slot auth email: $actual_account"
+      [[ -n "$provider_id" ]] && log_info "Provider: $provider_id"
       log_info "Slot: $slot"
       log_info "Location: $target_dir"
 
       if [[ "$FORMAT" == "json" ]]; then
-        echo "{\"saved\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"auth_email\": $(json_string_or_null "$actual_account"), \"account\": $(json_string_or_null "$actual_account"), \"path\": \"$target_dir\"}"
+        echo "{\"saved\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"slot_kind\": $(json_string_or_null "$kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": $(json_string_or_null "$actual_account"), \"account\": $(json_string_or_null "$actual_account"), \"path\": \"$target_dir\"}"
       fi
       ;;
     iflow)
@@ -568,7 +915,8 @@ cmd_save() {
 # 同步当前 auth.json 到对应备份目录
 sync_current_auth() {
   local tool="$1"
-  local auth_file="$HOME/.codex/auth.json"
+  local auth_file
+  auth_file="$(codex_live_auth_file)"
   
   if [[ ! -f "$auth_file" ]]; then
     return 0
@@ -585,8 +933,7 @@ sync_current_auth() {
 
   # 只在当前活跃槽位已存在时同步，避免创建意外槽位
   if [[ -d "$backup_dir" ]]; then
-    cp "$auth_file" "$backup_dir/"
-    chmod 600 "$backup_dir/auth.json"
+    codex_save_live_bundle_to_slot "$current_slot" "$backup_dir"
     log_info "Auto-synced current token to slot: $current_slot"
   fi
 }
@@ -677,7 +1024,7 @@ source_watchdog_script_or_fail() {
 _cmd_switch_auto_codex() {
   local project="${PROJECT_ROOT:-$(pwd)}"
   local tool="codex"
-  local actual_account=""
+  local actual_account="" switched_provider="" switched_kind=""
   local result rc=0 notified_slot=""
 
   codex_switch_lock_acquire "auto_probe_switch" "switch" "auto" || exit 1
@@ -686,16 +1033,21 @@ _cmd_switch_auto_codex() {
   result="$(codex_inventory_truth "$project" "refresh" || true)"
   case "$result" in
     oauth_unreachable)
-      if freely_network_proxy_has_effective_explicit_config "$project"; then
-        log_error "OAuth inventory refresh failed even though Freely proxy config is explicit. Check the configured proxy endpoint and network reachability."
+      if codex_saved_slots_include_kind "$project" "apikey"; then
+        log_warn "OAuth inventory refresh failed, but saved apikey slots exist; falling back to exec-only slot probing"
+        result="$(probe_all_codex_slots_and_update_cooldown "$project" || true)"
       else
-        log_error "OAuth inventory refresh failed before any slot could be classified. Configure proxy settings in $project/.freely/config.env or \$FREELY_HOME/config.env instead of relying on an outer shell."
+        if freely_network_proxy_has_effective_explicit_config "$project"; then
+          log_error "OAuth inventory refresh failed even though Freely proxy config is explicit. Check the configured proxy endpoint and network reachability."
+        else
+          log_error "OAuth inventory refresh failed before any slot could be classified. Configure proxy settings in $project/.freely/config.env or \$FREELY_HOME/config.env instead of relying on an outer shell."
+        fi
+        if [[ "$FORMAT" == "json" ]]; then
+          echo "{\"switched\": false, \"tool\": \"codex\", \"status\": \"oauth_unreachable\", \"launch_blocked\": true}"
+        fi
+        codex_switch_lock_release
+        return 5
       fi
-      if [[ "$FORMAT" == "json" ]]; then
-        echo "{\"switched\": false, \"tool\": \"codex\", \"status\": \"oauth_unreachable\", \"launch_blocked\": true}"
-      fi
-      codex_switch_lock_release
-      return 5
       ;;
     none)
       result="$(probe_all_codex_slots_and_update_cooldown "$project" || true)"
@@ -705,12 +1057,14 @@ _cmd_switch_auto_codex() {
   case "$result" in
     usable:*)
       local slot="${result#usable:}"
-      echo -e "${GREEN}[SWITCHED]${NC} -> $slot (usable)"
-      _cmd_switch_codex_direct_unlocked "$tool" "$slot"
+      _cmd_switch_codex_direct_unlocked "$tool" "$slot" "suppress_json"
       notified_slot="$slot"
-      actual_account="$(extract_codex_account "$HOME/.codex/auth.json")"
+      actual_account="$(extract_codex_account "$(codex_live_auth_file)")"
+      switched_provider="$(codex_live_provider_id)"
+      switched_kind="$(codex_saved_slot_kind "$slot")"
+      [[ "$FORMAT" != "json" ]] && echo -e "${GREEN}[SWITCHED]${NC} -> $slot (usable)"
       if [[ "$FORMAT" == "json" ]]; then
-        echo "{\"switched\": true, \"tool\": \"codex\", \"account\": $(json_string_or_null "$actual_account"), \"slot\": \"$slot\", \"status\": \"usable\"}"
+        echo "{\"switched\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"slot_kind\": $(json_string_or_null "$switched_kind"), \"provider_id\": $(json_string_or_null "$switched_provider"), \"auth_email\": $(json_string_or_null "$actual_account"), \"account\": $(json_string_or_null "$actual_account"), \"status\": \"usable\"}"
       fi
       ;;
     all_unavailable:*)
@@ -746,11 +1100,13 @@ _cmd_switch_auto_codex() {
 
 # 实际执行切换（不包含探测逻辑），由上层决定是否持有全局切号锁。
 _cmd_switch_codex_direct_unlocked() {
-  local tool="$1" slot="$2"
-  local source_dir target_file switched_account
+  local tool="$1" slot="$2" suppress_json="${3:-}"
+  local source_dir target_file switched_account switched_provider expected_kind actual_kind
   source_dir="$(auth_slot_dir "codex" "$slot")"
-  target_file="$HOME/.codex/auth.json"
+  target_file="$(codex_live_auth_file)"
   switched_account=""
+  switched_provider=""
+  expected_kind="$(codex_saved_slot_kind "$slot")"
 
   if [[ ! -d "$source_dir" ]]; then
     log_error "Slot '$slot' not found"
@@ -765,19 +1121,28 @@ _cmd_switch_codex_direct_unlocked() {
   [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would switch to $slot"; return; }
 
   cp "$source_dir/auth.json" "$target_file"
-  switched_account="$(extract_codex_account "$target_file")"
-  if [[ -z "$switched_account" ]]; then
-    log_error "Switch copied auth.json but could not verify the active codex slot auth"
+  codex_apply_saved_slot_config_fragment "$slot"
+  actual_kind="$(codex_live_auth_kind "$target_file")"
+  if [[ "$expected_kind" == "apikey" && "$actual_kind" != "apikey" ]]; then
+    log_error "Switch copied Codex bundle but active auth does not look like an apikey slot"
     exit 5
   fi
+  if [[ "$expected_kind" != "apikey" && "$actual_kind" == "apikey" ]]; then
+    log_error "Switch copied Codex bundle but active auth still looks like an apikey slot"
+    exit 5
+  fi
+  switched_account="$(extract_codex_account "$target_file")"
+  switched_provider="$(codex_live_provider_id)"
 
   write_tool_active_slot "codex" "$slot"
   log_info "Switched codex to slot: $slot"
-  log_info "Switched codex auth email: $switched_account"
+  log_info "Switched codex slot kind: $expected_kind"
+  [[ -n "$switched_account" ]] && log_info "Switched codex auth email: $switched_account"
+  [[ -n "$switched_provider" ]] && log_info "Switched codex provider: $switched_provider"
   log_warn "Restart codex for the change to take effect"
 
-  if [[ "$FORMAT" == "json" ]]; then
-    echo "{\"switched\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"auth_email\": \"$switched_account\", \"account\": \"$switched_account\"}"
+  if [[ "$FORMAT" == "json" && "$suppress_json" != "suppress_json" ]]; then
+    echo "{\"switched\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"slot_kind\": $(json_string_or_null "$expected_kind"), \"provider_id\": $(json_string_or_null "$switched_provider"), \"auth_email\": $(json_string_or_null "$switched_account"), \"account\": $(json_string_or_null "$switched_account")}"
   fi
 }
 
@@ -824,11 +1189,14 @@ cmd_whoami() {
   case "$tool" in
     codex)
       codex_switch_lock_wait_for_idle || exit 1
-      local auth_file="$HOME/.codex/auth.json"
-      local slot=""
+      local auth_file slot kind provider_id
+      auth_file="$(codex_live_auth_file)"
+      slot=""
+      kind=""
+      provider_id=""
       if [[ ! -f "$auth_file" ]]; then
         case "$FORMAT" in
-          json) echo "{\"tool\": \"codex\", \"slot\": null, \"auth_email\": null, \"account\": null}" ;;
+          json) echo "{\"tool\": \"codex\", \"slot\": null, \"slot_kind\": null, \"provider_id\": null, \"auth_email\": null, \"account\": null}" ;;
           *) log_warn "Not logged in" ;;
         esac
         exit 0
@@ -836,18 +1204,23 @@ cmd_whoami() {
       
       local account=$(extract_codex_account "$auth_file")
       slot="$(read_tool_active_slot "codex")"
+      kind="$(codex_saved_slot_kind "${slot:-}")"
+      [[ -n "$slot" ]] || kind="$(codex_live_auth_kind "$auth_file")"
+      provider_id="$(codex_live_provider_id)"
       if [[ -z "$account" ]]; then
         case "$FORMAT" in
-          json) echo "{\"tool\": \"codex\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": null, \"account\": null}" ;;
-          *) [[ -n "$slot" ]] && log_info "Current slot: $slot"; log_warn "Cannot determine auth email metadata" ;;
+          json) echo "{\"tool\": \"codex\", \"slot\": $(json_string_or_null "$slot"), \"slot_kind\": $(json_string_or_null "$kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": null, \"account\": null}" ;;
+          *) [[ -n "$slot" ]] && log_info "Current slot: $slot"; [[ -n "$kind" ]] && log_info "Current slot kind: $kind"; [[ -n "$provider_id" ]] && log_info "Current provider: $provider_id"; log_warn "Cannot determine auth email metadata" ;;
         esac
         exit 0
       fi
       
       case "$FORMAT" in
-        json) echo "{\"tool\": \"codex\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": \"$account\", \"account\": \"$account\"}" ;;
+        json) echo "{\"tool\": \"codex\", \"slot\": $(json_string_or_null "$slot"), \"slot_kind\": $(json_string_or_null "$kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": \"$account\", \"account\": \"$account\"}" ;;
         *)
           [[ -n "$slot" ]] && log_info "Current slot: $slot"
+          [[ -n "$kind" ]] && log_info "Current slot kind: $kind"
+          [[ -n "$provider_id" ]] && log_info "Current provider: $provider_id"
           log_info "Current auth email: $account"
           ;;
       esac
@@ -876,7 +1249,8 @@ cmd_status() {
   
   case "$tool" in
     codex)
-      local auth_file="$HOME/.codex/auth.json"
+      local auth_file
+      auth_file="$(codex_live_auth_file)"
       local cache_file=""
       source_watchdog_script_or_fail "$project"
       cache_file="$(codex_availability_cache_file "$project")"
@@ -887,7 +1261,12 @@ cmd_status() {
         local mtime=$(stat -f "%Sm" "$auth_file" 2>/dev/null || stat -c "%y" "$auth_file" 2>/dev/null || echo "unknown")
         local account=$(extract_codex_account "$auth_file")
         local slot
+        local slot_kind
+        local provider_id
         slot="$(read_tool_active_slot "codex")"
+        slot_kind="$(codex_saved_slot_kind "${slot:-}")"
+        [[ -n "$slot" ]] || slot_kind="$(codex_live_auth_kind "$auth_file")"
+        provider_id="$(codex_live_provider_id)"
         local usable_count=""
         local limited_count=""
         local deactivated_count=""
@@ -925,12 +1304,14 @@ cmd_status() {
         
         case "$FORMAT" in
           json)
-            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"slot\": $(json_string_or_null "$slot"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"last_modified\": \"$mtime\", \"availability_cache\": {\"present\": $([[ -f "$cache_file" ]] && printf true || printf false), \"usable\": ${usable_count:-0}, \"rate_limited\": ${limited_count:-0}, \"deactivated_workspace\": ${deactivated_count:-0}, \"other\": ${unknown_count:-0}, \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"earliest_reset_at\": ${earliest_reset:-0}, \"earliest_reset_human\": $(json_string_or_null "$earliest_reset_human"), \"refreshed_at\": $(json_string_or_null "$cache_refreshed"), \"refreshed_at_human\": $(json_string_or_null "$cache_refreshed_human")}}"
+            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"slot\": $(json_string_or_null "$slot"), \"slot_kind\": $(json_string_or_null "$slot_kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"last_modified\": \"$mtime\", \"availability_cache\": {\"present\": $([[ -f "$cache_file" ]] && printf true || printf false), \"usable\": ${usable_count:-0}, \"rate_limited\": ${limited_count:-0}, \"deactivated_workspace\": ${deactivated_count:-0}, \"other\": ${unknown_count:-0}, \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"earliest_reset_at\": ${earliest_reset:-0}, \"earliest_reset_human\": $(json_string_or_null "$earliest_reset_human"), \"refreshed_at\": $(json_string_or_null "$cache_refreshed"), \"refreshed_at_human\": $(json_string_or_null "$cache_refreshed_human")}}"
             ;;
           *)
             log_info "Tool: codex"
             log_info "Auth: present"
             [[ -n "$slot" ]] && log_info "Slot: $slot"
+            [[ -n "$slot_kind" ]] && log_info "Slot kind: $slot_kind"
+            [[ -n "$provider_id" ]] && log_info "Provider: $provider_id"
             log_info "Auth email: ${account:-unknown}"
             log_info "Last modified: $mtime"
             if [[ -f "$cache_file" ]]; then
@@ -1010,7 +1391,7 @@ Usage: freely ai <command> [options]
 
 Commands:
   init                    Initialize slot manager
-  login <tool>            Login and auto-save auth slot
+  login <tool> [mode]     Login and auto-save auth slot (`mode`: `account|apikey`)
   save <tool> [slot]      Save current login (auto-detect next slot if not specified)
   switch [tool] [slot]    Switch to slot. No slot = auto-probe and switch only to a usable slot
   list                    List all saved slots
@@ -1034,6 +1415,7 @@ Exit codes:
 Examples:
   freely ai init
   freely ai login codex
+  freely ai login codex apikey
   freely ai whoami
   freely ai switch codex                    # Refresh saved auth inventory, then switch if a slot is currently usable
   freely ai switch codex other@email-com-2  # Switch to specific slot
@@ -1071,7 +1453,7 @@ main() {
   
   case "$COMMAND" in
     init) cmd_init ;;
-    login) cmd_login "${ARGS[0]}" ;;
+    login) cmd_login "${ARGS[0]}" "${ARGS[1]:-}" ;;
     save) cmd_save "${ARGS[0]}" "${ARGS[1]:-}" ;;
     switch)
       case "${ARGS[0]:-}" in

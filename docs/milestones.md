@@ -14,7 +14,7 @@ candidate_policy:
 
 queue_policy:
 - committed_issues: sequencing is clear and the item is the next active batch
-- candidate_issues: belongs to the milestone, but still needs research or ordering
+- candidate_issues: contains unresolved candidates plus `todo_ibm` candidate mirrors for already-materialized issues; when `promoted_issue_path` is concrete, execution authority remains in `committed_issues`
 - completed_issues: delivered work kept for traceability within the same milestone
 
 phase_state_policy:
@@ -49,6 +49,29 @@ routing_policy:
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
 ### committed_issues
+
+1. `I-20260405-0027-A`
+- title: Codex API-key slot bundle and provider-aware probe governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md`
+- next_action: Keep the owner in verification until merge/cleanup evidence exists. Current verification already covers manifest + `auth.json/config-auth.toml` bundle save/switch, slot-kind-aware probe routing, apikey-to-apikey residue clearing, and single-envelope JSON auto-switch output.
+- revisit_trigger: Re-route only if another active owner absorbs the same auth+config slot bundle contract or if official Codex provider semantics invalidate the slot-kind split.
+
+2. `I-20260405-1415-A`
+- title: ai-switch-cli extraction threshold and skeleton disposition governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md`
+- next_action: Keep this owner parked as the canonical IBM handoff for standalone extraction timing. Do not open an extraction worktree until the Codex-first owner is merged and a concrete follow-on lane can prove the extraction-start checklist is satisfied.
+- revisit_trigger: Re-open only if the Codex-first owner is reopened and invalidates the threshold/boundary package, or if a second tool reaches verified parity quickly enough to change the extraction economics.
 
 ### candidate_issues
 
@@ -117,6 +140,27 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/candidates.md`
 - next_action: This candidate is now materialized as `I-20260405-1215-A`. Keep the owner scoped to canonical audio cue events, four standard bundled sounds, and frontend/Tauri playback only.
 - revisit_trigger: Re-open only if future work adds blocked/failed/interruption semantics, native notice adapters for more tools, or headless/OS fallback playback.
+7. `C-20260405-0027-A`
+- title: Codex API-key slot bundle and provider-aware probe governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md`
+- next_action: Candidate mirror only. `I-20260405-0027-A` is authoritative and currently sits in verification; do not route execution from this mirror while the committed owner remains active.
+- revisit_trigger: Revisit if another active owner absorbs the full auth+config slot bundle contract or if official Codex provider/auth semantics shift enough to invalidate the current slot-kind split.
+
+8. `C-20260405-1415-A`
+- title: ai-switch-cli extraction threshold and skeleton disposition governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md`
+- next_action: Candidate mirror only. `I-20260405-1415-A` is authoritative and now parked at `done_ibm`; use the committed owner as the canonical handoff package when a future extraction lane is justified.
+- revisit_trigger: Revisit once the Codex-first lane is merged or once a second tool reaches verified backend-worthy maturity.
 
 ### completed_issues
 1. `I-20260404-0640-A`
@@ -2039,6 +2083,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md`
 - next_action: Replay this capability-contract owner to `develop`, then verify canonical `develop` preserves project-owned `AGENTS.md` while exposing the formal project-level AGENTS contract under `docs/system/workspace/**`.
 
+3. `I-20260405-1235-A`
+- title: Tool authorization bootstrap and post-consent materialization governance
+- milestone_state: committed
+- phase_state: `in_ibm`
+- priority: P1
+- issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md`
+- next_action: Finish the IBM slice by freezing the authorization/bootstrap matrix, degradation semantics, and backend contract boundary before any runtime implementation follow-on is opened.
+
 ### completed_issues
 
 1. `I-20260402-0403-A`
@@ -2146,6 +2201,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md`
 - next_action: This candidate is now materialized as `I-20260405-1130-A`. Keep the first slice narrow: freeze the reusable project-level AGENTS contract, add preserve-existing-AGENTS coverage, and document the self-hosting boundary without widening into richer template customization.
 - revisit_trigger: Re-open only if the first capability-contract slice proves insufficient or future project template management needs a broader product/capability split.
+
+3. `C-20260405-1235-A`
+- title: Tool authorization bootstrap and post-consent materialization contract
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md`
+- next_action: This candidate is now materialized as `I-20260405-1235-A`. Keep the owner documentation-first: freeze the layer split, per-tool matrix, degradation semantics, and backend contract boundary before opening narrower implementation follow-ons.
+- revisit_trigger: Re-open only if the IBM slice proves too broad, overlaps older owners, or new tool surfaces require a separate owner family instead of a follow-on implementation lane.
 
 - none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.
   - `I-20260401-2245-A` owns build artifact exposure and release allowlist audit.
