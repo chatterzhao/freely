@@ -960,6 +960,20 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260404-latest-manager-continuity-worker-consumption-missing-run-dir-guard-verification.md`
 - completion_note: canonical `develop` 已重新对齐 latest continuity / latest worker prompt generated-consumed truth，并继续吸收 2026-04-04 的 same-family missing-run-dir parser/status guard 修复；更大的 websocket blocked-intake / supervision contract 仍需独立 lifecycle 承接
 
+3a. `I-20260405-1505-A`
+- title: Manager semantic-loop active-worker suppression governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/issues/manager-semantic-loop-active-worker-suppression-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1505--manager-semantic-loop-active-worker-suppression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1505--manager-semantic-loop-active-worker-suppression/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-manager-semantic-loop-active-worker-suppression-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/code-reviews/20260405-manager-semantic-loop-active-worker-suppression-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/code-reviews/20260405-manager-semantic-loop-active-worker-suppression-verification.md`
+- completion_note: semantic-loop monitoring 重新回到 conservative contract；一旦 runtime 仍能看到 active worker truth，无论来自当前 PID 发现还是 launch-state 记录，`live-status` / `fleet-status` 都不会把现场误报成 manager semantic loop。更广的 active-worker stall recovery 仍按独立 lifecycle 推进。
+
 4. `I-20260326-0445`
 - title: Manager-delegated intake absorption closure governance
 - milestone_state: completed

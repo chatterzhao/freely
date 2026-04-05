@@ -1098,7 +1098,7 @@ discover_supervisor_pid() {
 
 pid_matches_project() {
   local pid="$1" project="$2" expected="$3"
-  local cmd cwd project_real
+  local cmd cwd project_real candidate_paths candidate
   [[ -n "$pid" ]] || return 1
   kill -0 "$pid" 2>/dev/null || return 1
   project_real="$(cd "$project" 2>/dev/null && pwd -P || true)"
@@ -1108,23 +1108,42 @@ pid_matches_project() {
       if [[ -n "$expected" ]] && [[ "$cmd" != *"$expected"* ]]; then
         return 1
       fi
-      awk -v p="$project" -v pr="$project_real" -v e="$expected" '
-        (e == "" || index($0, e)) {
+      candidate_paths="$(awk '
+        {
           for (i = 1; i <= NF; i++) {
-            if (($i == "--project" || $i == "-C") && (i + 1) <= NF && ($(i + 1) == p || (pr != "" && $(i + 1) == pr))) {
-              found=1
+            if (($i == "--project" || $i == "-C") && (i + 1) <= NF) {
+              print $(i + 1)
             }
-            if (index($i, "--project=") == 1 && (substr($i, 11) == p || (pr != "" && substr($i, 11) == pr))) {
-              found=1
+            if (index($i, "--project=") == 1) {
+              print substr($i, 11)
             }
           }
         }
-        END { exit found ? 0 : 1 }
-      ' <<<"$cmd" && return 0
+      ' <<<"$cmd")"
+      while IFS= read -r candidate; do
+        [[ -n "$candidate" ]] || continue
+        if [[ "$candidate" == "$project" || "$candidate" == "$project_real" ]]; then
+          return 0
+        fi
+        if [[ -d "$candidate" ]]; then
+          candidate="$(cd "$candidate" 2>/dev/null && pwd -P || true)"
+          if [[ -n "$candidate" && ( "$candidate" == "$project" || "$candidate" == "$project_real" ) ]]; then
+            return 0
+          fi
+        fi
+      done <<<"$candidate_paths"
     fi
   fi
   cwd="$(lsof -a -d cwd -p "$pid" -Fn 2>/dev/null | sed -n 's/^n//p' | head -n 1)"
-  [[ "$cwd" == "$project" || (-n "$project_real" && "$cwd" == "$project_real") ]]
+  if [[ "$cwd" == "$project" || (-n "$project_real" && "$cwd" == "$project_real") ]]; then
+    return 0
+  fi
+  if [[ -n "$cwd" && -d "$cwd" ]]; then
+    cwd="$(cd "$cwd" 2>/dev/null && pwd -P || true)"
+    [[ -n "$cwd" && ( "$cwd" == "$project" || "$cwd" == "$project_real" ) ]]
+    return $?
+  fi
+  return 1
 }
 
 valid_supervisor_pid_for_project() {
@@ -4763,7 +4782,7 @@ manager_semantic_loop_repeat_state_for_project() {
   latest_prompt_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_continuity")"
   [[ -n "$latest_prompt_csv" ]] || return 1
   manager_continuity_has_unconsumed_launchable_worker_prompt "$project" "$latest_continuity" || return 1
-  active_running_workers="$(count_active_running_workers_for_manager_project "$project" 2>/dev/null || true)"
+  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" 2>/dev/null || true)"
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
   (( active_running_workers == 0 )) || return 1
   available_new_slots="$(manager_worker_launch_available_slots "$project" 2>/dev/null || true)"
@@ -5395,6 +5414,30 @@ count_active_running_workers_for_manager_project() {
     fi
   done < <(all_repo_worktrees_for_project "$project")
   printf '%s\n' "$count"
+}
+
+manager_active_running_worker_count_hint_for_project() {
+  local project="$1" state_file hinted_count
+  state_file="$(manager_worker_launch_state_file "$project")"
+  [[ -f "$state_file" ]] || return 0
+  # shellcheck disable=SC1090
+  source "$state_file"
+  hinted_count="${ACTIVE_RUNNING_WORKER_COUNT:-}"
+  [[ "$hinted_count" =~ ^[0-9]+$ ]] || return 0
+  printf '%s\n' "$hinted_count"
+}
+
+manager_semantic_loop_active_worker_count_for_project() {
+  local project="$1" discovered_count hinted_count
+  discovered_count="$(count_active_running_workers_for_manager_project "$project" 2>/dev/null || true)"
+  [[ "$discovered_count" =~ ^[0-9]+$ ]] || discovered_count="0"
+  hinted_count="$(manager_active_running_worker_count_hint_for_project "$project" 2>/dev/null || true)"
+  [[ "$hinted_count" =~ ^[0-9]+$ ]] || hinted_count="0"
+  if (( hinted_count > discovered_count )); then
+    printf '%s\n' "$hinted_count"
+  else
+    printf '%s\n' "$discovered_count"
+  fi
 }
 
 worker_project_busy_with_delegated_continuation() {
