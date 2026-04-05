@@ -1953,7 +1953,7 @@ routing_policy:
 ### committed_issues
 
 1. `I-20260405-cli-output-style-A`
-- title: AGENTS CLI output style experiment governance
+- title: AGENTS project entry and output style governance
 - milestone_state: committed
 - phase_state: `in_verification`
 - priority: P2
@@ -1961,7 +1961,7 @@ routing_policy:
 - progress_path: `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md`
-- next_action: Replay this narrow AGENTS-only owner to `develop`, then verify canonical `develop` still passes governance with the experiment scoped only to developer-facing CLI/chat output.
+- next_action: Replay this narrow owner to `develop`, then verify canonical `develop` still treats the change as an `AGENTS.md` experiment plus an explicit note about the already-existing project-AGENTS generation contract rather than a silent capability promotion.
 
 ### completed_issues
 
@@ -2057,7 +2057,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md`
-- next_action: This candidate is now materialized as `I-20260405-cli-output-style-A`. Keep the owner narrow: the current change only freezes an `AGENTS.md` experiment for developer-facing CLI/chat output and does not introduce a new Freely capability.
+- next_action: This candidate is now materialized as `I-20260405-cli-output-style-A`. Keep the owner narrow: the current change freezes an `AGENTS.md` experiment for developer-facing CLI/chat output while also documenting the already-existing project-level `AGENTS.md` generation/consumption contract; it does not introduce a new Freely capability.
 - revisit_trigger: Re-open only if the AGENTS-only experiment proves insufficient or later needs to become a higher-priority canonical product/capability contract.
 
 - none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.

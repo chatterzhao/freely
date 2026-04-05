@@ -107,6 +107,7 @@ When outputting to CLI:
 2. 产物暂时只落到 `AGENTS.md`。
 3. 风格采用“精炼白话文”，不采用文言文。
 4. 约束范围仅限开发 Freely 过程中的人类可读 CLI 输出与 chat 回答，不扩展到 runtime / skill / CLI 能力真源。
+5. 这轮讨论同时确认了一条已存在的 Freely 能力事实：Freely 当前已经会在项目初始化时补最小 `AGENTS.md`，并在执行前优先读取项目级 `AGENTS.md`；Freely 自举时同样遵循这个项目级入口契约。
 
 ## 后续重开条件
 
