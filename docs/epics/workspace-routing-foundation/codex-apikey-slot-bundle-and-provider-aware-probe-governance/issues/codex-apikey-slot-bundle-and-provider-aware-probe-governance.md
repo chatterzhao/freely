@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-0027-A`
 - title: Codex API-key slot bundle and provider-aware probe governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `codex-apikey-slot-bundle-and-provider-aware-probe-governance`
@@ -96,3 +96,9 @@ Freely 已经把 slot inventory、slot-first recovery、OAuth inventory sweep、
 - pass `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
 - pass `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
 - treat the two existing protected-merge receipt gaps on `develop` as historical governance debt unless this lane changes those merge commits
+
+## Next
+
+- Completed on canonical `develop` via guarded merge `c5e0b85`.
+- Post-merge closeout verification is recorded in `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-canonical-closeout-verification.md`.
+- Reopen only if Codex auth/config bundle materialization, slot-kind-aware probe routing, or provider residue cleanup regresses on canonical `develop`.
