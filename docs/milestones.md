@@ -50,6 +50,18 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260404-2148-A`
+- title: Slot-switch startup preflight and lock observability governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md`
+- next_action: Implement shared slot-switch lock snapshot helpers, startup preflight, and doctor/status visibility on the dedicated `2148` lane.
+- revisit_trigger: If the narrow startup/status contract cannot be implemented without reopening broader supervision behavior, route that expansion back to pre-brainstorm instead of widening this owner silently.
+
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -99,13 +111,13 @@ routing_policy:
 5. `C-20260404-2148-A`
 - title: Bound startup governance for stale or ambiguous codex slot-switch lock
 - milestone_state: candidate
-- phase_state: `needs_research`
+- phase_state: `todo_ibm`
 - priority: P1
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md`
-- next_action: Freeze startup-governance owner boundary separate from blocked-intake supervision candidate, then decide whether to promote a new issue for `freely start` preflight plus minimal status/doctor slot-switch lock truth.
-- revisit_trigger: Revisit when stale or ambiguous shared lock evidence is reproduced on current `develop`, or when `start` / `doctor` / status surfaces are updated to absorb this exact contract.
+- next_action: This candidate is now materialized as `I-20260404-2148-A`. Keep the owner scoped to startup preflight and minimal lock observability; do not widen it back into blocked-intake supervision.
+- revisit_trigger: Re-open only if a future runtime change proves the startup/status lock contract still lacks a dedicated owner after this issue closes.
 
 ### completed_issues
 1. `I-20260404-0640-A`

@@ -32,11 +32,13 @@
     summary: `The latest startup failure is not caused by a current lock, but the historical stale lock blocker is real and still lacks a governed preflight surface. This should be a narrow startup follow-on instead of being mixed back into blocked-intake supervision or reopened completed owners.`
     verdict: `needs_more_research`
 - priority: P1
-- status: needs_research
+- status: promoted
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `pending://issue-materialization`
-- next_action: Freeze the owner boundary as startup-governance-only, then decide whether to materialize a new issue for `start` preflight plus minimal status/doctor lock observability.
-- revisit_trigger: Revisit when stale or ambiguous shared lock evidence is reproduced on current `develop`, or when `start` / `doctor` / status surfaces are explicitly updated to absorb this exact lock contract.
+- decision_reason: The boundary is now narrow enough to materialize cleanly. This owner stays separate from blocked-intake websocket supervision and from completed shared-slot owners, and it converts the startup/doctor/status contract into a dedicated runtime lifecycle.
+- promoted_issue_id: `I-20260404-2148-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+- next_action: Implement the startup preflight plus minimal doctor/status lock truth on the dedicated `2148` feature lane and verify with focused runtime regressions.
+- revisit_trigger: Re-open only if future evidence proves this startup/status lock contract was fully absorbed elsewhere or if a broader shared-slot redesign is explicitly opened.
 - session_refs:
   - tool: codex
   - session_id: current-thread

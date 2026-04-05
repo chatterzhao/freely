@@ -45,6 +45,188 @@ format_timestamp_local_for_display() {
   printf '%s\n' "$value"
 }
 
+strip_simple_shell_quotes() {
+  local value="${1-}"
+  if [[ "$value" == \"*\" && "$value" == *\" ]]; then
+    value="${value#\"}"
+    value="${value%\"}"
+  elif [[ "$value" == \'*\' && "$value" == *\' ]]; then
+    value="${value#\'}"
+    value="${value%\'}"
+  fi
+  printf '%s\n' "$value"
+}
+
+codex_slot_switch_lock_dir_for_runtime() {
+  printf '%s\n' "${AI_CLI_SWITCH_LOCK_DIR:-$HOME/.codex/slot-switch.lock}"
+}
+
+codex_slot_switch_lock_state_file_for_runtime() {
+  printf '%s\n' "$(codex_slot_switch_lock_dir_for_runtime)/state.env"
+}
+
+codex_slot_switch_lock_snapshot_for_runtime() {
+  local lock_dir state_file owner_pid="" started_at="" reason="" detail="" state=""
+  local line key raw_value value owner_alive="0"
+  lock_dir="$(codex_slot_switch_lock_dir_for_runtime)"
+  state_file="$(codex_slot_switch_lock_state_file_for_runtime)"
+
+  CURRENT_SLOT_SWITCH_LOCK_STATE="idle"
+  CURRENT_SLOT_SWITCH_LOCK_DETAIL="lock_dir_absent"
+  CURRENT_SLOT_SWITCH_LOCK_OWNER_PID="none"
+  CURRENT_SLOT_SWITCH_LOCK_STARTED_AT="none"
+  CURRENT_SLOT_SWITCH_LOCK_REASON="none"
+  CURRENT_SLOT_SWITCH_LOCK_PATH="$lock_dir"
+
+  if [[ ! -d "$lock_dir" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "$state_file" ]]; then
+    CURRENT_SLOT_SWITCH_LOCK_STATE="ambiguous"
+    CURRENT_SLOT_SWITCH_LOCK_DETAIL="state_file_missing"
+    return 0
+  fi
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ "$line" == *=* ]] || continue
+    key="${line%%=*}"
+    raw_value="${line#*=}"
+    value="$(strip_simple_shell_quotes "$raw_value")"
+    case "$key" in
+      owner_pid) owner_pid="$value" ;;
+      started_at) started_at="$value" ;;
+      reason) reason="$value" ;;
+    esac
+  done <"$state_file"
+
+  [[ -n "$owner_pid" ]] || owner_pid="none"
+  [[ -n "$started_at" ]] || started_at="none"
+  [[ -n "$reason" ]] || reason="none"
+  CURRENT_SLOT_SWITCH_LOCK_OWNER_PID="$owner_pid"
+  CURRENT_SLOT_SWITCH_LOCK_STARTED_AT="$started_at"
+  CURRENT_SLOT_SWITCH_LOCK_REASON="$reason"
+
+  if [[ "$owner_pid" == "none" ]]; then
+    CURRENT_SLOT_SWITCH_LOCK_STATE="stale"
+    CURRENT_SLOT_SWITCH_LOCK_DETAIL="owner_pid_missing"
+    return 0
+  fi
+
+  if [[ ! "$owner_pid" =~ ^[0-9]+$ ]]; then
+    CURRENT_SLOT_SWITCH_LOCK_STATE="ambiguous"
+    CURRENT_SLOT_SWITCH_LOCK_DETAIL="owner_pid_malformed"
+    return 0
+  fi
+
+  if kill -0 "$owner_pid" 2>/dev/null; then
+    owner_alive="1"
+  fi
+  if [[ "$owner_alive" == "1" ]]; then
+    CURRENT_SLOT_SWITCH_LOCK_STATE="active"
+    CURRENT_SLOT_SWITCH_LOCK_DETAIL="owner_pid_alive"
+    return 0
+  fi
+
+  CURRENT_SLOT_SWITCH_LOCK_STATE="stale"
+  CURRENT_SLOT_SWITCH_LOCK_DETAIL="owner_pid_dead"
+}
+
+codex_slot_switch_lock_cleanup_if_stale_for_runtime() {
+  local lock_dir
+  codex_slot_switch_lock_snapshot_for_runtime
+  [[ "${CURRENT_SLOT_SWITCH_LOCK_STATE:-idle}" == "stale" ]] || return 0
+  lock_dir="${CURRENT_SLOT_SWITCH_LOCK_PATH:-$(codex_slot_switch_lock_dir_for_runtime)}"
+  rm -rf "$lock_dir"
+  codex_slot_switch_lock_snapshot_for_runtime
+}
+
+print_current_slot_switch_lock_snapshot() {
+  codex_slot_switch_lock_snapshot_for_runtime
+  echo "current_slot_switch_lock_state: ${CURRENT_SLOT_SWITCH_LOCK_STATE:-idle}"
+  echo "current_slot_switch_lock_detail: ${CURRENT_SLOT_SWITCH_LOCK_DETAIL:-lock_dir_absent}"
+  echo "current_slot_switch_lock_owner_pid: ${CURRENT_SLOT_SWITCH_LOCK_OWNER_PID:-none}"
+  echo "current_slot_switch_lock_started_at: $(format_timestamp_local_for_display "${CURRENT_SLOT_SWITCH_LOCK_STARTED_AT:-none}")"
+  echo "current_slot_switch_lock_reason: ${CURRENT_SLOT_SWITCH_LOCK_REASON:-none}"
+  echo "current_slot_switch_lock_path: ${CURRENT_SLOT_SWITCH_LOCK_PATH:-$(codex_slot_switch_lock_dir_for_runtime)}"
+}
+
+ensure_codex_slot_switch_startup_ready_or_fail() {
+  local project="$1"
+  local timeout_secs="${FREELY_ACCOUNT_SWITCH_WAIT_SECS:-60}"
+  local interval_secs="${FREELY_ACCOUNT_SWITCH_WAIT_INTERVAL_SECS:-1}"
+  local start_ts now waiting_logged="0"
+  [[ "${AI_TOOL:-}" == "codex" ]] || return 0
+  [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=60
+  [[ "$interval_secs" =~ ^[0-9]+$ ]] || interval_secs=1
+  start_ts="$(date +%s)"
+
+  while true; do
+    codex_slot_switch_lock_snapshot_for_runtime
+    case "${CURRENT_SLOT_SWITCH_LOCK_STATE:-idle}" in
+      idle)
+        return 0
+        ;;
+      stale)
+        log_warn "removing stale codex slot-switch lock before startup (detail=${CURRENT_SLOT_SWITCH_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_SLOT_SWITCH_LOCK_OWNER_PID:-none} path=${CURRENT_SLOT_SWITCH_LOCK_PATH:-unknown})"
+        append_runtime_event "$project" "startup_slot_switch_lock_stale_cleanup" \
+          "lock_state=${CURRENT_SLOT_SWITCH_LOCK_STATE:-stale}" \
+          "lock_detail=${CURRENT_SLOT_SWITCH_LOCK_DETAIL:-unknown}" \
+          "lock_owner_pid=${CURRENT_SLOT_SWITCH_LOCK_OWNER_PID:-none}" \
+          "lock_started_at=${CURRENT_SLOT_SWITCH_LOCK_STARTED_AT:-none}" \
+          "lock_reason=${CURRENT_SLOT_SWITCH_LOCK_REASON:-none}" \
+          "lock_path=${CURRENT_SLOT_SWITCH_LOCK_PATH:-unknown}"
+        codex_slot_switch_lock_cleanup_if_stale_for_runtime
+        continue
+        ;;
+      active)
+        if [[ "$waiting_logged" == "0" ]]; then
+          log_warn "codex slot switch is already in progress before freely start (owner_pid=${CURRENT_SLOT_SWITCH_LOCK_OWNER_PID:-unknown} reason=${CURRENT_SLOT_SWITCH_LOCK_REASON:-none}); waiting"
+          append_runtime_event "$project" "startup_slot_switch_lock_waiting" \
+            "lock_state=${CURRENT_SLOT_SWITCH_LOCK_STATE:-active}" \
+            "lock_detail=${CURRENT_SLOT_SWITCH_LOCK_DETAIL:-unknown}" \
+            "lock_owner_pid=${CURRENT_SLOT_SWITCH_LOCK_OWNER_PID:-none}" \
+            "lock_started_at=${CURRENT_SLOT_SWITCH_LOCK_STARTED_AT:-none}" \
+            "lock_reason=${CURRENT_SLOT_SWITCH_LOCK_REASON:-none}" \
+            "lock_path=${CURRENT_SLOT_SWITCH_LOCK_PATH:-unknown}" \
+            "timeout_secs=$timeout_secs" \
+            "interval_secs=$interval_secs"
+          waiting_logged="1"
+        fi
+        now="$(date +%s)"
+        if (( now - start_ts >= timeout_secs )); then
+          log_error "timed out waiting for active codex slot-switch lock before freely start (owner_pid=${CURRENT_SLOT_SWITCH_LOCK_OWNER_PID:-unknown} reason=${CURRENT_SLOT_SWITCH_LOCK_REASON:-none} path=${CURRENT_SLOT_SWITCH_LOCK_PATH:-unknown})"
+          append_runtime_event "$project" "startup_slot_switch_lock_timeout" \
+            "lock_state=${CURRENT_SLOT_SWITCH_LOCK_STATE:-active}" \
+            "lock_detail=${CURRENT_SLOT_SWITCH_LOCK_DETAIL:-unknown}" \
+            "lock_owner_pid=${CURRENT_SLOT_SWITCH_LOCK_OWNER_PID:-none}" \
+            "lock_started_at=${CURRENT_SLOT_SWITCH_LOCK_STARTED_AT:-none}" \
+            "lock_reason=${CURRENT_SLOT_SWITCH_LOCK_REASON:-none}" \
+            "lock_path=${CURRENT_SLOT_SWITCH_LOCK_PATH:-unknown}" \
+            "timeout_secs=$timeout_secs"
+          return 1
+        fi
+        sleep "$interval_secs"
+        ;;
+      ambiguous)
+        log_error "ambiguous codex slot-switch lock blocks freely start (detail=${CURRENT_SLOT_SWITCH_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_SLOT_SWITCH_LOCK_OWNER_PID:-none} path=${CURRENT_SLOT_SWITCH_LOCK_PATH:-unknown})"
+        append_runtime_event "$project" "startup_slot_switch_lock_ambiguous" \
+          "lock_state=${CURRENT_SLOT_SWITCH_LOCK_STATE:-ambiguous}" \
+          "lock_detail=${CURRENT_SLOT_SWITCH_LOCK_DETAIL:-unknown}" \
+          "lock_owner_pid=${CURRENT_SLOT_SWITCH_LOCK_OWNER_PID:-none}" \
+          "lock_started_at=${CURRENT_SLOT_SWITCH_LOCK_STARTED_AT:-none}" \
+          "lock_reason=${CURRENT_SLOT_SWITCH_LOCK_REASON:-none}" \
+          "lock_path=${CURRENT_SLOT_SWITCH_LOCK_PATH:-unknown}"
+        return 1
+        ;;
+      *)
+        log_error "unknown codex slot-switch lock state blocks freely start: ${CURRENT_SLOT_SWITCH_LOCK_STATE:-unknown}"
+        return 1
+        ;;
+    esac
+  done
+}
+
 usage() {
   cat <<'EOF'
 Usage:
@@ -8105,6 +8287,7 @@ start_project_runtime() {
   child_pid_file="$run_dir/ai.pid"
   loop_log="$logs_dir/loop.log"
   mkdir -p "$run_dir" "$logs_dir"
+  ensure_codex_slot_switch_startup_ready_or_fail "$project" || exit 1
   rm -f "$(stop_marker_file "$project")"
   LAST_ATTACH_REUSE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
@@ -8727,9 +8910,11 @@ cmd_doctor() {
     load_config "$project"
     echo "security_review_policy: $(freely_security_review_policy_for_loaded_config)"
     echo "security_review_scope: $(freely_security_review_scope_for_loaded_config)"
+    print_current_slot_switch_lock_snapshot
   else
     echo "security_review_policy: unavailable-uninitialized"
     echo "security_review_scope: unavailable-uninitialized"
+    print_current_slot_switch_lock_snapshot
   fi
 }
 
@@ -9062,6 +9247,7 @@ cmd_baseline_status() {
   echo "last_active_slot: ${LAST_ACTIVE_SLOT:-unavailable}"
   echo "last_slot_switch_reason: ${LAST_SLOT_SWITCH_REASON:-unavailable}"
   echo "last_slot_switch_at: $(format_timestamp_local_for_display "${LAST_SLOT_SWITCH_AT:-unavailable}")"
+  print_current_slot_switch_lock_snapshot
   echo "last_cycle_debug_log: ${LAST_CYCLE_DEBUG_LOG:-unavailable}"
   echo "last_claude_jsonl_path: ${LAST_CLAUDE_JSONL_PATH:-unavailable}"
   echo "last_codex_mcp_used: ${LAST_CODEX_MCP_USED:-0}"
@@ -9440,6 +9626,7 @@ cmd_live_status() {
   echo "restart_storm_escalation_target: ${LAST_RESTART_STORM_ESCALATION_TARGET:-unavailable}"
   echo "semantic_loop_signal_reason: ${semantic_loop_signal_reason}"
   echo "semantic_loop_signal_summary: ${semantic_loop_signal_summary}"
+  print_current_slot_switch_lock_snapshot
   echo "ownership_holder_state: ${ownership_holder_state}"
   echo "ownership_holder_status: ${ownership_holder_status}"
   echo "ownership_conflict_state: ${ownership_conflict_state}"
