@@ -1622,20 +1622,25 @@ routing_policy:
 
 ### committed_issues
 
+### completed_issues
+
 1. `I-20260405-0425-A`
 - title: Develop guarded merge entrypoint enforcement governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-develop-guarded-merge-entrypoint-enforcement-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-0425--develop-guarded-merge-entrypoint-enforcement/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-0425--develop-guarded-merge-entrypoint-enforcement/candidates.md`
-- next_action: Replay the verified owner worktree into `develop` through `./bin/merge-guarded`, then write closeout verification and completion evidence.
+- evidence:
+  - `develop` commit `f1965d3`
+  - `docs/progress/workspace-routing-foundation/p-develop-guarded-merge-entrypoint-enforcement-governance.md`
+  - `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-enforcement-verification.md`
+  - `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-canonical-closeout-verification.md`
+- completion_note: canonical `develop` now enforces `./bin/merge-guarded` as the required merge entrypoint; later expansion to other protected branch families should reopen as a narrower follow-on.
 
-### completed_issues
-
-1. `I-20260402-1912-A`
+2. `I-20260402-1912-A`
 - title: Protected-branch merge receipt hardening
 - milestone_state: completed
 - phase_state: `completed`
