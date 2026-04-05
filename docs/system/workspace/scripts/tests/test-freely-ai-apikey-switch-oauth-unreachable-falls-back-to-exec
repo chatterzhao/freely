@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ai-apikey-oauth-unreachable.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+FREELY_HOME_DIR="$TMP_DIR/freely-home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+CODEX_LOG="$TMP_DIR/codex.log"
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+  "$PROJECT/docs/system/workspace/scripts/runtime" \
+  "$HOME_DIR/.ai-auth/codex-apikey-custom-1" \
+  "$HOME_DIR/.codex" \
+  "$FREELY_HOME_DIR" \
+  "$MOCK_BIN"
+
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="inherit"
+FREELY_NETWORK_PROXY_URL=""
+FREELY_ALL_PROXY=""
+FREELY_HTTP_PROXY=""
+FREELY_HTTPS_PROXY=""
+FREELY_NO_PROXY=""
+EOF
+
+cat >"$HOME_DIR/.ai-auth/codex-apikey-custom-1/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-live"}
+EOF
+cat >"$HOME_DIR/.ai-auth/codex-apikey-custom-1/config-auth.toml" <<'EOF'
+model_provider = "custom"
+
+[model_providers.custom]
+name = "Custom"
+base_url = "https://api.example.com/v1"
+wire_api = "responses"
+requires_openai_auth = true
+EOF
+cat >"$HOME_DIR/.ai-auth/codex-apikey-custom-1/manifest.json" <<'EOF'
+{"manifest_version":"codex-slot-v1","tool":"codex","slot_id":"apikey-custom-1","slot_kind":"apikey","provider_id":"custom"}
+EOF
+cat >"$HOME_DIR/.codex/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-old"}
+EOF
+cat >"$HOME_DIR/.codex/config.toml" <<'EOF'
+[projects."/tmp/demo"]
+trust_level = "trusted"
+EOF
+
+cat >"$MOCK_BIN/curl" <<'EOF'
+#!/usr/bin/env bash
+exit 7
+EOF
+chmod +x "$MOCK_BIN/curl"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >>"${CODEX_LOG:?}"
+if [[ "${1:-}" == "exec" ]]; then
+  cat >/dev/null || true
+  exit 0
+fi
+exit 99
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+HOME="$HOME_DIR" \
+FREELY_HOME="$FREELY_HOME_DIR" \
+PROJECT_ROOT="$PROJECT" \
+PATH="$MOCK_BIN:$PATH" \
+CODEX_LOG="$CODEX_LOG" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/out.json"
+
+grep -q '"switched": true' "$TMP_DIR/out.json"
+grep -q '"slot": "apikey-custom-1"' "$TMP_DIR/out.json"
+grep -q '"status": "usable"' "$TMP_DIR/out.json"
+grep -q '"slot_kind": "apikey"' "$TMP_DIR/out.json"
+grep -q '"provider_id": "custom"' "$TMP_DIR/out.json"
+python3 - <<'PY' "$TMP_DIR/out.json"
+import json
+import pathlib
+import sys
+
+payload = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+data = json.loads(payload)
+assert data["slot"] == "apikey-custom-1"
+assert data["slot_kind"] == "apikey"
+assert data["provider_id"] == "custom"
+assert data["status"] == "usable"
+PY
+grep -q '^exec ' "$CODEX_LOG"
+grep -q '"slot_kind": "apikey"' <(HOME="$HOME_DIR" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
+grep -q '"provider_id": "custom"' <(HOME="$HOME_DIR" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
+
+echo "[PASS] freely ai switch codex falls back to exec-only probing for apikey slots when oauth inventory is unreachable"

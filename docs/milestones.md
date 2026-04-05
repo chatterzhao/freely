@@ -14,7 +14,7 @@ candidate_policy:
 
 queue_policy:
 - committed_issues: sequencing is clear and the item is the next active batch
-- candidate_issues: belongs to the milestone, but still needs research or ordering
+- candidate_issues: contains unresolved candidates plus `todo_ibm` candidate mirrors for already-materialized issues; when `promoted_issue_path` is concrete, execution authority remains in `committed_issues`
 - completed_issues: delivered work kept for traceability within the same milestone
 
 phase_state_policy:
@@ -49,6 +49,17 @@ routing_policy:
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
 ### committed_issues
+
+1. `I-20260405-1415-A`
+- title: ai-switch-cli extraction threshold and skeleton disposition governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md`
+- next_action: Keep this owner parked as the canonical IBM handoff for standalone extraction timing. Do not open an extraction worktree until the Codex-first owner is merged and a concrete follow-on lane can prove the extraction-start checklist is satisfied.
+- revisit_trigger: Re-open only if the Codex-first owner is reopened and invalidates the threshold/boundary package, or if a second tool reaches verified parity quickly enough to change the extraction economics.
 
 ### candidate_issues
 
@@ -96,6 +107,49 @@ routing_policy:
 - next_action: Decide whether to promote this as a follow-on to runtime network failure governance or as a new supervision-owned lifecycle for blocked intake and continuity truth, using the prompt-visible-but-unclaimed evidence plus slot-switch and fork-exhaustion signals.
 - revisit_trigger: Revisit if a fresh root runtime can successfully claim the pending intake and write a new continuity despite websocket permission-denied churn, or if an existing owner is updated to absorb this exact blocked-state contract.
 
+5. `C-20260404-2148-A`
+- title: Bound startup governance for stale or ambiguous codex slot-switch lock
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md`
+- next_action: This candidate is now materialized as `I-20260404-2148-A`. Keep the owner scoped to startup preflight and minimal lock observability; do not widen it back into blocked-intake supervision.
+- revisit_trigger: Re-open only if a future runtime change proves the startup/status lock contract still lacks a dedicated owner after this issue closes.
+
+6. `C-20260405-1215-A`
+- title: Runtime audio notifier and sound semantics
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/candidates.md`
+- next_action: This candidate is now materialized as `I-20260405-1215-A`. Keep the owner scoped to canonical audio cue events, four standard bundled sounds, and frontend/Tauri playback only.
+- revisit_trigger: Re-open only if future work adds blocked/failed/interruption semantics, native notice adapters for more tools, or headless/OS fallback playback.
+7. `C-20260405-0027-A`
+- title: Codex API-key slot bundle and provider-aware probe governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md`
+- next_action: Candidate mirror only. `I-20260405-0027-A` is now the canonical completed owner for the Codex auth+config bundle contract; future work should route through a new follow-on owner rather than reopening candidate-stage IBM.
+- revisit_trigger: Revisit if another active owner absorbs the full auth+config slot bundle contract or if official Codex provider/auth semantics shift enough to invalidate the current slot-kind split.
+
+8. `C-20260405-1415-A`
+- title: ai-switch-cli extraction threshold and skeleton disposition governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md`
+- next_action: Candidate mirror only. `I-20260405-1415-A` is authoritative and now parked at `done_ibm`; use the committed owner as the canonical handoff package when a future extraction lane is justified.
+- revisit_trigger: Revisit once the Codex-first lane is merged or once a second tool reaches verified backend-worthy maturity.
+
 ### completed_issues
 1. `I-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
@@ -115,6 +169,72 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
   - `./bin/governance-check`
 - completion_note: `Canonical develop now audits trailerless protected-ancestry merges by their actual merge subject, so gap 70ef97d and the same-day receiptless ancestry set pass under the ordinary backfill ledger. The blocker-triage branch/worktree was retired after post-merge verification passed.`
+2. `I-20260404-2148-A`
+- title: Slot-switch startup preflight and lock observability governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md`
+- evidence:
+  - `develop` merge `9fa8ec3`
+  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
+  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
+  - `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
+  - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-cleans-stale-slot-switch-lock`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-times-out-on-active-slot-switch-lock`
+  - `bash docs/system/workspace/scripts/tests/test-freely-slot-switch-lock-status-surface`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now enforces bounded slot-switch startup preflight and lock observability, and the closeout lane recorded the ordinary protected-merge receipt gap repair plus post-merge verification before retirement.`
+3. `I-20260405-1215-A`
+- title: Runtime audio notifier and sound semantics governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-audio-notifier-and-sound-semantics-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/candidates.md`
+- evidence:
+  - `develop` merge `a9eba5b`
+  - `docs/progress/workspace-routing-foundation/p-runtime-audio-notifier-and-sound-semantics-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-canonical-closeout-verification.md`
+  - `bun test src/frontend_probe_v0`
+  - `bun run typecheck`
+  - `bun run build`
+  - `cargo test --manifest-path src-tauri/Cargo.toml`
+  - `bun run tauri:validate:probe`
+  - `git diff --check`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now emits stable AudioCueRequested events for the bounded manager/worker start-and-complete matrix, and the bundled probe host ships the four standard wav assets without widening into fallback playback or transcript-listener semantics.`
+4. `I-20260405-0027-A`
+- title: Codex API-key slot bundle and provider-aware probe governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md`
+- evidence:
+  - `develop` merge `c5e0b85`
+  - `docs/progress/workspace-routing-foundation/p-codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-verification.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-canonical-closeout-verification.md`
+  - `git diff --check`
+  - `./bin/governance-check`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-creates-incremented-slot`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
+- completion_note: `Canonical develop now treats Codex auth as a bundle of auth truth plus provider-aware config fragment, preserves cross-kind account/apikey switching semantics, and keeps exec-only apikey probing separate from OAuth-backed account inventory without widening into non-Codex parity or standalone extraction.`
 
 1. `I-20260402-0020-A`
 - title: Hook bypass break-glass governance
@@ -1967,14 +2087,34 @@ routing_policy:
 
 2. `I-20260405-1130-A`
 - title: Project-level AGENTS bootstrap and management contract governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
 - progress_path: `docs/progress/freely-product-architecture/p-project-level-agents-bootstrap-and-management-contract-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md`
-- next_action: Replay this capability-contract owner to `develop`, then verify canonical `develop` preserves project-owned `AGENTS.md` while exposing the formal project-level AGENTS contract under `docs/system/workspace/**`.
+- evidence:
+  - `docs/progress/freely-product-architecture/p-project-level-agents-bootstrap-and-management-contract-governance.md`
+  - `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-governance-verification.md`
+  - `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-preserves-existing-agents-md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
+  - `git diff --check`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now treats project-level AGENTS bootstrap and management as reusable capability truth: init creates AGENTS only when missing, preserves project-owned files when present, and runtime consumption still reads the project root entrypoint before reusable workspace capability docs.`
+
+3. `I-20260405-1235-A`
+- title: Tool authorization bootstrap and post-consent materialization governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P1
+- issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md`
+- next_action: Keep this owner parked as the canonical IBM handoff for post-consent authorization/bootstrap semantics. Future work should open narrower follow-on owners for persisted state, per-tool repair/materialization cleanup, or adapter-specific drift rather than widening this architecture owner.
 
 ### completed_issues
 
@@ -2083,6 +2223,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md`
 - next_action: This candidate is now materialized as `I-20260405-1130-A`. Keep the first slice narrow: freeze the reusable project-level AGENTS contract, add preserve-existing-AGENTS coverage, and document the self-hosting boundary without widening into richer template customization.
 - revisit_trigger: Re-open only if the first capability-contract slice proves insufficient or future project template management needs a broader product/capability split.
+
+3. `C-20260405-1235-A`
+- title: Tool authorization bootstrap and post-consent materialization contract
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md`
+- next_action: This candidate is now materialized as `I-20260405-1235-A`. Keep the owner documentation-first: freeze the layer split, per-tool matrix, degradation semantics, and backend contract boundary before opening narrower implementation follow-ons.
+- revisit_trigger: Re-open only if the IBM slice proves too broad, overlaps older owners, or new tool surfaces require a separate owner family instead of a follow-on implementation lane.
 
 - none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.
   - `I-20260401-2245-A` owns build artifact exposure and release allowlist audit.

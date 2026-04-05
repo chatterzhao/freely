@@ -58,6 +58,16 @@ export type BaseEvent = {
   source: CommandSource | "system";
 };
 
+export type AudioCueActor = "manager" | "worker";
+
+export type AudioCueLifecycle = "started" | "completed";
+
+export type AudioCueKey =
+  | "manager-started"
+  | "manager-completed"
+  | "worker-started"
+  | "worker-completed";
+
 export type ServerEvent =
   | (BaseEvent & { type: "SessionUpserted"; status: string })
   | (BaseEvent & { type: "RunStatusChanged"; runId: string; status: string })
@@ -82,7 +92,14 @@ export type ServerEvent =
       outcome: string;
       details: string;
     })
-  | (BaseEvent & { type: "RecoveryStatusChanged"; runtimeState: string });
+  | (BaseEvent & { type: "RecoveryStatusChanged"; runtimeState: string })
+  | (BaseEvent & {
+      type: "AudioCueRequested";
+      cueKey: AudioCueKey;
+      actor: AudioCueActor;
+      lifecycle: AudioCueLifecycle;
+      reason: string;
+    });
 
 export type ProbeSnapshot = {
   projectSummary: {

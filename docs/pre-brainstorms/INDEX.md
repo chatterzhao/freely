@@ -11,13 +11,27 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition
+  - brainstorms: docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md
+- 20260405-1215--runtime-audio-notifier-and-sound-semantics
+  - brainstorms: docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/candidates.md
+- 20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization
+  - brainstorms: docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md
+- 20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe
+  - brainstorms: docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md
 - 20260405-1130--project-level-agents-bootstrap-and-management
   - brainstorms: docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/brainstorms.md
   - candidates: docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md
 - 20260405-1000--cli-output-conciseness-and-token-efficiency
   - brainstorms: docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md
   - candidates: docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md
-
+- 20260404-2148--slot-switch-lock-startup-governance
+  - brainstorms: docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md
 - 20260404-1545--runtime-websocket-permission-denied-recovery-governance
   - brainstorms: docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md

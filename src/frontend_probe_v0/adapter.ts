@@ -40,6 +40,18 @@ export class MockProbeAdapter implements ProbeAdapter {
         type: "SessionUpserted",
         status: "running",
       });
+      this.emit({
+        eventId: nextSnapshot.lastEventId,
+        occurredAt: new Date().toISOString(),
+        projectId: command.projectId,
+        sessionId,
+        source: "human-control",
+        type: "AudioCueRequested",
+        cueKey: "manager-started",
+        actor: "manager",
+        lifecycle: "started",
+        reason: "session-created-or-resumed",
+      });
       return;
     }
 
@@ -74,6 +86,20 @@ export class MockProbeAdapter implements ProbeAdapter {
         outcome: "accepted",
         details: command.content,
       });
+      if (command.targetAgentId?.startsWith("worker")) {
+        this.emit({
+          eventId: nextSnapshot.lastEventId,
+          occurredAt: new Date().toISOString(),
+          projectId: command.projectId,
+          sessionId: command.sessionId,
+          source: "human-chat",
+          type: "AudioCueRequested",
+          cueKey: "worker-started",
+          actor: "worker",
+          lifecycle: "started",
+          reason: "worker-targeted-chat-intervention",
+        });
+      }
       return;
     }
 
@@ -118,6 +144,8 @@ export class MockProbeAdapter implements ProbeAdapter {
     }
 
     const snapshot = this.getSnapshot(command.projectId);
+    const activeActor =
+      snapshot.activeAgents[0]?.agentId?.startsWith("worker") ? "worker" : "manager";
     const nextStatus =
       command.action === "terminate"
         ? "terminated"
@@ -175,6 +203,19 @@ export class MockProbeAdapter implements ProbeAdapter {
         nextSnapshot.terminalTargets[0]?.terminalTarget ?? `${command.runId}:pty-0`,
       chunk: `[mock:${command.action}] run ${command.runId} -> ${nextStatus}`,
     });
+    if (command.action !== "pause") {
+      this.emit({
+        ...baseEvent,
+        type: "AudioCueRequested",
+        cueKey:
+          nextStatus === "terminated"
+            ? `${activeActor}-completed`
+            : `${activeActor}-started`,
+        actor: activeActor,
+        lifecycle: nextStatus === "terminated" ? "completed" : "started",
+        reason: `run-${command.action}`,
+      });
+    }
   }
 
   subscribe(listener: EventListener): () => void {

@@ -160,7 +160,12 @@ impl ValidationReportRecorder {
             "AttachTerminal",
             "SendChatIntervention",
         ];
-        let required_events = ["RunStatusChanged", "SessionUpserted", "InputArbitrationRecorded"];
+        let required_events = [
+            "RunStatusChanged",
+            "SessionUpserted",
+            "InputArbitrationRecorded",
+            "AudioCueRequested",
+        ];
         let commands_ready = required_commands.iter().all(|required| {
             report
                 .observed_commands
