@@ -103,3 +103,14 @@
 - evidence_refs:
   - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
   - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
+
+## Receipt Gap: c20c6bd4a09112287a8b2ec6bd9148981946b86b
+
+- target_branch: `develop`
+- source_branch: `feature/cli-output-style-optimization-20260405-1000`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260405-cli-output-style-A`
+- evidence_refs:
+  - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
+  - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
