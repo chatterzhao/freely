@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-status-missing-sibling-run-dir.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+WT="$WT_ROOT/feature-demo"
+LIVE_STDOUT="$TMP_DIR/live.stdout"
+LIVE_STDERR="$TMP_DIR/live.stderr"
+FLEET_STDOUT="$TMP_DIR/fleet.stdout"
+FLEET_STDERR="$TMP_DIR/fleet.stderr"
+
+mkdir -p "$REPO" "$WT_ROOT" "$REPO/.freely/run" "$REPO/docs"
+cd "$REPO"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+git branch feature/demo
+git worktree add "$WT" feature/demo >/dev/null
+
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="starting"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-05T04:00:00Z"
+EOF
+cat >"$REPO/.freely/run/session-state.env" <<'EOF'
+LAST_DELEGATED_CONTINUATION_PENDING_IDS=""
+LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0"
+LAST_DELEGATED_CONTINUATION_CONSUMED_IDS=""
+LAST_DELEGATED_CONTINUATION_CONSUMED_AT=""
+LAST_RESTART_STORM_WINDOW_SECS="0"
+LAST_RESTART_STORM_COUNT="0"
+LAST_PROCESS_CHURN_PEAK="0"
+EOF
+
+bash "$ROOT_DIR/bin/freely" live-status --project "$REPO" >"$LIVE_STDOUT" 2>"$LIVE_STDERR"
+bash "$ROOT_DIR/bin/freely" fleet-status --project "$REPO" >"$FLEET_STDOUT" 2>"$FLEET_STDERR"
+
+if [[ -s "$LIVE_STDERR" || -s "$FLEET_STDERR" ]]; then
+  echo "[FAIL] status surfaces should not emit stderr for sibling worktrees without .freely/run" >&2
+  sed -n '1,80p' "$LIVE_STDERR" >&2
+  sed -n '1,80p' "$FLEET_STDERR" >&2
+  exit 1
+fi
+
+grep -q 'feature/demo' "$FLEET_STDOUT"
+grep -q "project: $REPO" "$LIVE_STDOUT"
+
+echo "[PASS] live-status and fleet-status ignore sibling worktrees without .freely/run"
