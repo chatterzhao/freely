@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260405-1505--manager-semantic-loop-active-worker-suppression
+  - brainstorms: docs/pre-brainstorms/20260405-1505--manager-semantic-loop-active-worker-suppression/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260405-1505--manager-semantic-loop-active-worker-suppression/candidates.md
 - 20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition
   - brainstorms: docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md
   - candidates: docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md
