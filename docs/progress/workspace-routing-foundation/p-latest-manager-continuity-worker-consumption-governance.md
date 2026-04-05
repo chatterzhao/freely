@@ -103,3 +103,29 @@
 - Residual verification note:
   - `bash docs/system/workspace/scripts/tests/test-freely-session-rotation` still fails in both this worktree and pristine `develop`, at the existing `context_usage_threshold` subcase before the new manager-only narrowing is even consulted
   - treat that failure as a pre-existing unrelated gap unless a later reduced reproduction shows otherwise
+
+## 2026-04-04 Same-Family Missing Run-Dir Guard
+
+- Runtime supervision on canonical root `develop` stayed healthy after stale slot-switch cleanup, but patrol exposed a narrower same-family status/parser defect:
+  - sibling worktrees without `.freely/run` caused `live-status` / `fleet-status` to leak `find: ... No such file or directory`
+  - the failure path ran through the shared helper family for latest manager continuity, latest launchable continuity, semantic-loop repeat state, and latest prompt lookup
+- Execution in this batch:
+  - branch: `feature/runtime-status-missing-run-dir-guard-20260404-2120`
+  - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-2120-feature-runtime-status-missing-run-dir-guard`
+  - runtime root supervised: `/Users/zhaoyu/Downloads/code/my-freely/freely`
+- Repair:
+  - add `run_dir` existence guards before every `.freely/run` scan in `docs/system/workspace/scripts/runtime/freely`
+  - add the same existence guard to `latest_cycle_log_for_project()` for the analogous missing `.freely/logs` path
+  - add focused regression `docs/system/workspace/scripts/tests/test-freely-status-silences-missing-sibling-run-dir`
+  - extend `docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface` so the semantic-loop monitoring path proves stderr stays empty with a sibling worktree lacking `.freely/run`
+  - replay real-root `live-status` / `fleet-status` with the patched CLI to confirm stderr stays clean
+- Verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-status-silences-missing-sibling-run-dir`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
+  - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `./bin/freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- Current judgement:
+  - absorb this as a same-family repair inside `I-20260322-0445`
+  - do not widen `C-20260404-1545-A`; that candidate still owns the separate blocked-intake / websocket / slot-switch supervision contract question

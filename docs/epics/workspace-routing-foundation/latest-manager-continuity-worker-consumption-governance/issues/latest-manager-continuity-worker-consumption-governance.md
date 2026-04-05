@@ -112,6 +112,27 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption` passes on canonical `develop`, proving the current `## Worker Prompts` / queue parsing contract is consumed correctly while the supervisor is already running.
 - The repair is already present in `develop` through same-family commit `c80cb34` (`fix: reconcile latest manager continuity prompt parsing`), so this issue should close as canonical writeback, not reopen as new implementation work.
 
+## 2026-04-04 Same-Family Missing Run-Dir Guard Repair
+
+- Canonical root runtime supervision on `develop` exposed another same-family parser/status regression:
+  - `freely live-status` and `freely fleet-status` stayed functionally usable
+  - but shared continuity/prompt lookup helpers leaked `find: .../.freely/run: No such file or directory` when sibling worktrees existed without initialized `.freely/run`
+  - the noise came from the same helper family that resolves latest continuity, latest launchable continuity, semantic-loop evidence, and latest prompt truth across worktrees
+- Narrow repair:
+  - guard every helper that scans `.freely/run` with an explicit `[[ -d "$run_dir" ]]` check before invoking `find`
+  - guard the sibling cycle-log helper the same way for the analogous missing `.freely/logs` shape
+  - preserve the existing empty-result semantics so status surfaces stay truthful and quiet when a sibling worktree has never initialized runtime state
+  - add a focused regression that reproduces a sibling worktree lacking `.freely/run` and proves both `live-status` and `fleet-status` no longer leak stderr
+  - extend the semantic-loop status regression so the shared monitoring path also stays quiet when another sibling worktree lacks runtime state
+- Verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-status-silences-missing-sibling-run-dir`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
+- Current judgement:
+  - this remains inside `I-20260322-0445` because the defect sits on the same shared continuity/prompt parser helpers already owned by latest generated/consumed truth
+  - it does not widen the issue into the separate blocked-intake/websocket supervision contract family
+
 ## Retirement Audit
 
 - audit_date: `2026-03-24`

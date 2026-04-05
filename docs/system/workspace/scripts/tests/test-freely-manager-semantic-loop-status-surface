@@ -8,6 +8,10 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 REPO="$TMP_DIR/repo"
 WT_ROOT="$TMP_DIR/repo-worktrees"
 WORKER="$WT_ROOT/feature-loop-worker"
+QUIET_SIBLING="$WT_ROOT/feature-missing-run-dir"
+LIVE_STDERR="$TMP_DIR/live.stderr"
+FLEET_STDERR="$TMP_DIR/fleet.stderr"
+LIVE_ACTIVE_STDERR="$TMP_DIR/live-active.stderr"
 
 mkdir -p "$REPO" "$WT_ROOT"
 cd "$REPO"
@@ -19,6 +23,8 @@ git add README.md
 git commit -q -m "init"
 git branch feature/loop-worker
 git worktree add "$WORKER" feature/loop-worker >/dev/null
+git branch feature/missing-run-dir
+git worktree add "$QUIET_SIBLING" feature/missing-run-dir >/dev/null
 
 mkdir -p "$REPO/.freely/run/worker-prompts" "$REPO/docs"
 mkdir -p "$WORKER/.freely/run"
@@ -93,8 +99,17 @@ AVAILABLE_NEW_WORKER_SLOTS="unbounded"
 UPDATED_AT="2026-03-27T18:02:00Z"
 EOF
 
-LIVE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
-FLEET_OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$REPO")"
+bash "$ROOT_DIR/bin/freely" live-status --project "$REPO" >"$TMP_DIR/live.stdout" 2>"$LIVE_STDERR"
+bash "$ROOT_DIR/bin/freely" fleet-status --project "$REPO" >"$TMP_DIR/fleet.stdout" 2>"$FLEET_STDERR"
+LIVE_OUTPUT="$(cat "$TMP_DIR/live.stdout")"
+FLEET_OUTPUT="$(cat "$TMP_DIR/fleet.stdout")"
+
+if [[ -s "$LIVE_STDERR" || -s "$FLEET_STDERR" ]]; then
+  echo "[FAIL] semantic-loop status surfaces should stay quiet when a sibling worktree lacks .freely/run" >&2
+  sed -n '1,80p' "$LIVE_STDERR" >&2
+  sed -n '1,80p' "$FLEET_STDERR" >&2
+  exit 1
+fi
 
 printf '%s\n' "$LIVE_OUTPUT" | grep -q 'semantic_loop_signal_reason: manager_continuity_rewrite_without_state_advance'
 printf '%s\n' "$LIVE_OUTPUT" | grep -q 'semantic_loop_signal_summary: repeats=3 latest='
@@ -110,7 +125,21 @@ trap 'kill "$WORKER_SUP_PID" "$WORKER_AI_PID" 2>/dev/null || true; rm -rf "$TMP_
 printf '%s' "$WORKER_SUP_PID" >"$WORKER/.freely/run/supervisor.pid"
 printf '%s' "$WORKER_AI_PID" >"$WORKER/.freely/run/ai.pid"
 
-LIVE_OUTPUT_ACTIVE="$(bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+LIVE_OUTPUT_ACTIVE=""
+for _ in 1 2 3 4 5; do
+  : >"$LIVE_ACTIVE_STDERR"
+  bash "$ROOT_DIR/bin/freely" live-status --project "$REPO" >"$TMP_DIR/live-active.stdout" 2>"$LIVE_ACTIVE_STDERR"
+  LIVE_OUTPUT_ACTIVE="$(cat "$TMP_DIR/live-active.stdout")"
+  if [[ -s "$LIVE_ACTIVE_STDERR" ]]; then
+    echo "[FAIL] active-worker semantic-loop status should not emit stderr" >&2
+    sed -n '1,80p' "$LIVE_ACTIVE_STDERR" >&2
+    exit 1
+  fi
+  if printf '%s\n' "$LIVE_OUTPUT_ACTIVE" | grep -q 'semantic_loop_signal_reason: unavailable'; then
+    break
+  fi
+  sleep 1
+done
 if ! printf '%s\n' "$LIVE_OUTPUT_ACTIVE" | grep -q 'semantic_loop_signal_reason: unavailable'; then
   echo "[FAIL] semantic loop signal should clear when a worker is already running" >&2
   exit 1

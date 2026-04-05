@@ -956,7 +956,9 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md`
   - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260322-latest-manager-continuity-worker-consumption-verification.md`
   - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260326-latest-manager-continuity-worker-consumption-canonical-replay-verification.md`
-- completion_note: canonical `develop` 已重新对齐 latest continuity / latest worker prompt generated-consumed truth，并通过当前 continuity parser focused regression；后续 queue / frozen / reentry 演进另开 lifecycle
+  - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260404-latest-manager-continuity-worker-consumption-missing-run-dir-guard-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260404-latest-manager-continuity-worker-consumption-missing-run-dir-guard-verification.md`
+- completion_note: canonical `develop` 已重新对齐 latest continuity / latest worker prompt generated-consumed truth，并继续吸收 2026-04-04 的 same-family missing-run-dir parser/status guard 修复；更大的 websocket blocked-intake / supervision contract 仍需独立 lifecycle 承接
 
 4. `I-20260326-0445`
 - title: Manager-delegated intake absorption closure governance
