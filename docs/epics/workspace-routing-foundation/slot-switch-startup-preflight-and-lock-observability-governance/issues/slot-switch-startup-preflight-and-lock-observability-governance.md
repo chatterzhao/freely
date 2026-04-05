@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260404-2148-A`
 - title: Slot-switch startup preflight and lock observability governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `slot-switch-startup-preflight-and-lock-observability-governance`
@@ -66,17 +66,19 @@ That combination means the immediate operator diagnosis is currently too implici
 - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/brainstorms/b-slot-switch-startup-preflight-and-lock-observability-governance.md`
 - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-implementation-decision.md`
 - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
+- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
 - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/prd.md`
 - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
+- `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
 - `docs/system/workspace/scripts/tests/test-freely-start-cleans-stale-slot-switch-lock`
 - `docs/system/workspace/scripts/tests/test-freely-start-times-out-on-active-slot-switch-lock`
 - `docs/system/workspace/scripts/tests/test-freely-slot-switch-lock-status-surface`
 
 ## Next
 
-- Keep this owner in `in_verification` until the feature lane is merged into canonical `develop`.
-- After develop absorption, confirm canonical root runtime still reports the same startup-lock truth while leaving the separate `auth_failure` line of evidence outside this owner.
-- If canonical `develop` still shows blocked-intake or broader auth-loop regressions afterward, route those as separate follow-on governance instead of widening `2148`.
+- Completed on canonical `develop` via merge `9fa8ec3`.
+- The missing protected-merge receipt for `9fa8ec3` was repaired through the ordinary backfill ledger instead of widening runtime scope or rewriting history.
+- Reopen only if canonical `develop` regresses the startup-lock contract itself; persistent `auth_failure` remains separate follow-on evidence.

@@ -50,18 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260404-2148-A`
-- title: Slot-switch startup preflight and lock observability governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md`
-- next_action: Merge the dedicated `2148` lane into `develop`, then confirm canonical root `doctor` and status still surface the same `current_slot_switch_lock_*` truth while keeping `auth_failure` as separate follow-on evidence.
-- revisit_trigger: If the narrow startup/status contract cannot be implemented without reopening broader supervision behavior, route that expansion back to pre-brainstorm instead of widening this owner silently.
-
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -138,6 +126,27 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
   - `./bin/governance-check`
 - completion_note: `Canonical develop now audits trailerless protected-ancestry merges by their actual merge subject, so gap 70ef97d and the same-day receiptless ancestry set pass under the ordinary backfill ledger. The blocker-triage branch/worktree was retired after post-merge verification passed.`
+2. `I-20260404-2148-A`
+- title: Slot-switch startup preflight and lock observability governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-2148--slot-switch-lock-startup-governance/candidates.md`
+- evidence:
+  - `develop` merge `9fa8ec3`
+  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
+  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
+  - `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
+  - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-cleans-stale-slot-switch-lock`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-times-out-on-active-slot-switch-lock`
+  - `bash docs/system/workspace/scripts/tests/test-freely-slot-switch-lock-status-surface`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop absorbed the bounded slot-switch startup preflight and observability contract through merge 9fa8ec3. The merge itself lacked canonical Freely trailers, so this closeout lane repaired that receipt gap through the ordinary protected-merge backfill ledger instead of widening runtime scope or rewriting history.`
 
 1. `I-20260402-0020-A`
 - title: Hook bypass break-glass governance
