@@ -114,3 +114,25 @@
 - evidence_refs:
   - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
   - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
+
+## Receipt Gap: 9fa8ec35bb9532235bd8cb51b6e20c6730836d7c
+
+- target_branch: `develop`
+- source_branch: `feature/slot-switch-startup-preflight-governance-20260404-2138`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260404-0640-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260405-slot-switch-receipt-gap-branch-local-verification.md`
+
+## Receipt Gap: 6969be7e02ea0c380a9e9fc892b5184168d261fb
+
+- target_branch: `develop`
+- source_branch: `feature/slot-switch-startup-preflight-closeout-20260404-2335`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260404-0640-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260405-slot-switch-receipt-gap-branch-local-verification.md`
