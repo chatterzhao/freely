@@ -138,3 +138,27 @@
   - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
   - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
   - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
+
+## Receipt Gap: 01e3263d6382c6b35a8714c44db9bd2c01b9a5e8
+
+- target_branch: `develop`
+- source_branch: `feature/worktree-tool-boundary-bootstrap-closeout-20260405-1700`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260404-0640-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260405-worktree-bootstrap-closeout-merge-receipt-gap-verification.md`
+  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`
+
+## Receipt Gap: 01e3263d6382c6b35a8714c44db9bd2c01b9a5e8
+
+- target_branch: `develop`
+- source_branch: `feature/worktree-tool-boundary-bootstrap-closeout-20260405-1700`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260403-2041-A`
+- evidence_refs:
+  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`
