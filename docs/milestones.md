@@ -14,7 +14,7 @@ candidate_policy:
 
 queue_policy:
 - committed_issues: sequencing is clear and the item is the next active batch
-- candidate_issues: belongs to the milestone, but still needs research or ordering
+- candidate_issues: contains unresolved candidates plus `todo_ibm` candidate mirrors for already-materialized issues; when `promoted_issue_path` is concrete, execution authority remains in `committed_issues`
 - completed_issues: delivered work kept for traceability within the same milestone
 
 phase_state_policy:
@@ -47,6 +47,18 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/candidates.md`
 - intent: 把首跳路由治理候选正式纳入 milestone，避免 Freely 自己继续依赖悬空 candidate 工作
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
+
+1. `I-20260405-0027-A`
+- title: Codex API-key slot bundle and provider-aware probe governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md`
+- next_action: Keep the owner in verification until merge/cleanup evidence exists. Current verification already covers manifest + `auth.json/config-auth.toml` bundle save/switch, slot-kind-aware probe routing, apikey-to-apikey residue clearing, and single-envelope JSON auto-switch output.
+- revisit_trigger: Re-route only if another active owner absorbs the same auth+config slot bundle contract or if official Codex provider semantics invalidate the slot-kind split.
 
 ### committed_issues
 
@@ -94,6 +106,17 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md`
 - next_action: Decide whether to promote this as a follow-on to runtime network failure governance or as a new supervision-owned lifecycle for blocked intake and continuity truth, using the prompt-visible-but-unclaimed evidence plus slot-switch and fork-exhaustion signals.
+5. `C-20260405-0027-A`
+- title: Codex API-key slot bundle and provider-aware probe governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md`
+- next_action: Candidate mirror only. `I-20260405-0027-A` is authoritative and currently sits in verification; do not route execution from this mirror while the committed owner remains active.
+- revisit_trigger: Revisit if another active owner absorbs the full auth+config slot bundle contract or if official Codex provider/auth semantics shift enough to invalidate the current slot-kind split.
+
 - revisit_trigger: Revisit if a fresh root runtime can successfully claim the pending intake and write a new continuity despite websocket permission-denied churn, or if an existing owner is updated to absorb this exact blocked-state contract.
 
 ### completed_issues
