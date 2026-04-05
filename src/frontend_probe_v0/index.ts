@@ -1,4 +1,6 @@
 export * from "./adapter";
+export * from "./audioCueCatalog";
+export * from "./audioCuePolicy";
 export * from "./bootstrap";
 export * from "./bridgeBindings";
 export * from "./bridgeManifest";
@@ -16,6 +18,7 @@ export * from "./AppShell";
 export * from "./tauriAdapter";
 export * from "./tauriRuntime";
 export * from "./timeDisplay";
+export * from "./useAudioNotifier";
 export * from "./useProbeChatIntervention";
 export * from "./useProbeControls";
 export * from "./useProbeEvents";
