@@ -9,7 +9,6 @@
 - branch: `feature/cli-output-style-closeout-20260405-1615`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-1615-feature-cli-output-style-closeout`
 - updated_at: `2026-04-05`
-- closure_status: `merged-and-verified`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -22,8 +21,12 @@
 
 ## Completion Evidence
 
-- `develop` merge `c20c6bd`
+- `feature/cli-output-style-closeout-20260405-1615` rebased onto current `develop`
 - `./bin/governance-check`
+- `bash docs/system/workspace/scripts/tests/test-freely-init-preserves-existing-agents-md`
+- `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+- `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
+- `git diff --check`
 - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
 - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`
 - reviewed `AGENTS.md`

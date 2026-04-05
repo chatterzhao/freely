@@ -12,7 +12,7 @@
 
 ## Summary
 
-- Canonical `develop` absorbed this narrow `AGENTS.md` experiment through merge `c20c6bd`.
+- The closeout branch is rebased onto current canonical `develop` and is ready for guarded replay.
 - Canonical replay still presents the change as developer-entrypoint governance in `AGENTS.md`, not as a new reusable capability materialization.
 - `AGENTS.md`, runtime, and existing init coverage still agree that project-root `AGENTS.md` is the first governance surface and that `freely init` creates a minimal file only when missing.
 

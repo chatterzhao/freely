@@ -2170,7 +2170,7 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md`
 - evidence:
-  - `develop` merge `c20c6bd`
+  - `feature/cli-output-style-closeout-20260405-1615` rebased onto current `develop`
   - `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
   - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
   - `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`
