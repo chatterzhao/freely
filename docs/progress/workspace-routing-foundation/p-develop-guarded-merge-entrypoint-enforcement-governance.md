@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-0425-A`
 - issue_path: `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `unavailable`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/protected-merge-entrypoint-enforcement-20260405-0425`
@@ -31,7 +31,9 @@
 4. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
 5. `git diff --check`
 6. `./bin/governance-check`
+7. `git log -1 --format=%B HEAD`
+8. `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-canonical-closeout-verification.md`
 
 ## Next Action
 
-- Commit the owner worktree changes and replay them into `develop` through `./bin/merge-guarded`, then write completion/cleanup followthrough.
+- No further action in this owner unless raw `develop` merge entry again bypasses the canonical guarded path, or the same entrypoint contract needs a separate follow-on for `main` / `test-pre-merge-*`.

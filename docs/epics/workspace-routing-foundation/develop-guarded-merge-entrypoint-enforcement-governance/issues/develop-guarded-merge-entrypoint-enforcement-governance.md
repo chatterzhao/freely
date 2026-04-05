@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-0425-A`
 - title: Develop guarded merge entrypoint enforcement governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `develop-guarded-merge-entrypoint-enforcement-governance`
@@ -63,3 +63,17 @@ Freely 已经有 `./bin/merge-guarded` 作为 merge 真源，但 `develop` 上�
 - `docs/system/workspace/scripts/tests/test-merge-guarded`
 - `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-enforcement-implementation.md`
 - `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-enforcement-verification.md`
+- `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-canonical-closeout-verification.md`
+
+## Completion Status
+
+- canonical_merge_commit: `f1965d3`
+- canonical_merge_target: `develop`
+- post_merge_acceptance:
+  - `git log -1 --format=%B HEAD`
+  - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+  - `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+  - `./bin/governance-check`
+- completion_note: canonical `develop` now rejects raw merge entry into the protected branch unless the merge came through `./bin/merge-guarded`; later expansion beyond `develop` should reopen as a narrower follow-on rather than silently widening this owner.
