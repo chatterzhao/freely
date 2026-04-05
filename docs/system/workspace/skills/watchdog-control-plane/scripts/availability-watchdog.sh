@@ -296,6 +296,15 @@ codex_current_slot() {
   printf '%s\n' "$output" | sed -n 's/.*"slot": *"\([^"]*\)".*/\1/p' | tail -n 1
 }
 
+codex_current_slot_kind() {
+  local project="$1" ai_bin output
+  wait_for_codex_slot_switch_idle "$project" || return 1
+  ai_bin="$(ai_cli_bin_for_project "$project")"
+  [[ -x "$ai_bin" ]] || return 0
+  output="$("$ai_bin" --quiet --format json whoami codex 2>/dev/null || true)"
+  printf '%s\n' "$output" | sed -n 's/.*"slot_kind": *"\([^"]*\)".*/\1/p' | tail -n 1
+}
+
 codex_saved_slots() {
   local project="$1" ai_bin output
   wait_for_codex_slot_switch_idle "$project" || return 1
@@ -322,6 +331,65 @@ codex_oauth_usage_url() {
 codex_saved_slot_auth_file() {
   local slot="$1"
   printf '%s\n' "${AUTH_DIR:-$HOME/.ai-auth}/codex-${slot}/auth.json"
+}
+
+codex_saved_slot_manifest_file() {
+  local slot="$1"
+  printf '%s\n' "${AUTH_DIR:-$HOME/.ai-auth}/codex-${slot}/manifest.json"
+}
+
+codex_saved_slot_kind() {
+  local slot="$1" manifest_file auth_file kind=""
+  manifest_file="$(codex_saved_slot_manifest_file "$slot")"
+  if [[ -f "$manifest_file" ]]; then
+    kind="$(python3 - <<'PY' "$manifest_file" 2>/dev/null || true
+import json
+import sys
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    data = json.load(f)
+value = data.get("slot_kind", "")
+print(value if isinstance(value, str) else "")
+PY
+)"
+  fi
+  if [[ -n "$kind" ]]; then
+    printf '%s\n' "$kind"
+    return 0
+  fi
+  case "$slot" in
+    account-*) printf 'account\n'; return 0 ;;
+    apikey-*) printf 'apikey\n'; return 0 ;;
+  esac
+  auth_file="$(codex_saved_slot_auth_file "$slot")"
+  python3 - <<'PY' "$auth_file" 2>/dev/null || true
+import json
+import os
+import sys
+
+path = sys.argv[1]
+if not os.path.exists(path):
+    print("legacy")
+    raise SystemExit(0)
+with open(path, "r", encoding="utf-8") as f:
+    data = json.load(f)
+if isinstance(data.get("OPENAI_API_KEY"), str) and data.get("OPENAI_API_KEY"):
+    print("apikey")
+elif isinstance(data.get("tokens"), dict) or isinstance(data.get("access_token"), str):
+    print("account")
+else:
+    print("legacy")
+PY
+}
+
+codex_saved_slots_include_kind() {
+  local project="$1" expected_kind="$2" candidate kind
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    kind="$(codex_saved_slot_kind "$candidate")"
+    [[ "$kind" == "$expected_kind" ]] || continue
+    return 0
+  done < <(codex_saved_slots "$project")
+  return 1
 }
 
 codex_saved_slots_fingerprint() {
@@ -710,7 +778,7 @@ PY
 
 codex_oauth_sweep_all_slots() {
   local project="$1"
-  local candidate auth_file tmp_dir results_file result_file
+  local candidate auth_file tmp_dir results_file result_file slot_kind swept_candidates=0
   local usable_slot="" earliest_slot="" earliest_reset=""
   local saw_result=0 current_identity curl_error_count=0
   current_identity="$(codex_current_cooldown_identity "$project")"
@@ -719,14 +787,19 @@ codex_oauth_sweep_all_slots() {
 
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
+    slot_kind="$(codex_saved_slot_kind "$candidate")"
+    if [[ "$slot_kind" == "apikey" ]]; then
+      continue
+    fi
     auth_file="$(codex_saved_slot_auth_file "$candidate")"
     result_file="$tmp_dir/${candidate}.tsv"
+    swept_candidates=$((swept_candidates + 1))
     codex_oauth_probe_single_slot "$project" "$candidate" "$auth_file" "$result_file" &
   done < <(codex_saved_slots "$project")
   wait || true
 
   cat "$tmp_dir"/*.tsv 2>/dev/null >"$results_file" || true
-  if [[ ! -s "$results_file" ]]; then
+  if [[ ! -s "$results_file" || "$swept_candidates" -eq 0 ]]; then
     rm -rf "$tmp_dir"
     printf 'none\n'
     return 1
@@ -1387,13 +1460,14 @@ switch_to_next_codex_slot() {
 
 ensure_codex_slot_ready_for_manager() {
   local project="$1"
-  local current_slot current_identity current_probe_result probe_result probe_status probe_slot cached_current_status
+  local current_slot current_slot_kind current_identity current_probe_result probe_result probe_status probe_slot cached_current_status
   local all_unavailable_info earliest_slot earliest_reset inventory_refresh_mode="stale_ok"
   local current_fingerprint previous_phase="" previous_blocked_reason="" previous_slot="" previous_fingerprint="" wake_reason="" wake_trigger="" recovery_trigger=""
   local previous_earliest_reset="" previous_reprobe_next_at="" previous_reprobe_attempts="" reprobe_due_at="" reprobe_next_at="" reprobe_attempts="" reprobe_max_attempts="" now=""
 
   wait_for_codex_slot_switch_idle "$project" || return 1
   current_slot="$(codex_current_slot "$project")"
+  current_slot_kind="$(codex_current_slot_kind "$project")"
   current_identity="$current_slot"
   current_fingerprint="$(codex_saved_slots_fingerprint "$project")"
 
@@ -1421,7 +1495,7 @@ ensure_codex_slot_ready_for_manager() {
   probe_result="$(codex_inventory_truth "$project" "$inventory_refresh_mode" || true)"
   cached_current_status="$(codex_cached_slot_status "$project" "$current_identity" || true)"
 
-  if [[ -n "$current_identity" && "$cached_current_status" == "usable" ]]; then
+  if [[ -n "$current_identity" && ( "$current_slot_kind" == "apikey" || "$cached_current_status" == "usable" ) ]]; then
     current_probe_result="$(codex_probe_current_slot_now "$project" || true)"
     case "$current_probe_result" in
       usable)

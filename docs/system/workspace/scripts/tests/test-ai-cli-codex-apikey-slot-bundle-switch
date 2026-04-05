@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_HOME="$(mktemp -d /tmp/freely-ai-cli-codex-apikey-bundle.XXXXXX)"
+trap 'rm -rf "$TMP_HOME"' EXIT
+
+make_account_auth() {
+  local email="$1" target="$2"
+  local payload
+  payload="$(python3 - <<'PY' "$email"
+import base64
+import json
+import sys
+print(base64.urlsafe_b64encode(json.dumps({"email": sys.argv[1]}).encode()).decode().rstrip("="))
+PY
+)"
+  printf '{"tokens":{"id_token":"x.%s.y","access_token":"token-%s"}}\n' "$payload" "$email" >"$target"
+}
+
+mkdir -p "$TMP_HOME/.codex" "$TMP_HOME/.ai-auth/codex-account-work@example-com-1" "$TMP_HOME/.ai-auth/codex-apikey-alt-1"
+cat >"$TMP_HOME/.codex/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-example"}
+EOF
+cat >"$TMP_HOME/.codex/config.toml" <<'EOF'
+model_provider = "custom"
+preferred_auth_method = "chatgpt"
+
+[model_providers.custom]
+name = "Custom"
+base_url = "https://api.example.com/v1"
+wire_api = "responses"
+requires_openai_auth = true
+
+[projects."/tmp/demo"]
+trust_level = "trusted"
+EOF
+cat >"$TMP_HOME/.ai-auth/codex-apikey-alt-1/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-alt"}
+EOF
+cat >"$TMP_HOME/.ai-auth/codex-apikey-alt-1/config-auth.toml" <<'EOF'
+model_provider = "alt"
+preferred_auth_method = "apikey"
+
+[model_providers.alt]
+name = "Alt"
+base_url = "https://alt.example.com/v1"
+wire_api = "responses"
+requires_openai_auth = false
+EOF
+cat >"$TMP_HOME/.ai-auth/codex-apikey-alt-1/manifest.json" <<'EOF'
+{"manifest_version":"codex-slot-v1","tool":"codex","slot_id":"apikey-alt-1","slot_kind":"apikey","provider_id":"alt"}
+EOF
+
+make_account_auth "work@example.com" "$TMP_HOME/.ai-auth/codex-account-work@example-com-1/auth.json"
+cat >"$TMP_HOME/.ai-auth/codex-account-work@example-com-1/manifest.json" <<'EOF'
+{"manifest_version":"codex-slot-v1","tool":"codex","slot_id":"account-work@example-com-1","slot_kind":"account","auth_email":"work@example.com"}
+EOF
+: >"$TMP_HOME/.ai-auth/codex-account-work@example-com-1/config-auth.toml"
+
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json save codex >"$TMP_HOME/save.json"
+
+grep -q '"slot": "apikey-custom-1"' "$TMP_HOME/save.json"
+grep -q '"slot_kind": "apikey"' "$TMP_HOME/save.json"
+test -f "$TMP_HOME/.ai-auth/codex-apikey-custom-1/auth.json"
+test -f "$TMP_HOME/.ai-auth/codex-apikey-custom-1/config-auth.toml"
+test -f "$TMP_HOME/.ai-auth/codex-apikey-custom-1/manifest.json"
+grep -q 'model_provider = "custom"' "$TMP_HOME/.ai-auth/codex-apikey-custom-1/config-auth.toml"
+grep -q '\[model_providers.custom\]' "$TMP_HOME/.ai-auth/codex-apikey-custom-1/config-auth.toml"
+grep -q '"slot_kind": "apikey"' "$TMP_HOME/.ai-auth/codex-apikey-custom-1/manifest.json"
+grep -q '"provider_id": "custom"' "$TMP_HOME/.ai-auth/codex-apikey-custom-1/manifest.json"
+
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex account-work@example-com-1 --yes >"$TMP_HOME/switch-account.json"
+
+grep -q '"slot_kind": "account"' "$TMP_HOME/switch-account.json"
+grep -q '"auth_email": "work@example.com"' "$TMP_HOME/switch-account.json"
+first_backup="$(find "$TMP_HOME/.codex" -maxdepth 1 -type f -name 'config.toml.backup-*' | sort | head -n 1)"
+test -n "$first_backup"
+grep -q 'model_provider = "custom"' "$first_backup"
+grep -q '\[projects."/tmp/demo"\]' "$first_backup"
+if grep -q 'model_provider = "custom"' "$TMP_HOME/.codex/config.toml"; then
+  echo "[FAIL] account switch should clear live apikey model_provider selection" >&2
+  exit 1
+fi
+if grep -q '\[model_providers.custom\]' "$TMP_HOME/.codex/config.toml"; then
+  echo "[FAIL] account switch should clear live apikey provider table" >&2
+  exit 1
+fi
+grep -q '\[projects."/tmp/demo"\]' "$TMP_HOME/.codex/config.toml"
+
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex apikey-custom-1 --yes >"$TMP_HOME/switch-apikey.json"
+
+grep -q '"slot_kind": "apikey"' "$TMP_HOME/switch-apikey.json"
+grep -q '"provider_id": "custom"' "$TMP_HOME/switch-apikey.json"
+grep -q 'model_provider = "custom"' "$TMP_HOME/.codex/config.toml"
+grep -q 'preferred_auth_method = "chatgpt"' "$TMP_HOME/.codex/config.toml"
+grep -q '\[model_providers.custom\]' "$TMP_HOME/.codex/config.toml"
+grep -q '\[projects."/tmp/demo"\]' "$TMP_HOME/.codex/config.toml"
+test "$(find "$TMP_HOME/.codex" -maxdepth 1 -type f -name 'config.toml.backup-*' | wc -l | tr -d ' ')" -ge 2
+grep -q '"slot_kind": "apikey"' <(HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
+grep -q '"provider_id": "custom"' <(HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
+
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex apikey-alt-1 --yes >"$TMP_HOME/switch-apikey-alt.json"
+
+grep -q '"slot_kind": "apikey"' "$TMP_HOME/switch-apikey-alt.json"
+grep -q '"provider_id": "alt"' "$TMP_HOME/switch-apikey-alt.json"
+grep -q 'model_provider = "alt"' "$TMP_HOME/.codex/config.toml"
+grep -q 'preferred_auth_method = "apikey"' "$TMP_HOME/.codex/config.toml"
+grep -q '\[model_providers.alt\]' "$TMP_HOME/.codex/config.toml"
+if grep -q '\[model_providers.custom\]' "$TMP_HOME/.codex/config.toml"; then
+  echo "[FAIL] apikey to apikey switch should clear the previous provider table when the target provider changes" >&2
+  exit 1
+fi
+grep -q '\[projects."/tmp/demo"\]' "$TMP_HOME/.codex/config.toml"
+test "$(find "$TMP_HOME/.codex" -maxdepth 1 -type f -name 'config.toml.backup-*' | wc -l | tr -d ' ')" -ge 3
+
+echo "[PASS] ai save/switch codex treats apikey auth plus config fragment as one bundle, clears stale provider selection across account/apikey switches, and timestamps live config backups before rewriting"
