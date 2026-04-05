@@ -1,0 +1,76 @@
+# Issue: agents-cli-output-style-experiment-governance
+
+- issue_id: `I-20260405-cli-output-style-A`
+- title: AGENTS CLI output style experiment governance
+- phase_state: `in_verification`
+- milestone: `M-20260326-freely-product-architecture`
+- epic-name: `freely-product-architecture`
+- story-name: `agents-cli-output-style-experiment-governance`
+- issue-name: `agents-cli-output-style-experiment-governance`
+- priority: P2
+- source_candidate: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md#c-20260405-cli-output-style`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md`
+- execution_base: `develop`
+- integration_target: `develop`
+- pre_tests_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/pre-tests.md`
+- progress_path: `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
+- verification_artifact_dir: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews`
+- session_refs:
+  - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
+
+## Why
+
+The current discussion is no longer a generic token-efficiency research question. The chosen scope is narrower:
+
+1. keep the output-style experiment inside `AGENTS.md`
+2. constrain it to developer-facing CLI/chat responses while building Freely
+3. avoid promoting it into `docs/system/**`, `bin/**`, `src/**`, or other capability truth
+
+That makes this a product-architecture/developer-entrypoint governance writeback, not a reusable capability lifecycle.
+
+## Scope
+
+1. Record the experiment as an `AGENTS.md` entrypoint rule for developer-facing CLI/chat output.
+2. Keep the rule on concise plain Chinese rather than classical Chinese.
+3. Keep the experiment explicitly outside Freely capability directories and runtime truth.
+4. Write back the matching pre-brainstorm, candidate, milestone, progress, and verification artifacts required for a lawful `develop` merge.
+
+## Non-Goals
+
+1. Do not define a new Freely runtime/agent/skill/CLI capability.
+2. Do not widen into tokenizer benchmarking or generalized token-efficiency infrastructure.
+3. Do not rewrite `PROJECT_INTENT`, `CONSTITUTION`, or `LAWS` for this experiment.
+4. Do not impose this style on product-facing runtime output beyond the current developer-facing experiment boundary.
+
+## Acceptance
+
+1. `AGENTS.md` contains a clear experimental output-style section that:
+   - uses concise plain Chinese
+   - rejects classical Chinese as the default
+   - preserves precision for commands, paths, status words, and evidence
+2. The pre-brainstorm and candidate truth say this remains an `AGENTS.md`-only experiment rather than a capability materialization.
+3. The milestone records a concrete owner issue instead of leaving the change as candidate-only evidence.
+4. `./bin/governance-check` passes in the source feature worktree.
+
+## Completion
+
+- `AGENTS.md`
+- `docs/pre-brainstorms/INDEX.md`
+- `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md`
+- `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md`
+- `docs/milestones.md`
+- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
+- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/brainstorms/b-agents-cli-output-style-experiment-governance.md`
+- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/prd.md`
+- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/pre-tests.md`
+- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/tasks.md`
+- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
+- `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
+
+## Verification
+
+- `./bin/governance-check`
+
+## Next
+
+- Replay this narrow owner to `develop`, then verify canonical `develop` still treats the change as an `AGENTS.md` experiment rather than a capability promotion.

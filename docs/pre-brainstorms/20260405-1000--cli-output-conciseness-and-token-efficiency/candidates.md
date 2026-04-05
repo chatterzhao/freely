@@ -26,13 +26,17 @@
   - 约束范围如何界定？
   - 用户是否接受文言文风格？
   - 如何落地到 AGENTS.md？
-- acceptance_reviews: []
+- acceptance_reviews:
+  - reviewer: `codex-self-review`
+    verdict: `supports`
+    note: 当前范围已被明确收窄为 `AGENTS.md` 开发入口实验；为了合法 merge 到 `develop`，以 narrow owner materialize 是更稳的路径，但这不等于 capability promotion。
 - priority: P2
-- status: dropped
+- status: promoted
 - milestone: `M-20260326-freely-product-architecture`
-- decision_reason: 本轮决定把产物收敛为 `AGENTS.md` 中的开发入口回复风格实验，只约束开发 Freely 过程中的人类可读输出；暂不把它继续推进为 Freely 能力或独立 issue。
-- promoted_issue_path: `pending://issue-materialization`
-- next_action: 保持 `AGENTS.md` 中的精炼白话文实验约束，观察其是否足以改善开发过程中的 CLI 输出质量；当前不进入 issue materialization。
+- decision_reason: 本轮仍把产物限定为 `AGENTS.md` 中的开发入口回复风格实验，不把它升级成 Freely 能力；但为了合法 merge 到 `develop`，需要以一个 narrow issue owner 承接 `AGENTS.md`、pre-brainstorm 与 milestone writeback。
+- promoted_issue_id: `I-20260405-cli-output-style-A`
+- promoted_issue_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
+- next_action: 以 narrow owner `I-20260405-cli-output-style-A` 完成 `AGENTS.md` 实验的 issue/progress/review writeback，并 replay 到 `develop`。
 - revisit_trigger: 当这条实验被证明不足、需要进入更高优先级真源，或需要作为 Freely 对外能力长期消费时重新唤起
 - session_refs:
   - tool: iflow

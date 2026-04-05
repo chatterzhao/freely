@@ -1952,6 +1952,17 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260405-cli-output-style-A`
+- title: AGENTS CLI output style experiment governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P2
+- issue_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md`
+- next_action: Replay this narrow AGENTS-only owner to `develop`, then verify canonical `develop` still passes governance with the experiment scoped only to developer-facing CLI/chat output.
+
 ### completed_issues
 
 1. `I-20260402-0403-A`
@@ -2037,6 +2048,17 @@ routing_policy:
 - completion_note: The first tool materialization slice is now canonical on `develop`: project-local Codex posture, launch-time auto injection, and Claude/Claude-via-Codex launcher semantics are explicitly separated from the higher-level product contract instead of remaining an implicit split.
 
 ### candidate_issues
+
+1. `C-20260405-cli-output-style`
+- title: CLI Output Style Optimization
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P2
+- promoted_issue_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1000--cli-output-conciseness-and-token-efficiency/candidates.md`
+- next_action: This candidate is now materialized as `I-20260405-cli-output-style-A`. Keep the owner narrow: the current change only freezes an `AGENTS.md` experiment for developer-facing CLI/chat output and does not introduce a new Freely capability.
+- revisit_trigger: Re-open only if the AGENTS-only experiment proves insufficient or later needs to become a higher-priority canonical product/capability contract.
 
 - none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.
   - `I-20260401-2245-A` owns build artifact exposure and release allowlist audit.
