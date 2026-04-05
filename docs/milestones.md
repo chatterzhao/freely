@@ -50,19 +50,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260405-0027-A`
-- title: Codex API-key slot bundle and provider-aware probe governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md`
-- next_action: Keep the owner in verification until merge/cleanup evidence exists. Current verification already covers manifest + `auth.json/config-auth.toml` bundle save/switch, slot-kind-aware probe routing, apikey-to-apikey residue clearing, and single-envelope JSON auto-switch output.
-- revisit_trigger: Re-route only if another active owner absorbs the same auth+config slot bundle contract or if official Codex provider semantics invalidate the slot-kind split.
-
-2. `I-20260405-1415-A`
+1. `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -224,6 +212,29 @@ routing_policy:
   - `git diff --check`
   - `./bin/governance-check`
 - completion_note: `Canonical develop now emits stable AudioCueRequested events for the bounded manager/worker start-and-complete matrix, and the bundled probe host ships the four standard wav assets without widening into fallback playback or transcript-listener semantics.`
+4. `I-20260405-0027-A`
+- title: Codex API-key slot bundle and provider-aware probe governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-0027--codex-apikey-slot-bundle-and-provider-aware-probe/candidates.md`
+- evidence:
+  - `develop` merge `c5e0b85`
+  - `docs/progress/workspace-routing-foundation/p-codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-verification.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260405-codex-apikey-slot-bundle-and-provider-aware-probe-canonical-closeout-verification.md`
+  - `git diff --check`
+  - `./bin/governance-check`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-creates-incremented-slot`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
+- completion_note: `Canonical develop now treats Codex auth as a bundle of auth truth plus provider-aware config fragment, preserves cross-kind account/apikey switching semantics, and keeps exec-only apikey probing separate from OAuth-backed account inventory without widening into non-Codex parity or standalone extraction.`
 
 1. `I-20260402-0020-A`
 - title: Hook bypass break-glass governance
