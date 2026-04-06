@@ -305,6 +305,21 @@ codex_current_slot_kind() {
   printf '%s\n' "$output" | sed -n 's/.*"slot_kind": *"\([^"]*\)".*/\1/p' | tail -n 1
 }
 
+codex_current_identity_hint() {
+  local project="$1" current_slot current_slot_kind
+  current_slot="$(codex_current_slot "$project")"
+  if [[ -n "$current_slot" ]]; then
+    printf '%s\n' "$current_slot"
+    return 0
+  fi
+  current_slot_kind="$(codex_current_slot_kind "$project")"
+  case "$current_slot_kind" in
+    apikey)
+      printf 'live-apikey-current\n'
+      ;;
+  esac
+}
+
 codex_saved_slots() {
   local project="$1" ai_bin output
   wait_for_codex_slot_switch_idle "$project" || return 1
@@ -1129,6 +1144,15 @@ codex_probe_current_slot_now() {
     cd "$project"
     freely_apply_project_network_proxy_env "$project"
 
+    local codex_pid=""
+    _probe_cleanup_child() {
+      if [[ -n "$codex_pid" ]]; then
+        kill "$codex_pid" 2>/dev/null || true
+        wait "$codex_pid" 2>/dev/null || true
+      fi
+    }
+    trap '_probe_cleanup_child; exit 143' TERM INT
+
     if [[ -n "${AI_MODEL:-}" ]]; then
       codex exec \
         --skip-git-repo-check \
@@ -1136,15 +1160,17 @@ codex_probe_current_slot_now() {
         -m "$AI_MODEL" \
         -c "model_reasoning_effort=\"${AI_REASONING_EFFORT:-medium}\"" \
         --dangerously-bypass-approvals-and-sandbox \
-        - <"$prompt_file"
+        - <"$prompt_file" &
     else
       codex exec \
         --skip-git-repo-check \
         -C "$project" \
         -c "model_reasoning_effort=\"${AI_REASONING_EFFORT:-medium}\"" \
         --dangerously-bypass-approvals-and-sandbox \
-        - <"$prompt_file"
+        - <"$prompt_file" &
     fi
+    codex_pid=$!
+    wait "$codex_pid"
   ) >"$output_file" 2>&1 &
   local pid=$!
 
@@ -1468,7 +1494,10 @@ ensure_codex_slot_ready_for_manager() {
   wait_for_codex_slot_switch_idle "$project" || return 1
   current_slot="$(codex_current_slot "$project")"
   current_slot_kind="$(codex_current_slot_kind "$project")"
-  current_identity="$current_slot"
+  current_identity="$(codex_current_identity_hint "$project")"
+  if [[ -z "$current_identity" && -n "$current_slot_kind" ]]; then
+    current_identity="live-$current_slot_kind"
+  fi
   current_fingerprint="$(codex_saved_slots_fingerprint "$project")"
 
   if codex_load_availability_state "$project"; then

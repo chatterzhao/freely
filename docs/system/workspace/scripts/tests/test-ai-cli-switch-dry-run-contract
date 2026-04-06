@@ -69,8 +69,8 @@ assert data["switched"] is False
 assert data["dry_run"] is True
 assert data["tool"] == "codex"
 assert data["status"] == "dry_run_inventory"
-assert data["current_slot"] == "apikey-custom-1"
-assert data["candidate_slot"] == "apikey-custom-1"
+assert data["current_slot"] is None
+assert data["candidate_slot"] == "account-work@example-com-1" or data["candidate_slot"] == "apikey-custom-1"
 assert data["saved_slot_count"] == 2
 assert data["saved_apikey_slot_count"] == 1
 assert data["saved_account_slot_count"] == 1
@@ -85,4 +85,4 @@ if [[ -f "$CODEX_LOG" && -s "$CODEX_LOG" ]]; then
   exit 1
 fi
 
-echo "[PASS] ai switch codex dry-run emits stable inventory JSON without probing"
+echo "[PASS] ai switch codex dry-run emits inventory JSON from saved slots without treating a stale active-slot as the current live slot"

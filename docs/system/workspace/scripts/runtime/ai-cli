@@ -299,8 +299,7 @@ resolve_codex_slot_name() {
   kind="$(codex_live_auth_kind "$auth_file")"
   case "$kind" in
     apikey)
-      provider_id="$(codex_live_provider_id)"
-      [[ -n "$provider_id" ]] || provider_id="custom"
+      provider_id="$(codex_effective_provider_id_for_kind "$kind" "$(codex_effective_live_provider_id "$auth_file")")"
       base_slot="apikey-$(printf '%s' "$provider_id" | sed 's/[^A-Za-z0-9._-]/-/g; s/\./-/g')"
       ;;
     *)
@@ -419,6 +418,31 @@ print(value if isinstance(value, str) else "")
 PY
 }
 
+codex_effective_provider_id_for_kind() {
+  local kind="$1" provider_id="${2:-}"
+  if [[ -n "$provider_id" ]]; then
+    printf '%s\n' "$provider_id"
+    return 0
+  fi
+  if [[ "$kind" == "apikey" ]]; then
+    printf 'custom\n'
+    return 0
+  fi
+  printf '\n'
+}
+
+codex_effective_live_provider_id() {
+  local auth_file="${1:-}" kind provider_id
+  [[ -n "$auth_file" ]] || auth_file="$(codex_live_auth_file)"
+  kind="$(codex_live_auth_kind "$auth_file")"
+  provider_id="$(codex_live_provider_id)"
+  if [[ "$kind" == "apikey" ]]; then
+    printf '%s\n' "$provider_id"
+    return 0
+  fi
+  printf '\n'
+}
+
 codex_infer_slot_kind_from_slot() {
   local slot="${1:-}"
   case "$slot" in
@@ -459,10 +483,10 @@ PY
 }
 
 codex_saved_slot_provider_id() {
-  local slot="$1" manifest_file
+  local slot="$1" manifest_file kind provider_id
   manifest_file="$(codex_slot_manifest_file "$slot")"
   [[ -f "$manifest_file" ]] || return 0
-  python3 - <<'PY' "$manifest_file" 2>/dev/null || true
+  provider_id="$(python3 - <<'PY' "$manifest_file" 2>/dev/null || true
 import json
 import sys
 with open(sys.argv[1], "r", encoding="utf-8") as f:
@@ -470,6 +494,110 @@ with open(sys.argv[1], "r", encoding="utf-8") as f:
 value = data.get("provider_id", "")
 print(value if isinstance(value, str) else "")
 PY
+)"
+  kind="$(codex_saved_slot_kind "$slot")"
+  codex_effective_provider_id_for_kind "$kind" "$provider_id"
+}
+
+codex_probe_result_status() {
+  local probe_result="${1:-}"
+  case "$probe_result" in
+    rate_limited:*) printf 'rate_limited\n' ;;
+    error:*) printf 'error\n' ;;
+    "") printf 'unknown\n' ;;
+    *) printf '%s\n' "$probe_result" ;;
+  esac
+}
+
+codex_probe_result_reset_at() {
+  local probe_result="${1:-}"
+  case "$probe_result" in
+    rate_limited:*) printf '%s\n' "${probe_result#rate_limited:}" ;;
+    *) printf '0\n' ;;
+  esac
+}
+
+codex_saved_slot_matches_live_bundle() {
+  local slot="$1" auth_file="$2" live_kind="$3" live_account="$4" live_provider="$5"
+  local slot_dir saved_auth_file saved_kind saved_account saved_provider
+  [[ -n "$slot" && -f "$auth_file" ]] || return 1
+  slot_dir="$(auth_slot_dir "codex" "$slot")"
+  [[ -d "$slot_dir" ]] || return 1
+  saved_kind="$(codex_saved_slot_kind "$slot")"
+  [[ "$saved_kind" == "$live_kind" ]] || return 1
+  saved_auth_file="$slot_dir/auth.json"
+  [[ -f "$saved_auth_file" ]] || return 1
+
+  case "$live_kind" in
+    apikey)
+      saved_provider="$(codex_saved_slot_provider_id "$slot")"
+      if [[ -n "$live_provider" || -n "$saved_provider" ]]; then
+        [[ "$saved_provider" == "$live_provider" ]] || return 1
+      fi
+      ;;
+    account)
+      if [[ -n "$live_account" ]]; then
+        saved_account="$(extract_codex_account "$saved_auth_file")"
+        [[ -n "$saved_account" && "$saved_account" == "$live_account" ]] || return 1
+      fi
+      ;;
+  esac
+
+  cmp -s "$saved_auth_file" "$auth_file"
+}
+
+codex_resolve_live_slot() {
+  local auth_file="$1" live_kind live_account live_provider
+  local preferred_slots=() candidate matched_slot="" match_count=0
+  [[ -f "$auth_file" ]] || return 0
+  live_kind="$(codex_live_auth_kind "$auth_file")"
+  [[ -n "$live_kind" ]] || return 0
+  live_account="$(extract_codex_account "$auth_file")"
+  if [[ "$live_kind" == "apikey" ]]; then
+    live_provider="$(codex_live_provider_id)"
+  else
+    live_provider=""
+  fi
+
+  if [[ -f "$(tool_active_slot_file "codex")" ]]; then
+    candidate="$(tr -d '\n' <"$(tool_active_slot_file "codex")" 2>/dev/null || true)"
+    [[ -n "$candidate" ]] && preferred_slots+=("$candidate")
+  fi
+  candidate="$(read_codex_active_slot)"
+  if [[ -n "$candidate" ]]; then
+    local seen=false existing
+    if [[ ${#preferred_slots[@]} -gt 0 ]]; then
+      for existing in "${preferred_slots[@]}"; do
+        if [[ "$existing" == "$candidate" ]]; then
+          seen=true
+          break
+        fi
+      done
+    fi
+    [[ "$seen" == "true" ]] || preferred_slots+=("$candidate")
+  fi
+
+  if [[ ${#preferred_slots[@]} -gt 0 ]]; then
+    for candidate in "${preferred_slots[@]}"; do
+      if codex_saved_slot_matches_live_bundle "$candidate" "$auth_file" "$live_kind" "$live_account" "$live_provider"; then
+        printf '%s\n' "$candidate"
+        return 0
+      fi
+    done
+  fi
+
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    if ! codex_saved_slot_matches_live_bundle "$candidate" "$auth_file" "$live_kind" "$live_account" "$live_provider"; then
+      continue
+    fi
+    matched_slot="$candidate"
+    match_count=$((match_count + 1))
+  done < <(list_tool_slots "codex")
+
+  if [[ "$match_count" -eq 1 ]]; then
+    printf '%s\n' "$matched_slot"
+  fi
 }
 
 codex_write_slot_manifest() {
@@ -676,7 +804,7 @@ codex_save_live_bundle_to_slot() {
   chmod 600 "$target_dir/auth.json"
 
   if [[ "$kind" == "apikey" ]]; then
-    provider_id="$(codex_live_provider_id)"
+    provider_id="$(codex_effective_provider_id_for_kind "$kind" "$(codex_effective_live_provider_id "$auth_file")")"
     codex_write_fragment_toml_from_live_config "$config_fragment"
   else
     : >"$config_fragment"
@@ -825,7 +953,7 @@ cmd_login() {
         slot="$(resolve_codex_slot_name "$auth_file")"
         target_dir="$(auth_slot_dir "codex" "$slot")"
         account="$(extract_codex_account "$auth_file")"
-        provider_id="$(codex_live_provider_id)"
+        provider_id="$(codex_effective_provider_id_for_kind "$kind" "$(codex_effective_live_provider_id "$auth_file")")"
         codex_save_live_bundle_to_slot "$slot" "$target_dir"
         write_tool_active_slot "codex" "$slot"
         [[ -n "$account" ]] && log_info "Auto-saved auth email: $account"
@@ -872,7 +1000,7 @@ cmd_save() {
       local actual_account kind provider_id
       actual_account="$(extract_codex_account "$auth_file")"
       kind="$(codex_live_auth_kind "$auth_file")"
-      provider_id="$(codex_live_provider_id)"
+      provider_id="$(codex_effective_provider_id_for_kind "$kind" "$(codex_effective_live_provider_id "$auth_file")")"
 
       if [[ -z "$slot" && -z "$actual_account" && "$kind" != "apikey" ]]; then
         log_error "Cannot derive Codex slot identity from current auth. Please specify slot name."
@@ -933,7 +1061,11 @@ sync_current_auth() {
   fi
   
   local current_slot
-  current_slot="$(read_tool_active_slot "$tool")"
+  if [[ "$tool" == "codex" ]]; then
+    current_slot="$(codex_resolve_live_slot "$auth_file")"
+  else
+    current_slot="$(read_tool_active_slot "$tool")"
+  fi
   if [[ -z "$current_slot" ]]; then
     return 0
   fi
@@ -1036,6 +1168,7 @@ _cmd_switch_auto_codex() {
   local tool="codex"
   local actual_account="" switched_provider="" switched_kind=""
   local result rc=0 notified_slot=""
+  local live_auth_file live_auth_kind live_provider_id current_live_probe current_live_status current_live_reset
 
   if [[ "$DRY_RUN" == "true" ]]; then
     _cmd_switch_auto_codex_dry_run
@@ -1044,6 +1177,39 @@ _cmd_switch_auto_codex() {
 
   codex_switch_lock_acquire "auto_probe_switch" "switch" "auto" || exit 1
   source_watchdog_script_or_fail "$project"
+  live_auth_file="$(codex_live_auth_file)"
+  live_auth_kind="$(codex_live_auth_kind "$live_auth_file")"
+  live_provider_id="$(codex_effective_live_provider_id "$live_auth_file")"
+
+  if [[ "$live_auth_kind" == "apikey" ]] && ! codex_saved_slots_include_kind "$project" "apikey"; then
+    current_live_probe="$(codex_probe_current_slot_now "$project" || true)"
+    current_live_status="$(codex_probe_result_status "$current_live_probe")"
+    case "$current_live_status" in
+      usable)
+        [[ "$FORMAT" != "json" ]] && echo -e "${GREEN}[READY]${NC} current live codex auth is usable (apikey)"
+        if [[ "$FORMAT" == "json" ]]; then
+          echo "{\"switched\": false, \"tool\": \"codex\", \"slot\": null, \"slot_kind\": \"apikey\", \"provider_id\": $(json_string_or_null "$live_provider_id"), \"auth_email\": null, \"account\": null, \"status\": \"usable_current_auth\", \"launch_blocked\": false}"
+        fi
+        codex_switch_lock_release
+        return 0
+        ;;
+      rate_limited)
+        current_live_reset="$(codex_probe_result_reset_at "$current_live_probe")"
+        if [[ "$FORMAT" == "json" ]]; then
+          echo "{\"switched\": false, \"tool\": \"codex\", \"slot\": null, \"slot_kind\": \"apikey\", \"provider_id\": $(json_string_or_null "$live_provider_id"), \"auth_email\": null, \"account\": null, \"status\": \"current_auth_rate_limited\", \"reset_at\": ${current_live_reset:-0}, \"launch_blocked\": true}"
+        fi
+        codex_switch_lock_release
+        return 4
+        ;;
+      unauthorized|deactivated_workspace|timeout|error|unknown)
+        if [[ "$FORMAT" == "json" ]]; then
+          echo "{\"switched\": false, \"tool\": \"codex\", \"slot\": null, \"slot_kind\": \"apikey\", \"provider_id\": $(json_string_or_null "$live_provider_id"), \"auth_email\": null, \"account\": null, \"status\": \"current_auth_unusable\", \"probe_status\": $(json_string_or_null "$current_live_status"), \"launch_blocked\": true}"
+        fi
+        codex_switch_lock_release
+        return 4
+        ;;
+    esac
+  fi
 
   result="$(codex_inventory_truth "$project" "refresh" || true)"
   case "$result" in
@@ -1075,7 +1241,7 @@ _cmd_switch_auto_codex() {
       _cmd_switch_codex_direct_unlocked "$tool" "$slot" "suppress_json"
       notified_slot="$slot"
       actual_account="$(extract_codex_account "$(codex_live_auth_file)")"
-      switched_provider="$(codex_live_provider_id)"
+      switched_provider="$(codex_effective_live_provider_id "$(codex_live_auth_file)")"
       switched_kind="$(codex_saved_slot_kind "$slot")"
       [[ "$FORMAT" != "json" ]] && echo -e "${GREEN}[SWITCHED]${NC} -> $slot (usable)"
       if [[ "$FORMAT" == "json" ]]; then
@@ -1114,10 +1280,11 @@ _cmd_switch_auto_codex() {
 }
 
 _cmd_switch_auto_codex_dry_run() {
-  local active_slot current_slot candidate_slot slot slot_count=0
+  local auth_file active_slot current_slot candidate_slot slot slot_count=0
   local apikey_count=0 account_count=0 other_count=0
   local slots=() apikey_slots=() account_slots=()
 
+  auth_file="$(codex_live_auth_file)"
   active_slot="$(read_tool_active_slot "codex")"
   while IFS= read -r slot; do
     [[ -n "$slot" ]] || continue
@@ -1138,7 +1305,11 @@ _cmd_switch_auto_codex_dry_run() {
     esac
   done < <(list_tool_slots "codex")
 
-  current_slot="$active_slot"
+  if [[ -f "$auth_file" ]]; then
+    current_slot="$(codex_resolve_live_slot "$auth_file")"
+  else
+    current_slot=""
+  fi
   candidate_slot="$current_slot"
   if [[ -z "$candidate_slot" && "${#slots[@]}" -gt 0 ]]; then
     candidate_slot="${slots[0]}"
@@ -1208,7 +1379,7 @@ _cmd_switch_codex_direct_unlocked() {
     exit 5
   fi
   switched_account="$(extract_codex_account "$target_file")"
-  switched_provider="$(codex_live_provider_id)"
+  switched_provider="$(codex_effective_live_provider_id "$target_file")"
 
   write_tool_active_slot "codex" "$slot"
   log_info "Switched codex to slot: $slot"
@@ -1279,10 +1450,10 @@ cmd_whoami() {
       fi
       
       local account=$(extract_codex_account "$auth_file")
-      slot="$(read_tool_active_slot "codex")"
+      slot="$(codex_resolve_live_slot "$auth_file")"
       kind="$(codex_saved_slot_kind "${slot:-}")"
       [[ -n "$slot" ]] || kind="$(codex_live_auth_kind "$auth_file")"
-      provider_id="$(codex_live_provider_id)"
+      provider_id="$(codex_effective_live_provider_id "$auth_file")"
       if [[ -z "$account" ]]; then
         case "$FORMAT" in
           json) echo "{\"tool\": \"codex\", \"slot\": $(json_string_or_null "$slot"), \"slot_kind\": $(json_string_or_null "$kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": null, \"account\": null}" ;;
@@ -1339,10 +1510,17 @@ cmd_status() {
         local slot
         local slot_kind
         local provider_id
-        slot="$(read_tool_active_slot "codex")"
+        local live_kind
+        local current_auth_probe=""
+        local current_auth_probe_method=""
+        local current_auth_probe_status=""
+        local current_auth_probe_reset="0"
+        local current_auth_probe_reset_human=""
+        slot="$(codex_resolve_live_slot "$auth_file")"
+        live_kind="$(codex_live_auth_kind "$auth_file")"
         slot_kind="$(codex_saved_slot_kind "${slot:-}")"
-        [[ -n "$slot" ]] || slot_kind="$(codex_live_auth_kind "$auth_file")"
-        provider_id="$(codex_live_provider_id)"
+        [[ -n "$slot" ]] || slot_kind="$live_kind"
+        provider_id="$(codex_effective_live_provider_id "$auth_file")"
         local usable_count=""
         local limited_count=""
         local deactivated_count=""
@@ -1377,10 +1555,19 @@ cmd_status() {
             cache_refreshed_human="$(format_timestamp_local "$cache_refreshed")"
           fi
         fi
+        if [[ "$live_kind" == "apikey" ]]; then
+          current_auth_probe_method="exec_current_auth"
+          current_auth_probe="$(codex_probe_current_slot_now "$project" || true)"
+          current_auth_probe_status="$(codex_probe_result_status "$current_auth_probe")"
+          current_auth_probe_reset="$(codex_probe_result_reset_at "$current_auth_probe")"
+          if [[ "$current_auth_probe_reset" =~ ^[0-9]+$ && "$current_auth_probe_reset" -gt 0 ]]; then
+            current_auth_probe_reset_human="$(format_epoch_local "$current_auth_probe_reset")"
+          fi
+        fi
         
         case "$FORMAT" in
           json)
-            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"slot\": $(json_string_or_null "$slot"), \"slot_kind\": $(json_string_or_null "$slot_kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"last_modified\": \"$mtime\", \"availability_cache\": {\"present\": $([[ -f "$cache_file" ]] && printf true || printf false), \"usable\": ${usable_count:-0}, \"rate_limited\": ${limited_count:-0}, \"deactivated_workspace\": ${deactivated_count:-0}, \"other\": ${unknown_count:-0}, \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"earliest_reset_at\": ${earliest_reset:-0}, \"earliest_reset_human\": $(json_string_or_null "$earliest_reset_human"), \"refreshed_at\": $(json_string_or_null "$cache_refreshed"), \"refreshed_at_human\": $(json_string_or_null "$cache_refreshed_human")}}"
+            echo "{\"tool\": \"codex\", \"auth\": \"present\", \"slot\": $(json_string_or_null "$slot"), \"slot_kind\": $(json_string_or_null "$slot_kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"last_modified\": \"$mtime\", \"current_auth_probe\": {\"present\": $([[ "$live_kind" == "apikey" ]] && printf true || printf false), \"method\": $(json_string_or_null "$current_auth_probe_method"), \"status\": $(json_string_or_null "$current_auth_probe_status"), \"reset_at\": ${current_auth_probe_reset:-0}, \"reset_at_human\": $(json_string_or_null "$current_auth_probe_reset_human")}, \"availability_cache\": {\"present\": $([[ -f "$cache_file" ]] && printf true || printf false), \"usable\": ${usable_count:-0}, \"rate_limited\": ${limited_count:-0}, \"deactivated_workspace\": ${deactivated_count:-0}, \"other\": ${unknown_count:-0}, \"earliest_slot\": $(json_string_or_null "$earliest_slot"), \"earliest_reset_at\": ${earliest_reset:-0}, \"earliest_reset_human\": $(json_string_or_null "$earliest_reset_human"), \"refreshed_at\": $(json_string_or_null "$cache_refreshed"), \"refreshed_at_human\": $(json_string_or_null "$cache_refreshed_human")}}"
             ;;
           *)
             log_info "Tool: codex"
@@ -1390,6 +1577,12 @@ cmd_status() {
             [[ -n "$provider_id" ]] && log_info "Provider: $provider_id"
             log_info "Auth email: ${account:-unknown}"
             log_info "Last modified: $mtime"
+            if [[ "$live_kind" == "apikey" ]]; then
+              log_info "Current auth probe: ${current_auth_probe_status:-unknown} (method=exec_current_auth)"
+              if [[ -n "$current_auth_probe_reset_human" ]]; then
+                log_info "Current auth reset hint: $current_auth_probe_reset_human"
+              fi
+            fi
             if [[ -f "$cache_file" ]]; then
               log_info "Recovery ledger: usable=${usable_count:-0} rate_limited=${limited_count:-0} deactivated_workspace=${deactivated_count:-0} other=${unknown_count:-0}"
               if [[ -n "$earliest_slot" && -n "$earliest_reset_human" ]]; then
