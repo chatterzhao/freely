@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-2055-A`
 - title: Restart slot-switch preflight preserves active runtime governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `restart-slot-switch-preflight-preserves-active-runtime-governance`
@@ -84,5 +84,6 @@ Freely 已经为 `freely start` 冻结了 shared codex slot-switch lock 的 star
 
 ## Next
 
-- Run guarded pre-merge integration on a fresh `test-pre-merge-*` lane from current `develop`.
-- Merge only after that pre-merge lane and post-merge followthrough both replay the verification subset cleanly.
+- Completed on canonical `develop` via guarded merge `255d6dd`.
+- Post-merge closeout verification is recorded in `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-canonical-closeout-verification.md`.
+- Reopen only if canonical `develop` again allows restart to stop a live runtime before shared slot-switch preflight resolves, or if adjacent durability hardenings regress the preserved-runtime contract.
