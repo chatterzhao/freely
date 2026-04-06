@@ -12,17 +12,40 @@ Behavior:
 USAGE
 }
 
+freely_wt_self_path() {
+  if [[ -n "${BASH_SOURCE[0]:-}" ]]; then
+    printf '%s\n' "${BASH_SOURCE[0]}"
+    return 0
+  fi
+  if [[ -n "${ZSH_VERSION:-}" ]]; then
+    eval 'printf "%s\n" "${(%):-%x}"'
+    return 0
+  fi
+  return 1
+}
+
+freely_wt_is_sourced() {
+  if [[ -n "${ZSH_VERSION:-}" ]]; then
+    [[ "${ZSH_EVAL_CONTEXT:-}" == *:file* ]]
+    return
+  fi
+  [[ "${BASH_SOURCE[0]:-}" != "$0" ]]
+}
+
+SELF_PATH="$(freely_wt_self_path)" || { echo "Unable to determine wt-enter script path." >&2; return 1 2>/dev/null || exit 1; }
+SELF_DIR="$(cd "$(dirname "$SELF_PATH")" && pwd -P)"
+
 branch="${1:-}"
 [[ -n "$branch" ]] || { usage; return 1 2>/dev/null || exit 1; }
 
 # Must be sourced to allow cd in current shell.
-if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+if ! freely_wt_is_sourced; then
   echo "Please run with: source bin/wt-enter <branch>" >&2
   exit 1
 fi
 
 # shellcheck disable=SC1091
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/worktree-common.sh"
+source "$SELF_DIR/worktree-common.sh"
 freely_wt_assert_strict_root || return 1 2>/dev/null || exit 1
 freely_wt_assert_existing_in_strict_root "$branch" || return 1 2>/dev/null || exit 1
 
