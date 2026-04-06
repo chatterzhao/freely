@@ -89,10 +89,10 @@
 
 - candidate_format_version: `v2`
 - title: CLI help and dry-run contract followthrough after canonical audit
-- status: `needs_research`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `pending://issue-materialization`
-- promoted_issue_id: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
+- promoted_issue_id: `I-20260406-0408-A`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -110,5 +110,5 @@
 - promotion_gate:
   - keep this owner on command-surface ergonomics, help/usage/exit-code semantics, and ai dry-run contract alignment
   - do not absorb fresh-project bootstrap, runtime supervision, or generic executable-bit packaging work
-- next_action: confirm which commands are intended to treat `--help` as success, freeze the expected exit-code/help semantics, and isolate whether `ai switch --dry-run` is failing in probe selection, verification, or JSON result reporting.
+- next_action: This candidate is now materialized as `I-20260406-0408-A`. Keep the owner narrow: make the audited help paths explicit and side-effect free, pin their success/exit semantics with focused regressions, and make `ai switch codex --dry-run --format json` emit one stable machine-readable result without reopening runtime/auth lifecycle work.
 - revisit_trigger: canonical CLI replay still shows help invocations with side effects/non-zero-only usage paths, or `ai switch --dry-run` remains inconsistent with the saved-slot inventory.

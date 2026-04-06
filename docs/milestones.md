@@ -61,6 +61,18 @@ routing_policy:
 - next_action: Keep this owner parked as the canonical IBM handoff for standalone extraction timing. Do not open an extraction worktree until the Codex-first owner is merged and a concrete follow-on lane can prove the extraction-start checklist is satisfied.
 - revisit_trigger: Re-open only if the Codex-first owner is reopened and invalidates the threshold/boundary package, or if a second tool reaches verified parity quickly enough to change the extraction economics.
 
+2. `I-20260406-0408-A`
+- title: CLI help and dry-run contract followthrough governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-cli-help-and-dry-run-contract-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
+- next_action: Repair the audited help/usage exit-code contracts plus the bounded `ai switch codex --dry-run` JSON summary path, then replay the focused CLI-first verification set before promotion.
+- revisit_trigger: Re-open only if the owner proves too narrow to keep help semantics and dry-run summary semantics aligned, or if canonical replay exposes another first-hop command contract outside this bounded set.
+
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -241,12 +253,12 @@ routing_policy:
 15. `C-20260405-2358-D`
 - title: CLI help and dry-run contract followthrough after canonical audit
 - milestone_state: candidate
-- phase_state: `needs_research`
+- phase_state: `todo_ibm`
 - priority: P1
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
-- next_action: Materialize a narrow owner around help/usage/exit-code consistency and `ai switch --dry-run` contract alignment instead of reopening wrapper executable-bit fixes or fresh-project bootstrap work.
+- next_action: Candidate mirror only. `I-20260406-0408-A` is now the canonical owner for audited help/usage contracts and bounded `ai switch --dry-run` result alignment.
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
