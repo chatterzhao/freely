@@ -6,7 +6,7 @@ TMP_DIR="$(mktemp -d /tmp/freely-ai-account-switch-serialization.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 make_auth_json() {
-  local email="$1" target="$2"
+  local email="$1" target="$2" access_token="${3:-token-$1}"
   local payload
   payload="$(python3 - <<'PY' "$email"
 import base64
@@ -17,17 +17,33 @@ payload = base64.urlsafe_b64encode(json.dumps({"email": sys.argv[1]}).encode()).
 print(payload)
 PY
 )"
-  printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$payload" >"$target"
+  printf '{"tokens":{"id_token":"x.%s.y","access_token":"%s"}}\n' "$payload" "$access_token" >"$target"
 }
 
 setup_project() {
   local project="$1"
   mkdir -p \
     "$project/.freely/run" \
+    "$project/docs/system/workspace/scripts/runtime" \
     "$project/docs/system/workspace/skills/watchdog-control-plane/scripts"
   ln -sf \
     "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
     "$project/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  ln -sf \
+    "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+    "$project/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+}
+
+write_proxy_config() {
+  local project="$1"
+  mkdir -p "$project/.freely"
+  cat >"$project/.freely/config.env" <<EOF
+FREELY_NETWORK_PROXY_MODE="explicit"
+FREELY_ALL_PROXY="socks5://proxy.example:1080"
+FREELY_HTTP_PROXY="http://proxy.example:8080"
+FREELY_HTTPS_PROXY="http://proxy.example:8443"
+FREELY_NO_PROXY="localhost,127.0.0.1"
+EOF
 }
 
 setup_home() {
@@ -37,6 +53,70 @@ setup_home() {
 
 MOCK_BIN="$TMP_DIR/mock-bin"
 mkdir -p "$MOCK_BIN"
+cat >"$MOCK_BIN/curl" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+lock_dir="${AI_CLI_SWITCH_LOCK_DIR:?}"
+log_file="${MOCK_OAUTH_LOG:?}"
+output_file=""
+auth_header=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --connect-timeout|--max-time)
+      shift 2
+      ;;
+    -o)
+      output_file="$2"
+      shift 2
+      ;;
+    -H)
+      if [[ "$2" == Authorization:\ Bearer* ]]; then
+        auth_header="$2"
+      fi
+      shift 2
+      ;;
+    -w)
+      shift 2
+      ;;
+    -s|-S|-sS)
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+token="${auth_header#Authorization: Bearer }"
+
+if [[ ! -d "$lock_dir" ]]; then
+  echo "missing-switch-lock-for-$token" >>"$log_file"
+  exit 9
+fi
+
+echo "locked-oauth-$token" >>"$log_file"
+sleep 1
+
+case "$token" in
+  token-limited)
+    printf '{"rate_limits":{"primary":{"used_percent":100.0,"resets_at":4102444800},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
+    ;;
+  token-work)
+    printf '{"rate_limits":{"primary":{"used_percent":25.0,"resets_at":0},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
+    ;;
+  *)
+    printf '{"detail":"unexpected"}\n' >"$output_file"
+    printf '500'
+    exit 7
+    ;;
+esac
+EOF
+chmod +x "$MOCK_BIN/curl"
+
 cat >"$MOCK_BIN/codex" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -88,18 +168,21 @@ PROJECT="$TMP_DIR/project"
 HOME_DIR="$TMP_DIR/home"
 LOCK_DIR="$TMP_DIR/account-switch.lock"
 PROBE_LOG="$TMP_DIR/probe.log"
+OAUTH_LOG="$TMP_DIR/oauth.log"
 setup_project "$PROJECT"
+write_proxy_config "$PROJECT"
 setup_home "$HOME_DIR"
 mkdir -p "$HOME_DIR/.ai-auth/codex-limited@example-com-1" "$HOME_DIR/.ai-auth/codex-work@example-com-2"
-make_auth_json "limited@example.com" "$HOME_DIR/.ai-auth/codex-limited@example-com-1/auth.json"
-make_auth_json "work@example.com" "$HOME_DIR/.ai-auth/codex-work@example-com-2/auth.json"
-make_auth_json "old@example.com" "$HOME_DIR/.codex/auth.json"
+make_auth_json "limited@example.com" "$HOME_DIR/.ai-auth/codex-limited@example-com-1/auth.json" "token-limited"
+make_auth_json "work@example.com" "$HOME_DIR/.ai-auth/codex-work@example-com-2/auth.json" "token-work"
+make_auth_json "old@example.com" "$HOME_DIR/.codex/auth.json" "token-old"
 
 HOME="$HOME_DIR" \
 PROJECT_ROOT="$PROJECT" \
 PATH="$MOCK_BIN:$PATH" \
 AI_CLI_SWITCH_LOCK_DIR="$LOCK_DIR" \
 MOCK_CODEX_LOG="$PROBE_LOG" \
+MOCK_OAUTH_LOG="$OAUTH_LOG" \
   bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/out.json" &
 
 switch_pid=$!
@@ -128,7 +211,7 @@ fi
 
 grep -q '"switched": true' "$TMP_DIR/out.json"
 grep -q '"account": "work@example.com"' "$TMP_DIR/out.json"
-grep -q 'locked-probe-limited@example.com' "$PROBE_LOG"
-grep -q 'locked-probe-work@example.com' "$PROBE_LOG"
+grep -q 'locked-oauth-token-limited' "$OAUTH_LOG"
+grep -q 'locked-oauth-token-work' "$OAUTH_LOG"
 
 echo "[PASS] freely ai switch codex serializes the full auto-probe sweep with a shared switch lock"

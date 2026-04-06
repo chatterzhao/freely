@@ -3351,7 +3351,7 @@ start_workcell_supervisor_async() {
   freely_bin="$(freely_bin_for_project "$project")"
   recovery_log="$(logs_dir_for_project "$project")/manager-runtime-recovery.log"
   mkdir -p "$(dirname "$recovery_log")"
-  nohup bash "$freely_bin" start --project "$project" >>"$recovery_log" 2>&1 </dev/null &
+  nohup bash -lc "cd '$project' && exec bash '$freely_bin' start --project '$project'" >>"$recovery_log" 2>&1 </dev/null &
 }
 
 log_has_context_compacted() {
@@ -4030,7 +4030,7 @@ terminate_pid_with_graceful_wait() {
 
   kill "$pid" 2>/dev/null || true
   while kill -0 "$pid" 2>/dev/null; do
-    if (( waited >= 30 )); then
+    if (( waited >= 50 )); then
       kill -9 "$pid" 2>/dev/null || true
       log_warn "forced hard-kill fallback while repairing ${label}: pid=$pid"
       return 0
@@ -5897,9 +5897,10 @@ recover_stalled_worker_ai_if_needed() {
 
 write_session_state() {
   local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" context_compacted="$8" context_ratio="$9" primary_used_percent="${10}" primary_resets_at="${11}" secondary_used_percent="${12}" secondary_resets_at="${13}" route_only_handoff="${14}" route_only_streak="${15}" resume_streak="${16}" active_slot="${17}" slot_switch_reason="${18}" slot_switch_at="${19}" cycle_debug_log="${20}" claude_jsonl_path="${21}" codex_mcp_used="${22}" codex_mcp_thread_id="${23}" codex_mcp_jsonl_path="${24}" claude_session_id_current="${25}" claude_session_id_previous="${26}" project_dirty_entries="${27}" worktree_summary_total="${28}" worktree_summary_dirty="${29}" checkpoint_drift_streak="${30}" delegated_pending_ids="${31}" delegated_pending_count="${32}" delegated_consumed_ids="${33}" delegated_consumed_at="${34}" restart_storm_window_secs="${35}" restart_storm_count="${36}" process_churn_peak="${37}" restart_storm_signal_at="${38}" restart_storm_signal_reason="${39}" restart_storm_escalated_at="${40}" restart_storm_escalation_target="${41}"
-  local state_file
+  local state_file tmp_state_file
   state_file="$(session_state_file "$project")"
-  cat >"$state_file" <<EOF
+  tmp_state_file="$(mktemp "${state_file}.tmp.XXXXXX")"
+  cat >"$tmp_state_file" <<EOF
 LAST_TOOL_SESSION_ID="$tool_session_id"
 LAST_TOOL_RESUME_TARGET="$tool_resume_target"
 LAST_TOOL_JSONL_PATH="$tool_jsonl_path"
@@ -5942,6 +5943,7 @@ CHECKPOINT_DRIFT_STREAK_CURRENT="$checkpoint_drift_streak"
 ROUTE_ONLY_STREAK_CURRENT="$route_only_streak"
 RESUME_STREAK_CURRENT="$resume_streak"
 EOF
+  mv "$tmp_state_file" "$state_file"
 }
 
 runtime_active_process_count_for_project() {
@@ -6728,7 +6730,7 @@ launch_interruption_dispatcher() {
   local project="$1"
   local launch_bin
   launch_bin="${FREELY_INTERRUPTION_DISPATCH_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
-  nohup bash "$launch_bin" ensure-interruption-dispatch --project "$project" --watch </dev/null >/dev/null 2>&1 &
+  nohup bash -lc "cd '$project' && exec bash '$launch_bin' ensure-interruption-dispatch --project '$project' --watch" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
 }
 
@@ -6737,7 +6739,7 @@ launch_manager_watchdog() {
   local launch_bin watch_interval
   launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
   watch_interval="${MANAGER_WATCHDOG_INTERVAL_SECS:-${CHECK_INTERVAL:-5}}"
-  nohup bash "$launch_bin" ensure-manager --project "$project" --watch --interval "$watch_interval" </dev/null >/dev/null 2>&1 &
+  nohup bash -lc "cd '$project' && exec bash '$launch_bin' ensure-manager --project '$project' --watch --interval '$watch_interval'" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
 }
 
@@ -6745,7 +6747,7 @@ launch_manager_control_plane_recheck() {
   local project="$1"
   local launch_bin
   launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
-  nohup bash "$launch_bin" ensure-manager --project "$project" </dev/null >/dev/null 2>&1 &
+  nohup bash -lc "cd '$project' && exec bash '$launch_bin' ensure-manager --project '$project'" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
 }
 
@@ -6901,24 +6903,24 @@ runtime_unverified_pid_roles_for_project() {
 
 ensure_interruption_dispatcher_ready_or_fail() {
   local project="$1" dispatcher_pid attempts
-  for attempts in 1 2 3 4 5; do
+  for attempts in $(seq 1 50); do
     dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
     if [[ -n "$dispatcher_pid" ]]; then
       return 0
     fi
-    sleep 1
+    sleep 0.1
   done
   return 1
 }
 
 ensure_manager_watchdog_ready_or_fail() {
   local project="$1" watchdog_pid attempts
-  for attempts in 1 2 3 4 5; do
+  for attempts in $(seq 1 50); do
     watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
     if [[ -n "$watchdog_pid" ]]; then
       return 0
     fi
-    sleep 1
+    sleep 0.1
   done
   return 1
 }
@@ -8322,6 +8324,13 @@ ensure_no_active_supervisor_conflict() {
 
 start_project_runtime() {
   local project="$1"
+  # When process inspection is unavailable, runtime ownership falls back to cwd checks.
+  # Anchor the supervisor itself to the target project so watchdog/attach logic can still
+  # prove ownership in degraded environments.
+  cd "$project" || {
+    log_error "unable to enter project root before runtime start: $project"
+    exit 1
+  }
   load_config "$project"
   register_project_in_registry "$project"
   check_doc_gate_or_fail "$project" || {
@@ -8377,7 +8386,32 @@ start_project_runtime() {
     fi
   }
 
+  exit_if_stop_requested_before_launch() {
+    if [[ "$stop_requested" -eq 1 || -f "$(stop_marker_file "$project")" ]]; then
+      if [[ "$stop_requested" -eq 0 ]]; then
+        stop_requested=1
+        append_runtime_event "$project" "operator_stop_requested" \
+          "supervisor_pid=$$" \
+          "child_pid_file=$child_pid_file"
+      fi
+      LAST_WORKCELL_EXIT_REASON="operator_stop"
+      DESIRED_RUNTIME_STATE_VALUE="stopped"
+      rm -f "$child_pid_file" "$(session_state_file "$project")" "$(handoff_file "$project")"
+      log_info "received stop signal, exiting supervisor before next ai launch"
+      exit 0
+    fi
+  }
+
   cleanup_supervisor() {
+    local dispatcher_pid="" watchdog_pid=""
+    dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+    if [[ -n "$dispatcher_pid" ]]; then
+      terminate_pid_with_graceful_wait "$dispatcher_pid" "project interruption dispatcher during supervisor cleanup"
+    fi
+    watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
+    if [[ -n "$watchdog_pid" ]]; then
+      terminate_pid_with_graceful_wait "$watchdog_pid" "project manager watchdog during supervisor cleanup"
+    fi
     append_runtime_event "$project" "supervisor_cleanup" \
       "supervisor_pid=$$" \
       "desired_state=${DESIRED_RUNTIME_STATE_VALUE:-stopped}" \
@@ -8421,11 +8455,18 @@ start_project_runtime() {
   while true; do
     local ts prompt_file cycle_log cycle_debug_log mode_name watchdog_script workspace_root
     local delegated_pending_ids delegated_pending_count delegated_consumed_ids delegated_consumed_at
+    if [[ "$stop_requested" -eq 1 || -f "$(stop_marker_file "$project")" ]]; then
+      LAST_WORKCELL_EXIT_REASON="operator_stop"
+      DESIRED_RUNTIME_STATE_VALUE="stopped"
+      log_info "stop requested before next launch, exiting supervisor loop"
+      exit 0
+    fi
     ts="$(date '+%Y%m%d-%H%M%S')"
     prompt_file="$run_dir/prompt-$ts.txt"
     cycle_log="$logs_dir/cycle-$ts.log"
     cycle_debug_log="$logs_dir/cycle-$ts.debug.log"
     workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
+    exit_if_stop_requested_before_launch
     local recovered_workers
     watchdog_script="$workspace_root/scripts/runtime/manager-watchdog.sh"
     if [[ -x "$watchdog_script" ]]; then
@@ -8440,6 +8481,7 @@ start_project_runtime() {
         "recovered_workers=$recovered_workers"
       sleep "${RESTART_DELAY:-2}"
     fi
+    exit_if_stop_requested_before_launch
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
     ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name"
@@ -8468,6 +8510,7 @@ start_project_runtime() {
 
     local tool_adapter
     tool_adapter="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "$AI_TOOL")}"
+    exit_if_stop_requested_before_launch
     log_info "launching $AI_TOOL via ${tool_adapter:-unknown} ($mode_name mode, ai_mode=$AI_MODE)"
     append_runtime_event "$project" "ai_launch_begin" \
       "supervisor_pid=$$" \
@@ -8739,6 +8782,12 @@ start_project_runtime() {
   done
 }
 
+preflight_project_runtime_restart_or_fail() {
+  local project="$1"
+  load_config "$project"
+  ensure_codex_slot_switch_startup_ready_or_fail "$project" || exit 1
+}
+
 cmd_start() {
   local project="" force="0"
   while [[ $# -gt 0 ]]; do
@@ -8771,6 +8820,7 @@ cmd_restart() {
     return 0
   fi
   log_info "restarting current project runtime/control-plane without implicit work restore"
+  preflight_project_runtime_restart_or_fail "$project"
   stop_project_runtime "$project" "operator_restart"
   start_project_runtime "$project"
 }
