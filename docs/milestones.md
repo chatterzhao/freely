@@ -2338,18 +2338,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260406-1905-A`
-- title: Fresh-project bootstrap and baseline scoping followthrough governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
-- progress_path: `docs/progress/freely-product-architecture/p-fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
-- next_action: Repair `sync-tooling` so target-local config and hook assets are rematerialized into fresh git projects, then verify `baseline-status` and `status --view baseline` stay pinned to the target project through a real fresh-project replay.
-
-2. `I-20260405-1235-A`
+1. `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -2362,7 +2351,31 @@ routing_policy:
 
 ### completed_issues
 
-1. `I-20260403-2041-A`
+1. `I-20260406-1905-A`
+- title: Fresh-project bootstrap and baseline scoping followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
+- evidence:
+  - `develop` merge `65553c9`
+  - `docs/progress/freely-product-architecture/p-fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+  - `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-verification.md`
+  - `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`
+  - `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-into-worktree`
+  - `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-status-family`
+  - `./bin/governance-check`
+  - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1935-test-pre-merge-fresh-project-bootstrap-baseline-scoping-followthrough --issue docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+  - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+  - `git diff --check`
+- completion_note: `Canonical develop now keeps fresh-project sync-tooling bootstrap scoped to the target project, rematerializes .githooks for follow-on init, and preserves baseline/status target pinning through premerge and post-merge followthrough.`
+
+2. `I-20260403-2041-A`
 - title: Worktree tool boundary bootstrap governance
 - milestone_state: completed
 - phase_state: `completed`
