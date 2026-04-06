@@ -61,6 +61,18 @@ routing_policy:
 - next_action: Keep this owner parked as the canonical IBM handoff for standalone extraction timing. Do not open an extraction worktree until the Codex-first owner is merged and a concrete follow-on lane can prove the extraction-start checklist is satisfied.
 - revisit_trigger: Re-open only if the Codex-first owner is reopened and invalidates the threshold/boundary package, or if a second tool reaches verified parity quickly enough to change the extraction economics.
 
+2. `I-20260405-2358-C`
+- title: CLI wrapper packaging and regression-surface governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-cli-wrapper-packaging-and-regression-surface-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
+- next_action: Use the current lane-local verification evidence to prepare guarded merge, then continue bootstrap/status and runtime follow-ons in separate owners.
+- revisit_trigger: Re-open prioritization only if this lane proves the observed defects actually belong to project bootstrap or runtime semantics instead of packaging/regression surface.
+
 2. `I-20260405-2136-A`
 - title: Runtime blocked intake and continuity truth governance
 - milestone_state: committed
@@ -237,6 +249,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md`
 - next_action: Candidate mirror only. `I-20260405-1415-A` is authoritative and now parked at `done_ibm`; use the committed owner as the canonical handoff package when a future extraction lane is justified.
 - revisit_trigger: Revisit once the Codex-first lane is merged or once a second tool reaches verified backend-worthy maturity.
+
+13. `C-20260405-2358-C`
+- title: CLI wrapper packaging and regression-surface audit
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
+- next_action: Candidate mirror only. `I-20260405-2358-C` is now the canonical owner for CLI packaging, clean help output, and deterministic regression-surface repair.
+- revisit_trigger: Revisit if canonical `develop` later proves the same defects belong to a broader bootstrap/runtime owner instead of this packaging lane.
 
 ### completed_issues
 1. `I-20260404-0640-A`
