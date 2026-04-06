@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-sync-tooling-fresh-project-bootstrap.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_project() {
+  local project="$1"
+  mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample"
+  git init -q -b develop "$project"
+  mkdir -p "$project/.githooks"
+  cat >"$project/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+  chmod +x "$project/.githooks/pre-commit"
+
+  cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+  cat >"$project/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+  cat >"$project/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+  cat >"$project/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0018--sample
+EOF
+
+  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+  cat >"$project/.gitignore" <<'EOF'
+.freely/
+.codex/
+.claude/
+.iflow/
+EOF
+
+  git -C "$project" add .
+  git -C "$project" -c user.name="Freely Test" -c user.email="freely-test@example.com" commit -q -m "Initial test project"
+}
+
+copy_project_docs_only() {
+  local source_project="$1" target_project="$2"
+  mkdir -p "$target_project/docs/pre-brainstorms/20260320-0018--sample"
+  git init -q -b develop "$target_project"
+  cp "$source_project/docs/PROJECT_INTENT.md" "$target_project/docs/PROJECT_INTENT.md"
+  cp "$source_project/docs/CONSTITUTION.md" "$target_project/docs/CONSTITUTION.md"
+  cp "$source_project/docs/LAWS.md" "$target_project/docs/LAWS.md"
+  cp "$source_project/AGENTS.md" "$target_project/AGENTS.md"
+  cp "$source_project/docs/pre-brainstorms/README.md" "$target_project/docs/pre-brainstorms/README.md"
+  cp "$source_project/docs/pre-brainstorms/INDEX.md" "$target_project/docs/pre-brainstorms/INDEX.md"
+  cp "$source_project/docs/pre-brainstorms/CONVERGENCE.md" "$target_project/docs/pre-brainstorms/CONVERGENCE.md"
+  cp "$source_project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" "$target_project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md"
+  cp "$source_project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" "$target_project/docs/pre-brainstorms/20260320-0018--sample/candidates.md"
+}
+
+FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$FREELY_HOME"
+
+SOURCE_PROJECT="$TMP_DIR/source-project"
+FRESH_PROJECT="$TMP_DIR/fresh-project"
+make_project "$SOURCE_PROJECT"
+copy_project_docs_only "$SOURCE_PROJECT" "$FRESH_PROJECT"
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --project "$SOURCE_PROJECT" \
+  --intent "$SOURCE_PROJECT/docs/PROJECT_INTENT.md" \
+  --constitution "$SOURCE_PROJECT/docs/CONSTITUTION.md" \
+  --ai codex:gpt-5.4:auto \
+  --accept-default-autonomy \
+  >/dev/null
+
+test ! -d "$FRESH_PROJECT/.githooks"
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" sync-tooling \
+  --source-project "$SOURCE_PROJECT" \
+  --project "$FRESH_PROJECT" \
+  >/dev/null
+
+test -x "$FRESH_PROJECT/.githooks/pre-commit"
+grep -Fq "PROJECT_ROOT=\"$FRESH_PROJECT\"" "$FRESH_PROJECT/.freely/config.env"
+grep -Fq "INTENT_FILE=\"$FRESH_PROJECT/docs/PROJECT_INTENT.md\"" "$FRESH_PROJECT/.freely/config.env"
+grep -Fq "CONSTITUTION_FILE=\"$FRESH_PROJECT/docs/CONSTITUTION.md\"" "$FRESH_PROJECT/.freely/config.env"
+
+BASELINE_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" baseline-status --project "$FRESH_PROJECT")"
+STATUS_BASELINE_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status --project "$FRESH_PROJECT" --view baseline)"
+
+printf '%s\n' "$BASELINE_OUTPUT" | grep -Fq "project: $FRESH_PROJECT"
+printf '%s\n' "$BASELINE_OUTPUT" | grep -Fq "intent: $FRESH_PROJECT/docs/PROJECT_INTENT.md"
+printf '%s\n' "$STATUS_BASELINE_OUTPUT" | grep -Fq "project: $FRESH_PROJECT"
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+  --project "$FRESH_PROJECT" \
+  --intent "$FRESH_PROJECT/docs/PROJECT_INTENT.md" \
+  --constitution "$FRESH_PROJECT/docs/CONSTITUTION.md" \
+  --ai codex:gpt-5.4:auto \
+  --accept-default-autonomy \
+  --force \
+  >/dev/null
+
+STATUS_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" status --project "$FRESH_PROJECT")"
+printf '%s\n' "$STATUS_OUTPUT" | grep -Fq "project: $FRESH_PROJECT"
+
+echo "[PASS] freely sync-tooling keeps fresh-project bootstrap and baseline/status scoping pinned to the target project"

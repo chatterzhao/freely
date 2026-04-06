@@ -2338,6 +2338,17 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260406-1905-A`
+- title: Fresh-project bootstrap and baseline scoping followthrough governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
+- next_action: Repair `sync-tooling` so target-local config and hook assets are rematerialized into fresh git projects, then verify `baseline-status` and `status --view baseline` stay pinned to the target project through a real fresh-project replay.
+
 2. `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
 - milestone_state: committed
@@ -2556,12 +2567,12 @@ routing_policy:
 4. `C-20260405-2358-A`
 - title: Fresh-project bootstrap and baseline scoping followthrough after CLI audit
 - milestone_state: candidate
-- phase_state: `needs_research`
+- phase_state: `todo_ibm`
 - priority: P1
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
-- next_action: Consume `I-20260405-1235-A` and `I-20260403-2041-A` as upper-bound bootstrap truth, then materialize a narrow owner around the still-reproducible `.githooks` bootstrap gap plus baseline/status scoping drift in fresh git projects instead of reopening runtime or already-fixed intake-noise subproblems.
+- next_action: This candidate is now materialized as `I-20260406-1905-A`. Keep the owner narrow: repair `sync-tooling` retargeting plus `.githooks` rematerialization, prove `baseline-status` / `status --view baseline` stay pinned to the target project, and keep `ensure-interruption-dispatch` as a non-regression guard rather than reopening runtime control-plane work.
 - revisit_trigger: Revisit if fresh-project bootstrap still requires manual `.githooks` copying, baseline/status scoping still drifts from the target project, or another project-targeted CLI command regresses the current doc-gate semantics.
 
 - none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.

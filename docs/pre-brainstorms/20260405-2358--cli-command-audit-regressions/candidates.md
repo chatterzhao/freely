@@ -4,10 +4,10 @@
 
 - candidate_format_version: `v2`
 - title: Fresh-project bootstrap and baseline scoping followthrough after CLI audit
-- status: `proposed`
+- status: `promoted`
 - milestone: `M-20260326-freely-product-architecture`
-- promoted_issue_path: `pending://issue-materialization`
-- promoted_issue_id: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- promoted_issue_id: `I-20260406-1905-A`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -26,7 +26,7 @@
 - promotion_gate:
   - keep this owner scoped to fresh-project bootstrap, baseline scoping, and adjacent non-regression guards for project-targeted CLI surfaces
   - do not absorb runtime supervision churn or intake counter reconciliation here
-- next_action: keep this candidate in `M-20260326-freely-product-architecture`, consume `I-20260405-1235-A` and `I-20260403-2041-A` as upper-bound bootstrap truth, and materialize a narrow owner around fresh-project hook/bootstrap plus baseline scoping instead of assuming the `--project` drift is already absorbed.
+- next_action: This candidate is now materialized as `I-20260406-1905-A`. Keep the owner narrow: repair `sync-tooling` retargeting plus `.githooks` rematerialization, prove `baseline-status` / `status --view baseline` stay pinned to the target project, and keep `ensure-interruption-dispatch` as a non-regression guard rather than reopening runtime control-plane work.
 - revisit_trigger: fresh-project bootstrap still requires manual hook copying, `baseline-status` / `status` baseline scoping still drifts from the target project, or another project-targeted CLI command regresses the current doc-gate semantics.
 
 ## C-20260405-2358-B
