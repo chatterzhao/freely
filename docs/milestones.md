@@ -75,6 +75,17 @@ routing_policy:
 
 ### candidate_issues
 
+1. `C-20260406-0715-A`
+- title: Codex live auth identity reconciliation and probe timeout boundary
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260406-0715--codex-live-auth-identity-and-probe-lock-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-0715--codex-live-auth-identity-and-probe-lock-boundary/candidates.md`
+- next_action: Finish landing the stale live-slot reconciliation and probe-timeout cleanup slice, then decide whether the remaining live `codex exec` timeout evidence warrants a separate issue instead of reopening the completed 20260405 Codex API-key owner.
+- revisit_trigger: Revisit if canonical replay shows this boundary is fully absorbed by an existing owner, or if the unresolved timeout evidence proves the real follow-on is upstream `codex exec` stall diagnosis rather than more slot identity work.
+
 1. `C-20260404-0119-A`
 - title: Governance merge gate milestone status followthrough
 - milestone_state: candidate

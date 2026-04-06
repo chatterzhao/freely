@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_HOME="$(mktemp -d /tmp/freely-ai-cli-stale-apikey-sync.XXXXXX)"
+trap 'rm -rf "$TMP_HOME"' EXIT
+
+payload="$(python3 - <<'PY'
+import base64, json
+print(base64.urlsafe_b64encode(json.dumps({"email":"work@example.com"}).encode()).decode().rstrip("="))
+PY
+)"
+
+mkdir -p \
+  "$TMP_HOME/.codex" \
+  "$TMP_HOME/.ai-auth/codex-apikey-custom-1" \
+  "$TMP_HOME/.ai-auth/codex-account-work@example-com-1"
+
+cat >"$TMP_HOME/.codex/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-live"}
+EOF
+
+cat >"$TMP_HOME/.codex/config.toml" <<'EOF'
+model = "gpt-5.4"
+EOF
+
+cat >"$TMP_HOME/.ai-auth/codex-apikey-custom-1/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-other"}
+EOF
+
+cat >"$TMP_HOME/.ai-auth/codex-apikey-custom-1/config-auth.toml" <<'EOF'
+model_provider = "custom"
+EOF
+
+cat >"$TMP_HOME/.ai-auth/codex-apikey-custom-1/manifest.json" <<'EOF'
+{"manifest_version":"codex-slot-v1","tool":"codex","slot_id":"apikey-custom-1","slot_kind":"apikey","provider_id":"custom"}
+EOF
+
+printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$payload" >"$TMP_HOME/.ai-auth/codex-account-work@example-com-1/auth.json"
+: >"$TMP_HOME/.ai-auth/codex-account-work@example-com-1/config-auth.toml"
+cat >"$TMP_HOME/.ai-auth/codex-account-work@example-com-1/manifest.json" <<'EOF'
+{"manifest_version":"codex-slot-v1","tool":"codex","slot_id":"account-work@example-com-1","slot_kind":"account","auth_email":"work@example.com"}
+EOF
+
+printf 'apikey-custom-1\n' >"$TMP_HOME/.codex/active-slot"
+printf 'apikey-custom-1\n' >"$TMP_HOME/.ai-auth/.codex-current-slot"
+
+HOME="$TMP_HOME" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex account-work@example-com-1 --yes >"$TMP_HOME/switch.json"
+HOME="$TMP_HOME" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex >"$TMP_HOME/whoami.json"
+
+python3 - <<'PY' "$TMP_HOME/switch.json"
+import json
+import pathlib
+import sys
+
+data = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+assert data["switched"] is True, data
+assert data["slot"] == "account-work@example-com-1", data
+assert data["slot_kind"] == "account", data
+PY
+
+grep -q '"OPENAI_API_KEY":"sk-other"' "$TMP_HOME/.ai-auth/codex-apikey-custom-1/auth.json"
+grep -q '"OPENAI_API_KEY":"sk-live"' "$TMP_HOME/.codex/auth.json" && {
+  echo "[FAIL] live auth should have switched away from the stale apikey bundle" >&2
+  exit 1
+}
+python3 - <<'PY' "$TMP_HOME/whoami.json"
+import json
+import pathlib
+import sys
+
+data = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+assert data["slot"] == "account-work@example-com-1", data
+assert data["auth_email"] == "work@example.com", data
+PY
+
+echo "[PASS] ai switch does not sync the current live auth bundle into a stale apikey slot before switching"
