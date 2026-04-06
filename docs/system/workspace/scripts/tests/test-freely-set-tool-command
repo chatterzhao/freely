@@ -64,6 +64,7 @@ FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
   --intent "$PROJECT/docs/PROJECT_INTENT.md" \
   --constitution "$PROJECT/docs/CONSTITUTION.md" \
   --ai cc:auto \
+  --accept-default-autonomy \
   >/dev/null
 
 CONFIG_FILE="$PROJECT/.freely/config.env"
