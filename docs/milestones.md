@@ -2531,6 +2531,17 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260405-1235-A`. Keep the owner documentation-first: freeze the layer split, per-tool matrix, degradation semantics, and backend contract boundary before opening narrower implementation follow-ons.
 - revisit_trigger: Re-open only if the IBM slice proves too broad, overlaps older owners, or new tool surfaces require a separate owner family instead of a follow-on implementation lane.
 
+4. `C-20260405-2358-A`
+- title: Fresh-project hook bootstrap followthrough after CLI audit
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
+- next_action: Consume `I-20260405-1235-A` and `I-20260403-2041-A` as upper-bound bootstrap truth, then materialize a narrow owner around the still-reproducible `.githooks` bootstrap gap in fresh git projects instead of reopening already-fixed status or intake-noise subproblems.
+- revisit_trigger: Revisit if fresh-project bootstrap still requires manual `.githooks` copying, or if another project-targeted CLI command regresses the now-revalidated `--project`/doc-gate semantics.
+
 - none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.
   - `I-20260401-2245-A` owns build artifact exposure and release allowlist audit.
   - `I-20260401-0115-A` owns supply-chain baseline and install-intake audit.
