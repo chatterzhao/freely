@@ -510,6 +510,11 @@ for branch in branches:
         body = chunks[idx + 1] if idx + 1 < len(chunks) else ""
         if not commit:
             continue
+        subject = body.splitlines()[0].strip() if body else ""
+        target_match = re.match(r"^Merge branch '.*' into (.+?)\s*$", subject)
+        target_branch = target_match.group(1).strip() if target_match else ""
+        if target_branch and target_branch != branch:
+            continue
         if re.search(r"^Freely-Merge-Path:\s+(merge-guarded|merge-guarded-complete)\s*$", body, re.MULTILINE):
             continue
         if re.search(r"^Freely-Merge-Path:\s+merge-guarded-break-glass\s*$", body, re.MULTILINE):
@@ -733,6 +738,11 @@ for branch in branches:
         commit = chunks[idx].strip()
         body = chunks[idx + 1] if idx + 1 < len(chunks) else ""
         if not commit:
+            continue
+        subject = body.splitlines()[0].strip() if body else ""
+        target_match = re.match(r"^Merge branch '.*' into (.+?)\s*$", subject)
+        target_branch = target_match.group(1).strip() if target_match else ""
+        if target_branch and target_branch != branch:
             continue
 
         merge_path_match = re.search(r"^Freely-Merge-Path:\s*(.+?)\s*$", body, re.MULTILINE)

@@ -15,7 +15,7 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
    - 结果：通过
-   - 说明：新增 nested `feature/* -> test-pre-merge-* -> develop` 场景，证明 `develop` 只审计 first-parent protected merge receipt，不再误判 batch 内部 merge。
+   - 说明：新增两个回归场景，分别覆盖 `develop` 不应误判 batch 内部 merge，以及当前 `test-pre-merge-*` 不应重新审计继承自 `develop` 的旧 promote merge。
 2. `./bin/governance-check`
    - 结果：通过
    - 说明：当前 feature worktree 已不再复现 `develop` 对 merge commit `ab7a9b8` 的误报。
