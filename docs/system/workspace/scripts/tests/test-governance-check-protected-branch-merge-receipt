@@ -495,4 +495,96 @@ if ./bin/governance-check >"$TMP_DIR/invalid-source.out" 2>&1; then
 fi
 grep -q "invalid Freely-Source-Branch 'feature/invalid-direct'" "$TMP_DIR/invalid-source.out"
 
+REPO_FIRST_PARENT="$TMP_DIR/repo-first-parent"
+make_repo "$REPO_FIRST_PARENT"
+cd "$REPO_FIRST_PARENT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/nested-source
+echo nested > NESTED.txt
+git add NESTED.txt
+git commit -q -m "nested source"
+git checkout -q -b test-pre-merge-20260406-nested-source develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/nested-source' into test-pre-merge-20260406-nested-source
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/nested-source
+EOF
+)" feature/nested-source >/dev/null
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260406-nested-source' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260406-nested-source
+EOF
+)" test-pre-merge-20260406-nested-source >/dev/null
+cat > "$REPO_FIRST_PARENT/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2026-04-02`
+- source_policy_effective_date: `2026-04-02`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/first-parent.out" 2>&1; then
+  echo "[FAIL] governance-check should ignore nested test-pre-merge merge receipts when auditing develop first-parent history" >&2
+  cat "$TMP_DIR/first-parent.out" >&2
+  exit 1
+fi
+
+REPO_INHERITED_TARGET="$TMP_DIR/repo-inherited-target"
+make_repo "$REPO_INHERITED_TARGET"
+cd "$REPO_INHERITED_TARGET"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/promoted
+echo promoted > PROMOTED.txt
+git add PROMOTED.txt
+git commit -q -m "promoted source"
+git checkout -q -b test-pre-merge-20260406-promoted develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/promoted' into test-pre-merge-20260406-promoted
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/promoted
+EOF
+)" feature/promoted >/dev/null
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260406-promoted' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260406-promoted
+EOF
+)" test-pre-merge-20260406-promoted >/dev/null
+git checkout -q -b test-pre-merge-20260406-current develop
+echo current > CURRENT.txt
+git add CURRENT.txt
+git commit -q -m "seed current batch"
+cat > "$REPO_INHERITED_TARGET/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2026-04-02`
+- source_policy_effective_date: `2026-04-02`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/inherited-target.out" 2>&1; then
+  echo "[FAIL] governance-check should ignore inherited develop-target merges when auditing a current test-pre-merge batch" >&2
+  cat "$TMP_DIR/inherited-target.out" >&2
+  exit 1
+fi
+
 echo "[PASS] governance-check audits protected-branch merge receipts and break-glass trailers"

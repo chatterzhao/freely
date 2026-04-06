@@ -488,7 +488,7 @@ for branch in branches:
         try:
             source_policy_commits = set(
                 subprocess.check_output(
-                    ["git", "log", branch, "--merges", "--since", source_policy_since, "--format=%H"],
+                    ["git", "log", branch, "--first-parent", "--merges", "--since", source_policy_since, "--format=%H"],
                     cwd=root,
                     text=True,
                 ).splitlines()
@@ -497,7 +497,7 @@ for branch in branches:
             source_policy_commits = set()
     try:
         merge_output = subprocess.check_output(
-            ["git", "log", branch, "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
+            ["git", "log", branch, "--first-parent", "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
             cwd=root,
             text=True,
         )
@@ -509,6 +509,11 @@ for branch in branches:
         commit = chunks[idx].strip()
         body = chunks[idx + 1] if idx + 1 < len(chunks) else ""
         if not commit:
+            continue
+        subject = body.splitlines()[0].strip() if body else ""
+        target_match = re.match(r"^Merge branch '.*' into (.+?)\s*$", subject)
+        target_branch = target_match.group(1).strip() if target_match else ""
+        if target_branch and target_branch != branch:
             continue
         if re.search(r"^Freely-Merge-Path:\s+(merge-guarded|merge-guarded-complete)\s*$", body, re.MULTILINE):
             continue
@@ -712,7 +717,7 @@ for branch in branches:
         try:
             source_policy_commits = set(
                 subprocess.check_output(
-                    ["git", "log", branch, "--merges", "--since", source_policy_since, "--format=%H"],
+                    ["git", "log", branch, "--first-parent", "--merges", "--since", source_policy_since, "--format=%H"],
                     cwd=root,
                     text=True,
                 ).splitlines()
@@ -721,7 +726,7 @@ for branch in branches:
             source_policy_commits = set()
     try:
         merge_output = subprocess.check_output(
-            ["git", "log", branch, "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
+            ["git", "log", branch, "--first-parent", "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
             cwd=root,
             text=True,
         )
@@ -733,6 +738,11 @@ for branch in branches:
         commit = chunks[idx].strip()
         body = chunks[idx + 1] if idx + 1 < len(chunks) else ""
         if not commit:
+            continue
+        subject = body.splitlines()[0].strip() if body else ""
+        target_match = re.match(r"^Merge branch '.*' into (.+?)\s*$", subject)
+        target_branch = target_match.group(1).strip() if target_match else ""
+        if target_branch and target_branch != branch:
             continue
 
         merge_path_match = re.search(r"^Freely-Merge-Path:\s*(.+?)\s*$", body, re.MULTILINE)
