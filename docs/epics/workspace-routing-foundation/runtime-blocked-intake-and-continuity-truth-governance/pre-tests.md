@@ -1,60 +1,64 @@
-# Pre-tests
+# Pre-Tests: runtime-blocked-intake-and-continuity-truth-governance
 
-## Acceptance Contract
+## Acceptance Targets
 
-- acceptance_target: `Issue-bound IBM for runtime blocked intake / continuity truth when prompt assembly advances but supervision writeback does not`
-- testing_layer: `doc`
-- target_environment: `canonical repo docs in the active feature worktree before any runtime blocked-state implementation starts`
-- required_evidence:
-  - `prd.md` freezes the blocked supervision family and its neighbor-owner boundaries
-  - `issues/*.md` and issue-bound brainstorm define a runtime-owned follow-on package instead of leaving the contract in chat memory
-  - `tasks.md` reflects materialized IBM work rather than open-ended investigation
-  - `docs/milestones.md` and the source candidate show this owner is now canonical and the pre-brainstorm candidate is mirror-only
-- blocker_taxonomy:
-  - `family_boundary_missing`: docs still cannot distinguish this owner from generic network taxonomy or bootstrap continuity repair
-  - `truth_surface_missing`: blocked intake / continuity / status writeback targets are still unspecified
-  - `scope_widened`: docs reopen watchdog redesign, semantic-loop automation, or GitHub issue automation
-  - `milestone_writeback_missing`: milestone and candidate state still present this as unresolved pre-brainstorm research
+### AT-001 blocked supervision truth is materialized after prompt visibility
 
-## Pre-merge acceptance
+- acceptance target: prompt-visible blocked supervision writes delegated continuation truth plus a blocked resolution artifact instead of leaving intake at misleading `new`
+- testing layer: integration
+- target environment: canonical runtime script plus issue-bound verification artifact
+- required evidence: `blocked-truth verification note`
+- blocker taxonomy: `execution_pending_or_failed`
 
-1. IBM docs must make it unambiguous that prompt-visible-but-unclaimed supervision is a dedicated blocked-truth family.
-2. IBM docs must clearly separate this owner from:
-   - runtime network taxonomy
-   - manager bootstrap continuity materialization
-   - successful delegated intake absorption closure
-3. The docs must name the minimum truth surfaces a later implementation lane will update:
-   - intake state
-   - continuity or blocked artifact
-   - status surface
-4. The docs must explicitly limit the first implementation slice to blocked-state truth and observability.
-5. The docs must not claim GitHub issue automation exists or that generic watchdog redesign is part of this owner.
+### AT-002 blocked status surface is machine-readable and bounded
 
-## Post-merge acceptance
+- acceptance target: `live-status` and `fleet-status` expose the blocked supervision surface without regressing neighboring status families
+- testing layer: integration
+- target environment: focused status-surface regressions plus issue-bound verification artifact
+- required evidence: `blocked-truth verification note`
+- blocker taxonomy: `execution_pending_or_failed`
 
-1. A follow-on implementation lane can open without re-researching why this is not just another network-taxonomy patch.
-2. Status-surface and runtime writeback work can proceed from a bounded owner rather than a pre-brainstorm candidate.
-3. Future retries, slot fallback, semantic-loop recovery, and broader orchestration work remain free to use separate owners.
+### AT-003 completed closeout remains bounded and governance-complete
+
+- acceptance target: issue, milestone, progress, and verification artifacts close this owner as completed without widening into generic watchdog redesign or broader network taxonomy
+- testing layer: IBM review
+- target environment: issue-bound canonical artifacts
+- required evidence: `issue + progress + milestone + implementation decision note`
+- blocker taxonomy: `definition_missing`
+
+## Pre-merge Acceptance
+
+1. Prompt-visible blocked supervision must stop leaving intake indefinitely at misleading `new`.
+2. Runtime must materialize delegated continuation truth plus a blocked resolution artifact once prompt assembly has advanced but claim or continuity cannot.
+3. Verification must prove the blocked status surface is visible in `live-status` and `fleet-status`.
+4. The implementation must remain bounded to blocked-state truth and observability.
+5. The owner must not widen into generic watchdog redesign, broader network recovery policy, or unrelated issue automation.
+
+## Post-merge Acceptance
+
+1. Canonical `develop` shows blocked supervision truth writeback and blocked status observability through guarded-merge verification evidence.
+2. Completed closeout artifacts keep this owner as the bounded contract for prompt-visible blocked truth.
+3. Future retries, slot fallback, semantic-loop recovery, and broader orchestration work remain separate owners.
 
 ## Acceptance Items
 
-### PT-1
-- id: `PT-1`
-- requirement: `blocked supervision family and neighboring owner boundaries are explicit`
-- evidence_level: `doc`
+### AT-001
+- id: `AT-001`
+- requirement: `Prompt-visible blocked supervision writes delegated continuation truth plus a blocked resolution artifact.`
+- evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/prd.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
 
-### PT-2
-- id: `PT-2`
-- requirement: `follow-on implementation truth surfaces are named`
-- evidence_level: `doc`
+### AT-002
+- id: `AT-002`
+- requirement: `Blocked supervision is exposed through bounded live-status and fleet-status surfaces without adjacent status regressions.`
+- evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/prd.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
 
-### PT-3
-- id: `PT-3`
-- requirement: `milestone and candidate writeback make this owner canonical`
-- evidence_level: `doc`
+### AT-003
+- id: `AT-003`
+- requirement: `Completed closeout keeps this owner bounded and governance-complete instead of relying on the merge alone.`
+- evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/milestones.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`

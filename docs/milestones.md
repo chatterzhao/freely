@@ -64,13 +64,13 @@ routing_policy:
 2. `I-20260405-2136-A`
 - title: Runtime blocked intake and continuity truth governance
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md`
-- next_action: Use this owner as the canonical IBM handoff for blocked supervision truth when prompt assembly advances but intake claim / continuity materialization does not. The first implementation lane must stay limited to blocked-state writeback and status observability.
-- revisit_trigger: Re-open only if canonical `develop` proves the blocked supervision family collapses cleanly into an existing owner, or if the same field evidence disappears without requiring a dedicated blocked-truth lifecycle.
+- next_action: Closed on canonical `develop` through guarded merge `fd1907b`. Keep this owner as the bounded contract for prompt-visible blocked supervision truth; future reopen only if canonical runtime again leaves intake stuck without blocked writeback or continuity handoff.
+- revisit_trigger: Re-open only if canonical `develop` regresses the blocked supervision truth surface, or if a future owner needs to split a new lifecycle out of the reused delegated-continuation implementation.
 
 3. `I-20260405-1615-A`
 - title: Feature-owned test-pre-merge family promotion model governance
