@@ -93,5 +93,5 @@ Issue front matter 还应显式绑定：
   - environment type: `protected verification worktree`
   - failure handling: 验收失败后回到 feature worktree / 新 feature worktree 修复
   - route semantics:
-    - `test-pre-merge-*`: 主线前临时验证，只做预检运行测试 / 预测试 merge，不直接并入 `develop`
+    - `test-pre-merge-*`: 主线前临时验证，承担预检运行测试 / 预测试 merge / develop-bound canonical promote；若失败则回到 dedicated writable worktree 修复
     - `develop`: 已进入主线后的 completion verification，不承担主线前预测试

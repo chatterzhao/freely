@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TEST_TMP="$(mktemp -d /tmp/freely-test-lane.XXXXXX)"
+trap 'rm -rf "$TEST_TMP"' EXIT
+
+REPO="$TEST_TMP/repo"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+
+cp "$ROOT_DIR/bin/test-lane" "$REPO/bin/test-lane"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/test-lane" "$REPO/docs/system/workspace/scripts/quality/test-lane"
+chmod +x "$REPO/bin/test-lane" "$REPO/docs/system/workspace/scripts/quality/test-lane"
+
+run_case() {
+  local name="$1"
+  local expected_rc="$2"
+  shift 2
+
+  local out_file="$TEST_TMP/stdout"
+  local err_file="$TEST_TMP/stderr"
+  local rc=0
+
+  if "$@" >"$out_file" 2>"$err_file"; then
+    rc=0
+  else
+    rc=$?
+  fi
+
+  if [[ "$rc" -ne "$expected_rc" ]]; then
+    echo "[FAIL] $name (expected rc=$expected_rc, got rc=$rc)" >&2
+    echo "stdout:" >&2
+    sed -n '1,120p' "$out_file" >&2
+    echo "stderr:" >&2
+    sed -n '1,120p' "$err_file" >&2
+    exit 1
+  fi
+
+  echo "[PASS] $name"
+}
+
+[[ -x "$ROOT_DIR/bin/test-lane" ]] || {
+  echo "[FAIL] repo wrapper bin/test-lane must be executable" >&2
+  exit 1
+}
+
+[[ -x "$ROOT_DIR/bin/test-test-lane" ]] || {
+  echo "[FAIL] repo wrapper bin/test-test-lane must be executable" >&2
+  exit 1
+}
+
+git checkout -q -b feature/demo
+run_case "feature-local allowed on feature branch" 0 ./bin/test-lane feature-local -- bash -lc 'printf "%s" "$(git rev-parse --abbrev-ref HEAD)"'
+./bin/test-lane feature-local -- bash -lc 'printf "%s" "$(git rev-parse --abbrev-ref HEAD)"' >"$TEST_TMP/feature.out" 2>"$TEST_TMP/feature.err"
+grep -q '^feature/demo$' "$TEST_TMP/feature.out"
+grep -q 'lane=feature-local branch=feature/demo' "$TEST_TMP/feature.err"
+
+run_case "premerge-integration blocked on feature branch" 1 ./bin/test-lane premerge-integration -- true
+grep -q "only runs on test-pre-merge-\\*" "$TEST_TMP/stderr"
+
+run_case "post-merge-followthrough blocked on feature branch" 1 ./bin/test-lane post-merge-followthrough -- true
+grep -q "only runs on protected target branches" "$TEST_TMP/stderr"
+
+git checkout -q develop
+run_case "feature-local blocked on develop" 1 ./bin/test-lane feature-local -- true
+grep -q "requires a writable dedicated feature/release/hotfix/premerge worktree" "$TEST_TMP/stderr"
+
+run_case "post-merge-followthrough allowed on develop" 0 ./bin/test-lane post-merge-followthrough -- bash -lc 'exit 0'
+
+git checkout -q -b test-pre-merge-20260405-demo
+run_case "premerge-integration allowed on test-pre-merge batch" 0 ./bin/test-lane premerge-integration -- bash -lc 'exit 0'
+run_case "post-merge-followthrough allowed on test-pre-merge batch" 0 ./bin/test-lane post-merge-followthrough -- bash -lc 'exit 0'
+run_case "feature-local blocked on test-pre-merge batch" 1 ./bin/test-lane feature-local -- true
+
+git checkout -q develop
+git checkout -q -b release/demo
+run_case "feature-local allows non-protected writable branches" 0 ./bin/test-lane feature-local -- bash -lc 'exit 0'
+
+git checkout -q develop
+git checkout -q -b hotfix/demo
+run_case "feature-local allows writable hotfix branches" 0 ./bin/test-lane feature-local -- bash -lc 'exit 0'
+
+git checkout -q develop
+git checkout -q -b feature/premerge-demo
+run_case "feature-local allows writable premerge branches" 0 ./bin/test-lane feature-local -- bash -lc 'exit 0'
+
+git checkout -q develop
+git checkout -q -b chore/demo
+run_case "feature-local blocks ad hoc writable branches" 1 ./bin/test-lane feature-local -- true
+grep -q "only runs on dedicated feature/release/hotfix/premerge branches" "$TEST_TMP/stderr"
+
+run_case "missing separator is rejected" 1 ./bin/test-lane feature-local true
+grep -q "missing '--' separator" "$TEST_TMP/stderr"
+
+run_case "unsupported lane is rejected" 1 ./bin/test-lane bad-lane -- true
+grep -q "unsupported lane 'bad-lane'" "$TEST_TMP/stderr"
+
+DETACHED_SHA="$(git rev-parse HEAD)"
+git checkout -q --detach "$DETACHED_SHA"
+run_case "detached HEAD is rejected" 1 ./bin/test-lane feature-local -- true
+grep -q "detached HEAD is not a valid testing lane context" "$TEST_TMP/stderr"
+
+git checkout -q develop
+git checkout -q feature/demo
+run_case "command exit code is preserved" 7 ./bin/test-lane feature-local -- bash -lc 'exit 7'
+
+echo "[PASS] test-lane enforces lane routing and preserves command execution"

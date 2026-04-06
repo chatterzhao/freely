@@ -45,7 +45,7 @@
   - 若其中某类不适用，已显式写明理由与替代证据
 - `post-merge acceptance` 已写明目标环境是 `develop` 还是某个 `test-pre-merge-*` 批次
 - `post-merge acceptance` 已写明：在 protected branch worktree 中只做验证，不直接修实现
-- 若目标环境是 `test-pre-merge-*`，语义已写明这是主线前临时验证批次，完成后走 replay 来源 feature + retire batch，而不是提升该批次本身
+- 若目标环境是 `test-pre-merge-*`，语义已写明这是主线前临时验证批次，完成后由当前权威批次进入 `develop` 并 retire 该批次，而不是绕回来源 `feature/*` 保留第二条正常路径
 - 若目标环境是 `develop`，语义已写明这是主线后的 completion verification，而不是在 `develop` 上先预测试
 - issue-bound brainstorm 的未决问题已不再阻断 dev
 - implementation 所需文档引用齐备

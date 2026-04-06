@@ -49,11 +49,13 @@ EOF
 # Protected Branch Break-Glass Receipts
 
 - audit_effective_date: `2099-01-01`
+- source_policy_effective_date: `2099-01-01`
 EOF
   cat > "$repo/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
 # Protected Branch Merge Receipt Backfills
 
 - audit_effective_date: `2099-01-01`
+- source_policy_effective_date: `2099-01-01`
 EOF
   cat > "$repo/docs/system/workspace/scripts/README.md" <<'EOF'
 # Scripts
@@ -214,19 +216,19 @@ git config user.email tester@example.com
 echo base > README.md
 git add .
 git commit -q -m "init"
-git checkout -q -b feature/receipt
+git checkout -q -b test-pre-merge-20260402-receipt
 echo receipt > RECEIPT.txt
 git add RECEIPT.txt
 git commit -q -m "receipt feature"
 git checkout -q develop
 git merge --no-ff -m "$(cat <<'EOF'
-Merge branch 'feature/receipt' into develop
+Merge branch 'test-pre-merge-20260402-receipt' into develop
 
 Freely-Merge-Path: merge-guarded
 Freely-Bypass-Mode: forbidden
-Freely-Source-Branch: feature/receipt
+Freely-Source-Branch: test-pre-merge-20260402-receipt
 EOF
-)" feature/receipt >/dev/null
+)" test-pre-merge-20260402-receipt >/dev/null
 
 if ! ./bin/governance-check >"$TMP_DIR/good.out" 2>&1; then
   cat "$TMP_DIR/good.out" >&2
@@ -243,24 +245,24 @@ git config user.email tester@example.com
 echo base > README.md
 git add .
 git commit -q -m "init"
-git checkout -q -b feature/breakglass
+git checkout -q -b test-pre-merge-20260402-breakglass
 echo breakglass > BREAKGLASS.txt
 git add BREAKGLASS.txt
 git commit -q -m "breakglass feature"
 git checkout -q develop
 git merge --no-ff -m "$(cat <<'EOF'
-Merge branch 'feature/breakglass' into develop
+Merge branch 'test-pre-merge-20260402-breakglass' into develop
 
 Freely-Merge-Path: merge-guarded-break-glass
 Freely-Bypass-Mode: break_glass
-Freely-Source-Branch: feature/breakglass
+Freely-Source-Branch: test-pre-merge-20260402-breakglass
 Freely-Break-Glass-Reason: verified_false_negative
 Freely-Blocked-Gate: pre-merge-commit
 Freely-Operation-Scope: merge_completion_only
 Freely-Evidence-Ref: docs/epics/sample/code-reviews/r-breakglass.md
 Freely-Follow-On-Issue: I-20260402-0020-A
 EOF
-)" feature/breakglass >/dev/null
+)" test-pre-merge-20260402-breakglass >/dev/null
 
 BREAK_COMMIT="$(git rev-parse HEAD)"
 cat > "$REPO_BREAK/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<EOF
@@ -271,7 +273,7 @@ cat > "$REPO_BREAK/docs/system/workspace/hooks/protected-branch-breakglass-recei
 ## Receipt: $BREAK_COMMIT
 
 - target_branch: \`develop\`
-- source_branch: \`feature/breakglass\`
+- source_branch: \`test-pre-merge-20260402-breakglass\`
 - receipt_mode: \`trailer_parity\`
 - bypass_mode: \`break_glass\`
 - break_glass_reason: \`verified_false_negative\`
@@ -297,12 +299,12 @@ git config user.email tester@example.com
 echo base > README.md
 git add .
 git commit -q -m "init"
-git checkout -q -b feature/legacy
+git checkout -q -b test-pre-merge-20260402-legacy
 echo legacy > LEGACY.txt
 git add LEGACY.txt
 git commit -q -m "legacy feature"
 git checkout -q develop
-git merge --no-ff --no-edit feature/legacy >/dev/null
+git merge --no-ff --no-edit test-pre-merge-20260402-legacy >/dev/null
 
 LEGACY_COMMIT="$(git rev-parse HEAD)"
 cat > "$REPO_LEGACY/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<EOF
@@ -313,7 +315,7 @@ cat > "$REPO_LEGACY/docs/system/workspace/hooks/protected-branch-breakglass-rece
 ## Receipt: $LEGACY_COMMIT
 
 - target_branch: \`develop\`
-- source_branch: \`feature/legacy\`
+- source_branch: \`test-pre-merge-20260402-legacy\`
 - receipt_mode: \`legacy_backfill\`
 - bypass_mode: \`break_glass\`
 - break_glass_reason: \`tooling_unavailable\`
@@ -324,19 +326,19 @@ cat > "$REPO_LEGACY/docs/system/workspace/hooks/protected-branch-breakglass-rece
   - \`docs/epics/sample/issues/sample.md\`
 EOF
 
-git checkout -q -b feature/legacy-head-receipt
+git checkout -q -b test-pre-merge-20260402-legacy-head-receipt
 echo head > HEAD.txt
 git add HEAD.txt
 git commit -q -m "head receipt feature"
 git checkout -q develop
 git merge --no-ff -m "$(cat <<'EOF'
-Merge branch 'feature/legacy-head-receipt' into develop
+Merge branch 'test-pre-merge-20260402-legacy-head-receipt' into develop
 
 Freely-Merge-Path: merge-guarded
 Freely-Bypass-Mode: forbidden
-Freely-Source-Branch: feature/legacy-head-receipt
+Freely-Source-Branch: test-pre-merge-20260402-legacy-head-receipt
 EOF
-)" feature/legacy-head-receipt >/dev/null
+)" test-pre-merge-20260402-legacy-head-receipt >/dev/null
 
 if ! ./bin/governance-check >"$TMP_DIR/legacy.out" 2>&1; then
   cat "$TMP_DIR/legacy.out" >&2
@@ -353,24 +355,24 @@ git config user.email tester@example.com
 echo base > README.md
 git add .
 git commit -q -m "init"
-git checkout -q -b feature/mismatch
+git checkout -q -b test-pre-merge-20260402-mismatch
 echo mismatch > MISMATCH.txt
 git add MISMATCH.txt
 git commit -q -m "mismatch feature"
 git checkout -q develop
 git merge --no-ff -m "$(cat <<'EOF'
-Merge branch 'feature/mismatch' into develop
+Merge branch 'test-pre-merge-20260402-mismatch' into develop
 
 Freely-Merge-Path: merge-guarded-break-glass
 Freely-Bypass-Mode: break_glass
-Freely-Source-Branch: feature/mismatch
+Freely-Source-Branch: test-pre-merge-20260402-mismatch
 Freely-Break-Glass-Reason: verified_false_negative
 Freely-Blocked-Gate: pre-merge-commit
 Freely-Operation-Scope: merge_completion_only
 Freely-Evidence-Ref: docs/epics/sample/code-reviews/r-breakglass.md
 Freely-Follow-On-Issue: I-20260402-0020-A
 EOF
-)" feature/mismatch >/dev/null
+)" test-pre-merge-20260402-mismatch >/dev/null
 
 MISMATCH_COMMIT="$(git rev-parse HEAD)"
 cat > "$REPO_MISMATCH/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<EOF
@@ -381,7 +383,7 @@ cat > "$REPO_MISMATCH/docs/system/workspace/hooks/protected-branch-breakglass-re
 ## Receipt: $MISMATCH_COMMIT
 
 - target_branch: \`develop\`
-- source_branch: \`feature/not-the-same-branch\`
+- source_branch: \`test-pre-merge-20260402-not-the-same-branch\`
 - receipt_mode: \`trailer_parity\`
 - bypass_mode: \`break_glass\`
 - break_glass_reason: \`verified_false_negative\`
@@ -408,24 +410,24 @@ git config user.email tester@example.com
 echo base > README.md
 git add .
 git commit -q -m "init"
-git checkout -q -b feature/backfill-misuse
+git checkout -q -b test-pre-merge-20260402-backfill-misuse
 echo misuse > MISUSE.txt
 git add MISUSE.txt
 git commit -q -m "misuse feature"
 git checkout -q develop
 git merge --no-ff -m "$(cat <<'EOF'
-Merge branch 'feature/backfill-misuse' into develop
+Merge branch 'test-pre-merge-20260402-backfill-misuse' into develop
 
 Freely-Merge-Path: merge-guarded-break-glass
 Freely-Bypass-Mode: break_glass
-Freely-Source-Branch: feature/backfill-misuse
+Freely-Source-Branch: test-pre-merge-20260402-backfill-misuse
 Freely-Break-Glass-Reason: tooling_unavailable
 Freely-Blocked-Gate: pre-commit
 Freely-Operation-Scope: merge_completion_only
 Freely-Evidence-Ref: docs/epics/sample/issues/sample.md
 Freely-Follow-On-Issue: I-20260402-0020-A
 EOF
-)" feature/backfill-misuse >/dev/null
+)" test-pre-merge-20260402-backfill-misuse >/dev/null
 
 BACKFILL_MISUSE_COMMIT="$(git rev-parse HEAD)"
 cat > "$REPO_BACKFILL_MISUSE/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<EOF
@@ -436,7 +438,7 @@ cat > "$REPO_BACKFILL_MISUSE/docs/system/workspace/hooks/protected-branch-breakg
 ## Receipt: $BACKFILL_MISUSE_COMMIT
 
 - target_branch: \`develop\`
-- source_branch: \`feature/backfill-misuse\`
+- source_branch: \`test-pre-merge-20260402-backfill-misuse\`
 - receipt_mode: \`legacy_backfill\`
 - bypass_mode: \`break_glass\`
 - break_glass_reason: \`tooling_unavailable\`
@@ -453,5 +455,44 @@ if ./bin/governance-check >"$TMP_DIR/backfill-misuse.out" 2>&1; then
   exit 1
 fi
 grep -q "receipt_mode is legacy_backfill" "$TMP_DIR/backfill-misuse.out"
+
+REPO_INVALID_SOURCE="$TMP_DIR/repo-invalid-source"
+make_repo "$REPO_INVALID_SOURCE"
+cd "$REPO_INVALID_SOURCE"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/invalid-direct
+echo invalid > INVALID.txt
+git add INVALID.txt
+git commit -q -m "invalid direct feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/invalid-direct' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/invalid-direct
+EOF
+)" feature/invalid-direct >/dev/null
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after invalid direct merge"
+cat > "$REPO_INVALID_SOURCE/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2026-04-02`
+- source_policy_effective_date: `2026-04-02`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/invalid-source.out" 2>&1; then
+  echo "[FAIL] governance-check should reject develop receipts whose source branch is not in the test-pre-merge family" >&2
+  cat "$TMP_DIR/invalid-source.out" >&2
+  exit 1
+fi
+grep -q "invalid Freely-Source-Branch 'feature/invalid-direct'" "$TMP_DIR/invalid-source.out"
 
 echo "[PASS] governance-check audits protected-branch merge receipts and break-glass trailers"

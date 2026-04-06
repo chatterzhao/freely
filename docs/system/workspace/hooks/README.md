@@ -70,6 +70,6 @@
 - 预期结果：`.githooks`
 - 若不是 `.githooks`，立即执行：`git config core.hooksPath .githooks`
 - `test-pre-merge-*` 依赖这些 hook 才能落实“只允许 merge 装配、禁止普通提交与 push、测试完即删”的语义
-- `pre-merge-commit` 会在本地把 feature replay 到 `develop` 时运行 develop-bound governance materialization gate，检查本次 merge 涉及的 candidate / milestone / IBM issue 链是否断裂
+- `pre-merge-commit` 会在本地把当前权威 `test-pre-merge-*` 批次并入 `develop` 时运行 develop-bound governance materialization gate，检查本次 merge 涉及的 candidate / milestone / IBM issue 链是否断裂
 - merge conflict completion 不能默认回退到裸 `git commit`；受保护分支上的 completion 应优先走 `./bin/merge-guarded complete ...`
 - `merge-guarded` 是 protected-branch merge receipt 的 canonical 正常入口；如果必须进入 break-glass，也要留下可审计 receipt，供后续 `governance-check` 识别

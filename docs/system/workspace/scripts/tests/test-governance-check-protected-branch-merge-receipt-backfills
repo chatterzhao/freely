@@ -49,11 +49,13 @@ EOF
 # Protected Branch Break-Glass Receipts
 
 - audit_effective_date: `2099-01-01`
+- source_policy_effective_date: `2099-01-01`
 EOF
   cat > "$repo/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
 # Protected Branch Merge Receipt Backfills
 
 - audit_effective_date: `2026-04-04`
+- source_policy_effective_date: `2026-04-04`
 EOF
   cat > "$repo/docs/system/workspace/scripts/README.md" <<'EOF'
 # Scripts
@@ -223,12 +225,12 @@ git config user.email tester@example.com
 echo base > README.md
 git add .
 git commit -q -m "init"
-git checkout -q -b feature/gap
+git checkout -q -b test-pre-merge-20260404-gap
 echo gap > GAP.txt
 git add GAP.txt
 git commit -q -m "gap feature"
 git checkout -q develop
-git merge --no-ff --no-edit feature/gap >/dev/null
+git merge --no-ff --no-edit test-pre-merge-20260404-gap >/dev/null
 GOOD_MERGE="$(git rev-parse HEAD)"
 echo tail > TAIL.txt
 git add TAIL.txt
@@ -241,7 +243,7 @@ cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<
 ## Receipt Gap: $GOOD_MERGE
 
 - target_branch: \`develop\`
-- source_branch: \`feature/gap\`
+- source_branch: \`test-pre-merge-20260404-gap\`
 - canonical_merge_path: \`merge-guarded\`
 - canonical_bypass_mode: \`forbidden\`
 - follow_on_owner: \`I-20260404-0640-A\`
@@ -275,15 +277,16 @@ git commit -q -m "mainline change"
 git checkout -q feature/owner
 git merge --no-ff --no-edit develop >/dev/null
 FEATURE_TARGET_MERGE="$(git rev-parse HEAD)"
+git checkout -q -b test-pre-merge-20260404-owner
 git checkout -q develop
 git merge --no-ff -m "$(cat <<'EOF'
-Merge branch 'feature/owner' into develop
+Merge branch 'test-pre-merge-20260404-owner' into develop
 
 Freely-Merge-Path: merge-guarded
 Freely-Bypass-Mode: forbidden
-Freely-Source-Branch: feature/owner
+Freely-Source-Branch: test-pre-merge-20260404-owner
 EOF
-)" feature/owner >/dev/null
+)" test-pre-merge-20260404-owner >/dev/null
 echo tail > TAIL.txt
 git add TAIL.txt
 git commit -q -m "tail after feature-target ancestry gap"
@@ -318,19 +321,19 @@ git config user.email tester@example.com
 echo base > README.md
 git add .
 git commit -q -m "init"
-git checkout -q -b feature/receipt
+git checkout -q -b test-pre-merge-20260404-receipt
 echo receipt > RECEIPT.txt
 git add RECEIPT.txt
 git commit -q -m "receipt feature"
 git checkout -q develop
 git merge --no-ff -m "$(cat <<'EOF'
-Merge branch 'feature/receipt' into develop
+Merge branch 'test-pre-merge-20260404-receipt' into develop
 
 Freely-Merge-Path: merge-guarded
 Freely-Bypass-Mode: forbidden
-Freely-Source-Branch: feature/receipt
+Freely-Source-Branch: test-pre-merge-20260404-receipt
 EOF
-)" feature/receipt >/dev/null
+)" test-pre-merge-20260404-receipt >/dev/null
 TRAILER_MERGE="$(git rev-parse HEAD)"
 echo tail > TAIL.txt
 git add TAIL.txt
@@ -343,7 +346,7 @@ cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<
 ## Receipt Gap: $TRAILER_MERGE
 
 - target_branch: \`develop\`
-- source_branch: \`feature/receipt\`
+- source_branch: \`test-pre-merge-20260404-receipt\`
 - canonical_merge_path: \`merge-guarded\`
 - canonical_bypass_mode: \`forbidden\`
 - follow_on_owner: \`I-20260404-0640-A\`
@@ -377,15 +380,16 @@ git add UPSTREAM.txt
 git commit -q -m "develop advance"
 git checkout -q feature/subject-target
 git merge --no-ff --no-edit develop >/dev/null
+git checkout -q -b test-pre-merge-20260404-subject-target
 git checkout -q develop
 git merge --no-ff -m "$(cat <<'EOF'
-Merge branch 'feature/subject-target' into develop
+Merge branch 'test-pre-merge-20260404-subject-target' into develop
 
 Freely-Merge-Path: merge-guarded
 Freely-Bypass-Mode: forbidden
-Freely-Source-Branch: feature/subject-target
+Freely-Source-Branch: test-pre-merge-20260404-subject-target
 EOF
-)" feature/subject-target >/dev/null
+)" test-pre-merge-20260404-subject-target >/dev/null
 echo tail > TAIL.txt
 git add TAIL.txt
 git commit -q -m "tail after ancestry merge"
@@ -396,5 +400,45 @@ if ! ./bin/governance-check >"$TMP_DIR/ancestry.out" 2>&1; then
   exit 1
 fi
 grep -q "Governance check passed" "$TMP_DIR/ancestry.out"
+
+REPO_INVALID_BACKFILL="$TMP_DIR/repo-invalid-backfill"
+make_repo "$REPO_INVALID_BACKFILL"
+cd "$REPO_INVALID_BACKFILL"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/invalid-gap
+echo invalid > INVALID.txt
+git add INVALID.txt
+git commit -q -m "invalid gap feature"
+git checkout -q develop
+git merge --no-ff --no-edit feature/invalid-gap >/dev/null
+INVALID_GAP_MERGE="$(git rev-parse HEAD)"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $INVALID_GAP_MERGE
+
+- target_branch: \`develop\`
+- source_branch: \`feature/invalid-gap\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/invalid-backfill.out" 2>&1; then
+  echo "[FAIL] governance-check should reject develop receipt-gap backfills whose source branch is not in the test-pre-merge family" >&2
+  cat "$TMP_DIR/invalid-backfill.out" >&2
+  exit 1
+fi
+grep -q "has invalid source_branch 'feature/invalid-gap' for target 'develop'" "$TMP_DIR/invalid-backfill.out"
 
 echo "[PASS] governance-check audits ordinary protected-branch merge receipt backfills"

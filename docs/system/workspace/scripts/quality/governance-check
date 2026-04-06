@@ -286,6 +286,9 @@ audit_current_protected_branch_merge_receipt() {
     return 0
   }
   [[ -n "$source_branch" ]] || fail "protected branch '$branch' HEAD merge commit is missing Freely-Source-Branch receipt"
+  if protected_branch_source_policy_active_for_head && ! protected_branch_merge_source_allowed "$branch" "$source_branch"; then
+    fail "protected branch '$branch' HEAD merge commit has invalid Freely-Source-Branch '$source_branch'"
+  fi
 
   case "$merge_path" in
     merge-guarded|merge-guarded-complete|merge-guarded-break-glass) ;;
@@ -320,6 +323,39 @@ audit_current_protected_branch_merge_receipt() {
     || fail "protected branch '$branch' HEAD break-glass merge must include at least one Freely-Evidence-Ref"
 }
 
+protected_branch_merge_source_allowed() {
+  local target="$1" source="$2"
+  case "$target" in
+    develop)
+      [[ "$source" == test-pre-merge-* || "$source" == hotfix/* ]]
+      ;;
+    main)
+      [[ "$source" == release/* || "$source" == hotfix/* ]]
+      ;;
+    test-pre-merge-*)
+      [[ "$source" == feature/* || "$source" == hotfix/* || "$source" == feature/premerge-* ]]
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+protected_branch_source_policy_effective_date() {
+  local receipts_path="docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md"
+  [[ -f "$receipts_path" ]] || return 0
+  sed -n 's/^- source_policy_effective_date:[[:space:]]*`\\{0,1\\}\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\).*/\\1/p' "$receipts_path" | head -n 1
+}
+
+protected_branch_source_policy_active_for_head() {
+  local effective_date head_date
+  effective_date="$(protected_branch_source_policy_effective_date)"
+  [[ -n "$effective_date" ]] || return 1
+  head_date="$(git log -1 --format=%cs HEAD 2>/dev/null || true)"
+  [[ -n "$head_date" ]] || return 1
+  [[ "$head_date" > "$effective_date" || "$head_date" == "$effective_date" ]]
+}
+
 audit_recorded_protected_branch_breakglass_receipts() {
   python3 - <<'PY'
 import pathlib
@@ -339,6 +375,12 @@ if not effective_match:
 
 effective_date = effective_match.group(1)
 effective_since = f"{effective_date} 00:00:00"
+source_policy_match = re.search(r"^- source_policy_effective_date:\s*`?([0-9]{4}-[0-9]{2}-[0-9]{2})`?\s*$", text, re.MULTILINE)
+source_policy_since = (
+    f"{source_policy_match.group(1)} 00:00:00"
+    if source_policy_match
+    else None
+)
 starts = list(re.finditer(r"^##\s+Receipt:\s+([0-9a-f]{7,40})\s*$", text, re.MULTILINE))
 
 allowed_reasons = {"tooling_unavailable", "verified_false_negative"}
@@ -348,6 +390,19 @@ allowed_receipt_modes = {"trailer_parity", "legacy_backfill"}
 receipts = {}
 errors = []
 observed_receipts = set()
+
+def merge_source_allowed(target_branch: str, source_branch: str) -> bool:
+    if target_branch == "develop":
+        return source_branch.startswith("test-pre-merge-") or source_branch.startswith("hotfix/")
+    if target_branch == "main":
+        return source_branch.startswith("release/") or source_branch.startswith("hotfix/")
+    if target_branch.startswith("test-pre-merge-"):
+        return (
+            source_branch.startswith("feature/")
+            or source_branch.startswith("hotfix/")
+            or source_branch.startswith("feature/premerge-")
+        )
+    return True
 
 for idx, match in enumerate(starts):
     commit = match.group(1)
@@ -428,6 +483,18 @@ for ref in extra_refs:
         branches.append(ref)
 
 for branch in branches:
+    source_policy_commits = set()
+    if source_policy_since:
+        try:
+            source_policy_commits = set(
+                subprocess.check_output(
+                    ["git", "log", branch, "--merges", "--since", source_policy_since, "--format=%H"],
+                    cwd=root,
+                    text=True,
+                ).splitlines()
+            )
+        except subprocess.CalledProcessError:
+            source_policy_commits = set()
     try:
         merge_output = subprocess.check_output(
             ["git", "log", branch, "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
@@ -449,6 +516,11 @@ for branch in branches:
             receipt = receipts.get(commit)
             if receipt and receipt.get("target_branch") == branch:
                 observed_receipts.add(commit)
+                if commit in source_policy_commits and not merge_source_allowed(branch, receipt.get("source_branch", "")):
+                    errors.append(
+                        f"[FAIL] {receipts_path.as_posix()} receipt {commit} has invalid source_branch '{receipt.get('source_branch')}' for target '{branch}'."
+                    )
+                trailer_source_branch = ""
                 if receipt.get("receipt_mode") == "legacy_backfill":
                     errors.append(
                         f"[FAIL] protected branch break-glass merge {commit} on {branch} is trailer-bearing but receipt_mode is legacy_backfill."
@@ -465,6 +537,11 @@ for branch in branches:
                 trailer_scope = grab_trailer("Freely-Operation-Scope")
                 trailer_follow_on_issue = grab_trailer("Freely-Follow-On-Issue")
                 trailer_evidence_refs = re.findall(r"^Freely-Evidence-Ref:\s*(.+?)\s*$", body, re.MULTILINE)
+
+                if commit in source_policy_commits and trailer_source_branch and not merge_source_allowed(branch, trailer_source_branch):
+                    errors.append(
+                        f"[FAIL] protected branch break-glass merge {commit} on {branch} has invalid Freely-Source-Branch '{trailer_source_branch}'."
+                    )
 
                 comparisons = [
                     ("source_branch", trailer_source_branch, receipt.get("source_branch", "")),
@@ -533,11 +610,30 @@ if not effective_match:
 
 effective_date = effective_match.group(1)
 effective_since = f"{effective_date} 00:00:00"
+source_policy_match = re.search(r"^- source_policy_effective_date:\s*`?([0-9]{4}-[0-9]{2}-[0-9]{2})`?\s*$", text, re.MULTILINE)
+source_policy_since = (
+    f"{source_policy_match.group(1)} 00:00:00"
+    if source_policy_match
+    else None
+)
 starts = list(re.finditer(r"^##\s+Receipt Gap:\s+([0-9a-f]{7,40})\s*$", text, re.MULTILINE))
 
 entries = {}
 errors = []
 observed = set()
+
+def merge_source_allowed(target_branch: str, source_branch: str) -> bool:
+    if target_branch == "develop":
+        return source_branch.startswith("test-pre-merge-") or source_branch.startswith("hotfix/")
+    if target_branch == "main":
+        return source_branch.startswith("release/") or source_branch.startswith("hotfix/")
+    if target_branch.startswith("test-pre-merge-"):
+        return (
+            source_branch.startswith("feature/")
+            or source_branch.startswith("hotfix/")
+            or source_branch.startswith("feature/premerge-")
+        )
+    return True
 
 for idx, match in enumerate(starts):
     commit = match.group(1)
@@ -611,6 +707,18 @@ for ref in extra_refs:
         branches.append(ref)
 
 for branch in branches:
+    source_policy_commits = set()
+    if source_policy_since:
+        try:
+            source_policy_commits = set(
+                subprocess.check_output(
+                    ["git", "log", branch, "--merges", "--since", source_policy_since, "--format=%H"],
+                    cwd=root,
+                    text=True,
+                ).splitlines()
+            )
+        except subprocess.CalledProcessError:
+            source_policy_commits = set()
     try:
         merge_output = subprocess.check_output(
             ["git", "log", branch, "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
@@ -636,12 +744,24 @@ for branch in branches:
         source_branch = source_branch_match.group(1).strip() if source_branch_match else ""
 
         if merge_path == "merge-guarded-break-glass":
-          continue
+            if commit in source_policy_commits and source_branch and not merge_source_allowed(branch, source_branch):
+                errors.append(
+                    f"[FAIL] protected branch merge {commit} on {branch} has invalid Freely-Source-Branch '{source_branch}'."
+                )
+            continue
 
         entry = entries.get(commit)
         if merge_path in {"merge-guarded", "merge-guarded-complete"}:
+            if commit in source_policy_commits and not merge_source_allowed(branch, source_branch):
+                errors.append(
+                    f"[FAIL] protected branch merge {commit} on {branch} has invalid Freely-Source-Branch '{source_branch}'."
+                )
             if entry:
                 observed.add(commit)
+                if commit in source_policy_commits and not merge_source_allowed(branch, entry.get("source_branch", "")):
+                    errors.append(
+                        f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid source_branch '{entry.get('source_branch')}' for target '{branch}'."
+                    )
                 errors.append(
                     f"[FAIL] protected branch merge {commit} on {branch} already has canonical trailers and must not declare a receipt-gap backfill in {receipts_path.as_posix()}."
                 )
@@ -653,6 +773,10 @@ for branch in branches:
                 continue
             if entry:
                 observed.add(commit)
+                if commit in source_policy_commits and not merge_source_allowed(branch, entry.get("source_branch", "")):
+                    errors.append(
+                        f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid source_branch '{entry.get('source_branch')}' for target '{branch}'."
+                    )
                 if not subject_match:
                     errors.append(
                         f"[FAIL] protected branch merge {commit} on {branch} is missing canonical trailers and has no parseable merge subject for backfill validation."
