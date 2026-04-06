@@ -41,6 +41,30 @@ Freely 当前进入 `cli first` 审计阶段，本轮在 dedicated feature workt
 
 最合理的方式是在同一预研条目下拆成多个 candidate，各自 materialize 成窄 owner。
 
+## 2026-04-06 canonical followthrough
+
+在 canonical `develop` 上重新回放 `C-20260405-2358-A` 的 CLI 之后，结论已经收窄，不再等同于最初的原始审计快照。
+
+### 已重放的命令
+
+- `./bin/freely sync-tooling --source-project /Users/zhaoyu/Downloads/code/my-freely/freely --project <fresh-git-project>`
+  - 结果：成功返回，但目标项目仍缺少 `.githooks`
+- `./bin/freely init --project <fresh-git-project> --intent ... --constitution ... --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
+  - 结果：在 fresh git project 上仍因缺失 `.githooks` 失败；手工复制 `.githooks` 后可成功初始化
+- `./bin/freely baseline-status --project <initialized-project>`
+  - 结果：`project:` 正确指向目标项目，不再漂移到 repo root
+- `./bin/freely status --project <initialized-project>`
+  - 结果：baseline 段与 live 段都指向目标项目，不再复现旧的 root 漂移
+- `./bin/freely ensure-interruption-dispatch --project <initialized-project>`
+  - 结果：当前通过 doc gate 显式失败，报缺失 `docs/PROJECT_INTENT.md` / `docs/CONSTITUTION.md` / `docs/LAWS.md` / `docs/pre-brainstorms/*`，没有再泄漏原始 `find: ... No such file or directory`
+
+### 收敛结论
+
+1. `baseline-status` / `status` 的 `--project` 漂移目前已不再复现，应视为已被后续 owner 吸收的子问题，而不是继续作为 candidate A 的主问题。
+2. `ensure-interruption-dispatch` 的“原始文件系统噪音”当前也不再复现；残留的是合理的 doc gate 阻断，不应和 bootstrap 缺口混为一谈。
+3. 当前仍稳定复现、且阻断 fresh-project CLI first bootstrap 的核心缺口是：`sync-tooling` 没有为后续 `init` materialize `.githooks`。
+4. 因此 `C-20260405-2358-A` 若继续推进，不应再以“status scoping + intake noise + bootstrap”打包 materialize，而应缩成 fresh-project hook/bootstrap owner，并把另外两项作为非回归守卫即可。
+
 ## 明确不做
 
 1. 不把本轮审计直接扩大成一次“全面 CLI 重构”。
