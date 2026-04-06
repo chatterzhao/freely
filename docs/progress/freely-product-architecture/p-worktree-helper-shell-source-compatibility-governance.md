@@ -3,7 +3,7 @@
 - issue_id: `I-20260405-2302-A`
 - issue_path: `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md`
 - title: `Worktree helper shell source compatibility governance`
-- phase_state: `in_dev`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260326-freely-product-architecture`
 - branch: `feature/worktree-helper-shell-source-compatibility-20260405-2302`
@@ -15,7 +15,7 @@
 ## Summary
 
 - Materialized a new narrow follow-on owner after reproducing that documented `wt-add` / `wt-enter` wrapper commands fail in default `zsh` before helper semantics run.
-- The lane is scoped to wrapper source-safety and wrapper-path regressions only.
+- Canonical `develop` now carries the bounded wrapper and helper-chain repair, plus focused regressions on the real `bin/` command path.
 
 ## Current Evidence
 
@@ -23,7 +23,11 @@
 - `zsh -lc 'source ./bin/wt-enter develop'`
 - `bash -lc 'source ./bin/wt-add -- README.md'`
 - `bash -lc 'source ./bin/wt-enter develop'`
+- `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-wt-wrapper-shell-source-compatibility`
+- `./bin/test-lane post-merge-followthrough -- bash docs/system/workspace/scripts/tests/test-worktree-entry-flow`
+- `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/code-reviews/20260405-worktree-helper-shell-source-compatibility-verification.md`
 
 ## Next Action
 
-- Implement the narrow wrapper fix and bind the regression suite to the documented `bin/` helper path.
+- Owner is complete on canonical `develop` merge `3e0c8b9`.
+- Retire the dedicated feature and `test-pre-merge-*` worktrees after this closeout writeback lands.

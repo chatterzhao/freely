@@ -2245,18 +2245,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md`
 - next_action: Keep this owner parked as the canonical IBM handoff for post-consent authorization/bootstrap semantics. Future work should open narrower follow-on owners for persisted state, per-tool repair/materialization cleanup, or adapter-specific drift rather than widening this architecture owner.
 
-3. `I-20260405-2302-A`
-- title: Worktree helper shell source compatibility governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md`
-- progress_path: `docs/progress/freely-product-architecture/p-worktree-helper-shell-source-compatibility-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-2302--worktree-helper-shell-source-compatibility/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-2302--worktree-helper-shell-source-compatibility/candidates.md`
-- next_action: Keep this owner narrowly scoped to `wt-add` / `wt-enter` source-safe wrapper behavior and wrapper-path regressions on the documented CLI commands. Do not widen into generic worktree helper redesign.
-- revisit_trigger: Revisit only if canonical `develop` shows the documented helper commands still require shell-specific operator workarounds, or if broader sourced wrapper families are proven to share the same broken contract.
-
 ### completed_issues
 
 1. `I-20260403-2041-A`
@@ -2273,6 +2261,21 @@ routing_policy:
   - `docs/progress/freely-product-architecture/p-worktree-tool-boundary-bootstrap-governance.md`
   - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260403-worktree-tool-boundary-bootstrap-verification.md`
   - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`
+
+2. `I-20260405-2302-A`
+- title: Worktree helper shell source compatibility governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-worktree-helper-shell-source-compatibility-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2302--worktree-helper-shell-source-compatibility/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2302--worktree-helper-shell-source-compatibility/candidates.md`
+- evidence:
+  - `develop` merge `3e0c8b9`
+  - `docs/progress/freely-product-architecture/p-worktree-helper-shell-source-compatibility-governance.md`
+  - `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/code-reviews/20260405-worktree-helper-shell-source-compatibility-verification.md`
+- completion_note: `Canonical develop now preserves the documented sourced worktree helper contract in default zsh and bash, while keeping protected-branch add blocking, existing-worktree re-entry, and dated sibling naming intact.`
   - `bash docs/system/workspace/scripts/tests/test-freely-init-codex-project-config-force`
   - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
   - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
