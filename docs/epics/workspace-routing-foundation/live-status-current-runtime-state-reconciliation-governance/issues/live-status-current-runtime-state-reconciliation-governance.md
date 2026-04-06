@@ -55,7 +55,13 @@ The contradiction came from reading current runtime PID truth and persisted `wor
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
 
+## Closure Evidence
+
+- `develop` 已包含 merge `2ebf39e Merge branch 'feature/fix-last-ai-state-down-20260328-0745' into develop`
+- canonical verification artifact 已存在：`docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/code-reviews/20260328-live-status-current-runtime-state-reconciliation-verification.md`
+- 原始 feature worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260328-0745-feature-fix-last-ai-state-down` 已退休，不再需要额外 salvage
+
 ## Next
 
-- Merge the narrow repair into `develop`.
-- Leave broader status-family evolution such as JSON/watch/scoring to separate lifecycles.
+- This lifecycle is closed on canonical `develop`.
+- Broader status-family evolution such as JSON/watch/scoring remains a separate lifecycle.
