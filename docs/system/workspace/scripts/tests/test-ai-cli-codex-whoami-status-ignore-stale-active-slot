@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ai-cli-stale-active-slot.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+HOME_DIR="$TMP_DIR/home"
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$HOME_DIR/.codex" \
+  "$HOME_DIR/.ai-auth/.cache" \
+  "$HOME_DIR/.ai-auth/codex-stale-account-slot" \
+  "$HOME_DIR/.ai-auth/codex-stale-apikey-slot" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+  "$PROJECT/docs/system/workspace/scripts/runtime"
+
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+
+cat >"$HOME_DIR/.codex/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-live"}
+EOF
+
+cat >"$HOME_DIR/.codex/config.toml" <<'EOF'
+[projects."/tmp/demo"]
+trust_level = "trusted"
+EOF
+
+cat >"$HOME_DIR/.ai-auth/.codex-current-slot" <<'EOF'
+stale-account-slot
+EOF
+
+cat >"$HOME_DIR/.codex/active-slot" <<'EOF'
+stale-apikey-slot
+EOF
+
+cat >"$HOME_DIR/.ai-auth/codex-stale-account-slot/auth.json" <<'EOF'
+{"tokens":{"id_token":"header.eyJlbWFpbCI6ICJzdGFsZUBleGFtcGxlLmNvbSJ9.signature"}}
+EOF
+
+cat >"$HOME_DIR/.ai-auth/codex-stale-account-slot/manifest.json" <<'EOF'
+{"manifest_version":"codex-slot-v1","tool":"codex","slot_id":"stale-account-slot","slot_kind":"account","auth_email":"stale@example.com"}
+EOF
+
+cat >"$HOME_DIR/.ai-auth/codex-stale-apikey-slot/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-other"}
+EOF
+
+cat >"$HOME_DIR/.ai-auth/codex-stale-apikey-slot/manifest.json" <<'EOF'
+{"manifest_version":"codex-slot-v1","tool":"codex","slot_id":"stale-apikey-slot","slot_kind":"apikey","provider_id":"custom"}
+EOF
+
+cat >"$PROJECT/.freely/run/codex-availability-cache.tsv" <<EOF
+slot	status	auth_email	reset_at	http_code	detail	refreshed_at
+stale-apikey-slot	usable		0	200	ok	$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+EOF
+
+HOME="$HOME_DIR" \
+PROJECT_ROOT="$PROJECT" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex >"$TMP_DIR/whoami.json"
+
+HOME="$HOME_DIR" \
+PROJECT_ROOT="$PROJECT" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json status codex >"$TMP_DIR/status.json"
+
+HOME="$HOME_DIR" \
+PROJECT_ROOT="$PROJECT" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json --dry-run switch codex >"$TMP_DIR/dry-run.json"
+
+python3 - <<'PY' "$TMP_DIR/whoami.json" "$TMP_DIR/status.json" "$TMP_DIR/dry-run.json"
+import json
+import pathlib
+import sys
+
+whoami = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+status = json.loads(pathlib.Path(sys.argv[2]).read_text(encoding="utf-8"))
+dry_run = json.loads(pathlib.Path(sys.argv[3]).read_text(encoding="utf-8"))
+
+assert whoami["slot"] is None, whoami
+assert whoami["slot_kind"] == "apikey", whoami
+assert whoami["provider_id"] is None, whoami
+
+assert status["slot"] is None, status
+assert status["slot_kind"] == "apikey", status
+assert status["provider_id"] is None, status
+assert status["availability_cache"]["present"] is True, status
+
+assert dry_run["current_slot"] is None, dry_run
+assert dry_run["saved_apikey_slot_count"] == 1, dry_run
+assert dry_run["saved_account_slot_count"] == 1, dry_run
+PY
+
+echo "[PASS] ai whoami/status/dry-run ignore stale codex active-slot metadata when the live apikey auth does not match any saved slot"
