@@ -326,6 +326,10 @@ do_completion() {
 
 main() {
   local subcommand="${1:-}"
+  if [[ "$subcommand" == "--help" || "$subcommand" == "-h" ]]; then
+    usage
+    exit 0
+  fi
   if [[ -z "$subcommand" ]]; then
     usage
     exit 1
@@ -333,6 +337,10 @@ main() {
 
   if [[ "$subcommand" == "complete" ]]; then
     shift
+    if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+      usage
+      exit 0
+    fi
     local target="${1:-}"
     local source_branch="${2:-}"
     [[ -n "$target" && -n "$source_branch" ]] || { usage; exit 1; }

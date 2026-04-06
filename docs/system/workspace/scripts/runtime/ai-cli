@@ -325,6 +325,16 @@ PY
   fi
 }
 
+json_array_from_values() {
+  local first=true value
+  printf '['
+  for value in "$@"; do
+    [[ "$first" == "true" ]] && first=false || printf ', '
+    json_string_or_null "$value"
+  done
+  printf ']'
+}
+
 # 从 auth.json 提取账号信息
 extract_codex_account() {
   local auth_file="$1"
@@ -1027,6 +1037,11 @@ _cmd_switch_auto_codex() {
   local actual_account="" switched_provider="" switched_kind=""
   local result rc=0 notified_slot=""
 
+  if [[ "$DRY_RUN" == "true" ]]; then
+    _cmd_switch_auto_codex_dry_run
+    return 0
+  fi
+
   codex_switch_lock_acquire "auto_probe_switch" "switch" "auto" || exit 1
   source_watchdog_script_or_fail "$project"
 
@@ -1096,6 +1111,67 @@ _cmd_switch_auto_codex() {
     notify_freely_auth_change "codex" "$notified_slot" "switch_success"
   fi
   return "$rc"
+}
+
+_cmd_switch_auto_codex_dry_run() {
+  local active_slot current_slot candidate_slot slot slot_count=0
+  local apikey_count=0 account_count=0 other_count=0
+  local slots=() apikey_slots=() account_slots=()
+
+  active_slot="$(read_tool_active_slot "codex")"
+  while IFS= read -r slot; do
+    [[ -n "$slot" ]] || continue
+    slots+=("$slot")
+    slot_count=$((slot_count + 1))
+    case "$(codex_saved_slot_kind "$slot")" in
+      apikey)
+        apikey_slots+=("$slot")
+        apikey_count=$((apikey_count + 1))
+        ;;
+      account)
+        account_slots+=("$slot")
+        account_count=$((account_count + 1))
+        ;;
+      *)
+        other_count=$((other_count + 1))
+        ;;
+    esac
+  done < <(list_tool_slots "codex")
+
+  current_slot="$active_slot"
+  candidate_slot="$current_slot"
+  if [[ -z "$candidate_slot" && "${#slots[@]}" -gt 0 ]]; then
+    candidate_slot="${slots[0]}"
+  fi
+
+  if [[ "$FORMAT" == "json" ]]; then
+    printf '{'
+    printf '"switched": false, '
+    printf '"dry_run": true, '
+    printf '"tool": "codex", '
+    printf '"status": "dry_run_inventory", '
+    printf '"current_slot": '
+    json_string_or_null "$current_slot"
+    printf ', "candidate_slot": '
+    json_string_or_null "$candidate_slot"
+    printf ', "saved_slot_count": %d, ' "$slot_count"
+    printf '"saved_apikey_slot_count": %d, ' "$apikey_count"
+    printf '"saved_account_slot_count": %d, ' "$account_count"
+    printf '"saved_other_slot_count": %d, ' "$other_count"
+    printf '"saved_slots": '
+    json_array_from_values "${slots[@]}"
+    printf ', "saved_apikey_slots": '
+    json_array_from_values "${apikey_slots[@]}"
+    printf ', "saved_account_slots": '
+    json_array_from_values "${account_slots[@]}"
+    printf '}\n'
+    return 0
+  fi
+
+  log_info "[DRY-RUN] Would inspect saved codex slots without switching"
+  log_info "Current slot: ${current_slot:-none}"
+  log_info "Candidate slot: ${candidate_slot:-none}"
+  log_info "Saved slots: $slot_count"
 }
 
 # 实际执行切换（不包含探测逻辑），由上层决定是否持有全局切号锁。

@@ -35,6 +35,11 @@ freely_wt_is_sourced() {
 SELF_PATH="$(freely_wt_self_path)" || { echo "Unable to determine wt-enter script path." >&2; return 1 2>/dev/null || exit 1; }
 SELF_DIR="$(cd "$(dirname "$SELF_PATH")" && pwd -P)"
 
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  usage
+  return 0 2>/dev/null || exit 0
+fi
+
 branch="${1:-}"
 [[ -n "$branch" ]] || { usage; return 1 2>/dev/null || exit 1; }
 
