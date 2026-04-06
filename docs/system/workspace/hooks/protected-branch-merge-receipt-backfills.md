@@ -10,6 +10,7 @@
 
 最小字段：
 - `audit_effective_date`
+- `source_policy_effective_date`（可选；用于定义 develop/test-pre-merge source-branch 新语义的生效日期）
 - merge commit hash 标题
 - `target_branch`
 - `source_branch`
@@ -19,10 +20,12 @@
 - `evidence_refs`
 
 - audit_effective_date: `2026-04-04`
+- source_policy_effective_date: `2026-04-06`
 
 ## Contract
 
 - `governance-check` 会从 `audit_effective_date` 当日零点开始扫描 protected-branch merge ancestry
+- 若声明 `source_policy_effective_date`，`governance-check` 只从该日期开始强制新的 protected-branch source-branch 语义；更早的历史 merge 继续按 receipt 完整性审计，不 retroactively 重判 promote model
 - 普通 protected merge 若已经带 canonical Freely trailer，则不得在本 ledger 中声明 backfill
 - 普通 protected merge 若缺 canonical Freely trailer，则必须在本 ledger 有 matching backfill entry
 - backfill entry 只修复 auditability，不授予 bypass 权限

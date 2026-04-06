@@ -46,7 +46,7 @@ echo base > README.md
 git add .
 git commit -q -m "init"
 
-git checkout -q -b feature/breakglass
+git checkout -q -b test-pre-merge-20260402-breakglass
 printf 'feature-side\n' > CONFLICT.txt
 git add CONFLICT.txt
 git commit -q -m "feature payload"
@@ -59,7 +59,7 @@ git commit -q -m "develop payload"
 git config core.hooksPath .githooks
 
 set +e
-git merge --no-commit feature/breakglass >"$TMP_DIR/raw-merge.stdout" 2>"$TMP_DIR/raw-merge.stderr"
+git merge --no-commit test-pre-merge-20260402-breakglass >"$TMP_DIR/raw-merge.stdout" 2>"$TMP_DIR/raw-merge.stderr"
 merge_rc=$?
 set -e
 [[ "$merge_rc" -ne 0 ]] || {
@@ -91,7 +91,7 @@ cat "$TMP_DIR/spoof-complete.stdout" "$TMP_DIR/spoof-complete.stderr" | grep -Eq
 git merge --abort >/dev/null 2>&1
 
 set +e
-./bin/merge-guarded develop feature/breakglass >"$TMP_DIR/guarded-merge.stdout" 2>"$TMP_DIR/guarded-merge.stderr"
+./bin/merge-guarded develop test-pre-merge-20260402-breakglass >"$TMP_DIR/guarded-merge.stdout" 2>"$TMP_DIR/guarded-merge.stderr"
 guarded_rc=$?
 set -e
 [[ "$guarded_rc" -ne 0 ]] || {
@@ -102,7 +102,7 @@ git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1
 
 printf 'resolved-breakglass\n' > CONFLICT.txt
 git add CONFLICT.txt
-./bin/merge-guarded complete develop feature/breakglass \
+./bin/merge-guarded complete develop test-pre-merge-20260402-breakglass \
   --break-glass \
   --reason verified_false_negative \
   --blocked-gate pre-merge-commit \

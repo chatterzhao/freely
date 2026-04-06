@@ -162,7 +162,7 @@ if [[ "$gate_rc" -ne 0 ]]; then
 
 $gate_output
 
-Fix the candidate -> milestone -> IBM issue chain in the source feature worktree, then replay the merge.
+Fix the candidate -> milestone -> IBM issue chain in the source writable worktree, then rerun the guarded merge from the canonical lane.
 Only use break-glass if this failure matches docs/LAWS.md §2D and the merge can stay within merge_completion_only scope.
 Policy source: docs/LAWS.md §2C, §2D
 MSG
