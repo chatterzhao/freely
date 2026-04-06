@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-2302-A`
 - title: Worktree helper shell source compatibility governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `worktree-helper-shell-source-compatibility-governance`
@@ -78,6 +78,7 @@ Freely 已经把 worktree boundary、`wt-create`、`sync-tooling` 与 `post-chec
 - `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/pre-tests.md`
 - `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/tasks.md`
 - `docs/progress/freely-product-architecture/p-worktree-helper-shell-source-compatibility-governance.md`
+- `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/code-reviews/20260405-worktree-helper-shell-source-compatibility-verification.md`
 - `bin/wt-add`
 - `bin/wt-enter`
 - `docs/system/workspace/scripts/tests/test-worktree-entry-flow`
@@ -93,6 +94,6 @@ Freely 已经把 worktree boundary、`wt-create`、`sync-tooling` 与 `post-chec
 
 ## Next
 
-- Current owner is in `in_dev`.
-- Keep the implementation bounded to wrapper source-safety and wrapper-path regressions.
-- Reopen only if canonical `develop` again requires shell-specific workarounds for documented worktree helper commands.
+- Completed on canonical `develop` via guarded merge `3e0c8b9`.
+- Verification is recorded in `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/code-reviews/20260405-worktree-helper-shell-source-compatibility-verification.md`.
+- Reopen only if canonical `develop` again requires shell-specific workarounds for documented worktree helper commands, or if adjacent sourced worktree helpers prove to share the same contract break.
