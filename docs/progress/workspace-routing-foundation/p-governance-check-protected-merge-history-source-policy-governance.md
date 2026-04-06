@@ -3,7 +3,7 @@
 - issue_id: `I-20260406-0045-A`
 - issue_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
 - title: `Governance-check protected-merge history source policy governance`
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/governance-check-protected-merge-history-20260406-0045`
@@ -17,8 +17,9 @@
 
 - A valid `feature/* -> test-pre-merge-* -> develop` promotion left canonical `develop` red because `governance-check` revalidated the batch-internal merge commit under develop-only source rules.
 - This lane is narrowing the repair to first-parent protected merge history selection plus a focused regression.
+- The code path and focused regression now pass in this feature worktree; the remaining step is canonical guarded promotion and develop followthrough replay.
 
 ## Active Plan
 
-1. Fix the protected-branch audit history traversal.
-2. Pass the focused regression and replay `./bin/governance-check` on canonical `develop`.
+1. Guarded-merge this owner through a fresh `test-pre-merge-*` batch.
+2. Replay `./bin/governance-check` on canonical `develop`.

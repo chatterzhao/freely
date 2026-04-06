@@ -76,13 +76,13 @@ routing_policy:
 3. `I-20260406-0045-A`
 - title: Governance-check protected-merge history source policy governance
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-governance-check-protected-merge-history-source-policy-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/candidates.md`
-- next_action: Repair protected-branch receipt auditing to use first-parent branch history, then replay `./bin/governance-check` on canonical `develop` before resuming unrelated closeout work.
+- next_action: Focused fix and regression are complete in the dedicated feature lane. Guarded-merge through a fresh `test-pre-merge-*` batch, then replay `./bin/governance-check` on canonical `develop`.
 - revisit_trigger: Re-open only if first-parent scanning still allows nested protected merge ancestry to poison `develop` source-policy auditing.
 
 2. `I-20260405-2136-A`

@@ -13,8 +13,16 @@
 
 ## Evidence
 
-- pending implementation replay
+1. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
+   - 结果：通过
+   - 说明：新增 nested `feature/* -> test-pre-merge-* -> develop` 场景，证明 `develop` 只审计 first-parent protected merge receipt，不再误判 batch 内部 merge。
+2. `./bin/governance-check`
+   - 结果：通过
+   - 说明：当前 feature worktree 已不再复现 `develop` 对 merge commit `ab7a9b8` 的误报。
+3. `git diff --check`
+   - 结果：通过
 
 ## Verdict
 
-- pending
+- 当前修复已经证明 ordinary receipt 与 break-glass receipt 审计都会按 first-parent protected merge history 工作。
+- canonical `develop` followthrough replay 仍需在 guarded merge 后再跑一轮，然后才能关闭本 owner。
