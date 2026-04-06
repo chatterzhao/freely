@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-2358-C`
 - title: CLI wrapper packaging and regression-surface governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `cli-wrapper-packaging-and-regression-surface-governance`
@@ -64,5 +64,6 @@
 
 ## Next
 
-- 当前 owner 已完成 focused implementation 与 lane-local verification，下一步是准备 guarded merge 所需的收尾写回。
-- 待 packaging / help / regression surface 收敛并吸收到 canonical `develop` 后，再继续 materialize project-target bootstrap/status 或 runtime control-plane follow-on。
+- Completed on canonical `develop` through `test-pre-merge-20260406-0035-cli-wrapper-regression-closeout` and guarded merge `8e0985b`.
+- Post-merge followthrough proved the repaired command surfaces on canonical `develop`; the newly exposed `governance-check` ancestry-audit false positive is routed as a separate pre-brainstorm follow-on and is not absorbed into this packaging owner.
+- Continue project-target bootstrap/status and runtime control-plane follow-ons in their own owners instead of reopening this bounded lane.

@@ -64,14 +64,14 @@ routing_policy:
 2. `I-20260405-2358-C`
 - title: CLI wrapper packaging and regression-surface governance
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-cli-wrapper-packaging-and-regression-surface-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
-- next_action: Use the current lane-local verification evidence to prepare guarded merge, then continue bootstrap/status and runtime follow-ons in separate owners.
-- revisit_trigger: Re-open prioritization only if this lane proves the observed defects actually belong to project bootstrap or runtime semantics instead of packaging/regression surface.
+- next_action: Closed on canonical `develop` through guarded merges `ab7a9b8` and `8e0985b`; keep this owner as the bounded contract for runnable wrapper packaging, clean help output, and deterministic auth-change wake coverage.
+- revisit_trigger: Re-open only if canonical `develop` regresses those packaging/regression surfaces, or if a future command audit proves they actually belong to a broader bootstrap/runtime owner.
 
 2. `I-20260405-2136-A`
 - title: Runtime blocked intake and continuity truth governance
@@ -271,6 +271,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
 - next_action: Candidate mirror only. `I-20260405-2358-C` is now the canonical owner for CLI packaging, clean help output, and deterministic regression-surface repair.
 - revisit_trigger: Revisit if canonical `develop` later proves the same defects belong to a broader bootstrap/runtime owner instead of this packaging lane.
+
+14. `C-20260406-0055-A`
+- title: Governance-check nested test-pre-merge ancestry receipt audit false positive
+- milestone_state: candidate
+- phase_state: `todo_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260406-0055--governance-check-nested-test-pre-merge-receipt-audit/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-0055--governance-check-nested-test-pre-merge-receipt-audit/candidates.md`
+- next_action: Continue pre-brainstorm and decide whether ancestry audit should ignore non-protected internal merges inside protected ancestry, or recover the effective protected target/source pair from the guarded merge receipt chain before validating `Freely-Source-Branch`.
+- revisit_trigger: Re-open immediately if another canonical `test-pre-merge-* -> develop` promotion causes `./bin/governance-check` to reject an internal feature -> test-pre-merge merge commit as if it landed directly on `develop`.
 
 ### completed_issues
 1. `I-20260406-0045-A`
