@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260406-0045-A`
 - title: Governance-check protected-merge history source policy governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `governance-check-protected-merge-history-source-policy-governance`
@@ -54,5 +54,5 @@
 
 ## Next
 
-- Focused implementation and lane-local verification are complete in this dedicated feature worktree.
-- Next step is guarded merge through a fresh `test-pre-merge-*` batch, then replay `./bin/governance-check` on canonical `develop` before resuming unrelated closeout work.
+- Completed on canonical `develop` through `test-pre-merge-20260406-0045-governance-check-history-source-policy` and guarded merge `f58cf65`.
+- Post-merge followthrough on canonical `develop` passed `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt` and `./bin/governance-check`; no reopen is needed unless protected-branch ancestry auditing regresses again.
