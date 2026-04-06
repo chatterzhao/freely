@@ -16,7 +16,30 @@ Notes:
 USAGE
 }
 
-if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+freely_wt_self_path() {
+  if [[ -n "${BASH_SOURCE[0]:-}" ]]; then
+    printf '%s\n' "${BASH_SOURCE[0]}"
+    return 0
+  fi
+  if [[ -n "${ZSH_VERSION:-}" ]]; then
+    eval 'printf "%s\n" "${(%):-%x}"'
+    return 0
+  fi
+  return 1
+}
+
+freely_wt_is_sourced() {
+  if [[ -n "${ZSH_VERSION:-}" ]]; then
+    [[ "${ZSH_EVAL_CONTEXT:-}" == *:file* ]]
+    return
+  fi
+  [[ "${BASH_SOURCE[0]:-}" != "$0" ]]
+}
+
+SELF_PATH="$(freely_wt_self_path)" || { echo "Unable to determine wt-add script path." >&2; return 1 2>/dev/null || exit 1; }
+SELF_DIR="$(cd "$(dirname "$SELF_PATH")" && pwd -P)"
+
+if ! freely_wt_is_sourced; then
   echo "Please run with: source bin/wt-add [branch] -- <git-add-args>" >&2
   exit 1
 fi
@@ -31,7 +54,7 @@ fi
 shift
 
 # shellcheck disable=SC1091
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/worktree-common.sh"
+source "$SELF_DIR/worktree-common.sh"
 
 if [[ -z "$branch" ]]; then
   branch="$(freely_wt_current_branch)"
@@ -53,7 +76,7 @@ esac
 
 if freely_wt_is_primary_worktree; then
   # shellcheck disable=SC1091
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/wt-enter" "$branch"
+  source "$SELF_DIR/wt-enter" "$branch"
 fi
 
 git add "$@"

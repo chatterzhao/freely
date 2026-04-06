@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TEST_TMP="$(mktemp -d /tmp/freely-wt-wrapper.XXXXXX)"
+trap 'rm -rf "$TEST_TMP"' EXIT
+
+TEST_TMP_REAL="$(cd "$TEST_TMP" && pwd -P)"
+REPO="$TEST_TMP_REAL/repo"
+mkdir -p "$REPO/docs/system/workspace/scripts/worktree" "$REPO/bin"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+
+cp -R "$ROOT_DIR/.githooks" "$REPO/.githooks"
+cp "$ROOT_DIR/bin/wt-enter" "$ROOT_DIR/bin/wt-add" "$REPO/bin/"
+cp "$ROOT_DIR/bin/worktree-common.sh" "$REPO/bin/"
+cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-enter" "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-add" "$REPO/docs/system/workspace/scripts/worktree/"
+cat > "$REPO/bin/freely" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${1:-}" != "sync-tooling" ]]; then
+  exit 1
+fi
+shift
+
+source_project=""
+project=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --source-project)
+      source_project="${2:-}"
+      shift 2
+      ;;
+    --project)
+      project="${2:-}"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+[[ -n "$source_project" && -n "$project" ]] || exit 1
+
+mkdir -p "$project/bin" "$project/docs/system/workspace/scripts/worktree"
+cp -R "$source_project/.githooks" "$project/.githooks"
+cp "$source_project/bin/wt-enter" "$source_project/bin/wt-add" "$source_project/bin/worktree-common.sh" "$source_project/bin/freely" "$project/bin/"
+cp "$source_project/docs/system/workspace/scripts/worktree/worktree-common.sh" "$source_project/docs/system/workspace/scripts/worktree/wt-enter" "$source_project/docs/system/workspace/scripts/worktree/wt-add" "$project/docs/system/workspace/scripts/worktree/"
+chmod +x "$project/.githooks/"* "$project/bin/"*
+git -C "$project" config core.hooksPath .githooks
+EOF
+chmod +x "$REPO/.githooks/"* "$REPO/bin/"*
+git config core.hooksPath .githooks
+
+EXEC_ENTER_ERR="$TEST_TMP_REAL/wt-enter-exec.err"
+if "$REPO/bin/wt-enter" feature/demo 2>"$EXEC_ENTER_ERR"; then
+  echo "[FAIL] wt-enter should reject direct execution" >&2
+  exit 1
+fi
+grep -q "Please run with: source bin/wt-enter <branch>" "$EXEC_ENTER_ERR"
+
+EXEC_ADD_ERR="$TEST_TMP_REAL/wt-add-exec.err"
+if "$REPO/bin/wt-add" -- README.md 2>"$EXEC_ADD_ERR"; then
+  echo "[FAIL] wt-add should reject direct execution" >&2
+  exit 1
+fi
+grep -q "Please run with: source bin/wt-add \\[branch\\] -- <git-add-args>" "$EXEC_ADD_ERR"
+
+PROTECT_ERR="$TEST_TMP_REAL/wt-add-develop.err"
+if zsh -lc 'cd "$1"; source ./bin/wt-add -- README.md' _ "$REPO" 2>"$PROTECT_ERR"; then
+  echo "[FAIL] wt-add should remain blocked on develop" >&2
+  exit 1
+fi
+grep -q "Add blocked: 'develop' is protected" "$PROTECT_ERR"
+
+RESULT="$(
+  zsh -lc '
+    set -euo pipefail
+    cd "$1"
+    git branch feature/demo develop
+    source ./bin/wt-enter feature/demo >/dev/null
+    printf "cwd=%s\n" "$(pwd -P)"
+    printf "branch=%s\n" "$(git rev-parse --abbrev-ref HEAD)"
+    echo zsh-wrapper >> README.md
+    source ./bin/wt-add -- README.md >/dev/null
+    printf "staged=%s\n" "$(git diff --cached --name-only)"
+  ' _ "$REPO"
+)"
+
+FEATURE_WT="$TEST_TMP_REAL/repo-worktrees/feature-demo"
+printf '%s\n' "$RESULT" | grep -q "cwd=$FEATURE_WT"
+printf '%s\n' "$RESULT" | grep -q "branch=feature/demo"
+printf '%s\n' "$RESULT" | grep -q "staged=README.md"
+
+RESULT_EXISTING="$(
+  zsh -lc '
+    set -euo pipefail
+    cd "$1"
+    source ./bin/wt-enter feature/demo >/dev/null
+    printf "cwd=%s\n" "$(pwd -P)"
+    printf "branch=%s\n" "$(git rev-parse --abbrev-ref HEAD)"
+  ' _ "$REPO"
+)"
+
+printf '%s\n' "$RESULT_EXISTING" | grep -q "cwd=$FEATURE_WT"
+printf '%s\n' "$RESULT_EXISTING" | grep -q "branch=feature/demo"
+
+RESULT_DATED="$(
+  zsh -lc '
+    set -euo pipefail
+    cd "$1"
+    git branch feature/demo-20260307-1015 develop
+    source ./bin/wt-enter feature/demo-20260307-1015 >/dev/null
+    printf "cwd=%s\n" "$(pwd -P)"
+    printf "branch=%s\n" "$(git rev-parse --abbrev-ref HEAD)"
+  ' _ "$REPO"
+)"
+
+DATED_WT="$TEST_TMP_REAL/repo-worktrees/20260307-1015-feature-demo"
+printf '%s\n' "$RESULT_DATED" | grep -q "cwd=$DATED_WT"
+printf '%s\n' "$RESULT_DATED" | grep -q "branch=feature/demo-20260307-1015"
+
+echo "[PASS] wt-add and wt-enter wrappers stay source-safe on zsh and preserve helper semantics"

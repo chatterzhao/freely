@@ -20,8 +20,11 @@ git commit -q -m "init"
 git branch test-pre-merge-20260327-demo
 
 mkdir -p "$REPO/bin"
+mkdir -p "$REPO/docs/system/workspace/scripts/worktree"
 cp -R "$ROOT_DIR/.githooks" "$REPO/.githooks"
-cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-enter" "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-add" "$REPO/bin/"
+cp "$ROOT_DIR/bin/wt-enter" "$ROOT_DIR/bin/wt-add" "$REPO/bin/"
+cp "$ROOT_DIR/bin/worktree-common.sh" "$REPO/bin/"
+cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-enter" "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-add" "$REPO/docs/system/workspace/scripts/worktree/"
 chmod +x "$REPO/.githooks/"* "$REPO/bin/"*
 git config core.hooksPath .githooks
 

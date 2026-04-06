@@ -51,15 +51,17 @@ freely_wt_dir_name_for_branch() {
   local safe prefix stamp suffix dir_name
   safe="$(freely_wt_sanitize_name "$branch")"
 
-  if [[ "$safe" =~ ^(.*[^0-9-])[-]?([0-9]{8}-[0-9]{4,6})(-.*)?$ ]]; then
-    prefix="${BASH_REMATCH[1]}"
-    stamp="${BASH_REMATCH[2]}"
-    suffix="${BASH_REMATCH[3]#-}"
-  elif [[ "$safe" =~ ^(.*[^0-9-])[-]?([0-9]{8})(-.*)?$ ]]; then
-    prefix="${BASH_REMATCH[1]}"
-    stamp="${BASH_REMATCH[2]}"
-    suffix="${BASH_REMATCH[3]#-}"
-  else
+  prefix="$(printf '%s\n' "$safe" | sed -nE 's/^(.*[^0-9-])-?([0-9]{8}-[0-9]{4,6})(-.*)?$/\1/p')"
+  stamp="$(printf '%s\n' "$safe" | sed -nE 's/^(.*[^0-9-])-?([0-9]{8}-[0-9]{4,6})(-.*)?$/\2/p')"
+  suffix="$(printf '%s\n' "$safe" | sed -nE 's/^(.*[^0-9-])-?([0-9]{8}-[0-9]{4,6})(-(.*))?$/\4/p')"
+
+  if [[ -z "$stamp" ]]; then
+    prefix="$(printf '%s\n' "$safe" | sed -nE 's/^(.*[^0-9-])-?([0-9]{8})(-.*)?$/\1/p')"
+    stamp="$(printf '%s\n' "$safe" | sed -nE 's/^(.*[^0-9-])-?([0-9]{8})(-.*)?$/\2/p')"
+    suffix="$(printf '%s\n' "$safe" | sed -nE 's/^(.*[^0-9-])-?([0-9]{8})(-(.*))?$/\4/p')"
+  fi
+
+  if [[ -z "$stamp" || -z "$prefix" ]]; then
     printf '%s' "$safe"
     return 0
   fi
@@ -128,10 +130,10 @@ freely_wt_existing_for_branch() {
 }
 
 freely_wt_path_in_root() {
-  local path="$1"
+  local candidate_path="$1"
   local root
   root="$(freely_wt_root_dir)"
-  [[ "$path" == "$root" || "$path" == "$root"/* ]]
+  [[ "$candidate_path" == "$root" || "$candidate_path" == "$root"/* ]]
 }
 
 freely_wt_assert_existing_in_strict_root() {
