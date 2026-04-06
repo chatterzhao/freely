@@ -218,6 +218,83 @@ if errors:
 PY
 }
 
+check_milestone_issue_phase_queue_alignment() {
+  python3 - <<'PY'
+import pathlib
+import re
+import sys
+
+root = pathlib.Path(".")
+milestones_path = root / "docs/milestones.md"
+lines = milestones_path.read_text(encoding="utf-8").splitlines()
+
+queue_for_phase = {
+    "in_ibm": "committed_issues",
+    "done_ibm": "committed_issues",
+    "in_dev": "committed_issues",
+    "blocked_dev": "committed_issues",
+    "in_verification": "committed_issues",
+    "completed": "completed_issues",
+}
+
+entries_by_issue_path = {}
+current_milestone = None
+current_queue = None
+current_item = None
+
+for raw in lines:
+    line = raw.strip()
+    m = re.match(r"^##\s+(M-[A-Za-z0-9-]+)\s*$", line)
+    if m:
+        current_milestone = m.group(1)
+        current_queue = None
+        current_item = None
+        continue
+    m = re.match(r"^###\s+(candidate_issues|committed_issues|completed_issues)\s*$", line)
+    if m:
+        current_queue = m.group(1)
+        current_item = None
+        continue
+    m = re.match(r"^\d+\.\s+`(I-[^`]+)`\s*$", line)
+    if m and current_milestone and current_queue in {"committed_issues", "completed_issues"}:
+        current_item = {"issue_id": m.group(1), "milestone": current_milestone, "queue": current_queue}
+        continue
+    m = re.match(r"^\s*-\s*issue_path:\s*(.+?)\s*$", raw)
+    if m and current_item:
+        issue_path = m.group(1).strip().strip("`").strip("'").strip('"').strip()
+        entries_by_issue_path.setdefault(issue_path, []).append(dict(current_item))
+
+errors = []
+
+for issue_path, entries in sorted(entries_by_issue_path.items()):
+    path = root / issue_path
+    if not path.is_file():
+        errors.append(f"[FAIL] docs/milestones.md references missing issue_path {issue_path}")
+        continue
+    text = path.read_text(encoding="utf-8")
+    phase_match = re.search(r"^\s*-\s*phase_state:\s*`?([^`\n]+)`?\s*$", text, re.MULTILINE)
+    if not phase_match:
+        errors.append(f"[FAIL] {issue_path} is referenced from docs/milestones.md but is missing phase_state")
+        continue
+    phase = phase_match.group(1).strip()
+    expected_queue = queue_for_phase.get(phase)
+    if not expected_queue:
+        continue
+    actual_queues = sorted({entry["queue"] for entry in entries})
+    if actual_queues != [expected_queue]:
+        rendered = ", ".join(actual_queues)
+        issue_id = entries[0]["issue_id"]
+        errors.append(
+            f"[FAIL] {issue_id} in {issue_path} has phase_state '{phase}', but docs/milestones.md places it in {rendered}. "
+            f"Move it so it appears only in {expected_queue}."
+        )
+
+if errors:
+    print("\n".join(errors))
+    sys.exit(1)
+PY
+}
+
 check_file_exists() {
   local file="$1"
   [[ -f "$file" ]] || fail "missing file: $file"
@@ -888,6 +965,7 @@ for entry in "${entries[@]}"; do
 done
 
 check_candidate_milestone_bindings || errors=$((errors + 1))
+check_milestone_issue_phase_queue_alignment || errors=$((errors + 1))
 audit_current_protected_branch_merge_receipt
 audit_recorded_protected_branch_merge_receipt_backfills || errors=$((errors + 1))
 audit_recorded_protected_branch_breakglass_receipts || errors=$((errors + 1))
