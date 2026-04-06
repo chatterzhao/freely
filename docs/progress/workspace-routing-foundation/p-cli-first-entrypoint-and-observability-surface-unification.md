@@ -1,21 +1,17 @@
 # Progress: cli-first-entrypoint-and-observability-surface-unification
 
 - issue_id: `I-20260322-0115`
+- issue_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
 - phase_state: `completed`
-- summary: 已完成 `freely` front-door contract 收敛，并让 `chat` / `tui` 共用同一个 high-level submit chain。
+- updated_at: `2026-04-06`
+- summary: 已完成 `freely` front-door contract 收敛，并让 `chat` / `tui` 共用同一个 high-level submit chain；canonical `develop` 已吸收 closeout writeback。
 - current_focus:
   - none
-- closure_status: `merged-pending-verify`
+- closure_status: `merged-and-verified`
 - closure_evidence:
-  - `worktree_disposition: retire-only`
-  - `retirement_path: salvage_then_retire`
-  - `branch: feature/cli-first-observability-surfaces-20260322`
-  - `worktree_path: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-cli-first-observability-surfaces`
-  - `local_branch_disposition: retained-with-reason`
-  - `local_branch_reason: feature branch 当前已 rebase 到最新 develop 之上，但 branch tip 仍包含未被 develop 吸收的 closure writeback；在这些 canonical 收口提交被收编前不能宣称 verified-retirable`
-  - `remote_branch_disposition: deleted`
-  - `remote_branch_evidence: git fetch origin --prune` 后未发现 `origin/feature/cli-first-observability-surfaces-20260322`
-  - `integration_absorption_evidence: git merge-base --is-ancestor feature/cli-first-observability-surfaces-20260322 develop` 仍返回非零，说明当前 feature branch tip 尚未被 develop 吸收
-  - `branch_divergence_evidence: git rev-list --left-right --count feature/cli-first-observability-surfaces-20260322...develop` 当前为 `3 0`，说明当前 branch 领先 develop 3 个 closure writeback 提交、behind 为 0
+  - `develop_commit: 0681fba docs: close out cli-first observability unification`
+  - `develop_contains_commit: git branch --contains 0681fba => develop`
+  - `original_feature_branch: feature/cli-first-observability-surfaces-20260322 (retired locally; remote already absent)`
+  - `original_feature_worktree: /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-cli-first-observability-surfaces (retired; path no longer present)`
   - `post_merge_acceptance_2026_03_22: bash -n docs/system/workspace/scripts/runtime/freely`、`bash docs/system/workspace/scripts/tests/test-freely-chat-and-tui`、`bash docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation` 与 `./bin/governance-check` 均通过；milestone queue 已保持 canonical completed entry`
-  - `audit_refresh_2026_03_22: source candidate C-20260322-0115-A 仍为 promoted，且当前 dirty 文件仅剩 issue/progress/review/milestone 四个 closure artifacts；因此当前仅做 retirement writeback，不回退 pre-brainstorm 或 dev-loop`
+  - `review: docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
