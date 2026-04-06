@@ -1386,7 +1386,7 @@ cmd_delete() {
 
 # 帮助
 show_help() {
-  cat << EOF
+  cat <<'EOF'
 Usage: freely ai <command> [options]
 
 Commands:

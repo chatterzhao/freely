@@ -30,7 +30,7 @@ printf '%s\n' "$*" >>"${WAKE_LOG:?}"
 EOF
 chmod +x "$MOCK_BIN/freely-auth-wake"
 
-HOME="$HOME_DIR" WAKE_LOG="$WAKE_LOG" FREELY_AUTH_CHANGE_WAKE_BIN="$MOCK_BIN/freely-auth-wake" PATH="$MOCK_BIN:$PATH" \
+HOME="$HOME_DIR" WAKE_LOG="$WAKE_LOG" FREELY_AUTH_CHANGE_WAKE_BIN="$MOCK_BIN/freely-auth-wake" AI_CLI_AUTH_CHANGE_WAKE_MODE=sync PATH="$MOCK_BIN:$PATH" \
   bash "$ROOT_DIR/bin/ai" --yes login codex >/dev/null
 
 for _ in $(seq 1 20); do
