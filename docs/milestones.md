@@ -227,6 +227,28 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260405-2358-C` is now the canonical owner for CLI packaging, clean help output, and deterministic regression-surface repair.
 - revisit_trigger: Revisit if canonical `develop` later proves the same defects belong to a broader bootstrap/runtime owner instead of this packaging lane.
 
+14. `C-20260405-2358-B`
+- title: Runtime control-plane CLI stability after full command audit
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
+- next_action: Keep this candidate visible under `workspace-routing-foundation`, then split the current evidence into restart/readiness semantics versus intake/chat state-accounting before materializing the narrow runtime/control-plane owner.
+- revisit_trigger: Revisit if canonical runtime commands still require stale-child cleanup, readiness babysitting, or contradictory intake state explanation.
+
+15. `C-20260405-2358-D`
+- title: CLI help and dry-run contract followthrough after canonical audit
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
+- next_action: Materialize a narrow owner around help/usage/exit-code consistency and `ai switch --dry-run` contract alignment instead of reopening wrapper executable-bit fixes or fresh-project bootstrap work.
+- revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
+
 ### completed_issues
 1. `I-20260406-1105-A`
 - title: Milestone completed-queue closeout governance
