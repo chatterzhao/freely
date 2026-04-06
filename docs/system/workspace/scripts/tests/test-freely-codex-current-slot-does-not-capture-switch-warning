@@ -10,11 +10,15 @@ LOCK_DIR="$TMP_DIR/account-switch.lock"
 AI_LOG="$TMP_DIR/ai.log"
 mkdir -p \
   "$PROJECT/bin" \
+  "$PROJECT/docs/system/workspace/scripts/runtime" \
   "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts"
 
 ln -sf \
   "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
   "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
 
 cat >"$PROJECT/bin/ai" <<'EOF'
 #!/usr/bin/env bash

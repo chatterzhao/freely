@@ -3,9 +3,16 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-checkpoint-governance.XXXXXX)"
-trap 'rm -rf "$TMP_DIR"' EXIT
+export FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$FREELY_HOME"
 
 PROJECT="$TMP_DIR/project"
+cleanup() {
+  bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
 mkdir -p \
   "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
   "$PROJECT/.freely/run" \
@@ -61,6 +68,7 @@ git -C "$PROJECT" config user.name freely-test
 git -C "$PROJECT" config user.email freely-test@example.com
 git -C "$PROJECT" add .
 git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" checkout -q -b feature/checkpoint-governance-test
 
 echo "dirty" >"$PROJECT/dirty.txt"
 
@@ -94,7 +102,14 @@ EOF
 
 bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
 
-prompt_file="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | tail -n 1)"
+prompt_file=""
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  prompt_file="$(find "$PROJECT/.freely/run" -maxdepth 1 -name 'prompt-*.txt' | sort | tail -n 1)"
+  if [[ -n "$prompt_file" ]]; then
+    break
+  fi
+  sleep 1
+done
 [[ -n "$prompt_file" ]] || {
   echo "[FAIL] expected prompt file"
   exit 1
@@ -105,7 +120,16 @@ grep -q 'current_project_dirty_entries: 1' "$prompt_file"
 grep -q 'current_worktree_dirty_summary: 1/1' "$prompt_file"
 grep -q '项目级工位快照：' "$prompt_file"
 
-status_output="$(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")"
+status_output=""
+for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+  status_output="$(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")"
+  if grep -q 'last_project_dirty_entries: 1' <<<"$status_output" \
+    && grep -q 'last_worktree_summary_total: 1' <<<"$status_output" \
+    && grep -q 'last_worktree_summary_dirty: 1' <<<"$status_output"; then
+    break
+  fi
+  sleep 1
+done
 grep -q 'last_project_dirty_entries: 1' <<<"$status_output"
 grep -q 'last_worktree_summary_total: 1' <<<"$status_output"
 grep -q 'last_worktree_summary_dirty: 1' <<<"$status_output"

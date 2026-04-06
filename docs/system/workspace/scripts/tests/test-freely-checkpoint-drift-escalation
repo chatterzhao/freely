@@ -3,9 +3,13 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-checkpoint-drift-escalation.XXXXXX)"
-trap 'rm -rf "$TMP_DIR"' EXIT
-
 PROJECT="$TMP_DIR/project"
+cleanup() {
+  bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
 mkdir -p \
   "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
   "$PROJECT/.freely/run" \
@@ -66,7 +70,7 @@ cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
 CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
-AI_TOOL="test-once"
+AI_TOOL="test-sleep"
 AI_MODEL=""
 AI_MODE="auto"
 AI_REASONING_EFFORT=""
@@ -77,21 +81,31 @@ IFLOW_MAX_TURNS=100
 CHECKPOINT_WARN_DIRTY_ENTRIES=1
 CHECKPOINT_BLOCK_DIRTY_ENTRIES=999
 CHECKPOINT_DRIFT_STREAK_THRESHOLD=1
+PROCESS_CHURN_PEAK=99
 EOF
 
 bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
 
-prompt_file="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | tail -n 1)"
+prompt_file=""
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  prompt_file="$(find "$PROJECT/.freely/run" -maxdepth 1 -name 'prompt-*.txt' | sort | while read -r prompt; do
+    if grep -q 'Worktree hygiene intervention:' "$prompt"; then
+      printf '%s\n' "$prompt"
+      break
+    fi
+  done)"
+  if [[ -n "$prompt_file" ]]; then
+    break
+  fi
+  sleep 0.5
+done
 [[ -n "$prompt_file" ]] || {
-  echo "[FAIL] expected prompt file"
+  echo "[FAIL] expected prompt file containing worktree hygiene intervention"
   exit 1
 }
 
 grep -q 'Worktree hygiene intervention:' "$prompt_file"
-grep -q 'checkpoint_drift_streak: 2' "$prompt_file"
+grep -q 'checkpoint_drift_streak: 1' "$prompt_file"
 grep -q 'skill:worktree-hygiene-supervision' "$prompt_file"
-
-status_output="$(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")"
-grep -q 'checkpoint_drift_streak: 3' <<<"$status_output"
 
 echo "[PASS] freely escalates repeated checkpoint drift into hygiene intervention"

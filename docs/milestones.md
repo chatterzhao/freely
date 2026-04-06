@@ -94,6 +94,17 @@ routing_policy:
 - next_action: Use this owner to land explicit lane routing truth, `./bin/test-lane` machine enforcement, wrapper entrypoint correctness, and lane-specific regression coverage without widening into automatic lane inference or lifecycle automation.
 - revisit_trigger: Re-open only if lane semantics cannot stay aligned across AGENTS/LAWS/skills/scripts, or if later work tries to infer lanes implicitly instead of requiring an explicit lane contract.
 
+5. `I-20260405-2055-A`
+- title: Restart slot-switch preflight preserves active runtime governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/candidates.md`
+- next_action: Finish issue-bound verification writeback on the current feature lane, then replay the focused restart regression set in a fresh `test-pre-merge-*` integration worktree before guarded merge to `develop`.
+- revisit_trigger: Re-open only if pre-merge replay proves the preserved-runtime restart contract is still unstable, or if a broader runtime durability gap appears that no longer belongs to this narrow restart owner.
+
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -206,6 +217,19 @@ routing_policy:
 - revisit_trigger: Revisit if another active owner absorbs the full auth+config slot bundle contract or if official Codex provider/auth semantics shift enough to invalidate the current slot-kind split.
 
 11. `C-20260405-1415-A`
+
+11. `C-20260405-2055-A`
+- title: Restart slot-switch preflight preserves active runtime governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/candidates.md`
+- next_action: Candidate mirror only. `I-20260405-2055-A` is now the canonical active owner for restart-time slot-switch preflight ordering and active-runtime preservation; continue execution from the issue/progress pair.
+- revisit_trigger: Revisit if the preserved-runtime restart contract is absorbed by another still-active owner, or if canonical replay shows this lane widened beyond the narrow restart boundary.
+
+12. `C-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: candidate
 - phase_state: `todo_ibm`
