@@ -3,7 +3,7 @@
 ## C-20260405-2358-A
 
 - candidate_format_version: `v2`
-- title: Fresh-project hook bootstrap followthrough after CLI audit
+- title: Fresh-project bootstrap and baseline scoping followthrough after CLI audit
 - status: `proposed`
 - milestone: `M-20260326-freely-product-architecture`
 - promoted_issue_path: `pending://issue-materialization`
@@ -13,20 +13,21 @@
     session_id: `current-thread`
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
-- problem: followthrough on canonical `develop` narrowed the original bundle. `freely baseline-status --project <x>` and `freely status --project <x>` now report the requested initialized project correctly, and `freely ensure-interruption-dispatch --project <x>` now fails through the doc gate instead of leaking raw `find` noise. The remaining confirmed bootstrap defect is that `freely sync-tooling --source-project <repo> --project <fresh-git-project>` still omits `.githooks`, so a subsequent `freely init` fails on missing hook assets unless the operator copies them manually.
+- problem: followthrough on canonical `develop` narrowed the original bundle, but not as far as the previous draft claimed. `freely ensure-interruption-dispatch --project <x>` now fails through the doc gate instead of leaking raw `find` noise, but `freely sync-tooling --source-project <repo> --project <fresh-git-project>` still omits `.githooks`, a subsequent `freely init` still fails on missing hook assets, and `freely baseline-status --project <x>` plus the baseline segment of `freely status --project <x>` still drift back to the Freely root instead of the target project.
 - why_now:
   - fresh-project bootstrap is still a first-hop CLI contract, and failing there blocks every later command audit on non-root projects
-  - the 2026-04-06 replay proves the old candidate is now too broad; if it materializes unchanged, the owner will chase already-absorbed status/intake wording instead of the one live bootstrap gap
-  - the surviving defect is narrow enough to keep separate from runtime restart semantics and from already-completed wrapper-packaging work
+  - the 2026-04-06 replay proves the old candidate must be narrowed, but not all the way down to `.githooks`; the baseline scoping defect is still live on canonical `develop`
+  - the surviving defects are still narrow enough to keep separate from runtime restart semantics and from already-completed wrapper-packaging work
 - acceptance_criteria:
   - `freely sync-tooling --source-project <repo> --project <fresh-git-project>` materializes the hook assets needed for a subsequent `freely init`, or `freely init` synthesizes the same minimum hook surface instead of failing on missing `.githooks`
-  - `freely baseline-status --project <x>` and `freely status --project <x>` remain pinned to the requested initialized project as a non-regression guard
+  - `freely baseline-status --project <x>` reports baseline metadata for `<x>`, not the Freely root
+  - `freely status --project <x>` keeps both `baseline` and `live` segments pinned to `<x>`, not a split root/project view
   - `freely ensure-interruption-dispatch --project <x>` continues to fail with an explicit semantic result rather than raw filesystem noise when the intake/doc prerequisites are absent
 - promotion_gate:
-  - keep this owner scoped to fresh-project bootstrap and adjacent non-regression guards for project-targeted CLI surfaces
+  - keep this owner scoped to fresh-project bootstrap, baseline scoping, and adjacent non-regression guards for project-targeted CLI surfaces
   - do not absorb runtime supervision churn or intake counter reconciliation here
-- next_action: keep this candidate in `M-20260326-freely-product-architecture`, consume `I-20260405-1235-A` and `I-20260403-2041-A` as upper-bound truth, and materialize a narrow fresh-project bootstrap owner instead of reopening already-revalidated status/intake wording.
-- revisit_trigger: fresh-project bootstrap still requires manual hook copying, or another project-targeted CLI command regresses the now-revalidated `--project`/doc-gate semantics.
+- next_action: keep this candidate in `M-20260326-freely-product-architecture`, consume `I-20260405-1235-A` and `I-20260403-2041-A` as upper-bound bootstrap truth, and materialize a narrow owner around fresh-project hook/bootstrap plus baseline scoping instead of assuming the `--project` drift is already absorbed.
+- revisit_trigger: fresh-project bootstrap still requires manual hook copying, `baseline-status` / `status` baseline scoping still drifts from the target project, or another project-targeted CLI command regresses the current doc-gate semantics.
 
 ## C-20260405-2358-B
 
