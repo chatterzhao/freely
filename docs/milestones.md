@@ -61,7 +61,18 @@ routing_policy:
 - next_action: Keep this owner parked as the canonical IBM handoff for standalone extraction timing. Do not open an extraction worktree until the Codex-first owner is merged and a concrete follow-on lane can prove the extraction-start checklist is satisfied.
 - revisit_trigger: Re-open only if the Codex-first owner is reopened and invalidates the threshold/boundary package, or if a second tool reaches verified parity quickly enough to change the extraction economics.
 
-2. `I-20260405-1615-A`
+2. `I-20260405-2136-A`
+- title: Runtime blocked intake and continuity truth governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md`
+- next_action: Use this owner as the canonical IBM handoff for blocked supervision truth when prompt assembly advances but intake claim / continuity materialization does not. The first implementation lane must stay limited to blocked-state writeback and status observability.
+- revisit_trigger: Re-open only if canonical `develop` proves the blocked supervision family collapses cleanly into an existing owner, or if the same field evidence disappears without requiring a dedicated blocked-truth lifecycle.
+
+3. `I-20260405-1615-A`
 - title: Feature-owned test-pre-merge family promotion model governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -72,7 +83,7 @@ routing_policy:
 - next_action: Keep this owner as the canonical handoff for freezing the promote model before any constitutional, legal, or protected-branch gate implementation changes. Follow-on work must reopen as narrower enforcement or lifecycle owners.
 - revisit_trigger: Re-open only if the owner package proves unable to distinguish single-feature lanes, explicit multi-bundles, and future enforcement boundaries clearly enough for follow-on execution.
 
-3. `I-20260405-1805-A`
+4. `I-20260405-1805-A`
 - title: Test-pre-merge family promotion gate enforcement governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -83,7 +94,7 @@ routing_policy:
 - next_action: Use this owner to land synchronized truth-source update and protected-branch promotion gate enforcement. Keep lifecycle automation as a later owner.
 - revisit_trigger: Re-open only if the owner cannot keep truth-source update and source-branch enforcement aligned without widening into lifecycle automation.
 
-4. `I-20260405-1914-A`
+5. `I-20260405-1914-A`
 - title: Test lane routing and enforcement governance
 - milestone_state: committed
 - phase_state: `completed`
@@ -165,13 +176,13 @@ routing_policy:
 7. `C-20260404-1545-A`
 - title: Bound runtime supervision when websocket permission-denied failures block manager continuity and intake claim
 - milestone_state: candidate
-- phase_state: `needs_research`
+- phase_state: `todo_ibm`
 - priority: P1
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md`
-- next_action: Decide whether to promote this as a follow-on to runtime network failure governance or as a new supervision-owned lifecycle for blocked intake and continuity truth, using the prompt-visible-but-unclaimed evidence plus slot-switch and fork-exhaustion signals.
-- revisit_trigger: Revisit if a fresh root runtime can successfully claim the pending intake and write a new continuity despite websocket permission-denied churn, or if an existing owner is updated to absorb this exact blocked-state contract.
+- next_action: Candidate mirror only. `I-20260405-2136-A` is now the canonical owner for prompt-visible-but-unclaimed runtime supervision; use the issue package for blocked intake / continuity truth and keep this candidate only as the discovery mirror.
+- revisit_trigger: Revisit only if canonical `develop` proves the blocked supervision family belongs entirely inside an existing owner, or if the same prompt-visible-but-unclaimed evidence disappears without needing a dedicated lifecycle.
 
 8. `C-20260404-2148-A`
 - title: Bound startup governance for stale or ambiguous codex slot-switch lock

@@ -32,13 +32,13 @@
   - reviewer: `codex`
     mode: `author review`
     summary: `The failure is narrower than generic network taxonomy. Fresh evidence shows prompt assembly can recover while claim/continuity truth still does not converge, so the blocked-state contract must cover websocket denial, slot-switch busy, and local process exhaustion before runtime behavior is changed.`
-    verdict: `needs_more_research`
+    verdict: `promote_to_issue`
 - priority: P1
-- status: needs_research
+- status: todo_ibm
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `pending://issue-materialization`
-- next_action: Decide whether to promote this as a follow-on to runtime network failure governance or as a new supervision-owned lifecycle for blocked intake/continuity truth, using the new prompt-visible-but-unclaimed evidence plus slot-switch/fork-exhaustion signals.
-- revisit_trigger: Revisit if a fresh root runtime can successfully claim the pending intake and write a new continuity despite websocket permission-denied churn, or if existing owner docs are updated to absorb this exact blocked-state contract.
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+- next_action: Candidate mirror only. `I-20260405-2136-A` is now the canonical owner for prompt-visible-but-unclaimed runtime supervision; continue all follow-on implementation and verification from the issue-bound package instead of this pre-brainstorm candidate.
+- revisit_trigger: Revisit only if canonical `develop` proves the blocked supervision family actually belongs inside an existing owner, or if the prompt-visible-but-unclaimed surface disappears without needing a dedicated lifecycle.
 - session_refs:
   - tool: codex
   - session_id: current-thread
