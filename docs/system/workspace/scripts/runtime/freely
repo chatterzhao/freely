@@ -10358,6 +10358,10 @@ cmd_stop() {
 
 main() {
   local cmd="${1:-}"
+  if [[ "$cmd" == "--help" || "$cmd" == "-h" ]]; then
+    usage
+    exit 0
+  fi
   [[ -n "$cmd" ]] || { usage; exit 1; }
   shift || true
   case "$cmd" in
