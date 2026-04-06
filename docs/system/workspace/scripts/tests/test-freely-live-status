@@ -203,6 +203,10 @@ grep -q 'last_state_updated_at: 2026.03.20 12:47:46 PDT' <<<"$OUTPUT"
 grep -q 'activation_consent_recorded_at: 2026.03.20 12:47:46 PDT' <<<"$OUTPUT"
 grep -q 'last_consumed_delegated_continuation_at: 2026.03.20 12:47:46 PDT' <<<"$OUTPUT"
 grep -q 'restart_storm_signal_at: 2026.03.20 12:47:46 PDT' <<<"$OUTPUT"
+grep -q 'blocked_supervision_state: none' <<<"$OUTPUT"
+grep -q 'blocked_supervision_reason: none' <<<"$OUTPUT"
+grep -q 'blocked_supervision_summary: none' <<<"$OUTPUT"
+grep -q 'blocked_supervision_artifact: none' <<<"$OUTPUT"
 grep -q "role=supervisor pid=$SUP_PID" <<<"$OUTPUT"
 grep -q "role=interruption_dispatcher pid=$DISPATCH_PID" <<<"$OUTPUT"
 grep -q "role=ai pid=$AI_PID" <<<"$OUTPUT"
@@ -224,7 +228,7 @@ grep -q "latest_manager_worker_prompt_intents_generated: cleanup@$TMP_DIR_REAL/q
 grep -q 'latest_manager_worker_prompt_intents_consumed: none' <<<"$OUTPUT"
 grep -q 'ownership_conflict_state: none' <<<"$OUTPUT"
 grep -q 'ownership_conflict_summary: none' <<<"$OUTPUT"
-grep -q 'active_running_worker_count: 0' <<<"$OUTPUT"
+grep -q 'active_running_worker_count: 1' <<<"$OUTPUT"
 grep -q 'available_new_worker_slots: unbounded' <<<"$OUTPUT"
 if grep -q '/tmp/retired-worktree' <<<"$OUTPUT"; then
   echo "[FAIL] live-status surfaced stale retired worktree continuity" >&2
@@ -233,7 +237,7 @@ fi
 # shellcheck disable=SC1090
 source "$PROJECT/.freely/run/manager-worker-launch-state.env"
 [[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}" == "none" || -z "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" ]]
-[[ "${ACTIVE_RUNNING_WORKER_COUNT:-unknown}" == "0" ]]
+[[ "${ACTIVE_RUNNING_WORKER_COUNT:-unknown}" == "1" ]]
 [[ "${AVAILABLE_NEW_WORKER_SLOTS:-unknown}" == "unbounded" ]]
 
 echo "[PASS] freely live-status shows current active runtime surface with prompt and deep refs"

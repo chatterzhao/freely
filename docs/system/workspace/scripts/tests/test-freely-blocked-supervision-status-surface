@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-blocked-supervision-status.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/.freely/run" "$REPO/.freely/intake" "$REPO/docs"
+
+cd "$REPO"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+cat >"$REPO/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_exit_rc_1"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-05T22:10:30Z"
+EOF
+cat >"$REPO/.freely/run/session-state.env" <<EOF
+LAST_LAUNCH_KIND="resume"
+LAST_CYCLE_LOG="$REPO/.freely/run/logs/cycle-20260405-221030.log"
+EOF
+
+mkdir -p "$REPO/.freely/run/logs"
+CONTINUITY="$REPO/.freely/run/manager-continuity-20260405-221000.md"
+PROMPT="$REPO/.freely/run/prompt-20260405-221030.txt"
+CYCLE_LOG="$REPO/.freely/run/logs/cycle-20260405-221030.log"
+
+cat >"$CONTINUITY" <<'EOF'
+# Manager Continuity
+- restart_point: `continuation`
+EOF
+touch -t 202604052210.00 "$CONTINUITY"
+
+mkdir -p "$REPO/.freely/intake/20260405-220900-blocked" "$REPO/.freely/intake/20260405-221045-future"
+cat >"$REPO/.freely/intake/20260405-220900-blocked/meta.env" <<'EOF'
+INTAKE_ID="20260405-220900-blocked"
+CREATED_AT="2026-04-05T22:09:00Z"
+AUTHOR="user"
+CHANNEL="chat"
+STATUS="new"
+CLASSIFICATION=""
+REACTION=""
+LINKED_ARTIFACT="pending://unclassified"
+DELEGATED_WORKTREE=""
+SESSION_REFS="[]"
+CLAIMED_BY=""
+CLAIMED_AT=""
+ABSORPTION_TARGET=""
+RESOLUTION_ARTIFACT=""
+EOF
+cat >"$REPO/.freely/intake/20260405-220900-blocked/message.txt" <<'EOF'
+检查 runtime 为什么卡住
+EOF
+cat >"$REPO/.freely/intake/20260405-221045-future/meta.env" <<'EOF'
+INTAKE_ID="20260405-221045-future"
+CREATED_AT="2026-04-06T05:10:45Z"
+AUTHOR="user"
+CHANNEL="chat"
+STATUS="new"
+CLASSIFICATION=""
+REACTION=""
+LINKED_ARTIFACT="pending://unclassified"
+DELEGATED_WORKTREE=""
+SESSION_REFS="[]"
+CLAIMED_BY=""
+CLAIMED_AT=""
+ABSORPTION_TARGET=""
+RESOLUTION_ARTIFACT=""
+EOF
+cat >"$REPO/.freely/intake/20260405-221045-future/message.txt" <<'EOF'
+这是 prompt 之后的新消息，不应被吸收
+EOF
+
+cat >"$PROMPT" <<'EOF'
+你正在继续主管 supervision。
+EOF
+touch -t 202604052210.30 "$PROMPT"
+
+cat >"$CYCLE_LOG" <<'EOF'
+[WARN] codex slot switch is already in progress (owner_pid=123); waiting before codex launch
+[ERROR] timed out waiting for codex slot switch to finish before codex launch
+EOF
+touch -t 202604052210.31 "$CYCLE_LOG"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+materialize_blocked_supervision_truth_if_needed "$REPO" "$PROMPT" "ai_exit_rc_1" "$CYCLE_LOG"
+
+BLOCKED_META="$REPO/.freely/intake/20260405-220900-blocked/meta.env"
+FUTURE_META="$REPO/.freely/intake/20260405-221045-future/meta.env"
+
+grep -q '^STATUS="delegated"$' "$BLOCKED_META"
+grep -q '^ABSORPTION_TARGET="handoff://continuation"$' "$BLOCKED_META"
+grep -q "^LINKED_ARTIFACT=\"$PROMPT\"$" "$BLOCKED_META"
+RESOLUTION_ARTIFACT="$(awk -F '\"' '/^RESOLUTION_ARTIFACT=/{print $2; exit}' "$BLOCKED_META")"
+[[ -n "$RESOLUTION_ARTIFACT" && -f "$RESOLUTION_ARTIFACT" ]]
+grep -q '^- blocked_supervision_state: active$' "$RESOLUTION_ARTIFACT"
+grep -q '^- blocked_reason: slot_switch_busy$' "$RESOLUTION_ARTIFACT"
+grep -q "^\\- prompt_file: \`$PROMPT\`$" "$RESOLUTION_ARTIFACT"
+grep -q '^STATUS="new"$' "$FUTURE_META"
+
+LIVE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+FLEET_OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$REPO")"
+
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'blocked_supervision_state: active'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'blocked_supervision_reason: slot_switch_busy'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'blocked_supervision_summary: intake_id=20260405-220900-blocked prompt='
+printf '%s\n' "$LIVE_OUTPUT" | grep -q "blocked_supervision_artifact: $RESOLUTION_ARTIFACT"
+printf '%s\n' "$FLEET_OUTPUT" | grep -q 'blocked_supervision'
+printf '%s\n' "$FLEET_OUTPUT" | grep -q 'reason=slot_switch_busy intake_id=20260405-220900-blocked'
+
+echo "[PASS] blocked supervision writeback materializes prompt-visible intake truth and surfaces it in live-status and fleet-status"
