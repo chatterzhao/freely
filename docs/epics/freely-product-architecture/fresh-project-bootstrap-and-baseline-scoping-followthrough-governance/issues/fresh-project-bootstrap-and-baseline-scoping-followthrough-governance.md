@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260406-1905-A`
 - title: Fresh-project bootstrap and baseline scoping followthrough governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `fresh-project-bootstrap-and-baseline-scoping-followthrough-governance`
@@ -62,7 +62,18 @@ This is a first-hop CLI contract bug. If fresh-project bootstrap is wrong, every
 - `bash docs/system/workspace/scripts/tests/test-freely-status-family`
 - `./bin/governance-check`
 
+## Completion
+
+- `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
+- `docs/milestones.md`
+- `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-verification.md`
+- `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-canonical-closeout-verification.md`
+- `docs/progress/freely-product-architecture/p-fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- `docs/system/workspace/scripts/runtime/freely`
+- `docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`
+
 ## Next
 
-- Current owner is in `in_dev` while the fresh-project bootstrap repair and focused regression coverage land.
-- After the feature lane passes focused verification, rerun the same behavior in `test-pre-merge-*`, merge to `develop`, and then close the owner with canonical followthrough evidence.
+- Completed on canonical `develop` after guarded promotion through `test-pre-merge-fresh-project-bootstrap-baseline-scoping-followthrough-20260406-1935` and closeout verification recorded in `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-canonical-closeout-verification.md`.
+- Reopen only if fresh-project sync stops retargeting baseline truth to the requested project, `.githooks` disappear again on sync/init replay, or baseline/status surfaces drift back to the source repo.
