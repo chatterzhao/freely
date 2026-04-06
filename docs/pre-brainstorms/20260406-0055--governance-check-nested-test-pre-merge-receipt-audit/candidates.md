@@ -4,10 +4,10 @@
 
 - candidate_format_version: `v2`
 - title: Governance-check nested test-pre-merge ancestry receipt audit false positive
-- status: `proposed`
+- status: `absorbed`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `pending://issue-materialization`
-- promoted_issue_id: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
+- promoted_issue_id: `I-20260406-0045-A`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -27,12 +27,12 @@
   - do not absorb CLI packaging, runtime control-plane, or unrelated protected-branch ledger work
   - preserve the canonical `test-pre-merge-* -> develop` promote model while fixing the audit blind spot
 - open_questions:
-  - should audit ignore nested internal merges after validating the outer protected merge, or should it validate them against their own effective target branch rules
-  - can the effective target/source pair be recovered from existing receipt fields and merge subjects, or is a narrower ancestry manifest needed
+  - none; the absorbed owner already proved first-parent protected merge history is the correct contract for this false-positive family
 - acceptance_reviews:
   - reviewer: `codex-self-review`
-    verdict: `supports`
-    note: the failure is a post-merge ancestry-audit false positive introduced by the now-canonical premerge promotion topology, so it needs a narrow governance follow-on instead of widening the just-completed CLI packaging owner.
+    verdict: `supports_absorb`
+    note: the false positive was real, but canonical `develop` already closed it under `I-20260406-0045-A`; this candidate should remain only as absorbed provenance instead of reopening a parallel owner.
 - priority: `P1`
-- next_action: compare “ignore nested internal merges” versus “audit them against their effective target branch” using the concrete failing ancestry `ab7a9b8 -> 8e0985b`, then materialize a narrow owner.
-- revisit_trigger: any later canonical `test-pre-merge-* -> develop` promotion still causes `./bin/governance-check` to reject an internal feature merge as if it were a direct merge into `develop`.
+- decision_reason: the exact false-positive family was already absorbed and completed by `I-20260406-0045-A`, which switched protected-branch receipt auditing to first-parent protected merge history and added the nested `test-pre-merge-*` regression that this candidate was asking for.
+- next_action: treat this pre-brainstorm as provenance for why `I-20260406-0045-A` widened from a concrete post-merge failure; future ancestry-audit regressions should open a new follow-on only if canonical `develop` regresses beyond that completed owner.
+- revisit_trigger: reopen only if canonical `develop` again causes `./bin/governance-check` to reject a valid nested `feature/* -> test-pre-merge-* -> develop` ancestry after the `I-20260406-0045-A` fix is already present.
