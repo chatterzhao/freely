@@ -488,7 +488,7 @@ for branch in branches:
         try:
             source_policy_commits = set(
                 subprocess.check_output(
-                    ["git", "log", branch, "--merges", "--since", source_policy_since, "--format=%H"],
+                    ["git", "log", branch, "--first-parent", "--merges", "--since", source_policy_since, "--format=%H"],
                     cwd=root,
                     text=True,
                 ).splitlines()
@@ -497,7 +497,7 @@ for branch in branches:
             source_policy_commits = set()
     try:
         merge_output = subprocess.check_output(
-            ["git", "log", branch, "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
+            ["git", "log", branch, "--first-parent", "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
             cwd=root,
             text=True,
         )
@@ -712,7 +712,7 @@ for branch in branches:
         try:
             source_policy_commits = set(
                 subprocess.check_output(
-                    ["git", "log", branch, "--merges", "--since", source_policy_since, "--format=%H"],
+                    ["git", "log", branch, "--first-parent", "--merges", "--since", source_policy_since, "--format=%H"],
                     cwd=root,
                     text=True,
                 ).splitlines()
@@ -721,7 +721,7 @@ for branch in branches:
             source_policy_commits = set()
     try:
         merge_output = subprocess.check_output(
-            ["git", "log", branch, "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
+            ["git", "log", branch, "--first-parent", "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
             cwd=root,
             text=True,
         )
