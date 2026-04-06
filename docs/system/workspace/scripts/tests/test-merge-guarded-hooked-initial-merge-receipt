@@ -44,16 +44,16 @@ echo base > README.md
 git add .
 git commit -q -m "seed guarded merge tooling"
 
-git checkout -q -b feature/receipt
+git checkout -q -b test-pre-merge-20260402-receipt
 echo feature >> README.md
 git add README.md
 git commit -q -m "feature change"
 
 git checkout -q develop
 git config core.hooksPath .githooks
-./bin/merge-guarded develop feature/receipt >/tmp/freely-merge-guarded-initial.out 2>/tmp/freely-merge-guarded-initial.err
+./bin/merge-guarded develop test-pre-merge-20260402-receipt >/tmp/freely-merge-guarded-initial.out 2>/tmp/freely-merge-guarded-initial.err
 git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded$'
 git log -1 --format=%B HEAD | grep -q '^Freely-Bypass-Mode: forbidden$'
-git log -1 --format=%B HEAD | grep -q '^Freely-Source-Branch: feature/receipt$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Source-Branch: test-pre-merge-20260402-receipt$'
 
 echo "[PASS] merge-guarded preserves initial merge receipts under real pre-merge hooks"

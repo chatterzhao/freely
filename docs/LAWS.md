@@ -29,10 +29,15 @@
 1. 分支来源、merge 方向、保护分支策略符合宪法分支表。
 2. `feature/*` 默认从 `develop` 创建并在 worktree 内开发；若 issue 明确依赖未合并父分支改动，可从父 `feature/*` 派生 dedicated worktree，但必须记录依赖关系与最终集成目标。
 3. `main/develop/test-pre-merge-*` 保持 add/commit 禁止；`test-pre-merge-*` 还必须禁止 push。
-4. `develop` 合并前，`TEST`（含集成验收）通过；若走 `test-pre-merge-*` 路径，验证批次必须可追溯，且 `develop` 只吸收来源 `feature/*` 的 replay，不直接吸收测试批次。
+4. `develop` 合并前，`TEST`（含集成验收）通过；`develop` 的正常合法来源是 `test-pre-merge-*` family 与 `hotfix/*`。若走 `test-pre-merge-*` 路径，当前批次必须可追溯到 single-feature lane 或 explicit multi-bundle 的来源 feature、source shas、merge order 与 base develop sha。
 4b. `test-pre-merge-*` 只承担主线前的临时验证职责，不承担“在 `develop` 上先预测试”的替代语义；需要主线前验证时，应进入新的 `test-pre-merge-*` 批次，需要主线后真实环境验收时，才进入 `develop` 的 completion verification。
 4d. `develop` 在本地 merge 后允许存在短暂的 post-merge acceptance / cleanup followthrough 窗口；但若本地 `develop` 已领先其 tracked remote，这段窗口必须以显式的 status / patrol truth 暴露，不得静默假装已经完成远端 canonical followthrough。
 4a. 当 issue 已有 `pre-tests.md` 时，develop 合并 gate 默认优先看其中定义的 integration / acceptance evidence；代码评审完成度不得替代这层验收。
+4e. 测试 lane 必须与分支职责一致，至少区分三类：
+   - `feature-local`：在 dedicated feature/release/hotfix/premerge worktree 中运行实现自测、局部回归、issue-bound 验证；不得在 `main/develop/test-pre-merge-*` 上冒充此 lane。
+   - `premerge-integration`：仅在 `test-pre-merge-*` 批次中运行主线前集成 smoke/regression/acceptance；不得在 `develop` 上提前执行来替代测试批次。
+   - `post-merge-followthrough`：仅在目标 protected branch 的 canonical worktree 中运行 merge 后真实环境 followthrough；它观察集成结果，不授予继续在 protected branch 上开发实现的权限。
+4f. 若使用统一测试入口，命令语义必须显式暴露 lane 与当前 branch 的匹配关系；lane 误用应直接失败，而不是静默降级到“能跑就算对”。
 4c. `pre-tests.md` 若不能恢复 acceptance contract，则不得被视为“测试已定义”。最低质量线至少包括：
    - acceptance target
    - testing layer
@@ -54,7 +59,7 @@
 16. `test-pre-merge-*` 不得承载 owner truth、issue continuation、milestone truth 或长期 cleanup 决策；若因为这些内容导致测试批次不能删除，默认判定为 misuse。
 
 最小验收证据：
-- 分支来源与合并路径记录（若经过 `test-pre-merge-*`，需包含 replay 到 `develop` 的来源 feature 顺序，以及该批次的删除 / 重建结论）
+- 分支来源与合并路径记录（若经过 `test-pre-merge-*`，需包含进入 `develop` 的批次标识、来源 feature 顺序或 explicit multi-bundle 组装证据，以及该批次的删除 / 重建结论）
 - `execution_base` / `integration_target` / `depends_on` 记录（如存在派生 worktree）
 - `wt-status-all` 输出记录
 - project dirty budget / worktree dirty summary 记录（如进入 checkpoint 治理）

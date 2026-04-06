@@ -58,7 +58,7 @@ validate_merge_direction() {
     case "$target" in
       develop)
         case "$source_branch" in
-          feature/*|hotfix/*) allowed=1 ;;
+          test-pre-merge-*|hotfix/*) allowed=1 ;;
         esac
         ;;
       main)
@@ -79,7 +79,7 @@ Allowed:
   feature/* -> test-pre-merge-*
   hotfix/* -> test-pre-merge-*
   feature/premerge-* -> test-pre-merge-*
-  feature/* -> develop
+  test-pre-merge-* -> develop
   hotfix/* -> develop
   release/* -> main
   hotfix/* -> main

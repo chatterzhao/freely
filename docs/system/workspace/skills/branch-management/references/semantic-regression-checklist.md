@@ -26,5 +26,5 @@
 
 7. `test-pre-merge-*` 语义：
 - `test-pre-merge-*` 只承担主线前验证，不承担在 `develop` 上先预测试的替代语义。
-- 进入 `develop` 的对象必须是来源 `feature/*` replay，而不是测试批次本身。
+- 进入 `develop` 的正常 promote 对象是当前权威 `test-pre-merge-*` 批次，而不是绕回来源 `feature/*` 继续保留第二条正常路径。
 - 当前批次完成后必须立即删除；若还要继续验证，只能从当前 `develop` 新建下一批次。

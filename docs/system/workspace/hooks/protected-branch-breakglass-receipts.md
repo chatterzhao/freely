@@ -10,6 +10,7 @@
 
 最小字段：
 - `audit_effective_date`
+- `source_policy_effective_date`（可选；用于定义 develop/test-pre-merge source-branch 新语义的生效日期）
 - merge commit hash 标题
 - `target_branch`
 - `source_branch`
@@ -22,6 +23,7 @@
 - `evidence_refs`
 
 - audit_effective_date: `2026-04-02`
+- source_policy_effective_date: `2026-04-06`
 
 ## Receipt Contract
 
@@ -44,6 +46,7 @@
 - `receipt_mode: trailer_parity` 表示该 merge commit 自己带有 canonical Freely trailer，`governance-check` 必须校验 trailer 与 ledger 字段逐项一致
 - `receipt_mode: legacy_backfill` 只用于历史补录：当 merge commit 发生在当前 canonical trailer contract 之前，允许 ledger 单独留痕，但不得拿它掩盖今天的 trailer-bearing break-glass merge
 - `governance-check` 会以 `audit_effective_date` 当日零点为起点，扫描之后的 protected-branch merge commit；凡是 break-glass merge，都必须能在本 ledger 里找到匹配 receipt
+- 若声明 `source_policy_effective_date`，新的 protected-branch source-branch 语义只从该日期开始强制；更早的 break-glass receipt 仍按当时模型作为 grandfathered 历史处理
 
 来源关系：
 - runtime handshake env 由 `merge-guarded complete ... --break-glass` 设置，并由 `pre-merge-commit` 验证
