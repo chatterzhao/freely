@@ -43,7 +43,7 @@ Freely 当前进入 `cli first` 审计阶段，本轮在 dedicated feature workt
 
 ## 2026-04-06 canonical followthrough
 
-在 canonical `develop` 上重新回放 `C-20260405-2358-A` 的 CLI 之后，结论已经收窄，不再等同于最初的原始审计快照。
+在 canonical `develop` 上重新回放 `C-20260405-2358-A` 的 CLI 之后，结论已经从“原始全量审计快照”收窄成更明确的 followthrough，但并没有像上一版草稿那样只剩 `.githooks` 一项。
 
 ### 已重放的命令
 
@@ -52,18 +52,21 @@ Freely 当前进入 `cli first` 审计阶段，本轮在 dedicated feature workt
 - `./bin/freely init --project <fresh-git-project> --intent ... --constitution ... --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
   - 结果：在 fresh git project 上仍因缺失 `.githooks` 失败；手工复制 `.githooks` 后可成功初始化
 - `./bin/freely baseline-status --project <initialized-project>`
-  - 结果：`project:` 正确指向目标项目，不再漂移到 repo root
+  - 结果：仍返回 0，但 baseline 段 `project:` 继续漂回 Freely root，而不是目标项目
 - `./bin/freely status --project <initialized-project>`
-  - 结果：baseline 段与 live 段都指向目标项目，不再复现旧的 root 漂移
+  - 结果：`live` 段指向目标项目，但 `baseline` 段仍漂回 Freely root；因此 `status` 只部分尊重 `--project`
 - `./bin/freely ensure-interruption-dispatch --project <initialized-project>`
   - 结果：当前通过 doc gate 显式失败，报缺失 `docs/PROJECT_INTENT.md` / `docs/CONSTITUTION.md` / `docs/LAWS.md` / `docs/pre-brainstorms/*`，没有再泄漏原始 `find: ... No such file or directory`
 
 ### 收敛结论
 
-1. `baseline-status` / `status` 的 `--project` 漂移目前已不再复现，应视为已被后续 owner 吸收的子问题，而不是继续作为 candidate A 的主问题。
-2. `ensure-interruption-dispatch` 的“原始文件系统噪音”当前也不再复现；残留的是合理的 doc gate 阻断，不应和 bootstrap 缺口混为一谈。
-3. 当前仍稳定复现、且阻断 fresh-project CLI first bootstrap 的核心缺口是：`sync-tooling` 没有为后续 `init` materialize `.githooks`。
-4. 因此 `C-20260405-2358-A` 若继续推进，不应再以“status scoping + intake noise + bootstrap”打包 materialize，而应缩成 fresh-project hook/bootstrap owner，并把另外两项作为非回归守卫即可。
+1. `baseline-status --project <x>` 的 baseline 面仍错误地指向 Freely root，因此“项目归属已经修好”这个判断是错误的。
+2. `status --project <x>` 目前是 split behavior：`live` 段正确，`baseline` 段仍漂移；这说明 `--project` contract 仍未完整闭合。
+3. `ensure-interruption-dispatch` 的“原始文件系统噪音”当前不再复现；残留的是合理的 doc gate 阻断，应降级为非回归守卫，而不是 candidate A 的主问题。
+4. 当前仍稳定复现、且都发生在 fresh-project first-hop bootstrap 链上的核心缺口有两项：
+   - `sync-tooling` 没有为后续 `init` materialize `.githooks`
+   - `baseline-status` / `status` 的 baseline 面没有稳定尊重 `--project`
+5. 因此 `C-20260405-2358-A` 若继续推进，不应再只缩成 fresh-project hook/bootstrap owner；更准确的边界应是 fresh-project bootstrap 与 baseline scoping followthrough，并把 `ensure-interruption-dispatch` 保留为非回归守卫。
 
 ## 明确不做
 
