@@ -73,18 +73,6 @@ routing_policy:
 - next_action: Use the current lane-local verification evidence to prepare guarded merge, then continue bootstrap/status and runtime follow-ons in separate owners.
 - revisit_trigger: Re-open prioritization only if this lane proves the observed defects actually belong to project bootstrap or runtime semantics instead of packaging/regression surface.
 
-3. `I-20260406-0045-A`
-- title: Governance-check protected-merge history source policy governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-governance-check-protected-merge-history-source-policy-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/candidates.md`
-- next_action: Focused fix and regression are complete in the dedicated feature lane. Guarded-merge through a fresh `test-pre-merge-*` batch, then replay `./bin/governance-check` on canonical `develop`.
-- revisit_trigger: Re-open only if first-parent scanning still allows nested protected merge ancestry to poison `develop` source-policy auditing.
-
 2. `I-20260405-2136-A`
 - title: Runtime blocked intake and continuity truth governance
 - milestone_state: committed
@@ -285,6 +273,25 @@ routing_policy:
 - revisit_trigger: Revisit if canonical `develop` later proves the same defects belong to a broader bootstrap/runtime owner instead of this packaging lane.
 
 ### completed_issues
+1. `I-20260406-0045-A`
+- title: Governance-check protected-merge history source policy governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-governance-check-protected-merge-history-source-policy-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/candidates.md`
+- evidence:
+  - `develop` merge `f58cf65`
+  - `docs/progress/workspace-routing-foundation/p-governance-check-protected-merge-history-source-policy-governance.md`
+  - `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/code-reviews/20260406-governance-check-protected-merge-history-source-policy-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/code-reviews/20260406-governance-check-protected-merge-history-source-policy-verification.md`
+  - `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/code-reviews/20260406-governance-check-protected-merge-history-source-policy-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now audits protected-branch merge receipts by effective target branch, so nested feature -> test-pre-merge ancestry no longer poisons develop source-policy checks while direct invalid feature -> develop receipts still fail.`
+
 1. `I-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
 - milestone_state: completed
