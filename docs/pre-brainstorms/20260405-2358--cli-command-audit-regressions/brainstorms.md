@@ -68,6 +68,41 @@ Freely 当前进入 `cli first` 审计阶段，本轮在 dedicated feature workt
    - `baseline-status` / `status` 的 baseline 面没有稳定尊重 `--project`
 5. 因此 `C-20260405-2358-A` 若继续推进，不应再只缩成 fresh-project hook/bootstrap owner；更准确的边界应是 fresh-project bootstrap 与 baseline scoping followthrough，并把 `ensure-interruption-dispatch` 保留为非回归守卫。
 
+## 2026-04-06 command-surface followthrough
+
+在后续的 canonical CLI surface audit 中，又出现了一组不适合塞回 `C-20260405-2358-A` 或 `C-20260405-2358-B` 的命令契约问题。
+
+### 已重放的命令
+
+- `./bin/freely`
+  - 结果：打印 usage，但返回码为 1；当前更像“缺参数 usage”而非标准 help surface。
+- `./bin/wt-create --help`
+  - 结果：没有进入 help 分支，而是把 `--help` 当成 branch 名继续执行，最终落到 `git branch`/`invalid reference` 错误。
+- `./bin/wt-enter --help`
+  - 结果：返回 `Please run with: source bin/wt-enter <branch>`，没有标准 `--help` 契约。
+- `./bin/wt-add --help`
+  - 结果：返回 `Please run with: source bin/wt-add [branch] -- <git-add-args>`，没有标准 `--help` 契约。
+- `./bin/merge-guarded --help`
+  - 结果：打印 usage，但退出码仍为 1，而不是 clean help 成功返回。
+- `./bin/ai list --format json`
+  - 结果：成功列出保存的 slots。
+- `./bin/ai whoami codex --format json`
+  - 结果：成功显示当前 active slot 为 `apikey-custom-2`。
+- `./bin/ai status codex --format json`
+  - 结果：成功显示 auth present 和 slot cache 信息。
+- `./bin/ai login codex apikey --dry-run --yes --format json`
+  - 结果：成功走 dry-run，打印将保存到新 slot 的路径。
+- `./bin/ai switch codex --dry-run --format json`
+  - 结果：在当前 active apikey slot 明明存在的情况下仍返回 `No slots found or all probing failed`；说明 dry-run switch 的 fallback/probe/JSON contract 仍不稳定。
+
+### 收敛结论
+
+1. 这组问题已经不再是“wrapper 可执行位”本身，而是 help / usage / dry-run / exit-code contract 的一致性缺口。
+2. `wt-create --help` 的问题具备副作用风险，因为它会误走 branch/worktree 创建路径，而不是停在帮助输出。
+3. `merge-guarded --help`、`wt-enter --help`、`wt-add --help` 暴露的是 command ergonomics 与 CLI-first contract 不一致，不应继续依赖操作者记忆。
+4. `ai switch codex --dry-run --format json` 的失败不适合归到 fresh-project bootstrap，也不应直接等同于 runtime/control-plane 生命周期问题；它更像 ai command surface 的 follow-on contract 漂移。
+5. 因此这批证据应独立成新的 candidate，而不是继续扩大 `C-20260405-2358-A/B/C` 的边界。
+
 ## 明确不做
 
 1. 不把本轮审计直接扩大成一次“全面 CLI 重构”。

@@ -34,7 +34,7 @@
 - candidate_format_version: `v2`
 - title: Runtime control-plane CLI stability after full command audit
 - status: `proposed`
-- milestone: `pending://milestone-binding`
+- milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `pending://issue-materialization`
 - promoted_issue_id: `pending://issue-materialization`
 - session_refs:
@@ -54,7 +54,7 @@
 - promotion_gate:
   - keep the owner focused on runtime/control-plane semantics surfaced by the audited commands
   - do not bundle unrelated wrapper executable-bit fixes or project bootstrap decisions
-- next_action: separate “stale pid / readiness / restart” evidence from “intake status / chat completion” evidence and confirm whether they belong in one supervision owner or two adjacent ones.
+- next_action: keep this candidate in `M-20260306-workspace-routing-foundation`, separate “stale pid / readiness / restart” evidence from “intake status / chat completion” evidence, and confirm whether they belong in one supervision owner or two adjacent ones.
 - revisit_trigger: any audited runtime command still requires manual cleanup of stale children or reports contradictory intake state on canonical develop.
 
 ## C-20260405-2358-C
@@ -84,3 +84,31 @@
   - keep this owner on packaging, command surface, and deterministic regression coverage
 - next_action: materialize the packaging-focused owner under `workspace-routing-foundation`, then repair the broken runnable wrapper set, clean the `freely ai --help` surface, and stabilize the auth-change wake regression coverage.
 - revisit_trigger: newly added `bin/` wrappers ship without executable permission or audited regression commands remain shell-noisy / worktree-sensitive.
+
+## C-20260405-2358-D
+
+- candidate_format_version: `v2`
+- title: CLI help and dry-run contract followthrough after canonical audit
+- status: `needs_research`
+- milestone: `M-20260306-workspace-routing-foundation`
+- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_id: `pending://issue-materialization`
+- session_refs:
+  - tool: `codex`
+    session_id: `current-thread`
+    jsonl_path: `unavailable://codex-thread-only`
+    role: `author`
+- problem: canonical CLI surface replay still exposes a narrow but real contract gap beyond the already-completed wrapper-packaging owner. `wt-create --help` misroutes into branch creation instead of a safe help path, `wt-enter --help` and `wt-add --help` do not expose a standard help contract, `merge-guarded --help` prints usage but exits non-zero, and `ai switch codex --dry-run --format json` can return `No slots found or all probing failed` even while `whoami/status` prove an active apikey slot exists.
+- why_now:
+  - these are first-hop command-surface contracts in a CLI-first product, so help and dry-run semantics are part of the product behavior, not operator trivia
+  - `wt-create --help` is not just noisy; it currently attempts the creation path and therefore carries avoidable side-effect risk
+  - the affected commands span workspace helpers, guarded merge tooling, and ai switching, so the remaining gap is broader than one single wrapper but still much narrower than runtime/control-plane lifecycle work
+- acceptance_criteria:
+  - `wt-create --help`, `wt-enter --help`, `wt-add --help`, and `merge-guarded --help` all expose explicit, side-effect-free help behavior with success exit codes where the command is only asking for usage
+  - the root `freely` command exposes a deliberate top-level help/usage contract instead of relying on ambiguous “missing command” behavior
+  - `ai switch codex --dry-run --format json` reports a stable, machine-consumable result that remains consistent with `ai list` / `whoami` / `status` when saved apikey slots exist
+- promotion_gate:
+  - keep this owner on command-surface ergonomics, help/usage/exit-code semantics, and ai dry-run contract alignment
+  - do not absorb fresh-project bootstrap, runtime supervision, or generic executable-bit packaging work
+- next_action: confirm which commands are intended to treat `--help` as success, freeze the expected exit-code/help semantics, and isolate whether `ai switch --dry-run` is failing in probe selection, verification, or JSON result reporting.
+- revisit_trigger: canonical CLI replay still shows help invocations with side effects/non-zero-only usage paths, or `ai switch --dry-run` remains inconsistent with the saved-slot inventory.
