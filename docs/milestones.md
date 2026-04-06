@@ -61,6 +61,17 @@ routing_policy:
 - next_action: Keep this owner parked as the canonical IBM handoff for standalone extraction timing. Do not open an extraction worktree until the Codex-first owner is merged and a concrete follow-on lane can prove the extraction-start checklist is satisfied.
 - revisit_trigger: Re-open only if the Codex-first owner is reopened and invalidates the threshold/boundary package, or if a second tool reaches verified parity quickly enough to change the extraction economics.
 
+2. `I-20260405-1615-A`
+- title: Feature-owned test-pre-merge family promotion model governance
+- milestone_state: committed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1615--feature-owned-test-pre-merge-family/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1615--feature-owned-test-pre-merge-family/candidates.md`
+- next_action: Keep this owner as the canonical handoff for freezing the promote model before any constitutional, legal, or protected-branch gate implementation changes. Follow-on work must reopen as narrower enforcement or lifecycle owners.
+- revisit_trigger: Re-open only if the owner package proves unable to distinguish single-feature lanes, explicit multi-bundles, and future enforcement boundaries clearly enough for follow-on execution.
+
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -74,7 +85,18 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260404-0119-A`. Keep the owner scoped to milestone-level status parsing so the merge gate stops reading nested queue item status lines as milestone truth.
 - revisit_trigger: Re-open only if active-milestone validation still misreads nested queue metadata after this parser-bound followthrough lands.
 
-2. `C-20260404-0232-A`
+2. `C-20260405-1615-A`
+- title: Feature-owned test-pre-merge family promotion model
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1615--feature-owned-test-pre-merge-family/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1615--feature-owned-test-pre-merge-family/candidates.md`
+- next_action: Candidate mirror only. `I-20260405-1615-A` is authoritative and now parked at `completed`; use the owner package to guide follow-on enforcement and lifecycle owners instead of reopening raw pre-brainstorm debate.
+- revisit_trigger: Revisit if a future owner tries to widen gate implementation or lifecycle automation without consuming `I-20260405-1615-A`, or if a second `test-pre-*` prefix is proposed.
+
+3. `C-20260404-0232-A`
 - title: Governance merge gate review-aware regression alignment
 - milestone_state: candidate
 - phase_state: `todo_ibm`

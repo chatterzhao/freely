@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260405-1615--feature-owned-test-pre-merge-family
+  - brainstorms: docs/pre-brainstorms/20260405-1615--feature-owned-test-pre-merge-family/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260405-1615--feature-owned-test-pre-merge-family/candidates.md
 - 20260405-0425--develop-guarded-merge-entrypoint-enforcement
   - brainstorms: docs/pre-brainstorms/20260405-0425--develop-guarded-merge-entrypoint-enforcement/brainstorms.md
   - candidates: docs/pre-brainstorms/20260405-0425--develop-guarded-merge-entrypoint-enforcement/candidates.md
