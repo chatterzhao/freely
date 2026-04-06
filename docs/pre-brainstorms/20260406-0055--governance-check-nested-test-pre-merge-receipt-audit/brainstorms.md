@@ -42,4 +42,12 @@ Two plausible contract directions need comparison:
 
 ## Working Conclusion
 
-Materialize a narrow governance follow-on only after pre-brainstorm decides which ancestry-audit contract is correct. The first concrete evidence is the false positive on `ab7a9b8` reproduced immediately after canonical develop merge `8e0985b`.
+This pre-brainstorm no longer needs an independent follow-on owner.
+
+Canonical `develop` already absorbed and completed the fix under `I-20260406-0045-A`:
+
+- protected-branch receipt auditing now follows first-parent protected merge history
+- nested `feature/* -> test-pre-merge-*` merges are no longer revalidated against `develop`
+- direct invalid `feature/* -> develop` receipts still fail
+
+This entry remains as discovery provenance for the false positive on `ab7a9b8`, not as an active unresolved bug.

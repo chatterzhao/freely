@@ -227,17 +227,6 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260405-2358-C` is now the canonical owner for CLI packaging, clean help output, and deterministic regression-surface repair.
 - revisit_trigger: Revisit if canonical `develop` later proves the same defects belong to a broader bootstrap/runtime owner instead of this packaging lane.
 
-14. `C-20260406-0055-A`
-- title: Governance-check nested test-pre-merge ancestry receipt audit false positive
-- milestone_state: candidate
-- phase_state: `todo_pre_brainstorm`
-- priority: P1
-- promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260406-0055--governance-check-nested-test-pre-merge-receipt-audit/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260406-0055--governance-check-nested-test-pre-merge-receipt-audit/candidates.md`
-- next_action: Continue pre-brainstorm and decide whether ancestry audit should ignore non-protected internal merges inside protected ancestry, or recover the effective protected target/source pair from the guarded merge receipt chain before validating `Freely-Source-Branch`.
-- revisit_trigger: Re-open immediately if another canonical `test-pre-merge-* -> develop` promotion causes `./bin/governance-check` to reject an internal feature -> test-pre-merge merge commit as if it landed directly on `develop`.
-
 ### completed_issues
 1. `I-20260406-1105-A`
 - title: Milestone completed-queue closeout governance
@@ -265,7 +254,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-governance-check-protected-merge-history-source-policy-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/candidates.md`
+- source_candidates: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/candidates.md`, `docs/pre-brainstorms/20260406-0055--governance-check-nested-test-pre-merge-receipt-audit/candidates.md`
 - evidence:
   - `develop` merge `f58cf65`
   - `docs/progress/workspace-routing-foundation/p-governance-check-protected-merge-history-source-policy-governance.md`
