@@ -8,15 +8,15 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/governance-1100-closeout-20260404-0648`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-0648-feature-governance-1100-closeout`
-- updated_at: `2026-04-04`
-- closure_status: `ready_for_merge`
+- updated_at: `2026-04-06`
+- closure_status: `merged-and-verified`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
 ## Summary
 
 - This owner is again backed by canonical issue/progress/epic artifacts instead of only a promoted candidate pointer.
-- The 2026-04-04 truth-repair closeout restored the missing `1100` owner set, removed dangling milestone/index references, and kept the gate strict.
+- Canonical `develop` absorbed the 2026-04-04 truth-repair closeout through merge `5da463c`, restoring the missing `1100` owner set, removing dangling milestone/index references, and keeping the gate strict.
 - The previously discussed `1200/1201/1202/1203` repair slices no longer exist in the active filesystem and are now recorded only as retired historical sub-slices in `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/child-slice-status.md`.
 - `1100` is now historical traceability only. Deleted child lanes stay retired, and any future governance-chain backfill must reopen from a new owner on current `develop`.
 
@@ -25,11 +25,16 @@
 1. Future operators could incorrectly treat this restored owner as still active if milestone/candidate/issue wording drifts again.
 2. New governance-chain drift could be misrouted into this historical owner instead of opening a fresh lifecycle from current `develop`.
 
+## Closure Evidence
+
+1. develop merge `5da463c`
+2. `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/code-reviews/20260403-governance-chain-legacy-repair-implementation-decision.md`
+3. `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/child-slice-status.md`
+
 ## Next Action
 
-1. Merge this closeout lane back into protected `develop` so the completed record becomes canonical.
-2. Keep the completed record stable across milestone, candidate, issue, and progress truth.
-3. Reopen with a new owner if future governance-chain drift appears on current `develop`.
+1. Keep the completed record stable across milestone, candidate, issue, and progress truth on canonical `develop`.
+2. Reopen with a new owner if future governance-chain drift appears on current `develop`.
 
 ## Fleet Hygiene Snapshot
 
