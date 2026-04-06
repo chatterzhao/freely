@@ -83,6 +83,16 @@ routing_policy:
 - next_action: Use this owner to land synchronized truth-source update and protected-branch promotion gate enforcement. Keep lifecycle automation as a later owner.
 - revisit_trigger: Re-open only if the owner cannot keep truth-source update and source-branch enforcement aligned without widening into lifecycle automation.
 
+4. `I-20260405-1914-A`
+- title: Test lane routing and enforcement governance
+- milestone_state: committed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/candidates.md`
+- next_action: Use this owner to land explicit lane routing truth, `./bin/test-lane` machine enforcement, wrapper entrypoint correctness, and lane-specific regression coverage without widening into automatic lane inference or lifecycle automation.
+- revisit_trigger: Re-open only if lane semantics cannot stay aligned across AGENTS/LAWS/skills/scripts, or if later work tries to infer lanes implicitly instead of requiring an explicit lane contract.
 
 ### candidate_issues
 
@@ -119,8 +129,18 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260405-1805-A` is authoritative and now parked at `completed`; use this owner for synchronized truth-source update and gate enforcement rather than splitting them again.
 - revisit_trigger: Revisit if someone proposes separate owner lifecycles for constitutional truth and gate semantics, or if lifecycle automation is widened into this enforcement owner.
 
+4. `C-20260405-1914-A`
+- title: Test lane routing and enforcement
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/candidates.md`
+- next_action: Candidate mirror only. `I-20260405-1914-A` is authoritative and now parked at `completed`; use this owner for explicit lane truth, machine enforcement, and regression alignment instead of leaving `test-lane` as an unowned implementation.
+- revisit_trigger: Revisit if lane enforcement is widened into implicit auto-routing, or if a future owner tries to hide lane mismatches behind generic “run tests anywhere” semantics.
 
-4. `C-20260404-0232-A`
+5. `C-20260404-0232-A`
 - title: Governance merge gate review-aware regression alignment
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -131,7 +151,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260404-0232-A`. Keep the owner scoped to making the mixed unresolved-candidate implementation regression review-aware and restoring same-file borrowed-owner blocking after staged review artifacts became mandatory.
 - revisit_trigger: Re-open only if a future guard again causes this mixed unresolved-candidate implementation regression to fail before it reaches the current allowed path, or if same-file borrowed-owner regressions start passing again.
 
-5. `C-20260404-0640-A`
+6. `C-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -142,7 +162,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260404-0640-A`. Keep the owner scoped to ancestry receipt-gap backfill and audit for ordinary protected merges only.
 - revisit_trigger: Re-open only if another ordinary protected merge is found without canonical trailers or the ancestry audit still misses such gaps after this followthrough lands.
 
-6. `C-20260404-1545-A`
+7. `C-20260404-1545-A`
 - title: Bound runtime supervision when websocket permission-denied failures block manager continuity and intake claim
 - milestone_state: candidate
 - phase_state: `needs_research`
@@ -153,7 +173,7 @@ routing_policy:
 - next_action: Decide whether to promote this as a follow-on to runtime network failure governance or as a new supervision-owned lifecycle for blocked intake and continuity truth, using the prompt-visible-but-unclaimed evidence plus slot-switch and fork-exhaustion signals.
 - revisit_trigger: Revisit if a fresh root runtime can successfully claim the pending intake and write a new continuity despite websocket permission-denied churn, or if an existing owner is updated to absorb this exact blocked-state contract.
 
-7. `C-20260404-2148-A`
+8. `C-20260404-2148-A`
 - title: Bound startup governance for stale or ambiguous codex slot-switch lock
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -164,7 +184,7 @@ routing_policy:
 - next_action: This candidate is now materialized as `I-20260404-2148-A`. Keep the owner scoped to startup preflight and minimal lock observability; do not widen it back into blocked-intake supervision.
 - revisit_trigger: Re-open only if a future runtime change proves the startup/status lock contract still lacks a dedicated owner after this issue closes.
 
-8. `C-20260405-1215-A`
+9. `C-20260405-1215-A`
 - title: Runtime audio notifier and sound semantics
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -174,7 +194,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/candidates.md`
 - next_action: This candidate is now materialized as `I-20260405-1215-A`. Keep the owner scoped to canonical audio cue events, four standard bundled sounds, and frontend/Tauri playback only.
 - revisit_trigger: Re-open only if future work adds blocked/failed/interruption semantics, native notice adapters for more tools, or headless/OS fallback playback.
-9. `C-20260405-0027-A`
+10. `C-20260405-0027-A`
 - title: Codex API-key slot bundle and provider-aware probe governance
 - milestone_state: candidate
 - phase_state: `todo_ibm`
@@ -185,7 +205,7 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260405-0027-A` is now the canonical completed owner for the Codex auth+config bundle contract; future work should route through a new follow-on owner rather than reopening candidate-stage IBM.
 - revisit_trigger: Revisit if another active owner absorbs the full auth+config slot bundle contract or if official Codex provider/auth semantics shift enough to invalidate the current slot-kind split.
 
-10. `C-20260405-1415-A`
+11. `C-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: candidate
 - phase_state: `todo_ibm`

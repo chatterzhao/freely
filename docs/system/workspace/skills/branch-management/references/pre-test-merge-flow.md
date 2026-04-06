@@ -8,6 +8,7 @@
 4. `test-pre-merge-*` 一旦启用，就应有自己的 canonical sibling worktree；进入该环境做验证时，直接 `cd` / `source ./bin/wt-enter <test-pre-merge-branch>` 到这棵树，而不是停留在其他工位假装“当前就是测试批次环境”
 5. 这棵 `test-pre-merge-*` worktree 是只读集成/验收环境：
    - 允许 merge、smoke、regression、post-merge acceptance
+   - 运行测试时显式使用 `./bin/test-lane premerge-integration -- <command...>`；若当前是 merge 后真实环境 followthrough，则用 `./bin/test-lane post-merge-followthrough -- <command...>`
    - 不允许直接 add/commit 新实现
    - 若在这里发现缺陷，返回对应 feature worktree 修复，再重新并回该测试批次
 6. 合并前执行 `./bin/wt-status-all`，结果必须全 `CLEAN`
@@ -33,6 +34,7 @@
 3. `develop` 不承担“先预测试”的职责：
    - 需要主线前验证时，使用新的 `test-pre-merge-*`
    - 需要主线后真实环境确认时，才在 `develop` 做 completion verification
+4. 来源 feature 的实现自测、局部回归与 issue-bound 验证留在 dedicated writable worktree，并使用 `./bin/test-lane feature-local -- <command...>`。
 
 ## Batch freshness and replay
 
@@ -50,6 +52,7 @@
 3. 在 protected worktree 中运行验收时：
    - 允许 `cd` 到目标环境
    - 允许运行真实 `freely` / test / smoke / patrol / verification
+   - 运行命令时显式使用 `./bin/test-lane post-merge-followthrough -- <command...>`
    - 不允许顺手修实现并提交
 4. 若验收暴露问题，下一跳必须显式回到：
    - 原 feature worktree 继续修复；或
