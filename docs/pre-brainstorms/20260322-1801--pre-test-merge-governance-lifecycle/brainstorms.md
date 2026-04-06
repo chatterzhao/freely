@@ -33,18 +33,20 @@ Freely 正在用 Freely 开发 Freely。
 
 1. `develop` 是长期集成主线。
 2. `test-pre-merge-*` 是临时预集成验证批次，不应固化为长期开发父分支。
-3. 复杂集成、短周期验收、冲突收敛、发布前预演可以启用 `test-pre-merge-*` 批次，但它必须有清晰的批次边界，并从当前 `develop` 新建。
+3. 对 develop-bound 变更，正常 promote 路径已经冻结为 `feature/* -> test-pre-merge-* -> develop`；`feature/* -> develop` 不再是正常路径。
+4. 单 feature 批次与 explicit multi-bundle 批次共用同一 `test-pre-merge-*` family；不再新增第二个 `test-pre-*` 前缀来表达 multi lane。
+5. 复杂集成、短周期验收、冲突收敛、发布前预演可以启用 `test-pre-merge-*` 批次，但它必须有清晰的批次边界，并从当前 `develop` 新建。
 
 ### 已确认的治理缺口
 
-1. 还没有明确区分：
-- `pre-test-merge` 只做验证
-- `develop` 才是最终集成真相
+1. 还没有完全冻结：
+- `test-pre-merge-*` 既是临时验证批次，也是进入 `develop` 的 canonical promote family
+- `develop` 仍是长期集成真相，但不再承担“先在主线上预测试”的职责
 
 2. 还没有明确回答：
-- 一个 `pre-test-merge` 批次什么时候 stale
+- 一个 `test-pre-merge-*` 批次什么时候 stale
 - 哪些改动必须回到来源 feature worktree
-- 哪些改动可以直接推进到 `develop`
+- 哪些情况下当前批次仍可作为权威 promote source，哪些情况下必须 retire / rebuild fresh batch
 
 3. 还没有形成完整的能力化输出：
 - 不能自动解释当前批次归属
@@ -108,9 +110,9 @@ Freely 正在用 Freely 开发 Freely。
 
 ## 关键张力
 
-1. `pre-test-merge` 是临时验证批次，不该长期承载实现真相。
-2. 但多个 feature 的组合行为只能在它这里被看见，不能简单废掉它。
-3. `develop` 是最终集成主线，但主线在前进时不能被旧批次的语义拖回去。
+1. `test-pre-merge-*` 是临时验证批次，不该长期承载实现真相。
+2. 但多个 feature 的组合行为只能在它这里被看见，而且当前 canonical develop promote 也必须经过它，不能简单废掉它或退回 direct `feature/* -> develop`。
+3. `develop` 是最终长期主线，但主线在前进时不能被旧批次的语义拖回去，也不能替代新的测试批次承担主线前预检。
 4. Git 本身不能天然表达 batch 生命周期，所以 Freely 需要显式治理与状态留痕。
 
 ## 预研方向
@@ -121,6 +123,7 @@ Freely 正在用 Freely 开发 Freely。
 - 不负责长期保存事实真相
 - 不作为新的 feature 开发父分支
 - 不作为默认回收旧实现的来源
+- 但它在仍然权威时，就是 develop-bound 批次的合法 promote source；lifecycle capability 不得把这条 canonical promote 路径重新改写回 replay-only 或 direct feature bypass
 
 ### 方向 B：明确 `pre-test-merge` 的生命周期模型
 
@@ -144,7 +147,7 @@ Freely 后续应具备能力去判断：
 - 当前 `pre-test-merge` 是否仍是有效批次
 - 是否已被 `develop` 甩开到需要重建
 - 是否存在未回流到来源 worktree 的 protected-env 差异
-- 是否能安全 promote，还是只能 replay 来源 feature
+- 是否能安全 promote，还是必须 retire / rebuild fresh batch 并重新吸收来源 feature 集合
 
 ## 预期落点
 
@@ -513,9 +516,9 @@ Validation batch governance:
   - `pre-tests.md` 没有先被读取时，系统容易把 `pre-test-merge` 当成默认 acceptance 环境，而不是先看 `integration_target`
   - stale 批次虽已在文档中定义为必须 retire/rebuild，但 runtime / patrol 仍缺足够硬的反向拒绝，因此旧批次会残留成“看起来还能继续消费”的 surface
 - 因而后续 contract 必须补一条比“何时可以启用”更硬的默认规则：
-  - 默认路径仍是 `feature/* -> develop`
-  - 只有当 `pre-tests.md` 或明确的主线前组合验证需求要求时，才进入 `pre-test-merge`
-  - 若 `pre-tests.md` 未显式声明 `integration_target=pre-test-merge`，manager 不得把它当成默认 acceptance 面
+  - develop-bound 默认 promote 路径已经是 `feature/* -> test-pre-merge-* -> develop`
+  - route 决策只回答当前验证落在 dedicated feature lane、当前权威 `test-pre-merge-*`，还是 merge 后的 `develop` completion verification；不得重新打开 direct `feature/* -> develop`
+  - 若验证目标不是当前权威 `test-pre-merge-*`，manager 必须有来自 `pre-tests.md` 或明确完成态 followthrough 的证据，不能因为 protected canonical worktree 显眼就把它当默认 acceptance 面
   - 若批次已 stale，默认动作是 retire/rebuild，不是继续消费旧批次
 - 换句话说，`pre-test-merge` 的问题更像“反滥用 contract 不够硬”，而不是“职责从未定义”
 
