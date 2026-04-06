@@ -10,7 +10,7 @@ description: 管理 Freely 风格开发的完整自主分支生命周期，支�
 1. 先跑固定门禁：`skill:constitution-guard` -> `skill:laws-enforcer`。
 2. 按场景选择唯一 reference：
    - 功能开发 / 派生 worktree：读 [feature-worktree-flow.md](references/feature-worktree-flow.md)
-   - 临时验证批次与 replay：读 [pre-test-merge-flow.md](references/pre-test-merge-flow.md)，其中 `test-pre-merge-*` 表示临时测试批次前缀族
+   - 临时验证批次与 promote：读 [pre-test-merge-flow.md](references/pre-test-merge-flow.md)，其中 `test-pre-merge-*` 表示临时测试批次前缀族
    - 发布 / 热修 / 标签：读 [release-hotfix-flow.md](references/release-hotfix-flow.md) 和 [release-tag-policy.md](references/release-tag-policy.md)
    - 清理：读 [cleanup-lifecycle.md](references/cleanup-lifecycle.md)
 3. 若冲突复杂或回滚风险出现，停止并切换到 `skill:premerge-reconcile`。
@@ -37,6 +37,6 @@ description: 管理 Freely 风格开发的完整自主分支生命周期，支�
 
 ## 完成
 - 临时验证批次完成后，无需继续保留的分支不会滞留在 `test-pre-merge-*` 中。
-- `test-pre-merge-*` 自身不是长期资产；该批次在验证通过或失败后都应立即删除，不作为并入 `develop` 的载体保留。
+- `test-pre-merge-*` 自身不是长期资产；该批次在验证通过或失败后都应立即删除。验证通过时，由当前权威批次进入 `develop`，随后 retire 该批次。
 - 语义回归检查清单全部为绿色。
 - 提升/标签/发布动作已完成或显式阻止并记录原因。
