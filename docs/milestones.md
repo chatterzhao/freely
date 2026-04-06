@@ -94,17 +94,6 @@ routing_policy:
 - next_action: Use this owner to land explicit lane routing truth, `./bin/test-lane` machine enforcement, wrapper entrypoint correctness, and lane-specific regression coverage without widening into automatic lane inference or lifecycle automation.
 - revisit_trigger: Re-open only if lane semantics cannot stay aligned across AGENTS/LAWS/skills/scripts, or if later work tries to infer lanes implicitly instead of requiring an explicit lane contract.
 
-5. `I-20260405-2055-A`
-- title: Restart slot-switch preflight preserves active runtime governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/candidates.md`
-- next_action: Finish issue-bound verification writeback on the current feature lane, then replay the focused restart regression set in a fresh `test-pre-merge-*` integration worktree before guarded merge to `develop`.
-- revisit_trigger: Re-open only if pre-merge replay proves the preserved-runtime restart contract is still unstable, or if a broader runtime durability gap appears that no longer belongs to this narrow restart owner.
-
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -216,8 +205,6 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260405-0027-A` is now the canonical completed owner for the Codex auth+config bundle contract; future work should route through a new follow-on owner rather than reopening candidate-stage IBM.
 - revisit_trigger: Revisit if another active owner absorbs the full auth+config slot bundle contract or if official Codex provider/auth semantics shift enough to invalidate the current slot-kind split.
 
-11. `C-20260405-1415-A`
-
 11. `C-20260405-2055-A`
 - title: Restart slot-switch preflight preserves active runtime governance
 - milestone_state: candidate
@@ -226,8 +213,8 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/candidates.md`
-- next_action: Candidate mirror only. `I-20260405-2055-A` is now the canonical active owner for restart-time slot-switch preflight ordering and active-runtime preservation; continue execution from the issue/progress pair.
-- revisit_trigger: Revisit if the preserved-runtime restart contract is absorbed by another still-active owner, or if canonical replay shows this lane widened beyond the narrow restart boundary.
+- next_action: Candidate mirror only. `I-20260405-2055-A` is now the canonical completed owner for restart-time slot-switch preflight ordering, preserved-runtime failure behavior, and the bounded adjacent durability hardenings required by that contract.
+- revisit_trigger: Revisit if canonical `develop` regresses the preserved-runtime restart contract or if a future owner absorbs this exact restart-only boundary.
 
 12. `C-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
@@ -325,6 +312,34 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
   - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
 - completion_note: `Canonical develop now treats Codex auth as a bundle of auth truth plus provider-aware config fragment, preserves cross-kind account/apikey switching semantics, and keeps exec-only apikey probing separate from OAuth-backed account inventory without widening into non-Codex parity or standalone extraction.`
+5. `I-20260405-2055-A`
+- title: Restart slot-switch preflight preserves active runtime governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-restart-slot-switch-preflight-preserves-active-runtime-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/candidates.md`
+- evidence:
+  - `develop` merge `255d6dd`
+  - `docs/progress/workspace-routing-foundation/p-restart-slot-switch-preflight-preserves-active-runtime-governance.md`
+  - `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-verification.md`
+  - `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-canonical-closeout-verification.md`
+  - `git diff --check`
+  - `./bin/governance-check`
+  - `bash -n docs/system/workspace/scripts/runtime/freely`
+  - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+  - `bash docs/system/workspace/scripts/tests/test-freely-restart-preserves-runtime-on-active-slot-switch-lock`
+  - `bash docs/system/workspace/scripts/tests/test-freely-session-rotation`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-serialization`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-triggers-auth-change-wake`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-does-not-block-on-auth-change-wake`
+  - `bash docs/system/workspace/scripts/tests/test-freely-checkpoint-governance`
+  - `bash docs/system/workspace/scripts/tests/test-freely-checkpoint-drift-escalation`
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-current-slot-does-not-capture-switch-warning`
+- completion_note: `Canonical develop now resolves shared slot-switch preflight before restart stops a live project runtime, preserves the active supervisor and AI child on bounded preflight failure, and keeps the restart-adjacent relaunch/session-state hardenings aligned with that contract without widening into broader watchdog redesign.`
 
 1. `I-20260402-0020-A`
 - title: Hook bypass break-glass governance
