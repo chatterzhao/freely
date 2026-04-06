@@ -44,7 +44,8 @@
   - watchdog 仍只负责 runtime recovery，不负责决定 validation batch legitimacy；batch legitimacy 只能消费 manager 已写出的治理真相
   - 所有指向 stale batch 的旧 queued worker prompts / delegated launches 都会被 supersede 或失效，不再继续消费旧 prompt 池
   - 若同一能力仍需继续验证，必须 replay 来源 feature 集合到 fresh `pre-test-merge` batch，而不是复用旧 stale batch 继续跑
-  - 反滥用默认值必须固定：默认提升路径仍是 `feature/* -> develop`；只有当 `pre-tests.md` 显式声明 `integration_target=pre-test-merge` 或当前问题确属主线前组合验证时，manager 才可把 lane 路由到 `pre-test-merge`
+  - 反滥用默认值必须固定：develop-bound 正常提升路径已经是 `feature/* -> test-pre-merge-* -> develop`；lifecycle capability 不得重新打开 direct `feature/* -> develop` 默认路径，也不得为 explicit multi-bundle 另造第二个 `test-pre-*` 前缀
+  - route 决策要回答的是“当前验证应落在 dedicated feature lane、当前权威 `test-pre-merge-*` 批次，还是 merge 后的 `develop` completion verification”，而不是把 `test-pre-merge-*` 错当成可选旁路
   - 只能使用现有状态与 gate 组合判断是否继续推进或删树：`done_ibm`、`completed`、cleanup gate、`verified-retirable`、`retired`；其中 `completed` 只代表 issue completion，不代表 delete-eligible，stale retire/rebuild 不得只依据 issue `completed` 或局部 loop 收口
   - 上述 contract 优先落在现有真源：manager continuity 为唯一治理真相面，`manager-worker-launch-state.env` 与 `live-status` 仅做消费镜像，不新增平行状态文件
   - manager continuity 必须带批次身份锚点与固定承载语法，至少包括 `validation_batch_id`、`integration_target`、`source_batch_base`，并以固定可解析块承载，而不是自由文本
@@ -67,6 +68,7 @@
   - 冻结 manager lifecycle transaction 与现有 patrol 词典的映射，不新增平行状态系统
   - 冻结 replay source manifest / replay order / retire evidence 的最小 schema
   - 冻结 `pre-test-merge` 的反滥用默认路由：未命中显式 `integration_target=pre-test-merge` 或主线前组合验证需求时，不得把它当默认验证面
+  - 冻结 canonical promote family：single-feature 与 explicit multi-bundle lane 共用 `test-pre-merge-*`，并证明 stale-batch lifecycle 能力不会重新引入 `test-pre-multi-merge-*` 之类第二前缀
   - 冻结 `superseded_worker_prompts` 与 stale batch gate 的联动，保证旧 queued prompt 不会继续被 runtime 消费
   - 冻结 `validation_batch_mode=read_only_cleanup|rebuild_planning`，确保 `collect_cleanup_evidence` 不会被误读成恢复普通 verification
   - 冻结 `Validation batch governance:` `v1` 固定块、必留 key 与 key 顺序，并证明 runtime / cleanup skill 只靠该块就能稳定读到最小治理字段
