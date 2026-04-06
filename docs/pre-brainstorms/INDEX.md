@@ -17,6 +17,9 @@
 - 20260406-0045--governance-check-protected-merge-history-source-policy
   - brainstorms: docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/brainstorms.md
   - candidates: docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/candidates.md
+- 20260406-1105--milestone-completed-queue-closeout
+  - brainstorms: docs/pre-brainstorms/20260406-1105--milestone-completed-queue-closeout/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260406-1105--milestone-completed-queue-closeout/candidates.md
 - 20260405-2358--cli-command-audit-regressions
   - brainstorms: docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md
   - candidates: docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md

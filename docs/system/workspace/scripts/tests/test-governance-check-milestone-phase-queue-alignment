@@ -1,0 +1,264 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-governance-check-queue.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality"
+cd "$REPO"
+git init -q
+
+cp "$ROOT_DIR/bin/governance-check" "$REPO/bin/governance-check"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-check" "$REPO/docs/system/workspace/scripts/quality/governance-check"
+chmod +x "$REPO/bin/governance-check" "$REPO/docs/system/workspace/scripts/quality/governance-check"
+
+mkdir -p "$REPO/docs/system/workspace/skills/doc-ibm-execution/references"
+mkdir -p "$REPO/docs/system/workspace/skills/doc-ibm-execution"
+mkdir -p "$REPO/docs/system/workspace/skills/doc-pre-brainstorm-execution"
+mkdir -p "$REPO/docs/system/workspace/skills/dev-loop-execution"
+mkdir -p "$REPO/docs/system/workspace/skills/auto-loop-orchestrator"
+mkdir -p "$REPO/docs/system/workspace/skills"
+mkdir -p "$REPO/docs/system/workspace/agents"
+mkdir -p "$REPO/docs/system/workspace/hooks"
+mkdir -p "$REPO/docs/pre-brainstorms"
+mkdir -p "$REPO/docs/epics/sample/story/issues"
+
+cat > "$REPO/AGENTS.md" <<'EOF'
+# Agent entry
+EOF
+
+cat > "$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Project Intent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+
+cat > "$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+
+cat > "$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+
+cat > "$REPO/docs/system/workspace/three-loop-capability-lifecycle.md" <<'EOF'
+# Three Loop Capability Lifecycle
+EOF
+
+cat > "$REPO/docs/system/workspace/hooks/README.md" <<'EOF'
+# Workspace Hooks
+EOF
+
+cat > "$REPO/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2099-01-01`
+- source_policy_effective_date: `2099-01-01`
+EOF
+
+cat > "$REPO/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<'EOF'
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: `2099-01-01`
+EOF
+
+cat > "$REPO/docs/system/workspace/scripts/README.md" <<'EOF'
+# Scripts
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+
+cat > "$REPO/docs/system/workspace/skills/README.md" <<'EOF'
+# Skills
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+
+cat > "$REPO/docs/system/workspace/agents/lead-agent.md" <<'EOF'
+# Lead Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+
+cat > "$REPO/docs/system/workspace/agents/manager-agent.md" <<'EOF'
+# Manager Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+
+cat > "$REPO/docs/system/workspace/agents/worker-agent.md" <<'EOF'
+# Worker Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+
+cat > "$REPO/docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+
+cat > "$REPO/docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+
+cat > "$REPO/docs/system/workspace/skills/doc-ibm-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+references/prd-quality-bar.md
+pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生
+EOF
+
+cat > "$REPO/docs/system/workspace/skills/dev-loop-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+
+cat > "$REPO/docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md" <<'EOF'
+# PRD Quality Bar
+## Minimum structure
+## Bar for `done_ibm`
+EOF
+
+cat > "$REPO/docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md" <<'EOF'
+# IBM Completion Gate
+prd-quality-bar.md
+EOF
+
+cat > "$REPO/docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md" <<'EOF'
+# Issue Materialization Checklist
+prd-quality-bar.md
+EOF
+
+cat > "$REPO/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+
+cat > "$REPO/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# Convergence
+EOF
+
+cat > "$REPO/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-9999--candidate-v2-sample
+  - brainstorms: docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md
+EOF
+
+mkdir -p "$REPO/docs/pre-brainstorms/20260320-9999--candidate-v2-sample"
+cat > "$REPO/docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+
+cat > "$REPO/docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260320-9999-A
+- candidate_format_version: v2
+- title: sample
+- status: promoted
+- milestone: `M-20260320-9999-sample`
+- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
+- acceptance_criteria:
+  - queue truth is aligned
+- promotion_gate:
+  - issue is materialized
+- open_questions: []
+- acceptance_reviews:
+  - reviewer: codex-mini
+    verdict: supports
+    note: boundary is stable
+- decision_reason: sample
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+- session_refs: []
+EOF
+
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260320-9999-A`
+- phase_state: `completed`
+- milestone: `M-20260320-9999-sample`
+- source_candidate: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md#c-20260320-9999-a`
+EOF
+
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-20260320-9999-sample
+
+- status: active
+
+### candidate_issues
+
+1. `C-20260320-9999-A`
+- title: sample
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md`
+- next_action: materialized already
+- revisit_trigger: drift appears
+
+### committed_issues
+
+1. `I-20260320-9999-A`
+- title: sample issue
+- milestone_state: committed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
+- source_candidates:
+  - `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md#c-20260320-9999-a`
+- next_action: wrong queue on purpose
+- revisit_trigger: move it
+
+### completed_issues
+EOF
+
+if ./bin/governance-check >/tmp/gov-queue-fail.out 2>&1; then
+  echo "[FAIL] governance-check should fail when a completed issue stays in committed_issues" >&2
+  cat /tmp/gov-queue-fail.out >&2
+  exit 1
+fi
+grep -q "only in completed_issues" /tmp/gov-queue-fail.out
+
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-20260320-9999-sample
+
+- status: active
+
+### candidate_issues
+
+1. `C-20260320-9999-A`
+- title: sample
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md`
+- next_action: materialized already
+- revisit_trigger: drift appears
+
+### committed_issues
+
+### completed_issues
+
+1. `I-20260320-9999-A`
+- title: sample issue
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- source_brainstorm: `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/brainstorms.md`
+- source_candidates:
+  - `docs/pre-brainstorms/20260320-9999--candidate-v2-sample/candidates.md#c-20260320-9999-a`
+EOF
+
+./bin/governance-check >/tmp/gov-queue-pass.out 2>&1
+
+echo "[PASS] governance-check enforces milestone queue alignment with issue phase"

@@ -8,6 +8,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 REPO="$TMP_DIR/repo"
 mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality"
 cd "$REPO"
+git init -q
 
 cp "$ROOT_DIR/bin/governance-check" "$REPO/bin/governance-check"
 cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-check" "$REPO/docs/system/workspace/scripts/quality/governance-check"
@@ -55,6 +56,13 @@ cat > "$REPO/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md
 # Protected Branch Break-Glass Receipts
 
 - audit_effective_date: `2099-01-01`
+EOF
+
+cat > "$REPO/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2099-01-01`
+- source_policy_effective_date: `2099-01-01`
 EOF
 
 cat > "$REPO/docs/system/workspace/scripts/README.md" <<'EOF'

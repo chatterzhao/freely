@@ -61,62 +61,6 @@ routing_policy:
 - next_action: Keep this owner parked as the canonical IBM handoff for standalone extraction timing. Do not open an extraction worktree until the Codex-first owner is merged and a concrete follow-on lane can prove the extraction-start checklist is satisfied.
 - revisit_trigger: Re-open only if the Codex-first owner is reopened and invalidates the threshold/boundary package, or if a second tool reaches verified parity quickly enough to change the extraction economics.
 
-2. `I-20260405-2358-C`
-- title: CLI wrapper packaging and regression-surface governance
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-cli-wrapper-packaging-and-regression-surface-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
-- next_action: Closed on canonical `develop` through guarded merges `ab7a9b8` and `8e0985b`; keep this owner as the bounded contract for runnable wrapper packaging, clean help output, and deterministic auth-change wake coverage.
-- revisit_trigger: Re-open only if canonical `develop` regresses those packaging/regression surfaces, or if a future command audit proves they actually belong to a broader bootstrap/runtime owner.
-
-2. `I-20260405-2136-A`
-- title: Runtime blocked intake and continuity truth governance
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md`
-- next_action: Closed on canonical `develop` through guarded merge `fd1907b`. Keep this owner as the bounded contract for prompt-visible blocked supervision truth; future reopen only if canonical runtime again leaves intake stuck without blocked writeback or continuity handoff.
-- revisit_trigger: Re-open only if canonical `develop` regresses the blocked supervision truth surface, or if a future owner needs to split a new lifecycle out of the reused delegated-continuation implementation.
-
-3. `I-20260405-1615-A`
-- title: Feature-owned test-pre-merge family promotion model governance
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1615--feature-owned-test-pre-merge-family/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-1615--feature-owned-test-pre-merge-family/candidates.md`
-- next_action: Keep this owner as the canonical handoff for freezing the promote model before any constitutional, legal, or protected-branch gate implementation changes. Follow-on work must reopen as narrower enforcement or lifecycle owners.
-- revisit_trigger: Re-open only if the owner package proves unable to distinguish single-feature lanes, explicit multi-bundles, and future enforcement boundaries clearly enough for follow-on execution.
-
-4. `I-20260405-1805-A`
-- title: Test-pre-merge family promotion gate enforcement governance
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1805--test-pre-merge-family-promotion-gate-enforcement/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-1805--test-pre-merge-family-promotion-gate-enforcement/candidates.md`
-- next_action: Use this owner to land synchronized truth-source update and protected-branch promotion gate enforcement. Keep lifecycle automation as a later owner.
-- revisit_trigger: Re-open only if the owner cannot keep truth-source update and source-branch enforcement aligned without widening into lifecycle automation.
-
-5. `I-20260405-1914-A`
-- title: Test lane routing and enforcement governance
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/candidates.md`
-- next_action: Use this owner to land explicit lane routing truth, `./bin/test-lane` machine enforcement, wrapper entrypoint correctness, and lane-specific regression coverage without widening into automatic lane inference or lifecycle automation.
-- revisit_trigger: Re-open only if lane semantics cannot stay aligned across AGENTS/LAWS/skills/scripts, or if later work tries to infer lanes implicitly instead of requiring an explicit lane contract.
-
 ### candidate_issues
 
 1. `C-20260404-0119-A`
@@ -140,6 +84,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/candidates.md`
 - next_action: Candidate mirror only. `I-20260406-0045-A` is the canonical owner for first-parent protected merge history auditing.
 - revisit_trigger: Re-open only if the issue boundary proves too narrow to keep ordinary receipt and break-glass receipt audits aligned.
+
+3. `C-20260406-1105-A`
+- title: Milestone completed-queue closeout
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-1105--milestone-completed-queue-closeout/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-1105--milestone-completed-queue-closeout/candidates.md`
+- next_action: Candidate mirror only. `I-20260406-1105-A` is the canonical owner for repairing completed-owner queue drift and binding the missing baseline audit.
+- revisit_trigger: Re-open only if canonical governance-check still misses milestone queue/phase drift after this owner closes.
 
 2. `C-20260405-1615-A`
 - title: Feature-owned test-pre-merge family promotion model
@@ -284,7 +239,25 @@ routing_policy:
 - revisit_trigger: Re-open immediately if another canonical `test-pre-merge-* -> develop` promotion causes `./bin/governance-check` to reject an internal feature -> test-pre-merge merge commit as if it landed directly on `develop`.
 
 ### completed_issues
-1. `I-20260406-0045-A`
+1. `I-20260406-1105-A`
+- title: Milestone completed-queue closeout governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-milestone-completed-queue-closeout-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-1105--milestone-completed-queue-closeout/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-1105--milestone-completed-queue-closeout/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-milestone-completed-queue-closeout-governance.md`
+  - `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-milestone-phase-queue-alignment`
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`
+  - `./bin/governance-check`
+- completion_note: `Canonical milestone truth no longer leaves completed owners in committed_issues, and baseline governance-check now audits milestone queue placement against the referenced issue phase so historical queue drift is no longer silent.`
+
+2. `I-20260406-0045-A`
 - title: Governance-check protected-merge history source policy governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -303,7 +276,83 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now audits protected-branch merge receipts by effective target branch, so nested feature -> test-pre-merge ancestry no longer poisons develop source-policy checks while direct invalid feature -> develop receipts still fail.`
 
-1. `I-20260404-0640-A`
+3. `I-20260405-2358-C`
+- title: CLI wrapper packaging and regression-surface governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-cli-wrapper-packaging-and-regression-surface-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
+- evidence:
+  - `develop` merge `8e0985b`
+  - `docs/progress/workspace-routing-foundation/p-cli-wrapper-packaging-and-regression-surface-governance.md`
+  - `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-verification.md`
+  - `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-canonical-closeout-verification.md`
+- completion_note: `Canonical develop has already absorbed the bounded wrapper packaging and regression-surface repair, so this owner belongs only in completed_issues.`
+
+4. `I-20260405-2136-A`
+- title: Runtime blocked intake and continuity truth governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-blocked-intake-and-continuity-truth-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md`
+- evidence:
+  - `develop` merge `fd1907b`
+  - `docs/progress/workspace-routing-foundation/p-runtime-blocked-intake-and-continuity-truth-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-canonical-closeout-verification.md`
+- completion_note: `Canonical develop already carries the blocked-intake and continuity truth surface, so this owner should not remain in committed_issues.`
+
+5. `I-20260405-1914-A`
+- title: Test lane routing and enforcement governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/code-reviews/20260405-test-lane-routing-and-enforcement-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/code-reviews/20260405-test-lane-routing-and-enforcement-verification.md`
+  - `./bin/governance-check`
+- completion_note: `Explicit lane routing, executable wrappers, and lane misuse enforcement are already frozen as completed historical truth and no longer belong in committed_issues.`
+
+6. `I-20260405-1805-A`
+- title: Test-pre-merge family promotion gate enforcement governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1805--test-pre-merge-family-promotion-gate-enforcement/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1805--test-pre-merge-family-promotion-gate-enforcement/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-verification.md`
+  - `./bin/governance-check`
+- completion_note: `The synchronized truth-source and promotion-gate contract is already frozen as completed governance, so the owner belongs only in completed_issues.`
+
+7. `I-20260405-1615-A`
+- title: Feature-owned test-pre-merge family promotion model governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1615--feature-owned-test-pre-merge-family/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1615--feature-owned-test-pre-merge-family/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/code-reviews/20260405-feature-owned-test-pre-merge-family-promotion-model-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/code-reviews/20260405-feature-owned-test-pre-merge-family-promotion-model-verification.md`
+  - `./bin/governance-check`
+- completion_note: `The canonical test-pre-merge family promote model has already been frozen as completed handoff truth and should no longer remain in the active committed queue.`
+
+8. `I-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
 - milestone_state: completed
 - phase_state: `completed`
@@ -321,7 +370,7 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
   - `./bin/governance-check`
 - completion_note: `Canonical develop now audits trailerless protected-ancestry merges by their actual merge subject, so gap 70ef97d and the same-day receiptless ancestry set pass under the ordinary backfill ledger. The blocker-triage branch/worktree was retired after post-merge verification passed.`
-2. `I-20260404-2148-A`
+9. `I-20260404-2148-A`
 - title: Slot-switch startup preflight and lock observability governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -2278,26 +2327,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260405-1130-A`
-- title: Project-level AGENTS bootstrap and management contract governance
-- milestone_state: completed
-- phase_state: `completed`
-- priority: P1
-- issue_path: `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
-- progress_path: `docs/progress/freely-product-architecture/p-project-level-agents-bootstrap-and-management-contract-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md`
-- evidence:
-  - `docs/progress/freely-product-architecture/p-project-level-agents-bootstrap-and-management-contract-governance.md`
-  - `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-governance-verification.md`
-  - `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-canonical-closeout-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-init-preserves-existing-agents-md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
-  - `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
-  - `git diff --check`
-  - `./bin/governance-check`
-- completion_note: `Canonical develop now treats project-level AGENTS bootstrap and management as reusable capability truth: init creates AGENTS only when missing, preserves project-owned files when present, and runtime consumption still reads the project root entrypoint before reusable workspace capability docs.`
-
 2. `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
 - milestone_state: committed
@@ -2375,6 +2404,26 @@ routing_policy:
   - `git diff --check`
   - `./bin/governance-check`
 - completion_note: `Canonical develop still treats the output-style change as a narrow AGENTS-only experiment and explicitly points at the already-existing project-level AGENTS bootstrap/read-order contract, without widening this owner into reusable capability truth.`
+
+3. `I-20260405-1130-A`
+- title: Project-level AGENTS bootstrap and management contract governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-project-level-agents-bootstrap-and-management-contract-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/candidates.md`
+- evidence:
+  - `docs/progress/freely-product-architecture/p-project-level-agents-bootstrap-and-management-contract-governance.md`
+  - `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-governance-verification.md`
+  - `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/code-reviews/20260405-project-level-agents-bootstrap-and-management-contract-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-preserves-existing-agents-md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
+  - `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
+  - `git diff --check`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now treats project-level AGENTS bootstrap and management as reusable capability truth: init creates AGENTS only when missing, preserves project-owned files when present, and runtime consumption still reads the project root entrypoint before reusable workspace capability docs.`
 
 3. `I-20260402-0403-A`
 - title: Canonical product posture bootstrap reconciliation governance
