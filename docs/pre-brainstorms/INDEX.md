@@ -473,6 +473,9 @@
 - 20260305-2338--governance-skill-hook-alignment
   - brainstorms: docs/pre-brainstorms/20260305-2338--governance-skill-hook-alignment/brainstorms.md
   - candidates: docs/pre-brainstorms/20260305-2338--governance-skill-hook-alignment/candidates.md
+- 20260405-2055--restart-slot-switch-preflight-preserves-active-runtime
+  - brainstorms: docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/candidates.md
 - 20260305-1402--doc-loop-governance-maintenance
   - brainstorms: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260305-1402--doc-loop-governance-maintenance/candidates.md

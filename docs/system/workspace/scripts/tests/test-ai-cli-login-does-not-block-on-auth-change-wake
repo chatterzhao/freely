@@ -44,8 +44,8 @@ for _ in $(seq 1 20); do
   sleep 0.1
 done
 
-test -f "$HOME_DIR/.ai-auth/codex-login@example-com-1/auth.json"
-grep -q '^auth-change-wake --tool codex --slot login@example-com-1 --reason login_success$' "$WAKE_LOG"
+test -f "$HOME_DIR/.ai-auth/codex-account-login@example-com-1/auth.json"
+grep -q '^auth-change-wake --tool codex --slot account-login@example-com-1 --reason login_success$' "$WAKE_LOG"
 if (( elapsed >= 5 )); then
   echo "[FAIL] ai login remained blocked on auth-change wake for ${elapsed}s" >&2
   exit 1

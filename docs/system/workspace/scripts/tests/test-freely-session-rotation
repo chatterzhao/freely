@@ -3,6 +3,8 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-session-rotation.XXXXXX)"
+export FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$FREELY_HOME"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
@@ -968,11 +970,17 @@ start_epoch="$(date +%s)"
 HOME="$mock_home_limit" PATH="$mock_bin_limit:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_LIMIT" >/dev/null 2>&1 || true
 end_epoch="$(date +%s)"
 
-if [[ $((end_epoch - start_epoch)) -gt 3 ]]; then
-  echo "[FAIL] expected local runtime to defer rate-limit recovery instead of sleeping locally"
+event_log_limit="$PROJECT_LIMIT/.freely/logs/runtime-events.log"
+if [[ $((end_epoch - start_epoch)) -gt 8 ]]; then
+  echo "[FAIL] expected local runtime to stop promptly after rate-limit defer"
   exit 1
 fi
 grep -q 'LAST_SLOT_SWITCH_REASON="primary_rate_limit_exhausted"' "$PROJECT_LIMIT/.freely/run/session-state.env"
+grep -q 'event=supervisor_stopping.*reason=primary_rate_limit_exhausted' "$event_log_limit"
+if [[ "$(grep -c 'event=ai_launch_begin' "$event_log_limit")" -ne 1 ]]; then
+  echo "[FAIL] expected rate-limit defer to avoid an extra local relaunch cycle"
+  exit 1
+fi
 
 echo "[PASS] freely defers rate-limit recovery from local runtime to global watchdog"
 

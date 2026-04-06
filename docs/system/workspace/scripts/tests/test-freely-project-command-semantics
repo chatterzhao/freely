@@ -3,6 +3,8 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-project-command-semantics.XXXXXX)"
+export FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$FREELY_HOME"
 PROJECT=""
 START_ATTACH_TMP=""
 STALE_PID_TMP=""
@@ -59,6 +61,8 @@ RESTART_OUTPUT="$(
     source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
     resolve_project_or_fail() { printf "%s\n" "$1"; }
     log_info() { :; }
+    load_config() { :; }
+    ensure_codex_slot_switch_startup_ready_or_fail() { :; }
     stop_project_runtime() { printf "stop:%s|reason:%s\n" "$1" "$2"; }
     start_project_runtime() { printf "start:%s\n" "$1"; }
     main restart --project /tmp/freely-project
@@ -67,6 +71,52 @@ RESTART_OUTPUT="$(
 
 [[ "$RESTART_OUTPUT" == *"stop:/tmp/freely-project|reason:operator_restart"* ]]
 [[ "$RESTART_OUTPUT" == *"start:/tmp/freely-project"* ]]
+
+RESTART_PREFLIGHT_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    log_info() { :; }
+    load_config() { printf "load:%s\n" "$1"; }
+    ensure_codex_slot_switch_startup_ready_or_fail() { printf "preflight:%s\n" "$1"; }
+    stop_project_runtime() { printf "stop:%s|reason:%s\n" "$1" "$2"; }
+    start_project_runtime() { printf "start:%s\n" "$1"; }
+    main restart --project /tmp/freely-project
+  '
+)"
+
+[[ "$RESTART_PREFLIGHT_OUTPUT" == $'load:/tmp/freely-project\npreflight:/tmp/freely-project\nstop:/tmp/freely-project|reason:operator_restart\nstart:/tmp/freely-project' ]]
+
+RESTART_PREFLIGHT_FAIL_OUTPUT="$TMP_DIR/restart-preflight-fail.out"
+if bash -lc '
+  set -euo pipefail
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+  resolve_project_or_fail() { printf "%s\n" "$1"; }
+  log_info() { :; }
+  load_config() { printf "load:%s\n" "$1"; }
+  ensure_codex_slot_switch_startup_ready_or_fail() { printf "preflight:%s\n" "$1"; return 1; }
+  stop_project_runtime() { printf "stop:%s|reason:%s\n" "$1" "$2"; }
+  start_project_runtime() { printf "start:%s\n" "$1"; }
+  main restart --project /tmp/freely-project
+' >"$RESTART_PREFLIGHT_FAIL_OUTPUT" 2>&1; then
+  echo "[FAIL] restart should fail before stop when restart preflight fails" >&2
+  cat "$RESTART_PREFLIGHT_FAIL_OUTPUT" >&2
+  exit 1
+fi
+
+grep -q '^load:/tmp/freely-project$' "$RESTART_PREFLIGHT_FAIL_OUTPUT"
+grep -q '^preflight:/tmp/freely-project$' "$RESTART_PREFLIGHT_FAIL_OUTPUT"
+if grep -q '^stop:/tmp/freely-project|reason:operator_restart$' "$RESTART_PREFLIGHT_FAIL_OUTPUT"; then
+  echo "[FAIL] restart preflight failure should not stop the current runtime" >&2
+  cat "$RESTART_PREFLIGHT_FAIL_OUTPUT" >&2
+  exit 1
+fi
+if grep -q '^start:/tmp/freely-project$' "$RESTART_PREFLIGHT_FAIL_OUTPUT"; then
+  echo "[FAIL] restart preflight failure should not continue into startup" >&2
+  cat "$RESTART_PREFLIGHT_FAIL_OUTPUT" >&2
+  exit 1
+fi
 
 START_FORCE_OUTPUT="$(
   bash -lc '
