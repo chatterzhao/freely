@@ -73,6 +73,18 @@ routing_policy:
 - next_action: Use the current lane-local verification evidence to prepare guarded merge, then continue bootstrap/status and runtime follow-ons in separate owners.
 - revisit_trigger: Re-open prioritization only if this lane proves the observed defects actually belong to project bootstrap or runtime semantics instead of packaging/regression surface.
 
+3. `I-20260406-0045-A`
+- title: Governance-check protected-merge history source policy governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-governance-check-protected-merge-history-source-policy-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/candidates.md`
+- next_action: Repair protected-branch receipt auditing to use first-parent branch history, then replay `./bin/governance-check` on canonical `develop` before resuming unrelated closeout work.
+- revisit_trigger: Re-open only if first-parent scanning still allows nested protected merge ancestry to poison `develop` source-policy auditing.
+
 2. `I-20260405-2136-A`
 - title: Runtime blocked intake and continuity truth governance
 - milestone_state: committed
@@ -129,6 +141,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md`
 - next_action: This candidate is now materialized as `I-20260404-0119-A`. Keep the owner scoped to milestone-level status parsing so the merge gate stops reading nested queue item status lines as milestone truth.
 - revisit_trigger: Re-open only if active-milestone validation still misreads nested queue metadata after this parser-bound followthrough lands.
+
+2. `C-20260406-0045-A`
+- title: Governance-check protected-merge history source policy
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/candidates.md`
+- next_action: Candidate mirror only. `I-20260406-0045-A` is the canonical owner for first-parent protected merge history auditing.
+- revisit_trigger: Re-open only if the issue boundary proves too narrow to keep ordinary receipt and break-glass receipt audits aligned.
 
 2. `C-20260405-1615-A`
 - title: Feature-owned test-pre-merge family promotion model
