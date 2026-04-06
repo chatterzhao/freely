@@ -2516,6 +2516,71 @@ materialize_project_tooling_for_loaded_config() {
   write_project_tool_boundary_bootstrap_file "$project"
 }
 
+retarget_project_path_from_source() {
+  local source_project="$1" target_project="$2" value="${3:-}"
+  case "$value" in
+    "$source_project")
+      printf '%s\n' "$target_project"
+      ;;
+    "$source_project"/*)
+      printf '%s\n' "$target_project/${value#"$source_project"/}"
+      ;;
+    *)
+      printf '%s\n' "$value"
+      ;;
+  esac
+}
+
+rewrite_synced_project_config_for_target() {
+  local source_project="$1" target_project="$2"
+  local target_cfg raw_intent raw_constitution target_intent target_constitution
+  target_cfg="$(config_file "$target_project")"
+
+  raw_intent="$(
+    (
+      unset PROJECT_ROOT INTENT_FILE CONSTITUTION_FILE
+      # shellcheck disable=SC1090
+      source "$target_cfg"
+      printf '%s' "${INTENT_FILE:-}"
+    )
+  )"
+  raw_constitution="$(
+    (
+      unset PROJECT_ROOT INTENT_FILE CONSTITUTION_FILE
+      # shellcheck disable=SC1090
+      source "$target_cfg"
+      printf '%s' "${CONSTITUTION_FILE:-}"
+    )
+  )"
+
+  target_intent="$(retarget_project_path_from_source "$source_project" "$target_project" "$raw_intent")"
+  target_constitution="$(retarget_project_path_from_source "$source_project" "$target_project" "$raw_constitution")"
+  if [[ -f "$target_project/docs/PROJECT_INTENT.md" ]]; then
+    target_intent="$target_project/docs/PROJECT_INTENT.md"
+  fi
+  if [[ -f "$target_project/docs/CONSTITUTION.md" ]]; then
+    target_constitution="$target_project/docs/CONSTITUTION.md"
+  fi
+
+  upsert_config_key "$target_project" "PROJECT_ROOT" "$target_project"
+  [[ -n "$target_intent" ]] && upsert_config_key "$target_project" "INTENT_FILE" "$target_intent"
+  [[ -n "$target_constitution" ]] && upsert_config_key "$target_project" "CONSTITUTION_FILE" "$target_constitution"
+}
+
+sync_repo_hook_assets_from_source() {
+  local source_project="$1" target_project="$2"
+  local source_hooks target_hooks hook_file
+  source_hooks="$source_project/.githooks"
+  target_hooks="$target_project/.githooks"
+  [[ -d "$source_hooks" ]] || return 0
+
+  rm -rf "$target_hooks"
+  cp -R "$source_hooks" "$target_hooks"
+  while IFS= read -r hook_file; do
+    chmod +x "$hook_file"
+  done < <(find "$target_hooks" -type f | sort)
+}
+
 sync_project_tooling_from_source() {
   local source_project="$1" target_project="$2"
   local source_cfg target_cfg
@@ -2537,6 +2602,8 @@ sync_project_tooling_from_source() {
 
   mkdir -p "$(dirname "$target_cfg")"
   cp "$source_cfg" "$target_cfg"
+  rewrite_synced_project_config_for_target "$source_project" "$target_project"
+  sync_repo_hook_assets_from_source "$source_project" "$target_project"
   load_config "$target_project"
   materialize_project_tooling_for_loaded_config "$target_project" "true"
   log_info "synced project-local tooling: $source_project -> $target_project"
