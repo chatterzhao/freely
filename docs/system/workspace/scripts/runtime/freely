@@ -2262,23 +2262,38 @@ resolve_project_tool_reasoning_effort_selection() {
   runtime_default_reasoning_effort_for_tool "$tool"
 }
 
-prepare_manager_same_tool_slot_recovery_if_needed() {
+manager_bootstrap_runtime_expected() {
   local project="$1"
-  local desired_state current_tool last_exit_reason supervisor_pid ai_pid
-  TOOL_AUTO_RECOVERY_SAME_TOOL_EXHAUSTED="0"
-  TOOL_AUTO_RECOVERY_ENTRY_BLOCKED="0"
-  TOOL_AUTO_RECOVERY_SLOT=""
-  desired_state="unknown"
-  last_exit_reason=""
+  local desired_state="unknown"
   if [[ -f "$(workcell_state_file "$project")" ]]; then
-    unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
+    unset DESIRED_RUNTIME_STATE
     # shellcheck disable=SC1090
     source "$(workcell_state_file "$project")"
     desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+  fi
+  if [[ "$desired_state" == "running" ]]; then
+    return 0
+  fi
+  if [[ "$desired_state" == "unknown" && "$(role_hint_for_project "$project")" == "manager" ]]; then
+    return 0
+  fi
+  return 1
+}
+
+prepare_manager_same_tool_slot_recovery_if_needed() {
+  local project="$1"
+  local current_tool last_exit_reason supervisor_pid ai_pid
+  TOOL_AUTO_RECOVERY_SAME_TOOL_EXHAUSTED="0"
+  TOOL_AUTO_RECOVERY_ENTRY_BLOCKED="0"
+  TOOL_AUTO_RECOVERY_SLOT=""
+  last_exit_reason=""
+  if [[ -f "$(workcell_state_file "$project")" ]]; then
+    unset LAST_EXIT_REASON
+    # shellcheck disable=SC1090
+    source "$(workcell_state_file "$project")"
     last_exit_reason="${LAST_EXIT_REASON:-}"
   fi
-  [[ "$desired_state" == "running" ]] || return 1
-  config_bool_enabled "${AUTO_SWITCH_SLOT:-false}" || return 1
+  manager_bootstrap_runtime_expected "$project" || return 1
   current_tool="${AI_TOOL:-}"
   [[ -n "$current_tool" ]] || return 1
   tool_supports_auto_same_tool_slot_recovery "$current_tool" || return 1
@@ -2305,19 +2320,17 @@ prepare_manager_same_tool_slot_recovery_if_needed() {
 
 prepare_manager_cross_tool_fallback_if_needed() {
   local project="$1" same_tool_exhausted="${2:-0}"
-  local desired_state current_tool fallback_tool last_exit_reason supervisor_pid ai_pid
+  local current_tool fallback_tool last_exit_reason supervisor_pid ai_pid
   local candidate earliest_tool earliest_slot fallback_slot hint_reset hint_info hint_slot
   TOOL_AUTO_RECOVERY_DECISION="none"
-  desired_state="unknown"
   last_exit_reason=""
   if [[ -f "$(workcell_state_file "$project")" ]]; then
-    unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
+    unset LAST_EXIT_REASON
     # shellcheck disable=SC1090
     source "$(workcell_state_file "$project")"
-    desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
     last_exit_reason="${LAST_EXIT_REASON:-}"
   fi
-  [[ "$desired_state" == "running" ]] || return 1
+  manager_bootstrap_runtime_expected "$project" || return 1
   config_bool_enabled "${AUTO_SWITCH_TOOL:-false}" || return 1
   current_tool="${AI_TOOL:-}"
   [[ -n "$current_tool" ]] || return 1
@@ -6941,6 +6954,11 @@ launch_manager_supervisor() {
   local launch_bin
   launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
   clear_execution_network_state "$project"
+  if [[ -n "${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-}" ]]; then
+    # Test launch shims are synchronous evidence points; avoid background races in focused regressions.
+    bash "$launch_bin" start --project "$project" </dev/null >/dev/null 2>&1
+    return 0
+  fi
   nohup bash "$launch_bin" start --project "$project" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
 }

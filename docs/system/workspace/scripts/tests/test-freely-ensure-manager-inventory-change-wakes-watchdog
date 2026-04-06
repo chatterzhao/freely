@@ -11,12 +11,15 @@ LAUNCH_LOG="$TMP_DIR/launch.log"
 AI_STATE="$TMP_DIR/active-account"
 AI_SWITCH_LOG="$TMP_DIR/ai-switch.log"
 LIST_MODE_FILE="$TMP_DIR/list-mode"
+MOCK_HOME="$TMP_DIR/mock-home"
 mkdir -p \
   "$PROJECT/bin" \
   "$PROJECT/docs/pre-brainstorms/20260318-0000--sample" \
   "$PROJECT/.freely/run" \
   "$PROJECT/.freely/logs" \
-  "$MOCK_BIN"
+  "$MOCK_BIN" \
+  "$MOCK_HOME/.ai-auth" \
+  "$MOCK_HOME/.codex"
 
 git init -q -b develop "$PROJECT"
 
@@ -69,6 +72,8 @@ AI_TOOL="codex"
 AI_MODEL="gpt-5.4"
 AI_MODE="auto"
 AI_REASONING_EFFORT="medium"
+AUTO_SWITCH_TOOL="true"
+AUTO_SWITCH_SLOT="true"
 CHECK_INTERVAL=1
 RESTART_DELAY=0
 MAX_RESTARTS=2
@@ -81,6 +86,12 @@ CONTEXT_WARN_RATIO=0.50
 CONTEXT_ROTATE_RATIO=0.70
 CHECKPOINT_WARN_DIRTY_ENTRIES=40
 CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+SUPERVISOR_STATE="down"
+AI_STATE="down"
 EOF
 
 cat >"$PROJECT/bin/ai" <<'EOF'
@@ -155,6 +166,76 @@ exit 1
 EOF
 chmod +x "$MOCK_BIN/codex"
 
+cat >"$MOCK_BIN/curl" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+output_file=""
+auth_header=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --connect-timeout|--max-time)
+      shift 2
+      ;;
+    -o)
+      output_file="$2"
+      shift 2
+      ;;
+    -H)
+      if [[ "$2" == Authorization:\ Bearer* ]]; then
+        auth_header="$2"
+      fi
+      shift 2
+      ;;
+    -w)
+      shift 2
+      ;;
+    -s|-S|-sS)
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+token="${auth_header#Authorization: Bearer }"
+case "$token" in
+  token-old)
+    printf '{"rate_limits":{"primary":{"used_percent":100.0,"resets_at":4102531200},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
+    ;;
+  token-new)
+    printf '{"rate_limits":{"primary":{"used_percent":5.0,"resets_at":0},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
+    ;;
+  *)
+    printf '{"detail":"unexpected"}\n' >"$output_file"
+    printf '500'
+    ;;
+esac
+EOF
+chmod +x "$MOCK_BIN/curl"
+
+python3 - <<'PY' "$MOCK_HOME"
+import base64
+import json
+import os
+import sys
+
+home = sys.argv[1]
+slots = {
+    "old@example-com": "token-old",
+    "new@example-com": "token-new",
+}
+for slot, token in slots.items():
+    payload = base64.urlsafe_b64encode(json.dumps({"email": slot}).encode()).decode().rstrip("=")
+    path = os.path.join(home, ".ai-auth", f"codex-{slot}", "auth.json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({"tokens": {"id_token": f"x.{payload}.y", "access_token": token}}, f)
+PY
+
 printf 'old@example-com' >"$AI_STATE"
 printf 'initial' >"$LIST_MODE_FILE"
 HANDOFF_FILE="$PROJECT/.freely/run/session-handoff.txt"
@@ -165,6 +246,7 @@ AI_SWITCH_LOG="$AI_SWITCH_LOG" \
 LIST_MODE_FILE="$LIST_MODE_FILE" \
 LAUNCH_LOG="$LAUNCH_LOG" \
 FREELY_ENSURE_MANAGER_LAUNCH_BIN="$MOCK_BIN/launch-freely" \
+HOME="$MOCK_HOME" \
 PATH="$MOCK_BIN:$PATH" \
   bash "$ROOT_DIR/bin/freely" ensure-manager --project "$PROJECT" --watch --interval 1 >/dev/null 2>&1 &
 watchdog_pid="$!"
