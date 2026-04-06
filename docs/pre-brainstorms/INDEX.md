@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260406-0045--governance-check-protected-merge-history-source-policy
+  - brainstorms: docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/candidates.md
 - 20260405-2358--cli-command-audit-regressions
   - brainstorms: docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md
   - candidates: docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md
