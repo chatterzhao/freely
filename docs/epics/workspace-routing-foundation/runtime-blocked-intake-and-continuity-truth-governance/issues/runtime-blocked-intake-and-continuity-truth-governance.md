@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-2136-A`
 - title: Runtime blocked intake and continuity truth governance
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-blocked-intake-and-continuity-truth-governance`
@@ -13,7 +13,7 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/pre-tests.md`
-- progress_path: `pending://progress-created-on-dev-loop`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-blocked-intake-and-continuity-truth-governance.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews`
 - depends_on:
   - `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
@@ -97,6 +97,13 @@ Freely 现在已经分别具备：
 - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/prd.md`
 - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/tasks.md`
+- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
+- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
+- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-canonical-closeout-verification.md`
+- `docs/progress/workspace-routing-foundation/p-runtime-blocked-intake-and-continuity-truth-governance.md`
+- `docs/system/workspace/scripts/runtime/freely`
+- `docs/system/workspace/scripts/tests/test-freely-blocked-supervision-status-surface`
+- `docs/system/workspace/scripts/tests/test-freely-live-status`
 - milestone / candidate writeback showing this is the canonical owner for blocked intake/continuity truth under runtime supervision
 
 ## IBM Handoff
@@ -116,13 +123,21 @@ Freely 现在已经分别具备：
 
 ## Next
 
-- 当前 owner 已到 `done_ibm`。
-- 后续只应在能复现实质 blocked supervision truth gap 的 dedicated worktree 上开 implementation lane。
-- 第一个实现切片只能先收束 blocked-state truth 与 status surface，不能顺手扩成 generic watchdog redesign。
+- Completed on canonical `develop` via guarded merge `fd1907b`.
+- This closeout also backfills the previously missing `progress` plus issue-bound verification artifacts so the governance chain is explicitly closed instead of relying on the merge alone.
+- Post-merge closeout verification is recorded in `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-canonical-closeout-verification.md`.
+- Reopen only if canonical `develop` again leaves prompt-visible intake stuck without claim/continuity writeback, or if future work tries to widen this owner back into generic watchdog redesign or network taxonomy.
 
 ## Verification
 
+- `git diff --check`
 - `./bin/governance-check`
+- `bash -n docs/system/workspace/scripts/runtime/freely`
+- `bash docs/system/workspace/scripts/tests/test-test-lane`
+- `bash docs/system/workspace/scripts/tests/test-freely-blocked-supervision-status-surface`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
+- `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
 - review `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md`
 - review `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
 - review `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
