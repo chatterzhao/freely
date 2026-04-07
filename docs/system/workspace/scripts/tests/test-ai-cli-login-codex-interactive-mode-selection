@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ai-login-codex-mode-selection.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+HOME_DIR="$TMP_DIR/home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+CODEX_LOG="$TMP_DIR/codex.log"
+
+mkdir -p "$HOME_DIR/.codex" "$MOCK_BIN"
+
+PAYLOAD="$(python3 - <<'PY'
+import base64
+import json
+print(base64.urlsafe_b64encode(json.dumps({"email": "account-login@example.com"}).encode()).decode().rstrip("="))
+PY
+)"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >>"${CODEX_LOG:?}"
+if [[ "${1:-}" == "login" ]]; then
+  printf '{"tokens":{"id_token":"x.%s.y"}}\n' "${PAYLOAD:?}" >"$HOME/.codex/auth.json"
+  exit 0
+fi
+exit 99
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+printf 'account\n' | HOME="$HOME_DIR" PATH="$MOCK_BIN:$PATH" CODEX_LOG="$CODEX_LOG" PAYLOAD="$PAYLOAD" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json login codex >"$TMP_DIR/login.json"
+
+grep -q '^login$' "$CODEX_LOG"
+grep -q '"logged_in": true' "$TMP_DIR/login.json"
+grep -q '"slot_kind": "account"' "$TMP_DIR/login.json"
+grep -q '"auth_email": "account-login@example.com"' "$TMP_DIR/login.json"
+test -f "$HOME_DIR/.ai-auth/codex-account-account-login@example-com-1/auth.json"
+
+echo "[PASS] ai login codex prompts for auth mode and routes account selection through codex login"
