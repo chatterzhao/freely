@@ -50,30 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260406-1829-A`
-- title: Codex current-live apikey bootstrap without saved-slot inventory governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260406-1829--codex-current-live-apikey-bootstrap-without-saved-slot/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260406-1829--codex-current-live-apikey-bootstrap-without-saved-slot/candidates.md`
-- next_action: Replay the issue-bound current-live bootstrap regressions and governance gates, then decide whether the old residual tree can retire.
-- revisit_trigger: Re-open only if canonical replay proves the no-saved-slot current-live bootstrap semantics were already fully absorbed by another owner.
-
-2. `I-20260406-1851-A`
-- title: Codex interactive login and API-key input flow governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-codex-interactive-login-and-apikey-input-flow-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260406-1851--codex-interactive-login-and-apikey-input-flow/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260406-1851--codex-interactive-login-and-apikey-input-flow/candidates.md`
-- next_action: Keep the interactive login implementation bounded to `ai-cli` plus the four issue-bound regressions, then replay the tests and governance gates before promotion.
-- revisit_trigger: Re-open only if canonical replay proves the dirty interactive login patch actually belongs inside another owner, or if the UX slice grows beyond Codex-first mode selection and API-key input/materialization.
-
 3. `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: committed
@@ -96,18 +72,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
 - next_action: Repair the audited help/usage exit-code contracts plus the bounded `ai switch codex --dry-run` JSON summary path, then replay the focused CLI-first verification set before promotion.
 - revisit_trigger: Re-open only if the owner proves too narrow to keep help semantics and dry-run summary semantics aligned, or if canonical replay exposes another first-hop command contract outside this bounded set.
-
-3. `I-20260406-0901-A`
-- title: Codex reconnect probe fast-fail and runtime network classification governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/candidates.md`
-- next_action: Use the recorded verification evidence to prepare guarded promotion/merge for `feature/codex-hi-fast-fail-and-runtime-availability`; keep any old residual worktrees parked outside this owner.
-- revisit_trigger: Re-open only if reconnect evidence proves to require a broader launch-time bootstrap redesign, or if canonical replay shows the issue boundary is still too narrow to keep probe status and runtime classification aligned.
 
 ### candidate_issues
 
@@ -342,6 +306,72 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+1. `I-20260406-1829-A`
+- title: Codex current-live apikey bootstrap without saved-slot inventory governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-1829--codex-current-live-apikey-bootstrap-without-saved-slot/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-1829--codex-current-live-apikey-bootstrap-without-saved-slot/candidates.md`
+- evidence:
+  - `develop` merge `4b6e0a9`
+  - `docs/progress/workspace-routing-foundation/p-codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+  - `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-verification.md`
+  - `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-current-live-apikey-without-saved-slot`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-current-live-apikey-without-saved-slot`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now carries the bounded current-live apikey bootstrap repair without saved-slot inventory, so this owner should no longer remain in committed_issues.`
+
+2. `I-20260406-1851-A`
+- title: Codex interactive login and API-key input flow governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-interactive-login-and-apikey-input-flow-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-1851--codex-interactive-login-and-apikey-input-flow/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-1851--codex-interactive-login-and-apikey-input-flow/candidates.md`
+- evidence:
+  - `develop` merge `7dc4074`
+  - `docs/progress/workspace-routing-foundation/p-codex-interactive-login-and-apikey-input-flow-governance.md`
+  - `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-verification.md`
+  - `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-codex-interactive-mode-selection`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-codex-apikey-interactive`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-codex-apikey-direct-args`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-codex-apikey-empty-input-fails`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now carries the bounded Codex-first interactive login and API-key input flow repair, so this owner should no longer remain in committed_issues.`
+
+3. `I-20260406-0901-A`
+- title: Codex reconnect probe fast-fail and runtime network classification governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/candidates.md`
+- evidence:
+  - `develop` merge `7674bc3`
+  - `docs/progress/workspace-routing-foundation/p-codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+  - `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-verification.md`
+  - `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-detects-network-failure-before-timeout`
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-network-failure-cleans-child-process`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-status-live-apikey-network-failure`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-live-apikey-network-failure`
+  - `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
+  - `bash docs/system/workspace/scripts/tests/test-freely-runtime-auth-failure-signal-filter`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now carries the reconnect fast-fail and runtime network-classification repair, while the unrelated interruption-manager readiness patch remains explicitly out of scope for this completed owner.`
+
 1. `I-20260406-1105-A`
 - title: Milestone completed-queue closeout governance
 - milestone_state: completed

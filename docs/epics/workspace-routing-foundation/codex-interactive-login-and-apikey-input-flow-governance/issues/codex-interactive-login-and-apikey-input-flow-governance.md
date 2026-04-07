@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260406-1851-A`
 - title: Codex interactive login and API-key input flow governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `codex-interactive-login-and-apikey-input-flow-governance`
@@ -58,9 +58,15 @@ Freely 还缺一个受治理约束的 Codex-first interactive login contract。�
 
 - `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-verification.md`
 - `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-implementation-decision.md`
+- `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-canonical-closeout-verification.md`
 
 ## Boundary Reminder
 
 - This owner is not the absorption surface for `feature/fix-codex-apikey-availability-lock`.
 - Old residual current-live/bootstrap semantics route to `I-20260406-1829-A`.
 - Old residual runtime auth-signal filtering routes to `I-20260406-0901-A`.
+
+## Next
+
+- Completed on canonical `develop` through `test-pre-merge-codex-interactive-login-20260406-2004` and guarded merge `7dc4074`.
+- Post-merge followthrough passed on canonical `develop`; keep future regressions in narrower follow-ons instead of reopening this bounded UX owner.
