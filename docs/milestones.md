@@ -50,6 +50,18 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260406-1829-A`
+- title: Codex current-live apikey bootstrap without saved-slot inventory governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-1829--codex-current-live-apikey-bootstrap-without-saved-slot/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-1829--codex-current-live-apikey-bootstrap-without-saved-slot/candidates.md`
+- next_action: Replay the issue-bound current-live bootstrap regressions and governance gates, then decide whether the old residual tree can retire.
+- revisit_trigger: Re-open only if canonical replay proves the no-saved-slot current-live bootstrap semantics were already fully absorbed by another owner.
+
 1. `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: committed
@@ -74,6 +86,17 @@ routing_policy:
 - revisit_trigger: Re-open only if the owner proves too narrow to keep help semantics and dry-run summary semantics aligned, or if canonical replay exposes another first-hop command contract outside this bounded set.
 
 ### candidate_issues
+
+1. `C-20260406-1829-A`
+- title: Codex current-live apikey bootstrap without saved-slot inventory
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-1829--codex-current-live-apikey-bootstrap-without-saved-slot/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-1829--codex-current-live-apikey-bootstrap-without-saved-slot/candidates.md`
+- next_action: Candidate mirror only. `I-20260406-1829-A` is now the canonical owner for the no-saved-slot current-live Codex apikey bootstrap boundary.
+- revisit_trigger: Re-open only if canonical replay proves the owner boundary is too narrow.
 
 1. `C-20260406-0715-A`
 - title: Codex live auth identity reconciliation and probe timeout boundary
