@@ -50,6 +50,18 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260407-0023-A`
+- title: Codex auto switch probe apikey fallback governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-auto-switch-probe-apikey-fallback-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/candidates.md`
+- next_action: Bind the already-implemented fallback fix to this narrow follow-on owner, replay the focused Codex switch/watchdog regressions, then promote through a fresh `test-pre-merge-*` batch.
+- revisit_trigger: Re-open only if canonical replay proves the fallback needs wider slot-identity or runtime-network scope.
+
 3. `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: committed
@@ -74,6 +86,17 @@ routing_policy:
 - revisit_trigger: Re-open only if the owner proves too narrow to keep help semantics and dry-run summary semantics aligned, or if canonical replay exposes another first-hop command contract outside this bounded set.
 
 ### candidate_issues
+
+1. `C-20260407-0023-A`
+- title: Codex auto switch keeps probing saved apikey slots after all-unavailable OAuth sweep
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/candidates.md`
+- next_action: Candidate mirror only. `I-20260407-0023-A` is now the canonical owner for the saved-apikey fallback after an `all_unavailable:*` account sweep.
+- revisit_trigger: Re-open only if canonical replay proves this follow-on owner is too narrow.
 
 1. `C-20260406-1829-A`
 - title: Codex current-live apikey bootstrap without saved-slot inventory

@@ -1393,21 +1393,27 @@ _cmd_switch_auto_codex() {
 
   result="$(codex_inventory_truth "$project" "refresh" || true)"
   case "$result" in
-    oauth_unreachable)
+    oauth_unreachable|all_unavailable:*)
       if codex_saved_slots_include_kind "$project" "apikey"; then
-        log_warn "OAuth inventory refresh failed, but saved apikey slots exist; falling back to exec-only slot probing"
+        if [[ "$result" == oauth_unreachable ]]; then
+          log_warn "OAuth inventory refresh failed, but saved apikey slots exist; falling back to exec-only slot probing"
+        else
+          log_warn "OAuth sweep found no usable account slots, but saved apikey slots exist; continuing with exec-only slot probing"
+        fi
         result="$(probe_all_codex_slots_and_update_cooldown "$project" || true)"
       else
-        if freely_network_proxy_has_effective_explicit_config "$project"; then
-          log_error "OAuth inventory refresh failed even though Freely proxy config is explicit. Check the configured proxy endpoint and network reachability."
-        else
-          log_error "OAuth inventory refresh failed before any slot could be classified. Configure proxy settings in $project/.freely/config.env or \$FREELY_HOME/config.env instead of relying on an outer shell."
+        if [[ "$result" == oauth_unreachable ]]; then
+          if freely_network_proxy_has_effective_explicit_config "$project"; then
+            log_error "OAuth inventory refresh failed even though Freely proxy config is explicit. Check the configured proxy endpoint and network reachability."
+          else
+            log_error "OAuth inventory refresh failed before any slot could be classified. Configure proxy settings in $project/.freely/config.env or \$FREELY_HOME/config.env instead of relying on an outer shell."
+          fi
+          if [[ "$FORMAT" == "json" ]]; then
+            echo "{\"switched\": false, \"tool\": \"codex\", \"status\": \"oauth_unreachable\", \"launch_blocked\": true}"
+          fi
+          codex_switch_lock_release
+          return 5
         fi
-        if [[ "$FORMAT" == "json" ]]; then
-          echo "{\"switched\": false, \"tool\": \"codex\", \"status\": \"oauth_unreachable\", \"launch_blocked\": true}"
-        fi
-        codex_switch_lock_release
-        return 5
       fi
       ;;
     none)
