@@ -1,0 +1,161 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ai-apikey-all-unavailable.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+FREELY_HOME_DIR="$TMP_DIR/freely-home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+CODEX_LOG="$TMP_DIR/codex.log"
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+  "$PROJECT/docs/system/workspace/scripts/runtime" \
+  "$HOME_DIR/.ai-auth/codex-account-limited@example-com-1" \
+  "$HOME_DIR/.ai-auth/codex-apikey-custom-1" \
+  "$HOME_DIR/.codex" \
+  "$FREELY_HOME_DIR" \
+  "$MOCK_BIN"
+
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="inherit"
+FREELY_NETWORK_PROXY_URL=""
+FREELY_ALL_PROXY=""
+FREELY_HTTP_PROXY=""
+FREELY_HTTPS_PROXY=""
+FREELY_NO_PROXY=""
+EOF
+
+python3 - <<'PY' "$HOME_DIR/.ai-auth/codex-account-limited@example-com-1/auth.json"
+import base64
+import json
+import pathlib
+import sys
+
+payload = base64.urlsafe_b64encode(json.dumps({"email": "limited@example.com"}).encode()).decode().rstrip("=")
+path = pathlib.Path(sys.argv[1])
+path.write_text(json.dumps({"tokens": {"id_token": f"x.{payload}.y", "access_token": "token-limited"}}) + "\n", encoding="utf-8")
+PY
+cat >"$HOME_DIR/.ai-auth/codex-account-limited@example-com-1/manifest.json" <<'EOF'
+{"manifest_version":"codex-slot-v1","tool":"codex","slot_id":"account-limited@example-com-1","slot_kind":"account","auth_email":"limited@example.com"}
+EOF
+cat >"$HOME_DIR/.ai-auth/codex-apikey-custom-1/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-live"}
+EOF
+cat >"$HOME_DIR/.ai-auth/codex-apikey-custom-1/config-auth.toml" <<'EOF'
+model_provider = "custom"
+
+[model_providers.custom]
+name = "Custom"
+base_url = "https://api.example.com/v1"
+wire_api = "responses"
+requires_openai_auth = true
+EOF
+cat >"$HOME_DIR/.ai-auth/codex-apikey-custom-1/manifest.json" <<'EOF'
+{"manifest_version":"codex-slot-v1","tool":"codex","slot_id":"apikey-custom-1","slot_kind":"apikey","provider_id":"custom"}
+EOF
+cat >"$HOME_DIR/.codex/auth.json" <<'EOF'
+{"tokens":{"id_token":"x.e30.y","access_token":"token-live"}}
+EOF
+cat >"$HOME_DIR/.codex/config.toml" <<'EOF'
+[projects."/tmp/demo"]
+trust_level = "trusted"
+EOF
+
+cat >"$MOCK_BIN/curl" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+output_file=""
+auth_header=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --connect-timeout|--max-time)
+      shift 2
+      ;;
+    -o)
+      output_file="$2"
+      shift 2
+      ;;
+    -H)
+      if [[ "$2" == Authorization:\ Bearer* ]]; then
+        auth_header="$2"
+      fi
+      shift 2
+      ;;
+    -w)
+      shift 2
+      ;;
+    -s|-S|-sS)
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+token="${auth_header#Authorization: Bearer }"
+if [[ "$token" == "token-limited" ]]; then
+  printf '{"rate_limits":{"primary":{"used_percent":100.0,"resets_at":4102444800},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+  printf '200'
+  exit 0
+fi
+
+printf '{"detail":"unexpected token"}\n' >"$output_file"
+printf '500'
+exit 7
+EOF
+chmod +x "$MOCK_BIN/curl"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >>"${CODEX_LOG:?}"
+if [[ "${1:-}" == "exec" ]]; then
+  cat >/dev/null || true
+  if python3 - <<'PY' "${HOME:?}/.codex/auth.json"
+import json
+import pathlib
+import sys
+
+data = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+raise SystemExit(0 if data.get("OPENAI_API_KEY") else 1)
+PY
+  then
+    exit 0
+  fi
+  printf 'ERROR: account slot exec probe still unavailable\n' >&2
+  exit 1
+fi
+exit 99
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+HOME="$HOME_DIR" \
+FREELY_HOME="$FREELY_HOME_DIR" \
+PROJECT_ROOT="$PROJECT" \
+PATH="$MOCK_BIN:$PATH" \
+CODEX_LOG="$CODEX_LOG" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/out.json"
+
+grep -q '"switched": true' "$TMP_DIR/out.json"
+grep -q '"slot": "apikey-custom-1"' "$TMP_DIR/out.json"
+grep -q '"status": "usable"' "$TMP_DIR/out.json"
+grep -q '"slot_kind": "apikey"' "$TMP_DIR/out.json"
+grep -q '"provider_id": "custom"' "$TMP_DIR/out.json"
+grep -q '^exec ' "$CODEX_LOG"
+grep -q '"slot": "apikey-custom-1"' <(HOME="$HOME_DIR" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
+
+echo "[PASS] freely ai switch codex keeps probing saved apikey slots when oauth sweep marks saved account slots all_unavailable"

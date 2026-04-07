@@ -1422,10 +1422,12 @@ probe_all_codex_slots_and_update_cooldown() {
       fi
       ;;
     all_unavailable:*)
-      restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
-      [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
-      printf '%s\n' "$probe_result"
-      return 0
+      if ! codex_saved_slots_include_kind "$project" "apikey"; then
+        restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
+        [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
+        printf '%s\n' "$probe_result"
+        return 0
+      fi
       ;;
   esac
 
