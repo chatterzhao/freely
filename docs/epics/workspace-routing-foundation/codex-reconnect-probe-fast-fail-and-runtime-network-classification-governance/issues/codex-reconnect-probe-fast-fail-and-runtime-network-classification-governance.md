@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260406-0901-A`
 - title: Codex reconnect probe fast-fail and runtime network classification governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance`
@@ -96,3 +96,9 @@ Freely 已经把 Codex API-key slot bundle、provider-aware probe routing、以�
 - review `docs/system/workspace/scripts/runtime/freely`
 - pass the issue-bound reconnect/status/runtime regression set from `pre-tests.md`
 - record verification evidence in `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-verification.md`
+- record canonical closeout evidence in `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-canonical-closeout-verification.md`
+
+## Next
+
+- Completed on canonical `develop` through `test-pre-merge-codex-reconnect-fast-fail-20260406-2014` and guarded merge `7674bc3`.
+- Post-merge followthrough passed on canonical `develop`; keep the unrelated `interruption-manager-handler` readiness patch outside this owner if it is materialized later.
