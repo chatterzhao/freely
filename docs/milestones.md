@@ -97,6 +97,18 @@ routing_policy:
 - next_action: Repair the audited help/usage exit-code contracts plus the bounded `ai switch codex --dry-run` JSON summary path, then replay the focused CLI-first verification set before promotion.
 - revisit_trigger: Re-open only if the owner proves too narrow to keep help semantics and dry-run summary semantics aligned, or if canonical replay exposes another first-hop command contract outside this bounded set.
 
+3. `I-20260406-0901-A`
+- title: Codex reconnect probe fast-fail and runtime network classification governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/candidates.md`
+- next_action: Use the recorded verification evidence to prepare guarded promotion/merge for `feature/codex-hi-fast-fail-and-runtime-availability`; keep any old residual worktrees parked outside this owner.
+- revisit_trigger: Re-open only if reconnect evidence proves to require a broader launch-time bootstrap redesign, or if canonical replay shows the issue boundary is still too narrow to keep probe status and runtime classification aligned.
+
 ### candidate_issues
 
 1. `C-20260406-1829-A`
@@ -131,6 +143,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260406-0715--codex-live-auth-identity-and-probe-lock-boundary/candidates.md`
 - next_action: Finish landing the stale live-slot reconciliation and probe-timeout cleanup slice, then decide whether the remaining live `codex exec` timeout evidence warrants a separate issue instead of reopening the completed 20260405 Codex API-key owner.
 - revisit_trigger: Revisit if canonical replay shows this boundary is fully absorbed by an existing owner, or if the unresolved timeout evidence proves the real follow-on is upstream `codex exec` stall diagnosis rather than more slot identity work.
+
+2. `C-20260406-0901-A`
+- title: Codex reconnect probe fast-fail and runtime network classification alignment
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/candidates.md`
+- next_action: Candidate mirror only. `I-20260406-0901-A` is now the canonical owner for reconnect fast-fail and runtime network classification alignment.
+- revisit_trigger: Re-open only if canonical replay proves the issue boundary is too narrow, or if upstream Codex semantics change enough that string-matched reconnect evidence is no longer the right boundary.
 
 1. `C-20260404-0119-A`
 - title: Governance merge gate milestone status followthrough
