@@ -29,6 +29,29 @@ codex_active_auth_file() {
   printf '%s\n' "$HOME/.codex/auth.json"
 }
 
+codex_live_auth_kind() {
+  local auth_file
+  auth_file="$(codex_active_auth_file)"
+  python3 - <<'PY' "$auth_file" 2>/dev/null || true
+import json
+import os
+import sys
+
+path = sys.argv[1]
+if not os.path.exists(path):
+    print("")
+    raise SystemExit(0)
+with open(path, "r", encoding="utf-8") as f:
+    data = json.load(f)
+if isinstance(data.get("OPENAI_API_KEY"), str) and data.get("OPENAI_API_KEY"):
+    print("apikey")
+elif isinstance(data.get("tokens"), dict) or isinstance(data.get("access_token"), str):
+    print("account")
+else:
+    print("legacy")
+PY
+}
+
 watchdog_run_dir_for_project() {
   local project="$1"
   printf '%s\n' "$project/.freely/run"
@@ -1486,7 +1509,7 @@ switch_to_next_codex_slot() {
 
 ensure_codex_slot_ready_for_manager() {
   local project="$1"
-  local current_slot current_slot_kind current_identity current_probe_result probe_result probe_status probe_slot cached_current_status
+  local current_slot current_slot_kind current_identity current_probe_identity current_live_kind current_probe_result probe_result probe_status probe_slot cached_current_status
   local all_unavailable_info earliest_slot earliest_reset inventory_refresh_mode="stale_ok"
   local current_fingerprint previous_phase="" previous_blocked_reason="" previous_slot="" previous_fingerprint="" wake_reason="" wake_trigger="" recovery_trigger=""
   local previous_earliest_reset="" previous_reprobe_next_at="" previous_reprobe_attempts="" reprobe_due_at="" reprobe_next_at="" reprobe_attempts="" reprobe_max_attempts="" now=""
@@ -1498,6 +1521,8 @@ ensure_codex_slot_ready_for_manager() {
   if [[ -z "$current_identity" && -n "$current_slot_kind" ]]; then
     current_identity="live-$current_slot_kind"
   fi
+  current_probe_identity="${current_identity:-current-live}"
+  current_live_kind="$(codex_live_auth_kind)"
   current_fingerprint="$(codex_saved_slots_fingerprint "$project")"
 
   if codex_load_availability_state "$project"; then
@@ -1524,7 +1549,7 @@ ensure_codex_slot_ready_for_manager() {
   probe_result="$(codex_inventory_truth "$project" "$inventory_refresh_mode" || true)"
   cached_current_status="$(codex_cached_slot_status "$project" "$current_identity" || true)"
 
-  if [[ -n "$current_identity" && ( "$current_slot_kind" == "apikey" || "$cached_current_status" == "usable" ) ]]; then
+  if [[ -f "$(codex_active_auth_file)" && ( "$current_slot_kind" == "apikey" || "$cached_current_status" == "usable" || "$current_fingerprint" == "none" || "$current_live_kind" == "apikey" ) ]]; then
     current_probe_result="$(codex_probe_current_slot_now "$project" || true)"
     case "$current_probe_result" in
       usable)
@@ -1540,9 +1565,9 @@ ensure_codex_slot_ready_for_manager() {
           else
             wake_trigger="periodic_reprobe"
           fi
-          log_info "watchdog found a usable current codex slot for manager bootstrap (trigger=$recovery_trigger reason=$wake_reason previous_slot=${previous_slot:-$current_identity} active_slot=$current_identity)"
-          write_manager_bootstrap_handoff "$project" "$recovery_trigger" "${previous_slot:-$current_identity}" "$current_identity" "$wake_reason" "inspect-fleet-and-recover-workers"
-          codex_write_availability_state "$project" "ready" "" "${previous_slot:-$current_identity}" "$current_identity" "$current_fingerprint" "$wake_trigger" "" ""
+          log_info "watchdog found a usable current codex slot for manager bootstrap (trigger=$recovery_trigger reason=$wake_reason previous_slot=${previous_slot:-$current_probe_identity} active_slot=$current_probe_identity)"
+          write_manager_bootstrap_handoff "$project" "$recovery_trigger" "${previous_slot:-$current_probe_identity}" "$current_probe_identity" "$wake_reason" "inspect-fleet-and-recover-workers"
+          codex_write_availability_state "$project" "ready" "" "${previous_slot:-$current_probe_identity}" "$current_probe_identity" "$current_fingerprint" "$wake_trigger" "" ""
         else
           codex_clear_availability_state "$project"
         fi
