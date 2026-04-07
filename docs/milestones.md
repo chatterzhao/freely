@@ -50,18 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260407-0023-A`
-- title: Codex auto switch probe apikey fallback governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-codex-auto-switch-probe-apikey-fallback-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/candidates.md`
-- next_action: Bind the already-implemented fallback fix to this narrow follow-on owner, replay the focused Codex switch/watchdog regressions, then promote through a fresh `test-pre-merge-*` batch.
-- revisit_trigger: Re-open only if canonical replay proves the fallback needs wider slot-identity or runtime-network scope.
-
 3. `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: committed
@@ -329,7 +317,29 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
-1. `I-20260406-1829-A`
+1. `I-20260407-0023-A`
+- title: Codex auto switch probe apikey fallback governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-auto-switch-probe-apikey-fallback-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/candidates.md`
+- evidence:
+  - `develop` merge `1b33131`
+  - `docs/progress/workspace-routing-foundation/p-codex-auto-switch-probe-apikey-fallback-governance.md`
+  - `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-verification.md`
+  - `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-all-unavailable-falls-back-to-exec`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
+
+2. `I-20260406-1829-A`
 - title: Codex current-live apikey bootstrap without saved-slot inventory governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -349,7 +359,7 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now carries the bounded current-live apikey bootstrap repair without saved-slot inventory, so this owner should no longer remain in committed_issues.`
 
-2. `I-20260406-1851-A`
+3. `I-20260406-1851-A`
 - title: Codex interactive login and API-key input flow governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -371,7 +381,7 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now carries the bounded Codex-first interactive login and API-key input flow repair, so this owner should no longer remain in committed_issues.`
 
-3. `I-20260406-0901-A`
+4. `I-20260406-0901-A`
 - title: Codex reconnect probe fast-fail and runtime network classification governance
 - milestone_state: completed
 - phase_state: `completed`
