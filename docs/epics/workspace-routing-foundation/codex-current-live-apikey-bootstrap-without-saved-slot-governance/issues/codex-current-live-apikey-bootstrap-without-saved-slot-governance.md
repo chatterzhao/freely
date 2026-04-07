@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260406-1829-A`
 - title: Codex current-live apikey bootstrap without saved-slot inventory governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `codex-current-live-apikey-bootstrap-without-saved-slot-governance`
@@ -37,6 +37,7 @@ Freely still needs a bounded owner for the case where current live Codex auth is
 
 - `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-verification.md`
 - `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-implementation-decision.md`
+- `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-canonical-closeout-verification.md`
 
 ## Retirement Handoff
 
@@ -47,3 +48,8 @@ Freely still needs a bounded owner for the case where current live Codex auth is
   - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-current-live-apikey-without-saved-slot`
 - The old residual `docs/system/workspace/scripts/runtime/ai-cli` patch is superseded by the stronger current-live switch path already present in this lane; do not transplant it verbatim during cleanup.
 - The old residual `docs/system/workspace/scripts/runtime/freely` plus `docs/system/workspace/scripts/tests/test-freely-runtime-auth-failure-signal-filter` belong to `I-20260406-0901-A`, not to this owner.
+
+## Next
+
+- Completed on canonical `develop` through `test-pre-merge-codex-current-live-apikey-bootstrap-20260406-2000` and guarded merge `4b6e0a9`.
+- Post-merge followthrough passed on canonical `develop`; the retired residual tree no longer carries canonical truth for this boundary.
