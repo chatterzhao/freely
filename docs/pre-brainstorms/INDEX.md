@@ -17,6 +17,9 @@
 - 20260406-1851--codex-interactive-login-and-apikey-input-flow
   - brainstorms: docs/pre-brainstorms/20260406-1851--codex-interactive-login-and-apikey-input-flow/brainstorms.md
   - candidates: docs/pre-brainstorms/20260406-1851--codex-interactive-login-and-apikey-input-flow/candidates.md
+- 20260406-0901--codex-reconnect-probe-fast-fail
+  - brainstorms: docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/candidates.md
 - 20260406-0715--codex-live-auth-identity-and-probe-lock-boundary
   - brainstorms: docs/pre-brainstorms/20260406-0715--codex-live-auth-identity-and-probe-lock-boundary/brainstorms.md
   - candidates: docs/pre-brainstorms/20260406-0715--codex-live-auth-identity-and-probe-lock-boundary/candidates.md

@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ai-switch-live-apikey-network.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+CODEX_LOG="$TMP_DIR/codex.log"
+
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+  "$PROJECT/docs/system/workspace/scripts/runtime" \
+  "$HOME_DIR/.codex" \
+  "$MOCK_BIN"
+
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="inherit"
+EOF
+
+cat >"$HOME_DIR/.codex/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-live"}
+EOF
+cat >"$HOME_DIR/.codex/config.toml" <<'EOF'
+model = "gpt-5.4"
+EOF
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >>"${CODEX_LOG:?}"
+if [[ "${1:-}" == "exec" ]]; then
+  echo 'ERROR: Reconnecting... 2/5'
+  sleep 30
+fi
+exit 99
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+set +e
+HOME="$HOME_DIR" \
+PROJECT_ROOT="$PROJECT" \
+PATH="$MOCK_BIN:$PATH" \
+CODEX_LOG="$CODEX_LOG" \
+CODEX_PROBE_TIMEOUT=10 \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/switch.json"
+RC=$?
+set -e
+
+[[ "$RC" -eq 4 ]]
+
+python3 - <<'PY' "$TMP_DIR/switch.json"
+import json
+import pathlib
+import sys
+
+data = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+assert data["switched"] is False
+assert data["status"] == "current_auth_unusable"
+assert data["probe_status"] == "network_failure"
+assert data["slot"] is None
+assert data["slot_kind"] == "apikey"
+assert data["launch_blocked"] is True
+PY
+
+grep -q '^exec ' "$CODEX_LOG"
+
+echo "[PASS] ai switch codex blocks launch and surfaces reconnect failures on live apikey auth as network_failure"
