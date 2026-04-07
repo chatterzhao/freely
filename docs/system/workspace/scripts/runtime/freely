@@ -3598,22 +3598,36 @@ cc_debug_log_has_codex_tool_call() {
   rg -q 'Calling MCP tool: codex|Tool '\''codex'\'' completed successfully|mcp__codex-cli__codex' "$debug_log"
 }
 
+runtime_error_signal_excerpt() {
+  local log_file="$1"
+  [[ -f "$log_file" ]] || return 1
+  awk '
+    /^[0-9]{4}-[0-9]{2}-[0-9]{2}T.* (ERROR|WARN) / { print; next }
+    /^(ERROR|WARN)(:| |$)/ { print; next }
+    /^\[(ERROR|WARN)\]/ { print; next }
+    /^(Please log in|Login required|Unauthorized|deactivated_workspace|workspace deactivated)/ { print; next }
+    /^OAuth inventory refresh failed/ { print; next }
+    /^FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set/ { print; next }
+    /^curl: \([0-9]+\)/ { print; next }
+  ' "$log_file"
+}
+
 log_has_auth_failure() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
-  rg -qi '401|402 payment required|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired' "$log_file"
+  runtime_error_signal_excerpt "$log_file" | rg -qi '401|402 payment required|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired|login required'
 }
 
 log_has_proxy_config_invalid() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
-  rg -qi 'FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set|OAuth inventory refresh failed even though Freely proxy config is explicit' "$log_file"
+  runtime_error_signal_excerpt "$log_file" | rg -qi 'FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set|OAuth inventory refresh failed even though Freely proxy config is explicit'
 }
 
 log_has_execution_network_failure() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
-  rg -qi 'curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error|502|503|504' "$log_file"
+  runtime_error_signal_excerpt "$log_file" | rg -qi 'ERROR:\s*Reconnecting|curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error|502|503|504'
 }
 
 log_has_kiro_monthly_request_limit() {
@@ -3774,13 +3788,14 @@ execution_network_launch_block_active() {
 log_has_codex_usage_limit() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
-  rg -qi 'usage limit|try again' "$log_file"
+  runtime_error_signal_excerpt "$log_file" | rg -qi 'usage limit|try again'
 }
 
 log_codex_rate_limit_reset_at() {
-  local log_file="$1" reset_at="" fallback_seconds
+  local log_file="$1" reset_at="" fallback_seconds signal_excerpt=""
   [[ -f "$log_file" ]] || return 1
-  reset_at="$(extract_try_again_time_from_output "$(cat "$log_file")" || true)"
+  signal_excerpt="$(runtime_error_signal_excerpt "$log_file" || true)"
+  reset_at="$(extract_try_again_time_from_output "$signal_excerpt" || true)"
   if [[ -n "$reset_at" ]]; then
     printf '%s\n' "$reset_at"
     return 0

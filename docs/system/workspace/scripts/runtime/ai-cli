@@ -1381,7 +1381,7 @@ _cmd_switch_auto_codex() {
         codex_switch_lock_release
         return 4
         ;;
-      unauthorized|deactivated_workspace|timeout|error|unknown)
+      subscription_expired|unauthorized|deactivated_workspace|network_failure|timeout|error|unknown)
         if [[ "$FORMAT" == "json" ]]; then
           echo "{\"switched\": false, \"tool\": \"codex\", \"slot\": null, \"slot_kind\": \"apikey\", \"provider_id\": $(json_string_or_null "$live_provider_id"), \"auth_email\": null, \"account\": null, \"status\": \"current_auth_unusable\", \"probe_status\": $(json_string_or_null "$current_live_status"), \"launch_blocked\": true}"
         fi

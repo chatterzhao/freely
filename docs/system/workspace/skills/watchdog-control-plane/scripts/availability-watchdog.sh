@@ -127,6 +127,39 @@ write_codex_probe_artifact() {
   printf '%s\n' "$artifact"
 }
 
+strip_probe_output_for_matching() {
+  printf '%s\n' "${1:-}" | sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g; s/\x1b\].*\x07//g; s/\x1b\][^\x1b]*\x1b\\//g'
+}
+
+codex_probe_output_has_deactivated_workspace() {
+  local output
+  output="$(strip_probe_output_for_matching "${1:-}")"
+  printf '%s\n' "$output" | grep -qi "deactivated_workspace\|402 Payment Required"
+}
+
+codex_probe_output_has_network_failure() {
+  local output
+  output="$(strip_probe_output_for_matching "${1:-}")"
+  printf '%s\n' "$output" | grep -Eqi \
+    'ERROR: Reconnecting|reconnecting\.\.\.|operation timed out|timed out|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error'
+}
+
+terminate_codex_probe_process() {
+  local pid="${1:-}" waited=0
+  [[ -n "$pid" ]] || return 0
+  if kill -0 "$pid" 2>/dev/null; then
+    kill "$pid" 2>/dev/null || true
+    while kill -0 "$pid" 2>/dev/null && [[ "$waited" -lt 20 ]]; do
+      sleep 0.1
+      waited=$((waited + 1))
+    done
+  fi
+  if kill -0 "$pid" 2>/dev/null; then
+    kill -KILL "$pid" 2>/dev/null || true
+  fi
+  wait "$pid" 2>/dev/null || true
+}
+
 codex_slot_switch_lock_dir() {
   printf '%s\n' "${AI_CLI_SWITCH_LOCK_DIR:-$HOME/.codex/slot-switch.lock}"
 }
@@ -1145,6 +1178,7 @@ select_earliest_reset_codex_slot_any() {
 #   rate_limited:<reset_at>
 #   subscription_expired
 #   unauthorized
+#   network_failure
 #   timeout
 #   error:<message>
 # Exit code:
@@ -1201,9 +1235,8 @@ codex_probe_current_slot_now() {
   local slept=0
   while [[ $slept -lt $timeout_secs ]]; do
     partial_output="$(cat "$output_file" 2>/dev/null || true)"
-    if printf '%s\n' "$partial_output" | grep -qi "deactivated_workspace\|402 Payment Required"; then
-      kill "$pid" 2>/dev/null || true
-      wait "$pid" 2>/dev/null || true
+    if codex_probe_output_has_deactivated_workspace "$partial_output"; then
+      terminate_codex_probe_process "$pid"
       artifact_path="$(write_codex_probe_artifact "$project" "$current_slot" "deactivated-workspace" "$partial_output")"
       rm -f "$prompt_file" "$output_file"
       if [[ "$probe_lock_held" == "1" ]]; then
@@ -1215,6 +1248,19 @@ codex_probe_current_slot_now() {
       printf 'deactivated_workspace\n'
       return 0
     fi
+    if codex_probe_output_has_network_failure "$partial_output"; then
+      terminate_codex_probe_process "$pid"
+      artifact_path="$(write_codex_probe_artifact "$project" "$current_slot" "network-failure" "$partial_output")"
+      rm -f "$prompt_file" "$output_file"
+      if [[ "$probe_lock_held" == "1" ]]; then
+        codex_slot_switch_probe_lock_release
+      fi
+      if [[ -n "$artifact_path" ]]; then
+        log_warn "codex probe observed network failure for slot ${current_slot:-unknown}; details captured at $artifact_path"
+      fi
+      printf 'network_failure\n'
+      return 0
+    fi
     if ! kill -0 "$pid" 2>/dev/null; then
       break
     fi
@@ -1224,8 +1270,7 @@ codex_probe_current_slot_now() {
 
   # Kill if still running
   if kill -0 "$pid" 2>/dev/null; then
-    kill "$pid" 2>/dev/null
-    wait "$pid" 2>/dev/null || true
+    terminate_codex_probe_process "$pid"
     artifact_path="$(write_codex_probe_artifact "$project" "$current_slot" "timeout" "$(cat "$output_file" 2>/dev/null || true)")"
     rm -f "$prompt_file" "$output_file"
     if [[ "$probe_lock_held" == "1" ]]; then
@@ -1248,9 +1293,7 @@ codex_probe_current_slot_now() {
     codex_slot_switch_probe_lock_release
   fi
 
-  # Strip ANSI escape codes for reliable grep matching
-  # Handle various escape sequences: ESC[...m, ESC]...BEL, ESC[?...h/l, etc.
-  output="$(printf '%s\n' "$output" | sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g; s/\x1b\].*\x07//g; s/\x1b\][^\x1b]*\x1b\\//g')"
+  output="$(strip_probe_output_for_matching "$output")"
 
   # Check for success.
   if [[ "$rc" -eq 0 ]]; then
@@ -1283,11 +1326,22 @@ codex_probe_current_slot_now() {
     return 0
   fi
 
-  if printf '%s\n' "$output" | grep -qi "deactivated_workspace\|402 Payment Required"; then
+  if codex_probe_output_has_deactivated_workspace "$output"; then
     artifact_path="$(write_codex_probe_artifact "$project" "$current_slot" "deactivated-workspace" "$output")"
     if [[ -n "$artifact_path" ]]; then
       log_warn "codex probe observed deactivated_workspace for slot ${current_slot:-unknown}; details captured at $artifact_path"
     fi
+    printf 'deactivated_workspace\n'
+    return 0
+  fi
+
+  if codex_probe_output_has_network_failure "$output"; then
+    artifact_path="$(write_codex_probe_artifact "$project" "$current_slot" "network-failure" "$output")"
+    if [[ -n "$artifact_path" ]]; then
+      log_warn "codex probe observed network failure for slot ${current_slot:-unknown}; details captured at $artifact_path"
+    fi
+    printf 'network_failure\n'
+    return 0
   fi
 
   # Generic error
@@ -1420,6 +1474,11 @@ probe_all_codex_slots_and_update_cooldown() {
         status_icon="🔒"
         status_text="unauthorized"
         details="auth token invalid or expired"
+        ;;
+      network_failure)
+        status_icon="🌐"
+        status_text="network"
+        details="connection failed before probe completed"
         ;;
       timeout)
         status_icon="⏱️"
