@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260407-0023-A`
 - title: Codex auto switch probe apikey fallback governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `codex-auto-switch-probe-apikey-fallback-governance`
@@ -48,7 +48,14 @@ Codex account/apikey bundle truth is already owned, but dogfooding exposed one r
 
 - `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-implementation-decision.md`
 - `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-verification.md`
+- `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-canonical-closeout-verification.md`
+
+## Retirement Handoff
+
+- `feature/codex-auto-switch-probe-apikey-fallback-20260406-2138` and `test-pre-merge-codex-auto-switch-probe-apikey-fallback-20260407-0029` are retire-only after the canonical closeout writeback lands.
+- Residual environment-level account TLS/certificate failures are explicitly out of scope for this completed owner.
 
 ## Next
 
-- Promote through a fresh `test-pre-merge-*` batch after the feature-local verification set and `pretests-gate` pass.
+- Completed on canonical `develop` through `test-pre-merge-codex-auto-switch-probe-apikey-fallback-20260407-0029` and guarded merge `1b33131`.
+- Post-merge followthrough passed on canonical `develop`; reopen only if saved-apikey fallback regresses after an `all_unavailable:*` account sweep.
