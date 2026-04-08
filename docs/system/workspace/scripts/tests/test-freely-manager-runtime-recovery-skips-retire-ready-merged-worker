@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-recovery-retire-ready-merged-worker.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER="$WT_ROOT/feature-a"
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260324-0000--sample" "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+cd "$PROJECT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+mkdir -p docs/pre-brainstorms/20260324-0000--sample
+cat > .gitignore <<'EOF'
+.freely/
+EOF
+cat >"docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260324-0000--sample
+EOF
+cat >"docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+echo base > README.md
+git add README.md .gitignore AGENTS.md docs
+git commit -q -m init
+git worktree add -q -b feature/a "$WORKER" develop
+
+for wt in "$PROJECT" "$WORKER"; do
+  mkdir -p "$wt/docs/pre-brainstorms/20260324-0000--sample" "$wt/.freely/run" "$wt/.freely/logs"
+  cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$wt/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$wt/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+  cat >"$wt/AGENTS.md" <<'EOF'
+# Agents
+EOF
+  cat >"$wt/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+  cat >"$wt/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260324-0000--sample
+EOF
+  cat >"$wt/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+  cat >"$wt/docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+  cat >"$wt/docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+done
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+cat >"$WORKER/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER"
+INTENT_FILE="$WORKER/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+cat >"$WORKER/.freely/run/prompt-20260408-000100.txt" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/a\`
+intent_kind:
+- \`edit\`
+intent_target:
+- \`I-20260408-0001-A\`
+EOF
+
+cat >"$WORKER/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-08T00:01:00Z"
+EOF
+
+git -C "$PROJECT" merge --no-ff -m "merge feature/a" feature/a >/dev/null
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+START_LOG="$TMP_DIR/started.log"
+manager_runtime_launch_workers_from_latest_handoff() {
+  echo "0"
+}
+start_workcell_supervisor_async() {
+  printf '%s\n' "$1" >>"$START_LOG"
+  return 0
+}
+
+OUTPUT="$(manager_runtime_recover_workers_if_needed "$PROJECT" 2>&1)"
+RECOVERED="$(printf '%s\n' "$OUTPUT" | tail -n 1)"
+[[ "$RECOVERED" == "0" ]]
+[[ ! -f "$START_LOG" ]]
+grep -q "retire-ready merged worker" <<<"$OUTPUT"
+if grep -q "manager runtime recovering expected-running worker" <<<"$OUTPUT"; then
+  echo "unexpected recovery log for retire-ready merged worker" >&2
+  exit 1
+fi
+
+echo "[PASS] manager runtime skips expected-running recovery for retire-ready merged worker"
