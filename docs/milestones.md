@@ -75,6 +75,17 @@ routing_policy:
 
 ### candidate_issues
 
+1. `C-20260407-1042-A`
+- title: External issue identity, mapping, and publication model after source-family contraction
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/candidates.md`
+- next_action: Keep this line in pre-research until GitHub-first external-issue policy cleanly separates source loop, owner loop, and publication loop; re-review `20260403-1000` explicitly, retain only governance-safe mapping/label insights, and do not assume GitHub create/sync automation or unconditional public mirroring.
+- revisit_trigger: Revisit when source-vs-public-tracking identity, AI-discovered formalization rules, publication policy, and GitHub writeback boundaries are stable enough to materialize a bounded policy/schema owner.
+
 1. `C-20260407-0817-A`
 - title: Source inbox, routing absorption boundary, and manager/worker audit contract
 - milestone_state: candidate
