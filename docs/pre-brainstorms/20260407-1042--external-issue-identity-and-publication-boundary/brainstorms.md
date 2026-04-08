@@ -271,6 +271,28 @@ Two hard rules follow:
 - entering the `external issue` family is a policy decision, not the default fate of every AI-discovered problem
 - publication target creation is a second policy decision layered on top of external-source formalization, not proof that the source family itself owns internal truth
 
+### Formalization Invariants
+
+The first bounded policy slice should freeze these invariants explicitly:
+
+1. User-created external issues
+
+- if an external issue already exists and a genuinely independent governed problem is accepted, the family may carry that object as `source_ref`
+- if the finding is still absorbable inside the current owner line, no new external-source formalization occurs
+- a reused `source issue` does not automatically become `publication target`
+
+2. AI-discovered problems
+
+- AI discovery alone is insufficient to enter the `external issue` family
+- formalization requires an explicit policy basis such as user-visible impact, contract-facing explanation duty, operator request, or standing publication policy
+- when the problem stays internal-only, the required evidence belongs on the internal owner side, not as a fake external-source placeholder
+
+3. Publication
+
+- publication policy is evaluated only after or alongside source-family formalization
+- publication may stay `none` even when external-source lineage exists
+- no publication decision may rewrite canonical internal owner truth
+
 ## Consumption / Dedupe Evidence Draft
 
 The old `20260403-1000` line was directionally right that external-source re-scan must avoid repeated consumption. The updated line should keep that requirement, but freeze it as a minimal evidence contract rather than a premature implementation.
@@ -287,6 +309,35 @@ Current safe direction:
 - external comments/labels may mirror that truth, but should not be the sole evidence that prevents re-consumption
 - the first slice should freeze the minimum dedupe/consumption invariant before choosing automation timing or storage layout
 - publication remains a policy gate owned by the internal owner loop
+
+### Minimum Dedupe / Consumption Contract
+
+The smallest governance-safe contract currently looks like this:
+
+1. Canonical evidence
+
+- once a user-created external issue is consumed into `pre-brainstorm`, canonical repo-native truth must record:
+  - source-family = external issue
+  - source locator or equivalent `source_ref`
+  - the consuming `pre-brainstorm`
+
+2. Scan-safe dedupe rule
+
+- future scan/manager paths must treat canonical repo-native linkage as the decisive evidence that the external source is already consumed
+- external labels/comments may help operators, but they are mirrors, not the only dedupe authority
+
+3. Optional external mirrors
+
+- comments, labels, or closeout on the external object may mirror one of:
+  - entered pre-research
+  - linked to canonical owner
+  - externally completed
+- but omission or delay of those mirrors must not cause the same source issue to be re-consumed if canonical linkage already exists
+
+4. No premature storage freeze
+
+- this contract does not yet require a dedicated mapping file, queue file, or API cache shape
+- storage/automation choices stay downstream of the policy invariant
 
 ### Source issue writeback boundaries
 
@@ -328,8 +379,8 @@ Therefore this line should freeze these boundaries:
 
 ## Concrete Questions To Settle Before Promotion
 
-1. When an AI-discovered problem becomes `ai_formalized_external_issue`, what minimum evidence justifies that formalization?
-2. For GitHub-first, what minimum `source_ref` fields are required before any local storage shape is frozen?
+1. For GitHub-first, what exact `source_ref` fields are minimally required before any local storage shape is frozen?
+2. What exact canonical owner evidence is sufficient to mark an external source as already consumed?
 3. When should a source issue be reused as the publication target versus split into a separate tracking issue?
 4. Which public-status vocabulary is small enough to stay stable while still useful?
 5. Which internal transitions deserve publication, and which should remain invisible externally?
