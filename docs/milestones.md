@@ -89,7 +89,7 @@ routing_policy:
 1. `C-20260407-0817-A`
 - title: Source inbox, routing absorption boundary, and manager/worker audit contract
 - milestone_state: candidate
-- phase_state: `needs_research`
+- phase_state: `in_pre_brainstorm`
 - priority: P1
 - promoted_issue_path: `pending://issue-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/brainstorms.md`
@@ -100,7 +100,7 @@ routing_policy:
 2. `C-20260407-1036-A`
 - title: Human interruption runtime contract after source-family contraction
 - milestone_state: candidate
-- phase_state: `needs_research`
+- phase_state: `in_pre_brainstorm`
 - priority: P1
 - promoted_issue_path: `pending://issue-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260407-1036--human-interruption-source-governance-boundary/brainstorms.md`
