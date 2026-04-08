@@ -221,6 +221,8 @@ EOF
 - 若工位视图缺少准确 issue/phase，不要伪造；先把该工位视为需要进一步核对的监督对象。
 - 若当前 AI 响应已经结束、目标进程已退出、命中限额/认证失败、或发生 `context compacted` 需要新进程续接，这类问题一律视为 `runtime-owned`。
 - 主管只输出恢复判定和委派；worker 只回写 blocker / continuity；真正的切号、sleep/recheck 和新进程启动由 Freely runtime / scripts 处理。
+- 若你编写 shell 命令给 `zsh` 执行，不要把 `status` 当作临时变量名；它在 `zsh` 中是只读特殊变量。需要保存退出码时统一改用 `exit_code`、`cmd_status` 等非保留名字。
+- 若活跃 owner 的 issue / progress / pre-tests 只存在于某个 dirty feature worktree，不要在 root `develop` 里直接读取同名相对路径并把 `No such file or directory` 当成 owner 缺失；应先锚定该 feature worktree，再从那个工位读取 owner 真相并生成 handoff。
 EOF
 )"
 fi

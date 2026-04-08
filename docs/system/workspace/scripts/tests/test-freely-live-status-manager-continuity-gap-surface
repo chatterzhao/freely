@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-continuity-gap.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/.freely/run" "$REPO/docs"
+
+git init -q "$REPO"
+git -C "$REPO" config user.email "test@example.com"
+git -C "$REPO" config user.name "Test User"
+cat >"$REPO/README.md" <<'EOF'
+# repo
+EOF
+git -C "$REPO" add README.md
+git -C "$REPO" commit -q -m "init"
+git -C "$REPO" branch -m develop
+
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$REPO/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-07T01:10:28Z"
+EOF
+
+CONTINUITY="$REPO/.freely/run/manager-continuity-20260406-064414.md"
+EXPECTED_CONTINUITY="$REPO/.freely/run/manager-continuity-20260407-011032.md"
+PROMPT="$REPO/.freely/run/prompt-20260407-011028.txt"
+
+cat >"$CONTINUITY" <<'EOF'
+# Manager Continuity
+- restart_point: `continuation`
+EOF
+touch -t 202604060644.14 "$CONTINUITY"
+
+cat >"$PROMPT" <<EOF
+你现在进入 Freely 的首跳闭环。
+19. 至少创建一个 manager continuity 文件：\`$EXPECTED_CONTINUITY\`。
+EOF
+touch -t 202604070110.28 "$PROMPT"
+
+PROMPT_EPOCH="$(stat -f '%m' "$PROMPT")"
+NOW_EPOCH="$((PROMPT_EPOCH + 120))"
+
+LIVE_OUTPUT="$(FREELY_TEST_NOW_EPOCH="$NOW_EPOCH" bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+FLEET_OUTPUT="$(FREELY_TEST_NOW_EPOCH="$NOW_EPOCH" bash "$ROOT_DIR/bin/freely" fleet-status --project "$REPO")"
+
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'manager_continuity_gap_state: active'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'manager_continuity_gap_reason: expected_continuity_missing'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q "manager_continuity_gap_expected_path: $EXPECTED_CONTINUITY"
+printf '%s\n' "$LIVE_OUTPUT" | grep -q "manager_continuity_gap_latest_generated: $CONTINUITY"
+printf '%s\n' "$LIVE_OUTPUT" | grep -q "manager_continuity_gap_prompt_file: $PROMPT"
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'manager_continuity_gap_age_secs: 120'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'manager_continuity_gap_age_state: beyond_grace'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'manager_continuity_gap_writer_state: no_ai_process_evidence'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q "manager_continuity_gap_summary: latest_generated=$CONTINUITY prompt=$PROMPT age_secs=120 age_state=beyond_grace"
+printf '%s\n' "$FLEET_OUTPUT" | grep -q 'continuity_gap'
+printf '%s\n' "$FLEET_OUTPUT" | grep -q "reason=expected_continuity_missing expected=$EXPECTED_CONTINUITY"
+printf '%s\n' "$FLEET_OUTPUT" | grep -Eq 'latest_generated=.*/manager-continuity-20260406-064414\.md prompt=.*/prompt-20260407-011028\.txt age_secs=120 age_state=beyond_grace writer=no_ai_process_evidence'
+
+echo "[PASS] live-status and fleet-status surface the missing manager continuity required by the latest prompt"

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="/tmp/freely-project-sigpipe-guard"
+    self_pid="${BASHPID:-$$}"
+    parent_pid="${PPID:-0}"
+
+    ps() {
+      perl -e '"'"'
+        my ($self_pid, $parent_pid, $project) = @ARGV;
+        print "  $self_pid bash /tmp/runtime/freely start --project $project\n";
+        print "  28282 bash /tmp/runtime/freely start --project $project\n";
+        for my $i (1..50000) {
+          print "  9$i bash /tmp/noise-command --project /tmp/noise-$i\n";
+        }
+        print "  $parent_pid bash /tmp/runtime/freely start --project $project\n";
+      '"'"' "$self_pid" "$parent_pid" "$project"
+    }
+
+    printf "discovered:%s\n" "$(discover_supervisor_pid "$project" "$self_pid,$parent_pid")"
+  '
+)"
+
+[[ "$OUTPUT" == *"discovered:28282"* ]]
+
+echo "[PASS] discover_supervisor_pid remains stable when early awk exit would otherwise SIGPIPE the ps producer"
