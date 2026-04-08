@@ -71,7 +71,7 @@
   - freeze the invariants that separate external-source formalization, internal-only owner evidence, and publication choice
   - define the minimum dedupe/consumption evidence contract that keeps already-consumed external issues from re-entering intake
   - freeze the GitHub-first minimum field contract for `source_ref`, canonical owner linkage, and optional `publication_ref`
-  - decide the minimum conceptual mapping fields and publication modes before proposing any local storage artifact or GitHub automation lane
-  - keep this line pre-research-only until the loop split and writeback boundaries are stable enough for a bounded policy/schema owner
+  - decide whether the bounded GitHub-first policy/schema owner can now be materialized with publication policy still explicitly narrow
+  - keep storage/API automation deferred unless and until that bounded owner is promoted
 - revisit_trigger:
   - revisit when publication policy, AI-discovered formalization rules, GitHub mapping semantics, or public-status vocabulary are stable enough to materialize a bounded GitHub-first policy/schema owner

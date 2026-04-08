@@ -458,3 +458,38 @@ Therefore this line should freeze these boundaries:
   - keep: source-vs-tracking distinction, dimensional labels, mapping awareness
   - reject for now: default public mirroring, unconditional GitHub tracking issue creation, self-evolution scheduling in the same family, premature local storage freeze
 - The most important promotion requirement is to make source loop, owner loop, and publication loop independently legible.
+
+## Bounded Owner Target Draft
+
+The work completed so far is now strong enough to describe the next bounded owner without pretending implementation should start immediately.
+
+### What the next bounded GitHub-first policy/schema owner should own
+
+- GitHub-first `source_ref` minimum field contract
+- canonical repo-native owner linkage required for dedupe
+- formalization decision rules for:
+  - user-created external source accepted as a governed problem
+  - AI-discovered problem kept internal-only
+  - AI-discovered problem formalized into external-source lineage without publication
+- explicit rule that publication is optional and separate from source-family formalization
+- the smallest writeback boundary language needed so later automation cannot reinterpret GitHub as internal truth
+
+### What it should explicitly not own yet
+
+- GitHub API automation
+- comment/label sync timing implementation
+- mapping-file or cache-file storage format
+- multi-platform abstraction
+- full public-status vocabulary beyond the smallest bounded set needed to avoid blocking policy promotion
+
+### Why the owner is now bounded enough
+
+- source identity, dedupe authority, and internal-owner primacy are now explicit enough to survive promotion
+- remaining open questions are mostly publication-policy refinements, not existential uncertainty about source-family shape
+- implementation still lacks a safe target unless this bounded owner freezes the policy/schema surface first
+
+### Remaining blockers before promotion
+
+- decide the explicit policy for reusing `source issue` as `publication target`
+- decide the smallest stable public-status vocabulary, if any, that the bounded owner must freeze now rather than defer
+- decide whether internal-only AI formalization needs any additional canonical owner field beyond the already-frozen reasoning requirement
