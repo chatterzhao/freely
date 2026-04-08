@@ -969,10 +969,51 @@ interruption_dispatcher_pid_file() {
 }
 
 latest_run_artifact_for_project() {
-  local project="$1" pattern="$2" run_dir
+  local project="$1" pattern="$2" run_dir artifact_count
+  local artifacts=()
   run_dir="$(run_dir_for_project "$project")"
   [[ -d "$run_dir" ]] || return 0
-  find "$run_dir" -maxdepth 1 -type f -name "$pattern" | sort | tail -n 1
+  shopt -s nullglob
+  artifacts=("$run_dir"/$pattern)
+  shopt -u nullglob
+  artifact_count="${#artifacts[@]}"
+  (( artifact_count > 0 )) || return 0
+  printf '%s\n' "${artifacts[$((artifact_count - 1))]}"
+}
+
+project_worktree_list_porcelain_cached() {
+  local project="$1" entries=""
+  if [[ "${FREELY_CACHED_WORKTREE_PORCELAIN_PROJECT:-}" == "$project" && "${FREELY_CACHED_WORKTREE_PORCELAIN_READY:-0}" == "1" ]]; then
+    printf '%s\n' "${FREELY_CACHED_WORKTREE_PORCELAIN:-}"
+    return 0
+  fi
+  entries="$(git -C "$project" worktree list --porcelain 2>/dev/null || true)"
+  FREELY_CACHED_WORKTREE_PORCELAIN_PROJECT="$project"
+  FREELY_CACHED_WORKTREE_PORCELAIN_READY="1"
+  FREELY_CACHED_WORKTREE_PORCELAIN="$entries"
+  printf '%s\n' "$entries"
+}
+
+manager_continuity_files_desc_for_project() {
+  local project="$1" run_dir count idx
+  if [[ "${FREELY_CACHED_MANAGER_CONTINUITY_PROJECT:-}" == "$project" && "${FREELY_CACHED_MANAGER_CONTINUITY_READY:-0}" == "1" ]]; then
+    printf '%s\n' "${FREELY_CACHED_MANAGER_CONTINUITY_LIST:-}"
+    return 0
+  fi
+  run_dir="$(run_dir_for_project "$project")"
+  FREELY_CACHED_MANAGER_CONTINUITY_PROJECT="$project"
+  FREELY_CACHED_MANAGER_CONTINUITY_READY="1"
+  FREELY_CACHED_MANAGER_CONTINUITY_LIST=""
+  [[ -d "$run_dir" ]] || return 0
+  shopt -s nullglob
+  FREELY_CACHED_MANAGER_CONTINUITY_FILES=("$run_dir"/manager-continuity-*.md)
+  shopt -u nullglob
+  count="${#FREELY_CACHED_MANAGER_CONTINUITY_FILES[@]}"
+  (( count > 0 )) || return 0
+  for ((idx=count - 1; idx>=0; idx--)); do
+    FREELY_CACHED_MANAGER_CONTINUITY_LIST+="${FREELY_CACHED_MANAGER_CONTINUITY_FILES[$idx]}"$'\n'
+  done
+  printf '%s' "${FREELY_CACHED_MANAGER_CONTINUITY_LIST}"
 }
 
 find_latest_prompt_file_for_project() {
@@ -988,6 +1029,94 @@ latest_generated_manager_continuity_file_for_project() {
 find_latest_manager_continuity_file_for_project() {
   local project="$1"
   latest_manager_continuity_file_for_project "$project"
+}
+
+required_manager_continuity_file_from_prompt() {
+  local prompt_file="$1"
+  [[ -f "$prompt_file" ]] || return 0
+  awk '
+    /manager continuity 文件：`/ {
+      if (match($0, /`[^`]+`/)) {
+        print substr($0, RSTART + 1, RLENGTH - 2)
+        exit
+      }
+    }
+  ' "$prompt_file"
+}
+
+runtime_now_epoch() {
+  if [[ "${FREELY_TEST_NOW_EPOCH:-}" =~ ^[0-9]+$ ]]; then
+    printf '%s\n' "$FREELY_TEST_NOW_EPOCH"
+  else
+    date +%s
+  fi
+}
+
+manager_continuity_gap_snapshot_for_project() {
+  local project="$1"
+  local prompt_file expected_continuity latest_generated prompt_epoch latest_generated_epoch
+  local now_epoch gap_age_secs gap_age_state grace_secs
+  prompt_file="$(find_latest_prompt_file_for_project "$project")"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || {
+    printf 'none|none|none|none|none|none|none|none\n'
+    return 0
+  }
+  expected_continuity="$(required_manager_continuity_file_from_prompt "$prompt_file")"
+  [[ -n "$expected_continuity" ]] || {
+    printf 'none|none|none|none|%s|none|none|none\n' "$prompt_file"
+    return 0
+  }
+  latest_generated="$(latest_generated_manager_continuity_file_for_project "$project")"
+  if [[ -f "$expected_continuity" ]]; then
+    printf 'none|none|%s|%s|%s|0|none|present\n' "$expected_continuity" "${latest_generated:-none}" "$prompt_file"
+    return 0
+  fi
+
+  prompt_epoch="$(file_mtime_epoch "$prompt_file" 2>/dev/null || true)"
+  latest_generated_epoch="0"
+  if [[ -n "$latest_generated" && -f "$latest_generated" ]]; then
+    latest_generated_epoch="$(file_mtime_epoch "$latest_generated" 2>/dev/null || true)"
+  fi
+  [[ "$prompt_epoch" =~ ^[0-9]+$ ]] || prompt_epoch="0"
+  [[ "$latest_generated_epoch" =~ ^[0-9]+$ ]] || latest_generated_epoch="0"
+  now_epoch="$(runtime_now_epoch 2>/dev/null || true)"
+  [[ "$now_epoch" =~ ^[0-9]+$ ]] || now_epoch="0"
+  gap_age_secs="unknown"
+  gap_age_state="unknown"
+  if (( now_epoch > 0 && prompt_epoch > 0 && now_epoch >= prompt_epoch )); then
+    gap_age_secs="$((now_epoch - prompt_epoch))"
+    grace_secs="${FREELY_MANAGER_CONTINUITY_GAP_GRACE_SECS:-15}"
+    [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=15
+    if (( gap_age_secs <= grace_secs )); then
+      gap_age_state="within_grace"
+    else
+      gap_age_state="beyond_grace"
+    fi
+  fi
+
+  if (( prompt_epoch >= latest_generated_epoch )); then
+    printf 'active|expected_continuity_missing|%s|%s|%s|%s|%s|latest_generated=%s prompt=%s age_secs=%s age_state=%s\n' \
+      "$expected_continuity" \
+      "${latest_generated:-none}" \
+      "$prompt_file" \
+      "$gap_age_secs" \
+      "$gap_age_state" \
+      "${latest_generated:-none}" \
+      "$prompt_file" \
+      "$gap_age_secs" \
+      "$gap_age_state"
+    return 0
+  fi
+
+  printf 'none|none|%s|%s|%s|%s|%s|latest_generated_newer=%s age_secs=%s age_state=%s\n' \
+    "$expected_continuity" \
+    "${latest_generated:-none}" \
+    "$prompt_file" \
+    "$gap_age_secs" \
+    "$gap_age_state" \
+    "${latest_generated:-none}" \
+    "$gap_age_secs" \
+    "$gap_age_state"
 }
 
 ps_command_for_pid() {
@@ -1068,8 +1197,11 @@ live_status_activity_state_for_project() {
 
 discover_supervisor_pid() {
   local project="$1" excluded_pids="${2:-}"
+  local process_rows
   process_inspection_available || return 0
-  ps -axo pid=,command= | awk -v p="$project" -v excluded="$excluded_pids" '
+  process_rows="$(ps -axo pid=,command= 2>/dev/null || true)"
+  [[ -n "$process_rows" ]] || return 0
+  awk -v p="$project" -v excluded="$excluded_pids" '
     BEGIN {
       split(excluded, raw, ",")
       for (i in raw) {
@@ -1093,7 +1225,7 @@ discover_supervisor_pid() {
         }
       }
     }
-  '
+  ' <<<"$process_rows"
 }
 
 pid_matches_project() {
@@ -1194,7 +1326,7 @@ manager_supervisor_pid_hint_for_project() {
     printf '%s\n' "$sp"
     return 0
   fi
-  pid_hint_from_file_without_process_inspection "$sp"
+  pid_hint_from_file_without_process_inspection "$sp" || true
 }
 
 manager_watchdog_pid_hint_for_project() {
@@ -1206,7 +1338,7 @@ manager_watchdog_pid_hint_for_project() {
     printf '%s\n' "$pid"
     return 0
   fi
-  pid_hint_from_file_without_process_inspection "$pid"
+  pid_hint_from_file_without_process_inspection "$pid" || true
 }
 
 interruption_dispatcher_pid_hint_for_project() {
@@ -1218,7 +1350,7 @@ interruption_dispatcher_pid_hint_for_project() {
     printf '%s\n' "$pid"
     return 0
   fi
-  pid_hint_from_file_without_process_inspection "$pid"
+  pid_hint_from_file_without_process_inspection "$pid" || true
 }
 
 valid_ai_pid_for_project() {
@@ -2857,6 +2989,54 @@ meta_env_value() {
   awk -F '"' -v key="$key" '$1 == key "=" { print $2; exit }' "$meta_file"
 }
 
+clear_loaded_meta_env_snapshot() {
+  LOADED_META_INTAKE_ID=""
+  LOADED_META_CREATED_AT=""
+  LOADED_META_AUTHOR=""
+  LOADED_META_CHANNEL=""
+  LOADED_META_STATUS=""
+  LOADED_META_CLASSIFICATION=""
+  LOADED_META_REACTION=""
+  LOADED_META_LINKED_ARTIFACT=""
+  LOADED_META_DELEGATED_WORKTREE=""
+  LOADED_META_SESSION_REFS=""
+  LOADED_META_CLAIMED_BY=""
+  LOADED_META_CLAIMED_AT=""
+  LOADED_META_ABSORPTION_TARGET=""
+  LOADED_META_RESOLUTION_ARTIFACT=""
+  LOADED_META_RESOLVED_BY=""
+}
+
+load_meta_env_snapshot() {
+  local meta_file="$1"
+  local line key raw_value value
+  clear_loaded_meta_env_snapshot
+  [[ -f "$meta_file" ]] || return 0
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ "$line" == *=* ]] || continue
+    key="${line%%=*}"
+    raw_value="${line#*=}"
+    value="$(strip_simple_shell_quotes "$raw_value")"
+    case "$key" in
+      INTAKE_ID) LOADED_META_INTAKE_ID="$value" ;;
+      CREATED_AT) LOADED_META_CREATED_AT="$value" ;;
+      AUTHOR) LOADED_META_AUTHOR="$value" ;;
+      CHANNEL) LOADED_META_CHANNEL="$value" ;;
+      STATUS) LOADED_META_STATUS="$value" ;;
+      CLASSIFICATION) LOADED_META_CLASSIFICATION="$value" ;;
+      REACTION) LOADED_META_REACTION="$value" ;;
+      LINKED_ARTIFACT) LOADED_META_LINKED_ARTIFACT="$value" ;;
+      DELEGATED_WORKTREE) LOADED_META_DELEGATED_WORKTREE="$value" ;;
+      SESSION_REFS) LOADED_META_SESSION_REFS="$value" ;;
+      CLAIMED_BY) LOADED_META_CLAIMED_BY="$value" ;;
+      CLAIMED_AT) LOADED_META_CLAIMED_AT="$value" ;;
+      ABSORPTION_TARGET) LOADED_META_ABSORPTION_TARGET="$value" ;;
+      RESOLUTION_ARTIFACT) LOADED_META_RESOLUTION_ARTIFACT="$value" ;;
+      RESOLVED_BY) LOADED_META_RESOLVED_BY="$value" ;;
+    esac
+  done <"$meta_file"
+}
+
 validate_reaction_or_fail() {
   local reaction="$1"
   case "$reaction" in
@@ -2969,19 +3149,20 @@ intake_snapshot_for_project() {
     meta_file="$item_dir/meta.env"
     message_file="$item_dir/message.txt"
     [[ -f "$meta_file" ]] || continue
-    status="$(awk -F '"' '/^STATUS=/{print $2; exit}' "$meta_file")"
+    load_meta_env_snapshot "$meta_file"
+    status="$LOADED_META_STATUS"
     case "$status" in
       absorbed|dropped) continue ;;
     esac
-    intake_id="$(awk -F '"' '/^INTAKE_ID=/{print $2; exit}' "$meta_file")"
-    created_at="$(awk -F '"' '/^CREATED_AT=/{print $2; exit}' "$meta_file")"
-    channel="$(awk -F '"' '/^CHANNEL=/{print $2; exit}' "$meta_file")"
-    author="$(awk -F '"' '/^AUTHOR=/{print $2; exit}' "$meta_file")"
-    classification="$(awk -F '"' '/^CLASSIFICATION=/{print $2; exit}' "$meta_file")"
-    reaction="$(awk -F '"' '/^REACTION=/{print $2; exit}' "$meta_file")"
-    claimed_by="$(awk -F '"' '/^CLAIMED_BY=/{print $2; exit}' "$meta_file")"
-    linked_artifact="$(awk -F '"' '/^LINKED_ARTIFACT=/{print $2; exit}' "$meta_file")"
-    absorption_target="$(awk -F '"' '/^ABSORPTION_TARGET=/{print $2; exit}' "$meta_file")"
+    intake_id="$LOADED_META_INTAKE_ID"
+    created_at="$LOADED_META_CREATED_AT"
+    channel="$LOADED_META_CHANNEL"
+    author="$LOADED_META_AUTHOR"
+    classification="$LOADED_META_CLASSIFICATION"
+    reaction="$LOADED_META_REACTION"
+    claimed_by="$LOADED_META_CLAIMED_BY"
+    linked_artifact="$LOADED_META_LINKED_ARTIFACT"
+    absorption_target="$LOADED_META_ABSORPTION_TARGET"
     first_line="$(sed -n '1p' "$message_file" 2>/dev/null || true)"
     printf -- '- id=%s status=%s classification=%s reaction=%s claimed_by=%s author=%s channel=%s created_at=%s linked_artifact=%s absorption_target=%s message=%s\n' \
       "${intake_id:-unknown}" "${status:-unknown}" "${classification:-unclassified}" "${reaction:-pending}" "${claimed_by:-unclaimed}" "${author:-unknown}" "${channel:-unknown}" "$(format_timestamp_local_for_display "${created_at:-unknown}")" "${linked_artifact:-none}" "${absorption_target:-pending}" "${first_line:-}"
@@ -3004,10 +3185,11 @@ delegated_continuation_snapshot_for_project() {
     meta_file="$item_dir/meta.env"
     message_file="$item_dir/message.txt"
     [[ -f "$meta_file" && -f "$message_file" ]] || continue
-    status="$(meta_env_value "$meta_file" "STATUS")"
-    absorption_target="$(meta_env_value "$meta_file" "ABSORPTION_TARGET")"
-    delegated_worktree="$(meta_env_value "$meta_file" "DELEGATED_WORKTREE")"
-    session_refs="$(meta_env_value "$meta_file" "SESSION_REFS")"
+    load_meta_env_snapshot "$meta_file"
+    status="$LOADED_META_STATUS"
+    absorption_target="$LOADED_META_ABSORPTION_TARGET"
+    delegated_worktree="$LOADED_META_DELEGATED_WORKTREE"
+    session_refs="$LOADED_META_SESSION_REFS"
     [[ "$status" == "delegated" ]] || continue
     [[ "$absorption_target" == "handoff://continuation" ]] || continue
     delegated_real=""
@@ -3026,7 +3208,7 @@ delegated_continuation_snapshot_for_project() {
     if [[ -n "$session_refs" && "$session_refs" != "[]" ]]; then
       printf '  session_refs=%s\n' "$session_refs"
     fi
-    resolution_file="$(meta_env_value "$meta_file" "RESOLUTION_ARTIFACT")"
+    resolution_file="$LOADED_META_RESOLUTION_ARTIFACT"
     if [[ -n "$resolution_file" && -f "$resolution_file" ]]; then
       summary="$(tr '\n' ' ' <"$resolution_file" | sed 's/  */ /g')"
       printf '  resolution=%s\n' "$summary"
@@ -3036,6 +3218,21 @@ delegated_continuation_snapshot_for_project() {
       break
     fi
   done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort -r)
+}
+
+delegated_continuation_candidate_meta_files() {
+  local root="$1"
+  local meta_files=()
+  [[ -d "$root" ]] || return 0
+  shopt -s nullglob
+  meta_files=("$root"/*/meta.env)
+  shopt -u nullglob
+  ((${#meta_files[@]})) || return 0
+  if command -v rg >/dev/null 2>&1; then
+    rg -l -- '^ABSORPTION_TARGET="handoff://continuation"$' "${meta_files[@]}" 2>/dev/null | sort
+  else
+    grep -l -- 'ABSORPTION_TARGET="handoff://continuation"' "${meta_files[@]}" 2>/dev/null | sort
+  fi
 }
 
 active_prompt_consumed_delegation_ids_for_project() {
@@ -3053,18 +3250,18 @@ active_prompt_consumed_delegation_ids_for_project() {
 
 delegated_continuation_ids_for_project() {
   local project="$1"
-  local intake_root item_dir meta_file status absorption_target delegated_worktree intake_id
+  local resolution_root meta_file status absorption_target delegated_worktree intake_id
   local project_real delegated_real active_consumed_ids ids=()
-  intake_root="$(intake_dir_for_project "$project")"
-  [[ -d "$intake_root" ]] || return 0
+  resolution_root="$(interruption_resolution_dir_for_project "$project")"
+  [[ -d "$resolution_root" ]] || return 0
   project_real="$(cd "$project" && pwd -P)"
   active_consumed_ids="$(active_prompt_consumed_delegation_ids_for_project "$project")"
-  while IFS= read -r item_dir; do
-    meta_file="$item_dir/meta.env"
+  while IFS= read -r meta_file; do
     [[ -f "$meta_file" ]] || continue
-    status="$(meta_env_value "$meta_file" "STATUS")"
-    absorption_target="$(meta_env_value "$meta_file" "ABSORPTION_TARGET")"
-    delegated_worktree="$(meta_env_value "$meta_file" "DELEGATED_WORKTREE")"
+    load_meta_env_snapshot "$meta_file"
+    status="$LOADED_META_STATUS"
+    absorption_target="$LOADED_META_ABSORPTION_TARGET"
+    delegated_worktree="$LOADED_META_DELEGATED_WORKTREE"
     [[ "$status" == "delegated" ]] || continue
     [[ "$absorption_target" == "handoff://continuation" ]] || continue
     delegated_real=""
@@ -3074,12 +3271,13 @@ delegated_continuation_ids_for_project() {
     if [[ -n "$delegated_real" && "$delegated_real" != "$project_real" ]]; then
       continue
     fi
-    intake_id="$(basename "$item_dir")"
+    intake_id="$LOADED_META_INTAKE_ID"
+    [[ -n "$intake_id" ]] || intake_id="$(basename "$(dirname "$meta_file")")"
     if [[ -n "$active_consumed_ids" ]] && csv_contains_exact_item "$active_consumed_ids" "$intake_id"; then
       continue
     fi
     ids+=("$intake_id")
-  done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort)
+  done < <(delegated_continuation_candidate_meta_files "$resolution_root")
   if ((${#ids[@]})); then
     local joined="" id
     for id in "${ids[@]}"; do
@@ -3166,11 +3364,12 @@ resolution_snapshot_for_project() {
     meta_file="$item_dir/meta.env"
     content_file="$item_dir/resolution.md"
     [[ -f "$meta_file" ]] || continue
-    intake_id="$(meta_env_value "$meta_file" "INTAKE_ID")"
-    reaction="$(meta_env_value "$meta_file" "REACTION")"
-    classification="$(meta_env_value "$meta_file" "CLASSIFICATION")"
-    absorption_target="$(meta_env_value "$meta_file" "ABSORPTION_TARGET")"
-    status="$(meta_env_value "$meta_file" "STATUS")"
+    load_meta_env_snapshot "$meta_file"
+    intake_id="$LOADED_META_INTAKE_ID"
+    reaction="$LOADED_META_REACTION"
+    classification="$LOADED_META_CLASSIFICATION"
+    absorption_target="$LOADED_META_ABSORPTION_TARGET"
+    status="$LOADED_META_STATUS"
     first_line="$(sed -n '2p' "$content_file" 2>/dev/null | sed 's/^- //')"
     printf -- '- id=%s status=%s classification=%s reaction=%s absorption_target=%s summary=%s\n' \
       "${intake_id:-unknown}" "${status:-unknown}" "${classification:-unclassified}" "${reaction:-pending}" "${absorption_target:-pending}" "${first_line:-}"
@@ -3204,6 +3403,41 @@ blocked_supervision_reason_from_exit_context() {
       ;;
   esac
   return 1
+}
+
+blocked_supervision_candidate_resolution_artifacts() {
+  local root="$1"
+  local artifacts=()
+  [[ -d "$root" ]] || return 0
+  shopt -s nullglob
+  artifacts=("$root"/*/resolution.md)
+  shopt -u nullglob
+  ((${#artifacts[@]})) || return 0
+  if command -v rg >/dev/null 2>&1; then
+    rg -l -- '^[-] blocked_supervision_state: active$' "${artifacts[@]}" 2>/dev/null | sort -r
+  else
+    grep -l -- '- blocked_supervision_state: active' "${artifacts[@]}" 2>/dev/null | sort -r
+  fi
+}
+
+blocked_supervision_resolution_fields() {
+  local resolution_artifact="$1"
+  [[ -f "$resolution_artifact" ]] || return 0
+  awk '
+    /^- blocked_reason: / {
+      sub(/^- blocked_reason: /, "", $0)
+      blocked_reason=$0
+      next
+    }
+    /^- prompt_file: `/ {
+      split($0, parts, "`")
+      prompt_file=parts[2]
+      next
+    }
+    END {
+      printf "%s|%s\n", blocked_reason, prompt_file
+    }
+  ' "$resolution_artifact"
 }
 
 prompt_visible_unclaimed_intake_ids_for_prompt() {
@@ -3300,18 +3534,19 @@ EOF
 
 blocked_supervision_snapshot_for_project() {
   local project="$1"
-  local intake_root item_dir meta_file resolution_artifact status absorption_target delegated_worktree intake_id
+  local resolution_root meta_file resolution_artifact status absorption_target delegated_worktree intake_id
   local project_real delegated_real blocked_reason prompt_file
-  intake_root="$(intake_dir_for_project "$project")"
-  [[ -d "$intake_root" ]] || return 0
+  resolution_root="$(interruption_resolution_dir_for_project "$project")"
+  [[ -d "$resolution_root" ]] || return 0
   project_real="$(cd "$project" && pwd -P)"
-  while IFS= read -r item_dir; do
-    meta_file="$item_dir/meta.env"
+  while IFS= read -r resolution_artifact; do
+    [[ -f "$resolution_artifact" ]] || continue
+    meta_file="$(dirname "$resolution_artifact")/meta.env"
     [[ -f "$meta_file" ]] || continue
-    status="$(meta_env_value "$meta_file" "STATUS")"
-    absorption_target="$(meta_env_value "$meta_file" "ABSORPTION_TARGET")"
-    delegated_worktree="$(meta_env_value "$meta_file" "DELEGATED_WORKTREE")"
-    resolution_artifact="$(meta_env_value "$meta_file" "RESOLUTION_ARTIFACT")"
+    load_meta_env_snapshot "$meta_file"
+    status="$LOADED_META_STATUS"
+    absorption_target="$LOADED_META_ABSORPTION_TARGET"
+    delegated_worktree="$LOADED_META_DELEGATED_WORKTREE"
     [[ "$status" == "delegated" ]] || continue
     [[ "$absorption_target" == "handoff://continuation" ]] || continue
     delegated_real=""
@@ -3321,15 +3556,12 @@ blocked_supervision_snapshot_for_project() {
     if [[ -n "$delegated_real" && "$delegated_real" != "$project_real" ]]; then
       continue
     fi
-    [[ -n "$resolution_artifact" && -f "$resolution_artifact" ]] || continue
-    grep -q '^[-] blocked_supervision_state: active$' "$resolution_artifact" 2>/dev/null || continue
-    blocked_reason="$(awk -F': ' '/^- blocked_reason: /{print $2; exit}' "$resolution_artifact")"
-    prompt_file="$(awk -F'`' '/^- prompt_file: `/{print $2; exit}' "$resolution_artifact")"
-    intake_id="$(meta_env_value "$meta_file" "INTAKE_ID")"
-    [[ -n "$intake_id" ]] || intake_id="$(basename "$item_dir")"
+    IFS='|' read -r blocked_reason prompt_file <<<"$(blocked_supervision_resolution_fields "$resolution_artifact")"
+    intake_id="$LOADED_META_INTAKE_ID"
+    [[ -n "$intake_id" ]] || intake_id="$(basename "$(dirname "$resolution_artifact")")"
     printf 'active|%s|intake_id=%s prompt=%s|%s\n' "${blocked_reason:-unknown}" "${intake_id:-unknown}" "${prompt_file:-none}" "$resolution_artifact"
     return 0
-  done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort -r)
+  done < <(blocked_supervision_candidate_resolution_artifacts "$resolution_root")
   printf 'none|none|none|none\n'
 }
 
@@ -3535,7 +3767,7 @@ worktree_summary_for_project() {
     printf '0|0\n'
     return 0
   }
-  entries="$(git -C "$project" worktree list --porcelain 2>/dev/null || true)"
+  entries="$(project_worktree_list_porcelain_cached "$project")"
   [[ -n "$entries" ]] || {
     printf '0|0\n'
     return 0
@@ -4289,16 +4521,14 @@ terminate_pid_with_graceful_wait() {
 }
 
 latest_manager_continuity_file_for_project() {
-  local project="$1" continuity_file run_dir
-  run_dir="$(run_dir_for_project "$project")"
-  [[ -d "$run_dir" ]] || return 0
+  local project="$1" continuity_file
   while IFS= read -r continuity_file; do
     [[ -f "$continuity_file" ]] || continue
     if manager_continuity_is_launchable_for_project "$project" "$continuity_file"; then
       printf '%s\n' "$continuity_file"
       return 0
     fi
-  done < <(find "$run_dir" -maxdepth 1 -type f -name 'manager-continuity-*.md' | sort -r)
+  done < <(manager_continuity_files_desc_for_project "$project")
 }
 
 latest_cycle_log_for_project() {
@@ -4406,7 +4636,7 @@ all_manager_worker_prompt_paths_from_continuity() {
 
 fleet_worktree_paths_for_project() {
   local project="$1"
-  git -C "$project" worktree list --porcelain 2>/dev/null | awk '/^worktree / {print substr($0, 10)}'
+  project_worktree_list_porcelain_cached "$project" | awk '/^worktree / {print substr($0, 10)}'
 }
 
 global_restart_project_paths() {
@@ -4431,7 +4661,7 @@ normalize_runtime_worktree_path() {
 
 fleet_worktree_branch_rows_for_project() {
   local project="$1"
-  git -C "$project" worktree list --porcelain 2>/dev/null | awk '
+  project_worktree_list_porcelain_cached "$project" | awk '
     BEGIN { wt=""; br="(detached)" }
     /^worktree / { wt=substr($0, 10); br="(detached)" }
     /^branch / { br=$2; sub(/^refs\/heads\//, "", br) }
@@ -4827,7 +5057,7 @@ worker_prompt_target_branch() {
 worktree_path_for_branch() {
   local project="$1" target_branch="$2"
   [[ -n "$target_branch" ]] || return 0
-  git -C "$project" worktree list --porcelain 2>/dev/null | awk -v target="refs/heads/$target_branch" '
+  project_worktree_list_porcelain_cached "$project" | awk -v target="refs/heads/$target_branch" '
     /^worktree / { wt=substr($0, 10); next }
     /^branch / {
       if ($2 == target) {
@@ -4976,9 +5206,7 @@ manager_continuity_is_launchable_for_project() {
 }
 
 latest_launchable_manager_continuity_file_for_project() {
-  local project="$1" continuity_file run_dir
-  run_dir="$(run_dir_for_project "$project")"
-  [[ -d "$run_dir" ]] || return 0
+  local project="$1" continuity_file
   while IFS= read -r continuity_file; do
     [[ -f "$continuity_file" ]] || continue
     if manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file"; then
@@ -4988,7 +5216,7 @@ latest_launchable_manager_continuity_file_for_project() {
       printf '%s\n' "$continuity_file"
       return 0
     fi
-  done < <(find "$run_dir" -maxdepth 1 -type f -name 'manager-continuity-*.md' | sort -r)
+  done < <(manager_continuity_files_desc_for_project "$project")
 }
 
 latest_manager_worker_prompt_csv_from_continuity() {
@@ -5050,9 +5278,6 @@ manager_semantic_loop_repeat_state_for_project() {
   [[ -n "$latest_consumed" && "$latest_consumed" != "unavailable" && "$latest_consumed" != "$latest_continuity" ]] || return 1
   latest_fingerprint="$(manager_continuity_semantic_fingerprint "$latest_continuity")"
   [[ -n "$latest_fingerprint" ]] || return 1
-  local run_dir
-  run_dir="$(run_dir_for_project "$project")"
-  [[ -d "$run_dir" ]] || return 1
   while IFS= read -r continuity_file; do
     [[ -f "$continuity_file" ]] || continue
     if manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file"; then
@@ -5065,7 +5290,7 @@ manager_semantic_loop_repeat_state_for_project() {
     [[ "$continuity_fingerprint" == "$latest_fingerprint" ]] || break
     repeat_count=$((repeat_count + 1))
     oldest_repeat="$continuity_file"
-  done < <(find "$run_dir" -maxdepth 1 -type f -name 'manager-continuity-*.md' | sort -r)
+  done < <(manager_continuity_files_desc_for_project "$project")
   threshold="${MANAGER_SEMANTIC_LOOP_REPEAT_THRESHOLD:-3}"
   [[ "$threshold" =~ ^[0-9]+$ ]] || return 1
   (( repeat_count >= threshold )) || return 1
@@ -5637,7 +5862,7 @@ manager_max_parallel_workers() {
 
 all_repo_worktrees_for_project() {
   local project="$1"
-  git -C "$project" worktree list --porcelain 2>/dev/null | awk '
+  project_worktree_list_porcelain_cached "$project" | awk '
     /^worktree / { print substr($0, 10) }
   '
 }
@@ -6906,7 +7131,12 @@ workspace_root_for_project() {
   candidate="$project/docs/system/workspace"
   start_script="$candidate/scripts/start-lead-agent.sh"
   if [[ -d "$candidate" && -f "$start_script" ]]; then
-    if rg -q -- '--workspace-root' "$start_script" && rg -q -- '--reasoning-effort' "$start_script"; then
+    if command -v rg >/dev/null 2>&1; then
+      if rg -q -- '--workspace-root' "$start_script" 2>/dev/null && rg -q -- '--reasoning-effort' "$start_script" 2>/dev/null; then
+        echo "$candidate"
+        return 0
+      fi
+    elif grep -q -- '--workspace-root' "$start_script" 2>/dev/null && grep -q -- '--reasoning-effort' "$start_script" 2>/dev/null; then
       echo "$candidate"
       return 0
     fi
@@ -7118,7 +7348,7 @@ manager_ai_pid_hint_for_project() {
     printf '%s\n' "$ap"
     return 0
   fi
-  pid_hint_from_file_without_process_inspection "$ap"
+  pid_hint_from_file_without_process_inspection "$ap" || true
 }
 
 runtime_ai_pid_hint_for_project() {
@@ -9767,6 +9997,7 @@ cmd_live_status() {
   local semantic_loop_signal semantic_loop_signal_reason semantic_loop_signal_summary semantic_loop_repeat_count
   local semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv
   local blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact
+  local manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary manager_continuity_gap_writer_state
   local develop_push_snapshot develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at
 
   run_dir="$(run_dir_for_project "$project")"
@@ -9939,6 +10170,19 @@ cmd_live_status() {
     semantic_loop_signal_summary="repeats=${semantic_loop_repeat_count:-0} latest=${semantic_loop_latest_continuity:-unavailable} consumed=${semantic_loop_latest_consumed:-unavailable} prompts=${semantic_loop_latest_prompt_csv:-none}"
   fi
   IFS='|' read -r blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact <<<"$(blocked_supervision_snapshot_for_project "$project")"
+  IFS='|' read -r manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$project")"
+  manager_continuity_gap_writer_state="none"
+  if [[ "$manager_continuity_gap_state" == "active" ]]; then
+    if [[ -n "$ai_pid" ]]; then
+      case "$ai_pid_evidence" in
+        authoritative) manager_continuity_gap_writer_state="authoritative_ai_running" ;;
+        unverified_pid_file) manager_continuity_gap_writer_state="unverified_ai_pid_hint" ;;
+        *) manager_continuity_gap_writer_state="ai_process_present" ;;
+      esac
+    else
+      manager_continuity_gap_writer_state="no_ai_process_evidence"
+    fi
+  fi
   develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
   IFS='|' read -r develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at <<<"$develop_push_snapshot"
 
@@ -9988,6 +10232,15 @@ cmd_live_status() {
   echo "blocked_supervision_reason: ${blocked_supervision_reason:-none}"
   echo "blocked_supervision_summary: ${blocked_supervision_summary:-none}"
   echo "blocked_supervision_artifact: ${blocked_supervision_artifact:-none}"
+  echo "manager_continuity_gap_state: ${manager_continuity_gap_state:-none}"
+  echo "manager_continuity_gap_reason: ${manager_continuity_gap_reason:-none}"
+  echo "manager_continuity_gap_expected_path: ${manager_continuity_gap_expected:-none}"
+  echo "manager_continuity_gap_latest_generated: ${manager_continuity_gap_latest_generated:-none}"
+  echo "manager_continuity_gap_prompt_file: ${manager_continuity_gap_prompt_file:-none}"
+  echo "manager_continuity_gap_age_secs: ${manager_continuity_gap_age_secs:-none}"
+  echo "manager_continuity_gap_age_state: ${manager_continuity_gap_age_state:-none}"
+  echo "manager_continuity_gap_writer_state: ${manager_continuity_gap_writer_state:-none}"
+  echo "manager_continuity_gap_summary: ${manager_continuity_gap_summary:-none}"
   print_current_slot_switch_lock_snapshot
   echo "ownership_holder_state: ${ownership_holder_state}"
   echo "ownership_holder_status: ${ownership_holder_status}"
@@ -10172,6 +10425,7 @@ sleep_with_rate_limit_recheck() {
 cmd_fleet_status() {
   local project="" repo_root entries wt_path wt_branch wt_state cfg run_dir session_state supervisor_pid ai_pid last_launch last_dirty checkpoint_json checkpoint_required restart_signal_reason restart_signal_at restart_summary semantic_loop_summary semantic_loop_signal ownership_conflict_summary manager_pending_ownership_conflicts role_hint
   local blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact
+  local manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary
   local develop_push_snapshot develop_push_state develop_push_summary prompt_file prompt_intent_kind prompt_intent_target manager_generated_intents manager_consumed_intents
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -10213,6 +10467,14 @@ cmd_fleet_status() {
     blocked_supervision_reason="none"
     blocked_supervision_summary="none"
     blocked_supervision_artifact="none"
+      manager_continuity_gap_state="none"
+      manager_continuity_gap_reason="none"
+      manager_continuity_gap_expected="none"
+      manager_continuity_gap_latest_generated="none"
+      manager_continuity_gap_prompt_file="none"
+      manager_continuity_gap_age_secs="none"
+      manager_continuity_gap_age_state="none"
+      manager_continuity_gap_summary="none"
     ownership_conflict_summary="none"
     manager_pending_ownership_conflicts="none"
     role_hint="unknown"
@@ -10251,6 +10513,7 @@ cmd_fleet_status() {
         semantic_loop_summary="loop=${semantic_loop_reason} repeats=${semantic_loop_repeat_count:-0}"
       fi
       IFS='|' read -r blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact <<<"$(blocked_supervision_snapshot_for_project "$wt_path")"
+      IFS='|' read -r manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$wt_path")"
       develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$wt_path")"
       IFS='|' read -r develop_push_state develop_push_summary _ _ _ _ _ <<<"$develop_push_snapshot"
       prompt_file="$(find_latest_prompt_file_for_project "$wt_path")"
@@ -10307,6 +10570,15 @@ cmd_fleet_status() {
     fi
     if [[ "$blocked_supervision_state" == "active" ]]; then
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "blocked_supervision" "" "reason=${blocked_supervision_reason:-unknown} ${blocked_supervision_summary:-none} artifact=${blocked_supervision_artifact:-none}"
+    fi
+    if [[ "$manager_continuity_gap_state" == "active" ]]; then
+      local continuity_gap_writer_state
+      if [[ -n "$ai_pid" && "$ai_pid" != "none" ]]; then
+        continuity_gap_writer_state="authoritative_ai_running"
+      else
+        continuity_gap_writer_state="no_ai_process_evidence"
+      fi
+      printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "continuity_gap" "" "reason=${manager_continuity_gap_reason:-unknown} expected=${manager_continuity_gap_expected:-none} latest_generated=${manager_continuity_gap_latest_generated:-none} prompt=${manager_continuity_gap_prompt_file:-none} age_secs=${manager_continuity_gap_age_secs:-none} age_state=${manager_continuity_gap_age_state:-none} writer=${continuity_gap_writer_state}"
     fi
     if [[ "$develop_push_state" != "not_applicable" ]]; then
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "develop_push" "" "${develop_push_state} ${develop_push_summary}"

@@ -50,6 +50,18 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260407-0215-A`
+- title: Runtime self-host continuity gap and status truth governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/candidates.md`
+- next_action: Keep the owner in bounded verification until the tracked root `develop` entrypoint absorbs the dirty feature implementation; use the current issue/progress plus verification replay to drive manager-side merge-prep / absorption judgment, and do not reopen worker implementation unless the patched feature entrypoint itself reintroduces a status-truth gap.
+- revisit_trigger: Re-open boundary selection only if automatic recovery of prompt-required continuity gaps proves inseparable from this bounded status owner, or if canonical `develop` shows the continuity-gap signal is actually absorbed by another active runtime supervision owner.
+
 3. `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: committed
@@ -74,6 +86,17 @@ routing_policy:
 - revisit_trigger: Re-open only if the owner proves too narrow to keep help semantics and dry-run summary semantics aligned, or if canonical replay exposes another first-hop command contract outside this bounded set.
 
 ### candidate_issues
+
+1. `C-20260407-0215-A`
+- title: Runtime self-host continuity gap and status truth followthrough
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/candidates.md`
+- next_action: Candidate mirror only. `I-20260407-0215-A` is now the canonical owner for self-host continuity-gap status truth and bounded runtime observability followthrough.
+- revisit_trigger: Re-open only if canonical replay proves the continuity-gap signal disappears without needing a dedicated owner, or if another active runtime supervision owner fully absorbs the bounded status surface.
 
 1. `C-20260407-0023-A`
 - title: Codex auto switch keeps probing saved apikey slots after all-unavailable OAuth sweep

@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260407-0215--runtime-selfhost-continuity-gap-and-status-truth
+  - brainstorms: docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/candidates.md
 - 20260407-0023--codex-auto-switch-probe-apikey-fallback
   - brainstorms: docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/brainstorms.md
   - candidates: docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/candidates.md
