@@ -193,9 +193,8 @@ Owns only the moment when a human interruption is judged to become a governed pr
 
 At that point the family must write enough linkage to say:
 
-- this interruption was consumed
-- it was consumed by which `pre-brainstorm`
-- or it was intentionally absorbed into runtime/continuity without new pre-brainstorm creation
+- if this interruption became a governed problem-source, it was consumed by which `pre-brainstorm`
+- if it was closed by runtime/control/continuity handling instead, that closure stays family-local runtime truth rather than shared source consumption
 
 After that, candidate / milestone / issue work belongs to the downstream owner, not to this family.
 
@@ -288,6 +287,7 @@ The guiding constraint is:
 
 - unresolved source shape should be source-like and small
 - runtime intake shape can remain richer because it is already carrying routing and recovery truth
+- this field set stays family-local and provisional until umbrella validation proves a reusable subset
 
 ## First-Slice Direction
 
@@ -313,6 +313,7 @@ The first implementation slice should be deliberately narrow:
 
 - if a human interruption is claimed to be consumed into a `pre-brainstorm`, unresolved visibility must clear
 - if it is direct-answer/runtime-local/control-only, unresolved visibility must also clear without forcing repo doc creation
+- any umbrella hook/gate backstop should validate only repo-visible governed-problem absorption claims, not generic runtime-local closure churn
 
 ## Preliminary Direction
 
@@ -333,7 +334,7 @@ The burden of proof should stay on any proposal that wants to rehome the family 
 3. Which interruption outcomes remain runtime-local/control-local and never become governed problem-sources?
 4. When an interruption is consumed into an existing `pre-brainstorm`, what linkage fields are minimally required?
 5. What exact unresolved-removal invariant should hold for direct answer, delegated continuation, delegated cleanup, and pre-brainstorm consumption respectively?
-6. Which checks belong in this family contract versus the umbrella source-governance backstop?
+6. Which checks belong in this family contract versus the umbrella source-governance backstop, and which must never be promoted beyond family-local runtime closure evidence?
 
 ## Initial Conclusion
 

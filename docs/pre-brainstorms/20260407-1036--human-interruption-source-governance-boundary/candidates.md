@@ -18,8 +18,9 @@
   - define the minimal unresolved interruption/source view and manager-visible surface without replacing current runtime truth
   - define claim / resolve / absorb semantics that stay compatible with current runtime behavior, including `delegated` continuation / cleanup handoff
   - define which interruption outcomes remain runtime-local/control-local and which become governed problem-sources
+  - explicitly distinguish shared source consumption into `pre-brainstorm` from family-local runtime/control/continuity closure
   - define writeback requirements when a human interruption is consumed into `pre-brainstorm`
-  - define the first-slice unresolved-removal/backstop invariant for both pre-brainstorm consumption and runtime-local closure
+  - define the first-slice unresolved-removal/backstop invariant for both pre-brainstorm consumption and runtime-local closure without promoting runtime-local closure into the shared consumed contract
   - prove the first-slice contract against the currently tested closure paths: pre-brainstorm absorption, delegated continuation visibility, manager-continuity absorption, and direct-answer/control closure
 - promotion_gate:
   - prove the line does not absorb AI-discovered external-issue responsibilities
@@ -27,6 +28,7 @@
   - prove direct-answer/runtime-only handling is preserved
   - prove the first slice is adapter/overlay-oriented rather than a blind storage replacement
   - prove delegated continuation/local re-entry semantics are preserved
+  - prove any provisional unresolved-view fields remain family-local unless umbrella validation later proves them reusable
 - open_questions:
   - should the family-local truth remain `.freely/intake/**` with a derived unresolved index, or should a thin adapter document be added alongside it
   - which fields belong on a family-local unresolved source view versus full runtime intake truth
@@ -54,6 +56,6 @@
   - separate runtime-local resolution from governed problem-source consumption explicitly
   - turn the currently tested closure matrix into explicit contract language for: `pre-brainstorm` absorption, `handoff://continuation`, `handoff://cleanup`, direct-answer absorption, and `continuity://manager-supervision`
   - specify the smallest manager-visible unresolved view that can be derived without flattening runtime statuses
-  - write the first-slice invariant for unresolved removal / absorption backstop
+  - write the first-slice invariant for unresolved removal / absorption backstop, while keeping umbrella gate scope limited to repo-visible governed-problem absorption claims
 - revisit_trigger:
   - revisit when interruption semantics again drift toward generic catch-all intake, or when the umbrella schema is stable enough to test a narrow first implementation slice

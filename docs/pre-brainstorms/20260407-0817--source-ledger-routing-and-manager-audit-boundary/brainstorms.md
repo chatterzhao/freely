@@ -119,8 +119,9 @@ Now that durable source families are being contracted, this umbrella pre-researc
 It should solve:
 
 - the common definition of durable problem-source
-- the common `unconsumed -> consumed` semantics
-- the rule that `consumed` means absorbed into `pre-brainstorm`
+- the common `unconsumed -> consumed` semantics for durable sources that have actually been judged to be governed problems
+- the rule that shared `consumed` means absorbed into `pre-brainstorm`
+- the rule that family-local runtime closure which never becomes a governed problem-source is not a shared `consumed` transition
 - the minimal unresolved-index and writeback invariant
 - the anti-loop rule between discovery and current-line absorption
 - the manager/worker visibility boundary around unresolved sources
@@ -146,7 +147,7 @@ So this umbrella line is not the place to finish the full GitHub issue model or 
 Its job is narrower:
 
 - define the shared source-governance contract those two follow-up lines must satisfy before pre-brainstorm
-- define where the common hook/gate backstop attaches
+- define where the common hook/gate backstop attaches for repo-visible governed-problem absorption claims
 - define where family-specific behavior must be delegated out
 
 ## Source-Type Clarification
@@ -168,6 +169,7 @@ So the safer model is:
 - human/operator-provided problem input
 - local to Freely runtime intake today
 - consumed into pre-brainstorm once judged to be a real governed problem
+- otherwise resolved by family-local runtime/control/continuity closure without entering the shared source contract
 
 #### B. External issue
 
@@ -177,8 +179,8 @@ So the safer model is:
 
 These two are conceptually parallel:
 
-- both are pre-pre-brainstorm problem inputs
-- both can be `unconsumed` or `consumed`
+- both can expose pre-pre-brainstorm governed problem inputs
+- both can be `unconsumed` or `consumed` once the shared source contract applies
 - both should freeze after they have been consumed into pre-brainstorm
 
 They are still operationally different:
