@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment
+  - brainstorms: docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/candidates.md
 - 20260407-1042--external-issue-identity-and-publication-boundary
   - brainstorms: docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/brainstorms.md
   - candidates: docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/candidates.md
