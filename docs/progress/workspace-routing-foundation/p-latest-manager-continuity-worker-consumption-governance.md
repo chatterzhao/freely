@@ -129,3 +129,27 @@
 - Current judgement:
   - absorb this as a same-family repair inside `I-20260322-0445`
   - do not widen `C-20260404-1545-A`; that candidate still owns the separate blocked-intake / websocket / slot-switch supervision contract question
+
+## 2026-04-07 Same-Family Retire-Ready Recovery Guard Followthrough
+
+- Followthrough judgement:
+  - a later local replay exposed another same-family gap in the latest manager continuity consumption family
+  - runtime already knew not to launch retire-ready merged-clean worker prompts from continuity parsing, but the expected-running recovery path still relaunched the same merged-clean worker worktree after supervisor exit
+  - the same replay also showed the worker prompt dispatch metadata parser still assumed inline `key: value` headers, even though current manager prompts can emit multiline list-form headers such as `dispatch_priority:` followed by `- \`P0\``
+- Why this is same-family:
+  - both defects live inside the same manager continuity / worker prompt consumption contract already owned by `I-20260322-0445`
+  - neither defect widens into tracked-root continuity-gap status truth or the broader research-only continuity fallback / authoritative replacement boundary
+- Repair:
+  - factor a shared `worker_project_is_retire_ready_merged_clean()` helper and reuse it from both prompt-launchability checks and `manager_runtime_recover_workers_if_needed()`
+  - skip expected-running recovery for merged-clean worker worktrees that already have runtime history and are therefore genuinely retire-ready
+  - extend `worker_prompt_dispatch_metadata_value()` so it accepts both inline headers and multiline list-form manager prompt headers
+  - add focused regressions for retire-ready recovery skip and multiline prompt metadata parsing
+- Verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-multiline-dispatch-metadata`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-intent-metadata`
+  - `./bin/governance-check`
+- Current judgement:
+  - absorb this as a same-family repair inside `I-20260322-0445`
+  - do not widen `I-20260407-0215-A`; tracked-root status truth stays in its own bounded owner

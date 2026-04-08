@@ -84,6 +84,8 @@
 - `docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
 - `docs/system/workspace/scripts/tests/test-freely-live-status`
 - `docs/system/workspace/scripts/tests/test-freely-worker-prompt-natural-language-contract-compat`
+- `docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
+- `docs/system/workspace/scripts/tests/test-freely-worker-prompt-multiline-dispatch-metadata`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md`
 - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260322-latest-manager-continuity-worker-consumption-verification.md`
@@ -100,6 +102,8 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-frozen-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
+- `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-multiline-dispatch-metadata`
 - `./bin/governance-check`
 
 ## Verification Summary
