@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-runtime-handoff-reconcile.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260408-0000--sample" \
+  "$PROJECT/.freely/run/interruption-resolution/20260408-054350-runtime-handoff" \
+  "$PROJECT/.freely/logs"
+
+git init -q -b feature/test-runtime-handoff-reconcile "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260408-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260408-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260408-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+bash "$ROOT_DIR/bin/freely" init --project "$PROJECT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="execution_network_transient"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-08T13:12:53Z"
+EOF
+
+cat >"$PROJECT/.freely/run/interruption-resolution/20260408-054350-runtime-handoff/meta.env" <<'EOF'
+INTAKE_ID="20260408-054350-runtime-handoff"
+CREATED_AT="2026-04-08T12:44:28Z"
+RESOLVED_BY="interruption-manager-agent"
+REACTION="followup"
+CLASSIFICATION="control"
+ABSORPTION_TARGET="handoff://runtime"
+LINKED_ARTIFACT="pending://interruption-manager-delegation"
+DELEGATED_WORKTREE=""
+STATUS="delegated"
+EOF
+
+cat >"$PROJECT/.freely/run/interruption-resolution/20260408-054350-runtime-handoff/resolution.md" <<'EOF'
+# Interruption Resolution
+- intake_id: `20260408-054350-runtime-handoff`
+- restart_point: `runtime`
+- ownership: `runtime`
+- summary: keep this lane parked and stop the runtime
+EOF
+
+OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+
+printf '%s\n' "$OUTPUT" | grep -q '^desired_runtime_state: stopped$' || {
+  echo "[FAIL] live-status did not reconcile desired runtime state to stopped" >&2
+  exit 1
+}
+
+grep -q '^DESIRED_RUNTIME_STATE="stopped"$' "$PROJECT/.freely/run/workcell-state.env" || {
+  echo "[FAIL] workcell state was not rewritten to stopped" >&2
+  exit 1
+}
+
+grep -q '^LAST_EXIT_REASON="delegated_runtime_handoff"$' "$PROJECT/.freely/run/workcell-state.env" || {
+  echo "[FAIL] workcell state did not record delegated_runtime_handoff exit reason" >&2
+  exit 1
+}
+
+grep -q 'event=delegated_runtime_handoff_state_reconciled' "$PROJECT/.freely/logs/runtime-events.log" || {
+  echo "[FAIL] reconcile event was not appended" >&2
+  exit 1
+}
+
+echo "[PASS] live-status reconciles stale delegated runtime handoff state to stopped truth"
