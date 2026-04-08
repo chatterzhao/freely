@@ -37,6 +37,11 @@ This line does not own:
 - milestone/public progress sync
 - generic source-family schema for every other durable family
 
+Hard boundary:
+
+- AI-discovered problems never become `human interruption`
+- if AI-discovered problems need durable source formalization, that belongs only to the `external issue` family
+
 ## Runtime Truth To Preserve
 
 Current runtime truth is already richer than a raw inbox.

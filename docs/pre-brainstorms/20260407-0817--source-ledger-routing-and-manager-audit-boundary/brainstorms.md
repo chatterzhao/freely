@@ -215,6 +215,12 @@ And when that happens, the new durable source should usually still be represente
 - human interruption style intake
 - external issue style intake
 
+Hard boundary:
+
+- AI-discovered problems never become `human interruption`
+- if AI-discovered problems need durable source formalization, they route only to `external issue`
+- otherwise they stay inside current-line absorption or internal followthrough rather than entering the durable source pool
+
 ### 3. Current-line absorption must win over new-source creation
 
 This is the anti-loop rule that the design must preserve.
@@ -1421,7 +1427,7 @@ If this line continues, the safest forward order is:
 1. Freeze the current boundary decisions
    - source document stays short
    - source state stays two-state
-   - not all families enter pre-brainstorm
+   - not all raw signals or discovery mechanisms enter pre-brainstorm, but the contracted durable source families do once they become governed problems
    - not all families enter one inbox
    - manager keeps runtime/fleet patrol
 
