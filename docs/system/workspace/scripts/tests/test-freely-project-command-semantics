@@ -364,6 +364,80 @@ START_ATTACH_WITH_MISSING_DISPATCHER_OUTPUT="$(
 [[ "$START_ATTACH_WITH_MISSING_DISPATCHER_OUTPUT" == *"terminate:23232|label:partial project control-plane before supervisor restart"* ]]
 [[ "$START_ATTACH_WITH_MISSING_DISPATCHER_OUTPUT" == *"attach_repair_supervisor_pid_removed"* ]]
 
+DISPATCHER_SELF_HEAL_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="/tmp/freely-dispatcher-self-heal-project"
+    dispatcher_state="missing"
+
+    interruption_dispatcher_pid_for_project() {
+      if [[ "$dispatcher_state" == "ready" ]]; then
+        printf "%s\n" "45454"
+      fi
+    }
+    manager_supervisor_pid_for_project() { printf "%s\n" "34343"; }
+    launch_interruption_dispatcher() {
+      dispatcher_state="ready"
+      printf "launch-dispatcher:%s\n" "$1"
+    }
+    ensure_interruption_dispatcher_ready_or_fail() {
+      if [[ "$dispatcher_state" == "ready" ]]; then
+        return 0
+      fi
+      return 1
+    }
+    append_runtime_event() {
+      local event="${2:-}" arg
+      printf "event:%s" "$event"
+      shift 2 || true
+      for arg in "$@"; do
+        printf "|%s" "$arg"
+      done
+      printf "\n"
+    }
+
+    ensure_interruption_dispatcher_running_for_active_runtime "$project"
+  '
+)"
+
+[[ "$DISPATCHER_SELF_HEAL_OUTPUT" == *"event:interruption_dispatcher_relaunch_requested|supervisor_pid=34343|reason=missing_dispatcher"* ]]
+[[ "$DISPATCHER_SELF_HEAL_OUTPUT" == *"launch-dispatcher:/tmp/freely-dispatcher-self-heal-project"* ]]
+[[ "$DISPATCHER_SELF_HEAL_OUTPUT" == *"event:interruption_dispatcher_relaunch_ready|dispatcher_pid=45454"* ]]
+
+DISPATCHER_SELF_HEAL_FAILURE_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="/tmp/freely-dispatcher-self-heal-failure-project"
+
+    interruption_dispatcher_pid_for_project() { return 0; }
+    manager_supervisor_pid_for_project() { printf "%s\n" "56565"; }
+    launch_interruption_dispatcher() { printf "launch-dispatcher:%s\n" "$1"; }
+    ensure_interruption_dispatcher_ready_or_fail() { return 1; }
+    append_runtime_event() {
+      local event="${2:-}" arg
+      printf "event:%s" "$event"
+      shift 2 || true
+      for arg in "$@"; do
+        printf "|%s" "$arg"
+      done
+      printf "\n"
+    }
+
+    if ensure_interruption_dispatcher_running_for_active_runtime "$project"; then
+      printf "dispatcher_self_heal_unexpected_success\n"
+    else
+      printf "dispatcher_self_heal_failed\n"
+    fi
+  '
+)"
+
+[[ "$DISPATCHER_SELF_HEAL_FAILURE_OUTPUT" == *"event:interruption_dispatcher_relaunch_requested|supervisor_pid=56565|reason=missing_dispatcher"* ]]
+[[ "$DISPATCHER_SELF_HEAL_FAILURE_OUTPUT" == *"launch-dispatcher:/tmp/freely-dispatcher-self-heal-failure-project"* ]]
+[[ "$DISPATCHER_SELF_HEAL_FAILURE_OUTPUT" == *"event:interruption_dispatcher_relaunch_failed|reason=dispatcher_not_ready"* ]]
+[[ "$DISPATCHER_SELF_HEAL_FAILURE_OUTPUT" == *"dispatcher_self_heal_failed"* ]]
+
 START_ATTACH_WITH_MISSING_WATCHDOG_OUTPUT="$(
   bash -lc '
     set -euo pipefail

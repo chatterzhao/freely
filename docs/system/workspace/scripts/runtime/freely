@@ -7433,6 +7433,26 @@ ensure_interruption_dispatcher_ready_or_fail() {
   return 1
 }
 
+ensure_interruption_dispatcher_running_for_active_runtime() {
+  local project="$1" dispatcher_pid
+  dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  if [[ -n "$dispatcher_pid" ]]; then
+    return 0
+  fi
+  append_runtime_event "$project" "interruption_dispatcher_relaunch_requested" \
+    "supervisor_pid=$(manager_supervisor_pid_for_project "$project")" \
+    "reason=missing_dispatcher"
+  launch_interruption_dispatcher "$project"
+  if ensure_interruption_dispatcher_ready_or_fail "$project"; then
+    append_runtime_event "$project" "interruption_dispatcher_relaunch_ready" \
+      "dispatcher_pid=$(interruption_dispatcher_pid_for_project "$project")"
+    return 0
+  fi
+  append_runtime_event "$project" "interruption_dispatcher_relaunch_failed" \
+    "reason=dispatcher_not_ready"
+  return 1
+}
+
 ensure_manager_watchdog_ready_or_fail() {
   local project="$1" watchdog_pid attempts
   for attempts in $(seq 1 50); do
@@ -8953,8 +8973,7 @@ start_project_runtime() {
   write_workcell_state "$project" "running" "up" "down" "starting"
   trap cleanup_supervisor EXIT
   trap request_stop INT TERM
-  launch_interruption_dispatcher "$project"
-  ensure_interruption_dispatcher_ready_or_fail "$project" || {
+  ensure_interruption_dispatcher_running_for_active_runtime "$project" || {
     log_error "freely interruption dispatcher did not become ready for project: $project"
     log_error "try: ./bin/freely ensure-interruption-dispatch --project \"$project\" --watch"
     exit 1
@@ -8987,6 +9006,11 @@ start_project_runtime() {
     cycle_debug_log="$logs_dir/cycle-$ts.debug.log"
     workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
     exit_if_stop_requested_before_launch
+    if ! ensure_interruption_dispatcher_running_for_active_runtime "$PROJECT_ROOT"; then
+      log_warn "interruption dispatcher missing during active runtime; waiting for control-plane recovery before next ai launch"
+      sleep 1
+      continue
+    fi
     local recovered_workers
     watchdog_script="$workspace_root/scripts/runtime/manager-watchdog.sh"
     if [[ -x "$watchdog_script" ]]; then
@@ -9579,10 +9603,16 @@ cmd_chat() {
 
 submit_human_frontdoor_message() {
   local project="$1" author="$2" channel="$3" message="$4"
+  local had_active_runtime intake_output
+  had_active_runtime="0"
+  if [[ -n "$(manager_supervisor_pid_for_project "$project")" || -n "$(runtime_ai_pid_hint_for_project "$project")" ]]; then
+    had_active_runtime="1"
+  fi
   bootstrap_interruption_entry_runtime_or_fail "$project"
-  local intake_output
   intake_output="$(cmd_intake_chat --project "$project" --author "$author" --channel "$channel" --message "$message")"
-  ensure_interruption_dispatch_once "$project"
+  if [[ "$had_active_runtime" != "1" ]]; then
+    ensure_interruption_dispatch_once "$project"
+  fi
   reactivate_worker_runtime_if_needed_after_chat "$project"
   printf '%s\n' "$intake_output"
 }
