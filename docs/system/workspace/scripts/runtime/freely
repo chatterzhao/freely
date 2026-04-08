@@ -4694,6 +4694,39 @@ request_local_continuation_reentry() {
   log_info "triggered graceful local continuation re-entry for intake: $intake_id (ai pid=$ai_pid)"
 }
 
+request_local_runtime_handoff_stop() {
+  local project="$1" intake_id="$2"
+  local current_pid supervisor_pid ai_pid run_dir stop_file
+  local state_settled="0"
+  current_pid="${BASHPID:-$$}"
+  run_dir="$(run_dir_for_project "$project")"
+  stop_file="$(stop_marker_file "$project")"
+  mkdir -p "$run_dir"
+  : >"$stop_file"
+  append_runtime_event "$project" "delegated_runtime_handoff_stop_requested" \
+    "intake_id=$intake_id" \
+    "request_pid=$current_pid"
+
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  if [[ -n "$ai_pid" && "$ai_pid" != "$current_pid" ]]; then
+    terminate_pid_with_graceful_wait "$ai_pid" "delegated runtime handoff ai stop"
+  fi
+
+  if [[ -z "$(manager_supervisor_pid_for_project "$project")" && -z "$(runtime_ai_pid_hint_for_project "$project")" ]]; then
+    rm -f "$run_dir/supervisor.pid" "$run_dir/ai.pid" "$(session_state_file "$project")" "$(handoff_file "$project")" "$stop_file"
+    write_workcell_state "$project" "stopped" "down" "down" "delegated_runtime_handoff"
+    state_settled="1"
+  fi
+
+  append_runtime_event "$project" "delegated_runtime_handoff_stop_applied" \
+    "intake_id=$intake_id" \
+    "state_settled=$state_settled" \
+    "supervisor_pid=${supervisor_pid:-none}" \
+    "ai_pid=${ai_pid:-none}"
+  log_info "applied local runtime handoff stop for intake: $intake_id"
+}
+
 terminate_pid_with_graceful_wait() {
   local pid="$1" label="$2"
   local waited=0
@@ -9992,7 +10025,7 @@ cmd_intake_resolve() {
   fi
   rewrite_existing_intake_item \
     "$project" "$intake_id" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "$reaction" "${claimed_by:-$resolved_by}" "${claimed_at:-$(date -u '+%Y-%m-%dT%H:%M:%SZ')}" "$absorption_target" "$resolution_artifact" "$session_refs_override"
-  if [[ "$status" == "delegated" && "$absorption_target" == "handoff://continuation" ]]; then
+  if [[ "$status" == "delegated" ]]; then
     local project_real delegated_real
     project_real="$(cd "$project" && pwd -P)"
     delegated_real=""
@@ -10000,7 +10033,14 @@ cmd_intake_resolve() {
       delegated_real="$(cd "$delegated_worktree" 2>/dev/null && pwd -P || true)"
     fi
     if [[ -z "$delegated_real" || "$delegated_real" == "$project_real" ]]; then
-      request_local_continuation_reentry "$project" "$intake_id"
+      case "$absorption_target" in
+        handoff://continuation)
+          request_local_continuation_reentry "$project" "$intake_id"
+          ;;
+        handoff://runtime)
+          request_local_runtime_handoff_stop "$project" "$intake_id"
+          ;;
+      esac
     fi
   fi
   log_info "intake resolved: $intake_id"
