@@ -153,3 +153,28 @@
 - Current judgement:
   - absorb this as a same-family repair inside `I-20260322-0445`
   - do not widen `I-20260407-0215-A`; tracked-root status truth stays in its own bounded owner
+
+## 2026-04-08 Worker Intent Fallback Absorption
+
+- Followthrough judgement:
+  - the stale mixed branch `feature/manager-continuity-gap-and-worker-recovery-guard-20260408` should not survive as its own owner or merge lane
+  - after re-aligning that branch with current `develop`, only one same-family residual remained worth carrying forward
+- What current `develop` had already absorbed:
+  - retire-ready merged-clean worker recovery guard behavior
+  - multiline list-form worker prompt dispatch metadata parsing
+- Residual repair carried forward:
+  - worker `live-status` and `fleet-status` should derive authoritative intent from manager continuity when the worker-local prompt file exists but lacks machine-readable intent headers
+  - normalize the target worktree path before comparing it against the manager prompt's resolved/effective target so symlinked or relative worker paths do not suppress the fallback match
+  - add focused regression `test-freely-live-status-worker-intent-falls-back-to-manager-continuity`
+- Boundary decision:
+  - absorb this residual into `I-20260322-0445` as a helper-level continuity/prompt consumption repair
+  - do not split `manager-continuity-gap-and-worker-recovery-guard` into a new issue
+  - do not widen `I-20260407-0215-A`; that owner remains on continuity-gap status truth rather than worker prompt intent consumption
+- Verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-worker-intent-falls-back-to-manager-continuity`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-multiline-dispatch-metadata`
+  - `./bin/governance-check`
+- Current judgement:
+  - retire the stale mixed lane as a standalone tracking concept
+  - keep only this narrowed fallback repair as a same-family absorption lane
