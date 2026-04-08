@@ -797,6 +797,7 @@ project_desired_runtime_state() {
   local state_file
   state_file="$(workcell_state_file "$project")"
   [[ -f "$state_file" ]] || { printf 'unknown\n'; return 0; }
+  reconcile_delegated_runtime_handoff_state_if_needed "$project" >/dev/null 2>&1 || true
   unset DESIRED_RUNTIME_STATE
   # shellcheck disable=SC1090
   source "$state_file"
@@ -2576,6 +2577,7 @@ manager_bootstrap_runtime_expected() {
   local project="$1"
   local desired_state="unknown"
   if [[ -f "$(workcell_state_file "$project")" ]]; then
+    reconcile_delegated_runtime_handoff_state_if_needed "$project" >/dev/null 2>&1 || true
     unset DESIRED_RUNTIME_STATE
     # shellcheck disable=SC1090
     source "$(workcell_state_file "$project")"
@@ -4725,6 +4727,53 @@ request_local_runtime_handoff_stop() {
     "supervisor_pid=${supervisor_pid:-none}" \
     "ai_pid=${ai_pid:-none}"
   log_info "applied local runtime handoff stop for intake: $intake_id"
+}
+
+reconcile_delegated_runtime_handoff_state_if_needed() {
+  local project="$1"
+  local state_file resolution_file meta_file project_real delegated_real
+  local desired_state last_exit_reason run_dir
+  local supervisor_pid ai_pid dispatcher_pid watchdog_pid unverified_roles
+  state_file="$(workcell_state_file "$project")"
+  [[ -f "$state_file" ]] || return 1
+
+  unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
+  # shellcheck disable=SC1090
+  source "$state_file"
+  desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+  last_exit_reason="${LAST_EXIT_REASON:-unknown}"
+  [[ "$desired_state" == "running" ]] || return 1
+  [[ "$last_exit_reason" != "delegated_runtime_handoff" ]] || return 1
+
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
+  [[ -z "$supervisor_pid" && -z "$ai_pid" && -z "$dispatcher_pid" && -z "$watchdog_pid" ]] || return 1
+  unverified_roles="$(runtime_unverified_pid_roles_for_project "$project")"
+  [[ -z "$unverified_roles" ]] || return 1
+
+  resolution_file="$(latest_interruption_resolution_file_for_project "$project")"
+  [[ -n "$resolution_file" && -f "$resolution_file" ]] || return 1
+  meta_file="$(dirname "$resolution_file")/meta.env"
+  [[ -f "$meta_file" ]] || return 1
+  load_meta_env_snapshot "$meta_file"
+  [[ "$LOADED_META_STATUS" == "delegated" ]] || return 1
+  [[ "$LOADED_META_ABSORPTION_TARGET" == "handoff://runtime" ]] || return 1
+  project_real="$(cd "$project" && pwd -P)"
+  delegated_real=""
+  if [[ -n "${LOADED_META_DELEGATED_WORKTREE:-}" ]]; then
+    delegated_real="$(cd "${LOADED_META_DELEGATED_WORKTREE}" 2>/dev/null && pwd -P || true)"
+  fi
+  [[ -z "$delegated_real" || "$delegated_real" == "$project_real" ]] || return 1
+
+  run_dir="$(run_dir_for_project "$project")"
+  rm -f "$run_dir/supervisor.pid" "$run_dir/ai.pid" "$(interruption_dispatcher_pid_file "$project")" "$(ensure_manager_watchdog_pid_file "$project")" "$(session_state_file "$project")" "$(handoff_file "$project")" "$(stop_marker_file "$project")"
+  write_workcell_state "$project" "stopped" "down" "down" "delegated_runtime_handoff"
+  append_runtime_event "$project" "delegated_runtime_handoff_state_reconciled" \
+    "resolution_file=$resolution_file" \
+    "previous_exit_reason=${last_exit_reason:-unknown}"
+  return 0
 }
 
 terminate_pid_with_graceful_wait() {
@@ -7227,6 +7276,7 @@ manager_runtime_recover_workers_if_needed() {
     exit_reason=""
     supervisor_state="down"
     if [[ -f "$(workcell_state_file "$wt_path")" ]]; then
+      reconcile_delegated_runtime_handoff_state_if_needed "$wt_path" >/dev/null 2>&1 || true
       # shellcheck disable=SC1090
       source "$(workcell_state_file "$wt_path")"
       desired_state="${DESIRED_RUNTIME_STATE:-}"
@@ -8645,6 +8695,7 @@ collect_global_restart_snapshot_rows() {
     desired_state="unknown"
     last_exit_reason="unavailable"
     if [[ -f "$workcell_state" ]]; then
+      reconcile_delegated_runtime_handoff_state_if_needed "$wt_path" >/dev/null 2>&1 || true
       unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
       # shellcheck disable=SC1090
       source "$workcell_state"
@@ -10398,6 +10449,7 @@ cmd_live_status() {
   local latest_manager_worker_prompt_intents_generated latest_manager_worker_prompt_intents_consumed
   local queued_worker_prompts queued_worker_prompt_blockers max_parallel_workers active_running_worker_count available_new_worker_slots
   if [[ -f "$(workcell_state_file "$project")" ]]; then
+    reconcile_delegated_runtime_handoff_state_if_needed "$project" >/dev/null 2>&1 || true
     # shellcheck disable=SC1090
     source "$(workcell_state_file "$project")"
     desired_runtime_state="${DESIRED_RUNTIME_STATE:-unknown}"
