@@ -75,6 +75,17 @@ routing_policy:
 
 ### candidate_issues
 
+1. `C-20260407-0817-A`
+- title: Source inbox, routing absorption boundary, and manager/worker audit contract
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/candidates.md`
+- next_action: Finish the current-state durable-source inventory, lock the default durable families to `human interruption` and `external issue`, treat review/test/runtime anomaly as discovery mechanisms by default, and decide whether the first bounded implementation should stay a human-interruption/local-intake slice with unresolved-index removal backstop instead of a repo-wide source-ledger rollout.
+- revisit_trigger: Revisit when a concrete first-slice proposal exists for the first source family and its storage boundary, or when another dogfooding incident proves the current visibility gap cannot be solved by strengthening existing pre-brainstorm/milestone/routing truth alone.
+
 1. `C-20260407-0023-A`
 - title: Codex auto switch keeps probing saved apikey slots after all-unavailable OAuth sweep
 - milestone_state: candidate
