@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-status-latest-generated-continuity.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/repo"
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/docs/pre-brainstorms"
+git -C "$TMP_DIR" init -q "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+OLD_PROMPT="$PROJECT/.freely/run/worker-prompts/20260408-0100-worker-old-codex.txt"
+NEW_PROMPT="$PROJECT/.freely/run/worker-prompts/20260408-0200-worker-new-codex.txt"
+cat >"$OLD_PROMPT" <<EOF
+Worktree: $PROJECT
+Branch: develop
+dispatch_priority: P1
+parallel_safe: true
+write_scope: docs/**
+intent_kind: edit
+intent_target: $PROJECT
+EOF
+cat >"$NEW_PROMPT" <<EOF
+Worktree: $PROJECT
+Branch: develop
+dispatch_priority: P1
+parallel_safe: true
+write_scope: docs/**
+intent_kind: edit
+intent_target: $PROJECT
+EOF
+
+OLD_CONT="$PROJECT/.freely/run/manager-continuity-20260408-0100.md"
+NEW_CONT="$PROJECT/.freely/run/manager-continuity-20260408-0200.md"
+cat >"$OLD_CONT" <<EOF
+# Manager Continuity
+
+## Worker Prompts
+- launched:
+  - $OLD_PROMPT
+EOF
+cat >"$NEW_CONT" <<EOF
+# Manager Continuity
+
+## Worker Prompts
+- launched:
+  - $NEW_PROMPT
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$OLD_CONT"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$OLD_PROMPT"
+LAST_MANAGER_CONTINUITY_CONSUMED="$OLD_CONT"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$OLD_PROMPT"
+UPDATED_AT="2026-04-08T01:00:00Z"
+EOF
+
+BASELINE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT")"
+FLEET_OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$PROJECT")"
+
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q "latest_manager_continuity_generated: $NEW_CONT"
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q "latest_manager_continuity_consumed: $OLD_CONT"
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q "latest_manager_worker_prompts_generated: $NEW_PROMPT"
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q "latest_manager_worker_prompts_consumed: $OLD_PROMPT"
+printf '%s\n' "$FLEET_OUTPUT" | grep -q "manager_intent"
+printf '%s\n' "$FLEET_OUTPUT" | grep -q "generated=edit@$PROJECT consumed=edit@$PROJECT"
+
+echo "[PASS] baseline-status and fleet-status surface the latest generated manager continuity without rewriting consumed truth"

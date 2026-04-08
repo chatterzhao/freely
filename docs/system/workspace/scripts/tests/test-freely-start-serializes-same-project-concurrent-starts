@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-serialize.XXXXXX)"
+cleanup() {
+  set +e
+  if [[ -n "${PROJECT:-}" && -d "${PROJECT:-}" ]]; then
+    bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+  fi
+  if [[ -n "${START_PID_1:-}" ]]; then
+    wait "$START_PID_1" 2>/dev/null || true
+  fi
+  if [[ -n "${START_PID_2:-}" ]]; then
+    wait "$START_PID_2" 2>/dev/null || true
+  fi
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260408-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260408-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260408-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260408-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+IFLOW_MAX_TURNS=100
+EOF
+
+START_1_LOG="$TMP_DIR/start-1.log"
+START_2_LOG="$TMP_DIR/start-2.log"
+FREELY_TEST_PROJECT_START_PREWRITE_DELAY_SECS=2 bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >"$START_1_LOG" 2>&1 &
+START_PID_1=$!
+sleep 0.2
+FREELY_TEST_PROJECT_START_PREWRITE_DELAY_SECS=2 bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >"$START_2_LOG" 2>&1 &
+START_PID_2=$!
+
+EVENT_LOG="$PROJECT/.freely/logs/runtime-events.log"
+for _ in $(seq 1 30); do
+  if [[ -f "$EVENT_LOG" ]] && grep -q 'event=supervisor_attach_reuse' "$EVENT_LOG"; then
+    break
+  fi
+  sleep 1
+done
+
+if kill -0 "$START_PID_2" 2>/dev/null; then
+  echo "[FAIL] second same-project start should serialize then attach/exit, but it is still running" >&2
+  cat "$START_2_LOG" >&2 || true
+  exit 1
+fi
+
+wait "$START_PID_2"
+
+if [[ ! -f "$EVENT_LOG" ]]; then
+  echo "[FAIL] expected runtime-events.log to be created" >&2
+  exit 1
+fi
+
+STARTED_COUNT="$(grep -c 'event=supervisor_started' "$EVENT_LOG" || true)"
+if [[ "$STARTED_COUNT" != "1" ]]; then
+  echo "[FAIL] expected exactly one supervisor_started event, got $STARTED_COUNT" >&2
+  cat "$EVENT_LOG" >&2
+  exit 1
+fi
+
+grep -q 'event=project_start_lock_waiting' "$EVENT_LOG"
+grep -q 'event=supervisor_attach_reuse' "$EVENT_LOG"
+
+echo "[PASS] freely serializes same-project concurrent start so only one supervisor is created"
