@@ -146,6 +146,14 @@ The external-issue family should distinguish three identities:
 Key rule:
 - equality among these three identities must be a policy decision, never a default assumption
 
+Recommended invariants for the first bounded model:
+
+- one canonical `internal owner` may map to zero or one `source issue`
+- one canonical `internal owner` may map to zero or one `publication target`
+- a `source issue` may exist without any public-tracking split
+- a `publication target` may exist without any original source issue when the problem was AI-discovered first
+- no external object may become the canonical owner truth for milestone routing, `phase_state`, or progress evidence
+
 ## Mapping Model Draft
 
 The family should research a minimum conceptual mapping first, before freezing storage:
@@ -168,6 +176,11 @@ The mapping contract should support these cases:
 3. AI-discovered problem with no source issue, but later published as a new public tracking issue
 4. AI-discovered problem kept fully internal with no GitHub writeback
 
+Boundary implication:
+
+- mapping semantics must be frozen before storage semantics
+- the first slice can stay storage-agnostic if the invariants are explicit
+
 ## Label Taxonomy Draft
 
 The old line was right that labels need dimensions, but the dimensions should be separated more carefully.
@@ -188,6 +201,7 @@ These answer “why is this object public and what kind of writeback is allowed?
 - `freely:publication:mirror`
 - `freely:publication:tracking`
 - `freely:publication:internal-origin`
+- `freely:publication:restricted`
 
 ### C. Public-status labels
 
@@ -219,6 +233,12 @@ AI-discovered problems should enter the external-issue family only when at least
 Otherwise:
 - keep the canonical owner internal
 - preserve the external-issue family semantics as “publication-capable”, not “always publish”
+
+This also means:
+
+- user-created external issue does not imply “separate tracking issue required”
+- AI-discovered durable problem does not imply “must publish to GitHub”
+- publication remains a policy gate owned by the internal owner loop
 
 ### Source issue writeback boundaries
 
