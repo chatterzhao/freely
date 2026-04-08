@@ -83,7 +83,7 @@ routing_policy:
 - promoted_issue_path: `pending://issue-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/candidates.md`
-- next_action: Finish the boundary freeze for `source issue` vs canonical internal owner vs optional `publication target`, then decide whether the first GitHub-first slice needs any durable mapping storage before policy/schema materialization.
+- next_action: Finish the boundary freeze for `source issue` vs canonical internal owner vs optional `publication target`, lock explicit keep/split/reject and formalization decision tables for legacy `20260403-1000` conclusions, define the minimum dedupe/consumption evidence contract, then decide whether the first GitHub-first slice needs any durable mapping storage before policy/schema materialization.
 - revisit_trigger: Revisit when source-loop intake, publication policy, and writeback limits are explicit enough to open a bounded GitHub-first policy/schema owner, or if storage design starts pulling GitHub back toward canonical owner truth.
 
 1. `C-20260407-0817-A`

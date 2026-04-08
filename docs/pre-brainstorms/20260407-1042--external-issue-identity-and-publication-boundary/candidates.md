@@ -17,6 +17,7 @@
   - define the relationship among `source issue`, optional `publication target`, and canonical internal owner
   - define a minimum mapping contract that supports `source_ref`, `internal_owner_ref`, `publication_ref`, and bounded `publication_mode` without freezing implementation storage too early
   - define mapping invariants that keep `internal owner` canonical even when `source issue` and `publication target` coincide
+  - define a formalization decision table for user-created versus AI-discovered external-issue entry, including internal-only, source-only, and source-plus-publication cases
   - define a label taxonomy whose dimensions are explicitly separated:
     - identity / role
     - publication policy
@@ -28,6 +29,8 @@
     - AI-discovered issue kept internal-only
     - AI-discovered issue later published externally
   - critically re-review `20260403-1000--external-issue-integration-and-self-evolution` and preserve only the parts that remain governance-safe under the contracted-family model
+  - produce an explicit keep / split / reject table for `20260403-1000` so later work does not silently re-import bundled assumptions
+  - define the minimum consumption / dedupe evidence needed to prevent already-consumed external source issues from being re-scanned as fresh intake
 - promotion_gate:
   - prove the result stays compatible with the umbrella source-governance contract and does not reopen a generic repo-wide source-ledger rollout by stealth
   - prove the result does not collapse `human interruption` back into generic intake, and does not collapse AI-discovered problems into “always publish externally”
@@ -60,6 +63,8 @@
 - next_action:
   - finish the GitHub-first policy review for `source issue` vs optional `publication target` vs internal owner
   - rewrite the old `20260403-1000` conclusions into an explicit keep/split/reject table, instead of silently inheriting its bundled assumptions
+  - freeze a formalization decision table for user-created versus AI-discovered external-issue entry before choosing storage or automation
+  - define the minimum dedupe/consumption evidence contract that keeps already-consumed external issues from re-entering intake
   - decide the minimum conceptual mapping fields and publication modes before proposing any local storage artifact or GitHub automation lane
   - keep this line pre-research-only until the loop split and writeback boundaries are stable enough for a bounded policy/schema owner
 - revisit_trigger:

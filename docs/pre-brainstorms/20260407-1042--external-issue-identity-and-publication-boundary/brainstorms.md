@@ -123,6 +123,21 @@ The older line also bundled decisions that should no longer stay together:
 
 The old line should be preserved as exploratory input, not treated as discarded noise. But its conclusions are not yet governance-safe enough to promote directly.
 
+### Keep / Split / Reject Table
+
+| Legacy idea from `20260403-1000` | Current disposition | Why |
+| --- | --- | --- |
+| Distinguish externally created source issue from Freely-created public tracking issue | Keep | This remains necessary to avoid collapsing source identity and publication target into one GitHub object by default. |
+| Treat candidate / pre-brainstorm as internal rather than automatically public | Keep | This matches the current owner-loop boundary and prevents GitHub from becoming canonical owner truth too early. |
+| Use labels with separate dimensions instead of one overloaded status word | Keep, but narrow | Dimensions remain useful, but only as publication/identity surfaces after loop separation is explicit. |
+| Model explicit mapping among external object(s) and internal owner | Keep, but storage-agnostic first | The conceptual mapping survives, but `.freely/github-issue-mapping.json` is not frozen yet. |
+| Scan open external issues and decide whether they are already consumed | Split | Family identity/intake rules stay here, but polling automation and concrete scan mechanics belong to a later GitHub-first owner once the contract is stable. |
+| Mirror internal lifecycle to GitHub labels/comments/closeout | Split | Publication policy belongs here conceptually, but concrete sync timing and automation should wait until public-status vocabulary and writeback boundaries are stable. |
+| Always create or update a GitHub milestone/tracking issue once an internal owner is accepted | Reject as default | Publication is policy-gated, not implied by internal acceptance. |
+| Treat GitHub labels as lifecycle ownership or consumption truth | Reject | GitHub remains publication/source lineage, never canonical internal owner truth. |
+| Bundle user-created external issues, AI-discovered problems, and Freely self-evolution scheduling into one family | Reject | Source-family contraction and three-loop separation now require these concerns to be separated. |
+| Generalize immediately to Gitee / multi-platform abstraction | Reject for first slice | The bounded first slice is GitHub-first; broader platform generalization would freeze abstraction too early. |
+
 ## Identity Model Draft
 
 The external-issue family should distinguish three identities:
@@ -238,6 +253,39 @@ This also means:
 
 - user-created external issue does not imply “separate tracking issue required”
 - AI-discovered durable problem does not imply “must publish to GitHub”
+
+## Formalization Decision Table Draft
+
+The next bounded step should freeze decision cases before any storage or automation choice.
+
+| Input situation | Does it enter `external issue` family? | `source_ref` expectation | `publication_ref` expectation | Minimum extra evidence to record |
+| --- | --- | --- | --- | --- |
+| User-created GitHub issue already exists and is accepted as a governed problem | Yes | Required | Optional | Source locator plus pre-brainstorm linkage and a dedupe/consumption marker |
+| User-created GitHub issue exists, but the finding is absorbed inside the current owner line and does not create a new governed problem | No new durable source | Existing external object stays outside this family handoff | None by default | Current-line absorption evidence only; do not create duplicate external-source lineage |
+| AI-discovered problem should stay internal-only for now | No | None | None | Internal owner evidence plus explicit internal-only formalization reason |
+| AI-discovered problem needs durable external-source lineage but no public tracking yet | Yes | Required after formalization | None initially | Formalization reason plus linkage to canonical internal owner |
+| AI-discovered problem needs immediate public tracking | Yes | Required after formalization | Required | Formalization reason, canonical owner linkage, and publication-policy basis |
+
+Two hard rules follow:
+
+- entering the `external issue` family is a policy decision, not the default fate of every AI-discovered problem
+- publication target creation is a second policy decision layered on top of external-source formalization, not proof that the source family itself owns internal truth
+
+## Consumption / Dedupe Evidence Draft
+
+The old `20260403-1000` line was directionally right that external-source re-scan must avoid repeated consumption. The updated line should keep that requirement, but freeze it as a minimal evidence contract rather than a premature implementation.
+
+What still needs to be made explicit:
+
+- what minimum evidence lets future scan/manager paths conclude that a user-created external issue has already been consumed into `pre-brainstorm`
+- whether that evidence lives only in canonical repo docs, only on the external object, or in a bounded combination
+- which publication-side comments/labels are optional mirrors versus required dedupe evidence
+
+Current safe direction:
+
+- repo-native owner artifacts remain canonical for internal truth
+- external comments/labels may mirror that truth, but should not be the sole evidence that prevents re-consumption
+- the first slice should freeze the minimum dedupe/consumption invariant before choosing automation timing or storage layout
 - publication remains a policy gate owned by the internal owner loop
 
 ### Source issue writeback boundaries
