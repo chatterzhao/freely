@@ -5097,18 +5097,24 @@ branch_is_merged_into_develop() {
   git -C "$project" merge-base --is-ancestor "refs/heads/$target_branch" "refs/heads/develop" 2>/dev/null
 }
 
-worker_prompt_targets_retire_ready_merged_worktree() {
-  local manager_project="$1" prompt_file="$2"
-  local resolved_worktree target_branch dirty_entries
-  resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
-  [[ -n "$resolved_worktree" && -d "$resolved_worktree" ]] || return 1
-  worker_worktree_has_runtime_history "$resolved_worktree" || return 1
-  target_branch="$(worker_prompt_target_branch "$prompt_file")"
+worker_project_is_retire_ready_merged_clean() {
+  local manager_project="$1" target_worktree="$2" target_branch="$3" dirty_entries
+  [[ -n "$target_worktree" && -d "$target_worktree" ]] || return 1
+  worker_worktree_has_runtime_history "$target_worktree" || return 1
   [[ -n "$target_branch" ]] || return 1
   branch_is_merged_into_develop "$manager_project" "$target_branch" || return 1
-  dirty_entries="$(project_dirty_entries "$resolved_worktree")"
+  dirty_entries="$(project_dirty_entries "$target_worktree")"
   [[ "$dirty_entries" =~ ^[0-9]+$ ]] || return 1
   (( dirty_entries == 0 ))
+}
+
+worker_prompt_targets_retire_ready_merged_worktree() {
+  local manager_project="$1" prompt_file="$2"
+  local resolved_worktree target_branch
+  resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+  [[ -n "$resolved_worktree" && -d "$resolved_worktree" ]] || return 1
+  target_branch="$(worker_prompt_target_branch "$prompt_file")"
+  worker_project_is_retire_ready_merged_clean "$manager_project" "$resolved_worktree" "$target_branch"
 }
 
 worker_prompt_launchable_for_manager_project() {
@@ -5364,18 +5370,43 @@ worker_prompt_dispatch_metadata_value() {
       gsub(/`/, "", value)
       return value
     }
+    function normalize_key(value) {
+      value=trim(value)
+      sub(/^[[:space:]]*-[[:space:]]*/, "", value)
+      gsub(/[[:space:]-]/, "_", value)
+      return tolower(value)
+    }
+    BEGIN {
+      awaiting_value=0
+    }
     {
       line=$0
-      gsub(/^[[:space:]]*-[[:space:]]*/, "", line)
       if (line ~ /^[[:space:]]*$/) next
+
+      if (awaiting_value == 1) {
+        value_line=line
+        if (value_line ~ /^[[:space:]]*-[[:space:]]*/) {
+          gsub(/^[[:space:]]*-[[:space:]]*/, "", value_line)
+          print trim(value_line)
+          exit
+        }
+        if (value_line ~ /^[[:space:]]*[^:]+:[[:space:]]*/) {
+          awaiting_value=0
+        } else {
+          next
+        }
+      }
+
+      if (line !~ /:/) next
       split(line, parts, ":")
-      if (length(parts) < 2) next
-      key_part=trim(parts[1])
-      gsub(/[[:space:]-]/, "_", key_part)
-      if (tolower(key_part) != tolower(desired_key)) next
-      sub(/^[^:]+:[[:space:]]*/, "", line)
-      print trim(line)
-      exit
+      key_part=normalize_key(parts[1])
+      if (key_part != tolower(desired_key)) next
+      if (line ~ /^[^:]+:[[:space:]]*[^[:space:]].*$/) {
+        sub(/^[^:]+:[[:space:]]*/, "", line)
+        print trim(line)
+        exit
+      }
+      awaiting_value=1
     }
   ' "$prompt_file"
 }
@@ -6953,7 +6984,7 @@ manager_hygiene_alerts() {
 
 manager_runtime_recover_workers_if_needed() {
   local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered latest_continuity_file
-  local worker_signature
+  local worker_signature worker_prompt_file
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || return 0
   [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
@@ -7000,6 +7031,13 @@ manager_runtime_recover_workers_if_needed() {
 
     if manager_continuity_explicitly_freezes_worker_project "$project" "$wt_path" "$latest_continuity_file"; then
       log_info "manager continuity keeps worker frozen; skipping expected-running recovery: branch=${branch:-unknown} path=$wt_path"
+      continue
+    fi
+
+    worker_prompt_file="$(latest_prompt_file_for_project "$wt_path")"
+    if worker_project_is_retire_ready_merged_clean "$project" "$wt_path" "$branch" || \
+      worker_prompt_targets_retire_ready_merged_worktree "$project" "$worker_prompt_file"; then
+      log_info "manager runtime skips expected-running recovery for retire-ready merged worker: branch=${branch:-unknown} path=$wt_path"
       continue
     fi
 
