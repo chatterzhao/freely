@@ -17,6 +17,7 @@
   - define the relationship among `source issue`, optional `publication target`, and canonical internal owner
   - define a minimum mapping contract that supports `source_ref`, `internal_owner_ref`, `publication_ref`, and bounded `publication_mode` without freezing implementation storage too early
   - define mapping invariants that keep `internal owner` canonical even when `source issue` and `publication target` coincide
+  - freeze the GitHub-first minimum field contract for `source_ref`, `internal_owner_ref`, and `publication_ref` before any storage/API shape is proposed
   - define a formalization decision table for user-created versus AI-discovered external-issue entry, including internal-only, source-only, and source-plus-publication cases
   - freeze the formalization invariants that prevent current-line absorption, internal-only owner evidence, and publication policy from collapsing into one decision
   - define a label taxonomy whose dimensions are explicitly separated:
@@ -33,6 +34,7 @@
   - produce an explicit keep / split / reject table for `20260403-1000` so later work does not silently re-import bundled assumptions
   - define the minimum consumption / dedupe evidence needed to prevent already-consumed external source issues from being re-scanned as fresh intake
   - define which canonical repo-native linkage is the decisive dedupe authority versus optional external mirrors
+  - prove the minimum field contract is sufficient for GitHub-first policy and dedupe decisions without freezing a mapping file format
 - promotion_gate:
   - prove the result stays compatible with the umbrella source-governance contract and does not reopen a generic repo-wide source-ledger rollout by stealth
   - prove the result does not collapse `human interruption` back into generic intake, and does not collapse AI-discovered problems into “always publish externally”
@@ -68,6 +70,7 @@
   - freeze a formalization decision table for user-created versus AI-discovered external-issue entry before choosing storage or automation
   - freeze the invariants that separate external-source formalization, internal-only owner evidence, and publication choice
   - define the minimum dedupe/consumption evidence contract that keeps already-consumed external issues from re-entering intake
+  - freeze the GitHub-first minimum field contract for `source_ref`, canonical owner linkage, and optional `publication_ref`
   - decide the minimum conceptual mapping fields and publication modes before proposing any local storage artifact or GitHub automation lane
   - keep this line pre-research-only until the loop split and writeback boundaries are stable enough for a bounded policy/schema owner
 - revisit_trigger:

@@ -196,6 +196,61 @@ Boundary implication:
 - mapping semantics must be frozen before storage semantics
 - the first slice can stay storage-agnostic if the invariants are explicit
 
+### GitHub-first Minimal Field Contract Draft
+
+The first bounded owner should not start with an abstract multi-platform schema. It should start with the smallest field contract that still lets policy and dedupe decisions be audited.
+
+#### 1. `source_ref` minimum fields
+
+For a GitHub-first source issue, the minimum source identity should be enough to answer “which external object was this?” without freezing storage format:
+
+- `source_platform`
+  - `github`
+- `source_repo`
+  - stable `owner/name` repository identity
+- `source_number`
+  - issue number
+- `source_url`
+  - canonical issue URL
+
+Optional until later:
+
+- source title snapshot
+- source labels snapshot
+- source author snapshot
+
+Why this minimum is enough:
+
+- `source_repo + source_number` gives a stable dedupe key
+- `source_url` keeps human-auditable linkage simple
+- delaying snapshots avoids freezing sync/cache behavior too early
+
+#### 2. `internal_owner_ref` minimum fields
+
+Once the problem is canonical inside Freely, the first bounded contract only needs:
+
+- `owner_kind`
+  - initially `pre_brainstorm`
+- `owner_path`
+  - canonical repo path to the consuming owner artifact
+
+Later owner expansion into candidate / issue / progress can remain downstream truth rather than source-family requirements.
+
+#### 3. `publication_ref` minimum fields
+
+Only required when publication exists:
+
+- `publication_platform`
+  - initially `github`
+- `publication_repo`
+  - stable `owner/name`
+- `publication_number`
+  - issue number
+- `publication_url`
+  - canonical URL
+
+If `publication_mode = none`, no placeholder fields should be invented.
+
 ## Label Taxonomy Draft
 
 The old line was right that labels need dimensions, but the dimensions should be separated more carefully.
@@ -321,6 +376,17 @@ The smallest governance-safe contract currently looks like this:
   - source locator or equivalent `source_ref`
   - the consuming `pre-brainstorm`
 
+#### Canonical linkage minimum
+
+The smallest repo-native linkage that should count as decisive dedupe authority is:
+
+- `source_family: external_issue`
+- a GitHub-first `source_ref` containing at least `source_platform`, `source_repo`, `source_number`, and `source_url`
+- `owner_kind: pre_brainstorm`
+- `owner_path: <canonical pre-brainstorm path>`
+
+If that linkage exists in canonical owner truth, future scans should treat the source as already consumed even if external mirrors lag.
+
 2. Scan-safe dedupe rule
 
 - future scan/manager paths must treat canonical repo-native linkage as the decisive evidence that the external source is already consumed
@@ -379,12 +445,10 @@ Therefore this line should freeze these boundaries:
 
 ## Concrete Questions To Settle Before Promotion
 
-1. For GitHub-first, what exact `source_ref` fields are minimally required before any local storage shape is frozen?
-2. What exact canonical owner evidence is sufficient to mark an external source as already consumed?
-3. When should a source issue be reused as the publication target versus split into a separate tracking issue?
-4. Which public-status vocabulary is small enough to stay stable while still useful?
-5. Which internal transitions deserve publication, and which should remain invisible externally?
-6. Does this family need a durable local mapping artifact at all before implementation, or is the first promotion target still pure policy/schema work?
+1. Under what explicit policy may `source issue` and `publication target` be the same GitHub object?
+2. Which public-status vocabulary is small enough to stay stable while still useful?
+3. Which internal transitions deserve publication, and which should remain invisible externally?
+4. Does this family need a durable local mapping artifact at all before implementation, or is the first promotion target still pure policy/schema work?
 
 ## Initial Conclusion
 
