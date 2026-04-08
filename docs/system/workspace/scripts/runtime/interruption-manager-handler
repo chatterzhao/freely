@@ -198,5 +198,11 @@ EOF
   cd "$project"
   tool_run_from_prompt_file "$project" "$tool" "" "$model" "$reasoning_effort" "auto" "$prompt_file" "fresh" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode"
 ) \
-  | awk '/^(DECISION|REACTION|CLASSIFICATION|RESTART_POINT|OWNERSHIP|WHY|HANDOFF|ANSWER)=/' \
-  | head -n 8
+  | awk '
+      /^(DECISION|REACTION|CLASSIFICATION|RESTART_POINT|OWNERSHIP|WHY|HANDOFF|ANSWER)=/ {
+        if (count < 8) {
+          print
+          count++
+        }
+      }
+    '

@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-chat-active-runtime.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+FREELY_HOME="$TMP_DIR/freely-home"
+SUP_PID=""
+DISPATCH_PID=""
+SLOW_HANDLER="$TMP_DIR/slow-handler"
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260319-0000--sample"
+git init -q -b feature/test "$PROJECT"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260319-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260319-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+EOF
+
+cat >"$SLOW_HANDLER" <<'EOF'
+#!/usr/bin/env bash
+sleep 10
+cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=continuation
+RESTART_POINT=continuation
+OWNERSHIP=manager
+WHY=slow fixture
+HANDOFF=slow fixture handoff
+ANSWER=
+OUT
+EOF
+chmod +x "$SLOW_HANDLER"
+
+INIT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy 2>&1)"
+printf '%s\n' "$INIT_OUTPUT" | grep -q 'initialized:'
+
+bash -c "cd '$PROJECT' && exec -a 'runtime/freely start --project $PROJECT' sleep 60" >/dev/null 2>&1 &
+SUP_PID="$!"
+trap 'kill "$SUP_PID" "$DISPATCH_PID" 2>/dev/null || true; wait "$SUP_PID" "$DISPATCH_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+printf '%s\n' "$SUP_PID" >"$PROJECT/.freely/run/supervisor.pid"
+
+SECONDS=0
+CHAT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$SLOW_HANDLER" bash "$ROOT_DIR/bin/freely" chat "active runtime should not block frontdoor")"
+ELAPSED="$SECONDS"
+
+CHAT_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$CHAT_ID" ]] || {
+  echo "[FAIL] freely chat did not return intake_id under active runtime" >&2
+  exit 1
+}
+(( ELAPSED < 8 )) || {
+  echo "[FAIL] freely chat blocked on inline interruption dispatch under active runtime (elapsed=${ELAPSED}s)" >&2
+  exit 1
+}
+grep -q 'active runtime should not block frontdoor' "$PROJECT/.freely/intake/$CHAT_ID/message.txt"
+
+for _ in $(seq 1 20); do
+  if [[ -f "$PROJECT/.freely/run/interruption-dispatch.pid" ]]; then
+    DISPATCH_PID="$(cat "$PROJECT/.freely/run/interruption-dispatch.pid" 2>/dev/null || true)"
+    if [[ -n "$DISPATCH_PID" ]] && kill -0 "$DISPATCH_PID" 2>/dev/null; then
+      break
+    fi
+  fi
+  sleep 0.2
+done
+[[ -n "$DISPATCH_PID" ]] || {
+  echo "[FAIL] freely chat did not bootstrap interruption dispatcher for active runtime" >&2
+  exit 1
+}
+
+STATUS="$(awk -F '\"' '/^STATUS=/{print $2; exit}' "$PROJECT/.freely/intake/$CHAT_ID/meta.env")"
+[[ "$STATUS" == "new" || "$STATUS" == "classified" || "$STATUS" == "delegated" || "$STATUS" == "absorbed" ]] || {
+  echo "[FAIL] unexpected intake status after active-runtime chat: $STATUS" >&2
+  exit 1
+}
+
+echo "[PASS] freely chat returns promptly on active runtime while dispatcher continues asynchronously"
