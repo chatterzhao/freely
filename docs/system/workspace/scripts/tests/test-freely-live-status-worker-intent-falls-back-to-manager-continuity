@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-worker-intent-continuity.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKTREE_ROOT="$TMP_DIR/project-worktrees"
+WORKER="$WORKTREE_ROOT/feature-worker"
+WORKER_REAL="$(cd "$TMP_DIR" && mkdir -p "$WORKTREE_ROOT" && cd "$WORKTREE_ROOT" && pwd -P)/feature-worker"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+mkdir -p "$PROJECT/docs"
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add .gitignore docs README.md
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" worktree add -q -b feature/worker "$WORKER" develop
+
+mkdir -p "$WORKER/docs" "$WORKER/.freely/run"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$WORKER/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER"
+INTENT_FILE="$WORKER/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$WORKER/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$WORKER/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+GENERIC_PROMPT="$WORKER/.freely/run/prompt-20260408-010000.txt"
+cat >"$GENERIC_PROMPT" <<EOF
+CURRENT_BRANCH=feature/worker
+This is a runtime prompt without explicit worker intent metadata.
+EOF
+
+WORKER_PROMPT="$PROJECT/.freely/run/worker-prompts/20260408-worker-feature-worker-codex.txt"
+cat >"$WORKER_PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/worker\`
+intent_kind:
+- \`edit\`
+intent_target:
+- \`I-20260408-0002-A\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260408-010001.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+## Worker Prompts
+- launched:
+  - \`$WORKER_PROMPT\`
+EOF
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$WORKER")"
+
+grep -q "prompt_file: $GENERIC_PROMPT" <<<"$OUTPUT"
+grep -q 'prompt_intent_kind: edit' <<<"$OUTPUT"
+grep -q "prompt_intent_target: $WORKER_REAL" <<<"$OUTPUT"
+grep -q 'prompt_intent_target_raw: I-20260408-0002-A' <<<"$OUTPUT"
+
+echo "[PASS] worker live-status falls back to manager continuity for authoritative intent"

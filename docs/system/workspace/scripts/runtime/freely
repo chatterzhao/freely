@@ -5816,6 +5816,9 @@ worker_prompt_targets_worktree() {
   local manager_project="$1" prompt_file="$2" target_worktree="$3"
   local resolved_worktree kind effective_target
   [[ -n "$target_worktree" ]] || return 1
+  if [[ -d "$target_worktree" ]]; then
+    target_worktree="$(normalize_runtime_worktree_path "$target_worktree")"
+  fi
   kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
   case "$kind" in
     edit|cleanup|promotion) ;;
@@ -5827,6 +5830,71 @@ worker_prompt_targets_worktree() {
   fi
   effective_target="$(worker_prompt_effective_intent_target "$manager_project" "$prompt_file")"
   [[ "$effective_target" == "$target_worktree" ]]
+}
+
+authoritative_worker_prompt_for_worktree_from_continuity() {
+  local manager_project="$1" target_worktree="$2" continuity_file="$3"
+  local prompt_file
+  [[ -n "$target_worktree" && -d "$target_worktree" ]] || return 1
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 1
+
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    worker_prompt_targets_worktree "$manager_project" "$prompt_file" "$target_worktree" || continue
+    printf '%s\n' "$prompt_file"
+    return 0
+  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    worker_prompt_targets_worktree "$manager_project" "$prompt_file" "$target_worktree" || continue
+    printf '%s\n' "$prompt_file"
+    return 0
+  done < <(latest_frozen_manager_worker_prompt_paths_from_continuity "$continuity_file")
+
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    worker_prompt_targets_worktree "$manager_project" "$prompt_file" "$target_worktree" || continue
+    printf '%s\n' "$prompt_file"
+    return 0
+  done < <(latest_queued_manager_worker_prompt_paths_from_continuity "$continuity_file")
+
+  return 1
+}
+
+status_intent_prompt_file_for_project() {
+  local project="$1" prompt_file repo_root manager_project continuity_file
+  prompt_file="$(find_latest_prompt_file_for_project "$project")"
+  if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
+    case "$(worker_prompt_normalized_intent_kind "$prompt_file")" in
+      edit|cleanup|promotion)
+        printf '%s\n' "$prompt_file"
+        return 0
+        ;;
+    esac
+  fi
+
+  [[ "$(role_hint_for_project "$project")" == "worker" ]] || {
+    printf '%s\n' "$prompt_file"
+    return 0
+  }
+
+  repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
+  manager_project="$(worktree_path_for_branch "$project" "develop")"
+  if [[ -z "$manager_project" ]]; then
+    manager_project="$repo_root"
+  fi
+  [[ -n "$manager_project" ]] || {
+    printf '%s\n' "$prompt_file"
+    return 0
+  }
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$manager_project")"
+  if prompt_file="$(authoritative_worker_prompt_for_worktree_from_continuity "$manager_project" "$project" "$continuity_file")"; then
+    printf '%s\n' "$prompt_file"
+    return 0
+  fi
+
+  printf '%s\n' "$prompt_file"
 }
 
 manager_active_blocking_intent_signatures_csv() {
@@ -10355,7 +10423,7 @@ cmd_live_status() {
   local supervisor_pid_evidence ai_pid_evidence dispatcher_pid_evidence watchdog_pid_evidence
   local supervisor_cmd ai_cmd dispatcher_cmd watchdog_cmd
   local prompt_file continuity_file prompt_excerpt continuity_excerpt
-  local prompt_intent_kind prompt_intent_target prompt_intent_target_raw
+  local prompt_intent_kind prompt_intent_target prompt_intent_target_raw intent_prompt_file
   local ownership_conflict_state ownership_conflict_signature ownership_conflict_with ownership_conflict_summary
   local ownership_holder_state ownership_holder_status
   local manager_pending_ownership_conflicts
@@ -10404,9 +10472,10 @@ cmd_live_status() {
   continuity_file="$(find_latest_manager_continuity_file_for_project "$project")"
   prompt_excerpt="$(trimmed_file_excerpt "$prompt_file" tail 12)"
   continuity_excerpt="$(trimmed_file_excerpt "$continuity_file" head 12)"
-  prompt_intent_kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
-  prompt_intent_target_raw="$(worker_prompt_intent_target "$project" "$prompt_file")"
-  prompt_intent_target="$(worker_prompt_effective_intent_target "$project" "$prompt_file")"
+  intent_prompt_file="$(status_intent_prompt_file_for_project "$project")"
+  prompt_intent_kind="$(worker_prompt_normalized_intent_kind "$intent_prompt_file")"
+  prompt_intent_target_raw="$(worker_prompt_intent_target "$project" "$intent_prompt_file")"
+  prompt_intent_target="$(worker_prompt_effective_intent_target "$project" "$intent_prompt_file")"
   IFS='|' read -r ownership_conflict_state ownership_conflict_summary ownership_conflict_signature ownership_conflict_with <<<"$(project_active_ownership_conflict_snapshot "$project")"
   ownership_holder_state="none"
   ownership_holder_status="none"
@@ -10795,7 +10864,7 @@ cmd_fleet_status() {
   local project="" repo_root entries wt_path wt_branch wt_state cfg run_dir session_state supervisor_pid ai_pid last_launch last_dirty checkpoint_json checkpoint_required restart_signal_reason restart_signal_at restart_summary semantic_loop_summary semantic_loop_signal ownership_conflict_summary manager_pending_ownership_conflicts role_hint
   local blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact
   local manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary
-  local develop_push_snapshot develop_push_state develop_push_summary prompt_file prompt_intent_kind prompt_intent_target manager_generated_intents manager_consumed_intents
+  local develop_push_snapshot develop_push_state develop_push_summary prompt_file prompt_intent_kind prompt_intent_target manager_generated_intents manager_consumed_intents intent_prompt_file
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -10886,9 +10955,10 @@ cmd_fleet_status() {
       develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$wt_path")"
       IFS='|' read -r develop_push_state develop_push_summary _ _ _ _ _ <<<"$develop_push_snapshot"
       prompt_file="$(find_latest_prompt_file_for_project "$wt_path")"
-      if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
-        prompt_intent_kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
-        prompt_intent_target="$(worker_prompt_effective_intent_target "$wt_path" "$prompt_file")"
+      intent_prompt_file="$(status_intent_prompt_file_for_project "$wt_path")"
+      if [[ -n "$intent_prompt_file" && -f "$intent_prompt_file" ]]; then
+        prompt_intent_kind="$(worker_prompt_normalized_intent_kind "$intent_prompt_file")"
+        prompt_intent_target="$(worker_prompt_effective_intent_target "$wt_path" "$intent_prompt_file")"
         if worker_project_is_actively_running "$wt_path"; then
           ownership_holder_status="active"
         elif [[ "$role_hint" == "worker" ]] && [[ -n "$(project_current_blocking_intent_signature "$wt_path")" ]]; then

@@ -137,6 +137,17 @@
   - this remains inside `I-20260322-0445` because the defect sits on the same shared continuity/prompt parser helpers already owned by latest generated/consumed truth
   - it does not widen the issue into the separate blocked-intake/websocket supervision contract family
 
+## 2026-04-08 Worker Intent Fallback Absorption
+
+- Review of stale mixed branch `feature/manager-continuity-gap-and-worker-recovery-guard-20260408` confirmed it should not materialize as its own issue or merge lane.
+- Current `develop` had already absorbed that branch's retire-ready merged-clean recovery guard and multiline dispatch-metadata parsing repairs through the same-family `I-20260322-0445` surface.
+- The only residual delta worth carrying forward is a worker status fallback: when the worker-local prompt lacks machine-readable intent metadata, `live-status` and `fleet-status` should resolve the authoritative worker prompt from manager continuity and surface intent from that authoritative prompt instead of reporting `none`.
+- The fallback also normalizes the target worktree path before matching against the manager prompt's resolved target so real-path worker directories still match continuity-authored worktree headers.
+- Decision:
+  - keep this residual fallback in the same latest-continuity / worker-prompt consumption family
+  - do not split a new `manager-continuity-gap-and-worker-recovery-guard` issue
+  - do not widen `I-20260407-0215-A`, whose bounded scope stays on continuity-gap status truth rather than worker prompt intent consumption
+
 ## Retirement Audit
 
 - audit_date: `2026-03-24`
