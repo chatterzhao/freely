@@ -83,34 +83,37 @@
   - finish the current-state inventory by durable source family and freeze non-first-slice mechanisms as contract-clarification only unless new evidence appears
   - rewrite the schema and gate discussion around the contracted durable families: `human interruption` and `external issue`
   - decide whether Freely should introduce a narrow durable problem-source inbox layer at all, or instead only strengthen source-routing contracts and gate checks around existing artifacts
+  - use `human interruption` as the first proving lane before promoting any generic source schema; treat reusable schema as a derivative outcome, not an independent architecture-first freeze
   - if such an inbox remains desirable, define the contract/location boundary first: contract truth versus live unresolved source documents versus runtime-local control-plane evidence
   - explicitly link and compare the GitHub issue family against `20260403-1000--external-issue-integration-and-self-evolution`, because that line already proposed scan/create/sync/mapping semantics but is still pre-research-only today
   - define review/test/runtime-anomaly discovery rules so current-line absorption wins by default and only genuinely independent new problems create a new durable source
   - keep hook/gate design source-family-specific at the raw-signal boundary, but align the contracted durable families on one common rule: once recognized as a governed problem, they are consumed into pre-brainstorm
-  - bias the first materialization slice toward human interruption / local governance intake plus unresolved-index removal backstop, because that family already has runtime truth to refactor
+  - bias the first materialization slice toward human interruption / local governance intake; only place unresolved-index removal backstop after that slice has made the removable artifact legible
 - revisit_trigger:
   - revisit when there is a concrete bounded proposal for the first source family and its storage boundary, or when another dogfooding incident proves the current source visibility gap cannot be solved by tightening existing pre-brainstorm/milestone/routing contracts alone
 
 ## C-20260407-0817-B
 
 - candidate_format_version: `v2`
-- title: `Minimal source document and unresolved-index schema`
+- title: `Family-validated minimal source view and unresolved-index contract`
 - source_brainstorm: `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/brainstorms.md`
-- problem: `Freely lacks a stable minimal contract for a durable raw source document and the corresponding small unresolved index, which blocks any narrow source-inbox slice from being judged cleanly.`
+- problem: `Freely still lacks a stable minimal contract for a durable source-facing view and corresponding unresolved index, but freezing that contract as a generic architecture before any family proves it would over-abstract past current runtime truth. The contract must therefore be derived from a first validated family slice, then narrowed to the reusable subset only if that subset survives contact with reality.`
 - why_now:
   - the umbrella research now rejects repo-wide rollout and needs a bounded first slice
-  - human interruption/local intake refactor should not start before the minimal source contract is frozen
-  - storage and gate decisions depend on a stable schema
+  - current `human interruption` runtime truth is rich enough to expose where a shared source-view contract is actually reusable and where it is not
+  - storage and gate decisions still need a contract, but that contract should be provisional-and-family-validated before it becomes a generic owner
 - acceptance_criteria:
-  - define the minimal source document fields and explicitly keep the document short
+  - define the smallest source-facing field set that survives validation against the first family slice without replacing family-local runtime truth
   - define unresolved-index fields and guarantee it only carries active unresolved items
   - define `unconsumed` and `consumed` semantics without introducing intermediate source states
-  - define canonical owner linkage fields around the contracted durable source families, with `consumed` meaning absorbed into pre-brainstorm
-  - define which fields belong in source documents versus pre-brainstorm or owner artifacts
+  - define the minimum canonical-owner linkage fields around the contracted durable source families, with `consumed` meaning absorbed into pre-brainstorm
+  - define which fields belong in a reusable source-facing view versus family-local runtime truth versus pre-brainstorm / owner artifacts
+  - explicitly record which candidate fields remain family-specific and therefore should not be frozen into the shared contract yet
 - promotion_gate:
-  - prove the schema fits current human-intake/runtime truth without replacing runtime state machines
-  - prove the schema does not reinterpret milestone as a raw-source queue
-  - prove the schema can reference GitHub issue lineage without assuming GitHub automation already exists
+  - prove the contract is derived from at least one validated family slice rather than frozen in isolation
+  - prove the contract fits current human-intake/runtime truth without replacing runtime state machines
+  - prove the contract does not reinterpret milestone as a raw-source queue
+  - prove the contract can reference GitHub issue lineage without assuming GitHub automation already exists
 - open_questions:
   - should the unresolved index be a single file or a generated view over source documents
   - what is the smallest canonical-owner linkage shape that still supports later gate checks
@@ -128,10 +131,11 @@
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 - next_action:
-  - draft the minimal source document schema and unresolved-index schema before any runtime or gate implementation starts
-  - explicitly test the draft against human interruption and GitHub issue lineage as positive examples, and review/test/runtime anomaly as non-default discovery mechanisms
+  - derive a provisional reusable source-view contract from the first `human interruption` slice instead of freezing a generic schema in isolation
+  - test the provisional contract against human interruption as the proving lane and external issue lineage as a boundary case, while keeping review/test/runtime anomaly as non-default discovery mechanisms
+  - promote only the subset that remains reusable after family validation; leave family-specific fields in the family contracts
 - revisit_trigger:
-  - revisit when the umbrella candidate is judged stable enough to split implementation lanes
+  - revisit when the first family slice has made a reusable subset legible enough to promote into a shared contract, or when family validation shows the shared layer should remain only invariant-level
 
 ## C-20260407-0817-C
 
@@ -161,18 +165,17 @@
 - promoted_issue_path: `pending://issue-materialization`
 - dependencies:
   - `C-20260407-0817-A`
-  - `C-20260407-0817-B`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 - next_action:
-  - compare current `.freely/intake/**`, interruption claim/resolve flow, and interruption-resolution artifacts against the proposed minimal source schema
+  - compare current `.freely/intake/**`, interruption claim/resolve flow, and interruption-resolution artifacts against a provisional source-facing contract derived from this family
   - identify the smallest viable refactor that introduces manager-visible unresolved truth without broad storage migration
   - keep the slice explicitly compatible with later `external issue` alignment, but do not widen it to review/test/runtime-anomaly ingestion
 - revisit_trigger:
-  - revisit when the minimal source schema is stable enough to test against the existing runtime intake path
+  - revisit when the family slice has either produced a reusable shared subset for 0817-B or shown that the shared contract must remain narrower than originally expected
 
 ## C-20260407-0817-D
 
@@ -202,7 +205,6 @@
 - promoted_issue_path: `pending://issue-materialization`
 - dependencies:
   - `C-20260407-0817-A`
-  - `C-20260407-0817-B`
   - `C-20260407-0817-C`
 - session_refs:
   - tool: `codex`
@@ -210,8 +212,8 @@
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 - next_action:
-  - map the proposed source backstop onto the existing gate stack and identify the minimum viable first enforcement stage
+  - map the proposed source backstop onto the existing gate stack only after the first `human interruption` slice makes the removable unresolved artifact explicit
   - keep the first enforcement path on human interruption/local intake, and treat external issue linkage as follow-on reconciliation with the existing 20260403 pre-research line
   - do not widen first-stage enforcement to review/test/runtime-anomaly discovery events
 - revisit_trigger:
-  - revisit when the first-slice source contract and human-intake alignment are stable enough to make gate placement concrete
+  - revisit when the first-slice human-intake alignment has made gate placement and removable-artifact semantics concrete enough to backstop without inventing a second orchestration surface

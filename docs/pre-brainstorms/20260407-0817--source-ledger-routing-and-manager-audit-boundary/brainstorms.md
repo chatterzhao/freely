@@ -259,6 +259,55 @@ What is still missing for the new design:
 - current intake schema is runtime-oriented, not yet the minimal generic source-document contract we are now discussing
 - no separate small unresolved source index optimized for manager patrol
 
+## Ordering Correction
+
+The next step should not be:
+
+- freeze a generic source-document schema in isolation
+- then require families to conform later
+- then bolt on a gate
+
+That order is too abstract for current repo truth.
+
+Why:
+
+- `human interruption` already has richer durable runtime truth than the proposed two-state source layer
+- `external issue` is still policy-first and storage-agnostic
+- a generic schema chosen too early will tend to overfit imagined symmetry instead of the actual first slice
+- a gate chosen too early will be forced to enforce contracts that no family has yet proven workable
+
+So the safer sequencing is:
+
+1. freeze umbrella invariants
+
+- durable source families stay contracted to `human interruption` and `external issue`
+- `consumed` means absorbed into `pre-brainstorm`
+- review/test/runtime anomaly stay discovery mechanisms by default
+
+2. prove the first family slice
+
+- use `human interruption` as the first proving lane
+- derive a minimal provisional source-view contract from existing `.freely/intake/**` and interruption-resolution truth
+- keep that contract overlay-oriented and family-validated rather than prematurely generic
+
+3. only then decide what deserves genericization
+
+- if the family-validated contract is truly reusable, promote the reusable subset into a narrow shared source-document / unresolved-index schema
+- if not, keep the shared layer at invariant level only and let families remain the primary contract holders
+
+4. place the backstop after the first slice is legible
+
+- gate/backstop should verify a proven absorption/removal invariant
+- it should not invent the invariant by itself
+
+This means the umbrella line should treat schema work as:
+
+- derivative of first-slice family validation
+
+not:
+
+- a prerequisite architecture freeze that blocks family-specific refinement
+
 Implementation implication:
 
 - this family is primarily a refactor / narrowing / relocation candidate

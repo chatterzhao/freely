@@ -94,8 +94,8 @@ routing_policy:
 - promoted_issue_path: `pending://issue-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/candidates.md`
-- next_action: Finish the current-state durable-source inventory, lock the default durable families to `human interruption` and `external issue`, treat review/test/runtime anomaly as discovery mechanisms by default, and decide whether the first bounded implementation should stay a human-interruption/local-intake slice with unresolved-index removal backstop instead of a repo-wide source-ledger rollout.
-- revisit_trigger: Revisit when a concrete first-slice proposal exists for the first source family and its storage boundary, or when another dogfooding incident proves the current visibility gap cannot be solved by strengthening existing pre-brainstorm/milestone/routing truth alone.
+- next_action: Finish the current-state durable-source inventory, lock the default durable families to `human interruption` and `external issue`, and use `human interruption` as the first proving lane before promoting any generic source schema or source-absorption gate.
+- revisit_trigger: Revisit when the first `human interruption` slice has made a reusable shared contract or removable-artifact invariant concrete enough to justify schema promotion or gate placement, or when another dogfooding incident proves the current visibility gap cannot be solved by strengthening existing pre-brainstorm/milestone/routing truth alone.
 
 2. `C-20260407-1036-A`
 - title: Human interruption runtime contract after source-family contraction
@@ -105,8 +105,8 @@ routing_policy:
 - promoted_issue_path: `pending://issue-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260407-1036--human-interruption-source-governance-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260407-1036--human-interruption-source-governance-boundary/candidates.md`
-- next_action: Finish the family-local runtime inventory under `.freely/intake/**` and `.freely/run/interruption-resolution/**`, then freeze the first-slice direction around a narrow adapter/overlay for manager-visible unresolved interruption truth instead of replacing the current runtime state machine.
-- revisit_trigger: Revisit when the umbrella source-governance schema is stable enough to test a human-interruption-first slice, or when another dogfooding incident shows the current interruption family boundary is still being polluted by AI-discovery or external-issue concerns.
+- next_action: Finish the family-local runtime inventory under `.freely/intake/**` and `.freely/run/interruption-resolution/**`, freeze the first-slice direction around a narrow adapter/overlay for manager-visible unresolved interruption truth, and feed any truly reusable source-facing subset back into the umbrella contract.
+- revisit_trigger: Revisit when the family slice has either identified a reusable shared subset for umbrella promotion or shown that the shared contract must stay narrower than originally expected, or when another dogfooding incident shows the current interruption family boundary is still being polluted by AI-discovery or external-issue concerns.
 
 1. `C-20260407-0023-A`
 - title: Codex auto switch keeps probing saved apikey slots after all-unavailable OAuth sweep

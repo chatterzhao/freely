@@ -48,6 +48,7 @@
 - next_action:
   - compare current `.freely/intake/**` and `.freely/run/interruption-resolution/**` shapes against the narrowed family contract
   - freeze the first-slice recommendation around overlay/adapter versus full storage migration
+  - explicitly identify which minimal source-facing fields proved reusable enough to feed back into the umbrella shared contract, and which must remain family-local
   - separate runtime-local resolution from governed problem-source consumption explicitly
   - specify the smallest manager-visible unresolved view that can be derived without flattening runtime statuses
   - write the first-slice invariant for unresolved removal / absorption backstop
