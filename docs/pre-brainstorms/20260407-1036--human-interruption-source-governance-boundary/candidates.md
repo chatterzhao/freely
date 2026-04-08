@@ -13,12 +13,14 @@
 - acceptance_criteria:
   - define `human interruption` as real human/operator input only
   - inventory the existing runtime-owned durable shapes under `.freely/intake/**` and `.freely/run/interruption-resolution/**`
+  - inventory the already-persisted intake fields and identify which are family-local runtime truth versus candidates for a smaller source-facing view
   - define the family responsibilities split across front-door intake, runtime routing, and canonical owner handoff
   - define the minimal unresolved interruption/source view and manager-visible surface without replacing current runtime truth
   - define claim / resolve / absorb semantics that stay compatible with current runtime behavior, including `delegated` continuation / cleanup handoff
   - define which interruption outcomes remain runtime-local/control-local and which become governed problem-sources
   - define writeback requirements when a human interruption is consumed into `pre-brainstorm`
   - define the first-slice unresolved-removal/backstop invariant for both pre-brainstorm consumption and runtime-local closure
+  - prove the first-slice contract against the currently tested closure paths: pre-brainstorm absorption, delegated continuation visibility, manager-continuity absorption, and direct-answer/control closure
 - promotion_gate:
   - prove the line does not absorb AI-discovered external-issue responsibilities
   - prove the result stays compatible with the umbrella two-state source contract only at the raw source-view layer
@@ -50,6 +52,7 @@
   - freeze the first-slice recommendation around overlay/adapter versus full storage migration
   - explicitly identify which minimal source-facing fields proved reusable enough to feed back into the umbrella shared contract, and which must remain family-local
   - separate runtime-local resolution from governed problem-source consumption explicitly
+  - turn the currently tested closure matrix into explicit contract language for: `pre-brainstorm` absorption, `handoff://continuation`, `handoff://cleanup`, direct-answer absorption, and `continuity://manager-supervision`
   - specify the smallest manager-visible unresolved view that can be derived without flattening runtime statuses
   - write the first-slice invariant for unresolved removal / absorption backstop
 - revisit_trigger:

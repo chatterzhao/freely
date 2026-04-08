@@ -63,6 +63,97 @@ not:
 
 - inventing a brand new interruption lifecycle
 
+## Concrete Runtime Inventory
+
+Current implementation evidence is concrete enough to name the family-local durable shapes more precisely.
+
+### 1. Intake metadata fields already persisted
+
+Current tests and fixtures show `.freely/intake/<intake_id>/meta.env` already persists fields such as:
+
+- `INTAKE_ID`
+- `CREATED_AT`
+- `AUTHOR`
+- `CHANNEL`
+- `STATUS`
+- `CLASSIFICATION`
+- `REACTION`
+- `LINKED_ARTIFACT`
+- `DELEGATED_WORKTREE`
+- `SESSION_REFS`
+- `CLAIMED_BY`
+- `CLAIMED_AT`
+- `ABSORPTION_TARGET`
+- `RESOLUTION_ARTIFACT`
+
+So the first slice does not need to invent a durable intake envelope. It needs to decide what smaller source-facing subset, if any, should be derived from this richer runtime truth.
+
+### 2. Resolution artifacts are already separate durable records
+
+Current tests and skills also show `.freely/run/interruption-resolution/<intake_id>/` already stores:
+
+- `meta.env` with `RESOLVED_BY`, `REACTION`, `CLASSIFICATION`, `ABSORPTION_TARGET`, `LINKED_ARTIFACT`, `DELEGATED_WORKTREE`, `STATUS`
+- `resolution.md` with human-readable rationale, handoff summary, and absorption recommendation
+
+This separation matters:
+
+- intake truth is not the same object as resolution truth
+- any source-facing overlay must avoid collapsing those two durable records back into one fake generic document
+
+### 3. Tested closure paths already cover multiple runtime outcomes
+
+Current test evidence already proves several distinct closure or handoff paths:
+
+1. discovery -> pre-brainstorm absorption
+
+- `test-freely-human-chat-intake` proves:
+  - intake record creation via `freely intake chat`
+  - claim/classification writeback
+  - resolution artifact creation
+  - final `STATUS="absorbed"` with `ABSORPTION_TARGET` pointing to `docs/pre-brainstorms/**`
+- `test-freely-interruption-direct-answer` also proves a nearby but distinct path:
+  - discovery may be handed off as `delegated + discovery + handoff://pre_brainstorm`
+  - so the family already supports both direct absorption and delegated pre-brainstorm routing, depending on runtime context
+
+2. delegated continuation remains runtime-visible
+
+- `test-freely-delegated-continuation-active-prompt-visibility` proves:
+  - delegated continuation is represented as runtime-local intake truth
+  - active runtime can show it as already consumed into the current prompt
+  - after runtime stop, the same delegated continuation returns to pending visibility
+
+3. delegated continuation can later be absorbed into manager continuity
+
+- `test-freely-manager-delegated-intake-absorption-closure` proves:
+  - delegated continuation may first sit at `handoff://continuation`
+  - later manager continuity publication can close the intake as `STATUS="absorbed"`
+  - final writeback may point to `continuity://manager-supervision` and a continuity artifact rather than a `pre-brainstorm`
+
+4. direct-answer / control handling can close without canonical repo materialization
+
+- `test-freely-interruption-direct-answer` proves:
+  - narrow control queries can be answered and absorbed directly by the interruption control plane
+  - control/cleanup signals can also become delegated runtime handoff via `handoff://cleanup` without pretending that a new `pre-brainstorm` was created
+
+### 4. `dropped` exists in runtime truth, but is not yet the first validated contract path
+
+Current code already accepts and persists `STATUS="dropped"` at intake-resolution time.
+
+But current family evidence is still stronger for:
+
+- absorbed into `pre-brainstorm`
+- delegated continuation / cleanup handoff
+- direct-answer absorption
+- manager-continuity absorption
+
+So the first slice should acknowledge `dropped` as a real runtime status without overclaiming that its source-facing closure semantics are already as well proven as the other paths above.
+
+Implication:
+
+- this family already has multiple legitimate terminal or transitional outcomes
+- the first slice must preserve those distinctions
+- any shared source-facing contract must be derived from these tested paths rather than replacing them
+
 ## Family Responsibilities By Layer
 
 ### 1. Front-door intake layer

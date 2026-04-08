@@ -105,7 +105,7 @@ routing_policy:
 - promoted_issue_path: `pending://issue-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260407-1036--human-interruption-source-governance-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260407-1036--human-interruption-source-governance-boundary/candidates.md`
-- next_action: Finish the family-local runtime inventory under `.freely/intake/**` and `.freely/run/interruption-resolution/**`, freeze the first-slice direction around a narrow adapter/overlay for manager-visible unresolved interruption truth, and feed any truly reusable source-facing subset back into the umbrella contract.
+- next_action: Finish the family-local runtime inventory under `.freely/intake/**` and `.freely/run/interruption-resolution/**`, make the tested closure matrix explicit across `pre-brainstorm`, delegated handoff, direct-answer, and manager-continuity absorption, then feed only the truly reusable source-facing subset back into the umbrella contract.
 - revisit_trigger: Revisit when the family slice has either identified a reusable shared subset for umbrella promotion or shown that the shared contract must stay narrower than originally expected, or when another dogfooding incident shows the current interruption family boundary is still being polluted by AI-discovery or external-issue concerns.
 
 1. `C-20260407-0023-A`
