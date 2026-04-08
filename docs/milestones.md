@@ -131,6 +131,17 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260407-0215-A` is now the canonical owner for self-host continuity-gap status truth and bounded runtime observability followthrough.
 - revisit_trigger: Re-open only if canonical replay proves the continuity-gap signal disappears without needing a dedicated owner, or if another active runtime supervision owner fully absorbs the bounded status surface.
 
+1. `C-20260407-0603-A`
+- title: Runtime evidence provenance and canonical absorption gate governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- active_session_ref: `codex current-thread-fresh-20260407-2024`
+- source_brainstorm: `docs/pre-brainstorms/20260407-0603--runtime-evidence-provenance-and-canonical-absorption-gate/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260407-0603--runtime-evidence-provenance-and-canonical-absorption-gate/candidates.md`
+- next_action: Keep `C-20260407-0603-A` `research-only` and do not promote it to IBM. Promotion stays blocked because no single visible canonical owner, and no explicitly declared bounded owner bundle, jointly freezes the structured-vs-flexible runtime evidence fields, control-plane absorption gate, continuity fallback boundary, and same-lane authoritative replacement rule. The `2026-04-07 20:24 PDT` continuity refresh re-ran the worker-scoped governance chain, re-verified `core.hooksPath=.githooks`, rechecked the active candidate package, directly re-read the strongest adjacent owner issues plus nearby progress evidence, and delegated a bounded read-only context-source scan without surfacing any new tracked-root anchor or route-changing owner.
+- revisit_trigger: Revisit when either a visible canonical owner proves this topic is already absorbed, or the remaining promotion blockers are resolved strongly enough to materialize a bounded issue or explicitly keep/reject the provisional contract without widening `I-20260405-2136-A` or the handoff-bounded tracked-root owner.
+
 1. `C-20260407-0023-A`
 - title: Codex auto switch keeps probing saved apikey slots after all-unavailable OAuth sweep
 - milestone_state: candidate

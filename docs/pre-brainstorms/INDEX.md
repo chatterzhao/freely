@@ -23,6 +23,9 @@
 - 20260407-0215--runtime-selfhost-continuity-gap-and-status-truth
   - brainstorms: docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/brainstorms.md
   - candidates: docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/candidates.md
+- 20260407-0603--runtime-evidence-provenance-and-canonical-absorption-gate
+  - brainstorms: docs/pre-brainstorms/20260407-0603--runtime-evidence-provenance-and-canonical-absorption-gate/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260407-0603--runtime-evidence-provenance-and-canonical-absorption-gate/candidates.md
 - 20260407-0023--codex-auto-switch-probe-apikey-fallback
   - brainstorms: docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/brainstorms.md
   - candidates: docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/candidates.md
