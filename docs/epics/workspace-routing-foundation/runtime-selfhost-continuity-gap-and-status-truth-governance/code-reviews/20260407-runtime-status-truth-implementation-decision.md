@@ -1,4 +1,4 @@
-# Implementation Decision Note
+## Implementation Decision Note
 
 - issue_id: `I-20260407-0215-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
