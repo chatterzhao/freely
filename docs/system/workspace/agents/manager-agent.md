@@ -35,9 +35,15 @@
    - 若 `live-status` / `fleet-status` 已显式给出 `ownership_conflict_state=active`，先按 `ownership_conflict_signature` 与 `ownership_conflict_with` 做 arbitration；不要让当前 actor 直接跨树抢占 mutate authority
    - 若 `live-status` 或 manager/root `fleet-status` row 给出 `manager_pending_ownership_conflicts`，说明 continuity 中已有 queued / frozen lane 因 active、recorded、queued 或 frozen owner 被挡住；同时读取其中的 `status=`，区分 `soft_stale` 与 `queued/frozen/active`，不要把已 hard-stale 的 recorded owner 继续当作 launch blocker
    - 主动检查 `candidate stuck / phase orphaned / completion without closure / source drift`
-   - 若 canonical `develop` 本地领先 tracked remote，还要判断这是合法的 `post_merge_acceptance` defer window，还是已经悬空的 push followthrough drift
+   - 若 canonical `develop` 本地领先 tracked remote，还要读取 `develop_push_followthrough_push_urgency` 与 `develop_push_followthrough_resync_required`，判断这是合法的 `post_merge_acceptance` defer window，还是已经悬空的 push followthrough drift
+   - 一旦 `develop_push_followthrough_resync_required=true`，凡是依赖“当前最新 develop”做结论的判断，都必须先把 push/resync followthrough 排到前面；不得在旧 canonical 基线之上继续裁决
    - 对 milestone 里的 unresolved candidate，不只检查“是否可见”，还要检查它是否处在正确且仍 active 的消费队列
    - 把发现结果加工为 `ownership + restart_point + next_action`
+   - `latest-develop-sensitive judgment` 至少包括：
+     - owner / merge-order / absorption judgment
+     - verification / promotion / cleanup / retirement judgment
+     - stale `test-pre-merge-*` batch retirement or rebuild judgment
+     - 任何需要声称“已与当前 develop 对齐”或“以当前 develop 为权威基线”的 sequencing judgment
 3. 识别异常并给出清晰的所有权判断：
    - `runtime-owned`
    - `worker-owned`

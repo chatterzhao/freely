@@ -43,6 +43,16 @@ git -C "$REPO" remote add origin "$REMOTE"
 git -C "$REPO" push -q -u origin develop
 
 git -C "$REPO" worktree add -q -b feature/demo "$WT" develop
+mkdir -p "$WT/.freely/run"
+cat >"$WT/.freely/config.env" <<EOF
+PROJECT_ROOT="$WT"
+INTENT_FILE="$WT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
 
 echo local >"$REPO/local.txt"
 git -C "$REPO" add local.txt
@@ -52,6 +62,10 @@ OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$REPO")"
 printf '%s\n' "$OUTPUT" | grep -q 'develop'
 printf '%s\n' "$OUTPUT" | grep -q 'develop_push'
 printf '%s\n' "$OUTPUT" | grep -q 'push_pending ahead=1'
+printf '%s\n' "$OUTPUT" | grep -q 'push_urgency'
+printf '%s\n' "$OUTPUT" | grep -q 'immediate resync_required=false'
+printf '%s\n' "$OUTPUT" | grep -q 'none resync_required=true'
+printf '%s\n' "$OUTPUT" | grep -q 'canonical_develop_state=push_pending canonical_develop_ahead=1'
 printf '%s\n' "$OUTPUT" | grep -q 'feature/demo'
 
 echo "[PASS] freely fleet-status mirrors develop push followthrough drift"

@@ -176,6 +176,9 @@
 - 20260408-1205--verification-contract-and-premerge-adequacy
   - brainstorms: docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/brainstorms.md
   - candidates: docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/candidates.md
+- 20260408-1200--develop-push-followthrough-escalation
+  - brainstorms: docs/pre-brainstorms/20260408-1200--develop-push-followthrough-escalation/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260408-1200--develop-push-followthrough-escalation/candidates.md
 - 20260401-0840--all-tools-unified-slot-contract-governance
   - brainstorms: docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md
