@@ -2,7 +2,7 @@
 
 ## Context
 - Source brainstorm: ./brainstorms.md
-- Status: promoted
+- Status: completed
 
 ## Candidates
 
@@ -16,10 +16,12 @@
   - 把 PRD 定义成可以驱动 prototype、eval、task slicing 和 dev-loop 的控制面
   - 明确哪些字段属于稳定 contract，哪些字段需要随模型进展周期性重判
 - priority: P0
-- status: promoted
-- decision_reason: 这轮研究已经从外部材料和 Freely 自身现状得出稳定结论：PRD 需要从“读物”变成“可执行包”。边界、产物、下一跳都已明确，足以进入正式 IBM issue。
+- status: completed
+- decision_reason: 这轮研究已经从外部材料和 Freely 自身现状得出稳定结论：PRD 需要从“读物”变成“可执行包”。该判断已经 materialize 为正式 IBM issue，并完成最小质量门槛、governance-check 与回归测试的真源吸收，因此此 candidate 现在只保留历史 provenance。
 - promoted_issue_path: docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/issues/agent-ready-prd-for-freely-flow.md
 - milestone: docs/milestones.md#m-20260321-ai-native-doc-loop
+- next_action: 保留为历史来源记录。若未来要继续扩展 PRD 模板生成器、lint 或更强 doc-loop 自动化，应从当前 canonical truth 新开 candidate/issue，而不是重新激活这条 candidate。
+- completion_note: `I-20260321-1530` 已完成 canonical closeout，`doc-ibm-execution` 真源已吸收 AI-ready PRD 质量门槛；该 candidate 不再代表活跃 owner。
 - session_refs:
   - tool: codex
   - session_id: current-thread
