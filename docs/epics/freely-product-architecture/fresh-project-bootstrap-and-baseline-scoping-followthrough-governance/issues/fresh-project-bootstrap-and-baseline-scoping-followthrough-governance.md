@@ -1,6 +1,6 @@
 # Issue: fresh-project-bootstrap-and-baseline-scoping-followthrough-governance
 
-- issue_id: `I-20260406-1905-A`
+- issue_id: `I-20260405-2358-A`
 - title: Fresh-project bootstrap and baseline scoping followthrough governance
 - phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`

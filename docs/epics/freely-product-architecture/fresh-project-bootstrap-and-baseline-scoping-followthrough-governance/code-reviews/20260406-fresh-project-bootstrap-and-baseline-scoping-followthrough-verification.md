@@ -1,6 +1,6 @@
 # Verification: fresh-project-bootstrap-and-baseline-scoping-followthrough-governance
 
-- issue_id: `I-20260406-1905-A`
+- issue_id: `I-20260405-2358-A`
 - title: `Fresh-project bootstrap and baseline scoping followthrough governance`
 - branch: `feature/fresh-project-bootstrap-baseline-scoping-followthrough-20260406-1905`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1905-feature-fresh-project-bootstrap-baseline-scoping-followthrough`
