@@ -49,6 +49,8 @@ PENDING_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-stat
 printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_state: push_pending'
 printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_summary: ahead=1 '
 printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_defer_reason: none'
+printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_push_urgency: immediate'
+printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_resync_required: true'
 
 TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" develop-push defer --project "$REPO" --reason post_merge_acceptance --note "post-merge smoke" >/dev/null
 DEFERRED_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
@@ -56,5 +58,7 @@ printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_state: pu
 printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_defer_reason: post_merge_acceptance'
 printf '%s\n' "$DEFERRED_OUTPUT" | grep -Eq 'develop_push_followthrough_defer_updated_at: .*(PST|PDT)'
 printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_summary: ahead=1 '
+printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_push_urgency: deferred'
+printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_resync_required: true'
 
 echo "[PASS] freely live-status surfaces develop push followthrough and explicit defer windows"

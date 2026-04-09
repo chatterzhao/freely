@@ -52,6 +52,8 @@ OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$REPO")"
 printf '%s\n' "$OUTPUT" | grep -q 'develop'
 printf '%s\n' "$OUTPUT" | grep -q 'develop_push'
 printf '%s\n' "$OUTPUT" | grep -q 'push_pending ahead=1'
+printf '%s\n' "$OUTPUT" | grep -q 'push_urgency'
+printf '%s\n' "$OUTPUT" | grep -q 'immediate resync_required=true'
 printf '%s\n' "$OUTPUT" | grep -q 'feature/demo'
 
 echo "[PASS] freely fleet-status mirrors develop push followthrough drift"

@@ -192,6 +192,8 @@ if is_manager_branch "$current_branch"; then
 5B. 若本轮是主管被 runtime 重新激活后的第一轮，先做一轮 patrol：
    - `live-status -> fleet-status -> milestone / issue / progress / recovery`
    - 主动寻找 `candidate stuck`、`phase orphaned`、`completion without closure`
+   - 若 `live-status` 暴露 `develop_push_followthrough_push_urgency=immediate|deferred` 或 `develop_push_followthrough_resync_required=true`，先判断 push/resync followthrough 是否应前置
+   - 对 owner / verification / promotion / cleanup / stale-batch retirement 这类 latest-develop-sensitive judgment，不得在 canonical `develop` 未同步时直接下结论
    - 把发现结果加工为 `ownership + restart_point + next_action`
 EOF
 )"
