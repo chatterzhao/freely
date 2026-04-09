@@ -3,7 +3,7 @@
 ## Context
 
 - Source brainstorm: `./brainstorms.md`
-- Status: `active`
+- Status: `reviewed`
 - Route: `research-only`
 
 ## Candidates
@@ -14,7 +14,7 @@
 - title: `Runtime evidence provenance and canonical absorption gate governance`
 - research_only: `true`
 - implementation_ready: `false`
-- status: `needs_research`
+- status: `dropped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P1`
 - promoted_issue_path: `pending://issue-materialization`
@@ -34,6 +34,13 @@
   - decide whether same-lane authoritative prompt replacement should be tightened, and distinguish supersession from supporting evidence
   - state in canonical artifacts that this lane remains research-only and is not implementation-ready
   - state explicitly that `I-20260407-0215-A` remains the bounded owner for tracked-root absorption and is not widened by this research lane
+- adoption_type: `superseded`
+- summary: `This research-only packet documented a real boundary question, but the repo no longer needs to keep it as an active candidate. Later owner lines now absorb the actionable subproblems separately, while the mixed-owner prototype recorded here was explicitly treated as a counterexample rather than a canonical owner composition rule.`
+- decision_reason: `Repeated read-only sweeps were useful to prove non-absorption, but they never produced an IBM-stable bounded owner for the whole package. Since then, canonical runtime / verification / premerge governance has continued through separate owner lines, and keeping this compound research candidate active now only creates false pressure to promote or merge a packet that still mixes non-composable partial owners. The correct disposition is to retain the research record and retire the worktree, not materialize a new issue from this packet.`
+- superseded_by:
+  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+  - `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/brainstorms.md`
 - promotion_gate:
   - prove no existing milestone-owned issue already absorbs this full boundary package
   - freeze a minimum provenance field set, source artifact class taxonomy, and absorption decision surface narrow enough for an IBM handoff
@@ -211,9 +218,9 @@
   mode: `author-review`
   summary: `A fresh continuity refresh after the same compaction-triggered handoff re-ran the worker-scoped governance chain, rechecked lane-local dirty scope, directly re-read the strongest adjacent canonical owner issues and progress artifacts, and delegated a read-only context-source scan. Nothing changed: the lane still stays continuation -> pre_brainstorm -> doc-pre-brainstorm-execution, the adjacent owners still remain bounded partial only, no GitHub-like repo artifact produced a stronger local owner, and I-20260407-0215-A is still only an external non-widening boundary rather than visible local absorption evidence.`
   verdict: `keep_in_pre_brainstorm`
-- next_action: Keep `C-20260407-0603-A` `research-only` and do not promote it to IBM. Promotion stays blocked because no single visible canonical owner, and no explicitly declared bounded owner bundle, jointly freezes the structured-vs-flexible runtime evidence fields, control-plane absorption gate, continuity fallback boundary, and same-lane authoritative replacement rule. The `2026-04-07 20:24 PDT` continuity refresh re-ran the worker-scoped `lead-agent -> constitution-guard -> laws-enforcer -> context-source-skill -> doc-pre-brainstorm-execution` chain, re-verified `core.hooksPath=.githooks`, rechecked the active milestone/candidate/brainstorm package, directly re-read the strongest adjacent owner issues plus nearby progress evidence, and delegated a bounded read-only explorer scan without surfacing any new tracked-root anchor or route-changing owner. `codex` remains the correct tool because `workspace/tools.md` requires same-tool continuation in-session, and `I-20260407-0215-A` still remains only an external non-widening boundary rather than a visible local canonical owner artifact.
-- revisit_trigger: Revisit when either (a) a canonical artifact for `I-20260407-0215-A` becomes visible and proves this lane is already absorbed, or (b) the remaining promotion blockers are resolved strongly enough to either materialize a bounded issue or explicitly keep/reject the provisional contract as research-only.
-- decision_reason: `No existing owner fully absorbs the topic; repeated fresh-session continuity refreshes and another independent read-only local-doc sweep still only find adjacent partial owners, so keeping a separate research-only candidate is safer than silently widening adjacent completed owners or treating the external tracked-root reference as local proof of absorption before a visible canonical owner exists.`
+- next_action: `Retire the dedicated research worktree. Keep this packet as historical pre-brainstorm evidence only, and do not promote it to IBM or reopen a mixed-owner issue from it.`
+- revisit_trigger: `Only reopen if a future bounded owner must explicitly govern cross-owner canonical absorption after the current separated owner lines prove insufficient in canonical develop.`
+- decision_reason: `The active question was resolved negatively: no lawful single owner exists for this combined packet, and later work continued by splitting the actionable boundary into narrower owners instead of legitimizing mixed-owner composition. That makes this packet useful as provenance, but no longer valid as an active promotion candidate.`
 - boundary_note: `Until I-20260407-0215-A is visible in canonical local docs, this lane is limited to control-plane absorption governance. The tracked-root reference remains a non-widening boundary constraint, not absorption evidence.`
 - anti_composition_note: `Partial coverage across multiple adjacent owners does not count as absorption. Unless one visible canonical owner, or one explicitly declared bounded owner bundle, covers runtime provenance fields, control-plane absorption gating, manager continuity fallback, and same-lane supersession together, this lane remains unabsorbed.`
 - promotion_defer_packet:
