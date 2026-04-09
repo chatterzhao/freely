@@ -220,6 +220,7 @@ EOF
    - \`Target-Environment:\`
    - \`Closeout-Gate:\`
    其中 \`Required-Test-Lanes\` 与 \`Required-Acceptance-Item-Ids\` 必须写成可枚举列表；不得只写“see issue”或“follow pre-tests”.
+   runtime 会把这组字段结构化写入 delegated intake 与 worker runtime state，所以不要把它们写成只适合人眼理解的散文。
 26. 若本轮结论是 manager-only cleanup queue、暂不发 worker，也仍然必须写 manager continuity，至少包含：fleet inventory、route_kind / restart_point / ownership / next_action、cleanup queue 或 frozen queue、以及 next supervision priority。
 27. 你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径；若没有写这些产物，就不算完成主管交付。
 28. 若当前输入包含 delegated continuation、cleanup followthrough、或明确的 project-level restart point，在主 handoff artifact 落盘前不要先 spawn subagent，也不要先等待子任务结果。
