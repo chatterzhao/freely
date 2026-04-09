@@ -58,13 +58,29 @@ Issue front matter 还应显式绑定：
 - 在 issue / `prd.md` / `pre-tests.md` / `tasks.md` / issue-bound brainstorm 中继续深化 acceptance 边界
 - 在 `pre-tests.md` 中默认先写 executable acceptance 行为，而不是 wording review / truth-source reading checklist
 - `pre-tests.md` 默认显式回答：
+  - unit
   - pre-merge focused regression / smoke
+  - integration
+  - end-to-end
+  - real-environment
   - post-merge integration acceptance
   - post-merge application-native real-environment acceptance
   - post-merge end-to-end dogfood acceptance
+- `pre-tests.md` 至少固定四个章节：
+  - `Unit`
+  - `Integration`
+  - `End-to-End`
+  - `Real-Environment`
 - 若某类 acceptance 不适用，必须同时写出：
-  - why_not_applicable
-  - replacement_evidence
+  - `not_applicable_reason`
+  - `not_applicable_explanation`
+  - `replacement_evidence`
+- `not_applicable_reason` 只允许：
+  - `change_not_touching_this_layer`
+  - `no_executable_boundary_at_this_layer`
+  - `protected_environment_only`
+  - `human_observation_only`
+  - `covered_by_more_realistic_required_surface`
 - 对每个关键 acceptance 面，默认写出：
   - environment
   - evidence

@@ -35,9 +35,15 @@
    - 若 `live-status` / `fleet-status` 已显式给出 `ownership_conflict_state=active`，先按 `ownership_conflict_signature` 与 `ownership_conflict_with` 做 arbitration；不要让当前 actor 直接跨树抢占 mutate authority
    - 若 `live-status` 或 manager/root `fleet-status` row 给出 `manager_pending_ownership_conflicts`，说明 continuity 中已有 queued / frozen lane 因 active、recorded、queued 或 frozen owner 被挡住；同时读取其中的 `status=`，区分 `soft_stale` 与 `queued/frozen/active`，不要把已 hard-stale 的 recorded owner 继续当作 launch blocker
    - 主动检查 `candidate stuck / phase orphaned / completion without closure / source drift`
-   - 若 canonical `develop` 本地领先 tracked remote，还要判断这是合法的 `post_merge_acceptance` defer window，还是已经悬空的 push followthrough drift
+   - 若 canonical `develop` 本地领先 tracked remote，还要读取 `develop_push_followthrough_push_urgency` 与 `develop_push_followthrough_resync_required`，判断这是合法的 `post_merge_acceptance` defer window，还是已经悬空的 push followthrough drift
+   - 一旦 `develop_push_followthrough_resync_required=true`，凡是依赖“当前最新 develop”做结论的判断，都必须先把 push/resync followthrough 排到前面；不得在旧 canonical 基线之上继续裁决
    - 对 milestone 里的 unresolved candidate，不只检查“是否可见”，还要检查它是否处在正确且仍 active 的消费队列
    - 把发现结果加工为 `ownership + restart_point + next_action`
+   - `latest-develop-sensitive judgment` 至少包括：
+     - owner / merge-order / absorption judgment
+     - verification / promotion / cleanup / retirement judgment
+     - stale `test-pre-merge-*` batch retirement or rebuild judgment
+     - 任何需要声称“已与当前 develop 对齐”或“以当前 develop 为权威基线”的 sequencing judgment
 3. 识别异常并给出清晰的所有权判断：
    - `runtime-owned`
    - `worker-owned`
@@ -48,6 +54,7 @@
    - 目标角色
    - dispatch metadata：`dispatch_priority`、`parallel_safe`、`write_scope`
    - ownership metadata：`intent_kind`、`intent_target`
+   - verification metadata：`Owner-Issue`、`Pre-Tests-Path`、`Verification-Artifact-Dir`、`Required-Test-Lanes`、`Required-Acceptance-Item-Ids`、`Minimum-Evidence-Level`、`Target-Environment`、`Closeout-Gate`
    - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
    - 一旦 `ownership + restart_point + next_action` 已经稳定，优先产出具体 worker handoff；不要继续停留在 manager-only patrol
    - completion / verification / cleanup 的最终裁决仍留在主管；worker 只负责带回 evidence，不负责宣布 terminal completion
@@ -85,11 +92,13 @@
    - queued worker list / current launch blockers
    - 下一轮监督优先级
    - 若存在 delegated manager continuation handoff，还要保证 runtime 至少留下：
-     - handoff generated
-     - handoff consumed into prompt
-     - handoff still pending after failure boundary
+   - handoff generated
+   - handoff consumed into prompt
+   - handoff still pending after failure boundary
    - 若本轮已生成新的 worker prompt set，还要保证 watchdog/runtime 后续能以最新 continuity 为基准继续消费，而不是停留在旧 consumed snapshot
    - 每个 worker prompt 除了任务正文外，还必须包含 machine-readable `Worktree:` 与 `Branch:` header；runtime worker launch 依赖这两个 header（或其兼容句式）解析目标工位
+   - 若当前 lane 带 verification 义务，worker prompt 还必须显式携带：`Owner-Issue`、`Pre-Tests-Path`、`Verification-Artifact-Dir`、`Required-Test-Lanes`、`Required-Acceptance-Item-Ids`、`Minimum-Evidence-Level`、`Target-Environment`、`Closeout-Gate`
+   - `Required-Test-Lanes` / `Required-Acceptance-Item-Ids` 不得只写“见 issue”；必须在 prompt 内给出 machine-readable 列表，便于 runtime / review / merge gate 恢复本轮最低测试义务
    - `Worktree:` header 只是输入锚点，不是最终 ownership 判重键；凡是进入 `write_scope`、`intent_target`、queue/freeze 或 recovery 比较的 worktree 路径，都必须先 canonicalize 成真实路径（例如 `pwd -P` / runtime normalized path）
    - 对会产生 mutate authority 的 lane，还必须写出 `intent_kind` 与 `intent_target`；`inspect-anywhere` 合法，但 `mutate-only-with-lease`
 13. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff / 这轮哪些该 cleanup”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff` 之一。

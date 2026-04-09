@@ -4397,33 +4397,44 @@ develop_push_defer_reason_is_valid() {
   esac
 }
 
+develop_push_followthrough_push_urgency_for_state() {
+  local state="${1:-}"
+  case "$state" in
+    push_pending) printf 'immediate\n' ;;
+    push_deferred) printf 'deferred\n' ;;
+    *) printf 'none\n' ;;
+  esac
+}
+
 develop_push_followthrough_upstream_for_project() {
   local project="$1"
   git -C "$project" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true
 }
 
-write_develop_push_followthrough_state() {
-  local project="$1" reason="$2" note="${3:-}"
-  local state_file updated_at
-  state_file="$(develop_push_followthrough_state_file "$project")"
-  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-  mkdir -p "$(dirname "$state_file")"
-  cat >"$state_file" <<EOF
-DEVELOP_PUSH_DEFER_REASON="$reason"
-DEVELOP_PUSH_DEFER_NOTE="$note"
-DEVELOP_PUSH_DEFER_UPDATED_AT="$updated_at"
-EOF
+develop_push_followthrough_authoritative_develop_project() {
+  local project="$1" repo_root entries wt_path wt_branch
+  repo_root="$(git_root_for_path "$project")"
+  [[ -n "$repo_root" ]] || return 0
+
+  if [[ "$(branch_name_for_project "$repo_root")" == "develop" ]]; then
+    printf '%s\n' "$repo_root"
+    return 0
+  fi
+
+  entries="$(project_worktree_list_porcelain_cached "$project")"
+  while IFS='|' read -r wt_path wt_branch; do
+    [[ "$wt_branch" == "develop" ]] || continue
+    printf '%s\n' "$wt_path"
+    return 0
+  done < <(printf '%s\n' "$entries" | awk '
+    /^worktree / { wt=substr($0, 10); br="" }
+    /^branch / { br=$2; sub(/^refs\/heads\//, "", br); print wt "|" br }
+  ')
 }
 
-clear_develop_push_followthrough_state() {
+develop_push_followthrough_snapshot_for_develop_project() {
   local project="$1"
-  rm -f "$(develop_push_followthrough_state_file "$project")"
-}
-
-develop_push_followthrough_snapshot_for_project() {
-  local project="$1"
-  local branch upstream counts ahead behind state summary defer_reason defer_note defer_updated_at state_file
-  branch="$(branch_name_for_project "$project")"
+  local upstream counts ahead behind state summary defer_reason defer_note defer_updated_at state_file
   state="not_applicable"
   summary="branch_not_develop"
   upstream="none"
@@ -4446,36 +4457,84 @@ develop_push_followthrough_snapshot_for_project() {
     [[ -n "$defer_note" ]] || defer_note="none"
   fi
 
-  if [[ "$branch" == "develop" ]]; then
-    upstream="$(develop_push_followthrough_upstream_for_project "$project")"
-    if [[ -z "$upstream" ]]; then
-      state="not_applicable"
-      summary="no_upstream"
-      upstream="none"
-    else
-      counts="$(git -C "$project" rev-list --left-right --count "HEAD...$upstream" 2>/dev/null || true)"
-      if [[ -n "$counts" ]]; then
-        ahead="$(printf '%s\n' "$counts" | awk '{print $1}')"
-        behind="$(printf '%s\n' "$counts" | awk '{print $2}')"
-      fi
-      [[ "$ahead" =~ ^[0-9]+$ ]] || ahead="0"
-      [[ "$behind" =~ ^[0-9]+$ ]] || behind="0"
-      if (( ahead > 0 )); then
-        if develop_push_defer_reason_is_valid "${DEVELOP_PUSH_DEFER_REASON:-}"; then
-          state="push_deferred"
-          summary="ahead=${ahead} behind=${behind} upstream=${upstream} defer=${DEVELOP_PUSH_DEFER_REASON}"
-        else
-          state="push_pending"
-          summary="ahead=${ahead} behind=${behind} upstream=${upstream} defer=none"
-        fi
+  upstream="$(develop_push_followthrough_upstream_for_project "$project")"
+  if [[ -z "$upstream" ]]; then
+    state="not_applicable"
+    summary="no_upstream"
+    upstream="none"
+  else
+    counts="$(git -C "$project" rev-list --left-right --count "HEAD...$upstream" 2>/dev/null || true)"
+    if [[ -n "$counts" ]]; then
+      ahead="$(printf '%s\n' "$counts" | awk '{print $1}')"
+      behind="$(printf '%s\n' "$counts" | awk '{print $2}')"
+    fi
+    [[ "$ahead" =~ ^[0-9]+$ ]] || ahead="0"
+    [[ "$behind" =~ ^[0-9]+$ ]] || behind="0"
+    if (( ahead > 0 )); then
+      if develop_push_defer_reason_is_valid "${DEVELOP_PUSH_DEFER_REASON:-}"; then
+        state="push_deferred"
+        summary="ahead=${ahead} behind=${behind} upstream=${upstream} defer=${DEVELOP_PUSH_DEFER_REASON}"
       else
-        state="clean"
-        summary="ahead=0 behind=${behind} upstream=${upstream}"
+        state="push_pending"
+        summary="ahead=${ahead} behind=${behind} upstream=${upstream} defer=none"
       fi
+    else
+      state="clean"
+      summary="ahead=0 behind=${behind} upstream=${upstream}"
     fi
   fi
 
   printf '%s|%s|%s|%s|%s|%s|%s\n' "$state" "$summary" "$upstream" "$ahead" "$behind" "$defer_reason" "$defer_updated_at"
+}
+
+write_develop_push_followthrough_state() {
+  local project="$1" reason="$2" note="${3:-}"
+  local state_file updated_at
+  state_file="$(develop_push_followthrough_state_file "$project")"
+  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  mkdir -p "$(dirname "$state_file")"
+  cat >"$state_file" <<EOF
+DEVELOP_PUSH_DEFER_REASON="$reason"
+DEVELOP_PUSH_DEFER_NOTE="$note"
+DEVELOP_PUSH_DEFER_UPDATED_AT="$updated_at"
+EOF
+}
+
+clear_develop_push_followthrough_state() {
+  local project="$1"
+  rm -f "$(develop_push_followthrough_state_file "$project")"
+}
+
+develop_push_followthrough_snapshot_for_project() {
+  local project="$1"
+  local branch upstream ahead behind state summary defer_reason defer_updated_at push_urgency resync_required
+  local canonical_develop_project canonical_develop_state canonical_develop_summary canonical_develop_upstream canonical_develop_ahead canonical_develop_behind canonical_develop_defer_reason canonical_develop_defer_updated_at
+  branch="$(branch_name_for_project "$project")"
+  state="not_applicable"
+  summary="branch_not_develop"
+  upstream="none"
+  ahead="0"
+  behind="0"
+  defer_reason="none"
+  defer_updated_at="unavailable"
+  push_urgency="none"
+  resync_required="false"
+
+  if [[ "$branch" == "develop" ]]; then
+    IFS='|' read -r state summary upstream ahead behind defer_reason defer_updated_at <<<"$(develop_push_followthrough_snapshot_for_develop_project "$project")"
+  else
+    canonical_develop_project="$(develop_push_followthrough_authoritative_develop_project "$project")"
+    if [[ -n "$canonical_develop_project" ]]; then
+      IFS='|' read -r canonical_develop_state canonical_develop_summary canonical_develop_upstream canonical_develop_ahead canonical_develop_behind canonical_develop_defer_reason canonical_develop_defer_updated_at <<<"$(develop_push_followthrough_snapshot_for_develop_project "$canonical_develop_project")"
+      if [[ "${canonical_develop_ahead:-0}" =~ ^[0-9]+$ ]] && (( canonical_develop_ahead > 0 )); then
+        resync_required="true"
+        summary="branch_not_develop canonical_develop_state=${canonical_develop_state} canonical_develop_ahead=${canonical_develop_ahead} canonical_develop_upstream=${canonical_develop_upstream}"
+      fi
+    fi
+  fi
+
+  push_urgency="$(develop_push_followthrough_push_urgency_for_state "$state")"
+  printf '%s|%s|%s|%s|%s|%s|%s|%s|%s\n' "$state" "$summary" "$upstream" "$ahead" "$behind" "$defer_reason" "$defer_updated_at" "$push_urgency" "$resync_required"
 }
 
 write_preemption_state() {
@@ -5686,6 +5745,81 @@ worker_prompt_dispatch_metadata_value() {
   ' "$prompt_file"
 }
 
+worker_prompt_dispatch_metadata_csv() {
+  local prompt_file="$1" key="$2"
+  [[ -f "$prompt_file" && -n "$key" ]] || return 0
+  awk -v desired_key="$key" '
+    function trim(value) {
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+      gsub(/`/, "", value)
+      return value
+    }
+    function normalize_key(value) {
+      value=trim(value)
+      sub(/^[[:space:]]*-[[:space:]]*/, "", value)
+      gsub(/[[:space:]-]/, "_", value)
+      return tolower(value)
+    }
+    function emit_current() {
+      if (current_value != "") {
+        if (out != "") out = out ","
+        out = out current_value
+      }
+      current_value=""
+    }
+    BEGIN {
+      capture=0
+      out=""
+      current_value=""
+    }
+    {
+      line=$0
+      if (line ~ /^[[:space:]]*$/) {
+        if (capture == 1 && current_value != "") {
+          emit_current()
+        }
+        next
+      }
+
+      if (capture == 1 && line ~ /^[[:space:]]*-[[:space:]]*/) {
+        emit_current()
+        sub(/^[[:space:]]*-[[:space:]]*/, "", line)
+        current_value=trim(line)
+        next
+      }
+
+      if (line ~ /:/) {
+        split(line, parts, ":")
+        key_part=normalize_key(parts[1])
+        if (capture == 1 && key_part != tolower(desired_key)) {
+          emit_current()
+          capture=0
+        }
+        if (key_part == tolower(desired_key)) {
+          capture=1
+          sub(/^[^:]+:[[:space:]]*/, "", line)
+          line=trim(line)
+          if (line != "") {
+            emit_current()
+            current_value=line
+          }
+          next
+        }
+      }
+
+      if (capture == 1 && current_value != "") {
+        current_value=current_value " " trim(line)
+      }
+    }
+    END {
+      if (capture == 1 && current_value != "") {
+        emit_current()
+      }
+      print out
+    }
+  ' "$prompt_file"
+}
+
 worker_prompt_dispatch_priority() {
   local prompt_file="$1" value
   value="$(worker_prompt_dispatch_metadata_value "$prompt_file" "dispatch_priority")"
@@ -5741,6 +5875,46 @@ worker_prompt_intent_target() {
     return 0
   fi
   printf '%s\n' "$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+}
+
+worker_prompt_owner_issue() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "owner_issue"
+}
+
+worker_prompt_pre_tests_path() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "pre_tests_path"
+}
+
+worker_prompt_verification_artifact_dir() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "verification_artifact_dir"
+}
+
+worker_prompt_required_test_lanes_csv() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_csv "$prompt_file" "required_test_lanes"
+}
+
+worker_prompt_required_acceptance_item_ids_csv() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_csv "$prompt_file" "required_acceptance_item_ids"
+}
+
+worker_prompt_minimum_evidence_level() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "minimum_evidence_level"
+}
+
+worker_prompt_target_environment() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "target_environment"
+}
+
+worker_prompt_closeout_gate() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "closeout_gate"
 }
 
 worker_prompt_normalized_intent_kind() {
@@ -10434,7 +10608,7 @@ cmd_live_status() {
   local semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv
   local blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact
   local manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary manager_continuity_gap_writer_state
-  local develop_push_snapshot develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at
+  local develop_push_snapshot develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at develop_push_urgency develop_push_resync_required
 
   run_dir="$(run_dir_for_project "$project")"
   branch="$(branch_name_for_project "$project")"
@@ -10622,7 +10796,7 @@ cmd_live_status() {
     fi
   fi
   develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
-  IFS='|' read -r develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at <<<"$develop_push_snapshot"
+  IFS='|' read -r develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at develop_push_urgency develop_push_resync_required <<<"$develop_push_snapshot"
 
   echo "project: $project"
   echo "branch: $branch"
@@ -10686,6 +10860,8 @@ cmd_live_status() {
   echo "ownership_conflict_summary: ${ownership_conflict_summary}"
   echo "develop_push_followthrough_state: ${develop_push_state}"
   echo "develop_push_followthrough_summary: ${develop_push_summary}"
+  echo "develop_push_followthrough_push_urgency: ${develop_push_urgency}"
+  echo "develop_push_followthrough_resync_required: ${develop_push_resync_required}"
   echo "current_prompt_has_delegated_continuation: ${prompt_has_delegated}"
   echo "latest_manager_continuity_generated: ${latest_manager_continuity_generated}"
   echo "latest_manager_continuity_consumed: ${latest_manager_continuity_consumed}"
@@ -10763,6 +10939,8 @@ cmd_live_status() {
   echo "- develop_push_followthrough_behind: ${develop_push_behind}"
   echo "- develop_push_followthrough_defer_reason: ${develop_push_defer_reason}"
   echo "- develop_push_followthrough_defer_updated_at: $(format_timestamp_local_for_display "${develop_push_defer_updated_at}")"
+  echo "- develop_push_followthrough_push_urgency: ${develop_push_urgency}"
+  echo "- develop_push_followthrough_resync_required: ${develop_push_resync_required}"
 }
 
 cmd_status() {
@@ -10864,7 +11042,7 @@ cmd_fleet_status() {
   local project="" repo_root entries wt_path wt_branch wt_state cfg run_dir session_state supervisor_pid ai_pid last_launch last_dirty checkpoint_json checkpoint_required restart_signal_reason restart_signal_at restart_summary semantic_loop_summary semantic_loop_signal ownership_conflict_summary manager_pending_ownership_conflicts role_hint
   local blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact
   local manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary
-  local develop_push_snapshot develop_push_state develop_push_summary prompt_file prompt_intent_kind prompt_intent_target manager_generated_intents manager_consumed_intents intent_prompt_file
+  local develop_push_snapshot develop_push_state develop_push_summary develop_push_urgency develop_push_resync_required prompt_file prompt_intent_kind prompt_intent_target manager_generated_intents manager_consumed_intents intent_prompt_file
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -10953,7 +11131,7 @@ cmd_fleet_status() {
       IFS='|' read -r blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact <<<"$(blocked_supervision_snapshot_for_project "$wt_path")"
       IFS='|' read -r manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$wt_path")"
       develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$wt_path")"
-      IFS='|' read -r develop_push_state develop_push_summary _ _ _ _ _ <<<"$develop_push_snapshot"
+      IFS='|' read -r develop_push_state develop_push_summary _ _ _ _ _ develop_push_urgency develop_push_resync_required <<<"$develop_push_snapshot"
       prompt_file="$(find_latest_prompt_file_for_project "$wt_path")"
       intent_prompt_file="$(status_intent_prompt_file_for_project "$wt_path")"
       if [[ -n "$intent_prompt_file" && -f "$intent_prompt_file" ]]; then
@@ -10979,6 +11157,8 @@ cmd_fleet_status() {
     else
       develop_push_state="not_applicable"
       develop_push_summary="config_missing"
+      develop_push_urgency="none"
+      develop_push_resync_required="false"
     fi
     checkpoint_json="$(checkpoint_guard_json_for_project "$wt_path")"
     checkpoint_required="$(checkpoint_guard_value "$checkpoint_json" checkpoint_required)"
@@ -11019,8 +11199,9 @@ cmd_fleet_status() {
       fi
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "continuity_gap" "" "reason=${manager_continuity_gap_reason:-unknown} expected=${manager_continuity_gap_expected:-none} latest_generated=${manager_continuity_gap_latest_generated:-none} prompt=${manager_continuity_gap_prompt_file:-none} age_secs=${manager_continuity_gap_age_secs:-none} age_state=${manager_continuity_gap_age_state:-none} writer=${continuity_gap_writer_state}"
     fi
-    if [[ "$develop_push_state" != "not_applicable" ]]; then
+    if [[ "$develop_push_state" != "not_applicable" || "$develop_push_resync_required" == "true" ]]; then
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "develop_push" "" "${develop_push_state} ${develop_push_summary}"
+      printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "push_urgency" "" "${develop_push_urgency} resync_required=${develop_push_resync_required}"
     fi
   done < <(printf '%s\n' "$entries" | awk '
     BEGIN { wt=""; br="(detached)" }
@@ -11049,9 +11230,9 @@ cmd_develop_push() {
 
   case "$subcmd" in
     status)
-      local snapshot state summary upstream ahead behind defer_reason defer_updated_at
+      local snapshot state summary upstream ahead behind defer_reason defer_updated_at push_urgency resync_required
       snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
-      IFS='|' read -r state summary upstream ahead behind defer_reason defer_updated_at <<<"$snapshot"
+      IFS='|' read -r state summary upstream ahead behind defer_reason defer_updated_at push_urgency resync_required <<<"$snapshot"
       echo "project: $project"
       echo "develop_push_followthrough_state: $state"
       echo "develop_push_followthrough_summary: $summary"
@@ -11060,6 +11241,8 @@ cmd_develop_push() {
       echo "develop_push_followthrough_behind: $behind"
       echo "develop_push_followthrough_defer_reason: $defer_reason"
       echo "develop_push_followthrough_defer_updated_at: $(format_timestamp_local_for_display "$defer_updated_at")"
+      echo "develop_push_followthrough_push_urgency: $push_urgency"
+      echo "develop_push_followthrough_resync_required: $resync_required"
       ;;
     defer)
       if ! develop_push_defer_reason_is_valid "$reason"; then

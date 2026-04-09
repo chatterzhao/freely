@@ -35,6 +35,10 @@ OUTPUT="$(bash "$ROOT_DIR/bin/wt-fleet-status" --project "$REPO")"
 printf '%s\n' "$OUTPUT" | grep -q 'PUSH'
 printf '%s\n' "$OUTPUT" | grep -q 'push_pending'
 printf '%s\n' "$OUTPUT" | grep -q 'develop_push'
+printf '%s\n' "$OUTPUT" | grep -q 'push_urgency'
+printf '%s\n' "$OUTPUT" | grep -q 'immediate resync_required=false'
+printf '%s\n' "$OUTPUT" | grep -q 'none resync_required=true'
+printf '%s\n' "$OUTPUT" | grep -q 'canonical_develop_state=push_pending canonical_develop_ahead=1'
 printf '%s\n' "$OUTPUT" | grep -q 'feature/demo'
 
 echo "[PASS] wt-fleet-status surfaces develop push followthrough summary"
