@@ -50,16 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260408-1205-A`
-- title: Verification contract and premerge adequacy governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/candidates.md`
-- next_action: Start the dev-loop from this IBM package. First freeze the worker handoff verification metadata and the fallback adequacy gate diagnostic taxonomy, then decide whether the implementation should stay on one lane or split into prompt/runtime and gate-consumption slices.
-- revisit_trigger: Re-open the owner boundary only if implementation proves the prompt contract and merge-gate contract cannot remain one bounded package without creating parallel truth.
 1. `I-20260408-1200-A`
 - title: Develop push followthrough escalation governance
 - milestone_state: committed
@@ -437,7 +427,27 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
-1. `I-20260407-0023-A`
+1. `I-20260408-1205-A`
+- title: Verification contract and premerge adequacy governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-verification-contract-and-premerge-adequacy-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/candidates.md`
+- evidence:
+  - `develop` merge `f70b0074`
+  - `docs/progress/workspace-routing-foundation/p-verification-contract-and-premerge-adequacy-governance.md`
+  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-verification-metadata`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-natural-language-prompt`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+  - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+  - `./bin/governance-check`
+- completion_note: `Verification metadata is now projected into delegated intake, worker runtime state, and premerge adequacy gates; future work should be follow-on recovery or retirement cleanup, not keeping this owner in committed_issues.`
+
+2. `I-20260407-0023-A`
 - title: Codex auto switch probe apikey fallback governance
 - milestone_state: completed
 - phase_state: `completed`
