@@ -5686,6 +5686,81 @@ worker_prompt_dispatch_metadata_value() {
   ' "$prompt_file"
 }
 
+worker_prompt_dispatch_metadata_csv() {
+  local prompt_file="$1" key="$2"
+  [[ -f "$prompt_file" && -n "$key" ]] || return 0
+  awk -v desired_key="$key" '
+    function trim(value) {
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+      gsub(/`/, "", value)
+      return value
+    }
+    function normalize_key(value) {
+      value=trim(value)
+      sub(/^[[:space:]]*-[[:space:]]*/, "", value)
+      gsub(/[[:space:]-]/, "_", value)
+      return tolower(value)
+    }
+    function emit_current() {
+      if (current_value != "") {
+        if (out != "") out = out ","
+        out = out current_value
+      }
+      current_value=""
+    }
+    BEGIN {
+      capture=0
+      out=""
+      current_value=""
+    }
+    {
+      line=$0
+      if (line ~ /^[[:space:]]*$/) {
+        if (capture == 1 && current_value != "") {
+          emit_current()
+        }
+        next
+      }
+
+      if (capture == 1 && line ~ /^[[:space:]]*-[[:space:]]*/) {
+        emit_current()
+        sub(/^[[:space:]]*-[[:space:]]*/, "", line)
+        current_value=trim(line)
+        next
+      }
+
+      if (line ~ /:/) {
+        split(line, parts, ":")
+        key_part=normalize_key(parts[1])
+        if (capture == 1 && key_part != tolower(desired_key)) {
+          emit_current()
+          capture=0
+        }
+        if (key_part == tolower(desired_key)) {
+          capture=1
+          sub(/^[^:]+:[[:space:]]*/, "", line)
+          line=trim(line)
+          if (line != "") {
+            emit_current()
+            current_value=line
+          }
+          next
+        }
+      }
+
+      if (capture == 1 && current_value != "") {
+        current_value=current_value " " trim(line)
+      }
+    }
+    END {
+      if (capture == 1 && current_value != "") {
+        emit_current()
+      }
+      print out
+    }
+  ' "$prompt_file"
+}
+
 worker_prompt_dispatch_priority() {
   local prompt_file="$1" value
   value="$(worker_prompt_dispatch_metadata_value "$prompt_file" "dispatch_priority")"
@@ -5741,6 +5816,46 @@ worker_prompt_intent_target() {
     return 0
   fi
   printf '%s\n' "$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+}
+
+worker_prompt_owner_issue() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "owner_issue"
+}
+
+worker_prompt_pre_tests_path() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "pre_tests_path"
+}
+
+worker_prompt_verification_artifact_dir() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "verification_artifact_dir"
+}
+
+worker_prompt_required_test_lanes_csv() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_csv "$prompt_file" "required_test_lanes"
+}
+
+worker_prompt_required_acceptance_item_ids_csv() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_csv "$prompt_file" "required_acceptance_item_ids"
+}
+
+worker_prompt_minimum_evidence_level() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "minimum_evidence_level"
+}
+
+worker_prompt_target_environment() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "target_environment"
+}
+
+worker_prompt_closeout_gate() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "closeout_gate"
 }
 
 worker_prompt_normalized_intent_kind() {
