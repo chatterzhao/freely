@@ -152,7 +152,7 @@ if [[ ! -x "./bin/governance-merge-gate" ]]; then
 fi
 
 set +e
-gate_output="$(./bin/governance-merge-gate --staged 2>&1)"
+gate_output="$(./bin/governance-merge-gate --staged --target-branch "$branch" --source-branch "$guarded_state_source" 2>&1)"
 gate_rc=$?
 set -e
 
