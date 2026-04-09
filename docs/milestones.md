@@ -1477,7 +1477,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260408-latest-manager-continuity-worker-consumption-worker-intent-fallback-verification.md`
 - completion_note: canonical `develop` 已重新对齐 latest continuity / latest worker prompt generated-consumed truth，并继续吸收 2026-04-04 的 same-family missing-run-dir parser/status guard 修复；2026-04-08 又把 worker local prompt 缺失 machine-readable intent header 时的 authoritative intent fallback 吸收到同族 owner，确认旧 mixed lane `manager-continuity-gap-and-worker-recovery-guard` 不成立为新 issue；更大的 websocket blocked-intake / supervision contract 仍需独立 lifecycle 承接
 
-3a. `I-20260405-1505-A`
+4. `I-20260405-1505-A`
 - title: Manager semantic-loop active-worker suppression governance
 - milestone_state: completed
 - phase_state: `completed`
