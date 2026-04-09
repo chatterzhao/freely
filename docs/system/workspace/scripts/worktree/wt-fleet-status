@@ -68,57 +68,106 @@ develop_push_defer_reason_is_valid() {
   esac
 }
 
-develop_push_followthrough_snapshot() {
+develop_push_followthrough_push_urgency_for_state() {
+  local state="${1:-}"
+  case "$state" in
+    push_pending) printf 'immediate\n' ;;
+    push_deferred) printf 'deferred\n' ;;
+    *) printf 'none\n' ;;
+  esac
+}
+
+authoritative_develop_worktree() {
+  local project="$1" repo_root
+  repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
+  [[ -n "$repo_root" ]] || return 0
+
+  if [[ "$(git -C "$repo_root" branch --show-current 2>/dev/null || printf 'unknown')" == "develop" ]]; then
+    printf '%s\n' "$repo_root"
+    return 0
+  fi
+
+  git -C "$repo_root" worktree list --porcelain 2>/dev/null | awk '
+    /^worktree / { wt=substr($0, 10); br="" }
+    /^branch / {
+      br=$2
+      sub(/^refs\/heads\//, "", br)
+      if (br == "develop") {
+        print wt
+        exit
+      }
+    }
+  '
+}
+
+develop_push_followthrough_snapshot_for_develop_worktree() {
   local worktree="$1"
-  local branch upstream counts ahead behind state summary state_file push_urgency resync_required
-  branch="$(git -C "$worktree" branch --show-current 2>/dev/null || printf 'unknown')"
+  local upstream counts ahead behind state summary
   state="not_applicable"
   summary="branch_not_develop"
   upstream="none"
   ahead="0"
   behind="0"
-  push_urgency="none"
-  resync_required="false"
-  state_file="$(develop_push_followthrough_state_file "$worktree")"
 
-  if [[ -f "$state_file" ]]; then
+  if [[ -f "$(develop_push_followthrough_state_file "$worktree")" ]]; then
     # shellcheck disable=SC1090
-    source "$state_file"
+    source "$(develop_push_followthrough_state_file "$worktree")"
   fi
 
-  if [[ "$branch" == "develop" ]]; then
-    upstream="$(git -C "$worktree" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)"
-    if [[ -z "$upstream" ]]; then
-      state="not_applicable"
-      summary="no_upstream"
-      upstream="none"
-    else
-      counts="$(git -C "$worktree" rev-list --left-right --count "HEAD...$upstream" 2>/dev/null || true)"
-      if [[ -n "$counts" ]]; then
-        ahead="$(printf '%s\n' "$counts" | awk '{print $1}')"
-        behind="$(printf '%s\n' "$counts" | awk '{print $2}')"
-      fi
-      [[ "$ahead" =~ ^[0-9]+$ ]] || ahead="0"
-      [[ "$behind" =~ ^[0-9]+$ ]] || behind="0"
-      if (( ahead > 0 )); then
-        if develop_push_defer_reason_is_valid "${DEVELOP_PUSH_DEFER_REASON:-}"; then
-          state="push_deferred"
-          summary="ahead=${ahead} upstream=${upstream} defer=${DEVELOP_PUSH_DEFER_REASON}"
-          push_urgency="deferred"
-          resync_required="true"
-        else
-          state="push_pending"
-          summary="ahead=${ahead} upstream=${upstream} defer=none"
-          push_urgency="immediate"
-          resync_required="true"
-        fi
+  upstream="$(git -C "$worktree" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)"
+  if [[ -z "$upstream" ]]; then
+    state="not_applicable"
+    summary="no_upstream"
+    upstream="none"
+  else
+    counts="$(git -C "$worktree" rev-list --left-right --count "HEAD...$upstream" 2>/dev/null || true)"
+    if [[ -n "$counts" ]]; then
+      ahead="$(printf '%s\n' "$counts" | awk '{print $1}')"
+      behind="$(printf '%s\n' "$counts" | awk '{print $2}')"
+    fi
+    [[ "$ahead" =~ ^[0-9]+$ ]] || ahead="0"
+    [[ "$behind" =~ ^[0-9]+$ ]] || behind="0"
+    if (( ahead > 0 )); then
+      if develop_push_defer_reason_is_valid "${DEVELOP_PUSH_DEFER_REASON:-}"; then
+        state="push_deferred"
+        summary="ahead=${ahead} upstream=${upstream} defer=${DEVELOP_PUSH_DEFER_REASON}"
       else
-        state="clean"
-        summary="ahead=0 upstream=${upstream}"
+        state="push_pending"
+        summary="ahead=${ahead} upstream=${upstream} defer=none"
+      fi
+    else
+      state="clean"
+      summary="ahead=0 upstream=${upstream}"
+    fi
+  fi
+
+  printf '%s|%s|%s|%s|%s\n' "$state" "$summary" "$upstream" "$ahead" "$behind"
+}
+
+develop_push_followthrough_snapshot() {
+  local worktree="$1"
+  local branch state summary push_urgency resync_required
+  local canonical_develop_worktree canonical_develop_state canonical_develop_summary canonical_develop_upstream canonical_develop_ahead canonical_develop_behind
+  branch="$(git -C "$worktree" branch --show-current 2>/dev/null || printf 'unknown')"
+  state="not_applicable"
+  summary="branch_not_develop"
+  push_urgency="none"
+  resync_required="false"
+
+  if [[ "$branch" == "develop" ]]; then
+    IFS='|' read -r state summary _ _ _ <<<"$(develop_push_followthrough_snapshot_for_develop_worktree "$worktree")"
+  else
+    canonical_develop_worktree="$(authoritative_develop_worktree "$worktree")"
+    if [[ -n "$canonical_develop_worktree" ]]; then
+      IFS='|' read -r canonical_develop_state canonical_develop_summary canonical_develop_upstream canonical_develop_ahead canonical_develop_behind <<<"$(develop_push_followthrough_snapshot_for_develop_worktree "$canonical_develop_worktree")"
+      if [[ "${canonical_develop_ahead:-0}" =~ ^[0-9]+$ ]] && (( canonical_develop_ahead > 0 )); then
+        resync_required="true"
+        summary="branch_not_develop canonical_develop_state=${canonical_develop_state} canonical_develop_ahead=${canonical_develop_ahead} canonical_develop_upstream=${canonical_develop_upstream}"
       fi
     fi
   fi
 
+  push_urgency="$(develop_push_followthrough_push_urgency_for_state "$state")"
   printf '%s|%s|%s|%s\n' "$state" "$summary" "$push_urgency" "$resync_required"
 }
 
@@ -211,7 +260,7 @@ for row in "${worktree_rows[@]}"; do
   IFS='|' read -r wt_path wt_branch dirty checkpoint_required changed_files supervisor ai phase issue desired_runtime_state role_hint exit_reason develop_push_state develop_push_summary develop_push_urgency develop_push_resync_required <<<"$row"
   printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-10s %-10s %-18s %-20s %s\n' \
     "$wt_path" "$wt_branch" "$dirty" "$checkpoint_required" "$changed_files" "$supervisor" "$ai" "$desired_runtime_state" "$role_hint" "$phase" "$develop_push_state" "$issue"
-  if [[ "$develop_push_state" != "not_applicable" ]]; then
+  if [[ "$develop_push_state" != "not_applicable" || "$develop_push_resync_required" == "true" ]]; then
     printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-10s %-10s %-18s %-20s %s\n' \
       "" "" "" "" "" "" "" "" "" "" "develop_push" "$develop_push_summary"
     printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-10s %-10s %-18s %-20s %s\n' \

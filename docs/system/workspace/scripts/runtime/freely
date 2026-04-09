@@ -11084,7 +11084,7 @@ cmd_fleet_status() {
       fi
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "continuity_gap" "" "reason=${manager_continuity_gap_reason:-unknown} expected=${manager_continuity_gap_expected:-none} latest_generated=${manager_continuity_gap_latest_generated:-none} prompt=${manager_continuity_gap_prompt_file:-none} age_secs=${manager_continuity_gap_age_secs:-none} age_state=${manager_continuity_gap_age_state:-none} writer=${continuity_gap_writer_state}"
     fi
-    if [[ "$develop_push_state" != "not_applicable" ]]; then
+    if [[ "$develop_push_state" != "not_applicable" || "$develop_push_resync_required" == "true" ]]; then
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "develop_push" "" "${develop_push_state} ${develop_push_summary}"
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "push_urgency" "" "${develop_push_urgency} resync_required=${develop_push_resync_required}"
     fi
