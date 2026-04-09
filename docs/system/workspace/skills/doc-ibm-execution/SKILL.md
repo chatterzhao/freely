@@ -36,7 +36,7 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
    - 默认先写 executable acceptance contract，而不是 wording review / truth-source reading checklist
    - 默认优先表达 focused regression、integration、real-environment、dogfood 这些行为验收面
    - 对第一阶段结构，至少固定四个章节：`Unit`、`Integration`、`End-to-End`、`Real-Environment`
-   - 四个章节必须都出现；不适用时不得省略，必须写 `not_applicable_reason` 与一句短解释
+   - 四个章节必须都出现；不适用时不得省略，必须写 `not_applicable_reason`、`not_applicable_explanation` 与 `replacement_evidence`
    - `not_applicable_reason` 只允许有限白名单：`change_not_touching_this_layer`、`no_executable_boundary_at_this_layer`、`protected_environment_only`、`human_observation_only`、`covered_by_more_realistic_required_surface`
    - 至少要能恢复 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
    - 最小 blocker taxonomy 至少区分：`definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`
@@ -52,7 +52,7 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
      - post-merge integration acceptance
      - post-merge application-native real-environment acceptance
      - post-merge end-to-end dogfood acceptance
-   - 若某类测试面不适用，显式写出不适用理由与替代证据，而不是省略
+   - 若某类测试面不适用，显式写出不适用理由、短解释与替代证据，而不是省略
    - 写清该环境只用于验证，不用于继续实现
    - 不要让后续 verification 只能靠口头解释或代码阅读来恢复验收标准
 9. 若文档已经足够驱动实现，按同一 gate 把 `phase_state` 切到 `done_ibm`，并返回最小实现上下文。
