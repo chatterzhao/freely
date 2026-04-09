@@ -2543,15 +2543,26 @@ routing_policy:
 ### candidate_issues
 
 1. `C-20260312-0011-E`
-- title: AI Team Control Surface and Multi-Worktree Visibility
+- title: AI Team Control Surface, Multi-Worktree Visibility, and Multi-Project Focus
 - milestone_state: candidate
 - phase_state: `in_pre_brainstorm`
 - priority: P0
 - promoted_issue_path: `pending://issue-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
-- next_action: 待 contract 边界初步冻结后进入 IBM，定义 day-1 control surface 的信息架构、worktree visibility 和 team timeline
-- revisit_trigger: 当需要设计控制面首页、多 worktree lanes 或团队态势视图时重新唤起
+- next_action: 待 contract 边界初步冻结后进入 IBM，定义 day-1 control surface 的信息架构、worktree visibility、team timeline，以及多项目 Focus/Overview / `activeProject` / 输入隔离 contract
+- revisit_trigger: 当需要设计控制面首页、多 worktree lanes、团队态势视图或多项目控制面时重新唤起
+
+2. `C-20260304-202`
+- title: 多项目 UI 隔离规则实现
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/candidates.md`
+- next_action: 与 control-surface 信息架构一起继续 pre-brainstorm，冻结多项目 Focus/Overview、`activeProject` 与项目级输入隔离 contract，再决定是否 materialize
+- revisit_trigger: 当 control-surface / multi-worktree 首页进入 IBM，或需要明确多项目并行开发的输入与状态隔离语义时重新唤起
 
 2. `C-20260312-0011-G`
 - title: Standalone Runtime Baseline Without OpenClaw
@@ -2934,18 +2945,7 @@ routing_policy:
 
 ### candidate_issues
 
-1. `C-20260304-202`
-- title: 多项目 UI 隔离规则实现
-- milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
-- priority: P1
-- promoted_issue_path: `pending://issue-materialization`
-- source_brainstorm: `docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/candidates.md`
-- next_action: 继续 pre-brainstorm，先判断 frontend probe 当前是否需要真正的多项目工作台，再决定是否 materialize
-- revisit_trigger: 当 frontend/control-surface 确认需要 `activeProject` 隔离、Focus/Overview 与项目级输入隔离 contract 时，重新进入 materialization 判断
-
-2. `C-20260317-1101`
+1. `C-20260317-1101`
 - title: Frontend Runtime Baseline for Probe
 - milestone_state: candidate
 - phase_state: `todo_ibm`
