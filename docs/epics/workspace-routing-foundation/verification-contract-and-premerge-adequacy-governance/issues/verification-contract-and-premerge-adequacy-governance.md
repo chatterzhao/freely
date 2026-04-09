@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260408-1205-A`
 - title: Verification contract and premerge adequacy governance
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `verification-contract-and-premerge-adequacy-governance`

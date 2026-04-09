@@ -1,6 +1,6 @@
 # Issue: cli-help-and-dry-run-contract-followthrough-governance
 
-- issue_id: `I-20260406-0408-A`
+- issue_id: `I-20260405-2358-D`
 - title: CLI help and dry-run contract followthrough governance
 - phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`

@@ -1,6 +1,6 @@
 # Progress: cli-help-and-dry-run-contract-followthrough-governance
 
-- issue_id: `I-20260406-0408-A`
+- issue_id: `I-20260405-2358-D`
 - issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
 - title: `CLI help and dry-run contract followthrough governance`
 - phase_state: `in_dev`

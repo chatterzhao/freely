@@ -7,7 +7,7 @@
 - status: `promoted`
 - milestone: `M-20260326-freely-product-architecture`
 - promoted_issue_path: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
-- promoted_issue_id: `I-20260406-1905-A`
+- promoted_issue_id: `I-20260405-2358-A`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -26,7 +26,7 @@
 - promotion_gate:
   - keep this owner scoped to fresh-project bootstrap, baseline scoping, and adjacent non-regression guards for project-targeted CLI surfaces
   - do not absorb runtime supervision churn or intake counter reconciliation here
-- next_action: This candidate is now materialized as `I-20260406-1905-A`. Keep the owner narrow: repair `sync-tooling` retargeting plus `.githooks` rematerialization, prove `baseline-status` / `status --view baseline` stay pinned to the target project, and keep `ensure-interruption-dispatch` as a non-regression guard rather than reopening runtime control-plane work.
+- next_action: This candidate is now materialized as `I-20260405-2358-A`. Keep the owner narrow: repair `sync-tooling` retargeting plus `.githooks` rematerialization, prove `baseline-status` / `status --view baseline` stay pinned to the target project, and keep `ensure-interruption-dispatch` as a non-regression guard rather than reopening runtime control-plane work.
 - revisit_trigger: fresh-project bootstrap still requires manual hook copying, `baseline-status` / `status` baseline scoping still drifts from the target project, or another project-targeted CLI command regresses the current doc-gate semantics.
 
 ## C-20260405-2358-B
@@ -92,7 +92,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
-- promoted_issue_id: `I-20260406-0408-A`
+- promoted_issue_id: `I-20260405-2358-D`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -110,5 +110,5 @@
 - promotion_gate:
   - keep this owner on command-surface ergonomics, help/usage/exit-code semantics, and ai dry-run contract alignment
   - do not absorb fresh-project bootstrap, runtime supervision, or generic executable-bit packaging work
-- next_action: This candidate is now materialized as `I-20260406-0408-A`. Keep the owner narrow: make the audited help paths explicit and side-effect free, pin their success/exit semantics with focused regressions, and make `ai switch codex --dry-run --format json` emit one stable machine-readable result without reopening runtime/auth lifecycle work.
+- next_action: This candidate is now materialized as `I-20260405-2358-D`. Keep the owner narrow: make the audited help paths explicit and side-effect free, pin their success/exit semantics with focused regressions, and make `ai switch codex --dry-run --format json` emit one stable machine-readable result without reopening runtime/auth lifecycle work.
 - revisit_trigger: canonical CLI replay still shows help invocations with side effects/non-zero-only usage paths, or `ai switch --dry-run` remains inconsistent with the saved-slot inventory.

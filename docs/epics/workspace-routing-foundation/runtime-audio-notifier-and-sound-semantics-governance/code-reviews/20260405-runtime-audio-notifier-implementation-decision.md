@@ -1,5 +1,10 @@
 # Implementation Decision: runtime-audio-notifier-and-sound-semantics-governance
 
+- issue_id: `I-20260405-1215-A`
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
+
+## Implementation Decision Note
+
 - decision: `Freeze the first standard audio path as canonical AudioCueRequested events emitted by the Tauri bridge and consumed by a frontend-native notifier with bundled audio assets.`
 - why_this:
   - `watchdog` already owns supervision and recovery evidence; making it play sound would widen owner scope and re-couple supervision with presentation.

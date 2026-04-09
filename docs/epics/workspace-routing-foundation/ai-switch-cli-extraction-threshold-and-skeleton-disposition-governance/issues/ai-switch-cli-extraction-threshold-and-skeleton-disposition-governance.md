@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance`
@@ -90,7 +90,7 @@ Freely 已经在当前 Codex owner 中冻结了长期方向: tool auth/switch/pr
 
 ## Next
 
-- 当前 owner 已到 `done_ibm`。
+- 当前 owner 已到 `in_verification`。
 - 除非 `I-20260405-0027-A` 的 verified contract 被推翻，或第二工具快速达到同等级 verified maturity，否则不应新开 extraction implementation lane。
 - 当后续 owner 真正启动时，第一步只允许：
   - 选择 `rename_in_place` 或 `fresh_repo`
