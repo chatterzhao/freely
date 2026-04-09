@@ -24,9 +24,9 @@
 ## Develop Absorption
 
 - canonical_merge_target: `develop`
-- canonical_merge_commit: `pending://develop-merge`
-- protected_push_result: `pending://origin-develop-push`
-- fleet_retirement_result: `pending://obsolete-research-worktree-retirement`
+- canonical_merge_commit: `76d6b160`
+- protected_push_result: `pass://origin/develop-fast-forwarded`
+- fleet_retirement_result: `pass://obsolete-research-worktree-retired`
 
 ## Implementation Decision Note
 

@@ -50,18 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260409-1715-A`
-- title: Runtime evidence provenance research retirement followthrough governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-evidence-provenance-research-retirement-followthrough-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260409-1715--runtime-evidence-provenance-research-retirement-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260409-1715--runtime-evidence-provenance-research-retirement-followthrough/candidates.md`
-- next_action: Replay the guarded merge chain with this owner in place, push canonical `develop`, then retire the obsolete research worktree and branch.
-- revisit_trigger: Re-open only if canonical develop later proves the dropped packet still leaves a real bounded owner gap instead of a pure closure problem.
-
 1. `I-20260408-1200-A`
 - title: Develop push followthrough escalation governance
 - milestone_state: committed
@@ -450,6 +438,26 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+1. `I-20260409-1715-A`
+- title: Runtime evidence provenance research retirement followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260409-1715--runtime-evidence-provenance-research-retirement-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260409-1715--runtime-evidence-provenance-research-retirement-followthrough/candidates.md`
+- evidence:
+  - `develop` merge `76d6b160`
+  - `docs/progress/workspace-routing-foundation/p-runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`
+  - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-feature-runtime-evidence-provenance-research-retirement --issue docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+  - `git diff --check`
+  - `./bin/governance-check`
+  - `git push origin develop`
+  - `git worktree list --porcelain`
+- completion_note: `Canonical develop now carries the narrow followthrough owner that lawfully closes the dropped runtime evidence provenance research packet and records obsolete-worktree retirement without reopening the mixed-owner packet.`
+
 1. `I-20260408-1205-A`
 - title: Verification contract and premerge adequacy governance
 - milestone_state: completed
