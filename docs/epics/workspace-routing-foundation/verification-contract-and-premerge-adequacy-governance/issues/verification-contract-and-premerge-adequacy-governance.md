@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260408-1205-A`
 - title: Verification contract and premerge adequacy governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `verification-contract-and-premerge-adequacy-governance`
@@ -105,7 +105,28 @@ Freely 现在已经有测试真源，但没有形成闭环：
 
 ## Next
 
-1. 先在 IBM 真源里固定 verification metadata、item schema 与 gate diagnostic taxonomy。
-2. 同时把 `pre-tests.md` 的四章强制结构与有限 `not_applicable_reason` 白名单收进 skill / checklist / quality bar。
-3. dev-loop 时按实现耦合度决定是单 lane 落地，还是拆成 handoff-contract 和 gate-consumption 两个 lane。
-4. 不要 reopen 已完成的 lane-routing / completion-gate owner；本 issue 只承接它们之间尚未闭环的 adequacy consumption。
+1. next_action: `completed`
+2. revisit_trigger: 若后续发现 manager handoff、worker recovery、或 develop-bound adequacy gate 仍出现“contract 已写但 runtime state / review 无法恢复”的漏口，再开 follow-on issue 继续收紧 launch 恢复与 merge followthrough。
+
+## Completion
+
+- `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+- `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
+- `docs/progress/workspace-routing-foundation/p-verification-contract-and-premerge-adequacy-governance.md`
+- `docs/system/workspace/agents/manager-agent.md`
+- `docs/system/workspace/agents/worker-agent.md`
+- `docs/system/workspace/scripts/start-lead-agent.sh`
+- `docs/system/workspace/scripts/runtime/freely`
+- `docs/system/workspace/scripts/quality/pretests-gate`
+- `docs/system/workspace/scripts/tests/test-freely-worker-prompt-verification-metadata`
+- `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-natural-language-prompt`
+- `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+- `docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+
+## Verification
+
+- `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-verification-metadata`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-natural-language-prompt`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+- `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+- `./bin/governance-check`
