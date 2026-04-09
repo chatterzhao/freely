@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260409-1715-A`
 - title: Runtime evidence provenance research retirement followthrough governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-evidence-provenance-research-retirement-followthrough-governance`
@@ -60,5 +60,14 @@ Because `develop` push lawfully rejects candidate-only retirement evidence, this
 
 ## Next
 
-- Push the guarded merge to `origin/develop`, then retire the obsolete research worktree and branch.
-- Any future real cross-owner absorption gap must reopen as a new bounded candidate from current canonical develop rather than reviving this closeout owner.
+1. next_action: `completed`
+2. revisit_trigger: Any future real cross-owner absorption gap must reopen as a new bounded candidate from current canonical develop rather than reviving this closeout owner.
+
+## Completion
+
+- `docs/milestones.md`
+- `docs/pre-brainstorms/20260407-0603--runtime-evidence-provenance-and-canonical-absorption-gate/candidates.md`
+- `docs/pre-brainstorms/20260409-1715--runtime-evidence-provenance-research-retirement-followthrough/candidates.md`
+- `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- `docs/progress/workspace-routing-foundation/p-runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`
