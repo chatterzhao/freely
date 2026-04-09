@@ -39,6 +39,7 @@ IMPLEMENTATION_PATH_FILES = {
     "vite.config.ts",
     "vite.config.js",
 }
+PRETESTS_GATE_BIN = os.path.join(ROOT_DIR, "bin", "pretests-gate")
 
 
 def git(*args: str) -> str:
@@ -170,6 +171,10 @@ class ReviewRecord:
 
 def relative_path(path: str) -> str:
     return os.path.relpath(path, ROOT_DIR)
+
+
+def is_test_premerge_branch(branch: Optional[str]) -> bool:
+    return bool(branch) and branch.startswith("test-pre-merge-")
 
 
 def staged_path_exists(rel_path: Optional[str]) -> bool:
@@ -510,6 +515,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Develop-merge governance gate for C/M/I materialization.")
     parser.add_argument("--staged", action="store_true", help="Validate the staged merge result.")
     parser.add_argument("--range", help="Validate changed governance artifacts in the given git revision range.")
+    parser.add_argument("--target-branch", default="develop", help="Target branch for the guarded merge or push.")
+    parser.add_argument("--source-branch", default="", help="Source branch for guarded merge verification.")
     args = parser.parse_args()
     USE_STAGED_VIEW = bool(args.staged)
 
@@ -1022,6 +1029,42 @@ def main() -> int:
                 f"{first_review.path} is the staged review artifact for {owner_issue.issue_id or owner_issue.path}, but its implementation decision note is incomplete. "
                 f"Missing fields: {', '.join(missing_fields)}."
             )
+
+    if (
+        args.target_branch == "develop"
+        and is_test_premerge_branch(args.source_branch)
+        and capability_changed_paths
+        and issue_bound_issue_paths
+    ):
+        if not os.path.exists(PRETESTS_GATE_BIN):
+            errors.append(
+                f"test-pre-merge promote from {args.source_branch} requires {relative_path(PRETESTS_GATE_BIN)}, but that gate is unavailable."
+            )
+        else:
+            for owner_issue_path in sorted(issue_bound_issue_paths):
+                result = subprocess.run(
+                    [PRETESTS_GATE_BIN, "--project", ROOT_DIR, "--issue", owner_issue_path],
+                    cwd=ROOT_DIR,
+                    text=True,
+                    capture_output=True,
+                )
+                if result.returncode == 0:
+                    continue
+                output_lines = [
+                    line.strip()
+                    for line in f"{result.stdout}\n{result.stderr}".splitlines()
+                    if line.strip()
+                ]
+                errors.append(
+                    f"{owner_issue_path}: owner issue pre-tests are not adequate for guarded promote from {args.source_branch}."
+                )
+                for line in output_lines:
+                    if line.startswith("[pretests-gate]"):
+                        continue
+                    if line.startswith("- "):
+                        errors.append(line[2:].strip())
+                    else:
+                        errors.append(line)
 
     if milestones_changed:
         for entry in milestones:

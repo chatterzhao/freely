@@ -48,6 +48,7 @@
    - 目标角色
    - dispatch metadata：`dispatch_priority`、`parallel_safe`、`write_scope`
    - ownership metadata：`intent_kind`、`intent_target`
+   - verification metadata：`Owner-Issue`、`Pre-Tests-Path`、`Verification-Artifact-Dir`、`Required-Test-Lanes`、`Required-Acceptance-Item-Ids`、`Minimum-Evidence-Level`、`Target-Environment`、`Closeout-Gate`
    - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
    - 一旦 `ownership + restart_point + next_action` 已经稳定，优先产出具体 worker handoff；不要继续停留在 manager-only patrol
    - completion / verification / cleanup 的最终裁决仍留在主管；worker 只负责带回 evidence，不负责宣布 terminal completion
@@ -85,11 +86,13 @@
    - queued worker list / current launch blockers
    - 下一轮监督优先级
    - 若存在 delegated manager continuation handoff，还要保证 runtime 至少留下：
-     - handoff generated
-     - handoff consumed into prompt
-     - handoff still pending after failure boundary
+   - handoff generated
+   - handoff consumed into prompt
+   - handoff still pending after failure boundary
    - 若本轮已生成新的 worker prompt set，还要保证 watchdog/runtime 后续能以最新 continuity 为基准继续消费，而不是停留在旧 consumed snapshot
    - 每个 worker prompt 除了任务正文外，还必须包含 machine-readable `Worktree:` 与 `Branch:` header；runtime worker launch 依赖这两个 header（或其兼容句式）解析目标工位
+   - 若当前 lane 带 verification 义务，worker prompt 还必须显式携带：`Owner-Issue`、`Pre-Tests-Path`、`Verification-Artifact-Dir`、`Required-Test-Lanes`、`Required-Acceptance-Item-Ids`、`Minimum-Evidence-Level`、`Target-Environment`、`Closeout-Gate`
+   - `Required-Test-Lanes` / `Required-Acceptance-Item-Ids` 不得只写“见 issue”；必须在 prompt 内给出 machine-readable 列表，便于 runtime / review / merge gate 恢复本轮最低测试义务
    - `Worktree:` header 只是输入锚点，不是最终 ownership 判重键；凡是进入 `write_scope`、`intent_target`、queue/freeze 或 recovery 比较的 worktree 路径，都必须先 canonicalize 成真实路径（例如 `pwd -P` / runtime normalized path）
    - 对会产生 mutate authority 的 lane，还必须写出 `intent_kind` 与 `intent_target`；`inspect-anywhere` 合法，但 `mutate-only-with-lease`
 13. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff / 这轮哪些该 cleanup”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff` 之一。

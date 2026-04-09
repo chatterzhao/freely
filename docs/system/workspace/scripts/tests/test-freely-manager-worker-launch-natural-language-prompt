@@ -73,6 +73,24 @@ dispatch_priority: P0
 parallel_safe: false
 write_scope:
 - docs/pre-brainstorms/20260322-0000--sample/**
+Owner-Issue:
+- \`I-20260322-0000-A\`
+Pre-Tests-Path:
+- \`docs/epics/sample/story/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`docs/epics/sample/story/code-reviews\`
+Required-Test-Lanes:
+- \`feature-local\`
+- \`premerge-integration\`
+Required-Acceptance-Item-Ids:
+- \`integration-cli-smoke\`
+- \`realenv-dogfood\`
+Minimum-Evidence-Level:
+- \`command-plus-artifact\`
+Target-Environment:
+- \`test-pre-merge-sample\`
+Closeout-Gate:
+- \`pretests-gate --require-adequacy\`
 
 You are the worker for \`feature/test-worker\` in \`$WORKER_WT\`.
 
@@ -119,5 +137,13 @@ grep -q "$WORKER_WT" "$START_LOG"
 grep -q '^DESIRED_RUNTIME_STATE="running"$' "$WORKER_WT/.freely/run/workcell-state.env"
 grep -q "^LAST_MANAGER_CONTINUITY_CONSUMED=\"$CONT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
 grep -q "^LAST_MANAGER_WORKER_PROMPTS_CONSUMED=\"$PROMPT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "$(worker_prompt_owner_issue "$PROMPT_FILE")" == "I-20260322-0000-A" ]]
+[[ "$(worker_prompt_pre_tests_path "$PROMPT_FILE")" == "docs/epics/sample/story/pre-tests.md" ]]
+[[ "$(worker_prompt_verification_artifact_dir "$PROMPT_FILE")" == "docs/epics/sample/story/code-reviews" ]]
+[[ "$(worker_prompt_required_test_lanes_csv "$PROMPT_FILE")" == "feature-local,premerge-integration" ]]
+[[ "$(worker_prompt_required_acceptance_item_ids_csv "$PROMPT_FILE")" == "integration-cli-smoke,realenv-dogfood" ]]
+[[ "$(worker_prompt_minimum_evidence_level "$PROMPT_FILE")" == "command-plus-artifact" ]]
+[[ "$(worker_prompt_target_environment "$PROMPT_FILE")" == "test-pre-merge-sample" ]]
+[[ "$(worker_prompt_closeout_gate "$PROMPT_FILE")" == "pretests-gate --require-adequacy" ]]
 
 echo "[PASS] manager launch linkage accepts natural-language worker prompt contract"

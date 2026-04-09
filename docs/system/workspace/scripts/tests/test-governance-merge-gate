@@ -14,8 +14,14 @@ git config user.name tester
 git config user.email tester@example.com
 
 cp "$ROOT_DIR/bin/governance-merge-gate" "$REPO/bin/governance-merge-gate"
+cp "$ROOT_DIR/bin/pretests-gate" "$REPO/bin/pretests-gate"
 cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-merge-gate" "$REPO/docs/system/workspace/scripts/quality/governance-merge-gate"
-chmod +x "$REPO/bin/governance-merge-gate" "$REPO/docs/system/workspace/scripts/quality/governance-merge-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/pretests-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
+chmod +x \
+  "$REPO/bin/governance-merge-gate" \
+  "$REPO/bin/pretests-gate" \
+  "$REPO/docs/system/workspace/scripts/quality/governance-merge-gate" \
+  "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
 
 mkdir -p "$REPO/docs"
 cat > "$REPO/docs/milestones.md" <<'EOF'
@@ -56,11 +62,39 @@ cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
 - phase_state: `in_dev`
 - milestone: `M-sample`
 - source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
 - verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+mkdir -p "$REPO/docs/epics/sample/story"
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+1. Record the unit surface that must remain stable.
+
+## Integration
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on integration adequacy.`
+
+## Real-Environment
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- evidence_level: `integration`
+- status: `pending`
+- artifact_ref: `pending://integration-sample`
 EOF
 
 echo base > README.md
-git add README.md docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md bin/governance-merge-gate docs/system/workspace/scripts/quality/governance-merge-gate
+git add README.md docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/pre-tests.md bin/governance-merge-gate bin/pretests-gate docs/system/workspace/scripts/quality/governance-merge-gate docs/system/workspace/scripts/quality/pretests-gate
 git commit -q -m "init"
 
 mkdir -p "$REPO/src"
@@ -1049,5 +1083,99 @@ rm -f \
   "$REPO/src/staged-view.js"
 "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout17" 2>"$TMP_DIR/stderr17"
 grep -q 'passed' "$TMP_DIR/stdout17"
+git reset -q HEAD \
+  docs/milestones.md \
+  docs/pre-brainstorms/staged-view/candidates.md \
+  docs/epics/staged/view/issues/staged-view.md \
+  docs/epics/staged/view/code-reviews/20260402-staged-view-verification.md \
+  docs/progress/staged/p-staged-view.md \
+  src/staged-view.js
+git checkout -q -- docs/milestones.md
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+mkdir -p "$REPO/docs/progress/sample" "$REPO/docs/epics/sample/story/code-reviews"
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_verification`
+EOF
+cat > "$REPO/docs/epics/sample/story/code-reviews/r-premerge.md" <<'EOF'
+# Review: sample
+
+- issue_id: `I-20260327-2205-A`
+
+## Implementation Decision Note
+
+- decision: `Require owner pre-tests adequacy before test-pre-merge batches can promote into develop.`
+- why_this: `Promotion should fail with actionable verification diagnostics instead of relying on manual review.`
+- alternatives_considered: `Trust the batch name alone.`
+- boundary_non_goals: `This fixture does not replace the existing owner/materialization gate.`
+- residual_risk: `Post-merge followthrough still needs its own closeout lane.`
+EOF
+cat > "$REPO/src/premerge-adequacy.js" <<'EOF'
+console.log('premerge adequacy');
+EOF
+git add \
+  docs/pre-brainstorms/sample/candidates.md \
+  docs/epics/sample/story/issues/sample.md \
+  docs/progress/sample/p-sample.md \
+  docs/epics/sample/story/code-reviews/r-premerge.md \
+  src/premerge-adequacy.js
+if "$REPO/bin/governance-merge-gate" --staged --target-branch develop --source-branch test-pre-merge-20260408-sample >"$TMP_DIR/stdout18" 2>"$TMP_DIR/stderr18"; then
+  echo "[FAIL] governance-merge-gate should reject test-pre-merge promotes whose owner pre-tests are still pending" >&2
+  exit 1
+fi
+grep -q 'owner issue pre-tests are not adequate' "$TMP_DIR/stdout18"
+grep -q '\[execution_missing\]' "$TMP_DIR/stdout18"
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+1. Record the unit surface that must remain stable.
+
+## Integration
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on integration adequacy.`
+
+## Real-Environment
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+EOF
+git add docs/epics/sample/story/pre-tests.md
+"$REPO/bin/governance-merge-gate" --staged --target-branch develop --source-branch test-pre-merge-20260408-sample >"$TMP_DIR/stdout18b" 2>"$TMP_DIR/stderr18b"
+grep -q 'passed' "$TMP_DIR/stdout18b"
 
 echo "[PASS] governance-merge-gate enforces candidate-driven lifecycle evidence"

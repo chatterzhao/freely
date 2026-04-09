@@ -35,13 +35,20 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 8. `pre-tests.md` 不是附属清单，而是 issue-level acceptance 的主控制面：
    - 默认先写 executable acceptance contract，而不是 wording review / truth-source reading checklist
    - 默认优先表达 focused regression、integration、real-environment、dogfood 这些行为验收面
+   - 对第一阶段结构，至少固定四个章节：`Unit`、`Integration`、`End-to-End`、`Real-Environment`
+   - 四个章节必须都出现；不适用时不得省略，必须写 `not_applicable_reason` 与一句短解释
+   - `not_applicable_reason` 只允许有限白名单：`change_not_touching_this_layer`、`no_executable_boundary_at_this_layer`、`protected_environment_only`、`human_observation_only`、`covered_by_more_realistic_required_surface`
    - 至少要能恢复 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
    - 最小 blocker taxonomy 至少区分：`definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`
    - 若存在 merge 后才能验证的能力，显式标记 `post-merge acceptance`
    - 并明确目标验证环境：`develop` 或某个 `test-pre-merge-*` 批次
    - 对每个关键 acceptance 面，写出最小 `environment`、`evidence`、`failure signal`、`failure handling / replay expectation`
    - 对 Freely 自治能力，默认回答：
+     - unit
      - pre-merge focused regression / smoke
+     - integration
+     - end-to-end
+     - real-environment
      - post-merge integration acceptance
      - post-merge application-native real-environment acceptance
      - post-merge end-to-end dogfood acceptance
