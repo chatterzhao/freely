@@ -98,6 +98,17 @@ routing_policy:
 - next_action: Keep this as a bounded repair lane: add a project-local concurrent-start guard so one project cannot materialize multiple supervisors, and align `status` / `fleet-status` generated continuity/prompt truth with the latest valid continuity on disk without faking consumption.
 - revisit_trigger: Revisit only if the bounded lock/read-path fix proves insufficient and the defect actually belongs to broader worker recovery or provenance governance.
 
+1. `C-20260408-1205-A`
+- title: Freeze verification handoff contract and premerge adequacy derivation for Freely-owned work
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/candidates.md`
+- next_action: Decide whether to materialize first as one verification-governance owner or split between handoff-contract and premerge-adequacy owners; keep the first slice on docs/prompt contract before broader automation.
+- revisit_trigger: Revisit when another `test-pre-merge-*` round cannot justify why its command set was sufficient, or when dogfood exposes a bug that should have been explicitly derived into earlier acceptance verification.
+
 1. `C-20260407-1042-A`
 - title: External issue identity, mapping, and publication model after source-family contraction
 - milestone_state: candidate
