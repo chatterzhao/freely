@@ -1,5 +1,10 @@
 # Implementation Decision: runtime-blocked-intake-and-continuity-truth-governance
 
+- issue_id: `I-20260404-1545-A`
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+
+## Implementation Decision Note
+
 - decision: `Materialize prompt-visible blocked supervision by reusing delegated-continuation intake semantics plus a blocked resolution artifact, instead of introducing a brand-new intake lifecycle.`
 - why_this:
   - The owner boundary only required truthful writeback after prompt visibility, not a generic runtime-state redesign.

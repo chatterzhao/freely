@@ -1,6 +1,6 @@
 # Progress: runtime-blocked-intake-and-continuity-truth-governance
 
-- issue_id: `I-20260405-2136-A`
+- issue_id: `I-20260404-1545-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 - title: `Runtime blocked intake and continuity truth governance`
 - phase_state: `completed`
