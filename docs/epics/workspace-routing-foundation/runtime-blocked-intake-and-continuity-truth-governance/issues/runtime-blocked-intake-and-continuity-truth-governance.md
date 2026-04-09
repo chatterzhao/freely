@@ -1,6 +1,6 @@
 # Issue: runtime-blocked-intake-and-continuity-truth-governance
 
-- issue_id: `I-20260405-2136-A`
+- issue_id: `I-20260404-1545-A`
 - title: Runtime blocked intake and continuity truth governance
 - phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
@@ -109,7 +109,7 @@ Freely 现在已经分别具备：
 ## IBM Handoff
 
 - implementation_scope_summary:
-  - `I-20260405-2136-A` 负责冻结 runtime blocked supervision truth：当 prompt 可见但 intake claim / continuity materialization 没有前进时，系统应该如何 machine-readably 表达 blocked state。
+  - `I-20260404-1545-A` 负责冻结 runtime blocked supervision truth：当 prompt 可见但 intake claim / continuity materialization 没有前进时，系统应该如何 machine-readably 表达 blocked state。
   - follow-on implementation 允许同步更新 runtime status surface、blocked artifact writeback、以及 focused regressions。
   - generic network retry/cooldown policy、semantic-loop automation、worker stall recovery、GitHub issue automation 仍留在各自 owner。
 - required_doc_refs:

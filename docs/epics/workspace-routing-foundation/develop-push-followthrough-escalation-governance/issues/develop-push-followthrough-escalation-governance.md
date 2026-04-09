@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260408-1200-A`
 - title: Develop push followthrough escalation governance
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `develop-push-followthrough-escalation-governance`

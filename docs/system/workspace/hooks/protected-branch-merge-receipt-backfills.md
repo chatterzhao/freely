@@ -165,3 +165,14 @@
 - evidence_refs:
   - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
   - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260405-worktree-tool-boundary-bootstrap-canonical-closeout-verification.md`
+
+## Receipt Gap: 63c9e509e9b2cb5ba99969622527a560d02f56cc
+
+- target_branch: `test-pre-merge-20260408-verification-and-develop-push`
+- source_branch: `feature/develop-push-followthrough-escalation-20260408-1200`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260408-1200-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+  - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`

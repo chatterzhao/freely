@@ -53,7 +53,7 @@ routing_policy:
 1. `I-20260408-1205-A`
 - title: Verification contract and premerge adequacy governance
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/brainstorms.md`
@@ -63,7 +63,7 @@ routing_policy:
 1. `I-20260408-1200-A`
 - title: Develop push followthrough escalation governance
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260408-1200--develop-push-followthrough-escalation/brainstorms.md`
@@ -86,7 +86,7 @@ routing_policy:
 3. `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
@@ -94,7 +94,7 @@ routing_policy:
 - next_action: Keep this owner parked as the canonical IBM handoff for standalone extraction timing. Do not open an extraction worktree until the Codex-first owner is merged and a concrete follow-on lane can prove the extraction-start checklist is satisfied.
 - revisit_trigger: Re-open only if the Codex-first owner is reopened and invalidates the threshold/boundary package, or if a second tool reaches verified parity quickly enough to change the extraction economics.
 
-2. `I-20260406-0408-A`
+2. `I-20260405-2358-D`
 - title: CLI help and dry-run contract followthrough governance
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -346,7 +346,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260404-1545--runtime-websocket-permission-denied-recovery-governance/candidates.md`
-- next_action: Candidate mirror only. `I-20260405-2136-A` is now the canonical owner for prompt-visible-but-unclaimed runtime supervision; use the issue package for blocked intake / continuity truth and keep this candidate only as the discovery mirror.
+- next_action: Candidate mirror only. `I-20260404-1545-A` is now the canonical owner for prompt-visible-but-unclaimed runtime supervision; use the issue package for blocked intake / continuity truth and keep this candidate only as the discovery mirror.
 - revisit_trigger: Revisit only if canonical `develop` proves the blocked supervision family belongs entirely inside an existing owner, or if the same prompt-visible-but-unclaimed evidence disappears without needing a dedicated lifecycle.
 
 8. `C-20260404-2148-A`
@@ -400,7 +400,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md`
-- next_action: Candidate mirror only. `I-20260405-1415-A` is authoritative and now parked at `done_ibm`; use the committed owner as the canonical handoff package when a future extraction lane is justified.
+- next_action: Candidate mirror only. `I-20260405-1415-A` is authoritative and now parked at `in_verification`; use the committed owner as the canonical handoff package when a future extraction lane is justified.
 - revisit_trigger: Revisit once the Codex-first lane is merged or once a second tool reaches verified backend-worthy maturity.
 
 13. `C-20260405-2358-C`
@@ -433,7 +433,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
-- next_action: Candidate mirror only. `I-20260406-0408-A` is now the canonical owner for audited help/usage contracts and bounded `ai switch --dry-run` result alignment.
+- next_action: Candidate mirror only. `I-20260405-2358-D` is now the canonical owner for audited help/usage contracts and bounded `ai switch --dry-run` result alignment.
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
@@ -579,7 +579,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-canonical-closeout-verification.md`
 - completion_note: `Canonical develop has already absorbed the bounded wrapper packaging and regression-surface repair, so this owner belongs only in completed_issues.`
 
-4. `I-20260405-2136-A`
+4. `I-20260404-1545-A`
 - title: Runtime blocked intake and continuity truth governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -2618,7 +2618,7 @@ routing_policy:
 1. `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - progress_path: `docs/progress/freely-product-architecture/p-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
@@ -2628,7 +2628,7 @@ routing_policy:
 
 ### completed_issues
 
-1. `I-20260406-1905-A`
+1. `I-20260405-2358-A`
 - title: Fresh-project bootstrap and baseline scoping followthrough governance
 - milestone_state: completed
 - phase_state: `completed`
@@ -2862,7 +2862,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
-- next_action: This candidate is now materialized as `I-20260406-1905-A`. Keep the owner narrow: repair `sync-tooling` retargeting plus `.githooks` rematerialization, prove `baseline-status` / `status --view baseline` stay pinned to the target project, and keep `ensure-interruption-dispatch` as a non-regression guard rather than reopening runtime control-plane work.
+- next_action: This candidate is now materialized as `I-20260405-2358-A`. Keep the owner narrow: repair `sync-tooling` retargeting plus `.githooks` rematerialization, prove `baseline-status` / `status --view baseline` stay pinned to the target project, and keep `ensure-interruption-dispatch` as a non-regression guard rather than reopening runtime control-plane work.
 - revisit_trigger: Revisit if fresh-project bootstrap still requires manual `.githooks` copying, baseline/status scoping still drifts from the target project, or another project-targeted CLI command regresses the current doc-gate semantics.
 
 - none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.
