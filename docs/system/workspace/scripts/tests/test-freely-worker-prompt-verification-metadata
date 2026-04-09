@@ -62,5 +62,7 @@ source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 [[ "$(worker_prompt_minimum_evidence_level "$PROMPT")" == "artifact-plus-human-observation" ]]
 [[ "$(worker_prompt_target_environment "$PROMPT")" == "develop" ]]
 [[ "$(worker_prompt_closeout_gate "$PROMPT")" == "owner-issue verification closeout" ]]
+worker_prompt_has_verification_metadata "$PROMPT"
+[[ -z "$(worker_prompt_verification_metadata_missing_fields_csv "$PROMPT")" ]]
 
 echo "[PASS] worker prompt parser reads verification metadata contract"

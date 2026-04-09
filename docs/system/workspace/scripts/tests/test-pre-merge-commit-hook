@@ -113,18 +113,40 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 # Pre-Tests: sample
 
 ## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/runtime-only-change`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
 1. Record the unit surface that must remain stable.
 
 ## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
 1. Run the premerge integration path before promotion.
 
 ## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
 - not_applicable_reason: `covered_by_more_realistic_required_surface`
 - not_applicable_explanation: `This fixture keeps the hook focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
 
 ## Real-Environment
+- acceptance target: `Reserve protected real-environment followthrough for post-merge validation.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `post-merge protected verification`
+- blocker taxonomy: `definition_missing`
 - not_applicable_reason: `protected_environment_only`
 - not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+- replacement_evidence: `Protected-branch followthrough after develop merge records the real-environment result.`
 
 ## Acceptance Items
 
@@ -368,18 +390,40 @@ cat > docs/epics/sample/story/pre-tests.md <<'EOF'
 # Pre-Tests: sample
 
 ## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
 1. Record the unit surface that must remain stable.
 
 ## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
 1. Run the premerge integration path before promotion.
 
 ## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
 - not_applicable_reason: `covered_by_more_realistic_required_surface`
 - not_applicable_explanation: `This fixture keeps the hook focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
 
 ## Real-Environment
+- acceptance target: `Reserve protected real-environment followthrough for post-merge validation.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `post-merge protected verification`
+- blocker taxonomy: `definition_missing`
 - not_applicable_reason: `protected_environment_only`
 - not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+- replacement_evidence: `Protected-branch followthrough after develop merge records the real-environment result.`
 
 ## Acceptance Items
 
@@ -400,5 +444,67 @@ FREELY_GUARDED_MERGE_COMPLETION=1 .githooks/pre-merge-commit >"$TMP_DIR/premerge
 FREELY_GUARDED_MERGE_COMPLETION=1 git commit -q --no-edit
 git merge-base --is-ancestor test-pre-merge-verification-batch develop
 rm -f "$REPO/.git/freely-guarded-merge-state"
+
+git checkout -q test-pre-merge-verification-batch
+cat > docs/epics/sample/story/pre-tests.md <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the hook focused on integration adequacy.`
+
+## Real-Environment
+- acceptance target: `Reserve protected real-environment followthrough for post-merge validation.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `post-merge protected verification`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+- replacement_evidence: `Protected-branch followthrough after develop merge records the real-environment result.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+EOF
+git add docs/epics/sample/story/pre-tests.md
+git commit -q -m "drop replacement evidence"
+set +e
+./bin/pretests-gate --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/pretests-standalone-stdout" 2>"$TMP_DIR/pretests-standalone-stderr"
+pretests_cmd_rc=$?
+set -e
+if [[ "$pretests_cmd_rc" -eq 0 ]]; then
+  echo "[FAIL] pretests-gate should reject not_applicable sections without replacement evidence" >&2
+  exit 1
+fi
+cat "$TMP_DIR/pretests-standalone-stdout" "$TMP_DIR/pretests-standalone-stderr" >"$TMP_DIR/pretests-standalone-output"
+grep -q "\[verification_state_missing\]" "$TMP_DIR/pretests-standalone-output"
+grep -q "missing replacement_evidence" "$TMP_DIR/pretests-standalone-output"
 
 echo "[PASS] pre-merge-commit hook enforces guarded develop entrypoint, governance materialization, duplicate promotion ownership, and test-pre-merge adequacy"
