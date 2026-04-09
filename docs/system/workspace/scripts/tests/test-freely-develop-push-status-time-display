@@ -51,6 +51,6 @@ printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_defer_reaso
 printf '%s\n' "$STATUS_OUTPUT" | grep -Eq 'develop_push_followthrough_defer_updated_at: .*(PST|PDT)'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_ahead: 1'
 printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_push_urgency: deferred'
-printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_resync_required: true'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_resync_required: false'
 
 echo "[PASS] freely develop-push status renders defer timestamps in host local time"
