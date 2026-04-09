@@ -1033,9 +1033,12 @@ def main() -> int:
     if (
         args.target_branch == "develop"
         and is_test_premerge_branch(args.source_branch)
-        and capability_changed_paths
         and issue_bound_issue_paths
     ):
+        # test-pre-merge -> develop is itself a guarded promotion surface.
+        # Once the merge binds to an owner issue, consume that owner's pre-tests
+        # contract even for governance/status-only closeout diffs so develop
+        # cannot accept "completed/verified" truth that lacks adequate evidence.
         if not os.path.exists(PRETESTS_GATE_BIN):
             errors.append(
                 f"test-pre-merge promote from {args.source_branch} requires {relative_path(PRETESTS_GATE_BIN)}, but that gate is unavailable."

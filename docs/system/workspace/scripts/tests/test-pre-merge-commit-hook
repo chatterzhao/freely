@@ -368,15 +368,14 @@ cat > docs/epics/sample/story/code-reviews/r-premerge.md <<'EOF'
 - boundary_non_goals: `This fixture does not replace the existing owner/materialization gate.`
 - residual_risk: `Post-merge followthrough still needs its own closeout lane.`
 EOF
-echo "console.log('premerge adequacy');" > src/premerge-adequacy.js
-git add docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md docs/epics/sample/story/code-reviews/r-premerge.md src/premerge-adequacy.js
-git commit -q -m "premerge verification payload"
+git add docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md docs/epics/sample/story/code-reviews/r-premerge.md
+git commit -q -m "premerge governance closeout payload"
 
 git checkout -q develop
 git merge --no-commit --no-ff test-pre-merge-verification-batch >/dev/null 2>&1
 write_guarded_state develop test-pre-merge-verification-batch
 if FREELY_GUARDED_MERGE_COMPLETION=1 .githooks/pre-merge-commit >"$TMP_DIR/premerge-adequacy-stdout" 2>"$TMP_DIR/premerge-adequacy-stderr"; then
-  echo "[FAIL] pre-merge-commit hook should block test-pre-merge promote when owner pre-tests remain pending" >&2
+  echo "[FAIL] pre-merge-commit hook should block docs-only test-pre-merge closeout promote when owner pre-tests remain pending" >&2
   exit 1
 fi
 cat "$TMP_DIR/premerge-adequacy-stdout" "$TMP_DIR/premerge-adequacy-stderr" >"$TMP_DIR/premerge-adequacy-output"
