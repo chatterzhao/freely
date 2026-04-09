@@ -178,7 +178,50 @@ issue / `pre-tests.md` 仍是主真源；merge gate 与 handoff 只消费它的 
 - `governance-merge-gate` 继续管 owner / lifecycle / review artifact
 - 两者共享同一 owner set，不各自重新猜 issue
 
+### A1. gate 不是主执行者，而是最后兜底并给出可操作诊断
+
+更好的设计不是 gate 代替人设计测试，而是：
+
+1. manager / worker handoff 先把 issue-bound 测试义务讲清楚
+2. `pre-tests.md` 继续做唯一 acceptance 真源
+3. merge gate 只在 promote 出口兜底，并明确告诉执行者到底卡在哪一层
+
+最小诊断面应至少区分四类：
+
+1. `pre_tests_missing`
+   - `pre-tests.md` 没写，或未写出当前 issue 所需的测试任务 / acceptance items
+2. `testcase_derivation_missing`
+   - `tasks.md` / acceptance target 已写，但没有把它们派生成可执行、可 machine-read 的测试项
+3. `execution_missing`
+   - 测试项已定义，但没有实际执行；仍停留在 `pending://`、空 artifact 或未跑状态
+4. `verification_state_missing`
+   - 测过了，但 `pre-tests.md` 没有正确标记 `status`、不适用理由、替代证据或完成情况
+
+这样 gate 的价值才是“兜底并提示下一步补什么”，而不是只报一个抽象的 “testing inadequate”。
+
 ### B. `pre-tests.md` 继续做主真源，但要把关键测试语义下沉到 item 级
+
+同时，`pre-tests.md` 不能只靠零散 item；它还需要固定章节骨架，便于评审快速判断有没有偷掉某个测试面。
+
+建议最小强制章节：
+
+1. `Unit`
+2. `Integration`
+3. `End-to-End`
+4. `Real-Environment`
+
+每个章节都必须出现：
+
+- 若当前修改需要该层测试，就写具体测试任务、测试用例与通过标准
+- 若当前修改不需要该层测试，也不能省略；必须写 `not_applicable_reason`
+
+`not_applicable_reason` 不应是自由发挥长文，而应先落有限枚举，再补一句解释。建议第一版白名单：
+
+- `change_not_touching_this_layer`
+- `no_executable_boundary_at_this_layer`
+- `protected_environment_only`
+- `human_observation_only`
+- `covered_by_more_realistic_required_surface`
 
 最稳设计不是再造一套平行 `testing section`，而是：
 
@@ -210,6 +253,12 @@ issue / `pre-tests.md` 仍是主真源；merge gate 与 handoff 只消费它的 
   - 复用现有 blocker taxonomy
 - `why_not_applicable`
 - `replacement_evidence`
+- `task_refs`
+  - 当前测试项来自哪些 `tasks.md` / acceptance target
+- `case_design`
+  - 最小测试用例摘要，避免只写“跑点测试”
+- `not_applicable_reason`
+  - 若当前 item 或整章不适用，必须使用白名单 reason，而不是自由发挥
 
 这样才能让系统 machine-readably 判断：
 
@@ -217,6 +266,7 @@ issue / `pre-tests.md` 仍是主真源；merge gate 与 handoff 只消费它的 
 - 该在哪个环境/lane 跑
 - 它是不是这次 `test-pre-merge-* -> develop` promote 的必需项
 - 若标 `not_applicable`，是否有合法理由和替代证据
+- 是否真的从任务设计出了测试用例，而不是跳过设计直接宣称“已测”
 
 ### C. manager/worker handoff 负责卡“不能只跑象征性 smoke”
 

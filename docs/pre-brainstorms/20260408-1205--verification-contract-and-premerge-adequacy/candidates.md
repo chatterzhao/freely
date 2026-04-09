@@ -30,16 +30,17 @@
     summary: `The repository already knows what pre-tests and lanes are. The missing slice is forcing manager/worker dispatch and premerge verification to consume that contract concretely enough to stop adequacy drift.`
     verdict: `ready_for_pre_brainstorm`
 - priority: `P0`
-- status: `needs_research`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_id: `I-20260408-1205-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
 - decision_reason:
   - repeated bug escape to dogfood is better explained by weak contract consumption than by missing high-level test doctrine
   - manager/worker prompt truth currently carries launch metadata, not verification obligations
   - this gap belongs to Freely's reusable governance/runtime contract because it affects every future self-hosted or hosted issue flow
 - next_action:
-  - decide whether to materialize first as a unified verification-governance owner or as two owners split between handoff contract and premerge adequacy derivation
-  - if promoted, freeze the docs/prompt contract first before deciding the minimum script/runtime enforcement slice
+  - candidate mirror only. `I-20260408-1205-A` is now the canonical owner for verification contract and premerge adequacy governance
+  - implementation should first freeze handoff metadata and fallback gate diagnostics before widening into broader automation
 - revisit_trigger:
   - another `test-pre-merge-*` round runs the correct lane but still lacks a clear answer for why those commands were sufficient
   - another dogfood acceptance round reveals a bug that should have been covered by earlier issue-bound acceptance but was never explicitly derived into premerge verification

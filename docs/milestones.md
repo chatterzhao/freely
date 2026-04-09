@@ -50,6 +50,17 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260408-1205-A`
+- title: Verification contract and premerge adequacy governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/candidates.md`
+- next_action: Start the dev-loop from this IBM package. First freeze the worker handoff verification metadata and the fallback adequacy gate diagnostic taxonomy, then decide whether the implementation should stay on one lane or split into prompt/runtime and gate-consumption slices.
+- revisit_trigger: Re-open the owner boundary only if implementation proves the prompt contract and merge-gate contract cannot remain one bounded package without creating parallel truth.
+
 1. `I-20260407-0215-A`
 - title: Runtime self-host continuity gap and status truth governance
 - milestone_state: committed
@@ -101,13 +112,13 @@ routing_policy:
 1. `C-20260408-1205-A`
 - title: Freeze verification handoff contract and premerge adequacy derivation for Freely-owned work
 - milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+- phase_state: `todo_ibm`
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/candidates.md`
-- next_action: Decide whether to materialize first as one verification-governance owner or split between handoff-contract and premerge-adequacy owners; keep the first slice on docs/prompt contract before broader automation.
-- revisit_trigger: Revisit when another `test-pre-merge-*` round cannot justify why its command set was sufficient, or when dogfood exposes a bug that should have been explicitly derived into earlier acceptance verification.
+- next_action: Candidate mirror only. `I-20260408-1205-A` is now the canonical owner for verification contract and premerge adequacy governance.
+- revisit_trigger: Re-open only if canonical replay shows the bounded owner should be split into separate handoff-contract and gate-consumption lanes.
 
 1. `C-20260407-1042-A`
 - title: External issue identity, mapping, and publication model after source-family contraction
