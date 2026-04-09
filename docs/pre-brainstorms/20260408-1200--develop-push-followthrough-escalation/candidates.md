@@ -30,16 +30,17 @@
     summary: `The gap is no longer visibility of develop push debt. The missing next slice is urgency plus stale-upstream resync governance for active worktrees.`
     verdict: `ready_for_pre_brainstorm`
 - priority: `P0`
-- status: `needs_research`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_id: `I-20260408-1200-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
 - decision_reason:
   - the repo already has canonical push-debt truth, so the next problem is sequencing, not state discovery
   - the repo has already demonstrated that stale research trees can continue on outdated assumptions until develop is re-absorbed
   - timely push matters because AI/runtime interruption can strand lawful merges locally, but auto-push remains the wrong mechanism
 - next_action:
-  - decide whether to promote as one owner or two tightly related owners under workspace routing governance
-  - if promoted, route first through governance/docs truth before deciding whether any runtime/script enforcement belongs in the first slice
+  - candidate mirror only. `I-20260408-1200-A` is now the canonical owner for develop push followthrough escalation governance
+  - implementation should first freeze timely-push default, lawful defer, and resync trigger before widening into runtime enforcement
 - revisit_trigger:
   - another protected-branch followthrough round leaves `develop` ahead of remote without a stronger prioritization contract
   - another active worktree continues owner/blocker judgment on stale upstream truth and only later discovers the gap after resync

@@ -50,6 +50,17 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260408-1200-A`
+- title: Develop push followthrough escalation governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260408-1200--develop-push-followthrough-escalation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260408-1200--develop-push-followthrough-escalation/candidates.md`
+- next_action: Start the dev-loop from this IBM package. First freeze timely-push default, lawful defer taxonomy, and `resync_required` patrol/status truth, then decide whether implementation should stay on one lane or split between manager/status surfaces and runtime checks.
+- revisit_trigger: Re-open the owner boundary only if implementation proves push urgency and upstream resync triggers cannot remain one bounded package without creating parallel truth.
+
 1. `I-20260407-0215-A`
 - title: Runtime self-host continuity gap and status truth governance
 - milestone_state: committed
@@ -101,13 +112,13 @@ routing_policy:
 1. `C-20260408-1200-A`
 - title: Freeze develop push urgency and upstream-resync escalation after protected-branch merge
 - milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+- phase_state: `todo_ibm`
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260408-1200--develop-push-followthrough-escalation/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260408-1200--develop-push-followthrough-escalation/candidates.md`
-- next_action: Decide whether this materializes as one owner or two follow-on owners covering `develop` push urgency and active-worktree upstream resync triggers; keep the first slice on governance truth and manager sequencing rather than auto-push.
-- revisit_trigger: Revisit when protected-branch followthrough still leaves `develop` ahead of remote without a clear escalation contract, or when another active worktree continues owner judgment on stale upstream truth and only later discovers the gap after resync.
+- next_action: Candidate mirror only. `I-20260408-1200-A` is now the canonical owner for develop push followthrough escalation governance.
+- revisit_trigger: Re-open only if canonical replay shows the bounded owner should be split into separate push-urgency and resync-trigger lanes.
 
 1. `C-20260407-1042-A`
 - title: External issue identity, mapping, and publication model after source-family contraction
