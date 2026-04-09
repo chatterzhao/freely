@@ -50,6 +50,18 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260409-1715-A`
+- title: Runtime evidence provenance research retirement followthrough governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260409-1715--runtime-evidence-provenance-research-retirement-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260409-1715--runtime-evidence-provenance-research-retirement-followthrough/candidates.md`
+- next_action: Replay the guarded merge chain with this owner in place, push canonical `develop`, then retire the obsolete research worktree and branch.
+- revisit_trigger: Re-open only if canonical develop later proves the dropped packet still leaves a real bounded owner gap instead of a pure closure problem.
+
 1. `I-20260408-1200-A`
 - title: Develop push followthrough escalation governance
 - milestone_state: committed
@@ -97,6 +109,17 @@ routing_policy:
 - revisit_trigger: Re-open only if the owner proves too narrow to keep help semantics and dry-run summary semantics aligned, or if canonical replay exposes another first-hop command contract outside this bounded set.
 
 ### candidate_issues
+
+1. `C-20260409-1715-A`
+- title: Runtime evidence provenance research retirement followthrough governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260409-1715--runtime-evidence-provenance-research-retirement-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260409-1715--runtime-evidence-provenance-research-retirement-followthrough/candidates.md`
+- next_action: Candidate mirror only. `I-20260409-1715-A` is now the canonical owner for the develop-bound retirement and obsolete-worktree closeout of dropped packet `C-20260407-0603-A`.
+- revisit_trigger: Re-open only if a future closure proves this narrow followthrough still hides a real active cross-owner governance issue.
 
 1. `C-20260408-0231-A`
 - title: Runtime concurrent start lock and generated status-surface alignment
@@ -182,7 +205,7 @@ routing_policy:
 - active_session_ref: `codex current-thread-fresh-20260407-2024`
 - source_brainstorm: `docs/pre-brainstorms/20260407-0603--runtime-evidence-provenance-and-canonical-absorption-gate/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260407-0603--runtime-evidence-provenance-and-canonical-absorption-gate/candidates.md`
-- next_action: Retire the dedicated research worktree. Keep `C-20260407-0603-A` as historical pre-brainstorm evidence only, and do not promote it to IBM or reopen a mixed-owner lifecycle from it.
+- next_action: Retirement and develop-bound closure now route through `I-20260409-1715-A`. Keep `C-20260407-0603-A` as historical pre-brainstorm evidence only, and do not promote it to IBM or reopen a mixed-owner lifecycle from it.
 - revisit_trigger: Reopen only if canonical `develop` later proves the split owner lines still leave a real cross-owner canonical absorption gap that cannot be carried by any existing bounded owner.
 
 1. `C-20260407-0023-A`
