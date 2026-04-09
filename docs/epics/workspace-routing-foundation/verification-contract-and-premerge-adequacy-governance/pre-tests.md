@@ -1,109 +1,73 @@
 # Pre-Tests: verification-contract-and-premerge-adequacy-governance
 
-## Acceptance Targets
-
-### AT-001 issue-bound verification stays single-source
-
-- acceptance target: `pre-tests.md` remains the only canonical verification truth for an owner issue
-- testing layer: governance
-- target environment: issue + IBM truth-source package
-- required evidence: `issue package`
+## Unit
+- acceptance target: `Keep the verification contract parser and state projection helpers narrow enough that missing metadata is surfaced as data rather than hidden in prompt prose.`
+- testing layer: `unit`
+- target environment: `feature/verification-contract-adequacy-governance-followthrough`
+- required evidence: `focused parser/state projection regression or explicit lawful replacement evidence`
 - blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This owner changes shell-runtime flow and governance docs, but does not introduce a separately callable unit boundary beyond the focused script regressions already asserted at higher layers.`
+- replacement_evidence: `Focused runtime regressions in test-freely-worker-prompt-verification-metadata and test-freely-manager-worker-launch-linkage cover the smallest executable boundary that exists in this package.`
 
-### AT-002 four required test sections always exist
-
-- acceptance target: every `pre-tests.md` must explicitly contain `Unit`, `Integration`, `End-to-End`, and `Real-Environment`
-- testing layer: governance
-- target environment: IBM quality bar + issue materialization + skill truth
-- required evidence: `pre-tests section contract`
-- blocker taxonomy: `definition_missing`
-
-### AT-003 section omission uses finite reviewable reasons
-
-- acceptance target: when a section is not needed for the current change, the file still records a finite `not_applicable_reason` type plus a short explanation
-- testing layer: governance
-- target environment: `pre-tests.md` section skeleton
-- required evidence: `not-applicable reason taxonomy`
-- blocker taxonomy: `definition_missing`
-
-### AT-004 handoff carries executable verification obligations
-
-- acceptance target: manager / worker handoff carries enough machine-readable metadata to tell a worker which verification contract it must satisfy
-- testing layer: governance
-- target environment: manager continuity + worker prompt + runtime metadata parser
-- required evidence: `prompt/runtime contract review`
-- blocker taxonomy: `definition_missing`
-
-### AT-005 adequacy gate diagnoses the missing layer
-
-- acceptance target: the fallback gate can distinguish whether the failure is missing pre-tests, missing testcase derivation, missing execution, or missing completion/evidence state
-- testing layer: focused regression
-- target environment: `test-pre-merge-* -> develop` guarded merge design
-- required evidence: `gate diagnostic contract`
+## Integration
+- acceptance target: `Prove manager handoff, delegated intake, worker runtime state, and pretests gate all consume one shared verification contract during guarded promotion flow.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-verification-contract-adequacy-gate-r2-20260409`
+- required evidence: `command output plus verification review artifact`
 - blocker taxonomy: `execution_pending_or_failed`
+1. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-verification-metadata`.
+2. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-natural-language-prompt`.
+3. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`.
+4. Run `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`.
+5. Run `./bin/governance-check`.
 
-### AT-006 premerge and post-merge surfaces stay distinct
+## End-to-End
+- acceptance target: `Keep the protected merge path and same-line lifecycle evidence visible end to end without pretending this owner also covers post-merge human dogfood.`
+- testing layer: `end_to_end`
+- target environment: `develop-bound guarded merge chain`
+- required evidence: `guarded feature -> test-pre-merge -> develop merge receipts plus owner review artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Merge `feature/verification-contract-adequacy-gate-materialization-20260409` into `test-pre-merge-verification-contract-adequacy-gate-r2-20260409` via `./bin/merge-guarded`.
+2. Merge `test-pre-merge-verification-contract-adequacy-gate-r2-20260409` into `develop` via `./bin/merge-guarded`.
+3. Materialize same-line owner evidence before `develop` push so the guarded push path cannot treat the implementation as a bare code change.
 
-- acceptance target: premerge adequacy does not erase post-merge integration / real-environment / dogfood obligations
-- testing layer: governance
-- target environment: `pre-tests.md` schema + merge gate contract
-- required evidence: `surface-boundary review`
-- blocker taxonomy: `definition_missing`
-
-## Pre-merge acceptance
-
-1. `git diff --check`
-   - expectation: new owner docs remain whitespace-clean
-2. `./bin/governance-check`
-   - expectation: candidate promotion, milestone writeback, and IBM package structure remain valid
-
-## Post-merge acceptance
-
-1. Freely can no longer hide verification failure behind a single vague message.
-2. A future reviewer can see all four required test sections even when some are not applicable.
-3. A future worker handoff can point to concrete required item ids / lanes / evidence level instead of only “please verify”.
-4. A future guarded merge can tell whether the next fix is to write `pre-tests`, design cases from tasks, actually run the tests, or mark evidence/status.
+## Real-Environment
+- acceptance target: `Reserve protected-branch push and later dogfood observation as a distinct surface instead of silently collapsing it into premerge integration.`
+- testing layer: `real_environment`
+- target environment: `origin/develop`
+- required evidence: `protected branch push result or lawful replacement evidence`
+- blocker taxonomy: `execution_pending_or_failed`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `The canonical protected push happens only after develop carries both implementation and same-line owner evidence, so this pre-tests file records the boundary rather than faking a local pass before push completes.`
+- replacement_evidence: `Local guarded merge receipts plus governance-check prove readiness; the final protected push result is recorded in the verification artifact once origin/develop accepts the merge.`
 
 ## Acceptance Items
 
-### AT-001
-- id: `AT-001`
-- requirement: `Issue-bound verification truth remains anchored in a single pre-tests file.`
+### Runtime verification metadata is parsed
+- id: `runtime-verification-metadata-parser`
+- requirement: `Worker prompt parsing returns owner issue, pre-tests path, required lanes, acceptance item ids, evidence level, target environment, and closeout gate as machine-readable fields.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
 
-### AT-002
-- id: `AT-002`
-- requirement: `Pre-tests uses a mandatory four-section structure: Unit, Integration, End-to-End, and Real-Environment.`
+### Worker launch writes verification contract state
+- id: `worker-launch-verification-contract-state`
+- requirement: `Manager delegated launch writes the verification contract into delegated intake and worker runtime state so recovery can continue from structured truth.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/prd.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
 
-### AT-003
-- id: `AT-003`
-- requirement: `Section omission is expressed through finite reason types rather than free-form skipping.`
+### Pretests gate enforces section schema
+- id: `pretests-gate-four-section-schema`
+- requirement: `pretests-gate rejects owner pre-tests files that omit required sections, required section scalars, or replacement evidence for not-applicable sections.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/brainstorms/b-verification-contract-and-premerge-adequacy-governance.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
 
-### AT-004
-- id: `AT-004`
-- requirement: `Worker handoff carries machine-readable verification obligations rather than scheduling metadata alone.`
+### Guarded premerge path survives adequacy contract
+- id: `guarded-premerge-verification-contract`
+- requirement: `The guarded feature -> test-pre-merge -> develop path preserves verification contract metadata and owner lifecycle evidence without bypassing protected-branch receipts.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
-
-### AT-005
-- id: `AT-005`
-- requirement: `Fallback adequacy gate distinguishes pre-tests missing, testcase derivation missing, execution missing, and verification state missing.`
-- evidence_level: `integration`
-- status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/brainstorms/b-verification-contract-and-premerge-adequacy-governance.md`
-
-### AT-006
-- id: `AT-006`
-- requirement: `Premerge adequacy keeps post-merge integration, real-environment, and dogfood as distinct surfaces.`
-- evidence_level: `integration`
-- status: `pass`
-- artifact_ref: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/brainstorms.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
