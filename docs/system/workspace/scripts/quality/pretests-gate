@@ -54,6 +54,12 @@ staged_only = sys.argv[3] == "1"
 
 ISSUE_RE = re.compile(r"^docs/epics/.+/issues/[^/]+\.md$")
 REQUIRED_SECTION_NAMES = ("Unit", "Integration", "End-to-End", "Real-Environment")
+REQUIRED_SECTION_SCALARS = (
+    "acceptance target",
+    "testing layer",
+    "target environment",
+    "required evidence",
+)
 VALID_NOT_APPLICABLE_REASONS = {
     "change_not_touching_this_layer",
     "no_executable_boundary_at_this_layer",
@@ -188,6 +194,14 @@ def parse_scalar(section_text: str, key: str) -> str:
     return match.group(1).strip() if match else ""
 
 
+def has_blocker_taxonomy(section_text: str) -> bool:
+    if re.search(r"^- blocker taxonomy:\s*`?([^`\n]+)`?\s*$", section_text, re.MULTILINE):
+        return True
+    if re.search(r"^- blocker taxonomy:\s*$", section_text, re.MULTILINE):
+        return True
+    return False
+
+
 def artifact_exists(path: str) -> bool:
     if not path:
         return False
@@ -224,8 +238,20 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             add_error("pre_tests_missing", f"{pre_tests_path}: missing required section '## {required_name}'")
             continue
         section_text = required_sections[required_name]
+        for key in REQUIRED_SECTION_SCALARS:
+            if not parse_scalar(section_text, key):
+                add_error(
+                    "pre_tests_missing",
+                    f"{pre_tests_path}: section '{required_name}' missing '{key}'",
+                )
+        if not has_blocker_taxonomy(section_text):
+            add_error(
+                "pre_tests_missing",
+                f"{pre_tests_path}: section '{required_name}' missing 'blocker taxonomy'",
+            )
         not_applicable_reason = parse_scalar(section_text, "not_applicable_reason")
         not_applicable_explanation = parse_scalar(section_text, "not_applicable_explanation")
+        replacement_evidence = parse_scalar(section_text, "replacement_evidence")
         if not_applicable_reason:
             if not_applicable_reason not in VALID_NOT_APPLICABLE_REASONS:
                 add_error(
@@ -236,6 +262,11 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 add_error(
                     "verification_state_missing",
                     f"{pre_tests_path}: section '{required_name}' is marked not applicable but missing not_applicable_explanation",
+                )
+            if not replacement_evidence:
+                add_error(
+                    "verification_state_missing",
+                    f"{pre_tests_path}: section '{required_name}' is marked not applicable but missing replacement_evidence",
                 )
             continue
         if not section_has_test_tasks(section_text):

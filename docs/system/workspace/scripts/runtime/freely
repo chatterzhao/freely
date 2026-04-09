@@ -1087,6 +1087,11 @@ workcell_state_file() {
   echo "$(run_dir_for_project "$project")/workcell-state.env"
 }
 
+worker_verification_contract_state_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/worker-verification-contract.env"
+}
+
 handoff_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/session-handoff.txt"
@@ -1130,6 +1135,11 @@ intake_item_meta_file() {
 intake_item_message_file() {
   local project="$1" intake_id="$2"
   echo "$(intake_dir_for_project "$project")/$intake_id/message.txt"
+}
+
+intake_item_verification_contract_file() {
+  local project="$1" intake_id="$2"
+  echo "$(intake_dir_for_project "$project")/$intake_id/verification-contract.env"
 }
 
 interruption_resolution_item_dir() {
@@ -4328,10 +4338,33 @@ role_hint_for_project() {
 
 write_workcell_state() {
   local project="$1" desired_state="$2" supervisor_state="$3" ai_state="$4" exit_reason="$5"
-  local state_file role_hint updated_at
+  local state_file role_hint updated_at verification_contract_file verification_metadata_present verification_missing_fields verification_owner_issue verification_pre_tests_path verification_artifact_dir verification_test_lanes verification_acceptance_ids verification_evidence_level verification_target_environment verification_closeout_gate
   state_file="$(workcell_state_file "$project")"
   role_hint="$(role_hint_for_project "$project")"
   updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  verification_contract_file="$(worker_verification_contract_state_file "$project")"
+  verification_metadata_present="false"
+  verification_missing_fields=""
+  verification_owner_issue=""
+  verification_pre_tests_path=""
+  verification_artifact_dir=""
+  verification_test_lanes=""
+  verification_acceptance_ids=""
+  verification_evidence_level=""
+  verification_target_environment=""
+  verification_closeout_gate=""
+  if [[ -f "$verification_contract_file" ]]; then
+    verification_metadata_present="$(meta_env_value "$verification_contract_file" "VERIFICATION_METADATA_PRESENT")"
+    verification_missing_fields="$(meta_env_value "$verification_contract_file" "VERIFICATION_METADATA_MISSING_FIELDS")"
+    verification_owner_issue="$(meta_env_value "$verification_contract_file" "OWNER_ISSUE")"
+    verification_pre_tests_path="$(meta_env_value "$verification_contract_file" "PRE_TESTS_PATH")"
+    verification_artifact_dir="$(meta_env_value "$verification_contract_file" "VERIFICATION_ARTIFACT_DIR")"
+    verification_test_lanes="$(meta_env_value "$verification_contract_file" "REQUIRED_TEST_LANES_CSV")"
+    verification_acceptance_ids="$(meta_env_value "$verification_contract_file" "REQUIRED_ACCEPTANCE_ITEM_IDS_CSV")"
+    verification_evidence_level="$(meta_env_value "$verification_contract_file" "MINIMUM_EVIDENCE_LEVEL")"
+    verification_target_environment="$(meta_env_value "$verification_contract_file" "TARGET_ENVIRONMENT")"
+    verification_closeout_gate="$(meta_env_value "$verification_contract_file" "CLOSEOUT_GATE")"
+  fi
   cat >"$state_file" <<EOF
 DESIRED_RUNTIME_STATE="$desired_state"
 LAST_SUPERVISOR_STATE="$supervisor_state"
@@ -4339,6 +4372,17 @@ LAST_AI_STATE="$ai_state"
 LAST_EXIT_REASON="$exit_reason"
 LAST_ROLE_HINT="$role_hint"
 LAST_STATE_UPDATED_AT="$updated_at"
+LAST_WORKER_VERIFICATION_CONTRACT_FILE="$verification_contract_file"
+LAST_WORKER_VERIFICATION_METADATA_PRESENT="$verification_metadata_present"
+LAST_WORKER_VERIFICATION_METADATA_MISSING_FIELDS="$verification_missing_fields"
+LAST_WORKER_OWNER_ISSUE="$verification_owner_issue"
+LAST_WORKER_PRE_TESTS_PATH="$verification_pre_tests_path"
+LAST_WORKER_VERIFICATION_ARTIFACT_DIR="$verification_artifact_dir"
+LAST_WORKER_REQUIRED_TEST_LANES_CSV="$verification_test_lanes"
+LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="$verification_acceptance_ids"
+LAST_WORKER_MINIMUM_EVIDENCE_LEVEL="$verification_evidence_level"
+LAST_WORKER_TARGET_ENVIRONMENT="$verification_target_environment"
+LAST_WORKER_CLOSEOUT_GATE="$verification_closeout_gate"
 EOF
 }
 
@@ -5917,6 +5961,96 @@ worker_prompt_closeout_gate() {
   worker_prompt_dispatch_metadata_value "$prompt_file" "closeout_gate"
 }
 
+worker_prompt_verification_metadata_missing_fields_csv() {
+  local prompt_file="$1"
+  local missing_csv="" owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate
+  owner_issue="$(worker_prompt_owner_issue "$prompt_file")"
+  pre_tests_path="$(worker_prompt_pre_tests_path "$prompt_file")"
+  artifact_dir="$(worker_prompt_verification_artifact_dir "$prompt_file")"
+  test_lanes_csv="$(worker_prompt_required_test_lanes_csv "$prompt_file")"
+  acceptance_csv="$(worker_prompt_required_acceptance_item_ids_csv "$prompt_file")"
+  evidence_level="$(worker_prompt_minimum_evidence_level "$prompt_file")"
+  target_environment="$(worker_prompt_target_environment "$prompt_file")"
+  closeout_gate="$(worker_prompt_closeout_gate "$prompt_file")"
+  [[ -n "$owner_issue" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "owner_issue")"
+  [[ -n "$pre_tests_path" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "pre_tests_path")"
+  [[ -n "$artifact_dir" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "verification_artifact_dir")"
+  [[ -n "$test_lanes_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "required_test_lanes")"
+  [[ -n "$acceptance_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "required_acceptance_item_ids")"
+  [[ -n "$evidence_level" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "minimum_evidence_level")"
+  [[ -n "$target_environment" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "target_environment")"
+  [[ -n "$closeout_gate" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "closeout_gate")"
+  printf '%s\n' "$missing_csv"
+}
+
+worker_prompt_has_verification_metadata() {
+  local prompt_file="$1"
+  local owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate
+  owner_issue="$(worker_prompt_owner_issue "$prompt_file")"
+  pre_tests_path="$(worker_prompt_pre_tests_path "$prompt_file")"
+  artifact_dir="$(worker_prompt_verification_artifact_dir "$prompt_file")"
+  test_lanes_csv="$(worker_prompt_required_test_lanes_csv "$prompt_file")"
+  acceptance_csv="$(worker_prompt_required_acceptance_item_ids_csv "$prompt_file")"
+  evidence_level="$(worker_prompt_minimum_evidence_level "$prompt_file")"
+  target_environment="$(worker_prompt_target_environment "$prompt_file")"
+  closeout_gate="$(worker_prompt_closeout_gate "$prompt_file")"
+  [[ -n "$owner_issue$pre_tests_path$artifact_dir$test_lanes_csv$acceptance_csv$evidence_level$target_environment$closeout_gate" ]] && return 0
+  return 1
+}
+
+write_worker_verification_contract_file() {
+  local contract_file="$1" prompt_file="$2" intake_id="${3:-}" target_project="${4:-}"
+  local owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate missing_fields_csv has_metadata updated_at
+  owner_issue="$(worker_prompt_owner_issue "$prompt_file")"
+  pre_tests_path="$(worker_prompt_pre_tests_path "$prompt_file")"
+  artifact_dir="$(worker_prompt_verification_artifact_dir "$prompt_file")"
+  test_lanes_csv="$(worker_prompt_required_test_lanes_csv "$prompt_file")"
+  acceptance_csv="$(worker_prompt_required_acceptance_item_ids_csv "$prompt_file")"
+  evidence_level="$(worker_prompt_minimum_evidence_level "$prompt_file")"
+  target_environment="$(worker_prompt_target_environment "$prompt_file")"
+  closeout_gate="$(worker_prompt_closeout_gate "$prompt_file")"
+  missing_fields_csv="$(worker_prompt_verification_metadata_missing_fields_csv "$prompt_file")"
+  has_metadata="false"
+  if worker_prompt_has_verification_metadata "$prompt_file"; then
+    has_metadata="true"
+  fi
+  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  mkdir -p "$(dirname "$contract_file")"
+  cat >"$contract_file" <<EOF
+SOURCE_PROMPT_FILE="$prompt_file"
+SOURCE_INTAKE_ID="$intake_id"
+TARGET_PROJECT="$target_project"
+VERIFICATION_METADATA_PRESENT="$has_metadata"
+VERIFICATION_METADATA_MISSING_FIELDS="$missing_fields_csv"
+OWNER_ISSUE="$owner_issue"
+PRE_TESTS_PATH="$pre_tests_path"
+VERIFICATION_ARTIFACT_DIR="$artifact_dir"
+REQUIRED_TEST_LANES_CSV="$test_lanes_csv"
+REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="$acceptance_csv"
+MINIMUM_EVIDENCE_LEVEL="$evidence_level"
+TARGET_ENVIRONMENT="$target_environment"
+CLOSEOUT_GATE="$closeout_gate"
+UPDATED_AT="$updated_at"
+EOF
+}
+
+refresh_workcell_state_projection() {
+  local project="$1"
+  local state_file desired_state supervisor_state ai_state exit_reason
+  state_file="$(workcell_state_file "$project")"
+  [[ -f "$state_file" ]] || return 0
+  desired_state="$(meta_env_value "$state_file" "DESIRED_RUNTIME_STATE")"
+  supervisor_state="$(meta_env_value "$state_file" "LAST_SUPERVISOR_STATE")"
+  ai_state="$(meta_env_value "$state_file" "LAST_AI_STATE")"
+  exit_reason="$(meta_env_value "$state_file" "LAST_EXIT_REASON")"
+  write_workcell_state \
+    "$project" \
+    "${desired_state:-unknown}" \
+    "${supervisor_state:-unknown}" \
+    "${ai_state:-unknown}" \
+    "${exit_reason:-unknown}"
+}
+
 worker_prompt_normalized_intent_kind() {
   local prompt_file="$1" value
   value="$(worker_prompt_intent_kind "$prompt_file")"
@@ -6482,7 +6616,7 @@ manager_worker_launch_intake_id_for_prompt() {
 
 write_manager_worker_launch_intake() {
   local target_project="$1" prompt_file="$2"
-  local intake_id created_at claimed_at message
+  local intake_id created_at claimed_at message verification_contract_file
   intake_id="$(manager_worker_launch_intake_id_for_prompt "$prompt_file")"
   created_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   claimed_at="$created_at"
@@ -6504,6 +6638,8 @@ write_manager_worker_launch_intake() {
     "handoff://continuation" \
     "" \
     "$created_at" >/dev/null
+  verification_contract_file="$(intake_item_verification_contract_file "$target_project" "$intake_id")"
+  write_worker_verification_contract_file "$verification_contract_file" "$prompt_file" "$intake_id" "$target_project"
   printf '%s\n' "$intake_id"
 }
 
@@ -6529,11 +6665,14 @@ ensure_runtime_workcell_initialized_for_launch() {
 
 launch_worker_from_manager_prompt_if_needed() {
   local manager_project="$1" prompt_file="$2"
-  local target_project intake_id supervisor_pid ai_pid
+  local target_project intake_id supervisor_pid ai_pid runtime_contract_file
   target_project="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   [[ -n "$target_project" && -d "$target_project" ]] || return 1
   ensure_runtime_workcell_initialized_for_launch "$target_project" || return 1
   intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"
+  runtime_contract_file="$(worker_verification_contract_state_file "$target_project")"
+  write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "$intake_id" "$target_project"
+  refresh_workcell_state_projection "$target_project"
   supervisor_pid="$(manager_supervisor_pid_for_project "$target_project")"
   ai_pid="$(runtime_ai_pid_hint_for_project "$target_project")"
   if [[ -n "$supervisor_pid" && -n "$ai_pid" ]]; then
