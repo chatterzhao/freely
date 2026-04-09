@@ -98,6 +98,17 @@ routing_policy:
 - next_action: Keep this as a bounded repair lane: add a project-local concurrent-start guard so one project cannot materialize multiple supervisors, and align `status` / `fleet-status` generated continuity/prompt truth with the latest valid continuity on disk without faking consumption.
 - revisit_trigger: Revisit only if the bounded lock/read-path fix proves insufficient and the defect actually belongs to broader worker recovery or provenance governance.
 
+1. `C-20260408-1200-A`
+- title: Freeze develop push urgency and upstream-resync escalation after protected-branch merge
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260408-1200--develop-push-followthrough-escalation/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260408-1200--develop-push-followthrough-escalation/candidates.md`
+- next_action: Decide whether this materializes as one owner or two follow-on owners covering `develop` push urgency and active-worktree upstream resync triggers; keep the first slice on governance truth and manager sequencing rather than auto-push.
+- revisit_trigger: Revisit when protected-branch followthrough still leaves `develop` ahead of remote without a clear escalation contract, or when another active worktree continues owner judgment on stale upstream truth and only later discovers the gap after resync.
+
 1. `C-20260407-1042-A`
 - title: External issue identity, mapping, and publication model after source-family contraction
 - milestone_state: candidate
