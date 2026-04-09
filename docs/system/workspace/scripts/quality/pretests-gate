@@ -53,6 +53,14 @@ issue_arg = sys.argv[2]
 staged_only = sys.argv[3] == "1"
 
 ISSUE_RE = re.compile(r"^docs/epics/.+/issues/[^/]+\.md$")
+REQUIRED_SECTION_NAMES = ("Unit", "Integration", "End-to-End", "Real-Environment")
+VALID_NOT_APPLICABLE_REASONS = {
+    "change_not_touching_this_layer",
+    "no_executable_boundary_at_this_layer",
+    "protected_environment_only",
+    "human_observation_only",
+    "covered_by_more_realistic_required_surface",
+}
 
 
 def git_output(*args: str, check: bool = True) -> str:
@@ -131,6 +139,34 @@ def extract_acceptance_sections(text: str) -> list[str]:
     return sections
 
 
+def extract_required_sections(text: str) -> dict[str, str]:
+    lines = text.splitlines()
+    sections: dict[str, str] = {}
+    current_name = ""
+    buffer: list[str] = []
+
+    def flush() -> None:
+        nonlocal current_name, buffer
+        if current_name:
+            sections[current_name] = "\n".join(buffer).strip()
+        current_name = ""
+        buffer = []
+
+    for line in lines:
+        match = re.match(r"^##\s+(Unit|Integration|End-to-End|Real-Environment)\s*$", line)
+        if match:
+            flush()
+            current_name = match.group(1)
+            continue
+        if current_name:
+            if re.match(r"^##\s+", line):
+                flush()
+            else:
+                buffer.append(line)
+    flush()
+    return sections
+
+
 def parse_fields(section: str) -> dict[str, str]:
     fields: dict[str, str] = {}
     for key in ("id", "requirement", "evidence_level", "status", "artifact_ref"):
@@ -138,6 +174,18 @@ def parse_fields(section: str) -> dict[str, str]:
         if match:
             fields[key] = match.group(1).strip()
     return fields
+
+
+def section_has_test_tasks(section_text: str) -> bool:
+    for line in section_text.splitlines():
+        if re.match(r"^\s*\d+\.\s+", line):
+            return True
+    return False
+
+
+def parse_scalar(section_text: str, key: str) -> str:
+    match = re.search(rf"^- {re.escape(key)}:\s*`?([^`\n]+)`?\s*$", section_text, re.MULTILINE)
+    return match.group(1).strip() if match else ""
 
 
 def artifact_exists(path: str) -> bool:
@@ -158,6 +206,9 @@ def artifact_exists(path: str) -> bool:
 
 def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
     errors: list[str] = []
+    def add_error(code: str, message: str) -> None:
+        errors.append(f"[{code}] {message}")
+
     try:
         pre_tests_path, _verification_dir = parse_issue_binding(issue_path, issue_text)
     except ValueError as exc:
@@ -165,11 +216,37 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
 
     pretests_text = get_staged_text(pre_tests_path) if source == "staged" else get_worktree_text(pre_tests_path)
     if not pretests_text:
-        return [f"{issue_path}: bound pre-tests file missing or unreadable: {pre_tests_path}"]
+        return [f"[pre_tests_missing] {issue_path}: bound pre-tests file missing or unreadable: {pre_tests_path}"]
+
+    required_sections = extract_required_sections(pretests_text)
+    for required_name in REQUIRED_SECTION_NAMES:
+        if required_name not in required_sections:
+            add_error("pre_tests_missing", f"{pre_tests_path}: missing required section '## {required_name}'")
+            continue
+        section_text = required_sections[required_name]
+        not_applicable_reason = parse_scalar(section_text, "not_applicable_reason")
+        not_applicable_explanation = parse_scalar(section_text, "not_applicable_explanation")
+        if not_applicable_reason:
+            if not_applicable_reason not in VALID_NOT_APPLICABLE_REASONS:
+                add_error(
+                    "pre_tests_missing",
+                    f"{pre_tests_path}: section '{required_name}' uses unsupported not_applicable_reason {not_applicable_reason}",
+                )
+            if not not_applicable_explanation:
+                add_error(
+                    "verification_state_missing",
+                    f"{pre_tests_path}: section '{required_name}' is marked not applicable but missing not_applicable_explanation",
+                )
+            continue
+        if not section_has_test_tasks(section_text):
+            add_error(
+                "testcase_derivation_missing",
+                f"{pre_tests_path}: section '{required_name}' has no concrete test tasks and no lawful not_applicable_reason",
+            )
 
     sections = extract_acceptance_sections(pretests_text)
     if not sections:
-        return [f"{pre_tests_path}: missing Acceptance Items"]
+        return [f"[pre_tests_missing] {pre_tests_path}: missing Acceptance Items"]
 
     valid_statuses = {"pass", "not_applicable"}
     valid_levels = {"mock", "integration", "real_env", "post_merge_dogfood"}
@@ -177,24 +254,37 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
     for section in sections:
         fields = parse_fields(section)
         title_line = section.splitlines()[0] if section.splitlines() else "### <unknown>"
-        for key in ("id", "requirement", "evidence_level", "status", "artifact_ref"):
+        for key in ("id", "requirement", "evidence_level"):
             if not fields.get(key):
-                errors.append(f"{pre_tests_path}: {title_line} missing {key}")
+                add_error("testcase_derivation_missing", f"{pre_tests_path}: {title_line} missing {key}")
+        for key in ("status", "artifact_ref"):
+            if not fields.get(key):
+                add_error("verification_state_missing", f"{pre_tests_path}: {title_line} missing {key}")
         if not fields:
             continue
         evidence_level = fields.get("evidence_level", "")
         if evidence_level and evidence_level not in valid_levels:
-            errors.append(f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported evidence_level {evidence_level}")
+            add_error(
+                "testcase_derivation_missing",
+                f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported evidence_level {evidence_level}",
+            )
         status = fields.get("status", "")
         if status and status not in valid_statuses:
-            errors.append(
+            add_error(
+                "execution_missing",
                 f"{pre_tests_path}: {fields.get('id', title_line)} must be pass or not_applicable before completion, got {status}"
             )
         artifact_ref = fields.get("artifact_ref", "")
         if artifact_ref.startswith("pending://"):
-            errors.append(f"{pre_tests_path}: {fields.get('id', title_line)} still points to pending artifact_ref {artifact_ref}")
+            add_error(
+                "execution_missing",
+                f"{pre_tests_path}: {fields.get('id', title_line)} still points to pending artifact_ref {artifact_ref}",
+            )
         elif artifact_ref and not artifact_exists(artifact_ref):
-            errors.append(f"{pre_tests_path}: {fields.get('id', title_line)} references missing artifact {artifact_ref}")
+            add_error(
+                "verification_state_missing",
+                f"{pre_tests_path}: {fields.get('id', title_line)} references missing artifact {artifact_ref}",
+            )
     return errors
 
 

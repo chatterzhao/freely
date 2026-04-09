@@ -41,6 +41,25 @@ EOF
 cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
+## Unit
+
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+
+## Integration
+
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+
+## Real-Environment
+
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
+
 ## Acceptance Items
 
 ### PT-1
@@ -66,6 +85,25 @@ EOF
 cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
+## Unit
+
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+
+## Integration
+
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+
+## Real-Environment
+
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
+
 ## Acceptance Items
 
 ### PT-1
@@ -77,5 +115,29 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 EOF
 
 "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Integration
+
+1. Run the sample issue-bound integration replay.
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout3" 2>"$TMP_DIR/stderr3"; then
+  echo "[FAIL] pretests-gate should reject pre-tests missing required sections" >&2
+  exit 1
+fi
+grep -q '\[pre_tests_missing\]' "$TMP_DIR/stderr3"
+grep -q "missing required section '## Unit'" "$TMP_DIR/stderr3"
 
 echo "[PASS] pretests-gate enforces issue binding and acceptance evidence"

@@ -15,6 +15,8 @@
 - `prd.md` 满足 [prd-quality-bar.md](prd-quality-bar.md)
 - `pre-tests.md` 来自 `prd.md` 的 eval / acceptance 结构
 - `pre-tests.md` 默认以 executable integration / acceptance 为主，而不是只列代码检查点或 wording review 清单
+- `pre-tests.md` 至少固定 `Unit`、`Integration`、`End-to-End`、`Real-Environment` 四个章节
+- 若某章节不适用，`pre-tests.md` 已写 `not_applicable_reason`、`not_applicable_explanation` 与必要的 `replacement_evidence`
 - `pre-tests.md` 至少明确 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
 - `pre-tests.md` 能恢复关键 acceptance 面的 `environment`、`evidence`、`failure signal`、`failure handling / replay expectation`
 - issue 已显式声明 `pre_tests_path` 与 `verification_artifact_dir`
@@ -36,6 +38,7 @@
 - issue scope 与 acceptance 稳定
 - `pre-tests.md` 与 `tasks.md` 已体现 issue-level acceptance
 - `pre-tests.md` 没有把 wording review 当成主验收面
+- `pre-tests.md` 没有缺失 `Unit`、`Integration`、`End-to-End`、`Real-Environment` 中的任一章节
 - `pre-tests.md` 已能区分最小 blocker taxonomy：`definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`
 - 若存在 merge 后才能验证的关键路径，`pre-tests.md` 已显式区分 `pre-merge` 与 `post-merge`
 - 对 Freely 自治能力，`pre-tests.md` 默认已覆盖：
