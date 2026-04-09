@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `tool-authorization-bootstrap-and-post-consent-materialization-governance`
@@ -143,6 +143,6 @@ This owner freezes the product boundary only. The following implementation-shape
 
 ## Next
 
-- Current owner is now at `done_ibm`.
+- Current owner is now at `in_verification`.
 - Future work should open narrower implementation or followthrough owners for persisted authorization-bootstrap state, per-tool repair/materialization cleanup, or adapter-specific drift correction rather than widening this architecture owner.
 - Reopen only if canonical product-boundary truth for post-consent authorization/bootstrap becomes inconsistent across CLI, TUI, GUI, settings, or sibling tool-routing owners.
