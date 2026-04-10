@@ -53,7 +53,7 @@ routing_policy:
 1. `I-20260410-1430-A`
 - title: Fix preferred_auth_method lost when switching to account slot
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
