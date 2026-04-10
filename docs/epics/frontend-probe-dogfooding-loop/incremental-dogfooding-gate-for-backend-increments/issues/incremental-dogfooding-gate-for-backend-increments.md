@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260317-1003`
 - title: Incremental Dogfooding Gate for Backend Increments
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `incremental-dogfooding-gate-for-backend-increments`
@@ -11,6 +11,9 @@
 - source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
+- pre_tests_path: `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/pre-tests.md`
+- progress_path: `docs/progress/frontend-probe-dogfooding-loop/p-incremental-dogfooding-gate-for-backend-increments.md`
+- verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
@@ -73,7 +76,8 @@
   - `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/pre-tests.md`
   - `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/tasks.md`
 
-## Next
+## Closeout
 
-- 当前 issue 已到 `done_ibm`，后续不再继续扩写门禁定义。
-- 后续实现或评审阶段应直接按本门禁检查每个后端增量是否具备 Probe 验证证据。
+- This owner is now explicitly closed as reusable gate truth rather than left parked between `done_ibm` and milestone `committed`.
+- Future backend increment owners should consume this gate directly instead of reopening the gate definition.
+- Reopen only if the minimal probe evidence set or blocking semantics become insufficient for real backend increment review.
