@@ -25,11 +25,13 @@
 - why_now: 如果不先冻结最小边界契约，Probe 会反复追着后端改，无法形成持续狗粮闭环。
 - acceptance_hint: 明确 sessions / stream / history / status 的最小调用面、事件语义与错误面；前端只通过该边界访问系统；第一阶段允许采用 Tauri 内部 contract layer，不引入 Node.js。
 - priority: P0
-- status: promoted
-- decision_reason: 这是“前端从第一天可用”与“后端仍保持解耦”同时成立的最小契约，也避免把 day-1 方案误锁为某种网络部署形态。
+- status: completed
+- decision_reason: 这条最小 boundary contract 候选已经 materialize 为正式 owner，并由 `I-20260317-1001` 完成 canonical closeout。当前 candidate 仅保留为来源 provenance，不再代表活跃待办。
 - promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md
 - legacy_id_mapping: I-20260317-1001  # 历史遗留的 issue id
 - milestone: M-20260308-frontend-probe-dogfooding-loop
+- next_action: 保留为历史来源记录。若未来 Probe 边界契约需要新的对象族、transport 兼容层或错误面扩展，应从当前 canonical truth 新开 candidate/issue，而不是恢复这条 candidate。
+- completion_note: `I-20260317-1001` 已完成 canonical closeout；最小 boundary contract 已被 `frontend-probe-v0` 与 `rust-tauri-probe-bridge-v1` 直接复用，因此该 candidate 不再构成活跃 queue。
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}]
 
 ### C-20260308-1244-03
