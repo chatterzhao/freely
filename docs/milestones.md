@@ -50,18 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260407-0215-A`
-- title: Runtime self-host continuity gap and status truth governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/candidates.md`
-- next_action: Keep the owner in bounded verification until the tracked root `develop` entrypoint absorbs the dirty feature implementation; use the current issue/progress plus verification replay to drive manager-side merge-prep / absorption judgment, and do not reopen worker implementation unless the patched feature entrypoint itself reintroduces a status-truth gap.
-- revisit_trigger: Re-open boundary selection only if automatic recovery of prompt-required continuity gaps proves inseparable from this bounded status owner, or if canonical `develop` shows the continuity-gap signal is actually absorbed by another active runtime supervision owner.
-
 3. `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: committed
