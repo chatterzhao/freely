@@ -2,13 +2,22 @@
 
 - issue_id: `I-20260410-1430-A`
 - title: `Fix preferred_auth_method lost when switching to account slot`
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/preferred-auth-method-account-switch-fix-20260410-143000`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260410-143000-feature-preferred-auth-method-account-switch-fix`
+- epic-name: `workspace-routing-foundation`
+- story-name: `codex-apikey-slot-bundle-and-provider-aware-probe-governance`
+- issue-name: `preferred-auth-method-account-switch-fix`
+- priority: `P1`
 - source_candidate: `docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/candidates.md#c-20260410-1430-a`
+- source_brainstorm: `docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/brainstorms.md`
+- execution_base: `develop`
+- integration_target: `develop`
+- pre_tests_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews`
 - follow_on_to: `I-20260405-0027-A`
 - created_at: `2026-04-10`
+- session_refs: []
 
 ## Problem
 
