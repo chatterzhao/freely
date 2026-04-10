@@ -86,6 +86,10 @@ if grep -q '\[model_providers.custom\]' "$TMP_HOME/.codex/config.toml"; then
   echo "[FAIL] account switch should clear live apikey provider table" >&2
   exit 1
 fi
+if ! grep -q 'preferred_auth_method = "chatgpt"' "$TMP_HOME/.codex/config.toml"; then
+  echo "[FAIL] account switch should set preferred_auth_method to chatgpt" >&2
+  exit 1
+fi
 grep -q '\[projects."/tmp/demo"\]' "$TMP_HOME/.codex/config.toml"
 
 HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex apikey-custom-1 --yes >"$TMP_HOME/switch-apikey.json"

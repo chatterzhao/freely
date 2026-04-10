@@ -392,6 +392,20 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+1. `I-20260410-1430-A`
+- title: Fix preferred_auth_method lost when switching to account slot
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+- source_brainstorm: `docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/candidates.md`
+- follow_on_to: `I-20260405-0027-A`
+- completion_note: Narrow bug fix for preferred_auth_method field being lost when switching to account slot. Added fallback logic based on slot_kind.
+- evidence:
+  - `docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
+
 1. `I-20260405-2358-D`
 - title: CLI help and dry-run contract followthrough governance
 - milestone_state: completed

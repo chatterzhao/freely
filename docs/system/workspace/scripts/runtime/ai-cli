@@ -803,6 +803,12 @@ for key in ("model_provider", "preferred_auth_method"):
     value = fragment.get(key)
     if isinstance(value, str) and value:
         data[key] = value
+# If preferred_auth_method was not set from fragment, set default based on slot_kind
+if "preferred_auth_method" not in data:
+    if slot_kind == "apikey":
+        data["preferred_auth_method"] = "apikey"
+    elif slot_kind == "account":
+        data["preferred_auth_method"] = "chatgpt"
 if isinstance(fragment.get("model_providers"), dict):
     existing = data.get("model_providers")
     if not isinstance(existing, dict):
