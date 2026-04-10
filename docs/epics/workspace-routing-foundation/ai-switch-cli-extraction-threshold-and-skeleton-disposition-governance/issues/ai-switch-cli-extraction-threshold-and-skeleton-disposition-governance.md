@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance`
@@ -13,7 +13,7 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/pre-tests.md`
-- progress_path: `pending://progress-created-on-dev-loop`
+- progress_path: `docs/progress/workspace-routing-foundation/p-ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews`
 - depends_on:
   - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
@@ -88,15 +88,11 @@ Freely 已经在当前 Codex owner 中冻结了长期方向: tool auth/switch/pr
   - `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/tasks.md`
   - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 
-## Next
+## Closeout
 
-- 当前 owner 已到 `in_verification`。
-- 除非 `I-20260405-0027-A` 的 verified contract 被推翻，或第二工具快速达到同等级 verified maturity，否则不应新开 extraction implementation lane。
-- 当后续 owner 真正启动时，第一步只允许：
-  - 选择 `rename_in_place` 或 `fresh_repo`
-  - 写下原因
-  - 迁移第一个 backend-owned slice
-  - 保持 Freely 在第一后端提交落地前仍是 canonical truth
+- Canonical `develop` already carries this bounded extraction-threshold and skeleton-disposition owner as the handoff package for any future standalone backend lane.
+- `2026-04-09` closeout verification reconfirmed the owner remains documentation/governance-only and that lifecycle drift, not implementation debt, was the only missing work.
+- Future work should open a new owner only when threshold conditions are truly ready to be exercised; do not reopen this owner merely because the local skeleton still exists.
 
 ## Verification
 
