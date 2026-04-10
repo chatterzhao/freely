@@ -55,8 +55,8 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `done_ibm`
 - priority: P1
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md`
-- source_candidate: `C-20260410-1430-A`
+- issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
 - source_candidates: `docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/candidates.md`
 - follow_on_to: `I-20260405-0027-A`
 - next_action: Merge completed. No further action.
