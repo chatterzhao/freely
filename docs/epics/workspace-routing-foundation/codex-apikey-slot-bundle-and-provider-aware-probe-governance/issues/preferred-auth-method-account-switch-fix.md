@@ -6,7 +6,8 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/preferred-auth-method-account-switch-fix-20260410-143000`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260410-143000-feature-preferred-auth-method-account-switch-fix`
-- candidate_source: `C-20260410-1430-A`
+- source_candidate: `C-20260410-1430-A`
+- source_candidate_path: `docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/candidates.md`
 - follow_on_to: `I-20260405-0027-A`
 - created_at: `2026-04-10`
 
