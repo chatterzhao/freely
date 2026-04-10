@@ -966,6 +966,54 @@ git reset -q HEAD docs/milestones.md docs/pre-brainstorms/sample/candidates.md d
 git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/milestones.md
 rm -f "$REPO/docs/progress/sample/p-sample.md"
 
+mkdir -p "$REPO/docs/pre-brainstorms/completed-provenance" "$REPO/docs/epics/completed/story/issues"
+cat > "$REPO/docs/pre-brainstorms/completed-provenance/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2235-A
+- status: completed
+- milestone: `M-sample`
+- promoted_issue_path: `docs/epics/completed/story/issues/owner.md`
+- legacy_id_mapping: `I-20260327-2235`
+- next_action: keep as historical provenance only
+- completion_note: `The canonical owner is already complete; this diff only repairs candidate-side historical truth.`
+EOF
+cat > "$REPO/docs/epics/completed/story/issues/owner.md" <<'EOF'
+# Issue: completed-owner
+
+- issue_id: `I-20260327-2235`
+- phase_state: `completed`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/completed-provenance/candidates.md#c-20260327-2235-a`
+- verification_artifact_dir: `docs/epics/completed/story/code-reviews`
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: completed
+
+### candidate_issues
+- none currently
+
+### committed_issues
+- none currently
+
+### completed_issues
+1. `I-20260327-2235`
+   - issue_path: `docs/epics/completed/story/issues/owner.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/completed-provenance/candidates.md#c-20260327-2235-a`
+EOF
+git add docs/pre-brainstorms/completed-provenance/candidates.md docs/epics/completed/story/issues/owner.md docs/milestones.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout16c" 2>"$TMP_DIR/stderr16c"
+grep -q 'passed' "$TMP_DIR/stdout16c"
+
+git reset -q HEAD docs/pre-brainstorms/completed-provenance/candidates.md docs/epics/completed/story/issues/owner.md docs/milestones.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/pre-brainstorms/completed-provenance/candidates.md" "$REPO/docs/epics/completed/story/issues/owner.md"
+
 mkdir -p "$REPO/docs/pre-brainstorms/statusscope" "$REPO/docs/progress/statusscope"
 cat > "$REPO/docs/pre-brainstorms/statusscope/candidates.md" <<'EOF'
 # Candidates

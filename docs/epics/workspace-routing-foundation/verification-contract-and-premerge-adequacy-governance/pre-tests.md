@@ -19,8 +19,10 @@
 1. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-verification-metadata`.
 2. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-natural-language-prompt`.
 3. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`.
-4. Run `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`.
-5. Run `./bin/governance-check`.
+4. Run `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`.
+5. Run `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`.
+6. Run `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`.
+7. Run `./bin/governance-check`.
 
 ## End-to-End
 - acceptance target: `Keep the protected merge path and same-line lifecycle evidence visible end to end without pretending this owner also covers post-merge human dogfood.`
