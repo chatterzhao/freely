@@ -2963,7 +2963,7 @@ routing_policy:
 ## M-20260308-frontend-probe-dogfooding-loop
 
 - title: Frontend probe + backend increment dogfooding loop
-- status: active
+- status: completed
 - source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
 - intent: 把“backend-core-first + frontend-probe-from-day-1”收敛为 Freely 自举开发自己的正式候选批次，避免继续只有后端结论、没有产品面验证闭环
@@ -2971,19 +2971,11 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260317-1003`
-- title: Incremental Dogfooding Gate for Backend Increments
+- none currently
+
 ### candidate_issues
 
-1. `C-20260317-1101`
-- title: Frontend Runtime Baseline for Probe
-- milestone_state: candidate
-- phase_state: `completed`
-- priority: P0
-- promoted_issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md`
-- source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md`
-- next_action: 已提升为独立 issue，且其 absorption closeout 已由 `I-20260317-1004` 写回 completed；此处只保留 candidate provenance
+- none currently
 
 ### completed_issues
 
@@ -3003,7 +2995,7 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `This gate remains reusable truth for later backend increment reviews, but it no longer needs to stay half-parked in committed_issues now that canonical closeout exists.`
 
-1. `I-20260308-1245`
+2. `I-20260308-1245`
 - title: Freely 内部前后端架构复评与可插拔协议边界
 - milestone_state: completed
 - phase_state: `completed`
