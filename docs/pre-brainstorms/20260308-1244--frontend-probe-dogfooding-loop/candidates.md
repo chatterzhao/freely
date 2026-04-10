@@ -17,6 +17,8 @@
 - promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md
 - legacy_id_mapping: I-20260308-1245  # 历史遗留的 issue id
 - milestone: M-20260308-frontend-probe-dogfooding-loop
+- next_action: 保留为历史来源记录。若未来要继续扩展 frontend UX、multi-project shell 或更宽的交互闭环，应从当前 canonical truth 新开 candidate/issue，而不是恢复这条 candidate。
+- completion_note: `I-20260308-1244-03` 已完成 canonical closeout；day-1 probe surface 与真实 `Transport=tauri` 闭环已经吸收到 `develop`，因此该 candidate 不再构成活跃 queue。
 - session_refs: []
 
 ### C-20260308-1244-02
@@ -38,10 +40,12 @@
 - why_now: Freely 必须从第一阶段就具备“可观察、可打断、可回放”的狗粮能力。
 - acceptance_hint: 提供最薄的 Tauri + React + TypeScript Probe，覆盖 project switch、session create/resume、message input、stream output、status、stop/retry；前端运行时使用 Bun，不走 Node.js。
 - priority: P0
-- status: promoted
-- decision_reason: 这是把“防止 AI 跑偏”落成产品能力的最直接载体，也是 Freely 自举开发自己的必需面。
+- status: completed
+- decision_reason: 这条 probe 候选已经 materialize 为正式 owner，并由 `I-20260308-1244-03` 完成 canonical closeout。当前 candidate 仅保留为来源 provenance，不再代表活跃待办。
 - promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md
 - milestone: M-20260308-frontend-probe-dogfooding-loop
+- next_action: 保留为历史来源记录。若未来要继续扩展 frontend UX、multi-project shell 或更宽的交互闭环，应从当前 canonical truth 新开 candidate/issue，而不是恢复这条 candidate。
+- completion_note: `I-20260308-1244-03` 已完成 canonical closeout；day-1 probe surface 与真实 `Transport=tauri` 闭环已经吸收到 `develop`，因此该 candidate 不再构成活跃 queue。
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}]
 
 ### C-20260308-1244-04
