@@ -57,6 +57,7 @@ routing_policy:
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+- source_brainstorm: `docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/candidates.md`
 - follow_on_to: `I-20260405-0027-A`
 - next_action: Merge completed. No further action.
