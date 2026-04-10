@@ -59,6 +59,7 @@
 - status: completed
 - decision_reason: 这条门禁候选已经 materialize 为正式 owner，并由 `I-20260317-1003` 的 canonical closeout 写回 completed。当前 candidate 只保留为历史 provenance，不再代表待执行 owner。
 - promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md
+- legacy_id_mapping: I-20260317-1003  # 历史遗留的 issue id
 - milestone: M-20260308-frontend-probe-dogfooding-loop
 - next_action: 保留为历史来源记录。后续若 backend increment review gate 需要扩展到更强 enforcement 或新的 probe 能力，应从当前 canonical truth 新开 candidate/issue。
 - completion_note: `I-20260317-1003` 已从 parked `done_ibm` owner 显式收口为 completed，并补齐 progress、verification 与 milestone writeback；该 candidate 不再构成活跃 queue。

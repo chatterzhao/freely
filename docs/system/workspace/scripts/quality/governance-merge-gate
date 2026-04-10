@@ -510,6 +510,33 @@ def resolve_review_owner_issue(
     return None
 
 
+def candidate_has_canonical_owner_line(
+    candidate: CandidateRecord,
+    issues_index: Dict[str, IssueRecord],
+    milestone_by_issue_path: Dict[str, List[MilestoneEntry]],
+) -> bool:
+    owner_path = normalize_scalar(candidate.promoted_issue_path or "")
+    if not owner_path or owner_path.startswith("pending://"):
+        return False
+
+    issue_record = issues_index.get(owner_path)
+    if not issue_record:
+        return False
+
+    candidate_source = anchorless_source_candidate(issue_record.source_candidate)
+    if candidate_source != candidate.path:
+        return False
+
+    if not issue_matches_candidate_identity(
+        issue_record.issue_id,
+        candidate.candidate_id,
+        candidate.legacy_id_mapping,
+    ):
+        return False
+
+    return bool(milestone_by_issue_path.get(owner_path))
+
+
 def main() -> int:
     global USE_STAGED_VIEW
     parser = argparse.ArgumentParser(description="Develop-merge governance gate for C/M/I materialization.")
@@ -714,6 +741,11 @@ def main() -> int:
             and governance_only_merge
             and bool(issue_bound_evidence)
         )
+        completed_provenance_fix_is_backed_by_canonical_owner = (
+            candidate_is_directly_touched
+            and status == "completed"
+            and candidate_has_canonical_owner_line(candidate, issues_index, milestone_by_issue_path)
+        )
 
         # dropped 状态的 candidate 不需要 owner issue，因为它们已被明确放弃
         if status == "dropped":
@@ -725,13 +757,18 @@ def main() -> int:
         if status in pre_ibm_statuses:
             continue
 
-        if not candidate_is_relevant and not unresolved_metadata_fix_is_absorbed_by_governance_owner:
+        if (
+            not candidate_is_relevant
+            and not unresolved_metadata_fix_is_absorbed_by_governance_owner
+            and not completed_provenance_fix_is_backed_by_canonical_owner
+        ):
             continue
 
         if (
             not candidate_is_bound_to_touched_issue
             and not (status == "absorbed" and candidate_is_bound_to_touched_owner)
             and not unresolved_metadata_fix_is_absorbed_by_governance_owner
+            and not completed_provenance_fix_is_backed_by_canonical_owner
         ):
             errors.append(
                 f"{candidate.candidate_id} in {candidate.path} is touched by this develop merge, but the same merge does not carry its concrete owner issue/progress/review. "

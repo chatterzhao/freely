@@ -6,7 +6,7 @@ TMP_DIR="$(mktemp -d /tmp/freely-pre-commit-test.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 REPO="$TMP_DIR/repo"
-mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/hooks"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/hooks" "$REPO/docs/system/workspace/scripts/quality"
 cd "$REPO"
 
 git init -q -b develop
@@ -14,17 +14,24 @@ git config user.name tester
 git config user.email tester@example.com
 cp -R "$ROOT_DIR/.githooks" "$REPO/.githooks"
 cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "$REPO/bin/worktree-common.sh"
+cp "$ROOT_DIR/bin/governance-merge-gate" "$REPO/bin/governance-merge-gate"
 cp "$ROOT_DIR/bin/pretests-gate" "$REPO/bin/pretests-gate"
 cp "$ROOT_DIR/docs/system/workspace/hooks/pre-commit.sh" "$REPO/docs/system/workspace/hooks/pre-commit.sh"
-mkdir -p "$REPO/docs/system/workspace/scripts/quality"
+cp "$ROOT_DIR/docs/system/workspace/hooks/pre-merge-commit.sh" "$REPO/docs/system/workspace/hooks/pre-merge-commit.sh"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-merge-gate" "$REPO/docs/system/workspace/scripts/quality/governance-merge-gate"
 cp "$ROOT_DIR/docs/system/workspace/scripts/quality/pretests-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
-chmod +x "$REPO/.githooks/"* "$REPO/bin/worktree-common.sh" "$REPO/bin/pretests-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
+chmod +x "$REPO/.githooks/"* "$REPO/bin/worktree-common.sh" "$REPO/bin/governance-merge-gate" "$REPO/bin/pretests-gate" "$REPO/docs/system/workspace/hooks/pre-commit.sh" "$REPO/docs/system/workspace/hooks/pre-merge-commit.sh" "$REPO/docs/system/workspace/scripts/quality/governance-merge-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
 
 echo base > README.md
+mkdir -p docs
+cat > docs/milestones.md <<'EOF'
+# Milestones
+EOF
 git add README.md
+git add docs/milestones.md
 git commit -q -m "init"
 
-git add .githooks docs/system/workspace/hooks/pre-commit.sh docs/system/workspace/scripts/quality/pretests-gate bin/worktree-common.sh bin/pretests-gate
+git add .githooks docs/system/workspace/hooks/pre-commit.sh docs/system/workspace/hooks/pre-merge-commit.sh docs/system/workspace/scripts/quality/governance-merge-gate docs/system/workspace/scripts/quality/pretests-gate bin/worktree-common.sh bin/governance-merge-gate bin/pretests-gate
 git commit -q -m "seed hook tooling"
 
 git checkout -q -b test-pre-merge-20260327-demo
@@ -77,11 +84,16 @@ target_branch=develop
 source_branch=feature/merge-completion
 bypass_mode=forbidden
 EOF
-FREELY_GUARDED_MERGE_COMPLETION=1 "$REPO/.githooks/pre-commit" >"$TMP_DIR/stdout-merge-allow" 2>"$TMP_DIR/stderr-merge-allow"
+if FREELY_GUARDED_MERGE_COMPLETION=1 "$REPO/.githooks/pre-commit" >"$TMP_DIR/stdout-merge-allow" 2>"$TMP_DIR/stderr-merge-allow"; then
+  echo "[FAIL] pre-commit should delegate guarded develop merge completion into governance materialization checks" >&2
+  exit 1
+fi
+cat "$TMP_DIR/stdout-merge-allow" "$TMP_DIR/stderr-merge-allow" | grep -q "develop-bound governance materialization gate failed"
+cat "$TMP_DIR/stdout-merge-allow" "$TMP_DIR/stderr-merge-allow" | grep -q "no candidate-driven lifecycle evidence"
 rm -f "$(git rev-parse --git-dir)/freely-guarded-merge-state"
 git merge --abort >/dev/null 2>&1
 
-echo "[PASS] pre-commit only allows protected-branch merge completion through guarded path"
+echo "[PASS] pre-commit now sends guarded develop merge completion through downstream governance checks"
 
 git checkout -q develop
 git worktree add -q -b feature/pretests ../repo-worktrees/feature-pretests develop

@@ -57,6 +57,12 @@ MSG
   fi
 }
 
+run_guarded_merge_followthrough_hook() {
+  local hook_path="./docs/system/workspace/hooks/pre-merge-commit.sh"
+  [[ -x "$hook_path" ]] || return 0
+  "$hook_path"
+}
+
 if freely_wt_is_test_pre_merge_branch "$branch"; then
   if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
     if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" == "1" ]]; then
@@ -90,6 +96,9 @@ case "$branch" in
     if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
       if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" == "1" ]]; then
         require_valid_guarded_completion_state
+        if [[ "$branch" == "develop" ]]; then
+          run_guarded_merge_followthrough_hook
+        fi
         exit 0
       fi
       cat <<MSG
