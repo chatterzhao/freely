@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-2358-D`
 - title: CLI help and dry-run contract followthrough governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `cli-help-and-dry-run-contract-followthrough-governance`
@@ -64,3 +64,9 @@ These are CLI-first product behaviors, not operator trivia. If the first-hop com
 - `./bin/freely --help`
 - `./bin/ai --quiet --format json --dry-run switch codex`
 - `./bin/governance-check`
+
+## Closeout
+
+- Canonical `develop` absorbed this owner through `test-pre-merge-20260406-0408-cli-help-dry-run-contract-followthrough` and guarded merge `cb46eabf`.
+- Post-merge closeout verification on `develop` reconfirmed the repaired help surfaces and bounded dry-run JSON contract on `2026-04-09`.
+- Future work should open a new owner if another first-hop command contract regresses; do not reopen this bounded lane for unrelated runtime or bootstrap drift.

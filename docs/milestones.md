@@ -84,18 +84,6 @@ routing_policy:
 - next_action: Keep this owner parked as the canonical IBM handoff for standalone extraction timing. Do not open an extraction worktree until the Codex-first owner is merged and a concrete follow-on lane can prove the extraction-start checklist is satisfied.
 - revisit_trigger: Re-open only if the Codex-first owner is reopened and invalidates the threshold/boundary package, or if a second tool reaches verified parity quickly enough to change the extraction economics.
 
-2. `I-20260405-2358-D`
-- title: CLI help and dry-run contract followthrough governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-cli-help-and-dry-run-contract-followthrough-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
-- next_action: Repair the audited help/usage exit-code contracts plus the bounded `ai switch codex --dry-run` JSON summary path, then replay the focused CLI-first verification set before promotion.
-- revisit_trigger: Re-open only if the owner proves too narrow to keep help semantics and dry-run summary semantics aligned, or if canonical replay exposes another first-hop command contract outside this bounded set.
-
 ### candidate_issues
 
 1. `C-20260409-1715-A`
@@ -438,6 +426,27 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+1. `I-20260405-2358-D`
+- title: CLI help and dry-run contract followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-cli-help-and-dry-run-contract-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
+- evidence:
+  - `develop` merge `cb46eabf`
+  - `docs/progress/workspace-routing-foundation/p-cli-help-and-dry-run-contract-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-verification.md`
+  - `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260409-cli-help-and-dry-run-contract-followthrough-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-cli-help-contracts`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-dry-run-contract`
+  - `./bin/ai --quiet --format json --dry-run switch codex`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now carries the explicit help/usage contract repairs and bounded dry-run inventory JSON path, so this owner should no longer remain in committed_issues.`
+
 1. `I-20260409-1715-A`
 - title: Runtime evidence provenance research retirement followthrough governance
 - milestone_state: completed
