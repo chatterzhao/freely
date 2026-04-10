@@ -61,18 +61,6 @@ routing_policy:
 - next_action: Start the dev-loop from this IBM package. First freeze timely-push default, lawful defer taxonomy, and `resync_required` patrol/status truth, then decide whether implementation should stay on one lane or split between manager/status surfaces and runtime checks.
 - revisit_trigger: Re-open the owner boundary only if implementation proves push urgency and upstream resync triggers cannot remain one bounded package without creating parallel truth.
 
-1. `I-20260407-0215-A`
-- title: Runtime self-host continuity gap and status truth governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/candidates.md`
-- next_action: Keep the owner in bounded verification until the tracked root `develop` entrypoint absorbs the dirty feature implementation; use the current issue/progress plus verification replay to drive manager-side merge-prep / absorption judgment, and do not reopen worker implementation unless the patched feature entrypoint itself reintroduces a status-truth gap.
-- revisit_trigger: Re-open boundary selection only if automatic recovery of prompt-required continuity gaps proves inseparable from this bounded status owner, or if canonical `develop` shows the continuity-gap signal is actually absorbed by another active runtime supervision owner.
-
 3. `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - milestone_state: committed
@@ -446,6 +434,26 @@ routing_policy:
   - `./bin/ai --quiet --format json --dry-run switch codex`
   - `./bin/governance-check`
 - completion_note: `Canonical develop now carries the explicit help/usage contract repairs and bounded dry-run inventory JSON path, so this owner should no longer remain in committed_issues.`
+
+1. `I-20260407-0215-A`
+- title: Runtime self-host continuity gap and status truth governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260407-0215--runtime-selfhost-continuity-gap-and-status-truth/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
+  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260409-runtime-selfhost-continuity-gap-and-status-truth-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-pid-hint-and-rg-degrade`
+  - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-040148-feature-runtime-selfhost-continuity-gap-status-truth-closeout --issue docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+  - `./bin/governance-check`
+- completion_note: `Tracked-root absorption was already proven by the bounded verification replay, and the remaining drift was lifecycle writeback only, so this owner no longer belongs in committed_issues.`
 
 1. `I-20260409-1715-A`
 - title: Runtime evidence provenance research retirement followthrough governance
