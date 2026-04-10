@@ -50,8 +50,10 @@
 - why_now: 需要把“后端每个增量都要在 Probe 中验证”固化为 Freely 自举治理的一部分。
 - acceptance_hint: 定义后端能力进入完成态前必须具备的 Probe 验证证据、回写位置和阻断条件。
 - priority: P0
-- status: promoted
-- decision_reason: 它把这次讨论从“开发建议”提升为“Freely 自己必须具备的产品与治理能力”。
+- status: completed
+- decision_reason: 这条门禁候选已经 materialize 为正式 owner，并由 `I-20260317-1003` 的 canonical closeout 写回 completed。当前 candidate 只保留为历史 provenance，不再代表待执行 owner。
 - promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md
 - milestone: M-20260308-frontend-probe-dogfooding-loop
+- next_action: 保留为历史来源记录。后续若 backend increment review gate 需要扩展到更强 enforcement 或新的 probe 能力，应从当前 canonical truth 新开 candidate/issue。
+- completion_note: `I-20260317-1003` 已从 parked `done_ibm` owner 显式收口为 completed，并补齐 progress、verification 与 milestone writeback；该 candidate 不再构成活跃 queue。
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}]
