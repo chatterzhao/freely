@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `tool-authorization-bootstrap-and-post-consent-materialization-governance`
@@ -143,6 +143,8 @@ This owner freezes the product boundary only. The following implementation-shape
 
 ## Next
 
-- Current owner is now at `in_verification`.
-- Future work should open narrower implementation or followthrough owners for persisted authorization-bootstrap state, per-tool repair/materialization cleanup, or adapter-specific drift correction rather than widening this architecture owner.
-- Reopen only if canonical product-boundary truth for post-consent authorization/bootstrap becomes inconsistent across CLI, TUI, GUI, settings, or sibling tool-routing owners.
+## Closeout
+
+- Canonical `develop` already carries this bounded architecture contract for post-consent authorization/bootstrap semantics.
+- `2026-04-09` closeout verification reconfirmed that downstream implementation owners should continue consuming this package rather than reopening it for tool-specific implementation.
+- Future work should open only narrower follow-on owners for persisted state, repair/materialization cleanup, or adapter-specific drift correction.
