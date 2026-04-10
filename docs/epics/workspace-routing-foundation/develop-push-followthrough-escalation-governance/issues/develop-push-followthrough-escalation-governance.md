@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260408-1200-A`
 - title: Develop push followthrough escalation governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `develop-push-followthrough-escalation-governance`
@@ -13,6 +13,7 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/pre-tests.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-develop-push-followthrough-escalation-governance.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/code-reviews`
 - depends_on:
   - `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
@@ -79,8 +80,8 @@ Freely 已经能显式暴露 `push_pending` / `push_deferred`，但还没有冻�
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/scripts/quality/governance-check`
 
-## Next
+## Closeout
 
-1. 先在 IBM 真源里固定 timely-push default、有限 defer reason、resync trigger 和 patrol surfacing。
-2. dev-loop 时再决定 status/runtime 改动是否与 manager truth-source writeback 同 lane 落地。
-3. 不要 reopen `develop-push-pending-guard-governance`；本 issue 只承接 visibility 之后的 stronger followthrough semantics。
+- Canonical `develop` already carries the bounded push-followthrough truth across `LAWS`, manager guidance, runtime status surfaces, and focused regressions.
+- `2026-04-09` closeout verification reconfirmed that the owner is absorbed and only lifecycle writeback was missing.
+- Future work should open a new owner if canonical `develop` later regresses push urgency, lawful defer visibility, or `resync_required` surfacing; do not reopen this bounded lane for auto-push or transport automation.
