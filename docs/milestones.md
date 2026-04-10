@@ -2924,14 +2924,6 @@ routing_policy:
 
 1. `I-20260317-1003`
 - title: Incremental Dogfooding Gate for Backend Increments
-- milestone_state: committed
-- phase_state: `done_ibm`
-- priority: P0
-- issue_path: `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md`
-- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
-- next_action: 这条验证门禁先保持 parked completed-IBM owner，作为后续 backend increment review gate 复用；当前不需要单独挂住 research worktree。等活跃 `in_dev` 主线逼近该成本窗口时，再决定是否补 canonical closeout 或 issue-bound continuation。
-
 ### candidate_issues
 
 1. `C-20260304-202`
@@ -2956,6 +2948,22 @@ routing_policy:
 - next_action: 已提升为独立 issue，且其 absorption closeout 已由 `I-20260317-1004` 写回 completed；此处只保留 candidate provenance
 
 ### completed_issues
+
+1. `I-20260317-1003`
+- title: Incremental Dogfooding Gate for Backend Increments
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md`
+- progress_path: `docs/progress/frontend-probe-dogfooding-loop/p-incremental-dogfooding-gate-for-backend-increments.md`
+- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md`
+- evidence:
+  - `docs/progress/frontend-probe-dogfooding-loop/p-incremental-dogfooding-gate-for-backend-increments.md`
+  - `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/code-reviews/20260409-incremental-dogfooding-gate-for-backend-increments-canonical-closeout-verification.md`
+  - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-051451-feature-incremental-dogfooding-gate-parked-ibm-closeout --issue docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md`
+  - `./bin/governance-check`
+- completion_note: `This gate remains reusable truth for later backend increment reviews, but it no longer needs to stay half-parked in committed_issues now that canonical closeout exists.`
 
 1. `I-20260308-1245`
 - title: Freely 内部前后端架构复评与可插拔协议边界
