@@ -3,32 +3,31 @@
 - issue_id: `I-20260405-1235-A`
 - issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - title: `Tool authorization bootstrap and post-consent materialization governance`
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260326-freely-product-architecture`
 - branch: `feature/tool-authorization-bootstrap-research-20260405-0335`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-0335-feature-tool-authorization-bootstrap-research`
-- updated_at: `2026-04-05`
+- updated_at: `2026-04-09`
+- closure_status: `merged-and-verified`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
 ## Summary
 
-- The pre-brainstorm is now promoted into a dedicated `freely-product-architecture` owner rather than being squeezed into existing consent/tool-policy owners.
-- The owner freezes four distinct layers: activation consent, project authorization bootstrap, tool trust/permission surface, and adapter surface.
-- The current implementation review already shows why a new owner is required: `init` / `set-tool` / `sync-tooling` can mutate tooling surfaces, `cc + acp` still has config/runtime drift, and future CLI/TUI/GUI/settings must share one backend contract.
-- The owner is now parked as the canonical IBM handoff for:
-  - a per-tool matrix for `codex`, `cc`, `cc-use-codex-cli`, `iflow`, and `kiro-cli`
-  - shared degradation semantics for missing/partial authorization bootstrap
-  - runtime refactor seams for `cmd_init`, `cmd_set_tool`, and `cmd_sync_tooling`
-- This lane remains documentation-first; future implementation must split into narrower follow-on owners instead of widening this architecture owner.
+- `I-20260405-1235-A` is now closed as a bounded architecture contract owner rather than left split between `done_ibm` progress truth and `in_verification` issue truth.
+- Canonical truth for this owner is already absorbed in the issue-bound architecture package that downstream implementation owners consume.
+- The remaining drift was lifecycle writeback only.
+- `2026-04-09` closeout replay passed `./bin/pretests-gate`, passed `./bin/governance-check`, and preserved the documentation-first boundary.
 
-## Verification Snapshot
+## Verification Evidence
 
-- Passed in this worktree:
-  - `./bin/governance-check`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-045823-feature-tool-authorization-bootstrap-post-consent-materialization-closeout --issue docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- `./bin/governance-check`
+- `git diff --check`
+- `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/code-reviews/20260408-tool-authorization-bootstrap-and-post-consent-materialization-verification.md`
+- `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/code-reviews/20260409-tool-authorization-bootstrap-and-post-consent-materialization-canonical-closeout-verification.md`
 
 ## Next Action
 
-- Keep this owner parked as `done_ibm` architecture truth for post-consent authorization/bootstrap semantics.
-- Route persisted state materialization, per-tool repair execution, and adapter/tool drift cleanup into narrower follow-on owners.
+- No further action in this owner unless post-consent authorization/bootstrap truth later drifts across CLI, TUI, GUI, settings, or sibling tool-routing owners.

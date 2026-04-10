@@ -2655,19 +2655,24 @@ routing_policy:
 - why_now: `PROJECT_INTENT / CONSTITUTION / LAWS / AGENTS.md` 的高层分工已经通过独立 issue 写回，需要 milestone 保留同一条 canonical traceability
 
 ### committed_issues
+### completed_issues
 
 1. `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
-- milestone_state: committed
-- phase_state: `in_verification`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - progress_path: `docs/progress/freely-product-architecture/p-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md`
-- next_action: Keep this owner parked as the canonical IBM handoff for post-consent authorization/bootstrap semantics. Future work should open narrower follow-on owners for persisted state, per-tool repair/materialization cleanup, or adapter-specific drift rather than widening this architecture owner.
-
-### completed_issues
+- evidence:
+  - `docs/progress/freely-product-architecture/p-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/code-reviews/20260408-tool-authorization-bootstrap-and-post-consent-materialization-verification.md`
+  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/code-reviews/20260409-tool-authorization-bootstrap-and-post-consent-materialization-canonical-closeout-verification.md`
+  - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-045823-feature-tool-authorization-bootstrap-post-consent-materialization-closeout --issue docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop already carries this bounded architecture package, and the remaining drift was lifecycle closeout truth rather than missing implementation.`
 
 1. `I-20260405-2358-A`
 - title: Fresh-project bootstrap and baseline scoping followthrough governance
