@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260410-1430-A`
 - title: `Fix preferred_auth_method lost when switching to account slot`
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `codex-apikey-slot-bundle-and-provider-aware-probe-governance`
