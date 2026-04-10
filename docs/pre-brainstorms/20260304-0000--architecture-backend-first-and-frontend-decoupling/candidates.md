@@ -27,12 +27,12 @@
 - why_now: 会影响自治开发触发与观察体验。
 - acceptance_hint: 实现 Focus/Overview、activeProject 高亮、项目级输入隔离。
 - priority: P1
-- status: proposed
-- decision_reason: 与多项目隔离交互主线一致，已形成明确实现边界。
+- status: needs_research
+- decision_reason: 方向仍然有效，但旧 `frontend-probe` milestone 已明确不再消费它；当前应把这条未完成候选后移到最早会真正消费它的 active milestone，而不是继续停放在旧里程碑或误写成已收口。
 - promoted_issue_path: pending://issue-materialization
-- milestone: M-20260308-frontend-probe-dogfooding-loop
-- next_action: 继续预研，等待前端 probe 稳定后再推进多项目 UI 隔离实现。
-- revisit_trigger: 当前端 probe dogfooding 完成后需要多项目交互能力时，再推进到 IBM。
+- milestone: M-20260312-control-surface-runtime-convergence
+- next_action: 继续 pre-brainstorm，并与 control-surface 信息架构一起冻结多项目 Focus/Overview、`activeProject` 与项目级输入隔离 contract，再决定是否 materialize 为独立 issue。
+- revisit_trigger: 当 control-surface / multi-worktree 首页开始进入 IBM，或需要明确多项目并行开发的输入与状态隔离语义时，推进到下一环。
 - session_refs: []
 
 ### C-20260304-203

@@ -72,15 +72,15 @@
   - C-20260312-0011-A
 
 ### C-20260312-0011-E
-- title: AI Team Control Surface and Multi-Worktree Visibility
-- problem: 当前文档已明确需要 human correction、agent roster、team timeline 和 embedded terminal，但还没有一份正式问题专门收敛 Freely 应用的整体信息架构，尤其是如何让人同时观察多个 worktree、多个 AI 和多个 subagent 的推进状态。
+- title: AI Team Control Surface, Multi-Worktree Visibility, and Multi-Project Focus
+- problem: 当前文档已明确需要 human correction、agent roster、team timeline 和 embedded terminal，但还没有一份正式问题专门收敛 Freely 应用的整体信息架构，尤其是如何让人同时观察多个 worktree、多个 AI、多个 subagent，以及在多项目并行开发时如何表达 Focus/Overview、`activeProject` 高亮和项目级输入隔离。
 - why_now: 如果不尽早冻结控制面方向，Frontend Probe 很容易退化成“聊天窗 + 单终端”，最终失去 Freely 作为自治工程控制面的产品识别度。
-- acceptance_hint: 定义面向不同操作系统用户的 Freely App 信息架构；明确 chat、team timeline、agent roster、worktree lanes、embedded terminal、status panels 的相对地位；说明 day-1 probe 如何做到“薄但方向正确”。
+- acceptance_hint: 定义面向不同操作系统用户的 Freely App 信息架构；明确 chat、team timeline、agent roster、worktree lanes、embedded terminal、status panels 的相对地位；冻结多项目并行开发下的 Focus/Overview、`activeProject`、项目级输入隔离与状态总览 contract；说明 day-1 control surface 如何做到“薄但方向正确”。
 - priority: P0
 - status: proposed
-- decision_reason: 这直接决定 Freely 的产品体验是否服务于多 agent / 多 worktree / 多 subagent 的真实使用场景。
-- next_action: 待 contract 边界确认后进入 IBM，定义 day-1 control surface 的信息架构、worktree lanes、team timeline 与 agent roster。
-- revisit_trigger: 当需要设计控制面首页、团队态势或多 worktree 可见性时重新唤起。
+- decision_reason: 这直接决定 Freely 的产品体验是否服务于多 agent / 多 worktree / 多 subagent / 多项目并行开发的真实使用场景，也正式吸收旧 `frontend-probe` 候选中关于 Focus/Overview 与 `activeProject` 的后续方向。
+- next_action: 待 contract 边界确认后进入 IBM，定义 day-1 control surface 的信息架构、worktree lanes、team timeline、agent roster，以及多项目 Focus/Overview / `activeProject` / 输入隔离语义。
+- revisit_trigger: 当需要设计控制面首页、团队态势、多 worktree lanes 或多项目控制面时重新唤起。
 - promoted_issue_path: pending://issue-materialization
 - milestone: M-20260312-control-surface-runtime-convergence
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
