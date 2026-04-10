@@ -12,11 +12,13 @@
 - why_now: 如果不先把内部边界思想收敛清楚，后续 API、Probe 和实现层都会建立在模糊假设上。
 - acceptance_hint: 明确 Tauri 桌面工具内部的 frontend/backend 职责边界、状态归属、命令/事件流模型、可插拔协议层分层，以及未来迁移到多进程/远端时保持兼容的原则。
 - priority: P0
-- status: promoted
-- decision_reason: 这是这轮重评项目架构的总入口，先把“前后端是解耦思想，不等于 day-1 分布式部署”落成正式 issue。
+- status: completed
+- decision_reason: 这条架构总入口已经 materialize 为正式 owner，并由 `I-20260308-1245` 完成 canonical closeout。当前 candidate 仅保留为来源 provenance，不再代表活跃待办。
 - promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md
 - legacy_id_mapping: I-20260308-1245  # 历史遗留的 issue id
 - milestone: M-20260308-frontend-probe-dogfooding-loop
+- next_action: 保留为历史来源记录。若未来前后端边界或可插拔协议层需要重新总论收敛，应从当前 canonical truth 新开 candidate/issue，而不是恢复这条 candidate。
+- completion_note: `I-20260308-1245` 已完成 canonical closeout；frontend/backend 边界、状态归属矩阵与协议分层已被下游 boundary/probe/bridge owner 复用，因此该 candidate 不再构成活跃 queue。
 - session_refs: []
 
 ### C-20260308-1244-02
