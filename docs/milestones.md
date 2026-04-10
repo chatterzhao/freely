@@ -2948,7 +2948,7 @@ routing_policy:
 2. `C-20260317-1101`
 - title: Frontend Runtime Baseline for Probe
 - milestone_state: candidate
-- phase_state: `todo_ibm`
+- phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md`
 - source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
