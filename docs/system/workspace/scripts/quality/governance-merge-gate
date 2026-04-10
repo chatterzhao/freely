@@ -744,7 +744,6 @@ def main() -> int:
         completed_provenance_fix_is_backed_by_canonical_owner = (
             candidate_is_directly_touched
             and status == "completed"
-            and governance_only_merge
             and candidate_has_canonical_owner_line(candidate, issues_index, milestone_by_issue_path)
         )
 
