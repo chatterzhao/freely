@@ -50,17 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-3. `I-20260405-1415-A`
-- title: ai-switch-cli extraction threshold and skeleton disposition governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md`
-- next_action: Keep this owner parked as the canonical IBM handoff for standalone extraction timing. Do not open an extraction worktree until the Codex-first owner is merged and a concrete follow-on lane can prove the extraction-start checklist is satisfied.
-- revisit_trigger: Re-open only if the Codex-first owner is reopened and invalidates the threshold/boundary package, or if a second tool reaches verified parity quickly enough to change the extraction economics.
-
 ### candidate_issues
 
 1. `C-20260409-1715-A`
@@ -464,6 +453,23 @@ routing_policy:
   - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-043549-feature-develop-push-followthrough-escalation-closeout --issue docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
   - `./bin/governance-check`
 - completion_note: `Canonical develop already absorbed the bounded push-followthrough truth, and the remaining drift was missing progress / closeout writeback rather than implementation debt.`
+
+1. `I-20260405-1415-A`
+- title: ai-switch-cli extraction threshold and skeleton disposition governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+  - `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
+  - `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260409-ai-switch-cli-extraction-threshold-and-skeleton-disposition-canonical-closeout-verification.md`
+  - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-044628-feature-ai-switch-cli-extraction-threshold-skeleton-disposition-closeout --issue docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop already carries this bounded extraction-threshold handoff package, and the remaining drift was missing progress / closeout writeback rather than extraction implementation debt.`
 
 1. `I-20260409-1715-A`
 - title: Runtime evidence provenance research retirement followthrough governance

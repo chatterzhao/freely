@@ -1,58 +1,67 @@
-# Pre-tests
+# Pre-Tests: ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance
 
-## Acceptance Contract
+## Unit
+- acceptance target: `Do not invent a fake code-unit boundary for a governance owner whose executable proof is the bounded IBM package and lifecycle legality.`
+- testing layer: `unit`
+- target environment: `issue-bound extraction-threshold governance package`
+- required evidence: `lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This owner freezes threshold, boundary, and skeleton disposition rules for a future backend extraction lane, but it does not introduce a narrower callable unit below the doc package and governance checks already used to prove it.`
+- replacement_evidence: `The smallest executable seams are governance-check, diff hygiene, and the issue-bound verification artifact that proves the owner remains a lawful active handoff package.`
 
-- acceptance_target: `Issue-bound IBM for extraction timing and skeleton disposition of the future ai-switch-cli backend`
-- testing_layer: `doc`
-- target_environment: `canonical repo docs in the active feature worktree before any standalone backend extraction starts`
-- required_evidence:
-  - `prd.md` freezes an executable extraction-start checklist and the control-plane/backend split without circular prerequisites
-  - `issues/*.md` and issue-bound brainstorm document the follow-on extraction owner handoff package
-  - `tasks.md` reflects current IBM work instead of pre-materialization steps
-  - `docs/milestones.md` keeps candidate mirror semantics explicit so committed issue authority is not confused with candidate queue presentation
-- blocker_taxonomy:
-  - `definition_missing`: extraction threshold, boundary, or skeleton disposition still depends on chat memory
-  - `commands_only`: docs enumerate commands but do not explain the decision contract for split/no-split
-  - `evidence_plan_missing`: no explicit handoff package or start checklist for the follow-on extraction owner
-  - `execution_pending_or_failed`: canonical docs still contain circular gate wording, stale tasks, or ambiguous milestone mirror semantics
+## Integration
+- acceptance target: `Prove the IBM package is complete enough that a future extraction owner can consume threshold, boundary, and skeleton-disposition truth without reopening research.`
+- testing layer: `integration`
+- target environment: `canonical repo docs in a dedicated closeout worktree`
+- required evidence: `reviewed owner package plus governance artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Review `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`.
+2. Review `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/brainstorms/b-ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`.
+3. Review `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/prd.md`.
+4. Review `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/prd.md`.
+5. Run `./bin/governance-check`.
+6. Run `git diff --check`.
 
-## Pre-merge acceptance
+## End-to-End
+- acceptance target: `Preserve this owner as a canonical handoff package for future extraction work instead of pretending standalone backend extraction already started.`
+- testing layer: `end_to_end`
+- target environment: `guarded develop-bound governance chain`
+- required evidence: `milestone/issue/progress closeout plus verification artifacts`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Keep `I-20260405-1415-A` as the canonical develop-bound package for extraction timing and skeleton disposition.
+2. Confirm no standalone extraction worktree is opened from this owner unless a later lane proves the threshold is met.
+3. Keep Freely as canonical truth until a future extraction owner writes the repo-path choice and first backend-owned move.
 
-1. IBM docs must make the extraction threshold concrete enough that a later owner can decide “split now / do not split yet” without relying on chat memory.
-2. IBM docs must clearly separate Freely control-plane responsibilities from backend responsibilities.
-3. The docs must explicitly classify `/Users/zhaoyu/Downloads/code/my-codex-account-switch/codex-account-switch` as non-canonical until a formal extraction owner starts.
-4. The docs must define the allowed handling paths for the skeleton:
-   - rename in place to `ai-switch-cli`
-   - discard and create fresh repo
-5. The docs must not claim standalone extraction has already begun.
-6. The docs must not reopen the frozen Codex slot bundle contract or pretend other tools already have verified parity.
-7. The docs must name the generic helper surfaces that should be stabilized before extraction, including write-before-backup for user-home config mutation.
-
-## Post-merge acceptance
-
-1. A follow-on owner can open a dedicated extraction worktree without re-researching whether the threshold has been met.
-2. Freely runtime and docs can continue evolving current embedded backend logic without ambiguity about what still remains canonical.
-3. Future repo migration of the local skeleton can be audited against a written rule instead of operator memory.
+## Real-Environment
+- acceptance target: `Reserve canonical closeout replay as a tracked-root governance check instead of confusing local skeleton existence with active backend materialization.`
+- testing layer: `real_environment`
+- target environment: `canonical develop in the tracked root`
+- required evidence: `tracked-root doc truth plus canonical closeout verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `Protected publication and any future standalone backend repo creation happen after canonical develop absorbs this owner; this pre-tests file records that boundary rather than pretending backend materialization already exists.`
+- replacement_evidence: `Tracked-root doc truth, governance-check, and canonical closeout verification prove the owner remains a lawful bounded handoff package without reopening extraction implementation.`
 
 ## Acceptance Items
 
-### PT-1
-- id: `PT-1`
-- requirement: `extraction threshold is explicit and executable`
-- evidence_level: `doc`
+### AT-001
+- id: `AT-001`
+- requirement: `The extraction threshold is explicit enough that a future owner can decide split-now versus do-not-split-yet without relying on chat memory.`
+- evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/prd.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
 
-### PT-2
-- id: `PT-2`
-- requirement: `Freely control-plane vs backend boundary is explicit`
-- evidence_level: `doc`
+### AT-002
+- id: `AT-002`
+- requirement: `Freely control-plane versus backend responsibility remains explicit and bounded.`
+- evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/prd.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
 
-### PT-3
-- id: `PT-3`
-- requirement: `local codex-account-switch skeleton is classified and constrained by written disposition rules`
-- evidence_level: `doc`
+### AT-003
+- id: `AT-003`
+- requirement: `The local codex-account-switch skeleton is explicitly non-canonical and constrained by written disposition rules.`
+- evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/prd.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
