@@ -3,25 +3,22 @@
 - issue_id: `I-20260407-0215-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
 - title: `Runtime self-host continuity gap and status truth governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-live-status-and-manager-continuity-followthrough-20260407`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260407-feature-runtime-live-status-and-manager-continuity-followthrough`
-- updated_at: `2026-04-08 02:22 PDT`
+- updated_at: `2026-04-09`
+- closure_status: `merged-and-verified`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
 ## Summary
 
-- `I-20260407-0215-A` remains a bounded verification owner, not a reopened implementation lane and not a worker-granted cleanup closeout.
-- `scope_drift=no`: the worktree stays inside the bounded `I-20260407-0215-A` write scope, the tree was clean before this replay, and this round only refreshes same-lane verification truth.
-- The feature-worktree entrypoint and the tracked root `develop` entrypoint now both replay machine-readable `live-status` successfully against the root project, so the bounded status-truth surface is absorbed at tracked root.
-- The executed entrypoint identity still differs by absolute path and is now recorded explicitly: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260407-feature-runtime-live-status-and-manager-continuity-followthrough/bin/freely` versus `/Users/zhaoyu/Downloads/code/my-freely/freely/bin/freely`.
-- The active project no longer has a missing prompt-required continuity file: both entrypoints now surface `manager_continuity_gap_state=none`, `manager_continuity_gap_summary=present`, and the same expected/latest-generated continuity path.
-- The remaining live runtime truth is generated-versus-consumed continuity drift on a stalled project: both entrypoints now show `latest_manager_continuity_generated=/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260408-012541.md` while `latest_manager_continuity_consumed=/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260407-221639.md`.
-- The current route remains `continuation -> committed_issues -> completion_verification -> target_owner=manager`, and the worker-side handoff state is now `ready_for_manager_completion_verification`.
-- `restart_point`: re-run the feature entrypoint and tracked-root entrypoint `live-status` commands against `/Users/zhaoyu/Downloads/code/my-freely/freely`, then compare the bounded manager-continuity and ownership-conflict fields recorded in the verification artifact before asking manager to close verification.
+- `I-20260407-0215-A` is now closed as a bounded runtime status-truth owner rather than left parked in verification.
+- The canonical truth for this owner is that tracked-root `develop` already absorbed the repaired status surface; the remaining drift was lifecycle writeback, not missing implementation.
+- `2026-04-09` closeout replay kept `scope_drift=no`, passed the focused regressions, passed `./bin/pretests-gate`, and passed `./bin/governance-check`.
+- The original verification replay remains the authoritative evidence that the tracked-root and feature entrypoints surfaced the same bounded continuity-gap field set, so this closeout does not reopen worker implementation.
 
 ## Implemented Slice
 
@@ -45,6 +42,12 @@
 
 ## Verification Evidence
 
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-pid-hint-and-rg-degrade`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-040148-feature-runtime-selfhost-continuity-gap-status-truth-closeout --issue docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- `./bin/governance-check`
+- `git diff --check`
+- `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260409-runtime-selfhost-continuity-gap-and-status-truth-canonical-closeout-verification.md`
 - `bash -n docs/system/workspace/scripts/runtime/freely`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-pid-hint-and-rg-degrade`
@@ -61,4 +64,4 @@
 
 ## Next Action
 
-- Treat `I-20260407-0215-A` as a bounded status-truth owner that stays in manager-owned `completion_verification` only. Current worker handoff state remains `ready_for_manager_completion_verification`, and this round still concludes `scope_drift=no`. As of `2026-04-08 02:22 PDT`, the feature entrypoint and tracked-root entrypoint both return `exit 0` and surface the same bounded status truth for the same target project, so canonical tracked-root absorption remains present after the current fresh replay. The missing-continuity symptom itself is still inactive: both entrypoints report `manager_continuity_gap_state: none` with the same expected/latest-generated path. The remaining manager-visible runtime truth is generated-versus-consumed continuity drift on a stalled project, still showing `latest_manager_continuity_generated=/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260408-012541.md` while consumption remains at `.../manager-continuity-20260407-221639.md`. The authoritative route evidence stays worker-scoped and unchanged after the fresh rerun: `source_class=continuation`, highest-priority pool `committed_issues`, `route_kind=completion_verification`, `target_owner=manager`, `selected_tool=codex`, and `workspace_action=reuse_current_worktree`. The next manager judgment should therefore be completion verification closeout, not reopened worker implementation and not cleanup delegated from this worktree. Keep the separate research-only pre-brainstorm around runtime evidence provenance / canonical absorption gate / manager continuity materialization visible as its own lane; do not silently fold it into this owner. Worker-local restart_point for traceability: `Manager route only. Consume I-20260407-0215-A as a bounded verification owner, not a reopened dev loop. Re-run /Users/zhaoyu/Downloads/code/my-freely/freely/bin/freely and /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260407-feature-runtime-live-status-and-manager-continuity-followthrough/bin/freely against /Users/zhaoyu/Downloads/code/my-freely/freely, compare the bounded manager-continuity fields captured in the verification artifact, and keep closeout in manager-owned completion verification, not worker cleanup.`
+- No further action in this owner unless canonical `develop` later regresses the bounded pid-hint degrade path, `rg`-missing workspace-root fallback, or continuity-gap status surface.
