@@ -1328,6 +1328,21 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews/20260327-pretests-gate-feature-verification.md`
 - completion_note: 第一阶段 issue-bound completed gate 已在 `develop` 吸收；后续 active worktree 在 issue 进入 `completed` 时会被同一 gate 约束，retirement enforcement 留给 follow-on lifecycle。
 
+3. `I-20260410-1835-A`
+- title: Auth switch real-environment and end-to-end adequacy governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-auth-switch-real-environment-and-e2e-adequacy-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260410-1835--auth-switch-real-environment-and-e2e-governance-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260410-1835--auth-switch-real-environment-and-e2e-governance-gap/candidates.md`
+- follow_on_to: `I-20260327-0701`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews/20260410-auth-switch-real-environment-and-e2e-adequacy-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
+- completion_note: `This follow-on owner freezes why the auth/switch regression was missed and prevents the same dual-waive pattern from passing governance again without live executable evidence.`
+
 3. `I-20260327-1115`
 - title: OAuth slot inventory sweep and launch-time confirmation governance
 - milestone_state: completed

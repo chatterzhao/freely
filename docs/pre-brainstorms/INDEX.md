@@ -14,6 +14,9 @@
 - 20260410-1835--codex-limit-triggered-slot-recovery-and-real-bin-ai-verification
   - brainstorms: docs/pre-brainstorms/20260410-1835--codex-limit-triggered-slot-recovery-and-real-bin-ai-verification/brainstorms.md
   - candidates: docs/pre-brainstorms/20260410-1835--codex-limit-triggered-slot-recovery-and-real-bin-ai-verification/candidates.md
+- 20260410-1835--auth-switch-real-environment-and-e2e-governance-gap
+  - brainstorms: docs/pre-brainstorms/20260410-1835--auth-switch-real-environment-and-e2e-governance-gap/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260410-1835--auth-switch-real-environment-and-e2e-governance-gap/candidates.md
 - 20260410-1430--preferred-auth-method-account-switch-fix
   - brainstorms: docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/brainstorms.md
   - candidates: docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/candidates.md
