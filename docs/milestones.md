@@ -50,7 +50,29 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260411-0217-A`
+- title: Protected-merge unparseable-subject receipt-gap governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-protected-merge-unparseable-subject-receipt-gap-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/candidates.md`
+- next_action: Guarded-merge the validated feature worktree into `develop`, then complete post-merge closeout verification and canonical writeback.
+
 ### candidate_issues
+
+1. `C-20260411-0217-A`
+- title: Protected-merge unparseable-subject receipt-gap followthrough
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/candidates.md`
+- next_action: Candidate mirror only. `I-20260411-0217-A` is now the canonical owner for the stronger-evidence contract covering generic-subject protected-ancestry receipt gaps.
+- revisit_trigger: Reopen only if canonical `develop` no longer contains this ancestry class, or if a bounded design proves the current subject-matched owner can absorb it without introducing a new audit bypass path.
 
 1. `C-20260409-1715-A`
 - title: Runtime evidence provenance research retirement followthrough governance

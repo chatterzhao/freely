@@ -22,7 +22,7 @@ make_repo() {
   mkdir -p "$repo/docs/system/workspace/skills"
   mkdir -p "$repo/docs/system/workspace/agents"
   mkdir -p "$repo/docs/pre-brainstorms/20260404-0640--sample-receipt-gap"
-  mkdir -p "$repo/docs/epics/sample/issues"
+  mkdir -p "$repo/docs/epics/sample/issues" "$repo/docs/epics/sample/code-reviews"
 
   cat > "$repo/AGENTS.md" <<'EOF'
 # Agent entry
@@ -187,6 +187,9 @@ EOF
 - phase_state: `in_dev`
 - milestone: `M-20260404-0640-sample`
 - source_candidate: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md#c-20260404-0640-a`
+EOF
+  cat > "$repo/docs/epics/sample/code-reviews/sample-verification.md" <<'EOF'
+# Verification: sample
 EOF
 }
 
@@ -440,5 +443,253 @@ if ./bin/governance-check >"$TMP_DIR/invalid-backfill.out" 2>&1; then
   exit 1
 fi
 grep -q "has invalid source_branch 'feature/invalid-gap' for target 'develop'" "$TMP_DIR/invalid-backfill.out"
+
+REPO_GENERIC_GOOD="$TMP_DIR/repo-generic-good"
+make_repo "$REPO_GENERIC_GOOD"
+cd "$REPO_GENERIC_GOOD"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260404-generic
+echo batch > BATCH.txt
+git add BATCH.txt
+git commit -q -m "batch seed"
+git checkout -q -b feature/generic-source develop
+echo source > SOURCE.txt
+git add SOURCE.txt
+git commit -q -m "source feature"
+git checkout -q test-pre-merge-20260404-generic
+git merge --no-ff -m "Merge" feature/generic-source >/dev/null
+GENERIC_GAP_MERGE="$(git rev-parse HEAD)"
+echo batch-tail > BATCH_TAIL.txt
+git add BATCH_TAIL.txt
+git commit -q -m "batch tail"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-generic' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-generic
+EOF
+)" test-pre-merge-20260404-generic >/dev/null
+ABSORBING_MERGE="$(git rev-parse HEAD)"
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after generic ancestry merge"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $GENERIC_GAP_MERGE
+
+- validation_mode: \`unparseable_subject_ancestry\`
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260404-generic\`
+- protected_batch_branch: \`test-pre-merge-20260404-generic\`
+- absorbing_protected_merge: \`$ABSORBING_MERGE\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- bounded_issue: \`docs/epics/sample/issues/sample.md\`
+- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/generic-good.out" 2>&1; then
+  cat "$TMP_DIR/generic-good.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/generic-good.out"
+
+REPO_GENERIC_WRONG_ABSORB="$TMP_DIR/repo-generic-wrong-absorb"
+make_repo "$REPO_GENERIC_WRONG_ABSORB"
+cd "$REPO_GENERIC_WRONG_ABSORB"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260404-generic
+echo batch > BATCH.txt
+git add BATCH.txt
+git commit -q -m "batch seed"
+git checkout -q -b feature/generic-source develop
+echo source > SOURCE.txt
+git add SOURCE.txt
+git commit -q -m "source feature"
+git checkout -q test-pre-merge-20260404-generic
+git merge --no-ff -m "Merge" feature/generic-source >/dev/null
+WRONG_ABSORB_GAP_MERGE="$(git rev-parse HEAD)"
+echo batch-tail > BATCH_TAIL.txt
+git add BATCH_TAIL.txt
+git commit -q -m "batch tail"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-generic' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-generic
+EOF
+)" test-pre-merge-20260404-generic >/dev/null
+REAL_ABSORBING_MERGE="$(git rev-parse HEAD)"
+git checkout -q -b test-pre-merge-20260404-other develop
+echo other > OTHER.txt
+git add OTHER.txt
+git commit -q -m "other batch"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-other' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-other
+EOF
+)" test-pre-merge-20260404-other >/dev/null
+WRONG_ABSORBING_MERGE="$(git rev-parse HEAD)"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $WRONG_ABSORB_GAP_MERGE
+
+- validation_mode: \`unparseable_subject_ancestry\`
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260404-generic\`
+- protected_batch_branch: \`test-pre-merge-20260404-generic\`
+- absorbing_protected_merge: \`$WRONG_ABSORBING_MERGE\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- bounded_issue: \`docs/epics/sample/issues/sample.md\`
+- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/generic-wrong-absorb.out" 2>&1; then
+  echo "[FAIL] governance-check should reject unparseable-subject entries whose absorbing merge source branch does not match the protected batch branch" >&2
+  cat "$TMP_DIR/generic-wrong-absorb.out" >&2
+  exit 1
+fi
+grep -q "absorbing merge" "$TMP_DIR/generic-wrong-absorb.out"
+
+REPO_GENERIC_UNDEREVIDENCED="$TMP_DIR/repo-generic-underevidenced"
+make_repo "$REPO_GENERIC_UNDEREVIDENCED"
+cd "$REPO_GENERIC_UNDEREVIDENCED"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260404-generic
+echo batch > BATCH.txt
+git add BATCH.txt
+git commit -q -m "batch seed"
+git checkout -q -b feature/generic-source develop
+echo source > SOURCE.txt
+git add SOURCE.txt
+git commit -q -m "source feature"
+git checkout -q test-pre-merge-20260404-generic
+git merge --no-ff -m "Merge" feature/generic-source >/dev/null
+UNDEREVIDENCED_GAP_MERGE="$(git rev-parse HEAD)"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-generic' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-generic
+EOF
+)" test-pre-merge-20260404-generic >/dev/null
+UNDEREVIDENCED_ABSORBING_MERGE="$(git rev-parse HEAD)"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $UNDEREVIDENCED_GAP_MERGE
+
+- validation_mode: \`unparseable_subject_ancestry\`
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260404-generic\`
+- protected_batch_branch: \`test-pre-merge-20260404-generic\`
+- absorbing_protected_merge: \`$UNDEREVIDENCED_ABSORBING_MERGE\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/generic-underevidenced.out" 2>&1; then
+  echo "[FAIL] governance-check should reject unparseable-subject entries that omit bounded issue and verification fields" >&2
+  cat "$TMP_DIR/generic-underevidenced.out" >&2
+  exit 1
+fi
+grep -q "bounded_issue" "$TMP_DIR/generic-underevidenced.out"
+
+REPO_GENERIC_PARSEABLE_MISUSE="$TMP_DIR/repo-generic-parseable-misuse"
+make_repo "$REPO_GENERIC_PARSEABLE_MISUSE"
+cd "$REPO_GENERIC_PARSEABLE_MISUSE"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260404-gap
+echo gap > GAP.txt
+git add GAP.txt
+git commit -q -m "gap feature"
+git checkout -q develop
+git merge --no-ff --no-edit test-pre-merge-20260404-gap >/dev/null
+PARSEABLE_MISUSE_MERGE="$(git rev-parse HEAD)"
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after parseable misuse"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $PARSEABLE_MISUSE_MERGE
+
+- validation_mode: \`unparseable_subject_ancestry\`
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260404-gap\`
+- protected_batch_branch: \`test-pre-merge-20260404-gap\`
+- absorbing_protected_merge: \`$PARSEABLE_MISUSE_MERGE\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- bounded_issue: \`docs/epics/sample/issues/sample.md\`
+- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/generic-parseable-misuse.out" 2>&1; then
+  echo "[FAIL] governance-check should reject unparseable-subject validation mode for merges whose subject is already parseable" >&2
+  cat "$TMP_DIR/generic-parseable-misuse.out" >&2
+  exit 1
+fi
+grep -q "already has a parseable merge subject" "$TMP_DIR/generic-parseable-misuse.out"
 
 echo "[PASS] governance-check audits ordinary protected-branch merge receipt backfills"
