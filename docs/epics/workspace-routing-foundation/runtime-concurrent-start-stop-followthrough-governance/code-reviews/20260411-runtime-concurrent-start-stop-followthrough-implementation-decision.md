@@ -1,7 +1,14 @@
 # Implementation Decision: runtime-concurrent-start-stop-followthrough-governance
 
 - issue_id: `I-20260408-0231-A`
-- date: `2026-04-11`
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
+- branch: `feature/runtime-concurrent-start-stop-followthrough-20260411`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260411-feature-runtime-concurrent-start-stop-followthrough`
+- decision_date: `2026-04-11`
+- author: `codex`
+
+## Implementation Decision Note
+
 - decision: `Materialize the remaining runtime half of C-20260408-0231-A as the bounded execution owner instead of leaving the develop-bound runtime diff in candidate-only closeout notes.`
 - why_this: `Canonical develop already absorbed the generated-truth status half, but the same candidate still owns unresolved runtime behavior around same-project bootstrap attach, project stop breadth, and stop-marker preservation. Keeping the same lifecycle key preserves candidate -> issue traceability while narrowing scope to the unmerged execution slice.`
 - alternatives_considered: `Leave the runtime diff as candidate-only closeout notes; open a brand-new unrelated issue id; reopen the already-absorbed status-surface half together with the runtime followthrough.`
