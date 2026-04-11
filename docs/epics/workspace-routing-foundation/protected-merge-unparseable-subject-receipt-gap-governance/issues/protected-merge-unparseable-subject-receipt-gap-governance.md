@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260411-0217-A`
 - title: `Protected-merge unparseable-subject receipt-gap governance`
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `protected-merge-unparseable-subject-receipt-gap-governance`
@@ -72,6 +72,5 @@ The current fail-closed behavior is correct, but Freely now needs a narrower fol
 
 ## Next
 
-- Start with focused regression expansion.
-- Only then implement parser/schema changes.
-- Add canonical ledger entries for the April 10 preferred-auth batch last.
+- Focused regression expansion, parser/schema changes, and canonical ledger entries are complete in the dedicated feature worktree.
+- Next step is guarded merge to `develop` and post-merge closeout verification.

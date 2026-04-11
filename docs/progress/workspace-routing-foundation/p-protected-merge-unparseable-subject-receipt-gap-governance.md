@@ -3,7 +3,7 @@
 - issue_id: `I-20260411-0217-A`
 - issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - title: `Protected-merge unparseable-subject receipt-gap governance`
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/protected-merge-unparseable-subject-gap-20260411`
@@ -16,14 +16,14 @@
 
 - This owner exists to define a stronger canonical contract for generic-subject protected-ancestry receipt gaps.
 - The old subject-matched receipt-gap contract remains intentionally narrow and unchanged.
-- Implementation has not started yet; IBM materialization is now complete and the next step is focused regression expansion.
+- Implementation is complete in the feature worktree: the ordinary receipt-gap ledger now has an explicit `unparseable_subject_ancestry` validation mode, `governance-check` validates it against absorbing protected merge truth, and the April 10 preferred-auth ancestry gaps are now registered canonically.
 
 ## Verification Evidence
 
-1. `./bin/governance-check` currently fails on six generic-subject ancestry merges under `test-pre-merge-20260410-preferred-auth-fix`.
-2. `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/brainstorms.md`
-3. `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/pre-tests.md`
+1. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
+2. `./bin/governance-check`
+3. `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-verification.md`
 
 ## Next Action
 
-1. Add focused regression coverage for the new validation mode before changing `docs/system/workspace/scripts/quality/governance-check`.
+1. Merge this bounded governance followthrough to `develop`, then write post-merge closeout evidence.

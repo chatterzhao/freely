@@ -53,13 +53,13 @@ routing_policy:
 1. `I-20260411-0217-A`
 - title: Protected-merge unparseable-subject receipt-gap governance
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-protected-merge-unparseable-subject-receipt-gap-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/candidates.md`
-- next_action: Start dev-loop with focused regression expansion for generic-subject ancestry gaps, then implement the explicit stronger-evidence validation mode without weakening the parseable-subject path.
+- next_action: Guarded-merge the validated feature worktree into `develop`, then complete post-merge closeout verification and canonical writeback.
 
 ### candidate_issues
 
