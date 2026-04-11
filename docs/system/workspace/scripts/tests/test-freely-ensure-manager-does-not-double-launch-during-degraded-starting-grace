@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-degraded-starting-grace.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260410-0000--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260410-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260410-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260410-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<EOF
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="starting"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+EOF
+
+bash -c "cd '$PROJECT' && exec -a 'runtime/freely start --project $PROJECT' sleep 30" >/dev/null 2>&1 &
+SUP_PID=$!
+trap 'kill "${SUP_PID:-}" 2>/dev/null || true; wait "${SUP_PID:-}" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+printf '%s\n' "$SUP_PID" >"$PROJECT/.freely/run/supervisor.pid"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+launch_log="$TMP_DIR/launch.log"
+process_inspection_available() { return 1; }
+discover_supervisor_pid() { return 0; }
+manager_ai_pid_for_project() { return 0; }
+recover_stalled_manager_ai_if_needed() { return 1; }
+prepare_manager_same_tool_slot_recovery_if_needed() { return 0; }
+prepare_manager_cross_tool_fallback_if_needed() { TOOL_AUTO_RECOVERY_DECISION="none"; return 0; }
+manager_runtime_recover_workers_if_needed() { return 0; }
+launch_manager_supervisor() {
+  printf '%s\n' "$1" >>"$launch_log"
+}
+log_info() { :; }
+log_warn() { :; }
+log_error() { :; }
+
+ensure_manager_once "$PROJECT" >/dev/null
+
+if [[ -s "$launch_log" ]]; then
+  echo "[FAIL] ensure-manager launched a second supervisor during degraded starting grace" >&2
+  cat "$launch_log" >&2
+  exit 1
+fi
+
+if [[ ! -f "$PROJECT/.freely/run/supervisor.pid" ]]; then
+  echo "[FAIL] expected supervisor pid hint to remain in place" >&2
+  exit 1
+fi
+
+echo "[PASS] ensure-manager does not double-launch while a degraded-starting supervisor hint is still within bootstrap grace"

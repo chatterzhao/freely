@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-stale-project-start-lock.XXXXXX)"
+cleanup() {
+  set +e
+  bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+  wait "${SUPERVISOR_PID:-}" >/dev/null 2>&1 || true
+  kill "${STALE_PID:-}" 2>/dev/null || true
+  wait "${STALE_PID:-}" >/dev/null 2>&1 || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/project"
+LOCK_DIR="$PROJECT/.freely/run/project-start.lock"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260408-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$LOCK_DIR"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260408-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260408-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260408-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+IFLOW_MAX_TURNS=100
+EOF
+
+sleep 1 &
+STALE_PID=$!
+wait "$STALE_PID" || true
+cat >"$LOCK_DIR/state.env" <<EOF
+owner_pid="$STALE_PID"
+started_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+reason="freely_start"
+EOF
+
+START_LOG="$TMP_DIR/start.log"
+bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >"$START_LOG" 2>&1 &
+SUPERVISOR_PID=$!
+
+for _ in $(seq 1 20); do
+  [[ ! -d "$LOCK_DIR" ]] && break
+  sleep 1
+done
+
+if [[ -d "$LOCK_DIR" ]]; then
+  echo "[FAIL] expected freely start to remove a stale project start lock before supervisor startup" >&2
+  cat "$START_LOG" >&2 || true
+  exit 1
+fi
+
+EVENT_LOG="$PROJECT/.freely/logs/runtime-events.log"
+for _ in $(seq 1 20); do
+  if [[ -f "$EVENT_LOG" ]] && grep -q 'event=project_start_lock_stale_cleanup' "$EVENT_LOG"; then
+    break
+  fi
+  sleep 1
+done
+
+if [[ ! -f "$PROJECT/.freely/run/supervisor.pid" ]]; then
+  echo "[FAIL] expected supervisor.pid after stale project start lock cleanup" >&2
+  cat "$START_LOG" >&2 || true
+  exit 1
+fi
+
+grep -q 'event=project_start_lock_stale_cleanup' "$EVENT_LOG"
+grep -q 'event=supervisor_started' "$EVENT_LOG"
+kill -0 "$SUPERVISOR_PID" 2>/dev/null
+
+echo "[PASS] freely start removes stale project start locks before supervisor startup"

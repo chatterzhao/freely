@@ -50,6 +50,27 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260408-0231-A`
+- title: Runtime concurrent start-stop followthrough governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-concurrent-start-stop-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/candidates.md`
+- next_action: Promote the bounded runtime followthrough through a guarded merge chain. Keep the owner scoped to same-project bootstrap attach, project stop, and stop-marker preservation; do not reopen the generated-truth status half.
+- evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-cleans-stale-project-start-lock`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-does-not-double-launch-during-degraded-starting-grace`
+  - `bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-all-same-project-supervisors`
+  - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+  - `bash docs/system/workspace/scripts/tests/test-freely-status-latest-generated-manager-continuity-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
+
 ### candidate_issues
 
 1. `C-20260411-0217-A`
@@ -77,13 +98,13 @@ routing_policy:
 1. `C-20260408-0231-A`
 - title: Runtime concurrent start lock and generated status-surface alignment
 - milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+- phase_state: `todo_ibm`
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/candidates.md`
-- next_action: Keep this as a bounded repair lane: add a project-local concurrent-start guard so one project cannot materialize multiple supervisors, and align `status` / `fleet-status` generated continuity/prompt truth with the latest valid continuity on disk without faking consumption.
-- revisit_trigger: Revisit only if the bounded lock/read-path fix proves insufficient and the defect actually belongs to broader worker recovery or provenance governance.
+- next_action: Candidate mirror only. `I-20260408-0231-A` is now the canonical owner for the remaining same-project runtime start/stop followthrough after the generated-truth status half was absorbed on `develop`.
+- revisit_trigger: Revisit only if the narrowed runtime followthrough still leaves duplicate same-project supervisors alive, degraded bootstrap attach tears down a healthy in-flight supervisor, or stop-marker cleanup leaves the project falsely pinned in stop mode after the last supervisor exits.
 
 1. `C-20260408-1205-A`
 - title: Freeze verification handoff contract and premerge adequacy derivation for Freely-owned work
