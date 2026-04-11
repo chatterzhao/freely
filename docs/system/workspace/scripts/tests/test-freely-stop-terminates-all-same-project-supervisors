@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-stop-all-supervisors.XXXXXX)"
+cleanup() {
+  set +e
+  kill "${SUP_PID_1:-}" "${SUP_PID_2:-}" 2>/dev/null || true
+  wait "${SUP_PID_1:-}" 2>/dev/null || true
+  wait "${SUP_PID_2:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/docs/pre-brainstorms"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+bash -c "cd '$PROJECT' && exec -a 'runtime/freely start --project $PROJECT' sleep 30" >/dev/null 2>&1 &
+SUP_PID_1=$!
+bash -c "cd '$PROJECT' && exec -a 'runtime/freely start --project $PROJECT' sleep 30" >/dev/null 2>&1 &
+SUP_PID_2=$!
+
+printf '%s' "$SUP_PID_2" >"$PROJECT/.freely/run/supervisor.pid"
+
+bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1
+
+if kill -0 "$SUP_PID_1" 2>/dev/null; then
+  echo "[FAIL] stop should terminate the first same-project supervisor too" >&2
+  exit 1
+fi
+
+if kill -0 "$SUP_PID_2" 2>/dev/null; then
+  echo "[FAIL] stop should terminate the pid-file-owned same-project supervisor" >&2
+  exit 1
+fi
+
+echo "[PASS] freely stop terminates all discovered same-project supervisors"

@@ -13,6 +13,17 @@
   - concurrent worker start is a runtime correctness / ownership bug
   - stale generated surface is a status alignment bug
 
+## 2026-04-10 Followthrough Check
+
+- The status-surface half is no longer open research:
+  - commit `3ef222ec` on `develop` already landed the baseline/fleet generated-truth refresh
+  - `bash docs/system/workspace/scripts/tests/test-freely-status-latest-generated-manager-continuity-surface` now passes on the current base
+- The remaining unfinished worktree task is narrower than the original two-part packet:
+  - keep attach/reuse behavior when a same-project supervisor is still inside bootstrap grace, even if process inspection is degraded
+  - ensure `freely stop --project <same-project>` kills every discovered same-project supervisor rather than only the pid-file owner
+  - preserve the stop marker correctly while another same-project supervisor is still cleaning up
+- This means the active lane is now a runtime start/stop followthrough, not another status-surface alignment repair.
+
 ## Boundaries
 
 - Keep this lane narrow:
@@ -36,7 +47,7 @@
 
 - One focused candidate is enough if its acceptance remains split:
   1. same-project concurrent `start` calls cannot create duplicate supervisors
-  2. `status` / `fleet-status` generated prompt truth follows latest continuity generation, while consumed truth remains unchanged unless actually consumed
+  2. later same-project attach/stop cleanup paths do not reintroduce duplicate-supervisor churn once the start lock and generated-truth repair already exist on `develop`
 
 ## Preferred Fix Direction
 
@@ -45,14 +56,17 @@
   - stale lock can be cleared if the recorded pid is dead or clearly unrelated
   - otherwise later start callers should wait briefly, then retry supervisor discovery / attach instead of racing into a second launch
 - After the lock lands, `start_workcell_supervisor_async()` may stay simple; the correctness boundary belongs in `freely start`.
-- For status alignment:
-  - reuse the same latest-continuity refresh logic already present in `live-status`
-  - do not rewrite consumed fields unless the existing stale-ref guard says it is necessary
+- The followthrough repair should stay narrow:
+  - prefer bootstrap-in-flight attach before degraded dispatcher/watchdog repair tears down the hinted supervisor
+  - on `freely stop`, discover and terminate all same-project supervisors, not just the first matching pid
+  - only clear the stop marker when no other same-project supervisor is still alive
 
 ## Risks
 
 - Over-eager stale-lock clearing could kill legitimate in-flight starts.
-- Treating generated prompt truth as “latest disk truth” in baseline/fleet must not accidentally hide the fact that launch-state persistence is stale.
+- Preserving a stale stop marker after the last supervisor exits could leave the project falsely stuck in stop mode.
+- Killing only the pid-file owner while leaving sibling same-project supervisors alive would keep the original duplicate-supervisor incident operationally unresolved.
 - Tests must prove the narrow invariant:
   - one `supervisor_started` event under concurrent same-project starts
-  - baseline/fleet generated prompt surface updates to latest continuity while consumed remains older when appropriate
+  - degraded bootstrap grace prefers attach/reuse over partial-control-plane repair
+  - stop terminates all discovered same-project supervisors for the project

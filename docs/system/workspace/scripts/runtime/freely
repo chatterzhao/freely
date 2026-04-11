@@ -1399,7 +1399,7 @@ live_status_activity_state_for_project() {
   fi
 }
 
-discover_supervisor_pid() {
+discover_supervisor_pids() {
   local project="$1" excluded_pids="${2:-}"
   local process_rows
   process_inspection_available || return 0
@@ -1421,15 +1421,20 @@ discover_supervisor_pid() {
       for (i = 1; i <= NF; i++) {
         if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
           print $1
-          exit
+          next
         }
         if (index($i, "--project=") == 1 && substr($i, 11) == p) {
           print $1
-          exit
+          next
         }
       }
     }
   ' <<<"$process_rows"
+}
+
+discover_supervisor_pid() {
+  local project="$1" excluded_pids="${2:-}"
+  discover_supervisor_pids "$project" "$excluded_pids" | head -n 1
 }
 
 pid_matches_project() {
@@ -9429,11 +9434,12 @@ latest_interruption_resolution_file_for_project() {
 
 stop_project_runtime() {
   local project="$1" stop_reason="${2:-operator_stop}"
-  local sdir run_dir
+  local sdir run_dir stop_marker supervisor_candidates sp
   sdir="$(state_dir "$project")"
   run_dir="$(run_dir_for_project "$project")"
   mkdir -p "$run_dir"
-  : >"$(stop_marker_file "$project")"
+  stop_marker="$(stop_marker_file "$project")"
+  : >"$stop_marker"
 
   if [[ -f "$run_dir/ai.pid" ]]; then
     local ap
@@ -9470,19 +9476,29 @@ stop_project_runtime() {
     rm -f "$(interruption_dispatcher_pid_file "$project")"
   fi
   if [[ -f "$run_dir/supervisor.pid" ]]; then
-    local sp
     sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
     if valid_supervisor_pid_for_project "$project" "$sp"; then
-      terminate_pid_with_graceful_wait "$sp" "project supervisor during stop"
+      supervisor_candidates="$sp"
     fi
     rm -f "$run_dir/supervisor.pid"
-  else
-    local sp
-    sp="$(discover_supervisor_pid "$project")"
-    terminate_pid_with_graceful_wait "$sp" "discovered project supervisor during stop"
+  fi
+  while IFS= read -r sp; do
+    [[ -n "$sp" ]] || continue
+    if [[ -n "$supervisor_candidates" ]]; then
+      supervisor_candidates+=$'\n'
+    fi
+    supervisor_candidates+="$sp"
+  done < <(discover_supervisor_pids "$project")
+  if [[ -n "$supervisor_candidates" ]]; then
+    while IFS= read -r sp; do
+      [[ -n "$sp" ]] || continue
+      valid_supervisor_pid_for_project "$project" "$sp" || continue
+      : >"$stop_marker"
+      terminate_pid_with_graceful_wait "$sp" "project supervisor during stop"
+    done < <(printf '%s\n' "$supervisor_candidates" | awk '!seen[$0]++')
   fi
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
-  rm -f "$(stop_marker_file "$project")"
+  rm -f "$stop_marker"
   write_workcell_state "$project" "stopped" "down" "down" "$stop_reason"
 }
 
@@ -9545,17 +9561,17 @@ ensure_no_active_supervisor_conflict() {
           attach_ai_pid_state="confirmed_running"
         fi
       fi
-      if ! ensure_interruption_dispatcher_ready_or_fail "$project"; then
-        log_warn "project supervisor pid=$old_pid is live but interruption dispatcher is not ready; falling back to project-local repair"
-      elif [[ "$role_hint" == "manager" ]] && ! ensure_manager_watchdog_ready_or_fail "$project"; then
-        log_warn "project supervisor pid=$old_pid is live but manager watchdog is not ready; falling back to project-local repair"
-      elif [[ "$attach_ai_pid_state" != "confirmed_running" ]] && project_bootstrap_launch_in_flight "$project" "$old_pid" ""; then
+      if [[ "$attach_ai_pid_state" != "confirmed_running" ]] && project_bootstrap_launch_in_flight "$project" "$old_pid" ""; then
         attach_ai_pid_state="bootstrap_in_flight"
         log_warn "project supervisor pid=$old_pid is still bootstrapping; attaching instead of repairing the in-flight startup"
         LAST_ATTACH_REUSE_SUPERVISOR_PID="$old_pid"
         LAST_ATTACH_REUSE_AI_PID_STATE="$attach_ai_pid_state"
         log_info "project runtime/control-plane startup already in flight; reusing supervisor pid=$old_pid"
         return 10
+      elif ! ensure_interruption_dispatcher_ready_or_fail "$project"; then
+        log_warn "project supervisor pid=$old_pid is live but interruption dispatcher is not ready; falling back to project-local repair"
+      elif [[ "$role_hint" == "manager" ]] && ! ensure_manager_watchdog_ready_or_fail "$project"; then
+        log_warn "project supervisor pid=$old_pid is live but manager watchdog is not ready; falling back to project-local repair"
       elif [[ "$role_hint" == "manager" && "$attach_ai_pid_state" != "confirmed_running" && "$attach_ai_pid_state" != "bootstrap_in_flight" ]]; then
         log_warn "project supervisor pid=$old_pid is live but manager ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
       elif [[ "$role_hint" == "worker" && "$attach_ai_pid_state" != "confirmed_running" && "$attach_ai_pid_state" != "bootstrap_in_flight" ]]; then
@@ -9672,7 +9688,7 @@ start_project_runtime() {
   }
 
   cleanup_supervisor() {
-    local dispatcher_pid="" watchdog_pid=""
+    local dispatcher_pid="" watchdog_pid="" other_supervisors=""
     dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
     if [[ -n "$dispatcher_pid" ]]; then
       terminate_pid_with_graceful_wait "$dispatcher_pid" "project interruption dispatcher during supervisor cleanup"
@@ -9686,7 +9702,19 @@ start_project_runtime() {
       "desired_state=${DESIRED_RUNTIME_STATE_VALUE:-stopped}" \
       "exit_reason=${LAST_WORKCELL_EXIT_REASON:-supervisor_exit}" \
       "stop_requested=$stop_requested"
-    rm -f "$sup_pid_file" "$child_pid_file" "$(stop_marker_file "$project")"
+    rm -f "$sup_pid_file" "$child_pid_file"
+    if [[ "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" == "stopped" ]] && [[ -f "$(stop_marker_file "$project")" ]]; then
+      other_supervisors="$(discover_supervisor_pids "$project" "$$" | head -n 1)"
+      if [[ -n "$other_supervisors" ]]; then
+        append_runtime_event "$project" "supervisor_cleanup_stop_marker_preserved" \
+          "supervisor_pid=$$" \
+          "other_supervisor_pid=$other_supervisors"
+      else
+        rm -f "$(stop_marker_file "$project")"
+      fi
+    else
+      rm -f "$(stop_marker_file "$project")"
+    fi
     write_workcell_state "$project" "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" "down" "down" "${LAST_WORKCELL_EXIT_REASON:-supervisor_exit}"
     if [[ "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" == "running" ]] && [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
       launch_interruption_dispatcher "$project"

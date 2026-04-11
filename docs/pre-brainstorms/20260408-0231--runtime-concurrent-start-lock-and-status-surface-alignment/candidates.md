@@ -21,33 +21,35 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `none`
-- problem: Same-project concurrent `freely start --project` invocations can pass startup conflict checks before any caller writes authoritative supervisor ownership, allowing duplicate supervisors to materialize for one worktree. Separately, `status` / `fleet-status` can keep showing stale generated worker-prompt truth from `manager-worker-launch-state.env` even after a newer continuity file exists on disk, creating a false impression that older prompts are still authoritative.
+- problem: The original packet contained two defects. The `status` / `fleet-status` generated-truth half has already landed on `develop`, but the runtime followthrough is still unfinished: same-project starts must keep bootstrap-in-flight attach behavior under degraded inspection, `freely stop` must terminate every discovered same-project supervisor, and stop-marker cleanup must not let leftover duplicate supervisors survive or accidentally pin the project in stop mode.
 - why_now:
   - dogfood evidence on `2026-04-08 01:23:58 PDT` showed three same-second supervisors for one worker project
   - stopping that worker required hard-kill fallback, so the defect is operationally harmful rather than cosmetic
-  - root `live-status` already shows the newer continuity generation, but `status` / `fleet-status` still surface old generated prompt truth and stale manager intent
+  - commit `3ef222ec` already absorbed the status-surface half on `develop`, so the remaining worktree should now be judged only on the runtime followthrough still missing from canonical truth
+  - current implementation evidence in `feature/runtime-concurrent-start-stop-fix-20260410` already narrows the repair to attach/stop semantics and needs canonical writeback rather than another round of broad research
 - acceptance_criteria:
   - concurrent same-project `freely start --project` calls materialize at most one `supervisor_started` runtime event
   - later concurrent callers either attach/reuse or exit after bounded wait; they do not create a second supervisor
   - stale start-lock recovery is bounded and does not block future starts forever
-  - `status` / `fleet-status` generated continuity/prompt surface reflects the latest valid continuity file on disk
-  - `status` / `fleet-status` consumed continuity/prompt surface does not advance unless consumption truth actually advances or stale-ref repair explicitly applies
-  - focused regression tests cover both the concurrent-start case and the stale-generated-surface case
+  - degraded process inspection keeps the hinted same-project supervisor alive while bootstrap grace is still active; it does not tear the supervisor down before attach/reuse can happen
+  - `freely stop --project` terminates all discovered same-project supervisors, including supervisors not currently recorded in `supervisor.pid`
+  - stop-marker cleanup only clears the marker when no other same-project supervisor remains alive
+  - focused regression tests cover the already-landed generated-truth repair plus the remaining attach/stop followthrough
 - promotion_gate:
-  - keep the repair inside runtime start serialization and status read-path alignment
+  - keep the repair inside runtime start serialization and same-project supervisor cleanup
   - do not widen into broader worker recovery policy, semantic-loop policy, or provenance research
-  - preserve the existing `live-status` meaning where `generated != consumed` is allowed
+  - preserve the already-landed baseline/fleet generated-truth behavior where `generated != consumed` is allowed
 - open_questions:
-  - should concurrent later callers wait for the start lock to clear and then attach, or fail fast once a healthy supervisor is observed
-  - should baseline/fleet explicitly annotate when generated truth was refreshed from disk rather than launch-state persistence
+  - should the remaining runtime followthrough stay as a continuation of `C-20260408-0231-A`, or be split into a new bounded owner once the current worktree writes canonical issue truth
+  - do we need any extra replay beyond focused script tests to prove the stop-marker preservation does not regress normal single-supervisor stop behavior
 - acceptance_reviews:
   - reviewer: `codex`
     mode: `author-review`
-    summary: `Observed dogfood evidence proves two narrow defects: same-project duplicate supervisor bootstrap and stale generated manager intent surface. Both can be repaired without reopening broader governance families.`
+    summary: `The original packet was valid, but one half is now already on develop. The unfinished part is the runtime followthrough around attach/stop cleanup for same-project duplicate supervisors, and it remains narrow enough to repair without reopening broader governance families.`
     verdict: `ready_for_bounded_repair`
-- next_action: Materialize the narrow repair in this worktree, add regression coverage first, then replay focused runtime status tests plus a concurrent-start regression.
-- revisit_trigger: Reopen only if the lock-based repair still allows duplicate same-project supervisors, or if aligning generated prompt truth in baseline/fleet hides real consumption drift.
-- decision_reason: `This is a bounded runtime correctness plus status-surface alignment repair, not a new architecture family. The observed defects are concrete, reproducible, and narrower than the surrounding restart-storm and provenance-governance families.`
+- next_action: Finish the narrow runtime followthrough in this worktree, keep `test-freely-status-latest-generated-manager-continuity-surface` as regression evidence for the already-landed half, and replay the focused attach/stop tests before deciding whether to materialize a dedicated issue or close this candidate as absorbed followthrough.
+- revisit_trigger: Reopen only if the lock-based repair still allows duplicate same-project supervisors, if degraded bootstrap attach still tears down a healthy in-flight supervisor, or if the stop-marker cleanup keeps a stopped project falsely pinned after the last supervisor exits.
+- decision_reason: `This remains a bounded runtime correctness packet. The status-surface subproblem was already absorbed on develop, leaving a still-narrow attach/stop followthrough that belongs with the same same-project duplicate-supervisor evidence family rather than a new architecture track.`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
