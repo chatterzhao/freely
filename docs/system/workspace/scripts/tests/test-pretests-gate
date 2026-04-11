@@ -42,23 +42,45 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
-
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
 - not_applicable_reason: `change_not_touching_this_layer`
 - not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
 
 ## Integration
 
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `feature/sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
 1. Run the sample issue-bound integration replay.
 
 ## End-to-End
 
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
 - not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
 
 ## Real-Environment
 
+- acceptance target: `State why protected real-environment followthrough is unavailable in this fixture.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `lawful replacement evidence for missing protected environment`
+- blocker taxonomy: `definition_missing`
 - not_applicable_reason: `protected_environment_only`
 - not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
+- replacement_evidence: `The isolated fixture does not model a protected branch environment.`
 
 ## Acceptance Items
 
@@ -86,23 +108,45 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
 ## Unit
-
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
 - not_applicable_reason: `change_not_touching_this_layer`
 - not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
 
 ## Integration
 
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `feature/sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
 1. Run the sample issue-bound integration replay.
 
 ## End-to-End
 
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
 - not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
 
 ## Real-Environment
 
+- acceptance target: `State why protected real-environment followthrough is unavailable in this fixture.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `lawful replacement evidence for missing protected environment`
+- blocker taxonomy: `definition_missing`
 - not_applicable_reason: `protected_environment_only`
 - not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
+- replacement_evidence: `The isolated fixture does not model a protected branch environment.`
 
 ## Acceptance Items
 
@@ -139,5 +183,206 @@ if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/i
 fi
 grep -q '\[pre_tests_missing\]' "$TMP_DIR/stderr3"
 grep -q "missing required section '## Unit'" "$TMP_DIR/stderr3"
+
+mkdir -p "$REPO/docs/epics/auth/switch/issues" "$REPO/docs/epics/auth/switch/code-reviews"
+cat > "$REPO/docs/epics/auth/switch/issues/auth-switch-follow-on.md" <<'EOF'
+# Issue: auth switch startup recovery follow-on
+
+- issue_id: `I-auth-switch-follow-on`
+- phase_state: `completed`
+- title: `Follow-on auth switch startup recovery verification tightening`
+- issue-name: `auth-switch-startup-recovery-follow-on`
+- follow_on_to: `I-auth-switch-parent`
+- pre_tests_path: `docs/epics/auth/switch/pre-tests.md`
+- verification_artifact_dir: `docs/epics/auth/switch/code-reviews`
+EOF
+
+cat > "$REPO/docs/epics/auth/switch/code-reviews/integration.md" <<'EOF'
+# Integration artifact
+EOF
+
+cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
+# Pre-tests: auth switch follow-on
+
+## Unit
+- acceptance target: `Unit surface remains bounded.`
+- testing layer: `unit`
+- target environment: `feature/auth-switch-follow-on`
+- required evidence: `explicit bounded unit contract`
+- blocker taxonomy: `definition_missing`
+1. Record the bounded unit contract.
+
+## Integration
+- acceptance target: `Integration replay covers slot switching semantics.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-auth-switch`
+- required evidence: `integration replay artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the integration replay for auth switch startup recovery.
+
+## End-to-End
+- acceptance target: `Protected end-to-end replay exists elsewhere.`
+- testing layer: `end_to_end`
+- target environment: `develop`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `evidence_plan_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `This follow-on defers end-to-end replay to the protected lane.`
+- replacement_evidence: `Integration replay plus governance check.`
+
+## Real-Environment
+- acceptance target: `Protected live replay exists elsewhere.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `evidence_plan_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `This follow-on defers live replay to the protected lane.`
+- replacement_evidence: `Integration replay plus governance check.`
+
+## Acceptance Items
+
+### Integration replay
+- id: `auth-switch-integration`
+- requirement: `Integration replay ran for auth switch startup recovery.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/auth/switch/code-reviews/integration.md`
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/auth/switch/issues/auth-switch-follow-on.md >"$TMP_DIR/stdout4" 2>"$TMP_DIR/stderr4"; then
+  echo "[FAIL] pretests-gate should reject auth/switch follow-on owners that dual-waive End-to-End and Real-Environment without live evidence" >&2
+  exit 1
+fi
+grep -q "cannot waive both 'End-to-End' and 'Real-Environment'" "$TMP_DIR/stderr4"
+
+cat > "$REPO/docs/epics/auth/switch/code-reviews/live.md" <<'EOF'
+# Live replay artifact
+EOF
+
+cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
+# Pre-tests: auth switch follow-on
+
+## Unit
+- acceptance target: `Unit surface remains bounded.`
+- testing layer: `unit`
+- target environment: `feature/auth-switch-follow-on`
+- required evidence: `explicit bounded unit contract`
+- blocker taxonomy: `definition_missing`
+1. Record the bounded unit contract.
+
+## Integration
+- acceptance target: `Integration replay covers slot switching semantics.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-auth-switch`
+- required evidence: `integration replay artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the integration replay for auth switch startup recovery.
+
+## End-to-End
+- acceptance target: `Protected end-to-end replay exists elsewhere.`
+- testing layer: `end_to_end`
+- target environment: `develop`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `evidence_plan_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `This follow-on defers end-to-end replay to the protected lane.`
+- replacement_evidence: `See docs/epics/auth/switch/code-reviews/live.md for the bound live replay artifact.`
+
+## Real-Environment
+- acceptance target: `Protected live replay exists elsewhere.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `evidence_plan_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `This follow-on defers live replay to the protected lane.`
+- replacement_evidence: `See docs/epics/auth/switch/code-reviews/live.md for the bound live replay artifact.`
+
+## Acceptance Items
+
+### Integration replay
+- id: `auth-switch-integration`
+- requirement: `Integration replay ran for auth switch startup recovery.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/auth/switch/code-reviews/integration.md`
+
+### Live replay
+- id: `auth-switch-live`
+- requirement: `A real protected-lane replay observed the startup recovery behavior.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/auth/switch/code-reviews/live.md`
+EOF
+
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/auth/switch/issues/auth-switch-follow-on.md
+
+cat > "$REPO/docs/epics/auth/switch/issues/auth-switch-follow-on.md" <<'EOF'
+# Issue: auth switch startup recovery follow-on
+
+- issue_id: `I-auth-switch-follow-on`
+- phase_state: `completed`
+- title: `Follow-on real bin/ai and codex exec verification tightening`
+- issue-name: `auth-switch-startup-recovery-follow-on`
+- follow_on_to: `I-auth-switch-parent`
+- pre_tests_path: `docs/epics/auth/switch/pre-tests.md`
+- verification_artifact_dir: `docs/epics/auth/switch/code-reviews`
+EOF
+
+cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
+# Pre-tests: auth switch follow-on
+
+## Unit
+- acceptance target: `Unit surface remains bounded.`
+- testing layer: `unit`
+- target environment: `feature/auth-switch-follow-on`
+- required evidence: `explicit bounded unit contract`
+- blocker taxonomy: `definition_missing`
+1. Record the bounded unit contract.
+
+## Integration
+- acceptance target: `Integration replay covers real bin/ai startup recovery semantics.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-auth-switch`
+- required evidence: `integration replay artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the integration replay for real bin/ai and codex exec startup recovery.
+
+## End-to-End
+- acceptance target: `Protected end-to-end replay exists elsewhere.`
+- testing layer: `end_to_end`
+- target environment: `develop`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `evidence_plan_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `This follow-on defers end-to-end replay to the protected lane.`
+- replacement_evidence: `Integration replay plus governance check.`
+
+## Real-Environment
+- acceptance target: `Protected live replay exists elsewhere.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `evidence_plan_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `This follow-on defers live replay to the protected lane.`
+- replacement_evidence: `Integration replay plus governance check.`
+
+## Acceptance Items
+
+### Integration replay
+- id: `auth-switch-integration`
+- requirement: `Integration replay ran for auth switch startup recovery.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/auth/switch/code-reviews/integration.md`
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/auth/switch/issues/auth-switch-follow-on.md >"$TMP_DIR/stdout5" 2>"$TMP_DIR/stderr5"; then
+  echo "[FAIL] pretests-gate should also reject follow-on owners that only mention bin/ai or codex exec while dual-waiving End-to-End and Real-Environment" >&2
+  exit 1
+fi
+grep -q "cannot waive both 'End-to-End' and 'Real-Environment'" "$TMP_DIR/stderr5"
 
 echo "[PASS] pretests-gate enforces issue binding and acceptance evidence"

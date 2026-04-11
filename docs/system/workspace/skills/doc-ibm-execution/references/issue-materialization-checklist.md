@@ -71,6 +71,11 @@ Issue front matter 还应显式绑定：
   - `Integration`
   - `End-to-End`
   - `Real-Environment`
+- 若当前 issue 是 follow-on owner，且 scope 触达 `auth switch / account switch / slot recovery / startup recovery / watchdog / freely start / bin/ai / codex exec` family，不得把 `End-to-End` 与 `Real-Environment` 同时写成 `protected_environment_only`
+- 若确实需要保留双豁免，`Acceptance Items` 至少保留一条：
+  - `evidence_level: real_env` 或 `post_merge_dogfood`
+  - `status: pass`
+  - `artifact_ref` 指向 repo 内可追溯 live artifact，且该 artifact 应能证明真实 `bin/ai` / `codex exec` / `freely start` 中至少一条命令链路被执行或观察
 - 若某类 acceptance 不适用，必须同时写出：
   - `not_applicable_reason`
   - `not_applicable_explanation`

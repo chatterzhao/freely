@@ -66,6 +66,15 @@ codex_capability_cwd_mode=""
 debug_log_file=""
 claude_session_id=""
 tool_resume_target=""
+network_failure_marker_file=""
+
+log_has_slot_local_network_failure() {
+  local current_tool="$1" current_log_file="$2"
+  [[ "$current_tool" == "codex" && -f "$current_log_file" ]] || return 1
+  rg -qi \
+    'ERROR:\s*Reconnecting|worker quit with fatal: Transport channel closed|invalid peer certificate|certificate was not trusted|certificate expired|received fatal alert: UnrecognisedName|websocket: failed to connect|connection closed via error|tls handshake|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error' \
+    "$current_log_file"
+}
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -88,6 +97,7 @@ while [[ $# -gt 0 ]]; do
     --debug-log-file) debug_log_file="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
     --claude-session-id) claude_session_id="${2:-}"; shift 2 ;;
     --tool-resume-target) tool_resume_target="${2:-}"; shift 2 ;;
+    --network-failure-marker-file) network_failure_marker_file="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
     *) usage; exit 1 ;;
   esac
 done
@@ -101,6 +111,10 @@ mkdir -p "$(dirname "$pid_file")" "$(dirname "$log_file")"
 [[ -d "$project" ]] || preflight_error "[ERROR] project not found: $project"
 [[ -f "$prompt_file" ]] || preflight_error "[ERROR] prompt file not found: $prompt_file"
 [[ -n "$tool_adapter" ]] || tool_adapter="$(tool_default_adapter "$tool")"
+if [[ -n "$network_failure_marker_file" ]]; then
+  mkdir -p "$(dirname "$network_failure_marker_file")"
+  rm -f "$network_failure_marker_file"
+fi
 if ! tool_adapter_supports_launch_kind "$tool" "$tool_adapter" "$launch_kind"; then
   preflight_error "[ERROR] launch kind '$launch_kind' is not supported for tool '$tool' with adapter '$tool_adapter' (supported: $(tool_supported_launch_kinds_for_adapter "$tool" "$tool_adapter" | tr '\n' ',' | sed 's/,$//'))"
 fi
@@ -116,5 +130,16 @@ fi
 child_pid=$!
 echo "$child_pid" >"$pid_file"
 echo "$child_pid"
+
+if [[ -n "$network_failure_marker_file" ]]; then
+  while kill -0 "$child_pid" 2>/dev/null; do
+    if log_has_slot_local_network_failure "$tool" "$log_file"; then
+      printf 'network_failure\n' >"$network_failure_marker_file"
+      kill "$child_pid" 2>/dev/null || true
+      break
+    fi
+    sleep 1
+  done
+fi
 
 wait "$child_pid"
