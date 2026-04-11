@@ -8042,6 +8042,30 @@ project_bootstrap_launch_in_flight() {
   (( now_epoch - state_updated_epoch <= grace_secs ))
 }
 
+project_bootstrap_launch_in_flight_from_unverified_supervisor_hint() {
+  local project="$1"
+  local supervisor_hint=""
+  local desired_state last_exit_reason
+
+  process_inspection_available && return 1
+  supervisor_hint="$(manager_supervisor_pid_hint_for_project "$project")"
+  [[ -n "$supervisor_hint" ]] || return 1
+
+  desired_state="unknown"
+  last_exit_reason=""
+  if [[ -f "$(workcell_state_file "$project")" ]]; then
+    unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
+    # shellcheck disable=SC1090
+    source "$(workcell_state_file "$project")"
+    desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+    last_exit_reason="${LAST_EXIT_REASON:-}"
+  fi
+
+  [[ "$desired_state" == "running" ]] || return 1
+  [[ "$last_exit_reason" == "starting" ]] || return 1
+  project_bootstrap_launch_in_flight "$project" "$supervisor_hint" ""
+}
+
 manager_supervisor_pid_for_project() {
   local project="$1" run_dir sp
   run_dir="$(run_dir_for_project "$project")"
@@ -8204,7 +8228,7 @@ restart_manager_supervisor_preserving_handoff() {
 
 ensure_manager_once() {
   local project="$1"
-  local run_dir sup_pid_file current_pid current_ai_pid same_tool_blocked desired_state last_exit_reason
+  local run_dir sup_pid_file current_pid current_ai_pid same_tool_blocked desired_state last_exit_reason supervisor_hint
 
   load_config "$project"
   run_dir="$(run_dir_for_project "$project")"
@@ -8223,6 +8247,7 @@ ensure_manager_once() {
   if [[ -n "$current_pid" ]]; then
     current_pid="$(manager_recheck_wait_for_supervisor_teardown_if_needed "$project" "$current_pid")"
   fi
+  supervisor_hint="$(manager_supervisor_pid_hint_for_project "$project")"
 
   desired_state="unknown"
   last_exit_reason=""
@@ -8260,6 +8285,8 @@ ensure_manager_once() {
   current_ai_pid="$(manager_ai_pid_for_project "$project")"
   if project_bootstrap_launch_in_flight "$project" "$current_pid" "$current_ai_pid"; then
     log_info "manager bootstrap is still within ai launch grace; keeping supervisor pid=$current_pid alive"
+  elif project_bootstrap_launch_in_flight_from_unverified_supervisor_hint "$project"; then
+    log_info "manager bootstrap is still within ai launch grace under degraded process inspection; keeping hinted supervisor pid=${supervisor_hint:-unknown} alive"
   elif [[ "$same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
     log_warn "manager supervisor is idle after recovery gate passed; restarting manager with the latest handoff"
     restart_manager_supervisor_preserving_handoff "$project"
@@ -8279,9 +8306,9 @@ ensure_manager_once() {
     return 0
   fi
 
-  if [[ -n "$current_pid" ]]; then
+  if [[ -n "$current_pid" ]] || project_bootstrap_launch_in_flight_from_unverified_supervisor_hint "$project"; then
     manager_runtime_recover_workers_if_needed "$project" >/dev/null || true
-    log_info "manager supervisor already running (pid=$current_pid)"
+    log_info "manager supervisor already running (pid=${current_pid:-${supervisor_hint:-unknown}})"
     return 0
   fi
 
