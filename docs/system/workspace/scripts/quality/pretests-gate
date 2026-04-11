@@ -67,6 +67,17 @@ VALID_NOT_APPLICABLE_REASONS = {
     "human_observation_only",
     "covered_by_more_realistic_required_surface",
 }
+FOLLOW_ON_LIVE_SURFACE_PATTERNS = (
+    "auth switch",
+    "account switch",
+    "slot recovery",
+    "startup recovery",
+    "watchdog",
+    "freely start",
+    "ensure-manager",
+    "bin/ai",
+    "codex exec",
+)
 
 
 def git_output(*args: str, check: bool = True) -> str:
@@ -218,6 +229,17 @@ def artifact_exists(path: str) -> bool:
     return result.returncode == 0
 
 
+def issue_is_follow_on(issue_text: str) -> bool:
+    return bool(re.search(r"^- follow_on_to:\s*`?([^`\n]+)`?\s*$", issue_text, re.MULTILINE))
+
+
+def issue_requires_stronger_live_surface(issue_text: str, pretests_text: str) -> bool:
+    if not issue_is_follow_on(issue_text):
+        return False
+    haystack = f"{issue_text}\n{pretests_text}".lower()
+    return any(pattern in haystack for pattern in FOLLOW_ON_LIVE_SURFACE_PATTERNS)
+
+
 def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
     errors: list[str] = []
     def add_error(code: str, message: str) -> None:
@@ -281,9 +303,11 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
 
     valid_statuses = {"pass", "not_applicable"}
     valid_levels = {"mock", "integration", "real_env", "post_merge_dogfood"}
+    acceptance_fields: list[dict[str, str]] = []
 
     for section in sections:
         fields = parse_fields(section)
+        acceptance_fields.append(fields)
         title_line = section.splitlines()[0] if section.splitlines() else "### <unknown>"
         for key in ("id", "requirement", "evidence_level"):
             if not fields.get(key):
@@ -316,6 +340,23 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 "verification_state_missing",
                 f"{pre_tests_path}: {fields.get('id', title_line)} references missing artifact {artifact_ref}",
             )
+
+    if issue_requires_stronger_live_surface(issue_text, pretests_text):
+        end_to_end_reason = parse_scalar(required_sections.get("End-to-End", ""), "not_applicable_reason")
+        real_env_reason = parse_scalar(required_sections.get("Real-Environment", ""), "not_applicable_reason")
+        if end_to_end_reason == "protected_environment_only" and real_env_reason == "protected_environment_only":
+            strong_live_items = [
+                fields
+                for fields in acceptance_fields
+                if fields.get("evidence_level") in {"real_env", "post_merge_dogfood"}
+                and fields.get("status") == "pass"
+                and artifact_exists(fields.get("artifact_ref", ""))
+            ]
+            if not strong_live_items:
+                add_error(
+                    "evidence_plan_missing",
+                    f"{pre_tests_path}: follow-on auth/switch/startup-recovery/watchdog owners cannot waive both 'End-to-End' and 'Real-Environment' with protected_environment_only unless Acceptance Items keep at least one artifact-backed pass item at evidence_level real_env or post_merge_dogfood",
+                )
     return errors
 
 
