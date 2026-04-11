@@ -50,17 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260411-0217-A`
-- title: Protected-merge unparseable-subject receipt-gap governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-protected-merge-unparseable-subject-receipt-gap-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/candidates.md`
-- next_action: Guarded-merge the validated feature worktree into `develop`, then complete post-merge closeout verification and canonical writeback.
-
 ### candidate_issues
 
 1. `C-20260411-0217-A`
@@ -414,6 +403,23 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+1. `I-20260411-0217-A`
+- title: Protected-merge unparseable-subject receipt-gap governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-protected-merge-unparseable-subject-receipt-gap-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/candidates.md`
+- evidence:
+  - `develop` merge `bd10c0fd`
+  - `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-verification.md`
+  - `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now carries the stronger-evidence audit path for generic-subject protected-ancestry receipt gaps, and post-merge replay stayed green.`
+
 1. `I-20260410-1430-A`
 - title: Fix preferred_auth_method lost when switching to account slot
 - milestone_state: completed

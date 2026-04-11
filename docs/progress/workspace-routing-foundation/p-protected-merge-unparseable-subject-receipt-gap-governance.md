@@ -3,12 +3,13 @@
 - issue_id: `I-20260411-0217-A`
 - issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - title: `Protected-merge unparseable-subject receipt-gap governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/protected-merge-unparseable-subject-gap-20260411`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260411-feature-protected-merge-unparseable-subject-gap`
 - updated_at: `2026-04-11`
+- closure_status: `merged-and-verified`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -23,7 +24,9 @@
 1. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
 2. `./bin/governance-check`
 3. `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-verification.md`
+4. `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-canonical-closeout-verification.md`
+5. `git worktree list --porcelain`
 
 ## Next Action
 
-1. Merge this bounded governance followthrough to `develop`, then write post-merge closeout evidence.
+1. `completed`
