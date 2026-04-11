@@ -82,8 +82,8 @@ routing_policy:
 - promoted_issue_path: `pending://issue-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/candidates.md`
-- next_action: Keep this as a bounded repair lane: add a project-local concurrent-start guard so one project cannot materialize multiple supervisors, and align `status` / `fleet-status` generated continuity/prompt truth with the latest valid continuity on disk without faking consumption.
-- revisit_trigger: Revisit only if the bounded lock/read-path fix proves insufficient and the defect actually belongs to broader worker recovery or provenance governance.
+- next_action: Keep this as a bounded runtime followthrough lane: preserve same-project attach/reuse while bootstrap is still in flight under degraded inspection, make `freely stop --project` terminate every discovered same-project supervisor, and clear `stop.marker` only after the last same-project supervisor exits.
+- revisit_trigger: Revisit only if the narrowed runtime followthrough still leaves duplicate same-project supervisors alive, degraded bootstrap attach tears down a healthy in-flight supervisor, or stop-marker cleanup leaves the project falsely pinned in stop mode after the last supervisor exits.
 
 1. `C-20260408-1205-A`
 - title: Freeze verification handoff contract and premerge adequacy derivation for Freely-owned work

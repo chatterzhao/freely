@@ -65,4 +65,9 @@ if kill -0 "$SUP_PID_2" 2>/dev/null; then
   exit 1
 fi
 
+if [[ -f "$PROJECT/.freely/run/stop.marker" ]]; then
+  echo "[FAIL] stop marker should be cleared after the last same-project supervisor exits" >&2
+  exit 1
+fi
+
 echo "[PASS] freely stop terminates all discovered same-project supervisors"
