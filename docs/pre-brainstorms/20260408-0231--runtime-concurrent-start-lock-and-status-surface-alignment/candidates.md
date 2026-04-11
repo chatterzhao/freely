@@ -17,7 +17,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
-- promoted_issue_id: `I-20260411-0517-A`
+- promoted_issue_id: `I-20260408-0231-A`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
@@ -48,7 +48,7 @@
     mode: `author-review`
     summary: `The original packet was valid, but one half is now already on develop. The unfinished part is the runtime followthrough around attach/stop cleanup for same-project duplicate supervisors, and it remains narrow enough to repair without reopening broader governance families.`
     verdict: `ready_for_bounded_repair`
-- next_action: Execute `I-20260411-0517-A` as the bounded followthrough owner for the remaining same-project start/stop repair. Keep the generated-truth half closed on canonical `develop`, carry only the focused runtime start/attach/stop evidence, and promote through a guarded merge chain.
+- next_action: Execute `I-20260408-0231-A` as the bounded followthrough owner for the remaining same-project start/stop repair. Keep the generated-truth half closed on canonical `develop`, carry only the focused runtime start/attach/stop evidence, and promote through a guarded merge chain.
 - revisit_trigger: Reopen only if the lock-based repair still allows duplicate same-project supervisors, if degraded bootstrap attach still tears down a healthy in-flight supervisor, or if the stop-marker cleanup keeps a stopped project falsely pinned after the last supervisor exits.
 - decision_reason: `This remains a bounded runtime correctness packet. The status-surface subproblem was already absorbed on develop, leaving a still-narrow attach/stop followthrough that belongs with the same same-project duplicate-supervisor evidence family rather than a new architecture track.`
 - session_refs:

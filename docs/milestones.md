@@ -50,10 +50,10 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260411-0517-A`
+1. `I-20260408-0231-A`
 - title: Runtime concurrent start-stop followthrough governance
 - milestone_state: committed
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-concurrent-start-stop-followthrough-governance.md`
@@ -103,7 +103,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/candidates.md`
-- next_action: Candidate mirror only. `I-20260411-0517-A` is now the canonical owner for the remaining same-project runtime start/stop followthrough after the generated-truth status half was absorbed on `develop`.
+- next_action: Candidate mirror only. `I-20260408-0231-A` is now the canonical owner for the remaining same-project runtime start/stop followthrough after the generated-truth status half was absorbed on `develop`.
 - revisit_trigger: Revisit only if the narrowed runtime followthrough still leaves duplicate same-project supervisors alive, degraded bootstrap attach tears down a healthy in-flight supervisor, or stop-marker cleanup leaves the project falsely pinned in stop mode after the last supervisor exits.
 
 1. `C-20260408-1205-A`

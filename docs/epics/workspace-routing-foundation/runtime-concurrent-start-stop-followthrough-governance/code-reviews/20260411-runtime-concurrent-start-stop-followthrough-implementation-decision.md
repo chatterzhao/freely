@@ -1,8 +1,12 @@
 # Implementation Decision: runtime-concurrent-start-stop-followthrough-governance
 
-- issue_id: `I-20260411-0517-A`
+- issue_id: `I-20260408-0231-A`
 - date: `2026-04-11`
-- decision: `Materialize a narrow followthrough owner instead of leaving the remaining runtime diff as candidate-only closeout notes.`
+- decision: `Materialize the remaining runtime half of C-20260408-0231-A as the bounded execution owner instead of leaving the develop-bound runtime diff in candidate-only closeout notes.`
+- why_this: `Canonical develop already absorbed the generated-truth status half, but the same candidate still owns unresolved runtime behavior around same-project bootstrap attach, project stop breadth, and stop-marker preservation. Keeping the same lifecycle key preserves candidate -> issue traceability while narrowing scope to the unmerged execution slice.`
+- alternatives_considered: `Leave the runtime diff as candidate-only closeout notes; open a brand-new unrelated issue id; reopen the already-absorbed status-surface half together with the runtime followthrough.`
+- boundary_non_goals: `Do not reopen generated-truth status alignment, broader watchdog/runtime recovery redesign, or the separate checkpoint-risk preflight capability discussion.`
+- residual_risk: `Canonical closeout still depends on guarded merge and tracked-root replay; if that replay regresses adjacent status surfaces or merge gates require additional lifecycle normalization, this owner may need one more bounded followthrough update.`
 
 ## Why
 

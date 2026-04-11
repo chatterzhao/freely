@@ -1,8 +1,8 @@
 # Issue: runtime-concurrent-start-stop-followthrough-governance
 
-- issue_id: `I-20260411-0517-A`
+- issue_id: `I-20260408-0231-A`
 - title: `Runtime concurrent start-stop followthrough governance`
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-concurrent-start-stop-followthrough-governance`

@@ -1,6 +1,6 @@
 # Verification: runtime-concurrent-start-stop-followthrough-governance
 
-- issue_id: `I-20260411-0517-A`
+- issue_id: `I-20260408-0231-A`
 - date: `2026-04-11`
 - branch: `feature/runtime-concurrent-start-stop-followthrough-20260411`
 - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260411-feature-runtime-concurrent-start-stop-followthrough`
