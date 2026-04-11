@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-codex-entry-no-saved-probe.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+mkdir -p "$PROJECT/.freely/run" "$HOME_DIR/.codex"
+
+bash -lc '
+  set -euo pipefail
+  export HOME="'"$HOME_DIR"'"
+  probe_log="'"$TMP_DIR"'/probe.log"
+  state_log="'"$TMP_DIR"'/state.log"
+  log_info() { :; }
+  log_warn() { :; }
+  log_error() { :; }
+  source "'"$ROOT_DIR"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  wait_for_codex_slot_switch_idle() { return 0; }
+  codex_current_slot() { echo ""; }
+  codex_current_slot_kind() { echo ""; }
+  codex_current_identity_hint() { echo ""; }
+  codex_saved_slots_fingerprint() { echo "fp-1"; }
+  codex_load_availability_state() { return 1; }
+  codex_write_availability_state() { printf "%s|%s\n" "$2" "$3" >>"$state_log"; }
+  codex_clear_availability_state() { :; }
+  codex_cached_slot_status() { echo ""; }
+  codex_live_auth_kind() { echo "none"; }
+  codex_active_auth_file() { echo "'"$TMP_DIR"'/missing-auth.json"; }
+  select_any_available_codex_slot() { echo ""; }
+  codex_exec_saved_slot_truth() {
+    echo after-failure-probe >>"$probe_log"
+    echo "usable:slot-should-not-be-probed"
+  }
+  ensure_codex_slot_ready_for_manager "'"$PROJECT"'" entry && {
+    echo "[FAIL] entry mode without a current auth should not auto-probe saved slots" >&2
+    exit 1
+  }
+  [[ ! -f "$probe_log" ]] || [[ ! -s "$probe_log" ]]
+  grep -q "^all_unavailable|no_ready_saved_slot_without_failure$" "$state_log"
+'
+
+echo "[PASS] ensure-manager entry without current auth waits instead of spending tokens on saved-slot probes"

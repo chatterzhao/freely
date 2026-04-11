@@ -73,7 +73,6 @@ bash -lc '
   ai_cli_bin_for_project() { printf "%s\n" "'"$PROJECT"'/bin/ai"; }
   write_manager_bootstrap_handoff() { :; }
   source "'"$PROJECT"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
-  codex_inventory_truth() { printf "none\n"; }
   probe_all_codex_slots_and_update_cooldown() { printf "none\n"; }
   ensure_codex_slot_ready_for_manager "'"$PROJECT"'"
 '

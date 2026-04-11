@@ -405,6 +405,21 @@ ensure_codex_slot_switch_startup_ready_or_fail() {
   done
 }
 
+preflight_codex_slot_recovery_before_start_or_fail() {
+  local project="$1"
+  local entry_slot=""
+  [[ "${AI_TOOL:-}" == "codex" ]] || return 0
+  if [[ -f "$(codex_active_auth_file)" ]] && [[ -n "$(codex_current_identity_hint "$project" || true)" ]]; then
+    return 0
+  fi
+  entry_slot="$(select_any_available_codex_slot "$project" || true)"
+  [[ -n "$entry_slot" ]] || return 0
+  switch_to_codex_slot "$project" "$entry_slot" "start_entry_select_saved_slot" >/dev/null || return 0
+  append_runtime_event "$project" "startup_slot_selected_without_probe" \
+    "active_slot=${entry_slot:-unknown}"
+  return 0
+}
+
 usage() {
   cat <<'EOF'
 Usage:
@@ -2286,7 +2301,7 @@ tool_binary_available_for_auto_recovery() {
 tool_failure_scope_for_auto_recovery() {
   local tool="$1" failure_reason="$2"
   case "$tool:$failure_reason" in
-    *:primary_rate_limit_exhausted|*:secondary_rate_limit_exhausted|*:auth_failure)
+    *:primary_rate_limit_exhausted|*:secondary_rate_limit_exhausted|*:auth_failure|*:network_failure)
       printf 'slot_local\n'
       ;;
     kiro-cli:kiro_monthly_request_limit|kiro-cli:kiro_subscription_status_service_error)
@@ -2372,7 +2387,7 @@ tool_select_ready_slot_for_manager_auto_recovery() {
   TOOL_AUTO_RECOVERY_SLOT=""
   case "$tool" in
     codex)
-      ensure_codex_slot_ready_for_manager "$project" || return 1
+      ensure_codex_slot_ready_for_manager "$project" "$mode" || return 1
       selected_slot="$(runtime_read_tool_current_slot "$project" "$tool")"
       ;;
     *)
@@ -2396,7 +2411,7 @@ tool_ready_for_manager_auto_recovery() {
 }
 
 record_tool_auto_switch_event() {
-  local project="$1" previous_tool="$2" active_tool="$3" active_slot="$4" reason="$5" earliest_reset="${6:-}" launch_blocked="${7:-false}" kind="${8:-selected}" earliest_slot="${9:-}"
+  local project="$1" previous_tool="$2" active_tool="$3" active_slot="$4" reason="$5" earliest_reset="${6:-}" launch_blocked="${7:-false}" kind="${8:-selected}" earliest_slot="${9:-}" owner="${10:-ensure_manager_control_plane}"
   local event_name="tool_auto_switch_selected"
   [[ "$kind" == "waiting" ]] && event_name="tool_auto_switch_waiting_for_recovery"
   append_runtime_event "$project" "$event_name" \
@@ -2408,7 +2423,25 @@ record_tool_auto_switch_event() {
     "launch_blocked=$launch_blocked" \
     "earliest_reset=${earliest_reset:-none}" \
     "earliest_slot=${earliest_slot:-none}" \
-    "owner=ensure_manager_control_plane"
+    "owner=${owner:-ensure_manager_control_plane}"
+}
+
+worker_runtime_should_self_recover_slot_local_failure() {
+  local project="$1" role
+  role="$(role_hint_for_project "$project")"
+  [[ "$role" == "worker" ]]
+}
+
+attempt_local_same_tool_slot_recovery_after_failure() {
+  local project="$1" tool="$2" failure_reason="$3"
+  LOCAL_TOOL_AUTO_RECOVERY_SLOT=""
+  tool_supports_auto_same_tool_slot_recovery "$tool" || return 1
+  tool_failure_allows_same_tool_slot_recovery "$tool" "$failure_reason" || return 1
+  worker_runtime_should_self_recover_slot_local_failure "$project" || return 1
+  tool_select_ready_slot_for_manager_auto_recovery "$project" "$tool" "after_failure" || return 1
+  LOCAL_TOOL_AUTO_RECOVERY_SLOT="${TOOL_AUTO_RECOVERY_SLOT:-}"
+  record_tool_auto_switch_event "$project" "$tool" "$tool" "${LOCAL_TOOL_AUTO_RECOVERY_SLOT:-}" "same_tool_slot_recovery" "" "false" "selected" "" "active_runtime_supervisor"
+  return 0
 }
 
 persist_project_tool_selection() {
@@ -4049,7 +4082,7 @@ log_has_proxy_config_invalid() {
 log_has_execution_network_failure() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
-  runtime_error_signal_excerpt "$log_file" | rg -qi 'ERROR:\s*Reconnecting|curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error|502|503|504'
+  runtime_error_signal_excerpt "$log_file" | rg -qi 'ERROR:\s*Reconnecting|worker quit with fatal: Transport channel closed|invalid peer certificate|certificate was not trusted|certificate expired|received fatal alert|websocket: failed to connect|connection closed via error|curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error|502|503|504'
 }
 
 log_has_kiro_monthly_request_limit() {
@@ -9555,6 +9588,7 @@ start_project_runtime() {
   loop_log="$logs_dir/loop.log"
   mkdir -p "$run_dir" "$logs_dir"
   ensure_codex_slot_switch_startup_ready_or_fail "$project" || exit 1
+  preflight_codex_slot_recovery_before_start_or_fail "$project" || exit 1
   rm -f "$(stop_marker_file "$project")"
   LAST_ATTACH_REUSE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
@@ -9977,6 +10011,16 @@ start_project_runtime() {
       exit 1
     fi
     if [[ -n "$slot_switch_reason" ]]; then
+      if attempt_local_same_tool_slot_recovery_after_failure "$PROJECT_ROOT" "$AI_TOOL" "$slot_switch_reason"; then
+        log_warn "${slot_switch_reason} detected for this workcell; worker runtime switched locally to slot=${LOCAL_TOOL_AUTO_RECOVERY_SLOT:-unknown} and will continue"
+        append_runtime_event "$project" "supervisor_local_slot_recovery" \
+          "supervisor_pid=$$" \
+          "tool=$AI_TOOL" \
+          "reason=$slot_switch_reason" \
+          "active_slot=${LOCAL_TOOL_AUTO_RECOVERY_SLOT:-unknown}"
+        sleep_with_rate_limit_recheck "$PROJECT_ROOT" 1
+        continue
+      fi
       log_warn "${slot_switch_reason} detected for this workcell; local runtime is deferring availability recovery to the global watchdog / manager control plane and will now stop"
       append_runtime_event "$project" "supervisor_stopping" \
         "supervisor_pid=$$" \

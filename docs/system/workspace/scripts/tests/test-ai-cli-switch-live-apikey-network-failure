@@ -5,53 +5,100 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-ai-switch-live-apikey-network.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-PROJECT="$TMP_DIR/project"
-HOME_DIR="$TMP_DIR/home"
-MOCK_BIN="$TMP_DIR/mock-bin"
-CODEX_LOG="$TMP_DIR/codex.log"
-
-mkdir -p \
-  "$PROJECT/.freely/run" \
-  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts" \
-  "$PROJECT/docs/system/workspace/scripts/runtime" \
-  "$HOME_DIR/.codex" \
-  "$MOCK_BIN"
-
-ln -sf \
-  "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
-  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
-ln -sf \
-  "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
-  "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
-
-cat >"$PROJECT/.freely/config.env" <<'EOF'
+setup_project() {
+  local project="$1"
+  mkdir -p \
+    "$project/.freely/run" \
+    "$project/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+    "$project/docs/system/workspace/scripts/runtime"
+  ln -sf \
+    "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+    "$project/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  ln -sf \
+    "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+    "$project/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+  cat >"$project/.freely/config.env" <<'EOF'
 FREELY_NETWORK_PROXY_MODE="inherit"
 EOF
+}
 
-cat >"$HOME_DIR/.codex/auth.json" <<'EOF'
+setup_home() {
+  local home_dir="$1"
+  mkdir -p "$home_dir/.codex" "$home_dir/.ai-auth"
+}
+
+write_live_apikey() {
+  local home_dir="$1"
+  cat >"$home_dir/.codex/auth.json" <<'EOF'
 {"OPENAI_API_KEY":"sk-live"}
 EOF
-cat >"$HOME_DIR/.codex/config.toml" <<'EOF'
+  cat >"$home_dir/.codex/config.toml" <<'EOF'
 model = "gpt-5.4"
 EOF
+}
 
-cat >"$MOCK_BIN/codex" <<'EOF'
+write_saved_account_slot() {
+  local home_dir="$1" slot_dir="$2" email="$3" access_token="$4"
+  mkdir -p "$home_dir/.ai-auth/$slot_dir"
+  local payload
+  payload="$(python3 - <<'PY' "$email"
+import base64
+import json
+import sys
+
+payload = base64.urlsafe_b64encode(json.dumps({"email": sys.argv[1]}).encode()).decode().rstrip("=")
+print(payload)
+PY
+)"
+  printf '{"tokens":{"id_token":"x.%s.y","access_token":"%s","refresh_token":"refresh-%s"}}\n' "$payload" "$access_token" "$access_token" >"$home_dir/.ai-auth/$slot_dir/auth.json"
+}
+
+write_mock_codex() {
+  local mock_bin="$1"
+  mkdir -p "$mock_bin"
+  cat >"$mock_bin/codex" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 printf '%s\n' "$*" >>"${CODEX_LOG:?}"
-if [[ "${1:-}" == "exec" ]]; then
-  echo 'ERROR: Reconnecting... 2/5'
-  sleep 30
+if [[ "${1:-}" != "exec" ]]; then
+  exit 99
 fi
-exit 99
+
+python3 - <<'PY' "${HOME:?}/.codex/auth.json"
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    data = json.load(f)
+token = data.get("tokens", {}).get("access_token", "")
+if token == "token-work":
+    print("hi")
+    raise SystemExit(0)
+if "OPENAI_API_KEY" in data:
+    print("ERROR: Reconnecting... 2/5")
+    raise SystemExit(99)
+print(f"unexpected token: {token}", file=sys.stderr)
+raise SystemExit(1)
+PY
 EOF
-chmod +x "$MOCK_BIN/codex"
+  chmod +x "$mock_bin/codex"
+}
+
+PROJECT_NO_SAVED="$TMP_DIR/project-no-saved"
+HOME_NO_SAVED="$TMP_DIR/home-no-saved"
+MOCK_BIN_NO_SAVED="$TMP_DIR/mock-bin-no-saved"
+CODEX_LOG_NO_SAVED="$TMP_DIR/codex-no-saved.log"
+
+setup_project "$PROJECT_NO_SAVED"
+setup_home "$HOME_NO_SAVED"
+write_live_apikey "$HOME_NO_SAVED"
+write_mock_codex "$MOCK_BIN_NO_SAVED"
 
 set +e
-HOME="$HOME_DIR" \
-PROJECT_ROOT="$PROJECT" \
-PATH="$MOCK_BIN:$PATH" \
-CODEX_LOG="$CODEX_LOG" \
+HOME="$HOME_NO_SAVED" \
+PROJECT_ROOT="$PROJECT_NO_SAVED" \
+PATH="$MOCK_BIN_NO_SAVED:$PATH" \
+CODEX_LOG="$CODEX_LOG_NO_SAVED" \
 CODEX_PROBE_TIMEOUT=10 \
   bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/switch.json"
 RC=$?
@@ -73,6 +120,42 @@ assert data["slot_kind"] == "apikey"
 assert data["launch_blocked"] is True
 PY
 
-grep -q '^exec ' "$CODEX_LOG"
+grep -q '^exec ' "$CODEX_LOG_NO_SAVED"
 
 echo "[PASS] ai switch codex blocks launch and surfaces reconnect failures on live apikey auth as network_failure"
+
+PROJECT_WITH_SAVED="$TMP_DIR/project-with-saved"
+HOME_WITH_SAVED="$TMP_DIR/home-with-saved"
+MOCK_BIN_WITH_SAVED="$TMP_DIR/mock-bin-with-saved"
+CODEX_LOG_WITH_SAVED="$TMP_DIR/codex-with-saved.log"
+
+setup_project "$PROJECT_WITH_SAVED"
+setup_home "$HOME_WITH_SAVED"
+write_live_apikey "$HOME_WITH_SAVED"
+write_saved_account_slot "$HOME_WITH_SAVED" "codex-work@example-com-1" "work@example.com" "token-work"
+write_mock_codex "$MOCK_BIN_WITH_SAVED"
+
+HOME="$HOME_WITH_SAVED" \
+PROJECT_ROOT="$PROJECT_WITH_SAVED" \
+PATH="$MOCK_BIN_WITH_SAVED:$PATH" \
+CODEX_LOG="$CODEX_LOG_WITH_SAVED" \
+CODEX_PROBE_TIMEOUT=10 \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/switch-with-saved.json"
+
+python3 - <<'PY' "$TMP_DIR/switch-with-saved.json"
+import json
+import pathlib
+import sys
+
+data = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+assert data["switched"] is True
+assert data["status"] == "usable"
+assert data["slot"] == "work@example-com-1"
+assert data["auth_email"] == "work@example.com"
+PY
+
+grep -q '^exec ' "$CODEX_LOG_WITH_SAVED"
+[[ "$(grep -c '^exec ' "$CODEX_LOG_WITH_SAVED")" -ge 2 ]]
+grep -q '"slot": "work@example-com-1"' <(HOME="$HOME_WITH_SAVED" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
+
+echo "[PASS] ai switch codex keeps sweeping saved slots after a live apikey network failure instead of stopping on the current auth"

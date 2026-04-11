@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-slot-recovery.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME="$TMP_DIR/home"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260401-0003--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+
+git init -q -b feature/test-worker-slot-recovery "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260401-0003--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260401-0003--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260401-0003--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AUTO_SWITCH_TOOL="true"
+AUTO_SWITCH_SLOT="true"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+SUPERVISOR_STATE="up"
+AI_STATE="down"
+LAST_EXIT_REASON="network_failure"
+EOF
+
+# shellcheck disable=SC1090
+HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+runtime_write_tool_current_slot "codex" "slot-1"
+
+role_hint_for_project() {
+  printf 'worker\n'
+}
+
+tool_select_ready_slot_for_manager_auto_recovery() {
+  local project="$1" tool="$2" mode="$3"
+  [[ "$tool" == "codex" ]] || return 1
+  [[ "$mode" == "after_failure" ]] || return 1
+  runtime_write_tool_current_slot "codex" "slot-2"
+  TOOL_AUTO_RECOVERY_SLOT="slot-2"
+  return 0
+}
+
+attempt_local_same_tool_slot_recovery_after_failure "$PROJECT" "codex" "network_failure" >/dev/null
+
+[[ "${LOCAL_TOOL_AUTO_RECOVERY_SLOT:-}" == "slot-2" ]] || {
+  echo "[FAIL] worker runtime should expose the selected replacement slot" >&2
+  exit 1
+}
+[[ "$(runtime_read_tool_current_slot "$PROJECT" "codex")" == "slot-2" ]] || {
+  echo "[FAIL] worker runtime should advance to the next ready slot after slot-local failure" >&2
+  exit 1
+}
+grep -q 'event=tool_auto_switch_selected .*reason=same_tool_slot_recovery .*owner=active_runtime_supervisor' "$PROJECT/.freely/logs/runtime-events.log" || {
+  echo "[FAIL] worker runtime should emit active_runtime_supervisor recovery evidence" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+
+echo "[PASS] worker runtime self-recovers slot-local failure to the next ready slot without depending on ensure-manager"
