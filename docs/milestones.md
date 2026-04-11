@@ -52,6 +52,17 @@ routing_policy:
 
 ### candidate_issues
 
+1. `C-20260411-0217-A`
+- title: Protected-merge unparseable-subject receipt-gap followthrough
+- milestone_state: candidate
+- phase_state: `needs_research`
+- priority: P1
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/candidates.md`
+- next_action: Freeze the minimal stronger-evidence contract for unparseable-subject ancestry gaps, compare “second mode in existing ledger” versus “separate ledger” without weakening auditability, then decide whether the bounded implementation owner can be materialized.
+- revisit_trigger: Reopen only if canonical `develop` no longer contains this ancestry class, or if a bounded design proves the current subject-matched owner can absorb it without introducing a new audit bypass path.
+
 1. `C-20260409-1715-A`
 - title: Runtime evidence provenance research retirement followthrough governance
 - milestone_state: candidate
