@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260411-0217-A`
 - title: `Protected-merge unparseable-subject receipt-gap governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `protected-merge-unparseable-subject-receipt-gap-governance`
@@ -72,5 +72,22 @@ The current fail-closed behavior is correct, but Freely now needs a narrower fol
 
 ## Next
 
-- Focused regression expansion, parser/schema changes, and canonical ledger entries are complete in the dedicated feature worktree.
-- Next step is guarded merge to `develop` and post-merge closeout verification.
+1. next_action: `completed`
+2. revisit_trigger: Reopen only if canonical `develop` later loses the explicit stronger-evidence path for generic-subject ancestry gaps, or if new history classes prove this owner boundary is still too broad.
+
+## Completion
+
+- `docs/pre-brainstorms/INDEX.md`
+- `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/brainstorms.md`
+- `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/candidates.md`
+- `docs/milestones.md`
+- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/prd.md`
+- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/pre-tests.md`
+- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/tasks.md`
+- `docs/progress/workspace-routing-foundation/p-protected-merge-unparseable-subject-receipt-gap-governance.md`
+- `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
+- `docs/system/workspace/scripts/quality/governance-check`
+- `docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
+- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-verification.md`
+- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-canonical-closeout-verification.md`
