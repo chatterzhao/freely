@@ -15,6 +15,12 @@ normalize_codex_slot_name() {
   printf '%s' "$1" | sed 's/\./-/g'
 }
 
+codex_slot_matches_identity() {
+  local slot="$1" identity="$2"
+  [[ -n "$slot" && -n "$identity" ]] || return 1
+  [[ "$(normalize_codex_slot_name "$slot")" == "$(normalize_codex_slot_name "$identity")" ]]
+}
+
 format_epoch_local() {
   local epoch="$1"
   [[ -n "$epoch" ]] || return 1
@@ -200,6 +206,7 @@ codex_slot_switch_in_progress() {
 
 wait_for_codex_slot_switch_idle() {
   local project="$1"
+  local activity_label="${2:-probe/relaunch}"
   local timeout_secs="${FREELY_ACCOUNT_SWITCH_WAIT_SECS:-60}"
   local interval_secs="${FREELY_ACCOUNT_SWITCH_WAIT_INTERVAL_SECS:-1}"
   local start_ts now owner_pid waiting_logged=0
@@ -210,12 +217,12 @@ wait_for_codex_slot_switch_idle() {
   while codex_slot_switch_in_progress; do
     if [[ "$waiting_logged" == "0" ]]; then
       owner_pid="$(codex_slot_switch_lock_owner_pid)"
-      log_warn "codex slot switch is already in progress (owner_pid=${owner_pid:-unknown}); waiting before watchdog probe/relaunch" >&2
+      log_warn "codex slot switch is already in progress (owner_pid=${owner_pid:-unknown}); waiting before ${activity_label}" >&2
       waiting_logged=1
     fi
     now="$(date +%s)"
     if (( now - start_ts >= timeout_secs )); then
-      log_warn "timed out waiting for codex slot switch to finish before watchdog recovery" >&2
+      log_warn "timed out waiting for codex slot switch to finish before ${activity_label}" >&2
       return 1
     fi
     sleep "$interval_secs"
@@ -225,7 +232,8 @@ wait_for_codex_slot_switch_idle() {
 }
 
 codex_slot_switch_probe_lock_acquire() {
-  local reason="${1:-watchdog_probe}"
+  local reason="${1:-codex_exec_probe}"
+  local activity_label="${2:-codex exec probe}"
   local timeout_secs="${AI_CLI_SWITCH_LOCK_WAIT_SECS:-60}"
   local lock_dir state_file start_ts now owner_pid inherited_owner_pid
   lock_dir="$(codex_slot_switch_lock_dir)"
@@ -257,7 +265,7 @@ EOF
 
     now="$(date +%s)"
     if (( now - start_ts >= timeout_secs )); then
-      log_warn "timed out waiting to serialize watchdog codex probe behind slot switch activity"
+      log_warn "timed out waiting to serialize ${activity_label} behind slot switch activity"
       return 1
     fi
     sleep 1
@@ -621,19 +629,11 @@ codex_cached_inventory_truth() {
 }
 
 codex_inventory_truth() {
-  local project="$1" refresh_mode="${2:-stale_ok}" result=""
+  local project="$1" refresh_mode="${2:-stale_ok}"
   if [[ "$refresh_mode" != "refresh" ]] && codex_availability_cache_is_fresh "$project"; then
     codex_cached_inventory_truth "$project"
     return $?
   fi
-
-  result="$(codex_oauth_sweep_all_slots "$project" || true)"
-  case "$result" in
-    usable:*|all_unavailable:*|oauth_unreachable)
-      printf '%s\n' "$result"
-      return 0
-      ;;
-  esac
 
   if codex_availability_cache_is_fresh "$project"; then
     codex_cached_inventory_truth "$project"
@@ -644,11 +644,101 @@ codex_inventory_truth() {
   return 1
 }
 
+# Runtime truth for switch/start/status/watchdog must come from real codex exec
+# probes. The OAuth/cache helpers above remain advisory only.
+codex_exec_saved_slot_truth() {
+  local project="$1" excluded_identity="${2:-}" switch_reason="${3:-probe_recovery_slots}" probe_lock_reason="${4:-codex_exec_recovery_probe}" probe_activity_label="${5:-codex exec recovery probe}"
+  local candidate probe_result reset_at
+  local earliest_slot="" earliest_reset=""
+  local original_slot active_slot original_active_slot auth_backup="" auth_file
+  local tmp_dir results_file status_text="" details="" auth_email="" detail=""
+
+  original_slot="$(codex_current_slot "$project")"
+  original_active_slot="$(read_codex_active_slot)"
+  auth_file="$(codex_active_auth_file)"
+  if [[ -f "$auth_file" ]]; then
+    auth_backup="$(mktemp)"
+    cp "$auth_file" "$auth_backup"
+  fi
+  tmp_dir="$(mktemp -d)"
+  results_file="$tmp_dir/exec-results.tsv"
+
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    if codex_slot_matches_identity "$candidate" "$excluded_identity"; then
+      continue
+    fi
+    switch_to_codex_slot "$project" "$candidate" "$switch_reason" >/dev/null || continue
+
+    probe_result="$(codex_probe_current_slot_now "$project" "$probe_lock_reason" "$probe_activity_label" || true)"
+    status_text=""
+    details=""
+    auth_email=""
+    detail=""
+    reset_at="0"
+    case "$probe_result" in
+      usable)
+        status_text="usable"
+        details="ready to use"
+        detail="$details"
+        printf '%s\t%s\t%s\t%s\t0\t%s\n' "$candidate" "$status_text" "$auth_email" "$reset_at" "$detail" >>"$results_file"
+        [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
+        rm -rf "$tmp_dir"
+        printf 'usable:%s\n' "$candidate"
+        return 0
+        ;;
+      rate_limited:*)
+        reset_at="${probe_result#rate_limited:}"
+        status_text="rate_limited"
+        details="$reset_at"
+        detail="$details"
+        if [[ -n "$reset_at" && "$reset_at" =~ ^[0-9]+$ && "$reset_at" -gt 0 ]]; then
+          codex_record_slot_cooldown "$project" "$candidate" "$reset_at"
+          if [[ -z "$earliest_reset" || "$reset_at" -lt "$earliest_reset" ]]; then
+            earliest_slot="$candidate"
+            earliest_reset="$reset_at"
+          fi
+        fi
+        ;;
+      subscription_expired|deactivated_workspace|unauthorized|network_failure|timeout)
+        status_text="$probe_result"
+        details="$probe_result"
+        detail="$details"
+        ;;
+      error:*)
+        status_text="error"
+        details="${probe_result#error:}"
+        detail="$details"
+        ;;
+      *)
+        status_text="unknown"
+        details="${probe_result:-unknown}"
+        detail="$details"
+        ;;
+    esac
+    printf '%s\t%s\t%s\t%s\t0\t%s\n' "$candidate" "$status_text" "$auth_email" "${reset_at:-0}" "$detail" >>"$results_file"
+  done < <(codex_saved_slots "$project")
+
+  restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
+  [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
+  rm -rf "$tmp_dir"
+  if [[ -n "$earliest_slot" && -n "$earliest_reset" ]]; then
+    printf 'all_unavailable:%s|%s\n' "$earliest_slot" "$earliest_reset"
+    return 0
+  fi
+  printf 'none\n'
+  return 1
+}
+
 codex_confirm_launch_candidate_slot() {
-  local project="$1" candidate="$2" reason="$3"
+  local project="$1" candidate="$2" reason="$3" excluded_identity="${4:-}"
   local original_slot original_active_slot auth_backup="" auth_file probe_result reset_at
 
   [[ -n "$candidate" ]] || { printf 'none\n'; return 1; }
+  if codex_slot_matches_identity "$candidate" "$excluded_identity"; then
+    printf 'excluded_current_slot\n'
+    return 1
+  fi
   original_slot="$(codex_current_slot "$project")"
   original_active_slot="$(read_codex_active_slot)"
   auth_file="$(codex_active_auth_file)"
@@ -1185,10 +1275,10 @@ select_earliest_reset_codex_slot_any() {
 #   0 for usable or rate limited
 #   1 for other probe failures
 codex_probe_current_slot_now() {
-  local project="$1" prompt_file output_file rc timeout_secs="${CODEX_PROBE_TIMEOUT:-15}" probe_lock_held=0
+  local project="$1" probe_lock_reason="${2:-codex_exec_probe}" probe_activity_label="${3:-codex exec probe}" prompt_file output_file rc timeout_secs="${CODEX_PROBE_TIMEOUT:-15}" probe_lock_held=0
   local current_slot artifact_path partial_output
-  wait_for_codex_slot_switch_idle "$project" || return 1
-  codex_slot_switch_probe_lock_acquire "watchdog_probe_current_slot" || return 1
+  wait_for_codex_slot_switch_idle "$project" "$probe_activity_label" || return 1
+  codex_slot_switch_probe_lock_acquire "$probe_lock_reason" "$probe_activity_label" || return 1
   probe_lock_held=1
   current_slot="$(codex_current_slot "$project" || true)"
   prompt_file="$(mktemp)"
@@ -1389,12 +1479,12 @@ probe_any_usable_codex_slot_now() {
 #   all_unavailable:<slot>|<reset_at>  - No usable slot right now; earliest reset is debug-only hint
 #   none                    - No slots saved or all failed without rate limit info
 probe_all_codex_slots_and_update_cooldown() {
-  local project="$1"
+  local project="$1" excluded_identity="${2:-}" promotion_mode="${3:-promote}"
   local candidate probe_result reset_at
   local usable_slot=""
   local earliest_slot="" earliest_reset=""
-  local -a slot_status=()
   local current_identity original_slot active_slot original_active_slot auth_backup="" auth_file
+  local tmp_dir results_file current_marker status_icon="" status_text="" details="" auth_email="" detail=""
 
   current_identity="$(codex_current_cooldown_identity "$project")"
   original_slot="$(codex_current_slot "$project")"
@@ -1404,32 +1494,8 @@ probe_all_codex_slots_and_update_cooldown() {
     auth_backup="$(mktemp)"
     cp "$auth_file" "$auth_backup"
   fi
-
-  probe_result="$(codex_inventory_truth "$project" "refresh" || true)"
-  case "$probe_result" in
-    usable:*)
-      usable_slot="${probe_result#usable:}"
-      if [[ -n "$usable_slot" ]]; then
-        probe_result="$(codex_confirm_launch_candidate_slot "$project" "$usable_slot" "oauth_sweep_promote_usable_slot" || true)"
-        case "$probe_result" in
-          usable:*)
-            [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
-            printf '%s\n' "$probe_result"
-            return 0
-            ;;
-        esac
-        restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
-      fi
-      ;;
-    all_unavailable:*)
-      if ! codex_saved_slots_include_kind "$project" "apikey"; then
-        restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
-        [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
-        printf '%s\n' "$probe_result"
-        return 0
-      fi
-      ;;
-  esac
+  tmp_dir="$(mktemp -d)"
+  results_file="$tmp_dir/exec-results.tsv"
 
   # Print header
   printf '\n%-30s  %-15s  %s\n' "Slot" "Status" "Details" >&2
@@ -1437,22 +1503,32 @@ probe_all_codex_slots_and_update_cooldown() {
 
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
+    if codex_slot_matches_identity "$candidate" "$excluded_identity"; then
+      continue
+    fi
     switch_to_codex_slot "$project" "$candidate" "probe_all_slots" >/dev/null || continue
 
     probe_result="$(codex_probe_current_slot_now "$project")" || continue
-
-    local status_line="" status_icon="" status_text="" details=""
+    current_marker=""
+    status_icon=""
+    status_text=""
+    details=""
+    auth_email=""
+    detail=""
 
     case "$probe_result" in
       usable)
-        usable_slot="$candidate"
+        if [[ -z "$usable_slot" ]]; then
+          usable_slot="$candidate"
+        fi
         status_icon="✅"
         status_text="usable"
         details="ready to use"
+        detail="$details"
         ;;
       rate_limited:*)
         reset_at="${probe_result#rate_limited:}"
-        if [[ -z "$earliest_reset" || "$reset_at" -lt "$earliest_reset" ]]; then
+        if [[ -n "$reset_at" && "$reset_at" =~ ^[0-9]+$ && "$reset_at" -gt 0 && ( -z "$earliest_reset" || "$reset_at" -lt "$earliest_reset" ) ]]; then
           earliest_slot="$candidate"
           earliest_reset="$reset_at"
         fi
@@ -1461,74 +1537,100 @@ probe_all_codex_slots_and_update_cooldown() {
         local human_time
         human_time="$(format_epoch_local "$reset_at")"
         details="resets at $human_time"
+        detail="$human_time"
         ;;
       subscription_expired)
         status_icon="💳"
-        status_text="subscription"
+        status_text="subscription_expired"
         details="plan expired or quota exceeded"
+        detail="$details"
         ;;
       deactivated_workspace)
         status_icon="🚫"
-        status_text="deactivated"
+        status_text="deactivated_workspace"
         details="workspace deactivated (402)"
+        detail="$details"
         ;;
       unauthorized)
         status_icon="🔒"
         status_text="unauthorized"
         details="auth token invalid or expired"
+        detail="$details"
         ;;
       network_failure)
         status_icon="🌐"
-        status_text="network"
+        status_text="network_failure"
         details="connection failed before probe completed"
+        detail="$details"
         ;;
       timeout)
         status_icon="⏱️"
         status_text="timeout"
         details="probe timed out after ${CODEX_PROBE_TIMEOUT:-15}s"
+        detail="$details"
         ;;
       error:*)
         status_icon="❌"
         status_text="error"
         details="${probe_result#error:}"
+        detail="$details"
         ;;
       *)
         status_icon="❓"
         status_text="unknown"
         details="$probe_result"
+        detail="$details"
         ;;
     esac
 
     # Mark current slot
-    local current_marker=""
     if [[ "$(normalize_codex_slot_name "$candidate")" == "$current_identity" ]]; then
       current_marker=" *"
     fi
 
+    if [[ "$candidate" == account-* ]]; then
+      auth_email="${candidate#account-}"
+    fi
+    printf '%s\t%s\t%s\t%s\t0\t%s\n' \
+      "$candidate" \
+      "$status_text" \
+      "$auth_email" \
+      "${reset_at:-0}" \
+      "${detail:-$details}" >>"$results_file"
+
     # Print status line
     printf '%s %-28s  %-15s  %s\n' "$status_icon" "$candidate$current_marker" "$status_text" "$details" >&2
-
-    slot_status+=("$candidate:$status_text")
   done < <(codex_saved_slots "$project")
 
+  if [[ -s "$results_file" ]]; then
+    codex_write_availability_cache_from_sweep_results "$project" "$results_file"
+    codex_overwrite_slot_cooldowns_from_sweep_results "$project" "$results_file"
+  fi
   printf '\n' >&2
 
   # Return results
   if [[ -n "$usable_slot" ]]; then
-    active_slot="$(codex_current_slot "$project")"
-    if [[ -n "$active_slot" && "$(normalize_codex_slot_name "$active_slot")" != "$(normalize_codex_slot_name "$usable_slot")" ]]; then
-      switch_to_codex_slot "$project" "$usable_slot" "probe_promote_usable_slot" >/dev/null || true
+    if [[ "$promotion_mode" == "promote" ]]; then
+      active_slot="$(codex_current_slot "$project")"
+      if [[ -n "$active_slot" && "$(normalize_codex_slot_name "$active_slot")" != "$(normalize_codex_slot_name "$usable_slot")" ]]; then
+        switch_to_codex_slot "$project" "$usable_slot" "probe_promote_usable_slot" >/dev/null || true
+      fi
+    else
+      restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
     fi
+    rm -rf "$tmp_dir"
     [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
     printf 'usable:%s\n' "$usable_slot"
     return 0
   elif [[ -n "$earliest_slot" ]]; then
     restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
+    rm -rf "$tmp_dir"
     [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
     printf 'all_unavailable:%s|%s\n' "$earliest_slot" "$earliest_reset"
     return 0
   else
     restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
+    rm -rf "$tmp_dir"
     [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
     printf 'none\n'
     return 1
@@ -1569,11 +1671,11 @@ switch_to_next_codex_slot() {
 }
 
 ensure_codex_slot_ready_for_manager() {
-  local project="$1"
+  local project="$1" recovery_mode="${2:-entry}"
   local current_slot current_slot_kind current_identity current_probe_identity current_live_kind current_probe_result probe_result probe_status probe_slot cached_current_status
-  local all_unavailable_info earliest_slot earliest_reset inventory_refresh_mode="stale_ok"
+  local failed_current_identity=""
+  local all_unavailable_info earliest_slot earliest_reset
   local current_fingerprint previous_phase="" previous_blocked_reason="" previous_slot="" previous_fingerprint="" wake_reason="" wake_trigger="" recovery_trigger=""
-  local previous_earliest_reset="" previous_reprobe_next_at="" previous_reprobe_attempts="" reprobe_due_at="" reprobe_next_at="" reprobe_attempts="" reprobe_max_attempts="" now=""
 
   wait_for_codex_slot_switch_idle "$project" || return 1
   current_slot="$(codex_current_slot "$project")"
@@ -1585,75 +1687,42 @@ ensure_codex_slot_ready_for_manager() {
   current_probe_identity="${current_identity:-current-live}"
   current_live_kind="$(codex_live_auth_kind)"
   current_fingerprint="$(codex_saved_slots_fingerprint "$project")"
+  if [[ "$recovery_mode" == "after_failure" ]]; then
+    failed_current_identity="$current_probe_identity"
+  fi
 
   if codex_load_availability_state "$project"; then
     previous_phase="${AVAILABILITY_PHASE:-}"
     previous_blocked_reason="${BLOCKED_REASON:-}"
     previous_slot="${PREVIOUS_SLOT:-}"
     previous_fingerprint="${SAVED_SLOTS_FINGERPRINT:-}"
-    previous_earliest_reset="${EARLIEST_RESET_HINT:-}"
-    previous_reprobe_next_at="${EARLIEST_REPROBE_NEXT_AT:-}"
-    previous_reprobe_attempts="${EARLIEST_REPROBE_ATTEMPTS:-}"
   fi
 
-  if should_defer_all_unavailable_reprobe "$previous_phase" "$previous_blocked_reason" "$previous_fingerprint" "$current_fingerprint" "$previous_earliest_reset" "$previous_reprobe_next_at"; then
-    log_info "watchdog defers codex reprobe until earliest-reset window matures (earliest_reset=${previous_earliest_reset:-unknown} next_reprobe_at=${previous_reprobe_next_at:-unknown})"
+  if [[ "$recovery_mode" != "after_failure" && "${previous_phase:-}" == "all_unavailable" && "${previous_blocked_reason:-}" == "all_slots_unavailable" && -n "${previous_fingerprint:-}" && "$previous_fingerprint" == "$current_fingerprint" ]]; then
+    log_info "watchdog leaves codex in all_unavailable state until a fresh failure or manual switch requests another real probe"
     return 1
-  fi
-
-  if watchdog_force_reprobe_requested || [[ "$previous_phase" == "all_unavailable" ]]; then
-    inventory_refresh_mode="refresh"
   fi
 
   codex_write_availability_state "$project" "probing" "${previous_blocked_reason:-probe_pending}" "${previous_slot:-$current_identity}" "$current_identity" "$current_fingerprint" "" "" ""
 
-  probe_result="$(codex_inventory_truth "$project" "$inventory_refresh_mode" || true)"
   cached_current_status="$(codex_cached_slot_status "$project" "$current_identity" || true)"
 
-  if [[ -f "$(codex_active_auth_file)" && ( "$current_slot_kind" == "apikey" || "$cached_current_status" == "usable" || "$current_fingerprint" == "none" || "$current_live_kind" == "apikey" ) ]]; then
-    current_probe_result="$(codex_probe_current_slot_now "$project" || true)"
-    case "$current_probe_result" in
-      usable)
-        if [[ "$previous_phase" == "all_unavailable" || "$previous_phase" == "probing" ]]; then
-          recovery_trigger="${previous_blocked_reason:-slot_probe_blocked}"
-          wake_reason="watchdog_probed_current_slot_usable"
-          if [[ -n "$previous_fingerprint" && "$previous_fingerprint" != "$current_fingerprint" ]]; then
-            wake_reason="watchdog_inventory_change_found_usable_slot"
-            wake_trigger="inventory_change"
-          elif [[ "$previous_phase" == "all_unavailable" || "$previous_blocked_reason" == "all_slots_unavailable" ]]; then
-            wake_reason="watchdog_probed_and_found_usable_slot"
-            wake_trigger="periodic_reprobe"
-          else
-            wake_trigger="periodic_reprobe"
-          fi
-          log_info "watchdog found a usable current codex slot for manager bootstrap (trigger=$recovery_trigger reason=$wake_reason previous_slot=${previous_slot:-$current_probe_identity} active_slot=$current_probe_identity)"
-          write_manager_bootstrap_handoff "$project" "$recovery_trigger" "${previous_slot:-$current_probe_identity}" "$current_probe_identity" "$wake_reason" "inspect-fleet-and-recover-workers"
-          codex_write_availability_state "$project" "ready" "" "${previous_slot:-$current_probe_identity}" "$current_probe_identity" "$current_fingerprint" "$wake_trigger" "" ""
-        else
-          codex_clear_availability_state "$project"
-        fi
-        return 0
-        ;;
-    esac
+  if [[ -z "$failed_current_identity" ]]; then
+    if [[ -f "$(codex_active_auth_file)" && -n "$current_probe_identity" ]]; then
+      codex_clear_availability_state "$project"
+      return 0
+    fi
+    probe_slot="$(select_any_available_codex_slot "$project" || true)"
+    if [[ -n "$probe_slot" ]] && switch_to_codex_slot "$project" "$probe_slot" "entry_select_saved_slot" >/dev/null; then
+      codex_clear_availability_state "$project"
+      return 0
+    fi
+    codex_write_availability_state "$project" "all_unavailable" "no_ready_saved_slot_without_failure" "${current_identity:-unknown}" "${current_identity:-unknown}" "$current_fingerprint" "" "" ""
+    log_warn "no cached ready codex slot is available for manager entry; runtime will wait for manual switch or a later real failure instead of probing in the background"
+    return 1
   fi
 
-  case "$probe_result" in
-    usable:*)
-      probe_slot="${probe_result#usable:}"
-      if [[ -n "$probe_slot" ]]; then
-        probe_result="$(codex_confirm_launch_candidate_slot "$project" "$probe_slot" "ensure_manager_launch_time_confirmation" || true)"
-      fi
-      ;;
-  esac
-
-  probe_status="${probe_result%%:*}"
-  case "$probe_status" in
-    usable|all_unavailable)
-      ;;
-    *)
-      probe_result="$(probe_all_codex_slots_and_update_cooldown "$project" || true)"
-      ;;
-  esac
+  probe_result="$(codex_exec_saved_slot_truth "$project" "$failed_current_identity" "after_failure_exec_recovery_slot_probe" "after_failure_exec_recovery_probe" "after-failure codex exec recovery probe" || true)"
   probe_status="${probe_result%%:*}"
   case "$probe_status" in
     usable)
@@ -1665,7 +1734,7 @@ ensure_codex_slot_ready_for_manager() {
           wake_reason="watchdog_inventory_change_found_usable_slot"
           wake_trigger="inventory_change"
         else
-          wake_trigger="periodic_reprobe"
+          wake_trigger="after_failure_exec_recovery"
         fi
         log_info "watchdog found a usable saved codex slot for manager bootstrap (trigger=$recovery_trigger reason=$wake_reason previous_slot=${current_identity:-${previous_slot:-unknown}} active_slot=$probe_slot)"
         write_manager_bootstrap_handoff "$project" "$recovery_trigger" "${current_identity:-${previous_slot:-unknown}}" "$probe_slot" "$wake_reason" "inspect-fleet-and-recover-workers"
@@ -1677,29 +1746,12 @@ ensure_codex_slot_ready_for_manager() {
       all_unavailable_info="${probe_result#all_unavailable:}"
       earliest_slot="${all_unavailable_info%%|*}"
       earliest_reset="${all_unavailable_info##*|}"
-      if [[ "$earliest_reset" =~ ^[0-9]+$ ]]; then
-        IFS='|' read -r reprobe_due_at reprobe_next_at reprobe_attempts reprobe_max_attempts <<<"$(compute_all_unavailable_reprobe_schedule "$earliest_reset" "$previous_earliest_reset" "$previous_reprobe_next_at" "$previous_reprobe_attempts")"
-      else
-        reprobe_due_at=""
-        reprobe_next_at=""
-        reprobe_attempts=""
-        reprobe_max_attempts=""
-      fi
-      codex_write_availability_state "$project" "all_unavailable" "all_slots_unavailable" "${current_identity:-unknown}" "${current_identity:-unknown}" "$current_fingerprint" "" "$earliest_slot" "$earliest_reset" "$reprobe_next_at" "$reprobe_attempts" "$reprobe_max_attempts"
+      codex_write_availability_state "$project" "all_unavailable" "all_slots_unavailable" "${current_identity:-unknown}" "${current_identity:-unknown}" "$current_fingerprint" "" "$earliest_slot" "$earliest_reset"
       write_manager_bootstrap_handoff "$project" "all_slots_unavailable" "${current_identity:-unknown}" "${current_identity:-unknown}" "watchdog_hold_until_slot_is_usable" "keep-manager-down-until-watchdog-finds-usable-slot"
       if [[ -n "$earliest_slot" && -n "$earliest_reset" && "$all_unavailable_info" == *"|"* ]]; then
-        now="$(date +%s)"
-        if [[ "$reprobe_due_at" =~ ^[0-9]+$ && "$reprobe_next_at" =~ ^[0-9]+$ && "$reprobe_attempts" =~ ^[0-9]+$ && "$reprobe_max_attempts" =~ ^[0-9]+$ ]]; then
-          if (( now < reprobe_due_at )); then
-            log_warn "no codex slot is usable for manager bootstrap; earliest_reset=${earliest_reset} buffered_until=${reprobe_due_at} next_reprobe_at=${reprobe_next_at}"
-          else
-            log_warn "no codex slot is usable for manager bootstrap; post-reset reprobe_attempt=${reprobe_attempts}/${reprobe_max_attempts} next_reprobe_at=${reprobe_next_at}"
-          fi
-        else
-          log_warn "no codex slot is usable for manager bootstrap; earliest_reset=${earliest_reset} will be retried after buffer"
-        fi
+        log_warn "no codex slot is usable for manager bootstrap; earliest_reset=${earliest_reset} and runtime will now wait for manual intervention or a later explicit recovery attempt"
       else
-        log_warn "no codex slot is usable for manager bootstrap; watchdog will keep manager down until a later probe succeeds"
+        log_warn "no codex slot is usable for manager bootstrap; runtime will wait for manual intervention or a later explicit recovery attempt"
       fi
       return 1
       ;;

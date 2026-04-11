@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-codex-no-periodic-reprobe.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+mkdir -p "$PROJECT/.freely/run" "$HOME_DIR/.codex"
+
+bash -lc '
+  set -euo pipefail
+  export HOME="'"$HOME_DIR"'"
+  state_log="'"$TMP_DIR"'/state.log"
+  log_info() { :; }
+  log_warn() { :; }
+  log_error() { :; }
+  source "'"$ROOT_DIR"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  wait_for_codex_slot_switch_idle() { return 0; }
+  codex_current_slot() { echo "slot-bad"; }
+  codex_current_slot_kind() { echo "account"; }
+  codex_current_identity_hint() { echo "slot-bad"; }
+  codex_saved_slots_fingerprint() { echo "fp-1"; }
+  codex_load_availability_state() {
+    AVAILABILITY_PHASE="all_unavailable"
+    BLOCKED_REASON="all_slots_unavailable"
+    PREVIOUS_SLOT="slot-bad"
+    SAVED_SLOTS_FINGERPRINT="fp-1"
+    EARLIEST_RESET_HINT="2000000000"
+    EARLIEST_REPROBE_NEXT_AT="2000000300"
+    EARLIEST_REPROBE_ATTEMPTS="2"
+    EARLIEST_REPROBE_MAX_ATTEMPTS="5"
+    return 0
+  }
+  codex_write_availability_state() { printf "%s|%s|%s|%s|%s|%s\n" "$2" "$3" "${10:-}" "${11:-}" "${12:-}" "$7" >>"$state_log"; }
+  codex_clear_availability_state() { :; }
+  codex_cached_slot_status() { echo ""; }
+  codex_live_auth_kind() { echo "account"; }
+  ensure_codex_slot_ready_for_manager "'"$PROJECT"'" entry && {
+    echo "[FAIL] entry mode should not schedule periodic reprobes for codex all_unavailable state" >&2
+    exit 1
+  }
+  grep -q "^$" /dev/null || true
+  [[ ! -s "$state_log" ]]
+'
+
+echo "[PASS] codex all_unavailable entry does not arm periodic reprobe scheduling"

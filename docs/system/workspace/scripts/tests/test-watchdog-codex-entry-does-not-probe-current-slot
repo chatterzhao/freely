@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-codex-entry-no-probe.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+mkdir -p "$PROJECT/.freely/run" "$HOME_DIR/.codex"
+
+cat >"$HOME_DIR/.codex/auth.json" <<'EOF'
+{"tokens":{"access_token":"token-current"}}
+EOF
+
+bash -lc '
+  set -euo pipefail
+  export HOME="'"$HOME_DIR"'"
+  probe_log="'"$TMP_DIR"'/probe.log"
+  log_info() { :; }
+  log_warn() { :; }
+  log_error() { :; }
+  source "'"$ROOT_DIR"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  codex_current_slot() { echo "slot-current"; }
+  codex_current_slot_kind() { echo "account"; }
+  codex_current_identity_hint() { echo "slot-current"; }
+  codex_saved_slots_fingerprint() { echo "fp-1"; }
+  codex_load_availability_state() { return 1; }
+  should_defer_all_unavailable_reprobe() { return 1; }
+  codex_write_availability_state() { :; }
+  codex_clear_availability_state() { :; }
+  codex_cached_slot_status() { echo "usable"; }
+  codex_live_auth_kind() { echo "account"; }
+  codex_probe_current_slot_now() {
+    echo current >>"$probe_log"
+    echo usable
+  }
+  ensure_codex_slot_ready_for_manager "'"$PROJECT"'" entry
+  [[ ! -f "$probe_log" ]] || [[ ! -s "$probe_log" ]]
+'
+
+echo "[PASS] ensure-manager entry trusts the current codex slot and does not spend tokens on a proactive probe"
