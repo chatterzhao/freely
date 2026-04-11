@@ -21,12 +21,12 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `none`
-- problem: The original packet contained two defects. The `status` / `fleet-status` generated-truth half has already landed on `develop`, but the runtime followthrough is still unfinished: same-project starts must keep bootstrap-in-flight attach behavior under degraded inspection, `freely stop` must terminate every discovered same-project supervisor, and stop-marker cleanup must not let leftover duplicate supervisors survive or accidentally pin the project in stop mode.
+- problem: The original packet contained two defects. The `status` / `fleet-status` generated-truth half has already landed on `develop`, and the remaining runtime followthrough now has a bounded implementation in the active lane: same-project starts keep bootstrap-in-flight attach behavior under degraded inspection, `freely stop` terminates every discovered same-project supervisor, and stop-marker cleanup no longer lets leftover duplicate supervisors survive or accidentally pin the project in stop mode. The unresolved work is now canonical closeout truth, not another round of runtime design.
 - why_now:
   - dogfood evidence on `2026-04-08 01:23:58 PDT` showed three same-second supervisors for one worker project
   - stopping that worker required hard-kill fallback, so the defect is operationally harmful rather than cosmetic
   - commit `3ef222ec` already absorbed the status-surface half on `develop`, so the remaining worktree should now be judged only on the runtime followthrough still missing from canonical truth
-  - current implementation evidence in `feature/runtime-concurrent-start-stop-fix-20260410` already narrows the repair to attach/stop semantics and needs canonical writeback rather than another round of broad research
+  - current implementation evidence in `feature/runtime-concurrent-start-stop-fix-20260410` now covers the attach/stop followthrough and focused regressions, so the lane needs canonical closeout writeback rather than another round of broad research
 - acceptance_criteria:
   - concurrent same-project `freely start --project` calls materialize at most one `supervisor_started` runtime event
   - later concurrent callers either attach/reuse or exit after bounded wait; they do not create a second supervisor
@@ -47,7 +47,7 @@
     mode: `author-review`
     summary: `The original packet was valid, but one half is now already on develop. The unfinished part is the runtime followthrough around attach/stop cleanup for same-project duplicate supervisors, and it remains narrow enough to repair without reopening broader governance families.`
     verdict: `ready_for_bounded_repair`
-- next_action: Finish the narrow runtime followthrough in this worktree, keep `test-freely-status-latest-generated-manager-continuity-surface` as regression evidence for the already-landed half, and replay the focused attach/stop tests before deciding whether to materialize a dedicated issue or close this candidate as absorbed followthrough.
+- next_action: Treat implementation as complete in this worktree, keep `test-freely-status-latest-generated-manager-continuity-surface` plus the focused start/attach/stop regressions as acceptance evidence, and decide whether the develop-bound closeout should materialize a dedicated owner or be recorded as candidate-level completed followthrough.
 - revisit_trigger: Reopen only if the lock-based repair still allows duplicate same-project supervisors, if degraded bootstrap attach still tears down a healthy in-flight supervisor, or if the stop-marker cleanup keeps a stopped project falsely pinned after the last supervisor exits.
 - decision_reason: `This remains a bounded runtime correctness packet. The status-surface subproblem was already absorbed on develop, leaving a still-narrow attach/stop followthrough that belongs with the same same-project duplicate-supervisor evidence family rather than a new architecture track.`
 - session_refs:
