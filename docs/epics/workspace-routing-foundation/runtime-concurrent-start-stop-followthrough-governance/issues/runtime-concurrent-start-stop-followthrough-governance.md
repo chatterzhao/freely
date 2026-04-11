@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260408-0231-A`
 - title: `Runtime concurrent start-stop followthrough governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-concurrent-start-stop-followthrough-governance`
@@ -92,4 +92,6 @@ That remaining work needs a bounded develop-bound owner instead of staying as ca
 
 ## Next
 
-- Completed in the dedicated feature worktree. Promote through a guarded `test-pre-merge-*` batch and merge to `develop`.
+- Completed on canonical `develop` via guarded merge `bf7e5a16`.
+- Post-merge closeout verification is recorded in `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-canonical-closeout-verification.md`.
+- Reopen only if canonical `develop` again regresses same-project bootstrap attach reuse, project-scoped stop breadth, or stop-marker preservation.

@@ -50,27 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260408-0231-A`
-- title: Runtime concurrent start-stop followthrough governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-concurrent-start-stop-followthrough-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/candidates.md`
-- next_action: Promote the bounded runtime followthrough through a guarded merge chain. Keep the owner scoped to same-project bootstrap attach, project stop, and stop-marker preservation; do not reopen the generated-truth status half.
-- evidence:
-  - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-implementation-decision.md`
-  - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-start-cleans-stale-project-start-lock`
-  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-does-not-double-launch-during-degraded-starting-grace`
-  - `bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-all-same-project-supervisors`
-  - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
-  - `bash docs/system/workspace/scripts/tests/test-freely-status-latest-generated-manager-continuity-surface`
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
-  - `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
-
 ### candidate_issues
 
 1. `C-20260411-0217-A`
@@ -424,6 +403,28 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+1. `I-20260408-0231-A`
+- title: Runtime concurrent start-stop followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-concurrent-start-stop-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260408-0231--runtime-concurrent-start-lock-and-status-surface-alignment/candidates.md`
+- evidence:
+  - `develop` merge `bf7e5a16`
+  - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-canonical-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-cleans-stale-project-start-lock`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-does-not-double-launch-during-degraded-starting-grace`
+  - `bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-all-same-project-supervisors`
+  - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+  - `bash docs/system/workspace/scripts/tests/test-freely-status-latest-generated-manager-continuity-surface`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now carries the bounded same-project bootstrap attach, project-scoped stop, and stop-marker preservation followthrough without reopening the already-absorbed generated-truth status half.`
+
 1. `I-20260411-0217-A`
 - title: Protected-merge unparseable-subject receipt-gap governance
 - milestone_state: completed
