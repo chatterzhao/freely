@@ -3,17 +3,18 @@
 - issue_id: `I-20260408-0231-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
 - title: `Runtime concurrent start-stop followthrough governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-concurrent-start-stop-followthrough-20260411`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260411-feature-runtime-concurrent-start-stop-followthrough`
 - updated_at: `2026-04-11`
+- closure_status: `merged-and-verified`
 - follow_on_to: `C-20260408-0231-A`
 
 ## Summary
 
-This bounded owner carries the still-unmerged runtime half of `C-20260408-0231-A` after canonical `develop` already absorbed the generated-truth status half.
+This bounded owner carried the remaining runtime half of `C-20260408-0231-A` after canonical `develop` had already absorbed the generated-truth status half. Canonical `develop` now carries the runtime followthrough too.
 
 ## Implementation
 
@@ -33,8 +34,9 @@ This bounded owner carries the still-unmerged runtime half of `C-20260408-0231-A
 - `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
 - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-implementation-decision.md`
 - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-verification.md`
-- Git commit `c770aeac` on this feature branch
+- `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-canonical-closeout-verification.md`
+- `develop` merge `bf7e5a16`
 
 ## Next Action
 
-Merge to `develop` through a guarded `test-pre-merge-*` batch.
+`completed`
