@@ -11,6 +11,12 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260410-1835--codex-limit-triggered-slot-recovery-and-real-bin-ai-verification
+  - brainstorms: docs/pre-brainstorms/20260410-1835--codex-limit-triggered-slot-recovery-and-real-bin-ai-verification/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260410-1835--codex-limit-triggered-slot-recovery-and-real-bin-ai-verification/candidates.md
+- 20260410-1430--preferred-auth-method-account-switch-fix
+  - brainstorms: docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260410-1430--preferred-auth-method-account-switch-fix/candidates.md
 - 20260409-1715--runtime-evidence-provenance-research-retirement-followthrough
   - brainstorms: docs/pre-brainstorms/20260409-1715--runtime-evidence-provenance-research-retirement-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260409-1715--runtime-evidence-provenance-research-retirement-followthrough/candidates.md
