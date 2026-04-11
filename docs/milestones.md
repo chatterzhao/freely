@@ -50,17 +50,28 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260411-0217-A`
+- title: Protected-merge unparseable-subject receipt-gap governance
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-protected-merge-unparseable-subject-receipt-gap-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/candidates.md`
+- next_action: Start dev-loop with focused regression expansion for generic-subject ancestry gaps, then implement the explicit stronger-evidence validation mode without weakening the parseable-subject path.
+
 ### candidate_issues
 
 1. `C-20260411-0217-A`
 - title: Protected-merge unparseable-subject receipt-gap followthrough
 - milestone_state: candidate
-- phase_state: `needs_research`
+- phase_state: `todo_ibm`
 - priority: P1
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/candidates.md`
-- next_action: Freeze the minimal stronger-evidence contract for unparseable-subject ancestry gaps, compare “second mode in existing ledger” versus “separate ledger” without weakening auditability, then decide whether the bounded implementation owner can be materialized.
+- next_action: Candidate mirror only. `I-20260411-0217-A` is now the canonical owner for the stronger-evidence contract covering generic-subject protected-ancestry receipt gaps.
 - revisit_trigger: Reopen only if canonical `develop` no longer contains this ancestry class, or if a bounded design proves the current subject-matched owner can absorb it without introducing a new audit bypass path.
 
 1. `C-20260409-1715-A`

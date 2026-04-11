@@ -3,8 +3,8 @@
 ## Context
 
 - Source brainstorm: `./brainstorms.md`
-- Status: `active`
-- Route: `research-to-bounded-governance-followthrough`
+- Status: `promoted`
+- Route: `bounded-governance-followthrough`
 
 ## Candidates
 
@@ -13,11 +13,12 @@
 - candidate_format_version: `v2`
 - title: `Protected-merge unparseable-subject receipt-gap followthrough`
 - research_only: `false`
-- implementation_ready: `false`
-- status: `needs_research`
+- implementation_ready: `true`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P1`
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_id: `I-20260411-0217-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
@@ -49,7 +50,7 @@
     mode: `author-review`
     summary: `This is a real new governance class, not a duplicate of the existing subject-matched receipt-gap owner. The new lane should stay narrow and preserve fail-closed audit semantics while defining a stronger fallback contract for unparseable merge subjects.`
     verdict: `ready_for_pre_brainstorm`
-- next_action: Keep this in pre-brainstorm until the stronger evidence schema is explicit. Freeze the minimal contract for unparseable-subject ancestry gaps, compare “second mode in existing ledger” versus “separate ledger”, and require explicit batch-level truth instead of relying on commit hash or free-text evidence refs before materializing any bounded implementation owner.
+- next_action: Execute `I-20260411-0217-A` as a narrow governance followthrough: add the explicit stronger-evidence schema, extend `governance-check` without weakening the parseable-subject path, and land focused regressions for the new pass/fail matrix before touching canonical ledger entries.
 - revisit_trigger: Reopen only if canonical `develop` no longer contains this ancestry class, or if a bounded design proves the current subject-matched owner can absorb it without introducing a new audit bypass path.
 - decision_reason: `The current receipt-gap owner deliberately stops at parseable merge subjects. The April 10 preferred-auth batch surfaced a new history class that needs a narrower follow-on before any implementation can safely relax governance-check.`
 - session_refs:
