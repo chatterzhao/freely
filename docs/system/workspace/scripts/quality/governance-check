@@ -704,6 +704,29 @@ entries = {}
 errors = []
 observed = set()
 
+def git_body(commit: str) -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "show", "--no-patch", "--format=%B", commit],
+            cwd=root,
+            text=True,
+        )
+    except subprocess.CalledProcessError:
+        return ""
+
+def has_absorbed_ancestry(absorbing_merge: str, ancestor: str) -> bool:
+    try:
+        absorbed_chain = set(
+            subprocess.check_output(
+                ["git", "rev-list", "--first-parent", f"{absorbing_merge}^2"],
+                cwd=root,
+                text=True,
+            ).splitlines()
+        )
+    except subprocess.CalledProcessError:
+        return False
+    return ancestor in absorbed_chain
+
 def merge_source_allowed(target_branch: str, source_branch: str) -> bool:
     if target_branch == "develop":
         return source_branch.startswith("test-pre-merge-") or source_branch.startswith("hotfix/")
@@ -741,9 +764,14 @@ for idx, match in enumerate(starts):
 
     target_branch = grab("target_branch")
     source_branch = grab("source_branch")
+    validation_mode = grab("validation_mode") or "subject_match"
+    protected_batch_branch = grab("protected_batch_branch")
+    absorbing_protected_merge = grab("absorbing_protected_merge")
     canonical_merge_path = grab("canonical_merge_path")
     canonical_bypass_mode = grab("canonical_bypass_mode")
     follow_on_owner = grab("follow_on_owner")
+    bounded_issue = grab("bounded_issue")
+    verification_ref = grab("verification_ref")
     evidence_refs = grab_list("evidence_refs")
 
     valid_target_branch = bool(
@@ -755,6 +783,10 @@ for idx, match in enumerate(starts):
 
     if not valid_target_branch:
         errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid target_branch '{target_branch}'.")
+    if validation_mode not in {"subject_match", "unparseable_subject_ancestry"}:
+        errors.append(
+            f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid validation_mode '{validation_mode}'."
+        )
     if not source_branch:
         errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} is missing source_branch.")
     if canonical_merge_path not in {"merge-guarded", "merge-guarded-complete"}:
@@ -765,12 +797,38 @@ for idx, match in enumerate(starts):
         errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} is missing a valid follow_on_owner.")
     if not evidence_refs:
         errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must list at least one evidence_ref.")
+    if validation_mode == "unparseable_subject_ancestry":
+        if not protected_batch_branch:
+            errors.append(
+                f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must declare protected_batch_branch for validation_mode unparseable_subject_ancestry."
+            )
+        if not absorbing_protected_merge or not re.match(r"^[0-9a-f]{7,40}$", absorbing_protected_merge or ""):
+            errors.append(
+                f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must declare a valid absorbing_protected_merge for validation_mode unparseable_subject_ancestry."
+            )
+        if protected_batch_branch and source_branch and protected_batch_branch != source_branch:
+            errors.append(
+                f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must keep source_branch aligned with protected_batch_branch for validation_mode unparseable_subject_ancestry."
+            )
+        if not bounded_issue:
+            errors.append(
+                f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must declare bounded_issue for validation_mode unparseable_subject_ancestry."
+            )
+        if not verification_ref:
+            errors.append(
+                f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must declare verification_ref for validation_mode unparseable_subject_ancestry."
+            )
 
     entries[commit] = {
         "target_branch": target_branch,
         "source_branch": source_branch,
+        "validation_mode": validation_mode,
+        "protected_batch_branch": protected_batch_branch,
+        "absorbing_protected_merge": absorbing_protected_merge,
         "canonical_merge_path": canonical_merge_path,
         "canonical_bypass_mode": canonical_bypass_mode,
+        "bounded_issue": bounded_issue,
+        "verification_ref": verification_ref,
     }
 
 branches = ["develop"]
@@ -859,11 +917,53 @@ for branch in branches:
             if subject_match and subject_match.group(2).strip() != branch and not entry:
                 continue
             if entry:
+                validation_mode = entry.get("validation_mode", "subject_match")
+                if validation_mode == "unparseable_subject_ancestry":
+                    if entry.get("target_branch") != branch:
+                        continue
                 observed.add(commit)
                 if commit in source_policy_commits and not merge_source_allowed(branch, entry.get("source_branch", "")):
                     errors.append(
                         f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid source_branch '{entry.get('source_branch')}' for target '{branch}'."
                     )
+                if validation_mode == "unparseable_subject_ancestry":
+                    if subject_match:
+                        errors.append(
+                            f"[FAIL] protected branch merge {commit} on {branch} already has a parseable merge subject and must not use validation_mode unparseable_subject_ancestry."
+                        )
+                        continue
+                    absorbing_commit = entry.get("absorbing_protected_merge", "")
+                    absorbing_body = git_body(absorbing_commit)
+                    absorbing_subject = absorbing_body.splitlines()[0].strip() if absorbing_body else ""
+                    absorbing_target_match = re.match(r"^Merge branch '.*' into (.+?)\s*$", absorbing_subject)
+                    absorbing_merge_path_match = re.search(r"^Freely-Merge-Path:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+                    absorbing_bypass_mode_match = re.search(r"^Freely-Bypass-Mode:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+                    absorbing_source_match = re.search(r"^Freely-Source-Branch:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+                    absorbing_target = absorbing_target_match.group(1).strip() if absorbing_target_match else ""
+                    absorbing_merge_path = absorbing_merge_path_match.group(1).strip() if absorbing_merge_path_match else ""
+                    absorbing_bypass_mode = absorbing_bypass_mode_match.group(1).strip() if absorbing_bypass_mode_match else ""
+                    absorbing_source = absorbing_source_match.group(1).strip() if absorbing_source_match else ""
+                    if not absorbing_target or absorbing_target != branch:
+                        errors.append(
+                            f"[FAIL] protected branch merge {commit} on {branch} has absorbing merge {absorbing_commit} with missing or mismatched protected target."
+                        )
+                        continue
+                    if absorbing_merge_path not in {"merge-guarded", "merge-guarded-complete"} or absorbing_bypass_mode != "forbidden":
+                        errors.append(
+                            f"[FAIL] protected branch merge {commit} on {branch} has absorbing merge {absorbing_commit} without canonical protected merge trailers."
+                        )
+                        continue
+                    if absorbing_source != entry.get("protected_batch_branch"):
+                        errors.append(
+                            f"[FAIL] protected branch merge {commit} on {branch} has absorbing merge {absorbing_commit} source branch '{absorbing_source}' that does not match protected_batch_branch '{entry.get('protected_batch_branch')}'."
+                        )
+                        continue
+                    if not has_absorbed_ancestry(absorbing_commit, commit):
+                        errors.append(
+                            f"[FAIL] protected branch merge {commit} on {branch} is not present in the absorbed ancestry below {absorbing_commit}."
+                        )
+                        continue
+                    continue
                 if not subject_match:
                     errors.append(
                         f"[FAIL] protected branch merge {commit} on {branch} is missing canonical trailers and has no parseable merge subject for backfill validation."

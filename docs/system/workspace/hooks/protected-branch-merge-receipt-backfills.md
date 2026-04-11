@@ -12,12 +12,21 @@
 - `audit_effective_date`
 - `source_policy_effective_date`（可选；用于定义 develop/test-pre-merge source-branch 新语义的生效日期）
 - merge commit hash 标题
+- `validation_mode`（可选；默认 `subject_match`）
 - `target_branch`
 - `source_branch`
 - `canonical_merge_path`
 - `canonical_bypass_mode`
 - `follow_on_owner`
 - `evidence_refs`
+
+`validation_mode: subject_match`（默认）继续使用现有 contract，并从 merge subject `Merge branch '<source>' into <target>` 恢复 source/target 语义。
+
+`validation_mode: unparseable_subject_ancestry` 只用于 generic-subject ancestry gap，并额外要求：
+- `protected_batch_branch`
+- `absorbing_protected_merge`
+- `bounded_issue`
+- `verification_ref`
 
 - audit_effective_date: `2026-04-04`
 - source_policy_effective_date: `2026-04-06`
@@ -28,6 +37,8 @@
 - 若声明 `source_policy_effective_date`，`governance-check` 只从该日期开始强制新的 protected-branch source-branch 语义；更早的历史 merge 继续按 receipt 完整性审计，不 retroactively 重判 promote model
 - 普通 protected merge 若已经带 canonical Freely trailer，则不得在本 ledger 中声明 backfill
 - 普通 protected merge 若缺 canonical Freely trailer，则必须在本 ledger 有 matching backfill entry
+- `validation_mode: subject_match` 仍要求 merge subject 可解析并与 ledger `source_branch` / `target_branch` 一致
+- `validation_mode: unparseable_subject_ancestry` 必须显式声明 absorbing protected merge、protected batch branch、bounded owner issue 和 verification artifact；不得退化为 hash-only 例外
 - backfill entry 只修复 auditability，不授予 bypass 权限
 
 ## Receipt Gap: 908a6ad9f96a1a76a22f1f44f3b5438e23f6c6e0
@@ -176,3 +187,105 @@
 - evidence_refs:
   - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
   - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
+
+## Receipt Gap: 357c18bb39286580a9c07856d0a1858867dd7d58
+
+- validation_mode: `unparseable_subject_ancestry`
+- target_branch: `develop`
+- source_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260411-0217-A`
+- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- evidence_refs:
+  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+
+## Receipt Gap: 8069bced62af4dc1e6c46387fa715613628f291a
+
+- validation_mode: `unparseable_subject_ancestry`
+- target_branch: `develop`
+- source_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260411-0217-A`
+- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- evidence_refs:
+  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+
+## Receipt Gap: 497c474abd9ecb4776462aa9416b59f7cc45a1f8
+
+- validation_mode: `unparseable_subject_ancestry`
+- target_branch: `develop`
+- source_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260411-0217-A`
+- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- evidence_refs:
+  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+
+## Receipt Gap: c235976621a36a1f89db5dda83676d3b4370278d
+
+- validation_mode: `unparseable_subject_ancestry`
+- target_branch: `develop`
+- source_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260411-0217-A`
+- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- evidence_refs:
+  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+
+## Receipt Gap: ae09968a60d722deb11e59ca43b1239dab694c5c
+
+- validation_mode: `unparseable_subject_ancestry`
+- target_branch: `develop`
+- source_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260411-0217-A`
+- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- evidence_refs:
+  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+
+## Receipt Gap: 88dd9eaabbcda45b2b7127da7dea9ec3f68e4df2
+
+- validation_mode: `unparseable_subject_ancestry`
+- target_branch: `develop`
+- source_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
+- absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260411-0217-A`
+- bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- verification_ref: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
+- evidence_refs:
+  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
