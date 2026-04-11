@@ -547,6 +547,28 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
+3. `I-20260410-1835-B`
+- title: Codex real exec switch and after-failure recovery governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-real-exec-switch-and-after-failure-recovery-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260410-1835--codex-limit-triggered-slot-recovery-and-real-bin-ai-verification/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260410-1835--codex-limit-triggered-slot-recovery-and-real-bin-ai-verification/candidates.md`
+- follow_on_to: `I-20260407-0023-A`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-watchdog-codex-after-failure-uses-recovery-probe-reason`
+  - `bash docs/system/workspace/scripts/tests/test-watchdog-codex-after-failure-skips-current-slot`
+  - `bash docs/system/workspace/scripts/tests/test-watchdog-codex-exec-truth-stops-at-first-usable-slot`
+  - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-network-failure`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-slot-local-failure-self-recovers-next-slot`
+  - `bash docs/system/workspace/scripts/tests/test-freely-active-runtime-reconnect-stays-network-local`
+  - `real ./bin/ai xx command-surface validation with restored auth`
+  - `real bad-slot ./bin/freely start replay with ordered recovery to first usable later slot`
+- completion_note: `This follow-on owner freezes real exec truth, after-failure skip-current recovery, manual full-sweep semantics, and real command-surface evidence for Codex slot recovery.`
+
 2. `I-20260406-1829-A`
 - title: Codex current-live apikey bootstrap without saved-slot inventory governance
 - milestone_state: completed
