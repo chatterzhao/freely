@@ -67,6 +67,55 @@
   - bounded follow-on owner issue path or id
   - verification artifact that names the same batch/owner boundary
 
+## Parser And Test Reality
+
+- Current parser only understands one receipt-gap shape:
+  - one `## Receipt Gap: <merge-hash>` block
+  - required `target_branch`, `source_branch`, `canonical_merge_path`, `canonical_bypass_mode`, `follow_on_owner`, `evidence_refs`
+  - semantic validation depends on either:
+    - canonical trailers on the merge commit, or
+    - a parseable subject `Merge branch '<source>' into <target>`
+- Existing focused regression `test-governance-check-protected-branch-merge-receipt-backfills` covers:
+  - no-backfill fail
+  - matching parseable-subject backfill pass
+  - feature-target ancestry gap pass when the subject is still parseable
+  - trailer-bearing merge cannot use backfill
+  - invalid develop `source_branch` rejection
+- Existing tests do not cover:
+  - generic-subject ancestry merges
+  - malformed unparseable-subject backfill entries
+  - unparseable-subject entries pointing at the wrong protected batch merge
+  - free-text `evidence_refs` that mention the wrong owner/batch
+
+## Recommended Contract Shape
+
+- Prefer a second explicit mode in the existing ledger instead of silently overloading the current block semantics.
+- Reason:
+  - one file keeps all ordinary protected merge receipt-gap truth in one audit surface
+  - an explicit mode field preserves current parseable-subject behavior as-is
+  - the parser can reject mixed or incomplete field sets instead of guessing which semantics the author intended
+- Recommended minimum fields for the new mode:
+  - `validation_mode: unparseable_subject_ancestry`
+  - `protected_batch_branch`: the protected batch branch that was later merged with canonical trailers
+  - `absorbing_protected_merge`: the trailer-bearing protected merge commit that absorbed the ancestry chain
+  - `bounded_issue`: canonical issue id or path that owned the batch
+  - `verification_ref`: one canonical verification artifact that names the same batch or owner boundary
+- Recommended invariants:
+  - `absorbing_protected_merge` must itself be a trailer-bearing protected merge on the scanned branch
+  - its `Freely-Source-Branch` must equal `protected_batch_branch`
+  - the unparseable merge hash must be reachable on the first-parent ancestry segment immediately below `absorbing_protected_merge`
+  - `bounded_issue` and `verification_ref` must be present; generic `evidence_refs` alone are insufficient for this mode
+  - the old mode must continue to require parseable subject equality with ledger `source_branch` and `target_branch`
+
+## Rejection Matrix To Preserve Non-Regression
+
+- Reject an unparseable-subject entry when `validation_mode` is omitted.
+- Reject an unparseable-subject entry when `absorbing_protected_merge` is missing canonical trailers.
+- Reject an unparseable-subject entry when `protected_batch_branch` disagrees with the absorbing merge's `Freely-Source-Branch`.
+- Reject an unparseable-subject entry when the claimed merge hash is not on the absorbed ancestry segment.
+- Reject an unparseable-subject entry when it only provides the old `evidence_refs` list without explicit bounded owner and verification fields.
+- Reject any attempt to use `validation_mode: unparseable_subject_ancestry` for a merge whose subject is already parseable; those must stay on the current contract.
+
 ## Risks
 
 - If the new mode is too weak, ordinary missing-trailer merges could bypass semantic validation by claiming “unparseable subject”.
