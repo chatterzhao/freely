@@ -100,7 +100,8 @@ chmod +x "$PROJECT/bin/ai"
 cat >"$MOCK_BIN/codex" <<'EOF'
 #!/usr/bin/env bash
 echo "session id: test-limit-log-session"
-echo "ERROR: You've hit your usage limit. To get more access now, send a request to your admin or try again at 9:42 PM."
+echo "ERROR: Reconnecting... 2/5"
+echo "ERROR: unexpected status 403 Forbidden: 预扣费额度失败，用户剩余额度不足"
 exit 1
 EOF
 chmod +x "$MOCK_BIN/codex"
@@ -117,4 +118,4 @@ fi
 grep -q 'LAST_SLOT_SWITCH_REASON="primary_rate_limit_exhausted"' "$PROJECT/.freely/run/session-state.env"
 grep -Eq '^limited@example-com-1[[:space:]][0-9]+' "$PROJECT/.freely/run/codex-slot-cooldowns.tsv"
 
-echo "[PASS] freely defers textual codex rate-limit recovery to the watchdog path"
+echo "[PASS] freely treats reconnect-plus-403 quota failures as slot exhaustion and defers recovery to the watchdog path"

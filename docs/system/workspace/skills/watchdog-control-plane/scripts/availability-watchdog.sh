@@ -137,6 +137,48 @@ strip_probe_output_for_matching() {
   printf '%s\n' "${1:-}" | sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g; s/\x1b\].*\x07//g; s/\x1b\][^\x1b]*\x1b\\//g'
 }
 
+codex_probe_output_is_expected_success() {
+  local output
+  output="$(strip_probe_output_for_matching "${1:-}")"
+  if printf '%s\n' "$output" | grep -Eqi \
+    'ERROR|WARN|forbidden|unauthorized|authentication|invalid.*token|login required|usage limit|try again|payment required|quota|余额不足|预扣费|subscription|deactivated_workspace|workspace deactivated|reconnecting\.\.\.|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error'
+  then
+    return 1
+  fi
+  printf '%s\n' "$output" | awk '
+    NF == 0 { next }
+    state == 0 && $0 == "user" { state = 1; next }
+    state == 1 {
+      if ($0 != "hi") exit 1
+      state = 2
+      next
+    }
+    state == 2 {
+      if ($0 != "codex") exit 1
+      state = 3
+      next
+    }
+    state == 3 {
+      if ($0 == "tokens used") exit 1
+      saw_response = 1
+      state = 4
+      next
+    }
+    state >= 4 && $0 == "tokens used" {
+      saw_tokens = 1
+      state = 5
+      next
+    }
+    END { exit (saw_response && saw_tokens) ? 0 : 1 }
+  '
+}
+
+codex_probe_is_expected_success() {
+  local rc="$1" output="${2:-}"
+  [[ "$rc" -eq 0 ]] || return 1
+  codex_probe_output_is_expected_success "$output"
+}
+
 codex_probe_output_has_deactivated_workspace() {
   local output
   output="$(strip_probe_output_for_matching "${1:-}")"
@@ -1385,8 +1427,8 @@ codex_probe_current_slot_now() {
 
   output="$(strip_probe_output_for_matching "$output")"
 
-  # Check for success.
-  if [[ "$rc" -eq 0 ]]; then
+  # Only a fixed successful "hi" transcript is treated as success.
+  if codex_probe_is_expected_success "$rc" "$output"; then
     printf 'usable\n'
     return 0
   fi
