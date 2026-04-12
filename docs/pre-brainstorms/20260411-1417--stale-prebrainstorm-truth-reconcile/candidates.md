@@ -42,11 +42,17 @@
   - `Missing fields remain machine-readable for diagnostics and recovery.`
   - `Complete verification metadata path remains launch-compatible without regression.`
 - fix_approach: Materialize launch-time hard gate as a separate owner; keep it independent from stale-text reconcile changes.
-- status: `proposed_follow_on`
+- status: `absorbed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: []
-- next_action: `Open dedicated owner after C-20260411-1417-A scope is frozen.`
-- revisit_trigger: `Worker launch continues to succeed with partial or missing verification contract metadata.`
+- decision_reason:
+  - the verification-contract / premerge-adequacy owner already materialized the canonical verification metadata contract
+  - leaving this candidate as a floating follow-on would duplicate the same owner chain and reintroduce stale-truth drift
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+- promoted_issue_id: `I-20260408-1205-A`
+- promoted_issue_path_role: `absorbed-into-successor`
+- next_action: `Do not reopen C-20260411-1417-B; use I-20260408-1205-A as canonical truth for the verification contract and premerge adequacy chain.`
+- revisit_trigger: `Never unless the canonical verification-contract owner itself is reopened.`
 - source_brainstorm: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/brainstorms.md`
 - promotion_gate:
   - `Must be implemented in dedicated runtime owner, not bundled into reconcile-only owner.`

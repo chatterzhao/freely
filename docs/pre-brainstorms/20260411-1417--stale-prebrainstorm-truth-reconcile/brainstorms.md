@@ -128,6 +128,11 @@
 4. `pretests-cleanup-retirement-enforcement-governance`
    - 承接 completion/merge 之后的 retirement gate 空档
 
+## Status Reconcile
+
+- `C-20260411-1417-B` is absorbed into `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md` as the canonical verification-contract chain for the same launch-time adequacy concern.
+- Keep this brainstorm narrow on stale-truth reconcile; do not reopen a separate launch-time execution owner from this lane.
+
 ## Verification Plan
 
 1. 为每个候选 stale 条目建立三点证据：
