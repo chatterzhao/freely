@@ -16,7 +16,7 @@
 - A dedicated `pretests-retirement-gate` blocks retirement when acceptance items are pending, evidence is insufficient, owner metadata is missing, issue resolution is ambiguous, or adequacy is requested outside this owner's boundary.
 - Cleanup followthrough now retains merged worktrees and writes explicit blocked resolution artifacts when retirement cannot lawfully proceed, including the case where the retirement gate itself is unavailable.
 - Retained merged worktrees escalate into manager continuation so cleanup followthrough stays actionable instead of silently leaving dirty or blocked worktrees behind.
-- This worktree has completed focused lifecycle regressions and governance verification; the next step is guarded promotion into canonical `develop`, then retirement of this dedicated lane and its temporary premerge batch.
+- This lane is already closed on canonical `develop`: focused lifecycle regressions, guarded premerge replay, develop promotion, and dedicated-lane retirement are complete, so this progress file is now historical closeout evidence rather than an active execution pointer.
 
 ## Verification Evidence
 

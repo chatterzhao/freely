@@ -97,5 +97,5 @@
 
 ## Next
 
-1. next_action: `Replay this completed feature lane through guarded premerge promotion into develop now that the owner also carries explicit premerge-integration develop-merge adequacy evidence, then retire the dedicated worktree and temporary premerge batch.`
+1. next_action: `completed on canonical develop; the guarded premerge replay, develop promotion, and dedicated-lane retirement are already closed and this issue now remains only as canonical delivered truth.`
 2. revisit_trigger: Re-open only if guarded premerge replay still shows the launch-time hard gate or its absorbed adequacy dependency can cross into develop without explicit develop-merge proof, or if incomplete verification metadata again crosses the dispatch boundary.
