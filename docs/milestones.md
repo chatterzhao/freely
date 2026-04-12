@@ -50,7 +50,29 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260411-1417-A`
+- title: Stale pre-brainstorm truth reconcile governance
+- milestone_state: committed
+- phase_state: `in_ibm`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/issues/stale-prebrainstorm-truth-reconcile-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/candidates.md`
+- next_action: Finish IBM materialization for the reconcile policy and representative batch, then update only clearly superseded or deferred stale samples with canonical pointers.
+- revisit_trigger: Re-scope only if representative reconcile cannot be done without broader shared-index or runtime truth changes.
+
 ### candidate_issues
+
+1. `C-20260411-1417-A`
+- title: Stale pre-brainstorm truth reconcile governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/issues/stale-prebrainstorm-truth-reconcile-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/candidates.md`
+- next_action: Candidate mirror only. `I-20260411-1417-A` is now the canonical owner for stale pre-brainstorm truth reconcile.
+- revisit_trigger: Re-open only if the bounded reconcile policy proves too narrow to handle stale, deferred, and absorbed samples without capability drift.
 
 1. `C-20260411-0217-A`
 - title: Protected-merge unparseable-subject receipt-gap followthrough

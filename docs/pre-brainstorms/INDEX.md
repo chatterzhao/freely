@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260411-1417--stale-prebrainstorm-truth-reconcile
+  - brainstorms: docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/candidates.md
 - 20260411-0217--protected-merge-unparseable-subject-receipt-gap
   - brainstorms: docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/brainstorms.md
   - candidates: docs/pre-brainstorms/20260411-0217--protected-merge-unparseable-subject-receipt-gap/candidates.md
