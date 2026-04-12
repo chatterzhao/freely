@@ -1220,6 +1220,21 @@ manager_continuity_files_desc_for_project() {
   printf '%s' "${FREELY_CACHED_MANAGER_CONTINUITY_LIST}"
 }
 
+reset_project_runtime_discovery_cache() {
+  local project="$1"
+  if [[ "${FREELY_CACHED_WORKTREE_PORCELAIN_PROJECT:-}" == "$project" ]]; then
+    unset FREELY_CACHED_WORKTREE_PORCELAIN_PROJECT
+    unset FREELY_CACHED_WORKTREE_PORCELAIN_READY
+    unset FREELY_CACHED_WORKTREE_PORCELAIN
+  fi
+  if [[ "${FREELY_CACHED_MANAGER_CONTINUITY_PROJECT:-}" == "$project" ]]; then
+    unset FREELY_CACHED_MANAGER_CONTINUITY_PROJECT
+    unset FREELY_CACHED_MANAGER_CONTINUITY_READY
+    unset FREELY_CACHED_MANAGER_CONTINUITY_LIST
+    unset FREELY_CACHED_MANAGER_CONTINUITY_FILES
+  fi
+}
+
 find_latest_prompt_file_for_project() {
   local project="$1"
   latest_run_artifact_for_project "$project" 'prompt-*.txt'
@@ -6023,17 +6038,7 @@ worker_prompt_verification_metadata_missing_fields_csv() {
 
 worker_prompt_has_verification_metadata() {
   local prompt_file="$1"
-  local owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate
-  owner_issue="$(worker_prompt_owner_issue "$prompt_file")"
-  pre_tests_path="$(worker_prompt_pre_tests_path "$prompt_file")"
-  artifact_dir="$(worker_prompt_verification_artifact_dir "$prompt_file")"
-  test_lanes_csv="$(worker_prompt_required_test_lanes_csv "$prompt_file")"
-  acceptance_csv="$(worker_prompt_required_acceptance_item_ids_csv "$prompt_file")"
-  evidence_level="$(worker_prompt_minimum_evidence_level "$prompt_file")"
-  target_environment="$(worker_prompt_target_environment "$prompt_file")"
-  closeout_gate="$(worker_prompt_closeout_gate "$prompt_file")"
-  [[ -n "$owner_issue$pre_tests_path$artifact_dir$test_lanes_csv$acceptance_csv$evidence_level$target_environment$closeout_gate" ]] && return 0
-  return 1
+  [[ -z "$(worker_prompt_verification_metadata_missing_fields_csv "$prompt_file")" ]]
 }
 
 write_worker_verification_contract_file() {
@@ -6072,11 +6077,38 @@ UPDATED_AT="$updated_at"
 EOF
 }
 
+write_worker_verification_contract_stub_for_project() {
+  local project="$1" missing_fields_csv="$2" source_prompt_file="${3:-}" target_project="${4:-}"
+  local contract_file updated_at
+  contract_file="$(worker_verification_contract_state_file "$project")"
+  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  mkdir -p "$(dirname "$contract_file")"
+  cat >"$contract_file" <<EOF
+SOURCE_PROMPT_FILE="$source_prompt_file"
+SOURCE_INTAKE_ID=""
+TARGET_PROJECT="${target_project:-$project}"
+VERIFICATION_METADATA_PRESENT="false"
+VERIFICATION_METADATA_MISSING_FIELDS="$missing_fields_csv"
+OWNER_ISSUE=""
+PRE_TESTS_PATH=""
+VERIFICATION_ARTIFACT_DIR=""
+REQUIRED_TEST_LANES_CSV=""
+REQUIRED_ACCEPTANCE_ITEM_IDS_CSV=""
+MINIMUM_EVIDENCE_LEVEL=""
+TARGET_ENVIRONMENT=""
+CLOSEOUT_GATE=""
+UPDATED_AT="$updated_at"
+EOF
+}
+
 refresh_workcell_state_projection() {
   local project="$1"
   local state_file desired_state supervisor_state ai_state exit_reason
   state_file="$(workcell_state_file "$project")"
-  [[ -f "$state_file" ]] || return 0
+  if [[ ! -f "$state_file" ]]; then
+    write_workcell_state "$project" "unknown" "unknown" "unknown" "none"
+    return 0
+  fi
   desired_state="$(meta_env_value "$state_file" "DESIRED_RUNTIME_STATE")"
   supervisor_state="$(meta_env_value "$state_file" "LAST_SUPERVISOR_STATE")"
   ai_state="$(meta_env_value "$state_file" "LAST_AI_STATE")"
@@ -6087,6 +6119,89 @@ refresh_workcell_state_projection() {
     "${supervisor_state:-unknown}" \
     "${ai_state:-unknown}" \
     "${exit_reason:-unknown}"
+}
+
+worker_verification_contract_missing_fields_csv_for_project() {
+  local project="$1" contract_file metadata_present missing_fields_csv owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate
+  contract_file="$(worker_verification_contract_state_file "$project")"
+  [[ -f "$contract_file" ]] || {
+    printf 'verification_contract_missing\n'
+    return 0
+  }
+  metadata_present="$(meta_env_value "$contract_file" "VERIFICATION_METADATA_PRESENT")"
+  missing_fields_csv="$(meta_env_value "$contract_file" "VERIFICATION_METADATA_MISSING_FIELDS")"
+  owner_issue="$(meta_env_value "$contract_file" "OWNER_ISSUE")"
+  pre_tests_path="$(meta_env_value "$contract_file" "PRE_TESTS_PATH")"
+  artifact_dir="$(meta_env_value "$contract_file" "VERIFICATION_ARTIFACT_DIR")"
+  test_lanes_csv="$(meta_env_value "$contract_file" "REQUIRED_TEST_LANES_CSV")"
+  acceptance_csv="$(meta_env_value "$contract_file" "REQUIRED_ACCEPTANCE_ITEM_IDS_CSV")"
+  evidence_level="$(meta_env_value "$contract_file" "MINIMUM_EVIDENCE_LEVEL")"
+  target_environment="$(meta_env_value "$contract_file" "TARGET_ENVIRONMENT")"
+  closeout_gate="$(meta_env_value "$contract_file" "CLOSEOUT_GATE")"
+  case "$metadata_present" in
+    true)
+      [[ -z "$missing_fields_csv" ]] || {
+        printf 'verification_contract_missing\n'
+        return 0
+      }
+      [[ -n "$owner_issue" && -n "$pre_tests_path" && -n "$artifact_dir" && -n "$test_lanes_csv" && -n "$acceptance_csv" && -n "$evidence_level" && -n "$target_environment" && -n "$closeout_gate" ]] || {
+        printf 'verification_contract_missing\n'
+        return 0
+      }
+      ;;
+    false)
+      [[ -n "$missing_fields_csv" ]] || {
+        printf 'verification_contract_missing\n'
+        return 0
+      }
+      ;;
+    *)
+      printf 'verification_contract_missing\n'
+      return 0
+      ;;
+  esac
+  printf '%s\n' "$missing_fields_csv"
+}
+
+worker_project_has_launchable_verification_contract() {
+  local project="$1" missing_fields_csv
+  missing_fields_csv="$(worker_verification_contract_missing_fields_csv_for_project "$project")"
+  [[ -z "$missing_fields_csv" ]]
+}
+
+record_manager_worker_launch_blocked_resolution() {
+  local project="$1" prompt_file="$2" reason="$3" details="${4:-}"
+  local prompt_basename intake_id resolved_worktree branch content resolution_dir
+  prompt_basename="$(basename "$prompt_file" 2>/dev/null || printf 'unknown-prompt')"
+  prompt_basename="${prompt_basename%.*}"
+  intake_id="launch-${prompt_basename}"
+  resolved_worktree="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
+  branch="$(worker_prompt_target_branch "$prompt_file")"
+  content=$(cat <<EOF
+# Manager Worker Launch Blocked
+
+- blocked_reason: ${reason}
+- prompt_file: ${prompt_file}
+- target_branch: ${branch:-unknown}
+- resolved_worktree: ${resolved_worktree:-unresolved}
+EOF
+)
+  if [[ -n "$details" ]]; then
+    content="${content}"$'\n'"- details: ${details}"
+  fi
+  write_interruption_resolution_artifact \
+    "$project" \
+    "$intake_id" \
+    "manager_runtime_launch_workers_from_latest_handoff" \
+    "blocked" \
+    "launch_blocked" \
+    "handoff://worker-launch" \
+    "$prompt_file" \
+    "${resolved_worktree:-}" \
+    "blocked" \
+    "$content" >/dev/null
+  resolution_dir="$(interruption_resolution_item_dir "$project" "$intake_id")"
+  printf '%s\n' "$resolution_dir"
 }
 
 worker_prompt_normalized_intent_kind() {
@@ -6703,16 +6818,31 @@ ensure_runtime_workcell_initialized_for_launch() {
 
 launch_worker_from_manager_prompt_if_needed() {
   local manager_project="$1" prompt_file="$2"
-  local target_project intake_id supervisor_pid ai_pid runtime_contract_file
+  local target_project intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv
   target_project="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   [[ -n "$target_project" && -d "$target_project" ]] || return 1
   ensure_runtime_workcell_initialized_for_launch "$target_project" || return 1
-  intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"
   runtime_contract_file="$(worker_verification_contract_state_file "$target_project")"
-  write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "$intake_id" "$target_project"
-  refresh_workcell_state_projection "$target_project"
   supervisor_pid="$(manager_supervisor_pid_for_project "$target_project")"
   ai_pid="$(runtime_ai_pid_hint_for_project "$target_project")"
+  missing_fields_csv="$(worker_prompt_verification_metadata_missing_fields_csv "$prompt_file")"
+  if [[ -n "$missing_fields_csv" ]]; then
+    write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "" "$target_project"
+    if [[ -n "$supervisor_pid" || -n "$ai_pid" ]]; then
+      write_workcell_state \
+        "$target_project" \
+        "running" \
+        "$( [[ -n "$supervisor_pid" ]] && printf 'up' || printf 'down' )" \
+        "$( [[ -n "$ai_pid" ]] && printf 'up' || printf 'down' )" \
+        "manager_worker_launch_verification_blocked"
+    else
+      write_workcell_state "$target_project" "stopped" "down" "down" "manager_worker_launch_verification_blocked"
+    fi
+    return 1
+  fi
+  intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"
+  write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "$intake_id" "$target_project"
+  refresh_workcell_state_projection "$target_project"
   if [[ -n "$supervisor_pid" && -n "$ai_pid" ]]; then
     request_local_continuation_reentry "$target_project" "$intake_id"
     return 0
@@ -6727,7 +6857,8 @@ manager_runtime_launch_workers_from_latest_handoff() {
   local launched_count prompt_file prompt_rank prompt_index target_project write_scope
   local parallel_safe active_running_workers available_new_slots max_parallel_workers
   local selected_write_scopes_csv selected_intent_signatures_csv frozen_intent_signatures_csv active_intent_signatures_csv recorded_intent_signatures_csv worker_is_active worker_is_busy prompt_queue_file prompt_signature queued_prompt_blockers
-  continuity_file="$(latest_manager_continuity_file_for_project "$project")"
+  reset_project_runtime_discovery_cache "$project"
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
     printf '0\n'
     return 0
@@ -6777,7 +6908,16 @@ manager_runtime_launch_workers_from_latest_handoff() {
   prompt_queue_file="$(mktemp "${TMPDIR:-/tmp}/freely-manager-launch-queue.XXXXXX")"
   prompt_index=0
   while IFS= read -r prompt_file; do
-    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    [[ -n "$prompt_file" ]] || continue
+    if [[ ! -f "$prompt_file" ]]; then
+      record_manager_worker_launch_blocked_resolution \
+        "$project" \
+        "$prompt_file" \
+        "manager_worker_launch_prompt_missing" \
+        "continuity references a worker prompt path that no longer exists" >/dev/null
+      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+      continue
+    fi
     prompt_rank="$(worker_prompt_dispatch_priority "$prompt_file")"
     printf '%s\t%06d\t%s\n' "$prompt_rank" "$prompt_index" "$prompt_file" >>"$prompt_queue_file"
     prompt_index=$((prompt_index + 1))
@@ -6786,7 +6926,15 @@ manager_runtime_launch_workers_from_latest_handoff() {
   while IFS=$'\t' read -r _prompt_rank _prompt_index prompt_file; do
     [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
     target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
-    [[ -n "$target_project" && -d "$target_project" ]] || continue
+    if [[ -z "$target_project" || ! -d "$target_project" ]]; then
+      record_manager_worker_launch_blocked_resolution \
+        "$project" \
+        "$prompt_file" \
+        "manager_worker_launch_target_unresolved" \
+        "worktree header or branch mapping did not resolve to a live worktree" >/dev/null
+      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+      continue
+    fi
     if csv_contains_exact_item "$launched_csv" "$prompt_file"; then
       if worker_project_is_actively_running "$target_project"; then
         continue
@@ -7683,6 +7831,7 @@ manager_runtime_recover_workers_if_needed() {
   [[ -n "$repo_root" ]] || return 0
   [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
 
+  reset_project_runtime_discovery_cache "$project"
   latest_continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
   recovered="$(manager_runtime_launch_workers_from_latest_handoff "$project")"
   [[ "$recovered" =~ ^[0-9]+$ ]] || recovered=0
@@ -7743,6 +7892,14 @@ manager_runtime_recover_workers_if_needed() {
     fi
 
     log_info "manager runtime recovering expected-running worker: branch=${branch:-unknown} exit_reason=${exit_reason:-unknown} path=$wt_path"
+    if ! worker_project_has_launchable_verification_contract "$wt_path"; then
+      local verification_missing_fields_csv
+      verification_missing_fields_csv="$(worker_verification_contract_missing_fields_csv_for_project "$wt_path")"
+      write_worker_verification_contract_stub_for_project "$wt_path" "$verification_missing_fields_csv" "" "$wt_path"
+      write_workcell_state "$wt_path" "stopped" "down" "down" "manager_worker_launch_verification_blocked"
+      log_warn "manager runtime skips expected-running recovery without launchable verification contract: branch=${branch:-unknown} missing=${verification_missing_fields_csv:-verification_contract_missing} path=$wt_path"
+      continue
+    fi
     start_workcell_supervisor_async "$wt_path"
     recovered=$((recovered + 1))
   done < <(git -C "$repo_root" worktree list --porcelain | awk '

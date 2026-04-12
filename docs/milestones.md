@@ -52,6 +52,17 @@ routing_policy:
 
 ### candidate_issues
 
+1. `C-20260411-1414-A`
+- title: Launch-time verification contract hard gate governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-1414--launch-time-verification-contract-hard-gate/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-1414--launch-time-verification-contract-hard-gate/candidates.md`
+- next_action: Candidate mirror only. `I-20260411-1414-A` is now the canonical owner for launch-time verification contract hard gating.
+- revisit_trigger: Re-open only if the bounded launch-time gate proves too narrow to keep dispatch hardening separate from adequacy schema or retirement enforcement.
+
 1. `C-20260411-0217-A`
 - title: Protected-merge unparseable-subject receipt-gap followthrough
 - milestone_state: candidate
@@ -403,6 +414,30 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+1. `I-20260411-1414-A`
+- title: Launch-time verification contract hard gate governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-launch-time-verification-contract-hard-gate-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-1414--launch-time-verification-contract-hard-gate/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-1414--launch-time-verification-contract-hard-gate/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-verification-metadata`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-branch-only-prompt`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-malformed-verification-contract`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-without-verification-contract`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-partial-verification-metadata`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-unresolved-worktree-blocked`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-worker-partial-metadata-keeps-running-state`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-missing-prompt-blocked`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+  - `./bin/governance-check`
+- completion_note: `The runtime now fails closed on incomplete launch-time verification contracts, preserves machine-readable blocked diagnostics, and refreshes stale discovery before delegated launch; the next lifecycle step is guarded premerge promotion into develop.`
 1. `I-20260408-0231-A`
 - title: Runtime concurrent start-stop followthrough governance
 - milestone_state: completed
