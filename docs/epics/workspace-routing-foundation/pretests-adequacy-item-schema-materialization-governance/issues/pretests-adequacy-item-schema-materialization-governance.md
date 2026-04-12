@@ -24,6 +24,10 @@
 
 现在真正缺的是 machine-readable adequacy semantics。最小五件套让 gate 能看见“跑过某些测试”，但还不足以判断“是否跑够了当前 lane / promote gate 需要的测试面”。
 
+## Absorbed Provenance
+
+- `C-20260411-1414-B` from `docs/pre-brainstorms/20260411-1414--launch-time-verification-contract-hard-gate/candidates.md` was intentionally split out of the launch-time hard-gate brainstorm and is canonically absorbed here so launch-time contract enforcement and adequacy-v2 schema materialization remain separate owners.
+
 ## Scope
 
 1. 冻结 adequacy item v2 schema

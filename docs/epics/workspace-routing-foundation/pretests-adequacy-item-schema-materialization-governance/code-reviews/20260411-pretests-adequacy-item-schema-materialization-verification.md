@@ -13,6 +13,7 @@
 - `PASS`: IBM/doc truth now teaches new owners to write adequacy-v2 fields instead of leaving schema uptake implicit.
 - `PASS`: the guarded `pre-merge-commit` hook path was replayed end-to-end, including the docs-only promote case where owner `pre-tests.md` stays pending until adequacy evidence is staged.
 - `PASS`: a disposable `test-pre-merge-20260411-pretests-adequacy-closeout` batch, assembled through `merge-guarded`, passed `premerge-integration` checks and exposed the missing `premerge-integration:develop_merge` adequacy statement that is now materialized in the owner `pre-tests.md`.
+- `PASS`: this owner now explicitly carries the absorbed follow-on provenance for `C-20260411-1414-B`, keeping the launch-time hard-gate brainstorm and the adequacy-v2 owner linked without reopening a parallel launch-time issue.
 
 ## Commands
 
