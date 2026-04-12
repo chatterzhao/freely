@@ -50,17 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260412-0225-A`
-- title: Structured closeout gate context and fresh review evidence governance
-- milestone_state: committed
-- phase_state: `in_ibm`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/candidates.md`
-- next_action: Finish IBM materialization around structured closeout lane/gate/evidence fields, then enter one bounded dev-loop lane touching runtime state, cleanup replay, and gate messaging without widening into new test orchestration.
-- revisit_trigger: Re-scope only if IBM shows the structured closeout fields must be split into separate runtime-state and merge-policy owners.
-
 1. `I-20260411-1417-A`
 - title: Stale pre-brainstorm truth reconcile governance
 - milestone_state: committed
@@ -722,6 +711,33 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-implementation-decision.md`
   - `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-verification.md`
   - `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/code-reviews/20260407-codex-auto-switch-probe-apikey-fallback-canonical-closeout-verification.md`
+
+3. `I-20260412-0225-A`
+- title: Structured closeout gate context and fresh review evidence governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-structured-closeout-gate-context-and-review-evidence-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/candidates.md`
+- evidence:
+  - `develop` merge `b702f966`
+  - `docs/progress/workspace-routing-foundation/p-structured-closeout-gate-context-and-review-evidence-governance.md`
+  - `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/code-reviews/20260412-structured-closeout-gate-context-and-review-evidence-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-verification-metadata`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-natural-language-prompt`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-partial-verification-metadata`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-branch-only-prompt`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+  - `bash docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
+  - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-pretests-retain`
+  - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-retained-continuation`
+  - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now carries the structured closeout contract, explicit develop-bound adequacy, and fresh issue-scoped review evidence. The gate behavior is no longer opaque; future changes should reopen only as narrower follow-ons instead of leaving this owner in committed_issues.`
   - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-all-unavailable-falls-back-to-exec`
   - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
   - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
