@@ -774,10 +774,10 @@ EOF
 echo "console.log('dev with progress');" > "$REPO/src/sample.js"
 git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
 if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout13" 2>"$TMP_DIR/stderr13"; then
-  echo "[FAIL] governance-merge-gate should reject implementation-bearing changes without a staged review artifact under verification_artifact_dir" >&2
+  echo "[FAIL] governance-merge-gate should reject implementation-bearing changes without a fresh staged owner review artifact under verification_artifact_dir" >&2
   exit 1
 fi
-grep -q 'no staged review artifact' "$TMP_DIR/stdout13"
+grep -q 'no fresh staged owner review artifact' "$TMP_DIR/stdout13"
 
 cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
 # Issue: sample
