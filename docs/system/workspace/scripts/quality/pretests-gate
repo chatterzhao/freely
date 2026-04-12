@@ -4,15 +4,21 @@ set -euo pipefail
 PROJECT="$(pwd -P)"
 ISSUE_PATH=""
 STAGED_ONLY=0
+REQUIRE_ADEQUACY=0
+TARGET_LANE=""
+PROMOTION_GATE=""
 
 usage() {
   cat <<'EOF'
 Usage:
   pretests-gate [--project <abs_path>] [--issue <issue_path>] [--staged-only]
+                [--require-adequacy] [--target-lane <lane>] [--promotion-gate <gate>]
 
 Purpose:
   - enforce issue-bound pre-tests acceptance items before an issue is marked completed
   - reuse the same verdict for standalone checks and git hook gating
+  - when `--require-adequacy` is present, enforce richer adequacy semantics for
+    opted-in Acceptance Items without regressing legacy minimal-schema owners
 EOF
 }
 
@@ -21,6 +27,9 @@ while [[ $# -gt 0 ]]; do
     --project) PROJECT="$2"; shift 2 ;;
     --issue) ISSUE_PATH="$2"; shift 2 ;;
     --staged-only) STAGED_ONLY=1; shift ;;
+    --require-adequacy) REQUIRE_ADEQUACY=1; shift ;;
+    --target-lane) TARGET_LANE="$2"; shift 2 ;;
+    --promotion-gate) PROMOTION_GATE="$2"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *)
       echo "unknown arg: $1" >&2
@@ -36,12 +45,12 @@ git -C "$PROJECT" rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
   exit 1
 }
 
-if [[ -n "$ISSUE_PATH" && "$STAGED_ONLY" -eq 1 ]]; then
-  echo "cannot combine --issue with --staged-only" >&2
+if [[ "$REQUIRE_ADEQUACY" -eq 0 && ( -n "$TARGET_LANE" || -n "$PROMOTION_GATE" ) ]]; then
+  echo "--target-lane/--promotion-gate require --require-adequacy" >&2
   exit 1
 fi
 
-python3 - "$PROJECT" "$ISSUE_PATH" "$STAGED_ONLY" <<'PY'
+python3 - "$PROJECT" "$ISSUE_PATH" "$STAGED_ONLY" "$REQUIRE_ADEQUACY" "$TARGET_LANE" "$PROMOTION_GATE" <<'PY'
 import os
 import re
 import subprocess
@@ -51,6 +60,9 @@ from pathlib import Path
 project = Path(sys.argv[1]).resolve()
 issue_arg = sys.argv[2]
 staged_only = sys.argv[3] == "1"
+require_adequacy = sys.argv[4] == "1"
+target_lane = sys.argv[5]
+promotion_gate = sys.argv[6]
 
 ISSUE_RE = re.compile(r"^docs/epics/.+/issues/[^/]+\.md$")
 REQUIRED_SECTION_NAMES = ("Unit", "Integration", "End-to-End", "Real-Environment")
@@ -78,6 +90,25 @@ FOLLOW_ON_LIVE_SURFACE_PATTERNS = (
     "bin/ai",
     "codex exec",
 )
+ADEQUACY_REQUIRED_FIELDS = ("surface_kind", "target_lane", "promotion_gate")
+ADEQUACY_HINT_FIELDS = ("task_refs", "case_design")
+VALID_SURFACE_KINDS = {
+    "unit",
+    "integration",
+    "end_to_end",
+    "real_environment",
+    "post_merge_followthrough",
+}
+VALID_TARGET_LANES = {
+    "feature-local",
+    "premerge-integration",
+    "post-merge-followthrough",
+}
+VALID_PROMOTION_GATES = {
+    "completion",
+    "develop_merge",
+    "retirement",
+}
 
 
 def git_output(*args: str, check: bool = True) -> str:
@@ -144,6 +175,51 @@ def parse_issue_binding(issue_path: str, text: str) -> tuple[str, str]:
     return pre_tests_path, verification_dir
 
 
+def staged_paths() -> list[str]:
+    output = git_output("diff", "--cached", "--name-only", "--diff-filter=ACMR")
+    return [line.strip() for line in output.splitlines() if line.strip()]
+
+
+def path_within_dir(path: str, directory: str) -> bool:
+    normalized_dir = directory.rstrip("/")
+    if not normalized_dir:
+        return False
+    return path == normalized_dir or path.startswith(f"{normalized_dir}/")
+
+
+def staged_blob_exists(path: str) -> bool:
+    result = subprocess.run(
+        ["git", "-C", str(project), "cat-file", "-t", f":{path}"],
+        text=True,
+        capture_output=True,
+    )
+    return result.returncode == 0 and result.stdout.strip() == "blob"
+
+
+def artifact_is_fresh_staged_review_artifact(path: str, verification_dir: str) -> bool:
+    if not path or not verification_dir:
+        return False
+    if not path_within_dir(path, verification_dir):
+        return False
+    if path not in staged_paths():
+        return False
+    return staged_blob_exists(path)
+
+
+def staged_changes_overlap_issue_scope(issue_path: str, issue_text: str) -> bool:
+    try:
+        pre_tests_path, verification_dir = parse_issue_binding(issue_path, issue_text)
+    except ValueError:
+        return False
+    verification_prefix = verification_dir.rstrip("/") + "/"
+    for path in staged_paths():
+        if path == issue_path or path == pre_tests_path:
+            return True
+        if path.startswith(verification_prefix):
+            return True
+    return False
+
+
 def extract_acceptance_sections(text: str) -> list[str]:
     marker = "## Acceptance Items"
     if marker not in text:
@@ -186,11 +262,26 @@ def extract_required_sections(text: str) -> dict[str, str]:
 
 def parse_fields(section: str) -> dict[str, str]:
     fields: dict[str, str] = {}
-    for key in ("id", "requirement", "evidence_level", "status", "artifact_ref"):
+    for key in (
+        "id",
+        "requirement",
+        "evidence_level",
+        "status",
+        "artifact_ref",
+        "surface_kind",
+        "target_lane",
+        "promotion_gate",
+        "task_refs",
+        "case_design",
+    ):
         match = re.search(rf"^- {key}:\s*`?([^`\n]+)`?\s*$", section, re.MULTILINE)
         if match:
             fields[key] = match.group(1).strip()
     return fields
+
+
+def acceptance_item_uses_adequacy_v2(fields: dict[str, str]) -> bool:
+    return any(fields.get(key) for key in (*ADEQUACY_REQUIRED_FIELDS, *ADEQUACY_HINT_FIELDS))
 
 
 def section_has_test_tasks(section_text: str) -> bool:
@@ -213,11 +304,18 @@ def has_blocker_taxonomy(section_text: str) -> bool:
     return False
 
 
-def artifact_exists(path: str) -> bool:
+def artifact_exists(path: str, source: str) -> bool:
     if not path:
         return False
     if path.startswith("pending://"):
         return False
+    if source == "staged":
+        result = subprocess.run(
+            ["git", "-C", str(project), "cat-file", "-e", f":{path}"],
+            text=True,
+            capture_output=True,
+        )
+        return result.returncode == 0
     fs_path = project / path
     if fs_path.exists():
         return True
@@ -246,7 +344,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
         errors.append(f"[{code}] {message}")
 
     try:
-        pre_tests_path, _verification_dir = parse_issue_binding(issue_path, issue_text)
+        pre_tests_path, verification_dir = parse_issue_binding(issue_path, issue_text)
     except ValueError as exc:
         return str(exc).splitlines()
 
@@ -304,6 +402,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
     valid_statuses = {"pass", "not_applicable"}
     valid_levels = {"mock", "integration", "real_env", "post_merge_dogfood"}
     acceptance_fields: list[dict[str, str]] = []
+    adequacy_v2_items: list[dict[str, str]] = []
 
     for section in sections:
         fields = parse_fields(section)
@@ -335,11 +434,88 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 "execution_missing",
                 f"{pre_tests_path}: {fields.get('id', title_line)} still points to pending artifact_ref {artifact_ref}",
             )
-        elif artifact_ref and not artifact_exists(artifact_ref):
+        elif artifact_ref and not artifact_exists(artifact_ref, source):
             add_error(
                 "verification_state_missing",
                 f"{pre_tests_path}: {fields.get('id', title_line)} references missing artifact {artifact_ref}",
             )
+        if require_adequacy and acceptance_item_uses_adequacy_v2(fields):
+            adequacy_v2_items.append(fields)
+            for key in ADEQUACY_REQUIRED_FIELDS:
+                if not fields.get(key):
+                    add_error(
+                        "testcase_derivation_missing",
+                        f"{pre_tests_path}: {fields.get('id', title_line)} opts into adequacy v2 but is missing {key}",
+                    )
+            surface_kind = fields.get("surface_kind", "")
+            if surface_kind and surface_kind not in VALID_SURFACE_KINDS:
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported surface_kind {surface_kind}",
+                )
+            item_target_lane = fields.get("target_lane", "")
+            if item_target_lane and item_target_lane not in VALID_TARGET_LANES:
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported target_lane {item_target_lane}",
+                )
+            item_promotion_gate = fields.get("promotion_gate", "")
+            if item_promotion_gate and item_promotion_gate not in VALID_PROMOTION_GATES:
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported promotion_gate {item_promotion_gate}",
+                )
+
+    if require_adequacy and target_lane and promotion_gate:
+        matching_items = [
+            fields
+            for fields in adequacy_v2_items
+            if fields.get("target_lane") == target_lane and fields.get("promotion_gate") == promotion_gate
+        ]
+        if not adequacy_v2_items:
+            add_error(
+                "evidence_plan_missing",
+                f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one Acceptance Item with adequacy v2 fields (surface_kind, target_lane, promotion_gate, task_refs, case_design)",
+            )
+        elif not matching_items:
+            available_pairs = sorted(
+                {
+                    f"{fields.get('target_lane', '<missing>')}:{fields.get('promotion_gate', '<missing>')}"
+                    for fields in adequacy_v2_items
+                }
+            )
+            add_error(
+                "evidence_plan_missing",
+                f"{pre_tests_path}: adequacy v2 items exist but none target lane {target_lane} for promotion gate {promotion_gate}; available lane/gate pairs: {', '.join(available_pairs)}",
+            )
+        else:
+            sufficient_items = [
+                fields
+                for fields in matching_items
+                if fields.get("status") == "pass"
+                and artifact_exists(fields.get("artifact_ref", ""), source)
+                and (
+                    target_lane != "premerge-integration"
+                    or promotion_gate != "develop_merge"
+                    or fields.get("evidence_level") in {"integration", "real_env", "post_merge_dogfood"}
+                )
+            ]
+            if not sufficient_items:
+                add_error(
+                    "evidence_plan_missing",
+                    f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one staged artifact-backed pass Acceptance Item with sufficient evidence_level",
+                )
+            elif source == "staged" and target_lane == "premerge-integration" and promotion_gate == "develop_merge":
+                fresh_staged_items = [
+                    fields
+                    for fields in sufficient_items
+                    if artifact_is_fresh_staged_review_artifact(fields.get("artifact_ref", ""), verification_dir)
+                ]
+                if not fresh_staged_items:
+                    add_error(
+                        "evidence_plan_missing",
+                        f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one pass Acceptance Item whose artifact_ref is a staged review artifact under {verification_dir}",
+                    )
 
     if issue_requires_stronger_live_surface(issue_text, pretests_text):
         end_to_end_reason = parse_scalar(required_sections.get("End-to-End", ""), "not_applicable_reason")
@@ -350,7 +526,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 for fields in acceptance_fields
                 if fields.get("evidence_level") in {"real_env", "post_merge_dogfood"}
                 and fields.get("status") == "pass"
-                and artifact_exists(fields.get("artifact_ref", ""))
+                and artifact_exists(fields.get("artifact_ref", ""), source)
             ]
             if not strong_live_items:
                 add_error(
@@ -381,8 +557,15 @@ def staged_completed_issues() -> list[str]:
 
 
 if issue_arg:
+    preview_issue_text = get_worktree_text(issue_arg)
+    if not staged_only and preview_issue_text and staged_changes_overlap_issue_scope(issue_arg, preview_issue_text):
+        print(
+            f"{issue_arg}: staged changes overlap the bound issue/pre-tests/artifact scope; rerun with --staged-only or unstage those paths",
+            file=sys.stderr,
+        )
+        sys.exit(1)
     targets = [issue_arg]
-    source = "worktree"
+    source = "staged" if staged_only else "worktree"
 elif staged_only:
     targets = staged_completed_issues()
     source = "staged"

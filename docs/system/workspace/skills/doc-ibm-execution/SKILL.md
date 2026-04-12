@@ -40,6 +40,8 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
    - 若当前 issue 是 follow-on owner，且 scope 触达 `auth switch / account switch / slot recovery / startup recovery / watchdog / freely start / bin/ai / codex exec` family，不得把 `End-to-End` 与 `Real-Environment` 两章同时写成 `protected_environment_only`，除非 `Acceptance Items` 至少保留一条 artifact-backed 的 `real_env` 或 `post_merge_dogfood` 证据
    - `not_applicable_reason` 只允许有限白名单：`change_not_touching_this_layer`、`no_executable_boundary_at_this_layer`、`protected_environment_only`、`human_observation_only`、`covered_by_more_realistic_required_surface`
    - 至少要能恢复 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
+   - 对新写或正在升级 adequacy 的 owner，`Acceptance Items` 默认补齐 `surface_kind`、`target_lane`、`promotion_gate`；`task_refs` 与 `case_design` 作为强建议同步补齐
+   - 若 owner 承担 `test-pre-merge-* -> develop` guarded promote，默认至少保留一条 `target_lane=premerge-integration` 且 `promotion_gate=develop_merge` 的 artifact-backed pass item
    - 最小 blocker taxonomy 至少区分：`definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`
    - 若存在 merge 后才能验证的能力，显式标记 `post-merge acceptance`
    - 并明确目标验证环境：`develop` 或某个 `test-pre-merge-*` 批次

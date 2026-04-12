@@ -52,6 +52,17 @@ routing_policy:
 
 ### candidate_issues
 
+1. `C-20260411-1415-A`
+- title: Materialize richer pre-tests adequacy item schema without introducing parallel test truth
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-1415--pretests-adequacy-item-schema-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-1415--pretests-adequacy-item-schema-materialization/candidates.md`
+- next_action: Candidate mirror only. `I-20260411-1415-A` is now the canonical owner for adequacy schema v2 and phased enforcement.
+- revisit_trigger: Re-open only if the bounded schema owner cannot preserve legacy compatibility without splitting enforcement policy from schema freeze.
+
 1. `C-20260411-0217-A`
 - title: Protected-merge unparseable-subject receipt-gap followthrough
 - milestone_state: candidate
@@ -403,6 +414,26 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260411-1415-A`
+- title: Pre-tests adequacy item schema materialization governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-pretests-adequacy-item-schema-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-1415--pretests-adequacy-item-schema-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-1415--pretests-adequacy-item-schema-materialization/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+  - `./bin/governance-check`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/test-lane premerge-integration -- ./bin/governance-check`
+- completion_note: `Adequacy-v2 schema, guarded develop promote sufficiency, owner-scoped staged review freshness, and explicit premerge-integration develop-merge coverage are all closed in the feature lane. Replay to canonical develop is the next step; this lane no longer needs more implementation work.`
 1. `I-20260408-0231-A`
 - title: Runtime concurrent start-stop followthrough governance
 - milestone_state: completed

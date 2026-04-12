@@ -104,6 +104,16 @@ Issue front matter 还应显式绑定：
   - `evidence_level`
   - `status`
   - `artifact_ref`
+- 对新写或正在升级 adequacy 的 owner，`Acceptance Items` 默认再写：
+  - `surface_kind`
+  - `target_lane`
+  - `promotion_gate`
+- 对 develop-bound guarded promote，默认至少保留一条 item：
+  - `target_lane: premerge-integration`
+  - `promotion_gate: develop_merge`
+  - `status: pass`
+  - `artifact_ref` 指向 repo 内可追溯 artifact
+- `task_refs`、`case_design` 默认作为强建议字段补齐，减少 acceptance item 与任务脱节、或只剩标题式测试
 - 最小 blocker taxonomy 至少区分：
   - `definition_missing`
   - `commands_only`

@@ -779,6 +779,22 @@ if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout13" 2>"$TMP_DIR/s
 fi
 grep -q 'no staged review artifact' "$TMP_DIR/stdout13"
 
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs`
+EOF
+git add docs/epics/sample/story/issues/sample.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout13b" 2>"$TMP_DIR/stderr13b"; then
+  echo "[FAIL] governance-merge-gate should reject overly broad verification_artifact_dir values" >&2
+  exit 1
+fi
+grep -q 'too broad or non-canonical' "$TMP_DIR/stdout13b"
+
 git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
 git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
 rm -f "$REPO/src/sample.js" "$REPO/docs/progress/sample/p-sample.md"
@@ -1372,9 +1388,185 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `task-promote-sample`
+- case_design: `Run the local guarded replay and observe the review artifact before promote.`
 EOF
 git add docs/epics/sample/story/pre-tests.md
-"$REPO/bin/governance-merge-gate" --staged --target-branch develop --source-branch test-pre-merge-20260408-sample >"$TMP_DIR/stdout18b" 2>"$TMP_DIR/stderr18b"
-grep -q 'passed' "$TMP_DIR/stdout18b"
+if "$REPO/bin/governance-merge-gate" --staged --target-branch develop --source-branch test-pre-merge-20260408-sample >"$TMP_DIR/stdout18b" 2>"$TMP_DIR/stderr18b"; then
+  echo "[FAIL] governance-merge-gate should reject adequacy-v2 pre-tests that do not cover premerge-integration develop_merge" >&2
+  exit 1
+fi
+grep -q '\[evidence_plan_missing\]' "$TMP_DIR/stdout18b"
+grep -q 'none target lane premerge-integration for promotion gate develop_merge' "$TMP_DIR/stdout18b"
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
+
+## Real-Environment
+- acceptance target: `Reserve protected real-environment followthrough for post-merge validation.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `post-merge protected verification`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+- replacement_evidence: `Protected-branch followthrough after develop merge records the real-environment result.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `task-promote-sample`
+- case_design: `Run the guarded premerge integration path and capture the artifact used to justify develop promote.`
+EOF
+git add docs/epics/sample/story/pre-tests.md
+"$REPO/bin/governance-merge-gate" --staged --target-branch develop --source-branch test-pre-merge-20260408-sample >"$TMP_DIR/stdout18c" 2>"$TMP_DIR/stderr18c"
+grep -q 'passed' "$TMP_DIR/stdout18c"
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
+
+## Real-Environment
+- acceptance target: `Reserve protected real-environment followthrough for post-merge validation.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `post-merge protected verification`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+- replacement_evidence: `Protected-branch followthrough after develop merge records the real-environment result.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `task-promote-sample`
+- case_design: `Run the guarded premerge integration path and capture the artifact used to justify develop promote.`
+EOF
+git add docs/epics/sample/story/pre-tests.md
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
+
+## Real-Environment
+- acceptance target: `Reserve protected real-environment followthrough for post-merge validation.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `post-merge protected verification`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+- replacement_evidence: `Protected-branch followthrough after develop merge records the real-environment result.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- evidence_level: `mock`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `task-promote-sample`
+- case_design: `Unstaged drift tries to weaken the staged adequacy contract.`
+EOF
+"$REPO/bin/governance-merge-gate" --staged --target-branch develop --source-branch test-pre-merge-20260408-sample >"$TMP_DIR/stdout18d" 2>"$TMP_DIR/stderr18d"
+grep -q 'passed' "$TMP_DIR/stdout18d"
 
 echo "[PASS] governance-merge-gate enforces candidate-driven lifecycle evidence"
