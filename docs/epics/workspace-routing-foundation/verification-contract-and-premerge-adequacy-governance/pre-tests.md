@@ -70,6 +70,11 @@
 ### Guarded premerge path survives adequacy contract
 - id: `guarded-premerge-verification-contract`
 - requirement: `The guarded feature -> test-pre-merge -> develop path preserves verification contract metadata and owner lifecycle evidence without bypassing protected-branch receipts.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Replay the guarded feature -> test-pre-merge -> develop chain while keeping the canonical owner issue, progress, and review evidence in the same develop-bound diff.`
+- case_design: `Use the guarded merge fixtures plus the owner-bound review artifact to prove develop promotion consumes explicit verification-contract adequacy truth rather than a bare implementation diff.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
