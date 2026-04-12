@@ -73,3 +73,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
+
+### Guarded develop promote stays adequate
+- id: `develop-promote-cleanup-adequacy`
+- requirement: `The develop-bound guarded merge for this owner keeps an explicit adequacy item tied to premerge replay instead of relying on feature-local completion evidence alone.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Replay the owner on its test-pre-merge lane, rerun the focused premerge checks, and prove the resulting develop-bound diff still carries adequate owner evidence.`
+- case_design: `Merge the feature lane into its test-pre-merge batch, run the focused premerge cleanup/governance regressions plus governance-check, then require guarded develop promote to consume this owner-bound verification artifact from the staged diff.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`

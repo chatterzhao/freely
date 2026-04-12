@@ -11,7 +11,7 @@
 - `PASS`: pending acceptance items, missing cleanup state, missing owner bindings, ambiguous issue resolution, and adequacy-required cleanup replays that lack lane/gate context all fail closed with machine-readable retirement blocker output.
 - `PASS`: cleanup followthrough retains merged worktrees when owner pre-tests still block retirement or when the retirement gate itself is unavailable.
 - `PASS`: retained merged worktrees are escalated into manager continuation instead of being silently dropped, while clean merged worktrees can still retire.
-- `PASS`: this owner adds cleanup/retirement closure without widening into launch-time gating or changing the existing completion/develop-merge gate contract.
+- `PASS`: this owner adds cleanup/retirement closure without widening into launch-time gating, and now materializes explicit premerge-integration adequacy evidence for the guarded `test-pre-merge-* -> develop` promote.
 
 ## Commands
 
@@ -19,6 +19,9 @@
 2. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-pretests-retain`
 3. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-retained-continuation`
 4. `./bin/governance-check`
+5. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
+6. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+7. `./bin/test-lane premerge-integration -- ./bin/governance-check`
 
 ## Implementation Decision Note
 
@@ -26,4 +29,4 @@
 - why_this: `The gap was lifecycle closure, not missing test concepts. Retirement previously had no bounded way to prove owner evidence was closed, so merged worktrees could disappear while required acceptance items were still pending.`
 - alternatives_considered: `Treat cleanup as heuristics-only; introduce a parallel retirement test document; force cleanup to understand adequacy-v2 before it can protect baseline completion truth.`
 - boundary_non_goals: `This owner does not harden launch-time verification contracts, change guarded develop merge adequacy semantics, or require cleanup to consume every future adequacy-v2 field.`
-- residual_risk: `Develop-bound promotion still needs a separate premerge replay and owner-level promote evidence before canonical merge, because this verification only closes the feature-lane cleanup/retirement surface.`
+- residual_risk: `Retirement replays that inherit \`--require-adequacy\` still fail closed until the recorded closeout gate captures full lane/gate context, so older worker-state snapshots will be retained instead of silently retiring.`
