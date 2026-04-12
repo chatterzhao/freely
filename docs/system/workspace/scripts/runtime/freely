@@ -4090,7 +4090,7 @@ runtime_error_signal_excerpt() {
 log_has_auth_failure() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
-  runtime_error_signal_excerpt "$log_file" | rg -qi '401|402 payment required|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired|login required'
+  runtime_error_signal_excerpt "$log_file" | rg -qi '401|402 payment required|403 forbidden|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired|login required'
 }
 
 log_has_proxy_config_invalid() {
@@ -4263,7 +4263,7 @@ execution_network_launch_block_active() {
 log_has_codex_usage_limit() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
-  runtime_error_signal_excerpt "$log_file" | rg -qi 'usage limit|try again'
+  runtime_error_signal_excerpt "$log_file" | rg -qi 'usage limit|try again|预扣费额度失败|剩余额度不足|余额不足|insufficient balance|insufficient credit|pre.?charge.*failed|billing hard limit|quota exceeded'
 }
 
 log_codex_rate_limit_reset_at() {

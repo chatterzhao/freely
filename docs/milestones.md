@@ -61,6 +61,29 @@ routing_policy:
 - next_action: Finish IBM materialization for the reconcile policy and representative batch, then update only clearly superseded or deferred stale samples with canonical pointers.
 - revisit_trigger: Re-scope only if representative reconcile cannot be done without broader shared-index or runtime truth changes.
 
+2. `I-20260412-0907-A`
+- title: Codex probe success shape and quota slot recovery governance
+- milestone_state: candidate
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-probe-success-shape-and-quota-slot-recovery-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260412-0907--codex-probe-success-shape-and-quota-slot-recovery/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260412-0907--codex-probe-success-shape-and-quota-slot-recovery/candidates.md`
+- follow_on_to: `I-20260410-1835-B`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-requires-expected-success-shape`
+  - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-log-defers-to-watchdog`
+  - `bash docs/system/workspace/scripts/tests/test-freely-active-runtime-reconnect-stays-network-local`
+  - `real bad-account ./bin/freely start replay with auto-switch to the next usable slot`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-all-unavailable-falls-back-to-exec`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
+  - `bash docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
+
 ### candidate_issues
 
 1. `C-20260411-1415-A`
@@ -738,12 +761,6 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
   - `./bin/governance-check`
 - completion_note: `Canonical develop now carries the structured closeout contract, explicit develop-bound adequacy, and fresh issue-scoped review evidence. The gate behavior is no longer opaque; future changes should reopen only as narrower follow-ons instead of leaving this owner in committed_issues.`
-  - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-all-unavailable-falls-back-to-exec`
-  - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
-  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
-  - `bash docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
-  - `./bin/governance-check`
-- completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
 3. `I-20260410-1835-B`
 - title: Codex real exec switch and after-failure recovery governance

@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260412-0907--codex-probe-success-shape-and-quota-slot-recovery
+  - brainstorms: docs/pre-brainstorms/20260412-0907--codex-probe-success-shape-and-quota-slot-recovery/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260412-0907--codex-probe-success-shape-and-quota-slot-recovery/candidates.md
 - 20260412-1230--historical-completed-queue-identity-followthrough
   - brainstorms: docs/pre-brainstorms/20260412-1230--historical-completed-queue-identity-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260412-1230--historical-completed-queue-identity-followthrough/candidates.md
