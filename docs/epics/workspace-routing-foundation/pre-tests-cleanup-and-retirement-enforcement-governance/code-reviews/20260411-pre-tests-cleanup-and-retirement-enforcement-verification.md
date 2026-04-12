@@ -8,7 +8,7 @@
 ## Scope Verdict
 
 - `PASS`: retirement now reads recorded owner issue metadata and bound `pre_tests_path` before deciding whether a worktree may retire.
-- `PASS`: pending acceptance items, missing cleanup state, missing owner bindings, ambiguous issue resolution, and unsupported adequacy requirements all fail closed with machine-readable retirement blocker output.
+- `PASS`: pending acceptance items, missing cleanup state, missing owner bindings, ambiguous issue resolution, and adequacy-required cleanup replays that lack lane/gate context all fail closed with machine-readable retirement blocker output.
 - `PASS`: cleanup followthrough retains merged worktrees when owner pre-tests still block retirement or when the retirement gate itself is unavailable.
 - `PASS`: retained merged worktrees are escalated into manager continuation instead of being silently dropped, while clean merged worktrees can still retire.
 - `PASS`: this owner adds cleanup/retirement closure without widening into launch-time gating or changing the existing completion/develop-merge gate contract.

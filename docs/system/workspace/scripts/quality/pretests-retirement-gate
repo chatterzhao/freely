@@ -36,6 +36,7 @@ done
 
 python3 - "$PROJECT" "$WORKTREE_PATH" "$RUNTIME_ROOT" <<'PY'
 import re
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -116,8 +117,30 @@ if not issue_path:
 
 cmd = [str(pretests_gate), "--project", str(project), "--issue", issue_path]
 require_adequacy = "--require-adequacy" in closeout_gate
+adequacy_target_lane = ""
+adequacy_promotion_gate = ""
 if require_adequacy:
+    try:
+        closeout_args = shlex.split(closeout_gate)
+    except ValueError as exc:
+        print(
+            f"[pretests_retirement_adequacy_context_missing] recorded closeout gate could not be parsed for adequacy replay: {exc}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    for idx, arg in enumerate(closeout_args):
+        if arg == "--target-lane" and idx + 1 < len(closeout_args):
+            adequacy_target_lane = closeout_args[idx + 1]
+        elif arg == "--promotion-gate" and idx + 1 < len(closeout_args):
+            adequacy_promotion_gate = closeout_args[idx + 1]
+    if not adequacy_target_lane or not adequacy_promotion_gate:
+        print(
+            "[pretests_retirement_adequacy_context_missing] recorded closeout gate requires --require-adequacy but does not record both --target-lane and --promotion-gate for retirement replay",
+            file=sys.stderr,
+        )
+        sys.exit(1)
     cmd.append("--require-adequacy")
+    cmd.extend(["--target-lane", adequacy_target_lane, "--promotion-gate", adequacy_promotion_gate])
 
 result = subprocess.run(cmd, text=True, capture_output=True)
 if result.returncode == 0:

@@ -208,10 +208,10 @@ LAST_WORKER_OWNER_ISSUE="I-sample"
 LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
 LAST_WORKER_CLOSEOUT_GATE="pretests-gate --require-adequacy"
 EOF
-if run_gate >"$TMP_DIR/stdout-adequacy-unsupported" 2>"$TMP_DIR/stderr-adequacy-unsupported"; then
-  echo "[FAIL] pretests-retirement-gate should fail closed when adequacy is required but unsupported" >&2
+if run_gate >"$TMP_DIR/stdout-adequacy-context-missing" 2>"$TMP_DIR/stderr-adequacy-context-missing"; then
+  echo "[FAIL] pretests-retirement-gate should fail closed when adequacy replay context is missing" >&2
   exit 1
 fi
-grep -q 'pretests_retirement_adequacy_unsupported' "$TMP_DIR/stderr-adequacy-unsupported"
+grep -q 'pretests_retirement_adequacy_context_missing' "$TMP_DIR/stderr-adequacy-context-missing"
 
 echo "[PASS] pretests-retirement-gate consumes recorded owner issue metadata before retirement"
