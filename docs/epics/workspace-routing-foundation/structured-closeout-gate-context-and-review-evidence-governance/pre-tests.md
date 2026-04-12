@@ -69,7 +69,7 @@
 - requirement: `Guarded develop promote explicitly states when the remaining blocker is missing fresh staged owner review evidence, even when owner pre-tests already carry the correct lane/gate adequacy item.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/progress/workspace-routing-foundation/p-structured-closeout-gate-context-and-review-evidence-governance.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/code-reviews/20260412-structured-closeout-gate-context-and-review-evidence-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
@@ -81,7 +81,7 @@
 - requirement: `This owner does not loosen existing pretests-gate or governance-merge-gate protections while improving contract observability and replay guidance.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/progress/workspace-routing-foundation/p-structured-closeout-gate-context-and-review-evidence-governance.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/code-reviews/20260412-structured-closeout-gate-context-and-review-evidence-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

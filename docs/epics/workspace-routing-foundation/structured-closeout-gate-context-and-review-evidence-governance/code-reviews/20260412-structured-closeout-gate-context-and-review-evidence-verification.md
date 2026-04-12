@@ -14,6 +14,7 @@
 - `PASS`: focused regression coverage confirms the closeout-contract hardening did not relax existing launch, cleanup, or guarded merge gates.
 - `PASS`: after adding same-diff progress truth and explicit `premerge-integration:develop_merge` pass items backed by staged non-review evidence, a disposable `test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay -> develop` replay narrows to the exact expected blocker: the owner still needs a fresh staged owner review artifact under its verification directory.
 - `PASS`: this replay proves the gate was not missing or bypassed; it was previously being obscured by fragmented owner truth across runtime closeout metadata, `pre-tests.md` adequacy, and review-artifact freshness.
+- `PASS`: the owner's develop-bound adequacy items are now rebound to this issue-scoped verification artifact, so the final guarded replay can satisfy the same fresh staged owner review artifact policy that the diagnostics demand.
 
 ## Commands
 
@@ -42,4 +43,4 @@
 - why_this: `The repeated confusion was not that gates were absent, but that the authoritative closeout contract was fragmented across runtime free text, pre-tests adequacy items, and merge-only review-artifact enforcement. Persisting one structured contract makes missing context recoverable earlier without weakening the final gate.`
 - alternatives_considered: `Keep parsing the legacy closeout string; widen cleanup replay heuristics; add a second tests ledger beside pre-tests; defer wording alignment and rely on final merge failure text alone.`
 - boundary_non_goals: `This slice does not backfill historical worker snapshots, redesign the review artifact schema, or pretend that the develop-bound owner lifecycle may stay in_ibm while still owning executable guarded-merge verification.`
-- residual_risk: `Older retained snapshots still fail closed until they are relaunched with the structured closeout fields, and canonical develop promotion still requires a freshly staged owner verification artifact under the issue-scoped code-reviews directory before this owner can lawfully close out.`
+- residual_risk: `Older retained snapshots still fail closed until they are relaunched with the structured closeout fields; if future follow-ons change closeout lane/gate policy again, they must refresh both the issue-scoped review artifact and the develop-bound acceptance binding together or operators will see the old fragmented-closeout confusion return.`
