@@ -52,6 +52,17 @@ routing_policy:
 
 ### candidate_issues
 
+1. `C-20260411-1416-A`
+- title: Pre-tests cleanup and retirement enforcement governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-1416--pretests-cleanup-retirement-enforcement/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-1416--pretests-cleanup-retirement-enforcement/candidates.md`
+- next_action: Candidate mirror only. `I-20260411-1416-A` is now the canonical owner for cleanup and retirement pre-tests enforcement.
+- revisit_trigger: Re-open only if the bounded retirement gate cannot preserve current completion/merge semantics without being split further.
+
 1. `C-20260411-0217-A`
 - title: Protected-merge unparseable-subject receipt-gap followthrough
 - milestone_state: candidate
@@ -403,6 +414,22 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+1. `I-20260411-1416-A`
+- title: Pre-tests cleanup and retirement enforcement governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-pre-tests-cleanup-and-retirement-enforcement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-1416--pretests-cleanup-retirement-enforcement/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-1416--pretests-cleanup-retirement-enforcement/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
+  - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-pretests-retain`
+  - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-retained-continuation`
+  - `./bin/governance-check`
+- completion_note: `Cleanup and retirement now consume the recorded issue-bound pre-tests truth, retain merged worktrees when closure evidence is missing, and escalate retained cleanup through manager continuation; the next lifecycle step is guarded premerge promotion into develop.`
 1. `I-20260408-0231-A`
 - title: Runtime concurrent start-stop followthrough governance
 - milestone_state: completed
