@@ -16,7 +16,8 @@
 - Worker launch, delegated intake, and workcell state now persist one structured closeout contract: command, target lane, promotion gate, adequacy requirement, and review-artifact policy all travel as first-class verification metadata.
 - Cleanup and retirement replay now consume those structured fields directly and fail closed when retained worker state only carries legacy free-text closeout guidance.
 - `pretests-gate` and `governance-merge-gate` now use the same `fresh staged owner review artifact` wording, so develop-bound diagnostics no longer split the contract across different phrases.
-- This owner is still in `in_dev` because the disposable `test-pre-merge-* -> develop` replay has not yet completed its final truth loop: the diff now carries structured closeout/runtime hardening, but the guarded replay still needs a same-diff adequacy/progress binding and a deliberate proof that fresh review-artifact enforcement remains the final narrow blocker when adequacy is otherwise satisfied.
+- A guarded replay now proves the non-review blockers are materially separated: once this owner carries same-diff progress truth and a `premerge-integration:develop_merge` pass item backed by staged non-review evidence, the `test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay -> develop` path narrows to exactly one blocker, the required `fresh staged owner review artifact` under the owner verification directory.
+- This owner remains in `in_dev` because that final fresh-review refresh has not been staged yet; the lane is verified as fail-closed and better explained, but not yet merge-ready for canonical `develop`.
 
 ## Verification Evidence
 
@@ -35,7 +36,10 @@
 - `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence --base develop`
 - `./bin/merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence feature/structured-closeout-gate-and-review-evidence-followon-20260412`
 - `./bin/merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence`
+- `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay --base develop`
+- `./bin/merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay feature/structured-closeout-gate-and-review-evidence-followon-20260412`
+- `./bin/merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay`
 
 ## Next Action
 
-- Replay the disposable `test-pre-merge-20260412-structured-closeout-gate-review-evidence -> develop` promote after binding this owner's same-diff progress artifact and develop-bound adequacy item, then verify whether the remaining blocker narrows to the expected fresh staged owner review artifact requirement without any gate relaxation.
+- Refresh the owner verification artifact under `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/code-reviews/` in the source feature lane, then rerun the guarded `test-pre-merge-* -> develop` promote to prove the final fresh-review blocker clears without relaxing any gate.
