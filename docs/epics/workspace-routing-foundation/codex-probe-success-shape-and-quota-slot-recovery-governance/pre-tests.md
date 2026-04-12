@@ -46,7 +46,7 @@
 ### Probe success contract is fixed
 - id: `probe-success-shape-frozen`
 - requirement: `The watchdog probe only returns usable when the transcript matches user -> hi -> codex -> response -> tokens used.`
-- evidence_level: `unit`
+- evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `unit`
@@ -82,7 +82,7 @@
 ### Real bad-slot replay shows forward progress
 - id: `bad-slot-runtime-replay-advances`
 - requirement: `A bad current account slot should trigger bounded same-tool recovery to the next usable slot during freely start.`
-- evidence_level: `real`
+- evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `real_environment`
