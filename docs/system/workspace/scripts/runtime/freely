@@ -4391,7 +4391,7 @@ role_hint_for_project() {
 
 write_workcell_state() {
   local project="$1" desired_state="$2" supervisor_state="$3" ai_state="$4" exit_reason="$5"
-  local state_file role_hint updated_at verification_contract_file verification_metadata_present verification_missing_fields verification_owner_issue verification_pre_tests_path verification_artifact_dir verification_test_lanes verification_acceptance_ids verification_evidence_level verification_target_environment verification_closeout_gate
+  local state_file role_hint updated_at verification_contract_file verification_metadata_present verification_missing_fields verification_owner_issue verification_pre_tests_path verification_artifact_dir verification_test_lanes verification_acceptance_ids verification_evidence_level verification_target_environment verification_closeout_gate verification_closeout_gate_command verification_closeout_target_lane verification_closeout_promotion_gate verification_closeout_requires_adequacy verification_closeout_review_artifact_policy
   state_file="$(workcell_state_file "$project")"
   role_hint="$(role_hint_for_project "$project")"
   updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
@@ -4406,6 +4406,11 @@ write_workcell_state() {
   verification_evidence_level=""
   verification_target_environment=""
   verification_closeout_gate=""
+  verification_closeout_gate_command=""
+  verification_closeout_target_lane=""
+  verification_closeout_promotion_gate=""
+  verification_closeout_requires_adequacy=""
+  verification_closeout_review_artifact_policy=""
   if [[ -f "$verification_contract_file" ]]; then
     verification_metadata_present="$(meta_env_value "$verification_contract_file" "VERIFICATION_METADATA_PRESENT")"
     verification_missing_fields="$(meta_env_value "$verification_contract_file" "VERIFICATION_METADATA_MISSING_FIELDS")"
@@ -4417,6 +4422,11 @@ write_workcell_state() {
     verification_evidence_level="$(meta_env_value "$verification_contract_file" "MINIMUM_EVIDENCE_LEVEL")"
     verification_target_environment="$(meta_env_value "$verification_contract_file" "TARGET_ENVIRONMENT")"
     verification_closeout_gate="$(meta_env_value "$verification_contract_file" "CLOSEOUT_GATE")"
+    verification_closeout_gate_command="$(meta_env_value "$verification_contract_file" "CLOSEOUT_GATE_COMMAND")"
+    verification_closeout_target_lane="$(meta_env_value "$verification_contract_file" "CLOSEOUT_TARGET_LANE")"
+    verification_closeout_promotion_gate="$(meta_env_value "$verification_contract_file" "CLOSEOUT_PROMOTION_GATE")"
+    verification_closeout_requires_adequacy="$(meta_env_value "$verification_contract_file" "CLOSEOUT_REQUIRES_ADEQUACY")"
+    verification_closeout_review_artifact_policy="$(meta_env_value "$verification_contract_file" "CLOSEOUT_REVIEW_ARTIFACT_POLICY")"
   fi
   cat >"$state_file" <<EOF
 DESIRED_RUNTIME_STATE="$desired_state"
@@ -4436,6 +4446,11 @@ LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="$verification_acceptance_ids"
 LAST_WORKER_MINIMUM_EVIDENCE_LEVEL="$verification_evidence_level"
 LAST_WORKER_TARGET_ENVIRONMENT="$verification_target_environment"
 LAST_WORKER_CLOSEOUT_GATE="$verification_closeout_gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="$verification_closeout_gate_command"
+LAST_WORKER_CLOSEOUT_TARGET_LANE="$verification_closeout_target_lane"
+LAST_WORKER_CLOSEOUT_PROMOTION_GATE="$verification_closeout_promotion_gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="$verification_closeout_requires_adequacy"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="$verification_closeout_review_artifact_policy"
 EOF
 }
 
@@ -6014,9 +6029,40 @@ worker_prompt_closeout_gate() {
   worker_prompt_dispatch_metadata_value "$prompt_file" "closeout_gate"
 }
 
+worker_prompt_closeout_gate_command() {
+  local prompt_file="$1" value
+  value="$(worker_prompt_dispatch_metadata_value "$prompt_file" "closeout_gate_command")"
+  if [[ -z "$value" ]]; then
+    value="$(worker_prompt_closeout_gate "$prompt_file")"
+  fi
+  printf '%s\n' "$value"
+}
+
+worker_prompt_closeout_target_lane() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "closeout_target_lane"
+}
+
+worker_prompt_closeout_promotion_gate() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "closeout_promotion_gate"
+}
+
+worker_prompt_closeout_requires_adequacy() {
+  local prompt_file="$1" value
+  value="$(worker_prompt_dispatch_metadata_value "$prompt_file" "closeout_requires_adequacy")"
+  value="$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')"
+  printf '%s\n' "$value"
+}
+
+worker_prompt_closeout_review_artifact_policy() {
+  local prompt_file="$1"
+  worker_prompt_dispatch_metadata_value "$prompt_file" "closeout_review_artifact_policy"
+}
+
 worker_prompt_verification_metadata_missing_fields_csv() {
   local prompt_file="$1"
-  local missing_csv="" owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate
+  local missing_csv="" owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate_command closeout_target_lane closeout_promotion_gate closeout_requires_adequacy closeout_review_artifact_policy
   owner_issue="$(worker_prompt_owner_issue "$prompt_file")"
   pre_tests_path="$(worker_prompt_pre_tests_path "$prompt_file")"
   artifact_dir="$(worker_prompt_verification_artifact_dir "$prompt_file")"
@@ -6024,7 +6070,11 @@ worker_prompt_verification_metadata_missing_fields_csv() {
   acceptance_csv="$(worker_prompt_required_acceptance_item_ids_csv "$prompt_file")"
   evidence_level="$(worker_prompt_minimum_evidence_level "$prompt_file")"
   target_environment="$(worker_prompt_target_environment "$prompt_file")"
-  closeout_gate="$(worker_prompt_closeout_gate "$prompt_file")"
+  closeout_gate_command="$(worker_prompt_closeout_gate_command "$prompt_file")"
+  closeout_target_lane="$(worker_prompt_closeout_target_lane "$prompt_file")"
+  closeout_promotion_gate="$(worker_prompt_closeout_promotion_gate "$prompt_file")"
+  closeout_requires_adequacy="$(worker_prompt_closeout_requires_adequacy "$prompt_file")"
+  closeout_review_artifact_policy="$(worker_prompt_closeout_review_artifact_policy "$prompt_file")"
   [[ -n "$owner_issue" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "owner_issue")"
   [[ -n "$pre_tests_path" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "pre_tests_path")"
   [[ -n "$artifact_dir" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "verification_artifact_dir")"
@@ -6032,7 +6082,11 @@ worker_prompt_verification_metadata_missing_fields_csv() {
   [[ -n "$acceptance_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "required_acceptance_item_ids")"
   [[ -n "$evidence_level" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "minimum_evidence_level")"
   [[ -n "$target_environment" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "target_environment")"
-  [[ -n "$closeout_gate" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "closeout_gate")"
+  [[ -n "$closeout_gate_command" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "closeout_gate_command")"
+  [[ -n "$closeout_target_lane" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "closeout_target_lane")"
+  [[ -n "$closeout_promotion_gate" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "closeout_promotion_gate")"
+  [[ -n "$closeout_requires_adequacy" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "closeout_requires_adequacy")"
+  [[ -n "$closeout_review_artifact_policy" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "closeout_review_artifact_policy")"
   printf '%s\n' "$missing_csv"
 }
 
@@ -6043,7 +6097,7 @@ worker_prompt_has_verification_metadata() {
 
 write_worker_verification_contract_file() {
   local contract_file="$1" prompt_file="$2" intake_id="${3:-}" target_project="${4:-}"
-  local owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate missing_fields_csv has_metadata updated_at
+  local owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate closeout_gate_command closeout_target_lane closeout_promotion_gate closeout_requires_adequacy closeout_review_artifact_policy missing_fields_csv has_metadata updated_at
   owner_issue="$(worker_prompt_owner_issue "$prompt_file")"
   pre_tests_path="$(worker_prompt_pre_tests_path "$prompt_file")"
   artifact_dir="$(worker_prompt_verification_artifact_dir "$prompt_file")"
@@ -6051,7 +6105,15 @@ write_worker_verification_contract_file() {
   acceptance_csv="$(worker_prompt_required_acceptance_item_ids_csv "$prompt_file")"
   evidence_level="$(worker_prompt_minimum_evidence_level "$prompt_file")"
   target_environment="$(worker_prompt_target_environment "$prompt_file")"
+  closeout_gate_command="$(worker_prompt_closeout_gate_command "$prompt_file")"
+  closeout_target_lane="$(worker_prompt_closeout_target_lane "$prompt_file")"
+  closeout_promotion_gate="$(worker_prompt_closeout_promotion_gate "$prompt_file")"
+  closeout_requires_adequacy="$(worker_prompt_closeout_requires_adequacy "$prompt_file")"
+  closeout_review_artifact_policy="$(worker_prompt_closeout_review_artifact_policy "$prompt_file")"
   closeout_gate="$(worker_prompt_closeout_gate "$prompt_file")"
+  if [[ -z "$closeout_gate" ]]; then
+    closeout_gate="$closeout_gate_command"
+  fi
   missing_fields_csv="$(worker_prompt_verification_metadata_missing_fields_csv "$prompt_file")"
   has_metadata="false"
   if worker_prompt_has_verification_metadata "$prompt_file"; then
@@ -6073,6 +6135,11 @@ REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="$acceptance_csv"
 MINIMUM_EVIDENCE_LEVEL="$evidence_level"
 TARGET_ENVIRONMENT="$target_environment"
 CLOSEOUT_GATE="$closeout_gate"
+CLOSEOUT_GATE_COMMAND="$closeout_gate_command"
+CLOSEOUT_TARGET_LANE="$closeout_target_lane"
+CLOSEOUT_PROMOTION_GATE="$closeout_promotion_gate"
+CLOSEOUT_REQUIRES_ADEQUACY="$closeout_requires_adequacy"
+CLOSEOUT_REVIEW_ARTIFACT_POLICY="$closeout_review_artifact_policy"
 UPDATED_AT="$updated_at"
 EOF
 }
@@ -6097,6 +6164,11 @@ REQUIRED_ACCEPTANCE_ITEM_IDS_CSV=""
 MINIMUM_EVIDENCE_LEVEL=""
 TARGET_ENVIRONMENT=""
 CLOSEOUT_GATE=""
+CLOSEOUT_GATE_COMMAND=""
+CLOSEOUT_TARGET_LANE=""
+CLOSEOUT_PROMOTION_GATE=""
+CLOSEOUT_REQUIRES_ADEQUACY=""
+CLOSEOUT_REVIEW_ARTIFACT_POLICY=""
 UPDATED_AT="$updated_at"
 EOF
 }
@@ -6122,7 +6194,7 @@ refresh_workcell_state_projection() {
 }
 
 worker_verification_contract_missing_fields_csv_for_project() {
-  local project="$1" contract_file metadata_present missing_fields_csv owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate
+  local project="$1" contract_file metadata_present missing_fields_csv owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate_command closeout_target_lane closeout_promotion_gate closeout_requires_adequacy closeout_review_artifact_policy
   contract_file="$(worker_verification_contract_state_file "$project")"
   [[ -f "$contract_file" ]] || {
     printf 'verification_contract_missing\n'
@@ -6137,14 +6209,18 @@ worker_verification_contract_missing_fields_csv_for_project() {
   acceptance_csv="$(meta_env_value "$contract_file" "REQUIRED_ACCEPTANCE_ITEM_IDS_CSV")"
   evidence_level="$(meta_env_value "$contract_file" "MINIMUM_EVIDENCE_LEVEL")"
   target_environment="$(meta_env_value "$contract_file" "TARGET_ENVIRONMENT")"
-  closeout_gate="$(meta_env_value "$contract_file" "CLOSEOUT_GATE")"
+  closeout_gate_command="$(meta_env_value "$contract_file" "CLOSEOUT_GATE_COMMAND")"
+  closeout_target_lane="$(meta_env_value "$contract_file" "CLOSEOUT_TARGET_LANE")"
+  closeout_promotion_gate="$(meta_env_value "$contract_file" "CLOSEOUT_PROMOTION_GATE")"
+  closeout_requires_adequacy="$(meta_env_value "$contract_file" "CLOSEOUT_REQUIRES_ADEQUACY")"
+  closeout_review_artifact_policy="$(meta_env_value "$contract_file" "CLOSEOUT_REVIEW_ARTIFACT_POLICY")"
   case "$metadata_present" in
     true)
       [[ -z "$missing_fields_csv" ]] || {
         printf 'verification_contract_missing\n'
         return 0
       }
-      [[ -n "$owner_issue" && -n "$pre_tests_path" && -n "$artifact_dir" && -n "$test_lanes_csv" && -n "$acceptance_csv" && -n "$evidence_level" && -n "$target_environment" && -n "$closeout_gate" ]] || {
+      [[ -n "$owner_issue" && -n "$pre_tests_path" && -n "$artifact_dir" && -n "$test_lanes_csv" && -n "$acceptance_csv" && -n "$evidence_level" && -n "$target_environment" && -n "$closeout_gate_command" && -n "$closeout_target_lane" && -n "$closeout_promotion_gate" && -n "$closeout_requires_adequacy" && -n "$closeout_review_artifact_policy" ]] || {
         printf 'verification_contract_missing\n'
         return 0
       }

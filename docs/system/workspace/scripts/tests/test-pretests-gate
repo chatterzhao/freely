@@ -667,7 +667,7 @@ if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/i
   echo "[FAIL] pretests-gate should reject develop-merge adequacy that reuses an unchanged committed artifact" >&2
   exit 1
 fi
-grep -q 'artifact_ref is a staged review artifact under docs/epics/staged/story/code-reviews' "$TMP_DIR/stderr7b"
+grep -q 'artifact_ref is a fresh staged owner review artifact under docs/epics/staged/story/code-reviews' "$TMP_DIR/stderr7b"
 
 cat > "$REPO/docs/epics/staged/story/code-reviews/r-staged.md" <<'EOF'
 # Staged review artifact
@@ -735,7 +735,7 @@ if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/i
   echo "[FAIL] pretests-gate should reject staged adequacy that points outside the bound verification dir" >&2
   exit 1
 fi
-grep -q 'artifact_ref is a staged review artifact under docs/epics/staged/story/code-reviews' "$TMP_DIR/stderr7c"
+grep -q 'artifact_ref is a fresh staged owner review artifact under docs/epics/staged/story/code-reviews' "$TMP_DIR/stderr7c"
 
 cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
 # Pre-tests: staged

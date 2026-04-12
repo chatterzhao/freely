@@ -145,6 +145,9 @@ cat >"$CLEAN_WT/.freely/run/workcell-state.env" <<'EOF'
 LAST_WORKER_OWNER_ISSUE="I-sample"
 LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
 LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="none"
 EOF
 
 git -C "$PROJECT" worktree add -q -b feature/dirty-fixture "$DIRTY_WT" develop

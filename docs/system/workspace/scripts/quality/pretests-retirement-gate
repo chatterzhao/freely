@@ -36,7 +36,6 @@ done
 
 python3 - "$PROJECT" "$WORKTREE_PATH" "$RUNTIME_ROOT" <<'PY'
 import re
-import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -87,6 +86,11 @@ env = parse_env(state_file)
 owner_issue = env.get("LAST_WORKER_OWNER_ISSUE", "")
 recorded_pre_tests = env.get("LAST_WORKER_PRE_TESTS_PATH", "")
 closeout_gate = env.get("LAST_WORKER_CLOSEOUT_GATE", "")
+closeout_gate_command = env.get("LAST_WORKER_CLOSEOUT_GATE_COMMAND", "")
+closeout_target_lane = env.get("LAST_WORKER_CLOSEOUT_TARGET_LANE", "")
+closeout_promotion_gate = env.get("LAST_WORKER_CLOSEOUT_PROMOTION_GATE", "")
+closeout_requires_adequacy = env.get("LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY", "").lower()
+closeout_review_artifact_policy = env.get("LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY", "")
 
 if not pretests_gate.exists():
     print(f"[pretests_retirement_missing] missing gate: {pretests_gate}", file=sys.stderr)
@@ -94,14 +98,42 @@ if not pretests_gate.exists():
 if not state_file.exists():
     print(f"[pretests_retirement_state_missing] missing worker state: {state_file}", file=sys.stderr)
     sys.exit(1)
-if not owner_issue and not recorded_pre_tests and not closeout_gate:
-    print("[pretests_retirement_binding_missing] worker state does not record owner issue, pre-tests path, or closeout gate", file=sys.stderr)
+if not owner_issue and not recorded_pre_tests and not closeout_gate and not closeout_gate_command:
+    print("[pretests_retirement_binding_missing] worker state does not record owner issue, pre-tests path, or closeout context", file=sys.stderr)
     sys.exit(1)
 if not owner_issue:
     print("[pretests_retirement_binding_missing] worktree recorded cleanup state but owner issue is missing", file=sys.stderr)
     sys.exit(1)
 if not recorded_pre_tests:
     print("[pretests_retirement_binding_missing] worktree recorded cleanup state but pre-tests path is missing", file=sys.stderr)
+    sys.exit(1)
+
+missing_closeout_fields: list[str] = []
+if not closeout_gate_command:
+    missing_closeout_fields.append("closeout_gate_command")
+if not closeout_requires_adequacy:
+    missing_closeout_fields.append("closeout_requires_adequacy")
+if not closeout_review_artifact_policy:
+    missing_closeout_fields.append("closeout_review_artifact_policy")
+
+require_adequacy = closeout_requires_adequacy == "true"
+if closeout_requires_adequacy not in ("true", "false", ""):
+    missing_closeout_fields.append("closeout_requires_adequacy")
+if require_adequacy and not closeout_target_lane:
+    missing_closeout_fields.append("closeout_target_lane")
+if require_adequacy and not closeout_promotion_gate:
+    missing_closeout_fields.append("closeout_promotion_gate")
+
+if missing_closeout_fields:
+    legacy_hint = ""
+    if closeout_gate and not closeout_gate_command:
+        legacy_hint = f" legacy_closeout_gate={closeout_gate}"
+    print(
+        "[pretests_retirement_closeout_context_missing] worktree cleanup snapshot is missing structured closeout fields: "
+        + ",".join(missing_closeout_fields)
+        + legacy_hint,
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 issue_path, issue_error = resolve_issue_path(owner_issue)
@@ -116,31 +148,9 @@ if not issue_path:
     sys.exit(1)
 
 cmd = [str(pretests_gate), "--project", str(project), "--issue", issue_path]
-require_adequacy = "--require-adequacy" in closeout_gate
-adequacy_target_lane = ""
-adequacy_promotion_gate = ""
 if require_adequacy:
-    try:
-        closeout_args = shlex.split(closeout_gate)
-    except ValueError as exc:
-        print(
-            f"[pretests_retirement_adequacy_context_missing] recorded closeout gate could not be parsed for adequacy replay: {exc}",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    for idx, arg in enumerate(closeout_args):
-        if arg == "--target-lane" and idx + 1 < len(closeout_args):
-            adequacy_target_lane = closeout_args[idx + 1]
-        elif arg == "--promotion-gate" and idx + 1 < len(closeout_args):
-            adequacy_promotion_gate = closeout_args[idx + 1]
-    if not adequacy_target_lane or not adequacy_promotion_gate:
-        print(
-            "[pretests_retirement_adequacy_context_missing] recorded closeout gate requires --require-adequacy but does not record both --target-lane and --promotion-gate for retirement replay",
-            file=sys.stderr,
-        )
-        sys.exit(1)
     cmd.append("--require-adequacy")
-    cmd.extend(["--target-lane", adequacy_target_lane, "--promotion-gate", adequacy_promotion_gate])
+    cmd.extend(["--target-lane", closeout_target_lane, "--promotion-gate", closeout_promotion_gate])
 
 result = subprocess.run(cmd, text=True, capture_output=True)
 if result.returncode == 0:

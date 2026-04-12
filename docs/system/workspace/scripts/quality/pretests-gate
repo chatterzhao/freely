@@ -514,7 +514,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 if not fresh_staged_items:
                     add_error(
                         "evidence_plan_missing",
-                        f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one pass Acceptance Item whose artifact_ref is a staged review artifact under {verification_dir}",
+                        f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one pass Acceptance Item whose artifact_ref is a fresh staged owner review artifact under {verification_dir}",
                     )
 
     if issue_requires_stronger_live_surface(issue_text, pretests_text):
