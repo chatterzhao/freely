@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-worker-cache-refresh.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER_WT="$TMP_DIR/worker-wt"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260322-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+# Prime the in-process caches before the worktree and continuity exist.
+project_worktree_list_porcelain_cached "$PROJECT" >/dev/null
+manager_continuity_files_desc_for_project "$PROJECT" >/dev/null
+
+git -C "$PROJECT" worktree add -q -b feature/test-worker "$WORKER_WT" develop
+mkdir -p "$WORKER_WT/.freely/run" "$WORKER_WT/.freely/logs"
+cat >"$WORKER_WT/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER_WT"
+INTENT_FILE="$WORKER_WT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER_WT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/20260322-020303-worker-cli-edit-codex.txt"
+cat >"$PROMPT_FILE" <<EOF
+Worktree:
+- \`$WORKER_WT\`
+Branch:
+- \`feature/test-worker\`
+dispatch_priority: P0
+parallel_safe: false
+write_scope: \`$WORKER_WT\`
+intent_kind: edit
+intent_target: \`$WORKER_WT\`
+Owner-Issue:
+- \`I-20260322-0203-A\`
+Pre-Tests-Path:
+- \`docs/epics/sample/story/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`docs/epics/sample/story/code-reviews\`
+Required-Test-Lanes:
+- \`feature-local\`
+Required-Acceptance-Item-Ids:
+- \`worker-launch-linkage\`
+Minimum-Evidence-Level:
+- \`artifact-plus-human-observation\`
+Target-Environment:
+- \`feature/test-worker\`
+Closeout-Gate:
+- \`owner-issue verification closeout\`
+
+继续处理 delegated continuation。
+EOF
+
+CONT_FILE="$PROJECT/.freely/run/manager-continuity-20260322-020303.md"
+cat >"$CONT_FILE" <<EOF
+# Manager Continuity
+
+- worker_prompt: \`$PROMPT_FILE\`
+EOF
+
+START_LOG="$TMP_DIR/started.log"
+manager_supervisor_pid_for_project() {
+  return 0
+}
+runtime_ai_pid_hint_for_project() {
+  return 0
+}
+start_workcell_supervisor_async() {
+  echo "$1" >>"$START_LOG"
+}
+
+LAUNCHED="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$LAUNCHED" == "1" ]] || {
+  echo "[FAIL] expected stale discovery caches to be refreshed before launch, got $LAUNCHED" >&2
+  exit 1
+}
+
+grep -q "$WORKER_WT" "$START_LOG" || {
+  echo "[FAIL] expected refreshed worktree discovery to launch the new worker worktree" >&2
+  exit 1
+}
+grep -q "^LAST_MANAGER_CONTINUITY_GENERATED=\"$CONT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env" || {
+  echo "[FAIL] expected refreshed continuity discovery to consume the new continuity file" >&2
+  exit 1
+}
+
+echo "[PASS] manager worker launch refreshes stale worktree and continuity discovery caches"
