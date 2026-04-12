@@ -205,6 +205,17 @@ def path_exists(rel_path: Optional[str]) -> bool:
     )
 
 
+def verification_artifact_dir_is_scoped(rel_path: str) -> bool:
+    parts = [part for part in normalize_scalar(rel_path).split("/") if part]
+    if len(parts) < 4:
+        return False
+    if parts[0] != "docs" or parts[1] != "epics":
+        return False
+    if parts[-1] != "code-reviews":
+        return False
+    return True
+
+
 def normalized_phase(value: Optional[str]) -> str:
     return (value or "").strip("`").strip()
 
@@ -1032,6 +1043,12 @@ def main() -> int:
                     f"Set the canonical review/verification directory on the issue before merging develop-bound implementation work."
                 )
                 continue
+            if not verification_artifact_dir_is_scoped(verification_dir):
+                errors.append(
+                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} uses verification_artifact_dir '{verification_dir}', which is too broad or non-canonical. "
+                    f"Use an issue-scoped docs/epics/.../code-reviews directory before merging implementation-bearing changes."
+                )
+                continue
 
             normalized_dir = verification_dir.rstrip("/")
             owner_reviews = [review for review in review_records if review.path.startswith(f"{normalized_dir}/")]
@@ -1083,7 +1100,19 @@ def main() -> int:
         else:
             for owner_issue_path in sorted(issue_bound_issue_paths):
                 result = subprocess.run(
-                    [PRETESTS_GATE_BIN, "--project", ROOT_DIR, "--issue", owner_issue_path],
+                    [
+                        PRETESTS_GATE_BIN,
+                        "--project",
+                        ROOT_DIR,
+                        "--issue",
+                        owner_issue_path,
+                        "--staged-only",
+                        "--require-adequacy",
+                        "--target-lane",
+                        "premerge-integration",
+                        "--promotion-gate",
+                        "develop_merge",
+                    ],
                     cwd=ROOT_DIR,
                     text=True,
                     capture_output=True,

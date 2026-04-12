@@ -160,6 +160,140 @@ EOF
 
 "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md
 
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout2a" 2>"$TMP_DIR/stderr2a"; then
+  echo "[FAIL] pretests-gate should reject develop-merge adequacy when no Acceptance Item materializes adequacy v2 fields" >&2
+  exit 1
+fi
+grep -q '\[evidence_plan_missing\]' "$TMP_DIR/stderr2a"
+grep -q 'require at least one Acceptance Item with adequacy v2 fields' "$TMP_DIR/stderr2a"
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Unit
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
+
+## Integration
+
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
+
+## Real-Environment
+
+- acceptance target: `State why protected real-environment followthrough is unavailable in this fixture.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `lawful replacement evidence for missing protected environment`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
+- replacement_evidence: `The isolated fixture does not model a protected branch environment.`
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `task-sample-1`
+- case_design: `Given the sample fixture, run the integration replay and observe the verification artifact.`
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout2b" 2>"$TMP_DIR/stderr2b"; then
+  echo "[FAIL] pretests-gate should reject adequacy-v2 items that do not cover the requested lane/gate" >&2
+  exit 1
+fi
+grep -q '\[evidence_plan_missing\]' "$TMP_DIR/stderr2b"
+grep -q 'none target lane premerge-integration for promotion gate develop_merge' "$TMP_DIR/stderr2b"
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Unit
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
+
+## Integration
+
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
+
+## Real-Environment
+
+- acceptance target: `State why protected real-environment followthrough is unavailable in this fixture.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `lawful replacement evidence for missing protected environment`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
+- replacement_evidence: `The isolated fixture does not model a protected branch environment.`
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `task-sample-1`
+- case_design: `Given the sample fixture, run the guarded integration replay and capture the review artifact used for develop promote.`
+EOF
+
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge
+
 cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 # Pre-tests: sample
 
@@ -384,5 +518,283 @@ if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/auth/switch/is
   exit 1
 fi
 grep -q "cannot waive both 'End-to-End' and 'Real-Environment'" "$TMP_DIR/stderr5"
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --target-lane premerge-integration >"$TMP_DIR/stdout6" 2>"$TMP_DIR/stderr6"; then
+  echo "[FAIL] pretests-gate should require --require-adequacy when target lane or promotion gate is provided" >&2
+  exit 1
+fi
+grep -q 'require --require-adequacy' "$TMP_DIR/stderr6"
+
+mkdir -p "$REPO/docs/epics/staged/story/issues" "$REPO/docs/epics/staged/story/code-reviews"
+cat > "$REPO/docs/epics/staged/story/issues/staged.md" <<'EOF'
+# Issue: staged
+
+- issue_id: `I-staged`
+- phase_state: `completed`
+- pre_tests_path: `docs/epics/staged/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/staged/story/code-reviews`
+EOF
+cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
+# Pre-tests: staged
+
+## Unit
+- acceptance target: `Record the bounded unit surface.`
+- testing layer: `unit`
+- target environment: `feature/staged`
+- required evidence: `unit contract`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface.
+
+## Integration
+- acceptance target: `Run the staged integration replay.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-staged`
+- required evidence: `staged replay artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the staged integration replay.
+
+## End-to-End
+- acceptance target: `Explain why integration is the most realistic surface here.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-staged`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on staged integration adequacy.`
+- replacement_evidence: `The staged integration acceptance item provides the guarded evidence.`
+
+## Real-Environment
+- acceptance target: `Reserve real environment followthrough for protected merge.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `post-merge protected replay`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+- replacement_evidence: `Protected-branch followthrough records the real environment result.`
+
+## Acceptance Items
+
+### Staged integration acceptance
+- id: `staged-integration`
+- requirement: `The staged guarded replay must be evidenced in the commit itself.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/staged/story/code-reviews/r-staged.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `task-staged-1`
+- case_design: `Run the staged replay and stage the review artifact in the same commit.`
+EOF
+git add docs/epics/staged/story/issues/staged.md docs/epics/staged/story/pre-tests.md
+
+cat > "$REPO/docs/epics/staged/story/code-reviews/r-staged.md" <<'EOF'
+# Staged review artifact
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7a" 2>"$TMP_DIR/stderr7a"; then
+  echo "[FAIL] pretests-gate should reject ambiguous issue-bound worktree reads when staged changes overlap the same owner scope" >&2
+  exit 1
+fi
+grep -q 'rerun with --staged-only or unstage those paths' "$TMP_DIR/stderr7a"
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7" 2>"$TMP_DIR/stderr7"; then
+  echo "[FAIL] pretests-gate should reject staged-only adequacy when the referenced artifact is not staged" >&2
+  exit 1
+fi
+grep -q 'require at least one staged artifact-backed pass Acceptance Item with sufficient evidence_level' "$TMP_DIR/stderr7"
+
+git add docs/epics/staged/story/code-reviews/r-staged.md
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge
+
+git commit -q -m "stage guarded artifact"
+cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
+# Pre-tests: staged
+
+## Unit
+- acceptance target: `Record the bounded unit surface.`
+- testing layer: `unit`
+- target environment: `feature/staged`
+- required evidence: `unit contract`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface.
+
+## Integration
+- acceptance target: `Run the staged integration replay.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-staged`
+- required evidence: `staged replay artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the staged integration replay.
+
+## End-to-End
+- acceptance target: `Explain why integration is the most realistic surface here.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-staged`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on staged integration adequacy.`
+- replacement_evidence: `The staged integration acceptance item provides the guarded evidence.`
+
+## Real-Environment
+- acceptance target: `Reserve real environment followthrough for protected merge.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `post-merge protected replay`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+- replacement_evidence: `Protected-branch followthrough records the real environment result.`
+
+## Acceptance Items
+
+### Reused staged integration acceptance
+- id: `staged-integration-reused`
+- requirement: `A previously committed artifact must not satisfy the guarded merge by itself.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/staged/story/code-reviews/r-staged.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `task-staged-1b`
+- case_design: `Demonstrate that old committed review evidence must be restaged in the guarded merge.`
+EOF
+git add docs/epics/staged/story/pre-tests.md
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7b" 2>"$TMP_DIR/stderr7b"; then
+  echo "[FAIL] pretests-gate should reject develop-merge adequacy that reuses an unchanged committed artifact" >&2
+  exit 1
+fi
+grep -q 'artifact_ref is a staged review artifact under docs/epics/staged/story/code-reviews' "$TMP_DIR/stderr7b"
+
+cat > "$REPO/docs/epics/staged/story/code-reviews/r-staged.md" <<'EOF'
+# Staged review artifact
+
+restaged refresh
+EOF
+git add docs/epics/staged/story/code-reviews/r-staged.md
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge
+
+cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
+# Pre-tests: staged
+
+## Unit
+- acceptance target: `Record the bounded unit surface.`
+- testing layer: `unit`
+- target environment: `feature/staged`
+- required evidence: `unit contract`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface.
+
+## Integration
+- acceptance target: `Run the staged integration replay.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-staged`
+- required evidence: `staged replay artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the staged integration replay.
+
+## End-to-End
+- acceptance target: `Explain why integration is the most realistic surface here.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-staged`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on staged integration adequacy.`
+- replacement_evidence: `The staged integration acceptance item provides the guarded evidence.`
+
+## Real-Environment
+- acceptance target: `Reserve real environment followthrough for protected merge.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `post-merge protected replay`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+- replacement_evidence: `Protected-branch followthrough records the real environment result.`
+
+## Acceptance Items
+
+### Wrong-dir staged integration acceptance
+- id: `staged-integration-wrong-dir`
+- requirement: `A staged artifact outside the bound verification dir must not satisfy guarded merge adequacy.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/staged/story/pre-tests.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `task-staged-1c`
+- case_design: `Demonstrate that only staged review artifacts under the owner verification dir can justify develop merge.`
+EOF
+git add docs/epics/staged/story/pre-tests.md
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout7c" 2>"$TMP_DIR/stderr7c"; then
+  echo "[FAIL] pretests-gate should reject staged adequacy that points outside the bound verification dir" >&2
+  exit 1
+fi
+grep -q 'artifact_ref is a staged review artifact under docs/epics/staged/story/code-reviews' "$TMP_DIR/stderr7c"
+
+cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
+# Pre-tests: staged
+
+## Unit
+- acceptance target: `Record the bounded unit surface.`
+- testing layer: `unit`
+- target environment: `feature/staged`
+- required evidence: `unit contract`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface.
+
+## Integration
+- acceptance target: `Run the staged integration replay.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-staged`
+- required evidence: `staged replay artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the staged integration replay.
+
+## End-to-End
+- acceptance target: `Explain why integration is the most realistic surface here.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-staged`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on staged integration adequacy.`
+- replacement_evidence: `The staged integration acceptance item provides the guarded evidence.`
+
+## Real-Environment
+- acceptance target: `Reserve real environment followthrough for protected merge.`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `post-merge protected replay`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `protected_environment_only`
+- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
+- replacement_evidence: `Protected-branch followthrough records the real environment result.`
+
+## Acceptance Items
+
+### Mock-only premerge acceptance
+- id: `staged-mock`
+- requirement: `A mock artifact must not satisfy guarded premerge integration.`
+- evidence_level: `mock`
+- status: `pass`
+- artifact_ref: `docs/epics/staged/story/code-reviews/r-staged.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `task-staged-2`
+- case_design: `Demonstrate that mock evidence is insufficient for guarded premerge integration.`
+EOF
+git add docs/epics/staged/story/pre-tests.md
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/staged/story/issues/staged.md --staged-only --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout8" 2>"$TMP_DIR/stderr8"; then
+  echo "[FAIL] pretests-gate should reject mock-only evidence for premerge-integration develop_merge" >&2
+  exit 1
+fi
+grep -q 'sufficient evidence_level' "$TMP_DIR/stderr8"
 
 echo "[PASS] pretests-gate enforces issue binding and acceptance evidence"

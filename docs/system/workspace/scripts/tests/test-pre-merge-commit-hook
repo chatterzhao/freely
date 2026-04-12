@@ -153,6 +153,11 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 ### Integration command is executed
 - id: `integration-sample`
 - requirement: `The guarded promote must prove the integration command ran.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Run the guarded premerge integration path before promotion.`
+- case_design: `Merge the authoritative test-pre-merge batch into develop and require an artifact-backed pass item under the owner verification directory before guarded completion succeeds.`
 - evidence_level: `integration`
 - status: `pending`
 - artifact_ref: `pending://integration-sample`
@@ -429,6 +434,11 @@ cat > docs/epics/sample/story/pre-tests.md <<'EOF'
 ### Integration command is executed
 - id: `integration-sample`
 - requirement: `The guarded promote must prove the integration command ran.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Run the guarded premerge integration path before promotion.`
+- case_design: `Guarded develop completion from the test-pre-merge batch requires a staged review artifact-backed pass item.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
@@ -488,6 +498,11 @@ cat > docs/epics/sample/story/pre-tests.md <<'EOF'
 ### Integration command is executed
 - id: `integration-sample`
 - requirement: `The guarded promote must prove the integration command ran.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Run the guarded premerge integration path before promotion.`
+- case_design: `Guarded develop completion from the test-pre-merge batch requires a staged review artifact-backed pass item.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
