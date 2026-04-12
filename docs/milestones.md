@@ -64,7 +64,7 @@ routing_policy:
 2. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
 - milestone_state: candidate
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-codex-probe-success-shape-and-quota-slot-recovery-governance.md`

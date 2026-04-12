@@ -5,6 +5,14 @@
 - verification_date: `2026-04-12`
 - verifier: `codex`
 
+## Implementation Decision Note
+
+- decision: `Treat the Codex hi probe as success only when the transcript shape is exactly the canonical user/assistant exchange, and prioritize explicit 403/quota evidence over reconnect noise so bad slots advance immediately to the next usable slot.`
+- why_this: `The real failure was not generic network instability; it was false-positive slot usability and misclassified quota/auth failures. Tightening the probe contract and making quota/auth evidence win over reconnect text is the smallest bounded change that restores forward progress without widening the whole execution-network policy.`
+- alternatives_considered: `Keep rc=0 as the probe truth and only broaden quota regexes later; or collapse all reconnect failures into unconditional slot rotation. The first leaves false-positive usable slots alive, and the second would erase the intentional bounded retry policy for genuine network-only failures.`
+- boundary_non_goals: `This owner does not redesign cross-tool fallback, remove execution_network taxonomy, or promise that every Codex CLI output variation forever matches the current transcript parser without future follow-on work.`
+- residual_risk: `If the Codex CLI transcript format changes again, the stricter probe may fail closed and require a fresh owner to re-freeze the success contract. Likewise, any new quota/auth wording not covered by the current detection set would need another bounded follow-on.`
+
 ## Scope Verdict
 
 - `PASS`: the Codex `hi` probe now only accepts the fixed success transcript shape
