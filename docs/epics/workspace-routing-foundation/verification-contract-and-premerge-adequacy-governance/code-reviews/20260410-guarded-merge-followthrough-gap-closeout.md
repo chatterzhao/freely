@@ -10,6 +10,7 @@
 - `PASS`: the guarded `develop` merge completion path now executes the same downstream governance gate that `pre-merge-commit` owns, so `git merge --continue` can no longer bypass develop materialization checks.
 - `PASS`: the new `completed` candidate provenance exemption stays narrow; it only applies to governance-only diffs whose candidate already points at a canonical owner issue and milestone closeout line.
 - `PASS`: the metadata repairs for historical candidate provenance now align legacy candidate ids with the canonical owner issues that already closed them out.
+- `PASS`: follow-on candidate `C-20260411-1417-B` remains absorbed by `I-20260408-1205-A`, and the canonical owner chain is now explicitly restated so stale-truth reconcile batches can carry lawful absorbed provenance in the same develop-bound diff.
 
 ## Commands
 

@@ -107,6 +107,8 @@ Freely 现在已经有测试真源，但没有形成闭环：
 
 1. next_action: `completed`
 2. revisit_trigger: 若后续发现 manager handoff、worker recovery、或 develop-bound adequacy gate 仍出现“contract 已写但 runtime state / review 无法恢复”的漏口，再开 follow-on issue 继续收紧 launch 恢复与 merge followthrough。
+3. absorbed_follow_ons:
+   - `C-20260411-1417-B` from `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/candidates.md`, because the stale-truth audit confirmed this canonical owner already closed the verification-contract / premerge-adequacy chain and no separate runtime owner should be reopened.
 
 ## Completion
 
