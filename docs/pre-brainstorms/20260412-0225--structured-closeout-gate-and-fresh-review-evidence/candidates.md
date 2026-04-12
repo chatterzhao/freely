@@ -31,9 +31,10 @@
     summary: `The gate already works. The repeated confusion comes from not persisting the full closeout adequacy contract in one recoverable place. This should become a narrow follow-on owner instead of more prose in AGENTS or laws.`
     verdict: `ready_for_issue_materialization`
 - priority: `P0`
-- status: `proposed`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- recommendation: `materialize follow-on owner after one more narrow overlap audit against verification-contract-and-premerge-adequacy-governance and implementation-decision-notes-in-issue-review-artifacts-governance`
+- promoted_issue_id: `I-20260412-0225-A`
+- recommendation: `materialized as a dedicated follow-on owner because verification-contract, review-artifact, and cleanup owners each cover only one slice of the contract and absorbing the structured closeout fields into any one of them would widen scope.`
 - dependencies:
   - `verification-contract-and-premerge-adequacy-governance`
   - `implementation-decision-notes-in-issue-review-artifacts-governance`
@@ -45,11 +46,11 @@
   - `docs/system/workspace/agents/manager-agent.md`
   - `docs/system/workspace/agents/worker-agent.md`
   - `docs/system/workspace/scripts/tests/`
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
-- next_action: `run a final overlap audit against the completed verification-contract and review-artifact owners, then materialize a dedicated follow-on owner if no canonical issue can absorb the structured closeout fields without scope drift.`
+- next_action: `candidate mirror only. I-20260412-0225-A is now the canonical owner for structured closeout lane/gate/evidence policy followthrough.`
 - revisit_trigger: `another guarded develop merge blocks because lane/gate adequacy exists in owner pre-tests but the develop-bound diff still lacks recoverable review-evidence context in runtime state or operator guidance.`
