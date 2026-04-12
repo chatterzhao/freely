@@ -22,6 +22,9 @@
 - `pre-tests.md` 能恢复关键 acceptance 面的 `environment`、`evidence`、`failure signal`、`failure handling / replay expectation`
 - issue 已显式声明 `pre_tests_path` 与 `verification_artifact_dir`
 - `pre-tests.md` 已包含 completion gate 可消费的 machine-readable acceptance items：`id` / `requirement` / `evidence_level` / `status` / `artifact_ref`
+- 对新写或正在升级 adequacy 的 owner，`Acceptance Items` 默认同步写 v2 adequacy 字段：`surface_kind` / `target_lane` / `promotion_gate`
+- 对 `develop` promote 相关 item，优先把 lane/gate 写成 `target_lane: premerge-integration` 与 `promotion_gate: develop_merge`
+- `task_refs` 与 `case_design` 默认作为强建议字段补齐，避免只有标题式测试项
 - `tasks.md` 来自 `prd.md` 的 decomposition / execution slices
 
 并保持：

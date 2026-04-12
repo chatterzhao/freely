@@ -68,6 +68,7 @@
 - 对 Freely 自治能力，`pre-tests.md` 默认不能缺少 integration / application-native real-environment / end-to-end dogfood 这些 post-merge 验收面；若缺少，必须显式写明不适用理由与替代证据
 - 若当前 issue 是 auth/switch/startup-recovery/watchdog family 的 follow-on owner，`pre-tests.md` 不得把 `End-to-End` 与 `Real-Environment` 同时降成 `protected_environment_only`，除非 `Acceptance Items` 至少保留一条 artifact-backed 的 `real_env` 或 `post_merge_dogfood` 证据；对这类 owner，artifact 应优先覆盖真实 `bin/ai`、真实 `codex exec` 或真实 `freely start`
 - `pre-tests.md` 所需的 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy 能从 `prd.md` 推导出来
+- 若 `pre-tests.md` 进入 adequacy v2，`surface_kind`、`target_lane`、`promotion_gate` 也应能从 `prd.md` 的 eval plan / execution slice 直接推导出来
 - `tasks.md` 能从 `prd.md` 的 decomposition / execution slices 派生，而不是与 PRD 脱节
 - AI 读取 `prd.md` 后，能回答：
   - 目标是什么
