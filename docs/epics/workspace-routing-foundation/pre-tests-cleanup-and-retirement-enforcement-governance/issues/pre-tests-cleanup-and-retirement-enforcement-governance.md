@@ -77,5 +77,5 @@
 
 ## Next
 
-1. next_action: `Replay this completed feature lane through guarded premerge promotion into develop, then retire the dedicated worktree and temporary premerge batch.`
+1. next_action: `completed on canonical develop; the guarded premerge replay, develop promotion, and dedicated-lane retirement are already closed and this issue now remains only as canonical delivered truth.`
 2. revisit_trigger: Re-open only if guarded premerge replay shows cleanup followthrough can still retire a worktree without reading its bound pre-tests truth or without surfacing item-level retirement blockers.

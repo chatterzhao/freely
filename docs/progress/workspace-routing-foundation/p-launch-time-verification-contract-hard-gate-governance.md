@@ -16,7 +16,7 @@
 - Blocked launch paths preserve machine-readable state: partial metadata, branch-only prompts, missing prompt files, unresolved worktrees, and malformed persisted contracts all surface explicit blocked reasons or missing-field projections.
 - Success paths remain intact: a fully specified manager-to-worker handoff still creates delegated intake, writes intake/runtime verification contracts, and supports active-worker reentry without regressing state projection.
 - Discovery freshness is now part of the launch contract, so stale worktree and continuity caches are refreshed before manager-driven worker dispatch and recovery decisions.
-- This worktree has completed focused runtime regressions, an initial guarded premerge replay, and governance verification; the remaining step is to replay the updated owner truth through canonical `develop`, then retire this dedicated lane and its temporary premerge batch.
+- This lane is already closed on canonical `develop`: focused runtime regressions, guarded premerge replay, develop promotion, and dedicated-lane retirement are complete, so this progress file is now historical closeout evidence rather than an active execution pointer.
 
 ## Verification Evidence
 
