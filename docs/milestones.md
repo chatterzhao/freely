@@ -430,7 +430,10 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
   - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
   - `./bin/governance-check`
-- completion_note: `Adequacy-v2 schema, guarded develop promote sufficiency, and owner-scoped staged review freshness are all closed in the feature lane. Replay to canonical develop is the next step; this lane no longer needs more implementation work.`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/test-lane premerge-integration -- ./bin/governance-check`
+- completion_note: `Adequacy-v2 schema, guarded develop promote sufficiency, owner-scoped staged review freshness, and explicit premerge-integration develop-merge coverage are all closed in the feature lane. Replay to canonical develop is the next step; this lane no longer needs more implementation work.`
 1. `I-20260408-0231-A`
 - title: Runtime concurrent start-stop followthrough governance
 - milestone_state: completed

@@ -12,6 +12,7 @@
 - `PASS`: `governance-merge-gate` now rejects overly broad `verification_artifact_dir` values and only accepts canonical `docs/epics/.../code-reviews` ownership.
 - `PASS`: IBM/doc truth now teaches new owners to write adequacy-v2 fields instead of leaving schema uptake implicit.
 - `PASS`: the guarded `pre-merge-commit` hook path was replayed end-to-end, including the docs-only promote case where owner `pre-tests.md` stays pending until adequacy evidence is staged.
+- `PASS`: a disposable `test-pre-merge-20260411-pretests-adequacy-closeout` batch, assembled through `merge-guarded`, passed `premerge-integration` checks and exposed the missing `premerge-integration:develop_merge` adequacy statement that is now materialized in the owner `pre-tests.md`.
 
 ## Commands
 
@@ -19,6 +20,9 @@
 2. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 3. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
 4. `./bin/governance-check`
+5. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`
+6. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+7. `./bin/test-lane premerge-integration -- ./bin/governance-check`
 
 ## Implementation Decision Note
 
@@ -26,4 +30,4 @@
 - why_this: `The observed gate miss was not that pre-tests existed in the abstract, but that develop-bound promote could still pass without a machine-readable statement of which lane/gate pair had been sufficiently covered by fresh owner-scoped evidence.`
 - alternatives_considered: `Keep adequacy semantics in prose only; trust any artifact-backed pass item; allow broad verification directories; leave hook coverage on the old fixture shape.`
 - boundary_non_goals: `This owner does not harden launch-time verification contract enforcement, cleanup/retirement gates, or force a warehouse-wide migration of historical pre-tests.`
-- residual_risk: `Older owners still rely on legacy compatibility until they adopt adequacy-v2 fields, and ambiguous non-staged issue scans remain a lower-priority follow-on if future evidence shows they distort operator workflow.`
+- residual_risk: `Older owners still rely on legacy compatibility until they adopt adequacy-v2 fields, and guarded promote still depends on operators replaying premerge evidence back into the canonical owner lane before final develop merge.`
