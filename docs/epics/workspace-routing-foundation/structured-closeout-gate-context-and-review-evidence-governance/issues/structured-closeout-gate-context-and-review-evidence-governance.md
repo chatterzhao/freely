@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260412-0225-A`
 - title: Structured closeout gate context and fresh review evidence governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `structured-closeout-gate-context-and-review-evidence-governance`
@@ -50,7 +50,53 @@
 3. 不新增 `tests.md` 或平行 closeout ledger
 4. 不在本 owner 内做全仓历史 worker-state 回填
 
+## Completion
+
+- `docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/candidates.md`
+- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/brainstorms/b-structured-closeout-gate-context-and-review-evidence-governance.md`
+- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/prd.md`
+- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/pre-tests.md`
+- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/tasks.md`
+- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/code-reviews/20260412-structured-closeout-gate-context-and-review-evidence-verification.md`
+- `docs/progress/workspace-routing-foundation/p-structured-closeout-gate-context-and-review-evidence-governance.md`
+- `docs/system/workspace/agents/manager-agent.md`
+- `docs/system/workspace/agents/worker-agent.md`
+- `docs/system/workspace/scripts/runtime/freely`
+- `docs/system/workspace/scripts/quality/pretests-gate`
+- `docs/system/workspace/scripts/quality/governance-merge-gate`
+- `docs/system/workspace/scripts/quality/pretests-retirement-gate`
+- `docs/system/workspace/scripts/tests/test-freely-worker-prompt-verification-metadata`
+- `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-natural-language-prompt`
+- `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-partial-verification-metadata`
+- `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-branch-only-prompt`
+- `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
+- `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+- `docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
+- `docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-pretests-retain`
+- `docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-retained-continuation`
+- `docs/system/workspace/scripts/tests/test-pretests-gate`
+- `docs/system/workspace/scripts/tests/test-governance-merge-gate`
+
+## Verification
+
+- `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-verification-metadata`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-natural-language-prompt`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-partial-verification-metadata`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-branch-only-prompt`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+- `bash docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
+- `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-pretests-retain`
+- `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-retained-continuation`
+- `bash docs/system/workspace/scripts/tests/test-pretests-gate`
+- `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+- `./bin/governance-check`
+- `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-final --base develop`
+- `./bin/merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-final feature/structured-closeout-gate-and-review-evidence-followon-20260412`
+- `./bin/merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-final`
+
 ## Next
 
-1. next_action: `finish the remaining develop-bound verification slice by updating owner pre-tests/progress truth and replaying a disposable test-pre-merge -> develop chain until the only remaining blocker is the expected fresh staged owner review artifact requirement.`
-2. revisit_trigger: 若 guarded replay 在 owner 已进 execution phase 且已回填完成项后，仍然先被其他 lifecycle drift 拦住，而不是收敛到 fresh staged owner review artifact 诊断。
+1. next_action: `completed on canonical develop via merge commit b702f966927e190e361736f75bfc965e7fb564bd; only cleanup/retirement of disposable worktrees remains.`
+2. revisit_trigger: 若后续 develop-bound replay 再次不能把 blocker 收敛到 fresh staged owner review artifact，或 cleanup/retirement 重新退回到依赖 free-text closeout guidance 而不是结构化 closeout contract。

@@ -2,8 +2,8 @@
 
 - issue_id: `I-20260412-0225-A`
 - title: Structured closeout gate context and fresh review evidence governance
-- phase_state: `in_dev`
-- runtime_state: `unavailable`
+- phase_state: `completed`
+- runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/structured-closeout-gate-and-review-evidence-followon-20260412`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260412-feature-structured-closeout-gate-and-review-evidence-followon`
@@ -16,8 +16,8 @@
 - Worker launch, delegated intake, and workcell state now persist one structured closeout contract: command, target lane, promotion gate, adequacy requirement, and review-artifact policy all travel as first-class verification metadata.
 - Cleanup and retirement replay now consume those structured fields directly and fail closed when retained worker state only carries legacy free-text closeout guidance.
 - `pretests-gate` and `governance-merge-gate` now use the same `fresh staged owner review artifact` wording, so develop-bound diagnostics no longer split the contract across different phrases.
-- A guarded replay now proves the non-review blockers are materially separated: once this owner carries same-diff progress truth and a `premerge-integration:develop_merge` pass item backed by staged non-review evidence, the `test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay -> develop` path narrows to exactly one blocker, the required `fresh staged owner review artifact` under the owner verification directory.
-- This owner remains in `in_dev` because that final fresh-review refresh has not been staged yet; the lane is verified as fail-closed and better explained, but not yet merge-ready for canonical `develop`.
+- Disposable guarded replay first proved the non-review blockers were separate from review freshness, then a fresh issue-scoped verification artifact completed the final `premerge-integration:develop_merge` requirement without relaxing any gate.
+- Canonical `develop` now carries the full owner truth via merge commit `b702f966927e190e361736f75bfc965e7fb564bd`, so this progress file is historical closeout evidence rather than an active execution pointer.
 
 ## Verification Evidence
 
@@ -39,7 +39,11 @@
 - `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay --base develop`
 - `./bin/merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay feature/structured-closeout-gate-and-review-evidence-followon-20260412`
 - `./bin/merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay`
+- `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-final --base develop`
+- `./bin/merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-final feature/structured-closeout-gate-and-review-evidence-followon-20260412`
+- `./bin/merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-final`
+- `git log -1 --format=%H develop`
 
 ## Next Action
 
-- Refresh the owner verification artifact under `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/code-reviews/` in the source feature lane, then rerun the guarded `test-pre-merge-* -> develop` promote to prove the final fresh-review blocker clears without relaxing any gate.
+`completed`
