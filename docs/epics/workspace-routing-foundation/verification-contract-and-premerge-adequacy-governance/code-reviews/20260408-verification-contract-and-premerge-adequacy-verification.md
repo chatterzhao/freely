@@ -11,14 +11,13 @@
 - `PASS`: runtime writes the same verification contract into delegated intake and worker runtime state, so recovery and followthrough can consume one machine-readable projection.
 - `PASS`: manager handoff guidance, launcher prompt scaffold, delegated intake, and worker runtime state now share one machine-readable verification contract instead of leaving recovery to prompt prose.
 - `PASS`: `pretests-gate` now enforces the four required sections and per-section scalar schema, and rejects `not_applicable` sections that omit concrete `replacement_evidence`.
-- `PASS`: guarded `feature/* -> test-pre-merge-* -> develop` promotion proved the verification contract survives both protected merge hops and still satisfies governance-check.
+- `PASS`: guarded `feature/* -> test-pre-merge-* -> develop` promotion proved the verification contract survives both protected merge hops, and the owner now carries an explicit `premerge-integration:develop_merge` adequacy item instead of relying on implicit merge history.
 
 ## Commands
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-verification-metadata`
 2. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-natural-language-prompt`
 3. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-5. `./bin/governance-check`
 4. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
 5. `./bin/governance-check`
 
