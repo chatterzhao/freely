@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-codex-probe-success-shape.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+source "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+good_output=$'OpenAI Codex v0.120.0 (research preview)\n--------\nuser\nhi\ncodex\nhello there\ntokens used\n14,136\n'
+no_response_output=$'OpenAI Codex v0.120.0 (research preview)\n--------\nuser\nhi\ntokens used\n14,136\n'
+wrong_role_output=$'OpenAI Codex v0.120.0 (research preview)\n--------\nuser\nhi\nassistant\nhello there\ntokens used\n14,136\n'
+
+codex_probe_is_expected_success 0 "$good_output"
+
+if codex_probe_is_expected_success 0 "$no_response_output"; then
+  echo "[FAIL] probe success must require a codex response block after user hi" >&2
+  exit 1
+fi
+
+if codex_probe_is_expected_success 0 "$wrong_role_output"; then
+  echo "[FAIL] probe success must require the codex role marker after user hi" >&2
+  exit 1
+fi
+
+if codex_probe_is_expected_success 1 "$good_output"; then
+  echo "[FAIL] probe success must still require rc=0" >&2
+  exit 1
+fi
+
+echo "[PASS] codex hi probe only accepts the fixed success transcript and rejects all other shapes"
