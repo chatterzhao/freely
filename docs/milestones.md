@@ -1854,7 +1854,22 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/code-reviews/20260324-watchdog-restart-storm-and-process-churn-verification.md`
 - completion_note: restart-storm / process-churn signal 的 runtime helper、`session-state.env` 真相面、manager escalation 与 `live-status` / `fleet-status` 暴露已在 same-family issue 中完成并验证；该 candidate 不再保留为 active dev handoff
 
-7. `I-20260320-1945`
+7. `I-20260412-1230-A`
+- title: Historical completed-queue identity followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-historical-completed-queue-identity-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260412-1230--historical-completed-queue-identity-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260412-1230--historical-completed-queue-identity-followthrough/candidates.md`
+- evidence:
+  - `docs/progress/workspace-routing-foundation/p-historical-completed-queue-identity-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/code-reviews/20260412-historical-completed-queue-identity-followthrough-verification.md`
+  - `./bin/governance-check`
+- completion_note: `This narrow followthrough only normalizes the historical completed watchdog queue item to its canonical issue identity, so future guarded develop replays no longer surface the stale legacy candidate warning.`
+
+8. `I-20260320-1945`
 - title: Watchdog live status surface and manager supervision
 - milestone_state: completed
 - phase_state: `completed`
