@@ -73,3 +73,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
+
+### Guarded develop promote proves launch-time adequacy
+- id: `develop-promote-launch-gate-proof`
+- requirement: `A guarded test-pre-merge promote proves this owner carries explicit premerge-integration coverage for develop-bound merge instead of relying only on feature-local completion evidence.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Replay guarded promotion on a disposable test-pre-merge batch and confirm the owner now carries a distinct develop-merge adequacy statement plus fresh staged review evidence for launch-time hard gating.`
+- case_design: `Merge the feature lane into a disposable test-pre-merge batch through merge-guarded, rerun the launch-time regressions plus governance-check there, and use the resulting verification artifact to prove the develop-bound lane/gate pair is explicitly covered.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`

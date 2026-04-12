@@ -42,14 +42,21 @@
 - candidate_format_version: `v2`
 - title: Pre-tests adequacy schema materialization governance
 - problem: richer adequacy semantics were defined in governance discussions but executable gate coverage remains at a minimal field subset, allowing under-specified premerge adequacy.
-- why_now: should start only after launch-time hard gate lands to avoid mixing contract enforcement and schema expansion in one owner.
+- why_now:
+  - the bounded launch-time owner needed to land first so runtime contract hardening stayed separate from adequacy schema expansion
+  - the follow-on schema owner has now already been materialized and completed as its own canonical lifecycle
 - acceptance_criteria:
   - define item-level adequacy schema additions and migration strategy
   - update executable gate consumption with compatibility safeguards
   - provide explicit no-regression plan for existing owners/pre-tests documents
 - priority: `P1`
-- status: `queued_follow_on`
+- status: `absorbed`
+- adoption_type: `follow_on_owner_materialized`
 - milestone: `M-20260306-workspace-routing-foundation`
 - source_brainstorm: `docs/pre-brainstorms/20260411-1414--launch-time-verification-contract-hard-gate/brainstorms.md`
 - session_refs: []
-- next_action: do not materialize until C-20260411-1414-A has merged and stabilized
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+- promoted_issue_id: `I-20260411-1415-A`
+- decision_reason: `Adequacy schema materialization was intentionally split out after launch-time contract hardening and is now canonically owned by I-20260411-1415-A, so this candidate remains only as provenance for why the two owners were separated.`
+- next_action: treat this candidate as absorbed provenance; any further adequacy evolution should continue from the completed canonical owner instead of reopening this launch-time lane.
+- revisit_trigger: reopen only if guarded develop promote still shows an adequacy-v2 gap after the completed schema owner is already present on canonical `develop`.

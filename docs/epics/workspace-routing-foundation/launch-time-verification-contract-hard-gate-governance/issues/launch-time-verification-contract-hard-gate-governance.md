@@ -89,10 +89,13 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-worker-partial-metadata-keeps-running-state`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-missing-prompt-blocked`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+- `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+- `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-branch-only-prompt`
+- `./bin/test-lane premerge-integration -- ./bin/governance-check`
 - `./bin/governance-check`
 - `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
 
 ## Next
 
-1. next_action: `Replay this completed feature lane through guarded premerge promotion into develop, then retire the dedicated worktree and temporary premerge batch.`
-2. revisit_trigger: Re-open only if guarded premerge replay shows the launch-time hard gate still permits incomplete verification metadata, stale discovery state, or unresolved worker targets to cross the dispatch boundary.
+1. next_action: `Replay this completed feature lane through guarded premerge promotion into develop now that the owner also carries explicit premerge-integration develop-merge adequacy evidence, then retire the dedicated worktree and temporary premerge batch.`
+2. revisit_trigger: Re-open only if guarded premerge replay still shows the launch-time hard gate or its absorbed adequacy dependency can cross into develop without explicit develop-merge proof, or if incomplete verification metadata again crosses the dispatch boundary.
