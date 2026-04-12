@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-worker-unresolved.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260322-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/20260323-unresolved-worker-codex.txt"
+cat >"$PROMPT_FILE" <<'EOF'
+Worktree:
+- `/tmp/nonexistent-worker-wt`
+Branch:
+- `feature/missing-worker`
+dispatch_priority: P0
+parallel_safe: false
+write_scope: `/tmp/nonexistent-worker-wt`
+intent_kind: edit
+intent_target: `/tmp/nonexistent-worker-wt`
+Owner-Issue:
+- `I-20260322-0203-A`
+Pre-Tests-Path:
+- `docs/epics/sample/story/pre-tests.md`
+Verification-Artifact-Dir:
+- `docs/epics/sample/story/code-reviews`
+Required-Test-Lanes:
+- `feature-local`
+Required-Acceptance-Item-Ids:
+- `worker-launch-linkage`
+Minimum-Evidence-Level:
+- `artifact-plus-human-observation`
+Target-Environment:
+- `develop`
+Closeout-Gate:
+- `owner-issue verification closeout`
+EOF
+
+CONT_FILE="$PROJECT/.freely/run/manager-continuity-20260323-unresolved.md"
+cat >"$CONT_FILE" <<EOF
+# Manager Continuity
+
+- delegated worker prompt:
+  - $PROMPT_FILE
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+LAUNCHED="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$LAUNCHED" == "0" ]] || {
+  echo "[FAIL] unresolved prompt must not launch a worker, got $LAUNCHED" >&2
+  exit 1
+}
+
+RESOLUTION_FILE="$(latest_interruption_resolution_file_for_project "$PROJECT")"
+[[ -n "$RESOLUTION_FILE" && -f "$RESOLUTION_FILE" ]] || {
+  echo "[FAIL] unresolved prompt must materialize a blocked resolution artifact" >&2
+  exit 1
+}
+grep -q 'blocked_reason: manager_worker_launch_target_unresolved' "$RESOLUTION_FILE"
+grep -q "prompt_file: $PROMPT_FILE" "$RESOLUTION_FILE"
+grep -q "resolved_worktree: unresolved" "$RESOLUTION_FILE"
+grep -q '^QUEUED_WORKER_PROMPTS="'"$PROMPT_FILE"'"$' "$PROJECT/.freely/run/manager-worker-launch-state.env"
+
+echo "[PASS] unresolved manager worker prompt leaves explicit blocked resolution artifact"

@@ -100,14 +100,25 @@ start_workcell_supervisor_async() {
 }
 
 LAUNCHED="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
-[[ "$LAUNCHED" == "1" ]] || {
-  echo "[FAIL] expected one launched worker from branch-only prompt, got $LAUNCHED" >&2
+[[ "$LAUNCHED" == "0" ]] || {
+  echo "[FAIL] expected launch-time hard gate to block branch-only prompt, got $LAUNCHED launched workers" >&2
   exit 1
 }
 
-grep -q "$WORKER_WT" "$START_LOG" || {
-  echo "[FAIL] expected runtime to resolve branch-only prompt into worktree path" >&2
+if [[ -s "$START_LOG" ]]; then
+  echo "[FAIL] branch-only prompt must not start a worker supervisor" >&2
   exit 1
-}
+fi
 
-echo "[PASS] manager continuity can launch worker from branch-only prompt"
+RUNTIME_CONTRACT="$(worker_verification_contract_state_file "$WORKER_WT")"
+grep -q '^VERIFICATION_METADATA_PRESENT="false"$' "$RUNTIME_CONTRACT"
+grep -q '^VERIFICATION_METADATA_MISSING_FIELDS="owner_issue,pre_tests_path,verification_artifact_dir,required_test_lanes,required_acceptance_item_ids,minimum_evidence_level,target_environment,closeout_gate"$' "$RUNTIME_CONTRACT"
+grep -q '^LAST_EXIT_REASON="manager_worker_launch_verification_blocked"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_VERIFICATION_METADATA_PRESENT="false"$' "$WORKER_WT/.freely/run/workcell-state.env"
+
+if find "$WORKER_WT/.freely/intake" -mindepth 1 -maxdepth 1 -type d | grep -q .; then
+  echo "[FAIL] branch-only blocked prompt must not create delegated intake items" >&2
+  exit 1
+fi
+
+echo "[PASS] launch-time hard gate blocks branch-only worker prompt"
