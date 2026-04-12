@@ -16,7 +16,7 @@
 - Blocked launch paths preserve machine-readable state: partial metadata, branch-only prompts, missing prompt files, unresolved worktrees, and malformed persisted contracts all surface explicit blocked reasons or missing-field projections.
 - Success paths remain intact: a fully specified manager-to-worker handoff still creates delegated intake, writes intake/runtime verification contracts, and supports active-worker reentry without regressing state projection.
 - Discovery freshness is now part of the launch contract, so stale worktree and continuity caches are refreshed before manager-driven worker dispatch and recovery decisions.
-- This worktree has completed focused runtime regressions and governance verification; the next step is guarded promotion into canonical `develop`, then retirement of this dedicated lane and its temporary premerge batch.
+- This worktree has completed focused runtime regressions, an initial guarded premerge replay, and governance verification; the remaining step is to replay the updated owner truth through canonical `develop`, then retire this dedicated lane and its temporary premerge batch.
 
 ## Verification Evidence
 
@@ -31,6 +31,9 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-worker-partial-metadata-keeps-running-state`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-missing-prompt-blocked`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+- `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+- `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-branch-only-prompt`
+- `./bin/test-lane premerge-integration -- ./bin/governance-check`
 - `./bin/governance-check`
 - `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
 
