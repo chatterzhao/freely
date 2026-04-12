@@ -12,6 +12,7 @@
 - `PASS`: cleanup followthrough retains merged worktrees when owner pre-tests still block retirement or when the retirement gate itself is unavailable.
 - `PASS`: retained merged worktrees are escalated into manager continuation instead of being silently dropped, while clean merged worktrees can still retire.
 - `PASS`: this owner adds cleanup/retirement closure without widening into launch-time gating, and now materializes explicit premerge-integration adequacy evidence for the guarded `test-pre-merge-* -> develop` promote.
+- `PASS`: canonical owner/progress closeout text now states that guarded premerge replay, develop promotion, and retirement are already complete, preventing cleanup followthrough from reopening a closed lane.
 
 ## Commands
 
@@ -22,6 +23,7 @@
 5. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
 6. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 7. `./bin/test-lane premerge-integration -- ./bin/governance-check`
+8. `./bin/merge-guarded test-pre-merge-20260412-completed-owner-closeout-truth feature/completed-owner-closeout-truth-20260412`
 
 ## Implementation Decision Note
 
@@ -29,4 +31,4 @@
 - why_this: `The gap was lifecycle closure, not missing test concepts. Retirement previously had no bounded way to prove owner evidence was closed, so merged worktrees could disappear while required acceptance items were still pending.`
 - alternatives_considered: `Treat cleanup as heuristics-only; introduce a parallel retirement test document; force cleanup to understand adequacy-v2 before it can protect baseline completion truth.`
 - boundary_non_goals: `This owner does not harden launch-time verification contracts, change guarded develop merge adequacy semantics, or require cleanup to consume every future adequacy-v2 field.`
-- residual_risk: `Retirement replays that inherit \`--require-adequacy\` still fail closed until the recorded closeout gate captures full lane/gate context, so older worker-state snapshots will be retained instead of silently retiring.`
+- residual_risk: `Retirement replays that inherit \`--require-adequacy\` still fail closed until the recorded closeout gate captures full lane/gate context, and future closeout-truth edits still need a fresh staged review artifact so develop-bound merges cannot reuse stale completion-era evidence.`
