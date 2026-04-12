@@ -16,7 +16,8 @@
 - `pretests-gate` now separates three failure classes for guarded promote: no adequacy-v2 item for the requested lane/gate pair, adequate item present but not backed by sufficient evidence, and stale/non-staged artifact reuse.
 - `governance-merge-gate` now requires owner `verification_artifact_dir` to stay scoped to `docs/epics/.../code-reviews`, so broad directories cannot smuggle unrelated staged files into develop-bound promote evidence.
 - The hook path itself is covered: the updated `test-pre-merge-commit-hook` fixture now uses adequacy-v2 fields and proves docs-only `test-pre-merge` closeout still blocks until fresh owner-scoped evidence is staged.
-- This worktree has completed focused regressions and governance verification; the next step is guarded promotion into canonical `develop`, then retirement of this dedicated lane and its temporary promote batch.
+- A guarded `test-pre-merge` replay also proved the remaining gap was not a broken hook but missing owner truth: develop-bound promote demanded an explicit `premerge-integration:develop_merge` adequacy item, which is now recorded in the owner pre-tests.
+- This worktree has completed focused feature-lane and premerge-lane regressions; the next step is guarded promotion into canonical `develop`, then retirement of this dedicated lane and its temporary promote batch.
 
 ## Verification Evidence
 
@@ -24,6 +25,9 @@
 - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
 - `./bin/governance-check`
+- `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`
+- `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+- `./bin/test-lane premerge-integration -- ./bin/governance-check`
 - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
 
 ## Next Action

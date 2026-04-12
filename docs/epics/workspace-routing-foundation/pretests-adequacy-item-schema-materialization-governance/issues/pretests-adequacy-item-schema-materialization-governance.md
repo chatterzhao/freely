@@ -77,6 +77,9 @@
 - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
 - `./bin/governance-check`
+- `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`
+- `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+- `./bin/test-lane premerge-integration -- ./bin/governance-check`
 - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
 
 ## Next
