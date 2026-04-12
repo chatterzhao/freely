@@ -44,7 +44,7 @@
 - id: `structured-closeout-context-persisted`
 - requirement: `Delegated intake and worker runtime state persist closeout lane, promotion gate, adequacy requirement, and review-artifact policy as first-class verification fields.`
 - evidence_level: `integration`
-- status: `pending`
+- status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/code-reviews/20260412-structured-closeout-gate-context-and-review-evidence-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
@@ -56,7 +56,7 @@
 - id: `cleanup-replay-consumes-structured-closeout`
 - requirement: `Cleanup and retirement replay read structured closeout fields directly and fail closed when those fields are incomplete.`
 - evidence_level: `integration`
-- status: `pending`
+- status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/code-reviews/20260412-structured-closeout-gate-context-and-review-evidence-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`

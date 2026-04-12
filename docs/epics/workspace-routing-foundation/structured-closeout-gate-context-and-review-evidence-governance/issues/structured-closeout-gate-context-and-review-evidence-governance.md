@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260412-0225-A`
 - title: Structured closeout gate context and fresh review evidence governance
-- phase_state: `in_ibm`
+- phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `structured-closeout-gate-context-and-review-evidence-governance`
@@ -50,26 +50,7 @@
 3. 不新增 `tests.md` 或平行 closeout ledger
 4. 不在本 owner 内做全仓历史 worker-state 回填
 
-## IBM Handoff
-
-- implementation_scope_summary:
-  - 这条 owner 是 verification contract 的 follow-on，负责把 closeout lane/gate/evidence policy 从弱 free-text 收紧为结构化真相。
-  - cleanup owner 只消费这套 contract，不再重新定义它。
-  - review artifact policy 继续复用现有 develop-bound staged review artifact 规则，不新增第二套 review 机制。
-- required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/tasks.md`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
-  - `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
-  - `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
-  - `docs/system/workspace/scripts/runtime/freely`
-  - `docs/system/workspace/scripts/quality/pretests-retirement-gate`
-  - `docs/system/workspace/scripts/quality/pretests-gate`
-  - `docs/system/workspace/agents/manager-agent.md`
-  - `docs/system/workspace/agents/worker-agent.md`
-
 ## Next
 
-1. next_action: `complete IBM materialization for the structured closeout fields, settle the overlap boundary against verification-contract and review-artifact owners, then enter dev-loop with runtime state, cleanup replay, and gate messaging kept in one bounded lane.`
-2. revisit_trigger: 若 overlap audit 证明这条 owner 仍然只是旧 owner 的 wording restatement，或如果 dev-loop 发现 closeout fields 必须被拆成 runtime-state 与 merge-policy 两个独立 lane。
+1. next_action: `finish the remaining develop-bound verification slice by updating owner pre-tests/progress truth and replaying a disposable test-pre-merge -> develop chain until the only remaining blocker is the expected fresh staged owner review artifact requirement.`
+2. revisit_trigger: 若 guarded replay 在 owner 已进 execution phase 且已回填完成项后，仍然先被其他 lifecycle drift 拦住，而不是收敛到 fresh staged owner review artifact 诊断。
