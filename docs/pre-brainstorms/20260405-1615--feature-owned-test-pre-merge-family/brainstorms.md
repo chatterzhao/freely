@@ -453,3 +453,22 @@
    - 还是 `merge-guarded` / promote 流程在缺失 active batch 时拒绝继续并提示创建
 3. batch family 的 canonical naming 与 rebuild suffix 应如何落到 hook / regex / cleanup 规则
 4. `wt-remove` / cleanup 流程是否需要新增“按 feature family 清理 test-pre-merge members”的能力
+
+## Status Reconcile
+
+- reconcile_status: `partially_materialized_and_deferred`
+- why: `后续 canonical truth 已经先冻结了 test-pre-merge promote model 与 promotion gate enforcement，但“feature owns a renewable batch family”以及 eager/lazy materialization、family cleanup automation 仍是 follow-on。`
+- stale_statement:
+  - `把 feature-owned renewable batch family、rebuild orchestration、family cleanup automation 读成当前仓库已经完整落地的既成事实。`
+- canonical_truth:
+  - `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+  - `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
+- materialized_scope:
+  - `canonical naming 已统一到 test-pre-merge-*`
+  - `develop-bound guarded promotion 已被收紧到 canonical test-pre-merge path`
+- deferred_scope:
+  - `feature-owned renewable family lifecycle automation`
+  - `stale batch rebuild orchestration`
+  - `family-aware cleanup helper`
+- follow_on_note: `当前仓库里还没有单独名为 feature-owned-test-pre-merge-family-governance 的 owner issue；不要伪造不存在的 canonical pointer。family lifecycle automation 目前仍只能作为 follow-on 方向挂在现有 promotion-gate / lane / cleanup 讨论之后。`
+- reconcile_note: `后续审计不应再把这篇里对 family automation 的构想当作“已经落地但门禁失效”；它们是明确未完结的 follow-on，不是功能回退。`
