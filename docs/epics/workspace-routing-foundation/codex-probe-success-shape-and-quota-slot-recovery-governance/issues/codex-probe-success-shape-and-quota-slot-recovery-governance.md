@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
-- phase_state: `done_ibm`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `codex-probe-success-shape-and-quota-slot-recovery-governance`
@@ -63,4 +63,4 @@ This is not a new generic network-taxonomy owner. It is a bounded closeout of th
 
 ## Next
 
-- Feature implementation and focused verification are complete in the dedicated feature worktree. Promote through `test-pre-merge-runtime-slot-recovery-20260412-0916` and guarded merge to `develop`, then close out the owner on canonical `develop`.
+- Feature implementation and focused verification are complete in the dedicated feature worktree. Promote through `test-pre-merge-runtime-slot-recovery-20260412-1004` and guarded merge to `develop`, then close out the owner on canonical `develop`.
