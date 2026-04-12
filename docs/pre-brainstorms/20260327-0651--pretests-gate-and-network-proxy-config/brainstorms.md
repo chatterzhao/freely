@@ -150,3 +150,19 @@
 
 1. `I-20260327-0701` 负责 issue-bound pre-tests evidence gate，并已先把 `phase_state=completed` 的第一阶段 gate 合入 `develop`
 2. `I-20260327-0651` 负责 project-scoped network proxy configuration and launcher inheritance，并在当前 lane 继续推进实现、验证与 closeout
+
+## Status Reconcile
+
+- reconcile_status: `deferred_split`
+- why: `这条预研把 pre-tests gate 愿景和 network proxy capability 放在同一入口里；后续 owner 已经把两条能力拆开推进，因此“completion / merge / retirement 全链一次性落地”不再是当前 owner 的真实承诺。`
+- stale_statement:
+  - `把 completion / merge / retirement 全链门禁与 project-scoped network proxy capability 继续当成同一个 earliest owner 的已承诺范围。`
+- canonical_truth:
+  - `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+- deferred_scope:
+  - `retirement auto-check / cleanup followthrough gate 是 follow-on owner scope；即使后续已有独立 owner，也不应回写成最早 pretests gate owner 已完成范围。`
+  - `network proxy capability 仍由独立 owner 继续推进，不能把其未完成面误报成 pre-tests gate regression。`
+- follow_on_owner:
+  - `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- reconcile_note: `此条仍保留原始愿景的产品化价值，但后续评审必须按拆分后的 owner 边界判断“已完成”“deferred”“另案推进”，而不是拿混合入口去要求单一 owner 覆盖全部能力。`
