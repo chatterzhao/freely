@@ -54,7 +54,7 @@
    - 目标角色
    - dispatch metadata：`dispatch_priority`、`parallel_safe`、`write_scope`
    - ownership metadata：`intent_kind`、`intent_target`
-   - verification metadata：`Owner-Issue`、`Pre-Tests-Path`、`Verification-Artifact-Dir`、`Required-Test-Lanes`、`Required-Acceptance-Item-Ids`、`Minimum-Evidence-Level`、`Target-Environment`、`Closeout-Gate`
+   - verification metadata：`Owner-Issue`、`Pre-Tests-Path`、`Verification-Artifact-Dir`、`Required-Test-Lanes`、`Required-Acceptance-Item-Ids`、`Minimum-Evidence-Level`、`Target-Environment`、`Closeout-Gate`、`Closeout-Gate-Command`、`Closeout-Target-Lane`、`Closeout-Promotion-Gate`、`Closeout-Requires-Adequacy`、`Closeout-Review-Artifact-Policy`
    - 上述 verification metadata 不是只给人看的提示语；runtime 会在消费 worker prompt 时把它结构化写入 launch intake 与 worker runtime state，供恢复、review 与 gate 继续消费
    - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
    - 一旦 `ownership + restart_point + next_action` 已经稳定，优先产出具体 worker handoff；不要继续停留在 manager-only patrol
@@ -98,7 +98,7 @@
    - handoff still pending after failure boundary
    - 若本轮已生成新的 worker prompt set，还要保证 watchdog/runtime 后续能以最新 continuity 为基准继续消费，而不是停留在旧 consumed snapshot
    - 每个 worker prompt 除了任务正文外，还必须包含 machine-readable `Worktree:` 与 `Branch:` header；runtime worker launch 依赖这两个 header（或其兼容句式）解析目标工位
-   - 若当前 lane 带 verification 义务，worker prompt 还必须显式携带：`Owner-Issue`、`Pre-Tests-Path`、`Verification-Artifact-Dir`、`Required-Test-Lanes`、`Required-Acceptance-Item-Ids`、`Minimum-Evidence-Level`、`Target-Environment`、`Closeout-Gate`
+   - 若当前 lane 带 verification 义务，worker prompt 还必须显式携带：`Owner-Issue`、`Pre-Tests-Path`、`Verification-Artifact-Dir`、`Required-Test-Lanes`、`Required-Acceptance-Item-Ids`、`Minimum-Evidence-Level`、`Target-Environment`、`Closeout-Gate`、`Closeout-Gate-Command`、`Closeout-Target-Lane`、`Closeout-Promotion-Gate`、`Closeout-Requires-Adequacy`、`Closeout-Review-Artifact-Policy`
    - `Required-Test-Lanes` / `Required-Acceptance-Item-Ids` 不得只写“见 issue”；必须在 prompt 内给出 machine-readable 列表，便于 runtime / review / merge gate 恢复本轮最低测试义务
    - 若这些字段缺失或不完整，runtime 仍会把缺口 machine-readably 暴露在 worker verification contract state 中；主管不应假定 launch 后缺口会自动消失
    - `Worktree:` header 只是输入锚点，不是最终 ownership 判重键；凡是进入 `write_scope`、`intent_target`、queue/freeze 或 recovery 比较的 worktree 路径，都必须先 canonicalize 成真实路径（例如 `pwd -P` / runtime normalized path）
