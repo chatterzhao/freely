@@ -31,8 +31,8 @@
 - testing layer: `real_environment`
 - target environment: `local gate boundary`
 - required evidence: `lawful replacement evidence recorded in verification artifact`
-- blocker taxonomy: `protected_environment_only`
-- not_applicable_reason: `no_distinct_real_environment_boundary`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
 - not_applicable_explanation: `The executable surface is the local gate and merge-governance path, not an additional hosted runtime environment.`
 - replacement_evidence: `Focused gate regressions and compatibility captures are sufficient for this bounded schema owner.`
 
@@ -41,20 +41,35 @@
 ### Freeze adequacy item v2 schema
 - id: `adequacy-item-schema-v2`
 - requirement: `The owner freezes richer adequacy metadata while preserving the existing five required fields.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `Freeze adequacy item schema v2 and keep the new fields optional for untouched legacy owners.`
+- case_design: `Use the feature-lane verification review to prove the same Acceptance Item now carries adequacy-v2 metadata without regressing legacy parsing.`
 - evidence_level: `integration`
-- status: `pending`
-- artifact_ref: `pending://pretests-adequacy-schema-verification`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
 
 ### Classify insufficient versus sufficient
 - id: `adequacy-classification-diagnostics`
 - requirement: `Gate diagnostics distinguish not-run, run-but-insufficient, and sufficient-with-evidence.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `Add focused regressions that differentiate missing adequacy-v2 coverage, insufficient evidence level, and stale artifact reuse.`
+- case_design: `Replay standalone and guarded gate fixtures that each fail for a different adequacy reason, then confirm the final feature-lane verification artifact records the distinct verdicts.`
 - evidence_level: `integration`
-- status: `pending`
-- artifact_ref: `pending://pretests-adequacy-schema-verification`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
 
 ### Preserve legacy compatibility
 - id: `legacy-owner-compatibility`
 - requirement: `Legacy owners remain compatible until phase policy explicitly hardens selected fields.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `Keep legacy owners on the compatibility path while hardening new-owner and develop-bound adequacy checks.`
+- case_design: `Retain an unchanged legacy fixture in gate tests while a new-owner fixture opts into adequacy-v2 and guarded develop promote enforcement.`
 - evidence_level: `integration`
-- status: `pending`
-- artifact_ref: `pending://pretests-adequacy-schema-verification`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`

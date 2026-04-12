@@ -50,17 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260411-1415-A`
-- title: Pre-tests adequacy item schema materialization governance
-- milestone_state: committed
-- phase_state: `in_ibm`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260411-1415--pretests-adequacy-item-schema-materialization/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260411-1415--pretests-adequacy-item-schema-materialization/candidates.md`
-- next_action: Finish IBM materialization for schema v2 and phased enforcement, then implement bounded gate changes without widening into launch hard gate or retirement enforcement.
-- revisit_trigger: Re-scope only if compatibility policy or doc-skill adoption proves inseparable from gate enforcement.
-
 ### candidate_issues
 
 1. `C-20260411-1415-A`
@@ -425,6 +414,23 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260411-1415-A`
+- title: Pre-tests adequacy item schema materialization governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-pretests-adequacy-item-schema-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-1415--pretests-adequacy-item-schema-materialization/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-1415--pretests-adequacy-item-schema-materialization/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+  - `./bin/governance-check`
+- completion_note: `Adequacy-v2 schema, guarded develop promote sufficiency, and owner-scoped staged review freshness are all closed in the feature lane. Replay to canonical develop is the next step; this lane no longer needs more implementation work.`
 1. `I-20260408-0231-A`
 - title: Runtime concurrent start-stop followthrough governance
 - milestone_state: completed

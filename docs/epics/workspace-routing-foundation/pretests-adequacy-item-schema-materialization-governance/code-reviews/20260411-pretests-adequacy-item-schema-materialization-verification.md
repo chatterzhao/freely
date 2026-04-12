@@ -1,0 +1,29 @@
+# Verification: pretests-adequacy-item-schema-materialization-governance
+
+- issue_id: `I-20260411-1415-A`
+- issue_path: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+- verification_date: `2026-04-11`
+- verifier: `codex`
+
+## Scope Verdict
+
+- `PASS`: `pretests-gate` now requires at least one adequacy-v2 Acceptance Item for the targeted lane/gate pair instead of letting develop-bound adequacy pass with legacy-only items.
+- `PASS`: staged `test-pre-merge-* -> develop` promote now requires a fresh staged review artifact under the owner-bound `verification_artifact_dir`, so reused committed artifacts no longer satisfy guarded completion.
+- `PASS`: `governance-merge-gate` now rejects overly broad `verification_artifact_dir` values and only accepts canonical `docs/epics/.../code-reviews` ownership.
+- `PASS`: IBM/doc truth now teaches new owners to write adequacy-v2 fields instead of leaving schema uptake implicit.
+- `PASS`: the guarded `pre-merge-commit` hook path was replayed end-to-end, including the docs-only promote case where owner `pre-tests.md` stays pending until adequacy evidence is staged.
+
+## Commands
+
+1. `bash docs/system/workspace/scripts/tests/test-pretests-gate`
+2. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+3. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+4. `./bin/governance-check`
+
+## Implementation Decision Note
+
+- decision: `Materialize adequacy-v2 as issue-owned Acceptance Item metadata and make guarded develop promote consume it directly, rather than inferring sufficiency from generic pass items or review-path heuristics.`
+- why_this: `The observed gate miss was not that pre-tests existed in the abstract, but that develop-bound promote could still pass without a machine-readable statement of which lane/gate pair had been sufficiently covered by fresh owner-scoped evidence.`
+- alternatives_considered: `Keep adequacy semantics in prose only; trust any artifact-backed pass item; allow broad verification directories; leave hook coverage on the old fixture shape.`
+- boundary_non_goals: `This owner does not harden launch-time verification contract enforcement, cleanup/retirement gates, or force a warehouse-wide migration of historical pre-tests.`
+- residual_risk: `Older owners still rely on legacy compatibility until they adopt adequacy-v2 fields, and ambiguous non-staged issue scans remain a lower-priority follow-on if future evidence shows they distort operator workflow.`

@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260411-1415-A`
 - title: Pre-tests adequacy item schema materialization governance
-- phase_state: `in_ibm`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `pretests-adequacy-item-schema-materialization-governance`
@@ -51,7 +51,35 @@
   - `docs/system/workspace/scripts/quality/governance-merge-gate`
   - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
 
+## Completion
+
+- `docs/pre-brainstorms/20260411-1415--pretests-adequacy-item-schema-materialization/candidates.md`
+- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/brainstorms/b-pretests-adequacy-item-schema-materialization-governance.md`
+- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/prd.md`
+- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/pre-tests.md`
+- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/tasks.md`
+- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
+- `docs/progress/workspace-routing-foundation/p-pretests-adequacy-item-schema-materialization-governance.md`
+- `docs/system/workspace/scripts/quality/pretests-gate`
+- `docs/system/workspace/scripts/quality/governance-merge-gate`
+- `docs/system/workspace/scripts/tests/test-pretests-gate`
+- `docs/system/workspace/scripts/tests/test-governance-merge-gate`
+- `docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+- `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
+- `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
+- `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
+- `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
+
+## Verification
+
+- `bash docs/system/workspace/scripts/tests/test-pretests-gate`
+- `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+- `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+- `./bin/governance-check`
+- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
+
 ## Next
 
-1. next_action: `finish IBM materialization and implement schema v2 plus phased gate enforcement`
-2. revisit_trigger: 若 phased enforcement 证明必须把 skill/doc update 与 gate enforcement 拆分成两个 owner。
+1. next_action: `Replay this completed feature lane through guarded premerge promotion into develop, then retire the dedicated worktree and temporary premerge batch.`
+2. revisit_trigger: Re-open only if guarded promote still allows a develop-bound owner to pass without adequacy-v2 coverage, fresh staged review evidence, or scoped verification directories.
