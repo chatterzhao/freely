@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260412-0225--structured-closeout-gate-and-fresh-review-evidence
+  - brainstorms: docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/candidates.md
 - 20260411-1415--pretests-adequacy-item-schema-materialization
   - brainstorms: docs/pre-brainstorms/20260411-1415--pretests-adequacy-item-schema-materialization/brainstorms.md
   - candidates: docs/pre-brainstorms/20260411-1415--pretests-adequacy-item-schema-materialization/candidates.md

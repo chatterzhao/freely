@@ -1054,7 +1054,7 @@ def main() -> int:
             owner_reviews = [review for review in review_records if review.path.startswith(f"{normalized_dir}/")]
             if not owner_reviews:
                 errors.append(
-                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} owns implementation-bearing changes, but no staged review artifact was added under {verification_dir}. "
+                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} owns implementation-bearing changes, but no fresh staged owner review artifact was added under {verification_dir}. "
                     f"Stage an issue-bound review/verification artifact there and record the implementation decision note."
                 )
                 continue

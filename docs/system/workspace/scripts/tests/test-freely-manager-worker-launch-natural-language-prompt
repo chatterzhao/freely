@@ -91,6 +91,16 @@ Target-Environment:
 - \`test-pre-merge-sample\`
 Closeout-Gate:
 - \`pretests-gate --require-adequacy\`
+Closeout-Gate-Command:
+- \`pretests-gate --require-adequacy\`
+Closeout-Target-Lane:
+- \`premerge-integration\`
+Closeout-Promotion-Gate:
+- \`develop_merge\`
+Closeout-Requires-Adequacy:
+- \`true\`
+Closeout-Review-Artifact-Policy:
+- \`fresh-staged-owner-review-artifact\`
 
 You are the worker for \`feature/test-worker\` in \`$WORKER_WT\`.
 
@@ -154,12 +164,22 @@ grep -q "^LAST_MANAGER_WORKER_PROMPTS_CONSUMED=\"$PROMPT_FILE\"$" "$PROJECT/.fre
 [[ "$(worker_prompt_minimum_evidence_level "$PROMPT_FILE")" == "command-plus-artifact" ]]
 [[ "$(worker_prompt_target_environment "$PROMPT_FILE")" == "test-pre-merge-sample" ]]
 [[ "$(worker_prompt_closeout_gate "$PROMPT_FILE")" == "pretests-gate --require-adequacy" ]]
+[[ "$(worker_prompt_closeout_gate_command "$PROMPT_FILE")" == "pretests-gate --require-adequacy" ]]
+[[ "$(worker_prompt_closeout_target_lane "$PROMPT_FILE")" == "premerge-integration" ]]
+[[ "$(worker_prompt_closeout_promotion_gate "$PROMPT_FILE")" == "develop_merge" ]]
+[[ "$(worker_prompt_closeout_requires_adequacy "$PROMPT_FILE")" == "true" ]]
+[[ "$(worker_prompt_closeout_review_artifact_policy "$PROMPT_FILE")" == "fresh-staged-owner-review-artifact" ]]
 grep -q '^VERIFICATION_METADATA_PRESENT="true"$' "$INTAKE_CONTRACT"
 grep -q '^OWNER_ISSUE="I-20260322-0000-A"$' "$INTAKE_CONTRACT"
 grep -q '^PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"$' "$INTAKE_CONTRACT"
 grep -q '^REQUIRED_TEST_LANES_CSV="feature-local,premerge-integration"$' "$INTAKE_CONTRACT"
 grep -q '^REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="integration-cli-smoke,realenv-dogfood"$' "$INTAKE_CONTRACT"
 grep -q '^CLOSEOUT_GATE="pretests-gate --require-adequacy"$' "$INTAKE_CONTRACT"
+grep -q '^CLOSEOUT_GATE_COMMAND="pretests-gate --require-adequacy"$' "$INTAKE_CONTRACT"
+grep -q '^CLOSEOUT_TARGET_LANE="premerge-integration"$' "$INTAKE_CONTRACT"
+grep -q '^CLOSEOUT_PROMOTION_GATE="develop_merge"$' "$INTAKE_CONTRACT"
+grep -q '^CLOSEOUT_REQUIRES_ADEQUACY="true"$' "$INTAKE_CONTRACT"
+grep -q '^CLOSEOUT_REVIEW_ARTIFACT_POLICY="fresh-staged-owner-review-artifact"$' "$INTAKE_CONTRACT"
 grep -q "^SOURCE_INTAKE_ID=\"$INTAKE_ID\"$" "$RUNTIME_CONTRACT"
 grep -q '^VERIFICATION_METADATA_PRESENT="true"$' "$RUNTIME_CONTRACT"
 grep -q '^OWNER_ISSUE="I-20260322-0000-A"$' "$RUNTIME_CONTRACT"
@@ -169,5 +189,10 @@ grep -q '^LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"$' "$
 grep -q '^LAST_WORKER_REQUIRED_TEST_LANES_CSV="feature-local,premerge-integration"$' "$WORKER_WT/.freely/run/workcell-state.env"
 grep -q '^LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="integration-cli-smoke,realenv-dogfood"$' "$WORKER_WT/.freely/run/workcell-state.env"
 grep -q '^LAST_WORKER_CLOSEOUT_GATE="pretests-gate --require-adequacy"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate --require-adequacy"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_TARGET_LANE="premerge-integration"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_PROMOTION_GATE="develop_merge"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="true"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="fresh-staged-owner-review-artifact"$' "$WORKER_WT/.freely/run/workcell-state.env"
 
 echo "[PASS] manager launch linkage accepts natural-language worker prompt contract"

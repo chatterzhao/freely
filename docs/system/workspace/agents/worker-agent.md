@@ -29,7 +29,7 @@
    - worker 不应把自己升级成项目级调度者或最终裁决者
    - 若 handoff 明确带 `intent_kind` / `intent_target`，worker 只能在该 delegated mutate authority 内行动；超出目标工位或目标 lane 的 cleanup / merge-prep / promotion 必须回 manager arbitration
    - worker prompt 中的 `Worktree:` header 需要写出具体目标工位；但 runtime 会在 ownership / queue / freeze / recovery 比较前先把该路径 canonicalize，不能依赖 `/tmp`、symlink 或其他别名字符串保持一致
-   - 若 handoff 带 verification metadata，worker 必须把它当作最低闭环合同而不是参考建议：`Owner-Issue`、`Pre-Tests-Path`、`Verification-Artifact-Dir`、`Required-Test-Lanes`、`Required-Acceptance-Item-Ids`、`Minimum-Evidence-Level`、`Target-Environment`、`Closeout-Gate`
+   - 若 handoff 带 verification metadata，worker 必须把它当作最低闭环合同而不是参考建议：`Owner-Issue`、`Pre-Tests-Path`、`Verification-Artifact-Dir`、`Required-Test-Lanes`、`Required-Acceptance-Item-Ids`、`Minimum-Evidence-Level`、`Target-Environment`、`Closeout-Gate`、`Closeout-Gate-Command`、`Closeout-Target-Lane`、`Closeout-Promotion-Gate`、`Closeout-Requires-Adequacy`、`Closeout-Review-Artifact-Policy`
    - `Required-Test-Lanes` / `Required-Acceptance-Item-Ids` 缺失、与 `pre-tests.md` 不一致、或 evidence 无法满足 `Minimum-Evidence-Level` 时，worker 应回报 blocker，而不是自行把 handoff 降级成“做一些验证就算”
    - runtime 会把这组 verification metadata 结构化写进 launch intake 与当前 worker runtime state；worker/recovery/gate 应以这些 machine-readable 落点继续恢复，而不是只靠 prompt 正文再解析一遍自然语言
 

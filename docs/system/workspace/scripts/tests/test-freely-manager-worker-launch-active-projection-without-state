@@ -96,6 +96,16 @@ Target-Environment:
 - \`develop\`
 Closeout-Gate:
 - \`owner-issue verification closeout\`
+Closeout-Gate-Command:
+- \`owner-issue verification closeout\`
+Closeout-Target-Lane:
+- \`post-merge-followthrough\`
+Closeout-Promotion-Gate:
+- \`completion\`
+Closeout-Requires-Adequacy:
+- \`false\`
+Closeout-Review-Artifact-Policy:
+- \`none\`
 EOF
 
 CONT_FILE="$PROJECT/.freely/run/manager-continuity-20260322-0412.md"
@@ -144,6 +154,7 @@ LAUNCHED="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
 grep -q '^DESIRED_RUNTIME_STATE="unknown"$' "$WORKER_WT/.freely/run/workcell-state.env"
 grep -q '^LAST_WORKER_VERIFICATION_METADATA_PRESENT="true"$' "$WORKER_WT/.freely/run/workcell-state.env"
 grep -q '^LAST_WORKER_OWNER_ISSUE="I-20260408-1205-A"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_GATE_COMMAND="owner-issue verification closeout"$' "$WORKER_WT/.freely/run/workcell-state.env"
 grep -q "$WORKER_WT|" "$REENTRY_LOG"
 [[ ! -f "$START_LOG" ]]
 

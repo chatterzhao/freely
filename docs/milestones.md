@@ -50,6 +50,17 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260412-0225-A`
+- title: Structured closeout gate context and fresh review evidence governance
+- milestone_state: committed
+- phase_state: `in_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/candidates.md`
+- next_action: Finish IBM materialization around structured closeout lane/gate/evidence fields, then enter one bounded dev-loop lane touching runtime state, cleanup replay, and gate messaging without widening into new test orchestration.
+- revisit_trigger: Re-scope only if IBM shows the structured closeout fields must be split into separate runtime-state and merge-policy owners.
+
 1. `I-20260411-1417-A`
 - title: Stale pre-brainstorm truth reconcile governance
 - milestone_state: committed
@@ -147,6 +158,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/candidates.md`
 - next_action: Candidate mirror only. `I-20260408-1205-A` is now the canonical owner for verification contract and premerge adequacy governance.
 - revisit_trigger: Re-open only if canonical replay shows the bounded owner should be split into separate handoff-contract and gate-consumption lanes.
+1. `C-20260412-0225-A`
+- title: Structured closeout gate context and fresh review evidence governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/candidates.md`
+- next_action: Candidate mirror only. `I-20260412-0225-A` is now the canonical owner for structured closeout lane/gate/evidence policy followthrough.
+- revisit_trigger: Re-open only if canonical replay proves these structured closeout fields can be absorbed without scope drift by an existing verification-contract or review-artifact owner.
 1. `C-20260408-1200-A`
 - title: Freeze develop push urgency and upstream-resync escalation after protected-branch merge
 - milestone_state: candidate

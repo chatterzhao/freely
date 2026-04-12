@@ -137,6 +137,9 @@ cat >"$WT/.freely/run/workcell-state.env" <<'EOF'
 LAST_WORKER_OWNER_ISSUE="I-sample"
 LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
 LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="none"
 EOF
 
 INTAKE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake chat --project "$PROJECT" --author cleanup-worker --channel runtime --message "cleanup followthrough")"
@@ -225,6 +228,9 @@ cat >"$GATE_WT/.freely/run/workcell-state.env" <<'EOF'
 LAST_WORKER_OWNER_ISSUE="I-sample"
 LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
 LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="none"
 EOF
 mkdir -p "$PROJECT/bin"
 cp "$ROOT_DIR/bin/pretests-retirement-gate" "$PROJECT/bin/pretests-retirement-gate"

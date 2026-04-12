@@ -94,6 +94,16 @@ Target-Environment:
 - \`feature/test-worker\`
 Closeout-Gate:
 - \`owner-issue verification closeout\`
+Closeout-Gate-Command:
+- \`owner-issue verification closeout\`
+Closeout-Target-Lane:
+- \`post-merge-followthrough\`
+Closeout-Promotion-Gate:
+- \`completion\`
+Closeout-Requires-Adequacy:
+- \`false\`
+Closeout-Review-Artifact-Policy:
+- \`none\`
 
 你现在运行在 Freely 的 worker 工位，不是主管工位。
 
