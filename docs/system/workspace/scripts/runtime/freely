@@ -8484,17 +8484,31 @@ cleanup_followthrough_remote_name() {
   git -C "$project" remote | sed -n '1p'
 }
 
+cleanup_followthrough_pretests_gate_bin() {
+  local project="$1"
+  local project_gate runtime_root runtime_gate
+  project_gate="$project/bin/pretests-retirement-gate"
+  if [[ -e "$project_gate" ]]; then
+    printf '%s\n' "$project_gate"
+    return 0
+  fi
+  runtime_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+  runtime_gate="$runtime_root/bin/pretests-retirement-gate"
+  printf '%s\n' "$runtime_gate"
+}
+
 run_cleanup_followthrough() {
   local project="$1" intake_id="$2" classification="$3" reaction="$4" why_text="$5" handoff_text="$6"
   local resolution_file blocked_reason cleaned retained wt_path branch dirty supervisor ai
   local remote_name remote_fetch_state remote_note remote_ref
-  local resolution_status absorption_target linked_artifact next_restart_point next_ownership next_handoff ownership_claim local_intent_signature ownership_state ownership_branch ownership_ref ownership_status local_intent_status
+  local resolution_status absorption_target linked_artifact next_restart_point next_ownership next_handoff ownership_claim local_intent_signature ownership_state ownership_branch ownership_ref ownership_status local_intent_status pretests_retirement_gate pretests_output pretests_reason
   blocked_reason=""
   cleaned=""
   retained=""
   next_restart_point=""
   next_ownership=""
   next_handoff=""
+  pretests_retirement_gate="$(cleanup_followthrough_pretests_gate_bin "$project")"
   remote_name="$(cleanup_followthrough_remote_name "$project")"
   if [[ -n "$remote_name" ]]; then
     if git -C "$project" fetch "$remote_name" --prune >/dev/null 2>&1; then
@@ -8548,6 +8562,17 @@ run_cleanup_followthrough() {
     fi
     if ([[ -n "$supervisor" ]] && kill -0 "$supervisor" 2>/dev/null) || ([[ -n "$ai" ]] && kill -0 "$ai" 2>/dev/null); then
       retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (runtime-active)"
+      continue
+    fi
+    if [[ ! -x "$pretests_retirement_gate" ]]; then
+      retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (pretests-retirement-gate-unavailable:${pretests_retirement_gate})"
+      blocked_reason="${blocked_reason:-pretests_retirement_gate_unavailable}"
+      continue
+    fi
+    if ! pretests_output="$("$pretests_retirement_gate" --project "$project" --worktree-path "$wt_path" 2>&1)"; then
+      pretests_reason="$(printf '%s\n' "$pretests_output" | tr '\n' ';' | sed 's/;*$//' | sed 's/[[:space:]]\+/ /g')"
+      retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (pretests-retirement-blocked:${pretests_reason})"
+      blocked_reason="${blocked_reason:-pretests_retirement_blocked}"
       continue
     fi
     remote_note="not-configured"
