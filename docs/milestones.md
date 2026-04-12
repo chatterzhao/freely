@@ -147,6 +147,16 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/candidates.md`
 - next_action: Candidate mirror only. `I-20260408-1205-A` is now the canonical owner for verification contract and premerge adequacy governance.
 - revisit_trigger: Re-open only if canonical replay shows the bounded owner should be split into separate handoff-contract and gate-consumption lanes.
+1. `C-20260412-0225-A`
+- title: Structured closeout gate context and fresh review evidence governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260412-0225--structured-closeout-gate-and-fresh-review-evidence/candidates.md`
+- next_action: Finish the overlap audit against the completed verification-contract, review-artifact, and cleanup owners, then materialize a narrow follow-on owner only if structured closeout lane/gate/evidence fields cannot be absorbed without scope drift.
+- revisit_trigger: Revisit when another guarded develop merge still blocks because lane/gate adequacy exists in owner pre-tests but the runtime state and operator guidance cannot recover the fresh staged owner-review evidence requirement early enough.
 1. `C-20260408-1200-A`
 - title: Freeze develop push urgency and upstream-resync escalation after protected-branch merge
 - milestone_state: candidate
