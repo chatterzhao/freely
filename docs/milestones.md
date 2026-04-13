@@ -50,6 +50,29 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260413-1640-A`
+- title: Tasks closeout completion and adequacy gate governance
+- milestone_state: candidate
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-tasks-closeout-completion-and-adequacy-gate-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/candidates.md`
+- follow_on_to: `I-20260412-0225-A`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
+  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-tasks-closeout-completion-and-adequacy-gate-governance.md`
+  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
+  - `bash -n docs/system/workspace/scripts/quality/pretests-gate`
+  - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+- completion_note: Current feature lane now binds owner `tasks.md` into completion and guarded adequacy checks inside `pretests-gate`; the remaining closeout step is the guarded upstream merge that lands this already-bounded repair on canonical `develop`.
+
 1. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
 - milestone_state: candidate
@@ -74,6 +97,17 @@ routing_policy:
 - completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
 ### candidate_issues
+
+1. `C-20260413-1640-A`
+- title: Tasks closeout completion and adequacy gate governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/candidates.md`
+- next_action: Candidate mirror only. `I-20260413-1640-A` is now the canonical owner for binding sibling `tasks.md` closeout completeness into `pretests-gate` completion and guarded adequacy decisions.
+- revisit_trigger: Re-open only if future closeout policy needs a broader execution ledger than owner-bound `tasks.md`, or if delegated develop-bound replay proves this gate can still be bypassed.
 
 1. `C-20260413-0208-A`
 - title: Foreground/background runtime entrypoint semantics governance
