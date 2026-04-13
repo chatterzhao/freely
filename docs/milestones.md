@@ -73,24 +73,6 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
-1. `I-20260412-1845-A`
-- title: Runtime forensic time alignment and stall recovery observability governance
-- milestone_state: candidate
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260412-1845--runtime-forensic-time-alignment-and-stall-observability/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260412-1845--runtime-forensic-time-alignment-and-stall-observability/candidates.md`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery`
-  - `bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`
-  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
-  - `./bin/governance-check`
-  - `git diff --check`
-- completion_note: `Feature implementation and focused verification are complete in the dedicated feature worktree; the remaining closeout is guarded promotion to canonical develop.`
-
 ### candidate_issues
 
 1. `C-20260412-1721-A`
@@ -506,6 +488,28 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260412-1845-A`
+- title: Runtime forensic time alignment and stall recovery observability governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260412-1845--runtime-forensic-time-alignment-and-stall-observability/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260412-1845--runtime-forensic-time-alignment-and-stall-observability/candidates.md`
+- evidence:
+  - `develop` merge `480d839a`
+  - `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-closeout-verification.md`
+  - `docs/progress/workspace-routing-foundation/p-runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery`
+  - `bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
+  - `./bin/governance-check`
+  - `git diff --check`
+- completion_note: `Canonical develop absorbed the bounded runtime forensic-alignment and stall-observability repair through merge 480d839a; this closeout lane only realigns issue/progress/milestone truth so future cross-plane observability work reopens as a new owner on current develop.`
 
 1. `I-20260412-1721-A`
 - title: Develop push attempt followthrough governance
