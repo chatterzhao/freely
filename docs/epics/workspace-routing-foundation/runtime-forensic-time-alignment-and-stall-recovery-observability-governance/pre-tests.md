@@ -7,7 +7,7 @@
 - target environment: `feature/fix-manager-continuity-gap-20260412`
 - required evidence: `focused runtime regression coverage at the shell integration boundary`
 - blocker taxonomy: `execution_pending_or_failed`
-- not_applicable_reason: `shell_runtime_boundary`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
 - not_applicable_explanation: `The repaired behavior lives in the runtime shell entrypoint and stop/recovery orchestration rather than a separately importable unit seam.`
 - replacement_evidence: `The focused runtime regressions in Integration cover the exact repaired control-flow boundaries.`
 
@@ -47,6 +47,8 @@
 - target environment: `develop`
 - required evidence: `post-merge followthrough on canonical develop runtime surfaces`
 - blocker taxonomy: `execution_pending_or_failed`
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; canonical develop followthrough remains the post-merge acceptance surface for this owner.`
 - not_applicable_reason: `post_merge_only`
 - not_applicable_explanation: `Real-environment verification for this owner only becomes lawful after guarded promote into canonical develop.`
 - replacement_evidence: `Feature-lane focused regressions plus premerge-integration evidence establish merge readiness.`
