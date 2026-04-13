@@ -77,6 +77,7 @@ The root-cause packet is already canonically split. This owner is the bounded ex
 
 - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-implementation-decision.md`
 - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
+- `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`
 - `bash docs/system/workspace/scripts/tests/test-freely-fake-supervisor-argv-does-not-validate`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-ignores-fake-supervisor-argv`
 - `bash docs/system/workspace/scripts/tests/test-freely-start-serializes-same-project-concurrent-starts`
@@ -96,6 +97,7 @@ The root-cause packet is already canonically split. This owner is the bounded ex
 - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/tasks.md`
 - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-implementation-decision.md`
 - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
+- `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-startup-authority-and-readiness-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
