@@ -8,6 +8,53 @@
 
 ## Candidates
 
+### C-20260413-0420-C
+
+- candidate_format_version: `v2`
+- title: `Runtime startup root-cause packet governance`
+- research_only: `false`
+- implementation_ready: `true`
+- status: `promoted`
+- milestone: `M-20260306-workspace-routing-foundation`
+- priority: `P0`
+- promoted_issue_id: `I-20260413-0420-C`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md`
+- execution_base: `develop`
+- integration_target: `develop`
+- depends_on:
+  - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+  - `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+- problem: The root-cause review is now strong enough to split into a promote-ready startup-authority lane and a still-research manager-handoff lane, but canonical `develop` cannot absorb candidate-only truth without a concrete owner package that records the split and its boundaries.
+- why_now:
+  - guarded develop replay already proved the current packet is blocked for lacking concrete owner truth rather than lacking more brainstorming
+  - the split itself is bounded and documentation-only, so it should land now instead of keeping canonical routing behind a disposable feature branch
+  - materializing this packet on `develop` keeps startup-authority implementation and manager-handoff follow-on cleanly separated before either dev-loop begins
+- acceptance_criteria:
+  - canonical `develop` records that `C-20260413-0420-A` is the promote-ready startup-authority owner boundary
+  - canonical `develop` records that `C-20260413-0420-B` remains visible as follow-on research for the manager-handoff contract
+  - the packet lands as a concrete issue/progress/review owner instead of candidate-only truth
+  - the owner does not claim runtime authority/readiness or manager continuity implementation is already fixed
+- promotion_gate:
+  - keep scope on packet split, milestone routing, and guarded-promote sufficiency for this documentation-only owner
+  - do not materialize `C-20260413-0420-A` into an implementation issue from this worktree
+  - do not claim success for fake-supervisor, daemon-ready, or continuity behavior beyond documenting the root-cause split and next owner boundaries
+- open_questions:
+  - whether the future startup-authority implementation should carry daemon parity in the same owner or split again after launch-truth design freezes
+  - whether the future manager-handoff owner should require a launch-bound stub artifact or another `manager_ready` truth surface
+- acceptance_reviews:
+  - reviewer: `codex`
+    mode: `author-review`
+    summary: `The pre-brainstorm analysis is mature enough that canonical develop should absorb the split itself now, but the actual runtime and continuity repairs still belong in later bounded owners.`
+    verdict: `ready_for_issue_materialization`
+- next_action: Materialize the packet as `I-20260413-0420-C`, run the bounded doc/governance verification path, guarded-promote the packet to `develop`, and then retire the temporary feature and premerge worktrees.
+- revisit_trigger: Revisit only if guarded promote still says the packet lacks a concrete owner after issue/progress/review truth and develop-merge adequacy are present, or if a later implementation lane proves the split itself should be redrawn.
+- decision_reason: `This owner exists only to canonically record the root-cause split and its routing. It intentionally stops before runtime implementation so startup authority and manager handoff can each reopen under their own bounded owners.`
+- session_refs:
+  - tool: `codex`
+    session_id: `current-thread`
+    jsonl_path: `unavailable://codex-thread-only`
+    role: `author`
+
 ### C-20260413-0420-A
 
 - candidate_format_version: `v2`
