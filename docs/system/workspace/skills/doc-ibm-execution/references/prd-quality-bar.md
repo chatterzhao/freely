@@ -64,10 +64,11 @@
 - `pre-tests.md` 能直接表达 issue-level acceptance，且默认以 smoke / integration / regression / non-goals 这类行为视角组织
 - `pre-tests.md` 至少固定 `Unit`、`Integration`、`End-to-End`、`Real-Environment` 四个章节；不适用时不得缺章
 - `pre-tests.md` 能恢复每个关键 acceptance 面的 `environment`、`evidence`、`failure signal`、`failure handling / replay expectation`
-- 若某章节不适用，`pre-tests.md` 必须写 `not_applicable_reason`、`not_applicable_explanation` 与必要的 `replacement_evidence`
+- `Unit`、`Integration`、`End-to-End` 三章若不适用，`pre-tests.md` 必须写 `not_applicable_reason`、`not_applicable_explanation` 与必要的 `replacement_evidence`
+- `Real-Environment` 章节必须固定写 `real_environment_status` 与 `real_environment_reason`，用于总结本次实现需要的真实环境测试是否已达标，或是否根本不需要真实环境测试
 - 对 Freely 自治能力，`pre-tests.md` 默认不能缺少 integration / application-native real-environment / end-to-end dogfood 这些 post-merge 验收面；若缺少，必须显式写明不适用理由与替代证据
-- 若当前 issue 是 auth/switch/startup-recovery/watchdog family 的 follow-on owner，`pre-tests.md` 不得把 `End-to-End` 与 `Real-Environment` 同时降成 `protected_environment_only`，除非 `Acceptance Items` 至少保留一条 artifact-backed 的 `real_env` 或 `post_merge_dogfood` 证据；对这类 owner，artifact 应优先覆盖真实 `bin/ai`、真实 `codex exec` 或真实 `freely start`
-- `pre-tests.md` 所需的 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy 能从 `prd.md` 推导出来
+- 若当前 issue 是 auth/switch/startup-recovery/watchdog family 的 follow-on owner，`Real-Environment` 不能只停在文字结论；`Acceptance Items` 至少保留一条 artifact-backed 的 `real_env` 或 `post_merge_dogfood` 证据；对这类 owner，artifact 应优先覆盖真实 `bin/ai`、真实 `codex exec` 或真实 `freely start`
+- `Unit`、`Integration`、`End-to-End` 三章所需的 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy 能从 `prd.md` 推导出来
 - 若 `pre-tests.md` 进入 adequacy v2，`surface_kind`、`target_lane`、`promotion_gate` 也应能从 `prd.md` 的 eval plan / execution slice 直接推导出来
 - `tasks.md` 能从 `prd.md` 的 decomposition / execution slices 派生，而不是与 PRD 脱节
 - AI 读取 `prd.md` 后，能回答：
@@ -85,7 +86,7 @@
 - `pre-tests.md` 与 `tasks.md` 需要额外聊天解释才能成立
 - `pre-tests.md` 主要还是 wording review / “读代码后再判断怎么测”，而不是先表达 acceptance 行为
 - `pre-tests.md` 缺少 `Unit`、`Integration`、`End-to-End`、`Real-Environment` 中的任一章节，或用自由发挥文本跳过某章节
-- auth/switch/startup-recovery/watchdog follow-on owner 把 `End-to-End` 与 `Real-Environment` 都写成 `protected_environment_only`，却没有留下 artifact-backed 的 `real_env` 或 `post_merge_dogfood` acceptance item，或留下的 artifact 仍回避真实 `bin/ai` / `codex exec` / `freely start`
+- auth/switch/startup-recovery/watchdog follow-on owner 把 `Real-Environment` 写成 `pass`，却没有留下 artifact-backed 的 `real_env` 或 `post_merge_dogfood` acceptance item，或留下的 artifact 仍回避真实 `bin/ai` / `codex exec` / `freely start`
 - `Eval Plan` 没有写 environment / evidence / failure signal，导致 merge 后该怎么验证无法恢复
 - `pre-tests.md` 的 blocker taxonomy 仍要靠聊天解释，无法区分定义不完整与执行失败
 - 没有写出 non-goals / non-negotiables

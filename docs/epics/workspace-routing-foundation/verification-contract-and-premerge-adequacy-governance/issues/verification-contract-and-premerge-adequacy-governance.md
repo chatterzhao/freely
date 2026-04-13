@@ -53,7 +53,8 @@ Freely 现在已经有测试真源，但没有形成闭环：
    - `Closeout-Gate`
 2. 冻结 `pre-tests.md` item-level contract，使系统能 machine-readably 判断：
    - 四个必备章节始终存在：`Unit`、`Integration`、`End-to-End`、`Real-Environment`
-   - 章节若不适用，必须写有限枚举的 `not_applicable_reason`
+   - `Unit`、`Integration`、`End-to-End` 章节若不适用，必须写有限枚举的 `not_applicable_reason`
+   - `Real-Environment` 固定写 `real_environment_status` 与 `real_environment_reason`
    - 测试项属于哪类 surface / lane / environment
    - 是否属于 promote 必跑项
    - 它来自哪些任务 / acceptance target
@@ -81,7 +82,7 @@ Freely 现在已经有测试真源，但没有形成闭环：
 2. Freely 真源明确：worker handoff 不能只写调度 metadata，必须带最小 verification contract 索引。
 3. Freely 真源明确：`test-pre-merge-* -> develop` 的 gate 是最后兜底，不代替测试设计，但必须能提示失败具体落在哪一层。
 4. Freely 真源明确：gate 至少能区分“没写测试任务”“没按任务设计测试用例”“没测”“没标记完成情况”这四类失败面。
-5. Freely 真源明确：`pre-tests.md` 必须显式包含 `Unit`、`Integration`、`End-to-End`、`Real-Environment` 四章；不适用只能使用有限 reason type 加短解释。
+5. Freely 真源明确：`pre-tests.md` 必须显式包含 `Unit`、`Integration`、`End-to-End`、`Real-Environment` 四章；前三章不适用只能使用有限 reason type 加短解释，`Real-Environment` 固定写最终审查结论。
 6. Freely 真源明确：premerge adequacy 不等于覆盖所有 post-merge surface；real-environment / dogfood 仍保留为独立 acceptance 面。
 
 ## IBM Handoff

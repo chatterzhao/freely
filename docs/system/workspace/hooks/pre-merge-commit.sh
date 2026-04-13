@@ -162,7 +162,7 @@ if [[ "$gate_rc" -ne 0 ]]; then
 
 $gate_output
 
-Fix the candidate -> milestone -> IBM issue chain in the source writable worktree, then rerun the guarded merge from the canonical lane.
+Fix the candidate -> milestone -> IBM issue chain in the source writable worktree, and make sure the owner pre-tests reflect real test work or lawful non-test waivers with traceable evidence before rerunning the guarded merge from the canonical lane. Do not clear this gate by only filling metadata.
 Only use break-glass if this failure matches docs/LAWS.md §2D and the merge can stay within merge_completion_only scope.
 Policy source: docs/LAWS.md §2C, §2D
 MSG

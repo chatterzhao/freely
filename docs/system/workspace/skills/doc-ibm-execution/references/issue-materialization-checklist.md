@@ -71,16 +71,22 @@ Issue front matter 还应显式绑定：
   - `Integration`
   - `End-to-End`
   - `Real-Environment`
-- 若当前 issue 是 follow-on owner，且 scope 触达 `auth switch / account switch / slot recovery / startup recovery / watchdog / freely start / bin/ai / codex exec` family，不得把 `End-to-End` 与 `Real-Environment` 同时写成 `protected_environment_only`
-- 若确实需要保留双豁免，`Acceptance Items` 至少保留一条：
-  - `evidence_level: real_env` 或 `post_merge_dogfood`
-  - `status: pass`
-  - `artifact_ref` 指向 repo 内可追溯 live artifact，且该 artifact 应能证明真实 `bin/ai` / `codex exec` / `freely start` 中至少一条命令链路被执行或观察
-- 若某类 acceptance 不适用，必须同时写出：
+- `Unit`、`Integration`、`End-to-End` 三章写测试任务本体；若某类 acceptance 不适用，必须同时写出：
   - `not_applicable_reason`
   - `not_applicable_explanation`
   - `replacement_evidence`
-- `not_applicable_reason` 只允许：
+- `Real-Environment` 章节固定只写：
+  - `real_environment_status`: `pass` 或 `fail`
+  - `real_environment_reason`: 必填
+- `real_environment_status=pass` 只允许表达两类真结论：
+  - 本次实现需要的真实环境测试已完成并达标
+  - 本次实现不需要真实环境测试
+- `real_environment_status=fail` 必须明确指出：哪些测试/实现面需要真实环境测试却还没做、没通过，或环境与恢复条件还不成立
+- 若当前 issue 是 follow-on owner，且 scope 触达 `auth switch / account switch / slot recovery / startup recovery / watchdog / freely start / bin/ai / codex exec` family，`Real-Environment` 章节不能只写结论就过；`Acceptance Items` 至少保留一条：
+  - `evidence_level: real_env` 或 `post_merge_dogfood`
+  - `status: pass`
+  - `artifact_ref` 指向 repo 内可追溯 live artifact，且该 artifact 应能证明真实 `bin/ai` / `codex exec` / `freely start` 中至少一条命令链路被执行或观察
+- 前三章的 `not_applicable_reason` 只允许：
   - `change_not_touching_this_layer`
   - `no_executable_boundary_at_this_layer`
   - `protected_environment_only`

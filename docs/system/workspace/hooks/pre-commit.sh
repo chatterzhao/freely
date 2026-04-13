@@ -170,7 +170,7 @@ MSG
 
 $pretests_output
 
-Keep the issue in a non-completed phase until its bound pre-tests acceptance items are passed and artifact-backed.
+Keep the issue in a non-completed phase until its bound pre-tests acceptance items are backed by real test execution, lawful non-test waivers, and traceable evidence. Do not clear this gate by only filling metadata.
 Policy source: docs/LAWS.md §2D
 MSG
       exit "$pretests_rc"

@@ -96,14 +96,8 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
 
 ## Real-Environment
-- acceptance target: `Reserve protected real-environment followthrough for post-merge validation.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `post-merge protected verification`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
-- replacement_evidence: `Protected-branch followthrough after develop merge records the real-environment result.`
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
 
 ## Acceptance Items
 
@@ -1371,14 +1365,8 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
 
 ## Real-Environment
-- acceptance target: `Reserve protected real-environment followthrough for post-merge validation.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `post-merge protected verification`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
-- replacement_evidence: `Protected-branch followthrough after develop merge records the real-environment result.`
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
 
 ## Acceptance Items
 
@@ -1432,14 +1420,8 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
 
 ## Real-Environment
-- acceptance target: `Reserve protected real-environment followthrough for post-merge validation.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `post-merge protected verification`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
-- replacement_evidence: `Protected-branch followthrough after develop merge records the real-environment result.`
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
 
 ## Acceptance Items
 
@@ -1489,14 +1471,8 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
 
 ## Real-Environment
-- acceptance target: `Reserve protected real-environment followthrough for post-merge validation.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `post-merge protected verification`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
-- replacement_evidence: `Protected-branch followthrough after develop merge records the real-environment result.`
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
 
 ## Acceptance Items
 
@@ -1543,14 +1519,8 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
 
 ## Real-Environment
-- acceptance target: `Reserve protected real-environment followthrough for post-merge validation.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `post-merge protected verification`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
-- replacement_evidence: `Protected-branch followthrough after develop merge records the real-environment result.`
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
 
 ## Acceptance Items
 
