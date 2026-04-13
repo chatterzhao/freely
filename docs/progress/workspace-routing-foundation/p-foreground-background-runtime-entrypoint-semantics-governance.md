@@ -3,16 +3,22 @@
 - issue_id: `I-20260413-0208-A`
 - issue_path: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
 - title: `Foreground/background runtime entrypoint semantics governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/runtime-daemon-semantics`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-runtime-daemon-semantics`
+- branch: `feature/runtime-daemon-semantics-closeout-20260413`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260413-feature-runtime-daemon-semantics-closeout`
 - updated_at: `2026-04-13`
+- closure_status: `merged-and-verified`
 
 ## Summary
 
-This owner has now moved past IBM into feature-local implementation and verification: Freely keeps `start/restart/stop/status` on the existing foreground contract while adding an explicit `daemon` control plane for detached runtime ownership.
+This owner is now closed on canonical `develop`:
+
+- Freely keeps `start/restart/stop/status` on the existing foreground contract
+- Freely now exposes explicit `daemon start|stop|status|logs` for detached runtime ownership
+- the same runtime truth continues to feed `live-status` and daemon observability
+- guarded premerge promotion, develop merge, push followthrough, and temporary worktree retirement all completed on `2026-04-13`
 
 ## Implementation
 
@@ -24,6 +30,8 @@ This owner has now moved past IBM into feature-local implementation and verifica
 
 ## Verification Evidence
 
+- `develop` merge `1b55aae6`
+- `premerge` merge `d9dc3167`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-command-semantics`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
@@ -31,7 +39,15 @@ This owner has now moved past IBM into feature-local implementation and verifica
 - `bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-all-same-project-supervisors`
 - `./bin/governance-check`
 - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
+
+## Closure Evidence
+
+1. `develop` merge `1b55aae6`
+2. `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+3. `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
 
 ## Next Action
 
-Promote through a dedicated `test-pre-merge-*` lane, then merge to `develop` and rewrite the owner to canonical `completed` truth.
+1. No further action in this owner unless canonical `develop` loses the explicit daemon control-plane contract or foreground `start` semantics drift.
+2. Any future daemon restart policy, UI/TUI attach behavior, or broader command-surface redesign should reopen as a new bounded owner instead of reviving this completed record.
