@@ -1246,6 +1246,16 @@ latest_generated_manager_continuity_file_for_project() {
   latest_run_artifact_for_project "$project" 'manager-continuity-*.md'
 }
 
+manager_continuity_id_from_path() {
+  local continuity_path="$1"
+  local filename=""
+  [[ -n "$continuity_path" ]] || return 1
+  filename="$(basename "$continuity_path")"
+  filename="${filename#manager-continuity-}"
+  filename="${filename%.md}"
+  printf '%s\n' "${filename:-unknown}"
+}
+
 find_latest_manager_continuity_file_for_project() {
   local project="$1"
   latest_manager_continuity_file_for_project "$project"
@@ -1337,6 +1347,87 @@ manager_continuity_gap_snapshot_for_project() {
     "${latest_generated:-none}" \
     "$gap_age_secs" \
     "$gap_age_state"
+}
+
+materialize_missing_required_manager_continuity_fallback() {
+  local project="$1" fallback_reason="${2:-runtime_cleanup}"
+  local gap_state gap_reason expected_continuity latest_generated prompt_file gap_age_secs gap_age_state gap_summary
+  local continuity_id branch generated_at previous_manager_continuity resolution_file session_file cycle_log cycle_log_from_state=""
+  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 1
+
+  IFS='|' read -r gap_state gap_reason expected_continuity latest_generated prompt_file gap_age_secs gap_age_state gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$project")"
+  [[ "$gap_state" == "active" && "$gap_reason" == "expected_continuity_missing" ]] || return 1
+  [[ -n "$expected_continuity" && "$expected_continuity" != "none" ]] || return 1
+  [[ ! -f "$expected_continuity" ]] || return 0
+
+  mkdir -p "$(dirname "$expected_continuity")"
+  continuity_id="$(manager_continuity_id_from_path "$expected_continuity")"
+  branch="$(git -C "$project" branch --show-current 2>/dev/null || printf 'unknown')"
+  generated_at="$(date '+%Y-%m-%d %H:%M:%S %Z')"
+  previous_manager_continuity="${latest_generated:-none}"
+  [[ -n "$previous_manager_continuity" && -f "$previous_manager_continuity" ]] || previous_manager_continuity="none"
+  resolution_file="$(latest_interruption_resolution_file_for_project "$project")"
+  [[ -n "$resolution_file" && -f "$resolution_file" ]] || resolution_file="none"
+  session_file="$(session_state_file "$project")"
+  if [[ ! -f "$session_file" ]]; then
+    session_file="none"
+  elif [[ -z "${LAST_CYCLE_LOG:-}" ]]; then
+    cycle_log_from_state="$(awk -F= '/^LAST_CYCLE_LOG=/ {print $2; exit}' "$session_file" 2>/dev/null || true)"
+    cycle_log_from_state="$(strip_simple_shell_quotes "$cycle_log_from_state")"
+  fi
+  cycle_log="${LAST_CYCLE_LOG:-none}"
+  if [[ "$cycle_log" == "none" && -n "$cycle_log_from_state" ]]; then
+    cycle_log="$cycle_log_from_state"
+  fi
+  [[ -n "$cycle_log" && -f "$cycle_log" ]] || cycle_log="none"
+
+  cat >"$expected_continuity" <<EOF
+# Manager Continuity
+- continuity_id: \`${continuity_id:-unknown}\`
+- generated_at: \`${generated_at}\`
+- role: \`manager\`
+- branch: \`${branch:-unknown}\`
+- worktree: \`${project}\`
+- tool: \`${AI_TOOL:-unknown}\`
+- model: \`${AI_MODEL:-unknown}\`
+- reasoning_effort: \`${AI_REASONING_EFFORT:-unknown}\`
+- manager_mode: \`true\`
+- previous_manager_continuity: \`${previous_manager_continuity}\`
+- continuity_written_by: \`freely-runtime-fallback\`
+- fallback_reason: \`${fallback_reason}\`
+- fallback_trigger: \`expected_continuity_missing_during_shutdown\`
+
+## Runtime Fallback Summary
+
+- expected_by_prompt: \`${prompt_file:-none}\`
+- continuity_gap_age_secs: \`${gap_age_secs:-unknown}\`
+- continuity_gap_age_state: \`${gap_age_state:-unknown}\`
+- summary: \`runtime materialized this fallback because the expected manager continuity file was still missing when cleanup began\`
+- next_action: \`resume from the latest prompt, cycle log, and session evidence before any new delegation or merge judgement\`
+
+## Evidence Anchors
+
+- prompt_file: \`${prompt_file:-none}\`
+- latest_generated_before_fallback: \`${previous_manager_continuity}\`
+- latest_cycle_log: \`${cycle_log}\`
+- session_state_file: \`${session_file}\`
+- latest_interruption_resolution: \`${resolution_file}\`
+
+## Worker Delegation
+
+- referenced_worker_prompts: \`none\`
+- authoritative_worker_prompts: \`none\`
+- queue: \`none\`
+- frozen_queue: \`none\`
+EOF
+
+  append_runtime_event "$project" "manager_continuity_fallback_materialized" \
+    "path=$expected_continuity" \
+    "fallback_reason=$fallback_reason" \
+    "prompt_file=${prompt_file:-none}" \
+    "previous_continuity=${previous_manager_continuity}" \
+    "gap_age_secs=${gap_age_secs:-unknown}" \
+    "gap_age_state=${gap_age_state:-unknown}"
 }
 
 ps_command_for_pid() {
@@ -7353,6 +7444,11 @@ recover_stalled_manager_ai_if_needed() {
   if [[ "${AI_TOOL:-}" == "codex" ]]; then
     current_slot="$(codex_current_slot "$project")"
   fi
+  append_runtime_event "$project" "runtime_stalled_ai_recovery_triggered" \
+    "role=manager" \
+    "reason=$stall_reason" \
+    "ai_pid=${ai_pid:-unknown}" \
+    "slot=${current_slot:-unknown}"
   write_manager_bootstrap_handoff "$project" "manager_stall_detected" "${current_slot:-unknown}" "${current_slot:-unknown}" "$stall_reason" "relaunch-manager-after-stall-recovery"
   request_local_continuation_reentry "$project" "runtime-stalled-ai-recovery"
   restart_manager_supervisor_preserving_handoff "$project"
@@ -7394,6 +7490,10 @@ recover_stalled_worker_ai_if_needed() {
   local project="$1" ai_pid stall_reason
   stall_reason="$(worker_ai_runtime_recovery_reason "$project" "${WORKER_AI_STALL_THRESHOLD_SECS:-90}")" || return 1
   ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  append_runtime_event "$project" "runtime_stalled_ai_recovery_triggered" \
+    "role=worker" \
+    "reason=$stall_reason" \
+    "ai_pid=${ai_pid:-unknown}"
   request_local_continuation_reentry "$project" "runtime-stalled-ai-recovery"
   log_warn "recovered stalled worker ai (project=$project ai_pid=${ai_pid:-unknown} reason=$stall_reason)"
   return 0
@@ -9838,6 +9938,9 @@ stop_project_runtime() {
       terminate_pid_with_graceful_wait "$sp" "project supervisor during stop"
     done < <(printf '%s\n' "$supervisor_candidates" | awk '!seen[$0]++')
   fi
+  if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
+    materialize_missing_required_manager_continuity_fallback "$project" "$stop_reason" || true
+  fi
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   rm -f "$stop_marker"
   write_workcell_state "$project" "stopped" "down" "down" "$stop_reason"
@@ -10037,6 +10140,9 @@ start_project_runtime() {
     watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
     if [[ -n "$watchdog_pid" ]]; then
       terminate_pid_with_graceful_wait "$watchdog_pid" "project manager watchdog during supervisor cleanup"
+    fi
+    if [[ "$(role_hint_for_project "$project")" == "manager" ]] && { [[ "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" == "stopped" ]] || [[ "${LAST_WORKCELL_EXIT_REASON:-}" == "operator_stop" ]]; }; then
+      materialize_missing_required_manager_continuity_fallback "$project" "${LAST_WORKCELL_EXIT_REASON:-supervisor_cleanup}" || true
     fi
     append_runtime_event "$project" "supervisor_cleanup" \
       "supervisor_pid=$$" \
