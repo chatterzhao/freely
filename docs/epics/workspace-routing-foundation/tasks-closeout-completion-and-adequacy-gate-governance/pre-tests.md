@@ -6,7 +6,7 @@
 - target environment: `feature/tasks-closeout-gate-20260413`
 - required evidence: `focused shell gate regression output`
 - blocker taxonomy: `definition_missing`
-- not_applicable_reason: `no_smaller_executable_boundary`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
 - not_applicable_explanation: `The bounded change lives inside shell gate flow, so focused gate regressions are the smallest useful executable boundary.`
 - replacement_evidence: `Focused shell regressions and syntax validation cover this owner's executable surface.`
 
@@ -35,8 +35,10 @@
 - target environment: `local governance gate boundary`
 - required evidence: `lawful replacement evidence recorded in owner review artifact`
 - blocker taxonomy: `definition_missing`
-- not_applicable_reason: `no_external_runtime_boundary`
-- not_applicable_explanation: `The bounded surface is a local governance gate contract rather than a hosted external system.`
+- real_environment_status: `pass`
+- real_environment_reason: `This owner changes a local governance gate boundary, and the executable surface is already exercised directly by the focused pretests-gate and delegated governance-merge-gate regressions. Canonical develop promotion remains the post-merge acceptance surface rather than a missing pre-merge environment.`
+- not_applicable_reason: `post_merge_only`
+- not_applicable_explanation: `No separate hosted environment exists before guarded develop promote; the real-environment boundary for this owner is the canonical protected-branch replay itself.`
 - replacement_evidence: `Focused shell regressions and governance-check are sufficient for this narrow owner.`
 
 ## Acceptance Items
