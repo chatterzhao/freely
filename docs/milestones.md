@@ -73,6 +73,26 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
+1. `I-20260413-0420-D`
+- title: Manager startup continuity materialization governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- follow_on_to: `I-20260413-0420-B`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-handoff-state-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
+  - `./bin/governance-check`
+- completion_note: `Active implementation owner. Canonical completion moves this item to a true completed closeout only after focused verification, bounded live replay, premerge adequacy, and guarded develop promotion are all recorded.`
+
 ### candidate_issues
 
 1. `C-20260413-0208-A`
@@ -118,6 +138,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
 - next_action: Candidate mirror only. `I-20260413-0420-B` is now the canonical contract owner for separating `launch_bootstrapped` from `manager_handoff_materialized` and freezing the normal-path startup continuity seam.
 - revisit_trigger: Re-open only if later runtime implementation proves the frozen handoff contract should change, or if canonical evidence shows the seam must widen beyond stub-plus-state exposure.
+
+1. `C-20260413-0420-D`
+- title: Manager startup continuity materialization governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- next_action: Candidate mirror only. `I-20260413-0420-D` is now the canonical implementation owner for normal-path startup continuity stub materialization and manager handoff state surfacing.
+- revisit_trigger: Re-open only if canonical implementation later proves the stub/state seam is wrong, or if manager handoff materialization still requires readiness-state coupling beyond this bounded owner.
 
 1. `C-20260412-1721-A`
 - title: Develop push attempt followthrough governance

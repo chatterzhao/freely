@@ -1270,6 +1270,19 @@ manager_continuity_id_from_path() {
   printf '%s\n' "${filename:-unknown}"
 }
 
+manager_continuity_written_by_from_file() {
+  local continuity_file="$1"
+  [[ -f "$continuity_file" ]] || return 0
+  awk '
+    /^- continuity_written_by: `/ {
+      if (match($0, /`[^`]+`/)) {
+        print substr($0, RSTART + 1, RLENGTH - 2)
+        exit
+      }
+    }
+  ' "$continuity_file"
+}
+
 find_latest_manager_continuity_file_for_project() {
   local project="$1"
   latest_manager_continuity_file_for_project "$project"
@@ -1442,6 +1455,116 @@ EOF
     "previous_continuity=${previous_manager_continuity}" \
     "gap_age_secs=${gap_age_secs:-unknown}" \
     "gap_age_state=${gap_age_state:-unknown}"
+}
+
+materialize_required_manager_continuity_startup_stub() {
+  local project="$1" prompt_file="$2" launch_kind="${3:-unknown}"
+  local expected_continuity continuity_id branch generated_at previous_manager_continuity
+  local session_file cycle_log cycle_log_from_state=""
+  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 1
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  expected_continuity="$(required_manager_continuity_file_from_prompt "$prompt_file")"
+  [[ -n "$expected_continuity" && "$expected_continuity" != "none" ]] || return 1
+  [[ ! -f "$expected_continuity" ]] || return 0
+
+  mkdir -p "$(dirname "$expected_continuity")"
+  continuity_id="$(manager_continuity_id_from_path "$expected_continuity")"
+  branch="$(git -C "$project" branch --show-current 2>/dev/null || printf 'unknown')"
+  generated_at="$(date '+%Y-%m-%d %H:%M:%S %Z')"
+  previous_manager_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
+  [[ -n "$previous_manager_continuity" && -f "$previous_manager_continuity" ]] || previous_manager_continuity="none"
+  session_file="$(session_state_file "$project")"
+  if [[ ! -f "$session_file" ]]; then
+    session_file="none"
+  elif [[ -z "${LAST_CYCLE_LOG:-}" ]]; then
+    cycle_log_from_state="$(awk -F= '/^LAST_CYCLE_LOG=/ {print $2; exit}' "$session_file" 2>/dev/null || true)"
+    cycle_log_from_state="$(strip_simple_shell_quotes "$cycle_log_from_state")"
+  fi
+  cycle_log="${LAST_CYCLE_LOG:-none}"
+  if [[ "$cycle_log" == "none" && -n "$cycle_log_from_state" ]]; then
+    cycle_log="$cycle_log_from_state"
+  fi
+  [[ -n "$cycle_log" && -f "$cycle_log" ]] || cycle_log="none"
+
+  cat >"$expected_continuity" <<EOF
+# Manager Continuity
+- continuity_id: \`${continuity_id:-unknown}\`
+- generated_at: \`${generated_at}\`
+- role: \`manager\`
+- branch: \`${branch:-unknown}\`
+- worktree: \`${project}\`
+- tool: \`${AI_TOOL:-unknown}\`
+- model: \`${AI_MODEL:-unknown}\`
+- reasoning_effort: \`${AI_REASONING_EFFORT:-unknown}\`
+- manager_mode: \`true\`
+- previous_manager_continuity: \`${previous_manager_continuity}\`
+- continuity_written_by: \`freely-runtime-startup-stub\`
+- startup_handoff_state: \`seeded_by_runtime\`
+- startup_handoff_launch_kind: \`${launch_kind:-unknown}\`
+
+## Runtime Startup Stub
+
+- expected_by_prompt: \`${prompt_file}\`
+- summary: \`runtime seeded the required continuity path before AI launch so startup has a launch-bound first handoff artifact\`
+- next_action: \`manager should enrich or replace this stub with the real startup continuity before delegation or merge judgement\`
+
+## Evidence Anchors
+
+- prompt_file: \`${prompt_file}\`
+- previous_manager_continuity: \`${previous_manager_continuity}\`
+- latest_cycle_log: \`${cycle_log}\`
+- session_state_file: \`${session_file}\`
+
+## Worker Delegation
+
+- referenced_worker_prompts: \`none\`
+- authoritative_worker_prompts: \`none\`
+- queue: \`none\`
+- frozen_queue: \`none\`
+EOF
+
+  append_runtime_event "$project" "manager_continuity_startup_stub_materialized" \
+    "path=$expected_continuity" \
+    "prompt_file=$prompt_file" \
+    "launch_kind=${launch_kind:-unknown}" \
+    "previous_continuity=${previous_manager_continuity}"
+}
+
+manager_handoff_snapshot_for_project() {
+  local project="$1"
+  local prompt_file expected_continuity latest_generated written_by
+  prompt_file="$(find_latest_prompt_file_for_project "$project")"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || {
+    printf 'none|none|none|none|none|none|none\n'
+    return 0
+  }
+  expected_continuity="$(required_manager_continuity_file_from_prompt "$prompt_file")"
+  [[ -n "$expected_continuity" ]] || {
+    printf 'none|none|none|none|%s|none|none\n' "$prompt_file"
+    return 0
+  }
+  latest_generated="$(latest_generated_manager_continuity_file_for_project "$project")"
+  if [[ ! -f "$expected_continuity" ]]; then
+    printf 'missing|expected_continuity_missing|%s|%s|%s|none|expected=%s latest_generated=%s prompt=%s\n' \
+      "$expected_continuity" "${latest_generated:-none}" "$prompt_file" "$expected_continuity" "${latest_generated:-none}" "$prompt_file"
+    return 0
+  fi
+
+  written_by="$(manager_continuity_written_by_from_file "$expected_continuity")"
+  case "$written_by" in
+    freely-runtime-startup-stub)
+      printf 'seeded_stub|runtime_seeded_startup_stub|%s|%s|%s|%s|expected=%s prompt=%s\n' \
+        "$expected_continuity" "${latest_generated:-none}" "$prompt_file" "$written_by" "$expected_continuity" "$prompt_file"
+      ;;
+    freely-runtime-fallback)
+      printf 'repair_fallback|runtime_cleanup_fallback|%s|%s|%s|%s|expected=%s prompt=%s\n' \
+        "$expected_continuity" "${latest_generated:-none}" "$prompt_file" "$written_by" "$expected_continuity" "$prompt_file"
+      ;;
+    *)
+      printf 'materialized|continuity_present|%s|%s|%s|%s|expected=%s prompt=%s\n' \
+        "$expected_continuity" "${latest_generated:-none}" "$prompt_file" "${written_by:-manager_or_external}" "$expected_continuity" "$prompt_file"
+      ;;
+  esac
 }
 
 ps_command_for_pid() {
@@ -10355,6 +10478,7 @@ start_project_runtime() {
       log_info "rotating session via fresh_with_handoff (reason=$LAUNCH_ROTATION_REASON)"
     fi
     build_prompt >"$prompt_file"
+    materialize_required_manager_continuity_startup_stub "$PROJECT_ROOT" "$prompt_file" "$mode_name" || true
     if [[ -n "$delegated_pending_ids" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
       delegated_consumed_ids="$delegated_pending_ids"
       delegated_consumed_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
@@ -11534,6 +11658,7 @@ cmd_live_status() {
   local semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv
   local blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact
   local manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary manager_continuity_gap_writer_state
+  local manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary
   local develop_push_snapshot develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at develop_push_urgency develop_push_resync_required
 
   run_dir="$(run_dir_for_project "$project")"
@@ -11708,6 +11833,7 @@ cmd_live_status() {
     semantic_loop_signal_summary="repeats=${semantic_loop_repeat_count:-0} latest=${semantic_loop_latest_continuity:-unavailable} consumed=${semantic_loop_latest_consumed:-unavailable} prompts=${semantic_loop_latest_prompt_csv:-none}"
   fi
   IFS='|' read -r blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact <<<"$(blocked_supervision_snapshot_for_project "$project")"
+  IFS='|' read -r manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary <<<"$(manager_handoff_snapshot_for_project "$project")"
   IFS='|' read -r manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$project")"
   manager_continuity_gap_writer_state="none"
   if [[ "$manager_continuity_gap_state" == "active" ]]; then
@@ -11771,6 +11897,13 @@ cmd_live_status() {
   echo "blocked_supervision_reason: ${blocked_supervision_reason:-none}"
   echo "blocked_supervision_summary: ${blocked_supervision_summary:-none}"
   echo "blocked_supervision_artifact: ${blocked_supervision_artifact:-none}"
+  echo "manager_handoff_state: ${manager_handoff_state:-none}"
+  echo "manager_handoff_reason: ${manager_handoff_reason:-none}"
+  echo "manager_handoff_expected_path: ${manager_handoff_expected:-none}"
+  echo "manager_handoff_latest_generated: ${manager_handoff_latest_generated:-none}"
+  echo "manager_handoff_prompt_file: ${manager_handoff_prompt_file:-none}"
+  echo "manager_handoff_writer: ${manager_handoff_writer:-none}"
+  echo "manager_handoff_summary: ${manager_handoff_summary:-none}"
   echo "manager_continuity_gap_state: ${manager_continuity_gap_state:-none}"
   echo "manager_continuity_gap_reason: ${manager_continuity_gap_reason:-none}"
   echo "manager_continuity_gap_expected_path: ${manager_continuity_gap_expected:-none}"
@@ -12063,6 +12196,8 @@ cmd_fleet_status() {
         semantic_loop_summary="loop=${semantic_loop_reason} repeats=${semantic_loop_repeat_count:-0}"
       fi
       IFS='|' read -r blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact <<<"$(blocked_supervision_snapshot_for_project "$wt_path")"
+      local manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary
+      IFS='|' read -r manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary <<<"$(manager_handoff_snapshot_for_project "$wt_path")"
       IFS='|' read -r manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$wt_path")"
       develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$wt_path")"
       IFS='|' read -r develop_push_state develop_push_summary _ _ _ _ _ _ _ _ _ develop_push_urgency develop_push_resync_required <<<"$develop_push_snapshot"
@@ -12123,6 +12258,9 @@ cmd_fleet_status() {
     fi
     if [[ "$blocked_supervision_state" == "active" ]]; then
       printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "blocked_supervision" "" "reason=${blocked_supervision_reason:-unknown} ${blocked_supervision_summary:-none} artifact=${blocked_supervision_artifact:-none}"
+    fi
+    if [[ "$manager_handoff_state" != "none" && "$manager_handoff_state" != "materialized" ]]; then
+      printf "%-16s | %-8s | %-8s | %-8s | %-10s | %-10s | %s\n" "" "" "" "" "manager_handoff" "" "state=${manager_handoff_state:-none} reason=${manager_handoff_reason:-none} expected=${manager_handoff_expected:-none} writer=${manager_handoff_writer:-none}"
     fi
     if [[ "$manager_continuity_gap_state" == "active" ]]; then
       local continuity_gap_writer_state
