@@ -109,13 +109,13 @@
 
 - candidate_format_version: `v2`
 - title: `Manager startup continuity contract governance`
-- research_only: `false`
+- research_only: `true`
 - implementation_ready: `false`
-- status: `needs_research`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
-- promoted_issue_id: `pending://issue-materialization`
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_id: `I-20260413-0420-B`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
@@ -124,30 +124,30 @@
   - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 - problem: The real self-hosting startup path still treats "AI process spawned" as sufficient startup success even when the first manager continuity is absent until stop fallback. That weakens Freely's outer loop, restart point, and runtime artifact chain.
 - why_now:
-  - the latest root-cause review shows this is deeper than a status-surface gap but not yet reduced to one implementation shape
-  - fixing startup authority alone will not define whether manager continuity is required for manager-ready semantics
-  - Freely's three-loop and autonomy contract needs a cleaner startup handoff boundary than prompt-only wording
+  - startup authority now landed on canonical `develop`, so the handoff lane no longer needs to wait for launch identity and bootstrapped truth
+  - repeated review shows the remaining defect is a bounded startup-handoff contract, not a generic watchdog or status-family rewrite
+  - Freely's three-loop and autonomy contract needs a first-handoff artifact on the normal path, not prompt-only wording plus stop fallback
 - acceptance_criteria:
   - runtime and manager contract clearly distinguish `launch bootstrapped` from `manager handoff materialized`
   - the first manager continuity or equivalent launch-bound handoff artifact is created on the normal startup path, not only by stop fallback
   - fallback continuity remains repair-only and does not masquerade as normal startup success
   - recovery and restart logic can tell the difference between startup in progress, startup succeeded but manager handoff missing, and clean stop after valid handoff
 - promotion_gate:
-  - keep this candidate out of implementation until the startup-authority owner clarifies the launch identity and phase model it will build on
+  - keep this owner on contract freeze and routing only; do not implement runtime stub writing or status fields from this worktree
   - do not solve this by prompt wording alone
   - do not reopen old continuity-gap status surfaces as if observability alone solves the contract defect
 - open_questions:
-  - should runtime seed a continuity claim or stub before AI launch, or should manager-ready be enforced through another launch-bound artifact
-  - how should `live-status` expose `bootstrapped` versus `manager_ready` without regressing current shared-status semantics
+  - what markdown/body shape should the first runtime-seeded continuity claim/stub use before manager enrichment
+  - how should `live-status` expose `manager_handoff_state` without regressing current shared-status semantics
   - what bounded SLA should define "manager handoff missing" before recovery or repair activates
 - acceptance_reviews:
   - reviewer: `codex`
     mode: `author-review`
-    summary: `The manager continuity contract is clearly a distinct owner boundary, but the implementation shape still depends on the launch-authority model chosen by the promote-ready startup owner.`
-    verdict: `needs_more_research`
-- next_action: Keep this candidate visible under the active milestone while `I-20260413-0420-A` fixes startup authority; then reopen this candidate with a narrowed handoff contract built on the resulting launch phases.
-- revisit_trigger: Revisit when the startup-authority owner lands a concrete launch identity/phase model, or if further real-repo evidence proves the continuity contract can be implemented independently without waiting.
-- decision_reason: `Manager continuity is a true follow-on owner boundary, but it should not be mixed into the startup-authority implementation before the launch model is fixed.`
+    summary: `Startup authority is now canonical, and the remaining handoff defect is narrow enough to freeze as a dedicated contract owner without yet promising runtime implementation.`
+    verdict: `ready_for_issue_materialization`
+- next_action: Materialize the contract-freezing owner as `I-20260413-0420-B`, run the bounded doc/governance verification path, guarded-promote it to `develop`, and then let a later implementation owner add the normal-path stub and handoff-state runtime changes.
+- revisit_trigger: Re-open only if later implementation proves the frozen contract is wrong, or if canonical runtime evidence shows the handoff seam must be widened beyond stub plus state exposure.
+- decision_reason: `Manager continuity is now ready to materialize as a research-only contract owner: startup authority already froze the launch boundary, and the remaining task is to freeze the next implementation seam without mixing implementation into this packet.`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
