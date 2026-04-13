@@ -16,9 +16,10 @@
 - `pre-tests.md` 来自 `prd.md` 的 eval / acceptance 结构
 - `pre-tests.md` 默认以 executable integration / acceptance 为主，而不是只列代码检查点或 wording review 清单
 - `pre-tests.md` 至少固定 `Unit`、`Integration`、`End-to-End`、`Real-Environment` 四个章节
-- 若某章节不适用，`pre-tests.md` 已写 `not_applicable_reason`、`not_applicable_explanation` 与必要的 `replacement_evidence`
-- 若当前 issue 是 follow-on owner，且 scope 触达 `auth switch / account switch / slot recovery / startup recovery / watchdog / freely start / bin/ai / codex exec` family，`End-to-End` 与 `Real-Environment` 不得同时仅以 `protected_environment_only` 豁免；至少要保留一条 artifact-backed 的 `real_env` 或 `post_merge_dogfood` acceptance item
-- `pre-tests.md` 至少明确 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
+- `Unit`、`Integration`、`End-to-End` 三章若不适用，`pre-tests.md` 已写 `not_applicable_reason`、`not_applicable_explanation` 与必要的 `replacement_evidence`
+- `Real-Environment` 章节固定写 `real_environment_status` 与 `real_environment_reason`，作为“本次实现是否需要真实环境测试、以及是否已达标”的最终审查结论
+- 若当前 issue 是 follow-on owner，且 scope 触达 `auth switch / account switch / slot recovery / startup recovery / watchdog / freely start / bin/ai / codex exec` family，`Real-Environment` 不能只填结论就过；至少要保留一条 artifact-backed 的 `real_env` 或 `post_merge_dogfood` acceptance item
+- `Unit`、`Integration`、`End-to-End` 三章至少明确 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
 - `pre-tests.md` 能恢复关键 acceptance 面的 `environment`、`evidence`、`failure signal`、`failure handling / replay expectation`
 - issue 已显式声明 `pre_tests_path` 与 `verification_artifact_dir`
 - `pre-tests.md` 已包含 completion gate 可消费的 machine-readable acceptance items：`id` / `requirement` / `evidence_level` / `status` / `artifact_ref`
@@ -44,7 +45,7 @@
 - `pre-tests.md` 没有把 wording review 当成主验收面
 - `pre-tests.md` 没有缺失 `Unit`、`Integration`、`End-to-End`、`Real-Environment` 中的任一章节
 - `pre-tests.md` 已能区分最小 blocker taxonomy：`definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`
-- 对 auth/switch/startup-recovery/watchdog follow-on owner，`pre-tests.md` 没有把真实 `bin/ai` / `codex exec` / `freely start` 启动恢复面同时降成 `End-to-End=protected_environment_only` 与 `Real-Environment=protected_environment_only` 且不留下 artifact-backed live-evidence acceptance item
+- 对 auth/switch/startup-recovery/watchdog follow-on owner，`pre-tests.md` 没有把 `Real-Environment` 写成 `pass` 却又缺失 artifact-backed 的 live-evidence acceptance item
 - 若存在 merge 后才能验证的关键路径，`pre-tests.md` 已显式区分 `pre-merge` 与 `post-merge`
 - 对 Freely 自治能力，`pre-tests.md` 默认已覆盖：
   - post-merge integration acceptance

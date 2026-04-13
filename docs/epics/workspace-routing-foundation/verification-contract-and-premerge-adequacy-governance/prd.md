@@ -44,7 +44,8 @@
 
 - `pre-tests.md` 继续是唯一 canonical verification truth
 - `pre-tests.md` 必须始终包含 `Unit`、`Integration`、`End-to-End`、`Real-Environment` 四个章节
-- 任何章节不适用都必须使用有限 `not_applicable_reason` 枚举并补一句解释
+- `Unit`、`Integration`、`End-to-End` 三章不适用时必须使用有限 `not_applicable_reason` 枚举并补一句解释
+- `Real-Environment` 固定为最终审查结论章，只写 `real_environment_status` 与 `real_environment_reason`
 - handoff 不能只传调度信息，不传测试义务
 - gate 必须是 issue-bound，而不是扫全仓
 - gate 失败必须给出可执行提示，而不是抽象口号
@@ -83,7 +84,8 @@
 
 - manager / worker 真源明确新增最小 verification metadata
 - `doc-ibm-execution` / checklist / quality bar 明确强制 `Unit`、`Integration`、`End-to-End`、`Real-Environment` 四章
-- 章节不适用时只能使用有限 reason type，而不是直接省略
+- 前三章不适用时只能使用有限 reason type，而不是直接省略
+- `Real-Environment` 不再扩成第二套任务表，而是给出 pass/fail + reason 的最终审查结论
 - `pre-tests.md` item-level schema 能 machine-readably 表达任务引用、测试用例设计、lane、environment、promotion requirement
 - merge gate 设计明确只消费 owner issue 绑定的 `pre-tests.md`
 - gate 设计明确能区分“没写任务”“没设计用例”“没测”“没标状态/证据”

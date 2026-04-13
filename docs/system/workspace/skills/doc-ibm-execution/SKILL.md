@@ -36,10 +36,15 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
    - 默认先写 executable acceptance contract，而不是 wording review / truth-source reading checklist
    - 默认优先表达 focused regression、integration、real-environment、dogfood 这些行为验收面
    - 对第一阶段结构，至少固定四个章节：`Unit`、`Integration`、`End-to-End`、`Real-Environment`
-   - 四个章节必须都出现；不适用时不得省略，必须写 `not_applicable_reason`、`not_applicable_explanation` 与 `replacement_evidence`
-   - 若当前 issue 是 follow-on owner，且 scope 触达 `auth switch / account switch / slot recovery / startup recovery / watchdog / freely start / bin/ai / codex exec` family，不得把 `End-to-End` 与 `Real-Environment` 两章同时写成 `protected_environment_only`，除非 `Acceptance Items` 至少保留一条 artifact-backed 的 `real_env` 或 `post_merge_dogfood` 证据
+   - 前三个章节写测试任务本体；若该章不适用，不得省略，必须写 `not_applicable_reason`、`not_applicable_explanation` 与 `replacement_evidence`
+   - `Real-Environment` 不是另一份测试任务清单，而是对“本次实现是否需要真实环境测试、以及是否已达标”的最终审查结论；固定写：
+     - `real_environment_status`: `pass` 或 `fail`
+     - `real_environment_reason`: 必填
+   - `real_environment_status=pass` 只允许表达两类真结论：本次实现需要的真实环境测试已完成并达标；或本次实现不需要真实环境测试
+   - `real_environment_status=fail` 必须明确指出：哪些测试/实现面需要真实环境测试却还没做、没通过，或环境与恢复条件还不成立
+   - 若当前 issue 是 follow-on owner，且 scope 触达 `auth switch / account switch / slot recovery / startup recovery / watchdog / freely start / bin/ai / codex exec` family，`Real-Environment` 章节不能只写结论就过；`Acceptance Items` 仍至少保留一条 artifact-backed 的 `real_env` 或 `post_merge_dogfood` 证据
    - `not_applicable_reason` 只允许有限白名单：`change_not_touching_this_layer`、`no_executable_boundary_at_this_layer`、`protected_environment_only`、`human_observation_only`、`covered_by_more_realistic_required_surface`
-   - 至少要能恢复 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
+   - `Unit`、`Integration`、`End-to-End` 至少要能恢复 acceptance target、testing layer、target environment、required evidence 与 blocker taxonomy
    - 对新写或正在升级 adequacy 的 owner，`Acceptance Items` 默认补齐 `surface_kind`、`target_lane`、`promotion_gate`；`task_refs` 与 `case_design` 作为强建议同步补齐
    - 若 owner 承担 `test-pre-merge-* -> develop` guarded promote，默认至少保留一条 `target_lane=premerge-integration` 且 `promotion_gate=develop_merge` 的 artifact-backed pass item
    - 最小 blocker taxonomy 至少区分：`definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`

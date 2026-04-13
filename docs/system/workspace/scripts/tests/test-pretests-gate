@@ -72,15 +72,8 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `The sample repo intentionally omits a runtime shell.`
 
 ## Real-Environment
-
-- acceptance target: `State why protected real-environment followthrough is unavailable in this fixture.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `lawful replacement evidence for missing protected environment`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
-- replacement_evidence: `The isolated fixture does not model a protected branch environment.`
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
 
 ## Acceptance Items
 
@@ -138,15 +131,8 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `The sample repo intentionally omits a runtime shell.`
 
 ## Real-Environment
-
-- acceptance target: `State why protected real-environment followthrough is unavailable in this fixture.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `lawful replacement evidence for missing protected environment`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
-- replacement_evidence: `The isolated fixture does not model a protected branch environment.`
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
 
 ## Acceptance Items
 
@@ -156,6 +142,230 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+EOF
+
+"$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Unit
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
+
+## Integration
+
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `feature/sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
+
+## Real-Environment
+- real_environment_status: `pass`
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout2re" 2>"$TMP_DIR/stderr2re"; then
+  echo "[FAIL] pretests-gate should reject Real-Environment chapters that omit the review reason" >&2
+  exit 1
+fi
+grep -q "section 'Real-Environment' missing 'real_environment_reason'" "$TMP_DIR/stderr2re"
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Unit
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
+
+## Integration
+
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `feature/sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
+
+## Real-Environment
+- real_environment_status: `fail`
+- real_environment_reason: `The integration replay changed startup behavior but no real-environment verification has been run yet.`
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout2rf" 2>"$TMP_DIR/stderr2rf"; then
+  echo "[FAIL] pretests-gate should reject Real-Environment chapters that explicitly fail review" >&2
+  exit 1
+fi
+grep -q "section 'Real-Environment' is fail" "$TMP_DIR/stderr2rf"
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Unit
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
+
+## Integration
+
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `feature/sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+
+### PT-2
+- id: `PT-2`
+- requirement: `This task is intentionally not run in the sample fixture.`
+- evidence_level: `integration`
+- status: `not_applicable`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout2na" 2>"$TMP_DIR/stderr2na"; then
+  echo "[FAIL] pretests-gate should reject not_applicable acceptance items that lack explicit reason fields" >&2
+  exit 1
+fi
+grep -q 'is marked not_applicable but is missing not_applicable_reason, not_applicable_explanation, replacement_evidence' "$TMP_DIR/stderr2na"
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Unit
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
+
+## Integration
+
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `feature/sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+
+### PT-2
+- id: `PT-2`
+- requirement: `This task is intentionally not run in the sample fixture.`
+- evidence_level: `integration`
+- status: `not_applicable`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `The pass item already captures the only executable integration surface in this bounded sample fixture.`
+- replacement_evidence: `PT-1 remains the canonical artifact-backed integration proof for this fixture.`
 EOF
 
 "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md
@@ -201,15 +411,8 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `The sample repo intentionally omits a runtime shell.`
 
 ## Real-Environment
-
-- acceptance target: `State why protected real-environment followthrough is unavailable in this fixture.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `lawful replacement evidence for missing protected environment`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
-- replacement_evidence: `The isolated fixture does not model a protected branch environment.`
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
 
 ## Acceptance Items
 
@@ -267,15 +470,8 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `The sample repo intentionally omits a runtime shell.`
 
 ## Real-Environment
-
-- acceptance target: `State why protected real-environment followthrough is unavailable in this fixture.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `lawful replacement evidence for missing protected environment`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
-- replacement_evidence: `The isolated fixture does not model a protected branch environment.`
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
 
 ## Acceptance Items
 
@@ -365,14 +561,8 @@ cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
 - replacement_evidence: `Integration replay plus governance check.`
 
 ## Real-Environment
-- acceptance target: `Protected live replay exists elsewhere.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `replacement evidence`
-- blocker taxonomy: `evidence_plan_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `This follow-on defers live replay to the protected lane.`
-- replacement_evidence: `Integration replay plus governance check.`
+- real_environment_status: `pass`
+- real_environment_reason: `This follow-on requires real-environment verification and currently claims protected-lane coverage.`
 
 ## Acceptance Items
 
@@ -388,7 +578,7 @@ if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/auth/switch/is
   echo "[FAIL] pretests-gate should reject auth/switch follow-on owners that dual-waive End-to-End and Real-Environment without live evidence" >&2
   exit 1
 fi
-grep -q "cannot waive both 'End-to-End' and 'Real-Environment'" "$TMP_DIR/stderr4"
+grep -q "cannot mark 'Real-Environment' pass without at least one artifact-backed pass Acceptance Item" "$TMP_DIR/stderr4"
 
 cat > "$REPO/docs/epics/auth/switch/code-reviews/live.md" <<'EOF'
 # Live replay artifact
@@ -424,14 +614,8 @@ cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
 - replacement_evidence: `See docs/epics/auth/switch/code-reviews/live.md for the bound live replay artifact.`
 
 ## Real-Environment
-- acceptance target: `Protected live replay exists elsewhere.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `replacement evidence`
-- blocker taxonomy: `evidence_plan_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `This follow-on defers live replay to the protected lane.`
-- replacement_evidence: `See docs/epics/auth/switch/code-reviews/live.md for the bound live replay artifact.`
+- real_environment_status: `pass`
+- real_environment_reason: `This follow-on requires real-environment verification and the bound live replay artifact records it.`
 
 ## Acceptance Items
 
@@ -494,14 +678,8 @@ cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
 - replacement_evidence: `Integration replay plus governance check.`
 
 ## Real-Environment
-- acceptance target: `Protected live replay exists elsewhere.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `replacement evidence`
-- blocker taxonomy: `evidence_plan_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `This follow-on defers live replay to the protected lane.`
-- replacement_evidence: `Integration replay plus governance check.`
+- real_environment_status: `pass`
+- real_environment_reason: `This follow-on requires real-environment verification and currently claims protected-lane coverage.`
 
 ## Acceptance Items
 
@@ -517,7 +695,7 @@ if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/auth/switch/is
   echo "[FAIL] pretests-gate should also reject follow-on owners that only mention bin/ai or codex exec while dual-waiving End-to-End and Real-Environment" >&2
   exit 1
 fi
-grep -q "cannot waive both 'End-to-End' and 'Real-Environment'" "$TMP_DIR/stderr5"
+grep -q "cannot mark 'Real-Environment' pass without at least one artifact-backed pass Acceptance Item" "$TMP_DIR/stderr5"
 
 if "$REPO/bin/pretests-gate" --project "$REPO" --target-lane premerge-integration >"$TMP_DIR/stdout6" 2>"$TMP_DIR/stderr6"; then
   echo "[FAIL] pretests-gate should require --require-adequacy when target lane or promotion gate is provided" >&2
@@ -564,14 +742,8 @@ cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `The staged integration acceptance item provides the guarded evidence.`
 
 ## Real-Environment
-- acceptance target: `Reserve real environment followthrough for protected merge.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `post-merge protected replay`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
-- replacement_evidence: `Protected-branch followthrough records the real environment result.`
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge.`
 
 ## Acceptance Items
 
@@ -639,14 +811,8 @@ cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `The staged integration acceptance item provides the guarded evidence.`
 
 ## Real-Environment
-- acceptance target: `Reserve real environment followthrough for protected merge.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `post-merge protected replay`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
-- replacement_evidence: `Protected-branch followthrough records the real environment result.`
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge.`
 
 ## Acceptance Items
 
@@ -707,14 +873,8 @@ cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `The staged integration acceptance item provides the guarded evidence.`
 
 ## Real-Environment
-- acceptance target: `Reserve real environment followthrough for protected merge.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `post-merge protected replay`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
-- replacement_evidence: `Protected-branch followthrough records the real environment result.`
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge.`
 
 ## Acceptance Items
 
@@ -767,14 +927,8 @@ cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `The staged integration acceptance item provides the guarded evidence.`
 
 ## Real-Environment
-- acceptance target: `Reserve real environment followthrough for protected merge.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `post-merge protected replay`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `Real environment followthrough belongs after develop merge.`
-- replacement_evidence: `Protected-branch followthrough records the real environment result.`
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge.`
 
 ## Acceptance Items
 
