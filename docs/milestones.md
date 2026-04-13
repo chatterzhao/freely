@@ -111,13 +111,13 @@ routing_policy:
 1. `C-20260413-0420-B`
 - title: Manager startup continuity contract governance
 - milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+- phase_state: `todo_ibm`
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
-- next_action: Keep this candidate visible while the new startup-authority owner lands a concrete launch identity and phase model; then reopen this packet as a bounded manager-handoff contract owner instead of mixing it into startup repair.
-- revisit_trigger: Revisit when startup authority phases are concrete enough to separate `bootstrapped` from `manager_ready`, or if new real-repo evidence proves the manager handoff contract can now be narrowed independently.
+- next_action: Candidate mirror only. `I-20260413-0420-B` is now the canonical contract owner for separating `launch_bootstrapped` from `manager_handoff_materialized` and freezing the normal-path startup continuity seam.
+- revisit_trigger: Re-open only if later runtime implementation proves the frozen handoff contract should change, or if canonical evidence shows the seam must widen beyond stub-plus-state exposure.
 
 1. `C-20260412-1721-A`
 - title: Develop push attempt followthrough governance
@@ -574,6 +574,24 @@ routing_policy:
   - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
   - `./bin/test-lane premerge-integration -- ./bin/governance-check`
 - completion_note: `Canonical develop should absorb this packet as documentation-only routing truth: it records the startup-authority versus manager-handoff split and retires the temporary research worktree without claiming the runtime defects are already fixed.`
+
+1. `I-20260413-0420-B`
+- title: Manager startup continuity contract governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-contract-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- follow_on_to: `I-20260413-0420-A`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
+  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop should absorb this contract-freezing owner as the bounded truth that separates launch bootstrapping from manager handoff materialization and fixes the next implementation seam as runtime-seeded continuity stub plus handoff-state exposure, without claiming runtime code already changed.`
 
 1. `I-20260413-0208-A`
 - title: Foreground/background runtime entrypoint semantics governance
