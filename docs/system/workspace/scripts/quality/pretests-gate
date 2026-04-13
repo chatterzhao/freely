@@ -176,6 +176,13 @@ def parse_issue_binding(issue_path: str, text: str) -> tuple[str, str]:
     return pre_tests_path, verification_dir
 
 
+def derive_tasks_path(issue_text: str, pre_tests_path: str) -> str:
+    match = re.search(r"^- tasks_path:\s*`?([^`\n]+)`?\s*$", issue_text, re.MULTILINE)
+    if match:
+        return match.group(1).strip()
+    return str(Path(pre_tests_path).with_name("tasks.md"))
+
+
 def staged_paths() -> list[str]:
     output = git_output("diff", "--cached", "--name-only", "--diff-filter=ACMR")
     return [line.strip() for line in output.splitlines() if line.strip()]
@@ -342,6 +349,19 @@ def issue_requires_stronger_live_surface(issue_text: str, pretests_text: str) ->
     return any(pattern in haystack for pattern in FOLLOW_ON_LIVE_SURFACE_PATTERNS)
 
 
+def tasks_text_for_source(path: str, source: str) -> str:
+    return get_staged_text(path) if source == "staged" else get_worktree_text(path)
+
+
+def unchecked_task_lines(text: str) -> list[str]:
+    lines: list[str] = []
+    for raw in text.splitlines():
+        stripped = raw.strip()
+        if re.match(r"^(?:[-*]|\d+\.)\s+\[\s\]\s+", stripped):
+            lines.append(stripped)
+    return lines
+
+
 def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
     errors: list[str] = []
     def add_error(code: str, message: str) -> None:
@@ -352,9 +372,28 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
     except ValueError as exc:
         return str(exc).splitlines()
 
+    tasks_path = derive_tasks_path(issue_text, pre_tests_path)
+
     pretests_text = get_staged_text(pre_tests_path) if source == "staged" else get_worktree_text(pre_tests_path)
     if not pretests_text:
         return [f"[pre_tests_missing] {issue_path}: bound pre-tests file missing or unreadable: {pre_tests_path}"]
+
+    if phase_state(issue_text) == "completed" or require_adequacy:
+        tasks_text = tasks_text_for_source(tasks_path, source)
+        if not tasks_text:
+            add_error(
+                "task_closeout_missing",
+                f"{issue_path}: bound tasks file missing or unreadable: {tasks_path}. "
+                "Completion and guarded promote closeout require the owner task decomposition to remain visible.",
+            )
+        else:
+            unchecked = unchecked_task_lines(tasks_text)
+            if unchecked:
+                add_error(
+                    "task_closeout_incomplete",
+                    f"{tasks_path}: contains unchecked tasks: {'; '.join(unchecked[:3])}. "
+                    "Do not clear completion or guarded promote while owner tasks still show unfinished execution slices.",
+                )
 
     required_sections = extract_required_sections(pretests_text)
     for required_name in REQUIRED_SECTION_NAMES:

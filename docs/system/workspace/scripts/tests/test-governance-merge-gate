@@ -66,6 +66,12 @@ cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
 - verification_artifact_dir: `docs/epics/sample/story/code-reviews`
 EOF
 mkdir -p "$REPO/docs/epics/sample/story"
+cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+# Tasks: sample
+
+- [x] Task 1: Keep the guarded merge sample fixture fully closed out.
+EOF
+
 cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 # Pre-Tests: sample
 
@@ -110,7 +116,7 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 EOF
 
 echo base > README.md
-git add README.md docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/pre-tests.md bin/governance-merge-gate bin/pretests-gate docs/system/workspace/scripts/quality/governance-merge-gate docs/system/workspace/scripts/quality/pretests-gate
+git add README.md docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/tasks.md docs/epics/sample/story/pre-tests.md bin/governance-merge-gate bin/pretests-gate docs/system/workspace/scripts/quality/governance-merge-gate docs/system/workspace/scripts/quality/pretests-gate
 git commit -q -m "init"
 
 mkdir -p "$REPO/src"

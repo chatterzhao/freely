@@ -144,6 +144,25 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
 EOF
 
+cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+# Tasks: sample
+
+- [ ] Task 1: This fixture still claims unfinished owner work.
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/stdout2tasks" 2>"$TMP_DIR/stderr2tasks"; then
+  echo "[FAIL] pretests-gate should reject completed issues whose tasks.md still has unchecked boxes" >&2
+  exit 1
+fi
+grep -q '\[task_closeout_incomplete\]' "$TMP_DIR/stderr2tasks"
+grep -q 'contains unchecked tasks' "$TMP_DIR/stderr2tasks"
+
+cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+# Tasks: sample
+
+- [x] Task 1: This fixture completed its owner work.
+EOF
+
 "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md
 
 cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
@@ -488,6 +507,24 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - case_design: `Given the sample fixture, run the guarded integration replay and capture the review artifact used for develop promote.`
 EOF
 
+cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+# Tasks: sample
+
+- [ ] Task 1: The guarded promote closeout is still unfinished.
+EOF
+
+if "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge >"$TMP_DIR/stdout2tasks2" 2>"$TMP_DIR/stderr2tasks2"; then
+  echo "[FAIL] pretests-gate should reject adequacy checks when tasks.md still shows unfinished owner work" >&2
+  exit 1
+fi
+grep -q '\[task_closeout_incomplete\]' "$TMP_DIR/stderr2tasks2"
+
+cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+# Tasks: sample
+
+- [x] Task 1: The guarded promote closeout is complete.
+EOF
+
 "$REPO/bin/pretests-gate" --project "$REPO" --issue docs/epics/sample/story/issues/sample.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge
 
 cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
@@ -529,6 +566,12 @@ EOF
 
 cat > "$REPO/docs/epics/auth/switch/code-reviews/integration.md" <<'EOF'
 # Integration artifact
+EOF
+
+cat > "$REPO/docs/epics/auth/switch/tasks.md" <<'EOF'
+# Tasks: auth switch follow-on
+
+- [x] Task 1: Keep the follow-on fixture fully closed out.
 EOF
 
 cat > "$REPO/docs/epics/auth/switch/pre-tests.md" <<'EOF'
@@ -759,7 +802,13 @@ cat > "$REPO/docs/epics/staged/story/pre-tests.md" <<'EOF'
 - task_refs: `task-staged-1`
 - case_design: `Run the staged replay and stage the review artifact in the same commit.`
 EOF
-git add docs/epics/staged/story/issues/staged.md docs/epics/staged/story/pre-tests.md
+
+cat > "$REPO/docs/epics/staged/story/tasks.md" <<'EOF'
+# Tasks: staged
+
+- [x] Task 1: Keep the staged completion fixture closed out.
+EOF
+git add docs/epics/staged/story/issues/staged.md docs/epics/staged/story/pre-tests.md docs/epics/staged/story/tasks.md
 
 cat > "$REPO/docs/epics/staged/story/code-reviews/r-staged.md" <<'EOF'
 # Staged review artifact
