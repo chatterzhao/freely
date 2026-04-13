@@ -38,7 +38,7 @@
    - `premerge-integration`：仅在 `test-pre-merge-*` 批次中运行主线前集成 smoke/regression/acceptance；不得在 `develop` 上提前执行来替代测试批次。
    - `post-merge-followthrough`：仅在目标 protected branch 的 canonical worktree 中运行 merge 后真实环境 followthrough；它观察集成结果，不授予继续在 protected branch 上开发实现的权限。
 4f. 若使用统一测试入口，命令语义必须显式暴露 lane 与当前 branch 的匹配关系；lane 误用应直接失败，而不是静默降级到“能跑就算对”。
-4g. 若 canonical `develop` 本地领先 tracked remote，任何依赖“当前最新 develop”作结论的判断都必须先消费 push/resync followthrough。runtime/status 至少要暴露 `develop_push_followthrough_push_urgency` 与 `develop_push_followthrough_resync_required`，供 manager / patrol / active worker 拦截 latest-develop-sensitive judgment。
+4g. 若 canonical `develop` 本地领先 tracked remote，任何依赖“当前最新 develop”作结论的判断都必须先消费 push/resync followthrough。runtime/status 至少要暴露 `develop_push_followthrough_push_urgency`、`develop_push_followthrough_resync_required` 与 push attempt truth，供 manager / patrol / active worker 拦截 latest-develop-sensitive judgment。`develop` 的 guarded merge 完成后允许自动发起一次受控 push attempt；若 attempt 失败，必须写回显式 `push_blocked` truth，不得静默回落成 generic `push_pending`，也不得在 hook/runtime 内无界重试直到成功。
 4c. `pre-tests.md` 若不能恢复 acceptance contract，则不得被视为“测试已定义”。最低质量线至少包括：
    - acceptance target
    - testing layer

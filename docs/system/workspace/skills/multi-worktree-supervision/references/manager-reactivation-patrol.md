@@ -65,7 +65,7 @@
 - 但没有显式 defer reason，或 defer window 长期未被重新消费
 - 主管应将其视为 `manager-owned` 的 standing-source followthrough，而不是把本地 merge 误判为远端 canonical closure
 - 若当前只是合法的 `post_merge_acceptance` / cleanup window，应要求留下结构化 defer reason 与下一跳 followthrough，再决定是否 push / 继续验收 / cleanup
-- patrol 输入若已给出 `develop_push_followthrough_push_urgency=immediate|deferred` 与 `develop_push_followthrough_resync_required=true`，说明 latest-develop-sensitive judgment 不能继续假定 remote 已同步；必须先显式处理 push/resync followthrough
+- patrol 输入若已给出 `develop_push_followthrough_push_urgency=immediate|deferred`、`develop_push_followthrough_resync_required=true`，或 `develop_push_followthrough_state=push_blocked`，说明 latest-develop-sensitive judgment 不能继续假定 remote 已同步；必须先显式处理 push/resync followthrough，并区分是尚未尝试、合法 defer，还是最近一次受控 attempt 已被 gate/remote 明确挡住
 - `latest-develop-sensitive judgment` 至少包括：owner/absorption sequencing、verification/promotion、cleanup/retirement、stale `test-pre-merge-*` rebuild 判定，以及任何声称“基于当前 develop 已完成对齐”的结论
 
 ## Trigger Model

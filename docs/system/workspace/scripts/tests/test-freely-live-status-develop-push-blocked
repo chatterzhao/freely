@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-develop-push-blocked.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+REMOTE="$TMP_DIR/remote.git"
+
+mkdir -p "$REPO" "$WT_ROOT"
+git init -q -b develop "$REPO"
+git -C "$REPO" config user.name tester
+git -C "$REPO" config user.email tester@example.com
+
+mkdir -p "$REPO/docs" "$REPO/.freely/run"
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+echo base >"$REPO/README.md"
+git -C "$REPO" add README.md
+git -C "$REPO" commit -q -m "init"
+git init -q --bare "$REMOTE"
+git -C "$REPO" remote add origin "$REMOTE"
+git -C "$REPO" push -q -u origin develop
+
+git -C "$REPO" worktree add -q -b feature/demo "$WT_ROOT/feature-demo" develop
+mkdir -p "$WT_ROOT/feature-demo/.freely/run" "$WT_ROOT/feature-demo/docs"
+cat >"$WT_ROOT/feature-demo/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$WT_ROOT/feature-demo/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$WT_ROOT/feature-demo/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$WT_ROOT/feature-demo/.freely/config.env" <<EOF
+PROJECT_ROOT="$WT_ROOT/feature-demo"
+INTENT_FILE="$WT_ROOT/feature-demo/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WT_ROOT/feature-demo/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+mkdir -p "$REPO/.git/hooks"
+cat >"$REPO/.git/hooks/pre-push" <<'EOF'
+#!/usr/bin/env bash
+echo "pre-push test gate blocked delivery" >&2
+exit 1
+EOF
+chmod +x "$REPO/.git/hooks/pre-push"
+
+echo blocked >"$REPO/blocked.txt"
+git -C "$REPO" add blocked.txt
+git -C "$REPO" commit -q -m "local merge result blocked"
+
+set +e
+bash "$ROOT_DIR/bin/freely" develop-push attempt --project "$REPO" >/dev/null 2>&1
+set -e
+
+ROOT_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+printf '%s\n' "$ROOT_OUTPUT" | grep -q 'develop_push_followthrough_state: push_blocked'
+printf '%s\n' "$ROOT_OUTPUT" | grep -q 'develop_push_followthrough_blocked_reason: push_rejected_by_gate'
+printf '%s\n' "$ROOT_OUTPUT" | grep -Eq 'develop_push_followthrough_blocked_updated_at: .*(PST|PDT)'
+printf '%s\n' "$ROOT_OUTPUT" | grep -q 'develop_push_followthrough_push_urgency: immediate'
+printf '%s\n' "$ROOT_OUTPUT" | grep -q 'develop_push_followthrough_resync_required: false'
+
+FEATURE_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$WT_ROOT/feature-demo")"
+printf '%s\n' "$FEATURE_OUTPUT" | grep -q 'develop_push_followthrough_state: not_applicable'
+printf '%s\n' "$FEATURE_OUTPUT" | grep -q 'canonical_develop_state=push_blocked canonical_develop_ahead=1'
+printf '%s\n' "$FEATURE_OUTPUT" | grep -q 'develop_push_followthrough_resync_required: true'
+
+echo "[PASS] freely live-status surfaces explicit push_blocked truth for canonical develop"
