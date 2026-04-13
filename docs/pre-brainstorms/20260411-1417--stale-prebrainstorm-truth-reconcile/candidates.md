@@ -17,8 +17,8 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260411-1417-A`
 - session_refs: []
-- next_action: `Candidate mirror only. I-20260411-1417-A is now the canonical owner for bounded stale-truth reconcile and representative batch execution.`
-- revisit_trigger: `Any new audit still reports implemented gate/hook behavior as missing because a pre-brainstorm statement remained unreconciled.`
+- next_action: `Candidate mirror only. I-20260411-1417-A is authoritative and now parked at completed; use the owner package for delivered reconcile truth instead of reopening raw pre-brainstorm debate.`
+- revisit_trigger: `Any new audit still reports implemented gate/hook behavior as missing because a pre-brainstorm statement remained unreconciled, and current reconcile labels cannot explain the gap.`
 - source_brainstorm: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/brainstorms.md`
 - promotion_gate:
   - `Owner scope is documentation-truth reconcile only; no runtime/gate behavior changes are mixed in.`
