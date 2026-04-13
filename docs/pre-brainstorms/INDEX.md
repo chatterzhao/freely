@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260413-1640--tasks-closeout-completion-and-adequacy-gate
+  - brainstorms: docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/candidates.md
 - 20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression
   - brainstorms: docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md
   - candidates: docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md
