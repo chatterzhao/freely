@@ -86,7 +86,7 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
 - surface_kind: `real_environment`
-- target_lane: `post_merge_dogfood`
-- promotion_gate: `completion`
-- task_refs: `tasks.md#task-1,tasks.md#task-2`
-- case_design: `Review the canonical develop startup evidence from the root-cause packet together with a current live-status inspection and confirm the missing first-handoff contract is still a real product/runtime problem rather than candidate-only theory.`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#task-1,tasks.md#task-2,tasks.md#task-4`
+- case_design: `In the disposable test-pre-merge batch, review the canonical develop startup evidence from the root-cause packet together with a current live-status inspection and confirm the missing first-handoff contract is still a real product/runtime problem rather than candidate-only theory.`
