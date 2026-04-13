@@ -43,3 +43,11 @@
 ## Residual Risk
 
 - This owner does not solve discovery for every historical stale pre-brainstorm. Future batches should stay bounded and open a new owner only when a new stale pattern cannot be explained by the current reconcile labels.
+
+## Implementation Decision Note
+
+- decision: `Close the stale-prebrainstorm reconcile owner as completed after materializing the representative batch and canonical pointers.`
+- why_this: `This owner is documentation-only, the representative batch is already recorded, and keeping the issue in_ibm creates a false develop-push blocker on a delivered governance slice.`
+- alternatives_considered: `Leaving the owner in_ibm; creating a separate execution owner now; reopening the same owner for any future stale-pattern follow-on.`
+- boundary_non_goals: `This closeout does not change runtime, hook, or gate behavior and does not broaden reconcile scope beyond the representative batch.`
+- residual_risk: `Future stale patterns may still need a new bounded follow-on owner if current labels cannot explain them.`

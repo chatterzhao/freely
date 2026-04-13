@@ -50,17 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260411-1417-A`
-- title: Stale pre-brainstorm truth reconcile governance
-- milestone_state: committed
-- phase_state: `in_ibm`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/issues/stale-prebrainstorm-truth-reconcile-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/candidates.md`
-- next_action: Finish IBM materialization for the reconcile policy and representative batch, then update only clearly superseded or deferred stale samples with canonical pointers.
-- revisit_trigger: Re-scope only if representative reconcile cannot be done without broader shared-index or runtime truth changes.
-
 2. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
 - milestone_state: candidate
@@ -124,8 +113,8 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/issues/stale-prebrainstorm-truth-reconcile-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/candidates.md`
-- next_action: Candidate mirror only. `I-20260411-1417-A` is now the canonical owner for stale pre-brainstorm truth reconcile.
-- revisit_trigger: Re-open only if the bounded reconcile policy proves too narrow to handle stale, deferred, and absorbed samples without capability drift.
+- next_action: Candidate mirror only. `I-20260411-1417-A` is authoritative and now parked at completed; use the owner package for delivered reconcile truth instead of reopening raw pre-brainstorm debate.
+- revisit_trigger: Re-open only if a future stale pattern cannot be explained by the current reconcile labels and needs a fresh bounded follow-on owner.
 
 1. `C-20260411-0217-A`
 - title: Protected-merge unparseable-subject receipt-gap followthrough
@@ -547,6 +536,18 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-retained-continuation`
   - `./bin/governance-check`
 - completion_note: `Cleanup and retirement now consume the recorded issue-bound pre-tests truth, retain merged worktrees when closure evidence is missing, and escalate retained cleanup through manager continuation; the next lifecycle step is guarded premerge promotion into develop.`
+1. `I-20260411-1417-A`
+- title: Stale pre-brainstorm truth reconcile governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/issues/stale-prebrainstorm-truth-reconcile-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
+  - `./bin/governance-check`
+- completion_note: `The representative stale-truth reconcile batch is now canonical on develop, and future stale-pattern work should open a fresh bounded follow-on owner instead of reopening this one.`
 1. `I-20260408-0231-A`
 - title: Runtime concurrent start-stop followthrough governance
 - milestone_state: completed
