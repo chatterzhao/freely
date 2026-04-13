@@ -72,6 +72,7 @@ REQUIRED_SECTION_SCALARS = (
     "target environment",
     "required evidence",
 )
+REAL_ENV_STATUS_VALUES = {"pass", "fail"}
 VALID_NOT_APPLICABLE_REASONS = {
     "change_not_touching_this_layer",
     "no_executable_boundary_at_this_layer",
@@ -268,6 +269,9 @@ def parse_fields(section: str) -> dict[str, str]:
         "evidence_level",
         "status",
         "artifact_ref",
+        "not_applicable_reason",
+        "not_applicable_explanation",
+        "replacement_evidence",
         "surface_kind",
         "target_lane",
         "promotion_gate",
@@ -358,6 +362,34 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             add_error("pre_tests_missing", f"{pre_tests_path}: missing required section '## {required_name}'")
             continue
         section_text = required_sections[required_name]
+        if required_name == "Real-Environment":
+            real_env_status = parse_scalar(section_text, "real_environment_status")
+            real_env_reason = parse_scalar(section_text, "real_environment_reason")
+            if not real_env_status:
+                add_error(
+                    "pre_tests_missing",
+                    f"{pre_tests_path}: section 'Real-Environment' missing 'real_environment_status'. "
+                    "This chapter is the final real-environment review verdict for the current implementation: record pass or fail, not a placeholder.",
+                )
+            elif real_env_status not in REAL_ENV_STATUS_VALUES:
+                add_error(
+                    "pre_tests_missing",
+                    f"{pre_tests_path}: section 'Real-Environment' uses unsupported real_environment_status {real_env_status}. "
+                    "Use pass when required real-environment testing is done or not needed, and fail when required real-environment testing is still missing or failing.",
+                )
+            if not real_env_reason:
+                add_error(
+                    "verification_state_missing",
+                    f"{pre_tests_path}: section 'Real-Environment' missing 'real_environment_reason'. "
+                    "Do not clear this chapter by only filling the status field; explain whether real-environment testing is complete, unnecessary, or still missing.",
+                )
+            if real_env_status == "fail":
+                add_error(
+                    "execution_missing",
+                    f"{pre_tests_path}: section 'Real-Environment' is fail. "
+                    "Complete the required real-environment testing or explicitly narrow the implementation until this review chapter can truthfully pass.",
+                )
+            continue
         for key in REQUIRED_SECTION_SCALARS:
             if not parse_scalar(section_text, key):
                 add_error(
@@ -392,12 +424,16 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
         if not section_has_test_tasks(section_text):
             add_error(
                 "testcase_derivation_missing",
-                f"{pre_tests_path}: section '{required_name}' has no concrete test tasks and no lawful not_applicable_reason",
+                f"{pre_tests_path}: section '{required_name}' has no concrete test tasks and no lawful not_applicable_reason. "
+                "List the real test work for this chapter, or record an explicit non-test reason with replacement evidence; do not leave a title-only placeholder.",
             )
 
     sections = extract_acceptance_sections(pretests_text)
     if not sections:
-        return [f"[pre_tests_missing] {pre_tests_path}: missing Acceptance Items"]
+        return [
+            f"[pre_tests_missing] {pre_tests_path}: missing Acceptance Items. "
+            "This gate expects real test tasks and result writeback for the current owner; you cannot clear it by only filling schema fields."
+        ]
 
     valid_statuses = {"pass", "not_applicable"}
     valid_levels = {"mock", "integration", "real_env", "post_merge_dogfood"}
@@ -410,34 +446,66 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
         title_line = section.splitlines()[0] if section.splitlines() else "### <unknown>"
         for key in ("id", "requirement", "evidence_level"):
             if not fields.get(key):
-                add_error("testcase_derivation_missing", f"{pre_tests_path}: {title_line} missing {key}")
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {title_line} missing {key}. "
+                    "Do not clear this gate by only filling placeholders; define the actual bounded test item for this implementation surface.",
+                )
         for key in ("status", "artifact_ref"):
             if not fields.get(key):
-                add_error("verification_state_missing", f"{pre_tests_path}: {title_line} missing {key}")
+                add_error(
+                    "verification_state_missing",
+                    f"{pre_tests_path}: {title_line} missing {key}. "
+                    "A passing owner still needs real test execution writeback; metadata alone is not enough.",
+                )
         if not fields:
             continue
         evidence_level = fields.get("evidence_level", "")
         if evidence_level and evidence_level not in valid_levels:
             add_error(
                 "testcase_derivation_missing",
-                f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported evidence_level {evidence_level}",
+                f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported evidence_level {evidence_level}. "
+                "Use a gate-supported evidence level that truthfully reflects the test you actually ran.",
             )
         status = fields.get("status", "")
         if status and status not in valid_statuses:
             add_error(
                 "execution_missing",
-                f"{pre_tests_path}: {fields.get('id', title_line)} must be pass or not_applicable before completion, got {status}"
+                f"{pre_tests_path}: {fields.get('id', title_line)} must be pass or not_applicable before completion, got {status}. "
+                "The test work is not complete yet; run the test, verify it, and write back the real result."
             )
+        if status == "not_applicable":
+            missing_non_test_fields = [
+                key
+                for key in ("not_applicable_reason", "not_applicable_explanation", "replacement_evidence")
+                if not fields.get(key)
+            ]
+            if missing_non_test_fields:
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {fields.get('id', title_line)} is marked not_applicable but is missing "
+                    f"{', '.join(missing_non_test_fields)}. If this task truly should not run, record the explicit non-test reason and replacement evidence; "
+                    "otherwise run the real test and write back a pass result.",
+                )
+            non_test_reason = fields.get("not_applicable_reason", "")
+            if non_test_reason and non_test_reason not in VALID_NOT_APPLICABLE_REASONS:
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {fields.get('id', title_line)} uses unsupported not_applicable_reason {non_test_reason}. "
+                    "Use one of the canonical lawful non-test reasons instead of inventing a new bypass label.",
+                )
         artifact_ref = fields.get("artifact_ref", "")
         if artifact_ref.startswith("pending://"):
             add_error(
                 "execution_missing",
-                f"{pre_tests_path}: {fields.get('id', title_line)} still points to pending artifact_ref {artifact_ref}",
+                f"{pre_tests_path}: {fields.get('id', title_line)} still points to pending artifact_ref {artifact_ref}. "
+                "That means execution/writeback is still incomplete; placeholder evidence cannot replace the real test.",
             )
         elif artifact_ref and not artifact_exists(artifact_ref, source):
             add_error(
                 "verification_state_missing",
-                f"{pre_tests_path}: {fields.get('id', title_line)} references missing artifact {artifact_ref}",
+                f"{pre_tests_path}: {fields.get('id', title_line)} references missing artifact {artifact_ref}. "
+                "Keep the gate tied to traceable test evidence; unstaged or imaginary records do not count.",
             )
         if require_adequacy and acceptance_item_uses_adequacy_v2(fields):
             adequacy_v2_items.append(fields)
@@ -475,7 +543,9 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
         if not adequacy_v2_items:
             add_error(
                 "evidence_plan_missing",
-                f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one Acceptance Item with adequacy v2 fields (surface_kind, target_lane, promotion_gate, task_refs, case_design)",
+                f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one Acceptance Item with adequacy v2 fields "
+                "(surface_kind, target_lane, promotion_gate, task_refs, case_design). "
+                "Add a real lane-bound test item for this guarded promote; generic pass text alone is not enough.",
             )
         elif not matching_items:
             available_pairs = sorted(
@@ -503,7 +573,8 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             if not sufficient_items:
                 add_error(
                     "evidence_plan_missing",
-                    f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one staged artifact-backed pass Acceptance Item with sufficient evidence_level",
+                    f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one staged artifact-backed pass Acceptance Item with sufficient evidence_level. "
+                    "This guarded promote needs real premerge-quality test evidence; metadata cleanup alone is not enough.",
                 )
             elif source == "staged" and target_lane == "premerge-integration" and promotion_gate == "develop_merge":
                 fresh_staged_items = [
@@ -518,9 +589,8 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                     )
 
     if issue_requires_stronger_live_surface(issue_text, pretests_text):
-        end_to_end_reason = parse_scalar(required_sections.get("End-to-End", ""), "not_applicable_reason")
-        real_env_reason = parse_scalar(required_sections.get("Real-Environment", ""), "not_applicable_reason")
-        if end_to_end_reason == "protected_environment_only" and real_env_reason == "protected_environment_only":
+        real_env_status = parse_scalar(required_sections.get("Real-Environment", ""), "real_environment_status")
+        if real_env_status == "pass":
             strong_live_items = [
                 fields
                 for fields in acceptance_fields
@@ -531,7 +601,8 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             if not strong_live_items:
                 add_error(
                     "evidence_plan_missing",
-                    f"{pre_tests_path}: follow-on auth/switch/startup-recovery/watchdog owners cannot waive both 'End-to-End' and 'Real-Environment' with protected_environment_only unless Acceptance Items keep at least one artifact-backed pass item at evidence_level real_env or post_merge_dogfood",
+                    f"{pre_tests_path}: follow-on auth/switch/startup-recovery/watchdog owners cannot mark 'Real-Environment' pass without at least one artifact-backed pass Acceptance Item at evidence_level real_env or post_merge_dogfood. "
+                    "For this owner family, high-quality live or dogfood testing must stay visible; do not clear the chapter by only filling the verdict fields.",
                 )
     return errors
 

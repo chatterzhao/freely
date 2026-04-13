@@ -68,14 +68,8 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `The sample repo intentionally omits a runtime shell.`
 
 ## Real-Environment
-- acceptance target: `State why protected real-environment followthrough is unavailable in this fixture.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `lawful replacement evidence for missing protected environment`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
-- replacement_evidence: `The isolated fixture does not model a protected branch environment.`
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
 
 ## Acceptance Items
 
@@ -138,14 +132,8 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - replacement_evidence: `The sample repo intentionally omits a runtime shell.`
 
 ## Real-Environment
-- acceptance target: `State why protected real-environment followthrough is unavailable in this fixture.`
-- testing layer: `real_environment`
-- target environment: `develop`
-- required evidence: `lawful replacement evidence for missing protected environment`
-- blocker taxonomy: `definition_missing`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `This isolated fixture does not provide a protected verification environment.`
-- replacement_evidence: `The isolated fixture does not model a protected branch environment.`
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
 
 ## Acceptance Items
 
