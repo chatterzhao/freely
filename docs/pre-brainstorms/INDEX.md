@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260412-1845--runtime-forensic-time-alignment-and-stall-observability
+  - brainstorms: docs/pre-brainstorms/20260412-1845--runtime-forensic-time-alignment-and-stall-observability/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260412-1845--runtime-forensic-time-alignment-and-stall-observability/candidates.md
 - 20260412-1721--develop-push-attempt-followthrough
   - brainstorms: docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/candidates.md
