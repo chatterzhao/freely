@@ -89,13 +89,13 @@ routing_policy:
 1. `C-20260413-0420-A`
 - title: Runtime startup authority and readiness governance
 - milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+- phase_state: `todo_ibm`
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
-- next_action: The research split is complete. Open a dedicated implementation worktree and materialize this candidate into a bounded owner for startup authority, launch readiness, daemon-ready truth, and ghost-supervisor cleanup followthrough.
-- revisit_trigger: Revisit immediately when the implementation lane starts issue materialization, or if fresh evidence proves the daemon parity symptom belongs to a separate root cause outside launch authority.
+- next_action: Candidate mirror only. `I-20260413-0420-A` is now the canonical owner for startup authority publication, daemon-ready truth, and authoritative supervisor cleanup.
+- revisit_trigger: Re-open only if canonical implementation later regresses back toward pid/argv startup heuristics, or if daemon parity still proves to be a separate owner after authoritative startup truth is in place.
 
 1. `C-20260413-0420-C`
 - title: Runtime startup root-cause packet governance
@@ -532,6 +532,27 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260413-0420-A`
+- title: Runtime startup authority and readiness governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-startup-authority-and-readiness-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- follow_on_to: `I-20260413-0420-C`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-fake-supervisor-argv-does-not-validate`
+  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-ignores-fake-supervisor-argv`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-serializes-same-project-concurrent-starts`
+  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-all-same-project-supervisors`
+  - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+  - `./bin/governance-check`
+- completion_note: `This owner records the bounded startup-authority repair that makes supervisor validation, daemon-ready truth, and stop cleanup depend on runtime-published authority instead of pid/argv resemblance.`
 
 1. `I-20260413-0420-C`
 - title: Runtime startup root-cause packet governance

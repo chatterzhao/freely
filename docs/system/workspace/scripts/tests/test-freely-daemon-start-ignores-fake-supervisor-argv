@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-daemon-fake-supervisor.XXXXXX)"
+cleanup() {
+  set +e
+  bash "$ROOT_DIR/bin/freely" daemon stop --project "$PROJECT" >/dev/null 2>&1 || true
+  kill "${FAKE_PID:-}" 2>/dev/null || true
+  wait "${FAKE_PID:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260413-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260413-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260413-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260413-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- candidate_format_version: `v2`
+- status: `promoted`
+- milestone: `M-20260306-workspace-routing-foundation`
+- promoted_issue_path: `docs/epics/sample/issues/sample.md`
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+IFLOW_MAX_TURNS=100
+EOF
+
+bash -c "cd '$PROJECT' && exec -a 'runtime/freely daemon-run --project $PROJECT' sleep 30" >/dev/null 2>&1 &
+FAKE_PID=$!
+
+DAEMON_OUTPUT="$(bash "$ROOT_DIR/bin/freely" daemon start --project "$PROJECT")"
+printf '%s\n' "$DAEMON_OUTPUT" | grep -q '^daemon_status: running$'
+
+SUPERVISOR_PID=""
+for _ in $(seq 1 50); do
+  if [[ -f "$PROJECT/.freely/run/supervisor.pid" ]]; then
+    SUPERVISOR_PID="$(cat "$PROJECT/.freely/run/supervisor.pid" 2>/dev/null || true)"
+  fi
+  if [[ -n "$SUPERVISOR_PID" ]] && [[ "$SUPERVISOR_PID" != "$FAKE_PID" ]] && kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+    break
+  fi
+  sleep 0.2
+done
+
+if [[ -z "$SUPERVISOR_PID" ]] || [[ "$SUPERVISOR_PID" == "$FAKE_PID" ]]; then
+  echo "[FAIL] daemon start reused the fake supervisor argv process" >&2
+  printf 'fake_pid=%s supervisor_pid=%s\n' "${FAKE_PID:-none}" "${SUPERVISOR_PID:-none}" >&2
+  exit 1
+fi
+
+EVENT_LOG="$PROJECT/.freely/logs/runtime-events.log"
+for _ in $(seq 1 20); do
+  [[ -f "$EVENT_LOG" ]] && grep -q "event=supervisor_started supervisor_pid=$SUPERVISOR_PID" "$EVENT_LOG" && break
+  sleep 0.2
+done
+
+grep -q "event=supervisor_started supervisor_pid=$SUPERVISOR_PID .*entrypoint_mode=daemon" "$EVENT_LOG"
+
+echo "[PASS] daemon start waits for runtime-published supervisor truth instead of fake argv discovery"

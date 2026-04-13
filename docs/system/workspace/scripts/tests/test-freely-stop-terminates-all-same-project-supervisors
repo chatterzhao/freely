@@ -51,23 +51,40 @@ SUP_PID_1=$!
 bash -c "cd '$PROJECT' && exec -a 'runtime/freely start --project $PROJECT' sleep 30" >/dev/null 2>&1 &
 SUP_PID_2=$!
 
+IDENTITY_DIR="$PROJECT/.freely/run/supervisor-identities"
+mkdir -p "$IDENTITY_DIR"
+cat >"$IDENTITY_DIR/supervisor-$SUP_PID_1.env" <<EOF
+SUPERVISOR_PID="$SUP_PID_1"
+PROJECT_ROOT="$PROJECT"
+ENTRYPOINT_MODE="foreground"
+STARTUP_TRUTH_PHASE="published"
+STARTUP_TRUTH_PUBLISHED_AT="2026-04-13T00:00:00Z"
+EOF
+cat >"$IDENTITY_DIR/supervisor-$SUP_PID_2.env" <<EOF
+SUPERVISOR_PID="$SUP_PID_2"
+PROJECT_ROOT="$PROJECT"
+ENTRYPOINT_MODE="foreground"
+STARTUP_TRUTH_PHASE="published"
+STARTUP_TRUTH_PUBLISHED_AT="2026-04-13T00:00:00Z"
+EOF
+
 printf '%s' "$SUP_PID_2" >"$PROJECT/.freely/run/supervisor.pid"
 
 bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1
 
 if kill -0 "$SUP_PID_1" 2>/dev/null; then
-  echo "[FAIL] stop should terminate the first same-project supervisor too" >&2
+  echo "[FAIL] stop should terminate the first authoritative same-project supervisor too" >&2
   exit 1
 fi
 
 if kill -0 "$SUP_PID_2" 2>/dev/null; then
-  echo "[FAIL] stop should terminate the pid-file-owned same-project supervisor" >&2
+  echo "[FAIL] stop should terminate the pid-file-owned authoritative same-project supervisor" >&2
   exit 1
 fi
 
-if [[ -f "$PROJECT/.freely/run/stop.marker" ]]; then
+if [[ -f "$PROJECT/.freely/run/stop.requested" ]]; then
   echo "[FAIL] stop marker should be cleared after the last same-project supervisor exits" >&2
   exit 1
 fi
 
-echo "[PASS] freely stop terminates all discovered same-project supervisors"
+echo "[PASS] freely stop terminates all authoritative same-project supervisors"
