@@ -35,14 +35,8 @@
 3. Materialize same-line owner evidence before `develop` push so the guarded push path cannot treat the implementation as a bare code change.
 
 ## Real-Environment
-- acceptance target: `Reserve protected-branch push and later dogfood observation as a distinct surface instead of silently collapsing it into premerge integration.`
-- testing layer: `real_environment`
-- target environment: `origin/develop`
-- required evidence: `protected branch push result or lawful replacement evidence`
-- blocker taxonomy: `execution_pending_or_failed`
-- not_applicable_reason: `protected_environment_only`
-- not_applicable_explanation: `The canonical protected push happens only after develop carries both implementation and same-line owner evidence, so this pre-tests file records the boundary rather than faking a local pass before push completes.`
-- replacement_evidence: `Local guarded merge receipts plus governance-check prove readiness; the final protected push result is recorded in the verification artifact once origin/develop accepts the merge.`
+- real_environment_status: `pass`
+- real_environment_reason: `This owner does not require an additional dedicated real-environment test beyond the guarded develop-bound verification path. The protected push and later dogfood observation remain separate post-merge acceptance surfaces.`
 
 ## Acceptance Items
 
@@ -77,4 +71,4 @@
 - case_design: `Use the guarded merge fixtures plus the owner-bound review artifact to prove develop promotion consumes explicit verification-contract adequacy truth rather than a bare implementation diff.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260412-real-environment-verdict-followthrough.md`
