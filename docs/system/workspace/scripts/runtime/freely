@@ -446,6 +446,7 @@ Usage:
   freely live-status [--project <abs_path>]
   freely fleet-status [--project <abs_path>]
   freely develop-push status [--project <abs_path>]
+  freely develop-push attempt [--project <abs_path>]
   freely develop-push defer [--project <abs_path>] --reason <post_merge_acceptance|cleanup_followthrough|remote_delivery_hold> [--note <text>]
   freely develop-push clear [--project <abs_path>]
   freely stop [--project <abs_path>]
@@ -4501,6 +4502,11 @@ develop_push_followthrough_state_file() {
   printf '%s/run/develop-push-followthrough.env\n' "$(state_dir "$project")"
 }
 
+develop_push_attempt_state_file() {
+  local project="$1"
+  printf '%s/run/develop-push-attempt.env\n' "$(state_dir "$project")"
+}
+
 develop_push_defer_reason_is_valid() {
   local reason="${1:-}"
   case "$reason" in
@@ -4509,13 +4515,43 @@ develop_push_defer_reason_is_valid() {
   esac
 }
 
+develop_push_attempt_reason_is_valid() {
+  local reason="${1:-}"
+  case "$reason" in
+    push_rejected_by_gate|remote_rejected|transport_failure|auth_failure|unknown_failure) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 develop_push_followthrough_push_urgency_for_state() {
   local state="${1:-}"
   case "$state" in
-    push_pending) printf 'immediate\n' ;;
+    push_pending|push_blocked) printf 'immediate\n' ;;
     push_deferred) printf 'deferred\n' ;;
     *) printf 'none\n' ;;
   esac
+}
+
+develop_push_followthrough_normalize_note() {
+  local note="${1:-}"
+  note="$(printf '%s\n' "$note" | tr '\n' ' ' | tr '\r' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//')"
+  note="${note//\"/\'}"
+  printf '%.240s\n' "$note"
+}
+
+develop_push_attempt_reason_from_output() {
+  local output="${1:-}"
+  if printf '%s\n' "$output" | grep -Eqi 'governance-merge-gate|pretests-gate|pre-push|hook declined|pushes to .* are not allowed'; then
+    printf 'push_rejected_by_gate\n'
+  elif printf '%s\n' "$output" | grep -Eqi 'Authentication failed|Permission denied|403|401|denied'; then
+    printf 'auth_failure\n'
+  elif printf '%s\n' "$output" | grep -Eqi 'remote rejected|protected branch hook declined|non-fast-forward|failed to push some refs'; then
+    printf 'remote_rejected\n'
+  elif printf '%s\n' "$output" | grep -Eqi 'Could not resolve host|Connection timed out|Failed to connect|Network is unreachable|Connection reset|TLS|SSL|proxy'; then
+    printf 'transport_failure\n'
+  else
+    printf 'unknown_failure\n'
+  fi
 }
 
 develop_push_followthrough_upstream_for_project() {
@@ -4546,7 +4582,7 @@ develop_push_followthrough_authoritative_develop_project() {
 
 develop_push_followthrough_snapshot_for_develop_project() {
   local project="$1"
-  local upstream counts ahead behind state summary defer_reason defer_note defer_updated_at state_file
+  local upstream counts ahead behind state summary defer_reason defer_note defer_updated_at state_file attempt_state_file head blocked_reason blocked_note blocked_updated_at blocked_head
   state="not_applicable"
   summary="branch_not_develop"
   upstream="none"
@@ -4555,7 +4591,12 @@ develop_push_followthrough_snapshot_for_develop_project() {
   defer_reason="none"
   defer_note="none"
   defer_updated_at="unavailable"
+  blocked_reason="none"
+  blocked_note="none"
+  blocked_updated_at="unavailable"
+  blocked_head="none"
   state_file="$(develop_push_followthrough_state_file "$project")"
+  attempt_state_file="$(develop_push_attempt_state_file "$project")"
 
   if [[ -f "$state_file" ]]; then
     # shellcheck disable=SC1090
@@ -4567,6 +4608,19 @@ develop_push_followthrough_snapshot_for_develop_project() {
       defer_reason="invalid:${defer_reason}"
     fi
     [[ -n "$defer_note" ]] || defer_note="none"
+  fi
+  if [[ -f "$attempt_state_file" ]]; then
+    # shellcheck disable=SC1090
+    source "$attempt_state_file"
+    blocked_reason="${DEVELOP_PUSH_ATTEMPT_REASON:-none}"
+    blocked_note="${DEVELOP_PUSH_ATTEMPT_NOTE:-none}"
+    blocked_updated_at="${DEVELOP_PUSH_ATTEMPT_UPDATED_AT:-unavailable}"
+    blocked_head="${DEVELOP_PUSH_ATTEMPT_HEAD:-none}"
+    if [[ -n "$blocked_reason" ]] && ! develop_push_attempt_reason_is_valid "$blocked_reason"; then
+      blocked_reason="invalid:${blocked_reason}"
+    fi
+    [[ -n "$blocked_note" ]] || blocked_note="none"
+    [[ -n "$blocked_head" ]] || blocked_head="none"
   fi
 
   upstream="$(develop_push_followthrough_upstream_for_project "$project")"
@@ -4580,12 +4634,16 @@ develop_push_followthrough_snapshot_for_develop_project() {
       ahead="$(printf '%s\n' "$counts" | awk '{print $1}')"
       behind="$(printf '%s\n' "$counts" | awk '{print $2}')"
     fi
+    head="$(git -C "$project" rev-parse HEAD 2>/dev/null || true)"
     [[ "$ahead" =~ ^[0-9]+$ ]] || ahead="0"
     [[ "$behind" =~ ^[0-9]+$ ]] || behind="0"
     if (( ahead > 0 )); then
       if develop_push_defer_reason_is_valid "${DEVELOP_PUSH_DEFER_REASON:-}"; then
         state="push_deferred"
         summary="ahead=${ahead} behind=${behind} upstream=${upstream} defer=${DEVELOP_PUSH_DEFER_REASON}"
+      elif [[ "${DEVELOP_PUSH_ATTEMPT_STATUS:-}" == "blocked" && -n "$head" && "$blocked_head" == "$head" ]]; then
+        state="push_blocked"
+        summary="ahead=${ahead} behind=${behind} upstream=${upstream} blocked=${blocked_reason}"
       else
         state="push_pending"
         summary="ahead=${ahead} behind=${behind} upstream=${upstream} defer=none"
@@ -4596,7 +4654,7 @@ develop_push_followthrough_snapshot_for_develop_project() {
     fi
   fi
 
-  printf '%s|%s|%s|%s|%s|%s|%s\n' "$state" "$summary" "$upstream" "$ahead" "$behind" "$defer_reason" "$defer_updated_at"
+  printf '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' "$state" "$summary" "$upstream" "$ahead" "$behind" "$defer_reason" "$defer_updated_at" "$blocked_reason" "$blocked_updated_at" "$blocked_head" "$blocked_note"
 }
 
 write_develop_push_followthrough_state() {
@@ -4617,10 +4675,31 @@ clear_develop_push_followthrough_state() {
   rm -f "$(develop_push_followthrough_state_file "$project")"
 }
 
+write_develop_push_attempt_state() {
+  local project="$1" reason="$2" note="${3:-}" head="${4:-}"
+  local state_file updated_at
+  state_file="$(develop_push_attempt_state_file "$project")"
+  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  note="$(develop_push_followthrough_normalize_note "$note")"
+  mkdir -p "$(dirname "$state_file")"
+  cat >"$state_file" <<EOF
+DEVELOP_PUSH_ATTEMPT_STATUS="blocked"
+DEVELOP_PUSH_ATTEMPT_REASON="$reason"
+DEVELOP_PUSH_ATTEMPT_NOTE="$note"
+DEVELOP_PUSH_ATTEMPT_HEAD="$head"
+DEVELOP_PUSH_ATTEMPT_UPDATED_AT="$updated_at"
+EOF
+}
+
+clear_develop_push_attempt_state() {
+  local project="$1"
+  rm -f "$(develop_push_attempt_state_file "$project")"
+}
+
 develop_push_followthrough_snapshot_for_project() {
   local project="$1"
-  local branch upstream ahead behind state summary defer_reason defer_updated_at push_urgency resync_required
-  local canonical_develop_project canonical_develop_state canonical_develop_summary canonical_develop_upstream canonical_develop_ahead canonical_develop_behind canonical_develop_defer_reason canonical_develop_defer_updated_at
+  local branch upstream ahead behind state summary defer_reason defer_updated_at blocked_reason blocked_updated_at blocked_head blocked_note push_urgency resync_required
+  local canonical_develop_project canonical_develop_state canonical_develop_summary canonical_develop_upstream canonical_develop_ahead canonical_develop_behind canonical_develop_defer_reason canonical_develop_defer_updated_at canonical_develop_blocked_reason canonical_develop_blocked_updated_at canonical_develop_blocked_head canonical_develop_blocked_note
   branch="$(branch_name_for_project "$project")"
   state="not_applicable"
   summary="branch_not_develop"
@@ -4629,15 +4708,19 @@ develop_push_followthrough_snapshot_for_project() {
   behind="0"
   defer_reason="none"
   defer_updated_at="unavailable"
+  blocked_reason="none"
+  blocked_updated_at="unavailable"
+  blocked_head="none"
+  blocked_note="none"
   push_urgency="none"
   resync_required="false"
 
   if [[ "$branch" == "develop" ]]; then
-    IFS='|' read -r state summary upstream ahead behind defer_reason defer_updated_at <<<"$(develop_push_followthrough_snapshot_for_develop_project "$project")"
+    IFS='|' read -r state summary upstream ahead behind defer_reason defer_updated_at blocked_reason blocked_updated_at blocked_head blocked_note <<<"$(develop_push_followthrough_snapshot_for_develop_project "$project")"
   else
     canonical_develop_project="$(develop_push_followthrough_authoritative_develop_project "$project")"
     if [[ -n "$canonical_develop_project" ]]; then
-      IFS='|' read -r canonical_develop_state canonical_develop_summary canonical_develop_upstream canonical_develop_ahead canonical_develop_behind canonical_develop_defer_reason canonical_develop_defer_updated_at <<<"$(develop_push_followthrough_snapshot_for_develop_project "$canonical_develop_project")"
+      IFS='|' read -r canonical_develop_state canonical_develop_summary canonical_develop_upstream canonical_develop_ahead canonical_develop_behind canonical_develop_defer_reason canonical_develop_defer_updated_at canonical_develop_blocked_reason canonical_develop_blocked_updated_at canonical_develop_blocked_head canonical_develop_blocked_note <<<"$(develop_push_followthrough_snapshot_for_develop_project "$canonical_develop_project")"
       if [[ "${canonical_develop_ahead:-0}" =~ ^[0-9]+$ ]] && (( canonical_develop_ahead > 0 )); then
         resync_required="true"
         summary="branch_not_develop canonical_develop_state=${canonical_develop_state} canonical_develop_ahead=${canonical_develop_ahead} canonical_develop_upstream=${canonical_develop_upstream}"
@@ -4646,7 +4729,7 @@ develop_push_followthrough_snapshot_for_project() {
   fi
 
   push_urgency="$(develop_push_followthrough_push_urgency_for_state "$state")"
-  printf '%s|%s|%s|%s|%s|%s|%s|%s|%s\n' "$state" "$summary" "$upstream" "$ahead" "$behind" "$defer_reason" "$defer_updated_at" "$push_urgency" "$resync_required"
+  printf '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' "$state" "$summary" "$upstream" "$ahead" "$behind" "$defer_reason" "$defer_updated_at" "$blocked_reason" "$blocked_updated_at" "$blocked_head" "$blocked_note" "$push_urgency" "$resync_required"
 }
 
 write_preemption_state() {
@@ -11292,7 +11375,8 @@ cmd_live_status() {
     fi
   fi
   develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
-  IFS='|' read -r develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at develop_push_urgency develop_push_resync_required <<<"$develop_push_snapshot"
+  local develop_push_blocked_reason develop_push_blocked_updated_at develop_push_blocked_head develop_push_blocked_note
+  IFS='|' read -r develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at develop_push_blocked_reason develop_push_blocked_updated_at develop_push_blocked_head develop_push_blocked_note develop_push_urgency develop_push_resync_required <<<"$develop_push_snapshot"
 
   echo "project: $project"
   echo "branch: $branch"
@@ -11356,6 +11440,8 @@ cmd_live_status() {
   echo "ownership_conflict_summary: ${ownership_conflict_summary}"
   echo "develop_push_followthrough_state: ${develop_push_state}"
   echo "develop_push_followthrough_summary: ${develop_push_summary}"
+  echo "develop_push_followthrough_blocked_reason: ${develop_push_blocked_reason}"
+  echo "develop_push_followthrough_blocked_updated_at: $(format_timestamp_local_for_display "${develop_push_blocked_updated_at}")"
   echo "develop_push_followthrough_push_urgency: ${develop_push_urgency}"
   echo "develop_push_followthrough_resync_required: ${develop_push_resync_required}"
   echo "current_prompt_has_delegated_continuation: ${prompt_has_delegated}"
@@ -11430,11 +11516,16 @@ cmd_live_status() {
   echo "- last_tool_resume_target: ${LAST_TOOL_RESUME_TARGET:-unavailable}"
   echo "- last_cycle_log: ${LAST_CYCLE_LOG:-unavailable}"
   echo "- develop_push_followthrough_state_file: $(develop_push_followthrough_state_file "$project")"
+  echo "- develop_push_attempt_state_file: $(develop_push_attempt_state_file "$project")"
   echo "- develop_push_followthrough_upstream: ${develop_push_upstream}"
   echo "- develop_push_followthrough_ahead: ${develop_push_ahead}"
   echo "- develop_push_followthrough_behind: ${develop_push_behind}"
   echo "- develop_push_followthrough_defer_reason: ${develop_push_defer_reason}"
   echo "- develop_push_followthrough_defer_updated_at: $(format_timestamp_local_for_display "${develop_push_defer_updated_at}")"
+  echo "- develop_push_followthrough_blocked_reason: ${develop_push_blocked_reason}"
+  echo "- develop_push_followthrough_blocked_updated_at: $(format_timestamp_local_for_display "${develop_push_blocked_updated_at}")"
+  echo "- develop_push_followthrough_blocked_head: ${develop_push_blocked_head}"
+  echo "- develop_push_followthrough_blocked_note: ${develop_push_blocked_note}"
   echo "- develop_push_followthrough_push_urgency: ${develop_push_urgency}"
   echo "- develop_push_followthrough_resync_required: ${develop_push_resync_required}"
 }
@@ -11627,7 +11718,7 @@ cmd_fleet_status() {
       IFS='|' read -r blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact <<<"$(blocked_supervision_snapshot_for_project "$wt_path")"
       IFS='|' read -r manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$wt_path")"
       develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$wt_path")"
-      IFS='|' read -r develop_push_state develop_push_summary _ _ _ _ _ develop_push_urgency develop_push_resync_required <<<"$develop_push_snapshot"
+      IFS='|' read -r develop_push_state develop_push_summary _ _ _ _ _ _ _ _ _ develop_push_urgency develop_push_resync_required <<<"$develop_push_snapshot"
       prompt_file="$(find_latest_prompt_file_for_project "$wt_path")"
       intent_prompt_file="$(status_intent_prompt_file_for_project "$wt_path")"
       if [[ -n "$intent_prompt_file" && -f "$intent_prompt_file" ]]; then
@@ -11726,9 +11817,9 @@ cmd_develop_push() {
 
   case "$subcmd" in
     status)
-      local snapshot state summary upstream ahead behind defer_reason defer_updated_at push_urgency resync_required
+      local snapshot state summary upstream ahead behind defer_reason defer_updated_at blocked_reason blocked_updated_at blocked_head blocked_note push_urgency resync_required
       snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
-      IFS='|' read -r state summary upstream ahead behind defer_reason defer_updated_at push_urgency resync_required <<<"$snapshot"
+      IFS='|' read -r state summary upstream ahead behind defer_reason defer_updated_at blocked_reason blocked_updated_at blocked_head blocked_note push_urgency resync_required <<<"$snapshot"
       echo "project: $project"
       echo "develop_push_followthrough_state: $state"
       echo "develop_push_followthrough_summary: $summary"
@@ -11737,8 +11828,64 @@ cmd_develop_push() {
       echo "develop_push_followthrough_behind: $behind"
       echo "develop_push_followthrough_defer_reason: $defer_reason"
       echo "develop_push_followthrough_defer_updated_at: $(format_timestamp_local_for_display "$defer_updated_at")"
+      echo "develop_push_followthrough_blocked_reason: $blocked_reason"
+      echo "develop_push_followthrough_blocked_updated_at: $(format_timestamp_local_for_display "$blocked_updated_at")"
+      echo "develop_push_followthrough_blocked_head: $blocked_head"
+      echo "develop_push_followthrough_blocked_note: $blocked_note"
       echo "develop_push_followthrough_push_urgency: $push_urgency"
       echo "develop_push_followthrough_resync_required: $resync_required"
+      ;;
+    attempt)
+      local snapshot branch state summary upstream ahead behind defer_reason defer_updated_at blocked_reason blocked_updated_at blocked_head blocked_note push_urgency resync_required head push_output attempt_reason attempt_note
+      branch="$(branch_name_for_project "$project")"
+      [[ "$branch" == "develop" ]] || {
+        log_error "develop-push attempt only applies to canonical develop"
+        exit 1
+      }
+      snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
+      IFS='|' read -r state summary upstream ahead behind defer_reason defer_updated_at blocked_reason blocked_updated_at blocked_head blocked_note push_urgency resync_required <<<"$snapshot"
+      if [[ "$state" == "push_deferred" ]]; then
+        log_error "develop-push is explicitly deferred; clear defer before attempt"
+        exit 1
+      fi
+      if [[ "$state" == "clean" || "$state" == "not_applicable" ]]; then
+        echo "project: $project"
+        echo "develop_push_followthrough_state: $state"
+        echo "develop_push_followthrough_summary: $summary"
+        echo "attempt_status: skipped"
+        exit 0
+      fi
+      head="$(git -C "$project" rev-parse HEAD 2>/dev/null || true)"
+      set +e
+      push_output="$(git -C "$project" push 2>&1)"
+      local push_rc=$?
+      set -e
+      if [[ "$push_rc" -eq 0 ]]; then
+        clear_develop_push_attempt_state "$project"
+        clear_develop_push_followthrough_state "$project"
+        snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
+        IFS='|' read -r state summary upstream ahead behind defer_reason defer_updated_at blocked_reason blocked_updated_at blocked_head blocked_note push_urgency resync_required <<<"$snapshot"
+        echo "project: $project"
+        echo "attempt_status: pushed"
+        echo "develop_push_followthrough_state: $state"
+        echo "develop_push_followthrough_summary: $summary"
+        [[ -n "$push_output" ]] && echo "push_result: $(develop_push_followthrough_normalize_note "$push_output")"
+        exit 0
+      fi
+      attempt_reason="$(develop_push_attempt_reason_from_output "$push_output")"
+      attempt_note="$(develop_push_followthrough_normalize_note "$(printf '%s\n' "$push_output" | tail -n 20)")"
+      write_develop_push_attempt_state "$project" "$attempt_reason" "$attempt_note" "$head"
+      snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
+      IFS='|' read -r state summary upstream ahead behind defer_reason defer_updated_at blocked_reason blocked_updated_at blocked_head blocked_note push_urgency resync_required <<<"$snapshot"
+      echo "project: $project"
+      echo "attempt_status: blocked"
+      echo "develop_push_followthrough_state: $state"
+      echo "develop_push_followthrough_summary: $summary"
+      echo "develop_push_followthrough_blocked_reason: $blocked_reason"
+      echo "develop_push_followthrough_blocked_updated_at: $(format_timestamp_local_for_display "$blocked_updated_at")"
+      echo "develop_push_followthrough_blocked_head: $blocked_head"
+      echo "develop_push_followthrough_blocked_note: $blocked_note"
+      return 1
       ;;
     defer)
       if ! develop_push_defer_reason_is_valid "$reason"; then
@@ -11754,8 +11901,10 @@ cmd_develop_push() {
       ;;
     clear)
       clear_develop_push_followthrough_state "$project"
+      clear_develop_push_attempt_state "$project"
       echo "project: $project"
       echo "state_file: $(develop_push_followthrough_state_file "$project")"
+      echo "attempt_state_file: $(develop_push_attempt_state_file "$project")"
       echo "status: cleared"
       ;;
     *)
