@@ -5,7 +5,7 @@
 - branch: `feature/develop-push-attempt-followthrough-20260412-1721`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260412-1721-feature-develop-push-attempt-followthrough`
 - verification_date: `2026-04-12`
-- verification_scope: `bounded integration verification prior to canonical develop replay`
+- verification_scope: `bounded integration verification plus canonical develop replay`
 
 ## Implementation Decision Note
 
@@ -19,7 +19,6 @@
   - `Do not suppress lawful defer reasons.`
   - `Do not add hidden retry loops or background push daemons.`
 - residual_risk:
-  - `Canonical protected replay is still required before this owner can claim real-environment completion.`
   - `Blocked reason classification is intentionally coarse and may need follow-on refinement if future gate/remote errors need finer routing.`
 
 ## Commands
@@ -42,3 +41,4 @@
 - `pass`: guarded merge now triggers exactly one attempt after a successful `develop` merge and does not fail the completed merge when delivery is blocked.
 - `pass`: existing defer/pending/fleet/pre-push contracts still pass after the refactor.
 - `pass`: the owner's real-environment verdict is the guarded `test-pre-merge -> develop` promotion path itself; no second synthetic live environment is required beyond that canonical boundary.
+- `pass`: canonical `develop` absorbed the owner through merge receipt `9bcf5fcf`, and `./bin/freely develop-push attempt --project /Users/zhaoyu/Downloads/code/my-freely/freely` completed remote delivery with `attempt_status: pushed`.

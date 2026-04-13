@@ -50,19 +50,7 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260412-1721-A`
-- title: Develop push attempt followthrough governance
-- milestone_state: candidate
-- phase_state: `in_dev`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/issues/develop-push-attempt-followthrough-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-develop-push-attempt-followthrough-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/candidates.md`
-- follow_on_to: `I-20260408-1200-A`
-- next_action: Implement the bounded single-attempt followthrough, add explicit `push_blocked` truth, and verify the guarded develop merge path now auto-attempts remote delivery once.
-
-2. `I-20260412-0907-A`
+1. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
 - milestone_state: candidate
 - phase_state: `in_verification`
@@ -500,6 +488,22 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260412-1721-A`
+- title: Develop push attempt followthrough governance
+- milestone_state: delivered
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/issues/develop-push-attempt-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-develop-push-attempt-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/candidates.md`
+- follow_on_to: `I-20260408-1200-A`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
+  - `merge receipt 9bcf5fcf`
+  - `./bin/freely develop-push attempt --project /Users/zhaoyu/Downloads/code/my-freely/freely -> attempt_status: pushed`
+- completion_note: The bounded develop push followthrough is now canonical: guarded `develop` merges expose one explicit attempt, blocked deliveries write `push_blocked`, and the current owner has already been merged and delivered to `origin/develop`.
 1. `I-20260411-1415-A`
 - title: Pre-tests adequacy item schema materialization governance
 - milestone_state: completed
