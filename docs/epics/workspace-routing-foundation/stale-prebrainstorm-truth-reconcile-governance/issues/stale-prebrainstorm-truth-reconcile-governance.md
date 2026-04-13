@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260411-1417-A`
 - title: Stale pre-brainstorm truth reconcile governance
-- phase_state: `in_ibm`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `stale-prebrainstorm-truth-reconcile-governance`
@@ -49,10 +49,10 @@
 
 ## Next
 
-1. next_action: `keep the representative reconcile batch and verification receipt as IBM materialization evidence, then decide whether to open a separate execution owner only for any newly discovered stale pattern that current labels cannot explain`
-2. revisit_trigger: 若新的审计仍因为旧 pre-brainstorm 语句把已实现能力误判为缺失，且现有 reconcile labels不足以解释该偏差。
+1. next_action: `completed on canonical develop; the representative reconcile batch and verification receipt are now canonical delivered truth.`
+2. revisit_trigger: Re-open only if a future stale pattern cannot be explained by the current reconcile labels and needs a new bounded follow-on owner.
 
 ## Current State Note
 
-- `pre-tests.md` 当前的 `pass` 只表示 IBM materialization 与代表样本 reconcile 已被记录，不表示本 owner 已进入 execution loop。
-- 在出现需要真正修改 runtime / hook / gate 的新 stale pattern 之前，本 owner 保持 `phase_state: in_ibm` 是刻意边界，而不是 lifecycle 漏写。
+- `pre-tests.md` 的 pass 已对应 canonical delivered truth，且本 owner 现已完成闭环。
+- 未来若出现新的 stale pattern，应另开更窄的 follow-on owner，而不是回写本 owner。

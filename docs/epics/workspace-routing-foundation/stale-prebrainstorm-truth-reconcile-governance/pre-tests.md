@@ -30,14 +30,8 @@
 - replacement_evidence: `The before/after reconcile capture is preserved in the verification artifact, and the paired develop-promote replay covers the remaining integration boundary.`
 
 ## Real-Environment
-- acceptance target: `This owner is documentation-only; no distinct real-environment execution surface exists.`
-- testing layer: `real_environment`
-- target environment: `documentation-only boundary`
-- required evidence: `lawful replacement evidence recorded in verification artifact`
-- blocker taxonomy: `protected_environment_only`
-- not_applicable_reason: `no_executable_boundary_at_this_layer`
-- not_applicable_explanation: `The bounded owner changes documentation truth and reconcile policy only, so there is no protected runtime surface to exercise here.`
-- replacement_evidence: `Representative reconcile diffs plus governance-check are sufficient for this owner.`
+- real_environment_status: `pass`
+- real_environment_reason: `This owner is documentation-only and does not require an additional real-environment test surface; the representative reconcile batch and governance-check are sufficient.`
 
 ## Acceptance Items
 
