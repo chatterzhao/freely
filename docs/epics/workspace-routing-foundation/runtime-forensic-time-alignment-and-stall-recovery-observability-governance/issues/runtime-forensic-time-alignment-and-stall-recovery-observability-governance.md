@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260412-1845-A`
 - title: Runtime forensic time alignment and stall recovery observability governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-forensic-time-alignment-and-stall-recovery-observability-governance`
@@ -86,4 +86,5 @@ So the real gap is not human-readable time-display policy. The gap is runtime fo
 
 ## Next
 
-- The bounded feature implementation and focused verification now exist in the dedicated feature worktree. Promote through the lawful guarded merge path, then close the owner on canonical `develop`.
+- `2026-04-12` closeout: canonical `develop` absorbed the bounded runtime repair through merge `480d839a`, and this closeout lane only writes back completed lifecycle truth.
+- Keep this owner closed as the forensic-alignment and stall-observability record for the 2026-04-12 incident; future broader cross-plane correlation or restart-policy work must reopen as a new owner on current `develop`.
