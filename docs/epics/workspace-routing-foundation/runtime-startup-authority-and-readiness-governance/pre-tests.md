@@ -78,3 +78,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
+
+### Guarded promote proves premerge adequacy
+- id: `develop-promote-startup-authority-proof`
+- requirement: `A guarded test-pre-merge replay proves this owner carries explicit premerge-integration adequacy before develop promotion.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Replay the startup-authority regressions and governance gate from a disposable test-pre-merge branch before guarded promote to develop.`
+- case_design: `Merge the feature lane into a disposable test-pre-merge batch, rerun the startup-authority regression set plus governance-check there, and record the replay in a closeout verification artifact that the develop gate can consume.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`

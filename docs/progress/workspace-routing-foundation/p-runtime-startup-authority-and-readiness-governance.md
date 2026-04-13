@@ -38,6 +38,7 @@ This owner replaces PID/argv startup authority with runtime-published supervisor
 - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
 - `./bin/governance-check`
 - `git diff --check`
+- `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`
 
 ## Next Action
 

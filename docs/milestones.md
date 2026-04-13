@@ -544,6 +544,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
 - follow_on_to: `I-20260413-0420-C`
 - evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`
   - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
   - `bash docs/system/workspace/scripts/tests/test-freely-fake-supervisor-argv-does-not-validate`
   - `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-ignores-fake-supervisor-argv`
