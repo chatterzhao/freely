@@ -694,6 +694,16 @@ run_dir_for_project() {
   echo "$(state_dir "$project")/run"
 }
 
+supervisor_identity_dir_for_project() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/supervisor-identities"
+}
+
+supervisor_identity_file_for_project_pid() {
+  local project="$1" pid="$2"
+  echo "$(supervisor_identity_dir_for_project "$project")/supervisor-$pid.env"
+}
+
 logs_dir_for_project() {
   local project="$1"
   echo "$(state_dir "$project")/logs"
@@ -1598,10 +1608,95 @@ pid_matches_project() {
   return 1
 }
 
+supervisor_identity_matches_project_pid() {
+  local project="$1" pid="$2" identity_file project_real identity_project identity_pid identity_phase
+  [[ -n "$pid" ]] || return 1
+  identity_file="$(supervisor_identity_file_for_project_pid "$project" "$pid")"
+  [[ -f "$identity_file" ]] || return 1
+  project_real="$(cd "$project" 2>/dev/null && pwd -P || true)"
+  unset SUPERVISOR_PID PROJECT_ROOT STARTUP_TRUTH_PHASE ENTRYPOINT_MODE STARTUP_TRUTH_PUBLISHED_AT
+  # shellcheck disable=SC1090
+  source "$identity_file"
+  identity_project="${PROJECT_ROOT:-}"
+  identity_pid="${SUPERVISOR_PID:-}"
+  identity_phase="${STARTUP_TRUTH_PHASE:-}"
+  [[ -n "$identity_project" && -n "$identity_pid" ]] || return 1
+  [[ "$identity_pid" == "$pid" ]] || return 1
+  [[ "$identity_phase" == "published" ]] || return 1
+  if [[ "$identity_project" != "$project" && "$identity_project" != "$project_real" ]]; then
+    if [[ -d "$identity_project" ]]; then
+      identity_project="$(cd "$identity_project" 2>/dev/null && pwd -P || true)"
+    fi
+    [[ -n "$identity_project" && ( "$identity_project" == "$project" || "$identity_project" == "$project_real" ) ]] || return 1
+  fi
+  return 0
+}
+
+write_supervisor_identity_truth() {
+  local project="$1" pid="$2" entrypoint_mode="$3" identity_dir identity_file published_at
+  identity_dir="$(supervisor_identity_dir_for_project "$project")"
+  identity_file="$(supervisor_identity_file_for_project_pid "$project" "$pid")"
+  published_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  mkdir -p "$identity_dir"
+  cat >"$identity_file" <<EOF
+SUPERVISOR_PID="$pid"
+PROJECT_ROOT="$project"
+ENTRYPOINT_MODE="$entrypoint_mode"
+STARTUP_TRUTH_PHASE="published"
+STARTUP_TRUTH_PUBLISHED_AT="$published_at"
+EOF
+}
+
+clear_supervisor_identity_truth() {
+  local project="$1" pid="${2:-}" identity_dir
+  identity_dir="$(supervisor_identity_dir_for_project "$project")"
+  if [[ -n "$pid" ]]; then
+    rm -f "$(supervisor_identity_file_for_project_pid "$project" "$pid")"
+    return 0
+  fi
+  rm -rf "$identity_dir"
+}
+
+authoritative_supervisor_pids_for_project() {
+  local project="$1" excluded_pids="${2:-}"
+  local identity_dir identity_file pid
+  identity_dir="$(supervisor_identity_dir_for_project "$project")"
+  [[ -d "$identity_dir" ]] || return 0
+  for identity_file in "$identity_dir"/supervisor-*.env; do
+    [[ -e "$identity_file" ]] || continue
+    pid="${identity_file##*/supervisor-}"
+    pid="${pid%.env}"
+    [[ -n "$pid" ]] || continue
+    if [[ -n "$excluded_pids" ]] && [[ ",$excluded_pids," == *",$pid,"* ]]; then
+      continue
+    fi
+    if valid_supervisor_pid_for_project "$project" "$pid"; then
+      printf '%s\n' "$pid"
+    else
+      rm -f "$identity_file"
+    fi
+  done
+}
+
+supervisor_startup_truth_ready_for_project() {
+  local project="$1" supervisor_pid="$2"
+  [[ -n "$supervisor_pid" ]] || return 1
+  supervisor_identity_matches_project_pid "$project" "$supervisor_pid" || return 1
+  [[ -f "$(workcell_state_file "$project")" ]] || return 1
+  unset DESIRED_RUNTIME_STATE LAST_SUPERVISOR_STATE LAST_EXIT_REASON
+  # shellcheck disable=SC1090
+  source "$(workcell_state_file "$project")"
+  [[ "${DESIRED_RUNTIME_STATE:-unknown}" == "running" ]] || return 1
+  [[ "${LAST_SUPERVISOR_STATE:-unknown}" == "up" ]] || return 1
+  [[ "${LAST_EXIT_REASON:-}" == "starting" || "${LAST_EXIT_REASON:-}" == "up" || "${LAST_EXIT_REASON:-}" == "already_running_attach" ]]
+}
+
 valid_supervisor_pid_for_project() {
   local project="$1" pid="$2"
-  pid_matches_project "$pid" "$project" "runtime/freely start --project" || \
-    pid_matches_project "$pid" "$project" "runtime/freely daemon-run --project"
+  [[ -n "$pid" ]] || return 1
+  kill -0 "$pid" 2>/dev/null || return 1
+  supervisor_identity_matches_project_pid "$project" "$pid" || return 1
+  pid_matches_project "$pid" "$project" ""
 }
 
 valid_ensure_manager_watchdog_pid_for_project() {
@@ -8502,7 +8597,11 @@ manager_supervisor_pid_for_project() {
       return 0
     fi
   fi
-  discover_supervisor_pid "$project"
+  sp="$(authoritative_supervisor_pids_for_project "$project" | head -n 1)"
+  if [[ -n "$sp" ]]; then
+    printf '%s\n' "$sp" >"$run_dir/supervisor.pid"
+    printf '%s\n' "$sp"
+  fi
 }
 
 manager_ai_pid_for_project() {
@@ -10154,9 +10253,10 @@ start_project_runtime() {
       "desired_state=${DESIRED_RUNTIME_STATE_VALUE:-stopped}" \
       "exit_reason=${LAST_WORKCELL_EXIT_REASON:-supervisor_exit}" \
       "stop_requested=$stop_requested"
+    clear_supervisor_identity_truth "$project" "$$"
     rm -f "$sup_pid_file" "$child_pid_file"
     if [[ "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" == "stopped" ]] && [[ -f "$(stop_marker_file "$project")" ]]; then
-      other_supervisors="$(discover_supervisor_pids "$project" "$$" | head -n 1)"
+      other_supervisors="$(authoritative_supervisor_pids_for_project "$project" "$$" | head -n 1)"
       if [[ -n "$other_supervisors" ]]; then
         append_runtime_event "$project" "supervisor_cleanup_stop_marker_preserved" \
           "supervisor_pid=$$" \
@@ -10179,13 +10279,14 @@ start_project_runtime() {
     sleep "$test_project_start_prewrite_delay_secs"
   fi
   echo "$$" >"$sup_pid_file"
-  release_project_start_lock_for_runtime "$project"
   append_runtime_event "$project" "supervisor_started" \
     "supervisor_pid=$$" \
     "project=$project" \
     "role_hint=$(role_hint_for_project "$project")" \
     "entrypoint_mode=$entrypoint_mode"
   write_workcell_state "$project" "running" "up" "down" "starting"
+  write_supervisor_identity_truth "$project" "$$" "$entrypoint_mode"
+  release_project_start_lock_for_runtime "$project"
   trap cleanup_supervisor EXIT
   trap request_stop INT TERM
   ensure_interruption_dispatcher_running_for_active_runtime "$project" || {
@@ -10601,7 +10702,7 @@ wait_for_daemon_supervisor_ready_or_fail() {
   started_at="$(date +%s)"
   while true; do
     supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
-    if [[ -n "$supervisor_pid" ]]; then
+    if [[ -n "$supervisor_pid" ]] && supervisor_startup_truth_ready_for_project "$project" "$supervisor_pid"; then
       printf '%s\n' "$supervisor_pid"
       return 0
     fi

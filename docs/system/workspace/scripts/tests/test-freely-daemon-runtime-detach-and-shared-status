@@ -92,13 +92,13 @@ SUPERVISOR_CMD="$(ps -p "$SUPERVISOR_PID" -o command= 2>/dev/null || true)"
 printf '%s\n' "$SUPERVISOR_CMD" | grep -q 'runtime/freely daemon-run --project'
 
 LIVE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
-printf '%s\n' "$LIVE_OUTPUT" | grep -q 'activity_state: supervising'
+printf '%s\n' "$LIVE_OUTPUT" | grep -Eq 'activity_state: (supervising|ai_active)'
 printf '%s\n' "$LIVE_OUTPUT" | grep -q "role=supervisor pid=$SUPERVISOR_PID"
 printf '%s\n' "$LIVE_OUTPUT" | grep -q 'runtime/freely daemon-run --project'
 
 DAEMON_STATUS_OUTPUT="$(bash "$ROOT_DIR/bin/freely" daemon status --project "$PROJECT")"
 printf '%s\n' "$DAEMON_STATUS_OUTPUT" | grep -q '^control_plane: daemon$'
-printf '%s\n' "$DAEMON_STATUS_OUTPUT" | grep -q 'activity_state: supervising'
+printf '%s\n' "$DAEMON_STATUS_OUTPUT" | grep -Eq 'activity_state: (supervising|ai_active)'
 printf '%s\n' "$DAEMON_STATUS_OUTPUT" | grep -q "role=supervisor pid=$SUPERVISOR_PID"
 
 EVENT_LOG="$PROJECT/.freely/logs/runtime-events.log"
