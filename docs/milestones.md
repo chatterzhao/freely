@@ -86,6 +86,39 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260413-0208-A` is now the canonical owner for runtime foreground-versus-daemon entrypoint semantics and bounded daemon materialization.
 - revisit_trigger: Re-open only if canonical implementation discovery proves daemon needs a separate shared-status owner or a narrower CLI policy owner before dev-loop can proceed.
 
+1. `C-20260413-0420-A`
+- title: Runtime startup authority and readiness governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- next_action: The research split is complete. Open a dedicated implementation worktree and materialize this candidate into a bounded owner for startup authority, launch readiness, daemon-ready truth, and ghost-supervisor cleanup followthrough.
+- revisit_trigger: Revisit immediately when the implementation lane starts issue materialization, or if fresh evidence proves the daemon parity symptom belongs to a separate root cause outside launch authority.
+
+1. `C-20260413-0420-C`
+- title: Runtime startup root-cause packet governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- next_action: Candidate mirror only. `I-20260413-0420-C` is now the canonical packet owner for absorbing the root-cause split, while future implementation remains with `C-20260413-0420-A` and future handoff research remains with `C-20260413-0420-B`.
+- revisit_trigger: Re-open only if canonical develop still cannot absorb the split after concrete owner truth and develop-merge adequacy are present, or if a later implementation lane proves the split itself should change.
+
+1. `C-20260413-0420-B`
+- title: Manager startup continuity contract governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- next_action: Keep this candidate visible while the new startup-authority owner lands a concrete launch identity and phase model; then reopen this packet as a bounded manager-handoff contract owner instead of mixing it into startup repair.
+- revisit_trigger: Revisit when startup authority phases are concrete enough to separate `bootstrapped` from `manager_ready`, or if new real-repo evidence proves the manager handoff contract can now be narrowed independently.
+
 1. `C-20260412-1721-A`
 - title: Develop push attempt followthrough governance
 - milestone_state: candidate
@@ -499,6 +532,26 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260413-0420-C`
+- title: Runtime startup root-cause packet governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-startup-root-cause-packet-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/code-reviews/20260413-runtime-startup-root-cause-packet-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+  - `git diff --check`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/test-lane premerge-integration -- ./bin/governance-check`
+- completion_note: `Canonical develop should absorb this packet as documentation-only routing truth: it records the startup-authority versus manager-handoff split and retires the temporary research worktree without claiming the runtime defects are already fixed.`
 
 1. `I-20260413-0208-A`
 - title: Foreground/background runtime entrypoint semantics governance
