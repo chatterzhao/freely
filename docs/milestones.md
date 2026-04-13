@@ -119,6 +119,17 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260413-0420-B` is now the canonical contract owner for separating `launch_bootstrapped` from `manager_handoff_materialized` and freezing the normal-path startup continuity seam.
 - revisit_trigger: Re-open only if later runtime implementation proves the frozen handoff contract should change, or if canonical evidence shows the seam must widen beyond stub-plus-state exposure.
 
+1. `C-20260413-0420-D`
+- title: Manager startup continuity materialization governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- next_action: Candidate mirror only. `I-20260413-0420-D` is now the canonical implementation owner for normal-path startup continuity stub materialization and manager handoff state surfacing.
+- revisit_trigger: Re-open only if canonical implementation later proves the stub/state seam is wrong, or if manager handoff materialization still requires readiness-state coupling beyond this bounded owner.
+
 1. `C-20260412-1721-A`
 - title: Develop push attempt followthrough governance
 - milestone_state: candidate
@@ -532,6 +543,32 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260413-0420-D`
+- title: Manager startup continuity materialization governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- follow_on_to: `I-20260413-0420-B`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
+  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-handoff-state-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
+  - `./bin/governance-check`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-handoff-state-surface`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
+  - `./bin/test-lane premerge-integration -- ./bin/governance-check`
+- completion_note: `Canonical develop should absorb this owner as the bounded runtime repair that materializes the first startup continuity artifact on the normal path, surfaces handoff state separately from repair fallback, and preserves worker-lane startup semantics during real replays.`
 
 1. `I-20260413-0420-A`
 - title: Runtime startup authority and readiness governance

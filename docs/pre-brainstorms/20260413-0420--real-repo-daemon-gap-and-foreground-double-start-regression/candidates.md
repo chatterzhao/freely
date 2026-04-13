@@ -8,6 +8,55 @@
 
 ## Candidates
 
+### C-20260413-0420-D
+
+- candidate_format_version: `v2`
+- title: `Manager startup continuity materialization governance`
+- research_only: `false`
+- implementation_ready: `true`
+- status: `promoted`
+- milestone: `M-20260306-workspace-routing-foundation`
+- priority: `P0`
+- promoted_issue_id: `I-20260413-0420-D`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
+- execution_base: `develop`
+- integration_target: `develop`
+- depends_on:
+  - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- problem: Canonical `develop` now has authoritative startup identity and a frozen startup-handoff contract, but the normal startup path still does not materialize the first manager continuity artifact until stop fallback or later manager behavior. That leaves Freely's startup chain bootstrapped but not handoff-materialized on the success path.
+- why_now:
+  - startup authority is already canonical, so this lane no longer needs to solve launch identity or daemon-ready truth
+  - the contract owner already froze the narrowest next seam: runtime-seeded continuity stub at the expected path plus machine-readable handoff state
+  - real dogfooding still treats missing first continuity as a status surface or stop-repair symptom instead of a normal startup responsibility
+- acceptance_criteria:
+  - normal startup seeds a launch-bound manager continuity stub at the prompt-required continuity path before AI launch
+  - the seeded startup artifact is distinguishable from stop-time repair fallback and from manager-materialized continuity
+  - `live-status` and `fleet-status` expose machine-readable manager handoff state for `missing`, `seeded_stub`, `repair_fallback`, or `materialized`
+  - stop fallback remains repair-only and is not redefined as normal startup success
+  - focused regressions prove the new startup stub materialization and handoff-state surfaces without reopening daemon-ready semantics
+- promotion_gate:
+  - keep scope on startup stub materialization, handoff-state exposure, and repair-only fallback distinction
+  - do not gate `daemon start` readiness on manager continuity in this first implementation pass
+  - do not widen into generic worker continuity consumption, watchdog redesign, or a new artifact family
+- open_questions:
+  - whether later manager enrichment should preserve the runtime stub body or replace it wholesale once semantic continuity is written
+  - whether a bounded SLA for `seeded_stub -> materialized` should become its own follow-on owner after this lane lands
+- acceptance_reviews:
+  - reviewer: `codex`
+    mode: `author-review`
+    summary: `The root cause is now narrow enough to implement directly: runtime must seed the first continuity artifact on the normal path and status must expose that handoff state separately from startup authority.`
+    verdict: `ready_for_issue_materialization`
+- next_action: Candidate mirror only. `I-20260413-0420-D` is now the canonical implementation owner for normal-path startup continuity stub materialization and manager handoff state surfacing.
+- revisit_trigger: Re-open only if canonical implementation later proves the stub/state seam is wrong, or if manager handoff materialization still requires readiness-state coupling beyond this bounded owner.
+- decision_reason: `This owner turns the frozen startup-handoff contract into the smallest runtime implementation slice that Freely can consume immediately: seed the expected continuity path on normal startup, surface what happened, and keep stop fallback visibly repair-only.`
+- session_refs:
+  - tool: `codex`
+    session_id: `current-thread`
+    jsonl_path: `unavailable://codex-thread-only`
+    role: `author`
+
 ### C-20260413-0420-C
 
 - candidate_format_version: `v2`
