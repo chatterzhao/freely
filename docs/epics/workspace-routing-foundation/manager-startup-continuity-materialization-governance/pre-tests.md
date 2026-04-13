@@ -36,8 +36,11 @@
 - target environment: `local self-host runtime`
 - required evidence: `verification artifact with exact commands and observed handoff-state outputs`
 - blocker taxonomy: `execution_pending_or_failed`
-- real_environment_status: `pending`
-- real_environment_reason: `This owner changes an executable runtime startup seam, so a bounded live replay is required in addition to focused tests.`
+- real_environment_status: `pass`
+- real_environment_reason: `This owner changes an executable runtime startup seam, and the bounded foreground plus daemon live replays were completed in the feature worktree without leaving residual freely runtime processes behind.`
+- not_applicable_reason: `not_applicable`
+- not_applicable_explanation: `none`
+- replacement_evidence: `Focused regressions plus bounded local self-host replays cover the executable seam for this owner.`
 
 ## Acceptance Items
 
@@ -49,7 +52,7 @@
 - promotion_gate: `completion`
 - task_refs: `tasks.md#task-1,tasks.md#task-2`
 - case_design: `Simulate a fresh startup path, inspect the expected continuity path, and verify the stub exists with startup writer metadata before any stop fallback runs.`
-- evidence_level: `unit`
+- evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
 
@@ -86,5 +89,17 @@
 - task_refs: `tasks.md#task-4,tasks.md#task-5`
 - case_design: `Merge the feature lane into a disposable test-pre-merge batch, rerun the focused startup continuity and status regressions there, and record the replay in a closeout verification artifact for the develop gate.`
 - evidence_level: `integration`
-- status: `pending`
-- artifact_ref: `pending://closeout-verification`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
+
+### Real worker-lane replay stops cleanly
+- id: `real-worker-lane-replay-clean-stop`
+- requirement: `Bounded foreground and daemon replays on the feature worktree start and stop cleanly without leaving same-worktree freely runtime processes behind.`
+- surface_kind: `real_environment`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#task-4,tasks.md#task-5`
+- case_design: `Run one bounded foreground replay and one bounded daemon replay from the feature worktree, confirm the worker lane stays on worker semantics, and verify stop leaves the worktree at desired_runtime_state stopped with no residual same-worktree freely runtime process.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`

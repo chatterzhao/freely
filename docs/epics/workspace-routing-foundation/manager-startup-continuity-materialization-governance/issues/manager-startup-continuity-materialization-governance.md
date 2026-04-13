@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260413-0420-D`
 - title: `Manager startup continuity materialization governance`
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-startup-continuity-materialization-governance`
@@ -78,6 +78,7 @@ That leaves Freely with a narrow but real product defect: the outer loop can be 
 
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-implementation-decision.md`
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
+- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
 - `bash -n docs/system/workspace/scripts/runtime/freely`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-handoff-state-surface`
@@ -96,6 +97,7 @@ That leaves Freely with a narrow but real product defect: the outer loop can be 
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/tasks.md`
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-implementation-decision.md`
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
+- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
 - `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-materialization-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
@@ -103,4 +105,5 @@ That leaves Freely with a narrow but real product defect: the outer loop can be 
 
 ## Next
 
-- Finish focused verification in this feature worktree, then promote through a disposable `test-pre-merge-*` lane before guarded merge to `develop`.
+- This owner should remain closed once canonical `develop` carries the startup stub materialization, handoff-state surface, and closeout verification artifact.
+- Reopen only if canonical runtime later regresses back to prompt-only startup continuity or stop-fallback-as-normal-path behavior.

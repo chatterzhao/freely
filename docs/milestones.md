@@ -73,26 +73,6 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
-1. `I-20260413-0420-D`
-- title: Manager startup continuity materialization governance
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-materialization-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
-- follow_on_to: `I-20260413-0420-B`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-implementation-decision.md`
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
-  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-handoff-state-surface`
-  - `bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`
-  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
-  - `./bin/governance-check`
-- completion_note: `Active implementation owner. Canonical completion moves this item to a true completed closeout only after focused verification, bounded live replay, premerge adequacy, and guarded develop promotion are all recorded.`
-
 ### candidate_issues
 
 1. `C-20260413-0208-A`
@@ -563,6 +543,32 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260413-0420-D`
+- title: Manager startup continuity materialization governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-materialization-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- follow_on_to: `I-20260413-0420-B`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-implementation-decision.md`
+  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
+  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-handoff-state-surface`
+  - `bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
+  - `./bin/governance-check`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-handoff-state-surface`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
+  - `./bin/test-lane premerge-integration -- ./bin/governance-check`
+- completion_note: `Canonical develop should absorb this owner as the bounded runtime repair that materializes the first startup continuity artifact on the normal path, surfaces handoff state separately from repair fallback, and preserves worker-lane startup semantics during real replays.`
 
 1. `I-20260413-0420-A`
 - title: Runtime startup authority and readiness governance
