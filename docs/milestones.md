@@ -50,26 +50,6 @@ routing_policy:
 
 ### committed_issues
 
-1. `I-20260413-0208-A`
-- title: Foreground/background runtime entrypoint semantics governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-foreground-background-runtime-entrypoint-semantics-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/candidates.md`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-command-semantics`
-  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
-  - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
-  - `bash docs/system/workspace/scripts/tests/test-freely-runtime-supervisor-event-log`
-  - `bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-all-same-project-supervisors`
-  - `./bin/governance-check`
-- next_action: Promote `feature/runtime-daemon-semantics` through a dedicated `test-pre-merge-*` lane, then merge to `develop` and rewrite the owner to canonical `completed` truth.
-- revisit_trigger: Re-open IBM only if guarded premerge or develop promotion proves daemon cannot share existing runtime truth surfaces, or if the host-shell/UI contract needs to split into a narrower owner before canonical closeout.
-
 1. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
 - milestone_state: candidate
@@ -519,6 +499,27 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260413-0208-A`
+- title: Foreground/background runtime entrypoint semantics governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-foreground-background-runtime-entrypoint-semantics-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/candidates.md`
+- evidence:
+  - `develop` merge `1b55aae6`
+  - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+  - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-command-semantics`
+  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+  - `bash docs/system/workspace/scripts/tests/test-freely-runtime-supervisor-event-log`
+  - `bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-all-same-project-supervisors`
+  - `./bin/governance-check`
+- completion_note: `Canonical develop absorbed explicit daemon runtime control-plane semantics through guarded merge 1b55aae6 while preserving the existing foreground start contract, shared live-status truth, and detached-session persistence proof; the temporary feature and premerge worktrees were retired after post-merge followthrough passed.`
 
 1. `I-20260412-1845-A`
 - title: Runtime forensic time alignment and stall recovery observability governance

@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260413-0208-A`
 - title: Foreground/background runtime entrypoint semantics governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `foreground-background-runtime-entrypoint-semantics-governance`
@@ -73,6 +73,7 @@ Freely 当前的产品心智与运行时入口 contract 仍存在一条会误导
 ## Verification
 
 - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-command-semantics`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
@@ -89,6 +90,7 @@ Freely 当前的产品心智与运行时入口 contract 仍存在一条会误导
 - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/tasks.md`
 - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
 - `docs/progress/workspace-routing-foundation/p-foreground-background-runtime-entrypoint-semantics-governance.md`
 - `docs/PROJECT_INTENT.md`
 - `docs/system/workspace/scripts/runtime/freely`
@@ -100,5 +102,5 @@ Freely 当前的产品心智与运行时入口 contract 仍存在一条会误导
 
 ## Next
 
-1. next_action: `Feature-local implementation and verification are complete in feature/runtime-daemon-semantics; promote through a dedicated test-pre-merge lane, then merge to develop and rewrite this owner to canonical completed truth.`
-2. revisit_trigger: `Re-open IBM only if guarded premerge or develop promotion proves daemon cannot continue sharing the existing runtime truth surfaces, or if a narrower host-shell/UI contract owner is needed before canonical closeout.`
+- `2026-04-13` closeout: canonical `develop` absorbed the explicit daemon control plane through merge `1b55aae6`, and this closeout lane only rewrites lifecycle truth after guarded promote, push followthrough, and worktree retirement completed.
+- Keep this owner closed as the canonical foreground-versus-daemon entrypoint record; any future daemon restart semantics, UI shell implementation, or broader command-surface renaming must reopen as a new bounded owner on current `develop`.
