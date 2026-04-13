@@ -40,12 +40,14 @@ The implementation repairs both bounded runtime gaps while explicitly keeping ti
 - `./bin/governance-check`
 - `git diff --check`
 - `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
+- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-closeout-verification.md`
 
 ## Closure Evidence
 
 1. `develop` merge `480d839a`
 2. `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-implementation-decision.md`
 3. `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
+4. `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-closeout-verification.md`
 
 ## Next Action
 
