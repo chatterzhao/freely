@@ -502,6 +502,7 @@ routing_policy:
   - `develop` merge `480d839a`
   - `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-implementation-decision.md`
   - `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-closeout-verification.md`
   - `docs/progress/workspace-routing-foundation/p-runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery`
   - `bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`

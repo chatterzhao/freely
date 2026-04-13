@@ -85,3 +85,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-implementation-decision.md`
+
+### AT-004
+- id: `AT-004`
+- requirement: `closeout writeback records merge 480d839a and moves the owner to completed lifecycle truth without reopening implementation scope`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-closeout-verification.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `./bin/governance-check; git diff --check`
+- case_design: `Stage a fresh owner closeout verification artifact alongside the lifecycle writeback, then require guarded premerge integration to see the owner as completed before develop promote can proceed.`
