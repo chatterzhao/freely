@@ -50,6 +50,26 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260413-0208-A`
+- title: Foreground/background runtime entrypoint semantics governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-foreground-background-runtime-entrypoint-semantics-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-command-semantics`
+  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+  - `bash docs/system/workspace/scripts/tests/test-freely-runtime-supervisor-event-log`
+  - `bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-all-same-project-supervisors`
+  - `./bin/governance-check`
+- next_action: Promote `feature/runtime-daemon-semantics` through a dedicated `test-pre-merge-*` lane, then merge to `develop` and rewrite the owner to canonical `completed` truth.
+- revisit_trigger: Re-open IBM only if guarded premerge or develop promotion proves daemon cannot share existing runtime truth surfaces, or if the host-shell/UI contract needs to split into a narrower owner before canonical closeout.
+
 1. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
 - milestone_state: candidate
@@ -74,6 +94,17 @@ routing_policy:
 - completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
 ### candidate_issues
+
+1. `C-20260413-0208-A`
+- title: Foreground/background runtime entrypoint semantics governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/candidates.md`
+- next_action: Candidate mirror only. `I-20260413-0208-A` is now the canonical owner for runtime foreground-versus-daemon entrypoint semantics and bounded daemon materialization.
+- revisit_trigger: Re-open only if canonical implementation discovery proves daemon needs a separate shared-status owner or a narrower CLI policy owner before dev-loop can proceed.
 
 1. `C-20260412-1721-A`
 - title: Develop push attempt followthrough governance
