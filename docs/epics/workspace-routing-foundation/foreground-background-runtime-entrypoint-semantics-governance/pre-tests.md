@@ -35,6 +35,8 @@
 - target environment: `local runtime boundary`
 - required evidence: `local detached-session replay recorded in verification artifact`
 - blocker taxonomy: `definition_missing`
+- real_environment_status: `pass`
+- real_environment_reason: `The bounded executable surface is the local runtime/session ownership boundary, and the detached daemon replay was exercised directly in the scripted feature-local and premerge-integration verification runs.`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
 - not_applicable_explanation: `The contract change is about local runtime/session ownership rather than an external hosted surface.`
 - replacement_evidence: `Local detached-session runtime replay plus focused runtime regressions are sufficient for this bounded owner.`
@@ -50,16 +52,20 @@
 - task_refs: `Preserve current foreground command semantics and keep the existing foreground regressions passing.`
 - case_design: `Replay the existing command-semantics, event-log, and stop-all-supervisors tests without converting them into daemon tests.`
 - evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
 
 ### Daemon survives parent shell exit
 - id: `daemon-parent-session-detach`
 - requirement: `A daemon-started runtime keeps running after the launching shell or PTY exits and no longer records the stop as a foreground operator stop.`
-- surface_kind: `end_to_end`
+- surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
 - task_refs: `Add explicit daemon start behavior with detached-session ownership and prove it survives parent session teardown.`
 - case_design: `Launch daemon mode from a short-lived shell, terminate the launcher, confirm the runtime still reports running, then stop it explicitly.`
-- evidence_level: `end_to_end`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
 
 ### Shared status truth remains singular
 - id: `daemon-shared-status-truth`
@@ -70,3 +76,17 @@
 - task_refs: `Keep daemon status and logs wired to the existing runtime state files and status commands rather than adding a separate state family.`
 - case_design: `Compare daemon status/log outputs with live-status or fleet-status for the same project runtime and confirm they agree on running/stopped state.`
 - evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+
+### Guarded develop promote proves daemon adequacy
+- id: `develop-promote-daemon-entrypoint-proof`
+- requirement: `A guarded test-pre-merge promote proves this owner carries explicit premerge-integration coverage for develop-bound merge rather than relying only on feature-local daemon completion evidence.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Replay the daemon-focused verification batch on a disposable test-pre-merge branch created from develop, and use that replay to prove guarded promotion adequacy for the explicit daemon control plane.`
+- case_design: `Merge the feature lane into a disposable test-pre-merge batch through merge-guarded, rerun the foreground and daemon regressions plus governance-check there, and use the resulting verification artifact to prove the develop-bound lane/gate pair is explicitly covered.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
