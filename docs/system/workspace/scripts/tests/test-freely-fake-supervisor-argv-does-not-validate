@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-fake-supervisor-validate.XXXXXX)"
+cleanup() {
+  set +e
+  kill "${FAKE_PID:-}" 2>/dev/null || true
+  wait "${FAKE_PID:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$PROJECT"'"
+    bash -c "cd \"$project\" && exec -a '\''runtime/freely daemon-run --project $project'\'' sleep 30" >/dev/null 2>&1 &
+    fake_pid=$!
+    printf "fake_pid:%s\n" "$fake_pid"
+    discovered="$(discover_supervisor_pid "$project")"
+    printf "discovered:%s\n" "${discovered:-none}"
+    if valid_supervisor_pid_for_project "$project" "$fake_pid"; then
+      printf "valid:true\n"
+    else
+      printf "valid:false\n"
+    fi
+    kill "$fake_pid" 2>/dev/null || true
+    wait "$fake_pid" 2>/dev/null || true
+  '
+)"
+
+[[ "$OUTPUT" == *"valid:false"* ]]
+
+echo "[PASS] fake argv alone does not validate as a project supervisor"
