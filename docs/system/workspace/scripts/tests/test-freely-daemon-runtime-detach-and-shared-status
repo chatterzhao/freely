@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-daemon-runtime-detach.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260413-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260413-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260413-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260413-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- candidate_format_version: `v2`
+- status: `promoted`
+- milestone: `M-20260306-workspace-routing-foundation`
+- promoted_issue_path: `docs/epics/sample/issues/sample.md`
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+IFLOW_MAX_TURNS=100
+EOF
+
+DAEMON_OUTPUT="$(bash "$ROOT_DIR/bin/freely" daemon start --project "$PROJECT")"
+printf '%s\n' "$DAEMON_OUTPUT" | grep -q "^project: $PROJECT$"
+printf '%s\n' "$DAEMON_OUTPUT" | grep -q '^daemon_status: running$'
+
+SUPERVISOR_PID=""
+for _ in $(seq 1 50); do
+  if [[ -f "$PROJECT/.freely/run/supervisor.pid" ]]; then
+    SUPERVISOR_PID="$(cat "$PROJECT/.freely/run/supervisor.pid" 2>/dev/null || true)"
+  fi
+  if [[ -n "$SUPERVISOR_PID" ]] && kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+    break
+  fi
+  sleep 0.2
+done
+
+if [[ -z "$SUPERVISOR_PID" ]] || ! kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+  echo "[FAIL] daemon start did not leave a live supervisor" >&2
+  exit 1
+fi
+
+SUPERVISOR_CMD="$(ps -p "$SUPERVISOR_PID" -o command= 2>/dev/null || true)"
+printf '%s\n' "$SUPERVISOR_CMD" | grep -q 'runtime/freely daemon-run --project'
+
+LIVE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'activity_state: supervising'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q "role=supervisor pid=$SUPERVISOR_PID"
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'runtime/freely daemon-run --project'
+
+DAEMON_STATUS_OUTPUT="$(bash "$ROOT_DIR/bin/freely" daemon status --project "$PROJECT")"
+printf '%s\n' "$DAEMON_STATUS_OUTPUT" | grep -q '^control_plane: daemon$'
+printf '%s\n' "$DAEMON_STATUS_OUTPUT" | grep -q 'activity_state: supervising'
+printf '%s\n' "$DAEMON_STATUS_OUTPUT" | grep -q "role=supervisor pid=$SUPERVISOR_PID"
+
+EVENT_LOG="$PROJECT/.freely/logs/runtime-events.log"
+for _ in $(seq 1 20); do
+  [[ -f "$EVENT_LOG" ]] && grep -q 'event=supervisor_started' "$EVENT_LOG" && break
+  sleep 0.2
+done
+
+grep -q 'event=supervisor_started .*entrypoint_mode=daemon' "$EVENT_LOG"
+if grep -q 'event=operator_stop_requested' "$EVENT_LOG"; then
+  echo "[FAIL] daemon runtime should not request operator stop before explicit daemon stop" >&2
+  cat "$EVENT_LOG" >&2
+  exit 1
+fi
+
+STOP_OUTPUT="$(bash "$ROOT_DIR/bin/freely" daemon stop --project "$PROJECT")"
+printf '%s\n' "$STOP_OUTPUT" | grep -q "^project: $PROJECT$"
+printf '%s\n' "$STOP_OUTPUT" | grep -q '^daemon_status: stopped$'
+
+for _ in $(seq 1 50); do
+  if ! kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+    break
+  fi
+  sleep 0.2
+done
+
+if kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+  echo "[FAIL] daemon stop should terminate the supervisor" >&2
+  exit 1
+fi
+
+grep -q 'event=operator_stop_requested' "$EVENT_LOG"
+grep -q 'event=supervisor_cleanup .*exit_reason=operator_stop' "$EVENT_LOG"
+
+echo "[PASS] freely daemon runtime survives command return, shares live-status truth, and stops explicitly"

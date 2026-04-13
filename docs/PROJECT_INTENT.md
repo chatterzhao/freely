@@ -280,6 +280,7 @@ Freely 自身产品/系统架构的当前高层拓扑可理解为：
 - boot semantics
   - `init`
   - `start`
+  - `daemon start|stop|status|logs`
 - submit / intervention semantics
   - `chat`
   - future human interruption submit paths
@@ -294,6 +295,7 @@ Freely 自身产品/系统架构的当前高层拓扑可理解为：
 
 - `chat` 不是 `CLI shell`、`TUI shell`、`GUI app` 的 peer
 - status family 也不是 `CLI shell`、`TUI shell`、`GUI app` 的 peer
+- foreground `start` 与 explicit `daemon` control plane 是同一 runtime/orchestration 的两种入口语义，不是两套并列产品壳
 - `CLI shell`、`TUI shell`、`GUI app` 是承载这些语义面的 host shells
 - Freely 自身的 `CLI-first` 选择，是 Freely 产品架构决策，不自动等于 Freely 通用能力
 
