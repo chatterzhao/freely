@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-stop-materializes-continuity.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/.freely/run" "$REPO/docs"
+
+git init -q "$REPO"
+git -C "$REPO" config user.email "test@example.com"
+git -C "$REPO" config user.name "Test User"
+cat >"$REPO/README.md" <<'EOF'
+# repo
+EOF
+git -C "$REPO" add README.md
+git -C "$REPO" commit -q -m "init"
+git -C "$REPO" branch -m develop
+
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+cat >"$REPO/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-12T18:17:00Z"
+EOF
+cat >"$REPO/.freely/run/session-state.env" <<EOF
+LAST_CYCLE_LOG="$REPO/.freely/logs/cycle-20260412-181201.log"
+EOF
+
+mkdir -p "$REPO/.freely/logs"
+touch "$REPO/.freely/logs/cycle-20260412-181201.log"
+
+OLD_CONTINUITY="$REPO/.freely/run/manager-continuity-20260410-040521.md"
+EXPECTED_CONTINUITY="$REPO/.freely/run/manager-continuity-20260412-181202.md"
+PROMPT="$REPO/.freely/run/prompt-20260412-181201.txt"
+
+cat >"$OLD_CONTINUITY" <<'EOF'
+# Manager Continuity
+- continuity_id: `20260410-040521`
+EOF
+cat >"$PROMPT" <<EOF
+你现在进入 Freely 的首跳闭环。
+19. 至少创建一个 manager continuity 文件：\`$EXPECTED_CONTINUITY\`。
+EOF
+
+bash "$ROOT_DIR/bin/freely" stop --project "$REPO" >/dev/null
+
+[[ -f "$EXPECTED_CONTINUITY" ]]
+grep -q '^# Manager Continuity$' "$EXPECTED_CONTINUITY"
+grep -q 'continuity_written_by: `freely-runtime-fallback`' "$EXPECTED_CONTINUITY"
+grep -q "fallback_reason: \`operator_stop\`" "$EXPECTED_CONTINUITY"
+grep -q "previous_manager_continuity: \`$OLD_CONTINUITY\`" "$EXPECTED_CONTINUITY"
+grep -q "prompt_file: \`$PROMPT\`" "$EXPECTED_CONTINUITY"
+grep -q "latest_cycle_log: \`$REPO/.freely/logs/cycle-20260412-181201.log\`" "$EXPECTED_CONTINUITY"
+grep -q 'event=manager_continuity_fallback_materialized' "$REPO/.freely/logs/runtime-events.log"
+
+echo "[PASS] freely stop materializes the missing manager continuity required by the latest prompt"

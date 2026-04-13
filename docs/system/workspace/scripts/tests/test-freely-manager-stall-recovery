@@ -88,5 +88,6 @@ fi
 grep -q "$PROJECT|runtime-stalled-ai-recovery" "$PREEMPT_LOG"
 grep -q "$PROJECT" "$RESTART_LOG"
 grep -q '^LAST_PREEMPTION_REASON="local_continuation_reentry"$' "$PROJECT/.freely/run/preemption-state.env"
+grep -q 'event=runtime_stalled_ai_recovery_triggered role=manager reason=manager_ai_stalled_with_pending_intake ai_pid='"$AI_PID"' slot=unknown' "$PROJECT/.freely/logs/runtime-events.log"
 
 echo "[PASS] stalled manager ai with pending intake triggers runtime recovery"
