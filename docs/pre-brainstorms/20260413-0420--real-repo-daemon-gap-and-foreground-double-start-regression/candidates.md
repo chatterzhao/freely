@@ -14,11 +14,11 @@
 - title: `Runtime startup authority and readiness governance`
 - research_only: `false`
 - implementation_ready: `true`
-- status: `promoted`
+- status: `proposed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
-- promoted_issue_id: `I-20260413-0420-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+- promoted_issue_id: `pending://issue-materialization`
+- promoted_issue_path: `pending://issue-materialization`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
@@ -47,11 +47,11 @@
 - acceptance_reviews:
   - reviewer: `codex`
     mode: `author-review`
-    summary: `The startup-authority half is now implementation-ready. The root cause is bounded to launch identity, authority publication timing, and ready determination across both foreground and daemon entrypoints.`
-    verdict: `promote`
-- next_action: Materialize `I-20260413-0420-A` as the new bounded owner for launch identity, startup readiness, duplicate-start prevention, daemon-ready truth, and ghost-supervisor cleanup followthrough.
-- revisit_trigger: Re-open only if canonical implementation later proves daemon parity failure belongs to a separate root cause outside the launch-authority model.
-- decision_reason: `Foreground duplicate-start, daemon false-ready, fake-supervisor acceptance, and stop-marker ghost retention are different symptoms of the same authority/readiness defect, so they should share one new bounded owner.`
+    summary: `The startup-authority half is implementation-ready as a bounded follow-on, but this research lane should stop at candidate split and milestone binding. The future owner package belongs in the dedicated implementation lane that will carry pre-tests, verification, and guarded promotion evidence.`
+    verdict: `ready_for_issue_materialization`
+- next_action: Open a dedicated implementation worktree from current `develop` and materialize this candidate into a new bounded owner for launch identity, startup readiness, duplicate-start prevention, daemon-ready truth, and ghost-supervisor cleanup followthrough.
+- revisit_trigger: Revisit immediately when the implementation lane is opened, or if fresh evidence proves daemon parity failure belongs to a separate root cause outside the launch-authority model.
+- decision_reason: `Foreground duplicate-start, daemon false-ready, fake-supervisor acceptance, and stop-marker ghost retention are different symptoms of the same authority/readiness defect, but this pre-brainstorm lane should promote only the research truth and leave actual issue materialization to the next implementation worktree.`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

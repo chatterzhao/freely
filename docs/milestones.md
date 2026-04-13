@@ -73,21 +73,6 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
-2. `I-20260413-0420-A`
-- title: Runtime startup authority and readiness governance
-- milestone_state: committed
-- phase_state: `in_ibm`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
-- follow_on_to:
-  - `I-20260408-0231-A`
-  - `I-20260413-0208-A`
-  - `I-20260407-0215-A`
-- next_action: Finish IBM materialization for the bounded startup-authority owner, then enter dev-loop for launch identity, startup publication, daemon-ready truth, and ghost-supervisor rejection without widening into manager continuity contract redesign.
-- revisit_trigger: Revisit split only if canonical implementation proves daemon parity failure is independent of the startup-authority model or if manager-ready semantics become inseparable from startup publication.
-
 ### candidate_issues
 
 1. `C-20260413-0208-A`
@@ -104,13 +89,13 @@ routing_policy:
 1. `C-20260413-0420-A`
 - title: Runtime startup authority and readiness governance
 - milestone_state: candidate
-- phase_state: `todo_ibm`
+- phase_state: `in_pre_brainstorm`
 - priority: P0
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+- promoted_issue_path: `pending://issue-materialization`
 - source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
-- next_action: Candidate mirror only. `I-20260413-0420-A` is now the canonical owner for startup authority, launch readiness, daemon-ready truth, and ghost-supervisor cleanup followthrough.
-- revisit_trigger: Re-open only if canonical implementation proves the daemon parity symptom belongs to a separate root cause outside launch authority.
+- next_action: The research split is complete. Open a dedicated implementation worktree and materialize this candidate into a bounded owner for startup authority, launch readiness, daemon-ready truth, and ghost-supervisor cleanup followthrough.
+- revisit_trigger: Revisit immediately when the implementation lane starts issue materialization, or if fresh evidence proves the daemon parity symptom belongs to a separate root cause outside launch authority.
 
 1. `C-20260413-0420-B`
 - title: Manager startup continuity contract governance
