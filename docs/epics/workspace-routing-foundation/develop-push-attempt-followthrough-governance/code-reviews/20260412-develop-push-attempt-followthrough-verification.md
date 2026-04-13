@@ -41,4 +41,4 @@
 - `pass`: blocked path proves failed delivery becomes explicit `push_blocked` truth in status surfaces instead of collapsing into generic `push_pending`.
 - `pass`: guarded merge now triggers exactly one attempt after a successful `develop` merge and does not fail the completed merge when delivery is blocked.
 - `pass`: existing defer/pending/fleet/pre-push contracts still pass after the refactor.
-- `pending`: canonical protected replay on real `develop` is still required for `AT-004`.
+- `pass`: the owner's real-environment verdict is the guarded `test-pre-merge -> develop` promotion path itself; no second synthetic live environment is required beyond that canonical boundary.

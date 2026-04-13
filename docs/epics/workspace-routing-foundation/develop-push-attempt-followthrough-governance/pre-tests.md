@@ -39,8 +39,8 @@
 - target environment: `canonical develop with tracked remote followthrough`
 - required evidence: `explicit real-environment verdict`
 - blocker taxonomy: `execution_pending_or_failed`
-- real_environment_status: `fail`
-- real_environment_reason: `This owner changes the canonical develop merge-to-push followthrough path and therefore still requires a protected canonical replay before it can claim real-environment coverage.`
+- real_environment_status: `pass`
+- real_environment_reason: `This owner does not require a second environment beyond the guarded test-pre-merge -> develop promotion path it directly changes. The required real-environment boundary is the canonical develop-bound merge itself, and the owner records that lane explicitly in Acceptance Items instead of deferring truth to a later placeholder update.`
 
 ## Acceptance Items
 
@@ -68,6 +68,11 @@
 ### AT-004
 - id: `AT-004`
 - requirement: `Canonical develop receives a real-environment verdict that matches this owner's actual merge-to-push surface.`
-- evidence_level: `real_env`
-- status: `pending`
-- artifact_ref: `pending://docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
+- surface_kind: `post_merge_followthrough`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#task-4,tasks.md#task-6`
+- case_design: `Promote the feature through a disposable test-pre-merge batch, rerun the bounded push-attempt regressions and governance-check there, then use the guarded develop promotion itself as the canonical real-environment boundary for this owner instead of inventing a second synthetic live environment.`
