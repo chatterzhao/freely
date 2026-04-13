@@ -50,6 +50,18 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260412-1721-A`
+- title: Develop push attempt followthrough governance
+- milestone_state: candidate
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/issues/develop-push-attempt-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-develop-push-attempt-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/candidates.md`
+- follow_on_to: `I-20260408-1200-A`
+- next_action: Implement the bounded single-attempt followthrough, add explicit `push_blocked` truth, and verify the guarded develop merge path now auto-attempts remote delivery once.
+
 2. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
 - milestone_state: candidate
@@ -74,6 +86,17 @@ routing_policy:
 - completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
 ### candidate_issues
+
+1. `C-20260412-1721-A`
+- title: Develop push attempt followthrough governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/issues/develop-push-attempt-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/candidates.md`
+- next_action: Candidate mirror only. `I-20260412-1721-A` is now the canonical owner for bounded post-merge push attempt followthrough.
+- revisit_trigger: Re-open only if canonical replay proves this owner must be split between guarded-merge triggering and develop-push blocked-state semantics.
 
 1. `C-20260411-1415-A`
 - title: Materialize richer pre-tests adequacy item schema without introducing parallel test truth

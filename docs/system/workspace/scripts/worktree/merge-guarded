@@ -196,6 +196,17 @@ cleanup_guarded_state() {
   rm -f "$state_file"
 }
 
+attempt_develop_push_followthrough_if_needed() {
+  local target="$1"
+  [[ "$target" == "develop" ]] || return 0
+  [[ -x "./bin/freely" ]] || return 0
+
+  echo "[MERGE-GUARD] develop merge completed; attempting single push followthrough"
+  if ! ./bin/freely develop-push attempt --project "$PWD"; then
+    echo "[MERGE-GUARD] develop push followthrough blocked; merge already committed and explicit push_blocked truth should be available" >&2
+  fi
+}
+
 do_initial_merge() {
   local target="$1"
   local source_branch="$2"
@@ -227,6 +238,7 @@ do_initial_merge() {
   set -e
   if [[ "$continue_rc" -eq 0 ]]; then
     cleanup_guarded_state
+    attempt_develop_push_followthrough_if_needed "$target"
   fi
   return "$continue_rc"
 }
@@ -320,6 +332,7 @@ do_completion() {
   fi
   if [[ "$continue_rc" -eq 0 ]]; then
     cleanup_guarded_state
+    attempt_develop_push_followthrough_if_needed "$target"
   fi
   return "$continue_rc"
 }
