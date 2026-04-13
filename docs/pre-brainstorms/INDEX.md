@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression
+  - brainstorms: docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md
 - 20260413-0208--foreground-background-runtime-entrypoint-semantics
   - brainstorms: docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/brainstorms.md
   - candidates: docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/candidates.md
