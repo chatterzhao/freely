@@ -438,6 +438,10 @@ Usage:
   freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
   freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
   freely start [--project <abs_path>] [--force]
+  freely daemon start [--project <abs_path>] [--force]
+  freely daemon stop [--project <abs_path>]
+  freely daemon status [--project <abs_path>]
+  freely daemon logs [--project <abs_path>] [--follow] [--file runtime-events|loop]
   freely restart [--project <abs_path>] [--all-projects]
   freely restore-work [--project <abs_path>]
   freely baseline-status [--project <abs_path>]
@@ -1521,7 +1525,7 @@ discover_supervisor_pids() {
         }
       }
     }
-    index($0, "runtime/freely start") {
+    index($0, "runtime/freely start") || index($0, "runtime/freely daemon-run") {
       if (skip[$1]) {
         next
       }
@@ -1596,7 +1600,8 @@ pid_matches_project() {
 
 valid_supervisor_pid_for_project() {
   local project="$1" pid="$2"
-  pid_matches_project "$pid" "$project" "runtime/freely start --project"
+  pid_matches_project "$pid" "$project" "runtime/freely start --project" || \
+    pid_matches_project "$pid" "$project" "runtime/freely daemon-run --project"
 }
 
 valid_ensure_manager_watchdog_pid_for_project() {
@@ -10048,7 +10053,7 @@ ensure_no_active_supervisor_conflict() {
 }
 
 start_project_runtime() {
-  local project="$1"
+  local project="$1" entrypoint_mode="${2:-foreground}"
   # When process inspection is unavailable, runtime ownership falls back to cwd checks.
   # Anchor the supervisor itself to the target project so watchdog/attach logic can still
   # prove ownership in degraded environments.
@@ -10178,7 +10183,8 @@ start_project_runtime() {
   append_runtime_event "$project" "supervisor_started" \
     "supervisor_pid=$$" \
     "project=$project" \
-    "role_hint=$(role_hint_for_project "$project")"
+    "role_hint=$(role_hint_for_project "$project")" \
+    "entrypoint_mode=$entrypoint_mode"
   write_workcell_state "$project" "running" "up" "down" "starting"
   trap cleanup_supervisor EXIT
   trap request_stop INT TERM
@@ -10566,7 +10572,7 @@ cmd_start() {
     log_info "forcing project-local runtime rebuild before start"
     stop_project_runtime "$project" "start_force"
   fi
-  start_project_runtime "$project"
+  start_project_runtime "$project" "foreground"
 }
 
 cmd_restart() {
@@ -10586,7 +10592,141 @@ cmd_restart() {
   log_info "restarting current project runtime/control-plane without implicit work restore"
   preflight_project_runtime_restart_or_fail "$project"
   stop_project_runtime "$project" "operator_restart"
-  start_project_runtime "$project"
+  start_project_runtime "$project" "foreground"
+}
+
+wait_for_daemon_supervisor_ready_or_fail() {
+  local project="$1" launcher_pid="${2:-}" wait_secs="${3:-15}" started_at now supervisor_pid
+  [[ "$wait_secs" =~ ^[0-9]+$ ]] || wait_secs=15
+  started_at="$(date +%s)"
+  while true; do
+    supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+    if [[ -n "$supervisor_pid" ]]; then
+      printf '%s\n' "$supervisor_pid"
+      return 0
+    fi
+    if [[ -n "$launcher_pid" ]] && ! kill -0 "$launcher_pid" 2>/dev/null; then
+      break
+    fi
+    now="$(date +%s)"
+    if (( now - started_at >= wait_secs )); then
+      break
+    fi
+    sleep 0.2
+  done
+  return 1
+}
+
+launch_project_runtime_daemon_or_fail() {
+  local project="$1"
+  local runtime_script launcher_log launcher_pid supervisor_pid
+  runtime_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely"
+  mkdir -p "$(logs_dir_for_project "$project")"
+  launcher_log="$(logs_dir_for_project "$project")/daemon-launch.log"
+  nohup bash -lc '
+    set -euo pipefail
+    project="$1"
+    runtime_script="$2"
+    cd "$project"
+    exec -a "runtime/freely daemon-run --project $project" bash "$runtime_script" daemon-run --project "$project"
+  ' bash "$project" "$runtime_script" >>"$launcher_log" 2>&1 < /dev/null &
+  launcher_pid=$!
+  if ! supervisor_pid="$(wait_for_daemon_supervisor_ready_or_fail "$project" "$launcher_pid" 15)"; then
+    log_error "daemon start did not materialize a live supervisor for project: $project"
+    log_error "see: $launcher_log"
+    if [[ -f "$launcher_log" ]]; then
+      tail -n 20 "$launcher_log" >&2 || true
+    fi
+    exit 1
+  fi
+  echo "project: $project"
+  echo "daemon_status: running"
+  echo "supervisor_pid: $supervisor_pid"
+  echo "launcher_log: $launcher_log"
+}
+
+cmd_daemon_start() {
+  local project="" force="0"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --force) force="1"; shift ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  if [[ "$force" == "1" ]]; then
+    log_info "forcing project-local runtime rebuild before daemon start"
+    stop_project_runtime "$project" "daemon_start_force"
+  fi
+  launch_project_runtime_daemon_or_fail "$project"
+}
+
+cmd_daemon_stop() {
+  local project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  stop_project_runtime "$project" "operator_daemon_stop"
+  echo "project: $project"
+  echo "daemon_status: stopped"
+}
+
+cmd_daemon_status() {
+  local project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  echo "control_plane: daemon"
+  cmd_live_status --project "$project"
+}
+
+cmd_daemon_logs() {
+  local project="" follow="0" file_kind="runtime-events" target_file=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --follow) follow="1"; shift ;;
+      --file) file_kind="${2:-}"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  case "$file_kind" in
+    runtime-events) target_file="$(runtime_events_log_file "$project")" ;;
+    loop) target_file="$(logs_dir_for_project "$project")/loop.log" ;;
+    *)
+      log_error "unsupported --file: $file_kind (supported: runtime-events, loop)"
+      exit 1
+      ;;
+  esac
+  mkdir -p "$(dirname "$target_file")"
+  touch "$target_file"
+  if [[ "$follow" == "1" ]]; then
+    tail -n 50 -f "$target_file"
+  else
+    cat "$target_file"
+  fi
+}
+
+cmd_daemon_run() {
+  local project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  start_project_runtime "$project" "daemon"
 }
 
 cmd_restore_work() {
@@ -12065,6 +12205,18 @@ main() {
     auth-change-wake) cmd_auth_change_wake "$@" ;;
     ensure-interruption-dispatch) cmd_ensure_interruption_dispatch "$@" ;;
     start) cmd_start "$@" ;;
+    daemon)
+      local subcmd="${1:-}"
+      shift || true
+      case "$subcmd" in
+        start) cmd_daemon_start "$@" ;;
+        stop) cmd_daemon_stop "$@" ;;
+        status) cmd_daemon_status "$@" ;;
+        logs) cmd_daemon_logs "$@" ;;
+        *) log_error "unknown daemon subcommand: $subcmd"; usage; exit 1 ;;
+      esac
+      ;;
+    daemon-run) cmd_daemon_run "$@" ;;
     restart) cmd_restart "$@" ;;
     restore-work) cmd_restore_work "$@" ;;
     baseline-status) cmd_baseline_status "$@" ;;

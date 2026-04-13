@@ -11,6 +11,9 @@
 - 现有的仅日期目录是遗留格式，可在后续迁移中重命名。
 
 ## 条目
+- 20260413-0208--foreground-background-runtime-entrypoint-semantics
+  - brainstorms: docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/candidates.md
 - 20260412-1845--runtime-forensic-time-alignment-and-stall-observability
   - brainstorms: docs/pre-brainstorms/20260412-1845--runtime-forensic-time-alignment-and-stall-observability/brainstorms.md
   - candidates: docs/pre-brainstorms/20260412-1845--runtime-forensic-time-alignment-and-stall-observability/candidates.md
