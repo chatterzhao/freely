@@ -2754,6 +2754,22 @@ runtime_auto_recovery_tool_order() {
   done < <(printf '%s\n' "$(runtime_cross_tool_fallback_order_for_current_tool "$current_tool")" | tr ',' '\n')
 }
 
+runtime_auto_recovery_reset_attempted_tools() {
+  AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV=""
+}
+
+runtime_auto_recovery_mark_tool_attempted() {
+  local tool="$1"
+  [[ -n "$tool" ]] || return 0
+  AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV="$(csv_append_unique_item "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "$tool")"
+}
+
+runtime_auto_recovery_tool_was_attempted() {
+  local tool="$1"
+  [[ -n "$tool" ]] || return 1
+  csv_contains_exact_item "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "$tool"
+}
+
 codex_earliest_recovery_hint_for_project() {
   local project="$1"
   if codex_load_availability_state "$project"; then
@@ -2844,6 +2860,7 @@ attempt_runtime_auto_recovery_after_failure() {
   RUNTIME_AUTO_RECOVERY_TOOL=""
   RUNTIME_AUTO_RECOVERY_SLOT=""
   RUNTIME_AUTO_RECOVERY_REASON="${failure_reason:-runtime_error_auto_recovery}"
+  runtime_auto_recovery_mark_tool_attempted "$current_tool"
 
   if config_bool_enabled "${AUTO_SWITCH_SLOT:-true}" \
     && attempt_local_same_tool_slot_recovery_after_failure "$project" "$current_tool" "$failure_reason"; then
@@ -2856,6 +2873,7 @@ attempt_runtime_auto_recovery_after_failure() {
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
     [[ "$candidate" != "$current_tool" ]] || continue
+    runtime_auto_recovery_tool_was_attempted "$candidate" && continue
     if ! tool_ready_for_manager_auto_recovery "$project" "$candidate"; then
       continue
     fi
@@ -4771,6 +4789,7 @@ load_session_state_or_defaults() {
   LAST_RESTART_STORM_SIGNAL_REASON=""
   LAST_RESTART_STORM_ESCALATED_AT=""
   LAST_RESTART_STORM_ESCALATION_TARGET=""
+  AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV=""
   CHECKPOINT_DRIFT_STREAK_CURRENT="0"
   ROUTE_ONLY_STREAK_CURRENT="0"
   RESUME_STREAK_CURRENT="0"
@@ -7816,7 +7835,7 @@ recover_stalled_worker_ai_if_needed() {
 }
 
 write_session_state() {
-  local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" context_compacted="$8" context_ratio="$9" primary_used_percent="${10}" primary_resets_at="${11}" secondary_used_percent="${12}" secondary_resets_at="${13}" route_only_handoff="${14}" route_only_streak="${15}" resume_streak="${16}" active_slot="${17}" slot_switch_reason="${18}" slot_switch_at="${19}" cycle_debug_log="${20}" claude_jsonl_path="${21}" codex_mcp_used="${22}" codex_mcp_thread_id="${23}" codex_mcp_jsonl_path="${24}" claude_session_id_current="${25}" claude_session_id_previous="${26}" project_dirty_entries="${27}" worktree_summary_total="${28}" worktree_summary_dirty="${29}" checkpoint_drift_streak="${30}" delegated_pending_ids="${31}" delegated_pending_count="${32}" delegated_consumed_ids="${33}" delegated_consumed_at="${34}" restart_storm_window_secs="${35}" restart_storm_count="${36}" process_churn_peak="${37}" restart_storm_signal_at="${38}" restart_storm_signal_reason="${39}" restart_storm_escalated_at="${40}" restart_storm_escalation_target="${41}"
+  local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" context_compacted="$8" context_ratio="$9" primary_used_percent="${10}" primary_resets_at="${11}" secondary_used_percent="${12}" secondary_resets_at="${13}" route_only_handoff="${14}" route_only_streak="${15}" resume_streak="${16}" active_slot="${17}" slot_switch_reason="${18}" slot_switch_at="${19}" cycle_debug_log="${20}" claude_jsonl_path="${21}" codex_mcp_used="${22}" codex_mcp_thread_id="${23}" codex_mcp_jsonl_path="${24}" claude_session_id_current="${25}" claude_session_id_previous="${26}" project_dirty_entries="${27}" worktree_summary_total="${28}" worktree_summary_dirty="${29}" checkpoint_drift_streak="${30}" delegated_pending_ids="${31}" delegated_pending_count="${32}" delegated_consumed_ids="${33}" delegated_consumed_at="${34}" restart_storm_window_secs="${35}" restart_storm_count="${36}" process_churn_peak="${37}" restart_storm_signal_at="${38}" restart_storm_signal_reason="${39}" restart_storm_escalated_at="${40}" restart_storm_escalation_target="${41}" auto_recovery_attempted_tools_csv="${42}"
   local state_file tmp_state_file
   state_file="$(session_state_file "$project")"
   tmp_state_file="$(mktemp "${state_file}.tmp.XXXXXX")"
@@ -7859,6 +7878,7 @@ LAST_RESTART_STORM_SIGNAL_AT="$restart_storm_signal_at"
 LAST_RESTART_STORM_SIGNAL_REASON="$restart_storm_signal_reason"
 LAST_RESTART_STORM_ESCALATED_AT="$restart_storm_escalated_at"
 LAST_RESTART_STORM_ESCALATION_TARGET="$restart_storm_escalation_target"
+AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV="$auto_recovery_attempted_tools_csv"
 CHECKPOINT_DRIFT_STREAK_CURRENT="$checkpoint_drift_streak"
 ROUTE_ONLY_STREAK_CURRENT="$route_only_streak"
 RESUME_STREAK_CURRENT="$resume_streak"
@@ -8005,7 +8025,7 @@ $(context_summary_target_hint "$project")
 EOF
 
   if [[ -n "${LAST_CYCLE_LOG:-}" && -f "$LAST_CYCLE_LOG" ]]; then
-    tail -n "$tail_lines" "$LAST_CYCLE_LOG" >>"$out_file"
+    session_handoff_recent_output_excerpt "$LAST_CYCLE_LOG" "$tail_lines" >>"$out_file"
   else
     printf 'unavailable://no-previous-cycle-log\n' >>"$out_file"
   fi
@@ -8034,6 +8054,34 @@ EOF
 $fleet_snapshot
 \`\`\`
 EOF
+  fi
+}
+
+session_handoff_recent_output_excerpt() {
+  local cycle_log="$1" max_lines="${2:-80}"
+  local excerpt
+  excerpt="$(
+    awk '
+      function emit(line) {
+        if (line ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T.* (ERROR|WARN) /) { print line; return }
+        if (line ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T.* \[(ERROR|WARN)\]/) { print line; return }
+        if (line ~ /^(ERROR|WARN)(:| |$)/) { print line; return }
+        if (line ~ /^\[(ERROR|WARN)\]/) { print line; return }
+        if (line ~ /^(assistant|codex|tokens used)$/) { print line; return }
+        if (line ~ /^OpenAI Codex v/ || line ~ /^Claude Code/) { print line; return }
+        if (line ~ /^(Please log in|Login required|Unauthorized|deactivated_workspace|workspace deactivated)/) { print line; return }
+        if (line ~ /^OAuth inventory refresh failed/) { print line; return }
+        if (line ~ /^FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set/) { print line; return }
+        if (line ~ /^curl: \([0-9]+\)/) { print line; return }
+        if (line ~ /^Attempt [0-9]+ failed\./) { print line; return }
+      }
+      { emit($0) }
+    ' "$cycle_log" | tail -n "$max_lines"
+  )"
+  if [[ -n "$excerpt" ]]; then
+    printf '%s\n' "$excerpt"
+  else
+    printf 'unavailable://no-diagnostic-excerpt-found\n'
   fi
 }
 
@@ -9393,6 +9441,78 @@ run_cleanup_followthrough() {
   rm -f "$resolution_file"
 }
 
+run_interruption_handler_for_intake() {
+  local handler_bin="$1" project="$2" intake_id="$3"
+  local timeout_secs="${FREELY_INTERRUPTION_HANDLER_TIMEOUT_SECS:-30}"
+  local stdout_file stderr_file pid start_ts now_ts rc timed_out
+
+  [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=30
+  stdout_file="$(mktemp /tmp/freely-interruption-handler-stdout.XXXXXX)"
+  stderr_file="$(mktemp /tmp/freely-interruption-handler-stderr.XXXXXX)"
+  INTERRUPTION_HANDLER_STDOUT=""
+  INTERRUPTION_HANDLER_STDERR=""
+
+  perl -MPOSIX -e 'setsid() or die "setsid failed: $!"; exec @ARGV or die "exec failed: $!"' \
+    "$handler_bin" --project "$project" --intake-id "$intake_id" >"$stdout_file" 2>"$stderr_file" &
+  pid=$!
+  start_ts="$(date +%s)"
+  timed_out="0"
+
+  while kill -0 "$pid" 2>/dev/null; do
+    now_ts="$(date +%s)"
+    if (( now_ts - start_ts >= timeout_secs )); then
+      timed_out="1"
+      kill -TERM "-$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null || true
+      sleep 1
+      kill -KILL "-$pid" 2>/dev/null || kill -KILL "$pid" 2>/dev/null || true
+      break
+    fi
+    sleep 1
+  done
+
+  if wait "$pid" 2>/dev/null; then
+    rc=0
+  else
+    rc=$?
+  fi
+  INTERRUPTION_HANDLER_STDOUT="$(cat "$stdout_file" 2>/dev/null || true)"
+  INTERRUPTION_HANDLER_STDERR="$(cat "$stderr_file" 2>/dev/null || true)"
+  rm -f "$stdout_file" "$stderr_file"
+
+  if [[ "$timed_out" == "1" ]]; then
+    return 124
+  fi
+  return "$rc"
+}
+
+apply_interruption_handler_failure_fallback_if_applicable() {
+  local project="$1" intake_id="$2" failure_kind="$3"
+  local role ai_pid reason_text handoff_text
+
+  role="$(role_hint_for_project "$project")"
+  [[ "$role" == "worker" ]] || return 1
+
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  [[ -n "$ai_pid" ]] || return 1
+  kill -0 "$ai_pid" 2>/dev/null || return 1
+
+  case "$failure_kind" in
+    timeout)
+      reason_text="triage 超时，保守交回当前 worker"
+      ;;
+    stderr)
+      reason_text="triage 异常写 stderr，保守交回当前 worker"
+      ;;
+    nonzero|*)
+      reason_text="triage 异常退出，保守交回当前 worker"
+      ;;
+  esac
+  handoff_text="让当前 worker 继续当前 issue，并优先吸收这条插话"
+  apply_interruption_manager_decision \
+    "$project" "$intake_id" "delegate" "followup" "continuation" \
+    "$reason_text" "continuation" "worker" "$handoff_text" ""
+}
+
 apply_interruption_manager_decision() {
   local project="$1" intake_id="$2" decision="$3" reaction="$4" classification="$5" why_text="$6" restart_point="$7" ownership="$8" handoff_text="$9" answer_text="${10}"
   local resolution_file
@@ -9465,12 +9585,40 @@ handle_interruption_intake_once() {
     reset_intake_claim_for_retry "$project" "$intake_id"
     return 0
   fi
-  if ! handler_output="$("$handler_bin" --project "$project" --intake-id "$intake_id" 2>/dev/null)"; then
-    log_warn "interruption handler exited non-zero; returning intake to new: $intake_id"
+  if run_interruption_handler_for_intake "$handler_bin" "$project" "$intake_id"; then
+    :
+  else
+    local handler_rc="$?"
+    if [[ "$handler_rc" == "124" ]]; then
+      log_warn "interruption handler timed out; attempting conservative fallback: $intake_id"
+      if apply_interruption_handler_failure_fallback_if_applicable "$project" "$intake_id" "timeout"; then
+        return 0
+      fi
+      log_warn "interruption handler timed out; returning intake to new: $intake_id"
+    else
+      log_warn "interruption handler exited non-zero; attempting conservative fallback: $intake_id"
+      if apply_interruption_handler_failure_fallback_if_applicable "$project" "$intake_id" "nonzero"; then
+        return 0
+      fi
+      log_warn "interruption handler exited non-zero; returning intake to new: $intake_id"
+    fi
     reset_intake_claim_for_retry "$project" "$intake_id"
     return 0
   fi
+  handler_output="$INTERRUPTION_HANDLER_STDOUT"
   decision="$(printf '%s\n' "$handler_output" | awk -F= '/^DECISION=/{print substr($0,10); exit}')"
+  if [[ -n "${INTERRUPTION_HANDLER_STDERR:-}" && -z "$decision" ]]; then
+    log_warn "interruption handler wrote stderr without a decision; attempting conservative fallback: $intake_id"
+    if apply_interruption_handler_failure_fallback_if_applicable "$project" "$intake_id" "stderr"; then
+      return 0
+    fi
+    log_warn "interruption handler wrote stderr without a decision; returning intake to new: $intake_id"
+    reset_intake_claim_for_retry "$project" "$intake_id"
+    return 0
+  fi
+  if [[ -n "${INTERRUPTION_HANDLER_STDERR:-}" && -n "$decision" ]]; then
+    log_warn "interruption handler wrote stderr alongside a decision; continuing with stdout decision: $intake_id"
+  fi
   reaction="$(printf '%s\n' "$handler_output" | awk -F= '/^REACTION=/{print substr($0,10); exit}')"
   classification="$(printf '%s\n' "$handler_output" | awk -F= '/^CLASSIFICATION=/{print substr($0,16); exit}')"
   restart_point="$(printf '%s\n' "$handler_output" | awk -F= '/^RESTART_POINT=/{print substr($0,15); exit}')"
@@ -10618,7 +10766,7 @@ start_project_runtime() {
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
     LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
     LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}"
     if [[ "$mode_name" == "fresh" || "$mode_name" == "fresh_with_handoff" ]]; then
       rm -f "$(handoff_file "$PROJECT_ROOT")"
     fi
@@ -10837,6 +10985,9 @@ start_project_runtime() {
     else
       clear_execution_network_state "$PROJECT_ROOT"
     fi
+    if [[ -z "$slot_switch_reason" && -z "$network_failure_reason" ]]; then
+      runtime_auto_recovery_reset_attempted_tools
+    fi
 
     local restart_signal_reason active_process_count now_epoch observe_delay restart_window_stats restart_window_count restart_window_peak
     restart_signal_reason=""
@@ -10851,7 +11002,7 @@ start_project_runtime() {
       record_restart_storm_signal "$PROJECT_ROOT" "$restart_signal_reason" "${restart_window_count:-0}" "${restart_window_peak:-0}"
     fi
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}"
     LAST_WORKCELL_EXIT_REASON="${slot_switch_reason:-${rate_limit_reason:-${network_failure_reason:-ai_exit_rc_${rc}}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     materialize_blocked_supervision_truth_if_needed "$PROJECT_ROOT" "$prompt_file" "$LAST_WORKCELL_EXIT_REASON" "$cycle_log"

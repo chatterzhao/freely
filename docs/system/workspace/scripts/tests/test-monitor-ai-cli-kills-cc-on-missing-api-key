@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-ai-cc-missing-key.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+PROMPT_FILE="$TMP_DIR/prompt.txt"
+PID_FILE="$TMP_DIR/child.pid"
+LOG_FILE="$TMP_DIR/monitor.log"
+DEBUG_LOG_FILE="$TMP_DIR/debug.log"
+MARKER_FILE="$TMP_DIR/failure.marker"
+MOCK_BIN="$TMP_DIR/mock-bin"
+
+mkdir -p "$PROJECT" "$MOCK_BIN"
+printf 'hi\n' >"$PROMPT_FILE"
+
+cat >"$MOCK_BIN/claude" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+debug_file=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --debug-file)
+      debug_file="${2:-}"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+[[ -n "$debug_file" ]]
+printf '%s\n' '2026-04-14T12:28:39.972Z [ERROR] Error: Error: Auth error: No API key available' >>"$debug_file"
+sleep 30
+EOF
+chmod +x "$MOCK_BIN/claude"
+
+set +e
+PATH="$MOCK_BIN:$PATH" \
+  bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+    --project "$PROJECT" \
+    --tool cc \
+    --tool-adapter direct \
+    --model sonnet \
+    --reasoning-effort medium \
+    --tool-capabilities "" \
+    --tool-policy "" \
+    --codex-capability-model "" \
+    --codex-capability-sandbox "" \
+    --codex-capability-approval-policy "" \
+    --codex-capability-cwd-mode "" \
+    --debug-log-file "$DEBUG_LOG_FILE" \
+    --claude-session-id "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee" \
+    --tool-resume-target "" \
+    --mode auto \
+    --prompt-file "$PROMPT_FILE" \
+    --pid-file "$PID_FILE" \
+    --log-file "$LOG_FILE" \
+    --failure-marker-file "$MARKER_FILE" \
+    --launch-kind fresh >/dev/null 2>&1
+RC=$?
+set -e
+
+[[ "$RC" -ne 0 ]]
+[[ -f "$MARKER_FILE" ]]
+grep -q '^tool_runtime_failure$' "$MARKER_FILE"
+grep -q 'Auth error: No API key available' "$DEBUG_LOG_FILE"
+
+CHILD_PID="$(cat "$PID_FILE")"
+if kill -0 "$CHILD_PID" 2>/dev/null; then
+  echo "[FAIL] monitor-ai-cli left the cc child running after a missing-api-key runtime failure" >&2
+  exit 1
+fi
+
+echo "[PASS] monitor-ai-cli treats cc missing-api-key runtime failures as unified recovery triggers"

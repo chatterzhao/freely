@@ -8,7 +8,9 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 PROJECT="$TMP_DIR/project"
 FREELY_HOME="$TMP_DIR/freely-home"
 HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
+HANDLER_STDERR_DECISION_FIXTURE="$TMP_DIR/interruption-handler-stderr-decision-fixture"
 HANDLER_FAIL_FIXTURE="$TMP_DIR/interruption-handler-fail-fixture"
+HANDLER_TIMEOUT_FIXTURE="$TMP_DIR/interruption-handler-timeout-fixture"
 CLEANUP_WT="$TMP_DIR/cleanup-wt"
 CLEANUP_WT_2="$TMP_DIR/cleanup-wt-2"
 DIRTY_WT="$TMP_DIR/dirty-wt"
@@ -148,12 +150,46 @@ fi
 EOF
 chmod +x "$HANDLER_FIXTURE"
 
+cat >"$HANDLER_STDERR_DECISION_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "warning: diagnostic stderr that should not void a valid decision" >&2
+cat <<'OUT'
+DECISION=answer
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=runtime
+OWNERSHIP=manager
+WHY=stderr noise should not discard a valid structured answer
+HANDOFF=
+ANSWER=stderr 和有效决策同时存在时，仍应采纳结构化决定
+OUT
+EOF
+chmod +x "$HANDLER_STDERR_DECISION_FIXTURE"
+
 cat >"$HANDLER_FAIL_FIXTURE" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 exit 1
 EOF
 chmod +x "$HANDLER_FAIL_FIXTURE"
+
+cat >"$HANDLER_TIMEOUT_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+sleep 5
+cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=discovery
+RESTART_POINT=pre_brainstorm
+OWNERSHIP=worker
+WHY=timeout fixture
+HANDOFF=should not be consumed
+ANSWER=
+OUT
+EOF
+chmod +x "$HANDLER_TIMEOUT_FIXTURE"
 
 cd "$PROJECT"
 FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
@@ -181,7 +217,7 @@ cleanup_dispatcher() {
 
 wait_for_grep() {
   local pattern="$1" file="$2" attempts
-  for attempts in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+  for attempts in $(seq 1 60); do
     if grep -q "$pattern" "$file" 2>/dev/null; then
       return 0
     fi
@@ -258,6 +294,16 @@ if ! git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/d
   echo "[FAIL] dirty remote branch should still exist" >&2
   exit 1
 fi
+
+CHAT_OUTPUT_STDERR_DECISION="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_STDERR_DECISION_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "stderr fixture should still produce a valid structured answer")"
+INTAKE_ID_STDERR_DECISION="$(printf '%s\n' "$CHAT_OUTPUT_STDERR_DECISION" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_STDERR_DECISION" ]] || {
+  echo "[FAIL] missing stderr decision intake id" >&2
+  exit 1
+}
+wait_for_grep '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_STDERR_DECISION/meta.env"
+wait_for_grep '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_STDERR_DECISION/meta.env"
+wait_for_grep 'stderr 和有效决策同时存在时，仍应采纳结构化决定' ".freely/run/interruption-resolution/$INTAKE_ID_STDERR_DECISION/resolution.md"
 
 CHAT_OUTPUT_MANAGER="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "你现在是 develop 工位上的主管。先检查所有 worktree、milestones、issues、intake 与 runtime 状态，然后决定下一步该委派什么。")"
 INTAKE_ID_MANAGER="$(printf '%s\n' "$CHAT_OUTPUT_MANAGER" | sed -n 's/^intake_id: //p')"
@@ -355,6 +401,18 @@ wait_for_grep '^CLASSIFICATION="discovery"$' ".freely/intake/$INTAKE_ID_RETRY/me
 wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
 wait_for_grep '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
 wait_for_grep '^CREATED_AT="'"$CREATED_AT_RETRY"'"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+
+CHAT_OUTPUT_TIMEOUT="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_TIMEOUT_FIXTURE" FREELY_INTERRUPTION_HANDLER_TIMEOUT_SECS=1 bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "超时 fixture")"
+INTAKE_ID_TIMEOUT="$(printf '%s\n' "$CHAT_OUTPUT_TIMEOUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_TIMEOUT" ]] || {
+  echo "[FAIL] missing timeout intake id" >&2
+  exit 1
+}
+wait_for_grep '^STATUS="new"$' ".freely/intake/$INTAKE_ID_TIMEOUT/meta.env"
+wait_for_grep '^CLASSIFICATION=""$' ".freely/intake/$INTAKE_ID_TIMEOUT/meta.env"
+wait_for_grep '^CLAIMED_BY=""$' ".freely/intake/$INTAKE_ID_TIMEOUT/meta.env"
+wait_for_grep '^LINKED_ARTIFACT="pending://unclassified"$' ".freely/intake/$INTAKE_ID_TIMEOUT/meta.env"
+wait_for_grep '^RESOLUTION_ARTIFACT=""$' ".freely/intake/$INTAKE_ID_TIMEOUT/meta.env"
 
 CHAT_OUTPUT_STALE="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "检查已经合并到develop的worktree，应该怎么收口")"
 INTAKE_ID_STALE="$(printf '%s\n' "$CHAT_OUTPUT_STALE" | sed -n 's/^intake_id: //p')"

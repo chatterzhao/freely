@@ -164,7 +164,7 @@ cat >"$prompt_file" <<'EOF'
   - 默认走 OWNERSHIP=worker
   - HANDOFF 应明确要求后续链使用 worktree-maintenance-governance 做 audit / merge_prep / retirement_handoff 判断
 - 但如果 signal 同时覆盖多个主管监督面，例如：
-  - \`worktree + milestones + issues + intake + runtime\`
+  - `worktree + milestones + issues + intake + runtime`
   - 或显式要求“你现在是主管”“检查所有”“开发 Freely 自己”
   - 或目标是先做项目级巡检、再决定委派
   则不要直接落到 cleanup followthrough。
@@ -172,7 +172,7 @@ cat >"$prompt_file" <<'EOF'
   - 仍走 DECISION=delegate
   - RESTART_POINT=continuation
   - OWNERSHIP=manager
-  - HANDOFF 应要求下一轮主管主循环先做 \`live-status -> fleet-status -> restart-point routing\`
+  - HANDOFF 应要求下一轮主管主循环先做 `live-status -> fleet-status -> restart-point routing`
 
 若选择委派，必须同时判断：
 - restart point 从哪里重新开始：
