@@ -50,6 +50,30 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260414-0255-A`
+- title: Freely start after-failure recovery handoff race root cause fix
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-freely-start-auto-recovery-rootcause-governance.md`
+- prd_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/prd.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/candidates.md`
+- follow_on_to: `I-20260410-1835-B`
+- branch: `feature/freely-start-auto-recovery-rootcause-20260414`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260414-feature-freely-start-auto-recovery-rootcause`
+- evidence:
+  - `docs/system/workspace/scripts/runtime/freely` (cleanup_supervisor fix)
+  - `docs/system/workspace/scripts/tests/test-freely-start-watchdog-recovers-when-fallback-tool-appears-late`
+  - `docs/system/workspace/scripts/tests/test-freely-worker-runtime-falls-through-to-cross-tool-after-failure`
+  - `docs/system/workspace/scripts/tests/test-watchdog-switch-to-codex-slot-accepts-actual-slot-without-json`
+- blocker: `test-freely-start-watchdog-recovers-when-fallback-tool-appears-late` 失败（`LAST_EXIT_REASON="starting"`，runtime 初始化未走到失败检测），需要深入调试 mock tool 执行路径和 runtime 初始化顺序
+- phase_state: `in_dev` -> `blocked_dev`（测试调试超出当前轮次 scope，需要交接）
+- next_action: 调试失败测试，补齐剩余 regression tests，准备 promote
+
 1. `I-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance
 - milestone_state: candidate

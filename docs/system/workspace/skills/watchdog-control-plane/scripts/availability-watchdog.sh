@@ -1681,7 +1681,7 @@ probe_all_codex_slots_and_update_cooldown() {
 
 switch_to_codex_slot() {
   local project="$1" slot="$2" reason="$3"
-  local ai_bin output actual_slot requested_normalized actual_slot_normalized
+  local ai_bin output actual_slot requested_normalized actual_slot_normalized switch_output_confirmed="0"
   wait_for_codex_slot_switch_idle "$project" || return 1
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" && -n "$slot" ]] || return 1
@@ -1689,8 +1689,13 @@ switch_to_codex_slot() {
   requested_normalized="$(normalize_codex_slot_name "$slot")"
   actual_slot="$(codex_current_slot "$project")"
   actual_slot_normalized="$(normalize_codex_slot_name "$actual_slot")"
-  if printf '%s\n' "$output" | grep -qE '"switched": *true' && \
-    [[ -n "$actual_slot" && "$actual_slot_normalized" == "$requested_normalized" ]]; then
+  if printf '%s\n' "$output" | grep -qE '"switched": *true'; then
+    switch_output_confirmed="1"
+  fi
+  if [[ -n "$actual_slot" && "$actual_slot_normalized" == "$requested_normalized" ]]; then
+    if [[ "$switch_output_confirmed" != "1" && -n "$output" ]]; then
+      log_warn "codex slot switch JSON confirmation missing; accepting actual active slot change instead (requested=$slot actual_slot=$actual_slot reason=$reason)" >&2
+    fi
     if [[ "$reason" != probe_all_slots ]]; then
       log_warn "auto-switched codex slot to $slot (reason=$reason)" >&2
     fi
