@@ -128,7 +128,7 @@ fi
 prompt_file="$(mktemp /tmp/freely-interruption-manager-prompt.XXXXXX)"
 trap 'rm -f "$prompt_file"' EXIT
 
-cat >"$prompt_file" <<EOF
+cat >"$prompt_file" <<'EOF'
 你现在承担 Freely 的 interruption manager agent。
 
 目标：
@@ -193,8 +193,9 @@ HANDOFF=<单行中文交接摘要，最多 60 字；若是 answer 可留空>
 ANSWER=<单行中文回答摘要，最多 60 字；若是 delegate 可留空>
 
 插话：
-$message
 EOF
+
+printf '%s\n' "$message" >>"$prompt_file"
 
 (
   cd "$project"
