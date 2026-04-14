@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-cross-tool-recovery.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME="$TMP_DIR/home"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260401-0004--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$HOME/.ai-auth/codex-default-2"
+
+git init -q -b feature/test-worker-cross-tool-recovery "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260401-0004--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260401-0004--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260401-0004--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="kiro-cli"
+AI_MODEL="auto"
+AI_MODE="auto"
+AUTO_SWITCH_TOOL="true"
+AUTO_SWITCH_SLOT="true"
+AI_FALLBACK_TOOLS="codex,iflow"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+SUPERVISOR_STATE="up"
+AI_STATE="down"
+LAST_EXIT_REASON="unexpected_runtime_error"
+EOF
+
+# shellcheck disable=SC1090
+HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+load_config "$PROJECT"
+
+runtime_write_tool_current_slot "kiro-cli" "default-1"
+
+role_hint_for_project() {
+  printf 'worker\n'
+}
+
+tool_select_ready_slot_for_manager_auto_recovery() {
+  local project="$1" tool="$2" mode="$3"
+  [[ "$tool" == "kiro-cli" ]] || return 1
+  [[ "$mode" == "after_failure" ]] || return 1
+  return 1
+}
+
+tool_ready_for_manager_auto_recovery() {
+  local project="$1" tool="$2"
+  [[ "$tool" == "codex" ]] || return 1
+  runtime_write_tool_current_slot "codex" "default-2"
+  TOOL_AUTO_RECOVERY_SLOT="default-2"
+  return 0
+}
+
+attempt_runtime_auto_recovery_after_failure "$PROJECT" "kiro-cli" "unexpected_runtime_error" >/dev/null
+
+[[ "${RUNTIME_AUTO_RECOVERY_TOOL:-}" == "codex" ]] || {
+  echo "[FAIL] worker runtime should fall through to the next recovery-capable tool" >&2
+  exit 1
+}
+[[ "$(runtime_read_tool_current_slot "$PROJECT" "codex")" == "default-2" ]] || {
+  echo "[FAIL] worker runtime should preserve the fallback tool slot selection" >&2
+  exit 1
+}
+grep -q '^AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] worker runtime should persist the selected fallback tool" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q 'event=tool_auto_switch_selected .*previous_tool=kiro-cli .*active_tool=codex .*owner=active_runtime_supervisor' "$PROJECT/.freely/logs/runtime-events.log" || {
+  echo "[FAIL] worker runtime should record cross-tool recovery under the active runtime supervisor" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+
+echo "[PASS] worker runtime falls through to cross-tool recovery after failure without failure-type gating"

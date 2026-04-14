@@ -834,6 +834,33 @@ project_desired_runtime_state() {
   printf '%s\n' "${DESIRED_RUNTIME_STATE:-unknown}"
 }
 
+project_cleanup_runtime_intent() {
+  local project="$1" fallback_desired_state="$2" fallback_exit_reason="$3"
+  local desired_state exit_reason state_file shared_desired_state shared_exit_reason
+
+  desired_state="${fallback_desired_state:-stopped}"
+  exit_reason="${fallback_exit_reason:-supervisor_exit}"
+  if [[ -f "$(stop_marker_file "$project")" ]]; then
+    printf 'stopped|operator_stop\n'
+    return 0
+  fi
+
+  state_file="$(workcell_state_file "$project")"
+  if [[ -f "$state_file" ]]; then
+    unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
+    # shellcheck disable=SC1090
+    source "$state_file"
+    shared_desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+    shared_exit_reason="${LAST_EXIT_REASON:-}"
+    if [[ "$shared_desired_state" == "stopped" || "$shared_exit_reason" == "operator_stop" ]]; then
+      desired_state="stopped"
+      exit_reason="${shared_exit_reason:-operator_stop}"
+    fi
+  fi
+
+  printf '%s|%s\n' "$desired_state" "$exit_reason"
+}
+
 project_role_hint() {
   local project="$1"
   local state_file
@@ -2053,11 +2080,12 @@ load_config() {
   [[ -f "$cfg" ]] || { log_error "missing config: $cfg"; exit 1; }
   # shellcheck disable=SC1090
   source "$cfg"
+  migrate_project_auto_recovery_defaults_if_needed "$project"
 }
 
 write_config() {
   local project="$1" intent="$2" constitution="$3" tool="$4" model="$5" mode="$6" reasoning_effort="$7" tool_adapter="$8" tool_adapter_policy="$9" tool_capabilities="${10}" tool_policy="${11}" codex_capability_model="${12}" codex_capability_sandbox="${13}" codex_capability_approval_policy="${14}" codex_capability_cwd_mode="${15}" force="${16:-false}"
-  local sdir cfg
+  local sdir cfg default_fallback_tools
   sdir="$(state_dir "$project")"
   cfg="$(config_file "$project")"
   mkdir -p "$sdir/logs" "$sdir/run"
@@ -2067,6 +2095,8 @@ write_config() {
     log_info "manual: edit $cfg or rerun freely init --force to rewrite Freely-managed defaults"
     return 0
   fi
+
+  default_fallback_tools="$(runtime_default_fallback_tools_for_current_tool "$tool" | paste -sd, -)"
 
   cat >"$cfg" <<EOF
 PROJECT_ROOT="$project"
@@ -2084,9 +2114,9 @@ AI_CAPABILITY_CODEX_MODEL="$codex_capability_model"
 AI_CAPABILITY_CODEX_SANDBOX="$codex_capability_sandbox"
 AI_CAPABILITY_CODEX_APPROVAL_POLICY="$codex_capability_approval_policy"
 AI_CAPABILITY_CODEX_CWD_MODE="$codex_capability_cwd_mode"
-AUTO_SWITCH_SLOT="false"
-AUTO_SWITCH_TOOL="false"
-AI_FALLBACK_TOOLS=""
+AUTO_SWITCH_SLOT="true"
+AUTO_SWITCH_TOOL="true"
+AI_FALLBACK_TOOLS="$default_fallback_tools"
 CHECK_INTERVAL=10
 RESTART_DELAY=2
 MAX_RESTARTS=0
@@ -2152,6 +2182,20 @@ upsert_config_key() {
     }
   ' "$cfg" >"$tmp"
   mv "$tmp" "$cfg"
+}
+
+migrate_project_auto_recovery_defaults_if_needed() {
+  local project="$1" default_fallback_tools=""
+  if [[ "${AUTO_SWITCH_SLOT:-}" == "false" && "${AUTO_SWITCH_TOOL:-}" == "false" && -z "${AI_FALLBACK_TOOLS:-}" ]]; then
+    default_fallback_tools="$(runtime_default_fallback_tools_for_current_tool "${AI_TOOL:-}" | paste -sd, -)"
+    AUTO_SWITCH_SLOT="true"
+    AUTO_SWITCH_TOOL="true"
+    AI_FALLBACK_TOOLS="$default_fallback_tools"
+    upsert_config_key "$project" "AUTO_SWITCH_SLOT" "$AUTO_SWITCH_SLOT"
+    upsert_config_key "$project" "AUTO_SWITCH_TOOL" "$AUTO_SWITCH_TOOL"
+    upsert_config_key "$project" "AI_FALLBACK_TOOLS" "$AI_FALLBACK_TOOLS"
+    log_warn "migrated legacy auto-switch defaults to current recovery contract (slot=true tool=true fallback_tools=${AI_FALLBACK_TOOLS:-none})"
+  fi
 }
 
 freely_autonomy_profile_for_mode() {
@@ -2502,9 +2546,7 @@ runtime_cross_tool_fallback_order_for_current_tool() {
     printf '%s\n' "$AI_FALLBACK_TOOLS"
     return 0
   fi
-  if [[ "$current_tool" != "codex" ]]; then
-    printf 'codex\n'
-  fi
+  runtime_default_fallback_tools_for_current_tool "$current_tool" | paste -sd, -
 }
 
 runtime_tool_auth_dir() {
@@ -2636,7 +2678,7 @@ tool_binary_available_for_auto_recovery() {
 tool_failure_scope_for_auto_recovery() {
   local tool="$1" failure_reason="$2"
   case "$tool:$failure_reason" in
-    *:primary_rate_limit_exhausted|*:secondary_rate_limit_exhausted|*:auth_failure|*:network_failure)
+    *:primary_rate_limit_exhausted|*:secondary_rate_limit_exhausted|*:auth_failure|*:network_failure|*:tool_runtime_failure)
       printf 'slot_local\n'
       ;;
     kiro-cli:kiro_monthly_request_limit|kiro-cli:kiro_subscription_status_service_error)
@@ -2680,6 +2722,24 @@ append_unique_tool_to_stream() {
     *",$candidate,"*) return 1 ;;
   esac
   printf '%s\n' "$candidate"
+}
+
+runtime_builtin_auto_recovery_tool_priority() {
+  printf 'codex\n'
+  printf 'cc\n'
+  printf 'iflow\n'
+  printf 'kiro-cli\n'
+  printf 'cc-use-codex-cli\n'
+}
+
+runtime_default_fallback_tools_for_current_tool() {
+  local current_tool="$1"
+  local seen="$current_tool" candidate
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    append_unique_tool_to_stream "$candidate" "$seen" || continue
+    seen="${seen}${seen:+,}$candidate"
+  done < <(runtime_builtin_auto_recovery_tool_priority)
 }
 
 runtime_auto_recovery_tool_order() {
@@ -2771,12 +2831,44 @@ attempt_local_same_tool_slot_recovery_after_failure() {
   local project="$1" tool="$2" failure_reason="$3"
   LOCAL_TOOL_AUTO_RECOVERY_SLOT=""
   tool_supports_auto_same_tool_slot_recovery "$tool" || return 1
-  tool_failure_allows_same_tool_slot_recovery "$tool" "$failure_reason" || return 1
   worker_runtime_should_self_recover_slot_local_failure "$project" || return 1
   tool_select_ready_slot_for_manager_auto_recovery "$project" "$tool" "after_failure" || return 1
   LOCAL_TOOL_AUTO_RECOVERY_SLOT="${TOOL_AUTO_RECOVERY_SLOT:-}"
   record_tool_auto_switch_event "$project" "$tool" "$tool" "${LOCAL_TOOL_AUTO_RECOVERY_SLOT:-}" "same_tool_slot_recovery" "" "false" "selected" "" "active_runtime_supervisor"
   return 0
+}
+
+attempt_runtime_auto_recovery_after_failure() {
+  local project="$1" current_tool="$2" failure_reason="$3"
+  local candidate fallback_slot
+  RUNTIME_AUTO_RECOVERY_TOOL=""
+  RUNTIME_AUTO_RECOVERY_SLOT=""
+  RUNTIME_AUTO_RECOVERY_REASON="${failure_reason:-runtime_error_auto_recovery}"
+
+  if config_bool_enabled "${AUTO_SWITCH_SLOT:-true}" \
+    && attempt_local_same_tool_slot_recovery_after_failure "$project" "$current_tool" "$failure_reason"; then
+    RUNTIME_AUTO_RECOVERY_TOOL="$current_tool"
+    RUNTIME_AUTO_RECOVERY_SLOT="${LOCAL_TOOL_AUTO_RECOVERY_SLOT:-}"
+    return 0
+  fi
+
+  config_bool_enabled "${AUTO_SWITCH_TOOL:-false}" || return 1
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    [[ "$candidate" != "$current_tool" ]] || continue
+    if ! tool_ready_for_manager_auto_recovery "$project" "$candidate"; then
+      continue
+    fi
+    fallback_slot="${TOOL_AUTO_RECOVERY_SLOT:-}"
+    persist_project_tool_selection "$project" "$candidate"
+    load_config "$project"
+    record_tool_auto_switch_event "$project" "$current_tool" "$candidate" "${fallback_slot:-}" "${failure_reason:-runtime_error_auto_recovery}" "" "false" "selected" "" "active_runtime_supervisor"
+    RUNTIME_AUTO_RECOVERY_TOOL="$candidate"
+    RUNTIME_AUTO_RECOVERY_SLOT="${fallback_slot:-}"
+    return 0
+  done < <(runtime_auto_recovery_tool_order "$current_tool")
+
+  return 1
 }
 
 persist_project_tool_selection() {
@@ -4393,6 +4485,7 @@ runtime_error_signal_excerpt() {
   [[ -f "$log_file" ]] || return 1
   awk '
     /^[0-9]{4}-[0-9]{2}-[0-9]{2}T.* (ERROR|WARN) / { print; next }
+    /^[0-9]{4}-[0-9]{2}-[0-9]{2}T.* \[(ERROR|WARN)\]/ { print; next }
     /^(ERROR|WARN)(:| |$)/ { print; next }
     /^\[(ERROR|WARN)\]/ { print; next }
     /^(Please log in|Login required|Unauthorized|deactivated_workspace|workspace deactivated)/ { print; next }
@@ -9043,6 +9136,25 @@ validate_signal_ownership_or_fail() {
   esac
 }
 
+normalize_interruption_manager_contract() {
+  local classification="${1:-}" restart_point="${2:-}" ownership="${3:-}"
+  local normalized_classification="$classification"
+  local normalized_restart_point="$restart_point"
+  local normalized_ownership="$ownership"
+
+  # `runtime` is reserved for signals that directly manipulate runtime state.
+  # Worker continuation work must stay on the continuation lane so the runtime
+  # re-enters work instead of parking itself.
+  if [[ "$normalized_restart_point" == "runtime" && "$normalized_classification" == "continuation" ]]; then
+    normalized_restart_point="continuation"
+  fi
+  if [[ "$normalized_restart_point" == "runtime" && "$normalized_ownership" != "runtime" ]]; then
+    normalized_restart_point="continuation"
+  fi
+
+  printf '%s|%s|%s\n' "$normalized_classification" "$normalized_restart_point" "$normalized_ownership"
+}
+
 write_manager_answer_resolution_file() {
   local intake_id="$1" out_file="$2" answer_text="$3" why_text="$4" restart_point="$5"
   cat >"$out_file" <<EOF
@@ -9366,6 +9478,7 @@ handle_interruption_intake_once() {
   why_text="$(printf '%s\n' "$handler_output" | awk -F= '/^WHY=/{print substr($0,5); exit}')"
   handoff_text="$(printf '%s\n' "$handler_output" | awk -F= '/^HANDOFF=/{print substr($0,9); exit}')"
   answer_text="$(printf '%s\n' "$handler_output" | awk -F= '/^ANSWER=/{print substr($0,8); exit}')"
+  IFS='|' read -r classification restart_point ownership <<<"$(normalize_interruption_manager_contract "$classification" "$restart_point" "$ownership")"
   if [[ -z "$decision" ]]; then
     log_warn "interruption handler returned no decision; returning intake to new: $intake_id"
     reset_intake_claim_for_retry "$project" "$intake_id"
@@ -10360,40 +10473,58 @@ start_project_runtime() {
 
   cleanup_supervisor() {
     local dispatcher_pid="" watchdog_pid="" other_supervisors=""
-    dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+    local effective_desired_state="" effective_exit_reason="" cleanup_intent=""
+    local cleanup_stop_requested="${stop_requested:-0}"
+
+    cleanup_intent="$(project_cleanup_runtime_intent "$PROJECT_ROOT" "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" "${LAST_WORKCELL_EXIT_REASON:-supervisor_exit}")"
+    effective_desired_state="${cleanup_intent%%|*}"
+    effective_exit_reason="${cleanup_intent#*|}"
+
+    other_supervisors="$(authoritative_supervisor_pids_for_project "$PROJECT_ROOT" "$$" | head -n 1)"
+    if [[ -n "$other_supervisors" ]]; then
+      append_runtime_event "$PROJECT_ROOT" "supervisor_cleanup_superseded_by_active_supervisor" \
+        "supervisor_pid=$$" \
+        "replacement_supervisor_pid=$other_supervisors" \
+        "desired_state=${effective_desired_state:-running}" \
+        "exit_reason=${effective_exit_reason:-supervisor_exit}"
+      clear_supervisor_identity_truth "$PROJECT_ROOT" "$$"
+      rm -f "$sup_pid_file" "$child_pid_file"
+      return 0
+    fi
+
+    dispatcher_pid="$(interruption_dispatcher_pid_for_project "$PROJECT_ROOT")"
     if [[ -n "$dispatcher_pid" ]]; then
       terminate_pid_with_graceful_wait "$dispatcher_pid" "project interruption dispatcher during supervisor cleanup"
     fi
-    watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
+    watchdog_pid="$(manager_watchdog_pid_for_project "$PROJECT_ROOT")"
     if [[ -n "$watchdog_pid" ]]; then
       terminate_pid_with_graceful_wait "$watchdog_pid" "project manager watchdog during supervisor cleanup"
     fi
-    if [[ "$(role_hint_for_project "$project")" == "manager" ]] && { [[ "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" == "stopped" ]] || [[ "${LAST_WORKCELL_EXIT_REASON:-}" == "operator_stop" ]]; }; then
-      materialize_missing_required_manager_continuity_fallback "$project" "${LAST_WORKCELL_EXIT_REASON:-supervisor_cleanup}" || true
+    if [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]] && { [[ "${effective_desired_state:-stopped}" == "stopped" ]] || [[ "${effective_exit_reason:-}" == "operator_stop" ]]; }; then
+      materialize_missing_required_manager_continuity_fallback "$PROJECT_ROOT" "${effective_exit_reason:-supervisor_cleanup}" || true
     fi
-    append_runtime_event "$project" "supervisor_cleanup" \
+    append_runtime_event "$PROJECT_ROOT" "supervisor_cleanup" \
       "supervisor_pid=$$" \
-      "desired_state=${DESIRED_RUNTIME_STATE_VALUE:-stopped}" \
-      "exit_reason=${LAST_WORKCELL_EXIT_REASON:-supervisor_exit}" \
-      "stop_requested=$stop_requested"
-    clear_supervisor_identity_truth "$project" "$$"
+      "desired_state=${effective_desired_state:-stopped}" \
+      "exit_reason=${effective_exit_reason:-supervisor_exit}" \
+      "stop_requested=$cleanup_stop_requested"
+    clear_supervisor_identity_truth "$PROJECT_ROOT" "$$"
     rm -f "$sup_pid_file" "$child_pid_file"
-    if [[ "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" == "stopped" ]] && [[ -f "$(stop_marker_file "$project")" ]]; then
-      other_supervisors="$(authoritative_supervisor_pids_for_project "$project" "$$" | head -n 1)"
+    if [[ "${effective_desired_state:-stopped}" == "stopped" ]] && [[ -f "$(stop_marker_file "$PROJECT_ROOT")" ]]; then
       if [[ -n "$other_supervisors" ]]; then
-        append_runtime_event "$project" "supervisor_cleanup_stop_marker_preserved" \
+        append_runtime_event "$PROJECT_ROOT" "supervisor_cleanup_stop_marker_preserved" \
           "supervisor_pid=$$" \
           "other_supervisor_pid=$other_supervisors"
       else
-        rm -f "$(stop_marker_file "$project")"
+        rm -f "$(stop_marker_file "$PROJECT_ROOT")"
       fi
     else
-      rm -f "$(stop_marker_file "$project")"
+      rm -f "$(stop_marker_file "$PROJECT_ROOT")"
     fi
-    write_workcell_state "$project" "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" "down" "down" "${LAST_WORKCELL_EXIT_REASON:-supervisor_exit}"
-    if [[ "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" == "running" ]] && [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
+    write_workcell_state "$project" "${effective_desired_state:-stopped}" "down" "down" "${effective_exit_reason:-supervisor_exit}"
+    if [[ "${effective_desired_state:-stopped}" == "running" ]] && [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
       launch_interruption_dispatcher "$project"
-      launch_manager_control_plane_recheck "$project"
+      launch_manager_watchdog "$project"
     fi
   }
 
@@ -10492,8 +10623,10 @@ start_project_runtime() {
       rm -f "$(handoff_file "$PROJECT_ROOT")"
     fi
 
-    local tool_adapter
+    local tool_adapter failure_marker_file=""
     tool_adapter="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "$AI_TOOL")}"
+    failure_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/tool-runtime-failure.marker"
+    rm -f "$failure_marker_file"
     exit_if_stop_requested_before_launch
     log_info "launching $AI_TOOL via ${tool_adapter:-unknown} ($mode_name mode, ai_mode=$AI_MODE)"
     append_runtime_event "$project" "ai_launch_begin" \
@@ -10528,6 +10661,7 @@ start_project_runtime() {
         --prompt-file "$prompt_file" \
         --pid-file "$child_pid_file" \
         --log-file "$cycle_log" \
+        --failure-marker-file "$failure_marker_file" \
         --launch-kind "$mode_name"
     } >>"$loop_log" 2>&1
     local rc=$?
@@ -10536,7 +10670,7 @@ start_project_runtime() {
     local codex_mcp_used codex_mcp_thread_id codex_mcp_jsonl_path
     local claude_jsonl_path
     local primary_rate_limit_used_percent primary_rate_limit_resets_at secondary_rate_limit_used_percent secondary_rate_limit_resets_at next_restart_delay
-    local active_slot active_cooldown_identity slot_switch_reason network_failure_reason
+    local active_slot active_cooldown_identity slot_switch_reason network_failure_reason live_failure_reason
     local rate_limit_reason rate_limit_reset_at
     local dirty_entries worktree_total worktree_dirty summary
     local launch_resume_target
@@ -10645,10 +10779,10 @@ start_project_runtime() {
       CHECKPOINT_DRIFT_STREAK_CURRENT=0
     fi
 
-    if [[ "$stop_requested" -eq 1 || -f "$(stop_marker_file "$project")" ]]; then
+    if [[ "$stop_requested" -eq 1 || -f "$(stop_marker_file "$PROJECT_ROOT")" ]]; then
       LAST_WORKCELL_EXIT_REASON="operator_stop"
       DESIRED_RUNTIME_STATE_VALUE="stopped"
-      rm -f "$child_pid_file" "$(session_state_file "$project")" "$(handoff_file "$project")"
+      rm -f "$child_pid_file" "$(session_state_file "$PROJECT_ROOT")" "$(handoff_file "$PROJECT_ROOT")"
       log_info "received stop signal, exiting supervisor"
       exit 0
     fi
@@ -10664,10 +10798,20 @@ start_project_runtime() {
       ROUTE_ONLY_STREAK_CURRENT=0
     fi
     network_failure_reason=""
+    live_failure_reason=""
+    if [[ -f "$failure_marker_file" ]]; then
+      live_failure_reason="$(tr -d '\r' <"$failure_marker_file" | awk 'NF { print; exit }')"
+      rm -f "$failure_marker_file"
+    fi
+    if [[ -n "$live_failure_reason" ]]; then
+      slot_switch_reason="$live_failure_reason"
+    fi
     if [[ "$AI_TOOL" == "codex" ]]; then
       rate_limit_reason="$(codex_rate_limit_reason_from_usage "${primary_rate_limit_used_percent:-}" "${secondary_rate_limit_used_percent:-}")"
       rate_limit_reset_at="$(codex_rate_limit_reset_at_for_reason "${rate_limit_reason:-}" "${primary_rate_limit_resets_at:-}" "${secondary_rate_limit_resets_at:-}")"
-      if [[ -n "$rate_limit_reason" ]]; then
+      if [[ -n "$slot_switch_reason" ]]; then
+        :
+      elif [[ -n "$rate_limit_reason" ]]; then
         slot_switch_reason="$rate_limit_reason"
         codex_record_slot_cooldown "$PROJECT_ROOT" "$active_cooldown_identity" "${rate_limit_reset_at:-}"
       elif log_has_codex_usage_limit "$cycle_log"; then
@@ -10681,7 +10825,7 @@ start_project_runtime() {
         LAST_SLOT_SWITCH_REASON="$slot_switch_reason"
         LAST_SLOT_SWITCH_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
       fi
-    elif [[ "$AI_TOOL" == "kiro-cli" ]]; then
+    elif [[ "$AI_TOOL" == "kiro-cli" && -z "$slot_switch_reason" ]]; then
       slot_switch_reason="$(kiro_availability_reason_from_log "$cycle_log" || true)"
       if [[ -n "$slot_switch_reason" ]]; then
         LAST_SLOT_SWITCH_REASON="$slot_switch_reason"
@@ -10743,21 +10887,27 @@ start_project_runtime() {
         "restart_count=$restart_count"
       exit 1
     fi
-    if [[ -n "$slot_switch_reason" ]]; then
-      if attempt_local_same_tool_slot_recovery_after_failure "$PROJECT_ROOT" "$AI_TOOL" "$slot_switch_reason"; then
-        log_warn "${slot_switch_reason} detected for this workcell; worker runtime switched locally to slot=${LOCAL_TOOL_AUTO_RECOVERY_SLOT:-unknown} and will continue"
+    local auto_recovery_reason=""
+    auto_recovery_reason="${slot_switch_reason:-${network_failure_reason:-}}"
+    if [[ -n "$auto_recovery_reason" ]]; then
+      if attempt_runtime_auto_recovery_after_failure "$PROJECT_ROOT" "$AI_TOOL" "$auto_recovery_reason"; then
+        if [[ "${RUNTIME_AUTO_RECOVERY_TOOL:-$AI_TOOL}" == "$AI_TOOL" ]]; then
+          log_warn "${auto_recovery_reason} detected for this workcell; worker runtime switched locally to slot=${RUNTIME_AUTO_RECOVERY_SLOT:-unknown} and will continue"
+        else
+          log_warn "${auto_recovery_reason} detected for this workcell; worker runtime switched to tool=${RUNTIME_AUTO_RECOVERY_TOOL:-unknown} slot=${RUNTIME_AUTO_RECOVERY_SLOT:-none} and will continue"
+        fi
         append_runtime_event "$project" "supervisor_local_slot_recovery" \
           "supervisor_pid=$$" \
-          "tool=$AI_TOOL" \
-          "reason=$slot_switch_reason" \
-          "active_slot=${LOCAL_TOOL_AUTO_RECOVERY_SLOT:-unknown}"
+          "tool=${RUNTIME_AUTO_RECOVERY_TOOL:-$AI_TOOL}" \
+          "reason=$auto_recovery_reason" \
+          "active_slot=${RUNTIME_AUTO_RECOVERY_SLOT:-unknown}"
         sleep_with_rate_limit_recheck "$PROJECT_ROOT" 1
         continue
       fi
-      log_warn "${slot_switch_reason} detected for this workcell; local runtime is deferring availability recovery to the global watchdog / manager control plane and will now stop"
+      log_warn "${auto_recovery_reason} detected for this workcell; no auto-recovery path is ready, so local runtime will now stop"
       append_runtime_event "$project" "supervisor_stopping" \
         "supervisor_pid=$$" \
-        "reason=$slot_switch_reason"
+        "reason=$auto_recovery_reason"
       exit 0
     fi
     if [[ -n "$restart_signal_reason" ]]; then

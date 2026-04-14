@@ -179,6 +179,8 @@ cat >"$prompt_file" <<EOF
   - pre_brainstorm / candidate / milestone / ibm / dev / review / verification / continuation / runtime / cleanup
 - ownership 属于 manager / worker / runtime 哪一侧
 - 给出一行 handoff 摘要
+- `RESTART_POINT=runtime` 只用于当前 runtime 本身需要停车、重启、续跑治理或恢复的 signal。
+- 若 signal 是继续当前 issue、创建文件、实现、测试、review、修 bug、补文档等实际工作，即使最终由运行中的 worker 去执行，也应优先落在 `continuation`、`dev`、`review`、`verification` 等工作阶段，而不是 `runtime`。
 
 只输出以下 KEY=VALUE 行，不要输出任何额外文本：
 DECISION=answer 或 delegate

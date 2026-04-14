@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-tool-runtime-failure-recovery.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+PROJECT_ROOT="__PROJECT__"
+AI_TOOL="cc"
+AI_MODEL=""
+AI_MODE="auto"
+AUTO_SWITCH_SLOT="true"
+AUTO_SWITCH_TOOL="true"
+AI_FALLBACK_TOOLS="codex"
+EOF
+perl -0pi -e "s#__PROJECT__#$PROJECT#g" "$PROJECT/.freely/config.env"
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+SUPERVISOR_STATE="up"
+AI_STATE="down"
+LAST_EXIT_REASON="tool_runtime_failure"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+load_config "$PROJECT"
+
+role_hint_for_project() {
+  printf 'worker\n'
+}
+
+tool_ready_for_manager_auto_recovery() {
+  local project="$1" tool="$2"
+  [[ "$tool" == "codex" ]] || return 1
+  TOOL_AUTO_RECOVERY_SLOT="default-2"
+  return 0
+}
+
+attempt_runtime_auto_recovery_after_failure "$PROJECT" "cc" "tool_runtime_failure" >/dev/null
+
+[[ "${RUNTIME_AUTO_RECOVERY_TOOL:-}" == "codex" ]] || {
+  echo "[FAIL] tool_runtime_failure should fall through the unified cross-tool recovery path" >&2
+  exit 1
+}
+grep -q '^AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] unified recovery path should persist the fallback tool selection" >&2
+  exit 1
+}
+grep -q 'event=tool_auto_switch_selected .*previous_tool=cc .*active_tool=codex .*reason=tool_runtime_failure' "$PROJECT/.freely/logs/runtime-events.log" || {
+  echo "[FAIL] unified recovery path should record tool_runtime_failure in the switch event" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+[[ "$(tool_failure_scope_for_auto_recovery "cc" "tool_runtime_failure")" == "slot_local" ]] || {
+  echo "[FAIL] tool_runtime_failure should authorize the shared slot-first recovery contract" >&2
+  exit 1
+}
+
+echo "[PASS] tool_runtime_failure feeds the shared auto-recovery path without per-failure switch forks"
