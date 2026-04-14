@@ -3,7 +3,7 @@
 - issue_id: `I-20260414-0255-A`
 - title: `Freely start after-failure recovery handoff race root cause fix`
 - milestone: `M-20260306-workspace-routing-foundation`
-- phase_state: `done_ibm`
+- phase_state: `in_dev`
 - priority: P1
 - epic: `workspace-routing-foundation`
 - source_brainstorm: `docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/brainstorms.md`
@@ -69,9 +69,9 @@
 
 ## Next Action
 
-1. 创建 `prd.md`、`pre-tests.md`、`tasks.md` 补充验收细节
-2. 更新 milestone 将候选提升为 committed_issue
-3. 决定是否进入 dev-loop 继续完善实现，或直接进入 verification
+1. 维持当前 `feature/freely-start-auto-recovery-rootcause-20260414` 的 dev-loop continuity，并以 `docs/progress/workspace-routing-foundation/p-freely-start-auto-recovery-rootcause-governance.md` 作为执行态真源
+2. 完成 feature-lane 余下的 verification closeout：补齐当前 tasks/pre-tests 中尚未收口的 regression / promotion 前证据
+3. 准备进入 `test-pre-merge-*` 批次做 premerge-integration，而不是在当前 issue 上伪装成已经 completed
 
 ## Session References
 
@@ -79,3 +79,7 @@
 - session_id: current-session
 - jsonl_path: unavailable://cc-session-only
 - role: author
+- tool: codex
+- session_id: 019d8ca9-5ac6-74d1-858d-38f1a1937a69
+- jsonl_path: /Users/zhaoyu/.codex/sessions/2026/04/14/rollout-2026-04-14T08-43-22-019d8ca9-5ac6-74d1-858d-38f1a1937a69.jsonl
+- role: continuation-author

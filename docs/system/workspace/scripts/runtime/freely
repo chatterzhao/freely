@@ -8827,6 +8827,40 @@ project_bootstrap_launch_in_flight() {
   (( now_epoch - state_updated_epoch <= grace_secs ))
 }
 
+project_runtime_auto_recovery_launch_in_flight() {
+  local project="$1" supervisor_pid="$2" ai_pid="$3"
+  local desired_state last_exit_reason last_slot_switch_reason last_slot_switch_at
+  local slot_switch_epoch now_epoch grace_secs
+
+  [[ -n "$supervisor_pid" && -z "$ai_pid" ]] || return 1
+  [[ -f "$(workcell_state_file "$project")" ]] || return 1
+  [[ -f "$(session_state_file "$project")" ]] || return 1
+
+  unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
+  # shellcheck disable=SC1090
+  source "$(workcell_state_file "$project")"
+  desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+  last_exit_reason="${LAST_EXIT_REASON:-}"
+  [[ "$desired_state" == "running" ]] || return 1
+  [[ -n "$last_exit_reason" && "$last_exit_reason" != "starting" && "$last_exit_reason" != "operator_stop" ]] || return 1
+
+  unset LAST_SLOT_SWITCH_REASON LAST_SLOT_SWITCH_AT
+  # shellcheck disable=SC1090
+  source "$(session_state_file "$project")"
+  last_slot_switch_reason="${LAST_SLOT_SWITCH_REASON:-}"
+  last_slot_switch_at="${LAST_SLOT_SWITCH_AT:-}"
+  [[ -n "$last_slot_switch_reason" && -n "$last_slot_switch_at" ]] || return 1
+
+  slot_switch_epoch="$(timestamp_epoch_or_zero "$last_slot_switch_at")"
+  [[ "$slot_switch_epoch" =~ ^[0-9]+$ ]] || slot_switch_epoch=0
+  (( slot_switch_epoch > 0 )) || return 1
+
+  now_epoch="$(date +%s)"
+  grace_secs="${FREELY_MANAGER_AUTO_RECOVERY_AI_GRACE_SECS:-5}"
+  [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=5
+  (( now_epoch - slot_switch_epoch <= grace_secs ))
+}
+
 project_bootstrap_launch_in_flight_from_unverified_supervisor_hint() {
   local project="$1"
   local supervisor_hint=""
@@ -9074,6 +9108,8 @@ ensure_manager_once() {
   current_ai_pid="$(manager_ai_pid_for_project "$project")"
   if project_bootstrap_launch_in_flight "$project" "$current_pid" "$current_ai_pid"; then
     log_info "manager bootstrap is still within ai launch grace; keeping supervisor pid=$current_pid alive"
+  elif project_runtime_auto_recovery_launch_in_flight "$project" "$current_pid" "$current_ai_pid"; then
+    log_info "manager runtime auto-recovery is still within ai launch grace; keeping supervisor pid=$current_pid alive"
   elif project_bootstrap_launch_in_flight_from_unverified_supervisor_hint "$project"; then
     log_info "manager bootstrap is still within ai launch grace under degraded process inspection; keeping hinted supervisor pid=${supervisor_hint:-unknown} alive"
   elif [[ "$same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
@@ -9095,7 +9131,8 @@ ensure_manager_once() {
     return 0
   fi
 
-  if [[ -n "$current_pid" ]] || project_bootstrap_launch_in_flight_from_unverified_supervisor_hint "$project"; then
+  if [[ "${TOOL_AUTO_RECOVERY_DECISION:-none}" != "selected" ]] \
+    && ([[ -n "$current_pid" ]] || project_bootstrap_launch_in_flight_from_unverified_supervisor_hint "$project"); then
     manager_runtime_recover_workers_if_needed "$project" >/dev/null || true
     log_info "manager supervisor already running (pid=${current_pid:-${supervisor_hint:-unknown}})"
     return 0

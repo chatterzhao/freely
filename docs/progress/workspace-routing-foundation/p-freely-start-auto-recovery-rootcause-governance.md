@@ -3,18 +3,46 @@
 - issue_id: `I-20260414-0255-A`
 - issue_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
 - title: `Freely start after-failure recovery handoff race root cause fix`
-- phase_state: `in_verification`
+- phase_state: `in_dev`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/freely-start-auto-recovery-rootcause-20260414`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260414-feature-freely-start-auto-recovery-rootcause`
-- updated_at: `2026-04-14T08:11:53-07:00`
+- updated_at: `2026-04-14T08:45:36-07:00`
 - session_refs:
-  - {tool: codex, session_id: "current-session", jsonl_path: "unavailable://codex-session-only", role: "author"}
+  - {tool: codex, session_id: "019d8ca9-5ac6-74d1-858d-38f1a1937a69", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/04/14/rollout-2026-04-14T08-43-22-019d8ca9-5ac6-74d1-858d-38f1a1937a69.jsonl", role: "author"}
 
 ## Summary
 
-IBM 已完成 materialization。本轮在真实环境中完成了根因修复与闭环验收：`freely start` 从坏 Codex 号自动切到可用号，随后继续运行并实际消费 delegated continuation，完成任务落盘。
+IBM 已完成 materialization。当前 issue 仍处于 feature lane 的 `dev-loop` closeout：主实现和一组 focused verification evidence 已落地，但 feature-lane verification / promote / post-merge tasks 仍未收口，因此本轮先把 compacted handoff 与 delegated continuation `healthcheck9` 吸收到 continuity，再继续沿现有 dev-loop 推进。
+
+**Checkpoint 2026-04-14T08:45:36-07:00**:
+- source_class=`continuation`
+- route_kind=`dev_loop`
+- target_skill=`dev-loop-execution`
+- selected_tool=`codex`
+- why_selected=`当前来源是 progress + delegated continuation；issue 边界和 docs 已完整，但 milestone/tasks 仍显示 feature-lane closeout 未完成，因此最小正确动作是继续当前 worktree 的 dev-loop continuity 与状态同步，而不是提前宣布 verification 结束`
+- workspace_action=`continue_current_worktree`
+- execution_base=`develop`
+- integration_target=`develop`
+- depends_on=`none`
+- constitution_guard=`pass`
+- laws_enforcer=`pass`
+- fresh handoff absorbed:
+  - previous_tool_session_id=`019d8ca9-5ac6-74d1-858d-38f1a1937a69`
+  - previous_cycle_log=`.freely/logs/cycle-20260414-084319.log`
+  - previous_cycle_debug_log=`.freely/logs/cycle-20260414-084319.debug.log`
+  - rotation_reason=`context_compacted`
+  - summary_target_hint=`dev-loop: update progress first`
+- delegated continuation absorbed:
+  - `.freely/run/healthcheck7.txt` present with `ok`
+  - `.freely/run/healthcheck8.txt` present with `ok`
+  - `.freely/run/healthcheck9.txt` created with `ok`
+  - note: `session-state.env` already marked intake `20260414-084032-issue-freely-run-healthcheck9-tx` as consumed; this round reconciles the missing file artifact with that control-plane truth
+- worktree hygiene snapshot:
+  - current_project_dirty_entries=`1`
+  - project_worktree_summary=`total=3; dirty=2`
+  - checkpoint_judgement=`continuity update first; no unrelated diff splitting required yet because dirty scope remains focused to the active runtime file plus this continuity writeback`
 
 **Checkpoint 2026-04-14T08:11:53-07:00**:
 - source_class=`continuation`
@@ -46,6 +74,11 @@ IBM 已完成 materialization。本轮在真实环境中完成了根因修复与
 
 ### 已完成
 
+0. Fresh-with-handoff continuity refresh
+   - 按 `context compacted` 治理先更新当前 progress，再继续本轮 issue
+   - 吸收 delegated continuation `healthcheck9`
+   - 记录本轮 Codex 显式 session evidence 与 dirty-budget judgement
+
 1. IBM 文档 materialization
    - issue 文档：`docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
    - prd.md：已创建，描述核心合同和技术设计
@@ -65,6 +98,7 @@ IBM 已完成 materialization。本轮在真实环境中完成了根因修复与
    - `monitor-ai-cli.sh` 在 child fast-exit 后会执行 post-exit 日志扫描，确保快速 429/配额失败仍会写出统一 failure marker
    - `freely` handoff 只注入诊断摘录，不再把整段上一轮 cycle log 递归塞回下一轮 prompt，避免 `fresh_with_handoff` 自旋膨胀
    - after-failure auto-recovery 继续沿用统一切换方法，真实回放已确认坏号后会先扫同工具 slot，再稳定落到可用号
+   - delegated continuation `healthcheck9` 已与当前 run-dir 真相对齐，避免 consumed signal 与文件证据失配
 
 5. 已通过的 focused regressions / verification evidence
    - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-detects-fast-exit-codex-429`
@@ -98,17 +132,20 @@ IBM 已完成 materialization。本轮在真实环境中完成了根因修复与
 
 1. 无功能性 blocker
    - 当前仅剩 premerge 装配与 protected-branch promote 流程未执行
+2. 无新的功能性 blocker
+   - 当前剩余工作是 feature-lane verification / promotion closeout，而不是新的实现阻塞
 
 ## Session Evidence
 
 - 当前会话已完成：真实坏号重放、统一切号修复、prompt/handoff 膨胀修复、interruption fallback 收口、focused regressions、real-env task completion
 - tool: codex
-- session_id: current-session
-- jsonl_path: unavailable://codex-session-only
+- session_id: 019d8ca9-5ac6-74d1-858d-38f1a1937a69
+- jsonl_path: /Users/zhaoyu/.codex/sessions/2026/04/14/rollout-2026-04-14T08-43-22-019d8ca9-5ac6-74d1-858d-38f1a1937a69.jsonl
 - cycle_log:
   - `.freely/logs/cycle-20260414-080744.log` bad slot fast-exit -> unified tool failure marker
   - `.freely/logs/cycle-20260414-080816.log` good slot stable run with `rc=0`
   - `.freely/logs/cycle-20260414-080928.log` delegated continuation absorption
+  - `.freely/logs/cycle-20260414-084319.log` context-compacted handoff with 429 excerpt carried into fresh session
 - runtime-events:
   - `event=tool_auto_switch_selected ... active_slot=account-worahe1012@outlook-com-1`
   - final stop truth: `desired_runtime_state=stopped`, `last_exit_reason=operator_stop`
