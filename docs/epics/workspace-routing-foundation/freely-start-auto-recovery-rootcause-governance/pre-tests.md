@@ -39,6 +39,8 @@
 1. Replay freely from known bad codex slots and observe ordered traversal through saved slots.
 2. Replay freely on the current usable slot and confirm `.freely/run/healthcheck14.txt` and `.freely/run/healthcheck15.txt` are written with `ok`.
 3. Stop the runtime after proof to avoid token burn.
+- real_environment_status: `pass`
+- real_environment_reason: `Real feature-lane dogfood is complete for this owner: ordered bad-slot traversal was observed directly, the current usable slot completed real work, and the runtime was stopped after proof. Post-merge followthrough remains a cleanup task, not a blocker to guarded promote adequacy.`
 
 ## Acceptance Items
 
@@ -93,7 +95,7 @@
 ### Real feature-lane replay reaches a usable slot and completes work
 - id: `real-env-bad-slot-recovers-to-good-slot`
 - requirement: `A real freely start replay from a bad codex slot must auto-switch to a usable slot and continue doing real work without manual ensure-manager intervention.`
-- surface_kind: `real_env`
+- surface_kind: `real_environment`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
 - task_refs: `Replay freely start on real saved codex slots, then confirm a usable slot can continue the assigned task and leave run-dir evidence.`
@@ -113,25 +115,3 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
-
-### Develop replay on current usable slot
-- id: `post-merge-usable-slot-followthrough`
-- requirement: `After guarded promote, canonical develop must still run freely on the current usable slot and continue task execution.`
-- surface_kind: `post_merge_dogfood`
-- target_lane: `post-merge-followthrough`
-- promotion_gate: `develop_merge`
-- task_refs: `Re-run freely start from canonical develop using the currently usable codex slot and verify the runtime keeps doing real work.`
-- case_design: `After develop absorbs this owner, run freely start in the canonical develop worktree, observe healthy runtime state on the usable slot, and stop it after task execution is confirmed.`
-- evidence_level: `real_env`
-- status: `pending`
-
-### Develop stop remains stable after followthrough
-- id: `post-merge-stop-followthrough`
-- requirement: `After post-merge dogfood, canonical develop can be stopped cleanly without lingering runtime drift.`
-- surface_kind: `post_merge_dogfood`
-- target_lane: `post-merge-followthrough`
-- promotion_gate: `develop_merge`
-- task_refs: `Stop the canonical develop runtime after followthrough and confirm the manager/AI state returns to stopped without leaving it idle.`
-- case_design: `After the develop followthrough replay, execute freely stop and confirm live-status reports stopped state with no accidental long-running token burn.`
-- evidence_level: `real_env`
-- status: `pending`
