@@ -38,6 +38,14 @@
 - stop discipline:
   - runtime manually stopped after proof to avoid idle token burn
 
+## Implementation Decision Note
+
+- decision: `Keep one unified switch mechanism, but split cached-ready probing from after-failure saved-slot traversal so codex failure recovery executes the next saved slot before deciding it is unusable.`
+- why_this: `The real replay showed the bug was not error taxonomy but traversal semantics: availability cache was skipping saved slots before they were ever run. Tightening the after-failure selector directly fixes the observed behavior while preserving the existing outer cross-tool loop.`
+- alternatives_considered: `Keep the old cache-filtered selector and add more failure-type labels; introduce multiple switch methods per error class; let codex wrap around the saved-slot list and hope a later probe finds something usable.`
+- boundary_non_goals: `This owner does not redesign tool priority order, rewrite manual hi-probe behavior, or absorb unrelated runtime failures outside the codex after-failure traversal contract.`
+- residual_risk: `Canonical develop still needs one short post-merge followthrough replay on the currently usable slot before the lane can be declared fully retired.`
+
 ## Residual Followthrough
 
 - develop guarded promote is still pending at the time of this verification note; the current artifact exists to satisfy owner-bound lifecycle and adequacy truth before replaying `test-pre-merge-* -> develop`.

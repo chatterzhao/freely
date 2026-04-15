@@ -1,6 +1,46 @@
 # Pre-Tests: freely-start-auto-recovery-rootcause-governance
 
-## Feature-Local Verification
+## Unit
+- acceptance target: `The codex after-failure selection path is routed through one unified next-slot method instead of cache-filtered probe semantics.`
+- testing layer: `unit`
+- target environment: `feature/freely-start-auto-recovery-rootcause-20260414`
+- required evidence: `focused selector/runtime regression output plus owner verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-codex-after-failure-next-slot-ignores-availability-cache`.
+2. Run `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-codex-select-next-slot-does-not-wrap`.
+
+## Integration
+- acceptance target: `Manager recovery keeps codex same-tool traversal first, then falls through the existing cross-tool loop without inventing error-type-specific switching.`
+- testing layer: `integration`
+- target environment: `feature/freely-start-auto-recovery-rootcause-20260414`
+- required evidence: `focused runtime regression output plus owner verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-codex-after-failure-uses-next-slot-not-probe`.
+2. Run `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`.
+3. Run `git diff --check`.
+
+## End-to-End
+- acceptance target: `A guarded feature -> test-pre-merge -> develop chain can evaluate this owner against explicit premerge adequacy truth rather than stale candidate-only metadata.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-20260414-freely-start-auto-recovery-rootcause`
+- required evidence: `guarded merge replay plus premerge governance audit`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run `./bin/merge-guarded test-pre-merge-20260414-freely-start-auto-recovery-rootcause feature/freely-start-auto-recovery-rootcause-20260414`.
+2. Run `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`.
+3. Run `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`.
+4. Run `./bin/test-lane premerge-integration -- ./bin/governance-check`.
+
+## Real-Environment
+- acceptance target: `A real freely start replay can move from bad codex slots to a usable slot and continue doing work without manual ensure-manager intervention.`
+- testing layer: `real_environment`
+- target environment: `feature/freely-start-auto-recovery-rootcause-20260414`
+- required evidence: `runtime traversal evidence plus run-dir task artifacts`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Replay freely from known bad codex slots and observe ordered traversal through saved slots.
+2. Replay freely on the current usable slot and confirm `.freely/run/healthcheck14.txt` and `.freely/run/healthcheck15.txt` are written with `ok`.
+3. Stop the runtime after proof to avoid token burn.
+
+## Acceptance Items
 
 ### After-failure next-slot ignores availability cache
 - id: `codex-after-failure-next-slot-ignores-cache`
@@ -62,8 +102,6 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
 
-## Guarded Develop Promote
-
 ### Guarded develop promote proves codex recovery adequacy
 - id: `develop-promote-codex-after-failure-adequacy`
 - requirement: `A guarded test-pre-merge replay proves this owner carries explicit premerge-integration coverage for the corrected codex after-failure traversal contract before develop promotion.`
@@ -71,12 +109,10 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `Replay the saved-slot-order verification batch on a disposable test-pre-merge branch created from develop and use that replay to prove guarded promotion adequacy for the corrected codex recovery contract.`
-- case_design: `Merge the feature lane into a disposable test-pre-merge batch via merge-guarded, rerun the four focused regressions plus governance-check there, and use the resulting review artifact to prove the owner explicitly covers the premerge-integration:develop_merge lane/gate pair.`
+- case_design: `Merge the feature lane into a disposable test-pre-merge batch via merge-guarded, rerun the focused pretests/governance regressions there, and use the resulting review artifact to prove the owner explicitly covers the premerge-integration:develop_merge lane/gate pair.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
-
-## Post-Merge Followthrough
 
 ### Develop replay on current usable slot
 - id: `post-merge-usable-slot-followthrough`
