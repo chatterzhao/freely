@@ -2798,7 +2798,11 @@ tool_select_ready_slot_for_manager_auto_recovery() {
   TOOL_AUTO_RECOVERY_SLOT=""
   case "$tool" in
     codex)
-      ensure_codex_slot_ready_for_manager "$project" "$mode" || return 1
+      if [[ "$mode" == "after_failure" ]]; then
+        switch_to_next_codex_slot "$project" "after_failure_exec_recovery_next_slot" || return 1
+      else
+        ensure_codex_slot_ready_for_manager "$project" "$mode" || return 1
+      fi
       selected_slot="$(runtime_read_tool_current_slot "$project" "$tool")"
       ;;
     *)

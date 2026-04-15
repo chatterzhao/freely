@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-codex-after-failure-next-slot.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME="$TMP_DIR/home"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260414-0001--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$HOME/.ai-auth/codex-slot-a" "$HOME/.ai-auth/codex-slot-b"
+
+git init -q -b feature/test-codex-after-failure-next-slot "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260414-0001--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260414-0001--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260414-0001--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AUTO_SWITCH_TOOL="true"
+AUTO_SWITCH_SLOT="true"
+AI_FALLBACK_TOOLS="cc"
+EOF
+
+printf 'slot-a\n' >"$HOME/.ai-auth/.codex-current-slot"
+
+# shellcheck disable=SC1090
+HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+load_config "$PROJECT"
+
+ensure_codex_slot_ready_for_manager() {
+  echo "[FAIL] codex after-failure recovery must not fall back to the hi probe path" >&2
+  exit 1
+}
+
+switch_to_next_codex_slot() {
+  local project="$1" reason="$2"
+  [[ "$reason" == "after_failure_exec_recovery_next_slot" ]] || {
+    echo "[FAIL] unexpected codex next-slot switch reason: $reason" >&2
+    exit 1
+  }
+  runtime_write_tool_current_slot "codex" "slot-b"
+  printf 'slot-b\n'
+  return 0
+}
+
+tool_select_ready_slot_for_manager_auto_recovery "$PROJECT" "codex" "after_failure" >/dev/null
+
+[[ "${TOOL_AUTO_RECOVERY_SLOT:-}" == "slot-b" ]] || {
+  echo "[FAIL] expected after-failure codex recovery to select slot-b; got ${TOOL_AUTO_RECOVERY_SLOT:-<none>}" >&2
+  exit 1
+}
+[[ "$(runtime_read_tool_current_slot "$PROJECT" "codex")" == "slot-b" ]] || {
+  echo "[FAIL] expected codex current slot to advance to slot-b" >&2
+  exit 1
+}
+
+echo "[PASS] codex after-failure recovery advances to the next slot without probing saved slots"

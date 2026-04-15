@@ -1166,18 +1166,42 @@ codex_any_saved_slot_available_now() {
 
 select_next_codex_slot() {
   local project="$1" current_identity="${2:-}"
-  local normalized_current candidate
+  local normalized_current candidate seen_current=0
   normalized_current="$(normalize_codex_slot_name "$current_identity")"
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
-    if [[ -z "$normalized_current" || "$candidate" != "$normalized_current" ]]; then
-      if ! codex_slot_is_available_now "$project" "$candidate"; then
-        continue
-      fi
+    if [[ -z "$normalized_current" ]]; then
+      codex_slot_is_available_now "$project" "$candidate" || continue
       printf '%s\n' "$candidate"
       return 0
     fi
+    if [[ "$seen_current" == "1" ]]; then
+      codex_slot_is_available_now "$project" "$candidate" || continue
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+    [[ "$candidate" == "$normalized_current" ]] && seen_current=1
   done < <(codex_saved_slots "$project")
+  return 1
+}
+
+select_next_codex_saved_slot() {
+  local project="$1" current_identity="${2:-}"
+  local normalized_current candidate seen_current=0
+  normalized_current="$(normalize_codex_slot_name "$current_identity")"
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    if [[ -z "$normalized_current" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+    if [[ "$seen_current" == "1" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+    [[ "$candidate" == "$normalized_current" ]] && seen_current=1
+  done < <(codex_saved_slots "$project")
+  return 1
 }
 
 select_earliest_reset_codex_slot() {
@@ -1712,7 +1736,7 @@ switch_to_next_codex_slot() {
   local project="$1" reason="$2"
   local current_identity next_slot
   current_identity="$(codex_current_cooldown_identity "$project")"
-  next_slot="$(select_next_codex_slot "$project" "$current_identity")"
+  next_slot="$(select_next_codex_saved_slot "$project" "$current_identity")"
   [[ -n "$next_slot" ]] || return 1
   switch_to_codex_slot "$project" "$next_slot" "$reason"
 }
