@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/watchdog-switch-accept-actual-slot.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT_DIR="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+AI_LOG="$TMP_DIR/ai.log"
+mkdir -p "$PROJECT_DIR/bin" "$PROJECT_DIR/.freely/run" "$HOME_DIR/.codex"
+
+cat >"$PROJECT_DIR/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf 'suppress=%s args=%s\n' "${AI_CLI_SUPPRESS_AUTH_CHANGE_WAKE:-0}" "$*" >>"${AI_LOG:?}"
+if [[ "${1:-}" == "--quiet" && "${2:-}" == "--format" && "${3:-}" == "json" && "${4:-}" == "whoami" ]]; then
+  cat <<'JSON'
+{"tool": "codex", "slot": "slot@example-com-2", "slot_kind": "account", "auth_email": "slot@example.com", "account": "slot@example.com"}
+JSON
+fi
+exit 0
+EOF
+chmod +x "$PROJECT_DIR/bin/ai"
+
+cat >"$HOME_DIR/.codex/active-slot" <<'EOF'
+slot@example-com-2
+EOF
+
+HOME="$HOME_DIR" AI_LOG="$AI_LOG" bash -lc '
+  set -euo pipefail
+  source "'"$ROOT_DIR"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  ai_cli_bin_for_project() { printf "%s\n" "'"$PROJECT_DIR"'/bin/ai"; }
+  wait_for_codex_slot_switch_idle() { return 0; }
+  log_warn() { return 0; }
+  switch_to_codex_slot "'"$PROJECT_DIR"'" "slot@example-com-2" "after_failure_exec_recovery_slot_probe" >/dev/null
+'
+
+grep -q '^suppress=1 args=--quiet --format json switch codex slot@example-com-2 --yes$' "$AI_LOG"
+
+echo "[PASS] watchdog accepts the actual active slot as success even when switch JSON is empty"

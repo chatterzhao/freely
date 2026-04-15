@@ -50,6 +50,30 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260414-0255-A`
+- title: Freely start after-failure recovery handoff race root cause fix
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-freely-start-auto-recovery-rootcause-governance.md`
+- prd_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/prd.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/candidates.md`
+- follow_on_to: `I-20260410-1835-B`
+- branch: `feature/freely-start-auto-recovery-rootcause-20260414`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260414-feature-freely-start-auto-recovery-rootcause`
+- evidence:
+  - `docs/system/workspace/scripts/runtime/freely` (cleanup_supervisor fix)
+  - `docs/system/workspace/scripts/tests/test-freely-start-watchdog-recovers-when-fallback-tool-appears-late`
+  - `docs/system/workspace/scripts/tests/test-freely-worker-runtime-falls-through-to-cross-tool-after-failure`
+  - `docs/system/workspace/scripts/tests/test-watchdog-switch-to-codex-slot-accepts-actual-slot-without-json`
+- latest_session_ref: `{tool: codex, session_id: "019d8ca9-5ac6-74d1-858d-38f1a1937a69"}`
+- next_action: 延续当前 feature-lane dev-loop closeout；当前实现与 focused evidence 已存在，但仍需完成 tasks/pre-tests 中剩余的 feature verification、premerge 装配与 promote 准备
+- revisit_trigger: 当 feature-lane verification 全部收口后，切入 `test-pre-merge-*` 做 premerge-integration；若真实 replay 再次出现 after-failure handoff race 或 stop resurrection，再回到当前 issue 继续实现
+
 1. `I-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance
 - milestone_state: candidate

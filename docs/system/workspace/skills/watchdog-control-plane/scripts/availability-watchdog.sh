@@ -1166,18 +1166,42 @@ codex_any_saved_slot_available_now() {
 
 select_next_codex_slot() {
   local project="$1" current_identity="${2:-}"
-  local normalized_current candidate
+  local normalized_current candidate seen_current=0
   normalized_current="$(normalize_codex_slot_name "$current_identity")"
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
-    if [[ -z "$normalized_current" || "$candidate" != "$normalized_current" ]]; then
-      if ! codex_slot_is_available_now "$project" "$candidate"; then
-        continue
-      fi
+    if [[ -z "$normalized_current" ]]; then
+      codex_slot_is_available_now "$project" "$candidate" || continue
       printf '%s\n' "$candidate"
       return 0
     fi
+    if [[ "$seen_current" == "1" ]]; then
+      codex_slot_is_available_now "$project" "$candidate" || continue
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+    [[ "$candidate" == "$normalized_current" ]] && seen_current=1
   done < <(codex_saved_slots "$project")
+  return 1
+}
+
+select_next_codex_saved_slot() {
+  local project="$1" current_identity="${2:-}"
+  local normalized_current candidate seen_current=0
+  normalized_current="$(normalize_codex_slot_name "$current_identity")"
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    if [[ -z "$normalized_current" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+    if [[ "$seen_current" == "1" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+    [[ "$candidate" == "$normalized_current" ]] && seen_current=1
+  done < <(codex_saved_slots "$project")
+  return 1
 }
 
 select_earliest_reset_codex_slot() {
@@ -1681,7 +1705,7 @@ probe_all_codex_slots_and_update_cooldown() {
 
 switch_to_codex_slot() {
   local project="$1" slot="$2" reason="$3"
-  local ai_bin output actual_slot requested_normalized actual_slot_normalized
+  local ai_bin output actual_slot requested_normalized actual_slot_normalized switch_output_confirmed="0"
   wait_for_codex_slot_switch_idle "$project" || return 1
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" && -n "$slot" ]] || return 1
@@ -1689,8 +1713,13 @@ switch_to_codex_slot() {
   requested_normalized="$(normalize_codex_slot_name "$slot")"
   actual_slot="$(codex_current_slot "$project")"
   actual_slot_normalized="$(normalize_codex_slot_name "$actual_slot")"
-  if printf '%s\n' "$output" | grep -qE '"switched": *true' && \
-    [[ -n "$actual_slot" && "$actual_slot_normalized" == "$requested_normalized" ]]; then
+  if printf '%s\n' "$output" | grep -qE '"switched": *true'; then
+    switch_output_confirmed="1"
+  fi
+  if [[ -n "$actual_slot" && "$actual_slot_normalized" == "$requested_normalized" ]]; then
+    if [[ "$switch_output_confirmed" != "1" && -n "$output" ]]; then
+      log_warn "codex slot switch JSON confirmation missing; accepting actual active slot change instead (requested=$slot actual_slot=$actual_slot reason=$reason)" >&2
+    fi
     if [[ "$reason" != probe_all_slots ]]; then
       log_warn "auto-switched codex slot to $slot (reason=$reason)" >&2
     fi
@@ -1707,7 +1736,7 @@ switch_to_next_codex_slot() {
   local project="$1" reason="$2"
   local current_identity next_slot
   current_identity="$(codex_current_cooldown_identity "$project")"
-  next_slot="$(select_next_codex_slot "$project" "$current_identity")"
+  next_slot="$(select_next_codex_saved_slot "$project" "$current_identity")"
   [[ -n "$next_slot" ]] || return 1
   switch_to_codex_slot "$project" "$next_slot" "$reason"
 }

@@ -79,6 +79,10 @@ ensure_codex_slot_ready_for_manager() {
   codex_write_availability_state "$1" "all_unavailable" "all_slots_unavailable" "slot-a" "slot-a" "fp" "" "slot-a" "1893456000"
   return 1
 }
+switch_to_next_codex_slot() {
+  printf 'codex:%s\n' "$1" >>"$readiness_log"
+  return 1
+}
 tool_binary_available_for_auto_recovery() {
   [[ "$1" == "iflow" ]]
 }

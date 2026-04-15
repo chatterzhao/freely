@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-load-config-auto-switch-migration.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely" "$PROJECT/docs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AUTO_SWITCH_SLOT="false"
+AUTO_SWITCH_TOOL="false"
+AI_FALLBACK_TOOLS=""
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+log_warn() { :; }
+
+load_config "$PROJECT"
+
+[[ "${AUTO_SWITCH_SLOT:-}" == "true" ]] || {
+  echo "[FAIL] expected load_config to migrate legacy AUTO_SWITCH_SLOT=false to true" >&2
+  exit 1
+}
+[[ "${AUTO_SWITCH_TOOL:-}" == "true" ]] || {
+  echo "[FAIL] expected load_config to migrate legacy AUTO_SWITCH_TOOL=false to true" >&2
+  exit 1
+}
+[[ "${AI_FALLBACK_TOOLS:-}" == "cc,iflow,kiro-cli,cc-use-codex-cli" ]] || {
+  echo "[FAIL] expected load_config to materialize the default fallback order excluding the current tool" >&2
+  echo "actual=${AI_FALLBACK_TOOLS:-}" >&2
+  exit 1
+}
+grep -q '^AUTO_SWITCH_SLOT="true"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected migrated config to persist AUTO_SWITCH_SLOT=true" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q '^AUTO_SWITCH_TOOL="true"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected migrated config to persist AUTO_SWITCH_TOOL=true" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q '^AI_FALLBACK_TOOLS="cc,iflow,kiro-cli,cc-use-codex-cli"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected migrated config to persist the default fallback order" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+
+echo "[PASS] load_config migrates the legacy auto-switch-off defaults to the current recovery contract"

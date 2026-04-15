@@ -411,7 +411,11 @@ tool_run_direct_from_prompt_file() {
       fi
       [[ -n "$worktrees_root" ]] && args+=(--add-dir "$worktrees_root")
       [[ -n "$debug_log_file" ]] && args+=(--debug-file "$debug_log_file")
-      [[ -n "$claude_session_id" ]] && args+=(--session-id "$claude_session_id")
+      if [[ "$launch_kind" == "resume" ]]; then
+        [[ -n "$tool_resume_target" ]] && args+=(--resume "$tool_resume_target")
+      elif [[ -n "$claude_session_id" ]]; then
+        args+=(--session-id "$claude_session_id")
+      fi
       [[ -n "$model" && "$model" != "default" ]] && args+=(--model "$model")
       [[ -n "$reasoning_effort" ]] && args+=(--effort "$reasoning_effort")
       if tool_has_capability "$tool_capabilities" "codex-cli"; then

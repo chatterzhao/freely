@@ -18,6 +18,9 @@
   - same-tool exhausted 后再从 `AI_FALLBACK_TOOLS` 最左侧开始重新扫描其他工具，而不是把 current tool 隐式插到最前
   - 每进入一个 fallback tool，先继续扫该工具自己的 slot family，再决定是否进入下一个工具
   - 全部不可用时保持 no-launch，并把 earliest-reset target 写成显式 `tool + slot` waiting truth
+- runtime work-loop 的切换 contract 是统一的：
+  - 各工具可以有不同的错误关键词 / 失败证据
+  - 但一旦命中“当前工具这轮工作失败”，统一进入同一条 slot-first / cross-tool fallback recovery path，而不是按 rate-limit、auth、network 分叉多套 switch 方法
 - execution-time network taxonomy 也是 runtime-owned truth：
   - `oauth_unreachable` 继续只表示 preflight / inventory 阶段的 launch blocker
   - `execution_network_transient`、`execution_network_persistent`、`proxy_config_invalid` 表示运行中的 network-local failure
@@ -168,7 +171,7 @@
   - 需要 `Claude Code` 的 agent/context 管理
 - example:
   - fresh/auto: `claude -p --permission-mode bypassPermissions --session-id <uuid> "<assembled prompt>"`
-  - resume/auto: `claude -p --permission-mode bypassPermissions --session-id <same-uuid> "<assembled prompt>"`
+  - resume/auto: `claude -p --permission-mode bypassPermissions --resume <session-id> "<assembled prompt>"`
 - runtime_notes:
   - `cc` 不默认启用 `codex-cli` MCP；它是纯 Claude Code 顶层工具。
   - `cc` 当前没有单独的 project-local tool config materialization；Freely 主要通过 launch-time flags 注入 non-interactive posture，例如 `--permission-mode bypassPermissions`、`--session-id`、以及可选 debug/model/effort parameters。
@@ -189,7 +192,7 @@
   - 同时希望 repo 实现、review、verification 默认走 Codex MCP
 - example:
   - fresh/auto: `claude -p --permission-mode bypassPermissions --session-id <uuid> --append-system-prompt "<fixed codex-cli MCP policy>" "<assembled prompt>"`
-  - resume/auto: `claude -p --permission-mode bypassPermissions --session-id <same-uuid> --append-system-prompt "<fixed codex-cli MCP policy>" "<assembled prompt>"`
+  - resume/auto: `claude -p --permission-mode bypassPermissions --resume <session-id> --append-system-prompt "<fixed codex-cli MCP policy>" "<assembled prompt>"`
 - runtime_notes:
   - `cc-use-codex-cli` 是固定 profile，不要求用户再单独配置 capability 参数。
   - `cc-use-codex-cli` 当前也主要通过 launch-time materialization 工作，而不是写独立 project-local Claude config。

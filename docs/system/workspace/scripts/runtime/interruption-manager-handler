@@ -128,7 +128,7 @@ fi
 prompt_file="$(mktemp /tmp/freely-interruption-manager-prompt.XXXXXX)"
 trap 'rm -f "$prompt_file"' EXIT
 
-cat >"$prompt_file" <<EOF
+cat >"$prompt_file" <<'EOF'
 你现在承担 Freely 的 interruption manager agent。
 
 目标：
@@ -164,7 +164,7 @@ cat >"$prompt_file" <<EOF
   - 默认走 OWNERSHIP=worker
   - HANDOFF 应明确要求后续链使用 worktree-maintenance-governance 做 audit / merge_prep / retirement_handoff 判断
 - 但如果 signal 同时覆盖多个主管监督面，例如：
-  - \`worktree + milestones + issues + intake + runtime\`
+  - `worktree + milestones + issues + intake + runtime`
   - 或显式要求“你现在是主管”“检查所有”“开发 Freely 自己”
   - 或目标是先做项目级巡检、再决定委派
   则不要直接落到 cleanup followthrough。
@@ -172,13 +172,15 @@ cat >"$prompt_file" <<EOF
   - 仍走 DECISION=delegate
   - RESTART_POINT=continuation
   - OWNERSHIP=manager
-  - HANDOFF 应要求下一轮主管主循环先做 \`live-status -> fleet-status -> restart-point routing\`
+  - HANDOFF 应要求下一轮主管主循环先做 `live-status -> fleet-status -> restart-point routing`
 
 若选择委派，必须同时判断：
 - restart point 从哪里重新开始：
   - pre_brainstorm / candidate / milestone / ibm / dev / review / verification / continuation / runtime / cleanup
 - ownership 属于 manager / worker / runtime 哪一侧
 - 给出一行 handoff 摘要
+- `RESTART_POINT=runtime` 只用于当前 runtime 本身需要停车、重启、续跑治理或恢复的 signal。
+- 若 signal 是继续当前 issue、创建文件、实现、测试、review、修 bug、补文档等实际工作，即使最终由运行中的 worker 去执行，也应优先落在 `continuation`、`dev`、`review`、`verification` 等工作阶段，而不是 `runtime`。
 
 只输出以下 KEY=VALUE 行，不要输出任何额外文本：
 DECISION=answer 或 delegate
@@ -191,8 +193,9 @@ HANDOFF=<单行中文交接摘要，最多 60 字；若是 answer 可留空>
 ANSWER=<单行中文回答摘要，最多 60 字；若是 delegate 可留空>
 
 插话：
-$message
 EOF
+
+printf '%s\n' "$message" >>"$prompt_file"
 
 (
   cd "$project"
