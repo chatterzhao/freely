@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-interruption-timeout-fallback.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+FREELY_HOME="$TMP_DIR/freely-home"
+HANDLER_TIMEOUT_FIXTURE="$TMP_DIR/interruption-handler-timeout"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0000--sample" "$PROJECT/.freely/run"
+
+git init -q -b feature/test-interruption-timeout-fallback "$PROJECT"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cd "$PROJECT"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
+python3 - <<'PY'
+from pathlib import Path
+cfg = Path(".freely/config.env")
+text = cfg.read_text()
+text = text.replace('AI_TOOL="codex"', 'AI_TOOL="iflow"', 1)
+cfg.write_text(text)
+PY
+
+cat >"$HANDLER_TIMEOUT_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+sleep 5
+EOF
+chmod +x "$HANDLER_TIMEOUT_FIXTURE"
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-03-21T00:00:00Z"
+EOF
+
+python3 -c 'import time; time.sleep(120)' iflow "$PROJECT" &
+AI_PID=$!
+trap 'kill "$AI_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+printf '%s\n' "$AI_PID" >"$PROJECT/.freely/run/ai.pid"
+
+FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_TIMEOUT_FIXTURE" FREELY_INTERRUPTION_HANDLER_TIMEOUT_SECS=1 \
+  bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" ensure-interruption-dispatch --project "$PROJECT" --watch >/dev/null 2>&1 &
+DISPATCH_PID=$!
+trap 'kill "$DISPATCH_PID" 2>/dev/null || true; kill "$AI_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+
+CHAT_OUTPUT_TIMEOUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "继续当前 issue：创建 .freely/run/timeout-fallback.txt，内容仅为 ok。完成后继续保持运行。")"
+INTAKE_ID_TIMEOUT="$(printf '%s\n' "$CHAT_OUTPUT_TIMEOUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_TIMEOUT" ]] || {
+  echo "[FAIL] missing timeout fallback intake id" >&2
+  exit 1
+}
+
+wait_for_grep() {
+  local pattern="$1" file="$2" tries="${3:-80}"
+  local i
+  for ((i=0; i<tries; i++)); do
+    if grep -q "$pattern" "$file" 2>/dev/null; then
+      return 0
+    fi
+    sleep 0.2
+  done
+  return 1
+}
+
+META_FILE="$PROJECT/.freely/intake/$INTAKE_ID_TIMEOUT/meta.env"
+wait_for_grep '^STATUS="delegated"$' "$META_FILE" || {
+  echo "[FAIL] timed-out interruption should conservatively delegate to active worker" >&2
+  cat "$META_FILE" >&2
+  exit 1
+}
+wait_for_grep '^CLASSIFICATION="continuation"$' "$META_FILE"
+wait_for_grep '^ABSORPTION_TARGET="handoff://continuation"$' "$META_FILE"
+wait_for_grep '^LINKED_ARTIFACT="pending://interruption-manager-delegation"$' "$META_FILE"
+
+RESOLUTION_FILE="$PROJECT/.freely/run/interruption-resolution/$INTAKE_ID_TIMEOUT/resolution.md"
+wait_for_grep 'restart_point: `continuation`' "$RESOLUTION_FILE"
+wait_for_grep 'ownership: `worker`' "$RESOLUTION_FILE"
+wait_for_grep 'triage 超时，保守交回当前 worker' "$RESOLUTION_FILE"
+
+echo "[PASS] interruption timeout falls back to delegated continuation when an active worker runtime is already alive"

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-codex-next-slot-no-wrap.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME="$TMP_DIR/home"
+mkdir -p "$PROJECT/.freely/run" "$HOME/.ai-auth/codex-slot-a" "$HOME/.ai-auth/codex-slot-b" "$HOME/.ai-auth/codex-slot-c"
+
+# shellcheck disable=SC1090
+HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+codex_slot_is_available_now() {
+  return 0
+}
+
+codex_saved_slots() {
+  printf 'slot-a\nslot-b\nslot-c\n'
+}
+
+printf 'slot-c\n' >"$HOME/.ai-auth/.codex-current-slot"
+
+next_slot="$(HOME="$HOME" select_next_codex_slot "$PROJECT" "slot-c" || true)"
+[[ -z "$next_slot" ]] || {
+  echo "[FAIL] expected no next codex slot after the last saved slot; got $next_slot" >&2
+  exit 1
+}
+
+next_slot="$(HOME="$HOME" select_next_codex_slot "$PROJECT" "slot-b" || true)"
+[[ "$next_slot" == "slot-c" ]] || {
+  echo "[FAIL] expected the next codex slot after slot-b to be slot-c; got ${next_slot:-<none>}" >&2
+  exit 1
+}
+
+echo "[PASS] codex next-slot selection advances strictly forward without wrapping"

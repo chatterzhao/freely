@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-codex-next-slot-ignore-cache.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME="$TMP_DIR/home"
+mkdir -p "$PROJECT/.freely/run" "$HOME/.ai-auth/codex-slot-a" "$HOME/.ai-auth/codex-slot-b" "$HOME/.ai-auth/codex-slot-c"
+
+# shellcheck disable=SC1090
+HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+codex_slot_is_available_now() {
+  local slot="${2:-}"
+  [[ "$slot" == "slot-c" ]]
+}
+
+codex_saved_slots() {
+  printf 'slot-a\nslot-b\nslot-c\n'
+}
+
+next_slot="$(HOME="$HOME" select_next_codex_saved_slot "$PROJECT" "slot-a" || true)"
+[[ "$next_slot" == "slot-b" ]] || {
+  echo "[FAIL] expected after-failure next-slot selection to advance to slot-b even when cache says it is unavailable; got ${next_slot:-<none>}" >&2
+  exit 1
+}
+
+ready_slot="$(HOME="$HOME" select_next_codex_slot "$PROJECT" "slot-a" || true)"
+[[ "$ready_slot" == "slot-c" ]] || {
+  echo "[FAIL] expected cached-ready next-slot selection to keep using slot-c; got ${ready_slot:-<none>}" >&2
+  exit 1
+}
+
+echo "[PASS] after-failure next-slot selection ignores availability cache while cached-ready selection still filters"

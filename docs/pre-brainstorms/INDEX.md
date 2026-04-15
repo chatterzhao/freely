@@ -1,4 +1,8 @@
 # 预研头脑风暴索引
+- 20260414-0255--freely-start-after-failure-recovery-handoff-race
+  - brainstorms: docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/candidates.md
+  - promoted_issue: docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md
 
 本目录是 pre-brainstorm 记录的规范结构。
 

@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-ai-user-echo.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+PROMPT_FILE="$TMP_DIR/prompt.txt"
+PID_FILE="$TMP_DIR/child.pid"
+LOG_FILE="$TMP_DIR/monitor.log"
+MARKER_FILE="$TMP_DIR/failure.marker"
+
+mkdir -p "$PROJECT" "$HOME_DIR/.codex" "$MOCK_BIN"
+cat >"$PROMPT_FILE" <<'EOF'
+请吸收以下历史证据：
+ERROR: exceeded retry limit, last status: 429 Too Many Requests
+如果没有新的真实报错，不要把它当成当前失败。
+EOF
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${1:-}" == "exec" ]]; then
+  printf 'OpenAI Codex v0.120.0 (research preview)\n'
+  printf '%s\n' '--------'
+  printf 'user\n'
+  cat
+  printf 'codex\n'
+  printf 'ok\n'
+  exit 0
+fi
+exit 98
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+HOME="$HOME_DIR" \
+PATH="$MOCK_BIN:$PATH" \
+  bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+    --project "$PROJECT" \
+    --tool codex \
+    --tool-adapter direct \
+    --model gpt-5.4 \
+    --reasoning-effort medium \
+    --tool-capabilities "" \
+    --tool-policy "" \
+    --codex-capability-model gpt-5.4 \
+    --codex-capability-sandbox workspace-write \
+    --codex-capability-approval-policy never \
+    --codex-capability-cwd-mode project-root \
+    --debug-log-file "$TMP_DIR/debug.log" \
+    --claude-session-id "" \
+    --tool-resume-target "" \
+    --mode auto \
+    --prompt-file "$PROMPT_FILE" \
+    --pid-file "$PID_FILE" \
+    --log-file "$LOG_FILE" \
+    --failure-marker-file "$MARKER_FILE" \
+    --launch-kind fresh >/dev/null 2>&1
+
+[[ ! -f "$MARKER_FILE" ]]
+grep -q '^user$' "$LOG_FILE"
+grep -q '^codex$' "$LOG_FILE"
+grep -q '^ok$' "$LOG_FILE"
+
+echo "[PASS] monitor-ai-cli ignores error-like text inside a user prompt echoed by codex"
