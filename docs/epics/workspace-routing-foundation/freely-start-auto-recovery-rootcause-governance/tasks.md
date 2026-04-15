@@ -1,193 +1,105 @@
 # Tasks: freely-start-auto-recovery-rootcause-governance
 
-## Implementation Tasks
+## Feature Lane
 
-### [x] Fix cleanup_supervisor to read shared runtime state
+### [x] Correct codex after-failure selector path
 
-**Owner**: root cause fix  
+**Owner**: runtime
 **Scope**: `docs/system/workspace/scripts/runtime/freely`  
-**Description**: `cleanup_supervisor()` 必先读取共享 runtime 真相（`runtime_read_desired_state()`），而不是只信当前进程内的 stale `DESIRED_RUNTIME_STATE_VALUE`  
-**Evidence**: 代码改动已 staged  
-**Acceptance**: `test-cleanup-supervisor-reads-shared-state`（待补）  
-**Closeout**: `[x] cleanup now reads shared state first`
+**Description**: `codex` after-failure manager recovery must use the unified next-slot switch path instead of cached-ready probing.
+**Evidence**: `tool_select_ready_slot_for_manager_auto_recovery()` now routes `after_failure` through `switch_to_next_codex_slot(... after_failure_exec_recovery_next_slot)`.
+**Closeout**: `[x] after-failure selection path corrected`
 
-### [x] Fix cleanup_supervisor to exit when replacement alive
+### [x] Split cached-ready selection from saved-slot traversal
 
-**Owner**: root cause fix  
-**Scope**: `docs/system/workspace/scripts/runtime/freely`  
-**Description**: 若已经有 replacement supervisor 存活，旧 supervisor cleanup 直接退出，不再覆盖共享 state，也不再去杀/重拉共享 control-plane  
-**Evidence**: 代码改动已 staged  
-**Acceptance**: `test-cleanup-exits-when-replacement-alive`（待补）  
-**Closeout**: `[x] cleanup exits when replacement supervisor alive`
+**Owner**: watchdog
+**Scope**: `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
+**Description**: Keep cache-filtered readiness for normal probing, but add a saved-slot-only selector for real after-failure traversal.
+**Evidence**: `select_next_codex_slot()` stays cache-filtered and forward-only; `select_next_codex_saved_slot()` now drives after-failure switching.
+**Closeout**: `[x] cached-ready and after-failure semantics separated`
 
-### [x] Replace one-shot recheck with continuous watchdog
+### [x] Add focused regressions for saved-slot order
 
-**Owner**: root cause fix  
-**Scope**: `docs/system/workspace/scripts/runtime/freely` + `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`  
-**Description**: manager 失败后的续跑执行者，从 one-shot `launch_manager_control_plane_recheck()` 改成持续 `launch_manager_watchdog()`  
-**Evidence**: 代码改动已 staged  
-**Acceptance**: `test-manager-recovery-launches-watchdog`（待补）  
-**Closeout**: `[x] manager recovery uses continuous watchdog`
+**Owner**: verification  
+**Scope**: `docs/system/workspace/scripts/tests/*codex*`
+**Description**: Lock the corrected after-failure contract with focused selector/runtime regressions.
+**Evidence**: four focused regressions added or updated and passing.
+**Closeout**: `[x] focused regressions cover cache skip, forward-only selection, next-slot recovery, and same-tool-before-cross-tool order`
 
-## Test Tasks
-
-### [x] Add regression: worker runtime falls through to cross-tool
-
-**Owner**: regression  
-**Scope**: `docs/system/workspace/scripts/tests/test-freely-worker-runtime-falls-through-to-cross-tool-after-failure`  
-**Description**: 证明 worker runtime 在 same-tool slot recovery 失败后能继续进入 cross-tool fallback  
-**Evidence**: test exists and passes  
-**Acceptance**: `[PASS]` output  
-**Closeout**: `[x] regression passes`
-
-### [x] Add regression: watchdog accepts actual slot without JSON
-
-**Owner**: regression  
-**Scope**: `docs/system/workspace/scripts/tests/test-watchdog-switch-to-codex-slot-accepts-actual-slot-without-json`  
-**Description**: 证明 watchdog 接受实际活跃 slot 作为成功证据，即使 switch JSON 为空  
-**Evidence**: test exists and passes  
-**Acceptance**: `[PASS]` output  
-**Closeout**: `[x] regression passes`
-
-### [x] Add regression: freely start watchdog recovers when fallback tool appears late
-
-**Owner**: regression  
-**Scope**: `docs/system/workspace/scripts/tests/test-freely-start-watchdog-recovers-when-fallback-tool-appears-late`  
-**Description**: 证明 `freely start` 在当前工具先失败、fallback 工具稍后才变可用时，watchdog 会持续接力直到恢复成功  
-**Evidence**: test exists and passes  
-**Acceptance**: `[PASS]` output  
-**Closeout**: `[x] regression passes`
-
-### [ ] Add regression: freely stop prevents supervisor resurrection
-
-**Owner**: regression（待补）  
-**Scope**: `docs/system/workspace/scripts/tests/test-freely-runtime-handoff-local-stop`  
-**Description**: 证明 `freely stop` 不会在 cleanup/recheck race 下被反向拉起  
-**Evidence**: test exists  
-**Acceptance**: `[PASS]` output  
-**Closeout**: `[ ] regression passes`
-
-### [ ] Add regression: cleanup reads shared state
-
-**Owner**: regression（待补）  
-**Scope**: `docs/system/workspace/scripts/tests/test-cleanup-supervisor-reads-shared-state`  
-**Description**: 证明 cleanup_supervisor 先读取共享 runtime state  
-**Evidence**: 待补  
-**Acceptance**: `[PASS]` output  
-**Closeout**: `[ ] regression passes`
-
-### [ ] Add regression: cleanup exits when replacement alive
-
-**Owner**: regression（待补）  
-**Scope**: `docs/system/workspace/scripts/tests/test-cleanup-exits-when-replacement-alive`  
-**Description**: 证明 cleanup 在 replacement supervisor 存活时直接退出  
-**Evidence**: 待补  
-**Acceptance**: `[PASS]` output  
-**Closeout**: `[ ] regression passes`
-
-## Verification Tasks
-
-### [ ] Run all regressions on feature branch
+### [x] Verify feature-local lane
 
 **Owner**: verification  
 **Scope**: `feature/freely-start-auto-recovery-rootcause-20260414`  
-**Description**: 在当前 feature branch 运行所有新增回归  
-**Evidence**: `./bin/governance-check` + individual test outputs  
-**Acceptance**: all tests `[PASS]`  
-**Closeout**: `[ ] all regressions pass on feature branch`
+**Description**: Run the focused regressions in the writable feature worktree.
+**Evidence**: `feature-local` runs passed for the four focused regressions plus `git diff --check`.
+**Closeout**: `[x] feature-local verification passed`
 
-### [ ] Run real bad account replay on feature branch
+### [x] Verify real runtime replay on feature lane
 
-**Owner**: verification  
+**Owner**: dogfood
 **Scope**: `feature/freely-start-auto-recovery-rootcause-20260414`  
-**Description**: 在当前 feature branch 执行真实坏号 replay  
-**Evidence**: `runtime-events.log` + `workcell-state.env`  
-**Acceptance**: recovery chain completes without race  
-**Closeout**: `[ ] real bad account recovery succeeds on feature branch`
+**Description**: Replay freely on real bad/good codex slots and confirm it can recover to a usable slot and continue doing work.
+**Evidence**: ordered traversal from `worahe1000` through later saved slots plus successful `a1020-1` run creating `.freely/run/healthcheck14.txt` and `.freely/run/healthcheck15.txt`.
+**Closeout**: `[x] real feature-lane replay passed and runtime was stopped after proof`
 
-### [ ] Run freely stop verification on feature branch
+## Promotion Lane
 
-**Owner**: verification  
-**Scope**: `feature/freely-start-auto-recovery-rootcause-20260414`  
-**Description**: 在当前 feature branch 执行 `freely stop` 验证  
-**Evidence**: absence of resurrected `supervisor.pid`  
-**Acceptance**: no resurrection after stop  
-**Closeout**: `[ ] freely stop prevents resurrection on feature branch`
-
-## Promotion Tasks
-
-### [ ] Merge to test-pre-merge batch
+### [x] Merge feature lane into test-pre-merge batch
 
 **Owner**: promotion  
-**Scope**: `test-pre-merge-freely-start-auto-recovery-rootcause-20260414`  
-**Description**: 把 feature branch merge 到对应 test-pre-merge-* 批次  
-**Evidence**: merge commit + receipt  
-**Acceptance**: merge receipt valid  
-**Closeout**: `[ ] feature merged to test-pre-merge`
+**Scope**: `test-pre-merge-20260414-freely-start-auto-recovery-rootcause`
+**Description**: Assemble the current owner into a disposable test-pre-merge batch via `merge-guarded`.
+**Evidence**: guarded premerge merge commit `ca6ef7a8`.
+**Closeout**: `[x] feature absorbed into current test-pre-merge batch`
 
-### [ ] Run premerge-integration tests on batch
+### [x] Verify premerge-integration lane
 
 **Owner**: promotion  
-**Scope**: `test-pre-merge-freely-start-auto-recovery-rootcause-20260414`  
-**Description**: 在 test-pre-merge 批次跑 premerge-integration lane  
-**Evidence**: test outputs  
-**Acceptance**: all tests pass  
-**Closeout**: `[ ] premerge-integration tests pass on batch`
+**Scope**: `test-pre-merge-20260414-freely-start-auto-recovery-rootcause`
+**Description**: Re-run the focused regressions and governance audit on the authoritative batch.
+**Evidence**: four `premerge-integration` runs passed and `./bin/governance-check` passed in the batch.
+**Closeout**: `[x] premerge-integration adequacy passed`
 
-### [ ] Merge batch to develop
+### [ ] Promote batch to develop
 
 **Owner**: promotion  
 **Scope**: `develop`  
-**Description**: 把 test-pre-merge 批次 merge 到 develop  
-**Evidence**: merge commit + receipt  
-**Acceptance**: merge receipt valid  
-**Closeout**: `[ ] batch merged to develop`
+**Description**: Replay guarded merge from the authoritative `test-pre-merge-*` batch into canonical `develop`.
+**Evidence**: pending guarded merge receipt after owner lifecycle artifacts are refreshed.
+**Closeout**: `[ ] develop promote pending`
 
-## Post-Merge Tasks
+## Post-Merge Followthrough
 
-### [ ] Run real bad account replay on develop
+### [ ] Run post-merge usable-slot replay on develop
 
-**Owner**: post-merge dogfood  
+**Owner**: dogfood
 **Scope**: `develop`  
-**Description**: 在 develop 执行真实坏号 replay  
-**Evidence**: `runtime-events.log` + `workcell-state.env`  
-**Acceptance**: recovery chain completes without race  
-**Closeout**: `[ ] real bad account recovery succeeds on develop`
+**Description**: Start Freely from canonical `develop` on the current usable slot and confirm it continues doing work.
+**Evidence**: pending post-merge followthrough artifact.
+**Closeout**: `[ ] develop followthrough pending`
 
-### [ ] Run freely stop verification on develop
+### [ ] Stop runtime cleanly after followthrough
 
-**Owner**: post-merge dogfood  
+**Owner**: dogfood
 **Scope**: `develop`  
-**Description**: 在 develop 执行 `freely stop` 验证  
-**Evidence**: absence of resurrected `supervisor.pid`  
-**Acceptance**: no resurrection after stop  
-**Closeout**: `[ ] freely stop prevents resurrection on develop`
+**Description**: Stop the canonical runtime after followthrough and confirm it remains stopped.
+**Evidence**: pending live-status / stop truth after post-merge replay.
+**Closeout**: `[ ] develop stop followthrough pending`
 
-### [ ] Update milestone status
+## Retirement
 
-**Owner**: governance  
-**Scope**: `docs/milestones.md`  
-**Description**: 把 issue 从 committed_issues 移到 completed_issues  
-**Evidence**: milestone update  
-**Acceptance**: milestone shows completed state  
-**Closeout**: `[ ] milestone updated`
+### [ ] Retire test-pre-merge worktree
 
-## Closeout Gate
+**Owner**: cleanup
+**Scope**: `test-pre-merge-20260414-freely-start-auto-recovery-rootcause`
+**Description**: Delete the disposable test-pre-merge branch/worktree once canonical develop absorbs it.
+**Evidence**: pending local worktree/branch deletion.
+**Closeout**: `[ ] test-pre-merge worktree pending retirement`
 
-### Completion Checkboxes
+### [ ] Retire feature worktree
 
-- [ ] All implementation tasks complete
-- [ ] All regression tests pass on feature branch
-- [ ] All real-env tests pass on feature branch
-- [ ] Feature merged to test-pre-merge
-- [ ] Premerge-integration tests pass on batch
-- [ ] Batch merged to develop
-- [ ] Post-merge dogfood tests pass on develop
-- [ ] Milestone updated to completed state
-- [ ] Worktree cleanup complete
-
-### Adequacy Gate
-
-- **Definition**: All closeout checkboxes checked
-- **Evidence**: This tasks.md with all `[x]` markers
-- **Guard**: `pretests-gate` will enforce tasks closeout before promote
+**Owner**: cleanup
+**Scope**: `feature/freely-start-auto-recovery-rootcause-20260414`
+**Description**: Delete the dedicated feature branch/worktree after post-merge followthrough passes.
+**Evidence**: pending local worktree/branch deletion.
+**Closeout**: `[ ] feature worktree pending retirement`
