@@ -11,7 +11,7 @@
 ## Integration
 - acceptance target: `Canonical Freely root carries the MemArk ignore prerequisite while linked worktree MemArk usage remains healthy.`
 - testing layer: `integration`
-- target environment: `feature/memark-init` plus canonical root readback
+- target environment: `feature/memark-init`
 - required evidence: `focused MemArk/bootstrap checks plus owner verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Run `git diff --check`.
