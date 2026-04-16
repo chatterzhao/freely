@@ -1,5 +1,46 @@
 # Pre-Tests: memark-protected-root-bootstrap-followthrough-governance
 
+## Unit
+- acceptance target: `No code-path rewrite is required for this owner; the unit boundary is that the canonical root ignore contract is expressed as plain repository metadata.`
+- testing layer: `unit`
+- target environment: `feature/memark-init`
+- required evidence: `tracked root .gitignore entries plus issue-bound verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run `rg -n '^\\.memark/$|^corpus/$' .gitignore`.
+
+## Integration
+- acceptance target: `Canonical Freely root carries the MemArk ignore prerequisite while linked worktree MemArk usage remains healthy.`
+- testing layer: `integration`
+- target environment: `feature/memark-init` plus canonical root readback
+- required evidence: `focused MemArk/bootstrap checks plus owner verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run `git diff --check`.
+2. Run `/Users/zhaoyu/.memark/venv/bin/memark init /Users/zhaoyu/Downloads/code/my-freely/freely --no-auto --json`.
+3. Run `/Users/zhaoyu/.memark/venv/bin/memark status --workspace /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-memark-init --project freely --json`.
+4. Run `/Users/zhaoyu/.memark/venv/bin/memark context --workspace /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-memark-init --project freely --no-refresh`.
+5. Run `./bin/governance-check`.
+
+## End-to-End
+- acceptance target: `A guarded feature -> test-pre-merge -> develop chain can evaluate this owner against explicit premerge adequacy truth instead of candidate-only metadata.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-20260416-memark-init`
+- required evidence: `guarded merge replay plus pretests-gate and governance evidence`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run `./bin/merge-guarded test-pre-merge-20260416-memark-init feature/memark-init`.
+2. Run `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260416-test-pre-merge-memark-init --issue docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md`.
+3. Run `./bin/test-lane premerge-integration -- ./bin/governance-check`.
+
+## Real-Environment
+- acceptance target: `The practical MemArk execution surface remains the linked writable worktree after the root metadata repair.`
+- testing layer: `real_environment`
+- target environment: `feature/memark-init`
+- required evidence: `linked worktree MemArk status and context output`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run `/Users/zhaoyu/.memark/venv/bin/memark status --workspace /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-memark-init --project freely --json`.
+2. Run `/Users/zhaoyu/.memark/venv/bin/memark context --workspace /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-memark-init --project freely --no-refresh`.
+- real_environment_status: `pass`
+- real_environment_reason: `Linked worktree MemArk usage remained healthy before and after the root ignore repair, so this owner only needs to preserve that usable surface while fixing canonical root metadata.`
+
 ## Acceptance Items
 
 ### PT-1
