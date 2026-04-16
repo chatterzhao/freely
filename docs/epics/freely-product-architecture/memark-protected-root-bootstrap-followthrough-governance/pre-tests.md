@@ -71,6 +71,18 @@
 - status: `pass`
 - artifact_ref: `./bin/governance-check`
 
+### Guarded develop promote proves MemArk bootstrap adequacy
+- id: `develop-promote-memark-bootstrap-adequacy`
+- requirement: `A guarded test-pre-merge replay proves this owner carries explicit premerge-integration coverage for the root ignore prerequisite before develop promotion.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Replay the narrow bootstrap followthrough on a disposable test-pre-merge branch created from develop and use that replay to prove guarded promotion adequacy for the root ignore prerequisite.`
+- case_design: `Merge feature/memark-init into test-pre-merge-20260416-memark-init with merge-guarded, rerun pretests-gate plus governance-check there, and use the resulting evidence to show develop promotion is tied to the explicit premerge lane instead of generic pass text.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/code-reviews/20260416-memark-protected-root-bootstrap-followthrough-verification.md`
+
 ## Pre-merge Focused Regression / Smoke
 
 1. acceptance target:
