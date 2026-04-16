@@ -3251,6 +3251,19 @@ routing_policy:
 - why_now: `PROJECT_INTENT / CONSTITUTION / LAWS / AGENTS.md` 的高层分工已经通过独立 issue 写回，需要 milestone 保留同一条 canonical traceability
 
 ### committed_issues
+
+1. `I-20260416-0448-A`
+- title: MemArk protected-root bootstrap followthrough governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md`
+- progress_path: `docs/progress/freely-product-architecture/p-memark-protected-root-bootstrap-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260416-0448--memark-protected-root-bootstrap-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260416-0448--memark-protected-root-bootstrap-followthrough/candidates.md`
+- next_action: Keep this owner narrow: carry the root `.gitignore` prerequisite for `.memark/` and `corpus/`, verify linked worktree MemArk health remains intact, then replay through `test-pre-merge-memark-init` into guarded `develop`.
+- revisit_trigger: Re-open only if canonical Freely root again loses the MemArk ignore prerequisite or the protected-root/worktree boundary for MemArk bootstrap drifts.
+
 ### completed_issues
 
 1. `I-20260405-1235-A`
@@ -3506,6 +3519,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
 - next_action: This candidate is now materialized as `I-20260405-2358-A`. Keep the owner narrow: repair `sync-tooling` retargeting plus `.githooks` rematerialization, prove `baseline-status` / `status --view baseline` stay pinned to the target project, and keep `ensure-interruption-dispatch` as a non-regression guard rather than reopening runtime control-plane work.
 - revisit_trigger: Revisit if fresh-project bootstrap still requires manual `.githooks` copying, baseline/status scoping still drifts from the target project, or another project-targeted CLI command regresses the current doc-gate semantics.
+
+5. `C-20260416-0448-A`
+- title: MemArk protected-root bootstrap followthrough
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260416-0448--memark-protected-root-bootstrap-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260416-0448--memark-protected-root-bootstrap-followthrough/candidates.md`
+- next_action: This candidate is now materialized as `I-20260416-0448-A`. Keep the owner narrow: canonical Freely root must ignore `.memark/` and `corpus/`, linked worktree MemArk usage remains the practical execution surface, and guarded develop promotion still needs the candidate-driven lifecycle truth.
+- revisit_trigger: Re-open only if canonical Freely root again drops the MemArk ignore prerequisite or protected-root bootstrap guidance diverges from MemArk's documented init contract.
 
 - none right now; the 20260401-1303 product-security candidate is now closed across `I-20260401-1303-A` and `I-20260401-1303-A-2`, while reusable security-capability follow-ons continue as separate owners instead of being carried implicitly inside this completed split.
   - `I-20260401-2245-A` owns build artifact exposure and release allowlist audit.

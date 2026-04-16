@@ -1,5 +1,7 @@
 # Runtime state
 .freely/
+.memark/
+corpus/
 
 # Local environment files (do not commit)
 .env
