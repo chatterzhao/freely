@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260416-0448--memark-protected-root-bootstrap-followthrough
+  - brainstorms: docs/pre-brainstorms/20260416-0448--memark-protected-root-bootstrap-followthrough/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260416-0448--memark-protected-root-bootstrap-followthrough/candidates.md
 - 20260414-0255--freely-start-after-failure-recovery-handoff-race
   - brainstorms: docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/brainstorms.md
   - candidates: docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/candidates.md
