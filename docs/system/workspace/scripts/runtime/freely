@@ -11399,6 +11399,8 @@ project_has_authoritative_runtime_processes_for_user_precheck() {
 reject_repeated_user_start_if_running() {
   local project="$1" command_name="$2"
   if project_has_authoritative_runtime_processes_for_user_precheck "$project"; then
+    append_runtime_event "$project" "user_start_rejected_already_running" \
+      "command_name=$command_name"
     log_error "$command_name refused: project runtime is already running for $project"
     log_error "run: ./bin/freely stop --project \"$project\""
     log_error "or:  ./bin/freely $command_name --project \"$project\" --force"
@@ -12170,12 +12172,16 @@ cmd_start() {
     "entrypoint=foreground" \
     "force=$force" \
     "expected_next=L010"
+  append_runtime_event "$project" "user_start_command_received" \
+    "force=$force"
   if [[ "$force" == "1" ]]; then
     log_info "forcing project-local runtime rebuild before start"
     stop_project_runtime "$project" "start_force"
   else
     reject_repeated_user_start_if_running "$project" "start"
   fi
+  append_runtime_event "$project" "user_start_precheck_clear" \
+    "force=$force"
   start_project_runtime "$project" "foreground"
 }
 
@@ -12272,12 +12278,16 @@ cmd_daemon_start() {
     "entrypoint=daemon" \
     "force=$force" \
     "expected_next=L010"
+  append_runtime_event "$project" "user_daemon_start_command_received" \
+    "force=$force"
   if [[ "$force" == "1" ]]; then
     log_info "forcing project-local runtime rebuild before daemon start"
     stop_project_runtime "$project" "daemon_start_force"
   else
     reject_repeated_user_start_if_running "$project" "daemon start"
   fi
+  append_runtime_event "$project" "user_daemon_start_precheck_clear" \
+    "force=$force"
   launch_project_runtime_daemon_or_fail "$project"
 }
 
