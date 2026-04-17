@@ -1953,6 +1953,22 @@ pid_hint_from_file_without_process_inspection() {
   printf '%s\n' "$pid"
 }
 
+current_runtime_discovery_excluded_pids_csv() {
+  local pid="" parent="" csv="" seen_csv=""
+  pid="${BASHPID:-$$}"
+  while [[ -n "$pid" && "$pid" =~ ^[0-9]+$ && "$pid" != "0" ]]; do
+    case ",$seen_csv," in
+      *",$pid,"*) break ;;
+    esac
+    seen_csv="${seen_csv}${seen_csv:+,}$pid"
+    csv="${csv}${csv:+,}$pid"
+    parent="$(ps -p "$pid" -o ppid= 2>/dev/null | awk 'NR==1 {gsub(/^[[:space:]]+|[[:space:]]+$/, "", $0); print $0}')"
+    [[ -n "$parent" && "$parent" != "$pid" ]] || break
+    pid="$parent"
+  done
+  printf '%s\n' "$csv"
+}
+
 emit_indented_block() {
   local prefix="$1" text="$2"
   [[ -n "$text" ]] || return 0
@@ -2001,11 +2017,41 @@ live_status_activity_state_for_project() {
 
 discover_supervisor_pids() {
   local project="$1" excluded_pids="${2:-}"
-  local process_rows
+  local project_regex
   process_inspection_available || return 0
-  process_rows="$(ps -axo pid=,command= 2>/dev/null || true)"
-  [[ -n "$process_rows" ]] || return 0
-  awk -v p="$project" -v excluded="$excluded_pids" '
+  project_regex="$(printf '%s\n' "$project" | sed 's/[][(){}.^$+*?|\\]/\\&/g')"
+  if command -v pgrep >/dev/null 2>&1; then
+    {
+      pgrep -fal "runtime/freely start.*${project_regex}" 2>/dev/null || true
+      pgrep -fal "runtime/freely daemon-run.*${project_regex}" 2>/dev/null || true
+    } | awk -v p="$project" -v excluded="$excluded_pids" '
+      BEGIN {
+        split(excluded, raw, ",")
+        for (i in raw) {
+          if (raw[i] != "") {
+            skip[raw[i]] = 1
+          }
+        }
+      }
+      {
+        if (skip[$1]) {
+          next
+        }
+        for (i = 1; i <= NF; i++) {
+          if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+            print $1
+            next
+          }
+          if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+            print $1
+            next
+          }
+        }
+      }
+    '
+    return 0
+  fi
+  ps -axo pid=,command= 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
     BEGIN {
       split(excluded, raw, ",")
       for (i in raw) {
@@ -2029,12 +2075,132 @@ discover_supervisor_pids() {
         }
       }
     }
-  ' <<<"$process_rows"
+  '
 }
 
 discover_supervisor_pid() {
   local project="$1" excluded_pids="${2:-}"
   discover_supervisor_pids "$project" "$excluded_pids" | head -n 1
+}
+
+discover_manager_watchdog_pids() {
+  local project="$1" excluded_pids="${2:-}"
+  local project_regex
+  process_inspection_available || return 0
+  project_regex="$(printf '%s\n' "$project" | sed 's/[][(){}.^$+*?|\\]/\\&/g')"
+  if command -v pgrep >/dev/null 2>&1; then
+    pgrep -fal "runtime/freely ensure-manager.*${project_regex}" 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
+      BEGIN {
+        split(excluded, raw, ",")
+        for (i in raw) {
+          if (raw[i] != "") {
+            skip[raw[i]] = 1
+          }
+        }
+      }
+      index($0, "--watch") {
+        if (skip[$1]) {
+          next
+        }
+        for (i = 1; i <= NF; i++) {
+          if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+            print $1
+            next
+          }
+          if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+            print $1
+            next
+          }
+        }
+      }
+    '
+    return 0
+  fi
+  ps -axo pid=,command= 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
+    BEGIN {
+      split(excluded, raw, ",")
+      for (i in raw) {
+        if (raw[i] != "") {
+          skip[raw[i]] = 1
+        }
+      }
+    }
+    index($0, "runtime/freely ensure-manager") && index($0, "--watch") {
+      if (skip[$1]) {
+        next
+      }
+      for (i = 1; i <= NF; i++) {
+        if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+          print $1
+          next
+        }
+        if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+          print $1
+          next
+        }
+      }
+    }
+  '
+}
+
+discover_interruption_dispatcher_pids() {
+  local project="$1" excluded_pids="${2:-}"
+  local project_regex
+  process_inspection_available || return 0
+  project_regex="$(printf '%s\n' "$project" | sed 's/[][(){}.^$+*?|\\]/\\&/g')"
+  if command -v pgrep >/dev/null 2>&1; then
+    pgrep -fal "runtime/freely ensure-interruption-dispatch.*${project_regex}" 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
+      BEGIN {
+        split(excluded, raw, ",")
+        for (i in raw) {
+          if (raw[i] != "") {
+            skip[raw[i]] = 1
+          }
+        }
+      }
+      index($0, "--watch") {
+        if (skip[$1]) {
+          next
+        }
+        for (i = 1; i <= NF; i++) {
+          if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+            print $1
+            next
+          }
+          if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+            print $1
+            next
+          }
+        }
+      }
+    '
+    return 0
+  fi
+  ps -axo pid=,command= 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
+    BEGIN {
+      split(excluded, raw, ",")
+      for (i in raw) {
+        if (raw[i] != "") {
+          skip[raw[i]] = 1
+        }
+      }
+    }
+    index($0, "runtime/freely ensure-interruption-dispatch") && index($0, "--watch") {
+      if (skip[$1]) {
+        next
+      }
+      for (i = 1; i <= NF; i++) {
+        if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+          print $1
+          next
+        }
+        if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+          print $1
+          next
+        }
+      }
+    }
+  '
 }
 
 pid_matches_project() {
@@ -2178,6 +2344,12 @@ valid_supervisor_pid_for_project() {
   pid_matches_project "$pid" "$project" ""
 }
 
+valid_discovered_supervisor_pid_for_project() {
+  local project="$1" pid="$2"
+  pid_matches_project "$pid" "$project" "runtime/freely start" && return 0
+  pid_matches_project "$pid" "$project" "runtime/freely daemon-run"
+}
+
 valid_ensure_manager_watchdog_pid_for_project() {
   local project="$1" pid="$2"
   pid_matches_project "$pid" "$project" "runtime/freely ensure-manager --project"
@@ -2198,6 +2370,11 @@ interruption_dispatcher_pid_for_project() {
       return 0
     fi
   fi
+  pid="$(discover_interruption_dispatcher_pids "$project" | head -n 1)"
+  if [[ -n "$pid" ]]; then
+    printf '%s\n' "$pid" >"$pid_file"
+    printf '%s\n' "$pid"
+  fi
 }
 
 manager_watchdog_pid_for_project() {
@@ -2209,6 +2386,11 @@ manager_watchdog_pid_for_project() {
       printf '%s\n' "$pid"
       return 0
     fi
+  fi
+  pid="$(discover_manager_watchdog_pids "$project" | head -n 1)"
+  if [[ -n "$pid" ]]; then
+    printf '%s\n' "$pid" >"$pid_file"
+    printf '%s\n' "$pid"
   fi
 }
 
@@ -9294,7 +9476,7 @@ project_bootstrap_launch_in_flight_from_unverified_supervisor_hint() {
 }
 
 manager_supervisor_pid_for_project() {
-  local project="$1" run_dir sp
+  local project="$1" run_dir sp excluded_pids=""
   run_dir="$(run_dir_for_project "$project")"
   if [[ -f "$run_dir/supervisor.pid" ]]; then
     sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
@@ -9305,6 +9487,13 @@ manager_supervisor_pid_for_project() {
   fi
   sp="$(authoritative_supervisor_pids_for_project "$project" | head -n 1)"
   if [[ -n "$sp" ]]; then
+    printf '%s\n' "$sp" >"$run_dir/supervisor.pid"
+    printf '%s\n' "$sp"
+    return 0
+  fi
+  excluded_pids="$(current_runtime_discovery_excluded_pids_csv)"
+  sp="$(discover_supervisor_pid "$project" "$excluded_pids")"
+  if valid_discovered_supervisor_pid_for_project "$project" "$sp"; then
     printf '%s\n' "$sp" >"$run_dir/supervisor.pid"
     printf '%s\n' "$sp"
   fi
@@ -9367,19 +9556,23 @@ runtime_unverified_pid_roles_for_project() {
 }
 
 ensure_interruption_dispatcher_ready_or_fail() {
-  local project="$1" dispatcher_pid attempts
-  for attempts in $(seq 1 50); do
+  local project="$1" dispatcher_pid attempts wait_attempts wait_sleep
+  wait_attempts="${FREELY_INTERRUPTION_DISPATCHER_READY_ATTEMPTS:-300}"
+  wait_sleep="${FREELY_INTERRUPTION_DISPATCHER_READY_SLEEP_SECS:-0.1}"
+  [[ "$wait_attempts" =~ ^[0-9]+$ ]] || wait_attempts=300
+  for attempts in $(seq 1 "$wait_attempts"); do
     dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
     if [[ -n "$dispatcher_pid" ]]; then
       return 0
     fi
-    sleep 0.1
+    sleep "$wait_sleep"
   done
   return 1
 }
 
 ensure_interruption_dispatcher_running_for_active_runtime() {
   local project="$1" dispatcher_pid
+  [[ -f "$(stop_marker_file "$project")" ]] && return 1
   dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
   if [[ -n "$dispatcher_pid" ]]; then
     return 0
@@ -9388,6 +9581,7 @@ ensure_interruption_dispatcher_running_for_active_runtime() {
     "supervisor_pid=$(manager_supervisor_pid_for_project "$project")" \
     "reason=missing_dispatcher"
   launch_interruption_dispatcher "$project"
+  [[ -f "$(stop_marker_file "$project")" ]] && return 1
   if ensure_interruption_dispatcher_ready_or_fail "$project"; then
     append_runtime_event "$project" "interruption_dispatcher_relaunch_ready" \
       "dispatcher_pid=$(interruption_dispatcher_pid_for_project "$project")"
@@ -9399,13 +9593,16 @@ ensure_interruption_dispatcher_running_for_active_runtime() {
 }
 
 ensure_manager_watchdog_ready_or_fail() {
-  local project="$1" watchdog_pid attempts
-  for attempts in $(seq 1 50); do
+  local project="$1" watchdog_pid attempts wait_attempts wait_sleep
+  wait_attempts="${FREELY_MANAGER_WATCHDOG_READY_ATTEMPTS:-300}"
+  wait_sleep="${FREELY_MANAGER_WATCHDOG_READY_SLEEP_SECS:-0.1}"
+  [[ "$wait_attempts" =~ ^[0-9]+$ ]] || wait_attempts=300
+  for attempts in $(seq 1 "$wait_attempts"); do
     watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
     if [[ -n "$watchdog_pid" ]]; then
       return 0
     fi
-    sleep 0.1
+    sleep "$wait_sleep"
   done
   return 1
 }
@@ -11032,7 +11229,7 @@ latest_interruption_resolution_file_for_project() {
 
 stop_project_runtime() {
   local project="$1" stop_reason="${2:-operator_stop}"
-  local sdir run_dir stop_marker supervisor_candidates sp
+  local sdir run_dir stop_marker supervisor_candidates sp watchdog_candidates dispatcher_candidates
   sdir="$(state_dir "$project")"
   run_dir="$(run_dir_for_project "$project")"
   mkdir -p "$run_dir"
@@ -11053,7 +11250,7 @@ stop_project_runtime() {
     local wp
     wp="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
     if valid_ensure_manager_watchdog_pid_for_project "$project" "$wp"; then
-      terminate_pid_with_graceful_wait "$wp" "project manager watchdog during stop"
+      watchdog_candidates="$wp"
     elif [[ -n "$(pid_hint_from_file_without_process_inspection "$wp" 2>/dev/null || true)" ]]; then
       log_warn "refusing to kill unverified manager watchdog pid without project ownership proof: $wp"
     elif [[ -n "$wp" ]]; then
@@ -11061,17 +11258,45 @@ stop_project_runtime() {
     fi
     rm -f "$(ensure_manager_watchdog_pid_file "$project")"
   fi
+  while IFS= read -r sp; do
+    [[ -n "$sp" ]] || continue
+    if [[ -n "$watchdog_candidates" ]]; then
+      watchdog_candidates+=$'\n'
+    fi
+    watchdog_candidates+="$sp"
+  done < <(discover_manager_watchdog_pids "$project")
   if [[ -f "$(interruption_dispatcher_pid_file "$project")" ]]; then
     local dp
     dp="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
     if valid_interruption_dispatcher_pid_for_project "$project" "$dp"; then
-      terminate_pid_with_graceful_wait "$dp" "project interruption dispatcher during stop"
+      dispatcher_candidates="$dp"
     elif [[ -n "$(pid_hint_from_file_without_process_inspection "$dp" 2>/dev/null || true)" ]]; then
       log_warn "refusing to kill unverified interruption-dispatch.pid without project ownership proof: $dp"
     elif [[ -n "$dp" ]]; then
       log_warn "ignoring stale interruption-dispatch.pid that is not owned by project: $dp"
     fi
     rm -f "$(interruption_dispatcher_pid_file "$project")"
+  fi
+  while IFS= read -r sp; do
+    [[ -n "$sp" ]] || continue
+    if [[ -n "$dispatcher_candidates" ]]; then
+      dispatcher_candidates+=$'\n'
+    fi
+    dispatcher_candidates+="$sp"
+  done < <(discover_interruption_dispatcher_pids "$project")
+  if [[ -n "$watchdog_candidates" ]]; then
+    while IFS= read -r sp; do
+      [[ -n "$sp" ]] || continue
+      valid_ensure_manager_watchdog_pid_for_project "$project" "$sp" || continue
+      terminate_pid_with_graceful_wait "$sp" "project manager watchdog during stop"
+    done < <(printf '%s\n' "$watchdog_candidates" | awk '!seen[$0]++')
+  fi
+  if [[ -n "$dispatcher_candidates" ]]; then
+    while IFS= read -r sp; do
+      [[ -n "$sp" ]] || continue
+      valid_interruption_dispatcher_pid_for_project "$project" "$sp" || continue
+      terminate_pid_with_graceful_wait "$sp" "project interruption dispatcher during stop"
+    done < <(printf '%s\n' "$dispatcher_candidates" | awk '!seen[$0]++')
   fi
   if [[ -f "$run_dir/supervisor.pid" ]]; then
     sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
@@ -11090,7 +11315,7 @@ stop_project_runtime() {
   if [[ -n "$supervisor_candidates" ]]; then
     while IFS= read -r sp; do
       [[ -n "$sp" ]] || continue
-      valid_supervisor_pid_for_project "$project" "$sp" || continue
+      valid_discovered_supervisor_pid_for_project "$project" "$sp" || continue
       : >"$stop_marker"
       terminate_pid_with_graceful_wait "$sp" "project supervisor during stop"
     done < <(printf '%s\n' "$supervisor_candidates" | awk '!seen[$0]++')
@@ -11103,12 +11328,60 @@ stop_project_runtime() {
   write_workcell_state "$project" "stopped" "down" "down" "$stop_reason"
 }
 
+project_has_active_runtime_processes() {
+  local project="$1"
+  [[ -n "$(manager_supervisor_pid_for_project "$project")" ]] && return 0
+  [[ -n "$(manager_watchdog_pid_for_project "$project")" ]] && return 0
+  [[ -n "$(interruption_dispatcher_pid_for_project "$project")" ]] && return 0
+  [[ -n "$(runtime_ai_pid_hint_for_project "$project")" ]] && return 0
+  return 1
+}
+
+project_has_authoritative_runtime_processes_for_user_precheck() {
+  local project="$1" run_dir supervisor_pid watchdog_pid dispatcher_pid
+  run_dir="$(run_dir_for_project "$project")"
+
+  if [[ -f "$run_dir/supervisor.pid" ]]; then
+    supervisor_pid="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
+    if valid_supervisor_pid_for_project "$project" "$supervisor_pid"; then
+      return 0
+    fi
+  fi
+  [[ -n "$(authoritative_supervisor_pids_for_project "$project" | head -n 1)" ]] && return 0
+
+  if [[ -f "$(ensure_manager_watchdog_pid_file "$project")" ]]; then
+    watchdog_pid="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$watchdog_pid"; then
+      return 0
+    fi
+  fi
+
+  if [[ -f "$(interruption_dispatcher_pid_file "$project")" ]]; then
+    dispatcher_pid="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
+    if valid_interruption_dispatcher_pid_for_project "$project" "$dispatcher_pid"; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+reject_repeated_user_start_if_running() {
+  local project="$1" command_name="$2"
+  if project_has_authoritative_runtime_processes_for_user_precheck "$project"; then
+    log_error "$command_name refused: project runtime is already running for $project"
+    log_error "run: ./bin/freely stop --project \"$project\""
+    log_error "or:  ./bin/freely $command_name --project \"$project\" --force"
+    exit 2
+  fi
+}
+
 resolve_active_supervisor_pid_for_start() {
   local project="$1" sup_pid_file="$2"
   local candidate_pid="" excluded_pids=""
   RESOLVED_ACTIVE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
-  excluded_pids="${BASHPID:-$$},${PPID:-}"
+  excluded_pids="$(current_runtime_discovery_excluded_pids_csv)"
   if [[ -f "$sup_pid_file" ]]; then
     candidate_pid="$(cat "$sup_pid_file" 2>/dev/null || true)"
     if valid_supervisor_pid_for_project "$project" "$candidate_pid"; then
@@ -11123,7 +11396,7 @@ resolve_active_supervisor_pid_for_start() {
   fi
 
   candidate_pid="$(discover_supervisor_pid "$project" "$excluded_pids")"
-  if valid_supervisor_pid_for_project "$project" "$candidate_pid"; then
+  if valid_supervisor_pid_for_project "$project" "$candidate_pid" || valid_discovered_supervisor_pid_for_project "$project" "$candidate_pid"; then
     log_warn "recovered live project supervisor after supervisor.pid drift: $candidate_pid"
     LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="process_discovery"
     printf '%s\n' "$candidate_pid" >"$sup_pid_file"
@@ -11382,14 +11655,18 @@ start_project_runtime() {
   release_project_start_lock_for_runtime "$project"
   trap cleanup_supervisor EXIT
   trap request_stop INT TERM
+  exit_if_stop_requested_before_launch
   ensure_interruption_dispatcher_running_for_active_runtime "$project" || {
+    exit_if_stop_requested_before_launch
     log_error "freely interruption dispatcher did not become ready for project: $project"
     log_error "try: ./bin/freely ensure-interruption-dispatch --project \"$project\" --watch"
     exit 1
   }
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
+    exit_if_stop_requested_before_launch
     launch_manager_watchdog "$project"
     ensure_manager_watchdog_ready_or_fail "$project" || {
+      exit_if_stop_requested_before_launch
       log_error "freely manager watchdog did not become ready for project: $project"
       log_error "try: ./bin/freely ensure-manager --project \"$project\" --watch"
       exit 1
@@ -11858,6 +12135,8 @@ cmd_start() {
   if [[ "$force" == "1" ]]; then
     log_info "forcing project-local runtime rebuild before start"
     stop_project_runtime "$project" "start_force"
+  else
+    reject_repeated_user_start_if_running "$project" "start"
   fi
   start_project_runtime "$project" "foreground"
 }
@@ -11883,16 +12162,23 @@ cmd_restart() {
 }
 
 wait_for_daemon_supervisor_ready_or_fail() {
-  local project="$1" launcher_pid="${2:-}" wait_secs="${3:-15}" started_at now supervisor_pid
-  [[ "$wait_secs" =~ ^[0-9]+$ ]] || wait_secs=15
+  local project="$1" launcher_pid="${2:-}" wait_secs="${3:-15}" started_at now supervisor_pid observed_supervisor_pid=""
+  [[ "$wait_secs" =~ ^[0-9]+$ ]] || wait_secs=60
   started_at="$(date +%s)"
   while true; do
     supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+    if [[ -n "$supervisor_pid" ]]; then
+      observed_supervisor_pid="$supervisor_pid"
+    fi
+    if [[ -n "$observed_supervisor_pid" ]] && supervisor_startup_truth_ready_for_project "$project" "$observed_supervisor_pid"; then
+      printf '%s\n' "$observed_supervisor_pid"
+      return 0
+    fi
     if [[ -n "$supervisor_pid" ]] && supervisor_startup_truth_ready_for_project "$project" "$supervisor_pid"; then
       printf '%s\n' "$supervisor_pid"
       return 0
     fi
-    if [[ -n "$launcher_pid" ]] && ! kill -0 "$launcher_pid" 2>/dev/null; then
+    if [[ -n "$launcher_pid" ]] && ! kill -0 "$launcher_pid" 2>/dev/null && [[ -z "$observed_supervisor_pid" ]]; then
       break
     fi
     now="$(date +%s)"
@@ -11906,8 +12192,10 @@ wait_for_daemon_supervisor_ready_or_fail() {
 
 launch_project_runtime_daemon_or_fail() {
   local project="$1"
-  local runtime_script launcher_log launcher_pid supervisor_pid
+  local runtime_script launcher_log launcher_pid supervisor_pid wait_secs
   runtime_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely"
+  wait_secs="${FREELY_DAEMON_READY_WAIT_SECS:-60}"
+  [[ "$wait_secs" =~ ^[0-9]+$ ]] || wait_secs=60
   mkdir -p "$(logs_dir_for_project "$project")"
   launcher_log="$(logs_dir_for_project "$project")/daemon-launch.log"
   nohup bash -lc '
@@ -11918,7 +12206,7 @@ launch_project_runtime_daemon_or_fail() {
     exec -a "runtime/freely daemon-run --project $project" bash "$runtime_script" daemon-run --project "$project"
   ' bash "$project" "$runtime_script" >>"$launcher_log" 2>&1 < /dev/null &
   launcher_pid=$!
-  if ! supervisor_pid="$(wait_for_daemon_supervisor_ready_or_fail "$project" "$launcher_pid" 15)"; then
+  if ! supervisor_pid="$(wait_for_daemon_supervisor_ready_or_fail "$project" "$launcher_pid" "$wait_secs")"; then
     log_error "daemon start did not materialize a live supervisor for project: $project"
     log_error "see: $launcher_log"
     if [[ -f "$launcher_log" ]]; then
@@ -11949,6 +12237,8 @@ cmd_daemon_start() {
   if [[ "$force" == "1" ]]; then
     log_info "forcing project-local runtime rebuild before daemon start"
     stop_project_runtime "$project" "daemon_start_force"
+  else
+    reject_repeated_user_start_if_running "$project" "daemon start"
   fi
   launch_project_runtime_daemon_or_fail "$project"
 }

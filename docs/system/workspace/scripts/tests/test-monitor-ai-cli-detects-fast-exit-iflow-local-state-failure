@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-ai-iflow-local-state.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/mock-bin"
+PROMPT_FILE="$TMP_DIR/prompt.txt"
+PID_FILE="$TMP_DIR/child.pid"
+LOG_FILE="$TMP_DIR/monitor.log"
+MARKER_FILE="$TMP_DIR/failure.marker"
+
+mkdir -p "$PROJECT" "$MOCK_BIN"
+printf 'hello\n' >"$PROMPT_FILE"
+
+cat >"$MOCK_BIN/iflow" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cat <<'LOG'
+⚠️  检查点功能初始化失败: Error: EPERM: operation not permitted, open '/Users/test/.iflow/history/demo/.gitconfig'。检查点功能已禁用。
+An unexpected critical error occurred:
+HistoryError: Failed to update project metadata: Error: EPERM: operation not permitted, open '/Users/test/.iflow/config/projects.json'
+LOG
+exit 1
+EOF
+chmod +x "$MOCK_BIN/iflow"
+
+set +e
+PATH="$MOCK_BIN:$PATH" \
+  bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+    --project "$PROJECT" \
+    --tool iflow \
+    --tool-adapter direct \
+    --model auto \
+    --reasoning-effort "" \
+    --tool-capabilities "" \
+    --tool-policy "" \
+    --codex-capability-model "" \
+    --codex-capability-sandbox "" \
+    --codex-capability-approval-policy "" \
+    --codex-capability-cwd-mode "" \
+    --debug-log-file "$TMP_DIR/debug.log" \
+    --claude-session-id "" \
+    --tool-resume-target "" \
+    --mode auto \
+    --prompt-file "$PROMPT_FILE" \
+    --pid-file "$PID_FILE" \
+    --log-file "$LOG_FILE" \
+    --failure-marker-file "$MARKER_FILE" \
+    --launch-kind fresh >/dev/null 2>&1
+RC=$?
+set -e
+
+[[ "$RC" -eq 1 ]]
+[[ -f "$MARKER_FILE" ]]
+grep -q '^tool_runtime_failure$' "$MARKER_FILE"
+grep -q 'HistoryError: Failed to update project metadata' "$LOG_FILE"
+
+echo "[PASS] monitor-ai-cli records iflow local-state permission failures as runtime failures even on fast exit"

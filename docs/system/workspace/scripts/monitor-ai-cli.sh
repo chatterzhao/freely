@@ -159,9 +159,24 @@ log_has_runtime_tool_failure() {
   esac
 }
 
+log_has_iflow_local_state_failure() {
+  local current_log_file="$1" current_debug_log_file="${2:-}"
+  local -a existing_files=()
+  [[ -f "$current_log_file" ]] && existing_files+=("$current_log_file")
+  [[ -f "$current_debug_log_file" ]] && existing_files+=("$current_debug_log_file")
+  [[ ${#existing_files[@]} -gt 0 ]] || return 1
+  rg -qi \
+    'HistoryError: Failed to update project metadata: Error: (EPERM|EACCES): .*\/\.iflow\/(config|history)\/|An unexpected critical error occurred:|Error: (EPERM|EACCES): .*\/\.iflow\/(config|history)\/' \
+    "${existing_files[@]}"
+}
+
 live_runtime_failure_reason() {
   local current_tool="$1" current_log_file="$2" current_debug_log_file="${3:-}"
   if log_has_runtime_network_failure "$current_log_file" "$current_debug_log_file"; then
+    printf 'tool_runtime_failure\n'
+    return 0
+  fi
+  if [[ "$current_tool" == "iflow" ]] && log_has_iflow_local_state_failure "$current_log_file" "$current_debug_log_file"; then
     printf 'tool_runtime_failure\n'
     return 0
   fi
@@ -170,6 +185,35 @@ live_runtime_failure_reason() {
     return 0
   fi
   return 1
+}
+
+child_pids_for_parent() {
+  local parent_pid="$1"
+  [[ -n "$parent_pid" ]] || return 0
+  ps -Ao pid=,ppid= 2>/dev/null | awk -v parent_pid="$parent_pid" '$2 == parent_pid { print $1 }'
+}
+
+collect_descendant_pids() {
+  local parent_pid="$1" child_pid nested_pid
+  [[ -n "$parent_pid" ]] || return 0
+  while IFS= read -r child_pid; do
+    [[ -n "$child_pid" ]] || continue
+    printf '%s\n' "$child_pid"
+    while IFS= read -r nested_pid; do
+      [[ -n "$nested_pid" ]] || continue
+      printf '%s\n' "$nested_pid"
+    done < <(collect_descendant_pids "$child_pid")
+  done < <(child_pids_for_parent "$parent_pid")
+}
+
+terminate_pid_tree() {
+  local root_pid="$1" signal="${2:-TERM}" descendant_pid
+  [[ -n "$root_pid" ]] || return 0
+  while IFS= read -r descendant_pid; do
+    [[ -n "$descendant_pid" ]] || continue
+    kill "-$signal" "$descendant_pid" 2>/dev/null || true
+  done < <(collect_descendant_pids "$root_pid" | awk '!seen[$0]++')
+  kill "-$signal" "$root_pid" 2>/dev/null || true
 }
 
 while [[ $# -gt 0 ]]; do
@@ -243,7 +287,7 @@ if [[ -n "$network_failure_marker_file" || -n "$failure_marker_file" ]]; then
       if [[ -n "$failure_marker_file" ]]; then
         printf '%s\n' "$live_failure_reason" >"$failure_marker_file"
       fi
-      kill "$child_pid" 2>/dev/null || true
+      terminate_pid_tree "$child_pid" TERM
       break
     fi
     sleep 1
@@ -254,6 +298,10 @@ set +e
 wait "$child_pid"
 child_rc=$?
 set -e
+
+if [[ "$child_rc" -ne 0 ]]; then
+  terminate_pid_tree "$child_pid" KILL
+fi
 
 if [[ -n "$network_failure_marker_file" || -n "$failure_marker_file" ]]; then
   live_failure_reason=""
