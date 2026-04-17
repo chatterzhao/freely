@@ -10798,7 +10798,14 @@ resolve_active_supervisor_pid_for_start() {
   fi
 
   candidate_pid="$(discover_supervisor_pid "$project" "$excluded_pids")"
-  if valid_supervisor_pid_for_project "$project" "$candidate_pid" || valid_discovered_supervisor_pid_for_project "$project" "$candidate_pid"; then
+  if valid_supervisor_pid_for_project "$project" "$candidate_pid"; then
+    log_warn "recovered live project supervisor after supervisor.pid drift: $candidate_pid"
+    LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="process_discovery"
+    printf '%s\n' "$candidate_pid" >"$sup_pid_file"
+    RESOLVED_ACTIVE_SUPERVISOR_PID="$candidate_pid"
+    return 0
+  fi
+  if valid_discovered_supervisor_pid_for_project "$project" "$candidate_pid" && { supervisor_startup_truth_ready_for_project "$project" "$candidate_pid" || project_bootstrap_launch_in_flight "$project" "$candidate_pid" ""; }; then
     log_warn "recovered live project supervisor after supervisor.pid drift: $candidate_pid"
     LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="process_discovery"
     printf '%s\n' "$candidate_pid" >"$sup_pid_file"
