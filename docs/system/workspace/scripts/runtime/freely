@@ -10777,7 +10777,9 @@ project_has_authoritative_runtime_processes_for_user_precheck() {
 
   cleanup_project_start_lock_if_stale_for_runtime "$project"
   project_start_lock_snapshot_for_runtime "$project"
-  if [[ "${CURRENT_PROJECT_START_LOCK_STATE:-idle}" == "active" ]] && [[ "${CURRENT_PROJECT_START_LOCK_REASON:-none}" == "freely_start" ]]; then
+  if [[ "${CURRENT_PROJECT_START_LOCK_STATE:-idle}" == "active" ]] \
+    && [[ "${CURRENT_PROJECT_START_LOCK_REASON:-none}" == "freely_start" ]] \
+    && [[ "${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" != "$$" ]]; then
     return 0
   fi
 
