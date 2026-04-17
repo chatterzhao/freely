@@ -198,19 +198,10 @@ EOF
 
     project_start_lock_snapshot_for_runtime "$project"
     case "${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" in
-      stale)
-        log_warn "removing stale project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
-        append_runtime_event "$project" "project_start_lock_stale_cleanup" \
-          "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-stale}" \
-          "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
-          "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
-          "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
-          "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
-          "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}"
-        cleanup_project_start_lock_if_stale_for_runtime "$project"
-        continue
-        ;;
-      active|ambiguous)
+      active)
+        if [[ "${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" == "$$" ]]; then
+          return 0
+        fi
         if [[ "${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" == "active" ]]; then
           lock_started_epoch="$(codex_timestamp_to_epoch "${CURRENT_PROJECT_START_LOCK_STARTED_AT:-}" 2>/dev/null || true)"
           if [[ -n "$lock_started_epoch" && "$lock_started_epoch" =~ ^[0-9]+$ ]]; then
@@ -232,6 +223,47 @@ EOF
             fi
           fi
         fi
+        if [[ "$waiting_logged" == "0" ]]; then
+          log_warn "project start already in progress; waiting for same-project startup serialization (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+          append_runtime_event "$project" "project_start_lock_waiting" \
+            "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-active}" \
+            "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+            "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+            "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+            "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+            "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}" \
+            "timeout_secs=$timeout_secs" \
+            "interval_secs=$interval_secs"
+          waiting_logged="1"
+        fi
+        now="$(date +%s)"
+        if (( now - start_ts >= timeout_secs )); then
+          log_error "timed out waiting for project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+          append_runtime_event "$project" "project_start_lock_timeout" \
+            "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-active}" \
+            "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+            "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+            "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+            "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+            "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}" \
+            "timeout_secs=$timeout_secs"
+          return 1
+        fi
+        sleep "$interval_secs"
+        ;;
+      stale)
+        log_warn "removing stale project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+        append_runtime_event "$project" "project_start_lock_stale_cleanup" \
+          "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-stale}" \
+          "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+          "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+          "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+          "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+          "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}"
+        cleanup_project_start_lock_if_stale_for_runtime "$project"
+        continue
+        ;;
+      ambiguous)
         if [[ "$waiting_logged" == "0" ]]; then
           log_warn "project start already in progress; waiting for same-project startup serialization (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
           append_runtime_event "$project" "project_start_lock_waiting" \
@@ -12192,6 +12224,7 @@ cmd_start() {
     "entrypoint=foreground" \
     "force=$force" \
     "expected_next=L010"
+  acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
   append_runtime_event "$project" "user_start_command_received" \
     "force=$force"
   if [[ "$force" == "1" ]]; then
@@ -12298,6 +12331,7 @@ cmd_daemon_start() {
     "entrypoint=daemon" \
     "force=$force" \
     "expected_next=L010"
+  acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
   append_runtime_event "$project" "user_daemon_start_command_received" \
     "force=$force"
   if [[ "$force" == "1" ]]; then
