@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+set +e
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    project_has_authoritative_runtime_processes_for_user_precheck() { return 0; }
+    log_error() { printf "error:%s\n" "$*"; }
+    launch_project_runtime_daemon_or_fail() { printf "unexpected-daemon-start\n"; }
+    main daemon start --project /tmp/freely-project
+  ' 2>&1
+)"
+RC=$?
+set -e
+
+[[ "$OUTPUT" == *"error:daemon start refused: project runtime is already running for /tmp/freely-project"* ]]
+[[ "$OUTPUT" == *'error:run: ./bin/freely stop --project "/tmp/freely-project"'* ]]
+[[ "$OUTPUT" == *'error:or:  ./bin/freely daemon start --project "/tmp/freely-project" --force'* ]]
+[[ "$RC" -eq 2 ]]
+[[ "$OUTPUT" != *"unexpected-daemon-start"* ]]
+
+echo "[PASS] freely daemon start rejects repeated user start when runtime is already running"

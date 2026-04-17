@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-stop-watchers-dispatchers.XXXXXX)"
+cleanup() {
+  set +e
+  kill "${WATCHDOG_PID_1:-}" "${WATCHDOG_PID_2:-}" "${DISPATCH_PID_1:-}" "${DISPATCH_PID_2:-}" 2>/dev/null || true
+  wait "${WATCHDOG_PID_1:-}" "${WATCHDOG_PID_2:-}" "${DISPATCH_PID_1:-}" "${DISPATCH_PID_2:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run"
+mkdir -p "$PROJECT/docs/pre-brainstorms"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+bash -c "cd '$PROJECT' && exec -a 'runtime/freely ensure-manager --project $PROJECT --watch --interval 10' sleep 30" >/dev/null 2>&1 &
+WATCHDOG_PID_1=$!
+bash -c "cd '$PROJECT' && exec -a 'runtime/freely ensure-manager --project $PROJECT --watch --interval 10' sleep 30" >/dev/null 2>&1 &
+WATCHDOG_PID_2=$!
+bash -c "cd '$PROJECT' && exec -a 'runtime/freely ensure-interruption-dispatch --project $PROJECT --watch' sleep 30" >/dev/null 2>&1 &
+DISPATCH_PID_1=$!
+bash -c "cd '$PROJECT' && exec -a 'runtime/freely ensure-interruption-dispatch --project $PROJECT --watch' sleep 30" >/dev/null 2>&1 &
+DISPATCH_PID_2=$!
+
+printf '%s' "$WATCHDOG_PID_2" >"$PROJECT/.freely/run/ensure-manager.pid"
+printf '%s' "$DISPATCH_PID_2" >"$PROJECT/.freely/run/interruption-dispatch.pid"
+
+bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1
+
+for pid in "$WATCHDOG_PID_1" "$WATCHDOG_PID_2" "$DISPATCH_PID_1" "$DISPATCH_PID_2"; do
+  if kill -0 "$pid" 2>/dev/null; then
+    echo "[FAIL] stop should terminate all discovered same-project watchers and dispatchers" >&2
+    exit 1
+  fi
+done
+
+echo "[PASS] freely stop terminates discovered same-project watchers and dispatchers"
