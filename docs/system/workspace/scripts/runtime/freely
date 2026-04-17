@@ -11415,6 +11415,7 @@ resolve_active_supervisor_pid_for_start() {
 ensure_no_active_supervisor_conflict() {
   local project="$1" sup_pid_file="$2" child_pid_file="$3" allow_attach="${4:-0}"
   local old_pid="" attach_ai_pid_state="missing" role_hint unverified_roles=""
+  local attach_ready_attempts="${FREELY_ATTACH_REUSE_READY_ATTEMPTS:-30}"
   LAST_ATTACH_REUSE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_AI_PID_STATE="missing"
   resolve_active_supervisor_pid_for_start "$project" "$sup_pid_file" || true
@@ -11448,9 +11449,9 @@ ensure_no_active_supervisor_conflict() {
         LAST_ATTACH_REUSE_AI_PID_STATE="$attach_ai_pid_state"
         log_info "project runtime/control-plane startup already in flight; reusing supervisor pid=$old_pid"
         return 10
-      elif ! ensure_interruption_dispatcher_ready_or_fail "$project"; then
+      elif ! FREELY_INTERRUPTION_DISPATCHER_READY_ATTEMPTS="$attach_ready_attempts" ensure_interruption_dispatcher_ready_or_fail "$project"; then
         log_warn "project supervisor pid=$old_pid is live but interruption dispatcher is not ready; falling back to project-local repair"
-      elif [[ "$role_hint" == "manager" ]] && ! ensure_manager_watchdog_ready_or_fail "$project"; then
+      elif [[ "$role_hint" == "manager" ]] && ! FREELY_MANAGER_WATCHDOG_READY_ATTEMPTS="$attach_ready_attempts" ensure_manager_watchdog_ready_or_fail "$project"; then
         log_warn "project supervisor pid=$old_pid is live but manager watchdog is not ready; falling back to project-local repair"
       elif [[ "$role_hint" == "manager" && "$attach_ai_pid_state" != "confirmed_running" && "$attach_ai_pid_state" != "bootstrap_in_flight" ]]; then
         log_warn "project supervisor pid=$old_pid is live but manager ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
