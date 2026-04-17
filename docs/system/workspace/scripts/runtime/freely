@@ -10602,9 +10602,12 @@ latest_interruption_resolution_file_for_project() {
 stop_project_runtime() {
   local project="$1" stop_reason="${2:-operator_stop}"
   local sdir run_dir stop_marker supervisor_candidates sp watchdog_candidates dispatcher_candidates
+  local stop_lock_acquired="0"
   sdir="$(state_dir "$project")"
   run_dir="$(run_dir_for_project "$project")"
   mkdir -p "$run_dir"
+  acquire_project_start_lock_or_wait "$project" "freely_stop" || exit 1
+  stop_lock_acquired="1"
   stop_marker="$(stop_marker_file "$project")"
   : >"$stop_marker"
 
@@ -10698,6 +10701,9 @@ stop_project_runtime() {
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   rm -f "$stop_marker"
   write_workcell_state "$project" "stopped" "down" "down" "$stop_reason"
+  if [[ "$stop_lock_acquired" == "1" ]]; then
+    release_project_start_lock_for_runtime "$project"
+  fi
 }
 
 project_has_active_runtime_processes() {
