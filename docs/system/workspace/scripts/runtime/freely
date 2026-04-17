@@ -10743,6 +10743,12 @@ project_has_authoritative_runtime_processes_for_user_precheck() {
   local project="$1" run_dir supervisor_pid watchdog_pid dispatcher_pid
   run_dir="$(run_dir_for_project "$project")"
 
+  cleanup_project_start_lock_if_stale_for_runtime "$project"
+  project_start_lock_snapshot_for_runtime "$project"
+  if [[ "${CURRENT_PROJECT_START_LOCK_STATE:-idle}" == "active" ]] && [[ "${CURRENT_PROJECT_START_LOCK_REASON:-none}" == "freely_start" ]]; then
+    return 0
+  fi
+
   if [[ -f "$run_dir/supervisor.pid" ]]; then
     supervisor_pid="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
     if valid_supervisor_pid_for_project "$project" "$supervisor_pid"; then
