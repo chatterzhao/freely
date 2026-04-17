@@ -23,6 +23,27 @@
 
 ---
 
+## 1A. 三 Loop 主链 Trace（硬性要求）
+
+判定规则：
+1. 三个 loop 的可判定执行节点必须写 lifecycle 主链 trace，不得只靠自然语言日志。
+2. 主链 trace 必须遵循 [three-loop-trace-contract](./system/workspace/three-loop-trace-contract.md)。
+3. 每个节点至少写一对 `ph=IN` / `ph=OUT`，并显式标记：
+   - `me`
+   - `fr`
+   - `to`
+4. 非入口节点不得省略上游；真实入口只能标记为 `ENTRY`。
+5. 非真实结束节点不得省略下一跳；真实结束只能标记为 `TERM`。
+6. 新增或重排 loop 逻辑时，必须同步更新 checkpoint 编号与 handoff；不得产生匿名跳转。
+
+最小验收证据：
+- lifecycle trace 中可观察到稳定 checkpoint 编号
+- 同一节点存在 `IN`/`OUT` 成对记录
+- 下游 `IN ok` 能校验上游声明
+- 断链时可从日志直接定位缺失或错链位置
+
+---
+
 ## 2. 分支与工作树策略（硬性要求）
 
 判定规则：
