@@ -11519,6 +11519,8 @@ ensure_no_active_supervisor_conflict() {
 
 start_project_runtime() {
   local project="$1" entrypoint_mode="${2:-foreground}"
+  append_runtime_event "$project" "start_project_runtime_enter" \
+    "entrypoint_mode=$entrypoint_mode"
   # When process inspection is unavailable, runtime ownership falls back to cwd checks.
   # Anchor the supervisor itself to the target project so watchdog/attach logic can still
   # prove ownership in degraded environments.
@@ -11526,12 +11528,20 @@ start_project_runtime() {
     log_error "unable to enter project root before runtime start: $project"
     exit 1
   }
+  append_runtime_event "$project" "start_project_runtime_after_cd" \
+    "entrypoint_mode=$entrypoint_mode"
   load_config "$project"
+  append_runtime_event "$project" "start_project_runtime_after_load_config" \
+    "entrypoint_mode=$entrypoint_mode"
   register_project_in_registry "$project"
+  append_runtime_event "$project" "start_project_runtime_after_registry" \
+    "entrypoint_mode=$entrypoint_mode"
   check_doc_gate_or_fail "$project" || {
     log_error "start blocked by doc gate"
     exit 1
   }
+  append_runtime_event "$project" "start_project_runtime_after_doc_gate" \
+    "entrypoint_mode=$entrypoint_mode"
 
   local sdir run_dir logs_dir sup_pid_file child_pid_file loop_log
   local stop_requested=0
@@ -11545,7 +11555,11 @@ start_project_runtime() {
   loop_log="$logs_dir/loop.log"
   mkdir -p "$run_dir" "$logs_dir"
   ensure_codex_slot_switch_startup_ready_or_fail "$project" || exit 1
+  append_runtime_event "$project" "start_project_runtime_after_slot_switch_ready" \
+    "entrypoint_mode=$entrypoint_mode"
   preflight_codex_slot_recovery_before_start_or_fail "$project" || exit 1
+  append_runtime_event "$project" "start_project_runtime_after_slot_recovery" \
+    "entrypoint_mode=$entrypoint_mode"
   rm -f "$(stop_marker_file "$project")"
   LAST_ATTACH_REUSE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
