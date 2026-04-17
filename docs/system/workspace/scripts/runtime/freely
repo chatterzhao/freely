@@ -171,9 +171,12 @@ release_project_start_lock_for_runtime() {
 acquire_project_start_lock_or_wait() {
   local project="$1" reason="${2:-freely_start}"
   local timeout_secs="${FREELY_PROJECT_START_LOCK_WAIT_SECS:-30}"
+  local stale_secs="${FREELY_PROJECT_START_LOCK_STALE_SECS:-90}"
   local interval_secs="${FREELY_PROJECT_START_LOCK_WAIT_INTERVAL_SECS:-1}"
   local start_ts now waiting_logged="0" lock_dir state_file
+  local lock_started_epoch="" lock_age_secs=""
   [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=30
+  [[ "$stale_secs" =~ ^[0-9]+$ ]] || stale_secs=90
   [[ "$interval_secs" =~ ^[0-9]+$ ]] || interval_secs=1
   start_ts="$(date +%s)"
   lock_dir="$(project_start_lock_dir_for_runtime "$project")"
@@ -208,6 +211,27 @@ EOF
         continue
         ;;
       active|ambiguous)
+        if [[ "${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" == "active" ]]; then
+          lock_started_epoch="$(codex_timestamp_to_epoch "${CURRENT_PROJECT_START_LOCK_STARTED_AT:-}" 2>/dev/null || true)"
+          if [[ -n "$lock_started_epoch" && "$lock_started_epoch" =~ ^[0-9]+$ ]]; then
+            now="$(date +%s)"
+            lock_age_secs=$(( now - lock_started_epoch ))
+            if (( lock_age_secs >= stale_secs )) && ! project_has_active_runtime_processes "$project"; then
+              log_warn "removing active-but-stalled project start lock before freely start (owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} age_secs=$lock_age_secs path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+              append_runtime_event "$project" "project_start_lock_active_stale_cleanup" \
+                "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-active}" \
+                "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+                "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+                "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+                "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+                "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}" \
+                "lock_age_secs=$lock_age_secs" \
+                "stale_secs=$stale_secs"
+              rm -rf "$lock_dir"
+              continue
+            fi
+          fi
+        fi
         if [[ "$waiting_logged" == "0" ]]; then
           log_warn "project start already in progress; waiting for same-project startup serialization (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
           append_runtime_event "$project" "project_start_lock_waiting" \
