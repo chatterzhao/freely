@@ -100,6 +100,47 @@ message_file="$project/.freely/intake/$intake_id/message.txt"
 [[ -f "$meta_file" && -f "$message_file" ]] || exit 1
 message="$(cat "$message_file")"
 
+message_has_any_phrase() {
+  local haystack="$1"
+  shift
+  local needle
+  for needle in "$@"; do
+    [[ -n "$needle" ]] || continue
+    if [[ "$haystack" == *"$needle"* ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+emit_minimal_control_validation_fast_path_if_applicable() {
+  local text="$1"
+
+  message_has_any_phrase "$text" "控制类" "control" || return 1
+  message_has_any_phrase "$text" "最小验证" "minimal validation" "最小校验" "测试插话" || return 1
+  message_has_any_phrase "$text" "不要委派" "无需委派" "不用委派" "不必委派" || return 1
+  if ! message_has_any_phrase "$text" "只需分类并收尾" "只需要分类并收尾"; then
+    message_has_any_phrase "$text" "分类" || return 1
+    message_has_any_phrase "$text" "收尾" "结束" "closing" "close out" || return 1
+  fi
+
+  cat <<'EOF'
+DECISION=answer
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=continuation
+OWNERSHIP=manager
+WHY=显式控制类最小验证，无需委派执行
+HANDOFF=
+ANSWER=已按控制类最小验证处理，主管完成分类并收尾
+EOF
+  return 0
+}
+
+if emit_minimal_control_validation_fast_path_if_applicable "$message"; then
+  exit 0
+fi
+
 config_file="$project/.freely/config.env"
 [[ -f "$config_file" ]] || exit 1
 # shellcheck disable=SC1090

@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-lifecycle-trace.XXXXXX)"
+DAEMON_PID=""
+trap 'if [[ -n "$DAEMON_PID" ]]; then kill "$DAEMON_PID" 2>/dev/null || true; wait "$DAEMON_PID" 2>/dev/null || true; fi; rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+FREELY_HOME="$TMP_DIR/freely-home"
+TRACE_LOG="$PROJECT/.freely/logs/lifecycle-trace.log"
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260416-0000--sample"
+
+git init -q -b develop "$PROJECT"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
+git -C "$PROJECT" config core.hooksPath .githooks
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260416-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260416-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260416-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+INIT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy 2>&1)"
+printf '%s\n' "$INIT_OUTPUT" | grep -q 'initialized:'
+
+wait_for_grep() {
+  local pattern="$1" file="$2" attempts="${3:-80}"
+  local i
+  for ((i=0; i<attempts; i++)); do
+    if grep -q "$pattern" "$file" 2>/dev/null; then
+      return 0
+    fi
+    sleep 0.2
+  done
+  echo "[FAIL] pattern not observed after retry: $pattern in $file" >&2
+  [[ -f "$file" ]] && cat "$file" >&2
+  return 1
+}
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" daemon start --project "$PROJECT" >/dev/null 2>&1 &
+DAEMON_PID="$!"
+wait_for_grep "ph=IN me=A-L001 fr=ENTRY checkpoint=L001 stage=start_requested" "$TRACE_LOG"
+wait_for_grep "ph=OUT me=A-L001 to=A-L010 ok=1 checkpoint=L001 stage=start_requested" "$TRACE_LOG"
+kill "$DAEMON_PID" 2>/dev/null || true
+wait "$DAEMON_PID" 2>/dev/null || true
+DAEMON_PID=""
+
+CHAT_OUTPUT="$(cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" chat "请记录这条插话")"
+INTAKE_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID" ]] || {
+  echo "[FAIL] freely chat did not return intake_id" >&2
+  exit 1
+}
+
+wait_for_grep "ph=IN me=A-L300 fr=ENTRY checkpoint=L300 stage=intake_recorded intake_id=$INTAKE_ID" "$TRACE_LOG"
+wait_for_grep "ph=OUT me=A-L300 to=A-L310 ok=1 checkpoint=L300 stage=intake_recorded intake_id=$INTAKE_ID" "$TRACE_LOG"
+
+grep -q "ph=IN me=A-L001 fr=ENTRY checkpoint=L001 stage=start_requested entrypoint=daemon force=0" "$TRACE_LOG" || {
+  echo "[FAIL] expected start_requested entry to expose ENTRY -> A-L001" >&2
+  cat "$TRACE_LOG" >&2
+  exit 1
+}
+grep -q "ph=OUT me=A-L001 to=A-L010 ok=1 checkpoint=L001 stage=start_requested entrypoint=daemon force=0" "$TRACE_LOG" || {
+  echo "[FAIL] expected start_requested exit to declare A-L010 as the next hop" >&2
+  cat "$TRACE_LOG" >&2
+  exit 1
+}
+grep -q "ph=IN me=A-L300 fr=ENTRY checkpoint=L300 stage=intake_recorded intake_id=$INTAKE_ID" "$TRACE_LOG" || {
+  echo "[FAIL] expected intake_recorded entry to mark the external interruption entrypoint" >&2
+  cat "$TRACE_LOG" >&2
+  exit 1
+}
+grep -q "ph=OUT me=A-L300 to=A-L310 ok=1 checkpoint=L300 stage=intake_recorded intake_id=$INTAKE_ID" "$TRACE_LOG" || {
+  echo "[FAIL] expected intake_recorded exit to hand off to intake_claimed" >&2
+  cat "$TRACE_LOG" >&2
+  exit 1
+}
+
+python3 - "$TRACE_LOG" "$INTAKE_ID" <<'PY'
+import sys
+
+trace_log = sys.argv[1]
+intake_id = sys.argv[2]
+targets = [
+    ("ph=IN", "me=A-L001", "checkpoint=L001", "stage=start_requested"),
+    ("ph=OUT", "me=A-L001", "to=A-L010", "checkpoint=L001", "stage=start_requested"),
+    ("ph=IN", "me=A-L300", f"intake_id={intake_id}", "checkpoint=L300", "stage=intake_recorded"),
+    ("ph=OUT", "me=A-L300", "to=A-L310", f"intake_id={intake_id}", "checkpoint=L300", "stage=intake_recorded"),
+]
+positions = []
+seq_values = []
+with open(trace_log, encoding="utf-8") as handle:
+    for idx, line in enumerate(handle, start=1):
+        for token in line.split():
+            if token.startswith("seq="):
+                seq_values.append(int(token.split("=", 1)[1]))
+                break
+        for target_idx, target in enumerate(targets):
+            if len(positions) != target_idx:
+                continue
+            if all(fragment in line for fragment in target):
+                positions.append(idx)
+                break
+if len(positions) != len(targets) or positions != sorted(positions):
+    raise SystemExit(1)
+if not seq_values or seq_values != sorted(seq_values) or len(seq_values) != len(set(seq_values)):
+    raise SystemExit(1)
+PY

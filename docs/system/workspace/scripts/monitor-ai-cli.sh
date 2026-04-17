@@ -94,12 +94,14 @@ runtime_error_signal_excerpt() {
       if (line ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T.* (ERROR|WARN) /) { print line; return }
       if (line ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T.* \[(ERROR|WARN)\]/) { print line; return }
       if (line ~ /^(ERROR|WARN)(:| |$)/) { print line; return }
+      if (line ~ /^Error:/) { print line; return }
       if (line ~ /^\[(ERROR|WARN)\]/) { print line; return }
       if (line ~ /^(Please log in|Login required|Unauthorized|deactivated_workspace|workspace deactivated)/) { print line; return }
       if (line ~ /^OAuth inventory refresh failed/) { print line; return }
       if (line ~ /^FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set/) { print line; return }
       if (line ~ /^curl: \([0-9]+\)/) { print line; return }
       if (line ~ /^Attempt [0-9]+ failed\./) { print line; return }
+      if (line ~ /(Failed to create session:|cannot access session files|thread\/start failed|permission denied)/) { print line; return }
     }
     {
       line = $0
@@ -141,7 +143,7 @@ log_has_runtime_tool_failure() {
   case "$current_tool" in
     codex)
       runtime_error_signal_excerpt "$current_log_file" "$current_debug_log_file" "$prompt_file" | rg -qi \
-        '401|402 payment required|403 forbidden|429 too many requests|exceeded retry limit|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired|login required|usage limit|try again|预扣费额度失败|剩余额度不足|余额不足|insufficient balance|insufficient credit|pre.?charge.*failed|billing hard limit|quota exceeded'
+        '401|402 payment required|403 forbidden|429 too many requests|exceeded retry limit|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired|login required|usage limit|try again|预扣费额度失败|剩余额度不足|余额不足|insufficient balance|insufficient credit|pre.?charge.*failed|billing hard limit|quota exceeded|cannot access session files|permission denied|thread/start failed'
       ;;
     cc|cc-use-codex-cli|kiro-cli)
       runtime_error_signal_excerpt "$current_log_file" "$current_debug_log_file" "$prompt_file" | rg -qi \
