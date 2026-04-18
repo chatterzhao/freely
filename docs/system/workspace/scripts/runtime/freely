@@ -198,19 +198,10 @@ EOF
 
     project_start_lock_snapshot_for_runtime "$project"
     case "${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" in
-      stale)
-        log_warn "removing stale project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
-        append_runtime_event "$project" "project_start_lock_stale_cleanup" \
-          "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-stale}" \
-          "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
-          "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
-          "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
-          "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
-          "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}"
-        cleanup_project_start_lock_if_stale_for_runtime "$project"
-        continue
-        ;;
-      active|ambiguous)
+      active)
+        if [[ "${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" == "$$" ]]; then
+          return 0
+        fi
         if [[ "${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" == "active" ]]; then
           lock_started_epoch="$(codex_timestamp_to_epoch "${CURRENT_PROJECT_START_LOCK_STARTED_AT:-}" 2>/dev/null || true)"
           if [[ -n "$lock_started_epoch" && "$lock_started_epoch" =~ ^[0-9]+$ ]]; then
@@ -232,6 +223,47 @@ EOF
             fi
           fi
         fi
+        if [[ "$waiting_logged" == "0" ]]; then
+          log_warn "project start already in progress; waiting for same-project startup serialization (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+          append_runtime_event "$project" "project_start_lock_waiting" \
+            "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-active}" \
+            "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+            "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+            "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+            "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+            "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}" \
+            "timeout_secs=$timeout_secs" \
+            "interval_secs=$interval_secs"
+          waiting_logged="1"
+        fi
+        now="$(date +%s)"
+        if (( now - start_ts >= timeout_secs )); then
+          log_error "timed out waiting for project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+          append_runtime_event "$project" "project_start_lock_timeout" \
+            "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-active}" \
+            "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+            "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+            "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+            "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+            "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}" \
+            "timeout_secs=$timeout_secs"
+          return 1
+        fi
+        sleep "$interval_secs"
+        ;;
+      stale)
+        log_warn "removing stale project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+        append_runtime_event "$project" "project_start_lock_stale_cleanup" \
+          "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-stale}" \
+          "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+          "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+          "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+          "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+          "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}"
+        cleanup_project_start_lock_if_stale_for_runtime "$project"
+        continue
+        ;;
+      ambiguous)
         if [[ "$waiting_logged" == "0" ]]; then
           log_warn "project start already in progress; waiting for same-project startup serialization (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
           append_runtime_event "$project" "project_start_lock_waiting" \
@@ -11371,6 +11403,14 @@ project_has_authoritative_runtime_processes_for_user_precheck() {
   local project="$1" run_dir supervisor_pid watchdog_pid dispatcher_pid
   run_dir="$(run_dir_for_project "$project")"
 
+  cleanup_project_start_lock_if_stale_for_runtime "$project"
+  project_start_lock_snapshot_for_runtime "$project"
+  if [[ "${CURRENT_PROJECT_START_LOCK_STATE:-idle}" == "active" ]] \
+    && [[ "${CURRENT_PROJECT_START_LOCK_REASON:-none}" == "freely_start" ]] \
+    && [[ "${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" != "$$" ]]; then
+    return 0
+  fi
+
   if [[ -f "$run_dir/supervisor.pid" ]]; then
     supervisor_pid="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
     if valid_supervisor_pid_for_project "$project" "$supervisor_pid"; then
@@ -11399,6 +11439,8 @@ project_has_authoritative_runtime_processes_for_user_precheck() {
 reject_repeated_user_start_if_running() {
   local project="$1" command_name="$2"
   if project_has_authoritative_runtime_processes_for_user_precheck "$project"; then
+    append_runtime_event "$project" "user_start_rejected_already_running" \
+      "command_name=$command_name"
     log_error "$command_name refused: project runtime is already running for $project"
     log_error "run: ./bin/freely stop --project \"$project\""
     log_error "or:  ./bin/freely $command_name --project \"$project\" --force"
@@ -11426,7 +11468,14 @@ resolve_active_supervisor_pid_for_start() {
   fi
 
   candidate_pid="$(discover_supervisor_pid "$project" "$excluded_pids")"
-  if valid_supervisor_pid_for_project "$project" "$candidate_pid" || valid_discovered_supervisor_pid_for_project "$project" "$candidate_pid"; then
+  if valid_supervisor_pid_for_project "$project" "$candidate_pid"; then
+    log_warn "recovered live project supervisor after supervisor.pid drift: $candidate_pid"
+    LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="process_discovery"
+    printf '%s\n' "$candidate_pid" >"$sup_pid_file"
+    RESOLVED_ACTIVE_SUPERVISOR_PID="$candidate_pid"
+    return 0
+  fi
+  if valid_discovered_supervisor_pid_for_project "$project" "$candidate_pid" && { supervisor_startup_truth_ready_for_project "$project" "$candidate_pid" || project_bootstrap_launch_in_flight "$project" "$candidate_pid" ""; }; then
     log_warn "recovered live project supervisor after supervisor.pid drift: $candidate_pid"
     LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="process_discovery"
     printf '%s\n' "$candidate_pid" >"$sup_pid_file"
@@ -11510,6 +11559,8 @@ ensure_no_active_supervisor_conflict() {
 
 start_project_runtime() {
   local project="$1" entrypoint_mode="${2:-foreground}"
+  append_runtime_event "$project" "start_project_runtime_enter" \
+    "entrypoint_mode=$entrypoint_mode"
   # When process inspection is unavailable, runtime ownership falls back to cwd checks.
   # Anchor the supervisor itself to the target project so watchdog/attach logic can still
   # prove ownership in degraded environments.
@@ -11517,12 +11568,20 @@ start_project_runtime() {
     log_error "unable to enter project root before runtime start: $project"
     exit 1
   }
+  append_runtime_event "$project" "start_project_runtime_after_cd" \
+    "entrypoint_mode=$entrypoint_mode"
   load_config "$project"
+  append_runtime_event "$project" "start_project_runtime_after_load_config" \
+    "entrypoint_mode=$entrypoint_mode"
   register_project_in_registry "$project"
+  append_runtime_event "$project" "start_project_runtime_after_registry" \
+    "entrypoint_mode=$entrypoint_mode"
   check_doc_gate_or_fail "$project" || {
     log_error "start blocked by doc gate"
     exit 1
   }
+  append_runtime_event "$project" "start_project_runtime_after_doc_gate" \
+    "entrypoint_mode=$entrypoint_mode"
 
   local sdir run_dir logs_dir sup_pid_file child_pid_file loop_log
   local stop_requested=0
@@ -11536,7 +11595,11 @@ start_project_runtime() {
   loop_log="$logs_dir/loop.log"
   mkdir -p "$run_dir" "$logs_dir"
   ensure_codex_slot_switch_startup_ready_or_fail "$project" || exit 1
+  append_runtime_event "$project" "start_project_runtime_after_slot_switch_ready" \
+    "entrypoint_mode=$entrypoint_mode"
   preflight_codex_slot_recovery_before_start_or_fail "$project" || exit 1
+  append_runtime_event "$project" "start_project_runtime_after_slot_recovery" \
+    "entrypoint_mode=$entrypoint_mode"
   rm -f "$(stop_marker_file "$project")"
   LAST_ATTACH_REUSE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
@@ -12159,16 +12222,22 @@ cmd_start() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
+  trap "release_project_start_lock_for_runtime '$project'" EXIT
   append_lifecycle_trace "$project" "L001" "start_requested" \
     "entrypoint=foreground" \
     "force=$force" \
     "expected_next=L010"
+  append_runtime_event "$project" "user_start_command_received" \
+    "force=$force"
   if [[ "$force" == "1" ]]; then
     log_info "forcing project-local runtime rebuild before start"
     stop_project_runtime "$project" "start_force"
   else
     reject_repeated_user_start_if_running "$project" "start"
   fi
+  append_runtime_event "$project" "user_start_precheck_clear" \
+    "force=$force"
   start_project_runtime "$project" "foreground"
 }
 
@@ -12261,16 +12330,22 @@ cmd_daemon_start() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
+  trap "release_project_start_lock_for_runtime '$project'" EXIT
   append_lifecycle_trace "$project" "L001" "start_requested" \
     "entrypoint=daemon" \
     "force=$force" \
     "expected_next=L010"
+  append_runtime_event "$project" "user_daemon_start_command_received" \
+    "force=$force"
   if [[ "$force" == "1" ]]; then
     log_info "forcing project-local runtime rebuild before daemon start"
     stop_project_runtime "$project" "daemon_start_force"
   else
     reject_repeated_user_start_if_running "$project" "daemon start"
   fi
+  append_runtime_event "$project" "user_daemon_start_precheck_clear" \
+    "force=$force"
   launch_project_runtime_daemon_or_fail "$project"
 }
 
@@ -13895,4 +13970,5 @@ main() {
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   main "$@"
+  exit $?
 fi

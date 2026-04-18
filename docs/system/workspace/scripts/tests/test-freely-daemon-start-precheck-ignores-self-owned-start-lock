@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    acquire_project_start_lock_or_wait() { return 0; }
+    project_start_lock_snapshot_for_runtime() {
+      CURRENT_PROJECT_START_LOCK_STATE="active"
+      CURRENT_PROJECT_START_LOCK_REASON="freely_start"
+      CURRENT_PROJECT_START_LOCK_OWNER_PID="$$"
+    }
+    cleanup_project_start_lock_if_stale_for_runtime() { return 0; }
+    authoritative_supervisor_pids_for_project() { return 0; }
+    valid_supervisor_pid_for_project() { return 1; }
+    valid_ensure_manager_watchdog_pid_for_project() { return 1; }
+    valid_interruption_dispatcher_pid_for_project() { return 1; }
+    append_runtime_event() { return 0; }
+    launch_project_runtime_daemon_or_fail() { printf "daemon-start-called\n"; }
+    main daemon start --project /tmp/freely-project
+  ' 2>&1
+)"
+
+[[ "$OUTPUT" == *"daemon-start-called"* ]]
+[[ "$OUTPUT" != *"daemon start refused: project runtime is already running"* ]]
+
+echo "[PASS] freely daemon start precheck ignores self-owned start lock"
