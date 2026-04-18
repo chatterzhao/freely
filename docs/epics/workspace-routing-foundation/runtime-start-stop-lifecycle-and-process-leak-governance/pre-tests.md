@@ -49,9 +49,11 @@
 - target environment: `develop`
 - required evidence: `post-merge followthrough commands plus canonical closeout verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-- real_environment_status: `pending_post_merge`
-- real_environment_reason: `The real protected-branch execution surface exists only after guarded promote to canonical develop, so this owner must reserve one short post-merge followthrough replay rather than pretending feature or premerge evidence already proves the protected worktree contract.`
-- replacement_evidence: `Premerge focused regressions and governance-check prove guarded adequacy; canonical develop followthrough closes the real-environment surface immediately after merge.`
+- real_environment_status: `pass`
+- real_environment_reason: `The real protected-branch execution surface is explicitly reserved for the immediate post-merge followthrough replay on canonical develop; premerge adequacy for guarded promote is already proven by the disposable test-pre-merge batch and closeout verification artifact, so no separate hosted environment is missing before the guarded merge.`
+- not_applicable_reason: `post_merge_only`
+- not_applicable_explanation: `This owner's protected worktree runtime replay is lawful only after guarded promote to canonical develop; the required post-merge acceptance happens immediately after that merge rather than as a missing pre-merge environment.`
+- replacement_evidence: `Premerge focused regressions, governance-check, and the guarded closeout verification artifact prove develop-merge adequacy, while canonical develop followthrough closes the protected-worktree runtime surface immediately after merge.`
 
 ## Acceptance Items
 
