@@ -41,6 +41,17 @@
 - `validation_mode: unparseable_subject_ancestry` 必须显式声明 absorbing protected merge、protected batch branch、bounded owner issue 和 verification artifact；不得退化为 hash-only 例外
 - backfill entry 只修复 auditability，不授予 bypass 权限
 
+## Receipt Gap: b05d485923c49bbef4412b32596e8d8596999ee9
+
+- target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
+- source_branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260418-1900-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+
 ## Receipt Gap: 9cb3236d2c297e3b8b36bb4613c3f0d8dbb69e98
 
 - target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
