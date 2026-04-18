@@ -12227,6 +12227,7 @@ cmd_start() {
     "force=$force" \
     "expected_next=L010"
   acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
+  trap "release_project_start_lock_for_runtime '$project'" EXIT
   append_runtime_event "$project" "user_start_command_received" \
     "force=$force"
   if [[ "$force" == "1" ]]; then
@@ -12334,6 +12335,7 @@ cmd_daemon_start() {
     "force=$force" \
     "expected_next=L010"
   acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
+  trap "release_project_start_lock_for_runtime '$project'" EXIT
   append_runtime_event "$project" "user_daemon_start_command_received" \
     "force=$force"
   if [[ "$force" == "1" ]]; then
@@ -13968,4 +13970,5 @@ main() {
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   main "$@"
+  exit $?
 fi
