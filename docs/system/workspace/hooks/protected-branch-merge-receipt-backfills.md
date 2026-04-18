@@ -41,6 +41,28 @@
 - `validation_mode: unparseable_subject_ancestry` 必须显式声明 absorbing protected merge、protected batch branch、bounded owner issue 和 verification artifact；不得退化为 hash-only 例外
 - backfill entry 只修复 auditability，不授予 bypass 权限
 
+## Receipt Gap: dc436573e5f3f995ed936e7b21c65f9440fffae9
+
+- target_branch: `test-pre-merge-runtime-lifecycle-20260417`
+- source_branch: `feature/runtime-process-leak-20260417`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260417-0445-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+
+## Receipt Gap: f7145cc889c3919cbe21b1162f96d14d736b83b7
+
+- target_branch: `test-pre-merge-runtime-lifecycle-20260417`
+- source_branch: `feature/runtime-process-leak-20260417`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260417-0445-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+
 ## Receipt Gap: 3e226fa9865973d5964e0bd5ec8a124452c49118
 
 - target_branch: `test-pre-merge-runtime-lifecycle-20260417`
