@@ -74,6 +74,43 @@ routing_policy:
 - next_action: 延续当前 feature-lane dev-loop closeout；当前实现与 focused evidence 已存在，但仍需完成 tasks/pre-tests 中剩余的 feature verification、premerge 装配与 promote 准备
 - revisit_trigger: 当 feature-lane verification 全部收口后，切入 `test-pre-merge-*` 做 premerge-integration；若真实 replay 再次出现 after-failure handoff race 或 stop resurrection，再回到当前 issue 继续实现
 
+1. `I-20260417-0445-A`
+- title: Runtime start/stop lifecycle and process leak governance
+- milestone_state: candidate
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- prd_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/prd.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-precheck-ignores-self-owned-start-lock`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-rejects-when-runtime-already-running`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-releases-start-lock-when-launch-fails`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-interruption-manager-fast-path-control-validation`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-lifecycle-trace-log`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-lock-cleans-stalled-active-owner`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-self-owned-start-lock`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-rejects-when-runtime-already-running`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-releases-start-lock-when-startup-fails`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-discovered-watchers-and-dispatchers`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-detects-codex-session-permission-failure`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-detects-fast-exit-iflow-local-state-failure`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-iflow-descendants-on-runtime-failure`
+  - `./bin/test-lane premerge-integration -- ./bin/governance-check`
+- completion_note: `The bounded runtime lifecycle owner now carries explicit repeated-start rejection, lawful start-lock handling, discovered relauncher cleanup, AI fast-exit containment, and guarded premerge adequacy evidence; the remaining closeout step is guarded promote into canonical develop plus one short protected-worktree followthrough replay.`
+
 1. `I-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance
 - milestone_state: candidate
@@ -121,6 +158,17 @@ routing_policy:
 - completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
 ### candidate_issues
+
+1. `C-20260417-0445-A`
+- title: Runtime start/stop lifecycle and process leak governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract/candidates.md`
+- next_action: Candidate mirror only. `I-20260417-0445-A` is now the canonical owner for CLI-first repeated-start rejection, lawful start-lock handling, same-project relauncher cleanup, AI fast-exit containment, and bounded lifecycle-trace support.
+- revisit_trigger: Re-open only if canonical implementation later regresses back toward silent repeated-start attach, leaves relaunch-capable same-project processes behind, or proves this bounded lifecycle seam still hides a different owner-worthy runtime defect.
 
 1. `C-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance
