@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-interruption-fast-path.XXXXXX)"
+DISPATCH_PID=""
+trap 'if [[ -n "$DISPATCH_PID" ]]; then kill "$DISPATCH_PID" 2>/dev/null || true; wait "$DISPATCH_PID" 2>/dev/null || true; fi; rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0000--sample"
+
+git init -q -b feature/test-interruption-fast-path "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cd "$PROJECT"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
+python3 - <<'PY'
+from pathlib import Path
+cfg = Path(".freely/config.env")
+text = cfg.read_text()
+text = text.replace('AI_TOOL="codex"', 'AI_TOOL="iflow"', 1)
+text = text.replace('AI_MODEL="gpt-5.4"', 'AI_MODEL=""', 1)
+text = text.replace('AI_REASONING_EFFORT="medium"', 'AI_REASONING_EFFORT=""', 1)
+cfg.write_text(text)
+PY
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$PROJECT" --watch >/dev/null 2>&1 &
+DISPATCH_PID="$!"
+
+wait_for_grep() {
+  local pattern="$1" file="$2" attempts="${3:-160}"
+  local i
+  for ((i=0; i<attempts; i++)); do
+    if grep -q "$pattern" "$file" 2>/dev/null; then
+      return 0
+    fi
+    sleep 0.2
+  done
+  echo "[FAIL] pattern not observed after retry: $pattern in $file" >&2
+  [[ -f "$file" ]] && cat "$file" >&2
+  return 1
+}
+
+CHAT_OUTPUT="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "测试插话：请确认这是控制类最小验证，不要委派开发，只需分类并收尾。")"
+INTAKE_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID" ]] || {
+  echo "[FAIL] missing fast-path intake id" >&2
+  exit 1
+}
+
+META_FILE="$PROJECT/.freely/intake/$INTAKE_ID/meta.env"
+RESOLUTION_FILE="$PROJECT/.freely/run/interruption-resolution/$INTAKE_ID/resolution.md"
+TRACE_FILE="$PROJECT/.freely/logs/lifecycle-trace.log"
+
+wait_for_grep '^STATUS="absorbed"$' "$META_FILE"
+wait_for_grep '^CLASSIFICATION="control"$' "$META_FILE"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' "$META_FILE"
+wait_for_grep '^ABSORPTION_TARGET="answer://manager-clarification"$' "$META_FILE"
+wait_for_grep '已按控制类最小验证处理，主管完成分类并收尾' "$RESOLUTION_FILE"
+wait_for_grep "ph=OUT me=A-L320 to=TERM ok=1 checkpoint=L320 stage=intake_resolved intake_id=$INTAKE_ID" "$TRACE_FILE"
+
+wait_for_grep "ph=IN me=A-L331 fr=A-L330 ok=1 checkpoint=L331 stage=intake_handler_decision_parsed intake_id=$INTAKE_ID decision=answer reaction=followup classification=control restart_point=continuation ownership=manager" "$TRACE_FILE"
+wait_for_grep "ph=OUT me=A-L331 to=A-L310 ok=1 checkpoint=L331 stage=intake_handler_decision_parsed intake_id=$INTAKE_ID decision=answer reaction=followup classification=control restart_point=continuation ownership=manager" "$TRACE_FILE"
+wait_for_grep "ph=IN me=A-L320 fr=A-L310 ok=1 checkpoint=L320 stage=intake_resolved intake_id=$INTAKE_ID resolved_by=interruption-manager-agent reaction=followup classification=control status=absorbed" "$TRACE_FILE"
+wait_for_grep "ph=OUT me=A-L320 to=TERM ok=1 checkpoint=L320 stage=intake_resolved intake_id=$INTAKE_ID resolved_by=interruption-manager-agent reaction=followup classification=control status=absorbed" "$TRACE_FILE"
+
+if grep -q "checkpoint=L333 stage=intake_handler_failed intake_id=$INTAKE_ID" "$TRACE_FILE"; then
+  echo "[FAIL] fast-path control validation should not hit handler timeout fallback" >&2
+  exit 1
+fi
+
+python3 - "$TRACE_FILE" "$INTAKE_ID" <<'PY'
+import sys
+
+trace_file = sys.argv[1]
+intake_id = sys.argv[2]
+targets = [
+    ("ph=IN", "me=A-L300", f"intake_id={intake_id}", "checkpoint=L300"),
+    ("ph=OUT", "me=A-L300", "to=A-L310", f"intake_id={intake_id}", "checkpoint=L300"),
+    ("ph=IN", "me=A-L310", "fr=A-L300", f"intake_id={intake_id}", "classification=unclassified"),
+    ("ph=OUT", "me=A-L310", "to=A-L330", f"intake_id={intake_id}", "classification=unclassified"),
+    ("ph=IN", "me=A-L330", "fr=A-L310", f"intake_id={intake_id}", "checkpoint=L330"),
+    ("ph=OUT", "me=A-L330", "to=A-L331", f"intake_id={intake_id}", "checkpoint=L330"),
+    ("ph=IN", "me=A-L331", "fr=A-L330", f"intake_id={intake_id}", "decision=answer"),
+    ("ph=OUT", "me=A-L331", "to=A-L310", f"intake_id={intake_id}", "decision=answer"),
+    ("ph=IN", "me=A-L310", "fr=A-L331", f"intake_id={intake_id}", "classification=control"),
+    ("ph=OUT", "me=A-L310", "to=A-L320", f"intake_id={intake_id}", "classification=control"),
+    ("ph=IN", "me=A-L320", "fr=A-L310", f"intake_id={intake_id}", "status=absorbed"),
+    ("ph=OUT", "me=A-L320", "to=TERM", f"intake_id={intake_id}", "status=absorbed"),
+]
+positions = []
+with open(trace_file, encoding="utf-8") as handle:
+    for idx, line in enumerate(handle, start=1):
+        for target_idx, target in enumerate(targets):
+            if len(positions) != target_idx:
+                continue
+            if all(fragment in line for fragment in target):
+                positions.append(idx)
+                break
+if len(positions) != len(targets) or positions != sorted(positions):
+    raise SystemExit(1)
+PY
+
+echo "[PASS] real interruption manager fast-path absorbs explicit control validation with actual IN/OUT handoff trace"

@@ -171,9 +171,12 @@ release_project_start_lock_for_runtime() {
 acquire_project_start_lock_or_wait() {
   local project="$1" reason="${2:-freely_start}"
   local timeout_secs="${FREELY_PROJECT_START_LOCK_WAIT_SECS:-30}"
+  local stale_secs="${FREELY_PROJECT_START_LOCK_STALE_SECS:-90}"
   local interval_secs="${FREELY_PROJECT_START_LOCK_WAIT_INTERVAL_SECS:-1}"
   local start_ts now waiting_logged="0" lock_dir state_file
+  local lock_started_epoch="" lock_age_secs=""
   [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=30
+  [[ "$stale_secs" =~ ^[0-9]+$ ]] || stale_secs=90
   [[ "$interval_secs" =~ ^[0-9]+$ ]] || interval_secs=1
   start_ts="$(date +%s)"
   lock_dir="$(project_start_lock_dir_for_runtime "$project")"
@@ -195,6 +198,59 @@ EOF
 
     project_start_lock_snapshot_for_runtime "$project"
     case "${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" in
+      active)
+        if [[ "${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" == "$$" ]]; then
+          return 0
+        fi
+        if [[ "${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" == "active" ]]; then
+          lock_started_epoch="$(codex_timestamp_to_epoch "${CURRENT_PROJECT_START_LOCK_STARTED_AT:-}" 2>/dev/null || true)"
+          if [[ -n "$lock_started_epoch" && "$lock_started_epoch" =~ ^[0-9]+$ ]]; then
+            now="$(date +%s)"
+            lock_age_secs=$(( now - lock_started_epoch ))
+            if (( lock_age_secs >= stale_secs )) && ! project_has_active_runtime_processes "$project"; then
+              log_warn "removing active-but-stalled project start lock before freely start (owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} age_secs=$lock_age_secs path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+              append_runtime_event "$project" "project_start_lock_active_stale_cleanup" \
+                "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-active}" \
+                "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+                "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+                "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+                "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+                "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}" \
+                "lock_age_secs=$lock_age_secs" \
+                "stale_secs=$stale_secs"
+              rm -rf "$lock_dir"
+              continue
+            fi
+          fi
+        fi
+        if [[ "$waiting_logged" == "0" ]]; then
+          log_warn "project start already in progress; waiting for same-project startup serialization (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+          append_runtime_event "$project" "project_start_lock_waiting" \
+            "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-active}" \
+            "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+            "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+            "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+            "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+            "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}" \
+            "timeout_secs=$timeout_secs" \
+            "interval_secs=$interval_secs"
+          waiting_logged="1"
+        fi
+        now="$(date +%s)"
+        if (( now - start_ts >= timeout_secs )); then
+          log_error "timed out waiting for project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+          append_runtime_event "$project" "project_start_lock_timeout" \
+            "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-active}" \
+            "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+            "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+            "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+            "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+            "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}" \
+            "timeout_secs=$timeout_secs"
+          return 1
+        fi
+        sleep "$interval_secs"
+        ;;
       stale)
         log_warn "removing stale project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
         append_runtime_event "$project" "project_start_lock_stale_cleanup" \
@@ -207,7 +263,7 @@ EOF
         cleanup_project_start_lock_if_stale_for_runtime "$project"
         continue
         ;;
-      active|ambiguous)
+      ambiguous)
         if [[ "$waiting_logged" == "0" ]]; then
           log_warn "project start already in progress; waiting for same-project startup serialization (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
           append_runtime_event "$project" "project_start_lock_waiting" \
@@ -441,7 +497,7 @@ Usage:
   freely daemon start [--project <abs_path>] [--force]
   freely daemon stop [--project <abs_path>]
   freely daemon status [--project <abs_path>]
-  freely daemon logs [--project <abs_path>] [--follow] [--file runtime-events|loop]
+  freely daemon logs [--project <abs_path>] [--follow] [--file runtime-events|lifecycle-trace|loop]
   freely restart [--project <abs_path>] [--all-projects]
   freely restore-work [--project <abs_path>]
   freely baseline-status [--project <abs_path>]
@@ -714,6 +770,92 @@ runtime_events_log_file() {
   printf '%s/runtime-events.log\n' "$(logs_dir_for_project "$project")"
 }
 
+lifecycle_trace_log_file() {
+  local project="$1"
+  printf '%s/lifecycle-trace.log\n' "$(logs_dir_for_project "$project")"
+}
+
+lifecycle_trace_seq_file() {
+  local project="$1"
+  printf '%s/lifecycle-trace.seq\n' "$(run_dir_for_project "$project")"
+}
+
+lifecycle_trace_lock_file() {
+  local project="$1"
+  printf '%s/lifecycle-trace.lock\n' "$(run_dir_for_project "$project")"
+}
+
+path_relative_to_project_for_trace() {
+  local project="$1" value="$2"
+  local canonical_project="$project" canonical_value="$value"
+  [[ -n "$value" && "$value" == /* ]] || {
+    printf '%s\n' "$value"
+    return 0
+  }
+  canonical_project="$(cd "$project" 2>/dev/null && pwd -P || printf '%s\n' "$project")"
+  case "$value" in
+    "$project")
+      printf '.\n'
+      return 0
+      ;;
+    "$project"/*)
+      printf '.%s\n' "${value#"$project"}"
+      return 0
+      ;;
+  esac
+  if [[ -e "$value" ]]; then
+    canonical_value="$(cd "$(dirname "$value")" 2>/dev/null && pwd -P)/$(basename "$value")"
+  fi
+  case "$canonical_value" in
+    "$canonical_project")
+      printf '.\n'
+      ;;
+    "$canonical_project"/*)
+      printf '.%s\n' "${canonical_value#"$canonical_project"}"
+      ;;
+    "$HOME")
+      printf '~\n'
+      ;;
+    "$HOME"/*)
+      printf '~%s\n' "${canonical_value#"$HOME"}"
+      ;;
+    *)
+      printf '%s\n' "$canonical_value"
+      ;;
+  esac
+}
+
+compact_trace_identifier() {
+  local value="${1:-}"
+  local len="${#value}"
+  if (( len <= 16 )); then
+    printf '%s\n' "$value"
+    return 0
+  fi
+  printf '%s..%s\n' "${value:0:8}" "${value:len-6:6}"
+}
+
+sanitize_lifecycle_trace_kv() {
+  local project="$1" key="$2" value="$3"
+  case "$key" in
+    prompt_file|cycle_log|resolution_artifact)
+      path_relative_to_project_for_trace "$project" "$value"
+      ;;
+    delegated_worktree|project)
+      path_relative_to_project_for_trace "$project" "$value"
+      ;;
+    jsonl_path)
+      path_relative_to_project_for_trace "$project" "$value"
+      ;;
+    session_id|resume_target)
+      compact_trace_identifier "$value"
+      ;;
+    *)
+      printf '%s\n' "$value"
+      ;;
+  esac
+}
+
 append_runtime_event() {
   local project="$1" event="$2"
   shift 2
@@ -730,6 +872,221 @@ append_runtime_event() {
     done
     printf '\n'
   } >>"$log_file"
+}
+
+lifecycle_loop_name_for_checkpoint() {
+  local checkpoint="$1"
+  case "$checkpoint" in
+    L*) printf 'auto\n' ;;
+    DOC-*|D-*) printf 'doc\n' ;;
+    DEV-*|V-*) printf 'dev\n' ;;
+    *) printf 'auto\n' ;;
+  esac
+}
+
+lifecycle_loop_code_for_name() {
+  local loop_name="$1"
+  case "$loop_name" in
+    auto) printf 'AUTO\n' ;;
+    doc) printf 'DOC\n' ;;
+    dev) printf 'DEV\n' ;;
+    *) printf 'AUTO\n' ;;
+  esac
+}
+
+qualify_lifecycle_checkpoint() {
+  local raw_checkpoint="$1" loop_code="$2"
+  [[ -n "$raw_checkpoint" ]] || return 0
+  case "$raw_checkpoint" in
+    ENTRY|TERM|UNSET)
+      printf '%s\n' "$raw_checkpoint"
+      ;;
+    terminal)
+      printf 'TERM\n'
+      ;;
+    *-*) printf '%s\n' "$raw_checkpoint" ;;
+    *) printf '%s-%s\n' "$loop_code" "$raw_checkpoint" ;;
+  esac
+}
+
+qualify_lifecycle_expected_next_list() {
+  local raw_list="$1" loop_code="$2" item qualified=""
+  local normalized="${raw_list//,/|}"
+  local -a items=()
+  IFS='|' read -r -a items <<<"$normalized"
+  for item in "${items[@]}"; do
+    [[ -n "$item" ]] || continue
+    item="$(printf '%s' "$item" | sed 's/^ *//; s/ *$//')"
+    [[ -n "$item" ]] || continue
+    item="$(qualify_lifecycle_checkpoint "$item" "$loop_code")"
+    qualified="${qualified}${qualified:+|}${item}"
+  done
+  printf '%s\n' "$qualified"
+}
+
+lifecycle_trace_display_id() {
+  local raw_checkpoint="$1"
+  local loop_name loop_mark
+  case "$raw_checkpoint" in
+    ENTRY|TERM|UNSET)
+      printf '%s\n' "$raw_checkpoint"
+      return 0
+      ;;
+    terminal)
+      printf 'TERM\n'
+      return 0
+      ;;
+  esac
+  loop_name="$(lifecycle_loop_name_for_checkpoint "$raw_checkpoint")"
+  case "$loop_name" in
+    auto) loop_mark="A" ;;
+    doc) loop_mark="D" ;;
+    dev) loop_mark="V" ;;
+    *) loop_mark="A" ;;
+  esac
+  printf '%s-%s\n' "$loop_mark" "$raw_checkpoint"
+}
+
+display_lifecycle_expected_next_list() {
+  local raw_list="$1" item displayed=""
+  local normalized="${raw_list//,/|}"
+  local -a items=()
+  IFS='|' read -r -a items <<<"$normalized"
+  for item in "${items[@]}"; do
+    [[ -n "$item" ]] || continue
+    item="$(printf '%s' "$item" | sed 's/^ *//; s/ *$//')"
+    [[ -n "$item" ]] || continue
+    item="$(lifecycle_trace_display_id "$item")"
+    displayed="${displayed}${displayed:+|}${item}"
+  done
+  printf '%s\n' "$displayed"
+}
+
+lifecycle_expected_next_contains_checkpoint() {
+  local expected_list="$1" qualified_checkpoint="$2"
+  local normalized="|${expected_list//,/|}|"
+  [[ "$normalized" == *"|$qualified_checkpoint|"* ]]
+}
+
+append_lifecycle_trace_record() {
+  local project="$1" checkpoint="$2" stage="$3" phase="$4"
+  shift 4
+  local log_file seq_file lock_file kv key value sanitized_value
+  local loop_name loop_code trace_id trace_display_id from_checkpoint="" to_checkpoint="" expected_next="" expected_from_previous=""
+  local qualified_expected_from_previous="" display_from="" display_to="" transition_match="" outgoing_ok=""
+  local -a record_pairs=() extra_pairs=()
+  log_file="$(lifecycle_trace_log_file "$project")"
+  seq_file="$(lifecycle_trace_seq_file "$project")"
+  lock_file="$(lifecycle_trace_lock_file "$project")"
+  mkdir -p "$(dirname "$log_file")"
+  mkdir -p "$(dirname "$seq_file")"
+  : >"$lock_file"
+  loop_name="$(lifecycle_loop_name_for_checkpoint "$checkpoint")"
+  loop_code="$(lifecycle_loop_code_for_name "$loop_name")"
+  trace_id="$(qualify_lifecycle_checkpoint "$checkpoint" "$loop_code")"
+  trace_display_id="$(lifecycle_trace_display_id "$checkpoint")"
+  for kv in "$@"; do
+    key="${kv%%=*}"
+    value="${kv#*=}"
+    case "$key" in
+      from_checkpoint) from_checkpoint="$value" ;;
+      to_checkpoint) to_checkpoint="$value" ;;
+      expected_next) expected_next="$value" ;;
+      expected_from_previous) expected_from_previous="$value" ;;
+      *)
+        sanitized_value="$(sanitize_lifecycle_trace_kv "$project" "$key" "$value")"
+        extra_pairs+=("$key=$sanitized_value")
+        ;;
+    esac
+  done
+  case "$phase" in
+    IN)
+      display_from="ENTRY"
+      if [[ -n "$from_checkpoint" ]]; then
+        display_from="$(lifecycle_trace_display_id "$from_checkpoint")"
+        if [[ -n "$expected_from_previous" ]]; then
+          qualified_expected_from_previous="$(qualify_lifecycle_expected_next_list "$expected_from_previous" "$loop_code")"
+        fi
+        if [[ -n "$qualified_expected_from_previous" ]]; then
+          if lifecycle_expected_next_contains_checkpoint "$qualified_expected_from_previous" "$trace_id"; then
+            transition_match="1"
+          else
+            transition_match="0"
+          fi
+        fi
+      fi
+      record_pairs=("ph=IN" "me=$trace_display_id" "fr=$display_from")
+      [[ -n "$transition_match" ]] && record_pairs+=("ok=$transition_match")
+      ;;
+    OUT)
+      if [[ -n "$to_checkpoint" ]]; then
+        display_to="$(display_lifecycle_expected_next_list "$to_checkpoint")"
+        outgoing_ok="1"
+      elif [[ -n "$expected_next" ]]; then
+        display_to="$(display_lifecycle_expected_next_list "$expected_next")"
+        outgoing_ok="1"
+      else
+        display_to="UNSET"
+        outgoing_ok="0"
+      fi
+      record_pairs=("ph=OUT" "me=$trace_display_id" "to=$display_to" "ok=$outgoing_ok")
+      ;;
+    *)
+      log_error "unknown lifecycle trace phase: $phase"
+      return 1
+      ;;
+  esac
+  record_pairs+=("checkpoint=$checkpoint" "stage=$stage")
+  record_pairs+=("${extra_pairs[@]}")
+  python3 - "$log_file" "$seq_file" "$lock_file" "${record_pairs[@]}" <<'PY'
+from datetime import datetime, timezone
+import fcntl
+import pathlib
+import shlex
+import sys
+
+log_path = pathlib.Path(sys.argv[1])
+seq_path = pathlib.Path(sys.argv[2])
+lock_path = pathlib.Path(sys.argv[3])
+kv_pairs = sys.argv[4:]
+
+with lock_path.open("r+") as lock_handle:
+    fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+    try:
+        current = seq_path.read_text().strip() if seq_path.exists() else "0"
+        if not current.isdigit():
+            current = "0"
+        seq = int(current) + 1
+        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with log_path.open("a", encoding="utf-8") as handle:
+            parts = [timestamp, f"seq={seq}"]
+            for pair in kv_pairs:
+                key, _, value = pair.partition("=")
+                parts.append(f"{key}={shlex.quote(value)}")
+            handle.write(" ".join(parts) + "\n")
+        seq_path.write_text(f"{seq}\n")
+    finally:
+        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+PY
+}
+
+append_lifecycle_trace_in() {
+  local project="$1" checkpoint="$2" stage="$3"
+  shift 3
+  append_lifecycle_trace_record "$project" "$checkpoint" "$stage" "IN" "$@"
+}
+
+append_lifecycle_trace_out() {
+  local project="$1" checkpoint="$2" stage="$3"
+  shift 3
+  append_lifecycle_trace_record "$project" "$checkpoint" "$stage" "OUT" "$@"
+}
+
+append_lifecycle_trace() {
+  local project="$1" checkpoint="$2" stage="$3"
+  shift 3
+  append_lifecycle_trace_in "$project" "$checkpoint" "$stage" "$@"
+  append_lifecycle_trace_out "$project" "$checkpoint" "$stage" "$@"
 }
 
 config_file() {
@@ -1214,6 +1571,34 @@ interruption_dispatcher_pid_file() {
   echo "$(run_dir_for_project "$project")/interruption-dispatch.pid"
 }
 
+interruption_triage_lock_dir_for_intake() {
+  local project="$1" intake_id="$2"
+  echo "$(run_dir_for_project "$project")/interruption-triage-locks/$intake_id.lock"
+}
+
+acquire_interruption_triage_lock_for_intake() {
+  local project="$1" intake_id="$2"
+  local lock_dir state_file
+  lock_dir="$(interruption_triage_lock_dir_for_intake "$project" "$intake_id")"
+  state_file="$lock_dir/state.env"
+  mkdir -p "$(dirname "$lock_dir")"
+  if ! mkdir "$lock_dir" 2>/dev/null; then
+    return 1
+  fi
+  cat >"$state_file" <<EOF
+owner_pid="$$"
+acquired_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+EOF
+}
+
+release_interruption_triage_lock_for_intake() {
+  local project="$1" intake_id="$2"
+  local lock_dir
+  lock_dir="$(interruption_triage_lock_dir_for_intake "$project" "$intake_id")"
+  [[ -d "$lock_dir" ]] || return 0
+  rm -rf "$lock_dir"
+}
+
 latest_run_artifact_for_project() {
   local project="$1" pattern="$2" run_dir artifact_count
   local artifacts=()
@@ -1624,6 +2009,22 @@ pid_hint_from_file_without_process_inspection() {
   printf '%s\n' "$pid"
 }
 
+current_runtime_discovery_excluded_pids_csv() {
+  local pid="" parent="" csv="" seen_csv=""
+  pid="${BASHPID:-$$}"
+  while [[ -n "$pid" && "$pid" =~ ^[0-9]+$ && "$pid" != "0" ]]; do
+    case ",$seen_csv," in
+      *",$pid,"*) break ;;
+    esac
+    seen_csv="${seen_csv}${seen_csv:+,}$pid"
+    csv="${csv}${csv:+,}$pid"
+    parent="$(ps -p "$pid" -o ppid= 2>/dev/null | awk 'NR==1 {gsub(/^[[:space:]]+|[[:space:]]+$/, "", $0); print $0}')"
+    [[ -n "$parent" && "$parent" != "$pid" ]] || break
+    pid="$parent"
+  done
+  printf '%s\n' "$csv"
+}
+
 emit_indented_block() {
   local prefix="$1" text="$2"
   [[ -n "$text" ]] || return 0
@@ -1672,11 +2073,41 @@ live_status_activity_state_for_project() {
 
 discover_supervisor_pids() {
   local project="$1" excluded_pids="${2:-}"
-  local process_rows
+  local project_regex
   process_inspection_available || return 0
-  process_rows="$(ps -axo pid=,command= 2>/dev/null || true)"
-  [[ -n "$process_rows" ]] || return 0
-  awk -v p="$project" -v excluded="$excluded_pids" '
+  project_regex="$(printf '%s\n' "$project" | sed 's/[][(){}.^$+*?|\\]/\\&/g')"
+  if command -v pgrep >/dev/null 2>&1; then
+    {
+      pgrep -fal "runtime/freely start.*${project_regex}" 2>/dev/null || true
+      pgrep -fal "runtime/freely daemon-run.*${project_regex}" 2>/dev/null || true
+    } | awk -v p="$project" -v excluded="$excluded_pids" '
+      BEGIN {
+        split(excluded, raw, ",")
+        for (i in raw) {
+          if (raw[i] != "") {
+            skip[raw[i]] = 1
+          }
+        }
+      }
+      {
+        if (skip[$1]) {
+          next
+        }
+        for (i = 1; i <= NF; i++) {
+          if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+            print $1
+            next
+          }
+          if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+            print $1
+            next
+          }
+        }
+      }
+    '
+    return 0
+  fi
+  ps -axo pid=,command= 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
     BEGIN {
       split(excluded, raw, ",")
       for (i in raw) {
@@ -1700,12 +2131,132 @@ discover_supervisor_pids() {
         }
       }
     }
-  ' <<<"$process_rows"
+  '
 }
 
 discover_supervisor_pid() {
   local project="$1" excluded_pids="${2:-}"
   discover_supervisor_pids "$project" "$excluded_pids" | head -n 1
+}
+
+discover_manager_watchdog_pids() {
+  local project="$1" excluded_pids="${2:-}"
+  local project_regex
+  process_inspection_available || return 0
+  project_regex="$(printf '%s\n' "$project" | sed 's/[][(){}.^$+*?|\\]/\\&/g')"
+  if command -v pgrep >/dev/null 2>&1; then
+    pgrep -fal "runtime/freely ensure-manager.*${project_regex}" 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
+      BEGIN {
+        split(excluded, raw, ",")
+        for (i in raw) {
+          if (raw[i] != "") {
+            skip[raw[i]] = 1
+          }
+        }
+      }
+      index($0, "--watch") {
+        if (skip[$1]) {
+          next
+        }
+        for (i = 1; i <= NF; i++) {
+          if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+            print $1
+            next
+          }
+          if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+            print $1
+            next
+          }
+        }
+      }
+    '
+    return 0
+  fi
+  ps -axo pid=,command= 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
+    BEGIN {
+      split(excluded, raw, ",")
+      for (i in raw) {
+        if (raw[i] != "") {
+          skip[raw[i]] = 1
+        }
+      }
+    }
+    index($0, "runtime/freely ensure-manager") && index($0, "--watch") {
+      if (skip[$1]) {
+        next
+      }
+      for (i = 1; i <= NF; i++) {
+        if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+          print $1
+          next
+        }
+        if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+          print $1
+          next
+        }
+      }
+    }
+  '
+}
+
+discover_interruption_dispatcher_pids() {
+  local project="$1" excluded_pids="${2:-}"
+  local project_regex
+  process_inspection_available || return 0
+  project_regex="$(printf '%s\n' "$project" | sed 's/[][(){}.^$+*?|\\]/\\&/g')"
+  if command -v pgrep >/dev/null 2>&1; then
+    pgrep -fal "runtime/freely ensure-interruption-dispatch.*${project_regex}" 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
+      BEGIN {
+        split(excluded, raw, ",")
+        for (i in raw) {
+          if (raw[i] != "") {
+            skip[raw[i]] = 1
+          }
+        }
+      }
+      index($0, "--watch") {
+        if (skip[$1]) {
+          next
+        }
+        for (i = 1; i <= NF; i++) {
+          if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+            print $1
+            next
+          }
+          if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+            print $1
+            next
+          }
+        }
+      }
+    '
+    return 0
+  fi
+  ps -axo pid=,command= 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
+    BEGIN {
+      split(excluded, raw, ",")
+      for (i in raw) {
+        if (raw[i] != "") {
+          skip[raw[i]] = 1
+        }
+      }
+    }
+    index($0, "runtime/freely ensure-interruption-dispatch") && index($0, "--watch") {
+      if (skip[$1]) {
+        next
+      }
+      for (i = 1; i <= NF; i++) {
+        if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+          print $1
+          next
+        }
+        if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+          print $1
+          next
+        }
+      }
+    }
+  '
 }
 
 pid_matches_project() {
@@ -1849,6 +2400,12 @@ valid_supervisor_pid_for_project() {
   pid_matches_project "$pid" "$project" ""
 }
 
+valid_discovered_supervisor_pid_for_project() {
+  local project="$1" pid="$2"
+  pid_matches_project "$pid" "$project" "runtime/freely start" && return 0
+  pid_matches_project "$pid" "$project" "runtime/freely daemon-run"
+}
+
 valid_ensure_manager_watchdog_pid_for_project() {
   local project="$1" pid="$2"
   pid_matches_project "$pid" "$project" "runtime/freely ensure-manager --project"
@@ -1869,6 +2426,11 @@ interruption_dispatcher_pid_for_project() {
       return 0
     fi
   fi
+  pid="$(discover_interruption_dispatcher_pids "$project" | head -n 1)"
+  if [[ -n "$pid" ]]; then
+    printf '%s\n' "$pid" >"$pid_file"
+    printf '%s\n' "$pid"
+  fi
 }
 
 manager_watchdog_pid_for_project() {
@@ -1880,6 +2442,11 @@ manager_watchdog_pid_for_project() {
       printf '%s\n' "$pid"
       return 0
     fi
+  fi
+  pid="$(discover_manager_watchdog_pids "$project" | head -n 1)"
+  if [[ -n "$pid" ]]; then
+    printf '%s\n' "$pid" >"$pid_file"
+    printf '%s\n' "$pid"
   fi
 }
 
@@ -2550,7 +3117,23 @@ runtime_cross_tool_fallback_order_for_current_tool() {
 }
 
 runtime_tool_auth_dir() {
-  printf '%s\n' "$HOME/.ai-auth"
+  local default_dir project_dir
+  if [[ -n "${AI_TOOL_AUTH_DIR:-}" ]]; then
+    printf '%s\n' "$AI_TOOL_AUTH_DIR"
+    return 0
+  fi
+  default_dir="$HOME/.ai-auth"
+  if mkdir -p "$default_dir" 2>/dev/null; then
+    printf '%s\n' "$default_dir"
+    return 0
+  fi
+  if [[ -n "${PROJECT_ROOT:-}" ]]; then
+    project_dir="$(run_dir_for_project "$PROJECT_ROOT")/ai-auth"
+    mkdir -p "$project_dir" 2>/dev/null || true
+    printf '%s\n' "$project_dir"
+    return 0
+  fi
+  printf '%s\n' "$default_dir"
 }
 
 runtime_tool_active_slot_file() {
@@ -2559,7 +3142,37 @@ runtime_tool_active_slot_file() {
 }
 
 runtime_codex_legacy_active_slot_file() {
-  printf '%s\n' "$HOME/.codex/active-slot"
+  local default_dir project_dir
+  default_dir="$HOME/.codex"
+  if mkdir -p "$default_dir" 2>/dev/null; then
+    printf '%s\n' "$default_dir/active-slot"
+    return 0
+  fi
+  if [[ -n "${PROJECT_ROOT:-}" ]]; then
+    project_dir="$(run_dir_for_project "$PROJECT_ROOT")/codex-legacy-state"
+    mkdir -p "$project_dir" 2>/dev/null || true
+    printf '%s\n' "$project_dir/active-slot"
+    return 0
+  fi
+  printf '%s\n' "$default_dir/active-slot"
+}
+
+sanitize_utf8_file_in_place() {
+  local file="$1"
+  [[ -f "$file" ]] || return 1
+  python3 - "$file" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+data = path.read_bytes()
+text = data.decode("utf-8", "replace")
+invalid_count = text.count("\ufffd")
+clean = text.encode("utf-8")
+if clean != data:
+    path.write_bytes(clean)
+print(invalid_count)
+PY
 }
 
 runtime_read_tool_current_slot() {
@@ -3997,6 +4610,7 @@ reset_intake_claim_for_retry() {
 recover_stale_interruption_triage_claims() {
   local project="$1" threshold_secs="${2:-60}"
   local intake_root item_dir meta_file intake_id item_status claimed_by linked_artifact resolution_artifact claimed_at claimed_epoch now_epoch recovered_any
+  local lock_root lock_dir state_file owner_pid acquired_at acquired_epoch
   intake_root="$(intake_dir_for_project "$project")"
   [[ -d "$intake_root" ]] || return 0
   recovered_any="0"
@@ -4024,6 +4638,26 @@ recover_stale_interruption_triage_claims() {
   if [[ "$recovered_any" == "1" ]]; then
     log_info "recovered stale interruption triage claim(s)"
   fi
+
+  lock_root="$(run_dir_for_project "$project")/interruption-triage-locks"
+  [[ -d "$lock_root" ]] || return 0
+  while IFS= read -r lock_dir; do
+    state_file="$lock_dir/state.env"
+    [[ -f "$state_file" ]] || {
+      rm -rf "$lock_dir"
+      continue
+    }
+    owner_pid="$(meta_env_value "$state_file" "owner_pid")"
+    acquired_at="$(meta_env_value "$state_file" "acquired_at")"
+    if [[ "$owner_pid" =~ ^[0-9]+$ ]] && kill -0 "$owner_pid" 2>/dev/null; then
+      continue
+    fi
+    acquired_epoch="$(date -j -u -f '%Y-%m-%dT%H:%M:%SZ' "$acquired_at" '+%s' 2>/dev/null || true)"
+    if [[ -n "$acquired_epoch" ]] && (( now_epoch - acquired_epoch < threshold_secs )); then
+      continue
+    fi
+    rm -rf "$lock_dir"
+  done < <(find "$lock_root" -mindepth 1 -maxdepth 1 -type d | sort)
 }
 
 resolution_snapshot_for_project() {
@@ -8785,6 +9419,11 @@ manager_recheck_wait_for_supervisor_teardown_if_needed() {
     "supervisor_pid=$current_pid" \
     "last_exit_reason=${last_exit_reason:-unknown}" \
     "attempts=$wait_attempts"
+  append_lifecycle_trace "$project" "L201" "manager_waiting_for_supervisor_teardown" \
+    "supervisor_pid=$current_pid" \
+    "trigger=workcell_state_running_but_supervisor_down" \
+    "last_exit_reason=${last_exit_reason:-unknown}" \
+    "attempts=$wait_attempts"
 
   refreshed_pid="$current_pid"
   for ((attempt = 1; attempt <= wait_attempts; attempt++)); do
@@ -8800,6 +9439,9 @@ manager_recheck_wait_for_supervisor_teardown_if_needed() {
   if [[ -z "$refreshed_pid" ]]; then
     append_runtime_event "$project" "manager_recheck_supervisor_teardown_observed" \
       "last_exit_reason=${last_exit_reason:-unknown}"
+    append_lifecycle_trace "$project" "L202" "manager_supervisor_teardown_observed" \
+      "last_exit_reason=${last_exit_reason:-unknown}" \
+      "next=continue_recovery_selection"
   fi
 
   printf '%s\n' "$refreshed_pid"
@@ -8890,7 +9532,7 @@ project_bootstrap_launch_in_flight_from_unverified_supervisor_hint() {
 }
 
 manager_supervisor_pid_for_project() {
-  local project="$1" run_dir sp
+  local project="$1" run_dir sp excluded_pids=""
   run_dir="$(run_dir_for_project "$project")"
   if [[ -f "$run_dir/supervisor.pid" ]]; then
     sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
@@ -8901,6 +9543,13 @@ manager_supervisor_pid_for_project() {
   fi
   sp="$(authoritative_supervisor_pids_for_project "$project" | head -n 1)"
   if [[ -n "$sp" ]]; then
+    printf '%s\n' "$sp" >"$run_dir/supervisor.pid"
+    printf '%s\n' "$sp"
+    return 0
+  fi
+  excluded_pids="$(current_runtime_discovery_excluded_pids_csv)"
+  sp="$(discover_supervisor_pid "$project" "$excluded_pids")"
+  if valid_discovered_supervisor_pid_for_project "$project" "$sp"; then
     printf '%s\n' "$sp" >"$run_dir/supervisor.pid"
     printf '%s\n' "$sp"
   fi
@@ -8963,19 +9612,23 @@ runtime_unverified_pid_roles_for_project() {
 }
 
 ensure_interruption_dispatcher_ready_or_fail() {
-  local project="$1" dispatcher_pid attempts
-  for attempts in $(seq 1 50); do
+  local project="$1" dispatcher_pid attempts wait_attempts wait_sleep
+  wait_attempts="${FREELY_INTERRUPTION_DISPATCHER_READY_ATTEMPTS:-300}"
+  wait_sleep="${FREELY_INTERRUPTION_DISPATCHER_READY_SLEEP_SECS:-0.1}"
+  [[ "$wait_attempts" =~ ^[0-9]+$ ]] || wait_attempts=300
+  for attempts in $(seq 1 "$wait_attempts"); do
     dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
     if [[ -n "$dispatcher_pid" ]]; then
       return 0
     fi
-    sleep 0.1
+    sleep "$wait_sleep"
   done
   return 1
 }
 
 ensure_interruption_dispatcher_running_for_active_runtime() {
   local project="$1" dispatcher_pid
+  [[ -f "$(stop_marker_file "$project")" ]] && return 1
   dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
   if [[ -n "$dispatcher_pid" ]]; then
     return 0
@@ -8984,6 +9637,7 @@ ensure_interruption_dispatcher_running_for_active_runtime() {
     "supervisor_pid=$(manager_supervisor_pid_for_project "$project")" \
     "reason=missing_dispatcher"
   launch_interruption_dispatcher "$project"
+  [[ -f "$(stop_marker_file "$project")" ]] && return 1
   if ensure_interruption_dispatcher_ready_or_fail "$project"; then
     append_runtime_event "$project" "interruption_dispatcher_relaunch_ready" \
       "dispatcher_pid=$(interruption_dispatcher_pid_for_project "$project")"
@@ -8995,13 +9649,16 @@ ensure_interruption_dispatcher_running_for_active_runtime() {
 }
 
 ensure_manager_watchdog_ready_or_fail() {
-  local project="$1" watchdog_pid attempts
-  for attempts in $(seq 1 50); do
+  local project="$1" watchdog_pid attempts wait_attempts wait_sleep
+  wait_attempts="${FREELY_MANAGER_WATCHDOG_READY_ATTEMPTS:-300}"
+  wait_sleep="${FREELY_MANAGER_WATCHDOG_READY_SLEEP_SECS:-0.1}"
+  [[ "$wait_attempts" =~ ^[0-9]+$ ]] || wait_attempts=300
+  for attempts in $(seq 1 "$wait_attempts"); do
     watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
     if [[ -n "$watchdog_pid" ]]; then
       return 0
     fi
-    sleep 0.1
+    sleep "$wait_sleep"
   done
   return 1
 }
@@ -9087,6 +9744,10 @@ ensure_manager_once() {
   fi
   if [[ "$desired_state" == "running" ]] && execution_network_launch_block_active "$project" "$last_exit_reason"; then
     log_warn "manager bootstrap paused by bounded network-recovery gate (reason=${last_exit_reason})"
+    append_lifecycle_trace "$project" "L210" "manager_bootstrap_paused" \
+      "trigger=network_recovery_gate_active" \
+      "reason=${last_exit_reason:-unknown}" \
+      "next=wait"
     return 0
   fi
 
@@ -9103,21 +9764,45 @@ ensure_manager_once() {
       if [[ "${TOOL_AUTO_RECOVERY_SAME_TOOL_EXHAUSTED:-0}" == "1" ]]; then
         same_tool_blocked="1"
         log_warn "no ${AI_TOOL:-unknown} slot is ready for manager bootstrap; checking cross-tool fallback policy"
+        append_lifecycle_trace "$project" "L211" "manager_same_tool_recovery_blocked" \
+          "trigger=same_tool_slots_exhausted" \
+          "tool=${AI_TOOL:-unknown}" \
+          "next=cross_tool_fallback_selection"
       elif [[ "${TOOL_AUTO_RECOVERY_ENTRY_BLOCKED:-0}" == "1" ]]; then
         same_tool_blocked="1"
         log_warn "current ${AI_TOOL:-unknown} slot entry is unavailable; holding manager bootstrap until recovery path is ready"
+        append_lifecycle_trace "$project" "L212" "manager_same_tool_recovery_blocked" \
+          "trigger=entry_slot_unavailable" \
+          "tool=${AI_TOOL:-unknown}" \
+          "next=wait_or_cross_tool_fallback"
       fi
     fi
   fi
   current_ai_pid="$(manager_ai_pid_for_project "$project")"
   if project_bootstrap_launch_in_flight "$project" "$current_pid" "$current_ai_pid"; then
     log_info "manager bootstrap is still within ai launch grace; keeping supervisor pid=$current_pid alive"
+    append_lifecycle_trace "$project" "L220" "manager_keepalive" \
+      "trigger=bootstrap_ai_grace" \
+      "supervisor_pid=${current_pid:-unknown}" \
+      "next=keep_current_supervisor"
   elif project_runtime_auto_recovery_launch_in_flight "$project" "$current_pid" "$current_ai_pid"; then
     log_info "manager runtime auto-recovery is still within ai launch grace; keeping supervisor pid=$current_pid alive"
+    append_lifecycle_trace "$project" "L221" "manager_keepalive" \
+      "trigger=auto_recovery_ai_grace" \
+      "supervisor_pid=${current_pid:-unknown}" \
+      "next=keep_current_supervisor"
   elif project_bootstrap_launch_in_flight_from_unverified_supervisor_hint "$project"; then
     log_info "manager bootstrap is still within ai launch grace under degraded process inspection; keeping hinted supervisor pid=${supervisor_hint:-unknown} alive"
+    append_lifecycle_trace "$project" "L222" "manager_keepalive" \
+      "trigger=bootstrap_ai_grace_unverified_supervisor_hint" \
+      "supervisor_pid=${supervisor_hint:-unknown}" \
+      "next=keep_current_supervisor"
   elif [[ "$same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
     log_warn "manager supervisor is idle after recovery gate passed; restarting manager with the latest handoff"
+    append_lifecycle_trace "$project" "L223" "manager_idle_supervisor_restart" \
+      "trigger=supervisor_alive_ai_missing_after_grace" \
+      "supervisor_pid=${current_pid:-unknown}" \
+      "next=restart_manager_supervisor"
     restart_manager_supervisor_preserving_handoff "$project"
     current_pid=""
   fi
@@ -9126,12 +9811,22 @@ ensure_manager_once() {
 
   if [[ "${TOOL_AUTO_RECOVERY_DECISION:-none}" == "waiting" ]]; then
     log_warn "manager bootstrap remains blocked while every configured recovery path is unavailable"
+    append_lifecycle_trace "$project" "L230" "manager_recovery_waiting" \
+      "trigger=all_recovery_paths_unavailable" \
+      "tool=${AI_TOOL:-unknown}" \
+      "decision=${TOOL_AUTO_RECOVERY_DECISION:-none}" \
+      "next=wait"
     return 0
   fi
 
   if [[ "$same_tool_blocked" == "1" && "${TOOL_AUTO_RECOVERY_DECISION:-none}" != "selected" ]]; then
     log_warn "manager bootstrap skipped because no recovery-capable tool is ready"
     current_pid=""
+    append_lifecycle_trace "$project" "L231" "manager_bootstrap_skipped" \
+      "trigger=no_recovery_capable_tool_ready" \
+      "tool=${AI_TOOL:-unknown}" \
+      "decision=${TOOL_AUTO_RECOVERY_DECISION:-none}" \
+      "next=wait"
     return 0
   fi
 
@@ -9139,9 +9834,17 @@ ensure_manager_once() {
     && ([[ -n "$current_pid" ]] || project_bootstrap_launch_in_flight_from_unverified_supervisor_hint "$project"); then
     manager_runtime_recover_workers_if_needed "$project" >/dev/null || true
     log_info "manager supervisor already running (pid=${current_pid:-${supervisor_hint:-unknown}})"
+    append_lifecycle_trace "$project" "L232" "manager_supervisor_already_running" \
+      "supervisor_pid=${current_pid:-${supervisor_hint:-unknown}}" \
+      "decision=${TOOL_AUTO_RECOVERY_DECISION:-none}" \
+      "next=keep_current_supervisor"
     return 0
   fi
 
+  append_lifecycle_trace "$project" "L240" "manager_launch_requested" \
+    "decision=${TOOL_AUTO_RECOVERY_DECISION:-none}" \
+    "tool=${AI_TOOL:-unknown}" \
+    "next=launch_manager_supervisor"
   launch_manager_supervisor "$project"
   log_info "manager bootstrap requested"
 }
@@ -9485,42 +10188,84 @@ run_cleanup_followthrough() {
 run_interruption_handler_for_intake() {
   local handler_bin="$1" project="$2" intake_id="$3"
   local timeout_secs="${FREELY_INTERRUPTION_HANDLER_TIMEOUT_SECS:-30}"
-  local stdout_file stderr_file pid start_ts now_ts rc timed_out
+  local stdout_file stderr_file meta_file rc
 
   [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=30
   stdout_file="$(mktemp /tmp/freely-interruption-handler-stdout.XXXXXX)"
   stderr_file="$(mktemp /tmp/freely-interruption-handler-stderr.XXXXXX)"
+  meta_file="$(mktemp /tmp/freely-interruption-handler-meta.XXXXXX)"
   INTERRUPTION_HANDLER_STDOUT=""
   INTERRUPTION_HANDLER_STDERR=""
+  INTERRUPTION_HANDLER_TIMEOUT_SECS_USED="$timeout_secs"
+  INTERRUPTION_HANDLER_ELAPSED_MS="unknown"
+  INTERRUPTION_HANDLER_STDOUT_BYTES="0"
+  INTERRUPTION_HANDLER_STDERR_BYTES="0"
+  INTERRUPTION_HANDLER_EXIT_CODE="unknown"
 
-  perl -MPOSIX -e 'setsid() or die "setsid failed: $!"; exec @ARGV or die "exec failed: $!"' \
-    "$handler_bin" --project "$project" --intake-id "$intake_id" >"$stdout_file" 2>"$stderr_file" &
-  pid=$!
-  start_ts="$(date +%s)"
-  timed_out="0"
+  if python3 - "$handler_bin" "$project" "$intake_id" "$timeout_secs" "$stdout_file" "$stderr_file" "$meta_file" <<'PY'
+import pathlib
+import subprocess
+import sys
+import time
 
-  while kill -0 "$pid" 2>/dev/null; do
-    now_ts="$(date +%s)"
-    if (( now_ts - start_ts >= timeout_secs )); then
-      timed_out="1"
-      kill -TERM "-$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null || true
-      sleep 1
-      kill -KILL "-$pid" 2>/dev/null || kill -KILL "$pid" 2>/dev/null || true
-      break
-    fi
-    sleep 1
-  done
+handler_bin = sys.argv[1]
+project = sys.argv[2]
+intake_id = sys.argv[3]
+timeout_secs = int(sys.argv[4])
+stdout_path = pathlib.Path(sys.argv[5])
+stderr_path = pathlib.Path(sys.argv[6])
+meta_path = pathlib.Path(sys.argv[7])
 
-  if wait "$pid" 2>/dev/null; then
+start = time.monotonic()
+timed_out = False
+rc = 0
+stdout = ""
+stderr = ""
+try:
+    completed = subprocess.run(
+        [handler_bin, "--project", project, "--intake-id", intake_id],
+        capture_output=True,
+        text=True,
+        timeout=timeout_secs,
+        start_new_session=True,
+        check=False,
+    )
+    rc = completed.returncode
+    stdout = completed.stdout
+    stderr = completed.stderr
+except subprocess.TimeoutExpired as exc:
+    timed_out = True
+    rc = 124
+    stdout = exc.stdout or ""
+    stderr = exc.stderr or ""
+
+elapsed_ms = int((time.monotonic() - start) * 1000)
+stdout_path.write_text(stdout, encoding="utf-8")
+stderr_path.write_text(stderr, encoding="utf-8")
+meta_path.write_text(
+    f"timed_out={'1' if timed_out else '0'}\n"
+    f"elapsed_ms={elapsed_ms}\n"
+    f"stdout_bytes={len(stdout.encode('utf-8'))}\n"
+    f"stderr_bytes={len(stderr.encode('utf-8'))}\n"
+    f"exit_code={rc}\n",
+    encoding="utf-8",
+)
+raise SystemExit(rc)
+PY
+  then
     rc=0
   else
     rc=$?
   fi
   INTERRUPTION_HANDLER_STDOUT="$(cat "$stdout_file" 2>/dev/null || true)"
   INTERRUPTION_HANDLER_STDERR="$(cat "$stderr_file" 2>/dev/null || true)"
-  rm -f "$stdout_file" "$stderr_file"
+  INTERRUPTION_HANDLER_ELAPSED_MS="$(awk -F= '/^elapsed_ms=/{print $2; exit}' "$meta_file" 2>/dev/null || true)"
+  INTERRUPTION_HANDLER_STDOUT_BYTES="$(awk -F= '/^stdout_bytes=/{print $2; exit}' "$meta_file" 2>/dev/null || true)"
+  INTERRUPTION_HANDLER_STDERR_BYTES="$(awk -F= '/^stderr_bytes=/{print $2; exit}' "$meta_file" 2>/dev/null || true)"
+  INTERRUPTION_HANDLER_EXIT_CODE="$(awk -F= '/^exit_code=/{print $2; exit}' "$meta_file" 2>/dev/null || true)"
+  rm -f "$stdout_file" "$stderr_file" "$meta_file"
 
-  if [[ "$timed_out" == "1" ]]; then
+  if [[ "$rc" == "124" ]]; then
     return 124
   fi
   return "$rc"
@@ -9561,7 +10306,7 @@ apply_interruption_manager_decision() {
   validate_signal_ownership_or_fail "$ownership"
   case "$decision" in
     answer)
-      cmd_intake_claim --project "$project" --intake-id "$intake_id" --claimed-by interruption-manager-agent --reaction "${reaction:-followup}" --classification "${classification:-control}" --linked-artifact pending://interruption-manager-answer >/dev/null
+      cmd_intake_claim --project "$project" --intake-id "$intake_id" --claimed-by interruption-manager-agent --reaction "${reaction:-followup}" --classification "${classification:-control}" --linked-artifact pending://interruption-manager-answer --from-checkpoint L331 --expected-from-previous L310\|L320 >/dev/null
       resolution_file="$(mktemp /tmp/freely-interruption-answer.XXXXXX)"
       write_manager_answer_resolution_file "$intake_id" "$resolution_file" "$answer_text" "$why_text" "$restart_point"
       cmd_intake_resolve \
@@ -9572,6 +10317,8 @@ apply_interruption_manager_decision() {
         --classification "${classification:-control}" \
         --resolution-file "$resolution_file" \
         --absorption-target answer://manager-clarification \
+        --from-checkpoint L310 \
+        --expected-from-previous L320 \
         --linked-artifact answer://manager-clarification >/dev/null
       rm -f "$resolution_file"
       ;;
@@ -9582,6 +10329,8 @@ apply_interruption_manager_decision() {
         --claimed-by interruption-manager-agent \
         --reaction "${reaction:-followup}" \
         --classification "${classification:-discovery}" \
+        --from-checkpoint L331 \
+        --expected-from-previous L310\|L320 \
         --linked-artifact pending://interruption-manager-delegation >/dev/null
       resolution_file="$(mktemp /tmp/freely-interruption-delegate.XXXXXX)"
       write_delegate_handoff_resolution_file "$intake_id" "$resolution_file" "$why_text" "${classification:-discovery}" "$restart_point" "$ownership" "$handoff_text"
@@ -9594,6 +10343,8 @@ apply_interruption_manager_decision() {
         --resolution-file "$resolution_file" \
         --absorption-target "handoff://${restart_point:-pre_brainstorm}" \
         --status delegated \
+        --from-checkpoint L310 \
+        --expected-from-previous L320 \
         --linked-artifact pending://interruption-manager-delegation >/dev/null
       rm -f "$resolution_file"
       ;;
@@ -9606,23 +10357,50 @@ apply_interruption_manager_decision() {
 handle_interruption_intake_once() {
   local project="$1" intake_id="$2"
   local meta_file message_file status claimed_by handler_bin handler_output decision reaction classification why_text restart_point ownership handoff_text answer_text
+  local lock_acquired="0"
   meta_file="$(intake_item_meta_file "$project" "$intake_id")"
   message_file="$(intake_item_message_file "$project" "$intake_id")"
   [[ -f "$meta_file" && -f "$message_file" ]] || return 1
+  if ! acquire_interruption_triage_lock_for_intake "$project" "$intake_id"; then
+    return 1
+  fi
+  lock_acquired="1"
   status="$(meta_env_value "$meta_file" "STATUS")"
   claimed_by="$(meta_env_value "$meta_file" "CLAIMED_BY")"
-  [[ "$status" == "new" && -z "$claimed_by" ]] || return 1
+  if [[ "$status" != "new" || -n "$claimed_by" ]]; then
+    release_interruption_triage_lock_for_intake "$project" "$intake_id"
+    return 1
+  fi
 
   cmd_intake_claim \
     --project "$project" \
     --intake-id "$intake_id" \
     --claimed-by interruption-manager-agent \
     --reaction followup \
+    --from-checkpoint L300 \
+    --expected-from-previous L310 \
     --linked-artifact pending://interruption-manager-triage >/dev/null
+  append_lifecycle_trace_in "$project" "L330" "intake_handler_started" \
+    "intake_id=$intake_id" \
+    "handler=interruption-manager" \
+    "next=run_handler" \
+    "from_checkpoint=L310" \
+    "expected_from_previous=L330"
 
   handler_bin="$(interruption_handler_bin_for_project "$project")"
   if [[ ! -x "$handler_bin" ]]; then
     log_warn "interruption handler missing or not executable; returning intake to new: $intake_id"
+    append_lifecycle_trace_out "$project" "L330" "intake_handler_started" \
+      "intake_id=$intake_id" \
+      "handler=interruption-manager" \
+      "to_checkpoint=L332"
+    append_lifecycle_trace "$project" "L332" "intake_handler_path_unavailable" \
+      "intake_id=$intake_id" \
+      "trigger=handler_missing_or_not_executable" \
+      "next=return_to_new" \
+      "from_checkpoint=L330" \
+      "expected_from_previous=L331|L332|L333|L334|L335|L336" \
+      "expected_next=TERM"
     reset_intake_claim_for_retry "$project" "$intake_id"
     return 0
   fi
@@ -9632,33 +10410,95 @@ handle_interruption_intake_once() {
     local handler_rc="$?"
     if [[ "$handler_rc" == "124" ]]; then
       log_warn "interruption handler timed out; attempting conservative fallback: $intake_id"
+      append_lifecycle_trace_out "$project" "L330" "intake_handler_started" \
+        "intake_id=$intake_id" \
+        "handler=interruption-manager" \
+        "to_checkpoint=L333"
+      append_lifecycle_trace "$project" "L333" "intake_handler_failed" \
+        "intake_id=$intake_id" \
+        "trigger=timeout" \
+        "timeout_secs=$INTERRUPTION_HANDLER_TIMEOUT_SECS_USED" \
+        "elapsed_ms=${INTERRUPTION_HANDLER_ELAPSED_MS:-unknown}" \
+        "stdout_bytes=${INTERRUPTION_HANDLER_STDOUT_BYTES:-0}" \
+        "stderr_bytes=${INTERRUPTION_HANDLER_STDERR_BYTES:-0}" \
+        "next=conservative_fallback_or_retry" \
+        "from_checkpoint=L330" \
+        "expected_from_previous=L331|L332|L333|L334|L335|L336" \
+        "expected_next=TERM"
       if apply_interruption_handler_failure_fallback_if_applicable "$project" "$intake_id" "timeout"; then
+        release_interruption_triage_lock_for_intake "$project" "$intake_id"
         return 0
       fi
       log_warn "interruption handler timed out; returning intake to new: $intake_id"
     else
       log_warn "interruption handler exited non-zero; attempting conservative fallback: $intake_id"
+      append_lifecycle_trace_out "$project" "L330" "intake_handler_started" \
+        "intake_id=$intake_id" \
+        "handler=interruption-manager" \
+        "to_checkpoint=L333"
+      append_lifecycle_trace "$project" "L333" "intake_handler_failed" \
+        "intake_id=$intake_id" \
+        "trigger=nonzero_exit" \
+        "exit_code=$handler_rc" \
+        "elapsed_ms=${INTERRUPTION_HANDLER_ELAPSED_MS:-unknown}" \
+        "stdout_bytes=${INTERRUPTION_HANDLER_STDOUT_BYTES:-0}" \
+        "stderr_bytes=${INTERRUPTION_HANDLER_STDERR_BYTES:-0}" \
+        "next=conservative_fallback_or_retry" \
+        "from_checkpoint=L330" \
+        "expected_from_previous=L331|L332|L333|L334|L335|L336" \
+        "expected_next=TERM"
       if apply_interruption_handler_failure_fallback_if_applicable "$project" "$intake_id" "nonzero"; then
+        release_interruption_triage_lock_for_intake "$project" "$intake_id"
         return 0
       fi
       log_warn "interruption handler exited non-zero; returning intake to new: $intake_id"
     fi
     reset_intake_claim_for_retry "$project" "$intake_id"
+    release_interruption_triage_lock_for_intake "$project" "$intake_id"
     return 0
   fi
   handler_output="$INTERRUPTION_HANDLER_STDOUT"
   decision="$(printf '%s\n' "$handler_output" | awk -F= '/^DECISION=/{print substr($0,10); exit}')"
   if [[ -n "${INTERRUPTION_HANDLER_STDERR:-}" && -z "$decision" ]]; then
     log_warn "interruption handler wrote stderr without a decision; attempting conservative fallback: $intake_id"
+    append_lifecycle_trace_out "$project" "L330" "intake_handler_started" \
+      "intake_id=$intake_id" \
+      "handler=interruption-manager" \
+      "to_checkpoint=L334"
+    append_lifecycle_trace "$project" "L334" "intake_handler_stderr_without_decision" \
+      "intake_id=$intake_id" \
+      "elapsed_ms=${INTERRUPTION_HANDLER_ELAPSED_MS:-unknown}" \
+      "stdout_bytes=${INTERRUPTION_HANDLER_STDOUT_BYTES:-0}" \
+      "stderr_bytes=${INTERRUPTION_HANDLER_STDERR_BYTES:-0}" \
+      "next=conservative_fallback_or_retry" \
+      "from_checkpoint=L330" \
+      "expected_from_previous=L331|L332|L333|L334|L335|L336" \
+      "expected_next=TERM"
     if apply_interruption_handler_failure_fallback_if_applicable "$project" "$intake_id" "stderr"; then
+      release_interruption_triage_lock_for_intake "$project" "$intake_id"
       return 0
     fi
     log_warn "interruption handler wrote stderr without a decision; returning intake to new: $intake_id"
     reset_intake_claim_for_retry "$project" "$intake_id"
+    release_interruption_triage_lock_for_intake "$project" "$intake_id"
     return 0
   fi
   if [[ -n "${INTERRUPTION_HANDLER_STDERR:-}" && -n "$decision" ]]; then
     log_warn "interruption handler wrote stderr alongside a decision; continuing with stdout decision: $intake_id"
+    append_lifecycle_trace_out "$project" "L330" "intake_handler_started" \
+      "intake_id=$intake_id" \
+      "handler=interruption-manager" \
+      "to_checkpoint=L335"
+    append_lifecycle_trace "$project" "L335" "intake_handler_stderr_with_decision" \
+      "intake_id=$intake_id" \
+      "decision=$decision" \
+      "elapsed_ms=${INTERRUPTION_HANDLER_ELAPSED_MS:-unknown}" \
+      "stdout_bytes=${INTERRUPTION_HANDLER_STDOUT_BYTES:-0}" \
+      "stderr_bytes=${INTERRUPTION_HANDLER_STDERR_BYTES:-0}" \
+      "next=continue_with_stdout_decision" \
+      "from_checkpoint=L330" \
+      "expected_from_previous=L331|L332|L333|L334|L335|L336" \
+      "expected_next=L331"
   fi
   reaction="$(printf '%s\n' "$handler_output" | awk -F= '/^REACTION=/{print substr($0,10); exit}')"
   classification="$(printf '%s\n' "$handler_output" | awk -F= '/^CLASSIFICATION=/{print substr($0,16); exit}')"
@@ -9670,10 +10510,51 @@ handle_interruption_intake_once() {
   IFS='|' read -r classification restart_point ownership <<<"$(normalize_interruption_manager_contract "$classification" "$restart_point" "$ownership")"
   if [[ -z "$decision" ]]; then
     log_warn "interruption handler returned no decision; returning intake to new: $intake_id"
+    append_lifecycle_trace_out "$project" "L330" "intake_handler_started" \
+      "intake_id=$intake_id" \
+      "handler=interruption-manager" \
+      "to_checkpoint=L336"
+    append_lifecycle_trace "$project" "L336" "intake_handler_no_decision" \
+      "intake_id=$intake_id" \
+      "next=return_to_new" \
+      "from_checkpoint=L330" \
+      "expected_from_previous=L331|L332|L333|L334|L335|L336" \
+      "expected_next=TERM"
     reset_intake_claim_for_retry "$project" "$intake_id"
+    release_interruption_triage_lock_for_intake "$project" "$intake_id"
     return 0
   fi
+  local decision_from_checkpoint="L330"
+  if [[ -n "${INTERRUPTION_HANDLER_STDERR:-}" && -n "$decision" ]]; then
+    decision_from_checkpoint="L335"
+  else
+    append_lifecycle_trace_out "$project" "L330" "intake_handler_started" \
+      "intake_id=$intake_id" \
+      "handler=interruption-manager" \
+      "to_checkpoint=L331"
+  fi
+  append_lifecycle_trace_in "$project" "L331" "intake_handler_decision_parsed" \
+    "intake_id=$intake_id" \
+    "decision=$decision" \
+    "reaction=${reaction:-followup}" \
+    "classification=${classification:-unclassified}" \
+    "restart_point=${restart_point:-unknown}" \
+    "ownership=${ownership:-unknown}" \
+    "elapsed_ms=${INTERRUPTION_HANDLER_ELAPSED_MS:-unknown}" \
+    "stdout_bytes=${INTERRUPTION_HANDLER_STDOUT_BYTES:-0}" \
+    "stderr_bytes=${INTERRUPTION_HANDLER_STDERR_BYTES:-0}" \
+    "from_checkpoint=$decision_from_checkpoint" \
+    "expected_from_previous=L331"
+  append_lifecycle_trace_out "$project" "L331" "intake_handler_decision_parsed" \
+    "intake_id=$intake_id" \
+    "decision=$decision" \
+    "reaction=${reaction:-followup}" \
+    "classification=${classification:-unclassified}" \
+    "restart_point=${restart_point:-unknown}" \
+    "ownership=${ownership:-unknown}" \
+    "to_checkpoint=L310"
   apply_interruption_manager_decision "$project" "$intake_id" "$decision" "$reaction" "$classification" "$why_text" "$restart_point" "$ownership" "$handoff_text" "$answer_text"
+  [[ "$lock_acquired" == "1" ]] && release_interruption_triage_lock_for_intake "$project" "$intake_id"
 }
 
 ensure_interruption_dispatch_once() {
@@ -10404,10 +11285,13 @@ latest_interruption_resolution_file_for_project() {
 
 stop_project_runtime() {
   local project="$1" stop_reason="${2:-operator_stop}"
-  local sdir run_dir stop_marker supervisor_candidates sp
+  local sdir run_dir stop_marker supervisor_candidates sp watchdog_candidates dispatcher_candidates
+  local stop_lock_acquired="0"
   sdir="$(state_dir "$project")"
   run_dir="$(run_dir_for_project "$project")"
   mkdir -p "$run_dir"
+  acquire_project_start_lock_or_wait "$project" "freely_stop" || exit 1
+  stop_lock_acquired="1"
   stop_marker="$(stop_marker_file "$project")"
   : >"$stop_marker"
 
@@ -10425,7 +11309,7 @@ stop_project_runtime() {
     local wp
     wp="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
     if valid_ensure_manager_watchdog_pid_for_project "$project" "$wp"; then
-      terminate_pid_with_graceful_wait "$wp" "project manager watchdog during stop"
+      watchdog_candidates="$wp"
     elif [[ -n "$(pid_hint_from_file_without_process_inspection "$wp" 2>/dev/null || true)" ]]; then
       log_warn "refusing to kill unverified manager watchdog pid without project ownership proof: $wp"
     elif [[ -n "$wp" ]]; then
@@ -10433,17 +11317,45 @@ stop_project_runtime() {
     fi
     rm -f "$(ensure_manager_watchdog_pid_file "$project")"
   fi
+  while IFS= read -r sp; do
+    [[ -n "$sp" ]] || continue
+    if [[ -n "$watchdog_candidates" ]]; then
+      watchdog_candidates+=$'\n'
+    fi
+    watchdog_candidates+="$sp"
+  done < <(discover_manager_watchdog_pids "$project")
   if [[ -f "$(interruption_dispatcher_pid_file "$project")" ]]; then
     local dp
     dp="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
     if valid_interruption_dispatcher_pid_for_project "$project" "$dp"; then
-      terminate_pid_with_graceful_wait "$dp" "project interruption dispatcher during stop"
+      dispatcher_candidates="$dp"
     elif [[ -n "$(pid_hint_from_file_without_process_inspection "$dp" 2>/dev/null || true)" ]]; then
       log_warn "refusing to kill unverified interruption-dispatch.pid without project ownership proof: $dp"
     elif [[ -n "$dp" ]]; then
       log_warn "ignoring stale interruption-dispatch.pid that is not owned by project: $dp"
     fi
     rm -f "$(interruption_dispatcher_pid_file "$project")"
+  fi
+  while IFS= read -r sp; do
+    [[ -n "$sp" ]] || continue
+    if [[ -n "$dispatcher_candidates" ]]; then
+      dispatcher_candidates+=$'\n'
+    fi
+    dispatcher_candidates+="$sp"
+  done < <(discover_interruption_dispatcher_pids "$project")
+  if [[ -n "$watchdog_candidates" ]]; then
+    while IFS= read -r sp; do
+      [[ -n "$sp" ]] || continue
+      valid_ensure_manager_watchdog_pid_for_project "$project" "$sp" || continue
+      terminate_pid_with_graceful_wait "$sp" "project manager watchdog during stop"
+    done < <(printf '%s\n' "$watchdog_candidates" | awk '!seen[$0]++')
+  fi
+  if [[ -n "$dispatcher_candidates" ]]; then
+    while IFS= read -r sp; do
+      [[ -n "$sp" ]] || continue
+      valid_interruption_dispatcher_pid_for_project "$project" "$sp" || continue
+      terminate_pid_with_graceful_wait "$sp" "project interruption dispatcher during stop"
+    done < <(printf '%s\n' "$dispatcher_candidates" | awk '!seen[$0]++')
   fi
   if [[ -f "$run_dir/supervisor.pid" ]]; then
     sp="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
@@ -10462,7 +11374,7 @@ stop_project_runtime() {
   if [[ -n "$supervisor_candidates" ]]; then
     while IFS= read -r sp; do
       [[ -n "$sp" ]] || continue
-      valid_supervisor_pid_for_project "$project" "$sp" || continue
+      valid_discovered_supervisor_pid_for_project "$project" "$sp" || continue
       : >"$stop_marker"
       terminate_pid_with_graceful_wait "$sp" "project supervisor during stop"
     done < <(printf '%s\n' "$supervisor_candidates" | awk '!seen[$0]++')
@@ -10473,6 +11385,67 @@ stop_project_runtime() {
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   rm -f "$stop_marker"
   write_workcell_state "$project" "stopped" "down" "down" "$stop_reason"
+  if [[ "$stop_lock_acquired" == "1" ]]; then
+    release_project_start_lock_for_runtime "$project"
+  fi
+}
+
+project_has_active_runtime_processes() {
+  local project="$1"
+  [[ -n "$(manager_supervisor_pid_for_project "$project")" ]] && return 0
+  [[ -n "$(manager_watchdog_pid_for_project "$project")" ]] && return 0
+  [[ -n "$(interruption_dispatcher_pid_for_project "$project")" ]] && return 0
+  [[ -n "$(runtime_ai_pid_hint_for_project "$project")" ]] && return 0
+  return 1
+}
+
+project_has_authoritative_runtime_processes_for_user_precheck() {
+  local project="$1" run_dir supervisor_pid watchdog_pid dispatcher_pid
+  run_dir="$(run_dir_for_project "$project")"
+
+  cleanup_project_start_lock_if_stale_for_runtime "$project"
+  project_start_lock_snapshot_for_runtime "$project"
+  if [[ "${CURRENT_PROJECT_START_LOCK_STATE:-idle}" == "active" ]] \
+    && [[ "${CURRENT_PROJECT_START_LOCK_REASON:-none}" == "freely_start" ]] \
+    && [[ "${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" != "$$" ]]; then
+    return 0
+  fi
+
+  if [[ -f "$run_dir/supervisor.pid" ]]; then
+    supervisor_pid="$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)"
+    if valid_supervisor_pid_for_project "$project" "$supervisor_pid"; then
+      return 0
+    fi
+  fi
+  [[ -n "$(authoritative_supervisor_pids_for_project "$project" | head -n 1)" ]] && return 0
+
+  if [[ -f "$(ensure_manager_watchdog_pid_file "$project")" ]]; then
+    watchdog_pid="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
+    if valid_ensure_manager_watchdog_pid_for_project "$project" "$watchdog_pid"; then
+      return 0
+    fi
+  fi
+
+  if [[ -f "$(interruption_dispatcher_pid_file "$project")" ]]; then
+    dispatcher_pid="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
+    if valid_interruption_dispatcher_pid_for_project "$project" "$dispatcher_pid"; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+reject_repeated_user_start_if_running() {
+  local project="$1" command_name="$2"
+  if project_has_authoritative_runtime_processes_for_user_precheck "$project"; then
+    append_runtime_event "$project" "user_start_rejected_already_running" \
+      "command_name=$command_name"
+    log_error "$command_name refused: project runtime is already running for $project"
+    log_error "run: ./bin/freely stop --project \"$project\""
+    log_error "or:  ./bin/freely $command_name --project \"$project\" --force"
+    exit 2
+  fi
 }
 
 resolve_active_supervisor_pid_for_start() {
@@ -10480,7 +11453,7 @@ resolve_active_supervisor_pid_for_start() {
   local candidate_pid="" excluded_pids=""
   RESOLVED_ACTIVE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
-  excluded_pids="${BASHPID:-$$},${PPID:-}"
+  excluded_pids="$(current_runtime_discovery_excluded_pids_csv)"
   if [[ -f "$sup_pid_file" ]]; then
     candidate_pid="$(cat "$sup_pid_file" 2>/dev/null || true)"
     if valid_supervisor_pid_for_project "$project" "$candidate_pid"; then
@@ -10502,12 +11475,20 @@ resolve_active_supervisor_pid_for_start() {
     RESOLVED_ACTIVE_SUPERVISOR_PID="$candidate_pid"
     return 0
   fi
+  if valid_discovered_supervisor_pid_for_project "$project" "$candidate_pid" && { supervisor_startup_truth_ready_for_project "$project" "$candidate_pid" || project_bootstrap_launch_in_flight "$project" "$candidate_pid" ""; }; then
+    log_warn "recovered live project supervisor after supervisor.pid drift: $candidate_pid"
+    LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="process_discovery"
+    printf '%s\n' "$candidate_pid" >"$sup_pid_file"
+    RESOLVED_ACTIVE_SUPERVISOR_PID="$candidate_pid"
+    return 0
+  fi
   return 1
 }
 
 ensure_no_active_supervisor_conflict() {
   local project="$1" sup_pid_file="$2" child_pid_file="$3" allow_attach="${4:-0}"
   local old_pid="" attach_ai_pid_state="missing" role_hint unverified_roles=""
+  local attach_ready_attempts="${FREELY_ATTACH_REUSE_READY_ATTEMPTS:-30}"
   LAST_ATTACH_REUSE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_AI_PID_STATE="missing"
   resolve_active_supervisor_pid_for_start "$project" "$sup_pid_file" || true
@@ -10541,9 +11522,9 @@ ensure_no_active_supervisor_conflict() {
         LAST_ATTACH_REUSE_AI_PID_STATE="$attach_ai_pid_state"
         log_info "project runtime/control-plane startup already in flight; reusing supervisor pid=$old_pid"
         return 10
-      elif ! ensure_interruption_dispatcher_ready_or_fail "$project"; then
+      elif ! FREELY_INTERRUPTION_DISPATCHER_READY_ATTEMPTS="$attach_ready_attempts" ensure_interruption_dispatcher_ready_or_fail "$project"; then
         log_warn "project supervisor pid=$old_pid is live but interruption dispatcher is not ready; falling back to project-local repair"
-      elif [[ "$role_hint" == "manager" ]] && ! ensure_manager_watchdog_ready_or_fail "$project"; then
+      elif [[ "$role_hint" == "manager" ]] && ! FREELY_MANAGER_WATCHDOG_READY_ATTEMPTS="$attach_ready_attempts" ensure_manager_watchdog_ready_or_fail "$project"; then
         log_warn "project supervisor pid=$old_pid is live but manager watchdog is not ready; falling back to project-local repair"
       elif [[ "$role_hint" == "manager" && "$attach_ai_pid_state" != "confirmed_running" && "$attach_ai_pid_state" != "bootstrap_in_flight" ]]; then
         log_warn "project supervisor pid=$old_pid is live but manager ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
@@ -10578,6 +11559,8 @@ ensure_no_active_supervisor_conflict() {
 
 start_project_runtime() {
   local project="$1" entrypoint_mode="${2:-foreground}"
+  append_runtime_event "$project" "start_project_runtime_enter" \
+    "entrypoint_mode=$entrypoint_mode"
   # When process inspection is unavailable, runtime ownership falls back to cwd checks.
   # Anchor the supervisor itself to the target project so watchdog/attach logic can still
   # prove ownership in degraded environments.
@@ -10585,12 +11568,20 @@ start_project_runtime() {
     log_error "unable to enter project root before runtime start: $project"
     exit 1
   }
+  append_runtime_event "$project" "start_project_runtime_after_cd" \
+    "entrypoint_mode=$entrypoint_mode"
   load_config "$project"
+  append_runtime_event "$project" "start_project_runtime_after_load_config" \
+    "entrypoint_mode=$entrypoint_mode"
   register_project_in_registry "$project"
+  append_runtime_event "$project" "start_project_runtime_after_registry" \
+    "entrypoint_mode=$entrypoint_mode"
   check_doc_gate_or_fail "$project" || {
     log_error "start blocked by doc gate"
     exit 1
   }
+  append_runtime_event "$project" "start_project_runtime_after_doc_gate" \
+    "entrypoint_mode=$entrypoint_mode"
 
   local sdir run_dir logs_dir sup_pid_file child_pid_file loop_log
   local stop_requested=0
@@ -10604,7 +11595,11 @@ start_project_runtime() {
   loop_log="$logs_dir/loop.log"
   mkdir -p "$run_dir" "$logs_dir"
   ensure_codex_slot_switch_startup_ready_or_fail "$project" || exit 1
+  append_runtime_event "$project" "start_project_runtime_after_slot_switch_ready" \
+    "entrypoint_mode=$entrypoint_mode"
   preflight_codex_slot_recovery_before_start_or_fail "$project" || exit 1
+  append_runtime_event "$project" "start_project_runtime_after_slot_recovery" \
+    "entrypoint_mode=$entrypoint_mode"
   rm -f "$(stop_marker_file "$project")"
   LAST_ATTACH_REUSE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
@@ -10668,6 +11663,11 @@ start_project_runtime() {
     cleanup_intent="$(project_cleanup_runtime_intent "$PROJECT_ROOT" "${DESIRED_RUNTIME_STATE_VALUE:-stopped}" "${LAST_WORKCELL_EXIT_REASON:-supervisor_exit}")"
     effective_desired_state="${cleanup_intent%%|*}"
     effective_exit_reason="${cleanup_intent#*|}"
+    append_lifecycle_trace "$PROJECT_ROOT" "L090" "supervisor_cleanup_begin" \
+      "supervisor_pid=$$" \
+      "desired_state=${effective_desired_state:-stopped}" \
+      "exit_reason=${effective_exit_reason:-supervisor_exit}" \
+      "stop_requested=$cleanup_stop_requested"
 
     other_supervisors="$(authoritative_supervisor_pids_for_project "$PROJECT_ROOT" "$$" | head -n 1)"
     if [[ -n "$other_supervisors" ]]; then
@@ -10676,6 +11676,10 @@ start_project_runtime() {
         "replacement_supervisor_pid=$other_supervisors" \
         "desired_state=${effective_desired_state:-running}" \
         "exit_reason=${effective_exit_reason:-supervisor_exit}"
+      append_lifecycle_trace "$PROJECT_ROOT" "L091" "supervisor_cleanup_superseded" \
+        "supervisor_pid=$$" \
+        "replacement_supervisor_pid=$other_supervisors" \
+        "next=handoff_to_active_supervisor"
       clear_supervisor_identity_truth "$PROJECT_ROOT" "$$"
       rm -f "$sup_pid_file" "$child_pid_file"
       return 0
@@ -10711,6 +11715,11 @@ start_project_runtime() {
       rm -f "$(stop_marker_file "$PROJECT_ROOT")"
     fi
     write_workcell_state "$project" "${effective_desired_state:-stopped}" "down" "down" "${effective_exit_reason:-supervisor_exit}"
+    append_lifecycle_trace "$PROJECT_ROOT" "L092" "supervisor_cleanup_complete" \
+      "supervisor_pid=$$" \
+      "desired_state=${effective_desired_state:-stopped}" \
+      "exit_reason=${effective_exit_reason:-supervisor_exit}" \
+      "next=$( [[ "${effective_desired_state:-stopped}" == "running" ]] && printf 'restart_control_plane' || printf 'stopped' )"
     if [[ "${effective_desired_state:-stopped}" == "running" ]] && [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
       launch_interruption_dispatcher "$project"
       launch_manager_watchdog "$project"
@@ -10727,19 +11736,31 @@ start_project_runtime() {
     "project=$project" \
     "role_hint=$(role_hint_for_project "$project")" \
     "entrypoint_mode=$entrypoint_mode"
+  append_lifecycle_trace "$project" "L010" "supervisor_started" \
+    "supervisor_pid=$$" \
+    "project=$project" \
+    "role_hint=$(role_hint_for_project "$project")" \
+    "entrypoint_mode=$entrypoint_mode" \
+    "from_checkpoint=L001" \
+    "expected_from_previous=L010" \
+    "expected_next=L020"
   write_workcell_state "$project" "running" "up" "down" "starting"
   write_supervisor_identity_truth "$project" "$$" "$entrypoint_mode"
   release_project_start_lock_for_runtime "$project"
   trap cleanup_supervisor EXIT
   trap request_stop INT TERM
+  exit_if_stop_requested_before_launch
   ensure_interruption_dispatcher_running_for_active_runtime "$project" || {
+    exit_if_stop_requested_before_launch
     log_error "freely interruption dispatcher did not become ready for project: $project"
     log_error "try: ./bin/freely ensure-interruption-dispatch --project \"$project\" --watch"
     exit 1
   }
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
+    exit_if_stop_requested_before_launch
     launch_manager_watchdog "$project"
     ensure_manager_watchdog_ready_or_fail "$project" || {
+      exit_if_stop_requested_before_launch
       log_error "freely manager watchdog did not become ready for project: $project"
       log_error "try: ./bin/freely ensure-manager --project \"$project\" --watch"
       exit 1
@@ -10797,8 +11818,39 @@ start_project_runtime() {
       write_session_handoff "$PROJECT_ROOT" "$LAUNCH_ROTATION_REASON"
       log_info "rotating session via fresh_with_handoff (reason=$LAUNCH_ROTATION_REASON)"
     fi
+    append_lifecycle_trace "$PROJECT_ROOT" "L020" "prompt_build_begin" \
+      "supervisor_pid=$$" \
+      "launch_kind=$mode_name" \
+      "rotation_reason=${LAUNCH_ROTATION_REASON:-none}" \
+      "prompt_file=$prompt_file" \
+      "from_checkpoint=L010" \
+      "expected_from_previous=L020" \
+      "expected_next=L021"
+    local prompt_utf8_invalid_count="0"
     build_prompt >"$prompt_file"
+    prompt_utf8_invalid_count="$(sanitize_utf8_file_in_place "$prompt_file" 2>/dev/null || printf '0\n')"
+    if [[ "${prompt_utf8_invalid_count:-0}" =~ ^[0-9]+$ ]] && (( prompt_utf8_invalid_count > 0 )); then
+      append_runtime_event "$project" "prompt_utf8_sanitized" \
+        "supervisor_pid=$$" \
+        "prompt_file=$prompt_file" \
+        "invalid_sequence_count=$prompt_utf8_invalid_count"
+    fi
+    append_lifecycle_trace "$PROJECT_ROOT" "L021" "prompt_build_complete" \
+      "supervisor_pid=$$" \
+      "launch_kind=$mode_name" \
+      "prompt_file=$prompt_file" \
+      "utf8_sanitized=${prompt_utf8_invalid_count:-0}" \
+      "from_checkpoint=L020" \
+      "expected_from_previous=L021" \
+      "expected_next=L022"
     materialize_required_manager_continuity_startup_stub "$PROJECT_ROOT" "$prompt_file" "$mode_name" || true
+    append_lifecycle_trace "$PROJECT_ROOT" "L022" "manager_startup_continuity_stub_checked" \
+      "supervisor_pid=$$" \
+      "launch_kind=$mode_name" \
+      "prompt_file=$prompt_file" \
+      "from_checkpoint=L021" \
+      "expected_from_previous=L022" \
+      "expected_next=L040"
     if [[ -n "$delegated_pending_ids" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
       delegated_consumed_ids="$delegated_pending_ids"
       delegated_consumed_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
@@ -10826,6 +11878,17 @@ start_project_runtime() {
       "rotation_reason=${LAUNCH_ROTATION_REASON:-none}" \
       "prompt_file=$prompt_file" \
       "cycle_log=$cycle_log"
+    append_lifecycle_trace "$project" "L040" "ai_launch_begin" \
+      "supervisor_pid=$$" \
+      "tool=$AI_TOOL" \
+      "tool_adapter=${tool_adapter:-unknown}" \
+      "launch_kind=$mode_name" \
+      "rotation_reason=${LAUNCH_ROTATION_REASON:-none}" \
+      "prompt_file=$prompt_file" \
+      "cycle_log=$cycle_log" \
+      "from_checkpoint=L022" \
+      "expected_from_previous=L040" \
+      "expected_next=L041"
     set +e
     {
       echo "===== $(date '+%F %T %Z') mode=$mode_name tool=$AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
@@ -10880,6 +11943,16 @@ start_project_runtime() {
     worktree_dirty="0"
     next_restart_delay="${RESTART_DELAY:-2}"
     launch_resume_target="$(tool_runtime_resume_target_before_launch "$AI_TOOL")"
+    append_lifecycle_trace "$project" "L041" "ai_launch_observed" \
+      "supervisor_pid=$$" \
+      "tool=$AI_TOOL" \
+      "launch_kind=$mode_name" \
+      "child_pid=${child_pid:-unknown}" \
+      "prompt_file=$prompt_file" \
+      "cycle_log=$cycle_log" \
+      "from_checkpoint=L040" \
+      "expected_from_previous=L041" \
+      "expected_next=L042"
     if [[ "$AI_TOOL" == "codex" && -n "$tool_session_id" ]]; then
       tool_jsonl_path="$(find_codex_jsonl_path_for_session "$tool_session_id")"
       context_ratio="$(extract_latest_codex_context_ratio_from_jsonl "$tool_jsonl_path")"
@@ -11065,6 +12138,20 @@ start_project_runtime() {
       "rate_limit_reason=${rate_limit_reason:-none}" \
       "network_failure_reason=${network_failure_reason:-none}" \
       "exit_reason=$LAST_WORKCELL_EXIT_REASON"
+    append_lifecycle_trace "$project" "L042" "ai_cycle_finished" \
+      "supervisor_pid=$$" \
+      "tool=$AI_TOOL" \
+      "launch_kind=$mode_name" \
+      "rc=$rc" \
+      "child_pid=${child_pid:-unknown}" \
+      "session_id=${tool_session_id:-unavailable}" \
+      "resume_target=${tool_resume_target:-unavailable}" \
+      "jsonl_path=${tool_jsonl_path:-unavailable}" \
+      "cycle_log=$cycle_log" \
+      "exit_reason=$LAST_WORKCELL_EXIT_REASON" \
+      "from_checkpoint=L041" \
+      "expected_from_previous=L042" \
+      "expected_next=L020|L090|L201|L210|L230|TERM"
 
     log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, secondary_rate_limit_used_percent=${secondary_rate_limit_used_percent:-unavailable}, secondary_rate_limit_resets_at=${secondary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
     rm -f "$child_pid_file"
@@ -11135,10 +12222,22 @@ cmd_start() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
+  trap "release_project_start_lock_for_runtime '$project'" EXIT
+  append_lifecycle_trace "$project" "L001" "start_requested" \
+    "entrypoint=foreground" \
+    "force=$force" \
+    "expected_next=L010"
+  append_runtime_event "$project" "user_start_command_received" \
+    "force=$force"
   if [[ "$force" == "1" ]]; then
     log_info "forcing project-local runtime rebuild before start"
     stop_project_runtime "$project" "start_force"
+  else
+    reject_repeated_user_start_if_running "$project" "start"
   fi
+  append_runtime_event "$project" "user_start_precheck_clear" \
+    "force=$force"
   start_project_runtime "$project" "foreground"
 }
 
@@ -11163,16 +12262,23 @@ cmd_restart() {
 }
 
 wait_for_daemon_supervisor_ready_or_fail() {
-  local project="$1" launcher_pid="${2:-}" wait_secs="${3:-15}" started_at now supervisor_pid
-  [[ "$wait_secs" =~ ^[0-9]+$ ]] || wait_secs=15
+  local project="$1" launcher_pid="${2:-}" wait_secs="${3:-15}" started_at now supervisor_pid observed_supervisor_pid=""
+  [[ "$wait_secs" =~ ^[0-9]+$ ]] || wait_secs=60
   started_at="$(date +%s)"
   while true; do
     supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+    if [[ -n "$supervisor_pid" ]]; then
+      observed_supervisor_pid="$supervisor_pid"
+    fi
+    if [[ -n "$observed_supervisor_pid" ]] && supervisor_startup_truth_ready_for_project "$project" "$observed_supervisor_pid"; then
+      printf '%s\n' "$observed_supervisor_pid"
+      return 0
+    fi
     if [[ -n "$supervisor_pid" ]] && supervisor_startup_truth_ready_for_project "$project" "$supervisor_pid"; then
       printf '%s\n' "$supervisor_pid"
       return 0
     fi
-    if [[ -n "$launcher_pid" ]] && ! kill -0 "$launcher_pid" 2>/dev/null; then
+    if [[ -n "$launcher_pid" ]] && ! kill -0 "$launcher_pid" 2>/dev/null && [[ -z "$observed_supervisor_pid" ]]; then
       break
     fi
     now="$(date +%s)"
@@ -11186,8 +12292,10 @@ wait_for_daemon_supervisor_ready_or_fail() {
 
 launch_project_runtime_daemon_or_fail() {
   local project="$1"
-  local runtime_script launcher_log launcher_pid supervisor_pid
+  local runtime_script launcher_log launcher_pid supervisor_pid wait_secs
   runtime_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely"
+  wait_secs="${FREELY_DAEMON_READY_WAIT_SECS:-60}"
+  [[ "$wait_secs" =~ ^[0-9]+$ ]] || wait_secs=60
   mkdir -p "$(logs_dir_for_project "$project")"
   launcher_log="$(logs_dir_for_project "$project")/daemon-launch.log"
   nohup bash -lc '
@@ -11198,7 +12306,7 @@ launch_project_runtime_daemon_or_fail() {
     exec -a "runtime/freely daemon-run --project $project" bash "$runtime_script" daemon-run --project "$project"
   ' bash "$project" "$runtime_script" >>"$launcher_log" 2>&1 < /dev/null &
   launcher_pid=$!
-  if ! supervisor_pid="$(wait_for_daemon_supervisor_ready_or_fail "$project" "$launcher_pid" 15)"; then
+  if ! supervisor_pid="$(wait_for_daemon_supervisor_ready_or_fail "$project" "$launcher_pid" "$wait_secs")"; then
     log_error "daemon start did not materialize a live supervisor for project: $project"
     log_error "see: $launcher_log"
     if [[ -f "$launcher_log" ]]; then
@@ -11222,10 +12330,22 @@ cmd_daemon_start() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
+  trap "release_project_start_lock_for_runtime '$project'" EXIT
+  append_lifecycle_trace "$project" "L001" "start_requested" \
+    "entrypoint=daemon" \
+    "force=$force" \
+    "expected_next=L010"
+  append_runtime_event "$project" "user_daemon_start_command_received" \
+    "force=$force"
   if [[ "$force" == "1" ]]; then
     log_info "forcing project-local runtime rebuild before daemon start"
     stop_project_runtime "$project" "daemon_start_force"
+  else
+    reject_repeated_user_start_if_running "$project" "daemon start"
   fi
+  append_runtime_event "$project" "user_daemon_start_precheck_clear" \
+    "force=$force"
   launch_project_runtime_daemon_or_fail "$project"
 }
 
@@ -11269,9 +12389,10 @@ cmd_daemon_logs() {
   project="$(resolve_project_or_fail "$project")"
   case "$file_kind" in
     runtime-events) target_file="$(runtime_events_log_file "$project")" ;;
+    lifecycle-trace) target_file="$(lifecycle_trace_log_file "$project")" ;;
     loop) target_file="$(logs_dir_for_project "$project")/loop.log" ;;
     *)
-      log_error "unsupported --file: $file_kind (supported: runtime-events, loop)"
+      log_error "unsupported --file: $file_kind (supported: runtime-events, lifecycle-trace, loop)"
       exit 1
       ;;
   esac
@@ -11610,13 +12731,20 @@ cmd_intake_chat() {
   intake_id="$(next_intake_id "$project" "$message")"
   write_intake_item "$project" "$intake_id" "$author" "$channel" "new" "" "pending://unclassified" "" "[]" "$message"
   log_info "intake recorded: $intake_id"
+  append_lifecycle_trace "$project" "L300" "intake_recorded" \
+    "intake_id=$intake_id" \
+    "author=$author" \
+    "channel=$channel" \
+    "status=new" \
+    "expected_next=L310"
   echo "intake_id: $intake_id"
   echo "intake_path: $(intake_dir_for_project "$project")/$intake_id"
 }
 
 cmd_intake_claim() {
-  local project="" intake_id="" claimed_by="" reaction="" classification="" delegated_worktree="" linked_artifact="pending://claim-unlinked" status=""
+  local project="" intake_id="" claimed_by="" reaction="" classification="" delegated_worktree="" linked_artifact="pending://claim-unlinked" status="" from_checkpoint="" expected_from_previous=""
   local meta_file claimed_at
+  local -a trace_args=()
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -11626,6 +12754,8 @@ cmd_intake_claim() {
       --classification) classification="${2:-}"; shift 2 ;;
       --delegated-worktree) delegated_worktree="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --linked-artifact) linked_artifact="${2:-}"; shift 2 ;;
+      --from-checkpoint) from_checkpoint="${2:-}"; shift 2 ;;
+      --expected-from-previous) expected_from_previous="${2:-}"; shift 2 ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
@@ -11644,6 +12774,17 @@ cmd_intake_claim() {
   rewrite_existing_intake_item \
     "$project" "$intake_id" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "$reaction" "$claimed_by" "$claimed_at" "" ""
   log_info "intake claimed: $intake_id"
+  [[ -n "$from_checkpoint" ]] && trace_args+=("from_checkpoint=$from_checkpoint")
+  [[ -n "$expected_from_previous" ]] && trace_args+=("expected_from_previous=$expected_from_previous")
+  append_lifecycle_trace "$project" "L310" "intake_claimed" \
+    "intake_id=$intake_id" \
+    "claimed_by=$claimed_by" \
+    "reaction=$reaction" \
+    "classification=${classification:-unclassified}" \
+    "status=$status" \
+    "delegated_worktree=${delegated_worktree:-none}" \
+    "expected_next=$(if [[ -z "$classification" ]]; then printf 'L330'; else printf 'L320'; fi)" \
+    "${trace_args[@]}"
   echo "intake_id: $intake_id"
   echo "status: $status"
   echo "reaction: $reaction"
@@ -11651,8 +12792,9 @@ cmd_intake_claim() {
 
 cmd_intake_resolve() {
   local project="" intake_id="" resolved_by="" reaction="" classification="" linked_artifact="pending://resolution-unlinked" delegated_worktree="" resolution_file="" absorption_target="" status="absorbed"
-  local session_refs_override=""
+  local session_refs_override="" from_checkpoint="" expected_from_previous=""
   local meta_file claimed_by claimed_at reaction_existing classification_existing delegated_existing linked_existing resolution_content resolution_dir resolution_artifact
+  local -a trace_args=()
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -11665,6 +12807,8 @@ cmd_intake_resolve() {
       --resolution-file) resolution_file="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --absorption-target) absorption_target="${2:-}"; shift 2 ;;
       --status) status="${2:-}"; shift 2 ;;
+      --from-checkpoint) from_checkpoint="${2:-}"; shift 2 ;;
+      --expected-from-previous) expected_from_previous="${2:-}"; shift 2 ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
@@ -11729,6 +12873,19 @@ cmd_intake_resolve() {
     fi
   fi
   log_info "intake resolved: $intake_id"
+  [[ -n "$from_checkpoint" ]] && trace_args+=("from_checkpoint=$from_checkpoint")
+  [[ -n "$expected_from_previous" ]] && trace_args+=("expected_from_previous=$expected_from_previous")
+  append_lifecycle_trace "$project" "L320" "intake_resolved" \
+    "intake_id=$intake_id" \
+    "resolved_by=$resolved_by" \
+    "reaction=$reaction" \
+    "classification=${classification:-unclassified}" \
+    "status=$status" \
+    "absorption_target=$absorption_target" \
+    "delegated_worktree=${delegated_worktree:-none}" \
+    "resolution_artifact=$resolution_artifact" \
+    "expected_next=terminal" \
+    "${trace_args[@]}"
   echo "intake_id: $intake_id"
   echo "status: $status"
   echo "resolution_artifact: $resolution_artifact"
@@ -12813,4 +13970,5 @@ main() {
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   main "$@"
+  exit $?
 fi
