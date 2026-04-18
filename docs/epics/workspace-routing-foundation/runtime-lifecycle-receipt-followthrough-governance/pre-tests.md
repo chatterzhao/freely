@@ -57,6 +57,11 @@
 ### Guarded merge path preserves the receipt closure
 - id: `receipt-followthrough-guarded-merge`
 - requirement: `Feature -> test-pre-merge -> develop guarded replay preserves the receipt-ledger followthrough without reopening runtime implementation scope.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#3,tasks.md#4`
+- case_design: `Merge the followthrough feature into the disposable followthrough test-pre-merge batch, rerun governance-check there, then guardedly replay that batch into develop and confirm the guarded path consumes this owner rather than raw ledger-only drift.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
