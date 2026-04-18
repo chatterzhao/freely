@@ -15,6 +15,7 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews`
 - depends_on:
@@ -46,11 +47,11 @@ Because direct protected-root edits are forbidden and candidate-only closure is 
 
 ## Acceptance
 
-1. The develop-bound followthrough diff carries concrete issue, pre-tests, progress, and review artifacts.
+1. The develop-bound followthrough diff carries concrete issue, pre-tests, progress, tasks, and review artifacts.
 2. `protected-branch-merge-receipt-backfills.md` contains the missing `dc436573...` and `f7145cc...` entries with bounded owner evidence.
-3. `./bin/governance-check` passes from the followthrough lane.
-4. Canonical develop absorbs the ledger repair through guarded replay and push remains clean.
-5. The temporary followthrough feature and test-pre-merge worktrees are retired after merge.
+3. `./bin/pretests-gate --project <worktree> --issue docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md` passes.
+4. `./bin/governance-check` passes.
+5. Canonical develop absorbs the ledger repair through guarded replay and the temporary followthrough worktrees are retired after merge.
 
 ## Verification
 
@@ -65,6 +66,7 @@ Because direct protected-root edits are forbidden and candidate-only closure is 
 - `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/candidates.md`
 - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
+- `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
 - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
