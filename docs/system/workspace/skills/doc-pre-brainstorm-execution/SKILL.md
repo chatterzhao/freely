@@ -12,6 +12,8 @@ description: 执行 pre-brainstorm 前置收敛环，负责把新问题收敛为
 - 把 `C-{issue-id}` candidate 原子同步进 `docs/milestones.md` 的 `M-{issue-id}` 候选位。
 - 明确下一跳是继续 pre-brainstorm，还是进入 `doc-ibm-execution`。
 - 三个 loop 下 doc-loop 的整体能力归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`。
+- 该文档是 whole-app lifecycle / logic 的唯一细节真源；本 skill 只定义 pre-brainstorm 执行步骤，不平行维护 three-loop 总图或 terminal semantics。
+- 若 pre-brainstorm 的 loop placement、回流语义或 reroute 语义变化，必须先同步检查该真源，再更新本 skill。
 
 ## 不负责
 

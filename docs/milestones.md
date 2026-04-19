@@ -69,6 +69,30 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `This narrow followthrough owner carries the final receipt-ledger repair for the absorbed runtime lifecycle batch and should retire the temporary followthrough feature and test-pre-merge worktrees immediately after canonical develop absorbs it.`
 
+1. `I-20260419-0915-A`
+- title: Three-loop lifecycle single-source governance followthrough
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-three-loop-lifecycle-single-source-governance-followthrough.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/candidates.md`
+- follow_on_to: `I-20260324-0405`
+- evidence:
+  - `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/brainstorms.md`
+  - `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/candidates.md`
+  - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+  - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-three-loop-lifecycle-single-source-governance-followthrough.md`
+  - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260419-three-loop-lifecycle-single-source-followthrough-verification.md`
+  - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-three-loop-model-refactor --issue docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+  - `./bin/governance-check`
+- completion_note: `This narrow governance-only followthrough keeps the detailed lifecycle model in one canonical document and requires downstream consumers to read/sync against it before the temporary feature and test-pre-merge worktrees retire.`
+
 1. `I-20260414-0255-A`
 - title: Freely start after-failure recovery handoff race root cause fix
 - milestone_state: committed
@@ -199,6 +223,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/candidates.md`
 - next_action: Candidate mirror only. `I-20260418-1900-A` is now the canonical owner for the runtime lifecycle receipt-ledger followthrough and immediate retirement of the temporary followthrough worktrees.
 - revisit_trigger: Re-open only if canonical develop still surfaces receipt-gap drift after this bounded ledger repair, or if future receipt-ledger closures prove this followthrough pattern needs a reusable owner family.
+
+1. `C-20260419-0915-A`
+- title: Three-loop lifecycle single-source governance followthrough
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/candidates.md`
+- next_action: Candidate mirror only. `I-20260419-0915-A` is now the canonical owner for the three-loop single-source lifecycle governance followthrough and retirement of the temporary merge worktrees after guarded replay.
+- revisit_trigger: Re-open only if canonical develop still permits parallel detailed lifecycle truth to drift across active docs or if downstream consumer docs prove the read-and-sync contract is insufficient.
 
 1. `C-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance
