@@ -125,4 +125,4 @@
 - case_design: `Merge feature/runtime-process-leak-20260417 into test-pre-merge-runtime-lifecycle-20260417 with merge-guarded, rerun the focused regression set plus governance-check there, and record the replay in a closeout verification artifact the develop gate can consume.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260419-runtime-start-stop-lifecycle-and-process-leak-develop-promote-verification.md`
