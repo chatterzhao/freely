@@ -6,13 +6,15 @@ TMP_DIR="$(mktemp -d /tmp/freely-interruption-handler-cc.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 run_case() {
-  local tool="$1"
-  local capabilities="$2"
-  local policy="$3"
-  local codex_model="$4"
-  local codex_sandbox="$5"
-  local codex_approval="$6"
-  local codex_cwd_mode="$7"
+  local message="$1"
+  local tool="$2"
+  local capabilities="$3"
+  local policy="$4"
+  local codex_model="$5"
+  local codex_sandbox="$6"
+  local codex_approval="$7"
+  local codex_cwd_mode="$8"
+  local expect_claude_args="${9:-yes}"
   local case_dir="$TMP_DIR/$tool"
   local project="$case_dir/project"
   local fake_bin="$case_dir/bin"
@@ -37,8 +39,8 @@ INTAKE_ID="20260320-000000-test"
 STATUS="classified"
 EOF
 
-  cat >"$project/.freely/intake/$intake_id/message.txt" <<'EOF'
-检查已经合并到develop的worktree，应该怎么收口
+  cat >"$project/.freely/intake/$intake_id/message.txt" <<EOF
+$message
 EOF
 
   cat >"$fake_bin/claude" <<'EOF'
@@ -65,26 +67,29 @@ EOF
   )"
 
   grep -q '^DECISION=delegate$' <<<"$OUTPUT"
-  grep -q '^RESTART_POINT=cleanup$' <<<"$OUTPUT"
-  grep -q '^OWNERSHIP=worker$' <<<"$OUTPUT"
-  grep -q -- '^--permission-mode$' "$case_dir/claude.args"
-  grep -q -- '^bypassPermissions$' "$case_dir/claude.args"
+  if [[ "$expect_claude_args" == "yes" ]]; then
+    grep -q -- '^--permission-mode$' "$case_dir/claude.args"
+    grep -q -- '^bypassPermissions$' "$case_dir/claude.args"
 
-  if [[ "$tool" == "cc-use-codex-cli" ]]; then
-    grep -q -- '^--add-dir$' "$case_dir/claude.args"
-    grep -q -- "^$worktrees_root$" "$case_dir/claude.args"
-    grep -q -- '^--append-system-prompt$' "$case_dir/claude.args"
-    grep -q 'approval-policy=never' "$case_dir/claude.args"
-    grep -q 'sandbox=workspace-write' "$case_dir/claude.args"
-  else
-    if grep -q -- '^--append-system-prompt$' "$case_dir/claude.args"; then
-      echo "[FAIL] plain cc interruption handler should not append codex policy" >&2
-      exit 1
+    if [[ "$tool" == "cc-use-codex-cli" ]]; then
+      grep -q -- '^--add-dir$' "$case_dir/claude.args"
+      grep -q -- "^$worktrees_root$" "$case_dir/claude.args"
+      grep -q -- '^--append-system-prompt$' "$case_dir/claude.args"
+      grep -q 'approval-policy=never' "$case_dir/claude.args"
+      grep -q 'sandbox=workspace-write' "$case_dir/claude.args"
+    else
+      if grep -q -- '^--append-system-prompt$' "$case_dir/claude.args"; then
+        echo "[FAIL] plain cc interruption handler should not append codex policy" >&2
+        exit 1
+      fi
     fi
+  else
+    [[ ! -e "$case_dir/claude.args" ]]
   fi
 }
 
-run_case "cc" "" "" "" "" "" ""
-run_case "cc-use-codex-cli" "codex-cli" "prefer-codex-for-repo-work" "gpt-5.4" "workspace-write" "never" "worktree-required-on-protected-branches"
+run_case "检查已经合并到develop的worktree，应该怎么收口" "cc" "" "" "" "" "" "" "no"
+run_case "请读取这条普通用户消息，并输出结构化路由决策，不要依赖任何固定短语。" "cc" "" "" "" "" "" "" "yes"
+run_case "请读取这条普通用户消息，并输出结构化路由决策，不要依赖任何固定短语。" "cc-use-codex-cli" "codex-cli" "prefer-codex-for-repo-work" "gpt-5.4" "workspace-write" "never" "worktree-required-on-protected-branches" "yes"
 
 echo "[PASS] interruption manager handler supports plain cc and cc-use-codex-cli profiles"

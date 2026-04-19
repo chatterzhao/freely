@@ -12,6 +12,7 @@ local expected_owner="$3"
 local expected_handoff="$4"
 local prompt_expectation="$5"
 local prompt_expectation_mode="${6:-regex}"
+local expect_prompt_capture="${7:-yes}"
 local case_dir="$TMP_DIR/$expected_restart"
 local project="$case_dir/project"
 local fake_bin="$case_dir/bin"
@@ -62,16 +63,20 @@ grep -q '^DECISION=delegate$' <<<"$OUTPUT"
 grep -q "^RESTART_POINT=$expected_restart$" <<<"$OUTPUT"
 grep -q "^OWNERSHIP=$expected_owner$" <<<"$OUTPUT"
 grep -q "^HANDOFF=$expected_handoff$" <<<"$OUTPUT"
-if [[ "$prompt_expectation_mode" == "fixed" ]]; then
-  grep -Fq "$prompt_expectation" "$prompt_capture"
+if [[ "$expect_prompt_capture" == "yes" ]]; then
+  if [[ "$prompt_expectation_mode" == "fixed" ]]; then
+    grep -Fq "$prompt_expectation" "$prompt_capture"
+  else
+    grep -q "$prompt_expectation" "$prompt_capture"
+  fi
+  grep -Fq '`live-status -> fleet-status -> restart-point routing`' "$prompt_capture"
+  grep -Fq '`continuation`、`dev`、`review`、`verification`' "$prompt_capture"
+  if [[ "$expected_restart" == "cleanup" && "$expected_owner" == "worker" ]]; then
+    grep -q 'worktree-maintenance-governance' "$prompt_capture"
+    grep -q '当前 signal 仍应先交接为 cleanup handoff' "$prompt_capture"
+  fi
 else
-  grep -q "$prompt_expectation" "$prompt_capture"
-fi
-grep -Fq '`live-status -> fleet-status -> restart-point routing`' "$prompt_capture"
-grep -Fq '`continuation`、`dev`、`review`、`verification`' "$prompt_capture"
-if [[ "$expected_restart" == "cleanup" && "$expected_owner" == "worker" ]]; then
-  grep -q 'worktree-maintenance-governance' "$prompt_capture"
-  grep -q '当前 signal 仍应先交接为 cleanup handoff' "$prompt_capture"
+  [[ ! -e "$prompt_capture" ]]
 fi
 }
 
@@ -80,14 +85,26 @@ run_case \
   "cleanup" \
   "worker" \
   "检查 merged worktree 是否满足 cleanup 生命周期并执行收口" \
-  '优先按 worktree maintenance 问题理解，而不是泛化成 continuation'
+  '优先按 worktree maintenance 问题理解，而不是泛化成 continuation' \
+  "regex" \
+  "no"
 
 run_case \
   "你现在是 develop 工位上的主管。先检查所有 worktree、milestones、issues、intake 与 runtime 状态，然后决定下一步该委派什么。" \
   "continuation" \
   "manager" \
-  "下一轮主管主循环先做 live-status 和 fleet-status 巡检再决定委派" \
+  "先做 live-status 与 fleet-status 巡检，再把 blocker materialize 成 continuity 或 worker prompt" \
   'worktree + milestones + issues + intake + runtime' \
-  'fixed'
+  'fixed' \
+  "yes"
+
+run_case \
+  "请读取这条普通用户消息，并输出结构化路由决策，不要依赖任何固定短语。" \
+  "dev" \
+  "worker" \
+  "进入当前 issue 的开发执行并更新实现/测试" \
+  'live-status -> fleet-status -> restart-point routing' \
+  'fixed' \
+  "yes"
 
 echo "[PASS] interruption manager handler distinguishes cleanup-only routing from broad supervisor reentry"

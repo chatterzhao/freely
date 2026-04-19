@@ -173,7 +173,7 @@ acquire_project_start_lock_or_wait() {
   local timeout_secs="${FREELY_PROJECT_START_LOCK_WAIT_SECS:-30}"
   local stale_secs="${FREELY_PROJECT_START_LOCK_STALE_SECS:-90}"
   local interval_secs="${FREELY_PROJECT_START_LOCK_WAIT_INTERVAL_SECS:-1}"
-  local start_ts now waiting_logged="0" lock_dir state_file
+  local start_ts now waiting_logged="0" lock_dir state_file lock_parent
   local lock_started_epoch="" lock_age_secs=""
   [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=30
   [[ "$stale_secs" =~ ^[0-9]+$ ]] || stale_secs=90
@@ -181,6 +181,9 @@ acquire_project_start_lock_or_wait() {
   start_ts="$(date +%s)"
   lock_dir="$(project_start_lock_dir_for_runtime "$project")"
   state_file="$(project_start_lock_state_file_for_runtime "$project")"
+  lock_parent="$(dirname "$lock_dir")"
+
+  mkdir -p "$lock_parent"
 
   while true; do
     if mkdir "$lock_dir" 2>/dev/null; then
@@ -264,6 +267,18 @@ EOF
         continue
         ;;
       ambiguous)
+        if [[ "${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" == "state_file_missing" ]] && ! project_has_active_runtime_processes "$project"; then
+          log_warn "removing ambiguous project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+          append_runtime_event "$project" "project_start_lock_ambiguous_cleanup" \
+            "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" \
+            "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+            "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+            "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+            "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+            "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}"
+          rm -rf "$lock_dir"
+          continue
+        fi
         if [[ "$waiting_logged" == "0" ]]; then
           log_warn "project start already in progress; waiting for same-project startup serialization (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
           append_runtime_event "$project" "project_start_lock_waiting" \
@@ -11529,7 +11544,12 @@ ensure_no_active_supervisor_conflict() {
       elif [[ "$role_hint" == "manager" && "$attach_ai_pid_state" != "confirmed_running" && "$attach_ai_pid_state" != "bootstrap_in_flight" ]]; then
         log_warn "project supervisor pid=$old_pid is live but manager ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
       elif [[ "$role_hint" == "worker" && "$attach_ai_pid_state" != "confirmed_running" && "$attach_ai_pid_state" != "bootstrap_in_flight" ]]; then
-        log_warn "project supervisor pid=$old_pid is live but worker ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
+        if supervisor_startup_truth_ready_for_project "$project" "$old_pid"; then
+          log_warn "project supervisor pid=$old_pid is live, worker startup truth is ready, and ai pid is ${attach_ai_pid_state}; attaching to preserve the active runtime"
+          attach_ai_pid_state="startup_truth_ready"
+        else
+          log_warn "project supervisor pid=$old_pid is live but worker ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
+        fi
       else
         LAST_ATTACH_REUSE_SUPERVISOR_PID="$old_pid"
         LAST_ATTACH_REUSE_AI_PID_STATE="$attach_ai_pid_state"
@@ -12346,6 +12366,8 @@ cmd_daemon_start() {
   fi
   append_runtime_event "$project" "user_daemon_start_precheck_clear" \
     "force=$force"
+  release_project_start_lock_for_runtime "$project"
+  trap - EXIT
   launch_project_runtime_daemon_or_fail "$project"
 }
 
