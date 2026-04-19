@@ -67,7 +67,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
   - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
   - `./bin/governance-check`
-- completion_note: `This narrow followthrough owner carries the final receipt-ledger repair for the absorbed runtime lifecycle batch and should retire the temporary followthrough feature and test-pre-merge worktrees immediately after canonical develop absorbs it.`
+- completion_note: `This narrow followthrough owner carries the final receipt-ledger repair for the absorbed runtime lifecycle batch and should retire the temporary followthrough feature and test-pre-merge worktrees immediately after canonical develop absorbs it. Continuation 2026-04-19: the first guarded replay fixed the test-pre-merge merge trailers but left a develop-bound diff that only carried the ledger file, so this owner remains active until the same replay batch also refreshes candidate/issue/progress/review evidence on canonical develop.`
 
 1. `I-20260419-0915-A`
 - title: Three-loop lifecycle single-source governance followthrough

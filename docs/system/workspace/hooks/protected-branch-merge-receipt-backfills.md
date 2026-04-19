@@ -62,7 +62,6 @@
 - evidence_refs:
   - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
   - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
-
 ## Receipt Gap: 890e24d5f971ad95a5b91b565911e5c432112bf3
 
 - target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`

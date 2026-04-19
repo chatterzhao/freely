@@ -31,6 +31,8 @@ Canonical `develop` already absorbed the runtime lifecycle implementation owner 
 
 Because direct protected-root edits are forbidden and candidate-only closure is not lawful for a develop-bound diff, this receipt-ledger repair needs its own narrow followthrough owner instead of silently extending the completed implementation owner.
 
+Continuation `2026-04-19`: replaying `feature/runtime-lifecycle-receipt-followthrough-20260418 -> test-pre-merge-runtime-lifecycle-followthrough-20260418` repaired the missing merge trailers on the protected batch, but the subsequent guarded `develop` replay still surfaced a governance blocker because the merge diff only carried the ledger file. This owner therefore keeps the same bounded scope while replaying the owner evidence itself in the same guarded batch.
+
 ## Scope
 
 1. Add the missing receipt-gap entries for `dc436573e5f3f995ed936e7b21c65f9440fffae9` and `f7145cc889c3919cbe21b1162f96d14d736b83b7`.
