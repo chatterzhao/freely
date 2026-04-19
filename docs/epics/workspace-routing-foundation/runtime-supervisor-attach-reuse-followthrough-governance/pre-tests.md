@@ -91,3 +91,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
+
+### Guarded promote preserves supervisor attach/reuse adequacy
+- id: `guarded-promote-preserves-supervisor-attach-reuse-adequacy`
+- requirement: `The guarded test-pre-merge replay keeps daemon reuse, foreground attach windows, ps-degraded ownership proof, and Claude runtime-home isolation intact before develop absorbs this owner.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#1,tasks.md#2,tasks.md#3,tasks.md#4`
+- case_design: `Merge the checkpoint owner into the current test-pre-merge-runtime-lifecycle-20260419 batch, rerun the bounded regression set plus governance-check there, and confirm the guarded promote path still carries the same attach/reuse behavior.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
