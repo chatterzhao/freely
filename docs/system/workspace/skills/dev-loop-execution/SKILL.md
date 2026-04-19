@@ -12,6 +12,8 @@ description: 执行 milestone-owned ready issue 的 AI-native 实现、测试与
 - `dev-loop` 中的“实现”不限于传统代码；也可以是 agent、skill、runtime script、hook、reference 或其他能力产物，只要它们属于已收敛 issue 的交付实现。
 - 让 `progress` 只承载 dev-loop 的执行态。
 - dev-loop 在整个三个 loop 中的归宿、owner 边界与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`。
+- 该文档是 whole-app lifecycle / logic 的唯一细节真源；本 skill 只定义 dev-loop 执行步骤，不平行维护 three-loop 总图或 terminal semantics。
+- 若 dev-loop 的 loop placement、回流语义、verification / cleanup handoff 语义变化，必须先同步检查该真源，再更新本 skill。
 
 ## 不负责
 

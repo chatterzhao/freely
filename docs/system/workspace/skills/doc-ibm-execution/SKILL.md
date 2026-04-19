@@ -11,6 +11,8 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 - 先把 milestone `candidate_issues` 中的输入 materialize 成正式 `epic/story` 目录与一个或多个 milestone-owned issue，再把这些 issue 从“docs 不足”推进到“ready for dev”或“明确阻塞”。
 - 同步 issue、milestone 与治理资产。
 - `IBM + G` 作为 doc-loop 的一部分，其循环归宿与生命周期细节以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准。
+- 该文档是 whole-app lifecycle / logic 的唯一细节真源；本 skill 只定义 IBM 执行步骤，不平行维护 three-loop 总图或 terminal semantics。
+- 若 IBM 的 loop placement、回流语义或 reroute 语义变化，必须先同步检查该真源，再更新本 skill。
 
 ## 不负责
 

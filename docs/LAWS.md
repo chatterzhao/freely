@@ -159,16 +159,23 @@
    - `LAWS.md`
    - `AGENTS.md`
 3. Freely 自身产品架构 discussion 默认不得直接写入 `docs/system/**`；只有当后续被独立抽象成可复用能力后，才另开生命周期进入能力目录。
-4. 当 Freely 自身产品架构表达更新时，必须至少检查：
+4. 例外：若某份 `docs/system/**` 文档已经被 `PROJECT_INTENT / LAWS / agents / skills` 明确共同指定为 whole-app lifecycle / logic 的唯一细节真源，则它可以承载该层系统行为地图；当前例外仅指 `docs/system/workspace/three-loop-capability-lifecycle.md`。
+5. 对这个 whole-app lifecycle 真源：
+   - `PROJECT_INTENT / CONSTITUTION / LAWS` 只保留原则、边界、状态词典、判定门与摘要引用
+   - agents / skills / scripts 不得各自平行维护 three-loop 细节流程、route map 或 terminal semantics
+   - 涉及 three-loop routing、loop placement、completion / verification / cleanup / recovery judgment 的实现或提示词变更前，必须先阅读并理解该真源
+   - 若这些语义发生变化，变更必须同步检查并按需更新该真源，再更新引用面
+6. 当 Freely 自身产品架构表达更新时，必须至少检查：
    - 当前 pre-brainstorm / candidate / issue / progress 是否与新的职责分工一致
    - 是否仍有文档把 semantic surfaces 与 host shells 混层
    - 是否仍有文档把 Freely 自身产品形态直接写成 Freely 通用能力
-5. `AGENTS.md` 在这类变更中只承担开发入口判断，不替代 `PROJECT_INTENT / CONSTITUTION / LAWS` 的架构本体职责。
+7. `AGENTS.md` 在这类变更中只承担开发入口判断，不替代 `PROJECT_INTENT / CONSTITUTION / LAWS` 的架构本体职责。
 
 最小验收证据：
 - 分类记录
 - `PROJECT_INTENT / CONSTITUTION / LAWS / AGENTS.md` 对齐记录
 - 至少一轮相关 repo 文档 sweep 记录
+- 若命中 whole-app lifecycle 真源例外，还需证明引用面已回退为摘要/引用，而不是继续平行维护细节
 
 执行技能：
 - `skill:laws-enforcer`
