@@ -70,6 +70,14 @@ printf '%s' "$SUP_PID" >"$PROJECT/.freely/run/supervisor.pid"
 printf '%s' "$DISPATCH_PID" >"$PROJECT/.freely/run/interruption-dispatch.pid"
 printf '%s' "$WATCHDOG_PID" >"$PROJECT/.freely/run/ensure-manager.pid"
 printf '%s' "$AI_PID" >"$PROJECT/.freely/run/ai.pid"
+mkdir -p "$PROJECT/.freely/run/supervisor-identities"
+cat >"$PROJECT/.freely/run/supervisor-identities/supervisor-$SUP_PID.env" <<EOF
+SUPERVISOR_PID="$SUP_PID"
+PROJECT_ROOT="$PROJECT"
+ENTRYPOINT_MODE="foreground"
+STARTUP_TRUTH_PHASE="published"
+STARTUP_TRUTH_PUBLISHED_AT="2026-04-03T22:55:00Z"
+EOF
 
 cat >"$FAKE_BIN_DIR/ps" <<'EOF'
 #!/usr/bin/env bash
@@ -79,8 +87,20 @@ chmod +x "$FAKE_BIN_DIR/ps"
 
 cat >"$FAKE_BIN_DIR/lsof" <<EOF
 #!/usr/bin/env bash
+pid=""
+while [[ \$# -gt 0 ]]; do
+  case "\$1" in
+    -p)
+      pid="\${2:-}"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
 cat <<'OUT'
-p${SUP_PID}
+p'"\$pid"'
 n${PROJECT}
 OUT
 EOF

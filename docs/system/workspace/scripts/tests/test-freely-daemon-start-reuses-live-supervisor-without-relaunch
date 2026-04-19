@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-daemon-reuse.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260413-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260413-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260413-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260413-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- candidate_format_version: `v2`
+- status: `promoted`
+- milestone: `M-20260306-workspace-routing-foundation`
+- promoted_issue_path: `docs/epics/sample/issues/sample.md`
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+IFLOW_MAX_TURNS=100
+EOF
+
+FIRST_OUTPUT="$(bash "$ROOT_DIR/bin/freely" daemon start --project "$PROJECT")"
+printf '%s\n' "$FIRST_OUTPUT" | grep -q "^project: $PROJECT$"
+printf '%s\n' "$FIRST_OUTPUT" | grep -q '^daemon_status: running$'
+
+SUPERVISOR_PID=""
+for _ in $(seq 1 50); do
+  if [[ -f "$PROJECT/.freely/run/supervisor.pid" ]]; then
+    SUPERVISOR_PID="$(cat "$PROJECT/.freely/run/supervisor.pid" 2>/dev/null || true)"
+  fi
+  if [[ -n "$SUPERVISOR_PID" ]] && kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+    break
+  fi
+  sleep 0.2
+done
+
+[[ -n "$SUPERVISOR_PID" ]] || {
+  echo "[FAIL] initial daemon start did not materialize a supervisor" >&2
+  exit 1
+}
+
+for _ in $(seq 1 50); do
+  if [[ -f "$PROJECT/.freely/logs/runtime-events.log" ]] && grep -q 'event=interruption_dispatcher_relaunch_ready' "$PROJECT/.freely/logs/runtime-events.log"; then
+    break
+  fi
+  sleep 0.2
+done
+
+RUNNER_COUNT_BEFORE="$(ps -ef | grep -F "runtime/freely daemon-run --project $PROJECT" | grep -v grep | wc -l | tr -d ' ')"
+[[ "$RUNNER_COUNT_BEFORE" == "1" ]] || {
+  echo "[FAIL] expected exactly one daemon-run process before reuse, found $RUNNER_COUNT_BEFORE" >&2
+  ps -ef | grep -F "runtime/freely daemon-run --project $PROJECT" | grep -v grep >&2 || true
+  exit 1
+}
+
+SECOND_OUTPUT="$(bash "$ROOT_DIR/bin/freely" daemon start --project "$PROJECT")"
+printf '%s\n' "$SECOND_OUTPUT" | grep -q "^project: $PROJECT$"
+printf '%s\n' "$SECOND_OUTPUT" | grep -q '^daemon_status: running$'
+printf '%s\n' "$SECOND_OUTPUT" | grep -q "^supervisor_pid: $SUPERVISOR_PID$"
+
+sleep 1
+
+RUNNER_COUNT_AFTER="$(ps -ef | grep -F "runtime/freely daemon-run --project $PROJECT" | grep -v grep | wc -l | tr -d ' ')"
+[[ "$RUNNER_COUNT_AFTER" == "1" ]] || {
+  echo "[FAIL] repeated daemon start should not launch an extra daemon-run process, found $RUNNER_COUNT_AFTER" >&2
+  ps -ef | grep -F "runtime/freely daemon-run --project $PROJECT" | grep -v grep >&2 || true
+  exit 1
+}
+
+ATTACH_COUNT="$(grep -c 'event=supervisor_attach_reuse' "$PROJECT/.freely/logs/runtime-events.log" || true)"
+[[ "$ATTACH_COUNT" -ge 1 ]] || {
+  echo "[FAIL] repeated daemon start should emit supervisor_attach_reuse" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+
+bash "$ROOT_DIR/bin/freely" daemon stop --project "$PROJECT" >/dev/null
+
+echo "[PASS] freely daemon start reuses a live supervisor without launching an extra daemon-run process"

@@ -173,7 +173,7 @@ acquire_project_start_lock_or_wait() {
   local timeout_secs="${FREELY_PROJECT_START_LOCK_WAIT_SECS:-30}"
   local stale_secs="${FREELY_PROJECT_START_LOCK_STALE_SECS:-90}"
   local interval_secs="${FREELY_PROJECT_START_LOCK_WAIT_INTERVAL_SECS:-1}"
-  local start_ts now waiting_logged="0" lock_dir state_file
+  local start_ts now waiting_logged="0" lock_dir state_file lock_parent
   local lock_started_epoch="" lock_age_secs=""
   [[ "$timeout_secs" =~ ^[0-9]+$ ]] || timeout_secs=30
   [[ "$stale_secs" =~ ^[0-9]+$ ]] || stale_secs=90
@@ -181,6 +181,9 @@ acquire_project_start_lock_or_wait() {
   start_ts="$(date +%s)"
   lock_dir="$(project_start_lock_dir_for_runtime "$project")"
   state_file="$(project_start_lock_state_file_for_runtime "$project")"
+  lock_parent="$(dirname "$lock_dir")"
+
+  mkdir -p "$lock_parent"
 
   while true; do
     if mkdir "$lock_dir" 2>/dev/null; then
@@ -264,6 +267,18 @@ EOF
         continue
         ;;
       ambiguous)
+        if [[ "${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" == "state_file_missing" ]] && ! project_has_active_runtime_processes "$project"; then
+          log_warn "removing ambiguous project start lock before freely start (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
+          append_runtime_event "$project" "project_start_lock_ambiguous_cleanup" \
+            "lock_state=${CURRENT_PROJECT_START_LOCK_STATE:-unknown}" \
+            "lock_detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown}" \
+            "lock_owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none}" \
+            "lock_started_at=${CURRENT_PROJECT_START_LOCK_STARTED_AT:-none}" \
+            "lock_reason=${CURRENT_PROJECT_START_LOCK_REASON:-none}" \
+            "lock_path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown}"
+          rm -rf "$lock_dir"
+          continue
+        fi
         if [[ "$waiting_logged" == "0" ]]; then
           log_warn "project start already in progress; waiting for same-project startup serialization (detail=${CURRENT_PROJECT_START_LOCK_DETAIL:-unknown} owner_pid=${CURRENT_PROJECT_START_LOCK_OWNER_PID:-none} path=${CURRENT_PROJECT_START_LOCK_PATH:-unknown})"
           append_runtime_event "$project" "project_start_lock_waiting" \
@@ -11485,6 +11500,82 @@ resolve_active_supervisor_pid_for_start() {
   return 1
 }
 
+project_runtime_should_keep_running() {
+  local project="$1"
+  local desired_state last_exit_reason
+  [[ -f "$(workcell_state_file "$project")" ]] || return 1
+  unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON
+  # shellcheck disable=SC1090
+  source "$(workcell_state_file "$project")"
+  desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+  last_exit_reason="${LAST_EXIT_REASON:-}"
+  [[ "$desired_state" == "running" ]] || return 1
+  [[ "$last_exit_reason" != "operator_stop" ]]
+}
+
+active_runtime_attach_reusable_for_project() {
+  local project="$1" sup_pid_file="$2" child_pid_file="$3"
+  local old_pid="" attach_ai_pid_state="missing" role_hint
+  local attach_ready_attempts="${FREELY_ATTACH_REUSE_READY_ATTEMPTS:-30}"
+
+  LAST_ATTACH_REUSE_SUPERVISOR_PID=""
+  LAST_ATTACH_REUSE_AI_PID_STATE="missing"
+  resolve_active_supervisor_pid_for_start "$project" "$sup_pid_file" || return 1
+  old_pid="${RESOLVED_ACTIVE_SUPERVISOR_PID:-}"
+  [[ -n "$old_pid" ]] || return 1
+
+  role_hint="$(role_hint_for_project "$project")"
+  if [[ -f "$child_pid_file" ]]; then
+    local active_ai_pid
+    active_ai_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
+    if [[ -n "$active_ai_pid" ]] && ! valid_ai_pid_for_project "$project" "$active_ai_pid"; then
+      attach_ai_pid_state="stale_pid_cleared"
+      log_warn "clearing stale ai.pid while reusing healthy project supervisor: $active_ai_pid"
+      rm -f "$child_pid_file"
+    elif [[ -n "$active_ai_pid" ]]; then
+      attach_ai_pid_state="confirmed_running"
+    fi
+  fi
+
+  if [[ "$attach_ai_pid_state" != "confirmed_running" ]] && project_bootstrap_launch_in_flight "$project" "$old_pid" ""; then
+    attach_ai_pid_state="bootstrap_in_flight"
+    log_warn "project supervisor pid=$old_pid is still bootstrapping; attaching instead of repairing the in-flight startup"
+  elif ! FREELY_INTERRUPTION_DISPATCHER_READY_ATTEMPTS="$attach_ready_attempts" ensure_interruption_dispatcher_ready_or_fail "$project"; then
+    log_warn "project supervisor pid=$old_pid is live but interruption dispatcher is not ready; falling back to project-local repair"
+    return 1
+  elif [[ "$role_hint" == "manager" ]] && ! FREELY_MANAGER_WATCHDOG_READY_ATTEMPTS="$attach_ready_attempts" ensure_manager_watchdog_ready_or_fail "$project"; then
+    log_warn "project supervisor pid=$old_pid is live but manager watchdog is not ready; falling back to project-local repair"
+    return 1
+  fi
+
+  if [[ "$attach_ai_pid_state" == "confirmed_running" || "$attach_ai_pid_state" == "bootstrap_in_flight" ]]; then
+    :
+  elif [[ "$role_hint" == "worker" ]] && supervisor_startup_truth_ready_for_project "$project" "$old_pid"; then
+    log_warn "project supervisor pid=$old_pid is live, worker startup truth is ready, and ai pid is ${attach_ai_pid_state}; attaching to preserve the active runtime"
+    attach_ai_pid_state="startup_truth_ready"
+  elif [[ "$role_hint" == "worker" ]] && project_runtime_should_keep_running "$project"; then
+    :
+  else
+    log_warn "project supervisor pid=$old_pid is live but ${role_hint} ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
+    return 1
+  fi
+
+  LAST_ATTACH_REUSE_SUPERVISOR_PID="$old_pid"
+  LAST_ATTACH_REUSE_AI_PID_STATE="$attach_ai_pid_state"
+  log_info "project runtime/control-plane already up; reusing supervisor pid=$old_pid"
+  return 0
+}
+
+emit_supervisor_attach_reuse_truth() {
+  local project="$1"
+  write_workcell_state "$project" "running" "up" "up" "already_running_attach"
+  append_runtime_event "$project" "supervisor_attach_reuse" \
+    "supervisor_pid=${LAST_ATTACH_REUSE_SUPERVISOR_PID:-unknown}" \
+    "supervisor_pid_source=${LAST_ATTACH_REUSE_SUPERVISOR_SOURCE:-unknown}" \
+    "ai_pid_state=${LAST_ATTACH_REUSE_AI_PID_STATE:-missing}" \
+    "role_hint=$(role_hint_for_project "$project")"
+}
+
 ensure_no_active_supervisor_conflict() {
   local project="$1" sup_pid_file="$2" child_pid_file="$3" allow_attach="${4:-0}"
   local old_pid="" attach_ai_pid_state="missing" role_hint unverified_roles=""
@@ -11529,7 +11620,12 @@ ensure_no_active_supervisor_conflict() {
       elif [[ "$role_hint" == "manager" && "$attach_ai_pid_state" != "confirmed_running" && "$attach_ai_pid_state" != "bootstrap_in_flight" ]]; then
         log_warn "project supervisor pid=$old_pid is live but manager ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
       elif [[ "$role_hint" == "worker" && "$attach_ai_pid_state" != "confirmed_running" && "$attach_ai_pid_state" != "bootstrap_in_flight" ]]; then
-        log_warn "project supervisor pid=$old_pid is live but worker ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
+        if supervisor_startup_truth_ready_for_project "$project" "$old_pid"; then
+          log_warn "project supervisor pid=$old_pid is live, worker startup truth is ready, and ai pid is ${attach_ai_pid_state}; attaching to preserve the active runtime"
+          attach_ai_pid_state="startup_truth_ready"
+        else
+          log_warn "project supervisor pid=$old_pid is live but worker ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
+        fi
       else
         LAST_ATTACH_REUSE_SUPERVISOR_PID="$old_pid"
         LAST_ATTACH_REUSE_AI_PID_STATE="$attach_ai_pid_state"
@@ -11609,12 +11705,7 @@ start_project_runtime() {
   ensure_no_active_supervisor_conflict "$project" "$sup_pid_file" "$child_pid_file" "1" || supervisor_conflict_rc=$?
   if [[ "$supervisor_conflict_rc" -eq 10 ]]; then
     release_project_start_lock_for_runtime "$project"
-    write_workcell_state "$project" "running" "up" "up" "already_running_attach"
-    append_runtime_event "$project" "supervisor_attach_reuse" \
-      "supervisor_pid=${LAST_ATTACH_REUSE_SUPERVISOR_PID:-unknown}" \
-      "supervisor_pid_source=${LAST_ATTACH_REUSE_SUPERVISOR_SOURCE:-unknown}" \
-      "ai_pid_state=${LAST_ATTACH_REUSE_AI_PID_STATE:-missing}" \
-      "role_hint=$(role_hint_for_project "$project")"
+    emit_supervisor_attach_reuse_truth "$project"
     return 0
   elif [[ "$supervisor_conflict_rc" -ne 0 ]]; then
     release_project_start_lock_for_runtime "$project"
@@ -12234,6 +12325,15 @@ cmd_start() {
     log_info "forcing project-local runtime rebuild before start"
     stop_project_runtime "$project" "start_force"
   else
+    local run_dir sup_pid_file child_pid_file
+    run_dir="$(run_dir_for_project "$project")"
+    sup_pid_file="$run_dir/supervisor.pid"
+    child_pid_file="$run_dir/ai.pid"
+    mkdir -p "$run_dir"
+    if active_runtime_attach_reusable_for_project "$project" "$sup_pid_file" "$child_pid_file"; then
+      emit_supervisor_attach_reuse_truth "$project"
+      return 0
+    fi
     reject_repeated_user_start_if_running "$project" "start"
   fi
   append_runtime_event "$project" "user_start_precheck_clear" \
@@ -12342,10 +12442,27 @@ cmd_daemon_start() {
     log_info "forcing project-local runtime rebuild before daemon start"
     stop_project_runtime "$project" "daemon_start_force"
   else
+    local run_dir sup_pid_file child_pid_file
+    run_dir="$(run_dir_for_project "$project")"
+    sup_pid_file="$run_dir/supervisor.pid"
+    child_pid_file="$run_dir/ai.pid"
+    mkdir -p "$run_dir"
+    if active_runtime_attach_reusable_for_project "$project" "$sup_pid_file" "$child_pid_file"; then
+      emit_supervisor_attach_reuse_truth "$project"
+      release_project_start_lock_for_runtime "$project"
+      trap - EXIT
+      echo "project: $project"
+      echo "daemon_status: running"
+      echo "supervisor_pid: ${LAST_ATTACH_REUSE_SUPERVISOR_PID:-unknown}"
+      echo "launcher_log: $(logs_dir_for_project "$project")/daemon-launch.log"
+      return 0
+    fi
     reject_repeated_user_start_if_running "$project" "daemon start"
   fi
   append_runtime_event "$project" "user_daemon_start_precheck_clear" \
     "force=$force"
+  release_project_start_lock_for_runtime "$project"
+  trap - EXIT
   launch_project_runtime_daemon_or_fail "$project"
 }
 
