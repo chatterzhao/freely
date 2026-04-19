@@ -1,3 +1,6 @@
+- 20260419-0915--three-loop-single-source-followthrough
+  - brainstorms: docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/candidates.md
 - 20260418-1900--runtime-lifecycle-receipt-followthrough
   - brainstorms: docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/candidates.md
