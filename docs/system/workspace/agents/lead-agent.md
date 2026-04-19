@@ -13,6 +13,8 @@
 - 下游：`skill:context-source-skill`
 - 工具清单：`workspace/tools.md`
 - 三个 loop 下首跳路由与能力归宿细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
+  - 该文档是 whole-app lifecycle / logic 的唯一细节真源；首跳在做 route_kind、loop placement 与 manager-owned judgement 分流前必须先按它理解全局地图
+  - 若首跳 prompt contract 或 routing semantics 变化，必须先同步检查该真源，再更新本文件或下游 skill
 
 ## 职责
 

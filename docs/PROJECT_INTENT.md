@@ -67,105 +67,24 @@ Freely 自身首先是一个产品，不应被拆成一堆并列的 shell、命�
 ### 三个 Loop 方法论
 
 说明：
-- 本节定义 Freely 为什么需要三个 loop，以及高层闭环结构。
-- 三个 loop 的能力归宿、owner 边界与生命周期细节真源统一收敛到 `docs/system/workspace/three-loop-capability-lifecycle.md`，避免在多个高层文档中重复维护。
+- 本节只定义 Freely 为什么需要三个 loop，以及高层闭环原则。
+- `docs/system/workspace/three-loop-capability-lifecycle.md` 是 whole-app lifecycle / logic 的唯一细节真源。
+- 因此本文件不再重复维护 three-loop 的细节图、route map、artifact 流转和 terminal semantics；这里只保留高层定位与引用约束。
+- 任何会改变 three-loop routing、loop placement、completion / verification / cleanup / recovery judgment 的实现、prompt 或文档，在修改前都必须先阅读并理解该真源；若语义变化，必须同步检查并按需更新该真源。
 
-```text
-A:auto-loop（外层编排 / 治理 loop）
-├── lead-agent（首跳代理）
-│   └── 调用 context-source-skill
-├── context-source-skill（路由决策）
-│   ├── 扫描需求池：milestones/progress/code-reviews/test/chat/github-issue
-│   ├── 判定 route_kind / worktree action
-│   └── 组装下一跳提示词
-├── sibling loop 1: doc-loop
-│   ├── D:doc-pre-brainstorm-execution（前置收敛）
-│   └── D:doc-ibm-execution（Issue-bound 文档收敛）
-├── sibling loop 2: dev-loop-execution（开发实现）
-├── verification / recovery / cleanup evidence 回流
-├── auto-loop 基于 canonical evidence 做完成判定 / 验证裁决 / cleanup 路由
-└── 状态交还 auto-loop，进入下一轮 orchestration 或结束当前 lifecycle
-```
-
-### 补充图：三个 Loop 架构
-
-```mermaid
-flowchart TD
-    subgraph RT["runtime / supervisor"]
-        R0["workspace/scripts/runtime/freely"]
-        R1["start-lead-agent.sh"]
-        R2["monitor-ai-cli.sh"]
-        R3["external AI CLI process"]
-    end
-
-    subgraph OUTER["outer loop: auto-loop"]
-        A0["lead-agent"]
-        A1["context-source-skill"]
-        A2{"route_kind?"}
-    end
-
-    subgraph DOC["sibling loop: doc-loop"]
-        D0["doc-pre-brainstorm-execution"]
-        D1["doc-ibm-execution"]
-    end
-
-    subgraph DEV["sibling loop: dev-loop"]
-        D2["dev-loop-execution"]
-    end
-
-    subgraph STATE["shared state / artifacts"]
-        S0["docs/milestones.md"]
-        S1["docs/pre-brainstorms/**"]
-        S2["docs/epics/**"]
-        S3["docs/progress/**"]
-    end
-
-    R0 --> R1 --> R2 --> R3
-    R3 --> A0 --> A1 --> A2
-
-    A2 -->|"no stable issue boundary"| D0
-    A2 -->|"issue-bound brainstorm / docs incomplete"| D1
-    A2 -->|"ready issue / in-progress"| D2
-
-    D0 --> S0
-    D0 --> S1
-    D1 --> S0
-    D1 --> S2
-    D2 --> S0
-    D2 --> S2
-    D2 --> S3
-
-    D0 -. "status / next_recommended_route / recovery_context" .-> A1
-    D1 -. "status / next_recommended_route / recovery_context" .-> A1
-    D2 -. "status / next_recommended_route / recovery_context" .-> A1
-
-    R3 -. "natural exit / crash" .-> R2
-    R2 -. "relaunch until Ctrl+C / stop" .-> R3
-```
+高层定位：
+- `auto-loop` 是 outer orchestration / governance loop
+- `doc-loop` 与 `dev-loop` 是 sibling execution loops
+- verification / recovery / cleanup 是 route、phase 或 governance path，不是新增 loop
+- worker 在 `doc-loop` / `dev-loop` 中产出 evidence；completion / verification / cleanup / retirement judgment 回到 `auto-loop`
 
 ### 来源与路由规则
 
 说明：
-- 本节保留高层来源到下一跳的方向性约束。
-- 详细 capability -> loop -> owner -> artifact -> transition 映射以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准。
-- 其中 `doc-loop` 与 `dev-loop` 是 sibling execution loops；`dev-loop` 是 AI-native 能力实现层，不限于传统“写代码”；凡是在既有 issue 边界内把能力真正 materialize 出来的工作，都属于 `dev-loop`。
-- `doc-loop` / `dev-loop` 负责推进与产出 evidence；最终的 completion / verification / cleanup judgment 由 `auto-loop` 负责。
-
-| 来源 | 路由起点 | 说明 |
-|-----------|---------|------|
-| 项目意图（新需求） | doc-pre-brainstorm-execution | 前置研究收敛 |
-| Chat 输入/会话证据（人类或自治） | doc-pre-brainstorm-execution | 先进入前置研究，再产出候选 Issue |
-| github-issue（外部输入） | doc-pre-brainstorm-execution | 先进入前置研究 |
-| code-reviews/test（Bug/改进） | doc-ibm-execution 或 dev-loop-execution | 视复杂度与边界 |
-| 治理漂移（宪法/法律/skills 不一致） | doc-ibm-execution | 先修治理一致性，再回到业务路由 |
-| 运行时异常 | doc-pre-brainstorm-execution 或 recovery-subagent-governance | 新异常先前置研究；已有中断上下文则进入恢复治理 |
-| pre-brainstorms 候选 | doc-ibm-execution | 候选 issue 需收敛并落位到 epic/story/milestone |
-| 里程碑 `candidate_issues` | doc-pre-brainstorm-execution 或 doc-ibm-execution | 仍需研究则回前置收敛；边界已清晰则进入 IBM |
-| 里程碑 `committed_issues` | doc-ibm-execution 或 dev-loop-execution | 视 docs 完整度与 `phase_state` 决定进入 IBM、dev-loop 或 completion verification |
-| 里程碑 `completed_issues` | completion_verification | 不重复执行，只做校验、追溯或必要的重新发现 |
-| issue 文档 | doc-ibm-execution 或 dev-loop-execution | 缺 IBM 产物则回文档环；文档齐备则进入开发环 |
-| 进度文档（未完成） | dev-loop-execution | `progress` 只跟踪 dev-loop 的实现/测试/阻塞/恢复 |
-| recovery 记录 | recovery-subagent-governance | 先恢复到中断前的执行上下文，再回到对应 pre/doc/dev 环 |
+- 本节只保留高层方向性约束，不再平行维护来源到具体 skill / route_kind / return path 的细表。
+- 详细 capability -> loop -> owner -> artifact -> transition 映射以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准，不在本文件重复展开。
+- 高层上，新问题与边界未稳的问题先进入 `doc-loop` 收敛；已收敛 issue 在 `doc-loop` 完成 IBM 后进入 `dev-loop` materialize；completion / verification / cleanup / recovery judgment 统一回到 `auto-loop`。
+- 其中 `dev-loop` 是 AI-native 能力实现层，不限于传统“写代码”；凡是在既有 issue 边界内把能力真正 materialize 出来的工作，都属于 `dev-loop`。
 
 流程标识词典与状态联动矩阵的规范语义统一见 `docs/LAWS.md` 第 2C 章；其中 issue / progress 的主执行标识统一使用 `phase_state`，skills 与 milestone policy 不得再自行发明同名状态。
 

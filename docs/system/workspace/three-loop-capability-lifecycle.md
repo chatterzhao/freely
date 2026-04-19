@@ -1,589 +1,146 @@
 # Three-Loop Capability Lifecycle
 
-Freely 三个 loop 的应用级事件地图真源。
+本文件是 Freely whole-app lifecycle / logic 的唯一细节真源；未来必须持续只用这 sequenceDiagram 图表形式表达 three-loop 真相，不允许在图表之外再增加章节、表格或补充性文本说明。
 
-核心关系：
-- `auto-loop` 是 outer orchestration / governance loop
-- `doc-loop` 与 `dev-loop` 是 sibling execution loops
-- `verification`、`recovery`、`cleanup governance` 是 route / phase / governance path，不是新增 loop
-- `doc-loop` / `dev-loop` 负责产出文档、实现、测试与 verification evidence；`auto-loop` 负责完成判定、验证裁决与 cleanup / retirement 路由
+凡是会改变 three-loop routing、loop placement、completion / verification / cleanup / recovery judgment 的实现、prompt、agent、skill 或高层文档，在修改前都必须先阅读并理解本文件；若语义变化，必须同步检查并按需更新本文件，再更新引用面。
 
-边界：
-- `CONSTITUTION.md`: 边界与硬约束
-- `LAWS.md`: 状态词典、判定门、验收
-- `SKILL.md`: 执行步骤
-
-本文件只保留：
-- 全应用流向图
-- 三个 loop 的站位、职责与回流关系
-- `signal -> lifecycle record -> worktree execution cell` 联动
-- owner / artifact / route 决策表
-- worktree 生命周期与 completion / cleanup 回路
-- 省周期关键点
-
-## 1. Loop Positioning Map
+Note：角色不另起泳道，<br/>只在步骤里标成<br/>[脚本 do]：<br/>[主管AI do]：<br/>[worker AI do]：
 
 ```mermaid
-flowchart TD
-    A[auto-loop<br/>outer orchestration / governance] -->|route to discovery or issue docs| B[doc-loop<br/>boundary / IBM / acceptance contract]
-    A -->|route to implementation or repair| C[dev-loop<br/>implementation / local test / verification evidence]
+sequenceDiagram
+    participant AUTO as auto-loop
+    participant DOC as doc-loop
+    participant DEV as dev-loop
 
-    B -->|canonical doc writeback| A
-    C -->|code + tests + verification evidence| A
+    Note over AUTO: Freely 启动首跳<br/>`freely start` / runtime restart / global restart restore
+    AUTO->>AUTO: [脚本 do]：<br/>启动 runtime<br/>校验项目锚点 / AGENTS / hooks / 最小状态面
+    AUTO->>AUTO: [脚本 do]：<br/>拉起 supervisor / interruption dispatcher / watchdog / lead-agent 首跳
+    AUTO->>AUTO: [脚本 do]：<br/>进入 signal intake 与 source patrol 监听态<br/>等待 event-driven / patrol-driven 信号进入
 
-    A -->|completion_verification| D[verification route]
-    A -->|cleanup_governance| E[cleanup route]
-    A -->|recovery| F[recovery route]
+    alt event-driven 信号/来源池
+        Note over AUTO: 人类插话 / runtime anomaly / worker 新发现<br/>未被当前 issue 吸收的 review/test 新信号<br/>已 closeout 后再次暴露的 review/test 新发现
+        AUTO->>AUTO: [脚本 do]：<br/>接住 event-driven signal<br/>记录 durable signal
+    else patrol-driven 信号/来源池
+        Note over AUTO: milestone 未收口 / progress 未完成 / pre-brainstorm 未产出<br/>GitHub issue 未挂 milestone / cleanup 尾项
+        AUTO->>AUTO: [脚本 do]：<br/>接住 patrol-derived signal<br/>记录 durable signal
+    end
 
-    D -->|same issue needs more work| C
-    D -->|new boundary exposed| B
-    D -->|verification passed| E
+    alt 命中 runtime-owned failure
+        AUTO->>AUTO: [脚本 do]：<br/>AI 工具或外部工具阻塞 / 崩溃 / 死循环且 AI 无法自行处理<br/>先执行恢复 / 重启 / kill-restart / 等待重检
+        AUTO->>AUTO: [脚本 do]：<br/>恢复后重回 intake gate
+    else 可进入主管 routing gate
+        AUTO->>AUTO: [脚本 do]：<br/>触发主管轮次<br/>提供 lifecycle 真相 / runtime 真相 / 当前工位真相 / 工具可用性
+        AUTO->>AUTO: [主管AI do]：<br/>notice 来源<br/>需要时先 claim
+        AUTO->>AUTO: [主管AI do]：<br/>读取真相<br/>做 intent understanding
+        AUTO->>AUTO: [主管AI do]：<br/>调用 context-source-skill<br/>做 source classification<br/>区分 discovery / milestone / continuation
+        AUTO->>AUTO: [主管AI do]：<br/>识别 restart point<br/>判断复用/新开/冻结/退休工位
+        AUTO->>AUTO: [主管AI do]：<br/>判断进入哪个 loop / gate
+        AUTO->>AUTO: [主管AI do]：<br/>需要时把 candidate 接入 milestone 的 M-*<br/>未收口 candidate 继续留在 candidate_issues 可见队列
+    end
 
-    E -->|cleanup incomplete / retained tree| A
-    E -->|retired / closure evidence written| G[next task patrol]
-    F -->|runtime/session recovered| A
+    alt 判断为进入 pre-brainstorm
+        AUTO->>DOC: [主管AI do]：<br/>进入 doc-loop<br/>进入条件：边界未稳 / 新发现 / candidate 未收口<br/>进入目标：收敛边界 / 补 candidate / 补 next action
+        loop doc-loop 内部循环
+            DOC->>DOC: [worker AI do]：<br/>读取来源上下文<br/>读取边界<br/>读取验收
+            loop doc-loop 预研子循环
+                DOC->>DOC: [worker AI do]：<br/>补 pre-brainstorm
+                DOC->>DOC: [worker AI do]：<br/>补 candidate<br/>补 next action<br/>补 revisit trigger
+                DOC->>DOC: [worker AI do]：<br/>补 acceptance 边界<br/>补 milestone 可见性
+            end
+            DOC->>DOC: [worker AI do]：<br/>判断当前边界是否稳定
+        end
+        alt 判断为边界已稳定且回写完成
+            DOC-->>AUTO: [worker AI do]：<br/>返回 auto-loop<br/>返回条件：边界已稳定且回写完成<br/>返回材料：candidate / milestone / acceptance / next action 已回写
+        else 判断为仍需继续当前循环
+            DOC->>DOC: [worker AI do]：<br/>继续 doc-loop 内部循环
+        else 判断为暴露新边界或新发现
+            DOC-->>AUTO: [worker AI do]：<br/>返回 auto-loop<br/>返回条件：暴露新边界或新发现<br/>返回材料：需要 auto-loop 重判下一跳 / 工位
+        end
+    else 判断为进入 doc-loop issue materialization / IBM
+        AUTO->>DOC: [主管AI do]：<br/>进入 doc-loop<br/>进入条件：milestone 已承接且 issue docs / acceptance 未收稳<br/>进入目标：补 IBM / 补 acceptance contract / 让 issue ready
+        Note over AUTO,DOC: 工位 / 分支 / worktree 仍是局部治理约束<br/>跟随 issue-ready handoff 收纳，不单独长成新生命周期分支
+        loop doc-loop IBM 内部循环
+            DOC->>DOC: [worker AI do]：<br/>读取 issue / IBM / acceptance
+            DOC->>DOC: [worker AI do]：<br/>把 milestone 的 M-* materialize 为 I-*<br/>同步 issue_path / milestone 回写
+            DOC->>DOC: [worker AI do]：<br/>C-* 继续保留 candidate mirror 语义<br/>I-* 成为当前执行编排 owner
+            DOC->>DOC: [worker AI do]：<br/>补 issue-bound docs<br/>补 acceptance contract
+            DOC->>DOC: [worker AI do]：<br/>补 pre-tests / tasks / issue-bound brainstorm
+            DOC->>DOC: [worker AI do]：<br/>判断 issue docs / acceptance 是否已收稳
+        end
+        alt 判断为 issue docs 已收稳且回写完成
+            DOC-->>AUTO: [worker AI do]：<br/>返回 auto-loop<br/>返回条件：issue docs 已收稳且当前 issue ready<br/>返回材料：issue / milestone / acceptance / pre-tests 已回写
+        else 判断为仍需继续当前循环
+            DOC->>DOC: [worker AI do]：<br/>继续 doc-loop IBM 循环
+        else 判断为暴露新边界或新发现
+            DOC-->>AUTO: [worker AI do]：<br/>返回 auto-loop<br/>返回条件：暴露新边界或新发现<br/>返回材料：需要 auto-loop 重判下一跳 / 工位
+        end
+    else 判断为进入 dev-loop execution
+        AUTO->>DEV: [主管AI do]：<br/>进入 dev-loop<br/>进入条件：issue ready / continuation<br/>进入目标：实现当前批次 / 补测试 / 补 evidence
+        Note over AUTO,DEV: add / commit / 局部分支推进属于当前 issue 的实现与证据动作<br/>不单独长成平行生命周期轴
+        loop dev-loop 内部循环
+            DEV->>DEV: [worker AI do]：<br/>确认当前 issue / 工位 / 依赖 / 当前批次目标
+            loop dev-loop 实现子循环
+                DEV->>DEV: [worker AI do]：<br/>改代码<br/>改脚本<br/>改 runtime<br/>改 agent
+                DEV->>DEV: [worker AI do]：<br/>自检当前实现批次<br/>是否还需继续
+            end
+            loop dev-loop 验证与证据子循环
+                DEV->>DEV: [worker AI do]：<br/>跑测试
+                DEV->>DEV: [worker AI do]：<br/>消化当前 issue 内部的 test failure / review feedback
+                DEV->>DEV: [worker AI do]：<br/>写 progress
+                DEV->>DEV: [worker AI do]：<br/>写 evidence
+                DEV->>DEV: [worker AI do]：<br/>写 verification_artifact_dir 下的 implementation decision note
+                DEV->>DEV: [worker AI do]：<br/>补 code-review / verification artifact
+                DEV->>DEV: [worker AI do]：<br/>需要时做 add / commit / worktree 内续推
+                DEV->>DEV: [worker AI do]：<br/>判断当前批次证据是否足够
+            end
+        end
+        alt 判断为当前批次 evidence 已就绪
+            DEV-->>AUTO: [worker AI do]：<br/>返回 auto-loop<br/>返回条件：当前批次 evidence 已就绪<br/>返回材料：tests / progress / evidence / implementation note 已回写
+        else 判断为仍需继续当前循环
+            DEV->>DEV: [worker AI do]：<br/>继续 dev-loop 内部循环
+        else 判断为当前边界不够用
+            DEV-->>AUTO: [worker AI do]：<br/>返回 auto-loop<br/>返回条件：发现当前边界不够用<br/>返回材料：需要 auto-loop 重判下一跳 / 工位
+        end
+    else 判断为进入 recovery
+        AUTO->>AUTO: [主管AI do]：<br/>进入 recovery gate
+        AUTO->>AUTO: [脚本 do]：<br/>提供中断态 / 恢复态 / 工具可用性
+        AUTO->>AUTO: [主管AI do]：<br/>按 recovery -> progress -> issue -> milestone 顺序读取恢复真相<br/>重建当前 runtime_state / phase_state / 可续接性
+        AUTO->>AUTO: [主管AI do]：<br/>判断恢复后跳去哪里
+        alt 判断为接回原 loop / 原工位
+            AUTO->>AUTO: [主管AI do]：<br/>按原 loop / 原工位继续推进
+        else 判断为跳去 doc-loop
+            AUTO->>DOC: [主管AI do]：<br/>跳去 doc-loop<br/>进入目标：重收边界 / 补 continuity / 重启文档推进
+        else 判断为跳去 dev-loop
+            AUTO->>DEV: [主管AI do]：<br/>跳去 dev-loop<br/>进入目标：重启实现批次 / 补 continuity / 继续推进
+        else 判断为继续等待
+            AUTO->>AUTO: [脚本 do]：<br/>继续 runtime-owned 等待 / 重试 / 重检<br/>等待下一轮巡检
+        end
+    end
+
+    AUTO->>AUTO: [主管AI do]：<br/>读取回写 / 读取证据 / 读取 review signal<br/>判断返回后跳去哪里
+    Note over AUTO: review / verification / cleanup / closeout 继续作为 auto-loop 回收后的判断面<br/>不再拆成彼此竞争的平行主轴
+    alt 判断为跳去 dev-loop
+        AUTO->>DEV: [主管AI do]：<br/>跳去 dev-loop<br/>进入条件：实现需修正 / 证据未收够 / 当前 issue 仍可继续<br/>进入目标：继续实现 / 补测试 / 补证据
+    else 判断为跳去 doc-loop
+        AUTO->>DOC: [主管AI do]：<br/>跳去 doc-loop<br/>进入条件：边界变化 / acceptance 需重写 / issue docs 未收稳<br/>进入目标：重收边界 / 补 IBM / 补 closeout docs
+    else 判断为形成新发现源
+        AUTO->>DOC: [主管AI do]：<br/>跳去 doc-loop<br/>进入条件：当前 issue 已完成且新发现不再属于原 issue<br/>进入目标：形成新的 candidate / GitHub issue / milestone intake
+    else 判断为进入 completion verification
+        AUTO->>AUTO: [主管AI do]：<br/>进入 completion verification gate<br/>进入条件：当前 issue 已达到 completion verification 条件<br/>进入目标：校验当前回写 / 证据 / completion judgment
+        alt 判断为跳去 doc-loop 补文档收口
+            AUTO->>DOC: [主管AI do]：<br/>跳去 doc-loop<br/>进入目标：补 closeout docs / 补 writeback / 补追溯
+        else 判断为跳去 dev-loop 补开发收口
+            AUTO->>DEV: [主管AI do]：<br/>跳去 dev-loop<br/>进入目标：补实现尾项 / 补验证 / 补 cleanup evidence
+        else 判断为进入 cleanup / closeout followthrough
+            AUTO->>AUTO: [主管AI do]：<br/>进入 cleanup / closeout followthrough gate<br/>读取 cleanup 尾项 / 提升条件 / 退休条件<br/>处理 merge / promotion / cleanup / writeback 尾项
+            alt 判断为仍有 cleanup 尾项
+                AUTO->>AUTO: [主管AI do]：<br/>继续 auto-loop 收口<br/>补排班 / 补跟进
+            else 判断为已提升待退休或进入下一轮巡检
+                AUTO->>AUTO: [脚本 do]：<br/>退出条件：cleanup / 提升 / 退休尾项已闭合<br/>退出期望：结束当前轮次并进入下一轮巡检
+            end
+        end
+    else 判断为继续等待
+        AUTO->>AUTO: [主管AI do]：<br/>判断是否委派<br/>是否复用工位<br/>是否冻结等待
+        AUTO->>AUTO: [脚本 do]：<br/>等待回写<br/>等待新信号<br/>等待下一轮巡检
+    end
 ```
-
-站位说明：
-- `auto-loop` 是唯一 outer loop，负责 notice、routing、completion judgment、verification judgment、cleanup / retirement routing。
-- `doc-loop` 与 `dev-loop` 是 sibling loops，不互相包含；它们都只把事项推进到“到达下一门”。
-- `verification`、`cleanup governance`、`recovery` 是 `auto-loop` 触发的 route / phase，不是第四个或第五个 loop。
-- worker 可在 `doc-loop` / `dev-loop` 中执行并产出 evidence，但不能自己宣布 terminal completion。
-- 只有 `auto-loop` 看到 evidence 已足够，且 cleanup / retirement 已闭合，当前主题才算真正退出本轮循环。
-
-跳出与回流：
-- `doc-loop` 跳出：边界收敛、IBM 就绪、或明确 reroute；然后回 `auto-loop`。
-- `dev-loop` 跳出：实现批次、局部测试、verification evidence 已到下一门；然后回 `auto-loop`。
-- `auto-loop` 不因任一局部 loop 跳出就判定结束；它必须继续决定：
-  - 是否再次进入 `doc-loop`
-  - 是否再次进入 `dev-loop`
-  - 是否进入 `completion_verification`
-  - 是否进入 `cleanup_governance`
-  - 或是否已经到 `retired` / next-task patrol
-- 若同一 `doc-loop` / `dev-loop` 内部出现 worker 死掉、死循环、或 route / restart point 走位错误，也不由该 loop 自判；而是由主管在 `auto-loop` 侧通过监督发现后介入：
-  - 主管可通过 patrol、live-status / session evidence，或 human interruption 重新判定 `ownership + restart_point + next_action`
-  - 若只是治理纠偏，主管写新的 continuity / worker handoff
-  - 若进程已失效或错误 worker 持续占位，则交回 runtime kill / restart / re-entry
-  - 若 watchdog 观察到短窗口内反复启动 AI 工具进程、异常重启次数、或进程总数异常膨胀，这同样属于 `auto-loop` supervision signal：watchdog 负责暴露 churn，主管负责判断这是正常恢复、prompt/continuity 漂移，还是 dead-loop / thrash
-
-## 2. Whole-System Flow
-
-```mermaid
-flowchart TD
-    A[front-door command or standing source] --> B[signal record]
-    B --> C[sync execution triad]
-    C --> C1[lifecycle record]
-    C --> C2[worktree execution cell]
-    C --> D[manager routing]
-
-    D --> E{route_kind}
-    E -->|pre_brainstorm| F[doc-loop: pre-brainstorm]
-    E -->|ibm| G[doc-loop: IBM]
-    E -->|dev_loop| H[dev-loop]
-    E -->|completion_verification| I[completion verification]
-    E -->|recovery| J[runtime or session recovery]
-    E -->|cleanup_governance| K[cleanup governance]
-
-    D --> L{worktree action}
-    L -->|reuse_existing_worktree| M[worker re-entry]
-    L -->|create_feature_worktree| N[new execution cell]
-    L -->|freeze_current_worktree| O[frozen / waiting]
-    L -->|retire_worktree| P[retirement handoff]
-    L -->|manager_only_no_worker| Q[manager-only patrol]
-
-    F --> R[canonical writeback]
-    G --> R
-    H --> R
-    I --> R
-    J --> R
-    K --> R
-
-    I -->|verification failed| H
-    I -->|new boundary exposed| F
-    I -->|verification passed| K
-    J -->|runtime recovered| D
-    K -->|cleanup finished| S[next patrol sees closed lifecycle]
-    O --> S
-    P --> S
-    Q --> S
-    R --> S
-    S --> D
-```
-
-说明：
-- 任何一轮都先同步三元组，而不是只看 issue 或只看 worktree。
-- `auto-loop` 负责 route 与 outer governance，不包含 `doc-loop` / `dev-loop` 的实现细节。
-- `doc-loop` 与 `dev-loop` 是 sibling execution loops；它们都可能把结果回流给 `auto-loop`。
-- `completion verification` 不是 cleanup，也不是第四个 loop；它是 `auto-loop` 消费 worker evidence 后做出的 promote 前后验收路径。
-- cleanup 完成后才算 lifecycle 真正闭环，不允许停在 `merged-not-cleaned`。
-- `route_kind` 与 `worktree action` 是两个并列判断，不允许只判 loop 不判执行容器。
-- 新 discovery 可以先被 intake 接住，但若存在唯一 canonical retained tree 仍未收口，manager 可以先延后 create，直到旧树 closeout 完成。
-
-## 3. Execution Triad Map
-
-```mermaid
-flowchart LR
-    A[signal] --> D[manager routing]
-    B[lifecycle record] --> D
-    C[worktree execution cell] --> D
-
-    A1[why this cycle woke up] --> A
-    B1[current phase and canonical truth] --> B
-    C1[where execution can safely happen] --> C
-```
-
-三元组定义：
-- `signal`: 这轮为什么被唤醒，例如 human interruption、patrol、test failure、review finding、runtime anomaly。
-- `lifecycle record`: 当前 canonical 文档真相，例如 candidate、issue、progress、recovery、milestone。
-- `worktree execution cell`: 当前真实执行容器，即 `branch + worktree + runtime/session + ownership`。
-- 当 `worktree` 进入 ownership / queue / freeze / recovery 比较时，必须先 canonicalize 为真实路径；prompt header / continuity 文本中的原始字符串只作为输入线索，不作为最终判重键。
-
-判定原则：
-- 只看 `signal` 会丢掉当前做到哪一步。
-- 只看 `lifecycle record` 会丢掉“该在哪棵树执行”。
-- 只看 `worktree execution cell` 会把 dirty/clean 误判成业务完成度。
-
-## 4. Front-Door Flow
-
-```mermaid
-flowchart LR
-    A[freely init] --> A1[baseline ready]
-    B[freely start] --> B1[runtime boot]
-    B1 --> B2[manager patrol]
-
-    C[freely chat]
-    D[test or review finding]
-    E[runtime anomaly]
-    F[milestones / progress / recovery / fleet]
-
-    C --> G[durable intake or source record]
-    D --> G
-    E --> G
-    F --> G
-
-    G --> H[manager notice]
-    H --> I[classify source]
-    I --> J[load lifecycle record]
-    J --> K[load worktree cell]
-    K --> L[choose route and worktree action]
-```
-
-## 5. Runtime Artifact Chain
-
-```mermaid
-flowchart LR
-    A[signal or patrol wakeup] --> B[durable intake or source record]
-    B --> C[interruption resolution]
-    C --> D[manager continuity]
-    D --> E[worker prompt]
-    E --> F[worker runtime / prompt]
-    F --> G[canonical writeback]
-    G --> H[verification or cleanup evidence]
-    H --> I[next patrol / next task scan]
-```
-
-说明：
-- 运行时真正消费的是 artifact 链，而不是聊天里的自然语言。
-- `intake -> resolution -> continuity -> worker prompt` 任何一环缺失，都会造成“看起来路由过了，实际上下游无从续跑”。
-- 文档真相写回后，还要再经过 `verification / cleanup evidence` 才算真正回到下一轮 patrol。
-- `worker prompt set` 不是无序列表；每条 worker handoff 至少要带 `dispatch_priority`、`parallel_safe`、`write_scope`，供 runtime 判断直接 launch、same-lane busy guard、写域冲突与 queue/frozen 保留。
-- 若该 handoff 会授予 mutate authority，还要显式带 `intent_kind` 与 `intent_target`；`write_scope` 只表达 launch-time 写域冲突，不替代长期 `edit / cleanup / promotion` ownership truth。
-- 对会产生 mutate authority 的 lane，worker handoff 还必须带 `intent_kind` 与 `intent_target`；`write_scope` 只负责 launch-time scheduling，不替代长期 ownership truth。
-- phase-1 launch scheduling 的 intent blocker 至少包含 `active-owner`、`recorded-owner` 与 `frozen-owner`；若目标 lane 只剩 recorded ownership，主管也必须先做 reclaim / handoff judgment，再决定是否重启或重派同 target lane。
-- protected-branch merge completion 也属于 artifact 链的一部分：正常 path 通过 `merge-guarded` 写 merge receipt，break-glass path 还必须额外携带 hook handshake env、issue-bound follow-on owner 与 post-hoc receipt ledger；没有这些 artifact 时，不得把一次 merge completion 解释为合法 lifecycle advancement。
-- protected-branch merge completion 也属于 artifact chain 的一段，而不是“冲突时可以手工收尾”的例外路径：`merge-guarded` 写 merge receipt、hooks 校验 guarded completion / break-glass 字段、`governance-check` 再做 post-merge audit，缺任一环都不能算 lifecycle 闭环。
-- break-glass 不是独立 loop；它只是 `dev-loop -> verification/cleanup` 之间的受控例外 route。命中时必须留下 machine-readable receipt、follow-on owner 和 evidence ref，随后仍要回到 doc-loop / verification artifact 把误报或工具缺口 materialize 成 canonical repair owner。
-
-## 5A. Observability Planes
-
-Day-1 观察面不新造平行控制面，而是先复用现有 `live-status` / `fleet-status` / artifact deep refs：
-
-- `current-state plane`
-  - 回答“现在谁在干活、在哪个 loop / phase、当前聚焦什么”
-  - day-1 由 `live-status` 承接
-- `fleet plane`
-  - 回答“所有 worktree / lane / runtime 当前分别处于什么状态”
-  - day-1 由 `fleet-status` 承接
-- `session plane`
-  - 指向当前 prompt、jsonl、cycle log、pid / runtime state 等 session deep refs
-- `stream plane`
-  - 指向实时或近实时输出面，例如 cycle log tail、session jsonl tail
-- `artifact plane`
-  - 指向 continuity、worker prompts、issue / progress / review / cleanup evidence
-  - `acceptance evidence` 的 canonical home 在此，不散落到 `current-state` / `fleet` 文本摘要里
-- phase-1 ownership truth 也优先挂在这些既有观察面上，而不是新造平行控制面：
-  - `occupancy plane` 回答“谁在这里、最近是否 still-live”
-  - `intent lease plane` 回答“谁当前拥有 `edit` / `cleanup` / `promotion` mutate authority”
-  - 若当前 lane 因 duplicate `edit` / `cleanup` / `promotion` target 被挡住，`live-status` / `fleet-status` 还要直接暴露 machine-readable `ownership_holder_state`、`ownership_holder_status`、`ownership_conflict_state`、`ownership_conflict_signature`、`ownership_conflict_with`，避免只剩 cycle log / merge gate 文本可读
-  - 若主管 continuity 的 queued / frozen prompt 因 active、recorded、queued 或 frozen owner 被挡住，`live-status` 与 manager/root `fleet-status` row 都要直接暴露 `manager_pending_ownership_conflicts`，并带出 `status=`；phase-1 里 `soft_stale recorded-owner` 继续阻塞，`hard_stale recorded-owner` 进入 runtime reclaim allowed
-  - 若 cleanup followthrough 因 queued / recorded / frozen ownership retain 某棵 merged tree，resolution artifact 也要直接写出 canonical holder state、ref 与 holder status，而不是只留内部 claim 名称
-- 对 `edit` / `cleanup` 这类 worktree-local target，比较时使用 canonicalized `resolved worktree_path`，避免 `/tmp`、`/private/tmp`、symlink 等别名路径造成 owner 漂移或重复 launch。
-
-最小 plane identity block：
-
-- `plane_kind`
-- `entity_kind`
-- `entity_ref`
-- `owner_kind`
-- `owner_ref`
-- `loop_kind`
-- `phase_state`
-- `topic_ref`
-- `deep_ref`
-
-共享 deep ref 组：
-
-- `session_ref`
-- `stream_ref`
-- `artifact_ref`
-- `fleet_ref`
-- `acceptance_ref`
-
-day-1 mirror 规则：
-
-- `current-state plane` 与 `fleet plane` 只镜像最小 acceptance 摘要：
-- 对 sibling dirty、cleanup followthrough、promotion in flight 这类跨 worktree signal，合法动作是 `inspect-anywhere`；真正跨树 mutate 仍必须回到 manager arbitration，并消费 machine-readable ownership truth。
-  - cleanup retain reason 也要回写最小 ownership snapshot，至少能区分 `active-owner`、`recorded-owner`、`queued-owner`、`frozen-owner`，避免把 continuity 中仍持有 cleanup/edit authority 的 merged tree 误删。
-  - `completion_state`
-  - `delete_gate_state`
-  - `acceptance_scope`
-  - `acceptance_target`
-  - `acceptance_ref`
-- protected-branch break-glass 不是平行 loop；它只是 `completion_verification -> cleanup_governance` 之间的一条例外 route。例外 route 只允许 `merge_completion_only`，并必须把 `blocked_gate + evidence_refs + follow_on_owner + receipt_ref` 全部写回 `artifact plane`，供后续 patrol、verification 与 governance-check 复盘。
-- stall / progress / restart-storm 这类 signal 只提供 supervision signal，不直接宣告 completed / delete-ready
-- 主管若要判断完成、删除门、或 acceptance 是否已闭合，必须沿 `acceptance_ref` 回到 `artifact plane`
-
-## 6. Manager Routing Map
-
-```mermaid
-flowchart TD
-    A[signal] --> B[classify source_class]
-    B --> C[read phase_state and runtime_state]
-    C --> D[read worktree state and ownership]
-    D --> E{retained canonical owner still open?}
-    E -->|yes| F[finish retained tree first]
-    E -->|no| G[allow new create or reuse]
-
-    F --> H{retained tree state}
-    H -->|dirty merged tree| I[continuation / cleanup followthrough]
-    H -->|operator stopped or rate-limited| J[manager-only hold or recovery]
-    H -->|already retire-ready| K[retire_worktree]
-
-    G --> L{worktree action}
-    L -->|reuse_existing_worktree| M[worker re-entry]
-    L -->|create_feature_worktree| N[branch-management]
-    L -->|freeze_current_worktree| O[frozen worktree]
-    L -->|retire_worktree| P[cleanup handoff]
-    L -->|manager_only_no_worker| Q[manager-only governance]
-
-    I --> R{route_kind}
-    J --> R
-    M --> R
-    N --> R
-
-    R -->|pre_brainstorm| S[worker doc-loop: pre-brainstorm]
-    R -->|ibm| T[worker doc-loop: IBM]
-    R -->|dev_loop| U[worker dev-loop]
-    R -->|completion_verification| V[manager or worker verification path]
-    R -->|recovery| W[runtime/session recovery]
-
-    K --> X[next patrol]
-    O --> X
-    P --> X
-    Q --> X
-    S --> X
-    T --> X
-    U --> X
-    V --> X
-    W --> X
-```
-
-## 7. Worktree Lifecycle Map
-
-```mermaid
-stateDiagram-v2
-    [*] --> planned
-    planned --> provisioning
-    provisioning --> active
-
-    active --> frozen
-    frozen --> active
-
-    active --> verification_ready
-    verification_ready --> active: verification failed / more implementation
-    verification_ready --> promotion_in_flight
-
-    promotion_in_flight --> active: replay conflict / protected verification failed
-    promotion_in_flight --> merged_not_cleaned
-
-    merged_not_cleaned --> retained_dirty: canonical writeback still open
-    retained_dirty --> active: followthrough resumed
-    retained_dirty --> frozen: operator stop / runtime hold / account unavailable
-    merged_not_cleaned --> retire_ready
-    retire_ready --> retired
-    retired --> [*]
-```
-
-约束：
-- `completed` 属于 issue 生命周期，不等于 worktree 已退休。
-- `merged-not-cleaned` 不是 terminal。
-- `retire-ready` 只表示 cleanup gate 已过，还差正式删除与留痕。
-- `retained_dirty` 表示“树已经被目标分支吸收，但该树仍持有 canonical writeback 或 closeout 责任”。
-- `operator stop`、`usage limit`、AI 崩溃这类运行时异常不会直接改写 lifecycle；它们只会让 worktree 暂停在当前状态，等待 manager recovery judgement。
-- worker 从 `doc-loop` / `dev-loop` 跳出只表示“到达下一门”；只有 `auto-loop` 接住 evidence 并做出 completion / cleanup judgment 后，主题才可能外层收口。
-
-## 8. Completion And Cleanup Flow
-
-```mermaid
-flowchart LR
-    A[worker verification evidence] --> B[manager completion verification]
-    B --> C{result}
-    C -->|pass| D[promotion in flight]
-    C -->|same issue needs more work| E[back to active dev-loop]
-    C -->|new boundary exposed| F[back to pre-brainstorm]
-
-    D --> G[merged-not-cleaned]
-    G --> H[cleanup gate check]
-    H -->|pass| I[retire-ready]
-    H -->|hold with reason| J[merged-not-cleaned visible in patrol]
-    I --> K[branch delete / worktree delete / remote disposition]
-    K --> L[cleanup evidence]
-    L --> M[next patrol sees lifecycle closed]
-```
-
-## 9. Ownership And Boundary Map
-
-```mermaid
-flowchart LR
-    A[runtime-owned] --> A1[intake durability]
-    A --> A2[watchdog and pid recovery]
-    A --> A3[continuity / prompt materialization]
-
-    B[manager-owned] --> B1[route_kind]
-    B --> B2[worktree action]
-    B --> B3[fleet priority order]
-
-    C[worker-owned] --> C1[doc-loop writeback]
-    C --> C2[dev-loop writeback]
-    C --> C3[verification evidence]
-
-    D[cleanup-owned] --> D1[retirement decision]
-    D --> D2[branch/worktree deletion]
-    D --> D3[cleanup evidence]
-```
-
-关键边界：
-- runtime 只负责托管、恢复、handoff artifact 与进程态，不替 worker 做语义 closeout。
-- manager 负责决定“先收哪棵树、何时新建树、何时只冻结/等待”，不直接在 protected branch 上实现。
-- worker 负责 canonical 文档或代码写回，不负责自己决定 retirement。
-- queue / launch 判断属于 `manager decision + runtime enforcement` 联动：manager 写 lane metadata，runtime 对 launchable lane 直接执行，只把 same-lane busy guard、显式 freeze、写域冲突或 supersede 保留为 queue/frozen truth。
-
-## 9A. Dispatch Scheduling Map
-
-```mermaid
-flowchart TD
-    A[manager continuity with worker prompt set] --> B[rank by dispatch_priority]
-    B --> C{lane launchable now?}
-    C -->|yes| D{parallel_safe and write_scope conflict-free?}
-    C -->|no| E[queue or freeze remaining prompts]
-    D -->|yes| F[launch worker runtime]
-    D -->|no| E
-    F --> G[active running worker lane]
-    E --> H[queued worker list in continuity / launch state]
-    G --> I[next manager patrol]
-    H --> I
-```
-
-调度约束：
-- `dispatch_priority` 决定先派谁，不决定 route_kind 本身。
-- `parallel_safe=false` 的 lane 默认单独占一个 dispatch wave。
-- `write_scope` 冲突的 lane 不应同 wave 并发。
-- `intent_kind` / `intent_target` 决定 lane 取得的 mutate authority；worker 发现 sibling dirty 或 promotion blocker 时，必须先回 manager arbitration，而不是直接跨树获取 authority。
-- same-lane busy guard、显式 freeze、写域冲突或 supersede 出现时，未派发 lane 必须保留在 queue / frozen truth，而不是静默丢失或被挤回单一 continuation。
-
-## 10. Loop Ownership Table
-
-| Node | Primary owner | Main modules | Canonical artifacts |
-| --- | --- | --- | --- |
-| front-door intake | runtime | `freely init/start/chat`, runtime scripts | `.freely/intake/**`, runtime state |
-| manager routing | manager-agent | `auto-loop-orchestrator`, `context-source-skill` | routing output, continuity |
-| pre-brainstorm | worker | `doc-pre-brainstorm-execution` | `docs/pre-brainstorms/**` |
-| IBM | worker | `doc-ibm-execution` | `docs/epics/**`; story-level `pre-tests.md` must already distinguish acceptance-definition blockers from execution blockers |
-| dev-loop | worker | `dev-loop-execution` | code, tests, reviews, progress |
-| completion verification | manager -> worker | issue verification sections, review artifacts, protected acceptance evidence | issue, progress, milestone, cleanup pending truth; do not treat `execution_pending_or_failed` as interchangeable with `definition_missing` / `commands_only` / `evidence_plan_missing` |
-| recovery | runtime + manager | runtime scripts, `recovery-subagent-governance` | `docs/recovery/**`, continuity |
-| worktree action | manager + runtime | `branch-management`, worktree scripts | branch/worktree state |
-| fleet supervision | manager | `multi-worktree-supervision`, `worktree-maintenance-governance` | fleet snapshot, disposition |
-| cleanup governance | manager -> worker | `worktree-maintenance-governance`, `branch-management` | cleanup evidence |
-
-## 11. Route Decision Table
-
-| Condition | Route | Worktree default | Why |
-| --- | --- | --- | --- |
-| no stable issue boundary | `pre_brainstorm` | create | 先收敛边界，不提前写实现 |
-| milestone-owned issue but IBM incomplete | `ibm` | reuse/create | 先补 issue 文档，不跳过文档层 |
-| ready issue or explicit continuation | `dev_loop` | reuse | 默认回现有 active tree，减少新树与上下文切换 |
-| `phase_state=in_verification` or milestone completed but cleanup open | `completion_verification` | reuse/manager-only | 不重复开发，直接处理 promote/cleanup |
-| runtime/session unavailable or stale `in_*` | `recovery` | freeze/reuse | 先恢复 continuity，再决定是否继续 |
-| cleanup gate already passed | cleanup governance | retire | 直接删树留痕，不让旧树继续占位 |
-| new discovery admitted but retained dirty owner still open | `pre_brainstorm` deferred | manager-only first | 先收 canonical owner，避免同时制造第二个 competing tree |
-| operator-stopped worker with unresolved lifecycle | `recovery` or manager-only hold | freeze | 不擅自自动复活，要先重新判定 ownership |
-| AI tool usage limit / auth unavailable | `recovery` | freeze/manager-only | 这是 runtime-owned 暂停，不是业务状态改变 |
-
-## 12. Worktree Action Table
-
-| Action | Chosen by | Meaning | Next hop |
-| --- | --- | --- | --- |
-| `reuse_existing_worktree` | manager | current signal continues in an existing active tree | worker re-entry |
-| `create_feature_worktree` | manager | current signal needs a new dedicated execution cell | `branch-management` |
-| `freeze_current_worktree` | manager | tree remains visible but cannot continue now | next patrol / recovery |
-| `retire_worktree` | manager | tree passed cleanup gate and should be removed | cleanup handoff |
-| `manager_only_no_worker` | manager | this hop is governance-only and does not need worker execution | next patrol |
-
-复用优先规则：
-- 现有 issue continuation 默认复用当前 active worktree。
-- 只有边界变化、树已退休、树不可安全继续、或需要独立 repair/research cell 时才新开树。
-- 若唯一 retained dirty tree 仍持有 canonical closeout，默认先完成它，再决定是否新开 discovery worktree。
-
-## 13. Worktree State Table
-
-| Worktree state | Meaning | Usual owner |
-| --- | --- | --- |
-| `planned` | dedicated tree required but not created yet | manager |
-| `provisioning` | branch/worktree creation or enter in progress | runtime + manager |
-| `active` | tree is executing doc-loop or dev-loop | worker |
-| `frozen` | tree is intentionally paused by dependency/runtime/hygiene reason | manager |
-| `verification-ready` | worker finished current batch and is waiting for completion routing | manager + worker |
-| `promotion-in-flight` | merge-up, merge-prep, replay, or protected acceptance is running | manager |
-| `merged-not-cleaned` | target absorbed changes but branch/worktree disposition still open | manager |
-| `retained-dirty` | merged tree still carries canonical writeback / closeout duty | manager + worker |
-| `retire-ready` | cleanup gate passed; delete/retain disposition remains to execute | manager |
-| `retired` | local tree and branch removed; remote handled or retained-with-reason | manager |
-
-## 14. Lifecycle Record Map
-
-| Record | Main loop | Purpose |
-| --- | --- | --- |
-| `pre-brainstorm candidate` | doc-loop | discovery boundary |
-| `issue` | doc-loop | issue boundary |
-| `progress` | dev-loop | implementation continuity |
-| `recovery` | auto-loop / recovery | recovery continuity |
-| `milestones.md` | auto-loop + doc-loop | queue, index, orchestration |
-| cleanup evidence | auto-loop | closure proof |
-
-## 15. Event Matrix
-
-| Event | Source | First owner | Loop entry | Lifecycle record update | Worktree action | Next hop |
-| --- | --- | --- | --- | --- | --- | --- |
-| `project_initialized` | `freely init` | runtime | auto-loop | baseline/bootstrap truth | none | wait/start |
-| `manager_started` | `freely start` | runtime | auto-loop | runtime continuity updated | none | patrol |
-| `human_chat_received` | `freely chat` | runtime -> manager | auto-loop | intake refs, issue refs, recovery refs | reuse/create/none | route |
-| `standing_source_patrol` | milestones/progress/recovery/fleet | manager | auto-loop | continuity snapshot | reuse/create/freeze/retire/none | route |
-| `new_discovery_confirmed` | manager routing | manager | doc-loop | pre-brainstorm + candidate | create | worker pre-brainstorm |
-| `new_discovery_admitted_but_deferred` | manager routing | manager | auto-loop | intake + candidate stay visible | manager-only | finish retained owner first |
-| `candidate_promoted_to_issue` | doc-loop | worker | doc-loop | issue + milestone | reuse/create | IBM |
-| `issue_docs_ready` | IBM | worker | dev-loop | issue + milestone | reuse | dev-loop |
-| `issue_continuation_confirmed` | manager routing | manager | doc-loop or dev-loop | issue/progress/recovery continuity | reuse | worker re-entry |
-| `runtime_recovery_required` | runtime/session failure | runtime -> manager | recovery | recovery continuity | freeze/reuse/none | recovery |
-| `runtime_limit_hit` | AI tool / account | runtime | recovery | runtime continuity only | freeze/manager-only | wait or re-entry |
-| `operator_stopped_worker` | human or runtime stop | runtime -> manager | recovery | workcell state only | freeze | manager re-judge before resume |
-| `checkpoint_or_hygiene_triggered` | worker or patrol | manager + worker | dev-loop | progress continuity | freeze/reuse | hygiene / continue |
-| `verification_passed` | worker | manager | completion verification | issue/progress/milestone evidence | none | promote decision |
-| `verification_failed_same_issue` | worker/protected verification | manager | dev-loop | blocker / next-step continuity | reuse | repair same tree |
-| `verification_failed_new_boundary` | worker/protected verification | manager | doc-loop | candidate / issue reroute | create/reuse | pre-brainstorm |
-| `promotion_started` | manager | manager | completion verification | verification continuity | none | merge-up / merge-prep / replay |
-| `promotion_completed` | manager | manager | cleanup governance | cleanup pending truth | none | cleanup decision |
-| `cleanup_gate_passed` | manager | manager | cleanup governance | cleanup readiness evidence | retire | branch-management cleanup |
-| `cleanup_completed` | cleanup worker | manager | auto-loop governance | cleanup evidence | retired | patrol |
-| `post_merge_new_finding` | review/test/patrol after promote | manager | discovery or dev-loop | new candidate / issue / blocker continuity | create/reuse | new repair route |
-
-## 16. Standard Chains
-
-### 16.1 Chat To Worker Execution
-
-```mermaid
-flowchart LR
-    A[freely chat] --> B[durable intake]
-    B --> C[manager notice]
-    C --> D[classify source]
-    D --> E[load issue/progress/recovery]
-    E --> F[load worktree cell]
-    F --> G{reuse or create}
-    G -->|reuse| H[existing worktree]
-    G -->|create| I[new feature worktree]
-    H --> J[worker handoff]
-    I --> J
-    J --> K[doc-loop or dev-loop]
-    K --> L[writeback]
-    L --> M[next patrol]
-```
-
-### 16.2 Verification To Retirement
-
-```mermaid
-flowchart LR
-    A[worker verification-ready] --> B[manager completion verification]
-    B -->|pass| C[promotion in flight]
-    B -->|fail same issue| D[back to active]
-    B -->|new boundary| E[back to pre-brainstorm]
-    C --> F[merged-not-cleaned]
-    F --> G[cleanup gate]
-    G -->|pass| H[retire-ready]
-    G -->|partial / retained| G2[continuation handoff]
-    G2 --> F
-    H --> I[delete branch/worktree]
-    I --> J[cleanup evidence]
-    J --> K[closed lifecycle visible to patrol]
-```
-
-### 15.3 Retained Dirty Tree Before New Discovery
-
-```mermaid
-flowchart LR
-    A[new chat discovery admitted] --> B[intake delegated to pre_brainstorm]
-    B --> C[manager patrol sees retained dirty merged tree]
-    C --> D{canonical owner still open?}
-    D -->|yes| E[defer create_feature_worktree]
-    E --> F[route retained tree to continuation or cleanup]
-    F --> G[closeout or freeze with reason]
-    G --> H[next patrol]
-    H --> I[new discovery becomes creatable]
-    D -->|no| J[create dedicated worktree now]
-```
-
-### 15.4 Runtime Pause Without Lifecycle Rewrite
-
-```mermaid
-flowchart LR
-    A[worker or manager active] --> B[runtime anomaly: limit/auth/crash/operator stop]
-    B --> C[runtime-owned hold]
-    C --> D[workcell state updated]
-    D --> E[manager recovery judgement]
-    E -->|resume same tree| F[re-entry]
-    E -->|freeze| G[next patrol]
-    E -->|retire| H[cleanup]
-```
-
-## 16. Cycle-Saving Gates
-
-| Gate | Default decision | Cycle saved |
-| --- | --- | --- |
-| issue continuation already has active tree | reuse existing worktree | 避免无意义新开 sibling tree |
-| docs already sufficient for implementation | skip back to IBM and enter `dev_loop` | 避免重复文档收敛 |
-| current batch only needs promote/cleanup | enter `completion_verification` instead of `dev_loop` | 避免重复开发和重复测试 |
-| verification failed but boundary unchanged | return to same active tree | 避免把实现问题误升级成新 discovery |
-| verification exposed a new boundary | reroute to `pre_brainstorm` | 避免把边界问题硬塞进当前 issue |
-| retained dirty canonical owner still open | defer new worktree creation | 避免新旧两棵树同时争夺同一 closeout 真相 |
-| cleanup gate passed | retire immediately | 避免停留在 `merged-not-cleaned` 占住树和注意力 |
-| operator stop or usage limit only changed runtime state | keep lifecycle truth unchanged | 避免把运行时暂停误写成业务完成或失败 |
-| runtime broken but canonical truth intact | recovery before new work | 避免重做已经完成的 doc/dev 写回 |
-
-## 17. Minimal Maintenance Rule
-
-新增能力时只补对应真源：
-- 新入口事件：补 `Whole-System Flow`、`Front-Door Flow` 或 `Event Matrix`
-- 新 artifact 交接层：补 `Runtime Artifact Chain`
-- 新 manager 判断：补 `Manager Routing Map` 或 `Route Decision Table`
-- 新 worktree 状态：补 `Worktree Lifecycle Map` 和 `Worktree State Table`
-- 新 promote / cleanup 分支：补 `Completion And Cleanup Flow`
-- 新 owner 边界：补 `Ownership And Boundary Map`

@@ -15,6 +15,8 @@
   - `skill:worktree-hygiene-supervision`
   - `skill:worktree-maintenance-governance`
 - 主管角色在三个 loop 中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
+  - 该文档是 whole-app lifecycle / logic 的唯一细节真源；主管在做 loop placement、restart point、completion / verification / cleanup / recovery judgment 前必须先阅读并按其语义裁决
+  - 若主管相关 prompt、routing 或 judgement contract 改变了 three-loop 语义，必须先同步检查该真源，再更新本文件
   - `skill:watchdog-control-plane`
   - `skill:continuity-watchdog`
   - `skill:agent-execution-safety-review`
