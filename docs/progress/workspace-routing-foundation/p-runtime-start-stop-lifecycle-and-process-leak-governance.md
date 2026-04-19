@@ -7,7 +7,7 @@
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-process-leak-20260417`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260417-feature-runtime-process-leak`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260417-integration-runtime-lifecycle-worker`
 - updated_at: `2026-04-18`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
