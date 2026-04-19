@@ -52,6 +52,17 @@
   - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
   - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
 
+## Receipt Gap: f3e0cd791bd30b36aef29e78dea66ccbff4c03ef
+
+- target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
+- source_branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260418-1900-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+
 ## Receipt Gap: 890e24d5f971ad95a5b91b565911e5c432112bf3
 
 - target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
