@@ -50,6 +50,25 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260418-1900-A`
+- title: Runtime lifecycle receipt followthrough governance
+- milestone_state: candidate
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
+- source_brainstorm: `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
+  - `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+  - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
+  - `./bin/governance-check`
+- completion_note: `This narrow followthrough owner carries the final receipt-ledger repair for the absorbed runtime lifecycle batch and should retire the temporary followthrough feature and test-pre-merge worktrees immediately after canonical develop absorbs it. Continuation 2026-04-19: the first guarded replay fixed the test-pre-merge merge trailers but left a develop-bound diff that only carried the ledger file, so this owner remains active until the same replay batch also refreshes candidate/issue/progress/review evidence on canonical develop.`
+
 1. `I-20260414-0255-A`
 - title: Freely start after-failure recovery handoff race root cause fix
 - milestone_state: committed
@@ -169,6 +188,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract/candidates.md`
 - next_action: Candidate mirror only. `I-20260417-0445-A` is now the canonical owner for CLI-first repeated-start rejection, lawful start-lock handling, same-project relauncher cleanup, AI fast-exit containment, and bounded lifecycle-trace support.
 - revisit_trigger: Re-open only if canonical implementation later regresses back toward silent repeated-start attach, leaves relaunch-capable same-project processes behind, or proves this bounded lifecycle seam still hides a different owner-worthy runtime defect.
+
+1. `C-20260418-1900-A`
+- title: Runtime lifecycle receipt followthrough governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/candidates.md`
+- next_action: Candidate mirror only. `I-20260418-1900-A` is now the canonical owner for the runtime lifecycle receipt-ledger followthrough and immediate retirement of the temporary followthrough worktrees.
+- revisit_trigger: Re-open only if canonical develop still surfaces receipt-gap drift after this bounded ledger repair, or if future receipt-ledger closures prove this followthrough pattern needs a reusable owner family.
 
 1. `C-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance

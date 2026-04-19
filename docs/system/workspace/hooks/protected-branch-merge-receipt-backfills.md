@@ -41,6 +41,72 @@
 - `validation_mode: unparseable_subject_ancestry` 必须显式声明 absorbing protected merge、protected batch branch、bounded owner issue 和 verification artifact；不得退化为 hash-only 例外
 - backfill entry 只修复 auditability，不授予 bypass 权限
 
+## Receipt Gap: 17556ba9d970b4bae03edf2fd4b679395125b8bd
+
+- target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
+- source_branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260418-1900-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+
+## Receipt Gap: 890e24d5f971ad95a5b91b565911e5c432112bf3
+
+- target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
+- source_branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260418-1900-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+
+## Receipt Gap: b05d485923c49bbef4412b32596e8d8596999ee9
+
+- target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
+- source_branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260418-1900-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+
+## Receipt Gap: 9cb3236d2c297e3b8b36bb4613c3f0d8dbb69e98
+
+- target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
+- source_branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260418-1900-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+
+## Receipt Gap: dc436573e5f3f995ed936e7b21c65f9440fffae9
+
+- target_branch: `test-pre-merge-runtime-lifecycle-20260417`
+- source_branch: `feature/runtime-process-leak-20260417`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260417-0445-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+
+## Receipt Gap: f7145cc889c3919cbe21b1162f96d14d736b83b7
+
+- target_branch: `test-pre-merge-runtime-lifecycle-20260417`
+- source_branch: `feature/runtime-process-leak-20260417`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260417-0445-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+
 ## Receipt Gap: 3e226fa9865973d5964e0bd5ec8a124452c49118
 
 - target_branch: `test-pre-merge-runtime-lifecycle-20260417`
