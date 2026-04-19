@@ -116,7 +116,6 @@
 - evidence_refs:
   - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
   - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
-
 ## Receipt Gap: 3e226fa9865973d5964e0bd5ec8a124452c49118
 
 - target_branch: `test-pre-merge-runtime-lifecycle-20260417`

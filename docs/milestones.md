@@ -234,7 +234,6 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/candidates.md`
 - next_action: Candidate mirror only. `I-20260419-0915-A` is now the canonical owner for the three-loop single-source lifecycle governance followthrough and retirement of the temporary merge worktrees after guarded replay.
 - revisit_trigger: Re-open only if canonical develop still permits parallel detailed lifecycle truth to drift across active docs or if downstream consumer docs prove the read-and-sync contract is insufficient.
-
 1. `C-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance
 - milestone_state: candidate

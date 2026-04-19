@@ -21,12 +21,13 @@ cleanup() {
 trap cleanup EXIT
 
 mkdir -p "$PROJECT_DIR/.freely/run"
+export TEST_FREELY_SCRIPT="$FREELY_SCRIPT"
 
 # Create test harness that overrides freely functions
 cat > "$HARNESS" <<'HARNESS_EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-FREELY="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260417-feature-runtime-process-leak/docs/system/workspace/scripts/runtime/freely"
+FREELY="${TEST_FREELY_SCRIPT:?}"
 PROJECT="/tmp/test-freely-start-lock"
 LOG="/tmp/harness-inner.log"
 
