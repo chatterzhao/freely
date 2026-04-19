@@ -2,14 +2,15 @@
 
 - issue_id: `I-20260418-1900-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-- verification_date: `2026-04-18`
+- verification_date: `2026-04-19`
 - verifier: `codex`
 
 ## Scope Verdict
 
 - `PASS`: this followthrough owner is bounded to receipt-ledger closure for the absorbed runtime lifecycle batch rather than reopening implementation scope.
 - `PASS`: the missing receipt-gap entries `dc436573...` and `f7145cc...` are now materialized with concrete owner evidence.
-- `PASS`: the develop-bound followthrough diff now carries concrete issue, pre-tests, progress, and review artifacts.
+- `PASS`: replaying the protected batch through `test-pre-merge-runtime-lifecycle-followthrough-20260418` now yields canonical Freely merge trailers at `8b465ae4`.
+- `PASS`: the remaining blocker is governance-only owner-evidence freshness on the develop-bound replay, not a runtime-behavior or receipt-ledger scope gap.
 - `PASS`: the remaining protected-branch acceptance surface is canonical develop replay plus temporary worktree retirement, not new runtime behavior changes.
 
 ## Commands

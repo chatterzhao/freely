@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-runtime-lifecycle-receipt-followthrough`
-- updated_at: `2026-04-18`
+- updated_at: `2026-04-19`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -16,7 +16,8 @@
 
 - The main runtime lifecycle implementation owner is already merged and pushed on canonical `develop`.
 - Post-merge governance replay exposed two remaining historical receipt gaps for the absorbed test-pre-merge batch, so this narrow followthrough owner exists only to carry the missing backfill ledger repair through a lawful protected-branch path.
-- The next lifecycle step is guarded replay of this governance-only followthrough and immediate retirement of the temporary followthrough worktrees.
+- The repaired `test-pre-merge-runtime-lifecycle-followthrough-20260418` replay now has canonical Freely merge trailers at `8b465ae4`, but the first guarded `develop` replay was still blocked because the merge diff only carried the ledger backfill file and not the owner-chain continuation evidence.
+- The next lifecycle step is to replay the same bounded owner with refreshed candidate / milestone / issue / progress / review evidence, then re-run canonical `develop` merge and retire the temporary followthrough worktrees.
 
 ## Verification Evidence
 
@@ -28,6 +29,7 @@
 
 ## Next Action
 
-1. Replay `feature/runtime-lifecycle-receipt-followthrough-20260418 -> test-pre-merge-runtime-lifecycle-followthrough-20260418 -> develop`.
-2. Re-run governance followthrough on canonical develop.
-3. Retire both temporary followthrough worktrees.
+1. Refresh the owner-chain continuation evidence in the source feature lane so the guarded `develop` replay is not ledger-only.
+2. Replay `feature/runtime-lifecycle-receipt-followthrough-20260418 -> test-pre-merge-runtime-lifecycle-followthrough-20260418 -> develop` again.
+3. Re-run governance followthrough on canonical develop.
+4. Retire both temporary followthrough worktrees.
