@@ -113,6 +113,86 @@ message_has_any_phrase() {
   return 1
 }
 
+message_lacks_any_phrase() {
+  local haystack="$1"
+  shift
+  if message_has_any_phrase "$haystack" "$@"; then
+    return 1
+  fi
+  return 0
+}
+
+emit_cleanup_worker_fast_path_if_applicable() {
+  local text="$1"
+
+  message_has_any_phrase "$text" \
+    "worktree" "工位" "分支" "branch" "cleanup" "收口" "retire" "退休" "merged" "已合并" "merge" || return 1
+  message_has_any_phrase "$text" \
+    "检查" "核对" "清理" "收口" "cleanup" "retire" "退休" "删除" "remove" "merge" "已合并" || return 1
+  message_lacks_any_phrase "$text" \
+    "milestones" "issues" "intake" "runtime" "主管" "所有 worktree" "所有工位" "所有" "当前状态推进" || return 1
+
+  cat <<'EOF'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=cleanup
+OWNERSHIP=worker
+WHY=收口问题依赖现场核对与实际 cleanup 动作
+HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口
+ANSWER=
+EOF
+  return 0
+}
+
+emit_manager_supervision_fast_path_if_applicable() {
+  local text="$1" role="$2"
+  [[ "$role" == "manager" ]] || return 1
+
+  if message_has_any_phrase "$text" "milestones" "issues" "intake" "runtime" "fleet-status" "live-status"; then
+    :
+  elif message_has_any_phrase "$text" "当前状态" "closeout" "收口项" "worker prompt" "continuity" "blocker" "启动链路"; then
+    message_has_any_phrase "$text" "继续" "推进" "处理" "优先" "materialize" "委派" || return 1
+  else
+    return 1
+  fi
+
+  cat <<'EOF'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=continuation
+RESTART_POINT=continuation
+OWNERSHIP=manager
+WHY=开发类插话需回主管主循环巡检并产出后续开发交接
+HANDOFF=先做 live-status 与 fleet-status 巡检，再把 blocker materialize 成 continuity 或 worker prompt
+ANSWER=
+EOF
+  return 0
+}
+
+emit_execution_continuation_fast_path_if_applicable() {
+  local text="$1" role="$2"
+
+  message_has_any_phrase "$text" \
+    "继续" "推进" "开发" "修复" "实现" "测试" "review" "验证" "blocker" "current issue" "active issue" "继续当前" "closeout" "收口" || return 1
+
+  if [[ "$role" == "worker" ]]; then
+    cat <<'EOF'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=continuation
+RESTART_POINT=continuation
+OWNERSHIP=worker
+WHY=开发类插话应回到当前工位继续执行 active issue
+HANDOFF=围绕当前工位 active issue 继续推进，不要停在旧 prompt
+ANSWER=
+EOF
+    return 0
+  fi
+
+  emit_manager_supervision_fast_path_if_applicable "$text" "$role"
+}
+
 emit_minimal_control_validation_fast_path_if_applicable() {
   local text="$1"
 
@@ -137,7 +217,18 @@ EOF
   return 0
 }
 
+role_hint="$(role_hint_for_project "$project")"
+
 if emit_minimal_control_validation_fast_path_if_applicable "$message"; then
+  exit 0
+fi
+if emit_cleanup_worker_fast_path_if_applicable "$message"; then
+  exit 0
+fi
+if emit_manager_supervision_fast_path_if_applicable "$message" "$role_hint"; then
+  exit 0
+fi
+if emit_execution_continuation_fast_path_if_applicable "$message" "$role_hint"; then
   exit 0
 fi
 
