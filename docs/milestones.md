@@ -204,6 +204,32 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: Current feature lane now binds owner `tasks.md` into completion and guarded adequacy checks inside `pretests-gate`; the remaining closeout step is the guarded upstream merge that lands this already-bounded repair on canonical `develop`.
 
+1. `I-20260419-1505-A`
+- title: Runtime supervisor attach reuse followthrough governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-supervisor-attach-reuse-followthrough-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-1505--runtime-supervisor-attach-reuse-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-1505--runtime-supervisor-attach-reuse-followthrough/candidates.md`
+- branch: `feature/checkpoint-lifecycle-trace-debuggability-20260419`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260416-feature-lifecycle-trace-debuggability`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-runtime-supervisor-attach-reuse-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-reuses-live-supervisor-without-relaunch`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-attaches-live-supervisor-between-ai-cycles`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-attaches-when-ps-is-unavailable`
+  - `bash docs/system/workspace/scripts/tests/test-freely-cc-launch-isolates-home-under-project-runtime`
+- next_action: `Keep this owner narrow, preserve the checkpoint evidence, and decide in a later pass whether guarded replay should happen directly or be absorbed by a newer runtime followthrough owner.`
+- revisit_trigger: `If later replay shows launcher-home isolation or supervisor attach should split into separate owners, reopen narrowly around the conflicting seam instead of silently widening this owner.`
+
 1. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
 - milestone_state: candidate
@@ -389,6 +415,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/candidates.md`
 - next_action: Candidate mirror only. `I-20260411-1417-A` is authoritative and now parked at completed; use the owner package for delivered reconcile truth instead of reopening raw pre-brainstorm debate.
 - revisit_trigger: Re-open only if a future stale pattern cannot be explained by the current reconcile labels and needs a fresh bounded follow-on owner.
+
+1. `C-20260419-1505-A`
+- title: Runtime supervisor attach reuse followthrough
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-1505--runtime-supervisor-attach-reuse-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-1505--runtime-supervisor-attach-reuse-followthrough/candidates.md`
+- next_action: Candidate mirror only. `I-20260419-1505-A` is now the canonical owner for the preserved supervisor attach/reuse checkpoint and Claude runtime-home isolation followthrough.
+- revisit_trigger: Re-open only if a later runtime owner absorbs this seam or guarded replay proves the branch-local checkpoint should be dropped instead of promoted.
 
 1. `C-20260411-0217-A`
 - title: Protected-merge unparseable-subject receipt-gap followthrough

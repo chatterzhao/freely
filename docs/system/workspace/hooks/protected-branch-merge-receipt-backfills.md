@@ -52,16 +52,6 @@
   - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
   - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
 
-## Receipt Gap: f3e0cd791bd30b36aef29e78dea66ccbff4c03ef
-
-- target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
-- source_branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
-- canonical_merge_path: `merge-guarded`
-- canonical_bypass_mode: `forbidden`
-- follow_on_owner: `I-20260418-1900-A`
-- evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
 ## Receipt Gap: 890e24d5f971ad95a5b91b565911e5c432112bf3
 
 - target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
@@ -113,6 +103,38 @@
 - canonical_merge_path: `merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+
+## Receipt Gap: f3dcbbd8fe4da12377f7e533dc162c649792bc69
+
+- validation_mode: `unparseable_subject_ancestry`
+- target_branch: `test-pre-merge-runtime-lifecycle-20260419`
+- source_branch: `feature/runtime-process-leak-20260417`
+- protected_batch_branch: `feature/runtime-process-leak-20260417`
+- absorbing_protected_merge: `48a4224750bbc4131ea8eb86a6213252417aa7ca`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260417-0445-A`
+- bounded_issue: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- verification_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+- evidence_refs:
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+
+## Receipt Gap: 8674e717fd4c8d5a4dde465cd01d9dd34ecbbad2
+
+- validation_mode: `unparseable_subject_ancestry`
+- target_branch: `test-pre-merge-runtime-lifecycle-20260419`
+- source_branch: `feature/runtime-process-leak-20260417`
+- protected_batch_branch: `feature/runtime-process-leak-20260417`
+- absorbing_protected_merge: `48a4224750bbc4131ea8eb86a6213252417aa7ca`
+- canonical_merge_path: `merge-guarded`
+- canonical_bypass_mode: `forbidden`
+- follow_on_owner: `I-20260417-0445-A`
+- bounded_issue: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- verification_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
 - evidence_refs:
   - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
   - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`

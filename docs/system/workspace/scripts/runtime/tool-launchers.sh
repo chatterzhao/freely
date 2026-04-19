@@ -266,6 +266,28 @@ project_worktrees_root_for_launch() {
   printf '%s\n' "${project_parent}/${project_name}-worktrees"
 }
 
+claude_home_mode_for_launch() {
+  printf '%s\n' "${FREELY_CLAUDE_HOME_MODE:-project}"
+}
+
+claude_runtime_home_for_launch() {
+  local project="$1"
+  printf '%s\n' "$project/.freely/tool-homes/claude"
+}
+
+ensure_claude_runtime_home_for_launch() {
+  local project="$1" claude_home
+  claude_home="$(claude_runtime_home_for_launch "$project")"
+  mkdir -p \
+    "$claude_home/.claude" \
+    "$claude_home/.claude/projects" \
+    "$claude_home/.claude/plugins" \
+    "$claude_home/.claude/statsig" \
+    "$claude_home/.claude/session-env" \
+    "$claude_home/.claude/sessions"
+  printf '%s\n' "$claude_home"
+}
+
 tool_supports_add_dir_boundary() {
   local tool="$1"
   case "$tool" in
@@ -401,11 +423,16 @@ tool_run_direct_from_prompt_file() {
       fi
       ;;
     cc|cc-use-codex-cli)
-      local prompt_text system_prompt worktrees_root project_branch
+      local prompt_text system_prompt worktrees_root project_branch claude_home_mode claude_home
       local -a args=(-p)
       prompt_text="$(cat "$prompt_file")"
       worktrees_root="$(tool_boundary_add_dir "$tool" "$project")"
       project_branch="$(project_branch_for_launch "$project")"
+      claude_home_mode="$(claude_home_mode_for_launch)"
+      claude_home=""
+      if [[ "$tool" == "cc" && "$claude_home_mode" == "project" ]]; then
+        claude_home="$(ensure_claude_runtime_home_for_launch "$project")"
+      fi
       if [[ "$mode" == "auto" ]]; then
         args+=(--permission-mode bypassPermissions)
       fi
@@ -421,6 +448,9 @@ tool_run_direct_from_prompt_file() {
       if tool_has_capability "$tool_capabilities" "codex-cli"; then
         system_prompt="$(cc_codex_policy_prompt "$tool_policy" "$project" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$worktrees_root" "$project_branch")"
         args+=(--append-system-prompt "$system_prompt")
+      fi
+      if [[ -n "$claude_home" ]]; then
+        exec env HOME="$claude_home" claude "${args[@]}" "$prompt_text"
       fi
       exec claude "${args[@]}" "$prompt_text"
       ;;

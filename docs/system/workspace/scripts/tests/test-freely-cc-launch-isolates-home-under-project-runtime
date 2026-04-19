@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-cc-home-isolation.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+BIN_DIR="$TMP_DIR/bin"
+PROMPT_FILE="$TMP_DIR/prompt.txt"
+OBSERVED_FILE="$TMP_DIR/observed.env"
+
+mkdir -p "$PROJECT/.freely" "$BIN_DIR"
+cat >"$PROMPT_FILE" <<'EOF'
+Reply with exactly: CLAUDE_OK
+EOF
+
+cat >"$BIN_DIR/claude" <<EOF
+#!/usr/bin/env bash
+cat >"$OBSERVED_FILE" <<OUT
+HOME=\${HOME:-}
+PWD=\$(pwd -P)
+ARGS=\$*
+OUT
+exit 0
+EOF
+chmod +x "$BIN_DIR/claude"
+
+(
+  export PATH="$BIN_DIR:$PATH"
+  # shellcheck disable=SC1090
+  source "$ROOT_DIR/docs/system/workspace/scripts/runtime/tool-launchers.sh"
+  tool_run_from_prompt_file "$PROJECT" "cc" "direct" "" "medium" "auto" "$PROMPT_FILE" "fresh"
+)
+
+EXPECTED_HOME="$PROJECT/.freely/tool-homes/claude"
+grep -q "^HOME=$EXPECTED_HOME$" "$OBSERVED_FILE" || {
+  echo "[FAIL] expected Claude launch HOME to be isolated under project runtime" >&2
+  cat "$OBSERVED_FILE" >&2
+  exit 1
+}
+grep -q -- '--permission-mode bypassPermissions' "$OBSERVED_FILE" || {
+  echo "[FAIL] expected cc auto mode to preserve bypassPermissions launch arg" >&2
+  cat "$OBSERVED_FILE" >&2
+  exit 1
+}
+[[ -d "$EXPECTED_HOME/.claude/sessions" ]] || {
+  echo "[FAIL] expected isolated Claude runtime home directories to be materialized" >&2
+  find "$PROJECT/.freely" -maxdepth 4 -type d | sort >&2
+  exit 1
+}
+
+echo "[PASS] cc launch isolates Claude HOME under project runtime"

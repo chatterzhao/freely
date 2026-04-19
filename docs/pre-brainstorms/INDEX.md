@@ -1,3 +1,4 @@
+# 预研头脑风暴索引
 - 20260419-0915--three-loop-single-source-followthrough
   - brainstorms: docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/candidates.md
@@ -10,6 +11,9 @@
 - 20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract
   - brainstorms: docs/pre-brainstorms/20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract/brainstorms.md
   - candidates: docs/pre-brainstorms/20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract/candidates.md
+- 20260419-1505--runtime-supervisor-attach-reuse-followthrough
+  - brainstorms: docs/pre-brainstorms/20260419-1505--runtime-supervisor-attach-reuse-followthrough/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260419-1505--runtime-supervisor-attach-reuse-followthrough/candidates.md
 - 20260416-0448--memark-protected-root-bootstrap-followthrough
   - brainstorms: docs/pre-brainstorms/20260416-0448--memark-protected-root-bootstrap-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260416-0448--memark-protected-root-bootstrap-followthrough/candidates.md
