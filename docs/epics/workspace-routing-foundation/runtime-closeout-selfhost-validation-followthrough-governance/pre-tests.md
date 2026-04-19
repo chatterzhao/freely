@@ -1,0 +1,84 @@
+# Pre-Tests: runtime-closeout-selfhost-validation-followthrough-governance
+
+## Unit
+- acceptance target: `No narrower executable unit seam is required because the bounded behavior lives in integrated runtime shell and interruption-routing scripts.`
+- testing layer: `unit`
+- target environment: `feature/checkpoint-runtime-closeout-selfhost-validation-20260419`
+- required evidence: `focused shell regressions plus owner verification artifact`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `The preserved checkpoint seam only becomes meaningful across integrated daemon-start, start-lock, and interruption-routing behavior, so a fake lower-level unit seam would be less truthful than the focused shell regressions already present.`
+- replacement_evidence: `Focused shell regressions, diff hygiene, governance-check, and owner verification artifacts cover the smallest stable boundary.`
+
+## Integration
+- acceptance target: `The checkpoint follow-on preserves lawful daemon reuse, ambiguous start-lock cleanup, and interruption-manager fast-path routing without breaking the generic AI fallback path.`
+- testing layer: `integration`
+- target environment: `feature/checkpoint-runtime-closeout-selfhost-validation-20260419`
+- required evidence: `focused regression output plus owner verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run `bash docs/system/workspace/scripts/tests/test-freely-start-lock-cleans-ambiguous-missing-state`.
+2. Run `bash docs/system/workspace/scripts/tests/test-freely-start-lock-acquires-with-missing-run-dir`.
+3. Run `bash docs/system/workspace/scripts/tests/test-freely-start-attaches-worker-runtime-when-startup-truth-is-ready`.
+4. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-releases-start-lock-when-launch-fails`.
+5. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-rejects-when-runtime-already-running`.
+6. Run `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler`.
+7. Run `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler-cc`.
+8. Run `git diff --check`.
+9. Run `./bin/governance-check`.
+
+## End-to-End
+- acceptance target: `The bounded owner is documented well enough that a later guarded replay can evaluate it as one lawful feature lane instead of a checkpoint-only branch.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-runtime-closeout-selfhost-validation-20260419`
+- required evidence: `guarded replay plan plus premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Create or select a disposable `test-pre-merge-*` batch only after this owner is ready for guarded replay.
+2. Replay the focused regression set there in `premerge-integration`.
+3. Record the promote adequacy result in a closeout verification artifact.
+
+## Real-Environment
+- acceptance target: `A real self-host replay in the active checkpoint worker worktree can still distinguish lawful daemon reuse from duplicate detached startup before guarded promote.`
+- testing layer: `real_environment`
+- target environment: `feature/checkpoint-runtime-closeout-selfhost-validation-20260419`
+- required evidence: `real self-host replay evidence in the active checkpoint worktree plus owner verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+- real_environment_status: `pass`
+- real_environment_reason: `This owner's truthful real-environment surface is the active checkpoint worker worktree where duplicate detached startup was originally observed. Two real self-host replays there now show repeated daemon start stays on the no-relaunch path across both early bootstrap and post-ai-launch timing windows.`
+
+## Acceptance Items
+
+### Daemon start reuses healthy same-project supervisor
+- id: `daemon-start-reuses-live-supervisor`
+- requirement: `Repeated daemon start should reuse a healthy same-project supervisor instead of launching another detached runtime chain.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#1`
+- case_design: `Start a detached runtime, rerun daemon start, and assert the same supervisor pid is reused without creating another daemon-run process.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
+
+### Ambiguous missing-state start lock is cleaned safely
+- id: `ambiguous-start-lock-cleans-when-runtime-is-absent`
+- requirement: `Ambiguous project start locks with missing state should be cleaned only when no runtime is actually active.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#2`
+- case_design: `Seed a lock directory without state.env, prove there is no active runtime, and assert freely start cleans the lock before reacquiring it.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
+
+### Interruption manager fast paths stay bounded
+- id: `interruption-manager-fast-paths-stay-bounded`
+- requirement: `Cleanup-oriented and broad-supervision prompts take the new fast paths, while generic prompts still invoke the AI fallback path for codex and cc.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#3`
+- case_design: `Replay cleanup, manager-supervision, and generic prompts against interruption-manager-handler, then assert direct fast-path output only where intended and prompt generation still happens for generic codex/cc fallback cases.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="$(mktemp -d /tmp/freely-worker-startup-truth-attach.XXXXXX)"
+    trap "rm -rf \"$project\"" EXIT
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir" "$project/.freely/logs"
+    printf "%s\n" "41414" >"$run_dir/supervisor.pid"
+    cat >"$run_dir/workcell-state.env" <<EOF
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="starting"
+LAST_STATE_UPDATED_AT="$(date -u "+%Y-%m-%dT%H:%M:%SZ")"
+EOF
+
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    load_config() { :; }
+    check_doc_gate_or_fail() { return 0; }
+    state_dir() { printf "%s\n" "$1/.freely"; }
+    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
+    logs_dir_for_project() { printf "%s\n" "$1/.freely/logs"; }
+    stop_marker_file() { printf "%s\n" "$1/.freely/run/stop.marker"; }
+    valid_supervisor_pid_for_project() { [[ "$2" == "41414" ]]; }
+    valid_ai_pid_for_project() { return 1; }
+    project_has_authoritative_runtime_processes_for_user_precheck() { return 1; }
+    ensure_interruption_dispatcher_ready_or_fail() { return 0; }
+    write_workcell_state() { printf "state:%s|%s|%s|%s\n" "$2" "$3" "$4" "$5"; }
+    append_runtime_event() {
+      local event="${2:-}" arg
+      printf "event:%s" "$event"
+      shift 2 || true
+      for arg in "$@"; do
+        printf "|%s" "$arg"
+      done
+      printf "\n"
+    }
+    role_hint_for_project() { printf "%s\n" worker; }
+    ensure_manager_watchdog_ready_or_fail() { return 0; }
+    load_session_state_or_defaults() { :; }
+    log_info() { printf "info:%s\n" "$*"; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    launch_interruption_dispatcher() { printf "unexpected-dispatcher-launch\n"; }
+    launch_manager_watchdog() { printf "unexpected-watchdog-launch\n"; }
+    terminate_pid_with_graceful_wait() { printf "unexpected-terminate:%s|%s\n" "$1" "$2"; }
+    main start --project "$project"
+  '
+)"
+
+[[ "$OUTPUT" == *"warn:project supervisor pid=41414 is live, worker startup truth is ready, and ai pid is missing; attaching to preserve the active runtime"* ]]
+[[ "$OUTPUT" == *"info:project runtime/control-plane already up; reusing supervisor pid=41414"* ]]
+[[ "$OUTPUT" == *"state:running|up|up|already_running_attach"* ]]
+[[ "$OUTPUT" == *"event:supervisor_attach_reuse|supervisor_pid=41414|supervisor_pid_source=supervisor_pid_file|ai_pid_state=startup_truth_ready|role_hint=worker"* ]]
+[[ "$OUTPUT" != *"unexpected-dispatcher-launch"* ]]
+[[ "$OUTPUT" != *"unexpected-watchdog-launch"* ]]
+[[ "$OUTPUT" != *"unexpected-terminate"* ]]
+
+echo "[PASS] freely start attaches worker runtime when startup truth is ready before ai.pid lands"

@@ -69,6 +69,33 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `This narrow followthrough owner carries the final receipt-ledger repair for the absorbed runtime lifecycle batch and should retire the temporary followthrough feature and test-pre-merge worktrees immediately after canonical develop absorbs it.`
 
+1. `I-20260419-0333-A`
+- title: Runtime closeout selfhost validation followthrough governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-closeout-selfhost-validation-followthrough-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-0333--runtime-closeout-selfhost-validation-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-0333--runtime-closeout-selfhost-validation-followthrough/candidates.md`
+- follow_on_to: `I-20260418-1900-A`
+- branch: `feature/checkpoint-runtime-closeout-selfhost-validation-20260419`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-runtime-closeout-selfhost-validation`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-runtime-closeout-selfhost-validation-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-lock-cleans-ambiguous-missing-state`
+  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-releases-start-lock-when-launch-fails`
+  - `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler`
+  - `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler-cc`
+- next_action: `Run diff hygiene plus governance-check in the current checkpoint worktree, then decide whether one real self-host replay is needed before any guarded premerge batch is opened.`
+- revisit_trigger: `If protected-worktree replay later proves the daemon/start-lock half and closeout-routing half are actually independent seams, split them then rather than widening this owner further.`
+
 1. `I-20260414-0255-A`
 - title: Freely start after-failure recovery handoff race root cause fix
 - milestone_state: committed
@@ -199,6 +226,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/candidates.md`
 - next_action: Candidate mirror only. `I-20260418-1900-A` is now the canonical owner for the runtime lifecycle receipt-ledger followthrough and immediate retirement of the temporary followthrough worktrees.
 - revisit_trigger: Re-open only if canonical develop still surfaces receipt-gap drift after this bounded ledger repair, or if future receipt-ledger closures prove this followthrough pattern needs a reusable owner family.
+
+1. `C-20260419-0333-A`
+- title: Runtime closeout selfhost validation followthrough
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-0333--runtime-closeout-selfhost-validation-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-0333--runtime-closeout-selfhost-validation-followthrough/candidates.md`
+- next_action: Candidate mirror only. `I-20260419-0333-A` is now the canonical owner for the preserved runtime closeout/selfhost follow-on.
+- revisit_trigger: Re-open only if canonical develop later proves the bounded daemon/start-lock and closeout-routing changes need separate owners.
 
 1. `C-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance

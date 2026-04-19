@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-lock-missing-run-dir.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+
+    project="'"$TMP_DIR"'/project"
+    lock_dir="$project/.freely/run/project-start.lock"
+    state_file="$lock_dir/state.env"
+
+    append_runtime_event() { return 0; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    log_error() { printf "error:%s\n" "$*"; }
+
+    [[ ! -d "$project/.freely/run" ]]
+
+    acquire_project_start_lock_or_wait "$project" "freely_start"
+
+    [[ -d "$project/.freely/run" ]]
+    [[ -d "$lock_dir" ]]
+    [[ -f "$state_file" ]]
+    printf "lock_acquired\n"
+    cat "$state_file"
+    release_project_start_lock_for_runtime "$project"
+  '
+)"
+
+[[ "$OUTPUT" == *"lock_acquired"* ]]
+[[ "$OUTPUT" == *'reason="freely_start"'* ]]
+
+echo "[PASS] project start lock acquires even when .freely/run does not exist yet"
