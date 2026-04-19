@@ -82,3 +82,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
+
+### Guarded promote preserves closeout selfhost adequacy
+- id: `guarded-promote-preserves-closeout-selfhost-adequacy`
+- requirement: `The guarded test-pre-merge replay keeps daemon reuse, lawful start-lock cleanup, worker startup-truth attach, and interruption-manager fast paths intact before develop absorbs this owner.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#1,tasks.md#2,tasks.md#3`
+- case_design: `Merge the checkpoint owner into the current test-pre-merge-runtime-lifecycle-20260419 batch, rerun the bounded regression set plus governance-check there, and confirm the guarded promote path still carries the same bounded behavior.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
