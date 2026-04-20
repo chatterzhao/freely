@@ -760,6 +760,32 @@ effective_project_for_global_state() {
   printf '%s\n' "$candidate"
 }
 
+project_paths_equivalent() {
+  local left="$1" right="$2" left_real="" right_real=""
+  [[ -n "$left" && -n "$right" ]] || return 1
+  [[ "$left" == "$right" ]] && return 0
+  if [[ -d "$left" ]]; then
+    left_real="$(cd "$left" 2>/dev/null && pwd -P || true)"
+  fi
+  if [[ -d "$right" ]]; then
+    right_real="$(cd "$right" 2>/dev/null && pwd -P || true)"
+  fi
+  [[ -n "$left_real" && -n "$right_real" && "$left_real" == "$right_real" ]] && return 0
+  if command -v python3 >/dev/null 2>&1 && [[ -e "$left" && -e "$right" ]]; then
+    python3 - "$left" "$right" <<'PY'
+import os
+import sys
+
+try:
+    sys.exit(0 if os.path.samefile(sys.argv[1], sys.argv[2]) else 1)
+except Exception:
+    sys.exit(1)
+PY
+    return $?
+  fi
+  return 1
+}
+
 run_dir_for_project() {
   local project="$1"
   echo "$(state_dir "$project")/run"
@@ -2388,10 +2414,9 @@ discover_interruption_dispatcher_pids() {
 
 pid_matches_project() {
   local pid="$1" project="$2" expected="$3"
-  local cmd cwd project_real candidate_paths candidate
+  local cmd cwd candidate_paths candidate
   [[ -n "$pid" ]] || return 1
   kill -0 "$pid" 2>/dev/null || return 1
-  project_real="$(cd "$project" 2>/dev/null && pwd -P || true)"
   if process_inspection_available; then
     cmd="$(ps -p "$pid" -o command= 2>/dev/null || true)"
     if [[ -n "$cmd" ]]; then
@@ -2412,36 +2437,24 @@ pid_matches_project() {
       ' <<<"$cmd")"
       while IFS= read -r candidate; do
         [[ -n "$candidate" ]] || continue
-        if [[ "$candidate" == "$project" || "$candidate" == "$project_real" ]]; then
+        if project_paths_equivalent "$candidate" "$project"; then
           return 0
-        fi
-        if [[ -d "$candidate" ]]; then
-          candidate="$(cd "$candidate" 2>/dev/null && pwd -P || true)"
-          if [[ -n "$candidate" && ( "$candidate" == "$project" || "$candidate" == "$project_real" ) ]]; then
-            return 0
-          fi
         fi
       done <<<"$candidate_paths"
     fi
   fi
   cwd="$(lsof -a -d cwd -p "$pid" -Fn 2>/dev/null | sed -n 's/^n//p' | head -n 1)"
-  if [[ "$cwd" == "$project" || (-n "$project_real" && "$cwd" == "$project_real") ]]; then
+  if project_paths_equivalent "$cwd" "$project"; then
     return 0
-  fi
-  if [[ -n "$cwd" && -d "$cwd" ]]; then
-    cwd="$(cd "$cwd" 2>/dev/null && pwd -P || true)"
-    [[ -n "$cwd" && ( "$cwd" == "$project" || "$cwd" == "$project_real" ) ]]
-    return $?
   fi
   return 1
 }
 
 supervisor_identity_matches_project_pid() {
-  local project="$1" pid="$2" identity_file project_real identity_project identity_pid identity_phase
+  local project="$1" pid="$2" identity_file identity_project identity_pid identity_phase
   [[ -n "$pid" ]] || return 1
   identity_file="$(supervisor_identity_file_for_project_pid "$project" "$pid")"
   [[ -f "$identity_file" ]] || return 1
-  project_real="$(cd "$project" 2>/dev/null && pwd -P || true)"
   unset SUPERVISOR_PID PROJECT_ROOT STARTUP_TRUTH_PHASE ENTRYPOINT_MODE STARTUP_TRUTH_PUBLISHED_AT
   # shellcheck disable=SC1090
   source "$identity_file"
@@ -2451,13 +2464,7 @@ supervisor_identity_matches_project_pid() {
   [[ -n "$identity_project" && -n "$identity_pid" ]] || return 1
   [[ "$identity_pid" == "$pid" ]] || return 1
   [[ "$identity_phase" == "published" ]] || return 1
-  if [[ "$identity_project" != "$project" && "$identity_project" != "$project_real" ]]; then
-    if [[ -d "$identity_project" ]]; then
-      identity_project="$(cd "$identity_project" 2>/dev/null && pwd -P || true)"
-    fi
-    [[ -n "$identity_project" && ( "$identity_project" == "$project" || "$identity_project" == "$project_real" ) ]] || return 1
-  fi
-  return 0
+  project_paths_equivalent "$identity_project" "$project"
 }
 
 write_supervisor_identity_truth() {
@@ -2557,7 +2564,9 @@ interruption_dispatcher_pid_for_project() {
   if [[ -n "$pid" ]]; then
     printf '%s\n' "$pid" >"$pid_file"
     printf '%s\n' "$pid"
+    return 0
   fi
+  return 0
 }
 
 manager_watchdog_pid_for_project() {
@@ -2574,7 +2583,9 @@ manager_watchdog_pid_for_project() {
   if [[ -n "$pid" ]]; then
     printf '%s\n' "$pid" >"$pid_file"
     printf '%s\n' "$pid"
+    return 0
   fi
+  return 0
 }
 
 manager_supervisor_pid_hint_for_project() {
@@ -4712,6 +4723,7 @@ delegated_continuation_ids_for_project() {
     done
     printf '%s\n' "$joined"
   fi
+  return 0
 }
 
 csv_item_count() {
@@ -5197,6 +5209,20 @@ context_summary_target_hint() {
     role="$(role_hint_for_project "$project")"
   fi
   context_summary_target_hint_for_role "$role"
+}
+
+runtime_capture_or_empty() {
+  local output rc
+  set +e
+  output="$("$@")"
+  rc=$?
+  set -e
+  if [[ "$rc" -eq 0 ]]; then
+    printf '%s\n' "$output"
+  else
+    printf '\n'
+  fi
+  return 0
 }
 
 project_dirty_entries() {
@@ -8855,7 +8881,6 @@ session_handoff_recent_output_excerpt() {
         if (line ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T.* \[(ERROR|WARN)\]/) { print line; return }
         if (line ~ /^(ERROR|WARN)(:| |$)/) { print line; return }
         if (line ~ /^\[(ERROR|WARN)\]/) { print line; return }
-        if (line ~ /^(assistant|codex|tokens used)$/) { print line; return }
         if (line ~ /^OpenAI Codex v/ || line ~ /^Claude Code/) { print line; return }
         if (line ~ /^(Please log in|Login required|Unauthorized|deactivated_workspace|workspace deactivated)/) { print line; return }
         if (line ~ /^OAuth inventory refresh failed/) { print line; return }
@@ -9144,6 +9169,10 @@ Delegated continuation handoff:
 - interruption dispatcher 已将以下 signal 委派回当前工位继续处理。
 - 本轮不要忽略这些 delegated continuation；先吸收它们，再继续当前 issue。
 - 若 handoff 与当前 active issue 一致，优先按 handoff 继续，不要停留在旧 prompt 或旧 focus。
+- 这类 \`handoff://continuation\` 已经是当前工位被授权的 in-scope 工作，不要仅因为它看起来像“额外需求”或“不同生命周期”就自行驳回。
+- 若历史 progress / recovery / issue 中存在针对同一 intake 的旧“不吸收 / 不归当前 owner”判断，把它视为已被当前 delegated handoff 覆盖；本轮以这里的 handoff 为准。
+- 若 handoff 要求的是一个最小可验证动作，默认先直接完成；只有命中更高优先级 blocker 或治理冲突时，才允许不执行。
+- 若你判断暂时不能执行，必须先把 blocker 证据写回当前 issue / progress / recovery，再说明为什么本轮不能吸收；不能只给出“越界”或“应由别的 owner 处理”的口头结论。
 
 $snapshot
 EOF
@@ -9702,7 +9731,9 @@ manager_supervisor_pid_for_project() {
   if valid_discovered_supervisor_pid_for_project "$project" "$sp"; then
     printf '%s\n' "$sp" >"$run_dir/supervisor.pid"
     printf '%s\n' "$sp"
+    return 0
   fi
+  return 0
 }
 
 manager_ai_pid_for_project() {
@@ -9715,6 +9746,7 @@ manager_ai_pid_for_project() {
       return 0
     fi
   fi
+  return 0
 }
 
 manager_ai_pid_hint_for_project() {
@@ -9740,6 +9772,7 @@ runtime_ai_pid_hint_for_project() {
     fi
   fi
   manager_ai_pid_for_project "$project"
+  return 0
 }
 
 runtime_unverified_pid_roles_for_project() {
@@ -9767,7 +9800,7 @@ ensure_interruption_dispatcher_ready_or_fail() {
   wait_sleep="${FREELY_INTERRUPTION_DISPATCHER_READY_SLEEP_SECS:-0.1}"
   [[ "$wait_attempts" =~ ^[0-9]+$ ]] || wait_attempts=300
   for attempts in $(seq 1 "$wait_attempts"); do
-    dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+    dispatcher_pid="$(runtime_capture_or_empty interruption_dispatcher_pid_for_project "$project")"
     if [[ -n "$dispatcher_pid" ]]; then
       return 0
     fi
@@ -9779,7 +9812,7 @@ ensure_interruption_dispatcher_ready_or_fail() {
 ensure_interruption_dispatcher_running_for_active_runtime() {
   local project="$1" dispatcher_pid
   [[ -f "$(stop_marker_file "$project")" ]] && return 1
-  dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  dispatcher_pid="$(runtime_capture_or_empty interruption_dispatcher_pid_for_project "$project")"
   if [[ -n "$dispatcher_pid" ]]; then
     return 0
   fi
@@ -9790,7 +9823,7 @@ ensure_interruption_dispatcher_running_for_active_runtime() {
   [[ -f "$(stop_marker_file "$project")" ]] && return 1
   if ensure_interruption_dispatcher_ready_or_fail "$project"; then
     append_runtime_event "$project" "interruption_dispatcher_relaunch_ready" \
-      "dispatcher_pid=$(interruption_dispatcher_pid_for_project "$project")"
+      "dispatcher_pid=$(runtime_capture_or_empty interruption_dispatcher_pid_for_project "$project")"
     return 0
   fi
   append_runtime_event "$project" "interruption_dispatcher_relaunch_failed" \
@@ -9804,7 +9837,7 @@ ensure_manager_watchdog_ready_or_fail() {
   wait_sleep="${FREELY_MANAGER_WATCHDOG_READY_SLEEP_SECS:-0.1}"
   [[ "$wait_attempts" =~ ^[0-9]+$ ]] || wait_attempts=300
   for attempts in $(seq 1 "$wait_attempts"); do
-    watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
+    watchdog_pid="$(runtime_capture_or_empty manager_watchdog_pid_for_project "$project")"
     if [[ -n "$watchdog_pid" ]]; then
       return 0
     fi
@@ -12167,7 +12200,7 @@ start_project_runtime() {
     local dirty_entries worktree_total worktree_dirty summary
     local launch_resume_target
     child_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
-    tool_session_id="$(extract_tool_session_id_from_log "$AI_TOOL" "$cycle_log")"
+    tool_session_id="$(runtime_capture_or_empty extract_tool_session_id_from_log "$AI_TOOL" "$cycle_log")"
     tool_resume_target=""
     tool_jsonl_path=""
     context_ratio=""
@@ -12182,7 +12215,7 @@ start_project_runtime() {
     worktree_total="0"
     worktree_dirty="0"
     next_restart_delay="${RESTART_DELAY:-2}"
-    launch_resume_target="$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")"
+    launch_resume_target="$(runtime_capture_or_empty tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")"
     append_lifecycle_trace "$project" "L041" "ai_launch_observed" \
       "supervisor_pid=$$" \
       "tool=$AI_TOOL" \
@@ -12194,17 +12227,17 @@ start_project_runtime() {
       "expected_from_previous=L041" \
       "expected_next=L042"
     if [[ "$AI_TOOL" == "codex" && -n "$tool_session_id" ]]; then
-      tool_jsonl_path="$(find_codex_jsonl_path_for_session "$tool_session_id")"
-      context_ratio="$(extract_latest_codex_context_ratio_from_jsonl "$tool_jsonl_path")"
-      primary_rate_limit_used_percent="$(extract_latest_codex_primary_rate_limit_used_percent_from_jsonl "$tool_jsonl_path")"
-      primary_rate_limit_resets_at="$(extract_latest_codex_primary_rate_limit_reset_at_from_jsonl "$tool_jsonl_path")"
-      secondary_rate_limit_used_percent="$(extract_latest_codex_secondary_rate_limit_used_percent_from_jsonl "$tool_jsonl_path")"
-      secondary_rate_limit_resets_at="$(extract_latest_codex_secondary_rate_limit_reset_at_from_jsonl "$tool_jsonl_path")"
+      tool_jsonl_path="$(runtime_capture_or_empty find_codex_jsonl_path_for_session "$tool_session_id")"
+      context_ratio="$(runtime_capture_or_empty extract_latest_codex_context_ratio_from_jsonl "$tool_jsonl_path")"
+      primary_rate_limit_used_percent="$(runtime_capture_or_empty extract_latest_codex_primary_rate_limit_used_percent_from_jsonl "$tool_jsonl_path")"
+      primary_rate_limit_resets_at="$(runtime_capture_or_empty extract_latest_codex_primary_rate_limit_reset_at_from_jsonl "$tool_jsonl_path")"
+      secondary_rate_limit_used_percent="$(runtime_capture_or_empty extract_latest_codex_secondary_rate_limit_used_percent_from_jsonl "$tool_jsonl_path")"
+      secondary_rate_limit_resets_at="$(runtime_capture_or_empty extract_latest_codex_secondary_rate_limit_reset_at_from_jsonl "$tool_jsonl_path")"
     fi
-    active_slot="$(runtime_read_tool_current_slot "$PROJECT_ROOT" "$AI_TOOL")"
+    active_slot="$(runtime_capture_or_empty runtime_read_tool_current_slot "$PROJECT_ROOT" "$AI_TOOL")"
     if [[ "$AI_TOOL" == "codex" ]]; then
-      [[ -n "$active_slot" ]] || active_slot="$(codex_current_slot "$PROJECT_ROOT")"
-      active_cooldown_identity="$(codex_current_cooldown_identity "$PROJECT_ROOT")"
+      [[ -n "$active_slot" ]] || active_slot="$(runtime_capture_or_empty codex_current_slot "$PROJECT_ROOT")"
+      active_cooldown_identity="$(runtime_capture_or_empty codex_current_cooldown_identity "$PROJECT_ROOT")"
     fi
     dirty_entries="$(project_dirty_entries "$PROJECT_ROOT")"
     summary="$(worktree_summary_for_project "$PROJECT_ROOT")"
@@ -12224,7 +12257,7 @@ start_project_runtime() {
     fi
     if tool_uses_claude_session_id "$AI_TOOL" && [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
       local resolved_cc_evidence
-      resolved_cc_evidence="$(resolve_cc_session_evidence "$PROJECT_ROOT" "${CLAUDE_SESSION_ID_CURRENT:-}")"
+      resolved_cc_evidence="$(runtime_capture_or_empty resolve_cc_session_evidence "$PROJECT_ROOT" "${CLAUDE_SESSION_ID_CURRENT:-}")"
       if [[ -n "$resolved_cc_evidence" ]]; then
         unset CLAUDE_JSONL_PATH CODEX_MCP_USED CODEX_MCP_THREAD_ID CODEX_MCP_JSONL_PATH
         # shellcheck disable=SC1090
@@ -12240,8 +12273,8 @@ start_project_runtime() {
         CLAUDE_SESSION_ID_CURRENT=""
       fi
     fi
-    tool_resume_target="$(tool_runtime_resume_target_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_jsonl_path" "$launch_resume_target" "${LAST_TOOL_JSONL_PATH:-}")"
-    tool_session_id="$(tool_persisted_session_id_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_resume_target")"
+    tool_resume_target="$(runtime_capture_or_empty tool_runtime_resume_target_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_jsonl_path" "$launch_resume_target" "${LAST_TOOL_JSONL_PATH:-}")"
+    tool_session_id="$(runtime_capture_or_empty tool_persisted_session_id_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_resume_target")"
     if [[ "$AI_TOOL" == "cc-use-codex-cli" && "$codex_mcp_used" != "1" ]] && cc_debug_log_has_codex_tool_call "$cycle_debug_log"; then
       codex_mcp_used="1"
       [[ -n "$codex_mcp_thread_id" ]] || codex_mcp_thread_id="unavailable://claude-jsonl-did-not-yet-expose-codex-thread-id"
@@ -12276,8 +12309,8 @@ start_project_runtime() {
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
     LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
     LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
-    checkpoint_json="$(checkpoint_guard_json_for_project "$PROJECT_ROOT")"
-    checkpoint_required="$(checkpoint_guard_value "$checkpoint_json" checkpoint_required)"
+    checkpoint_json="$(runtime_capture_or_empty checkpoint_guard_json_for_project "$PROJECT_ROOT")"
+    checkpoint_required="$(runtime_capture_or_empty checkpoint_guard_value "$checkpoint_json" checkpoint_required)"
     if [[ "$checkpoint_required" == "true" || "$dirty_entries" =~ ^[0-9]+$ && "$dirty_entries" -ge "${CHECKPOINT_WARN_DIRTY_ENTRIES:-40}" ]]; then
       CHECKPOINT_DRIFT_STREAK_CURRENT=$(( ${CHECKPOINT_DRIFT_STREAK_CURRENT:-0} + 1 ))
     else
@@ -12305,15 +12338,15 @@ start_project_runtime() {
     network_failure_reason=""
     live_failure_reason=""
     if [[ -f "$failure_marker_file" ]]; then
-      live_failure_reason="$(tr -d '\r' <"$failure_marker_file" | awk 'NF { print; exit }')"
+      live_failure_reason="$(tr -d '\r' <"$failure_marker_file" | awk 'NF { print; exit }' || true)"
       rm -f "$failure_marker_file"
     fi
     if [[ -n "$live_failure_reason" ]]; then
       slot_switch_reason="$live_failure_reason"
     fi
     if [[ "$AI_TOOL" == "codex" ]]; then
-      rate_limit_reason="$(codex_rate_limit_reason_from_usage "${primary_rate_limit_used_percent:-}" "${secondary_rate_limit_used_percent:-}")"
-      rate_limit_reset_at="$(codex_rate_limit_reset_at_for_reason "${rate_limit_reason:-}" "${primary_rate_limit_resets_at:-}" "${secondary_rate_limit_resets_at:-}")"
+      rate_limit_reason="$(runtime_capture_or_empty codex_rate_limit_reason_from_usage "${primary_rate_limit_used_percent:-}" "${secondary_rate_limit_used_percent:-}")"
+      rate_limit_reset_at="$(runtime_capture_or_empty codex_rate_limit_reset_at_for_reason "${rate_limit_reason:-}" "${primary_rate_limit_resets_at:-}" "${secondary_rate_limit_resets_at:-}")"
       if [[ -n "$slot_switch_reason" ]]; then
         :
       elif [[ -n "$rate_limit_reason" ]]; then
@@ -12355,11 +12388,11 @@ start_project_runtime() {
     restart_window_count="${restart_window_stats%%|*}"
     restart_window_peak="${restart_window_stats##*|}"
     if restart_storm_signal_reason_for_window "${restart_window_count:-0}" "${restart_window_peak:-0}" >/dev/null 2>&1; then
-      restart_signal_reason="$(restart_storm_signal_reason_for_window "${restart_window_count:-0}" "${restart_window_peak:-0}")"
+      restart_signal_reason="$(runtime_capture_or_empty restart_storm_signal_reason_for_window "${restart_window_count:-0}" "${restart_window_peak:-0}")"
       record_restart_storm_signal "$PROJECT_ROOT" "$restart_signal_reason" "${restart_window_count:-0}" "${restart_window_peak:-0}"
     fi
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_capture_or_empty runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}"
     LAST_WORKCELL_EXIT_REASON="${slot_switch_reason:-${rate_limit_reason:-${network_failure_reason:-ai_exit_rc_${rc}}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     materialize_blocked_supervision_truth_if_needed "$PROJECT_ROOT" "$prompt_file" "$LAST_WORKCELL_EXIT_REASON" "$cycle_log"
@@ -12552,14 +12585,33 @@ launch_project_runtime_daemon_or_fail() {
   [[ "$wait_secs" =~ ^[0-9]+$ ]] || wait_secs=60
   mkdir -p "$(logs_dir_for_project "$project")"
   launcher_log="$(logs_dir_for_project "$project")/daemon-launch.log"
-  nohup bash -lc '
-    set -euo pipefail
-    project="$1"
-    runtime_script="$2"
-    cd "$project"
-    exec -a "runtime/freely daemon-run --project $project" bash "$runtime_script" daemon-run --project "$project"
-  ' bash "$project" "$runtime_script" >>"$launcher_log" 2>&1 < /dev/null &
-  launcher_pid=$!
+  # Keep daemon-run in a separate session instead of a shell-owned background job.
+  # We previously launched this with `nohup bash ... &`, which looked detached while
+  # the caller shell stayed alive but still died when short-lived non-interactive
+  # exec/PTY wrappers tore their session down. The daemon launcher must survive
+  # after `freely daemon start` returns, so regressions here need a stronger guard
+  # than ordinary shell job control.
+  launcher_pid="$(
+    python3 - "$project" "$runtime_script" "$launcher_log" <<'PY'
+import subprocess
+import sys
+
+project, runtime_script, launcher_log = sys.argv[1:4]
+argv0 = f"runtime/freely daemon-run --project {project}"
+with open(launcher_log, "ab", buffering=0) as log_file:
+    child = subprocess.Popen(
+        [argv0, runtime_script, "daemon-run", "--project", project],
+        executable="bash",
+        cwd=project,
+        stdin=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=subprocess.STDOUT,
+        start_new_session=True,
+        close_fds=True,
+    )
+print(child.pid)
+PY
+  )"
   if ! supervisor_pid="$(wait_for_daemon_supervisor_ready_or_fail "$project" "$launcher_pid" "$wait_secs")"; then
     log_error "daemon start did not materialize a live supervisor for project: $project"
     log_error "see: $launcher_log"
@@ -13057,7 +13109,7 @@ cmd_intake_claim() {
     "status=$status" \
     "delegated_worktree=${delegated_worktree:-none}" \
     "expected_next=$(if [[ -z "$classification" ]]; then printf 'L330'; else printf 'L320'; fi)" \
-    "${trace_args[@]}"
+    "${trace_args[@]:-}"
   echo "intake_id: $intake_id"
   echo "status: $status"
   echo "reaction: $reaction"
@@ -13158,7 +13210,7 @@ cmd_intake_resolve() {
     "delegated_worktree=${delegated_worktree:-none}" \
     "resolution_artifact=$resolution_artifact" \
     "expected_next=terminal" \
-    "${trace_args[@]}"
+    "${trace_args[@]:-}"
   echo "intake_id: $intake_id"
   echo "status: $status"
   echo "resolution_artifact: $resolution_artifact"
