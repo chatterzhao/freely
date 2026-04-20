@@ -1,14 +1,38 @@
-# Pre-tests
+# Pre-tests: latest-manager-continuity-worker-consumption-governance
 
-## Pre-merge acceptance
+## Success Criteria
 
-1. stale `manager-worker-launch-state.env` 存在时，runtime 再次消费 latest continuity 会把 consumed continuity 更新到最新文件。
-2. 若 latest continuity 派生出新的 worker prompt，runtime 会消费最新 prompt set，而不是停留在旧 prompt csv。
-3. `ensure_manager_once` 在 manager supervisor 已运行时，仍会触发 latest continuity consumption。
-4. `baseline-status` / `live-status` 能显示 latest continuity / prompt set 的 generated 与 consumed truth。
+### Pre-merge success criteria
 
-## Post-merge acceptance
+1. delegated continuation 的 prompt 注入只消费当前 manager continuity 之后的新 handoff，不再自动重放更早 supervision round 的 backlog。
+2. `Human chat intake queue` 不再把 `STATUS="delegated"` 的 intake 伪装成 front-door 未分诊聊天。
+3. `live-status` 仍能正确显示 delegated item 计数，但 front-door intake snapshot 不再重复显示 delegated 项。
 
-1. 在 `develop` 上真实执行 `freely chat` 后，若主管产生新一轮 worker prompt set，worker 会切到最新 prompt set，而不是继续沿用更早 delegated continuation。
-2. `ACTIVE_RUNNING_WORKER_COUNT` 只能作为 fleet-wide 观察信号；若其他 issue family / runtime-owned lane 仍在运行，它可以大于当前 issue family 的 same-round worker 数。不要把该值单独当成 `I-20260322-0445` reopen 的判据。
-3. 对这条 issue family 的 canonical `develop` acceptance，重点检查的是 same-round latest continuity / worker prompt generated-consumed truth 是否一致，而不是要求 fleet-wide worker 总数在后续轮次保持某个固定值。
+### Post-merge success criteria
+
+1. 在 canonical `develop` 上真实执行 `freely chat` 后，新治理插话会成为当前主管轮次消费的 delegated continuation，而不会被旧 `runtime-lifecycle-validation` continuation 抢占。
+2. 当前主管 prompt 可以把旧 `runtime-lifecycle-validation` worktree 仅当作 inventory 观察对象，而不是当前 delegated continuation handoff。
+3. 这次 same-family repair 完成后，当前修复 worktree 走完 `feature -> test-pre-merge-* -> develop`，并清理已完成的 feature 与 pre-merge worktree / branch。
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `manager prompt filters delegated continuation backlog older than the latest manager continuity`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
+
+### PT-2
+- id: `PT-2`
+- requirement: `front-door intake snapshot excludes delegated items while live-status still reports delegated counts truthfully`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
+
+### PT-3
+- id: `PT-3`
+- requirement: `canonical develop replay consumes the fresh success-standard governance interruption instead of reusing the stale runtime-lifecycle-validation continuation`
+- evidence_level: `dogfood`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
