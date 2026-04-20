@@ -48,6 +48,101 @@ abs_path_or_fail() {
   echo "$p"
 }
 
+workcell_state_file_for_project() {
+  local current_project="$1"
+  printf '%s\n' "$current_project/.freely/run/workcell-state.env"
+}
+
+write_workcell_launch_state_if_possible() {
+  local current_project="$1"
+  local state_file tmp_file updated_at
+  local desired_state supervisor_state ai_state exit_reason role_hint
+  local verification_contract_file verification_metadata_present verification_missing_fields
+  local verification_owner_issue verification_pre_tests_path verification_artifact_dir
+  local verification_test_lanes verification_acceptance_ids verification_evidence_level
+  local verification_target_environment verification_closeout_gate verification_closeout_gate_command
+  local verification_closeout_target_lane verification_closeout_promotion_gate
+  local verification_closeout_requires_adequacy verification_closeout_review_artifact_policy
+
+  state_file="$(workcell_state_file_for_project "$current_project")"
+  mkdir -p "$(dirname "$state_file")"
+
+  desired_state="running"
+  supervisor_state="up"
+  ai_state="down"
+  exit_reason="starting"
+  role_hint="worker"
+  verification_contract_file="$current_project/.freely/run/worker-verification-contract.env"
+  verification_metadata_present="false"
+  verification_missing_fields=""
+  verification_owner_issue=""
+  verification_pre_tests_path=""
+  verification_artifact_dir=""
+  verification_test_lanes=""
+  verification_acceptance_ids=""
+  verification_evidence_level=""
+  verification_target_environment=""
+  verification_closeout_gate=""
+  verification_closeout_gate_command=""
+  verification_closeout_target_lane=""
+  verification_closeout_promotion_gate=""
+  verification_closeout_requires_adequacy=""
+  verification_closeout_review_artifact_policy=""
+
+  if [[ -f "$state_file" ]]; then
+    unset DESIRED_RUNTIME_STATE LAST_SUPERVISOR_STATE LAST_AI_STATE LAST_EXIT_REASON LAST_ROLE_HINT LAST_WORKER_VERIFICATION_CONTRACT_FILE LAST_WORKER_VERIFICATION_METADATA_PRESENT LAST_WORKER_VERIFICATION_METADATA_MISSING_FIELDS LAST_WORKER_OWNER_ISSUE LAST_WORKER_PRE_TESTS_PATH LAST_WORKER_VERIFICATION_ARTIFACT_DIR LAST_WORKER_REQUIRED_TEST_LANES_CSV LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV LAST_WORKER_MINIMUM_EVIDENCE_LEVEL LAST_WORKER_TARGET_ENVIRONMENT LAST_WORKER_CLOSEOUT_GATE LAST_WORKER_CLOSEOUT_GATE_COMMAND LAST_WORKER_CLOSEOUT_TARGET_LANE LAST_WORKER_CLOSEOUT_PROMOTION_GATE LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY
+    # shellcheck disable=SC1090
+    source "$state_file"
+    desired_state="${DESIRED_RUNTIME_STATE:-running}"
+    supervisor_state="${LAST_SUPERVISOR_STATE:-up}"
+    role_hint="${LAST_ROLE_HINT:-worker}"
+    verification_contract_file="${LAST_WORKER_VERIFICATION_CONTRACT_FILE:-$verification_contract_file}"
+    verification_metadata_present="${LAST_WORKER_VERIFICATION_METADATA_PRESENT:-false}"
+    verification_missing_fields="${LAST_WORKER_VERIFICATION_METADATA_MISSING_FIELDS:-}"
+    verification_owner_issue="${LAST_WORKER_OWNER_ISSUE:-}"
+    verification_pre_tests_path="${LAST_WORKER_PRE_TESTS_PATH:-}"
+    verification_artifact_dir="${LAST_WORKER_VERIFICATION_ARTIFACT_DIR:-}"
+    verification_test_lanes="${LAST_WORKER_REQUIRED_TEST_LANES_CSV:-}"
+    verification_acceptance_ids="${LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV:-}"
+    verification_evidence_level="${LAST_WORKER_MINIMUM_EVIDENCE_LEVEL:-}"
+    verification_target_environment="${LAST_WORKER_TARGET_ENVIRONMENT:-}"
+    verification_closeout_gate="${LAST_WORKER_CLOSEOUT_GATE:-}"
+    verification_closeout_gate_command="${LAST_WORKER_CLOSEOUT_GATE_COMMAND:-}"
+    verification_closeout_target_lane="${LAST_WORKER_CLOSEOUT_TARGET_LANE:-}"
+    verification_closeout_promotion_gate="${LAST_WORKER_CLOSEOUT_PROMOTION_GATE:-}"
+    verification_closeout_requires_adequacy="${LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY:-}"
+    verification_closeout_review_artifact_policy="${LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY:-}"
+  fi
+
+  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  tmp_file="$(mktemp "${state_file}.tmp.XXXXXX")"
+  cat >"$tmp_file" <<EOF
+DESIRED_RUNTIME_STATE="${desired_state:-running}"
+LAST_SUPERVISOR_STATE="${supervisor_state:-up}"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="ai_launch_in_flight"
+LAST_ROLE_HINT="${role_hint:-worker}"
+LAST_STATE_UPDATED_AT="$updated_at"
+LAST_WORKER_VERIFICATION_CONTRACT_FILE="${verification_contract_file:-$current_project/.freely/run/worker-verification-contract.env}"
+LAST_WORKER_VERIFICATION_METADATA_PRESENT="${verification_metadata_present:-false}"
+LAST_WORKER_VERIFICATION_METADATA_MISSING_FIELDS="${verification_missing_fields:-}"
+LAST_WORKER_OWNER_ISSUE="${verification_owner_issue:-}"
+LAST_WORKER_PRE_TESTS_PATH="${verification_pre_tests_path:-}"
+LAST_WORKER_VERIFICATION_ARTIFACT_DIR="${verification_artifact_dir:-}"
+LAST_WORKER_REQUIRED_TEST_LANES_CSV="${verification_test_lanes:-}"
+LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="${verification_acceptance_ids:-}"
+LAST_WORKER_MINIMUM_EVIDENCE_LEVEL="${verification_evidence_level:-}"
+LAST_WORKER_TARGET_ENVIRONMENT="${verification_target_environment:-}"
+LAST_WORKER_CLOSEOUT_GATE="${verification_closeout_gate:-}"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="${verification_closeout_gate_command:-}"
+LAST_WORKER_CLOSEOUT_TARGET_LANE="${verification_closeout_target_lane:-}"
+LAST_WORKER_CLOSEOUT_PROMOTION_GATE="${verification_closeout_promotion_gate:-}"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="${verification_closeout_requires_adequacy:-}"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="${verification_closeout_review_artifact_policy:-}"
+EOF
+  mv "$tmp_file" "$state_file"
+}
+
 project=""
 tool=""
 tool_adapter=""
@@ -274,6 +369,7 @@ fi
 
 child_pid=$!
 echo "$child_pid" >"$pid_file"
+write_workcell_launch_state_if_possible "$project"
 echo "$child_pid"
 
 if [[ -n "$network_failure_marker_file" || -n "$failure_marker_file" ]]; then

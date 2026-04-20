@@ -1303,7 +1303,7 @@ startup_self_heal_should_mark_runtime_down() {
 
   [[ "$desired_state" == "running" ]] || return 1
   case "$last_exit_reason" in
-    starting|up|already_running_attach) ;;
+    starting|up|already_running_attach|ai_launch_in_flight) ;;
     *) return 1 ;;
   esac
 
@@ -10801,6 +10801,9 @@ reactivate_worker_runtime_if_needed_after_chat() {
 
 build_prompt() {
   local workspace_root
+  if [[ "${FREELY_TEST_FAIL_BUILD_PROMPT:-0}" == "1" ]]; then
+    return 1
+  fi
   workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
   AI_TOOL_ADAPTER="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AI_TOOL:-}")}" \
   AI_TOOL_ADAPTER_POLICY="${AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AI_TOOL:-}")}" \
@@ -12038,7 +12041,18 @@ start_project_runtime() {
       "expected_from_previous=L020" \
       "expected_next=L021"
     local prompt_utf8_invalid_count="0"
-    build_prompt >"$prompt_file"
+    if ! build_prompt >"$prompt_file"; then
+      LAST_WORKCELL_EXIT_REASON="prompt_build_failed"
+      write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
+      append_runtime_event "$project" "prompt_build_failed" \
+        "supervisor_pid=$$" \
+        "launch_kind=$mode_name" \
+        "rotation_reason=${LAUNCH_ROTATION_REASON:-none}" \
+        "prompt_file=$prompt_file"
+      log_warn "prompt build failed; keeping supervisor alive for retry"
+      sleep "${RESTART_DELAY:-2}"
+      continue
+    fi
     prompt_utf8_invalid_count="$(sanitize_utf8_file_in_place "$prompt_file" 2>/dev/null || printf '0\n')"
     if [[ "${prompt_utf8_invalid_count:-0}" =~ ^[0-9]+$ ]] && (( prompt_utf8_invalid_count > 0 )); then
       append_runtime_event "$project" "prompt_utf8_sanitized" \
