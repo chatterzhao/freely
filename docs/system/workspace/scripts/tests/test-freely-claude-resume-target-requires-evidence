@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-claude-resume-target.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT_ROOT="$TMP_DIR/project"
+CLAUDE_CONFIG_DIR="$TMP_DIR/.claude"
+CLAUDE_SESSION_ID="11111111-2222-4333-8444-555555555555"
+
+mkdir -p "$PROJECT_ROOT"
+
+OUTPUT="$(
+  CLAUDE_CONFIG_DIR="$CLAUDE_CONFIG_DIR" bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project_root="'"$PROJECT_ROOT"'"
+    claude_session_id="'"$CLAUDE_SESSION_ID"'"
+    CLAUDE_SESSION_ID_CURRENT="$claude_session_id"
+
+    before_missing="$(tool_runtime_resume_target_before_launch "cc" "$project_root")"
+    [[ -z "$before_missing" ]] || {
+      printf "unexpected_resume_target_without_evidence=%s\n" "$before_missing"
+      exit 1
+    }
+
+    ensure_runtime_tool_session_anchor "cc" "resume" "$project_root"
+    rotated_session_id="$CLAUDE_SESSION_ID_CURRENT"
+    [[ "$rotated_session_id" != "$claude_session_id" ]] || {
+      printf "resume_anchor_did_not_rotate_without_evidence=%s\n" "$rotated_session_id"
+      exit 1
+    }
+
+    project_key="$(sanitize_claude_project_key "$project_root")"
+    mkdir -p "'"$CLAUDE_CONFIG_DIR"'/projects/$project_key"
+    cat >"'"$CLAUDE_CONFIG_DIR"'/projects/$project_key/$rotated_session_id.jsonl" <<EOF
+{"type":"assistant","sessionId":"$rotated_session_id","cwd":"$project_root"}
+EOF
+
+    after_present="$(tool_runtime_resume_target_before_launch "cc" "$project_root")"
+    [[ "$after_present" == "$rotated_session_id" ]] || {
+      printf "resume_target_with_evidence_mismatch=%s\n" "$after_present"
+      exit 1
+    }
+
+    printf "rotated=%s\n" "$rotated_session_id"
+  '
+)"
+
+[[ "$OUTPUT" == rotated=* ]] || {
+  echo "[FAIL] unexpected output" >&2
+  printf '%s\n' "$OUTPUT" >&2
+  exit 1
+}
+
+echo "[PASS] Claude resume targets are only reused after real session evidence exists"

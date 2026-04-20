@@ -2660,11 +2660,22 @@ tool_prefers_explicit_resume_target() {
   esac
 }
 
+claude_has_verified_resume_evidence() {
+  local project="${1:-}" claude_session_id="${2:-}" claude_jsonl_path=""
+  [[ -n "$project" && -n "$claude_session_id" ]] || return 1
+  claude_jsonl_path="$(find_claude_jsonl_path_for_session "$project" "$claude_session_id")"
+  [[ -n "$claude_jsonl_path" && -f "$claude_jsonl_path" ]]
+}
+
 tool_runtime_resume_target_before_launch() {
-  local tool="$1"
+  local tool="$1" project="${2:-}"
   case "$tool" in
     cc|cc-use-codex-cli)
-      printf '%s\n' "${CLAUDE_SESSION_ID_CURRENT:-}"
+      if claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
+        printf '%s\n' "${CLAUDE_SESSION_ID_CURRENT:-}"
+      else
+        printf '\n'
+      fi
       ;;
     *)
       printf '%s\n' "${LAST_TOOL_RESUME_TARGET:-}"
@@ -2727,7 +2738,7 @@ tool_persisted_session_id_after_cycle() {
 
 current_workcell_session_refs() {
   local tool="${AI_TOOL:-}" resume_target
-  resume_target="$(tool_runtime_resume_target_before_launch "$tool")"
+  resume_target="$(tool_runtime_resume_target_before_launch "$tool" "${PROJECT_ROOT:-}")"
   if [[ -z "$tool" || -z "$resume_target" ]]; then
     printf '[]\n'
     return 0
@@ -2741,15 +2752,19 @@ is_valid_uuid() {
 }
 
 ensure_runtime_tool_session_anchor() {
-  local tool="$1" launch_kind="$2"
+  local tool="$1" launch_kind="$2" project="${3:-}"
   if tool_uses_claude_session_id "$tool"; then
+    local current_verified="0"
     if ! is_valid_uuid "${CLAUDE_SESSION_ID_CURRENT:-}"; then
       CLAUDE_SESSION_ID_CURRENT=""
     fi
     if ! is_valid_uuid "${CLAUDE_SESSION_ID_PREVIOUS:-}"; then
       CLAUDE_SESSION_ID_PREVIOUS=""
     fi
-    if [[ "$launch_kind" == "fresh_with_handoff" || -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+    if claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
+      current_verified="1"
+    fi
+    if [[ "$launch_kind" == "fresh" || "$launch_kind" == "fresh_with_handoff" || -z "${CLAUDE_SESSION_ID_CURRENT:-}" || ( "$launch_kind" == "resume" && "$current_verified" != "1" ) ]]; then
       CLAUDE_SESSION_ID_PREVIOUS="${CLAUDE_SESSION_ID_CURRENT:-}"
       CLAUDE_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
     fi
@@ -5479,7 +5494,7 @@ tool_prefers_resume_evidence() {
 tool_has_resume_evidence() {
   local tool="$1"
   local resume_target
-  resume_target="$(tool_runtime_resume_target_before_launch "$tool")"
+  resume_target="$(tool_runtime_resume_target_before_launch "$tool" "$project")"
   if tool_prefers_explicit_resume_target "$tool"; then
     case "$tool" in
       codex)
@@ -12022,7 +12037,7 @@ start_project_runtime() {
     exit_if_stop_requested_before_launch
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
-    ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name"
+    ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name" "$PROJECT_ROOT"
     delegated_pending_ids="$(delegated_continuation_ids_for_project "$PROJECT_ROOT")"
     delegated_pending_count="$(csv_item_count "$delegated_pending_ids")"
     delegated_consumed_ids="${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-}"
@@ -12133,7 +12148,7 @@ start_project_runtime() {
         --codex-capability-cwd-mode "${AI_CAPABILITY_CODEX_CWD_MODE:-}" \
         --debug-log-file "$cycle_debug_log" \
         --claude-session-id "${CLAUDE_SESSION_ID_CURRENT:-}" \
-        --tool-resume-target "$(tool_runtime_resume_target_before_launch "$AI_TOOL")" \
+        --tool-resume-target "$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")" \
         --mode "$AI_MODE" \
         --prompt-file "$prompt_file" \
         --pid-file "$child_pid_file" \
@@ -12167,7 +12182,7 @@ start_project_runtime() {
     worktree_total="0"
     worktree_dirty="0"
     next_restart_delay="${RESTART_DELAY:-2}"
-    launch_resume_target="$(tool_runtime_resume_target_before_launch "$AI_TOOL")"
+    launch_resume_target="$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")"
     append_lifecycle_trace "$project" "L041" "ai_launch_observed" \
       "supervisor_pid=$$" \
       "tool=$AI_TOOL" \
@@ -12207,8 +12222,6 @@ start_project_runtime() {
     if log_has_same_tool_route_only_handoff "$cycle_log" "$AI_TOOL"; then
       route_only_handoff="1"
     fi
-    tool_resume_target="$(tool_runtime_resume_target_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_jsonl_path" "$launch_resume_target" "${LAST_TOOL_JSONL_PATH:-}")"
-    tool_session_id="$(tool_persisted_session_id_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_resume_target")"
     if tool_uses_claude_session_id "$AI_TOOL" && [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
       local resolved_cc_evidence
       resolved_cc_evidence="$(resolve_cc_session_evidence "$PROJECT_ROOT" "${CLAUDE_SESSION_ID_CURRENT:-}")"
@@ -12223,7 +12236,12 @@ start_project_runtime() {
           codex_mcp_jsonl_path="${CODEX_MCP_JSONL_PATH:-}"
         fi
       fi
+      if [[ -z "$claude_jsonl_path" ]]; then
+        CLAUDE_SESSION_ID_CURRENT=""
+      fi
     fi
+    tool_resume_target="$(tool_runtime_resume_target_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_jsonl_path" "$launch_resume_target" "${LAST_TOOL_JSONL_PATH:-}")"
+    tool_session_id="$(tool_persisted_session_id_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_resume_target")"
     if [[ "$AI_TOOL" == "cc-use-codex-cli" && "$codex_mcp_used" != "1" ]] && cc_debug_log_has_codex_tool_call "$cycle_debug_log"; then
       codex_mcp_used="1"
       [[ -n "$codex_mcp_thread_id" ]] || codex_mcp_thread_id="unavailable://claude-jsonl-did-not-yet-expose-codex-thread-id"
