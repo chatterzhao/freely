@@ -2976,11 +2976,37 @@ routing_policy:
 - next_action: Candidate is already materialized as `I-20260405-0425-A`; keep this mirror only for source traceability and route execution from the issue/progress pair.
 - revisit_trigger: Revisit immediately if raw `git merge` on `develop` still reaches a merge commit without canonical guarded state, or if entrypoint enforcement suppresses governance/promotion gates after handshake validation.
 
+19. `C-20260419-0210-A`
+- title: Protected-branch ref-only entrypoint enforcement
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/issues/protected-branch-ref-only-entrypoint-enforcement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-0210--protected-branch-ref-only-entrypoint-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-0210--protected-branch-ref-only-entrypoint-gap/candidates.md`
+- next_action: Candidate is already materialized as `I-20260419-0210-A`; keep this mirror only for source traceability and route execution from the issue/progress pair.
+- revisit_trigger: Revisit immediately if protected-root local `develop` can still advance through non-receipted ref-only updates, or if the new ref gate blocks canonical receipt-bearing protected merge commits.
+
 ### committed_issues
+
+1. `I-20260419-0210-A`
+- title: Protected-branch ref-only entrypoint enforcement governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/issues/protected-branch-ref-only-entrypoint-enforcement-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-ref-only-entrypoint-enforcement-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-0210--protected-branch-ref-only-entrypoint-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-0210--protected-branch-ref-only-entrypoint-gap/candidates.md`
+- evidence:
+  - `.githooks/reference-transaction`
+  - `docs/system/workspace/hooks/reference-transaction.sh`
+  - `docs/system/workspace/scripts/tests/test-reference-transaction-hook`
+  - `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`
 
 ### completed_issues
 
-1. `I-20260405-0425-A`
+2. `I-20260405-0425-A`
 - title: Develop guarded merge entrypoint enforcement governance
 - milestone_state: completed
 - phase_state: `completed`
