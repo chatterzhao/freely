@@ -6,4 +6,4 @@
 - [x] Persist corrected manager launch-state continuity/prompt references during status refresh.
 - [x] Add focused regressions for startup self-heal and launch-state writeback.
 - [x] Replay the protected root and capture canonical evidence.
-- [ ] Merge to `develop`, push, and retire the feature worktree/branch.
+- [x] Merge to `develop`, push, and retire the feature worktree/branch.
