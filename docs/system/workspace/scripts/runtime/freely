@@ -4590,7 +4590,7 @@ intake_snapshot_for_project() {
     load_meta_env_snapshot "$meta_file"
     status="$LOADED_META_STATUS"
     case "$status" in
-      absorbed|dropped) continue ;;
+      absorbed|dropped|delegated) continue ;;
     esac
     intake_id="$LOADED_META_INTAKE_ID"
     created_at="$LOADED_META_CREATED_AT"
@@ -4611,13 +4611,26 @@ intake_snapshot_for_project() {
   done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort -r)
 }
 
+delegated_continuation_freshness_floor_epoch_for_project() {
+  local project="$1" continuity_file continuity_epoch
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
+    printf '0\n'
+    return 0
+  }
+  continuity_epoch="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
+  [[ "$continuity_epoch" =~ ^[0-9]+$ ]] || continuity_epoch="0"
+  printf '%s\n' "$continuity_epoch"
+}
+
 delegated_continuation_snapshot_for_project() {
   local project="$1" limit="${2:-3}"
-  local intake_root item_dir meta_file message_file resolution_file status absorption_target delegated_worktree message summary count project_real delegated_real session_refs active_consumed_ids intake_id
+  local intake_root item_dir meta_file message_file resolution_file status absorption_target delegated_worktree message summary count project_real delegated_real session_refs active_consumed_ids intake_id created_at item_epoch continuity_floor_epoch
   intake_root="$(intake_dir_for_project "$project")"
   [[ -d "$intake_root" ]] || return 0
   project_real="$(cd "$project" && pwd -P)"
   active_consumed_ids="$(active_prompt_consumed_delegation_ids_for_project "$project")"
+  continuity_floor_epoch="$(delegated_continuation_freshness_floor_epoch_for_project "$project")"
   count=0
   while IFS= read -r item_dir; do
     meta_file="$item_dir/meta.env"
@@ -4630,6 +4643,19 @@ delegated_continuation_snapshot_for_project() {
     session_refs="$LOADED_META_SESSION_REFS"
     [[ "$status" == "delegated" ]] || continue
     [[ "$absorption_target" == "handoff://continuation" ]] || continue
+    # Older delegated continuations belong to earlier supervision rounds. They may
+    # remain in durable intake history until explicitly absorbed, but they must not
+    # be auto-reinjected into the current manager lane unless a newer continuity
+    # or fresh claim carries them forward again.
+    created_at="$LOADED_META_CREATED_AT"
+    item_epoch="$(timestamp_epoch_or_zero "$created_at")"
+    if [[ ! "$item_epoch" =~ ^[0-9]+$ || "$item_epoch" -le 0 ]]; then
+      item_epoch="$(file_mtime_epoch "$meta_file" 2>/dev/null || true)"
+    fi
+    [[ "$item_epoch" =~ ^[0-9]+$ ]] || item_epoch="0"
+    if (( continuity_floor_epoch > 0 && item_epoch > 0 && item_epoch <= continuity_floor_epoch )); then
+      continue
+    fi
     delegated_real=""
     if [[ -n "$delegated_worktree" ]]; then
       delegated_real="$(cd "$delegated_worktree" 2>/dev/null && pwd -P || true)"
@@ -4688,12 +4714,13 @@ active_prompt_consumed_delegation_ids_for_project() {
 
 delegated_continuation_ids_for_project() {
   local project="$1"
-  local resolution_root meta_file status absorption_target delegated_worktree intake_id
+  local resolution_root meta_file status absorption_target delegated_worktree intake_id created_at item_epoch continuity_floor_epoch
   local project_real delegated_real active_consumed_ids ids=()
   resolution_root="$(interruption_resolution_dir_for_project "$project")"
   [[ -d "$resolution_root" ]] || return 0
   project_real="$(cd "$project" && pwd -P)"
   active_consumed_ids="$(active_prompt_consumed_delegation_ids_for_project "$project")"
+  continuity_floor_epoch="$(delegated_continuation_freshness_floor_epoch_for_project "$project")"
   while IFS= read -r meta_file; do
     [[ -f "$meta_file" ]] || continue
     load_meta_env_snapshot "$meta_file"
@@ -4702,6 +4729,15 @@ delegated_continuation_ids_for_project() {
     delegated_worktree="$LOADED_META_DELEGATED_WORKTREE"
     [[ "$status" == "delegated" ]] || continue
     [[ "$absorption_target" == "handoff://continuation" ]] || continue
+    created_at="$LOADED_META_CREATED_AT"
+    item_epoch="$(timestamp_epoch_or_zero "$created_at")"
+    if [[ ! "$item_epoch" =~ ^[0-9]+$ || "$item_epoch" -le 0 ]]; then
+      item_epoch="$(file_mtime_epoch "$meta_file" 2>/dev/null || true)"
+    fi
+    [[ "$item_epoch" =~ ^[0-9]+$ ]] || item_epoch="0"
+    if (( continuity_floor_epoch > 0 && item_epoch > 0 && item_epoch <= continuity_floor_epoch )); then
+      continue
+    fi
     delegated_real=""
     if [[ -n "$delegated_worktree" ]]; then
       delegated_real="$(cd "$delegated_worktree" 2>/dev/null && pwd -P || true)"
