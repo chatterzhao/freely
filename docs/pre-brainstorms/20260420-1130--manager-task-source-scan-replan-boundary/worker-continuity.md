@@ -38,10 +38,10 @@
 - session_evidence_refs:
   - {tool: `codex`, session_id: `current-codex-session-id-unavailable`, jsonl_path: `unavailable://fresh-session-current-id-not-exposed`, role: `author`}
   - {tool: `codex`, session_id: `019dabe9-21c2-7041-94f2-f6df2dec59c6`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-21-15-019dabe9-21c2-7041-94f2-f6df2dec59c6.jsonl`, role: `fresh_with_handoff_source`}
-- explicit_hygiene_outcome: `one narrow checkpoint commit still required`
+- explicit_hygiene_outcome: `clean hold in pre-brainstorm`
 - next_action:
   - keep this lane in `doc-pre-brainstorm-execution`; this replay is continuity/evidence refresh only because the bounded runtime/doc/test slice is already checkpointed in branch history and the patrol boundary still needs candidate-level judgment
-  - cut one narrow checkpoint commit containing only this candidate-owned continuity refresh, then return the worktree to a clean hold without reopening implementation
+  - bounded checkpoint commit `91b51f61` now carries only this candidate-owned continuity refresh, so the worktree can remain on a clean hold without reopening implementation
   - keep the next replay on boundary revalidation only: if new follow-on work appears, prove whether it belongs to this candidate before reopening implementation
   - keep any future broader watchdog or provider automation follow-on explicitly outside this candidate unless a new owner absorbs it
 - intentionally_out_of_scope:
