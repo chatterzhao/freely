@@ -44,15 +44,18 @@
   - reviewer: `codex-first-hop-audit`
     verdict: `still_pre_brainstorm`
     note: `Current repo truth keeps the lane inside candidate-owned boundary freeze. The runtime/script/test batch now proves the idle/replan scan seam, launch-time prompt consumption, and the narrow stale-pid bootstrap guard needed for startup re-entry, but the owner is still not IBM-ready because its patrol contract and provider/follow-on boundaries remain candidate-level only.`
+  - reviewer: `codex-continuity-refresh-2026-04-20`
+    verdict: `still_pre_brainstorm`
+    note: `HEAD already contains the bounded runtime/doc/test checkpoint series for this patrol-scan seam, and the current replay reran the focused patrol regressions plus runtime syntax check without reopening implementation. Current worktree truth no longer justifies another in-scope implementation checkpoint; the remaining action is candidate-side continuity/evidence refresh and a clean hold until a new bounded delta appears.`
 - depends_on:
   - `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/candidates.md#c-20260407-0817-a`
   - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
 - promoted_issue_path: `pending://issue-materialization`
-- next_action: `Checkpoint the current bounded runtime/doc/test slice now that focused patrol-seam regressions pass, keep the bootstrap stale-pid guard as a narrow startup adjunct inside this owner, and revisit IBM only after the patrol contract is stable enough to freeze provider/follow-on boundaries.`
-- revisit_trigger: `Revisit when external issue provider scan/writeback is ready to join the same patrol transaction, or when progress/recovery surfaces need to be promoted into the scan json rather than read ad hoc.`
+- next_action: `Keep this candidate in pre-brainstorm as a clean hold after continuity/evidence refresh; reopen implementation only if a new bounded patrol-scan delta still fits this owner, or if provider/follow-on boundary decisions become stable enough to justify IBM materialization.`
+- revisit_trigger: `Revisit when external issue provider scan/writeback is ready to join the same patrol transaction, when progress/recovery surfaces need promotion into the scan json rather than ad hoc reads, or when a fresh bounded patrol-seam delta appears that still belongs entirely to this candidate.`
 - session_refs:
   - {tool: `codex`, session_id: `current-thread`, jsonl_path: `unavailable://codex-thread-only`, role: `author`}
 - next_recommended_route: `doc-pre-brainstorm-execution`
 - restart_point: `continuation`
 - ownership: `worker-canonical-pre-brainstorm-writeback`
-- checkpoint_decision: `checkpoint-after-focused-tests`
+- checkpoint_decision: `clean-hold-after-continuity-refresh`
