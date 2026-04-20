@@ -17,12 +17,14 @@
 - required evidence: `focused regression output plus verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Run `bash -n docs/system/workspace/scripts/runtime/freely`.
-2. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-startup-self-heals-stale-runtime-state`.
-3. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-persists-stale-continuity-rewrite`.
-4. Run `bash docs/system/workspace/scripts/tests/test-freely-stale-manager-continuity-filter`.
-5. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status`.
-6. Run `./bin/governance-check`.
-7. Run `git diff --check`.
+2. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-detach-contract`.
+3. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-keeps-daemon-runtime-across-case-variant-project-path`.
+4. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-startup-self-heals-stale-runtime-state`.
+5. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-persists-stale-continuity-rewrite`.
+6. Run `bash docs/system/workspace/scripts/tests/test-freely-stale-manager-continuity-filter`.
+7. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status`.
+8. Run `./bin/governance-check`.
+9. Run `git diff --check`.
 
 ## End-to-End
 - acceptance target: `Promote the bounded startup self-heal owner through canonical develop instead of treating feature-lane replay as final absorption.`
@@ -45,6 +47,7 @@
 1. Inspect the protected root stale state before replay.
 2. Run `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely` and confirm startup self-heal canonicalizes stale machine state.
 3. Run `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, wait through the startup grace window, and verify the runtime no longer remains in contradictory fake-up state.
+4. Verify the detached supervisor survives after the non-interactive `daemon start` caller exits, instead of only staying alive while the caller shell/session remains open.
 
 ## Acceptance Items
 

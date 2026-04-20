@@ -233,7 +233,7 @@ routing_policy:
 1. `I-20260419-1630-A`
 - title: Runtime startup self-healing governance
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-startup-self-healing-governance.md`
@@ -242,8 +242,8 @@ routing_policy:
 - tasks_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/tasks.md`
 - source_brainstorm: `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/candidates.md`
-- branch: `feature/runtime-startup-self-healing-boundary-20260419`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-feature-runtime-startup-self-healing-boundary`
+- branch: `feature/runtime-manager-startup-blocker-rootcause-20260419`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-feature-runtime-manager-startup-blocker-rootcause`
 - follow_on_to: `I-20260414-0255-A`
 - evidence:
   - `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/brainstorms.md`
@@ -253,7 +253,12 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/pre-tests.md`
   - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/tasks.md`
   - `docs/progress/workspace-routing-foundation/p-runtime-startup-self-healing-governance.md`
-- next_action: `Finish the focused startup self-heal regressions, replay stale protected-root startup truth through live-status and daemon start, then write verification evidence and promote to develop.`
+  - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/code-reviews/20260419-runtime-startup-self-healing-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-keeps-daemon-runtime-across-case-variant-project-path`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-startup-self-heals-stale-runtime-state`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+  - `./bin/governance-check`
+- next_action: `Keep the owner narrow, preserve the new path-equivalence verification evidence, then finish the guarded promote path for the current feature continuation.`
 - revisit_trigger: `If replay shows startup self-heal must make semantic continuation choices rather than machine-only repairs, split that follow-on back into a manager-owned recovery owner instead of widening this one.`
 
 1. `I-20260419-2245-A`
