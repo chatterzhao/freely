@@ -22,10 +22,10 @@
   - current milestone truth already carries `C-20260420-1130-A` as `candidate` / `in_pre_brainstorm`, and no stronger `docs/epics/**`, `docs/progress/**`, or `docs/recovery/**` owner absorbs this bounded patrol-scan slice
   - the already-landed runtime/doc/test commits on this branch still point to the same idle/replan patrol seam: stale delegated continuation stops counting as current-round active intake, idle managers get a machine-readable patrol seed, active workers suppress broad patrol, and launch-time worker prompts preserve the intended handoff state
   - the older `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md` owner is already `completed` and only freezes patrol-completeness semantics; it does not absorb this newer idle/replan scan-trigger contract
-  - the stale `ensure-manager` pid regression remains a narrow startup/bootstrap guard inside this owner, and this fresh session absorbed the newer `019dabed-a4b3-7921-b039-8319b70d784b` `fresh_with_handoff` restart after `context compacted` only to refresh candidate-side continuity/evidence instead of reopening implementation or widening into generic watchdog redesign
+  - the stale `ensure-manager` pid regression remains a narrow startup/bootstrap guard inside this owner, and this fresh session absorbed the newer `019dabf3-2ce5-7c01-be02-2183ac142d4d` `fresh_with_handoff` restart after `context compacted` only to refresh candidate-side continuity/evidence instead of reopening implementation or widening into generic watchdog redesign
 - hygiene_judgement:
   - current `git status --short` started empty, and `git diff --stat` started empty, so the worktree entered this round in a clean hold rather than a pending checkpoint batch
-  - this round started as `fresh_with_handoff` from Codex session `019dabed-a4b3-7921-b039-8319b70d784b` after `context compacted`, so continuity refresh was required before any scope expansion
+  - this round started as `fresh_with_handoff` from Codex session `019dabf3-2ce5-7c01-be02-2183ac142d4d` after `context compacted`, so continuity refresh was required before any scope expansion
   - `./bin/checkpoint-guard` reports `checkpoint_required: no`
   - `./bin/freely baseline-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile` now reports `last_project_dirty_entries: 0` and `last_worktree_summary_dirty: 0`, which matches the clean worktree truth before this continuity refresh
   - no runtime/script/test implementation files were reopened, so the only bounded delta from this session is candidate-owned continuity writeback; returning to a clean hold only requires checkpointing this doc-only refresh
@@ -37,7 +37,7 @@
   - `PASS: bash -n docs/system/workspace/scripts/runtime/freely`
 - session_evidence_refs:
   - {tool: `codex`, session_id: `current-codex-session-id-unavailable`, jsonl_path: `unavailable://fresh-session-current-id-not-exposed`, role: `author`}
-  - {tool: `codex`, session_id: `019dabed-a4b3-7921-b039-8319b70d784b`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-26-11-019dabed-a4b3-7921-b039-8319b70d784b.jsonl`, role: `fresh_with_handoff_source`}
+  - {tool: `codex`, session_id: `019dabf3-2ce5-7c01-be02-2183ac142d4d`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-32-13-019dabf3-2ce5-7c01-be02-2183ac142d4d.jsonl`, role: `fresh_with_handoff_source`}
 - explicit_hygiene_outcome: `clean hold in pre-brainstorm`
 - next_action:
   - keep this lane in `doc-pre-brainstorm-execution`; this replay is continuity/evidence refresh only because the bounded runtime/doc/test slice is already checkpointed in branch history and the patrol boundary still needs candidate-level judgment
