@@ -256,6 +256,34 @@ routing_policy:
 - next_action: `Finish the focused startup self-heal regressions, replay stale protected-root startup truth through live-status and daemon start, then write verification evidence and promote to develop.`
 - revisit_trigger: `If replay shows startup self-heal must make semantic continuation choices rather than machine-only repairs, split that follow-on back into a manager-owned recovery owner instead of widening this one.`
 
+1. `I-20260419-2245-A`
+- title: Runtime Claude launch and session evidence governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-claude-launch-and-session-evidence-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/candidates.md`
+- branch: `feature/fix-tool-switch-noninteractive-state-20260419-2315`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-2315-feature-fix-tool-switch-noninteractive-state`
+- evidence:
+  - `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/brainstorms.md`
+  - `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/candidates.md`
+  - `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-runtime-claude-launch-and-session-evidence-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/code-reviews/20260419-runtime-claude-launch-and-session-evidence-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-tool-launchers-cc-stdin-add-dir`
+  - `bash docs/system/workspace/scripts/tests/test-freely-claude-resume-target-requires-evidence`
+  - `printf 'say hi\n' | claude -p --permission-mode bypassPermissions --add-dir /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees`
+  - `./bin/governance-check`
+- next_action: `Refresh the disposable premerge batch with this owner evidence, rerun the focused regressions there, and promote the bounded repair into develop.`
+- revisit_trigger: `If later replay proves the remaining failure is actually generic runtime truth drift rather than Claude-family launcher/session evidence, split that into a new owner instead of widening this one.`
+
 1. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
 - milestone_state: candidate
@@ -324,6 +352,18 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260419-0333--runtime-closeout-selfhost-validation-followthrough/candidates.md`
 - next_action: Candidate mirror only. `I-20260419-0333-A` is now the canonical owner for the preserved runtime closeout/selfhost follow-on.
 - revisit_trigger: Re-open only if canonical develop later proves the bounded daemon/start-lock and closeout-routing changes need separate owners.
+
+1. `C-20260419-2245-A`
+- title: Runtime Claude launch and session evidence governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/candidates.md`
+- next_action: Candidate mirror only. `I-20260419-2245-A` is now the canonical owner for the Claude-family non-interactive launch and verified session-evidence repair.
+- revisit_trigger: Re-open only if canonical develop later proves the failure lives outside launcher/session-evidence truth or if another Claude CLI contract change requires a new narrow follow-on.
+
 1. `C-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance
 - milestone_state: candidate

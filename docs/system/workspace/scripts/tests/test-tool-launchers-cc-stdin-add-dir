@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-tool-launchers-cc-stdin-add-dir.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKTREES_ROOT="${PROJECT}-worktrees"
+PROMPT_FILE="$TMP_DIR/prompt.txt"
+MOCK_BIN="$TMP_DIR/bin"
+mkdir -p "$PROJECT" "$MOCK_BIN"
+printf 'say hi\n' >"$PROMPT_FILE"
+
+cat >"$MOCK_BIN/claude" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$@" >"${TEST_CAPTURE_ARGS_FILE:?missing args capture file}"
+cat >"${TEST_CAPTURE_STDIN_FILE:?missing stdin capture file}"
+exit 0
+EOF
+chmod +x "$MOCK_BIN/claude"
+
+export PATH="$MOCK_BIN:$PATH"
+export TEST_CAPTURE_ARGS_FILE="$TMP_DIR/claude-argv.txt"
+export TEST_CAPTURE_STDIN_FILE="$TMP_DIR/claude-stdin.txt"
+
+bash -lc '
+  set -euo pipefail
+  # shellcheck disable=SC1090
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/tool-launchers.sh"
+  tool_run_from_prompt_file \
+    "'"$PROJECT"'" \
+    "cc" \
+    "" \
+    "" \
+    "" \
+    "auto" \
+    "'"$PROMPT_FILE"'" \
+    "fresh" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "11111111-2222-4333-8444-555555555555" \
+    ""
+' >/dev/null
+
+grep -q -- '^--add-dir$' "$TEST_CAPTURE_ARGS_FILE" || {
+  echo "[FAIL] expected Claude launcher to add the sibling worktrees root" >&2
+  cat "$TEST_CAPTURE_ARGS_FILE" >&2
+  exit 1
+}
+
+grep -q -- "^$WORKTREES_ROOT$" "$TEST_CAPTURE_ARGS_FILE" || {
+  echo "[FAIL] expected Claude launcher to pass the sibling worktrees root" >&2
+  cat "$TEST_CAPTURE_ARGS_FILE" >&2
+  exit 1
+}
+
+grep -q -- '^--session-id$' "$TEST_CAPTURE_ARGS_FILE" || {
+  echo "[FAIL] expected Claude launcher to preserve explicit session ids for fresh launches" >&2
+  cat "$TEST_CAPTURE_ARGS_FILE" >&2
+  exit 1
+}
+
+if grep -qx 'say hi' "$TEST_CAPTURE_ARGS_FILE"; then
+  echo "[FAIL] expected Claude launcher to send the prompt through stdin instead of argv" >&2
+  cat "$TEST_CAPTURE_ARGS_FILE" >&2
+  exit 1
+fi
+
+grep -qx 'say hi' "$TEST_CAPTURE_STDIN_FILE" || {
+  echo "[FAIL] expected Claude launcher to stream the prompt via stdin" >&2
+  cat "$TEST_CAPTURE_STDIN_FILE" >&2
+  exit 1
+}
+
+echo "[PASS] Claude launcher keeps workspace boundary flags and sends prompts through stdin"
