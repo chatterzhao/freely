@@ -354,6 +354,12 @@ cat > docs/progress/sample/p-sample.md <<'EOF'
 - issue_path: `docs/epics/sample/story/issues/sample.md`
 - phase_state: `in_verification`
 EOF
+cat > docs/epics/sample/story/tasks.md <<'EOF'
+# Tasks: sample
+
+- [x] Keep the owner lifecycle binding visible during guarded promote.
+- [x] Record the guarded premerge closeout artifact and adequacy evidence.
+EOF
 cat > docs/epics/sample/story/code-reviews/r-premerge.md <<'EOF'
 # Review: sample
 
@@ -367,7 +373,7 @@ cat > docs/epics/sample/story/code-reviews/r-premerge.md <<'EOF'
 - boundary_non_goals: `This fixture does not replace the existing owner/materialization gate.`
 - residual_risk: `Post-merge followthrough still needs its own closeout lane.`
 EOF
-git add docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md docs/epics/sample/story/code-reviews/r-premerge.md
+git add docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/tasks.md docs/progress/sample/p-sample.md docs/epics/sample/story/code-reviews/r-premerge.md
 git commit -q -m "premerge governance closeout payload"
 
 git checkout -q develop

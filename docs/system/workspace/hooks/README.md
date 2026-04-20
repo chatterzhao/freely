@@ -23,6 +23,10 @@
   - develop-bound governance merge gate 与 promotion ownership gate
   - gate 失败时默认回到来源 feature worktree 修源，不得直接用裸 `--no-verify` 跳过
   - 若命中 break-glass，只能通过受控 completion path 留下 receipt 并承担 follow-on 修复责任
+- `reference-transaction.sh`
+  - 受保护分支 ref 更新门禁
+  - 阻止 `git merge --ff-only`、`git reset` 等没有 canonical protected-merge receipt 的 ref-only advance
+  - 允许 receipt-bearing protected merge commit 继续更新 `main` / `develop` / `test-pre-merge-*`
 
 ## 投影规则
 
