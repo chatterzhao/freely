@@ -1,14 +1,81 @@
-# Pre-tests
+# Pre-tests: latest-manager-continuity-worker-consumption-governance
 
-## Pre-merge acceptance
+## Unit
+- acceptance target: `No narrower truthful unit seam is required because delegated freshness only becomes meaningful once intake history, continuity timestamps, prompt composition, and live-status surface are evaluated together.`
+- testing layer: `unit`
+- target environment: `feature/success-standard-governance-20260420`
+- required evidence: `focused integration regressions plus owner verification artifact`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `A fake lower-level seam would miss the exact failure mode: old delegated handoffs being re-presented through both prompt composition and front-door queue rendering.`
+- replacement_evidence: `The focused manager prompt, intake, and live-status regressions together are the smallest stable executable boundary for this repair.`
 
-1. stale `manager-worker-launch-state.env` 存在时，runtime 再次消费 latest continuity 会把 consumed continuity 更新到最新文件。
-2. 若 latest continuity 派生出新的 worker prompt，runtime 会消费最新 prompt set，而不是停留在旧 prompt csv。
-3. `ensure_manager_once` 在 manager supervisor 已运行时，仍会触发 latest continuity consumption。
-4. `baseline-status` / `live-status` 能显示 latest continuity / prompt set 的 generated 与 consumed truth。
+## Integration
+- acceptance target: `delegated continuation freshness prevents stale backlog replay while preserving truthful delegated count/status surfaces`
+- testing layer: `integration`
+- target environment: `feature/success-standard-governance-20260420`
+- required evidence: `focused regression output plus owner verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-filters-stale-delegated-continuations`.
+2. Run `bash docs/system/workspace/scripts/tests/test-freely-human-chat-intake`.
+3. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`.
+4. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status`.
+5. Run `git diff --check`.
+6. Run `./bin/governance-check`.
 
-## Post-merge acceptance
+## End-to-End
+- acceptance target: `guarded promote keeps the delegated freshness repair intact across feature -> test-pre-merge -> develop governance`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-success-standard-governance-20260420-0215`
+- required evidence: `premerge replay evidence plus owner verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Merge `feature/success-standard-governance-20260420` into `test-pre-merge-success-standard-governance-20260420-0215` through `./bin/merge-guarded`.
+2. Rerun the focused regression set plus `./bin/governance-check` in the pre-merge batch.
+3. Use the resulting verification artifact to justify guarded promote into `develop`.
 
-1. 在 `develop` 上真实执行 `freely chat` 后，若主管产生新一轮 worker prompt set，worker 会切到最新 prompt set，而不是继续沿用更早 delegated continuation。
-2. `ACTIVE_RUNNING_WORKER_COUNT` 只能作为 fleet-wide 观察信号；若其他 issue family / runtime-owned lane 仍在运行，它可以大于当前 issue family 的 same-round worker 数。不要把该值单独当成 `I-20260322-0445` reopen 的判据。
-3. 对这条 issue family 的 canonical `develop` acceptance，重点检查的是 same-round latest continuity / worker prompt generated-consumed truth 是否一致，而不是要求 fleet-wide worker 总数在后续轮次保持某个固定值。
+## Real-Environment
+- acceptance target: `canonical develop replay consumes the fresh success-standard governance interruption first and does not let the stale runtime-lifecycle-validation continuation hijack the manager round`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `one-minute canonical daemon replay, live-status evidence, and prompt excerpt captured in the owner verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+- real_environment_status: `pass`
+- real_environment_reason: `The truthful production seam was canonical develop itself, because the failure only surfaced when the manager prompt consumed a real delegated governance interruption against durable intake history.`
+
+## Acceptance Items
+
+### Fresh continuity suppresses stale delegated backlog replay
+- id: `PT-1`
+- requirement: `manager prompt filters delegated continuation backlog older than the latest manager continuity`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#2,tasks.md#5`
+- case_design: `Seed stale and fresh delegated continuation items around the latest manager continuity timestamp, then verify only the fresh handoff appears in the current manager prompt while delegated items stay out of the front-door queue.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
+
+### Live-status keeps delegated counts without duplicating queue truth
+- id: `PT-2`
+- requirement: `front-door intake snapshot excludes delegated items while live-status still reports delegated counts truthfully`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#4,tasks.md#5`
+- case_design: `Replay a delegated intake item through live-status and confirm the delegated count remains visible while intake_snapshot no longer duplicates the delegated item as untriaged chat.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
+
+### Guarded promote preserves delegated freshness adequacy
+- id: `PT-3`
+- requirement: `the guarded promote path and canonical develop replay consume the fresh success-standard governance interruption instead of reusing the stale runtime-lifecycle-validation continuation`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#4,tasks.md#5,tasks.md#6`
+- case_design: `Merge the feature lane into the disposable test-pre-merge-success-standard-governance-20260420-0215 batch, rerun the focused regressions plus governance-check there, then replay patched daemon start and one-minute chat intake on canonical develop to confirm the new success-standard interruption becomes the consumed delegated continuation for the current manager round.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`

@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `latest-manager-continuity-worker-consumption-governance`
 - issue-name: `latest-manager-continuity-worker-consumption-governance`
+- pre_tests_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/pre-tests.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md#c-20260322-0445-a`
@@ -89,6 +90,7 @@
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md`
 - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260322-latest-manager-continuity-worker-consumption-verification.md`
+- `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
 
 ## Verification
 
@@ -105,6 +107,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-multiline-dispatch-metadata`
 - `./bin/governance-check`
+- `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
 
 ## Verification Summary
 
@@ -147,6 +150,29 @@
   - keep this residual fallback in the same latest-continuity / worker-prompt consumption family
   - do not split a new `manager-continuity-gap-and-worker-recovery-guard` issue
   - do not widen `I-20260407-0215-A`, whose bounded scope stays on continuity-gap status truth rather than worker prompt intent consumption
+
+## 2026-04-20 Delegated Continuation Freshness Guard
+
+- Real dogfood on canonical `develop` exposed another same-family prompt-consumption gap after runtime startup became healthy:
+  - the manager prompt still replayed delegated continuation items that were older than the latest generated manager continuity
+  - those delegated items also remained duplicated in the front-door `Human chat intake queue`
+  - a fresh governance interruption about `成功标准` therefore got bundled behind an older `runtime-lifecycle-validation` continuation and the manager kept following the stale lane instead of routing the new work
+- Why this remains same-family:
+  - the defect still sits on the latest continuity / delegated prompt-consumption seam already owned by `I-20260322-0445`
+  - no new interruption taxonomy is required; the missing contract is freshness about which delegated handoffs still belong to the current supervision round
+- Narrow repair:
+  - front-door `Human chat intake queue` excludes `STATUS="delegated"` items, because they have already left the claim queue and should not be re-presented as untriaged chat
+  - local delegated continuation prompt injection only includes handoffs newer than the latest generated manager continuity for the same project
+  - older delegated items remain durable intake history until explicitly absorbed or re-claimed, but they no longer hijack the current manager lane by default
+- Success criteria:
+  - fresh delegated governance interruptions enter the current manager prompt without being bundled behind older continuation backlog
+  - delegated items older than the latest manager continuity do not auto-reenter the current manager lane unless a newer continuity or fresh claim carries them forward
+  - front-door intake queue only shows not-yet-delegated chat items
+  - a real replay can route the new governance task first instead of silently reusing the older runtime-lifecycle-validation lane
+- Verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-filters-stale-delegated-continuations`
+  - `bash docs/system/workspace/scripts/tests/test-freely-human-chat-intake`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
 
 ## Retirement Audit
 
