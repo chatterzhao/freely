@@ -1,10 +1,11 @@
 # Verification: runtime-startup-self-healing-governance
 
-- date: `2026-04-19`
-- issue: `I-20260419-1630-A`
+- issue_id: `I-20260419-1630-A`
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
+- verification_date: `2026-04-19`
 - branch: `feature/runtime-startup-self-healing-boundary-20260419`
 - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-feature-runtime-startup-self-healing-boundary`
-- verifier: `{tool: codex, session_id: "current-thread"}`
+- verifier: `codex`
 
 ## Commands
 
@@ -45,6 +46,14 @@
 ## Verdict
 
 `AT-001`, `AT-002`, and `AT-003` are satisfied for this bounded owner: startup now canonicalizes stale machine-owned truth and exposes the remaining failure as continuity-gap truth rather than fake runtime liveness.
+
+## Implementation Decision Note
+
+- decision: `Keep startup self-heal scoped to machine-provable stale state and repair the separate retired-target receipt-gap audit path only far enough to let this owner close under the existing governance gate.`
+- why_this: `The protected-root replay showed the user-visible failure happens before manager-owned semantic recovery starts, so startup must canonicalize stale pid/state truth itself. The receipt-gap follow-on is deliberately narrower than a governance redesign: it only restores auditability for already absorbed unparseable-subject entries after their target batch branch is lawfully deleted.`
+- alternatives_considered: `Leave stale startup truth for manager recovery; widen restart into implicit continuity restoration; delete the stale receipt-gap entries by hand; broaden governance-check into a generic ancestry audit redesign.`
+- boundary_non_goals: `This note does not let startup repair semantic continuation, does not change attach/reuse or restart semantics, and does not reopen the broader protected-merge receipt policy beyond the retired-target false negative needed for closeout.`
+- residual_risk: `The remaining risk is downstream manager continuity failure after startup truth is corrected; that failure now surfaces explicitly as continuity-gap state instead of fake runtime liveness.`
 
 ## Remaining Closeout
 
