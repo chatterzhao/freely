@@ -182,6 +182,17 @@ additional_requirements="$(cat <<'EOF'
 EOF
 )"
 startup_bounded_patrol_rule=""
+initial_read_targets="$(cat <<EOF
+- 项目治理入口：$project/AGENTS.md
+- 项目意图：$intent
+- 宪法：$constitution
+- 里程碑扫描入口：$project/docs/milestones.md
+- workspace 根：$workspace_root
+- 工具清单：workspace/tools.md
+- 技能索引：workspace/skills/README.md
+- 首跳代理：workspace/agents/lead-agent.md
+EOF
+)"
 
 if is_manager_branch "$current_branch"; then
   manager_mode="true"
@@ -254,6 +265,22 @@ EOF
 - 若 scan json 已经证明 backlog 非空，但首轮没有形成 continuity 或 worker prompt，这一轮应视为失败；不要把“继续读更多文档”当作默认下一步。
 EOF
 )"
+  initial_read_targets="$(cat <<EOF
+- 项目治理入口：$project/AGENTS.md
+- runtime 当前态入口：./bin/freely live-status --project $project
+- 结构化巡检入口：machine_readable_scan_json（若 prompt 尾部已给出路径，先消费该 json）
+- workspace 根：$workspace_root
+- 首跳代理：workspace/agents/lead-agent.md
+- 巡检技能：workspace/skills/context-source-skill/SKILL.md
+
+按需再读，不要在首轮默认展开：
+- 项目意图：$intent
+- 宪法：$constitution
+- 里程碑扫描入口：$project/docs/milestones.md
+- 工具清单：workspace/tools.md
+- 技能索引：workspace/skills/README.md
+EOF
+)"
 fi
 
 escape_prompt_backticks() {
@@ -269,6 +296,7 @@ role_scope_rule_5b_escaped="$(escape_prompt_backticks "$role_scope_rule_5b")"
 manager_artifact_rule_escaped="$(escape_prompt_backticks "$manager_artifact_rule")"
 additional_requirements_escaped="$(escape_prompt_backticks "$additional_requirements")"
 startup_bounded_patrol_rule_escaped="$(escape_prompt_backticks "$startup_bounded_patrol_rule")"
+initial_read_targets_escaped="$(escape_prompt_backticks "$initial_read_targets")"
 
 cat <<EOF
 你现在进入 Freely 的首跳闭环。
@@ -280,14 +308,7 @@ cat <<EOF
 - 若当前工具的读文件接口支持分页/范围参数，只在确实需要时填写有效值；不要传空字符串。
 
 先读取以下文档或索引：
-- 项目治理入口：$project/AGENTS.md
-- 项目意图：$intent
-- 宪法：$constitution
-- 里程碑扫描入口：$project/docs/milestones.md
-- workspace 根：$workspace_root
-- 工具清单：workspace/tools.md
-- 技能索引：workspace/skills/README.md
-- 首跳代理：workspace/agents/lead-agent.md
+${initial_read_targets_escaped}
 
 运行上下文：
 - PROJECT_ROOT=$project
