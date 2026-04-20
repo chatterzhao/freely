@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-prompt-milestone-seed.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260420-0000--sample" \
+  "$PROJECT/.freely/run"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-20260420-runtime
+
+- title: Runtime self-host patrol
+- status: active
+
+### committed_issues
+
+1. `I-20260420-1000-A`
+- title: Startup patrol should continue active verification
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/runtime/issues/startup-patrol.md`
+- progress_path: `docs/progress/p-startup-patrol.md`
+- next_action: `verify the latest runtime evidence before declaring closeout`
+
+### candidate_issues
+
+1. `C-20260420-1100-A`
+- title: Patrol should research orphan source reconciliation
+- status: needs_research
+- priority: P1
+- next_action: `route back into pre-brainstorm reconciliation`
+
+### completed_issues
+
+1. `I-20260419-0900-A`
+- title: already closed item should not reappear
+- phase_state: `completed`
+- priority: P2
+- next_action: `none`
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260420-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260420-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260420-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+PROMPT_OUTPUT="$(
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+  bash -lc '
+    source "$1"
+    build_prompt
+  ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+)"
+
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'Task-source patrol seed:'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '默认只把它们当作 patrol seed，不当作 completion 证明'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'machine_readable_scan_json:'
+SCAN_JSON="$PROJECT/.freely/run/manager-task-source-scan-latest.json"
+test -f "$SCAN_JSON"
+python3 - "$SCAN_JSON" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    payload = json.load(f)
+
+assert payload["schema_version"] == "manager-task-source-scan-v1"
+assert payload["scan_reason"] == "bootstrap_missing_scan"
+surfaces = {entry["surface"]: entry for entry in payload["surfaces"]}
+assert "human_chat_intake" in surfaces
+assert "delegated_continuation" in surfaces
+assert "active_milestone_queue" in surfaces
+assert surfaces["active_milestone_queue"]["active_count"] == 2
+assert surfaces["delegated_continuation"]["needs_reconcile"] is True
+assert surfaces["human_chat_intake"]["trust_level"] == "runtime_intake_authoritative_for_existence"
+PY
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'item=I-20260420-1000-A'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'route_hint=issue_continuation/in_verification'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'item=C-20260420-1100-A'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'route_hint=candidate_research'
+if printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'I-20260419-0900-A'; then
+  echo "[FAIL] completed milestone items should not be surfaced as patrol seeds" >&2
+  exit 1
+fi
+
+echo "[PASS] manager prompt includes unresolved milestone patrol seeds and excludes completed queue items"
