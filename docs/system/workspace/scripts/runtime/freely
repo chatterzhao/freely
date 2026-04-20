@@ -1855,7 +1855,7 @@ manager_continuity_written_by_from_file() {
 
 find_latest_manager_continuity_file_for_project() {
   local project="$1"
-  latest_manager_continuity_file_for_project "$project"
+  latest_patrol_authoritative_manager_continuity_file_for_project "$project"
 }
 
 required_manager_continuity_file_from_prompt() {
@@ -14424,8 +14424,9 @@ cmd_live_status() {
   latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
   latest_generated_prompts_csv="none"
   if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
-    if manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_generated_continuity"; then
-      latest_generated_continuity="$(latest_manager_continuity_file_for_project "$project")"
+    if manager_continuity_precedes_operator_stop_boundary "$project" "$latest_generated_continuity" \
+      || manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_generated_continuity"; then
+      latest_generated_continuity="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
     fi
   fi
   if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
