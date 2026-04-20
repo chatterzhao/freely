@@ -47,6 +47,9 @@
   - reviewer: `codex-continuity-refresh-2026-04-20`
     verdict: `still_pre_brainstorm`
     note: `HEAD already contains the bounded runtime/doc/test checkpoint series for this patrol-scan seam, and the current replay reran the focused patrol regressions plus runtime syntax check without reopening implementation. Current worktree truth no longer justifies another in-scope implementation checkpoint; the remaining action is candidate-side continuity/evidence refresh and a clean hold until a new bounded delta appears.`
+  - reviewer: `codex-fresh-session-continuity-refresh-2026-04-20`
+    verdict: `still_pre_brainstorm`
+    note: `A fresh session resumed from the `019dabd6-26d2-7952-979e-59315886567e` context-compacted handoff and revalidated the narrow patrol seam with passing milestone-seed, idle-regeneration, active-worker suppression, stale-delegated-intake, and runtime syntax checks. Current repo truth stays narrowly dirty only in candidate-side continuity writeback, so this owner remains in pre-brainstorm without reopening implementation or forcing a new checkpoint commit.`
 - depends_on:
   - `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/candidates.md#c-20260407-0817-a`
   - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
@@ -55,6 +58,7 @@
 - revisit_trigger: `Revisit when external issue provider scan/writeback is ready to join the same patrol transaction, when progress/recovery surfaces need promotion into the scan json rather than ad hoc reads, or when a fresh bounded patrol-seam delta appears that still belongs entirely to this candidate.`
 - session_refs:
   - {tool: `codex`, session_id: `current-thread`, jsonl_path: `unavailable://codex-thread-only`, role: `author`}
+  - {tool: `codex`, session_id: `019dabd6-26d2-7952-979e-59315886567e`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-00-31-019dabd6-26d2-7952-979e-59315886567e.jsonl`, role: `fresh_with_handoff_source`}
 - next_recommended_route: `doc-pre-brainstorm-execution`
 - restart_point: `continuation`
 - ownership: `worker-canonical-pre-brainstorm-writeback`
