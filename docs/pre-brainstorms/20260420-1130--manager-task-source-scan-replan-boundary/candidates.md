@@ -65,6 +65,9 @@
   - reviewer: `codex-fresh-session-clean-hold-reconcile-2026-04-20`
     verdict: `still_pre_brainstorm`
     note: `This fresh session absorbed the newer `019dabe9-21c2-7041-94f2-f6df2dec59c6` context-compacted handoff, rechecked milestone placement, confirmed the current worktree started clean (`git status --short`, `git diff --stat`, `./bin/checkpoint-guard`, `./bin/freely baseline-status --project ...`), reran the same focused patrol regressions, and reconfirmed that the older completed `I-20260326-1835` source-patrol owner does not absorb the newer idle/replan scan-trigger seam. The candidate therefore remains in pre-brainstorm on a clean hold, with this continuity refresh as the only new bounded delta.`
+  - reviewer: `codex-fresh-session-context-compacted-reconcile-2026-04-20`
+    verdict: `still_pre_brainstorm`
+    note: `This fresh session absorbed the newer `019dabed-a4b3-7921-b039-8319b70d784b` `fresh_with_handoff` restart after `context compacted`, re-ran `git status --short`, `git diff --stat`, `./bin/checkpoint-guard`, and `./bin/freely baseline-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile`, then reran the same focused patrol-seam checks plus `bash -n docs/system/workspace/scripts/runtime/freely`. Repo truth still starts clean, the focused patrol slice still passes without reopening implementation, and no stronger issue/progress/recovery owner absorbs this bounded idle/replan scan-trigger seam. The candidate therefore remains on a clean hold in pre-brainstorm, with this continuity/evidence refresh as the only in-scope delta.`
 - depends_on:
   - `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/candidates.md#c-20260407-0817-a`
   - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
@@ -73,6 +76,7 @@
 - revisit_trigger: `Revisit when external issue provider scan/writeback is ready to join the same patrol transaction, when progress/recovery surfaces need promotion into the scan json rather than ad hoc reads, or when a fresh bounded patrol-seam delta appears that still belongs entirely to this candidate.`
 - session_refs:
   - {tool: `codex`, session_id: `current-codex-session-id-unavailable`, jsonl_path: `unavailable://fresh-session-current-id-not-exposed`, role: `author`}
+  - {tool: `codex`, session_id: `019dabed-a4b3-7921-b039-8319b70d784b`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-26-11-019dabed-a4b3-7921-b039-8319b70d784b.jsonl`, role: `fresh_with_handoff_source`}
   - {tool: `codex`, session_id: `019dabe9-21c2-7041-94f2-f6df2dec59c6`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-21-15-019dabe9-21c2-7041-94f2-f6df2dec59c6.jsonl`, role: `fresh_with_handoff_source`}
   - {tool: `codex`, session_id: `019dabe6-3b10-7d02-bc6b-7122d800fb6b`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-18-05-019dabe6-3b10-7d02-bc6b-7122d800fb6b.jsonl`, role: `fresh_with_handoff_source`}
   - {tool: `codex`, session_id: `019dabe3-8e3a-7ad1-a5a9-69e57689b9b3`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-15-10-019dabe3-8e3a-7ad1-a5a9-69e57689b9b3.jsonl`, role: `fresh_with_handoff_source`}
