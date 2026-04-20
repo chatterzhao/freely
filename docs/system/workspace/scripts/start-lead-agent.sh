@@ -181,6 +181,7 @@ additional_requirements="$(cat <<'EOF'
 - 若 `MANAGER_MODE=false` 且当前分支是 `feature/*`，当前会话保持 worker scope：不要升级成项目级监督者；若发现需要主管裁决的 fleet / merge / cleanup 问题，只记录 evidence 与 reroute 建议。
 EOF
 )"
+startup_bounded_patrol_rule=""
 
 if is_manager_branch "$current_branch"; then
   manager_mode="true"
@@ -238,6 +239,21 @@ EOF
 - 若活跃 owner 的 issue / progress / pre-tests 只存在于某个 dirty feature worktree，不要在 root `develop` 里直接读取同名相对路径并把 `No such file or directory` 当成 owner 缺失；应先锚定该 feature worktree，再从那个工位读取 owner 真相并生成 handoff。
 EOF
 )"
+  startup_bounded_patrol_rule="$(cat <<'EOF'
+启动首轮有界巡检契约：
+- 若当前没有 launchable manager continuity、也没有 active worker，先把这轮视为 `fresh_startup_patrol`，不要直接展开全量治理阅读。
+- `fresh_startup_patrol` 的首批必读证据只允许包含：
+  - `PROJECT_ROOT/AGENTS.md`
+  - `machine_readable_scan_json`
+  - `./bin/freely live-status --project <project>`
+  - `workspace/agents/lead-agent.md`
+  - `workspace/skills/context-source-skill/SKILL.md`
+- 在写出 primary manager continuity 前，不要整文件读取 `docs/milestones.md`，不要并行展开多个 skill，也不要为每个 surface 预读 issue / progress / pre-brainstorm 原文。
+- 首轮先用 `machine_readable_scan_json` 的 active counts 和 summary 选出至多一个 highest-leverage source；只对该 source 做定点核对，再写 primary manager continuity。
+- primary manager continuity 必须先回答四件事：`route_kind`、`restart_point`、`ownership`、`next_action`。如果证据仍不足，再把“需要补读的具体文档路径”写进 continuity / queue，而不是在首轮继续扩读。
+- 若 scan json 已经证明 backlog 非空，但首轮没有形成 continuity 或 worker prompt，这一轮应视为失败；不要把“继续读更多文档”当作默认下一步。
+EOF
+)"
 fi
 
 escape_prompt_backticks() {
@@ -252,6 +268,7 @@ role_scope_rule_5a_escaped="$(escape_prompt_backticks "$role_scope_rule_5a")"
 role_scope_rule_5b_escaped="$(escape_prompt_backticks "$role_scope_rule_5b")"
 manager_artifact_rule_escaped="$(escape_prompt_backticks "$manager_artifact_rule")"
 additional_requirements_escaped="$(escape_prompt_backticks "$additional_requirements")"
+startup_bounded_patrol_rule_escaped="$(escape_prompt_backticks "$startup_bounded_patrol_rule")"
 
 cat <<EOF
 你现在进入 Freely 的首跳闭环。
@@ -304,6 +321,7 @@ cat <<EOF
 3. 进入 \`lead-agent\`，不要绕过首跳代理。
 4. 由 \`lead-agent\` 参照 \`workspace/skills/context-source-skill/SKILL.md\` 完成需求池扫描、优先级判断与下一跳提示词组装；若当前工具没有原生 skill executor，就直接读取该技能文档并在当前会话按它执行。
 4A. 若 runtime 在 prompt 尾部附加了 \`machine_readable_scan_json\`，先把它当作本轮 idle / replan patrol 的结构化入口；其中状态只算 routing hint，phase judgement 仍需回到 linked evidence 核对。
+${startup_bounded_patrol_rule_escaped}
 5. 若当前轮次承担项目级监督职责，先基于项目级工位视图做排班、冻结、集成与 cleanup 判断；不要直接把自己降级成单工位写代码代理。
 ${role_scope_rule_5a_escaped}
 ${role_scope_rule_5b_escaped}
