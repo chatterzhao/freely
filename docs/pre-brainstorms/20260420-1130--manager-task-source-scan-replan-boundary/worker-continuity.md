@@ -22,14 +22,13 @@
   - current milestone truth already carries `C-20260420-1130-A` as `candidate` / `in_pre_brainstorm`, and no stronger `docs/epics/**`, `docs/progress/**`, or `docs/recovery/**` owner absorbs this bounded patrol-scan slice
   - the already-landed runtime/doc/test commits on this branch still point to the same idle/replan patrol seam: stale delegated continuation stops counting as current-round active intake, idle managers get a machine-readable patrol seed, active workers suppress broad patrol, and launch-time worker prompts preserve the intended handoff state
   - the older `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md` owner is already `completed` and only freezes patrol-completeness semantics; it does not absorb this newer idle/replan scan-trigger contract
-  - the stale `ensure-manager` pid regression remains a narrow startup/bootstrap guard inside this owner, and this fresh session absorbed the newer `019dabe6-3b10-7d02-bc6b-7122d800fb6b` `context compacted` handoff only to refresh candidate-side continuity/evidence instead of reopening implementation or widening into generic watchdog redesign
+  - the stale `ensure-manager` pid regression remains a narrow startup/bootstrap guard inside this owner, and this fresh session absorbed the newer `019dabe9-21c2-7041-94f2-f6df2dec59c6` `context compacted` handoff only to refresh candidate-side continuity/evidence instead of reopening implementation or widening into generic watchdog redesign
 - hygiene_judgement:
-  - current `git status --short` shows exactly two dirty entries: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md` and `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/worker-continuity.md`
-  - current `git diff --stat` is limited to those same two candidate-owned continuity files, so the remaining dirty batch stays entirely inside `C-20260420-1130-A`
-  - this round started as `fresh_with_handoff` from Codex session `019dabe6-3b10-7d02-bc6b-7122d800fb6b` after `context compacted`, so continuity refresh was required before any scope expansion
+  - current `git status --short` started empty, and `git diff --stat` started empty, so the worktree entered this round in a clean hold rather than a pending checkpoint batch
+  - this round started as `fresh_with_handoff` from Codex session `019dabe9-21c2-7041-94f2-f6df2dec59c6` after `context compacted`, so continuity refresh was required before any scope expansion
   - `./bin/checkpoint-guard` reports `checkpoint_required: no`
-  - `./bin/freely baseline-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile` reports `last_project_dirty_entries: 2` and `last_worktree_summary_dirty: 1`, which matches the current continuity-only writeback batch rather than an implementation drift-budget breach
-  - no runtime/script/test implementation files were reopened, so this round closes by checkpointing the continuity-only doc batch and returning the worktree to a clean hold
+  - `./bin/freely baseline-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile` now reports `last_project_dirty_entries: 0` and `last_worktree_summary_dirty: 0`, which matches the clean worktree truth before this continuity refresh
+  - no runtime/script/test implementation files were reopened, so the only bounded delta from this session is candidate-owned continuity writeback; returning to a clean hold only requires checkpointing this doc-only refresh
 - focused_verification:
   - `PASS: bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-includes-milestone-patrol-seed`
   - `PASS: bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
@@ -38,11 +37,11 @@
   - `PASS: bash -n docs/system/workspace/scripts/runtime/freely`
 - session_evidence_refs:
   - {tool: `codex`, session_id: `current-codex-session-id-unavailable`, jsonl_path: `unavailable://fresh-session-current-id-not-exposed`, role: `author`}
-  - {tool: `codex`, session_id: `019dabe6-3b10-7d02-bc6b-7122d800fb6b`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-18-05-019dabe6-3b10-7d02-bc6b-7122d800fb6b.jsonl`, role: `fresh_with_handoff_source`}
-- explicit_hygiene_outcome: `clean hold in pre-brainstorm`
+  - {tool: `codex`, session_id: `019dabe9-21c2-7041-94f2-f6df2dec59c6`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-21-15-019dabe9-21c2-7041-94f2-f6df2dec59c6.jsonl`, role: `fresh_with_handoff_source`}
+- explicit_hygiene_outcome: `one narrow checkpoint commit still required`
 - next_action:
   - keep this lane in `doc-pre-brainstorm-execution`; this replay is continuity/evidence refresh only because the bounded runtime/doc/test slice is already checkpointed in branch history and the patrol boundary still needs candidate-level judgment
-  - after this bounded two-file doc checkpoint, leave the worktree in a clean hold and do not reopen implementation unless a new bounded patrol-scan delta is proven to belong to `C-20260420-1130-A`
+  - cut one narrow checkpoint commit containing only this candidate-owned continuity refresh, then return the worktree to a clean hold without reopening implementation
   - keep the next replay on boundary revalidation only: if new follow-on work appears, prove whether it belongs to this candidate before reopening implementation
   - keep any future broader watchdog or provider automation follow-on explicitly outside this candidate unless a new owner absorbs it
 - intentionally_out_of_scope:

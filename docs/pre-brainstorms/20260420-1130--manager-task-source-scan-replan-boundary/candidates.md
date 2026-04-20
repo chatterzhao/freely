@@ -62,6 +62,9 @@
   - reviewer: `codex-fresh-session-reconcile-2026-04-20-third-rotation`
     verdict: `still_pre_brainstorm`
     note: `This fresh session absorbed the newer `019dabe6-3b10-7d02-bc6b-7122d800fb6b` context-compacted handoff, reran the same focused patrol regressions plus `bash -n docs/system/workspace/scripts/runtime/freely`, and reconfirmed that no stronger `docs/epics/**`, `docs/progress/**`, or `docs/recovery/**` owner absorbs this idle/replan patrol seam. The lane therefore remains a bounded pre-brainstorm candidate, and the only in-scope closure is this two-file continuity/doc checkpoint back to a clean hold.`
+  - reviewer: `codex-fresh-session-clean-hold-reconcile-2026-04-20`
+    verdict: `still_pre_brainstorm`
+    note: `This fresh session absorbed the newer `019dabe9-21c2-7041-94f2-f6df2dec59c6` context-compacted handoff, rechecked milestone placement, confirmed the current worktree started clean (`git status --short`, `git diff --stat`, `./bin/checkpoint-guard`, `./bin/freely baseline-status --project ...`), reran the same focused patrol regressions, and reconfirmed that the older completed `I-20260326-1835` source-patrol owner does not absorb the newer idle/replan scan-trigger seam. The candidate therefore remains in pre-brainstorm on a clean hold, with this continuity refresh as the only new bounded delta.`
 - depends_on:
   - `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/candidates.md#c-20260407-0817-a`
   - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
@@ -70,6 +73,7 @@
 - revisit_trigger: `Revisit when external issue provider scan/writeback is ready to join the same patrol transaction, when progress/recovery surfaces need promotion into the scan json rather than ad hoc reads, or when a fresh bounded patrol-seam delta appears that still belongs entirely to this candidate.`
 - session_refs:
   - {tool: `codex`, session_id: `current-codex-session-id-unavailable`, jsonl_path: `unavailable://fresh-session-current-id-not-exposed`, role: `author`}
+  - {tool: `codex`, session_id: `019dabe9-21c2-7041-94f2-f6df2dec59c6`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-21-15-019dabe9-21c2-7041-94f2-f6df2dec59c6.jsonl`, role: `fresh_with_handoff_source`}
   - {tool: `codex`, session_id: `019dabe6-3b10-7d02-bc6b-7122d800fb6b`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-18-05-019dabe6-3b10-7d02-bc6b-7122d800fb6b.jsonl`, role: `fresh_with_handoff_source`}
   - {tool: `codex`, session_id: `019dabe3-8e3a-7ad1-a5a9-69e57689b9b3`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-15-10-019dabe3-8e3a-7ad1-a5a9-69e57689b9b3.jsonl`, role: `fresh_with_handoff_source`}
   - {tool: `codex`, session_id: `019dabe0-2381-7aa1-9636-c3b242e02904`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-11-26-019dabe0-2381-7aa1-9636-c3b242e02904.jsonl`, role: `fresh_with_handoff_source`}
