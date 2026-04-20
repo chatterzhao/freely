@@ -14,6 +14,7 @@ Freely 当前已经具备三类彼此相关但边界还不够稳定的任务面�
 2. standing / continuation surfaces
    - delegated continuation
    - milestone unresolved queue
+   - pre-brainstorm unresolved candidate queue
    - progress / recovery / worktree continuity
 3. discovery mechanisms
    - review
@@ -41,7 +42,7 @@ Freely 需要让主管在启动后和收口后都能“自己找事做”，但�
 当前缺口可分成两个层次：
 
 1. source completeness 缺口
-   - manager 应能把 `human interruption`、`external issue`、milestone unresolved queue、delegated continuation、progress/recovery 等看成可巡检任务面
+   - manager 应能把 `human interruption`、`external issue`、milestone unresolved queue、pre-brainstorm unresolved candidate queue、delegated continuation、progress/recovery 等看成可巡检任务面
 2. replanning trigger 缺口
    - 并不是任何时刻都应该重新扫描这些任务面
    - 扫描应该只发生在 idle / replan 边界，而不是 worker 稳定运行中的每一轮
@@ -93,6 +94,7 @@ scan json 里任何 phase / status / queue state 都只能当 advisory。
 尤其是：
 
 - delegated continuation 需要核对当前 continuity 是否已吸收或过时
+- pre-brainstorm unresolved candidate 需要核对 candidate 是否已被吸收到 issue / milestone，还是仍应停留在 research
 - milestone / progress / recovery 的旧标签不能直接当完成证明
 - review/test/runtime anomaly 发现的问题，若当前 lifecycle 能吸收，优先回到当前 line，不直接长成新 raw source
 
@@ -136,13 +138,21 @@ runtime 生成的 `manager-task-source-scan-latest.json` 应作为主管 patrol 
 - `scan_reason`
 - `continuity_anchor`
 - `manager_context.active_running_workers`
-- `surfaces[]`
+ - `surfaces[]`
   - `surface`
   - `source_class`
   - `active_count`
   - `trust_level`
   - `needs_reconcile`
   - `summary_lines`
+
+当前 runtime 的首个 bounded surface set 包含：
+
+- `human_chat_intake`
+- `delegated_continuation`
+- `active_milestone_queue`
+- `active_pre_brainstorm_queue`
+- `active_progress_queue`
 
 注意：
 
@@ -185,5 +195,5 @@ runtime 生成的 `manager-task-source-scan-latest.json` 应作为主管 patrol 
 若这一层稳定，下一条 owner 才应继续回答：
 
 - external issue provider（GitHub / Gitee）如何 scan / label / publish / write back
-- progress / recovery 是否也要进入统一 machine-readable patrol snapshot
+- recovery / external issue provider 是否也要进入统一 machine-readable patrol snapshot
 - scan state 是否进一步进入 `live-status` / `fleet-status` 观测面

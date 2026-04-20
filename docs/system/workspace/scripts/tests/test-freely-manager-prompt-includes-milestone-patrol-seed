@@ -9,6 +9,7 @@ PROJECT="$TMP_DIR/project"
 
 mkdir -p \
   "$PROJECT/docs/pre-brainstorms/20260420-0000--sample" \
+  "$PROJECT/docs/progress/runtime" \
   "$PROJECT/.freely/run"
 
 git init -q -b develop "$PROJECT"
@@ -74,9 +75,34 @@ cat >"$PROJECT/docs/pre-brainstorms/20260420-0000--sample/brainstorms.md" <<'EOF
 EOF
 cat >"$PROJECT/docs/pre-brainstorms/20260420-0000--sample/candidates.md" <<'EOF'
 # Candidates
-- promoted_issue_path: pending://issue-materialization
-- milestone: pending://milestone-binding
+
+### C-20260420-1200-A
+
+- title: `Patrol should absorb stale status reconciliation`
+- candidate_status: `needs_research`
+- phase_state: `in_pre_brainstorm`
+- priority: `P1`
+- milestone: `pending://milestone-binding`
+- promoted_issue_path: `pending://issue-materialization`
+- next_action: `verify whether stale delegated continuity should be reconciled before reuse`
 - session_refs: []
+EOF
+
+cat >"$PROJECT/docs/progress/runtime/p-startup-patrol.md" <<'EOF'
+# Progress
+
+- issue_id: `I-20260420-1300-A`
+- title: `Startup patrol continuation remains open`
+- phase_state: `implementing`
+- runtime_state: `paused`
+- issue_path: `docs/epics/runtime/issues/startup-patrol.md`
+- branch: `feature/startup-patrol`
+- worktree_path: `/tmp/fake-startup-patrol`
+- updated_at: `2026-04-20T12:30:00Z`
+
+## Next Action
+
+1. Verify whether manager should resume this continuation or route a fresher discovery source first.
 EOF
 
 cat >"$PROJECT/.freely/config.env" <<EOF
@@ -121,17 +147,27 @@ surfaces = {entry["surface"]: entry for entry in payload["surfaces"]}
 assert "human_chat_intake" in surfaces
 assert "delegated_continuation" in surfaces
 assert "active_milestone_queue" in surfaces
+assert "active_pre_brainstorm_queue" in surfaces
+assert "active_progress_queue" in surfaces
 assert surfaces["active_milestone_queue"]["active_count"] == 2
+assert surfaces["active_pre_brainstorm_queue"]["active_count"] == 1
+assert surfaces["active_progress_queue"]["active_count"] == 1
 assert surfaces["delegated_continuation"]["needs_reconcile"] is True
 assert surfaces["human_chat_intake"]["trust_level"] == "runtime_intake_authoritative_for_existence"
+assert surfaces["active_pre_brainstorm_queue"]["trust_level"] == "advisory_candidate_reconcile_required"
+assert surfaces["active_progress_queue"]["trust_level"] == "advisory_progress_reconcile_required"
 PY
 printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'item=I-20260420-1000-A'
 printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'route_hint=issue_continuation/in_verification'
 printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'item=C-20260420-1100-A'
 printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'route_hint=candidate_research'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '## Surface: active_pre_brainstorm_queue'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'candidate=C-20260420-1200-A'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '## Surface: active_progress_queue'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'issue=I-20260420-1300-A phase_state=implementing runtime_state=paused'
 if printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'I-20260419-0900-A'; then
   echo "[FAIL] completed milestone items should not be surfaced as patrol seeds" >&2
   exit 1
 fi
 
-echo "[PASS] manager prompt includes unresolved milestone patrol seeds and excludes completed queue items"
+echo "[PASS] manager prompt includes unresolved patrol seeds for milestone/pre-brainstorm/progress and excludes completed queue items"

@@ -9509,6 +9509,151 @@ for item in results[:limit]:
 PY
 }
 
+pre_brainstorm_patrol_seed_snapshot_for_project() {
+  local project="$1" limit="${2:-6}"
+  local index_file
+  index_file="$project/docs/pre-brainstorms/INDEX.md"
+  [[ -f "$index_file" ]] || return 0
+  python3 - "$project" "$index_file" "$limit" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+project_root = Path(sys.argv[1])
+index_path = Path(sys.argv[2])
+limit = int(sys.argv[3])
+
+entries = []
+for raw_line in index_path.read_text(encoding="utf-8").splitlines():
+    match = re.match(r"^-\s+([0-9]{8}-[0-9]{4}--[A-Za-z0-9._-]+)\s*$", raw_line.strip())
+    if match:
+        entries.append(match.group(1))
+
+results = []
+for entry in entries:
+    candidates_path = project_root / "docs" / "pre-brainstorms" / entry / "candidates.md"
+    if not candidates_path.is_file():
+        continue
+    current = None
+    for raw_line in candidates_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.rstrip()
+        heading_match = re.match(r"^###\s+(.+?)\s*$", line)
+        if heading_match:
+            if current:
+                results.append(current)
+            current = {
+                "pre_brainstorm": entry,
+                "candidate": heading_match.group(1).strip(),
+            }
+            continue
+        if current is None:
+            continue
+        field_match = re.match(r"^-\s+([A-Za-z0-9_]+):\s*(.*)$", line.strip())
+        if not field_match:
+            continue
+        key = field_match.group(1)
+        value = field_match.group(2).strip()
+        if value.startswith("`") and value.endswith("`") and len(value) >= 2:
+            value = value[1:-1]
+        current[key] = value
+    if current:
+        results.append(current)
+
+count = 0
+for item in results:
+    candidate_status = item.get("candidate_status", "unspecified")
+    phase_state = item.get("phase_state", "unspecified")
+    promoted_issue = item.get("promoted_issue_path", "")
+    if candidate_status in {"promoted", "absorbed", "dropped"}:
+        continue
+    if phase_state == "completed":
+        continue
+    if promoted_issue and promoted_issue != "pending://issue-materialization":
+        continue
+    print(
+        f"- pre_brainstorm={item['pre_brainstorm']} candidate={item['candidate']} "
+        f"candidate_status={candidate_status} phase_state={phase_state} "
+        f"priority={item.get('priority', 'unspecified')} milestone={item.get('milestone', 'missing')} "
+        f"next_action={item.get('next_action', 'missing')}"
+    )
+    count += 1
+    if count >= limit:
+        break
+PY
+}
+
+progress_patrol_seed_snapshot_for_project() {
+  local project="$1" limit="${2:-6}"
+  local progress_root
+  progress_root="$project/docs/progress"
+  [[ -d "$progress_root" ]] || return 0
+  python3 - "$progress_root" "$limit" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+progress_root = Path(sys.argv[1])
+limit = int(sys.argv[2])
+
+results = []
+for path in sorted(progress_root.rglob("p-*.md")):
+    text = path.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    data = {"path": str(path.relative_to(progress_root.parent))}
+    next_action = "missing"
+    in_next_action = False
+    for raw_line in lines:
+        line = raw_line.rstrip()
+        header_match = re.match(r"^##\s+Next Action\s*$", line)
+        if header_match:
+            in_next_action = True
+            continue
+        if in_next_action:
+            if re.match(r"^##\s+", line):
+                in_next_action = False
+            else:
+                step_match = re.match(r"^(?:[0-9]+\.\s+|-\s+)(.+)$", line.strip())
+                if step_match:
+                    next_action = step_match.group(1).strip()
+                    in_next_action = False
+                    continue
+        field_match = re.match(r"^-\s+([A-Za-z0-9_]+):\s*(.*)$", line.strip())
+        if field_match:
+            key = field_match.group(1)
+            value = field_match.group(2).strip()
+            if value.startswith("`") and value.endswith("`") and len(value) >= 2:
+                value = value[1:-1]
+            data[key] = value
+    phase_state = data.get("phase_state", "unspecified")
+    runtime_state = data.get("runtime_state", "unspecified")
+    if phase_state == "completed":
+      continue
+    results.append({
+        "issue_id": data.get("issue_id", "unknown"),
+        "title": data.get("title", path.stem),
+        "phase_state": phase_state,
+        "runtime_state": runtime_state,
+        "issue_path": data.get("issue_path", ""),
+        "branch": data.get("branch", "unknown"),
+        "worktree_path": data.get("worktree_path", ""),
+        "updated_at": data.get("updated_at", "unknown"),
+        "next_action": next_action,
+        "path": data["path"],
+    })
+
+for item in results[:limit]:
+    print(
+        f"- issue={item['issue_id']} phase_state={item['phase_state']} runtime_state={item['runtime_state']} "
+        f"title={item['title']} updated_at={item['updated_at']} next_action={item['next_action']}"
+    )
+    print(f"  progress_path={item['path']}")
+    if item["issue_path"]:
+        print(f"  issue_path={item['issue_path']}")
+    if item["worktree_path"]:
+        print(f"  worktree_path={item['worktree_path']}")
+PY
+}
+
 task_source_scan_json_path_for_project() {
   local project="$1"
   printf '%s\n' "$(run_dir_for_project "$project")/manager-task-source-scan-latest.json"
@@ -9573,7 +9718,9 @@ task_source_scan_regeneration_reason_for_project() {
 write_task_source_scan_json_for_project() {
   local project="$1" regeneration_reason="${2:-manual}"
   local output_path state_path run_dir tmp_dir generated_at human_snapshot delegated_snapshot milestone_snapshot
-  local human_count delegated_count milestone_count continuity_file active_running_workers
+  local pre_brainstorm_snapshot progress_snapshot
+  local human_count delegated_count milestone_count pre_brainstorm_count progress_count
+  local continuity_file active_running_workers
 
   run_dir="$(run_dir_for_project "$project")"
   output_path="$(task_source_scan_json_path_for_project "$project")"
@@ -9584,9 +9731,13 @@ write_task_source_scan_json_for_project() {
   human_snapshot="$(intake_snapshot_for_project "$project" 8)"
   delegated_snapshot="$(delegated_continuation_snapshot_for_project "$project" 6)"
   milestone_snapshot="$(milestone_patrol_seed_snapshot_for_project "$project" 6)"
+  pre_brainstorm_snapshot="$(pre_brainstorm_patrol_seed_snapshot_for_project "$project" 6)"
+  progress_snapshot="$(progress_patrol_seed_snapshot_for_project "$project" 6)"
   human_count="$(snapshot_item_count_from_prefix "$human_snapshot" "- id=")"
   delegated_count="$(snapshot_item_count_from_prefix "$delegated_snapshot" "- intake_id=")"
   milestone_count="$(snapshot_item_count_from_prefix "$milestone_snapshot" "- milestone=")"
+  pre_brainstorm_count="$(snapshot_item_count_from_prefix "$pre_brainstorm_snapshot" "- pre_brainstorm=")"
+  progress_count="$(snapshot_item_count_from_prefix "$progress_snapshot" "- issue=")"
   continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" 2>/dev/null || true)"
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
@@ -9595,8 +9746,10 @@ write_task_source_scan_json_for_project() {
   printf '%s\n' "$human_snapshot" >"$tmp_dir/human.txt"
   printf '%s\n' "$delegated_snapshot" >"$tmp_dir/delegated.txt"
   printf '%s\n' "$milestone_snapshot" >"$tmp_dir/milestone.txt"
+  printf '%s\n' "$pre_brainstorm_snapshot" >"$tmp_dir/pre_brainstorm.txt"
+  printf '%s\n' "$progress_snapshot" >"$tmp_dir/progress.txt"
 
-  python3 - "$output_path" "$project" "$generated_at" "$regeneration_reason" "$active_running_workers" "$human_count" "$delegated_count" "$milestone_count" "$continuity_file" "$tmp_dir/human.txt" "$tmp_dir/delegated.txt" "$tmp_dir/milestone.txt" <<'PY'
+  python3 - "$output_path" "$project" "$generated_at" "$regeneration_reason" "$active_running_workers" "$human_count" "$delegated_count" "$milestone_count" "$pre_brainstorm_count" "$progress_count" "$continuity_file" "$tmp_dir/human.txt" "$tmp_dir/delegated.txt" "$tmp_dir/milestone.txt" "$tmp_dir/pre_brainstorm.txt" "$tmp_dir/progress.txt" <<'PY'
 import json
 import sys
 
@@ -9608,10 +9761,14 @@ active_running_workers = int(sys.argv[5])
 human_count = int(sys.argv[6])
 delegated_count = int(sys.argv[7])
 milestone_count = int(sys.argv[8])
-continuity_file = sys.argv[9]
-human_file = sys.argv[10]
-delegated_file = sys.argv[11]
-milestone_file = sys.argv[12]
+pre_brainstorm_count = int(sys.argv[9])
+progress_count = int(sys.argv[10])
+continuity_file = sys.argv[11]
+human_file = sys.argv[12]
+delegated_file = sys.argv[13]
+milestone_file = sys.argv[14]
+pre_brainstorm_file = sys.argv[15]
+progress_file = sys.argv[16]
 
 def read_lines(path):
     with open(path, "r", encoding="utf-8") as f:
@@ -9655,6 +9812,22 @@ payload = {
             "needs_reconcile": True,
             "summary_lines": read_lines(milestone_file),
         },
+        {
+            "surface": "active_pre_brainstorm_queue",
+            "source_class": "discovery",
+            "active_count": pre_brainstorm_count,
+            "trust_level": "advisory_candidate_reconcile_required",
+            "needs_reconcile": True,
+            "summary_lines": read_lines(pre_brainstorm_file),
+        },
+        {
+            "surface": "active_progress_queue",
+            "source_class": "continuation",
+            "active_count": progress_count,
+            "trust_level": "advisory_progress_reconcile_required",
+            "needs_reconcile": True,
+            "summary_lines": read_lines(progress_file),
+        },
     ],
 }
 
@@ -9674,9 +9847,10 @@ EOF
   printf '%s\n' "$output_path"
 }
 
-append_milestone_patrol_seed_if_needed() {
-  local snapshot scan_json_path scan_reason active_running_workers
-  local human_count delegated_count milestone_count total_active_count
+append_task_source_patrol_seed_if_needed() {
+  local scan_json_path scan_reason active_running_workers
+  local human_snapshot delegated_snapshot milestone_snapshot pre_brainstorm_snapshot progress_snapshot
+  local human_count delegated_count milestone_count pre_brainstorm_count progress_count total_active_count
   [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]] || return 0
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$PROJECT_ROOT" 2>/dev/null || true)"
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
@@ -9691,27 +9865,41 @@ append_milestone_patrol_seed_if_needed() {
     [[ -f "$scan_json_path" ]] || scan_json_path="$(write_task_source_scan_json_for_project "$PROJECT_ROOT" "bootstrap_missing_scan")"
     scan_reason="reuse_existing_scan"
   fi
-  snapshot="$(milestone_patrol_seed_snapshot_for_project "$PROJECT_ROOT" 6)"
-  human_count="$(snapshot_item_count_from_prefix "$(intake_snapshot_for_project "$PROJECT_ROOT" 8)" "- id=")"
-  delegated_count="$(snapshot_item_count_from_prefix "$(delegated_continuation_snapshot_for_project "$PROJECT_ROOT" 6)" "- intake_id=")"
-  milestone_count="$(snapshot_item_count_from_prefix "$snapshot" "- milestone=")"
-  total_active_count=$((human_count + delegated_count + milestone_count))
+  human_snapshot="$(intake_snapshot_for_project "$PROJECT_ROOT" 8)"
+  delegated_snapshot="$(delegated_continuation_snapshot_for_project "$PROJECT_ROOT" 6)"
+  milestone_snapshot="$(milestone_patrol_seed_snapshot_for_project "$PROJECT_ROOT" 6)"
+  pre_brainstorm_snapshot="$(pre_brainstorm_patrol_seed_snapshot_for_project "$PROJECT_ROOT" 6)"
+  progress_snapshot="$(progress_patrol_seed_snapshot_for_project "$PROJECT_ROOT" 6)"
+  human_count="$(snapshot_item_count_from_prefix "$human_snapshot" "- id=")"
+  delegated_count="$(snapshot_item_count_from_prefix "$delegated_snapshot" "- intake_id=")"
+  milestone_count="$(snapshot_item_count_from_prefix "$milestone_snapshot" "- milestone=")"
+  pre_brainstorm_count="$(snapshot_item_count_from_prefix "$pre_brainstorm_snapshot" "- pre_brainstorm=")"
+  progress_count="$(snapshot_item_count_from_prefix "$progress_snapshot" "- issue=")"
+  total_active_count=$((human_count + delegated_count + milestone_count + pre_brainstorm_count + progress_count))
   (( total_active_count > 0 )) || return 0
   cat <<EOF
 
 Task-source patrol seed:
 - 这是 manager 进入 idle / replan 边界时使用的结构化任务面，不是每轮都应重扫。
 - current_scan_reason: \`$scan_reason\`
-- active_surface_counts: \`human_chat_intake=$human_count delegated_continuation=$delegated_count active_milestone_queue=$milestone_count\`
+- active_surface_counts: \`human_chat_intake=$human_count delegated_continuation=$delegated_count active_milestone_queue=$milestone_count active_pre_brainstorm_queue=$pre_brainstorm_count active_progress_queue=$progress_count\`
 - machine_readable_scan_json: \`$scan_json_path\`
 - \`lead-agent\` / \`context-source-skill\` 先消费这份 scan json，再决定当前从哪个 source 进入哪条 loop。
 - human interruption / delegated continuation / milestone 状态都只能当 routing hint；是否推进、改写状态、还是回滚标签，必须回到 linked evidence 核对。
+- pre-brainstorm / progress 也只作为 patrol seed；默认要持怀疑态度核对 candidate / issue / worktree / verification 证据。
 - 这些 milestone / issue / progress 状态可能是 AI 之前写的，默认只把它们当作 patrol seed，不当作 completion 证明。
 - 对每个 seed，先核对 linked issue / progress / recovery / worktree 证据，再决定是继续推进、回滚状态、还是改写 next_action。
 - \`candidate_issues\` 默认先回 doc/pre-brainstorm 或 IBM；\`committed_issues\` 才能按 \`phase_state\` 继续 dev / verification / cleanup。
 - 若某项写着进行中但证据缺失，优先做 state reconcile，而不是盲信旧标签。
 
-$snapshot
+## Surface: active_milestone_queue
+$milestone_snapshot
+
+## Surface: active_pre_brainstorm_queue
+$pre_brainstorm_snapshot
+
+## Surface: active_progress_queue
+$progress_snapshot
 EOF
 }
 
@@ -11411,7 +11599,7 @@ build_prompt() {
   append_fleet_supervision_if_needed
   append_human_chat_intake_if_needed
   append_local_delegated_continuation_if_needed
-  append_milestone_patrol_seed_if_needed
+  append_task_source_patrol_seed_if_needed
   append_manager_supervision_alert_if_needed
   append_manager_hygiene_alert_if_needed
   append_route_only_recovery_if_needed

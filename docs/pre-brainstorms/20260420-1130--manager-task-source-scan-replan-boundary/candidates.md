@@ -21,7 +21,7 @@
   - freeze task-source scan as an idle/replan step rather than an every-cycle step
   - define the first bounded trigger set for regeneration and suppression
   - materialize a machine-readable scan json and scan-state artifact for manager patrol
-  - keep raw durable family naming (`human interruption`, `external issue`) separate from standing surfaces (`milestone`, `progress`, `recovery`, `delegated continuation`)
+  - keep raw durable family naming (`human interruption`, `external issue`) separate from standing surfaces (`milestone`, `pre-brainstorm`, `progress`, `recovery`, `delegated continuation`)
 - non_goals:
   - shipping full GitHub/Gitee provider automation in this owner
   - collapsing all standing surfaces into a new raw-source family schema
@@ -31,14 +31,14 @@
   - runtime regenerates `manager-task-source-scan-latest.json` only on bounded idle/replan triggers
   - prompt-time broad patrol is suppressed while active workers are stably running
   - prompt-time patrol seed remains available for idle manager rounds, using existing scan json when no new regeneration is needed
-  - scan json records trigger reason plus per-surface reconcile/trust hints
-  - focused tests prove startup generation, active-worker suppression, idle-after-continuity regeneration, and stale delegated intake filtering
+  - scan json records trigger reason plus per-surface reconcile/trust hints for milestone / pre-brainstorm / progress patrol seeds
+  - focused tests prove startup generation, active-worker suppression, idle-after-continuity regeneration, stale delegated intake filtering, and unresolved pre-brainstorm/progress surfacing
 - promotion_gate:
-  - keep the first patrol surface set bounded to `human interruption`, delegated continuation, and active milestone queue
+  - keep the first patrol surface set bounded to `human interruption`, delegated continuation, active milestone queue, active pre-brainstorm queue, and active progress queue
   - do not widen this owner into external issue provider automation, generic watchdog redesign, or project-wide fleet closure
   - prove the runtime slice with focused startup/prompt/launch regressions before considering IBM materialization
 - open_questions:
-  - whether `progress` and `recovery` should join the machine-readable patrol snapshot or stay ad hoc until a narrower owner absorbs them
+  - whether `recovery` should join the machine-readable patrol snapshot or stay ad hoc until a narrower owner absorbs it
   - whether the same stale-pid protection should be frozen as an explicit cross-watcher contract for `ensure-interruption-dispatch`, rather than only traveling as a mirrored bootstrap guard in the current runtime patch
 - acceptance_reviews:
   - reviewer: `codex-first-hop-audit`

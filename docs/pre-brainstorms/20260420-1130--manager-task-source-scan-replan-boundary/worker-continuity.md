@@ -22,9 +22,14 @@
   - current milestone truth already carries `C-20260420-1130-A` as `candidate` / `in_pre_brainstorm`, and no stronger `docs/epics/**`, `docs/progress/**`, or `docs/recovery/**` owner absorbs the full dirty batch
   - the bounded runtime/doc/test changes all point to the same idle/replan patrol seam: stale delegated continuation should stop counting as current-round active intake, idle managers should get machine-readable patrol seed, active workers should suppress broad patrol, and launch-time worker prompts should preserve the intended handoff state
   - the stale `ensure-manager` pid regression passed as a narrow startup/bootstrap guard, so it can travel with this checkpoint without widening the owner into generic watchdog redesign
+- focused_verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-includes-milestone-patrol-seed`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-suppresses-broad-patrol-while-worker-active`
+  - `bash -n docs/system/workspace/scripts/runtime/freely`
 - next_action:
-  - run the focused patrol-seam regressions plus adjacent launch/parser coverage
-  - if those regressions pass, cut a bounded checkpoint commit for the in-scope patrol-scan slice
+  - cut one bounded checkpoint commit for the in-scope patrol-scan slice now that the focused patrol-seam regressions and runtime syntax check pass
+  - keep the next replay on boundary revalidation only: if new follow-on work appears, prove whether it belongs to this candidate before reopening implementation
   - keep any future broader watchdog or provider automation follow-on explicitly outside this candidate unless a new owner absorbs it
 - intentionally_out_of_scope:
   - external issue provider scan/writeback/publication automation
