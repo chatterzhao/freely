@@ -1,4 +1,5 @@
-# 2026-04-20 Delegated Freshness Verification
+# Code Review: latest-manager-continuity-worker-consumption-governance delegated freshness verification
+- issue_id: `I-20260322-0445`
 
 ## Scope
 
