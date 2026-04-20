@@ -2,6 +2,9 @@
 - 20260419-0210--protected-branch-ref-only-entrypoint-gap
   - brainstorms: docs/pre-brainstorms/20260419-0210--protected-branch-ref-only-entrypoint-gap/brainstorms.md
   - candidates: docs/pre-brainstorms/20260419-0210--protected-branch-ref-only-entrypoint-gap/candidates.md
+- 20260419-2245--runtime-claude-launch-and-session-evidence
+  - brainstorms: docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/candidates.md
 - 20260419-1630--runtime-startup-self-healing-boundary
   - brainstorms: docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/brainstorms.md
   - candidates: docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/candidates.md
