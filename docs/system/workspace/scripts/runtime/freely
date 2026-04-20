@@ -4653,7 +4653,7 @@ intake_snapshot_for_project() {
 
 delegated_continuation_freshness_floor_epoch_for_project() {
   local project="$1" continuity_file continuity_epoch
-  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
     printf '0\n'
     return 0
@@ -6198,7 +6198,7 @@ manager_worker_launch_state_refresh_for_status() {
   local needs_writeback="0"
   state_file="$(manager_worker_launch_state_file "$project")"
   [[ -n "$project" && -f "$state_file" ]] || return 0
-  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
   manager_worker_launch_state_reconcile_same_continuity_prompts "$project" "$continuity_file" >/dev/null 2>&1 || true
 
@@ -6420,6 +6420,18 @@ latest_manager_continuity_file_for_project() {
       printf '%s\n' "$continuity_file"
       return 0
     fi
+  done < <(manager_continuity_files_desc_for_project "$project")
+}
+
+latest_patrol_authoritative_manager_continuity_file_for_project() {
+  local project="$1" continuity_file
+  while IFS= read -r continuity_file; do
+    [[ -f "$continuity_file" ]] || continue
+    manager_continuity_precedes_operator_stop_boundary "$project" "$continuity_file" && continue
+    manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file" && continue
+    manager_continuity_is_launchable_for_project "$project" "$continuity_file" || continue
+    printf '%s\n' "$continuity_file"
+    return 0
   done < <(manager_continuity_files_desc_for_project "$project")
 }
 
@@ -6659,13 +6671,18 @@ manager_continuity_missing_runtime_worktree_refs() {
 
 manager_prompt_fleet_truth_markdown_for_project() {
   local project="$1"
-  local latest_generated_continuity latest_launchable_continuity generated_stale missing_refs wt_path wt_branch wt_state
+  local latest_generated_continuity latest_launchable_continuity generated_stale generated_pre_stop missing_refs wt_path wt_branch wt_state
   latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
-  latest_launchable_continuity="$(latest_manager_continuity_file_for_project "$project")"
+  latest_launchable_continuity="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
   generated_stale="false"
+  generated_pre_stop="false"
   missing_refs=""
 
   if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
+    if manager_continuity_precedes_operator_stop_boundary "$project" "$latest_generated_continuity"; then
+      generated_stale="true"
+      generated_pre_stop="true"
+    fi
     if manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_generated_continuity"; then
       generated_stale="true"
       missing_refs="$(manager_continuity_missing_runtime_worktree_refs "$project" "$latest_generated_continuity")"
@@ -6678,6 +6695,7 @@ manager_prompt_fleet_truth_markdown_for_project() {
 - latest_generated_manager_continuity: \`${latest_generated_continuity:-none}\`
 - latest_launchable_manager_continuity: \`${latest_launchable_continuity:-none}\`
 - latest_generated_manager_continuity_stale: \`${generated_stale}\`
+- latest_generated_manager_continuity_precedes_operator_stop: \`${generated_pre_stop}\`
 
 ## Current Worktree Inventory
 EOF
@@ -6711,6 +6729,7 @@ EOF
 
 Manager continuity truth guard:
 - Treat `Current Worktree Inventory` as the authoritative active fleet for this round.
+- If a continuity was generated before the latest explicit operator stop boundary, treat it as stale history for fresh startup patrol, not as the current continuity anchor.
 - If any continuity references a path absent from that inventory, treat it as stale history, not as current queue/fleet truth.
 - Before writing a new manager continuity, rebuild fleet inventory / queue / cleanup sections from the current worktree inventory rather than copying stale historical paths.
 EOF
@@ -8132,7 +8151,7 @@ manager_project_ownership_claim_for_worktree() {
 manager_worktree_ownership_claim_snapshot() {
   local project="$1" target_worktree="$2"
   local continuity_file wt_path prompt_file holder_branch holder_status
-  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
 
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" && -d "$wt_path" ]] || continue
@@ -9788,7 +9807,7 @@ write_task_source_scan_json_for_project() {
   milestone_count="$(snapshot_item_count_from_prefix "$milestone_snapshot" "- milestone=")"
   pre_brainstorm_count="$(snapshot_item_count_from_prefix "$pre_brainstorm_snapshot" "- pre_brainstorm=")"
   progress_count="$(snapshot_item_count_from_prefix "$progress_snapshot" "- issue=")"
-  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" 2>/dev/null || true)"
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
 
