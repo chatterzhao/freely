@@ -6,7 +6,7 @@
 - target environment: `feature/success-standard-governance-20260420`
 - required evidence: `focused integration regressions plus owner verification artifact`
 - blocker taxonomy: `definition_missing`
-- not_applicable_reason: `no_truthful_lower_level_boundary`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
 - not_applicable_explanation: `A fake lower-level seam would miss the exact failure mode: old delegated handoffs being re-presented through both prompt composition and front-door queue rendering.`
 - replacement_evidence: `The focused manager prompt, intake, and live-status regressions together are the smallest stable executable boundary for this repair.`
 
@@ -76,6 +76,6 @@
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#4,tasks.md#5,tasks.md#6`
 - case_design: `Merge the feature lane into the disposable test-pre-merge-success-standard-governance-20260420-0215 batch, rerun the focused regressions plus governance-check there, then replay patched daemon start and one-minute chat intake on canonical develop to confirm the new success-standard interruption becomes the consumed delegated continuation for the current manager round.`
-- evidence_level: `real_environment`
+- evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
