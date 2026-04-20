@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260419-1630-A`
 - title: `Runtime startup self-healing governance`
-- phase_state: `in_dev`
+- phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-startup-self-healing-governance`
@@ -54,12 +54,15 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 2. A stale startup state older than the bounded grace window, with no authoritative runtime processes or active start lock, is rewritten to `stopped/down/down/startup_self_heal_no_runtime`.
 3. Stale `supervisor.pid`, `ai.pid`, `ensure-manager.pid`, and `interruption-dispatch.pid` files are removed only when project ownership cannot be validated and no unverified pid-hint exception remains.
 4. `manager_worker_launch_state_refresh_for_status()` persists corrected continuity/prompt references even when worker-slot counts do not change.
-5. Protected-root replay proves Freely can cold-start from a stale machine-owned state and reach a canonical self-healed startup surface instead of remaining self-contradictory.
+5. Protected-root replay proves Freely can cold-start from a stale machine-owned state and reach either a canonical self-healed startup surface or a still-live retryable supervisor state instead of remaining self-contradictory.
 
 ## Verification
 
 - `bash -n docs/system/workspace/scripts/runtime/freely`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-startup-self-heals-stale-runtime-state`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-startup-self-heals-stale-launch-in-flight-state`
+- `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-pid`
+- `bash docs/system/workspace/scripts/tests/test-freely-prompt-build-failure-keeps-supervisor-alive`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-persists-stale-continuity-rewrite`
 - `bash docs/system/workspace/scripts/tests/test-freely-stale-manager-continuity-filter`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
@@ -69,6 +72,6 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 
 ## Success Criteria
 
-1. On the protected root, machine-owned startup truth no longer stays in `running/up/starting` after runtime processes are already gone.
-2. Any startup self-heal remains compatible with attach/reuse, daemon cold-start, and existing after-failure recovery semantics.
+1. On the protected root, machine-owned startup truth no longer stays in fake `running/up/starting` after runtime processes are already gone.
+2. Short-lived non-interactive AI tools remain compatible with attach/reuse, daemon cold-start, and existing after-failure recovery semantics because launch-in-flight state is recorded before child exit and prompt-build failure now stays retryable under a live supervisor.
 3. Verification evidence is written back in this owner, then the branch is merged to `develop`, pushed, and the dedicated worktree is retired.
