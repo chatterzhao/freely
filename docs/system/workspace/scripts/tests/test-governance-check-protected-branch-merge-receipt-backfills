@@ -509,6 +509,85 @@ if ! ./bin/governance-check >"$TMP_DIR/generic-good.out" 2>&1; then
 fi
 grep -q "Governance check passed" "$TMP_DIR/generic-good.out"
 
+REPO_GENERIC_RETIRED_TARGET="$TMP_DIR/repo-generic-retired-target"
+make_repo "$REPO_GENERIC_RETIRED_TARGET"
+cd "$REPO_GENERIC_RETIRED_TARGET"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/retired-batch-source develop
+echo batch-source > BATCH_SOURCE.txt
+git add BATCH_SOURCE.txt
+git commit -q -m "batch source seed"
+git checkout -q -b test-pre-merge-20260404-retired
+echo batch > BATCH.txt
+git add BATCH.txt
+git commit -q -m "batch seed"
+git checkout -q -b feature/retired-source feature/retired-batch-source
+echo source > SOURCE.txt
+git add SOURCE.txt
+git commit -q -m "source feature"
+git checkout -q feature/retired-batch-source
+git merge --no-ff -m "Merge" feature/retired-source >/dev/null
+RETIRED_GAP_MERGE="$(git rev-parse HEAD)"
+echo batch-source-tail > BATCH_SOURCE_TAIL.txt
+git add BATCH_SOURCE_TAIL.txt
+git commit -q -m "batch source tail"
+git checkout -q test-pre-merge-20260404-retired
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/retired-batch-source' into test-pre-merge-20260404-retired
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/retired-batch-source
+EOF
+)" feature/retired-batch-source >/dev/null
+RETIRED_ABSORBING_MERGE="$(git rev-parse HEAD)"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-retired' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-retired
+EOF
+)" test-pre-merge-20260404-retired >/dev/null
+git branch -D test-pre-merge-20260404-retired >/dev/null
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after retiring absorbed target"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $RETIRED_GAP_MERGE
+
+- validation_mode: \`unparseable_subject_ancestry\`
+- target_branch: \`test-pre-merge-20260404-retired\`
+- source_branch: \`feature/retired-batch-source\`
+- protected_batch_branch: \`feature/retired-batch-source\`
+- absorbing_protected_merge: \`$RETIRED_ABSORBING_MERGE\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- bounded_issue: \`docs/epics/sample/issues/sample.md\`
+- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/generic-retired-target.out" 2>&1; then
+  cat "$TMP_DIR/generic-retired-target.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/generic-retired-target.out"
+
 REPO_GENERIC_WRONG_ABSORB="$TMP_DIR/repo-generic-wrong-absorb"
 make_repo "$REPO_GENERIC_WRONG_ABSORB"
 cd "$REPO_GENERIC_WRONG_ABSORB"

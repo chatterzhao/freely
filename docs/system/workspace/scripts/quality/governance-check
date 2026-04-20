@@ -703,6 +703,7 @@ starts = list(re.finditer(r"^##\s+Receipt Gap:\s+([0-9a-f]{7,40})\s*$", text, re
 entries = {}
 errors = []
 observed = set()
+reachable_protected_merge_commits = set()
 
 def git_body(commit: str) -> str:
     try:
@@ -874,6 +875,7 @@ for branch in branches:
         body = chunks[idx + 1] if idx + 1 < len(chunks) else ""
         if not commit:
             continue
+        reachable_protected_merge_commits.add(commit)
         subject = body.splitlines()[0].strip() if body else ""
         target_match = re.match(r"^Merge branch '.*' into (.+?)\s*$", subject)
         target_branch = target_match.group(1).strip() if target_match else ""
@@ -990,6 +992,69 @@ for branch in branches:
             errors.append(
                 f"[FAIL] protected branch merge {commit} on {branch} has partial or malformed merge trailers and cannot rely on receipt-gap backfill."
             )
+
+for commit, entry in entries.items():
+    if commit in observed or entry.get("validation_mode") != "unparseable_subject_ancestry":
+        continue
+    if entry.get("target_branch") in branches:
+        continue
+
+    body = git_body(commit)
+    if not body:
+        continue
+    subject = body.splitlines()[0].strip() if body else ""
+    if re.search(r"^Merge branch '([^']+)' into ([^\n]+)$", subject):
+        errors.append(
+            f"[FAIL] protected branch merge {commit} already has a parseable merge subject and must not use validation_mode unparseable_subject_ancestry."
+        )
+        continue
+
+    merge_path_match = re.search(r"^Freely-Merge-Path:\s*(.+?)\s*$", body, re.MULTILINE)
+    bypass_mode_match = re.search(r"^Freely-Bypass-Mode:\s*(.+?)\s*$", body, re.MULTILINE)
+    source_branch_match = re.search(r"^Freely-Source-Branch:\s*(.+?)\s*$", body, re.MULTILINE)
+    if any(match and match.group(1).strip() for match in (merge_path_match, bypass_mode_match, source_branch_match)):
+        errors.append(
+            f"[FAIL] protected branch merge {commit} already carries canonical merge trailers and must not use validation_mode unparseable_subject_ancestry."
+        )
+        continue
+
+    absorbing_commit = entry.get("absorbing_protected_merge", "")
+    absorbing_body = git_body(absorbing_commit)
+    absorbing_subject = absorbing_body.splitlines()[0].strip() if absorbing_body else ""
+    absorbing_target_match = re.match(r"^Merge branch '.*' into (.+?)\s*$", absorbing_subject)
+    absorbing_merge_path_match = re.search(r"^Freely-Merge-Path:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+    absorbing_bypass_mode_match = re.search(r"^Freely-Bypass-Mode:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+    absorbing_source_match = re.search(r"^Freely-Source-Branch:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+    absorbing_target = absorbing_target_match.group(1).strip() if absorbing_target_match else ""
+    absorbing_merge_path = absorbing_merge_path_match.group(1).strip() if absorbing_merge_path_match else ""
+    absorbing_bypass_mode = absorbing_bypass_mode_match.group(1).strip() if absorbing_bypass_mode_match else ""
+    absorbing_source = absorbing_source_match.group(1).strip() if absorbing_source_match else ""
+    if absorbing_commit not in reachable_protected_merge_commits:
+        errors.append(
+            f"[FAIL] protected branch merge {commit} references absorbing merge {absorbing_commit} that is not reachable from current protected-branch ancestry since {effective_since}."
+        )
+        continue
+    if not absorbing_target or absorbing_target != entry.get("target_branch"):
+        errors.append(
+            f"[FAIL] protected branch merge {commit} has absorbing merge {absorbing_commit} with missing or mismatched protected target."
+        )
+        continue
+    if absorbing_merge_path not in {"merge-guarded", "merge-guarded-complete"} or absorbing_bypass_mode != "forbidden":
+        errors.append(
+            f"[FAIL] protected branch merge {commit} on retired target {entry.get('target_branch')} has absorbing merge {absorbing_commit} without canonical protected merge trailers."
+        )
+        continue
+    if absorbing_source != entry.get("protected_batch_branch"):
+        errors.append(
+            f"[FAIL] protected branch merge {commit} on retired target {entry.get('target_branch')} has absorbing merge {absorbing_commit} source branch '{absorbing_source}' that does not match protected_batch_branch '{entry.get('protected_batch_branch')}'."
+        )
+        continue
+    if not has_absorbed_ancestry(absorbing_commit, commit):
+        errors.append(
+            f"[FAIL] protected branch merge {commit} is not present in the absorbed ancestry below {absorbing_commit}."
+        )
+        continue
+    observed.add(commit)
 
 for commit, entry in entries.items():
     if commit not in observed:

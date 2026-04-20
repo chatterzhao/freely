@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-startup-self-heal.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/docs/pre-brainstorms/20260419-0000--sample"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260419-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260419-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260419-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="starting"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-19T00:00:00Z"
+EOF
+printf '424242\n' >"$PROJECT/.freely/run/supervisor.pid"
+printf '434343\n' >"$PROJECT/.freely/run/interruption-dispatch.pid"
+
+OUTPUT="$(
+  FREELY_STARTUP_SELF_HEAL_GRACE_SECS=1 \
+  TZ="America/Los_Angeles" \
+  bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT"
+)"
+
+grep -q 'desired_runtime_state: stopped' <<<"$OUTPUT"
+grep -q 'last_supervisor_state: down' <<<"$OUTPUT"
+grep -q 'last_ai_state: down' <<<"$OUTPUT"
+grep -q 'last_exit_reason: startup_self_heal_no_runtime' <<<"$OUTPUT"
+grep -q 'active_processes: none' <<<"$OUTPUT"
+! test -f "$PROJECT/.freely/run/supervisor.pid"
+! test -f "$PROJECT/.freely/run/interruption-dispatch.pid"
+grep -q 'LAST_EXIT_REASON="startup_self_heal_no_runtime"' "$PROJECT/.freely/run/workcell-state.env"
+grep -q 'startup_self_heal_stale_pid_cleared' "$PROJECT/.freely/logs/runtime-events.log"
+grep -q 'startup_self_heal_runtime_state_cleared' "$PROJECT/.freely/logs/runtime-events.log"
+
+echo "[PASS] live-status self-heals stale startup machine state before status readback"

@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260419-1630--runtime-startup-self-healing-boundary
+  - brainstorms: docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/candidates.md
 - 20260419-0915--three-loop-single-source-followthrough
   - brainstorms: docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/candidates.md

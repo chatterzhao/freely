@@ -1233,6 +1233,118 @@ project_cleanup_runtime_intent() {
   printf '%s|%s\n' "$desired_state" "$exit_reason"
 }
 
+runtime_pid_file_for_role() {
+  local project="$1" role="$2"
+  case "$role" in
+    supervisor) printf '%s\n' "$(run_dir_for_project "$project")/supervisor.pid" ;;
+    ai) printf '%s\n' "$(run_dir_for_project "$project")/ai.pid" ;;
+    manager_watchdog) printf '%s\n' "$(ensure_manager_watchdog_pid_file "$project")" ;;
+    interruption_dispatcher) printf '%s\n' "$(interruption_dispatcher_pid_file "$project")" ;;
+    *) return 1 ;;
+  esac
+}
+
+runtime_pid_valid_for_role() {
+  local project="$1" role="$2" pid="$3"
+  case "$role" in
+    supervisor) valid_supervisor_pid_for_project "$project" "$pid" ;;
+    ai) valid_ai_pid_for_project "$project" "$pid" ;;
+    manager_watchdog) valid_ensure_manager_watchdog_pid_for_project "$project" "$pid" ;;
+    interruption_dispatcher) valid_interruption_dispatcher_pid_for_project "$project" "$pid" ;;
+    *) return 1 ;;
+  esac
+}
+
+clear_stale_runtime_pid_file_if_invalid() {
+  local project="$1" role="$2" trigger="${3:-runtime_read}"
+  local pid_file pid
+  pid_file="$(runtime_pid_file_for_role "$project" "$role")" || return 1
+  [[ -f "$pid_file" ]] || return 1
+  pid="$(cat "$pid_file" 2>/dev/null || true)"
+  [[ -n "$pid" ]] || {
+    rm -f "$pid_file"
+    return 0
+  }
+  if runtime_pid_valid_for_role "$project" "$role" "$pid"; then
+    return 1
+  fi
+  if [[ -n "$(pid_hint_from_file_without_process_inspection "$pid" 2>/dev/null || true)" ]]; then
+    return 1
+  fi
+  rm -f "$pid_file"
+  append_runtime_event "$project" "startup_self_heal_stale_pid_cleared" \
+    "trigger=$trigger" \
+    "role=$role" \
+    "pid=$pid"
+  return 0
+}
+
+startup_self_heal_clear_stale_pid_files_if_needed() {
+  local project="$1" trigger="${2:-runtime_read}" role cleared_any=1
+  for role in supervisor ai manager_watchdog interruption_dispatcher; do
+    if clear_stale_runtime_pid_file_if_invalid "$project" "$role" "$trigger"; then
+      cleared_any=0
+    fi
+  done
+  return "$cleared_any"
+}
+
+startup_self_heal_should_mark_runtime_down() {
+  local project="$1" desired_state last_exit_reason last_state_updated_at state_epoch now_epoch grace_secs
+  local supervisor_pid ai_pid dispatcher_pid watchdog_pid
+  [[ -f "$(workcell_state_file "$project")" ]] || return 1
+
+  unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON LAST_STATE_UPDATED_AT
+  # shellcheck disable=SC1090
+  source "$(workcell_state_file "$project")"
+  desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+  last_exit_reason="${LAST_EXIT_REASON:-unknown}"
+  last_state_updated_at="${LAST_STATE_UPDATED_AT:-}"
+
+  [[ "$desired_state" == "running" ]] || return 1
+  case "$last_exit_reason" in
+    starting|up|already_running_attach) ;;
+    *) return 1 ;;
+  esac
+
+  cleanup_project_start_lock_if_stale_for_runtime "$project"
+  project_start_lock_snapshot_for_runtime "$project"
+  [[ "${CURRENT_PROJECT_START_LOCK_STATE:-idle}" != "active" ]] || return 1
+
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
+  [[ -z "$supervisor_pid" && -z "$ai_pid" && -z "$dispatcher_pid" && -z "$watchdog_pid" ]] || return 1
+  [[ -z "$(runtime_unverified_pid_roles_for_project "$project")" ]] || return 1
+
+  state_epoch="$(timestamp_epoch_or_zero "$last_state_updated_at")"
+  [[ "$state_epoch" =~ ^[0-9]+$ ]] || state_epoch=0
+  now_epoch="$(runtime_now_epoch)"
+  grace_secs="${FREELY_STARTUP_SELF_HEAL_GRACE_SECS:-20}"
+  [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=20
+  (( state_epoch > 0 )) || return 0
+  (( now_epoch - state_epoch > grace_secs ))
+}
+
+startup_self_heal_machine_state_if_needed() {
+  local project="$1" trigger="${2:-runtime_read}" stale_launch_state_rc=1
+  [[ -n "$project" && -d "$project" ]] || return 0
+  startup_self_heal_clear_stale_pid_files_if_needed "$project" "$trigger" || true
+  manager_worker_launch_state_refresh_for_status "$project" >/dev/null 2>&1 || true
+  if startup_self_heal_should_mark_runtime_down "$project"; then
+    stale_launch_state_rc=0
+  else
+    stale_launch_state_rc=$?
+  fi
+  if [[ "$stale_launch_state_rc" -eq 0 ]]; then
+    write_workcell_state "$project" "stopped" "down" "down" "startup_self_heal_no_runtime"
+    append_runtime_event "$project" "startup_self_heal_runtime_state_cleared" \
+      "trigger=$trigger" \
+      "reason=no_runtime_processes_after_startup_grace"
+  fi
+}
+
 project_role_hint() {
   local project="$1"
   local state_file
@@ -5932,6 +6044,7 @@ manager_worker_launch_state_refresh_for_status() {
   local max_parallel_workers active_running_workers available_new_slots
   local generated_continuity generated_prompts consumed_continuity consumed_prompts queued_prompts queued_prompt_blockers
   local latest_generated_continuity latest_generated_prompts_csv
+  local needs_writeback="0"
   state_file="$(manager_worker_launch_state_file "$project")"
   [[ -n "$project" && -f "$state_file" ]] || return 0
   continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
@@ -5954,12 +6067,14 @@ manager_worker_launch_state_refresh_for_status() {
   if [[ "$generated_continuity" == "unavailable" || "$generated_continuity" != "$latest_generated_continuity" ]]; then
     generated_continuity="$latest_generated_continuity"
     generated_prompts="$latest_generated_prompts_csv"
+    needs_writeback="1"
   fi
   if [[ -n "$consumed_continuity" && "$consumed_continuity" != "unavailable" ]]; then
     if [[ ! -f "$consumed_continuity" ]] || manager_continuity_has_stale_runtime_worktree_refs "$project" "$consumed_continuity"; then
       consumed_continuity="$latest_generated_continuity"
       consumed_prompts="$(csv_retain_exact_items "${consumed_prompts:-}" "$latest_generated_prompts_csv")"
       [[ -n "$consumed_prompts" ]] || consumed_prompts="none"
+      needs_writeback="1"
     fi
   fi
   max_parallel_workers="$(manager_max_parallel_workers)"
@@ -5977,7 +6092,12 @@ manager_worker_launch_state_refresh_for_status() {
     fi
   fi
 
-  if [[ "${MAX_PARALLEL_WORKERS:-}" != "$max_parallel_workers" \
+  if [[ "$needs_writeback" == "1" \
+    || "${LAST_MANAGER_CONTINUITY_GENERATED:-}" != "$generated_continuity" \
+    || "${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-}" != "$generated_prompts" \
+    || "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" != "$consumed_continuity" \
+    || "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}" != "$consumed_prompts" \
+    || "${MAX_PARALLEL_WORKERS:-}" != "$max_parallel_workers" \
     || "${ACTIVE_RUNNING_WORKER_COUNT:-}" != "$active_running_workers" \
     || "${AVAILABLE_NEW_WORKER_SLOTS:-}" != "$available_new_slots" ]]; then
     write_manager_worker_launch_state \
@@ -12313,6 +12433,7 @@ cmd_start() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  startup_self_heal_machine_state_if_needed "$project" "start_command"
   acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
   trap "release_project_start_lock_for_runtime '$project'" EXIT
   append_lifecycle_trace "$project" "L001" "start_requested" \
@@ -12351,6 +12472,7 @@ cmd_restart() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  startup_self_heal_machine_state_if_needed "$project" "restart_command"
   if [[ "$all_projects" == "1" ]]; then
     cmd_global_restart --project "$project"
     return 0
@@ -12430,6 +12552,7 @@ cmd_daemon_start() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  startup_self_heal_machine_state_if_needed "$project" "daemon_start_command"
   acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
   trap "release_project_start_lock_for_runtime '$project'" EXIT
   append_lifecycle_trace "$project" "L001" "start_requested" \
@@ -12632,6 +12755,7 @@ cmd_ensure_manager() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  startup_self_heal_machine_state_if_needed "$project" "ensure_manager_command"
   [[ "$watch_interval" =~ ^[0-9]+$ ]] || { log_error "ensure-manager --interval must be a positive integer"; exit 1; }
   load_config "$project"
   register_project_in_registry "$project"
@@ -13255,6 +13379,7 @@ cmd_live_status() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  startup_self_heal_machine_state_if_needed "$project" "live_status"
   load_config "$project"
   load_session_state_or_defaults "$project"
 

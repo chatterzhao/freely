@@ -230,6 +230,32 @@ routing_policy:
 - next_action: `Keep this owner narrow, preserve the checkpoint evidence, and decide in a later pass whether guarded replay should happen directly or be absorbed by a newer runtime followthrough owner.`
 - revisit_trigger: `If later replay shows launcher-home isolation or supervisor attach should split into separate owners, reopen narrowly around the conflicting seam instead of silently widening this owner.`
 
+1. `I-20260419-1630-A`
+- title: Runtime startup self-healing governance
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-startup-self-healing-governance.md`
+- prd_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/prd.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/candidates.md`
+- branch: `feature/runtime-startup-self-healing-boundary-20260419`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-feature-runtime-startup-self-healing-boundary`
+- follow_on_to: `I-20260414-0255-A`
+- evidence:
+  - `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/brainstorms.md`
+  - `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/candidates.md`
+  - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-runtime-startup-self-healing-governance.md`
+- next_action: `Finish the focused startup self-heal regressions, replay stale protected-root startup truth through live-status and daemon start, then write verification evidence and promote to develop.`
+- revisit_trigger: `If replay shows startup self-heal must make semantic continuation choices rather than machine-only repairs, split that follow-on back into a manager-owned recovery owner instead of widening this one.`
+
 1. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
 - milestone_state: candidate
