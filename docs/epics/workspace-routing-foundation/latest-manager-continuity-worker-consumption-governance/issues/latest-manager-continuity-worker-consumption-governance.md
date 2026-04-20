@@ -7,6 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `latest-manager-continuity-worker-consumption-governance`
 - issue-name: `latest-manager-continuity-worker-consumption-governance`
+- pre_tests_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/pre-tests.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/pre-brainstorms/20260322-0445--latest-manager-continuity-worker-consumption/candidates.md#c-20260322-0445-a`
@@ -89,6 +90,7 @@
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/progress/workspace-routing-foundation/p-latest-manager-continuity-worker-consumption-governance.md`
 - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260322-latest-manager-continuity-worker-consumption-verification.md`
+- `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
 
 ## Verification
 
@@ -105,6 +107,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-multiline-dispatch-metadata`
 - `./bin/governance-check`
+- `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
 
 ## Verification Summary
 
