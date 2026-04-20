@@ -240,16 +240,36 @@ EOF
 )"
 fi
 
+escape_prompt_backticks() {
+  local value="${1-}"
+  printf '%s' "${value//\`/\\\`}"
+}
+
+execution_rule_15_escaped="$(escape_prompt_backticks "$execution_rule_15")"
+execution_rule_16_escaped="$(escape_prompt_backticks "$execution_rule_16")"
+execution_rule_17_escaped="$(escape_prompt_backticks "$execution_rule_17")"
+role_scope_rule_5a_escaped="$(escape_prompt_backticks "$role_scope_rule_5a")"
+role_scope_rule_5b_escaped="$(escape_prompt_backticks "$role_scope_rule_5b")"
+manager_artifact_rule_escaped="$(escape_prompt_backticks "$manager_artifact_rule")"
+additional_requirements_escaped="$(escape_prompt_backticks "$additional_requirements")"
+
 cat <<EOF
 你现在进入 Freely 的首跳闭环。
 
-先读取以下文档：
+读取约定：
+- skill:<name> 只是 workspace 技能文档的引用名，不是当前 CLI 一定存在的原生 tool。默认做法是打开对应的 workspace/skills/<name>/SKILL.md，而不是调用一个名为 skill 的工具。
+- workspace/skills/README.md 是技能索引；先从这里确认技能路径，再按需打开具体 SKILL.md。
+- 对大型文档不要整文件硬读。尤其 docs/milestones.md，先用 patrol seed、rg、标题定位或分段读取，按命中的 issue / progress / queue 做定点核对。
+- 若当前工具的读文件接口支持分页/范围参数，只在确实需要时填写有效值；不要传空字符串。
+
+先读取以下文档或索引：
 - 项目治理入口：$project/AGENTS.md
 - 项目意图：$intent
 - 宪法：$constitution
 - 里程碑扫描入口：$project/docs/milestones.md
 - workspace 根：$workspace_root
 - 工具清单：workspace/tools.md
+- 技能索引：workspace/skills/README.md
 - 首跳代理：workspace/agents/lead-agent.md
 
 运行上下文：
@@ -280,12 +300,13 @@ cat <<EOF
 
 执行要求：
 1. 先遵守 \`PROJECT_ROOT/AGENTS.md\`；它是当前目标项目的治理入口，不要在 workspace 能力文档里重复发明第二套项目规则。
-2. 再执行 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\`。
+2. 再完成 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\` 预检：默认做法是阅读 \`workspace/skills/constitution-guard/SKILL.md\` 与 \`workspace/skills/laws-enforcer/SKILL.md\` 并按其约束执行；不要假设存在可直接调用的 \`skill\` 工具。
 3. 进入 \`lead-agent\`，不要绕过首跳代理。
-4. 由 \`lead-agent\` 委托 \`skill:context-source-skill\` 进行需求池扫描、优先级判断与下一跳提示词组装。
+4. 由 \`lead-agent\` 参照 \`workspace/skills/context-source-skill/SKILL.md\` 完成需求池扫描、优先级判断与下一跳提示词组装；若当前工具没有原生 skill executor，就直接读取该技能文档并在当前会话按它执行。
+4A. 若 runtime 在 prompt 尾部附加了 \`machine_readable_scan_json\`，先把它当作本轮 idle / replan patrol 的结构化入口；其中状态只算 routing hint，phase judgement 仍需回到 linked evidence 核对。
 5. 若当前轮次承担项目级监督职责，先基于项目级工位视图做排班、冻结、集成与 cleanup 判断；不要直接把自己降级成单工位写代码代理。
-${role_scope_rule_5a}
-${role_scope_rule_5b}
+${role_scope_rule_5a_escaped}
+${role_scope_rule_5b_escaped}
 6. 在可并行的 doc-loop、verification、review、日志诊断或互不冲突的代码任务上，使用 subagent 提高效率。
 7. 你的需求池至少包括：
    - \`docs/milestones.md\`
@@ -307,6 +328,7 @@ ${role_scope_rule_5b}
    - \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`
    - \`workspace/skills/doc-ibm-execution/SKILL.md\`
    - \`workspace/skills/dev-loop-execution/SKILL.md\`
+10A. 除非当前工具明确暴露了兼容的原生 skill tool，否则所有 \`skill:<name>\` 都按“去读对应 \`SKILL.md\` 并照此执行”解释。
 11. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`。
 12. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`workspace/skills/doc-ibm-execution/SKILL.md\`。
 13. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`workspace/skills/dev-loop-execution/SKILL.md\`。
@@ -315,11 +337,11 @@ ${role_scope_rule_5b}
 13C. 若当前目标分支不是直接从 \`develop\` 派生，而是依赖未合并父分支，不要直接给出“并入 develop”的结论；先按 \`child -> parent -> merge-prep-from-develop -> develop\` 的 stacked merge-chain 逐层检查。
 14. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
 15. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。
-${execution_rule_15}
-${execution_rule_16}
-${execution_rule_17}
-${manager_artifact_rule}
+${execution_rule_15_escaped}
+${execution_rule_16_escaped}
+${execution_rule_17_escaped}
+${manager_artifact_rule_escaped}
 
 补充要求：
-${additional_requirements}
+${additional_requirements_escaped}
 EOF
