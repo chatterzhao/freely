@@ -29,7 +29,7 @@
   - this round started as `fresh_with_handoff` from Codex session `019dabfa-babb-7a22-bca4-63ce4693ea81` after `context compacted`, so continuity refresh was required before any scope expansion
   - `./bin/checkpoint-guard` reports `checkpoint_required: no`
   - `./bin/freely baseline-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile` reports `last_project_dirty_entries: 2` and `last_worktree_summary_dirty: 1`, which matches the current worktree snapshot injected for this round
-  - no runtime/script/test implementation files were reopened, so the only bounded delta from this session is candidate-owned continuity/evidence writeback; a single doc-only checkpoint commit is sufficient to restore a clean hold
+  - no runtime/script/test implementation files were reopened, so the only bounded delta from this session is candidate-owned continuity/evidence writeback; this round closed it with a single doc-only checkpoint commit and returned the worktree to a clean hold
 - focused_verification:
   - `PASS: bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-includes-milestone-patrol-seed`
   - `PASS: bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
@@ -39,11 +39,11 @@
 - session_evidence_refs:
   - {tool: `codex`, session_id: `current-codex-session-id-unavailable`, jsonl_path: `unavailable://fresh-session-current-id-not-exposed`, role: `author`}
   - {tool: `codex`, session_id: `019dabfa-babb-7a22-bca4-63ce4693ea81`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-40-29-019dabfa-babb-7a22-bca4-63ce4693ea81.jsonl`, role: `fresh_with_handoff_source`}
-- explicit_hygiene_outcome: `one narrow checkpoint commit still required`
+- explicit_hygiene_outcome: `clean hold in pre-brainstorm`
 - next_action:
   - keep this lane in `doc-pre-brainstorm-execution`; this replay is continuity/evidence refresh only because the bounded runtime/doc/test slice is already checkpointed in branch history and the patrol boundary still needs candidate-level judgment
-  - explicit next action for this round before closeout: `one narrow checkpoint commit still required`
-  - current worktree truth is a two-file candidate-owned doc batch, so the hygiene-preserving way back to `clean hold in pre-brainstorm` is one checkpoint commit containing only this continuity/evidence refresh
+  - explicit next action for this round after closeout: `clean hold in pre-brainstorm`
+  - current worktree truth is back to clean after a checkpoint commit containing only this continuity/evidence refresh, so the next replay should stay on boundary revalidation rather than reopening implementation
   - keep the next replay on boundary revalidation only: if new follow-on work appears, prove whether it belongs to this candidate before reopening implementation
   - keep any future broader watchdog or provider automation follow-on explicitly outside this candidate unless a new owner absorbs it
 - intentionally_out_of_scope:
