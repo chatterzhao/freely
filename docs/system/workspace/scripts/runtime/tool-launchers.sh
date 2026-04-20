@@ -423,9 +423,8 @@ tool_run_direct_from_prompt_file() {
       fi
       ;;
     cc|cc-use-codex-cli)
-      local prompt_text system_prompt worktrees_root project_branch claude_home_mode claude_home
+      local system_prompt worktrees_root project_branch claude_home_mode claude_home
       local -a args=(-p)
-      prompt_text="$(cat "$prompt_file")"
       worktrees_root="$(tool_boundary_add_dir "$tool" "$project")"
       project_branch="$(project_branch_for_launch "$project")"
       claude_home_mode="$(claude_home_mode_for_launch)"
@@ -439,7 +438,11 @@ tool_run_direct_from_prompt_file() {
       [[ -n "$worktrees_root" ]] && args+=(--add-dir "$worktrees_root")
       [[ -n "$debug_log_file" ]] && args+=(--debug-file "$debug_log_file")
       if [[ "$launch_kind" == "resume" ]]; then
-        [[ -n "$tool_resume_target" ]] && args+=(--resume "$tool_resume_target")
+        if [[ -n "$tool_resume_target" ]]; then
+          args+=(--resume "$tool_resume_target")
+        elif [[ -n "$claude_session_id" ]]; then
+          args+=(--session-id "$claude_session_id")
+        fi
       elif [[ -n "$claude_session_id" ]]; then
         args+=(--session-id "$claude_session_id")
       fi
@@ -450,9 +453,9 @@ tool_run_direct_from_prompt_file() {
         args+=(--append-system-prompt "$system_prompt")
       fi
       if [[ -n "$claude_home" ]]; then
-        exec env HOME="$claude_home" claude "${args[@]}" "$prompt_text"
+        exec env HOME="$claude_home" claude "${args[@]}" <"$prompt_file"
       fi
-      exec claude "${args[@]}" "$prompt_text"
+      exec claude "${args[@]}" <"$prompt_file"
       ;;
     test-sleep)
       exec bash -lc 'echo "[TEST] mock AI CLI started"; sleep 5'
