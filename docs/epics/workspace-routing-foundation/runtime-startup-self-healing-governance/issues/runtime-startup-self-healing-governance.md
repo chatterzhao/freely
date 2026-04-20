@@ -39,7 +39,8 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 2. Clear stale runtime pid files when project ownership cannot be validated and no unverified pid-hint exception remains.
 3. Downgrade stale `running/up/starting` startup truth to canonical stopped/down state after a bounded grace window when no authoritative runtime processes exist.
 4. Persist refreshed manager launch-state continuity/prompt references when read-time status repair discovers stale continuity anchors.
-5. Cover the repair with focused regressions and one protected-root replay.
+5. Treat equivalent on-disk project paths as the same runtime owner during pid and supervisor-identity validation so status readback does not clear a live daemon only because the recorded path spelling differs.
+6. Cover the repair with focused regressions and one protected-root replay.
 
 ## Non-Goals
 
@@ -55,10 +56,14 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 3. Stale `supervisor.pid`, `ai.pid`, `ensure-manager.pid`, and `interruption-dispatch.pid` files are removed only when project ownership cannot be validated and no unverified pid-hint exception remains.
 4. `manager_worker_launch_state_refresh_for_status()` persists corrected continuity/prompt references even when worker-slot counts do not change.
 5. Protected-root replay proves Freely can cold-start from a stale machine-owned state and reach either a canonical self-healed startup surface or a still-live retryable supervisor state instead of remaining self-contradictory.
+6. `live-status` and related ownership checks keep a live daemon runtime authoritative when the recorded project root and the inspected project root resolve to the same on-disk directory even if the path spelling differs.
+7. `daemon start` launches `daemon-run` in a session-detached way that survives short-lived non-interactive caller teardown instead of depending on shell job control.
 
 ## Verification
 
 - `bash -n docs/system/workspace/scripts/runtime/freely`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-keeps-daemon-runtime-across-case-variant-project-path`
+- `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-detach-contract`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-startup-self-heals-stale-runtime-state`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-startup-self-heals-stale-launch-in-flight-state`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-pid`

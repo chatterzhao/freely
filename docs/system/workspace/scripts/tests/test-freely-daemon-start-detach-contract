@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+RUNTIME_SCRIPT="$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+BLOCK="$(sed -n '/launch_project_runtime_daemon_or_fail()/,/^}/p' "$RUNTIME_SCRIPT")"
+
+printf '%s\n' "$BLOCK" | grep -q 'start_new_session=True' || {
+  echo "[FAIL] daemon launcher must start daemon-run in a new session" >&2
+  exit 1
+}
+
+printf '%s\n' "$BLOCK" | grep -q 'Keep daemon-run in a separate session instead of a shell-owned background job' || {
+  echo "[FAIL] daemon launcher should document why session detach is mandatory" >&2
+  exit 1
+}
+
+if printf '%s\n' "$BLOCK" | grep -q "nohup bash -lc"; then
+  echo "[FAIL] daemon launcher must not fall back to shell-owned nohup backgrounding" >&2
+  exit 1
+fi
+
+echo "[PASS] daemon start detach contract stays explicit"
