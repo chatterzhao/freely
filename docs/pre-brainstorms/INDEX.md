@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260420-1130--manager-task-source-scan-replan-boundary
+  - brainstorms: docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md
 - 20260419-0210--protected-branch-ref-only-entrypoint-gap
   - brainstorms: docs/pre-brainstorms/20260419-0210--protected-branch-ref-only-entrypoint-gap/brainstorms.md
   - candidates: docs/pre-brainstorms/20260419-0210--protected-branch-ref-only-entrypoint-gap/candidates.md

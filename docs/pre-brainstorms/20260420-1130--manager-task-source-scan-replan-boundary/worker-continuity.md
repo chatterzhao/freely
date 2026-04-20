@@ -1,0 +1,35 @@
+# Worker Continuity
+
+- selected_tool: `codex`
+- why_selected:
+  - this lane already resolves to `continuation -> pre_brainstorm`, and the required next hop is canonical pre-brainstorm writeback plus focused repo-local verification
+  - `selected_tool` matches the current tool, so the work must continue in this session rather than stopping at `next_prompt`
+- source_class: `continuation`
+- route_kind: `pre_brainstorm`
+- target_skill_or_loop: `doc-pre-brainstorm-execution`
+- prioritized_pool: `docs/pre-brainstorms/** + docs/milestones.md#candidate_issues`
+- restart_point: `continuation`
+- ownership: `worker-canonical-pre-brainstorm-writeback`
+- workspace_action: `reuse-current-feature-worktree`
+- execution_base: `develop`
+- integration_target: `develop`
+- depends_on:
+  - `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/brainstorms.md`
+  - `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md`
+  - `docs/milestones.md`
+- route_verdict: `still_pre_brainstorm`
+- why:
+  - current milestone truth already carries `C-20260420-1130-A` as `candidate` / `in_pre_brainstorm`, and no stronger `docs/epics/**`, `docs/progress/**`, or `docs/recovery/**` owner absorbs the full dirty batch
+  - the bounded runtime/doc/test changes all point to the same idle/replan patrol seam: stale delegated continuation should stop counting as current-round active intake, idle managers should get machine-readable patrol seed, active workers should suppress broad patrol, and launch-time worker prompts should preserve the intended handoff state
+  - the stale `ensure-manager` pid regression passed as a narrow startup/bootstrap guard, so it can travel with this checkpoint without widening the owner into generic watchdog redesign
+- next_action:
+  - run the focused patrol-seam regressions plus adjacent launch/parser coverage
+  - if those regressions pass, cut a bounded checkpoint commit for the in-scope patrol-scan slice
+  - keep any future broader watchdog or provider automation follow-on explicitly outside this candidate unless a new owner absorbs it
+- intentionally_out_of_scope:
+  - external issue provider scan/writeback/publication automation
+  - generic project-level fleet patrol while `MANAGER_MODE=false`
+  - milestone completion verification or cleanup judgement
+  - generic watchdog policy redesign beyond the narrow stale-pid bootstrap guard already covered by the focused regression
+- revisit_trigger:
+  - revisit IBM promotion only after the patrol-scan slice is checkpointed and the remaining provider/follow-on boundaries are frozen strongly enough to stop living as candidate-only judgment
