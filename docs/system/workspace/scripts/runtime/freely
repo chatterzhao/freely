@@ -1669,6 +1669,11 @@ manager_bootstrap_handoff_file() {
   echo "$(run_dir_for_project "$project")/manager-bootstrap-handoff.txt"
 }
 
+manager_operator_stop_boundary_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/manager-operator-stop-boundary.env"
+}
+
 intake_dir_for_project() {
   local project="$1"
   echo "$(state_dir "$project")/intake"
@@ -6063,6 +6068,39 @@ UPDATED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 EOF
 }
 
+record_manager_operator_stop_boundary() {
+  local project="$1"
+  local boundary_file now_epoch
+  boundary_file="$(manager_operator_stop_boundary_file "$project")"
+  now_epoch="$(runtime_now_epoch 2>/dev/null || true)"
+  [[ "$now_epoch" =~ ^[0-9]+$ ]] || now_epoch="$(date +%s)"
+  cat >"$boundary_file" <<EOF
+OPERATOR_STOP_BOUNDARY_EPOCH="$now_epoch"
+OPERATOR_STOP_BOUNDARY_RECORDED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+EOF
+}
+
+clear_manager_operator_stop_boundary() {
+  local project="$1"
+  rm -f "$(manager_operator_stop_boundary_file "$project")"
+}
+
+manager_operator_stop_boundary_epoch_for_project() {
+  local project="$1" boundary_file
+  boundary_file="$(manager_operator_stop_boundary_file "$project")"
+  [[ -f "$boundary_file" ]] || return 0
+  # shellcheck disable=SC1090
+  source "$boundary_file"
+  if [[ "${OPERATOR_STOP_BOUNDARY_EPOCH:-}" =~ ^[0-9]+$ ]]; then
+    printf '%s\n' "${OPERATOR_STOP_BOUNDARY_EPOCH:-}"
+  fi
+}
+
+clear_manager_worker_launch_state_for_fresh_restart() {
+  local project="$1"
+  rm -f "$(manager_worker_launch_state_file "$project")"
+}
+
 csv_contains_exact_item() {
   local csv="$1" needle="$2"
   [[ -n "$csv" && -n "$needle" ]] || return 1
@@ -6596,6 +6634,17 @@ manager_continuity_has_stale_runtime_worktree_refs() {
     project_has_worktree_path "$project" "$target_path" || return 0
   done < <(manager_continuity_worktree_paths_from_runtime_sections "$continuity_file")
   return 1
+}
+
+manager_continuity_precedes_operator_stop_boundary() {
+  local project="$1" continuity_file="$2"
+  local boundary_epoch continuity_epoch
+  [[ -n "$project" && -f "$continuity_file" ]] || return 1
+  boundary_epoch="$(manager_operator_stop_boundary_epoch_for_project "$project")"
+  [[ "$boundary_epoch" =~ ^[0-9]+$ ]] || return 1
+  continuity_epoch="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
+  [[ "$continuity_epoch" =~ ^[0-9]+$ ]] || return 1
+  (( continuity_epoch <= boundary_epoch ))
 }
 
 manager_continuity_missing_runtime_worktree_refs() {
@@ -7158,6 +7207,7 @@ latest_launchable_manager_worker_prompt_continuity_file_for_project() {
   local project="$1" continuity_file
   while IFS= read -r continuity_file; do
     [[ -f "$continuity_file" ]] || continue
+    manager_continuity_precedes_operator_stop_boundary "$project" "$continuity_file" && continue
     manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file" && continue
     manager_continuity_has_worker_prompts "$continuity_file" || continue
     manager_continuity_is_launchable_for_project "$project" "$continuity_file" || continue
@@ -12293,6 +12343,10 @@ stop_project_runtime() {
   fi
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
     materialize_missing_required_manager_continuity_fallback "$project" "$stop_reason" || true
+    if [[ "$stop_reason" == "operator_stop" ]]; then
+      record_manager_operator_stop_boundary "$project"
+      clear_manager_worker_launch_state_for_fresh_restart "$project"
+    fi
   fi
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   rm -f "$stop_marker"
@@ -12594,6 +12648,9 @@ start_project_runtime() {
   append_runtime_event "$project" "start_project_runtime_after_slot_recovery" \
     "entrypoint_mode=$entrypoint_mode"
   rm -f "$(stop_marker_file "$project")"
+  if [[ "$(role_hint_for_project "$project")" != "manager" ]]; then
+    clear_manager_operator_stop_boundary "$project"
+  fi
   LAST_ATTACH_REUSE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
   LAST_ATTACH_REUSE_AI_PID_STATE="missing"
