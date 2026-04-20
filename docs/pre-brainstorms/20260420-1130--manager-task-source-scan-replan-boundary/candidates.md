@@ -50,15 +50,31 @@
   - reviewer: `codex-fresh-session-continuity-refresh-2026-04-20`
     verdict: `still_pre_brainstorm`
     note: `A fresh session resumed from the `019dabd6-26d2-7952-979e-59315886567e` context-compacted handoff and revalidated the narrow patrol seam with passing milestone-seed, idle-regeneration, active-worker suppression, stale-delegated-intake, and runtime syntax checks. Current repo truth stays narrowly dirty only in candidate-side continuity writeback, so this owner remains in pre-brainstorm without reopening implementation or forcing a new checkpoint commit.`
+  - reviewer: `codex-handoff-reconcile-2026-04-20`
+    verdict: `still_pre_brainstorm`
+    note: `This fresh session absorbed the newer `019dabd9-6821-7860-85f2-1e69f20f4bac` context-compacted handoff, reran the same focused patrol regressions plus `bash -n docs/system/workspace/scripts/runtime/freely`, and confirmed the bounded patrol-scan slice is still owned entirely by this candidate. Current repo truth already started with a narrow candidate-owned continuity diff, while the older `I-20260326-1835` manager/source-patrol owner is already completed and does not absorb the newer idle/replan scan-trigger seam. The route therefore stays in pre-brainstorm, and any follow-on checkpoint remains limited to these continuity artifacts only.`
+  - reviewer: `codex-fresh-session-reconcile-2026-04-20`
+    verdict: `still_pre_brainstorm`
+    note: `This fresh session absorbed the `019dabe0-2381-7aa1-9636-c3b242e02904` context-compacted handoff, reconfirmed the milestone candidate placement, and reran the focused patrol checks for milestone-seed inclusion, idle regeneration, active-worker suppression, stale delegated continuation filtering, plus `bash -n docs/system/workspace/scripts/runtime/freely`. All checks still pass without reopening implementation, so the owner remains a bounded pre-brainstorm candidate and the only remaining hygiene delta is a two-file continuity/doc checkpoint if the worktree needs to return to clean hold.`
+  - reviewer: `codex-fresh-session-reconcile-2026-04-20-second-rotation`
+    verdict: `still_pre_brainstorm`
+    note: `This fresh session absorbed the newer `019dabe3-8e3a-7ad1-a5a9-69e57689b9b3` context-compacted handoff, rechecked milestone placement and current dirty-tree ownership, and reran the same focused patrol regressions plus `bash -n docs/system/workspace/scripts/runtime/freely`. Repo truth still shows only a two-file candidate-owned continuity batch, so this owner stays in pre-brainstorm and the remaining hygiene action is still limited to one narrow doc checkpoint if the worktree must return to clean hold.`
+  - reviewer: `codex-fresh-session-reconcile-2026-04-20-third-rotation`
+    verdict: `still_pre_brainstorm`
+    note: `This fresh session absorbed the newer `019dabe6-3b10-7d02-bc6b-7122d800fb6b` context-compacted handoff, reran the same focused patrol regressions plus `bash -n docs/system/workspace/scripts/runtime/freely`, and reconfirmed that no stronger `docs/epics/**`, `docs/progress/**`, or `docs/recovery/**` owner absorbs this idle/replan patrol seam. The lane therefore remains a bounded pre-brainstorm candidate, and the only in-scope closure is this two-file continuity/doc checkpoint back to a clean hold.`
 - depends_on:
   - `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/candidates.md#c-20260407-0817-a`
   - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
 - promoted_issue_path: `pending://issue-materialization`
-- next_action: `Keep this candidate in pre-brainstorm as a clean hold after continuity/evidence refresh; reopen implementation only if a new bounded patrol-scan delta still fits this owner, or if provider/follow-on boundary decisions become stable enough to justify IBM materialization.`
+- next_action: `Keep this candidate in pre-brainstorm as a clean hold after this bounded continuity/doc checkpoint. Reopen implementation only if a new patrol-scan delta still fits this owner, or if provider/follow-on boundary decisions become stable enough to justify IBM materialization.`
 - revisit_trigger: `Revisit when external issue provider scan/writeback is ready to join the same patrol transaction, when progress/recovery surfaces need promotion into the scan json rather than ad hoc reads, or when a fresh bounded patrol-seam delta appears that still belongs entirely to this candidate.`
 - session_refs:
-  - {tool: `codex`, session_id: `current-thread`, jsonl_path: `unavailable://codex-thread-only`, role: `author`}
+  - {tool: `codex`, session_id: `current-codex-session-id-unavailable`, jsonl_path: `unavailable://fresh-session-current-id-not-exposed`, role: `author`}
+  - {tool: `codex`, session_id: `019dabe6-3b10-7d02-bc6b-7122d800fb6b`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-18-05-019dabe6-3b10-7d02-bc6b-7122d800fb6b.jsonl`, role: `fresh_with_handoff_source`}
+  - {tool: `codex`, session_id: `019dabe3-8e3a-7ad1-a5a9-69e57689b9b3`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-15-10-019dabe3-8e3a-7ad1-a5a9-69e57689b9b3.jsonl`, role: `fresh_with_handoff_source`}
+  - {tool: `codex`, session_id: `019dabe0-2381-7aa1-9636-c3b242e02904`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-11-26-019dabe0-2381-7aa1-9636-c3b242e02904.jsonl`, role: `fresh_with_handoff_source`}
   - {tool: `codex`, session_id: `019dabd6-26d2-7952-979e-59315886567e`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-00-31-019dabd6-26d2-7952-979e-59315886567e.jsonl`, role: `fresh_with_handoff_source`}
+  - {tool: `codex`, session_id: `019dabd9-6821-7860-85f2-1e69f20f4bac`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-04-05-019dabd9-6821-7860-85f2-1e69f20f4bac.jsonl`, role: `fresh_with_handoff_source`}
 - next_recommended_route: `doc-pre-brainstorm-execution`
 - restart_point: `continuation`
 - ownership: `worker-canonical-pre-brainstorm-writeback`
