@@ -39,6 +39,8 @@
 - target environment: `feature/fix-tool-switch-noninteractive-state-20260419-2315`
 - required evidence: `manual CLI replay plus owner verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
+- real_environment_status: `pass`
+- real_environment_reason: `Real Claude CLI replay and runtime-equivalent fresh/resume launcher replays already ran in this feature lane on 2026-04-19, proving the bounded launch-contract and session-evidence repair against the actual tool binary.`
 1. Run `printf 'say hi\n' | claude -p --permission-mode bypassPermissions --add-dir /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees`.
 2. Run a runtime-equivalent fresh launcher replay and confirm it returns content.
 3. Run a runtime-equivalent resume replay with no verified evidence and confirm it falls back to fresh execution.
