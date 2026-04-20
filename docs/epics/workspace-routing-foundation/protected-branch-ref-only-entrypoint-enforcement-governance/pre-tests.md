@@ -1,50 +1,75 @@
 # Pre-Tests: protected-branch-ref-only-entrypoint-enforcement-governance
 
-## Acceptance Targets
+## Unit
+- acceptance target: `Do not invent a fake unit boundary for a hook-routing repair whose meaningful behavior only exists at the Git protected-ref integration surface.`
+- testing layer: `unit`
+- target environment: `feature/protected-branch-ff-only-gate-20260419`
+- required evidence: `lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This owner adds a Git hook wrapper and ref-transaction policy check; the smallest truthful executable surface is the guarded Git integration flow, not an isolated unit seam.`
+- replacement_evidence: `The focused hook regressions and guarded merge regressions below are the first executable boundary that can prove protected-ref behavior.`
 
-### AT-001 protected-branch ff-only is blocked before ref advance
-
-- acceptance target: `git merge --ff-only` cannot advance `develop` to a feature commit without a canonical protected merge receipt
-- testing layer: focused regression
-- target environment: `docs/system/workspace/scripts/tests/test-reference-transaction-hook`
-- required evidence: `reference-transaction blocks protected-branch ff-only before HEAD moves`
+## Integration
+- acceptance target: `Prove protected-branch ref-only advances are blocked locally while canonical receipt-bearing merge commits still pass.`
+- testing layer: `integration`
+- target environment: `feature/protected-branch-ff-only-gate-20260419`
+- required evidence: `focused regression output plus governance verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
+1. Run `bash docs/system/workspace/scripts/tests/test-reference-transaction-hook`.
+2. Run `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`.
+3. Run `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`.
+4. Run `bash docs/system/workspace/scripts/tests/test-merge-guarded`.
+5. Run `git diff --check`.
+6. Run `./bin/governance-check`.
 
-### AT-002 receipt-bearing protected merge commit remains valid
-
-- acceptance target: a receipt-bearing protected merge commit can still update a protected branch under the same hook
-- testing layer: focused regression
-- target environment: `docs/system/workspace/scripts/tests/test-reference-transaction-hook`
-- required evidence: `receipt-bearing merge commit allowed on protected branch`
+## End-to-End
+- acceptance target: `Keep the lawful feature -> test-pre-merge -> develop guarded chain intact after adding ref-only protected-branch enforcement.`
+- testing layer: `end_to_end`
+- target environment: `guarded protected-branch merge chain`
+- required evidence: `guarded merge receipts plus verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
+1. Merge `feature/protected-branch-ff-only-gate-20260419` into a disposable `test-pre-merge-*` branch via `./bin/merge-guarded`.
+2. Merge that `test-pre-merge-*` branch into `develop` via `./bin/merge-guarded`.
+3. Confirm the protected-root merge path accepts the receipt-bearing merge commit while rejecting non-receipted ref-only updates.
 
-### AT-003 merge-commit entrypoint contract remains intact
-
-- acceptance target: the earlier guarded merge entrypoint enforcement still passes under its existing focused regressions
-- testing layer: governance
-- target environment: `docs/system/workspace/scripts/tests/test-pre-merge-commit-hook` plus `docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt` plus `docs/system/workspace/scripts/tests/test-merge-guarded`
-- required evidence: `merge-commit guarded path still valid after adding ref gate`
+## Real-Environment
+- acceptance target: `Publish the protected-branch repair to canonical develop and retire the temporary merge lanes instead of leaving local-only proof behind.`
+- testing layer: `real_environment`
+- target environment: `local protected root plus origin/develop`
+- required evidence: `push result and temporary branch/worktree retirement evidence`
 - blocker taxonomy: `execution_pending_or_failed`
+1. Push `develop` to `origin/develop`.
+2. Delete branch `test-pre-merge-20260419-protected-ref-only-entrypoint`.
+3. Remove `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-feature-protected-branch-ff-only-gate`.
+4. Delete branch `feature/protected-branch-ff-only-gate-20260419`.
+- real_environment_status: `pass`
+- real_environment_reason: `This owner changes local Git governance, not an external hosted runtime. The meaningful real-environment surface is canonical develop publication plus retirement of the temporary merge lanes.`
 
 ## Acceptance Items
 
-### AT-001
-- id: `AT-001`
-- requirement: `Protected-branch ff-only updates fail before the protected ref moves to a non-receipted commit.`
+### Protected ref-only advance is blocked before HEAD moves
+- id: `protected-ref-ff-only-block`
+- requirement: `Protected branches fail closed when a ref-only update tries to advance them to a non-receipted commit.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/system/workspace/scripts/tests/test-reference-transaction-hook`
+- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`
 
-### AT-002
-- id: `AT-002`
-- requirement: `Receipt-bearing protected merge commits still update protected branches under the ref gate.`
+### Receipt-bearing protected merge commit still succeeds
+- id: `protected-ref-receipt-allow`
+- requirement: `The new ref gate preserves canonical protected merge commits that already carry a valid guarded merge receipt.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/system/workspace/scripts/tests/test-reference-transaction-hook`
+- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`
 
-### AT-003
-- id: `AT-003`
-- requirement: `The existing merge-commit entrypoint contract remains green after the ref-only enforcement is added.`
+### Guarded premerge promote remains lawful under the new ref gate
+- id: `protected-ref-guarded-promote`
+- requirement: `Feature -> test-pre-merge -> develop guarded replay remains valid after adding protected ref-only enforcement.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#2,tasks.md#3,tasks.md#4`
+- case_design: `Run the focused reference-transaction and guarded merge regressions in the feature lane, then replay the feature through a disposable test-pre-merge branch into develop via merge-guarded and require the protected branch to accept only the receipt-bearing merge commit.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
+- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`
