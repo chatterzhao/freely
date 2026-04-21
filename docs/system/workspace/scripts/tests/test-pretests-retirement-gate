@@ -8,6 +8,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 REPO="$TMP_DIR/repo"
 WT="$TMP_DIR/wt"
 mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality" "$REPO/docs/epics/sample/story/issues" "$REPO/docs/epics/sample/story/code-reviews" "$WT/.freely/run"
+mkdir -p "$REPO/docs/epics/sample/story"
 
 git init -q -b develop "$REPO"
 git -C "$REPO" config user.name tester
@@ -81,6 +82,11 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - artifact_ref: `pending://sample`
 EOF
 
+cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+# Tasks
+1. Keep the sample owner visible for retirement gate validation.
+EOF
+
 cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
 LAST_WORKER_OWNER_ISSUE="I-sample"
 LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
@@ -143,6 +149,17 @@ cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+EOF
+
+run_gate
+
+cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
+LAST_WORKER_OWNER_ISSUE="docs/epics/sample/story/issues/sample.md"
+LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="none"
 EOF
 
 run_gate
