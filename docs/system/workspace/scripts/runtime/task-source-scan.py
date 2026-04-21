@@ -21,9 +21,11 @@ TERMINAL_PROGRESS_CLOSURE_STATUSES = {
     "closed",
     "implemented-and-verified",
     "completed-reusable-gate",
+    "contract-frozen",
 }
 TERMINAL_PROGRESS_PHASES = {"completed"}
-TERMINAL_CANDIDATE_STATUSES = {"promoted", "dropped", "completed", "retired"}
+TERMINAL_CANDIDATE_STATUSES = {"absorbed", "dropped", "completed", "retired"}
+FOLLOWTHROUGH_CANDIDATE_STATUSES = {"promoted", "materialized"}
 TERMINAL_MILESTONE_STATES = {"completed", "delivered"}
 DEFAULT_PROVIDER_TIMEOUT_SECS = 15
 
@@ -58,12 +60,40 @@ def parse_simple_markdown_fields(path: Path, *, stop_at_h2: bool = True) -> dict
     for line in path.read_text(encoding="utf-8").splitlines():
         if stop_at_h2 and line.startswith("## "):
             break
-        match = re.match(r"^- ([A-Za-z0-9_]+):\s*(.*)$", line)
+        match = re.match(r"^- ([^:]+):\s*(.*)$", line)
         if not match:
             continue
         key, value = match.groups()
-        values[key] = value.strip().strip("`")
+        cooked = value.strip().strip("`")
+        values[key] = cooked
+        normalized = key.strip().lower().replace(" ", "_").replace("-", "_")
+        values.setdefault(normalized, cooked)
     return values
+
+
+def parse_markdown_h3_sections(path: Path) -> list[dict]:
+    if not path.is_file():
+        return []
+    text = path.read_text(encoding="utf-8")
+    parts = re.split(r"^###\s+(.+)$", text, flags=re.MULTILINE)
+    sections = []
+    for index in range(1, len(parts), 2):
+        title = parts[index].strip()
+        body = parts[index + 1]
+        fields = {}
+        for line in body.splitlines():
+            match = re.match(r"^- ([^:]+):\s*(.*)$", line)
+            if not match:
+                continue
+            key, value = match.groups()
+            cooked = value.strip().strip("`")
+            fields[key] = cooked
+            normalized = key.strip().lower().replace(" ", "_").replace("-", "_")
+            fields.setdefault(normalized, cooked)
+        if fields:
+            fields["_section_title"] = title
+            sections.append(fields)
+    return sections
 
 
 def relative_to_project(project: Path, path: Path) -> str:
@@ -147,37 +177,42 @@ def scan_pre_brainstorms(project: Path) -> list[dict]:
                 }
             )
             continue
-        fields = parse_simple_markdown_fields(candidates, stop_at_h2=False)
-        if not fields.get("candidate_format_version") and not fields.get("status"):
+        sections = parse_markdown_h3_sections(candidates)
+        if not sections:
             continue
-        status = fields.get("status", "")
-        promoted_issue_path = fields.get("promoted_issue_path", "")
-        milestone = fields.get("milestone", "")
-        needs_action = (
-            status not in TERMINAL_CANDIDATE_STATUSES
-            or not promoted_issue_path
-            or promoted_issue_path.startswith("pending://")
-            or (status == "promoted" and (not milestone or milestone.startswith("pending://")))
-        )
-        if not needs_action:
-            continue
-        items.append(
-            {
-                "source_family": "pre-brainstorm",
-                "source_type": "candidate_packet",
-                "source_ref": relative_to_project(project, candidates),
-                "artifact_path": relative_to_project(project, candidates),
-                "status_markers": {
-                    "candidate_status": status or "unknown",
-                    "promoted_issue_path": promoted_issue_path or "missing",
-                    "milestone": milestone or "missing",
-                },
-                "needs_action": True,
-                "restart_point": "pre_brainstorm",
-                "owner_hint": "manager",
-                "next_action": fields.get("next_action") or "Advance the candidate to a concrete milestone/issue decision or explicitly discard it.",
-            }
-        )
+        for fields in sections:
+            status = fields.get("status") or fields.get("candidate_status") or ""
+            promoted_issue_path = fields.get("promoted_issue_path", "")
+            milestone = fields.get("milestone", "")
+            if status in TERMINAL_CANDIDATE_STATUSES:
+                continue
+            if status in FOLLOWTHROUGH_CANDIDATE_STATUSES:
+                needs_action = (
+                    not promoted_issue_path
+                    or promoted_issue_path.startswith("pending://")
+                    or not milestone
+                    or milestone.startswith("pending://")
+                )
+                if not needs_action:
+                    continue
+            items.append(
+                {
+                    "source_family": "pre-brainstorm",
+                    "source_type": "candidate_packet",
+                    "source_ref": f"{relative_to_project(project, candidates)}#{fields.get('_section_title', 'candidate')}",
+                    "artifact_path": relative_to_project(project, candidates),
+                    "status_markers": {
+                        "candidate_id": fields.get("_section_title", "unknown"),
+                        "candidate_status": status or "unknown",
+                        "promoted_issue_path": promoted_issue_path or "missing",
+                        "milestone": milestone or "missing",
+                    },
+                    "needs_action": True,
+                    "restart_point": "pre_brainstorm",
+                    "owner_hint": "manager",
+                    "next_action": fields.get("next_action") or "Advance the candidate to a concrete milestone/issue decision or explicitly discard it.",
+                }
+            )
     return items
 
 
@@ -258,7 +293,10 @@ def scan_progress(project: Path) -> list[dict]:
             continue
         phase_state = fields.get("phase_state", "")
         closure_status = fields.get("closure_status", "")
+        next_action = fields.get("next_action", "")
         if phase_state in TERMINAL_PROGRESS_PHASES and (
+            not next_action or next_action.lower() == "completed"
+        ) and (
             not closure_status or closure_status in TERMINAL_PROGRESS_CLOSURE_STATUSES
         ):
             continue
@@ -278,7 +316,7 @@ def scan_progress(project: Path) -> list[dict]:
                 "needs_action": True,
                 "restart_point": "verification" if phase_state == "in_verification" else "continuation",
                 "owner_hint": fields.get("issue_path") or "manager",
-                "next_action": fields.get("Next Action") or "Resume the active owner or finish its closeout followthrough.",
+                "next_action": next_action or "Resume the active owner or finish its closeout followthrough.",
             }
         )
     return items

@@ -62,13 +62,24 @@ EOF
 cat >"$PROJECT/docs/pre-brainstorms/20260420-0001--scan-demo/candidates.md" <<'EOF'
 # Candidates
 
-## C-20260420-0001-A
+### C-20260420-0001-A
 
 - candidate_format_version: `v2`
 - status: `needs_research`
 - milestone: `pending://milestone-binding`
 - promoted_issue_path: `pending://issue-materialization`
 - next_action: `Promote this scan demo into a milestone-owned issue.`
+
+### C-20260420-0001-B
+- status: `dropped`
+- milestone: `pending://milestone-binding`
+- promoted_issue_path: `pending://issue-materialization`
+- next_action: `This dropped candidate must not be resurfaced.`
+
+### C-20260420-0001-C
+- status: `absorbed`
+- milestone: `M-20260420-demo`
+- promoted_issue_path: `docs/epics/demo/issues/demo.md`
 EOF
 
 cat >"$PROJECT/docs/milestones.md" <<'EOF'
@@ -105,6 +116,28 @@ cat >"$PROJECT/docs/progress/demo/p-demo.md" <<'EOF'
 
 - linked_source: `https://github.com/example/freely-demo/issues/102`
 - linked_source: `https://gitee.com/zhaoquan/freely/issues/202`
+EOF
+
+cat >"$PROJECT/docs/progress/demo/p-contract-frozen.md" <<'EOF'
+# Progress: contract-frozen
+
+- issue_id: `I-20260420-0002-A`
+- issue_path: `docs/epics/demo/issues/contract-frozen.md`
+- phase_state: `completed`
+- runtime_state: `stopped`
+- closure_status: `contract-frozen`
+- next_action: `completed`
+EOF
+
+cat >"$PROJECT/docs/progress/demo/p-ready-followthrough.md" <<'EOF'
+# Progress: ready-followthrough
+
+- issue_id: `I-20260420-0003-A`
+- issue_path: `docs/epics/demo/issues/ready-followthrough.md`
+- phase_state: `completed`
+- runtime_state: `stopped`
+- closure_status: `ready_for_guarded_replay`
+- next_action: `Replay guarded develop merge and verify the warning disappears.`
 EOF
 
 cat >"$PROJECT/.freely/intake/INTAKE-20260420-0001/meta.env" <<'EOF'
@@ -246,6 +279,12 @@ assert intake["restart_point"] == "pre_brainstorm"
 candidate = one("candidate_packet")
 assert candidate["source_family"] == "pre-brainstorm"
 assert candidate["status_markers"]["candidate_status"] == "needs_research"
+assert candidate["status_markers"]["candidate_id"] == "C-20260420-0001-A"
+assert not any(
+    entry["source_type"] == "candidate_packet"
+    and entry["status_markers"]["candidate_status"] in {"dropped", "absorbed"}
+    for entry in sources
+), sources
 
 milestone = one("milestone_queue_item")
 assert milestone["source_family"] == "milestone"
@@ -254,6 +293,18 @@ assert milestone["restart_point"] == "continuation"
 progress = one("progress_item")
 assert progress["source_family"] == "progress"
 assert progress["restart_point"] == "verification"
+assert progress["source_ref"] == "docs/progress/demo/p-demo.md"
+ready_followthrough = [
+    entry for entry in sources
+    if entry["source_type"] == "progress_item"
+    and entry["source_ref"] == "docs/progress/demo/p-ready-followthrough.md"
+]
+assert ready_followthrough, sources
+assert not any(
+    entry["source_type"] == "progress_item"
+    and entry["source_ref"] == "docs/progress/demo/p-contract-frozen.md"
+    for entry in sources
+), sources
 
 raw_issue = one("github_raw_issue")
 assert raw_issue["source_family"] == "external issue"
@@ -279,7 +330,7 @@ assert payload["providers"]["external_issue"]["github"]["enabled"] is True
 assert payload["providers"]["external_issue"]["gitee"]["enabled"] is True
 assert payload["providers"]["external_issue"]["github"]["availability_hint"] is None
 assert payload["providers"]["external_issue"]["gitee"]["availability_hint"] is None
-assert payload["summary"]["actionable_count"] == 8
+assert payload["summary"]["actionable_count"] == 9
 PY
 
 LATEST_SCAN="$PROJECT/.freely/run/task-source-scan/latest.json"
