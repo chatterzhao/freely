@@ -115,13 +115,14 @@ cat >"$CONT_FILE" <<EOF
 # Manager Continuity
 
 ## Worker Delegation
-- authoritative_worker_prompts:
-  - \`$PROMPT_FILE\`
-- launchable_queue:
-  - lane_id: \`I-20260322-0203-A\`
-    prompt_path: \`$PROMPT_FILE\`
-    dispatch_priority: \`P0\`
-    intent_kind: \`cleanup\`
+- prompt_path: \`$PROMPT_FILE\`
+- target_worktree: \`$WORKER_WT\`
+- target_branch: \`feature/test-worker\`
+- dispatch_priority: \`P0\`
+- parallel_safe: \`false\`
+- write_scope: \`$WORKER_WT\`
+- intent_kind: \`cleanup\`
+- intent_target: \`$WORKER_WT\`
 EOF
 
 cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
@@ -160,4 +161,4 @@ grep -q "^LAST_MANAGER_CONTINUITY_CONSUMED=\"$CONT_FILE\"$" "$PROJECT/.freely/ru
 grep -q "^LAST_MANAGER_WORKER_PROMPTS_GENERATED=\"$PROMPT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
 grep -q "^LAST_MANAGER_WORKER_PROMPTS_CONSUMED=\"$PROMPT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
 
-echo "[PASS] manager launches worker prompts from worker delegation continuity format"
+echo "[PASS] manager launches worker prompts from direct worker delegation continuity format"
