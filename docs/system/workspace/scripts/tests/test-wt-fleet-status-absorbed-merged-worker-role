@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-wt-fleet-status-absorbed.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WORKTREE="$TMP_DIR/repo-worktrees/feature-absorbed"
+mkdir -p "$REPO"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+
+mkdir -p "$REPO/bin"
+cp "$ROOT_DIR/bin/checkpoint-guard" "$REPO/bin/checkpoint-guard"
+chmod +x "$REPO/bin/checkpoint-guard"
+
+git worktree add -q -b feature/absorbed "$WORKTREE" develop
+echo absorbed > "$WORKTREE/absorbed.txt"
+git -C "$WORKTREE" add absorbed.txt
+git -C "$WORKTREE" commit -q -m "absorbed lane"
+git -C "$REPO" merge --no-ff -q feature/absorbed -m "merge absorbed lane"
+
+echo dirty > "$WORKTREE/post-merge-followthrough.txt"
+mkdir -p "$WORKTREE/.freely/run"
+cat >"$WORKTREE/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_ROLE_HINT="worker"
+LAST_EXIT_REASON="operator_stop"
+EOF
+
+OUTPUT="$(bash "$ROOT_DIR/bin/wt-fleet-status" --project "$REPO")"
+printf '%s\n' "$OUTPUT" | grep -q 'feature/absorbed'
+printf '%s\n' "$OUTPUT" | grep -q 'cleanup'
+if printf '%s\n' "$OUTPUT" | grep -q 'feature/absorbed .* worker'; then
+  echo "absorbed merged worker lane should not remain role=worker in fleet status" >&2
+  exit 1
+fi
+
+echo "[PASS] wt-fleet-status downgrades absorbed merged worker lanes to cleanup"
