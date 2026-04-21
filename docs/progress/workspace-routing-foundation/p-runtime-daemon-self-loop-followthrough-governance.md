@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/manager-followthrough-handoff-resume-20260421`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-manager-followthrough-handoff-resume`
-- updated_at: `2026-04-21 07:47 PDT`
+- branch: `feature/manager-launch-state-continuity-supersession-20260421`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-manager-launch-state-continuity-supersession`
+- updated_at: `2026-04-21 08:31 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -40,6 +40,9 @@
 - The same repair worktree also exposed an absorbed-lane overreach: a never-started worker branch cut from `develop` could be treated as already absorbed solely because its branch was still an ancestor of `develop`.
 - Runtime now only classifies a merged worker lane as absorbed after that worktree has recorded worker state, while cleanup followthrough prompts with complete verification metadata remain launchable until the lane is actually retire-ready.
 - Focused regressions now cover current-format continuity anchoring, active-worker state projection, stale discovery cache refresh before launch, retire-ready merged prompt suppression, and absorbed-merged dirty-worker recovery suppression in addition to the earlier direct worker-delegation launch checks.
+- Canonical `develop` daemon replay then exposed one more same-owner state-refresh seam: after manager wrote a new manager-owned continuity with no worker prompt, `manager_worker_launch_state.env` could keep advertising an older queued worker prompt and an older consumed continuity as the current truth.
+- The result was another `fresh_with_handoff` patrol that saw the latest continuity excerpt but still carried stale queued prompt state, so manager stayed in verification judgment without ever advancing the cleanup-only task it had already selected.
+- Runtime now treats manager-authored no-worker continuity as authoritative enough to supersede stale queued worker-prompt state, while still preserving older unconsumed prompts across newer runtime-seeded startup stubs and runtime fallback continuity.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
 
 ## Verification Evidence
@@ -73,6 +76,7 @@
 16. `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
 17. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
 18. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+19. `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-supersedes-queued-prompt-with-manager-continuity`
 
 ## 2026-04-21 05:29 PDT Recheck Commands
 
@@ -211,6 +215,18 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-absorbed-merged-dirty-worker`
 - `PASS`: replayed `feature/manager-followthrough-handoff-resume-20260421 -> test-pre-merge-20260421-manager-followthrough-handoff-resume` through `./bin/merge-guarded`; the protected test lane stayed green on the representative same-owner regressions.
 - `PENDING`: absorb this repair into canonical `develop`, then complete the required self-host daemon acceptance and temporary lane retirement.
+
+## 2026-04-21 08:31 PDT Manager Launch-State Supersession Verification
+
+- `FAIL`: canonical `develop` daemon replay still stalled after that repair because a new manager-authored continuity with no worker prompt did not overwrite `LAST_MANAGER_CONTINUITY_CONSUMED` or `QUEUED_WORKER_PROMPTS`; the next `fresh_with_handoff` round therefore kept seeing stale queued worker-prompt truth from `064955` even though the current continuity had already moved to manager-owned cleanup.
+- `PASS`: narrowed `manager_worker_launch_state_refresh_for_status()` so only `freely-runtime-startup-stub` and `freely-runtime-fallback` continuity may preserve an older unconsumed worker prompt; a newer manager-authored no-worker continuity now supersedes stale queued prompt state and clears the stale queue.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-supersedes-queued-prompt-with-manager-continuity`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-preserves-unconsumed-prompt-across-startup-stub`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
+- `PENDING`: guarded replay into `develop`, then canonical `develop` self-host acceptance must prove Freely can finish one task and continue instead of cycling through manager-owned continuity rewrites.
 
 ## Current Lane Judgement
 

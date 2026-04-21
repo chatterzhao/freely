@@ -15,6 +15,7 @@
 - `PASS`: retire-ready merged-clean blocker worktrees are now treated as cleanup-followthrough retirement targets instead of recoverable edit workers, and cleanup can reclaim stale recorded ownership for those lanes.
 - `PASS`: merged develop-absorbed blocker lanes that remain dirty only in owner evidence surfaces are now treated as retire-ready followthrough instead of relaunchable edit workers.
 - `PASS`: never-started worker branches are no longer misclassified as absorbed merged lanes just because their branch tip still equals an ancestor of `develop`; runtime now requires recorded worker state before treating a merged lane as already absorbed.
+- `PASS`: when manager writes a newer manager-owned continuity with no worker prompt, runtime now lets that continuity supersede stale queued worker-prompt state instead of keeping an older queued prompt as the consumed truth.
 - `PASS`: manager worker-launch fallback now rechecks whether a prompt still targets a launchable lane before reviving it, so the latest generated continuity cannot bypass retire-ready merged guards.
 - `PASS`: expected-running worker recovery and global restart selection now both exclude absorbed merged worker lanes, even if an earlier bad recovery already left ordinary dirty files behind in that old worktree.
 - `PASS`: focused regressions and nearby daemon/live-status coverage passed on the guarded source lane, and the protected test lane replay still passed after the retirement followthrough repair.
@@ -46,6 +47,7 @@
 22. `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
 23. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
 24. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+25. `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-supersedes-queued-prompt-with-manager-continuity`
 
 ## 2026-04-21 05:25 PDT Recheck
 
@@ -129,3 +131,11 @@
 - alternatives_considered: `Teach Freely to rescan broadly after every compaction instead of honoring the current continuity anchor; keep the old absorbed-merged shortcut and special-case individual tests; add a new lifecycle index or prompt registry just to recover the current followthrough anchor.`
 - boundary_non_goals: `No broad scan-architecture rewrite, no live-status redesign, no hardcoded task picking, and no reduction in Freely's freely working behavior.`
 - residual_risk: `Canonical develop still has to prove the repaired manager can finish one task to the current-project success standard, close the temporary worktree, and continue to the next task before this owner can be closed.`
+
+## 2026-04-21 08:31 PDT Implementation Decision Note
+
+- decision: `Let manager-authored no-worker continuity supersede stale queued prompt state, but keep the older prompt-preservation exception only for runtime-seeded startup stubs and runtime fallback continuity.`
+- why_this: `Canonical develop replay showed the previous repair was still not enough: manager chose the correct cleanup-only followthrough and wrote a new continuity, but `manager_worker_launch_state.env` kept an older queued worker prompt and older consumed continuity. The next `fresh_with_handoff` round therefore re-entered startup patrol semantics instead of advancing the already-selected manager-owned task. The true boundary is not “newer continuity with no prompt” in general; runtime-seeded startup stubs are intentionally allowed to preserve older unconsumed prompts, while manager-authored completion/cleanup continuity must advance the consumed truth.`
+- alternatives_considered: `Always preserve the older launchable prompt whenever a newer continuity has no worker prompt; always supersede older prompts for any newer no-worker continuity including startup stubs; add a separate index file just to track manager continuity supersession.`
+- boundary_non_goals: `No new index layer, no broad scan redesign, and no weakening of the existing startup-stub prompt-preservation behavior.`
+- residual_risk: `The remaining risk is still only the final canonical develop daemon replay: Freely must now prove it can consume the manager-owned cleanup continuity, finish a task to the current-project success standard, and continue to the next task.`

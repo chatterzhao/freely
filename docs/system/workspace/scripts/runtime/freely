@@ -6197,7 +6197,7 @@ manager_worker_launch_state_refresh_for_status() {
   local max_parallel_workers active_running_workers available_new_slots
   local generated_continuity generated_prompts consumed_continuity consumed_prompts queued_prompts queued_prompt_blockers
   local latest_generated_continuity latest_generated_prompts_csv
-  local latest_launchable_continuity latest_launchable_prompts_csv launch_tracking_continuity launch_tracking_prompts
+  local latest_launchable_continuity latest_launchable_prompts_csv launch_tracking_continuity launch_tracking_prompts latest_generated_written_by
   local needs_writeback="0"
   state_file="$(manager_worker_launch_state_file "$project")"
   [[ -n "$project" && -f "$state_file" ]] || return 0
@@ -6218,6 +6218,7 @@ manager_worker_launch_state_refresh_for_status() {
   latest_generated_continuity="$continuity_file"
   latest_generated_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_generated_continuity")"
   [[ -n "$latest_generated_prompts_csv" ]] || latest_generated_prompts_csv="none"
+  latest_generated_written_by="$(manager_continuity_written_by_from_file "$latest_generated_continuity")"
 
   launch_tracking_continuity="$latest_generated_continuity"
   launch_tracking_prompts="$latest_generated_prompts_csv"
@@ -6225,7 +6226,8 @@ manager_worker_launch_state_refresh_for_status() {
   if [[ -n "$latest_launchable_continuity" && -f "$latest_launchable_continuity" ]]; then
     latest_launchable_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_launchable_continuity")"
     [[ -n "$latest_launchable_prompts_csv" ]] || latest_launchable_prompts_csv="none"
-    if [[ "$launch_tracking_prompts" == "none" || "$launch_tracking_continuity" != "$latest_launchable_continuity" ]]; then
+    if { [[ "$latest_generated_written_by" == "freely-runtime-startup-stub" ]] || [[ "$latest_generated_written_by" == "freely-runtime-fallback" ]]; } \
+      && { [[ "$launch_tracking_prompts" == "none" ]] || [[ "$launch_tracking_continuity" != "$latest_launchable_continuity" ]]; }; then
       launch_tracking_continuity="$latest_launchable_continuity"
       launch_tracking_prompts="$latest_launchable_prompts_csv"
     fi
@@ -6243,6 +6245,15 @@ manager_worker_launch_state_refresh_for_status() {
       [[ -n "$consumed_prompts" ]] || consumed_prompts="none"
       needs_writeback="1"
     fi
+  fi
+  if [[ "$latest_generated_prompts_csv" == "none" ]] \
+    && [[ "$latest_generated_written_by" != "freely-runtime-startup-stub" ]] \
+    && [[ "$latest_generated_written_by" != "freely-runtime-fallback" ]]; then
+    consumed_continuity="$latest_generated_continuity"
+    consumed_prompts="none"
+    queued_prompts=""
+    queued_prompt_blockers="none"
+    needs_writeback="1"
   fi
   max_parallel_workers="$(manager_max_parallel_workers)"
   active_running_workers="$(count_active_running_workers_for_manager_project "$project")"
