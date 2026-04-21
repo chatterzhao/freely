@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-recovery-skip-absorbed-merged-dirty.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WT_ROOT="$TMP_DIR/worktrees"
+WORKER="$WT_ROOT/feature-a"
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260324-0000--sample" "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260324-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m init
+
+git -C "$PROJECT" worktree add -q -b feature/a "$WORKER" develop
+
+for wt in "$PROJECT" "$WORKER"; do
+  mkdir -p "$wt/.freely/run" "$wt/.freely/logs"
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+done
+
+mkdir -p "$WORKER/docs/epics/sample/story/issues" "$WORKER/docs/epics/sample/story/code-reviews" "$WORKER/docs/progress"
+for wt in "$WORKER"; do
+  cat >"$wt/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+- issue_id: `I-sample`
+- phase_state: `in_verification`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+- tasks_path: `docs/epics/sample/story/tasks.md`
+- progress_path: `docs/progress/sample.md`
+EOF
+  cat >"$wt/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests
+EOF
+  cat >"$wt/docs/epics/sample/story/tasks.md" <<'EOF'
+# Tasks
+EOF
+  cat >"$wt/docs/progress/sample.md" <<'EOF'
+# Progress
+EOF
+done
+
+echo feature >"$WORKER/feature.txt"
+git -C "$WORKER" add feature.txt docs
+git -C "$WORKER" commit -q -m "feature lane"
+git -C "$PROJECT" merge --no-ff -m "merge feature/a" feature/a >/dev/null
+
+echo local-post-merge-dirty >"$WORKER/extra.txt"
+
+cat >"$WORKER/.freely/run/prompt-20260421-000100.txt" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/a\`
+intent_kind:
+- \`edit\`
+intent_target:
+- \`I-20260421-0001-A\`
+EOF
+
+cat >"$WORKER/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-21T00:01:00Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+START_LOG="$TMP_DIR/started.log"
+manager_runtime_launch_workers_from_latest_handoff() {
+  echo "0"
+}
+start_workcell_supervisor_async() {
+  printf '%s\n' "$1" >>"$START_LOG"
+  return 0
+}
+
+OUTPUT="$(manager_runtime_recover_workers_if_needed "$PROJECT" 2>&1)"
+RECOVERED="$(printf '%s\n' "$OUTPUT" | tail -n 1)"
+[[ "$RECOVERED" == "0" ]]
+[[ ! -f "$START_LOG" ]]
+grep -q '^DESIRED_RUNTIME_STATE="stopped"$' "$WORKER/.freely/run/workcell-state.env"
+grep -q '^LAST_EXIT_REASON="retire_ready_merged_worker"$' "$WORKER/.freely/run/workcell-state.env"
+if grep -q "manager runtime recovering expected-running worker" <<<"$OUTPUT"; then
+  echo "unexpected recovery log for absorbed merged dirty worker" >&2
+  exit 1
+fi
+
+echo "[PASS] manager runtime skips absorbed merged dirty worker recovery"

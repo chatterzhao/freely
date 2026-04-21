@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-daemon-self-loop-blocker-20260421`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-runtime-daemon-self-loop-blocker`
-- updated_at: `2026-04-21 06:05 PDT`
+- updated_at: `2026-04-21 06:18 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -23,6 +23,8 @@
 - Canonical `develop` then exposed a narrower replay seam after guarded absorption: if the merged blocker lane only stayed dirty in owner progress / verification evidence, runtime still treated it as a relaunchable edit worker because the old guard only recognized fully clean merged worktrees. This followthrough now treats owner-evidence-only dirty merged lanes as retirement/promotion followthrough instead of active edit capacity.
 - Canonical `develop` then exposed one more fallback seam in the manager launcher: when no launchable continuity remained, runtime could fall back to the latest generated continuity and relaunch a worker prompt without rechecking whether that prompt now targeted a retire-ready merged lane.
 - This followthrough now makes the fallback launcher respect the same `worker_prompt_launchable_for_manager_project()` gate and settle retire-ready merged targets instead of reviving them.
+- Canonical self-host replay then showed one more recovery-memory seam: once the stale merged blocker lane had been wrongly revived and left ordinary dirty files behind, manager expected-running recovery and restart-memory selection could still treat that absorbed branch as restore-ready because the older guard only recognized clean or owner-evidence-only merged followthrough.
+- This followthrough now blocks automatic relaunch for any worker lane whose branch is already merged into `develop`; if new post-merge work is ever needed, it must materialize as a fresh lane rather than resurrecting the absorbed worktree.
 - The protected test lane replay now passes again; the remaining completion work is develop absorption, real self-host task completion, and temporary lane retirement.
 
 ## Verification Evidence
@@ -50,6 +52,7 @@
 21. `./bin/governance-check`
 22. `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
 23. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-retire-ready-merged-prompt`
+24. `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-absorbed-merged-dirty-worker`
 
 ## Next Action
 
