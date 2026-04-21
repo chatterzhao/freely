@@ -83,10 +83,22 @@
 - id: `develop-self-host-daemon-continuation`
 - requirement: `Canonical develop proves Freely can autonomously pick a task, finish it to the current-project success standard, close the temporary worktree, and proceed to another task.`
 - surface_kind: `real_environment`
-- target_lane: `develop-self-host`
-- promotion_gate: `completion`
-- task_refs: `tasks.md#4,tasks.md#5`
-- case_design: `Start Freely on canonical develop, observe one full task completion with lawful closeout, then confirm the daemon remains autonomous and moves on to a next task.`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#5,tasks.md#6,tasks.md#7`
+- case_design: `Use the guarded test-pre-merge lane to prove the owner carries explicit daemon-lifecycle adequacy into develop, then after protected replay observe canonical develop until Freely completes one task with lawful closeout and continues to the next task.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+
+### Guarded promote carries explicit daemon adequacy
+- id: `daemon-self-loop-guarded-promote-proof`
+- requirement: `The develop-bound replay is backed by an explicit premerge-integration evidence plan instead of feature-local daemon tests alone.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#5,tasks.md#6`
+- case_design: `Replay the blocker owner through the disposable protected test lane, rerun owner gates there, and use that bounded evidence to justify guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
