@@ -16,7 +16,7 @@
 
 - The first bounded implementation slice is now materialized: `live-status` keeps prompt anchors authoritative on current-state prompt surfaces and adds advisory scan-summary fields from `manager-task-source-scan-latest.json`.
 - Focused regressions passed in the feature worktree and in the guarded `test-pre-merge-20260421-live-status-scan-summary` batch.
-- The remaining work is guarded-develop completion plus develop-side replay/validation.
+- Guarded develop replay also passed the bounded startup seam for this owner: canonical `daemon start` returned running status and generated a fresh startup prompt on the merged develop runtime path.
 
 ## Verification Evidence
 
@@ -35,6 +35,6 @@
 
 ## Next Action
 
-1. Re-run guarded completion on local `develop` after this owner chain is present in the merge diff.
-2. Run develop-side validation for daemon-start/status/patrol behavior.
-3. If develop replay exposes a regression, fix it on the retained worktree rather than deleting the lane.
+1. Complete the guarded develop promote with the now-updated owner chain.
+2. Keep the dedicated feature worktree retained after merge in case later runtime-ops followthrough wants a narrower fix.
+3. Treat the observed tool-runtime restart-storm evidence as a separate residual runtime risk, not as an open blocker for this owner.
