@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260421-1330--absorbed-merged-lane-routing-followthrough
+  - brainstorms: docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md
 - 20260421-1200--runtime-daemon-self-loop-followthrough
   - brainstorms: docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/candidates.md

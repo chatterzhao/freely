@@ -93,6 +93,31 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
 - completion_note: `This bounded followthrough owner exists only because real 2026-04-21 dogfooding still found one daemon self-loop blocker after the broader runtime lifecycle owners landed. Completion remains blocked until canonical develop proves Freely can finish one task to the current-project success standard, close the worktree, and continue to the next task.`
 
+1. `I-20260421-1330-A`
+- title: Absorbed merged lane routing followthrough governance
+- milestone_state: candidate
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-absorbed-merged-lane-routing-followthrough-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md`
+- evidence:
+  - `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
+  - `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md`
+  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-absorbed-merged-lane-routing-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status`
+  - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status-absorbed-merged-worker-role`
+  - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan`
+  - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan-routes-absorbed-merged-progress-to-cleanup`
+- completion_note: `This bounded followthrough owner exists only because canonical develop still routed absorbed merged lanes as if they were edit-ready workers after the relaunch guards landed. Completion remains blocked until canonical develop proves Freely now chooses a real launchable task, finishes it to the current-project success standard, closes the worktree, and continues.`
+
 1. `I-20260419-0915-A`
 - title: Three-loop lifecycle single-source governance followthrough
 - milestone_state: committed
@@ -451,6 +476,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/candidates.md`
 - next_action: Candidate mirror only. `I-20260421-1200-A` is now the canonical owner for the daemon self-loop followthrough, guarded develop replay, final self-host acceptance, and retirement of the temporary blocker worktree and disposable test-pre-merge branch.
 - revisit_trigger: Re-open only if canonical develop still falls out of autonomous looping after this bounded repair, or if another blocker shows the self-loop boundary needs a larger dedicated runtime owner.
+
+1. `C-20260421-1330-A`
+- title: Absorbed merged lane routing followthrough governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md`
+- next_action: Candidate mirror only. `I-20260421-1330-A` is now the canonical owner for downgrading absorbed merged lanes in fleet status and task-source-scan while preserving cleanup visibility and final develop self-host acceptance.
+- revisit_trigger: Re-open only if canonical develop still routes absorbed merged lanes back into edit execution after this bounded downgrade, or if future dogfooding proves cleanup visibility and execution visibility still cannot stay separated without a larger owner.
 
 1. `C-20260419-0915-A`
 - title: Three-loop lifecycle single-source governance followthrough
