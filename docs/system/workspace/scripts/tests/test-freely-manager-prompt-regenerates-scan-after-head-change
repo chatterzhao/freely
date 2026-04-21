@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-patrol-head-change.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260420-0000--sample" \
+  "$PROJECT/.freely/run"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-20260420-runtime
+
+- title: Runtime self-host patrol
+- status: active
+
+### committed_issues
+
+1. `I-20260420-1000-A`
+- title: Resume verification after worker closeout
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/runtime/issues/startup-patrol.md`
+- progress_path: `docs/progress/p-startup-patrol.md`
+- next_action: `verify latest evidence`
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260420-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260420-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260420-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+OLD_HEAD="$(git -C "$PROJECT" rev-parse HEAD)"
+
+SCAN_JSON="$PROJECT/.freely/run/manager-task-source-scan-latest.json"
+cat >"$SCAN_JSON" <<'EOF'
+{"schema_version":"manager-task-source-scan-v1","scan_reason":"bootstrap_missing_scan","surfaces":[]}
+EOF
+touch -t 202604200800.00 "$SCAN_JSON"
+
+STATE_FILE="$PROJECT/.freely/run/manager-task-source-scan-state.env"
+cat >"$STATE_FILE" <<EOF
+LAST_TASK_SOURCE_SCAN_JSON="$SCAN_JSON"
+LAST_TASK_SOURCE_SCAN_REASON="bootstrap_missing_scan"
+LAST_TASK_SOURCE_SCAN_CONTINUITY_ANCHOR=""
+LAST_TASK_SOURCE_SCAN_ACTIVE_RUNNING_WORKERS="0"
+LAST_TASK_SOURCE_SCAN_GENERATED_AT="2026-04-20T08:00:00Z"
+LAST_TASK_SOURCE_SCAN_PROJECT_HEAD="$OLD_HEAD"
+EOF
+
+echo changed >>"$PROJECT/README.md"
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "head advanced"
+NEW_HEAD="$(git -C "$PROJECT" rev-parse HEAD)"
+[[ "$NEW_HEAD" != "$OLD_HEAD" ]]
+
+PROMPT_OUTPUT="$(
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+  bash -lc '
+    source "$1"
+    manager_semantic_loop_active_worker_count_for_project() {
+      echo 0
+    }
+    build_prompt
+  ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+)"
+
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'Task-source patrol seed:'
+grep -q '^LAST_TASK_SOURCE_SCAN_REASON="project_head_changed_since_last_scan"$' "$STATE_FILE"
+grep -q "^LAST_TASK_SOURCE_SCAN_PROJECT_HEAD=\"$NEW_HEAD\"$" "$STATE_FILE"
+python3 - "$SCAN_JSON" "$NEW_HEAD" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    payload = json.load(f)
+
+assert payload["scan_reason"] == "project_head_changed_since_last_scan"
+assert payload["project_head_anchor"] == sys.argv[2]
+PY
+
+echo "[PASS] manager prompt regenerates patrol scan after project head changes"

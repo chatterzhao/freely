@@ -9968,6 +9968,11 @@ task_source_scan_state_file_for_project() {
   printf '%s\n' "$(run_dir_for_project "$project")/manager-task-source-scan-state.env"
 }
 
+task_source_scan_current_project_head_for_project() {
+  local project="$1"
+  git -C "$project" rev-parse HEAD 2>/dev/null || true
+}
+
 latest_task_source_scan_json_mtime_for_project() {
   local project="$1" scan_json_path
   scan_json_path="$(task_source_scan_json_path_for_project "$project")"
@@ -9987,7 +9992,7 @@ snapshot_item_count_from_prefix() {
 task_source_scan_regeneration_reason_for_project() {
   local project="$1"
   local scan_mtime latest_intake_mtime latest_continuity_mtime
-  local continuity_file active_running_workers
+  local continuity_file active_running_workers state_path current_head anchored_head
 
   scan_mtime="$(latest_task_source_scan_json_mtime_for_project "$project" 2>/dev/null || true)"
   if [[ -z "$scan_mtime" ]]; then
@@ -9999,6 +10004,19 @@ task_source_scan_regeneration_reason_for_project() {
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
   if (( active_running_workers > 0 )); then
     return 1
+  fi
+
+  state_path="$(task_source_scan_state_file_for_project "$project")"
+  current_head="$(task_source_scan_current_project_head_for_project "$project")"
+  anchored_head=""
+  if [[ -f "$state_path" ]]; then
+    # shellcheck disable=SC1090
+    source "$state_path"
+    anchored_head="${LAST_TASK_SOURCE_SCAN_PROJECT_HEAD:-}"
+  fi
+  if [[ -n "$current_head" && -n "$anchored_head" && "$current_head" != "$anchored_head" ]]; then
+    printf 'project_head_changed_since_last_scan\n'
+    return 0
   fi
 
   latest_intake_mtime="$(latest_active_intake_meta_mtime_for_project "$project" 2>/dev/null || true)"
@@ -10024,7 +10042,7 @@ write_task_source_scan_json_for_project() {
   local output_path state_path run_dir tmp_dir generated_at human_snapshot delegated_snapshot milestone_snapshot
   local pre_brainstorm_snapshot progress_snapshot
   local human_count delegated_count milestone_count pre_brainstorm_count progress_count
-  local continuity_file active_running_workers
+  local continuity_file active_running_workers project_head
 
   run_dir="$(run_dir_for_project "$project")"
   output_path="$(task_source_scan_json_path_for_project "$project")"
@@ -10045,6 +10063,7 @@ write_task_source_scan_json_for_project() {
   continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" 2>/dev/null || true)"
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
+  project_head="$(task_source_scan_current_project_head_for_project "$project")"
 
   tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/freely-task-source-scan.XXXXXX")"
   printf '%s\n' "$human_snapshot" >"$tmp_dir/human.txt"
@@ -10053,7 +10072,7 @@ write_task_source_scan_json_for_project() {
   printf '%s\n' "$pre_brainstorm_snapshot" >"$tmp_dir/pre_brainstorm.txt"
   printf '%s\n' "$progress_snapshot" >"$tmp_dir/progress.txt"
 
-  python3 - "$output_path" "$project" "$generated_at" "$regeneration_reason" "$active_running_workers" "$human_count" "$delegated_count" "$milestone_count" "$pre_brainstorm_count" "$progress_count" "$continuity_file" "$tmp_dir/human.txt" "$tmp_dir/delegated.txt" "$tmp_dir/milestone.txt" "$tmp_dir/pre_brainstorm.txt" "$tmp_dir/progress.txt" <<'PY'
+  python3 - "$output_path" "$project" "$generated_at" "$regeneration_reason" "$active_running_workers" "$human_count" "$delegated_count" "$milestone_count" "$pre_brainstorm_count" "$progress_count" "$continuity_file" "$project_head" "$tmp_dir/human.txt" "$tmp_dir/delegated.txt" "$tmp_dir/milestone.txt" "$tmp_dir/pre_brainstorm.txt" "$tmp_dir/progress.txt" <<'PY'
 import json
 import sys
 
@@ -10068,11 +10087,12 @@ milestone_count = int(sys.argv[8])
 pre_brainstorm_count = int(sys.argv[9])
 progress_count = int(sys.argv[10])
 continuity_file = sys.argv[11]
-human_file = sys.argv[12]
-delegated_file = sys.argv[13]
-milestone_file = sys.argv[14]
-pre_brainstorm_file = sys.argv[15]
-progress_file = sys.argv[16]
+project_head = sys.argv[12] or None
+human_file = sys.argv[13]
+delegated_file = sys.argv[14]
+milestone_file = sys.argv[15]
+pre_brainstorm_file = sys.argv[16]
+progress_file = sys.argv[17]
 
 def read_lines(path):
     with open(path, "r", encoding="utf-8") as f:
@@ -10084,6 +10104,7 @@ payload = {
     "project_root": project_root,
     "scan_reason": regeneration_reason,
     "continuity_anchor": continuity_file or None,
+    "project_head_anchor": project_head,
     "manager_context": {
         "active_running_workers": active_running_workers,
     },
@@ -10147,6 +10168,7 @@ LAST_TASK_SOURCE_SCAN_REASON="$regeneration_reason"
 LAST_TASK_SOURCE_SCAN_CONTINUITY_ANCHOR="$continuity_file"
 LAST_TASK_SOURCE_SCAN_ACTIVE_RUNNING_WORKERS="$active_running_workers"
 LAST_TASK_SOURCE_SCAN_GENERATED_AT="$generated_at"
+LAST_TASK_SOURCE_SCAN_PROJECT_HEAD="$project_head"
 EOF
   printf '%s\n' "$output_path"
 }
