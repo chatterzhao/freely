@@ -23,6 +23,7 @@
   - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
   - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
 - problem: Dogfooding proved a remaining runtime-control blocker: daemon-mode Freely could stop self-looping after a patrol round because an unexpected `TERM` was recorded as `operator_stop`, and a lone dispatcher/watchdog residue could also falsely block the next `start` or `daemon start`.
+- followthrough_update: Guarded replay then exposed two same-owner seams on canonical `develop`: runtime could not consume the current `## Worker Delegation` continuity shape into worker launches, and after that repair it could still auto-recover a `merged-clean` blocker worktree instead of routing it to cleanup followthrough retirement.
 - why_now:
   - this blocker prevents Freely from autonomously selecting, finishing, and closing tasks on canonical `develop`
   - the fix is already implemented and focused regressions are green in the blocker worktree, but guarded develop promotion still needs lawful owner evidence
@@ -30,6 +31,8 @@
 - acceptance_criteria:
   - `start` and `daemon start` no longer reject because of orphaned watchdog/dispatcher residue when no authoritative supervisor exists
   - daemon supervisor ignores unexpected `TERM` without `stop.marker` and still honors explicit daemon stop
+  - runtime consumes current `## Worker Delegation` continuity into worker launches instead of stalling after manager selection
+  - `merged-clean` / `retire-ready` blocker worktrees are settled toward cleanup followthrough retirement rather than being auto-recovered as edit workers
   - guarded `feature/* -> test-pre-merge-* -> develop` replay succeeds with concrete owner evidence
   - on canonical `develop`, `freely daemon start` autonomously selects at least one task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task
 - promotion_gate:
@@ -44,7 +47,7 @@
     mode: `author review`
     summary: `The field blocker is runtime-control-plane specific. The smallest truthful owner is a followthrough lane that repairs orphan precheck truth, ignores unexpected daemon TERM without stop intent, and proves canonical develop self-host continuity.`
     verdict: `ready_for_issue_materialization`
-- next_action: Candidate mirror only. `I-20260421-1200-A` is now the canonical owner for the daemon self-loop followthrough, guarded develop replay, final self-host acceptance, and retirement of the temporary blocker worktree and test-pre-merge branch.
+- next_action: Candidate mirror only. `I-20260421-1200-A` remains the canonical owner for the daemon self-loop followthrough, the guarded-replay-discovered continuity/retirement seams, final self-host acceptance on `develop`, and retirement of the temporary blocker worktree and test-pre-merge branch.
 - revisit_trigger: Re-open only if canonical `develop` still falls out of autonomous looping after this bounded repair, or if another blocker shows the self-loop boundary needs a larger dedicated runtime owner.
 - decision_reason: `This is a concrete post-architecture runtime blocker with already-bounded code changes. A narrow followthrough owner is safer and more truthful than reopening the broader runtime architecture lanes.`
 - session_refs:
