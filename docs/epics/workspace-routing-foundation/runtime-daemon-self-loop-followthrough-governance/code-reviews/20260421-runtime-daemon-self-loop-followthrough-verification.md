@@ -18,6 +18,7 @@
 - `PASS`: when manager writes a newer manager-owned continuity with no worker prompt, runtime now lets that continuity supersede stale queued worker-prompt state instead of keeping an older queued prompt as the consumed truth.
 - `PASS`: manager worker-launch fallback now rechecks whether a prompt still targets a launchable lane before reviving it, so the latest generated continuity cannot bypass retire-ready merged guards.
 - `PASS`: expected-running worker recovery and global restart selection now both exclude absorbed merged worker lanes, even if an earlier bad recovery already left ordinary dirty files behind in that old worktree.
+- `PASS`: once canonical replay proves `kiro-cli` hit monthly request exhaustion, runtime now persists that tool-unavailable truth and later auto-switch / manager bootstrap selection skips Kiro instead of routing immediately back into the same exhausted tool.
 - `PASS`: focused regressions and nearby daemon/live-status coverage passed on the guarded source lane, and the protected test lane replay still passed after the retirement followthrough repair.
 - `PENDING`: the final protected-branch acceptance remains canonical `develop` self-host execution where Freely finishes one task to the current-project success standard, closes the worktree, and continues to the next task.
 
@@ -48,6 +49,20 @@
 23. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
 24. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
 25. `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-supersedes-queued-prompt-with-manager-continuity`
+26. `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
+27. `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-skips-known-unavailable-kiro`
+28. `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-uses-unified-auto-recovery-path`
+29. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
+
+## 2026-04-21 08:45 PDT Kiro Availability Memory Followthrough
+
+- `FAIL`: canonical `develop` self-host replay no longer stalled on stale manager continuity, but after a later `cc` `tool_runtime_failure` the active runtime still selected `kiro-cli` even though that same replay had already recorded `kiro_monthly_request_limit`; Kiro availability was classified correctly at failure time, but the candidate picker had no persisted memory of that unavailability.
+- `PASS`: runtime now writes a Kiro tool-availability state file when monthly-limit truth is observed, preserves a reset hint from the CLI transcript when available, falls back to the next calendar-month boundary when the transcript omits the explicit reset line, and skips the cached-unavailable Kiro candidate during later cross-tool recovery.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-skips-known-unavailable-kiro`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-uses-unified-auto-recovery-path`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
+- `PENDING`: replay the guarded merge into canonical `develop`, then resume self-host daemon validation until one real task completes, the corresponding worktree is lawfully closed, and the daemon proceeds to another task.
 
 ## 2026-04-21 05:25 PDT Recheck
 

@@ -43,7 +43,19 @@
 - Canonical `develop` daemon replay then exposed one more same-owner state-refresh seam: after manager wrote a new manager-owned continuity with no worker prompt, `manager_worker_launch_state.env` could keep advertising an older queued worker prompt and an older consumed continuity as the current truth.
 - The result was another `fresh_with_handoff` patrol that saw the latest continuity excerpt but still carried stale queued prompt state, so manager stayed in verification judgment without ever advancing the cleanup-only task it had already selected.
 - Runtime now treats manager-authored no-worker continuity as authoritative enough to supersede stale queued worker-prompt state, while still preserving older unconsumed prompts across newer runtime-seeded startup stubs and runtime fallback continuity.
+- Canonical `develop` daemon replay then exposed one more tool-availability seam: after `cc` ended `tool_runtime_failure`, cross-tool recovery could still select `kiro-cli` even though the immediately preceding self-host evidence had already proven this machine was at Kiro monthly request limit.
+- Runtime now persists `kiro_monthly_request_limit` as a tool-availability state with a recovery hint and skips that cached-unavailable Kiro candidate during later auto-switch / manager bootstrap selection, instead of re-burning the same exhausted tool before moving on.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
+
+## 2026-04-21 08:45 PDT Kiro Availability Memory Verification
+
+- `FAIL`: canonical `develop` self-host replay advanced past the stale manager continuity blocker, but a later `cc` `tool_runtime_failure` still cross-switched into `kiro-cli` even though the same replay had already established `kiro_monthly_request_limit`; runtime had classification for the Kiro failure, but no persisted availability memory for later candidate selection.
+- `PASS`: runtime now writes `tool-availability-kiro-cli.env` when Kiro monthly-limit truth is observed, derives a recovery hint from the reset line when present and otherwise falls back to the next calendar-month boundary, and skips that cached-unavailable Kiro candidate during later cross-tool recovery.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-skips-known-unavailable-kiro`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-uses-unified-auto-recovery-path`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
+- `PENDING`: absorb this same-owner followthrough into canonical `develop`, then rerun `./bin/freely daemon start` until a real task completes, the corresponding worktree is lawfully closed, and the daemon proceeds to another task.
 
 ## Verification Evidence
 
