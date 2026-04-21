@@ -231,6 +231,11 @@ EOF
    - \`Minimum-Evidence-Level:\`
    - \`Target-Environment:\`
    - \`Closeout-Gate:\`
+   - \`Closeout-Gate-Command:\`
+   - \`Closeout-Target-Lane:\`
+   - \`Closeout-Promotion-Gate:\`
+   - \`Closeout-Requires-Adequacy:\`
+   - \`Closeout-Review-Artifact-Policy:\`
    其中 \`Required-Test-Lanes\` 与 \`Required-Acceptance-Item-Ids\` 必须写成可枚举列表；不得只写“see issue”或“follow pre-tests”.
    runtime 会把这组字段结构化写入 delegated intake 与 worker runtime state，所以不要把它们写成只适合人眼理解的散文。
 26. 若本轮结论是 manager-only cleanup queue、暂不发 worker，也仍然必须写 manager continuity，至少包含：fleet inventory、route_kind / restart_point / ownership / next_action、cleanup queue 或 frozen queue、以及 next supervision priority。
