@@ -41,9 +41,10 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 1. Keep `project_has_authoritative_runtime_processes_for_user_precheck()` authoritative-supervisor-only for user-facing repeated-start refusal.
 2. Make daemon-mode supervisor ignore unexpected `INT`/`TERM` when no `stop.marker` exists, while preserving explicit stop semantics.
 3. Keep current manager continuity formats runtime-consumable by parsing `## Worker Delegation` handoffs into concrete worker prompt launches.
-4. Add focused regressions for orphan precheck residue, unexpected daemon `TERM`, and worker-delegation continuity consumption.
-5. Replay the guarded promotion path with concrete owner evidence.
-6. Prove on canonical `develop` that Freely self-starts, selects a task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
+4. Route `merged-clean` / `retire-ready` worker lanes to cleanup followthrough retirement instead of runtime recovery, and let cleanup reclaim stale recorded ownership for those lanes.
+5. Add focused regressions for orphan precheck residue, unexpected daemon `TERM`, worker-delegation continuity consumption, and retire-ready merged-worker retirement routing.
+6. Replay the guarded promotion path with concrete owner evidence.
+7. Prove on canonical `develop` that Freely self-starts, selects a task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
 
 ## Non-Goals
 
@@ -55,10 +56,11 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 ## Acceptance
 
 1. Focused regressions cover the orphaned precheck residue and unexpected daemon `TERM` seams.
-2. `./bin/pretests-gate` and `./bin/governance-check` pass for this owner.
-3. Guarded replay from `feature/runtime-daemon-self-loop-blocker-20260421` through `test-pre-merge-20260421-runtime-self-loop-blocker` into `develop` succeeds lawfully.
-4. On canonical `develop`, `freely daemon start` selects at least one task, completes it to the current-project success standard, closes the corresponding temporary worktree, and proceeds to another task.
-5. The temporary blocker worktree and disposable test-pre-merge branch are retired after canonical `develop` absorbs the fix.
+2. Focused regressions also prove runtime consumes current `## Worker Delegation` continuity and retires merged-clean blocker worktrees instead of re-recovering them.
+3. `./bin/pretests-gate` and `./bin/governance-check` pass for this owner.
+4. Guarded replay from `feature/runtime-daemon-self-loop-blocker-20260421` through `test-pre-merge-20260421-runtime-self-loop-blocker` into `develop` succeeds lawfully.
+5. On canonical `develop`, `freely daemon start` selects at least one task, completes it to the current-project success standard, closes the corresponding temporary worktree, and proceeds to another task.
+6. The temporary blocker worktree and disposable test-pre-merge branch are retired after canonical `develop` absorbs the fix.
 
 ## Verification
 
@@ -67,6 +69,10 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert-retire-ready-merged-worker`
+- `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
+- `bash docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
 - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - `./bin/governance-check`
 - canonical `develop` self-host replay: `./bin/freely daemon start`
@@ -84,5 +90,9 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
+- `docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
+- `docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert-retire-ready-merged-worker`
+- `docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
+- `docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
 - `docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`
 - `docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`

@@ -146,6 +146,8 @@ RECOVERED="$(printf '%s\n' "$OUTPUT" | tail -n 1)"
 [[ "$RECOVERED" == "0" ]]
 [[ ! -f "$START_LOG" ]]
 grep -q "retire-ready merged worker" <<<"$OUTPUT"
+grep -q '^DESIRED_RUNTIME_STATE="stopped"$' "$WORKER/.freely/run/workcell-state.env"
+grep -q '^LAST_EXIT_REASON="retire_ready_merged_worker"$' "$WORKER/.freely/run/workcell-state.env"
 if grep -q "manager runtime recovering expected-running worker" <<<"$OUTPUT"; then
   echo "unexpected recovery log for retire-ready merged worker" >&2
   exit 1

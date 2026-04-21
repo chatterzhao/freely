@@ -62,11 +62,16 @@ def parse_env(path: Path) -> dict[str, str]:
     return data
 
 
-def resolve_issue_path(issue_id: str) -> tuple[str, str]:
+def resolve_issue_path(issue_ref: str) -> tuple[str, str]:
+    if not issue_ref:
+        return "", "missing"
     issue_root = project / "docs" / "epics"
     if not issue_root.exists():
         return "", "missing_issue_root"
-    pattern = re.compile(rf"^- issue_id:\s*`?{re.escape(issue_id)}`?\s*$", re.MULTILINE)
+    candidate_path = project / issue_ref
+    if issue_ref.startswith("docs/epics/") and candidate_path.exists():
+        return issue_ref, ""
+    pattern = re.compile(rf"^- issue_id:\s*`?{re.escape(issue_ref)}`?\s*$", re.MULTILINE)
     matches: list[str] = []
     for issue_file in issue_root.glob("**/issues/*.md"):
         try:

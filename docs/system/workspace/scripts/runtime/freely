@@ -8101,6 +8101,17 @@ authoritative_worker_prompt_for_worktree_from_continuity() {
   return 1
 }
 
+retire_ready_merged_worktree_can_reclaim_ownership() {
+  local manager_project="$1" target_worktree="$2" branch="${3:-}" prompt_file=""
+  [[ -n "$manager_project" && -n "$target_worktree" && -d "$target_worktree" ]] || return 1
+  prompt_file="$(latest_prompt_file_for_project "$target_worktree")"
+  if worker_project_is_retire_ready_merged_clean "$manager_project" "$target_worktree" "$branch" || \
+    worker_prompt_targets_retire_ready_merged_worktree "$manager_project" "$prompt_file"; then
+    return 0
+  fi
+  return 1
+}
+
 status_intent_prompt_file_for_project() {
   local project="$1" prompt_file repo_root manager_project continuity_file
   prompt_file="$(find_latest_prompt_file_for_project "$project")"
@@ -8243,11 +8254,16 @@ manager_frozen_blocking_intent_signatures_csv() {
 
 manager_project_ownership_claim_for_worktree() {
   local project="$1" target_worktree="$2"
-  local holder_state holder_branch holder_ref holder_status
+  local holder_state holder_branch holder_ref holder_status branch_name
   IFS='|' read -r holder_state holder_branch holder_ref holder_status <<<"$(manager_worktree_ownership_claim_snapshot "$project" "$target_worktree")"
+  branch_name="$(branch_name_for_project "$target_worktree")"
   case "$holder_state" in
     active-owner) printf 'runtime-active-owner\n' ;;
     recorded-owner)
+      if retire_ready_merged_worktree_can_reclaim_ownership "$project" "$target_worktree" "$branch_name"; then
+        printf '\n'
+        return 0
+      fi
       [[ "$holder_status" == "hard_stale" ]] || printf 'runtime-recorded-owner\n'
       ;;
     queued-owner) printf 'manager-queued-owner\n' ;;
@@ -10083,6 +10099,7 @@ EOF
 
 manager_supervision_alerts() {
   local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state ai_state owner next_action anomaly
+  local worker_prompt_file
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || return 0
   while IFS='|' read -r wt_path branch; do
@@ -10104,6 +10121,19 @@ manager_supervision_alerts() {
     [[ "$desired_state" == "running" ]] || continue
     owner="runtime-owned"
     next_action="runtime_recovery_requested"
+    worker_prompt_file="$(latest_prompt_file_for_project "$wt_path")"
+    if worker_project_is_retire_ready_merged_clean "$project" "$wt_path" "$branch" || \
+      worker_prompt_targets_retire_ready_merged_worktree "$project" "$worker_prompt_file"; then
+      printf -- '- %s: branch=%s role=%s owner=%s next_action=%s exit_reason=%s path=%s\n' \
+        "retire_ready_merged_worktree_retained" \
+        "${branch:-unknown}" \
+        "${role_hint:-worker}" \
+        "manager-owned" \
+        "cleanup_followthrough" \
+        "${exit_reason:-unknown}" \
+        "$wt_path"
+      continue
+    fi
     if [[ -f "$(run_dir_for_project "$wt_path")/supervisor.pid" ]]; then
       local sp
       sp="$(cat "$(run_dir_for_project "$wt_path")/supervisor.pid" 2>/dev/null || true)"
@@ -10129,6 +10159,37 @@ manager_supervision_alerts() {
     /^worktree / { wt=substr($0, 10); br="" }
     /^branch / { br=$2; sub(/^refs\/heads\//, "", br); print wt "|" br }
   ')
+}
+
+settle_retire_ready_merged_worker_runtime_state() {
+  local manager_project="$1" target_project="$2" branch="${3:-}" worker_prompt_file="" supervisor_pid="" ai_pid=""
+  [[ -n "$manager_project" && -n "$target_project" && -d "$target_project" ]] || return 1
+  worker_prompt_file="$(latest_prompt_file_for_project "$target_project")"
+  if ! worker_project_is_retire_ready_merged_clean "$manager_project" "$target_project" "$branch" \
+    && ! worker_prompt_targets_retire_ready_merged_worktree "$manager_project" "$worker_prompt_file"; then
+    return 1
+  fi
+  supervisor_pid="$(manager_supervisor_pid_for_project "$target_project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$target_project")"
+  if [[ -n "$supervisor_pid" || -n "$ai_pid" ]]; then
+    : >"$(stop_marker_file "$target_project")"
+    [[ -n "$ai_pid" ]] && kill -TERM "$ai_pid" 2>/dev/null || true
+    [[ -n "$supervisor_pid" ]] && kill -TERM "$supervisor_pid" 2>/dev/null || true
+  fi
+  rm -f \
+    "$(run_dir_for_project "$target_project")/supervisor.pid" \
+    "$(run_dir_for_project "$target_project")/ai.pid" \
+    "$(interruption_dispatcher_pid_file "$target_project")" \
+    "$(ensure_manager_watchdog_pid_file "$target_project")" \
+    "$(session_state_file "$target_project")" \
+    "$(handoff_file "$target_project")"
+  write_workcell_state "$target_project" "stopped" "down" "down" "retire_ready_merged_worker"
+  append_runtime_event "$manager_project" "retire_ready_merged_worker_settled" \
+    "worktree=$target_project" \
+    "branch=${branch:-unknown}" \
+    "previous_supervisor_pid=${supervisor_pid:-none}" \
+    "previous_ai_pid=${ai_pid:-none}"
+  return 0
 }
 
 manager_hygiene_alerts() {
@@ -10206,6 +10267,10 @@ manager_runtime_recover_workers_if_needed() {
       fi
     fi
     if [[ "$supervisor_state" == "up" ]]; then
+      if settle_retire_ready_merged_worker_runtime_state "$project" "$wt_path" "$branch"; then
+        log_info "manager runtime settled retire-ready merged worker out of active recovery: branch=${branch:-unknown} path=$wt_path"
+        continue
+      fi
       if manager_continuity_explicitly_freezes_worker_project "$project" "$wt_path" "$latest_continuity_file"; then
         log_info "manager continuity keeps worker frozen; skipping active recovery: branch=${branch:-unknown} path=$wt_path"
         continue
@@ -10224,6 +10289,7 @@ manager_runtime_recover_workers_if_needed() {
     worker_prompt_file="$(latest_prompt_file_for_project "$wt_path")"
     if worker_project_is_retire_ready_merged_clean "$project" "$wt_path" "$branch" || \
       worker_prompt_targets_retire_ready_merged_worktree "$project" "$worker_prompt_file"; then
+      settle_retire_ready_merged_worker_runtime_state "$project" "$wt_path" "$branch" >/dev/null 2>&1 || true
       log_info "manager runtime skips expected-running recovery for retire-ready merged worker: branch=${branch:-unknown} path=$wt_path"
       continue
     fi
@@ -11213,7 +11279,7 @@ run_cleanup_followthrough() {
   local project="$1" intake_id="$2" classification="$3" reaction="$4" why_text="$5" handoff_text="$6"
   local resolution_file blocked_reason cleaned retained wt_path branch dirty supervisor ai
   local remote_name remote_fetch_state remote_note remote_ref
-  local resolution_status absorption_target linked_artifact next_restart_point next_ownership next_handoff ownership_claim local_intent_signature ownership_state ownership_branch ownership_ref ownership_status local_intent_status pretests_retirement_gate pretests_output pretests_reason
+  local resolution_status absorption_target linked_artifact next_restart_point next_ownership next_handoff ownership_claim local_intent_signature ownership_state ownership_branch ownership_ref ownership_status local_intent_status pretests_retirement_gate pretests_output pretests_reason retire_ready_reclaim="0" latest_prompt_file_for_reclaim=""
   blocked_reason=""
   cleaned=""
   retained=""
@@ -11237,6 +11303,11 @@ run_cleanup_followthrough() {
     if [[ "$wt_path" == "$project" ]]; then
       continue
     fi
+    retire_ready_reclaim="0"
+    if retire_ready_merged_worktree_can_reclaim_ownership "$project" "$wt_path" "$branch"; then
+      retire_ready_reclaim="1"
+    fi
+    latest_prompt_file_for_reclaim="$(latest_prompt_file_for_project "$wt_path")"
     dirty="$(git -C "$wt_path" status --porcelain 2>/dev/null || true)"
     if [[ -n "$dirty" ]]; then
       retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (dirty)"
@@ -11249,7 +11320,7 @@ run_cleanup_followthrough() {
         continue
       fi
       local_intent_status="$(recorded_worker_ownership_status "$wt_path")"
-      if [[ "$local_intent_status" != "hard_stale" ]]; then
+      if [[ "$retire_ready_reclaim" != "1" && "$local_intent_status" != "hard_stale" ]]; then
         retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (ownership:local-intent:${local_intent_signature}:status=${local_intent_status:-soft_stale})"
         continue
       fi
@@ -11275,6 +11346,18 @@ run_cleanup_followthrough() {
     if ([[ -n "$supervisor" ]] && kill -0 "$supervisor" 2>/dev/null) || ([[ -n "$ai" ]] && kill -0 "$ai" 2>/dev/null); then
       retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (runtime-active)"
       continue
+    fi
+    if [[ "$retire_ready_reclaim" == "1" && -n "$latest_prompt_file_for_reclaim" && -f "$latest_prompt_file_for_reclaim" ]]; then
+      write_worker_verification_contract_file \
+        "$(worker_verification_contract_state_file "$wt_path")" \
+        "$latest_prompt_file_for_reclaim" \
+        "" \
+        "$wt_path"
+    fi
+    if [[ "$retire_ready_reclaim" == "1" ]] && [[ ! -f "$(workcell_state_file "$wt_path")" || ! -s "$(workcell_state_file "$wt_path")" ]]; then
+      write_workcell_state "$wt_path" "stopped" "down" "down" "retire_ready_merged_worker"
+    elif [[ "$retire_ready_reclaim" == "1" ]]; then
+      write_workcell_state "$wt_path" "stopped" "down" "down" "retire_ready_merged_worker"
     fi
     if [[ ! -x "$pretests_retirement_gate" ]]; then
       retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (pretests-retirement-gate-unavailable:${pretests_retirement_gate})"
