@@ -21,7 +21,8 @@ sequenceDiagram
         Note over AUTO: 人类插话 / runtime anomaly / worker 新发现<br/>未被当前 issue 吸收的 review/test 新信号<br/>已 closeout 后再次暴露的 review/test 新发现
         AUTO->>AUTO: [脚本 do]：<br/>接住 event-driven signal<br/>记录 durable signal
     else patrol-driven 信号/来源池
-        Note over AUTO: milestone 未收口 / progress 未完成 / pre-brainstorm 未产出<br/>GitHub issue 未挂 milestone / cleanup 尾项
+        Note over AUTO: milestone 未收口 / progress 未完成 / pre-brainstorm 未产出<br/>GitHub/Gitee raw issue 未被 canonical linkage 消费<br/>GitHub/Gitee linked issue 仍 open 但 canonical closeout 未闭合 / cleanup 尾项
+        AUTO->>AUTO: [脚本 do]：<br/>运行 `freely task-source-scan --json`<br/>生成 standing-source inventory
         AUTO->>AUTO: [脚本 do]：<br/>接住 patrol-derived signal<br/>记录 durable signal
     end
 
@@ -30,6 +31,7 @@ sequenceDiagram
         AUTO->>AUTO: [脚本 do]：<br/>恢复后重回 intake gate
     else 可进入主管 routing gate
         AUTO->>AUTO: [脚本 do]：<br/>触发主管轮次<br/>提供 lifecycle 真相 / runtime 真相 / 当前工位真相 / 工具可用性
+        AUTO->>AUTO: [脚本 do]：<br/>提供最新 task-source-scan JSON<br/>供主管做 standing-source first-hop
         AUTO->>AUTO: [主管AI do]：<br/>notice 来源<br/>需要时先 claim
         AUTO->>AUTO: [主管AI do]：<br/>读取真相<br/>做 intent understanding
         AUTO->>AUTO: [主管AI do]：<br/>调用 context-source-skill<br/>做 source classification<br/>区分 discovery / milestone / continuation

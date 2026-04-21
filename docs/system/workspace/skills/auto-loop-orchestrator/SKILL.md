@@ -26,16 +26,17 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 ## 工作流
 1. 先执行固定前置门禁：`skill:constitution-guard` -> `skill:laws-enforcer`。
 2. `system/workspace/scripts` 中定义的 `sh` / `ps1` 启动外部 AI CLI 工具，并进入 `lead-agent`。
-3. `lead-agent` 调用 `skill:context-source-skill`，基于当前来源、milestone、工具清单与上下文做 usable issue 判定，并组装下一跳提示词。
-4. 根据 `context-source-skill` 的结果分流：
+3. manager / patrol 轮次先把 standing/event source 扫描成 machine-readable `manager-task-source-scan-latest.json`，作为本轮路由的结构化输入。
+4. `lead-agent` 调用 `skill:context-source-skill`，基于当前来源、scan json、milestone、工具清单与上下文做 usable issue 判定，并组装下一跳提示词。
+5. 根据 `context-source-skill` 的结果分流：
    - 无稳定 issue 边界 -> `skill:doc-pre-brainstorm-execution`
    - issue-bound brainstorm / mapping / governance -> `skill:doc-ibm-execution`
    - ready issue / in-progress -> `skill:dev-loop-execution`
    - `completion_verification` / `cleanup_governance` -> 留在 `auto-loop` 侧做 manager-owned judgement / handoff，必要时委派 worker 或 `skill:worktree-maintenance-governance`
-5. 各 loop skill 在环内完成自己的工作，并把状态、阻塞、完成或恢复上下文回流给 `auto-loop`；不要求下游 skill 直接“调用 auto-loop 的某个子 skill”。
-6. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
-7. 当状态跨环迁移时，按 `docs/LAWS.md` 第 2C 章同步更新候选项 / milestone / issue / progress / recovery / session evidence。
-8. 重复循环直到停止条件。
+6. 各 loop skill 在环内完成自己的工作，并把状态、阻塞、完成或恢复上下文回流给 `auto-loop`；不要求下游 skill 直接“调用 auto-loop 的某个子 skill”。
+7. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
+8. 当状态跨环迁移时，按 `docs/LAWS.md` 第 2C 章同步更新候选项 / milestone / issue / progress / recovery / session evidence。
+9. scan json 是 idle/replan step，而不是 every-cycle step：至少在首次启动缺少 scan、manager idle 且有新 intake、或 manager continuity 在无 active worker 的情况下前进后重生成；若 active worker 正在稳定推进，不要为 broad patrol 每轮重扫。
 
 ## 主管模式
 
@@ -56,8 +57,10 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 8. 若异常 owner 属于目标工位 `runtime`，主管只输出结构化恢复目标，不自行处理切号、等待或重启。
 9. 主管同时处理两类 source：
    - `event source`：interruption / review finding / test failure / runtime anomaly / worker-discovered gap
-   - `standing source`：milestones / issue / progress / recovery / interruption backlog / pre-brainstorm lifecycle / fleet
+  - `standing source`：external issue / milestones / issue / progress / recovery / interruption backlog / pre-brainstorm lifecycle / fleet
 10. 对 `event source`，主管及时 notice；对 `standing source`，主管周期扫描，并在必要时生成 derived problem signal。
+   - 推荐统一脚本入口：`./bin/freely task-source-scan --project <project> --json`
+   - 该 JSON 是 standing-source inventory，不替代 canonical issue / progress / milestone / source closeout 真相
 11. 因此 `auto-loop` 对主管而言至少有两类入口：
    - `event-driven`
    - `patrol-driven`
@@ -65,7 +68,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 12. 主管被 runtime 重新激活后，不得只确认“进程活着”；必须先做一轮 patrol：
    - `live-status`
    - `fleet-status`
-   - milestone / issue / progress / recovery
+  - external issue / milestone / issue / progress / recovery
    - 主动寻找没有 worker 在推进的点位与已完成但未收口的 worktree
 13. 主管的核心职责不是“分流插话”，而是对任意 signal 决定 restart point：
    - `pre-brainstorm`
@@ -107,11 +110,13 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
   - `retire-only / retire-now` -> cleanup / retirement worker
   - `continue-dev` -> verification / dev continuation worker
   - 只有在关键事实缺失、上游依赖不明或 blocker 未冻结时，才允许继续 manager-only patrol
-25. standing-source completeness 至少覆盖 interruption、milestone、progress 与 pre-brainstorm：
+25. standing-source completeness 至少覆盖 interruption、external issue、milestone、progress 与 pre-brainstorm：
+  - external issue 要区分 raw source intake 与已消费后的 external drift / closeout drift，不得把所有 open issue 都当 fresh intake
   - interruption 要检查是否已分类、吸收、写回
   - progress 要优先读取，确认是否已有主动记录
   - pre-brainstorm 要检查 candidate / milestone 同步、`next_action` 与 `revisit_trigger`
   - 发现 drift 时默认补账、核实、重排与委派，而不是把项目级不确定性默认退回给人类插话者
+  - `task-source-scan` 更适合在 startup patrol、closeout 后 truth 发生变化、或 worker capacity 有空位时运行；不要在所有 worker lane 都忙且没有新 truth 时机械重扫
 26. 当主管已经生成更新的一轮 manager continuity 和 worker prompt set 时，runtime 必须以后者为最新 truth：
   - latest continuity generated
   - latest prompt set generated

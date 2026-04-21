@@ -312,6 +312,56 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
+1. `I-20260407-1042-A`
+- title: GitHub-first external issue source governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-github-first-external-issue-source-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
+  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-github-first-external-issue-source-governance.md`
+  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-decision.md`
+  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
+  - `bash docs/system/workspace/scripts/tests/test-human-chat-routing`
+  - `./bin/governance-check`
+- next_action: Keep this owner bounded to GitHub-first source contract truth, finish verification in the current closeout lane, and open provider API automation only as a follow-on implementation owner after canonical `develop` absorbs the governance package.
+
+1. `I-20260420-1130-A`
+- title: Manager task-source scan idle/replan boundary governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-manager-task-source-scan-idle-replan-boundary-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-manager-task-source-scan-idle-replan-boundary-governance.md`
+  - `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-includes-milestone-patrol-seed`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-suppresses-broad-patrol-while-worker-active`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-task-source-scan-ignores-pre-stop-continuity-anchor`
+  - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan-provider-hints`
+  - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan-python-compat`
+  - `bash docs/system/workspace/scripts/tests/test-start-lead-agent-verification-metadata-contract`
+  - `./bin/governance-check`
+- next_action: Keep the patrol seam narrow, verify the idle/replan scan contract against the focused runtime tests, and route any future GitHub or Gitee provider expansion into a separate external-source implementation owner.
+
 ### candidate_issues
 
 1. `C-20260417-0445-A`
@@ -565,13 +615,13 @@ routing_policy:
 1. `C-20260407-1042-A`
 - title: External issue identity, mapping, and publication model after source-family contraction
 - milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+- phase_state: `todo_ibm`
 - priority: P1
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/candidates.md`
-- next_action: Finish the boundary freeze for `source issue` vs canonical internal owner vs optional `publication target`, lock explicit keep/split/reject plus formalization invariants/decision tables for legacy `20260403-1000` conclusions, freeze the GitHub-first minimum field and canonical dedupe/consumption contract, then decide whether the bounded GitHub-first policy/schema owner can now be materialized while storage/API automation remains deferred.
-- revisit_trigger: Revisit when source-loop intake, publication policy, and writeback limits are explicit enough to open a bounded GitHub-first policy/schema owner, or if storage design starts pulling GitHub back toward canonical owner truth.
+- next_action: Candidate mirror only. `I-20260407-1042-A` is now the canonical owner for GitHub-first external issue source governance; followthrough should materialize source scan, canonical metadata, and source closeout into context-source truth before widening into runtime create/sync automation.
+- revisit_trigger: Re-open only if implementation discovery proves the bounded owner still lacks a required internal-only AI field or must introduce a dedicated mapping artifact before document-driven rollout can work.
 
 1. `C-20260407-0817-A`
 - title: Source inbox, routing absorption boundary, and manager/worker audit contract
@@ -583,6 +633,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/candidates.md`
 - next_action: Finish the current-state durable-source inventory, lock the default durable families to `human interruption` and `external issue`, and use `human interruption` as the first proving lane while explicitly separating shared `consumed -> pre-brainstorm` semantics from family-local runtime/control closure before promoting any generic source schema or source-absorption gate.
 - revisit_trigger: Revisit when the first `human interruption` slice has made a reusable shared contract or removable-artifact invariant concrete enough to justify schema promotion or gate placement, or when another dogfooding incident proves the current visibility gap cannot be solved by strengthening existing pre-brainstorm/milestone/routing truth alone.
+
+1. `C-20260420-1130-A`
+- title: Manager task-source scan idle/replan boundary governance
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md`
+- next_action: Candidate mirror only. `I-20260420-1130-A` is now the canonical owner for manager task-source scan idle/replan boundary governance; route runtime, tests, and verification from the issue/progress pair.
+- revisit_trigger: Re-open only if canonical replay proves the idle/replan patrol seam should merge back into another bounded owner or needs to split further before provider automation begins.
 
 2. `C-20260407-1036-A`
 - title: Human interruption runtime contract after source-family contraction

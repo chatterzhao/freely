@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d)"
+PROJECT="$TMP_DIR/project"
+
+cleanup() {
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+mkdir -p "$PROJECT/docs"
+git init -q "$PROJECT"
+git -C "$PROJECT" remote add origin git@gitee-zhaoquan:zhaoquan/freely.git
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# test
+EOF
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# laws
+EOF
+
+OUTPUT="$TMP_DIR/scan.txt"
+HOME="$TMP_DIR/home" \
+XDG_CONFIG_HOME="$TMP_DIR/xdg-config" \
+env -u GITEE_ACCESS_TOKEN -u GITEE_TOKEN -u FREELY_ENV_FILE \
+  bash "$ROOT_DIR/bin/freely" task-source-scan --project "$PROJECT" >"$OUTPUT"
+
+grep -q 'provider_hint_github: GitHub external issue scan unavailable' "$OUTPUT"
+grep -q 'gh auth login' "$OUTPUT"
+grep -q 'provider_hint_gitee: Gitee external issue scan' "$OUTPUT"
+grep -q 'https://gitee.com/profile/personal_access_tokens' "$OUTPUT"
+grep -q 'credentials.env' "$OUTPUT"
+grep -q '\.freely/.env' "$OUTPUT"
+grep -q 'GITEE_ACCESS_TOKEN=<token>' "$OUTPUT"
+
+echo "[PASS] freely task-source-scan prints provider-specific setup hints without blocking scan"

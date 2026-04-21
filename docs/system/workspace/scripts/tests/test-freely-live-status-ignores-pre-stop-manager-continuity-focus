@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-pre-stop-focus.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/.freely/run" "$REPO/docs"
+
+git init -q "$REPO"
+git -C "$REPO" config user.email "test@example.com"
+git -C "$REPO" config user.name "Test User"
+cat >"$REPO/README.md" <<'EOF'
+# repo
+EOF
+git -C "$REPO" add README.md
+git -C "$REPO" commit -q -m "init"
+git -C "$REPO" branch -m develop
+
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$REPO/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="ai_launch_in_flight"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-20T09:37:47Z"
+EOF
+
+PROMPT="$REPO/.freely/run/prompt-20260420-093740.txt"
+cat >"$PROMPT" <<'EOF'
+prompt body
+EOF
+
+CONTINUITY="$REPO/.freely/run/manager-continuity-20260420-092518.md"
+cat >"$CONTINUITY" <<'EOF'
+# Manager Continuity
+- route_kind: `pre_brainstorm`
+EOF
+
+cat >"$REPO/.freely/run/manager-operator-stop-boundary.env" <<'EOF'
+OPERATOR_STOP_BOUNDARY_EPOCH="9999999999"
+OPERATOR_STOP_BOUNDARY_RECORDED_AT="2286-11-20T17:46:39Z"
+EOF
+
+LIVE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'latest_manager_continuity_generated: unavailable'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'latest_manager_continuity_consumed: unavailable'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q -- '- manager_continuity_file: none'
+
+echo "[PASS] live-status omits pre-stop manager continuity from current focus and generated continuity fields"

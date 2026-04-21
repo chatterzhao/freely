@@ -54,6 +54,8 @@ printf '%s\n' "$prompt" | grep -q '先更新当前阶段对应的 continuity art
 printf '%s\n' "$prompt" | grep -q '使用 subagent 提高效率'
 printf '%s\n' "$prompt" | grep -q 'freely live-status --project'
 printf '%s\n' "$prompt" | grep -q 'fleet-status'
+printf '%s\n' "$prompt" | grep -q 'freely task-source-scan --project'
+printf '%s\n' "$prompt" | grep -q 'standing-source'
 printf '%s\n' "$prompt" | grep -q '需求池至少包括'
 printf '%s\n' "$prompt" | grep -q '当前先看哪个池'
 printf '%s\n' "$prompt" | grep -q 'pre-brainstorm'
@@ -90,7 +92,8 @@ case "$current_branch" in
     printf '%s\n' "$prompt" | grep -q '默认不要在首跳结束时只输出'
     printf '%s\n' "$prompt" | grep -q '必须在当前会话内继续执行第二跳'
     printf '%s\n' "$prompt" | grep -q '保持 worker reentry scope'
-    printf '%s\n' "$prompt" | grep -q '不要写 `.freely/run/manager-continuity-\*.md`'
+    printf '%s\n' "$prompt" | grep -q '不要写'
+    printf '%s\n' "$prompt" | grep -q '.freely/run/manager-continuity-'
     if printf '%s\n' "$prompt" | grep -q '至少创建一个 manager continuity 文件'; then
       echo "[FAIL] worker prompt should not require manager continuity generation" >&2
       exit 1

@@ -19,14 +19,16 @@
 ## 职责
 
 1. 在进入领域工作流前先执行 `skill:constitution-guard` 与 `skill:laws-enforcer`。
+   - `skill:<name>` 默认表示对应的 `workspace/skills/<name>/SKILL.md` 文档锚点，不假设当前外部 AI CLI 具备原生 skill executor。
 2. 读取当前输入上下文，识别来源类型：
    - chat / session evidence
    - project intent
    - review / test
-   - github-issue
+   - external issue
    - milestone
    - issue / progress / recovery
 3. 将来源判定、需求池扫描、优先级判断与下一跳提示词组装委托给 `skill:context-source-skill`，而不是在本文件中内嵌所有路由细节。
+   - 若当前工具没有原生 skill tool，就直接读取 `workspace/skills/context-source-skill/SKILL.md` 并按其约束执行。
 4. 读取 `workspace/tools.md`，理解当前可用工具、优先级和适配阶段。
 5. 基于 `context-source-skill` 的输出，自主决定下一跳是：
    - `skill:doc-pre-brainstorm-execution`
@@ -54,6 +56,7 @@
 1. 启动器把项目路径、宪法路径、意图路径、AI 规格作为最小输入面交给外部 AI CLI 工具。
 2. `lead-agent` 接管后，先做治理门禁预检。
 3. 将当前 `input_context`、`docs/milestones.md` 与 `workspace/tools.md` 作为首跳判定输入交给 `context-source-skill`。
+   - 对 `docs/milestones.md` 这类大型文档，先用已有 patrol seed、标题定位或分段读取缩小范围，不默认整文件硬读。
 4. 接收 `context-source-skill` 的输出：
    - 来源判定
    - usable issue 结论

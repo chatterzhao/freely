@@ -35,6 +35,16 @@
   - define the minimum consumption / dedupe evidence needed to prevent already-consumed external source issues from being re-scanned as fresh intake
   - define which canonical repo-native linkage is the decisive dedupe authority versus optional external mirrors
   - prove the minimum field contract is sufficient for GitHub-first policy and dedupe decisions without freezing a mapping file format
+  - freeze the raw external source scan-eligibility contract so scan covers only open and unconsumed source issues rather than all open issues
+  - freeze the suspicion rule that AI-written external labels/comments are hints and canonical repo-native linkage remains decisive
+  - freeze the minimum canonical source metadata contract, including bounded `source_consumption_state` and `publication_mode`
+  - define the full source lifecycle after consumption into `pre-brainstorm`, including:
+    - source stays open while pre-research is in flight
+    - discard closes a user-created source issue with a reasoned comment
+    - accept binds to canonical milestone-owned followthrough and then closes the original source issue once forward linkage is durable
+  - define when a separate public milestone tracking issue should be created, and when `source_only` or `none` remains correct
+  - define the default external writeback surface as issue comments rather than GitHub Discussions
+  - produce a testable scenario matrix covering raw-source intake, discard closeout, accept-and-bind, AI-internal-only, and stale-external-mirror replay
 - promotion_gate:
   - prove the result stays compatible with the umbrella source-governance contract and does not reopen a generic repo-wide source-ledger rollout by stealth
   - prove the result does not collapse `human interruption` back into generic intake, and does not collapse AI-discovered problems into “always publish externally”
@@ -42,9 +52,9 @@
   - prove the family does not assume GitHub create/sync automation already exists in runtime or manager paths
   - prove any recommended status vocabulary is publication-facing only and not a second `phase_state`
   - prove the first slice can remain storage-agnostic if mapping invariants are stable, instead of forcing premature `.freely/*` local-state design
+  - prove source closeout semantics do not leave user-created source issues indefinitely open after discard or successful milestone binding
+  - prove separate public milestone creation is policy-gated and not the default for every accepted source issue
 - open_questions:
-  - under what explicit policy may `source issue` and `publication target` be the same external object?
-  - what minimum public-status vocabulary is stable enough to expose without leaking internal owner semantics?
   - what durable evidence should the owner loop record when an AI-discovered problem is intentionally kept internal-only?
   - is a canonical mapping artifact required in the first slice, or can storage stay deferred until a later GitHub-first policy/schema owner?
 - acceptance_reviews:
@@ -56,22 +66,29 @@
   - the highest-risk failure mode is lifecycle collapse, where source, owner, and publication silently become the same object
   - freezing boundary semantics before storage or automation choices is the lowest-risk path to a governance-compatible first slice
 - priority: `P1`
-- status: `needs_research`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_id: `I-20260407-1042-A`
+- recommendation: `materialized as a bounded GitHub-first owner because source scan, canonical metadata, and source closeout now have a stable enough contract to guide `context-source-skill` and later runtime implementation without widening into generic multi-platform sync.`
+- dependencies:
+  - `source-routing-and-derived-worktree-governance`
+  - `milestone-planning-and-state-maintenance`
+  - `three-loop-lifecycle-single-source-governance-followthrough`
+- landing_zones:
+  - `docs/system/workspace/skills/context-source-skill/SKILL.md`
+  - `docs/system/workspace/skills/context-source-skill/references/source-classification.md`
+  - `docs/system/workspace/agents/lead-agent.md`
+  - `docs/system/workspace/scripts/start-lead-agent.sh`
+  - `docs/system/workspace/scripts/tests/`
+  - `docs/system/workspace/scripts/runtime/freely`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 - next_action:
-  - finish the GitHub-first policy review for `source issue` vs optional `publication target` vs internal owner
-  - rewrite the old `20260403-1000` conclusions into an explicit keep/split/reject table, instead of silently inheriting its bundled assumptions
-  - freeze a formalization decision table for user-created versus AI-discovered external-issue entry before choosing storage or automation
-  - freeze the invariants that separate external-source formalization, internal-only owner evidence, and publication choice
-  - define the minimum dedupe/consumption evidence contract that keeps already-consumed external issues from re-entering intake
-  - freeze the GitHub-first minimum field contract for `source_ref`, canonical owner linkage, and optional `publication_ref`
-  - decide whether the bounded GitHub-first policy/schema owner can now be materialized with publication policy still explicitly narrow
-  - keep storage/API automation deferred unless and until that bounded owner is promoted
+  - candidate mirror only. `I-20260407-1042-A` is now the canonical owner for GitHub-first external issue source scan, canonical metadata, source closeout, and policy-gated public milestone creation governance.
+  - first implementation should update `context-source-skill` and adjacent prompt truth before widening into runtime create/sync automation.
 - revisit_trigger:
-  - revisit when publication policy, AI-discovered formalization rules, GitHub mapping semantics, or public-status vocabulary are stable enough to materialize a bounded GitHub-first policy/schema owner
+  - revisit when implementation discovery shows the bounded GitHub-first owner still lacks a required internal-only AI field or truly needs a dedicated mapping artifact before document-driven rollout can work

@@ -61,6 +61,8 @@ Freely 处于研究优先的整合阶段。
    - 先确认 `git config --get core.hooksPath` 返回 `.githooks`。仓库中“存在 hook 脚本”不代表 Git 已启用它们；只有 `core.hooksPath=.githooks` 时，根目录 `.githooks/` 包装层才会实际转发到 `docs/system/workspace/hooks/*.sh` 执行门禁。
    - `test-pre-merge-*` 是一次性本地测试批次：必须从当前 `develop` 新建，只允许 merge 装配验证，不允许普通写入/提交/push，不允许承载 owner / milestone / continuation 真相，测试结束后立即删除。
    - 跑测试先判 lane：dedicated `feature/*`、`feature/premerge-*`、`release/*`、`hotfix/*` writable worktree 跑 `feature-local`；`test-pre-merge-*` 跑 `premerge-integration`；受保护分支 merge 后 followthrough 跑 `post-merge-followthrough`。不要把 `develop` 当成主线前预测试环境。
+   - 测 worker/feature lane 示例：`/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile/bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile`
+   - 测未 merge 的主管态示例：`/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile/bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 2. **大重构先做 fleet sequencing audit**：若当前任务会同时改多层真源、跨多个现有 worktree / issue，或可能重排架构主干，先运行 `git worktree list --porcelain`、`./bin/wt-fleet-status`、`./bin/freely live-status --project <project-root>`、`./bin/freely fleet-status --project <project-root>`，并把结果与 `docs/milestones.md` / 相关 `progress` 对齐。优先收束 `dirty` 或仍在 `desired=running` 的 worktree，识别必须先合并的上游治理树，再决定是否开大重构 lane；不要在 fleet 状态模糊时直接开始深层重构。
 3. **首跳先判 loop，不要先判 cleanup**：
    - 如果是 Freely 自举中暴露的新共性问题，先判它是否应成为 Freely 能力发现；若边界未稳定，先进入 `docs/pre-brainstorms/`

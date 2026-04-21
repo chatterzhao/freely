@@ -405,6 +405,326 @@ If that linkage exists in canonical owner truth, future scans should treat the s
 - this contract does not yet require a dedicated mapping file, queue file, or API cache shape
 - storage/automation choices stay downstream of the policy invariant
 
+## Raw External Source Scan Contract Draft
+
+The first GitHub-first scan contract should stay narrow and auditable. It should not attempt to ingest every open issue.
+
+### Scan eligibility
+
+A raw GitHub issue is scan-eligible only when all of the following are true:
+
+- the issue is open
+- the issue is not already bound by canonical repo-native linkage to a consuming owner
+- the issue does not already advertise a canonical milestone/publication handoff that Freely can verify
+
+The practical intent is:
+
+- scan raw source issues that are still open and still appear unconsumed
+- do not rescan already-consumed source issues just because external labels/comments are stale
+- do not treat all open GitHub issues as fresh intake forever
+
+### Decisive authority versus hints
+
+For scan eligibility, these signals should be interpreted in this order:
+
+1. canonical repo-native linkage
+- decisive authority
+- if a canonical owner already records the source issue, scanning must treat the source as consumed
+
+2. verifiable external linkage to a canonical milestone/publication target
+- supportive evidence only
+- useful when canonical linkage is being audited or manually repaired
+
+3. raw labels or human-authored status text on the source issue
+- hint only
+- must not override canonical truth
+
+### Suspicion rule
+
+Freely should distrust AI-written external status mirrors enough to re-check canonical owner truth before acting.
+
+That means:
+
+- a missing external comment/label does not prove the source is fresh
+- an old “triaged” label does not prove the source is still active
+- a stale “linked” comment should be revalidated against canonical owner artifacts before skipping or re-consuming the issue
+
+## Canonical Source Metadata Draft
+
+The source family now needs a minimum canonical metadata contract that can survive scan, pre-research, discard, accept, and external publication decisions without forcing a storage file format.
+
+### Minimum canonical fields
+
+These fields should be stable enough to require on the canonical owner side once a source issue is consumed:
+
+- `source_family`
+  - `external_issue`
+- `source_kind`
+  - `user_external_issue`
+  - `ai_formalized_external_issue`
+- `source_platform`
+  - `github` in the first slice
+- `source_ref`
+  - GitHub-first locator containing at least `source_repo`, `source_number`, and `source_url`
+- `source_observed_state`
+  - the last observed source-side state relevant to intake, such as `open`
+- `source_consumption_state`
+  - bounded source-family consumption state, distinct from owner `phase_state`
+- `owner_kind`
+  - initially `pre_brainstorm`
+- `owner_path`
+  - canonical repo path to the consuming owner artifact
+- `publication_mode`
+  - `none`
+  - `source_only`
+  - `separate_tracking_issue`
+
+### Optional but explicitly non-required in the first slice
+
+- label snapshots
+- title/body snapshots
+- author snapshots
+- API cache timestamps beyond what a later implementation owner may need
+
+### Why `source_consumption_state` is separate
+
+The source family needs a small state word for answering “has this source been consumed and what happened to it?” without overloading:
+
+- owner `phase_state`
+- public-status labels
+- publication policy
+
+The bounded state set should stay minimal:
+
+- `fresh`
+- `consumed_pre_brainstorm`
+- `discarded`
+- `accepted_bound`
+
+Interpretation:
+
+- `fresh` means scan-eligible if no canonical linkage disproves freshness
+- `consumed_pre_brainstorm` means the source has entered pre-research and should not be re-consumed
+- `discarded` means pre-research decided not to continue and source closeout should be auditable
+- `accepted_bound` means the source has been accepted into a canonical owner/publication handoff and should no longer behave like raw intake
+
+## Source Lifecycle Decision Contract Draft
+
+The family now needs an explicit answer for what happens to the source issue after pre-research.
+
+### 1. Consume into pre-brainstorm
+
+When a raw external issue is first accepted for pre-research:
+
+- create or reuse the canonical `pre-brainstorm` owner
+- record canonical source metadata on that owner
+- move `source_consumption_state` to `consumed_pre_brainstorm`
+- optional external writeback may say the issue has entered pre-research
+
+At this point the source issue remains open, because the triage outcome is not known yet.
+
+### 2. Pre-research discard
+
+When pre-research concludes the problem should not continue:
+
+- update canonical owner truth with discard reasoning
+- move `source_consumption_state` to `discarded`
+- if the source was a user-created GitHub issue, close that source issue with a reasoned closeout comment
+
+Hard rule:
+
+- discard of a user-created source issue should close the source issue rather than leaving it indefinitely “triaged”
+
+### 3. Pre-research accept into milestone-owned followthrough
+
+When pre-research accepts the problem and a canonical milestone-owned owner is created:
+
+- keep the local milestone/issue docs as canonical truth
+- associate the source issue with that canonical owner
+- choose `publication_mode`
+- if publication policy says the milestone should exist on GitHub/Gitee, create or bind the publication target
+- move `source_consumption_state` to `accepted_bound`
+
+For user-created source issues:
+
+- once the canonical owner/publication target linkage is durable, close the original source issue
+- the closeout comment should link to the canonical owner and, when present, the public milestone tracking issue
+
+Hard rule:
+
+- the original source issue is intake, not the long-running execution ledger
+
+### 4. AI-formalized external issue
+
+When an AI-discovered problem is intentionally formalized into external-source lineage:
+
+- canonical owner truth must record `source_kind = ai_formalized_external_issue`
+- a synthetic or newly created external source/publication target must not be used as a substitute for internal owner truth
+- if publication is off, the canonical owner may still carry external-source lineage with `publication_mode = none`
+
+## Publication Target Creation Draft
+
+The first slice should freeze when public milestone/tracking issue creation is allowed.
+
+### When to create a public milestone tracking issue
+
+Creation is justified only when all of these are true:
+
+- pre-research has accepted the problem into milestone-owned followthrough
+- publication policy says this work should be externally visible
+- the source issue itself is not a good long-running public progress surface
+
+Typical reasons include:
+
+- the source issue should remain the original report rather than a changing implementation ledger
+- the external audience needs a stable progress thread for milestone-level followthrough
+- Freely needs to aggregate or summarize progress more cleanly than the source issue can support
+
+### Default publication posture
+
+The default should remain:
+
+- no public milestone issue before pre-research acceptance
+- no public milestone issue when publication policy is `none`
+- no separate public milestone issue when `source_only` is sufficient
+
+### Local-to-public association contract
+
+Once a public milestone tracking issue exists, canonical owner truth should be able to answer:
+
+- which local milestone/issue owns the work
+- which external object is the original source issue, if any
+- which external object is the public milestone tracking issue, if any
+
+The first slice does not need to freeze a mapping file, but it does need to freeze the association fields conceptually.
+
+### Reuse policy: when `source issue` may equal `publication target`
+
+The GitHub-first rule should be:
+
+- allow equality only when `publication_mode = source_only`
+- require an explicit judgment that the source issue is suitable as the public progress surface
+
+Suitability means all of the following:
+
+- the source issue can carry brief progress comments without harming the original report
+- there is only one canonical owner thread being presented externally
+- no cleaner separate narrative is needed for milestone-level followthrough
+
+If any of those fail:
+
+- keep the source issue as intake lineage only
+- choose `publication_mode = separate_tracking_issue` if public tracking is still required
+
+## Minimum Public-Status Vocabulary Decision
+
+The first bounded vocabulary should stay at four states:
+
+- `triaged`
+- `in-progress`
+- `blocked`
+- `completed`
+
+Why this is sufficient:
+
+- `triaged` covers consumed/accepted public acknowledgment without leaking owner internals
+- `in-progress` and `blocked` cover the only two externally meaningful execution distinctions needed early
+- `completed` covers externally visible closeout
+
+Why nothing else should be added yet:
+
+- anything finer starts shadowing internal `phase_state`
+- early automation does not need a richer publication vocabulary to be correct
+- a larger set would make stale-mirror handling harder, not easier
+
+## Source Closeout And Comment Placement Draft
+
+### Comment versus discussion
+
+The default external writeback surface should be issue comments, not GitHub Discussions.
+
+Reason:
+
+- the source issue itself is the durable intake object
+- comments preserve auditability on that exact object
+- discussions are too detached to serve as the default linkage surface for source consumption or closeout
+
+Therefore:
+
+- pre-research consumption notice should go to an issue comment if any writeback occurs
+- discard rationale should go to an issue comment before closing
+- accept-and-bind closeout should go to an issue comment that links forward to the canonical owner and optional public milestone issue
+
+### What belongs in the comment
+
+The comment should stay summary-level:
+
+- acknowledgement that Freely consumed the source
+- discard reason or acceptance/binding result
+- link to the canonical owner artifact and optional public milestone tracking issue
+
+The full pre-research document should remain canonical repo-native truth. The external comment links to it; it does not replace it.
+
+## Canonical Metadata Placement Decision
+
+Canonical source metadata should have one authoritative write location and one bounded mirror.
+
+### Authoritative location
+
+The consuming `pre-brainstorm` is the first authoritative owner of source metadata:
+
+- it records source family, source locator, source consumption state, and publication mode
+- it records the first durable link that proves the raw source issue has been consumed
+
+### Acceptance mirror after milestone binding
+
+After pre-research accepts the problem into milestone-owned followthrough:
+
+- mirror a reduced linkage into the milestone/issue owner
+- keep the authoritative intake record on the original `pre-brainstorm`
+
+The reduced mirror should include only what later replay needs:
+
+- source family
+- source locator
+- source/publication association
+- forward link to the original pre-research owner
+
+This gives later replay two safe properties:
+
+- scan and closeout logic can still verify the accepted source from the active owner line
+- the pre-research artifact remains the first durable intake truth rather than being rewritten away
+
+## Testable Contract Draft
+
+The candidate is only promotion-ready if later implementation can prove these scenarios without appealing to hidden operator judgment:
+
+1. raw user-created GitHub issue
+- scan sees open/unconsumed source
+- source is consumed into `pre-brainstorm`
+- canonical metadata records source linkage
+- source is not re-consumed on the next scan
+
+2. discarded user-created GitHub issue
+- pre-research records discard reasoning
+- source issue is closed with a reasoned comment
+- later scan no longer treats it as fresh intake
+
+3. accepted user-created GitHub issue with separate publication target
+- pre-research accepts the problem
+- milestone/publication target is bound
+- original source issue is closed with forward links
+- canonical owner remains the decisive truth
+
+4. AI-discovered internal-only problem
+- problem stays outside external publication
+- canonical owner records internal-only reasoning
+- no fake external-source placeholder is invented
+
+5. stale external mirror
+- an outdated label/comment on GitHub does not override canonical repo-native linkage
+- scan still avoids re-consuming the source when canonical linkage exists
+
 ### Source issue writeback boundaries
 
 Safe candidates for source-issue writeback:
@@ -445,10 +765,8 @@ Therefore this line should freeze these boundaries:
 
 ## Concrete Questions To Settle Before Promotion
 
-1. Under what explicit policy may `source issue` and `publication target` be the same GitHub object?
-2. Which public-status vocabulary is small enough to stay stable while still useful?
-3. Which internal transitions deserve publication, and which should remain invisible externally?
-4. Does this family need a durable local mapping artifact at all before implementation, or is the first promotion target still pure policy/schema work?
+1. Which internal transitions deserve publication, and which should remain invisible externally?
+2. Does this family need a durable local mapping artifact at all before implementation, or is the first promotion target still pure policy/schema work?
 
 ## Initial Conclusion
 
@@ -490,6 +808,7 @@ The work completed so far is now strong enough to describe the next bounded owne
 
 ### Remaining blockers before promotion
 
-- decide the explicit policy for reusing `source issue` as `publication target`
-- decide the smallest stable public-status vocabulary, if any, that the bounded owner must freeze now rather than defer
+The existential blockers are now mostly closed. What remains is implementation slicing rather than family shape:
+
 - decide whether internal-only AI formalization needs any additional canonical owner field beyond the already-frozen reasoning requirement
+- decide whether a first implementation can stay document-driven or needs a dedicated local mapping artifact immediately

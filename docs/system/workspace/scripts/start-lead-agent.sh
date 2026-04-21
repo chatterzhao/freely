@@ -181,6 +181,18 @@ additional_requirements="$(cat <<'EOF'
 - 若 `MANAGER_MODE=false` 且当前分支是 `feature/*`，当前会话保持 worker scope：不要升级成项目级监督者；若发现需要主管裁决的 fleet / merge / cleanup 问题，只记录 evidence 与 reroute 建议。
 EOF
 )"
+startup_bounded_patrol_rule=""
+initial_read_targets="$(cat <<EOF
+- 项目治理入口：$project/AGENTS.md
+- 项目意图：$intent
+- 宪法：$constitution
+- 里程碑扫描入口：$project/docs/milestones.md
+- workspace 根：$workspace_root
+- 工具清单：workspace/tools.md
+- 技能索引：workspace/skills/README.md
+- 首跳代理：workspace/agents/lead-agent.md
+EOF
+)"
 
 if is_manager_branch "$current_branch"; then
   manager_mode="true"
@@ -219,6 +231,11 @@ EOF
    - \`Minimum-Evidence-Level:\`
    - \`Target-Environment:\`
    - \`Closeout-Gate:\`
+   - \`Closeout-Gate-Command:\`
+   - \`Closeout-Target-Lane:\`
+   - \`Closeout-Promotion-Gate:\`
+   - \`Closeout-Requires-Adequacy:\`
+   - \`Closeout-Review-Artifact-Policy:\`
    其中 \`Required-Test-Lanes\` 与 \`Required-Acceptance-Item-Ids\` 必须写成可枚举列表；不得只写“see issue”或“follow pre-tests”.
    runtime 会把这组字段结构化写入 delegated intake 与 worker runtime state，所以不要把它们写成只适合人眼理解的散文。
 26. 若本轮结论是 manager-only cleanup queue、暂不发 worker，也仍然必须写 manager continuity，至少包含：fleet inventory、route_kind / restart_point / ownership / next_action、cleanup queue 或 frozen queue、以及 next supervision priority。
@@ -238,19 +255,65 @@ EOF
 - 若活跃 owner 的 issue / progress / pre-tests 只存在于某个 dirty feature worktree，不要在 root `develop` 里直接读取同名相对路径并把 `No such file or directory` 当成 owner 缺失；应先锚定该 feature worktree，再从那个工位读取 owner 真相并生成 handoff。
 EOF
 )"
+  startup_bounded_patrol_rule="$(cat <<'EOF'
+启动首轮有界巡检契约：
+- 若当前没有 launchable manager continuity、也没有 active worker，先把这轮视为 `fresh_startup_patrol`，不要直接展开全量治理阅读。
+- `fresh_startup_patrol` 的首批必读证据只允许包含：
+  - `PROJECT_ROOT/AGENTS.md`
+  - `machine_readable_scan_json`
+  - `./bin/freely live-status --project <project>`
+  - `workspace/agents/lead-agent.md`
+  - `workspace/skills/context-source-skill/SKILL.md`
+- 在写出 primary manager continuity 前，不要整文件读取 `docs/milestones.md`，不要并行展开多个 skill，也不要为每个 surface 预读 issue / progress / pre-brainstorm 原文。
+- 首轮先用 `machine_readable_scan_json` 的 active counts 和 summary 选出至多一个 highest-leverage source；只对该 source 做定点核对，再写 primary manager continuity。
+- primary manager continuity 必须先回答四件事：`route_kind`、`restart_point`、`ownership`、`next_action`。如果证据仍不足，再把“需要补读的具体文档路径”写进 continuity / queue，而不是在首轮继续扩读。
+- 若 scan json 已经证明 backlog 非空，但首轮没有形成 continuity 或 worker prompt，这一轮应视为失败；不要把“继续读更多文档”当作默认下一步。
+EOF
+)"
+  initial_read_targets="$(cat <<EOF
+- 项目治理入口：$project/AGENTS.md
+- runtime 当前态入口：./bin/freely live-status --project $project
+- 结构化巡检入口：machine_readable_scan_json（若 prompt 尾部已给出路径，先消费该 json）
+- workspace 根：$workspace_root
+- 首跳代理：workspace/agents/lead-agent.md
+- 巡检技能：workspace/skills/context-source-skill/SKILL.md
+
+按需再读，不要在首轮默认展开：
+- 项目意图：$intent
+- 宪法：$constitution
+- 里程碑扫描入口：$project/docs/milestones.md
+- 工具清单：workspace/tools.md
+- 技能索引：workspace/skills/README.md
+EOF
+)"
 fi
+
+escape_prompt_backticks() {
+  local value="${1-}"
+  printf '%s' "${value//\`/\\\`}"
+}
+
+execution_rule_15_escaped="$(escape_prompt_backticks "$execution_rule_15")"
+execution_rule_16_escaped="$(escape_prompt_backticks "$execution_rule_16")"
+execution_rule_17_escaped="$(escape_prompt_backticks "$execution_rule_17")"
+role_scope_rule_5a_escaped="$(escape_prompt_backticks "$role_scope_rule_5a")"
+role_scope_rule_5b_escaped="$(escape_prompt_backticks "$role_scope_rule_5b")"
+manager_artifact_rule_escaped="$(escape_prompt_backticks "$manager_artifact_rule")"
+additional_requirements_escaped="$(escape_prompt_backticks "$additional_requirements")"
+startup_bounded_patrol_rule_escaped="$(escape_prompt_backticks "$startup_bounded_patrol_rule")"
+initial_read_targets_escaped="$(escape_prompt_backticks "$initial_read_targets")"
 
 cat <<EOF
 你现在进入 Freely 的首跳闭环。
 
-先读取以下文档：
-- 项目治理入口：$project/AGENTS.md
-- 项目意图：$intent
-- 宪法：$constitution
-- 里程碑扫描入口：$project/docs/milestones.md
-- workspace 根：$workspace_root
-- 工具清单：workspace/tools.md
-- 首跳代理：workspace/agents/lead-agent.md
+读取约定：
+- skill:<name> 只是 workspace 技能文档的引用名，不是当前 CLI 一定存在的原生 tool。默认做法是打开对应的 workspace/skills/<name>/SKILL.md，而不是调用一个名为 skill 的工具。
+- workspace/skills/README.md 是技能索引；先从这里确认技能路径，再按需打开具体 SKILL.md。
+- 对大型文档不要整文件硬读。尤其 docs/milestones.md，先用 patrol seed、rg、标题定位或分段读取，按命中的 issue / progress / queue 做定点核对。
+- 若当前工具的读文件接口支持分页/范围参数，只在确实需要时填写有效值；不要传空字符串。
+
+先读取以下文档或索引：
+${initial_read_targets_escaped}
 
 运行上下文：
 - PROJECT_ROOT=$project
@@ -280,20 +343,32 @@ cat <<EOF
 
 执行要求：
 1. 先遵守 \`PROJECT_ROOT/AGENTS.md\`；它是当前目标项目的治理入口，不要在 workspace 能力文档里重复发明第二套项目规则。
-2. 再执行 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\`。
+2. 再完成 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\` 预检：默认做法是阅读 \`workspace/skills/constitution-guard/SKILL.md\` 与 \`workspace/skills/laws-enforcer/SKILL.md\` 并按其约束执行；不要假设存在可直接调用的 \`skill\` 工具。
 3. 进入 \`lead-agent\`，不要绕过首跳代理。
-4. 由 \`lead-agent\` 委托 \`skill:context-source-skill\` 进行需求池扫描、优先级判断与下一跳提示词组装。
+4. 先运行 \`./bin/freely task-source-scan --project $project --json\`，把最新 scan JSON 当作 standing-source 现场，再由 \`lead-agent\` 参照 \`workspace/skills/context-source-skill/SKILL.md\` 完成优先级判断与下一跳提示词组装；若当前工具没有原生 skill executor，就直接读取该技能文档并在当前会话按它执行。
+4A. 若 runtime 在 prompt 尾部附加了 \`machine_readable_scan_json\`，优先把它当作本轮 idle / replan patrol 的结构化入口；仅当该 json 缺失、过时或不足以裁决时，才回退到重新运行 \`task-source-scan\`。其中状态只算 routing hint，phase judgement 仍需回到 linked evidence 核对。
+${startup_bounded_patrol_rule_escaped}
 5. 若当前轮次承担项目级监督职责，先基于项目级工位视图做排班、冻结、集成与 cleanup 判断；不要直接把自己降级成单工位写代码代理。
-${role_scope_rule_5a}
-${role_scope_rule_5b}
+${role_scope_rule_5a_escaped}
+${role_scope_rule_5b_escaped}
 6. 在可并行的 doc-loop、verification、review、日志诊断或互不冲突的代码任务上，使用 subagent 提高效率。
+6A. \`task-source-scan\` 的推荐消费方式：
+   - 默认技能：\`auto-loop-orchestrator\`
+   - 来源解释技能：\`context-source-skill\`
+   - 先看 JSON 里的 \`sources[]\`、\`restart_point\`、\`status_markers\`、\`next_action\`
+   - 不要把 scan 当成最终裁决；它是 patrol 输入，不替代 issue/progress/milestone 真相
+6B. 不要在每轮都机械重跑 scan。优先在这些时机运行：
+   - 启动后的第一轮 patrol
+   - 某条 lane 刚完成 verification / closeout 并改写了 canonical truth 之后
+   - 当前 worker 未满载，或没有 worker 在跑时
+6C. 若所有 worker slot 都在推进未收口的 active lane，且没有新的 source/event truth，不要只为了“再扫一遍”打断当前主线、浪费 token。
 7. 你的需求池至少包括：
    - \`docs/milestones.md\`
    - progress / recovery
    - review / test / acceptance review
    - milestone planning / state maintenance
    - human chat / session evidence
-   - github issue
+   - external issue
    - \`docs/PROJECT_INTENT.md\`
 8. 你需要自主判断：
    - 当前先看哪个池
@@ -307,6 +382,7 @@ ${role_scope_rule_5b}
    - \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`
    - \`workspace/skills/doc-ibm-execution/SKILL.md\`
    - \`workspace/skills/dev-loop-execution/SKILL.md\`
+10A. 除非当前工具明确暴露了兼容的原生 skill tool，否则所有 \`skill:<name>\` 都按“去读对应 \`SKILL.md\` 并照此执行”解释。
 11. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`。
 12. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`workspace/skills/doc-ibm-execution/SKILL.md\`。
 13. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`workspace/skills/dev-loop-execution/SKILL.md\`。
@@ -315,11 +391,11 @@ ${role_scope_rule_5b}
 13C. 若当前目标分支不是直接从 \`develop\` 派生，而是依赖未合并父分支，不要直接给出“并入 develop”的结论；先按 \`child -> parent -> merge-prep-from-develop -> develop\` 的 stacked merge-chain 逐层检查。
 14. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
 15. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。
-${execution_rule_15}
-${execution_rule_16}
-${execution_rule_17}
-${manager_artifact_rule}
+${execution_rule_15_escaped}
+${execution_rule_16_escaped}
+${execution_rule_17_escaped}
+${manager_artifact_rule_escaped}
 
 补充要求：
-${additional_requirements}
+${additional_requirements_escaped}
 EOF

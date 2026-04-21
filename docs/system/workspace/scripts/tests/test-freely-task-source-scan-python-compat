@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+SCRIPT="$ROOT_DIR/docs/system/workspace/scripts/runtime/task-source-scan.py"
+
+grep -q '^from __future__ import annotations$' "$SCRIPT"
+python3 "$SCRIPT" --help >/dev/null
+
+echo "[PASS] task-source-scan keeps postponed annotations so python3 launch does not evaluate PEP 604 unions at import time"

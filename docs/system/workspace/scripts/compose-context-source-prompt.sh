@@ -52,7 +52,7 @@ cat <<EOF
 - 来源编排技能：workspace/skills/context-source-skill/SKILL.md
 
 你的任务：
-1. 读取 source input，理解当前 human chat 的真实意图。
+1. 读取 source input，先判断当前 durable source family 是 \`human interruption\`、\`external issue\`，还是仅临时 discovery 信号，再理解它的真实意图。
 2. 阅读 milestone，判断是否存在 usable issue。
 3. 阅读 workspace/tools.md，根据任务强度、工具优先级和当前可用性，自主选择下一跳工具。
 4. 你要输出：
@@ -69,4 +69,5 @@ cat <<EOF
    - 实现延续时阅读 workspace/skills/dev-loop-execution/SKILL.md
    - 若当前事项已收敛为 manager-owned 的 \`completion_verification\` / \`cleanup_governance\`，不要伪装成新的 doc-loop / dev-loop
 7. 不要把路由理解成脚本硬编码分支；应由你基于输入和文档理解后决定。
+8. 若 source input 来自 \`external issue\`，不要把外部 labels/comments 当成唯一真相；优先以 canonical repo-native linkage 判断它是否已被消费。
 EOF

@@ -26,6 +26,7 @@ source "$SESSION_EVIDENCE_RESOLVER_LIB"
 
 BUILD_ARTIFACT_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-build-artifact-exposure"
 SUPPLY_CHAIN_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-supply-chain-baseline"
+TASK_SOURCE_SCAN_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/runtime/task-source-scan.py"
 
 format_timestamp_local_for_display() {
   local value="${1:-}" epoch=""
@@ -517,6 +518,7 @@ Usage:
   freely restore-work [--project <abs_path>]
   freely baseline-status [--project <abs_path>]
   freely security-review-brief [--project <abs_path>]
+  freely task-source-scan [--project <abs_path>] [--json]
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]
   freely fleet-status [--project <abs_path>]
@@ -1669,6 +1671,11 @@ manager_bootstrap_handoff_file() {
   echo "$(run_dir_for_project "$project")/manager-bootstrap-handoff.txt"
 }
 
+manager_operator_stop_boundary_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/manager-operator-stop-boundary.env"
+}
+
 intake_dir_for_project() {
   local project="$1"
   echo "$(state_dir "$project")/intake"
@@ -1850,7 +1857,7 @@ manager_continuity_written_by_from_file() {
 
 find_latest_manager_continuity_file_for_project() {
   local project="$1"
-  latest_manager_continuity_file_for_project "$project"
+  latest_patrol_authoritative_manager_continuity_file_for_project "$project"
 }
 
 required_manager_continuity_file_from_prompt() {
@@ -4376,7 +4383,7 @@ count_intake_items_by_status() {
 
 count_active_intake_items() {
   local project="$1"
-  local intake_root meta_file count status
+  local intake_root meta_file count
   intake_root="$(intake_dir_for_project "$project")"
   [[ -d "$intake_root" ]] || {
     printf '0\n'
@@ -4385,13 +4392,48 @@ count_active_intake_items() {
   count=0
   while IFS= read -r meta_file; do
     [[ -f "$meta_file" ]] || continue
-    status="$(awk -F '"' '/^STATUS=/{print $2; exit}' "$meta_file")"
-    case "$status" in
-      absorbed|dropped) ;;
-      *) count=$((count + 1)) ;;
-    esac
+    if intake_item_counts_as_active_in_current_round "$project" "$meta_file"; then
+      count=$((count + 1))
+    fi
   done < <(find "$intake_root" -mindepth 2 -maxdepth 2 -type f -name meta.env | sort)
   printf '%s\n' "$count"
+}
+
+intake_item_counts_as_active_in_current_round() {
+  local project="$1" meta_file="$2"
+  local project_real status absorption_target delegated_worktree delegated_real
+  local created_at item_epoch continuity_floor_epoch
+
+  [[ -f "$meta_file" ]] || return 1
+  load_meta_env_snapshot "$meta_file"
+
+  status="$LOADED_META_STATUS"
+  case "$status" in
+    absorbed|dropped) return 1 ;;
+    delegated) ;;
+    *) return 0 ;;
+  esac
+
+  absorption_target="$LOADED_META_ABSORPTION_TARGET"
+  [[ "$absorption_target" == "handoff://continuation" ]] || return 0
+
+  continuity_floor_epoch="$(delegated_continuation_freshness_floor_epoch_for_project "$project")"
+  created_at="$LOADED_META_CREATED_AT"
+  item_epoch="$(timestamp_epoch_or_zero "$created_at")"
+  if [[ ! "$item_epoch" =~ ^[0-9]+$ || "$item_epoch" -le 0 ]]; then
+    item_epoch="$(file_mtime_epoch "$meta_file" 2>/dev/null || true)"
+  fi
+  [[ "$item_epoch" =~ ^[0-9]+$ ]] || item_epoch="0"
+  if (( continuity_floor_epoch > 0 && item_epoch > 0 && item_epoch <= continuity_floor_epoch )); then
+    return 1
+  fi
+
+  delegated_worktree="$LOADED_META_DELEGATED_WORKTREE"
+  [[ -n "$delegated_worktree" ]] || return 0
+  delegated_real="$(cd "$delegated_worktree" 2>/dev/null && pwd -P || true)"
+  [[ -n "$delegated_real" ]] || return 0
+  project_real="$(cd "$project" && pwd -P)"
+  [[ "$delegated_real" == "$project_real" ]]
 }
 
 has_local_delegated_worker_reactivation_target() {
@@ -4613,7 +4655,7 @@ intake_snapshot_for_project() {
 
 delegated_continuation_freshness_floor_epoch_for_project() {
   local project="$1" continuity_file continuity_epoch
-  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
     printf '0\n'
     return 0
@@ -6028,6 +6070,39 @@ UPDATED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 EOF
 }
 
+record_manager_operator_stop_boundary() {
+  local project="$1"
+  local boundary_file now_epoch
+  boundary_file="$(manager_operator_stop_boundary_file "$project")"
+  now_epoch="$(runtime_now_epoch 2>/dev/null || true)"
+  [[ "$now_epoch" =~ ^[0-9]+$ ]] || now_epoch="$(date +%s)"
+  cat >"$boundary_file" <<EOF
+OPERATOR_STOP_BOUNDARY_EPOCH="$now_epoch"
+OPERATOR_STOP_BOUNDARY_RECORDED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+EOF
+}
+
+clear_manager_operator_stop_boundary() {
+  local project="$1"
+  rm -f "$(manager_operator_stop_boundary_file "$project")"
+}
+
+manager_operator_stop_boundary_epoch_for_project() {
+  local project="$1" boundary_file
+  boundary_file="$(manager_operator_stop_boundary_file "$project")"
+  [[ -f "$boundary_file" ]] || return 0
+  # shellcheck disable=SC1090
+  source "$boundary_file"
+  if [[ "${OPERATOR_STOP_BOUNDARY_EPOCH:-}" =~ ^[0-9]+$ ]]; then
+    printf '%s\n' "${OPERATOR_STOP_BOUNDARY_EPOCH:-}"
+  fi
+}
+
+clear_manager_worker_launch_state_for_fresh_restart() {
+  local project="$1"
+  rm -f "$(manager_worker_launch_state_file "$project")"
+}
+
 csv_contains_exact_item() {
   local csv="$1" needle="$2"
   [[ -n "$csv" && -n "$needle" ]] || return 1
@@ -6121,10 +6196,11 @@ manager_worker_launch_state_refresh_for_status() {
   local max_parallel_workers active_running_workers available_new_slots
   local generated_continuity generated_prompts consumed_continuity consumed_prompts queued_prompts queued_prompt_blockers
   local latest_generated_continuity latest_generated_prompts_csv
+  local latest_launchable_continuity latest_launchable_prompts_csv launch_tracking_continuity launch_tracking_prompts
   local needs_writeback="0"
   state_file="$(manager_worker_launch_state_file "$project")"
   [[ -n "$project" && -f "$state_file" ]] || return 0
-  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
   manager_worker_launch_state_reconcile_same_continuity_prompts "$project" "$continuity_file" >/dev/null 2>&1 || true
 
@@ -6141,15 +6217,28 @@ manager_worker_launch_state_refresh_for_status() {
   latest_generated_continuity="$continuity_file"
   latest_generated_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_generated_continuity")"
   [[ -n "$latest_generated_prompts_csv" ]] || latest_generated_prompts_csv="none"
-  if [[ "$generated_continuity" == "unavailable" || "$generated_continuity" != "$latest_generated_continuity" ]]; then
-    generated_continuity="$latest_generated_continuity"
-    generated_prompts="$latest_generated_prompts_csv"
+
+  launch_tracking_continuity="$latest_generated_continuity"
+  launch_tracking_prompts="$latest_generated_prompts_csv"
+  latest_launchable_continuity="$(latest_launchable_manager_worker_prompt_continuity_file_for_project "$project")"
+  if [[ -n "$latest_launchable_continuity" && -f "$latest_launchable_continuity" ]]; then
+    latest_launchable_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_launchable_continuity")"
+    [[ -n "$latest_launchable_prompts_csv" ]] || latest_launchable_prompts_csv="none"
+    if [[ "$launch_tracking_prompts" == "none" || "$launch_tracking_continuity" != "$latest_launchable_continuity" ]]; then
+      launch_tracking_continuity="$latest_launchable_continuity"
+      launch_tracking_prompts="$latest_launchable_prompts_csv"
+    fi
+  fi
+
+  if [[ "$generated_continuity" == "unavailable" || "$generated_continuity" != "$launch_tracking_continuity" ]]; then
+    generated_continuity="$launch_tracking_continuity"
+    generated_prompts="$launch_tracking_prompts"
     needs_writeback="1"
   fi
   if [[ -n "$consumed_continuity" && "$consumed_continuity" != "unavailable" ]]; then
     if [[ ! -f "$consumed_continuity" ]] || manager_continuity_has_stale_runtime_worktree_refs "$project" "$consumed_continuity"; then
-      consumed_continuity="$latest_generated_continuity"
-      consumed_prompts="$(csv_retain_exact_items "${consumed_prompts:-}" "$latest_generated_prompts_csv")"
+      consumed_continuity="$launch_tracking_continuity"
+      consumed_prompts="$(csv_retain_exact_items "${consumed_prompts:-}" "$launch_tracking_prompts")"
       [[ -n "$consumed_prompts" ]] || consumed_prompts="none"
       needs_writeback="1"
     fi
@@ -6333,6 +6422,18 @@ latest_manager_continuity_file_for_project() {
       printf '%s\n' "$continuity_file"
       return 0
     fi
+  done < <(manager_continuity_files_desc_for_project "$project")
+}
+
+latest_patrol_authoritative_manager_continuity_file_for_project() {
+  local project="$1" continuity_file
+  while IFS= read -r continuity_file; do
+    [[ -f "$continuity_file" ]] || continue
+    manager_continuity_precedes_operator_stop_boundary "$project" "$continuity_file" && continue
+    manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file" && continue
+    manager_continuity_is_launchable_for_project "$project" "$continuity_file" || continue
+    printf '%s\n' "$continuity_file"
+    return 0
   done < <(manager_continuity_files_desc_for_project "$project")
 }
 
@@ -6549,6 +6650,17 @@ manager_continuity_has_stale_runtime_worktree_refs() {
   return 1
 }
 
+manager_continuity_precedes_operator_stop_boundary() {
+  local project="$1" continuity_file="$2"
+  local boundary_epoch continuity_epoch
+  [[ -n "$project" && -f "$continuity_file" ]] || return 1
+  boundary_epoch="$(manager_operator_stop_boundary_epoch_for_project "$project")"
+  [[ "$boundary_epoch" =~ ^[0-9]+$ ]] || return 1
+  continuity_epoch="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
+  [[ "$continuity_epoch" =~ ^[0-9]+$ ]] || return 1
+  (( continuity_epoch <= boundary_epoch ))
+}
+
 manager_continuity_missing_runtime_worktree_refs() {
   local project="$1" continuity_file="$2" target_path
   [[ -n "$project" && -f "$continuity_file" ]] || return 0
@@ -6561,13 +6673,18 @@ manager_continuity_missing_runtime_worktree_refs() {
 
 manager_prompt_fleet_truth_markdown_for_project() {
   local project="$1"
-  local latest_generated_continuity latest_launchable_continuity generated_stale missing_refs wt_path wt_branch wt_state
+  local latest_generated_continuity latest_launchable_continuity generated_stale generated_pre_stop missing_refs wt_path wt_branch wt_state
   latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
-  latest_launchable_continuity="$(latest_manager_continuity_file_for_project "$project")"
+  latest_launchable_continuity="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
   generated_stale="false"
+  generated_pre_stop="false"
   missing_refs=""
 
   if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
+    if manager_continuity_precedes_operator_stop_boundary "$project" "$latest_generated_continuity"; then
+      generated_stale="true"
+      generated_pre_stop="true"
+    fi
     if manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_generated_continuity"; then
       generated_stale="true"
       missing_refs="$(manager_continuity_missing_runtime_worktree_refs "$project" "$latest_generated_continuity")"
@@ -6580,6 +6697,7 @@ manager_prompt_fleet_truth_markdown_for_project() {
 - latest_generated_manager_continuity: \`${latest_generated_continuity:-none}\`
 - latest_launchable_manager_continuity: \`${latest_launchable_continuity:-none}\`
 - latest_generated_manager_continuity_stale: \`${generated_stale}\`
+- latest_generated_manager_continuity_precedes_operator_stop: \`${generated_pre_stop}\`
 
 ## Current Worktree Inventory
 EOF
@@ -6613,6 +6731,7 @@ EOF
 
 Manager continuity truth guard:
 - Treat `Current Worktree Inventory` as the authoritative active fleet for this round.
+- If a continuity was generated before the latest explicit operator stop boundary, treat it as stale history for fresh startup patrol, not as the current continuity anchor.
 - If any continuity references a path absent from that inventory, treat it as stale history, not as current queue/fleet truth.
 - Before writing a new manager continuity, rebuild fleet inventory / queue / cleanup sections from the current worktree inventory rather than copying stale historical paths.
 EOF
@@ -6632,6 +6751,7 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
     /^## / {
       section=tolower(substr($0, 4))
       gsub(/[`[:space:]]+$/, "", section)
+      gsub(/[[:space:]]+\/[[:space:]]+/, "|", section)
       capture_runtime_worker_prompt=0
       capture_worker_prompt_path_list=0
       worker_prompts_subsection=""
@@ -6671,7 +6791,45 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
           next
         }
       }
+      if (section == "queue|frozen queue") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*queue:[[:space:]]*$/) {
+          worker_prompts_subsection="queue"
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*frozen_queue:[[:space:]]*$/ || $0 ~ /^[[:space:]]*-[[:space:]]*frozen queue:[[:space:]]*$/) {
+          worker_prompts_subsection="frozen"
+          next
+        }
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/ || $0 ~ /worker_prompt:/)) {
+          if (worker_prompts_subsection == "frozen") {
+            if (mode != "launchable") {
+              emit_prompt_paths($0)
+            }
+          } else if (worker_prompts_subsection == "queue") {
+            if (mode != "frozen") {
+              emit_prompt_paths($0)
+            }
+          }
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+          if (worker_prompts_subsection == "frozen") {
+            if (mode != "launchable") {
+              emit_prompt_paths($0)
+            }
+          } else if (worker_prompts_subsection == "queue") {
+            if (mode != "frozen") {
+              emit_prompt_paths($0)
+            }
+          }
+          next
+        }
+      }
       if (section == "worker dispatch") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*(worker_prompt|active_worker_prompt|queued_worker_prompt|refreshed_queued_worker_prompt):[[:space:]]*$/) {
+          capture_worker_prompt_path_list=(mode != "frozen")
+          next
+        }
         if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "frozen") {
           emit_prompt_paths($0)
           next
@@ -6682,6 +6840,10 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         next
       }
       if (section == "queue") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*(worker_prompt|active_worker_prompt|queued_worker_prompt|refreshed_queued_worker_prompt):[[:space:]]*$/) {
+          capture_worker_prompt_path_list=(mode != "frozen")
+          next
+        }
         if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "frozen") {
           emit_prompt_paths($0)
           next
@@ -6692,6 +6854,10 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         next
       }
       if (section == "frozen queue") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*(worker_prompt|active_worker_prompt|queued_worker_prompt|refreshed_queued_worker_prompt):[[:space:]]*$/) {
+          capture_worker_prompt_path_list=(mode != "launchable")
+          next
+        }
         if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "launchable") {
           emit_prompt_paths($0)
           next
@@ -6776,6 +6942,7 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
     /^## / {
       section=tolower(substr($0, 4))
       gsub(/[`[:space:]]+$/, "", section)
+      gsub(/[[:space:]]+\/[[:space:]]+/, "|", section)
       worker_prompts_subsection=""
       next
     }
@@ -6803,7 +6970,29 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
           next
         }
       }
+      if (section == "queue|frozen|cleanup" || section == "queue|frozen queue" || section == "queue|frozen|cleanup queue") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*queue:[[:space:]]*$/) {
+          worker_prompts_subsection="queue"
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*frozen_queue:[[:space:]]*$/ || $0 ~ /^[[:space:]]*-[[:space:]]*frozen queue:[[:space:]]*$/) {
+          worker_prompts_subsection="frozen"
+          next
+        }
+        if (worker_prompts_subsection == "queue" && ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/ || $0 ~ /worker_prompt:/)) {
+          emit_prompt_paths($0)
+          next
+        }
+        if (worker_prompts_subsection == "queue" && $0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+          emit_prompt_paths($0)
+          next
+        }
+      }
       if (section == "worker dispatch") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*(worker_prompt|queued_worker_prompt|refreshed_queued_worker_prompt):[[:space:]]*$/) {
+          capture_worker_prompt_path_list=1
+          next
+        }
         if ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) {
           emit_prompt_paths($0)
           next
@@ -6814,6 +7003,10 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
         next
       }
       if (section == "queue") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*(worker_prompt|queued_worker_prompt|refreshed_queued_worker_prompt):[[:space:]]*$/) {
+          capture_worker_prompt_path_list=1
+          next
+        }
         if ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) {
           emit_prompt_paths($0)
           next
@@ -6822,6 +7015,19 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
           emit_prompt_paths($0)
         }
         next
+      }
+      if (capture_worker_prompt_path_list == 1) {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+          emit_prompt_paths($0)
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`none`[[:space:]]*$/ || $0 ~ /^[[:space:]]*`none`[[:space:]]*$/) {
+          capture_worker_prompt_path_list=0
+          next
+        }
+        if ($0 !~ /^[[:space:]]*$/ && $0 !~ /^[[:space:]]*-[[:space:]]/) {
+          capture_worker_prompt_path_list=0
+        }
       }
       if ($0 ~ /- queued_worker_prompt: / || $0 ~ /- refreshed_queued_worker_prompt: /) {
         emit_prompt_paths($0)
@@ -6853,6 +7059,27 @@ worker_prompt_target_branch() {
       value=$0
       sub(/^- /, "", value)
       gsub(/`/, "", value)
+      print value
+      exit
+    }
+  ' "$prompt_file"
+}
+
+worker_prompt_selected_tool() {
+  local prompt_file="$1"
+  [[ -f "$prompt_file" ]] || return 0
+  awk '
+    /^- selected_tool: / {
+      value=$0
+      sub(/^- selected_tool: `?/, "", value)
+      sub(/`?$/, "", value)
+      print value
+      exit
+    }
+    /^selected_tool: / {
+      value=$0
+      sub(/^selected_tool: `?/, "", value)
+      sub(/`?$/, "", value)
       print value
       exit
     }
@@ -7027,6 +7254,19 @@ latest_launchable_manager_continuity_file_for_project() {
       printf '%s\n' "$continuity_file"
       return 0
     fi
+  done < <(manager_continuity_files_desc_for_project "$project")
+}
+
+latest_launchable_manager_worker_prompt_continuity_file_for_project() {
+  local project="$1" continuity_file
+  while IFS= read -r continuity_file; do
+    [[ -f "$continuity_file" ]] || continue
+    manager_continuity_precedes_operator_stop_boundary "$project" "$continuity_file" && continue
+    manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file" && continue
+    manager_continuity_has_worker_prompts "$continuity_file" || continue
+    manager_continuity_is_launchable_for_project "$project" "$continuity_file" || continue
+    printf '%s\n' "$continuity_file"
+    return 0
   done < <(manager_continuity_files_desc_for_project "$project")
 }
 
@@ -7447,6 +7687,36 @@ worker_prompt_verification_metadata_missing_fields_csv() {
   [[ -n "$closeout_requires_adequacy" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "closeout_requires_adequacy")"
   [[ -n "$closeout_review_artifact_policy" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "closeout_review_artifact_policy")"
   printf '%s\n' "$missing_csv"
+}
+
+worker_prompt_has_any_verification_metadata() {
+  local prompt_file="$1"
+  local owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level target_environment closeout_gate_command closeout_target_lane closeout_promotion_gate closeout_requires_adequacy closeout_review_artifact_policy
+  owner_issue="$(worker_prompt_owner_issue "$prompt_file")"
+  pre_tests_path="$(worker_prompt_pre_tests_path "$prompt_file")"
+  artifact_dir="$(worker_prompt_verification_artifact_dir "$prompt_file")"
+  test_lanes_csv="$(worker_prompt_required_test_lanes_csv "$prompt_file")"
+  acceptance_csv="$(worker_prompt_required_acceptance_item_ids_csv "$prompt_file")"
+  evidence_level="$(worker_prompt_minimum_evidence_level "$prompt_file")"
+  target_environment="$(worker_prompt_target_environment "$prompt_file")"
+  closeout_gate_command="$(worker_prompt_closeout_gate_command "$prompt_file")"
+  closeout_target_lane="$(worker_prompt_closeout_target_lane "$prompt_file")"
+  closeout_promotion_gate="$(worker_prompt_closeout_promotion_gate "$prompt_file")"
+  closeout_requires_adequacy="$(worker_prompt_closeout_requires_adequacy "$prompt_file")"
+  closeout_review_artifact_policy="$(worker_prompt_closeout_review_artifact_policy "$prompt_file")"
+  [[ -n "$owner_issue" ]] && return 0
+  [[ -n "$pre_tests_path" ]] && return 0
+  [[ -n "$artifact_dir" ]] && return 0
+  [[ -n "$test_lanes_csv" ]] && return 0
+  [[ -n "$acceptance_csv" ]] && return 0
+  [[ -n "$evidence_level" ]] && return 0
+  [[ -n "$target_environment" ]] && return 0
+  [[ -n "$closeout_gate_command" ]] && return 0
+  [[ -n "$closeout_target_lane" ]] && return 0
+  [[ -n "$closeout_promotion_gate" ]] && return 0
+  [[ -n "$closeout_requires_adequacy" ]] && return 0
+  [[ -n "$closeout_review_artifact_policy" ]] && return 0
+  return 1
 }
 
 worker_prompt_has_verification_metadata() {
@@ -7916,7 +8186,7 @@ manager_project_ownership_claim_for_worktree() {
 manager_worktree_ownership_claim_snapshot() {
   local project="$1" target_worktree="$2"
   local continuity_file wt_path prompt_file holder_branch holder_status
-  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
 
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" && -d "$wt_path" ]] || continue
@@ -8253,15 +8523,23 @@ ensure_runtime_workcell_initialized_for_launch() {
 
 launch_worker_from_manager_prompt_if_needed() {
   local manager_project="$1" prompt_file="$2"
-  local target_project intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv
+  local target_project intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv has_any_verification_metadata="0"
+  local selected_tool
   target_project="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   [[ -n "$target_project" && -d "$target_project" ]] || return 1
   ensure_runtime_workcell_initialized_for_launch "$target_project" || return 1
+  selected_tool="$(worker_prompt_selected_tool "$prompt_file")"
+  if [[ -n "$selected_tool" ]]; then
+    persist_project_tool_selection "$target_project" "$selected_tool"
+  fi
   runtime_contract_file="$(worker_verification_contract_state_file "$target_project")"
   supervisor_pid="$(manager_supervisor_pid_for_project "$target_project")"
   ai_pid="$(runtime_ai_pid_hint_for_project "$target_project")"
   missing_fields_csv="$(worker_prompt_verification_metadata_missing_fields_csv "$prompt_file")"
-  if [[ -n "$missing_fields_csv" ]]; then
+  if worker_prompt_has_any_verification_metadata "$prompt_file"; then
+    has_any_verification_metadata="1"
+  fi
+  if [[ -n "$missing_fields_csv" && "$has_any_verification_metadata" == "1" ]]; then
     write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "" "$target_project"
     if [[ -n "$supervisor_pid" || -n "$ai_pid" ]]; then
       write_workcell_state \
@@ -8293,7 +8571,10 @@ manager_runtime_launch_workers_from_latest_handoff() {
   local parallel_safe active_running_workers available_new_slots max_parallel_workers
   local selected_write_scopes_csv selected_intent_signatures_csv frozen_intent_signatures_csv active_intent_signatures_csv recorded_intent_signatures_csv worker_is_active worker_is_busy prompt_queue_file prompt_signature queued_prompt_blockers
   reset_project_runtime_discovery_cache "$project"
-  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  continuity_file="$(latest_launchable_manager_worker_prompt_continuity_file_for_project "$project")"
+  if [[ -z "$continuity_file" || ! -f "$continuity_file" ]]; then
+    continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  fi
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
     printf '0\n'
     return 0
@@ -8429,6 +8710,26 @@ manager_runtime_launch_workers_from_latest_handoff() {
   printf '%s\n' "$launched_count"
 }
 
+manager_runtime_launch_workers_after_ai_cycle_if_needed() {
+  local project="$1" exit_reason="${2:-}" launched_count="0"
+  [[ "$(role_hint_for_project "$project")" == "manager" ]] || {
+    printf '0\n'
+    return 0
+  }
+  [[ "$exit_reason" == "ai_exit_rc_0" ]] || {
+    printf '0\n'
+    return 0
+  }
+  launched_count="$(manager_runtime_launch_workers_from_latest_handoff "$project")"
+  [[ "$launched_count" =~ ^[0-9]+$ ]] || launched_count="0"
+  if (( launched_count > 0 )); then
+    append_runtime_event "$project" "manager_worker_launch_after_ai_cycle" \
+      "launched_count=$launched_count" \
+      "exit_reason=$exit_reason"
+  fi
+  printf '%s\n' "$launched_count"
+}
+
 manager_ai_stalled_with_pending_intake() {
   local project="$1" threshold_secs="${2:-90}"
   local ai_pid cycle_log intake_signal log_mtime signal_mtime now
@@ -8448,15 +8749,12 @@ manager_ai_stalled_with_pending_intake() {
 
 latest_active_intake_meta_mtime_for_project() {
   local project="$1"
-  local intake_root meta_file status mtime latest_mtime=""
+  local intake_root meta_file mtime latest_mtime=""
   intake_root="$(intake_dir_for_project "$project")"
   [[ -d "$intake_root" ]] || return 1
   while IFS= read -r meta_file; do
     [[ -f "$meta_file" ]] || continue
-    status="$(meta_env_value "$meta_file" "STATUS")"
-    case "$status" in
-      absorbed|dropped) continue ;;
-    esac
+    intake_item_counts_as_active_in_current_round "$project" "$meta_file" || continue
     mtime="$(file_mtime_epoch "$meta_file" 2>/dev/null || true)"
     [[ -n "$mtime" ]] || continue
     if [[ -z "$latest_mtime" ]] || (( mtime > latest_mtime )); then
@@ -9211,6 +9509,501 @@ Delegated continuation handoff:
 - 若你判断暂时不能执行，必须先把 blocker 证据写回当前 issue / progress / recovery，再说明为什么本轮不能吸收；不能只给出“越界”或“应由别的 owner 处理”的口头结论。
 
 $snapshot
+EOF
+}
+
+milestone_patrol_seed_snapshot_for_project() {
+  local project="$1" limit="${2:-6}"
+  local milestones_file
+  milestones_file="$project/docs/milestones.md"
+  [[ -f "$milestones_file" ]] || return 0
+  python3 - "$milestones_file" "$limit" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+milestones_path = Path(sys.argv[1])
+limit = int(sys.argv[2])
+lines = milestones_path.read_text(encoding="utf-8").splitlines()
+
+results = []
+current_milestone = None
+current_milestone_active = False
+current_queue = None
+current_item = None
+
+def flush_item():
+    global current_item
+    if not current_item or not current_milestone_active:
+        current_item = None
+        return
+    queue = current_item.get("queue")
+    phase_state = current_item.get("phase_state", "")
+    item_status = current_item.get("status", "")
+    if queue == "completed_issues":
+        current_item = None
+        return
+    if queue == "committed_issues" and phase_state == "completed":
+        current_item = None
+        return
+    if queue == "candidate_issues" and item_status == "dropped":
+        current_item = None
+        return
+    results.append({
+        "milestone": current_milestone,
+        "queue": queue,
+        "item_id": current_item.get("item_id", "unknown"),
+        "title": current_item.get("title", "untitled"),
+        "phase_state": phase_state or "unspecified",
+        "priority": current_item.get("priority", "unspecified"),
+        "next_action": current_item.get("next_action", "missing"),
+        "issue_path": current_item.get("issue_path", ""),
+        "progress_path": current_item.get("progress_path", ""),
+    })
+    current_item = None
+
+for raw_line in lines:
+    line = raw_line.rstrip()
+    milestone_match = re.match(r"^##\s+(M-[A-Za-z0-9._-]+)\s*$", line)
+    if milestone_match:
+        flush_item()
+        current_milestone = milestone_match.group(1)
+        current_milestone_active = False
+        current_queue = None
+        continue
+    if current_milestone and current_queue is None:
+        status_match = re.match(r"^- status:\s*(.+?)\s*$", line.strip())
+        if status_match:
+            current_milestone_active = status_match.group(1).strip() == "active"
+            continue
+    queue_match = re.match(r"^###\s+(candidate_issues|committed_issues|completed_issues)\s*$", line)
+    if queue_match:
+        flush_item()
+        current_queue = queue_match.group(1)
+        continue
+    item_match = re.match(r"^[0-9]+\.\s+`([^`]+)`\s*$", line.strip())
+    if item_match and current_milestone and current_queue:
+        flush_item()
+        current_item = {"queue": current_queue, "item_id": item_match.group(1)}
+        continue
+    if current_item:
+        field_match = re.match(r"^-\s+([A-Za-z0-9_]+):\s*(.*)$", line.strip())
+        if field_match:
+            key = field_match.group(1)
+            value = field_match.group(2).strip()
+            if value.startswith("`") and value.endswith("`") and len(value) >= 2:
+                value = value[1:-1]
+            current_item[key] = value
+
+flush_item()
+
+for item in results[:limit]:
+    route_hint = "candidate_research"
+    if item["queue"] == "committed_issues":
+        route_hint = f"issue_continuation/{item['phase_state']}"
+    print(
+        f"- milestone={item['milestone']} queue={item['queue']} route_hint={route_hint} "
+        f"item={item['item_id']} priority={item['priority']} phase_state={item['phase_state']} "
+        f"title={item['title']} next_action={item['next_action']}"
+    )
+    if item["issue_path"]:
+        print(f"  issue_path={item['issue_path']}")
+    if item["progress_path"]:
+        print(f"  progress_path={item['progress_path']}")
+PY
+}
+
+pre_brainstorm_patrol_seed_snapshot_for_project() {
+  local project="$1" limit="${2:-6}"
+  local index_file
+  index_file="$project/docs/pre-brainstorms/INDEX.md"
+  [[ -f "$index_file" ]] || return 0
+  python3 - "$project" "$index_file" "$limit" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+project_root = Path(sys.argv[1])
+index_path = Path(sys.argv[2])
+limit = int(sys.argv[3])
+
+entries = []
+for raw_line in index_path.read_text(encoding="utf-8").splitlines():
+    match = re.match(r"^-\s+([0-9]{8}-[0-9]{4}--[A-Za-z0-9._-]+)\s*$", raw_line.strip())
+    if match:
+        entries.append(match.group(1))
+
+results = []
+for entry in entries:
+    candidates_path = project_root / "docs" / "pre-brainstorms" / entry / "candidates.md"
+    if not candidates_path.is_file():
+        continue
+    current = None
+    for raw_line in candidates_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.rstrip()
+        heading_match = re.match(r"^###\s+(.+?)\s*$", line)
+        if heading_match:
+            if current:
+                results.append(current)
+            current = {
+                "pre_brainstorm": entry,
+                "candidate": heading_match.group(1).strip(),
+            }
+            continue
+        if current is None:
+            continue
+        field_match = re.match(r"^-\s+([A-Za-z0-9_]+):\s*(.*)$", line.strip())
+        if not field_match:
+            continue
+        key = field_match.group(1)
+        value = field_match.group(2).strip()
+        if value.startswith("`") and value.endswith("`") and len(value) >= 2:
+            value = value[1:-1]
+        current[key] = value
+    if current:
+        results.append(current)
+
+count = 0
+for item in results:
+    candidate_status = item.get("candidate_status", "unspecified")
+    phase_state = item.get("phase_state", "unspecified")
+    promoted_issue = item.get("promoted_issue_path", "")
+    if candidate_status in {"promoted", "absorbed", "dropped"}:
+        continue
+    if phase_state == "completed":
+        continue
+    if promoted_issue and promoted_issue != "pending://issue-materialization":
+        continue
+    print(
+        f"- pre_brainstorm={item['pre_brainstorm']} candidate={item['candidate']} "
+        f"candidate_status={candidate_status} phase_state={phase_state} "
+        f"priority={item.get('priority', 'unspecified')} milestone={item.get('milestone', 'missing')} "
+        f"next_action={item.get('next_action', 'missing')}"
+    )
+    count += 1
+    if count >= limit:
+        break
+PY
+}
+
+progress_patrol_seed_snapshot_for_project() {
+  local project="$1" limit="${2:-6}"
+  local progress_root
+  progress_root="$project/docs/progress"
+  [[ -d "$progress_root" ]] || return 0
+  python3 - "$progress_root" "$limit" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+progress_root = Path(sys.argv[1])
+limit = int(sys.argv[2])
+
+results = []
+for path in sorted(progress_root.rglob("p-*.md")):
+    text = path.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    data = {"path": str(path.relative_to(progress_root.parent))}
+    next_action = "missing"
+    in_next_action = False
+    for raw_line in lines:
+        line = raw_line.rstrip()
+        header_match = re.match(r"^##\s+Next Action\s*$", line)
+        if header_match:
+            in_next_action = True
+            continue
+        if in_next_action:
+            if re.match(r"^##\s+", line):
+                in_next_action = False
+            else:
+                step_match = re.match(r"^(?:[0-9]+\.\s+|-\s+)(.+)$", line.strip())
+                if step_match:
+                    next_action = step_match.group(1).strip()
+                    in_next_action = False
+                    continue
+        field_match = re.match(r"^-\s+([A-Za-z0-9_]+):\s*(.*)$", line.strip())
+        if field_match:
+            key = field_match.group(1)
+            value = field_match.group(2).strip()
+            if value.startswith("`") and value.endswith("`") and len(value) >= 2:
+                value = value[1:-1]
+            data[key] = value
+    phase_state = data.get("phase_state", "unspecified")
+    runtime_state = data.get("runtime_state", "unspecified")
+    if phase_state == "completed":
+      continue
+    results.append({
+        "issue_id": data.get("issue_id", "unknown"),
+        "title": data.get("title", path.stem),
+        "phase_state": phase_state,
+        "runtime_state": runtime_state,
+        "issue_path": data.get("issue_path", ""),
+        "branch": data.get("branch", "unknown"),
+        "worktree_path": data.get("worktree_path", ""),
+        "updated_at": data.get("updated_at", "unknown"),
+        "next_action": next_action,
+        "path": data["path"],
+    })
+
+for item in results[:limit]:
+    print(
+        f"- issue={item['issue_id']} phase_state={item['phase_state']} runtime_state={item['runtime_state']} "
+        f"title={item['title']} updated_at={item['updated_at']} next_action={item['next_action']}"
+    )
+    print(f"  progress_path={item['path']}")
+    if item["issue_path"]:
+        print(f"  issue_path={item['issue_path']}")
+    if item["worktree_path"]:
+        print(f"  worktree_path={item['worktree_path']}")
+PY
+}
+
+task_source_scan_json_path_for_project() {
+  local project="$1"
+  printf '%s\n' "$(run_dir_for_project "$project")/manager-task-source-scan-latest.json"
+}
+
+task_source_scan_state_file_for_project() {
+  local project="$1"
+  printf '%s\n' "$(run_dir_for_project "$project")/manager-task-source-scan-state.env"
+}
+
+latest_task_source_scan_json_mtime_for_project() {
+  local project="$1" scan_json_path
+  scan_json_path="$(task_source_scan_json_path_for_project "$project")"
+  [[ -f "$scan_json_path" ]] || return 1
+  file_mtime_epoch "$scan_json_path"
+}
+
+snapshot_item_count_from_prefix() {
+  local snapshot="$1" prefix="$2"
+  [[ -n "$snapshot" ]] || {
+    printf '0\n'
+    return 0
+  }
+  printf '%s\n' "$snapshot" | awk -v prefix="$prefix" 'index($0, prefix) == 1 { count += 1 } END { print count + 0 }'
+}
+
+task_source_scan_regeneration_reason_for_project() {
+  local project="$1"
+  local scan_mtime latest_intake_mtime latest_continuity_mtime
+  local continuity_file active_running_workers
+
+  scan_mtime="$(latest_task_source_scan_json_mtime_for_project "$project" 2>/dev/null || true)"
+  if [[ -z "$scan_mtime" ]]; then
+    printf 'bootstrap_missing_scan\n'
+    return 0
+  fi
+
+  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" 2>/dev/null || true)"
+  [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
+  if (( active_running_workers > 0 )); then
+    return 1
+  fi
+
+  latest_intake_mtime="$(latest_active_intake_meta_mtime_for_project "$project" 2>/dev/null || true)"
+  if [[ "$latest_intake_mtime" =~ ^[0-9]+$ ]] && (( latest_intake_mtime > scan_mtime )); then
+    printf 'new_active_intake_since_last_scan\n'
+    return 0
+  fi
+
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
+    latest_continuity_mtime="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
+    if [[ "$latest_continuity_mtime" =~ ^[0-9]+$ ]] && (( latest_continuity_mtime > scan_mtime )); then
+      printf 'continuity_advanced_since_last_scan\n'
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+write_task_source_scan_json_for_project() {
+  local project="$1" regeneration_reason="${2:-manual}"
+  local output_path state_path run_dir tmp_dir generated_at human_snapshot delegated_snapshot milestone_snapshot
+  local pre_brainstorm_snapshot progress_snapshot
+  local human_count delegated_count milestone_count pre_brainstorm_count progress_count
+  local continuity_file active_running_workers
+
+  run_dir="$(run_dir_for_project "$project")"
+  output_path="$(task_source_scan_json_path_for_project "$project")"
+  state_path="$(task_source_scan_state_file_for_project "$project")"
+  mkdir -p "$run_dir"
+
+  generated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  human_snapshot="$(intake_snapshot_for_project "$project" 8)"
+  delegated_snapshot="$(delegated_continuation_snapshot_for_project "$project" 6)"
+  milestone_snapshot="$(milestone_patrol_seed_snapshot_for_project "$project" 6)"
+  pre_brainstorm_snapshot="$(pre_brainstorm_patrol_seed_snapshot_for_project "$project" 6)"
+  progress_snapshot="$(progress_patrol_seed_snapshot_for_project "$project" 6)"
+  human_count="$(snapshot_item_count_from_prefix "$human_snapshot" "- id=")"
+  delegated_count="$(snapshot_item_count_from_prefix "$delegated_snapshot" "- intake_id=")"
+  milestone_count="$(snapshot_item_count_from_prefix "$milestone_snapshot" "- milestone=")"
+  pre_brainstorm_count="$(snapshot_item_count_from_prefix "$pre_brainstorm_snapshot" "- pre_brainstorm=")"
+  progress_count="$(snapshot_item_count_from_prefix "$progress_snapshot" "- issue=")"
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
+  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" 2>/dev/null || true)"
+  [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
+
+  tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/freely-task-source-scan.XXXXXX")"
+  printf '%s\n' "$human_snapshot" >"$tmp_dir/human.txt"
+  printf '%s\n' "$delegated_snapshot" >"$tmp_dir/delegated.txt"
+  printf '%s\n' "$milestone_snapshot" >"$tmp_dir/milestone.txt"
+  printf '%s\n' "$pre_brainstorm_snapshot" >"$tmp_dir/pre_brainstorm.txt"
+  printf '%s\n' "$progress_snapshot" >"$tmp_dir/progress.txt"
+
+  python3 - "$output_path" "$project" "$generated_at" "$regeneration_reason" "$active_running_workers" "$human_count" "$delegated_count" "$milestone_count" "$pre_brainstorm_count" "$progress_count" "$continuity_file" "$tmp_dir/human.txt" "$tmp_dir/delegated.txt" "$tmp_dir/milestone.txt" "$tmp_dir/pre_brainstorm.txt" "$tmp_dir/progress.txt" <<'PY'
+import json
+import sys
+
+output_path = sys.argv[1]
+project_root = sys.argv[2]
+generated_at = sys.argv[3]
+regeneration_reason = sys.argv[4]
+active_running_workers = int(sys.argv[5])
+human_count = int(sys.argv[6])
+delegated_count = int(sys.argv[7])
+milestone_count = int(sys.argv[8])
+pre_brainstorm_count = int(sys.argv[9])
+progress_count = int(sys.argv[10])
+continuity_file = sys.argv[11]
+human_file = sys.argv[12]
+delegated_file = sys.argv[13]
+milestone_file = sys.argv[14]
+pre_brainstorm_file = sys.argv[15]
+progress_file = sys.argv[16]
+
+def read_lines(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return [line.rstrip("\n") for line in f if line.rstrip("\n")]
+
+payload = {
+    "schema_version": "manager-task-source-scan-v1",
+    "generated_at": generated_at,
+    "project_root": project_root,
+    "scan_reason": regeneration_reason,
+    "continuity_anchor": continuity_file or None,
+    "manager_context": {
+        "active_running_workers": active_running_workers,
+    },
+    "patrol_contract": {
+        "consumer_skill": "context-source-skill",
+        "policy": "scan on idle/replan boundaries, distrust stale ai-written status, verify linked evidence before phase advancement or closeout",
+    },
+    "surfaces": [
+        {
+            "surface": "human_chat_intake",
+            "source_class": "discovery",
+            "active_count": human_count,
+            "trust_level": "runtime_intake_authoritative_for_existence",
+            "needs_reconcile": False,
+            "summary_lines": read_lines(human_file),
+        },
+        {
+            "surface": "delegated_continuation",
+            "source_class": "continuation",
+            "active_count": delegated_count,
+            "trust_level": "advisory_handoff_verify_against_current_continuity",
+            "needs_reconcile": True,
+            "summary_lines": read_lines(delegated_file),
+        },
+        {
+            "surface": "active_milestone_queue",
+            "source_class": "milestone",
+            "active_count": milestone_count,
+            "trust_level": "advisory_status_reconcile_required",
+            "needs_reconcile": True,
+            "summary_lines": read_lines(milestone_file),
+        },
+        {
+            "surface": "active_pre_brainstorm_queue",
+            "source_class": "discovery",
+            "active_count": pre_brainstorm_count,
+            "trust_level": "advisory_candidate_reconcile_required",
+            "needs_reconcile": True,
+            "summary_lines": read_lines(pre_brainstorm_file),
+        },
+        {
+            "surface": "active_progress_queue",
+            "source_class": "continuation",
+            "active_count": progress_count,
+            "trust_level": "advisory_progress_reconcile_required",
+            "needs_reconcile": True,
+            "summary_lines": read_lines(progress_file),
+        },
+    ],
+}
+
+with open(output_path, "w", encoding="utf-8") as f:
+    json.dump(payload, f, indent=2, sort_keys=True, ensure_ascii=False)
+    f.write("\n")
+PY
+
+  rm -rf "$tmp_dir"
+  cat >"$state_path" <<EOF
+LAST_TASK_SOURCE_SCAN_JSON="$output_path"
+LAST_TASK_SOURCE_SCAN_REASON="$regeneration_reason"
+LAST_TASK_SOURCE_SCAN_CONTINUITY_ANCHOR="$continuity_file"
+LAST_TASK_SOURCE_SCAN_ACTIVE_RUNNING_WORKERS="$active_running_workers"
+LAST_TASK_SOURCE_SCAN_GENERATED_AT="$generated_at"
+EOF
+  printf '%s\n' "$output_path"
+}
+
+append_task_source_patrol_seed_if_needed() {
+  local scan_json_path scan_reason active_running_workers
+  local human_snapshot delegated_snapshot milestone_snapshot pre_brainstorm_snapshot progress_snapshot
+  local human_count delegated_count milestone_count pre_brainstorm_count progress_count total_active_count
+  [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]] || return 0
+  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$PROJECT_ROOT" 2>/dev/null || true)"
+  [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
+  if (( active_running_workers > 0 )); then
+    return 0
+  fi
+  scan_reason="$(task_source_scan_regeneration_reason_for_project "$PROJECT_ROOT" 2>/dev/null || true)"
+  if [[ -n "$scan_reason" ]]; then
+    scan_json_path="$(write_task_source_scan_json_for_project "$PROJECT_ROOT" "$scan_reason")"
+  else
+    scan_json_path="$(task_source_scan_json_path_for_project "$PROJECT_ROOT")"
+    [[ -f "$scan_json_path" ]] || scan_json_path="$(write_task_source_scan_json_for_project "$PROJECT_ROOT" "bootstrap_missing_scan")"
+    scan_reason="reuse_existing_scan"
+  fi
+  human_snapshot="$(intake_snapshot_for_project "$PROJECT_ROOT" 8)"
+  delegated_snapshot="$(delegated_continuation_snapshot_for_project "$PROJECT_ROOT" 6)"
+  milestone_snapshot="$(milestone_patrol_seed_snapshot_for_project "$PROJECT_ROOT" 6)"
+  pre_brainstorm_snapshot="$(pre_brainstorm_patrol_seed_snapshot_for_project "$PROJECT_ROOT" 6)"
+  progress_snapshot="$(progress_patrol_seed_snapshot_for_project "$PROJECT_ROOT" 6)"
+  human_count="$(snapshot_item_count_from_prefix "$human_snapshot" "- id=")"
+  delegated_count="$(snapshot_item_count_from_prefix "$delegated_snapshot" "- intake_id=")"
+  milestone_count="$(snapshot_item_count_from_prefix "$milestone_snapshot" "- milestone=")"
+  pre_brainstorm_count="$(snapshot_item_count_from_prefix "$pre_brainstorm_snapshot" "- pre_brainstorm=")"
+  progress_count="$(snapshot_item_count_from_prefix "$progress_snapshot" "- issue=")"
+  total_active_count=$((human_count + delegated_count + milestone_count + pre_brainstorm_count + progress_count))
+  (( total_active_count > 0 )) || return 0
+  cat <<EOF
+
+Task-source patrol seed:
+- 这是 manager 进入 idle / replan 边界时使用的结构化任务面，不是每轮都应重扫。
+- current_scan_reason: \`$scan_reason\`
+- active_surface_counts: \`human_chat_intake=$human_count delegated_continuation=$delegated_count active_milestone_queue=$milestone_count active_pre_brainstorm_queue=$pre_brainstorm_count active_progress_queue=$progress_count\`
+- machine_readable_scan_json: \`$scan_json_path\`
+- \`lead-agent\` / \`context-source-skill\` 先消费这份 scan json，再决定当前从哪个 source 进入哪条 loop。
+- human interruption / delegated continuation / milestone 状态都只能当 routing hint；是否推进、改写状态、还是回滚标签，必须回到 linked evidence 核对。
+- pre-brainstorm / progress 也只作为 patrol seed；默认要持怀疑态度核对 candidate / issue / worktree / verification 证据。
+- 这些 milestone / issue / progress 状态可能是 AI 之前写的，默认只把它们当作 patrol seed，不当作 completion 证明。
+- 对每个 seed，先核对 linked issue / progress / recovery / worktree 证据，再决定是继续推进、回滚状态、还是改写 next_action。
+- \`candidate_issues\` 默认先回 doc/pre-brainstorm 或 IBM；\`committed_issues\` 才能按 \`phase_state\` 继续 dev / verification / cleanup。
+- 若某项写着进行中但证据缺失，优先做 state reconcile，而不是盲信旧标签。
+
+## Surface: active_milestone_queue
+$milestone_snapshot
+
+## Surface: active_pre_brainstorm_queue
+$pre_brainstorm_snapshot
+
+## Surface: active_progress_queue
+$progress_snapshot
 EOF
 }
 
@@ -10801,7 +11594,7 @@ cmd_ensure_interruption_dispatch_watch() {
 
   if [[ -f "$pid_file" ]]; then
     existing_pid="$(cat "$pid_file" 2>/dev/null || true)"
-    if [[ -n "$(interruption_dispatcher_pid_for_project "$project")" ]]; then
+    if [[ "$existing_pid" != "$$" ]] && valid_interruption_dispatcher_pid_for_project "$project" "$existing_pid"; then
       log_info "interruption dispatcher already running (pid=$existing_pid)"
       return 0
     fi
@@ -10829,7 +11622,7 @@ cmd_ensure_manager_watch() {
 
   if [[ -f "$pid_file" ]]; then
     existing_pid="$(cat "$pid_file" 2>/dev/null || true)"
-    if [[ -n "$(manager_watchdog_pid_for_project "$project")" ]]; then
+    if [[ "$existing_pid" != "$$" ]] && valid_ensure_manager_watchdog_pid_for_project "$project" "$existing_pid"; then
       log_info "ensure-manager watchdog already running (pid=$existing_pid)"
       return 0
     fi
@@ -10910,6 +11703,7 @@ build_prompt() {
   append_fleet_supervision_if_needed
   append_human_chat_intake_if_needed
   append_local_delegated_continuation_if_needed
+  append_task_source_patrol_seed_if_needed
   append_manager_supervision_alert_if_needed
   append_manager_hygiene_alert_if_needed
   append_route_only_recovery_if_needed
@@ -11603,6 +12397,10 @@ stop_project_runtime() {
   fi
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
     materialize_missing_required_manager_continuity_fallback "$project" "$stop_reason" || true
+    if [[ "$stop_reason" == "operator_stop" ]]; then
+      record_manager_operator_stop_boundary "$project"
+      clear_manager_worker_launch_state_for_fresh_restart "$project"
+    fi
   fi
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   rm -f "$stop_marker"
@@ -11904,6 +12702,9 @@ start_project_runtime() {
   append_runtime_event "$project" "start_project_runtime_after_slot_recovery" \
     "entrypoint_mode=$entrypoint_mode"
   rm -f "$(stop_marker_file "$project")"
+  if [[ "$(role_hint_for_project "$project")" != "manager" ]]; then
+    clear_manager_operator_stop_boundary "$project"
+  fi
   LAST_ATTACH_REUSE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
   LAST_ATTACH_REUSE_AI_PID_STATE="missing"
@@ -12467,6 +13268,8 @@ start_project_runtime() {
 
     log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, secondary_rate_limit_used_percent=${secondary_rate_limit_used_percent:-unavailable}, secondary_rate_limit_resets_at=${secondary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
     rm -f "$child_pid_file"
+
+    manager_runtime_launch_workers_after_ai_cycle_if_needed "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON" >/dev/null
 
     FIRST_ROUND=false
     restart_count=$((restart_count + 1))
@@ -13452,6 +14255,58 @@ cmd_baseline_status() {
   fi
 }
 
+task_source_scan_dir_for_project() {
+  local project="$1"
+  printf '%s\n' "$(run_dir_for_project "$project")/task-source-scan"
+}
+
+task_source_scan_latest_file_for_project() {
+  local project="$1"
+  printf '%s\n' "$(task_source_scan_dir_for_project "$project")/latest.json"
+}
+
+cmd_task_source_scan() {
+  local project="" emit_json="0" latest_file scan_dir
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --json) emit_json="1"; shift ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project" 1)"
+  [[ -f "$TASK_SOURCE_SCAN_SCRIPT" ]] || {
+    log_error "missing task source scan script: $TASK_SOURCE_SCAN_SCRIPT"
+    exit 1
+  }
+  scan_dir="$(task_source_scan_dir_for_project "$project")"
+  latest_file="$(task_source_scan_latest_file_for_project "$project")"
+  mkdir -p "$scan_dir"
+  python3 "$TASK_SOURCE_SCAN_SCRIPT" --project "$project" >"$latest_file"
+  if [[ "$emit_json" == "1" ]]; then
+    cat "$latest_file"
+  else
+    echo "project: $project"
+    echo "task_source_scan: $latest_file"
+    echo "recommended_skill: auto-loop-orchestrator"
+    echo "routing_skill: context-source-skill"
+    python3 - "$latest_file" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+payload = json.load(open(path, encoding="utf-8"))
+providers = payload.get("providers", {}).get("external_issue", {})
+for name in ("github", "gitee"):
+    provider = providers.get(name, {})
+    hint = provider.get("availability_hint")
+    if not hint:
+        continue
+    print(f"provider_hint_{name}: {hint}")
+PY
+  fi
+}
+
 cmd_security_review_brief() {
   local project=""
   while [[ $# -gt 0 ]]; do
@@ -13656,8 +14511,9 @@ cmd_live_status() {
   latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
   latest_generated_prompts_csv="none"
   if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
-    if manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_generated_continuity"; then
-      latest_generated_continuity="$(latest_manager_continuity_file_for_project "$project")"
+    if manager_continuity_precedes_operator_stop_boundary "$project" "$latest_generated_continuity" \
+      || manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_generated_continuity"; then
+      latest_generated_continuity="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
     fi
   fi
   if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
@@ -14321,6 +15177,7 @@ main() {
     restore-work) cmd_restore_work "$@" ;;
     baseline-status) cmd_baseline_status "$@" ;;
     security-review-brief) cmd_security_review_brief "$@" ;;
+    task-source-scan) cmd_task_source_scan "$@" ;;
     status) cmd_status "$@" ;;
     live-status) cmd_live_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;
