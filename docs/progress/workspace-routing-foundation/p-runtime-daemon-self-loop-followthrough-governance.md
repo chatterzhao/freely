@@ -18,7 +18,9 @@
 - A second restart blocker also existed: a lone same-project dispatcher/watchdog residue could cause `start` or `daemon start` to refuse even though no authoritative supervisor was alive.
 - The runtime fix and focused regressions are complete in the blocker worktree.
 - Canonical `develop` then exposed one more followthrough seam: runtime was reading the new `## Worker Delegation` continuity shape as if no worker prompts existed, so freshly generated worker lanes could not launch even though manager continuity had already selected them.
-- The continuity parser and worker-launch consumption path are now updated to read that current handoff shape, and guarded promotion is re-running with owner evidence in the diff.
+- The continuity parser and worker-launch consumption path are now updated to read that current handoff shape.
+- Guarded replay then exposed one more same-owner retirement seam: an already merged-clean blocker worktree could still be treated as a recoverable active worker. Runtime now settles those lanes toward cleanup followthrough, and cleanup can reclaim stale recorded ownership for retire-ready merged worktrees.
+- The protected test lane replay now passes again; the remaining completion work is develop absorption, real self-host task completion, and temporary lane retirement.
 
 ## Verification Evidence
 
@@ -29,11 +31,16 @@
 5. `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`
 6. `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 7. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
-8. `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+8. `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
+9. `bash docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert-retire-ready-merged-worker`
+10. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
+11. `bash docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
+12. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+13. `./bin/governance-check`
+14. `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
 
 ## Next Action
 
-1. Run `./bin/pretests-gate` and `./bin/governance-check` for this owner on the guarded source lane.
-2. Replay `test-pre-merge-20260421-runtime-self-loop-blocker -> develop` through `./bin/merge-guarded` with the owner evidence above included in the diff.
-3. On canonical `develop`, run `./bin/freely daemon start` until one task completes to the current-project success standard and the daemon proceeds to the next task.
-4. Retire the temporary blocker worktree and disposable test-pre-merge branch.
+1. Replay `test-pre-merge-20260421-runtime-self-loop-blocker -> develop` through `./bin/merge-guarded` with the refreshed owner evidence above included in the diff.
+2. On canonical `develop`, run `./bin/freely daemon start` until one task completes to the current-project success standard, its temporary worktree closes lawfully, and the daemon proceeds to the next task.
+3. Retire the temporary blocker worktree and disposable test-pre-merge branch.
