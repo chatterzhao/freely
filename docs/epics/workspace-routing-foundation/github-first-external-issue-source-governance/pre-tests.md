@@ -71,7 +71,7 @@
 
 ### Source family term is corrected
 - id: `external-issue-family-term-adopted`
-- requirement: `Source-routing consumer docs use `external issue` as the durable source-family term and keep GitHub scoped to the first platform slice.`
+- requirement: `Source-routing consumer docs use the external issue durable source-family term and keep GitHub scoped to the first platform slice.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
@@ -79,7 +79,7 @@
 - target_lane: `feature-local`
 - promotion_gate: `completion`
 - task_refs: `tasks.md#task-3,tasks.md#task-4`
-- case_design: `Review `context-source-skill`, `source-classification`, `lead-agent`, and the startup prompt template and confirm they now speak in terms of the external-issue family rather than the looser github-issue term.`
+- case_design: `Review context-source-skill, source-classification, lead-agent, and the startup prompt template, then confirm they now speak in terms of the external-issue family rather than the looser github-issue term.`
 - testcase_derivation: `The changed consumer surfaces are `context-source-skill`, `source-classification`, `lead-agent`, and the startup prompt template, so the bounded derivation is a targeted wording audit anchored to the same staged verification artifact.`
 
 ### Guarded promote carries the external-source owner chain
