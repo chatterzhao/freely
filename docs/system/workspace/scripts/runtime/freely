@@ -6431,7 +6431,12 @@ latest_patrol_authoritative_manager_continuity_file_for_project() {
   local project="$1" continuity_file
   while IFS= read -r continuity_file; do
     [[ -f "$continuity_file" ]] || continue
-    manager_continuity_precedes_operator_stop_boundary "$project" "$continuity_file" && continue
+    if manager_continuity_precedes_operator_stop_boundary "$project" "$continuity_file"; then
+      # Once the newest continuity predates the latest explicit operator stop,
+      # older continuity files are stale history too and must not be reused as
+      # current patrol truth.
+      return 0
+    fi
     manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file" && continue
     manager_continuity_is_launchable_for_project "$project" "$continuity_file" || continue
     printf '%s\n' "$continuity_file"
@@ -7264,13 +7269,14 @@ latest_launchable_manager_worker_prompt_continuity_file_for_project() {
   local project="$1" continuity_file
   while IFS= read -r continuity_file; do
     [[ -f "$continuity_file" ]] || continue
-    manager_continuity_precedes_operator_stop_boundary "$project" "$continuity_file" && continue
+    manager_continuity_precedes_operator_stop_boundary "$project" "$continuity_file" && return 0
     manager_continuity_has_stale_runtime_worktree_refs "$project" "$continuity_file" && continue
     manager_continuity_has_worker_prompts "$continuity_file" || continue
     manager_continuity_is_launchable_for_project "$project" "$continuity_file" || continue
     printf '%s\n' "$continuity_file"
     return 0
   done < <(manager_continuity_files_desc_for_project "$project")
+  return 0
 }
 
 latest_manager_worker_prompt_csv_from_continuity() {
