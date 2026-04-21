@@ -7,12 +7,13 @@
 - candidate_format_version: `v2`
 - title: `Scan-owned patrol inventory and live-status on-demand reading contract`
 - source_class: `discovery`
-- route_kind: `pre_brainstorm`
-- phase_state: `todo_pre_brainstorm`
-- status: `proposed`
+- route_kind: `ibm`
+- phase_state: `todo_ibm`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_id: `I-20260421-1530-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
 - problem: `Freely currently risks mixing patrol inventory semantics with current-state observation semantics. Prompt-history lookup can identify a current execution contract only partially, cannot describe all unresolved surfaces, and becomes especially misleading once manager plus multiple worker prompts coexist.`
 - why_now:
   - this round's runtime and doc audit confirmed `task-source-scan` is already the patrol-seed mechanism, while `live-status` is already the current-state plane
@@ -46,8 +47,8 @@
   - `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md#C-20260420-1130-A`
   - `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
   - `docs/system/workspace/three-loop-capability-lifecycle.md`
-- next_action: `Hold this as the design boundary for any future owner that enriches scan inventory or narrows live-status field semantics; do not reopen implementation until a concrete bounded contract slice is chosen.`
-- revisit_trigger: `Re-open when the repo is ready to either (a) add typed scan item refs and scan summary consumption to status surfaces or (b) replace ambiguous prompt-history-derived status fields with explicit current-manager/worker prompt groups.`
+- next_action: `Candidate mirror only. I-20260421-1530-A is now the canonical owner for the bounded implementation slice that keeps prompt anchors authoritative, adds advisory scan-summary consumption to live-status, and proves the develop-bound path through guarded test-pre-merge plus develop replay.`
+- revisit_trigger: `Re-open only if later implementation needs a heavier typed scan-item schema, a broader status-family redesign, or a different owner for daemon-start autonomous completion proof.`
 - session_refs:
   - {tool: `codex`, session_id: `current-codex-session-id-unavailable`, jsonl_path: `unavailable://fresh-session-current-id-not-exposed`, role: `author`}
 - next_recommended_route: `doc-pre-brainstorm-execution`
