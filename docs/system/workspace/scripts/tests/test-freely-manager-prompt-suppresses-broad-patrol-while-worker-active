@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-patrol-suppressed-active-worker.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260420-0000--sample" \
+  "$PROJECT/.freely/run"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-20260420-runtime
+
+- title: Runtime self-host patrol
+- status: active
+
+### committed_issues
+
+1. `I-20260420-1000-A`
+- title: Should stay out of prompt while worker is active
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/runtime/issues/startup-patrol.md`
+- progress_path: `docs/progress/p-startup-patrol.md`
+- next_action: `continue current lane`
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260420-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260420-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260420-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+SCAN_JSON="$PROJECT/.freely/run/manager-task-source-scan-latest.json"
+cat >"$SCAN_JSON" <<'EOF'
+{"schema_version":"manager-task-source-scan-v1","scan_reason":"bootstrap_missing_scan","surfaces":[]}
+EOF
+touch -t 202604200801.00 "$SCAN_JSON"
+SCAN_MTIME_BEFORE="$(stat -f %m "$SCAN_JSON")"
+
+PROMPT_OUTPUT="$(
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+  bash -lc '
+    source "$1"
+    manager_semantic_loop_active_worker_count_for_project() {
+      echo 1
+    }
+    build_prompt
+  ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+)"
+
+if printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'Task-source patrol seed:'; then
+  echo "[FAIL] broad patrol should be suppressed while an active worker is running" >&2
+  exit 1
+fi
+
+SCAN_MTIME_AFTER="$(stat -f %m "$SCAN_JSON")"
+[[ "$SCAN_MTIME_AFTER" == "$SCAN_MTIME_BEFORE" ]]
+
+echo "[PASS] manager prompt suppresses broad patrol and scan regeneration while an active worker is running"

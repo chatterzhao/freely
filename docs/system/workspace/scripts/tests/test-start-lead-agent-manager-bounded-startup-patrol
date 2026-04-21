@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-lead-agent-manager-bounded-startup.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p "$PROJECT/docs" "$PROJECT/.freely/run"
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+EOF
+
+PROMPT_OUTPUT="$(
+  bash "$ROOT_DIR/docs/system/workspace/scripts/start-lead-agent.sh" \
+    --project "$PROJECT" \
+    --intent "$PROJECT/docs/PROJECT_INTENT.md" \
+    --constitution "$PROJECT/docs/CONSTITUTION.md" \
+    --ai codex:auto
+)"
+
+printf '%s\n' "$PROMPT_OUTPUT" | grep -Fq '启动首轮有界巡检契约：'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -Fq 'fresh_startup_patrol'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -Fq '首批必读证据只允许包含'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -Fq '在写出 primary manager continuity 前，不要整文件读取'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -Fq '选出至多一个 highest-leverage source'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -Fq 'route_kind'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -Fq 'restart_point'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -Fq 'ownership'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -Fq 'next_action'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -Fq '若 scan json 已经证明 backlog 非空，但首轮没有形成 continuity 或 worker prompt'
+
+echo "[PASS] start-lead-agent manager startup contract requires bounded patrol before broad reads"

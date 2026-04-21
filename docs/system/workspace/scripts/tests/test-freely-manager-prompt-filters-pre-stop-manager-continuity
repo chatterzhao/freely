@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-prompt-pre-stop.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/docs"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name freely-test
+git -C "$PROJECT" config user.email freely-test@example.com
+cat >"$PROJECT/README.md" <<'EOF'
+# project
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+OLD_CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260420-071010.md"
+cat >"$OLD_CONTINUITY" <<'EOF'
+# Manager Continuity
+- route_kind: `issue_continuation`
+EOF
+touch -t 202604201410.10 "$OLD_CONTINUITY"
+
+cat >"$PROJECT/.freely/run/manager-operator-stop-boundary.env" <<'EOF'
+OPERATOR_STOP_BOUNDARY_EPOCH="9999999999"
+OPERATOR_STOP_BOUNDARY_RECORDED_AT="2286-11-20T17:46:39Z"
+EOF
+
+PROMPT_OUTPUT="$(
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+    bash -lc '
+      source "$1"
+      build_prompt
+    ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+)"
+
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q "latest_generated_manager_continuity: \`$OLD_CONTINUITY\`"
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'latest_launchable_manager_continuity: `none`'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'latest_generated_manager_continuity_stale: `true`'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'latest_generated_manager_continuity_precedes_operator_stop: `true`'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'treat it as stale history for fresh startup patrol'
+
+echo "[PASS] manager prompt treats pre-stop manager continuity as stale for fresh startup patrol"

@@ -26,16 +26,17 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 ## 工作流
 1. 先执行固定前置门禁：`skill:constitution-guard` -> `skill:laws-enforcer`。
 2. `system/workspace/scripts` 中定义的 `sh` / `ps1` 启动外部 AI CLI 工具，并进入 `lead-agent`。
-3. `lead-agent` 调用 `skill:context-source-skill`，基于当前来源、milestone、工具清单与上下文做 usable issue 判定，并组装下一跳提示词。
-4. 根据 `context-source-skill` 的结果分流：
+3. manager / patrol 轮次先把 standing/event source 扫描成 machine-readable `manager-task-source-scan-latest.json`，作为本轮路由的结构化输入。
+4. `lead-agent` 调用 `skill:context-source-skill`，基于当前来源、scan json、milestone、工具清单与上下文做 usable issue 判定，并组装下一跳提示词。
+5. 根据 `context-source-skill` 的结果分流：
    - 无稳定 issue 边界 -> `skill:doc-pre-brainstorm-execution`
    - issue-bound brainstorm / mapping / governance -> `skill:doc-ibm-execution`
    - ready issue / in-progress -> `skill:dev-loop-execution`
    - `completion_verification` / `cleanup_governance` -> 留在 `auto-loop` 侧做 manager-owned judgement / handoff，必要时委派 worker 或 `skill:worktree-maintenance-governance`
-5. 各 loop skill 在环内完成自己的工作，并把状态、阻塞、完成或恢复上下文回流给 `auto-loop`；不要求下游 skill 直接“调用 auto-loop 的某个子 skill”。
-6. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
-7. 当状态跨环迁移时，按 `docs/LAWS.md` 第 2C 章同步更新候选项 / milestone / issue / progress / recovery / session evidence。
-8. 重复循环直到停止条件。
+6. 各 loop skill 在环内完成自己的工作，并把状态、阻塞、完成或恢复上下文回流给 `auto-loop`；不要求下游 skill 直接“调用 auto-loop 的某个子 skill”。
+7. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
+8. 当状态跨环迁移时，按 `docs/LAWS.md` 第 2C 章同步更新候选项 / milestone / issue / progress / recovery / session evidence。
+9. scan json 是 idle/replan step，而不是 every-cycle step：至少在首次启动缺少 scan、manager idle 且有新 intake、或 manager continuity 在无 active worker 的情况下前进后重生成；若 active worker 正在稳定推进，不要为 broad patrol 每轮重扫。
 
 ## 主管模式
 

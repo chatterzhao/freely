@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-lead-agent-skill-doc-contract.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p "$PROJECT/docs" "$PROJECT/.freely/run"
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+EOF
+
+PROMPT_OUTPUT="$(
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="cc" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+  bash -lc '
+    source "$1"
+    build_prompt
+  ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+)"
+
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'workspace/skills/README.md'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '不是当前 CLI 一定存在的原生 tool'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '不要假设存在可直接调用的 `skill` 工具'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '对大型文档不要整文件硬读'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '不要传空字符串'
+
+echo "[PASS] start-lead-agent prompt treats skills as documentation contracts and warns against broad reads"

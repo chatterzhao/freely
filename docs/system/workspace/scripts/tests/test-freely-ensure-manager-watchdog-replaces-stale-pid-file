@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-watchdog-stale-pid.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260320-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=0
+IFLOW_MAX_TURNS=100
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_EXIT_REASON="up"
+EOF
+
+bash -c "exec -a 'runtime/freely daemon-run --project $PROJECT' sleep 30" >/dev/null 2>&1 &
+SUPERVISOR_PID=$!
+printf '%s' "$SUPERVISOR_PID" >"$PROJECT/.freely/run/supervisor.pid"
+mkdir -p "$PROJECT/.freely/run/supervisor-identities"
+cat >"$PROJECT/.freely/run/supervisor-identities/supervisor-$SUPERVISOR_PID.env" <<EOF
+SUPERVISOR_PID="$SUPERVISOR_PID"
+PROJECT_ROOT="$PROJECT"
+ENTRYPOINT_MODE="daemon"
+STARTUP_TRUTH_PHASE="published"
+STARTUP_TRUTH_PUBLISHED_AT="2026-03-20T00:00:00Z"
+EOF
+
+bash -c "cd '$PROJECT' && exec sleep 30" >/dev/null 2>&1 &
+AI_PID=$!
+printf '%s' "$AI_PID" >"$PROJECT/.freely/run/ai.pid"
+
+printf '999999' >"$PROJECT/.freely/run/ensure-manager.pid"
+
+bash "$ROOT_DIR/bin/freely" ensure-manager --project "$PROJECT" --watch --interval 1 >/dev/null 2>&1 &
+WATCH_PID=$!
+
+watchdog_pid=""
+for _ in $(seq 1 20); do
+  watchdog_pid="$(cat "$PROJECT/.freely/run/ensure-manager.pid" 2>/dev/null || true)"
+  if [[ -n "$watchdog_pid" && "$watchdog_pid" != "999999" ]]; then
+    break
+  fi
+  sleep 0.2
+done
+
+if [[ -z "$watchdog_pid" || "$watchdog_pid" == "999999" ]]; then
+  echo "[FAIL] expected ensure-manager watch mode to replace the stale pid file" >&2
+  kill "$WATCH_PID" "$SUPERVISOR_PID" "$AI_PID" 2>/dev/null || true
+  wait "$WATCH_PID" 2>/dev/null || true
+  wait "$SUPERVISOR_PID" 2>/dev/null || true
+  wait "$AI_PID" 2>/dev/null || true
+  exit 1
+fi
+
+if ! kill -0 "$watchdog_pid" 2>/dev/null; then
+  echo "[FAIL] expected ensure-manager watchdog process to stay alive after replacing stale pid" >&2
+  kill "$WATCH_PID" "$SUPERVISOR_PID" "$AI_PID" 2>/dev/null || true
+  wait "$WATCH_PID" 2>/dev/null || true
+  wait "$SUPERVISOR_PID" 2>/dev/null || true
+  wait "$AI_PID" 2>/dev/null || true
+  exit 1
+fi
+
+kill "$WATCH_PID" "$SUPERVISOR_PID" "$AI_PID" 2>/dev/null || true
+wait "$WATCH_PID" 2>/dev/null || true
+wait "$SUPERVISOR_PID" 2>/dev/null || true
+wait "$AI_PID" 2>/dev/null || true
+
+echo "[PASS] ensure-manager watchdog ignores stale pid files and stays alive"

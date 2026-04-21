@@ -14,8 +14,10 @@ FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000003-worker-frozen
 CREATED_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000004-worker-created-codex.txt"
 DELEGATED_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000005-worker-delegated-codex.txt"
 DISPATCH_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000006-worker-dispatch-codex.txt"
+NESTED_QUEUE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000007-worker-nested-queue-codex.txt"
+NESTED_FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000008-worker-nested-frozen-codex.txt"
 
-touch "$LAUNCHED_PROMPT" "$QUEUED_PROMPT" "$FROZEN_PROMPT" "$CREATED_PROMPT" "$DELEGATED_PROMPT" "$DISPATCH_PROMPT"
+touch "$LAUNCHED_PROMPT" "$QUEUED_PROMPT" "$FROZEN_PROMPT" "$CREATED_PROMPT" "$DELEGATED_PROMPT" "$DISPATCH_PROMPT" "$NESTED_QUEUE_PROMPT" "$NESTED_FROZEN_PROMPT"
 
 CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260326-000000.md"
 cat >"$CONTINUITY" <<EOF
@@ -28,11 +30,13 @@ cat >"$CONTINUITY" <<EOF
 - launched:
   - $LAUNCHED_PROMPT
 
-## Queue / Frozen / Cleanup
+## Queue / Frozen Queue
 - queue:
   - worker_prompt_path: \`$QUEUED_PROMPT\`
+  - worker_prompt: \`$NESTED_QUEUE_PROMPT\`
 - frozen queue:
   - worker_prompt_path: \`$FROZEN_PROMPT\`
+  - worker_prompt: \`$NESTED_FROZEN_PROMPT\`
 
 ## Frozen Queue
 - worker_prompt: \`$FROZEN_PROMPT\`
@@ -51,7 +55,7 @@ source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 LAUNCHABLE="$(latest_manager_worker_prompt_paths_from_continuity "$CONTINUITY" | paste -sd, -)"
 FROZEN="$(latest_frozen_manager_worker_prompt_paths_from_continuity "$CONTINUITY" | paste -sd, -)"
 
-[[ "$LAUNCHABLE" == "$CREATED_PROMPT,$DELEGATED_PROMPT,$DISPATCH_PROMPT,$LAUNCHED_PROMPT,$QUEUED_PROMPT" ]]
-[[ "$FROZEN" == "$FROZEN_PROMPT" ]]
+[[ "$LAUNCHABLE" == "$CREATED_PROMPT,$DELEGATED_PROMPT,$DISPATCH_PROMPT,$LAUNCHED_PROMPT,$NESTED_QUEUE_PROMPT,$QUEUED_PROMPT" ]]
+[[ "$FROZEN" == "$FROZEN_PROMPT,$NESTED_FROZEN_PROMPT" ]]
 
 echo "[PASS] continuity parser recognizes legacy and current worker prompt contracts"

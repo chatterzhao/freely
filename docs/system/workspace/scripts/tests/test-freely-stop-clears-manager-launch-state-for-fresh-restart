@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-stop-clears-manager-launch-state.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/.freely/run/worker-prompts" "$REPO/.freely/logs" "$REPO/docs"
+
+git init -q -b develop "$REPO"
+git -C "$REPO" config user.email "test@example.com"
+git -C "$REPO" config user.name "Test User"
+cat >"$REPO/README.md" <<'EOF'
+# repo
+EOF
+git -C "$REPO" add README.md
+git -C "$REPO" commit -q -m "init"
+
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+cat >"$REPO/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-20T14:10:00Z"
+EOF
+
+CONTINUITY="$REPO/.freely/run/manager-continuity-20260420-141000.md"
+cat >"$CONTINUITY" <<'EOF'
+# Manager Continuity
+- worker_prompt: `/tmp/example/.freely/run/worker-prompts/prompt.txt`
+EOF
+touch -t 202604201410.00 "$CONTINUITY"
+
+cat >"$REPO/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="/tmp/example/.freely/run/worker-prompts/prompt.txt"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="/tmp/example/.freely/run/worker-prompts/prompt.txt"
+LAUNCHED_WORKER_PROMPTS="/tmp/example/.freely/run/worker-prompts/prompt.txt"
+QUEUED_WORKER_PROMPTS=""
+MAX_PARALLEL_WORKERS="1"
+ACTIVE_RUNNING_WORKER_COUNT="1"
+AVAILABLE_NEW_WORKER_SLOTS="0"
+UPDATED_AT="2026-04-20T14:10:10Z"
+EOF
+
+bash "$ROOT_DIR/bin/freely" stop --project "$REPO" >/dev/null
+
+[[ ! -f "$REPO/.freely/run/manager-worker-launch-state.env" ]]
+[[ -f "$REPO/.freely/run/manager-operator-stop-boundary.env" ]]
+
+# shellcheck disable=SC1090
+source "$REPO/.freely/run/manager-operator-stop-boundary.env"
+[[ "${OPERATOR_STOP_BOUNDARY_EPOCH:-}" =~ ^[0-9]+$ ]]
+
+echo "[PASS] freely stop clears manager launch state and records a fresh-restart boundary"

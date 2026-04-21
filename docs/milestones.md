@@ -584,6 +584,17 @@ routing_policy:
 - next_action: Finish the current-state durable-source inventory, lock the default durable families to `human interruption` and `external issue`, and use `human interruption` as the first proving lane while explicitly separating shared `consumed -> pre-brainstorm` semantics from family-local runtime/control closure before promoting any generic source schema or source-absorption gate.
 - revisit_trigger: Revisit when the first `human interruption` slice has made a reusable shared contract or removable-artifact invariant concrete enough to justify schema promotion or gate placement, or when another dogfooding incident proves the current visibility gap cannot be solved by strengthening existing pre-brainstorm/milestone/routing truth alone.
 
+1. `C-20260420-1130-A`
+- title: Manager task-source scan idle/replan boundary governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md`
+- next_action: Freeze the runtime-owned scan trigger contract, prove idle/replan-only regeneration with focused tests, and keep the first patrol surface set narrow instead of widening immediately into full external issue provider automation.
+- revisit_trigger: Revisit when the bounded runtime slice and tests stabilize enough to decide whether this should promote into a dedicated owner or fold into a broader source-governance follow-on with external issue provider semantics.
+
 2. `C-20260407-1036-A`
 - title: Human interruption runtime contract after source-family contraction
 - milestone_state: candidate
