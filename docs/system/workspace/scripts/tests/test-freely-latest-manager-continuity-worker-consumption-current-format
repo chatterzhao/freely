@@ -74,22 +74,20 @@ NEW_CONT="$PROJECT/.freely/run/manager-continuity-20260325-023343.md"
 cat >"$NEW_CONT" <<EOF
 # Manager Continuity
 
-## Worker Dispatch
-- prompt_path: \`$PROMPT_P0\`
-- dispatch_priority: \`P0\`
+## Worker Delegation
+- authoritative_worker_prompts:
+  - \`$PROMPT_P0\`
+  - \`$PROMPT_P1\`
+- launchable_queue:
+  - lane_id: \`I-20260325-0233-A\`
+    prompt_path: \`$PROMPT_P0\`
+    dispatch_priority: \`P0\`
 
-## Queue / Frozen / Cleanup Judgement
+## Queue / Frozen / Cleanup
 - merge-review queue:
   - path: \`$PROJECT/worktrees/p1\`
     - worker_prompt_path: \`$PROMPT_P1\`
     - dispatch_priority: \`P1\`
-
-## Worker Prompt Materialization
-- worker_prompt_paths_created_this_round:
-  - \`$PROMPT_P0\`
-- worker_prompt_paths_referenced:
-  - \`$PROMPT_P0\`
-  - \`$PROMPT_P1\`
 EOF
 
 cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
