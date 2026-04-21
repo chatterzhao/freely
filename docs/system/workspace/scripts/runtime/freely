@@ -1824,7 +1824,7 @@ reset_project_runtime_discovery_cache() {
 
 find_latest_prompt_file_for_project() {
   local project="$1"
-  latest_run_artifact_for_project "$project" 'prompt-*.txt'
+  latest_prompt_file_for_project "$project"
 }
 
 latest_generated_manager_continuity_file_for_project() {
@@ -5641,6 +5641,7 @@ load_session_state_or_defaults() {
   LAST_LAUNCH_KIND=""
   LAST_ROTATION_REASON=""
   LAST_CYCLE_LOG=""
+  LAST_PROMPT_FILE=""
   LAST_CONTEXT_COMPACTED="0"
   LAST_CONTEXT_RATIO=""
   LAST_PRIMARY_RATE_LIMIT_USED_PERCENT=""
@@ -8983,7 +8984,7 @@ recover_stalled_worker_ai_if_needed() {
 }
 
 write_session_state() {
-  local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" context_compacted="$8" context_ratio="$9" primary_used_percent="${10}" primary_resets_at="${11}" secondary_used_percent="${12}" secondary_resets_at="${13}" route_only_handoff="${14}" route_only_streak="${15}" resume_streak="${16}" active_slot="${17}" slot_switch_reason="${18}" slot_switch_at="${19}" cycle_debug_log="${20}" claude_jsonl_path="${21}" codex_mcp_used="${22}" codex_mcp_thread_id="${23}" codex_mcp_jsonl_path="${24}" claude_session_id_current="${25}" claude_session_id_previous="${26}" project_dirty_entries="${27}" worktree_summary_total="${28}" worktree_summary_dirty="${29}" checkpoint_drift_streak="${30}" delegated_pending_ids="${31}" delegated_pending_count="${32}" delegated_consumed_ids="${33}" delegated_consumed_at="${34}" restart_storm_window_secs="${35}" restart_storm_count="${36}" process_churn_peak="${37}" restart_storm_signal_at="${38}" restart_storm_signal_reason="${39}" restart_storm_escalated_at="${40}" restart_storm_escalation_target="${41}" auto_recovery_attempted_tools_csv="${42}"
+  local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" prompt_file="$8" context_compacted="$9" context_ratio="${10}" primary_used_percent="${11}" primary_resets_at="${12}" secondary_used_percent="${13}" secondary_resets_at="${14}" route_only_handoff="${15}" route_only_streak="${16}" resume_streak="${17}" active_slot="${18}" slot_switch_reason="${19}" slot_switch_at="${20}" cycle_debug_log="${21}" claude_jsonl_path="${22}" codex_mcp_used="${23}" codex_mcp_thread_id="${24}" codex_mcp_jsonl_path="${25}" claude_session_id_current="${26}" claude_session_id_previous="${27}" project_dirty_entries="${28}" worktree_summary_total="${29}" worktree_summary_dirty="${30}" checkpoint_drift_streak="${31}" delegated_pending_ids="${32}" delegated_pending_count="${33}" delegated_consumed_ids="${34}" delegated_consumed_at="${35}" restart_storm_window_secs="${36}" restart_storm_count="${37}" process_churn_peak="${38}" restart_storm_signal_at="${39}" restart_storm_signal_reason="${40}" restart_storm_escalated_at="${41}" restart_storm_escalation_target="${42}" auto_recovery_attempted_tools_csv="${43}"
   local state_file tmp_state_file
   state_file="$(session_state_file "$project")"
   tmp_state_file="$(mktemp "${state_file}.tmp.XXXXXX")"
@@ -8994,6 +8995,7 @@ LAST_TOOL_JSONL_PATH="$tool_jsonl_path"
 LAST_LAUNCH_KIND="$launch_kind"
 LAST_ROTATION_REASON="$rotation_reason"
 LAST_CYCLE_LOG="$cycle_log"
+LAST_PROMPT_FILE="$prompt_file"
 LAST_CONTEXT_COMPACTED="$context_compacted"
 LAST_CONTEXT_RATIO="$context_ratio"
 LAST_PRIMARY_RATE_LIMIT_USED_PERCENT="$primary_used_percent"
@@ -10863,10 +10865,19 @@ ensure_manager_once() {
 
 latest_prompt_file_for_project() {
   local project="$1"
-  local run_dir
-  run_dir="$(run_dir_for_project "$project")"
-  [[ -d "$run_dir" ]] || return 0
-  find "$run_dir" -maxdepth 1 -type f -name 'prompt-*.txt' | sort | tail -n 1
+  local state_file anchored_prompt_file
+  state_file="$(session_state_file "$project")"
+  anchored_prompt_file="${LAST_PROMPT_FILE:-}"
+  if [[ -z "$anchored_prompt_file" && -f "$state_file" ]]; then
+    anchored_prompt_file="$(awk -F= '/^LAST_PROMPT_FILE=/ {print $2; exit}' "$state_file" 2>/dev/null || true)"
+    anchored_prompt_file="${anchored_prompt_file#\"}"
+    anchored_prompt_file="${anchored_prompt_file%\"}"
+  fi
+  if [[ -n "$anchored_prompt_file" && -f "$anchored_prompt_file" ]]; then
+    printf '%s\n' "$anchored_prompt_file"
+    return 0
+  fi
+  latest_run_artifact_for_project "$project" 'prompt-*.txt'
 }
 
 ai_process_command_for_project() {
@@ -12969,7 +12980,7 @@ start_project_runtime() {
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
     LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
     LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}"
     if [[ "$mode_name" == "fresh" || "$mode_name" == "fresh_with_handoff" ]]; then
       rm -f "$(handoff_file "$PROJECT_ROOT")"
     fi
@@ -13229,7 +13240,7 @@ start_project_runtime() {
       record_restart_storm_signal "$PROJECT_ROOT" "$restart_signal_reason" "${restart_window_count:-0}" "${restart_window_peak:-0}"
     fi
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_capture_or_empty runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_capture_or_empty runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}"
     LAST_WORKCELL_EXIT_REASON="${slot_switch_reason:-${rate_limit_reason:-${network_failure_reason:-ai_exit_rc_${rc}}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     materialize_blocked_supervision_truth_if_needed "$PROJECT_ROOT" "$prompt_file" "$LAST_WORKCELL_EXIT_REASON" "$cycle_log"
@@ -14265,6 +14276,39 @@ task_source_scan_latest_file_for_project() {
   printf '%s\n' "$(task_source_scan_dir_for_project "$project")/latest.json"
 }
 
+task_source_scan_status_summary_for_project() {
+  local project="$1" scan_json_path
+  scan_json_path="$(task_source_scan_json_path_for_project "$project")"
+  [[ -f "$scan_json_path" ]] || return 0
+  python3 - "$scan_json_path" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as f:
+    payload = json.load(f)
+
+generated_at = payload.get("generated_at") or "unknown"
+scan_reason = payload.get("scan_reason") or "unknown"
+surfaces = payload.get("surfaces") or []
+active_parts = []
+summary_lines = []
+for surface in surfaces:
+    name = surface.get("surface") or "unknown"
+    count = surface.get("active_count")
+    if isinstance(count, int):
+        active_parts.append(f"{name}={count}")
+    lines = surface.get("summary_lines") or []
+    trimmed = [line for line in lines if isinstance(line, str) and line.strip()]
+    if trimmed:
+        summary_lines.append(f"{name}: {trimmed[0]}")
+
+active_csv = ",".join(active_parts) if active_parts else "none"
+top_refs = " || ".join(summary_lines[:3]) if summary_lines else "none"
+print(f"present|{generated_at}|{scan_reason}|{active_csv}|{top_refs}")
+PY
+}
+
 cmd_task_source_scan() {
   local project="" emit_json="0" latest_file scan_dir
   while [[ $# -gt 0 ]]; do
@@ -14372,6 +14416,7 @@ cmd_live_status() {
   local desired_runtime_state last_supervisor_state last_ai_state last_exit_reason last_role_hint last_state_updated_at
   local semantic_loop_signal semantic_loop_signal_reason semantic_loop_signal_summary semantic_loop_repeat_count
   local semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv
+  local scan_summary_state scan_summary_generated_at scan_summary_reason scan_summary_surface_counts scan_summary_top_refs
   local blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact
   local manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary manager_continuity_gap_writer_state
   local manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary
@@ -14549,6 +14594,12 @@ cmd_live_status() {
     IFS='|' read -r semantic_loop_signal_reason semantic_loop_repeat_count semantic_loop_latest_continuity semantic_loop_latest_consumed semantic_loop_latest_prompt_csv _ <<<"$semantic_loop_signal"
     semantic_loop_signal_summary="repeats=${semantic_loop_repeat_count:-0} latest=${semantic_loop_latest_continuity:-unavailable} consumed=${semantic_loop_latest_consumed:-unavailable} prompts=${semantic_loop_latest_prompt_csv:-none}"
   fi
+  scan_summary_state="none"
+  scan_summary_generated_at="unavailable"
+  scan_summary_reason="unavailable"
+  scan_summary_surface_counts="none"
+  scan_summary_top_refs="none"
+  IFS='|' read -r scan_summary_state scan_summary_generated_at scan_summary_reason scan_summary_surface_counts scan_summary_top_refs <<<"$(task_source_scan_status_summary_for_project "$project")"
   IFS='|' read -r blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact <<<"$(blocked_supervision_snapshot_for_project "$project")"
   IFS='|' read -r manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary <<<"$(manager_handoff_snapshot_for_project "$project")"
   IFS='|' read -r manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$project")"
@@ -14610,6 +14661,11 @@ cmd_live_status() {
   echo "restart_storm_escalation_target: ${LAST_RESTART_STORM_ESCALATION_TARGET:-unavailable}"
   echo "semantic_loop_signal_reason: ${semantic_loop_signal_reason}"
   echo "semantic_loop_signal_summary: ${semantic_loop_signal_summary}"
+  echo "scan_summary_state: ${scan_summary_state:-none}"
+  echo "scan_summary_generated_at: $(format_timestamp_local_for_display "${scan_summary_generated_at:-unavailable}")"
+  echo "scan_summary_reason: ${scan_summary_reason:-unavailable}"
+  echo "scan_summary_surface_counts: ${scan_summary_surface_counts:-none}"
+  echo "scan_summary_top_refs: ${scan_summary_top_refs:-none}"
   echo "blocked_supervision_state: ${blocked_supervision_state:-none}"
   echo "blocked_supervision_reason: ${blocked_supervision_reason:-none}"
   echo "blocked_supervision_summary: ${blocked_supervision_summary:-none}"

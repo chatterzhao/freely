@@ -430,6 +430,17 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260413-1640-A` is now the canonical owner for binding sibling `tasks.md` closeout completeness into `pretests-gate` completion and guarded adequacy decisions.
 - revisit_trigger: Re-open only if future closeout policy needs a broader execution ledger than owner-bound `tasks.md`, or if delegated develop-bound replay proves this gate can still be bypassed.
 
+1. `C-20260421-1530-A`
+- title: Scan-owned patrol inventory and live-status on-demand reading contract
+- milestone_state: candidate
+- phase_state: `todo_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260421-1530--scan-owned-patrol-inventory-and-live-status-on-demand-reading/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260421-1530--scan-owned-patrol-inventory-and-live-status-on-demand-reading/candidates.md`
+- next_action: Keep this boundary in pre-brainstorm while landing bounded implementation slices: preserve current-state truth and deep refs, add advisory scan summary consumption, then verify daemon-start autonomous routing/completion and develop-side closeout before deciding whether to materialize a narrower owner.
+- revisit_trigger: Re-open only when the repo is ready to either materialize typed scan-item references into status surfaces or narrow prompt-history-derived fields into explicit current-manager/worker prompt groups without capability regression.
+
 1. `C-20260413-0208-A`
 - title: Foreground/background runtime entrypoint semantics governance
 - milestone_state: candidate
