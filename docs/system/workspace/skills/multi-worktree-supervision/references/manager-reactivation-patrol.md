@@ -8,7 +8,7 @@
 2. `./bin/freely fleet-status --project <develop>` 或等价工位总览
 3. `docs/milestones.md`
 4. 当前 active milestone 阶段对应的 worktree / issue / progress / recovery
-5. interruption backlog、resume / handoff 证据、以及 relevant candidate / pre-brainstorm artifacts
+5. interruption backlog、external issue source backlog、resume / handoff 证据、以及 relevant candidate / pre-brainstorm artifacts
 
 ## 巡检目标
 
@@ -54,13 +54,18 @@
 - 或 pre-brainstorm 已形成稳定结论，但尚未产出 candidate / 未写回 milestone / 缺少 `next_action` 与 `revisit_trigger`
 - 主管应把这类点位视为 standing-source completeness drift，而不是“以后再看”
 
-9. `candidate visible but not consumable`
+9. `external source not consumed or not closed out`
+- raw external issue 仍 open，但 canonical owner truth 中没有可验证的 source linkage
+- 或 source 已被 consume/accept/discard，但外部 closeout/comment/publication linkage 明显漂移
+- 主管应先判定这是 source intake 还是 external drift reconcile，再决定走 pre-brainstorm/materialization 还是 maintenance followthrough
+
+10. `candidate visible but not consumable`
 - candidate 虽然已经出现在 milestone，但仍处于 `unassigned` 思维、错误 milestone、或当前 milestone 中长期无人继续研究
 - `next_action` / `revisit_trigger` 无法指向近期消费节奏
 - 当前 milestone 已经确定不会消费它，但也没有后移到更合适的 active milestone，或显式标记为 `dropped`
 - 主管应将其分流给 `milestone-planning-state-maintenance` 或新的 pre-brainstorm/materialization worker，而不是继续让它停留在静态可见状态
 
-10. `develop push followthrough drift`
+11. `develop push followthrough drift`
 - canonical `develop` 本地已经领先 tracked remote
 - 但没有显式 defer reason，或 defer window 长期未被重新消费
 - 主管应将其视为 `manager-owned` 的 standing-source followthrough，而不是把本地 merge 误判为远端 canonical closure
@@ -74,7 +79,7 @@
 
 - `patrol-driven`
   - 来源：standing-source scan
-  - 典型输入：`live-status` / `fleet-status` / interruption / milestone / issue / progress / recovery / pre-brainstorm
+  - 典型输入：`live-status` / `fleet-status` / interruption / external issue / milestone / issue / progress / recovery / pre-brainstorm
 
 - `event-driven`
   - 来源：human interruption / worker result / runtime anomaly / review/test signal

@@ -54,6 +54,8 @@ printf '%s\n' "$prompt" | grep -q '先更新当前阶段对应的 continuity art
 printf '%s\n' "$prompt" | grep -q '使用 subagent 提高效率'
 printf '%s\n' "$prompt" | grep -q 'freely live-status --project'
 printf '%s\n' "$prompt" | grep -q 'fleet-status'
+printf '%s\n' "$prompt" | grep -q 'freely task-source-scan --project'
+printf '%s\n' "$prompt" | grep -q 'standing-source'
 printf '%s\n' "$prompt" | grep -q '需求池至少包括'
 printf '%s\n' "$prompt" | grep -q '当前先看哪个池'
 printf '%s\n' "$prompt" | grep -q 'pre-brainstorm'

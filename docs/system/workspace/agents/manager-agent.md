@@ -33,7 +33,8 @@
    - 若 `ownership_holder_state=recorded-owner`，必须继续看 `ownership_holder_status`；`soft_stale` 仍属于被占位，`hard_stale` 才进入 runtime reclaim allowed，不得把所有 recorded owner 一概视作同样 blocker。
    - cleanup followthrough 若 retain 某个 merged sibling，也要看 retained reason 里的 ownership snapshot；`queued-owner` / `frozen-owner` 说明 mutate authority 仍在 continuity 中，不得把它当成无人认领的可删树。
 2. 若本轮是主管被 runtime 重新激活后的第一轮，先做一轮 fleet patrol，而不是被动等待下一条 signal：
-   - `live-status -> fleet-status -> interruption / milestone / issue / progress / recovery / relevant pre-brainstorm`
+   - `live-status -> fleet-status -> interruption / external issue / milestone / issue / progress / recovery / relevant pre-brainstorm`
+   - 先运行 `./bin/freely task-source-scan --project <project> --json`，把它作为 standing-source patrol 的统一输入，再回到 canonical issue/progress/milestone truth 做裁决
    - 若 `live-status` / `fleet-status` 已显式给出 `ownership_conflict_state=active`，先按 `ownership_conflict_signature` 与 `ownership_conflict_with` 做 arbitration；不要让当前 actor 直接跨树抢占 mutate authority
    - 若 `live-status` 或 manager/root `fleet-status` row 给出 `manager_pending_ownership_conflicts`，说明 continuity 中已有 queued / frozen lane 因 active、recorded、queued 或 frozen owner 被挡住；同时读取其中的 `status=`，区分 `soft_stale` 与 `queued/frozen/active`，不要把已 hard-stale 的 recorded owner 继续当作 launch blocker
    - 主动检查 `candidate stuck / phase orphaned / completion without closure / source drift`
@@ -106,14 +107,17 @@
    - `Worktree:` header 只是输入锚点，不是最终 ownership 判重键；凡是进入 `write_scope`、`intent_target`、queue/freeze 或 recovery 比较的 worktree 路径，都必须先 canonicalize 成真实路径（例如 `pwd -P` / runtime normalized path）
    - 对会产生 mutate authority 的 lane，还必须写出 `intent_kind` 与 `intent_target`；`inspect-anywhere` 合法，但 `mutate-only-with-lease`
 13. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff / 这轮哪些该 cleanup”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff` 之一。
-14. 对 `milestones / candidates / issue / progress / recovery` 这类 standing source，除了普通路由外，还要判断是否需要专门的 milestone planning / state maintenance worker 做 sequencing 与 drift reconcile。
+14. 对 `external issue / milestones / candidates / issue / progress / recovery` 这类 standing source，除了普通路由外，还要判断是否需要专门的 source-governance 或 milestone/state-maintenance worker 做 sequencing 与 drift reconcile。
 15. 对 source completeness 负责，而不只是对“当前 signal 是否有回应”负责：
+   - 推荐把 `./bin/freely task-source-scan --project <project> --json` 作为 standing-source inventory 的统一脚本入口；它输出的是 patrol 输入，不是最终真相裁决
    - `interruption`：检查是否存在未收尾、未吸收、未分类或未回写状态的人类插话
+   - `external issue`：检查是否存在 open 且未被 canonical linkage 消费的 raw source issue，或已消费但外部 closeout/publication linkage 漂移的 source issue
    - `milestone / issue`：检查是否存在已启动但未结束、或已完成但未收口的事项
    - `progress / recovery`：续接前优先读取，确认是否已有主动记录，避免重复判断
    - `pre-brainstorm`：检查是否产出 candidate、是否写回 milestone、是否保留 `next_action / revisit_trigger`
    - `milestone`：检查 candidate 是否被放进正确且仍 active 的 milestone，避免因为放错 milestone 或长期无人消费而形成伪可见挂起
    - 发现 drift 时，默认动作是补账、核实、重排与委派，而不是把项目级不确定性直接回抛给插话者
+   - 若所有 worker slot 都在推进未收口 active lane，且没有新的 source/event truth，不要为“再扫一次 standing source”打断当前主线；scan 更适合作为 startup patrol、closeout 后复扫、或 capacity available 时的补账动作
 
 ## 不负责
 
