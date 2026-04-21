@@ -20,6 +20,7 @@
 - `PASS`: expected-running worker recovery and global restart selection now both exclude absorbed merged worker lanes, even if an earlier bad recovery already left ordinary dirty files behind in that old worktree.
 - `PASS`: once canonical replay proves `kiro-cli` hit monthly request exhaustion, runtime now persists that tool-unavailable truth and later auto-switch / manager bootstrap selection skips Kiro instead of routing immediately back into the same exhausted tool.
 - `PASS`: after a successful guarded `develop` push followthrough, runtime now refreshes the local upstream tracking ref to the pushed `HEAD`, so manager/live-status do not keep reporting false `push_pending` solely because the remote-tracking ref remained stale.
+- `PASS`: untracked runtime-only Python cache residue under `docs/system/workspace/scripts/runtime/__pycache__/` no longer keeps canonical `develop` or disposable premerge lanes artificially dirty during manager hygiene judgement; runtime now auto-cleans that residue before dirty-state evaluation.
 - `PASS`: focused regressions and nearby daemon/live-status coverage passed on the guarded source lane, and the protected test lane replay still passed after the retirement followthrough repair.
 - `PENDING`: the final protected-branch acceptance remains canonical `develop` self-host execution where Freely finishes one task to the current-project success standard, closes the worktree, and continues to the next task.
 
@@ -56,6 +57,7 @@
 29. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
 30. `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
 31. `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
+32. `bash docs/system/workspace/scripts/tests/test-freely-live-status-cleans-disposable-pycache-residue`
 
 ## 2026-04-21 08:45 PDT Kiro Availability Memory Followthrough
 
@@ -74,6 +76,15 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
 - `PENDING`: replay the guarded merge into canonical `develop`, then resume daemon self-host validation until one real task completes, the relevant worktree is retired, and the daemon advances to another task.
+
+## 2026-04-21 16:45 PDT Disposable Pycache Hygiene Followthrough
+
+- `FAIL`: canonical `develop` self-host replay still looped after push truth cleared because manager kept treating untracked `docs/system/workspace/scripts/runtime/__pycache__/` residue in canonical `develop` and the disposable absorbed-merged premerge lane as durable cleanup blockers, so no real replay/closeout work ever started.
+- `PASS`: runtime dirty-state and startup prompt hygiene now auto-clean untracked disposable Python cache residue (`__pycache__` / `.pyc`) before lane cleanliness is judged.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-cleans-disposable-pycache-residue`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
+- `PENDING`: rerun canonical `develop` daemon self-host acceptance and confirm the repaired hygiene gate lets manager advance into a real task, retire the corresponding temporary worktree, and continue.
 
 ## 2026-04-21 05:25 PDT Recheck
 

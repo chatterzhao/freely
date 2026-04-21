@@ -47,6 +47,8 @@
 - Runtime now persists `kiro_monthly_request_limit` as a tool-availability state with a recovery hint and skips that cached-unavailable Kiro candidate during later auto-switch / manager bootstrap selection, instead of re-burning the same exhausted tool before moving on.
 - Canonical `develop` self-host replay then exposed one more same-owner followthrough seam: guarded merge push followthrough had already succeeded, but local `origin/develop` tracking truth still lagged behind `HEAD`, so manager/live-status kept surfacing `develop_push_followthrough_state=push_pending` and continued to treat protected push followthrough as an unresolved gating fact.
 - Runtime now refreshes the local upstream tracking ref to the pushed `HEAD` immediately after a successful `develop-push attempt`, so later manager patrols do not stall on a false `ahead>0` reading after guarded delivery has already completed.
+- Canonical `develop` self-host replay then exposed one more hygiene seam: after push truth cleared, manager still looped on untracked `docs/system/workspace/scripts/runtime/__pycache__/` residue in canonical `develop` and the disposable absorbed-merged premerge lane instead of advancing the selected cleanup / replay followthrough.
+- Runtime and the lead-agent startup snapshot now auto-clean untracked disposable Python cache residue (`__pycache__` / `.pyc`) before dirty-state hygiene judgement, so manager no longer treats runtime-only cache artifacts as durable lane dirt.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
 
 ## 2026-04-21 08:45 PDT Kiro Availability Memory Verification
@@ -66,6 +68,15 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
 - `PENDING`: absorb this repair into canonical `develop`, then rerun daemon self-host acceptance to verify manager advances past false push followthrough and actually completes cleanup/task closeout.
+
+## 2026-04-21 16:45 PDT Disposable Pycache Hygiene Verification
+
+- `FAIL`: canonical `develop` self-host replay no longer stalled on false push followthrough, but manager still looped across `fresh` and repeated `fresh_with_handoff` rounds because canonical `develop` plus `test-pre-merge-20260421-absorbed-merged-scan-routing-fix` only looked dirty from untracked `docs/system/workspace/scripts/runtime/__pycache__/` residue.
+- `PASS`: runtime now auto-cleans untracked disposable Python cache residue before dirty-state hygiene judgement, and the lead-agent startup snapshot uses the same narrow rule so manager prompts stop freezing on runtime-only cache artifacts.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-cleans-disposable-pycache-residue`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
+- `PENDING`: absorb this repair into canonical `develop`, then rerun daemon self-host acceptance until one real task completes, the relevant worktree closes, and the daemon advances to another task.
 
 ## Verification Evidence
 
