@@ -8832,6 +8832,15 @@ manager_runtime_launch_workers_from_latest_handoff() {
       queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
       continue
     fi
+    if ! worker_prompt_launchable_for_manager_project "$project" "$prompt_file"; then
+      if worker_prompt_targets_retire_ready_merged_worktree "$project" "$prompt_file"; then
+        settle_retire_ready_merged_worker_runtime_state \
+          "$project" \
+          "$target_project" \
+          "$(worker_prompt_target_branch "$prompt_file")" >/dev/null 2>&1 || true
+      fi
+      continue
+    fi
     if csv_contains_exact_item "$launched_csv" "$prompt_file"; then
       if worker_project_is_actively_running "$target_project"; then
         continue
