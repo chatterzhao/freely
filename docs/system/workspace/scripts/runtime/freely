@@ -12509,7 +12509,7 @@ project_has_active_runtime_processes() {
 }
 
 project_has_authoritative_runtime_processes_for_user_precheck() {
-  local project="$1" run_dir supervisor_pid watchdog_pid dispatcher_pid
+  local project="$1" run_dir supervisor_pid
   run_dir="$(run_dir_for_project "$project")"
 
   cleanup_project_start_lock_if_stale_for_runtime "$project"
@@ -12527,20 +12527,6 @@ project_has_authoritative_runtime_processes_for_user_precheck() {
     fi
   fi
   [[ -n "$(authoritative_supervisor_pids_for_project "$project" | head -n 1)" ]] && return 0
-
-  if [[ -f "$(ensure_manager_watchdog_pid_file "$project")" ]]; then
-    watchdog_pid="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
-    if valid_ensure_manager_watchdog_pid_for_project "$project" "$watchdog_pid"; then
-      return 0
-    fi
-  fi
-
-  if [[ -f "$(interruption_dispatcher_pid_file "$project")" ]]; then
-    dispatcher_pid="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
-    if valid_interruption_dispatcher_pid_for_project "$project" "$dispatcher_pid"; then
-      return 0
-    fi
-  fi
 
   return 1
 }
@@ -12810,12 +12796,21 @@ start_project_runtime() {
   fi
 
   request_stop() {
+    local signal_name="${1:-TERM}"
+    if [[ "$entrypoint_mode" == "daemon" ]] && [[ ! -f "$(stop_marker_file "$project")" ]]; then
+      append_runtime_event "$project" "daemon_signal_ignored" \
+        "supervisor_pid=$$" \
+        "signal=$signal_name" \
+        "reason=no_stop_marker"
+      return 0
+    fi
     stop_requested=1
     LAST_WORKCELL_EXIT_REASON="operator_stop"
     DESIRED_RUNTIME_STATE_VALUE="stopped"
     : >"$(stop_marker_file "$project")"
     append_runtime_event "$project" "operator_stop_requested" \
       "supervisor_pid=$$" \
+      "signal=$signal_name" \
       "child_pid_file=$child_pid_file"
     if [[ -f "$child_pid_file" ]]; then
       local active_child
@@ -12833,6 +12828,7 @@ start_project_runtime() {
         stop_requested=1
         append_runtime_event "$project" "operator_stop_requested" \
           "supervisor_pid=$$" \
+          "signal=stop_marker" \
           "child_pid_file=$child_pid_file"
       fi
       LAST_WORKCELL_EXIT_REASON="operator_stop"
@@ -12936,7 +12932,8 @@ start_project_runtime() {
   write_supervisor_identity_truth "$project" "$$" "$entrypoint_mode"
   release_project_start_lock_for_runtime "$project"
   trap cleanup_supervisor EXIT
-  trap request_stop INT TERM
+  trap 'request_stop INT' INT
+  trap 'request_stop TERM' TERM
   exit_if_stop_requested_before_launch
   ensure_interruption_dispatcher_running_for_active_runtime "$project" || {
     exit_if_stop_requested_before_launch
