@@ -7212,13 +7212,105 @@ worker_project_is_retire_ready_merged_clean() {
   (( dirty_entries == 0 ))
 }
 
+markdown_backtick_field_value() {
+  local markdown_file="$1" field_name="$2"
+  [[ -f "$markdown_file" ]] || return 0
+  awk -v field_name="$field_name" '
+    $0 ~ "^- " field_name ":" {
+      if (match($0, /`[^`]+`/)) {
+        print substr($0, RSTART + 1, RLENGTH - 2)
+        exit
+      }
+    }
+  ' "$markdown_file"
+}
+
+worker_retirement_followthrough_paths() {
+  local target_worktree="$1" prompt_file="${2:-}" contract_file owner_issue pre_tests_path artifact_dir owner_issue_file progress_path tasks_path
+  contract_file="$(worker_verification_contract_state_file "$target_worktree")"
+  owner_issue=""
+  pre_tests_path=""
+  artifact_dir=""
+
+  if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
+    owner_issue="$(worker_prompt_owner_issue "$prompt_file")"
+    pre_tests_path="$(worker_prompt_pre_tests_path "$prompt_file")"
+    artifact_dir="$(worker_prompt_verification_artifact_dir "$prompt_file")"
+  fi
+  if [[ -z "$owner_issue" && -f "$contract_file" ]]; then
+    owner_issue="$(meta_env_value "$contract_file" "OWNER_ISSUE")"
+  fi
+  if [[ -z "$pre_tests_path" && -f "$contract_file" ]]; then
+    pre_tests_path="$(meta_env_value "$contract_file" "PRE_TESTS_PATH")"
+  fi
+  if [[ -z "$artifact_dir" && -f "$contract_file" ]]; then
+    artifact_dir="$(meta_env_value "$contract_file" "VERIFICATION_ARTIFACT_DIR")"
+  fi
+
+  [[ -n "$owner_issue" ]] && printf '%s\n' "$owner_issue"
+  [[ -n "$pre_tests_path" ]] && printf '%s\n' "$pre_tests_path"
+  [[ -n "$artifact_dir" ]] && printf '%s/\n' "${artifact_dir%/}"
+
+  if [[ -n "$owner_issue" ]]; then
+    owner_issue_file="$target_worktree/$owner_issue"
+    progress_path="$(markdown_backtick_field_value "$owner_issue_file" "progress_path")"
+    tasks_path="$(markdown_backtick_field_value "$owner_issue_file" "tasks_path")"
+    [[ -n "$progress_path" ]] && printf '%s\n' "$progress_path"
+    [[ -n "$tasks_path" ]] && printf '%s\n' "$tasks_path"
+  fi
+}
+
+worker_project_has_only_retirement_followthrough_dirty_entries() {
+  local target_worktree="$1" prompt_file="${2:-}" dirty_line dirty_path allowed_path matched
+  [[ -n "$target_worktree" && -d "$target_worktree" ]] || return 1
+
+  while IFS= read -r dirty_line; do
+    [[ -n "$dirty_line" ]] || continue
+    dirty_path="${dirty_line:3}"
+    [[ -n "$dirty_path" ]] || return 1
+    [[ "$dirty_path" == *" -> "* ]] && return 1
+    matched="0"
+    while IFS= read -r allowed_path; do
+      [[ -n "$allowed_path" ]] || continue
+      if [[ "$allowed_path" == */ ]]; then
+        allowed_path="${allowed_path%/}"
+        case "$dirty_path" in
+          "$allowed_path"|"$allowed_path"/*)
+            matched="1"
+            break
+            ;;
+        esac
+      elif [[ "$dirty_path" == "$allowed_path" ]]; then
+        matched="1"
+        break
+      fi
+    done < <(worker_retirement_followthrough_paths "$target_worktree" "$prompt_file")
+    [[ "$matched" == "1" ]] || return 1
+  done < <(git -C "$target_worktree" status --porcelain 2>/dev/null)
+  return 0
+}
+
+worker_project_is_retire_ready_merged_followthrough() {
+  local manager_project="$1" target_worktree="$2" target_branch="$3" prompt_file="${4:-}" dirty_entries
+  [[ -n "$target_worktree" && -d "$target_worktree" ]] || return 1
+  worker_worktree_has_runtime_history "$target_worktree" || return 1
+  [[ -n "$target_branch" ]] || return 1
+  branch_is_merged_into_develop "$manager_project" "$target_branch" || return 1
+  dirty_entries="$(project_dirty_entries "$target_worktree")"
+  [[ "$dirty_entries" =~ ^[0-9]+$ ]] || return 1
+  if (( dirty_entries == 0 )); then
+    return 0
+  fi
+  worker_project_has_only_retirement_followthrough_dirty_entries "$target_worktree" "$prompt_file"
+}
+
 worker_prompt_targets_retire_ready_merged_worktree() {
   local manager_project="$1" prompt_file="$2"
   local resolved_worktree target_branch
   resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   [[ -n "$resolved_worktree" && -d "$resolved_worktree" ]] || return 1
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
-  worker_project_is_retire_ready_merged_clean "$manager_project" "$resolved_worktree" "$target_branch"
+  worker_project_is_retire_ready_merged_followthrough "$manager_project" "$resolved_worktree" "$target_branch" "$prompt_file"
 }
 
 worker_prompt_launchable_for_manager_project() {
@@ -8105,7 +8197,7 @@ retire_ready_merged_worktree_can_reclaim_ownership() {
   local manager_project="$1" target_worktree="$2" branch="${3:-}" prompt_file=""
   [[ -n "$manager_project" && -n "$target_worktree" && -d "$target_worktree" ]] || return 1
   prompt_file="$(latest_prompt_file_for_project "$target_worktree")"
-  if worker_project_is_retire_ready_merged_clean "$manager_project" "$target_worktree" "$branch" || \
+  if worker_project_is_retire_ready_merged_followthrough "$manager_project" "$target_worktree" "$branch" "$prompt_file" || \
     worker_prompt_targets_retire_ready_merged_worktree "$manager_project" "$prompt_file"; then
     return 0
   fi
@@ -10122,7 +10214,7 @@ manager_supervision_alerts() {
     owner="runtime-owned"
     next_action="runtime_recovery_requested"
     worker_prompt_file="$(latest_prompt_file_for_project "$wt_path")"
-    if worker_project_is_retire_ready_merged_clean "$project" "$wt_path" "$branch" || \
+    if worker_project_is_retire_ready_merged_followthrough "$project" "$wt_path" "$branch" "$worker_prompt_file" || \
       worker_prompt_targets_retire_ready_merged_worktree "$project" "$worker_prompt_file"; then
       printf -- '- %s: branch=%s role=%s owner=%s next_action=%s exit_reason=%s path=%s\n' \
         "retire_ready_merged_worktree_retained" \
@@ -10165,7 +10257,7 @@ settle_retire_ready_merged_worker_runtime_state() {
   local manager_project="$1" target_project="$2" branch="${3:-}" worker_prompt_file="" supervisor_pid="" ai_pid=""
   [[ -n "$manager_project" && -n "$target_project" && -d "$target_project" ]] || return 1
   worker_prompt_file="$(latest_prompt_file_for_project "$target_project")"
-  if ! worker_project_is_retire_ready_merged_clean "$manager_project" "$target_project" "$branch" \
+  if ! worker_project_is_retire_ready_merged_followthrough "$manager_project" "$target_project" "$branch" "$worker_prompt_file" \
     && ! worker_prompt_targets_retire_ready_merged_worktree "$manager_project" "$worker_prompt_file"; then
     return 1
   fi
@@ -10287,7 +10379,7 @@ manager_runtime_recover_workers_if_needed() {
     fi
 
     worker_prompt_file="$(latest_prompt_file_for_project "$wt_path")"
-    if worker_project_is_retire_ready_merged_clean "$project" "$wt_path" "$branch" || \
+    if worker_project_is_retire_ready_merged_followthrough "$project" "$wt_path" "$branch" "$worker_prompt_file" || \
       worker_prompt_targets_retire_ready_merged_worktree "$project" "$worker_prompt_file"; then
       settle_retire_ready_merged_worker_runtime_state "$project" "$wt_path" "$branch" >/dev/null 2>&1 || true
       log_info "manager runtime skips expected-running recovery for retire-ready merged worker: branch=${branch:-unknown} path=$wt_path"
