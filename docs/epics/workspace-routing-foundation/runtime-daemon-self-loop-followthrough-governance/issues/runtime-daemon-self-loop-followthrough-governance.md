@@ -50,6 +50,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 10. Ensure a newer manager-authored continuity can supersede stale queued worker-prompt state when the current truth has shifted to manager-owned cleanup / completion verification with no launchable worker prompt.
 11. Prove on canonical `develop` that Freely self-starts, selects a task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
 12. When runtime learns that `kiro-cli` is unavailable due to monthly request exhaustion during canonical self-host replay, persist that tool-unavailable truth so later auto-switch / manager bootstrap decisions do not immediately route back into the same exhausted tool.
+13. After guarded `develop` merge push followthrough succeeds, refresh local upstream tracking truth so manager/live-status do not keep treating canonical `develop` as `push_pending` purely because the local remote-tracking ref stayed stale.
 
 ## Non-Goals
 
@@ -77,6 +78,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-supersedes-queued-prompt-with-manager-continuity`
 - `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
 - `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-skips-known-unavailable-kiro`
+- `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
