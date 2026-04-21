@@ -88,6 +88,29 @@ done
   exit 1
 }
 
+daemon_run_process_lines() {
+  ps -ef | grep -F "runtime/freely daemon-run --project $PROJECT" | grep -v grep || true
+}
+
+wait_for_single_daemon_run_process() {
+  local lines="" count="0"
+  for _ in $(seq 1 25); do
+    lines="$(daemon_run_process_lines)"
+    if [[ -n "$lines" ]]; then
+      count="$(printf '%s\n' "$lines" | sed '/^$/d' | wc -l | tr -d ' ')"
+    else
+      count="0"
+    fi
+    if [[ "$count" == "1" ]]; then
+      printf '%s\n' "$lines"
+      return 0
+    fi
+    sleep 0.2
+  done
+  printf '%s\n' "$lines"
+  return 1
+}
+
 for _ in $(seq 1 50); do
   if [[ -f "$PROJECT/.freely/logs/runtime-events.log" ]] && grep -q 'event=interruption_dispatcher_relaunch_ready' "$PROJECT/.freely/logs/runtime-events.log"; then
     break
@@ -95,10 +118,11 @@ for _ in $(seq 1 50); do
   sleep 0.2
 done
 
-RUNNER_COUNT_BEFORE="$(ps -ef | grep -F "runtime/freely daemon-run --project $PROJECT" | grep -v grep | wc -l | tr -d ' ')"
+RUNNER_LINES_BEFORE="$(wait_for_single_daemon_run_process || true)"
+RUNNER_COUNT_BEFORE="$(printf '%s\n' "$RUNNER_LINES_BEFORE" | sed '/^$/d' | wc -l | tr -d ' ')"
 [[ "$RUNNER_COUNT_BEFORE" == "1" ]] || {
   echo "[FAIL] expected exactly one daemon-run process before reuse, found $RUNNER_COUNT_BEFORE" >&2
-  ps -ef | grep -F "runtime/freely daemon-run --project $PROJECT" | grep -v grep >&2 || true
+  printf '%s\n' "$RUNNER_LINES_BEFORE" >&2
   exit 1
 }
 
@@ -109,10 +133,11 @@ printf '%s\n' "$SECOND_OUTPUT" | grep -q "^supervisor_pid: $SUPERVISOR_PID$"
 
 sleep 1
 
-RUNNER_COUNT_AFTER="$(ps -ef | grep -F "runtime/freely daemon-run --project $PROJECT" | grep -v grep | wc -l | tr -d ' ')"
+RUNNER_LINES_AFTER="$(wait_for_single_daemon_run_process || true)"
+RUNNER_COUNT_AFTER="$(printf '%s\n' "$RUNNER_LINES_AFTER" | sed '/^$/d' | wc -l | tr -d ' ')"
 [[ "$RUNNER_COUNT_AFTER" == "1" ]] || {
   echo "[FAIL] repeated daemon start should not launch an extra daemon-run process, found $RUNNER_COUNT_AFTER" >&2
-  ps -ef | grep -F "runtime/freely daemon-run --project $PROJECT" | grep -v grep >&2 || true
+  printf '%s\n' "$RUNNER_LINES_AFTER" >&2
   exit 1
 }
 

@@ -6865,7 +6865,7 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
             if (mode != "launchable") {
               emit_prompt_paths($0)
             }
-          } else if (worker_prompts_subsection == "launchable" || worker_prompts_subsection == "queue") {
+          } else if (worker_prompts_subsection == "" || worker_prompts_subsection == "launchable" || worker_prompts_subsection == "queue") {
             if (mode != "frozen") {
               emit_prompt_paths($0)
             }
@@ -7054,7 +7054,11 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
           emit_prompt_paths($0)
           next
         }
-        if ((worker_prompts_subsection == "launchable" || worker_prompts_subsection == "queue") && $0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+        if ((worker_prompts_subsection == "" || worker_prompts_subsection == "launchable" || worker_prompts_subsection == "queue") && ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/ || $0 ~ /worker_prompt:/)) {
+          emit_prompt_paths($0)
+          next
+        }
+        if ((worker_prompts_subsection == "" || worker_prompts_subsection == "launchable" || worker_prompts_subsection == "queue") && $0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
           emit_prompt_paths($0)
           next
         }
