@@ -45,6 +45,8 @@
 - Runtime now treats manager-authored no-worker continuity as authoritative enough to supersede stale queued worker-prompt state, while still preserving older unconsumed prompts across newer runtime-seeded startup stubs and runtime fallback continuity.
 - Canonical `develop` daemon replay then exposed one more tool-availability seam: after `cc` ended `tool_runtime_failure`, cross-tool recovery could still select `kiro-cli` even though the immediately preceding self-host evidence had already proven this machine was at Kiro monthly request limit.
 - Runtime now persists `kiro_monthly_request_limit` as a tool-availability state with a recovery hint and skips that cached-unavailable Kiro candidate during later auto-switch / manager bootstrap selection, instead of re-burning the same exhausted tool before moving on.
+- Canonical `develop` self-host replay then exposed one more same-owner followthrough seam: guarded merge push followthrough had already succeeded, but local `origin/develop` tracking truth still lagged behind `HEAD`, so manager/live-status kept surfacing `develop_push_followthrough_state=push_pending` and continued to treat protected push followthrough as an unresolved gating fact.
+- Runtime now refreshes the local upstream tracking ref to the pushed `HEAD` immediately after a successful `develop-push attempt`, so later manager patrols do not stall on a false `ahead>0` reading after guarded delivery has already completed.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
 
 ## 2026-04-21 08:45 PDT Kiro Availability Memory Verification
@@ -56,6 +58,14 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-uses-unified-auto-recovery-path`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
 - `PENDING`: absorb this same-owner followthrough into canonical `develop`, then rerun `./bin/freely daemon start` until a real task completes, the corresponding worktree is lawfully closed, and the daemon proceeds to another task.
+
+## 2026-04-21 09:25 PDT Develop Push Followthrough Tracking Refresh Verification
+
+- `FAIL`: canonical `develop` self-host replay showed `merge-guarded` had already pushed successfully, but local branch truth still reported `develop...origin/develop [ahead 73]`; manager therefore kept surfacing `develop_push_followthrough_state=push_pending` and never cleared that gating fact before cleanup sequencing.
+- `PASS`: `develop-push attempt` now rewrites the local upstream tracking ref to the pushed `HEAD` immediately after a successful push, so later `develop_push_followthrough_snapshot_for_project()` reads `clean` instead of replaying stale ahead-count truth.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
+- `PENDING`: absorb this repair into canonical `develop`, then rerun daemon self-host acceptance to verify manager advances past false push followthrough and actually completes cleanup/task closeout.
 
 ## Verification Evidence
 

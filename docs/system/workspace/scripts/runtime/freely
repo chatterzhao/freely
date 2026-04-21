@@ -5975,6 +5975,15 @@ develop_push_followthrough_upstream_for_project() {
   git -C "$project" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true
 }
 
+develop_push_followthrough_refresh_upstream_tracking_ref_after_success() {
+  local project="$1" pushed_head="${2:-}" upstream_ref
+  upstream_ref="$(git -C "$project" rev-parse --symbolic-full-name '@{upstream}' 2>/dev/null || true)"
+  [[ "$upstream_ref" == refs/remotes/* ]] || return 0
+  [[ -n "$pushed_head" ]] || pushed_head="$(git -C "$project" rev-parse HEAD 2>/dev/null || true)"
+  [[ -n "$pushed_head" ]] || return 1
+  git -C "$project" update-ref "$upstream_ref" "$pushed_head" >/dev/null 2>&1 || return 1
+}
+
 develop_push_followthrough_authoritative_develop_project() {
   local project="$1" repo_root entries wt_path wt_branch
   repo_root="$(git_root_for_path "$project")"
@@ -15635,6 +15644,7 @@ cmd_develop_push() {
       local push_rc=$?
       set -e
       if [[ "$push_rc" -eq 0 ]]; then
+        develop_push_followthrough_refresh_upstream_tracking_ref_after_success "$project" "$head" || true
         clear_develop_push_attempt_state "$project"
         clear_develop_push_followthrough_state "$project"
         snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
