@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/absorbed-merged-scan-routing-fix-20260421`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-absorbed-merged-scan-routing-fix`
-- updated_at: `2026-04-21 13:40 PDT`
+- updated_at: `2026-04-21 14:07 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -18,7 +18,9 @@
 - The first drift source was `wt-fleet-status`, which kept `LAST_ROLE_HINT=worker` for absorbed merged lanes and therefore kept rendering them as worker workcells in manager prompts.
 - The second drift source was `task-source-scan`, which kept routing linked progress owners to `verification` because it only read progress metadata, not the linked branch/worktree absorption state.
 - The bounded fix now downgrades those fleet lanes to cleanup visibility and routes absorbed merged progress items to `cleanup` while preserving scan visibility.
-- Focused regressions and nearby scan/fleet tests now pass; remaining work is guarded replay into `develop`, canonical self-host acceptance, and temporary worktree retirement.
+- Canonical `develop` dogfooding then exposed a second drift source: manager startup could still reuse a stale patrol scan after `HEAD` changed, so a just-merged owner could remain launchable from old scan truth even after scan/fleet routing was corrected.
+- The follow-up fix now anchors each generated patrol scan to the project `HEAD` and forces regeneration when manager startup observes a different `HEAD`, which keeps startup patrol aligned with post-merge canonical truth.
+- Focused regressions and nearby scan/fleet/prompt tests now pass; remaining work is guarded replay into `develop`, canonical self-host acceptance, and temporary worktree retirement.
 
 ## Verification Evidence
 
@@ -26,8 +28,10 @@
 2. `bash docs/system/workspace/scripts/tests/test-wt-fleet-status-absorbed-merged-worker-role`
 3. `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan`
 4. `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan-routes-absorbed-merged-progress-to-cleanup`
-5. `./bin/governance-check`
-6. `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
+5. `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
+6. `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-head-change`
+7. `./bin/governance-check`
+8. `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
 
 ## Next Action
 
