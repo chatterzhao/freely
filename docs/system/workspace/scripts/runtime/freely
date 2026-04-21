@@ -7209,6 +7209,7 @@ worker_project_is_absorbed_merged_lane() {
   local manager_project="$1" target_worktree="$2" target_branch="$3"
   [[ -n "$target_worktree" && -d "$target_worktree" ]] || return 1
   worker_worktree_has_runtime_history "$target_worktree" || return 1
+  [[ -f "$(workcell_state_file "$target_worktree")" ]] || return 1
   [[ -n "$target_branch" ]] || return 1
   branch_is_merged_into_develop "$manager_project" "$target_branch" || return 1
 }
@@ -7326,10 +7327,16 @@ worker_prompt_targets_retire_ready_merged_worktree() {
 }
 
 worker_prompt_launchable_for_manager_project() {
-  local manager_project="$1" prompt_file="$2" resolved_worktree
+  local manager_project="$1" prompt_file="$2" resolved_worktree target_branch
   resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   [[ -n "$resolved_worktree" && -d "$resolved_worktree" ]] || return 1
-  if worker_project_is_absorbed_merged_lane "$manager_project" "$resolved_worktree" "$(worker_prompt_target_branch "$prompt_file")"; then
+  target_branch="$(worker_prompt_target_branch "$prompt_file")"
+  if worker_project_is_absorbed_merged_lane "$manager_project" "$resolved_worktree" "$target_branch"; then
+    if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]] \
+      && worker_prompt_has_verification_metadata "$prompt_file" \
+      && ! worker_project_is_retire_ready_merged_followthrough "$manager_project" "$resolved_worktree" "$target_branch" "$prompt_file"; then
+      return 0
+    fi
     return 1
   fi
   return 0
@@ -9457,6 +9464,7 @@ manager_continuity_resume_focus_route_kind() {
   [[ -f "$continuity_file" ]] || return 1
   awk '
     /^## Ownership And Restart Point$/ { in_section=1; next }
+    /^## Primary Judgement$/ { in_section=1; next }
     /^## / && in_section { exit }
     in_section && /route_kind:/ {
       if (match($0, /`[^`]+`/)) {
@@ -9468,27 +9476,54 @@ manager_continuity_resume_focus_route_kind() {
   ' "$continuity_file"
 }
 
+manager_continuity_resume_focus_section() {
+  local continuity_file="$1" primary_heading="$2" secondary_heading="${3:-}"
+  [[ -f "$continuity_file" ]] || return 1
+  awk -v primary="$primary_heading" -v secondary="$secondary_heading" '
+    BEGIN {
+      primary_header="## " primary
+      secondary_header=(secondary == "" ? "" : "## " secondary)
+    }
+    $0 == primary_header { in_section=1; print; next }
+    secondary_header != "" && $0 == secondary_header { in_section=1; print; next }
+    /^## / && in_section { exit }
+    in_section { print }
+  ' "$continuity_file"
+}
+
 append_manager_consumed_continuity_resume_focus_if_needed() {
   local project="$1"
   local state_file continuity_file latest_generated route_kind
-  local queue_excerpt ownership_excerpt
+  local queue_excerpt ownership_excerpt next_priority_excerpt focus_label
 
   [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
-  [[ "${LAUNCH_KIND_SELECTED:-}" == "resume" ]] || return 0
-  [[ ! -f "$(handoff_file "$project")" ]] || return 0
   [[ "${LAST_DELEGATED_CONTINUATION_PENDING_COUNT:-0}" == "0" ]] || return 0
 
-  state_file="$(manager_worker_launch_state_file "$project")"
-  continuity_file="${LAST_MANAGER_CONTINUITY_CONSUMED:-}"
-  if [[ -z "$continuity_file" && -f "$state_file" ]]; then
-    # shellcheck disable=SC1090
-    source "$state_file"
-    continuity_file="${LAST_MANAGER_CONTINUITY_CONSUMED:-}"
-  fi
-  [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
-
   latest_generated="$(latest_generated_manager_continuity_file_for_project "$project")"
-  [[ -n "$latest_generated" && "$continuity_file" == "$latest_generated" ]] || return 0
+  case "${LAUNCH_KIND_SELECTED:-}" in
+    resume)
+      [[ ! -f "$(handoff_file "$project")" ]] || return 0
+      state_file="$(manager_worker_launch_state_file "$project")"
+      continuity_file="${LAST_MANAGER_CONTINUITY_CONSUMED:-}"
+      if [[ -z "$continuity_file" && -f "$state_file" ]]; then
+        # shellcheck disable=SC1090
+        source "$state_file"
+        continuity_file="${LAST_MANAGER_CONTINUITY_CONSUMED:-}"
+      fi
+      [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
+      [[ -n "$latest_generated" && "$continuity_file" == "$latest_generated" ]] || return 0
+      focus_label="已消费 manager continuity 续接"
+      ;;
+    fresh_with_handoff)
+      [[ -f "$(handoff_file "$project")" ]] || return 0
+      continuity_file="$latest_generated"
+      [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
+      focus_label="manager continuity handoff 续接"
+      ;;
+    *)
+      return 0
+      ;;
+  esac
 
   route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
   case "$route_kind" in
@@ -9496,29 +9531,27 @@ append_manager_consumed_continuity_resume_focus_if_needed() {
     *) return 0 ;;
   esac
 
-  queue_excerpt="$(awk '
-    /^## Queue And Dispatch$/ { in_section=1; print; next }
-    /^## / && in_section { exit }
-    in_section { print }
-  ' "$continuity_file")"
-  ownership_excerpt="$(awk '
-    /^## Ownership And Restart Point$/ { in_section=1; print; next }
-    /^## / && in_section { exit }
-    in_section { print }
-  ' "$continuity_file")"
-  [[ -n "$queue_excerpt" || -n "$ownership_excerpt" ]] || return 0
+  queue_excerpt="$(manager_continuity_resume_focus_section "$continuity_file" "Queue And Dispatch" "Queue")"
+  ownership_excerpt="$(manager_continuity_resume_focus_section "$continuity_file" "Ownership And Restart Point" "Primary Judgement")"
+  next_priority_excerpt="$(manager_continuity_resume_focus_section "$continuity_file" "Next Supervision Priority")"
+  [[ -n "$queue_excerpt" || -n "$ownership_excerpt" || -n "$next_priority_excerpt" ]] || return 0
 
-  printf '\n已消费 manager continuity 续接：\n'
-  printf -- '- 当前轮次是同一 manager lane 的 `resume`，且 runtime 已消费最近一份 continuity：\n'
+  printf '\n%s：\n' "$focus_label"
+  printf -- '- 当前轮次必须把这份 continuity 当作当前 manager lane 的执行锚点：\n'
   printf -- '  - `%s`\n' "$continuity_file"
   printf -- '- 不要默认重做完整的主管首跳 patrol / 里程碑全扫描。\n'
-  printf -- '- 先严格承接这份 continuity 的 `active_lane / restart_point / next_action / next_supervision_priority`。\n'
+  printf -- '- 先严格承接这份 continuity 的 `route_kind / restart_point / next_action / next_supervision_priority`。\n'
+  printf -- '- 对 manager-owned `completion_verification / cleanup_governance`，本轮目标不是再写一份同义 continuity；必须优先推进其中已经写明的 maintenance / replay / retirement followthrough。\n'
+  printf -- '- 若当前问题实质是 worktree merge / cleanup / retirement / fleet sequencing，先按 `workspace/skills/worktree-maintenance-governance/SKILL.md` 执行，而不是回到新的 broad patrol。\n'
+  printf -- '- 只有当你已经推进了当前 continuity 指定的 followthrough，或发现缺少某项 runtime / governance capability 必须先修复时，才允许写下一份 continuity。\n'
   printf -- '- 只有出现以下情况时，才允许扩回全量巡检：\n'
   printf -- '  - 有新的 delegated continuation / fresh intake\n'
   printf -- '  - 当前 authoritative fleet truth 与该 continuity 明显冲突\n'
   printf -- '  - 该 continuity 指定的 restart point 已被你本轮明确关闭，并且你正在写下一份 manager continuity 来推进 owner / phase judgement\n\n'
   [[ -n "$queue_excerpt" ]] && printf '%s\n' "$queue_excerpt"
   [[ -n "$ownership_excerpt" ]] && printf '%s\n' "$ownership_excerpt"
+  [[ -n "$next_priority_excerpt" ]] && printf '%s\n' "$next_priority_excerpt"
+  return 0
 }
 
 write_manager_bootstrap_handoff() {
