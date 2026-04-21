@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TARGET="$ROOT_DIR/docs/system/workspace/scripts/start-lead-agent.sh"
+
+required_fields=(
+  'Owner-Issue:'
+  'Pre-Tests-Path:'
+  'Verification-Artifact-Dir:'
+  'Required-Test-Lanes:'
+  'Required-Acceptance-Item-Ids:'
+  'Minimum-Evidence-Level:'
+  'Target-Environment:'
+  'Closeout-Gate:'
+  'Closeout-Gate-Command:'
+  'Closeout-Target-Lane:'
+  'Closeout-Promotion-Gate:'
+  'Closeout-Requires-Adequacy:'
+  'Closeout-Review-Artifact-Policy:'
+)
+
+for field in "${required_fields[@]}"; do
+  if ! grep -Fq "$field" "$TARGET"; then
+    echo "[FAIL] start-lead-agent verification contract missing $field" >&2
+    exit 1
+  fi
+done
+
+echo "[PASS] start-lead-agent verification contract matches runtime-required fields"
