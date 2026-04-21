@@ -44,8 +44,10 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 4. Route `merged-clean` / `retire-ready` worker lanes to cleanup followthrough retirement instead of runtime recovery, and let cleanup reclaim stale recorded ownership for those lanes.
 5. Treat merged develop-absorbed worker lanes that are dirty only in owner evidence surfaces as cleanup/promotion followthrough, not as relaunchable edit workers.
 6. Add focused regressions for orphan precheck residue, unexpected daemon `TERM`, worker-delegation continuity consumption, and retire-ready merged-worker retirement routing.
-7. Replay the guarded promotion path with concrete owner evidence.
-8. Prove on canonical `develop` that Freely self-starts, selects a task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
+7. Keep manager-owned continuity followthrough anchored across both `resume` and `fresh_with_handoff` launches so context compaction cannot devolve into rewriting the same continuity instead of performing the queued maintenance / retirement work.
+8. Distinguish never-started worker branches from truly absorbed merged lanes so launch gating still starts real work while absorbed merged workers remain routed to retirement followthrough.
+9. Replay the guarded promotion path with concrete owner evidence.
+10. Prove on canonical `develop` that Freely self-starts, selects a task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
 
 ## Non-Goals
 
@@ -69,7 +71,12 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-retire-ready-merged-prompt`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-absorbed-merged-dirty-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert-retire-ready-merged-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
