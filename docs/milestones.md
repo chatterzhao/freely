@@ -565,13 +565,13 @@ routing_policy:
 1. `C-20260407-1042-A`
 - title: External issue identity, mapping, and publication model after source-family contraction
 - milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+- phase_state: `todo_ibm`
 - priority: P1
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/candidates.md`
-- next_action: Finish the boundary freeze for `source issue` vs canonical internal owner vs optional `publication target`, lock explicit keep/split/reject plus formalization invariants/decision tables for legacy `20260403-1000` conclusions, freeze the GitHub-first minimum field and canonical dedupe/consumption contract, then decide whether the bounded GitHub-first policy/schema owner can now be materialized while storage/API automation remains deferred.
-- revisit_trigger: Revisit when source-loop intake, publication policy, and writeback limits are explicit enough to open a bounded GitHub-first policy/schema owner, or if storage design starts pulling GitHub back toward canonical owner truth.
+- next_action: Candidate mirror only. `I-20260407-1042-A` is now the canonical owner for GitHub-first external issue source governance; followthrough should materialize source scan, canonical metadata, and source closeout into context-source truth before widening into runtime create/sync automation.
+- revisit_trigger: Re-open only if implementation discovery proves the bounded owner still lacks a required internal-only AI field or must introduce a dedicated mapping artifact before document-driven rollout can work.
 
 1. `C-20260407-0817-A`
 - title: Source inbox, routing absorption boundary, and manager/worker audit contract
