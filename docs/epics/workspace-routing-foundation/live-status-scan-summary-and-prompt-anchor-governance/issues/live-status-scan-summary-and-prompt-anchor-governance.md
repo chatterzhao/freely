@@ -41,7 +41,7 @@ What was still missing was a narrow implementation owner that applies the separa
 
 1. Keep explicit prompt anchors authoritative for `live-status`, manager handoff, and continuity-gap prompt references.
 2. Add an advisory `scan_summary` surface to `live-status` by reading the existing `manager-task-source-scan-latest.json`.
-3. Preserve existing `current-state plane` behavior, deep refs, worker-lane visibility, and the bounded startup continuity-selection seam needed for the same owner to replay on canonical `develop`.
+3. Preserve existing `current-state plane` behavior, deep refs, worker-lane visibility, the bounded startup continuity-selection seam, and the startup lifecycle keepalive needed so watchdog recovery does not kill a supervisor while prompt build is still legitimately in flight.
 4. Carry the design/materialization chain needed for guarded merge through `test-pre-merge-*` and develop replay.
 
 ## Non-Goals
