@@ -113,6 +113,36 @@ authoritative_develop_worktree() {
   '
 }
 
+branch_is_merged_into_authoritative_develop() {
+  local project="$1" branch="$2" develop_worktree branch_head develop_head
+  [[ -n "$branch" ]] || return 1
+  develop_worktree="$(authoritative_develop_worktree "$project")"
+  [[ -n "$develop_worktree" ]] || return 1
+  branch_head="$(git -C "$develop_worktree" rev-parse "$branch" 2>/dev/null || true)"
+  develop_head="$(git -C "$develop_worktree" rev-parse develop 2>/dev/null || true)"
+  [[ -n "$branch_head" && -n "$develop_head" ]] || return 1
+  [[ "$branch_head" != "$develop_head" ]] || return 1
+  git -C "$develop_worktree" merge-base --is-ancestor "$branch" develop >/dev/null 2>&1
+}
+
+worktree_has_runtime_history() {
+  local worktree="$1"
+  [[ -f "$worktree/.freely/run/workcell-state.env" ]] \
+    || [[ -f "$worktree/.freely/run/session-state.env" ]] \
+    || [[ -f "$worktree/.freely/run/manager-worker-launch-state.env" ]]
+}
+
+normalized_role_hint() {
+  local project="$1" worktree="$2" branch="$3" role_hint="$4"
+  if [[ "$role_hint" == "worker" ]] \
+    && worktree_has_runtime_history "$worktree" \
+    && branch_is_merged_into_authoritative_develop "$project" "$branch"; then
+    printf 'cleanup\n'
+    return 0
+  fi
+  printf '%s\n' "${role_hint:-unavailable}"
+}
+
 develop_push_followthrough_snapshot_for_develop_worktree() {
   local worktree="$1"
   local upstream counts ahead behind state summary head blocked_reason blocked_head
@@ -244,6 +274,7 @@ while IFS='|' read -r wt_path wt_branch; do
   issue_hint="$(extract_issue_hint "$wt_path")"
   desired_runtime_state="$(extract_workcell_state_value "$wt_path" DESIRED_RUNTIME_STATE)"
   role_hint="$(extract_workcell_state_value "$wt_path" LAST_ROLE_HINT)"
+  role_hint="$(normalized_role_hint "$PROJECT_ROOT" "$wt_path" "$wt_branch" "$role_hint")"
   exit_reason="$(extract_workcell_state_value "$wt_path" LAST_EXIT_REASON)"
   develop_push_snapshot="$(develop_push_followthrough_snapshot "$wt_path")"
   IFS='|' read -r develop_push_state develop_push_summary develop_push_urgency develop_push_resync_required <<<"$develop_push_snapshot"

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import os
 import re
@@ -103,6 +104,111 @@ def relative_to_project(project: Path, path: Path) -> str:
         return str(path.relative_to(project))
     except ValueError:
         return str(path)
+
+
+@functools.lru_cache(maxsize=None)
+def repo_root_for_project(project: str) -> Path | None:
+    try:
+        output = subprocess.check_output(
+            ["git", "-C", project, "rev-parse", "--show-toplevel"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except subprocess.CalledProcessError:
+        return None
+    return Path(output) if output else None
+
+
+@functools.lru_cache(maxsize=None)
+def authoritative_develop_worktree(project: str) -> Path | None:
+    repo_root = repo_root_for_project(project)
+    if repo_root is None:
+        return None
+    try:
+        current_branch = subprocess.check_output(
+            ["git", "-C", str(repo_root), "branch", "--show-current"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except subprocess.CalledProcessError:
+        current_branch = ""
+    if current_branch == "develop":
+        return repo_root
+
+    try:
+        output = subprocess.check_output(
+            ["git", "-C", str(repo_root), "worktree", "list", "--porcelain"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        return None
+
+    worktree = None
+    for line in output.splitlines():
+        if line.startswith("worktree "):
+            worktree = Path(line[9:].strip())
+        elif line.startswith("branch refs/heads/") and line.strip() == "branch refs/heads/develop":
+            return worktree
+    return None
+
+
+@functools.lru_cache(maxsize=None)
+def branch_is_merged_into_authoritative_develop(project: str, branch: str) -> bool:
+    if not branch:
+        return False
+    develop_worktree = authoritative_develop_worktree(project)
+    if develop_worktree is None:
+        return False
+    try:
+        branch_head = subprocess.check_output(
+            ["git", "-C", str(develop_worktree), "rev-parse", branch],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+        develop_head = subprocess.check_output(
+            ["git", "-C", str(develop_worktree), "rev-parse", "develop"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except subprocess.CalledProcessError:
+        return False
+    if not branch_head or branch_head == develop_head:
+        return False
+    try:
+        subprocess.check_call(
+            ["git", "-C", str(develop_worktree), "merge-base", "--is-ancestor", branch, "develop"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        return False
+    return True
+
+
+def worktree_has_runtime_history(worktree_path: Path) -> bool:
+    run_dir = worktree_path / ".freely" / "run"
+    return any(
+        candidate.exists()
+        for candidate in (
+            run_dir / "workcell-state.env",
+            run_dir / "session-state.env",
+            run_dir / "manager-worker-launch-state.env",
+        )
+    )
+
+
+def progress_item_is_absorbed_merged_lane(project: Path, fields: dict) -> bool:
+    branch = fields.get("branch", "")
+    worktree_path = fields.get("worktree_path", "")
+    if not branch or not worktree_path:
+        return False
+    worktree = Path(worktree_path)
+    if not worktree.is_dir():
+        return False
+    if not worktree_has_runtime_history(worktree):
+        return False
+    return branch_is_merged_into_authoritative_develop(str(project), branch)
 
 
 def restart_point_for_interruption(classification: str) -> str:
@@ -302,6 +408,16 @@ def scan_progress(project: Path) -> list[dict]:
             not closure_status or closure_status in TERMINAL_PROGRESS_CLOSURE_STATUSES
         ):
             continue
+        absorbed_merged_lane = progress_item_is_absorbed_merged_lane(project, fields)
+        restart_point = "verification" if phase_state == "in_verification" else "continuation"
+        owner_hint = fields.get("issue_path") or "manager"
+        if absorbed_merged_lane:
+            restart_point = "cleanup"
+            owner_hint = "manager"
+            next_action = (
+                "Finish cleanup/closeout followthrough for the already absorbed merged lane instead "
+                "of routing it back into verification execution."
+            )
         items.append(
             {
                 "source_family": "progress",
@@ -314,10 +430,11 @@ def scan_progress(project: Path) -> list[dict]:
                     "runtime_state": fields.get("runtime_state", "unknown"),
                     "closure_status": closure_status or "open",
                     "verification_status": fields.get("verification_status", "unknown"),
+                    "lane_state": "absorbed_merged" if absorbed_merged_lane else "active_or_unclassified",
                 },
                 "needs_action": True,
-                "restart_point": "verification" if phase_state == "in_verification" else "continuation",
-                "owner_hint": fields.get("issue_path") or "manager",
+                "restart_point": restart_point,
+                "owner_hint": owner_hint,
                 "next_action": next_action or "Resume the active owner or finish its closeout followthrough.",
             }
         )
