@@ -42,9 +42,10 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 2. Make daemon-mode supervisor ignore unexpected `INT`/`TERM` when no `stop.marker` exists, while preserving explicit stop semantics.
 3. Keep current manager continuity formats runtime-consumable by parsing `## Worker Delegation` handoffs into concrete worker prompt launches.
 4. Route `merged-clean` / `retire-ready` worker lanes to cleanup followthrough retirement instead of runtime recovery, and let cleanup reclaim stale recorded ownership for those lanes.
-5. Add focused regressions for orphan precheck residue, unexpected daemon `TERM`, worker-delegation continuity consumption, and retire-ready merged-worker retirement routing.
-6. Replay the guarded promotion path with concrete owner evidence.
-7. Prove on canonical `develop` that Freely self-starts, selects a task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
+5. Treat merged develop-absorbed worker lanes that are dirty only in owner evidence surfaces as cleanup/promotion followthrough, not as relaunchable edit workers.
+6. Add focused regressions for orphan precheck residue, unexpected daemon `TERM`, worker-delegation continuity consumption, and retire-ready merged-worker retirement routing.
+7. Replay the guarded promotion path with concrete owner evidence.
+8. Prove on canonical `develop` that Freely self-starts, selects a task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
 
 ## Non-Goals
 
