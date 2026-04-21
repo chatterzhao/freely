@@ -1,0 +1,227 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d)"
+PROJECT="$TMP_DIR/project"
+SERVER_LOG="$TMP_DIR/server.log"
+SERVER_META="$TMP_DIR/server-meta.json"
+BODY_FILE="$TMP_DIR/body.md"
+BOOTSTRAP_HOME="$TMP_DIR/home-bootstrap"
+DEFAULT_HOME="$TMP_DIR/home-default"
+BOOTSTRAP_TARGET_ENV="$TMP_DIR/custom-credentials.env"
+
+cleanup() {
+  if [[ -n "${SERVER_PID:-}" ]]; then
+    kill "$SERVER_PID" >/dev/null 2>&1 || true
+    wait "$SERVER_PID" >/dev/null 2>&1 || true
+  fi
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+mkdir -p "$PROJECT"
+git init -q "$PROJECT"
+git -C "$PROJECT" remote add origin git@gitee-zhaoquan:zhaoquan/freely.git
+
+cat >"$TMP_DIR/server.py" <<'PY'
+import json
+import sys
+import urllib.parse
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+meta_path, log_path = sys.argv[1], sys.argv[2]
+requests = []
+
+class Handler(BaseHTTPRequestHandler):
+    def _capture(self):
+        length = int(self.headers.get("Content-Length", "0"))
+        raw = self.rfile.read(length).decode("utf-8") if length else ""
+        entry = {
+            "method": self.command,
+            "path": self.path,
+            "body": raw,
+        }
+        requests.append(entry)
+        with open(log_path, "w", encoding="utf-8") as handle:
+            json.dump(requests, handle, ensure_ascii=False, indent=2)
+        return raw
+
+    def _send(self, payload):
+        encoded = json.dumps(payload).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(encoded)))
+        self.end_headers()
+        self.wfile.write(encoded)
+
+    def do_GET(self):
+        self._capture()
+        if self.path.startswith("/api/v5/repos/zhaoquan/freely/issues/12"):
+            self._send({"number": 12, "state": "open", "title": "demo"})
+            return
+        self._send([{"number": 12, "state": "open", "title": "demo"}])
+
+    def do_POST(self):
+        raw = self._capture()
+        if self.path.startswith("/api/v5/repos/zhaoquan/freely/issues/12/comments"):
+            values = urllib.parse.parse_qs(raw)
+            self._send({"id": 2, "body": values.get("body", [""])[0]})
+            return
+        values = urllib.parse.parse_qs(raw)
+        self._send({"number": 12, "title": values.get("title", [""])[0]})
+
+    def do_PATCH(self):
+        raw = self._capture()
+        values = urllib.parse.parse_qs(raw)
+        self._send({"number": 12, "state": values.get("state", ["open"])[0]})
+
+    def log_message(self, fmt, *args):
+        return
+
+server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+with open(meta_path, "w", encoding="utf-8") as handle:
+    json.dump({"port": server.server_address[1]}, handle)
+server.serve_forever()
+PY
+
+python3 "$TMP_DIR/server.py" "$SERVER_META" "$SERVER_LOG" &
+SERVER_PID=$!
+
+for _ in $(seq 1 50); do
+  [[ -f "$SERVER_META" ]] && break
+  sleep 0.1
+done
+[[ -f "$SERVER_META" ]]
+PORT="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["port"])' "$SERVER_META")"
+printf 'Created from file.\n' >"$BODY_FILE"
+
+LIST_OUTPUT="$TMP_DIR/list.json"
+(
+  cd "$PROJECT"
+  GITEE_API_BASE="http://127.0.0.1:$PORT/api/v5" \
+  "$ROOT_DIR/bin/gitee-issue" list >"$LIST_OUTPUT"
+)
+
+CREATE_OUTPUT="$TMP_DIR/create.json"
+(
+  cd "$PROJECT"
+  GITEE_API_BASE="http://127.0.0.1:$PORT/api/v5" \
+  GITEE_ACCESS_TOKEN="demo-token" \
+  "$ROOT_DIR/bin/gitee-issue" create --title "Demo issue" --body-file "$BODY_FILE" >"$CREATE_OUTPUT"
+)
+
+COMMENT_OUTPUT="$TMP_DIR/comment.json"
+(
+  cd "$PROJECT"
+  GITEE_API_BASE="http://127.0.0.1:$PORT/api/v5" \
+  GITEE_ACCESS_TOKEN="demo-token" \
+  "$ROOT_DIR/bin/gitee-issue" comment 12 --body "Please continue" >"$COMMENT_OUTPUT"
+)
+
+CLOSE_OUTPUT="$TMP_DIR/close.json"
+(
+  cd "$PROJECT"
+  GITEE_API_BASE="http://127.0.0.1:$PORT/api/v5" \
+  GITEE_ACCESS_TOKEN="demo-token" \
+  "$ROOT_DIR/bin/gitee-issue" close 12 --comment "done" >"$CLOSE_OUTPUT"
+)
+
+REOPEN_OUTPUT="$TMP_DIR/reopen.json"
+(
+  cd "$PROJECT"
+  GITEE_API_BASE="http://127.0.0.1:$PORT/api/v5" \
+  GITEE_ACCESS_TOKEN="demo-token" \
+  "$ROOT_DIR/bin/gitee-issue" reopen 12 --comment "resume" >"$REOPEN_OUTPUT"
+)
+
+mkdir -p "$BOOTSTRAP_HOME/.freely"
+cat >"$BOOTSTRAP_HOME/.freely/.env" <<EOF
+FREELY_ENV_FILE=$BOOTSTRAP_TARGET_ENV
+EOF
+
+cat >"$BOOTSTRAP_TARGET_ENV" <<'EOF'
+GITEE_ACCESS_TOKEN=env-file-token
+EOF
+
+CREATE_FROM_BOOTSTRAP_OUTPUT="$TMP_DIR/create-from-bootstrap.json"
+(
+  cd "$PROJECT"
+  HOME="$BOOTSTRAP_HOME" \
+  GITEE_API_BASE="http://127.0.0.1:$PORT/api/v5" \
+  "$ROOT_DIR/bin/gitee-issue" create --title "From bootstrap" >"$CREATE_FROM_BOOTSTRAP_OUTPUT"
+)
+
+mkdir -p "$DEFAULT_HOME/.config/freely"
+cat >"$DEFAULT_HOME/.config/freely/credentials.env" <<'EOF'
+GITEE_ACCESS_TOKEN=default-path-token
+EOF
+
+CREATE_FROM_DEFAULT_PATH_OUTPUT="$TMP_DIR/create-from-default-path.json"
+(
+  cd "$PROJECT"
+  HOME="$DEFAULT_HOME" \
+  GITEE_API_BASE="http://127.0.0.1:$PORT/api/v5" \
+  "$ROOT_DIR/bin/gitee-issue" create --title "From default path" >"$CREATE_FROM_DEFAULT_PATH_OUTPUT"
+)
+
+python3 - <<'PY' "$LIST_OUTPUT" "$CREATE_OUTPUT" "$COMMENT_OUTPUT" "$CLOSE_OUTPUT" "$REOPEN_OUTPUT" "$CREATE_FROM_BOOTSTRAP_OUTPUT" "$CREATE_FROM_DEFAULT_PATH_OUTPUT" "$SERVER_LOG"
+import json
+import sys
+
+list_payload = json.load(open(sys.argv[1], encoding="utf-8"))
+create_payload = json.load(open(sys.argv[2], encoding="utf-8"))
+comment_payload = json.load(open(sys.argv[3], encoding="utf-8"))
+close_payload = json.load(open(sys.argv[4], encoding="utf-8"))
+reopen_payload = json.load(open(sys.argv[5], encoding="utf-8"))
+create_from_bootstrap_payload = json.load(open(sys.argv[6], encoding="utf-8"))
+create_from_default_path_payload = json.load(open(sys.argv[7], encoding="utf-8"))
+requests = json.load(open(sys.argv[8], encoding="utf-8"))
+
+assert list_payload[0]["number"] == 12
+assert create_payload["title"] == "Demo issue"
+assert comment_payload["body"] == "Please continue"
+assert close_payload["state"] == "closed"
+assert reopen_payload["state"] == "open"
+assert create_from_bootstrap_payload["title"] == "From bootstrap"
+assert create_from_default_path_payload["title"] == "From default path"
+
+assert requests[0]["method"] == "GET"
+assert requests[0]["path"].startswith("/api/v5/repos/zhaoquan/freely/issues?")
+assert "state=open" in requests[0]["path"]
+
+assert requests[1]["method"] == "POST"
+assert requests[1]["path"] == "/api/v5/repos/zhaoquan/freely/issues?access_token=demo-token"
+assert "title=Demo+issue" in requests[1]["body"]
+assert "body=Created+from+file.%0A" in requests[1]["body"]
+
+assert requests[2]["method"] == "POST"
+assert requests[2]["path"] == "/api/v5/repos/zhaoquan/freely/issues/12/comments?access_token=demo-token"
+assert "body=Please+continue" in requests[2]["body"]
+
+assert requests[3]["method"] == "POST"
+assert requests[3]["path"] == "/api/v5/repos/zhaoquan/freely/issues/12/comments?access_token=demo-token"
+assert "body=done" in requests[3]["body"]
+
+assert requests[4]["method"] == "PATCH"
+assert requests[4]["path"] == "/api/v5/repos/zhaoquan/freely/issues/12?access_token=demo-token"
+assert requests[4]["body"] == "state=closed"
+
+assert requests[5]["method"] == "POST"
+assert requests[5]["path"] == "/api/v5/repos/zhaoquan/freely/issues/12/comments?access_token=demo-token"
+assert "body=resume" in requests[5]["body"]
+
+assert requests[6]["method"] == "PATCH"
+assert requests[6]["path"] == "/api/v5/repos/zhaoquan/freely/issues/12?access_token=demo-token"
+assert requests[6]["body"] == "state=open"
+
+assert requests[7]["method"] == "POST"
+assert requests[7]["path"] == "/api/v5/repos/zhaoquan/freely/issues?access_token=env-file-token"
+assert "title=From+bootstrap" in requests[7]["body"]
+
+assert requests[8]["method"] == "POST"
+assert requests[8]["path"] == "/api/v5/repos/zhaoquan/freely/issues?access_token=default-path-token"
+assert "title=From+default+path" in requests[8]["body"]
+PY
+
+echo "[PASS] gitee-issue manages list/create/comment/close/reopen with repo auto-detection, env/bootstrap/default-path auth fallback, body-file support, and API base override"
