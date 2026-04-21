@@ -19,6 +19,8 @@ OUTPUT="$(
     valid_ai_pid_for_project() { return 0; }
     mkdir -p "$RUN_DIR"
     printf "%s\n" "42424" >"$RUN_DIR/ai.pid"
+    printf "%s\n" "43434" >"$RUN_DIR/ensure-manager.pid"
+    printf "%s\n" "44444" >"$RUN_DIR/interruption-dispatcher.pid"
     if project_has_authoritative_runtime_processes_for_user_precheck "$project"; then
       printf "unexpected-authoritative-runtime\n"
       exit 1
@@ -30,4 +32,4 @@ OUTPUT="$(
 [[ "$OUTPUT" == *"precheck-clear"* ]]
 [[ "$OUTPUT" != *"unexpected-authoritative-runtime"* ]]
 
-echo "[PASS] freely start precheck ignores orphaned ai.pid without authoritative runtime control-plane"
+echo "[PASS] freely start precheck ignores orphaned ai/watchdog/dispatcher pid files without an authoritative supervisor"
