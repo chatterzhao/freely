@@ -10488,7 +10488,77 @@ project_bootstrap_launch_in_flight() {
   now_epoch="$(date +%s)"
   grace_secs="${FREELY_MANAGER_BOOTSTRAP_AI_GRACE_SECS:-15}"
   [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=15
-  (( now_epoch - state_updated_epoch <= grace_secs ))
+  if (( now_epoch - state_updated_epoch <= grace_secs )); then
+    return 0
+  fi
+
+  supervisor_startup_lifecycle_in_flight "$project" "$supervisor_pid"
+}
+
+supervisor_startup_lifecycle_in_flight() {
+  local project="$1" supervisor_pid="$2"
+  local trace_file startup_snapshot last_startup_seq last_startup_ts last_startup_checkpoint
+  local terminal_snapshot last_terminal_seq startup_epoch now_epoch grace_secs
+
+  [[ -n "$supervisor_pid" ]] || return 1
+  trace_file="$(lifecycle_trace_log_file "$project")"
+  [[ -f "$trace_file" ]] || return 1
+
+  startup_snapshot="$(
+    awk -v pid="$supervisor_pid" '
+      index($0, "supervisor_pid=" pid) {
+        checkpoint=""
+        seq=""
+        for (i = 1; i <= NF; i++) {
+          if ($i ~ /^checkpoint=/) {
+            checkpoint = substr($i, 12)
+          } else if ($i ~ /^seq=/) {
+            seq = substr($i, 5)
+          }
+        }
+        if (checkpoint == "L020" || checkpoint == "L021" || checkpoint == "L022") {
+          print seq "|" $1 "|" checkpoint
+        }
+      }
+    ' "$trace_file" | tail -n 1
+  )"
+  [[ -n "$startup_snapshot" ]] || return 1
+  IFS='|' read -r last_startup_seq last_startup_ts last_startup_checkpoint <<<"$startup_snapshot"
+  [[ "$last_startup_seq" =~ ^[0-9]+$ ]] || return 1
+
+  terminal_snapshot="$(
+    awk -v pid="$supervisor_pid" '
+      index($0, "supervisor_pid=" pid) {
+        checkpoint=""
+        seq=""
+        for (i = 1; i <= NF; i++) {
+          if ($i ~ /^checkpoint=/) {
+            checkpoint = substr($i, 12)
+          } else if ($i ~ /^seq=/) {
+            seq = substr($i, 5)
+          }
+        }
+        if (checkpoint == "L040" || checkpoint == "L041" || checkpoint == "L042" || checkpoint == "L090" || checkpoint == "L091" || checkpoint == "L092") {
+          print seq "|" $1 "|" checkpoint
+        }
+      }
+    ' "$trace_file" | tail -n 1
+  )"
+  if [[ -n "$terminal_snapshot" ]]; then
+    IFS='|' read -r last_terminal_seq _ <<<"$terminal_snapshot"
+    if [[ "$last_terminal_seq" =~ ^[0-9]+$ ]] && (( last_terminal_seq >= last_startup_seq )); then
+      return 1
+    fi
+  fi
+
+  startup_epoch="$(timestamp_epoch_or_zero "$last_startup_ts")"
+  [[ "$startup_epoch" =~ ^[0-9]+$ ]] || startup_epoch=0
+  (( startup_epoch > 0 )) || return 1
+
+  now_epoch="$(date +%s)"
+  grace_secs="${FREELY_MANAGER_STARTUP_LIFECYCLE_GRACE_SECS:-120}"
+  [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=120
+  (( now_epoch - startup_epoch <= grace_secs ))
 }
 
 project_runtime_auto_recovery_launch_in_flight() {
