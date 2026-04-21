@@ -83,7 +83,7 @@ run_case() {
   local project="$TMP_DIR/$case_name-project"
   local mock_bin="$TMP_DIR/$case_name-mock-bin"
   local output_file="$TMP_DIR/$case_name-output.log"
-  local event_log session_state workcell_state supervisor_pid launch_count
+  local event_log session_state workcell_state supervisor_pid launch_count availability_state
 
   create_project_fixture "$project"
   mkdir -p "$mock_bin"
@@ -103,6 +103,7 @@ EOF
   event_log="$project/.freely/logs/runtime-events.log"
   session_state="$project/.freely/run/session-state.env"
   workcell_state="$project/.freely/run/workcell-state.env"
+  availability_state="$project/.freely/run/tool-availability-kiro-cli.env"
 
   [[ -f "$event_log" ]] || {
     echo "[FAIL] $case_name: expected runtime event log" >&2
@@ -149,6 +150,23 @@ EOF
     cat "$event_log" >&2
     exit 1
   }
+
+  if [[ "$expected_reason" == "kiro_monthly_request_limit" ]]; then
+    [[ -f "$availability_state" ]] || {
+      echo "[FAIL] $case_name: expected kiro monthly limit to persist a tool availability state file" >&2
+      exit 1
+    }
+    grep -q '^BLOCKED_REASON="kiro_monthly_request_limit"$' "$availability_state" || {
+      echo "[FAIL] $case_name: expected kiro availability state to preserve the monthly limit reason" >&2
+      cat "$availability_state" >&2
+      exit 1
+    }
+    grep -Eq '^EARLIEST_RESET_HINT="[0-9]+"' "$availability_state" || {
+      echo "[FAIL] $case_name: expected kiro availability state to preserve the parsed reset hint" >&2
+      cat "$availability_state" >&2
+      exit 1
+    }
+  fi
 
   if [[ -f "$project/.freely/run/supervisor.pid" ]]; then
     supervisor_pid="$(cat "$project/.freely/run/supervisor.pid" 2>/dev/null || true)"

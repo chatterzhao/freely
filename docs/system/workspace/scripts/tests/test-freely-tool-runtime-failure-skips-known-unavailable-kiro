@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-tool-runtime-failure-skip-known-kiro.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+PROJECT_ROOT="__PROJECT__"
+AI_TOOL="cc"
+AI_MODEL=""
+AI_MODE="auto"
+AUTO_SWITCH_SLOT="true"
+AUTO_SWITCH_TOOL="true"
+AI_FALLBACK_TOOLS="kiro-cli,iflow"
+EOF
+perl -0pi -e "s#__PROJECT__#$PROJECT#g" "$PROJECT/.freely/config.env"
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+SUPERVISOR_STATE="up"
+AI_STATE="down"
+LAST_EXIT_REASON="tool_runtime_failure"
+EOF
+
+cat >"$PROJECT/.freely/run/tool-availability-kiro-cli.env" <<'EOF'
+AVAILABILITY_PHASE="all_unavailable"
+BLOCKED_REASON="kiro_monthly_request_limit"
+EARLIEST_RESET_HINT="1900000000"
+LAST_PROBE_AT="2026-04-21T15:37:14Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+load_config "$PROJECT"
+
+role_hint_for_project() {
+  printf 'worker\n'
+}
+
+tool_select_ready_slot_for_manager_auto_recovery() {
+  local project="$1" tool="$2" mode="${3:-entry}"
+  case "$tool" in
+    iflow)
+      TOOL_AUTO_RECOVERY_SLOT="default-1"
+      runtime_write_tool_current_slot "$tool" "default-1"
+      return 0
+      ;;
+    kiro-cli)
+      echo "[FAIL] known-unavailable kiro should have been filtered before slot selection (mode=$mode)" >&2
+      exit 1
+      ;;
+  esac
+  return 1
+}
+
+attempt_runtime_auto_recovery_after_failure "$PROJECT" "cc" "tool_runtime_failure" >/dev/null
+
+[[ "${RUNTIME_AUTO_RECOVERY_TOOL:-}" == "iflow" ]] || {
+  echo "[FAIL] expected runtime recovery to skip the cached-unavailable kiro candidate and choose iflow" >&2
+  exit 1
+}
+grep -q '^AI_TOOL="iflow"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected fallback tool selection to persist iflow after skipping kiro" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q 'event=tool_auto_switch_selected .*previous_tool=cc .*active_tool=iflow .*reason=tool_runtime_failure' "$PROJECT/.freely/logs/runtime-events.log" || {
+  echo "[FAIL] expected runtime event log to record fallback past the unavailable kiro candidate" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+
+echo "[PASS] tool_runtime_failure skips a fallback tool whose cached availability state still says unavailable"
