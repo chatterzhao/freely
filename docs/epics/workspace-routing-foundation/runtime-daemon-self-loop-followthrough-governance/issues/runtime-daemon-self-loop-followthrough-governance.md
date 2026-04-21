@@ -40,9 +40,10 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 
 1. Keep `project_has_authoritative_runtime_processes_for_user_precheck()` authoritative-supervisor-only for user-facing repeated-start refusal.
 2. Make daemon-mode supervisor ignore unexpected `INT`/`TERM` when no `stop.marker` exists, while preserving explicit stop semantics.
-3. Add focused regressions for orphan precheck residue and unexpected daemon `TERM`.
-4. Replay the guarded promotion path with concrete owner evidence.
-5. Prove on canonical `develop` that Freely self-starts, selects a task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
+3. Keep current manager continuity formats runtime-consumable by parsing `## Worker Delegation` handoffs into concrete worker prompt launches.
+4. Add focused regressions for orphan precheck residue, unexpected daemon `TERM`, and worker-delegation continuity consumption.
+5. Replay the guarded promotion path with concrete owner evidence.
+6. Prove on canonical `develop` that Freely self-starts, selects a task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
 
 ## Non-Goals
 
@@ -64,6 +65,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
+- `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
 - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - `./bin/governance-check`
 - canonical `develop` self-host replay: `./bin/freely daemon start`
@@ -79,5 +82,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/progress/workspace-routing-foundation/p-runtime-daemon-self-loop-followthrough-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
 - `docs/system/workspace/scripts/runtime/freely`
+- `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
+- `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
 - `docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`
 - `docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
