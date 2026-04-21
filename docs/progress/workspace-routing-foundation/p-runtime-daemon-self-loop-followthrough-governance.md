@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/runtime-daemon-self-loop-blocker-20260421`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-runtime-daemon-self-loop-blocker`
-- updated_at: `2026-04-21 06:18 PDT`
+- branch: `feature/manager-followthrough-handoff-resume-20260421`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-manager-followthrough-handoff-resume`
+- updated_at: `2026-04-21 07:47 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -35,6 +35,11 @@
 - Canonical `develop` self-host replay then exposed a remaining continuity-consumption seam: manager wrote the current direct `## Worker Delegation` handoff with a bare `prompt_path`, but runtime only parsed `prompt_path` after an explicit `launchable_queue`/`queue` subsection, so post-cycle worker launch treated the continuity as prompt-empty and restarted manager instead.
 - The runtime parser now treats direct `## Worker Delegation` `prompt_path` entries as launchable by default, matching the manager-written continuity shape that self-host dogfooding is actually producing.
 - The current-format continuity-consumption and manager worker-launch regressions now exercise that direct handoff shape, and a post-AI-cycle launch regression passes against the same parser path.
+- Canonical `develop` self-host replay then exposed a continuation-handoff seam: after context compaction, manager could relaunch on `fresh_with_handoff`, lose the current continuity anchor, and spend the next round rewriting manager continuity instead of executing the already-selected maintenance / retirement followthrough.
+- The continuity resume-focus helper now recognizes the current `## Primary Judgement`, `## Queue`, and `## Next Supervision Priority` headings and applies the same anchor across both `resume` and `fresh_with_handoff`, with an explicit success return so prompt building cannot fail when an optional section is absent.
+- The same repair worktree also exposed an absorbed-lane overreach: a never-started worker branch cut from `develop` could be treated as already absorbed solely because its branch was still an ancestor of `develop`.
+- Runtime now only classifies a merged worker lane as absorbed after that worktree has recorded worker state, while cleanup followthrough prompts with complete verification metadata remain launchable until the lane is actually retire-ready.
+- Focused regressions now cover current-format continuity anchoring, active-worker state projection, stale discovery cache refresh before launch, retire-ready merged prompt suppression, and absorbed-merged dirty-worker recovery suppression in addition to the earlier direct worker-delegation launch checks.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
 
 ## Verification Evidence
@@ -65,6 +70,9 @@
 24. `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-absorbed-merged-dirty-worker`
 14. `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
 15. `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
+16. `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
+17. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
+18. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
 
 ## 2026-04-21 05:29 PDT Recheck Commands
 
@@ -185,6 +193,24 @@ All commands passed in the feature worktree during this worker continuation veri
 13. `./bin/governance-check`
 
 All commands passed again in the feature worktree during this worker continuation verification. No further source edits were required.
+
+## 2026-04-21 07:47 PDT Continuity Handoff / Launch-Gating Verification
+
+- `FAIL`: canonical `develop` self-host replay still looped after worker launch recovery because manager resumed from a compacted handoff, rewrote manager continuity again, and never actually executed the current continuity's queued followthrough.
+- `FAIL`: the same repair worktree then showed `worker_prompt_launchable_for_manager_project()` still over-classified never-started worker branches as absorbed merged lanes, which broke active-worker reentry and stale-cache launch flows even though those branches had not been retired.
+- `PASS`: anchored current-format manager continuity across both `resume` and `fresh_with_handoff`, including the new section headings and a deterministic helper return path.
+- `PASS`: narrowed absorbed-merged classification to require recorded worker state, and kept cleanup followthrough prompts launchable until the target lane is truly retire-ready.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-retire-ready-merged-prompt`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-absorbed-merged-dirty-worker`
+- `PASS`: replayed `feature/manager-followthrough-handoff-resume-20260421 -> test-pre-merge-20260421-manager-followthrough-handoff-resume` through `./bin/merge-guarded`; the protected test lane stayed green on the representative same-owner regressions.
+- `PENDING`: absorb this repair into canonical `develop`, then complete the required self-host daemon acceptance and temporary lane retirement.
 
 ## Current Lane Judgement
 
