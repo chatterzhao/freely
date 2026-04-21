@@ -362,6 +362,37 @@ routing_policy:
   - `./bin/governance-check`
 - next_action: Keep the patrol seam narrow, verify the idle/replan scan contract against the focused runtime tests, and route any future GitHub or Gitee provider expansion into a separate external-source implementation owner.
 
+1. `I-20260421-1530-A`
+- title: Live-status scan summary and prompt anchor governance
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-live-status-scan-summary-and-prompt-anchor-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260421-1530--scan-owned-patrol-inventory-and-live-status-on-demand-reading/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260421-1530--scan-owned-patrol-inventory-and-live-status-on-demand-reading/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
+  - `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-live-status-scan-summary-and-prompt-anchor-governance.md`
+  - `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-includes-scan-summary`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-prefers-session-state-prompt-anchor`
+  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-includes-milestone-patrol-seed`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-suppresses-broad-patrol-while-worker-active`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+  - `bash docs/system/workspace/scripts/tests/test-start-lead-agent-verification-metadata-contract`
+  - `bash -n docs/system/workspace/scripts/runtime/freely`
+  - `./bin/governance-check`
+- next_action: Preserve this owner as the smallest implementation slice: complete guarded develop merge and run develop-side daemon/status replay before considering any broader status-family or scan-schema follow-on.
+
 ### candidate_issues
 
 1. `C-20260417-0445-A`
@@ -429,6 +460,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/candidates.md`
 - next_action: Candidate mirror only. `I-20260413-1640-A` is now the canonical owner for binding sibling `tasks.md` closeout completeness into `pretests-gate` completion and guarded adequacy decisions.
 - revisit_trigger: Re-open only if future closeout policy needs a broader execution ledger than owner-bound `tasks.md`, or if delegated develop-bound replay proves this gate can still be bypassed.
+
+1. `C-20260421-1530-A`
+- title: Scan-owned patrol inventory and live-status on-demand reading contract
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260421-1530--scan-owned-patrol-inventory-and-live-status-on-demand-reading/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260421-1530--scan-owned-patrol-inventory-and-live-status-on-demand-reading/candidates.md`
+- next_action: Candidate mirror only. `I-20260421-1530-A` is now the canonical owner for the bounded implementation slice that keeps prompt anchors authoritative, adds advisory scan-summary consumption to live-status, and carries the guarded develop replay.
+- revisit_trigger: Re-open only if later implementation needs a heavier typed scan-item schema, a broader status-family redesign, or a different owner for daemon-start autonomous completion proof.
 
 1. `C-20260413-0208-A`
 - title: Foreground/background runtime entrypoint semantics governance
