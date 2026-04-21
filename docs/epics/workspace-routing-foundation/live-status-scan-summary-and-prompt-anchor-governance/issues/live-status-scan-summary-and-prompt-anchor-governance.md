@@ -41,7 +41,7 @@ What was still missing was a narrow implementation owner that applies the separa
 
 1. Keep explicit prompt anchors authoritative for `live-status`, manager handoff, and continuity-gap prompt references.
 2. Add an advisory `scan_summary` surface to `live-status` by reading the existing `manager-task-source-scan-latest.json`.
-3. Preserve existing `current-state plane` behavior, deep refs, and worker-lane visibility.
+3. Preserve existing `current-state plane` behavior, deep refs, worker-lane visibility, and the bounded startup continuity-selection seam needed for the same owner to replay on canonical `develop`.
 4. Carry the design/materialization chain needed for guarded merge through `test-pre-merge-*` and develop replay.
 
 ## Non-Goals
@@ -89,4 +89,5 @@ What was still missing was a narrow implementation owner that applies the separa
 
 ## Next
 
+- Finish the canonical `develop` replay for this owner and prove the bounded startup continuity-selection fix still leads into real scan-driven work selection rather than only prompt-build success.
 - Keep any future typed scan-item schema, broader status-family field renames, and daemon-start autonomous completion followthrough in later bounded owners if this slice cannot absorb them without widening.
