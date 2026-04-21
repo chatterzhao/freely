@@ -11,8 +11,10 @@
 - `PASS`: `project_has_authoritative_runtime_processes_for_user_precheck()` now requires supervisor truth instead of lone dispatcher/watchdog residue.
 - `PASS`: daemon supervisor now ignores unexpected `TERM` without `stop.marker` and still records explicit daemon stop correctly.
 - `PASS`: current manager continuity files that use `## Worker Delegation` now expose worker prompt paths to runtime launch and live-status truth.
+- `PASS`: current manager continuity followthrough stays anchored across `resume` and `fresh_with_handoff`, so context compaction does not devolve into rewriting the same continuity instead of executing queued manager-owned work.
 - `PASS`: retire-ready merged-clean blocker worktrees are now treated as cleanup-followthrough retirement targets instead of recoverable edit workers, and cleanup can reclaim stale recorded ownership for those lanes.
 - `PASS`: merged develop-absorbed blocker lanes that remain dirty only in owner evidence surfaces are now treated as retire-ready followthrough instead of relaunchable edit workers.
+- `PASS`: never-started worker branches are no longer misclassified as absorbed merged lanes just because their branch tip still equals an ancestor of `develop`; runtime now requires recorded worker state before treating a merged lane as already absorbed.
 - `PASS`: manager worker-launch fallback now rechecks whether a prompt still targets a launchable lane before reviving it, so the latest generated continuity cannot bypass retire-ready merged guards.
 - `PASS`: expected-running worker recovery and global restart selection now both exclude absorbed merged worker lanes, even if an earlier bad recovery already left ordinary dirty files behind in that old worktree.
 - `PASS`: focused regressions and nearby daemon/live-status coverage passed on the guarded source lane, and the protected test lane replay still passed after the retirement followthrough repair.
@@ -41,6 +43,9 @@
 19. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
 20. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-retire-ready-merged-prompt`
 21. `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-absorbed-merged-dirty-worker`
+22. `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
+23. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
+24. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
 
 ## 2026-04-21 05:25 PDT Recheck
 
@@ -116,3 +121,11 @@
 - alternatives_considered: `Treat the transient duplicate snapshot as a proven product relaunch defect without first proving steady-state duplication; weaken the daemon reuse assertion to stop checking daemon-run cardinality at all; force the manager to keep emitting the older launchable_queue wrapper instead of consuming the current direct handoff shape; reopen scan/live-status architecture instead of fixing the bounded continuity-consumption seam.`
 - boundary_non_goals: `No scan-architecture rewrite, no live-status redesign, no reduction in Freely's autonomous execution authority.`
 - residual_risk: `The remaining risk is only the final canonical develop self-host acceptance, which still must prove end-to-end autonomous continuation after one completed task and lawful worktree retirement.`
+
+## 2026-04-21 07:47 PDT Implementation Decision Note
+
+- decision: `Keep the same owner and harden the manager followthrough execution contract instead of opening a new scan/live-status architecture lane.`
+- why_this: `Canonical develop replay proved the next blocker was not task selection itself. Manager already picked the right followthrough, but after context compaction the runtime prompt lost its anchor to the current continuity and rewrote continuity again. The same repair lane also showed launch gating was using a pure git-ancestry shortcut that treated never-started worker branches as already absorbed merged lanes. Extending the current continuity anchor to `fresh_with_handoff` and requiring recorded worker state before classifying a merged worker as absorbed fixes the real control-plane seams without weakening autonomy.`
+- alternatives_considered: `Teach Freely to rescan broadly after every compaction instead of honoring the current continuity anchor; keep the old absorbed-merged shortcut and special-case individual tests; add a new lifecycle index or prompt registry just to recover the current followthrough anchor.`
+- boundary_non_goals: `No broad scan-architecture rewrite, no live-status redesign, no hardcoded task picking, and no reduction in Freely's freely working behavior.`
+- residual_risk: `Canonical develop still has to prove the repaired manager can finish one task to the current-project success standard, close the temporary worktree, and continue to the next task before this owner can be closed.`
