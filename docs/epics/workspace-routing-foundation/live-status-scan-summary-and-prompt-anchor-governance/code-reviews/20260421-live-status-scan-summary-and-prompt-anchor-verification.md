@@ -12,7 +12,7 @@
 - `PASS`: prompt-anchor current-state truth remains authoritative on the status surfaces touched by this owner.
 - `PASS`: `live-status` now exposes advisory scan-summary output from the bounded patrol inventory instead of relying only on prompt-history inference for unresolved follow-up visibility.
 - `PASS`: the bounded daemon, patrol, worker-launch, and verification-contract regressions still pass.
-- `PASS`: the remaining work is guarded develop completion plus develop-side replay, not further feature-lane implementation expansion.
+- `PASS`: guarded `test-pre-merge-20260421-live-status-scan-summary` replay and canonical develop startup replay both now prove this owner does not break the startup prompt-build / daemon-start seam.
 
 ## Commands
 
@@ -36,6 +36,8 @@
 3. `test-freely-live-status` and `test-freely-daemon-runtime-detach-and-shared-status` prove the day-1 current-state plane still works after the status change.
 4. The patrol-trigger regressions prove the older `task-source-scan` owner still behaves as bounded idle/replan patrol rather than every-cycle broad patrol.
 5. The worker-launch and verification-contract regressions prove the change did not cut the autonomous follow-on and closeout metadata chain.
+6. The guarded premerge replay passed again after the startup continuity exit-semantics fix.
+7. Canonical develop replay no longer dies before prompt build: `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` returned running status and generated `.freely/run/prompt-20260421-020221.txt` on the merged runtime path.
 
 ## Implementation Decision Note
 
@@ -43,4 +45,4 @@
 - why_this: `The user-corrected architecture target was not "more docs"; it was implementing the first narrow seam that makes status read patrol inventory without weakening current-state truth.`
 - alternatives_considered: `Leave the change as pre-research only; widen immediately into a full status-family redesign; build a heavyweight prompt lifecycle ledger first.`
 - boundary_non_goals: `No heavy prompt lifecycle index, no broad status-family rename, no removal of existing deep refs, and no widening of scan into canonical completion truth.`
-- residual_risk: `A later owner may still need explicit current-manager/worker prompt-group fields or a typed scan-item schema if advisory surface counts and top refs prove insufficient on develop replay.`
+- residual_risk: `A later owner may still need explicit current-manager/worker prompt-group fields or a typed scan-item schema if advisory surface counts and top refs prove insufficient on develop replay. Separate tool-runtime restart-storm / auth-slot evidence also remains visible on canonical develop, but that is an adjacent runtime-ops seam rather than a regression introduced by this owner.`
