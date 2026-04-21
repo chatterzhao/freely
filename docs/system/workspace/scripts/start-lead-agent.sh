@@ -25,7 +25,40 @@ abs_path_or_fail() {
 
 project_dirty_entries() {
   local project="$1"
-  (git -C "$project" status --porcelain 2>/dev/null || true) | wc -l | tr -d ' '
+  (git_status_porcelain_with_runtime_hygiene "$project") | wc -l | tr -d ' '
+}
+
+git_status_entry_path_is_disposable_runtime_residue() {
+  local rel_path="$1"
+  [[ -n "$rel_path" ]] || return 1
+  case "$rel_path" in
+    __pycache__|__pycache__/*|*/__pycache__|*/__pycache__/*|*.pyc) return 0 ;;
+  esac
+  return 1
+}
+
+cleanup_disposable_runtime_residue_for_project() {
+  local project="$1"
+  local -a cleanup_targets=()
+  local porcelain status_path abs_target
+  while IFS= read -r porcelain; do
+    [[ -n "$porcelain" ]] || continue
+    [[ "$porcelain" == '?? '* ]] || continue
+    status_path="${porcelain#?? }"
+    git_status_entry_path_is_disposable_runtime_residue "$status_path" || continue
+    abs_target="$project/$status_path"
+    [[ -e "$abs_target" ]] || continue
+    cleanup_targets+=("$abs_target")
+  done < <(git -C "$project" status --porcelain 2>/dev/null || true)
+
+  ((${#cleanup_targets[@]} > 0)) || return 0
+  rm -rf -- "${cleanup_targets[@]}"
+}
+
+git_status_porcelain_with_runtime_hygiene() {
+  local project="$1"
+  cleanup_disposable_runtime_residue_for_project "$project"
+  git -C "$project" status --porcelain 2>/dev/null || true
 }
 
 project_clean_state() {
@@ -76,7 +109,7 @@ worktree_fleet_brief() {
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" ]] || continue
     total=$((total + 1))
-    if [[ -n "$(git -C "$wt_path" status --porcelain 2>/dev/null)" ]]; then
+    if [[ -n "$(git_status_porcelain_with_runtime_hygiene "$wt_path")" ]]; then
       dirty=$((dirty + 1))
     fi
   done < <(git -C "$repo_root" worktree list --porcelain 2>/dev/null | awk '/^worktree / {print substr($0, 10)}')

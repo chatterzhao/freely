@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-pycache.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+
+mkdir -p "$REPO" "$WT_ROOT"
+git init -q -b develop "$REPO"
+git -C "$REPO" config user.name tester
+git -C "$REPO" config user.email tester@example.com
+
+mkdir -p "$REPO/docs" "$REPO/.freely/run"
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+echo base >"$REPO/README.md"
+git -C "$REPO" add README.md docs/PROJECT_INTENT.md docs/CONSTITUTION.md docs/LAWS.md AGENTS.md .freely/config.env
+git -C "$REPO" commit -q -m "init"
+
+git -C "$REPO" worktree add -q -b feature/demo "$WT_ROOT/feature-demo" develop
+
+mkdir -p "$REPO/docs/system/workspace/scripts/runtime/__pycache__"
+mkdir -p "$WT_ROOT/feature-demo/docs/system/workspace/scripts/runtime/__pycache__"
+printf 'cache' >"$REPO/docs/system/workspace/scripts/runtime/__pycache__/root.cpython-314.pyc"
+printf 'cache' >"$WT_ROOT/feature-demo/docs/system/workspace/scripts/runtime/__pycache__/feature.cpython-314.pyc"
+
+ROOT_BEFORE="$(git -C "$REPO" status --short)"
+FEATURE_BEFORE="$(git -C "$WT_ROOT/feature-demo" status --short)"
+[[ -n "$ROOT_BEFORE" ]]
+[[ -n "$FEATURE_BEFORE" ]]
+
+OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+printf '%s\n' "$OUTPUT" | grep -q 'project: '
+
+ROOT_AFTER="$(git -C "$REPO" status --short)"
+FEATURE_AFTER="$(git -C "$WT_ROOT/feature-demo" status --short)"
+[[ -z "$ROOT_AFTER" ]]
+[[ -z "$FEATURE_AFTER" ]]
+[[ ! -e "$REPO/docs/system/workspace/scripts/runtime/__pycache__/root.cpython-314.pyc" ]]
+[[ ! -e "$WT_ROOT/feature-demo/docs/system/workspace/scripts/runtime/__pycache__/feature.cpython-314.pyc" ]]
+
+echo "[PASS] freely live-status auto-cleans disposable __pycache__ residue before hygiene judgement"
