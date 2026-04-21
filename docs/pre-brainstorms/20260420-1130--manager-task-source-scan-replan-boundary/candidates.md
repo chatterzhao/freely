@@ -7,9 +7,9 @@
 - candidate_format_version: `v2`
 - title: `Manager task-source scan idle/replan boundary governance`
 - source_class: `discovery`
-- route_kind: `pre_brainstorm`
-- phase_state: `in_pre_brainstorm`
-- candidate_status: `needs_research`
+- route_kind: `ibm`
+- phase_state: `todo_ibm`
+- status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
 - problem: `Freely manager needs a structured way to find work after startup and after closeout, but the current patrol layer lacks a runtime-owned trigger contract. Without it, stale delegated continuation can hijack the lane, while broad patrol can also re-scan too often and derail in-flight worker continuity.`
@@ -77,9 +77,10 @@
 - depends_on:
   - `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/candidates.md#c-20260407-0817-a`
   - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
-- promoted_issue_path: `pending://issue-materialization`
-- next_action: `Keep this candidate in pre-brainstorm as a clean hold after this bounded continuity/evidence checkpoint commit. Reopen implementation only if a new patrol-scan delta still fits this owner, or if provider/follow-on boundary decisions become stable enough to justify IBM materialization.`
-- revisit_trigger: `Revisit when external issue provider scan/writeback is ready to join the same patrol transaction, when progress/recovery surfaces need promotion into the scan json rather than ad hoc reads, or when a fresh bounded patrol-seam delta appears that still belongs entirely to this candidate.`
+- promoted_issue_id: `I-20260420-1130-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
+- next_action: `Candidate mirror only. I-20260420-1130-A is now the canonical owner for manager idle/replan task-source scan regeneration, active-worker suppression, stale delegated filtering, and machine-readable patrol seed truth.`
+- revisit_trigger: `Re-open only if provider automation, recovery-surface expansion, or a broader patrol transaction redesign can no longer stay outside this bounded owner.`
 - session_refs:
   - {tool: `codex`, session_id: `current-codex-session-id-unavailable`, jsonl_path: `unavailable://fresh-session-current-id-not-exposed`, role: `author`}
   - {tool: `codex`, session_id: `019dabfa-babb-7a22-bca4-63ce4693ea81`, jsonl_path: `/Users/zhaoyu/.codex/sessions/2026/04/20/rollout-2026-04-20T10-40-29-019dabfa-babb-7a22-bca4-63ce4693ea81.jsonl`, role: `fresh_with_handoff_source`}
