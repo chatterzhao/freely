@@ -6636,6 +6636,10 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         }
       }
       if (section == "worker dispatch") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*(worker_prompt|active_worker_prompt|queued_worker_prompt|refreshed_queued_worker_prompt):[[:space:]]*$/) {
+          capture_worker_prompt_path_list=(mode != "frozen")
+          next
+        }
         if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "frozen") {
           emit_prompt_paths($0)
           next
@@ -6646,6 +6650,10 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         next
       }
       if (section == "queue") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*(worker_prompt|active_worker_prompt|queued_worker_prompt|refreshed_queued_worker_prompt):[[:space:]]*$/) {
+          capture_worker_prompt_path_list=(mode != "frozen")
+          next
+        }
         if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "frozen") {
           emit_prompt_paths($0)
           next
@@ -6656,6 +6664,10 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         next
       }
       if (section == "frozen queue") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*(worker_prompt|active_worker_prompt|queued_worker_prompt|refreshed_queued_worker_prompt):[[:space:]]*$/) {
+          capture_worker_prompt_path_list=(mode != "launchable")
+          next
+        }
         if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "launchable") {
           emit_prompt_paths($0)
           next
@@ -6768,6 +6780,10 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
         }
       }
       if (section == "worker dispatch") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*(worker_prompt|queued_worker_prompt|refreshed_queued_worker_prompt):[[:space:]]*$/) {
+          capture_worker_prompt_path_list=1
+          next
+        }
         if ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) {
           emit_prompt_paths($0)
           next
@@ -6778,6 +6794,10 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
         next
       }
       if (section == "queue") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*(worker_prompt|queued_worker_prompt|refreshed_queued_worker_prompt):[[:space:]]*$/) {
+          capture_worker_prompt_path_list=1
+          next
+        }
         if ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) {
           emit_prompt_paths($0)
           next
@@ -6786,6 +6806,19 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
           emit_prompt_paths($0)
         }
         next
+      }
+      if (capture_worker_prompt_path_list == 1) {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+          emit_prompt_paths($0)
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`none`[[:space:]]*$/ || $0 ~ /^[[:space:]]*`none`[[:space:]]*$/) {
+          capture_worker_prompt_path_list=0
+          next
+        }
+        if ($0 !~ /^[[:space:]]*$/ && $0 !~ /^[[:space:]]*-[[:space:]]/) {
+          capture_worker_prompt_path_list=0
+        }
       }
       if ($0 ~ /- queued_worker_prompt: / || $0 ~ /- refreshed_queued_worker_prompt: /) {
         emit_prompt_paths($0)
