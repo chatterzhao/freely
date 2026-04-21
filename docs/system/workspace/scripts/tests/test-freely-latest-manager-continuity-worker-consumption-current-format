@@ -75,13 +75,14 @@ cat >"$NEW_CONT" <<EOF
 # Manager Continuity
 
 ## Worker Delegation
-- authoritative_worker_prompts:
-  - \`$PROMPT_P0\`
-  - \`$PROMPT_P1\`
-- launchable_queue:
-  - lane_id: \`I-20260325-0233-A\`
-    prompt_path: \`$PROMPT_P0\`
-    dispatch_priority: \`P0\`
+- prompt_path: \`$PROMPT_P0\`
+- target_worktree: \`$PROJECT\`
+- target_branch: \`develop\`
+- dispatch_priority: \`P0\`
+- parallel_safe: \`true\`
+- write_scope: \`$PROJECT\`
+- intent_kind: \`edit\`
+- intent_target: \`I-20260325-0233-A readiness\`
 
 ## Queue / Frozen / Cleanup
 - merge-review queue:
@@ -114,4 +115,4 @@ printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_generated: $EXPEC
 
 grep -q "^LAST_MANAGER_WORKER_PROMPTS_GENERATED=\"$EXPECTED_CSV\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
 
-echo "[PASS] live-status refreshes current manager continuity prompt truth from the new handoff format"
+echo "[PASS] live-status refreshes current manager continuity prompt truth from the direct worker-delegation handoff format"
