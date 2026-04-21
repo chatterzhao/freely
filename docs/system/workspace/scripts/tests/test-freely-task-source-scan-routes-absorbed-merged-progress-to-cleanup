@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d)"
+PROJECT="$TMP_DIR/project"
+WORKTREE="$TMP_DIR/project-worktrees/feature-absorbed-progress"
+
+cleanup() {
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+mkdir -p "$PROJECT/docs/progress/demo" "$PROJECT/docs/epics/demo/issues"
+
+git init -q "$PROJECT" -b develop
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+echo base > "$PROJECT/README.md"
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" worktree add -q -b feature/absorbed-progress "$WORKTREE" develop
+
+echo feature > "$WORKTREE/feature.txt"
+git -C "$WORKTREE" add feature.txt
+git -C "$WORKTREE" commit -q -m "feature lane"
+git -C "$PROJECT" merge --no-ff -q feature/absorbed-progress -m "merge absorbed progress lane"
+
+echo dirty > "$WORKTREE/followthrough.txt"
+mkdir -p "$WORKTREE/.freely/run"
+cat >"$WORKTREE/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_ROLE_HINT="worker"
+LAST_EXIT_REASON="operator_stop"
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# test
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# laws
+EOF
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+EOF
+
+cat >"$PROJECT/docs/epics/demo/issues/absorbed-progress.md" <<'EOF'
+# Issue: absorbed-progress
+
+- issue_id: `I-TEST-ABSORBED`
+- progress_path: `docs/progress/demo/p-absorbed-progress.md`
+EOF
+
+cat >"$PROJECT/docs/progress/demo/p-absorbed-progress.md" <<EOF
+# Progress: absorbed-progress
+
+- issue_id: \`I-TEST-ABSORBED\`
+- issue_path: \`docs/epics/demo/issues/absorbed-progress.md\`
+- phase_state: \`in_verification\`
+- runtime_state: \`stopped\`
+- closure_status: \`open\`
+- verification_status: \`unknown\`
+- branch: \`feature/absorbed-progress\`
+- worktree_path: \`$WORKTREE\`
+EOF
+
+OUTPUT_JSON="$TMP_DIR/task-source-scan.json"
+bash "$ROOT_DIR/bin/freely" task-source-scan --project "$PROJECT" --json >"$OUTPUT_JSON"
+
+python3 - <<'PY' "$OUTPUT_JSON"
+import json
+import sys
+
+data = json.load(open(sys.argv[1], encoding="utf-8"))
+items = [item for item in data["sources"] if item["source_ref"] == "docs/progress/demo/p-absorbed-progress.md"]
+if len(items) != 1:
+    raise SystemExit(f"expected one absorbed progress item, got {len(items)}")
+item = items[0]
+assert item["restart_point"] == "cleanup", item
+assert item["owner_hint"] == "manager", item
+assert item["status_markers"]["lane_state"] == "absorbed_merged", item
+assert "absorbed merged lane" in item["next_action"], item
+PY
+
+echo "[PASS] task-source-scan routes absorbed merged progress lanes to cleanup"
