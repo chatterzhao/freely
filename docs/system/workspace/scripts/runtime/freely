@@ -7201,6 +7201,14 @@ branch_is_merged_into_develop() {
   git -C "$project" merge-base --is-ancestor "refs/heads/$target_branch" "refs/heads/develop" 2>/dev/null
 }
 
+worker_project_is_absorbed_merged_lane() {
+  local manager_project="$1" target_worktree="$2" target_branch="$3"
+  [[ -n "$target_worktree" && -d "$target_worktree" ]] || return 1
+  worker_worktree_has_runtime_history "$target_worktree" || return 1
+  [[ -n "$target_branch" ]] || return 1
+  branch_is_merged_into_develop "$manager_project" "$target_branch" || return 1
+}
+
 worker_project_is_retire_ready_merged_clean() {
   local manager_project="$1" target_worktree="$2" target_branch="$3" dirty_entries
   [[ -n "$target_worktree" && -d "$target_worktree" ]] || return 1
@@ -7317,7 +7325,7 @@ worker_prompt_launchable_for_manager_project() {
   local manager_project="$1" prompt_file="$2" resolved_worktree
   resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   [[ -n "$resolved_worktree" && -d "$resolved_worktree" ]] || return 1
-  if worker_prompt_targets_retire_ready_merged_worktree "$manager_project" "$prompt_file"; then
+  if worker_project_is_absorbed_merged_lane "$manager_project" "$resolved_worktree" "$(worker_prompt_target_branch "$prompt_file")"; then
     return 1
   fi
   return 0
@@ -8833,7 +8841,8 @@ manager_runtime_launch_workers_from_latest_handoff() {
       continue
     fi
     if ! worker_prompt_launchable_for_manager_project "$project" "$prompt_file"; then
-      if worker_prompt_targets_retire_ready_merged_worktree "$project" "$prompt_file"; then
+    if worker_project_is_absorbed_merged_lane "$project" "$target_project" "$(worker_prompt_target_branch "$prompt_file")" || \
+      worker_prompt_targets_retire_ready_merged_worktree "$project" "$prompt_file"; then
         settle_retire_ready_merged_worker_runtime_state \
           "$project" \
           "$target_project" \
@@ -10223,7 +10232,8 @@ manager_supervision_alerts() {
     owner="runtime-owned"
     next_action="runtime_recovery_requested"
     worker_prompt_file="$(latest_prompt_file_for_project "$wt_path")"
-    if worker_project_is_retire_ready_merged_followthrough "$project" "$wt_path" "$branch" "$worker_prompt_file" || \
+    if worker_project_is_absorbed_merged_lane "$project" "$wt_path" "$branch" || \
+      worker_project_is_retire_ready_merged_followthrough "$project" "$wt_path" "$branch" "$worker_prompt_file" || \
       worker_prompt_targets_retire_ready_merged_worktree "$project" "$worker_prompt_file"; then
       printf -- '- %s: branch=%s role=%s owner=%s next_action=%s exit_reason=%s path=%s\n' \
         "retire_ready_merged_worktree_retained" \
@@ -10266,7 +10276,8 @@ settle_retire_ready_merged_worker_runtime_state() {
   local manager_project="$1" target_project="$2" branch="${3:-}" worker_prompt_file="" supervisor_pid="" ai_pid=""
   [[ -n "$manager_project" && -n "$target_project" && -d "$target_project" ]] || return 1
   worker_prompt_file="$(latest_prompt_file_for_project "$target_project")"
-  if ! worker_project_is_retire_ready_merged_followthrough "$manager_project" "$target_project" "$branch" "$worker_prompt_file" \
+  if ! worker_project_is_absorbed_merged_lane "$manager_project" "$target_project" "$branch" \
+    && ! worker_project_is_retire_ready_merged_followthrough "$manager_project" "$target_project" "$branch" "$worker_prompt_file" \
     && ! worker_prompt_targets_retire_ready_merged_worktree "$manager_project" "$worker_prompt_file"; then
     return 1
   fi
@@ -10388,7 +10399,8 @@ manager_runtime_recover_workers_if_needed() {
     fi
 
     worker_prompt_file="$(latest_prompt_file_for_project "$wt_path")"
-    if worker_project_is_retire_ready_merged_followthrough "$project" "$wt_path" "$branch" "$worker_prompt_file" || \
+    if worker_project_is_absorbed_merged_lane "$project" "$wt_path" "$branch" || \
+      worker_project_is_retire_ready_merged_followthrough "$project" "$wt_path" "$branch" "$worker_prompt_file" || \
       worker_prompt_targets_retire_ready_merged_worktree "$project" "$worker_prompt_file"; then
       settle_retire_ready_merged_worker_runtime_state "$project" "$wt_path" "$branch" >/dev/null 2>&1 || true
       log_info "manager runtime skips expected-running recovery for retire-ready merged worker: branch=${branch:-unknown} path=$wt_path"
@@ -12324,7 +12336,7 @@ global_restart_manifest_timestamp() {
 
 collect_global_restart_snapshot_rows() {
   local repo_root="$1" wt_path declared_project_root branch workcell_state launch_state manager_continuity worker_continuity
-  local resolution_file prompt_file intake_count desired_state last_exit_reason operator_anchor_count
+  local resolution_file prompt_file intake_count desired_state last_exit_reason operator_anchor_count role_hint
   local restore_candidate restore_ready restore_blocker
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" ]] || continue
@@ -12335,6 +12347,7 @@ collect_global_restart_snapshot_rows() {
     source "$(config_file "$wt_path")"
     declared_project_root="${PROJECT_ROOT:-$wt_path}"
     branch="$(git -C "$wt_path" branch --show-current 2>/dev/null || true)"
+    role_hint="$(role_hint_for_project "$wt_path")"
     workcell_state="$(workcell_state_file "$wt_path")"
     launch_state="$(manager_worker_launch_state_file "$wt_path")"
     manager_continuity="$(latest_generated_manager_continuity_file_for_project "$wt_path")"
@@ -12356,7 +12369,9 @@ collect_global_restart_snapshot_rows() {
     restore_candidate="0"
     restore_ready="0"
     restore_blocker=""
-    if [[ -f "$workcell_state" && "$desired_state" == "running" ]]; then
+    if [[ "$role_hint" == "worker" ]] && worker_project_is_absorbed_merged_lane "$repo_root" "$wt_path" "$branch"; then
+      restore_blocker="merged_worker_absorbed"
+    elif [[ -f "$workcell_state" && "$desired_state" == "running" ]]; then
       restore_candidate="1"
       if (( operator_anchor_count > 0 )); then
         restore_ready="1"
