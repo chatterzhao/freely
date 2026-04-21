@@ -47,7 +47,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 7. Keep manager-owned continuity followthrough anchored across both `resume` and `fresh_with_handoff` launches so context compaction cannot devolve into rewriting the same continuity instead of performing the queued maintenance / retirement work.
 8. Distinguish never-started worker branches from truly absorbed merged lanes so launch gating still starts real work while absorbed merged workers remain routed to retirement followthrough.
 9. Replay the guarded promotion path with concrete owner evidence.
-10. Prove on canonical `develop` that Freely self-starts, selects a task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
+10. Ensure a newer manager-authored continuity can supersede stale queued worker-prompt state when the current truth has shifted to manager-owned cleanup / completion verification with no launchable worker prompt.
+11. Prove on canonical `develop` that Freely self-starts, selects a task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
 
 ## Non-Goals
 
@@ -72,6 +73,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-supersedes-queued-prompt-with-manager-continuity`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`

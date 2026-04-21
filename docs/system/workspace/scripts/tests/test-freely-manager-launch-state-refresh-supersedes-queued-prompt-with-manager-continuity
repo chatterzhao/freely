@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-launch-state-supersession.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WT_ROOT="$TMP_DIR/project-worktrees"
+WORKER="$WT_ROOT/feature-worker"
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$PROJECT/docs/pre-brainstorms/20260421-0000--sample" "$WT_ROOT"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260421-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260421-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260421-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" branch feature/worker
+git -C "$PROJECT" worktree add "$WORKER" feature/worker >/dev/null
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+OLD_PROMPT="$PROJECT/.freely/run/worker-prompts/20260421-010000-worker-cleanup-codex.txt"
+cat >"$OLD_PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/worker\`
+dispatch_priority: P0
+parallel_safe: false
+write_scope: \`$WORKER\`
+intent_kind: cleanup
+intent_target: \`$WORKER\`
+EOF
+
+OLD_CONT="$PROJECT/.freely/run/manager-continuity-20260421-010000.md"
+cat >"$OLD_CONT" <<EOF
+# Manager Continuity
+
+## Worker Delegation
+- prompt_path: \`$OLD_PROMPT\`
+EOF
+
+NEW_CONT="$PROJECT/.freely/run/manager-continuity-20260421-020000.md"
+cat >"$NEW_CONT" <<'EOF'
+# Manager Continuity
+
+## Primary Judgement
+- route_kind: `completion_verification`
+- restart_point: `manager-owned cleanup queue supersedes the stale worker prompt`
+- next_action: `treat the dirty premerge lane as cleanup-only and do not preserve the old worker prompt`
+
+## Cleanup Queue
+- cleanup: `/tmp/disposable-premerge`
+  - authority: `runtime-or-operator cleanup only`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$OLD_CONT"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$OLD_PROMPT"
+LAST_MANAGER_CONTINUITY_CONSUMED="$OLD_CONT"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED=""
+LAUNCHED_WORKER_PROMPTS=""
+QUEUED_WORKER_PROMPTS="$OLD_PROMPT"
+QUEUED_WORKER_PROMPT_BLOCKERS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-04-21T01:00:10Z"
+EOF
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    load_config "'"$PROJECT"'"
+    manager_worker_launch_state_refresh_for_status "'"$PROJECT"'"
+    cat "'"$PROJECT"'/.freely/run/manager-worker-launch-state.env"
+  '
+)"
+
+grep -q "^LAST_MANAGER_CONTINUITY_GENERATED=\"$NEW_CONT\"$" <<<"$OUTPUT"
+grep -q '^LAST_MANAGER_WORKER_PROMPTS_GENERATED="none"$' <<<"$OUTPUT"
+grep -q "^LAST_MANAGER_CONTINUITY_CONSUMED=\"$NEW_CONT\"$" <<<"$OUTPUT"
+grep -q '^LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"$' <<<"$OUTPUT"
+grep -q '^QUEUED_WORKER_PROMPTS=""$' <<<"$OUTPUT"
+
+echo "[PASS] launch-state refresh lets a newer manager-owned continuity supersede a stale queued worker prompt"
