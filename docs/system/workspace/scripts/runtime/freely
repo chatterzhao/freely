@@ -26,6 +26,7 @@ source "$SESSION_EVIDENCE_RESOLVER_LIB"
 
 BUILD_ARTIFACT_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-build-artifact-exposure"
 SUPPLY_CHAIN_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-supply-chain-baseline"
+TASK_SOURCE_SCAN_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/runtime/task-source-scan.py"
 
 format_timestamp_local_for_display() {
   local value="${1:-}" epoch=""
@@ -517,6 +518,7 @@ Usage:
   freely restore-work [--project <abs_path>]
   freely baseline-status [--project <abs_path>]
   freely security-review-brief [--project <abs_path>]
+  freely task-source-scan [--project <abs_path>] [--json]
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]
   freely fleet-status [--project <abs_path>]
@@ -14220,6 +14222,58 @@ cmd_baseline_status() {
   fi
 }
 
+task_source_scan_dir_for_project() {
+  local project="$1"
+  printf '%s\n' "$(run_dir_for_project "$project")/task-source-scan"
+}
+
+task_source_scan_latest_file_for_project() {
+  local project="$1"
+  printf '%s\n' "$(task_source_scan_dir_for_project "$project")/latest.json"
+}
+
+cmd_task_source_scan() {
+  local project="" emit_json="0" latest_file scan_dir
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --json) emit_json="1"; shift ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project" 1)"
+  [[ -f "$TASK_SOURCE_SCAN_SCRIPT" ]] || {
+    log_error "missing task source scan script: $TASK_SOURCE_SCAN_SCRIPT"
+    exit 1
+  }
+  scan_dir="$(task_source_scan_dir_for_project "$project")"
+  latest_file="$(task_source_scan_latest_file_for_project "$project")"
+  mkdir -p "$scan_dir"
+  python3 "$TASK_SOURCE_SCAN_SCRIPT" --project "$project" >"$latest_file"
+  if [[ "$emit_json" == "1" ]]; then
+    cat "$latest_file"
+  else
+    echo "project: $project"
+    echo "task_source_scan: $latest_file"
+    echo "recommended_skill: auto-loop-orchestrator"
+    echo "routing_skill: context-source-skill"
+    python3 - "$latest_file" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+payload = json.load(open(path, encoding="utf-8"))
+providers = payload.get("providers", {}).get("external_issue", {})
+for name in ("github", "gitee"):
+    provider = providers.get(name, {})
+    hint = provider.get("availability_hint")
+    if not hint:
+        continue
+    print(f"provider_hint_{name}: {hint}")
+PY
+  fi
+}
+
 cmd_security_review_brief() {
   local project=""
   while [[ $# -gt 0 ]]; do
@@ -15090,6 +15144,7 @@ main() {
     restore-work) cmd_restore_work "$@" ;;
     baseline-status) cmd_baseline_status "$@" ;;
     security-review-brief) cmd_security_review_brief "$@" ;;
+    task-source-scan) cmd_task_source_scan "$@" ;;
     status) cmd_status "$@" ;;
     live-status) cmd_live_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;

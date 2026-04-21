@@ -24,7 +24,7 @@
    - chat / session evidence
    - project intent
    - review / test
-   - github-issue
+   - external issue
    - milestone
    - issue / progress / recovery
 3. 将来源判定、需求池扫描、优先级判断与下一跳提示词组装委托给 `skill:context-source-skill`，而不是在本文件中内嵌所有路由细节。

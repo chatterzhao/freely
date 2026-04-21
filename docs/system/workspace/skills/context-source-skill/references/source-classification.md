@@ -5,9 +5,10 @@
 - `source_class=discovery`
   - `PROJECT_INTENT`
   - chat / session evidence
+  - human interruption
   - test
   - code-review
-  - github-issue
+  - external issue
   - 治理漂移
   - 新运行时异常
 - `source_class=milestone`
@@ -21,5 +22,14 @@
 ## Output hints
 
 - `discovery` 通常先去 `doc-pre-brainstorm-execution`
+- `human interruption` 与 `external issue` 是默认 durable source families，但它们的 consumption / dedupe / closeout 规则不同，不能因为都属于 `discovery` 就混成一个来源池
+- `github_raw_issue` / `gitee_raw_issue`
+  - 仍属于 `discovery`
+  - 默认首跳：`doc-pre-brainstorm-execution`
+  - 语义：外部原始 issue 仍未被 canonical milestone / issue linkage 消费，需要先做 intake / 预研 / 接纳或丢弃判断
+- `github_linked_open_issue` / `gitee_linked_open_issue`
+  - 仍属于 `discovery`，但不是 fresh intake
+  - 默认首跳：先回 canonical milestone / issue / progress truth 做 drift reconcile
+  - 语义：外部 issue 已有 canonical linkage，但外部面仍 open；先判断是否只是 closeout/publication 未收口，还是本地 continuation 真没做完
 - `milestone` 需要再看队列和 `phase_state`
 - `continuation` 需要再看 docs 完整度、`phase_state`、`runtime_state` 与恢复证据

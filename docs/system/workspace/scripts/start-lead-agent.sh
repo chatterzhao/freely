@@ -340,20 +340,30 @@ ${initial_read_targets_escaped}
 1. 先遵守 \`PROJECT_ROOT/AGENTS.md\`；它是当前目标项目的治理入口，不要在 workspace 能力文档里重复发明第二套项目规则。
 2. 再完成 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\` 预检：默认做法是阅读 \`workspace/skills/constitution-guard/SKILL.md\` 与 \`workspace/skills/laws-enforcer/SKILL.md\` 并按其约束执行；不要假设存在可直接调用的 \`skill\` 工具。
 3. 进入 \`lead-agent\`，不要绕过首跳代理。
-4. 由 \`lead-agent\` 参照 \`workspace/skills/context-source-skill/SKILL.md\` 完成需求池扫描、优先级判断与下一跳提示词组装；若当前工具没有原生 skill executor，就直接读取该技能文档并在当前会话按它执行。
-4A. 若 runtime 在 prompt 尾部附加了 \`machine_readable_scan_json\`，先把它当作本轮 idle / replan patrol 的结构化入口；其中状态只算 routing hint，phase judgement 仍需回到 linked evidence 核对。
+4. 先运行 \`./bin/freely task-source-scan --project $project --json\`，把最新 scan JSON 当作 standing-source 现场，再由 \`lead-agent\` 参照 \`workspace/skills/context-source-skill/SKILL.md\` 完成优先级判断与下一跳提示词组装；若当前工具没有原生 skill executor，就直接读取该技能文档并在当前会话按它执行。
+4A. 若 runtime 在 prompt 尾部附加了 \`machine_readable_scan_json\`，优先把它当作本轮 idle / replan patrol 的结构化入口；仅当该 json 缺失、过时或不足以裁决时，才回退到重新运行 \`task-source-scan\`。其中状态只算 routing hint，phase judgement 仍需回到 linked evidence 核对。
 ${startup_bounded_patrol_rule_escaped}
 5. 若当前轮次承担项目级监督职责，先基于项目级工位视图做排班、冻结、集成与 cleanup 判断；不要直接把自己降级成单工位写代码代理。
 ${role_scope_rule_5a_escaped}
 ${role_scope_rule_5b_escaped}
 6. 在可并行的 doc-loop、verification、review、日志诊断或互不冲突的代码任务上，使用 subagent 提高效率。
+6A. \`task-source-scan\` 的推荐消费方式：
+   - 默认技能：\`auto-loop-orchestrator\`
+   - 来源解释技能：\`context-source-skill\`
+   - 先看 JSON 里的 \`sources[]\`、\`restart_point\`、\`status_markers\`、\`next_action\`
+   - 不要把 scan 当成最终裁决；它是 patrol 输入，不替代 issue/progress/milestone 真相
+6B. 不要在每轮都机械重跑 scan。优先在这些时机运行：
+   - 启动后的第一轮 patrol
+   - 某条 lane 刚完成 verification / closeout 并改写了 canonical truth 之后
+   - 当前 worker 未满载，或没有 worker 在跑时
+6C. 若所有 worker slot 都在推进未收口的 active lane，且没有新的 source/event truth，不要只为了“再扫一遍”打断当前主线、浪费 token。
 7. 你的需求池至少包括：
    - \`docs/milestones.md\`
    - progress / recovery
    - review / test / acceptance review
    - milestone planning / state maintenance
    - human chat / session evidence
-   - github issue
+   - external issue
    - \`docs/PROJECT_INTENT.md\`
 8. 你需要自主判断：
    - 当前先看哪个池
