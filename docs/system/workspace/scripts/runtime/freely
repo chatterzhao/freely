@@ -1696,6 +1696,37 @@ codex_slot_cooldown_file() {
   echo "$(run_dir_for_project "$project")/codex-slot-cooldowns.tsv"
 }
 
+tool_availability_state_file() {
+  local project="$1" tool="$2"
+  printf '%s\n' "$(run_dir_for_project "$project")/tool-availability-${tool}.env"
+}
+
+tool_load_availability_state() {
+  local project="$1" tool="$2" state_file
+  state_file="$(tool_availability_state_file "$project" "$tool")"
+  [[ -f "$state_file" ]] || return 1
+  # shellcheck disable=SC1090
+  source "$state_file"
+}
+
+tool_write_availability_state() {
+  local project="$1" tool="$2" phase="$3" blocked_reason="$4" earliest_reset="$5"
+  local state_file
+  state_file="$(tool_availability_state_file "$project" "$tool")"
+  mkdir -p "$(dirname "$state_file")"
+  cat >"$state_file" <<EOF
+AVAILABILITY_PHASE="${phase:-unknown}"
+BLOCKED_REASON="${blocked_reason:-}"
+EARLIEST_RESET_HINT="${earliest_reset:-}"
+LAST_PROBE_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+EOF
+}
+
+tool_clear_availability_state() {
+  local project="$1" tool="$2"
+  rm -f "$(tool_availability_state_file "$project" "$tool")"
+}
+
 stop_marker_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/stop.requested"
@@ -1879,6 +1910,71 @@ runtime_now_epoch() {
   else
     date +%s
   fi
+}
+
+kiro_monthly_limit_reset_epoch_from_log() {
+  local log_file="$1" reset_epoch
+  [[ -f "$log_file" ]] || return 1
+  reset_epoch="$(python3 - <<'PY' "$log_file" "${FREELY_TEST_NOW_EPOCH:-}" 2>/dev/null || true
+import datetime as dt
+import re
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+now_arg = sys.argv[2].strip()
+text = path.read_text(encoding="utf-8", errors="ignore")
+match = re.search(r'reset on\s+([0-9]{2})/([0-9]{2})', text, re.IGNORECASE)
+if now_arg.isdigit():
+    now = dt.datetime.fromtimestamp(int(now_arg))
+else:
+    now = dt.datetime.now()
+
+if match:
+    month = int(match.group(1))
+    day = int(match.group(2))
+    year = now.year
+    candidate = dt.datetime(year, month, day)
+    if candidate < now:
+        candidate = dt.datetime(year + 1, month, day)
+else:
+    if now.month == 12:
+        candidate = dt.datetime(now.year + 1, 1, 1)
+    else:
+        candidate = dt.datetime(now.year, now.month + 1, 1)
+
+print(int(candidate.timestamp()))
+PY
+)"
+  [[ "$reset_epoch" =~ ^[0-9]+$ ]] || return 1
+  printf '%s\n' "$reset_epoch"
+}
+
+record_tool_unavailability_from_failure() {
+  local project="$1" tool="$2" failure_reason="$3" cycle_log="${4:-}" earliest_reset=""
+  case "$tool:$failure_reason" in
+    kiro-cli:kiro_monthly_request_limit)
+      earliest_reset="$(kiro_monthly_limit_reset_epoch_from_log "$cycle_log" || true)"
+      tool_write_availability_state "$project" "$tool" "all_unavailable" "$failure_reason" "${earliest_reset:-}"
+      ;;
+  esac
+}
+
+tool_cached_availability_blocks_auto_recovery() {
+  local project="$1" tool="$2" now_epoch
+  tool_load_availability_state "$project" "$tool" || return 1
+  [[ "${AVAILABILITY_PHASE:-}" == "all_unavailable" ]] || return 1
+  if [[ "${EARLIEST_RESET_HINT:-}" =~ ^[0-9]+$ ]]; then
+    now_epoch="$(runtime_now_epoch 2>/dev/null || true)"
+    [[ "$now_epoch" =~ ^[0-9]+$ ]] || now_epoch="$(date +%s)"
+    if (( EARLIEST_RESET_HINT > now_epoch )); then
+      return 0
+    fi
+  else
+    return 0
+  fi
+  tool_clear_availability_state "$project" "$tool"
+  return 1
 }
 
 manager_continuity_gap_snapshot_for_project() {
@@ -3560,6 +3656,14 @@ tool_earliest_recovery_hint_for_project() {
     codex)
       codex_earliest_recovery_hint_for_project "$project"
       ;;
+    kiro-cli)
+      if tool_cached_availability_blocks_auto_recovery "$project" "$tool" \
+        && [[ "${EARLIEST_RESET_HINT:-}" =~ ^[0-9]+$ ]]; then
+        printf 'default-1|%s\n' "${EARLIEST_RESET_HINT:-}"
+        return 0
+      fi
+      return 1
+      ;;
     *)
       return 1
       ;;
@@ -3595,6 +3699,7 @@ tool_select_ready_slot_for_manager_auto_recovery() {
 
 tool_ready_for_manager_auto_recovery() {
   local project="$1" tool="$2"
+  tool_cached_availability_blocks_auto_recovery "$project" "$tool" && return 1
   tool_select_ready_slot_for_manager_auto_recovery "$project" "$tool" "entry"
 }
 
@@ -13630,6 +13735,9 @@ start_project_runtime() {
       network_failure_reason="$(runtime_network_failure_reason_from_log "$PROJECT_ROOT" "$cycle_log" || true)"
     else
       clear_execution_network_state "$PROJECT_ROOT"
+    fi
+    if [[ -n "$slot_switch_reason" ]]; then
+      record_tool_unavailability_from_failure "$PROJECT_ROOT" "$AI_TOOL" "$slot_switch_reason" "$cycle_log"
     fi
     if [[ -z "$slot_switch_reason" && -z "$network_failure_reason" ]]; then
       runtime_auto_recovery_reset_attempted_tools
