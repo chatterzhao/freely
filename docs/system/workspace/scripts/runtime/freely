@@ -2976,6 +2976,10 @@ RESTART_STORM_WINDOW_SECS=30
 RESTART_STORM_COUNT=4
 PROCESS_CHURN_PEAK=3
 RESTART_STORM_OBSERVE_DELAY_SECS=30
+# Proxy mode:
+# - inherit: keep ambient shell proxy env for tool launches
+# - disabled: clear ALL_PROXY/HTTP_PROXY/HTTPS_PROXY/NO_PROXY before tool launches
+# - explicit: force the FREELY_* proxy values below for tool launches
 FREELY_NETWORK_PROXY_MODE="inherit"
 FREELY_NETWORK_PROXY_URL=""
 FREELY_ALL_PROXY=""
@@ -5734,6 +5738,87 @@ runtime_network_failure_reason_from_log() {
 
   persist_execution_network_state "$project" "$reason" "$failure_count" "$next_retry_epoch" "$now_epoch"
   printf '%s\n' "$reason"
+}
+
+runtime_proxy_mode_summary_for_logs() {
+  local project="$1" project_cfg global_cfg mode
+  project_cfg="$project/.freely/config.env"
+  global_cfg="${FREELY_HOME:-$HOME/.freely}/config.env"
+
+  if declare -F freely_network_proxy_project_config_file >/dev/null 2>&1; then
+    project_cfg="$(freely_network_proxy_project_config_file "$project")"
+  fi
+  if declare -F freely_network_proxy_global_config_file >/dev/null 2>&1; then
+    global_cfg="$(freely_network_proxy_global_config_file)"
+  fi
+
+  if declare -F freely_network_proxy_resolve_config >/dev/null 2>&1; then
+    freely_network_proxy_resolve_config "$project"
+  fi
+  if declare -F freely_network_proxy_mode >/dev/null 2>&1; then
+    mode="$(freely_network_proxy_mode)"
+  else
+    mode="${FREELY_NETWORK_PROXY_MODE:-inherit}"
+  fi
+
+  case "$mode" in
+    disabled)
+      printf 'proxy mode=disabled; Freely clears proxy env before launch (project_cfg=%s global_cfg=%s)\n' "$project_cfg" "$global_cfg"
+      ;;
+    explicit)
+      printf 'proxy mode=explicit; Freely applies FREELY_NETWORK_PROXY_URL/FREELY_ALL_PROXY/FREELY_HTTP_PROXY/FREELY_HTTPS_PROXY/FREELY_NO_PROXY from config (project_cfg=%s global_cfg=%s)\n' "$project_cfg" "$global_cfg"
+      ;;
+    *)
+      printf 'proxy mode=inherit; Freely keeps ambient ALL_PROXY/HTTP_PROXY/HTTPS_PROXY/NO_PROXY from the shell unless project/global config overrides it (project_cfg=%s global_cfg=%s)\n' "$project_cfg" "$global_cfg"
+      ;;
+  esac
+}
+
+emit_runtime_failure_guidance() {
+  local project="$1" tool="$2" slot_switch_reason="${3:-}" network_failure_reason="${4:-}" log_file="${5:-}"
+  local effective_reason="${network_failure_reason:-$slot_switch_reason}"
+
+  case "$effective_reason" in
+    auth_failure|kiro_monthly_request_limit|kiro_subscription_status_service_error)
+      log_warn "diagnose provider access: check login/API key state, balance/quota/subscription, and whether the relay/base_url expects a different credential"
+      return 0
+      ;;
+    proxy_config_invalid)
+      log_warn "diagnose proxy config: check the selected proxy mode and ensure the required FREELY_* proxy variables are populated"
+      log_warn "$(runtime_proxy_mode_summary_for_logs "$project")"
+      log_warn "set FREELY_NETWORK_PROXY_MODE=\"disabled\" to force direct access, keep \"inherit\" to use shell proxy env, or use \"explicit\" with FREELY_NETWORK_PROXY_URL/FREELY_ALL_PROXY/FREELY_HTTP_PROXY/FREELY_HTTPS_PROXY/FREELY_NO_PROXY"
+      return 0
+      ;;
+    execution_network_transient|execution_network_persistent)
+      log_warn "diagnose network path: check direct network reachability, relay/base_url health, TLS/certificate trust, and whether the current proxy mode matches this environment"
+      log_warn "$(runtime_proxy_mode_summary_for_logs "$project")"
+      log_warn "if the transport path looks healthy but reconnects continue, also verify provider quota/subscription because some relays surface billing failures as reconnects"
+      return 0
+      ;;
+  esac
+
+  [[ -f "$log_file" ]] || return 0
+
+  if log_has_proxy_config_invalid "$log_file"; then
+    emit_runtime_failure_guidance "$project" "$tool" "proxy_config_invalid" "" "$log_file"
+    return 0
+  fi
+  if log_has_auth_failure "$log_file"; then
+    emit_runtime_failure_guidance "$project" "$tool" "auth_failure" "" "$log_file"
+    return 0
+  fi
+  if log_has_execution_network_failure "$log_file"; then
+    emit_runtime_failure_guidance "$project" "$tool" "" "execution_network_transient" "$log_file"
+    return 0
+  fi
+  if [[ "$tool" == "kiro-cli" ]] && log_has_kiro_subscription_status_service_error "$log_file"; then
+    emit_runtime_failure_guidance "$project" "$tool" "kiro_subscription_status_service_error" "" "$log_file"
+    return 0
+  fi
+  if [[ "$tool" == "kiro-cli" ]] && log_has_kiro_monthly_request_limit "$log_file"; then
+    emit_runtime_failure_guidance "$project" "$tool" "kiro_monthly_request_limit" "" "$log_file"
+    return 0
+  fi
 }
 
 execution_network_launch_block_active() {
@@ -14761,6 +14846,9 @@ start_project_runtime() {
     fi
     if [[ -z "$slot_switch_reason" && -z "$network_failure_reason" ]]; then
       runtime_auto_recovery_reset_attempted_tools
+    fi
+    if [[ -n "$slot_switch_reason" || -n "$network_failure_reason" ]]; then
+      emit_runtime_failure_guidance "$PROJECT_ROOT" "$AI_TOOL" "$slot_switch_reason" "$network_failure_reason" "$cycle_log"
     fi
 
     local restart_signal_reason active_process_count now_epoch observe_delay restart_window_stats restart_window_count restart_window_peak
