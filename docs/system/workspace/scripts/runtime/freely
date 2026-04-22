@@ -5542,11 +5542,16 @@ freely_bin_for_project() {
 }
 
 start_workcell_supervisor_async() {
-  local project="$1" freely_bin recovery_log
+  local project="$1" freely_bin recovery_log launch_mode launch_command
   freely_bin="$(freely_bin_for_project "$project")"
   recovery_log="$(logs_dir_for_project "$project")/manager-runtime-recovery.log"
+  launch_mode="$(project_control_plane_entrypoint_mode "$project")"
+  launch_command="start"
+  if [[ "$launch_mode" == "daemon" ]]; then
+    launch_command="daemon-run"
+  fi
   mkdir -p "$(dirname "$recovery_log")"
-  nohup bash -lc "cd '$project' && exec bash '$freely_bin' start --project '$project'" >>"$recovery_log" 2>&1 </dev/null &
+  nohup bash -lc "cd '$project' && exec bash '$freely_bin' $launch_command --project '$project'" >>"$recovery_log" 2>&1 </dev/null &
 }
 
 log_has_context_compacted() {
@@ -5890,10 +5895,21 @@ role_hint_for_project() {
 
 write_workcell_state() {
   local project="$1" desired_state="$2" supervisor_state="$3" ai_state="$4" exit_reason="$5"
-  local state_file role_hint updated_at verification_contract_file verification_metadata_present verification_missing_fields verification_owner_issue verification_pre_tests_path verification_artifact_dir verification_test_lanes verification_acceptance_ids verification_evidence_level verification_target_environment verification_closeout_gate verification_closeout_gate_command verification_closeout_target_lane verification_closeout_promotion_gate verification_closeout_requires_adequacy verification_closeout_review_artifact_policy
+  local state_file role_hint updated_at verification_contract_file verification_metadata_present verification_missing_fields verification_owner_issue verification_pre_tests_path verification_artifact_dir verification_test_lanes verification_acceptance_ids verification_evidence_level verification_target_environment verification_closeout_gate verification_closeout_gate_command verification_closeout_target_lane verification_closeout_promotion_gate verification_closeout_requires_adequacy verification_closeout_review_artifact_policy entrypoint_mode
   state_file="$(workcell_state_file "$project")"
   role_hint="$(role_hint_for_project "$project")"
   updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  entrypoint_mode="${WORKCELL_ENTRYPOINT_MODE_OVERRIDE:-}"
+  if [[ -z "$entrypoint_mode" && -f "$state_file" ]]; then
+    unset LAST_ENTRYPOINT_MODE
+    # shellcheck disable=SC1090
+    source "$state_file"
+    entrypoint_mode="${LAST_ENTRYPOINT_MODE:-}"
+  fi
+  case "$entrypoint_mode" in
+    daemon|foreground) ;;
+    *) entrypoint_mode="foreground" ;;
+  esac
   verification_contract_file="$(worker_verification_contract_state_file "$project")"
   verification_metadata_present="false"
   verification_missing_fields=""
@@ -5932,6 +5948,7 @@ DESIRED_RUNTIME_STATE="$desired_state"
 LAST_SUPERVISOR_STATE="$supervisor_state"
 LAST_AI_STATE="$ai_state"
 LAST_EXIT_REASON="$exit_reason"
+LAST_ENTRYPOINT_MODE="$entrypoint_mode"
 LAST_ROLE_HINT="$role_hint"
 LAST_STATE_UPDATED_AT="$updated_at"
 LAST_WORKER_VERIFICATION_CONTRACT_FILE="$verification_contract_file"
@@ -11746,17 +11763,40 @@ checkpoint_guard_reason_codes() {
   printf '%s\n' "$value" | xargs
 }
 
+project_control_plane_entrypoint_mode() {
+  local project="$1" entrypoint_mode=""
+  if [[ -f "$(workcell_state_file "$project")" ]]; then
+    unset LAST_ENTRYPOINT_MODE
+    # shellcheck disable=SC1090
+    source "$(workcell_state_file "$project")"
+    entrypoint_mode="${LAST_ENTRYPOINT_MODE:-}"
+  fi
+  case "$entrypoint_mode" in
+    daemon|foreground)
+      printf '%s\n' "$entrypoint_mode"
+      ;;
+    *)
+      printf 'foreground\n'
+      ;;
+  esac
+}
+
 launch_manager_supervisor() {
   local project="$1"
-  local launch_bin
+  local launch_bin launch_mode launch_mode_command
   launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
+  launch_mode="$(project_control_plane_entrypoint_mode "$project")"
+  launch_mode_command="start"
+  if [[ "$launch_mode" == "daemon" ]]; then
+    launch_mode_command="daemon-run"
+  fi
   clear_execution_network_state "$project"
   if [[ -n "${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-}" ]]; then
     # Test launch shims are synchronous evidence points; avoid background races in focused regressions.
-    bash "$launch_bin" start --project "$project" </dev/null >/dev/null 2>&1
+    bash "$launch_bin" "$launch_mode_command" --project "$project" </dev/null >/dev/null 2>&1
     return 0
   fi
-  nohup bash "$launch_bin" start --project "$project" </dev/null >/dev/null 2>&1 &
+  nohup bash "$launch_bin" "$launch_mode_command" --project "$project" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
 }
 
@@ -14141,6 +14181,7 @@ ensure_no_active_supervisor_conflict() {
 
 start_project_runtime() {
   local project="$1" entrypoint_mode="${2:-foreground}"
+  local WORKCELL_ENTRYPOINT_MODE_OVERRIDE="$entrypoint_mode"
   append_runtime_event "$project" "start_project_runtime_enter" \
     "entrypoint_mode=$entrypoint_mode"
   # When process inspection is unavailable, runtime ownership falls back to cwd checks.
