@@ -7360,6 +7360,29 @@ worker_prompt_selected_tool() {
   ' "$prompt_file"
 }
 
+worker_selected_tool_from_verification_contract_for_project() {
+  local project="$1" contract_file prompt_file
+  contract_file="$(worker_verification_contract_state_file "$project")"
+  [[ -f "$contract_file" ]] || return 1
+  prompt_file="$(meta_env_value "$contract_file" "SOURCE_PROMPT_FILE")"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  worker_prompt_selected_tool "$prompt_file"
+}
+
+worker_runtime_reconcile_selected_tool_from_contract_if_needed() {
+  local project="$1" role selected_tool current_tool _ current_truth
+  role="$(role_hint_for_project "$project")"
+  [[ "$role" == "worker" ]] || return 1
+  selected_tool="$(worker_selected_tool_from_verification_contract_for_project "$project")"
+  [[ -n "$selected_tool" ]] || return 1
+  current_truth="$(project_tool_runtime_selection_truth "$project")"
+  IFS='|' read -r current_tool _ <<<"$current_truth"
+  [[ -n "$current_tool" ]] || current_tool="${AI_TOOL:-}"
+  [[ "$selected_tool" == "$current_tool" ]] && return 0
+  persist_project_tool_selection "$project" "$selected_tool"
+  return 0
+}
+
 worktree_path_for_branch() {
   local project="$1" target_branch="$2"
   [[ -n "$target_branch" ]] || return 0
@@ -14076,6 +14099,9 @@ start_project_runtime() {
   append_runtime_event "$project" "start_project_runtime_after_cd" \
     "entrypoint_mode=$entrypoint_mode"
   load_config "$project"
+  if worker_runtime_reconcile_selected_tool_from_contract_if_needed "$project"; then
+    load_config "$project"
+  fi
   append_runtime_event "$project" "start_project_runtime_after_load_config" \
     "entrypoint_mode=$entrypoint_mode"
   register_project_in_registry "$project"

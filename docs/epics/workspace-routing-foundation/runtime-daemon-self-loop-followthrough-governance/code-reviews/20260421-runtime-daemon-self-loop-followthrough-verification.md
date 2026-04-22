@@ -236,3 +236,15 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-stall-recovery`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-supervision-quiet-period-does-not-recover`
 - `PENDING`: guarded promote into canonical `develop`, then rerun the daemon self-host acceptance until Freely proves it can complete one task, retire that temporary lane, and continue to a second task without hanging on an ordinary manager prompt.
+
+## 2026-04-21 23:35 PDT Worker Restart Selected-Tool Verification
+
+- `FAIL`: canonical `develop` self-host replay relaunched the down cleanup worker from fresh runtime state, but the new worker inherited `tool=cc-use-codex-cli` from fallback state instead of the delegated prompt's `selected_tool=codex`; that immediately reproduced `tool_runtime_failure` and prevented the same owner followthrough from completing.
+- `PASS`: runtime now resolves the authoritative delegated tool from `worker-verification-contract.env` `SOURCE_PROMPT_FILE` and reapplies that `selected_tool` before a fresh worker restart launches.
+- `PASS`: the new restart path preserves the delegated prompt contract across failure recovery instead of reviving whichever fallback tool the previous failed attempt left behind.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-restart-reapplies-selected-tool-from-verification-contract`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-applies-selected-tool`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-uses-unified-auto-recovery-path`
+- `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-manager-exit-contract-expected-worker-guard --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- `PASS`: `./bin/governance-check`
+- `PENDING`: guarded promotion into canonical `develop` and final self-host replay still remain required before this owner can close.
