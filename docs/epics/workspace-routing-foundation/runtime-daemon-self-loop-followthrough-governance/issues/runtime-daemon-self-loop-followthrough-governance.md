@@ -68,6 +68,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 28. When one bounded cross-tool recovery episode exhausts every fallback tool, restore the original tool selection for the next retry instead of leaving the project pinned to the last failed fallback.
 29. Preserve `manager_exit_contract_repair` / `worker_exit_contract_repair` relaunches across supervisor restarts and same-process relaunch loops, so repair rounds resume the same tool context instead of falling back to a fresh `initial_start` patrol.
 30. Ignore the known benign Codex startup line `failed to refresh available models: timeout waiting for child process to exit` so monitor/runtime do not treat an otherwise successful manager patrol round as `tool_runtime_failure`.
+31. Keep a newly started daemon manager alive while startup is still between `L010 supervisor_started` and `L020 prompt_build_begin`, so pre-prompt recovery/fleet work does not get misclassified as an idle supervisor restart.
 
 ## Non-Goals
 
@@ -117,6 +118,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-defers-codex-reconnect-until-retries-exhaust`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-model-refresh-timeout`
+- `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`
 - `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`

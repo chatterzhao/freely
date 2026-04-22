@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/monitor-codex-model-refresh-timeout-ignore-20260422`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-monitor-codex-model-refresh-timeout-ignore`
-- updated_at: `2026-04-22 04:18 PDT`
+- branch: `feature/manager-bootstrap-prompt-build-grace-20260422`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-manager-bootstrap-prompt-build-grace`
+- updated_at: `2026-04-22 04:25 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -50,6 +50,8 @@
 - Runtime now treats manager-authored no-worker continuity as authoritative enough to supersede stale queued worker-prompt state, while still preserving older unconsumed prompts across newer runtime-seeded startup stubs and runtime fallback continuity.
 - Canonical `develop` replay then exposed one more monitor/runtime seam: Codex could print `failed to refresh available models: timeout waiting for child process to exit` during an otherwise successful manager round, and `monitor-ai-cli.sh` misclassified that single line as `tool_runtime_failure`.
 - The monitor now strips that known benign Codex startup noise before runtime-failure classification, so a normal manager patrol no longer falls into same-tool / cross-tool recovery just because model refresh lagged during startup.
+- Canonical `develop` replay after that repair exposed a narrower bootstrap seam: `ensure-manager` could still restart a fresh daemon-owned manager as idle before `ai_launch_begin` if worker recovery or fleet prep kept startup between `L010 supervisor_started` and `L020 prompt_build_begin` longer than the initial 15-second bootstrap grace.
+- Runtime startup-lifecycle protection now treats `L010 supervisor_started` as in-flight startup evidence, so daemon-owned manager bootstrap can finish pre-prompt recovery work without being killed and relaunched by its own keepalive loop.
 - Focused verification passed for the new benign-noise regression while the adjacent real-failure regressions for Codex 429 and reconnect defer stayed green.
 - Canonical `develop` daemon replay then exposed one more tool-availability seam: after `cc` ended `tool_runtime_failure`, cross-tool recovery could still select `kiro-cli` even though the immediately preceding self-host evidence had already proven this machine was at Kiro monthly request limit.
 - Runtime now persists `kiro_monthly_request_limit` as a tool-availability state with a recovery hint and skips that cached-unavailable Kiro candidate during later auto-switch / manager bootstrap selection, instead of re-burning the same exhausted tool before moving on.
