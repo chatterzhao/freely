@@ -27,6 +27,9 @@
 - `PASS`: manager and worker prompt builds now publish explicit structured exit-contract directives, so the role-specific closeout contract is no longer implicit free text.
 - `PASS`: runtime now validates manager/worker exit contracts after `ai_exit_rc_0`, routes that handling through one unified dispatcher, and reuses the exact current resume target when it must repair a missing or malformed contract.
 - `PASS`: manager `EXIT_KIND=stop_ai` is now rejected whenever authoritative supervision still shows a runtime-owned expected-running worker down/degraded; runtime writes a repair handoff instead of legally ending autonomy while recovery remains unresolved.
+- `PASS`: `monitor-ai-cli` no longer treats pure `ERROR: Reconnecting... x/5` output as immediate network-failure kill evidence, so Codex keeps its own reconnect/backoff loop until the current process actually exits.
+- `PASS`: post-exit runtime classification still maps pure reconnect evidence to bounded `execution_network_*` recovery, while hard failure evidence such as Codex 429 remains immediate monitor-level kill/switch-worthy.
+- `PASS`: one bounded fallback episode now preserves attempted-tool memory and restores the episode origin tool after every configured fallback fails, instead of leaving project selection pinned to the last failed fallback.
 - `PASS`: focused regressions cover manager-invalid repair, manager-stop, worker-invalid repair, worker-done stop, worker prompt directive injection, cleanup worker materialization, and retained-merged cleanup followthrough coexistence.
 - `PASS`: cleanup-governance handoff workers that still have external cleanup surfaces are now explicitly protected from merged-lane reclaim/settle, and a focused regression proves runtime leaves them launchable instead of auto-closing them as `retire_ready_merged_worker`.
 - `PASS`: the merged-lane guard now resolves that authoritative cleanup prompt through `worker-verification-contract.env` when the target worktree no longer has a local `prompt-*.txt`, which matches the canonical `develop` reproduction.
@@ -87,6 +90,10 @@
 49. `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
 50. `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
 51. `bash docs/system/workspace/scripts/tests/test-freely-retire-ready-merged-cleanup-handoff-not-reclaimed`
+52. `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-defers-codex-reconnect-until-retries-exhaust`
+53. `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
+54. `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
+55. `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`
 
 ## 2026-04-21 23:12 PDT Manager Stop Guard Verification
 
@@ -258,6 +265,20 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`
 - `PASS`: `./bin/governance-check`
+
+## 2026-04-22 09:35 PDT Reconnect Deferral And Origin-Tool Recovery Verification
+
+- `FAIL`: canonical `develop` replay showed `monitor-ai-cli` could treat Codex `ERROR: Reconnecting... x/5` as immediate live network-failure evidence, so runtime switched tools before Codex exhausted its own retry loop even though Codex itself was still usable.
+- `FAIL`: the same bounded recovery path could also leave `AI_TOOL` pinned to the last failed fallback after `codex -> cc -> iflow -> kiro-cli` exhaustion, so the next retry no longer started from the truthful origin tool.
+- `PASS`: `monitor-ai-cli` now ignores reconnect-in-progress output as a live-kill signal and lets the tool exit naturally; post-exit runtime classification still routes pure reconnect evidence through `execution_network_transient` / `execution_network_persistent`.
+- `PASS`: hard failures such as Codex 429 remain immediate monitor-level kill signals, so the reconnect deferral does not weaken rate-limit handling.
+- `PASS`: runtime auto-recovery now remembers the origin tool for one fallback episode and restores that tool once every configured fallback has failed.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-defers-codex-reconnect-until-retries-exhaust`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-network-failure-blocks-fallback`
+- `PENDING`: carry this same-owner reconnect/fallback repair through guarded `feature -> test-pre-merge -> develop` promotion, then rerun canonical `develop` self-host acceptance until Freely finishes one real task, lawfully closes that temporary worktree, and advances to the next task.
 - `PASS`: replayed the same regression trio plus `./bin/governance-check` on protected lane `test-pre-merge-20260421-manager-exit-contract-expected-worker-guard-v2`; all passed before the first `develop` merge attempt.
 - `FAIL`: the first guarded `develop` merge attempt was blocked by the develop-bound governance materialization gate because this followthrough's owner issue/progress/review evidence was not yet present in the merge diff, even though the code/test patch itself was ready.
 - `PENDING`: rerun guarded `develop` merge with the refreshed owner evidence, then restart canonical `develop` runtime and continue self-host replay until Freely completes one task with lawful closeout and advances to the next task.

@@ -64,6 +64,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 24. Refuse manager `EXIT_KIND=stop_ai` whenever authoritative supervision truth still shows any unresolved runtime-owned expected-running worker, so autonomy cannot legally terminate while recovery/cleanup followthrough remains open.
 25. When a down expected-running worker is relaunched from fresh runtime state, reapply the delegated prompt's authoritative `selected_tool` from the worker verification contract instead of inheriting a stale fallback tool from the failed prior attempt.
 26. Reject manager `EXIT_KIND=delegate_workers` unless the advertised `WORKER_PROMPTS_CSV` contains at least one prompt that the same runtime control plane would actually treat as launchable.
+27. Keep reconnect-in-progress runtime output on the bounded execution-network retry path until the current tool actually exits; `ERROR: Reconnecting... x/5` must not trigger monitor-level early kill or immediate cross-tool switch.
+28. When one bounded cross-tool recovery episode exhausts every fallback tool, restore the original tool selection for the next retry instead of leaving the project pinned to the last failed fallback.
 
 ## Non-Goals
 
@@ -85,6 +87,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 9. Canonical `develop` no longer accepts manager `stop_ai` as a lawful terminal outcome while any runtime-owned expected-running worker is still down/degraded; runtime must continue with repair/recovery until that worker is resolved or explicitly reclassified.
 10. Canonical `develop` no longer loops on fresh worker restarts that inherit a stale fallback tool; a relaunched expected-running worker must recover with the delegated `selected_tool` and continue the same owner followthrough.
 11. Canonical `develop` no longer accepts `delegate_workers` as a lawful manager outcome when every advertised worker prompt is already non-launchable; runtime must force same-session repair instead of recording an impossible delegation.
+12. Canonical `develop` no longer treats `ERROR: Reconnecting... x/5` as sufficient evidence to live-kill Codex or switch tools before the tool exhausts its own retry loop; pure reconnect evidence stays on the bounded execution-network retry path.
+13. Canonical `develop` restores the original tool after one bounded fallback episode exhausts every configured fallback, so the next retry starts from truthful project preference instead of stale last-fallback state.
 
 ## Verification
 
@@ -108,6 +112,10 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt`
+- `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-defers-codex-reconnect-until-retries-exhaust`
+- `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
+- `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
+- `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`
@@ -152,8 +160,12 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
 - `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
 - `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt`
+- `docs/system/workspace/scripts/tests/test-monitor-ai-cli-defers-codex-reconnect-until-retries-exhaust`
+- `docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
+- `docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
 - `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
 - `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
 - `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`
+- `docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`
 - `docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
 - `docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
