@@ -26,6 +26,13 @@
 8. Run `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-stale-target-worktree-blocked`.
 9. Run `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-into-worktree`.
 10. Run `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`.
+11. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`.
+12. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`.
+13. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`.
+14. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`.
+15. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`.
+16. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`.
+17. Run `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -103,5 +110,17 @@
 - task_refs: `tasks.md#5,tasks.md#6`
 - case_design: `Replay the blocker owner through the disposable protected test lane, rerun owner gates there, and use that bounded evidence to justify guarded promote into develop.`
 - evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+
+### Runtime exit contracts are machine-checkable and self-repairable
+- id: `runtime-exit-contract-enforcement`
+- requirement: `Every manager / worker AI round must leave exactly one valid structured exit contract, or runtime must resume that same role with the exact current resume target and repair handoff before broader work continues.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#9,tasks.md#10`
+- case_design: `Exercise manager-invalid, manager-stop, worker-invalid, worker-done, and worker-prompt directive paths so runtime proves prompt injection, post-cycle validation, and precise same-session repair behavior.`
+- evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`

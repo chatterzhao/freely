@@ -55,6 +55,9 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 15. Keep Codex resume launches compatible with the current CLI contract: `codex exec resume` must not inherit `--add-dir`, otherwise manager continuity handoff chains crash with `ai_exit_rc_2` before followthrough can continue.
 16. Only bootstrap worker runtime state for target paths that still belong to the authoritative `git worktree list --porcelain` fleet, and require missing-config worker init to succeed with inherited default-autonomy consent before any post-init config mutation proceeds.
 17. Skip `sync-tooling` config and hook rewrites for stale directories that still sit under the managed `*-worktrees` root but no longer belong to the authoritative `git worktree list --porcelain` fleet, while preserving valid worktree sync and fresh-project bootstrap.
+18. Require every manager AI round to leave exactly one machine-checkable exit contract artifact whose `EXIT_KIND` is one of `stop_ai`, `resume_manager`, or `delegate_workers`.
+19. Require every worker AI round to leave exactly one machine-checkable exit contract artifact whose `EXIT_KIND` is one of `worker_done`, `worker_blocked`, or `worker_handoff_needed`.
+20. When an exit contract is missing or malformed, reuse the exact current resume target for that role and force a same-session repair handoff before broader patrol, delegation, or closeout continues.
 
 ## Non-Goals
 
@@ -71,6 +74,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 4. Guarded replay from `feature/runtime-daemon-self-loop-blocker-20260421` through `test-pre-merge-20260421-runtime-self-loop-blocker` into `develop` succeeds lawfully.
 5. On canonical `develop`, `freely daemon start` selects at least one task, completes it to the current-project success standard, closes the corresponding temporary worktree, and proceeds to another task.
 6. The temporary blocker worktree and disposable test-pre-merge branch are retired after canonical `develop` absorbs the fix.
+7. Manager prompt build, worker prompt build, and post-cycle runtime handling all agree on the same structured exit-contract contract, so manager/worker intent is machine-checkable instead of inferred from free text.
 
 ## Verification
 
@@ -91,6 +95,13 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-stale-target-worktree-blocked`
 - `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-into-worktree`
 - `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
+- `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
+- `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
+- `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
+- `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
@@ -124,3 +135,9 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`
 - `docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
 - `docs/system/workspace/scripts/tests/test-freely-sync-tooling-stale-target-worktree-blocked`
+- `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
+- `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
+- `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
+- `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
+- `docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
+- `docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`

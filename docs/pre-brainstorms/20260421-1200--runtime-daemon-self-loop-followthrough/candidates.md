@@ -24,6 +24,7 @@
   - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
 - problem: Dogfooding proved a remaining runtime-control blocker: daemon-mode Freely could stop self-looping after a patrol round because an unexpected `TERM` was recorded as `operator_stop`, and a lone dispatcher/watchdog residue could also falsely block the next `start` or `daemon start`.
 - followthrough_update: Guarded replay then exposed two same-owner seams on canonical `develop`: runtime could not consume the current `## Worker Delegation` continuity shape into worker launches, and after that repair it could still auto-recover a `merged-clean` blocker worktree instead of routing it to cleanup followthrough retirement.
+- followthrough_update_2: The same autonomous-loop owner then exposed one more control-plane seam: manager and worker AI rounds could exit without a machine-checkable closeout contract, so runtime had no reliable way to distinguish `stop_ai`, `resume_manager`, `delegate_workers`, `worker_done`, `worker_blocked`, and `worker_handoff_needed`, nor to force a precise same-session repair when the artifact was missing.
 - why_now:
   - this blocker prevents Freely from autonomously selecting, finishing, and closing tasks on canonical `develop`
   - the fix is already implemented and focused regressions are green in the blocker worktree, but guarded develop promotion still needs lawful owner evidence
@@ -33,6 +34,7 @@
   - daemon supervisor ignores unexpected `TERM` without `stop.marker` and still honors explicit daemon stop
   - runtime consumes current `## Worker Delegation` continuity into worker launches instead of stalling after manager selection
   - `merged-clean` / `retire-ready` blocker worktrees are settled toward cleanup followthrough retirement rather than being auto-recovered as edit workers
+  - every manager / worker AI cycle now leaves exactly one valid exit contract artifact, or runtime reuses the precise resume target to repair that artifact before doing broader work
   - guarded `feature/* -> test-pre-merge-* -> develop` replay succeeds with concrete owner evidence
   - on canonical `develop`, `freely daemon start` autonomously selects at least one task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task
 - promotion_gate:

@@ -24,6 +24,9 @@
 - `PASS`: Codex resume launches now omit `--add-dir`, matching the current `codex exec resume` CLI contract and preventing manager continuity resume loops from crashing with `ai_exit_rc_2`.
 - `PASS`: worker bootstrap now rejects stale target paths outside the authoritative worktree fleet, requires missing-config `freely init` to succeed before any follow-on config mutation, and carries inherited `--accept-default-autonomy` through that runtime-owned bootstrap path.
 - `PASS`: `sync-tooling` now also skips stale directories that still sit under the managed `*-worktrees` root but no longer belong to the authoritative worktree fleet, so runtime cannot rewrite `.freely/config.env` / `.githooks` into absorbed or deleted premerge lanes.
+- `PASS`: manager and worker prompt builds now publish explicit structured exit-contract directives, so the role-specific closeout contract is no longer implicit free text.
+- `PASS`: runtime now validates manager/worker exit contracts after `ai_exit_rc_0`, routes that handling through one unified dispatcher, and reuses the exact current resume target when it must repair a missing or malformed contract.
+- `PASS`: focused regressions cover manager-invalid repair, manager-stop, worker-invalid repair, worker-done stop, worker prompt directive injection, cleanup worker materialization, and retained-merged cleanup followthrough coexistence.
 - `PASS`: focused regressions and nearby daemon/live-status coverage passed on the guarded source lane, and the protected test lane replay still passed after the retirement followthrough repair.
 - `PENDING`: the final protected-branch acceptance remains canonical `develop` self-host execution where Freely finishes one task to the current-project success standard, closes the worktree, and continues to the next task.
 
@@ -68,6 +71,16 @@
 37. `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-stale-target-worktree-blocked`
 38. `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-into-worktree`
 39. `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`
+40. `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
+41. `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
+42. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
+43. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
+44. `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
+45. `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
+46. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-retire-ready-merged-prompt`
+47. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
+48. `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
+49. `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
 
 ## 2026-04-21 18:15 PDT Worker Bootstrap Guard Followthrough
 
