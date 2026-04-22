@@ -258,6 +258,18 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
 
+### Protected replay stages empty Codex session resume evidence
+- id: `empty-codex-session-files-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the empty-session resume regression and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#21`
+- case_design: `Replay the empty-session resume repair on the disposable protected lane, rerun the focused explicit-resume contract plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
+
 ### Repair handoff relaunches stay on resume instead of restarting patrol
 - id: `repair-handoff-does-not-regress-to-initial-start`
 - requirement: `A manager or worker repair handoff created from an invalid exit contract must resume the recorded tool context even after supervisor restart, instead of re-entering fresh initial patrol.`
