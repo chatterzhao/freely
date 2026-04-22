@@ -43,6 +43,7 @@
 25. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`.
 26. Run `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-model-refresh-timeout`.
 27. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`.
+28. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-failure-guidance`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -121,7 +122,19 @@
 - case_design: `Replay the blocker owner through the disposable protected test lane, rerun owner gates there, and use that bounded evidence to justify guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-proxy-guidance-verification.md`
+
+### Guarded promote carries fresh proxy/network diagnosis evidence
+- id: `guarded-promote-proxy-guidance-proof`
+- requirement: `The develop-bound replay includes fresh staged owner evidence for the current proxy/network diagnosis followthrough rather than relying only on older bounded runtime reviews.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#18`
+- case_design: `Replay the current proxy-guidance repair through the disposable protected test lane, rerun the focused proxy/network regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-proxy-guidance-verification.md`
 
 ### Runtime exit contracts are machine-checkable and self-repairable
 - id: `runtime-exit-contract-enforcement`
