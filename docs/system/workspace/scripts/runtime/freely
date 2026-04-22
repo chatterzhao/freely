@@ -6713,6 +6713,19 @@ fleet_worktree_paths_for_project() {
   project_worktree_list_porcelain_cached "$project" | awk '/^worktree / {print substr($0, 10)}'
 }
 
+project_has_authoritative_worktree_path() {
+  local project="$1" target_path="$2"
+  local normalized_target normalized_candidate
+  [[ -n "$target_path" ]] || return 1
+  normalized_target="$(normalize_runtime_worktree_path "$target_path")"
+  while IFS= read -r normalized_candidate; do
+    [[ -n "$normalized_candidate" ]] || continue
+    normalized_candidate="$(normalize_runtime_worktree_path "$normalized_candidate")"
+    [[ "$normalized_candidate" == "$normalized_target" ]] && return 0
+  done < <(fleet_worktree_paths_for_project "$project")
+  return 1
+}
+
 global_restart_project_paths() {
   local project="$1"
   {
@@ -8862,10 +8875,12 @@ write_manager_worker_launch_intake() {
 }
 
 ensure_runtime_workcell_initialized_for_launch() {
-  local target_project="$1"
-  local tool_adapter tool_adapter_policy
+  local manager_project="$1" target_project="$2"
+  local tool_adapter tool_adapter_policy init_rc
   local freely_bin
+  [[ -n "$manager_project" && -d "$manager_project" ]] || return 1
   [[ -d "$target_project" ]] || return 1
+  project_has_authoritative_worktree_path "$manager_project" "$target_project" || return 1
   if [[ -f "$(config_file "$target_project")" ]]; then
     return 0
   fi
@@ -8876,7 +8891,10 @@ ensure_runtime_workcell_initialized_for_launch() {
     --project "$target_project" \
     --intent "$target_project/docs/PROJECT_INTENT.md" \
     --constitution "$target_project/docs/CONSTITUTION.md" \
-    --ai "${AI_TOOL:-codex}:${AI_MODEL:-}:${AI_MODE:-auto}" >/dev/null
+    --ai "${AI_TOOL:-codex}:${AI_MODEL:-}:${AI_MODE:-auto}" \
+    --accept-default-autonomy >/dev/null
+  init_rc=$?
+  (( init_rc == 0 )) || return "$init_rc"
   upsert_config_key "$target_project" "AI_TOOL_ADAPTER" "$tool_adapter"
   upsert_config_key "$target_project" "AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
 }
@@ -8887,7 +8905,8 @@ launch_worker_from_manager_prompt_if_needed() {
   local selected_tool
   target_project="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   [[ -n "$target_project" && -d "$target_project" ]] || return 1
-  ensure_runtime_workcell_initialized_for_launch "$target_project" || return 1
+  project_has_authoritative_worktree_path "$manager_project" "$target_project" || return 1
+  ensure_runtime_workcell_initialized_for_launch "$manager_project" "$target_project" || return 1
   selected_tool="$(worker_prompt_selected_tool "$prompt_file")"
   if [[ -n "$selected_tool" ]]; then
     persist_project_tool_selection "$target_project" "$selected_tool"
@@ -9012,8 +9031,17 @@ manager_runtime_launch_workers_from_latest_handoff() {
       continue
     fi
     if ! worker_prompt_launchable_for_manager_project "$project" "$prompt_file"; then
-    if worker_project_is_absorbed_merged_lane "$project" "$target_project" "$(worker_prompt_target_branch "$prompt_file")" || \
-      worker_prompt_targets_retire_ready_merged_worktree "$project" "$prompt_file"; then
+      if ! project_has_authoritative_worktree_path "$project" "$target_project"; then
+        record_manager_worker_launch_blocked_resolution \
+          "$project" \
+          "$prompt_file" \
+          "manager_worker_launch_target_unresolved" \
+          "resolved worktree is outside the authoritative git worktree inventory" >/dev/null
+        queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+        continue
+      fi
+      if worker_project_is_absorbed_merged_lane "$project" "$target_project" "$(worker_prompt_target_branch "$prompt_file")" || \
+        worker_prompt_targets_retire_ready_merged_worktree "$project" "$prompt_file"; then
         settle_retire_ready_merged_worker_runtime_state \
           "$project" \
           "$target_project" \

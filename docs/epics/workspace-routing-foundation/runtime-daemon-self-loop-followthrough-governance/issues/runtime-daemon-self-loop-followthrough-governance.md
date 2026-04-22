@@ -53,6 +53,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 13. After guarded `develop` merge push followthrough succeeds, refresh local upstream tracking truth so manager/live-status do not keep treating canonical `develop` as `push_pending` purely because the local remote-tracking ref stayed stale.
 14. Auto-clean untracked disposable Python cache residue (`__pycache__` / `.pyc`) before runtime hygiene judgement so canonical self-host replay does not spin forever on runtime-only cache dirt instead of advancing the selected cleanup / replay followthrough.
 15. Keep Codex resume launches compatible with the current CLI contract: `codex exec resume` must not inherit `--add-dir`, otherwise manager continuity handoff chains crash with `ai_exit_rc_2` before followthrough can continue.
+16. Only bootstrap worker runtime state for target paths that still belong to the authoritative `git worktree list --porcelain` fleet, and require missing-config worker init to succeed with inherited default-autonomy consent before any post-init config mutation proceeds.
 
 ## Non-Goals
 
@@ -84,6 +85,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-cleans-disposable-pycache-residue`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-inherits-tool-adapter`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-stale-existing-worktree-blocked`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
