@@ -35,6 +35,8 @@
 - Canonical `develop` self-host replay then exposed a remaining continuity-consumption seam: manager wrote the current direct `## Worker Delegation` handoff with a bare `prompt_path`, but runtime only parsed `prompt_path` after an explicit `launchable_queue`/`queue` subsection, so post-cycle worker launch treated the continuity as prompt-empty and restarted manager instead.
 - The runtime parser now treats direct `## Worker Delegation` `prompt_path` entries as launchable by default, matching the manager-written continuity shape that self-host dogfooding is actually producing.
 - The current-format continuity-consumption and manager worker-launch regressions now exercise that direct handoff shape, and a post-AI-cycle launch regression passes against the same parser path.
+- Canonical `develop` self-host replay then exposed one more stale-target seam outside the worker-launch bootstrap path: `sync_project_tooling_from_source()` could still rewrite `.freely/config.env` and `.githooks` into a directory under the managed `*-worktrees` root even after that path dropped out of the authoritative `git worktree list --porcelain` fleet.
+- `sync-tooling` now no-ops for those under-root non-authoritative targets before copying config or rewriting hooks, while still allowing valid managed worktree sync and fresh-project bootstrap outside the worktree root.
 - Canonical `develop` self-host replay then exposed a continuation-handoff seam: after context compaction, manager could relaunch on `fresh_with_handoff`, lose the current continuity anchor, and spend the next round rewriting manager continuity instead of executing the already-selected maintenance / retirement followthrough.
 - The continuity resume-focus helper now recognizes the current `## Primary Judgement`, `## Queue`, and `## Next Supervision Priority` headings and applies the same anchor across both `resume` and `fresh_with_handoff`, with an explicit success return so prompt building cannot fail when an optional section is absent.
 - The same repair worktree also exposed an absorbed-lane overreach: a never-started worker branch cut from `develop` could be treated as already absorbed solely because its branch was still an ancestor of `develop`.
@@ -167,6 +169,14 @@ All commands passed in the feature worktree on this recheck.
 13. `./bin/governance-check`
 
 All commands passed again in the feature worktree during this fresh session.
+
+## 2026-04-21 Sync-Tooling Stale-Target Followthrough
+
+1. `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-stale-target-worktree-blocked`
+2. `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-into-worktree`
+3. `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`
+
+All three commands passed in `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-sync-tooling-authoritative-target-guard`.
 
 ## 2026-04-21 05:36 PDT Failure Reproduction
 
