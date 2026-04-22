@@ -9694,6 +9694,37 @@ manager_continuity_resume_focus_section() {
   ' "$continuity_file"
 }
 
+manager_continuity_cleanup_retirement_targets() {
+  local continuity_file="$1"
+  [[ -f "$continuity_file" ]] || return 1
+  awk '
+    /^## Cleanup Queue$/ { in_section=1; next }
+    /^## / && in_section { exit }
+    in_section && /target_paths:/ { in_targets=1; next }
+    in_section && in_targets && /^   - / {
+      line=$0
+      sub(/^   - /, "", line)
+      gsub(/`/, "", line)
+      print line
+      next
+    }
+    in_targets && !/^   - / { in_targets=0 }
+  ' "$continuity_file"
+}
+
+manager_continuity_requires_retirement_worker_handoff() {
+  local continuity_file="$1" route_kind
+  [[ -f "$continuity_file" ]] || return 1
+  route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
+  [[ "$route_kind" == "cleanup_governance" ]] || return 1
+  latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | grep -q .
+  if [[ $? -eq 0 ]]; then
+    return 1
+  fi
+  grep -q 'retained-with-reason' "$continuity_file" || return 1
+  manager_continuity_cleanup_retirement_targets "$continuity_file" | grep -q .
+}
+
 append_manager_consumed_continuity_resume_focus_if_needed() {
   local project="$1"
   local state_file continuity_file latest_generated route_kind
@@ -9755,6 +9786,46 @@ append_manager_consumed_continuity_resume_focus_if_needed() {
   [[ -n "$ownership_excerpt" ]] && printf '%s\n' "$ownership_excerpt"
   [[ -n "$next_priority_excerpt" ]] && printf '%s\n' "$next_priority_excerpt"
   return 0
+}
+
+append_cleanup_governance_retirement_worker_directive_if_needed() {
+  local project="$1"
+  local continuity_file latest_generated focus_label target_paths
+
+  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
+
+  latest_generated="$(latest_generated_manager_continuity_file_for_project "$project")"
+  case "${LAUNCH_KIND_SELECTED:-}" in
+    resume)
+      continuity_file="${LAST_MANAGER_CONTINUITY_CONSUMED:-}"
+      [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
+      [[ -n "$latest_generated" && "$continuity_file" == "$latest_generated" ]] || return 0
+      focus_label="cleanup_governance retirement worker directive"
+      ;;
+    fresh_with_handoff)
+      continuity_file="$latest_generated"
+      [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
+      focus_label="cleanup_governance handoff retirement worker directive"
+      ;;
+    *)
+      return 0
+      ;;
+  esac
+
+  manager_continuity_requires_retirement_worker_handoff "$continuity_file" || return 0
+  target_paths="$(manager_continuity_cleanup_retirement_targets "$continuity_file")"
+  [[ -n "$target_paths" ]] || return 0
+
+  printf '\n%s：\n' "$focus_label"
+  printf -- '- 这份 continuity 已经把当前 lane 稳定判成 `cleanup_governance`，且 retained merged worktree 仍在 authoritative fleet 中。\n'
+  printf -- '- 本轮不得再次只写一份同义 manager continuity，也不得继续停留在“等待显式证据”。\n'
+  printf -- '- 必须改走 `workspace/skills/worktree-maintenance-governance/SKILL.md` 的 `retirement_handoff`，并产出可消费的 cleanup worker delegation / worker prompt。\n'
+  printf -- '- worker prompt 至少要把下面这些 retained target 作为 cleanup/retirement 目标写进 `Worktree:` / `write_scope` / `intent_target`：\n'
+  while IFS= read -r target_path; do
+    [[ -n "$target_path" ]] || continue
+    printf -- '  - `%s`\n' "$target_path"
+  done <<<"$target_paths"
+  printf -- '- 只有当这些 target 已经不在 authoritative fleet、或本轮已被更高优先级 cleanup worker 占用时，才允许不发 worker prompt；否则视为本轮失败。\n'
 }
 
 write_manager_bootstrap_handoff() {
@@ -12320,6 +12391,7 @@ build_prompt() {
   append_route_only_recovery_if_needed
   append_handoff_prompt_if_present "$PROJECT_ROOT"
   append_manager_consumed_continuity_resume_focus_if_needed "$PROJECT_ROOT"
+  append_cleanup_governance_retirement_worker_directive_if_needed "$PROJECT_ROOT"
 }
 
 cmd_init() {
