@@ -62,6 +62,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 22. Resolve that cleanup-handoff authority from the worker verification contract when no local worker prompt artifact remains in the target worktree, so merged-lane settle/reclaim uses the same prompt truth runtime launched from.
 23. Prefer the worker verification contract `SOURCE_PROMPT_FILE` over any later worker-local bootstrap/reentry prompt when deciding whether a merged lane is still a cleanup-handoff worker with external cleanup scope.
 24. Refuse manager `EXIT_KIND=stop_ai` whenever authoritative supervision truth still shows any unresolved runtime-owned expected-running worker, so autonomy cannot legally terminate while recovery/cleanup followthrough remains open.
+25. When a down expected-running worker is relaunched from fresh runtime state, reapply the delegated prompt's authoritative `selected_tool` from the worker verification contract instead of inheriting a stale fallback tool from the failed prior attempt.
 
 ## Non-Goals
 
@@ -81,6 +82,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 7. Manager prompt build, worker prompt build, and post-cycle runtime handling all agree on the same structured exit-contract contract, so manager/worker intent is machine-checkable instead of inferred from free text.
 8. Cleanup-governance handoff workers selected on canonical `develop` remain launchable until they finish or explicitly hand back the external cleanup surfaces named in their worker prompt, rather than being auto-settled immediately after launch.
 9. Canonical `develop` no longer accepts manager `stop_ai` as a lawful terminal outcome while any runtime-owned expected-running worker is still down/degraded; runtime must continue with repair/recovery until that worker is resolved or explicitly reclassified.
+10. Canonical `develop` no longer loops on fresh worker restarts that inherit a stale fallback tool; a relaunched expected-running worker must recover with the delegated `selected_tool` and continue the same owner followthrough.
 
 ## Verification
 
@@ -106,6 +108,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`
+- `bash docs/system/workspace/scripts/tests/test-freely-worker-restart-reapplies-selected-tool-from-verification-contract`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`

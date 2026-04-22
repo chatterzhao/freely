@@ -339,3 +339,15 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-stall-recovery`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-supervision-quiet-period-does-not-recover`
 - `PENDING`: replay this followthrough through guarded promotion, then rerun canonical `develop` daemon self-host acceptance until Freely completes one task, retires the corresponding temporary lane lawfully, and advances to another task.
+
+## 2026-04-21 23:35 PDT Worker Restart Selected-Tool Followthrough
+
+- `FAIL`: canonical `develop` self-host replay still could not clear the cleanup worker followthrough because a freshly restarted expected-running worker came back with `tool=cc-use-codex-cli` instead of the delegated prompt's `selected_tool=codex`, immediately re-entered `tool_runtime_failure`, and kept the same owner lane in recovery loop.
+- `PASS`: worker startup now reads the authoritative delegated tool back from `worker-verification-contract.env` `SOURCE_PROMPT_FILE` and reapplies that `selected_tool` before launch whenever the worker is being restarted from fresh runtime state.
+- `PASS`: this keeps worker restart truth aligned with the delegated prompt contract instead of whatever fallback tool a previous failed attempt happened to persist.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-restart-reapplies-selected-tool-from-verification-contract`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-applies-selected-tool`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-uses-unified-auto-recovery-path`
+- `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-manager-exit-contract-expected-worker-guard --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- `PASS`: `./bin/governance-check`
+- `PENDING`: replay this same-owner continuation through fresh test-pre-merge and guarded `develop` merge, then rerun canonical `develop` self-host acceptance until Freely completes one task, closes that temporary worktree, and continues to the next task without falling back into the stale-tool worker restart loop.
