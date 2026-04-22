@@ -133,4 +133,39 @@ PROMPT_HANDOFF="$(build_test_prompt "fresh_with_handoff")"
 [[ "$PROMPT_HANDOFF" == *'cleanup_governance handoff retirement worker directive：'* ]]
 [[ "$PROMPT_HANDOFF" == *'cleanup worker delegation / worker prompt'* ]]
 
+CONTINUITY_CLEANUP_TARGETS="$PROJECT/.freely/run/manager-continuity-20260327-181024.md"
+cat >"$CONTINUITY_CLEANUP_TARGETS" <<EOF
+# Manager Continuity
+
+## Primary Judgement
+- route_kind: \`cleanup_governance\`
+- restart_point: \`I-20260421-1330-A cleanup followthrough after canonical absorption\`
+- next_action: \`retire the absorbed worktrees now\`
+
+## Cleanup Queue
+1. \`I-20260421-1330-A\`
+   - status: \`ready_for_retirement\`
+   - cleanup_targets:
+     - \`$TARGET_A\`
+     - \`$TARGET_B\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$CONTINUITY_CLEANUP_TARGETS"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="none"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY_CLEANUP_TARGETS"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"
+LAUNCHED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPTS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-03-27T18:10:25Z"
+EOF
+CONTINUITY="$CONTINUITY_CLEANUP_TARGETS"
+
+PROMPT_HANDOFF_CLEANUP_TARGETS="$(build_test_prompt "fresh_with_handoff")"
+[[ "$PROMPT_HANDOFF_CLEANUP_TARGETS" == *"$TARGET_A"* ]]
+[[ "$PROMPT_HANDOFF_CLEANUP_TARGETS" == *"$TARGET_B"* ]]
+
 echo "[PASS] cleanup-governance continuity with retained merged targets forces a retirement worker directive in resume and handoff prompts"
