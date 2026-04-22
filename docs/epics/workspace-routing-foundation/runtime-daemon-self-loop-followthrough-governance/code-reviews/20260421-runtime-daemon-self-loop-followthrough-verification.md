@@ -23,6 +23,7 @@
 - `PASS`: untracked runtime-only Python cache residue under `docs/system/workspace/scripts/runtime/__pycache__/` no longer keeps canonical `develop` or disposable premerge lanes artificially dirty during manager hygiene judgement; runtime now auto-cleans that residue before dirty-state evaluation.
 - `PASS`: Codex resume launches now omit `--add-dir`, matching the current `codex exec resume` CLI contract and preventing manager continuity resume loops from crashing with `ai_exit_rc_2`.
 - `PASS`: worker bootstrap now rejects stale target paths outside the authoritative worktree fleet, requires missing-config `freely init` to succeed before any follow-on config mutation, and carries inherited `--accept-default-autonomy` through that runtime-owned bootstrap path.
+- `PASS`: `sync-tooling` now also skips stale directories that still sit under the managed `*-worktrees` root but no longer belong to the authoritative worktree fleet, so runtime cannot rewrite `.freely/config.env` / `.githooks` into absorbed or deleted premerge lanes.
 - `PASS`: focused regressions and nearby daemon/live-status coverage passed on the guarded source lane, and the protected test lane replay still passed after the retirement followthrough repair.
 - `PENDING`: the final protected-branch acceptance remains canonical `develop` self-host execution where Freely finishes one task to the current-project success standard, closes the worktree, and continues to the next task.
 
@@ -64,6 +65,9 @@
 34. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-inherits-tool-adapter`
 35. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-stale-existing-worktree-blocked`
 36. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+37. `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-stale-target-worktree-blocked`
+38. `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-into-worktree`
+39. `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`
 
 ## 2026-04-21 18:15 PDT Worker Bootstrap Guard Followthrough
 
@@ -72,6 +76,9 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-inherits-tool-adapter`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-stale-existing-worktree-blocked`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-stale-target-worktree-blocked`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-into-worktree`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`
 - `PENDING`: merge this same-owner followthrough into canonical `develop`, then rerun daemon self-host acceptance until one real task completes, the temporary worktree is lawfully retired, and the daemon advances to another task.
 
 ## 2026-04-21 08:45 PDT Kiro Availability Memory Followthrough

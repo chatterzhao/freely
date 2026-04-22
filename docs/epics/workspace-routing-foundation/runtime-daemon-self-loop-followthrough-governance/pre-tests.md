@@ -23,6 +23,9 @@
 5. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`.
 6. Run `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`.
 7. Run `./bin/governance-check`.
+8. Run `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-stale-target-worktree-blocked`.
+9. Run `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-into-worktree`.
+10. Run `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
