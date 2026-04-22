@@ -60,6 +60,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 20. When an exit contract is missing or malformed, reuse the exact current resume target for that role and force a same-session repair handoff before broader patrol, delegation, or closeout continues.
 21. Do not reclaim or auto-settle a cleanup-handoff worker as `retire_ready_merged_worker` when its authoritative prompt still carries full verification metadata and external cleanup surfaces that must run before fleet retirement can close.
 22. Resolve that cleanup-handoff authority from the worker verification contract when no local worker prompt artifact remains in the target worktree, so merged-lane settle/reclaim uses the same prompt truth runtime launched from.
+23. Prefer the worker verification contract `SOURCE_PROMPT_FILE` over any later worker-local bootstrap/reentry prompt when deciding whether a merged lane is still a cleanup-handoff worker with external cleanup scope.
 
 ## Non-Goals
 

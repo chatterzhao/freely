@@ -29,6 +29,7 @@
 - `PASS`: focused regressions cover manager-invalid repair, manager-stop, worker-invalid repair, worker-done stop, worker prompt directive injection, cleanup worker materialization, and retained-merged cleanup followthrough coexistence.
 - `PASS`: cleanup-governance handoff workers that still have external cleanup surfaces are now explicitly protected from merged-lane reclaim/settle, and a focused regression proves runtime leaves them launchable instead of auto-closing them as `retire_ready_merged_worker`.
 - `PASS`: the merged-lane guard now resolves that authoritative cleanup prompt through `worker-verification-contract.env` when the target worktree no longer has a local `prompt-*.txt`, which matches the canonical `develop` reproduction.
+- `PASS`: the same guard now prefers `worker-verification-contract.env` `SOURCE_PROMPT_FILE` over a later worker-local reentry prompt, so bootstrap prompts cannot mask the real cleanup-handoff scope during merged-lane settle/reclaim.
 - `PASS`: focused regressions and nearby daemon/live-status coverage passed on the guarded source lane, and the protected test lane replay still passed after the retirement followthrough repair.
 - `PENDING`: the final protected-branch acceptance remains canonical `develop` self-host execution where Freely finishes one task to the current-project success standard, closes the worktree, and continues to the next task.
 
