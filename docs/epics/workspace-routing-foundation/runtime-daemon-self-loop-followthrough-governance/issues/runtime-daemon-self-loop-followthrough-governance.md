@@ -69,6 +69,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 29. Preserve `manager_exit_contract_repair` / `worker_exit_contract_repair` relaunches across supervisor restarts and same-process relaunch loops, so repair rounds resume the same tool context instead of falling back to a fresh `initial_start` patrol.
 30. Ignore the known benign Codex startup line `failed to refresh available models: timeout waiting for child process to exit` so monitor/runtime do not treat an otherwise successful manager patrol round as `tool_runtime_failure`.
 31. Keep a newly started daemon manager alive while startup is still between `L010 supervisor_started` and `L020 prompt_build_begin`, so pre-prompt recovery/fleet work does not get misclassified as an idle supervisor restart.
+32. When runtime classifies tool failures as network, proxy, auth, or subscription seams, log explicit operator guidance that points at relay/base_url reachability, proxy mode, and provider access rather than leaving canonical self-host replay with an opaque retry loop.
 
 ## Non-Goals
 
@@ -93,6 +94,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 12. Canonical `develop` no longer treats `ERROR: Reconnecting... x/5` as sufficient evidence to live-kill Codex or switch tools before the tool exhausts its own retry loop; pure reconnect evidence stays on the bounded execution-network retry path.
 13. Canonical `develop` restores the original tool after one bounded fallback episode exhausts every configured fallback, so the next retry starts from truthful project preference instead of stale last-fallback state.
 14. Canonical `develop` no longer re-enters `initial_start` after `manager_exit_contract_invalid`; repair handoff rounds must reuse the recorded resume target and stay on the same repair contract path until a valid exit contract exists.
+15. Canonical `develop` surfaces explicit runtime diagnostics for execution-network, proxy-config, auth, and Kiro subscription failures, including the effective proxy mode and the relevant config-file path, so supervision can distinguish network-path bugs from provider/quota misconfiguration during self-host replay.
 
 ## Verification
 
@@ -120,6 +122,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-model-refresh-timeout`
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`
 - `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
+- `bash docs/system/workspace/scripts/tests/test-freely-runtime-failure-guidance`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`
@@ -170,6 +173,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-defers-codex-reconnect-until-retries-exhaust`
 - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-model-refresh-timeout`
 - `docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
+- `docs/system/workspace/scripts/tests/test-freely-runtime-failure-guidance`
 - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
 - `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
 - `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
