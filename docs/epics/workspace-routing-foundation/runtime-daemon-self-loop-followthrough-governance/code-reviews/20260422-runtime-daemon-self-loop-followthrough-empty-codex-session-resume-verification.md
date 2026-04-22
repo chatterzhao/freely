@@ -13,6 +13,7 @@
 - `PASS`: `docs/system/workspace/scripts/runtime/freely` now treats Codex jsonl evidence as resumable only when the file is non-empty, so both persisted resume-target reuse and observed post-cycle session persistence fall back away from empty files.
 - `PASS`: `recorded_worker_has_resume_evidence()` now uses the same Codex evidence gate, preventing zero-byte `LAST_TOOL_JSONL_PATH` state from falsely advertising resumable worker truth elsewhere in runtime governance.
 - `PASS`: `docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract` now covers zero-byte observed and persisted Codex rollout files while preserving the existing non-empty explicit-resume contract.
+- `PASS`: protected replay on `test-pre-merge-20260422-codex-empty-session-resume-fallback` reran the same explicit-resume contract plus owner gates, so the develop-bound promotion evidence is fresh and staged under this owner instead of inferred from feature-local output only.
 - `PASS`: this remains a same-owner continuation inside `I-20260421-1200-A`; no tool-switching policy, slot policy, or broader resume-model redesign is introduced.
 - `PENDING`: canonical `develop` still needs protected absorption plus daemon replay proving cleanup governance skips the empty resume target, retires the retained blocker lane, and continues to another task.
 
