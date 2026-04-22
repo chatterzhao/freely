@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-runtime-failure-guidance.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME="$TMP_DIR/home"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260401-0000--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$HOME"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260401-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260401-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260401-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+FREELY_NETWORK_PROXY_MODE="disabled"
+EOF
+
+# shellcheck disable=SC1090
+HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+NETWORK_LOG="$TMP_DIR/network.log"
+AUTH_LOG="$TMP_DIR/auth.log"
+printf 'ERROR: Reconnecting... 2/5\n' >"$NETWORK_LOG"
+printf '401 unauthorized\n' >"$AUTH_LOG"
+
+NETWORK_OUTPUT="$(
+  HOME="$HOME" bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    emit_runtime_failure_guidance "'"$PROJECT"'" codex "" "execution_network_transient" "'"$NETWORK_LOG"'"
+  ' 2>&1
+)"
+
+printf '%s\n' "$NETWORK_OUTPUT" | grep -Fq 'diagnose network path: check direct network reachability, relay/base_url health, TLS/certificate trust, and whether the current proxy mode matches this environment'
+printf '%s\n' "$NETWORK_OUTPUT" | grep -Fq 'proxy mode=disabled; Freely clears proxy env before launch'
+printf '%s\n' "$NETWORK_OUTPUT" | grep -Fq 'if the transport path looks healthy but reconnects continue, also verify provider quota/subscription because some relays surface billing failures as reconnects'
+
+AUTH_OUTPUT="$(
+  HOME="$HOME" bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    emit_runtime_failure_guidance "'"$PROJECT"'" codex "auth_failure" "" "'"$AUTH_LOG"'"
+  ' 2>&1
+)"
+
+printf '%s\n' "$AUTH_OUTPUT" | grep -Fq 'diagnose provider access: check login/API key state, balance/quota/subscription, and whether the relay/base_url expects a different credential'
+
+echo "[PASS] runtime failure guidance surfaces network, proxy-mode, and subscription diagnostics"
