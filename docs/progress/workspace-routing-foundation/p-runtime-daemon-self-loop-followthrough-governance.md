@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/network-reconnect-defer-and-origin-fallback-20260422`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-network-reconnect-defer-and-origin-fallback`
-- updated_at: `2026-04-22 03:15 PDT`
+- branch: `feature/daemon-runtime-failure-recovery-preserves-daemon-20260422`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-daemon-runtime-failure-recovery-preserves-daemon`
+- updated_at: `2026-04-22 03:44 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -378,3 +378,15 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-new-intake-reentry`
 - `PASS`: replayed the same three regressions plus `bash -n docs/system/workspace/scripts/runtime/freely` on protected lane `test-pre-merge-20260422-manager-repair-handoff-intake-supersede`.
 - `PENDING`: rerun guarded `develop` merge with this refreshed owner evidence, then restart canonical `develop` daemon replay and verify the repair handoff now stays on same-context resume long enough to finish one task, retire the temporary lane, and continue to the next task.
+
+## 2026-04-22 03:44 PDT Daemon Recovery Preserves Control Plane
+
+- `FAIL`: canonical `develop` daemon replay then exposed one narrower same-owner seam: after `tool_runtime_failure`, supervisor cleanup correctly kept `desired_state=running`, but later manager recovery relaunched `start --project` foreground supervisors and broke daemon-mode single-control-plane semantics.
+- `PASS`: `workcell-state.env` now persists the authoritative control-plane entrypoint mode as `LAST_ENTRYPOINT_MODE`, with daemon/foreground truth preserved across later state writes even after the original supervisor exits.
+- `PASS`: manager supervisor relaunch now consumes that persisted entrypoint truth and uses `daemon-run --project` for daemon-owned recovery while leaving foreground-owned recovery on `start --project`.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-failure-recovery-preserves-daemon`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-reuses-live-supervisor-without-relaunch`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-waits-for-supervisor-teardown-before-fallback`
+- `PENDING`: absorb this daemon-preservation repair into canonical `develop`, rerun `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and continue supervision until Freely finishes a real task, merges upward, retires that lane, and autonomously selects the next task.
