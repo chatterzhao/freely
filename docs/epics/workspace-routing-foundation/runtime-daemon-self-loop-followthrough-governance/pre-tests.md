@@ -184,6 +184,18 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
 
+### Exhausted Codex reconnect 502 stays on the execution-network path
+- id: `codex-reconnect-exhaustion-502-stays-network-scoped`
+- requirement: `After Codex exhausts its own reconnect loop and exits with upstream 502 evidence, monitor/runtime must persist network failure truth rather than generic tool_runtime_failure.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#19`
+- case_design: `Emit a Codex transcript with reconnect exhaustion plus upstream 502 Bad Gateway evidence, verify monitor-ai-cli writes only the network marker, then keep adjacent reconnect-defer and 429-kill regressions green.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-reconnect-502-network-verification.md`
+
 ### Manager bootstrap startup stays alive before prompt build begins
 - id: `manager-pre-prompt-startup-grace-preserved`
 - requirement: `A newly started manager supervisor must not be restarted as idle while startup is still lawfully between L010 supervisor_started and prompt build / ai launch.`

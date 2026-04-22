@@ -70,6 +70,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 30. Ignore the known benign Codex startup line `failed to refresh available models: timeout waiting for child process to exit` so monitor/runtime do not treat an otherwise successful manager patrol round as `tool_runtime_failure`.
 31. Keep a newly started daemon manager alive while startup is still between `L010 supervisor_started` and `L020 prompt_build_begin`, so pre-prompt recovery/fleet work does not get misclassified as an idle supervisor restart.
 32. When runtime classifies tool failures as network, proxy, auth, or subscription seams, log explicit operator guidance that points at relay/base_url reachability, proxy mode, and provider access rather than leaving canonical self-host replay with an opaque retry loop.
+33. When Codex exits after exhausting its own reconnect loop with upstream `502 Bad Gateway` evidence, monitor/runtime must persist that outcome as execution-network failure truth instead of collapsing it into generic `tool_runtime_failure`.
 
 ## Non-Goals
 
@@ -95,6 +96,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 13. Canonical `develop` restores the original tool after one bounded fallback episode exhausts every configured fallback, so the next retry starts from truthful project preference instead of stale last-fallback state.
 14. Canonical `develop` no longer re-enters `initial_start` after `manager_exit_contract_invalid`; repair handoff rounds must reuse the recorded resume target and stay on the same repair contract path until a valid exit contract exists.
 15. Canonical `develop` surfaces explicit runtime diagnostics for execution-network, proxy-config, auth, and Kiro subscription failures, including the effective proxy mode and the relevant config-file path, so supervision can distinguish network-path bugs from provider/quota misconfiguration during self-host replay.
+16. Canonical `develop` no longer routes exhausted Codex reconnect `502 Bad Gateway` exits into `tool_runtime_failure`; the bounded execution-network retry path remains authoritative for that failure family.
 
 ## Verification
 
@@ -123,6 +125,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`
 - `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
 - `bash docs/system/workspace/scripts/tests/test-freely-runtime-failure-guidance`
+- `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-classifies-codex-reconnect-exhaustion-as-network-failure`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`
@@ -174,6 +177,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-model-refresh-timeout`
 - `docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
 - `docs/system/workspace/scripts/tests/test-freely-runtime-failure-guidance`
+- `docs/system/workspace/scripts/tests/test-monitor-ai-cli-classifies-codex-reconnect-exhaustion-as-network-failure`
 - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
 - `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
 - `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
