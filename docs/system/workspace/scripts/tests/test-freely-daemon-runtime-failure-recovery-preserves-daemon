@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-daemon-runtime-failure-recovery.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/mock-bin"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$MOCK_BIN"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+AI_TOOL="codex"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+EOF
+
+cat >"$MOCK_BIN/freely-launch" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >"$MOCK_LAUNCH_LOG"
+EOF
+chmod +x "$MOCK_BIN/freely-launch"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+WORKCELL_ENTRYPOINT_MODE_OVERRIDE="daemon"
+write_workcell_state "$PROJECT" "running" "up" "down" "starting"
+unset WORKCELL_ENTRYPOINT_MODE_OVERRIDE
+write_workcell_state "$PROJECT" "running" "down" "down" "tool_runtime_failure"
+
+grep -q '^LAST_ENTRYPOINT_MODE="daemon"$' "$PROJECT/.freely/run/workcell-state.env" || {
+  echo "[FAIL] write_workcell_state should preserve daemon entrypoint mode across follow-up state writes" >&2
+  cat "$PROJECT/.freely/run/workcell-state.env" >&2
+  exit 1
+}
+
+MOCK_LAUNCH_LOG="$TMP_DIR/launch.log" \
+FREELY_ENSURE_MANAGER_LAUNCH_BIN="$MOCK_BIN/freely-launch" \
+  launch_manager_supervisor "$PROJECT"
+
+if [[ "$(cat "$TMP_DIR/launch.log")" != "daemon-run --project $PROJECT" ]]; then
+  echo "[FAIL] manager recovery should relaunch daemon-owned control planes with daemon-run" >&2
+  cat "$TMP_DIR/launch.log" >&2
+  exit 1
+fi
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="tool_runtime_failure"
+LAST_ENTRYPOINT_MODE="foreground"
+EOF
+
+MOCK_LAUNCH_LOG="$TMP_DIR/launch.log" \
+FREELY_ENSURE_MANAGER_LAUNCH_BIN="$MOCK_BIN/freely-launch" \
+  launch_manager_supervisor "$PROJECT"
+
+if [[ "$(cat "$TMP_DIR/launch.log")" != "start --project $PROJECT" ]]; then
+  echo "[FAIL] foreground-owned control planes should still relaunch with start" >&2
+  cat "$TMP_DIR/launch.log" >&2
+  exit 1
+fi
+
+echo "[PASS] daemon recovery preserves daemon control-plane mode when relaunching the manager supervisor"
