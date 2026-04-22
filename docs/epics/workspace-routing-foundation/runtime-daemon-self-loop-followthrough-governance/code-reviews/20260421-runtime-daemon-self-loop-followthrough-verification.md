@@ -225,3 +225,14 @@
 - alternatives_considered: `Always preserve the older launchable prompt whenever a newer continuity has no worker prompt; always supersede older prompts for any newer no-worker continuity including startup stubs; add a separate index file just to track manager continuity supersession.`
 - boundary_non_goals: `No new index layer, no broad scan redesign, and no weakening of the existing startup-stub prompt-preservation behavior.`
 - residual_risk: `The remaining risk is still only the final canonical develop daemon replay: Freely must now prove it can consume the manager-owned cleanup continuity, finish a task to the current-project success standard, and continue to the next task.`
+
+## 2026-04-21 23:10 PDT Ordinary Manager Stall Recovery Verification
+
+- `FAIL`: canonical `develop` self-host replay moved beyond the retired absorbed-cleanup lane, but a fresh ordinary manager `codex` prompt could still hang indefinitely with no delegated continuation, no pending intake, and no new runtime artifacts; the existing recovery contract only recognized pending-intake and delegated-continuation stall shapes, so the manager could remain active without making autonomous progress.
+- `PASS`: added a narrow third manager stall classification for ordinary prompts that show no pending intake, no delegated continuation handoff, and no cycle-log progress past the existing stall threshold; recovery still reuses the same local continuation reentry path rather than inventing a new repair flow.
+- `PASS`: kept the delegated-supervision boundary intact by excluding delegated-continuation prompts and pending-intake prompts from the new classifier, so active-worker quiet periods still remain idle-safe.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery-without-runtime-progress`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-stall-recovery`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-supervision-quiet-period-does-not-recover`
+- `PENDING`: guarded promote into canonical `develop`, then rerun the daemon self-host acceptance until Freely proves it can complete one task, retire that temporary lane, and continue to a second task without hanging on an ordinary manager prompt.

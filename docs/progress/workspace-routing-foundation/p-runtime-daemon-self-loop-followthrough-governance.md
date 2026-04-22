@@ -329,3 +329,13 @@ All commands passed again in the feature worktree during this worker continuatio
 1. Replay `feature/manager-exit-contract-expected-worker-guard-20260421 -> test-pre-merge-20260421-manager-exit-contract-expected-worker-guard -> develop` through `./bin/merge-guarded` with this refreshed owner evidence included.
 2. On canonical `develop`, run `./bin/freely daemon start` until one task completes to the current-project success standard, its temporary worktree closes lawfully, and the daemon proceeds to the next task.
 3. Retire the temporary feature/test-pre-merge lanes for this stop-guard followthrough after canonical replay succeeds.
+
+## 2026-04-21 23:10 PDT Ordinary Manager Stall Recovery Followthrough
+
+- `FAIL`: canonical `develop` self-host replay advanced past the retired absorbed-cleanup lane, but a fresh manager `codex` round with no delegated continuation, no new intake, and no new runtime artifacts could still sit on one ordinary prompt indefinitely; existing stall recovery only covered pending-intake and delegated-continuation shapes, so autonomy could stop making progress without triggering a repair handoff.
+- `PASS`: runtime now treats a manager round with an ordinary prompt, no pending intake, no delegated continuation, and no runtime log progress beyond the stall threshold as recoverable stalled manager work, and forces the same local continuation reentry path already used by the narrower stall classes.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery-without-runtime-progress`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-stall-recovery`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-supervision-quiet-period-does-not-recover`
+- `PENDING`: replay this followthrough through guarded promotion, then rerun canonical `develop` daemon self-host acceptance until Freely completes one task, retires the corresponding temporary lane lawfully, and advances to another task.
