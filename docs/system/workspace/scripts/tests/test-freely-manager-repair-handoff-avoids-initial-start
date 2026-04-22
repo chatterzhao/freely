@@ -5,8 +5,11 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-manager-repair-handoff.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
+export HOME="$TMP_DIR/home"
+export CODEX_HOME="$HOME/.codex"
 PROJECT="$TMP_DIR/project"
 mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+mkdir -p "$CODEX_HOME/sessions/2026/04/22"
 
 cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
 LAST_TOOL_SESSION_ID="sess-demo"
@@ -61,6 +64,8 @@ cat >"$PROJECT/.freely/run/session-handoff.txt" <<'EOF'
 - previous_tool_resume_target: resume-demo
 EOF
 
+printf '{"type":"token_count","total_tokens":100,"model_context_window":1000}\n' >"$CODEX_HOME/sessions/2026/04/22/rollout-2026-04-22T00-00-00-resume-demo.jsonl"
+
 # shellcheck disable=SC1090
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 
@@ -72,7 +77,7 @@ load_session_state_or_defaults "$PROJECT"
 select_launch_kind
 
 [[ "$LAUNCH_KIND_SELECTED" == "resume" ]] || {
-  echo "[FAIL] expected preserved manager repair handoff to resume, got $LAUNCH_KIND_SELECTED" >&2
+  echo "[FAIL] expected preserved manager repair handoff with verified resume evidence to resume, got $LAUNCH_KIND_SELECTED" >&2
   exit 1
 }
 [[ -z "${LAUNCH_ROTATION_REASON:-}" ]] || {

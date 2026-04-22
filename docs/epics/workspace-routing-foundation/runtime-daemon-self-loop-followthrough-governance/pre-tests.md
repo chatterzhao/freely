@@ -46,6 +46,7 @@
 28. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-failure-guidance`.
 29. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-materialized-cleanup-worker-applies-selected-tool`.
 30. Run `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`.
+31. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-missing-resume-evidence-falls-back`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`

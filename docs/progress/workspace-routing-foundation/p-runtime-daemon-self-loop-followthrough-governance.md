@@ -181,6 +181,17 @@
 - `PASS`: `./bin/governance-check`
 - `PENDING`: replay this owner through fresh protected premerge, merge into canonical `develop`, restart `./bin/freely daemon start`, and verify cleanup governance falls back away from the empty Codex session file, retires the blocker cleanup lane, and advances to the next task.
 
+## 2026-04-22 09:48 PDT Empty Repair Resume Target Followthrough
+
+- `FAIL`: after the zero-byte session-file fix landed, canonical `develop` self-host replay advanced one step further but still forced `launch_kind=resume` for `manager_exit_contract_repair` even when `LAST_TOOL_RESUME_TARGET=""`; monitor preflight then failed immediately with `[ERROR] codex resume requires --tool-resume-target`, so daemon replay still could not reach the retained cleanup worker.
+- `PASS`: `select_launch_kind()` now preserves exit-contract repair resumes only when the resolved pre-launch target is non-empty and the current tool still has verified resume evidence; otherwise the repair handoff downgrades to `fresh_with_handoff` with `missing_resume_evidence`.
+- `PASS`: verified repair resumes still stay on `resume` when Codex has a real persisted rollout file for the recorded target, so this followthrough narrows only the empty-target case rather than regressing the earlier same-session repair contract.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-missing-resume-evidence-falls-back`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
+- `PENDING`: promote through fresh protected premerge, merge into canonical `develop`, restart `./bin/freely daemon start`, and verify this owner finally clears cleanup followthrough, retires the temporary blocker lane, and continues to another task instead of stopping at monitor preflight.
+
 ## Verification Evidence
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`
