@@ -21,6 +21,7 @@
 - `PASS`: once canonical replay proves `kiro-cli` hit monthly request exhaustion, runtime now persists that tool-unavailable truth and later auto-switch / manager bootstrap selection skips Kiro instead of routing immediately back into the same exhausted tool.
 - `PASS`: after a successful guarded `develop` push followthrough, runtime now refreshes the local upstream tracking ref to the pushed `HEAD`, so manager/live-status do not keep reporting false `push_pending` solely because the remote-tracking ref remained stale.
 - `PASS`: untracked runtime-only Python cache residue under `docs/system/workspace/scripts/runtime/__pycache__/` no longer keeps canonical `develop` or disposable premerge lanes artificially dirty during manager hygiene judgement; runtime now auto-cleans that residue before dirty-state evaluation.
+- `PASS`: Codex resume launches now omit `--add-dir`, matching the current `codex exec resume` CLI contract and preventing manager continuity resume loops from crashing with `ai_exit_rc_2`.
 - `PASS`: focused regressions and nearby daemon/live-status coverage passed on the guarded source lane, and the protected test lane replay still passed after the retirement followthrough repair.
 - `PENDING`: the final protected-branch acceptance remains canonical `develop` self-host execution where Freely finishes one task to the current-project success standard, closes the worktree, and continues to the next task.
 
@@ -58,6 +59,7 @@
 30. `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
 31. `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
 32. `bash docs/system/workspace/scripts/tests/test-freely-live-status-cleans-disposable-pycache-residue`
+33. `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
 
 ## 2026-04-21 08:45 PDT Kiro Availability Memory Followthrough
 

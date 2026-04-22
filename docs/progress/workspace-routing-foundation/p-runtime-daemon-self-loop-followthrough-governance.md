@@ -49,6 +49,8 @@
 - Runtime now refreshes the local upstream tracking ref to the pushed `HEAD` immediately after a successful `develop-push attempt`, so later manager patrols do not stall on a false `ahead>0` reading after guarded delivery has already completed.
 - Canonical `develop` self-host replay then exposed one more hygiene seam: after push truth cleared, manager still looped on untracked `docs/system/workspace/scripts/runtime/__pycache__/` residue in canonical `develop` and the disposable absorbed-merged premerge lane instead of advancing the selected cleanup / replay followthrough.
 - Runtime and the lead-agent startup snapshot now auto-clean untracked disposable Python cache residue (`__pycache__` / `.pyc`) before dirty-state hygiene judgement, so manager no longer treats runtime-only cache artifacts as durable lane dirt.
+- Canonical `develop` self-host replay then exposed one more launcher seam: once hygiene cleared, manager finally resumed the same Codex session, but the runtime still passed `--add-dir` through `codex exec resume`, which the current Codex CLI rejects with `unexpected argument '--add-dir'`, causing repeated `ai_exit_rc_2` instead of continuity followthrough.
+- Runtime now keeps `--add-dir` on fresh Codex launches but omits it from `codex exec resume`, matching the current CLI contract while preserving project-root cwd scoping.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
 
 ## 2026-04-21 08:45 PDT Kiro Availability Memory Verification
@@ -77,6 +79,14 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
 - `PENDING`: absorb this repair into canonical `develop`, then rerun daemon self-host acceptance until one real task completes, the relevant worktree closes, and the daemon advances to another task.
+
+## 2026-04-21 17:55 PDT Codex Resume Add-Dir Followthrough
+
+- `FAIL`: after hygiene cleared, canonical `develop` replay finally reached manager continuity resume, but `tool_run_direct_from_prompt_file()` still passed `--add-dir` through `codex exec resume`; current Codex CLI rejects that form and the daemon looped on `ai_exit_rc_2` instead of resuming followthrough.
+- `PASS`: fresh Codex launches still pass `--add-dir`, but resume launches now omit it so `codex exec resume --skip-git-repo-check <session>` matches the actual CLI contract.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-cleans-disposable-pycache-residue`
+- `PENDING`: absorb this launcher repair into canonical `develop`, then rerun daemon self-host acceptance and verify resume no longer collapses into `ai_exit_rc_2`.
 
 ## Verification Evidence
 
