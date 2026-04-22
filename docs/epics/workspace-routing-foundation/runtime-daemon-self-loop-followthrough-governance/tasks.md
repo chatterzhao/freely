@@ -9,3 +9,5 @@
 - [x] Materialize the candidate -> issue -> progress -> pre-tests -> review owner chain required for guarded promote.
 - [x] Replay `feature/runtime-daemon-self-loop-blocker-20260421 -> test-pre-merge-20260421-runtime-self-loop-blocker` through `./bin/merge-guarded` and rerun owner gates on the protected test lane.
 - [x] Keep canonical develop self-host acceptance and temporary lane retirement as post-promote completion conditions owned by the same issue, not as unfinished pre-promote task checklist items.
+- [x] Enforce structured manager / worker exit contracts so runtime can stop, resume, or delegate from machine-checkable artifacts instead of inferring intent from free text.
+- [x] Reuse the exact current role resume target when an exit contract artifact is missing or malformed, and block broader patrol until that same session repairs the contract.
