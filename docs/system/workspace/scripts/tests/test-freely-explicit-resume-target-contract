@@ -7,6 +7,8 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 export HOME="$TMP_DIR/home"
 export CODEX_HOME="$HOME/.codex"
+export CLAUDE_CONFIG_DIR="$HOME/.claude"
+export PROJECT_ROOT="$ROOT_DIR"
 mkdir -p "$CODEX_HOME/sessions/2026/03/30"
 
 # shellcheck disable=SC1090
@@ -15,6 +17,9 @@ source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 LAST_TOOL_RESUME_TARGET="codex-known-session"
 LAST_TOOL_JSONL_PATH=""
 CLAUDE_SESSION_ID_CURRENT="11111111-2222-4333-8444-555555555555"
+claude_project_key="${PROJECT_ROOT//\//-}"
+mkdir -p "$CLAUDE_CONFIG_DIR/projects/$claude_project_key"
+printf '{"sessionId":"%s","cwd":"%s"}\n' "$CLAUDE_SESSION_ID_CURRENT" "$PROJECT_ROOT" >"$CLAUDE_CONFIG_DIR/projects/$claude_project_key/$CLAUDE_SESSION_ID_CURRENT.jsonl"
 
 [[ "$(tool_runtime_resume_target_before_launch codex)" == "codex-known-session" ]] || {
   echo "[FAIL] codex should launch from the persisted explicit resume target" >&2
@@ -25,6 +30,13 @@ observed_jsonl="$CODEX_HOME/sessions/2026/03/30/rollout-2026-03-30T00-00-00-code
 printf '{"type":"token_count","total_tokens":100,"model_context_window":1000}\n' >"$observed_jsonl"
 [[ "$(tool_runtime_resume_target_after_cycle codex "codex-new-session" "$observed_jsonl" "codex-known-session" "")" == "codex-new-session" ]] || {
   echo "[FAIL] codex should prefer the observed session id only when rollout evidence exists" >&2
+  exit 1
+}
+
+empty_observed_jsonl="$CODEX_HOME/sessions/2026/03/30/rollout-2026-03-30T00-00-00-codex-empty-observed-session.jsonl"
+: >"$empty_observed_jsonl"
+[[ "$(tool_runtime_resume_target_after_cycle codex "codex-empty-observed-session" "$empty_observed_jsonl" "codex-known-session" "")" == "" ]] || {
+  echo "[FAIL] codex should reject zero-byte rollout evidence for the observed session id" >&2
   exit 1
 }
 
@@ -41,12 +53,31 @@ LAST_TOOL_JSONL_PATH="$persisted_jsonl"
   exit 1
 }
 
+empty_persisted_jsonl="$CODEX_HOME/sessions/2026/03/30/rollout-2026-03-30T00-00-00-codex-empty-known-session.jsonl"
+: >"$empty_persisted_jsonl"
+LAST_TOOL_RESUME_TARGET="codex-empty-known-session"
+LAST_TOOL_JSONL_PATH="$empty_persisted_jsonl"
+[[ "$(tool_runtime_resume_target_before_launch codex)" == "codex-empty-known-session" ]] || {
+  echo "[FAIL] codex should still surface the stored explicit resume target before evidence verification" >&2
+  exit 1
+}
+[[ "$(tool_runtime_resume_target_after_cycle codex "" "" "codex-empty-known-session" "$empty_persisted_jsonl")" == "" ]] || {
+  echo "[FAIL] codex should drop a prior launch target when the persisted rollout file is zero bytes" >&2
+  exit 1
+}
+if tool_has_resume_evidence codex "$PROJECT_ROOT"; then
+  echo "[FAIL] codex should not report resume evidence for a zero-byte persisted rollout file" >&2
+  exit 1
+fi
+
+LAST_TOOL_RESUME_TARGET="codex-known-session"
+LAST_TOOL_JSONL_PATH="$persisted_jsonl"
 [[ "$(tool_persisted_session_id_after_cycle codex "" "codex-known-session")" == "codex-known-session" ]] || {
   echo "[FAIL] codex should persist the known explicit session target as the cycle session id fallback" >&2
   exit 1
 }
 
-[[ "$(tool_runtime_resume_target_before_launch cc)" == "11111111-2222-4333-8444-555555555555" ]] || {
+[[ "$(tool_runtime_resume_target_before_launch cc "$PROJECT_ROOT")" == "11111111-2222-4333-8444-555555555555" ]] || {
   echo "[FAIL] cc should launch from the current claude session id" >&2
   exit 1
 }
@@ -56,19 +87,19 @@ LAST_TOOL_JSONL_PATH="$persisted_jsonl"
   exit 1
 }
 
-if ! tool_has_resume_evidence codex; then
+if ! tool_has_resume_evidence codex "$PROJECT_ROOT"; then
   echo "[FAIL] codex should report resume evidence when explicit target has verified rollout evidence" >&2
   exit 1
 fi
 
 LAST_TOOL_RESUME_TARGET="codex-weak-session"
 LAST_TOOL_JSONL_PATH=""
-if tool_has_resume_evidence codex; then
+if tool_has_resume_evidence codex "$PROJECT_ROOT"; then
   echo "[FAIL] codex should not report resume evidence for session-id-only state without rollout evidence" >&2
   exit 1
 fi
 
-if ! tool_has_resume_evidence cc; then
+if ! tool_has_resume_evidence cc "$PROJECT_ROOT"; then
   echo "[FAIL] cc should report resume evidence when claude session id exists" >&2
   exit 1
 fi
