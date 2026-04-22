@@ -55,7 +55,26 @@
 - Runtime now keeps `--add-dir` on fresh Codex launches but omits it from `codex exec resume`, matching the current CLI contract while preserving project-root cwd scoping.
 - Canonical self-host replay then exposed one more worker-bootstrap seam: a stale worker target could still enter missing-config bootstrap, call `freely init` without inherited default-autonomy consent, ignore that init failure, and continue mutating `config.env` for a path that no longer belonged to the authoritative fleet.
 - Runtime now refuses to bootstrap worker targets outside the authoritative `git worktree list --porcelain` fleet, requires missing-config worker init to succeed before any post-init config writes continue, and carries `--accept-default-autonomy` during that bounded runtime-owned bootstrap path.
+- The same autonomous-loop owner then exposed one more supervisor seam in the bounded repair space: manager and worker rounds could end without a machine-checkable exit artifact, so runtime had no precise contract for `stop_ai`, `resume_manager`, `delegate_workers`, `worker_done`, `worker_blocked`, or `worker_handoff_needed`, and could not force the same session to repair missing closeout state before broader patrol resumed.
+- Runtime now injects explicit manager/worker exit-contract directives into prompts, clears stale role-specific contract files before each new AI cycle, validates the resulting artifact after `ai_exit_rc_0`, and reuses the exact `LAST_TOOL_RESUME_TARGET` to repair missing or malformed contracts before any broader followthrough continues.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
+
+## 2026-04-21 20:55 PDT Exit Contract Enforcement Followthrough
+
+- `FAIL`: the bounded self-loop owner still had one non-machine-checkable seam: manager/worker rounds could terminate without a structured exit artifact, so runtime could not distinguish lawful stop, precise manager resume, worker delegation, worker completion, worker block, or worker handoff without guessing from free text.
+- `PASS`: manager prompt build now injects a hard exit-contract directive with one exclusive `EXIT_KIND` from `stop_ai`, `resume_manager`, or `delegate_workers`, and worker prompt build does the same for `worker_done`, `worker_blocked`, or `worker_handoff_needed`.
+- `PASS`: runtime now clears stale role-specific contract files before launch, routes post-cycle handling through one unified exit-contract dispatcher, and writes a repair handoff that reuses the exact current resume target when the contract is missing or malformed.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-retire-ready-merged-prompt`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
+- `PENDING`: carry this same-owner followthrough through guarded promotion into canonical `develop`, then rerun real daemon self-host acceptance until Freely finishes one real task, lawfully closes the temporary worktree, and advances to another task.
 
 ## 2026-04-21 18:15 PDT Worker Bootstrap Guard Followthrough
 
