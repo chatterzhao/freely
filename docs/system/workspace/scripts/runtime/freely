@@ -10135,9 +10135,11 @@ append_cleanup_governance_retirement_worker_directive_if_needed() {
 }
 
 append_manager_exit_contract_directive_if_needed() {
-  local project="$1" contract_file
+  local project="$1" contract_file unresolved_workers
   [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
   contract_file="$(manager_exit_contract_file "$project")"
+  unresolved_workers="$(manager_unresolved_expected_running_worker_count "$project")"
+  [[ "${unresolved_workers:-0}" =~ ^[0-9]+$ ]] || unresolved_workers="0"
   cat <<EOF
 
 Manager exit contract（硬性要求）：
@@ -10174,6 +10176,7 @@ WORKER_PROMPTS_CSV="/abs/path/worker-a.txt,/abs/path/worker-b.txt"
 规则：
 - 如果派多个 worker，也仍然只属于 \`delegate_workers\` 这一种出口。
 - 如果你认为自己无能为力、被人要求暂停、或所有 scan 已收口，也必须明确写 \`stop_ai\`，而不是沉默结束。
+- 如果当前仍有 \`expected_running_worktree_down/degraded\` 且 \`owner=runtime-owned\` 的 worker 未收口（当前计数：\`${unresolved_workers}\`），本轮禁止写 \`stop_ai\`；必须先让 runtime 继续恢复、委派或完成 cleanup 判定。
 - 如果你本轮还没把出口合同写完整，就不算完成；runtime 会用同一个 resume target 拉你回来补合同。
 EOF
 }
@@ -10382,7 +10385,7 @@ EOF
 }
 
 manager_runtime_handle_exit_contract_after_ai_cycle() {
-  local project="$1" exit_reason="${2:-}" missing_csv="" kind="" worker_prompts_csv=""
+  local project="$1" exit_reason="${2:-}" missing_csv="" kind="" worker_prompts_csv="" stop_reason="" unresolved_workers=""
   [[ "$(role_hint_for_project "$project")" == "manager" ]] || {
     printf 'continue\n'
     return 0
@@ -10401,12 +10404,26 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
     return 0
   fi
   kind="$(manager_exit_contract_kind "$project" || true)"
+  stop_reason="$(meta_env_value "$(manager_exit_contract_file "$project")" "STOP_REASON")"
   case "$kind" in
     stop_ai)
+      if manager_has_unresolved_expected_running_workers "$project"; then
+        unresolved_workers="$(manager_unresolved_expected_running_worker_count "$project")"
+        write_manager_exit_contract_repair_handoff \
+          "$project" \
+          "manager_exit_contract_stop_ai_blocked_expected_running_worker" \
+          "stop_reason=${stop_reason:-missing};blocking_workers=${unresolved_workers:-0}"
+        write_workcell_state "$project" "running" "up" "down" "manager_exit_contract_stop_ai_blocked_expected_running_worker"
+        append_runtime_event "$project" "manager_exit_contract_stop_ai_blocked_expected_running_worker" \
+          "stop_reason=${stop_reason:-missing}" \
+          "blocking_workers=${unresolved_workers:-0}"
+        printf 'resume_invalid\n'
+        return 0
+      fi
       : >"$(stop_marker_file "$project")"
       write_workcell_state "$project" "stopped" "down" "down" "manager_exit_contract_stop_ai"
       append_runtime_event "$project" "manager_exit_contract_stop_ai" \
-        "stop_reason=$(meta_env_value "$(manager_exit_contract_file "$project")" "STOP_REASON")"
+        "stop_reason=${stop_reason}"
       printf 'stop_ai\n'
       ;;
     resume_manager)
@@ -11266,6 +11283,23 @@ manager_supervision_alerts() {
     /^worktree / { wt=substr($0, 10); br="" }
     /^branch / { br=$2; sub(/^refs\/heads\//, "", br); print wt "|" br }
   ')
+}
+
+manager_unresolved_expected_running_worker_count() {
+  local project="$1" alerts
+  alerts="$(manager_supervision_alerts "$project")"
+  [[ -n "$alerts" ]] || {
+    printf '0\n'
+    return 0
+  }
+  grep -Ec 'expected_running_worktree_(down|degraded): .*owner=runtime-owned' <<<"$alerts" || true
+}
+
+manager_has_unresolved_expected_running_workers() {
+  local project="$1" count
+  count="$(manager_unresolved_expected_running_worker_count "$project")"
+  [[ "${count:-0}" =~ ^[0-9]+$ ]] || count="0"
+  [[ "$count" -gt 0 ]]
 }
 
 settle_retire_ready_merged_worker_runtime_state() {
