@@ -11,3 +11,4 @@
 - [x] Keep canonical develop self-host acceptance and temporary lane retirement as post-promote completion conditions owned by the same issue, not as unfinished pre-promote task checklist items.
 - [x] Enforce structured manager / worker exit contracts so runtime can stop, resume, or delegate from machine-checkable artifacts instead of inferring intent from free text.
 - [x] Reuse the exact current role resume target when an exit contract artifact is missing or malformed, and block broader patrol until that same session repairs the contract.
+- [x] Keep cleanup-governance handoff workers launchable when their prompt still carries full verification metadata and external cleanup scope, instead of auto-settling them as merged-lane retirement before the real cleanup work runs.

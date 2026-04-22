@@ -58,6 +58,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 18. Require every manager AI round to leave exactly one machine-checkable exit contract artifact whose `EXIT_KIND` is one of `stop_ai`, `resume_manager`, or `delegate_workers`.
 19. Require every worker AI round to leave exactly one machine-checkable exit contract artifact whose `EXIT_KIND` is one of `worker_done`, `worker_blocked`, or `worker_handoff_needed`.
 20. When an exit contract is missing or malformed, reuse the exact current resume target for that role and force a same-session repair handoff before broader patrol, delegation, or closeout continues.
+21. Do not reclaim or auto-settle a cleanup-handoff worker as `retire_ready_merged_worker` when its authoritative prompt still carries full verification metadata and external cleanup surfaces that must run before fleet retirement can close.
 
 ## Non-Goals
 
@@ -75,6 +76,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 5. On canonical `develop`, `freely daemon start` selects at least one task, completes it to the current-project success standard, closes the corresponding temporary worktree, and proceeds to another task.
 6. The temporary blocker worktree and disposable test-pre-merge branch are retired after canonical `develop` absorbs the fix.
 7. Manager prompt build, worker prompt build, and post-cycle runtime handling all agree on the same structured exit-contract contract, so manager/worker intent is machine-checkable instead of inferred from free text.
+8. Cleanup-governance handoff workers selected on canonical `develop` remain launchable until they finish or explicitly hand back the external cleanup surfaces named in their worker prompt, rather than being auto-settled immediately after launch.
 
 ## Verification
 
@@ -102,6 +104,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
+- `bash docs/system/workspace/scripts/tests/test-freely-retire-ready-merged-cleanup-handoff-not-reclaimed`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-projection-without-state`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
