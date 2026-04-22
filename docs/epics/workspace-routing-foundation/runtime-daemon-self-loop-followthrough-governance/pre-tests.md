@@ -44,6 +44,7 @@
 26. Run `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-model-refresh-timeout`.
 27. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`.
 28. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-failure-guidance`.
+29. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-materialized-cleanup-worker-applies-selected-tool`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -219,6 +220,18 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+
+### Materialized cleanup worker prompts carry selected tool truth
+- id: `materialized-cleanup-worker-selected-tool-truth`
+- requirement: `When manager materializes a cleanup-governance worker prompt from continuity, that prompt must carry the authoritative selected_tool so stale retained cleanup worktrees are corrected before launch.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#20`
+- case_design: `Seed continuity with selected_tool=codex and a retained cleanup worktree whose local config still says cc-use-codex-cli, then verify materialized worker prompt contains selected_tool and launch rewrites the stale worktree config before startup.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-materialized-cleanup-selected-tool-verification.md`
 
 ### Repair handoff relaunches stay on resume instead of restarting patrol
 - id: `repair-handoff-does-not-regress-to-initial-start`
