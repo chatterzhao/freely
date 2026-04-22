@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/manager-bootstrap-prompt-build-grace-20260422`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-manager-bootstrap-prompt-build-grace`
-- updated_at: `2026-04-22 04:25 PDT`
+- branch: `feature/codex-proxy-mode-and-network-hints-20260422`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-codex-proxy-mode-and-network-hints`
+- updated_at: `2026-04-22 06:05 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -69,7 +69,19 @@
 - The monitor now leaves reconnect-in-progress output alone and lets the tool exit naturally; post-exit runtime classification still maps pure reconnect evidence to the bounded `execution_network_transient` / `execution_network_persistent` path, while hard failures like Codex 429 remain immediate monitor-level kill signals.
 - The same replay family also exposed one more recovery-memory seam: after exhausting `cc`, `iflow`, and `kiro-cli` inside one bounded fallback episode, project tool selection could remain pinned to the last failed fallback instead of returning to the original tool for the next retry.
 - Runtime auto-recovery now remembers the origin tool for the current episode, preserves attempted-tool memory across the episode, and restores the original tool once every configured fallback has failed.
+- Canonical `develop` replay for the current Codex-first operating mode then exposed a narrower observability seam: when runtime classified a failure as reconnect/network, proxy-config, auth, or Kiro subscription, the logs still lacked enough operator guidance to tell whether the real blocker was relay reachability, proxy mode, or provider access/quota.
+- Runtime now emits targeted guidance for those classified failure families, includes a proxy-mode summary with the authoritative project/global config paths, and documents `inherit` / `disabled` / `explicit` proxy modes directly in the runtime config template without changing the default mode.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
+
+## 2026-04-22 06:05 PDT Proxy Guidance Followthrough
+
+- `FAIL`: canonical `develop` replay under the current Codex-first setup still left network-facing failures too opaque; once runtime classified reconnect/network, proxy-config, auth, or Kiro subscription errors, the operator-visible logs did not say whether to check relay/base_url reachability, proxy mode, or provider access/quota next.
+- `PASS`: runtime now emits targeted failure guidance for `execution_network_*`, `proxy_config_invalid`, `auth_failure`, `kiro_monthly_request_limit`, and `kiro_subscription_status_service_error`, and it logs the effective proxy mode together with the authoritative project/global config paths.
+- `PASS`: the runtime config template now documents proxy mode semantics inline at `FREELY_NETWORK_PROXY_MODE` so the relevant control surface is visible where operators actually edit it.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-network-proxy-resolver`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-runtime-failure-guidance`
+- `PENDING`: absorb this same-owner followthrough into canonical `develop`, then rerun daemon self-host supervision until Freely completes one real task, merges upward, retires the temporary lane, and advances to another task.
 
 ## 2026-04-21 20:55 PDT Exit Contract Enforcement Followthrough
 
