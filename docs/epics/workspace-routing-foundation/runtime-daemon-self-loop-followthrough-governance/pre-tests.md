@@ -83,7 +83,7 @@
 - case_design: `Materialize stale dispatcher/watchdog pid files without a valid supervisor and verify precheck still clears.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-daemon-recovery-verification.md`
 
 ### Unexpected daemon TERM does not fake operator stop
 - id: `daemon-unexpected-term-ignored`
@@ -119,7 +119,7 @@
 - case_design: `Replay the blocker owner through the disposable protected test lane, rerun owner gates there, and use that bounded evidence to justify guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-daemon-recovery-verification.md`
 
 ### Runtime exit contracts are machine-checkable and self-repairable
 - id: `runtime-exit-contract-enforcement`
