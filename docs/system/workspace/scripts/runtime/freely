@@ -9547,6 +9547,29 @@ manager_ai_stalled_after_delegated_continuation_prompt() {
   return 0
 }
 
+manager_ai_stalled_without_runtime_progress() {
+  local project="$1" threshold_secs="${2:-90}"
+  local ai_pid cycle_log prompt_file
+  local log_mtime prompt_mtime now
+
+  ai_pid="$(manager_ai_pid_for_project "$project")"
+  [[ -n "$ai_pid" ]] || return 1
+  cycle_log="$(latest_cycle_log_for_project "$project")"
+  [[ -n "$cycle_log" && -f "$cycle_log" ]] || return 1
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  prompt_file_has_delegated_continuation "$prompt_file" && return 1
+  [[ -f "$(intake_pending_signal_file "$project")" ]] && return 1
+
+  log_mtime="$(file_mtime_epoch "$cycle_log" 2>/dev/null || true)"
+  prompt_mtime="$(file_mtime_epoch "$prompt_file" 2>/dev/null || true)"
+  [[ -n "$log_mtime" && -n "$prompt_mtime" ]] || return 1
+
+  now="$(date +%s)"
+  (( now - log_mtime >= threshold_secs )) || return 1
+  (( now - prompt_mtime >= threshold_secs )) || return 1
+}
+
 manager_delegated_supervision_quiet_period_waiting_on_active_worker() {
   local project="$1" prompt_mtime="$2"
   local continuity_file continuity_mtime state_file consumed_csv prompt_file target_project saw_busy="0"
@@ -9633,6 +9656,10 @@ manager_ai_runtime_recovery_reason() {
   fi
   if manager_ai_stalled_after_delegated_continuation_prompt "$project" "$threshold_secs"; then
     printf 'manager_ai_stalled_after_delegated_continuation_prompt\n'
+    return 0
+  fi
+  if manager_ai_stalled_without_runtime_progress "$project" "$threshold_secs"; then
+    printf 'manager_ai_stalled_without_runtime_progress\n'
     return 0
   fi
   return 1
