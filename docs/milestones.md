@@ -460,7 +460,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md`
-- next_action: Candidate mirror only. `I-20260421-1330-A` is now the canonical owner for downgrading absorbed merged lanes in fleet status and task-source-scan while preserving cleanup visibility and final develop self-host acceptance.
+- next_action: Candidate mirror only. `I-20260421-1330-A` is now the canonical owner for downgrading absorbed merged lanes in fleet status and task-source-scan while preserving cleanup visibility; current state is cleanup-governance / retirement_handoff followthrough with explicit retire-only disposition for the absorbed feature/test-pre-merge pair, so manager may review the linked ancestry proof and unblock `I-20260421-1200-A` before ordinary retirement cleanup.
 - revisit_trigger: Re-open only if canonical develop still routes absorbed merged lanes back into edit execution after this bounded downgrade, or if future dogfooding proves cleanup visibility and execution visibility still cannot stay separated without a larger owner.
 
 1. `C-20260419-0915-A`
@@ -1049,7 +1049,7 @@ routing_policy:
     remote_branch_disposition: `retained-with-reason`
     remote_branch_reason: no matching `origin` or `github` remote branch exists to delete
 - revisit_trigger: Reopen only if a fresh ancestry audit finds unique non-`develop` behavior or if manager retirement review discovers a concrete deletion blocker.
-- completion_note: `Canonical cleanup followthrough now proves the absorbed feature tip and absorbed test-pre-merge tip are already ancestors of both delegated-hand-off develop tip d0564874860d15530aa6c8fb97656cec771cc88c and current local develop tip cc2a01f26443e27b2ded09842bb61452d2f24b73. The absorbed feature/test-pre-merge pair is now explicitly retire-only, carries no unique commits versus develop (`0 66` and `0 62`), and has no matching remote branch to delete; manager only needs to execute ordinary retirement cleanup rather than replay this owner. Fresh 2026-04-21 22:17 PDT recheck preserved the same evidence and keeps manager-unblock status current.`
+- completion_note: `Canonical cleanup followthrough now proves the absorbed feature tip and absorbed test-pre-merge tip are already ancestors of both delegated-hand-off develop tip d0564874860d15530aa6c8fb97656cec771cc88c and current local develop tip cc2a01f26443e27b2ded09842bb61452d2f24b73. The absorbed feature/test-pre-merge pair is now explicitly retire-only, carries no unique commits versus develop (`0 66` and `0 62`), has no matching remote branch to delete, and a fresh 2026-04-22 06:10 UTC task-source-scan patrol still keeps this owner on cleanup-governance / retirement_handoff followthrough rather than replay; manager only needs to execute ordinary retirement cleanup rather than replay this owner.`
 
 1. `I-20260413-0420-D`
 - title: Manager startup continuity materialization governance
