@@ -233,6 +233,18 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-materialized-cleanup-selected-tool-verification.md`
 
+### Protected replay stages materialized cleanup selected-tool evidence
+- id: `materialized-cleanup-worker-selected-tool-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the selected-tool cleanup materialization proof and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#20`
+- case_design: `Replay the materialized cleanup selected-tool repair on the disposable protected lane, rerun the four focused selected-tool regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-materialized-cleanup-selected-tool-verification.md`
+
 ### Repair handoff relaunches stay on resume instead of restarting patrol
 - id: `repair-handoff-does-not-regress-to-initial-start`
 - requirement: `A manager or worker repair handoff created from an invalid exit contract must resume the recorded tool context even after supervisor restart, instead of re-entering fresh initial patrol.`
