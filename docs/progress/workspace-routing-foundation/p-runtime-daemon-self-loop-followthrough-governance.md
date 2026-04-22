@@ -51,7 +51,18 @@
 - Runtime and the lead-agent startup snapshot now auto-clean untracked disposable Python cache residue (`__pycache__` / `.pyc`) before dirty-state hygiene judgement, so manager no longer treats runtime-only cache artifacts as durable lane dirt.
 - Canonical `develop` self-host replay then exposed one more launcher seam: once hygiene cleared, manager finally resumed the same Codex session, but the runtime still passed `--add-dir` through `codex exec resume`, which the current Codex CLI rejects with `unexpected argument '--add-dir'`, causing repeated `ai_exit_rc_2` instead of continuity followthrough.
 - Runtime now keeps `--add-dir` on fresh Codex launches but omits it from `codex exec resume`, matching the current CLI contract while preserving project-root cwd scoping.
+- Canonical self-host replay then exposed one more worker-bootstrap seam: a stale worker target could still enter missing-config bootstrap, call `freely init` without inherited default-autonomy consent, ignore that init failure, and continue mutating `config.env` for a path that no longer belonged to the authoritative fleet.
+- Runtime now refuses to bootstrap worker targets outside the authoritative `git worktree list --porcelain` fleet, requires missing-config worker init to succeed before any post-init config writes continue, and carries `--accept-default-autonomy` during that bounded runtime-owned bootstrap path.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
+
+## 2026-04-21 18:15 PDT Worker Bootstrap Guard Followthrough
+
+- `FAIL`: canonical self-host replay exposed a bounded launcher seam after the Codex resume repair: a stale worker target could still enter missing-config bootstrap, call `freely init` without inherited default-autonomy consent, ignore that failing init result, and continue mutating `config.env` for a path that no longer belonged to the authoritative fleet.
+- `PASS`: runtime now hard-gates worker bootstrap on authoritative worktree membership, requires `freely init` success before post-init config writes proceed, and carries `--accept-default-autonomy` through this runtime-owned missing-config bootstrap path.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-inherits-tool-adapter`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-stale-existing-worktree-blocked`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
+- `PENDING`: absorb this same-owner followthrough into canonical `develop`, then rerun daemon self-host acceptance until Freely completes one real task, lawfully retires the temporary lane, and advances to another task.
 
 ## 2026-04-21 08:45 PDT Kiro Availability Memory Verification
 
