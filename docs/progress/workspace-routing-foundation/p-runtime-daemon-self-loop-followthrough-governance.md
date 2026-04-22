@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/cleanup-worker-prompt-selected-tool-20260422`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-cleanup-worker-prompt-selected-tool`
-- updated_at: `2026-04-22 08:05 PDT`
+- branch: `feature/codex-empty-session-resume-fallback-20260422`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-codex-empty-session-resume-fallback`
+- updated_at: `2026-04-22 09:10 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -171,6 +171,15 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-cleans-disposable-pycache-residue`
 - `PENDING`: absorb this launcher repair into canonical `develop`, then rerun daemon self-host acceptance and verify resume no longer collapses into `ai_exit_rc_2`.
+
+## 2026-04-22 09:10 PDT Empty Codex Session Resume Followthrough
+
+- `FAIL`: canonical `develop` self-host replay progressed into cleanup governance for `I-20260421-1200-A`, but manager continuity still pointed at a persisted Codex session whose jsonl file existed at `/Users/zhaoyu/.codex/sessions/2026/04/22/rollout-2026-04-22T06-57-47-019db57b-8fe9-7cc3-81c3-36058a79c5c4.jsonl` with size `0`; runtime treated `-f` as sufficient resume evidence and the next manager launch failed immediately with `thread/resume failed: failed to load rollout ...jsonl: empty session file`.
+- `PASS`: `docs/system/workspace/scripts/runtime/freely` now requires Codex rollout/session jsonl evidence to be non-empty before it can be reused as persisted resume truth, both when resolving a prior launch target and when accepting an observed post-cycle session id.
+- `PASS`: the same helper now keeps recorded worker resume-evidence checks aligned with that stricter Codex truth, so a zero-byte `LAST_TOOL_JSONL_PATH` no longer advertises resumable state elsewhere in the runtime.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
+- `PASS`: `./bin/governance-check`
+- `PENDING`: replay this owner through fresh protected premerge, merge into canonical `develop`, restart `./bin/freely daemon start`, and verify cleanup governance falls back away from the empty Codex session file, retires the blocker cleanup lane, and advances to the next task.
 
 ## Verification Evidence
 
