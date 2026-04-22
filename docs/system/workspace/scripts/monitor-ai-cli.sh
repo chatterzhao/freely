@@ -227,10 +227,20 @@ runtime_error_signal_excerpt() {
   ' "${existing_files[@]}" 2>/dev/null
 }
 
+filter_known_benign_runtime_error_noise() {
+  local current_tool="$1"
+  if [[ "$current_tool" == "codex" ]]; then
+    sed '/failed to refresh available models: timeout waiting for child process to exit/d'
+    return 0
+  fi
+  cat
+}
+
 log_has_runtime_network_failure() {
-  local current_log_file="$1" current_debug_log_file="${2:-}"
+  local current_tool="$1" current_log_file="$2" current_debug_log_file="${3:-}"
   local excerpt=""
   excerpt="$(runtime_error_signal_excerpt "$current_log_file" "$current_debug_log_file" "$prompt_file" || true)"
+  excerpt="$(printf '%s\n' "$excerpt" | filter_known_benign_runtime_error_noise "$current_tool")"
   [[ -n "$excerpt" ]] || return 1
 
   # Let tools finish their own reconnect/backoff loop without a monitor-level
@@ -246,17 +256,19 @@ log_has_runtime_network_failure() {
 
 log_has_runtime_tool_failure() {
   local current_tool="$1" current_log_file="$2" current_debug_log_file="${3:-}"
+  local excerpt=""
+  excerpt="$(runtime_error_signal_excerpt "$current_log_file" "$current_debug_log_file" "$prompt_file" | filter_known_benign_runtime_error_noise "$current_tool")"
   case "$current_tool" in
     codex)
-      runtime_error_signal_excerpt "$current_log_file" "$current_debug_log_file" "$prompt_file" | rg -qi \
+      printf '%s\n' "$excerpt" | rg -qi \
         '401|402 payment required|403 forbidden|429 too many requests|exceeded retry limit|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired|login required|usage limit|try again|预扣费额度失败|剩余额度不足|余额不足|insufficient balance|insufficient credit|pre.?charge.*failed|billing hard limit|quota exceeded|cannot access session files|permission denied|thread/start failed'
       ;;
     cc|cc-use-codex-cli|kiro-cli)
-      runtime_error_signal_excerpt "$current_log_file" "$current_debug_log_file" "$prompt_file" | rg -qi \
+      printf '%s\n' "$excerpt" | rg -qi \
         'API error \(attempt [0-9]+/[0-9]+\): (401|402|403|429)|provider_response_error|insufficient_quota|quota exceeded|insufficient balance|insufficient credit|payment required|authentication.?failed|auth error:\s*no api key available|no api key available|api key required|missing api key|unauthorized|invalid.?token|token.?expired|subscription.?expired|login required|deactivated_workspace|workspace deactivated|monthly request limit reached|unable to verify subscription status:\s*service error'
       ;;
     iflow)
-      runtime_error_signal_excerpt "$current_log_file" "$current_debug_log_file" "$prompt_file" | rg -qi \
+      printf '%s\n' "$excerpt" | rg -qi \
         'auth error:\s*no api key available|no api key available|api key required|missing api key|unauthorized|invalid.?token|token.?expired|subscription.?expired|login required|deactivated_workspace|workspace deactivated|insufficient_quota|quota exceeded|insufficient balance|insufficient credit|payment required|平台并发限制|请控制单并发使用|并发限制|concurrency limit|concurrent limit|too many concurrent'
       ;;
     *)
@@ -278,7 +290,7 @@ log_has_iflow_local_state_failure() {
 
 live_runtime_failure_reason() {
   local current_tool="$1" current_log_file="$2" current_debug_log_file="${3:-}"
-  if log_has_runtime_network_failure "$current_log_file" "$current_debug_log_file"; then
+  if log_has_runtime_network_failure "$current_tool" "$current_log_file" "$current_debug_log_file"; then
     printf 'tool_runtime_failure\n'
     return 0
   fi
