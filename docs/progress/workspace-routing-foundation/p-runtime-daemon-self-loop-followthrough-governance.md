@@ -73,6 +73,7 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-retire-ready-merged-prompt`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-retire-ready-merged-cleanup-handoff-not-reclaimed`
+- `PASS`: authoritative cleanup-handoff prompt resolution now falls back from a missing local worker prompt to `worker-verification-contract.env` `SOURCE_PROMPT_FILE`, matching the real runtime shape that canonical `develop` produced.
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
 - `PENDING`: carry this same-owner followthrough through guarded promotion into canonical `develop`, then rerun real daemon self-host acceptance until Freely finishes one real task, lawfully closes the temporary worktree, and advances to another task.
