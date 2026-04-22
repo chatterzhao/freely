@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-exit-contract-delegate.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER="$WT_ROOT/feature-worker"
+PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/retire-ready-cleanup.txt"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260324-0000--sample"
+cat >"$PROJECT/README.md" <<'EOF'
+base
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260324-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+mkdir -p "$PROJECT/.freely/run"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_exit_rc_0"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-21T12:00:00Z"
+EOF
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+LAST_TOOL_SESSION_ID="sess-demo"
+LAST_TOOL_RESUME_TARGET="resume-demo"
+LAST_TOOL_JSONL_PATH=""
+LAST_LAUNCH_KIND="resume"
+LAST_ROTATION_REASON="none"
+LAST_CYCLE_LOG=""
+LAST_PROMPT_FILE=""
+LAST_CONTEXT_COMPACTED="0"
+LAST_CONTEXT_RATIO=""
+LAST_PRIMARY_RATE_LIMIT_USED_PERCENT=""
+LAST_PRIMARY_RATE_LIMIT_RESETS_AT=""
+LAST_SECONDARY_RATE_LIMIT_USED_PERCENT=""
+LAST_SECONDARY_RATE_LIMIT_RESETS_AT=""
+LAST_ROUTE_ONLY_HANDOFF="0"
+ROUTE_ONLY_STREAK_CURRENT="0"
+RESUME_STREAK_CURRENT="1"
+CURRENT_TOOL_SLOT=""
+LAST_SLOT_SWITCH_REASON=""
+LAST_SLOT_SWITCH_AT=""
+LAST_CYCLE_DEBUG_LOG=""
+LAST_CLAUDE_JSONL_PATH=""
+LAST_CODEX_MCP_USED="0"
+LAST_CODEX_MCP_THREAD_ID=""
+LAST_CODEX_MCP_JSONL_PATH=""
+CLAUDE_SESSION_ID_CURRENT=""
+CLAUDE_SESSION_ID_PREVIOUS=""
+LAST_PROJECT_DIRTY_ENTRIES="0"
+LAST_WORKTREE_SUMMARY_TOTAL="1"
+LAST_WORKTREE_SUMMARY_DIRTY="0"
+CHECKPOINT_DRIFT_STREAK_CURRENT="0"
+LAST_DELEGATED_CONTINUATION_PENDING_IDS=""
+LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0"
+LAST_DELEGATED_CONTINUATION_CONSUMED_IDS=""
+LAST_DELEGATED_CONTINUATION_CONSUMED_AT=""
+LAST_RESTART_STORM_WINDOW_SECS="0"
+LAST_RESTART_STORM_COUNT="0"
+LAST_PROCESS_CHURN_PEAK="0"
+LAST_RESTART_STORM_SIGNAL_AT=""
+LAST_RESTART_STORM_SIGNAL_REASON=""
+LAST_RESTART_STORM_ESCALATED_AT=""
+LAST_RESTART_STORM_ESCALATION_TARGET=""
+AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV=""
+EOF
+git -C "$PROJECT" add README.md AGENTS.md docs .freely
+git -C "$PROJECT" commit -q -m init
+
+git -C "$PROJECT" worktree add -b feature/worker "$WORKER" develop >/dev/null
+cat >"$WORKER/worker-note.txt" <<'EOF'
+worker lane change
+EOF
+git -C "$WORKER" add worker-note.txt
+git -C "$WORKER" commit -q -m "feature work"
+git -C "$PROJECT" merge --no-ff -m "merge feature worker" feature/worker >/dev/null
+
+cat >"$PROMPT_FILE" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/worker\`
+dispatch_priority: \`immediate\`
+parallel_safe: \`false\`
+intent_kind: \`cleanup\`
+intent_target: \`retained_merged_worktree:feature/worker\`
+Owner-Issue:
+- \`$PROJECT/docs/owner.md\`
+Pre-Tests-Path:
+- \`$PROJECT/docs/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`$PROJECT/docs/reviews\`
+Required-Test-Lanes:
+- \`feature-local\`
+Required-Acceptance-Item-Ids:
+- \`cleanup-followthrough\`
+Minimum-Evidence-Level: \`existing verification plus closeout receipts\`
+Target-Environment: \`retire-ready merged worker lane\`
+Closeout-Gate: \`cleanup_followthrough\`
+Closeout-Gate-Command: \`git worktree list --porcelain\`
+Closeout-Target-Lane: \`cleanup_governance\`
+Closeout-Promotion-Gate: \`retirement\`
+Closeout-Requires-Adequacy: \`true\`
+Closeout-Review-Artifact-Policy: \`reuse owner evidence\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+cat >"$(manager_exit_contract_file "$PROJECT")" <<EOF
+EXIT_KIND="delegate_workers"
+WORKER_PROMPTS_CSV="$PROMPT_FILE"
+EOF
+
+RESULT="$(manager_runtime_handle_exit_contract_after_ai_cycle "$PROJECT" "ai_exit_rc_0")"
+[[ "$RESULT" == "resume_invalid" ]] || {
+  echo "[FAIL] expected non-launchable delegate_workers contract to force resume_invalid, got $RESULT" >&2
+  exit 1
+}
+grep -q '^LAST_EXIT_REASON="manager_exit_contract_invalid"$' "$PROJECT/.freely/run/workcell-state.env"
+grep -q 'WORKER_PROMPTS_NOT_LAUNCHABLE' "$PROJECT/.freely/run/session-handoff.txt"
+
+echo "[PASS] manager exit contract rejects delegate_workers without a launchable prompt"
