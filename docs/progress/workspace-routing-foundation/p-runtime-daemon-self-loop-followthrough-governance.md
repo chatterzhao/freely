@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/codex-proxy-mode-and-network-hints-20260422`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-codex-proxy-mode-and-network-hints`
-- updated_at: `2026-04-22 06:05 PDT`
+- branch: `feature/codex-reconnect-exhaustion-network-marker-20260422`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-codex-reconnect-exhaustion-network-marker`
+- updated_at: `2026-04-22 07:09 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -71,7 +71,19 @@
 - Runtime auto-recovery now remembers the origin tool for the current episode, preserves attempted-tool memory across the episode, and restores the original tool once every configured fallback has failed.
 - Canonical `develop` replay for the current Codex-first operating mode then exposed a narrower observability seam: when runtime classified a failure as reconnect/network, proxy-config, auth, or Kiro subscription, the logs still lacked enough operator guidance to tell whether the real blocker was relay reachability, proxy mode, or provider access/quota.
 - Runtime now emits targeted guidance for those classified failure families, includes a proxy-mode summary with the authoritative project/global config paths, and documents `inherit` / `disabled` / `explicit` proxy modes directly in the runtime config template without changing the default mode.
+- Canonical `develop` replay still exposed one narrower reconnect-exhaustion seam after that guidance landed: when Codex exhausted its own reconnect loop and ended with upstream `502 Bad Gateway`, monitor/runtime still persisted `tool_runtime_failure`, which incorrectly widened recovery into generic tool/slot fallback.
+- Runtime now passes a dedicated network marker from `monitor-ai-cli` into the supervisor loop, writes that marker only for real network evidence, and reclassifies reconnect-exhaustion `502` exits back onto the bounded `execution_network_transient` / `execution_network_persistent` path while keeping Codex 429 on the immediate tool-failure path.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
+
+## 2026-04-22 07:09 PDT Reconnect Exhaustion 502 Network Marker Followthrough
+
+- `FAIL`: direct `codex exec` was healthy again, but the same invocation through `monitor-ai-cli.sh` still reproduced `ERROR: Reconnecting... 1/5 ... 5/5` followed by upstream `502 Bad Gateway`; runtime persisted that exit as `tool_runtime_failure`, which reopened generic cross-tool fallback instead of staying on the bounded execution-network path.
+- `PASS`: `monitor-ai-cli.sh` now writes `network_failure` only for real network evidence, `runtime/freely` passes and consumes a dedicated network marker, and exhausted Codex reconnect `502` exits now fall back through runtime network classification rather than generic tool failure.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-classifies-codex-reconnect-exhaustion-as-network-failure`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-defers-codex-reconnect-until-retries-exhaust`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
+- `PENDING`: absorb this same-owner repair into canonical `develop`, rerun daemon self-host supervision, and verify Freely can advance past reconnect-exhaustion truth into real task completion instead of widening into cross-tool fallback.
 
 ## 2026-04-22 06:05 PDT Proxy Guidance Followthrough
 

@@ -14603,10 +14603,12 @@ start_project_runtime() {
       rm -f "$(handoff_file "$PROJECT_ROOT")"
     fi
 
-    local tool_adapter failure_marker_file=""
+    local tool_adapter failure_marker_file="" network_failure_marker_file=""
     tool_adapter="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "$AI_TOOL")}"
     failure_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/tool-runtime-failure.marker"
+    network_failure_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/network-failure.marker"
     rm -f "$failure_marker_file"
+    rm -f "$network_failure_marker_file"
     exit_if_stop_requested_before_launch
     log_info "launching $AI_TOOL via ${tool_adapter:-unknown} ($mode_name mode, ai_mode=$AI_MODE)"
     append_runtime_event "$project" "ai_launch_begin" \
@@ -14652,6 +14654,7 @@ start_project_runtime() {
         --prompt-file "$prompt_file" \
         --pid-file "$child_pid_file" \
         --log-file "$cycle_log" \
+        --network-failure-marker-file "$network_failure_marker_file" \
         --failure-marker-file "$failure_marker_file" \
         --launch-kind "$mode_name"
     } >>"$loop_log" 2>&1
@@ -14661,7 +14664,7 @@ start_project_runtime() {
     local codex_mcp_used codex_mcp_thread_id codex_mcp_jsonl_path
     local claude_jsonl_path
     local primary_rate_limit_used_percent primary_rate_limit_resets_at secondary_rate_limit_used_percent secondary_rate_limit_resets_at next_restart_delay
-    local active_slot active_cooldown_identity slot_switch_reason network_failure_reason live_failure_reason
+    local active_slot active_cooldown_identity slot_switch_reason network_failure_reason live_failure_reason live_network_failure_reason
     local rate_limit_reason rate_limit_reset_at
     local dirty_entries worktree_total worktree_dirty summary
     local launch_resume_target
@@ -14803,9 +14806,17 @@ start_project_runtime() {
     fi
     network_failure_reason=""
     live_failure_reason=""
+    live_network_failure_reason=""
+    if [[ -f "$network_failure_marker_file" ]]; then
+      live_network_failure_reason="$(tr -d '\r' <"$network_failure_marker_file" | awk 'NF { print; exit }' || true)"
+      rm -f "$network_failure_marker_file"
+    fi
     if [[ -f "$failure_marker_file" ]]; then
       live_failure_reason="$(tr -d '\r' <"$failure_marker_file" | awk 'NF { print; exit }' || true)"
       rm -f "$failure_marker_file"
+    fi
+    if [[ -n "$live_network_failure_reason" ]]; then
+      network_failure_reason="$(runtime_network_failure_reason_from_log "$PROJECT_ROOT" "$cycle_log" || true)"
     fi
     if [[ -n "$live_failure_reason" ]]; then
       slot_switch_reason="$live_failure_reason"
@@ -14836,7 +14847,7 @@ start_project_runtime() {
         LAST_SLOT_SWITCH_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
       fi
     fi
-    if [[ -z "$slot_switch_reason" && -z "$rate_limit_reason" ]]; then
+    if [[ -z "$network_failure_reason" && -z "$slot_switch_reason" && -z "$rate_limit_reason" ]]; then
       network_failure_reason="$(runtime_network_failure_reason_from_log "$PROJECT_ROOT" "$cycle_log" || true)"
     else
       clear_execution_network_state "$PROJECT_ROOT"
