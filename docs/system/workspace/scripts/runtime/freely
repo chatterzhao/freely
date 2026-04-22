@@ -11732,12 +11732,19 @@ EOF
 
 select_launch_kind() {
   local handoff_rotation_reason=""
+  local resume_target_before_launch=""
   handoff_rotation_reason="$(session_handoff_rotation_reason "$PROJECT_ROOT" || true)"
+  resume_target_before_launch="$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")"
 
   case "$handoff_rotation_reason" in
     manager_exit_contract_repair|worker_exit_contract_repair)
-      LAUNCH_KIND_SELECTED="resume"
-      LAUNCH_ROTATION_REASON=""
+      if [[ -n "$resume_target_before_launch" ]] && tool_has_resume_evidence "$AI_TOOL" "$PROJECT_ROOT"; then
+        LAUNCH_KIND_SELECTED="resume"
+        LAUNCH_ROTATION_REASON=""
+      else
+        LAUNCH_KIND_SELECTED="fresh_with_handoff"
+        LAUNCH_ROTATION_REASON="missing_resume_evidence"
+      fi
       return 0
       ;;
   esac

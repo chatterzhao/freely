@@ -21,3 +21,4 @@
 - [x] When Codex exhausts its own reconnect loop and exits on upstream `502 Bad Gateway`, keep the failure on the bounded execution-network path instead of writing `tool_runtime_failure` and triggering cross-tool fallback.
 - [x] When manager materializes a cleanup followthrough prompt from continuity, carry the authoritative `selected_tool` into that prompt and correct stale retained cleanup worktree config before launch.
 - [x] Reject zero-byte Codex rollout/session jsonl files as resume evidence so canonical cleanup replay falls back away from `thread/resume failed: empty session file`.
+- [x] Downgrade exit-contract repair relaunches away from `resume` whenever the resolved Codex resume target is empty or lacks verified rollout evidence, so canonical daemon replay cannot die in monitor preflight with `codex resume requires --tool-resume-target`.
