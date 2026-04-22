@@ -1680,6 +1680,16 @@ manager_bootstrap_handoff_file() {
   echo "$(run_dir_for_project "$project")/manager-bootstrap-handoff.txt"
 }
 
+manager_exit_contract_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/manager-exit-contract.env"
+}
+
+worker_exit_contract_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/worker-exit-contract.env"
+}
+
 manager_operator_stop_boundary_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/manager-operator-stop-boundary.env"
@@ -7426,6 +7436,244 @@ markdown_backtick_field_value() {
   ' "$markdown_file"
 }
 
+manager_continuity_backtick_field_value() {
+  local continuity_file="$1" field_name="$2"
+  [[ -f "$continuity_file" ]] || return 0
+  awk -v field_name="$field_name" '
+    $0 ~ "^- " field_name ":" {
+      if (match($0, /`[^`]+`/)) {
+        print substr($0, RSTART + 1, RLENGTH - 2)
+        exit
+      }
+    }
+  ' "$continuity_file"
+}
+
+manager_continuity_selected_cleanup_family_rows() {
+  local continuity_file="$1"
+  [[ -f "$continuity_file" ]] || return 0
+  awk '
+    function trim_tick(value) {
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+      gsub(/`/, "", value)
+      return value
+    }
+    function emit_current() {
+      if (path != "") {
+        printf "%s|%s|%s|%s\n", path, branch, desired, role_hint
+      }
+      path=""
+      branch=""
+      desired=""
+      role_hint=""
+    }
+    /^## Fleet Inventory$/ { in_section=1; next }
+    /^## / && in_section {
+      emit_current()
+      exit
+    }
+    !in_section { next }
+    /^[[:space:]]*-[[:space:]]*selected_cleanup_family:[[:space:]]*$/ {
+      emit_current()
+      in_cleanup=1
+      next
+    }
+    /^[[:space:]]*-[[:space:]]*[a-zA-Z0-9_-]+:[[:space:]]*$/ {
+      if (in_cleanup == 1) {
+        emit_current()
+      }
+      in_cleanup=0
+      next
+    }
+    in_cleanup != 1 { next }
+    /^[[:space:]]*-[[:space:]]*path:[[:space:]]*/ {
+      emit_current()
+      line=$0
+      sub(/^[[:space:]]*-[[:space:]]*path:[[:space:]]*/, "", line)
+      path=trim_tick(line)
+      next
+    }
+    path == "" { next }
+    /^[[:space:]]*branch:[[:space:]]*/ {
+      line=$0
+      sub(/^[[:space:]]*branch:[[:space:]]*/, "", line)
+      branch=trim_tick(line)
+      next
+    }
+    /^[[:space:]]*desired:[[:space:]]*/ {
+      line=$0
+      sub(/^[[:space:]]*desired:[[:space:]]*/, "", line)
+      desired=trim_tick(line)
+      next
+    }
+    /^[[:space:]]*role_hint:[[:space:]]*/ {
+      line=$0
+      sub(/^[[:space:]]*role_hint:[[:space:]]*/, "", line)
+      role_hint=trim_tick(line)
+      next
+    }
+    END {
+      emit_current()
+    }
+  ' "$continuity_file"
+}
+
+manager_cleanup_prompt_primary_target_row_from_continuity() {
+  local project="$1" continuity_file="$2"
+  local row path branch desired role_hint fallback=""
+  while IFS='|' read -r path branch desired role_hint; do
+    [[ -n "$path" && -d "$path" ]] || continue
+    project_has_authoritative_worktree_path "$project" "$path" || continue
+    [[ -n "$branch" ]] || continue
+    [[ "$desired" == "stopped" ]] || continue
+    if [[ "$branch" == feature/* || "$role_hint" == "cleanup" ]]; then
+      printf '%s|%s|%s|%s\n' "$path" "$branch" "$desired" "$role_hint"
+      return 0
+    fi
+    [[ -n "$fallback" ]] || fallback="$path|$branch|$desired|$role_hint"
+  done < <(manager_continuity_selected_cleanup_family_rows "$continuity_file")
+  [[ -n "$fallback" ]] && printf '%s\n' "$fallback"
+}
+
+manager_cleanup_prompt_write_scope_paths_from_continuity() {
+  local project="$1" continuity_file="$2"
+  local row path branch desired role_hint
+  while IFS='|' read -r path branch desired role_hint; do
+    [[ -n "$path" && -d "$path" ]] || continue
+    project_has_authoritative_worktree_path "$project" "$path" || continue
+    [[ "$desired" == "stopped" ]] || continue
+    printf '%s\n' "$path"
+  done < <(manager_continuity_selected_cleanup_family_rows "$continuity_file")
+  printf '%s\n' "$project/.freely/run/"
+}
+
+manager_continuity_cleanup_issue_id() {
+  local continuity_file="$1" value
+  value="$(manager_continuity_backtick_field_value "$continuity_file" "issue_id")"
+  if [[ -n "$value" ]]; then
+    printf '%s\n' "$value"
+    return 0
+  fi
+  value="$(manager_continuity_backtick_field_value "$continuity_file" "selected_source")"
+  printf '%s\n' "$value"
+}
+
+manager_cleanup_prompt_file_for_continuity() {
+  local project="$1" continuity_file="$2" issue_id slug
+  issue_id="$(manager_continuity_cleanup_issue_id "$continuity_file")"
+  slug="$(printf '%s' "${issue_id:-cleanup-governance}" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-')"
+  slug="${slug#-}"
+  slug="${slug%-}"
+  [[ -n "$slug" ]] || slug="cleanup-governance"
+  printf '%s/.freely/run/worker-prompts/%s-worker-%s-cleanup-codex.txt\n' \
+    "$project" \
+    "$(date '+%Y%m%d-%H%M%S')" \
+    "$slug"
+}
+
+append_manager_cleanup_worker_prompt_reference_to_continuity() {
+  local continuity_file="$1" prompt_file="$2" lane_id="$3"
+  [[ -f "$continuity_file" && -n "$prompt_file" ]] || return 1
+  if grep -Fq "$prompt_file" "$continuity_file"; then
+    return 0
+  fi
+  {
+    printf '\n## Worker Delegation\n'
+    printf -- '- authoritative_worker_prompts:\n'
+    printf -- '  - `%s`\n' "$prompt_file"
+    printf -- '- launchable_queue:\n'
+    printf -- '  - lane_id: `%s`\n' "${lane_id:-cleanup-governance}"
+    printf -- '    dispatch_priority: `P0`\n'
+    printf -- '    prompt_path: `%s`\n' "$prompt_file"
+  } >>"$continuity_file"
+}
+
+materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
+  local project="$1" continuity_file="$2"
+  local route_kind primary_row primary_path primary_branch _desired _role_hint
+  local owner_issue_rel owner_issue_source owner_issue_abs pre_tests_rel verification_rel issue_id prompt_file
+  local write_scope_path target_environment
+
+  [[ -n "$project" && -f "$continuity_file" ]] || return 1
+  latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | grep -q . && return 1
+
+  route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
+  [[ "$route_kind" == "cleanup_governance" ]] || return 1
+
+  primary_row="$(manager_cleanup_prompt_primary_target_row_from_continuity "$project" "$continuity_file")"
+  [[ -n "$primary_row" ]] || return 1
+  IFS='|' read -r primary_path primary_branch _desired _role_hint <<<"$primary_row"
+  [[ -n "$primary_path" && -d "$primary_path" && -n "$primary_branch" ]] || return 1
+
+  owner_issue_rel="$(manager_continuity_backtick_field_value "$continuity_file" "issue_truth")"
+  [[ -n "$owner_issue_rel" ]] || return 1
+  owner_issue_source="$project/$owner_issue_rel"
+  [[ -f "$owner_issue_source" ]] || return 1
+  pre_tests_rel="$(markdown_backtick_field_value "$owner_issue_source" "pre_tests_path")"
+  verification_rel="$(markdown_backtick_field_value "$owner_issue_source" "verification_artifact_dir")"
+  [[ -n "$pre_tests_rel" && -n "$verification_rel" ]] || return 1
+
+  owner_issue_abs="$primary_path/$owner_issue_rel"
+  [[ -f "$owner_issue_abs" ]] || owner_issue_abs="$owner_issue_source"
+  issue_id="$(markdown_backtick_field_value "$owner_issue_source" "issue_id")"
+  [[ -n "$issue_id" ]] || issue_id="$(manager_continuity_cleanup_issue_id "$continuity_file")"
+  [[ -n "$issue_id" ]] || issue_id="cleanup-governance"
+
+  prompt_file="$(manager_cleanup_prompt_file_for_continuity "$project" "$continuity_file")"
+  mkdir -p "$(dirname "$prompt_file")"
+  {
+    printf 'Worktree:\n'
+    printf -- '- `%s`\n' "$primary_path"
+    printf 'Branch:\n'
+    printf -- '- `%s`\n' "$primary_branch"
+    printf 'dispatch_priority: `P0`\n'
+    printf 'parallel_safe: `false`\n'
+    printf 'write_scope:\n'
+    while IFS= read -r write_scope_path; do
+      [[ -n "$write_scope_path" ]] || continue
+      printf -- '- `%s`\n' "$write_scope_path"
+    done < <(manager_cleanup_prompt_write_scope_paths_from_continuity "$project" "$continuity_file")
+    printf 'intent_kind: `cleanup`\n'
+    printf 'intent_target: `%s`\n' "$primary_path"
+    printf 'Owner-Issue:\n'
+    printf -- '- `%s`\n' "$owner_issue_abs"
+    printf 'Pre-Tests-Path:\n'
+    printf -- '- `%s`\n' "$primary_path/$pre_tests_rel"
+    printf 'Verification-Artifact-Dir:\n'
+    printf -- '- `%s`\n' "$primary_path/$verification_rel"
+    printf 'Required-Test-Lanes:\n'
+    printf -- '- `cleanup-followthrough`\n'
+    printf 'Required-Acceptance-Item-Ids:\n'
+    printf -- '- `cleanup-governance-retirement-handoff`\n'
+    printf 'Minimum-Evidence-Level: `cleanup followthrough evidence plus worktree retirement disposition`\n'
+    target_environment="$(printf '%s cleanup_governance retirement followthrough' "$issue_id")"
+    printf 'Target-Environment: `%s`\n' "$target_environment"
+    printf 'Closeout-Gate: `Only claim closeout after the retained merged cleanup targets are retired or explicitly left with bounded followthrough evidence`\n'
+    printf 'Closeout-Gate-Command: `./bin/freely daemon start --project %s`\n' "$project"
+    printf 'Closeout-Target-Lane: `develop`\n'
+    printf 'Closeout-Promotion-Gate: `Retire retained merged worktrees for %s without reopening replay`\n' "$issue_id"
+    printf 'Closeout-Requires-Adequacy: `true`\n'
+    printf 'Closeout-Review-Artifact-Policy: `Append cleanup receipts, retained-vs-retired disposition, and fleet closeout evidence to the owner verification artifact`\n'
+    printf '\nManager-Continuity:\n'
+    printf -- '- `%s`\n' "$continuity_file"
+    printf '\nYou are not alone in the codebase. Do not revert other people'\''s changes. Adjust to concurrent truth if a newer manager continuity lands while you work.\n'
+    printf '\nStay inside `%s`. This is cleanup_governance followthrough, not a new replay lane.\n' "$issue_id"
+    printf '\nExecution contract:\n'
+    printf '1. Start from `%s`.\n' "$primary_path"
+    printf '2. Reconcile the owner issue/progress/verification surfaces to reflect absorbed merged cleanup truth instead of replay truth.\n'
+    printf '3. Use the retained merged worktrees in `write_scope` as the cleanup/retirement boundary for this owner.\n'
+    printf '4. Leave explicit retirement-ready evidence for each retained merged worktree you do not retire directly.\n'
+    printf '5. If cleanup closes successfully, leave the lane ready for manager fleet closure and next-task patrol.\n'
+  } >"$prompt_file"
+
+  append_manager_cleanup_worker_prompt_reference_to_continuity "$continuity_file" "$prompt_file" "$issue_id" || return 1
+  append_runtime_event "$project" "manager_cleanup_worker_prompt_materialized" \
+    "continuity=$(basename "$continuity_file")" \
+    "prompt=$(basename "$prompt_file")" \
+    "target_branch=$primary_branch"
+  printf '%s\n' "$prompt_file"
+}
+
 worker_retirement_followthrough_paths() {
   local target_worktree="$1" prompt_file="${2:-}" contract_file owner_issue pre_tests_path artifact_dir owner_issue_file progress_path tasks_path
   contract_file="$(worker_verification_contract_state_file "$target_worktree")"
@@ -7521,9 +7769,11 @@ worker_prompt_launchable_for_manager_project() {
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
   if worker_project_is_absorbed_merged_lane "$manager_project" "$resolved_worktree" "$target_branch"; then
     if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]] \
-      && worker_prompt_has_verification_metadata "$prompt_file" \
-      && ! worker_project_is_retire_ready_merged_followthrough "$manager_project" "$resolved_worktree" "$target_branch" "$prompt_file"; then
-      return 0
+      && worker_prompt_has_verification_metadata "$prompt_file"; then
+      if ! worker_project_is_retire_ready_merged_followthrough "$manager_project" "$resolved_worktree" "$target_branch" "$prompt_file" || \
+        worker_prompt_spans_external_cleanup_surfaces "$manager_project" "$prompt_file"; then
+        return 0
+      fi
     fi
     return 1
   fi
@@ -7940,6 +8190,35 @@ worker_prompt_write_scope() {
   fi
   resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   printf '%s\n' "${resolved_worktree:-$prompt_file}"
+}
+
+worker_prompt_write_scope_csv() {
+  local manager_project="$1" prompt_file="$2"
+  local value resolved_worktree
+  value="$(worker_prompt_dispatch_metadata_csv "$prompt_file" "write_scope")"
+  if [[ -n "$value" ]]; then
+    printf '%s\n' "$value"
+    return 0
+  fi
+  resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+  printf '%s\n' "${resolved_worktree:-$prompt_file}"
+}
+
+worker_prompt_spans_external_cleanup_surfaces() {
+  local manager_project="$1" prompt_file="$2"
+  local resolved_worktree write_scope_csv scope_item
+  resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+  [[ -n "$resolved_worktree" ]] || return 1
+  write_scope_csv="$(worker_prompt_write_scope_csv "$manager_project" "$prompt_file")"
+  [[ -n "$write_scope_csv" ]] || return 1
+  IFS=',' read -r -a __freely_write_scopes <<<"$write_scope_csv"
+  for scope_item in "${__freely_write_scopes[@]}"; do
+    [[ -n "$scope_item" ]] || continue
+    if [[ "$scope_item" != "$resolved_worktree" ]]; then
+      return 0
+    fi
+  done
+  return 1
 }
 
 worker_prompt_intent_kind() {
@@ -8974,6 +9253,9 @@ manager_runtime_launch_workers_from_latest_handoff() {
     return 0
   }
   continuity_generated="$continuity_file"
+  if ! manager_continuity_has_worker_prompts "$continuity_file"; then
+    materialize_cleanup_worker_prompt_from_manager_continuity_if_needed "$project" "$continuity_file" >/dev/null || true
+  fi
   prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
 
   launched_csv=""
@@ -9826,6 +10108,363 @@ append_cleanup_governance_retirement_worker_directive_if_needed() {
     printf -- '  - `%s`\n' "$target_path"
   done <<<"$target_paths"
   printf -- '- 只有当这些 target 已经不在 authoritative fleet、或本轮已被更高优先级 cleanup worker 占用时，才允许不发 worker prompt；否则视为本轮失败。\n'
+}
+
+append_manager_exit_contract_directive_if_needed() {
+  local project="$1" contract_file
+  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
+  contract_file="$(manager_exit_contract_file "$project")"
+  cat <<EOF
+
+Manager exit contract（硬性要求）：
+- 在本轮结束前，必须写出且只写出一个 manager exit contract 文件：
+  - \`$contract_file\`
+- 文件必须采用 shell env 键值格式，并且 \`EXIT_KIND\` 只能是以下三者之一：
+  - \`stop_ai\`
+  - \`resume_manager\`
+  - \`delegate_workers\`
+- 三者必须且只能出现一个；不得混写，不得留空，不得让 runtime 自己猜。
+
+允许格式：
+1. stop_ai
+\`\`\`env
+EXIT_KIND="stop_ai"
+STOP_REASON="<human_pause|manager_blocked_no_safe_next_step|all_scan_closed|operator_stop_boundary|other-bounded-reason>"
+\`\`\`
+
+2. resume_manager
+\`\`\`env
+EXIT_KIND="resume_manager"
+RESTART_POINT="<exact restart point>"
+NEXT_ACTION="<exact next action>"
+WHY_NOT_STOP="<why AI must continue>"
+WHY_NOT_DELEGATE="<why not dispatch workers yet>"
+\`\`\`
+
+3. delegate_workers
+\`\`\`env
+EXIT_KIND="delegate_workers"
+WORKER_PROMPTS_CSV="/abs/path/worker-a.txt,/abs/path/worker-b.txt"
+\`\`\`
+
+规则：
+- 如果派多个 worker，也仍然只属于 \`delegate_workers\` 这一种出口。
+- 如果你认为自己无能为力、被人要求暂停、或所有 scan 已收口，也必须明确写 \`stop_ai\`，而不是沉默结束。
+- 如果你本轮还没把出口合同写完整，就不算完成；runtime 会用同一个 resume target 拉你回来补合同。
+EOF
+}
+
+append_worker_exit_contract_directive_if_needed() {
+  local project="$1" contract_file
+  [[ "$(role_hint_for_project "$project")" == "worker" ]] || return 0
+  contract_file="$(worker_exit_contract_file "$project")"
+  cat <<EOF
+
+Worker exit contract（硬性要求）：
+- 在本轮结束前，必须写出且只写出一个 worker exit contract 文件：
+  - \`$contract_file\`
+- 文件必须采用 shell env 键值格式，并且 \`EXIT_KIND\` 只能是以下三者之一：
+  - \`worker_done\`
+  - \`worker_blocked\`
+  - \`worker_handoff_needed\`
+
+允许格式：
+1. worker_done
+\`\`\`env
+EXIT_KIND="worker_done"
+COMPLETION_SUMMARY="<what completed>"
+EVIDENCE_PATHS_CSV="/abs/path/a.md,/abs/path/b.txt"
+\`\`\`
+
+2. worker_blocked
+\`\`\`env
+EXIT_KIND="worker_blocked"
+BLOCKED_REASON="<bounded blocker>"
+NEXT_ACTION_FOR_MANAGER="<exact manager next action>"
+\`\`\`
+
+3. worker_handoff_needed
+\`\`\`env
+EXIT_KIND="worker_handoff_needed"
+HANDOFF_REASON="<why manager must reschedule>"
+NEXT_ACTION_FOR_MANAGER="<exact manager next action>"
+\`\`\`
+
+规则：
+- 如果你还没把 worker exit contract 写完整，就不算完成；runtime 会用同一个 resume target 拉你回来补合同。
+- 不要让 runtime 猜你的完成、阻塞或交接意图。
+EOF
+}
+
+manager_exit_contract_kind() {
+  local project="$1" contract_file
+  contract_file="$(manager_exit_contract_file "$project")"
+  [[ -f "$contract_file" ]] || return 1
+  meta_env_value "$contract_file" "EXIT_KIND"
+}
+
+validate_manager_exit_contract_for_project() {
+  local project="$1" contract_file kind missing_csv=""
+  local stop_reason restart_point next_action why_not_stop why_not_delegate worker_prompts_csv
+  contract_file="$(manager_exit_contract_file "$project")"
+  [[ -f "$contract_file" ]] || {
+    printf 'missing_file\n'
+    return 1
+  }
+  kind="$(meta_env_value "$contract_file" "EXIT_KIND")"
+  case "$kind" in
+    stop_ai|resume_manager|delegate_workers) ;;
+    *)
+      printf 'invalid_exit_kind\n'
+      return 1
+      ;;
+  esac
+  stop_reason="$(meta_env_value "$contract_file" "STOP_REASON")"
+  restart_point="$(meta_env_value "$contract_file" "RESTART_POINT")"
+  next_action="$(meta_env_value "$contract_file" "NEXT_ACTION")"
+  why_not_stop="$(meta_env_value "$contract_file" "WHY_NOT_STOP")"
+  why_not_delegate="$(meta_env_value "$contract_file" "WHY_NOT_DELEGATE")"
+  worker_prompts_csv="$(meta_env_value "$contract_file" "WORKER_PROMPTS_CSV")"
+  case "$kind" in
+    stop_ai)
+      [[ -n "$stop_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "STOP_REASON")"
+      [[ -z "$restart_point$next_action$why_not_stop$why_not_delegate$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      ;;
+    resume_manager)
+      [[ -n "$restart_point" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "RESTART_POINT")"
+      [[ -n "$next_action" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "NEXT_ACTION")"
+      [[ -n "$why_not_stop" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "WHY_NOT_STOP")"
+      [[ -n "$why_not_delegate" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "WHY_NOT_DELEGATE")"
+      [[ -z "$stop_reason$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      ;;
+    delegate_workers)
+      [[ -n "$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "WORKER_PROMPTS_CSV")"
+      [[ -z "$stop_reason$restart_point$next_action$why_not_stop$why_not_delegate" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      ;;
+  esac
+  if [[ -n "$missing_csv" ]]; then
+    printf '%s\n' "$missing_csv"
+    return 1
+  fi
+  printf '\n'
+}
+
+worker_exit_contract_kind() {
+  local project="$1" contract_file
+  contract_file="$(worker_exit_contract_file "$project")"
+  [[ -f "$contract_file" ]] || return 1
+  meta_env_value "$contract_file" "EXIT_KIND"
+}
+
+validate_worker_exit_contract_for_project() {
+  local project="$1" contract_file kind missing_csv=""
+  local completion_summary evidence_paths_csv blocked_reason handoff_reason next_action_for_manager
+  contract_file="$(worker_exit_contract_file "$project")"
+  [[ -f "$contract_file" ]] || {
+    printf 'missing_file\n'
+    return 1
+  }
+  kind="$(meta_env_value "$contract_file" "EXIT_KIND")"
+  case "$kind" in
+    worker_done|worker_blocked|worker_handoff_needed) ;;
+    *)
+      printf 'invalid_exit_kind\n'
+      return 1
+      ;;
+  esac
+  completion_summary="$(meta_env_value "$contract_file" "COMPLETION_SUMMARY")"
+  evidence_paths_csv="$(meta_env_value "$contract_file" "EVIDENCE_PATHS_CSV")"
+  blocked_reason="$(meta_env_value "$contract_file" "BLOCKED_REASON")"
+  handoff_reason="$(meta_env_value "$contract_file" "HANDOFF_REASON")"
+  next_action_for_manager="$(meta_env_value "$contract_file" "NEXT_ACTION_FOR_MANAGER")"
+  case "$kind" in
+    worker_done)
+      [[ -n "$completion_summary" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "COMPLETION_SUMMARY")"
+      [[ -n "$evidence_paths_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "EVIDENCE_PATHS_CSV")"
+      [[ -z "$blocked_reason$handoff_reason$next_action_for_manager" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      ;;
+    worker_blocked)
+      [[ -n "$blocked_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "BLOCKED_REASON")"
+      [[ -n "$next_action_for_manager" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "NEXT_ACTION_FOR_MANAGER")"
+      [[ -z "$completion_summary$evidence_paths_csv$handoff_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      ;;
+    worker_handoff_needed)
+      [[ -n "$handoff_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "HANDOFF_REASON")"
+      [[ -n "$next_action_for_manager" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "NEXT_ACTION_FOR_MANAGER")"
+      [[ -z "$completion_summary$evidence_paths_csv$blocked_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      ;;
+  esac
+  if [[ -n "$missing_csv" ]]; then
+    printf '%s\n' "$missing_csv"
+    return 1
+  fi
+  printf '\n'
+}
+
+write_manager_exit_contract_repair_handoff() {
+  local project="$1" reason="$2" details="$3" contract_file resume_target session_file
+  contract_file="$(manager_exit_contract_file "$project")"
+  session_file="$(session_state_file "$project")"
+  resume_target="${LAST_TOOL_RESUME_TARGET:-}"
+  if [[ -z "$resume_target" && -f "$session_file" ]]; then
+    resume_target="$(meta_env_value "$session_file" "LAST_TOOL_RESUME_TARGET")"
+  fi
+  cat >"$(handoff_file "$project")" <<EOF
+# Session Handoff
+
+- rotation_reason: manager_exit_contract_repair
+- previous_launch_kind: resume
+- previous_tool_resume_target: ${resume_target:-unavailable}
+- worktree_path: $project
+
+## Repair Contract
+- reason: ${reason:-manager_exit_contract_invalid}
+- contract_file: $contract_file
+- details: ${details:-missing}
+
+## What To Handle First
+- Do not restart broad patrol first.
+- Reuse the same manager context and produce a valid manager exit contract before any other closeout claim.
+- The missing/invalid contract is the blocking defect from the previous round.
+EOF
+}
+
+write_worker_exit_contract_repair_handoff() {
+  local project="$1" reason="$2" details="$3" contract_file resume_target session_file
+  contract_file="$(worker_exit_contract_file "$project")"
+  session_file="$(session_state_file "$project")"
+  resume_target="${LAST_TOOL_RESUME_TARGET:-}"
+  if [[ -z "$resume_target" && -f "$session_file" ]]; then
+    resume_target="$(meta_env_value "$session_file" "LAST_TOOL_RESUME_TARGET")"
+  fi
+  cat >"$(handoff_file "$project")" <<EOF
+# Session Handoff
+
+- rotation_reason: worker_exit_contract_repair
+- previous_launch_kind: resume
+- previous_tool_resume_target: ${resume_target:-unavailable}
+- worktree_path: $project
+
+## Repair Contract
+- reason: ${reason:-worker_exit_contract_invalid}
+- contract_file: $contract_file
+- details: ${details:-missing}
+
+## What To Handle First
+- Stay inside the current worker issue boundary.
+- Reuse the same worker context and produce a valid worker exit contract before claiming completion or requesting reschedule.
+- The missing/invalid contract is the blocking defect from the previous round.
+EOF
+}
+
+manager_runtime_handle_exit_contract_after_ai_cycle() {
+  local project="$1" exit_reason="${2:-}" missing_csv="" kind="" worker_prompts_csv=""
+  [[ "$(role_hint_for_project "$project")" == "manager" ]] || {
+    printf 'continue\n'
+    return 0
+  }
+  [[ "$exit_reason" == "ai_exit_rc_0" ]] || {
+    printf 'continue\n'
+    return 0
+  }
+  if ! missing_csv="$(validate_manager_exit_contract_for_project "$project")"; then
+    write_manager_exit_contract_repair_handoff "$project" "manager_exit_contract_invalid" "${missing_csv:-missing_file}"
+    write_workcell_state "$project" "running" "up" "down" "manager_exit_contract_invalid"
+    append_runtime_event "$project" "manager_exit_contract_invalid" \
+      "details=${missing_csv:-missing_file}" \
+      "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
+    printf 'resume_invalid\n'
+    return 0
+  fi
+  kind="$(manager_exit_contract_kind "$project" || true)"
+  case "$kind" in
+    stop_ai)
+      : >"$(stop_marker_file "$project")"
+      write_workcell_state "$project" "stopped" "down" "down" "manager_exit_contract_stop_ai"
+      append_runtime_event "$project" "manager_exit_contract_stop_ai" \
+        "stop_reason=$(meta_env_value "$(manager_exit_contract_file "$project")" "STOP_REASON")"
+      printf 'stop_ai\n'
+      ;;
+    resume_manager)
+      write_manager_exit_contract_repair_handoff \
+        "$project" \
+        "manager_exit_contract_resume" \
+        "restart_point=$(meta_env_value "$(manager_exit_contract_file "$project")" "RESTART_POINT");next_action=$(meta_env_value "$(manager_exit_contract_file "$project")" "NEXT_ACTION")"
+      append_runtime_event "$project" "manager_exit_contract_resume" \
+        "restart_point=$(meta_env_value "$(manager_exit_contract_file "$project")" "RESTART_POINT")"
+      printf 'resume_manager\n'
+      ;;
+    delegate_workers)
+      worker_prompts_csv="$(meta_env_value "$(manager_exit_contract_file "$project")" "WORKER_PROMPTS_CSV")"
+      append_runtime_event "$project" "manager_exit_contract_delegate_workers" \
+        "worker_prompts_csv=${worker_prompts_csv:-none}"
+      printf 'delegate_workers\n'
+      ;;
+    *)
+      write_manager_exit_contract_repair_handoff "$project" "manager_exit_contract_invalid" "invalid_exit_kind"
+      write_workcell_state "$project" "running" "up" "down" "manager_exit_contract_invalid"
+      printf 'resume_invalid\n'
+      ;;
+  esac
+}
+
+worker_runtime_handle_exit_contract_after_ai_cycle() {
+  local project="$1" exit_reason="${2:-}" missing_csv="" kind=""
+  [[ "$(role_hint_for_project "$project")" == "worker" ]] || {
+    printf 'continue\n'
+    return 0
+  }
+  [[ "$exit_reason" == "ai_exit_rc_0" ]] || {
+    printf 'continue\n'
+    return 0
+  }
+  if ! missing_csv="$(validate_worker_exit_contract_for_project "$project")"; then
+    write_worker_exit_contract_repair_handoff "$project" "worker_exit_contract_invalid" "${missing_csv:-missing_file}"
+    write_workcell_state "$project" "running" "up" "down" "worker_exit_contract_invalid"
+    append_runtime_event "$project" "worker_exit_contract_invalid" \
+      "details=${missing_csv:-missing_file}" \
+      "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
+    printf 'resume_invalid\n'
+    return 0
+  fi
+  kind="$(worker_exit_contract_kind "$project" || true)"
+  case "$kind" in
+    worker_done)
+      : >"$(stop_marker_file "$project")"
+      write_workcell_state "$project" "stopped" "down" "down" "worker_exit_contract_done"
+      append_runtime_event "$project" "worker_exit_contract_done" \
+        "summary=$(meta_env_value "$(worker_exit_contract_file "$project")" "COMPLETION_SUMMARY")"
+      printf 'stop_ai\n'
+      ;;
+    worker_blocked)
+      : >"$(stop_marker_file "$project")"
+      write_workcell_state "$project" "stopped" "down" "down" "worker_exit_contract_blocked"
+      append_runtime_event "$project" "worker_exit_contract_blocked" \
+        "blocked_reason=$(meta_env_value "$(worker_exit_contract_file "$project")" "BLOCKED_REASON")"
+      printf 'stop_ai\n'
+      ;;
+    worker_handoff_needed)
+      : >"$(stop_marker_file "$project")"
+      write_workcell_state "$project" "stopped" "down" "down" "worker_exit_contract_handoff_needed"
+      append_runtime_event "$project" "worker_exit_contract_handoff_needed" \
+        "handoff_reason=$(meta_env_value "$(worker_exit_contract_file "$project")" "HANDOFF_REASON")"
+      printf 'stop_ai\n'
+      ;;
+    *)
+      write_worker_exit_contract_repair_handoff "$project" "worker_exit_contract_invalid" "invalid_exit_kind"
+      write_workcell_state "$project" "running" "up" "down" "worker_exit_contract_invalid"
+      printf 'resume_invalid\n'
+      ;;
+  esac
+}
+
+project_runtime_handle_exit_contract_after_ai_cycle() {
+  local project="$1" exit_reason="${2:-}"
+  case "$(role_hint_for_project "$project")" in
+    manager) manager_runtime_handle_exit_contract_after_ai_cycle "$project" "$exit_reason" ;;
+    worker) worker_runtime_handle_exit_contract_after_ai_cycle "$project" "$exit_reason" ;;
+    *) printf 'continue\n' ;;
+  esac
 }
 
 write_manager_bootstrap_handoff() {
@@ -12392,6 +13031,8 @@ build_prompt() {
   append_handoff_prompt_if_present "$PROJECT_ROOT"
   append_manager_consumed_continuity_resume_focus_if_needed "$PROJECT_ROOT"
   append_cleanup_governance_retirement_worker_directive_if_needed "$PROJECT_ROOT"
+  append_manager_exit_contract_directive_if_needed "$PROJECT_ROOT"
+  append_worker_exit_contract_directive_if_needed "$PROJECT_ROOT"
 }
 
 cmd_init() {
@@ -13644,6 +14285,14 @@ start_project_runtime() {
       "from_checkpoint=L021" \
       "expected_from_previous=L022" \
       "expected_next=L040"
+    case "$(role_hint_for_project "$PROJECT_ROOT")" in
+      manager)
+        rm -f "$(manager_exit_contract_file "$PROJECT_ROOT")"
+        ;;
+      worker)
+        rm -f "$(worker_exit_contract_file "$PROJECT_ROOT")"
+        ;;
+    esac
     if [[ -n "$delegated_pending_ids" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
       delegated_consumed_ids="$delegated_pending_ids"
       delegated_consumed_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
@@ -13955,7 +14604,41 @@ start_project_runtime() {
     log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, secondary_rate_limit_used_percent=${secondary_rate_limit_used_percent:-unavailable}, secondary_rate_limit_resets_at=${secondary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
     rm -f "$child_pid_file"
 
-    manager_runtime_launch_workers_after_ai_cycle_if_needed "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON" >/dev/null
+    local exit_contract_action
+    exit_contract_action="$(project_runtime_handle_exit_contract_after_ai_cycle "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON")"
+    case "$exit_contract_action" in
+      stop_ai)
+        stop_requested=1
+        DESIRED_RUNTIME_STATE_VALUE="stopped"
+        case "$(role_hint_for_project "$PROJECT_ROOT")" in
+          manager) LAST_WORKCELL_EXIT_REASON="manager_exit_contract_stop_ai" ;;
+          worker) LAST_WORKCELL_EXIT_REASON="worker_exit_contract_stop_ai" ;;
+        esac
+        log_info "exit contract requested stop_ai; exiting supervisor"
+        exit 0
+        ;;
+      resume_invalid|resume_manager)
+        case "$exit_contract_action" in
+          resume_invalid)
+            case "$(role_hint_for_project "$PROJECT_ROOT")" in
+              manager) LAST_WORKCELL_EXIT_REASON="manager_exit_contract_invalid" ;;
+              worker) LAST_WORKCELL_EXIT_REASON="worker_exit_contract_invalid" ;;
+            esac
+            ;;
+          resume_manager)
+            LAST_WORKCELL_EXIT_REASON="manager_exit_contract_resume"
+            ;;
+        esac
+        sleep "${RESTART_DELAY:-2}"
+        continue
+        ;;
+      delegate_workers|continue|"")
+        ;;
+    esac
+
+    if [[ "$exit_contract_action" == "delegate_workers" ]]; then
+      manager_runtime_launch_workers_after_ai_cycle_if_needed "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON" >/dev/null
+    fi
 
     FIRST_ROUND=false
     restart_count=$((restart_count + 1))
