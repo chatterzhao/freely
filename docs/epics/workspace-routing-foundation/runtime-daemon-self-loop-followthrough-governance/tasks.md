@@ -20,3 +20,4 @@
 - [x] Emit explicit runtime guidance for network/proxy/auth/subscription failures and document proxy mode semantics in the runtime config template without widening tool or slot policy.
 - [x] When Codex exhausts its own reconnect loop and exits on upstream `502 Bad Gateway`, keep the failure on the bounded execution-network path instead of writing `tool_runtime_failure` and triggering cross-tool fallback.
 - [x] When manager materializes a cleanup followthrough prompt from continuity, carry the authoritative `selected_tool` into that prompt and correct stale retained cleanup worktree config before launch.
+- [x] Reject zero-byte Codex rollout/session jsonl files as resume evidence so canonical cleanup replay falls back away from `thread/resume failed: empty session file`.

@@ -45,6 +45,7 @@
 27. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`.
 28. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-failure-guidance`.
 29. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-materialized-cleanup-worker-applies-selected-tool`.
+30. Run `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -244,6 +245,30 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-materialized-cleanup-selected-tool-verification.md`
+
+### Empty Codex session files do not count as resume evidence
+- id: `empty-codex-session-files-fall-back-from-resume`
+- requirement: `Codex explicit resume targets must only survive when the persisted rollout/session jsonl is non-empty.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#21`
+- case_design: `Seed Codex explicit resume state with a zero-byte rollout jsonl, then verify before-launch evidence checks, post-cycle persistence, and tool_has_resume_evidence all reject that state while non-empty jsonl evidence still remains resumable.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
+
+### Protected replay stages empty Codex session resume evidence
+- id: `empty-codex-session-files-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the empty-session resume regression and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#21`
+- case_design: `Replay the empty-session resume repair on the disposable protected lane, rerun the focused explicit-resume contract plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
 
 ### Repair handoff relaunches stay on resume instead of restarting patrol
 - id: `repair-handoff-does-not-regress-to-initial-start`

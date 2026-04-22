@@ -2818,25 +2818,30 @@ tool_runtime_resume_target_before_launch() {
 
 resolve_codex_jsonl_path_for_resume_target() {
   local resume_target="$1" persisted_jsonl_path="${2:-}"
-  if [[ -n "$persisted_jsonl_path" && -f "$persisted_jsonl_path" ]]; then
+  if codex_jsonl_has_verified_resume_evidence "$persisted_jsonl_path"; then
     printf '%s\n' "$persisted_jsonl_path"
     return 0
   fi
   find_codex_jsonl_path_for_session "$resume_target"
 }
 
+codex_jsonl_has_verified_resume_evidence() {
+  local jsonl_path="${1:-}"
+  [[ -n "$jsonl_path" && -s "$jsonl_path" ]]
+}
+
 codex_has_verified_resume_evidence() {
   local resume_target="${1:-}" persisted_jsonl_path="${2:-}" resolved_jsonl_path
   [[ -n "$resume_target" ]] || return 1
   resolved_jsonl_path="$(resolve_codex_jsonl_path_for_resume_target "$resume_target" "$persisted_jsonl_path")"
-  [[ -n "$resolved_jsonl_path" && -f "$resolved_jsonl_path" ]]
+  codex_jsonl_has_verified_resume_evidence "$resolved_jsonl_path"
 }
 
 tool_runtime_resume_target_after_cycle() {
   local tool="$1" observed_tool_session_id="$2" observed_tool_jsonl_path="$3" launch_resume_target="$4" persisted_jsonl_path="${5:-}"
   case "$tool" in
     codex)
-      if [[ -n "$observed_tool_session_id" && -n "$observed_tool_jsonl_path" && -f "$observed_tool_jsonl_path" ]]; then
+      if [[ -n "$observed_tool_session_id" ]] && codex_jsonl_has_verified_resume_evidence "$observed_tool_jsonl_path"; then
         printf '%s\n' "$observed_tool_session_id"
       elif codex_has_verified_resume_evidence "$launch_resume_target" "$persisted_jsonl_path"; then
         printf '%s\n' "$launch_resume_target"
@@ -6795,7 +6800,7 @@ recorded_worker_has_resume_evidence() {
   [[ -f "$state_file" ]] || return 1
   # shellcheck disable=SC1090
   source "$state_file"
-  [[ -n "${LAST_TOOL_JSONL_PATH:-}" && "${LAST_TOOL_JSONL_PATH:-}" != "unavailable" && -f "${LAST_TOOL_JSONL_PATH:-}" ]] && return 0
+  [[ -n "${LAST_TOOL_JSONL_PATH:-}" && "${LAST_TOOL_JSONL_PATH:-}" != "unavailable" ]] && codex_jsonl_has_verified_resume_evidence "${LAST_TOOL_JSONL_PATH:-}" && return 0
   [[ -n "${LAST_CLAUDE_JSONL_PATH:-}" && "${LAST_CLAUDE_JSONL_PATH:-}" != "unavailable" && -f "${LAST_CLAUDE_JSONL_PATH:-}" ]] && return 0
   [[ -n "${LAST_CODEX_MCP_JSONL_PATH:-}" && "${LAST_CODEX_MCP_JSONL_PATH:-}" != "unavailable" && -f "${LAST_CODEX_MCP_JSONL_PATH:-}" ]] && return 0
   [[ -n "${LAST_TOOL_SESSION_ID:-}" && "${LAST_TOOL_SESSION_ID:-}" != "unavailable" ]] && return 0
