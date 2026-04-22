@@ -36,6 +36,10 @@
 18. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`.
 19. Run `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`.
 20. Run `bash docs/system/workspace/scripts/tests/test-freely-retire-ready-merged-cleanup-handoff-not-reclaimed`.
+21. Run `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-defers-codex-reconnect-until-retries-exhaust`.
+22. Run `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`.
+23. Run `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`.
+24. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -136,6 +140,30 @@
 - promotion_gate: `completion`
 - task_refs: `tasks.md#12`
 - case_design: `Construct a merged cleanup-handoff worktree with full verification metadata plus external cleanup write scope and verify runtime neither reclaims ownership nor auto-settles it as retire_ready_merged_worker.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+
+### Reconnect retries stay local until the tool actually exits
+- id: `reconnect-does-not-trigger-early-cross-tool-switch`
+- requirement: `Reconnect-in-progress output must stay on the bounded execution-network retry path until the current tool exhausts its own retries and exits.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#13`
+- case_design: `Emit a Codex transcript containing only ERROR: Reconnecting... x/5, verify monitor-ai-cli does not write the network-failure marker or kill the child early, then prove runtime classification still maps that log to execution_network_transient while 429 evidence still remains immediate kill/switch-worthy.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+
+### Exhausted fallback episodes restore the original tool
+- id: `fallback-episode-restores-origin-tool`
+- requirement: `A bounded cross-tool recovery episode must remember its origin tool and restore that tool selection once every configured fallback has failed.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#13`
+- case_design: `Walk one recovery episode across codex -> cc -> iflow -> kiro-cli failures and verify the attempted-tool memory is preserved within the episode while project tool selection returns to codex after exhaustion.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
-TMP_DIR="$(mktemp -d /tmp/freely-monitor-ai-network-kill.XXXXXX)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-ai-reconnect-defer.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PROJECT="$TMP_DIR/project"
@@ -21,7 +21,7 @@ cat >"$MOCK_BIN/codex" <<'EOF'
 set -euo pipefail
 if [[ "${1:-}" == "exec" ]]; then
   echo "ERROR: Reconnecting... 2/5"
-  sleep 30
+  sleep 2
   exit 99
 fi
 exit 98
@@ -56,14 +56,13 @@ RC=$?
 set -e
 
 [[ "$RC" -ne 0 ]]
-[[ -f "$MARKER_FILE" ]]
-grep -q '^network_failure$' "$MARKER_FILE"
-grep -q 'ERROR: Reconnecting' "$LOG_FILE"
+[[ ! -f "$MARKER_FILE" ]]
+grep -q 'ERROR: Reconnecting... 2/5' "$LOG_FILE"
 
 CHILD_PID="$(cat "$PID_FILE")"
 if kill -0 "$CHILD_PID" 2>/dev/null; then
-  echo "[FAIL] monitor-ai-cli left the codex child running after slot-local network failure" >&2
+  echo "[FAIL] monitor-ai-cli should let codex finish its own reconnect loop before intervening" >&2
   exit 1
 fi
 
-echo "[PASS] monitor-ai-cli kills the current codex child as soon as slot-local network failure evidence appears"
+echo "[PASS] monitor-ai-cli defers reconnect-in-progress logs to the tool's own retry loop"

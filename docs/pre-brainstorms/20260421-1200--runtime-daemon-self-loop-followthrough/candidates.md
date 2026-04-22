@@ -28,6 +28,7 @@
 - followthrough_update_3: Canonical `develop` replay then exposed a narrower cleanup-handoff retirement seam: manager could select a real cleanup-governance task and materialize a lawful worker prompt, but the worker worktree was still auto-settled as `retire_ready_merged_worker` before it could execute the external cleanup surfaces named in that prompt.
 - followthrough_update_4: The cleanup-handoff seam turned out to be more specific on live runtime truth: the worker worktree often had no local `prompt-*.txt`, and the authoritative cleanup prompt only remained reachable via `worker-verification-contract.env` `SOURCE_PROMPT_FILE`, so merged-lane settle/reclaim had to fall back to contract truth instead of assuming a local prompt artifact existed.
 - followthrough_update_5: A second live replay then showed the worker could also generate a fresh local reentry prompt that was not the authoritative cleanup handoff prompt; merged-lane settle/reclaim therefore had to prefer `SOURCE_PROMPT_FILE` over any later worker-local bootstrap prompt.
+- followthrough_update_6: Canonical `develop` replay then exposed one more bounded recovery seam: `monitor-ai-cli` treated Codex `ERROR: Reconnecting... x/5` as an immediate runtime failure, so pure reconnect evidence could trigger cross-tool switching before the tool exhausted its own retry loop, and one exhausted fallback episode could leave the project pinned on the last fallback tool instead of returning to the original tool for the next bounded retry.
 - why_now:
   - this blocker prevents Freely from autonomously selecting, finishing, and closing tasks on canonical `develop`
   - the fix is already implemented and focused regressions are green in the blocker worktree, but guarded develop promotion still needs lawful owner evidence
@@ -40,6 +41,8 @@
   - `merged-clean` / `retire-ready` blocker worktrees are settled toward cleanup followthrough retirement rather than being auto-recovered as edit workers
   - cleanup-handoff workers that still need to reconcile external owner surfaces are not reclaimed or auto-settled merely because their branch is already merged into `develop`
   - every manager / worker AI cycle now leaves exactly one valid exit contract artifact, or runtime reuses the precise resume target to repair that artifact before doing broader work
+  - reconnect-in-progress output such as `ERROR: Reconnecting... x/5` stays on the bounded execution-network retry path until the current tool actually exits, instead of triggering monitor-level live kill or immediate cross-tool switch
+  - once one bounded cross-tool recovery episode exhausts every configured fallback, Freely restores the original tool selection for the next retry instead of remaining pinned to the last failed fallback
   - guarded `feature/* -> test-pre-merge-* -> develop` replay succeeds with concrete owner evidence
   - on canonical `develop`, `freely daemon start` autonomously selects at least one task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task
 - promotion_gate:

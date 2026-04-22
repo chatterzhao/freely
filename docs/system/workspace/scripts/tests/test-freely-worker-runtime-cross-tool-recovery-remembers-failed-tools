@@ -110,9 +110,19 @@ if attempt_runtime_auto_recovery_after_failure "$PROJECT" "kiro-cli" "tool_runti
   exit 1
 fi
 
+grep -q '^AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] once every fallback fails, the runtime should restore the episode origin tool for the next retry" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+
 [[ "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" == "codex,cc,iflow,kiro-cli" ]] || {
   echo "[FAIL] expected attempted tool memory to preserve the recovery episode ordering" >&2
   printf '%s\n' "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" >&2
+  exit 1
+}
+[[ "${AUTO_RECOVERY_ORIGIN_TOOL:-}" == "codex" ]] || {
+  echo "[FAIL] expected recovery episode to remember the original tool while fallback memory remains active" >&2
   exit 1
 }
 
