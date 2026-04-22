@@ -118,11 +118,11 @@
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
-- task_refs: `tasks.md#5,tasks.md#6`
-- case_design: `Replay the blocker owner through the disposable protected test lane, rerun owner gates there, and use that bounded evidence to justify guarded promote into develop.`
+- task_refs: `tasks.md#5,tasks.md#6,tasks.md#19`
+- case_design: `Replay the current blocker owner through the disposable protected test lane, including the reconnect-exhaustion 502 network-path regression set, rerun owner gates there, and use that bounded evidence to justify guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-proxy-guidance-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-reconnect-502-network-verification.md`
 
 ### Guarded promote carries fresh proxy/network diagnosis evidence
 - id: `guarded-promote-proxy-guidance-proof`
