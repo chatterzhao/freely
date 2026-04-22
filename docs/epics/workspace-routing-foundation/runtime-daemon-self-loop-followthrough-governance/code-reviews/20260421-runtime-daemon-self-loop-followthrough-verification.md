@@ -248,3 +248,16 @@
 - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-manager-exit-contract-expected-worker-guard --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - `PASS`: `./bin/governance-check`
 - `PENDING`: guarded promotion into canonical `develop` and final self-host replay still remain required before this owner can close.
+
+## 2026-04-22 00:44 PDT Non-Launchable Delegate Contract Verification
+
+- `FAIL`: canonical `develop` self-host replay showed one more exit-contract/control-plane mismatch: manager generated only a cleanup prompt for an already absorbed `retire_ready` merged worker lane, wrote `EXIT_KIND=delegate_workers`, and runtime accepted that contract even though the subsequent worker-launch gate would refuse to launch the same prompt.
+- `PASS`: `validate_manager_exit_contract_for_project()` now treats `delegate_workers` as invalid unless at least one prompt in `WORKER_PROMPTS_CSV` is actually launchable under `worker_prompt_launchable_for_manager_project()`.
+- `PASS`: runtime now records `WORKER_PROMPTS_NOT_LAUNCHABLE` and forces same-session manager repair via `resume_invalid` instead of silently accepting an impossible delegate outcome.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`
+- `PASS`: `./bin/governance-check`
+- `PASS`: replayed the same regression trio plus `./bin/governance-check` on protected lane `test-pre-merge-20260421-manager-exit-contract-expected-worker-guard-v2`; all passed before the first `develop` merge attempt.
+- `FAIL`: the first guarded `develop` merge attempt was blocked by the develop-bound governance materialization gate because this followthrough's owner issue/progress/review evidence was not yet present in the merge diff, even though the code/test patch itself was ready.
+- `PENDING`: rerun guarded `develop` merge with the refreshed owner evidence, then restart canonical `develop` runtime and continue self-host replay until Freely completes one task with lawful closeout and advances to the next task.

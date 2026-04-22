@@ -351,3 +351,14 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-manager-exit-contract-expected-worker-guard --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - `PASS`: `./bin/governance-check`
 - `PENDING`: replay this same-owner continuation through fresh test-pre-merge and guarded `develop` merge, then rerun canonical `develop` self-host acceptance until Freely completes one task, closes that temporary worktree, and continues to the next task without falling back into the stale-tool worker restart loop.
+
+## 2026-04-22 00:44 PDT Non-Launchable Delegate Contract Followthrough
+
+- `FAIL`: canonical `develop` self-host replay advanced further, but manager could still exit with `EXIT_KIND=delegate_workers` after generating only a cleanup prompt for an already absorbed `retire_ready` merged worker lane; the contract claimed delegation succeeded even though the same runtime launch gate would refuse to launch that prompt.
+- `PASS`: manager exit-contract validation now requires `WORKER_PROMPTS_CSV` to contain at least one prompt that `worker_prompt_launchable_for_manager_project()` would actually launch; otherwise runtime records `WORKER_PROMPTS_NOT_LAUNCHABLE` and forces same-session manager repair via `resume_invalid`.
+- `PASS`: added `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt` to reproduce the exact absorbed+merged+retire-ready cleanup-lane contradiction and prove runtime rejects the impossible delegate contract.
+- `PASS`: reran `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`.
+- `PASS`: reran `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`.
+- `PASS`: reran `./bin/governance-check`.
+- `PASS`: replayed the same three runtime regressions plus `./bin/governance-check` on fresh protected lane `test-pre-merge-20260421-manager-exit-contract-expected-worker-guard-v2`; all passed there as well.
+- `PENDING`: rerun guarded `develop` merge with this owner evidence in the diff, then restart canonical `develop` runtime and continue self-host replay until Freely completes one task to the current-project success standard, closes that lane lawfully, and proceeds to the next task.

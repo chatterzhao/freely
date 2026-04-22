@@ -63,6 +63,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 23. Prefer the worker verification contract `SOURCE_PROMPT_FILE` over any later worker-local bootstrap/reentry prompt when deciding whether a merged lane is still a cleanup-handoff worker with external cleanup scope.
 24. Refuse manager `EXIT_KIND=stop_ai` whenever authoritative supervision truth still shows any unresolved runtime-owned expected-running worker, so autonomy cannot legally terminate while recovery/cleanup followthrough remains open.
 25. When a down expected-running worker is relaunched from fresh runtime state, reapply the delegated prompt's authoritative `selected_tool` from the worker verification contract instead of inheriting a stale fallback tool from the failed prior attempt.
+26. Reject manager `EXIT_KIND=delegate_workers` unless the advertised `WORKER_PROMPTS_CSV` contains at least one prompt that the same runtime control plane would actually treat as launchable.
 
 ## Non-Goals
 
@@ -83,6 +84,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 8. Cleanup-governance handoff workers selected on canonical `develop` remain launchable until they finish or explicitly hand back the external cleanup surfaces named in their worker prompt, rather than being auto-settled immediately after launch.
 9. Canonical `develop` no longer accepts manager `stop_ai` as a lawful terminal outcome while any runtime-owned expected-running worker is still down/degraded; runtime must continue with repair/recovery until that worker is resolved or explicitly reclassified.
 10. Canonical `develop` no longer loops on fresh worker restarts that inherit a stale fallback tool; a relaunched expected-running worker must recover with the delegated `selected_tool` and continue the same owner followthrough.
+11. Canonical `develop` no longer accepts `delegate_workers` as a lawful manager outcome when every advertised worker prompt is already non-launchable; runtime must force same-session repair instead of recording an impossible delegation.
 
 ## Verification
 
@@ -105,6 +107,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`
@@ -148,6 +151,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/system/workspace/scripts/tests/test-freely-sync-tooling-stale-target-worktree-blocked`
 - `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
 - `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
+- `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt`
 - `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
 - `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
 - `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`
