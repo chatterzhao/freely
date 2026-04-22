@@ -79,6 +79,10 @@ LAST_ROLE_HINT="worker"
 LAST_STATE_UPDATED_AT="2026-04-21T12:00:00Z"
 EOF
 
+cat >"$TARGET_WT/.freely/run/prompt-worker-reentry.txt" <<'EOF'
+Worker bootstrap prompt that should not override the authoritative cleanup handoff prompt recorded in the verification contract.
+EOF
+
 PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/prompt-cleanup-handoff.txt"
 cat >"$PROMPT_FILE" <<EOF
 Worktree:
