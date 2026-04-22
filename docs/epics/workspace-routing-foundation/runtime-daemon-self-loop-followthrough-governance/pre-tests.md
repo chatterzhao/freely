@@ -40,6 +40,7 @@
 22. Run `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`.
 23. Run `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`.
 24. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`.
+25. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -164,6 +165,18 @@
 - promotion_gate: `completion`
 - task_refs: `tasks.md#13`
 - case_design: `Walk one recovery episode across codex -> cc -> iflow -> kiro-cli failures and verify the attempted-tool memory is preserved within the episode while project tool selection returns to codex after exhaustion.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+
+### Repair handoff relaunches stay on resume instead of restarting patrol
+- id: `repair-handoff-does-not-regress-to-initial-start`
+- requirement: `A manager or worker repair handoff created from an invalid exit contract must resume the recorded tool context even after supervisor restart, instead of re-entering fresh initial patrol.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#16`
+- case_design: `Seed session-state plus a manager_exit_contract_repair handoff and verify launch-kind selection stays on resume rather than rotating to fresh/initial_start.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`

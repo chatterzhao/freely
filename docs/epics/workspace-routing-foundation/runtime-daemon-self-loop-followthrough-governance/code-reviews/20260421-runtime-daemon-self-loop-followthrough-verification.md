@@ -282,3 +282,15 @@
 - `PASS`: replayed the same regression trio plus `./bin/governance-check` on protected lane `test-pre-merge-20260421-manager-exit-contract-expected-worker-guard-v2`; all passed before the first `develop` merge attempt.
 - `FAIL`: the first guarded `develop` merge attempt was blocked by the develop-bound governance materialization gate because this followthrough's owner issue/progress/review evidence was not yet present in the merge diff, even though the code/test patch itself was ready.
 - `PENDING`: rerun guarded `develop` merge with the refreshed owner evidence, then restart canonical `develop` runtime and continue self-host replay until Freely completes one task with lawful closeout and advances to the next task.
+
+## 2026-04-22 03:15 PDT Repair Handoff Relaunch Verification
+
+- `FAIL`: canonical `develop` self-host replay progressed to `manager_exit_contract_invalid`, but the next manager round relaunched as `fresh rotation_reason=initial_start`; that violated the repair handoff contract, reopened broad patrol, and let newer intake supersede the repair round before a valid exit contract existed.
+- `PASS`: `select_launch_kind()` now recognizes persisted `manager_exit_contract_repair` / `worker_exit_contract_repair` handoffs as resume-only relaunches and refuses to treat a supervisor restart with existing handoff/resume evidence as a true first launch.
+- `PASS`: the supervisor loop now flips `FIRST_ROUND=false` immediately after the first AI cycle, so same-process `resume_invalid` / `resume_manager` loops cannot regress into `initial_start`.
+- `PASS`: `tool_has_resume_evidence()` now evaluates resume evidence against the actual project root instead of an unbound local `project` variable, which keeps repair-handoff launch-kind selection shell-safe.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-new-intake-reentry`
+- `PASS`: replayed the same regressions plus `bash -n docs/system/workspace/scripts/runtime/freely` on protected lane `test-pre-merge-20260422-manager-repair-handoff-intake-supersede`.
+- `PENDING`: rerun guarded `develop` merge with the refreshed owner evidence, then restart canonical `develop` runtime and verify the repair handoff stays on same-context resume until the daemon can complete one task, retire that temporary lane, and advance to another task.
