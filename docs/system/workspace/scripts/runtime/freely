@@ -8521,11 +8521,6 @@ worker_verification_contract_missing_fields_csv_for_project() {
 
 authoritative_worker_prompt_file_for_project() {
   local project="$1" prompt_file contract_file source_prompt_file
-  prompt_file="$(latest_prompt_file_for_project "$project")"
-  if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
-    printf '%s\n' "$prompt_file"
-    return 0
-  fi
   contract_file="$(worker_verification_contract_state_file "$project")"
   if [[ -f "$contract_file" ]]; then
     source_prompt_file="$(meta_env_value "$contract_file" "SOURCE_PROMPT_FILE")"
@@ -8533,6 +8528,11 @@ authoritative_worker_prompt_file_for_project() {
       printf '%s\n' "$source_prompt_file"
       return 0
     fi
+  fi
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
+    printf '%s\n' "$prompt_file"
+    return 0
   fi
   return 1
 }
