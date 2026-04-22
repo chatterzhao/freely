@@ -26,6 +26,7 @@
 - `PASS`: `sync-tooling` now also skips stale directories that still sit under the managed `*-worktrees` root but no longer belong to the authoritative worktree fleet, so runtime cannot rewrite `.freely/config.env` / `.githooks` into absorbed or deleted premerge lanes.
 - `PASS`: manager and worker prompt builds now publish explicit structured exit-contract directives, so the role-specific closeout contract is no longer implicit free text.
 - `PASS`: runtime now validates manager/worker exit contracts after `ai_exit_rc_0`, routes that handling through one unified dispatcher, and reuses the exact current resume target when it must repair a missing or malformed contract.
+- `PASS`: manager `EXIT_KIND=stop_ai` is now rejected whenever authoritative supervision still shows a runtime-owned expected-running worker down/degraded; runtime writes a repair handoff instead of legally ending autonomy while recovery remains unresolved.
 - `PASS`: focused regressions cover manager-invalid repair, manager-stop, worker-invalid repair, worker-done stop, worker prompt directive injection, cleanup worker materialization, and retained-merged cleanup followthrough coexistence.
 - `PASS`: cleanup-governance handoff workers that still have external cleanup surfaces are now explicitly protected from merged-lane reclaim/settle, and a focused regression proves runtime leaves them launchable instead of auto-closing them as `retire_ready_merged_worker`.
 - `PASS`: the merged-lane guard now resolves that authoritative cleanup prompt through `worker-verification-contract.env` when the target worktree no longer has a local `prompt-*.txt`, which matches the canonical `develop` reproduction.
@@ -76,15 +77,24 @@
 39. `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`
 40. `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
 41. `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
-42. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
-43. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
-44. `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
-45. `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
-46. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-retire-ready-merged-prompt`
-47. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
-48. `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
-49. `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
-50. `bash docs/system/workspace/scripts/tests/test-freely-retire-ready-merged-cleanup-handoff-not-reclaimed`
+42. `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`
+43. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
+44. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
+45. `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
+46. `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
+47. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-retire-ready-merged-prompt`
+48. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
+49. `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
+50. `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
+51. `bash docs/system/workspace/scripts/tests/test-freely-retire-ready-merged-cleanup-handoff-not-reclaimed`
+
+## 2026-04-21 23:12 PDT Manager Stop Guard Verification
+
+- `FAIL`: canonical `develop` replay still allowed manager to legally emit `EXIT_KIND=stop_ai` even when authoritative supervision truth showed a runtime-owned expected-running worker had failed and remained unresolved, so autonomy could terminate before recovery/cleanup followthrough completed.
+- `PASS`: manager exit-contract directives now surface the unresolved expected-running-worker count, and post-cycle runtime handling blocks `stop_ai` whenever that count is non-zero by writing a same-session repair handoff instead.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`
+- `PASS`: `./bin/governance-check`
+- `PENDING`: absorb this stop-guard repair into canonical `develop`, then rerun daemon self-host acceptance until Freely completes one real task, lawfully closes the corresponding worktree, and advances to the next task instead of stopping at the first unresolved worker failure.
 
 ## 2026-04-21 18:15 PDT Worker Bootstrap Guard Followthrough
 

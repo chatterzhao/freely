@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/manager-launch-state-continuity-supersession-20260421`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-manager-launch-state-continuity-supersession`
-- updated_at: `2026-04-21 08:31 PDT`
+- branch: `feature/manager-exit-contract-expected-worker-guard-20260421`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-manager-exit-contract-expected-worker-guard`
+- updated_at: `2026-04-21 23:12 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -43,6 +43,9 @@
 - Runtime now only classifies a merged worker lane as absorbed after that worktree has recorded worker state, while cleanup followthrough prompts with complete verification metadata remain launchable until the lane is actually retire-ready.
 - Focused regressions now cover current-format continuity anchoring, active-worker state projection, stale discovery cache refresh before launch, retire-ready merged prompt suppression, and absorbed-merged dirty-worker recovery suppression in addition to the earlier direct worker-delegation launch checks.
 - Canonical `develop` daemon replay then exposed one more same-owner state-refresh seam: after manager wrote a new manager-owned continuity with no worker prompt, `manager_worker_launch_state.env` could keep advertising an older queued worker prompt and an older consumed continuity as the current truth.
+- Canonical `develop` replay now exposes a narrower autonomy-stop seam: even after worker recovery logic exists, manager can still legally terminate with `EXIT_KIND=stop_ai` while authoritative supervision truth shows a runtime-owned expected-running worker remains down/degraded.
+- This followthrough now counts unresolved expected-running workers directly from manager supervision truth, surfaces that count in the manager exit-contract directive, and refuses `stop_ai` by forcing a same-session repair handoff until recovery/cleanup resolves the worker.
+- A focused regression proves runtime now blocks premature manager stop when a worker remains unresolved, and the guarded test-pre-merge lane passed that new regression plus `./bin/governance-check`.
 - The result was another `fresh_with_handoff` patrol that saw the latest continuity excerpt but still carried stale queued prompt state, so manager stayed in verification judgment without ever advancing the cleanup-only task it had already selected.
 - Runtime now treats manager-authored no-worker continuity as authoritative enough to supersede stale queued worker-prompt state, while still preserving older unconsumed prompts across newer runtime-seeded startup stubs and runtime fallback continuity.
 - Canonical `develop` daemon replay then exposed one more tool-availability seam: after `cc` ended `tool_runtime_failure`, cross-tool recovery could still select `kiro-cli` even though the immediately preceding self-host evidence had already proven this machine was at Kiro monthly request limit.
@@ -323,6 +326,6 @@ All commands passed again in the feature worktree during this worker continuatio
 
 ## Next Action
 
-1. Replay `feature/runtime-daemon-self-loop-blocker-20260421 -> test-pre-merge-20260421-runtime-self-loop-blocker -> develop` through `./bin/merge-guarded` with this refreshed evidence included.
+1. Replay `feature/manager-exit-contract-expected-worker-guard-20260421 -> test-pre-merge-20260421-manager-exit-contract-expected-worker-guard -> develop` through `./bin/merge-guarded` with this refreshed owner evidence included.
 2. On canonical `develop`, run `./bin/freely daemon start` until one task completes to the current-project success standard, its temporary worktree closes lawfully, and the daemon proceeds to the next task.
-3. Retire the temporary blocker worktree and disposable test-pre-merge branch after canonical replay succeeds.
+3. Retire the temporary feature/test-pre-merge lanes for this stop-guard followthrough after canonical replay succeeds.
