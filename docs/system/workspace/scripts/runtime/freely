@@ -11939,7 +11939,7 @@ supervisor_startup_lifecycle_in_flight() {
             seq = substr($i, 5)
           }
         }
-        if (checkpoint == "L020" || checkpoint == "L021" || checkpoint == "L022") {
+        if (checkpoint == "L010" || checkpoint == "L020" || checkpoint == "L021" || checkpoint == "L022") {
           print seq "|" $1 "|" checkpoint
         }
       }
