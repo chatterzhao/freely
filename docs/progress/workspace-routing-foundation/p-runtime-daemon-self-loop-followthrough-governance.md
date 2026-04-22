@@ -6,8 +6,8 @@
 - phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/manager-exit-contract-expected-worker-guard-20260421`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-manager-exit-contract-expected-worker-guard`
+- branch: `feature/network-reconnect-defer-and-origin-fallback-20260422`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-network-reconnect-defer-and-origin-fallback`
 - updated_at: `2026-04-21 23:12 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -60,6 +60,10 @@
 - Runtime now refuses to bootstrap worker targets outside the authoritative `git worktree list --porcelain` fleet, requires missing-config worker init to succeed before any post-init config writes continue, and carries `--accept-default-autonomy` during that bounded runtime-owned bootstrap path.
 - The same autonomous-loop owner then exposed one more supervisor seam in the bounded repair space: manager and worker rounds could end without a machine-checkable exit artifact, so runtime had no precise contract for `stop_ai`, `resume_manager`, `delegate_workers`, `worker_done`, `worker_blocked`, or `worker_handoff_needed`, and could not force the same session to repair missing closeout state before broader patrol resumed.
 - Runtime now injects explicit manager/worker exit-contract directives into prompts, clears stale role-specific contract files before each new AI cycle, validates the resulting artifact after `ai_exit_rc_0`, and reuses the exact `LAST_TOOL_RESUME_TARGET` to repair missing or malformed contracts before any broader followthrough continues.
+- Canonical `develop` self-host replay then exposed one more runtime/tool-boundary seam: `monitor-ai-cli` treated Codex `ERROR: Reconnecting... x/5` as immediate network-failure evidence, so the current tool could be killed and cross-tool fallback could start before Codex exhausted its own retry loop.
+- The monitor now leaves reconnect-in-progress output alone and lets the tool exit naturally; post-exit runtime classification still maps pure reconnect evidence to the bounded `execution_network_transient` / `execution_network_persistent` path, while hard failures like Codex 429 remain immediate monitor-level kill signals.
+- The same replay family also exposed one more recovery-memory seam: after exhausting `cc`, `iflow`, and `kiro-cli` inside one bounded fallback episode, project tool selection could remain pinned to the last failed fallback instead of returning to the original tool for the next retry.
+- Runtime auto-recovery now remembers the origin tool for the current episode, preserves attempted-tool memory across the episode, and restores the original tool once every configured fallback has failed.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
 
 ## 2026-04-21 20:55 PDT Exit Contract Enforcement Followthrough
