@@ -1154,6 +1154,15 @@ project_worktrees_root_for_path() {
   echo "${project_parent}/${project_name}-worktrees"
 }
 
+project_path_is_under_worktrees_root() {
+  local project="$1" target_path="$2"
+  local normalized_target normalized_root
+  [[ -n "$target_path" ]] || return 1
+  normalized_target="$(normalize_runtime_worktree_path "$target_path")"
+  normalized_root="$(normalize_runtime_worktree_path "$(project_worktrees_root_for_path "$project")")"
+  [[ "$normalized_target" == "$normalized_root"/* ]]
+}
+
 project_tool_wrapper_dir() {
   local project="$1"
   echo "$project/.freely/bin"
@@ -4294,6 +4303,12 @@ sync_project_tooling_from_source() {
     log_warn "skip tooling sync: source config missing at $source_cfg"
     return 0
   }
+  if [[ "$target_project" != "$source_project" ]] && project_path_is_under_worktrees_root "$source_project" "$target_project"; then
+    if ! project_has_authoritative_worktree_path "$source_project" "$target_project"; then
+      log_warn "skip tooling sync: target worktree is outside authoritative git worktree inventory: $target_project"
+      return 0
+    fi
+  fi
 
   mkdir -p "$(dirname "$target_cfg")"
   cp "$source_cfg" "$target_cfg"
