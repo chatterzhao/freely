@@ -93,31 +93,6 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
 - completion_note: `This bounded followthrough owner exists only because real 2026-04-21 dogfooding still found one daemon self-loop blocker after the broader runtime lifecycle owners landed. Completion remains blocked until canonical develop proves Freely can finish one task to the current-project success standard, close the worktree, and continue to the next task.`
 
-1. `I-20260421-1330-A`
-- title: Absorbed merged lane routing followthrough governance
-- milestone_state: candidate
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-absorbed-merged-lane-routing-followthrough-governance.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md`
-- evidence:
-  - `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
-  - `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md`
-  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-absorbed-merged-lane-routing-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status`
-  - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status-absorbed-merged-worker-role`
-  - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan`
-  - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan-routes-absorbed-merged-progress-to-cleanup`
-- completion_note: `This bounded followthrough owner exists only because canonical develop still routed absorbed merged lanes as if they were edit-ready workers after the relaunch guards landed. Completion remains blocked until canonical develop proves Freely now chooses a real launchable task, finishes it to the current-project success standard, closes the worktree, and continues.`
-
 1. `I-20260419-0915-A`
 - title: Three-loop lifecycle single-source governance followthrough
 - milestone_state: committed
@@ -485,7 +460,7 @@ routing_policy:
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md`
-- next_action: Candidate mirror only. `I-20260421-1330-A` is now the canonical owner for downgrading absorbed merged lanes in fleet status and task-source-scan while preserving cleanup visibility and final develop self-host acceptance.
+- next_action: Candidate mirror only. `I-20260421-1330-A` is now the canonical owner for downgrading absorbed merged lanes in fleet status and task-source-scan while preserving cleanup visibility; current state is cleanup-governance / retirement_handoff followthrough with explicit retire-only disposition for the absorbed feature/test-pre-merge pair, so manager may review the linked ancestry proof and unblock `I-20260421-1200-A` before ordinary retirement cleanup.
 - revisit_trigger: Re-open only if canonical develop still routes absorbed merged lanes back into edit execution after this bounded downgrade, or if future dogfooding proves cleanup visibility and execution visibility still cannot stay separated without a larger owner.
 
 1. `C-20260419-0915-A`
@@ -1033,6 +1008,48 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260421-1330-A`
+- title: Absorbed merged lane routing followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-absorbed-merged-lane-routing-followthrough-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md`
+- evidence:
+  - `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
+  - `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md`
+  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-absorbed-merged-lane-routing-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status`
+  - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status-absorbed-merged-worker-role`
+  - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan`
+  - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan-routes-absorbed-merged-progress-to-cleanup`
+- cleanup_gate: `manager-review-ready`
+- cleanup_targets:
+  - path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-absorbed-merged-scan-routing-fix`
+    branch: `feature/absorbed-merged-scan-routing-fix-20260421`
+    disposition: `retire-only`
+    local_branch_disposition: `retained-with-reason`
+    local_branch_reason: ordinary manager/supervisor retirement cleanup should delete the already absorbed local branch/worktree after review of this canonical handoff
+    remote_branch_disposition: `retained-with-reason`
+    remote_branch_reason: no matching `origin` or `github` remote branch exists to delete
+  - path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-test-pre-merge-absorbed-merged-scan-routing-fix`
+    branch: `test-pre-merge-20260421-absorbed-merged-scan-routing-fix`
+    disposition: `retire-only`
+    local_branch_disposition: `retained-with-reason`
+    local_branch_reason: ordinary manager/supervisor retirement cleanup should delete the already absorbed local batch branch/worktree after review of this canonical handoff
+    remote_branch_disposition: `retained-with-reason`
+    remote_branch_reason: no matching `origin` or `github` remote branch exists to delete
+- revisit_trigger: Reopen only if a fresh ancestry audit finds unique non-`develop` behavior or if manager retirement review discovers a concrete deletion blocker.
+- completion_note: `Canonical cleanup followthrough now proves the absorbed feature tip and absorbed test-pre-merge tip are already ancestors of both delegated-hand-off develop tip d0564874860d15530aa6c8fb97656cec771cc88c and current local develop tip cc2a01f26443e27b2ded09842bb61452d2f24b73. The absorbed feature/test-pre-merge pair is now explicitly retire-only, carries no unique commits versus develop (`0 66` and `0 62`), has no matching remote branch to delete, and a fresh 2026-04-22 06:10 UTC task-source-scan patrol still keeps this owner on cleanup-governance / retirement_handoff followthrough rather than replay; manager only needs to execute ordinary retirement cleanup rather than replay this owner.`
 
 1. `I-20260413-0420-D`
 - title: Manager startup continuity materialization governance
