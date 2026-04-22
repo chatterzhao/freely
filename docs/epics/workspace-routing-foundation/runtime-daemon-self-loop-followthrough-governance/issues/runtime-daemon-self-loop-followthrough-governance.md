@@ -72,6 +72,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 32. When runtime classifies tool failures as network, proxy, auth, or subscription seams, log explicit operator guidance that points at relay/base_url reachability, proxy mode, and provider access rather than leaving canonical self-host replay with an opaque retry loop.
 33. When Codex exits after exhausting its own reconnect loop with upstream `502 Bad Gateway` evidence, monitor/runtime must persist that outcome as execution-network failure truth instead of collapsing it into generic `tool_runtime_failure`.
 34. When manager materializes a cleanup followthrough worker prompt from continuity rather than reusing an existing prompt file, it must carry the authoritative `selected_tool` so stale retained cleanup worktrees do not relaunch on obsolete local tool config.
+35. Treat a Codex resume target as valid only when its rollout/session jsonl evidence is non-empty, so zero-byte persisted session files cannot send canonical cleanup followthrough back into `thread/resume failed: empty session file`.
 
 ## Non-Goals
 
@@ -99,6 +100,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 15. Canonical `develop` surfaces explicit runtime diagnostics for execution-network, proxy-config, auth, and Kiro subscription failures, including the effective proxy mode and the relevant config-file path, so supervision can distinguish network-path bugs from provider/quota misconfiguration during self-host replay.
 16. Canonical `develop` no longer routes exhausted Codex reconnect `502 Bad Gateway` exits into `tool_runtime_failure`; the bounded execution-network retry path remains authoritative for that failure family.
 17. Canonical `develop` no longer materializes cleanup followthrough worker prompts without `selected_tool`; retained cleanup worktrees with stale local config must be corrected to the continuity-selected tool before launch.
+18. Canonical `develop` no longer attempts `codex exec resume` against a zero-byte persisted rollout file; empty-session resume evidence must fall back to fresh launch/handoff so cleanup governance can keep progressing.
 
 ## Verification
 
@@ -138,6 +140,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-materialized-cleanup-worker-applies-selected-tool`
+- `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
 - `bash docs/system/workspace/scripts/tests/test-freely-retire-ready-merged-cleanup-handoff-not-reclaimed`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
@@ -163,6 +166,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-daemon-self-loop-followthrough-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+- `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
