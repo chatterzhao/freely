@@ -380,7 +380,6 @@ tool_run_direct_from_prompt_file() {
           return 1
         }
         args=(exec resume "$tool_resume_target" --skip-git-repo-check)
-        [[ -n "$worktrees_root" ]] && args+=(--add-dir "$worktrees_root")
       fi
       [[ -n "$model" ]] && args+=(-m "$model")
       [[ -n "$reasoning_effort" ]] && args+=(-c "model_reasoning_effort=\"$reasoning_effort\"")
