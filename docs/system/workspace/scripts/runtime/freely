@@ -5775,7 +5775,7 @@ tool_prefers_resume_evidence() {
 }
 
 tool_has_resume_evidence() {
-  local tool="$1"
+  local tool="$1" project="${2:-$PROJECT_ROOT}"
   local resume_target
   resume_target="$(tool_runtime_resume_target_before_launch "$tool" "$project")"
   if tool_prefers_explicit_resume_target "$tool"; then
@@ -5790,6 +5790,13 @@ tool_has_resume_evidence() {
   else
     return 0
   fi
+}
+
+session_handoff_rotation_reason() {
+  local project="$1" handoff_path
+  handoff_path="$(handoff_file "$project")"
+  [[ -f "$handoff_path" ]] || return 1
+  awk -F': ' '/^- rotation_reason:/ { print $2; exit }' "$handoff_path"
 }
 
 log_has_same_tool_route_only_handoff() {
@@ -11608,7 +11615,23 @@ EOF
 }
 
 select_launch_kind() {
-  if [[ "${FIRST_ROUND:-true}" == true ]]; then
+  local handoff_rotation_reason=""
+  handoff_rotation_reason="$(session_handoff_rotation_reason "$PROJECT_ROOT" || true)"
+
+  case "$handoff_rotation_reason" in
+    manager_exit_contract_repair|worker_exit_contract_repair)
+      LAUNCH_KIND_SELECTED="resume"
+      LAUNCH_ROTATION_REASON=""
+      return 0
+      ;;
+  esac
+
+  if [[ "${FIRST_ROUND:-true}" == true ]] \
+    && [[ ! -f "$(handoff_file "$PROJECT_ROOT")" ]] \
+    && [[ -z "${LAST_TOOL_RESUME_TARGET:-}" ]] \
+    && [[ -z "${LAST_TOOL_SESSION_ID:-}" ]] \
+    && [[ -z "${LAST_LAUNCH_KIND:-}" ]] \
+    && [[ -z "${LAST_CYCLE_LOG:-}" ]]; then
     LAUNCH_KIND_SELECTED="fresh"
     LAUNCH_ROTATION_REASON="initial_start"
     return 0
@@ -11644,7 +11667,7 @@ select_launch_kind() {
     return 0
   fi
 
-  if tool_prefers_resume_evidence "$AI_TOOL" && ! tool_has_resume_evidence "$AI_TOOL"; then
+  if tool_prefers_resume_evidence "$AI_TOOL" && ! tool_has_resume_evidence "$AI_TOOL" "$PROJECT_ROOT"; then
     LAUNCH_KIND_SELECTED="fresh_with_handoff"
     LAUNCH_ROTATION_REASON="missing_resume_evidence"
     return 0
@@ -14749,6 +14772,8 @@ start_project_runtime() {
       "expected_from_previous=L042" \
       "expected_next=L020|L090|L201|L210|L230|TERM"
 
+    FIRST_ROUND=false
+
     log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, secondary_rate_limit_used_percent=${secondary_rate_limit_used_percent:-unavailable}, secondary_rate_limit_resets_at=${secondary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
     rm -f "$child_pid_file"
 
@@ -14788,7 +14813,6 @@ start_project_runtime() {
       manager_runtime_launch_workers_after_ai_cycle_if_needed "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON" >/dev/null
     fi
 
-    FIRST_ROUND=false
     restart_count=$((restart_count + 1))
     if [[ "${MAX_RESTARTS:-0}" -gt 0 && "$restart_count" -gt "${MAX_RESTARTS:-0}" ]]; then
       log_error "reached MAX_RESTARTS=${MAX_RESTARTS}, stopping"

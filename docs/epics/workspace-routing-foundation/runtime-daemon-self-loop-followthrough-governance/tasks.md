@@ -13,3 +13,4 @@
 - [x] Reuse the exact current role resume target when an exit contract artifact is missing or malformed, and block broader patrol until that same session repairs the contract.
 - [x] Keep cleanup-governance handoff workers launchable when their prompt still carries full verification metadata and external cleanup scope, instead of auto-settling them as merged-lane retirement before the real cleanup work runs.
 - [x] Keep reconnect-in-progress logs on the bounded execution-network retry path until the current tool actually exits, and restore the original tool after one fallback episode exhausts every configured fallback.
+- [x] Keep exit-contract repair relaunches on the same resume path across supervisor restarts and same-process relaunch loops, so repair rounds do not regress into `initial_start`.
