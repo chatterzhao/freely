@@ -41,6 +41,7 @@
 23. Run `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`.
 24. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`.
 25. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`.
+26. Run `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-model-refresh-timeout`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -156,6 +157,18 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+
+### Benign Codex model-refresh timeout noise does not trigger runtime failure
+- id: `codex-model-refresh-timeout-noise-ignored`
+- requirement: `Known benign Codex startup noise about model-refresh timeout must not write a runtime failure marker or trigger control-plane recovery.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#16`
+- case_design: `Emit only the known Codex model-refresh timeout line, confirm monitor-ai-cli records no failure marker, then keep adjacent real-failure regressions green so 429 and reconnect handling still behave as designed.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-daemon-recovery-verification.md`
 
 ### Exhausted fallback episodes restore the original tool
 - id: `fallback-episode-restores-origin-tool`

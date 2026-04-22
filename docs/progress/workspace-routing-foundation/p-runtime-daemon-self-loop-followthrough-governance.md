@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/daemon-runtime-failure-recovery-preserves-daemon-20260422`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-daemon-runtime-failure-recovery-preserves-daemon`
-- updated_at: `2026-04-22 03:44 PDT`
+- branch: `feature/monitor-codex-model-refresh-timeout-ignore-20260422`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-monitor-codex-model-refresh-timeout-ignore`
+- updated_at: `2026-04-22 04:18 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -48,6 +48,9 @@
 - A focused regression proves runtime now blocks premature manager stop when a worker remains unresolved, and the guarded test-pre-merge lane passed that new regression plus `./bin/governance-check`.
 - The result was another `fresh_with_handoff` patrol that saw the latest continuity excerpt but still carried stale queued prompt state, so manager stayed in verification judgment without ever advancing the cleanup-only task it had already selected.
 - Runtime now treats manager-authored no-worker continuity as authoritative enough to supersede stale queued worker-prompt state, while still preserving older unconsumed prompts across newer runtime-seeded startup stubs and runtime fallback continuity.
+- Canonical `develop` replay then exposed one more monitor/runtime seam: Codex could print `failed to refresh available models: timeout waiting for child process to exit` during an otherwise successful manager round, and `monitor-ai-cli.sh` misclassified that single line as `tool_runtime_failure`.
+- The monitor now strips that known benign Codex startup noise before runtime-failure classification, so a normal manager patrol no longer falls into same-tool / cross-tool recovery just because model refresh lagged during startup.
+- Focused verification passed for the new benign-noise regression while the adjacent real-failure regressions for Codex 429 and reconnect defer stayed green.
 - Canonical `develop` daemon replay then exposed one more tool-availability seam: after `cc` ended `tool_runtime_failure`, cross-tool recovery could still select `kiro-cli` even though the immediately preceding self-host evidence had already proven this machine was at Kiro monthly request limit.
 - Runtime now persists `kiro_monthly_request_limit` as a tool-availability state with a recovery hint and skips that cached-unavailable Kiro candidate during later auto-switch / manager bootstrap selection, instead of re-burning the same exhausted tool before moving on.
 - Canonical `develop` self-host replay then exposed one more same-owner followthrough seam: guarded merge push followthrough had already succeeded, but local `origin/develop` tracking truth still lagged behind `HEAD`, so manager/live-status kept surfacing `develop_push_followthrough_state=push_pending` and continued to treat protected push followthrough as an unresolved gating fact.
