@@ -229,8 +229,19 @@ runtime_error_signal_excerpt() {
 
 log_has_runtime_network_failure() {
   local current_log_file="$1" current_debug_log_file="${2:-}"
-  runtime_error_signal_excerpt "$current_log_file" "$current_debug_log_file" "$prompt_file" | rg -qi \
-    'ERROR:\s*Reconnecting|worker quit with fatal: Transport channel closed|invalid peer certificate|certificate was not trusted|certificate expired|received fatal alert|websocket: failed to connect|connection closed via error|curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error'
+  local excerpt=""
+  excerpt="$(runtime_error_signal_excerpt "$current_log_file" "$current_debug_log_file" "$prompt_file" || true)"
+  [[ -n "$excerpt" ]] || return 1
+
+  # Let tools finish their own reconnect/backoff loop without a monitor-level
+  # kill. Post-exit runtime recovery classifies reconnect logs and applies the
+  # bounded execution-network backoff policy; hard network failures still trip
+  # immediately here.
+  if printf '%s\n' "$excerpt" | rg -qi \
+    'worker quit with fatal: Transport channel closed|invalid peer certificate|certificate was not trusted|certificate expired|received fatal alert|websocket: failed to connect|connection closed via error|curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error'; then
+    return 0
+  fi
+  return 1
 }
 
 log_has_runtime_tool_failure() {
