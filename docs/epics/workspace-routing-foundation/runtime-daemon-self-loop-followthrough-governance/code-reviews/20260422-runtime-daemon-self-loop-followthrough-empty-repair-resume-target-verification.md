@@ -22,3 +22,11 @@
 
 - `PASS`: bounded feature-lane regression coverage now distinguishes verified repair resumes from empty-target repair fallbacks.
 - `PENDING`: guarded premerge + canonical `develop` replay still need to prove this owner reaches retained cleanup closeout, retires the temporary blocker lane, and continues to the next task.
+
+## Implementation Decision Note
+
+- decision: `Permit repair-handoff resume only when the resolved Codex resume target is non-empty and still backed by verified rollout evidence; otherwise rotate to fresh_with_handoff.`
+- why_this: `The new failing replay no longer concerned bad session files themselves. Runtime had already lost usable resume truth, yet the repair shortcut still bypassed launch-kind evidence checks and pushed an empty target into monitor preflight. Reusing the existing evidence gate in the repair branch is the smallest truthful repair.`
+- alternatives_considered: `Let monitor reject the empty target and rely on a later retry; special-case only manager_exit_contract_repair while leaving worker repair inconsistent; redesign session tracking around PID/process state instead of the existing session/resume-target contract.`
+- boundary_non_goals: `No PID-driven resume model, no broader session-store redesign, no tool/slot policy changes, and no claim that daemon self-host success is complete before canonical develop proves task completion, upward merge, retirement, and next-task continuation.`
+- residual_risk: `If future repair continuity can carry a non-empty but stale resume target whose rollout file looks valid yet cannot actually resume, canonical replay may expose another narrower evidence-validity seam beyond the current empty-target guard.`
