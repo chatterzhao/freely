@@ -67,6 +67,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 27. Keep reconnect-in-progress runtime output on the bounded execution-network retry path until the current tool actually exits; `ERROR: Reconnecting... x/5` must not trigger monitor-level early kill or immediate cross-tool switch.
 28. When one bounded cross-tool recovery episode exhausts every fallback tool, restore the original tool selection for the next retry instead of leaving the project pinned to the last failed fallback.
 29. Preserve `manager_exit_contract_repair` / `worker_exit_contract_repair` relaunches across supervisor restarts and same-process relaunch loops, so repair rounds resume the same tool context instead of falling back to a fresh `initial_start` patrol.
+30. Ignore the known benign Codex startup line `failed to refresh available models: timeout waiting for child process to exit` so monitor/runtime do not treat an otherwise successful manager patrol round as `tool_runtime_failure`.
 
 ## Non-Goals
 
@@ -115,6 +116,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-defers-codex-reconnect-until-retries-exhaust`
+- `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-model-refresh-timeout`
 - `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`
@@ -164,6 +166,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
 - `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt`
 - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-defers-codex-reconnect-until-retries-exhaust`
+- `docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-model-refresh-timeout`
 - `docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
 - `docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
 - `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
