@@ -27,6 +27,7 @@
 - `PASS`: manager and worker prompt builds now publish explicit structured exit-contract directives, so the role-specific closeout contract is no longer implicit free text.
 - `PASS`: runtime now validates manager/worker exit contracts after `ai_exit_rc_0`, routes that handling through one unified dispatcher, and reuses the exact current resume target when it must repair a missing or malformed contract.
 - `PASS`: focused regressions cover manager-invalid repair, manager-stop, worker-invalid repair, worker-done stop, worker prompt directive injection, cleanup worker materialization, and retained-merged cleanup followthrough coexistence.
+- `PASS`: cleanup-governance handoff workers that still have external cleanup surfaces are now explicitly protected from merged-lane reclaim/settle, and a focused regression proves runtime leaves them launchable instead of auto-closing them as `retire_ready_merged_worker`.
 - `PASS`: focused regressions and nearby daemon/live-status coverage passed on the guarded source lane, and the protected test lane replay still passed after the retirement followthrough repair.
 - `PENDING`: the final protected-branch acceptance remains canonical `develop` self-host execution where Freely finishes one task to the current-project success standard, closes the worktree, and continues to the next task.
 
@@ -81,6 +82,7 @@
 47. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
 48. `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
 49. `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
+50. `bash docs/system/workspace/scripts/tests/test-freely-retire-ready-merged-cleanup-handoff-not-reclaimed`
 
 ## 2026-04-21 18:15 PDT Worker Bootstrap Guard Followthrough
 

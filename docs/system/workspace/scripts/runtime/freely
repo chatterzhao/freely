@@ -8683,6 +8683,12 @@ retire_ready_merged_worktree_can_reclaim_ownership() {
   local manager_project="$1" target_worktree="$2" branch="${3:-}" prompt_file=""
   [[ -n "$manager_project" && -n "$target_worktree" && -d "$target_worktree" ]] || return 1
   prompt_file="$(latest_prompt_file_for_project "$target_worktree")"
+  if [[ -n "$prompt_file" && -f "$prompt_file" ]] \
+    && [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]] \
+    && worker_prompt_has_verification_metadata "$prompt_file" \
+    && worker_prompt_spans_external_cleanup_surfaces "$manager_project" "$prompt_file"; then
+    return 1
+  fi
   if worker_project_is_retire_ready_merged_followthrough "$manager_project" "$target_worktree" "$branch" "$prompt_file" || \
     worker_prompt_targets_retire_ready_merged_worktree "$manager_project" "$prompt_file"; then
     return 0
@@ -11248,6 +11254,12 @@ settle_retire_ready_merged_worker_runtime_state() {
   local manager_project="$1" target_project="$2" branch="${3:-}" worker_prompt_file="" supervisor_pid="" ai_pid=""
   [[ -n "$manager_project" && -n "$target_project" && -d "$target_project" ]] || return 1
   worker_prompt_file="$(latest_prompt_file_for_project "$target_project")"
+  if [[ -n "$worker_prompt_file" && -f "$worker_prompt_file" ]] \
+    && [[ "$(worker_prompt_normalized_intent_kind "$worker_prompt_file")" == "cleanup" ]] \
+    && worker_prompt_has_verification_metadata "$worker_prompt_file" \
+    && worker_prompt_spans_external_cleanup_surfaces "$manager_project" "$worker_prompt_file"; then
+    return 1
+  fi
   if ! worker_project_is_absorbed_merged_lane "$manager_project" "$target_project" "$branch" \
     && ! worker_project_is_retire_ready_merged_followthrough "$manager_project" "$target_project" "$branch" "$worker_prompt_file" \
     && ! worker_prompt_targets_retire_ready_merged_worktree "$manager_project" "$worker_prompt_file"; then
