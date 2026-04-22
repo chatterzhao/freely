@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-retire-ready-cleanup-handoff.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+TARGET_WT="$TMP_DIR/worktrees/cleanup-handoff"
+
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$PROJECT/docs/pre-brainstorms/20260421-0000--sample" "$TMP_DIR/worktrees"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260421-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260421-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260421-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m init
+
+git -C "$PROJECT" worktree add -q -b feature/cleanup-handoff "$TARGET_WT" develop
+mkdir -p "$TARGET_WT/.freely/run" "$TARGET_WT/.freely/logs"
+echo handoff >"$TARGET_WT/handoff.txt"
+git -C "$TARGET_WT" add handoff.txt
+git -C "$TARGET_WT" commit -q -m "cleanup handoff fixture"
+git -C "$PROJECT" merge --no-ff -m "merge cleanup handoff fixture" feature/cleanup-handoff >/dev/null
+
+mkdir -p \
+  "$TARGET_WT/docs/epics/workspace-routing-foundation/sample/issues" \
+  "$TARGET_WT/docs/epics/workspace-routing-foundation/sample/code-reviews" \
+  "$TARGET_WT/docs/progress/workspace-routing-foundation"
+
+cat >"$TARGET_WT/.freely/config.env" <<EOF
+PROJECT_ROOT="$TARGET_WT"
+INTENT_FILE="$TARGET_WT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$TARGET_WT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+cat >"$TARGET_WT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_exit_rc_0"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-21T12:00:00Z"
+EOF
+
+PROMPT_FILE="$TARGET_WT/.freely/run/prompt-cleanup-handoff.txt"
+cat >"$PROMPT_FILE" <<EOF
+Worktree:
+- \`$TARGET_WT\`
+Branch:
+- \`feature/cleanup-handoff\`
+dispatch_priority: \`P0\`
+parallel_safe: \`false\`
+write_scope:
+- \`$TARGET_WT/docs/epics/workspace-routing-foundation/sample/issues/sample.md\`
+- \`$TARGET_WT/docs/progress/workspace-routing-foundation/p-sample.md\`
+- \`$TARGET_WT/.freely/run/\`
+intent_kind: \`cleanup\`
+intent_target: \`sample cleanup handoff\`
+Owner-Issue:
+- \`$TARGET_WT/docs/epics/workspace-routing-foundation/sample/issues/sample.md\`
+Pre-Tests-Path:
+- \`$TARGET_WT/docs/epics/workspace-routing-foundation/sample/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`$TARGET_WT/docs/epics/workspace-routing-foundation/sample/code-reviews\`
+Required-Test-Lanes:
+- \`cleanup-handoff\`
+Required-Acceptance-Item-Ids:
+- \`cleanup-handoff-complete\`
+Minimum-Evidence-Level: \`cleanup reconcile evidence\`
+Target-Environment: \`feature/cleanup-handoff\`
+Closeout-Gate: \`Only claim closeout after retained merged cleanup targets are retired or explicitly left with bounded followthrough evidence\`
+Closeout-Gate-Command: \`./bin/freely daemon start --project $PROJECT\`
+Closeout-Target-Lane: \`develop\`
+Closeout-Promotion-Gate: \`Retire retained merged worktrees for cleanup-handoff without reopening replay\`
+Closeout-Requires-Adequacy: \`true\`
+Closeout-Review-Artifact-Policy: \`Append cleanup receipts, retained-vs-retired disposition, and fleet closeout evidence to the owner verification artifact\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+if retire_ready_merged_worktree_can_reclaim_ownership "$PROJECT" "$TARGET_WT" "feature/cleanup-handoff"; then
+  echo "[FAIL] cleanup handoff worktree should not be reclaimed before its external cleanup surfaces run" >&2
+  exit 1
+fi
+
+if settle_retire_ready_merged_worker_runtime_state "$PROJECT" "$TARGET_WT" "feature/cleanup-handoff"; then
+  echo "[FAIL] cleanup handoff worktree should not be auto-settled as retire-ready merged worker" >&2
+  exit 1
+fi
+
+grep -q '^LAST_EXIT_REASON="ai_exit_rc_0"$' "$TARGET_WT/.freely/run/workcell-state.env"
+
+echo "[PASS] merged cleanup handoff worktree is not reclaimed before external cleanup surfaces run"
