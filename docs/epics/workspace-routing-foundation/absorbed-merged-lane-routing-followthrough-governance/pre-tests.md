@@ -20,7 +20,8 @@
 2. Run `bash docs/system/workspace/scripts/tests/test-wt-fleet-status-absorbed-merged-worker-role`.
 3. Run `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan`.
 4. Run `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan-routes-absorbed-merged-progress-to-cleanup`.
-5. Run `./bin/governance-check`.
+5. Run `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`.
+6. Run `./bin/governance-check`.
 
 ## End-to-End
 - acceptance target: `Guarded replay must carry the owner chain into develop before the final self-host daemon acceptance is trusted.`

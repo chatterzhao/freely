@@ -42,6 +42,7 @@ This owner exists to downgrade those absorbed lanes to cleanup-followthrough vis
 3. Add focused regressions for both downgraded surfaces plus nearby scan/fleet coverage.
 4. Replay the guarded feature -> test-pre-merge -> develop chain.
 5. Re-run canonical `develop` self-host acceptance so Freely must pick a real task, complete it to the current-project success standard, close the worktree, and continue.
+6. When cleanup-governance continuity already proves retained merged lanes are `retire-only`, force the next manager resume/handoff round to demand a concrete `retirement_handoff` worker instead of allowing another no-worker continuity loop.
 
 ## Non-Goals
 
@@ -64,6 +65,7 @@ This owner exists to downgrade those absorbed lanes to cleanup-followthrough vis
 - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status-absorbed-merged-worker-role`
 - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan`
 - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan-routes-absorbed-merged-progress-to-cleanup`
+- `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
 - `./bin/governance-check`
 - canonical `develop` self-host replay: `./bin/freely daemon start`
 
@@ -76,7 +78,9 @@ This owner exists to downgrade those absorbed lanes to cleanup-followthrough vis
 - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-absorbed-merged-lane-routing-followthrough-governance.md`
 - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
+- `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/runtime/task-source-scan.py`
 - `docs/system/workspace/scripts/worktree/wt-fleet-status`
 - `docs/system/workspace/scripts/tests/test-wt-fleet-status-absorbed-merged-worker-role`
 - `docs/system/workspace/scripts/tests/test-freely-task-source-scan-routes-absorbed-merged-progress-to-cleanup`
+- `docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
