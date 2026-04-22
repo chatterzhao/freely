@@ -4,11 +4,11 @@
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - title: `Runtime daemon self-loop followthrough governance`
 - phase_state: `in_verification`
-- runtime_state: `stopped`
+- runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/codex-reconnect-exhaustion-network-marker-20260422`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-codex-reconnect-exhaustion-network-marker`
-- updated_at: `2026-04-22 07:09 PDT`
+- branch: `feature/cleanup-worker-prompt-selected-tool-20260422`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-cleanup-worker-prompt-selected-tool`
+- updated_at: `2026-04-22 08:05 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -150,6 +150,19 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
 - `PENDING`: absorb this repair into canonical `develop`, then rerun daemon self-host acceptance until one real task completes, the relevant worktree closes, and the daemon advances to another task.
+
+## 2026-04-22 08:05 PDT Materialized Cleanup Worker Selected-Tool Followthrough
+
+- `FAIL`: canonical `develop` self-host replay advanced to manager-selected cleanup followthrough for `I-20260421-1200-A`, but the materialized cleanup worker prompt omitted `selected_tool`, so the retained cleanup worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-runtime-daemon-self-loop-blocker` kept relaunching on stale local `AI_TOOL=\"cc-use-codex-cli\"` and immediately re-entered runtime failure instead of closing the owner cleanup lane.
+- `PASS`: `materialize_cleanup_worker_prompt_from_manager_continuity_if_needed()` now reads the authoritative tool from manager continuity first and falls back to current project tool truth only when continuity lacks it, then writes `- selected_tool: \`...\`` into the generated cleanup worker prompt.
+- `PASS`: existing launch/recovery paths already honor `selected_tool`, so the narrow repair keeps cleanup materialization aligned with the same prompt contract manager launch and worker verification contract recovery already consume.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-materialized-cleanup-worker-applies-selected-tool`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-applies-selected-tool`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-restart-reapplies-selected-tool-from-verification-contract`
+- `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-cleanup-worker-prompt-selected-tool --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- `PASS`: `./bin/governance-check`
+- `PENDING`: promote through fresh protected premerge, merge into canonical `develop`, then restart daemon replay and verify the retained cleanup lane actually relaunches as `codex`, retires lawfully, and Freely advances to the next task.
 
 ## 2026-04-21 17:55 PDT Codex Resume Add-Dir Followthrough
 

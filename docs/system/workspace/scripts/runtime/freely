@@ -7739,7 +7739,7 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
   local project="$1" continuity_file="$2"
   local route_kind primary_row primary_path primary_branch _desired _role_hint
   local owner_issue_rel owner_issue_source owner_issue_abs pre_tests_rel verification_rel issue_id prompt_file
-  local write_scope_path target_environment
+  local write_scope_path target_environment cleanup_selected_tool current_tool _ current_truth
 
   [[ -n "$project" && -f "$continuity_file" ]] || return 1
   latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | grep -q . && return 1
@@ -7765,6 +7765,12 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
   issue_id="$(markdown_backtick_field_value "$owner_issue_source" "issue_id")"
   [[ -n "$issue_id" ]] || issue_id="$(manager_continuity_cleanup_issue_id "$continuity_file")"
   [[ -n "$issue_id" ]] || issue_id="cleanup-governance"
+  cleanup_selected_tool="$(manager_continuity_backtick_field_value "$continuity_file" "selected_tool")"
+  if [[ -z "$cleanup_selected_tool" ]]; then
+    current_truth="$(project_tool_runtime_selection_truth "$project")"
+    IFS='|' read -r current_tool _ <<<"$current_truth"
+    cleanup_selected_tool="${current_tool:-${AI_TOOL:-}}"
+  fi
 
   prompt_file="$(manager_cleanup_prompt_file_for_continuity "$project" "$continuity_file")"
   mkdir -p "$(dirname "$prompt_file")"
@@ -7782,6 +7788,9 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
     done < <(manager_cleanup_prompt_write_scope_paths_from_continuity "$project" "$continuity_file")
     printf 'intent_kind: `cleanup`\n'
     printf 'intent_target: `%s`\n' "$primary_path"
+    if [[ -n "$cleanup_selected_tool" ]]; then
+      printf -- '- selected_tool: `%s`\n' "$cleanup_selected_tool"
+    fi
     printf 'Owner-Issue:\n'
     printf -- '- `%s`\n' "$owner_issue_abs"
     printf 'Pre-Tests-Path:\n'
