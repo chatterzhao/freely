@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/network-reconnect-defer-and-origin-fallback-20260422`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-network-reconnect-defer-and-origin-fallback`
-- updated_at: `2026-04-21 23:12 PDT`
+- updated_at: `2026-04-22 03:15 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -366,3 +366,15 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: reran `./bin/governance-check`.
 - `PASS`: replayed the same three runtime regressions plus `./bin/governance-check` on fresh protected lane `test-pre-merge-20260421-manager-exit-contract-expected-worker-guard-v2`; all passed there as well.
 - `PENDING`: rerun guarded `develop` merge with this owner evidence in the diff, then restart canonical `develop` runtime and continue self-host replay until Freely completes one task to the current-project success standard, closes that lane lawfully, and proceeds to the next task.
+
+## 2026-04-22 03:15 PDT Repair Handoff Relaunch Verification
+
+- `FAIL`: canonical `develop` self-host replay progressed to `manager_exit_contract_invalid`, but the next manager round relaunched as `fresh rotation_reason=initial_start`; that reopened broad patrol and allowed newer intake to supersede the repair round before a valid exit contract existed.
+- `PASS`: launch-kind selection now treats persisted `manager_exit_contract_repair` / `worker_exit_contract_repair` handoffs as resume-only relaunches and refuses to classify a restart with existing handoff/resume evidence as a true first launch.
+- `PASS`: the supervisor loop now flips `FIRST_ROUND=false` immediately after the first AI cycle, so same-process `resume_invalid` / `resume_manager` loops cannot regress into `initial_start` before the repair path completes.
+- `PASS`: `tool_has_resume_evidence()` now resolves resume evidence against the actual project root instead of an unbound local `project` variable during repair relaunch selection.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-new-intake-reentry`
+- `PASS`: replayed the same three regressions plus `bash -n docs/system/workspace/scripts/runtime/freely` on protected lane `test-pre-merge-20260422-manager-repair-handoff-intake-supersede`.
+- `PENDING`: rerun guarded `develop` merge with this refreshed owner evidence, then restart canonical `develop` daemon replay and verify the repair handoff now stays on same-context resume long enough to finish one task, retire the temporary lane, and continue to the next task.
