@@ -10280,6 +10280,18 @@ manager_exit_contract_kind() {
   meta_env_value "$contract_file" "EXIT_KIND"
 }
 
+manager_exit_contract_has_launchable_worker_prompt() {
+  local project="$1" worker_prompts_csv="$2" prompt_file
+  [[ -n "$worker_prompts_csv" ]] || return 1
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    if worker_prompt_launchable_for_manager_project "$project" "$prompt_file"; then
+      return 0
+    fi
+  done < <(printf '%s\n' "$worker_prompts_csv" | tr ',' '\n')
+  return 1
+}
+
 validate_manager_exit_contract_for_project() {
   local project="$1" contract_file kind missing_csv=""
   local stop_reason restart_point next_action why_not_stop why_not_delegate worker_prompts_csv
@@ -10316,6 +10328,9 @@ validate_manager_exit_contract_for_project() {
       ;;
     delegate_workers)
       [[ -n "$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "WORKER_PROMPTS_CSV")"
+      if [[ -n "$worker_prompts_csv" ]] && ! manager_exit_contract_has_launchable_worker_prompt "$project" "$worker_prompts_csv"; then
+        missing_csv="$(csv_append_unique_item "$missing_csv" "WORKER_PROMPTS_NOT_LAUNCHABLE")"
+      fi
       [[ -z "$stop_reason$restart_point$next_action$why_not_stop$why_not_delegate" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
       ;;
   esac
