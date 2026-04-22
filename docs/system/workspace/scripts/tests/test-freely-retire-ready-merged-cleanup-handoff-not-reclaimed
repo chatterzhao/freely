@@ -58,6 +58,7 @@ git -C "$PROJECT" merge --no-ff -m "merge cleanup handoff fixture" feature/clean
 mkdir -p \
   "$TARGET_WT/docs/epics/workspace-routing-foundation/sample/issues" \
   "$TARGET_WT/docs/epics/workspace-routing-foundation/sample/code-reviews" \
+  "$PROJECT/.freely/run/worker-prompts" \
   "$TARGET_WT/docs/progress/workspace-routing-foundation"
 
 cat >"$TARGET_WT/.freely/config.env" <<EOF
@@ -78,7 +79,7 @@ LAST_ROLE_HINT="worker"
 LAST_STATE_UPDATED_AT="2026-04-21T12:00:00Z"
 EOF
 
-PROMPT_FILE="$TARGET_WT/.freely/run/prompt-cleanup-handoff.txt"
+PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/prompt-cleanup-handoff.txt"
 cat >"$PROMPT_FILE" <<EOF
 Worktree:
 - \`$TARGET_WT\`
@@ -114,6 +115,12 @@ EOF
 
 # shellcheck disable=SC1090
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+write_worker_verification_contract_file \
+  "$(worker_verification_contract_state_file "$TARGET_WT")" \
+  "$PROMPT_FILE" \
+  "test-cleanup-handoff" \
+  "$TARGET_WT"
 
 if retire_ready_merged_worktree_can_reclaim_ownership "$PROJECT" "$TARGET_WT" "feature/cleanup-handoff"; then
   echo "[FAIL] cleanup handoff worktree should not be reclaimed before its external cleanup surfaces run" >&2

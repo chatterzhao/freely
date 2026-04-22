@@ -8519,6 +8519,24 @@ worker_verification_contract_missing_fields_csv_for_project() {
   printf '%s\n' "$missing_fields_csv"
 }
 
+authoritative_worker_prompt_file_for_project() {
+  local project="$1" prompt_file contract_file source_prompt_file
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
+    printf '%s\n' "$prompt_file"
+    return 0
+  fi
+  contract_file="$(worker_verification_contract_state_file "$project")"
+  if [[ -f "$contract_file" ]]; then
+    source_prompt_file="$(meta_env_value "$contract_file" "SOURCE_PROMPT_FILE")"
+    if [[ -n "$source_prompt_file" && -f "$source_prompt_file" ]]; then
+      printf '%s\n' "$source_prompt_file"
+      return 0
+    fi
+  fi
+  return 1
+}
+
 worker_project_has_launchable_verification_contract() {
   local project="$1" missing_fields_csv
   missing_fields_csv="$(worker_verification_contract_missing_fields_csv_for_project "$project")"
@@ -8682,7 +8700,7 @@ authoritative_worker_prompt_for_worktree_from_continuity() {
 retire_ready_merged_worktree_can_reclaim_ownership() {
   local manager_project="$1" target_worktree="$2" branch="${3:-}" prompt_file=""
   [[ -n "$manager_project" && -n "$target_worktree" && -d "$target_worktree" ]] || return 1
-  prompt_file="$(latest_prompt_file_for_project "$target_worktree")"
+  prompt_file="$(authoritative_worker_prompt_file_for_project "$target_worktree" || true)"
   if [[ -n "$prompt_file" && -f "$prompt_file" ]] \
     && [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]] \
     && worker_prompt_has_verification_metadata "$prompt_file" \
@@ -11209,7 +11227,7 @@ manager_supervision_alerts() {
     [[ "$desired_state" == "running" ]] || continue
     owner="runtime-owned"
     next_action="runtime_recovery_requested"
-    worker_prompt_file="$(latest_prompt_file_for_project "$wt_path")"
+    worker_prompt_file="$(authoritative_worker_prompt_file_for_project "$wt_path" || true)"
     if worker_project_is_absorbed_merged_lane "$project" "$wt_path" "$branch" || \
       worker_project_is_retire_ready_merged_followthrough "$project" "$wt_path" "$branch" "$worker_prompt_file" || \
       worker_prompt_targets_retire_ready_merged_worktree "$project" "$worker_prompt_file"; then
@@ -11253,7 +11271,7 @@ manager_supervision_alerts() {
 settle_retire_ready_merged_worker_runtime_state() {
   local manager_project="$1" target_project="$2" branch="${3:-}" worker_prompt_file="" supervisor_pid="" ai_pid=""
   [[ -n "$manager_project" && -n "$target_project" && -d "$target_project" ]] || return 1
-  worker_prompt_file="$(latest_prompt_file_for_project "$target_project")"
+  worker_prompt_file="$(authoritative_worker_prompt_file_for_project "$target_project" || true)"
   if [[ -n "$worker_prompt_file" && -f "$worker_prompt_file" ]] \
     && [[ "$(worker_prompt_normalized_intent_kind "$worker_prompt_file")" == "cleanup" ]] \
     && worker_prompt_has_verification_metadata "$worker_prompt_file" \
@@ -11382,7 +11400,7 @@ manager_runtime_recover_workers_if_needed() {
       continue
     fi
 
-    worker_prompt_file="$(latest_prompt_file_for_project "$wt_path")"
+    worker_prompt_file="$(authoritative_worker_prompt_file_for_project "$wt_path" || true)"
     if worker_project_is_absorbed_merged_lane "$project" "$wt_path" "$branch" || \
       worker_project_is_retire_ready_merged_followthrough "$project" "$wt_path" "$branch" "$worker_prompt_file" || \
       worker_prompt_targets_retire_ready_merged_worktree "$project" "$worker_prompt_file"; then
