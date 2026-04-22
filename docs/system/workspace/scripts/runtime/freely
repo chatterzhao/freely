@@ -9700,7 +9700,7 @@ manager_continuity_cleanup_retirement_targets() {
   awk '
     /^## Cleanup Queue$/ { in_section=1; next }
     /^## / && in_section { exit }
-    in_section && /target_paths:/ { in_targets=1; next }
+    in_section && (/target_paths:/ || /cleanup_targets:/) { in_targets=1; next }
     in_section && in_targets && /^   - / {
       line=$0
       sub(/^   - /, "", line)

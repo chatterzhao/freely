@@ -12,6 +12,7 @@
 - `PASS`: fresh branches that still point at current `develop` without an absorbed feature tip are not downgraded, so the fix does not erase legitimate worker lanes.
 - `PASS`: manager startup no longer reuses a stale patrol scan after the project `HEAD` changes; it regenerates scan truth before choosing work.
 - `PASS`: when cleanup-governance continuity already contains retained merged targets but no launchable worker prompt, runtime now appends an explicit retirement-worker directive in both `resume` and `fresh_with_handoff` prompts, preventing another no-worker continuity loop from masquerading as progress.
+- `PASS`: the retirement-worker directive now accepts both `target_paths:` and canonical daemon `cleanup_targets:` queue fields, so the prompt guard matches real manager continuity output instead of only the reduced fixture format.
 - `PASS`: focused regressions and existing nearby scan/fleet regressions passed on the source lane.
 - `PENDING`: canonical `develop` self-host replay still must prove Freely selects a real launchable task, completes it to the current-project success standard, closes the worktree, and continues.
 

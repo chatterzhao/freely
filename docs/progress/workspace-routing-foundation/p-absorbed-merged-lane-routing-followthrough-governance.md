@@ -22,6 +22,7 @@
 - The follow-up fix now anchors each generated patrol scan to the project `HEAD` and forces regeneration when manager startup observes a different `HEAD`, which keeps startup patrol aligned with post-merge canonical truth.
 - Canonical `develop` dogfooding then exposed the next bounded seam in the same owner family: manager continuity could already classify the retained merged lanes as `retire-only`, yet `resume` / `fresh_with_handoff` prompts still allowed another no-worker `cleanup_governance` round instead of demanding a concrete `retirement_handoff` worker.
 - Runtime prompt construction now appends an explicit retirement-worker directive whenever the latest cleanup-governance continuity contains retained merged targets but no launchable worker prompt, so the next manager round treats another no-worker continuity as failure rather than acceptable steady state.
+- The first pass only matched `target_paths:` from the fixture continuity shape; canonical manager continuity actually emits `cleanup_targets:`. The compatibility followthrough now accepts both field names so the retirement-worker directive fires on real daemon output, not just the reduced test fixture.
 - Focused regressions and nearby scan/fleet/prompt tests now pass; remaining work is guarded replay into `develop`, canonical self-host acceptance, and temporary worktree retirement.
 
 ## Verification Evidence
