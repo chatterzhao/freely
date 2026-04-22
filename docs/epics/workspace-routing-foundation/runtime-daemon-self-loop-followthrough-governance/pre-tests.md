@@ -42,6 +42,7 @@
 24. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`.
 25. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`.
 26. Run `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-model-refresh-timeout`.
+27. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -108,7 +109,7 @@
 - case_design: `Use the guarded test-pre-merge lane to prove the owner carries explicit daemon-lifecycle adequacy into develop, then after protected replay observe canonical develop until Freely completes one task with lawful closeout and continues to the next task.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-monitor-timeout-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
 
 ### Guarded promote carries explicit daemon adequacy
 - id: `daemon-self-loop-guarded-promote-proof`
@@ -120,7 +121,7 @@
 - case_design: `Replay the blocker owner through the disposable protected test lane, rerun owner gates there, and use that bounded evidence to justify guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-monitor-timeout-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
 
 ### Runtime exit contracts are machine-checkable and self-repairable
 - id: `runtime-exit-contract-enforcement`
@@ -168,7 +169,19 @@
 - case_design: `Emit only the known Codex model-refresh timeout line, confirm monitor-ai-cli records no failure marker, then keep adjacent real-failure regressions green so 429 and reconnect handling still behave as designed.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-monitor-timeout-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
+
+### Manager bootstrap startup stays alive before prompt build begins
+- id: `manager-pre-prompt-startup-grace-preserved`
+- requirement: `A newly started manager supervisor must not be restarted as idle while startup is still lawfully between L010 supervisor_started and prompt build / ai launch.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#17`
+- case_design: `Seed a running/starting manager with an old workcell timestamp but a fresh L010 lifecycle trace entry, and verify ensure-manager keeps the supervisor alive instead of relaunching before prompt build starts.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
 
 ### Exhausted fallback episodes restore the original tool
 - id: `fallback-episode-restores-origin-tool`

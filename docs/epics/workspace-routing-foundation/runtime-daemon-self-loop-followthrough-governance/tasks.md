@@ -16,3 +16,4 @@
 - [x] Keep exit-contract repair relaunches on the same resume path across supervisor restarts and same-process relaunch loops, so repair rounds do not regress into `initial_start`.
 - [x] Preserve daemon-owned control-plane recovery after `tool_runtime_failure` so watchdog/manager relaunch returns through `daemon-run` instead of silently materializing foreground `start`.
 - [x] Ignore the known benign Codex `failed to refresh available models: timeout waiting for child process to exit` startup noise so monitor/runtime do not misclassify a successful manager round as `tool_runtime_failure`.
+- [x] Keep daemon bootstrap supervisors alive while startup is still between `L010 supervisor_started` and prompt build, so long pre-prompt recovery or fleet prep does not get misclassified as an idle manager.
