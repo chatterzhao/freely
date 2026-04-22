@@ -18,3 +18,4 @@
 - [x] Ignore the known benign Codex `failed to refresh available models: timeout waiting for child process to exit` startup noise so monitor/runtime do not misclassify a successful manager round as `tool_runtime_failure`.
 - [x] Keep daemon bootstrap supervisors alive while startup is still between `L010 supervisor_started` and prompt build, so long pre-prompt recovery or fleet prep does not get misclassified as an idle manager.
 - [x] Emit explicit runtime guidance for network/proxy/auth/subscription failures and document proxy mode semantics in the runtime config template without widening tool or slot policy.
+- [x] When Codex exhausts its own reconnect loop and exits on upstream `502 Bad Gateway`, keep the failure on the bounded execution-network path instead of writing `tool_runtime_failure` and triggering cross-tool fallback.

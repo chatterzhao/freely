@@ -288,10 +288,18 @@ log_has_iflow_local_state_failure() {
     "${existing_files[@]}"
 }
 
-live_runtime_failure_reason() {
+live_runtime_network_failure_detected() {
   local current_tool="$1" current_log_file="$2" current_debug_log_file="${3:-}"
   if log_has_runtime_network_failure "$current_tool" "$current_log_file" "$current_debug_log_file"; then
-    printf 'tool_runtime_failure\n'
+    return 0
+  fi
+  return 1
+}
+
+live_runtime_failure_reason() {
+  local current_tool="$1" current_log_file="$2" current_debug_log_file="${3:-}"
+  if live_runtime_network_failure_detected "$current_tool" "$current_log_file" "$current_debug_log_file"; then
+    printf 'network_failure\n'
     return 0
   fi
   if [[ "$current_tool" == "iflow" ]] && log_has_iflow_local_state_failure "$current_log_file" "$current_debug_log_file"; then
@@ -400,10 +408,10 @@ if [[ -n "$network_failure_marker_file" || -n "$failure_marker_file" ]]; then
     live_failure_reason=""
     live_failure_reason="$(live_runtime_failure_reason "$tool" "$log_file" "$debug_log_file" || true)"
     if [[ -n "$live_failure_reason" ]]; then
-      if [[ -n "$network_failure_marker_file" ]]; then
+      if [[ "$live_failure_reason" == "network_failure" && -n "$network_failure_marker_file" ]]; then
         printf 'network_failure\n' >"$network_failure_marker_file"
       fi
-      if [[ -n "$failure_marker_file" ]]; then
+      if [[ "$live_failure_reason" != "network_failure" && -n "$failure_marker_file" ]]; then
         printf '%s\n' "$live_failure_reason" >"$failure_marker_file"
       fi
       terminate_pid_tree "$child_pid" TERM
@@ -426,10 +434,10 @@ if [[ -n "$network_failure_marker_file" || -n "$failure_marker_file" ]]; then
   live_failure_reason=""
   live_failure_reason="$(live_runtime_failure_reason "$tool" "$log_file" "$debug_log_file" || true)"
   if [[ -n "$live_failure_reason" ]]; then
-    if [[ -n "$network_failure_marker_file" ]]; then
+    if [[ "$live_failure_reason" == "network_failure" && -n "$network_failure_marker_file" ]]; then
       printf 'network_failure\n' >"$network_failure_marker_file"
     fi
-    if [[ -n "$failure_marker_file" ]]; then
+    if [[ "$live_failure_reason" != "network_failure" && -n "$failure_marker_file" ]]; then
       printf '%s\n' "$live_failure_reason" >"$failure_marker_file"
     fi
   fi
