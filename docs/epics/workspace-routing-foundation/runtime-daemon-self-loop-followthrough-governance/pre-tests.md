@@ -30,10 +30,11 @@
 12. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`.
 13. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`.
 14. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`.
-15. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`.
-16. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`.
-17. Run `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`.
-18. Run `bash docs/system/workspace/scripts/tests/test-freely-retire-ready-merged-cleanup-handoff-not-reclaimed`.
+15. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`.
+16. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`.
+17. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`.
+18. Run `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`.
+19. Run `bash docs/system/workspace/scripts/tests/test-freely-retire-ready-merged-cleanup-handoff-not-reclaimed`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -121,7 +122,7 @@
 - target_lane: `feature-local`
 - promotion_gate: `completion`
 - task_refs: `tasks.md#9,tasks.md#10`
-- case_design: `Exercise manager-invalid, manager-stop, worker-invalid, worker-done, and worker-prompt directive paths so runtime proves prompt injection, post-cycle validation, and precise same-session repair behavior.`
+- case_design: `Exercise manager-invalid, manager-stop, manager-stop-blocked-by-unresolved-worker, worker-invalid, worker-done, and worker-prompt directive paths so runtime proves prompt injection, post-cycle validation, precise same-session repair behavior, and no premature autonomy stop while recovery-owned worker truth remains open.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`

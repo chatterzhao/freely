@@ -61,6 +61,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 21. Do not reclaim or auto-settle a cleanup-handoff worker as `retire_ready_merged_worker` when its authoritative prompt still carries full verification metadata and external cleanup surfaces that must run before fleet retirement can close.
 22. Resolve that cleanup-handoff authority from the worker verification contract when no local worker prompt artifact remains in the target worktree, so merged-lane settle/reclaim uses the same prompt truth runtime launched from.
 23. Prefer the worker verification contract `SOURCE_PROMPT_FILE` over any later worker-local bootstrap/reentry prompt when deciding whether a merged lane is still a cleanup-handoff worker with external cleanup scope.
+24. Refuse manager `EXIT_KIND=stop_ai` whenever authoritative supervision truth still shows any unresolved runtime-owned expected-running worker, so autonomy cannot legally terminate while recovery/cleanup followthrough remains open.
 
 ## Non-Goals
 
@@ -79,6 +80,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 6. The temporary blocker worktree and disposable test-pre-merge branch are retired after canonical `develop` absorbs the fix.
 7. Manager prompt build, worker prompt build, and post-cycle runtime handling all agree on the same structured exit-contract contract, so manager/worker intent is machine-checkable instead of inferred from free text.
 8. Cleanup-governance handoff workers selected on canonical `develop` remain launchable until they finish or explicitly hand back the external cleanup surfaces named in their worker prompt, rather than being auto-settled immediately after launch.
+9. Canonical `develop` no longer accepts manager `stop_ai` as a lawful terminal outcome while any runtime-owned expected-running worker is still down/degraded; runtime must continue with repair/recovery until that worker is resolved or explicitly reclassified.
 
 ## Verification
 
@@ -103,6 +105,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
@@ -144,5 +147,6 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
 - `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
 - `docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
+- `docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-blocks-stop-with-unresolved-worker`
 - `docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
 - `docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
