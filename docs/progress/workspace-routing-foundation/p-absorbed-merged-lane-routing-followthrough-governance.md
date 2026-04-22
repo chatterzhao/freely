@@ -20,6 +20,8 @@
 - The bounded fix now downgrades those fleet lanes to cleanup visibility and routes absorbed merged progress items to `cleanup` while preserving scan visibility.
 - Canonical `develop` dogfooding then exposed a second drift source: manager startup could still reuse a stale patrol scan after `HEAD` changed, so a just-merged owner could remain launchable from old scan truth even after scan/fleet routing was corrected.
 - The follow-up fix now anchors each generated patrol scan to the project `HEAD` and forces regeneration when manager startup observes a different `HEAD`, which keeps startup patrol aligned with post-merge canonical truth.
+- Canonical `develop` dogfooding then exposed the next bounded seam in the same owner family: manager continuity could already classify the retained merged lanes as `retire-only`, yet `resume` / `fresh_with_handoff` prompts still allowed another no-worker `cleanup_governance` round instead of demanding a concrete `retirement_handoff` worker.
+- Runtime prompt construction now appends an explicit retirement-worker directive whenever the latest cleanup-governance continuity contains retained merged targets but no launchable worker prompt, so the next manager round treats another no-worker continuity as failure rather than acceptable steady state.
 - Focused regressions and nearby scan/fleet/prompt tests now pass; remaining work is guarded replay into `develop`, canonical self-host acceptance, and temporary worktree retirement.
 
 ## Verification Evidence
@@ -32,6 +34,7 @@
 6. `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-head-change`
 7. `./bin/governance-check`
 8. `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
+9. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
 
 ## Next Action
 
