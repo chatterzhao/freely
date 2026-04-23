@@ -306,3 +306,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-repair-resume-target-verification.md`
+
+### Cleanup followthrough runs before manager resume relaunch
+- id: `cleanup-followthrough-precedes-resume-manager-relaunch`
+- requirement: `When manager exit-contract replay resolves to resume_manager while continuity already targets cleanup governance, runtime must execute that cleanup followthrough before relaunch and must materialize exact blocker truth if the cleanup step fails.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#23`
+- case_design: `Seed a resume_manager exit-contract with cleanup-followthrough continuity and verify runtime either runs cleanup before relaunch or records manager_exit_contract_cleanup_followthrough_failed plus repair handoff when that cleanup path fails.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-cleanup-followthrough-resume-verification.md`
