@@ -35,3 +35,14 @@
 - alternatives_considered: `Change the default proxy mode for every project; re-enable automatic tool or slot switching to route around the symptom; add a broader new diagnostics subsystem instead of using the existing runtime log surface.`
 - boundary_non_goals: `No default proxy-policy change, no auto tool switching, no slot switching, and no claim that self-host acceptance is complete before canonical develop replay proves one full autonomous task/merge/retirement/next-task cycle.`
 - residual_risk: `Some relays may emit provider or billing failures with different wording than the current classifiers recognize; if canonical replay exposes a new concrete transcript, that belongs to another bounded same-owner followthrough rather than broadening this patch now.`
+
+## 2026-04-23 16:05 PDT Proxy Resolution Followthrough
+
+- `FAIL`: latest canonical `develop` replay no longer showed a real device-network outage or the already-fixed Codex OAuth transport-classification seam; manager exited on `proxy_config_invalid` because project config set `FREELY_NETWORK_PROXY_MODE="explicit"` with blank proxy values while `~/.freely/config.env` still carried valid explicit proxy fields.
+- `FAIL`: resolver precedence treated the empty project explicit block as authoritative, so usable global explicit proxy values were masked and daemon replay stayed stuck behind `network_recovery_gate_active`.
+- `PASS`: `network-proxy-resolver.sh` now keeps `project` precedence at field granularity under `explicit`, so blank project proxy fields fall back to the corresponding global explicit values while project overrides like `FREELY_NO_PROXY` still win.
+- `PASS`: the intended boundary remains intact: `disabled` still clears proxy usage outright, `inherit` still leaves ambient shell behavior alone unless config overrides it, and `explicit` still expresses a deterministic config-backed proxy surface.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-network-proxy-resolver`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-proxy-self-heal`
+- `PASS`: `./bin/governance-check`
+- `PENDING`: promote this same-owner resolver repair through protected premerge and guarded `develop`, then restart canonical `develop` daemon replay and verify runtime gets past `proxy_config_invalid`, resumes cleanup followthrough, and advances toward the next real task cycle.
