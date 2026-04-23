@@ -55,13 +55,17 @@ freely_network_proxy_resolve_config() {
   FREELY_NO_PROXY=""
 
   case "${project_mode:-inherit}" in
-    explicit|disabled)
-      FREELY_NETWORK_PROXY_MODE="$project_mode"
-      FREELY_NETWORK_PROXY_URL="$project_url"
-      FREELY_ALL_PROXY="$project_all"
-      FREELY_HTTP_PROXY="$project_http"
-      FREELY_HTTPS_PROXY="$project_https"
-      FREELY_NO_PROXY="$project_no"
+    disabled)
+      FREELY_NETWORK_PROXY_MODE="disabled"
+      return 0
+      ;;
+    explicit)
+      FREELY_NETWORK_PROXY_MODE="explicit"
+      FREELY_NETWORK_PROXY_URL="${project_url:-$global_url}"
+      FREELY_ALL_PROXY="${project_all:-$global_all}"
+      FREELY_HTTP_PROXY="${project_http:-$global_http}"
+      FREELY_HTTPS_PROXY="${project_https:-$global_https}"
+      FREELY_NO_PROXY="${project_no:-$global_no}"
       return 0
       ;;
   esac

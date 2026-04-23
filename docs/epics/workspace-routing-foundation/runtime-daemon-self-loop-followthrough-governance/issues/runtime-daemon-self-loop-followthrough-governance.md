@@ -77,6 +77,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 37. If cleanup followthrough fails on that `resume_manager` path, runtime must preserve exact blocker truth and same-owner repair handoff instead of silently degrading into another generic patrol/resume loop.
 38. Treat Codex OAuth refresh request-send failures against `https://auth.openai.com/oauth/token` as bounded transport/network failures when the evidence is request delivery failure rather than explicit auth rejection, so runtime recovery stays on `execution_network_*` instead of widening to generic `tool_runtime_failure`.
 39. Preserve the auth boundary for that same Codex OAuth refresh path: explicit auth denial such as `401 Unauthorized` remains non-network and must not enter the device-network recovery path.
+40. When project proxy mode is `explicit`, resolve proxy fields with project-over-global precedence instead of treating blank project values as authoritative empties; an empty project explicit block must not mask valid global explicit proxy values and force false `proxy_config_invalid`.
 
 ## Non-Goals
 
@@ -109,6 +110,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 20. Canonical `develop` now records `manager_exit_contract_cleanup_followthrough_failed` plus repair-handoff truth whenever that cleanup-followthrough resume path breaks, so self-host replay stops on exact blocker evidence instead of an opaque relaunch loop.
 21. Canonical `develop` no longer collapses Codex OAuth refresh request-send failures into `tool_runtime_failure`; those transport failures stay on the bounded `execution_network_transient` / `execution_network_persistent` path.
 22. Canonical `develop` still keeps explicit Codex OAuth refresh auth denial such as `401 Unauthorized` off the network path, so auth noise does not masquerade as device-network instability.
+23. Canonical `develop` no longer loops on `proxy_config_invalid` when project config sets `FREELY_NETWORK_PROXY_MODE="explicit"` but leaves proxy values blank while global config still carries valid explicit proxy settings; field-level resolution must preserve the usable global proxy and let daemon self-work continue.
 
 ## Verification
 
@@ -141,6 +143,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-classifies-codex-oauth-refresh-request-error-as-network-failure`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-apikey-oauth-refresh-401`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
+- `bash docs/system/workspace/scripts/tests/test-freely-network-proxy-resolver`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`

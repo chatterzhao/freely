@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-cleanup-followthrough-extraction-20260423`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-feature-runtime-cleanup-followthrough-extraction`
-- updated_at: `2026-04-23 08:05 PDT`
+- updated_at: `2026-04-23 16:05 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -212,6 +212,17 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-classifies-codex-oauth-refresh-request-error-as-network-failure`
 - `PASS`: `./bin/governance-check`
 - `PENDING`: refresh protected premerge with this owner evidence in diff, merge lawfully into `develop`, then restart canonical `develop` daemon replay and confirm the same failure family now lands on `execution_network_*` instead of `tool_runtime_failure`.
+
+## 2026-04-23 16:05 PDT Project-Explicit Proxy Global Fallback
+
+- `FAIL`: latest canonical `develop` daemon replay was no longer blocked on real network truth; it was blocked on proxy resolution precedence. Runtime repeatedly exited with `proxy_config_invalid` because project config set `FREELY_NETWORK_PROXY_MODE="explicit"` but left proxy values blank, while global config still had valid explicit proxy values.
+- `FAIL`: the previous resolver treated project `explicit` as authoritative even when every project proxy field was empty, so an empty project block masked the usable global proxy and kept manager stuck in `network_recovery_gate_active`.
+- `PASS`: proxy resolution now keeps `project` precedence but applies it field-by-field under `explicit`, so blank project proxy fields fall back to the corresponding global explicit values instead of turning into a false misconfiguration.
+- `PASS`: this preserves the intended boundary: `disabled` still disables outright, `inherit` still keeps ambient shell proxy behavior unless config overrides it, and `explicit` still lets project config override individual fields such as `NO_PROXY`.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-network-proxy-resolver`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-proxy-self-heal`
+- `PASS`: `./bin/governance-check`
+- `PENDING`: replay this same-owner resolver fix through protected premerge and guarded `develop`, then rerun canonical `develop` daemon replay and verify manager gets past `proxy_config_invalid`, resumes cleanup followthrough, and advances toward the next real task cycle.
 
 ## Verification Evidence
 
