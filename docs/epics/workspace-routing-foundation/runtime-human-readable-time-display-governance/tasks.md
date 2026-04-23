@@ -5,4 +5,5 @@
 - Route `freely live-status`, `baseline-status`, intake status, and `develop-push status` through the formatter.
 - Preserve raw stored truth while adding human-readable sibling fields where needed.
 - Verify ai-cli and watchdog cooldown displays still follow the same host-local rule.
+- Consolidate runtime-side "current time" call sites onto one local-display helper and one UTC machine-truth helper.
 - Write back issue, progress, milestone, and verification evidence.
