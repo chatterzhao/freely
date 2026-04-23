@@ -1,0 +1,230 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-exit-contract-cleanup-autodelegate.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WT_ROOT="$TMP_DIR/worktrees"
+FEATURE_WT="$WT_ROOT/feature-cleanup"
+PREMERGE_WT="$WT_ROOT/test-pre-merge-cleanup"
+
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$PROJECT/docs/pre-brainstorms/20260421-0000--sample" "$WT_ROOT"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260421-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260421-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260421-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+mkdir -p "$PROJECT/docs/epics/demo/cleanup-governance/issues" "$PROJECT/docs/epics/demo/cleanup-governance/code-reviews" "$PROJECT/docs/progress/demo"
+cat >"$PROJECT/docs/epics/demo/cleanup-governance/issues/cleanup-governance.md" <<'EOF'
+# Issue: cleanup-governance
+
+- issue_id: `I-20260421-1330-A`
+- pre_tests_path: `docs/epics/demo/cleanup-governance/pre-tests.md`
+- progress_path: `docs/progress/demo/p-cleanup-governance.md`
+- verification_artifact_dir: `docs/epics/demo/cleanup-governance/code-reviews`
+EOF
+cat >"$PROJECT/docs/epics/demo/cleanup-governance/pre-tests.md" <<'EOF'
+# Pre-tests
+EOF
+cat >"$PROJECT/docs/progress/demo/p-cleanup-governance.md" <<'EOF'
+# Progress
+EOF
+
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m init
+
+git -C "$PROJECT" worktree add -q -b feature/cleanup "$FEATURE_WT" develop
+git -C "$PROJECT" worktree add -q -b test-pre-merge-cleanup "$PREMERGE_WT" develop
+
+echo cleanup >"$FEATURE_WT/cleanup.txt"
+git -C "$FEATURE_WT" add cleanup.txt
+git -C "$FEATURE_WT" commit -q -m "cleanup fixture"
+git -C "$PROJECT" merge --no-ff -m "merge cleanup fixture" feature/cleanup >/dev/null
+
+for wt in "$PROJECT" "$FEATURE_WT" "$PREMERGE_WT"; do
+  mkdir -p "$wt/.freely/run" "$wt/.freely/logs"
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+done
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_exit_rc_0"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-21T18:49:39Z"
+EOF
+
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+LAST_TOOL_SESSION_ID="sess-demo"
+LAST_TOOL_RESUME_TARGET="resume-demo"
+LAST_TOOL_JSONL_PATH=""
+LAST_LAUNCH_KIND="resume"
+LAST_ROTATION_REASON="none"
+LAST_CYCLE_LOG=""
+LAST_PROMPT_FILE=""
+LAST_CONTEXT_COMPACTED="0"
+LAST_CONTEXT_RATIO=""
+LAST_PRIMARY_RATE_LIMIT_USED_PERCENT=""
+LAST_PRIMARY_RATE_LIMIT_RESETS_AT=""
+LAST_SECONDARY_RATE_LIMIT_USED_PERCENT=""
+LAST_SECONDARY_RATE_LIMIT_RESETS_AT=""
+LAST_ROUTE_ONLY_HANDOFF="0"
+ROUTE_ONLY_STREAK_CURRENT="0"
+RESUME_STREAK_CURRENT="1"
+CURRENT_TOOL_SLOT=""
+LAST_SLOT_SWITCH_REASON=""
+LAST_SLOT_SWITCH_AT=""
+LAST_CYCLE_DEBUG_LOG=""
+LAST_CLAUDE_JSONL_PATH=""
+LAST_CODEX_MCP_USED="0"
+LAST_CODEX_MCP_THREAD_ID=""
+LAST_CODEX_MCP_JSONL_PATH=""
+CLAUDE_SESSION_ID_CURRENT=""
+CLAUDE_SESSION_ID_PREVIOUS=""
+LAST_PROJECT_DIRTY_ENTRIES="0"
+LAST_WORKTREE_SUMMARY_TOTAL="2"
+LAST_WORKTREE_SUMMARY_DIRTY="0"
+CHECKPOINT_DRIFT_STREAK_CURRENT="0"
+LAST_DELEGATED_CONTINUATION_PENDING_IDS=""
+LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0"
+LAST_DELEGATED_CONTINUATION_CONSUMED_IDS=""
+LAST_DELEGATED_CONTINUATION_CONSUMED_AT=""
+LAST_RESTART_STORM_WINDOW_SECS="0"
+LAST_RESTART_STORM_COUNT="0"
+LAST_PROCESS_CHURN_PEAK="0"
+LAST_RESTART_STORM_SIGNAL_AT=""
+LAST_RESTART_STORM_SIGNAL_REASON=""
+LAST_RESTART_STORM_ESCALATED_AT=""
+LAST_RESTART_STORM_ESCALATION_TARGET=""
+AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV=""
+EOF
+
+for wt in "$FEATURE_WT" "$PREMERGE_WT"; do
+  cat >"$wt/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-21T18:49:39Z"
+EOF
+done
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260421-184939.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+
+## Primary Judgement
+
+- route_kind: \`cleanup_governance\`
+- selected_tool: \`codex\`
+- next_action: \`decide retirement handoff for retained merged worktrees\`
+
+## Why This Route
+
+- selected_source: \`I-20260421-1330-A\`
+
+## Evidence
+
+- issue_truth: \`docs/epics/demo/cleanup-governance/issues/cleanup-governance.md\`
+- progress_truth: \`docs/progress/demo/p-cleanup-governance.md\`
+
+## Fleet Inventory
+
+- manager_lane:
+  - path: \`$PROJECT\`
+    branch: \`develop\`
+    clean_state: \`CLEAN\`
+    desired: \`running\`
+    role: \`manager\`
+- selected_cleanup_family:
+  - path: \`$FEATURE_WT\`
+    branch: \`feature/cleanup\`
+    clean_state: \`CLEAN\`
+    desired: \`stopped\`
+    role_hint: \`cleanup\`
+  - path: \`$PREMERGE_WT\`
+    branch: \`test-pre-merge-cleanup\`
+    clean_state: \`CLEAN\`
+    desired: \`stopped\`
+    role_hint: \`manager/premerge\`
+
+## Queue
+
+- cleanup_queue:
+  - lane_slug: \`cleanup-governance\`
+    issue_id: \`I-20260421-1330-A\`
+    status: \`manager_reconcile_required\`
+    next_action: \`materialize cleanup followthrough worker\`
+
+## Worker Prompts
+
+- launched: \`none\`
+- prompt_paths: \`none\`
+- reason: \`cleanup worker has not been materialized yet\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+ACTION="$(manager_runtime_handle_exit_contract_after_ai_cycle "$PROJECT" "ai_exit_rc_0")"
+[[ "$ACTION" == "delegate_workers" ]] || {
+  echo "[FAIL] expected cleanup governance fallback to delegate workers, got $ACTION" >&2
+  exit 1
+}
+
+grep -q '^EXIT_KIND="delegate_workers"$' "$(manager_exit_contract_file "$PROJECT")"
+PROMPT_FILE="$(find "$PROJECT/.freely/run/worker-prompts" -type f | head -n 1)"
+[[ -n "$PROMPT_FILE" && -f "$PROMPT_FILE" ]] || {
+  echo "[FAIL] expected materialized cleanup worker prompt" >&2
+  exit 1
+}
+grep -q "^WORKER_PROMPTS_CSV=\"$PROMPT_FILE\"$" "$(manager_exit_contract_file "$PROJECT")"
+grep -q 'manager_exit_contract_autofilled_cleanup_delegate_workers' "$PROJECT/.freely/logs/runtime-events.log"
+
+echo "[PASS] missing manager exit contract auto-delegates cleanup governance via materialized worker prompt"

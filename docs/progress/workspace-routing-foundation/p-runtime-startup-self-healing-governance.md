@@ -6,23 +6,21 @@
 - phase_state: `in_verification`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/runtime-manager-startup-blocker-rootcause-20260419`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-feature-runtime-manager-startup-blocker-rootcause`
-- updated_at: `2026-04-20`
+- branch: `feature/live-status-hang-root-cause-20260422`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-live-status-hang-root-cause`
+- updated_at: `2026-04-22`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
 ## Summary
 
-- Protected-root replay exposed two adjacent startup seams: stale machine-owned state before manager launch, and prompt-build-stage supervisor loss that later got mislabeled as `startup_self_heal_no_runtime`.
-- This owner keeps the same narrow line: startup repairs only script-provable stale state, but now also records launch-in-flight truth and preserves retryable prompt-build failure under a live supervisor.
-- The current implementation adds launch-state writeback hardening plus a prompt-build failure retry path that is tool-agnostic and compatible with short-lived non-interactive CLI tools.
-- A follow-on continuation on `2026-04-20` fixes one more narrow ownership seam: `live-status` must not clear a live daemon when the recorded project root and inspected project root are the same directory but spelled with different casing/path forms.
-- A fresh-session reentry on `2026-04-20` consumed the `context_compacted` handoff and confirmed this lane remains a verification continuation, so the first closeout duty is still to keep the verification artifact current instead of reopening implementation scope.
-- The delegated continuation `20260419-232124-blocker-docs-project-intent-md-h` was re-read during the fresh-session reentry; after no higher-priority blocker surfaced from milestones, progress, review/test, session evidence, GitHub-like repo evidence, or `PROJECT_INTENT`, this worktree absorbs the requested one-line marker as a sidecar continuity action without changing the startup self-heal acceptance boundary.
-- The same dirty tree also carries several runtime hardening tests outside this owner's acceptance surface: `test-freely-session-rotation`, `test-freely-delegated-continuation-ids-empty-success`, `test-freely-delegated-continuation-prompt-contract`, `test-freely-interruption-dispatcher-ready-loop-tolerates-empty-probe-failure`, and `test-freely-post-cycle-helper-failure-does-not-kill-supervisor` align with delegated-continuation/session-rotation/readiness-resilience contracts rather than startup self-heal.
-- The same fresh-session rerun also kept the continuity-specific guards green: `test-freely-manager-launch-state-refresh-persists-stale-continuity-rewrite` and `test-freely-stale-manager-continuity-filter` still pass after the path-equivalence followthrough, so this lane's continuity rewrite/filter contract remains intact.
-- Focused regressions are green in the current worker worktree; the remaining work is to refresh verification evidence and finish the guarded merge chain for this continuation.
+- Protected-root replay on `2026-04-22` exposed a narrower still-open startup seam on canonical `develop`: after `L041 ai_launch_observed`, watchdog still restarted the manager with `L223 trigger=supervisor_alive_ai_missing_after_grace` because bootstrap grace accepted `starting` but not the newer `ai_launch_in_flight` truth written by monitor/runtime.
+- This continuation keeps the same owner boundary. The fix does not widen into generic recovery; it aligns bootstrap grace with runtime-published startup truth, strengthens supported-tool PID validation, and keeps manager-active status reads on the lightweight path.
+- The current implementation now treats `LAST_EXIT_REASON="ai_launch_in_flight"` as lawful bootstrap in-flight state, so a just-observed AI launch is not torn down as fake absence before the grace window or startup lifecycle closes.
+- Supported-tool PID validation now reads launcher fragments from configured tool support instead of stale hard-coded argv assumptions, including the lawful `claude` process behind `cc` aliases while still rejecting foreign same-tool processes.
+- Execution-time network failure handling now supports bounded project-scoped proxy self-heal, verified by a `hi` probe, without silently re-enabling `AUTO_SWITCH_TOOL` or `AUTO_SWITCH_SLOT` when those settings are disabled.
+- `live-status` no longer pays the heavy fleet-refresh cost while the manager AI is already active; it uses cached launch-state and lightweight intake/worker counters so status polling does not perturb the same startup window this owner is trying to stabilize.
+- Focused regressions are green in both the feature lane and the disposable `test-pre-merge-20260422-live-status-hang-root-cause` lane; the remaining work is to land the owner docs, replay the guarded merge, and then re-run canonical root daemon validation on updated `develop`.
 
 ## Success Criteria
 
@@ -35,16 +33,16 @@
 1. Real replay on `2026-04-19` recorded stale `supervisor.pid` and `interruption-dispatch.pid` under `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/` while no owned runtime processes remained.
 2. The same protected-root state still showed `DESIRED_RUNTIME_STATE="running"`, `LAST_SUPERVISOR_STATE="up"`, and `LAST_EXIT_REASON="starting"`.
 3. Continuity and prompt artifacts still referenced missing worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260413-feature-runtime-manager-startup-blocker-rootcause`.
-4. Feature-lane replay on `2026-04-19 20:29 PDT` no longer collapsed to `startup_self_heal_no_runtime`; it stopped in explicit governance state `manager_worker_launch_verification_blocked`, proving the startup self-heal path was no longer misclassifying the lane.
-5. Protected-root replay on `2026-04-19 20:57-20:58 PDT` stayed live after prompt build and reached `desired_runtime_state: running`, `last_supervisor_state: up`, `last_ai_state: up` under `tool=codex`, instead of dying at `L020 prompt_build_begin` and self-healing to `startup_self_heal_no_runtime`.
-6. The new regressions `test-monitor-ai-cli-pid`, `test-freely-live-status-startup-self-heals-stale-launch-in-flight-state`, and `test-freely-prompt-build-failure-keeps-supervisor-alive` all pass alongside the existing startup-self-heal and supervisor-event tests.
-7. `bash docs/system/workspace/scripts/tests/test-freely-live-status-keeps-daemon-runtime-across-case-variant-project-path` now passes on `2026-04-20`, proving pid/supervisor ownership checks preserve a live daemon when `os.path.samefile()` shows the recorded project root and inspected project root are the same directory.
-8. `bash docs/system/workspace/scripts/tests/test-freely-live-status-startup-self-heals-stale-runtime-state`, `bash docs/system/workspace/scripts/tests/test-freely-live-status`, `bash -n docs/system/workspace/scripts/runtime/freely`, `git diff --check`, and `./bin/governance-check` all pass in `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-feature-runtime-manager-startup-blocker-rootcause`.
-9. `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-persists-stale-continuity-rewrite` and `bash docs/system/workspace/scripts/tests/test-freely-stale-manager-continuity-filter` also pass on `2026-04-20`, so the continuity refresh/filter edge covered by this owner remains stable in the fresh session.
-10. `docs/PROJECT_INTENT.md` now ends with `<!-- runtime-lifecycle-validation -->` so the delegated continuation has a durable repository marker while this worker lane stays on the same verification closeout path.
+4. Canonical protected-root history on `2026-04-22` still showed the defect before this fix landed: `L041 ai_launch_observed supervisor_pid=41480 child_pid=65227` at `02:46:31Z`, followed by `L223 manager_idle_supervisor_restart trigger=supervisor_alive_ai_missing_after_grace supervisor_pid=41480` at `02:46:43Z`. A second replay repeated the same pattern for supervisor `96217` at `02:51:45Z -> 02:52:04Z`.
+5. `bash docs/system/workspace/scripts/tests/test-freely-manager-bootstrap-keeps-supervisor-after-ai-launch-observed` now passes and directly proves `project_bootstrap_launch_in_flight` accepts `LAST_EXIT_REASON="ai_launch_in_flight"` while the startup lifecycle is still in-flight.
+6. `bash docs/system/workspace/scripts/tests/test-freely-ai-pid-validation-supported-tools` passes and proves configured supported-tool signatures accept lawful owner processes while rejecting foreign same-tool pids.
+7. `bash docs/system/workspace/scripts/tests/test-freely-proxy-self-heal` passes and proves proxy self-heal rotates bounded proxy modes, honors `AUTO_SETUP_FREELY_PROXY`, and restores the original mode after exhaustion.
+8. `bash docs/system/workspace/scripts/tests/test-freely-live-status-active-manager-skips-fleet-refresh`, `bash docs/system/workspace/scripts/tests/test-freely-live-status-uses-status-signals-when-manager-idle`, and `bash docs/system/workspace/scripts/tests/test-freely-live-status-worker-count-fast-path` all pass, so status polling now stays lightweight in the exact manager-active window that previously churned.
+9. The feature lane and the disposable `test-pre-merge-20260422-live-status-hang-root-cause` lane both pass the focused regression set: `bash -n docs/system/workspace/scripts/runtime/freely`, `bash docs/system/workspace/scripts/tests/test-freely-manager-bootstrap-keeps-supervisor-after-ai-launch-observed`, `bash docs/system/workspace/scripts/tests/test-freely-startup-self-heal-keeps-codex-wrapper-ai-pid`, `bash docs/system/workspace/scripts/tests/test-freely-ai-pid-validation-supported-tools`, `bash docs/system/workspace/scripts/tests/test-freely-proxy-self-heal`, `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`, `bash docs/system/workspace/scripts/tests/test-freely-live-status-active-manager-skips-fleet-refresh`, `bash docs/system/workspace/scripts/tests/test-freely-live-status-uses-status-signals-when-manager-idle`, and `bash docs/system/workspace/scripts/tests/test-freely-live-status-worker-count-fast-path`.
+10. The guarded `feature -> test-pre-merge` merge already succeeded for `feature/live-status-hang-root-cause-20260422`; the first `test-pre-merge -> develop` replay was blocked only because the merge diff lacked owner lifecycle artifacts, not because of code/test failure.
 
 ## Next Action
 
-1. Preserve the verification-first route: keep the refreshed case-variant path evidence in the verification artifact, then finish the guarded `feature -> test-pre-merge -> develop` merge chain for the current continuation and retire the dedicated worktree/branch.
-2. Treat the `docs/PROJECT_INTENT.md` marker as absorbed delegated continuity evidence only; do not let it widen the startup self-heal acceptance surface or replace the remaining guarded promote duties.
-3. Before guarded promote, split or reroute the cross-owner dirty tests in this worktree unless a later bounded review proves they are required by this owner's acceptance surface: `test-freely-session-rotation`, `test-freely-delegated-continuation-ids-empty-success`, `test-freely-delegated-continuation-prompt-contract`, `test-freely-interruption-dispatcher-ready-loop-tolerates-empty-probe-failure`, and `test-freely-post-cycle-helper-failure-does-not-kill-supervisor`.
+1. Re-run the guarded `test-pre-merge-20260422-live-status-hang-root-cause -> develop` merge now that the owner lifecycle artifacts are in the diff.
+2. After canonical `develop` carries the patch, restart `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` and verify the old `L041 -> L223 supervisor_alive_ai_missing_after_grace` sequence no longer reproduces.
+3. Once canonical replay is green, push `develop`, retire `test-pre-merge-20260422-live-status-hang-root-cause`, and retire `feature/live-status-hang-root-cause-20260422`.

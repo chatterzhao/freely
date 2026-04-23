@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-log-has-auth-failure-apikey-noise.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+HOME_DIR="$TMP_DIR/home"
+LOG_FILE="$TMP_DIR/cycle.log"
+mkdir -p "$HOME_DIR/.codex"
+
+cat >"$HOME_DIR/.codex/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-test"}
+EOF
+
+cat >"$LOG_FILE" <<'EOF'
+2026-04-23T01:17:02.603724Z ERROR codex_login::auth::manager: Failed to refresh token: 401 Unauthorized: {
+2026-04-23T01:20:11.795086Z ERROR rmcp::transport::worker: worker quit with fatal: Transport channel closed, when Client(Reqwest(reqwest::Error { kind: Request, url: "https://chatgpt.com/backend-api/wham/apps", source: hyper_util::client::legacy::Error(Connect, Error { code: -9806, message: "connection closed via error" }) }))
+EOF
+
+HOME="$HOME_DIR" \
+bash -lc '
+  set -euo pipefail
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+  AI_TOOL="codex"
+  if log_has_auth_failure "'"$LOG_FILE"'"; then
+    echo "[FAIL] apikey OAuth refresh 401 noise should not count as auth_failure" >&2
+    exit 1
+  fi
+  if ! log_has_execution_network_failure "'"$LOG_FILE"'"; then
+    echo "[FAIL] network failure signal should still be preserved" >&2
+    exit 1
+  fi
+' >/dev/null
+
+echo "[PASS] runtime auth detection ignores Codex OAuth refresh 401 noise for live apikey auth"

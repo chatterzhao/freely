@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-codex-wrapper-ai-pid.XXXXXX)"
+cleanup() {
+  set +e
+  kill "${AI_PID:-}" 2>/dev/null || true
+  wait "${AI_PID:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="ai_launch_in_flight"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2099-01-01T00:00:00Z"
+EOF
+
+bash -c "cd '$PROJECT' && exec -a 'node /Users/test/tools/codex-wrapper.js --resume session-123' sleep 30" >/dev/null 2>&1 &
+AI_PID=$!
+printf '%s\n' "$AI_PID" >"$PROJECT/.freely/run/ai.pid"
+
+bash -lc "
+  source '$ROOT_DIR/docs/system/workspace/scripts/runtime/freely'
+  valid_ai_pid_for_project '$PROJECT' '$AI_PID'
+  startup_self_heal_machine_state_if_needed '$PROJECT' 'start_command'
+"
+
+if [[ ! -f "$PROJECT/.freely/run/ai.pid" ]]; then
+  echo '[FAIL] startup self-heal should not clear a live generic codex wrapper pid that is owned by the project cwd' >&2
+  exit 1
+fi
+
+grep -q "^$AI_PID\$" "$PROJECT/.freely/run/ai.pid" || {
+  echo '[FAIL] ai.pid changed after startup self-heal' >&2
+  exit 1
+}
+
+if grep -q 'startup_self_heal_stale_pid_cleared.*role=ai' "$PROJECT/.freely/logs/runtime-events.log" 2>/dev/null; then
+  echo '[FAIL] startup self-heal incorrectly recorded the live codex wrapper pid as stale' >&2
+  exit 1
+fi
+
+echo "[PASS] startup self-heal preserves a live generic codex wrapper pid when cwd ownership proves the project"

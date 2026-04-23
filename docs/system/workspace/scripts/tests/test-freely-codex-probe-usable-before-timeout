@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-codex-probe-usable-before-timeout.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+  "$HOME_DIR/.codex" \
+  "$MOCK_BIN"
+
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+cat >"$PROJECT/bin-ai-mock" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cmd=""
+for arg in "$@"; do
+  case "$arg" in
+    whoami)
+      cmd="whoami"
+      break
+      ;;
+  esac
+done
+case "$cmd" in
+  whoami)
+    echo '{"tool":"codex","slot":"slow-success-slot-1","auth_email":"slow@example.com"}'
+    ;;
+  *)
+    echo '{}'
+    ;;
+esac
+EOF
+chmod +x "$PROJECT/bin-ai-mock"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf 'user\n'
+printf 'hi\n'
+printf 'codex\n'
+printf 'Hi. What do you want to work on in this repo?\n'
+printf 'tokens used\n'
+printf '12,182\n'
+bash -c "exec -a freely-probe-usable-child sleep 30" &
+child=$!
+trap 'kill "$child" 2>/dev/null || true; wait "$child" 2>/dev/null || true; exit 143' TERM INT
+wait "$child"
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+RESULT="$(
+  HOME="$HOME_DIR" \
+  PATH="$MOCK_BIN:$PATH" \
+  CODEX_PROBE_TIMEOUT=10 \
+  PROJECT_ROOT="$PROJECT" \
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+    ai_cli_bin_for_project() { printf "%s\n" "'"$PROJECT"'/bin-ai-mock"; }
+    log_warn() { printf "%s\n" "$*" >&2; }
+    log_error() { printf "%s\n" "$*" >&2; }
+    codex_probe_current_slot_now "'"$PROJECT"'"
+  ' 2>"$TMP_DIR/stderr.log"
+)"
+
+[[ "$RESULT" == "usable" ]]
+sleep 1
+if pgrep -f 'freely-probe-usable-child' >/dev/null 2>&1; then
+  echo "[FAIL] codex probe usable short-circuit left a child process running" >&2
+  pgrep -fal 'freely-probe-usable-child' >&2 || true
+  pkill -f 'freely-probe-usable-child' || true
+  exit 1
+fi
+
+if [[ -d "$PROJECT/.freely/run/codex-probe-artifacts" ]] \
+  && find "$PROJECT/.freely/run/codex-probe-artifacts" -maxdepth 1 -type f -name '*slow-success-slot-1-timeout.log' | grep -q .
+then
+  echo "[FAIL] codex probe usable short-circuit should not emit a timeout artifact" >&2
+  exit 1
+fi
+
+echo "[PASS] codex probe returns usable as soon as the success transcript is complete"
