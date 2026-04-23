@@ -73,6 +73,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 33. When Codex exits after exhausting its own reconnect loop with upstream `502 Bad Gateway` evidence, monitor/runtime must persist that outcome as execution-network failure truth instead of collapsing it into generic `tool_runtime_failure`.
 34. When manager materializes a cleanup followthrough worker prompt from continuity rather than reusing an existing prompt file, it must carry the authoritative `selected_tool` so stale retained cleanup worktrees do not relaunch on obsolete local tool config.
 35. Treat a Codex resume target as valid only when its rollout/session jsonl evidence is non-empty, so zero-byte persisted session files cannot send canonical cleanup followthrough back into `thread/resume failed: empty session file`.
+36. When manager exit-contract replay resolves to `resume_manager` while continuity already targets cleanup followthrough, runtime must run that cleanup followthrough before relaunch so canonical replay cannot stay pinned on the same retained merged lane.
+37. If cleanup followthrough fails on that `resume_manager` path, runtime must preserve exact blocker truth and same-owner repair handoff instead of silently degrading into another generic patrol/resume loop.
 
 ## Non-Goals
 
@@ -101,6 +103,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 16. Canonical `develop` no longer routes exhausted Codex reconnect `502 Bad Gateway` exits into `tool_runtime_failure`; the bounded execution-network retry path remains authoritative for that failure family.
 17. Canonical `develop` no longer materializes cleanup followthrough worker prompts without `selected_tool`; retained cleanup worktrees with stale local config must be corrected to the continuity-selected tool before launch.
 18. Canonical `develop` no longer attempts `codex exec resume` against a zero-byte persisted rollout file; empty-session resume evidence must fall back to fresh launch/handoff so cleanup governance can keep progressing.
+19. Canonical `develop` no longer lets `EXIT_KIND=resume_manager` bypass an already-selected cleanup followthrough; retained cleanup closeout must run before manager relaunch.
+20. Canonical `develop` now records `manager_exit_contract_cleanup_followthrough_failed` plus repair-handoff truth whenever that cleanup-followthrough resume path breaks, so self-host replay stops on exact blocker evidence instead of an opaque relaunch loop.
 
 ## Verification
 
@@ -141,6 +145,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-materialized-cleanup-worker-applies-selected-tool`
 - `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-triggers-cleanup-followthrough`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-cleanup-followthrough-failure-materializes-blocker`
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
 - `bash docs/system/workspace/scripts/tests/test-freely-retire-ready-merged-cleanup-handoff-not-reclaimed`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
