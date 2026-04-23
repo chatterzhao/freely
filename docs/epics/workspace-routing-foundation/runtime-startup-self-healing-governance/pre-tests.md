@@ -80,5 +80,5 @@
 - task_refs: `Replay the followthrough fix through the guarded feature -> test-pre-merge -> develop lane and prove protected-root startup either self-heals stale state or remains in a live retryable supervisor state instead of collapsing to fake runtime absence.`
 - case_design: `Merge the followthrough lane into a disposable test-pre-merge batch, rerun the focused startup-self-heal regressions there, then replay protected-root daemon start plus one-minute observation to confirm live-status and lifecycle evidence stay aligned for short-lived non-interactive CLI tools.`
 - evidence_level: `integration`
-- status: `in_progress`
+- status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/code-reviews/20260419-runtime-startup-self-healing-verification.md`
