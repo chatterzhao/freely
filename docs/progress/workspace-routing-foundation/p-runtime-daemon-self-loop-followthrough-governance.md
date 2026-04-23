@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/codex-empty-session-resume-fallback-20260422`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-codex-empty-session-resume-fallback`
-- updated_at: `2026-04-22 09:10 PDT`
+- branch: `feature/runtime-cleanup-followthrough-extraction-20260423`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-feature-runtime-cleanup-followthrough-extraction`
+- updated_at: `2026-04-23 07:18 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -191,6 +191,16 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
 - `PENDING`: promote through fresh protected premerge, merge into canonical `develop`, restart `./bin/freely daemon start`, and verify this owner finally clears cleanup followthrough, retires the temporary blocker lane, and continues to another task instead of stopping at monitor preflight.
+
+## 2026-04-23 07:18 PDT Cleanup Followthrough Resume Extraction
+
+- `FAIL`: canonical `develop` still reached `cleanup_governance`, but manager exit-contract replay could accept `EXIT_KIND=resume_manager` and relaunch manager before executing the already-selected cleanup followthrough, leaving continuity pinned to the same retained merged-lane closeout instead of retiring it and advancing patrol.
+- `FAIL`: when that cleanup path failed during replay, runtime only degraded into generic invalid-resume behavior without persisting an exact manager blocker that explains cleanup-followthrough failure as the real seam.
+- `PASS`: `manager_runtime_handle_exit_contract_after_ai_cycle()` now checks the active continuity for cleanup-followthrough intent before honoring `resume_manager`, runs that cleanup step first, and emits explicit `manager_exit_contract_cleanup_followthrough_begin` / `manager_exit_contract_cleanup_followthrough` receipts on success.
+- `PASS`: when `run_cleanup_followthrough` fails on that path, runtime now writes a same-owner repair handoff, records `LAST_EXIT_REASON=manager_exit_contract_cleanup_followthrough_failed`, emits `manager_exit_contract_cleanup_followthrough_failed`, and returns `resume_invalid` instead of silently resuming broader patrol.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-triggers-cleanup-followthrough`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-cleanup-followthrough-failure-materializes-blocker`
+- `PENDING`: rerun guarded premerge and canonical `develop` replay to verify cleanup followthrough now retires the retained blocker lane, clears `cleanup_governance`, and lets Freely continue toward the next task.
 
 ## Verification Evidence
 

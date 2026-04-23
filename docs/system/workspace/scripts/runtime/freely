@@ -10443,6 +10443,42 @@ manager_continuity_requires_retirement_worker_handoff() {
   return 1
 }
 
+manager_continuity_cleanup_followthrough_intake_id() {
+  local continuity_file="$1"
+  [[ -f "$continuity_file" ]] || return 1
+  python3 - "$continuity_file" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text(encoding="utf-8")
+in_truth = False
+for line in text.splitlines():
+    if "delegated continuation truth" in line:
+        in_truth = True
+        continue
+    if in_truth and line.startswith("## "):
+        break
+    if not in_truth:
+        continue
+    match = re.search(r"`([^`]+)`", line)
+    if match:
+        print(match.group(1))
+        raise SystemExit(0)
+raise SystemExit(1)
+PY
+}
+
+manager_exit_contract_cleanup_followthrough_intake_id() {
+  local project="$1" continuity_file route_kind
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 1
+  route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
+  [[ "$route_kind" == "cleanup_governance" ]] || return 1
+  grep -Eq 'retire_only|retirement receipt|runtime retirement|fleet closure' "$continuity_file" || return 1
+  manager_continuity_cleanup_followthrough_intake_id "$continuity_file"
+}
+
 append_manager_consumed_continuity_resume_focus_if_needed() {
   local project="$1"
   local state_file continuity_file latest_generated route_kind
@@ -10844,7 +10880,7 @@ EOF
 }
 
 manager_runtime_handle_exit_contract_after_ai_cycle() {
-  local project="$1" exit_reason="${2:-}" missing_csv="" kind="" worker_prompts_csv="" stop_reason="" unresolved_workers=""
+  local project="$1" exit_reason="${2:-}" missing_csv="" kind="" worker_prompts_csv="" stop_reason="" unresolved_workers="" cleanup_followthrough_intake_id="" cleanup_followthrough_output="" cleanup_followthrough_detail=""
   [[ "$(role_hint_for_project "$project")" == "manager" ]] || {
     printf 'continue\n'
     return 0
@@ -10892,6 +10928,27 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
       printf 'stop_ai\n'
       ;;
     resume_manager)
+      cleanup_followthrough_intake_id="$(manager_exit_contract_cleanup_followthrough_intake_id "$project" || true)"
+      if [[ -n "$cleanup_followthrough_intake_id" ]]; then
+        append_runtime_event "$project" "manager_exit_contract_cleanup_followthrough_begin" \
+          "intake_id=$cleanup_followthrough_intake_id"
+        if ! cleanup_followthrough_output="$({ run_cleanup_followthrough "$project" "$cleanup_followthrough_intake_id" "control" "followup" "" ""; } 2>&1)"; then
+          cleanup_followthrough_detail="$(printf '%s\n' "$cleanup_followthrough_output" | tr '\n' ';' | sed 's/;*$//' | sed 's/[[:space:]]\+/ /g')"
+          write_manager_exit_contract_repair_handoff \
+            "$project" \
+            "manager_exit_contract_cleanup_followthrough_failed" \
+            "intake_id=$cleanup_followthrough_intake_id;details=${cleanup_followthrough_detail:-unknown}"
+          write_workcell_state "$project" "running" "up" "down" "manager_exit_contract_cleanup_followthrough_failed"
+          append_runtime_event "$project" "manager_exit_contract_cleanup_followthrough_failed" \
+            "intake_id=$cleanup_followthrough_intake_id" \
+            "details=${cleanup_followthrough_detail:-unknown}"
+          printf 'resume_invalid\n'
+          return 0
+        fi
+        append_runtime_event "$project" "manager_exit_contract_cleanup_followthrough" \
+          "intake_id=$cleanup_followthrough_intake_id" \
+          "details=$(printf '%s\n' "$cleanup_followthrough_output" | tr '\n' ';' | sed 's/;*$//' | sed 's/[[:space:]]\+/ /g' | sed 's/^$/none/')"
+      fi
       write_manager_exit_contract_repair_handoff \
         "$project" \
         "manager_exit_contract_resume" \

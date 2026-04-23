@@ -306,3 +306,27 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-repair-resume-target-verification.md`
+
+### Cleanup followthrough runs before manager resume relaunch
+- id: `cleanup-followthrough-precedes-resume-manager-relaunch`
+- requirement: `When manager exit-contract replay resolves to resume_manager while continuity already targets cleanup governance, runtime must execute that cleanup followthrough before relaunch and must materialize exact blocker truth if the cleanup step fails.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#23`
+- case_design: `Seed a resume_manager exit-contract with cleanup-followthrough continuity and verify runtime either runs cleanup before relaunch or records manager_exit_contract_cleanup_followthrough_failed plus repair handoff when that cleanup path fails.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-cleanup-followthrough-resume-verification.md`
+
+### Protected replay stages cleanup followthrough resume evidence
+- id: `cleanup-followthrough-resume-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the cleanup-followthrough resume regressions and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#23`
+- case_design: `Replay the cleanup-followthrough resume repair on the disposable protected lane, rerun the focused cleanup-followthrough resume regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-cleanup-followthrough-resume-premerge-verification.md`

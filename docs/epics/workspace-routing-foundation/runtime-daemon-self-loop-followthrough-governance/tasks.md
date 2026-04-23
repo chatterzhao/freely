@@ -22,3 +22,4 @@
 - [x] When manager materializes a cleanup followthrough prompt from continuity, carry the authoritative `selected_tool` into that prompt and correct stale retained cleanup worktree config before launch.
 - [x] Reject zero-byte Codex rollout/session jsonl files as resume evidence so canonical cleanup replay falls back away from `thread/resume failed: empty session file`.
 - [x] Downgrade exit-contract repair relaunches away from `resume` whenever the resolved Codex resume target is empty or lacks verified rollout evidence, so canonical daemon replay cannot die in monitor preflight with `codex resume requires --tool-resume-target`.
+- [x] Force `resume_manager` exit-contract replay to execute pending cleanup followthrough before relaunch and fail closed with exact blocker truth when that cleanup step breaks.
