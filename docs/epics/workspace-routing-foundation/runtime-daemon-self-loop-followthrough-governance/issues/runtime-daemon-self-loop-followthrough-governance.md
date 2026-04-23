@@ -75,6 +75,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 35. Treat a Codex resume target as valid only when its rollout/session jsonl evidence is non-empty, so zero-byte persisted session files cannot send canonical cleanup followthrough back into `thread/resume failed: empty session file`.
 36. When manager exit-contract replay resolves to `resume_manager` while continuity already targets cleanup followthrough, runtime must run that cleanup followthrough before relaunch so canonical replay cannot stay pinned on the same retained merged lane.
 37. If cleanup followthrough fails on that `resume_manager` path, runtime must preserve exact blocker truth and same-owner repair handoff instead of silently degrading into another generic patrol/resume loop.
+38. Treat Codex OAuth refresh request-send failures against `https://auth.openai.com/oauth/token` as bounded transport/network failures when the evidence is request delivery failure rather than explicit auth rejection, so runtime recovery stays on `execution_network_*` instead of widening to generic `tool_runtime_failure`.
+39. Preserve the auth boundary for that same Codex OAuth refresh path: explicit auth denial such as `401 Unauthorized` remains non-network and must not enter the device-network recovery path.
 
 ## Non-Goals
 
@@ -105,6 +107,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 18. Canonical `develop` no longer attempts `codex exec resume` against a zero-byte persisted rollout file; empty-session resume evidence must fall back to fresh launch/handoff so cleanup governance can keep progressing.
 19. Canonical `develop` no longer lets `EXIT_KIND=resume_manager` bypass an already-selected cleanup followthrough; retained cleanup closeout must run before manager relaunch.
 20. Canonical `develop` now records `manager_exit_contract_cleanup_followthrough_failed` plus repair-handoff truth whenever that cleanup-followthrough resume path breaks, so self-host replay stops on exact blocker evidence instead of an opaque relaunch loop.
+21. Canonical `develop` no longer collapses Codex OAuth refresh request-send failures into `tool_runtime_failure`; those transport failures stay on the bounded `execution_network_transient` / `execution_network_persistent` path.
+22. Canonical `develop` still keeps explicit Codex OAuth refresh auth denial such as `401 Unauthorized` off the network path, so auth noise does not masquerade as device-network instability.
 
 ## Verification
 
@@ -134,6 +138,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
 - `bash docs/system/workspace/scripts/tests/test-freely-runtime-failure-guidance`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-classifies-codex-reconnect-exhaustion-as-network-failure`
+- `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-classifies-codex-oauth-refresh-request-error-as-network-failure`
+- `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-apikey-oauth-refresh-401`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`

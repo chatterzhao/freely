@@ -283,6 +283,17 @@
 - `FAIL`: the first guarded `develop` merge attempt was blocked by the develop-bound governance materialization gate because this followthrough's owner issue/progress/review evidence was not yet present in the merge diff, even though the code/test patch itself was ready.
 - `PENDING`: rerun guarded `develop` merge with the refreshed owner evidence, then restart canonical `develop` runtime and continue self-host replay until Freely completes one task with lawful closeout and advances to the next task.
 
+## 2026-04-23 08:05 PDT Codex OAuth Refresh Transport Classification Verification
+
+- `FAIL`: latest runtime truth still showed a real Codex transport failure being widened into generic runtime failure: worker prompt evidence included `Failed to refresh token: error sending request for url (https://auth.openai.com/oauth/token)`, while live-status still reported `last_exit_reason=tool_runtime_failure`.
+- `PASS`: `monitor-ai-cli` and runtime classification now treat that request-send failure family as bounded network evidence, so the same device-network recovery path used for reconnect exhaustion can also cover OAuth refresh transport failures.
+- `PASS`: explicit auth rejection remains outside that path; the existing `401 Unauthorized` OAuth refresh noise test still passes and guards the auth/network boundary.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-apikey-oauth-refresh-401`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-classifies-codex-oauth-refresh-request-error-as-network-failure`
+- `PASS`: `./bin/governance-check`
+- `PENDING`: replay protected promotion with this refreshed owner evidence, then re-run canonical `develop` daemon self-host acceptance and verify the same Codex OAuth request-send failure family now lands on `execution_network_*` rather than `tool_runtime_failure`.
+
 ## 2026-04-22 03:15 PDT Repair Handoff Relaunch Verification
 
 - `FAIL`: canonical `develop` self-host replay progressed to `manager_exit_contract_invalid`, but the next manager round relaunched as `fresh rotation_reason=initial_start`; that violated the repair handoff contract, reopened broad patrol, and let newer intake supersede the repair round before a valid exit contract existed.
