@@ -5661,7 +5661,7 @@ log_has_proxy_config_invalid() {
 log_has_execution_network_failure() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
-  runtime_error_signal_excerpt "$log_file" | rg -qi 'ERROR:\s*Reconnecting|worker quit with fatal: Transport channel closed|invalid peer certificate|certificate was not trusted|certificate expired|received fatal alert|websocket: failed to connect|connection closed via error|curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error|502|503|504'
+  runtime_error_signal_excerpt "$log_file" | rg -qi 'ERROR:\s*Reconnecting|worker quit with fatal: Transport channel closed|invalid peer certificate|certificate was not trusted|certificate expired|received fatal alert|websocket: failed to connect|connection closed via error|curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error|502|503|504|Failed to refresh token: error sending request for url \("https://auth\.openai\.com/oauth/token"\)'
 }
 
 log_has_kiro_monthly_request_limit() {
