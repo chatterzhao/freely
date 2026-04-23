@@ -330,3 +330,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-cleanup-followthrough-resume-premerge-verification.md`
+
+### Protected replay stages Codex OAuth refresh network-classification evidence
+- id: `codex-oauth-refresh-network-classification-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the focused Codex OAuth refresh network-classification regressions and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#13`
+- case_design: `Replay the Codex OAuth refresh transport-classification repair on the disposable protected lane, rerun the focused OAuth request-send network classification regressions plus owner gate there, and stage the refreshed owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
