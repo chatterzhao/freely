@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ai-pid-validation.XXXXXX)"
+cleanup() {
+  set +e
+  kill "${IFLOW_PID:-}" "${CLAUDE_PID:-}" "${FOREIGN_PID:-}" 2>/dev/null || true
+  wait "${IFLOW_PID:-}" "${CLAUDE_PID:-}" "${FOREIGN_PID:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+make_project() {
+  local name="$1" tool="$2" project=""
+  project="$TMP_DIR/$name"
+  mkdir -p "$project/.freely/run" "$project/.freely/logs"
+  cat >"$project/.freely/config.env" <<EOF
+PROJECT_ROOT="$project"
+AI_TOOL="$tool"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+  printf '%s\n' "$project"
+}
+
+IFLOW_PROJECT="$(make_project iflow-project iflow)"
+CC_PROJECT="$(make_project cc-project cc)"
+
+bash -c "cd '$IFLOW_PROJECT' && exec -a 'iflow --resume session-1' sleep 30" >/dev/null 2>&1 &
+IFLOW_PID=$!
+
+bash -c "cd '$CC_PROJECT' && exec -a 'claude --session-id abc123' sleep 30" >/dev/null 2>&1 &
+CLAUDE_PID=$!
+
+bash -c "cd '$TMP_DIR' && exec -a 'iflow --resume foreign-session' sleep 30" >/dev/null 2>&1 &
+FOREIGN_PID=$!
+
+bash -lc "
+  source '$ROOT_DIR/docs/system/workspace/scripts/runtime/freely'
+  valid_ai_pid_for_project '$IFLOW_PROJECT' '$IFLOW_PID'
+  valid_ai_pid_for_project '$CC_PROJECT' '$CLAUDE_PID'
+  if valid_ai_pid_for_project '$IFLOW_PROJECT' '$FOREIGN_PID'; then
+    echo '[FAIL] pid validation accepted a same-tool process that is not owned by the project cwd' >&2
+    exit 1
+  fi
+"
+
+echo "[PASS] ai pid validation follows supported tool signatures and still rejects foreign same-tool processes"

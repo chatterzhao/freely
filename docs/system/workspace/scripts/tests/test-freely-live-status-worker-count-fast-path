@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-worker-count-fast-path.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER_A="$TMP_DIR/worker-a"
+WORKER_B="$TMP_DIR/worker-b"
+
+mkdir -p "$PROJECT" "$WORKER_A/.freely/run" "$WORKER_B/.freely/run"
+
+bash -c "exec -a 'codex exec -C $WORKER_A -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+WORKER_A_AI_PID=$!
+bash -c "exec -a 'runtime/freely daemon-run --project $WORKER_B' sleep 30" >/dev/null 2>&1 &
+WORKER_B_SUP_PID=$!
+trap 'kill "$WORKER_A_AI_PID" "$WORKER_B_SUP_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+
+printf '%s' "$WORKER_A_AI_PID" >"$WORKER_A/.freely/run/ai.pid"
+printf '%s' "$WORKER_B_SUP_PID" >"$WORKER_B/.freely/run/supervisor.pid"
+
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+fleet_worktree_branch_rows_for_project() {
+  cat <<EOF
+$PROJECT|develop
+$WORKER_A|feature/worker-a
+$WORKER_B|feature/worker-b
+EOF
+}
+
+worker_project_is_actively_running() {
+  echo "[FAIL] count_active_running_workers_for_manager_project should use the status fast path" >&2
+  return 99
+}
+
+COUNT="$(count_active_running_workers_for_manager_project "$PROJECT")"
+if [[ "$COUNT" != "2" ]]; then
+  echo "[FAIL] expected fast-path worker count to report 2 active workers, got: $COUNT" >&2
+  exit 1
+fi
+
+echo "[PASS] live-status worker count uses the fast path instead of heavy worker runtime discovery"

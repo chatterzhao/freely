@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-proxy-self-heal.XXXXXX)"
+export FREELY_HOME="$TMP_DIR/freely-home"
+cleanup() {
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+mkdir -p "$FREELY_HOME"
+
+make_project() {
+  local name="$1" auto_setup="${2:-true}" mode="${3:-inherit}" project=""
+  project="$TMP_DIR/$name"
+  mkdir -p "$project/.freely/run" "$project/.freely/logs"
+  cat >"$project/.freely/config.env" <<EOF
+PROJECT_ROOT="$project"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+AUTO_SWITCH_SLOT="false"
+AUTO_SWITCH_TOOL="false"
+AUTO_SETUP_FREELY_PROXY="$auto_setup"
+FREELY_NETWORK_PROXY_MODE="$mode"
+FREELY_NETWORK_PROXY_URL="http://proxy.example:7890"
+FREELY_ALL_PROXY=""
+FREELY_HTTP_PROXY=""
+FREELY_HTTPS_PROXY=""
+FREELY_NO_PROXY=""
+EOF
+  printf '%s\n' "$project"
+}
+
+SUCCESS_PROJECT="$(make_project success true inherit)"
+DISABLED_PROJECT="$(make_project disabled false inherit)"
+FAIL_PROJECT="$(make_project fail true inherit)"
+
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+runtime_proxy_self_heal_probe_result() {
+  local project="$1" tool="$2" mode=""
+  mode="$(awk -F= '/^FREELY_NETWORK_PROXY_MODE=/{gsub(/"/, "", $2); print $2; exit}' "$project/.freely/config.env")"
+  case "$project:$mode" in
+    "$SUCCESS_PROJECT:explicit") printf 'usable\n' ;;
+    "$SUCCESS_PROJECT:"*) printf 'network_failure\n' ;;
+    "$DISABLED_PROJECT:"*) printf 'usable\n' ;;
+    "$FAIL_PROJECT:"*) printf 'network_failure\n' ;;
+    *) printf 'network_failure\n' ;;
+  esac
+}
+
+attempt_runtime_proxy_self_heal_after_network_failure "$SUCCESS_PROJECT" "codex" "execution_network_transient"
+grep -q '^FREELY_NETWORK_PROXY_MODE="explicit"$' "$SUCCESS_PROJECT/.freely/config.env" || {
+  echo '[FAIL] proxy self-heal should persist the verified proxy mode' >&2
+  cat "$SUCCESS_PROJECT/.freely/config.env" >&2
+  exit 1
+}
+
+if attempt_runtime_proxy_self_heal_after_network_failure "$DISABLED_PROJECT" "codex" "execution_network_transient"; then
+  echo '[FAIL] proxy self-heal should stay disabled when AUTO_SETUP_FREELY_PROXY=false' >&2
+  exit 1
+fi
+grep -q '^FREELY_NETWORK_PROXY_MODE="inherit"$' "$DISABLED_PROJECT/.freely/config.env" || {
+  echo '[FAIL] disabled proxy self-heal should not rewrite proxy mode' >&2
+  exit 1
+}
+
+if attempt_runtime_proxy_self_heal_after_network_failure "$FAIL_PROJECT" "codex" "execution_network_transient"; then
+  echo '[FAIL] proxy self-heal should fail after exhausting all proxy modes' >&2
+  exit 1
+fi
+grep -q '^FREELY_NETWORK_PROXY_MODE="inherit"$' "$FAIL_PROJECT/.freely/config.env" || {
+  echo '[FAIL] exhausted proxy self-heal should restore the original proxy mode' >&2
+  cat "$FAIL_PROJECT/.freely/config.env" >&2
+  exit 1
+}
+
+echo "[PASS] proxy self-heal rotates proxy modes, respects AUTO_SETUP_FREELY_PROXY, and restores the original mode on exhaustion"
