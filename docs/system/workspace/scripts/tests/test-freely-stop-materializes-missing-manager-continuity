@@ -70,6 +70,7 @@ bash "$ROOT_DIR/bin/freely" stop --project "$REPO" >/dev/null
 grep -q '^# Manager Continuity$' "$EXPECTED_CONTINUITY"
 grep -q 'continuity_written_by: `freely-runtime-fallback`' "$EXPECTED_CONTINUITY"
 grep -q "fallback_reason: \`operator_stop\`" "$EXPECTED_CONTINUITY"
+grep -Eq 'generated_at: `20[0-9]{2}\.[0-9]{2}\.[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [A-Z]{3}`' "$EXPECTED_CONTINUITY"
 grep -q "previous_manager_continuity: \`$OLD_CONTINUITY\`" "$EXPECTED_CONTINUITY"
 grep -q "prompt_file: \`$PROMPT\`" "$EXPECTED_CONTINUITY"
 grep -q "latest_cycle_log: \`$REPO/.freely/logs/cycle-20260412-181201.log\`" "$EXPECTED_CONTINUITY"

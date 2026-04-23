@@ -46,6 +46,14 @@ format_timestamp_local_for_display() {
   printf '%s\n' "$value"
 }
 
+current_timestamp_local_for_display() {
+  format_epoch_local "$(date +%s)"
+}
+
+current_timestamp_utc_for_machine() {
+  date -u '+%Y-%m-%dT%H:%M:%SZ'
+}
+
 strip_simple_shell_quotes() {
   local value="${1-}"
   if [[ "$value" == \"*\" && "$value" == *\" ]]; then
@@ -190,7 +198,7 @@ acquire_project_start_lock_or_wait() {
     if mkdir "$lock_dir" 2>/dev/null; then
       cat >"$state_file" <<EOF
 owner_pid="$$"
-started_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+started_at="$(current_timestamp_utc_for_machine)"
 reason="$reason"
 EOF
       append_runtime_event "$project" "project_start_lock_acquired" \
@@ -905,7 +913,7 @@ append_runtime_event() {
   local log_file timestamp kv key value
   log_file="$(runtime_events_log_file "$project")"
   mkdir -p "$(dirname "$log_file")"
-  timestamp="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  timestamp="$(current_timestamp_utc_for_machine)"
   {
     printf '%s event=%s' "$timestamp" "$event"
     for kv in "$@"; do
@@ -1198,7 +1206,7 @@ register_project_in_registry() {
   local registry dir tmp now canonical_project
   registry="$(projects_registry_file)"
   dir="$(dirname "$registry")"
-  now="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  now="$(current_timestamp_utc_for_machine)"
   if [[ -d "$project" ]]; then
     canonical_project="$(cd "$project" && pwd -P)"
   else
@@ -1411,7 +1419,7 @@ append_global_auth_change_event() {
   local log_file
   log_file="$(global_state_dir)/auth-change-events.log"
   mkdir -p "$(dirname "$log_file")"
-  printf '%s event=auth_change tool=%q slot=%q reason=%q\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "${tool:-unknown}" "${slot:-}" "${reason:-unspecified}" >>"$log_file"
+  printf '%s event=auth_change tool=%q slot=%q reason=%q\n' "$(current_timestamp_utc_for_machine)" "${tool:-unknown}" "${slot:-}" "${reason:-unspecified}" >>"$log_file"
 }
 
 reset_project_auth_change_hold_state() {
@@ -1737,7 +1745,7 @@ tool_write_availability_state() {
 AVAILABILITY_PHASE="${phase:-unknown}"
 BLOCKED_REASON="${blocked_reason:-}"
 EARLIEST_RESET_HINT="${earliest_reset:-}"
-LAST_PROBE_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+LAST_PROBE_AT="$(current_timestamp_utc_for_machine)"
 EOF
 }
 
@@ -1797,7 +1805,7 @@ acquire_interruption_triage_lock_for_intake() {
   fi
   cat >"$state_file" <<EOF
 owner_pid="$$"
-acquired_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+acquired_at="$(current_timestamp_utc_for_machine)"
 EOF
 }
 
@@ -2077,7 +2085,7 @@ materialize_missing_required_manager_continuity_fallback() {
   mkdir -p "$(dirname "$expected_continuity")"
   continuity_id="$(manager_continuity_id_from_path "$expected_continuity")"
   branch="$(git -C "$project" branch --show-current 2>/dev/null || printf 'unknown')"
-  generated_at="$(date '+%Y-%m-%d %H:%M:%S %Z')"
+  generated_at="$(current_timestamp_local_for_display)"
   previous_manager_continuity="${latest_generated:-none}"
   [[ -n "$previous_manager_continuity" && -f "$previous_manager_continuity" ]] || previous_manager_continuity="none"
   resolution_file="$(latest_interruption_resolution_file_for_project "$project")"
@@ -2157,7 +2165,7 @@ materialize_required_manager_continuity_startup_stub() {
   mkdir -p "$(dirname "$expected_continuity")"
   continuity_id="$(manager_continuity_id_from_path "$expected_continuity")"
   branch="$(git -C "$project" branch --show-current 2>/dev/null || printf 'unknown')"
-  generated_at="$(date '+%Y-%m-%d %H:%M:%S %Z')"
+  generated_at="$(current_timestamp_local_for_display)"
   previous_manager_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
   [[ -n "$previous_manager_continuity" && -f "$previous_manager_continuity" ]] || previous_manager_continuity="none"
   session_file="$(session_state_file "$project")"
@@ -2595,7 +2603,7 @@ write_supervisor_identity_truth() {
   local project="$1" pid="$2" entrypoint_mode="$3" identity_dir identity_file published_at
   identity_dir="$(supervisor_identity_dir_for_project "$project")"
   identity_file="$(supervisor_identity_file_for_project_pid "$project" "$pid")"
-  published_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  published_at="$(current_timestamp_utc_for_machine)"
   mkdir -p "$identity_dir"
   cat >"$identity_file" <<EOF
 SUPERVISOR_PID="$pid"
@@ -3339,7 +3347,7 @@ require_default_autonomy_activation_consent() {
   print_autonomy_posture_summary "$project"
   echo "note: safeguards are strongly recommended and supported, but not default activation blockers"
 
-  recorded_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  recorded_at="$(current_timestamp_utc_for_machine)"
   if [[ "$accept_flag" == "true" ]]; then
     FREELY_INIT_CONSENT_STATUS="accepted"
     FREELY_INIT_CONSENT_RECORDED_AT="$recorded_at"
@@ -4724,7 +4732,7 @@ update_intake_pending_signal() {
   if [[ "$count" -gt 0 ]]; then
     cat >"$pending_file" <<EOF
 PENDING_INTAKE_ITEMS="$count"
-UPDATED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+UPDATED_AT="$(current_timestamp_utc_for_machine)"
 EOF
   else
     rm -f "$pending_file"
@@ -4760,7 +4768,7 @@ write_intake_item() {
   item_dir="$intake_root/$intake_id"
   meta_file="$item_dir/meta.env"
   message_file="$item_dir/message.txt"
-  created_at="${created_at_override:-$(date -u '+%Y-%m-%dT%H:%M:%SZ')}"
+  created_at="${created_at_override:-$(current_timestamp_utc_for_machine)}"
   mkdir -p "$item_dir"
   cat >"$meta_file" <<EOF
 INTAKE_ID="$intake_id"
@@ -4788,7 +4796,7 @@ write_interruption_resolution_artifact() {
   item_dir="$(interruption_resolution_item_dir "$project" "$intake_id")"
   meta_file="$item_dir/meta.env"
   content_file="$item_dir/resolution.md"
-  created_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  created_at="$(current_timestamp_utc_for_machine)"
   mkdir -p "$item_dir"
   cat >"$meta_file" <<EOF
 INTAKE_ID="$intake_id"
@@ -5227,7 +5235,7 @@ materialize_blocked_supervision_truth_if_needed() {
   fi
   pending_ids="$(prompt_visible_unclaimed_intake_ids_for_prompt "$project" "$prompt_file")"
   [[ -n "$pending_ids" ]] || return 0
-  now="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  now="$(current_timestamp_utc_for_machine)"
   session_refs="$(current_workcell_session_refs)"
   IFS=',' read -r -a __blocked_pending_ids <<<"$pending_ids"
   for intake_id in "${__blocked_pending_ids[@]}"; do
@@ -6128,7 +6136,7 @@ write_workcell_state() {
   local state_file role_hint updated_at verification_contract_file verification_metadata_present verification_missing_fields verification_owner_issue verification_pre_tests_path verification_artifact_dir verification_test_lanes verification_acceptance_ids verification_evidence_level verification_target_environment verification_closeout_gate verification_closeout_gate_command verification_closeout_target_lane verification_closeout_promotion_gate verification_closeout_requires_adequacy verification_closeout_review_artifact_policy entrypoint_mode
   state_file="$(workcell_state_file "$project")"
   role_hint="$(role_hint_for_project "$project")"
-  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  updated_at="$(current_timestamp_utc_for_machine)"
   entrypoint_mode="${WORKCELL_ENTRYPOINT_MODE_OVERRIDE:-}"
   if [[ -z "$entrypoint_mode" && -f "$state_file" ]]; then
     unset LAST_ENTRYPOINT_MODE
@@ -6415,7 +6423,7 @@ write_develop_push_followthrough_state() {
   local project="$1" reason="$2" note="${3:-}"
   local state_file updated_at
   state_file="$(develop_push_followthrough_state_file "$project")"
-  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  updated_at="$(current_timestamp_utc_for_machine)"
   mkdir -p "$(dirname "$state_file")"
   cat >"$state_file" <<EOF
 DEVELOP_PUSH_DEFER_REASON="$reason"
@@ -6433,7 +6441,7 @@ write_develop_push_attempt_state() {
   local project="$1" reason="$2" note="${3:-}" head="${4:-}"
   local state_file updated_at
   state_file="$(develop_push_attempt_state_file "$project")"
-  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  updated_at="$(current_timestamp_utc_for_machine)"
   note="$(develop_push_followthrough_normalize_note "$note")"
   mkdir -p "$(dirname "$state_file")"
   cat >"$state_file" <<EOF
@@ -6493,7 +6501,7 @@ LAST_PREEMPTION_MODE="$mode"
 LAST_PREEMPTION_REASON="$reason"
 LAST_PREEMPTION_INTAKE_ID="$intake_id"
 LAST_PREEMPTION_PID="$pid"
-LAST_PREEMPTION_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+LAST_PREEMPTION_AT="$(current_timestamp_utc_for_machine)"
 EOF
 }
 
@@ -6510,7 +6518,7 @@ QUEUED_WORKER_PROMPT_BLOCKERS="$queued_prompt_blockers"
 MAX_PARALLEL_WORKERS="$max_parallel_workers"
 ACTIVE_RUNNING_WORKER_COUNT="$active_worker_count"
 AVAILABLE_NEW_WORKER_SLOTS="$available_worker_slots"
-UPDATED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+UPDATED_AT="$(current_timestamp_utc_for_machine)"
 EOF
 }
 
@@ -6522,7 +6530,7 @@ record_manager_operator_stop_boundary() {
   [[ "$now_epoch" =~ ^[0-9]+$ ]] || now_epoch="$(date +%s)"
   cat >"$boundary_file" <<EOF
 OPERATOR_STOP_BOUNDARY_EPOCH="$now_epoch"
-OPERATOR_STOP_BOUNDARY_RECORDED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+OPERATOR_STOP_BOUNDARY_RECORDED_AT="$(current_timestamp_utc_for_machine)"
 EOF
 }
 
@@ -8735,7 +8743,7 @@ write_worker_verification_contract_file() {
   if worker_prompt_has_verification_metadata "$prompt_file"; then
     has_metadata="true"
   fi
-  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  updated_at="$(current_timestamp_utc_for_machine)"
   mkdir -p "$(dirname "$contract_file")"
   cat >"$contract_file" <<EOF
 SOURCE_PROMPT_FILE="$prompt_file"
@@ -8764,7 +8772,7 @@ write_worker_verification_contract_stub_for_project() {
   local project="$1" missing_fields_csv="$2" source_prompt_file="${3:-}" target_project="${4:-}"
   local contract_file updated_at
   contract_file="$(worker_verification_contract_state_file "$project")"
-  updated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  updated_at="$(current_timestamp_utc_for_machine)"
   mkdir -p "$(dirname "$contract_file")"
   cat >"$contract_file" <<EOF
 SOURCE_PROMPT_FILE="$source_prompt_file"
@@ -9527,7 +9535,7 @@ write_manager_worker_launch_intake() {
   local target_project="$1" prompt_file="$2"
   local intake_id created_at claimed_at message verification_contract_file
   intake_id="$(manager_worker_launch_intake_id_for_prompt "$prompt_file")"
-  created_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  created_at="$(current_timestamp_utc_for_machine)"
   claimed_at="$created_at"
   message="$(cat "$prompt_file")"
   write_intake_item \
@@ -10237,7 +10245,7 @@ record_restart_storm_signal() {
   LAST_RESTART_STORM_WINDOW_SECS="${RESTART_STORM_WINDOW_SECS:-30}"
   LAST_RESTART_STORM_COUNT="${restart_count:-0}"
   LAST_PROCESS_CHURN_PEAK="${process_peak:-0}"
-  LAST_RESTART_STORM_SIGNAL_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  LAST_RESTART_STORM_SIGNAL_AT="$(current_timestamp_utc_for_machine)"
   LAST_RESTART_STORM_SIGNAL_REASON="$signal_reason"
   LAST_RESTART_STORM_ESCALATED_AT="$LAST_RESTART_STORM_SIGNAL_AT"
   LAST_RESTART_STORM_ESCALATION_TARGET="manager_bootstrap_handoff"
@@ -11505,7 +11513,7 @@ write_task_source_scan_json_for_project() {
   state_path="$(task_source_scan_state_file_for_project "$project")"
   mkdir -p "$run_dir"
 
-  generated_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  generated_at="$(current_timestamp_utc_for_machine)"
   human_snapshot="$(intake_snapshot_for_project "$project" 8)"
   delegated_snapshot="$(delegated_continuation_snapshot_for_project "$project" 6)"
   milestone_snapshot="$(milestone_patrol_seed_snapshot_for_project "$project" 6)"
@@ -14939,7 +14947,7 @@ start_project_runtime() {
     esac
     if [[ -n "$delegated_pending_ids" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
       delegated_consumed_ids="$delegated_pending_ids"
-      delegated_consumed_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+      delegated_consumed_at="$(current_timestamp_utc_for_machine)"
     fi
     LAST_DELEGATED_CONTINUATION_PENDING_IDS="$delegated_pending_ids"
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
@@ -14979,7 +14987,7 @@ start_project_runtime() {
       "expected_next=L041"
     set +e
     {
-      echo "===== $(date '+%F %T %Z') mode=$mode_name tool=$AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
+      echo "===== $(current_timestamp_local_for_display) mode=$mode_name tool=$AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
       local workspace_root monitor_script
       workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
       monitor_script="$SELF_ROOT/docs/system/workspace/scripts/monitor-ai-cli.sh"
@@ -15187,13 +15195,13 @@ start_project_runtime() {
       fi
       if [[ -n "$slot_switch_reason" ]]; then
         LAST_SLOT_SWITCH_REASON="$slot_switch_reason"
-        LAST_SLOT_SWITCH_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+        LAST_SLOT_SWITCH_AT="$(current_timestamp_utc_for_machine)"
       fi
     elif [[ "$AI_TOOL" == "kiro-cli" && -z "$slot_switch_reason" ]]; then
       slot_switch_reason="$(kiro_availability_reason_from_log "$cycle_log" || true)"
       if [[ -n "$slot_switch_reason" ]]; then
         LAST_SLOT_SWITCH_REASON="$slot_switch_reason"
-        LAST_SLOT_SWITCH_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+        LAST_SLOT_SWITCH_AT="$(current_timestamp_utc_for_machine)"
       fi
     fi
     if [[ -z "$network_failure_reason" && -z "$slot_switch_reason" && -z "$rate_limit_reason" ]]; then
@@ -15963,7 +15971,7 @@ cmd_intake_claim() {
   validate_absorption_classification_or_fail "$classification"
   meta_file="$(intake_item_meta_file "$project" "$intake_id")"
   [[ -f "$meta_file" ]] || { log_error "intake item not found: $intake_id"; exit 1; }
-  claimed_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  claimed_at="$(current_timestamp_utc_for_machine)"
   if [[ -n "$delegated_worktree" ]]; then
     status="delegated"
   else
@@ -16051,7 +16059,7 @@ cmd_intake_resolve() {
     session_refs_override="$(current_workcell_session_refs)"
   fi
   rewrite_existing_intake_item \
-    "$project" "$intake_id" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "$reaction" "${claimed_by:-$resolved_by}" "${claimed_at:-$(date -u '+%Y-%m-%dT%H:%M:%SZ')}" "$absorption_target" "$resolution_artifact" "$session_refs_override"
+    "$project" "$intake_id" "$status" "$classification" "$linked_artifact" "$delegated_worktree" "$reaction" "${claimed_by:-$resolved_by}" "${claimed_at:-$(current_timestamp_utc_for_machine)}" "$absorption_target" "$resolution_artifact" "$session_refs_override"
   if [[ "$status" == "delegated" ]]; then
     local project_real delegated_real
     project_real="$(cd "$project" && pwd -P)"
