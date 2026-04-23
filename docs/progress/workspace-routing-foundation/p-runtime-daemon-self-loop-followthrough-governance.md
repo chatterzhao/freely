@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-cleanup-followthrough-extraction-20260423`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-feature-runtime-cleanup-followthrough-extraction`
-- updated_at: `2026-04-23 07:18 PDT`
+- updated_at: `2026-04-23 08:05 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -201,6 +201,17 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-triggers-cleanup-followthrough`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-cleanup-followthrough-failure-materializes-blocker`
 - `PENDING`: rerun guarded premerge and canonical `develop` replay to verify cleanup followthrough now retires the retained blocker lane, clears `cleanup_governance`, and lets Freely continue toward the next task.
+
+## 2026-04-23 08:05 PDT Codex OAuth Refresh Network Classification
+
+- `FAIL`: latest worker replay still widened one real transport seam into generic runtime failure: Codex logged `Failed to refresh token: error sending request for url (https://auth.openai.com/oauth/token)`, and runtime surfaced that exit as `tool_runtime_failure` instead of bounded `execution_network_*`.
+- `PASS`: tightened the existing same-owner network classifier so request-send failures on the Codex OAuth refresh path are treated as transport/network evidence, while explicit auth-denied evidence remains outside the network path.
+- `PASS`: preserved the prior auth boundary by keeping OAuth refresh `401 Unauthorized` noise non-network, so auth/config problems do not masquerade as real device / wifi / hotspot instability.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-apikey-oauth-refresh-401`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-classifies-codex-oauth-refresh-request-error-as-network-failure`
+- `PASS`: `./bin/governance-check`
+- `PENDING`: refresh protected premerge with this owner evidence in diff, merge lawfully into `develop`, then restart canonical `develop` daemon replay and confirm the same failure family now lands on `execution_network_*` instead of `tool_runtime_failure`.
 
 ## Verification Evidence
 
