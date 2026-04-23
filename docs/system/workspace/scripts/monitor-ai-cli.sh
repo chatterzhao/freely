@@ -486,7 +486,7 @@ log_has_runtime_network_failure() {
   # bounded execution-network backoff policy; hard network failures still trip
   # immediately here.
   if printf '%s\n' "$excerpt" | rg -qi \
-    'worker quit with fatal: Transport channel closed|invalid peer certificate|certificate was not trusted|certificate expired|received fatal alert|websocket: failed to connect|connection closed via error|curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error'; then
+    'worker quit with fatal: Transport channel closed|invalid peer certificate|certificate was not trusted|certificate expired|received fatal alert|websocket: failed to connect|connection closed via error|curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error|Failed to refresh token: error sending request for url \("https://auth\.openai\.com/oauth/token"\)'; then
     return 0
   fi
   return 1

@@ -59,9 +59,11 @@ HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 TRANSIENT_LOG="$TMP_DIR/transient.log"
 PROXY_LOG="$TMP_DIR/proxy.log"
 RECONNECT_LOG="$TMP_DIR/reconnect.log"
+OAUTH_LOG="$TMP_DIR/oauth.log"
 printf 'curl: (28) Operation timed out after 30000 milliseconds\n' >"$TRANSIENT_LOG"
 printf '[ERROR] FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set\n' >"$PROXY_LOG"
 printf 'ERROR: Reconnecting... 2/5\n' >"$RECONNECT_LOG"
+printf '2026-04-23T22:00:13.468108Z ERROR codex_login::auth::manager: Failed to refresh token: error sending request for url ("https://auth.openai.com/oauth/token")\n' >"$OAUTH_LOG"
 
 reason_one="$(runtime_network_failure_reason_from_log "$PROJECT" "$TRANSIENT_LOG")"
 reason_two="$(runtime_network_failure_reason_from_log "$PROJECT" "$TRANSIENT_LOG")"
@@ -96,6 +98,13 @@ clear_execution_network_state "$PROJECT"
 reconnect_reason="$(runtime_network_failure_reason_from_log "$PROJECT" "$RECONNECT_LOG")"
 [[ "$reconnect_reason" == "execution_network_transient" ]] || {
   echo "[FAIL] codex reconnect log should classify as execution_network_transient" >&2
+  exit 1
+}
+
+clear_execution_network_state "$PROJECT"
+oauth_reason="$(runtime_network_failure_reason_from_log "$PROJECT" "$OAUTH_LOG")"
+[[ "$oauth_reason" == "execution_network_transient" ]] || {
+  echo "[FAIL] codex OAuth request-send failure should classify as execution_network_transient" >&2
   exit 1
 }
 
