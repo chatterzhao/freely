@@ -104,3 +104,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/system/workspace/scripts/tests/test-freely-machine-time-format-uses-shared-helper`
+
+### Protected premerge replay preserves runtime time helper unification
+- id: `premerge-runtime-time-helper-unification-proof`
+- requirement: `Before guarded develop merge, the protected lane must rerun the bounded helper regressions and stage a fresh owner verification artifact for the replay.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#runtime-time-helper-unification`
+- case_design: `Replay the helper-unification slice on test-pre-merge, rerun the five bounded regressions plus owner gates there, and stage a fresh premerge verification artifact before promoting into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/code-reviews/20260423-runtime-human-readable-time-display-helper-unification-premerge-verification.md`
