@@ -21,6 +21,7 @@
   - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
   - `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
 - created_at: `2026-04-19`
+- updated_at: `2026-04-22`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -40,7 +41,10 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 3. Downgrade stale `running/up/starting` startup truth to canonical stopped/down state after a bounded grace window when no authoritative runtime processes exist.
 4. Persist refreshed manager launch-state continuity/prompt references when read-time status repair discovers stale continuity anchors.
 5. Treat equivalent on-disk project paths as the same runtime owner during pid and supervisor-identity validation so status readback does not clear a live daemon only because the recorded path spelling differs.
-6. Cover the repair with focused regressions and one protected-root replay.
+6. Keep startup/bootstrap grace aligned with runtime-published launch truth so a manager lane that has already recorded `ai_launch_in_flight` or `ai_launch_observed` is not torn down as fake runtime absence during the same bounded grace window.
+7. Validate live AI pids against the configured supported-tool launcher signatures instead of stale hard-coded argv fragments, while still rejecting foreign same-tool processes.
+8. Allow bounded project-scoped proxy self-heal for execution-time network failures without silently re-enabling tool or slot auto-switch when those controls are disabled.
+9. Cover the repair with focused regressions and one protected-root replay.
 
 ## Non-Goals
 
@@ -48,6 +52,7 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 2. Do not silently restore interrupted AI work during `restart`.
 3. Do not redesign generic post-failure recovery, fleet sequencing, or manager routing.
 4. Do not widen this owner into a broad runtime lifecycle rewrite.
+5. Do not silently turn `AUTO_SWITCH_TOOL=false` or `AUTO_SWITCH_SLOT=false` back on.
 
 ## Acceptance
 
@@ -55,9 +60,11 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 2. A stale startup state older than the bounded grace window, with no authoritative runtime processes or active start lock, is rewritten to `stopped/down/down/startup_self_heal_no_runtime`.
 3. Stale `supervisor.pid`, `ai.pid`, `ensure-manager.pid`, and `interruption-dispatch.pid` files are removed only when project ownership cannot be validated and no unverified pid-hint exception remains.
 4. `manager_worker_launch_state_refresh_for_status()` persists corrected continuity/prompt references even when worker-slot counts do not change.
-5. Protected-root replay proves Freely can cold-start from a stale machine-owned state and reach either a canonical self-healed startup surface or a still-live retryable supervisor state instead of remaining self-contradictory.
-6. `live-status` and related ownership checks keep a live daemon runtime authoritative when the recorded project root and the inspected project root resolve to the same on-disk directory even if the path spelling differs.
-7. `daemon start` launches `daemon-run` in a session-detached way that survives short-lived non-interactive caller teardown instead of depending on shell job control.
+5. If monitor/runtime has already recorded `LAST_EXIT_REASON="ai_launch_in_flight"` during startup, bootstrap grace keeps the supervisor in a retryable in-flight state instead of misclassifying it as missing AI runtime immediately after `L041 ai_launch_observed`.
+6. AI pid validation follows the configured supported tool family and accepts lawful `claude` launcher processes for `cc` aliases while still rejecting foreign same-tool processes.
+7. Network execution failures can attempt bounded project-scoped proxy self-heal, verified by a live `hi` probe, without changing tool or slot selection when those auto-switch controls are disabled.
+8. `live-status` and related ownership checks keep a live daemon runtime authoritative when the recorded project root and the inspected project root resolve to the same on-disk directory even if the path spelling differs, and avoid heavy fleet refresh while a manager AI is already active.
+9. `daemon start` launches `daemon-run` in a session-detached way that survives short-lived non-interactive caller teardown instead of depending on shell job control.
 
 ## Verification
 
@@ -70,6 +77,12 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 - `bash docs/system/workspace/scripts/tests/test-freely-prompt-build-failure-keeps-supervisor-alive`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-persists-stale-continuity-rewrite`
 - `bash docs/system/workspace/scripts/tests/test-freely-stale-manager-continuity-filter`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-bootstrap-keeps-supervisor-after-ai-launch-observed`
+- `bash docs/system/workspace/scripts/tests/test-freely-ai-pid-validation-supported-tools`
+- `bash docs/system/workspace/scripts/tests/test-freely-proxy-self-heal`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-active-manager-skips-fleet-refresh`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-uses-status-signals-when-manager-idle`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-worker-count-fast-path`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 - `git diff --check`
 - `./bin/governance-check`
@@ -78,5 +91,6 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 ## Success Criteria
 
 1. On the protected root, machine-owned startup truth no longer stays in fake `running/up/starting` after runtime processes are already gone.
-2. Short-lived non-interactive AI tools remain compatible with attach/reuse, daemon cold-start, and existing after-failure recovery semantics because launch-in-flight state is recorded before child exit and prompt-build failure now stays retryable under a live supervisor.
-3. Verification evidence is written back in this owner, then the branch is merged to `develop`, pushed, and the dedicated worktree is retired.
+2. Short-lived non-interactive AI tools remain compatible with attach/reuse, daemon cold-start, and existing after-failure recovery semantics because launch-in-flight state is recorded before child exit, `ai_launch_in_flight` stays inside the bounded bootstrap grace window, and prompt-build failure now stays retryable under a live supervisor.
+3. Supported-tool PID matching, manager-active status fast paths, and proxy self-heal all preserve project-scoped truth without re-enabling disabled tool/slot auto-switch.
+4. Verification evidence is written back in this owner, then the branch is merged to `develop`, pushed, and the dedicated worktree is retired.

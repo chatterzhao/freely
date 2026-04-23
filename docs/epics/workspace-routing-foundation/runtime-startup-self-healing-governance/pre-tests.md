@@ -3,7 +3,7 @@
 ## Unit
 - acceptance target: `Do not invent a fake lower-level seam; the smallest executable boundaries here are focused runtime script regressions.`
 - testing layer: `unit`
-- target environment: `feature/runtime-startup-self-healing-followthrough-20260419`
+- target environment: `feature/live-status-hang-root-cause-20260422`
 - required evidence: `lawful replacement evidence`
 - blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
@@ -22,9 +22,15 @@
 4. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-startup-self-heals-stale-runtime-state`.
 5. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-persists-stale-continuity-rewrite`.
 6. Run `bash docs/system/workspace/scripts/tests/test-freely-stale-manager-continuity-filter`.
-7. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status`.
-8. Run `./bin/governance-check`.
-9. Run `git diff --check`.
+7. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-bootstrap-keeps-supervisor-after-ai-launch-observed`.
+8. Run `bash docs/system/workspace/scripts/tests/test-freely-ai-pid-validation-supported-tools`.
+9. Run `bash docs/system/workspace/scripts/tests/test-freely-proxy-self-heal`.
+10. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-active-manager-skips-fleet-refresh`.
+11. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-uses-status-signals-when-manager-idle`.
+12. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-worker-count-fast-path`.
+13. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status`.
+14. Run `./bin/governance-check`.
+15. Run `git diff --check`.
 
 ## End-to-End
 - acceptance target: `Promote the bounded startup self-heal owner through canonical develop instead of treating feature-lane replay as final absorption.`
@@ -32,7 +38,7 @@
 - target environment: `guarded develop-bound merge chain`
 - required evidence: `merge receipts plus verification artifacts`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/runtime-startup-self-healing-followthrough-20260419` into canonical `develop` through a disposable `test-pre-merge-*` lane.
+1. Merge `feature/live-status-hang-root-cause-20260422` into canonical `develop` through a disposable `test-pre-merge-*` lane.
 2. Push `develop` after final verification evidence is written back.
 3. Delete the dedicated feature worktree and branch after develop carries the absorbed owner.
 
@@ -43,7 +49,7 @@
 - required evidence: `protected-root live replay plus verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
 - real_environment_status: `pass`
-- real_environment_reason: `Protected-root replay now proves both stale-state self-heal and prompt-build followthrough no longer collapse live startup into fake runtime absence.`
+- real_environment_reason: `Protected-root replay must confirm the post-L041 bootstrap grace repair lands on canonical develop so the manager lane no longer self-restarts immediately after ai_launch_observed.`
 1. Inspect the protected root stale state before replay.
 2. Run `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely` and confirm startup self-heal canonicalizes stale machine state.
 3. Run `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, wait through the startup grace window, and verify the runtime no longer remains in contradictory fake-up state.
@@ -74,5 +80,5 @@
 - task_refs: `Replay the followthrough fix through the guarded feature -> test-pre-merge -> develop lane and prove protected-root startup either self-heals stale state or remains in a live retryable supervisor state instead of collapsing to fake runtime absence.`
 - case_design: `Merge the followthrough lane into a disposable test-pre-merge batch, rerun the focused startup-self-heal regressions there, then replay protected-root daemon start plus one-minute observation to confirm live-status and lifecycle evidence stay aligned for short-lived non-interactive CLI tools.`
 - evidence_level: `integration`
-- status: `pass`
+- status: `in_progress`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/code-reviews/20260419-runtime-startup-self-healing-verification.md`
