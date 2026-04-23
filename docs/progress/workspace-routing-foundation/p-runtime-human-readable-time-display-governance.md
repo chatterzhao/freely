@@ -4,8 +4,8 @@
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
 - title: `Runtime human-readable time display governance`
 - phase_state: `completed`
-- summary: `Host-local rendering for runtime human-readable time surfaces is canonical, including the residual baseline/live status tail fields, while UTC naming truth and RFC3339/epoch machine truth remain unchanged.`
+- summary: `Host-local rendering for runtime human-readable time surfaces remains canonical, and runtime current-time minting is now unified onto one local-display helper plus one UTC machine-truth helper without changing stored truth or UTC naming.`
 - closure_status: `closed`
-- updated_at: `2026-04-02`
+- updated_at: `2026-04-23`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

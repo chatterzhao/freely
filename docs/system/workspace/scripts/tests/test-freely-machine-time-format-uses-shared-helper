@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd)"
+TARGET="$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+if rg -n "\\$\\(date -u '\\+%Y-%m-%dT%H:%M:%SZ'\\)|\\$\\(date -u \\+%Y-%m-%dT%H:%M:%SZ\\)" "$TARGET" >/dev/null; then
+  echo "[FAIL] runtime script still contains direct machine UTC timestamp formatting; use the shared helper instead" >&2
+  exit 1
+fi
+
+echo "[PASS] runtime machine UTC timestamp formatting uses the shared helper"
