@@ -30,6 +30,8 @@ This owner closes that gap without reopening the frontend owner or rewriting mac
 
 After the first merge, a follow-up review found a narrow tail of runtime status fields that still printed raw UTC/RFC3339 values in `baseline-status` and `live-status`. This issue continues to own that closeout because the remaining work stays inside the same boundary: localize human-readable runtime display only, preserve stored truth and naming truth unchanged.
 
+After the status-tail closeout landed, a runtime follow-up found one more consistency gap inside the same owner boundary: runtime code still minted "current time" strings through multiple ad hoc call sites. This continuation keeps the scope narrow by consolidating those runtime-side call sites onto one local-display helper and one UTC machine-truth helper, without changing stored truth, filenames, or timezone policy.
+
 ## Scope
 
 1. Materialize a dedicated runtime/workspace owner for human-readable time display.
@@ -93,6 +95,11 @@ After the first merge, a follow-up review found a narrow tail of runtime status 
 - `docs/system/workspace/scripts/tests/test-freely-live-status-execution-boundary-audit`
 - `docs/system/workspace/scripts/tests/test-freely-develop-push-status-time-display`
 - `docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
+- `docs/system/workspace/scripts/tests/test-freely-current-timestamp-local-display-format`
+- `docs/system/workspace/scripts/tests/test-freely-human-display-time-format-uses-shared-helper`
+- `docs/system/workspace/scripts/tests/test-freely-machine-time-format-uses-shared-helper`
+- `docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
+- `docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`
 
 ## Verification
 
