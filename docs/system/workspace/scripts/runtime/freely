@@ -2324,10 +2324,12 @@ live_status_activity_state_for_project() {
   ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
   dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
   watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
-  intake_active="$(count_active_intake_items "$project")"
   if [[ -n "$ai_pid" ]]; then
     printf 'ai_active\n'
-  elif [[ -n "$watchdog_pid" && -n "$dispatcher_pid" && "${intake_active:-0}" -gt 0 ]]; then
+    return 0
+  fi
+  intake_active="$(status_surface_intake_active_count_for_project "$project")"
+  if [[ -n "$watchdog_pid" && -n "$dispatcher_pid" && "${intake_active:-0}" -gt 0 ]]; then
     printf 'supervising_with_pending_intake\n'
   elif [[ -n "$supervisor_pid" && -n "$dispatcher_pid" && "${intake_active:-0}" -gt 0 ]]; then
     printf 'supervising_with_pending_intake\n'
@@ -2748,7 +2750,7 @@ interruption_dispatcher_pid_hint_for_project() {
 
 valid_ai_pid_for_project() {
   local project="$1" pid="$2"
-  local cfg tool expected
+  local cfg tool cmd fragment
   cfg="$(config_file "$project")"
   tool="codex"
   if [[ -f "$cfg" ]]; then
@@ -2756,14 +2758,17 @@ valid_ai_pid_for_project() {
     source "$cfg"
     tool="${AI_TOOL:-codex}"
   fi
-  case "$tool" in
-    codex) expected="codex exec" ;;
-    iflow) expected="iflow" ;;
-    kiro-cli) expected="kiro-cli chat" ;;
-    cc|cc-use-codex-cli) expected="claude" ;;
-    *) expected="" ;;
-  esac
-  pid_matches_project "$pid" "$project" "$expected"
+  while IFS= read -r fragment; do
+    [[ -n "$fragment" ]] || continue
+    pid_matches_project "$pid" "$project" "$fragment" && return 0
+  done < <(tool_runtime_process_match_fragments "$tool")
+  if tool_runtime_process_match_requires_project_owned_fallback "$tool" && process_inspection_available; then
+    cmd="$(ps -p "$pid" -o command= 2>/dev/null || true)"
+    if [[ -n "$cmd" ]] && [[ "$cmd" == *"$(tool_runtime_process_match_fallback_token "$tool")"* ]] && pid_matches_project "$pid" "$project" ""; then
+      return 0
+    fi
+  fi
+  return 1
 }
 
 generate_uuid_for_runtime() {
@@ -2963,6 +2968,7 @@ AI_CAPABILITY_CODEX_APPROVAL_POLICY="$codex_capability_approval_policy"
 AI_CAPABILITY_CODEX_CWD_MODE="$codex_capability_cwd_mode"
 AUTO_SWITCH_SLOT="true"
 AUTO_SWITCH_TOOL="true"
+AUTO_SETUP_FREELY_PROXY="true"
 AI_FALLBACK_TOOLS="$default_fallback_tools"
 CHECK_INTERVAL=10
 RESTART_DELAY=2
@@ -3036,17 +3042,8 @@ upsert_config_key() {
 }
 
 migrate_project_auto_recovery_defaults_if_needed() {
-  local project="$1" default_fallback_tools=""
-  if [[ "${AUTO_SWITCH_SLOT:-}" == "false" && "${AUTO_SWITCH_TOOL:-}" == "false" && -z "${AI_FALLBACK_TOOLS:-}" ]]; then
-    default_fallback_tools="$(runtime_default_fallback_tools_for_current_tool "${AI_TOOL:-}" | paste -sd, -)"
-    AUTO_SWITCH_SLOT="true"
-    AUTO_SWITCH_TOOL="true"
-    AI_FALLBACK_TOOLS="$default_fallback_tools"
-    upsert_config_key "$project" "AUTO_SWITCH_SLOT" "$AUTO_SWITCH_SLOT"
-    upsert_config_key "$project" "AUTO_SWITCH_TOOL" "$AUTO_SWITCH_TOOL"
-    upsert_config_key "$project" "AI_FALLBACK_TOOLS" "$AI_FALLBACK_TOOLS"
-    log_warn "migrated legacy auto-switch defaults to current recovery contract (slot=true tool=true fallback_tools=${AI_FALLBACK_TOOLS:-none})"
-  fi
+  local project="$1"
+  [[ -n "$project" ]] || return 0
 }
 
 freely_autonomy_profile_for_mode() {
@@ -4558,15 +4555,23 @@ intake_item_counts_as_active_in_current_round() {
   local created_at item_epoch continuity_floor_epoch
 
   [[ -f "$meta_file" ]] || return 1
-  load_meta_env_snapshot "$meta_file"
-
-  status="$LOADED_META_STATUS"
+  status="$(meta_env_status_value "$meta_file")"
   case "$status" in
     absorbed|dropped) return 1 ;;
+    new|classified) return 0 ;;
     delegated) ;;
-    *) return 0 ;;
+    *)
+      load_meta_env_snapshot "$meta_file"
+      status="$LOADED_META_STATUS"
+      case "$status" in
+        absorbed|dropped) return 1 ;;
+        delegated) ;;
+        *) return 0 ;;
+      esac
+      ;;
   esac
 
+  load_meta_env_snapshot "$meta_file"
   absorption_target="$LOADED_META_ABSORPTION_TARGET"
   [[ "$absorption_target" == "handoff://continuation" ]] || return 0
 
@@ -4620,6 +4625,12 @@ meta_env_value() {
   local meta_file="$1" key="$2"
   [[ -f "$meta_file" ]] || return 0
   awk -F '"' -v key="$key" '$1 == key "=" { print $2; exit }' "$meta_file"
+}
+
+meta_env_status_value() {
+  local meta_file="$1"
+  [[ -f "$meta_file" ]] || return 0
+  awk -F '"' '/^STATUS=/{ print $2; exit }' "$meta_file"
 }
 
 clear_loaded_meta_env_snapshot() {
@@ -4720,6 +4731,28 @@ EOF
   fi
 }
 
+intake_pending_signal_count_for_project() {
+  local project="$1" pending_file
+  pending_file="$(intake_pending_signal_file "$project")"
+  [[ -f "$pending_file" ]] || {
+    printf '0\n'
+    return 0
+  }
+  awk -F '"' '/^PENDING_INTAKE_ITEMS=/{ print $2; exit }' "$pending_file"
+}
+
+status_surface_intake_active_count_for_project() {
+  local project="$1" count
+  count="$(intake_pending_signal_count_for_project "$project")"
+  [[ "$count" =~ ^[0-9]+$ ]] || count="0"
+  printf '%s\n' "$count"
+}
+
+status_surface_delegated_pending_ids_for_project() {
+  [[ -n "${LAST_DELEGATED_CONTINUATION_PENDING_IDS:-}" ]] || return 0
+  printf '%s\n' "$LAST_DELEGATED_CONTINUATION_PENDING_IDS"
+}
+
 write_intake_item() {
   local project="$1" intake_id="$2" author="$3" channel="$4" status="$5" classification="$6" linked_artifact="$7" delegated_worktree="$8" session_refs="$9" message="${10}" reaction="${11:-}" claimed_by="${12:-}" claimed_at="${13:-}" absorption_target="${14:-}" resolution_artifact="${15:-}" created_at_override="${16:-}"
   local intake_root item_dir meta_file message_file created_at
@@ -4782,11 +4815,11 @@ intake_snapshot_for_project() {
     meta_file="$item_dir/meta.env"
     message_file="$item_dir/message.txt"
     [[ -f "$meta_file" ]] || continue
-    load_meta_env_snapshot "$meta_file"
-    status="$LOADED_META_STATUS"
+    status="$(meta_env_status_value "$meta_file")"
     case "$status" in
       absorbed|dropped|delegated) continue ;;
     esac
+    load_meta_env_snapshot "$meta_file"
     intake_id="$LOADED_META_INTAKE_ID"
     created_at="$LOADED_META_CREATED_AT"
     channel="$LOADED_META_CHANNEL"
@@ -4808,13 +4841,23 @@ intake_snapshot_for_project() {
 
 delegated_continuation_freshness_floor_epoch_for_project() {
   local project="$1" continuity_file continuity_epoch
+  if [[ "${FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_PROJECT:-}" == "$project" && "${FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_READY:-0}" == "1" ]]; then
+    printf '%s\n' "${FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_EPOCH:-0}"
+    return 0
+  fi
   continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
+    FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_PROJECT="$project"
+    FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_READY="1"
+    FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_EPOCH="0"
     printf '0\n'
     return 0
   }
   continuity_epoch="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
   [[ "$continuity_epoch" =~ ^[0-9]+$ ]] || continuity_epoch="0"
+  FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_PROJECT="$project"
+  FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_READY="1"
+  FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_EPOCH="$continuity_epoch"
   printf '%s\n' "$continuity_epoch"
 }
 
@@ -5592,8 +5635,13 @@ runtime_error_signal_excerpt() {
 
 log_has_auth_failure() {
   local log_file="$1"
+  local excerpt=""
   [[ -f "$log_file" ]] || return 1
-  runtime_error_signal_excerpt "$log_file" | rg -qi '401|402 payment required|403 forbidden|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired|login required'
+  excerpt="$(runtime_error_signal_excerpt "$log_file")"
+  if [[ "${AI_TOOL:-}" == "codex" && "$(codex_live_auth_kind)" == "apikey" ]]; then
+    excerpt="$(printf '%s\n' "$excerpt" | sed '/codex_login::auth::manager: Failed to refresh token: 401 Unauthorized/d')"
+  fi
+  printf '%s\n' "$excerpt" | rg -qi '401|402 payment required|403 forbidden|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired|login required'
 }
 
 log_has_proxy_config_invalid() {
@@ -5777,6 +5825,98 @@ runtime_proxy_mode_summary_for_logs() {
       printf 'proxy mode=inherit; Freely keeps ambient ALL_PROXY/HTTP_PROXY/HTTPS_PROXY/NO_PROXY from the shell unless project/global config overrides it (project_cfg=%s global_cfg=%s)\n' "$project_cfg" "$global_cfg"
       ;;
   esac
+}
+
+runtime_proxy_self_heal_candidate_modes() {
+  local project="$1"
+  printf 'disabled\n'
+  if runtime_proxy_self_heal_explicit_candidate_available "$project"; then
+    printf 'explicit\n'
+  fi
+  printf 'inherit\n'
+}
+
+runtime_proxy_self_heal_explicit_candidate_available() {
+  local project="$1" values cfg explicit_url explicit_all explicit_http explicit_https explicit_no_proxy
+  while IFS= read -r cfg; do
+    [[ -f "$cfg" ]] || continue
+    values="$(freely_network_proxy_read_config_values "$cfg" || true)"
+    [[ -n "$values" ]] || continue
+    IFS=$'\x1f' read -r _ explicit_url explicit_all explicit_http explicit_https explicit_no_proxy <<<"$values"
+    if [[ -n "${explicit_url:-}" || -n "${explicit_all:-}" || -n "${explicit_http:-}" || -n "${explicit_https:-}" || -n "${explicit_no_proxy:-}" ]]; then
+      return 0
+    fi
+  done < <(printf '%s\n' "$(freely_network_proxy_project_config_file "$project")" "$(freely_network_proxy_global_config_file)")
+  return 1
+}
+
+runtime_proxy_self_heal_probe_result() {
+  local project="$1" tool="$2"
+  case "$tool" in
+    codex)
+      codex_probe_current_slot_now "$project" "freely_proxy_self_heal" "freely proxy self-heal"
+      ;;
+    *)
+      printf 'unsupported_tool\n'
+      return 1
+      ;;
+  esac
+}
+
+attempt_runtime_proxy_self_heal_after_network_failure() {
+  local project="$1" tool="$2" failure_reason="${3:-}"
+  local original_mode candidate probe_result attempted_any=0
+  case "$failure_reason" in
+    execution_network_transient|execution_network_persistent|proxy_config_invalid) ;;
+    *) return 1 ;;
+  esac
+  load_config "$project"
+  config_bool_enabled "${AUTO_SETUP_FREELY_PROXY:-true}" || return 1
+  case "$tool" in
+    codex) ;;
+    *) return 1 ;;
+  esac
+
+  freely_network_proxy_resolve_config "$project"
+  original_mode="$(freely_network_proxy_mode)"
+  [[ -n "$original_mode" ]] || original_mode="inherit"
+
+  append_runtime_event "$project" "proxy_self_heal_started" \
+    "tool=$tool" \
+    "reason=$failure_reason" \
+    "original_mode=$original_mode"
+
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    attempted_any=1
+    upsert_config_key "$project" "FREELY_NETWORK_PROXY_MODE" "$candidate"
+    load_config "$project"
+    probe_result="$(runtime_capture_or_empty runtime_proxy_self_heal_probe_result "$project" "$tool")"
+    append_runtime_event "$project" "proxy_self_heal_probe" \
+      "tool=$tool" \
+      "reason=$failure_reason" \
+      "candidate_mode=$candidate" \
+      "probe_result=${probe_result:-empty}"
+    if [[ "$probe_result" == "usable" ]]; then
+      clear_execution_network_state "$project"
+      log_warn "proxy self-heal switched $tool to proxy mode=$candidate after $failure_reason and verified with a hi probe"
+      append_runtime_event "$project" "proxy_self_heal_succeeded" \
+        "tool=$tool" \
+        "reason=$failure_reason" \
+        "selected_mode=$candidate"
+      return 0
+    fi
+  done < <(runtime_proxy_self_heal_candidate_modes "$project")
+
+  if [[ "$attempted_any" == "1" ]]; then
+    upsert_config_key "$project" "FREELY_NETWORK_PROXY_MODE" "$original_mode"
+    load_config "$project"
+  fi
+  append_runtime_event "$project" "proxy_self_heal_exhausted" \
+    "tool=$tool" \
+    "reason=$failure_reason" \
+    "restored_mode=$original_mode"
+  return 1
 }
 
 emit_runtime_failure_guidance() {
@@ -6867,6 +7007,24 @@ fleet_worktree_paths_for_project() {
   project_worktree_list_porcelain_cached "$project" | awk '/^worktree / {print substr($0, 10)}'
 }
 
+fleet_normalized_worktree_paths_for_project() {
+  local project="$1" worktree_path normalized_path result=""
+  if [[ "${FREELY_CACHED_NORMALIZED_WORKTREE_PATHS_PROJECT:-}" == "$project" && "${FREELY_CACHED_NORMALIZED_WORKTREE_PATHS_READY:-0}" == "1" ]]; then
+    printf '%s\n' "${FREELY_CACHED_NORMALIZED_WORKTREE_PATHS:-}"
+    return 0
+  fi
+  while IFS= read -r worktree_path; do
+    [[ -n "$worktree_path" ]] || continue
+    normalized_path="$(normalize_runtime_worktree_path "$worktree_path")"
+    [[ -n "$normalized_path" ]] || continue
+    result+="${normalized_path}"$'\n'
+  done < <(fleet_worktree_paths_for_project "$project")
+  FREELY_CACHED_NORMALIZED_WORKTREE_PATHS_PROJECT="$project"
+  FREELY_CACHED_NORMALIZED_WORKTREE_PATHS_READY="1"
+  FREELY_CACHED_NORMALIZED_WORKTREE_PATHS="${result%$'\n'}"
+  printf '%s\n' "${FREELY_CACHED_NORMALIZED_WORKTREE_PATHS:-}"
+}
+
 project_has_authoritative_worktree_path() {
   local project="$1" target_path="$2"
   local normalized_target normalized_candidate
@@ -6962,16 +7120,16 @@ manager_continuity_worktree_paths_from_runtime_sections() {
 }
 
 project_has_worktree_path() {
-  local project="$1" target_path="$2" worktree_path normalized_target normalized_worktree
+  local project="$1" target_path="$2" normalized_target normalized_worktree
   [[ -n "$target_path" ]] || return 1
   normalized_target="$(normalize_runtime_worktree_path "$target_path")"
-  while IFS= read -r worktree_path; do
-    [[ -n "$worktree_path" ]] || continue
-    normalized_worktree="$(normalize_runtime_worktree_path "$worktree_path")"
+  fleet_normalized_worktree_paths_for_project "$project" >/dev/null
+  while IFS= read -r normalized_worktree; do
+    [[ -n "$normalized_worktree" ]] || continue
     if [[ "$normalized_worktree" == "$normalized_target" ]]; then
       return 0
     fi
-  done < <(fleet_worktree_paths_for_project "$project")
+  done <<<"${FREELY_CACHED_NORMALIZED_WORKTREE_PATHS:-}"
   return 1
 }
 
@@ -7601,7 +7759,7 @@ manager_continuity_backtick_field_value() {
   ' "$continuity_file"
 }
 
-manager_continuity_selected_cleanup_family_rows() {
+manager_continuity_selected_cleanup_rows() {
   local continuity_file="$1"
   [[ -f "$continuity_file" ]] || return 0
   awk '
@@ -7612,12 +7770,13 @@ manager_continuity_selected_cleanup_family_rows() {
     }
     function emit_current() {
       if (path != "") {
-        printf "%s|%s|%s|%s\n", path, branch, desired, role_hint
+        printf "%s|%s|%s|%s|%s|%s\n", path, branch, desired, role_hint, section_key, disposition
       }
       path=""
       branch=""
       desired=""
       role_hint=""
+      disposition=""
     }
     /^## Fleet Inventory$/ { in_section=1; next }
     /^## / && in_section {
@@ -7625,8 +7784,12 @@ manager_continuity_selected_cleanup_family_rows() {
       exit
     }
     !in_section { next }
-    /^[[:space:]]*-[[:space:]]*selected_cleanup_family:[[:space:]]*$/ {
+    /^[[:space:]]*-[[:space:]]*selected_cleanup_[a-zA-Z0-9_-]+:[[:space:]]*$/ {
       emit_current()
+      line=$0
+      sub(/^[[:space:]]*-[[:space:]]*/, "", line)
+      sub(/:[[:space:]]*$/, "", line)
+      section_key=trim_tick(line)
       in_cleanup=1
       next
     }
@@ -7635,13 +7798,15 @@ manager_continuity_selected_cleanup_family_rows() {
         emit_current()
       }
       in_cleanup=0
+      section_key=""
       next
     }
     in_cleanup != 1 { next }
-    /^[[:space:]]*-[[:space:]]*path:[[:space:]]*/ {
+    /^[[:space:]]*-[[:space:]]*path:[[:space:]]*/ || /^[[:space:]]*path:[[:space:]]*/ {
       emit_current()
       line=$0
       sub(/^[[:space:]]*-[[:space:]]*path:[[:space:]]*/, "", line)
+      sub(/^[[:space:]]*path:[[:space:]]*/, "", line)
       path=trim_tick(line)
       next
     }
@@ -7664,6 +7829,12 @@ manager_continuity_selected_cleanup_family_rows() {
       role_hint=trim_tick(line)
       next
     }
+    /^[[:space:]]*disposition:[[:space:]]*/ {
+      line=$0
+      sub(/^[[:space:]]*disposition:[[:space:]]*/, "", line)
+      disposition=trim_tick(line)
+      next
+    }
     END {
       emit_current()
     }
@@ -7672,30 +7843,34 @@ manager_continuity_selected_cleanup_family_rows() {
 
 manager_cleanup_prompt_primary_target_row_from_continuity() {
   local project="$1" continuity_file="$2"
-  local row path branch desired role_hint fallback=""
-  while IFS='|' read -r path branch desired role_hint; do
+  local row path branch desired role_hint section_key disposition fallback=""
+  while IFS='|' read -r path branch desired role_hint section_key disposition; do
     [[ -n "$path" && -d "$path" ]] || continue
     project_has_authoritative_worktree_path "$project" "$path" || continue
     [[ -n "$branch" ]] || continue
-    [[ "$desired" == "stopped" ]] || continue
-    if [[ "$branch" == feature/* || "$role_hint" == "cleanup" ]]; then
-      printf '%s|%s|%s|%s\n' "$path" "$branch" "$desired" "$role_hint"
+    if [[ -n "$desired" && "$desired" != "stopped" ]]; then
+      continue
+    fi
+    if [[ "$branch" == feature/* || "$role_hint" == "cleanup" || "$section_key" == "selected_cleanup_lane" ]]; then
+      printf '%s|%s|%s|%s|%s|%s\n' "$path" "$branch" "$desired" "$role_hint" "$section_key" "$disposition"
       return 0
     fi
-    [[ -n "$fallback" ]] || fallback="$path|$branch|$desired|$role_hint"
-  done < <(manager_continuity_selected_cleanup_family_rows "$continuity_file")
+    [[ -n "$fallback" ]] || fallback="$path|$branch|$desired|$role_hint|$section_key|$disposition"
+  done < <(manager_continuity_selected_cleanup_rows "$continuity_file")
   [[ -n "$fallback" ]] && printf '%s\n' "$fallback"
 }
 
 manager_cleanup_prompt_write_scope_paths_from_continuity() {
   local project="$1" continuity_file="$2"
-  local row path branch desired role_hint
-  while IFS='|' read -r path branch desired role_hint; do
+  local row path branch desired role_hint section_key disposition
+  while IFS='|' read -r path branch desired role_hint section_key disposition; do
     [[ -n "$path" && -d "$path" ]] || continue
     project_has_authoritative_worktree_path "$project" "$path" || continue
-    [[ "$desired" == "stopped" ]] || continue
+    if [[ -n "$desired" && "$desired" != "stopped" ]]; then
+      continue
+    fi
     printf '%s\n' "$path"
-  done < <(manager_continuity_selected_cleanup_family_rows "$continuity_file")
+  done < <(manager_continuity_selected_cleanup_rows "$continuity_file")
   printf '%s\n' "$project/.freely/run/"
 }
 
@@ -7742,7 +7917,7 @@ append_manager_cleanup_worker_prompt_reference_to_continuity() {
 
 materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
   local project="$1" continuity_file="$2"
-  local route_kind primary_row primary_path primary_branch _desired _role_hint
+  local route_kind primary_row primary_path primary_branch _desired _role_hint _section_key _disposition
   local owner_issue_rel owner_issue_source owner_issue_abs pre_tests_rel verification_rel issue_id prompt_file
   local write_scope_path target_environment cleanup_selected_tool current_tool _ current_truth
 
@@ -7754,7 +7929,7 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
 
   primary_row="$(manager_cleanup_prompt_primary_target_row_from_continuity "$project" "$continuity_file")"
   [[ -n "$primary_row" ]] || return 1
-  IFS='|' read -r primary_path primary_branch _desired _role_hint <<<"$primary_row"
+  IFS='|' read -r primary_path primary_branch _desired _role_hint _section_key _disposition <<<"$primary_row"
   [[ -n "$primary_path" && -d "$primary_path" && -n "$primary_branch" ]] || return 1
 
   owner_issue_rel="$(manager_continuity_backtick_field_value "$continuity_file" "issue_truth")"
@@ -9259,24 +9434,48 @@ all_repo_worktrees_for_project() {
   '
 }
 
+worker_runtime_pid_hint_is_live_for_status() {
+  local project="$1" pid_file="$2"
+  local pid=""
+  [[ -f "$pid_file" ]] || return 1
+  pid="$(cat "$pid_file" 2>/dev/null || true)"
+  [[ "$pid" =~ ^[0-9]+$ ]] || return 1
+  kill -0 "$pid" 2>/dev/null || return 1
+  pid_matches_project "$pid" "$project" "" || return 1
+  return 0
+}
+
+worker_project_is_actively_running_for_status() {
+  local project="$1"
+  local run_dir
+  run_dir="$(run_dir_for_project "$project")"
+  [[ -d "$run_dir" ]] || return 1
+  worker_runtime_pid_hint_is_live_for_status "$project" "$run_dir/ai.pid" && return 0
+  worker_runtime_pid_hint_is_live_for_status "$project" "$run_dir/supervisor.pid" && return 0
+  return 1
+}
+
+worker_worktree_paths_for_manager_project() {
+  local project="$1"
+  fleet_worktree_branch_rows_for_project "$project" | awk -F'|' '
+    $2 !~ /^(develop|main|test-pre-merge-)/ { print $1 }
+  '
+}
+
 worker_project_is_actively_running() {
   local project="$1"
-  local supervisor_pid ai_pid
   [[ "$(role_hint_for_project "$project")" == "worker" ]] || return 1
-  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
-  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
-  [[ -n "$supervisor_pid" || -n "$ai_pid" ]]
+  worker_project_is_actively_running_for_status "$project"
 }
 
 count_active_running_workers_for_manager_project() {
   local project="$1" wt_path count=0
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" && -d "$wt_path" ]] || continue
-    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
-    if worker_project_is_actively_running "$wt_path"; then
+    if worker_project_is_actively_running_for_status "$wt_path"; then
       count=$((count + 1))
     fi
-  done < <(all_repo_worktrees_for_project "$project")
+  done < <(worker_worktree_paths_for_manager_project "$project")
   printf '%s\n' "$count"
 }
 
@@ -9380,19 +9579,26 @@ ensure_runtime_workcell_initialized_for_launch() {
 
 launch_worker_from_manager_prompt_if_needed() {
   local manager_project="$1" prompt_file="$2"
-  local target_project intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv has_any_verification_metadata="0"
+  local target_project runtime_probe_project prompt_target_worktree
+  local intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv has_any_verification_metadata="0"
   local selected_tool
   target_project="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   [[ -n "$target_project" && -d "$target_project" ]] || return 1
   project_has_authoritative_worktree_path "$manager_project" "$target_project" || return 1
   ensure_runtime_workcell_initialized_for_launch "$manager_project" "$target_project" || return 1
+  runtime_probe_project="$target_project"
+  prompt_target_worktree="$(worker_prompt_target_worktree "$prompt_file")"
+  if [[ -n "$prompt_target_worktree" && -d "$prompt_target_worktree" ]] \
+    && project_has_authoritative_worktree_path "$manager_project" "$prompt_target_worktree"; then
+    runtime_probe_project="$prompt_target_worktree"
+  fi
   selected_tool="$(worker_prompt_selected_tool "$prompt_file")"
   if [[ -n "$selected_tool" ]]; then
     persist_project_tool_selection "$target_project" "$selected_tool"
   fi
   runtime_contract_file="$(worker_verification_contract_state_file "$target_project")"
-  supervisor_pid="$(manager_supervisor_pid_for_project "$target_project")"
-  ai_pid="$(runtime_ai_pid_hint_for_project "$target_project")"
+  supervisor_pid="$(manager_supervisor_pid_for_project "$runtime_probe_project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$runtime_probe_project")"
   missing_fields_csv="$(worker_prompt_verification_metadata_missing_fields_csv "$prompt_file")"
   if worker_prompt_has_any_verification_metadata "$prompt_file"; then
     has_any_verification_metadata="1"
@@ -10207,8 +10413,16 @@ manager_continuity_cleanup_retirement_targets() {
   ' "$continuity_file"
 }
 
+manager_continuity_project_root_from_path() {
+  local continuity_file="$1" project_root=""
+  [[ -f "$continuity_file" ]] || return 1
+  project_root="$(cd "$(dirname "$continuity_file")/../.." && pwd -P 2>/dev/null || true)"
+  [[ -n "$project_root" && -d "$project_root" ]] || return 1
+  printf '%s\n' "$project_root"
+}
+
 manager_continuity_requires_retirement_worker_handoff() {
-  local continuity_file="$1" route_kind
+  local continuity_file="$1" route_kind continuity_project=""
   [[ -f "$continuity_file" ]] || return 1
   route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
   [[ "$route_kind" == "cleanup_governance" ]] || return 1
@@ -10216,8 +10430,17 @@ manager_continuity_requires_retirement_worker_handoff() {
   if [[ $? -eq 0 ]]; then
     return 1
   fi
-  grep -q 'retained-with-reason' "$continuity_file" || return 1
-  manager_continuity_cleanup_retirement_targets "$continuity_file" | grep -q .
+  if manager_continuity_cleanup_retirement_targets "$continuity_file" | grep -q .; then
+    return 0
+  fi
+  continuity_project="$(manager_continuity_project_root_from_path "$continuity_file" || true)"
+  if [[ -n "$continuity_project" ]] \
+    && manager_cleanup_prompt_primary_target_row_from_continuity "$continuity_project" "$continuity_file" >/dev/null 2>&1; then
+    if grep -Eq 'retained-with-reason|retirement handoff|retire the absorbed worktrees now|cleanup followthrough worker' "$continuity_file"; then
+      return 0
+    fi
+  fi
+  return 1
 }
 
 append_manager_consumed_continuity_resume_focus_if_needed() {
@@ -10480,6 +10703,38 @@ validate_manager_exit_contract_for_project() {
   printf '\n'
 }
 
+autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible() {
+  local project="$1" missing_csv="${2:-}"
+  local continuity_file worker_prompts_csv contract_file
+  case "$missing_csv" in
+    missing_file|WORKER_PROMPTS_NOT_LAUNCHABLE|WORKER_PROMPTS_CSV|WORKER_PROMPTS_CSV,WORKER_PROMPTS_NOT_LAUNCHABLE|WORKER_PROMPTS_NOT_LAUNCHABLE,WORKER_PROMPTS_CSV)
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 1
+  manager_continuity_requires_retirement_worker_handoff "$continuity_file" || return 1
+
+  materialize_cleanup_worker_prompt_from_manager_continuity_if_needed "$project" "$continuity_file" >/dev/null 2>&1 || true
+  worker_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
+  [[ -n "$worker_prompts_csv" ]] || return 1
+  manager_exit_contract_has_launchable_worker_prompt "$project" "$worker_prompts_csv" || return 1
+
+  contract_file="$(manager_exit_contract_file "$project")"
+  cat >"$contract_file" <<EOF
+EXIT_KIND="delegate_workers"
+WORKER_PROMPTS_CSV="$worker_prompts_csv"
+EOF
+  append_runtime_event "$project" "manager_exit_contract_autofilled_cleanup_delegate_workers" \
+    "continuity=$(basename "$continuity_file")" \
+    "worker_prompts_csv=$worker_prompts_csv" \
+    "missing_csv=${missing_csv:-none}"
+  return 0
+}
+
 worker_exit_contract_kind() {
   local project="$1" contract_file
   contract_file="$(worker_exit_contract_file "$project")"
@@ -10599,6 +10854,12 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
     return 0
   }
   if ! missing_csv="$(validate_manager_exit_contract_for_project "$project")"; then
+    if autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible "$project" "${missing_csv:-missing_file}"; then
+      append_runtime_event "$project" "manager_exit_contract_delegate_workers_autofilled" \
+        "details=${missing_csv:-missing_file}"
+      printf 'delegate_workers\n'
+      return 0
+    fi
     write_manager_exit_contract_repair_handoff "$project" "manager_exit_contract_invalid" "${missing_csv:-missing_file}"
     write_workcell_state "$project" "running" "up" "down" "manager_exit_contract_invalid"
     append_runtime_event "$project" "manager_exit_contract_invalid" \
@@ -12008,7 +12269,11 @@ project_bootstrap_launch_in_flight() {
   desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
   last_exit_reason="${LAST_EXIT_REASON:-}"
   last_state_updated_at="${LAST_STATE_UPDATED_AT:-}"
-  [[ "$desired_state" == "running" && "$last_exit_reason" == "starting" ]] || return 1
+  [[ "$desired_state" == "running" ]] || return 1
+  case "$last_exit_reason" in
+    starting|ai_launch_in_flight) ;;
+    *) return 1 ;;
+  esac
 
   state_updated_epoch="$(timestamp_epoch_or_zero "$last_state_updated_at")"
   [[ "$state_updated_epoch" =~ ^[0-9]+$ ]] || state_updated_epoch=0
@@ -12067,7 +12332,7 @@ supervisor_startup_lifecycle_in_flight() {
             seq = substr($i, 5)
           }
         }
-        if (checkpoint == "L040" || checkpoint == "L041" || checkpoint == "L042" || checkpoint == "L090" || checkpoint == "L091" || checkpoint == "L092") {
+        if (checkpoint == "L042" || checkpoint == "L090" || checkpoint == "L091" || checkpoint == "L092") {
           print seq "|" $1 "|" checkpoint
         }
       }
@@ -12315,11 +12580,14 @@ restart_manager_supervisor_preserving_handoff() {
   ai_pid="$(manager_ai_pid_for_project "$project")"
   supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
   if [[ -n "$ai_pid" ]]; then
-    kill "$ai_pid" 2>/dev/null || true
+    terminate_pid_with_graceful_wait "$ai_pid" "manager ai restart preserving handoff"
     rm -f "$run_dir/ai.pid"
   fi
   if [[ -n "$supervisor_pid" ]]; then
-    kill "$supervisor_pid" 2>/dev/null || true
+    # Daemon supervisors ignore naked TERM without a stop marker, so recovery
+    # restarts must force teardown instead of relying on operator-stop semantics.
+    terminate_pid_with_graceful_wait "$supervisor_pid" "manager supervisor restart preserving handoff"
+    clear_supervisor_identity_truth "$project" "$supervisor_pid"
     rm -f "$run_dir/supervisor.pid"
   fi
   for _ in $(seq 1 20); do
@@ -13503,6 +13771,52 @@ tool_supported_adapters_for_runtime() {
   esac
 }
 
+tool_runtime_process_match_fragments() {
+  local tool="$1"
+  case "$tool" in
+    codex)
+      printf 'codex exec\n.bun/bin/codex\n/codex/codex\n'
+      ;;
+    iflow)
+      printf 'iflow\n'
+      ;;
+    kiro-cli)
+      printf 'kiro-cli chat\n'
+      ;;
+    cc|cc-use-codex-cli)
+      printf 'claude\n'
+      ;;
+    test-sleep)
+      printf 'sleep\n'
+      ;;
+    test-compact|test-once|test-session|test-route-only)
+      printf 'python3\n'
+      ;;
+    *)
+      printf '%s\n' "$tool"
+      ;;
+  esac
+}
+
+tool_runtime_process_match_fallback_token() {
+  local tool="$1"
+  case "$tool" in
+    codex) printf 'codex\n' ;;
+    iflow) printf 'iflow\n' ;;
+    kiro-cli) printf 'kiro-cli\n' ;;
+    cc|cc-use-codex-cli) printf 'claude\n' ;;
+    *) printf '%s\n' "$tool" ;;
+  esac
+}
+
+tool_runtime_process_match_requires_project_owned_fallback() {
+  local tool="$1"
+  case "$tool" in
+    codex|iflow|kiro-cli|cc|cc-use-codex-cli) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 tool_adapter_is_supported_for_runtime() {
   local tool="$1" adapter="${2:-}"
   local supported
@@ -14200,11 +14514,23 @@ active_runtime_attach_reusable_for_project() {
 
 emit_supervisor_attach_reuse_truth() {
   local project="$1"
-  write_workcell_state "$project" "running" "up" "up" "already_running_attach"
+  local ai_pid_state desired_state supervisor_state ai_state exit_reason
+  ai_pid_state="${LAST_ATTACH_REUSE_AI_PID_STATE:-missing}"
+  desired_state="running"
+  supervisor_state="up"
+  ai_state="up"
+  exit_reason="already_running_attach"
+
+  if [[ "$ai_pid_state" == "bootstrap_in_flight" ]]; then
+    ai_state="down"
+    exit_reason="starting"
+  fi
+
+  write_workcell_state "$project" "$desired_state" "$supervisor_state" "$ai_state" "$exit_reason"
   append_runtime_event "$project" "supervisor_attach_reuse" \
     "supervisor_pid=${LAST_ATTACH_REUSE_SUPERVISOR_PID:-unknown}" \
     "supervisor_pid_source=${LAST_ATTACH_REUSE_SUPERVISOR_SOURCE:-unknown}" \
-    "ai_pid_state=${LAST_ATTACH_REUSE_AI_PID_STATE:-missing}" \
+    "ai_pid_state=$ai_pid_state" \
     "role_hint=$(role_hint_for_project "$project")"
 }
 
@@ -14654,9 +14980,11 @@ start_project_runtime() {
     set +e
     {
       echo "===== $(date '+%F %T %Z') mode=$mode_name tool=$AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
-      local workspace_root
+      local workspace_root monitor_script
       workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
-      bash "$workspace_root/scripts/monitor-ai-cli.sh" \
+      monitor_script="$SELF_ROOT/docs/system/workspace/scripts/monitor-ai-cli.sh"
+      [[ -f "$monitor_script" ]] || monitor_script="$workspace_root/scripts/monitor-ai-cli.sh"
+      bash "$monitor_script" \
         --project "$PROJECT_ROOT" \
         --tool "$AI_TOOL" \
         --tool-adapter "${tool_adapter:-}" \
@@ -14986,6 +15314,10 @@ start_project_runtime() {
     local auto_recovery_reason=""
     auto_recovery_reason="${slot_switch_reason:-${network_failure_reason:-}}"
     if [[ -n "$auto_recovery_reason" ]]; then
+      if attempt_runtime_proxy_self_heal_after_network_failure "$PROJECT_ROOT" "$AI_TOOL" "$auto_recovery_reason"; then
+        sleep_with_rate_limit_recheck "$PROJECT_ROOT" 1
+        continue
+      fi
       if attempt_runtime_auto_recovery_after_failure "$PROJECT_ROOT" "$AI_TOOL" "$auto_recovery_reason"; then
         if [[ "${RUNTIME_AUTO_RECOVERY_TOOL:-$AI_TOOL}" == "$AI_TOOL" ]]; then
           log_warn "${auto_recovery_reason} detected for this workcell; worker runtime switched locally to slot=${RUNTIME_AUTO_RECOVERY_SLOT:-unknown} and will continue"
@@ -16112,6 +16444,8 @@ cmd_live_status() {
   local manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary manager_continuity_gap_writer_state
   local manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary
   local develop_push_snapshot develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at develop_push_urgency develop_push_resync_required
+  local live_status_manager_fast_path="0"
+  local intake_active_items intake_classified_items intake_delegated_items
 
   run_dir="$(run_dir_for_project "$project")"
   branch="$(branch_name_for_project "$project")"
@@ -16169,17 +16503,37 @@ cmd_live_status() {
     prompt_intent_kind="none"
     prompt_intent_target="none"
   fi
+  if [[ "$role_hint" == "manager" && -n "$ai_pid" ]]; then
+    live_status_manager_fast_path="1"
+  fi
   if [[ "$ownership_conflict_state" != "active" ]]; then
     ownership_conflict_summary="none"
-    if [[ "$role_hint" == "manager" ]]; then
+    if [[ "$role_hint" == "manager" && "$live_status_manager_fast_path" != "1" ]]; then
       ownership_conflict_summary="$(fleet_active_ownership_conflicts_summary "$project")"
       [[ "$ownership_conflict_summary" == "none" ]] || ownership_conflict_state="active"
     fi
   fi
   manager_pending_ownership_conflicts="none"
-  intake_snapshot="$(intake_snapshot_for_project "$project" 3)"
+  intake_snapshot=""
   latest_resolution_snapshot="$(resolution_snapshot_for_project "$project" 1)"
-  delegated_pending_ids="$(delegated_continuation_ids_for_project "$project")"
+  intake_active_items="unknown"
+  intake_classified_items="unknown"
+  intake_delegated_items="unknown"
+  delegated_pending_ids="unknown"
+  if [[ "$live_status_manager_fast_path" == "1" ]]; then
+    intake_active_items="$(status_surface_intake_active_count_for_project "$project")"
+    [[ -n "$intake_active_items" ]] || intake_active_items="0"
+    intake_classified_items="deferred_while_manager_active"
+    intake_delegated_items="deferred_while_manager_active"
+    delegated_pending_ids="deferred_while_manager_active"
+    intake_snapshot="deferred_while_manager_active"
+  else
+    intake_snapshot="$(intake_snapshot_for_project "$project" 3)"
+    intake_active_items="$(status_surface_intake_active_count_for_project "$project")"
+    intake_classified_items="$(count_intake_items_by_status "$project" "classified")"
+    intake_delegated_items="$(count_intake_items_by_status "$project" "delegated")"
+    delegated_pending_ids="$(status_surface_delegated_pending_ids_for_project)"
+  fi
   prompt_has_delegated="0"
   if [[ -n "$prompt_file" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
     prompt_has_delegated="1"
@@ -16230,7 +16584,6 @@ cmd_live_status() {
   active_running_worker_count="unknown"
   available_new_worker_slots="unknown"
   if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
-    manager_worker_launch_state_refresh_for_status "$project"
     # shellcheck disable=SC1090
     source "$(manager_worker_launch_state_file "$project")"
     latest_manager_continuity_generated="${LAST_MANAGER_CONTINUITY_GENERATED:-unavailable}"
@@ -16338,9 +16691,9 @@ cmd_live_status() {
   execution_boundary_audit_summary="$(freely_execution_boundary_audit_summary_for_loaded_config "$project")"
   echo "execution_boundary_audit_status: $(freely_execution_boundary_audit_status_for_loaded_config "$execution_boundary_audit_summary")"
   echo "execution_boundary_audit_detail: $(freely_execution_boundary_audit_detail_for_loaded_config "$execution_boundary_audit_summary")"
-  echo "intake_active_items: $(count_active_intake_items "$project")"
-  echo "intake_classified_items: $(count_intake_items_by_status "$project" "classified")"
-  echo "intake_delegated_items: $(count_intake_items_by_status "$project" "delegated")"
+  echo "intake_active_items: ${intake_active_items}"
+  echo "intake_classified_items: ${intake_classified_items}"
+  echo "intake_delegated_items: ${intake_delegated_items}"
   echo "last_launch_kind: ${LAST_LAUNCH_KIND:-unavailable}"
   echo "last_rotation_reason: ${LAST_ROTATION_REASON:-unavailable}"
   echo "pending_delegated_continuation_ids: ${delegated_pending_ids:-none}"

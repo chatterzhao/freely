@@ -1391,6 +1391,15 @@ codex_probe_current_slot_now() {
   local slept=0
   while [[ $slept -lt $timeout_secs ]]; do
     partial_output="$(cat "$output_file" 2>/dev/null || true)"
+    if codex_probe_output_is_expected_success "$partial_output"; then
+      terminate_codex_probe_process "$pid"
+      rm -f "$prompt_file" "$output_file"
+      if [[ "$probe_lock_held" == "1" ]]; then
+        codex_slot_switch_probe_lock_release
+      fi
+      printf 'usable\n'
+      return 0
+    fi
     if codex_probe_output_has_deactivated_workspace "$partial_output"; then
       terminate_codex_probe_process "$pid"
       artifact_path="$(write_codex_probe_artifact "$project" "$current_slot" "deactivated-workspace" "$partial_output")"

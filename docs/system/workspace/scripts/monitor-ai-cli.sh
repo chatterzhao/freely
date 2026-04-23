@@ -53,6 +53,238 @@ workcell_state_file_for_project() {
   printf '%s\n' "$current_project/.freely/run/workcell-state.env"
 }
 
+session_state_file_for_project() {
+  local current_project="$1"
+  printf '%s\n' "$current_project/.freely/run/session-state.env"
+}
+
+codex_active_auth_file() {
+  printf '%s\n' "$HOME/.codex/auth.json"
+}
+
+codex_live_auth_kind() {
+  local auth_file
+  auth_file="$(codex_active_auth_file)"
+  python3 - <<'PY' "$auth_file" 2>/dev/null || true
+import json
+import os
+import sys
+
+path = sys.argv[1]
+if not os.path.exists(path):
+    print("")
+    raise SystemExit(0)
+with open(path, "r", encoding="utf-8") as f:
+    data = json.load(f)
+if isinstance(data.get("OPENAI_API_KEY"), str) and data.get("OPENAI_API_KEY"):
+    print("apikey")
+elif isinstance(data.get("tokens"), dict) or isinstance(data.get("access_token"), str):
+    print("account")
+else:
+    print("legacy")
+PY
+}
+
+extract_tool_session_id_from_log_if_present() {
+  local current_tool="$1" current_log_file="$2"
+  [[ -f "$current_log_file" ]] || return 0
+  case "$current_tool" in
+    codex)
+      sed -n 's/^session id: //p' "$current_log_file" | head -n 1
+      ;;
+    test-session)
+      sed -n 's/^session id: //p' "$current_log_file" | head -n 1
+      ;;
+    *)
+      ;;
+  esac
+}
+
+find_codex_jsonl_path_for_session_if_present() {
+  local session_id="$1"
+  local sessions_root
+  [[ -n "$session_id" ]] || return 0
+  sessions_root="${CODEX_HOME:-$HOME/.codex}/sessions"
+  [[ -d "$sessions_root" ]] || return 0
+  find "$sessions_root" -type f -name "*${session_id}.jsonl" | sort | tail -n 1
+}
+
+write_live_session_state_if_possible() {
+  local current_project="$1" current_tool="$2" current_log_file="$3" current_prompt_file="$4" current_launch_kind="$5"
+  local session_state_file tmp_file tool_session_id tool_resume_target tool_jsonl_path
+  local last_launch_kind last_rotation_reason last_cycle_log last_prompt_file
+  local last_context_compacted last_context_ratio last_primary_rate_limit_used_percent last_primary_rate_limit_resets_at
+  local last_secondary_rate_limit_used_percent last_secondary_rate_limit_resets_at last_route_only_handoff
+  local current_tool_slot last_active_slot last_slot_switch_reason last_slot_switch_at last_cycle_debug_log
+  local last_claude_jsonl_path last_codex_mcp_used last_codex_mcp_thread_id last_codex_mcp_jsonl_path
+  local claude_session_id_current_state claude_session_id_previous_state last_project_dirty_entries
+  local last_worktree_summary_total last_worktree_summary_dirty last_delegated_pending_ids
+  local last_delegated_pending_count last_delegated_consumed_ids last_delegated_consumed_at
+  local last_restart_storm_window_secs last_restart_storm_count last_process_churn_peak
+  local last_restart_storm_signal_at last_restart_storm_signal_reason last_restart_storm_escalated_at
+  local last_restart_storm_escalation_target auto_recovery_attempted_tools_csv auto_recovery_origin_tool
+  local checkpoint_drift_streak route_only_streak resume_streak
+
+  session_state_file="$(session_state_file_for_project "$current_project")"
+  mkdir -p "$(dirname "$session_state_file")"
+
+  tool_session_id=""
+  tool_resume_target=""
+  tool_jsonl_path=""
+  last_launch_kind=""
+  last_rotation_reason=""
+  last_cycle_log=""
+  last_prompt_file=""
+  last_context_compacted="0"
+  last_context_ratio=""
+  last_primary_rate_limit_used_percent=""
+  last_primary_rate_limit_resets_at=""
+  last_secondary_rate_limit_used_percent=""
+  last_secondary_rate_limit_resets_at=""
+  last_route_only_handoff="0"
+  current_tool_slot=""
+  last_active_slot=""
+  last_slot_switch_reason=""
+  last_slot_switch_at=""
+  last_cycle_debug_log=""
+  last_claude_jsonl_path=""
+  last_codex_mcp_used="0"
+  last_codex_mcp_thread_id=""
+  last_codex_mcp_jsonl_path=""
+  claude_session_id_current_state=""
+  claude_session_id_previous_state=""
+  last_project_dirty_entries="0"
+  last_worktree_summary_total="0"
+  last_worktree_summary_dirty="0"
+  last_delegated_pending_ids=""
+  last_delegated_pending_count="0"
+  last_delegated_consumed_ids=""
+  last_delegated_consumed_at=""
+  last_restart_storm_window_secs="0"
+  last_restart_storm_count="0"
+  last_process_churn_peak="0"
+  last_restart_storm_signal_at=""
+  last_restart_storm_signal_reason=""
+  last_restart_storm_escalated_at=""
+  last_restart_storm_escalation_target=""
+  auto_recovery_attempted_tools_csv=""
+  auto_recovery_origin_tool=""
+  checkpoint_drift_streak="0"
+  route_only_streak="0"
+  resume_streak="0"
+
+  if [[ -f "$session_state_file" ]]; then
+    unset LAST_TOOL_SESSION_ID LAST_TOOL_RESUME_TARGET LAST_TOOL_JSONL_PATH LAST_LAUNCH_KIND LAST_ROTATION_REASON LAST_CYCLE_LOG LAST_PROMPT_FILE LAST_CONTEXT_COMPACTED LAST_CONTEXT_RATIO LAST_PRIMARY_RATE_LIMIT_USED_PERCENT LAST_PRIMARY_RATE_LIMIT_RESETS_AT LAST_SECONDARY_RATE_LIMIT_USED_PERCENT LAST_SECONDARY_RATE_LIMIT_RESETS_AT LAST_ROUTE_ONLY_HANDOFF CURRENT_TOOL_SLOT LAST_ACTIVE_SLOT LAST_SLOT_SWITCH_REASON LAST_SLOT_SWITCH_AT LAST_CYCLE_DEBUG_LOG LAST_CLAUDE_JSONL_PATH LAST_CODEX_MCP_USED LAST_CODEX_MCP_THREAD_ID LAST_CODEX_MCP_JSONL_PATH CLAUDE_SESSION_ID_CURRENT CLAUDE_SESSION_ID_PREVIOUS LAST_PROJECT_DIRTY_ENTRIES LAST_WORKTREE_SUMMARY_TOTAL LAST_WORKTREE_SUMMARY_DIRTY LAST_DELEGATED_CONTINUATION_PENDING_IDS LAST_DELEGATED_CONTINUATION_PENDING_COUNT LAST_DELEGATED_CONTINUATION_CONSUMED_IDS LAST_DELEGATED_CONTINUATION_CONSUMED_AT LAST_RESTART_STORM_WINDOW_SECS LAST_RESTART_STORM_COUNT LAST_PROCESS_CHURN_PEAK LAST_RESTART_STORM_SIGNAL_AT LAST_RESTART_STORM_SIGNAL_REASON LAST_RESTART_STORM_ESCALATED_AT LAST_RESTART_STORM_ESCALATION_TARGET AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV AUTO_RECOVERY_ORIGIN_TOOL CHECKPOINT_DRIFT_STREAK_CURRENT ROUTE_ONLY_STREAK_CURRENT RESUME_STREAK_CURRENT
+    # shellcheck disable=SC1090
+    source "$session_state_file"
+    tool_session_id="${LAST_TOOL_SESSION_ID:-}"
+    tool_resume_target="${LAST_TOOL_RESUME_TARGET:-}"
+    tool_jsonl_path="${LAST_TOOL_JSONL_PATH:-}"
+    last_launch_kind="${LAST_LAUNCH_KIND:-}"
+    last_rotation_reason="${LAST_ROTATION_REASON:-}"
+    last_cycle_log="${LAST_CYCLE_LOG:-}"
+    last_prompt_file="${LAST_PROMPT_FILE:-}"
+    last_context_compacted="${LAST_CONTEXT_COMPACTED:-0}"
+    last_context_ratio="${LAST_CONTEXT_RATIO:-}"
+    last_primary_rate_limit_used_percent="${LAST_PRIMARY_RATE_LIMIT_USED_PERCENT:-}"
+    last_primary_rate_limit_resets_at="${LAST_PRIMARY_RATE_LIMIT_RESETS_AT:-}"
+    last_secondary_rate_limit_used_percent="${LAST_SECONDARY_RATE_LIMIT_USED_PERCENT:-}"
+    last_secondary_rate_limit_resets_at="${LAST_SECONDARY_RATE_LIMIT_RESETS_AT:-}"
+    last_route_only_handoff="${LAST_ROUTE_ONLY_HANDOFF:-0}"
+    current_tool_slot="${CURRENT_TOOL_SLOT:-}"
+    last_active_slot="${LAST_ACTIVE_SLOT:-}"
+    last_slot_switch_reason="${LAST_SLOT_SWITCH_REASON:-}"
+    last_slot_switch_at="${LAST_SLOT_SWITCH_AT:-}"
+    last_cycle_debug_log="${LAST_CYCLE_DEBUG_LOG:-}"
+    last_claude_jsonl_path="${LAST_CLAUDE_JSONL_PATH:-}"
+    last_codex_mcp_used="${LAST_CODEX_MCP_USED:-0}"
+    last_codex_mcp_thread_id="${LAST_CODEX_MCP_THREAD_ID:-}"
+    last_codex_mcp_jsonl_path="${LAST_CODEX_MCP_JSONL_PATH:-}"
+    claude_session_id_current_state="${CLAUDE_SESSION_ID_CURRENT:-}"
+    claude_session_id_previous_state="${CLAUDE_SESSION_ID_PREVIOUS:-}"
+    last_project_dirty_entries="${LAST_PROJECT_DIRTY_ENTRIES:-0}"
+    last_worktree_summary_total="${LAST_WORKTREE_SUMMARY_TOTAL:-0}"
+    last_worktree_summary_dirty="${LAST_WORKTREE_SUMMARY_DIRTY:-0}"
+    last_delegated_pending_ids="${LAST_DELEGATED_CONTINUATION_PENDING_IDS:-}"
+    last_delegated_pending_count="${LAST_DELEGATED_CONTINUATION_PENDING_COUNT:-0}"
+    last_delegated_consumed_ids="${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-}"
+    last_delegated_consumed_at="${LAST_DELEGATED_CONTINUATION_CONSUMED_AT:-}"
+    last_restart_storm_window_secs="${LAST_RESTART_STORM_WINDOW_SECS:-0}"
+    last_restart_storm_count="${LAST_RESTART_STORM_COUNT:-0}"
+    last_process_churn_peak="${LAST_PROCESS_CHURN_PEAK:-0}"
+    last_restart_storm_signal_at="${LAST_RESTART_STORM_SIGNAL_AT:-}"
+    last_restart_storm_signal_reason="${LAST_RESTART_STORM_SIGNAL_REASON:-}"
+    last_restart_storm_escalated_at="${LAST_RESTART_STORM_ESCALATED_AT:-}"
+    last_restart_storm_escalation_target="${LAST_RESTART_STORM_ESCALATION_TARGET:-}"
+    auto_recovery_attempted_tools_csv="${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}"
+    auto_recovery_origin_tool="${AUTO_RECOVERY_ORIGIN_TOOL:-}"
+    checkpoint_drift_streak="${CHECKPOINT_DRIFT_STREAK_CURRENT:-0}"
+    route_only_streak="${ROUTE_ONLY_STREAK_CURRENT:-0}"
+    resume_streak="${RESUME_STREAK_CURRENT:-0}"
+  fi
+
+  if [[ -z "$tool_session_id" ]]; then
+    tool_session_id="$(extract_tool_session_id_from_log_if_present "$current_tool" "$current_log_file")"
+  fi
+  if [[ "$current_tool" == "codex" && -n "$tool_session_id" && -z "$tool_jsonl_path" ]]; then
+    tool_jsonl_path="$(find_codex_jsonl_path_for_session_if_present "$tool_session_id")"
+  fi
+  if [[ -z "$tool_resume_target" && -n "$tool_session_id" ]]; then
+    tool_resume_target="$tool_session_id"
+  fi
+
+  [[ -n "$tool_session_id" || -n "$tool_resume_target" || -n "$tool_jsonl_path" ]] || return 0
+
+  tmp_file="$(mktemp "${session_state_file}.tmp.XXXXXX")"
+  cat >"$tmp_file" <<EOF
+LAST_TOOL_SESSION_ID="$tool_session_id"
+LAST_TOOL_RESUME_TARGET="$tool_resume_target"
+LAST_TOOL_JSONL_PATH="$tool_jsonl_path"
+LAST_LAUNCH_KIND="${last_launch_kind:-$current_launch_kind}"
+LAST_ROTATION_REASON="$last_rotation_reason"
+LAST_CYCLE_LOG="${last_cycle_log:-$current_log_file}"
+LAST_PROMPT_FILE="${last_prompt_file:-$current_prompt_file}"
+LAST_CONTEXT_COMPACTED="$last_context_compacted"
+LAST_CONTEXT_RATIO="$last_context_ratio"
+LAST_PRIMARY_RATE_LIMIT_USED_PERCENT="$last_primary_rate_limit_used_percent"
+LAST_PRIMARY_RATE_LIMIT_RESETS_AT="$last_primary_rate_limit_resets_at"
+LAST_SECONDARY_RATE_LIMIT_USED_PERCENT="$last_secondary_rate_limit_used_percent"
+LAST_SECONDARY_RATE_LIMIT_RESETS_AT="$last_secondary_rate_limit_resets_at"
+LAST_ROUTE_ONLY_HANDOFF="$last_route_only_handoff"
+CURRENT_TOOL_SLOT="$current_tool_slot"
+LAST_ACTIVE_SLOT="$last_active_slot"
+LAST_SLOT_SWITCH_REASON="$last_slot_switch_reason"
+LAST_SLOT_SWITCH_AT="$last_slot_switch_at"
+LAST_CYCLE_DEBUG_LOG="$last_cycle_debug_log"
+LAST_CLAUDE_JSONL_PATH="$last_claude_jsonl_path"
+LAST_CODEX_MCP_USED="$last_codex_mcp_used"
+LAST_CODEX_MCP_THREAD_ID="$last_codex_mcp_thread_id"
+LAST_CODEX_MCP_JSONL_PATH="$last_codex_mcp_jsonl_path"
+CLAUDE_SESSION_ID_CURRENT="$claude_session_id_current_state"
+CLAUDE_SESSION_ID_PREVIOUS="$claude_session_id_previous_state"
+LAST_PROJECT_DIRTY_ENTRIES="$last_project_dirty_entries"
+LAST_WORKTREE_SUMMARY_TOTAL="$last_worktree_summary_total"
+LAST_WORKTREE_SUMMARY_DIRTY="$last_worktree_summary_dirty"
+LAST_DELEGATED_CONTINUATION_PENDING_IDS="$last_delegated_pending_ids"
+LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$last_delegated_pending_count"
+LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$last_delegated_consumed_ids"
+LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$last_delegated_consumed_at"
+LAST_RESTART_STORM_WINDOW_SECS="$last_restart_storm_window_secs"
+LAST_RESTART_STORM_COUNT="$last_restart_storm_count"
+LAST_PROCESS_CHURN_PEAK="$last_process_churn_peak"
+LAST_RESTART_STORM_SIGNAL_AT="$last_restart_storm_signal_at"
+LAST_RESTART_STORM_SIGNAL_REASON="$last_restart_storm_signal_reason"
+LAST_RESTART_STORM_ESCALATED_AT="$last_restart_storm_escalated_at"
+LAST_RESTART_STORM_ESCALATION_TARGET="$last_restart_storm_escalation_target"
+AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV="$auto_recovery_attempted_tools_csv"
+AUTO_RECOVERY_ORIGIN_TOOL="$auto_recovery_origin_tool"
+CHECKPOINT_DRIFT_STREAK_CURRENT="$checkpoint_drift_streak"
+ROUTE_ONLY_STREAK_CURRENT="$route_only_streak"
+RESUME_STREAK_CURRENT="$resume_streak"
+EOF
+  mv "$tmp_file" "$session_state_file"
+}
+
 write_workcell_launch_state_if_possible() {
   local current_project="$1"
   local state_file tmp_file updated_at
@@ -230,6 +462,12 @@ runtime_error_signal_excerpt() {
 filter_known_benign_runtime_error_noise() {
   local current_tool="$1"
   if [[ "$current_tool" == "codex" ]]; then
+    if [[ "$(codex_live_auth_kind)" == "apikey" ]]; then
+      sed \
+        -e '/failed to refresh available models: timeout waiting for child process to exit/d' \
+        -e '/codex_login::auth::manager: Failed to refresh token: 401 Unauthorized/d'
+      return 0
+    fi
     sed '/failed to refresh available models: timeout waiting for child process to exit/d'
     return 0
   fi
@@ -401,10 +639,12 @@ fi
 child_pid=$!
 echo "$child_pid" >"$pid_file"
 write_workcell_launch_state_if_possible "$project"
+write_live_session_state_if_possible "$project" "$tool" "$log_file" "$prompt_file" "$launch_kind"
 echo "$child_pid"
 
-if [[ -n "$network_failure_marker_file" || -n "$failure_marker_file" ]]; then
-  while kill -0 "$child_pid" 2>/dev/null; do
+while kill -0 "$child_pid" 2>/dev/null; do
+  write_live_session_state_if_possible "$project" "$tool" "$log_file" "$prompt_file" "$launch_kind"
+  if [[ -n "$network_failure_marker_file" || -n "$failure_marker_file" ]]; then
     live_failure_reason=""
     live_failure_reason="$(live_runtime_failure_reason "$tool" "$log_file" "$debug_log_file" || true)"
     if [[ -n "$live_failure_reason" ]]; then
@@ -417,9 +657,9 @@ if [[ -n "$network_failure_marker_file" || -n "$failure_marker_file" ]]; then
       terminate_pid_tree "$child_pid" TERM
       break
     fi
-    sleep 1
-  done
-fi
+  fi
+  sleep 1
+done
 
 set +e
 wait "$child_pid"
@@ -431,6 +671,7 @@ if [[ "$child_rc" -ne 0 ]]; then
 fi
 
 if [[ -n "$network_failure_marker_file" || -n "$failure_marker_file" ]]; then
+  write_live_session_state_if_possible "$project" "$tool" "$log_file" "$prompt_file" "$launch_kind"
   live_failure_reason=""
   live_failure_reason="$(live_runtime_failure_reason "$tool" "$log_file" "$debug_log_file" || true)"
   if [[ -n "$live_failure_reason" ]]; then
