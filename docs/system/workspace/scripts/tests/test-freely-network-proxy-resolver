@@ -74,6 +74,26 @@ RESULT_GLOBAL="$(
 
 [[ "$RESULT_GLOBAL" == "http://global-http.example:8080|http://global-http.example:8080|http://global-https.example:8443|localhost" ]]
 
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="explicit"
+FREELY_NETWORK_PROXY_URL=""
+FREELY_ALL_PROXY=""
+FREELY_HTTP_PROXY=""
+FREELY_HTTPS_PROXY=""
+FREELY_NO_PROXY="project-only-no-proxy"
+EOF
+
+RESULT_PROJECT_EXPLICIT_GLOBAL_FALLBACK="$(
+  FREELY_HOME="$FREELY_HOME" bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+    freely_apply_project_network_proxy_env "'"$PROJECT"'"
+    printf "%s|%s|%s|%s\n" "${ALL_PROXY:-}" "${HTTP_PROXY:-}" "${HTTPS_PROXY:-}" "${NO_PROXY:-}"
+  '
+)"
+
+[[ "$RESULT_PROJECT_EXPLICIT_GLOBAL_FALLBACK" == "http://global-http.example:8080|http://global-http.example:8080|http://global-https.example:8443|project-only-no-proxy" ]]
+
 MISSING_CONFIG_PROJECT="$TMP_DIR/project-missing-config"
 mkdir -p "$MISSING_CONFIG_PROJECT/.freely"
 MISSING_CONFIG_RESULT="$(
@@ -91,4 +111,4 @@ MISSING_CONFIG_RESULT="$(
 
 [[ "$MISSING_CONFIG_RESULT" == "inherit|http://ambient-all.example:9000|http://ambient-http.example:9001|http://ambient-https.example:9002|ambient-no-proxy" ]]
 
-echo "[PASS] network proxy resolver handles explicit base-url, disabled mode, global fallback, and missing-config inherit behavior"
+echo "[PASS] network proxy resolver handles explicit base-url, disabled mode, global fallback, project-explicit global fallback, and missing-config inherit behavior"
