@@ -22,10 +22,15 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-keeps-fresh-materialized-worker-with-authoritative-edit-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
+- `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-worktree-summary-multi-worktree`
+- `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-materializes-missing-worktree`
+- `./bin/test-lane premerge-integration -- ./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-test-pre-merge-worker-materialization --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- `./bin/test-lane premerge-integration -- ./bin/governance-check`
 
 ## Status
 
 - `PASS`: focused feature-lane regressions prove manager can now convert continuity-selected worker prompts into actual governed worktrees without tripping the old broken-pipe or retire-ready misclassification seams.
+- `PASS`: protected `test-pre-merge-20260423-worker-materialization` replay reran the bounded summary/materialization checks plus owner gates, so develop-bound adequacy now has a fresh staged owner review artifact for this repair family.
 - `PENDING`: protected premerge plus canonical `develop` daemon replay still must show the retained cleanup lane closes and the next scan-selected task begins automatically.
 
 ## Implementation Decision Note
