@@ -6,8 +6,8 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/worker-exit-contract-repair-closeout-boundary-20260424`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-worker-exit-contract-repair-closeout-boundary`
+- branch: `feature/worker-recovery-sync-tooling-before-launch-20260424`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-worker-recovery-sync-tooling-before-launch`
 - updated_at: `2026-04-24`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -26,6 +26,9 @@
 - Canonical replay evidence after that first repair narrowed the remaining root cause further: runtime was already relaunching the retained cleanup worker correctly, but the generated `session-handoff.txt` only required “produce a valid worker exit contract,” so the resumed lane could legally short-circuit into a repair-only `worker_done` backed only by runtime repair artifacts.
 - Runtime now rebinds worker exit-contract repair handoffs to the authoritative cleanup prompt metadata when that worker carries verification/closeout state, and cleanup repair rounds now reject a repair-only `worker_done` that cites only the handoff plus the rewritten exit contract instead of bounded cleanup evidence.
 - New regressions prove the repair handoff preserves the original cleanup closeout contract and that a retained cleanup lane in `worker_exit_contract_repair` cannot stop itself with a no-op repair receipt while ordinary `worker_done` still stops a normal worker lane.
+- Post-merge canonical replay exposed one more runtime-owned seam on the same owner: manager recovery was correctly deciding to restart the retained cleanup worker, but it launched that worktree through the worktree's own stale `bin/freely`, so the recovered lane still ran old runtime code and never consumed the new cleanup reentry hardening from `develop`.
+- `start_workcell_supervisor_async()` now syncs tooling from the canonical source project into the target worktree before launching its supervisor, and both worker-prompt launches plus expected-running recovery paths now pass the manager project as that canonical source.
+- A focused regression proves the launch order is now `sync-tooling` first, then worker supervisor start, so retained worker recovery can actually pick up newly merged runtime fixes without manual intervention.
 
 ## Verification Evidence
 
@@ -48,15 +51,18 @@
 17. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-repair-only-done-forces-resume`
 18. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
 19. `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-cleanup-reentry-verification.md`
+20. `bash docs/system/workspace/scripts/tests/test-freely-start-workcell-supervisor-syncs-tooling-before-launch`
+21. `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-supervision-nonbusy-worker-recovers`
+22. `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-worker-recovery-sync-verification.md`
 
 ## Current Batch Risks
 
-1. The new repair-round hardening must stay scoped to cleanup lanes that already carry authoritative verification metadata; ordinary worker completions and non-cleanup repair paths must keep their existing stop behavior.
-2. Canonical success still depends on protected-lane absorption plus a real daemon replay that proves the retained cleanup worker now emits a bounded blocker or retirement contract instead of a no-op `worker_done`.
-3. The retained cleanup worktree remains mixed-scope dirty and must still be handled by cleanup governance rather than silently absorbed by this repair-only lane.
+1. Runtime must keep syncing worker tooling from the canonical source project only as a launch preflight; it must not silently mutate unrelated worktree content outside the existing sync-tooling contract.
+2. Canonical success still depends on protected-lane absorption plus a real daemon replay that proves the retained cleanup worker now runs the merged runtime code and emits a bounded blocker or retirement contract instead of a no-op `worker_done`.
+3. The retained cleanup worktree remains mixed-scope dirty and must still be handled by cleanup governance rather than silently absorbed by this runtime launch fix.
 
 ## Next Action
 
-1. Promote this repair through a fresh `test-pre-merge-*` replay into `develop`.
-2. Restart canonical `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` and verify retained cleanup replay no longer accepts a repair-only `worker_done`.
+1. Promote this runtime-launch fix through a fresh `test-pre-merge-*` replay into `develop`.
+2. Restart canonical `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` and verify retained cleanup replay now runs the merged worker runtime instead of stale worktree tooling.
 3. Keep all other dirty retained-lane residue frozen until runtime either retires that worktree cleanly or hands back a precise split/freeze decision.

@@ -31,6 +31,8 @@
 13. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-repair-handoff-rebinds-cleanup-closeout`.
 14. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-repair-only-done-forces-resume`.
 15. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`.
+16. Run `bash docs/system/workspace/scripts/tests/test-freely-start-workcell-supervisor-syncs-tooling-before-launch`.
+17. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-supervision-nonbusy-worker-recovers`.
 
 ## End-to-End
 - acceptance target: `The bounded owner is documented well enough that a later guarded replay can evaluate it as one lawful feature lane instead of a checkpoint-only branch.`
@@ -124,3 +126,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-cleanup-reentry-verification.md`
+
+### Worker recovery syncs canonical tooling before launch
+- id: `worker-recovery-syncs-canonical-tooling-before-launch`
+- requirement: `When manager runtime restarts an expected-running worker, it must sync canonical tooling into that worktree before launching the worker supervisor so newly merged runtime fixes are not bypassed by stale worktree scripts.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#7`
+- case_design: `Seed a target worktree with a stale local bin/freely, invoke the runtime launch helper from a canonical source project, and assert the launched supervisor executes the synced replacement instead of the stale script.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-worker-recovery-sync-verification.md`
