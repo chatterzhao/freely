@@ -91,8 +91,7 @@ cat >"$NEW_CONT" <<EOF
 # Manager Continuity
 
 ## Worker Prompts
-- launched:
-  - $NEW_PROMPT
+- $NEW_PROMPT
 - queue:
   - $QUEUED_PROMPT
 - frozen_queue:

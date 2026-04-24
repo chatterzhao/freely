@@ -7329,7 +7329,7 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
             if (mode != "launchable") {
               emit_prompt_paths($0)
             }
-          } else if (worker_prompts_subsection == "launched" || worker_prompts_subsection == "queue") {
+          } else if (worker_prompts_subsection == "" || worker_prompts_subsection == "launched" || worker_prompts_subsection == "queue") {
             if (mode != "frozen") {
               emit_prompt_paths($0)
             }
