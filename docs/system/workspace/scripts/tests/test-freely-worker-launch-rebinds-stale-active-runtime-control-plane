@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-runtime-rebind.XXXXXX)"
+PROJECT="$TMP_DIR/manager"
+WORKER="$TMP_DIR/worker"
+PROMPT_FILE="$TMP_DIR/prompt.txt"
+
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/docs/system/workspace/scripts/runtime" \
+  "$WORKER/.freely/run" \
+  "$WORKER/docs/system/workspace/scripts/runtime"
+
+printf 'manager runtime\n' >"$PROJECT/docs/system/workspace/scripts/runtime/freely"
+printf 'worker runtime\n' >"$WORKER/docs/system/workspace/scripts/runtime/freely"
+printf 'prompt\n' >"$PROMPT_FILE"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+materialize_worker_prompt_worktree_if_needed() {
+  printf '%s\n' "$WORKER"
+}
+
+project_has_authoritative_worktree_path() {
+  return 0
+}
+
+ensure_runtime_workcell_initialized_for_launch() {
+  return 0
+}
+
+worker_prompt_target_worktree() {
+  printf '%s\n' "$WORKER"
+}
+
+worker_prompt_selected_tool() {
+  return 0
+}
+
+persist_project_tool_selection() {
+  return 0
+}
+
+worker_verification_contract_state_file() {
+  printf '%s\n' "$WORKER/.freely/run/worker-verification-contract.env"
+}
+
+manager_supervisor_pid_for_project() {
+  [[ "$1" == "$WORKER" ]] && printf '111\n'
+}
+
+runtime_ai_pid_hint_for_project() {
+  [[ "$1" == "$WORKER" ]] && printf '222\n'
+}
+
+worker_prompt_verification_metadata_missing_fields_csv() {
+  printf '\n'
+}
+
+worker_prompt_has_any_verification_metadata() {
+  return 1
+}
+
+write_manager_worker_launch_intake() {
+  printf 'intake-1\n'
+}
+
+write_worker_verification_contract_file() {
+  printf '%s\n' "$*" >>"$TMP_DIR/verification.log"
+}
+
+refresh_workcell_state_projection() {
+  return 0
+}
+
+append_runtime_event() {
+  printf '%s|%s\n' "$1" "$2" >>"$TMP_DIR/events.log"
+}
+
+request_local_runtime_handoff_stop() {
+  printf '%s|%s\n' "$1" "$2" >>"$TMP_DIR/handoff.log"
+}
+
+start_workcell_supervisor_async() {
+  printf '%s|%s\n' "$1" "$2" >>"$TMP_DIR/start.log"
+}
+
+request_local_continuation_reentry() {
+  printf '%s|%s\n' "$1" "$2" >>"$TMP_DIR/reentry.log"
+}
+
+handoff_file() {
+  printf '%s\n' "$1/.freely/run/handoff.md"
+}
+
+write_workcell_state() {
+  printf '%s|%s|%s|%s|%s\n' "$@" >>"$TMP_DIR/state.log"
+}
+
+launch_worker_from_manager_prompt_if_needed "$PROJECT" "$PROMPT_FILE"
+
+grep -q "^$WORKER|intake-1$" "$TMP_DIR/handoff.log" || {
+  echo "[FAIL] expected stale active worker runtime to request a local runtime handoff stop" >&2
+  exit 1
+}
+
+grep -q "^$WORKER|$PROJECT$" "$TMP_DIR/start.log" || {
+  echo "[FAIL] expected stale active worker runtime to relaunch under the manager source project" >&2
+  exit 1
+}
+
+grep -q "^$PROJECT|manager_worker_runtime_control_plane_rebind$" "$TMP_DIR/events.log" || {
+  echo "[FAIL] expected runtime rebind event to be recorded" >&2
+  exit 1
+}
+
+if [[ -f "$TMP_DIR/reentry.log" ]]; then
+  echo "[FAIL] stale active worker runtime should be rebound instead of plain local continuation reentry" >&2
+  exit 1
+fi
+
+echo "[PASS] launch_worker_from_manager_prompt_if_needed rebinds stale active worker runtime control planes"

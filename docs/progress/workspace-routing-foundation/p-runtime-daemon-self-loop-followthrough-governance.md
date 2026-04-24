@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/manager-queued-owner-self-block-reconcile-20260424`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-queued-owner-self-block-reconcile`
-- updated_at: `2026-04-24 06:55 PDT`
+- branch: `feature/manager-worker-runtime-source-rebind-20260424`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-worker-runtime-source-rebind`
+- updated_at: `2026-04-24 07:44 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -649,3 +649,17 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-does-not-override-network-transient`
 - `PASS`: `bash -n docs/system/workspace/scripts/runtime/freely`
 - `PENDING`: run owner gates on this feature lane, stage protected premerge evidence, merge to canonical `develop`, and rerun `./bin/freely daemon start` until the retained cleanup lane closes, promotes/cleans up lawfully, and runtime returns to the next scan-selected task source.
+
+## 2026-04-24 07:44 PDT Manager-Owned Worker Runtime Source Rebind
+
+- `FAIL`: canonical `develop` continuity-first replay advanced past the worker-exit-contract seam, but the retained worker lane still stayed under a supervisor started at `2026-04-24 06:35:03 PDT` from that worktree's own runtime script. The lane had already written lawful `EXIT_KIND="worker_done"` truth, yet manager supervision kept depending on stale worktree-local runtime code instead of the current canonical manager runtime.
+- `PASS`: this is a control-plane seam, not a scan-json or manager-role seam. Root continuity still selected the retained cleanup-followthrough lane first, but worker relaunch/reentry could keep inheriting the target worktree's older runtime implementation after later fixes were absorbed into `develop`.
+- `PASS`: `start_workcell_supervisor_async()` now uses the manager/source project's runtime bin whenever manager is launching or relaunching a distinct worker worktree, so canonical `develop` remains the authoritative control plane for retained worker supervision.
+- `PASS`: active-worker launch reconciliation now detects when a still-running worker worktree is on stale runtime code relative to the manager source runtime, requests a local runtime-handoff stop, and relaunches that worker control plane under the manager/source runtime instead of doing plain local continuation reentry.
+- `PASS`: this stays continuity-first. The retained lane is still the first task to finish; the repair only rebinds who supervises that same lane so the already-merged closeout fixes on `develop` can finally govern it.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-start-workcell-supervisor-uses-source-runtime-bin`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-launch-rebinds-stale-active-runtime-control-plane`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
+- `PASS`: `bash -n docs/system/workspace/scripts/runtime/freely`
+- `PENDING`: run owner gates on this feature lane, promote through protected premerge into canonical `develop`, then prove real daemon replay rebinds the retained worker control plane, consumes its existing `worker_done` closeout, retires/advances that lane lawfully, and only then returns to scan-selected backlog.
