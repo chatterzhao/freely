@@ -289,6 +289,7 @@ write_workcell_launch_state_if_possible() {
   local current_project="$1"
   local state_file tmp_file updated_at
   local desired_state supervisor_state ai_state exit_reason role_hint
+  local entrypoint_mode
   local verification_contract_file verification_metadata_present verification_missing_fields
   local verification_owner_issue verification_pre_tests_path verification_artifact_dir
   local verification_test_lanes verification_acceptance_ids verification_evidence_level
@@ -304,6 +305,7 @@ write_workcell_launch_state_if_possible() {
   ai_state="down"
   exit_reason="starting"
   role_hint="worker"
+  entrypoint_mode="foreground"
   verification_contract_file="$current_project/.freely/run/worker-verification-contract.env"
   verification_metadata_present="false"
   verification_missing_fields=""
@@ -322,11 +324,12 @@ write_workcell_launch_state_if_possible() {
   verification_closeout_review_artifact_policy=""
 
   if [[ -f "$state_file" ]]; then
-    unset DESIRED_RUNTIME_STATE LAST_SUPERVISOR_STATE LAST_AI_STATE LAST_EXIT_REASON LAST_ROLE_HINT LAST_WORKER_VERIFICATION_CONTRACT_FILE LAST_WORKER_VERIFICATION_METADATA_PRESENT LAST_WORKER_VERIFICATION_METADATA_MISSING_FIELDS LAST_WORKER_OWNER_ISSUE LAST_WORKER_PRE_TESTS_PATH LAST_WORKER_VERIFICATION_ARTIFACT_DIR LAST_WORKER_REQUIRED_TEST_LANES_CSV LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV LAST_WORKER_MINIMUM_EVIDENCE_LEVEL LAST_WORKER_TARGET_ENVIRONMENT LAST_WORKER_CLOSEOUT_GATE LAST_WORKER_CLOSEOUT_GATE_COMMAND LAST_WORKER_CLOSEOUT_TARGET_LANE LAST_WORKER_CLOSEOUT_PROMOTION_GATE LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY
+    unset DESIRED_RUNTIME_STATE LAST_SUPERVISOR_STATE LAST_AI_STATE LAST_EXIT_REASON LAST_ENTRYPOINT_MODE LAST_ROLE_HINT LAST_WORKER_VERIFICATION_CONTRACT_FILE LAST_WORKER_VERIFICATION_METADATA_PRESENT LAST_WORKER_VERIFICATION_METADATA_MISSING_FIELDS LAST_WORKER_OWNER_ISSUE LAST_WORKER_PRE_TESTS_PATH LAST_WORKER_VERIFICATION_ARTIFACT_DIR LAST_WORKER_REQUIRED_TEST_LANES_CSV LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV LAST_WORKER_MINIMUM_EVIDENCE_LEVEL LAST_WORKER_TARGET_ENVIRONMENT LAST_WORKER_CLOSEOUT_GATE LAST_WORKER_CLOSEOUT_GATE_COMMAND LAST_WORKER_CLOSEOUT_TARGET_LANE LAST_WORKER_CLOSEOUT_PROMOTION_GATE LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY
     # shellcheck disable=SC1090
     source "$state_file"
     desired_state="${DESIRED_RUNTIME_STATE:-running}"
     supervisor_state="${LAST_SUPERVISOR_STATE:-up}"
+    entrypoint_mode="${LAST_ENTRYPOINT_MODE:-foreground}"
     role_hint="${LAST_ROLE_HINT:-worker}"
     verification_contract_file="${LAST_WORKER_VERIFICATION_CONTRACT_FILE:-$verification_contract_file}"
     verification_metadata_present="${LAST_WORKER_VERIFICATION_METADATA_PRESENT:-false}"
@@ -353,6 +356,7 @@ DESIRED_RUNTIME_STATE="${desired_state:-running}"
 LAST_SUPERVISOR_STATE="${supervisor_state:-up}"
 LAST_AI_STATE="up"
 LAST_EXIT_REASON="ai_launch_in_flight"
+LAST_ENTRYPOINT_MODE="${entrypoint_mode:-foreground}"
 LAST_ROLE_HINT="${role_hint:-worker}"
 LAST_STATE_UPDATED_AT="$updated_at"
 LAST_WORKER_VERIFICATION_CONTRACT_FILE="${verification_contract_file:-$current_project/.freely/run/worker-verification-contract.env}"
