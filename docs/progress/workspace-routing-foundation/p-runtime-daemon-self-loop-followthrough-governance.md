@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/manager-worker-launch-recorded-self-intent-reclaim-20260424`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-worker-launch-recorded-self-intent-reclaim`
-- updated_at: `2026-04-24 06:18 PDT`
+- branch: `feature/manager-active-worker-prompt-consumption-reconcile-20260424`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-active-worker-prompt-consumption-reconcile`
+- updated_at: `2026-04-24 06:38 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -612,3 +612,15 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-superseded-frozen-self-intent`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reconciles-stale-frozen-consumed-prompt`
 - `PENDING`: guarded premerge replay is green, but canonical `develop` replay still must prove the retained cleanup lane relaunches from the authoritative prompt, writes bounded followthrough truth, and then Freely advances to the next task source instead of looping on frozen-owner queue residue.
+
+## 2026-04-24 06:38 PDT Active Authoritative Worker Prompt Consumption Reconcile
+
+- `FAIL`: canonical `develop` continuity-first replay progressed one step further, but manager could still leave the current authoritative retained-lane prompt in `QUEUED_WORKER_PROMPTS` even while the exact target worker was already active on that same prompt. The result was repeated supervision/launch churn instead of waiting on the running worker and then continuing the selected followthrough.
+- `PASS`: runtime now recognizes when a manager prompt matches the active worker lane's authoritative prompt and treats that prompt as already consumed/launched rather than as an unconsumed queued item.
+- `PASS`: the repair stays narrow. Workers that are merely busy with delegated continuation still remain queued; only the exact active authoritative prompt is auto-consumed.
+- `PASS`: `manager_continuity_has_unconsumed_launchable_worker_prompt()` now skips those active authoritative prompts, `manager_continuity_waiting_on_active_busy_worker()` now waits on them, and `manager_runtime_launch_workers_from_latest_handoff()` records them into consumed launch state instead of trying to relaunch.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-authoritative-worker-consumes-prompt`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-busy-worker-queue`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-supersedes-queued-prompt-with-manager-continuity`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
+- `PENDING`: guarded promote and canonical `develop` daemon replay still need to prove the retained runtime-cleanup lane finishes, merges/retires lawfully, and Freely then returns to scan-selected backlog instead of spinning on same-prompt supervision.
