@@ -386,13 +386,13 @@
 - id: `queue-state-worker-handoff-launches-worker`
 - requirement: `When manager continuity uses the current ## Queue State shape with worker_prompts:, runtime must still extract the prompt, record launch-state truth, and start the worker after delegate_workers.`
 - surface_kind: `integration`
-- target_lane: `feature-local`
-- promotion_gate: `completion`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
 - task_refs: `tasks.md#26`
-- case_design: `Seed continuity in the current Queue State format, verify prompt parsing still finds the worker prompt, and verify post-AI-cycle launch updates manager-worker-launch-state instead of returning launched_count=0.`
-- evidence_level: `integration`
+- case_design: `Replay the queue-state handoff repair on a disposable protected test lane, rerun the continuity parsing and post-AI-cycle launch regressions there, and stage a fresh owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-queue-state-worker-prompt-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-queue-state-worker-prompt-premerge-verification.md`
 
 ### Protected replay stages explicit daemon-stop boundary evidence
 - id: `daemon-stop-boundary-premerge-proof`
