@@ -28,6 +28,9 @@
 10. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-repair-prompt-prioritizes-exit-contract`.
 11. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`.
 12. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`.
+13. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-repair-handoff-rebinds-cleanup-closeout`.
+14. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-repair-only-done-forces-resume`.
+15. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`.
 
 ## End-to-End
 - acceptance target: `The bounded owner is documented well enough that a later guarded replay can evaluate it as one lawful feature lane instead of a checkpoint-only branch.`
@@ -109,3 +112,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-exit-contract-repair-focus-verification.md`
+
+### Cleanup repair round cannot short-circuit closeout
+- id: `cleanup-repair-round-cannot-short-circuit-closeout`
+- requirement: `A retained cleanup worker resumed only to repair its exit contract must re-enter the original cleanup closeout gate and may not stop with a repair-only \`worker_done\` backed solely by runtime repair artifacts.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#6`
+- case_design: `Seed a cleanup worker prompt with authoritative verification metadata, force a \`worker_exit_contract_repair\` handoff, then assert the new handoff preserves the cleanup gate and runtime rejects a repair-only \`worker_done\` that cites only the handoff plus rewritten contract.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-cleanup-reentry-verification.md`
