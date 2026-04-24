@@ -132,6 +132,18 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-reconnect-502-network-verification.md`
 
+### Guarded promote carries fresh delegated-continuation stop-boundary evidence
+- id: `guarded-promote-pre-stop-delegated-continuation-boundary-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving startup no longer re-consumes pre-stop delegated continuation handoffs after explicit operator stop.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#27`
+- case_design: `Replay the stop-boundary delegated-continuation repair through the disposable protected lane, rerun the focused prompt/live-status regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-pre-stop-delegated-continuation-verification.md`
+
 ### Guarded promote carries fresh proxy/network diagnosis evidence
 - id: `guarded-promote-proxy-guidance-proof`
 - requirement: `The develop-bound replay includes fresh staged owner evidence for the current proxy/network diagnosis followthrough rather than relying only on older bounded runtime reviews.`

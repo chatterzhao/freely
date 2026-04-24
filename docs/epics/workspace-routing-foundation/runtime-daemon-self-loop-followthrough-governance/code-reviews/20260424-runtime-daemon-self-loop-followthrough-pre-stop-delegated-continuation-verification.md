@@ -25,3 +25,11 @@
 
 - `PASS`: operator-stop freshness now suppresses pre-stop delegated continuation reinjection while preserving newer continuation handoffs.
 - `PENDING`: guarded promote and canonical daemon replay still need to prove the runtime returns to scan-selected next-task patrol after the retained cleanup lane is reconciled.
+
+## Implementation Decision Note
+
+- decision: `Anchor delegated-continuation freshness to the later of continuity truth and explicit operator-stop boundary.`
+- why_this: `Fresh restart already discards pre-stop continuity; without a second floor the runtime can accidentally revive older delegated continuation history and stay pinned to stale cleanup followthrough instead of the new scan-selected patrol.`
+- alternatives_considered: `Keep continuity-only floor and rely on scan JSON to win later; always zero delegated continuation history on stop; reopen cleanup routing instead of repairing freshness.`
+- boundary_non_goals: `No scan-priority redesign, no cleanup-lane policy change, and no attempt to settle the retained dirty cleanup lane in this repair.`
+- residual_risk: `Canonical develop may still surface a later cleanup or retirement seam after startup returns to scan-driven patrol, but pre-stop delegated continuation reinjection itself is now fenced off.`
