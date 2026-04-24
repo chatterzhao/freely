@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-worker-continuity-pipe.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+RUN_DIR="$PROJECT/.freely/run"
+
+mkdir -p "$RUN_DIR"
+
+cat >"$RUN_DIR/manager-continuity-20260424-080000.md" <<'EOF'
+# Manager Continuity
+- continuity_written_by: `freely-runtime`
+
+## Worker Delegation
+- referenced_worker_prompts: `/tmp/worker-a.txt`
+- authoritative_worker_prompts: `/tmp/worker-a.txt`
+EOF
+
+cat >"$RUN_DIR/manager-continuity-20260424-090000.md" <<'EOF'
+# Manager Continuity
+- continuity_written_by: `freely-runtime`
+
+## Worker Delegation
+- referenced_worker_prompts: `/tmp/worker-b.txt`
+- authoritative_worker_prompts: `/tmp/worker-b.txt`
+EOF
+
+set +e
+bash -lc '
+  set -euo pipefail
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+
+  manager_continuity_precedes_operator_stop_boundary() { return 0; }
+  manager_continuity_has_stale_runtime_worktree_refs() { return 1; }
+  manager_continuity_has_worker_prompts() { return 0; }
+  manager_continuity_is_launchable_for_project() { return 0; }
+
+  latest_launchable_manager_worker_prompt_continuity_file_for_project "'"$PROJECT"'" >/dev/null
+  echo survived
+' >"$TMP_DIR/stdout" 2>"$TMP_DIR/stderr"
+status=$?
+set -e
+
+output="$(cat "$TMP_DIR/stdout")"
+stderr_output="$(cat "$TMP_DIR/stderr")"
+
+[[ "$status" -eq 0 ]] || {
+  echo "[FAIL] expected continuity discovery to tolerate closed pipe, got status=$status" >&2
+  [[ -z "$stderr_output" ]] || echo "$stderr_output" >&2
+  exit 1
+}
+
+[[ "$output" == "survived" ]] || {
+  echo "[FAIL] expected continuity discovery to survive, got: $output" >&2
+  exit 1
+}
+
+echo "[PASS] manager worker continuity discovery tolerates closed stdout pipe"

@@ -59,6 +59,10 @@
 41. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-queued-prompt`.
 42. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-auth-failure-signal-filter`.
 43. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-recorded-self-intent`.
+44. Run `bash docs/system/workspace/scripts/tests/test-freely-worktree-summary-tolerates-closed-pipe`.
+45. Run `bash docs/system/workspace/scripts/tests/test-freely-discover-supervisor-pid-sigpipe-guard`.
+46. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-continuity-discovery-tolerates-closed-pipe`.
+47. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-ignores-pre-stop-continuity`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -258,6 +262,30 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-reconnect-502-network-verification.md`
+
+### Cached discovery producers survive closed-pipe consumers
+- id: `cached-discovery-producers-survive-closed-pipe`
+- requirement: `Closed-pipe exits from early-return consumers must not abort manager or worker supervision while runtime is scanning continuity, worktrees, or PID inventories.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#33`
+- case_design: `Exercise worktree-summary, supervisor-discovery, and manager continuity discovery paths under set -euo pipefail with downstream consumers that return as soon as they find the first needed record.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-sigpipe-closeout-verification.md`
+
+### Guarded promote carries fresh SIGPIPE closeout evidence
+- id: `guarded-promote-sigpipe-closeout-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving cached discovery producers no longer strand supervisor closeout when downstream consumers exit early.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#33`
+- case_design: `Replay the SIGPIPE closeout repair through the disposable protected lane, rerun the focused closed-pipe regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-sigpipe-closeout-premerge-verification.md`
 
 ### Manager bootstrap startup stays alive before prompt build begins
 - id: `manager-pre-prompt-startup-grace-preserved`

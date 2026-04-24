@@ -1834,20 +1834,20 @@ latest_run_artifact_for_project() {
 project_worktree_list_porcelain_cached() {
   local project="$1" entries=""
   if [[ "${FREELY_CACHED_WORKTREE_PORCELAIN_PROJECT:-}" == "$project" && "${FREELY_CACHED_WORKTREE_PORCELAIN_READY:-0}" == "1" ]]; then
-    printf '%s\n' "${FREELY_CACHED_WORKTREE_PORCELAIN:-}"
+    safely_printf_cached_lines '%s\n' "${FREELY_CACHED_WORKTREE_PORCELAIN:-}"
     return 0
   fi
   entries="$(git -C "$project" worktree list --porcelain 2>/dev/null || true)"
   FREELY_CACHED_WORKTREE_PORCELAIN_PROJECT="$project"
   FREELY_CACHED_WORKTREE_PORCELAIN_READY="1"
   FREELY_CACHED_WORKTREE_PORCELAIN="$entries"
-  printf '%s\n' "$entries"
+  safely_printf_cached_lines '%s\n' "$entries"
 }
 
 manager_continuity_files_desc_for_project() {
   local project="$1" run_dir count idx
   if [[ "${FREELY_CACHED_MANAGER_CONTINUITY_PROJECT:-}" == "$project" && "${FREELY_CACHED_MANAGER_CONTINUITY_READY:-0}" == "1" ]]; then
-    printf '%s\n' "${FREELY_CACHED_MANAGER_CONTINUITY_LIST:-}"
+    safely_printf_cached_lines '%s\n' "${FREELY_CACHED_MANAGER_CONTINUITY_LIST:-}"
     return 0
   fi
   run_dir="$(run_dir_for_project "$project")"
@@ -1863,7 +1863,15 @@ manager_continuity_files_desc_for_project() {
   for ((idx=count - 1; idx>=0; idx--)); do
     FREELY_CACHED_MANAGER_CONTINUITY_LIST+="${FREELY_CACHED_MANAGER_CONTINUITY_FILES[$idx]}"$'\n'
   done
-  printf '%s' "${FREELY_CACHED_MANAGER_CONTINUITY_LIST}"
+  safely_printf_cached_lines '%s' "${FREELY_CACHED_MANAGER_CONTINUITY_LIST}"
+}
+
+safely_printf_cached_lines() {
+  (
+    trap '' PIPE
+    printf "$@" || true
+    exit 0
+  )
 }
 
 reset_project_runtime_discovery_cache() {
