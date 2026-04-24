@@ -4848,22 +4848,35 @@ intake_snapshot_for_project() {
   done < <(find "$intake_root" -mindepth 1 -maxdepth 1 -type d | sort -r)
 }
 
+delegated_continuation_freshness_floor_file_for_project() {
+  local project="$1" continuity_file
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
+  if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
+    printf '%s\n' "$continuity_file"
+    return 0
+  fi
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
+  printf '%s\n' "$continuity_file"
+}
+
 delegated_continuation_freshness_floor_epoch_for_project() {
-  local project="$1" continuity_file continuity_epoch
+  local project="$1" continuity_file continuity_epoch operator_stop_epoch
   if [[ "${FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_PROJECT:-}" == "$project" && "${FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_READY:-0}" == "1" ]]; then
     printf '%s\n' "${FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_EPOCH:-0}"
     return 0
   fi
-  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
-  [[ -n "$continuity_file" && -f "$continuity_file" ]] || {
-    FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_PROJECT="$project"
-    FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_READY="1"
-    FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_EPOCH="0"
-    printf '0\n'
-    return 0
-  }
-  continuity_epoch="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
+  continuity_file="$(delegated_continuation_freshness_floor_file_for_project "$project")"
+  continuity_epoch="0"
+  if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
+    continuity_epoch="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
+  fi
   [[ "$continuity_epoch" =~ ^[0-9]+$ ]] || continuity_epoch="0"
+  operator_stop_epoch="$(manager_operator_stop_boundary_epoch_for_project "$project")"
+  [[ "$operator_stop_epoch" =~ ^[0-9]+$ ]] || operator_stop_epoch="0"
+  if (( operator_stop_epoch > continuity_epoch )); then
+    continuity_epoch="$operator_stop_epoch"
+  fi
   FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_PROJECT="$project"
   FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_READY="1"
   FREELY_CACHED_DELEGATED_CONTINUITY_FLOOR_EPOCH="$continuity_epoch"

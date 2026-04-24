@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/fleet-review-and-closeout-20260423`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-feature-fleet-review-and-closeout`
-- updated_at: `2026-04-23 23:40 PDT`
+- branch: `feature/operator-stop-delegated-continuation-boundary-20260424`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-operator-stop-delegated-continuation-boundary`
+- updated_at: `2026-04-24 00:41 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -266,6 +266,21 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
 - `PASS`: `bash -lc 'source docs/system/workspace/scripts/runtime/freely; latest_manager_worker_prompt_csv_from_continuity /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260423-235503.md'`
 - `PENDING`: rerun protected premerge, merge into canonical `develop`, restart daemon replay, and verify the retained cleanup lane actually launches, returns cleanup readiness or exact blocker truth, retires lawfully, and lets manager move on to the next scan-selected task.
+
+## 2026-04-24 00:41 PDT Pre-Stop Delegated Continuation Boundary Followthrough
+
+- `FAIL`: after the queue-state worker prompt parser repair merged, fresh canonical restart still consumed `20260423-080027-p0-cleanup-supervision-latest-wo` as current delegated continuation even though `daemon stop` had already recorded a newer operator-stop boundary and startup had produced a fresh scan JSON.
+- `FAIL`: delegated-continuation freshness only anchored to continuity truth; once pre-stop continuity was correctly fenced off, the floor collapsed to zero and older delegated continuation history leaked back into prompt/live-status scope.
+- `PASS`: delegated-continuation freshness now takes the later of continuity truth and `manager-operator-stop-boundary.env`, while still allowing newer post-stop delegated continuation handoffs to remain eligible.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-ignores-pre-stop-delegated-continuation-after-operator-stop`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-ignores-pre-stop-delegated-intake-after-operator-stop`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-filters-stale-delegated-continuations`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-ignores-pre-stop-continuity`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-task-source-scan-ignores-pre-stop-continuity-anchor`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-ignores-stale-delegated-continuation-intake`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-stop-refreshes-manager-operator-boundary`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-filters-pre-stop-manager-continuity`
+- `PENDING`: replay through guarded premerge and canonical `develop`, then verify startup no longer re-consumes stale cleanup continuation and can return to scan-selected next-task patrol once retained cleanup truth settles.
 
 ## Verification Evidence
 
