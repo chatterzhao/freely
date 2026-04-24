@@ -637,3 +637,15 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
 - `PASS`: `bash -n docs/system/workspace/scripts/runtime/freely`
 - `PENDING`: run owner gates on this feature lane, stage protected premerge evidence, merge back to canonical `develop`, and rerun `./bin/freely daemon start` until the retained lane closes lawfully and runtime advances to the next scan-selected task.
+
+## 2026-04-24 07:26 PDT Worker Exit Contract Wins Over Network Transient
+
+- `FAIL`: canonical `develop` continuity-first replay advanced past queued-owner self-block, and the retained worker lane then wrote a valid `worker-exit-contract.env` with `EXIT_KIND="worker_done"`, but runtime still recorded the same AI cycle as `execution_network_transient` and immediately relaunched the lane. That left manager stuck waiting on the active retained worker forever even though the worker had already emitted machine-readable completion truth.
+- `PASS`: the seam was in `worker_runtime_handle_exit_contract_after_ai_cycle()`. Worker exit contracts were only consumed when `exit_reason=ai_exit_rc_0`, so any reconnect-classified exit that happened after the contract file landed would bypass the contract and fall straight into proxy/self-heal retry.
+- `PASS`: runtime now lets a valid worker exit contract override `execution_network_transient`, `execution_network_persistent`, and `proxy_config_invalid` only when the contract file already exists and validates. Missing or malformed contracts still stay on bounded network recovery instead of being misclassified as repair-needed completion.
+- `PASS`: this keeps continuity-first intact. The retained lane still resumes directly from its authoritative continuity instead of broad scan patrol, but once the worker has already written lawful `worker_done` truth, network reconnect noise no longer forces the same lane back into infinite relaunch.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-overrides-network-transient`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-does-not-override-network-transient`
+- `PASS`: `bash -n docs/system/workspace/scripts/runtime/freely`
+- `PENDING`: run owner gates on this feature lane, stage protected premerge evidence, merge to canonical `develop`, and rerun `./bin/freely daemon start` until the retained cleanup lane closes, promotes/cleans up lawfully, and runtime returns to the next scan-selected task source.
