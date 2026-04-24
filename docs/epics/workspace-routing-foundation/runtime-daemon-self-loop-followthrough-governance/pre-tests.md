@@ -187,6 +187,18 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-superseded-frozen-prompt-premerge-verification.md`
 
+### Guarded promote carries fresh queued-owner self-block evidence
+- id: `guarded-promote-queued-owner-self-block-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving runtime no longer lets the retained authoritative prompt block itself as queued-owner while preserving real earlier queued-owner explainability.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#28`
+- case_design: `Replay the queued-owner self-block repair through the disposable protected lane, rerun the focused worker-delegation, active-authoritative, and duplicate queued-owner regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-queued-owner-self-block-premerge-verification.md`
+
 ### Runtime exit contracts are machine-checkable and self-repairable
 - id: `runtime-exit-contract-enforcement`
 - requirement: `Every manager / worker AI round must leave exactly one valid structured exit contract, or runtime must resume that same role with the exact current resume target and repair handoff before broader work continues.`
