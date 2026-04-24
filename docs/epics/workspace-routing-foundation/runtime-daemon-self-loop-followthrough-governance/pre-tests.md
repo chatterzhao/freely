@@ -594,3 +594,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-worker-exit-contract-network-transient-premerge-verification.md`
+
+### Guarded promote carries manager-owned worker runtime source rebind evidence
+- id: `guarded-promote-manager-worker-runtime-source-rebind-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving retained active worker control planes are rebound from stale worktree-local runtime code to the canonical manager/source runtime before closeout continues.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#34`
+- case_design: `Replay the manager-owned worker runtime source-rebind repair on a disposable protected lane, rerun the focused source-runtime launch and stale-active-runtime rebind regressions plus owner governance there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-manager-worker-runtime-source-rebind-premerge-verification.md`

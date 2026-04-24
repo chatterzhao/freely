@@ -31,3 +31,4 @@
 - [x] When cleanup_governance continuity already carries an AI-written retained-lane prompt that fails launchability, auto-materialize the authoritative verification-bound cleanup prompt instead of looping on `WORKER_PROMPTS_NOT_LAUNCHABLE`.
 - [x] Let a retained merged cleanup lane reclaim its own recorded cleanup intent during manager relaunch, so `delegate_workers` can launch the selected hygiene worker instead of self-queuing forever on the target lane's stale recorded signature.
 - [x] Let a re-delegated stopped worker lane reclaim its own soft-stale recorded intent when manager explicitly targets that same worktree/signature again, so retained owner-rebind relaunches do not self-queue behind their own recorded edit ownership.
+- [x] Rebind retained active worker control planes to the manager/source runtime when the target worktree is still running stale runtime code, so canonical `develop` closeout logic governs the already-selected retained lane.
