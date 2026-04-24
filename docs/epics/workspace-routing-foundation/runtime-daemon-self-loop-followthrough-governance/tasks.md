@@ -24,3 +24,4 @@
 - [x] Downgrade exit-contract repair relaunches away from `resume` whenever the resolved Codex resume target is empty or lacks verified rollout evidence, so canonical daemon replay cannot die in monitor preflight with `codex resume requires --tool-resume-target`.
 - [x] Force `resume_manager` exit-contract replay to execute pending cleanup followthrough before relaunch and fail closed with exact blocker truth when that cleanup step breaks.
 - [x] Keep worktree summary pipe-safe during daemon patrol, materialize governed missing worker lanes from prompt metadata, and block retire-ready cleanup when authoritative continuity still grants active `edit` ownership to the merged-tip lane.
+- [x] Refresh the manager operator-stop freshness boundary on explicit `daemon stop`, so the next fresh startup patrol cannot reuse pre-stop continuity as current queue truth.
