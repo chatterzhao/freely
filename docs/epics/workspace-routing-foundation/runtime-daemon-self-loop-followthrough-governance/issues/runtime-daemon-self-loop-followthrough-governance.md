@@ -40,10 +40,10 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 
 1. Keep `project_has_authoritative_runtime_processes_for_user_precheck()` authoritative-supervisor-only for user-facing repeated-start refusal.
 2. Make daemon-mode supervisor ignore unexpected `INT`/`TERM` when no `stop.marker` exists, while preserving explicit stop semantics.
-3. Keep current manager continuity formats runtime-consumable by parsing `## Worker Delegation` handoffs into concrete worker prompt launches.
+3. Keep current manager continuity formats runtime-consumable by parsing both direct `## Worker Delegation` handoffs and `## Queue State` `worker_prompts:` handoffs into concrete worker prompt launches.
 4. Route `merged-clean` / `retire-ready` worker lanes to cleanup followthrough retirement instead of runtime recovery, and let cleanup reclaim stale recorded ownership for those lanes.
 5. Treat merged develop-absorbed worker lanes that are dirty only in owner evidence surfaces as cleanup/promotion followthrough, not as relaunchable edit workers.
-6. Add focused regressions for orphan precheck residue, unexpected daemon `TERM`, worker-delegation continuity consumption, and retire-ready merged-worker retirement routing.
+6. Add focused regressions for orphan precheck residue, unexpected daemon `TERM`, current-format continuity consumption, queue-state worker handoff consumption, and retire-ready merged-worker retirement routing.
 7. Keep manager-owned continuity followthrough anchored across both `resume` and `fresh_with_handoff` launches so context compaction cannot devolve into rewriting the same continuity instead of performing the queued maintenance / retirement work.
 8. Distinguish never-started worker branches from truly absorbed merged lanes so launch gating still starts real work while absorbed merged workers remain routed to retirement followthrough.
 9. Replay the guarded promotion path with concrete owner evidence.
@@ -80,7 +80,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 40. When project proxy mode is `explicit`, resolve proxy fields with project-over-global precedence instead of treating blank project values as authoritative empties; an empty project explicit block must not mask valid global explicit proxy values and force false `proxy_config_invalid`.
 41. Keep project-level worktree summary pipe-safe during daemon/live-status patrol so runtime hygiene and startup followthrough cannot fail just because a downstream consumer closes stdout early.
 42. Treat explicit `daemon stop` as an operator-stop freshness boundary for startup patrol, so a new scan after restart can supersede pre-stop manager continuity instead of re-anchoring on stale cleanup queue truth.
-42. Let manager delegation and launch treat a prompt-targeted missing sibling worktree as materializable when its branch/worktree headers stay within the governed `*-worktrees` root, and do not retire a merged-tip worker lane while authoritative continuity still carries active `edit` or `promotion` ownership for that lane.
+43. Let manager delegation and launch treat a prompt-targeted missing sibling worktree as materializable when its branch/worktree headers stay within the governed `*-worktrees` root, and do not retire a merged-tip worker lane while authoritative continuity still carries active `edit` or `promotion` ownership for that lane.
+44. Keep `## Queue State` `worker_prompts:` continuity launchable for the same runtime control plane that validated `delegate_workers`, so manager cannot consume a lawful handoff contract without ever materializing queued/launched worker state.
 
 ## Non-Goals
 
@@ -92,7 +93,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 ## Acceptance
 
 1. Focused regressions cover the orphaned precheck residue and unexpected daemon `TERM` seams.
-2. Focused regressions also prove runtime consumes current `## Worker Delegation` continuity and retires merged-clean blocker worktrees instead of re-recovering them.
+2. Focused regressions also prove runtime consumes current `## Worker Delegation` and `## Queue State` continuity handoffs, then retires merged-clean blocker worktrees instead of re-recovering them.
 3. `./bin/pretests-gate` and `./bin/governance-check` pass for this owner.
 4. Guarded replay from `feature/runtime-daemon-self-loop-blocker-20260421` through `test-pre-merge-20260421-runtime-self-loop-blocker` into `develop` succeeds lawfully.
 5. On canonical `develop`, `freely daemon start` selects at least one task, completes it to the current-project success standard, closes the corresponding temporary worktree, and proceeds to another task.
@@ -116,15 +117,18 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 23. Canonical `develop` no longer loops on `proxy_config_invalid` when project config sets `FREELY_NETWORK_PROXY_MODE="explicit"` but leaves proxy values blank while global config still carries valid explicit proxy settings; field-level resolution must preserve the usable global proxy and let daemon self-work continue.
 24. Canonical `develop` no longer risks aborting patrol/log consumers with `printf: write error: Broken pipe` while computing multi-worktree summary during daemon/live-status followthrough.
 25. Canonical `develop` can take a scan/continuity-selected worker prompt that points at a missing governed sibling worktree, materialize that worktree lawfully, launch the worker, and keep a merged-tip authoritative `edit` lane out of retire-ready cleanup until its prompt ownership is actually settled.
+26. Canonical `develop` no longer records `EXIT_KIND=delegate_workers` while `manager-worker-launch-state.env` still shows `generated/queued/launched=none` just because the selected continuity used `## Queue State` `worker_prompts:` instead of a direct `## Worker Delegation` block.
 
 ## Verification
 
 - `bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-supersedes-queued-prompt-with-manager-continuity`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
 - `bash docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`
 - `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-skips-known-unavailable-kiro`
 - `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
@@ -194,7 +198,9 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
+- `docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
+- `docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
 - `docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
 - `docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert-retire-ready-merged-worker`
 - `docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
