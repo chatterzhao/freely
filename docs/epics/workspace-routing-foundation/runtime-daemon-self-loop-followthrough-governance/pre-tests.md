@@ -193,6 +193,18 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-superseded-frozen-prompt-premerge-verification.md`
 
+### Guarded promote carries fresh daemon entrypoint ownership evidence
+- id: `guarded-promote-daemon-entrypoint-mode-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving daemon-owned recovery preserves entrypoint ownership while ai launch is in flight, so watchdog relaunch cannot silently fall back to foreground start semantics.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#29`
+- case_design: `Replay the daemon entrypoint-mode preservation repair through the disposable protected lane, rerun the focused monitor/daemon recovery regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-entrypoint-mode-preservation-verification.md`
+
 ### Guarded promote carries fresh queued-owner self-block evidence
 - id: `guarded-promote-queued-owner-self-block-proof`
 - requirement: `The develop-bound replay includes a fresh staged owner artifact proving runtime no longer lets the retained authoritative prompt block itself as queued-owner while preserving real earlier queued-owner explainability.`
