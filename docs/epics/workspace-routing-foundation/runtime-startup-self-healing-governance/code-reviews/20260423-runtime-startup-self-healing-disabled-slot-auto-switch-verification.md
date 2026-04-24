@@ -37,3 +37,11 @@ An operator report on `2026-04-23` showed a narrower residual defect inside the 
 ## Verdict
 
 This continuation satisfies the still-open portion of the owner contract around disabled auto-switch controls: when `AUTO_SWITCH_SLOT=false`, runtime startup/watchdog recovery no longer rewrites `~/.codex/auth.json` behind the operator's back. The remaining closeout is canonical `develop` replay with the disabled setting to confirm the protected root now preserves live auth truth over time.
+
+## Implementation Decision Note
+
+- decision: `Treat AUTO_SWITCH_SLOT=false as a hard stop for startup/watchdog codex slot recovery by short-circuiting preflight, manager entry selection, full-sweep probing, and the physical slot-switch helper before they touch live auth material.`
+- why_this: `The observed field defect was not that manual switch was wrong; it was that background recovery still traversed saved slots and rewrote ~/.codex/auth.json after the operator had explicitly disabled slot auto-switch. The narrowest correct repair is therefore to stop those auto-recovery entrypoints before any slot inventory, probe, or switch occurs.`
+- alternatives_considered: `Only guard switch_to_codex_slot and let probes keep enumerating candidates; rely on auth-change-wake suppression alone; widen the repair into a broader account-runtime redesign; introduce a third config flag just for probing.`
+- boundary_non_goals: `This continuation does not change explicit human-invoked ai switch behavior, does not redesign codex slot inventory semantics, does not widen into cross-tool recovery policy, and does not re-open broader auth-change lifecycle work outside this owner's disabled-auto-switch contract.`
+- residual_risk: `Protected-root replay on canonical develop still needs to confirm no other background path outside startup/watchdog recovery mutates ~/.codex/auth.json while AUTO_SWITCH_SLOT=false. If that replay still changes live auth, the next seam is a remaining non-watchdog auto-recovery caller rather than the probe/switch helpers covered here.`
