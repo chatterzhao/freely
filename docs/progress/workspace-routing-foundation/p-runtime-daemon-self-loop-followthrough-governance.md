@@ -256,6 +256,17 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-command-semantics`
 - `PENDING`: promote this same-owner repair through protected premerge and guarded `develop`, rerun canonical `./bin/freely daemon start`, and verify startup patrol now discards pre-stop continuity, picks from fresh scan JSON, and continues through lawful task closeout instead of re-entering the stale cleanup anchor.
 
+## 2026-04-23 23:58 PDT Queue State Worker Prompt Launch Followthrough
+
+- `FAIL`: after the stale pre-stop continuity was fenced off, canonical replay re-delegated the retained cleanup lane with `EXIT_KIND=delegate_workers`, but `manager-worker-launch-state.env` still showed `LAST_MANAGER_WORKER_PROMPTS_GENERATED=""`, `QUEUED_WORKER_PROMPTS=""`, and `LAUNCHED_WORKER_PROMPTS=""`.
+- `FAIL`: the manager continuity was lawful and launchable, but runtime only parsed direct `## Worker Delegation` handoffs; the current `## Queue State` continuity shape with bare `worker_prompts:` was treated as prompt-empty, so the selected worker was never queued or launched.
+- `PASS`: `manager_worker_prompt_paths_from_continuity_by_mode()` and the queue-state parser now accept both direct and bare `worker_prompts:` entries under `## Queue State`, preserving the same launchability truth that `delegate_workers` contract validation already enforced.
+- `PASS`: focused regressions now cover both continuity parsing and post-AI-cycle launch under that exact queue-state handoff shape.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
+- `PASS`: `bash -lc 'source docs/system/workspace/scripts/runtime/freely; latest_manager_worker_prompt_csv_from_continuity /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260423-235503.md'`
+- `PENDING`: rerun protected premerge, merge into canonical `develop`, restart daemon replay, and verify the retained cleanup lane actually launches, returns cleanup readiness or exact blocker truth, retires lawfully, and lets manager move on to the next scan-selected task.
+
 ## Verification Evidence
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`

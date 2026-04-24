@@ -25,3 +25,4 @@
 - [x] Force `resume_manager` exit-contract replay to execute pending cleanup followthrough before relaunch and fail closed with exact blocker truth when that cleanup step breaks.
 - [x] Keep worktree summary pipe-safe during daemon patrol, materialize governed missing worker lanes from prompt metadata, and block retire-ready cleanup when authoritative continuity still grants active `edit` ownership to the merged-tip lane.
 - [x] Refresh the manager operator-stop freshness boundary on explicit `daemon stop`, so the next fresh startup patrol cannot reuse pre-stop continuity as current queue truth.
+- [x] Keep `## Queue State` `worker_prompts:` continuity launchable so manager `delegate_workers` materializes queued/launched worker state instead of silently dropping the selected cleanup handoff.
