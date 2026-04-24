@@ -379,3 +379,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-daemon-stop-boundary-verification.md`
+
+### Protected replay stages explicit daemon-stop boundary evidence
+- id: `daemon-stop-boundary-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the explicit daemon-stop boundary regression plus owner gates and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#25`
+- case_design: `Replay the explicit daemon-stop boundary repair on the disposable protected lane, rerun the focused daemon-stop boundary regression plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-daemon-stop-boundary-premerge-verification.md`
