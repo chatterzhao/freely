@@ -33,6 +33,16 @@
 2. Rerun the focused regression set plus `./bin/governance-check` in the pre-merge batch.
 3. Use the resulting verification artifact to justify guarded promote into `develop`.
 
+## End-to-End - 2026-04-24 Plain Worker Prompt List Parsing
+- acceptance target: `guarded promote keeps current-format plain-list worker prompts launchable across feature -> test-pre-merge -> develop governance`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-20260424-manager-continuity-worker-prompt-plain-list-parser`
+- required evidence: `premerge replay evidence plus fresh owner verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Merge `feature/manager-continuity-worker-prompt-plain-list-parser-20260424` into `test-pre-merge-20260424-manager-continuity-worker-prompt-plain-list-parser` through `./bin/merge-guarded`.
+2. Rerun `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`, `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`, and `./bin/governance-check` in the pre-merge batch.
+3. Use the resulting verification artifact to justify guarded promote into `develop`.
+
 ## Real-Environment
 - acceptance target: `canonical develop replay consumes the fresh success-standard governance interruption first and does not let the stale runtime-lifecycle-validation continuation hijack the manager round`
 - testing layer: `real_environment`
@@ -79,3 +89,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
+
+### Guarded promote preserves plain-list worker prompt launchability
+- id: `PT-4`
+- requirement: `the guarded promote path preserves launchability for plain-list entries under current-format ## Worker Prompts continuity`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#4,tasks.md#6`
+- case_design: `Merge the plain-list parser feature lane into the disposable test-pre-merge-20260424-manager-continuity-worker-prompt-plain-list-parser batch, rerun the focused parser and latest continuity consumption regressions plus governance-check, then use the resulting review artifact to justify guarded promote into develop.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260424-latest-manager-continuity-worker-consumption-plain-list-prompt-parser-verification.md`
