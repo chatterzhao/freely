@@ -22,3 +22,11 @@
 
 - `PASS`: feature-local regression and real-log replay both show the timestamp-driven auth false positive is closed without weakening true auth-failure detection.
 - `PENDING`: guarded premerge plus canonical `develop` daemon replay still need to prove manager now consumes the queued retained-cleanup worker followthrough instead of stopping at the former fake `auth_failure` seam.
+
+## Implementation Decision Note
+
+- decision: `Constrain auth-failure detection to explicit auth-shaped phrases and stop matching bare numeric substrings like 401.`
+- why_this: `The failing canonical replay was not an authentication regression. Runtime had already narrowed the real blocker to a non-auth apply_patch file-missing error, but the old classifier widened that log into auth_failure because fractional-second timestamps contained .401... . Tightening the matcher is the smallest repair that preserves the real auth boundary.`
+- alternatives_considered: `Keep bare 401 matching and special-case only timestamp formats; suppress auth classification for every apply_patch error; widen the repair into broader task-source or continuity-selection changes even though the stop happened after continuity had already selected the cleanup followthrough.`
+- boundary_non_goals: `No scan-json task-selection redesign, no continuity-priority rewrite, no cleanup-governance ownership change, and no claim that canonical autonomous looping is complete before protected replay proves task completion, upward merge, retirement, and next-task continuation.`
+- residual_risk: `Canonical replay may still surface the next narrower retained-cleanup blocker after this false auth stop is removed, but runtime should now stop on exact blocker truth instead of a timestamp-driven auth misclassification.`
