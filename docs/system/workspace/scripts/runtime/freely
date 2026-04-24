@@ -5621,8 +5621,25 @@ freely_bin_for_project() {
   fi
 }
 
+sync_tooling_before_workcell_launch() {
+  local project="$1" source_project="${2:-}" source_bin
+  [[ -n "$project" && -d "$project" ]] || return 0
+  if [[ -z "$source_project" || ! -d "$source_project" ]]; then
+    source_project="$(worktree_path_for_branch "$project" "develop" || true)"
+  fi
+  if [[ -z "$source_project" || ! -d "$source_project" ]]; then
+    source_project="$SELF_ROOT"
+  fi
+  [[ -n "$source_project" && -d "$source_project" ]] || return 0
+  [[ "$source_project" != "$project" ]] || return 0
+  source_bin="$(freely_bin_for_project "$source_project")"
+  [[ -x "$source_bin" ]] || return 0
+  bash "$source_bin" sync-tooling --source-project "$source_project" --project "$project" >/dev/null 2>&1 || true
+}
+
 start_workcell_supervisor_async() {
-  local project="$1" freely_bin recovery_log launch_mode launch_command
+  local project="$1" source_project="${2:-}" freely_bin recovery_log launch_mode launch_command
+  sync_tooling_before_workcell_launch "$project" "$source_project"
   freely_bin="$(freely_bin_for_project "$project")"
   recovery_log="$(logs_dir_for_project "$project")/manager-runtime-recovery.log"
   launch_mode="$(project_control_plane_entrypoint_mode "$project")"
@@ -9771,7 +9788,7 @@ launch_worker_from_manager_prompt_if_needed() {
     return 0
   fi
   write_workcell_state "$target_project" "running" "down" "down" "manager_worker_launch_linkage"
-  start_workcell_supervisor_async "$target_project"
+  start_workcell_supervisor_async "$target_project" "$manager_project"
 }
 
 manager_runtime_launch_workers_from_latest_handoff() {
@@ -12268,7 +12285,7 @@ manager_runtime_recover_workers_if_needed() {
       log_warn "manager runtime skips expected-running recovery without launchable verification contract: branch=${branch:-unknown} missing=${verification_missing_fields_csv:-verification_contract_missing} path=$wt_path"
       continue
     fi
-    start_workcell_supervisor_async "$wt_path"
+    start_workcell_supervisor_async "$wt_path" "$project"
     recovered=$((recovered + 1))
   done < <(git -C "$repo_root" worktree list --porcelain | awk '
     /^worktree / { wt=substr($0, 10); br="" }
