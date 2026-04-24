@@ -28,3 +28,4 @@
 - [x] Keep `## Queue State` `worker_prompts:` continuity launchable so manager `delegate_workers` materializes queued/launched worker state instead of silently dropping the selected cleanup handoff.
 - [x] Keep delegated-continuation freshness anchored to the later of continuity truth and explicit operator-stop boundary, so fresh restart cannot re-consume pre-stop cleanup handoffs after stale continuity is fenced off.
 - [x] Keep blocked cleanup-worker recorded ownership anchored to the verification-contract source prompt, so duplicate cleanup launch requests queue behind the real blocked owner instead of relaunching the same retained lane.
+- [x] When cleanup_governance continuity already carries an AI-written retained-lane prompt that fails launchability, auto-materialize the authoritative verification-bound cleanup prompt instead of looping on `WORKER_PROMPTS_NOT_LAUNCHABLE`.

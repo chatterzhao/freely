@@ -8032,7 +8032,10 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
   local write_scope_path target_environment cleanup_selected_tool current_tool _ current_truth
 
   [[ -n "$project" && -f "$continuity_file" ]] || return 1
-  latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | grep -q . && return 1
+  if manager_continuity_has_worker_prompts "$continuity_file" \
+    && manager_continuity_is_launchable_for_project "$project" "$continuity_file"; then
+    return 1
+  fi
 
   route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
   [[ "$route_kind" == "cleanup_governance" ]] || return 1
@@ -10556,14 +10559,18 @@ manager_continuity_requires_retirement_worker_handoff() {
   [[ -f "$continuity_file" ]] || return 1
   route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
   [[ "$route_kind" == "cleanup_governance" ]] || return 1
-  latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | grep -q .
-  if [[ $? -eq 0 ]]; then
-    return 1
+  continuity_project="$(manager_continuity_project_root_from_path "$continuity_file" || true)"
+  if latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | grep -q .; then
+    if [[ -z "$continuity_project" ]]; then
+      return 1
+    fi
+    if manager_continuity_is_launchable_for_project "$continuity_project" "$continuity_file"; then
+      return 1
+    fi
   fi
   if manager_continuity_cleanup_retirement_targets "$continuity_file" | grep -q .; then
     return 0
   fi
-  continuity_project="$(manager_continuity_project_root_from_path "$continuity_file" || true)"
   if [[ -n "$continuity_project" ]] \
     && manager_cleanup_prompt_primary_target_row_from_continuity "$continuity_project" "$continuity_file" >/dev/null 2>&1; then
     if grep -Eq 'retained-with-reason|retirement handoff|retire the absorbed worktrees now|cleanup followthrough worker' "$continuity_file"; then
