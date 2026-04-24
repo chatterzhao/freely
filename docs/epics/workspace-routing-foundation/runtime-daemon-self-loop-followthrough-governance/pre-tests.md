@@ -175,6 +175,18 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-auth-failure-timestamp-verification.md`
 
+### Guarded promote carries fresh superseded-frozen prompt reclaim evidence
+- id: `guarded-promote-superseded-frozen-prompt-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving runtime consumes the authoritative retained-lane prompt instead of queueing forever behind older same-lane frozen prompt history.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#28`
+- case_design: `Replay the superseded-frozen prompt reclaim repair through the disposable protected lane, rerun the focused manager worker-launch regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-superseded-frozen-prompt-premerge-verification.md`
+
 ### Runtime exit contracts are machine-checkable and self-repairable
 - id: `runtime-exit-contract-enforcement`
 - requirement: `Every manager / worker AI round must leave exactly one valid structured exit contract, or runtime must resume that same role with the exact current resume target and repair handoff before broader work continues.`
