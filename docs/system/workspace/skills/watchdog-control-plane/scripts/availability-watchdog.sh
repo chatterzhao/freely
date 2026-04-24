@@ -15,6 +15,15 @@ normalize_codex_slot_name() {
   printf '%s' "$1" | sed 's/\./-/g'
 }
 
+codex_auto_slot_switch_enabled() {
+  local value="${AUTO_SWITCH_SLOT:-true}"
+  value="$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')"
+  case "$value" in
+    1|true|yes|on) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 codex_slot_matches_identity() {
   local slot="$1" identity="$2"
   [[ -n "$slot" && -n "$identity" ]] || return 1
@@ -1518,6 +1527,7 @@ codex_probe_current_slot_now() {
 
 probe_any_usable_codex_slot_now() {
   local project="$1" candidate probe_result reset_at original_slot active_slot original_active_slot auth_backup="" auth_file
+  codex_auto_slot_switch_enabled || return 1
   original_slot="$(codex_current_slot "$project")"
   original_active_slot="$(read_codex_active_slot)"
   auth_file="$(codex_active_auth_file)"
@@ -1560,6 +1570,11 @@ probe_all_codex_slots_and_update_cooldown() {
   local earliest_slot="" earliest_reset=""
   local current_identity original_slot active_slot original_active_slot auth_backup="" auth_file
   local tmp_dir results_file current_marker status_icon="" status_text="" details="" auth_email="" detail=""
+
+  codex_auto_slot_switch_enabled || {
+    printf 'none\n'
+    return 1
+  }
 
   current_identity="$(codex_current_cooldown_identity "$project")"
   original_slot="$(codex_current_slot "$project")"
@@ -1715,6 +1730,7 @@ probe_all_codex_slots_and_update_cooldown() {
 switch_to_codex_slot() {
   local project="$1" slot="$2" reason="$3"
   local ai_bin output actual_slot requested_normalized actual_slot_normalized switch_output_confirmed="0"
+  codex_auto_slot_switch_enabled || return 1
   wait_for_codex_slot_switch_idle "$project" || return 1
   ai_bin="$(ai_cli_bin_for_project "$project")"
   [[ -x "$ai_bin" && -n "$slot" ]] || return 1
@@ -1757,6 +1773,7 @@ ensure_codex_slot_ready_for_manager() {
   local all_unavailable_info earliest_slot earliest_reset
   local current_fingerprint previous_phase="" previous_blocked_reason="" previous_slot="" previous_fingerprint="" wake_reason="" wake_trigger="" recovery_trigger=""
 
+  codex_auto_slot_switch_enabled || return 1
   wait_for_codex_slot_switch_idle "$project" || return 1
   current_slot="$(codex_current_slot "$project")"
   current_slot_kind="$(codex_current_slot_kind "$project")"

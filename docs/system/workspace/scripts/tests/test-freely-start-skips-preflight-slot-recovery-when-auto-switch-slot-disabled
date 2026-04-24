@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-slot-disabled.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+mkdir -p "$PROJECT/.freely/run" "$HOME_DIR/.codex"
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+SUPERVISOR_STATE="down"
+AI_STATE="down"
+LAST_EXIT_REASON="primary_rate_limit_exhausted"
+EOF
+
+bash -lc '
+  set -euo pipefail
+  export HOME="'"$HOME_DIR"'"
+  export AUTO_SWITCH_SLOT="false"
+  log_info() { :; }
+  log_warn() { :; }
+  log_error() { :; }
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+  codex_active_auth_file() { echo "'"$HOME_DIR"'/missing-auth.json"; }
+  codex_current_identity_hint() { echo ""; }
+  select_any_available_codex_slot() {
+    echo "[FAIL] freely start should not inventory saved slots when AUTO_SWITCH_SLOT=false" >&2
+    exit 1
+  }
+  switch_to_codex_slot() {
+    echo "[FAIL] freely start should not switch slots when AUTO_SWITCH_SLOT=false" >&2
+    exit 1
+  }
+  preflight_codex_slot_recovery_before_start_or_fail "'"$PROJECT"'"
+'
+
+echo "[PASS] freely start skips codex slot preflight recovery when AUTO_SWITCH_SLOT=false"
