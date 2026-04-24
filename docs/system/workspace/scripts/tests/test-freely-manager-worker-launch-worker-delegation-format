@@ -137,6 +137,12 @@ EOF
 # shellcheck disable=SC1090
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 
+QUEUED_PROMPTS="$(latest_queued_manager_worker_prompt_paths_from_continuity "$CONT_FILE" | paste -sd, -)"
+[[ -z "$QUEUED_PROMPTS" ]] || {
+  echo "[FAIL] worker delegation launchable prompt must not be parsed as queued: $QUEUED_PROMPTS" >&2
+  exit 1
+}
+
 START_LOG="$TMP_DIR/started.log"
 manager_supervisor_pid_for_project() {
   return 0

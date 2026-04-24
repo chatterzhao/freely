@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/manager-active-worker-prompt-consumption-reconcile-20260424`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-active-worker-prompt-consumption-reconcile`
-- updated_at: `2026-04-24 06:38 PDT`
+- branch: `feature/manager-queued-owner-self-block-reconcile-20260424`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-queued-owner-self-block-reconcile`
+- updated_at: `2026-04-24 06:55 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -624,3 +624,16 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-supersedes-queued-prompt-with-manager-continuity`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 - `PENDING`: guarded promote and canonical `develop` daemon replay still need to prove the retained runtime-cleanup lane finishes, merges/retires lawfully, and Freely then returns to scan-selected backlog instead of spinning on same-prompt supervision.
+
+## 2026-04-24 06:55 PDT Queued-Owner Self-Block Boundary
+
+- `FAIL`: canonical `develop` continuity-first replay still showed the retained 05:48 worker prompt in `QUEUED_WORKER_PROMPTS` with `blocked_by=<same prompt> state=queued-owner`. This was not a scan-json routing regression; root continuity still chose the retained cleanup-followthrough lane first.
+- `PASS`: the narrower seam sat in queued-owner bookkeeping for current `## Worker Delegation` continuity. `latest_queued_manager_worker_prompt_paths_from_continuity()` was still treating direct/launchable worker-delegation prompt paths as queued-owner candidates, so the exact authoritative prompt could block itself.
+- `PASS`: queued-owner parsing now only accepts explicit `queue` subsection entries for `## Worker Delegation`; direct/launchable prompt paths remain launchable truth and no longer self-register as queued owners.
+- `PASS`: direct worker-delegation launch still works, active authoritative workers still consume/wait on the exact prompt, and real earlier queued-owner blockers still surface for true duplicate queued prompts.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-authoritative-worker-consumes-prompt`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-queue-explainability-queued-owner`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
+- `PASS`: `bash -n docs/system/workspace/scripts/runtime/freely`
+- `PENDING`: run owner gates on this feature lane, stage protected premerge evidence, merge back to canonical `develop`, and rerun `./bin/freely daemon start` until the retained lane closes lawfully and runtime advances to the next scan-selected task.
