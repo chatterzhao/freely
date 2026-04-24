@@ -7307,6 +7307,18 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
           next
         }
       }
+      if (section == "queue state") {
+        if ($0 ~ /^[[:space:]]*(-[[:space:]]*)?worker_prompts:[[:space:]]*$/) {
+          capture_worker_prompt_path_list=(mode != "frozen")
+          worker_prompts_subsection="worker_prompts"
+          next
+        }
+        if ($0 ~ /^[[:space:]]*(-[[:space:]]*)?frozen_queue:[[:space:]]*$/ || $0 ~ /^[[:space:]]*(-[[:space:]]*)?cleanup_queue:[[:space:]]*$/ || $0 ~ /^[[:space:]]*(-[[:space:]]*)?launch_queue:[[:space:]]*$/) {
+          capture_worker_prompt_path_list=0
+          worker_prompts_subsection=""
+          next
+        }
+      }
       if (section == "queue|frozen queue") {
         if ($0 ~ /^[[:space:]]*-[[:space:]]*queue:[[:space:]]*$/) {
           worker_prompts_subsection="queue"
@@ -7524,6 +7536,18 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
         }
         if (worker_prompts_subsection == "queue" && $0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
           emit_prompt_paths($0)
+          next
+        }
+      }
+      if (section == "queue state") {
+        if ($0 ~ /^[[:space:]]*(-[[:space:]]*)?worker_prompts:[[:space:]]*$/) {
+          capture_worker_prompt_path_list=1
+          worker_prompts_subsection="worker_prompts"
+          next
+        }
+        if ($0 ~ /^[[:space:]]*(-[[:space:]]*)?frozen_queue:[[:space:]]*$/ || $0 ~ /^[[:space:]]*(-[[:space:]]*)?cleanup_queue:[[:space:]]*$/ || $0 ~ /^[[:space:]]*(-[[:space:]]*)?launch_queue:[[:space:]]*$/) {
+          capture_worker_prompt_path_list=0
+          worker_prompts_subsection=""
           next
         }
       }

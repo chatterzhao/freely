@@ -17,8 +17,9 @@ DISPATCH_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000006-worker-disp
 NESTED_QUEUE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000007-worker-nested-queue-codex.txt"
 NESTED_FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000008-worker-nested-frozen-codex.txt"
 NESTED_DISPATCH_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000009-worker-dispatch-nested-codex.txt"
+QUEUE_STATE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260326-000010-worker-queue-state-codex.txt"
 
-touch "$LAUNCHED_PROMPT" "$QUEUED_PROMPT" "$FROZEN_PROMPT" "$CREATED_PROMPT" "$DELEGATED_PROMPT" "$DISPATCH_PROMPT" "$NESTED_QUEUE_PROMPT" "$NESTED_FROZEN_PROMPT" "$NESTED_DISPATCH_PROMPT"
+touch "$LAUNCHED_PROMPT" "$QUEUED_PROMPT" "$FROZEN_PROMPT" "$CREATED_PROMPT" "$DELEGATED_PROMPT" "$DISPATCH_PROMPT" "$NESTED_QUEUE_PROMPT" "$NESTED_FROZEN_PROMPT" "$NESTED_DISPATCH_PROMPT" "$QUEUE_STATE_PROMPT"
 
 CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260326-000000.md"
 cat >"$CONTINUITY" <<EOF
@@ -50,6 +51,10 @@ cat >"$CONTINUITY" <<EOF
 ## Worker Prompt Materialization
 - worker_prompt_paths_created_this_round:
   - $CREATED_PROMPT
+
+## Queue State
+worker_prompts:
+- $QUEUE_STATE_PROMPT
 EOF
 
 # shellcheck disable=SC1090
@@ -58,7 +63,7 @@ source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 LAUNCHABLE="$(latest_manager_worker_prompt_paths_from_continuity "$CONTINUITY" | paste -sd, -)"
 FROZEN="$(latest_frozen_manager_worker_prompt_paths_from_continuity "$CONTINUITY" | paste -sd, -)"
 
-[[ "$LAUNCHABLE" == "$CREATED_PROMPT,$DELEGATED_PROMPT,$DISPATCH_PROMPT,$LAUNCHED_PROMPT,$NESTED_DISPATCH_PROMPT,$NESTED_QUEUE_PROMPT,$QUEUED_PROMPT" ]]
+[[ "$LAUNCHABLE" == "$CREATED_PROMPT,$DELEGATED_PROMPT,$DISPATCH_PROMPT,$LAUNCHED_PROMPT,$NESTED_DISPATCH_PROMPT,$NESTED_QUEUE_PROMPT,$QUEUED_PROMPT,$QUEUE_STATE_PROMPT" ]]
 [[ "$FROZEN" == "$FROZEN_PROMPT,$NESTED_FROZEN_PROMPT" ]]
 
 echo "[PASS] continuity parser recognizes legacy and current worker prompt contracts"
