@@ -679,3 +679,13 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: replayed the same focused regression set on protected lane `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-test-pre-merge-runtime-sigpipe-supervisor-closeout` after a lawful `./bin/merge-guarded` merge from `feature/runtime-sigpipe-supervisor-closeout-20260424`.
 - `FAIL`: the next guarded merge into canonical `develop` is blocked only by missing same-owner lifecycle materialization in the diff, not by code or test failure.
 - `PENDING`: rerun guarded promote into `develop`, then replay canonical `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` to confirm retained cleanup closeout is consumed without another SIGPIPE stall and runtime continues to the next task source.
+
+## 2026-04-24 16:05 PDT Daemon Entrypoint Mode Preservation Followthrough
+
+- `FAIL`: after the SIGPIPE repair proved supervisor closeout could reach `ai_cycle_finished`, the same current canonical replay window beginning at `2026-04-24T22:09:45Z` exposed a narrower ownership seam. Daemon supervisor `39611` reached `L041 ai_launch_observed child_pid=40603`, but watchdog later recorded `L223 manager_idle_supervisor_restart`, and `runtime-events.log` then showed `2026-04-24T22:20:33Z event=user_start_command_received` for foreground supervisor `54468`.
+- `PASS`: root cause was bounded and same-owner. `monitor-ai-cli.sh` rewrote `.freely/run/workcell-state.env` to `LAST_EXIT_REASON="ai_launch_in_flight"` but dropped `LAST_ENTRYPOINT_MODE`, so any later `project_control_plane_entrypoint_mode()` read fell back to `foreground` and `launch_manager_supervisor()` selected `start --project` instead of `daemon-run --project`.
+- `PASS`: `monitor-ai-cli.sh` now preserves the previously recorded entrypoint mode when writing launch-in-flight state, so daemon-owned manager recovery keeps daemon ownership semantics across AI launch observation.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-pid`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-failure-recovery-preserves-daemon`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-detach-contract`
+- `PENDING`: replay this repair through fresh protected premerge and canonical `develop`, then rerun `./bin/freely daemon start` until runtime completes one task lawfully, retires that lane, and advances to the next task instead of drifting back into foreground ownership.

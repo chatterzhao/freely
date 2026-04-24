@@ -63,6 +63,8 @@
 45. Run `bash docs/system/workspace/scripts/tests/test-freely-discover-supervisor-pid-sigpipe-guard`.
 46. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-continuity-discovery-tolerates-closed-pipe`.
 47. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-ignores-pre-stop-continuity`.
+48. Run `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-pid`.
+49. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-failure-recovery-preserves-daemon`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`

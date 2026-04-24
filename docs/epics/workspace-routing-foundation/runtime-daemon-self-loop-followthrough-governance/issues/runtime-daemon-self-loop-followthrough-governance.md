@@ -83,6 +83,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 42. Treat explicit `daemon stop` as an operator-stop freshness boundary for startup patrol, so a new scan after restart can supersede pre-stop manager continuity instead of re-anchoring on stale cleanup queue truth.
 43. Let manager delegation and launch treat a prompt-targeted missing sibling worktree as materializable when its branch/worktree headers stay within the governed `*-worktrees` root, and do not retire a merged-tip worker lane while authoritative continuity still carries active `edit` or `promotion` ownership for that lane.
 44. Keep `## Queue State` `worker_prompts:` continuity launchable for the same runtime control plane that validated `delegate_workers`, so manager cannot consume a lawful handoff contract without ever materializing queued/launched worker state.
+45. Preserve `LAST_ENTRYPOINT_MODE` when `monitor-ai-cli.sh` writes launch-in-flight workcell truth, so daemon-owned manager recovery cannot silently degrade into foreground `start --project`.
 
 ## Non-Goals
 
@@ -121,6 +122,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 26. Canonical `develop` no longer records `EXIT_KIND=delegate_workers` while `manager-worker-launch-state.env` still shows `generated/queued/launched=none` just because the selected continuity used `## Queue State` `worker_prompts:` instead of a direct `## Worker Delegation` block.
 27. Canonical `develop` no longer re-consumes a pre-stop delegated continuation after fresh restart just because the stale continuity anchor was discarded; operator-stop freshness still fences off older delegated handoffs until newer post-stop continuity or newer post-stop delegated continuation arrives.
 28. Canonical `develop` can recover cleanup followthrough from current-shape continuity that exposes only top-level `route_kind` plus inline `worker_prompt:` references, by inheriting authoritative verification metadata from the retained target worker lane instead of looping on a nonlaunchable hygiene prompt.
+29. Canonical `develop` no longer loses daemon control-plane ownership while AI launch is in flight; if watchdog must relaunch after that state write, it still chooses `daemon-run --project` rather than materializing a foreground `start --project`.
 
 ## Verification
 
@@ -186,6 +188,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert-retire-ready-merged-worker`
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
+- `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-pid`
+- `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-failure-recovery-preserves-daemon`
 - `bash docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
 - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - `./bin/governance-check`
