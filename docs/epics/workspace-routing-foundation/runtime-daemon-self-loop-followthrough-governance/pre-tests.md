@@ -582,3 +582,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-active-authoritative-worker-prompt-premerge-verification.md`
+
+### Guarded promote carries worker exit contract network-transient precedence evidence
+- id: `guarded-promote-worker-exit-contract-network-transient-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving a valid retained-worker exit contract stops the lane even if the same AI cycle is also classified as reconnect/network transient, while malformed contracts still stay on bounded recovery.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#9,tasks.md#10`
+- case_design: `Replay the worker exit-contract network-transient precedence repair through the disposable protected lane, rerun the focused worker_done, network-transient override, malformed-contract recovery, and owner gates there, then stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pending`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-worker-exit-contract-network-transient-verification.md`

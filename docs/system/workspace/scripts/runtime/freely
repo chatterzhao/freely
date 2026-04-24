@@ -11491,24 +11491,41 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
 }
 
 worker_runtime_handle_exit_contract_after_ai_cycle() {
-  local project="$1" exit_reason="${2:-}" missing_csv="" kind=""
+  local project="$1" exit_reason="${2:-}" missing_csv="" kind="" contract_file=""
   [[ "$(role_hint_for_project "$project")" == "worker" ]] || {
     printf 'continue\n'
     return 0
   }
-  [[ "$exit_reason" == "ai_exit_rc_0" ]] || {
-    printf 'continue\n'
-    return 0
-  }
-  if ! missing_csv="$(validate_worker_exit_contract_for_project "$project")"; then
-    write_worker_exit_contract_repair_handoff "$project" "worker_exit_contract_invalid" "${missing_csv:-missing_file}"
-    write_workcell_state "$project" "running" "up" "down" "worker_exit_contract_invalid"
-    append_runtime_event "$project" "worker_exit_contract_invalid" \
-      "details=${missing_csv:-missing_file}" \
-      "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
-    printf 'resume_invalid\n'
-    return 0
-  fi
+  contract_file="$(worker_exit_contract_file "$project")"
+  case "$exit_reason" in
+    ai_exit_rc_0)
+      if ! missing_csv="$(validate_worker_exit_contract_for_project "$project")"; then
+        write_worker_exit_contract_repair_handoff "$project" "worker_exit_contract_invalid" "${missing_csv:-missing_file}"
+        write_workcell_state "$project" "running" "up" "down" "worker_exit_contract_invalid"
+        append_runtime_event "$project" "worker_exit_contract_invalid" \
+          "details=${missing_csv:-missing_file}" \
+          "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
+        printf 'resume_invalid\n'
+        return 0
+      fi
+      ;;
+    execution_network_transient|execution_network_persistent|proxy_config_invalid)
+      [[ -f "$contract_file" ]] || {
+        printf 'continue\n'
+        return 0
+      }
+      if ! missing_csv="$(validate_worker_exit_contract_for_project "$project")"; then
+        printf 'continue\n'
+        return 0
+      fi
+      append_runtime_event "$project" "worker_exit_contract_consumed_after_runtime_failure" \
+        "failure_reason=$exit_reason"
+      ;;
+    *)
+      printf 'continue\n'
+      return 0
+      ;;
+  esac
   kind="$(worker_exit_contract_kind "$project" || true)"
   case "$kind" in
     worker_done)

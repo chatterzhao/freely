@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-exit-contract-network-invalid.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+git init -q -b feature/worker-exit-contract-network-invalid "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260324-0000--sample"
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260324-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m init
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="execution_network_transient"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-21T12:00:00Z"
+EOF
+
+cat >"$PROJECT/.freely/run/worker-exit-contract.env" <<'EOF'
+EXIT_KIND="worker_done"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+ACTION="$(worker_runtime_handle_exit_contract_after_ai_cycle "$PROJECT" "execution_network_transient")"
+[[ "$ACTION" == "continue" ]]
+grep -q '^DESIRED_RUNTIME_STATE="running"$' "$PROJECT/.freely/run/workcell-state.env"
+[[ ! -f "$PROJECT/.freely/run/session-handoff.txt" ]]
+if [[ -f "$PROJECT/.freely/logs/runtime-events.log" ]]; then
+  ! grep -q 'worker_exit_contract_consumed_after_runtime_failure' "$PROJECT/.freely/logs/runtime-events.log"
+fi
+
+echo "[PASS] invalid worker exit contract does not override execution_network_transient relaunch"
