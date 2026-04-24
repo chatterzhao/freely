@@ -120,6 +120,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 25. Canonical `develop` can take a scan/continuity-selected worker prompt that points at a missing governed sibling worktree, materialize that worktree lawfully, launch the worker, and keep a merged-tip authoritative `edit` lane out of retire-ready cleanup until its prompt ownership is actually settled.
 26. Canonical `develop` no longer records `EXIT_KIND=delegate_workers` while `manager-worker-launch-state.env` still shows `generated/queued/launched=none` just because the selected continuity used `## Queue State` `worker_prompts:` instead of a direct `## Worker Delegation` block.
 27. Canonical `develop` no longer re-consumes a pre-stop delegated continuation after fresh restart just because the stale continuity anchor was discarded; operator-stop freshness still fences off older delegated handoffs until newer post-stop continuity or newer post-stop delegated continuation arrives.
+28. Canonical `develop` can recover cleanup followthrough from current-shape continuity that exposes only top-level `route_kind` plus inline `worker_prompt:` references, by inheriting authoritative verification metadata from the retained target worker lane instead of looping on a nonlaunchable hygiene prompt.
 
 ## Verification
 
@@ -147,6 +148,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-forces-resume`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-stop-ai`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-autodelegates-cleanup-from-worker-verification-truth`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-defers-codex-reconnect-until-retries-exhaust`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-model-refresh-timeout`
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`

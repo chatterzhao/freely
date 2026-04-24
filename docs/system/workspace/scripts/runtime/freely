@@ -7429,7 +7429,7 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
           capture_worker_prompt_path_list=(mode != "frozen")
           next
         }
-        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "frozen") {
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/ || $0 ~ /worker_prompt:/) && mode != "frozen") {
           emit_prompt_paths($0)
           next
         }
@@ -7443,7 +7443,7 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
           capture_worker_prompt_path_list=(mode != "frozen")
           next
         }
-        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "frozen") {
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/ || $0 ~ /worker_prompt:/) && mode != "frozen") {
           emit_prompt_paths($0)
           next
         }
@@ -7457,7 +7457,7 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
           capture_worker_prompt_path_list=(mode != "launchable")
           next
         }
-        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/) && mode != "launchable") {
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/ || $0 ~ /worker_prompt:/) && mode != "launchable") {
           emit_prompt_paths($0)
           next
         }
@@ -7971,6 +7971,7 @@ manager_continuity_selected_cleanup_rows() {
 manager_cleanup_prompt_primary_target_row_from_continuity() {
   local project="$1" continuity_file="$2"
   local row path branch desired role_hint section_key disposition fallback=""
+  local prompt_file prompt_worktree prompt_branch
   while IFS='|' read -r path branch desired role_hint section_key disposition; do
     [[ -n "$path" && -d "$path" ]] || continue
     project_has_authoritative_worktree_path "$project" "$path" || continue
@@ -7984,12 +7985,25 @@ manager_cleanup_prompt_primary_target_row_from_continuity() {
     fi
     [[ -n "$fallback" ]] || fallback="$path|$branch|$desired|$role_hint|$section_key|$disposition"
   done < <(manager_continuity_selected_cleanup_rows "$continuity_file")
-  [[ -n "$fallback" ]] && printf '%s\n' "$fallback"
+  if [[ -n "$fallback" ]]; then
+    printf '%s\n' "$fallback"
+    return 0
+  fi
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    prompt_worktree="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
+    prompt_branch="$(worker_prompt_target_branch "$prompt_file")"
+    [[ -n "$prompt_worktree" && -d "$prompt_worktree" && -n "$prompt_branch" ]] || continue
+    project_has_authoritative_worktree_path "$project" "$prompt_worktree" || continue
+    printf '%s|%s|stopped|cleanup|worker_prompt_fallback|retained-with-reason\n' "$prompt_worktree" "$prompt_branch"
+    return 0
+  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  return 1
 }
 
 manager_cleanup_prompt_write_scope_paths_from_continuity() {
   local project="$1" continuity_file="$2"
-  local row path branch desired role_hint section_key disposition
+  local row path branch desired role_hint section_key disposition emitted="0" primary_row primary_path primary_branch
   while IFS='|' read -r path branch desired role_hint section_key disposition; do
     [[ -n "$path" && -d "$path" ]] || continue
     project_has_authoritative_worktree_path "$project" "$path" || continue
@@ -7997,7 +8011,15 @@ manager_cleanup_prompt_write_scope_paths_from_continuity() {
       continue
     fi
     printf '%s\n' "$path"
+    emitted="1"
   done < <(manager_continuity_selected_cleanup_rows "$continuity_file")
+  if [[ "$emitted" != "1" ]]; then
+    primary_row="$(manager_cleanup_prompt_primary_target_row_from_continuity "$project" "$continuity_file" || true)"
+    if [[ -n "$primary_row" ]]; then
+      IFS='|' read -r primary_path primary_branch _desired _role_hint _section_key _disposition <<<"$primary_row"
+      [[ -n "$primary_path" && -d "$primary_path" ]] && printf '%s\n' "$primary_path"
+    fi
+  fi
   printf '%s\n' "$project/.freely/run/"
 }
 
@@ -8047,6 +8069,9 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
   local route_kind primary_row primary_path primary_branch _desired _role_hint _section_key _disposition
   local owner_issue_rel owner_issue_source owner_issue_abs pre_tests_rel verification_rel issue_id prompt_file
   local write_scope_path target_environment cleanup_selected_tool current_tool _ current_truth
+  local source_prompt_file required_test_lanes_csv required_acceptance_ids_csv minimum_evidence_level
+  local closeout_gate closeout_gate_command closeout_target_lane closeout_promotion_gate
+  local closeout_requires_adequacy closeout_review_artifact_policy
 
   [[ -n "$project" && -f "$continuity_file" ]] || return 1
   if manager_continuity_has_worker_prompts "$continuity_file" \
@@ -8063,18 +8088,54 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
   [[ -n "$primary_path" && -d "$primary_path" && -n "$primary_branch" ]] || return 1
 
   owner_issue_rel="$(manager_continuity_backtick_field_value "$continuity_file" "issue_truth")"
-  [[ -n "$owner_issue_rel" ]] || return 1
-  owner_issue_source="$project/$owner_issue_rel"
-  [[ -f "$owner_issue_source" ]] || return 1
-  pre_tests_rel="$(markdown_backtick_field_value "$owner_issue_source" "pre_tests_path")"
-  verification_rel="$(markdown_backtick_field_value "$owner_issue_source" "verification_artifact_dir")"
-  [[ -n "$pre_tests_rel" && -n "$verification_rel" ]] || return 1
+  if [[ -n "$owner_issue_rel" ]]; then
+    owner_issue_source="$project/$owner_issue_rel"
+    if [[ -f "$owner_issue_source" ]]; then
+      pre_tests_rel="$(markdown_backtick_field_value "$owner_issue_source" "pre_tests_path")"
+      verification_rel="$(markdown_backtick_field_value "$owner_issue_source" "verification_artifact_dir")"
+      owner_issue_abs="$primary_path/$owner_issue_rel"
+      [[ -f "$owner_issue_abs" ]] || owner_issue_abs="$owner_issue_source"
+      [[ -n "$pre_tests_rel" ]] && pre_tests_rel="$primary_path/$pre_tests_rel"
+      [[ -n "$verification_rel" ]] && verification_rel="$primary_path/$verification_rel"
+      issue_id="$(markdown_backtick_field_value "$owner_issue_source" "issue_id")"
+    fi
+  fi
 
-  owner_issue_abs="$primary_path/$owner_issue_rel"
-  [[ -f "$owner_issue_abs" ]] || owner_issue_abs="$owner_issue_source"
-  issue_id="$(markdown_backtick_field_value "$owner_issue_source" "issue_id")"
+  source_prompt_file="$(authoritative_worker_prompt_file_for_project "$primary_path" || true)"
+  if [[ -n "$source_prompt_file" && -f "$source_prompt_file" ]] \
+    && worker_prompt_has_verification_metadata "$source_prompt_file"; then
+    owner_issue_abs="$(worker_prompt_owner_issue "$source_prompt_file")"
+    pre_tests_rel="$(worker_prompt_pre_tests_path "$source_prompt_file")"
+    verification_rel="$(worker_prompt_verification_artifact_dir "$source_prompt_file")"
+    required_test_lanes_csv="$(worker_prompt_required_test_lanes_csv "$source_prompt_file")"
+    required_acceptance_ids_csv="$(worker_prompt_required_acceptance_item_ids_csv "$source_prompt_file")"
+    minimum_evidence_level="$(worker_prompt_minimum_evidence_level "$source_prompt_file")"
+    target_environment="$(worker_prompt_target_environment "$source_prompt_file")"
+    closeout_gate="$(worker_prompt_closeout_gate "$source_prompt_file")"
+    closeout_gate_command="$(worker_prompt_closeout_gate_command "$source_prompt_file")"
+    closeout_target_lane="$(worker_prompt_closeout_target_lane "$source_prompt_file")"
+    closeout_promotion_gate="$(worker_prompt_closeout_promotion_gate "$source_prompt_file")"
+    closeout_requires_adequacy="$(worker_prompt_closeout_requires_adequacy "$source_prompt_file")"
+    closeout_review_artifact_policy="$(worker_prompt_closeout_review_artifact_policy "$source_prompt_file")"
+    if [[ -f "$owner_issue_abs" ]]; then
+      issue_id="$(markdown_backtick_field_value "$owner_issue_abs" "issue_id")"
+    fi
+  fi
+
+  [[ -n "$owner_issue_abs" && -n "$pre_tests_rel" && -n "$verification_rel" ]] || return 1
   [[ -n "$issue_id" ]] || issue_id="$(manager_continuity_cleanup_issue_id "$continuity_file")"
   [[ -n "$issue_id" ]] || issue_id="cleanup-governance"
+  [[ -n "$required_test_lanes_csv" ]] || required_test_lanes_csv="cleanup-followthrough"
+  [[ -n "$required_acceptance_ids_csv" ]] || required_acceptance_ids_csv="cleanup-governance-retirement-handoff"
+  [[ -n "$minimum_evidence_level" ]] || minimum_evidence_level="cleanup followthrough evidence plus worktree retirement disposition"
+  [[ -n "$target_environment" ]] || target_environment="$(printf '%s cleanup_governance retirement followthrough' "$issue_id")"
+  [[ -n "$closeout_gate" ]] || closeout_gate="Only claim closeout after the retained merged cleanup targets are retired or explicitly left with bounded followthrough evidence"
+  [[ -n "$closeout_gate_command" ]] || closeout_gate_command="./bin/freely daemon start --project $project"
+  [[ -n "$closeout_target_lane" ]] || closeout_target_lane="develop"
+  [[ -n "$closeout_promotion_gate" ]] || closeout_promotion_gate="Retire retained merged worktrees for $issue_id without reopening replay"
+  [[ -n "$closeout_requires_adequacy" ]] || closeout_requires_adequacy="true"
+  [[ -n "$closeout_review_artifact_policy" ]] || closeout_review_artifact_policy="Append cleanup receipts, retained-vs-retired disposition, and fleet closeout evidence to the owner verification artifact"
+
   cleanup_selected_tool="$(manager_continuity_backtick_field_value "$continuity_file" "selected_tool")"
   if [[ -z "$cleanup_selected_tool" ]]; then
     current_truth="$(project_tool_runtime_selection_truth "$project")"
@@ -8104,22 +8165,27 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
     printf 'Owner-Issue:\n'
     printf -- '- `%s`\n' "$owner_issue_abs"
     printf 'Pre-Tests-Path:\n'
-    printf -- '- `%s`\n' "$primary_path/$pre_tests_rel"
+    printf -- '- `%s`\n' "$pre_tests_rel"
     printf 'Verification-Artifact-Dir:\n'
-    printf -- '- `%s`\n' "$primary_path/$verification_rel"
+    printf -- '- `%s`\n' "$verification_rel"
     printf 'Required-Test-Lanes:\n'
-    printf -- '- `cleanup-followthrough`\n'
+    while IFS= read -r write_scope_path; do
+      [[ -n "$write_scope_path" ]] || continue
+      printf -- '- `%s`\n' "$write_scope_path"
+    done < <(printf '%s\n' "$required_test_lanes_csv" | tr ',' '\n')
     printf 'Required-Acceptance-Item-Ids:\n'
-    printf -- '- `cleanup-governance-retirement-handoff`\n'
-    printf 'Minimum-Evidence-Level: `cleanup followthrough evidence plus worktree retirement disposition`\n'
-    target_environment="$(printf '%s cleanup_governance retirement followthrough' "$issue_id")"
+    while IFS= read -r write_scope_path; do
+      [[ -n "$write_scope_path" ]] || continue
+      printf -- '- `%s`\n' "$write_scope_path"
+    done < <(printf '%s\n' "$required_acceptance_ids_csv" | tr ',' '\n')
+    printf 'Minimum-Evidence-Level: `%s`\n' "$minimum_evidence_level"
     printf 'Target-Environment: `%s`\n' "$target_environment"
-    printf 'Closeout-Gate: `Only claim closeout after the retained merged cleanup targets are retired or explicitly left with bounded followthrough evidence`\n'
-    printf 'Closeout-Gate-Command: `./bin/freely daemon start --project %s`\n' "$project"
-    printf 'Closeout-Target-Lane: `develop`\n'
-    printf 'Closeout-Promotion-Gate: `Retire retained merged worktrees for %s without reopening replay`\n' "$issue_id"
-    printf 'Closeout-Requires-Adequacy: `true`\n'
-    printf 'Closeout-Review-Artifact-Policy: `Append cleanup receipts, retained-vs-retired disposition, and fleet closeout evidence to the owner verification artifact`\n'
+    printf 'Closeout-Gate: `%s`\n' "$closeout_gate"
+    printf 'Closeout-Gate-Command: `%s`\n' "$closeout_gate_command"
+    printf 'Closeout-Target-Lane: `%s`\n' "$closeout_target_lane"
+    printf 'Closeout-Promotion-Gate: `%s`\n' "$closeout_promotion_gate"
+    printf 'Closeout-Requires-Adequacy: `%s`\n' "$closeout_requires_adequacy"
+    printf 'Closeout-Review-Artifact-Policy: `%s`\n' "$closeout_review_artifact_policy"
     printf '\nManager-Continuity:\n'
     printf -- '- `%s`\n' "$continuity_file"
     printf '\nYou are not alone in the codebase. Do not revert other people'\''s changes. Adjust to concurrent truth if a newer manager continuity lands while you work.\n'
@@ -10568,6 +10634,14 @@ manager_continuity_resume_focus_route_kind() {
   local continuity_file="$1"
   [[ -f "$continuity_file" ]] || return 1
   awk '
+    /^## / && !in_section && !top_section_done { top_section_done=1 }
+    !in_section && !top_section_done && /route_kind:/ {
+      if (match($0, /`[^`]+`/)) {
+        value=substr($0, RSTART + 1, RLENGTH - 2)
+        print value
+        exit
+      }
+    }
     /^## Ownership And Restart Point$/ { in_section=1; next }
     /^## Primary Judgement$/ { in_section=1; next }
     /^## / && in_section { exit }
@@ -10641,6 +10715,9 @@ manager_continuity_requires_retirement_worker_handoff() {
   fi
   if [[ -n "$continuity_project" ]] \
     && manager_cleanup_prompt_primary_target_row_from_continuity "$continuity_project" "$continuity_file" >/dev/null 2>&1; then
+    if latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | grep -q .; then
+      return 0
+    fi
     if grep -Eq 'retained-with-reason|retirement handoff|retire the absorbed worktrees now|cleanup followthrough worker' "$continuity_file"; then
       return 0
     fi

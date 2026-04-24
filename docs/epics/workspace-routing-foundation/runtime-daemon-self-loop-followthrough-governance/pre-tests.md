@@ -53,9 +53,10 @@
 35. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-ignores-pre-stop-delegated-continuation-after-operator-stop`.
 36. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-ignores-pre-stop-delegated-intake-after-operator-stop`.
 37. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-autodelegates-cleanup-when-existing-prompt-is-nonlaunchable`.
-38. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-retained-merged-cleanup-self-intent`.
-39. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-cleanup-queue-recorded-owner-from-verification-contract`.
-40. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-queued-prompt`.
+38. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-autodelegates-cleanup-from-worker-verification-truth`.
+39. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-retained-merged-cleanup-self-intent`.
+40. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-cleanup-queue-recorded-owner-from-verification-contract`.
+41. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-queued-prompt`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -460,17 +461,29 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-nonlaunchable-cleanup-autofill-verification.md`
 
-### Protected replay stages nonlaunchable cleanup autofill evidence
-- id: `cleanup-nonlaunchable-prompt-autofill-premerge-proof`
-- requirement: `Before guarded develop merge, the protected test lane must rerun the nonlaunchable cleanup prompt autofill regression together with the adjacent cleanup-governance delegate-worker guard and stage a fresh owner review artifact under the owner code-reviews directory.`
+### Cleanup governance current-shape continuity recovers from worker verification truth
+- id: `cleanup-current-shape-worker-verification-autofill`
+- requirement: `When cleanup_governance continuity exposes only top-level route kind plus inline worker_prompt references, runtime must still resolve the retained cleanup lane and inherit authoritative verification metadata from that worker's existing prompt/contract.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#29`
+- case_design: `Seed current-shape cleanup continuity with top-level route_kind, inline Worker Dispatch prompt references, and a retained merged cleanup lane whose authoritative verification truth already exists on the target worker; verify manager exit-contract autofill rewrites the nonlaunchable hygiene prompt into a launchable authoritative cleanup prompt.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-nonlaunchable-cleanup-autofill-verification.md`
+
+### Protected replay stages current-shape cleanup autofill evidence
+- id: `cleanup-current-shape-worker-verification-autofill-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the current-shape cleanup autofill regression together with the adjacent cleanup-governance launchability guard and stage a fresh owner review artifact under the owner code-reviews directory.`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#29`
-- case_design: `Replay the nonlaunchable retained-lane cleanup prompt repair on a disposable protected lane, rerun the focused autofill/canonical cleanup continuity/launchability guard regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
+- case_design: `Replay the current-shape retained-lane cleanup prompt repair on a disposable protected lane, rerun the worker-verification-truth autofill regression together with the adjacent nonlaunchable-prompt launchability guard plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-nonlaunchable-cleanup-autofill-premerge-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-current-shape-cleanup-autofill-premerge-verification.md`
 
 ### Retained cleanup self-intent relaunch stays launchable
 - id: `retained-cleanup-self-intent-relaunch`
