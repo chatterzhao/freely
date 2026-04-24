@@ -5640,7 +5640,11 @@ sync_tooling_before_workcell_launch() {
 start_workcell_supervisor_async() {
   local project="$1" source_project="${2:-}" freely_bin recovery_log launch_mode launch_command
   sync_tooling_before_workcell_launch "$project" "$source_project"
-  freely_bin="$(freely_bin_for_project "$project")"
+  if [[ -n "$source_project" && -d "$source_project" && "$source_project" != "$project" ]]; then
+    freely_bin="$(freely_bin_for_project "$source_project")"
+  else
+    freely_bin="$(freely_bin_for_project "$project")"
+  fi
   recovery_log="$(logs_dir_for_project "$project")/manager-runtime-recovery.log"
   launch_mode="$(project_control_plane_entrypoint_mode "$project")"
   launch_command="start"
@@ -8372,6 +8376,73 @@ worker_prompt_matches_active_authoritative_worker() {
   [[ -n "$authoritative_prompt_file" && "$authoritative_prompt_file" == "$prompt_file" ]]
 }
 
+runtime_script_for_project() {
+  local project="$1"
+  printf '%s\n' "$project/docs/system/workspace/scripts/runtime/freely"
+}
+
+worker_runtime_control_plane_needs_manager_source_rebind() {
+  local manager_project="$1" target_project="$2"
+  local manager_runtime_script target_runtime_script
+  [[ -n "$manager_project" && -n "$target_project" ]] || return 1
+  [[ -d "$manager_project" && -d "$target_project" ]] || return 1
+  [[ "$manager_project" != "$target_project" ]] || return 1
+  manager_runtime_script="$(runtime_script_for_project "$manager_project")"
+  target_runtime_script="$(runtime_script_for_project "$target_project")"
+  [[ -f "$manager_runtime_script" && -f "$target_runtime_script" ]] || return 1
+  cmp -s "$manager_runtime_script" "$target_runtime_script" && return 1
+  return 0
+}
+
+rebind_active_worker_runtime_control_plane_if_needed() {
+  local manager_project="$1" target_project="$2" prompt_file="$3"
+  local runtime_probe_project prompt_target_worktree intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv has_any_verification_metadata="0"
+  local selected_tool
+  worker_runtime_control_plane_needs_manager_source_rebind "$manager_project" "$target_project" || return 1
+  project_has_authoritative_worktree_path "$manager_project" "$target_project" || return 1
+  ensure_runtime_workcell_initialized_for_launch "$manager_project" "$target_project" || return 1
+  runtime_probe_project="$target_project"
+  prompt_target_worktree="$(worker_prompt_target_worktree "$prompt_file")"
+  if [[ -n "$prompt_target_worktree" && -d "$prompt_target_worktree" ]] \
+    && project_has_authoritative_worktree_path "$manager_project" "$prompt_target_worktree"; then
+    runtime_probe_project="$prompt_target_worktree"
+  fi
+  selected_tool="$(worker_prompt_selected_tool "$prompt_file")"
+  if [[ -n "$selected_tool" ]]; then
+    persist_project_tool_selection "$target_project" "$selected_tool"
+  fi
+  runtime_contract_file="$(worker_verification_contract_state_file "$target_project")"
+  supervisor_pid="$(manager_supervisor_pid_for_project "$runtime_probe_project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$runtime_probe_project")"
+  [[ -n "$supervisor_pid" && -n "$ai_pid" ]] || return 1
+  missing_fields_csv="$(worker_prompt_verification_metadata_missing_fields_csv "$prompt_file")"
+  if worker_prompt_has_any_verification_metadata "$prompt_file"; then
+    has_any_verification_metadata="1"
+  fi
+  if [[ -n "$missing_fields_csv" && "$has_any_verification_metadata" == "1" ]]; then
+    write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "" "$target_project"
+    write_workcell_state \
+      "$target_project" \
+      "running" \
+      "$( [[ -n "$supervisor_pid" ]] && printf 'up' || printf 'down' )" \
+      "$( [[ -n "$ai_pid" ]] && printf 'up' || printf 'down' )" \
+      "manager_worker_launch_verification_blocked"
+    return 1
+  fi
+  intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"
+  write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "$intake_id" "$target_project"
+  rm -f "$(handoff_file "$target_project")"
+  refresh_workcell_state_projection "$target_project"
+  append_runtime_event "$manager_project" "manager_worker_runtime_control_plane_rebind" \
+    "worktree=$target_project" \
+    "source_project=$manager_project" \
+    "prompt_file=$prompt_file"
+  request_local_runtime_handoff_stop "$target_project" "$intake_id"
+  write_workcell_state "$target_project" "running" "down" "down" "manager_worker_launch_linkage"
+  start_workcell_supervisor_async "$target_project" "$manager_project"
+  return 0
+}
+
 manager_continuity_has_worker_prompts() {
   local continuity_file="$1"
   [[ -n "$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")" ]]
@@ -9943,6 +10014,9 @@ launch_worker_from_manager_prompt_if_needed() {
   rm -f "$(handoff_file "$target_project")"
   refresh_workcell_state_projection "$target_project"
   if [[ -n "$supervisor_pid" && -n "$ai_pid" ]]; then
+    if rebind_active_worker_runtime_control_plane_if_needed "$manager_project" "$target_project" "$prompt_file"; then
+      return 0
+    fi
     request_local_continuation_reentry "$target_project" "$intake_id"
     return 0
   fi
@@ -10066,6 +10140,9 @@ manager_runtime_launch_workers_from_latest_handoff() {
     fi
     if csv_contains_exact_item "$launched_csv" "$prompt_file"; then
       if worker_project_is_actively_running "$target_project"; then
+        if rebind_active_worker_runtime_control_plane_if_needed "$project" "$target_project" "$prompt_file"; then
+          launched_count=$((launched_count + 1))
+        fi
         continue
       fi
       launched_csv="$(csv_remove_exact_item "$launched_csv" "$prompt_file")"
@@ -10082,6 +10159,15 @@ manager_runtime_launch_workers_from_latest_handoff() {
     fi
     if [[ "$worker_is_active" == "1" ]] \
       && worker_prompt_matches_active_authoritative_worker "$project" "$target_project" "$prompt_file"; then
+      if rebind_active_worker_runtime_control_plane_if_needed "$project" "$target_project" "$prompt_file"; then
+        launched_csv="$(csv_append_unique_item "$launched_csv" "$prompt_file")"
+        selected_write_scopes_csv="$(csv_append_unique_item "$selected_write_scopes_csv" "$write_scope")"
+        if [[ -n "$prompt_signature" ]]; then
+          selected_intent_signatures_csv="$(csv_append_unique_item "$selected_intent_signatures_csv" "$prompt_signature")"
+        fi
+        launched_count=$((launched_count + 1))
+        continue
+      fi
       launched_csv="$(csv_append_unique_item "$launched_csv" "$prompt_file")"
       selected_write_scopes_csv="$(csv_append_unique_item "$selected_write_scopes_csv" "$write_scope")"
       if [[ -n "$prompt_signature" ]]; then
