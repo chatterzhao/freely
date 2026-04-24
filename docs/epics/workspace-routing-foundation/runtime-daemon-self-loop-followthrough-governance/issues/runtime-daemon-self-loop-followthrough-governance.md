@@ -78,6 +78,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 38. Treat Codex OAuth refresh request-send failures against `https://auth.openai.com/oauth/token` as bounded transport/network failures when the evidence is request delivery failure rather than explicit auth rejection, so runtime recovery stays on `execution_network_*` instead of widening to generic `tool_runtime_failure`.
 39. Preserve the auth boundary for that same Codex OAuth refresh path: explicit auth denial such as `401 Unauthorized` remains non-network and must not enter the device-network recovery path.
 40. When project proxy mode is `explicit`, resolve proxy fields with project-over-global precedence instead of treating blank project values as authoritative empties; an empty project explicit block must not mask valid global explicit proxy values and force false `proxy_config_invalid`.
+41. Keep project-level worktree summary pipe-safe during daemon/live-status patrol so runtime hygiene and startup followthrough cannot fail just because a downstream consumer closes stdout early.
+42. Let manager delegation and launch treat a prompt-targeted missing sibling worktree as materializable when its branch/worktree headers stay within the governed `*-worktrees` root, and do not retire a merged-tip worker lane while authoritative continuity still carries active `edit` or `promotion` ownership for that lane.
 
 ## Non-Goals
 
@@ -111,6 +113,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 21. Canonical `develop` no longer collapses Codex OAuth refresh request-send failures into `tool_runtime_failure`; those transport failures stay on the bounded `execution_network_transient` / `execution_network_persistent` path.
 22. Canonical `develop` still keeps explicit Codex OAuth refresh auth denial such as `401 Unauthorized` off the network path, so auth noise does not masquerade as device-network instability.
 23. Canonical `develop` no longer loops on `proxy_config_invalid` when project config sets `FREELY_NETWORK_PROXY_MODE="explicit"` but leaves proxy values blank while global config still carries valid explicit proxy settings; field-level resolution must preserve the usable global proxy and let daemon self-work continue.
+24. Canonical `develop` no longer risks aborting patrol/log consumers with `printf: write error: Broken pipe` while computing multi-worktree summary during daemon/live-status followthrough.
+25. Canonical `develop` can take a scan/continuity-selected worker prompt that points at a missing governed sibling worktree, materialize that worktree lawfully, launch the worker, and keep a merged-tip authoritative `edit` lane out of retire-ready cleanup until its prompt ownership is actually settled.
 
 ## Verification
 
@@ -144,6 +148,11 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-ignores-codex-apikey-oauth-refresh-401`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
 - `bash docs/system/workspace/scripts/tests/test-freely-network-proxy-resolver`
+- `bash docs/system/workspace/scripts/tests/test-freely-worktree-summary-multi-worktree`
+- `bash docs/system/workspace/scripts/tests/test-freely-worktree-summary-tolerates-closed-pipe`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-allows-materializable-missing-worktree`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-materializes-missing-worktree`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-keeps-fresh-materialized-worker-with-authoritative-edit-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`

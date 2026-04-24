@@ -342,3 +342,27 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+
+### Worker materialization and pipe-safe summary hold on feature lane
+- id: `worker-materialization-and-summary-feature-proof`
+- requirement: `Daemon patrol must tolerate closed-pipe worktree summary consumers, and manager launch must be able to materialize a governed missing sibling worker lane without reclaiming active authoritative edit ownership as retire-ready cleanup.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#24`
+- case_design: `Run the focused worktree-summary broken-pipe regressions together with worker materialization / authoritative-edit ownership regressions on the writable owner lane and record the bounded followthrough evidence under the owner review directory.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-worker-materialization-and-summary-verification.md`
+
+### Protected replay stages worker materialization and pipe-safe summary evidence
+- id: `worker-materialization-and-summary-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the bounded worker-materialization / summary regressions plus owner gates and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#24`
+- case_design: `Replay the pipe-safe worktree-summary and missing-worktree materialization repair on the disposable protected lane, rerun the focused summary and worker-materialization regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-worker-materialization-and-summary-verification.md`
