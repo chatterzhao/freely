@@ -9848,6 +9848,7 @@ launch_worker_from_manager_prompt_if_needed() {
   fi
   intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"
   write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "$intake_id" "$target_project"
+  rm -f "$(handoff_file "$target_project")"
   refresh_workcell_state_projection "$target_project"
   if [[ -n "$supervisor_pid" && -n "$ai_pid" ]]; then
     request_local_continuation_reentry "$target_project" "$intake_id"
@@ -11133,6 +11134,49 @@ write_manager_exit_contract_repair_handoff() {
 EOF
 }
 
+write_manager_resume_handoff() {
+  local project="$1" reason="$2" details="$3"
+  local contract_file session_file resume_target continuity_file route_kind restart_point next_action
+  local why_not_stop why_not_delegate
+  contract_file="$(manager_exit_contract_file "$project")"
+  session_file="$(session_state_file "$project")"
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  resume_target="${LAST_TOOL_RESUME_TARGET:-}"
+  if [[ -z "$resume_target" && -f "$session_file" ]]; then
+    resume_target="$(meta_env_value "$session_file" "LAST_TOOL_RESUME_TARGET")"
+  fi
+  route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
+  restart_point="$(meta_env_value "$contract_file" "RESTART_POINT")"
+  next_action="$(meta_env_value "$contract_file" "NEXT_ACTION")"
+  why_not_stop="$(meta_env_value "$contract_file" "WHY_NOT_STOP")"
+  why_not_delegate="$(meta_env_value "$contract_file" "WHY_NOT_DELEGATE")"
+  cat >"$(handoff_file "$project")" <<EOF
+# Session Handoff
+
+- rotation_reason: manager_exit_contract_resume
+- previous_launch_kind: resume
+- previous_tool_resume_target: ${resume_target:-unavailable}
+- worktree_path: $project
+
+## Continue Current Manager Lane
+- reason: ${reason:-manager_exit_contract_resume}
+- contract_file: $contract_file
+- continuity_file: ${continuity_file:-none}
+- route_kind: ${route_kind:-unknown}
+- restart_point: ${restart_point:-unknown}
+- next_action: ${next_action:-unknown}
+- why_not_stop: ${why_not_stop:-unknown}
+- why_not_delegate: ${why_not_delegate:-unknown}
+- details: ${details:-none}
+
+## What To Handle First
+- This is a valid manager continuation, not an exit-contract repair round.
+- Reuse the same manager context and continue from the current continuity / restart point before widening back to broad patrol.
+- If the current continuity is no longer authoritative, refresh the judgement against current fleet truth and write the next bounded manager continuity instead of replaying a stale repair step.
+EOF
+}
+
 write_worker_exit_contract_repair_handoff() {
   local project="$1" reason="$2" details="$3" contract_file resume_target session_file prompt_file intent_kind owner_issue artifact_dir closeout_gate closeout_gate_command closeout_target_lane closeout_promotion_gate closeout_requires_adequacy closeout_review_artifact_policy
   contract_file="$(worker_exit_contract_file "$project")"
@@ -11322,7 +11366,7 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
           "intake_id=$cleanup_followthrough_intake_id" \
           "details=$(printf '%s\n' "$cleanup_followthrough_output" | tr '\n' ';' | sed 's/;*$//' | sed 's/[[:space:]]\+/ /g' | sed 's/^$/none/')"
       fi
-      write_manager_exit_contract_repair_handoff \
+      write_manager_resume_handoff \
         "$project" \
         "manager_exit_contract_resume" \
         "restart_point=$(meta_env_value "$(manager_exit_contract_file "$project")" "RESTART_POINT");next_action=$(meta_env_value "$(manager_exit_contract_file "$project")" "NEXT_ACTION")"
