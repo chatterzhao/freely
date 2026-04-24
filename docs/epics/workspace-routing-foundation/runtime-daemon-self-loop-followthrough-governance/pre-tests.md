@@ -444,3 +444,27 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-cleanup-blocked-recorded-owner-premerge-verification.md`
+
+### Cleanup governance autofills nonlaunchable retained-lane prompts
+- id: `cleanup-nonlaunchable-prompt-autofill`
+- requirement: `When cleanup_governance continuity already carries an AI-written worker prompt for a retained merged lane, runtime must materialize an authoritative verification-bound cleanup prompt if that existing prompt is not launchable.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#29`
+- case_design: `Seed canonical cleanup continuity with a retained merged cleanup lane plus an AI-written hygiene prompt that lacks verification metadata, then verify manager exit-contract autofill appends a launchable authoritative cleanup prompt instead of looping on WORKER_PROMPTS_NOT_LAUNCHABLE.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-nonlaunchable-cleanup-autofill-verification.md`
+
+### Protected replay stages nonlaunchable cleanup autofill evidence
+- id: `cleanup-nonlaunchable-prompt-autofill-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the nonlaunchable cleanup prompt autofill regression together with the adjacent cleanup-governance delegate-worker guard and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#29`
+- case_design: `Replay the nonlaunchable retained-lane cleanup prompt repair on a disposable protected lane, rerun the focused autofill/canonical cleanup continuity/launchability guard regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-nonlaunchable-cleanup-autofill-premerge-verification.md`
