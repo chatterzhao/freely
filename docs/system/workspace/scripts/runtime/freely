@@ -9372,20 +9372,44 @@ manager_other_worker_project_for_blocking_intent_signature() {
 
 manager_prompt_may_reclaim_recorded_self_intent() {
   local project="$1" target_project="$2" prompt_file="$3" prompt_signature="$4"
-  local target_signature target_branch
+  local target_signature target_branch continuity_file queued_holder frozen_holder
+  local verification_contract_file verification_source_prompt verification_signature
   [[ -n "$project" && -n "$target_project" && -d "$target_project" ]] || return 1
   [[ -n "$prompt_file" && -f "$prompt_file" && -n "$prompt_signature" ]] || return 1
-  [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]] || return 1
-  worker_prompt_has_verification_metadata "$prompt_file" || return 1
+  worker_project_is_actively_running "$target_project" && return 1
+  [[ "$(recorded_worker_ownership_status "$target_project")" == "soft_stale" ]] || return 1
   target_signature="$(project_current_blocking_intent_signature "$target_project")"
   [[ -n "$target_signature" && "$target_signature" == "$prompt_signature" ]] || return 1
-  target_branch="$(worker_prompt_target_branch "$prompt_file")"
-  if worker_project_is_absorbed_merged_lane "$project" "$target_project" "$target_branch" || \
-    worker_project_is_retire_ready_merged_followthrough "$project" "$target_project" "$target_branch" "$prompt_file" || \
-    worker_prompt_targets_retire_ready_merged_worktree "$project" "$prompt_file"; then
-    return 0
+  manager_other_worker_holds_blocking_intent_signature "$project" "$target_project" "$prompt_signature" && return 1
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
+  if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
+    queued_holder="$(manager_queued_prompt_for_blocking_intent_signature "$project" "$continuity_file" "$prompt_file" "$prompt_signature")"
+    [[ -z "$queued_holder" ]] || return 1
+    frozen_holder="$(manager_frozen_prompt_for_blocking_intent_signature "$project" "$continuity_file" "$prompt_file" "$prompt_signature")"
+    [[ -z "$frozen_holder" ]] || return 1
   fi
-  return 1
+  target_branch="$(worker_prompt_target_branch "$prompt_file")"
+  if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]]; then
+    verification_contract_file="$(worker_verification_contract_state_file "$target_project")"
+    if [[ -f "$verification_contract_file" ]]; then
+      verification_source_prompt="$(meta_env_value "$verification_contract_file" "SOURCE_PROMPT_FILE")"
+      if [[ -n "$verification_source_prompt" && "$verification_source_prompt" != "$prompt_file" && -f "$verification_source_prompt" ]]; then
+        verification_signature="$(worker_prompt_blocking_intent_signature "$project" "$verification_source_prompt")"
+        if [[ -n "$verification_signature" && "$verification_signature" == "$prompt_signature" ]]; then
+          return 1
+        fi
+      fi
+    fi
+  fi
+  if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]] && \
+    worker_prompt_has_verification_metadata "$prompt_file"; then
+    if worker_project_is_absorbed_merged_lane "$project" "$target_project" "$target_branch" || \
+      worker_project_is_retire_ready_merged_followthrough "$project" "$target_project" "$target_branch" "$prompt_file" || \
+      worker_prompt_targets_retire_ready_merged_worktree "$project" "$prompt_file"; then
+      return 0
+    fi
+  fi
+  return 0
 }
 
 project_active_ownership_conflict_snapshot() {

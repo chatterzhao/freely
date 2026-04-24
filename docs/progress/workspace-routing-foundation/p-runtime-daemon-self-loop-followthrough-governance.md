@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/manager-worker-launch-self-conflict-boundary-20260424`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-worker-launch-self-conflict-boundary`
-- updated_at: `2026-04-24 01:18 PDT`
+- branch: `feature/manager-worker-launch-recorded-self-intent-reclaim-20260424`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-worker-launch-recorded-self-intent-reclaim`
+- updated_at: `2026-04-24 05:45 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -258,6 +258,15 @@
 - `PENDING`: replay this repair through protected premerge and guarded `develop`, then rerun canonical daemon replay until the retained cleanup worker truly launches, returns cleanup truth, and Freely advances to the next scan-selected task.
 - `PASS`: `manager_runtime_handle_exit_contract_after_ai_cycle()` now checks the active continuity for cleanup-followthrough intent before honoring `resume_manager`, runs that cleanup step first, and emits explicit `manager_exit_contract_cleanup_followthrough_begin` / `manager_exit_contract_cleanup_followthrough` receipts on success.
 - `PASS`: when `run_cleanup_followthrough` fails on that path, runtime now writes a same-owner repair handoff, records `LAST_EXIT_REASON=manager_exit_contract_cleanup_followthrough_failed`, emits `manager_exit_contract_cleanup_followthrough_failed`, and returns `resume_invalid` instead of silently resuming broader patrol.
+
+## 2026-04-24 05:45 PDT Recorded Self-Intent Relaunch Boundary
+
+- `FAIL`: canonical `develop` replay after the auth-failure timestamp fix proved continuity-first delegation was working and the retained owner-rebind worker prompt was launchable, but manager still re-entered another manager round instead of consuming that prompt. Live runtime state showed `QUEUED_WORKER_PROMPTS` held the delegated prompt with `ACTIVE_RUNNING_WORKER_COUNT=0` and no ownership blocker summary, while direct helper probes proved `launch_worker_from_manager_prompt_if_needed()` itself succeeded for the same prompt.
+- `PASS`: the remaining seam was narrower than the retained cleanup case. The delegated prompt carried `intent_kind=edit` with signature `edit@<target_worktree>`, and `manager_runtime_launch_workers_from_latest_handoff()` preloaded `selected_intent_signatures_csv` from recorded worker ownership, so the target lane self-conflicted on its own soft-stale recorded edit signature before launch.
+- `PASS`: `manager_prompt_may_reclaim_recorded_self_intent()` now allows manager to reclaim that recorded self-intent whenever the prompt targets the same stopped worktree/signature, the target lane is only `soft_stale`, and no other worker plus no queued/frozen prompt still holds that signature. The older retained-cleanup merged followthrough reclaim path remains intact as a stricter subset.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-recorded-self-intent`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-retained-merged-cleanup-self-intent`
+- `PENDING`: replay this broader recorded-self-intent reclaim repair through protected premerge and guarded `develop`, then rerun canonical daemon replay until the delegated retained owner-rebind worker launches automatically, returns lawful cleanup / blocker truth, and Freely continues to the next task source instead of restarting manager patrol.
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-triggers-cleanup-followthrough`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-cleanup-followthrough-failure-materializes-blocker`
 - `PENDING`: rerun guarded premerge and canonical `develop` replay to verify cleanup followthrough now retires the retained blocker lane, clears `cleanup_governance`, and lets Freely continue toward the next task.
