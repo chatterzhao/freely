@@ -275,6 +275,18 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-sigpipe-closeout-verification.md`
 
+### Guarded promote carries fresh SIGPIPE closeout evidence
+- id: `guarded-promote-sigpipe-closeout-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving cached discovery producers no longer strand supervisor closeout when downstream consumers exit early.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#33`
+- case_design: `Replay the SIGPIPE closeout repair through the disposable protected lane, rerun the focused closed-pipe regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-sigpipe-closeout-premerge-verification.md`
+
 ### Manager bootstrap startup stays alive before prompt build begins
 - id: `manager-pre-prompt-startup-grace-preserved`
 - requirement: `A newly started manager supervisor must not be restarted as idle while startup is still lawfully between L010 supervisor_started and prompt build / ai launch.`
