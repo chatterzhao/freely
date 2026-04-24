@@ -592,5 +592,5 @@
 - task_refs: `tasks.md#9,tasks.md#10`
 - case_design: `Replay the worker exit-contract network-transient precedence repair through the disposable protected lane, rerun the focused worker_done, network-transient override, malformed-contract recovery, and owner gates there, then stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
-- status: `pending`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-worker-exit-contract-network-transient-verification.md`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-worker-exit-contract-network-transient-premerge-verification.md`
