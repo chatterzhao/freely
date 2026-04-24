@@ -238,6 +238,16 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
 - `PENDING`: promote this compatibility repair through guarded premerge and canonical `develop`, then replay daemon start again to confirm runtime launches the cleanup worker instead of dying at prompt launchability repair.
 
+## 2026-04-24 05:30 PDT Auth-Failure Timestamp False Positive Followthrough
+
+- `FAIL`: canonical `develop` replay advanced far enough to let manager write fresh continuity plus a launchable worker prompt for the retained cleanup lane, but the next manager cycle still exited with `last_exit_reason=auth_failure` before consuming that queued worker prompt. Replay evidence showed the only extracted runtime error line was `apply_patch verification failed ... manager-exit-contract.env: No such file or directory`, yet `log_has_auth_failure()` still matched because the timestamp fragment `.401071Z` satisfied the old bare `401` regex branch.
+- `PASS`: narrowed auth-failure detection to auth-specific phrases (`unauthorized`, `auth failed`, `authentication failed`, token/login/subscription phrases, and explicit `402 payment required` / `403 forbidden`) instead of treating any bare `401` substring in the error excerpt as an auth seam.
+- `PASS`: strengthened `bash docs/system/workspace/scripts/tests/test-freely-runtime-auth-failure-signal-filter` with the real replay shape: a timestamped non-auth `ERROR` line whose fractional seconds contain `401`, proving runtime no longer converts ordinary file/update errors into `auth_failure`.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-runtime-auth-failure-signal-filter`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-log-has-auth-failure-ignores-codex-apikey-oauth-refresh-noise`
+- `PASS`: `./bin/governance-check`
+- `PENDING`: replay this repair through guarded premerge and canonical `develop`, then rerun `./bin/freely daemon start` on `develop` to verify manager keeps the continuity/queued-worker truth alive, consumes the retained cleanup lane handoff, and resumes the larger self-host closeout loop instead of stopping on a fake `auth_failure`.
+
 ## 2026-04-24 01:18 PDT Retained Cleanup Self-Intent Relaunch Boundary
 
 - `FAIL`: canonical `develop` replay after `c82592d5` advanced one seam further. Manager now repaired `delegate_workers`, parsed the queued cleanup prompt, and validated that prompt as launchable, but the selected worker still never launched. Logs and direct helper probes showed the failure sat exactly between `manager_exit_contract_delegate_workers` and `launch_worker_from_manager_prompt_if_needed`: manager preloaded `selected_intent_signatures_csv` from recorded worker ownership, and the retained merged cleanup lane then self-conflicted on its own stale recorded cleanup signature, leaving the prompt perpetually in `queued_worker_prompts` with no blocker text.
