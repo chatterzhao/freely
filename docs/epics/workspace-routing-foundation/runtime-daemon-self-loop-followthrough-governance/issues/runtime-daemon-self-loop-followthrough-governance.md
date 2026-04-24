@@ -71,6 +71,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 31. Keep a newly started daemon manager alive while startup is still between `L010 supervisor_started` and `L020 prompt_build_begin`, so pre-prompt recovery/fleet work does not get misclassified as an idle supervisor restart.
 32. When runtime classifies tool failures as network, proxy, auth, or subscription seams, log explicit operator guidance that points at relay/base_url reachability, proxy mode, and provider access rather than leaving canonical self-host replay with an opaque retry loop.
 33. When Codex exits after exhausting its own reconnect loop with upstream `502 Bad Gateway` evidence, monitor/runtime must persist that outcome as execution-network failure truth instead of collapsing it into generic `tool_runtime_failure`.
+34. Fresh startup patrol must treat the delegated-continuation freshness floor as the later of continuity truth and the explicit manager operator-stop boundary, so pre-stop delegated continuation handoffs stay historical after `daemon stop` while newer post-stop handoffs remain eligible.
 34. When manager materializes a cleanup followthrough worker prompt from continuity rather than reusing an existing prompt file, it must carry the authoritative `selected_tool` so stale retained cleanup worktrees do not relaunch on obsolete local tool config.
 35. Treat a Codex resume target as valid only when its rollout/session jsonl evidence is non-empty, so zero-byte persisted session files cannot send canonical cleanup followthrough back into `thread/resume failed: empty session file`.
 36. When manager exit-contract replay resolves to `resume_manager` while continuity already targets cleanup followthrough, runtime must run that cleanup followthrough before relaunch so canonical replay cannot stay pinned on the same retained merged lane.
@@ -118,6 +119,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 24. Canonical `develop` no longer risks aborting patrol/log consumers with `printf: write error: Broken pipe` while computing multi-worktree summary during daemon/live-status followthrough.
 25. Canonical `develop` can take a scan/continuity-selected worker prompt that points at a missing governed sibling worktree, materialize that worktree lawfully, launch the worker, and keep a merged-tip authoritative `edit` lane out of retire-ready cleanup until its prompt ownership is actually settled.
 26. Canonical `develop` no longer records `EXIT_KIND=delegate_workers` while `manager-worker-launch-state.env` still shows `generated/queued/launched=none` just because the selected continuity used `## Queue State` `worker_prompts:` instead of a direct `## Worker Delegation` block.
+27. Canonical `develop` no longer re-consumes a pre-stop delegated continuation after fresh restart just because the stale continuity anchor was discarded; operator-stop freshness still fences off older delegated handoffs until newer post-stop continuity or newer post-stop delegated continuation arrives.
 
 ## Verification
 
@@ -126,6 +128,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-ignores-pre-stop-delegated-continuation-after-operator-stop`
+- `bash docs/system/workspace/scripts/tests/test-freely-live-status-ignores-pre-stop-delegated-intake-after-operator-stop`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-supersedes-queued-prompt-with-manager-continuity`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
