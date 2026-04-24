@@ -9089,7 +9089,7 @@ worker_prompt_blocking_intent_signature() {
 
 project_current_blocking_intent_signature() {
   local project="$1" prompt_file
-  prompt_file="$(latest_prompt_file_for_project "$project")"
+  prompt_file="$(status_intent_prompt_file_for_project "$project")"
   [[ -n "$prompt_file" && -f "$prompt_file" ]] || {
     printf '\n'
     return 0
