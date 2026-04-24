@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-reclaim-retained-cleanup-self-intent.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER="$WT_ROOT/feature-cleanup"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m init
+git -C "$PROJECT" worktree add -q -b feature/cleanup "$WORKER" develop
+
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$WORKER/.freely/run" "$WORKER/.freely/logs"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$WORKER/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER"
+INTENT_FILE="$WORKER/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+mkdir -p "$PROJECT/docs" "$WORKER/docs"
+for doc in PROJECT_INTENT CONSTITUTION LAWS; do
+  printf '# %s\n' "$doc" >"$PROJECT/docs/$doc.md"
+  printf '# %s\n' "$doc" >"$WORKER/docs/$doc.md"
+done
+printf '# Agents\n' >"$PROJECT/AGENTS.md"
+printf '# Agents\n' >"$WORKER/AGENTS.md"
+
+echo cleanup >"$WORKER/cleanup.txt"
+git -C "$WORKER" add cleanup.txt
+git -C "$WORKER" commit -q -m "cleanup lane"
+git -C "$PROJECT" merge --no-ff -m "merge cleanup lane" feature/cleanup >/dev/null
+
+cat >"$WORKER/retained-dirty.txt" <<'EOF'
+retained dirty followthrough
+EOF
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260424-020000-worker-cleanup-codex.txt"
+cat >"$PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/cleanup\`
+dispatch_priority: \`P0\`
+parallel_safe: \`false\`
+write_scope: \`$WORKER\`
+intent_kind: \`cleanup\`
+intent_target: \`$WORKER\`
+Owner-Issue:
+- \`$WORKER/docs/owner-issue.md\`
+Pre-Tests-Path:
+- \`$WORKER/docs/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`$WORKER/docs/code-reviews\`
+Required-Test-Lanes:
+- \`feature-local\`
+Required-Acceptance-Item-Ids:
+- \`checkpoint-drift-classified\`
+Minimum-Evidence-Level: \`focused diff hygiene plus governance-check and worktree-local continuity\`
+Target-Environment: \`feature/cleanup\`
+Closeout-Gate: \`cleanup_followthrough\`
+Closeout-Gate-Command: \`./bin/checkpoint-guard\`
+Closeout-Target-Lane: \`cleanup_governance\`
+Closeout-Promotion-Gate: \`manager_requeue_after_hygiene\`
+Closeout-Requires-Adequacy: \`true\`
+Closeout-Review-Artifact-Policy: \`append hygiene classification evidence\`
+EOF
+
+cat >"$WORKER/.freely/run/prompt-20260424-020001.txt" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/cleanup\`
+dispatch_priority: \`P0\`
+parallel_safe: \`false\`
+write_scope: \`$WORKER\`
+intent_kind: \`cleanup\`
+intent_target: \`$WORKER\`
+EOF
+
+cat >"$WORKER/.freely/run/worker-verification-contract.env" <<EOF
+SOURCE_PROMPT_FILE="$PROMPT"
+SOURCE_INTAKE_ID="worker-cleanup-intake"
+TARGET_PROJECT="$WORKER"
+VERIFICATION_METADATA_PRESENT="true"
+VERIFICATION_METADATA_MISSING_FIELDS=""
+OWNER_ISSUE="$WORKER/docs/owner-issue.md"
+PRE_TESTS_PATH="$WORKER/docs/pre-tests.md"
+VERIFICATION_ARTIFACT_DIR="$WORKER/docs/code-reviews"
+REQUIRED_TEST_LANES_CSV="feature-local"
+REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="checkpoint-drift-classified"
+MINIMUM_EVIDENCE_LEVEL="focused diff hygiene plus governance-check and worktree-local continuity"
+TARGET_ENVIRONMENT="feature/cleanup"
+CLOSEOUT_GATE="cleanup_followthrough"
+CLOSEOUT_GATE_COMMAND="./bin/checkpoint-guard"
+CLOSEOUT_TARGET_LANE="cleanup_governance"
+CLOSEOUT_PROMOTION_GATE="manager_requeue_after_hygiene"
+CLOSEOUT_REQUIRES_ADEQUACY="true"
+CLOSEOUT_REVIEW_ARTIFACT_POLICY="append hygiene classification evidence"
+UPDATED_AT="2026-04-24T08:00:00Z"
+EOF
+
+cat >"$WORKER/.freely/run/workcell-state.env" <<EOF
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ENTRYPOINT_MODE="foreground"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-24T08:00:01Z"
+LAST_WORKER_VERIFICATION_CONTRACT_FILE="$WORKER/.freely/run/worker-verification-contract.env"
+LAST_WORKER_VERIFICATION_METADATA_PRESENT="true"
+LAST_WORKER_VERIFICATION_METADATA_MISSING_FIELDS=""
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260424-020000.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+
+## Worker Delegation
+- authoritative_worker_prompts:
+  - \`$PROMPT\`
+- launchable_queue:
+  - lane_id: \`I-20260424-0200-A\`
+    dispatch_priority: \`P0\`
+    prompt_path: \`$PROMPT\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+LAUNCH_LOG="$TMP_DIR/launch.log"
+launch_worker_from_manager_prompt_if_needed() {
+  local _manager_project="$1" prompt_file="$2"
+  basename "$prompt_file" >>"$LAUNCH_LOG"
+  return 0
+}
+
+COUNT="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$COUNT" == "1" ]] || {
+  echo "[FAIL] retained merged cleanup worker should reclaim its own recorded intent, got $COUNT" >&2
+  exit 1
+}
+grep -q '^20260424-020000-worker-cleanup-codex.txt$' "$LAUNCH_LOG"
+
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" == "$CONTINUITY" ]]
+[[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" == "$PROMPT" ]]
+[[ "${ACTIVE_RUNNING_WORKER_COUNT:-}" == "1" ]]
+[[ -z "${QUEUED_WORKER_PROMPTS:-}" ]]
+
+echo "[PASS] retained merged cleanup worker prompt reclaims its recorded self intent and launches"
