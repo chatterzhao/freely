@@ -424,7 +424,7 @@
 - id: `blocked-cleanup-recorded-owner-retained`
 - requirement: `When a cleanup worker exits blocked, runtime must derive current blocking ownership from the authoritative verification-contract prompt source rather than a later worker-local AI prompt that may omit dispatch headers.`
 - surface_kind: `integration`
-- target_lane: `completion`
+- target_lane: `feature-local`
 - promotion_gate: `completion`
 - task_refs: `tasks.md#28`
 - case_design: `Simulate a blocked cleanup worker whose verification contract still points at the delegated source prompt while the latest worker AI prompt no longer carries machine-readable Worktree/Branch headers, then verify duplicate cleanup launch requests queue behind the recorded owner instead of relaunching the lane.`
