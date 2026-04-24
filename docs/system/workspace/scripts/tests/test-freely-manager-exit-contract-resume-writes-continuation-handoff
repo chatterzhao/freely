@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-exit-contract-resume-handoff.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+LAST_TOOL_SESSION_ID="sess-demo"
+LAST_TOOL_RESUME_TARGET="resume-demo"
+LAST_TOOL_JSONL_PATH=""
+LAST_LAUNCH_KIND="resume"
+LAST_ROTATION_REASON=""
+LAST_CYCLE_LOG=""
+LAST_PROMPT_FILE=""
+LAST_CONTEXT_COMPACTED="0"
+LAST_CONTEXT_RATIO=""
+LAST_PRIMARY_RATE_LIMIT_USED_PERCENT=""
+LAST_PRIMARY_RATE_LIMIT_RESETS_AT=""
+LAST_SECONDARY_RATE_LIMIT_USED_PERCENT=""
+LAST_SECONDARY_RATE_LIMIT_RESETS_AT=""
+LAST_ROUTE_ONLY_HANDOFF="0"
+ROUTE_ONLY_STREAK_CURRENT="0"
+RESUME_STREAK_CURRENT="1"
+CURRENT_TOOL_SLOT=""
+LAST_SLOT_SWITCH_REASON=""
+LAST_SLOT_SWITCH_AT=""
+LAST_CYCLE_DEBUG_LOG=""
+LAST_CLAUDE_JSONL_PATH=""
+LAST_CODEX_MCP_USED="0"
+LAST_CODEX_MCP_THREAD_ID=""
+LAST_CODEX_MCP_JSONL_PATH=""
+CLAUDE_SESSION_ID_CURRENT=""
+CLAUDE_SESSION_ID_PREVIOUS=""
+LAST_PROJECT_DIRTY_ENTRIES="0"
+LAST_WORKTREE_SUMMARY_TOTAL="1"
+LAST_WORKTREE_SUMMARY_DIRTY="0"
+CHECKPOINT_DRIFT_STREAK_CURRENT="0"
+LAST_DELEGATED_CONTINUATION_PENDING_IDS=""
+LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0"
+LAST_DELEGATED_CONTINUATION_CONSUMED_IDS=""
+LAST_DELEGATED_CONTINUATION_CONSUMED_AT=""
+LAST_RESTART_STORM_WINDOW_SECS="0"
+LAST_RESTART_STORM_COUNT="0"
+LAST_PROCESS_CHURN_PEAK="0"
+LAST_RESTART_STORM_SIGNAL_AT=""
+LAST_RESTART_STORM_SIGNAL_REASON=""
+LAST_RESTART_STORM_ESCALATED_AT=""
+LAST_RESTART_STORM_ESCALATION_TARGET=""
+AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV=""
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_exit_rc_0"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-24T09:00:00Z"
+EOF
+
+cat >"$PROJECT/.freely/run/manager-continuity-20260424-090000.md" <<EOF
+# Manager Continuity
+
+## Primary Judgement
+
+- route_kind: \`cleanup_governance\`
+- restart_point: \`review retained mixed-scope cleanup lane owner truth\`
+- ownership: \`manager-owned owner-rebind continuation\`
+- next_action: \`reconcile owner binding before any worker delegation\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-exit-contract.env" <<'EOF'
+EXIT_KIND="resume_manager"
+RESTART_POINT="review retained mixed-scope cleanup lane owner truth"
+NEXT_ACTION="reconcile owner binding before any worker delegation"
+WHY_NOT_STOP="unfinished manager-owned continuity remains open"
+WHY_NOT_DELEGATE="no launchable worker authority exists yet"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+ACTION="$(manager_runtime_handle_exit_contract_after_ai_cycle "$PROJECT" "ai_exit_rc_0")"
+[[ "$ACTION" == "resume_manager" ]] || {
+  echo "[FAIL] expected resume_manager action, got $ACTION" >&2
+  exit 1
+}
+
+HANDOFF="$PROJECT/.freely/run/session-handoff.txt"
+[[ -f "$HANDOFF" ]] || {
+  echo "[FAIL] expected session handoff to be written" >&2
+  exit 1
+}
+
+grep -q 'rotation_reason: manager_exit_contract_resume' "$HANDOFF"
+grep -q 'reason: manager_exit_contract_resume' "$HANDOFF"
+grep -q 'restart_point: review retained mixed-scope cleanup lane owner truth' "$HANDOFF"
+grep -q 'next_action: reconcile owner binding before any worker delegation' "$HANDOFF"
+grep -q 'This is a valid manager continuation, not an exit-contract repair round.' "$HANDOFF"
+if grep -q 'Repair Contract' "$HANDOFF"; then
+  echo "[FAIL] resume handoff should not be marked as a repair contract" >&2
+  exit 1
+fi
+
+echo "[PASS] manager resume exit contract writes a continuation handoff instead of a repair handoff"
