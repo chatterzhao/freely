@@ -5,3 +5,4 @@
 3. Fast-path the bounded closeout/self-host interruption prompts while preserving generic AI fallback for `codex` and `cc`.
 4. Write the focused verification artifact and keep the owner bound to this checkpoint worktree.
 5. Decide whether a guarded premerge replay can follow directly or whether one real-repo self-host replay is still needed first.
+6. Keep exit-contract repair resumes anchored to the repair contract before the broad lead-agent body so retained cleanup followthrough cannot silently downgrade into a no-op completion receipt.

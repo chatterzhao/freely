@@ -25,6 +25,9 @@
 7. Run `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler-cc`.
 8. Run `git diff --check`.
 9. Run `./bin/governance-check`.
+10. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-repair-prompt-prioritizes-exit-contract`.
+11. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`.
+12. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`.
 
 ## End-to-End
 - acceptance target: `The bounded owner is documented well enough that a later guarded replay can evaluate it as one lawful feature lane instead of a checkpoint-only branch.`
@@ -85,12 +88,24 @@
 
 ### Guarded promote preserves closeout selfhost adequacy
 - id: `guarded-promote-preserves-closeout-selfhost-adequacy`
-- requirement: `The guarded test-pre-merge replay keeps daemon reuse, lawful start-lock cleanup, worker startup-truth attach, and interruption-manager fast paths intact before develop absorbs this owner.`
+- requirement: `The guarded test-pre-merge replay keeps the new exit-contract repair prompt ordering and the existing exit-contract repair directives intact before develop absorbs this owner.`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
-- task_refs: `tasks.md#1,tasks.md#2,tasks.md#3`
-- case_design: `Merge the checkpoint owner into the current test-pre-merge-runtime-lifecycle-20260419 batch, rerun the bounded regression set plus governance-check there, and confirm the guarded promote path still carries the same bounded behavior.`
+- task_refs: `tasks.md#6`
+- case_design: `Merge this owner into test-pre-merge-20260424-worker-exit-contract-repair-focus, rerun the repair-first prompt regression plus the two existing exit-contract regressions and governance-check there, and confirm the guarded promote path preserves the narrow repair contract ordering.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-exit-contract-repair-focus-verification.md`
+
+### Exit-contract repair prompt stays repair-first
+- id: `exit-contract-repair-prompt-stays-repair-first`
+- requirement: `When runtime resumes a worker or manager specifically for exit-contract repair, the repair contract must render ahead of the broad lead-agent preamble so the resumed lane repairs the contract before any wider patrol.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#6`
+- case_design: `Seed a worker repair session handoff, build the prompt, and assert the repair-first override appears before the lead-agent body while the broader exit-contract directive and resume-repair enforcement still pass.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-exit-contract-repair-focus-verification.md`

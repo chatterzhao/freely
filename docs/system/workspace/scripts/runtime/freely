@@ -10518,6 +10518,35 @@ EOF
   cat "$handoff_path"
 }
 
+prepend_exit_contract_repair_focus_if_needed() {
+  local project="$1"
+  local rotation_reason handoff_path
+  rotation_reason="$(session_handoff_rotation_reason "$project" || true)"
+  handoff_path="$(handoff_file "$project")"
+  case "$rotation_reason" in
+    worker_exit_contract_repair)
+      cat <<EOF
+Repair-first override:
+- 当前轮次是 worker exit contract repair。先补齐缺失或无效的 worker exit contract，再做任何其它扩展阅读、实现或 broad patrol。
+- 继续沿用当前 worker issue 边界，不要重开 manager patrol，也不要把自己提升成主管。
+- 必须在本轮结束前写出有效的 $(worker_exit_contract_file "$project")；否则 runtime 会继续按同一 resume target 拉回修复。
+- handoff_evidence: \`${handoff_path}\`
+
+EOF
+      ;;
+    manager_exit_contract_repair)
+      cat <<EOF
+Repair-first override:
+- 当前轮次是 manager exit contract repair。先补齐缺失或无效的 manager exit contract，再做新的 delegation、cleanup judgement 或 broad patrol。
+- 继续沿用当前 manager 上下文，不要忽略 repair contract 去重跑首轮排班。
+- 必须在本轮结束前写出有效的 $(manager_exit_contract_file "$project")；否则 runtime 会继续按同一 resume target 拉回修复。
+- handoff_evidence: \`${handoff_path}\`
+
+EOF
+      ;;
+  esac
+}
+
 manager_continuity_resume_focus_route_kind() {
   local continuity_file="$1"
   [[ -f "$continuity_file" ]] || return 1
@@ -13801,6 +13830,7 @@ build_prompt() {
     return 1
   fi
   workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
+  prepend_exit_contract_repair_focus_if_needed "$PROJECT_ROOT"
   AI_TOOL_ADAPTER="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AI_TOOL:-}")}" \
   AI_TOOL_ADAPTER_POLICY="${AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AI_TOOL:-}")}" \
   AI_TOOL_CAPABILITIES="${AI_TOOL_CAPABILITIES:-}" \
