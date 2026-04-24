@@ -29,8 +29,12 @@
 11. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-uses-status-signals-when-manager-idle`.
 12. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-worker-count-fast-path`.
 13. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status`.
-14. Run `./bin/governance-check`.
-15. Run `git diff --check`.
+14. Run `bash docs/system/workspace/scripts/tests/test-freely-start-skips-preflight-slot-recovery-when-auto-switch-slot-disabled`.
+15. Run `bash docs/system/workspace/scripts/tests/test-watchdog-manager-entry-skips-slot-selection-when-auto-switch-slot-disabled`.
+16. Run `bash docs/system/workspace/scripts/tests/test-watchdog-probe-all-skips-sweep-when-auto-switch-slot-disabled`.
+17. Run `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`.
+18. Run `./bin/governance-check`.
+19. Run `git diff --check`.
 
 ## End-to-End
 - acceptance target: `Promote the bounded startup self-heal owner through canonical develop instead of treating feature-lane replay as final absorption.`
@@ -78,7 +82,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `Replay the followthrough fix through the guarded feature -> test-pre-merge -> develop lane and prove protected-root startup either self-heals stale state or remains in a live retryable supervisor state instead of collapsing to fake runtime absence.`
-- case_design: `Merge the followthrough lane into a disposable test-pre-merge batch, rerun the focused startup-self-heal regressions there, then replay protected-root daemon start plus one-minute observation to confirm live-status and lifecycle evidence stay aligned for short-lived non-interactive CLI tools.`
+- case_design: `Merge the followthrough lane into a disposable test-pre-merge batch, rerun the focused startup-self-heal regressions there, explicitly verify AUTO_SWITCH_SLOT=false blocks startup/watchdog slot inventory and probing, then replay protected-root daemon start plus one-minute observation to confirm live-status and lifecycle evidence stay aligned for short-lived non-interactive CLI tools.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/code-reviews/20260419-runtime-startup-self-healing-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/code-reviews/20260423-runtime-startup-self-healing-disabled-slot-auto-switch-verification.md`
