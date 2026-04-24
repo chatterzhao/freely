@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-exit-contract-materializable.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+TARGET_WT="$WT_ROOT/20260423-feature-materializable-worker"
+PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/materializable-worker.txt"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT" "$PROJECT/docs/pre-brainstorms/20260423-0001--sample"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260423-0001--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260423-0001--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260423-0001--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+git -C "$PROJECT" add AGENTS.md docs
+git -C "$PROJECT" commit -q -m init
+
+cat >"$PROMPT_FILE" <<EOF
+Worktree:
+- \`$TARGET_WT\`
+Branch:
+- \`feature/materializable-worker\`
+dispatch_priority: \`P1\`
+parallel_safe: \`false\`
+write_scope:
+- \`$TARGET_WT\`
+intent_kind: \`edit\`
+intent_target: \`materialize missing worker lane\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+cat >"$(manager_exit_contract_file "$PROJECT")" <<EOF
+EXIT_KIND="delegate_workers"
+WORKER_PROMPTS_CSV="$PROMPT_FILE"
+EOF
+
+RESULT="$(validate_manager_exit_contract_for_project "$PROJECT" || true)"
+[[ -z "$RESULT" ]] || {
+  echo "[FAIL] materializable missing worktree prompt should remain launchable for delegate_workers, got $RESULT" >&2
+  exit 1
+}
+
+echo "[PASS] manager exit contract accepts delegate_workers when the worker lane can be materialized from prompt metadata"
