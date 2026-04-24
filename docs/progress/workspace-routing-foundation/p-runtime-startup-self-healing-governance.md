@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/live-status-hang-root-cause-20260422`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-live-status-hang-root-cause`
-- updated_at: `2026-04-22`
+- updated_at: `2026-04-23`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -20,6 +20,7 @@
 - Supported-tool PID validation now reads launcher fragments from configured tool support instead of stale hard-coded argv assumptions, including the lawful `claude` process behind `cc` aliases while still rejecting foreign same-tool processes.
 - Execution-time network failure handling now supports bounded project-scoped proxy self-heal, verified by a `hi` probe, without silently re-enabling `AUTO_SWITCH_TOOL` or `AUTO_SWITCH_SLOT` when those settings are disabled.
 - `live-status` no longer pays the heavy fleet-refresh cost while the manager AI is already active; it uses cached launch-state and lightweight intake/worker counters so status polling does not perturb the same startup window this owner is trying to stabilize.
+- Continuation `2026-04-23`: a real operator report showed `AUTO_SWITCH_SLOT=false` still allowed startup/watchdog paths to inventory saved codex slots and eventually rewrite `~/.codex/auth.json`. The bounded repair now short-circuits startup preflight, watchdog entry selection, and watchdog full-sweep probing before any slot switch/probe happens when slot auto-switch is disabled.
 - Focused regressions are green in both the feature lane and the disposable `test-pre-merge-20260422-live-status-hang-root-cause` lane; the remaining work is to land the owner docs, replay the guarded merge, and then re-run canonical root daemon validation on updated `develop`.
 
 ## Success Criteria
@@ -40,9 +41,11 @@
 8. `bash docs/system/workspace/scripts/tests/test-freely-live-status-active-manager-skips-fleet-refresh`, `bash docs/system/workspace/scripts/tests/test-freely-live-status-uses-status-signals-when-manager-idle`, and `bash docs/system/workspace/scripts/tests/test-freely-live-status-worker-count-fast-path` all pass, so status polling now stays lightweight in the exact manager-active window that previously churned.
 9. The feature lane and the disposable `test-pre-merge-20260422-live-status-hang-root-cause` lane both pass the focused regression set: `bash -n docs/system/workspace/scripts/runtime/freely`, `bash docs/system/workspace/scripts/tests/test-freely-manager-bootstrap-keeps-supervisor-after-ai-launch-observed`, `bash docs/system/workspace/scripts/tests/test-freely-startup-self-heal-keeps-codex-wrapper-ai-pid`, `bash docs/system/workspace/scripts/tests/test-freely-ai-pid-validation-supported-tools`, `bash docs/system/workspace/scripts/tests/test-freely-proxy-self-heal`, `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`, `bash docs/system/workspace/scripts/tests/test-freely-live-status-active-manager-skips-fleet-refresh`, `bash docs/system/workspace/scripts/tests/test-freely-live-status-uses-status-signals-when-manager-idle`, and `bash docs/system/workspace/scripts/tests/test-freely-live-status-worker-count-fast-path`.
 10. The guarded `feature -> test-pre-merge` merge already succeeded for `feature/live-status-hang-root-cause-20260422`; the first `test-pre-merge -> develop` replay was blocked only because the merge diff lacked owner lifecycle artifacts, not because of code/test failure.
+11. A separate bounded continuation lane `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-guard-disable-slot-switch-probe` now adds an explicit `AUTO_SWITCH_SLOT=false` guard to `preflight_codex_slot_recovery_before_start_or_fail()`, `ensure_codex_slot_ready_for_manager()`, `probe_any_usable_codex_slot_now()`, `probe_all_codex_slots_and_update_cooldown()`, and `switch_to_codex_slot()`.
+12. The focused regressions `test-freely-start-skips-preflight-slot-recovery-when-auto-switch-slot-disabled`, `test-watchdog-manager-entry-skips-slot-selection-when-auto-switch-slot-disabled`, `test-watchdog-probe-all-skips-sweep-when-auto-switch-slot-disabled`, and baseline `test-ai-cli-switch-default-tool` all passed in both the feature lane and `test-pre-merge-20260423-guard-disable-slot-switch-probe`.
 
 ## Next Action
 
-1. Re-run the guarded `test-pre-merge-20260422-live-status-hang-root-cause -> develop` merge now that the owner lifecycle artifacts are in the diff.
-2. After canonical `develop` carries the patch, restart `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` and verify the old `L041 -> L223 supervisor_alive_ai_missing_after_grace` sequence no longer reproduces.
-3. Once canonical replay is green, push `develop`, retire `test-pre-merge-20260422-live-status-hang-root-cause`, and retire `feature/live-status-hang-root-cause-20260422`.
+1. Re-run the guarded `test-pre-merge-20260423-guard-disable-slot-switch-probe -> develop` merge with this owner evidence in the diff.
+2. After canonical `develop` carries the patch, restart `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` under `AUTO_SWITCH_SLOT=false` and verify `~/.codex/auth.json` no longer changes from background startup/watchdog probing.
+3. Once canonical replay is green, retire `test-pre-merge-20260423-guard-disable-slot-switch-probe` and `feature/guard-disable-slot-switch-probe`, then continue the broader protected-root daemon replay closeout for this owner.

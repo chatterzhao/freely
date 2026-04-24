@@ -489,6 +489,7 @@ preflight_codex_slot_recovery_before_start_or_fail() {
   local project="$1"
   local entry_slot=""
   [[ "${AI_TOOL:-}" == "codex" ]] || return 0
+  config_bool_enabled "${AUTO_SWITCH_SLOT:-true}" || return 0
   if [[ -f "$(codex_active_auth_file)" ]] && [[ -n "$(codex_current_identity_hint "$project" || true)" ]]; then
     return 0
   fi

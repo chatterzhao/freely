@@ -21,7 +21,7 @@
   - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
   - `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
 - created_at: `2026-04-19`
-- updated_at: `2026-04-22`
+- updated_at: `2026-04-23`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -65,6 +65,7 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 7. Network execution failures can attempt bounded project-scoped proxy self-heal, verified by a live `hi` probe, without changing tool or slot selection when those auto-switch controls are disabled.
 8. `live-status` and related ownership checks keep a live daemon runtime authoritative when the recorded project root and the inspected project root resolve to the same on-disk directory even if the path spelling differs, and avoid heavy fleet refresh while a manager AI is already active.
 9. `daemon start` launches `daemon-run` in a session-detached way that survives short-lived non-interactive caller teardown instead of depending on shell job control.
+10. When `AUTO_SWITCH_SLOT=false`, startup/watchdog recovery paths do not inventory saved codex slots, do not probe candidate slots, and do not rewrite `~/.codex/auth.json` behind the operator's back.
 
 ## Verification
 
@@ -94,3 +95,4 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 2. Short-lived non-interactive AI tools remain compatible with attach/reuse, daemon cold-start, and existing after-failure recovery semantics because launch-in-flight state is recorded before child exit, `ai_launch_in_flight` stays inside the bounded bootstrap grace window, and prompt-build failure now stays retryable under a live supervisor.
 3. Supported-tool PID matching, manager-active status fast paths, and proxy self-heal all preserve project-scoped truth without re-enabling disabled tool/slot auto-switch.
 4. Verification evidence is written back in this owner, then the branch is merged to `develop`, pushed, and the dedicated worktree is retired.
+5. Disabled slot auto-switch remains a hard stop for startup/watchdog recovery: no background codex slot probe or switch may touch live auth material until the operator explicitly re-enables it.
