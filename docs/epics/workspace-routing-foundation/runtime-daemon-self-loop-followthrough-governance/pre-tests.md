@@ -48,6 +48,8 @@
 30. Run `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`.
 31. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-missing-resume-evidence-falls-back`.
 32. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-stop-refreshes-manager-operator-boundary`.
+33. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`.
+34. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -379,6 +381,18 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-daemon-stop-boundary-verification.md`
+
+### Queue-state worker handoffs stay launchable through delegate_workers
+- id: `queue-state-worker-handoff-launches-worker`
+- requirement: `When manager continuity uses the current ## Queue State shape with worker_prompts:, runtime must still extract the prompt, record launch-state truth, and start the worker after delegate_workers.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#26`
+- case_design: `Replay the queue-state handoff repair on a disposable protected test lane, rerun the continuity parsing and post-AI-cycle launch regressions there, and stage a fresh owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-queue-state-worker-prompt-premerge-verification.md`
 
 ### Protected replay stages explicit daemon-stop boundary evidence
 - id: `daemon-stop-boundary-premerge-proof`

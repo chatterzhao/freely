@@ -33,6 +33,7 @@
 - followthrough_update_8: Latest canonical `develop` replay then exposed a proxy-resolution seam rather than a real network outage: project config carried `FREELY_NETWORK_PROXY_MODE=explicit` with empty proxy values, global config still held a valid explicit proxy, and resolver precedence treated the empty project explicit block as authoritative, so manager repeatedly stalled on `proxy_config_invalid` before self-work could resume.
 - followthrough_update_9: After the fleet narrowed to one retained dirty blocker lane, canonical replay still exposed two same-owner launchability seams: project worktree summary could throw a broken pipe during daemon patrol, and manager could legally choose a worker prompt from scan/continuity but fail to materialize a missing sibling worktree or wrongly retire a fresh merged-tip edit lane whose authoritative prompt still carried active `edit` ownership.
 - followthrough_update_10: Fresh restart observation then exposed one more same-owner patrol-freshness seam: `daemon stop` only wrote `operator_daemon_stop`, but the manager continuity staleness boundary refreshed only for plain `operator_stop`, so startup patrol could still reuse pre-stop cleanup continuity instead of the new scan-selected queue.
+- followthrough_update_11: Fresh canonical replay then exposed a narrower handoff-parser seam: manager could write cleanup followthrough in the current `## Queue State` shape with `worker_prompts:`, but runtime still parsed that continuity as prompt-empty, so `delegate_workers` exited cleanly while no worker was ever queued or launched.
 - why_now:
   - this blocker prevents Freely from autonomously selecting, finishing, and closing tasks on canonical `develop`
   - the fix is already implemented and focused regressions are green in the blocker worktree, but guarded develop promotion still needs lawful owner evidence
@@ -52,6 +53,7 @@
   - daemon patrol no longer emits a broken-pipe failure while computing project worktree summary for live-status / startup followthrough
   - manager launch/exit-contract validation can treat a prompt-targeted missing sibling worktree as materializable runtime truth, and a merged-tip lane with an authoritative `edit` prompt is not misclassified as retire-ready cleanup residue
   - explicit `daemon stop` refreshes the same startup freshness boundary used by patrol continuity filtering, so post-stop startup patrol cannot reuse pre-stop manager continuity as current queue truth
+  - current `## Queue State` continuity with `worker_prompts:` remains launchable runtime truth, so manager `delegate_workers` cannot silently drop the selected worker handoff on canonical replay
   - guarded `feature/* -> test-pre-merge-* -> develop` replay succeeds with concrete owner evidence
   - on canonical `develop`, `freely daemon start` autonomously selects at least one task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task
 - promotion_gate:
