@@ -1,0 +1,216 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-exit-contract-cleanup-nonlaunchable.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WT_ROOT="$TMP_DIR/worktrees"
+FEATURE_WT="$WT_ROOT/feature-cleanup"
+PREMERGE_WT="$WT_ROOT/test-pre-merge-cleanup"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$PROJECT/docs/pre-brainstorms/20260421-0000--sample" "$WT_ROOT"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260421-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260421-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260421-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+mkdir -p "$PROJECT/docs/epics/demo/cleanup-governance/issues" "$PROJECT/docs/epics/demo/cleanup-governance/code-reviews" "$PROJECT/docs/progress/demo"
+cat >"$PROJECT/docs/epics/demo/cleanup-governance/issues/cleanup-governance.md" <<'EOF'
+# Issue: cleanup-governance
+
+- issue_id: `I-20260421-1330-A`
+- pre_tests_path: `docs/epics/demo/cleanup-governance/pre-tests.md`
+- progress_path: `docs/progress/demo/p-cleanup-governance.md`
+- verification_artifact_dir: `docs/epics/demo/cleanup-governance/code-reviews`
+EOF
+cat >"$PROJECT/docs/epics/demo/cleanup-governance/pre-tests.md" <<'EOF'
+# Pre-tests
+EOF
+cat >"$PROJECT/docs/progress/demo/p-cleanup-governance.md" <<'EOF'
+# Progress
+EOF
+
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m init
+
+git -C "$PROJECT" worktree add -q -b feature/cleanup "$FEATURE_WT" develop
+git -C "$PROJECT" worktree add -q -b test-pre-merge-cleanup "$PREMERGE_WT" develop
+
+echo cleanup >"$FEATURE_WT/cleanup.txt"
+git -C "$FEATURE_WT" add cleanup.txt
+git -C "$FEATURE_WT" commit -q -m "cleanup fixture"
+git -C "$PROJECT" merge --no-ff -m "merge cleanup fixture" feature/cleanup >/dev/null
+
+echo merged-followthrough >"$FEATURE_WT/docs/progress/demo/p-cleanup-governance.md"
+
+for wt in "$PROJECT" "$FEATURE_WT" "$PREMERGE_WT"; do
+  mkdir -p "$wt/.freely/run" "$wt/.freely/logs"
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+done
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_exit_rc_0"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-24T07:52:10Z"
+EOF
+
+for wt in "$FEATURE_WT" "$PREMERGE_WT"; do
+  cat >"$wt/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-24T07:52:10Z"
+EOF
+done
+
+AI_PROMPT="$PROJECT/.freely/run/worker-prompts/20260424-004759-worker-runtime-cleanup-followthrough-hygiene-codex.txt"
+cat >"$AI_PROMPT" <<EOF
+Worktree:
+- \`$FEATURE_WT\`
+Branch:
+- \`feature/cleanup\`
+dispatch_priority: \`P0\`
+parallel_safe: \`true\`
+write_scope:
+- \`docs/system/workspace/scripts/runtime/freely\`
+- \`.freely/**\`
+intent_kind: \`cleanup\`
+intent_target: \`$FEATURE_WT\`
+
+Goal: inspect the dirty checkpoint drift and classify it without widening scope.
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260424-004759.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+
+## Primary Judgement
+
+- route_kind: \`cleanup_governance\`
+- restart_point: \`I-20260421-1330-A remains blocked on retained merged cleanup followthrough\`
+- next_action: \`delegate_hygiene_worker\`
+- selected_tool: \`codex\`
+
+## Evidence
+
+- issue_truth: \`docs/epics/demo/cleanup-governance/issues/cleanup-governance.md\`
+- progress_truth: \`docs/progress/demo/p-cleanup-governance.md\`
+
+## Fleet Inventory
+
+- protected_root:
+  path: \`$PROJECT\`
+  branch: \`develop\`
+  clean_state: \`CLEAN\`
+  role: \`manager\`
+- selected_cleanup_lane:
+  path: \`$FEATURE_WT\`
+  branch: \`feature/cleanup\`
+  clean_state: \`DIRTY\`
+  desired: \`stopped\`
+  role_hint: \`cleanup\`
+  disposition: \`retained-with-reason\`
+- selected_cleanup_companion:
+  path: \`$PREMERGE_WT\`
+  branch: \`test-pre-merge-cleanup\`
+  clean_state: \`CLEAN\`
+  desired: \`stopped\`
+  role_hint: \`manager/premerge\`
+  disposition: \`retain as disposable premerge batch\`
+
+## Worker Delegation
+
+- worker_prompt: \`$AI_PROMPT\`
+- rationale: \`ai selected the retained dirty cleanup lane as the next highest-leverage source\`
+EOF
+
+cat >"$(cd "$PROJECT" && pwd -P)/.freely/run/manager-exit-contract.env" <<EOF
+EXIT_KIND="delegate_workers"
+WORKER_PROMPTS_CSV="$AI_PROMPT"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+ACTION="$(manager_runtime_handle_exit_contract_after_ai_cycle "$PROJECT" "ai_exit_rc_0")"
+[[ "$ACTION" == "delegate_workers" ]] || {
+  echo "[FAIL] expected cleanup governance autofill to recover nonlaunchable worker prompt, got $ACTION" >&2
+  exit 1
+}
+
+UPDATED_CSV="$(meta_env_value "$(manager_exit_contract_file "$PROJECT")" "WORKER_PROMPTS_CSV")"
+[[ -n "$UPDATED_CSV" ]] || {
+  echo "[FAIL] expected updated worker prompts csv" >&2
+  exit 1
+}
+
+IFS=',' read -r -a PROMPTS <<<"$UPDATED_CSV"
+MATERIALIZED_PROMPT=""
+for prompt in "${PROMPTS[@]}"; do
+  [[ -f "$prompt" ]] || continue
+  if [[ "$prompt" != "$AI_PROMPT" ]]; then
+    MATERIALIZED_PROMPT="$prompt"
+    break
+  fi
+done
+
+[[ -n "$MATERIALIZED_PROMPT" && -f "$MATERIALIZED_PROMPT" ]] || {
+  echo "[FAIL] expected a materialized authoritative cleanup worker prompt" >&2
+  exit 1
+}
+
+worker_prompt_has_verification_metadata "$MATERIALIZED_PROMPT"
+worker_prompt_launchable_for_manager_project "$PROJECT" "$MATERIALIZED_PROMPT"
+grep -Fq "$MATERIALIZED_PROMPT" "$CONTINUITY"
+grep -q 'manager_exit_contract_autofilled_cleanup_delegate_workers' "$PROJECT/.freely/logs/runtime-events.log"
+
+echo "[PASS] cleanup governance autofill materializes a launchable worker prompt when the existing prompt is nonlaunchable"
