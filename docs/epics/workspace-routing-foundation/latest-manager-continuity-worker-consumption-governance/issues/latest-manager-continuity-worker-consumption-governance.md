@@ -174,6 +174,29 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-human-chat-intake`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
 
+## 2026-04-24 Same-Family Plain Worker Prompt List Parsing Repair
+
+- Canonical replay after the cleanup-followthrough chain repairs exposed another same-family launch-consumption gap:
+  - the manager produced a fresh continuity and worker prompt for the retained cleanup lane
+  - the continuity wrote that prompt under `## Worker Prompts` as a plain bullet list
+  - runtime launch-state consumption only treated `launched:` and `queue:` subsections as launchable
+  - result: `manager_exit_contract_delegate_workers` fired, but `LAST_MANAGER_WORKER_PROMPTS_GENERATED` stayed empty and the retained cleanup worker never launched
+- Why this is same-family:
+  - the defect sits exactly on the latest continuity -> worker prompt consumption seam already owned by `I-20260322-0445`
+  - no new task-source taxonomy, recovery authority, or supervisor role split is needed
+  - runtime remains the launcher; manager/worker AI still only materialize artifacts
+- Narrow repair:
+  - treat plain bullets directly under `## Worker Prompts` as launchable prompts, the same as `launched:` / `queue:` entries
+  - keep `Frozen Queue` / frozen-only prompts non-launchable
+  - update the parser regression and latest-continuity consumption regression so the current continuity format is exercised explicitly
+- Verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
+  - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
+  - `./bin/governance-check`
+- Current judgement:
+  - absorb this as a same-family repair inside `I-20260322-0445`
+  - do not split a new lifecycle, because the broken seam is still continuity prompt consumption rather than a new runtime architecture owner
+
 ## Retirement Audit
 
 - audit_date: `2026-03-24`
