@@ -534,3 +534,15 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-recorded-self-intent-verification.md`
+
+### Protected replay stages recorded self-intent relaunch evidence
+- id: `recorded-self-intent-worker-relaunch-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the recorded self-intent relaunch regression together with adjacent ownership queue guards and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#33`
+- case_design: `Replay the recorded-self-intent relaunch repair on a disposable protected lane, rerun the focused relaunch, retained-cleanup reclaim, duplicate-owner queue, and stale-queue regressions there, then stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-recorded-self-intent-premerge-verification.md`
