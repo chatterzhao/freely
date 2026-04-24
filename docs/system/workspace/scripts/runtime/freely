@@ -7612,15 +7612,11 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
           worker_prompts_subsection="frozen"
           next
         }
-        if ((worker_prompts_subsection == "launchable" || worker_prompts_subsection == "queue") && ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/ || $0 ~ /worker_prompt:/)) {
+        if (worker_prompts_subsection == "queue" && ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/ || $0 ~ /worker_prompt:/)) {
           emit_prompt_paths($0)
           next
         }
-        if ((worker_prompts_subsection == "" || worker_prompts_subsection == "launchable" || worker_prompts_subsection == "queue") && ($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/ || $0 ~ /worker_prompt:/)) {
-          emit_prompt_paths($0)
-          next
-        }
-        if ((worker_prompts_subsection == "" || worker_prompts_subsection == "launchable" || worker_prompts_subsection == "queue") && $0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+        if (worker_prompts_subsection == "queue" && $0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
           emit_prompt_paths($0)
           next
         }
