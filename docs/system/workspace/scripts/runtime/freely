@@ -7674,6 +7674,55 @@ latest_queued_manager_worker_prompt_paths_from_continuity() {
   ' "$continuity_file"
 }
 
+worker_prompt_superseded_paths() {
+  local prompt_file="$1"
+  [[ -f "$prompt_file" ]] || return 0
+  awk '
+    function emit_prompt_paths(line,    remaining) {
+      remaining=line
+      while (match(remaining, /\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt/)) {
+        print substr(remaining, RSTART, RLENGTH)
+        remaining=substr(remaining, RSTART + RLENGTH)
+      }
+    }
+    /^This prompt supersedes / {
+      capture=1
+      next
+    }
+    capture == 1 {
+      if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+        emit_prompt_paths($0)
+        next
+      }
+      if ($0 ~ /^[[:space:]]*$/ || $0 !~ /^[[:space:]]*-[[:space:]]/) {
+        capture=0
+      }
+    }
+  ' "$prompt_file" | sort -u
+}
+
+worker_prompt_supersedes_prompt() {
+  local prompt_file="$1" candidate_prompt="$2" superseded_prompt
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  [[ -n "$candidate_prompt" && -f "$candidate_prompt" ]] || return 1
+  while IFS= read -r superseded_prompt; do
+    [[ -n "$superseded_prompt" ]] || continue
+    [[ "$superseded_prompt" == "$candidate_prompt" ]] && return 0
+  done < <(worker_prompt_superseded_paths "$prompt_file")
+  return 1
+}
+
+manager_launchable_prompt_supersedes_frozen_prompt() {
+  local continuity_file="$1" frozen_prompt="$2" prompt_file
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 1
+  [[ -n "$frozen_prompt" && -f "$frozen_prompt" ]] || return 1
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    worker_prompt_supersedes_prompt "$prompt_file" "$frozen_prompt" && return 0
+  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  return 1
+}
+
 worker_prompt_target_branch() {
   local prompt_file="$1"
   [[ -f "$prompt_file" ]] || return 0
@@ -9436,6 +9485,7 @@ manager_frozen_blocking_intent_signatures_csv() {
   }
   while IFS= read -r prompt_file; do
     [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    manager_launchable_prompt_supersedes_frozen_prompt "$continuity_file" "$prompt_file" && continue
     signature="$(worker_prompt_blocking_intent_signature "$project" "$prompt_file")"
     [[ -n "$signature" ]] || continue
     csv="$(csv_append_unique_item "$csv" "$signature")"
@@ -9495,6 +9545,7 @@ manager_worktree_ownership_claim_snapshot() {
 
     while IFS= read -r prompt_file; do
       [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+      manager_launchable_prompt_supersedes_frozen_prompt "$continuity_file" "$prompt_file" && continue
       worker_prompt_targets_worktree "$project" "$prompt_file" "$target_worktree" || continue
       holder_branch="$(worker_prompt_target_branch "$prompt_file")"
       printf 'frozen-owner|%s|%s|frozen\n' "${holder_branch:-unknown}" "$prompt_file"
@@ -9581,6 +9632,7 @@ manager_frozen_prompt_for_blocking_intent_signature() {
   while IFS= read -r prompt_file; do
     [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
     [[ -n "$exclude_prompt" && "$prompt_file" == "$exclude_prompt" ]] && continue
+    manager_launchable_prompt_supersedes_frozen_prompt "$continuity_file" "$prompt_file" && continue
     prompt_signature="$(worker_prompt_blocking_intent_signature "$project" "$prompt_file")"
     [[ -n "$prompt_signature" && "$prompt_signature" == "$signature" ]] || continue
     printf '%s\n' "$prompt_file"
