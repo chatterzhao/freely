@@ -13,6 +13,7 @@ cat >"$FALSE_LOG" <<'EOF'
 - docs mention `402 Payment Required`
 - docs mention `subscription_expired`
 - docs mention `Please log in`
+2026-04-24T11:34:32.401071Z ERROR apply_patch verification failed: Failed to read file to update /tmp/example.env: No such file or directory (os error 2)
 EOF
 
 cat >"$TRUE_LOG" <<'EOF'

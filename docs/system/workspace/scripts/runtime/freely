@@ -5686,7 +5686,7 @@ log_has_auth_failure() {
   if [[ "${AI_TOOL:-}" == "codex" && "$(codex_live_auth_kind)" == "apikey" ]]; then
     excerpt="$(printf '%s\n' "$excerpt" | sed '/codex_login::auth::manager: Failed to refresh token: 401 Unauthorized/d')"
   fi
-  printf '%s\n' "$excerpt" | rg -qi '401|402 payment required|403 forbidden|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired|login required'
+  printf '%s\n' "$excerpt" | rg -qi '402 payment required|403 forbidden|auth error: 402|unauthorized|invalid.?token|token.?expired|authentication.?failed|auth failed|deactivated_workspace|workspace deactivated|请先登录|subscription.?expired|login required'
 }
 
 log_has_proxy_config_invalid() {

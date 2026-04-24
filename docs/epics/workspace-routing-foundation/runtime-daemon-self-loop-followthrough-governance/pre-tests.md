@@ -57,6 +57,7 @@
 39. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-retained-merged-cleanup-self-intent`.
 40. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-cleanup-queue-recorded-owner-from-verification-contract`.
 41. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-queued-prompt`.
+42. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-auth-failure-signal-filter`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -160,6 +161,18 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-proxy-guidance-verification.md`
+
+### Guarded promote carries fresh auth-failure classifier evidence
+- id: `guarded-promote-auth-failure-timestamp-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving runtime no longer classifies timestamp-shaped non-auth errors as auth_failure before the retained cleanup followthrough can continue.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#28`
+- case_design: `Replay the current auth-failure timestamp false-positive repair through the disposable protected lane, rerun the focused auth-classification regressions plus the real-log classifier check, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-auth-failure-timestamp-verification.md`
 
 ### Runtime exit contracts are machine-checkable and self-repairable
 - id: `runtime-exit-contract-enforcement`
