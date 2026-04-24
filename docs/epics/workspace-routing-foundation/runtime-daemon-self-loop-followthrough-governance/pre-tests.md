@@ -471,3 +471,27 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-nonlaunchable-cleanup-autofill-premerge-verification.md`
+
+### Retained cleanup self-intent relaunch stays launchable
+- id: `retained-cleanup-self-intent-relaunch`
+- requirement: `When manager relaunches a retained merged cleanup lane from authoritative verification-bound prompt truth, runtime must let that lane reclaim its own recorded cleanup intent instead of self-queuing forever.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#32`
+- case_design: `Seed a retained merged cleanup lane whose current recorded cleanup signature matches the authoritative delegated prompt, then verify manager launches that prompt while adjacent duplicate-owner and stale-queue guards remain intact.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-retained-cleanup-self-intent-verification.md`
+
+### Protected replay stages retained cleanup self-intent relaunch evidence
+- id: `retained-cleanup-self-intent-relaunch-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the retained cleanup self-intent relaunch regression together with adjacent queue/ownership guards and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#32`
+- case_design: `Replay the retained cleanup self-intent relaunch repair on a disposable protected lane, rerun the focused retained-self-reclaim, duplicate-owner, stale-queue, and post-ai-cycle launch regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-retained-cleanup-self-intent-premerge-verification.md`
