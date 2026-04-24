@@ -9287,6 +9287,24 @@ manager_other_worker_project_for_blocking_intent_signature() {
   done < <(all_repo_worktrees_for_project "$project")
 }
 
+manager_prompt_may_reclaim_recorded_self_intent() {
+  local project="$1" target_project="$2" prompt_file="$3" prompt_signature="$4"
+  local target_signature target_branch
+  [[ -n "$project" && -n "$target_project" && -d "$target_project" ]] || return 1
+  [[ -n "$prompt_file" && -f "$prompt_file" && -n "$prompt_signature" ]] || return 1
+  [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]] || return 1
+  worker_prompt_has_verification_metadata "$prompt_file" || return 1
+  target_signature="$(project_current_blocking_intent_signature "$target_project")"
+  [[ -n "$target_signature" && "$target_signature" == "$prompt_signature" ]] || return 1
+  target_branch="$(worker_prompt_target_branch "$prompt_file")"
+  if worker_project_is_absorbed_merged_lane "$project" "$target_project" "$target_branch" || \
+    worker_project_is_retire_ready_merged_followthrough "$project" "$target_project" "$target_branch" "$prompt_file" || \
+    worker_prompt_targets_retire_ready_merged_worktree "$project" "$prompt_file"; then
+    return 0
+  fi
+  return 1
+}
+
 project_active_ownership_conflict_snapshot() {
   local project="$1"
   local summary signature repo_root continuity_file holder_state holder_branch conflicting_project holder_signature holder_status
@@ -9905,8 +9923,12 @@ manager_runtime_launch_workers_from_latest_handoff() {
       continue
     fi
     if [[ -n "$prompt_signature" ]] && csv_conflicts_with_item "$selected_intent_signatures_csv" "$prompt_signature"; then
-      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
-      continue
+      if manager_prompt_may_reclaim_recorded_self_intent "$project" "$target_project" "$prompt_file" "$prompt_signature"; then
+        :
+      else
+        queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+        continue
+      fi
     fi
     if launch_worker_from_manager_prompt_if_needed "$project" "$prompt_file"; then
       launched_csv="$(csv_append_unique_item "$launched_csv" "$prompt_file")"
