@@ -29,3 +29,4 @@
 - [x] Keep delegated-continuation freshness anchored to the later of continuity truth and explicit operator-stop boundary, so fresh restart cannot re-consume pre-stop cleanup handoffs after stale continuity is fenced off.
 - [x] Keep blocked cleanup-worker recorded ownership anchored to the verification-contract source prompt, so duplicate cleanup launch requests queue behind the real blocked owner instead of relaunching the same retained lane.
 - [x] When cleanup_governance continuity already carries an AI-written retained-lane prompt that fails launchability, auto-materialize the authoritative verification-bound cleanup prompt instead of looping on `WORKER_PROMPTS_NOT_LAUNCHABLE`.
+- [x] Let a retained merged cleanup lane reclaim its own recorded cleanup intent during manager relaunch, so `delegate_workers` can launch the selected hygiene worker instead of self-queuing forever on the target lane's stale recorded signature.

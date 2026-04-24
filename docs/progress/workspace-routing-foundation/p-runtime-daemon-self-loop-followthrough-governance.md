@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/operator-stop-delegated-continuation-boundary-20260424`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-operator-stop-delegated-continuation-boundary`
-- updated_at: `2026-04-24 00:41 PDT`
+- branch: `feature/manager-worker-launch-self-conflict-boundary-20260424`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-worker-launch-self-conflict-boundary`
+- updated_at: `2026-04-24 01:18 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -227,6 +227,15 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-autodelegates-canonical-cleanup-continuity`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt`
 - `PENDING`: replay this repair through guarded premerge and guarded `develop` merge, then rerun canonical daemon replay until the retained cleanup worker actually launches, produces a lawful closeout/blocker result, and Freely returns to the next scan-selected task.
+
+## 2026-04-24 01:18 PDT Retained Cleanup Self-Intent Relaunch Boundary
+
+- `FAIL`: canonical `develop` replay after `c82592d5` advanced one seam further. Manager now repaired `delegate_workers`, parsed the queued cleanup prompt, and validated that prompt as launchable, but the selected worker still never launched. Logs and direct helper probes showed the failure sat exactly between `manager_exit_contract_delegate_workers` and `launch_worker_from_manager_prompt_if_needed`: manager preloaded `selected_intent_signatures_csv` from recorded worker ownership, and the retained merged cleanup lane then self-conflicted on its own stale recorded cleanup signature, leaving the prompt perpetually in `queued_worker_prompts` with no blocker text.
+- `PASS`: manager launch selection now allows a bounded reclaim path only for cleanup prompts with verification metadata whose target is the same retained merged lane already represented by that recorded signature. This keeps ordinary duplicate-owner blocking intact while letting the canonical retained cleanup worker relaunch instead of self-queuing forever.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-retained-merged-cleanup-self-intent`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-cleanup-queue-recorded-owner-from-verification-contract`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-queued-prompt`
+- `PENDING`: replay this repair through protected premerge and guarded `develop`, then rerun canonical daemon replay until the retained cleanup worker truly launches, returns cleanup truth, and Freely advances to the next scan-selected task.
 - `PASS`: `manager_runtime_handle_exit_contract_after_ai_cycle()` now checks the active continuity for cleanup-followthrough intent before honoring `resume_manager`, runs that cleanup step first, and emits explicit `manager_exit_contract_cleanup_followthrough_begin` / `manager_exit_contract_cleanup_followthrough` receipts on success.
 - `PASS`: when `run_cleanup_followthrough` fails on that path, runtime now writes a same-owner repair handoff, records `LAST_EXIT_REASON=manager_exit_contract_cleanup_followthrough_failed`, emits `manager_exit_contract_cleanup_followthrough_failed`, and returns `resume_invalid` instead of silently resuming broader patrol.
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-triggers-cleanup-followthrough`
