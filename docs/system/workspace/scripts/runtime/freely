@@ -8365,6 +8365,17 @@ worker_prompt_launchable_for_manager_project() {
   return 0
 }
 
+worker_prompt_matches_active_authoritative_worker() {
+  local manager_project="$1" target_project="$2" prompt_file="$3"
+  local authoritative_prompt_file
+  [[ -n "$manager_project" && -n "$target_project" && -d "$target_project" ]] || return 1
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  worker_project_is_actively_running "$target_project" || return 1
+  worker_project_busy_with_delegated_continuation "$target_project" && return 1
+  authoritative_prompt_file="$(authoritative_worker_prompt_file_for_project "$target_project" || true)"
+  [[ -n "$authoritative_prompt_file" && "$authoritative_prompt_file" == "$prompt_file" ]]
+}
+
 manager_continuity_has_worker_prompts() {
   local continuity_file="$1"
   [[ -n "$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")" ]]
@@ -8388,7 +8399,12 @@ manager_continuity_has_unconsumed_launchable_worker_prompt() {
   while IFS= read -r prompt_file; do
     [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
     worker_prompt_launchable_for_manager_project "$project" "$prompt_file" || continue
+    target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
     if ! csv_contains_exact_item "$launched_csv" "$prompt_file"; then
+      if [[ -n "$target_project" && -d "$target_project" ]] \
+        && worker_prompt_matches_active_authoritative_worker "$project" "$target_project" "$prompt_file"; then
+        continue
+      fi
       return 0
     fi
   done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
@@ -8415,6 +8431,10 @@ manager_continuity_waiting_on_active_busy_worker() {
     [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
     target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
     [[ -n "$target_project" && -d "$target_project" ]] || return 1
+    if worker_prompt_matches_active_authoritative_worker "$project" "$target_project" "$prompt_file"; then
+      saw_active_busy="1"
+      continue
+    fi
     if csv_contains_exact_item "$launched_csv" "$prompt_file"; then
       if worker_project_is_actively_running "$target_project"; then
         continue
@@ -10063,6 +10083,16 @@ manager_runtime_launch_workers_from_latest_handoff() {
       if worker_project_busy_with_delegated_continuation "$target_project"; then
         worker_is_busy="1"
       fi
+    fi
+    if [[ "$worker_is_active" == "1" ]] \
+      && worker_prompt_matches_active_authoritative_worker "$project" "$target_project" "$prompt_file"; then
+      launched_csv="$(csv_append_unique_item "$launched_csv" "$prompt_file")"
+      selected_write_scopes_csv="$(csv_append_unique_item "$selected_write_scopes_csv" "$write_scope")"
+      if [[ -n "$prompt_signature" ]]; then
+        selected_intent_signatures_csv="$(csv_append_unique_item "$selected_intent_signatures_csv" "$prompt_signature")"
+      fi
+      launched_count=$((launched_count + 1))
+      continue
     fi
 
     if [[ "$worker_is_busy" == "1" ]]; then
