@@ -5554,7 +5554,7 @@ git_status_porcelain_with_runtime_hygiene() {
 
 worktree_summary_for_project() {
   local project="$1"
-  local entries total dirty wt_path
+  local entries total dirty line wt_path
   git -C "$project" rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
     printf '0|0\n'
     return 0
@@ -5567,14 +5567,20 @@ worktree_summary_for_project() {
 
   total=0
   dirty=0
-  while IFS= read -r wt_path; do
+  while IFS= read -r line; do
+    [[ "$line" == worktree\ * ]] || continue
+    wt_path="${line#worktree }"
     [[ -n "$wt_path" ]] || continue
     total=$((total + 1))
     if [[ -n "$(git_status_porcelain_with_runtime_hygiene "$wt_path")" ]]; then
       dirty=$((dirty + 1))
     fi
-  done < <(printf '%s\n' "$entries" | awk '/^worktree / {print substr($0, 10)}')
-  printf '%s|%s\n' "$total" "$dirty"
+  done <<<"$entries"
+  (
+    trap '' PIPE
+    printf '%s|%s\n' "$total" "$dirty" || true
+    exit 0
+  )
 }
 
 fleet_status_bin_for_project() {
@@ -7707,6 +7713,55 @@ worker_prompt_resolved_worktree() {
   fi
 }
 
+worker_prompt_can_materialize_missing_worktree() {
+  local manager_project="$1" prompt_file="$2"
+  local target_worktree target_branch sibling_root normalized_target normalized_parent
+  target_worktree="$(worker_prompt_target_worktree "$prompt_file")"
+  target_branch="$(worker_prompt_target_branch "$prompt_file")"
+  [[ -n "$target_worktree" && -n "$target_branch" ]] || return 1
+  [[ ! -d "$target_worktree" ]] || return 1
+  case "$target_branch" in
+    feature/*|feature/premerge-*|test-pre-merge-*|hotfix/*|release/*) ;;
+    *) return 1 ;;
+  esac
+  normalized_parent="$(cd "$(dirname "$target_worktree")" 2>/dev/null && pwd -P)" || return 1
+  normalized_target="$normalized_parent/$(basename "$target_worktree")"
+  sibling_root="$(normalize_runtime_worktree_path "$(cd "$manager_project/.." 2>/dev/null && pwd -P)/$(basename "$manager_project")-worktrees")"
+  case "$normalized_target" in
+    "$sibling_root"/*) return 0 ;;
+  esac
+  return 1
+}
+
+materialize_worker_prompt_worktree_if_needed() {
+  local manager_project="$1" prompt_file="$2"
+  local target_project target_worktree target_branch freely_bin
+  target_project="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+  if [[ -n "$target_project" && -d "$target_project" ]]; then
+    printf '%s\n' "$target_project"
+    return 0
+  fi
+
+  worker_prompt_can_materialize_missing_worktree "$manager_project" "$prompt_file" || return 1
+  target_worktree="$(worker_prompt_target_worktree "$prompt_file")"
+  target_branch="$(worker_prompt_target_branch "$prompt_file")"
+
+  if [[ -x "$manager_project/bin/wt-create" ]]; then
+    bash "$manager_project/bin/wt-create" "$target_branch" --base develop >/dev/null 2>&1 || return 1
+  else
+    git -C "$manager_project" worktree add -b "$target_branch" "$target_worktree" develop >/dev/null 2>&1 || return 1
+    freely_bin="$(freely_bin_for_project "$manager_project")"
+    if [[ -x "$freely_bin" ]]; then
+      bash "$freely_bin" sync-tooling --source-project "$manager_project" --project "$target_worktree" >/dev/null 2>&1 || true
+    fi
+  fi
+
+  reset_project_runtime_discovery_cache "$manager_project"
+  target_project="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+  [[ -n "$target_project" && -d "$target_project" ]] || return 1
+  printf '%s\n' "$target_project"
+}
+
 worker_worktree_has_runtime_history() {
   local worktree_path="$1"
   [[ -n "$worktree_path" && -d "$worktree_path" ]] || return 1
@@ -7728,6 +7783,7 @@ worker_project_is_absorbed_merged_lane() {
   worker_worktree_has_runtime_history "$target_worktree" || return 1
   [[ -f "$(workcell_state_file "$target_worktree")" ]] || return 1
   [[ -n "$target_branch" ]] || return 1
+  worker_worktree_has_pending_non_cleanup_manager_prompt "$manager_project" "$target_worktree" && return 1
   branch_is_merged_into_develop "$manager_project" "$target_branch" || return 1
 }
 
@@ -8089,6 +8145,7 @@ worker_project_is_retire_ready_merged_followthrough() {
   [[ -n "$target_worktree" && -d "$target_worktree" ]] || return 1
   worker_worktree_has_runtime_history "$target_worktree" || return 1
   [[ -n "$target_branch" ]] || return 1
+  worker_worktree_has_pending_non_cleanup_manager_prompt "$manager_project" "$target_worktree" && return 1
   branch_is_merged_into_develop "$manager_project" "$target_branch" || return 1
   dirty_entries="$(project_dirty_entries "$target_worktree")"
   [[ "$dirty_entries" =~ ^[0-9]+$ ]] || return 1
@@ -8110,7 +8167,10 @@ worker_prompt_targets_retire_ready_merged_worktree() {
 worker_prompt_launchable_for_manager_project() {
   local manager_project="$1" prompt_file="$2" resolved_worktree target_branch
   resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
-  [[ -n "$resolved_worktree" && -d "$resolved_worktree" ]] || return 1
+  if [[ -z "$resolved_worktree" || ! -d "$resolved_worktree" ]]; then
+    worker_prompt_can_materialize_missing_worktree "$manager_project" "$prompt_file" && return 0
+    return 1
+  fi
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
   if worker_project_is_absorbed_merged_lane "$manager_project" "$resolved_worktree" "$target_branch"; then
     if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]] \
@@ -9042,6 +9102,17 @@ authoritative_worker_prompt_for_worktree_from_continuity() {
   return 1
 }
 
+worker_worktree_has_pending_non_cleanup_manager_prompt() {
+  local manager_project="$1" target_worktree="$2" continuity_file="" prompt_file="" intent_kind=""
+  [[ -n "$manager_project" && -n "$target_worktree" && -d "$target_worktree" ]] || return 1
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$manager_project")"
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 1
+  prompt_file="$(authoritative_worker_prompt_for_worktree_from_continuity "$manager_project" "$target_worktree" "$continuity_file" || true)"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  intent_kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
+  [[ "$intent_kind" == "edit" || "$intent_kind" == "promotion" ]]
+}
+
 retire_ready_merged_worktree_can_reclaim_ownership() {
   local manager_project="$1" target_worktree="$2" branch="${3:-}" prompt_file=""
   [[ -n "$manager_project" && -n "$target_worktree" && -d "$target_worktree" ]] || return 1
@@ -9591,7 +9662,7 @@ launch_worker_from_manager_prompt_if_needed() {
   local target_project runtime_probe_project prompt_target_worktree
   local intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv has_any_verification_metadata="0"
   local selected_tool
-  target_project="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
+  target_project="$(materialize_worker_prompt_worktree_if_needed "$manager_project" "$prompt_file")"
   [[ -n "$target_project" && -d "$target_project" ]] || return 1
   project_has_authoritative_worktree_path "$manager_project" "$target_project" || return 1
   ensure_runtime_workcell_initialized_for_launch "$manager_project" "$target_project" || return 1
@@ -9718,6 +9789,11 @@ manager_runtime_launch_workers_from_latest_handoff() {
   while IFS=$'\t' read -r _prompt_rank _prompt_index prompt_file; do
     [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
     target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
+    if [[ -z "$target_project" || ! -d "$target_project" ]]; then
+      if worker_prompt_can_materialize_missing_worktree "$project" "$prompt_file"; then
+        target_project="$(materialize_worker_prompt_worktree_if_needed "$project" "$prompt_file" || true)"
+      fi
+    fi
     if [[ -z "$target_project" || ! -d "$target_project" ]]; then
       record_manager_worker_launch_blocked_resolution \
         "$project" \
