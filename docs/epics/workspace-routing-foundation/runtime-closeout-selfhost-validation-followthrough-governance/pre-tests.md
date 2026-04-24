@@ -33,6 +33,8 @@
 15. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`.
 16. Run `bash docs/system/workspace/scripts/tests/test-freely-start-workcell-supervisor-syncs-tooling-before-launch`.
 17. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-supervision-nonbusy-worker-recovers`.
+18. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-writes-continuation-handoff`.
+19. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-clears-stale-worker-repair-handoff`.
 
 ## End-to-End
 - acceptance target: `The bounded owner is documented well enough that a later guarded replay can evaluate it as one lawful feature lane instead of a checkpoint-only branch.`
@@ -138,3 +140,27 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-worker-recovery-sync-verification.md`
+
+### Manager cleanup resume stays on continuation truth
+- id: `manager-cleanup-resume-stays-on-continuation-truth`
+- requirement: `A valid manager resume_manager contract for retained cleanup followthrough must write a continuation handoff rather than dropping the next round back into exit-contract repair semantics.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#8`
+- case_design: `Seed a valid cleanup-governance resume_manager contract, run the exit-contract consumer, and assert runtime writes a continuation handoff plus cleanup followthrough evidence instead of a repair handoff.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-manager-resume-and-stale-worker-handoff-verification.md`
+
+### Authoritative worker relaunch clears stale repair handoff
+- id: `authoritative-worker-relaunch-clears-stale-repair-handoff`
+- requirement: `When manager re-delegates the retained cleanup worker with a fresh authoritative prompt, runtime must clear any stale worker exit-contract repair handoff so the next worker round follows the cleanup prompt instead of replaying repair-only semantics.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#8`
+- case_design: `Seed a retained worker worktree with an old worker_exit_contract_repair handoff, relaunch it through an authoritative manager prompt, and assert the stale handoff is cleared before the next worker round while the adjacent repair-first and invalid-contract regressions still pass in protected replay.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-manager-resume-and-stale-worker-handoff-premerge-verification.md`
