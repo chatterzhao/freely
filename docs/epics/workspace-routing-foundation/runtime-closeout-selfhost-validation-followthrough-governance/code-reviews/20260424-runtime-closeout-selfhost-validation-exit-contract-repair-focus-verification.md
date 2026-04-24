@@ -18,12 +18,17 @@
 2. `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
 3. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
 4. `./bin/governance-check`
+5. `test-pre-merge-20260424-worker-exit-contract-repair-focus: bash docs/system/workspace/scripts/tests/test-freely-worker-repair-prompt-prioritizes-exit-contract`
+6. `test-pre-merge-20260424-worker-exit-contract-repair-focus: bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
+7. `test-pre-merge-20260424-worker-exit-contract-repair-focus: bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
+8. `test-pre-merge-20260424-worker-exit-contract-repair-focus: ./bin/governance-check`
 
 ## Real Replay Evidence
 
 - Canonical `develop` generated cleanup worker prompt `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260424-015330-worker-runtime-cleanup-followthrough-resume-hygiene-codex.txt` for retained worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-runtime-cleanup-followthrough-resume`.
 - Before this repair landed in a clean lane, retained runtime replay showed repeated `launch_kind=resume` cycles that wrote `EXIT_KIND="worker_done"` with summary `Repaired the missing worker exit contract... no additional cleanup work was performed`, proving the resumed lane was satisfying the minimal repair shape without re-entering the real cleanup classification task.
 - The root cause matched prompt ordering, not responsibility drift: runtime still launched the worker, but the worker session saw the broad lead-agent body before the explicit repair contract and therefore took the easiest contract-valid exit.
+- Guarded premerge replay in `test-pre-merge-20260424-worker-exit-contract-repair-focus` reran the same three regressions plus `./bin/governance-check`; all passed against the receipt-bearing premerge branch, so the owner now has fresh `premerge-integration` evidence for develop absorption.
 
 ## Implementation Decision Note
 
