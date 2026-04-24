@@ -115,12 +115,12 @@
 
 ### Cleanup repair round cannot short-circuit closeout
 - id: `cleanup-repair-round-cannot-short-circuit-closeout`
-- requirement: `A retained cleanup worker resumed only to repair its exit contract must re-enter the original cleanup closeout gate and may not stop with a repair-only \`worker_done\` backed solely by runtime repair artifacts.`
+- requirement: `A retained cleanup worker resumed only to repair its exit contract must re-enter the original cleanup closeout gate and may not stop with a repair-only worker_done backed solely by runtime repair artifacts.`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#6`
-- case_design: `First prove in feature-local that a cleanup worker prompt with authoritative verification metadata rewrites the repair handoff back onto the original closeout gate, then replay the same regressions in the guarded test-pre-merge lane and confirm runtime still rejects a repair-only \`worker_done\` that cites only the handoff plus rewritten contract.`
+- case_design: `First prove in feature-local that a cleanup worker prompt with authoritative verification metadata rewrites the repair handoff back onto the original closeout gate, then replay the same regressions in the guarded test-pre-merge lane and confirm runtime still rejects a repair-only worker_done that cites only the handoff plus rewritten contract.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-cleanup-reentry-verification.md`
