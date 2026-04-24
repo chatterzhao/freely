@@ -602,3 +602,13 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-reuses-live-supervisor-without-relaunch`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-waits-for-supervisor-teardown-before-fallback`
 - `PENDING`: absorb this daemon-preservation repair into canonical `develop`, rerun `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and continue supervision until Freely finishes a real task, merges upward, retires that lane, and autonomously selects the next task.
+
+## 2026-04-24 07:05 PDT Superseded Frozen Prompt Reclaim
+
+- `FAIL`: canonical `develop` still stalled after the recorded self-intent reclaim repair. The authoritative retained-lane prompt `20260424-054822` stayed in `QUEUED_WORKER_PROMPTS` with `ACTIVE_RUNNING_WORKER_COUNT="0"` because older same-lane frozen prompts were still treated as stronger ownership blockers than the newer authoritative prompt that explicitly superseded them.
+- `PASS`: runtime now parses the prompt-level `This prompt supersedes...` history and excludes superseded frozen prompts from blocking-intent ownership, frozen-signature preloading, and frozen-owner worktree claims.
+- `PASS`: this keeps continuity-first intact. Manager still reuses the same authoritative retained-lane prompt instead of widening scope into fresh scan selection, but runtime can now consume that prompt instead of queueing forever behind stale frozen history.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-recorded-self-intent`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-superseded-frozen-self-intent`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reconciles-stale-frozen-consumed-prompt`
+- `PENDING`: guarded premerge replay is green, but canonical `develop` replay still must prove the retained cleanup lane relaunches from the authoritative prompt, writes bounded followthrough truth, and then Freely advances to the next task source instead of looping on frozen-owner queue residue.
