@@ -20,6 +20,12 @@
 4. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
 5. `bash docs/system/workspace/scripts/tests/test-freely-worker-repair-prompt-prioritizes-exit-contract`
 6. `./bin/governance-check`
+7. `test-pre-merge-20260424-worker-exit-contract-repair-closeout-boundary: bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-repair-handoff-rebinds-cleanup-closeout`
+8. `test-pre-merge-20260424-worker-exit-contract-repair-closeout-boundary: bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-repair-only-done-forces-resume`
+9. `test-pre-merge-20260424-worker-exit-contract-repair-closeout-boundary: bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
+10. `test-pre-merge-20260424-worker-exit-contract-repair-closeout-boundary: bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
+11. `test-pre-merge-20260424-worker-exit-contract-repair-closeout-boundary: bash docs/system/workspace/scripts/tests/test-freely-worker-repair-prompt-prioritizes-exit-contract`
+12. `test-pre-merge-20260424-worker-exit-contract-repair-closeout-boundary: ./bin/governance-check`
 
 ## Real Replay Evidence
 
