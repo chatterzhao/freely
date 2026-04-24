@@ -21,6 +21,7 @@ DESIRED_RUNTIME_STATE="running"
 LAST_SUPERVISOR_STATE="up"
 LAST_AI_STATE="down"
 LAST_EXIT_REASON="starting"
+LAST_ENTRYPOINT_MODE="daemon"
 LAST_ROLE_HINT="worker"
 LAST_STATE_UPDATED_AT="2026-04-19T00:00:00Z"
 LAST_WORKER_VERIFICATION_CONTRACT_FILE=""
@@ -66,9 +67,10 @@ reported_pid="$(tr -d '\n' <"$session_id_file")"
 kill -0 "$recorded_pid" 2>/dev/null
 grep -q 'LAST_AI_STATE="up"' "$project_dir/.freely/run/workcell-state.env"
 grep -q 'LAST_EXIT_REASON="ai_launch_in_flight"' "$project_dir/.freely/run/workcell-state.env"
+grep -q 'LAST_ENTRYPOINT_MODE="daemon"' "$project_dir/.freely/run/workcell-state.env"
 
 wait "$monitor_pid"
 
 printf '%s\n' "$(cat "$log_file")" | grep -q '\[TEST\] mock AI CLI started'
 
-echo "[PASS] monitor writes the real launched pid, marks launch-in-flight state, and blocks until exit"
+echo "[PASS] monitor writes the real launched pid, preserves entrypoint mode, marks launch-in-flight state, and blocks until exit"
