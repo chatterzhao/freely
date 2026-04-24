@@ -6541,6 +6541,14 @@ OPERATOR_STOP_BOUNDARY_RECORDED_AT="$(current_timestamp_utc_for_machine)"
 EOF
 }
 
+stop_reason_records_manager_operator_boundary() {
+  local stop_reason="${1:-}"
+  case "$stop_reason" in
+    operator_stop|operator_daemon_stop) return 0 ;;
+  esac
+  return 1
+}
+
 clear_manager_operator_stop_boundary() {
   local project="$1"
   rm -f "$(manager_operator_stop_boundary_file "$project")"
@@ -14494,7 +14502,7 @@ stop_project_runtime() {
   fi
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
     materialize_missing_required_manager_continuity_fallback "$project" "$stop_reason" || true
-    if [[ "$stop_reason" == "operator_stop" ]]; then
+    if stop_reason_records_manager_operator_boundary "$stop_reason"; then
       record_manager_operator_stop_boundary "$project"
       clear_manager_worker_launch_state_for_fresh_restart "$project"
     fi

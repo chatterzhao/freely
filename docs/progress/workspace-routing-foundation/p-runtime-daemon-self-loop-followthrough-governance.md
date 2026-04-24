@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/fleet-review-and-closeout-20260423`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-feature-fleet-review-and-closeout`
-- updated_at: `2026-04-23 23:25 PDT`
+- updated_at: `2026-04-23 23:40 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -19,6 +19,8 @@
 - The runtime fix and focused regressions are complete in the blocker worktree.
 - Canonical `develop` then exposed one more followthrough seam: runtime was reading the new `## Worker Delegation` continuity shape as if no worker prompts existed, so freshly generated worker lanes could not launch even though manager continuity had already selected them.
 - The continuity parser and worker-launch consumption path are now updated to read that current handoff shape.
+- Canonical restart observation then exposed one more freshness seam: `daemon stop` recorded `LAST_EXIT_REASON=operator_daemon_stop`, but the startup patrol staleness boundary only refreshed on plain `operator_stop`, so the next fresh patrol could still anchor itself to a pre-stop cleanup continuity instead of the new scan JSON.
+- Explicit daemon stop now refreshes the same manager operator-stop boundary used by patrol freshness filtering, so startup patrol can discard pre-stop continuity history and let scan-selected work win the next round.
 - Guarded replay then exposed one more same-owner retirement seam: an already merged-clean blocker worktree could still be treated as a recoverable active worker. Runtime now settles those lanes toward cleanup followthrough, and cleanup can reclaim stale recorded ownership for retire-ready merged worktrees.
 - Canonical `develop` then exposed a narrower replay seam after guarded absorption: if the merged blocker lane only stayed dirty in owner progress / verification evidence, runtime still treated it as a relaunchable edit worker because the old guard only recognized fully clean merged worktrees. This followthrough now treats owner-evidence-only dirty merged lanes as retirement/promotion followthrough instead of active edit capacity.
 - Canonical `develop` then exposed one more fallback seam in the manager launcher: when no launchable continuity remained, runtime could fall back to the latest generated continuity and relaunch a worker prompt without rechecking whether that prompt now targeted a retire-ready merged lane.
@@ -244,13 +246,24 @@
 - `PASS`: `./bin/governance-check`
 - `PENDING`: replay this same-owner resolver fix through protected premerge and guarded `develop`, then rerun canonical `develop` daemon replay and verify manager gets past `proxy_config_invalid`, resumes cleanup followthrough, and advances toward the next real task cycle.
 
+## 2026-04-23 23:40 PDT Explicit Daemon Stop Boundary Refresh
+
+- `FAIL`: fresh canonical restart observation proved startup was generating a new `manager-task-source-scan-latest.json`, but patrol still surfaced the older cleanup continuity because the manager freshness boundary had not moved with `operator_daemon_stop`.
+- `FAIL`: this let the next startup round re-anchor on pre-stop cleanup continuity instead of letting the new scan-selected queue decide the next highest-leverage task source.
+- `PASS`: `stop_project_runtime()` now refreshes the manager operator-stop boundary for both `operator_stop` and `operator_daemon_stop`, preserving the existing explicit-stop semantics while keeping runtime-owned restarts out of this path.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-stop-refreshes-manager-operator-boundary`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-ignores-pre-stop-manager-continuity-focus`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-command-semantics`
+- `PENDING`: promote this same-owner repair through protected premerge and guarded `develop`, rerun canonical `./bin/freely daemon start`, and verify startup patrol now discards pre-stop continuity, picks from fresh scan JSON, and continues through lawful task closeout instead of re-entering the stale cleanup anchor.
+
 ## Verification Evidence
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`
 2. `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
-3. `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
-4. `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-reuses-live-supervisor-without-relaunch`
-5. `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`
+3. `bash docs/system/workspace/scripts/tests/test-freely-daemon-stop-refreshes-manager-operator-boundary`
+4. `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
+5. `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-reuses-live-supervisor-without-relaunch`
+6. `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`
 6. `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 7. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-worker-delegation-format`
 8. `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-retire-ready-merged-worker`

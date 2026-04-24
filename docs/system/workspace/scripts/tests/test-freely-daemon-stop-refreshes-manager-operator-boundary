@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-daemon-stop-refreshes-manager-boundary.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$PROJECT/docs"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+cat >"$PROJECT/README.md" <<'EOF'
+# repo
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m init
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_daemon_stop"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-23T23:00:00Z"
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260423-214244.md"
+cat >"$CONTINUITY" <<'EOF'
+# Manager Continuity
+- route_kind: `cleanup_governance`
+EOF
+touch -t 202604232144.14 "$CONTINUITY"
+
+cat >"$PROJECT/.freely/run/manager-operator-stop-boundary.env" <<'EOF'
+OPERATOR_STOP_BOUNDARY_EPOCH="1776995785"
+OPERATOR_STOP_BOUNDARY_RECORDED_AT="2026-04-24T01:56:25Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+before_epoch="$(manager_operator_stop_boundary_epoch_for_project "$PROJECT")"
+continuity_epoch="$(file_mtime_epoch "$CONTINUITY")"
+[[ "$before_epoch" =~ ^[0-9]+$ ]]
+[[ "$continuity_epoch" =~ ^[0-9]+$ ]]
+(( before_epoch < continuity_epoch ))
+! manager_continuity_precedes_operator_stop_boundary "$PROJECT" "$CONTINUITY"
+
+stop_project_runtime "$PROJECT" "operator_daemon_stop"
+
+after_epoch="$(manager_operator_stop_boundary_epoch_for_project "$PROJECT")"
+[[ "$after_epoch" =~ ^[0-9]+$ ]]
+(( after_epoch >= continuity_epoch ))
+manager_continuity_precedes_operator_stop_boundary "$PROJECT" "$CONTINUITY"
+
+echo "[PASS] daemon stop refreshes the manager operator-stop boundary so pre-stop continuity is treated as stale history"
