@@ -11040,12 +11040,24 @@ EOF
 }
 
 write_worker_exit_contract_repair_handoff() {
-  local project="$1" reason="$2" details="$3" contract_file resume_target session_file
+  local project="$1" reason="$2" details="$3" contract_file resume_target session_file prompt_file intent_kind owner_issue artifact_dir closeout_gate closeout_gate_command closeout_target_lane closeout_promotion_gate closeout_requires_adequacy closeout_review_artifact_policy
   contract_file="$(worker_exit_contract_file "$project")"
   session_file="$(session_state_file "$project")"
   resume_target="${LAST_TOOL_RESUME_TARGET:-}"
   if [[ -z "$resume_target" && -f "$session_file" ]]; then
     resume_target="$(meta_env_value "$session_file" "LAST_TOOL_RESUME_TARGET")"
+  fi
+  prompt_file="$(authoritative_worker_prompt_file_for_project "$project" || true)"
+  if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
+    intent_kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
+    owner_issue="$(worker_prompt_owner_issue "$prompt_file")"
+    artifact_dir="$(worker_prompt_verification_artifact_dir "$prompt_file")"
+    closeout_gate="$(worker_prompt_closeout_gate "$prompt_file")"
+    closeout_gate_command="$(worker_prompt_closeout_gate_command "$prompt_file")"
+    closeout_target_lane="$(worker_prompt_closeout_target_lane "$prompt_file")"
+    closeout_promotion_gate="$(worker_prompt_closeout_promotion_gate "$prompt_file")"
+    closeout_requires_adequacy="$(worker_prompt_closeout_requires_adequacy "$prompt_file")"
+    closeout_review_artifact_policy="$(worker_prompt_closeout_review_artifact_policy "$prompt_file")"
   fi
   cat >"$(handoff_file "$project")" <<EOF
 # Session Handoff
@@ -11065,6 +11077,85 @@ write_worker_exit_contract_repair_handoff() {
 - Reuse the same worker context and produce a valid worker exit contract before claiming completion or requesting reschedule.
 - The missing/invalid contract is the blocking defect from the previous round.
 EOF
+  if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
+    cat >>"$(handoff_file "$project")" <<EOF
+
+## Original Worker Boundary
+- source_prompt_file: ${prompt_file}
+- intent_kind: ${intent_kind:-unknown}
+- owner_issue: ${owner_issue:-unknown}
+- verification_artifact_dir: ${artifact_dir:-unknown}
+- closeout_gate: ${closeout_gate:-unknown}
+- closeout_gate_command: ${closeout_gate_command:-unknown}
+- closeout_target_lane: ${closeout_target_lane:-unknown}
+- closeout_promotion_gate: ${closeout_promotion_gate:-unknown}
+- closeout_requires_adequacy: ${closeout_requires_adequacy:-unknown}
+- closeout_review_artifact_policy: ${closeout_review_artifact_policy:-unknown}
+EOF
+    if [[ "${intent_kind:-unknown}" == "cleanup" ]] && worker_prompt_has_verification_metadata "$prompt_file"; then
+      cat >>"$(handoff_file "$project")" <<'EOF'
+
+## Cleanup Reentry Requirement
+- Repairing the missing worker exit contract is necessary, but it is not by itself a valid cleanup completion.
+- Before claiming `worker_done`, return to the original cleanup closeout gate and produce bounded cleanup evidence outside the runtime repair artifacts.
+- This round must classify the lane as exactly one of:
+  - atomic_checkpoint_ready
+  - split_required_with_target
+  - retire_only_ready
+  - blocked_need_manager_decision
+- If that bounded cleanup classification cannot be proven this round, emit `worker_blocked` or `worker_handoff_needed` instead of a repair-only `worker_done`.
+EOF
+    fi
+  fi
+}
+
+worker_exit_contract_summary_is_repair_only() {
+  local summary="${1:-}" summary_lower
+  [[ -n "$summary" ]] || return 1
+  summary_lower="$(printf '%s' "$summary" | tr '[:upper:]' '[:lower:]')"
+  [[ "$summary_lower" == *"no additional cleanup work"* ]] && return 0
+  [[ "$summary_lower" == *"repair-first round"* ]] && return 0
+  [[ "$summary_lower" == *"repair"* && "$summary_lower" == *"exit contract"* ]] && return 0
+  return 1
+}
+
+worker_exit_contract_evidence_is_internal_repair_only() {
+  local project="$1" evidence_paths_csv="${2:-}" contract_file handoff_path item
+  [[ -n "$evidence_paths_csv" ]] || return 1
+  contract_file="$(worker_exit_contract_file "$project")"
+  handoff_path="$(handoff_file "$project")"
+  IFS=',' read -r -a __freely_repair_evidence_items <<<"$evidence_paths_csv"
+  ((${#__freely_repair_evidence_items[@]} > 0)) || return 1
+  for item in "${__freely_repair_evidence_items[@]}"; do
+    item="${item#"${item%%[![:space:]]*}"}"
+    item="${item%"${item##*[![:space:]]}"}"
+    [[ -n "$item" ]] || continue
+    case "$item" in
+      "$contract_file"|"$handoff_path") ;;
+      *) return 1 ;;
+    esac
+  done
+  return 0
+}
+
+worker_exit_contract_repair_round_requires_cleanup_reentry() {
+  local project="$1" prompt_file rotation_reason
+  rotation_reason="$(session_handoff_rotation_reason "$project" || true)"
+  [[ "$rotation_reason" == "worker_exit_contract_repair" ]] || return 1
+  prompt_file="$(authoritative_worker_prompt_file_for_project "$project" || true)"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]] || return 1
+  worker_prompt_has_verification_metadata "$prompt_file"
+}
+
+worker_exit_contract_done_is_repair_only_cleanup_escape() {
+  local project="$1" contract_file summary evidence_paths_csv
+  worker_exit_contract_repair_round_requires_cleanup_reentry "$project" || return 1
+  contract_file="$(worker_exit_contract_file "$project")"
+  summary="$(meta_env_value "$contract_file" "COMPLETION_SUMMARY")"
+  evidence_paths_csv="$(meta_env_value "$contract_file" "EVIDENCE_PATHS_CSV")"
+  worker_exit_contract_summary_is_repair_only "$summary" || return 1
+  worker_exit_contract_evidence_is_internal_repair_only "$project" "$evidence_paths_csv"
 }
 
 manager_runtime_handle_exit_contract_after_ai_cycle() {
@@ -11181,6 +11272,15 @@ worker_runtime_handle_exit_contract_after_ai_cycle() {
   kind="$(worker_exit_contract_kind "$project" || true)"
   case "$kind" in
     worker_done)
+      if worker_exit_contract_done_is_repair_only_cleanup_escape "$project"; then
+        write_worker_exit_contract_repair_handoff "$project" "worker_exit_contract_repair_done_without_bounded_cleanup" "repair_only_worker_done"
+        write_workcell_state "$project" "running" "up" "down" "worker_exit_contract_invalid"
+        append_runtime_event "$project" "worker_exit_contract_invalid" \
+          "details=repair_only_worker_done" \
+          "summary=$(meta_env_value "$(worker_exit_contract_file "$project")" "COMPLETION_SUMMARY")"
+        printf 'resume_invalid\n'
+        return 0
+      fi
       : >"$(stop_marker_file "$project")"
       write_workcell_state "$project" "stopped" "down" "down" "worker_exit_contract_done"
       append_runtime_event "$project" "worker_exit_contract_done" \

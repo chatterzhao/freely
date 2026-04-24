@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-repair-handoff-closeout.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER="$TMP_DIR/project-worktrees/feature-cleanup"
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$WORKER"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260424-030000-worker-cleanup-closeout-codex.txt"
+cat >"$PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/cleanup-closeout-20260424\`
+dispatch_priority: P0
+parallel_safe: false
+write_scope:
+- \`$WORKER\`
+intent_kind: cleanup
+intent_target: \`$WORKER\`
+Owner-Issue:
+- \`I-20260424-0300-A\`
+Pre-Tests-Path:
+- \`docs/epics/sample/story/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`docs/epics/sample/story/code-reviews\`
+Required-Test-Lanes:
+- \`feature-local\`
+- \`premerge-integration\`
+Required-Acceptance-Item-Ids:
+- \`cleanup-boundary\`
+Minimum-Evidence-Level:
+- \`cleanup-blocker-or-bounded-closeout-artifact\`
+Target-Environment:
+- \`feature/cleanup-closeout-20260424\`
+Closeout-Gate:
+- \`classify the lane as exactly one of atomic_checkpoint_ready, split_required_with_target, retire_only_ready, or blocked_need_manager_decision\`
+Closeout-Gate-Command:
+- \`./bin/checkpoint-guard && ./bin/freely baseline-status --project $WORKER && git status --short\`
+Closeout-Target-Lane:
+- \`cleanup_governance\`
+Closeout-Promotion-Gate:
+- \`manager_cleanup_replay\`
+Closeout-Requires-Adequacy:
+- \`true\`
+Closeout-Review-Artifact-Policy:
+- \`write or update one cleanup blocker/handoff artifact under the owner verification artifact directory and cite exact residue paths\`
+EOF
+
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+LAST_TOOL_RESUME_TARGET="worker-cleanup-repair-demo"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+write_worker_verification_contract_file "$(worker_verification_contract_state_file "$PROJECT")" "$PROMPT" "" "$WORKER"
+write_worker_exit_contract_repair_handoff "$PROJECT" "worker_exit_contract_invalid" "missing_file"
+
+HANDOFF="$PROJECT/.freely/run/session-handoff.txt"
+grep -q '^## Original Worker Boundary$' "$HANDOFF"
+grep -q "source_prompt_file: $PROMPT" "$HANDOFF"
+grep -q 'intent_kind: cleanup' "$HANDOFF"
+grep -q 'owner_issue: I-20260424-0300-A' "$HANDOFF"
+grep -q 'closeout_target_lane: cleanup_governance' "$HANDOFF"
+grep -q '^## Cleanup Reentry Requirement$' "$HANDOFF"
+grep -q 'atomic_checkpoint_ready' "$HANDOFF"
+grep -q 'split_required_with_target' "$HANDOFF"
+grep -q 'retire_only_ready' "$HANDOFF"
+grep -q 'blocked_need_manager_decision' "$HANDOFF"
+grep -q 'worker_blocked' "$HANDOFF"
+
+echo "[PASS] worker repair handoff rebinds cleanup closeout contract"
