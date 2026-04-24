@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/manager-worker-runtime-source-rebind-20260424`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-worker-runtime-source-rebind`
-- updated_at: `2026-04-24 07:44 PDT`
+- branch: `feature/runtime-sigpipe-supervisor-closeout-20260424`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-sigpipe-supervisor-closeout`
+- updated_at: `2026-04-24 15:03 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -78,6 +78,8 @@
 - Canonical `develop` replay for the retained dirty blocker lane then exposed one narrower launchability family inside the same owner: daemon patrol could still emit `printf: write error: Broken pipe` while computing worktree summary, and manager launch / exit-contract validation still required the target worktree to pre-exist even when continuity had already selected a governed sibling lane that should be materialized on demand.
 - The same replay family also showed a retirement overreach: once a branch tip was merged, runtime could still misclassify a merged-tip lane as retire-ready cleanup even though the latest authoritative continuity still carried an active `edit` prompt for that lane, which would erase real ownership instead of letting the selected task continue.
 - This followthrough now makes `worktree_summary_for_project()` consume `git worktree list --porcelain` without the pipe-fragile `awk` stage, tolerates downstream closed-pipe consumers, allows prompt-governed missing sibling worktrees to be materialized before manager launch, and blocks both absorbed/retire-ready merged classification whenever authoritative continuity still grants active `edit` or `promotion` ownership to that lane.
+- Canonical replay after the manager/source-runtime rebind then exposed one more same-owner closeout seam: cached worktree and continuity discovery helpers still emitted multi-line output through bare `printf`, so lawful early-return consumers could raise `Broken pipe` under `set -euo pipefail` and strand manager/worker supervision after AI exit before `ai_cycle_finished` closeout truth was fully consumed.
+- Cached `git worktree list --porcelain` and manager continuity producers now emit through a bounded helper that traps `PIPE`, ignores `SIGPIPE`, and returns success when the downstream consumer has already found the first needed record.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
 
 ## 2026-04-22 07:09 PDT Reconnect Exhaustion 502 Network Marker Followthrough
@@ -663,3 +665,17 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
 - `PASS`: `bash -n docs/system/workspace/scripts/runtime/freely`
 - `PENDING`: run owner gates on this feature lane, promote through protected premerge into canonical `develop`, then prove real daemon replay rebinds the retained worker control plane, consumes its existing `worker_done` closeout, retires/advances that lane lawfully, and only then returns to scan-selected backlog.
+
+## 2026-04-24 15:03 PDT SIGPIPE Supervisor Closeout Guard
+
+- `FAIL`: canonical replay after the runtime-source rebind still stranded supervisor closeout. Runtime evidence showed `ai_launch_begin` with no matching `ai_cycle_finished`, stale `ai.pid` truth, and repeated `printf: write error: Broken pipe` lines while daemon patrol and continuity scanning were still resolving retained cleanup followthrough.
+- `PASS`: the narrower seam sat in cached discovery producers, not in task selection. `project_worktree_list_porcelain_cached()` and `manager_continuity_files_desc_for_project()` were still writing with bare `printf`, so early-return consumers in continuity selection and PID/worktree discovery could abort the supervising shell under `set -euo pipefail`.
+- `PASS`: both cached producers now emit through a bounded helper that traps `PIPE`, ignores `SIGPIPE`, and returns success when the consumer exits after finding the first useful record.
+- `PASS`: this stays continuity-first and same-owner. No worker-launch policy, prompt shape, or exit-contract semantics changed; runtime simply no longer dies because the producer side treats a lawful early consumer exit as fatal.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worktree-summary-tolerates-closed-pipe`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-discover-supervisor-pid-sigpipe-guard`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-continuity-discovery-tolerates-closed-pipe`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-ignores-pre-stop-continuity`
+- `PASS`: replayed the same focused regression set on protected lane `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-test-pre-merge-runtime-sigpipe-supervisor-closeout` after a lawful `./bin/merge-guarded` merge from `feature/runtime-sigpipe-supervisor-closeout-20260424`.
+- `FAIL`: the next guarded merge into canonical `develop` is blocked only by missing same-owner lifecycle materialization in the diff, not by code or test failure.
+- `PENDING`: rerun guarded promote into `develop`, then replay canonical `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` to confirm retained cleanup closeout is consumed without another SIGPIPE stall and runtime continues to the next task source.
