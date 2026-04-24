@@ -79,6 +79,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 39. Preserve the auth boundary for that same Codex OAuth refresh path: explicit auth denial such as `401 Unauthorized` remains non-network and must not enter the device-network recovery path.
 40. When project proxy mode is `explicit`, resolve proxy fields with project-over-global precedence instead of treating blank project values as authoritative empties; an empty project explicit block must not mask valid global explicit proxy values and force false `proxy_config_invalid`.
 41. Keep project-level worktree summary pipe-safe during daemon/live-status patrol so runtime hygiene and startup followthrough cannot fail just because a downstream consumer closes stdout early.
+42. Treat explicit `daemon stop` as an operator-stop freshness boundary for startup patrol, so a new scan after restart can supersede pre-stop manager continuity instead of re-anchoring on stale cleanup queue truth.
 42. Let manager delegation and launch treat a prompt-targeted missing sibling worktree as materializable when its branch/worktree headers stay within the governed `*-worktrees` root, and do not retire a merged-tip worker lane while authoritative continuity still carries active `edit` or `promotion` ownership for that lane.
 
 ## Non-Goals

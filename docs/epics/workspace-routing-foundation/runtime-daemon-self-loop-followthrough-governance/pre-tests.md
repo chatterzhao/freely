@@ -47,6 +47,7 @@
 29. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-materialized-cleanup-worker-applies-selected-tool`.
 30. Run `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`.
 31. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-missing-resume-evidence-falls-back`.
+32. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-stop-refreshes-manager-operator-boundary`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -366,3 +367,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-worker-materialization-and-summary-verification.md`
+
+### Explicit daemon stop invalidates pre-stop patrol continuity
+- id: `daemon-stop-refreshes-pre-stop-boundary`
+- requirement: `An explicit daemon stop must refresh the manager operator-stop boundary so the next startup patrol treats older manager continuity as stale history instead of current queue truth.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#25`
+- case_design: `Seed a manager continuity newer than the previous boundary, run stop handling with operator_daemon_stop, and verify the refreshed boundary makes that continuity pre-stop on the next patrol.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-daemon-stop-boundary-verification.md`
