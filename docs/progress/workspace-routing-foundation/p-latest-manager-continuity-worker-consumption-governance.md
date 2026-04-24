@@ -178,3 +178,26 @@
 - Current judgement:
   - retire the stale mixed lane as a standalone tracking concept
   - keep only this narrowed fallback repair as a same-family absorption lane
+
+## 2026-04-24 Same-Family Plain Worker Prompt List Parsing Repair
+
+- Followthrough judgement:
+  - canonical `daemon start` replay after the worker closeout / recovery fixes showed the manager could now select the retained cleanup lane again and emit a fresh worker prompt
+  - the new break was later in the chain: runtime did not launch that prompt because the latest continuity wrote `## Worker Prompts` as a plain bullet list, while the parser only considered `launched:` and `queue:` subsections launchable
+  - evidence on canonical root showed `manager_exit_contract_delegate_workers` fired, but `manager-worker-launch-state.env` still reported `LAST_MANAGER_WORKER_PROMPTS_GENERATED=""` and `LAUNCHED_WORKER_PROMPTS="none"`
+- Execution in this batch:
+  - branch: `feature/manager-continuity-worker-prompt-plain-list-parser-20260424`
+  - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-continuity-worker-prompt-plain-list-parser`
+  - retained worker prompt that should have launched: `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260424-025646-worker-runtime-cleanup-followthrough-resume-hygiene-codex.txt`
+- Repair:
+  - widen `manager_worker_prompt_paths_from_continuity_by_mode()` so plain bullets under `## Worker Prompts` are treated as launchable prompts
+  - preserve frozen prompt exclusion and queue parsing semantics
+  - extend `test-freely-manager-continuity-current-worker-prompt-parsing` with an explicit plain-list prompt
+  - rewrite `test-freely-latest-manager-continuity-worker-consumption` to use the same plain-list continuity shape seen in canonical replay
+- Verification:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
+  - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
+  - `./bin/governance-check`
+- Current judgement:
+  - keep this repair in `I-20260322-0445` as another same-family continuity/prompt consumption fix
+  - after merge, canonical replay must prove the runtime actually launches the retained cleanup prompt and resumes autonomous closeout before this batch can be considered complete
