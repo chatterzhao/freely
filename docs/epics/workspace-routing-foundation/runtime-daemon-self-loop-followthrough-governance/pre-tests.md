@@ -58,6 +58,7 @@
 40. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-cleanup-queue-recorded-owner-from-verification-contract`.
 41. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-queued-prompt`.
 42. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-auth-failure-signal-filter`.
+43. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-recorded-self-intent`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -521,3 +522,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-retained-cleanup-self-intent-premerge-verification.md`
+
+### Recorded self-intent worker relaunch stays launchable
+- id: `recorded-self-intent-worker-relaunch`
+- requirement: `When manager re-delegates a stopped worker lane whose target worktree still advertises the same soft-stale recorded intent signature, runtime must relaunch that exact lane instead of queueing it behind its own recorded ownership.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#33`
+- case_design: `Seed a stopped worker lane whose latest prompt leaves an `edit@<target_worktree>` recorded signature behind, delegate the same lane again from manager continuity, and verify launch selection reclaims that self-intent while leaving other queued/frozen holders blocked.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-recorded-self-intent-verification.md`
