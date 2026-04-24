@@ -258,6 +258,17 @@
 
 ## 2026-04-23 23:58 PDT Queue State Worker Prompt Launch Followthrough
 
+- `FAIL`: canonical `develop` replay got past the pre-stop delegated-continuation seam, but the retained dirty cleanup lane could still relaunch indefinitely after a lawful `worker_blocked` exit because recorded-owner recovery read the latest worker AI prompt instead of the authoritative delegated source prompt preserved in `worker-verification-contract.env`.
+- `FAIL`: in the real runtime shape, that latest worker AI prompt may omit machine-readable `Worktree:` / `Branch:` dispatch headers, so ownership signature collapsed to empty, manager considered the same cleanup target unowned, and startup kept re-delegating the lane instead of consuming the blocker and advancing.
+- `PASS`: `project_current_blocking_intent_signature()` now resolves intent from `status_intent_prompt_file_for_project()`, which already prefers the verification-contract `SOURCE_PROMPT_FILE` over later worker-local prompt artifacts.
+- `PASS`: a focused regression now proves duplicate cleanup prompts queue behind the blocked recorded owner even when the latest worker AI prompt lacks dispatch headers, matching the retained cleanup-lane runtime shape from canonical `develop`.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-cleanup-queue-recorded-owner-from-verification-contract`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-stale-existing-worktree-blocked`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-queue-recorded-owner`
+- `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-cleanup-worker-blocked-consumption-boundary --issue /Users/zhaoyu/Downloads/code/my-freely/freely/docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- `PASS`: `./bin/governance-check`
+- `PENDING`: promote this same-owner repair through fresh protected premerge, merge into canonical `develop`, then rerun `./bin/freely daemon start` until the retained cleanup lane stays blocked/consumed instead of relaunching and the manager advances to the next scan-selected task.
+
 - `FAIL`: after the stale pre-stop continuity was fenced off, canonical replay re-delegated the retained cleanup lane with `EXIT_KIND=delegate_workers`, but `manager-worker-launch-state.env` still showed `LAST_MANAGER_WORKER_PROMPTS_GENERATED=""`, `QUEUED_WORKER_PROMPTS=""`, and `LAUNCHED_WORKER_PROMPTS=""`.
 - `FAIL`: the manager continuity was lawful and launchable, but runtime only parsed direct `## Worker Delegation` handoffs; the current `## Queue State` continuity shape with bare `worker_prompts:` was treated as prompt-empty, so the selected worker was never queued or launched.
 - `PASS`: `manager_worker_prompt_paths_from_continuity_by_mode()` and the queue-state parser now accept both direct and bare `worker_prompts:` entries under `## Queue State`, preserving the same launchability truth that `delegate_workers` contract validation already enforced.

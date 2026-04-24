@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-duplicate-cleanup-recorded-owner.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+trap 'rm -rf "$TMP_DIR_REAL"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER="$WT_ROOT/feature-cleanup"
+WORKER_REAL="$TMP_DIR_REAL/freely-worktrees/feature-cleanup"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+cd "$PROJECT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m init
+git branch feature/cleanup
+git worktree add "$WORKER" feature/cleanup >/dev/null
+
+mkdir -p "$WORKER/.freely/run" "$WORKER/.freely/logs"
+
+SOURCE_PROMPT="$WORKER/.freely/run/source-worker-cleanup.txt"
+cat >"$SOURCE_PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/cleanup\`
+dispatch_priority: \`P0\`
+parallel_safe: \`false\`
+write_scope: \`$WORKER/.freely/**\`
+intent_kind: \`cleanup\`
+intent_target: \`cleanup-governance:feature/cleanup\`
+EOF
+
+cat >"$WORKER/.freely/run/worker-verification-contract.env" <<EOF
+SOURCE_PROMPT_FILE="$SOURCE_PROMPT"
+SOURCE_INTAKE_ID="worker-cleanup-intake"
+VERIFICATION_METADATA_PRESENT="true"
+VERIFICATION_METADATA_MISSING_FIELDS=""
+OWNER_ISSUE="cleanup-governance:feature/cleanup"
+PRE_TESTS_PATH=".freely/intake/worker-cleanup-intake"
+VERIFICATION_ARTIFACT_DIR=".freely/run"
+REQUIRED_TEST_LANES_CSV="feature-local"
+REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="cleanup-acceptance"
+MINIMUM_EVIDENCE_LEVEL="exact-path cleanup or blocker evidence"
+TARGET_ENVIRONMENT="retained local feature worktree cleanup lane"
+CLOSEOUT_GATE="cleanup_or_blocker_only"
+CLOSEOUT_GATE_COMMAND="git status --short && ./bin/checkpoint-guard"
+CLOSEOUT_TARGET_LANE="feature/cleanup"
+CLOSEOUT_PROMOTION_GATE="do not promote"
+CLOSEOUT_REQUIRES_ADEQUACY="true"
+CLOSEOUT_REVIEW_ARTIFACT_POLICY="minimum cleanup evidence only"
+UPDATED_AT="2026-04-24T07:27:23Z"
+EOF
+
+cat >"$WORKER/.freely/run/prompt-20260424-002405.txt" <<'EOF'
+This is the worker AI prompt body after runtime expansion.
+It does not preserve machine-readable dispatch headers.
+EOF
+
+cat >"$WORKER/.freely/run/workcell-state.env" <<EOF
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="worker_exit_contract_blocked"
+LAST_ENTRYPOINT_MODE="foreground"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-24T07:27:24Z"
+LAST_WORKER_VERIFICATION_CONTRACT_FILE="$WORKER/.freely/run/worker-verification-contract.env"
+LAST_WORKER_VERIFICATION_METADATA_PRESENT="true"
+LAST_WORKER_VERIFICATION_METADATA_MISSING_FIELDS=""
+LAST_WORKER_OWNER_ISSUE="cleanup-governance:feature/cleanup"
+LAST_WORKER_PRE_TESTS_PATH=".freely/intake/worker-cleanup-intake"
+LAST_WORKER_VERIFICATION_ARTIFACT_DIR=".freely/run"
+LAST_WORKER_REQUIRED_TEST_LANES_CSV="feature-local"
+LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="cleanup-acceptance"
+LAST_WORKER_MINIMUM_EVIDENCE_LEVEL="exact-path cleanup or blocker evidence"
+LAST_WORKER_TARGET_ENVIRONMENT="retained local feature worktree cleanup lane"
+LAST_WORKER_CLOSEOUT_GATE="cleanup_or_blocker_only"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="git status --short && ./bin/checkpoint-guard"
+LAST_WORKER_CLOSEOUT_TARGET_LANE="feature/cleanup"
+LAST_WORKER_CLOSEOUT_PROMOTION_GATE="do not promote"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="true"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="minimum cleanup evidence only"
+EOF
+
+PROMPT_B="$PROJECT/.freely/run/worker-prompts/20260424-002438-worker-cleanup-codex.txt"
+cat >"$PROMPT_B" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/cleanup\`
+dispatch_priority: \`P0\`
+parallel_safe: \`false\`
+write_scope: \`$WORKER/.freely/**\`
+intent_kind: \`cleanup\`
+intent_target: \`cleanup-governance:feature/cleanup\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260424-002438.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+- worker_prompt: \`$PROMPT_B\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+LAUNCH_LOG="$TMP_DIR/launch.log"
+launch_worker_from_manager_prompt_if_needed() {
+  local _manager_project="$1" prompt_file="$2"
+  basename "$prompt_file" >>"$LAUNCH_LOG"
+  return 0
+}
+
+COUNT="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$COUNT" == "0" ]] || {
+  echo "[FAIL] duplicate cleanup prompt should queue behind the recorded blocked owner from verification contract, got $COUNT" >&2
+  exit 1
+}
+[[ ! -f "$LAUNCH_LOG" ]] || {
+  echo "[FAIL] duplicate cleanup prompt should not relaunch while the blocked owner is still recorded" >&2
+  cat "$LAUNCH_LOG" >&2
+  exit 1
+}
+
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "${QUEUED_WORKER_PROMPTS:-}" == "$PROMPT_B" ]]
+[[ "${QUEUED_WORKER_PROMPT_BLOCKERS:-}" == "queued:feature/cleanup=cleanup@$WORKER_REAL blocked_by=feature/cleanup@$WORKER_REAL state=recorded-owner status=soft_stale" ]]
+
+echo "[PASS] duplicate cleanup prompt queues behind the blocked recorded owner from verification contract"

@@ -419,3 +419,27 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-daemon-stop-boundary-premerge-verification.md`
+
+### Blocked cleanup workers retain authoritative recorded ownership
+- id: `blocked-cleanup-recorded-owner-retained`
+- requirement: `When a cleanup worker exits blocked, runtime must derive current blocking ownership from the authoritative verification-contract prompt source rather than a later worker-local AI prompt that may omit dispatch headers.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#28`
+- case_design: `Simulate a blocked cleanup worker whose verification contract still points at the delegated source prompt while the latest worker AI prompt no longer carries machine-readable Worktree/Branch headers, then verify duplicate cleanup launch requests queue behind the recorded owner instead of relaunching the lane.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-cleanup-blocked-recorded-owner-verification.md`
+
+### Protected replay stages blocked cleanup ownership evidence
+- id: `blocked-cleanup-recorded-owner-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the blocked-cleanup recorded-owner regression together with adjacent ownership guards and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#28`
+- case_design: `Replay the blocked-cleanup ownership repair on a disposable protected lane, rerun the duplicate-cleanup, stale-target, and duplicate-promotion recorded-owner regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-cleanup-blocked-recorded-owner-premerge-verification.md`
