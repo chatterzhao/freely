@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/manager-worker-launch-recorded-self-intent-reclaim-20260424`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-worker-launch-recorded-self-intent-reclaim`
-- updated_at: `2026-04-24 05:45 PDT`
+- updated_at: `2026-04-24 06:18 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -266,7 +266,8 @@
 - `PASS`: `manager_prompt_may_reclaim_recorded_self_intent()` now allows manager to reclaim that recorded self-intent whenever the prompt targets the same stopped worktree/signature, the target lane is only `soft_stale`, and no other worker plus no queued/frozen prompt still holds that signature. The older retained-cleanup merged followthrough reclaim path remains intact as a stricter subset.
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-recorded-self-intent`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-reclaims-retained-merged-cleanup-self-intent`
-- `PENDING`: replay this broader recorded-self-intent reclaim repair through protected premerge and guarded `develop`, then rerun canonical daemon replay until the delegated retained owner-rebind worker launches automatically, returns lawful cleanup / blocker truth, and Freely continues to the next task source instead of restarting manager patrol.
+- `PASS`: protected replay on `test-pre-merge-20260424-recorded-self-intent` reran the recorded-self-intent relaunch regression, retained cleanup self-reclaim regression, duplicate cleanup recorded-owner queue regression, stale queued relaunch regression, `./bin/pretests-gate`, and `./bin/governance-check` without widening ordinary ownership blocking.
+- `PENDING`: guarded `develop` merge still needs to land this repair and canonical daemon replay still must prove the delegated retained owner-rebind worker launches automatically, returns lawful cleanup / blocker truth, and Freely continues to the next task source instead of restarting manager patrol.
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-triggers-cleanup-followthrough`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-cleanup-followthrough-failure-materializes-blocker`
 - `PENDING`: rerun guarded premerge and canonical `develop` replay to verify cleanup followthrough now retires the retained blocker lane, clears `cleanup_governance`, and lets Freely continue toward the next task.
