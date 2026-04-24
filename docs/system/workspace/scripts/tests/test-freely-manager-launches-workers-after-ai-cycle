@@ -110,7 +110,10 @@ CONT_FILE="$PROJECT/.freely/run/manager-continuity-20260322-020303.md"
 cat >"$CONT_FILE" <<EOF
 # Manager Continuity
 
-- worker_prompt: \`$PROMPT_FILE\`
+## Queue State
+
+worker_prompts:
+- $PROMPT_FILE
 EOF
 
 cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
