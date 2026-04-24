@@ -558,3 +558,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-recorded-self-intent-premerge-verification.md`
+
+### Protected replay stages active authoritative worker prompt consumption evidence
+- id: `active-authoritative-worker-prompt-consumption-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must prove manager consumes an already-active worker's exact authoritative prompt instead of keeping that prompt queued and spinning another manager round.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#34`
+- case_design: `Replay the active-authoritative worker prompt consumption repair on a disposable protected lane, rerun the focused active-authoritative, delegated-busy queue, and launch-state refresh regressions there, then stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-active-authoritative-worker-prompt-premerge-verification.md`

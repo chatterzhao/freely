@@ -60,6 +60,14 @@ EOF
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 
 LAUNCH_LOG="$TMP_DIR/launch.log"
+worker_project_is_actively_running() {
+  local project="$1"
+  project_paths_equivalent "$project" "$WORKER"
+}
+worker_project_busy_with_delegated_continuation() {
+  local project="$1"
+  project_paths_equivalent "$project" "$WORKER"
+}
 launch_worker_from_manager_prompt_if_needed() {
   local _manager_project="$1" prompt_file="$2"
   basename "$prompt_file" >>"$LAUNCH_LOG"

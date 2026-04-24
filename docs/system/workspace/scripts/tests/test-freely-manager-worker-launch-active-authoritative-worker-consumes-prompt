@@ -1,0 +1,216 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-worker-active-authoritative.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER_WT="$TMP_DIR/worker-wt"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260322-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" worktree add -q -b feature/test-worker "$WORKER_WT" develop
+PROJECT="$(cd "$PROJECT" && pwd -P)"
+WORKER_WT="$(cd "$WORKER_WT" && pwd -P)"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WORKER_WT/.freely/run" "$WORKER_WT/.freely/logs"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$WORKER_WT/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER_WT"
+INTENT_FILE="$WORKER_WT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER_WT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/20260322-0412-worker-three-loop-continue-dev-codex.txt"
+cat >"$PROMPT_FILE" <<EOF
+Worktree:
+- \`$WORKER_WT\`
+Branch:
+- \`feature/test-worker\`
+dispatch_priority: P0
+parallel_safe: true
+write_scope: \`$WORKER_WT\`
+intent_kind: edit
+intent_target: \`$WORKER_WT\`
+Owner-Issue:
+- \`I-20260408-1205-A\`
+Pre-Tests-Path:
+- \`docs/epics/sample/story/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`docs/epics/sample/story/code-reviews\`
+Required-Test-Lanes:
+- \`feature-local\`
+Required-Acceptance-Item-Ids:
+- \`worker-launch-linkage\`
+Minimum-Evidence-Level:
+- \`artifact-plus-human-observation\`
+Target-Environment:
+- \`develop\`
+Closeout-Gate:
+- \`owner-issue verification closeout\`
+Closeout-Gate-Command:
+- \`owner-issue verification closeout\`
+Closeout-Target-Lane:
+- \`post-merge-followthrough\`
+Closeout-Promotion-Gate:
+- \`completion\`
+Closeout-Requires-Adequacy:
+- \`false\`
+Closeout-Review-Artifact-Policy:
+- \`none\`
+EOF
+
+CONT_FILE="$PROJECT/.freely/run/manager-continuity-20260322-0412.md"
+cat >"$CONT_FILE" <<EOF
+# Manager Continuity
+
+- delegated worker prompt:
+  - $PROMPT_FILE
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$CONT_FILE"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$PROMPT_FILE"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONT_FILE"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED=""
+LAUNCHED_WORKER_PROMPTS=""
+QUEUED_WORKER_PROMPTS="$PROMPT_FILE"
+QUEUED_WORKER_PROMPT_BLOCKERS="queued:feature/test-worker=edit@$WORKER_WT blocked_by=feature/test-worker@$PROMPT_FILE state=queued-owner status=queued"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="1"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-03-22T04:12:20Z"
+EOF
+
+cat >"$WORKER_WT/.freely/run/workcell-state.env" <<EOF
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="worker"
+EOF
+
+sleep 999 >/dev/null 2>&1 &
+ACTIVE_SUP="$!"
+sleep 999 >/dev/null 2>&1 &
+ACTIVE_AI="$!"
+trap 'kill "$ACTIVE_SUP" "$ACTIVE_AI" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+printf '%s' "$ACTIVE_SUP" >"$WORKER_WT/.freely/run/supervisor.pid"
+printf '%s' "$ACTIVE_AI" >"$WORKER_WT/.freely/run/ai.pid"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+REENTRY_LOG="$TMP_DIR/reentry.log"
+START_LOG="$TMP_DIR/started.log"
+request_local_continuation_reentry() {
+  printf '%s|%s\n' "$1" "$2" >>"$REENTRY_LOG"
+}
+start_workcell_supervisor_async() {
+  echo "$1" >>"$START_LOG"
+}
+manager_supervisor_pid_for_project() {
+  local project="$1"
+  if [[ "$project" == "$WORKER_WT" ]]; then
+    echo "12345"
+  fi
+}
+runtime_ai_pid_hint_for_project() {
+  local project="$1"
+  if [[ "$project" == "$WORKER_WT" ]]; then
+    echo "54321"
+  fi
+}
+worker_project_is_actively_running() {
+  local project="$1"
+  [[ "$project" == "$WORKER_WT" ]]
+}
+
+cat >"$WORKER_WT/.freely/run/worker-verification-contract.env" <<EOF
+SOURCE_PROMPT_FILE="$PROMPT_FILE"
+VERIFICATION_METADATA_PRESENT="true"
+OWNER_ISSUE="I-20260408-1205-A"
+EOF
+
+LAUNCHED="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$LAUNCHED" == "1" ]] || {
+  echo "[FAIL] expected active authoritative worker to count as handled, got $LAUNCHED" >&2
+  exit 1
+}
+[[ ! -f "$REENTRY_LOG" ]] || {
+  echo "[FAIL] active authoritative worker must not request redundant reentry" >&2
+  exit 1
+}
+[[ ! -f "$START_LOG" ]] || {
+  echo "[FAIL] active authoritative worker must not start a second supervisor" >&2
+  exit 1
+}
+
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" == "$PROMPT_FILE" ]] || {
+  echo "[FAIL] expected prompt to be recorded as consumed" >&2
+  exit 1
+}
+[[ -z "${QUEUED_WORKER_PROMPTS:-}" ]] || {
+  echo "[FAIL] active authoritative worker prompt must not stay queued" >&2
+  exit 1
+}
+manager_continuity_has_unconsumed_launchable_worker_prompt "$PROJECT" "$CONT_FILE" && {
+  echo "[FAIL] active authoritative worker must not keep continuity launchable" >&2
+  exit 1
+}
+manager_continuity_waiting_on_active_busy_worker "$PROJECT" "$CONT_FILE" || {
+  echo "[FAIL] manager continuity should wait on the active authoritative worker" >&2
+  exit 1
+}
+
+echo "[PASS] active authoritative worker consumes the manager prompt without redundant queueing"
