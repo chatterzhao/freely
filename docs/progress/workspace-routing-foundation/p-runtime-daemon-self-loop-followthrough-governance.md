@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/runtime-cleanup-followthrough-extraction-20260423`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-feature-runtime-cleanup-followthrough-extraction`
-- updated_at: `2026-04-23 16:05 PDT`
+- branch: `feature/fleet-review-and-closeout-20260423`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-feature-fleet-review-and-closeout`
+- updated_at: `2026-04-23 23:25 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -73,6 +73,9 @@
 - Runtime now emits targeted guidance for those classified failure families, includes a proxy-mode summary with the authoritative project/global config paths, and documents `inherit` / `disabled` / `explicit` proxy modes directly in the runtime config template without changing the default mode.
 - Canonical `develop` replay still exposed one narrower reconnect-exhaustion seam after that guidance landed: when Codex exhausted its own reconnect loop and ended with upstream `502 Bad Gateway`, monitor/runtime still persisted `tool_runtime_failure`, which incorrectly widened recovery into generic tool/slot fallback.
 - Runtime now passes a dedicated network marker from `monitor-ai-cli` into the supervisor loop, writes that marker only for real network evidence, and reclassifies reconnect-exhaustion `502` exits back onto the bounded `execution_network_transient` / `execution_network_persistent` path while keeping Codex 429 on the immediate tool-failure path.
+- Canonical `develop` replay for the retained dirty blocker lane then exposed one narrower launchability family inside the same owner: daemon patrol could still emit `printf: write error: Broken pipe` while computing worktree summary, and manager launch / exit-contract validation still required the target worktree to pre-exist even when continuity had already selected a governed sibling lane that should be materialized on demand.
+- The same replay family also showed a retirement overreach: once a branch tip was merged, runtime could still misclassify a merged-tip lane as retire-ready cleanup even though the latest authoritative continuity still carried an active `edit` prompt for that lane, which would erase real ownership instead of letting the selected task continue.
+- This followthrough now makes `worktree_summary_for_project()` consume `git worktree list --porcelain` without the pipe-fragile `awk` stage, tolerates downstream closed-pipe consumers, allows prompt-governed missing sibling worktrees to be materialized before manager launch, and blocks both absorbed/retire-ready merged classification whenever authoritative continuity still grants active `edit` or `promotion` ownership to that lane.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
 
 ## 2026-04-22 07:09 PDT Reconnect Exhaustion 502 Network Marker Followthrough
@@ -84,6 +87,23 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-codex-on-429-rate-limit`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
 - `PENDING`: absorb this same-owner repair into canonical `develop`, rerun daemon self-host supervision, and verify Freely can advance past reconnect-exhaustion truth into real task completion instead of widening into cross-tool fallback.
+
+## 2026-04-23 23:25 PDT Worker Materialization And Pipe-Safe Summary Followthrough
+
+- `FAIL`: canonical `develop` fleet replay narrowed to one retained dirty blocker lane, but daemon/log consumers could still hit `printf: write error: Broken pipe` inside `worktree_summary_for_project()`, which is enough to degrade patrol/live-status even though the task source was already present.
+- `FAIL`: the same replay family then showed manager could choose a worker prompt from continuity/scan and still reject it as non-launchable when its governed sibling worktree did not already exist, even though the prompt already contained lawful `Worktree:` and `Branch:` metadata under the canonical `*-worktrees` root.
+- `FAIL`: once such a lane existed and its branch tip was merged, runtime could still misclassify it as retire-ready cleanup despite the latest authoritative continuity still carrying an active `edit` prompt for that same lane, which would throw away real selected-task ownership instead of letting the worker continue.
+- `PASS`: `worktree_summary_for_project()` now iterates the porcelain output directly and writes its summary through a pipe-tolerant block, removing the broken-pipe seam without changing worktree counting semantics.
+- `PASS`: manager exit-contract validation and worker launch now treat governed missing sibling worktrees as materializable runtime truth, materialize them before launch, and refresh discovery so scan-selected worker prompts can actually become live workers instead of stalling in launchability repair.
+- `PASS`: merged-tip absorbed/retire-ready classification now checks the latest authoritative continuity for active non-cleanup prompt ownership, so an `edit`/`promotion` lane is not reclaimed into cleanup just because its branch is already merged.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worktree-summary-multi-worktree`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worktree-summary-tolerates-closed-pipe`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-allows-materializable-missing-worktree`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-materializes-missing-worktree`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-keeps-fresh-materialized-worker-with-authoritative-edit-prompt`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
+- `PENDING`: replay this same-owner repair through fresh protected premerge and guarded `develop`, then rerun canonical `./bin/freely daemon start` until Freely both closes the retained cleanup lane and advances to the next scan-selected task.
 
 ## 2026-04-22 06:05 PDT Proxy Guidance Followthrough
 
