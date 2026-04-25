@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-lead-agent-test-pre-merge-worker.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs" "$PROJECT/.freely/run"
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+EOF
+
+git init -q "$PROJECT"
+git -C "$PROJECT" config user.name test
+git -C "$PROJECT" config user.email test@example.com
+git -C "$PROJECT" add AGENTS.md docs
+git -C "$PROJECT" commit -qm "init"
+git -C "$PROJECT" checkout -qb test-pre-merge-demo
+
+cat >"$PROJECT/.freely/run/worker-verification-contract.env" <<EOF
+SOURCE_PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/demo.txt"
+SOURCE_INTAKE_ID="demo"
+TARGET_PROJECT="$PROJECT"
+VERIFICATION_METADATA_PRESENT="true"
+VERIFICATION_METADATA_MISSING_FIELDS=""
+OWNER_ISSUE="$PROJECT/docs/issue.md"
+PRE_TESTS_PATH="$PROJECT/docs/pre-tests.md"
+VERIFICATION_ARTIFACT_DIR="$PROJECT/docs/reviews"
+REQUIRED_TEST_LANES_CSV="premerge-integration"
+REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="ACC-1"
+MINIMUM_EVIDENCE_LEVEL="bounded verification evidence"
+TARGET_ENVIRONMENT="test-pre-merge worktree"
+CLOSEOUT_GATE="manager review"
+CLOSEOUT_GATE_COMMAND="./bin/test-lane premerge-integration -- ./bin/governance-check"
+CLOSEOUT_TARGET_LANE="develop"
+CLOSEOUT_PROMOTION_GATE="manager approval"
+CLOSEOUT_REQUIRES_ADEQUACY="true"
+CLOSEOUT_REVIEW_ARTIFACT_POLICY="write bounded review artifact"
+UPDATED_AT="2026-04-25T00:00:00Z"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="starting"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-25T00:00:00Z"
+EOF
+
+PROMPT="$(
+  bash "$ROOT_DIR/docs/system/workspace/scripts/start-lead-agent.sh" \
+    --project "$PROJECT" \
+    --intent "$PROJECT/docs/PROJECT_INTENT.md" \
+    --constitution "$PROJECT/docs/CONSTITUTION.md" \
+    --workspace-root "$ROOT_DIR/docs/system/workspace" \
+    --ai codex:auto
+)"
+
+printf '%s\n' "$PROMPT" | grep -q 'CURRENT_BRANCH=test-pre-merge-demo'
+printf '%s\n' "$PROMPT" | grep -q 'MANAGER_MODE=false'
+printf '%s\n' "$PROMPT" | grep -q '保持 worker reentry scope'
+
+if printf '%s\n' "$PROMPT" | grep -q '至少创建一个 manager continuity 文件'; then
+  echo "[FAIL] delegated test-pre-merge worker prompt should not require manager continuity generation" >&2
+  exit 1
+fi
+
+if printf '%s\n' "$PROMPT" | grep -q '当前分支是受保护主管工位'; then
+  echo "[FAIL] delegated test-pre-merge worker prompt should not be forced into manager-only scope" >&2
+  exit 1
+fi
+
+echo "[PASS] delegated test-pre-merge worker prompt stays worker-scoped"

@@ -2772,6 +2772,60 @@ pid_matches_project() {
   return 1
 }
 
+runtime_source_project_from_command() {
+  local cmd="$1" token
+  [[ -n "$cmd" ]] || return 0
+  while IFS= read -r token; do
+    [[ -n "$token" ]] || continue
+    case "$token" in
+      */docs/system/workspace/scripts/runtime/freely)
+        printf '%s\n' "${token%/docs/system/workspace/scripts/runtime/freely}"
+        return 0
+        ;;
+      */bin/freely)
+        printf '%s\n' "${token%/bin/freely}"
+        return 0
+        ;;
+    esac
+  done < <(awk '{ for (i = 1; i <= NF; i++) print $i }' <<<"$cmd")
+  return 0
+}
+
+runtime_source_project_for_pid() {
+  local pid="$1" cmd
+  [[ -n "$pid" ]] || return 0
+  cmd="$(ps_command_for_pid "$pid")"
+  runtime_source_project_from_command "$cmd"
+}
+
+project_control_plane_runtime_source_project() {
+  local project="$1" supervisor_pid runtime_source=""
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  if [[ -n "$supervisor_pid" ]]; then
+    runtime_source="$(runtime_source_project_for_pid "$supervisor_pid")"
+    if [[ -n "$runtime_source" ]]; then
+      printf '%s\n' "$runtime_source"
+      return 0
+    fi
+  fi
+  if [[ -n "$SELF_ROOT" && -d "$SELF_ROOT" ]]; then
+    printf '%s\n' "$SELF_ROOT"
+    return 0
+  fi
+  return 0
+}
+
+control_plane_pid_matches_authoritative_runtime_source() {
+  local project="$1" pid="$2" expected_source actual_source
+  process_inspection_available || return 0
+  [[ -n "$pid" ]] || return 1
+  expected_source="$(project_control_plane_runtime_source_project "$project")"
+  [[ -n "$expected_source" ]] || return 0
+  actual_source="$(runtime_source_project_for_pid "$pid")"
+  [[ -n "$actual_source" ]] || return 1
+  project_paths_equivalent "$actual_source" "$expected_source"
+}
+
 supervisor_identity_matches_project_pid() {
   local project="$1" pid="$2" identity_file identity_project identity_pid identity_phase
   [[ -n "$pid" ]] || return 1
@@ -2864,12 +2918,62 @@ valid_discovered_supervisor_pid_for_project() {
 
 valid_ensure_manager_watchdog_pid_for_project() {
   local project="$1" pid="$2"
-  pid_matches_project "$pid" "$project" "runtime/freely ensure-manager --project"
+  [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 1
+  pid_matches_project "$pid" "$project" "runtime/freely ensure-manager --project" || return 1
+  control_plane_pid_matches_authoritative_runtime_source "$project" "$pid"
 }
 
 valid_interruption_dispatcher_pid_for_project() {
   local project="$1" pid="$2"
+  pid_matches_project "$pid" "$project" "runtime/freely ensure-interruption-dispatch --project" || return 1
+  control_plane_pid_matches_authoritative_runtime_source "$project" "$pid"
+}
+
+project_owned_manager_watchdog_pid_for_project() {
+  local project="$1" pid="$2"
+  pid_matches_project "$pid" "$project" "runtime/freely ensure-manager --project"
+}
+
+project_owned_interruption_dispatcher_pid_for_project() {
+  local project="$1" pid="$2"
   pid_matches_project "$pid" "$project" "runtime/freely ensure-interruption-dispatch --project"
+}
+
+reconcile_control_plane_processes_for_active_runtime() {
+  local project="$1" role pid pid_file
+  role="$(effective_runtime_role_for_project "$project")"
+
+  pid_file="$(interruption_dispatcher_pid_file "$project")"
+  if [[ -f "$pid_file" ]]; then
+    pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if [[ -n "$pid" ]] && project_owned_interruption_dispatcher_pid_for_project "$project" "$pid" && ! valid_interruption_dispatcher_pid_for_project "$project" "$pid"; then
+      terminate_pid_with_graceful_wait "$pid" "project interruption dispatcher runtime-source reconcile"
+      rm -f "$pid_file"
+    fi
+  fi
+  while IFS= read -r pid; do
+    [[ -n "$pid" ]] || continue
+    valid_interruption_dispatcher_pid_for_project "$project" "$pid" && continue
+    terminate_pid_with_graceful_wait "$pid" "project interruption dispatcher runtime-source reconcile"
+  done < <(discover_interruption_dispatcher_pids "$project")
+
+  pid_file="$(ensure_manager_watchdog_pid_file "$project")"
+  if [[ -f "$pid_file" ]]; then
+    pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if [[ -n "$pid" ]] && project_owned_manager_watchdog_pid_for_project "$project" "$pid"; then
+      if [[ "$role" != "manager" ]] || ! valid_ensure_manager_watchdog_pid_for_project "$project" "$pid"; then
+        terminate_pid_with_graceful_wait "$pid" "project manager watchdog runtime-source reconcile"
+        rm -f "$pid_file"
+      fi
+    fi
+  fi
+  while IFS= read -r pid; do
+    [[ -n "$pid" ]] || continue
+    if [[ "$role" == "manager" ]] && valid_ensure_manager_watchdog_pid_for_project "$project" "$pid"; then
+      continue
+    fi
+    terminate_pid_with_graceful_wait "$pid" "project manager watchdog runtime-source reconcile"
+  done < <(discover_manager_watchdog_pids "$project")
 }
 
 interruption_dispatcher_pid_for_project() {
@@ -5810,9 +5914,26 @@ freely_bin_for_project() {
   fi
 }
 
+delegated_launch_runtime_source_project() {
+  local requested_source_project="${1:-}" target_project="${2:-}"
+  if [[ -n "$SELF_ROOT" && -d "$SELF_ROOT" && "$SELF_ROOT" != "$target_project" ]]; then
+    printf '%s\n' "$SELF_ROOT"
+    return 0
+  fi
+  if [[ -n "$requested_source_project" && -d "$requested_source_project" ]]; then
+    printf '%s\n' "$requested_source_project"
+    return 0
+  fi
+  return 1
+}
+
 sync_tooling_before_workcell_launch() {
-  local project="$1" source_project="${2:-}" source_bin
+  local project="$1" source_project="${2:-}" source_bin runtime_source_project
   [[ -n "$project" && -d "$project" ]] || return 0
+  runtime_source_project="$(delegated_launch_runtime_source_project "$source_project" "$project" || true)"
+  if [[ -n "$runtime_source_project" ]]; then
+    source_project="$runtime_source_project"
+  fi
   if [[ -z "$source_project" || ! -d "$source_project" ]]; then
     source_project="$(worktree_path_for_branch "$project" "develop" || true)"
   fi
@@ -5827,7 +5948,11 @@ sync_tooling_before_workcell_launch() {
 }
 
 start_workcell_supervisor_async() {
-  local project="$1" source_project="${2:-}" freely_bin recovery_log launch_mode launch_command
+  local project="$1" source_project="${2:-}" freely_bin recovery_log launch_mode launch_command runtime_source_project
+  runtime_source_project="$(delegated_launch_runtime_source_project "$source_project" "$project" || true)"
+  if [[ -n "$runtime_source_project" ]]; then
+    source_project="$runtime_source_project"
+  fi
   sync_tooling_before_workcell_launch "$project" "$source_project"
   if [[ -n "$source_project" && -d "$source_project" && "$source_project" != "$project" ]]; then
     freely_bin="$(freely_bin_for_project "$source_project")"
@@ -6351,7 +6476,7 @@ branch_name_for_project() {
   git -C "$project" branch --show-current 2>/dev/null || printf 'unknown'
 }
 
-role_hint_for_project() {
+branch_role_hint_for_project() {
   local project="$1" branch
   branch="$(branch_name_for_project "$project")"
   [[ "$branch" == test-pre-merge-* ]] && { printf 'manager\n'; return 0; }
@@ -6359,6 +6484,27 @@ role_hint_for_project() {
     develop|main) printf 'manager\n' ;;
     *) printf 'worker\n' ;;
   esac
+}
+
+role_hint_for_project() {
+  local project="$1" state_file role_hint=""
+  state_file="$(workcell_state_file "$project")"
+  if [[ -f "$state_file" ]]; then
+    unset LAST_ROLE_HINT
+    # shellcheck disable=SC1090
+    source "$state_file"
+    role_hint="${LAST_ROLE_HINT:-}"
+    if [[ "$role_hint" == "manager" || "$role_hint" == "worker" ]]; then
+      printf '%s\n' "$role_hint"
+      return 0
+    fi
+  fi
+  role_hint="$(branch_role_hint_for_project "$project")"
+  if [[ "$role_hint" == "manager" ]] && worker_project_has_launchable_verification_contract "$project"; then
+    printf 'worker\n'
+    return 0
+  fi
+  printf '%s\n' "$role_hint"
 }
 
 write_workcell_state() {
@@ -8666,10 +8812,14 @@ worker_prompt_targets_retire_ready_merged_worktree() {
 }
 
 worker_prompt_launchable_for_manager_project() {
-  local manager_project="$1" prompt_file="$2" resolved_worktree target_branch
+  local manager_project="$1" prompt_file="$2" resolved_worktree target_branch handoff_prompt_file
   resolved_worktree="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   if [[ -z "$resolved_worktree" || ! -d "$resolved_worktree" ]]; then
     worker_prompt_can_materialize_missing_worktree "$manager_project" "$prompt_file" && return 0
+    return 1
+  fi
+  handoff_prompt_file="$(worker_handoff_followthrough_prompt_file_for_project "$resolved_worktree" || true)"
+  if [[ -n "$handoff_prompt_file" && -f "$handoff_prompt_file" && "$handoff_prompt_file" != "$prompt_file" ]]; then
     return 1
   fi
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
@@ -9514,7 +9664,12 @@ worker_verification_contract_missing_fields_csv_for_project() {
 }
 
 authoritative_worker_prompt_file_for_project() {
-  local project="$1" prompt_file contract_file source_prompt_file
+  local project="$1" prompt_file contract_file source_prompt_file handoff_prompt_file
+  handoff_prompt_file="$(worker_handoff_followthrough_prompt_file_for_project "$project" || true)"
+  if [[ -n "$handoff_prompt_file" && -f "$handoff_prompt_file" ]]; then
+    printf '%s\n' "$handoff_prompt_file"
+    return 0
+  fi
   contract_file="$(worker_verification_contract_state_file "$project")"
   if [[ -f "$contract_file" ]]; then
     source_prompt_file="$(meta_env_value "$contract_file" "SOURCE_PROMPT_FILE")"
@@ -9527,6 +9682,46 @@ authoritative_worker_prompt_file_for_project() {
   if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
     printf '%s\n' "$prompt_file"
     return 0
+  fi
+  return 1
+}
+
+worker_exit_contract_next_action_prompt_file_for_project() {
+  local project="$1" contract_file next_action_for_manager
+  contract_file="$(worker_exit_contract_file "$project")"
+  [[ -f "$contract_file" ]] || return 1
+  next_action_for_manager="$(meta_env_value "$contract_file" "NEXT_ACTION_FOR_MANAGER")"
+  [[ -n "$next_action_for_manager" ]] || return 1
+  printf '%s\n' "$next_action_for_manager" | awk '
+    {
+      remaining=$0
+      while (match(remaining, /\/[^` ,]+\/\.freely\/run\/worker-prompts\/[^` ,]+\.txt/)) {
+        print substr(remaining, RSTART, RLENGTH)
+        exit
+      }
+    }
+  '
+}
+
+worker_handoff_followthrough_prompt_file_for_project() {
+  local project="$1" terminal_kind followthrough_prompt continuity_file
+  terminal_kind="$(worker_exit_contract_kind "$project" || true)"
+  [[ "$terminal_kind" == "worker_handoff_needed" ]] || return 1
+
+  followthrough_prompt="$(worker_exit_contract_next_action_prompt_file_for_project "$project" || true)"
+  if [[ -n "$followthrough_prompt" && -f "$followthrough_prompt" ]] \
+    && worker_prompt_targets_worktree "$project" "$followthrough_prompt" "$project"; then
+    printf '%s\n' "$followthrough_prompt"
+    return 0
+  fi
+
+  continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
+    followthrough_prompt="$(authoritative_worker_prompt_for_worktree_from_continuity "$project" "$project" "$continuity_file" || true)"
+    if [[ -n "$followthrough_prompt" && -f "$followthrough_prompt" ]]; then
+      printf '%s\n' "$followthrough_prompt"
+      return 0
+    fi
   fi
   return 1
 }
@@ -12894,7 +13089,7 @@ manager_hygiene_alerts() {
 
 manager_runtime_recover_workers_if_needed() {
   local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered latest_continuity_file normalized_project normalized_wt_path
-  local worker_signature worker_prompt_file terminal_kind terminal_exit_reason
+  local worker_signature worker_prompt_file terminal_kind terminal_exit_reason handoff_prompt_file allow_terminal_handoff_absorb
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || return 0
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
@@ -12922,11 +13117,35 @@ manager_runtime_recover_workers_if_needed() {
       exit_reason="${LAST_EXIT_REASON:-}"
     fi
 
-    [[ "$desired_state" == "running" ]] || continue
     [[ "${role_hint:-worker}" == "worker" ]] || continue
 
     if worker_project_has_terminal_exit_contract "$wt_path"; then
       terminal_kind="$(worker_exit_contract_kind "$wt_path" || true)"
+      allow_terminal_handoff_absorb=0
+      if [[ "$terminal_kind" == "worker_handoff_needed" ]]; then
+        if [[ "$desired_state" == "running" || "$desired_state" == "stopped" || "${exit_reason:-}" == "worker_exit_contract_handoff_needed" ]]; then
+          allow_terminal_handoff_absorb=1
+        fi
+      fi
+      if [[ "$allow_terminal_handoff_absorb" -eq 1 ]]; then
+        handoff_prompt_file="$(worker_handoff_followthrough_prompt_file_for_project "$wt_path" || true)"
+        if [[ -n "$handoff_prompt_file" && -f "$handoff_prompt_file" ]]; then
+          log_info "manager runtime absorbs terminal worker handoff into followthrough prompt: branch=${branch:-unknown} prompt=$handoff_prompt_file path=$wt_path"
+          if launch_worker_from_manager_prompt_if_needed "$project" "$handoff_prompt_file"; then
+            rm -f "$(worker_exit_contract_file "$wt_path")"
+            append_runtime_event "$project" "worker_exit_contract_handoff_absorbed" \
+              "worktree=$wt_path" \
+              "branch=${branch:-unknown}" \
+              "followthrough_prompt=$handoff_prompt_file"
+            recovered=$((recovered + 1))
+            continue
+          fi
+          append_runtime_event "$project" "worker_exit_contract_handoff_absorb_launch_failed" \
+            "worktree=$wt_path" \
+            "branch=${branch:-unknown}" \
+            "followthrough_prompt=$handoff_prompt_file"
+        fi
+      fi
       case "$terminal_kind" in
         worker_done) terminal_exit_reason="worker_exit_contract_done" ;;
         worker_blocked) terminal_exit_reason="worker_exit_contract_blocked" ;;
@@ -12943,6 +13162,8 @@ manager_runtime_recover_workers_if_needed() {
       log_info "manager runtime skips expected-running recovery for terminal worker exit contract: branch=${branch:-unknown} exit_kind=${terminal_kind:-unknown} path=$wt_path"
       continue
     fi
+
+    [[ "$desired_state" == "running" ]] || continue
 
     if [[ -f "$(run_dir_for_project "$wt_path")/supervisor.pid" ]]; then
       local sp
@@ -13136,6 +13357,10 @@ select_launch_kind() {
 workspace_root_for_project() {
   local project="$1"
   local candidate start_script
+  if worker_project_has_launchable_verification_contract "$project"; then
+    echo "$SELF_ROOT/docs/system/workspace"
+    return 0
+  fi
   candidate="$project/docs/system/workspace"
   start_script="$candidate/scripts/start-lead-agent.sh"
   if [[ -d "$candidate" && -f "$start_script" ]]; then
@@ -15420,7 +15645,7 @@ stop_project_runtime() {
   if [[ -f "$(ensure_manager_watchdog_pid_file "$project")" ]]; then
     local wp
     wp="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
-    if valid_ensure_manager_watchdog_pid_for_project "$project" "$wp"; then
+    if project_owned_manager_watchdog_pid_for_project "$project" "$wp"; then
       watchdog_candidates="$wp"
     elif [[ -n "$(pid_hint_from_file_without_process_inspection "$wp" 2>/dev/null || true)" ]]; then
       log_warn "refusing to kill unverified manager watchdog pid without project ownership proof: $wp"
@@ -15439,7 +15664,7 @@ stop_project_runtime() {
   if [[ -f "$(interruption_dispatcher_pid_file "$project")" ]]; then
     local dp
     dp="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
-    if valid_interruption_dispatcher_pid_for_project "$project" "$dp"; then
+    if project_owned_interruption_dispatcher_pid_for_project "$project" "$dp"; then
       dispatcher_candidates="$dp"
     elif [[ -n "$(pid_hint_from_file_without_process_inspection "$dp" 2>/dev/null || true)" ]]; then
       log_warn "refusing to kill unverified interruption-dispatch.pid without project ownership proof: $dp"
@@ -15458,14 +15683,14 @@ stop_project_runtime() {
   if [[ -n "$watchdog_candidates" ]]; then
     while IFS= read -r sp; do
       [[ -n "$sp" ]] || continue
-      valid_ensure_manager_watchdog_pid_for_project "$project" "$sp" || continue
+      project_owned_manager_watchdog_pid_for_project "$project" "$sp" || continue
       terminate_pid_with_graceful_wait "$sp" "project manager watchdog during stop"
     done < <(printf '%s\n' "$watchdog_candidates" | awk '!seen[$0]++')
   fi
   if [[ -n "$dispatcher_candidates" ]]; then
     while IFS= read -r sp; do
       [[ -n "$sp" ]] || continue
-      valid_interruption_dispatcher_pid_for_project "$project" "$sp" || continue
+      project_owned_interruption_dispatcher_pid_for_project "$project" "$sp" || continue
       terminate_pid_with_graceful_wait "$sp" "project interruption dispatcher during stop"
     done < <(printf '%s\n' "$dispatcher_candidates" | awk '!seen[$0]++')
   fi
@@ -15958,6 +16183,7 @@ start_project_runtime() {
   trap 'request_stop INT' INT
   trap 'request_stop TERM' TERM
   exit_if_stop_requested_before_launch
+  reconcile_control_plane_processes_for_active_runtime "$project"
   ensure_interruption_dispatcher_running_for_active_runtime "$project" || {
     exit_if_stop_requested_before_launch
     log_error "freely interruption dispatcher did not become ready for project: $project"

@@ -97,6 +97,72 @@ is_manager_branch() {
   esac
 }
 
+workcell_state_file() {
+  local project="$1"
+  printf '%s\n' "$project/.freely/run/workcell-state.env"
+}
+
+worker_verification_contract_file() {
+  local project="$1"
+  printf '%s\n' "$project/.freely/run/worker-verification-contract.env"
+}
+
+worker_verification_contract_launchable() {
+  local project="$1" contract_file metadata_present missing_fields_csv
+  local owner_issue pre_tests_path artifact_dir test_lanes_csv acceptance_csv evidence_level
+  local target_environment closeout_gate_command closeout_target_lane closeout_promotion_gate
+  local closeout_requires_adequacy closeout_review_artifact_policy
+  contract_file="$(worker_verification_contract_file "$project")"
+  [[ -f "$contract_file" ]] || return 1
+  unset VERIFICATION_METADATA_PRESENT VERIFICATION_METADATA_MISSING_FIELDS OWNER_ISSUE PRE_TESTS_PATH \
+    VERIFICATION_ARTIFACT_DIR REQUIRED_TEST_LANES_CSV REQUIRED_ACCEPTANCE_ITEM_IDS_CSV \
+    MINIMUM_EVIDENCE_LEVEL TARGET_ENVIRONMENT CLOSEOUT_GATE_COMMAND CLOSEOUT_TARGET_LANE \
+    CLOSEOUT_PROMOTION_GATE CLOSEOUT_REQUIRES_ADEQUACY CLOSEOUT_REVIEW_ARTIFACT_POLICY
+  # shellcheck disable=SC1090
+  source "$contract_file"
+  metadata_present="${VERIFICATION_METADATA_PRESENT:-}"
+  missing_fields_csv="${VERIFICATION_METADATA_MISSING_FIELDS:-}"
+  owner_issue="${OWNER_ISSUE:-}"
+  pre_tests_path="${PRE_TESTS_PATH:-}"
+  artifact_dir="${VERIFICATION_ARTIFACT_DIR:-}"
+  test_lanes_csv="${REQUIRED_TEST_LANES_CSV:-}"
+  acceptance_csv="${REQUIRED_ACCEPTANCE_ITEM_IDS_CSV:-}"
+  evidence_level="${MINIMUM_EVIDENCE_LEVEL:-}"
+  target_environment="${TARGET_ENVIRONMENT:-}"
+  closeout_gate_command="${CLOSEOUT_GATE_COMMAND:-}"
+  closeout_target_lane="${CLOSEOUT_TARGET_LANE:-}"
+  closeout_promotion_gate="${CLOSEOUT_PROMOTION_GATE:-}"
+  closeout_requires_adequacy="${CLOSEOUT_REQUIRES_ADEQUACY:-}"
+  closeout_review_artifact_policy="${CLOSEOUT_REVIEW_ARTIFACT_POLICY:-}"
+  [[ "$metadata_present" == "true" ]] || return 1
+  [[ -z "$missing_fields_csv" ]] || return 1
+  [[ -n "$owner_issue" && -n "$pre_tests_path" && -n "$artifact_dir" && -n "$test_lanes_csv" && -n "$acceptance_csv" && -n "$evidence_level" && -n "$target_environment" && -n "$closeout_gate_command" && -n "$closeout_target_lane" && -n "$closeout_promotion_gate" && -n "$closeout_requires_adequacy" && -n "$closeout_review_artifact_policy" ]]
+}
+
+prompt_role_for_project() {
+  local project="$1" branch="$2" state_file role_hint=""
+  state_file="$(workcell_state_file "$project")"
+  if [[ -f "$state_file" ]]; then
+    unset LAST_ROLE_HINT
+    # shellcheck disable=SC1090
+    source "$state_file"
+    role_hint="${LAST_ROLE_HINT:-}"
+    if [[ "$role_hint" == "manager" || "$role_hint" == "worker" ]]; then
+      printf '%s\n' "$role_hint"
+      return 0
+    fi
+  fi
+  if is_manager_branch "$branch" && worker_verification_contract_launchable "$project"; then
+    printf 'worker\n'
+    return 0
+  fi
+  if is_manager_branch "$branch"; then
+    printf 'manager\n'
+  else
+    printf 'worker\n'
+  fi
+}
+
 worktree_fleet_brief() {
   local project="$1" repo_root total dirty
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
@@ -195,6 +261,7 @@ fi
 IFS='|' read -r ai_tool ai_model ai_mode <<<"$(parse_ai_spec_or_fail "$ai_spec")"
 
 current_branch="$(git -C "$project" branch --show-current 2>/dev/null || printf 'unknown')"
+prompt_role="$(prompt_role_for_project "$project" "$current_branch")"
 current_clean_state="$(project_clean_state "$project")"
 current_dirty_entries="$(project_dirty_entries "$project")"
 current_checkpoint_summary="$(checkpoint_guard_summary "$project")"
@@ -227,7 +294,7 @@ initial_read_targets="$(cat <<EOF
 EOF
 )"
 
-if is_manager_branch "$current_branch"; then
+if [[ "$prompt_role" == "manager" ]]; then
   manager_mode="true"
   execution_rule_15="15. 当前分支是受保护主管工位；你不得在当前 worktree 直接修改受版本管理的仓库产物。"
   execution_rule_16="16. 若 \`selected_tool\` 与当前运行中的 \`AI_TOOL\` 相同，也不要在当前会话内直接执行第二跳实现；你必须先选择或创建对应 feature worktree，并把执行权委派到那个工位的 worker AI/tool 进程。"
