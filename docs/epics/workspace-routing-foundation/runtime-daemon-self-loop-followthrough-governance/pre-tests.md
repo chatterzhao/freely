@@ -529,6 +529,30 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-cleanup-blocked-recorded-owner-premerge-verification.md`
 
+### Existing stale worker worktree bootstrap repair holds on feature lane
+- id: `existing-stale-worker-worktree-bootstrap-feature-proof`
+- requirement: `If a manager-selected worker worktree directory already exists but still lacks managed tooling or `.freely/run` baseline state, runtime must repair that worktree before delegation instead of treating it as already launch-ready.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#34`
+- case_design: `Seed an authoritative worker prompt that targets an already-existing sibling worktree containing only copied `.freely/config.env`, then verify manager launch syncs tooling, recreates runtime baseline state, and starts the worker instead of stalling on the half-materialized directory.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-existing-stale-worker-bootstrap-verification.md`
+
+### Protected replay stages existing stale worker worktree bootstrap repair
+- id: `existing-stale-worker-worktree-bootstrap-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the bounded stale-existing-worktree bootstrap regressions together with adjacent worker-materialization/tooling checks and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#34`
+- case_design: `Replay the stale-existing-worktree bootstrap repair on the disposable protected lane, rerun the focused stale-worktree launch repair regression plus missing-worktree materialization and sync-tooling regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-existing-stale-worker-bootstrap-verification.md`
+
 ### Cleanup governance autofills nonlaunchable retained-lane prompts
 - id: `cleanup-nonlaunchable-prompt-autofill`
 - requirement: `When cleanup_governance continuity already carries an AI-written worker prompt for a retained merged lane, runtime must materialize an authoritative verification-bound cleanup prompt if that existing prompt is not launchable.`
