@@ -722,3 +722,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-self-loop-recovery-verification.md`
+
+### Guarded promote carries terminal followthrough materialization evidence
+- id: `guarded-promote-manager-worker-terminal-followthrough-materialization-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving manager empty-success rounds no longer auto-resume from input-only Codex sessions, terminal worker exit contracts are materialized into manager-consumable delegated continuation truth, and advisory live-status helpers cannot abort followthrough state inspection early.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#34`
+- case_design: `Replay the manager/worker terminal followthrough materialization repair on the disposable protected lane, rerun the focused explicit-resume, empty-success, terminal-worker materialization, idempotence, and live-status advisory regressions there, then stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-terminal-followthrough-materialization-verification.md`
