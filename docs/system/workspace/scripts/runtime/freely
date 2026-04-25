@@ -16750,6 +16750,10 @@ start_project_runtime() {
     if [[ -n "$delegated_pending_ids" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
       delegated_consumed_ids="$delegated_pending_ids"
       delegated_consumed_at="$(current_timestamp_utc_for_machine)"
+      # While the active prompt is already carrying these delegated continuations,
+      # the session surface must treat them as consumed rather than still pending.
+      delegated_pending_ids=""
+      delegated_pending_count="0"
     fi
     LAST_DELEGATED_CONTINUATION_PENDING_IDS="$delegated_pending_ids"
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
