@@ -89,6 +89,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 48. Reconcile launched-worker liveness on the dispatch-critical path before manager concludes no launchable worker prompt remains, so stale `LAUNCHED_WORKER_PROMPTS` / `ACTIVE_RUNNING_WORKER_COUNT` state from dead or never-up targets cannot suppress the next lawful delegation.
 49. Keep manager supervision alive while runtime is between-round relaunch grace or waiting on an expected-running worker, so a lawful manager/worker handoff loop is not misclassified as idle-supervisor drift and stopped prematurely.
 50. Treat terminal worker exit-contract truth as authoritative for recovery/cleanup followthrough: terminal workers must not be relaunched, cleanup must record their terminal evidence, clear stale launch state, normalize authoritative worktree paths, and reset discovery caches before the next patrol/closeout decision.
+51. When the latest authoritative worker prompt supersedes an older terminal `worker_handoff_needed` exit contract for the same lane, manager launch must absorb that terminal handoff and relaunch the current followthrough prompt instead of skipping the lane forever behind stale terminal truth.
 
 ## Non-Goals
 
@@ -134,6 +135,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 33. Canonical `develop` now performs target-liveness reconciliation before delegation/no-launchable-worker decisions, so stale launched-worker state from dead or never-up targets cannot keep `ACTIVE_RUNNING_WORKER_COUNT` pinned and block the next lawful worker dispatch.
 34. Canonical `develop` keeps manager supervision alive while runtime is waiting on an expected-running worker or inside between-round relaunch grace, so manager does not stop in the middle of an otherwise-correct manager/worker loop.
 35. Canonical `develop` treats terminal worker exit-contract truth plus cleanup followthrough as authoritative closeout state, which prevents stale terminal workers from being relaunched and lets cleanup clear launch/discovery residue before the next patrol and retirement decision.
+36. Canonical `develop` no longer lets a stale terminal `worker_handoff_needed` contract suppress the same lane's newer authoritative followthrough prompt; runtime must absorb that terminal handoff, clear the stale contract, and relaunch the current lane so review/cleanup/retirement can keep progressing.
 
 ## Verification
 
@@ -211,6 +213,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-workers-absorbs-terminal-handoff-followthrough`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-absorbs-terminal-handoff-followthrough`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-autonomous-existing-worktree-review-merge-retire-next-task-loop`
 - `bash docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
 - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
@@ -228,6 +232,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/progress/workspace-routing-foundation/p-runtime-daemon-self-loop-followthrough-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
+- `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-terminal-handoff-followthrough-absorb-verification.md`
+- `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-terminal-handoff-followthrough-absorb-premerge-verification.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 - `docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
