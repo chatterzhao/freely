@@ -768,3 +768,18 @@ All commands passed again in the feature worktree during this worker continuatio
   - `./bin/governance-check`
 - `PASS`: owner-linked evidence for this continuation is now explicit in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-terminal-followthrough-materialization-verification.md`, so manager no longer needs to infer this repair from candidate-only diff state.
 - `PENDING`: manager should consume the parked clean premerge lane `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-runtime-target-worker-role-and-starting-stuck-recovery` next as the first guarded-merge adequacy surface; if that parked evidence is judged stale against current diff, request a fresh protected replay instead of promoting directly from feature-local evidence.
+
+## 2026-04-25 17:30 PDT Manager Post-AI-Cycle Finalize Grace
+
+- `FAIL`: real canonical `develop` daemon evidence still exposed one narrower same-owner seam after the previous followthrough repairs landed. The root lifecycle trace showed `L041 ai_launch_observed` for the live manager supervisor, then within a few seconds watchdog emitted `L223 manager_idle_supervisor_restart trigger=supervisor_alive_ai_missing_after_grace`, and only later would the same round have been expected to write `L042 ai_cycle_finished`.
+- `FAIL`: this meant Freely was not fundamentally confused about task selection or manager/worker taxonomy. The runtime middleman had simply not modeled the post-launch / pre-finalize transition, so a manager that was still materializing terminal closeout or delegated followthrough could be mistaken for an idle orphan and restarted mid-closeout.
+- `PASS`: the bounded fix stays inside `I-20260421-1200-A`. `ensure_manager_once()` now recognizes a dedicated finalize window when the current `supervisor_pid` has observed `L041` but not yet emitted later terminal checkpoints (`L042`, `L090`, `L091`, `L092`) and keeps that supervisor alive for `FREELY_MANAGER_POST_AI_CYCLE_FINALIZE_GRACE_SECS` instead of triggering `supervisor_alive_ai_missing_after_grace`.
+- `PASS`: focused `feature-local` verification passed for the new seam and adjacent closeout surfaces:
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-post-ai-cycle-finalize-grace`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-post-ai-cycle-finalize-grace`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-empty-success-cycle-does-not-autoresume`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-overrides-network-transient`
+  - `./bin/governance-check`
+- `PASS`: a fresh guarded replay on `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-manager-worker-terminal-followthrough-materialization` absorbed the same owner commit and reran the same focused suite successfully, so this bounded repair now carries explicit issue/progress/pre-tests/review evidence rather than code-only diff state.
+- `PASS`: owner-linked verification for this seam is staged in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-post-ai-cycle-finalize-grace-verification.md`.
+- `PENDING`: rerun guarded merge into `develop`, then stop the root daemon, restart it from merged `develop`, and keep watching real lifecycle/runtime evidence until Freely either proves the full autonomous loop or surfaces the next bounded same-owner seam.
