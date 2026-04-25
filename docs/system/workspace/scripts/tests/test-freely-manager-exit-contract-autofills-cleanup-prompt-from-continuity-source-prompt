@@ -1,0 +1,279 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-exit-contract-autofill-cleanup.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER="$WT_ROOT/20260424-feature-runtime-lifecycle-receipt-closeout-reconcile"
+PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/20260424-175210-worker-runtime-lifecycle-receipt-closeout-reconcile-codex.txt"
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260424-175210.md"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260324-0000--sample" \
+  "$PROJECT/docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues" \
+  "$PROJECT/docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews" \
+  "$PROJECT/docs/progress/workspace-routing-foundation" \
+  "$PROJECT/docs/system/workspace/hooks"
+cat >"$PROJECT/README.md" <<'EOF'
+base
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260324-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+cat >"$PROJECT/docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md" <<'EOF'
+# Issue
+- issue_id: `I-20260418-1900-A`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
+- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews`
+EOF
+cat >"$PROJECT/docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md" <<'EOF'
+# Pre-tests
+EOF
+cat >"$PROJECT/docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md" <<'EOF'
+# Progress
+EOF
+cat >"$PROJECT/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Hook Notes
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_exit_rc_0"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-24T23:55:24Z"
+EOF
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+LAST_TOOL_SESSION_ID="sess-demo"
+LAST_TOOL_RESUME_TARGET="resume-demo"
+LAST_TOOL_JSONL_PATH=""
+LAST_LAUNCH_KIND="resume"
+LAST_ROTATION_REASON="none"
+LAST_CYCLE_LOG=""
+LAST_PROMPT_FILE=""
+LAST_CONTEXT_COMPACTED="0"
+LAST_CONTEXT_RATIO=""
+LAST_PRIMARY_RATE_LIMIT_USED_PERCENT=""
+LAST_PRIMARY_RATE_LIMIT_RESETS_AT=""
+LAST_SECONDARY_RATE_LIMIT_USED_PERCENT=""
+LAST_SECONDARY_RATE_LIMIT_RESETS_AT=""
+LAST_ROUTE_ONLY_HANDOFF="0"
+ROUTE_ONLY_STREAK_CURRENT="0"
+RESUME_STREAK_CURRENT="1"
+CURRENT_TOOL_SLOT=""
+LAST_SLOT_SWITCH_REASON=""
+LAST_SLOT_SWITCH_AT=""
+LAST_CYCLE_DEBUG_LOG=""
+LAST_CLAUDE_JSONL_PATH=""
+LAST_CODEX_MCP_USED="0"
+LAST_CODEX_MCP_THREAD_ID=""
+LAST_CODEX_MCP_JSONL_PATH=""
+CLAUDE_SESSION_ID_CURRENT=""
+CLAUDE_SESSION_ID_PREVIOUS=""
+LAST_PROJECT_DIRTY_ENTRIES="0"
+LAST_WORKTREE_SUMMARY_TOTAL="1"
+LAST_WORKTREE_SUMMARY_DIRTY="0"
+CHECKPOINT_DRIFT_STREAK_CURRENT="0"
+LAST_DELEGATED_CONTINUATION_PENDING_IDS=""
+LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0"
+LAST_DELEGATED_CONTINUATION_CONSUMED_IDS=""
+LAST_DELEGATED_CONTINUATION_CONSUMED_AT=""
+LAST_RESTART_STORM_WINDOW_SECS="0"
+LAST_RESTART_STORM_COUNT="0"
+LAST_PROCESS_CHURN_PEAK="0"
+LAST_RESTART_STORM_SIGNAL_AT=""
+LAST_RESTART_STORM_SIGNAL_REASON=""
+LAST_RESTART_STORM_ESCALATED_AT=""
+LAST_RESTART_STORM_ESCALATION_TARGET=""
+AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV=""
+EOF
+git -C "$PROJECT" add README.md AGENTS.md docs .freely
+git -C "$PROJECT" commit -q -m init
+
+git -C "$PROJECT" worktree add -b feature/runtime-lifecycle-receipt-closeout-reconcile-20260424 "$WORKER" develop >/dev/null
+cat >"$WORKER/owner-note.txt" <<'EOF'
+owner chain note
+EOF
+git -C "$WORKER" add owner-note.txt
+git -C "$WORKER" commit -q -m "owner chain note"
+git -C "$PROJECT" merge --no-ff -m "merge receipt reconcile lane" feature/runtime-lifecycle-receipt-closeout-reconcile-20260424 >/dev/null
+
+mkdir -p "$WORKER/.freely/run" "$WORKER/.freely/logs"
+cat >"$WORKER/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER"
+INTENT_FILE="$WORKER/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$WORKER/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-24T23:38:03Z"
+EOF
+
+cat >"$PROMPT_FILE" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/runtime-lifecycle-receipt-closeout-reconcile-20260424\`
+dispatch_priority: \`P1\`
+parallel_safe: \`true\`
+write_scope:
+- \`docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md\`
+- \`docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md\`
+- \`docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/\`
+- \`docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md\`
+intent_kind: \`edit\`
+intent_target: \`docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md\`
+Owner-Issue:
+- \`docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md\`
+Pre-Tests-Path:
+- \`docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews\`
+Required-Test-Lanes:
+- \`feature-local\`
+- \`premerge-integration\`
+- \`real-environment\`
+Required-Acceptance-Item-Ids:
+- \`receipt-followthrough-owner-chain\`
+- \`receipt-followthrough-guarded-merge\`
+- \`receipt-followthrough-fleet-closeout\`
+Minimum-Evidence-Level:
+- \`integration\`
+Target-Environment:
+- \`feature/runtime-lifecycle-receipt-closeout-reconcile-20260424\`
+Closeout-Gate:
+- \`guarded_replay_and_retirement\`
+Closeout-Gate-Command:
+- \`./bin/merge-guarded\`
+Closeout-Target-Lane:
+- \`premerge-integration\`
+Closeout-Promotion-Gate:
+- \`develop_merge\`
+Closeout-Requires-Adequacy:
+- \`true\`
+Closeout-Review-Artifact-Policy:
+- \`Update the existing verification artifact or add a dated addendum under docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews with exact command evidence plus blocker or closeout judgment.\`
+EOF
+
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+- generated_at: \`2026-04-24 17:52:10 PDT\`
+
+## Primary Judgement
+- route_kind: \`cleanup_governance\`
+- restart_point: \`delegate_launchable_receipt_followthrough_reconcile_lane_for_I-20260418-1900-A\`
+- next_action: \`Dispatch exactly one worker to $WORKER\`
+
+## Fleet Inventory
+- selected_supervision_target:
+  - issue: \`I-20260418-1900-A\`
+  - worktree: \`$WORKER\`
+  - branch: \`feature/runtime-lifecycle-receipt-closeout-reconcile-20260424\`
+  - state: \`stopped cleanup lane awaiting one fresh launchable prompt\`
+
+## Dispatch State
+- dispatch_state: \`launchable_delegate_prepared\`
+- worker_prompt_paths:
+  - \`$PROMPT_FILE\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$PROMPT_FILE"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"
+LAUNCHED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPTS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-04-24T23:55:24Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+cat >"$(manager_exit_contract_file "$PROJECT")" <<EOF
+EXIT_KIND="delegate_workers"
+WORKER_PROMPTS_CSV="$PROMPT_FILE"
+EOF
+
+RESULT="$(manager_runtime_handle_exit_contract_after_ai_cycle "$PROJECT" "ai_exit_rc_0")"
+[[ "$RESULT" == "delegate_workers" ]] || {
+  echo "[FAIL] expected cleanup autofill to repair the delegate_workers contract, got $RESULT" >&2
+  exit 1
+}
+
+REPAIRED_PROMPT="$(meta_env_value "$(manager_exit_contract_file "$PROJECT")" "WORKER_PROMPTS_CSV")"
+[[ -n "$REPAIRED_PROMPT" && -f "$REPAIRED_PROMPT" ]] || {
+  echo "[FAIL] expected repaired cleanup prompt file" >&2
+  exit 1
+}
+[[ "$REPAIRED_PROMPT" != "$PROMPT_FILE" ]] || {
+  echo "[FAIL] expected a new cleanup prompt instead of reusing the non-launchable edit prompt" >&2
+  exit 1
+}
+[[ "$(worker_prompt_normalized_intent_kind "$REPAIRED_PROMPT")" == "cleanup" ]] || {
+  echo "[FAIL] expected repaired prompt intent_kind=cleanup" >&2
+  exit 1
+}
+EXPECTED_OWNER_ISSUE="$(cd "$WORKER/docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues" && pwd -P)/runtime-lifecycle-receipt-followthrough-governance.md"
+[[ "$(cd "$(dirname "$(worker_prompt_owner_issue "$REPAIRED_PROMPT")")" && pwd -P)/$(basename "$(worker_prompt_owner_issue "$REPAIRED_PROMPT")")" == "$EXPECTED_OWNER_ISSUE" ]] || {
+  echo "[FAIL] expected repaired cleanup prompt owner issue to resolve inside the worker worktree" >&2
+  exit 1
+}
+grep -q 'manager_exit_contract_delegate_workers_autofilled' "$PROJECT/.freely/logs/runtime-events.log"
+
+echo "[PASS] manager exit contract autofills a cleanup prompt from continuity source prompt metadata when issue_truth is missing"
