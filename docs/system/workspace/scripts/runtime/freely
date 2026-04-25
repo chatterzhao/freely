@@ -10817,7 +10817,7 @@ manager_runtime_launch_workers_from_latest_handoff() {
   local continuity_file continuity_generated prompt_generated_csv launched_csv queued_csv
   local launched_count prompt_file prompt_rank prompt_index target_project write_scope
   local parallel_safe active_running_workers available_new_slots max_parallel_workers
-  local selected_write_scopes_csv selected_intent_signatures_csv frozen_intent_signatures_csv active_intent_signatures_csv recorded_intent_signatures_csv worker_is_active worker_is_busy prompt_queue_file prompt_signature queued_prompt_blockers
+  local selected_write_scopes_csv selected_intent_signatures_csv frozen_intent_signatures_csv active_intent_signatures_csv recorded_intent_signatures_csv worker_is_active worker_is_busy prompt_queue_file prompt_signature queued_prompt_blockers terminal_kind
   reset_project_runtime_discovery_cache "$project"
   continuity_file="$(latest_launchable_manager_worker_prompt_continuity_file_for_project "$project")"
   if [[ -z "$continuity_file" || ! -f "$continuity_file" ]]; then
@@ -10908,6 +10908,25 @@ manager_runtime_launch_workers_from_latest_handoff() {
       continue
     fi
     if worker_project_has_terminal_exit_contract "$target_project"; then
+      terminal_kind="$(worker_exit_contract_kind "$target_project" || true)"
+      if [[ "$terminal_kind" == "worker_handoff_needed" ]]; then
+        if launch_worker_from_manager_prompt_if_needed "$project" "$prompt_file"; then
+          rm -f "$(worker_exit_contract_file "$target_project")"
+          append_runtime_event "$project" "worker_exit_contract_handoff_absorbed" \
+            "worktree=$target_project" \
+            "branch=$(worker_prompt_target_branch "$prompt_file")" \
+            "followthrough_prompt=$prompt_file"
+          launched_csv="$(csv_append_unique_item "$launched_csv" "$prompt_file")"
+          selected_write_scopes_csv="$(csv_append_unique_item "$selected_write_scopes_csv" "$(worker_prompt_write_scope "$project" "$prompt_file")")"
+          prompt_signature="$(worker_prompt_blocking_intent_signature "$project" "$prompt_file")"
+          if [[ -n "$prompt_signature" ]]; then
+            selected_intent_signatures_csv="$(csv_append_unique_item "$selected_intent_signatures_csv" "$prompt_signature")"
+          fi
+          launched_count=$((launched_count + 1))
+          active_running_workers=$((active_running_workers + 1))
+          continue
+        fi
+      fi
       continue
     fi
     if ! worker_prompt_launchable_for_manager_project "$project" "$prompt_file"; then
