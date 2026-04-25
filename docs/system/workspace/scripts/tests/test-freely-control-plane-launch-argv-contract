@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-control-plane-launch-argv.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT" "$TMP_DIR/bin"
+touch "$TMP_DIR/bin/freely"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+SELF_ROOT="$TMP_DIR"
+
+nohup() {
+  printf '%s\n' "$*" >>"$TMP_DIR/nohup.log"
+}
+
+disown() {
+  return 0
+}
+
+launch_interruption_dispatcher "$PROJECT"
+launch_manager_watchdog "$PROJECT"
+launch_manager_control_plane_recheck "$PROJECT"
+
+grep -Fq "exec -a 'runtime/freely ensure-interruption-dispatch --project $PROJECT --watch' bash '$TMP_DIR/bin/freely' ensure-interruption-dispatch --project '$PROJECT' --watch" "$TMP_DIR/nohup.log" || {
+  echo "[FAIL] expected interruption dispatcher launcher to publish runtime/freely argv contract" >&2
+  cat "$TMP_DIR/nohup.log" >&2
+  exit 1
+}
+
+grep -Fq "exec -a 'runtime/freely ensure-manager --project $PROJECT --watch' bash '$TMP_DIR/bin/freely' ensure-manager --project '$PROJECT' --watch --interval '5'" "$TMP_DIR/nohup.log" || {
+  echo "[FAIL] expected manager watchdog launcher to publish runtime/freely argv contract" >&2
+  cat "$TMP_DIR/nohup.log" >&2
+  exit 1
+}
+
+grep -Fq "exec -a 'runtime/freely ensure-manager --project $PROJECT' bash '$TMP_DIR/bin/freely' ensure-manager --project '$PROJECT'" "$TMP_DIR/nohup.log" || {
+  echo "[FAIL] expected manager recheck launcher to publish runtime/freely argv contract" >&2
+  cat "$TMP_DIR/nohup.log" >&2
+  exit 1
+}
+
+echo "[PASS] control-plane background launchers publish runtime/freely argv contracts"
