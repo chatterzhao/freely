@@ -6,7 +6,7 @@
 - verifier: `codex`
 - source_branch: `feature/manager-worker-terminal-followthrough-materialization-20260425`
 - source_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-feature-manager-worker-terminal-followthrough-materialization`
-- related_protected_replay_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-runtime-target-worker-role-and-starting-stuck-recovery`
+- related_protected_replay_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-manager-worker-terminal-followthrough-materialization`
 
 ## Scope Verdict
 
@@ -24,6 +24,13 @@
   10. `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-materializes-worker-blocked-continuation`
   11. `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-terminal-followthrough-materialization-idempotent`
   12. `./bin/governance-check`
+- `PASS`: protected `premerge-integration` replay passed on the guarded disposable lane for the same owner surface:
+  1. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
+  2. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-empty-success-cycle-does-not-autoresume`
+  3. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-materializes-worker-done-continuation`
+  4. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-terminal-followthrough-materialization-idempotent`
+  5. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-live-status-tolerates-advisory-snapshot-failures`
+  6. `./bin/governance-check`
 - `PASS`: the current diff is adequate for manager verification intake. No extra code change was required after this pass set; the remaining gate is whether manager consumes the already parked clean premerge lane next or requests a fresh protected replay before guarded `develop` judgement.
 - `PENDING`: canonical `develop` acceptance is still open. Manager must consume the parked clean premerge lane or schedule a fresh protected replay, then keep the owner in verification until `develop` proves one full select -> finish -> merge/retire -> next-task loop.
 
@@ -41,6 +48,12 @@
 10. `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-materializes-worker-blocked-continuation`
 11. `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-terminal-followthrough-materialization-idempotent`
 12. `./bin/governance-check`
+13. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
+14. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-empty-success-cycle-does-not-autoresume`
+15. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-materializes-worker-done-continuation`
+16. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-terminal-followthrough-materialization-idempotent`
+17. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-live-status-tolerates-advisory-snapshot-failures`
+18. `./bin/governance-check`
 
 ## Implementation Decision Note
 
