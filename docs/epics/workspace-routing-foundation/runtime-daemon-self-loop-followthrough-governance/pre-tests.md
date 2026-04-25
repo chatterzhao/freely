@@ -591,12 +591,12 @@
 
 ### Dispatch-state cleanup continuity recovers from source prompt fallback
 - id: `cleanup-dispatch-state-source-prompt-fallback`
-- requirement: `When cleanup_governance continuity exposes retained-lane prompt truth only through \`## Dispatch State\` \`worker_prompt_paths:\` and legacy \`issue_truth\` is absent, runtime must still materialize a fresh launchable cleanup prompt from the continuity-carried source prompt metadata for that same retained merged lane.`
+- requirement: `When cleanup-governance continuity exposes retained-lane prompt truth only through dispatch-state worker prompt paths and legacy issue-truth is absent, runtime must still materialize a fresh launchable cleanup prompt from the continuity-carried source prompt metadata for that same retained merged lane.`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
 - task_refs: `tasks.md#36`
-- case_design: `Seed cleanup_governance continuity with \`## Dispatch State\` \`worker_prompt_paths:\`, no \`issue_truth\`, and only a merged-lane nonlaunchable edit prompt carrying verification metadata for the same retained worker; verify manager exit-contract autofill writes a fresh cleanup prompt, rebases owner metadata into the retained worker worktree, and keeps the nonlaunchable launchability guard intact.`
+- case_design: `Seed cleanup-governance continuity with dispatch-state worker prompt paths, no legacy issue-truth, and only a merged-lane nonlaunchable edit prompt carrying verification metadata for the same retained worker; verify manager exit-contract autofill writes a fresh cleanup prompt, rebases owner metadata into the retained worker worktree, and keeps the nonlaunchable launchability guard intact.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-dispatch-state-cleanup-source-prompt-fallback-premerge-verification.md`
