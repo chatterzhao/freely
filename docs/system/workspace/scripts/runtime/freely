@@ -7451,6 +7451,20 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
         }
         next
       }
+      if (section == "dispatch state") {
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*worker_prompt_paths:[[:space:]]*$/) {
+          capture_worker_prompt_path_list=(mode != "frozen")
+          next
+        }
+        if (($0 ~ /prompt_path:/ || $0 ~ /worker_prompt_path:/ || $0 ~ /worker_prompt:/) && mode != "frozen") {
+          emit_prompt_paths($0)
+          next
+        }
+        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/ && mode != "frozen") {
+          emit_prompt_paths($0)
+        }
+        next
+      }
       if (section == "queue") {
         if ($0 ~ /^[[:space:]]*-[[:space:]]*(worker_prompt|active_worker_prompt|queued_worker_prompt|refreshed_queued_worker_prompt):[[:space:]]*$/) {
           capture_worker_prompt_path_list=(mode != "frozen")
@@ -8090,6 +8104,21 @@ manager_cleanup_prompt_primary_target_row_from_continuity() {
   return 1
 }
 
+manager_cleanup_source_prompt_file_from_continuity() {
+  local project="$1" continuity_file="$2" primary_path="$3"
+  local prompt_file prompt_worktree
+  [[ -n "$primary_path" && -d "$primary_path" ]] || return 1
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    worker_prompt_has_verification_metadata "$prompt_file" || continue
+    prompt_worktree="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
+    [[ -n "$prompt_worktree" && "$prompt_worktree" == "$primary_path" ]] || continue
+    printf '%s\n' "$prompt_file"
+    return 0
+  done < <(latest_manager_worker_prompt_paths_from_continuity "$continuity_file")
+  return 1
+}
+
 manager_cleanup_prompt_write_scope_paths_from_continuity() {
   local project="$1" continuity_file="$2"
   local row path branch desired role_hint section_key disposition emitted="0" primary_row primary_path primary_branch
@@ -8138,10 +8167,47 @@ manager_cleanup_prompt_file_for_continuity() {
 
 append_manager_cleanup_worker_prompt_reference_to_continuity() {
   local continuity_file="$1" prompt_file="$2" lane_id="$3"
+  local tmp_file
   [[ -f "$continuity_file" && -n "$prompt_file" ]] || return 1
   if grep -Fq "$prompt_file" "$continuity_file"; then
     return 0
   fi
+  tmp_file="$(mktemp "${TMPDIR:-/tmp}/freely-cleanup-continuity.XXXXXX")"
+  awk -v prompt_file="$prompt_file" '
+    BEGIN {
+      in_dispatch=0
+      rewriting_paths=0
+      rewrote=0
+    }
+    /^## / {
+      in_dispatch=($0 == "## Dispatch State")
+      rewriting_paths=0
+      print
+      next
+    }
+    {
+      if (in_dispatch == 1 && $0 ~ /^[[:space:]]*-[[:space:]]*worker_prompt_paths:[[:space:]]*$/) {
+        print
+        printf "  - `%s`\n", prompt_file
+        rewriting_paths=1
+        rewrote=1
+        next
+      }
+      if (rewriting_paths == 1) {
+        if ($0 ~ /^[[:space:]]{2}-[[:space:]]/) {
+          next
+        }
+        rewriting_paths=0
+      }
+      print
+    }
+    END {
+      if (rewrote == 0) {
+        exit 0
+      }
+    }
+  ' "$continuity_file" >"$tmp_file"
+  mv "$tmp_file" "$continuity_file"
   {
     printf '\n## Worker Delegation\n'
     printf -- '- authoritative_worker_prompts:\n'
@@ -8191,6 +8257,10 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
   fi
 
   source_prompt_file="$(authoritative_worker_prompt_file_for_project "$primary_path" || true)"
+  if [[ -z "$source_prompt_file" || ! -f "$source_prompt_file" ]] \
+    || ! worker_prompt_has_verification_metadata "$source_prompt_file"; then
+    source_prompt_file="$(manager_cleanup_source_prompt_file_from_continuity "$project" "$continuity_file" "$primary_path" || true)"
+  fi
   if [[ -n "$source_prompt_file" && -f "$source_prompt_file" ]] \
     && worker_prompt_has_verification_metadata "$source_prompt_file"; then
     owner_issue_abs="$(worker_prompt_owner_issue "$source_prompt_file")"
@@ -8209,6 +8279,16 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
     if [[ -f "$owner_issue_abs" ]]; then
       issue_id="$(markdown_backtick_field_value "$owner_issue_abs" "issue_id")"
     fi
+  fi
+
+  if [[ -n "$owner_issue_abs" && "$owner_issue_abs" != /* ]]; then
+    owner_issue_abs="$primary_path/$owner_issue_abs"
+  fi
+  if [[ -n "$pre_tests_rel" && "$pre_tests_rel" != /* ]]; then
+    pre_tests_rel="$primary_path/$pre_tests_rel"
+  fi
+  if [[ -n "$verification_rel" && "$verification_rel" != /* ]]; then
+    verification_rel="$primary_path/$verification_rel"
   fi
 
   [[ -n "$owner_issue_abs" && -n "$pre_tests_rel" && -n "$verification_rel" ]] || return 1
@@ -9410,13 +9490,20 @@ authoritative_worker_prompt_for_worktree_from_continuity() {
 }
 
 worker_worktree_has_pending_non_cleanup_manager_prompt() {
-  local manager_project="$1" target_worktree="$2" continuity_file="" prompt_file="" intent_kind=""
+  local manager_project="$1" target_worktree="$2" continuity_file="" prompt_file="" intent_kind="" route_kind="" target_branch=""
   [[ -n "$manager_project" && -n "$target_worktree" && -d "$target_worktree" ]] || return 1
   continuity_file="$(latest_generated_manager_continuity_file_for_project "$manager_project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 1
   prompt_file="$(authoritative_worker_prompt_for_worktree_from_continuity "$manager_project" "$target_worktree" "$continuity_file" || true)"
   [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
   intent_kind="$(worker_prompt_normalized_intent_kind "$prompt_file")"
+  route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
+  if [[ "$route_kind" == "cleanup_governance" ]] && [[ "$intent_kind" == "edit" || "$intent_kind" == "promotion" ]]; then
+    target_branch="$(worker_prompt_target_branch "$prompt_file")"
+    if [[ -n "$target_branch" ]] && branch_is_merged_into_develop "$manager_project" "$target_branch"; then
+      return 1
+    fi
+  fi
   [[ "$intent_kind" == "edit" || "$intent_kind" == "promotion" ]]
 }
 
