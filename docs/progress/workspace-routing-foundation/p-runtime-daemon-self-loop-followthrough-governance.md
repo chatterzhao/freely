@@ -185,6 +185,18 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
 - `PENDING`: absorb this repair into canonical `develop`, then rerun daemon self-host acceptance until one real task completes, the relevant worktree closes, and the daemon advances to another task.
 
+## 2026-04-25 14:05 PDT Worker Runtime Rebind Guard Verification
+
+- `FAIL`: canonical `develop` self-host replay had already moved past prompt generation and worker materialization. Manager wrote real continuity, worker prompt, and exit-contract artifacts, and the delegated worktree produced real owner evidence, but runtime immediately re-opened that same worker lane through `manager_worker_runtime_control_plane_rebind` because it compared versioned runtime-script files instead of the live worker process source. At the same time, `active_running_worker_count` could stay falsely elevated because cached hints overrode live process discovery.
+- `PASS`: `worker_runtime_control_plane_needs_manager_source_rebind()` now prefers live worker supervisor/AI runtime source truth. When the active delegated lane already runs from the authoritative manager/source project, manager skips rebind and requests plain local continuation instead of stop/restart churn.
+- `PASS`: `manager_semantic_loop_active_worker_count_for_project()` now returns live discovered worker count whenever process inspection is available, falling back to cached hints only on degraded hosts.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-launch-skips-rebind-when-active-runtime-already-uses-manager-source`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-launch-rebinds-stale-active-runtime-control-plane`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-active-worker-count-prefers-live-processes`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-collapses-terminal-handoff-worker-slot`
+- `PENDING`: replay this repair through protected premerge, merge into canonical `develop`, restart daemon replay, and verify the delegated worker no longer loops on repeated rebind/stop while Freely advances toward merge, retire, and next-task followthrough.
+
 ## 2026-04-22 08:05 PDT Materialized Cleanup Worker Selected-Tool Followthrough
 
 - `FAIL`: canonical `develop` self-host replay advanced to manager-selected cleanup followthrough for `I-20260421-1200-A`, but the materialized cleanup worker prompt omitted `selected_tool`, so the retained cleanup worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-runtime-daemon-self-loop-blocker` kept relaunching on stale local `AI_TOOL=\"cc-use-codex-cli\"` and immediately re-entered runtime failure instead of closing the owner cleanup lane.
