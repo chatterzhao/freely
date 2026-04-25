@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+count_active_running_workers_for_manager_project() {
+  printf '1\n'
+}
+
+manager_active_running_worker_count_hint_for_project() {
+  printf '5\n'
+}
+
+process_inspection_available() {
+  return 0
+}
+
+LIVE_RESULT="$(manager_semantic_loop_active_worker_count_for_project /tmp/freely-live-count)"
+[[ "$LIVE_RESULT" == "1" ]] || {
+  echo "[FAIL] expected live process count to win when process inspection is available, got: $LIVE_RESULT" >&2
+  exit 1
+}
+
+process_inspection_available() {
+  return 1
+}
+
+HINT_RESULT="$(manager_semantic_loop_active_worker_count_for_project /tmp/freely-live-count)"
+[[ "$HINT_RESULT" == "5" ]] || {
+  echo "[FAIL] expected cached hint to be used when process inspection is unavailable, got: $HINT_RESULT" >&2
+  exit 1
+}
+
+echo "[PASS] manager_semantic_loop_active_worker_count_for_project prefers live processes over stale hints"

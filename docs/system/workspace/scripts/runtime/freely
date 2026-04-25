@@ -9102,10 +9102,30 @@ runtime_script_for_project() {
 
 worker_runtime_control_plane_needs_manager_source_rebind() {
   local manager_project="$1" target_project="$2"
-  local manager_runtime_script target_runtime_script
+  local manager_runtime_script target_runtime_script authoritative_source supervisor_pid ai_pid supervisor_source ai_source
   [[ -n "$manager_project" && -n "$target_project" ]] || return 1
   [[ -d "$manager_project" && -d "$target_project" ]] || return 1
   [[ "$manager_project" != "$target_project" ]] || return 1
+  authoritative_source="$(delegated_launch_runtime_source_project "$manager_project" "$target_project" || true)"
+  if [[ -z "$authoritative_source" || ! -d "$authoritative_source" ]]; then
+    authoritative_source="$manager_project"
+  fi
+  if process_inspection_available; then
+    supervisor_pid="$(manager_supervisor_pid_for_project "$target_project")"
+    ai_pid="$(runtime_ai_pid_hint_for_project "$target_project")"
+    if [[ -n "$supervisor_pid" ]]; then
+      supervisor_source="$(runtime_source_project_for_pid "$supervisor_pid")"
+      if [[ -n "$supervisor_source" ]] && project_paths_equivalent "$supervisor_source" "$authoritative_source"; then
+        return 1
+      fi
+    fi
+    if [[ -n "$ai_pid" ]]; then
+      ai_source="$(runtime_source_project_for_pid "$ai_pid")"
+      if [[ -n "$ai_source" ]] && project_paths_equivalent "$ai_source" "$authoritative_source"; then
+        return 1
+      fi
+    fi
+  fi
   manager_runtime_script="$(runtime_script_for_project "$manager_project")"
   target_runtime_script="$(runtime_script_for_project "$target_project")"
   [[ -f "$manager_runtime_script" && -f "$target_runtime_script" ]] || return 1
@@ -10661,11 +10681,11 @@ manager_semantic_loop_active_worker_count_for_project() {
   [[ "$discovered_count" =~ ^[0-9]+$ ]] || discovered_count="0"
   hinted_count="$(manager_active_running_worker_count_hint_for_project "$project" 2>/dev/null || true)"
   [[ "$hinted_count" =~ ^[0-9]+$ ]] || hinted_count="0"
-  if (( hinted_count > discovered_count )); then
-    printf '%s\n' "$hinted_count"
-  else
+  if process_inspection_available; then
     printf '%s\n' "$discovered_count"
+    return 0
   fi
+  printf '%s\n' "$hinted_count"
 }
 
 worker_project_busy_with_delegated_continuation() {
