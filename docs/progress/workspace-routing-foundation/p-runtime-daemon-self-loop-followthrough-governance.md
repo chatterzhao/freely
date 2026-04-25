@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/runtime-sigpipe-supervisor-closeout-20260424`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-sigpipe-supervisor-closeout`
-- updated_at: `2026-04-24 15:03 PDT`
+- branch: `feature/runtime-target-worker-role-and-starting-stuck-recovery-20260424`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-target-worker-role-and-starting-stuck-recovery`
+- updated_at: `2026-04-25 11:20 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -710,3 +710,26 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-failure-recovery-preserves-daemon`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-detach-contract`
 - `PENDING`: replay this repair through fresh protected premerge and canonical `develop`, then rerun `./bin/freely daemon start` until runtime completes one task lawfully, retires that lane, and advances to the next task instead of drifting back into foreground ownership.
+
+## 2026-04-25 11:20 PDT Manager / Worker Self-Loop Recovery Absorption
+
+- `FAIL`: canonical `develop` dogfooding still exposed one bounded same-owner chain after the earlier cleanup/continuity repairs. `freely daemon start` did launch and keep writing manager continuity, but delegated targets could still fall back to manager-mode behavior because runtime kept trusting branch/worktree role hints over authoritative worker verification truth. When that happened on `test-pre-merge-*` or other manager-default targets, the delegated lane stayed stuck at `LAST_EXIT_REASON=starting` with no `ai.pid`, the parent launch slot stayed occupied, and manager kept regenerating the same prompt instead of letting the worker close out, retire, and advance to the next task.
+- `PASS`: runtime now derives effective delegated-worker role from the authoritative worker verification contract, reclaims delegated targets that remain `starting` past the existing grace without valid `ai.pid`, and reconciles stale launched-worker state on the dispatch-critical path before deciding whether another worker prompt is launchable.
+- `PASS`: the same repair keeps manager supervision alive during between-round relaunch grace and while expected-running workers are still active, preserves terminal worker exit truth through cleanup/closeout instead of relaunching finished workers, normalizes authoritative worktree-path comparisons, and clears stale launch/discovery residue after cleanup followthrough.
+- `PASS`: this confirms the project architecture the dogfooding evidence implied. AI role is not assigned by a bare `agent` / `skill` / free-text prompt label. Manager/worker handoff is artifact-driven: manager writes machine-readable delegation artifacts and continuity, runtime consumes those artifacts as the control plane, launches the next manager or worker AI, and later consumes worker/manager exit contracts to decide whether to continue, review, delegate again, clean up, retire, or patrol the next task.
+- `PASS`: feature-local regressions passed:
+  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-autonomous-existing-worktree-review-merge-retire-next-task-loop`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-malformed-verification-contract`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-without-verification-contract`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-stall-recovery-from-manager-watchdog`
+  - `bash docs/system/workspace/scripts/tests/test-freely-delegated-worker-starting-stuck-reclaim`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-reclaims-stale-starting-worker-slot`
+  - `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`
+- `PASS`: protected replay already accepted this same implementation onto `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-test-pre-merge-runtime-lifecycle-followthrough` as merge commit `08129972ab13aa9672521f1167feba279a32ec66`, and focused premerge regressions there passed:
+  - `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`
+  - `bash docs/system/workspace/scripts/tests/test-freely-delegated-worker-starting-stuck-reclaim`
+- `FAIL`: the previous attempt to merge protected replay into `develop` was blocked by governance because the diff still carried this repair as candidate-only material instead of explicit owner-linked issue/progress/review evidence for `I-20260421-1200-A`.
+- `PENDING`: absorb this repair into the canonical owner docs, rerun guarded promotion with the new owner-linked artifact, merge into `develop`, restart daemon replay on canonical `develop`, and keep looping until Freely proves select -> finish -> merge upward -> retire -> next task without manual intervention.
