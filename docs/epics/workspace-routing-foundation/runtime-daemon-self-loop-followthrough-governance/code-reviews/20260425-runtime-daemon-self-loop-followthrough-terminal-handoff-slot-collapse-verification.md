@@ -36,3 +36,4 @@
 - why_this: `The real control-plane need for the hint still exists while a delegated non-worker branch target is genuinely active, but once reconciliation has already proven there is no surviving launched prompt for the current continuity, preserving the larger hint only recreates the same false wait state forever.`
 - alternatives_considered: `Remove the hint globally from semantic-loop worker counting; teach worker discovery to count test-pre-merge branches as ordinary workers; special-case worker_handoff_needed in manager recovery only.`
 - boundary_non_goals: `No new role taxonomy, no broad semantic-loop redesign, and no claim that canonical develop acceptance is complete before the full daemon loop closes one task and advances to the next.`
+- residual_risk: `This change only closes the stale active-worker-count seam; canonical develop may still expose a later manager followthrough or merge/retire sequencing gap before the full unattended loop is complete.`
