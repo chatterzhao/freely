@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/runtime-target-worker-role-and-starting-stuck-recovery-20260424`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-target-worker-role-and-starting-stuck-recovery`
-- updated_at: `2026-04-25 13:05 PDT`
+- branch: `feature/manager-worker-terminal-followthrough-materialization-20260425`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-feature-manager-worker-terminal-followthrough-materialization`
+- updated_at: `2026-04-25 10:08 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -749,3 +749,22 @@ All commands passed again in the feature worktree during this worker continuatio
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`
 - `FAIL`: the current owner pre-tests had drifted into falsely advertising canonical develop acceptance as already `pass`. That status is now corrected back to `pending` until real daemon replay proves the full success standard: select task -> finish -> merge upward -> retire worktree -> continue to next task.
 - `PENDING`: commit this same-owner continuation, replay it through fresh protected premerge and guarded `develop`, then rerun canonical `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` until Freely either meets the full autonomous-loop success standard or exposes the next bounded same-owner seam with fresh evidence.
+
+## 2026-04-25 16:20 PDT Manager / Worker Terminal Followthrough Materialization
+
+- `PASS`: the current worker lane stayed within `I-20260421-1200-A`. The dirty runtime/tests diff is a same-owner continuation covering three artifact-quality seams only: Codex explicit resume now requires effective output evidence instead of token-count-only jsonl presence, manager `ai_exit_rc_0` rounds without effective output now fall back to continuity/repair instead of stale auto-resume, and terminal worker exit contracts now materialize a delegated manager continuation intake with idempotent content.
+- `PASS`: the delegated handoff's focused `feature-local` set passed in this worktree:
+  - `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
+  - `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-avoids-initial-start`
+  - `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-empty-success-falls-back`
+  - `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-empty-success-cycle-does-not-autoresume`
+  - `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-missing-continuity-autoresumes`
+  - `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-overrides-network-transient`
+  - `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-invalid-does-not-override-network-transient`
+  - `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-delegated-continuation-not-active-intake`
+  - `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-materializes-worker-done-continuation`
+  - `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-materializes-worker-blocked-continuation`
+  - `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-terminal-followthrough-materialization-idempotent`
+  - `./bin/governance-check`
+- `PASS`: owner-linked evidence for this continuation is now explicit in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-terminal-followthrough-materialization-verification.md`, so manager no longer needs to infer this repair from candidate-only diff state.
+- `PENDING`: manager should consume the parked clean premerge lane `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-runtime-target-worker-role-and-starting-stuck-recovery` next as the first guarded-merge adequacy surface; if that parked evidence is judged stale against current diff, request a fresh protected replay instead of promoting directly from feature-local evidence.

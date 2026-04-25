@@ -64,7 +64,10 @@ cat >"$PROJECT/.freely/run/session-handoff.txt" <<'EOF'
 - previous_tool_resume_target: resume-demo
 EOF
 
-printf '{"type":"token_count","total_tokens":100,"model_context_window":1000}\n' >"$CODEX_HOME/sessions/2026/04/22/rollout-2026-04-22T00-00-00-resume-demo.jsonl"
+cat >"$CODEX_HOME/sessions/2026/04/22/rollout-2026-04-22T00-00-00-resume-demo.jsonl" <<'EOF'
+{"timestamp":"2026-04-22T00:00:00.000Z","type":"session_meta","payload":{"id":"resume-demo"}}
+{"timestamp":"2026-04-22T00:00:01.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"resume-ready"}]}}
+EOF
 
 # shellcheck disable=SC1090
 source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"

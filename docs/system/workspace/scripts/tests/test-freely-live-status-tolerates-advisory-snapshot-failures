@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-advisory-failures.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/.freely/run" "$REPO/docs"
+
+git init -q "$REPO"
+git -C "$REPO" config user.email "test@example.com"
+git -C "$REPO" config user.name "Test User"
+cat >"$REPO/README.md" <<'EOF'
+# repo
+EOF
+git -C "$REPO" add README.md
+git -C "$REPO" commit -q -m "init"
+git -C "$REPO" branch -m develop
+
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+LAW_FILE="$REPO/docs/LAWS.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+cat >"$REPO/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_launch_in_flight"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-25T15:52:19Z"
+EOF
+cat >"$REPO/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$REPO/.freely/run/manager-continuity-20260425-085127.md"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="none"
+LAST_MANAGER_CONTINUITY_CONSUMED="$REPO/.freely/run/manager-continuity-20260425-085127.md"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"
+LAUNCHED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPT_BLOCKERS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-04-25T15:52:19Z"
+EOF
+cat >"$REPO/.freely/run/manager-continuity-20260425-085127.md" <<'EOF'
+# Manager Continuity
+
+- generated_at: `2026-04-25T08:51:27-07:00`
+- manager_branch: `develop`
+- manager_worktree: `/tmp/repo`
+- selected_tool: `codex`
+- patrol_mode: `continuity_followthrough`
+
+## Primary Judgement
+
+- route_kind: `completion_verification`
+- restart_point: `followthrough`
+- ownership: `manager`
+- next_action: `continue`
+
+## Queue And Freeze
+
+- frozen_queue:
+  - `none`
+
+## Dispatch State
+
+- worker_prompt_paths_abs: `none`
+- delegated_workers: `none`
+- dispatch_decision: `resume_manager_without_new_worker`
+EOF
+cat >"$REPO/.freely/run/prompt-20260425-085115.txt" <<EOF
+Worktree:
+- $REPO
+EOF
+cat >"$REPO/.freely/run/session-state.env" <<EOF
+LAST_PROMPT_FILE="$REPO/.freely/run/prompt-20260425-085115.txt"
+EOF
+
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+project_active_ownership_conflict_snapshot() {
+  return 1
+}
+
+latest_generated_manager_continuity_file_for_project() {
+  printf '%s\n' "$REPO/.freely/run/manager-continuity-20260425-085127.md"
+  return 1
+}
+
+latest_patrol_authoritative_manager_continuity_file_for_project() {
+  printf '%s\n' "$REPO/.freely/run/manager-continuity-20260425-085127.md"
+}
+
+latest_manager_worker_prompt_csv_from_continuity() {
+  return 1
+}
+
+manager_pending_ownership_conflicts_summary() {
+  return 1
+}
+
+task_source_scan_status_summary_for_project() {
+  return 1
+}
+
+blocked_supervision_snapshot_for_project() {
+  return 1
+}
+
+manager_handoff_snapshot_for_project() {
+  return 1
+}
+
+manager_continuity_gap_snapshot_for_project() {
+  return 1
+}
+
+develop_push_followthrough_snapshot_for_project() {
+  return 1
+}
+
+OUTPUT="$(cmd_live_status --project "$REPO")"
+
+printf '%s\n' "$OUTPUT" | grep -q "project: $REPO"
+printf '%s\n' "$OUTPUT" | grep -q 'role_hint: manager'
+printf '%s\n' "$OUTPUT" | grep -q 'latest_manager_worker_prompts_generated: none'
+printf '%s\n' "$OUTPUT" | grep -q 'manager_pending_ownership_conflicts: none'
+printf '%s\n' "$OUTPUT" | grep -q 'scan_summary_state: none'
+printf '%s\n' "$OUTPUT" | grep -q 'blocked_supervision_state: none'
+printf '%s\n' "$OUTPUT" | grep -q 'manager_handoff_state: none'
+printf '%s\n' "$OUTPUT" | grep -q 'manager_continuity_gap_state: none'
+
+echo "[PASS] live-status degrades advisory snapshot failures instead of exiting early"
