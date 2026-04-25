@@ -91,10 +91,10 @@
 - source_branch: `feature/runtime-process-leak-20260417`
 - canonical_merge_path: `merge-guarded`
 - canonical_bypass_mode: `forbidden`
-- follow_on_owner: `I-20260417-0445-A`
+- follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
 
 ## Receipt Gap: f7145cc889c3919cbe21b1162f96d14d736b83b7
 
@@ -102,10 +102,10 @@
 - source_branch: `feature/runtime-process-leak-20260417`
 - canonical_merge_path: `merge-guarded`
 - canonical_bypass_mode: `forbidden`
-- follow_on_owner: `I-20260417-0445-A`
+- follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
 
 ## Receipt Gap: f3dcbbd8fe4da12377f7e533dc162c649792bc69
 
