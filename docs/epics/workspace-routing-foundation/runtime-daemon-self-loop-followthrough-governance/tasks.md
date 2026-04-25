@@ -35,3 +35,4 @@
 - [x] Rebind retained active worker control planes to the manager/source runtime when the target worktree is still running stale runtime code, so canonical `develop` closeout logic governs the already-selected retained lane.
 - [x] Guard cached worktree and continuity discovery producers against closed-pipe exits, so early-return closeout consumers cannot strand manager/worker supervision before `ai_cycle_finished` and exit-contract followthrough are recorded.
 - [x] Repair already-existing worker worktrees that still lack managed tooling/runtime bootstrap, so manager launch no longer treats `config present but .freely/run/tooling missing` directories as ready workers.
+- [x] Keep manager supervisors alive during the post-`L041`/pre-`L042` finalize window, so watchdog does not restart a live manager while it is still materializing terminal closeout or delegated followthrough.
