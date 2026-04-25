@@ -14045,6 +14045,72 @@ manager_supervisor_between_rounds_relaunch_in_flight() {
   (( now_epoch - state_updated_epoch <= grace_secs ))
 }
 
+manager_supervisor_post_ai_cycle_finalize_in_flight() {
+  local project="$1" supervisor_pid="$2" ai_pid="$3"
+  local trace_file finalize_snapshot last_finalize_seq last_finalize_ts
+  local terminal_snapshot last_terminal_seq finalize_epoch now_epoch grace_secs
+
+  [[ -n "$supervisor_pid" && -z "$ai_pid" ]] || return 1
+  trace_file="$(lifecycle_trace_log_file "$project")"
+  [[ -f "$trace_file" ]] || return 1
+
+  finalize_snapshot="$(
+    awk -v pid="$supervisor_pid" '
+      index($0, "supervisor_pid=" pid) {
+        checkpoint=""
+        seq=""
+        for (i = 1; i <= NF; i++) {
+          if ($i ~ /^checkpoint=/) {
+            checkpoint = substr($i, 12)
+          } else if ($i ~ /^seq=/) {
+            seq = substr($i, 5)
+          }
+        }
+        if (checkpoint == "L041") {
+          print seq "|" $1 "|" checkpoint
+        }
+      }
+    ' "$trace_file" | tail -n 1
+  )"
+  [[ -n "$finalize_snapshot" ]] || return 1
+  IFS='|' read -r last_finalize_seq last_finalize_ts _ <<<"$finalize_snapshot"
+  [[ "$last_finalize_seq" =~ ^[0-9]+$ ]] || return 1
+
+  terminal_snapshot="$(
+    awk -v pid="$supervisor_pid" '
+      index($0, "supervisor_pid=" pid) {
+        checkpoint=""
+        seq=""
+        for (i = 1; i <= NF; i++) {
+          if ($i ~ /^checkpoint=/) {
+            checkpoint = substr($i, 12)
+          } else if ($i ~ /^seq=/) {
+            seq = substr($i, 5)
+          }
+        }
+        if (checkpoint == "L042" || checkpoint == "L090" || checkpoint == "L091" || checkpoint == "L092") {
+          print seq "|" $1 "|" checkpoint
+        }
+      }
+    ' "$trace_file" | tail -n 1
+  )"
+  if [[ -n "$terminal_snapshot" ]]; then
+    IFS='|' read -r last_terminal_seq _ <<<"$terminal_snapshot"
+    if [[ "$last_terminal_seq" =~ ^[0-9]+$ ]] && (( last_terminal_seq >= last_finalize_seq )); then
+      return 1
+    fi
+  fi
+
+  finalize_epoch="$(timestamp_epoch_or_zero "$last_finalize_ts")"
+  [[ "$finalize_epoch" =~ ^[0-9]+$ ]] || finalize_epoch=0
+  (( finalize_epoch > 0 )) || return 1
+
+  now_epoch="$(date +%s)"
+  grace_secs="${FREELY_MANAGER_POST_AI_CYCLE_FINALIZE_GRACE_SECS:-20}"
+  [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=20
+  (( now_epoch - finalize_epoch <= grace_secs ))
+}
+
 manager_supervisor_waiting_on_active_workers() {
   local project="$1" supervisor_pid="$2" ai_pid="$3" active_worker_count
   [[ -n "$supervisor_pid" && -z "$ai_pid" ]] || return 1
@@ -14349,6 +14415,12 @@ ensure_manager_once() {
     log_info "manager supervisor is between rounds within relaunch grace; keeping supervisor pid=$current_pid alive"
     append_lifecycle_trace "$project" "L221" "manager_keepalive" \
       "trigger=between_rounds_relaunch_grace" \
+      "supervisor_pid=${current_pid:-unknown}" \
+      "next=keep_current_supervisor"
+  elif manager_supervisor_post_ai_cycle_finalize_in_flight "$project" "$current_pid" "$current_ai_pid"; then
+    log_info "manager supervisor is finalizing the previous ai cycle; keeping supervisor pid=$current_pid alive"
+    append_lifecycle_trace "$project" "L221" "manager_keepalive" \
+      "trigger=post_ai_cycle_finalize_grace" \
       "supervisor_pid=${current_pid:-unknown}" \
       "next=keep_current_supervisor"
   elif manager_supervisor_waiting_on_active_workers "$project" "$current_pid" "$current_ai_pid"; then

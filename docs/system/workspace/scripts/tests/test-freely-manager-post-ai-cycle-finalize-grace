@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-post-ai-cycle.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+OBSERVED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+FINISHED_AT="$(date -u -v+5S '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || python3 - <<'PY'
+from datetime import datetime, timedelta, timezone
+print((datetime.now(timezone.utc) + timedelta(seconds=5)).strftime('%Y-%m-%dT%H:%M:%SZ'))
+PY
+)"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+PROJECT_ROOT=""
+AI_TOOL="codex"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="ai_launch_in_flight"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="dynamic"
+EOF
+
+python3 - <<'PY' "$PROJECT/.freely/run/workcell-state.env" "$OBSERVED_AT"
+from pathlib import Path
+import sys
+path = Path(sys.argv[1])
+text = path.read_text()
+path.write_text(text.replace('LAST_STATE_UPDATED_AT="dynamic"', f'LAST_STATE_UPDATED_AT="{sys.argv[2]}"'))
+PY
+
+cat >"$PROJECT/.freely/logs/lifecycle-trace.log" <<EOF
+$OBSERVED_AT seq=20102 ph=IN me=A-L041 fr=A-L040 ok=1 checkpoint=L041 stage=ai_launch_observed supervisor_pid=50559 tool=codex launch_kind=fresh_with_handoff child_pid=48791 prompt_file=./.freely/run/prompt.txt cycle_log=./.freely/logs/cycle.log
+$OBSERVED_AT seq=20104 ph=IN me=A-L223 fr=ENTRY checkpoint=L223 stage=manager_idle_supervisor_restart trigger=supervisor_alive_ai_missing_after_grace supervisor_pid=11111 next=restart_manager_supervisor
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+FREELY_MANAGER_POST_AI_CYCLE_FINALIZE_GRACE_SECS=20
+if ! manager_supervisor_post_ai_cycle_finalize_in_flight "$PROJECT" "50559" ""; then
+  echo "[FAIL] expected post-ai-cycle finalize helper to keep the supervisor alive" >&2
+  exit 1
+fi
+
+cat >>"$PROJECT/.freely/logs/lifecycle-trace.log" <<EOF
+$FINISHED_AT seq=20106 ph=IN me=A-L042 fr=A-L041 ok=1 checkpoint=L042 stage=ai_cycle_finished supervisor_pid=50559 tool=codex launch_kind=fresh_with_handoff rc=0 child_pid=48791 session_id=sess resume_target=sess jsonl_path=~/.codex/sessions/example.jsonl cycle_log=./.freely/logs/cycle.log exit_reason=execution_network_transient
+EOF
+
+if manager_supervisor_post_ai_cycle_finalize_in_flight "$PROJECT" "50559" ""; then
+  echo "[FAIL] finalize grace should end once L042 is recorded" >&2
+  exit 1
+fi
+
+echo "[PASS] manager keeps the supervisor alive while the previous ai cycle is still finalizing"
