@@ -463,6 +463,17 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260421-1330-A` is now the canonical owner for downgrading absorbed merged lanes in fleet status and task-source-scan while preserving cleanup visibility; current state is cleanup-governance / retirement_handoff followthrough with explicit retire-only disposition for the absorbed feature/test-pre-merge pair, so manager may review the linked ancestry proof and unblock `I-20260421-1200-A` before ordinary retirement cleanup.
 - revisit_trigger: Re-open only if canonical develop still routes absorbed merged lanes back into edit execution after this bounded downgrade, or if future dogfooding proves cleanup visibility and execution visibility still cannot stay separated without a larger owner.
 
+1. `C-20260424-2230-A`
+- title: Runtime target worker role and starting-stuck recovery governance
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `pending://issue-materialization`
+- source_brainstorm: `docs/pre-brainstorms/20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery/candidates.md`
+- next_action: Materialize the bounded owner issue, carry the three same-family seams together, and keep feature-local pre-tests plus guarded `test-pre-merge-* -> develop` replay scoped to worker-role election, `starting`-stuck reclamation, and dead-target slot release only.
+- revisit_trigger: Re-open only if canonical `develop` still cannot autonomously self-loop after this bounded repair, or if replay exposes a fourth same-family seam that no longer fits this owner.
+
 1. `C-20260419-0915-A`
 - title: Three-loop lifecycle single-source governance followthrough
 - milestone_state: candidate

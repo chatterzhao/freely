@@ -199,7 +199,7 @@ tool_supported_adapters() {
     codex)
       printf 'direct\nacp\n'
       ;;
-    kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only)
+    kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
       printf 'direct\n'
       ;;
     *)
@@ -479,6 +479,22 @@ target_skill_or_loop = workspace/skills/doc-ibm-execution/SKILL.md
 ```
 EOF
 sleep 1"
+      ;;
+    test-scripted)
+      [[ -n "${FREELY_TEST_SCRIPTED_TOOL_BIN:-}" ]] || {
+        echo "[ERROR] test-scripted requires FREELY_TEST_SCRIPTED_TOOL_BIN" >&2
+        return 1
+      }
+      [[ -x "${FREELY_TEST_SCRIPTED_TOOL_BIN:-}" ]] || {
+        echo "[ERROR] test-scripted script is not executable: ${FREELY_TEST_SCRIPTED_TOOL_BIN:-}" >&2
+        return 1
+      }
+      exec "${FREELY_TEST_SCRIPTED_TOOL_BIN}" \
+        --project "$project" \
+        --prompt-file "$prompt_file" \
+        --launch-kind "$launch_kind" \
+        --mode "$mode" \
+        --tool-resume-target "$tool_resume_target"
       ;;
     *)
       echo "[ERROR] unsupported tool: $tool" >&2

@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery
+  - brainstorms: docs/pre-brainstorms/20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery/candidates.md
 - 20260421-1330--absorbed-merged-lane-routing-followthrough
   - brainstorms: docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md
   - candidates: docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md

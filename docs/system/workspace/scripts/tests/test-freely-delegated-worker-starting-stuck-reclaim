@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+
+    project="$(mktemp -d /tmp/freely-starting-stuck-reclaim.XXXXXX)"
+    trap "rm -rf \"$project\"" EXIT
+    run_dir="$project/.freely/run"
+    mkdir -p "$run_dir" "$project/.freely/logs"
+
+    cat >"$run_dir/workcell-state.env" <<EOF
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="starting"
+LAST_STATE_UPDATED_AT="2026-04-24T00:00:00Z"
+EOF
+
+    cat >"$run_dir/worker-verification-contract.env" <<EOF
+SOURCE_PROMPT_FILE="$project/.freely/run/worker-prompt.txt"
+SOURCE_INTAKE_ID="intake-1"
+TARGET_PROJECT="$project"
+VERIFICATION_METADATA_PRESENT="true"
+VERIFICATION_METADATA_MISSING_FIELDS=""
+OWNER_ISSUE="docs/epics/sample/issues/sample.md"
+PRE_TESTS_PATH="docs/epics/sample/pre-tests.md"
+VERIFICATION_ARTIFACT_DIR="docs/epics/sample/artifacts"
+REQUIRED_TEST_LANES_CSV="feature-local"
+REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="sample-acceptance"
+MINIMUM_EVIDENCE_LEVEL="sample"
+TARGET_ENVIRONMENT="sample"
+CLOSEOUT_GATE="sample"
+CLOSEOUT_GATE_COMMAND="./bin/freely daemon start --project $project"
+CLOSEOUT_TARGET_LANE="develop"
+CLOSEOUT_PROMOTION_GATE="sample"
+CLOSEOUT_REQUIRES_ADEQUACY="true"
+CLOSEOUT_REVIEW_ARTIFACT_POLICY="sample"
+UPDATED_AT="2026-04-25T00:00:00Z"
+EOF
+
+    printf "42424\n" >"$run_dir/supervisor.pid"
+    printf "52525\n" >"$run_dir/interruption-dispatch.pid"
+    printf "62626\n" >"$run_dir/ensure-manager.pid"
+
+    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
+    workcell_state_file() { printf "%s\n" "$1/.freely/run/workcell-state.env"; }
+    worker_verification_contract_state_file() { printf "%s\n" "$1/.freely/run/worker-verification-contract.env"; }
+    current_timestamp_utc_for_machine() { printf "2026-04-25T00:00:00Z\n"; }
+    role_hint_for_project() { printf "manager\n"; }
+    manager_supervisor_pid_for_project() { printf "42424\n"; }
+    runtime_ai_pid_hint_for_project() { return 0; }
+    project_bootstrap_launch_in_flight() { return 1; }
+    interruption_dispatcher_pid_for_project() { printf "52525\n"; }
+    manager_watchdog_pid_for_project() { printf "62626\n"; }
+    terminate_pid_with_graceful_wait() { printf "terminate:%s|%s\n" "$1" "$2"; }
+    clear_supervisor_identity_truth() { printf "clear-supervisor:%s|%s\n" "$1" "$2"; }
+    append_runtime_event() {
+      local event="$2"
+      shift 2 || true
+      printf "event:%s" "$event"
+      for arg in "$@"; do
+        printf "|%s" "$arg"
+      done
+      printf "\n"
+    }
+
+    reclaim_delegated_worker_starting_stuck_runtime_if_needed "$project" "$project/.freely/run/worker-prompt.txt"
+    awk -F= "/^LAST_EXIT_REASON=/{print \"stored_exit:\" \$2}" "$run_dir/workcell-state.env"
+    printf "supervisor_pid_exists:%s\n" "$( [[ -f "$run_dir/supervisor.pid" ]] && printf yes || printf no )"
+    printf "session_state_exists:%s\n" "$( [[ -f "$run_dir/session-state.env" ]] && printf yes || printf no )"
+  '
+)"
+
+[[ "$OUTPUT" == *"terminate:42424|delegated worker starting-stuck supervisor reclaim"* ]]
+[[ "$OUTPUT" == *"terminate:52525|delegated worker starting-stuck interruption dispatcher reclaim"* ]]
+[[ "$OUTPUT" == *"terminate:62626|delegated worker starting-stuck manager watchdog reclaim"* ]]
+[[ "$OUTPUT" == *"clear-supervisor:"* ]]
+[[ "$OUTPUT" == *"event:delegated_worker_starting_stuck_reclaimed"* ]]
+[[ "$OUTPUT" == *'stored_exit:"starting_stuck_reclaimed"'* ]]
+[[ "$OUTPUT" == *"supervisor_pid_exists:no"* ]]
+[[ "$OUTPUT" == *"session_state_exists:no"* ]]
+
+echo "[PASS] delegated starting-stuck worker runtime is reclaimed after startup grace"
