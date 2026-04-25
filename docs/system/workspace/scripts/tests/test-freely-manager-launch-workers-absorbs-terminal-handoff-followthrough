@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+
+    root="$(mktemp -d /tmp/freely-manager-launch-handoff.XXXXXX)"
+    trap "rm -rf \"$root\"" EXIT
+    project="$root/repo"
+    worker="$root/feature-worker"
+    mkdir -p "$project/.freely/run/worker-prompts" "$worker/.freely/run"
+    : >"$project/.freely/config.env"
+    : >"$worker/.freely/config.env"
+
+    prompt_file_path="$project/.freely/run/worker-prompts/followthrough.txt"
+    continuity_file_path="$project/.freely/run/manager-continuity.md"
+
+    cat >"$prompt_file_path" <<EOF
+Worktree:
+- \`$worker\`
+Branch:
+- \`feature/demo\`
+dispatch_priority: \`P1\`
+parallel_safe: \`false\`
+write_scope: \`docs/demo/**\`
+intent_kind: \`edit\`
+intent_target: \`demo followthrough\`
+Owner-Issue:
+- \`$worker/docs/issue.md\`
+Pre-Tests-Path:
+- \`$worker/docs/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`$worker/docs/reviews\`
+Required-Test-Lanes:
+- \`feature-local\`
+Required-Acceptance-Item-Ids:
+- \`demo-acceptance\`
+Minimum-Evidence-Level:
+- \`integration\`
+Target-Environment:
+- \`feature first\`
+Closeout-Gate:
+- \`feature-local first\`
+Closeout-Gate-Command:
+- \`./bin/governance-check\`
+Closeout-Target-Lane:
+- \`test-pre-merge-demo\`
+Closeout-Promotion-Gate:
+- \`develop_merge\`
+Closeout-Requires-Adequacy:
+- \`true\`
+Closeout-Review-Artifact-Policy:
+- \`reuse evidence\`
+EOF
+
+    cat >"$continuity_file_path" <<EOF
+# Manager Continuity
+- authoritative_worker_prompts:
+  - \`$prompt_file_path\`
+EOF
+
+    cat >"$worker/.freely/run/worker-exit-contract.env" <<EOF
+EXIT_KIND="worker_handoff_needed"
+HANDOFF_REASON="followthrough prompt already materialized"
+NEXT_ACTION_FOR_MANAGER="Launch the authoritative followthrough prompt."
+EOF
+
+    git() {
+      if [[ "$1" == "-C" && "$3" == "worktree" && "$4" == "list" && "$5" == "--porcelain" ]]; then
+        cat <<EOF
+worktree $project
+branch refs/heads/develop
+
+worktree $worker
+branch refs/heads/feature/demo
+EOF
+        return 0
+      fi
+      command git "$@"
+    }
+
+    config_file() { printf "%s\n" "$1/.freely/config.env"; }
+    workcell_state_file() { printf "%s\n" "$1/.freely/run/workcell-state.env"; }
+    worker_exit_contract_file() { printf "%s\n" "$1/.freely/run/worker-exit-contract.env"; }
+    manager_worker_launch_state_file() { printf "%s\n" "$1/.freely/run/manager-worker-launch-state.env"; }
+    latest_launchable_manager_worker_prompt_continuity_file_for_project() { printf "%s\n" "$continuity_file_path"; }
+    latest_generated_manager_continuity_file_for_project() { printf "%s\n" "$continuity_file_path"; }
+    manager_continuity_has_worker_prompts() { return 0; }
+    latest_manager_worker_prompt_csv_from_continuity() { printf "%s\n" "$prompt_file_path"; }
+    latest_manager_worker_prompt_paths_from_continuity() { printf "%s\n" "$prompt_file_path"; }
+    latest_frozen_manager_worker_prompt_paths_from_continuity() { return 0; }
+    latest_queued_manager_worker_prompt_paths_from_continuity() { return 0; }
+    worker_prompt_resolved_worktree() { printf "%s\n" "$worker"; }
+    worker_prompt_target_worktree() { printf "%s\n" "$worker"; }
+    project_has_authoritative_worktree_path() { return 0; }
+    worker_prompt_launchable_for_manager_project() { return 0; }
+    worker_project_is_actively_running() { return 1; }
+    worker_project_busy_with_delegated_continuation() { return 1; }
+    manager_other_worker_holds_blocking_intent_signature() { return 1; }
+    manager_prompt_may_reclaim_recorded_self_intent() { return 1; }
+    manager_pending_ownership_conflicts_summary() { printf "none\n"; }
+    count_active_running_workers_for_manager_project() { printf "0\n"; }
+    manager_semantic_loop_active_worker_count_for_project() { printf "0\n"; }
+    manager_max_parallel_workers() { printf "unbounded\n"; }
+    worker_prompt_dispatch_priority() { printf "P1\n"; }
+    worker_prompt_write_scope() { printf "docs/demo/**\n"; }
+    worker_prompt_parallel_safe() { printf "false\n"; }
+    worker_prompt_blocking_intent_signature() { printf "edit@%s\n" "$worker"; }
+    csv_conflicts_with_item() { return 1; }
+    launch_worker_from_manager_prompt_if_needed() {
+      write_worker_verification_contract_file "$worker/.freely/run/worker-verification-contract.env" "$2" "intake-1" "$worker"
+      printf "launch:%s\n" "$2"
+      return 0
+    }
+    append_runtime_event() {
+      if [[ "$2" == "worker_exit_contract_handoff_absorbed" ]]; then
+        printf "event:%s\n" "$5"
+      fi
+    }
+    write_manager_worker_launch_state() {
+      cat >"$project/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$5"
+LAUNCHED_WORKER_PROMPTS="$5"
+ACTIVE_RUNNING_WORKER_COUNT="$8"
+EOF
+    }
+    current_timestamp_utc_for_machine() { printf "2026-04-25T00:00:00Z\n"; }
+    reset_project_runtime_discovery_cache() { :; }
+
+    launched="$(manager_runtime_launch_workers_from_latest_handoff "$project")"
+    printf "launched_count:%s\n" "$launched"
+    [[ ! -f "$worker/.freely/run/worker-exit-contract.env" ]] && printf "contract:cleared\n"
+    awk -F= "/^SOURCE_PROMPT_FILE=/{print \"source:\" \$2}" "$worker/.freely/run/worker-verification-contract.env"
+  ' 2>&1
+)"
+
+[[ "$OUTPUT" == *"launch:"*"/followthrough.txt"* ]]
+[[ "$OUTPUT" == *"event:followthrough_prompt="*"/followthrough.txt"* ]]
+[[ "$OUTPUT" == *"launched_count:1"* ]]
+[[ "$OUTPUT" == *"contract:cleared"* ]]
+[[ "$OUTPUT" == *"source:\""*"/followthrough.txt\""* ]]
+
+echo "[PASS] manager launch path absorbs terminal handoff followthrough for the same worker lane"
