@@ -589,6 +589,30 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-current-shape-cleanup-autofill-premerge-verification.md`
 
+### Dispatch-state cleanup continuity recovers from source prompt fallback
+- id: `cleanup-dispatch-state-source-prompt-fallback`
+- requirement: `When cleanup_governance continuity exposes retained-lane prompt truth only through \`## Dispatch State\` \`worker_prompt_paths:\` and legacy \`issue_truth\` is absent, runtime must still materialize a fresh launchable cleanup prompt from the continuity-carried source prompt metadata for that same retained merged lane.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#36`
+- case_design: `Seed cleanup_governance continuity with \`## Dispatch State\` \`worker_prompt_paths:\`, no \`issue_truth\`, and only a merged-lane nonlaunchable edit prompt carrying verification metadata for the same retained worker; verify manager exit-contract autofill writes a fresh cleanup prompt, rebases owner metadata into the retained worker worktree, and keeps the nonlaunchable launchability guard intact.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-dispatch-state-cleanup-source-prompt-fallback-premerge-verification.md`
+
+### Protected replay stages dispatch-state cleanup source-prompt fallback evidence
+- id: `cleanup-dispatch-state-source-prompt-fallback-premerge-proof`
+- requirement: `Before guarded develop merge, the protected test lane must rerun the dispatch-state source-prompt fallback regression together with the adjacent cleanup-governance launchability guard and stage a fresh owner review artifact under the owner code-reviews directory.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#36`
+- case_design: `Replay the dispatch-state retained-lane cleanup prompt repair on a disposable protected lane, rerun the source-prompt fallback regression together with the delegate-workers launchability guard, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-dispatch-state-cleanup-source-prompt-fallback-premerge-verification.md`
+
 ### Retained cleanup self-intent relaunch stays launchable
 - id: `retained-cleanup-self-intent-relaunch`
 - requirement: `When manager relaunches a retained merged cleanup lane from authoritative verification-bound prompt truth, runtime must let that lane reclaim its own recorded cleanup intent instead of self-queuing forever.`

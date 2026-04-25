@@ -123,6 +123,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 27. Canonical `develop` no longer re-consumes a pre-stop delegated continuation after fresh restart just because the stale continuity anchor was discarded; operator-stop freshness still fences off older delegated handoffs until newer post-stop continuity or newer post-stop delegated continuation arrives.
 28. Canonical `develop` can recover cleanup followthrough from current-shape continuity that exposes only top-level `route_kind` plus inline `worker_prompt:` references, by inheriting authoritative verification metadata from the retained target worker lane instead of looping on a nonlaunchable hygiene prompt.
 29. Canonical `develop` no longer loses daemon control-plane ownership while AI launch is in flight; if watchdog must relaunch after that state write, it still chooses `daemon-run --project` rather than materializing a foreground `start --project`.
+30. Canonical `develop` can also recover cleanup followthrough when the latest continuity exposes retained-lane prompt truth only through `## Dispatch State` `worker_prompt_paths:` and the retained worker has no authoritative local prompt left, by materializing a fresh cleanup prompt from the continuity-carried source prompt metadata without treating the merged-lane `edit` prompt itself as still launchable.
 
 ## Verification
 
