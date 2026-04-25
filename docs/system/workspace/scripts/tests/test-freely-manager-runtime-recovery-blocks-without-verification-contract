@@ -55,6 +55,10 @@ EOF
 EOF
 done
 
+echo worker >"$WORKER/worker-branch.txt"
+git -C "$WORKER" add worker-branch.txt
+git -C "$WORKER" commit -q -m "worker branch divergence"
+
 cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
 INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"

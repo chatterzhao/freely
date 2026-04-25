@@ -1,0 +1,541 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-daemon-existing-worktree-loop.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WT_ROOT="$TMP_DIR/project-worktrees"
+TASK_A_WT="$WT_ROOT/feature-task-a"
+TASK_B_WT="$WT_ROOT/feature-task-b"
+SCRIPTED_TOOL="$TMP_DIR/test-scripted-tool"
+export FREELY_TEST_SCRIPTED_TOOL_BIN="$SCRIPTED_TOOL"
+export FREELY_TEST_SCRIPT_ROOT="$ROOT_DIR"
+export FREELY_TEST_SCRIPT_WT_ROOT="$WT_ROOT"
+export FREELY_TEST_SCRIPT_TASK_A_WT="$TASK_A_WT"
+export FREELY_TEST_SCRIPT_TASK_B_WT="$TASK_B_WT"
+
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$PROJECT/docs/pre-brainstorms/20260425-0000--sample" \
+  "$PROJECT/docs/epics/demo/task-a/issues" \
+  "$PROJECT/docs/epics/demo/task-a/code-reviews" \
+  "$PROJECT/docs/epics/demo/task-b/issues" \
+  "$PROJECT/docs/epics/demo/task-b/code-reviews" \
+  "$PROJECT/docs/progress/demo" \
+  "$WT_ROOT"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-demo-autonomous-loop
+- status: active
+
+### committed_issues
+1. `I-TASK-A`
+- title: `task-a`
+- phase_state: `in_progress`
+- priority: `P0`
+- next_action: `review the existing feature/task-a worktree first`
+- issue_path: `docs/epics/demo/task-a/issues/task-a.md`
+- progress_path: `docs/progress/demo/p-task-a.md`
+
+2. `I-TASK-B`
+- title: `task-b`
+- phase_state: `in_progress`
+- priority: `P1`
+- next_action: `continue with the existing feature/task-b worktree after task-a closes`
+- issue_path: `docs/epics/demo/task-b/issues/task-b.md`
+- progress_path: `docs/progress/demo/p-task-b.md`
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260425-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260425-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260425-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/docs/epics/demo/task-a/issues/task-a.md" <<'EOF'
+# Issue: task-a
+
+- issue_id: `I-TASK-A`
+- phase_state: `in_progress`
+- pre_tests_path: `docs/epics/demo/task-a/pre-tests.md`
+- progress_path: `docs/progress/demo/p-task-a.md`
+- verification_artifact_dir: `docs/epics/demo/task-a/code-reviews`
+EOF
+cat >"$PROJECT/docs/epics/demo/task-b/issues/task-b.md" <<'EOF'
+# Issue: task-b
+
+- issue_id: `I-TASK-B`
+- phase_state: `in_progress`
+- pre_tests_path: `docs/epics/demo/task-b/pre-tests.md`
+- progress_path: `docs/progress/demo/p-task-b.md`
+- verification_artifact_dir: `docs/epics/demo/task-b/code-reviews`
+EOF
+
+cat >"$PROJECT/docs/epics/demo/task-a/pre-tests.md" <<'EOF'
+# Pre-tests: task-a
+
+## Unit
+- acceptance target: `Document the bounded unit surface for task-a.`
+- testing layer: `unit`
+- target environment: `feature/task-a`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This fixture keeps runtime logic unchanged.`
+- replacement_evidence: `task-a uses fixture-only evidence.`
+
+## Integration
+- acceptance target: `Run the task-a fixture replay.`
+- testing layer: `integration`
+- target environment: `feature/task-a`
+- required evidence: `fixture replay evidence`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the task-a fixture replay.
+
+## End-to-End
+- acceptance target: `State why no end-to-end shell exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/task-a`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `The fixture omits an end-to-end shell.`
+- replacement_evidence: `task-a fixture has no end-to-end shell.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `No real environment is required for this isolated fixture.`
+
+## Acceptance Items
+
+### PT-TASK-A
+- id: `PT-TASK-A`
+- requirement: `task-a`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/demo/task-a/code-reviews/task-a.md`
+EOF
+cat >"$PROJECT/docs/epics/demo/task-b/pre-tests.md" <<'EOF'
+# Pre-tests: task-b
+
+## Unit
+- acceptance target: `Document the bounded unit surface for task-b.`
+- testing layer: `unit`
+- target environment: `feature/task-b`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This fixture keeps runtime logic unchanged.`
+- replacement_evidence: `task-b uses fixture-only evidence.`
+
+## Integration
+- acceptance target: `Run the task-b fixture replay.`
+- testing layer: `integration`
+- target environment: `feature/task-b`
+- required evidence: `fixture replay evidence`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the task-b fixture replay.
+
+## End-to-End
+- acceptance target: `State why no end-to-end shell exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/task-b`
+- required evidence: `replacement evidence`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `The fixture omits an end-to-end shell.`
+- replacement_evidence: `task-b fixture has no end-to-end shell.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `No real environment is required for this isolated fixture.`
+
+## Acceptance Items
+
+### PT-TASK-B
+- id: `PT-TASK-B`
+- requirement: `task-b`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/demo/task-b/code-reviews/task-b.md`
+EOF
+
+cat >"$PROJECT/docs/progress/demo/p-task-a.md" <<EOF
+# Progress: task-a
+
+- issue_id: \`I-TASK-A\`
+- issue_path: \`docs/epics/demo/task-a/issues/task-a.md\`
+- phase_state: \`in_progress\`
+- runtime_state: \`stopped\`
+- closure_status: \`open\`
+- verification_status: \`unknown\`
+- branch: \`feature/task-a\`
+- worktree_path: \`$TASK_A_WT\`
+EOF
+cat >"$PROJECT/docs/progress/demo/p-task-b.md" <<EOF
+# Progress: task-b
+
+- issue_id: \`I-TASK-B\`
+- issue_path: \`docs/epics/demo/task-b/issues/task-b.md\`
+- phase_state: \`in_progress\`
+- runtime_state: \`stopped\`
+- closure_status: \`open\`
+- verification_status: \`unknown\`
+- branch: \`feature/task-b\`
+- worktree_path: \`$TASK_B_WT\`
+EOF
+
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+git -C "$PROJECT" worktree add -q -b feature/task-a "$TASK_A_WT" develop
+git -C "$PROJECT" worktree add -q -b feature/task-b "$TASK_B_WT" develop
+
+printf 'existing task-a lane\n' >"$TASK_A_WT/task-a-existing.txt"
+git -C "$TASK_A_WT" add task-a-existing.txt
+git -C "$TASK_A_WT" commit -q -m "seed task-a lane"
+
+printf 'existing task-b lane\n' >"$TASK_B_WT/task-b-existing.txt"
+git -C "$TASK_B_WT" add task-b-existing.txt
+git -C "$TASK_B_WT" commit -q -m "seed task-b lane"
+
+for wt in "$PROJECT" "$TASK_A_WT" "$TASK_B_WT"; do
+  mkdir -p "$wt/.freely/run" "$wt/.freely/logs"
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="test-scripted"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+IFLOW_MAX_TURNS=100
+EOF
+done
+
+cat >"$SCRIPTED_TOOL" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="${FREELY_TEST_SCRIPT_ROOT:?}"
+WT_ROOT="${FREELY_TEST_SCRIPT_WT_ROOT:?}"
+TASK_A_WT="${FREELY_TEST_SCRIPT_TASK_A_WT:?}"
+TASK_B_WT="${FREELY_TEST_SCRIPT_TASK_B_WT:?}"
+
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+project=""
+prompt_file=""
+launch_kind=""
+mode=""
+tool_resume_target=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) project="$2"; shift 2 ;;
+    --prompt-file) prompt_file="$2"; shift 2 ;;
+    --launch-kind) launch_kind="$2"; shift 2 ;;
+    --mode) mode="$2"; shift 2 ;;
+    --tool-resume-target) tool_resume_target="$2"; shift 2 ;;
+    *) echo "unknown arg: $1" >&2; exit 1 ;;
+  esac
+done
+
+branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
+role="$(effective_runtime_role_for_project "$project")"
+echo "session id: test-scripted-${branch//\//-}"
+echo "[TEST] scripted tool started role=$role branch=$branch launch_kind=$launch_kind mode=$mode resume_target=${tool_resume_target:-none}"
+
+delegate_existing_worker() {
+  local manager_project="$1" issue_id="$2" branch_name="$3" target_worktree="$4" slug="$5" task_label="$6"
+  local prompt_file_path continuity_file ts
+  ts="$(date '+%Y%m%d-%H%M%S')"
+  prompt_file_path="$manager_project/.freely/run/worker-prompts/${ts}-worker-${slug}-test-scripted.txt"
+  continuity_file="$manager_project/.freely/run/manager-continuity-${ts}.md"
+  mkdir -p "$manager_project/.freely/run/worker-prompts"
+  cat >"$prompt_file_path" <<PROMPT
+Worktree:
+- \`$target_worktree\`
+Branch:
+- \`$branch_name\`
+dispatch_priority: P0
+parallel_safe: false
+write_scope: \`$target_worktree\`
+intent_kind: edit
+intent_target: \`$issue_id\`
+Owner-Issue:
+- \`$issue_id\`
+Pre-Tests-Path:
+- \`docs/epics/demo/${slug}/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`docs/epics/demo/${slug}/code-reviews\`
+Required-Test-Lanes:
+- \`feature-local,post-merge-followthrough\`
+Required-Acceptance-Item-Ids:
+- \`PT-${task_label}\`
+Minimum-Evidence-Level:
+- \`artifact-plus-human-observation\`
+Target-Environment:
+- \`$branch_name\`
+Closeout-Gate:
+- \`owner-issue verification closeout\`
+Closeout-Gate-Command:
+- \`owner-issue verification closeout\`
+Closeout-Target-Lane:
+- \`post-merge-followthrough\`
+Closeout-Promotion-Gate:
+- \`completion\`
+Closeout-Requires-Adequacy:
+- \`false\`
+Closeout-Review-Artifact-Policy:
+- \`none\`
+
+You are resuming the existing worktree for $issue_id. Review whether the current lane already targets the problem, continue inside the same worktree, and close it cleanly.
+PROMPT
+  cat >"$continuity_file" <<CONTINUITY
+# Manager Continuity
+
+## Primary Judgement
+
+- route_kind: \`completion_verification\`
+- restart_point: \`existing_worktree_review\`
+- ownership: \`manager -> existing worker lane for $issue_id\`
+- next_action: \`review the existing $branch_name worktree, continue inside it if the problem is aligned, then close it out\`
+
+## Worker Delegation
+- prompt_path: \`$prompt_file_path\`
+- target_worktree: \`$target_worktree\`
+- target_branch: \`$branch_name\`
+- dispatch_priority: \`P0\`
+- parallel_safe: \`false\`
+- write_scope: \`$target_worktree\`
+- intent_kind: \`edit\`
+- intent_target: \`$issue_id\`
+CONTINUITY
+  cat >"$(manager_exit_contract_file "$manager_project")" <<CONTRACT
+EXIT_KIND="delegate_workers"
+WORKER_PROMPTS_CSV="$prompt_file_path"
+CONTRACT
+}
+
+write_waiting_manager_contract() {
+  local manager_project="$1" restart_point="$2" next_action="$3"
+  cat >"$(manager_exit_contract_file "$manager_project")" <<CONTRACT
+EXIT_KIND="resume_manager"
+RESTART_POINT="$restart_point"
+NEXT_ACTION="$next_action"
+WHY_NOT_STOP="A delegated worker is still active or awaiting review."
+WHY_NOT_DELEGATE="The existing worker lane already owns the current task."
+CONTRACT
+}
+
+write_cleanup_resume_contract() {
+  local manager_project="$1" target_worktree="$2" branch_name="$3" issue_id="$4"
+  local intake_output intake_id continuity_file ts
+  intake_output="$(bash "$ROOT_DIR/bin/freely" intake chat --project "$manager_project" --author cleanup-worker --channel runtime --message "cleanup followthrough for $issue_id")"
+  intake_id="$(printf '%s\n' "$intake_output" | sed -n 's/^intake_id: //p')"
+  [[ -n "$intake_id" ]] || { echo "missing cleanup intake id for $issue_id" >&2; exit 1; }
+  ts="$(date '+%Y%m%d-%H%M%S')"
+  continuity_file="$manager_project/.freely/run/manager-continuity-${ts}.md"
+  cat >"$continuity_file" <<CONTINUITY
+# Manager Continuity
+
+## Primary Judgement
+
+- route_kind: \`cleanup_governance\`
+- restart_point: \`post_retirement_receipt_patrol\`
+- ownership: \`manager -> runtime retirement followthrough for $issue_id\`
+- next_action: \`consume the existing worker exit contract, retire $target_worktree, materialize a retirement receipt, then resume patrol from the next source\`
+
+## Evidence
+
+5. delegated continuation truth
+   - \`$intake_id\`: consume existing worker exit contract and move cleanup surface into runtime retirement / fleet closure
+
+## Cleanup Queue
+- target_paths:
+   - \`$target_worktree\`
+
+CONTINUITY
+  cat >"$(manager_exit_contract_file "$manager_project")" <<CONTRACT
+EXIT_KIND="resume_manager"
+RESTART_POINT="post_retirement_receipt_patrol"
+NEXT_ACTION="Wait for runtime retirement receipt, then resume patrol."
+WHY_NOT_STOP="Cleanup followthrough is still open."
+WHY_NOT_DELEGATE="This lane is already retire_only."
+CONTRACT
+}
+
+worker_complete_task() {
+  local worker_project="$1" slug="$2" issue_id="$3" task_label="$4"
+  local review_file progress_file state_marker
+  review_file="$worker_project/docs/epics/demo/${slug}/code-reviews/${slug}.md"
+  progress_file="$worker_project/docs/progress/demo/p-${slug}.md"
+  state_marker="$worker_project/.freely/run/${slug}-complete.marker"
+  if [[ ! -f "$state_marker" ]]; then
+    mkdir -p "$(dirname "$review_file")"
+    cat >"$review_file" <<REVIEW
+# Verification artifact: ${slug}
+
+- issue_id: \`$issue_id\`
+- result: \`pass\`
+- note: \`The existing worker lane was reviewed, aligned to the target problem, completed, and prepared for upward merge.\`
+REVIEW
+    python3 - "$progress_file" <<'PY'
+from pathlib import Path
+import sys
+path = Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+text = text.replace("- phase_state: `in_progress`", "- phase_state: `completed`")
+text = text.replace("- runtime_state: `stopped`", "- runtime_state: `running`")
+text = text.replace("- verification_status: `unknown`", "- verification_status: `pass`")
+path.write_text(text, encoding="utf-8")
+PY
+    printf 'completed %s\n' "$slug" >"$worker_project/${slug}.txt"
+    git -C "$worker_project" add "$review_file" "$progress_file" "$worker_project/${slug}.txt"
+    git -C "$worker_project" commit -q -m "complete ${slug}"
+    : >"$state_marker"
+  fi
+  cat >"$(worker_exit_contract_file "$worker_project")" <<CONTRACT
+EXIT_KIND="worker_done"
+COMPLETION_SUMMARY="Completed $issue_id in the existing worker lane and prepared it for manager review, merge, and cleanup."
+EVIDENCE_PATHS_CSV="$review_file,$progress_file"
+CONTRACT
+}
+
+manager_handle_task() {
+  local manager_project="$1" issue_id="$2" branch_name="$3" target_worktree="$4" slug="$5" task_label="$6"
+  if ! git -C "$manager_project" show-ref --verify --quiet "refs/heads/$branch_name"; then
+    return 1
+  fi
+  if [[ -f "$(worker_exit_contract_file "$target_worktree")" ]]; then
+    if ! git -C "$manager_project" merge-base --is-ancestor "$branch_name" HEAD >/dev/null 2>&1; then
+      git -C "$manager_project" merge --no-ff -m "merge ${slug}" "$branch_name" >/dev/null
+    fi
+    if [[ -d "$target_worktree" ]]; then
+      write_cleanup_resume_contract "$manager_project" "$target_worktree" "$branch_name" "$issue_id"
+      return 0
+    fi
+    return 1
+  fi
+  if worker_project_is_actively_running "$target_worktree"; then
+    write_waiting_manager_contract "$manager_project" "wait_for_${slug}_worker" "Wait for the existing $branch_name worker lane to finish."
+    return 0
+  fi
+  delegate_existing_worker "$manager_project" "$issue_id" "$branch_name" "$target_worktree" "$slug" "$task_label"
+  return 0
+}
+
+case "$role" in
+  manager)
+    if manager_handle_task "$project" "I-TASK-A" "feature/task-a" "$TASK_A_WT" "task-a" "TASK-A"; then
+      exit 0
+    fi
+    if manager_handle_task "$project" "I-TASK-B" "feature/task-b" "$TASK_B_WT" "task-b" "TASK-B"; then
+      exit 0
+    fi
+    cat >"$(manager_exit_contract_file "$project")" <<CONTRACT
+EXIT_KIND="stop_ai"
+STOP_REASON="all_scan_closed"
+CONTRACT
+    ;;
+  worker)
+    case "$branch" in
+      feature/task-a) worker_complete_task "$project" "task-a" "I-TASK-A" "TASK-A" ;;
+      feature/task-b) worker_complete_task "$project" "task-b" "I-TASK-B" "TASK-B" ;;
+      *) echo "unexpected worker branch: $branch" >&2; exit 1 ;;
+    esac
+    ;;
+  *)
+    echo "unexpected role: $role" >&2
+    exit 1
+    ;;
+esac
+EOF
+chmod +x "$SCRIPTED_TOOL"
+
+START_OUTPUT="$(bash "$ROOT_DIR/bin/freely" daemon start --project "$PROJECT")"
+grep -q '^daemon_status: running$' <<<"$START_OUTPUT"
+
+for _ in $(seq 1 240); do
+  if [[ -f "$PROJECT/.freely/run/workcell-state.env" ]] && grep -q '^LAST_EXIT_REASON="manager_exit_contract_stop_ai"$' "$PROJECT/.freely/run/workcell-state.env"; then
+    break
+  fi
+  sleep 1
+done
+
+if ! grep -q '^LAST_EXIT_REASON="manager_exit_contract_stop_ai"$' "$PROJECT/.freely/run/workcell-state.env"; then
+  echo "[FAIL] manager runtime did not close the autonomous loop" >&2
+  bash "$ROOT_DIR/bin/freely" daemon logs --project "$PROJECT" --file runtime-events >&2 || true
+  bash "$ROOT_DIR/bin/freely" daemon logs --project "$PROJECT" --file loop >&2 || true
+  exit 1
+fi
+
+if [[ -d "$TASK_A_WT" || -d "$TASK_B_WT" ]]; then
+  echo "[FAIL] merged worker worktrees should be retired by cleanup followthrough" >&2
+  exit 1
+fi
+if git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/task-a; then
+  echo "[FAIL] feature/task-a branch should be deleted after cleanup followthrough" >&2
+  exit 1
+fi
+if git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/task-b; then
+  echo "[FAIL] feature/task-b branch should be deleted after cleanup followthrough" >&2
+  exit 1
+fi
+
+git -C "$PROJECT" log --oneline --merges | grep -q 'merge task-a'
+git -C "$PROJECT" log --oneline --merges | grep -q 'merge task-b'
+
+grep -q 'event=manager_exit_contract_delegate_workers' "$PROJECT/.freely/logs/runtime-events.log"
+grep -q 'event=worker_exit_contract_done' "$PROJECT/.freely/logs/runtime-events.log"
+grep -q 'event=manager_exit_contract_cleanup_followthrough ' "$PROJECT/.freely/logs/runtime-events.log"
+grep -q 'event=manager_exit_contract_stop_ai' "$PROJECT/.freely/logs/runtime-events.log"
+
+TASK_SCAN_JSON="$PROJECT/.freely/run/manager-task-source-scan-latest.json"
+[[ -f "$TASK_SCAN_JSON" ]] || {
+  echo "[FAIL] expected task-source scan output during manager patrol" >&2
+  exit 1
+}
+
+echo "[PASS] daemon autonomously reviews existing worktrees, completes them, merges upward, retires them, and continues to the next task"

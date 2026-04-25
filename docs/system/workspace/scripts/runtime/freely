@@ -1259,7 +1259,7 @@ project_cleanup_runtime_intent() {
   desired_state="${fallback_desired_state:-stopped}"
   exit_reason="${fallback_exit_reason:-supervisor_exit}"
   if [[ -f "$(stop_marker_file "$project")" ]]; then
-    printf 'stopped|operator_stop\n'
+    printf 'stopped|%s\n' "$(runtime_stop_exit_reason "${fallback_exit_reason:-}")"
     return 0
   fi
 
@@ -1277,6 +1277,18 @@ project_cleanup_runtime_intent() {
   fi
 
   printf '%s|%s\n' "$desired_state" "$exit_reason"
+}
+
+runtime_stop_exit_reason() {
+  local current_reason="${1:-}"
+  case "$current_reason" in
+    manager_exit_contract_stop_ai|worker_exit_contract_stop_ai)
+      printf '%s\n' "$current_reason"
+      ;;
+    *)
+      printf 'operator_stop\n'
+      ;;
+  esac
 }
 
 runtime_pid_file_for_role() {
@@ -1395,11 +1407,174 @@ project_role_hint() {
   local project="$1"
   local state_file
   state_file="$(workcell_state_file "$project")"
-  [[ -f "$state_file" ]] || { printf '%s\n' "$(role_hint_for_project "$project")"; return 0; }
+  [[ -f "$state_file" ]] || { printf '%s\n' "$(effective_runtime_role_for_project "$project")"; return 0; }
   unset LAST_ROLE_HINT
   # shellcheck disable=SC1090
   source "$state_file"
-  printf '%s\n' "${LAST_ROLE_HINT:-$(role_hint_for_project "$project")}"
+  printf '%s\n' "${LAST_ROLE_HINT:-$(effective_runtime_role_for_project "$project")}"
+}
+
+effective_runtime_role_for_project() {
+  local project="$1" role_hint
+  role_hint="$(role_hint_for_project "$project")"
+  if [[ "$role_hint" == "manager" ]] && worker_project_has_launchable_verification_contract "$project"; then
+    printf 'worker\n'
+    return 0
+  fi
+  printf '%s\n' "$role_hint"
+}
+
+delegated_worker_startup_grace_secs() {
+  local grace_secs
+  grace_secs="${FREELY_MANAGER_STARTUP_LIFECYCLE_GRACE_SECS:-120}"
+  [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=120
+  printf '%s\n' "$grace_secs"
+}
+
+delegated_worker_starting_stuck_for_reclaim() {
+  local project="$1" supervisor_pid="${2:-}" ai_pid="${3:-}"
+  local desired_state last_exit_reason last_state_updated_at state_updated_epoch now_epoch grace_secs
+
+  [[ "$(effective_runtime_role_for_project "$project")" == "worker" ]] || return 1
+  worker_project_has_launchable_verification_contract "$project" || return 1
+  [[ -f "$(workcell_state_file "$project")" ]] || return 1
+  [[ -z "$ai_pid" ]] || return 1
+
+  unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON LAST_STATE_UPDATED_AT
+  # shellcheck disable=SC1090
+  source "$(workcell_state_file "$project")"
+  desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+  last_exit_reason="${LAST_EXIT_REASON:-}"
+  last_state_updated_at="${LAST_STATE_UPDATED_AT:-}"
+  [[ "$desired_state" == "running" ]] || return 1
+  [[ "$last_exit_reason" == "starting" ]] || return 1
+
+  if [[ -n "$supervisor_pid" ]] && project_bootstrap_launch_in_flight "$project" "$supervisor_pid" ""; then
+    return 1
+  fi
+
+  state_updated_epoch="$(timestamp_epoch_or_zero "$last_state_updated_at")"
+  [[ "$state_updated_epoch" =~ ^[0-9]+$ ]] || state_updated_epoch=0
+  (( state_updated_epoch > 0 )) || return 1
+
+  now_epoch="$(date +%s)"
+  grace_secs="$(delegated_worker_startup_grace_secs)"
+  (( now_epoch - state_updated_epoch > grace_secs ))
+}
+
+reclaim_delegated_worker_starting_stuck_runtime_if_needed() {
+  local project="$1" prompt_file="${2:-}"
+  local run_dir supervisor_pid ai_pid watchdog_pid dispatcher_pid
+
+  run_dir="$(run_dir_for_project "$project")"
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  delegated_worker_starting_stuck_for_reclaim "$project" "$supervisor_pid" "$ai_pid" || return 1
+
+  if [[ -n "$ai_pid" ]]; then
+    terminate_pid_with_graceful_wait "$ai_pid" "delegated worker starting-stuck ai reclaim"
+  fi
+  if [[ -n "$supervisor_pid" ]]; then
+    terminate_pid_with_graceful_wait "$supervisor_pid" "delegated worker starting-stuck supervisor reclaim"
+    clear_supervisor_identity_truth "$project" "$supervisor_pid"
+  fi
+  dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
+  [[ -n "$dispatcher_pid" ]] && terminate_pid_with_graceful_wait "$dispatcher_pid" "delegated worker starting-stuck interruption dispatcher reclaim"
+  watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
+  [[ -n "$watchdog_pid" ]] && terminate_pid_with_graceful_wait "$watchdog_pid" "delegated worker starting-stuck manager watchdog reclaim"
+
+  rm -f \
+    "$run_dir/supervisor.pid" \
+    "$run_dir/ai.pid" \
+    "$(interruption_dispatcher_pid_file "$project")" \
+    "$(ensure_manager_watchdog_pid_file "$project")" \
+    "$(session_state_file "$project")" \
+    "$(handoff_file "$project")" \
+    "$(stop_marker_file "$project")"
+  write_workcell_state "$project" "stopped" "down" "down" "starting_stuck_reclaimed"
+  append_runtime_event "$project" "delegated_worker_starting_stuck_reclaimed" \
+    "prompt_file=${prompt_file:-none}" \
+    "supervisor_pid=${supervisor_pid:-none}" \
+    "ai_pid=${ai_pid:-none}"
+  return 0
+}
+
+manager_worker_launch_state_reconcile_prompt_liveness() {
+  local project="$1" continuity_file="$2"
+  local state_file prompt_generated_csv launched_csv normalized_launched_csv queued_csv max_parallel_workers active_running_workers available_new_slots queued_prompt_blockers
+  local generated_continuity generated_prompts consumed_continuity updated_launched_csv prompt_file target_project needs_writeback="0"
+  local worker_terminal="0"
+
+  state_file="$(manager_worker_launch_state_file "$project")"
+  [[ -f "$state_file" && -n "$continuity_file" && -f "$continuity_file" ]] || return 0
+  # shellcheck disable=SC1090
+  source "$state_file"
+  generated_continuity="${LAST_MANAGER_CONTINUITY_GENERATED:-$continuity_file}"
+  generated_prompts="${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-}"
+  consumed_continuity="${LAST_MANAGER_CONTINUITY_CONSUMED:-$continuity_file}"
+  prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
+  launched_csv="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
+  normalized_launched_csv="$(csv_retain_exact_items "$launched_csv" "$prompt_generated_csv")"
+  updated_launched_csv=""
+
+  IFS=',' read -r -a __freely_reconcile_prompts <<<"$normalized_launched_csv"
+  for prompt_file in "${__freely_reconcile_prompts[@]}"; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
+    if [[ -n "$target_project" && -d "$target_project" ]] && reclaim_delegated_worker_starting_stuck_runtime_if_needed "$target_project" "$prompt_file"; then
+      needs_writeback="1"
+      continue
+    fi
+    worker_terminal="0"
+    if [[ -n "$target_project" && -d "$target_project" ]]; then
+      if worker_project_has_terminal_exit_contract "$target_project"; then
+        worker_terminal="1"
+      elif ! worker_prompt_launchable_for_manager_project "$project" "$prompt_file" \
+        && ! worker_project_is_actively_running "$target_project"; then
+        worker_terminal="1"
+      fi
+    else
+      worker_terminal="1"
+    fi
+    if [[ "$worker_terminal" == "1" ]]; then
+      needs_writeback="1"
+      continue
+    fi
+    updated_launched_csv="$(csv_append_unique_item "$updated_launched_csv" "$prompt_file")"
+  done
+
+  queued_csv="${QUEUED_WORKER_PROMPTS:-}"
+  queued_prompt_blockers="${QUEUED_WORKER_PROMPT_BLOCKERS:-}"
+  max_parallel_workers="$(manager_max_parallel_workers)"
+  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project")"
+  if [[ "$max_parallel_workers" == "unbounded" ]]; then
+    available_new_slots="unbounded"
+  else
+    if ! [[ "$active_running_workers" =~ ^[0-9]+$ ]]; then
+      active_running_workers="0"
+    fi
+    if (( active_running_workers >= max_parallel_workers )); then
+      available_new_slots="0"
+    else
+      available_new_slots="$((max_parallel_workers - active_running_workers))"
+    fi
+  fi
+
+  if [[ "$needs_writeback" == "1" || "$updated_launched_csv" != "$normalized_launched_csv" ]]; then
+    write_manager_worker_launch_state \
+      "$project" \
+      "$generated_continuity" \
+      "${generated_prompts:-$prompt_generated_csv}" \
+      "$consumed_continuity" \
+      "${updated_launched_csv:-none}" \
+      "$queued_csv" \
+      "$max_parallel_workers" \
+      "$active_running_workers" \
+      "$available_new_slots" \
+      "$queued_prompt_blockers"
+  fi
+
+  printf '%s\n' "${updated_launched_csv:-}"
 }
 
 registered_projects_requiring_auth_change_wake() {
@@ -3771,7 +3946,7 @@ record_tool_auto_switch_event() {
 
 worker_runtime_should_self_recover_slot_local_failure() {
   local project="$1" role
-  role="$(role_hint_for_project "$project")"
+  role="$(effective_runtime_role_for_project "$project")"
   [[ "$role" == "worker" ]]
 }
 
@@ -5510,7 +5685,7 @@ context_summary_target_hint() {
   local project="${1:-${PROJECT_ROOT:-}}"
   local role="worker"
   if [[ -n "$project" ]]; then
-    role="$(role_hint_for_project "$project")"
+    role="$(effective_runtime_role_for_project "$project")"
   fi
   context_summary_target_hint_for_role "$role"
 }
@@ -6185,7 +6360,7 @@ write_workcell_state() {
   local state_file role_hint updated_at verification_contract_file verification_metadata_present verification_missing_fields verification_owner_issue verification_pre_tests_path verification_artifact_dir verification_test_lanes verification_acceptance_ids verification_evidence_level verification_target_environment verification_closeout_gate verification_closeout_gate_command verification_closeout_target_lane verification_closeout_promotion_gate verification_closeout_requires_adequacy verification_closeout_review_artifact_policy entrypoint_mode
   state_file="$(workcell_state_file "$project")"
   mkdir -p "$(dirname "$state_file")"
-  role_hint="$(role_hint_for_project "$project")"
+  role_hint="$(effective_runtime_role_for_project "$project")"
   updated_at="$(current_timestamp_utc_for_machine)"
   entrypoint_mode="${WORKCELL_ENTRYPOINT_MODE_OVERRIDE:-}"
   if [[ -z "$entrypoint_mode" && -f "$state_file" ]]; then
@@ -6713,6 +6888,7 @@ manager_worker_launch_state_refresh_for_status() {
   continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
   [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
   manager_worker_launch_state_reconcile_same_continuity_prompts "$project" "$continuity_file" >/dev/null 2>&1 || true
+  manager_worker_launch_state_reconcile_prompt_liveness "$project" "$continuity_file" >/dev/null 2>&1 || true
 
   # Refresh runtime capacity truth on read so live-status reflects running worker lanes
   # even when the latest continuity did not itself enqueue or consume a prompt.
@@ -6765,7 +6941,7 @@ manager_worker_launch_state_refresh_for_status() {
     needs_writeback="1"
   fi
   max_parallel_workers="$(manager_max_parallel_workers)"
-  active_running_workers="$(count_active_running_workers_for_manager_project "$project")"
+  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project")"
   if [[ "$max_parallel_workers" == "unbounded" ]]; then
     available_new_slots="unbounded"
   else
@@ -7807,7 +7983,7 @@ worker_selected_tool_from_verification_contract_for_project() {
 
 worker_runtime_reconcile_selected_tool_from_contract_if_needed() {
   local project="$1" role selected_tool current_tool _ current_truth
-  role="$(role_hint_for_project "$project")"
+  role="$(effective_runtime_role_for_project "$project")"
   [[ "$role" == "worker" ]] || return 1
   selected_tool="$(worker_selected_tool_from_verification_contract_for_project "$project")"
   [[ -n "$selected_tool" ]] || return 1
@@ -7895,6 +8071,25 @@ worker_prompt_can_materialize_missing_worktree() {
     "$sibling_root"/*) return 0 ;;
   esac
   return 1
+}
+
+retire_manager_worker_prompts_for_target() {
+  local manager_project="$1" target_worktree="$2" target_branch="$3"
+  local prompt_dir prompt_file prompt_worktree prompt_branch
+  prompt_dir="$(run_dir_for_project "$manager_project")/worker-prompts"
+  [[ -d "$prompt_dir" ]] || return 0
+  while IFS= read -r prompt_file; do
+    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+    prompt_worktree="$(worker_prompt_target_worktree "$prompt_file")"
+    prompt_branch="$(worker_prompt_target_branch "$prompt_file")"
+    if [[ -n "$target_worktree" && -n "$prompt_worktree" && "$prompt_worktree" == "$target_worktree" ]]; then
+      rm -f "$prompt_file"
+      continue
+    fi
+    if [[ -n "$target_branch" && -n "$prompt_branch" && "$prompt_branch" == "$target_branch" ]]; then
+      rm -f "$prompt_file"
+    fi
+  done < <(find "$prompt_dir" -maxdepth 1 -type f -name '*.txt' | sort)
 }
 
 materialize_worker_prompt_worktree_if_needed() {
@@ -8574,6 +8769,7 @@ manager_continuity_has_unconsumed_launchable_worker_prompt() {
   [[ -f "$continuity_file" ]] || return 1
   prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
   if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
+    manager_worker_launch_state_reconcile_prompt_liveness "$project" "$continuity_file" >/dev/null 2>&1 || true
     # shellcheck disable=SC1090
     source "$(manager_worker_launch_state_file "$project")"
     launched_csv="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
@@ -8707,7 +8903,7 @@ manager_semantic_loop_repeat_state_for_project() {
   local continuity_prompt_csv repeat_count=0 active_running_workers max_parallel_workers
   local continuity_fingerprint latest_fingerprint="" oldest_repeat="" available_new_slots
   local threshold min_age oldest_mtime now desired_runtime_state="unknown"
-  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 1
+  [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 1
   if [[ -f "$(workcell_state_file "$project")" ]]; then
     # shellcheck disable=SC1090
     source "$(workcell_state_file "$project")"
@@ -9536,7 +9732,7 @@ status_intent_prompt_file_for_project() {
     esac
   fi
 
-  [[ "$(role_hint_for_project "$project")" == "worker" ]] || {
+  [[ "$(effective_runtime_role_for_project "$project")" == "worker" ]] || {
     printf '%s\n' "$prompt_file"
     return 0
   }
@@ -9565,7 +9761,7 @@ manager_active_blocking_intent_signatures_csv() {
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" && -d "$wt_path" ]] || continue
     [[ "$wt_path" == "$exclude_project" ]] && continue
-    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    [[ "$(effective_runtime_role_for_project "$wt_path")" == "worker" ]] || continue
     worker_project_is_actively_running "$wt_path" || continue
     signature="$(project_current_blocking_intent_signature "$wt_path")"
     [[ -n "$signature" ]] || continue
@@ -9580,7 +9776,7 @@ manager_recorded_blocking_intent_signatures_csv() {
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" && -d "$wt_path" ]] || continue
     [[ "$wt_path" == "$exclude_project" ]] && continue
-    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    [[ "$(effective_runtime_role_for_project "$wt_path")" == "worker" ]] || continue
     worker_project_is_actively_running "$wt_path" && continue
     recorded_status="$(recorded_worker_ownership_status "$wt_path")"
     [[ "$recorded_status" == "hard_stale" ]] && continue
@@ -9598,7 +9794,7 @@ manager_other_worker_holds_blocking_intent_signature() {
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" && -d "$wt_path" ]] || continue
     [[ "$wt_path" == "$exclude_project" ]] && continue
-    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    [[ "$(effective_runtime_role_for_project "$wt_path")" == "worker" ]] || continue
     if [[ "$active_only" == "true" ]]; then
       worker_project_is_actively_running "$wt_path" || continue
     elif ! worker_project_is_actively_running "$wt_path"; then
@@ -9619,7 +9815,7 @@ manager_other_worker_project_for_blocking_intent_signature() {
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" && -d "$wt_path" ]] || continue
     [[ "$wt_path" == "$exclude_project" ]] && continue
-    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    [[ "$(effective_runtime_role_for_project "$wt_path")" == "worker" ]] || continue
     if [[ "$active_only" == "true" ]]; then
       worker_project_is_actively_running "$wt_path" || continue
     elif ! worker_project_is_actively_running "$wt_path"; then
@@ -9734,7 +9930,7 @@ manager_worktree_ownership_claim_snapshot() {
 
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" && -d "$wt_path" ]] || continue
-    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    [[ "$(effective_runtime_role_for_project "$wt_path")" == "worker" ]] || continue
     prompt_file="$(latest_prompt_file_for_project "$wt_path")"
     [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
     worker_prompt_targets_worktree "$wt_path" "$prompt_file" "$target_worktree" || continue
@@ -9829,7 +10025,7 @@ fleet_active_ownership_conflicts_summary() {
   continuity_file="$(latest_generated_manager_continuity_file_for_project "$repo_root")"
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" && -d "$wt_path" ]] || continue
-    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    [[ "$(effective_runtime_role_for_project "$wt_path")" == "worker" ]] || continue
     signature="$(project_current_blocking_intent_signature "$wt_path")"
     [[ -n "$signature" ]] || continue
     IFS='|' read -r holder_state holder_branch holder_ref holder_signature holder_status <<<"$(ownership_holder_snapshot_for_blocking_intent_signature "$repo_root" "$wt_path" "$continuity_file" "" "$signature")"
@@ -9983,7 +10179,7 @@ worker_worktree_paths_for_manager_project() {
 
 worker_project_is_actively_running() {
   local project="$1"
-  [[ "$(role_hint_for_project "$project")" == "worker" ]] || return 1
+  [[ "$(effective_runtime_role_for_project "$project")" == "worker" ]] || return 1
   worker_project_is_actively_running_for_status "$project"
 }
 
@@ -10028,6 +10224,18 @@ worker_project_busy_with_delegated_continuation() {
   prompt_file="$(latest_prompt_file_for_project "$project")"
   [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
   prompt_file_has_delegated_continuation "$prompt_file"
+}
+
+worker_project_waiting_on_delegated_continuation_startup() {
+  local project="$1" prompt_file supervisor_pid ai_pid
+  [[ "$(effective_runtime_role_for_project "$project")" == "worker" ]] || return 1
+  prompt_file="$(latest_prompt_file_for_project "$project")"
+  [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
+  prompt_file_has_delegated_continuation "$prompt_file" || return 1
+  supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
+  ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
+  delegated_worker_starting_stuck_for_reclaim "$project" "$supervisor_pid" "$ai_pid" && return 1
+  return 0
 }
 
 manager_worker_launch_available_slots() {
@@ -10189,7 +10397,7 @@ manager_runtime_launch_workers_from_latest_handoff() {
   fi
 
   max_parallel_workers="$(manager_max_parallel_workers)"
-  active_running_workers="$(count_active_running_workers_for_manager_project "$project")"
+  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project")"
   available_new_slots="$(manager_worker_launch_available_slots "$project")"
   launched_count=0
   queued_prompt_blockers="none"
@@ -10247,6 +10455,9 @@ manager_runtime_launch_workers_from_latest_handoff() {
         "manager_worker_launch_target_unresolved" \
         "worktree header or branch mapping did not resolve to a live worktree" >/dev/null
       queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+      continue
+    fi
+    if worker_project_has_terminal_exit_contract "$target_project"; then
       continue
     fi
     if ! worker_prompt_launchable_for_manager_project "$project" "$prompt_file"; then
@@ -10355,7 +10566,7 @@ manager_runtime_launch_workers_from_latest_handoff() {
 
 manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   local project="$1" exit_reason="${2:-}" launched_count="0"
-  [[ "$(role_hint_for_project "$project")" == "manager" ]] || {
+  [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || {
     printf '0\n'
     return 0
   }
@@ -10520,7 +10731,7 @@ manager_delegated_supervision_quiet_period_waiting_on_active_worker() {
   [[ -f "$state_file" ]] || return 1
   # shellcheck disable=SC1090
   source "$state_file"
-  active_running_workers="$(count_active_running_workers_for_manager_project "$project")"
+  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project")"
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || return 1
   (( active_running_workers > 0 )) || return 1
   [[ -z "${QUEUED_WORKER_PROMPTS:-}" ]] || return 1
@@ -10533,8 +10744,11 @@ manager_delegated_supervision_quiet_period_waiting_on_active_worker() {
     [[ -n "$prompt_file" && -f "$prompt_file" ]] || return 1
     target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
     [[ -n "$target_project" && -d "$target_project" ]] || return 1
-    worker_project_is_actively_running "$target_project" || return 1
-    worker_project_busy_with_delegated_continuation "$target_project" || return 1
+    if worker_project_busy_with_delegated_continuation "$target_project"; then
+      saw_busy="1"
+      continue
+    fi
+    worker_project_waiting_on_delegated_continuation_startup "$target_project" || return 1
     saw_busy="1"
   done
 
@@ -11085,7 +11299,7 @@ append_manager_consumed_continuity_resume_focus_if_needed() {
   local state_file continuity_file latest_generated route_kind
   local queue_excerpt ownership_excerpt next_priority_excerpt focus_label
 
-  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
+  [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
   [[ "${LAST_DELEGATED_CONTINUATION_PENDING_COUNT:-0}" == "0" ]] || return 0
 
   latest_generated="$(latest_generated_manager_continuity_file_for_project "$project")"
@@ -11147,7 +11361,7 @@ append_cleanup_governance_retirement_worker_directive_if_needed() {
   local project="$1"
   local continuity_file latest_generated focus_label target_paths
 
-  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
+  [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
 
   latest_generated="$(latest_generated_manager_continuity_file_for_project "$project")"
   case "${LAUNCH_KIND_SELECTED:-}" in
@@ -11185,7 +11399,7 @@ append_cleanup_governance_retirement_worker_directive_if_needed() {
 
 append_manager_exit_contract_directive_if_needed() {
   local project="$1" contract_file unresolved_workers
-  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
+  [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
   contract_file="$(manager_exit_contract_file "$project")"
   unresolved_workers="$(manager_unresolved_expected_running_worker_count "$project")"
   [[ "${unresolved_workers:-0}" =~ ^[0-9]+$ ]] || unresolved_workers="0"
@@ -11232,7 +11446,7 @@ EOF
 
 append_worker_exit_contract_directive_if_needed() {
   local project="$1" contract_file
-  [[ "$(role_hint_for_project "$project")" == "worker" ]] || return 0
+  [[ "$(effective_runtime_role_for_project "$project")" == "worker" ]] || return 0
   contract_file="$(worker_exit_contract_file "$project")"
   cat <<EOF
 
@@ -11377,6 +11591,15 @@ worker_exit_contract_kind() {
   contract_file="$(worker_exit_contract_file "$project")"
   [[ -f "$contract_file" ]] || return 1
   meta_env_value "$contract_file" "EXIT_KIND"
+}
+
+worker_project_has_terminal_exit_contract() {
+  local project="$1" kind
+  kind="$(worker_exit_contract_kind "$project" || true)"
+  case "$kind" in
+    worker_done|worker_blocked|worker_handoff_needed) return 0 ;;
+    *) return 1 ;;
+  esac
 }
 
 validate_worker_exit_contract_for_project() {
@@ -11616,7 +11839,7 @@ worker_exit_contract_done_is_repair_only_cleanup_escape() {
 
 manager_runtime_handle_exit_contract_after_ai_cycle() {
   local project="$1" exit_reason="${2:-}" missing_csv="" kind="" worker_prompts_csv="" stop_reason="" unresolved_workers="" cleanup_followthrough_intake_id="" cleanup_followthrough_output="" cleanup_followthrough_detail=""
-  [[ "$(role_hint_for_project "$project")" == "manager" ]] || {
+  [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || {
     printf 'continue\n'
     return 0
   }
@@ -11657,7 +11880,6 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
         return 0
       fi
       : >"$(stop_marker_file "$project")"
-      write_workcell_state "$project" "stopped" "down" "down" "manager_exit_contract_stop_ai"
       append_runtime_event "$project" "manager_exit_contract_stop_ai" \
         "stop_reason=${stop_reason}"
       printf 'stop_ai\n'
@@ -11683,6 +11905,7 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
         append_runtime_event "$project" "manager_exit_contract_cleanup_followthrough" \
           "intake_id=$cleanup_followthrough_intake_id" \
           "details=$(printf '%s\n' "$cleanup_followthrough_output" | tr '\n' ';' | sed 's/;*$//' | sed 's/[[:space:]]\+/ /g' | sed 's/^$/none/')"
+        clear_manager_worker_launch_state_for_fresh_restart "$project"
       fi
       write_manager_resume_handoff \
         "$project" \
@@ -11708,7 +11931,7 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
 
 worker_runtime_handle_exit_contract_after_ai_cycle() {
   local project="$1" exit_reason="${2:-}" missing_csv="" kind="" contract_file=""
-  [[ "$(role_hint_for_project "$project")" == "worker" ]] || {
+  [[ "$(effective_runtime_role_for_project "$project")" == "worker" ]] || {
     printf 'continue\n'
     return 0
   }
@@ -11784,7 +12007,7 @@ worker_runtime_handle_exit_contract_after_ai_cycle() {
 
 project_runtime_handle_exit_contract_after_ai_cycle() {
   local project="$1" exit_reason="${2:-}"
-  case "$(role_hint_for_project "$project")" in
+  case "$(effective_runtime_role_for_project "$project")" in
     manager) manager_runtime_handle_exit_contract_after_ai_cycle "$project" "$exit_reason" ;;
     worker) worker_runtime_handle_exit_contract_after_ai_cycle "$project" "$exit_reason" ;;
     *) printf 'continue\n' ;;
@@ -12504,13 +12727,15 @@ EOF
 }
 
 manager_supervision_alerts() {
-  local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state ai_state owner next_action anomaly
+  local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state ai_state owner next_action anomaly normalized_project normalized_wt_path
   local worker_prompt_file
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || return 0
+  normalized_project="$(normalize_runtime_worktree_path "$project")"
   while IFS='|' read -r wt_path branch; do
     [[ -n "$wt_path" ]] || continue
-    [[ "$wt_path" == "$project" ]] && continue
+    normalized_wt_path="$(normalize_runtime_worktree_path "$wt_path")"
+    [[ -n "$normalized_wt_path" && "$normalized_wt_path" == "$normalized_project" ]] && continue
     [[ -f "$(config_file "$wt_path")" ]] || continue
     desired_state=""
     role_hint=""
@@ -12624,13 +12849,15 @@ settle_retire_ready_merged_worker_runtime_state() {
 }
 
 manager_hygiene_alerts() {
-  local project="$1" repo_root wt_path branch role_hint dirty_entries checkpoint_json checkpoint_required streak threshold
+  local project="$1" repo_root wt_path branch role_hint dirty_entries checkpoint_json checkpoint_required streak threshold normalized_project normalized_wt_path
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || return 0
   threshold="${CHECKPOINT_DRIFT_STREAK_THRESHOLD:-2}"
+  normalized_project="$(normalize_runtime_worktree_path "$project")"
   while IFS='|' read -r wt_path branch; do
     [[ -n "$wt_path" ]] || continue
-    [[ "$wt_path" == "$project" ]] && continue
+    normalized_wt_path="$(normalize_runtime_worktree_path "$wt_path")"
+    [[ -n "$normalized_wt_path" && "$normalized_wt_path" == "$normalized_project" ]] && continue
     [[ -f "$(config_file "$wt_path")" ]] || continue
     role_hint="${LAST_ROLE_HINT:-worker}"
     if [[ -f "$(workcell_state_file "$wt_path")" ]]; then
@@ -12660,19 +12887,21 @@ manager_hygiene_alerts() {
 }
 
 manager_runtime_recover_workers_if_needed() {
-  local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered latest_continuity_file
-  local worker_signature worker_prompt_file
+  local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered latest_continuity_file normalized_project normalized_wt_path
+  local worker_signature worker_prompt_file terminal_kind terminal_exit_reason
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || return 0
-  [[ "$(role_hint_for_project "$project")" == "manager" ]] || return 0
+  [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
 
   reset_project_runtime_discovery_cache "$project"
   latest_continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
   recovered="$(manager_runtime_launch_workers_from_latest_handoff "$project")"
   [[ "$recovered" =~ ^[0-9]+$ ]] || recovered=0
+  normalized_project="$(normalize_runtime_worktree_path "$project")"
   while IFS='|' read -r wt_path branch; do
     [[ -n "$wt_path" ]] || continue
-    [[ "$wt_path" == "$project" ]] && continue
+    normalized_wt_path="$(normalize_runtime_worktree_path "$wt_path")"
+    [[ -n "$normalized_wt_path" && "$normalized_wt_path" == "$normalized_project" ]] && continue
     [[ -f "$(config_file "$wt_path")" ]] || continue
     desired_state=""
     role_hint=""
@@ -12683,12 +12912,31 @@ manager_runtime_recover_workers_if_needed() {
       # shellcheck disable=SC1090
       source "$(workcell_state_file "$wt_path")"
       desired_state="${DESIRED_RUNTIME_STATE:-}"
-      role_hint="${LAST_ROLE_HINT:-}"
+      role_hint="${LAST_ROLE_HINT:-$(effective_runtime_role_for_project "$wt_path")}"
       exit_reason="${LAST_EXIT_REASON:-}"
     fi
 
     [[ "$desired_state" == "running" ]] || continue
     [[ "${role_hint:-worker}" == "worker" ]] || continue
+
+    if worker_project_has_terminal_exit_contract "$wt_path"; then
+      terminal_kind="$(worker_exit_contract_kind "$wt_path" || true)"
+      case "$terminal_kind" in
+        worker_done) terminal_exit_reason="worker_exit_contract_done" ;;
+        worker_blocked) terminal_exit_reason="worker_exit_contract_blocked" ;;
+        worker_handoff_needed) terminal_exit_reason="worker_exit_contract_handoff_needed" ;;
+        *) terminal_exit_reason="worker_exit_contract_terminal" ;;
+      esac
+      if [[ "${exit_reason:-}" != "$terminal_exit_reason" ]]; then
+        append_runtime_event "$project" "$terminal_exit_reason" \
+          "worktree=$wt_path" \
+          "branch=${branch:-unknown}" \
+          "source=manager_runtime_recover_workers_if_needed"
+      fi
+      write_workcell_state "$wt_path" "stopped" "down" "down" "$terminal_exit_reason"
+      log_info "manager runtime skips expected-running recovery for terminal worker exit contract: branch=${branch:-unknown} exit_kind=${terminal_kind:-unknown} path=$wt_path"
+      continue
+    fi
 
     if [[ -f "$(run_dir_for_project "$wt_path")/supervisor.pid" ]]; then
       local sp
@@ -13207,6 +13455,45 @@ project_runtime_auto_recovery_launch_in_flight() {
   (( now_epoch - slot_switch_epoch <= grace_secs ))
 }
 
+manager_supervisor_between_rounds_relaunch_in_flight() {
+  local project="$1" supervisor_pid="$2" ai_pid="$3"
+  local desired_state last_exit_reason last_state_updated_at
+  local state_updated_epoch now_epoch grace_secs
+
+  [[ -n "$supervisor_pid" && -z "$ai_pid" ]] || return 1
+  [[ -f "$(workcell_state_file "$project")" ]] || return 1
+
+  unset DESIRED_RUNTIME_STATE LAST_EXIT_REASON LAST_STATE_UPDATED_AT
+  # shellcheck disable=SC1090
+  source "$(workcell_state_file "$project")"
+  desired_state="${DESIRED_RUNTIME_STATE:-unknown}"
+  last_exit_reason="${LAST_EXIT_REASON:-}"
+  last_state_updated_at="${LAST_STATE_UPDATED_AT:-}"
+  [[ "$desired_state" == "running" ]] || return 1
+  case "$last_exit_reason" in
+    ai_exit_rc_0|manager_exit_contract_resume|manager_exit_contract_invalid|manager_worker_launch_after_ai_cycle) ;;
+    *) return 1 ;;
+  esac
+
+  state_updated_epoch="$(timestamp_epoch_or_zero "$last_state_updated_at")"
+  [[ "$state_updated_epoch" =~ ^[0-9]+$ ]] || state_updated_epoch=0
+  (( state_updated_epoch > 0 )) || return 1
+
+  now_epoch="$(date +%s)"
+  grace_secs="${FREELY_MANAGER_BETWEEN_ROUNDS_GRACE_SECS:-12}"
+  [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=12
+  (( now_epoch - state_updated_epoch <= grace_secs ))
+}
+
+manager_supervisor_waiting_on_active_workers() {
+  local project="$1" supervisor_pid="$2" ai_pid="$3" active_worker_count
+  [[ -n "$supervisor_pid" && -z "$ai_pid" ]] || return 1
+  manager_worker_launch_state_refresh_for_status "$project" >/dev/null 2>&1 || true
+  active_worker_count="$(manager_semantic_loop_active_worker_count_for_project "$project" 2>/dev/null || true)"
+  [[ "$active_worker_count" =~ ^[0-9]+$ ]] || active_worker_count="0"
+  (( active_worker_count > 0 ))
+}
+
 project_bootstrap_launch_in_flight_from_unverified_supervisor_hint() {
   local project="$1"
   local supervisor_hint=""
@@ -13498,6 +13785,18 @@ ensure_manager_once() {
       "trigger=auto_recovery_ai_grace" \
       "supervisor_pid=${current_pid:-unknown}" \
       "next=keep_current_supervisor"
+  elif manager_supervisor_between_rounds_relaunch_in_flight "$project" "$current_pid" "$current_ai_pid"; then
+    log_info "manager supervisor is between rounds within relaunch grace; keeping supervisor pid=$current_pid alive"
+    append_lifecycle_trace "$project" "L221" "manager_keepalive" \
+      "trigger=between_rounds_relaunch_grace" \
+      "supervisor_pid=${current_pid:-unknown}" \
+      "next=keep_current_supervisor"
+  elif manager_supervisor_waiting_on_active_workers "$project" "$current_pid" "$current_ai_pid"; then
+    log_info "manager supervisor is waiting on active worker progress; keeping supervisor pid=$current_pid alive"
+    append_lifecycle_trace "$project" "L221" "manager_keepalive" \
+      "trigger=active_worker_wait" \
+      "supervisor_pid=${current_pid:-unknown}" \
+      "next=keep_current_supervisor"
   elif project_bootstrap_launch_in_flight_from_unverified_supervisor_hint "$project"; then
     log_info "manager bootstrap is still within ai launch grace under degraded process inspection; keeping hinted supervisor pid=${supervisor_hint:-unknown} alive"
     append_lifecycle_trace "$project" "L222" "manager_keepalive" \
@@ -13783,9 +14082,11 @@ run_cleanup_followthrough() {
     remote_fetch_state="not-configured"
   fi
 
+  normalized_project="$(normalize_runtime_worktree_path "$project")"
   while IFS=$'\t' read -r wt_path branch; do
     [[ -n "$wt_path" && -n "$branch" ]] || continue
-    if [[ "$wt_path" == "$project" ]]; then
+    normalized_wt_path="$(normalize_runtime_worktree_path "$wt_path")"
+    if [[ -n "$normalized_wt_path" && "$normalized_wt_path" == "$normalized_project" ]]; then
       continue
     fi
     retire_ready_reclaim="0"
@@ -13831,6 +14132,11 @@ run_cleanup_followthrough() {
     if ([[ -n "$supervisor" ]] && kill -0 "$supervisor" 2>/dev/null) || ([[ -n "$ai" ]] && kill -0 "$ai" 2>/dev/null); then
       retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (runtime-active)"
       continue
+    fi
+    if [[ "$retire_ready_reclaim" == "1" ]] && ! worker_project_has_launchable_verification_contract "$wt_path"; then
+      latest_prompt_file_for_reclaim="$(latest_prompt_file_for_project "$wt_path")"
+    else
+      latest_prompt_file_for_reclaim=""
     fi
     if [[ "$retire_ready_reclaim" == "1" && -n "$latest_prompt_file_for_reclaim" && -f "$latest_prompt_file_for_reclaim" ]]; then
       write_worker_verification_contract_file \
@@ -13884,6 +14190,13 @@ run_cleanup_followthrough() {
         ;;
     esac
     if git -C "$project" worktree remove "$wt_path" >/dev/null 2>&1 && git -C "$project" branch -d "$branch" >/dev/null 2>&1; then
+      if [[ -d "$wt_path" ]] || git -C "$project" show-ref --verify --quiet "refs/heads/$branch" >/dev/null 2>&1; then
+        retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (local-remove-postcheck-failed; remote:${remote_note})"
+        blocked_reason="${blocked_reason:-cleanup_followthrough_postcheck_failed}"
+        continue
+      fi
+      reset_project_runtime_discovery_cache "$project"
+      retire_manager_worker_prompts_for_target "$project" "$wt_path" "$branch"
       cleaned="${cleaned}${cleaned:+$'\n'}${branch} @ ${wt_path} (remote:${remote_note})"
     else
       retained="${retained}${retained:+$'\n'}${branch} @ ${wt_path} (local-remove-failed; remote:${remote_note})"
@@ -14581,7 +14894,7 @@ tool_supported_adapters_for_runtime() {
     codex)
       printf 'direct\nacp\n'
       ;;
-    kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only)
+    kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
       printf 'direct\n'
       ;;
     *)
@@ -14610,6 +14923,9 @@ tool_runtime_process_match_fragments() {
       ;;
     test-compact|test-once|test-session|test-route-only)
       printf 'python3\n'
+      ;;
+    test-scripted)
+      printf 'test-scripted\npython3\nbash\n'
       ;;
     *)
       printf '%s\n' "$tool"
@@ -15506,7 +15822,7 @@ start_project_runtime() {
       return 0
     fi
     stop_requested=1
-    LAST_WORKCELL_EXIT_REASON="operator_stop"
+    LAST_WORKCELL_EXIT_REASON="$(runtime_stop_exit_reason "${LAST_WORKCELL_EXIT_REASON:-}")"
     DESIRED_RUNTIME_STATE_VALUE="stopped"
     : >"$(stop_marker_file "$project")"
     append_runtime_event "$project" "operator_stop_requested" \
@@ -15532,7 +15848,7 @@ start_project_runtime() {
           "signal=stop_marker" \
           "child_pid_file=$child_pid_file"
       fi
-      LAST_WORKCELL_EXIT_REASON="operator_stop"
+      LAST_WORKCELL_EXIT_REASON="$(runtime_stop_exit_reason "${LAST_WORKCELL_EXIT_REASON:-}")"
       DESIRED_RUNTIME_STATE_VALUE="stopped"
       rm -f "$child_pid_file" "$(session_state_file "$project")" "$(handoff_file "$project")"
       log_info "received stop signal, exiting supervisor before next ai launch"
@@ -15955,7 +16271,7 @@ start_project_runtime() {
     fi
 
     if [[ "$stop_requested" -eq 1 || -f "$(stop_marker_file "$PROJECT_ROOT")" ]]; then
-      LAST_WORKCELL_EXIT_REASON="operator_stop"
+      LAST_WORKCELL_EXIT_REASON="$(runtime_stop_exit_reason "${LAST_WORKCELL_EXIT_REASON:-}")"
       DESIRED_RUNTIME_STATE_VALUE="stopped"
       rm -f "$child_pid_file" "$(session_state_file "$PROJECT_ROOT")" "$(handoff_file "$PROJECT_ROOT")"
       log_info "received stop signal, exiting supervisor"
@@ -16110,6 +16426,7 @@ start_project_runtime() {
             LAST_WORKCELL_EXIT_REASON="manager_exit_contract_resume"
             ;;
         esac
+        write_workcell_state "$PROJECT_ROOT" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
         sleep "${RESTART_DELAY:-2}"
         continue
         ;;
@@ -16119,6 +16436,8 @@ start_project_runtime() {
 
     if [[ "$exit_contract_action" == "delegate_workers" ]]; then
       manager_runtime_launch_workers_after_ai_cycle_if_needed "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON" >/dev/null
+      LAST_WORKCELL_EXIT_REASON="manager_worker_launch_after_ai_cycle"
+      write_workcell_state "$PROJECT_ROOT" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     fi
 
     restart_count=$((restart_count + 1))

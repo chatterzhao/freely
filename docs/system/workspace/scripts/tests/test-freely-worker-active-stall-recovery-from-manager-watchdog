@@ -50,6 +50,10 @@ git -C "$PROJECT" commit -q -m "init"
 git -C "$PROJECT" worktree add -q -b feature/test-worker "$WORKER_WT" develop
 WORKER_WT="$(cd "$WORKER_WT" && pwd -P)"
 
+echo worker >"$WORKER_WT/worker-branch.txt"
+git -C "$WORKER_WT" add worker-branch.txt
+git -C "$WORKER_WT" commit -q -m "worker branch divergence"
+
 mkdir -p "$PROJECT/.freely/run" "$WORKER_WT/.freely/run" "$WORKER_WT/.freely/logs"
 cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
