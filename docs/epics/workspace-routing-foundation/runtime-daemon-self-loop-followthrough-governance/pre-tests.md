@@ -531,12 +531,12 @@
 
 ### Existing stale worker worktree bootstrap repair holds on feature lane
 - id: `existing-stale-worker-worktree-bootstrap-feature-proof`
-- requirement: `If a manager-selected worker worktree directory already exists but still lacks managed tooling or `.freely/run` baseline state, runtime must repair that worktree before delegation instead of treating it as already launch-ready.`
+- requirement: `If a manager-selected worker worktree directory already exists with .freely/config.env already present but managed tooling or .freely/run/workcell-state.env still missing, runtime must repair that same worktree before delegation instead of treating it as already launch-ready.`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
 - task_refs: `tasks.md#34`
-- case_design: `Seed an authoritative worker prompt that targets an already-existing sibling worktree containing only copied `.freely/config.env`, then verify manager launch syncs tooling, recreates runtime baseline state, and starts the worker instead of stalling on the half-materialized directory.`
+- case_design: `Run test-freely-manager-worker-launch-repairs-existing-stale-worktree by seeding an authoritative worker prompt that targets an already-existing sibling worktree containing only copied .freely/config.env, then verify manager launch syncs tooling, recreates runtime baseline state, and starts the worker instead of stalling on the half-materialized directory.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-existing-stale-worker-bootstrap-verification.md`
