@@ -71,10 +71,11 @@
 53. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-active-stall-recovery-from-manager-watchdog`.
 54. Run `bash docs/system/workspace/scripts/tests/test-freely-delegated-worker-starting-stuck-reclaim`.
 55. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-reclaims-stale-starting-worker-slot`.
-56. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`.
-57. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`.
-58. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`.
-59. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-autonomous-existing-worktree-review-merge-retire-next-task-loop`.
+56. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-collapses-terminal-handoff-worker-slot`.
+57. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`.
+58. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`.
+59. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`.
+60. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-autonomous-existing-worktree-review-merge-retire-next-task-loop`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -140,8 +141,8 @@
 - task_refs: `tasks.md#5,tasks.md#6,tasks.md#7`
 - case_design: `Use the guarded test-pre-merge lane to prove the owner carries explicit daemon-lifecycle adequacy into develop, then after protected replay observe canonical develop until Freely completes one task with lawful closeout and continues to the next task.`
 - evidence_level: `integration`
-- status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
+- status: `pending`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-terminal-handoff-slot-collapse-verification.md`
 
 ### Guarded promote carries explicit daemon adequacy
 - id: `daemon-self-loop-guarded-promote-proof`

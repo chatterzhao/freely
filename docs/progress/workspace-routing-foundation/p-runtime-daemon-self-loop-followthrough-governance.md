@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-target-worker-role-and-starting-stuck-recovery-20260424`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-target-worker-role-and-starting-stuck-recovery`
-- updated_at: `2026-04-25 11:20 PDT`
+- updated_at: `2026-04-25 13:05 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -733,3 +733,19 @@ All commands passed again in the feature worktree during this worker continuatio
   - `bash docs/system/workspace/scripts/tests/test-freely-delegated-worker-starting-stuck-reclaim`
 - `FAIL`: the previous attempt to merge protected replay into `develop` was blocked by governance because the diff still carried this repair as candidate-only material instead of explicit owner-linked issue/progress/review evidence for `I-20260421-1200-A`.
 - `PENDING`: absorb this repair into the canonical owner docs, rerun guarded promotion with the new owner-linked artifact, merge into `develop`, restart daemon replay on canonical `develop`, and keep looping until Freely proves select -> finish -> merge upward -> retire -> next task without manual intervention.
+
+## 2026-04-25 13:05 PDT Terminal Handoff Slot Collapse
+
+- `FAIL`: after the manager/worker role + `starting`-stuck repair merged into canonical `develop` as `2fd905c9`, real daemon replay still exposed one narrower same-owner seam. Root runtime no longer mis-launched the delegated `test-pre-merge` target, but after that target emitted terminal `EXIT_KIND="worker_handoff_needed"` and materialized a fresh local followthrough prompt, root `manager-worker-launch-state.env` still held `ACTIVE_RUNNING_WORKER_COUNT="1"` with `LAST_MANAGER_WORKER_PROMPTS_CONSUMED=none` and no surviving launched prompt.
+- `FAIL`: the stale count came from the semantic-loop hint itself, not from a still-running worker. `manager_worker_launch_state_reconcile_prompt_liveness()` correctly pruned the old outer launched prompt because the delegated target was terminal, but then recomputed active workers through `manager_semantic_loop_active_worker_count_for_project()`, which preferred the old hinted count over discovered reality even though the current continuity's launched prompt set had already collapsed to empty.
+- `PASS`: this seam still belongs to `I-20260421-1200-A`. The runtime control plane remains artifact-driven: manager/worker identity is operationally assigned by verification/delegation artifacts and exit contracts, while runtime is the middleman that decides whether to keep the manager alive, delegate another worker, or consume worker handoff/closeout followthrough. The remaining bug was stale launch-state bookkeeping after a terminal handoff, not confusion over agent/skill/prompt taxonomy.
+- `PASS`: `manager_worker_launch_state_reconcile_prompt_liveness()` now collapses `ACTIVE_RUNNING_WORKER_COUNT` back to the actually discovered worker count when the current continuity's launched prompt set has been fully pruned. This keeps the old hint behavior for genuinely active delegated lanes, but stops a terminal or reclaimed slot from pinning the parent manager in false wait state forever.
+- `PASS`: focused regressions passed for the new seam and adjacent recovery surface:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-collapses-terminal-handoff-worker-slot`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-reclaims-stale-starting-worker-slot`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-malformed-verification-contract`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-without-verification-contract`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`
+- `FAIL`: the current owner pre-tests had drifted into falsely advertising canonical develop acceptance as already `pass`. That status is now corrected back to `pending` until real daemon replay proves the full success standard: select task -> finish -> merge upward -> retire worktree -> continue to next task.
+- `PENDING`: commit this same-owner continuation, replay it through fresh protected premerge and guarded `develop`, then rerun canonical `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` until Freely either meets the full autonomous-loop success standard or exposes the next bounded same-owner seam with fresh evidence.

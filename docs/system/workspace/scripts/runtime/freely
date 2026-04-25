@@ -1502,6 +1502,7 @@ reclaim_delegated_worker_starting_stuck_runtime_if_needed() {
 manager_worker_launch_state_reconcile_prompt_liveness() {
   local project="$1" continuity_file="$2"
   local state_file prompt_generated_csv launched_csv normalized_launched_csv queued_csv max_parallel_workers active_running_workers available_new_slots queued_prompt_blockers
+  local discovered_active_running_workers
   local generated_continuity generated_prompts consumed_continuity updated_launched_csv prompt_file target_project needs_writeback="0"
   local worker_terminal="0"
 
@@ -1546,7 +1547,12 @@ manager_worker_launch_state_reconcile_prompt_liveness() {
   queued_csv="${QUEUED_WORKER_PROMPTS:-}"
   queued_prompt_blockers="${QUEUED_WORKER_PROMPT_BLOCKERS:-}"
   max_parallel_workers="$(manager_max_parallel_workers)"
+  discovered_active_running_workers="$(count_active_running_workers_for_manager_project "$project" 2>/dev/null || true)"
+  [[ "$discovered_active_running_workers" =~ ^[0-9]+$ ]] || discovered_active_running_workers="0"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project")"
+  if [[ -n "$normalized_launched_csv" && -z "$updated_launched_csv" ]]; then
+    active_running_workers="$discovered_active_running_workers"
+  fi
   if [[ "$max_parallel_workers" == "unbounded" ]]; then
     available_new_slots="unbounded"
   else
