@@ -1513,43 +1513,44 @@ manager_worker_launch_state_reconcile_prompt_liveness() {
   generated_continuity="${LAST_MANAGER_CONTINUITY_GENERATED:-$continuity_file}"
   generated_prompts="${LAST_MANAGER_WORKER_PROMPTS_GENERATED:-}"
   consumed_continuity="${LAST_MANAGER_CONTINUITY_CONSUMED:-$continuity_file}"
-  prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
+  prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file" || true)"
   launched_csv="${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-${LAUNCHED_WORKER_PROMPTS:-}}"
-  normalized_launched_csv="$(csv_retain_exact_items "$launched_csv" "$prompt_generated_csv")"
+  normalized_launched_csv="$(csv_retain_exact_items "$launched_csv" "$prompt_generated_csv" || true)"
   updated_launched_csv=""
 
-  IFS=',' read -r -a __freely_reconcile_prompts <<<"$normalized_launched_csv"
-  for prompt_file in "${__freely_reconcile_prompts[@]}"; do
-    [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
-    target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
-    if [[ -n "$target_project" && -d "$target_project" ]] && reclaim_delegated_worker_starting_stuck_runtime_if_needed "$target_project" "$prompt_file"; then
-      needs_writeback="1"
-      continue
-    fi
-    worker_terminal="0"
-    if [[ -n "$target_project" && -d "$target_project" ]]; then
-      if worker_project_has_terminal_exit_contract "$target_project"; then
-        worker_terminal="1"
-      elif ! worker_prompt_launchable_for_manager_project "$project" "$prompt_file" \
-        && ! worker_project_is_actively_running "$target_project"; then
+  if [[ -n "$normalized_launched_csv" ]]; then
+    while IFS= read -r prompt_file; do
+      [[ -n "$prompt_file" && -f "$prompt_file" ]] || continue
+      target_project="$(worker_prompt_resolved_worktree "$project" "$prompt_file")"
+      if [[ -n "$target_project" && -d "$target_project" ]] && reclaim_delegated_worker_starting_stuck_runtime_if_needed "$target_project" "$prompt_file"; then
+        needs_writeback="1"
+        continue
+      fi
+      worker_terminal="0"
+      if [[ -n "$target_project" && -d "$target_project" ]]; then
+        if worker_project_has_terminal_exit_contract "$target_project"; then
+          worker_terminal="1"
+        elif ! worker_prompt_launchable_for_manager_project "$project" "$prompt_file" \
+          && ! worker_project_is_actively_running "$target_project"; then
+          worker_terminal="1"
+        fi
+      else
         worker_terminal="1"
       fi
-    else
-      worker_terminal="1"
-    fi
-    if [[ "$worker_terminal" == "1" ]]; then
-      needs_writeback="1"
-      continue
-    fi
-    updated_launched_csv="$(csv_append_unique_item "$updated_launched_csv" "$prompt_file")"
-  done
+      if [[ "$worker_terminal" == "1" ]]; then
+        needs_writeback="1"
+        continue
+      fi
+      updated_launched_csv="$(csv_append_unique_item "$updated_launched_csv" "$prompt_file")"
+    done < <(printf '%s\n' "$normalized_launched_csv" | tr ',' '\n')
+  fi
 
   queued_csv="${QUEUED_WORKER_PROMPTS:-}"
   queued_prompt_blockers="${QUEUED_WORKER_PROMPT_BLOCKERS:-}"
-  max_parallel_workers="$(manager_max_parallel_workers)"
+  max_parallel_workers="$(manager_max_parallel_workers || true)"
   discovered_active_running_workers="$(count_active_running_workers_for_manager_project "$project" 2>/dev/null || true)"
   [[ "$discovered_active_running_workers" =~ ^[0-9]+$ ]] || discovered_active_running_workers="0"
-  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project")"
+  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" || true)"
   if [[ -n "$normalized_launched_csv" && -z "$updated_launched_csv" ]]; then
     active_running_workers="$discovered_active_running_workers"
   fi
@@ -1581,6 +1582,7 @@ manager_worker_launch_state_reconcile_prompt_liveness() {
   fi
 
   printf '%s\n' "${updated_launched_csv:-}"
+  return 0
 }
 
 registered_projects_requiring_auth_change_wake() {
@@ -3142,6 +3144,13 @@ codex_has_verified_resume_evidence() {
   [[ -n "$resume_target" ]] || return 1
   resolved_jsonl_path="$(resolve_codex_jsonl_path_for_resume_target "$resume_target" "$persisted_jsonl_path")"
   codex_jsonl_has_verified_resume_evidence "$resolved_jsonl_path"
+}
+
+codex_has_launchable_resume_evidence() {
+  local resume_target="${1:-}" persisted_jsonl_path="${2:-}" resolved_jsonl_path
+  [[ -n "$resume_target" ]] || return 1
+  resolved_jsonl_path="$(resolve_codex_jsonl_path_for_resume_target "$resume_target" "$persisted_jsonl_path")"
+  codex_jsonl_has_effective_output_evidence "$resolved_jsonl_path"
 }
 
 tool_runtime_resume_target_after_cycle() {
@@ -4734,6 +4743,68 @@ find_codex_jsonl_path_for_session() {
   find "$sessions_root" -type f -name "*${session_id}.jsonl" | sort | tail -n 1
 }
 
+codex_jsonl_has_effective_output_evidence() {
+  local jsonl_path="$1"
+  [[ -f "$jsonl_path" && -s "$jsonl_path" ]] || return 1
+
+  if command -v python3 >/dev/null 2>&1; then
+    python3 - "$jsonl_path" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as fh:
+    for raw in fh:
+        raw = raw.strip()
+        if not raw:
+            continue
+        try:
+            obj = json.loads(raw)
+        except Exception:
+            continue
+        obj_type = obj.get("type")
+        payload = obj.get("payload") or {}
+        if obj_type == "response_item":
+            role = payload.get("role")
+            item_type = payload.get("type")
+            if role == "assistant":
+                sys.exit(0)
+            if item_type not in ("message", "reasoning", None):
+                sys.exit(0)
+        elif obj_type == "event_msg":
+            if payload.get("type") in ("agent_message", "task_complete"):
+                sys.exit(0)
+sys.exit(1)
+PY
+    return $?
+  fi
+
+  if rg -q '"role":"assistant"' "$jsonl_path"; then
+    return 0
+  fi
+  if rg -q '"type":"event_msg".*"type":"(agent_message|task_complete)"' "$jsonl_path"; then
+    return 0
+  fi
+  return 1
+}
+
+manager_cycle_has_effective_output_evidence() {
+  local project="$1" session_file jsonl_path tool_name
+  session_file="$(session_state_file "$project")"
+  [[ -f "$session_file" ]] || return 1
+  tool_name="${AI_TOOL:-}"
+  [[ -n "$tool_name" ]] || tool_name="$(meta_env_value "$(config_file "$project")" "AI_TOOL")"
+  case "$tool_name" in
+    codex)
+      jsonl_path="$(meta_env_value "$session_file" "LAST_TOOL_JSONL_PATH")"
+      codex_jsonl_has_effective_output_evidence "$jsonl_path"
+      ;;
+    *)
+      return 0
+      ;;
+  esac
+}
+
 extract_latest_codex_context_ratio_from_jsonl() {
   local jsonl_path="$1"
   local line total_tokens context_window
@@ -4854,7 +4925,7 @@ count_active_intake_items() {
 intake_item_counts_as_active_in_current_round() {
   local project="$1" meta_file="$2"
   local project_real status absorption_target delegated_worktree delegated_real
-  local created_at item_epoch continuity_floor_epoch
+  local created_at item_epoch continuity_floor_epoch intake_id active_consumed_ids
 
   [[ -f "$meta_file" ]] || return 1
   status="$(meta_env_status_value "$meta_file")"
@@ -4893,7 +4964,15 @@ intake_item_counts_as_active_in_current_round() {
   delegated_real="$(cd "$delegated_worktree" 2>/dev/null && pwd -P || true)"
   [[ -n "$delegated_real" ]] || return 0
   project_real="$(cd "$project" && pwd -P)"
-  [[ "$delegated_real" == "$project_real" ]]
+  [[ "$delegated_real" == "$project_real" ]] || return 1
+
+  intake_id="$LOADED_META_INTAKE_ID"
+  [[ -n "$intake_id" ]] || intake_id="$(basename "$(dirname "$meta_file")")"
+  active_consumed_ids="$(active_prompt_consumed_delegation_ids_for_project "$project")"
+  if [[ -n "$active_consumed_ids" ]] && csv_contains_exact_item "$active_consumed_ids" "$intake_id"; then
+    return 1
+  fi
+  return 0
 }
 
 has_local_delegated_worker_reactivation_target() {
@@ -5105,6 +5184,173 @@ STATUS="$status"
 EOF
   printf '%s\n' "$content" >"$content_file"
   printf '%s\n' "$item_dir"
+}
+
+manager_worker_terminal_round_anchor_for_project() {
+  local project="$1" anchor_epoch continuity_file continuity_epoch
+  anchor_epoch="$(manager_operator_stop_boundary_epoch_for_project "$project")"
+  [[ "$anchor_epoch" =~ ^[0-9]+$ ]] || anchor_epoch="0"
+  if (( anchor_epoch > 0 )); then
+    printf '%s\n' "$anchor_epoch"
+    return 0
+  fi
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project" || true)"
+  continuity_epoch="0"
+  if [[ -n "$continuity_file" && -f "$continuity_file" ]]; then
+    continuity_epoch="$(file_mtime_epoch "$continuity_file" 2>/dev/null || true)"
+  fi
+  [[ "$continuity_epoch" =~ ^[0-9]+$ ]] || continuity_epoch="0"
+  if (( continuity_epoch > 0 )); then
+    printf '%s\n' "$continuity_epoch"
+    return 0
+  fi
+  date '+%s'
+}
+
+manager_worker_terminal_continuation_intake_id() {
+  local project="$1" branch="$2" terminal_kind="$3" worktree_path="$4" anchor slug
+  anchor="$(manager_worker_terminal_round_anchor_for_project "$project")"
+  [[ "$anchor" =~ ^[0-9]+$ ]] || anchor="0"
+  slug="$(slugify_text "${branch:-$(basename "$worktree_path")}-${terminal_kind:-worker-terminal}")"
+  [[ -n "$slug" ]] || slug="worker-terminal"
+  printf 'worker-terminal-%s-%s\n' "$anchor" "$slug"
+}
+
+materialize_manager_worker_terminal_continuation() {
+  local project="$1" worker_project="$2" branch="$3" terminal_kind="$4"
+  local contract_file intake_id created_at meta_file resolution_dir resolution_artifact
+  local contract_summary manager_next_action linked_artifact content intake_message
+  local owner_issue artifact_dir closeout_target_lane closeout_gate_command closeout_promotion_gate evidence_paths_csv
+  contract_file="$(worker_exit_contract_file "$worker_project")"
+  [[ -f "$contract_file" ]] || return 1
+
+  case "$terminal_kind" in
+    worker_done)
+      contract_summary="$(meta_env_value "$contract_file" "COMPLETION_SUMMARY")"
+      manager_next_action="Consume this completed worker result before broad patrol, then decide manager-owned closeout, merge judgement, retirement, or next dispatch."
+      ;;
+    worker_blocked)
+      contract_summary="$(meta_env_value "$contract_file" "BLOCKED_REASON")"
+      manager_next_action="Consume this blocked worker result before broad patrol, then decide manager-owned unblock, re-dispatch, or bounded stop."
+      ;;
+    worker_handoff_needed)
+      contract_summary="$(meta_env_value "$contract_file" "HANDOFF_REASON")"
+      manager_next_action="Consume this worker handoff before broad patrol, then decide manager-owned followthrough or next dispatch."
+      ;;
+    *)
+      contract_summary="terminal worker result observed"
+      manager_next_action="Consume this terminal worker result before broad patrol."
+      ;;
+  esac
+  [[ -n "$contract_summary" ]] || contract_summary="summary_missing"
+
+  owner_issue="$(meta_env_value "$contract_file" "OWNER_ISSUE")"
+  [[ -n "$owner_issue" ]] || owner_issue="$(meta_env_value "$(worker_verification_contract_file "$worker_project")" "OWNER_ISSUE")"
+  artifact_dir="$(meta_env_value "$contract_file" "VERIFICATION_ARTIFACT_DIR")"
+  [[ -n "$artifact_dir" ]] || artifact_dir="$(meta_env_value "$(worker_verification_contract_file "$worker_project")" "VERIFICATION_ARTIFACT_DIR")"
+  closeout_target_lane="$(meta_env_value "$contract_file" "CLOSEOUT_TARGET_LANE")"
+  [[ -n "$closeout_target_lane" ]] || closeout_target_lane="$(meta_env_value "$(worker_verification_contract_file "$worker_project")" "CLOSEOUT_TARGET_LANE")"
+  closeout_gate_command="$(meta_env_value "$contract_file" "CLOSEOUT_GATE_COMMAND")"
+  [[ -n "$closeout_gate_command" ]] || closeout_gate_command="$(meta_env_value "$(worker_verification_contract_file "$worker_project")" "CLOSEOUT_GATE_COMMAND")"
+  closeout_promotion_gate="$(meta_env_value "$contract_file" "CLOSEOUT_PROMOTION_GATE")"
+  [[ -n "$closeout_promotion_gate" ]] || closeout_promotion_gate="$(meta_env_value "$(worker_verification_contract_file "$worker_project")" "CLOSEOUT_PROMOTION_GATE")"
+  evidence_paths_csv="$(meta_env_value "$contract_file" "EVIDENCE_PATHS_CSV")"
+
+  intake_id="$(manager_worker_terminal_continuation_intake_id "$project" "$branch" "$terminal_kind" "$worker_project")"
+  meta_file="$(intake_item_meta_file "$project" "$intake_id")"
+  created_at="$(current_timestamp_utc_for_machine)"
+  if [[ -f "$meta_file" ]]; then
+    created_at="$(meta_env_value "$meta_file" "CREATED_AT")"
+    [[ -n "$created_at" ]] || created_at="$(current_timestamp_utc_for_machine)"
+  fi
+
+  linked_artifact="$contract_file"
+  content="$(cat <<EOF
+# Resolution
+- worker_terminal_state: ${terminal_kind}
+- worker_project: \`${worker_project}\`
+- worker_branch: \`${branch:-unknown}\`
+- contract_file: \`${contract_file}\`
+- owner_issue: \`${owner_issue:-unknown}\`
+- verification_artifact_dir: \`${artifact_dir:-unknown}\`
+- closeout_target_lane: \`${closeout_target_lane:-unknown}\`
+- closeout_gate_command: \`${closeout_gate_command:-unknown}\`
+- closeout_promotion_gate: \`${closeout_promotion_gate:-unknown}\`
+- summary: ${contract_summary}
+- next_restart_point: \`consume worker terminal result from ${worker_project}\`
+- next_ownership: \`manager\`
+- handoff_summary: Manager must absorb this worker terminal result before broad patrol so merge / cleanup / next-dispatch sequencing stays attached to the completed lane.
+EOF
+)"
+  if [[ -n "$evidence_paths_csv" ]]; then
+    content="${content}"$'\n'"- evidence_paths_csv: \`${evidence_paths_csv}\`"
+  fi
+  resolution_dir="$(
+    write_interruption_resolution_artifact \
+      "$project" "$intake_id" "manager-runtime-worker-terminal-recovery" "followup" "continuation" "handoff://continuation" "$linked_artifact" "$project" "delegated" "$content"
+  )"
+  resolution_artifact="$resolution_dir/resolution.md"
+  intake_message="$(cat <<EOF
+worker terminal followthrough
+- worker_project: \`${worker_project}\`
+- worker_branch: \`${branch:-unknown}\`
+- worker_terminal_kind: \`${terminal_kind}\`
+- summary: ${contract_summary}
+- owner_issue: \`${owner_issue:-unknown}\`
+- verification_artifact_dir: \`${artifact_dir:-unknown}\`
+- closeout_target_lane: \`${closeout_target_lane:-unknown}\`
+- closeout_gate_command: \`${closeout_gate_command:-unknown}\`
+- closeout_promotion_gate: \`${closeout_promotion_gate:-unknown}\`
+- next_action: ${manager_next_action}
+EOF
+)"
+  if worker_terminal_continuation_materialization_is_current \
+    "$project" \
+    "$intake_id" \
+    "$linked_artifact" \
+    "$resolution_artifact" \
+    "$intake_message" \
+    "$content"; then
+    return 0
+  fi
+  write_intake_item \
+    "$project" \
+    "$intake_id" \
+    "manager-runtime-worker-terminal-recovery" \
+    "delegation" \
+    "delegated" \
+    "continuation" \
+    "$linked_artifact" \
+    "$project" \
+    "[]" \
+    "$intake_message" \
+    "followup" \
+    "manager-runtime-worker-terminal-recovery" \
+    "$created_at" \
+    "handoff://continuation" \
+    "$resolution_artifact" \
+    "$created_at" >/dev/null
+  request_local_continuation_reentry "$project" "$intake_id"
+  printf '%s\n' "$intake_id"
+}
+
+worker_terminal_continuation_materialization_is_current() {
+  local project="$1" intake_id="$2" linked_artifact="$3" resolution_artifact="$4" intake_message="$5" resolution_content="$6"
+  local meta_file message_file
+  meta_file="$(intake_item_meta_file "$project" "$intake_id")"
+  message_file="$(intake_item_message_file "$project" "$intake_id")"
+  [[ -f "$meta_file" && -f "$message_file" && -n "$resolution_artifact" && -f "$resolution_artifact" ]] || return 1
+  [[ "$(meta_env_value "$meta_file" "STATUS")" == "delegated" ]] || return 1
+  [[ "$(meta_env_value "$meta_file" "CLASSIFICATION")" == "continuation" ]] || return 1
+  [[ "$(meta_env_value "$meta_file" "REACTION")" == "followup" ]] || return 1
+  [[ "$(meta_env_value "$meta_file" "CLAIMED_BY")" == "manager-runtime-worker-terminal-recovery" ]] || return 1
+  [[ "$(meta_env_value "$meta_file" "LINKED_ARTIFACT")" == "$linked_artifact" ]] || return 1
+  [[ "$(meta_env_value "$meta_file" "DELEGATED_WORKTREE")" == "$project" ]] || return 1
+  [[ "$(meta_env_value "$meta_file" "ABSORPTION_TARGET")" == "handoff://continuation" ]] || return 1
+  [[ "$(meta_env_value "$meta_file" "RESOLUTION_ARTIFACT")" == "$resolution_artifact" ]] || return 1
+  [[ "$(cat "$message_file" 2>/dev/null || true)" == "$intake_message" ]] || return 1
+  [[ "$(cat "$resolution_artifact" 2>/dev/null || true)" == "$resolution_content" ]] || return 1
+  return 0
 }
 
 intake_snapshot_for_project() {
@@ -6379,7 +6625,7 @@ tool_has_resume_evidence() {
   if tool_prefers_explicit_resume_target "$tool"; then
     case "$tool" in
       codex)
-        codex_has_verified_resume_evidence "$resume_target" "${LAST_TOOL_JSONL_PATH:-}"
+        codex_has_launchable_resume_evidence "$resume_target" "${LAST_TOOL_JSONL_PATH:-}"
         ;;
       *)
         [[ -n "$resume_target" ]]
@@ -7026,6 +7272,7 @@ manager_worker_launch_state_reconcile_same_continuity_prompts() {
   fi
 
   printf '%s\n' "$normalized_launched_csv"
+  return 0
 }
 
 manager_worker_launch_state_refresh_for_status() {
@@ -7053,15 +7300,15 @@ manager_worker_launch_state_refresh_for_status() {
   queued_prompts="${QUEUED_WORKER_PROMPTS:-}"
   queued_prompt_blockers="${QUEUED_WORKER_PROMPT_BLOCKERS:-}"
   latest_generated_continuity="$continuity_file"
-  latest_generated_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_generated_continuity")"
+  latest_generated_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_generated_continuity" || true)"
   [[ -n "$latest_generated_prompts_csv" ]] || latest_generated_prompts_csv="none"
-  latest_generated_written_by="$(manager_continuity_written_by_from_file "$latest_generated_continuity")"
+  latest_generated_written_by="$(manager_continuity_written_by_from_file "$latest_generated_continuity" || true)"
 
   launch_tracking_continuity="$latest_generated_continuity"
   launch_tracking_prompts="$latest_generated_prompts_csv"
-  latest_launchable_continuity="$(latest_launchable_manager_worker_prompt_continuity_file_for_project "$project")"
+  latest_launchable_continuity="$(latest_launchable_manager_worker_prompt_continuity_file_for_project "$project" || true)"
   if [[ -n "$latest_launchable_continuity" && -f "$latest_launchable_continuity" ]]; then
-    latest_launchable_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_launchable_continuity")"
+    latest_launchable_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_launchable_continuity" || true)"
     [[ -n "$latest_launchable_prompts_csv" ]] || latest_launchable_prompts_csv="none"
     if { [[ "$latest_generated_written_by" == "freely-runtime-startup-stub" ]] || [[ "$latest_generated_written_by" == "freely-runtime-fallback" ]]; } \
       && { [[ "$launch_tracking_prompts" == "none" ]] || [[ "$launch_tracking_continuity" != "$latest_launchable_continuity" ]]; }; then
@@ -7078,7 +7325,7 @@ manager_worker_launch_state_refresh_for_status() {
   if [[ -n "$consumed_continuity" && "$consumed_continuity" != "unavailable" ]]; then
     if [[ ! -f "$consumed_continuity" ]] || manager_continuity_has_stale_runtime_worktree_refs "$project" "$consumed_continuity"; then
       consumed_continuity="$launch_tracking_continuity"
-      consumed_prompts="$(csv_retain_exact_items "${consumed_prompts:-}" "$launch_tracking_prompts")"
+      consumed_prompts="$(csv_retain_exact_items "${consumed_prompts:-}" "$launch_tracking_prompts" || true)"
       [[ -n "$consumed_prompts" ]] || consumed_prompts="none"
       needs_writeback="1"
     fi
@@ -7092,8 +7339,8 @@ manager_worker_launch_state_refresh_for_status() {
     queued_prompt_blockers="none"
     needs_writeback="1"
   fi
-  max_parallel_workers="$(manager_max_parallel_workers)"
-  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project")"
+  max_parallel_workers="$(manager_max_parallel_workers || true)"
+  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" || true)"
   if [[ "$max_parallel_workers" == "unbounded" ]]; then
     available_new_slots="unbounded"
   else
@@ -7127,6 +7374,7 @@ manager_worker_launch_state_refresh_for_status() {
       "$available_new_slots" \
       "$queued_prompt_blockers"
   fi
+  return 0
 }
 
 csv_conflicts_with_item() {
@@ -9039,8 +9287,9 @@ latest_launchable_manager_worker_prompt_continuity_file_for_project() {
 latest_manager_worker_prompt_csv_from_continuity() {
   local continuity_file="$1"
   local csv
-  csv="$(latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | paste -sd, -)"
+  csv="$(latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | paste -sd, - || true)"
   printf '%s\n' "${csv:-}"
+  return 0
 }
 
 manager_continuity_semantic_fingerprint() {
@@ -11787,6 +12036,47 @@ EOF
   return 0
 }
 
+autofill_manager_exit_contract_for_continuity_resume_if_possible() {
+  local project="$1" missing_csv="${2:-}"
+  local continuity_file contract_file worker_prompts_csv route_kind restart_point next_action
+  case "$missing_csv" in
+    missing_file)
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+
+  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+  [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 1
+
+  worker_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
+  if [[ -n "$worker_prompts_csv" ]] && manager_exit_contract_has_launchable_worker_prompt "$project" "$worker_prompts_csv"; then
+    return 1
+  fi
+
+  route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
+  restart_point="$(manager_continuity_backtick_field_value "$continuity_file" "restart_point")"
+  next_action="$(manager_continuity_backtick_field_value "$continuity_file" "next_action")"
+  [[ -n "$restart_point" ]] || restart_point="resume from authoritative manager continuity $(basename "$continuity_file")"
+  [[ -n "$next_action" ]] || next_action="continue the current manager-owned lane from $(basename "$continuity_file") before widening patrol"
+
+  contract_file="$(manager_exit_contract_file "$project")"
+  cat >"$contract_file" <<EOF
+EXIT_KIND="resume_manager"
+RESTART_POINT="$restart_point"
+NEXT_ACTION="$next_action"
+WHY_NOT_STOP="authoritative manager continuity remains open"
+WHY_NOT_DELEGATE="current continuity has no launchable worker prompts"
+EOF
+  append_runtime_event "$project" "manager_exit_contract_autofilled_continuity_resume" \
+    "continuity=$(basename "$continuity_file")" \
+    "route_kind=${route_kind:-unknown}" \
+    "missing_csv=${missing_csv:-none}"
+  return 0
+}
+
 worker_exit_contract_kind() {
   local project="$1" contract_file
   contract_file="$(worker_exit_contract_file "$project")"
@@ -12044,25 +12334,56 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
     printf 'continue\n'
     return 0
   }
-  [[ "$exit_reason" == "ai_exit_rc_0" ]] || {
-    printf 'continue\n'
-    return 0
-  }
-  if ! missing_csv="$(validate_manager_exit_contract_for_project "$project")"; then
-    if autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible "$project" "${missing_csv:-missing_file}"; then
-      append_runtime_event "$project" "manager_exit_contract_delegate_workers_autofilled" \
-        "details=${missing_csv:-missing_file}"
-      printf 'delegate_workers\n'
+  case "$exit_reason" in
+    ai_exit_rc_0)
+      if ! missing_csv="$(validate_manager_exit_contract_for_project "$project")"; then
+        if ! manager_cycle_has_effective_output_evidence "$project"; then
+          write_manager_exit_contract_repair_handoff "$project" "manager_empty_success_cycle" "${missing_csv:-missing_file};effective_output_evidence=absent"
+          write_workcell_state "$project" "running" "up" "down" "manager_empty_success_cycle"
+          append_runtime_event "$project" "manager_empty_success_cycle_detected" \
+            "details=${missing_csv:-missing_file}" \
+            "jsonl_path=$(meta_env_value "$(session_state_file "$project")" "LAST_TOOL_JSONL_PATH")" \
+            "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
+          printf 'resume_invalid\n'
+          return 0
+        fi
+        if autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible "$project" "${missing_csv:-missing_file}"; then
+          append_runtime_event "$project" "manager_exit_contract_delegate_workers_autofilled" \
+            "details=${missing_csv:-missing_file}"
+          printf 'delegate_workers\n'
+          return 0
+        fi
+        if autofill_manager_exit_contract_for_continuity_resume_if_possible "$project" "${missing_csv:-missing_file}"; then
+          append_runtime_event "$project" "manager_exit_contract_resume_autofilled" \
+            "details=${missing_csv:-missing_file}"
+        else
+          write_manager_exit_contract_repair_handoff "$project" "manager_exit_contract_invalid" "${missing_csv:-missing_file}"
+          write_workcell_state "$project" "running" "up" "down" "manager_exit_contract_invalid"
+          append_runtime_event "$project" "manager_exit_contract_invalid" \
+            "details=${missing_csv:-missing_file}" \
+            "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
+          printf 'resume_invalid\n'
+          return 0
+        fi
+      fi
+      ;;
+    execution_network_transient|execution_network_persistent|proxy_config_invalid)
+      [[ -f "$(manager_exit_contract_file "$project")" ]] || {
+        printf 'continue\n'
+        return 0
+      }
+      if ! missing_csv="$(validate_manager_exit_contract_for_project "$project")"; then
+        printf 'continue\n'
+        return 0
+      fi
+      append_runtime_event "$project" "manager_exit_contract_consumed_after_runtime_failure" \
+        "failure_reason=$exit_reason"
+      ;;
+    *)
+      printf 'continue\n'
       return 0
-    fi
-    write_manager_exit_contract_repair_handoff "$project" "manager_exit_contract_invalid" "${missing_csv:-missing_file}"
-    write_workcell_state "$project" "running" "up" "down" "manager_exit_contract_invalid"
-    append_runtime_event "$project" "manager_exit_contract_invalid" \
-      "details=${missing_csv:-missing_file}" \
-      "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
-    printf 'resume_invalid\n'
-    return 0
-  fi
+      ;;
+  esac
   kind="$(manager_exit_contract_kind "$project" || true)"
   stop_reason="$(meta_env_value "$(manager_exit_contract_file "$project")" "STOP_REASON")"
   case "$kind" in
@@ -13089,7 +13410,7 @@ manager_hygiene_alerts() {
 
 manager_runtime_recover_workers_if_needed() {
   local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered latest_continuity_file normalized_project normalized_wt_path
-  local worker_signature worker_prompt_file terminal_kind terminal_exit_reason handoff_prompt_file allow_terminal_handoff_absorb
+  local worker_signature worker_prompt_file terminal_kind terminal_exit_reason handoff_prompt_file allow_terminal_handoff_absorb terminal_intake_id
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || return 0
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
@@ -13157,6 +13478,14 @@ manager_runtime_recover_workers_if_needed() {
           "worktree=$wt_path" \
           "branch=${branch:-unknown}" \
           "source=manager_runtime_recover_workers_if_needed"
+      fi
+      terminal_intake_id="$(materialize_manager_worker_terminal_continuation "$project" "$wt_path" "$branch" "$terminal_kind" || true)"
+      if [[ -n "$terminal_intake_id" ]]; then
+        append_runtime_event "$project" "worker_terminal_followthrough_materialized" \
+          "worktree=$wt_path" \
+          "branch=${branch:-unknown}" \
+          "terminal_kind=${terminal_kind:-unknown}" \
+          "intake_id=$terminal_intake_id"
       fi
       write_workcell_state "$wt_path" "stopped" "down" "down" "$terminal_exit_reason"
       log_info "manager runtime skips expected-running recovery for terminal worker exit contract: branch=${branch:-unknown} exit_kind=${terminal_kind:-unknown} path=$wt_path"
@@ -17849,15 +18178,15 @@ cmd_live_status() {
   ai_cmd="$(ps_command_for_pid "$ai_pid")"
   dispatcher_cmd="$(ps_command_for_pid "$dispatcher_pid")"
   watchdog_cmd="$(ps_command_for_pid "$watchdog_pid")"
-  prompt_file="$(find_latest_prompt_file_for_project "$project")"
-  continuity_file="$(find_latest_manager_continuity_file_for_project "$project")"
-  prompt_excerpt="$(trimmed_file_excerpt "$prompt_file" tail 12)"
-  continuity_excerpt="$(trimmed_file_excerpt "$continuity_file" head 12)"
-  intent_prompt_file="$(status_intent_prompt_file_for_project "$project")"
-  prompt_intent_kind="$(worker_prompt_normalized_intent_kind "$intent_prompt_file")"
-  prompt_intent_target_raw="$(worker_prompt_intent_target "$project" "$intent_prompt_file")"
-  prompt_intent_target="$(worker_prompt_effective_intent_target "$project" "$intent_prompt_file")"
-  IFS='|' read -r ownership_conflict_state ownership_conflict_summary ownership_conflict_signature ownership_conflict_with <<<"$(project_active_ownership_conflict_snapshot "$project")"
+  prompt_file="$(find_latest_prompt_file_for_project "$project" || true)"
+  continuity_file="$(find_latest_manager_continuity_file_for_project "$project" || true)"
+  prompt_excerpt="$(trimmed_file_excerpt "$prompt_file" tail 12 || true)"
+  continuity_excerpt="$(trimmed_file_excerpt "$continuity_file" head 12 || true)"
+  intent_prompt_file="$(status_intent_prompt_file_for_project "$project" || true)"
+  prompt_intent_kind="$(worker_prompt_normalized_intent_kind "$intent_prompt_file" || true)"
+  prompt_intent_target_raw="$(worker_prompt_intent_target "$project" "$intent_prompt_file" || true)"
+  prompt_intent_target="$(worker_prompt_effective_intent_target "$project" "$intent_prompt_file" || true)"
+  IFS='|' read -r ownership_conflict_state ownership_conflict_summary ownership_conflict_signature ownership_conflict_with <<<"$(project_active_ownership_conflict_snapshot "$project" || true)"
   ownership_holder_state="none"
   ownership_holder_status="none"
   if [[ -n "$(project_current_blocking_intent_signature "$project")" ]]; then
@@ -17879,30 +18208,30 @@ cmd_live_status() {
   if [[ "$ownership_conflict_state" != "active" ]]; then
     ownership_conflict_summary="none"
     if [[ "$role_hint" == "manager" && "$live_status_manager_fast_path" != "1" ]]; then
-      ownership_conflict_summary="$(fleet_active_ownership_conflicts_summary "$project")"
+      ownership_conflict_summary="$(fleet_active_ownership_conflicts_summary "$project" || true)"
       [[ "$ownership_conflict_summary" == "none" ]] || ownership_conflict_state="active"
     fi
   fi
   manager_pending_ownership_conflicts="none"
   intake_snapshot=""
-  latest_resolution_snapshot="$(resolution_snapshot_for_project "$project" 1)"
+  latest_resolution_snapshot="$(resolution_snapshot_for_project "$project" 1 || true)"
   intake_active_items="unknown"
   intake_classified_items="unknown"
   intake_delegated_items="unknown"
   delegated_pending_ids="unknown"
   if [[ "$live_status_manager_fast_path" == "1" ]]; then
-    intake_active_items="$(status_surface_intake_active_count_for_project "$project")"
+    intake_active_items="$(status_surface_intake_active_count_for_project "$project" || true)"
     [[ -n "$intake_active_items" ]] || intake_active_items="0"
     intake_classified_items="deferred_while_manager_active"
     intake_delegated_items="deferred_while_manager_active"
     delegated_pending_ids="deferred_while_manager_active"
     intake_snapshot="deferred_while_manager_active"
   else
-    intake_snapshot="$(intake_snapshot_for_project "$project" 3)"
-    intake_active_items="$(status_surface_intake_active_count_for_project "$project")"
-    intake_classified_items="$(count_intake_items_by_status "$project" "classified")"
-    intake_delegated_items="$(count_intake_items_by_status "$project" "delegated")"
-    delegated_pending_ids="$(status_surface_delegated_pending_ids_for_project)"
+    intake_snapshot="$(intake_snapshot_for_project "$project" 3 || true)"
+    intake_active_items="$(status_surface_intake_active_count_for_project "$project" || true)"
+    intake_classified_items="$(count_intake_items_by_status "$project" "classified" || true)"
+    intake_delegated_items="$(count_intake_items_by_status "$project" "delegated" || true)"
+    delegated_pending_ids="$(status_surface_delegated_pending_ids_for_project || true)"
   fi
   prompt_has_delegated="0"
   if [[ -n "$prompt_file" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
@@ -17967,16 +18296,16 @@ cmd_live_status() {
     available_new_worker_slots="${AVAILABLE_NEW_WORKER_SLOTS:-unknown}"
   fi
   local latest_generated_continuity latest_generated_prompts_csv
-  latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
+  latest_generated_continuity="$(latest_generated_manager_continuity_file_for_project "$project" || true)"
   latest_generated_prompts_csv="none"
   if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
     if manager_continuity_precedes_operator_stop_boundary "$project" "$latest_generated_continuity" \
       || manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_generated_continuity"; then
-      latest_generated_continuity="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
+      latest_generated_continuity="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project" || true)"
     fi
   fi
   if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
-    latest_generated_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_generated_continuity")"
+    latest_generated_prompts_csv="$(latest_manager_worker_prompt_csv_from_continuity "$latest_generated_continuity" || true)"
     [[ -n "$latest_generated_prompts_csv" ]] || latest_generated_prompts_csv="none"
     if [[ "$latest_manager_continuity_generated" == "unavailable" || "$latest_manager_continuity_generated" != "$latest_generated_continuity" ]]; then
       latest_manager_continuity_generated="$latest_generated_continuity"
@@ -17987,7 +18316,7 @@ cmd_live_status() {
     if [[ ! -f "$latest_manager_continuity_consumed" ]] || manager_continuity_has_stale_runtime_worktree_refs "$project" "$latest_manager_continuity_consumed"; then
       if [[ -n "$latest_generated_continuity" && -f "$latest_generated_continuity" ]]; then
         latest_manager_continuity_consumed="$latest_generated_continuity"
-        latest_manager_worker_prompts_consumed="$(csv_retain_exact_items "${latest_manager_worker_prompts_consumed:-}" "$latest_generated_prompts_csv")"
+        latest_manager_worker_prompts_consumed="$(csv_retain_exact_items "${latest_manager_worker_prompts_consumed:-}" "$latest_generated_prompts_csv" || true)"
         [[ -n "$latest_manager_worker_prompts_consumed" ]] || latest_manager_worker_prompts_consumed="none"
       else
         latest_manager_continuity_consumed="unavailable"
@@ -17998,7 +18327,7 @@ cmd_live_status() {
   if [[ "$role_hint" == "manager" ]]; then
     manager_pending_ownership_conflicts="${queued_worker_prompt_blockers:-none}"
     if [[ -z "$manager_pending_ownership_conflicts" || "$manager_pending_ownership_conflicts" == "none" ]]; then
-      manager_pending_ownership_conflicts="$(manager_pending_ownership_conflicts_summary "$project" "${latest_generated_continuity:-$continuity_file}" "${queued_worker_prompts:-none}")"
+      manager_pending_ownership_conflicts="$(manager_pending_ownership_conflicts_summary "$project" "${latest_generated_continuity:-$continuity_file}" "${queued_worker_prompts:-none}" || true)"
     fi
   fi
   semantic_loop_signal_reason="unavailable"
@@ -18013,10 +18342,10 @@ cmd_live_status() {
   scan_summary_reason="unavailable"
   scan_summary_surface_counts="none"
   scan_summary_top_refs="none"
-  IFS='|' read -r scan_summary_state scan_summary_generated_at scan_summary_reason scan_summary_surface_counts scan_summary_top_refs <<<"$(task_source_scan_status_summary_for_project "$project")"
-  IFS='|' read -r blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact <<<"$(blocked_supervision_snapshot_for_project "$project")"
-  IFS='|' read -r manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary <<<"$(manager_handoff_snapshot_for_project "$project")"
-  IFS='|' read -r manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$project")"
+  IFS='|' read -r scan_summary_state scan_summary_generated_at scan_summary_reason scan_summary_surface_counts scan_summary_top_refs <<<"$(task_source_scan_status_summary_for_project "$project" || true)"
+  IFS='|' read -r blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact <<<"$(blocked_supervision_snapshot_for_project "$project" || true)"
+  IFS='|' read -r manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary <<<"$(manager_handoff_snapshot_for_project "$project" || true)"
+  IFS='|' read -r manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$project" || true)"
   manager_continuity_gap_writer_state="none"
   if [[ "$manager_continuity_gap_state" == "active" ]]; then
     if [[ -n "$ai_pid" ]]; then
@@ -18029,7 +18358,7 @@ cmd_live_status() {
       manager_continuity_gap_writer_state="no_ai_process_evidence"
     fi
   fi
-  develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$project")"
+  develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$project" || true)"
   local develop_push_blocked_reason develop_push_blocked_updated_at develop_push_blocked_head develop_push_blocked_note
   IFS='|' read -r develop_push_state develop_push_summary develop_push_upstream develop_push_ahead develop_push_behind develop_push_defer_reason develop_push_defer_updated_at develop_push_blocked_reason develop_push_blocked_updated_at develop_push_blocked_head develop_push_blocked_note develop_push_urgency develop_push_resync_required <<<"$develop_push_snapshot"
 

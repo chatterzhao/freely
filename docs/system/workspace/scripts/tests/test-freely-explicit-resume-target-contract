@@ -27,7 +27,10 @@ printf '{"sessionId":"%s","cwd":"%s"}\n' "$CLAUDE_SESSION_ID_CURRENT" "$PROJECT_
 }
 
 observed_jsonl="$CODEX_HOME/sessions/2026/03/30/rollout-2026-03-30T00-00-00-codex-new-session.jsonl"
-printf '{"type":"token_count","total_tokens":100,"model_context_window":1000}\n' >"$observed_jsonl"
+cat >"$observed_jsonl" <<'EOF'
+{"timestamp":"2026-03-30T00:00:00.000Z","type":"session_meta","payload":{"id":"codex-new-session"}}
+{"timestamp":"2026-03-30T00:00:01.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"ok"}]}}
+EOF
 [[ "$(tool_runtime_resume_target_after_cycle codex "codex-new-session" "$observed_jsonl" "codex-known-session" "")" == "codex-new-session" ]] || {
   echo "[FAIL] codex should prefer the observed session id only when rollout evidence exists" >&2
   exit 1
@@ -46,7 +49,10 @@ empty_observed_jsonl="$CODEX_HOME/sessions/2026/03/30/rollout-2026-03-30T00-00-0
 }
 
 persisted_jsonl="$CODEX_HOME/sessions/2026/03/30/rollout-2026-03-30T00-00-00-codex-known-session.jsonl"
-printf '{"type":"token_count","total_tokens":100,"model_context_window":1000}\n' >"$persisted_jsonl"
+cat >"$persisted_jsonl" <<'EOF'
+{"timestamp":"2026-03-30T00:00:00.000Z","type":"session_meta","payload":{"id":"codex-known-session"}}
+{"timestamp":"2026-03-30T00:00:01.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"resume ready"}]}}
+EOF
 LAST_TOOL_JSONL_PATH="$persisted_jsonl"
 [[ "$(tool_runtime_resume_target_after_cycle codex "" "" "codex-known-session" "$persisted_jsonl")" == "codex-known-session" ]] || {
   echo "[FAIL] codex should keep a prior launch target only when persisted rollout evidence is still valid" >&2
@@ -88,7 +94,7 @@ LAST_TOOL_JSONL_PATH="$persisted_jsonl"
 }
 
 if ! tool_has_resume_evidence codex "$PROJECT_ROOT"; then
-  echo "[FAIL] codex should report resume evidence when explicit target has verified rollout evidence" >&2
+  echo "[FAIL] codex should report resume evidence when explicit target has effective rollout evidence" >&2
   exit 1
 fi
 

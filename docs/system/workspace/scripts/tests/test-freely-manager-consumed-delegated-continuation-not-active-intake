@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-consumed-delegated-inactive.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/intake/worker-terminal-sample"
+touch "$PROJECT/.freely/config.env"
+
+cat >"$PROJECT/.freely/intake/worker-terminal-sample/meta.env" <<'EOF'
+INTAKE_ID="worker-terminal-sample"
+CREATED_AT="2026-04-25T15:38:52Z"
+AUTHOR="manager-runtime-worker-terminal-recovery"
+CHANNEL="delegation"
+STATUS="delegated"
+CLASSIFICATION="continuation"
+REACTION="followup"
+LINKED_ARTIFACT="/tmp/worker-exit-contract.env"
+DELEGATED_WORKTREE="__PROJECT__"
+SESSION_REFS="[]"
+CLAIMED_BY="manager-runtime-worker-terminal-recovery"
+CLAIMED_AT="2026-04-25T15:38:52Z"
+ABSORPTION_TARGET="handoff://continuation"
+RESOLUTION_ARTIFACT="/tmp/resolution.md"
+EOF
+
+perl -0pi -e "s#__PROJECT__#$PROJECT#g" "$PROJECT/.freely/intake/worker-terminal-sample/meta.env"
+
+cat >"$PROJECT/.freely/intake/worker-terminal-sample/message.txt" <<'EOF'
+worker terminal followthrough
+EOF
+
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="worker-terminal-sample"
+EOF
+
+cat >"$PROJECT/.freely/run/prompt.txt" <<'EOF'
+Delegated continuation handoff:
+- intake_id=worker-terminal-sample message=worker terminal followthrough
+EOF
+
+cat >"$PROJECT/.freely/run/ai.pid" <<'EOF'
+12345
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+runtime_ai_pid_hint_for_project() { printf "12345\n"; }
+latest_prompt_file_for_project() { printf "%s\n" "$PROJECT/.freely/run/prompt.txt"; }
+delegated_continuation_freshness_floor_epoch_for_project() { printf "0\n"; }
+
+META_FILE="$PROJECT/.freely/intake/worker-terminal-sample/meta.env"
+
+if intake_item_counts_as_active_in_current_round "$PROJECT" "$META_FILE"; then
+  echo "[FAIL] consumed delegated continuation still counted as active intake" >&2
+  exit 1
+fi
+
+echo "[PASS] consumed delegated continuation is excluded from active intake detection"
