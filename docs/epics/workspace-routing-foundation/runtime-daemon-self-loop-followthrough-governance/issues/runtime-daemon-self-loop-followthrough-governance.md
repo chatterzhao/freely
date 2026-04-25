@@ -164,6 +164,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-worktree-summary-multi-worktree`
 - `bash docs/system/workspace/scripts/tests/test-freely-worktree-summary-tolerates-closed-pipe`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-allows-materializable-missing-worktree`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-repairs-existing-stale-worktree`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-materializes-missing-worktree`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-keeps-fresh-materialized-worker-with-authoritative-edit-prompt`
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`

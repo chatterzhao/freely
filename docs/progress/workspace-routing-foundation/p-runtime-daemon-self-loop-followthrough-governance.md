@@ -82,6 +82,16 @@
 - Cached `git worktree list --porcelain` and manager continuity producers now emit through a bounded helper that traps `PIPE`, ignores `SIGPIPE`, and returns success when the downstream consumer has already found the first needed record.
 - The remaining completion work is guarded promotion into `develop`, canonical `develop` self-host task completion, and temporary lane retirement.
 
+## 2026-04-24 17:05 PDT Existing Stale Worker Bootstrap Followthrough
+
+- `FAIL`: canonical `develop` daemon replay moved past the missing-worktree materialization seam, but the next selected cleanup lane could still point at a sibling worktree directory that already existed with copied `.freely/config.env` while lacking `.freely/run` baseline state and rematerialized tooling; runtime treated that half-bootstrap directory as an already-ready worker and never repaired it into a launchable workcell.
+- `PASS`: manager launch now repairs such existing authoritative worker worktrees before delegation by re-running managed tooling sync when bootstrap surfaces are missing, and runtime writes baseline workcell state on config-present lanes that still lack `.freely/run/workcell-state.env`.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-repairs-existing-stale-worktree`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-materializes-missing-worktree`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-into-worktree`
+- `PASS`: protected premerge replay on `test-pre-merge-20260424-worker-launch-bootstrap-repair` reran the same stale-existing-worktree bootstrap regression plus the adjacent missing-worktree materialization and sync-tooling regressions without widening owner scope.
+- `PENDING`: guarded `develop` merge and fresh canonical daemon replay still must prove the retained receipt-closeout lane both launches from an existing stale worktree and advances the self-host loop to the next scan-selected task instead of stopping after manager selection.
+
 ## 2026-04-22 07:09 PDT Reconnect Exhaustion 502 Network Marker Followthrough
 
 - `FAIL`: direct `codex exec` was healthy again, but the same invocation through `monitor-ai-cli.sh` still reproduced `ERROR: Reconnecting... 1/5 ... 5/5` followed by upstream `502 Bad Gateway`; runtime persisted that exit as `tool_runtime_failure`, which reopened generic cross-tool fallback instead of staying on the bounded execution-network path.
