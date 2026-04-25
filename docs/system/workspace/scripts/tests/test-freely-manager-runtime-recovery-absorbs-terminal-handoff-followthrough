@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+
+    root="$(mktemp -d /tmp/freely-runtime-handoff-recover.XXXXXX)"
+    trap "rm -rf \"$root\"" EXIT
+    project="$root/repo"
+    worker="$root/test-pre-merge-worker"
+    mkdir -p "$project/.freely/run/worker-prompts" "$worker/.freely/run/worker-prompts"
+    : >"$project/.freely/config.env"
+    : >"$worker/.freely/config.env"
+
+    outer_prompt="$project/.freely/run/worker-prompts/outer.txt"
+    local_prompt="$worker/.freely/run/worker-prompts/local-followthrough.txt"
+    continuity="$worker/.freely/run/manager-continuity-20260425-051541.md"
+
+    cat >"$outer_prompt" <<EOF
+Worktree:
+- \`$worker\`
+Branch:
+- \`test-pre-merge-demo\`
+dispatch_priority: \`P1\`
+parallel_safe: \`true\`
+intent_kind: \`promotion\`
+EOF
+
+    cat >"$local_prompt" <<EOF
+Worktree:
+- \`$worker\`
+Branch:
+- \`test-pre-merge-demo\`
+dispatch_priority: \`P1\`
+parallel_safe: \`true\`
+intent_kind: \`promotion\`
+EOF
+
+    cat >"$continuity" <<EOF
+# Manager Continuity
+- authoritative_worker_prompts:
+  - \`$local_prompt\`
+EOF
+
+    cat >"$worker/.freely/run/workcell-state.env" <<EOF
+DESIRED_RUNTIME_STATE="running"
+LAST_ROLE_HINT="worker"
+LAST_EXIT_REASON="worker_exit_contract_handoff_needed"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_STATE_UPDATED_AT="2026-04-25T00:00:00Z"
+EOF
+
+    cat >"$worker/.freely/run/worker-exit-contract.env" <<EOF
+EXIT_KIND="worker_handoff_needed"
+HANDOFF_REASON="protected lane emitted a fresh local followthrough prompt"
+NEXT_ACTION_FOR_MANAGER="Launch $local_prompt then continue bounded guarded replay verification."
+EOF
+
+    git() {
+      if [[ "$1" == "-C" && "$3" == "rev-parse" && "$4" == "--show-toplevel" ]]; then
+        printf "%s\n" "$project"
+        return 0
+      fi
+      if [[ "$1" == "-C" && "$3" == "worktree" && "$4" == "list" && "$5" == "--porcelain" ]]; then
+        cat <<EOF
+worktree $project
+branch refs/heads/develop
+
+worktree $worker
+branch refs/heads/test-pre-merge-demo
+EOF
+        return 0
+      fi
+      command git "$@"
+    }
+
+    config_file() { printf "%s\n" "$1/.freely/config.env"; }
+    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
+    workcell_state_file() { printf "%s\n" "$1/.freely/run/workcell-state.env"; }
+    worker_exit_contract_file() { printf "%s\n" "$1/.freely/run/worker-exit-contract.env"; }
+    worker_verification_contract_state_file() { printf "%s\n" "$1/.freely/run/worker-verification-contract.env"; }
+    manager_supervisor_pid_for_project() { return 1; }
+    runtime_ai_pid_hint_for_project() { return 1; }
+    reset_project_runtime_discovery_cache() { :; }
+    effective_runtime_role_for_project() { [[ "$1" == "$project" ]] && printf "manager\n" || printf "worker\n"; }
+    normalize_runtime_worktree_path() { printf "%s\n" "$1"; }
+    latest_generated_manager_continuity_file_for_project() { [[ "$1" == "$worker" ]] && printf "%s\n" "$continuity"; }
+    latest_manager_worker_prompt_paths_from_continuity() { printf "%s\n" "$local_prompt"; }
+    latest_frozen_manager_worker_prompt_paths_from_continuity() { return 0; }
+    latest_queued_manager_worker_prompt_paths_from_continuity() { return 0; }
+    worker_prompt_resolved_worktree() { printf "%s\n" "$worker"; }
+    worker_prompt_target_worktree() { printf "%s\n" "$worker"; }
+    worker_prompt_target_branch() { printf "test-pre-merge-demo\n"; }
+    worker_prompt_intent_kind() { printf "promotion\n"; }
+    worker_prompt_dispatch_metadata_value() { return 1; }
+    worker_prompt_normalized_intent_kind() { printf "promotion\n"; }
+    worker_prompt_has_verification_metadata() { return 1; }
+    worker_prompt_can_materialize_missing_worktree() { return 1; }
+    worker_project_has_launchable_verification_contract() { return 1; }
+    worker_project_is_absorbed_merged_lane() { return 1; }
+    worker_project_is_retire_ready_merged_followthrough() { return 1; }
+    worker_prompt_targets_retire_ready_merged_worktree() { return 1; }
+    manager_continuity_explicitly_freezes_worker_project() { return 1; }
+    worker_project_is_actively_running() { return 1; }
+    settle_retire_ready_merged_worker_runtime_state() { return 1; }
+    recover_stalled_worker_ai_if_needed() { return 1; }
+    project_has_authoritative_worktree_path() { return 0; }
+    launch_worker_from_manager_prompt_if_needed() {
+      printf "launched:%s\n" "$2"
+      return 0
+    }
+    append_runtime_event() {
+      if [[ "$2" == "worker_exit_contract_handoff_absorbed" ]]; then
+        printf "event:%s\n" "$5"
+      fi
+    }
+    log_info() { :; }
+    write_workcell_state() { :; }
+
+    recovered="$(manager_runtime_recover_workers_if_needed "$project")"
+    printf "recovered:%s\n" "$recovered"
+    [[ ! -f "$worker/.freely/run/worker-exit-contract.env" ]] && printf "contract:cleared\n"
+  ' 2>&1
+)"
+
+[[ "$OUTPUT" == *"launched:"*"/local-followthrough.txt"* ]]
+[[ "$OUTPUT" == *"event:followthrough_prompt="*"/local-followthrough.txt"* ]]
+[[ "$OUTPUT" == *"recovered:1"* ]]
+[[ "$OUTPUT" == *"contract:cleared"* ]]
+
+echo "[PASS] manager runtime absorbs terminal worker handoff into local followthrough prompt"

@@ -71,10 +71,11 @@
 53. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-active-stall-recovery-from-manager-watchdog`.
 54. Run `bash docs/system/workspace/scripts/tests/test-freely-delegated-worker-starting-stuck-reclaim`.
 55. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-reclaims-stale-starting-worker-slot`.
-56. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`.
-57. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`.
-58. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`.
-59. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-autonomous-existing-worktree-review-merge-retire-next-task-loop`.
+56. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-collapses-terminal-handoff-worker-slot`.
+57. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`.
+58. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`.
+59. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`.
+60. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-autonomous-existing-worktree-review-merge-retire-next-task-loop`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -140,8 +141,11 @@
 - task_refs: `tasks.md#5,tasks.md#6,tasks.md#7`
 - case_design: `Use the guarded test-pre-merge lane to prove the owner carries explicit daemon-lifecycle adequacy into develop, then after protected replay observe canonical develop until Freely completes one task with lawful closeout and continues to the next task.`
 - evidence_level: `integration`
-- status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
+- status: `not_applicable`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `The truthful acceptance surface for this item only exists after guarded promote reaches canonical develop. Marking it pass before that replay would be false; premerge adequacy is instead anchored by the fresh protected replay artifact, and the immediate next step remains the post-merge canonical daemon replay.`
+- replacement_evidence: `Fresh premerge-integration replay in test-pre-merge-runtime-target-worker-role-and-starting-stuck-recovery-20260425 plus the staged owner verification artifact prove guarded-merge adequacy without pretending canonical develop has already completed the full autonomous loop.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-worker-role-runtime-source-premerge-verification.md`
 
 ### Guarded promote carries explicit daemon adequacy
 - id: `daemon-self-loop-guarded-promote-proof`
@@ -153,7 +157,7 @@
 - case_design: `Replay the current blocker owner through the disposable protected test lane, including the reconnect-exhaustion 502 network-path regression set, rerun owner gates there, and use that bounded evidence to justify guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-reconnect-502-network-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-worker-role-runtime-source-premerge-verification.md`
 
 ### Guarded promote carries fresh delegated-continuation stop-boundary evidence
 - id: `guarded-promote-pre-stop-delegated-continuation-boundary-proof`

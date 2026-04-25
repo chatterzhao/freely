@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+
+    root="$(mktemp -d /tmp/freely-runtime-role-hint.XXXXXX)"
+    trap "rm -rf \"$root\"" EXIT
+    project="$root/test-pre-merge-worker"
+    mkdir -p "$project/.freely/run"
+
+    workcell_state_file() { printf "%s\n" "$1/.freely/run/workcell-state.env"; }
+    worker_verification_contract_state_file() { printf "%s\n" "$1/.freely/run/worker-verification-contract.env"; }
+    branch_name_for_project() { printf "test-pre-merge-runtime-lifecycle-followthrough-20260424\n"; }
+
+    cat >"$project/.freely/run/workcell-state.env" <<EOF
+LAST_ROLE_HINT="worker"
+EOF
+    printf "state:%s\n" "$(role_hint_for_project "$project")"
+
+    rm -f "$project/.freely/run/workcell-state.env"
+    cat >"$project/.freely/run/worker-verification-contract.env" <<EOF
+VERIFICATION_METADATA_PRESENT="true"
+VERIFICATION_METADATA_MISSING_FIELDS=""
+OWNER_ISSUE="docs/epics/sample/issues/sample.md"
+PRE_TESTS_PATH="docs/epics/sample/pre-tests.md"
+VERIFICATION_ARTIFACT_DIR="docs/epics/sample/artifacts"
+REQUIRED_TEST_LANES_CSV="premerge-integration"
+REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="sample-acceptance"
+MINIMUM_EVIDENCE_LEVEL="sample"
+TARGET_ENVIRONMENT="sample"
+CLOSEOUT_GATE="sample"
+CLOSEOUT_GATE_COMMAND="./bin/freely daemon start --project $project"
+CLOSEOUT_TARGET_LANE="develop"
+CLOSEOUT_PROMOTION_GATE="sample"
+CLOSEOUT_REQUIRES_ADEQUACY="true"
+CLOSEOUT_REVIEW_ARTIFACT_POLICY="sample"
+EOF
+    printf "contract:%s\n" "$(role_hint_for_project "$project")"
+  '
+)"
+
+[[ "$OUTPUT" == *"state:worker"* ]]
+[[ "$OUTPUT" == *"contract:worker"* ]]
+
+echo "[PASS] runtime role hint prefers delegated worker truth over test-pre-merge branch default"

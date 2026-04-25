@@ -44,11 +44,11 @@ PROMPT="$(
     --ai codex:auto
 )"
 
-printf '%s\n' "$PROMPT" | grep -q 'MANAGER_MODE=false'
-printf '%s\n' "$PROMPT" | grep -q '保持 worker reentry scope'
-printf '%s\n' "$PROMPT" | grep -q '不要把 `./bin/freely live-status --project '"$PROJECT"'`'
-printf '%s\n' "$PROMPT" | grep -q '不要写 `.freely/run/manager-continuity-\*.md`'
-printf '%s\n' "$PROMPT" | grep -q 'worker 只回写本工位 issue / progress / recovery / worker continuity / verification evidence'
+printf '%s\n' "$PROMPT" | grep -F -q 'MANAGER_MODE=false'
+printf '%s\n' "$PROMPT" | grep -F -q '保持 worker reentry scope'
+printf '%s\n' "$PROMPT" | grep -F -q "不要把 \\`./bin/freely live-status --project $PROJECT\\`"
+printf '%s\n' "$PROMPT" | grep -F -q '不要写 \`.freely/run/manager-continuity-*.md\`'
+printf '%s\n' "$PROMPT" | grep -F -q 'worker 只回写本工位 issue / progress / recovery / worker continuity / verification evidence'
 
 if printf '%s\n' "$PROMPT" | grep -q '至少创建一个 manager continuity 文件'; then
   echo "[FAIL] worker reentry prompt should not require manager continuity generation" >&2
