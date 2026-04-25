@@ -84,6 +84,11 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 43. Let manager delegation and launch treat a prompt-targeted missing sibling worktree as materializable when its branch/worktree headers stay within the governed `*-worktrees` root, and do not retire a merged-tip worker lane while authoritative continuity still carries active `edit` or `promotion` ownership for that lane.
 44. Keep `## Queue State` `worker_prompts:` continuity launchable for the same runtime control plane that validated `delegate_workers`, so manager cannot consume a lawful handoff contract without ever materializing queued/launched worker state.
 45. Preserve `LAST_ENTRYPOINT_MODE` when `monitor-ai-cli.sh` writes launch-in-flight workcell truth, so daemon-owned manager recovery cannot silently degrade into foreground `start --project`.
+46. Derive the effective runtime role for a delegated target from authoritative worker verification-contract truth before falling back to branch/worktree role hints, so manager-launched worker lanes under `test-pre-merge-*` or other manager-default names do not relaunch as manager control planes.
+47. Reclaim a delegated target that stays at `LAST_EXIT_REASON=starting` beyond the existing startup grace while no valid `ai.pid` ever appears, including clearing stale supervisor/watchdog residue so the parent manager can legally release and relaunch that worker slot.
+48. Reconcile launched-worker liveness on the dispatch-critical path before manager concludes no launchable worker prompt remains, so stale `LAUNCHED_WORKER_PROMPTS` / `ACTIVE_RUNNING_WORKER_COUNT` state from dead or never-up targets cannot suppress the next lawful delegation.
+49. Keep manager supervision alive while runtime is between-round relaunch grace or waiting on an expected-running worker, so a lawful manager/worker handoff loop is not misclassified as idle-supervisor drift and stopped prematurely.
+50. Treat terminal worker exit-contract truth as authoritative for recovery/cleanup followthrough: terminal workers must not be relaunched, cleanup must record their terminal evidence, clear stale launch state, normalize authoritative worktree paths, and reset discovery caches before the next patrol/closeout decision.
 
 ## Non-Goals
 
@@ -124,6 +129,11 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 28. Canonical `develop` can recover cleanup followthrough from current-shape continuity that exposes only top-level `route_kind` plus inline `worker_prompt:` references, by inheriting authoritative verification metadata from the retained target worker lane instead of looping on a nonlaunchable hygiene prompt.
 29. Canonical `develop` no longer loses daemon control-plane ownership while AI launch is in flight; if watchdog must relaunch after that state write, it still chooses `daemon-run --project` rather than materializing a foreground `start --project`.
 30. Canonical `develop` can also recover cleanup followthrough when the latest continuity exposes retained-lane prompt truth only through `## Dispatch State` `worker_prompt_paths:` and the retained worker has no authoritative local prompt left, by materializing a fresh cleanup prompt from the continuity-carried source prompt metadata without treating the merged-lane `edit` prompt itself as still launchable.
+31. Canonical `develop` no longer lets delegated worker targets under manager-default worktree names boot manager-mode control planes just because branch/worktree role hints say `manager`; authoritative worker verification truth now decides the effective runtime role for that lane.
+32. Canonical `develop` now reclaims delegated targets that stay stuck in `starting` past startup grace without ever producing `ai.pid`, releases their recorded launch slot, and allows manager to relaunch or advance instead of rewriting the same worker prompt forever.
+33. Canonical `develop` now performs target-liveness reconciliation before delegation/no-launchable-worker decisions, so stale launched-worker state from dead or never-up targets cannot keep `ACTIVE_RUNNING_WORKER_COUNT` pinned and block the next lawful worker dispatch.
+34. Canonical `develop` keeps manager supervision alive while runtime is waiting on an expected-running worker or inside between-round relaunch grace, so manager does not stop in the middle of an otherwise-correct manager/worker loop.
+35. Canonical `develop` treats terminal worker exit-contract truth plus cleanup followthrough as authoritative closeout state, which prevents stale terminal workers from being relaunched and lets cleanup clear launch/discovery residue before the next patrol and retirement decision.
 
 ## Verification
 
@@ -192,6 +202,16 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-pid`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-failure-recovery-preserves-daemon`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-malformed-verification-contract`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-without-verification-contract`
+- `bash docs/system/workspace/scripts/tests/test-freely-worker-active-stall-recovery-from-manager-watchdog`
+- `bash docs/system/workspace/scripts/tests/test-freely-delegated-worker-starting-stuck-reclaim`
+- `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-reclaims-stale-starting-worker-slot`
+- `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`
+- `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`
+- `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`
+- `bash docs/system/workspace/scripts/tests/test-freely-daemon-autonomous-existing-worktree-review-merge-retire-next-task-loop`
 - `bash docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
 - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - `./bin/governance-check`
@@ -235,3 +255,14 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/system/workspace/scripts/tests/test-freely-worker-runtime-cross-tool-recovery-remembers-failed-tools`
 - `docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
 - `docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
+- `docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
+- `docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-malformed-verification-contract`
+- `docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-without-verification-contract`
+- `docs/system/workspace/scripts/tests/test-freely-worker-active-stall-recovery-from-manager-watchdog`
+- `docs/system/workspace/scripts/tests/test-freely-delegated-worker-starting-stuck-reclaim`
+- `docs/system/workspace/scripts/tests/test-freely-manager-launch-path-reclaims-stale-starting-worker-slot`
+- `docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`
+- `docs/system/workspace/scripts/tests/test-freely-daemon-autonomous-existing-worktree-review-merge-retire-next-task-loop`
+- `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-self-loop-recovery-verification.md`

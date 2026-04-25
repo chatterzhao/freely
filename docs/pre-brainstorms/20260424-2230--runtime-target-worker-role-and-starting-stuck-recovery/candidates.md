@@ -2,8 +2,8 @@
 
 ## Context
 - Source brainstorm: `docs/pre-brainstorms/20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery/brainstorms.md`
-- Status: `proposed`
-- Route: `materialize-target-worker-role-and-starting-stuck-recovery-owner-and-replay-through-guarded-develop`
+- Status: `absorbed`
+- Route: `absorb-into-i-20260421-1200-a-runtime-daemon-self-loop-followthrough-governance`
 
 ## Candidates
 
@@ -12,11 +12,11 @@
 - title: `Runtime target worker role and starting-stuck recovery governance`
 - research_only: `false`
 - implementation_ready: `true`
-- status: `proposed`
+- status: `absorbed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
-- promoted_issue_id: `pending://issue-materialization`
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_id: `I-20260421-1200-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
@@ -46,7 +46,7 @@
     mode: `author review`
     summary: `Three same-family runtime seams keep daemon self-loop blocked after the first dispatch on canonical develop. The real gap is not agent/skill role definition but runtime consumption of worker-contract truth, plus a narrow delegated starting-stuck reclaim seam and dispatch-path liveness reconciliation. Owner stays narrow to those three.`
     verdict: `ready_for_issue_materialization`
-- next_action: Materialize an owner issue and progress entry, write feature-local pre-tests for the three seams, replay through `test-pre-merge-runtime-target-worker-role-and-starting-stuck-recovery-20260424`, and prove canonical develop autonomous-loop continuation before retiring the temporary worktrees.
+- next_action: Candidate mirror only. This bounded repair is now absorbed into `I-20260421-1200-A`, which owns the manager/worker/runtime self-loop followthrough, guarded replay, canonical `develop` daemon acceptance, and retirement of the temporary feature/test-pre-merge worktrees.
 - revisit_trigger: Re-open only if canonical `develop` still cannot autonomously self-loop after this bounded repair, or if a fourth same-family seam emerges during replay.
 - decision_reason: `The three seams share one critical path (target supervisor cannot get its AI up before the parent loses confidence). Splitting them into separate owners would either ship partial fixes that still hang or duplicate evidence work for no architectural gain.`
 - session_refs:

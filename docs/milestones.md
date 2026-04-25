@@ -466,12 +466,12 @@ routing_policy:
 1. `C-20260424-2230-A`
 - title: Runtime target worker role and starting-stuck recovery governance
 - milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+- phase_state: `absorbed`
 - priority: P0
-- promoted_issue_path: `pending://issue-materialization`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - source_brainstorm: `docs/pre-brainstorms/20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery/candidates.md`
-- next_action: Materialize the bounded owner issue, carry the three same-family seams together, and keep feature-local pre-tests plus guarded `test-pre-merge-* -> develop` replay scoped to worker-role election, `starting`-stuck reclamation, and dead-target slot release only.
+- next_action: Candidate mirror only. `I-20260421-1200-A` is now the canonical owner for this bounded manager/worker/runtime self-loop recovery, the guarded replay into `develop`, final canonical daemon acceptance, and retirement of the temporary worktrees.
 - revisit_trigger: Re-open only if canonical `develop` still cannot autonomously self-loop after this bounded repair, or if replay exposes a fourth same-family seam that no longer fits this owner.
 
 1. `C-20260419-0915-A`
