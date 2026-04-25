@@ -6184,6 +6184,7 @@ write_workcell_state() {
   local project="$1" desired_state="$2" supervisor_state="$3" ai_state="$4" exit_reason="$5"
   local state_file role_hint updated_at verification_contract_file verification_metadata_present verification_missing_fields verification_owner_issue verification_pre_tests_path verification_artifact_dir verification_test_lanes verification_acceptance_ids verification_evidence_level verification_target_environment verification_closeout_gate verification_closeout_gate_command verification_closeout_target_lane verification_closeout_promotion_gate verification_closeout_requires_adequacy verification_closeout_review_artifact_policy entrypoint_mode
   state_file="$(workcell_state_file "$project")"
+  mkdir -p "$(dirname "$state_file")"
   role_hint="$(role_hint_for_project "$project")"
   updated_at="$(current_timestamp_utc_for_machine)"
   entrypoint_mode="${WORKCELL_ENTRYPOINT_MODE_OVERRIDE:-}"
@@ -7832,6 +7833,36 @@ worker_prompt_resolved_worktree() {
   fi
 }
 
+worker_worktree_needs_managed_tooling_repair() {
+  local project="$1"
+  local wrapper_dir tool tool_capabilities
+  [[ -n "$project" && -d "$project" ]] || return 1
+  [[ -f "$(config_file "$project")" ]] || return 0
+  [[ -f "$(project_tool_boundary_bootstrap_file "$project")" ]] || return 0
+  wrapper_dir="$(project_tool_wrapper_dir "$project")"
+  [[ -x "$wrapper_dir/codex" ]] || return 0
+  tool="${AI_TOOL:-codex}"
+  tool_capabilities="${AI_TOOL_CAPABILITIES:-$(tool_default_capabilities_for_runtime "$tool")}"
+  if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
+    [[ -f "$(project_codex_config_file "$project")" ]] || return 0
+  fi
+  return 1
+}
+
+repair_existing_worker_worktree_if_needed() {
+  local manager_project="$1" target_project="$2"
+  local freely_bin
+  [[ -n "$manager_project" && -d "$manager_project" ]] || return 1
+  [[ -n "$target_project" && -d "$target_project" ]] || return 1
+  project_has_authoritative_worktree_path "$manager_project" "$target_project" || return 1
+  worker_worktree_needs_managed_tooling_repair "$target_project" || return 0
+  freely_bin="$(freely_bin_for_project "$manager_project")"
+  [[ -x "$freely_bin" ]] || return 1
+  bash "$freely_bin" sync-tooling --source-project "$manager_project" --project "$target_project" >/dev/null 2>&1 || return 1
+  worker_worktree_needs_managed_tooling_repair "$target_project" && return 1
+  return 0
+}
+
 worker_prompt_can_materialize_missing_worktree() {
   local manager_project="$1" prompt_file="$2"
   local target_worktree target_branch sibling_root normalized_target normalized_parent
@@ -7857,6 +7888,7 @@ materialize_worker_prompt_worktree_if_needed() {
   local target_project target_worktree target_branch freely_bin
   target_project="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   if [[ -n "$target_project" && -d "$target_project" ]]; then
+    repair_existing_worker_worktree_if_needed "$manager_project" "$target_project" || return 1
     printf '%s\n' "$target_project"
     return 0
   fi
@@ -9960,6 +9992,9 @@ ensure_runtime_workcell_initialized_for_launch() {
   [[ -d "$target_project" ]] || return 1
   project_has_authoritative_worktree_path "$manager_project" "$target_project" || return 1
   if [[ -f "$(config_file "$target_project")" ]]; then
+    if [[ ! -f "$(workcell_state_file "$target_project")" ]]; then
+      write_workcell_state "$target_project" "stopped" "down" "down" "initialized"
+    fi
     return 0
   fi
   tool_adapter="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AI_TOOL:-codex}")}"
