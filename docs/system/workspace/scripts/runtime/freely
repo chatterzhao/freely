@@ -13834,26 +13834,29 @@ launch_manager_supervisor() {
 
 launch_interruption_dispatcher() {
   local project="$1"
-  local launch_bin
+  local launch_bin argv0
   launch_bin="${FREELY_INTERRUPTION_DISPATCH_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
-  nohup bash -lc "cd '$project' && exec bash '$launch_bin' ensure-interruption-dispatch --project '$project' --watch" </dev/null >/dev/null 2>&1 &
+  argv0="runtime/freely ensure-interruption-dispatch --project $project --watch"
+  nohup bash -lc "cd '$project' && exec -a '$argv0' bash '$launch_bin' ensure-interruption-dispatch --project '$project' --watch" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
 }
 
 launch_manager_watchdog() {
   local project="$1"
-  local launch_bin watch_interval
+  local launch_bin watch_interval argv0
   launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
   watch_interval="${MANAGER_WATCHDOG_INTERVAL_SECS:-${CHECK_INTERVAL:-5}}"
-  nohup bash -lc "cd '$project' && exec bash '$launch_bin' ensure-manager --project '$project' --watch --interval '$watch_interval'" </dev/null >/dev/null 2>&1 &
+  argv0="runtime/freely ensure-manager --project $project --watch"
+  nohup bash -lc "cd '$project' && exec -a '$argv0' bash '$launch_bin' ensure-manager --project '$project' --watch --interval '$watch_interval'" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
 }
 
 launch_manager_control_plane_recheck() {
   local project="$1"
-  local launch_bin
+  local launch_bin argv0
   launch_bin="${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-$SELF_ROOT/bin/freely}"
-  nohup bash -lc "cd '$project' && exec bash '$launch_bin' ensure-manager --project '$project'" </dev/null >/dev/null 2>&1 &
+  argv0="runtime/freely ensure-manager --project $project"
+  nohup bash -lc "cd '$project' && exec -a '$argv0' bash '$launch_bin' ensure-manager --project '$project'" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
 }
 

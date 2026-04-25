@@ -197,6 +197,17 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-collapses-terminal-handoff-worker-slot`
 - `PENDING`: replay this repair through protected premerge, merge into canonical `develop`, restart daemon replay, and verify the delegated worker no longer loops on repeated rebind/stop while Freely advances toward merge, retire, and next-task followthrough.
 
+## 2026-04-25 12:50 PDT Control-Plane Helper Argv Contract Verification
+
+- `FAIL`: after merge commit `a63f37e1` removed the worker runtime rebind loop, a fresh canonical `develop` daemon replay still stalled before manager AI launch. Supervisor `11693` stayed alive, but `.freely/run/interruption-dispatcher.pid` and `.freely/run/manager-watchdog.pid` remained absent, runtime never emitted `interruption_dispatcher_relaunch_ready`, and `live-status` reported `activity_state: stalled_without_runtime` with `last_exit_reason: starting`.
+- `PASS`: direct process inspection showed the helper children were actually alive under that supervisor, but they were launched as `bash .../docs/system/workspace/scripts/runtime/freely ensure-interruption-dispatch ...` and `bash ... ensure-manager ...`, while runtime readiness only accepts commands carrying the `runtime/freely ...` argv contract.
+- `PASS`: `launch_interruption_dispatcher()`, `launch_manager_watchdog()`, and `launch_manager_control_plane_recheck()` now use `exec -a 'runtime/freely ...'` so the background helpers advertise the same process identity contract that runtime pid discovery already validates.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-control-plane-launch-argv-contract`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-reuses-live-supervisor-without-relaunch`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-ignores-fake-supervisor-argv`
+- `PENDING`: promote this repair through protected premerge, merge into canonical `develop`, restart daemon replay, and verify manager reaches AI launch instead of stalling behind invisible helper processes.
+
 ## 2026-04-22 08:05 PDT Materialized Cleanup Worker Selected-Tool Followthrough
 
 - `FAIL`: canonical `develop` self-host replay advanced to manager-selected cleanup followthrough for `I-20260421-1200-A`, but the materialized cleanup worker prompt omitted `selected_tool`, so the retained cleanup worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-runtime-daemon-self-loop-blocker` kept relaunching on stale local `AI_TOOL=\"cc-use-codex-cli\"` and immediately re-entered runtime failure instead of closing the owner cleanup lane.
