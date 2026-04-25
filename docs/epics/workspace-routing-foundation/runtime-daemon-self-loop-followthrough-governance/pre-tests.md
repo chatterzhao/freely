@@ -734,3 +734,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-terminal-followthrough-materialization-verification.md`
+
+### Guarded promote carries post-ai-cycle finalize keepalive evidence
+- id: `guarded-promote-manager-post-ai-cycle-finalize-grace-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving ensure-manager does not restart a live manager supervisor during the narrow post-L041 finalize window before ai_cycle_finished or other terminal lifecycle checkpoints are recorded.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#35`
+- case_design: `Replay the manager post-ai-cycle finalize keepalive repair on the disposable protected lane, rerun the focused finalize-grace and adjacent empty-success / exit-contract regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-post-ai-cycle-finalize-grace-verification.md`
