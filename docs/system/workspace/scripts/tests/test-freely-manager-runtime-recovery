@@ -19,6 +19,7 @@ git add README.md
 git commit -q -m "init"
 git branch feature/worker
 git worktree add "$WORKER" feature/worker >/dev/null
+WORKER="$(cd "$WORKER" && pwd -P)"
 
 for wt in "$PROJECT" "$WORKER"; do
   mkdir -p "$wt/docs/pre-brainstorms/20260309-0000--sample" "$wt/.freely/run" "$wt/.freely/logs"
@@ -55,6 +56,10 @@ EOF
 - session_refs: []
 EOF
 done
+
+echo worker >"$WORKER/worker-branch.txt"
+git -C "$WORKER" add worker-branch.txt
+git -C "$WORKER" commit -q -m "worker branch divergence"
 
 cat >"$PROJECT/.freely/config.env" <<EOF
 PROJECT_ROOT="$PROJECT"
@@ -93,18 +98,63 @@ LAST_ROLE_HINT="worker"
 LAST_STATE_UPDATED_AT="2026-03-18T00:00:00Z"
 EOF
 
-bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
+WORKER_PROMPT="$PROJECT/.freely/run/worker-prompts/recovery-worker.txt"
+mkdir -p "$(dirname "$WORKER_PROMPT")"
+cat >"$WORKER_PROMPT" <<EOF
+Dispatch metadata:
+- dispatch_priority: P0
+- parallel_safe: true
+- write_scope: $WORKER
 
-for _ in 1 2 3 4 5 6 7 8 9 10; do
-  if [[ -f "$WORKER/.freely/run/supervisor.pid" ]]; then
-    sp="$(cat "$WORKER/.freely/run/supervisor.pid" 2>/dev/null || true)"
-    if [[ -n "$sp" ]] && kill -0 "$sp" 2>/dev/null; then
-      echo "[PASS] manager runtime auto-recovers expected-running worker supervisor"
-      exit 0
-    fi
-  fi
-  sleep 1
-done
+Branch:
+- \`feature/worker\`
 
-echo "[FAIL] expected manager runtime to restart missing worker supervisor" >&2
-exit 1
+Worktree:
+- \`$WORKER\`
+EOF
+
+cat >"$WORKER/.freely/run/worker-verification-contract.env" <<EOF
+SOURCE_PROMPT_FILE="$WORKER_PROMPT"
+SOURCE_INTAKE_ID="recovery-intake"
+TARGET_PROJECT="$WORKER"
+VERIFICATION_METADATA_PRESENT="true"
+VERIFICATION_METADATA_MISSING_FIELDS=""
+OWNER_ISSUE="docs/epics/sample/issues/sample.md"
+PRE_TESTS_PATH="docs/epics/sample/pre-tests.md"
+VERIFICATION_ARTIFACT_DIR="docs/epics/sample/artifacts"
+REQUIRED_TEST_LANES_CSV="feature-local"
+REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="sample-acceptance"
+MINIMUM_EVIDENCE_LEVEL="sample"
+TARGET_ENVIRONMENT="sample"
+CLOSEOUT_GATE="sample"
+CLOSEOUT_GATE_COMMAND="./bin/freely daemon start --project $PROJECT"
+CLOSEOUT_TARGET_LANE="develop"
+CLOSEOUT_PROMOTION_GATE="sample"
+CLOSEOUT_REQUIRES_ADEQUACY="true"
+CLOSEOUT_REVIEW_ARTIFACT_POLICY="sample"
+UPDATED_AT="2026-03-18T00:00:00Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+START_LOG="$TMP_DIR/start.log"
+manager_runtime_launch_workers_from_latest_handoff() {
+  echo "0"
+}
+start_workcell_supervisor_async() {
+  printf '%s\n' "$1" >>"$START_LOG"
+  return 0
+}
+
+RECOVERED="$(manager_runtime_recover_workers_if_needed "$PROJECT" | tail -n 1)"
+[[ "$RECOVERED" == "1" ]] || {
+  echo "[FAIL] expected one recovered worker, got $RECOVERED" >&2
+  exit 1
+}
+grep -q "^$WORKER$" "$START_LOG" || {
+  echo "[FAIL] expected manager recovery to start the worker supervisor" >&2
+  exit 1
+}
+
+echo "[PASS] manager runtime recovers expected-running worker with launchable verification contract"

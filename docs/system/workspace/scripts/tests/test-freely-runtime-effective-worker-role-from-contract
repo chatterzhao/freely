@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+
+    project="$(mktemp -d /tmp/freely-effective-worker-role.XXXXXX)"
+    trap "rm -rf \"$project\"" EXIT
+    mkdir -p "$project/.freely/run" "$project/.freely/logs"
+
+    prompt_file="$project/.freely/run/worker-prompt.txt"
+    cat >"$prompt_file" <<'"'"'EOF'"'"'
+- selected_tool: `claude`
+EOF
+
+    contract_file="$project/.freely/run/worker-verification-contract.env"
+    cat >"$contract_file" <<EOF
+SOURCE_PROMPT_FILE="$prompt_file"
+SOURCE_INTAKE_ID="intake-1"
+TARGET_PROJECT="$project"
+VERIFICATION_METADATA_PRESENT="true"
+VERIFICATION_METADATA_MISSING_FIELDS=""
+OWNER_ISSUE="docs/epics/sample/issues/sample.md"
+PRE_TESTS_PATH="docs/epics/sample/pre-tests.md"
+VERIFICATION_ARTIFACT_DIR="docs/epics/sample/artifacts"
+REQUIRED_TEST_LANES_CSV="feature-local"
+REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="sample-acceptance"
+MINIMUM_EVIDENCE_LEVEL="sample"
+TARGET_ENVIRONMENT="sample"
+CLOSEOUT_GATE="sample"
+CLOSEOUT_GATE_COMMAND="./bin/freely daemon start --project $project"
+CLOSEOUT_TARGET_LANE="develop"
+CLOSEOUT_PROMOTION_GATE="sample"
+CLOSEOUT_REQUIRES_ADEQUACY="true"
+CLOSEOUT_REVIEW_ARTIFACT_POLICY="sample"
+UPDATED_AT="2026-04-25T00:00:00Z"
+EOF
+
+    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
+    workcell_state_file() { printf "%s\n" "$1/.freely/run/workcell-state.env"; }
+    worker_verification_contract_state_file() { printf "%s\n" "$1/.freely/run/worker-verification-contract.env"; }
+    current_timestamp_utc_for_machine() { printf "2026-04-25T00:00:00Z\n"; }
+    role_hint_for_project() { printf "manager\n"; }
+    project_tool_runtime_selection_truth() { printf "codex|\n"; }
+    persist_project_tool_selection() { printf "persist:%s|%s\n" "$1" "$2"; }
+
+    printf "effective:%s\n" "$(effective_runtime_role_for_project "$project")"
+    worker_runtime_reconcile_selected_tool_from_contract_if_needed "$project"
+    write_workcell_state "$project" "running" "up" "down" "starting"
+    awk -F= "/^LAST_ROLE_HINT=/{print \"stored:\" \$2}" "$project/.freely/run/workcell-state.env"
+  '
+)"
+
+[[ "$OUTPUT" == *"effective:worker"* ]]
+[[ "$OUTPUT" == *"persist:"* ]]
+[[ "$OUTPUT" == *"|claude"* ]]
+[[ "$OUTPUT" == *'stored:"worker"'* ]]
+
+echo "[PASS] delegated worker contract overrides branch-default manager role in runtime control-plane"

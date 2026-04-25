@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-worker-active.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260425-0001--sample" "$PROJECT/.freely/run"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260425-0001--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260425-0001--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260425-0001--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="manager_worker_launch_after_ai_cycle"
+LAST_ENTRYPOINT_MODE="daemon"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-25T00:00:00Z"
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<'EOF'
+LAST_MANAGER_CONTINUITY_GENERATED="generated"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="prompt-a"
+LAST_MANAGER_CONTINUITY_CONSUMED="generated"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="prompt-a"
+LAUNCHED_WORKER_PROMPTS="prompt-a"
+QUEUED_WORKER_PROMPTS=""
+QUEUED_WORKER_PROMPT_BLOCKERS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="1"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-04-25T00:00:00Z"
+EOF
+
+SUPERVISOR_PID="12345"
+printf '%s\n' "$SUPERVISOR_PID" >"$PROJECT/.freely/run/supervisor.pid"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+RESTART_LOG="$TMP_DIR/restart.log"
+LAUNCH_LOG="$TMP_DIR/launch.log"
+
+valid_supervisor_pid_for_project() {
+  [[ "$2" == "$SUPERVISOR_PID" ]]
+}
+discover_supervisor_pid() {
+  return 0
+}
+manager_ai_pid_for_project() {
+  return 0
+}
+recover_stalled_manager_ai_if_needed() {
+  return 1
+}
+prepare_manager_same_tool_slot_recovery_if_needed() {
+  return 0
+}
+prepare_manager_cross_tool_fallback_if_needed() {
+  TOOL_AUTO_RECOVERY_DECISION="none"
+  return 0
+}
+restart_manager_supervisor_preserving_handoff() {
+  printf '%s\n' "$1" >>"$RESTART_LOG"
+}
+launch_manager_supervisor() {
+  printf '%s\n' "$1" >>"$LAUNCH_LOG"
+}
+log_info() { :; }
+log_warn() { :; }
+log_error() { :; }
+
+ensure_manager_once "$PROJECT" >/dev/null
+
+if [[ -s "$RESTART_LOG" ]]; then
+  echo "[FAIL] ensure-manager restarted supervisor while active workers were still running" >&2
+  cat "$RESTART_LOG" >&2
+  exit 1
+fi
+
+if [[ -s "$LAUNCH_LOG" ]]; then
+  echo "[FAIL] ensure-manager launched a replacement while active workers were still running" >&2
+  cat "$LAUNCH_LOG" >&2
+  exit 1
+fi
+
+echo "[PASS] ensure-manager keeps a live manager supervisor while workers remain active"

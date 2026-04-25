@@ -65,6 +65,16 @@
 47. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-ignores-pre-stop-continuity`.
 48. Run `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-pid`.
 49. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-failure-recovery-preserves-daemon`.
+50. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`.
+51. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-malformed-verification-contract`.
+52. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-without-verification-contract`.
+53. Run `bash docs/system/workspace/scripts/tests/test-freely-worker-active-stall-recovery-from-manager-watchdog`.
+54. Run `bash docs/system/workspace/scripts/tests/test-freely-delegated-worker-starting-stuck-reclaim`.
+55. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-reclaims-stale-starting-worker-slot`.
+56. Run `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`.
+57. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`.
+58. Run `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`.
+59. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-autonomous-existing-worktree-review-merge-retire-next-task-loop`.
 
 ## End-to-End
 - acceptance target: `Protected promotion must carry this owner chain and the final daemon acceptance must prove Freely can keep working instead of stopping after one patrol round.`
@@ -696,3 +706,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-manager-worker-runtime-source-rebind-premerge-verification.md`
+
+### Guarded promote carries manager/worker self-loop recovery evidence
+- id: `guarded-promote-manager-worker-self-loop-recovery-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving delegated-worker effective role, starting-stuck reclaim, terminal-worker closeout handling, and manager keepalive now preserve the full manager/worker/runtime handoff loop instead of stopping after the first dispatch.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#34`
+- case_design: `Replay the manager/worker self-loop recovery repair on the disposable protected lane, rerun the focused delegated-worker role, starting-stuck reclaim, manager keepalive, and autonomous existing-worktree loop regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-self-loop-recovery-verification.md`
