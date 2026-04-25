@@ -233,6 +233,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-terminal-handoff-followthrough-absorb-verification.md`
+- `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-terminal-handoff-followthrough-absorb-premerge-verification.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 - `docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`

@@ -746,3 +746,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-post-ai-cycle-finalize-grace-verification.md`
+
+### Guarded promote carries terminal handoff followthrough absorb evidence
+- id: `guarded-promote-terminal-handoff-followthrough-absorb-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving manager launch absorbs stale terminal worker_handoff_needed truth when the same lane already has a newer authoritative followthrough prompt, instead of suppressing that lane forever.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#35`
+- case_design: `Replay the terminal-handoff followthrough absorb repair on the disposable protected lane, rerun the focused absorb, runtime-recovery, and terminal-slot-collapse regressions plus owner governance there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-terminal-handoff-followthrough-absorb-premerge-verification.md`
