@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+
+    root="$(mktemp -d /tmp/freely-launch-terminal-handoff.XXXXXX)"
+    trap "rm -rf \"$root\"" EXIT
+    project="$root/manager"
+    worker="$root/test-pre-merge-worker"
+    mkdir -p "$project/.freely/run" "$worker/.freely/run"
+
+    prompt_file_path="$project/.freely/run/worker-prompt.txt"
+    continuity_file_path="$project/.freely/run/manager-continuity.md"
+    {
+      printf "Worktree:\n"
+      printf -- "- \`%s\`\n\n" "$worker"
+      printf "Branch:\n"
+      printf -- "- \`test-pre-merge-demo\`\n"
+    } >"$prompt_file_path"
+    {
+      printf "# Manager Continuity\n"
+      printf -- "- authoritative_worker_prompts:\n"
+      printf -- "  - \`%s\`\n" "$prompt_file_path"
+    } >"$continuity_file_path"
+
+    cat >"$project/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$continuity_file_path"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$prompt_file_path"
+LAST_MANAGER_CONTINUITY_CONSUMED="$continuity_file_path"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$prompt_file_path"
+LAUNCHED_WORKER_PROMPTS="$prompt_file_path"
+QUEUED_WORKER_PROMPTS=""
+QUEUED_WORKER_PROMPT_BLOCKERS=""
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="1"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-04-25T00:00:00Z"
+EOF
+
+    cat >"$worker/.freely/run/worker-exit-contract.env" <<EOF
+EXIT_KIND="worker_handoff_needed"
+HANDOFF_REASON="protected premerge lane materialized fresh local followthrough"
+NEXT_ACTION_FOR_MANAGER="consume the local followthrough prompt instead of relaunching the outer delegated slot"
+EOF
+
+    run_dir_for_project() { printf "%s\n" "$1/.freely/run"; }
+    workcell_state_file() { printf "%s\n" "$1/.freely/run/workcell-state.env"; }
+    worker_exit_contract_file() { printf "%s\n" "$1/.freely/run/worker-exit-contract.env"; }
+    current_timestamp_utc_for_machine() { printf "2026-04-25T00:00:00Z\n"; }
+    latest_manager_worker_prompt_csv_from_continuity() { printf "%s\n" "$prompt_file_path"; }
+    latest_manager_worker_prompt_paths_from_continuity() { printf "%s\n" "$prompt_file_path"; }
+    worker_prompt_launchable_for_manager_project() { return 0; }
+    worker_prompt_resolved_worktree() { printf "%s\n" "$worker"; }
+    count_active_running_workers_for_manager_project() { printf "0\n"; }
+    manager_max_parallel_workers() { printf "unbounded\n"; }
+    manager_worker_launch_state_reconcile_prompt_liveness "$project" "$continuity_file_path"
+
+    awk -F= "/^LAST_MANAGER_WORKER_PROMPTS_CONSUMED=/{print \"consumed:\" \$2}" "$project/.freely/run/manager-worker-launch-state.env"
+    awk -F= "/^LAUNCHED_WORKER_PROMPTS=/{print \"launched:\" \$2}" "$project/.freely/run/manager-worker-launch-state.env"
+    awk -F= "/^ACTIVE_RUNNING_WORKER_COUNT=/{print \"active:\" \$2}" "$project/.freely/run/manager-worker-launch-state.env"
+  ' 2>&1
+)"
+
+[[ "$OUTPUT" == *'consumed:"none"'* ]]
+[[ "$OUTPUT" == *'launched:"none"'* ]]
+[[ "$OUTPUT" == *'active:"0"'* ]]
+[[ "$OUTPUT" != *"unbound variable"* ]]
+
+echo "[PASS] terminal handoff workers release stale launched slot suppression"
