@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/manager-worker-terminal-followthrough-materialization-20260425`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-feature-manager-worker-terminal-followthrough-materialization`
-- updated_at: `2026-04-25 10:08 PDT`
+- branch: `feature/manager-exit-contract-prompt-narrowing-20260425`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-feature-manager-exit-contract-prompt-narrowing`
+- updated_at: `2026-04-25 20:15 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -27,6 +27,8 @@
 - This followthrough now makes the fallback launcher respect the same `worker_prompt_launchable_for_manager_project()` gate and settle retire-ready merged targets instead of reviving them.
 - Canonical self-host replay then showed one more recovery-memory seam: once the stale merged blocker lane had been wrongly revived and left ordinary dirty files behind, manager expected-running recovery and restart-memory selection could still treat that absorbed branch as restore-ready because the older guard only recognized clean or owner-evidence-only merged followthrough.
 - This followthrough now blocks automatic relaunch for any worker lane whose branch is already merged into `develop`; if new post-merge work is ever needed, it must materialize as a fresh lane rather than resurrecting the absorbed worktree.
+- Canonical `develop` replay then exposed one narrower manager-repair seam after the watchdog keepalive fixes landed: `fresh_with_handoff` recovery with `rotation_reason=missing_resume_evidence` could still rebuild the full broad lead-agent startup prompt, so manager spent the next round rereading patrol context and still exited `rc=0` without writing either a fresh manager continuity or `manager-exit-contract.env`.
+- The runtime prompt builder now narrows exactly that repair surface. When the role is manager, the handoff says `manager_exit_contract_repair`, and launch selection has already downgraded to `fresh_with_handoff` because resume evidence is missing, Freely emits a bounded repair prompt that requires continuity first and exit contract second instead of re-entering broad startup patrol.
 - The protected test lane replay now passes again; the remaining completion work is develop absorption, real self-host task completion, and temporary lane retirement.
 - A fresh-session verification at `2026-04-21 05:36 PDT` disproved the previous "already green" claim: `test-freely-daemon-start-reuses-live-supervisor-without-relaunch` failed before reuse because its `ps`-count assertion could observe a transient duplicate `daemon-run` snapshot.
 - A narrow same-lane fix then hardened that regression to wait for a stable single `daemon-run` process snapshot before asserting reuse, instead of treating a startup race between separate `ps` calls as a product failure.
@@ -872,3 +874,23 @@ All commands passed again in the feature worktree during this worker continuatio
 - `FAIL`: the first attempt to merge that protected replay into canonical `develop` was rejected by governance because the diff still lacked explicit same-owner issue/progress/review materialization for this continuation.
 - `PASS`: owner-linked verification for this continuation is now explicit in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-post-l042-followthrough-keepalive-verification.md`.
 - `PENDING`: rerun guarded promote with this owner-linked evidence, merge into canonical `develop`, restart root daemon replay, and keep observing whether Freely now advances through select -> finish -> merge upward -> retire -> next task rather than stalling at the post-`L042` boundary.
+
+## 2026-04-25 20:15 PDT Manager Exit-Contract Repair Prompt Narrowing
+
+- `FAIL`: after `L042` keepalive was fixed, canonical `develop` daemon replay still exposed one narrower same-owner seam. Root runtime could now keep the live manager supervisor through post-cycle followthrough, but when a manager round exited `rc=0` without `manager-exit-contract.env`, repair selection downgraded correctly to `fresh_with_handoff` on `missing_resume_evidence` and then still rebuilt the full broad startup prompt.
+- `FAIL`: the result was another empty-success manager round instead of bounded repair. Real runtime evidence showed repeated `manager_empty_success_cycle_detected details=missing_file`, `last_launch_kind: fresh_with_handoff`, and `last_rotation_reason: missing_resume_evidence` while `latest_manager_continuity_generated` stayed stale. This confirms the blocker is still the runtime middleman prompt contract, not scan task choice or role taxonomy.
+- `PASS`: `build_prompt()` now narrows only this exact repair surface. When role truth is manager, `session-handoff.txt` says `rotation_reason=manager_exit_contract_repair`, `LAUNCH_KIND_SELECTED=fresh_with_handoff`, and `LAUNCH_ROTATION_REASON=missing_resume_evidence`, runtime bypasses the broad `start-lead-agent.sh` startup prompt and emits a bounded repair prompt that requires:
+  - first read only `AGENTS.md`, `session-handoff.txt`, `live-status`, current scan json, and latest manager continuity
+  - first write a new manager continuity
+  - then write `manager-exit-contract.env`
+  - avoid broad patrol, full milestones reread, or generic fleet survey before continuity/contract closeout
+- `PASS`: the narrowed prompt keeps the existing `manager continuity 文件：\`...\`` contract so `materialize_required_manager_continuity_startup_stub()` and the existing continuity materialization path remain compatible.
+- `PASS`: focused feature-local verification passed:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-fresh-with-handoff-prompt-narrowing`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-empty-success-cycle-does-not-autoresume`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-missing-resume-evidence-falls-back`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-repair-prompt-prioritizes-exit-contract`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
+  - `./bin/governance-check`
+- `PASS`: owner-linked verification for this continuation is now explicit in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-prompt-narrowing-verification.md`.
+- `PENDING`: rerun guarded feature/premerge verification with the owner-linked evidence, merge into canonical `develop`, restart root `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and watch whether the next repair/fresh-with-handoff manager round now produces continuity + exit contract instead of looping on `manager_empty_success_cycle_detected`.

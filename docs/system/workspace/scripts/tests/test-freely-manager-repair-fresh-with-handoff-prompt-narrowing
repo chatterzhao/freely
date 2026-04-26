@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-repair-fresh-handoff.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260425-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260425-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260425-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260425-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="manager_empty_success_cycle"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-25T19:09:28Z"
+EOF
+
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+LAST_TOOL_SESSION_ID="sess-demo"
+LAST_TOOL_RESUME_TARGET="resume-demo"
+LAST_TOOL_JSONL_PATH=""
+LAST_LAUNCH_KIND="fresh_with_handoff"
+LAST_ROTATION_REASON="missing_resume_evidence"
+LAST_CYCLE_LOG=""
+LAST_PROMPT_FILE=""
+LAST_CONTEXT_COMPACTED="0"
+LAST_CONTEXT_RATIO=""
+LAST_PRIMARY_RATE_LIMIT_USED_PERCENT=""
+LAST_PRIMARY_RATE_LIMIT_RESETS_AT=""
+LAST_SECONDARY_RATE_LIMIT_USED_PERCENT=""
+LAST_SECONDARY_RATE_LIMIT_RESETS_AT=""
+LAST_ROUTE_ONLY_HANDOFF="0"
+ROUTE_ONLY_STREAK_CURRENT="0"
+RESUME_STREAK_CURRENT="0"
+CURRENT_TOOL_SLOT=""
+LAST_SLOT_SWITCH_REASON=""
+LAST_SLOT_SWITCH_AT=""
+LAST_CYCLE_DEBUG_LOG=""
+LAST_CLAUDE_JSONL_PATH=""
+LAST_CODEX_MCP_USED="0"
+LAST_CODEX_MCP_THREAD_ID=""
+LAST_CODEX_MCP_JSONL_PATH=""
+CLAUDE_SESSION_ID_CURRENT=""
+CLAUDE_SESSION_ID_PREVIOUS=""
+LAST_PROJECT_DIRTY_ENTRIES="0"
+LAST_WORKTREE_SUMMARY_TOTAL="1"
+LAST_WORKTREE_SUMMARY_DIRTY="0"
+CHECKPOINT_DRIFT_STREAK_CURRENT="0"
+LAST_DELEGATED_CONTINUATION_PENDING_IDS=""
+LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0"
+LAST_DELEGATED_CONTINUATION_CONSUMED_IDS=""
+LAST_DELEGATED_CONTINUATION_CONSUMED_AT=""
+LAST_RESTART_STORM_WINDOW_SECS="0"
+LAST_RESTART_STORM_COUNT="0"
+LAST_PROCESS_CHURN_PEAK="0"
+LAST_RESTART_STORM_SIGNAL_AT=""
+LAST_RESTART_STORM_SIGNAL_REASON=""
+LAST_RESTART_STORM_ESCALATED_AT=""
+LAST_RESTART_STORM_ESCALATION_TARGET=""
+AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV=""
+EOF
+
+cat >"$PROJECT/.freely/run/session-handoff.txt" <<EOF
+# Session Handoff
+
+- rotation_reason: manager_exit_contract_repair
+- previous_launch_kind: resume
+- previous_tool_resume_target: resume-demo
+- worktree_path: $PROJECT
+
+## Repair Contract
+- reason: manager_empty_success_cycle
+- contract_file: $PROJECT/.freely/run/manager-exit-contract.env
+- details: missing_file;effective_output_evidence=absent
+EOF
+
+cat >"$PROJECT/.freely/run/manager-task-source-scan-latest.json" <<'EOF'
+{"schema_version":"manager-task-source-scan-v1","generated_at":"2026-04-25T19:08:25Z","sources":[{"surface":"active_milestone_queue","active_count":1,"summary_lines":["- milestone=M-demo queue=committed_issues route_hint=issue_continuation/in_progress item=I-demo priority=P1 phase_state=in_progress title=Demo next_action=write continuity first"]}]}
+EOF
+
+PROMPT_OUTPUT="$(
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+  LAUNCH_KIND_SELECTED="fresh_with_handoff" \
+  LAUNCH_ROTATION_REASON="missing_resume_evidence" \
+  bash -lc '
+    source "$1"
+    build_prompt
+  ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+)"
+
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '你当前处于受限修复轮次，不是新的主管首跳巡检。'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'manager continuity 文件：`'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q "$PROJECT/.freely/run/manager-exit-contract.env"
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q "$PROJECT/.freely/run/session-handoff.txt"
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q "$PROJECT/.freely/run/manager-task-source-scan-latest.json"
+
+if [[ "$PROMPT_OUTPUT" == *'你现在进入 Freely 的首跳闭环。'* ]]; then
+  echo "[FAIL] narrowed repair prompt should bypass the broad lead-agent startup prompt" >&2
+  exit 1
+fi
+
+if [[ "$PROMPT_OUTPUT" == *'先运行 `./bin/freely task-source-scan'* ]]; then
+  echo "[FAIL] narrowed repair prompt should not require a fresh broad startup patrol before repairing the exit contract" >&2
+  exit 1
+fi
+
+echo "[PASS] manager repair fresh_with_handoff prompt narrows to continuity and exit-contract recovery"
