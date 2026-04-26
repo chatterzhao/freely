@@ -327,6 +327,18 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
 
+### Resumed manager round stays alive while the next prompt is still building
+- id: `manager-resume-prompt-build-startup-grace-preserved`
+- requirement: `After ai_cycle_finished and resume_manager handoff, ensure-manager must keep the same supervisor alive while that resumed round has already re-entered L020/L021/L022 startup lifecycle truth and has not yet relaunched AI.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#36`
+- case_design: `Seed a running manager whose between-rounds grace is already expired, but whose lifecycle trace has a newer L020 prompt_build_begin after the last L042 ai_cycle_finished, and verify ensure-manager keeps the same supervisor alive instead of triggering manager_idle_supervisor_restart.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-resume-prompt-build-grace-verification.md`
+
 ### Exhausted fallback episodes restore the original tool
 - id: `fallback-episode-restores-origin-tool`
 - requirement: `A bounded cross-tool recovery episode must remember its origin tool and restore that tool selection once every configured fallback has failed.`
@@ -782,3 +794,15 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-delegated-continuation-pending-state-verification.md`
+
+### Guarded promote carries resumed prompt-build keepalive evidence
+- id: `guarded-promote-manager-resume-prompt-build-grace-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving ensure-manager does not restart a live manager supervisor after resume_manager once the same supervisor has already re-entered L020/L021/L022 startup lifecycle truth for the next round.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#37`
+- case_design: `Replay the resumed prompt-build keepalive repair on the disposable protected lane, rerun the focused resumed-prompt-build, between-rounds, pre-prompt, and post-finalize keepalive regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-resume-prompt-build-grace-verification.md`
