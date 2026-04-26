@@ -220,6 +220,18 @@
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-entrypoint-mode-preservation-verification.md`
 
+### Guarded promote carries fresh resume-cycle evidence-boundary proof
+- id: `guarded-promote-resume-incremental-output-evidence-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving a reused Codex resume session cannot satisfy manager success using stale historical output from an earlier cycle.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#20,tasks.md#35,tasks.md#36`
+- case_design: `Replay the resume evidence-boundary repair through the disposable protected lane, rerun the focused manager exit-contract regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-resume-incremental-output-evidence-verification.md`
+
 ### Guarded promote carries fresh queued-owner self-block evidence
 - id: `guarded-promote-queued-owner-self-block-proof`
 - requirement: `The develop-bound replay includes a fresh staged owner artifact proving runtime no longer lets the retained authoritative prompt block itself as queued-owner while preserving real earlier queued-owner explainability.`
