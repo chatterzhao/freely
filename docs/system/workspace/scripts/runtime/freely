@@ -14417,6 +14417,12 @@ ensure_manager_once() {
       "trigger=between_rounds_relaunch_grace" \
       "supervisor_pid=${current_pid:-unknown}" \
       "next=keep_current_supervisor"
+  elif supervisor_startup_lifecycle_in_flight "$project" "$current_pid"; then
+    log_info "manager supervisor is still advancing the next startup lifecycle; keeping supervisor pid=$current_pid alive"
+    append_lifecycle_trace "$project" "L221" "manager_keepalive" \
+      "trigger=startup_lifecycle_grace" \
+      "supervisor_pid=${current_pid:-unknown}" \
+      "next=keep_current_supervisor"
   elif manager_supervisor_post_ai_cycle_finalize_in_flight "$project" "$current_pid" "$current_ai_pid"; then
     log_info "manager supervisor is finalizing the previous ai cycle; keeping supervisor pid=$current_pid alive"
     append_lifecycle_trace "$project" "L221" "manager_keepalive" \
