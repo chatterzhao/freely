@@ -4788,15 +4788,84 @@ PY
   return 1
 }
 
+codex_jsonl_has_effective_output_evidence_since_prompt() {
+  local jsonl_path="$1" prompt_file="$2"
+  [[ -f "$jsonl_path" && -s "$jsonl_path" ]] || return 1
+  [[ -f "$prompt_file" ]] || return 1
+
+  if command -v python3 >/dev/null 2>&1; then
+    python3 - "$jsonl_path" "$prompt_file" <<'PY'
+import json
+import os
+import sys
+from datetime import datetime, timezone
+
+jsonl_path, prompt_file = sys.argv[1], sys.argv[2]
+prompt_epoch = os.path.getmtime(prompt_file)
+
+def parse_epoch(value: str):
+    if not value:
+        return None
+    value = value.strip()
+    if not value:
+        return None
+    if value.endswith("Z"):
+        value = value[:-1] + "+00:00"
+    try:
+        dt = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.timestamp()
+
+with open(jsonl_path, "r", encoding="utf-8") as fh:
+    for raw in fh:
+        raw = raw.strip()
+        if not raw:
+            continue
+        try:
+            obj = json.loads(raw)
+        except Exception:
+            continue
+        event_epoch = parse_epoch(obj.get("timestamp"))
+        if event_epoch is None or event_epoch < prompt_epoch:
+            continue
+        obj_type = obj.get("type")
+        payload = obj.get("payload") or {}
+        if obj_type == "response_item":
+            role = payload.get("role")
+            item_type = payload.get("type")
+            if role == "assistant":
+                sys.exit(0)
+            if item_type not in ("message", "reasoning", None):
+                sys.exit(0)
+        elif obj_type == "event_msg":
+            if payload.get("type") in ("agent_message", "task_complete"):
+                sys.exit(0)
+sys.exit(1)
+PY
+    return $?
+  fi
+
+  codex_jsonl_has_effective_output_evidence "$jsonl_path"
+}
+
 manager_cycle_has_effective_output_evidence() {
-  local project="$1" session_file jsonl_path tool_name
+  local project="$1" session_file jsonl_path tool_name launch_kind prompt_file
   session_file="$(session_state_file "$project")"
   [[ -f "$session_file" ]] || return 1
   tool_name="${AI_TOOL:-}"
   [[ -n "$tool_name" ]] || tool_name="$(meta_env_value "$(config_file "$project")" "AI_TOOL")"
+  launch_kind="$(meta_env_value "$session_file" "LAST_LAUNCH_KIND")"
+  prompt_file="$(meta_env_value "$session_file" "LAST_PROMPT_FILE")"
   case "$tool_name" in
     codex)
       jsonl_path="$(meta_env_value "$session_file" "LAST_TOOL_JSONL_PATH")"
+      if [[ "$launch_kind" == "resume" && -n "$prompt_file" && -f "$prompt_file" ]]; then
+        codex_jsonl_has_effective_output_evidence_since_prompt "$jsonl_path" "$prompt_file"
+        return $?
+      fi
       codex_jsonl_has_effective_output_evidence "$jsonl_path"
       ;;
     *)
