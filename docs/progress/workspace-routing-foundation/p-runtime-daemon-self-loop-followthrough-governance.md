@@ -894,3 +894,19 @@ All commands passed again in the feature worktree during this worker continuatio
   - `./bin/governance-check`
 - `PASS`: owner-linked verification for this continuation is now explicit in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-prompt-narrowing-verification.md`.
 - `PENDING`: rerun guarded feature/premerge verification with the owner-linked evidence, merge into canonical `develop`, restart root `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and watch whether the next repair/fresh-with-handoff manager round now produces continuity + exit contract instead of looping on `manager_empty_success_cycle_detected`.
+
+## 2026-04-25 20:58 PDT Manager Repair Handoff Preservation
+
+- `FAIL`: root replay still exposed one more control-plane seam after prompt narrowing. `select_launch_kind()` correctly recognized `manager_exit_contract_repair` and downgraded to `fresh_with_handoff` on `missing_resume_evidence`, but the runtime main loop then overwrote `session-handoff.txt` with a generic rotation handoff before `build_prompt()` consumed it.
+- `FAIL`: this meant the new bounded repair prompt was logically present but unreachable in the real loop. The bug was not task choice and not prompt text quality; it was that the runtime middleman erased its own repair signal between launch selection and prompt build.
+- `PASS`: runtime now preserves an existing `manager_exit_contract_repair` or `worker_exit_contract_repair` handoff when `fresh_with_handoff` was chosen only because resume evidence is missing, so repair-specific prompt and directive logic still receive the intended handoff contract.
+- `PASS`: the fix is intentionally narrow. Non-repair `fresh_with_handoff` rotations such as `context_compacted`, route-only, dirty-budget, and resume-streak paths still rewrite handoff through the generic writer.
+- `PASS`: focused feature-local verification passed:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-missing-resume-evidence-preserves-repair-handoff`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-fresh-with-handoff-prompt-narrowing`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-missing-resume-evidence-falls-back`
+  - `bash docs/system/workspace/scripts/tests/test-freely-worker-repair-prompt-prioritizes-exit-contract`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-empty-success-cycle-does-not-autoresume`
+  - `./bin/governance-check`
+- `PASS`: owner-linked verification for this continuation is now explicit in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-repair-handoff-preservation-verification.md`.
+- `PENDING`: rerun protected `premerge-integration` verification, guarded promote into canonical `develop`, restart root daemon replay, and confirm the next repair/fresh-with-handoff manager round preserves repair handoff truth long enough to write continuity + exit contract and continue toward the overall autonomy loop.
