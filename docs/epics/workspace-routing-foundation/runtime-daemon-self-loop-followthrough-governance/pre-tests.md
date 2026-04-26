@@ -758,3 +758,27 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-terminal-handoff-followthrough-absorb-premerge-verification.md`
+
+### Delegated continuation session state clears absorbed pending backlog
+- id: `delegated-continuation-session-state-clears-absorbed-pending-backlog`
+- requirement: `When the active manager prompt already carries a Delegated continuation handoff block, runtime must persist those delegated IDs as consumed and must not keep the same IDs exposed as pending session-state backlog.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#36`
+- case_design: `Seed delegated pending ids, build an active prompt that already contains the delegated continuation handoff block, write session-state, and verify the same ids move to consumed while pending ids/count collapse to empty/zero so resume focus can execute the current followthrough instead of treating it as still-pending backlog.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-delegated-continuation-pending-state-verification.md`
+
+### Guarded promote carries delegated continuation pending-state evidence
+- id: `guarded-promote-delegated-continuation-pending-state-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving delegated continuation ids already absorbed into the active manager prompt are cleared from pending session-state, so consumed-continuity resume cannot stall behind contradictory backlog truth.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#36`
+- case_design: `Replay the delegated-continuation pending-state repair on the disposable protected lane, rerun the focused pending-state and consumed-continuity resume-focus regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-delegated-continuation-pending-state-verification.md`
