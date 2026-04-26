@@ -17,7 +17,14 @@
   2. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`
   3. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-post-ai-cycle-finalize-grace`
   4. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`
-- `PENDING`: protected `premerge-integration` replay and canonical `develop` daemon acceptance remain open until this continuation is replayed on a fresh protected lane, merged lawfully into `develop`, and proven on real root replay.
+- `PASS`: protected `premerge-integration` replay passed on `2026-04-25 17:46 PDT` in `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-manager-worker-terminal-followthrough-materialization-r2`:
+  1. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-resume-prompt-build`
+  2. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`
+  3. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-post-ai-cycle-finalize-grace`
+  4. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`
+  5. `./bin/test-lane premerge-integration -- ./bin/governance-check`
+  6. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-manager-worker-terminal-followthrough-materialization-r2 --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge`
+- `PENDING`: canonical `develop` daemon acceptance remains open until this continuation is merged lawfully into `develop` and proven on real root replay.
 
 ## Implementation Decision Note
 

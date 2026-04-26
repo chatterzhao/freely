@@ -844,4 +844,11 @@ All commands passed again in the feature worktree during this worker continuatio
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-post-ai-cycle-finalize-grace`
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`
 - `PASS`: owner-linked feature-local verification for this seam is staged in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-resume-prompt-build-grace-verification.md`.
-- `PENDING`: replay this continuation on a fresh protected test lane, merge it lawfully into `develop`, restart the root daemon from merged `develop`, and keep observing whether Freely now continues through select -> finish -> merge upward -> retire -> next task rather than stuttering at manager round boundaries.
+- `PASS`: protected `premerge-integration` replay passed at `2026-04-25 17:46 PDT` on `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-manager-worker-terminal-followthrough-materialization-r2`:
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-resume-prompt-build`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-post-ai-cycle-finalize-grace`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`
+  - `./bin/test-lane premerge-integration -- ./bin/governance-check`
+  - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-manager-worker-terminal-followthrough-materialization-r2 --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge`
+- `PENDING`: merge this protected lane lawfully into `develop`, restart the root daemon from merged `develop`, and keep observing whether Freely now continues through select -> finish -> merge upward -> retire -> next task rather than stuttering at manager round boundaries.
