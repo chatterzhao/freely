@@ -854,3 +854,27 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-prompt-narrowing-verification.md`
+
+### Feature-local manager repair handoff survives missing-resume downgrade
+- id: `feature-local-manager-exit-contract-repair-handoff-preservation-develop-adequacy`
+- requirement: `Before protected promote, the owner must carry explicit feature-local develop-bound adequacy evidence that a manager exit-contract repair handoff downgraded to fresh_with_handoff on missing resume evidence is not overwritten by a generic rotation handoff before prompt build.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#39`
+- case_design: `Run the chain-level manager repair handoff preservation regression together with the prompt narrowing, missing-resume-evidence fallback, worker repair prompt, and empty-success adjacency regressions in the writable owner worktree, then stage the owner-linked verification artifact that pins the failure to the runtime handoff/prompt control plane seam.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-repair-handoff-preservation-verification.md`
+
+### Guarded promote carries manager repair handoff preservation evidence
+- id: `guarded-promote-manager-exit-contract-repair-handoff-preservation-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving that a manager exit-contract repair round downgraded to fresh_with_handoff on missing resume evidence preserves the repair handoff through prompt build instead of rewriting it into a generic rotation handoff.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#39`
+- case_design: `Replay the manager repair handoff preservation fix on the disposable protected lane, rerun the chain-level preservation regression plus the adjacent prompt narrowing, empty-success, missing-resume-evidence fallback, worker repair prompt, and governance regressions there, then stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-repair-handoff-preservation-verification.md`
