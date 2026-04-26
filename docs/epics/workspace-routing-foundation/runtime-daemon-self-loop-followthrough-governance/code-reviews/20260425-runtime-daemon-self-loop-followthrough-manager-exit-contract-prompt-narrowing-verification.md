@@ -25,7 +25,15 @@
   4. `bash docs/system/workspace/scripts/tests/test-freely-worker-repair-prompt-prioritizes-exit-contract`
   5. `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
   6. `./bin/governance-check`
-- `PENDING`: protected `premerge-integration` replay and canonical `develop` daemon acceptance remain open. This repair is not complete until the merged root replay shows the next manager repair/fresh-with-handoff round producing continuity + exit contract and Freely continuing toward select -> finish -> merge upward -> retire -> next task.
+- `PASS`: protected `premerge-integration` replay passed on `2026-04-25 20:39 PDT` in `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-manager-exit-contract-prompt-narrowing`:
+  1. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-repair-fresh-with-handoff-prompt-narrowing`
+  2. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-empty-success-cycle-does-not-autoresume`
+  3. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-missing-resume-evidence-falls-back`
+  4. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-worker-repair-prompt-prioritizes-exit-contract`
+  5. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
+  6. `./bin/test-lane premerge-integration -- ./bin/governance-check`
+  7. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-manager-exit-contract-prompt-narrowing --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge`
+- `PENDING`: canonical `develop` daemon acceptance remains open. This repair is not complete until the merged root replay shows the next manager repair/fresh-with-handoff round producing continuity + exit contract and Freely continuing toward select -> finish -> merge upward -> retire -> next task.
 
 ## Implementation Decision Note
 
