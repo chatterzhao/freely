@@ -11580,6 +11580,16 @@ EOF
   fi
 }
 
+should_preserve_exit_contract_repair_handoff() {
+  local project="$1" rotation_reason="${2:-}" existing_rotation_reason=""
+  [[ "$rotation_reason" == "missing_resume_evidence" ]] || return 1
+  existing_rotation_reason="$(session_handoff_rotation_reason "$project" || true)"
+  case "$existing_rotation_reason" in
+    manager_exit_contract_repair|worker_exit_contract_repair) return 0 ;;
+  esac
+  return 1
+}
+
 session_handoff_recent_output_excerpt() {
   local cycle_log="$1" max_lines="${2:-80}"
   local excerpt
@@ -16768,8 +16778,12 @@ start_project_runtime() {
     delegated_consumed_at="${LAST_DELEGATED_CONTINUATION_CONSUMED_AT:-}"
 
     if [[ "$mode_name" == "fresh_with_handoff" ]]; then
-      write_session_handoff "$PROJECT_ROOT" "$LAUNCH_ROTATION_REASON"
-      log_info "rotating session via fresh_with_handoff (reason=$LAUNCH_ROTATION_REASON)"
+      if should_preserve_exit_contract_repair_handoff "$PROJECT_ROOT" "$LAUNCH_ROTATION_REASON"; then
+        log_info "rotating session via fresh_with_handoff (reason=$LAUNCH_ROTATION_REASON, preserving existing exit-contract repair handoff)"
+      else
+        write_session_handoff "$PROJECT_ROOT" "$LAUNCH_ROTATION_REASON"
+        log_info "rotating session via fresh_with_handoff (reason=$LAUNCH_ROTATION_REASON)"
+      fi
     fi
     append_lifecycle_trace "$PROJECT_ROOT" "L020" "prompt_build_begin" \
       "supervisor_pid=$$" \
