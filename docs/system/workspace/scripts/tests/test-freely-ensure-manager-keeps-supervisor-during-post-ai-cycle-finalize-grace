@@ -62,9 +62,19 @@ LAST_ROLE_HINT="manager"
 LAST_STATE_UPDATED_AT="$STATE_TS"
 EOF
 
-OBSERVED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+OBSERVED_AT="$(date -u -v-4S '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || python3 - <<'PY'
+from datetime import datetime, timedelta, timezone
+print((datetime.now(timezone.utc) - timedelta(seconds=4)).strftime('%Y-%m-%dT%H:%M:%SZ'))
+PY
+)"
+FINISHED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || python3 - <<'PY'
+from datetime import datetime, timezone
+print(datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'))
+PY
+)"
 cat >"$PROJECT/.freely/logs/lifecycle-trace.log" <<EOF
 $OBSERVED_AT seq=20102 ph=IN me=A-L041 fr=A-L040 ok=1 checkpoint=L041 stage=ai_launch_observed supervisor_pid=12345 tool=codex launch_kind=fresh_with_handoff child_pid=48791 prompt_file=./.freely/run/prompt.txt cycle_log=./.freely/logs/cycle.log
+$FINISHED_AT seq=20106 ph=IN me=A-L042 fr=A-L041 ok=1 checkpoint=L042 stage=ai_cycle_finished supervisor_pid=12345 tool=codex launch_kind=fresh_with_handoff rc=0 child_pid=48791 session_id=sess resume_target=sess jsonl_path=~/.codex/sessions/example.jsonl cycle_log=./.freely/logs/cycle.log exit_reason=ai_exit_rc_0
 EOF
 
 SUPERVISOR_PID="12345"

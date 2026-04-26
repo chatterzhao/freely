@@ -14137,8 +14137,18 @@ manager_supervisor_post_ai_cycle_finalize_in_flight() {
     ' "$trace_file" | tail -n 1
   )"
   if [[ -n "$terminal_snapshot" ]]; then
-    IFS='|' read -r last_terminal_seq _ <<<"$terminal_snapshot"
+    IFS='|' read -r last_terminal_seq last_terminal_ts last_terminal_checkpoint <<<"$terminal_snapshot"
     if [[ "$last_terminal_seq" =~ ^[0-9]+$ ]] && (( last_terminal_seq >= last_finalize_seq )); then
+      if [[ "$last_terminal_checkpoint" == "L042" ]]; then
+        finalize_epoch="$(timestamp_epoch_or_zero "$last_terminal_ts")"
+        [[ "$finalize_epoch" =~ ^[0-9]+$ ]] || finalize_epoch=0
+        (( finalize_epoch > 0 )) || return 1
+        now_epoch="$(date +%s)"
+        grace_secs="${FREELY_MANAGER_POST_AI_CYCLE_FINALIZE_GRACE_SECS:-20}"
+        [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=20
+        (( now_epoch - finalize_epoch <= grace_secs ))
+        return
+      fi
       return 1
     fi
   fi
