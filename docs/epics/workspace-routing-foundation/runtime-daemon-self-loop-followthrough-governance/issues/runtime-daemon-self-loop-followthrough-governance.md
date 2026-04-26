@@ -222,6 +222,12 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - canonical `develop` self-host replay: `./bin/freely daemon start`
 - `git worktree list`
 
+## 2026-04-25 Continuation Note: Post-L042 Followthrough Keepalive
+
+- Real canonical `develop` replay advanced past the earlier `post-L041/pre-L042` finalize seam and started recording `L042 ai_cycle_finished`, but watchdog could still classify the same live manager supervisor as idle and emit `L223 manager_idle_supervisor_restart` before that supervisor finished exit-contract replay or wrote later terminal/followthrough truth.
+- This remains inside `I-20260421-1200-A`. The architecture boundary is unchanged: manager/worker intent stays artifact-driven, runtime remains the middleman, and the defect is still watchdog lifecycle classification rather than task-selection policy or role taxonomy.
+- The bounded fix is to treat same-supervisor `L042` as post-cycle followthrough-in-flight for a short authoritative grace window unless later `L090|L091|L092` truth has already been written.
+
 ## Completion
 
 - `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/brainstorms.md`
@@ -234,6 +240,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-terminal-handoff-followthrough-absorb-verification.md`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-terminal-handoff-followthrough-absorb-premerge-verification.md`
+- `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-post-l042-followthrough-keepalive-verification.md`
+- `docs/system/workspace/hooks/commit-msg.sh`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 - `docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
@@ -270,5 +278,6 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-post-ai-cycle-finalize-grace`
 - `docs/system/workspace/scripts/tests/test-freely-daemon-autonomous-existing-worktree-review-merge-retire-next-task-loop`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-self-loop-recovery-verification.md`

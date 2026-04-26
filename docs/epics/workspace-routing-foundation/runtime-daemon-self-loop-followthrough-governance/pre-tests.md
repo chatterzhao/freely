@@ -806,3 +806,27 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-resume-prompt-build-grace-verification.md`
+
+### Feature-local post-L042 followthrough keepalive evidence is develop-bound adequate
+- id: `feature-local-post-l042-followthrough-keepalive-develop-adequacy`
+- requirement: `Before protected promote, the owner must carry explicit feature-local develop-bound adequacy evidence that same-supervisor L042 is treated as followthrough-in-flight keepalive instead of idle restart truth.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#38`
+- case_design: `Run the focused post-L042 helper, ensure-manager top-level keepalive, resume-manager cleanup-followthrough, and network-transient override regressions in the writable owner worktree, then record the owner-linked verification artifact that explains why this seam belongs to the runtime middleman rather than task-selection or role-taxonomy design.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-post-l042-followthrough-keepalive-verification.md`
+
+### Guarded promote carries post-L042 followthrough keepalive evidence
+- id: `guarded-promote-post-l042-followthrough-keepalive-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving watchdog does not restart a live manager supervisor after L042 while the same supervisor is still finishing exit-contract replay or delegated followthrough.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#38`
+- case_design: `Replay the post-L042 keepalive repair on the disposable protected lane, rerun the focused post-L042 helper, ensure-manager top-level keepalive, cleanup-followthrough, and network-transient override regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-post-l042-followthrough-keepalive-verification.md`
