@@ -832,3 +832,16 @@ All commands passed again in the feature worktree during this worker continuatio
 - `FAIL`: the first attempt to bring that protected replay into canonical `develop` was rejected by governance because the diff still lacked explicit same-owner issue/progress/review materialization for this continuation. The blocker is owner evidence, not the code path or regression set.
 - `PASS`: owner-linked verification for this continuation is now explicit in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-delegated-continuation-pending-state-verification.md`.
 - `PENDING`: rerun guarded promote with the refreshed owner evidence, merge into canonical `develop`, restart root daemon replay, and verify manager now executes the absorbed delegated followthrough instead of re-exposing the same ids as pending backlog.
+
+## 2026-04-25 18:05 PDT Manager Resume Prompt-Build Grace
+
+- `FAIL`: after the finalize-gap repair, the same canonical replay still exposed one narrower watchdog seam. The live manager supervisor could already write a new `L020 prompt_build_begin` for the resumed round after `L042 ai_cycle_finished`, yet `ensure-manager` still fell through to `L223 manager_idle_supervisor_restart` once the generic between-rounds grace expired before prompt build completed.
+- `PASS`: this confirms the runtime architecture boundary more sharply. The blocker is not that manager failed to choose work or that worker/manager roles are conceptually wrong; runtime already had the next round and the next continuity handoff. The middleman simply was not treating resumed prompt-build startup lifecycle as authoritative keepalive truth.
+- `PASS`: `ensure_manager_once()` now reuses `supervisor_startup_lifecycle_in_flight()` directly when the same supervisor is already inside `L010|L020|L021|L022` for the next round, so watchdog keeps that supervisor alive across slow resumed prompt builds instead of spawning a redundant replacement control plane.
+- `PASS`: focused `feature-local` verification passed:
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-resume-prompt-build`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-post-ai-cycle-finalize-grace`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-pre-prompt-startup`
+- `PASS`: owner-linked feature-local verification for this seam is staged in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-resume-prompt-build-grace-verification.md`.
+- `PENDING`: replay this continuation on a fresh protected test lane, merge it lawfully into `develop`, restart the root daemon from merged `develop`, and keep observing whether Freely now continues through select -> finish -> merge upward -> retire -> next task rather than stuttering at manager round boundaries.

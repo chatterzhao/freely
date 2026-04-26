@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-resume-prompt-build.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260425-0000--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260425-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260425-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260425-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+STATE_TS="$(date -u -v-30S '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || python3 - <<'PY'
+from datetime import datetime, timedelta, timezone
+print((datetime.now(timezone.utc) - timedelta(seconds=30)).strftime('%Y-%m-%dT%H:%M:%SZ'))
+PY
+)"
+cat >"$PROJECT/.freely/run/workcell-state.env" <<EOF
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="manager_exit_contract_resume"
+LAST_ENTRYPOINT_MODE="daemon"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="$STATE_TS"
+EOF
+
+SUPERVISOR_PID="12345"
+printf '%s\n' "$SUPERVISOR_PID" >"$PROJECT/.freely/run/supervisor.pid"
+
+OBSERVED_AT="$(date -u -v-12S '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || python3 - <<'PY'
+from datetime import datetime, timedelta, timezone
+print((datetime.now(timezone.utc) - timedelta(seconds=12)).strftime('%Y-%m-%dT%H:%M:%SZ'))
+PY
+)"
+PROMPT_BUILD_AT="$(date -u -v-4S '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || python3 - <<'PY'
+from datetime import datetime, timedelta, timezone
+print((datetime.now(timezone.utc) - timedelta(seconds=4)).strftime('%Y-%m-%dT%H:%M:%SZ'))
+PY
+)"
+cat >"$PROJECT/.freely/logs/lifecycle-trace.log" <<EOF
+$OBSERVED_AT seq=20102 ph=IN me=A-L042 fr=A-L041 ok=1 checkpoint=L042 stage=ai_cycle_finished supervisor_pid=$SUPERVISOR_PID tool=codex launch_kind=fresh rc=0 child_pid=48791 session_id=sess resume_target=sess jsonl_path=~/.codex/sessions/example.jsonl cycle_log=./.freely/logs/cycle.log exit_reason=ai_exit_rc_0
+$PROMPT_BUILD_AT seq=20104 ph=IN me=A-L020 fr=A-L010 ok=1 checkpoint=L020 stage=prompt_build_begin supervisor_pid=$SUPERVISOR_PID launch_kind=fresh_with_handoff rotation_reason=context_compacted prompt_file=./.freely/run/prompt.txt
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+RESTART_LOG="$TMP_DIR/restart.log"
+LAUNCH_LOG="$TMP_DIR/launch.log"
+
+valid_supervisor_pid_for_project() {
+  [[ "$2" == "$SUPERVISOR_PID" ]]
+}
+discover_supervisor_pid() {
+  return 0
+}
+manager_ai_pid_for_project() {
+  return 0
+}
+recover_stalled_manager_ai_if_needed() {
+  return 1
+}
+prepare_manager_same_tool_slot_recovery_if_needed() {
+  return 0
+}
+prepare_manager_cross_tool_fallback_if_needed() {
+  TOOL_AUTO_RECOVERY_DECISION="none"
+  return 0
+}
+manager_runtime_recover_workers_if_needed() {
+  return 0
+}
+restart_manager_supervisor_preserving_handoff() {
+  printf '%s\n' "$1" >>"$RESTART_LOG"
+}
+launch_manager_supervisor() {
+  printf '%s\n' "$1" >>"$LAUNCH_LOG"
+}
+log_info() { :; }
+log_warn() { :; }
+log_error() { :; }
+
+FREELY_MANAGER_BETWEEN_ROUNDS_GRACE_SECS=3 \
+  FREELY_MANAGER_STARTUP_LIFECYCLE_GRACE_SECS=120 \
+  ensure_manager_once "$PROJECT" >/dev/null
+
+if [[ -s "$RESTART_LOG" ]]; then
+  echo "[FAIL] ensure-manager restarted supervisor while the resumed round was still building the next prompt" >&2
+  cat "$RESTART_LOG" >&2
+  exit 1
+fi
+
+if [[ -s "$LAUNCH_LOG" ]]; then
+  echo "[FAIL] ensure-manager launched a replacement supervisor while the resumed round was still building the next prompt" >&2
+  cat "$LAUNCH_LOG" >&2
+  exit 1
+fi
+
+if ! grep -q 'trigger=startup_lifecycle_grace' "$PROJECT/.freely/logs/lifecycle-trace.log"; then
+  echo "[FAIL] ensure-manager did not record the startup lifecycle keepalive trigger for resumed prompt build" >&2
+  cat "$PROJECT/.freely/logs/lifecycle-trace.log" >&2
+  exit 1
+fi
+
+echo "[PASS] ensure-manager keeps a live manager supervisor while resumed prompt build is still in flight"
