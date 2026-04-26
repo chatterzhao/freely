@@ -6,9 +6,9 @@
 - phase_state: `in_verification`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `feature/manager-exit-contract-prompt-narrowing-20260425`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-feature-manager-exit-contract-prompt-narrowing`
-- updated_at: `2026-04-25 20:15 PDT`
+- branch: `feature/runtime-resume-incremental-output-evidence-guard-20260425`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-feature-runtime-resume-incremental-output-evidence-guard`
+- updated_at: `2026-04-25 20:25 PDT`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -910,3 +910,16 @@ All commands passed again in the feature worktree during this worker continuatio
   - `./bin/governance-check`
 - `PASS`: owner-linked verification for this continuation is now explicit in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-repair-handoff-preservation-verification.md`.
 - `PENDING`: rerun protected `premerge-integration` verification, guarded promote into canonical `develop`, restart root daemon replay, and confirm the next repair/fresh-with-handoff manager round preserves repair handoff truth long enough to write continuity + exit contract and continue toward the overall autonomy loop.
+
+## 2026-04-25 20:25 PDT Resume Incremental Output Evidence Verification
+
+- `FAIL`: canonical `develop` replay advanced past the repaired `fresh_with_handoff` repair prompt, but the next `resume` cycle still returned `rc=0` without writing new continuity or `manager-exit-contract.env`; runtime accepted it anyway because `manager_cycle_has_effective_output_evidence()` trusted assistant output anywhere in the reused Codex session jsonl, including output from earlier cycles.
+- `PASS`: Codex `resume` cycles now require effective output evidence at or after the current prompt boundary, so reused session history cannot satisfy the success check for a new empty manager round.
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-resume-cycle-does-not-reuse-stale-output-evidence`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-empty-success-cycle-does-not-autoresume`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-missing-resume-evidence-preserves-repair-handoff`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-missing-continuity-autoresumes`
+- `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-fresh-with-handoff-prompt-narrowing`
+- `PASS`: `./bin/governance-check`
+- `PASS`: owner-linked verification for this continuation is now explicit in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-resume-incremental-output-evidence-verification.md`.
+- `PENDING`: promote this followthrough through protected premerge, merge into canonical `develop`, restart daemon replay, and verify Freely either writes a real post-repair manager continuity / worker handoff or re-enters `manager_empty_success_cycle_detected` instead of silently auto-resuming on stale session history.
