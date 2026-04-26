@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-delegated-continuation-session-state.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run"
+touch "$PROJECT/.freely/config.env"
+
+PROMPT_FILE="$PROJECT/.freely/run/prompt.txt"
+cat >"$PROMPT_FILE" <<'EOF'
+Delegated continuation handoff:
+- intake_id=sample-a message=continue manager followthrough
+- intake_id=sample-b message=continue worker terminal followthrough
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+LAST_TOOL_SESSION_ID="session-id"
+LAST_TOOL_RESUME_TARGET="resume-target"
+LAST_TOOL_JSONL_PATH="/tmp/session.jsonl"
+LAST_LAUNCH_KIND="resume"
+LAST_ROTATION_REASON=""
+LAST_CYCLE_LOG="/tmp/cycle.log"
+LAST_CONTEXT_COMPACTED="0"
+LAST_CONTEXT_RATIO="0"
+LAST_PRIMARY_RATE_LIMIT_USED_PERCENT=""
+LAST_PRIMARY_RATE_LIMIT_RESETS_AT=""
+LAST_SECONDARY_RATE_LIMIT_USED_PERCENT=""
+LAST_SECONDARY_RATE_LIMIT_RESETS_AT=""
+LAST_ROUTE_ONLY_HANDOFF="0"
+ROUTE_ONLY_STREAK_CURRENT="0"
+RESUME_STREAK_CURRENT="1"
+LAST_SLOT_SWITCH_REASON=""
+LAST_SLOT_SWITCH_AT=""
+LAST_CYCLE_DEBUG_LOG="/tmp/cycle.debug.log"
+LAST_CLAUDE_JSONL_PATH=""
+LAST_CODEX_MCP_USED="0"
+LAST_CODEX_MCP_THREAD_ID=""
+LAST_CODEX_MCP_JSONL_PATH=""
+LAST_PROJECT_DIRTY_ENTRIES="0"
+LAST_WORKTREE_SUMMARY_TOTAL="0"
+LAST_WORKTREE_SUMMARY_DIRTY="0"
+CHECKPOINT_DRIFT_STREAK_CURRENT="0"
+LAST_RESTART_STORM_WINDOW_SECS="0"
+LAST_RESTART_STORM_COUNT="0"
+LAST_PROCESS_CHURN_PEAK="0"
+LAST_RESTART_STORM_SIGNAL_AT=""
+LAST_RESTART_STORM_SIGNAL_REASON=""
+LAST_RESTART_STORM_ESCALATED_AT=""
+LAST_RESTART_STORM_ESCALATION_TARGET=""
+AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV=""
+AUTO_RECOVERY_ORIGIN_TOOL=""
+
+delegated_pending_ids="sample-a,sample-b"
+delegated_pending_count="2"
+delegated_consumed_ids=""
+delegated_consumed_at=""
+
+if [[ -n "$delegated_pending_ids" ]] && grep -q '^Delegated continuation handoff:' "$PROMPT_FILE" 2>/dev/null; then
+  delegated_consumed_ids="$delegated_pending_ids"
+  delegated_consumed_at="$(current_timestamp_utc_for_machine)"
+  delegated_pending_ids=""
+  delegated_pending_count="0"
+fi
+
+write_session_state \
+  "$PROJECT" \
+  "$LAST_TOOL_SESSION_ID" \
+  "$LAST_TOOL_RESUME_TARGET" \
+  "$LAST_TOOL_JSONL_PATH" \
+  "$LAST_LAUNCH_KIND" \
+  "$LAST_ROTATION_REASON" \
+  "$LAST_CYCLE_LOG" \
+  "$PROMPT_FILE" \
+  "$LAST_CONTEXT_COMPACTED" \
+  "$LAST_CONTEXT_RATIO" \
+  "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" \
+  "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" \
+  "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" \
+  "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" \
+  "$LAST_ROUTE_ONLY_HANDOFF" \
+  "$ROUTE_ONLY_STREAK_CURRENT" \
+  "$RESUME_STREAK_CURRENT" \
+  "slot-1" \
+  "$LAST_SLOT_SWITCH_REASON" \
+  "$LAST_SLOT_SWITCH_AT" \
+  "$LAST_CYCLE_DEBUG_LOG" \
+  "$LAST_CLAUDE_JSONL_PATH" \
+  "$LAST_CODEX_MCP_USED" \
+  "$LAST_CODEX_MCP_THREAD_ID" \
+  "$LAST_CODEX_MCP_JSONL_PATH" \
+  "" \
+  "" \
+  "$LAST_PROJECT_DIRTY_ENTRIES" \
+  "$LAST_WORKTREE_SUMMARY_TOTAL" \
+  "$LAST_WORKTREE_SUMMARY_DIRTY" \
+  "$CHECKPOINT_DRIFT_STREAK_CURRENT" \
+  "$delegated_pending_ids" \
+  "$delegated_pending_count" \
+  "$delegated_consumed_ids" \
+  "$delegated_consumed_at" \
+  "$LAST_RESTART_STORM_WINDOW_SECS" \
+  "$LAST_RESTART_STORM_COUNT" \
+  "$LAST_PROCESS_CHURN_PEAK" \
+  "$LAST_RESTART_STORM_SIGNAL_AT" \
+  "$LAST_RESTART_STORM_SIGNAL_REASON" \
+  "$LAST_RESTART_STORM_ESCALATED_AT" \
+  "$LAST_RESTART_STORM_ESCALATION_TARGET" \
+  "$AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV" \
+  "$AUTO_RECOVERY_ORIGIN_TOOL"
+
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/session-state.env"
+
+[[ "${LAST_DELEGATED_CONTINUATION_PENDING_IDS:-}" == "" ]]
+[[ "${LAST_DELEGATED_CONTINUATION_PENDING_COUNT:-}" == "0" ]]
+[[ "${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-}" == "sample-a,sample-b" ]]
+
+echo "[PASS] active delegated continuation prompt clears pending session-state surface"
