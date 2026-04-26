@@ -17,6 +17,11 @@ from datetime import datetime, timedelta, timezone
 print((datetime.now(timezone.utc) + timedelta(seconds=5)).strftime('%Y-%m-%dT%H:%M:%SZ'))
 PY
 )"
+EXPIRED_AT="$(date -u -v-25S '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || python3 - <<'PY'
+from datetime import datetime, timedelta, timezone
+print((datetime.now(timezone.utc) - timedelta(seconds=25)).strftime('%Y-%m-%dT%H:%M:%SZ'))
+PY
+)"
 
 cat >"$PROJECT/.freely/config.env" <<'EOF'
 PROJECT_ROOT=""
@@ -54,13 +59,40 @@ if ! manager_supervisor_post_ai_cycle_finalize_in_flight "$PROJECT" "50559" ""; 
   exit 1
 fi
 
+# L042 within grace: post-cycle processing still in flight → keepalive
 cat >>"$PROJECT/.freely/logs/lifecycle-trace.log" <<EOF
 $FINISHED_AT seq=20106 ph=IN me=A-L042 fr=A-L041 ok=1 checkpoint=L042 stage=ai_cycle_finished supervisor_pid=50559 tool=codex launch_kind=fresh_with_handoff rc=0 child_pid=48791 session_id=sess resume_target=sess jsonl_path=~/.codex/sessions/example.jsonl cycle_log=./.freely/logs/cycle.log exit_reason=execution_network_transient
 EOF
 
-if manager_supervisor_post_ai_cycle_finalize_in_flight "$PROJECT" "50559" ""; then
-  echo "[FAIL] finalize grace should end once L042 is recorded" >&2
+if ! manager_supervisor_post_ai_cycle_finalize_in_flight "$PROJECT" "50559" ""; then
+  echo "[FAIL] post-ai-cycle finalize should keep the supervisor alive within grace after L042" >&2
   exit 1
 fi
 
-echo "[PASS] manager keeps the supervisor alive while the previous ai cycle is still finalizing"
+# L042 outside grace: finalize complete → no keepalive
+cat >"$PROJECT/.freely/logs/lifecycle-trace.log" <<EOF
+$OBSERVED_AT seq=20102 ph=IN me=A-L041 fr=A-L040 ok=1 checkpoint=L041 stage=ai_launch_observed supervisor_pid=50559 tool=codex launch_kind=fresh_with_handoff child_pid=48791 prompt_file=./.freely/run/prompt.txt cycle_log=./.freely/logs/cycle.log
+$EXPIRED_AT seq=20106 ph=IN me=A-L042 fr=A-L041 ok=1 checkpoint=L042 stage=ai_cycle_finished supervisor_pid=50559 tool=codex launch_kind=fresh_with_handoff rc=0 child_pid=48791 session_id=sess resume_target=sess jsonl_path=~/.codex/sessions/example.jsonl cycle_log=./.freely/logs/cycle.log exit_reason=execution_network_transient
+EOF
+
+if manager_supervisor_post_ai_cycle_finalize_in_flight "$PROJECT" "50559" ""; then
+  echo "[FAIL] finalize grace should end when L042 is outside the grace window" >&2
+  exit 1
+fi
+
+# L090/L091/L092 terminate immediately regardless of age
+L092_AT="$(date -u -v+5S '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || python3 -c "
+from datetime import datetime, timedelta, timezone
+print((datetime.now(timezone.utc) + timedelta(seconds=5)).strftime('%Y-%m-%dT%H:%M:%SZ'))
+")"
+cat >"$PROJECT/.freely/logs/lifecycle-trace.log" <<EOF
+$OBSERVED_AT seq=20102 ph=IN me=A-L041 fr=A-L040 ok=1 checkpoint=L041 stage=ai_launch_observed supervisor_pid=50559 tool=codex launch_kind=fresh_with_handoff child_pid=48791 prompt_file=./.freely/run/prompt.txt cycle_log=./.freely/logs/cycle.log
+$L092_AT seq=20108 ph=IN me=A-L092 fr=A-L091 ok=1 checkpoint=L092 stage=supervisor_terminal supervisor_pid=50559 exit_reason=supervisor_stopped
+EOF
+
+if manager_supervisor_post_ai_cycle_finalize_in_flight "$PROJECT" "50559" ""; then
+  echo "[FAIL] finalize grace should end when L090+ terminal checkpoint is recorded" >&2
+  exit 1
+fi
+
+echo "[PASS] manager keeps the supervisor alive within post-ai-cycle finalize grace; L042 within grace extends keepalive, L042 outside grace and L090+ terminate it"
