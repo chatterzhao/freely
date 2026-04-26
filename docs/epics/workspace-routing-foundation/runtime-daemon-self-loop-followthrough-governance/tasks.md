@@ -40,3 +40,4 @@
 - [x] Keep manager supervisors alive during the post-`L041`/pre-`L042` finalize window, so watchdog does not restart a live manager while it is still materializing terminal closeout or delegated followthrough.
 - [x] Clear delegated-continuation pending session state as soon as the current manager prompt has already absorbed that handoff, so consumed continuity stays on the execute-current-followthrough path instead of reappearing as still-pending backlog.
 - [x] Keep manager supervisors alive during resumed-round prompt build after `resume_manager`, so a fresh `L020/L021/L022` startup lifecycle cannot be torn down as idle just because the generic between-rounds grace expires before prompt build completes.
+- [x] Keep manager supervisors alive during the immediate post-`L042` exit-contract/followthrough window, so watchdog does not restart a live manager after `ai_cycle_finished` before the same supervisor writes later terminal or delegated-followthrough truth.

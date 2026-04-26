@@ -852,3 +852,23 @@ All commands passed again in the feature worktree during this worker continuatio
   - `./bin/test-lane premerge-integration -- ./bin/governance-check`
   - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-manager-worker-terminal-followthrough-materialization-r2 --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge`
 - `PENDING`: merge this protected lane lawfully into `develop`, restart the root daemon from merged `develop`, and keep observing whether Freely now continues through select -> finish -> merge upward -> retire -> next task rather than stuttering at manager round boundaries.
+
+## 2026-04-25 19:05 PDT Post-L042 Followthrough Keepalive
+
+- `FAIL`: after the earlier `post-L041/pre-L042` finalize repair and the resumed prompt-build keepalive repair, canonical `develop` replay still exposed one narrower watchdog seam. The live manager supervisor could already record `L042 ai_cycle_finished`, but `ensure-manager` still treated that same supervisor as terminal/idle and emitted `L223 manager_idle_supervisor_restart` before exit-contract replay or delegated-followthrough materialization wrote any later `L090|L091|L092` truth.
+- `PASS`: this stays inside `I-20260421-1200-A`. The architecture remains artifact-driven: manager writes continuity/delegation/exit-contract artifacts, runtime is the middleman that consumes them, and the bug is that watchdog misclassified `L042` as “already done” instead of “same supervisor still finalizing followthrough”.
+- `PASS`: `manager_supervisor_post_ai_cycle_finalize_in_flight()` now treats same-supervisor `L042` as keepalive evidence for `FREELY_MANAGER_POST_AI_CYCLE_FINALIZE_GRACE_SECS` unless a later terminal checkpoint has already been written, so watchdog no longer restarts the live manager in the narrow post-cycle followthrough window.
+- `PASS`: the top-level keepalive regression now feeds `L041 -> L042` into `ensure_manager_once()` directly, so the bounded fix is locked at the real `L042 -> no L223` control-plane seam rather than only at the helper layer.
+- `PASS`: focused feature-local verification passed:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-post-ai-cycle-finalize-grace`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-post-ai-cycle-finalize-grace`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-triggers-cleanup-followthrough`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-overrides-network-transient`
+- `PASS`: protected replay passed on `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-post-l042-followthrough-keepalive-grace` with the same focused regressions:
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-post-ai-cycle-finalize-grace`
+  - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-post-ai-cycle-finalize-grace`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-triggers-cleanup-followthrough`
+  - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-overrides-network-transient`
+- `FAIL`: the first attempt to merge that protected replay into canonical `develop` was rejected by governance because the diff still lacked explicit same-owner issue/progress/review materialization for this continuation.
+- `PASS`: owner-linked verification for this continuation is now explicit in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-post-l042-followthrough-keepalive-verification.md`.
+- `PENDING`: rerun guarded promote with this owner-linked evidence, merge into canonical `develop`, restart root daemon replay, and keep observing whether Freely now advances through select -> finish -> merge upward -> retire -> next task rather than stalling at the post-`L042` boundary.
