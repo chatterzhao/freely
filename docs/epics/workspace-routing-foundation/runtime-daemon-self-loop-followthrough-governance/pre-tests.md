@@ -830,3 +830,27 @@
 - evidence_level: `real_env`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-post-l042-followthrough-keepalive-verification.md`
+
+### Feature-local manager exit-contract repair prompt narrowing is develop-bound adequate
+- id: `feature-local-manager-exit-contract-repair-prompt-narrowing-develop-adequacy`
+- requirement: `Before protected promote, the owner must carry explicit feature-local develop-bound adequacy evidence that manager repair rounds downgraded to fresh_with_handoff on missing resume evidence no longer re-enter broad startup patrol before writing continuity and exit-contract artifacts.`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#39`
+- case_design: `Run the focused manager repair prompt narrowing regression plus the adjacent empty-success, missing-resume-evidence fallback, worker repair prompt, and consumed-continuity resume-focus regressions in the writable owner worktree, then stage the owner-linked verification artifact that explains why this seam belongs to the runtime prompt contract rather than scan choice or role taxonomy.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-prompt-narrowing-verification.md`
+
+### Guarded promote carries manager exit-contract repair prompt narrowing evidence
+- id: `guarded-promote-manager-exit-contract-repair-prompt-narrowing-proof`
+- requirement: `The develop-bound replay includes a fresh staged owner artifact proving a manager exit-contract repair round relaunched as fresh_with_handoff on missing resume evidence receives a bounded continuity-first / exit-contract-second prompt instead of broad startup patrol.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#39`
+- case_design: `Replay the manager exit-contract repair prompt narrowing on the disposable protected lane, rerun the focused manager repair prompt narrowing, empty-success, missing-resume-evidence fallback, worker repair prompt, consumed-continuity resume-focus regressions, and governance gate there, then stage the resulting owner review artifact before guarded promote into develop.`
+- evidence_level: `real_env`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-prompt-narrowing-verification.md`

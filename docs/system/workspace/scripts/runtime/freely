@@ -11652,6 +11652,61 @@ EOF
   esac
 }
 
+manager_exit_contract_repair_prompt_narrowing_active() {
+  local project="$1" rotation_reason
+  [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 1
+  rotation_reason="$(session_handoff_rotation_reason "$project" || true)"
+  [[ "$rotation_reason" == "manager_exit_contract_repair" ]] || return 1
+  [[ "${LAUNCH_KIND_SELECTED:-}" == "fresh_with_handoff" ]] || return 1
+  [[ "${LAUNCH_ROTATION_REASON:-}" == "missing_resume_evidence" ]] || return 1
+}
+
+manager_exit_contract_repair_prompt_expected_continuity_file() {
+  local project="$1" stamp
+  stamp="$(date '+%Y%m%d-%H%M%S')"
+  printf '%s\n' "$(run_dir_for_project "$project")/manager-continuity-${stamp}.md"
+}
+
+build_manager_exit_contract_repair_fresh_with_handoff_prompt() {
+  local project="$1" expected_continuity contract_file handoff_path live_status_cmd scan_json_path latest_continuity
+  expected_continuity="$(manager_exit_contract_repair_prompt_expected_continuity_file "$project")"
+  contract_file="$(manager_exit_contract_file "$project")"
+  handoff_path="$(handoff_file "$project")"
+  live_status_cmd="./bin/freely live-status --project $project"
+  scan_json_path="$(task_source_scan_json_path_for_project "$project")"
+  latest_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
+  [[ -n "$latest_continuity" && -f "$latest_continuity" ]] || latest_continuity="none"
+
+  cat <<EOF
+你当前处于受限修复轮次，不是新的主管首跳巡检。
+
+当前轮次目的：
+- 上一轮 manager 已经 \`rc=0\` 退出，但没有留下合法的 manager exit contract。
+- 这次因为缺少可验证 resume evidence，runtime 改走 \`fresh_with_handoff\`；但你的职责仍然是修复当前 manager lane，而不是重做 broad patrol。
+
+本轮只允许先读这些最小现场：
+- 项目治理入口：\`$project/AGENTS.md\`
+- 当前修复交接：\`$handoff_path\`
+- 当前 runtime 状态入口：\`$live_status_cmd\`
+- 当前结构化 scan：\`$scan_json_path\`
+- 当前最新 manager continuity：\`$latest_continuity\`
+
+硬性收口要求：
+- 先写 manager continuity 文件：\`$expected_continuity\`
+- 再写 manager exit contract 文件：\`$contract_file\`
+- 如果 scan 显示 backlog 非空，而你没有形成新的 manager continuity 或合法 worker delegation，这一轮视为失败。
+- 如果当前没有 launchable worker prompt，就必须用 continuity 把当前 manager-owned restart point / next_action 写清，再写 \`EXIT_KIND=\"resume_manager\"\`。
+- 只有当前 manager lane 已经明确闭合且 scan/source 也证明可以安全停下时，才允许 \`EXIT_KIND=\"stop_ai\"\`。
+
+本轮禁止事项：
+- 不要重做完整 lead-agent 首跳。
+- 不要先展开 \`docs/milestones.md\` 全文、全量 fleet 巡检或多 source broad patrol。
+- 不要把“继续多读一些文档”当作默认下一步；先把 continuity 和 exit contract 落盘。
+
+manager continuity 文件：\`$expected_continuity\`
+EOF
+}
+
 manager_continuity_resume_focus_route_kind() {
   local continuity_file="$1"
   [[ -f "$continuity_file" ]] || return 1
@@ -15407,31 +15462,36 @@ build_prompt() {
   fi
   workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
   prepend_exit_contract_repair_focus_if_needed "$PROJECT_ROOT"
-  AI_TOOL_ADAPTER="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AI_TOOL:-}")}" \
-  AI_TOOL_ADAPTER_POLICY="${AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AI_TOOL:-}")}" \
-  AI_TOOL_CAPABILITIES="${AI_TOOL_CAPABILITIES:-}" \
-  AI_TOOL_POLICY="${AI_TOOL_POLICY:-}" \
-  AI_CAPABILITY_CODEX_MODEL="${AI_CAPABILITY_CODEX_MODEL:-}" \
-  AI_CAPABILITY_CODEX_SANDBOX="${AI_CAPABILITY_CODEX_SANDBOX:-}" \
-  AI_CAPABILITY_CODEX_APPROVAL_POLICY="${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}" \
-  AI_CAPABILITY_CODEX_CWD_MODE="${AI_CAPABILITY_CODEX_CWD_MODE:-}" \
-  bash "$workspace_root/scripts/start-lead-agent.sh" \
-    --project "$PROJECT_ROOT" \
-    --intent "$INTENT_FILE" \
-    --constitution "$CONSTITUTION_FILE" \
-    --ai "${AI_TOOL}:${AI_MODEL:-}:${AI_MODE}" \
-    --workspace-root "$workspace_root" \
-    --reasoning-effort "${AI_REASONING_EFFORT:-}"
-  append_context_warning_if_needed
-  append_checkpoint_governance_if_needed
-  append_checkpoint_intervention_if_needed
-  append_fleet_supervision_if_needed
-  append_human_chat_intake_if_needed
-  append_local_delegated_continuation_if_needed
-  append_task_source_patrol_seed_if_needed
-  append_manager_supervision_alert_if_needed
-  append_manager_hygiene_alert_if_needed
-  append_route_only_recovery_if_needed
+  if manager_exit_contract_repair_prompt_narrowing_active "$PROJECT_ROOT"; then
+    build_manager_exit_contract_repair_fresh_with_handoff_prompt "$PROJECT_ROOT"
+    append_task_source_patrol_seed_if_needed
+  else
+    AI_TOOL_ADAPTER="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "${AI_TOOL:-}")}" \
+    AI_TOOL_ADAPTER_POLICY="${AI_TOOL_ADAPTER_POLICY:-$(tool_default_adapter_policy_for_runtime "${AI_TOOL:-}")}" \
+    AI_TOOL_CAPABILITIES="${AI_TOOL_CAPABILITIES:-}" \
+    AI_TOOL_POLICY="${AI_TOOL_POLICY:-}" \
+    AI_CAPABILITY_CODEX_MODEL="${AI_CAPABILITY_CODEX_MODEL:-}" \
+    AI_CAPABILITY_CODEX_SANDBOX="${AI_CAPABILITY_CODEX_SANDBOX:-}" \
+    AI_CAPABILITY_CODEX_APPROVAL_POLICY="${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}" \
+    AI_CAPABILITY_CODEX_CWD_MODE="${AI_CAPABILITY_CODEX_CWD_MODE:-}" \
+    bash "$workspace_root/scripts/start-lead-agent.sh" \
+      --project "$PROJECT_ROOT" \
+      --intent "$INTENT_FILE" \
+      --constitution "$CONSTITUTION_FILE" \
+      --ai "${AI_TOOL}:${AI_MODEL:-}:${AI_MODE}" \
+      --workspace-root "$workspace_root" \
+      --reasoning-effort "${AI_REASONING_EFFORT:-}"
+    append_context_warning_if_needed
+    append_checkpoint_governance_if_needed
+    append_checkpoint_intervention_if_needed
+    append_fleet_supervision_if_needed
+    append_human_chat_intake_if_needed
+    append_local_delegated_continuation_if_needed
+    append_task_source_patrol_seed_if_needed
+    append_manager_supervision_alert_if_needed
+    append_manager_hygiene_alert_if_needed
+    append_route_only_recovery_if_needed
+  fi
   append_handoff_prompt_if_present "$PROJECT_ROOT"
   append_manager_consumed_continuity_resume_focus_if_needed "$PROJECT_ROOT"
   append_cleanup_governance_retirement_worker_directive_if_needed "$PROJECT_ROOT"
