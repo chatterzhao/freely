@@ -118,6 +118,27 @@ def issue_matches_candidate_identity(
     return False
 
 
+def raw_key(raw_id: str) -> Optional[str]:
+    """Extract the shared key from a raw issue local_id: raw-YYYYMMDD-HHMM -> YYYYMMDD-HHMM"""
+    match = re.match(r"^raw-(.+)$", raw_id)
+    return match.group(1) if match else None
+
+
+def candidate_matches_raw_identity(
+    candidate_id: Optional[str],
+    raw_local_ids: set[str],
+) -> bool:
+    """Check if a promoted candidate has a corresponding raw issue with shared key."""
+    c_key = candidate_key(candidate_id or "")
+    if not c_key:
+        return False
+    for raw_id in raw_local_ids:
+        r_key = raw_key(raw_id)
+        if r_key and c_key.startswith(r_key):
+            return True
+    return False
+
+
 @dataclass
 class CandidateRecord:
     path: str
@@ -834,6 +855,18 @@ def main() -> int:
                 )
 
         if status == "promoted":
+            # Check raw→C key chain: promoted candidates should have a matching raw issue
+            issues_dir = os.path.join(ROOT_DIR, "docs", "issues")
+            raw_ids: set[str] = set()
+            if os.path.isdir(issues_dir):
+                for entry in os.listdir(issues_dir):
+                    raw_dir = os.path.join(issues_dir, entry)
+                    if os.path.isdir(raw_dir) and entry.startswith("raw-"):
+                        raw_ids.add(entry)
+            if raw_ids and not candidate_matches_raw_identity(candidate.candidate_id, raw_ids):
+                # Not a hard error: candidate may come from platform raw issue (no local raw dir)
+                pass  # Future: add warning when raw→C chain is incomplete
+
             issue_path = owner_path
             if not issue_path or issue_path.startswith("pending://"):
                 errors.append(

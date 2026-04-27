@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# issue-migrate-intake: one-time migration from .freely/intake/ to docs/issues/
+# Run once, verify, then delete .freely/intake/
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+PROJECT="${1:-$ROOT_DIR}"
+INTAKE_DIR="$PROJECT/.freely/intake"
+ISSUES_DIR="$PROJECT/docs/issues"
+
+[[ -d "$INTAKE_DIR" ]] || { echo "[migrate] no .freely/intake/ directory to migrate"; exit 0; }
+[[ -d "$ISSUES_DIR" ]] || mkdir -p "$ISSUES_DIR"
+
+migrated=0
+skipped=0
+
+for item_dir in "$INTAKE_DIR"/*/; do
+  [[ -d "$item_dir" ]] || continue
+  intake_id=$(basename "$item_dir")
+  message_file="$item_dir/message.txt"
+  meta_file="$item_dir/meta.env"
+  [[ -f "$message_file" ]] || { skipped=$((skipped + 1)); continue; }
+
+  message=$(head -1 "$message_file" 2>/dev/null || echo "")
+  created=$(date -r "$message_file" -u +"%Y%m%d-%H%M" 2>/dev/null || date -u +"%Y%m%d-%H%M")
+  local_id="raw-$created"
+
+  # Create raw issue directory
+  raw_dir="$ISSUES_DIR/$local_id"
+  [[ -d "$raw_dir" ]] && local_id="raw-${created}-${intake_id:0:4}"
+
+  mkdir -p "$raw_dir"
+
+  # Build issue.md with frontmatter
+  cat > "$raw_dir/issue.md" << ISSUEEOF
+---
+local_id: $local_id
+kind: raw
+status: proposed
+platform_ids: {}
+primary_platform: ""
+canonical_issue_path: ""
+last_synced_comment_at: {}
+hash: ""
+created_at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+updated_at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+session_refs: []
+---
+
+$(cat "$message_file")
+ISSUEEOF
+
+  echo "[migrate] $intake_id -> $local_id"
+  migrated=$((migrated + 1))
+done
+
+echo "[migrate] done: $migrated migrated, $skipped skipped"
+echo "[migrate] verify docs/issues/ contents, then: rm -rf $INTAKE_DIR"
