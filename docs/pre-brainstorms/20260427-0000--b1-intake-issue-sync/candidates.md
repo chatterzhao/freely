@@ -65,33 +65,7 @@
 
 `meta.env` 记录 `last_synced_comment_at`。sync 时取此时间戳后的新 `###` 章节推送到平台。
 
-**ISSUES.md 格式**（每行一个 YAML frontmatter 块）：
-```markdown
----
-local_id: raw-20260427-0001
-kind: raw
-platform_ids:
-  github: {issue_id: "42", synced_at: "..."}
-  gitee: {issue_id: "17", synced_at: "..."}
-primary_platform: github
-canonical_issue_path: ""
-sync_state: synced
-hash: "sha256:abc123..."
-created_at: "2026-04-27T10:00:00Z"
----
 
----
-local_id: I-20260426-0000-A
-kind: linked
-platform_ids:
-  github: {issue_id: "43", synced_at: "..."}
-primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md"
-sync_state: synced
-hash: "sha256:def456..."
-created_at: "2026-04-26T18:00:00Z"
----
-```
 
 ### D2. 平台事件与 CLI
 
