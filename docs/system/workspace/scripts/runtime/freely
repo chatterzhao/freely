@@ -5205,34 +5205,13 @@ status_surface_delegated_pending_ids_for_project() {
 
 write_intake_item() {
   local project="$1" intake_id="$2" author="$3" channel="$4" status="$5" classification="$6" linked_artifact="$7" delegated_worktree="$8" session_refs="$9" message="${10}" reaction="${11:-}" claimed_by="${12:-}" claimed_at="${13:-}" absorption_target="${14:-}" resolution_artifact="${15:-}" created_at_override="${16:-}"
-  local intake_root item_dir meta_file message_file created_at
-  intake_root="$(intake_dir_for_project "$project")"
-  item_dir="$intake_root/$intake_id"
-  meta_file="$item_dir/meta.env"
-  message_file="$item_dir/message.txt"
+  local created_at
   created_at="${created_at_override:-$(current_timestamp_utc_for_machine)}"
-  mkdir -p "$item_dir"
-  cat >"$meta_file" <<EOF
-INTAKE_ID="$intake_id"
-CREATED_AT="$created_at"
-AUTHOR="$author"
-CHANNEL="$channel"
-STATUS="$status"
-CLASSIFICATION="$classification"
-REACTION="$reaction"
-LINKED_ARTIFACT="$linked_artifact"
-DELEGATED_WORKTREE="$delegated_worktree"
-SESSION_REFS="$session_refs"
-CLAIMED_BY="$claimed_by"
-CLAIMED_AT="$claimed_at"
-ABSORPTION_TARGET="$absorption_target"
-RESOLUTION_ARTIFACT="$resolution_artifact"
-EOF
-  printf '%s\n' "$message" >"$message_file"
-  update_intake_pending_signal "$project"
 
-  # Also write to docs/issues/ (new issue-centric model)
+  # Write to docs/issues/ — the only intake storage now.
+  # .freely/intake/ is deprecated. Every chat creates a raw issue or a comment.
   _write_chat_to_issue "$project" "$intake_id" "$author" "$channel" "$message" "$session_refs" "$created_at"
+  update_intake_pending_signal "$project"
 }
 
 # _write_chat_to_issue: write chat message to docs/issues/ as new raw issue or comment
