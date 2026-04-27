@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/115"
     synced_at: "2026-04-27T11:25:15Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md"
+canonical_issue_path: "docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:25:15Z"
 hash: ""

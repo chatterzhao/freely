@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/121"
     synced_at: "2026-04-27T11:25:49Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:25:49Z"
 hash: ""
