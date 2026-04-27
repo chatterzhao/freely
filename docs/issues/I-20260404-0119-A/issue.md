@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "97"
     url: "https://github.com/chatterzhao/freely/issues/97"
     synced_at: "2026-04-27T11:23:27Z"
+
+  gitee:
+    issue_id: "IJFO8A"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8A"
+    synced_at: "2026-04-27T13:16:07Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md"
 last_synced_comment_at:

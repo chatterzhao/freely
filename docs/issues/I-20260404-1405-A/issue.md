@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "100"
     url: "https://github.com/chatterzhao/freely/issues/100"
     synced_at: "2026-04-27T11:23:43Z"
+
+  gitee:
+    issue_id: "IJFO8E"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8E"
+    synced_at: "2026-04-27T13:16:12Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "94"
     url: "https://github.com/chatterzhao/freely/issues/94"
     synced_at: "2026-04-27T11:23:09Z"
+
+  gitee:
+    issue_id: "IJFO84"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO84"
+    synced_at: "2026-04-27T13:16:03Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md"
 last_synced_comment_at:

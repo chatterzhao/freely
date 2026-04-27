@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "99"
     url: "https://github.com/chatterzhao/freely/issues/99"
     synced_at: "2026-04-27T11:23:39Z"
+
+  gitee:
+    issue_id: "IJFO8C"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8C"
+    synced_at: "2026-04-27T13:16:10Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md"
 last_synced_comment_at:

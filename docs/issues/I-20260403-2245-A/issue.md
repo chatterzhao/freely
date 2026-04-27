@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "96"
     url: "https://github.com/chatterzhao/freely/issues/96"
     synced_at: "2026-04-27T11:23:21Z"
+
+  gitee:
+    issue_id: "IJFO87"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO87"
+    synced_at: "2026-04-27T13:16:06Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md"
 last_synced_comment_at:

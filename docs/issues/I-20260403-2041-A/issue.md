@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "95"
     url: "https://github.com/chatterzhao/freely/issues/95"
     synced_at: "2026-04-27T11:23:15Z"
+
+  gitee:
+    issue_id: "IJFO85"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO85"
+    synced_at: "2026-04-27T13:16:04Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "98"
     url: "https://github.com/chatterzhao/freely/issues/98"
     synced_at: "2026-04-27T11:23:32Z"
+
+  gitee:
+    issue_id: "IJFO8B"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8B"
+    synced_at: "2026-04-27T13:16:08Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md"
 last_synced_comment_at:
