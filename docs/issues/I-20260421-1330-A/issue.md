@@ -1,0 +1,26 @@
+---
+local_id: I-20260421-1330-A
+kind: linked
+status: completed
+platform_ids:
+  github:
+    issue_id: "161"
+    url: "https://github.com/chatterzhao/freely/issues/161"
+    synced_at: "2026-04-27T11:28:45Z"
+primary_platform: github
+canonical_issue_path: "docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md"
+last_synced_comment_at:
+  github: "2026-04-27T11:28:45Z"
+hash: ""
+created_at: "2026-04-27T11:28:45Z"
+updated_at: "2026-04-27T11:28:45Z"
+---
+
+The previous runtime repairs already blocked automatic relaunch of merged worker lanes. The remaining failure was subtler: manager patrol still looked at absorbed merged lanes and treated them like current execution capacity.
+
+Two bounded surfaces caused that drift:
+
+1. `wt-fleet-status` preserved `LAST_ROLE_HINT=worker` even when the branch tip was already absorbed into `develop`.
+2. `task-source-scan` kept routing linked progress items back to `verification` because it did not consult the link
+
+canonical: docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md

@@ -1,0 +1,23 @@
+---
+local_id: I-20260419-0915-A
+kind: linked
+status: completed
+platform_ids:
+  github:
+    issue_id: "155"
+    url: "https://github.com/chatterzhao/freely/issues/155"
+    synced_at: "2026-04-27T11:28:15Z"
+primary_platform: github
+canonical_issue_path: "docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md"
+last_synced_comment_at:
+  github: "2026-04-27T11:28:15Z"
+hash: ""
+created_at: "2026-04-27T11:28:15Z"
+updated_at: "2026-04-27T11:28:15Z"
+---
+
+The whole-app lifecycle model is important enough that Freely should maintain exactly one detailed truth source for it. The active docs refactor already pushes the detailed semantics into `docs/system/workspace/three-loop-capability-lifecycle.md` and reduces other consumer documents to lighter references plus read/sync expectations.
+
+Because the earlier three-loop architecture owner is already `completed`, this governance-only closeout still needs its own lawful owner chain before `develop` can 
+
+canonical: docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md
