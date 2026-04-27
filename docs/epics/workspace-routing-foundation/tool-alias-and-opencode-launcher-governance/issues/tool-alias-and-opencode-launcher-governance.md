@@ -57,3 +57,7 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 - absorbed_at: `2026-04-27`
 - reason: `B1 pre-brainstorm design for unifying chat/intake into issue-centric model. 161 milestone issues synced to GitHub and Gitee. Platform adapter, storage layer, sync scripts implemented.`
 - scope: `brainstorms (26 sections), candidates (7 decisions), TASKS (30 items), ibm-framework.md update, docs/issues/ storage, bin/issue-* scripts, gitee-issue.py fix, platform-adapter.py`
+
+### Bug fix: tool_extra_args unbound variable
+- fixed_at: `2026-04-27`
+- reason: `tool_extra_args[@] under set -u caused unbound variable error when AI_TOOL_EXTRA_ARGS was not set. Fixed with :- default operator.`
