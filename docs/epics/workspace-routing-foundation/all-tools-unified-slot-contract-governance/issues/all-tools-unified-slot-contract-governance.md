@@ -52,3 +52,30 @@ Ordered cross-tool fallback v1 is already in place, but Freely still lacks the f
 7. Focused regressions prove non-Codex same-tool slot rotation, earliest `tool + slot` waiting truth, and preserved left-to-right fallback order.
 8. Live validation proves: current tool `kiro-cli` unavailable, current Codex slot dead, manager still reaches a later usable Codex slot before launch.
 
+## Completion
+
+- `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`
+- `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md`
+- `docs/milestones.md`
+- `docs/system/workspace/tools.md`
+- `docs/system/workspace/scripts/runtime/ai-cli`
+- `docs/system/workspace/scripts/runtime/freely`
+- `docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
+- `docs/system/workspace/scripts/tests/test-ai-cli-login-creates-incremented-slot`
+- `docs/system/workspace/scripts/tests/test-ai-cli-generic-tool-login-creates-slot-container`
+- `docs/system/workspace/scripts/tests/test-ai-cli-generic-tool-switch-persists-current-slot`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-entry-blocked-cross-tool-fallback`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-reset`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-cross-tool-restarts-from-leftmost-priority`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-non-codex-slot-first-then-cross-tool`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-tool-slot`
+- `docs/system/workspace/scripts/tests/test-freely-ensure-manager-single-slot-failure-falls-through-to-cross-tool`
+- `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`
+- live validation on `develop`
+
+## Next
+
+- `2026-04-01 09:55 PDT` canonical develop validation and merge absorption are complete; this owner is closed.
+- Future work may deepen per-tool probe/reset parity, but the shared slot contract and scheduler semantics should not be reopened here.
