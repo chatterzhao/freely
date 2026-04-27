@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "119"
     url: "https://github.com/chatterzhao/freely/issues/119"
     synced_at: "2026-04-27T11:25:38Z"
+
+  gitee:
+    issue_id: "IJFO91"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO91"
+    synced_at: "2026-04-27T13:16:40Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md"
 last_synced_comment_at:

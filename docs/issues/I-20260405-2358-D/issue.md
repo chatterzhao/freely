@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "117"
     url: "https://github.com/chatterzhao/freely/issues/117"
     synced_at: "2026-04-27T11:25:29Z"
+
+  gitee:
+    issue_id: "IJFO8Y"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8Y"
+    synced_at: "2026-04-27T13:16:38Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md"
 last_synced_comment_at:

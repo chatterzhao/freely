@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "121"
     url: "https://github.com/chatterzhao/freely/issues/121"
     synced_at: "2026-04-27T11:25:49Z"
+
+  gitee:
+    issue_id: "IJFO94"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO94"
+    synced_at: "2026-04-27T13:16:43Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md"
 last_synced_comment_at:

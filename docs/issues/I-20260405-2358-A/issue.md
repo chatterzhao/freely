@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "115"
     url: "https://github.com/chatterzhao/freely/issues/115"
     synced_at: "2026-04-27T11:25:15Z"
+
+  gitee:
+    issue_id: "IJFO8W"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8W"
+    synced_at: "2026-04-27T13:16:35Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md"
 last_synced_comment_at:

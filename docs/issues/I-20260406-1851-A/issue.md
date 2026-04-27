@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "122"
     url: "https://github.com/chatterzhao/freely/issues/122"
     synced_at: "2026-04-27T11:25:53Z"
+
+  gitee:
+    issue_id: "IJFO95"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO95"
+    synced_at: "2026-04-27T13:16:44Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md"
 last_synced_comment_at:

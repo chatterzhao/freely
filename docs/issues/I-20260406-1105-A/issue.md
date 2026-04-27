@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "120"
     url: "https://github.com/chatterzhao/freely/issues/120"
     synced_at: "2026-04-27T11:25:43Z"
+
+  gitee:
+    issue_id: "IJFO92"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO92"
+    synced_at: "2026-04-27T13:16:42Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "113"
     url: "https://github.com/chatterzhao/freely/issues/113"
     synced_at: "2026-04-27T11:25:05Z"
+
+  gitee:
+    issue_id: "IJFO8T"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8T"
+    synced_at: "2026-04-27T13:16:32Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md"
 last_synced_comment_at:

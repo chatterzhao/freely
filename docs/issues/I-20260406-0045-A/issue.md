@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "118"
     url: "https://github.com/chatterzhao/freely/issues/118"
     synced_at: "2026-04-27T11:25:33Z"
+
+  gitee:
+    issue_id: "IJFO90"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO90"
+    synced_at: "2026-04-27T13:16:39Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md"
 last_synced_comment_at:

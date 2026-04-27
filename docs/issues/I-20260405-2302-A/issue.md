@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "114"
     url: "https://github.com/chatterzhao/freely/issues/114"
     synced_at: "2026-04-27T11:25:11Z"
+
+  gitee:
+    issue_id: "IJFO8U"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8U"
+    synced_at: "2026-04-27T13:16:33Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md"
 last_synced_comment_at:
