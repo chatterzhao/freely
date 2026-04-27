@@ -199,14 +199,15 @@
 - case_design: `Verify message with raw-xxx reference appends comment. Message without reference creates new raw issue.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-chat-routing-integration.md`
 
+
 ### PT-14
-- id: 
-- requirement: 
-- evidence_level: 
-- status: 
-- surface_kind: 
-- target_lane: 
-- promotion_gate: 
-- task_refs: 
-- case_design: 
-- artifact_ref: 
+- id: `PT-14`
+- requirement: `chat requires --issue or --new-issue for explicit intent`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-14`
+- case_design: `Verify chat without flags errors. Verify --issue appends comment. Verify --new-issue creates raw issue.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-chat-explicit-flags.md`
