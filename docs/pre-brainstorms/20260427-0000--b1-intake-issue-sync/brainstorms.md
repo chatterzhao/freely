@@ -499,3 +499,31 @@ I-20260427-1030-A       key = "20260427-1030-A"    ← 以 C key 开头
 之后该评论在本地和平台之间有了双向映射。后续更新、删除等操作通过 platform comment_id 定位。
 
 **本地 ID 的作用**：chat 执行后立即生成，不阻塞等网络。本地引用（如 urgent signal、session_refs）用 local_id。平台 ID 是异步补充的——即使 sync 失败，本地 ID 仍然有效。
+
+### 23. 多平台元数据
+
+每个 issue 和每条评论都需要记录各平台的同步状态，不依赖单一平台。
+
+**issue 级别**：
+```yaml
+platform_ids:
+  github: {issue_id: "42", synced_at: "..."}
+  gitee: {issue_id: "17", synced_at: "..."}
+primary_platform: github
+last_synced_comment_at:
+  github: "2026-04-27T10:25:00Z"
+  gitee: "2026-04-27T10:20:00Z"
+```
+
+**评论级别**（`###` 标题下的元数据行）：
+```
+{source: chat, platform_ids: {github: {comment_id: "12345"}, gitee: {comment_id: "67890"}}}
+```
+
+- source 标记评论来源（chat / github / gitee / worker）
+- platform_ids 标记各平台上的 comment_id
+- 未同步的平台不出现该平台的 key
+
+**sync 行为**：
+- push：遍历 `## Comments` 下的所有 `###`，对每个平台，找没有该平台 `comment_id` 的评论，推送。推送后写回 `comment_id`，更新 `last_synced_comment_at`
+- pull：从各平台拉取 `last_synced_comment_at` 之后的新评论，追加到 `## Comments`，写回 `last_synced_comment_at`

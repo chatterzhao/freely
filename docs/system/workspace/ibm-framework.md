@@ -200,10 +200,18 @@ issue 正文内容。
 {source: chat, platform_ids: {github: {comment_id: "12345"}, gitee: {comment_id: "67890"}}}
 
 评论内容。
+
+### comment-20260427T110000Z
+{source: github}
+
+从平台拉取的评论（已有 github comment_id 在 platform_ids 中）。
+
 ```
 
 - 所有元数据在 YAML frontmatter 中（参考 issueme `data-model.md`）
-- `last_synced_comment_at`：sync 脚本只推送此时间戳后的新评论到平台
+- `platform_ids`：issue 级别记录每个平台的 issue_id 和同步时间。评论级别记录每个平台的 comment_id
+- `last_synced_comment_at`：**按平台分别记录**。sync 时比较各平台的时间戳，只推送增量
+- `primary_platform`：主平台标记。push 优先 push 主平台，pull 优先从主平台拉取
 - 每条评论的标题为 `### comment-{local_id}`。local_id 在创建时立即生成（`comment-YYYYMMDDTHHMMSSZ`），不依赖平台返回
 - `platform_ids` 记录平台上的 comment_id。sync 后异步写回，未同步时字段为空
 - 本地引用永远用 local_id，不依赖平台 ID 的存在
