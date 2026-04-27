@@ -54,7 +54,6 @@
 - requirement: `opencode launches via direct adapter in auto mode`
 - evidence_level: `integration`
 - status: `pass`
-- surface_kind: `cli`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-1`
@@ -66,7 +65,6 @@
 - requirement: `opencode session ID extracted from --print-logs output`
 - evidence_level: `integration`
 - status: `pass`
-- surface_kind: `cli`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-2`
@@ -78,7 +76,6 @@
 - requirement: `AI_TOOL=ccds alias resolves to claude binary via zsh -ic`
 - evidence_level: `integration`
 - status: `pass`
-- surface_kind: `cli`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-3`
@@ -90,7 +87,6 @@
 - requirement: `AI_TOOL_EXTRA_ARGS injected into tool launch command`
 - evidence_level: `integration`
 - status: `pass`
-- surface_kind: `cli`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-4`

@@ -1,6 +1,6 @@
 # Issue: tool-alias-and-opencode-launcher-governance
 
-- issue_id: `I-20260426-0001-A`
+- issue_id: `I-20260426-0000-A`
 - title: Add opencode direct launcher and AI_TOOL alias resolution
 - phase_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`

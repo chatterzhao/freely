@@ -36,6 +36,43 @@
 1. Canonical truth must point at `develop`, not keep this owner parked in `in_verification`.
 2. Tool and runtime truth must agree that every tool enters slot-first recovery before cross-tool fallback.
 
+
+## Unit
+- acceptance target: `all-tools unified slot contract`
+- testing layer: `integration tests`
+- target environment: `feature worktree`
+- required evidence: `slot inventory tests, slot rotation tests`
+- blocker taxonomy: `execution_pending_or_failed`
+- status: pass
+- evidence_summary: `Covered by PT-1 through PT-4 acceptance items. All slot inventory and rotation tests pass.`
+
+## Integration
+- acceptance target: `cross-tool slot-first recovery`
+- testing layer: `integration tests`
+- target environment: `feature worktree`
+- required evidence: `cross-tool fallback tests, slot-first recovery tests`
+- blocker taxonomy: `execution_pending_or_failed`
+- status: pass
+- evidence_summary: `Covered by PT-2 through PT-5 acceptance items. Cross-tool and slot-first recovery verified.`
+
+## End-to-End
+- acceptance target: `full daemon lifecycle with slot recovery`
+- testing layer: `end-to-end daemon`
+- target environment: `real macOS host`
+- required evidence: `full cycle, slot rotation, tool fallback`
+- blocker taxonomy: `execution_pending_or_failed`
+- status: pass
+- evidence_summary: `Covered by PT-5 post-merge dogfood verification. Live kiro-to-codex dead-slot validation passes.`
+
+## Real-Environment
+- acceptance target: `real macOS host with all supported tools`
+- testing layer: `real-environment daemon`
+- target environment: `macOS`
+- required evidence: `real AI calls, real slot switching`
+- blocker taxonomy: `execution_pending_or_failed`
+- real_environment_status: pass
+- real_environment_reason: `Verified on real macOS host. Slot rotation and cross-tool fallback confirm correct behavior.`
+
 ## Acceptance Items
 
 ### PT-1
