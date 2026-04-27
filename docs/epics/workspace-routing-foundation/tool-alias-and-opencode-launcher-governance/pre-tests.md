@@ -198,3 +198,15 @@
 - task_refs: `tasks.md#T-13`
 - case_design: `Verify message with raw-xxx reference appends comment. Message without reference creates new raw issue.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-chat-routing-integration.md`
+
+### PT-14
+- id: 
+- requirement: 
+- evidence_level: 
+- status: 
+- surface_kind: 
+- target_lane: 
+- promotion_gate: 
+- task_refs: 
+- case_design: 
+- artifact_ref: 
