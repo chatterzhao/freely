@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "30"
     url: "https://github.com/chatterzhao/freely/issues/30"
     synced_at: "2026-04-27T11:14:43Z"
+
+  gitee:
+    issue_id: "IJFO5Q"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5Q"
+    synced_at: "2026-04-27T13:14:22Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md"
 last_synced_comment_at:

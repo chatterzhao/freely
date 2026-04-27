@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "32"
     url: "https://github.com/chatterzhao/freely/issues/32"
     synced_at: "2026-04-27T11:14:53Z"
+
+  gitee:
+    issue_id: "IJFO5S"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5S"
+    synced_at: "2026-04-27T13:14:25Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md"
 last_synced_comment_at:

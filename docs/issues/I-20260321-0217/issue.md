@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "31"
     url: "https://github.com/chatterzhao/freely/issues/31"
     synced_at: "2026-04-27T11:14:48Z"
+
+  gitee:
+    issue_id: "IJFO5R"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5R"
+    synced_at: "2026-04-27T13:14:24Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md"
 last_synced_comment_at:

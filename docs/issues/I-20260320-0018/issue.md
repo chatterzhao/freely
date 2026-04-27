@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "25"
     url: "https://github.com/chatterzhao/freely/issues/25"
     synced_at: "2026-04-27T11:14:16Z"
+
+  gitee:
+    issue_id: "IJFO5K"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5K"
+    synced_at: "2026-04-27T13:14:14Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md"
 last_synced_comment_at:

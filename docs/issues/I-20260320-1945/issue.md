@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "29"
     url: "https://github.com/chatterzhao/freely/issues/29"
     synced_at: "2026-04-27T11:14:37Z"
+
+  gitee:
+    issue_id: "IJFO5P"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5P"
+    synced_at: "2026-04-27T13:14:21Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md"
 last_synced_comment_at:

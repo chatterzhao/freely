@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "24"
     url: "https://github.com/chatterzhao/freely/issues/24"
     synced_at: "2026-04-27T11:14:12Z"
+
+  gitee:
+    issue_id: "IJFO5I"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5I"
+    synced_at: "2026-04-27T13:14:09Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md"
 last_synced_comment_at:
