@@ -21,11 +21,8 @@ B1_IBM 的 Input 有两个入口：
 .freely/issues/
 ├── ISSUES.md                # 索引：所有已知 issue 的映射表
 ├── {issue-local-id}/
-│   ├── meta.env             # 平台 ID、状态、关联 milestone issue
-│   ├── issue.md             # 本地 issue 内容
-│   └── comments/
-│       ├── {timestamp}.md   # 每条评论一个文件
-│       └── ...
+│   ├── meta.env             # 平台 ID、状态、last_synced_comment_at
+│   └── issue.md             # 正文 + ## Comments 章节（评论追加在此）
 ```
 
 `ISSUES.md` 索引记录：

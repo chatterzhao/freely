@@ -40,38 +40,32 @@
 ```
 .freely/issues/
 ├── ISSUES.md                          # 索引：所有 issue 的映射表
-│                                       # 每行一个 issue 的摘要 frontmatter
 ├── raw-{YYYYMMDD}-{NNNN}/             # raw issue（B1 输入）
-│   ├── meta.env                       # 本地 ID、平台 ID、状态、关联
-│   ├── issue.md                       # issue 正文（从平台下载或 chat 创建）
-│   └── comments/                      # 该 issue 的评论
-│       └── {timestamp}.md             # 每条评论一个文件
+│   ├── meta.env                       # 平台 ID、状态、last_synced_comment_at
+│   └── issue.md                       # 正文 + ## Comments 章节（评论追加在此）
 └── I-{YYYYMMDD}-{NNNN}-{split}/       # linked issue（B2 产出）
-    ├── meta.env                       # 本地 ID、平台 ID、canonical 路径
-    ├── issue.md                       # 正式 issue 摘要（sync 时推送到平台 body）
-    └── comments/                      # 该 issue 的评论
-        └── {timestamp}.md
+    ├── meta.env                       # 平台 ID、canonical 路径、last_synced_comment_at
+    └── issue.md                       # 摘要 + ## Comments 章节
 ```
 
-**为什么 comments 嵌套在 issue 目录下？** 每条评论只属于一个 issue。交叉引用通过评论正文中的链接实现，不需要多处存储。sync 时按 issue 粒度推送该 issue 下的所有未同步评论。
+**为什么评论在 issue.md 内而非独立文件？** 一个 issue = 一个文档。评论是 issue 的时间线，追加在 `## Comments` 章节下最自然。sync 时比较 `last_synced_comment_at` 和最新评论时间戳，只推送增量。
 
-**comment 文件格式**：
+**评论在 issue.md 中的格式**（`## Comments` 章节下的 `###` 条目）：
 ```markdown
----
-id: comment-20260427-0001
-author: human
-source: chat                    # chat | github | gitee | worker
-platform_ids:
-  github:
-    comment_id: "12345"
-    synced_at: "2026-04-27T10:30:00Z"
-created_at: "2026-04-27T10:25:00Z"
-session_refs:
-  - {tool: ccds, session_id: "xxx", role: "author"}
----
+## Comments
+
+### 2026-04-27T10:25:00Z - human (chat)
+{source: chat, session_refs: [{tool: ccds, session_id: "xxx", role: "author"}]}
 
 评论正文内容。
+
+### 2026-04-27T11:00:00Z - github
+{platform_ids: {github: {comment_id: "12345"}}}
+
+从平台同步的评论。
 ```
+
+`meta.env` 记录 `last_synced_comment_at`。sync 时取此时间戳后的新 `###` 章节推送到平台。
 
 **ISSUES.md 格式**（每行一个 YAML frontmatter 块）：
 ```markdown

@@ -127,15 +127,11 @@ IBM Framework 的 I（Input source）统一为 github/gitee issue。平台 issue
 .freely/issues/
 ├── ISSUES.md                          # 所有 issue 的映射索引
 ├── raw-{YYYYMMDD}-{NNNN}/             # raw issue：B1_IBM 的 Input
-│   ├── meta.env                       # 平台 ID、状态、canonical 关联
-│   ├── issue.md                       # issue 正文
-│   └── comments/                      # 该 issue 的评论
-│       └── {timestamp}.md
+│   ├── meta.env                       # 平台 ID、状态、last_synced_comment_at
+│   └── issue.md                       # issue 正文 + ## Comments 章节
 └── I-{YYYYMMDD}-{NNNN}-{split}/       # linked issue：B2_IBM 的产物
-    ├── meta.env                       # 平台 ID、canonical 路径
-    ├── issue.md                       # 正式 issue 摘要
-    └── comments/                      # 该 issue 的评论
-        └── {timestamp}.md
+    ├── meta.env                       # 平台 ID、canonical 路径、last_synced_comment_at
+    └── issue.md                       # 正式 issue 摘要 + ## Comments 章节
 ```
 
 ### 平台隔离
@@ -175,3 +171,34 @@ IBM Framework 的 I（Input source）统一为 github/gitee issue。平台 issue
 | 正式 issue | issue | B2_IBM 的 I，milestone committed_issues 中的 I-{key} |
 
 在 prompt、文档、代码中引用：使用 "按 IBM Framework B1_IBM/B2_IBM" 或 `@ibm-framework`。
+
+**issue.md 格式**：
+
+```markdown
+---
+local_id: raw-20260427-0001
+kind: raw
+platform_ids:
+  github: {issue_id: "42", synced_at: "..."}
+primary_platform: github
+created_at: "2026-04-27T10:00:00Z"
+---
+
+# Issue Title
+
+issue 正文内容。
+
+## Comments
+
+### 2026-04-27T10:25:00Z - human (chat)
+{source: chat, session_refs: [...]}
+
+评论内容。
+
+### 2026-04-27T11:00:00Z - github
+{platform_ids: {github: {comment_id: "12345"}}}
+
+从平台同步的评论。
+```
+
+每条评论是一个 `###` 章节。`meta.env` 中的 `last_synced_comment_at` 记录上次同步时间，sync 脚本只推送此时间戳后的新评论到平台。
