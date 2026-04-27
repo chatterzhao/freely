@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "90"
     url: "https://github.com/chatterzhao/freely/issues/90"
     synced_at: "2026-04-27T11:22:47Z"
+
+  gitee:
+    issue_id: "IJFO7X"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7X"
+    synced_at: "2026-04-27T13:15:53Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/issues/canonical-product-posture-bootstrap-reconciliation-governance.md"
 last_synced_comment_at:

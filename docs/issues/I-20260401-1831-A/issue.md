@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "84"
     url: "https://github.com/chatterzhao/freely/issues/84"
     synced_at: "2026-04-27T11:22:13Z"
+
+  gitee:
+    issue_id: "IJFO7Q"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7Q"
+    synced_at: "2026-04-27T13:15:43Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md"
 last_synced_comment_at:

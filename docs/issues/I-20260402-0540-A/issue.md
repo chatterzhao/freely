@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "92"
     url: "https://github.com/chatterzhao/freely/issues/92"
     synced_at: "2026-04-27T11:23:00Z"
+
+  gitee:
+    issue_id: "IJFO80"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO80"
+    synced_at: "2026-04-27T13:16:00Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md"
 last_synced_comment_at:

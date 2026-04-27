@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "86"
     url: "https://github.com/chatterzhao/freely/issues/86"
     synced_at: "2026-04-27T11:22:24Z"
+
+  gitee:
+    issue_id: "IJFO7S"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7S"
+    synced_at: "2026-04-27T13:15:46Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/freely-product-architecture/cc-acp-init-autonomy-consent-test-followthrough-governance/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md"
 last_synced_comment_at:

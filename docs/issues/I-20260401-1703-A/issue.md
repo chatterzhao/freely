@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "83"
     url: "https://github.com/chatterzhao/freely/issues/83"
     synced_at: "2026-04-27T11:22:08Z"
+
+  gitee:
+    issue_id: "IJFO7O"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7O"
+    synced_at: "2026-04-27T13:15:42Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md"
 last_synced_comment_at:

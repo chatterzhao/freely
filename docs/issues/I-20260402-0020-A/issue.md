@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "88"
     url: "https://github.com/chatterzhao/freely/issues/88"
     synced_at: "2026-04-27T11:22:35Z"
+
+  gitee:
+    issue_id: "IJFO7V"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7V"
+    synced_at: "2026-04-27T13:15:49Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md"
 last_synced_comment_at:
