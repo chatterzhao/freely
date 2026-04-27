@@ -212,10 +212,10 @@ parse_ai_spec_or_fail() {
   }
 
   case "$tool" in
-    codex|kiro-cli|iflow|cc|claude|cc-use-codex-cli|opencode|test-sleep|test-compact|test-once|test-session|test-route-only) ;;
+    codex|kiro-cli|iflow|cc|claude|cc-use-codex-cli|opencode|cc-ds-auto|test-sleep|test-compact|test-once|test-session|test-route-only) ;;
     *)
-      echo "[ERROR] unsupported tool: $tool" >&2
-      exit 1
+      # Unknown tool may be an alias resolved by tool-launchers.sh
+      echo "[WARN] tool '$tool' not in known list, passing through for alias resolution" >&2
       ;;
   esac
 

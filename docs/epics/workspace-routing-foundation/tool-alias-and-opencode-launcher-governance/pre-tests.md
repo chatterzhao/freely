@@ -283,3 +283,15 @@
 - task_refs: `tasks.md#T-21`
 - case_design: `Verify ensure_interruption_dispatch_once scans docs/issues/raw-* for unprocessed issues.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-b2-handler-bridge.md`
+
+### PT-22
+- id: `PT-22`
+- requirement: `unknown tools pass start-lead-agent.sh validation for alias resolution`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-22`
+- case_design: `Verify cc-ds-auto passes tool validation.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-alias-validation.md`
