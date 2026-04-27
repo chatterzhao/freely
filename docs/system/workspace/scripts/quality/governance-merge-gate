@@ -864,8 +864,13 @@ def main() -> int:
                     if os.path.isdir(raw_dir) and entry.startswith("raw-"):
                         raw_ids.add(entry)
             if raw_ids and not candidate_matches_raw_identity(candidate.candidate_id, raw_ids):
-                # Not a hard error: candidate may come from platform raw issue (no local raw dir)
-                pass  # Future: add warning when raw→C chain is incomplete
+                # Promoted candidate must trace back to a raw-* issue (B1 input source)
+                c_key_val = candidate_key(candidate.candidate_id) or candidate.candidate_id
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is promoted but has no matching raw-* issue in docs/issues/. "
+                    f"Every promoted candidate must share its date-time key with a raw issue (raw-{c_key_val.split('-')[0] if '-' in str(c_key_val) else c_key_val} → {candidate.candidate_id}). "
+                    f"Create docs/issues/raw-{{key}}/issue.md for this candidate, or if the candidate came from a platform issue, ensure scan creates the raw-* entry."
+                )
 
             issue_path = owner_path
             if not issue_path or issue_path.startswith("pending://"):
