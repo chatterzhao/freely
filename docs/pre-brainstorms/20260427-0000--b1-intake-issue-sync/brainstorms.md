@@ -31,7 +31,7 @@ B1_IBM 的 Input 有两个入口：
 `ISSUES.md` 索引记录：
 - `local_id`：本地唯一 ID
 - `platform_ids`：`github:<owner>/<repo>#<num>, gitee:<owner>/<repo>#<num>`
-- `kind`：`raw`（原始 issue，B1 输入）/ `linked`（里程碑 issue，B2 产出）/ `inbox`（未归类插话）
+- `kind`：`raw`（原始 issue，B1 输入）/ `linked`（里程碑 issue，B2 产出）
 - `canonical_issue_path`：B2 产物的 issue 路径（linked 类型）
 - `sync_state`：每个平台的同步状态
 
@@ -49,7 +49,7 @@ freely chat "xxx"
     ├── 如何判断"命中已有 issue"？
     │   ├── 用户在消息中显式引用 issue（#123、issue-abc）
     │   ├── AI 判断消息内容与已有 issue 相关
-    │   └── 默认：写入 inbox issue，后续 AI 归类
+    │   └── 默认：创建新的 raw issue，标记 needs_research
     │
     └── 紧急？
         ├── 消息命中的 issue 正在 dev-loop 中 → 标记 urgent，触发通知
@@ -124,10 +124,10 @@ freely chat --message-file <path>  # 文件插话
 
 变更后：
 ```
-freely chat <message>                           # 默认写入 inbox issue
-freely chat --issue <id> <message>              # 指定 issue
-freely chat --issue <id> --urgent <message>     # 紧急插话
-freely chat --new-issue <message>               # 显式创建新 issue
+freely chat <message>                           # 默认创建新 raw issue
+freely chat --issue <id> <message>              # 指定已有 issue 的评论
+freely chat --issue <id> --urgent <message>     # 紧急评论
+freely chat --comment <id> <message>            # 等价于 --issue
 ```
 
 ### 9. 现有 intake 子系统（`freely intake chat/claim/resolve/status`）
@@ -161,7 +161,7 @@ intake 的 claim/resolve 生命周期本质上是"issue 评论的处理状态"�
 
 ## 未解决问题
 
-1. **inbox issue 何时由谁归类？** AI 定期扫描 inbox，将消息分配到正确的 issue。频率是多少？
+1. **new raw issue 何时由谁创建？** 如果 chat 消息不显式指定 issue，默认创建 raw issue（标记 needs_research）。这会导致大量低质量 raw issue 吗？是否需要最小内容长度阈值？
 2. **issue local_id 用什么格式？** UUID？递增数字？`raw-YYYYMMDD-NNNN`？
 3. **现有的 `.freely/intake/` 目录是否废弃还是迁移？**
 4. **sync 脚本是 daemon 自动跑还是手动触发？**

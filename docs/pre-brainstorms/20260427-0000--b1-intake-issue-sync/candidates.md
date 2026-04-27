@@ -174,8 +174,8 @@ bin/issue-sync status <local-id>        # 查看同步状态
 **`freely chat` 新行为**：
 ```
 freely chat "xxx"
-    → 判断消息属于哪个 issue（显式引用 or 默认 inbox）
-    → 写入 .freely/issues/comments/{comment-id}.md
+    → 判断消息属于哪个 issue（显式引用 or 新建 raw issue）
+    → 写入 .freely/issues/comments/{comment-id}.md 或创建 raw-* 目录
     → bin/issue-sync comment <issue-id> <comment-id>（异步，不阻塞）
 ```
 
@@ -191,23 +191,3 @@ target_phase: in_dev  # 当前 issue 正在 dev-loop 中
 
 如果 `belongs_to` 的 issue 当前不在 dev-loop 中，`--urgent` 无效（AI 不中断），评论正常等待 scan。
 
-### D7. 关于 inbox
-
-inbox 不是永久状态。它是一个**临时缓冲区**，存放无法立即归类到已有 issue 的 chat 消息。
-
-**inbox 处理流程**：
-1. `freely chat "xxx"` → 无法匹配已有 issue → 写入 `inbox/{ts}-{id}.md`
-2. supervisor patrol 或 AI 空闲时 → 扫描 inbox → 判断每条消息归属
-3. 归属判断：创建新 raw issue OR 作为已有 issue 的评论
-4. 处理完成后从 inbox 删除（或标记 `classified: true`）
-5. inbox 超过 N 条 → supervisor 触发优先处理
-
-**inbox 不需要 `issue-sync`**：inbox 内容不上平台。只有当消息被归类到具体 issue 后，才通过正常 sync 流程推送。
-
-## 未决
-
-1. **issue local_id 格式**：`raw-YYYYMMDD-NNNN` vs `raw-YYYYMMDD-HHMM` vs UUID？建议用日期前缀，可读且可排序，递增数字由脚本自动分配。
-2. **comment 粒度**：一条 chat 消息 = 一个 comment 文件。但如果 chat 内容很长（multi-paragraph），是否拆分为多个 comment？建议不拆——完整性优先，一个 chat = 一个 comment。
-3. **sync 失败重试策略**：退避算法？最大重试次数？死信队列？
-4. **多平台 comment ID 映射**：github 的 comment ID 是全局递增整数，gitee 也是。映射存储在 comment frontmatter 的 `platform_ids` 中。
-5. **raw issue 何时被 promote 的检测**：需要 scan 脚本或 hook 能检测到 "raw issue 已经被 B1 处理完毕，candidate 已 promoted" 这个状态。当前 scan 用 `linked_open_issue` 检测已关联但未关闭的 raw issue。不变。
