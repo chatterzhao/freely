@@ -15358,6 +15358,15 @@ handle_interruption_intake_once() {
   local project="$1" intake_id="$2"
   local meta_file message_file status claimed_by handler_bin handler_output decision reaction classification why_text restart_point ownership handoff_text answer_text
   local lock_acquired="0"
+  # Try new docs/issues/ path first (raw-xxx or I-xxx)
+  if [[ "$intake_id" == raw-* || "$intake_id" == I-* ]]; then
+    issue_file="$project/docs/issues/$intake_id/issue.md"
+    [[ -f "$issue_file" ]] || return 1
+    log_info "processing docs/issues/ intake: $intake_id"
+    # For now, skip full claim/resolve for new-model items (deferred to handler migration)
+    return 0
+  fi
+
   meta_file="$(intake_item_meta_file "$project" "$intake_id")"
   message_file="$(intake_item_message_file "$project" "$intake_id")"
   [[ -f "$meta_file" && -f "$message_file" ]] || return 1
@@ -15570,6 +15579,26 @@ ensure_interruption_dispatch_once() {
       handled_any="1"
     fi
   done < <(find "$(intake_dir_for_project "$project")" -mindepth 1 -maxdepth 1 -type d | sort)
+
+  # Also process new raw issues from docs/issues/ (IBM Framework B1_IBM)
+  local issues_dir="$project/docs/issues"
+  if [[ -d "$issues_dir" ]]; then
+    for raw_dir in "$issues_dir"/raw-*/; do
+      [[ -d "$raw_dir" ]] || continue
+      local raw_id raw_file frontmatter_status
+      raw_id="$(basename "$raw_dir")"
+      raw_file="$raw_dir/issue.md"
+      [[ -f "$raw_file" ]] || continue
+      # Check if already claimed/resolved (status in frontmatter)
+      frontmatter_status="$(sed -n '/^---$/,/^---$/p' "$raw_file" | grep "^status:" | sed 's/^status: *//' | tr -d '"' 2>/dev/null || echo "proposed")"
+      if [[ "$frontmatter_status" == "proposed" ]]; then
+        if handle_interruption_intake_once "$project" "$raw_id"; then
+          handled_any="1"
+        fi
+      fi
+    done
+  fi
+
   if [[ "$handled_any" == "1" ]]; then
     log_info "interruption dispatcher handled intake(s)"
   fi
