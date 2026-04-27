@@ -8,7 +8,7 @@
 - source_class: `discovery`
 - route_kind: `pre_brainstorm`
 - phase_state: `done_pre_brainstorm`
-- status: `proposed`
+- status: `absorbed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
 - problem: `freely 的 chat 插话和平台 issue 是两条独立的输入路径，存储结构不同（.freely/intake/ vs task-source-scan），sync 逻辑分散。AI 有时直接调平台 API，token 浪费且与平台耦合。`
@@ -157,3 +157,7 @@ target_phase: in_dev  # 当前 issue 正在 dev-loop 中
 
 如果 `belongs_to` 的 issue 当前不在 dev-loop 中，`--urgent` 无效（AI 不中断），评论正常等待 scan。
 
+
+- absorbed_by_issue: `I-20260426-0000-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
+- decision_reason: `B1 pre-brainstorm for chat intake→issue unification. Implementation artifacts (scripts, storage, sync) absorbed into the canonical tool launcher governance issue.`
