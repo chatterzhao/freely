@@ -168,7 +168,7 @@
 - 基于意图理解后，判断这件事应从哪里重新接入：
   - `pre-brainstorm`
   - `candidate / milestone intake`
-  - `IBM`
+  - `B2_IBM`
   - `dev`
   - `review`
   - `verification`

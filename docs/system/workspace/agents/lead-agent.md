@@ -45,7 +45,7 @@
 
 ## 不负责
 
-- 不直接定义 doc-loop 的 `IBM+G` 细节
+- 不直接定义 doc-loop 的 `B2_IBM+G` 细节
 - 不直接定义 dev-loop 的实现与测试步骤
 - 不把 milestone、brainstorm、progress 的完整状态机硬编码在这里
 - 不在脚本里预先写死“某输入必须走哪个工具”

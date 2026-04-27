@@ -128,8 +128,8 @@
 ## 2B. B2 与 Progress 边界（硬性要求）
 
 判定规则：
-1. `B2` 中的 `I` 是 milestone-owned issue，而不是任意发现到的问题。正式 IBM 产物目录必须先确定为 `docs/epics/{epic-name}/{story-name}/...`。
-2. candidate 未进入 milestone 前，不得声称已经进入 IBM。
+1. `B2_IBM` 中的 `I` 是 milestone-owned issue，而不是任意发现到的问题。正式 B2_IBM 产物目录必须先确定为 `docs/epics/{epic-name}/{story-name}/...`。
+2. candidate 未进入 milestone 前，不得声称已经进入 B2_IBM。
 3. `progress` 只跟踪 dev-loop 中的实现、测试、阻塞、恢复与回写，不跟踪 candidate 收敛或纯 B2 文档收敛。
 4. 若 dev-loop 暴露出边界外新问题，应回到 `pre-brainstorm`，而不是塞回当前 issue 进度。
 
@@ -251,7 +251,7 @@
    - `rotate`：下一轮直接进入 `fresh_with_handoff`
 19. continuity artifact 的落点必须遵循 loop 分层，不得一律写成 `progress`：
    - `dev-loop` 写 `progress`
-   - `doc-loop` 写当前 issue / IBM / pre-brainstorm 产物
+   - `doc-loop` 写当前 issue / B2_IBM / pre-brainstorm 产物
    - `recovery` 写 `recovery` 或允许的等价恢复留痕
 20. 若 runtime 无法直接知道当前 loop 的精确文档路径，至少必须把 `summary_target_hint` 写入 prompt / handoff，由当前 AI 在下一跳先补 continuity，再继续业务推进。
 21. `needs_research` 或其他未收口 candidate 不得脱离 milestone 可见队列；除非显式写成 `dropped` 或已 materialize 为 milestone-owned issue，否则必须保留在 `milestones.md.candidate_issues`，并具备可执行的 `next_action` 与 `revisit_trigger` 或等价字段。
@@ -535,7 +535,7 @@ phase-1 break-glass merge commit 仍应包含：
 ## 11. 方法论总述（硬性要求）
 
 判定规则：
-1. Doc-loop 产物完整（`IBM` 业务产物与 `G` 治理产物按 issue 范围满足其一或组合，并保持可追溯）。
+1. Doc-loop 产物完整（`B2_IBM` 业务产物与 `G` 治理产物按 issue 范围满足其一或组合，并保持可追溯）。
 2. Dev-loop 产物完整，且测试证据可追溯。
 3. Auto-loop 路由可解释，回流状态正确。
 4. `map` 阶段定义 `PRE_TEST` 基线，提升/合并阶段使用执行后的 `TEST` 结果。
