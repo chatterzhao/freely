@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/43"
     synced_at: "2026-04-27T11:16:13Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:16:13Z"
 hash: ""

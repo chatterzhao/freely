@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/49"
     synced_at: "2026-04-27T11:16:47Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/issues/manager-semantic-loop-active-worker-suppression-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:16:47Z"
 hash: ""

@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/52"
     synced_at: "2026-04-27T11:17:04Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:17:04Z"
 hash: ""

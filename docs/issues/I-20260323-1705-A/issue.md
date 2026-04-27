@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/51"
     synced_at: "2026-04-27T11:16:59Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:16:59Z"
 hash: ""
