@@ -259,3 +259,15 @@
 - task_refs: `tasks.md#T-19`
 - case_design: `Verify intake_dir_for_project and scan_intake have DEPRECATED comments.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-remaining-tasks.md`
+
+### PT-20
+- id: `PT-20`
+- requirement: `GATE 6.2 checks platform_ids for linked issues in governance-merge-gate`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-20`
+- case_design: `Verify gate errors when linked issue has no platform_ids in docs/issues/.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-final-gates.md`
