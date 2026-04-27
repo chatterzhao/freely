@@ -235,3 +235,15 @@
 - task_refs: `tasks.md#T-16`
 - case_design: `Verify gate errors when promoted candidate has no matching raw-* issue.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-gate-raw-c-keychain.md`
+
+### PT-17
+- id: `PT-17`
+- requirement: `task-source-scan uses docs/issues/ exclusively`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-17`
+- case_design: `Verify build_payload does not call scan_intake. Verify scan_raw_issues and scan_linked_issues are called.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-scan-clean-break.md`
