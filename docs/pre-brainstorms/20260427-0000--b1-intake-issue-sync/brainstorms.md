@@ -390,3 +390,74 @@ Platform (github/gitee)                    Local (.freely/issues/, docs/)
 - 下载平台版本，和本地版本 diff
 - 如果只是格式差异 → 本地覆盖平台
 - 如果有实质内容差异 → 保留两边，标记冲突，生成 conflict-{timestamp}.md 供人工处理
+
+### 18. chat 路由 skill（修正：每条插话必须创建 issue）
+
+**核心原则**：每条 `freely chat` 必须落地为一个 issue（或已有 issue 的评论）。不存在"丢弃"的插话——即使内容看似无价值，也创建 issue 容器，由 B1 决定其命运。
+
+**路由 skill 的职责**（只做路由，不做价值判断）：
+
+```
+freely chat "xxx"
+    │
+    ▼
+chat-routing skill（本地脚本 + AI 判断）
+    │
+    ├── 消息匹配到 OPEN issue？
+    │   └── 是 → 作为该 issue 的 comment
+    │
+    ├── 消息匹配到 CLOSED issue？
+    │   ├── 适合 reopen → reopen issue + comment
+    │   └── 不适合 reopen → 新建 raw issue，link 到关闭的 issue，comment 说明关联
+    │
+    ├── 消息全新，且内容超前/探索性？
+    │   └── 新建 raw issue，打标签 `needs_research`
+    │
+    ├── 消息内容看似无价值/闲聊？
+    │   └── 新建 raw issue，打标签 `proposed`（B1 将判断为 dropped）
+    │
+    └── 无法判断？
+        └── 新建 raw issue，打标签 `needs_research`
+```
+
+**关键约束**：
+- skill 不做价值判断——不决定"这个值得做"或"这个应该丢弃"
+- skill 只判断两件事：①这属于哪个已有 issue？②如果新建，打什么初始标签？
+- 标签只是 hint，B1 预研时根据实际内容重新判断
+- 标签和 status 不同：标签是 B1 输入的 hint，status 是 B1 输出的决定
+
+**skill 实现方式**：
+- 快速路径：脚本匹配（issue 编号引用、关键词命中 open issue title）
+- AI 路径：无法快速匹配时，调 AI 做语义判断（这条消息和哪个 issue 相关？）
+- AI 只做路由判断，不需要读完整 issue 内容（读 ISSUES.md 索引中的 title + status 即可）
+
+**初始标签建议**：
+
+| 标签 | 含义 | B1 处理后的可能结果 |
+|------|------|-------------------|
+| `proposed` | 待评估（默认） | promoted / absorbed / dropped |
+| `needs_research` | 需要更多研究 | 留在 candidate_issues，标记 needs_research |
+| `forward_looking` | 超前想法，当前不可行 | 留在 candidate_issues，记录 revisit_trigger |
+| `reopen_candidate` | 关联已关闭 issue，可能需重开 | B1 判断是否 reopen 还是新建 |
+
+### 19. dropped 的语义
+
+即使插话最终被判定为"不值得做"，也必须走完 B1 流程才能标记 dropped。
+
+**dropped 的完整路径**：
+```
+chat → 创建 raw issue (proposed) → scan → B1 预研 → candidate 标记 dropped
+                                                         │
+                                                    记录 drop_reason
+                                                    记录 session_refs
+                                                    sync 到平台（关闭 issue + comment）
+```
+
+**drop_reason 必须写清**，不能只是"不需要"。合法理由包括：
+- `out_of_scope`：超出当前项目范围
+- `already_addressed`：已被其他 issue 覆盖
+- `not_worthwhile`：成本收益不成比例
+- `superseded`：被后续更完整的 issue 替代
+- `user_withdrawn`：用户自己撤回
+
+平台上的关闭 comment 应写清 drop_reason，保持可追溯。

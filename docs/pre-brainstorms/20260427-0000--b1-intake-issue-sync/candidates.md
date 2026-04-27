@@ -169,10 +169,15 @@ bin/issue-sync status <local-id>        # 查看同步状态
 **`freely chat` 新行为**：
 ```
 freely chat "xxx"
-    → 判断消息属于哪个 issue（显式引用 or 新建 raw issue）
+    → chat-routing skill 判断路由：
+        ├── OPEN issue → comment
+        ├── CLOSED issue → reopen + comment OR 新建 raw issue + link
+        ├── 全新内容 → 新建 raw issue (proposed/needs_research)
     → 写入 .freely/issues/comments/{comment-id}.md 或创建 raw-* 目录
     → bin/issue-sync comment <issue-id> <comment-id>（异步，不阻塞）
 ```
+
+**chat skill 不做价值判断**：skill 只路由到正确的 issue 容器。最终是 promote、absorb 还是 drop，由 B1 预研决定。即使 chat 内容看似无价值，也创建 issue——B1 标记 `dropped` 并写清 `drop_reason`。
 
 ### D6. 评论的紧急标记
 
