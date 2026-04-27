@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "156"
     url: "https://github.com/chatterzhao/freely/issues/156"
     synced_at: "2026-04-27T11:28:19Z"
+
+  gitee:
+    issue_id: "IJFOAA"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOAA"
+    synced_at: "2026-04-27T13:17:35Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md"
 last_synced_comment_at:

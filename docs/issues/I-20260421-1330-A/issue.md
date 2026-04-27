@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "161"
     url: "https://github.com/chatterzhao/freely/issues/161"
     synced_at: "2026-04-27T11:28:45Z"
+
+  gitee:
+    issue_id: "IJFOAI"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOAI"
+    synced_at: "2026-04-27T13:17:42Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md"
 last_synced_comment_at:

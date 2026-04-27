@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "157"
     url: "https://github.com/chatterzhao/freely/issues/157"
     synced_at: "2026-04-27T11:28:25Z"
+
+  gitee:
+    issue_id: "IJFOAB"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOAB"
+    synced_at: "2026-04-27T13:17:36Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "160"
     url: "https://github.com/chatterzhao/freely/issues/160"
     synced_at: "2026-04-27T11:28:41Z"
+
+  gitee:
+    issue_id: "IJFOAF"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOAF"
+    synced_at: "2026-04-27T13:17:40Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md"
 last_synced_comment_at:

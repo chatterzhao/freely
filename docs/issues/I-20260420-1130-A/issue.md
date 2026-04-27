@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "159"
     url: "https://github.com/chatterzhao/freely/issues/159"
     synced_at: "2026-04-27T11:28:37Z"
+
+  gitee:
+    issue_id: "IJFOAD"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOAD"
+    synced_at: "2026-04-27T13:17:39Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md"
 last_synced_comment_at:

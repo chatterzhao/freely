@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "155"
     url: "https://github.com/chatterzhao/freely/issues/155"
     synced_at: "2026-04-27T11:28:15Z"
+
+  gitee:
+    issue_id: "IJFOA7"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOA7"
+    synced_at: "2026-04-27T13:17:34Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md"
 last_synced_comment_at:

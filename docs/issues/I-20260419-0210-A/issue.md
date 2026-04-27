@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "153"
     url: "https://github.com/chatterzhao/freely/issues/153"
     synced_at: "2026-04-27T11:28:04Z"
+
+  gitee:
+    issue_id: "IJFOA5"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOA5"
+    synced_at: "2026-04-27T13:17:31Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/issues/protected-branch-ref-only-entrypoint-enforcement-governance.md"
 last_synced_comment_at:

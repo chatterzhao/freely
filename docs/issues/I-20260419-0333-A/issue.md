@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "154"
     url: "https://github.com/chatterzhao/freely/issues/154"
     synced_at: "2026-04-27T11:28:11Z"
+
+  gitee:
+    issue_id: "IJFOA6"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOA6"
+    synced_at: "2026-04-27T13:17:32Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md"
 last_synced_comment_at:
