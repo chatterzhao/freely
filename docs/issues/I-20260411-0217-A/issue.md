@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "133"
     url: "https://github.com/chatterzhao/freely/issues/133"
     synced_at: "2026-04-27T11:26:36Z"
+
+  gitee:
+    issue_id: "IJFO9I"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9I"
+    synced_at: "2026-04-27T13:17:00Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md"
 last_synced_comment_at:

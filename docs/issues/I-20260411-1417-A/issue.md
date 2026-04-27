@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "137"
     url: "https://github.com/chatterzhao/freely/issues/137"
     synced_at: "2026-04-27T11:26:48Z"
+
+  gitee:
+    issue_id: "IJFO9N"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9N"
+    synced_at: "2026-04-27T13:17:05Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/issues/stale-prebrainstorm-truth-reconcile-governance.md"
 last_synced_comment_at:

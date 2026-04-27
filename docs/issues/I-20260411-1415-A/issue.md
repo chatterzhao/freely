@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "135"
     url: "https://github.com/chatterzhao/freely/issues/135"
     synced_at: "2026-04-27T11:26:42Z"
+
+  gitee:
+    issue_id: "IJFO9L"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9L"
+    synced_at: "2026-04-27T13:17:03Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "139"
     url: "https://github.com/chatterzhao/freely/issues/139"
     synced_at: "2026-04-27T11:26:53Z"
+
+  gitee:
+    issue_id: "IJFO9Q"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9Q"
+    synced_at: "2026-04-27T13:17:08Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md"
 last_synced_comment_at:

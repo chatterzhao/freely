@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "141"
     url: "https://github.com/chatterzhao/freely/issues/141"
     synced_at: "2026-04-27T11:26:59Z"
+
+  gitee:
+    issue_id: "IJFO9S"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9S"
+    synced_at: "2026-04-27T13:17:10Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/issues/develop-push-attempt-followthrough-governance.md"
 last_synced_comment_at:

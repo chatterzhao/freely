@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "138"
     url: "https://github.com/chatterzhao/freely/issues/138"
     synced_at: "2026-04-27T11:26:51Z"
+
+  gitee:
+    issue_id: "IJFO9P"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9P"
+    synced_at: "2026-04-27T13:17:06Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md"
 last_synced_comment_at:

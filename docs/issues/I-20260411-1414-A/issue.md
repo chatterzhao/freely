@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "134"
     url: "https://github.com/chatterzhao/freely/issues/134"
     synced_at: "2026-04-27T11:26:39Z"
+
+  gitee:
+    issue_id: "IJFO9J"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9J"
+    synced_at: "2026-04-27T13:17:01Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "136"
     url: "https://github.com/chatterzhao/freely/issues/136"
     synced_at: "2026-04-27T11:26:45Z"
+
+  gitee:
+    issue_id: "IJFO9M"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9M"
+    synced_at: "2026-04-27T13:17:04Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md"
 last_synced_comment_at:
