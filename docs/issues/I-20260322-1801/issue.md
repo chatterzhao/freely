@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "50"
     url: "https://github.com/chatterzhao/freely/issues/50"
     synced_at: "2026-04-27T11:16:52Z"
+
+  gitee:
+    issue_id: "IJFO6I"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6I"
+    synced_at: "2026-04-27T13:14:51Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "48"
     url: "https://github.com/chatterzhao/freely/issues/48"
     synced_at: "2026-04-27T11:16:42Z"
+
+  gitee:
+    issue_id: "IJFO6G"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6G"
+    synced_at: "2026-04-27T13:14:48Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md"
 last_synced_comment_at:

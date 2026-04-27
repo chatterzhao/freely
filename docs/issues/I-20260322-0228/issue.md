@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "46"
     url: "https://github.com/chatterzhao/freely/issues/46"
     synced_at: "2026-04-27T11:16:31Z"
+
+  gitee:
+    issue_id: "IJFO6C"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6C"
+    synced_at: "2026-04-27T13:14:44Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md"
 last_synced_comment_at:

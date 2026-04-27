@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "43"
     url: "https://github.com/chatterzhao/freely/issues/43"
     synced_at: "2026-04-27T11:16:13Z"
+
+  gitee:
+    issue_id: "IJFO67"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO67"
+    synced_at: "2026-04-27T13:14:40Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md"
 last_synced_comment_at:

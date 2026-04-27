@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "45"
     url: "https://github.com/chatterzhao/freely/issues/45"
     synced_at: "2026-04-27T11:16:26Z"
+
+  gitee:
+    issue_id: "IJFO6B"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6B"
+    synced_at: "2026-04-27T13:14:43Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md"
 last_synced_comment_at:

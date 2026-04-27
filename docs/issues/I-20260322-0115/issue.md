@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "44"
     url: "https://github.com/chatterzhao/freely/issues/44"
     synced_at: "2026-04-27T11:16:20Z"
+
+  gitee:
+    issue_id: "IJFO68"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO68"
+    synced_at: "2026-04-27T13:14:42Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md"
 last_synced_comment_at:

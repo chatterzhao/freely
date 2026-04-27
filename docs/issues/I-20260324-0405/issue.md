@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "52"
     url: "https://github.com/chatterzhao/freely/issues/52"
     synced_at: "2026-04-27T11:17:04Z"
+
+  gitee:
+    issue_id: "IJFO6K"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6K"
+    synced_at: "2026-04-27T13:14:54Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md"
 last_synced_comment_at:

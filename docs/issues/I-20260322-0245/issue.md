@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "47"
     url: "https://github.com/chatterzhao/freely/issues/47"
     synced_at: "2026-04-27T11:16:38Z"
+
+  gitee:
+    issue_id: "IJFO6E"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6E"
+    synced_at: "2026-04-27T13:14:47Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md"
 last_synced_comment_at:

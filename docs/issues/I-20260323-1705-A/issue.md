@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "51"
     url: "https://github.com/chatterzhao/freely/issues/51"
     synced_at: "2026-04-27T11:16:59Z"
+
+  gitee:
+    issue_id: "IJFO6J"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6J"
+    synced_at: "2026-04-27T13:14:52Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md"
 last_synced_comment_at:
