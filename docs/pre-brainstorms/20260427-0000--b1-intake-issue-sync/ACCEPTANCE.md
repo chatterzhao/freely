@@ -9,7 +9,7 @@
 - [ ] sync 触发是确定性的生命周期事件，不是 AI 判断
 
 ### S2. 本地 issue 存储
-- [ ] `.freely/issues/` 目录结构定义完整
+- [ ] `docs/issues/` 目录结构定义完整
 - [ ] `ISSUES.md` 索引格式明确（local_id、kind、platform_ids、sync_state）
 - [ ] `raw-*` 和 `I-*` 两种 issue 类型的区分清晰
 - [ ] comment 独立存储，frontmatter 记录 `belongs_to`
