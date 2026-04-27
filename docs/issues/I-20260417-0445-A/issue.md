@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "151"
     url: "https://github.com/chatterzhao/freely/issues/151"
     synced_at: "2026-04-27T11:27:54Z"
+
+  gitee:
+    issue_id: "IJFOA3"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOA3"
+    synced_at: "2026-04-27T13:17:24Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md"
 last_synced_comment_at:

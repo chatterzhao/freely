@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "152"
     url: "https://github.com/chatterzhao/freely/issues/152"
     synced_at: "2026-04-27T11:27:59Z"
+
+  gitee:
+    issue_id: "IJFOA4"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOA4"
+    synced_at: "2026-04-27T13:17:30Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md"
 last_synced_comment_at:

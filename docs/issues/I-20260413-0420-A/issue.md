@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "144"
     url: "https://github.com/chatterzhao/freely/issues/144"
     synced_at: "2026-04-27T11:27:13Z"
+
+  gitee:
+    issue_id: "IJFO9V"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9V"
+    synced_at: "2026-04-27T13:17:14Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md"
 last_synced_comment_at:

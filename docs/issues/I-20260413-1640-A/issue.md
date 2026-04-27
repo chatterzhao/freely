@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "148"
     url: "https://github.com/chatterzhao/freely/issues/148"
     synced_at: "2026-04-27T11:27:35Z"
+
+  gitee:
+    issue_id: "IJFO9Z"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9Z"
+    synced_at: "2026-04-27T13:17:20Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md"
 last_synced_comment_at:

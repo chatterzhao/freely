@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "150"
     url: "https://github.com/chatterzhao/freely/issues/150"
     synced_at: "2026-04-27T11:27:46Z"
+
+  gitee:
+    issue_id: "IJFOA2"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOA2"
+    synced_at: "2026-04-27T13:17:23Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md"
 last_synced_comment_at:

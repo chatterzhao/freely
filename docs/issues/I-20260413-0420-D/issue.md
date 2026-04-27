@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "147"
     url: "https://github.com/chatterzhao/freely/issues/147"
     synced_at: "2026-04-27T11:27:29Z"
+
+  gitee:
+    issue_id: "IJFO9Y"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9Y"
+    synced_at: "2026-04-27T13:17:19Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md"
 last_synced_comment_at:

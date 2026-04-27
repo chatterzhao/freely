@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "146"
     url: "https://github.com/chatterzhao/freely/issues/146"
     synced_at: "2026-04-27T11:27:23Z"
+
+  gitee:
+    issue_id: "IJFO9X"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9X"
+    synced_at: "2026-04-27T13:17:18Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md"
 last_synced_comment_at:
