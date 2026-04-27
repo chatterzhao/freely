@@ -509,9 +509,9 @@ Usage:
   freely sync-tooling [--project <abs_path>] --source-project <abs_path>
   freely doctor [--project <abs_path>]
   freely security-review-brief [--project <abs_path>]
-  freely chat [--project <abs_path>] <message>
+  freely chat [--project <abs_path>] (--issue <id> | --new-issue) [--urgent] <message>
   freely tui [--project <abs_path>] [--once]
-  freely intake chat [--project <abs_path>] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
+  freely intake chat [--project <abs_path>] (--issue <id> | --new-issue) [--urgent] (--message <text> | --message-file <abs_file>) [--author <name>] [--channel <name>]
   freely intake claim [--project <abs_path>] --intake-id <id> --claimed-by <name> --reaction <steer|followup|collect|interrupt|noise> [--classification <discovery|continuation|control|noise>] [--delegated-worktree <abs_path>] [--linked-artifact <path>]
   freely intake resolve [--project <abs_path>] --intake-id <id> --resolved-by <name> --reaction <steer|followup|collect|interrupt|noise> --resolution-file <abs_file> --absorption-target <target> [--status <delegated|absorbed|dropped>] [--classification <discovery|continuation|control|noise>] [--linked-artifact <path>] [--delegated-worktree <abs_path>]
   freely intake status [--project <abs_path>]
