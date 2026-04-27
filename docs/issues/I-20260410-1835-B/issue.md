@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "132"
     url: "https://github.com/chatterzhao/freely/issues/132"
     synced_at: "2026-04-27T11:26:33Z"
+
+  gitee:
+    issue_id: "IJFO9H"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9H"
+    synced_at: "2026-04-27T13:16:59Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md"
 last_synced_comment_at:

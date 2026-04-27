@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "125"
     url: "https://github.com/chatterzhao/freely/issues/125"
     synced_at: "2026-04-27T11:26:06Z"
+
+  gitee:
+    issue_id: "IJFO9A"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9A"
+    synced_at: "2026-04-27T13:16:49Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md"
 last_synced_comment_at:

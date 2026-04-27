@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "130"
     url: "https://github.com/chatterzhao/freely/issues/130"
     synced_at: "2026-04-27T11:26:25Z"
+
+  gitee:
+    issue_id: "IJFO9F"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9F"
+    synced_at: "2026-04-27T13:16:56Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md"
 last_synced_comment_at:

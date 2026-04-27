@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "126"
     url: "https://github.com/chatterzhao/freely/issues/126"
     synced_at: "2026-04-27T11:26:09Z"
+
+  gitee:
+    issue_id: "IJFO9B"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9B"
+    synced_at: "2026-04-27T13:16:51Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md"
 last_synced_comment_at:

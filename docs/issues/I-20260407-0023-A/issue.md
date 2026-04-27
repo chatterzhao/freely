@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "123"
     url: "https://github.com/chatterzhao/freely/issues/123"
     synced_at: "2026-04-27T11:25:59Z"
+
+  gitee:
+    issue_id: "IJFO97"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO97"
+    synced_at: "2026-04-27T13:16:47Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md"
 last_synced_comment_at:

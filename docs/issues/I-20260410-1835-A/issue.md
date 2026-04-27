@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "131"
     url: "https://github.com/chatterzhao/freely/issues/131"
     synced_at: "2026-04-27T11:26:29Z"
+
+  gitee:
+    issue_id: "IJFO9G"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9G"
+    synced_at: "2026-04-27T13:16:58Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md"
 last_synced_comment_at:

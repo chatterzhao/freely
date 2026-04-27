@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "124"
     url: "https://github.com/chatterzhao/freely/issues/124"
     synced_at: "2026-04-27T11:26:02Z"
+
+  gitee:
+    issue_id: "IJFO99"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO99"
+    synced_at: "2026-04-27T13:16:48Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md"
 last_synced_comment_at:

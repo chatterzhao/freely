@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "129"
     url: "https://github.com/chatterzhao/freely/issues/129"
     synced_at: "2026-04-27T11:26:21Z"
+
+  gitee:
+    issue_id: "IJFO9E"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9E"
+    synced_at: "2026-04-27T13:16:54Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md"
 last_synced_comment_at:
