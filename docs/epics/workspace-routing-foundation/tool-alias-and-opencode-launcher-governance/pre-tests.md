@@ -162,3 +162,15 @@
 - task_refs: `tasks.md#T-10`
 - case_design: `Verify start-lead-agent.sh and tool-launchers.sh include claude in validation lists.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-claude-tool-validation.md`
+
+### PT-11
+- id: `PT-11`
+- requirement: `chat→issue migration writes to docs/issues/ and scan detects raw issues`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-11`
+- case_design: `Verify write_intake_item creates docs/issues/raw-*/issue.md. Verify scan_raw_issues returns raw issues.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-chat-intake-to-issue.md`
