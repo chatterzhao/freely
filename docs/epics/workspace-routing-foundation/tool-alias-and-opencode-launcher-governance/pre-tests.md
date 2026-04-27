@@ -138,3 +138,15 @@
 - task_refs: `tasks.md#T-8`
 - case_design: `Verify 161 milestone issues synced to GitHub and Gitee with correct platform_ids. Verify gitee-issue.py API path fix.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-b1-intake-issue-sync-design.md`
+
+### PT-9
+- id: `PT-9`
+- requirement: `tool_extra_args unbound variable fix does not break tool launching`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-9`
+- case_design: `Verify bash -n passes. Verify tool launch with and without AI_TOOL_EXTRA_ARGS.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-tool-extra-args-unbound.md`
