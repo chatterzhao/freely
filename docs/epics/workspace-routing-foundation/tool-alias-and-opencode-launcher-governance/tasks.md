@@ -29,3 +29,9 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-26`
+### T-5
+- id: `T-5`
+- title: `Harden AGENTS.md break-glass guidance`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-26`
