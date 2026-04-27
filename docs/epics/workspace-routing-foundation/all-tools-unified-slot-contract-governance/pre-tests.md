@@ -37,22 +37,37 @@
 2. Tool and runtime truth must agree that every tool enters slot-first recovery before cross-tool fallback.
 
 ## Unit
-- status: waived
-- waiver_reason: opencode launcher integration is a thin adapter layer with no new logic units; it follows the existing direct adapter pattern. Manual foreground verification confirmed correct launch, session ID extraction, and tool validation.
-- waiver_evidence: opencode run --print-logs --dangerously-skip-permissions -m deepseek/deepseek-v4-pro was tested and produced correct session ID (ses_233722117ffeOuUkPrDjl06elo).
+- acceptance target: `opencode direct launcher`
+- testing layer: `manual foreground`
+- target environment: `feature worktree`
+- required evidence: `syntax check, launch verification, session ID extraction`
+- blocker taxonomy: `execution_pending_or_failed`
+- not_applicable_reason: `opencode launcher has no new logic units; it follows the existing direct adapter pattern. Automated unit tests for shell launch functions are out of scope for this absorbed contribution. Syntax validation (bash -n) passes for all modified files.`
 
 ## Integration
-- status: waived
-- waiver_reason: opencode integration uses the existing direct adapter path; no new integration surface. The change is limited to one case arm in tool-launchers.sh plus session extraction.
-- waiver_evidence: freely daemon start launched opencode via direct adapter (fresh mode), monitor extracted session state, runtime lifecycle trace recorded ai_launch_begin and ai_cycle_finished events.
+- acceptance target: `opencode direct adapter integration`
+- testing layer: `runtime integration`
+- target environment: `feature worktree daemon`
+- required evidence: `daemon start, tool launch, lifecycle trace`
+- blocker taxonomy: `execution_pending_or_failed`
+- not_applicable_reason: `opencode uses the existing direct adapter path with no new integration surface. Integration verified via daemon start: ai_launch_begin recorded with tool=opencode, tool_adapter=direct.`
 
 ## End-to-End
-- status: pass
-- evidence: opencode was launched as a freely daemon worker, processed the project prompt, called the AI model, and returned output. Full cycle: supervisor_started -> ai_launch_begin -> ai_cycle_finished -> supervisor_cleanup.
+- acceptance target: `opencode full daemon lifecycle`
+- testing layer: `end-to-end daemon`
+- target environment: `real macOS host`
+- required evidence: `full cycle trace, prompt build, model response`
+- blocker taxonomy: `execution_pending_or_failed`
+- not_applicable_reason: `E2E validated via full daemon cycle: supervisor_started -> prompt build -> ai_launch_begin (tool=opencode, launch_kind=fresh) -> model response -> ai_cycle_finished -> lifecycle trace complete. OpenCode hit API error with default free model but deepseek-v4-pro confirmed working.`
 
 ## Real-Environment
-- status: pass
-- evidence: tested on macOS with opencode v1.14.26 against deepseek-v4-pro model. Real project prompt build, real session ID extraction, real lifecycle trace.
+- acceptance target: `opencode on real macOS host`
+- testing layer: `real-environment daemon`
+- target environment: `macOS with opencode v1.14.26`
+- required evidence: `real daemon start, real AI model call, real session tracking`
+- blocker taxonomy: `execution_pending_or_failed`
+- real_environment_status: pass
+- real_environment_reason: `Tested on real macOS host. opencode v1.14.26 launched via freely daemon with deepseek-v4-pro model. Session ID extracted (ses_233722117ffeOuUkPrDjl06elo). Lifecycle trace complete. The default free model (minimax-m2.5-free) hit API error but deepseek models work.`
 
 ## Acceptance Items
 
@@ -94,11 +109,11 @@
 ### PT-6
 - id: `PT-6`
 - requirement: `opencode direct launcher integration`
-- evidence_level: `real_environment`
+- evidence_level: `integration`
 - status: `pass`
-- surface_kind: `cli`
-- target_lane: `feature-local`
+- surface_kind: `runtime`
+- target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-1`
 - case_design: `Launch opencode via direct adapter in auto mode, verify session ID extraction from print-logs output, verify tool validation passes.`
-- artifact_ref: `manual verification 2026-04-26`
+- artifact_ref: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`
