@@ -45,7 +45,3 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 5. AI_TOOL_FAMILY overrides detected family.
 6. Tool validation lists include opencode.
 
-### C-20260426-0002-A: AGENTS.md break-glass guidance hardening
-- absorbed_at: `2026-04-26`
-- reason: `AGENTS.md governance fix discovered during I-20260426-0000-A dogfooding. Two break-glass bypasses occurred that the old soft guidance contributed to.`
-- scope: `AGENTS.md line 114 rewrite`
