@@ -112,6 +112,12 @@ updated_at: "{ts}"
             failed.append(local_id)
             print(f"  [{synced_count}/{len(batch)}] {local_id}: FAILED - {result.stderr.strip()[:80]}")
 
+
+    # Gitee sync placeholder
+    gitee_token = os.environ.get('GITEE_ACCESS_TOKEN', '')
+    if gitee_token:
+        print(f'  Gitee token available. Run: python3 gitee-issue.py create ...')
+
     print(f"\nBatch: {synced_count} synced, {len(failed)} failed")
     if failed:
         print(f"Failed: {failed[:5]}")
