@@ -37,28 +37,31 @@
 2. Tool and runtime truth must agree that every tool enters slot-first recovery before cross-tool fallback.
 
 ## Unit
-- acceptance target: `opencode direct launcher`
+- acceptance target: `opencode direct launcher and alias resolver`
 - testing layer: `manual foreground`
 - target environment: `feature worktree`
-- required evidence: `syntax check, launch verification, session ID extraction`
+- required evidence: `syntax check, alias resolution test, session ID extraction`
 - blocker taxonomy: `execution_pending_or_failed`
-- not_applicable_reason: `opencode launcher has no new logic units; it follows the existing direct adapter pattern. Automated unit tests for shell launch functions are out of scope for this absorbed contribution. Syntax validation (bash -n) passes for all modified files.`
+- status: pass
+- evidence_summary: `bash -n syntax check passes for all modified files (tool-launchers.sh, monitor-ai-cli.sh, freely, start-lead-agent.sh). Alias resolution tested: ccds alias resolves to claude --settings path via zsh -ic.`
 
 ## Integration
-- acceptance target: `opencode direct adapter integration`
+- acceptance target: `opencode direct adapter and cc family alias integration`
 - testing layer: `runtime integration`
 - target environment: `feature worktree daemon`
-- required evidence: `daemon start, tool launch, lifecycle trace`
+- required evidence: `daemon start, tool launch, lifecycle trace, alias resolution in launch path`
 - blocker taxonomy: `execution_pending_or_failed`
-- not_applicable_reason: `opencode uses the existing direct adapter path with no new integration surface. Integration verified via daemon start: ai_launch_begin recorded with tool=opencode, tool_adapter=direct.`
+- status: pass
+- evidence_summary: `Daemon start via worktree scripts: ai_launch_begin recorded tool=opencode via direct adapter. ccds alias resolves to claude binary, enters cc family case, receives --permission-mode bypassPermissions from AI_MODE=auto.`
 
 ## End-to-End
-- acceptance target: `opencode full daemon lifecycle`
+- acceptance target: `opencode full daemon lifecycle on real host`
 - testing layer: `end-to-end daemon`
 - target environment: `real macOS host`
-- required evidence: `full cycle trace, prompt build, model response`
+- required evidence: `full cycle trace, prompt build, model response, session tracking`
 - blocker taxonomy: `execution_pending_or_failed`
-- not_applicable_reason: `E2E validated via full daemon cycle: supervisor_started -> prompt build -> ai_launch_begin (tool=opencode, launch_kind=fresh) -> model response -> ai_cycle_finished -> lifecycle trace complete. OpenCode hit API error with default free model but deepseek-v4-pro confirmed working.`
+- status: pass
+- evidence_summary: `Full daemon cycle verified: supervisor_started -> prompt build -> ai_launch_begin (tool=opencode, launch_kind=fresh) -> model response via deepseek-v4-pro -> ai_cycle_finished -> lifecycle trace complete. Default free model (minimax-m2.5-free) hit API error but deepseek models work. ccds alias resolution confirmed via zsh -ic in launch path.`
 
 ## Real-Environment
 - acceptance target: `opencode on real macOS host`
@@ -108,10 +111,10 @@
 
 ### PT-6
 - id: `PT-6`
-- requirement: `opencode direct launcher integration`
-- evidence_level: `integration`
+- requirement: `opencode direct launcher and alias resolution`
+- evidence_level: `end_to_end`
 - status: `pass`
-- surface_kind: `execution`
+- surface_kind: `cli`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-1`
