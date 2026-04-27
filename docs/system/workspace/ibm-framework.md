@@ -1,8 +1,8 @@
 # IBM Framework
 
-Freely 的输入到合入治理框架。每个工作项经历两个 I-B-M 阶段，由 Milestone 串联。
+Freely doc-loop 的治理框架。每个工作项在 doc-loop 中经历两个 I-B-M 阶段，由 Milestone 串联。本文件是 IBM Framework 的能力真源——Freely 开发自身项目时吃自己的狗粮，外部项目由 Freely 托管时同样以此框架推进。
 
-本文件是 IBM Framework 的能力真源。治理规则（status 校验、gate 白名单、字段约束）见 `docs/LAWS.md` §2。执行路由（auto/doc/dev loop）见 `docs/system/workspace/three-loop-capability-lifecycle.md`。
+执行路由（auto/dev loop）见 `docs/system/workspace/three-loop-capability-lifecycle.md`。治理规则（status 校验、gate 白名单、字段约束）见 `docs/LAWS.md` §2。
 
 ## 总览
 
@@ -11,14 +11,16 @@ Freely 的输入到合入治理框架。每个工作项经历两个 I-B-M 阶段
      ┌──────────┐   ┌──────────┐   ┌────┐        ┌───────┐   ┌──────────┐   ┌──────────────┐
      │ github   │   │          │   │    │        │formal │   │          │   │ epic/story/  │
      │ gitee    │ → │ 发散收敛  │ → │can-│  ───→  │issue  │ → │ 实现设计  │ → │  {name}      │
-     │ chat     │   │ 边界决策  │   │did-│        │from   │   │ 替代评估  │   │  issues/     │
-     │ runtime  │   │          │   │ate │        │mile-  │   │ 验收标准  │   │  brainstorms/│
-     │ anomaly  │   └──────────┘   │    │        │stone  │   │          │   │  prd.md      │
-     │ review   │                  └────┘        └───────┘   └──────────┘   │  pre-tests.md│
-     └──────────┘                     │                                    │  tasks.md    │
+     │ issue    │   │ 边界决策  │   │did-│        │from   │   │ 替代评估  │   │  issues/     │
+     │ chat     │   │          │   │ate │        │mile-  │   │ 验收标准  │   │  brainstorms/│
+     │ 插话     │   └──────────┘   │    │        │stone  │   │          │   │  prd.md      │
+     └──────────┘                  └────┘        └───────┘   └──────────┘   │  pre-tests.md│
+                                     │                                    │  tasks.md    │
                                    milestone                                │  code-reviews│
                                    queue                                   └──────────────┘
 ```
+
+> runtime anomaly、review/test 新发现、治理漂移等信号由 auto-loop 捕获后，通过 chat 插话或创建平台 issue 进入 B1，不直接作为 B1 的 Input。
 
 ## B1：Input → Brainstorm → Milestone
 
@@ -26,7 +28,7 @@ Freely 的输入到合入治理框架。每个工作项经历两个 I-B-M 阶段
 
 | 字母 | 含义 | 说明 |
 |------|------|------|
-| I | Input source | github issue、gitee issue、chat 插话、runtime anomaly、review/test 新发现、治理漂移。不限格式，但必须能被 Freely 的 source patrol 或 signal intake 捕获 |
+| I | Input source | github issue、gitee issue、Freely chat 插话。其他信号（runtime anomaly、review 发现等）需通过 chat 或创建平台 issue 进入 |
 | B | Brainstorm | 发散→收敛→决策。读边界（CONSTITUTION/LAWS/PROJECT_INTENT）、读验收、读依赖。产物：`brainstorms.md` |
 | M | Milestone | 产出 candidate（`candidates.md`）：scope、non-goals、priority、status、milestone 归属 |
 
@@ -79,7 +81,7 @@ Freely 的输入到合入治理框架。每个工作项经历两个 I-B-M 阶段
 
 | | B1 | B2 |
 |---|---|---|
-| I（输入） | github/gitee issue、chat 插话、runtime anomaly、review 发现 | milestone committed_issues 中的正式 issue（I-{key}） |
+| I（输入） | github/gitee issue、chat 插话 | milestone committed_issues 中的正式 issue（I-{key}） |
 | B（头脑风暴） | 边界收敛、价值判断 | 实现设计、替代方案评估、验收标准 |
 | M（产物） | candidate → milestone queue | Map：issues + PRD + pre-tests + tasks + code-review |
 | 核心问题 | 做不做？排哪？边界？ | 怎么做？怎么验？替代方案？ |
@@ -96,12 +98,12 @@ milestone 是 B1 和 B2 之间的排序与承接层。
 
 ## 与 Three-Loop 的关系
 
-IBM Framework 定义 **工作项的治理生命周期**（从输入到合入）。Three-Loop 定义 **AI 的执行路由**（auto/doc/dev loop）。两者正交：
+IBM Framework 定义 **doc-loop 内的治理生命周期**。Three-Loop 定义 **AI 的执行路由**（auto/doc/dev loop）。两者正交：
 
 ```
 B1  ←→  doc-loop pre-brainstorm 子循环
 B2  ←→  doc-loop IBM 子循环（设计）+ dev-loop（实现）
-auto-loop ←→ B1/B2 之间的 routing 判定 + completion/verification/cleanup/retirement
+auto-loop ←→ 信号捕获、B1/B2 之间的 routing、completion/verification/cleanup/retirement
 ```
 
 详细 routing 见 `docs/system/workspace/three-loop-capability-lifecycle.md`。治理规则见 `docs/LAWS.md` §2。
@@ -110,8 +112,8 @@ auto-loop ←→ B1/B2 之间的 routing 判定 + completion/verification/cleanu
 
 | 旧称 | 新称 | 说明 |
 |------|------|------|
-| 预研头脑风暴 | B1 | I → B → M 第一阶段 |
-| IBM 头脑风暴 | B2 | I → B → M 第二阶段 |
+| 预研头脑风暴 | B1 | I → B → M 第一阶段，Input 是平台 issue 或 chat 插话 |
+| IBM 头脑风暴 | B2 | I → B → M 第二阶段，Input 是 milestone 中的正式 issue |
 | 候选 | candidate | B1 产物，milestone 输入 |
 | 里程碑 | milestone | B1 和 B2 之间的排序层 |
 | 正式 issue | issue | B2 的 I，milestone committed_issues 中的 I-{key} |

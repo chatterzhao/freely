@@ -37,7 +37,7 @@ new_project() {
   cp "$ROOT_DIR/docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/candidates.md" \
     "$dir/docs/pre-brainstorms/20260309-0000--sample/candidates.md"
   cat > "$dir/docs/pre-brainstorms/INDEX.md" <<'EOT'
-# 预研头脑风暴索引
+# Pre-brainstorm 索引（IBM Framework B1）
 
 ## 条目
 - 20260309-0000--sample

@@ -44,7 +44,7 @@ sequenceDiagram
         AUTO->>DOC: [主管AI do]：<br/>进入 doc-loop<br/>进入条件：边界未稳 / 新发现 / candidate 未收口<br/>进入目标：收敛边界 / 补 candidate / 补 next action
         loop doc-loop 内部循环
             DOC->>DOC: [worker AI do]：<br/>读取来源上下文<br/>读取边界<br/>读取验收
-            loop doc-loop 预研子循环
+            loop doc-loop pre-brainstorm 子循环
                 DOC->>DOC: [worker AI do]：<br/>补 pre-brainstorm
                 DOC->>DOC: [worker AI do]：<br/>补 candidate<br/>补 next action<br/>补 revisit trigger
                 DOC->>DOC: [worker AI do]：<br/>补 acceptance 边界<br/>补 milestone 可见性

@@ -70,7 +70,7 @@ Freely 处于研究优先的整合阶段。
    - 如果当前变更已落在现有 issue scope 内，优先吸收到既有 `issue / milestones / progress / code-review` 生命周期，不要为了一个新 worktree 再伪造新 candidate / issue
    - 只有当问题已经是“现有 lifecycle 走到 merge / verification / cleanup 哪一步”时，才切到 worktree promotion / retirement 判断
 4. **IBM Framework 路由**：工作项按 `docs/system/workspace/ibm-framework.md` 定义的两阶段推进。
-   - B1（Input → Brainstorm → Milestone）：Input source（github/gitee/chat/runtime anomaly/review）→ 预研收敛 → candidate 入里程碑。文档落 `docs/pre-brainstorms/{b1-id}/`
+   - B1（Input → Brainstorm → Milestone）：Input source（github/gitee issue、chat 插话）→ 预研收敛 → candidate 入里程碑。文档落 `docs/pre-brainstorms/{b1-id}/`
    - B2（Input → Brainstorm → Map）：Input source（milestone committed_issues 中的正式 issue）→ 实现设计 → Map 产物（epic/story/{name}/ + PRD + pre-tests + tasks + code-review）。文档落 `docs/epics/{epic-name}/{story-name}/`
 
 ## Freely 自举首跳
