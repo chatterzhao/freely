@@ -86,3 +86,9 @@ Ordered cross-tool fallback v1 is already in place, but Freely still lacks the f
 
 - `2026-04-01 09:55 PDT` canonical develop validation and merge absorption are complete; this owner is closed.
 - Future work may deepen per-tool probe/reset parity, but the shared slot contract and scheduler semantics should not be reopened here.
+
+
+### C-20260426-0001-A: AI_TOOL alias resolution
+- absorbed_at: `2026-04-26`
+- reason: `Users can set AI_TOOL to shell alias name; freely resolves via zsh and injects alias args.`
+- scope: `tool-launchers.sh alias resolver, AI_TOOL_EXTRA_ARGS, AI_TOOL_FAMILY, extra args injection in all exec lines`
