@@ -209,7 +209,6 @@ primary_platform: github
 **新的 issue local_id 需要区分来源**：
 - `raw-YYYYMMDD-NNNN`：raw issue（B1 输入，用户创建或平台拉取）
 - `I-YYYYMMDD-NNNN-A`：linked issue（B2 产出）——沿用现有格式
-- `inbox`：未归类的插话暂存
 
 **raw issue 到 linked issue 的关联**：
 - raw issue 的 `meta.env` 记录其 B2 产物路径：`canonical_issue_path: docs/epics/.../issues/...`

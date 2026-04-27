@@ -26,7 +26,6 @@
   - gate 校验 issue 文档元数据规范
 - non_goals:
   - 不实现 TUI/GUI issue 界面（CLI-first）
-  - 不实现 AI 自动归类 inbox（本次只建存储，分类逻辑后续）
   - 不改变 `docs/epics/` B2 产物目录结构
   - 不改变 `task-source-scan.py` 的扫描逻辑（下载到本地不变）
 - session_refs:
@@ -48,12 +47,9 @@
 ├── raw-{YYYYMMDD}-{NNNN}/             # raw issue（B1 输入）
 │   ├── meta.env                       # 本地 ID、平台 ID、状态、关联
 │   └── issue.md                       # issue 正文（从平台下载或 chat 创建）
-├── I-{YYYYMMDD}-{NNNN}-{split}/       # linked issue（B2 产出）
-│   ├── meta.env                       # 本地 ID、平台 ID、canonical 路径
-│   └── issue.md                       # 正式 issue 摘要（sync 时推送到平台 body）
-└── inbox/                             # 未归类的 chat 消息
-    ├── {timestamp}-{id}.md            # 待 AI 分类的消息
-    └── ...
+└── I-{YYYYMMDD}-{NNNN}-{split}/       # linked issue（B2 产出）
+    ├── meta.env                       # 本地 ID、平台 ID、canonical 路径
+    └── issue.md                       # 正式 issue 摘要（sync 时推送到平台 body）
 ```
 
 **为什么 comments 独立于 issue 目录？** 一条评论可能需要在多个 issue 上显示（交叉引用），且 sync 时按评论粒度操作比按 issue 粒度更高效。条评论的 frontmatter 记录 `belongs_to`。
@@ -165,7 +161,6 @@ bin/issue-sync status <local-id>        # 查看同步状态
 1. 新建 `.freely/issues/` 目录结构
 2. 迁移脚本 `bin/issue-migrate-intake`：
    - 读取 `.freely/intake/` 下所有 intake item
-   - 按 message 内容创建对应的 raw issue 或 inbox 条目
    - 保留 meta.env 中的 author、channel、session_refs
    - 写入新的 `.freely/issues/` 结构
 3. 验证迁移完整性后，删除 `.freely/intake/`
