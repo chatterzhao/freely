@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "38"
     url: "https://github.com/chatterzhao/freely/issues/38"
     synced_at: "2026-04-27T11:15:42Z"
+
+  gitee:
+    issue_id: "IJFO60"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO60"
+    synced_at: "2026-04-27T13:14:34Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md"
 last_synced_comment_at:

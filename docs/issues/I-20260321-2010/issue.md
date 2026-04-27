@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "42"
     url: "https://github.com/chatterzhao/freely/issues/42"
     synced_at: "2026-04-27T11:16:07Z"
+
+  gitee:
+    issue_id: "IJFO66"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO66"
+    synced_at: "2026-04-27T13:14:39Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md"
 last_synced_comment_at:

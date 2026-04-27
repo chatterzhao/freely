@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "40"
     url: "https://github.com/chatterzhao/freely/issues/40"
     synced_at: "2026-04-27T11:15:56Z"
+
+  gitee:
+    issue_id: "IJFO64"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO64"
+    synced_at: "2026-04-27T13:14:37Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md"
 last_synced_comment_at:

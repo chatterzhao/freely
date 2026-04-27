@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "36"
     url: "https://github.com/chatterzhao/freely/issues/36"
     synced_at: "2026-04-27T11:15:26Z"
+
+  gitee:
+    issue_id: "IJFO5Y"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5Y"
+    synced_at: "2026-04-27T13:14:31Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/issues/agent-ready-prd-for-freely-flow.md"
 last_synced_comment_at:

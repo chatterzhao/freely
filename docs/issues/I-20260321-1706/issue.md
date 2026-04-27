@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "37"
     url: "https://github.com/chatterzhao/freely/issues/37"
     synced_at: "2026-04-27T11:15:34Z"
+
+  gitee:
+    issue_id: "IJFO5Z"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5Z"
+    synced_at: "2026-04-27T13:14:32Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md"
 last_synced_comment_at:

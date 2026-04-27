@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "39"
     url: "https://github.com/chatterzhao/freely/issues/39"
     synced_at: "2026-04-27T11:15:49Z"
+
+  gitee:
+    issue_id: "IJFO62"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO62"
+    synced_at: "2026-04-27T13:14:35Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md"
 last_synced_comment_at:

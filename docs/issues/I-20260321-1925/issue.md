@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "41"
     url: "https://github.com/chatterzhao/freely/issues/41"
     synced_at: "2026-04-27T11:16:01Z"
+
+  gitee:
+    issue_id: "IJFO65"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO65"
+    synced_at: "2026-04-27T13:14:38Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md"
 last_synced_comment_at:

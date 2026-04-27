@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "33"
     url: "https://github.com/chatterzhao/freely/issues/33"
     synced_at: "2026-04-27T11:15:02Z"
+
+  gitee:
+    issue_id: "IJFO5U"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5U"
+    synced_at: "2026-04-27T13:14:26Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md"
 last_synced_comment_at:
