@@ -1,13 +1,15 @@
 # IBM Framework
 
-Freely doc-loop 的治理框架。每个工作项在 doc-loop 中经历两个 I-B-M 阶段，由 Milestone 串联。本文件是 IBM Framework 的能力真源——Freely 开发自身项目时吃自己的狗粮，外部项目由 Freely 托管时同样以此框架推进。
+Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1_IBM 和 B2_IBM——由 Milestone 串联。
 
-执行路由（auto/dev loop）见 `docs/system/workspace/three-loop-capability-lifecycle.md`。治理规则（status 校验、gate 白名单、字段约束）见 `docs/LAWS.md` §2。
+每个阶段的引擎是 AI 做 Brainstorm（B）：从 Input source（I）摄取输入，经发散→收敛→决策，产出 Milestone candidate 或 Map 文档集（M）。两个阶段共享 I→B→M 骨架，区别在于 I 的来源不同、M 的产物不同，因此命名为 B1_IBM 和 B2_IBM——B 打头强调 Brainstorm 是核心，IBM 是贯穿两个阶段的 I-B-M 结构。
+
+本文件是 IBM Framework 的能力真源。Freely 开发自身项目时吃自己的狗粮，外部项目由 Freely 托管时同样以此框架推进。执行路由（auto/dev loop）见 `docs/system/workspace/three-loop-capability-lifecycle.md`，治理规则见 `docs/LAWS.md` §2。
 
 ## 总览
 
 ```
- B1: Input → Brainstorm → Milestone          B2: Input → Brainstorm → Map
+ B1_IBM：I → B → M                              B2_IBM：I → B → M
      ┌──────────┐   ┌──────────┐   ┌────┐        ┌───────┐   ┌──────────┐   ┌──────────────┐
      │ github   │   │          │   │    │        │formal │   │          │   │ epic/story/  │
      │ gitee    │ → │ 发散收敛  │ → │can-│  ───→  │issue  │ → │ 实现设计  │ → │  {name}      │
@@ -20,9 +22,9 @@ Freely doc-loop 的治理框架。每个工作项在 doc-loop 中经历两个 I-
                                    queue                                   └──────────────┘
 ```
 
-> runtime anomaly、review/test 新发现、治理漂移等信号由 auto-loop 捕获后，通过 chat 插话或创建平台 issue 进入 B1，不直接作为 B1 的 Input。
+> runtime anomaly、review/test 新发现、治理漂移等信号由 auto-loop 捕获后，通过 chat 插话或创建平台 issue 进入 B1_IBM，不直接作为 B1_IBM 的 Input。
 
-## B1：Input → Brainstorm → Milestone
+## B1_IBM：Input → Brainstorm → Milestone
 
 从 Input source 到 candidate 进入 milestone。
 
@@ -32,9 +34,9 @@ Freely doc-loop 的治理框架。每个工作项在 doc-loop 中经历两个 I-
 | B | Brainstorm | 发散→收敛→决策。读边界（CONSTITUTION/LAWS/PROJECT_INTENT）、读验收、读依赖。产物：`brainstorms.md` |
 | M | Milestone | 产出 candidate（`candidates.md`）：scope、non-goals、priority、status、milestone 归属 |
 
-**信号进入 B1**：
-- github/gitee issue：`task-source-scan.py` 扫描到 raw issue 后，`restart_point=pre_brainstorm`，lead agent 路由到 B1
-- chat 插话：`freely chat` → `.freely/intake/` → `interruption-manager-handler` 分类为 `discovery` → 路由到 B1
+**信号进入 B1_IBM**：
+- github/gitee issue：`task-source-scan.py` 扫描到 raw issue 后，`restart_point=pre_brainstorm`，lead agent 路由到 B1_IBM
+- chat 插话：`freely chat` → `.freely/intake/` → `interruption-manager-handler` 分类为 `discovery` → 路由到 B1_IBM
 - 其他信号（runtime anomaly、review 发现）：先通过 chat 插话或创建平台 issue，再进入上述路径
 - 详细路由见 `context-source-skill` 和 `docs/system/workspace/three-loop-capability-lifecycle.md`
 
@@ -52,7 +54,7 @@ Freely doc-loop 的治理框架。每个工作项在 doc-loop 中经历两个 I-
 
 **对应 three-loop**：doc-loop 的 pre-brainstorm 子循环（`three-loop-capability-lifecycle.md` 行 43-60）
 
-## B2：Input → Brainstorm → Map
+## B2_IBM：Input → Brainstorm → Map
 
 从 milestone committed_issues 中的正式 issue 到 map 产物完整交付。
 
@@ -79,13 +81,13 @@ Freely doc-loop 的治理框架。每个工作项在 doc-loop 中经历两个 I-
     └── {review-file}.md
 ```
 
-**issue phase_state**：`in_ibm` → `done_ibm` → `in_dev` → `blocked_dev` → `in_verification` → `completed`
+**issue phase_state**：`in_b2_ibm` → `done_b2_ibm` → `in_dev` → `blocked_dev` → `in_verification` → `completed`
 
 **对应 three-loop**：doc-loop 的 IBM 子循环（`three-loop-capability-lifecycle.md` 行 61-78），完成后进入 dev-loop（行 79-105）
 
-## B1 与 B2
+## B1_IBM 与 B2_IBM
 
-| | B1 | B2 |
+| | B1_IBM | B2_IBM |
 |---|---|---|
 | I（输入） | github/gitee issue、chat 插话 | milestone committed_issues 中的正式 issue（I-{key}） |
 | B（头脑风暴） | 边界收敛、价值判断 | 实现设计、替代方案评估、验收标准 |
@@ -96,10 +98,10 @@ Freely doc-loop 的治理框架。每个工作项在 doc-loop 中经历两个 I-
 
 ## milestone 的角色
 
-milestone 是 B1 和 B2 之间的排序与承接层。
+milestone 是 B1_IBM 和 B2_IBM 之间的排序与承接层。
 
-- `candidate_issues`：B1 产出的 candidate 队列。未收口的 candidate 继续留在此处，写清 `next_action` 和 `revisit_trigger`
-- `committed_issues`：B2 的 I 的来源。candidate 被 promoted 后，正式 issue 进入此队列
+- `candidate_issues`：B1_IBM 产出的 candidate 队列。未收口的 candidate 继续留在此处，写清 `next_action` 和 `revisit_trigger`
+- `committed_issues`：B2_IBM 的 I 的来源。candidate 被 promoted 后，正式 issue 进入此队列
 - milestone 的 `M-{key}` 是 candidate 身份，不等于执行编排身份。IBM materialization 产出 `I-{key}` 后，编排切到 I-*
 
 ## 与 Three-Loop 的关系
@@ -118,10 +120,10 @@ auto-loop ←→ 信号捕获、B1/B2 之间的 routing、completion/verificatio
 
 | 旧称 | 新称 | 说明 |
 |------|------|------|
-| 预研头脑风暴 | B1 | I → B → M 第一阶段，Input 是平台 issue 或 chat 插话 |
-| IBM 头脑风暴 | B2 | I → B → M 第二阶段，Input 是 milestone 中的正式 issue |
-| 候选 | candidate | B1 产物，milestone 输入 |
-| 里程碑 | milestone | B1 和 B2 之间的排序层 |
-| 正式 issue | issue | B2 的 I，milestone committed_issues 中的 I-{key} |
+| 预研头脑风暴 | B1_IBM | I → B → M 第一阶段，Input 是平台 issue 或 chat 插话 |
+| IBM 头脑风暴 | B2_IBM | I → B → M 第二阶段，Input 是 milestone 中的正式 issue |
+| 候选 | candidate | B1_IBM 产物，milestone 输入 |
+| 里程碑 | milestone | B1_IBM 和 B2_IBM 之间的排序层 |
+| 正式 issue | issue | B2_IBM 的 I，milestone committed_issues 中的 I-{key} |
 
-在 prompt、文档、代码中引用：使用 "按 IBM Framework B1/B2" 或 `@ibm-framework`。
+在 prompt、文档、代码中引用：使用 "按 IBM Framework B1_IBM/B2_IBM" 或 `@ibm-framework`。

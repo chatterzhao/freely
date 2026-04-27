@@ -83,7 +83,7 @@ Freely 自身首先是一个产品，不应被拆成一堆并列的 shell、命�
 说明：
 - 本节只保留高层方向性约束，不再平行维护来源到具体 skill / route_kind / return path 的细表。
 - 详细 capability -> loop -> owner -> artifact -> transition 映射以 `docs/system/workspace/three-loop-capability-lifecycle.md` 为准，不在本文件重复展开。
-- 高层上，新问题与边界未稳的问题先进入 `doc-loop` 收敛；已收敛 issue 在 `doc-loop` 完成 B2（IBM）后进入 `dev-loop` materialize；completion / verification / cleanup / recovery judgment 统一回到 `auto-loop`。
+- 高层上，新问题与边界未稳的问题先进入 `doc-loop` 收敛；已收敛 issue 在 `doc-loop` 完成 B2_IBM 后进入 `dev-loop` materialize；completion / verification / cleanup / recovery judgment 统一回到 `auto-loop`。
 - 其中 `dev-loop` 是 AI-native 能力实现层，不限于传统“写代码”；凡是在既有 issue 边界内把能力真正 materialize 出来的工作，都属于 `dev-loop`。
 
 流程标识词典与状态联动矩阵的规范语义统一见 `docs/LAWS.md` 第 2C 章；其中 issue / progress 的主执行标识统一使用 `phase_state`，skills 与 milestone policy 不得再自行发明同名状态。
@@ -93,8 +93,8 @@ Freely 自身首先是一个产品，不应被拆成一堆并列的 shell、命�
 ```
 人类 ←──→ Chat Session ←──→ AI
               │
-              ├── 讨论先进入 B1：沉淀到 pre-brainstorms/*/brainstorms.md
-              ├── candidate 写入 pre-brainstorms/*/candidates.md（B1 产物，进入 milestone）
+              ├── 讨论先进入 B1_IBM：沉淀到 pre-brainstorms/*/brainstorms.md
+              ├── candidate 写入 pre-brainstorms/*/candidates.md（B1_IBM 产物，进入 milestone）
               ├── 多 AI/子代理会话日志以 jsonl 作为 session evidence
               └── 在 candidates.md / issue / progress / recovery 中持续维护 `session_refs`
 ```
