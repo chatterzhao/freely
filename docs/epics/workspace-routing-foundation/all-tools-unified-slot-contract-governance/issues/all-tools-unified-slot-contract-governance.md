@@ -52,6 +52,13 @@ Ordered cross-tool fallback v1 is already in place, but Freely still lacks the f
 7. Focused regressions prove non-Codex same-tool slot rotation, earliest `tool + slot` waiting truth, and preserved left-to-right fallback order.
 8. Live validation proves: current tool `kiro-cli` unavailable, current Codex slot dead, manager still reaches a later usable Codex slot before launch.
 
+## Absorbed Contributions
+
+### C-20260426-0000-A: opencode direct launcher integration
+- absorbed_at: `2026-04-26`
+- reason: `opencode is now available as a tool in the all-tools surface; minimal launcher-only integration with explicit non-goal of slot/switch parity`
+- scope: `tool-launchers.sh opencode case, session ID extraction, tool validation lists`
+
 ## Completion
 
 - `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`

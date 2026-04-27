@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260426-0000--opencode-direct-launcher-integration
+  - brainstorms: docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/candidates.md
 - 20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery
   - brainstorms: docs/pre-brainstorms/20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery/brainstorms.md
   - candidates: docs/pre-brainstorms/20260424-2230--runtime-target-worker-role-and-starting-stuck-recovery/candidates.md

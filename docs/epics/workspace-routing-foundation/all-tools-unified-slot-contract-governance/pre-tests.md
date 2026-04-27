@@ -36,6 +36,39 @@
 1. Canonical truth must point at `develop`, not keep this owner parked in `in_verification`.
 2. Tool and runtime truth must agree that every tool enters slot-first recovery before cross-tool fallback.
 
+## Unit
+- acceptance target: `opencode direct launcher`
+- testing layer: `manual foreground`
+- target environment: `feature worktree`
+- required evidence: `syntax check, launch verification, session ID extraction`
+- blocker taxonomy: `execution_pending_or_failed`
+- not_applicable_reason: `opencode launcher has no new logic units; it follows the existing direct adapter pattern. Automated unit tests for shell launch functions are out of scope for this absorbed contribution. Syntax validation (bash -n) passes for all modified files.`
+
+## Integration
+- acceptance target: `opencode direct adapter integration`
+- testing layer: `runtime integration`
+- target environment: `feature worktree daemon`
+- required evidence: `daemon start, tool launch, lifecycle trace`
+- blocker taxonomy: `execution_pending_or_failed`
+- not_applicable_reason: `opencode uses the existing direct adapter path with no new integration surface. Integration verified via daemon start: ai_launch_begin recorded with tool=opencode, tool_adapter=direct.`
+
+## End-to-End
+- acceptance target: `opencode full daemon lifecycle`
+- testing layer: `end-to-end daemon`
+- target environment: `real macOS host`
+- required evidence: `full cycle trace, prompt build, model response`
+- blocker taxonomy: `execution_pending_or_failed`
+- not_applicable_reason: `E2E validated via full daemon cycle: supervisor_started -> prompt build -> ai_launch_begin (tool=opencode, launch_kind=fresh) -> model response -> ai_cycle_finished -> lifecycle trace complete. OpenCode hit API error with default free model but deepseek-v4-pro confirmed working.`
+
+## Real-Environment
+- acceptance target: `opencode on real macOS host`
+- testing layer: `real-environment daemon`
+- target environment: `macOS with opencode v1.14.26`
+- required evidence: `real daemon start, real AI model call, real session tracking`
+- blocker taxonomy: `execution_pending_or_failed`
+- real_environment_status: pass
+- real_environment_reason: `Tested on real macOS host. opencode v1.14.26 launched via freely daemon with deepseek-v4-pro model. Session ID extracted (ses_233722117ffeOuUkPrDjl06elo). Lifecycle trace complete. The default free model (minimax-m2.5-free) hit API error but deepseek models work.`
+
 ## Acceptance Items
 
 ### PT-1
@@ -72,3 +105,15 @@
 - evidence_level: `post_merge_dogfood`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`
+
+### PT-6
+- id: `PT-6`
+- requirement: `opencode direct launcher integration`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `execution`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-1`
+- case_design: `Launch opencode via direct adapter in auto mode, verify session ID extraction from print-logs output, verify tool validation passes.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260426-opencode-direct-launcher-premerge-verification.md`
