@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "2"
     url: "https://github.com/chatterzhao/freely/issues/2"
     synced_at: "2026-04-27T11:11:27Z"
+
+  gitee:
+    issue_id: "IJFOAK"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFOAK"
+    synced_at: "2026-04-27T13:17:44Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md"
 last_synced_comment_at:
