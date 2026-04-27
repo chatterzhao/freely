@@ -4,6 +4,18 @@ Called by bin/issue-sync-bootstrap or run standalone.
 Usage: python3 issue-sync-batch.py --repo chatterzhao/freely --batch 50 --issues-dir docs/issues
 """
 import subprocess, os, re, sys, argparse
+
+# Load freely_user_env for credential resolution (same as gitee-issue.py)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..',
+    'docs', 'system', 'workspace', 'scripts', 'runtime'))
+try:
+    from freely_user_env import value as freely_env_value
+except ImportError:
+    def freely_env_value(*keys):
+        for k in keys:
+            v = os.environ.get(k, '')
+            if v: return v
+        return ''
 from datetime import datetime, timezone
 
 def main():
@@ -114,7 +126,7 @@ updated_at: "{ts}"
 
 
     # Gitee sync placeholder
-    gitee_token = os.environ.get('GITEE_ACCESS_TOKEN', '')
+    gitee_token = freely_env_value('GITEE_ACCESS_TOKEN', 'GITEE_TOKEN')
     if gitee_token:
         print(f'  Gitee token available. Run: python3 gitee-issue.py create ...')
 
