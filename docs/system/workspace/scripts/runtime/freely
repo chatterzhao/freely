@@ -5205,58 +5205,68 @@ status_surface_delegated_pending_ids_for_project() {
 
 write_intake_item() {
   local project="$1" intake_id="$2" author="$3" channel="$4" status="$5" classification="$6" linked_artifact="$7" delegated_worktree="$8" session_refs="$9" message="${10}" reaction="${11:-}" claimed_by="${12:-}" claimed_at="${13:-}" absorption_target="${14:-}" resolution_artifact="${15:-}" created_at_override="${16:-}"
-  local intake_root item_dir meta_file message_file created_at
-  intake_root="$(intake_dir_for_project "$project")"
-  item_dir="$intake_root/$intake_id"
-  meta_file="$item_dir/meta.env"
-  message_file="$item_dir/message.txt"
+  local created_at
   created_at="${created_at_override:-$(current_timestamp_utc_for_machine)}"
-  mkdir -p "$item_dir"
-  cat >"$meta_file" <<EOF
-INTAKE_ID="$intake_id"
-CREATED_AT="$created_at"
-AUTHOR="$author"
-CHANNEL="$channel"
-STATUS="$status"
-CLASSIFICATION="$classification"
-REACTION="$reaction"
-LINKED_ARTIFACT="$linked_artifact"
-DELEGATED_WORKTREE="$delegated_worktree"
-SESSION_REFS="$session_refs"
-CLAIMED_BY="$claimed_by"
-CLAIMED_AT="$claimed_at"
-ABSORPTION_TARGET="$absorption_target"
-RESOLUTION_ARTIFACT="$resolution_artifact"
-EOF
-  printf '%s\n' "$message" >"$message_file"
-  update_intake_pending_signal "$project"
 
-  # Also write to docs/issues/ (new issue-centric model)
+  # Write to docs/issues/ — the only intake storage now.
+  # .freely/intake/ is deprecated. Every chat creates a raw issue or a comment.
   _write_chat_to_issue "$project" "$intake_id" "$author" "$channel" "$message" "$session_refs" "$created_at"
+  update_intake_pending_signal "$project"
 }
 
 # _write_chat_to_issue: write chat message to docs/issues/ as new raw issue or comment
+# If TARGET_ISSUE is set (via --issue flag), append as comment to that issue.
+# Otherwise create a new raw issue.
 _write_chat_to_issue() {
   local project="$1" intake_id="$2" author="$3" channel="$4" message="$5" session_refs="$6" created_at="$7"
-  local issues_dir issue_local_id issue_file
+  local issues_dir target_issue issue_file
   issues_dir="$project/docs/issues"
   mkdir -p "$issues_dir"
 
-  # Generate local_id from timestamp
-  local ts
-  ts=$(date -u +"%Y%m%d-%H%M" 2>/dev/null || echo "${created_at:0:13}" | tr -d 'T:-' | sed 's/\(.\{8\}\)\(.\{4\}\).*/\1-\2/')
-  issue_local_id="raw-$ts"
-  # Avoid collision
-  local suffix=0
-  while [[ -d "$issues_dir/$issue_local_id" ]]; do
-    suffix=$((suffix + 1))
-    issue_local_id="raw-${ts}-${suffix}"
-  done
+  target_issue="${FREELY_CHAT_TARGET_ISSUE:-}"
 
-  local issue_dir="$issues_dir/$issue_local_id"
-  mkdir -p "$issue_dir"
+  if [[ -n "$target_issue" ]]; then
+    # --- Append as comment to existing issue ---
+    issue_file="$issues_dir/$target_issue/issue.md"
+    if [[ ! -f "$issue_file" ]]; then
+      log_error "target issue not found: $target_issue"
+      return 1
+    fi
 
-  cat > "$issue_dir/issue.md" <<ISSUEEOF
+    local comment_id urgent_marker
+    comment_id="comment-$(date -u +"%Y%m%dT%H%M%SZ" 2>/dev/null || echo "${created_at}" | tr -d 'T:-')"
+    urgent_marker=""
+    [[ "${FREELY_CHAT_URGENT:-}" == "true" ]] && urgent_marker=", urgent: true"
+
+    cat >> "$issue_file" <<COMMENTEOF
+
+### $comment_id
+{source: chat, author: $author, channel: $channel, intake_id: $intake_id, session_refs: $session_refs$urgent_marker}
+
+$message
+COMMENTEOF
+
+    log_info "chat comment appended to docs/issues/$target_issue/issue.md"
+
+    # If urgent and issue is active, trigger signal
+    if [[ "${FREELY_CHAT_URGENT:-}" == "true" ]]; then
+      _check_issue_active_and_signal "$project" "$target_issue"
+    fi
+  else
+    # --- Create new raw issue ---
+    local ts
+    ts=$(date -u +"%Y%m%d-%H%M" 2>/dev/null || echo "${created_at:0:13}" | tr -d 'T:-' | sed 's/\(.\{8\}\)\(.\{4\}\).*/\1-\2/')
+    local issue_local_id="raw-$ts"
+    local suffix=0
+    while [[ -d "$issues_dir/$issue_local_id" ]]; do
+      suffix=$((suffix + 1))
+      issue_local_id="raw-${ts}-${suffix}"
+    done
+
+    local issue_dir="$issues_dir/$issue_local_id"
+    mkdir -p "$issue_dir"
+
+    cat > "$issue_dir/issue.md" <<ISSUEEOF
 ---
 local_id: $issue_local_id
 kind: raw
@@ -5277,7 +5287,27 @@ session_refs: $session_refs
 $message
 ISSUEEOF
 
-  log_info "chat written to docs/issues/$issue_local_id/issue.md"
+    log_info "chat written to docs/issues/$issue_local_id/issue.md"
+  fi
+}
+
+# _check_issue_active_and_signal: if target issue is in dev-loop, update pending signal
+_check_issue_active_and_signal() {
+  local project="$1" target_issue="$2"
+  local canonical_path phase
+  canonical_path=""
+  if [[ -f "$project/docs/issues/$target_issue/issue.md" ]]; then
+    canonical_path=$(sed -n 's/^canonical_issue_path: "\(.*\)"/\1/p' "$project/docs/issues/$target_issue/issue.md" 2>/dev/null || echo "")
+  fi
+  if [[ -n "$canonical_path" && -f "$project/$canonical_path" ]]; then
+    phase=$(sed -n 's/^- phase_state: `\([^`]*\)`/\1/p' "$project/$canonical_path" 2>/dev/null || echo "")
+    case "$phase" in
+      in_b2|in_b2_ibm|done_b2|done_b2_ibm|in_dev|blocked_dev|in_verification)
+        log_info "target issue $target_issue is active ($phase), triggering urgent signal"
+        update_intake_pending_signal "$project"
+        ;;
+    esac
+  fi
 }
 
 write_interruption_resolution_artifact() {
@@ -17933,7 +17963,7 @@ cmd_tui() {
 }
 
 cmd_intake_chat() {
-  local project="" message="" message_file="" author="human" channel="chat" intake_id=""
+  local project="" message="" message_file="" author="human" channel="chat" intake_id="" target_issue="" urgent=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -17941,6 +17971,8 @@ cmd_intake_chat() {
       --message-file) message_file="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --author) author="${2:-}"; shift 2 ;;
       --channel) channel="${2:-}"; shift 2 ;;
+      --issue) target_issue="${2:-}"; shift 2 ;;
+      --urgent) urgent="true"; shift ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
@@ -17950,6 +17982,11 @@ cmd_intake_chat() {
     message="$(cat "$message_file")"
   fi
   [[ -n "$message" ]] || { log_error "missing --message or --message-file"; exit 1; }
+
+  # Set env vars for _write_chat_to_issue
+  [[ -n "$target_issue" ]] && export FREELY_CHAT_TARGET_ISSUE="$target_issue"
+  [[ -n "$urgent" ]] && export FREELY_CHAT_URGENT="$urgent"
+
   intake_id="$(next_intake_id "$project" "$message")"
   write_intake_item "$project" "$intake_id" "$author" "$channel" "new" "" "pending://unclassified" "" "[]" "$message"
   log_info "intake recorded: $intake_id"
@@ -17961,6 +17998,8 @@ cmd_intake_chat() {
     "expected_next=L310"
   echo "intake_id: $intake_id"
   echo "intake_path: $(intake_dir_for_project "$project")/$intake_id"
+  [[ -n "$target_issue" ]] && echo "target_issue: $target_issue"
+  [[ -n "$urgent" ]] && echo "urgent: true"
 }
 
 cmd_intake_claim() {
