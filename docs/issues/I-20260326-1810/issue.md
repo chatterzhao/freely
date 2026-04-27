@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "56"
     url: "https://github.com/chatterzhao/freely/issues/56"
     synced_at: "2026-04-27T11:17:27Z"
+
+  gitee:
+    issue_id: "IJFO6Q"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6Q"
+    synced_at: "2026-04-27T13:14:59Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/issues/freely-layered-architecture-and-tooling-topology.md"
 last_synced_comment_at:

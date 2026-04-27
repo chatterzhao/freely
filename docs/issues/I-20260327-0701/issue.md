@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "61"
     url: "https://github.com/chatterzhao/freely/issues/61"
     synced_at: "2026-04-27T11:17:58Z"
+
+  gitee:
+    issue_id: "IJFO6X"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6X"
+    synced_at: "2026-04-27T13:15:06Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md"
 last_synced_comment_at:

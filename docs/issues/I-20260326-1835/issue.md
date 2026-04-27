@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "58"
     url: "https://github.com/chatterzhao/freely/issues/58"
     synced_at: "2026-04-27T11:17:40Z"
+
+  gitee:
+    issue_id: "IJFO6S"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6S"
+    synced_at: "2026-04-27T13:15:03Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md"
 last_synced_comment_at:

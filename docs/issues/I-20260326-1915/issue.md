@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "59"
     url: "https://github.com/chatterzhao/freely/issues/59"
     synced_at: "2026-04-27T11:17:45Z"
+
+  gitee:
+    issue_id: "IJFO6U"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6U"
+    synced_at: "2026-04-27T13:15:04Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md"
 last_synced_comment_at:

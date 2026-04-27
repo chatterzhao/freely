@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "53"
     url: "https://github.com/chatterzhao/freely/issues/53"
     synced_at: "2026-04-27T11:17:09Z"
+
+  gitee:
+    issue_id: "IJFO6L"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6L"
+    synced_at: "2026-04-27T13:14:55Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md"
 last_synced_comment_at:

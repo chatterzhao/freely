@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "60"
     url: "https://github.com/chatterzhao/freely/issues/60"
     synced_at: "2026-04-27T11:17:52Z"
+
+  gitee:
+    issue_id: "IJFO6V"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6V"
+    synced_at: "2026-04-27T13:15:05Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md"
 last_synced_comment_at:

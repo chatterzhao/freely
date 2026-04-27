@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "55"
     url: "https://github.com/chatterzhao/freely/issues/55"
     synced_at: "2026-04-27T11:17:21Z"
+
+  gitee:
+    issue_id: "IJFO6O"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6O"
+    synced_at: "2026-04-27T13:14:58Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "54"
     url: "https://github.com/chatterzhao/freely/issues/54"
     synced_at: "2026-04-27T11:17:16Z"
+
+  gitee:
+    issue_id: "IJFO6M"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6M"
+    synced_at: "2026-04-27T13:14:56Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md"
 last_synced_comment_at:
