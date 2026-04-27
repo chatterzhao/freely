@@ -41,24 +41,24 @@
 .freely/issues/
 ├── ISSUES.md                          # 索引：所有 issue 的映射表
 │                                       # 每行一个 issue 的摘要 frontmatter
-├── comments/
-│   └── {comment-id}.md                # 所有评论存这里
-│                                       # frontmatter 记录所属 issue、作者、来源平台
 ├── raw-{YYYYMMDD}-{NNNN}/             # raw issue（B1 输入）
 │   ├── meta.env                       # 本地 ID、平台 ID、状态、关联
-│   └── issue.md                       # issue 正文（从平台下载或 chat 创建）
+│   ├── issue.md                       # issue 正文（从平台下载或 chat 创建）
+│   └── comments/                      # 该 issue 的评论
+│       └── {timestamp}.md             # 每条评论一个文件
 └── I-{YYYYMMDD}-{NNNN}-{split}/       # linked issue（B2 产出）
     ├── meta.env                       # 本地 ID、平台 ID、canonical 路径
-    └── issue.md                       # 正式 issue 摘要（sync 时推送到平台 body）
+    ├── issue.md                       # 正式 issue 摘要（sync 时推送到平台 body）
+    └── comments/                      # 该 issue 的评论
+        └── {timestamp}.md
 ```
 
-**为什么 comments 独立于 issue 目录？** 一条评论可能需要在多个 issue 上显示（交叉引用），且 sync 时按评论粒度操作比按 issue 粒度更高效。条评论的 frontmatter 记录 `belongs_to`。
+**为什么 comments 嵌套在 issue 目录下？** 每条评论只属于一个 issue。交叉引用通过评论正文中的链接实现，不需要多处存储。sync 时按 issue 粒度推送该 issue 下的所有未同步评论。
 
 **comment 文件格式**：
 ```markdown
 ---
 id: comment-20260427-0001
-belongs_to: raw-20260427-0001
 author: human
 source: chat                    # chat | github | gitee | worker
 platform_ids:

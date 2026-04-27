@@ -32,6 +32,7 @@ B1_IBM 的 Input 有两个入口：
 - `local_id`：本地唯一 ID
 - `platform_ids`：`github:<owner>/<repo>#<num>, gitee:<owner>/<repo>#<num>`
 - `kind`：`raw`（原始 issue，B1 输入）/ `linked`（里程碑 issue，B2 产出）
+- `comment_count`：本地评论数
 - `canonical_issue_path`：B2 产物的 issue 路径（linked 类型）
 - `sync_state`：每个平台的同步状态
 

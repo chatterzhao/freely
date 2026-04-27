@@ -126,14 +126,16 @@ IBM Framework 的 I（Input source）统一为 github/gitee issue。平台 issue
 ```
 .freely/issues/
 ├── ISSUES.md                          # 所有 issue 的映射索引
-├── comments/
-│   └── {comment-id}.md                # 评论（frontmatter 记录归属 issue）
 ├── raw-{YYYYMMDD}-{NNNN}/             # raw issue：B1_IBM 的 Input
 │   ├── meta.env                       # 平台 ID、状态、canonical 关联
-│   └── issue.md                       # issue 正文
+│   ├── issue.md                       # issue 正文
+│   └── comments/                      # 该 issue 的评论
+│       └── {timestamp}.md
 └── I-{YYYYMMDD}-{NNNN}-{split}/       # linked issue：B2_IBM 的产物
     ├── meta.env                       # 平台 ID、canonical 路径
-    └── issue.md                       # 正式 issue 摘要
+    ├── issue.md                       # 正式 issue 摘要
+    └── comments/                      # 该 issue 的评论
+        └── {timestamp}.md
 ```
 
 ### 平台隔离
