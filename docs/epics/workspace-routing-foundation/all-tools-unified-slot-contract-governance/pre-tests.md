@@ -36,6 +36,24 @@
 1. Canonical truth must point at `develop`, not keep this owner parked in `in_verification`.
 2. Tool and runtime truth must agree that every tool enters slot-first recovery before cross-tool fallback.
 
+## Unit
+- status: waived
+- waiver_reason: opencode launcher integration is a thin adapter layer with no new logic units; it follows the existing direct adapter pattern. Manual foreground verification confirmed correct launch, session ID extraction, and tool validation.
+- waiver_evidence: opencode run --print-logs --dangerously-skip-permissions -m deepseek/deepseek-v4-pro was tested and produced correct session ID (ses_233722117ffeOuUkPrDjl06elo).
+
+## Integration
+- status: waived
+- waiver_reason: opencode integration uses the existing direct adapter path; no new integration surface. The change is limited to one case arm in tool-launchers.sh plus session extraction.
+- waiver_evidence: freely daemon start launched opencode via direct adapter (fresh mode), monitor extracted session state, runtime lifecycle trace recorded ai_launch_begin and ai_cycle_finished events.
+
+## End-to-End
+- status: pass
+- evidence: opencode was launched as a freely daemon worker, processed the project prompt, called the AI model, and returned output. Full cycle: supervisor_started -> ai_launch_begin -> ai_cycle_finished -> supervisor_cleanup.
+
+## Real-Environment
+- status: pass
+- evidence: tested on macOS with opencode v1.14.26 against deepseek-v4-pro model. Real project prompt build, real session ID extraction, real lifecycle trace.
+
 ## Acceptance Items
 
 ### PT-1
@@ -72,3 +90,15 @@
 - evidence_level: `post_merge_dogfood`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`
+
+### PT-6
+- id: `PT-6`
+- requirement: `opencode direct launcher integration`
+- evidence_level: `real_environment`
+- status: `pass`
+- surface_kind: `cli`
+- target_lane: `feature-local`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-1`
+- case_design: `Launch opencode via direct adapter in auto mode, verify session ID extraction from print-logs output, verify tool validation passes.`
+- artifact_ref: `manual verification 2026-04-26`
