@@ -132,7 +132,7 @@ freely chat --comment <id> <message>            # 等价于 --issue
 当前 `freely intake` 是一套完整的轻量工作流：
 
 ```
-freely intake chat    → 写入 .freely/intake/<id>/message.txt（带 meta.env）
+[当前] freely intake chat → 写入 .freely/intake/<id>/message.txt（带 meta.env，待废弃）
 freely intake claim   → 标记 claimed_by + reaction + classification
 freely intake resolve → 标记 resolved（delegated/absorbed/dropped） + resolution_file
 freely intake status  → 列出所有 intake item 及其状态
@@ -146,27 +146,16 @@ intake 的 claim/resolve 生命周期本质上是"issue 评论的处理状态"�
 
 | 当前 intake 概念 | 新模型对应 |
 |---|---|
-| `intake chat` | 向 issue 写入评论 |
-| `intake claim` | 评论标记为 claimed，AI 开始处理 |
-| `intake resolve` | 评论处理完毕，标记 resolved + 记录处理结果 |
-| `intake status` | 查看某个 issue 的未处理评论队列 |
-| `meta.env` 字段 | 评论文件的 frontmatter |
-| `message.txt` | `comments/{timestamp}.md` |
-| `LINKED_ARTIFACT` | 评论关联的 issue canonical path |
+| `intake chat` | 向 issue.md 追加 `###` 评论章节，或创建新 raw issue |
+| `intake claim` | 评论标记为 claimed（`###` 元数据行加 `status: claimed`） |
+| `intake resolve` | 评论标记 resolved（`###` 元数据行加 `status: resolved`） |
+| `intake status` | 查看某个 issue 的未处理评论数量 |
+| `INTAKE_ID` | 废弃，改用 `comment-{local_id}` |
+| `message.txt` | 废弃，评论直接写入 issue.md 的 `## Comments` 章节 |
 
-**命令兼容**：`freely intake chat --issue <id>` 替代 `--linked-artifact`，底层写 `docs/issues/<id>/comments/<ts>.md` 而非 `.freely/intake/<id>/message.txt`。
+**命令兼容**：`freely intake chat --issue <id>` 替代 `--linked-artifact`，底层追加评论到 `docs/issues/<id>/issue.md` 的 `## Comments` 章节。整个 `.freely/intake/` 目录废弃。
 
-## 未解决问题
 
-1. **new raw issue 何时由谁创建？** 如果 chat 消息不显式指定 issue，默认创建 raw issue（标记 needs_research）。这会导致大量低质量 raw issue 吗？是否需要最小内容长度阈值？
-2. **issue local_id 用什么格式？** UUID？递增数字？`raw-YYYYMMDD-NNNN`？
-3. **现有的 `.freely/intake/` 目录是否废弃还是迁移？**
-4. **sync 脚本是 daemon 自动跑还是手动触发？**
-5. **评论是否需要 session_refs 追踪？** 一条评论可能来自 AI worker 的发现、用户的 chat、或平台上的第三方用户——来源不同，处理方式不同。
-
-## 决定
-
-暂不在此 brainstorms.md 中做决定。先列出所有需要收敛的问题，下一步产出 candidates.md。
 
 ### 10. 平台 issue ID 管理
 
@@ -208,9 +197,9 @@ primary_platform: github
 - `I-YYYYMMDD-NNNN-A`：linked issue（B2 产出）——沿用现有格式
 
 **raw issue 到 linked issue 的关联**：
-- raw issue 的 `meta.env` 记录其 B2 产物路径：`canonical_issue_path: docs/epics/.../issues/...`
-- linked issue 的 `issue.md` frontmatter 反向引用：`source_raw_issue: raw-20260427-0001`
-- 用户评论 linked issue 时，sync 脚本通过 frontmatter 找到对应的平台 issue
+- raw issue 的 issue.md frontmatter 记录其 B2 关联
+- linked issue 的 frontmatter 反向引用：`source_raw_issue: raw-20260427-1030`
+- sync 脚本通过 frontmatter 的 `platform_ids` 找到对应的平台 issue
 
 ### 12. 本地存储组织形式
 
@@ -219,26 +208,23 @@ primary_platform: github
 **freely 的差异**：freely 已有 `docs/epics/{epic}/{story}/` 目录结构，不需要改名。但 `docs/issues/` 可以作为平台 issue 的本地缓存层，与 `docs/epics/` 的 B2 产物分离：
 
 ```
-docs/issues/              # 所有平台 issue 的本地缓存（B1 输入 + B2 同步）
-├── ISSUES.md                # 映射索引
-├── raw-20260427-0001/       # raw issue
-│   ├── meta.env
-│   ├── issue.md
-│   └── comments/
-└── I-20260426-0000-A/       # linked issue（B2 产物同步回本地）
-    ├── meta.env
-    ├── issue.md             # 从 docs/epics/.../issues/ 镜像
-    └── comments/
+docs/issues/                    # 所有 issue 的本地存储（git 管理）
+├── .scan-state                 # { last_scan_at: "..." }
+├── ISSUES.md                   # 索引缓存（脚本维护）
+├── raw-20260427-1030/          # raw issue（B1 输入）
+│   └── issue.md                # frontmatter + 正文 + ## Comments
+└── I-20260427-1030-A/          # linked issue（B2 产物）
+    └── issue.md                # frontmatter + 摘要 + ## Comments
 
-docs/epics/{epic}/{story}/   # B2 产物（canonical issue 文档）
+docs/epics/{epic}/{story}/      # B2 治理产物（canonical docs）
 ├── issues/
-│   └── {issue-name}.md      # canonical issue 规格
+│   └── {issue-name}.md         # canonical issue 规格
 ├── pre-tests.md
 ├── tasks.md
 └── code-reviews/
 ```
 
-两层不重复——`docs/epics/` 是 B2 治理产物，`docs/issues/` 是平台同步缓存。linked issue 在两边都有记录，通过 `meta.env.canonical_issue_path` 关联。
+两层不重复——`docs/epics/` 是 B2 治理产物，`docs/issues/` 是平台同步存储。linked issue 的 frontmatter 中 `canonical_issue_path` 关联两边的文档。
 
 ### 13. issueme 可借鉴的设计
 
@@ -312,7 +298,7 @@ Canonical docs: docs/epics/{epic}/{story}/issues/{name}.md
 
 本地文档 ↔ 平台 issue 之间需要双向可追溯：
 
-**本地 → 平台**（通过 ISSUES.md 或 frontmatter）：
+**本地 → 平台**（通过 issue.md frontmatter）：
 ```yaml
 # docs/epics/.../issues/{name}.md frontmatter
 platform_ids:
@@ -527,3 +513,54 @@ last_synced_comment_at:
 **sync 行为**：
 - push：遍历 `## Comments` 下的所有 `###`，对每个平台，找没有该平台 `comment_id` 的评论，推送。推送后写回 `comment_id`，更新 `last_synced_comment_at`
 - pull：从各平台拉取 `last_synced_comment_at` 之后的新评论，追加到 `## Comments`，写回 `last_synced_comment_at`
+
+### 24. scan 如何集成 docs/issues/
+
+当前 `task-source-scan.py` 扫描 6 个来源家族。重构后需要在 scan 中新增对 `docs/issues/` 的扫描：
+
+**新增 scan 家族**：
+- `scan_raw_issues()`：扫描 `docs/issues/raw-*/issue.md`
+  - 未与 candidate 关联的 raw issue → `restart_point=pre_brainstorm`
+  - 有新评论（`last_synced_comment_at` 之后有新的 `###`）但 issue 未活跃 → 标记有新评论待处理
+- `scan_linked_issues()`：扫描 `docs/issues/I-*/issue.md`
+  - 与新 raw issue 不同——linked issue 已经关联了 canonical docs
+  - 有新评论 → `restart_point=cleanup`（drift reconcile）
+
+**scan 增量逻辑**：
+1. 读 `.scan-state` 获取 `last_scan_at`
+2. `find docs/issues -name issue.md -newermt <last_scan_at>` 只处理修改过的文件
+3. 处理完后更新 `last_scan_at`
+4. ISSUES.md 缓存索引同步更新
+
+**废弃的 scan 家族**：
+- `scan_intake()`：`.freely/intake/` 不再存在，移除
+- `scan_external_github/gitee()`：保留，但下载后的内容写入 `docs/issues/raw-*/` 而非临时处理
+
+### 25. sync 的回写流程
+
+sync 不仅推送，还要把平台返回的 ID 写回本地 frontmatter。
+
+**创建 linked issue 的回写**：
+1. candidate promoted → trigger `issue-sync create`
+2. 脚本读取 `docs/issues/I-{key}/issue.md` 的 frontmatter，构建 platform issue body
+3. 调平台 API 创建 issue → 平台返回 `{id: 42, url: "https://..."}`
+4. 将 platform_id 写回 issue.md frontmatter 的 `platform_ids.{platform}.issue_id`
+5. 更新 ISSUES.md 索引
+
+**推送评论的回写**：
+1. 扫描 `## Comments` 下所有 `###`，对每个平台，找没有该平台 `comment_id` 的章节
+2. POST 到平台 API → 返回 `{id: 12345}`
+3. 写回 `comment_id` 到该 `###` 的元数据行
+4. 更新 `last_synced_comment_at.{platform}`
+
+### 26. .freely/intake/ 迁移步骤
+
+一次性重构，不保留兼容：
+
+1. freeze：禁止新的 `freely chat` 写入 `.freely/intake/`（先切换到新路径）
+2. migrate：`bin/issue-migrate-intake` 遍历 `.freely/intake/*/message.txt`，每条消息：
+   - 判断是否匹配已有 raw issue → 追加为评论
+   - 否则 → 创建新的 raw issue
+3. validate：对比迁移前后的消息数量，确认无遗漏
+4. remove：`rm -rf .freely/intake/`
+5. 更新 `freely chat`、`freely intake *` 代码路径
