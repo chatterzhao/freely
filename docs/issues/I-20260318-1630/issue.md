@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/19"
     synced_at: "2026-04-27T11:13:47Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md"
 last_synced_comment_at:
   github: "2026-04-27T11:13:47Z"
 hash: ""
