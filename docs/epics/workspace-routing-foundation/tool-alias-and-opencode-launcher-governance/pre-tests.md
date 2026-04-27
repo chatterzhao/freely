@@ -174,3 +174,15 @@
 - task_refs: `tasks.md#T-11`
 - case_design: `Verify write_intake_item creates docs/issues/raw-*/issue.md. Verify scan_raw_issues returns raw issues.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-chat-intake-to-issue.md`
+
+### PT-12
+- id: `PT-12`
+- requirement: `chat --issue appends comment, --urgent triggers signal for active issues`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-12`
+- case_design: `Verify --issue appends ### comment to existing issue.md. Verify --urgent triggers signal for B2/dev/verification phases.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-chat-comment-append.md`

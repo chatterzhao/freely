@@ -69,3 +69,7 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 ### CHG 2.1-2.3: chat→issue migration
 - implemented_at: `2026-04-27`
 - reason: `write_intake_item now also writes to docs/issues/. New scan_raw_issues() in task-source-scan.py. Backward compatible.`
+
+### CHG: chat --issue/--urgent + comment append
+- implemented_at: `2026-04-27`
+- reason: `--issue flag appends chat as ### comment. Active B2+dev+verification phases trigger urgent signal.`
