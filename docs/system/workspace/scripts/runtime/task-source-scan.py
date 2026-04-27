@@ -297,6 +297,52 @@ def scan_raw_issues(project: Path) -> list[dict]:
     return items
 
 
+def scan_linked_issues(project: Path) -> list[dict]:
+    """Scan docs/issues/I-*/ for linked issues with new comments that need attention."""
+    items = []
+    issues_root = project / "docs" / "issues"
+    if not issues_root.is_dir():
+        return items
+    for entry_dir in sorted([p for p in issues_root.iterdir() if p.is_dir() and p.name.startswith("I-")]):
+        issue_file = entry_dir / "issue.md"
+        if not issue_file.is_file():
+            continue
+        content = issue_file.read_text(encoding="utf-8")
+        # Check for unprocessed comments (### sections without status: resolved)
+        comments_section = content.split("## Comments", 1)
+        if len(comments_section) < 2:
+            continue
+        comment_lines = comments_section[1]
+        unresolved = 0
+        for line in comment_lines.split("\\n"):
+            if line.startswith("### comment-") and "status: resolved" not in comment_lines:
+                unresolved += 1
+        if unresolved == 0:
+            continue
+        # Check if issue is active
+        canonical = ""
+        for line in content.splitlines():
+            if line.startswith("canonical_issue_path:"):
+                canonical = line.split('"')[1] if '"' in line else ""
+        items.append({
+            "source_family": "linked issue",
+            "source_type": "linked_issue_comments",
+            "source_ref": f"issue://{entry_dir.name}",
+            "artifact_path": str(issue_file.relative_to(project)),
+            "status_markers": {
+                "status": "active",
+                "unresolved_comments": unresolved,
+                "canonical_issue_path": canonical,
+            },
+            "needs_action": unresolved > 0,
+            "restart_point": "cleanup",
+            "owner_hint": "manager",
+            "next_action": f"Review {unresolved} unresolved comment(s) on linked issue {entry_dir.name}.",
+            "message_preview": f"{unresolved} unresolved comments",
+        })
+    return items
+
+
 def scan_pre_brainstorms(project: Path) -> list[dict]:
     items = []
     root = project / "docs" / "pre-brainstorms"
@@ -814,8 +860,9 @@ def scan_external_gitee(project: Path) -> tuple[list[dict], dict]:
 
 def build_payload(project: Path) -> dict:
     sources = []
-    sources.extend(scan_intake(project))
+    # .freely/intake/ is deprecated. scan_raw_issues and scan_linked_issues replace it.
     sources.extend(scan_raw_issues(project))
+    sources.extend(scan_linked_issues(project))
     sources.extend(scan_pre_brainstorms(project))
     sources.extend(scan_milestones(project))
     sources.extend(scan_progress(project))
