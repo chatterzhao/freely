@@ -114,3 +114,15 @@
 - task_refs: `tasks.md#T-5`
 - case_design: `Verify AGENTS.md line 114 explicitly lists forbidden break-glass patterns and narrowed verified_false_negative.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260426-break-glass-agents-guidance-hardening.md`
+
+### PT-7
+- id: `PT-7`
+- requirement: `IBM Framework documentation unified across all active governance docs`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-7`
+- case_design: `Verify ibm-framework.md defines B1_IBM/B2_IBM, all active docs (AGENTS.md, CONSTITUTION, three-loop, LAWS, skills, agents) use unified terminology, terminology table maps old→new.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260426-ibm-framework-docs.md`

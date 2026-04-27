@@ -35,3 +35,9 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-26`
+### T-7
+- id: `T-7`
+- title: `Create IBM Framework canonical documentation`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-26`

@@ -1,6 +1,6 @@
-# 预研头脑风暴工作区
+# Pre-brainstorm 工作区（IBM Framework B1）
 
-预研头脑风暴记录的规范结构：
+Pre-brainstorm 记录的规范结构（B1 阶段）：
 
 ```text
 docs/pre-brainstorms/

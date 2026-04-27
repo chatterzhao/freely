@@ -44,7 +44,7 @@ sequenceDiagram
         AUTO->>DOC: [主管AI do]：<br/>进入 doc-loop<br/>进入条件：边界未稳 / 新发现 / candidate 未收口<br/>进入目标：收敛边界 / 补 candidate / 补 next action
         loop doc-loop 内部循环
             DOC->>DOC: [worker AI do]：<br/>读取来源上下文<br/>读取边界<br/>读取验收
-            loop doc-loop 预研子循环
+            loop doc-loop pre-brainstorm 子循环
                 DOC->>DOC: [worker AI do]：<br/>补 pre-brainstorm
                 DOC->>DOC: [worker AI do]：<br/>补 candidate<br/>补 next action<br/>补 revisit trigger
                 DOC->>DOC: [worker AI do]：<br/>补 acceptance 边界<br/>补 milestone 可见性
@@ -58,11 +58,11 @@ sequenceDiagram
         else 判断为暴露新边界或新发现
             DOC-->>AUTO: [worker AI do]：<br/>返回 auto-loop<br/>返回条件：暴露新边界或新发现<br/>返回材料：需要 auto-loop 重判下一跳 / 工位
         end
-    else 判断为进入 doc-loop issue materialization / IBM
-        AUTO->>DOC: [主管AI do]：<br/>进入 doc-loop<br/>进入条件：milestone 已承接且 issue docs / acceptance 未收稳<br/>进入目标：补 IBM / 补 acceptance contract / 让 issue ready
+    else 判断为进入 doc-loop issue materialization / B2_IBM
+        AUTO->>DOC: [主管AI do]：<br/>进入 doc-loop<br/>进入条件：milestone 已承接且 issue docs / acceptance 未收稳<br/>进入目标：补 B2_IBM / 补 acceptance contract / 让 issue ready
         Note over AUTO,DOC: 工位 / 分支 / worktree 仍是局部治理约束<br/>跟随 issue-ready handoff 收纳，不单独长成新生命周期分支
-        loop doc-loop IBM 内部循环
-            DOC->>DOC: [worker AI do]：<br/>读取 issue / IBM / acceptance
+        loop doc-loop B2_IBM 内部循环
+            DOC->>DOC: [worker AI do]：<br/>读取 issue / B2_IBM / acceptance
             DOC->>DOC: [worker AI do]：<br/>把 milestone 的 M-* materialize 为 I-*<br/>同步 issue_path / milestone 回写
             DOC->>DOC: [worker AI do]：<br/>C-* 继续保留 candidate mirror 语义<br/>I-* 成为当前执行编排 owner
             DOC->>DOC: [worker AI do]：<br/>补 issue-bound docs<br/>补 acceptance contract
@@ -72,7 +72,7 @@ sequenceDiagram
         alt 判断为 issue docs 已收稳且回写完成
             DOC-->>AUTO: [worker AI do]：<br/>返回 auto-loop<br/>返回条件：issue docs 已收稳且当前 issue ready<br/>返回材料：issue / milestone / acceptance / pre-tests 已回写
         else 判断为仍需继续当前循环
-            DOC->>DOC: [worker AI do]：<br/>继续 doc-loop IBM 循环
+            DOC->>DOC: [worker AI do]：<br/>继续 doc-loop B2_IBM 循环
         else 判断为暴露新边界或新发现
             DOC-->>AUTO: [worker AI do]：<br/>返回 auto-loop<br/>返回条件：暴露新边界或新发现<br/>返回材料：需要 auto-loop 重判下一跳 / 工位
         end
@@ -124,7 +124,7 @@ sequenceDiagram
     alt 判断为跳去 dev-loop
         AUTO->>DEV: [主管AI do]：<br/>跳去 dev-loop<br/>进入条件：实现需修正 / 证据未收够 / 当前 issue 仍可继续<br/>进入目标：继续实现 / 补测试 / 补证据
     else 判断为跳去 doc-loop
-        AUTO->>DOC: [主管AI do]：<br/>跳去 doc-loop<br/>进入条件：边界变化 / acceptance 需重写 / issue docs 未收稳<br/>进入目标：重收边界 / 补 IBM / 补 closeout docs
+        AUTO->>DOC: [主管AI do]：<br/>跳去 doc-loop<br/>进入条件：边界变化 / acceptance 需重写 / issue docs 未收稳<br/>进入目标：重收边界 / 补 B2_IBM / 补 closeout docs
     else 判断为形成新发现源
         AUTO->>DOC: [主管AI do]：<br/>跳去 doc-loop<br/>进入条件：当前 issue 已完成且新发现不再属于原 issue<br/>进入目标：形成新的 candidate / GitHub issue / milestone intake
     else 判断为进入 completion verification

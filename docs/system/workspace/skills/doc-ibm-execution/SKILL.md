@@ -83,7 +83,7 @@ description: 在法律和宪法下执行 milestone-owned issue 的 `IBM+G` 文�
 ## 完成判定
 
 - 当前 issue 已明确属于 milestone-owned issue。
-- 当前 milestone candidate 若进入 IBM，已被 materialize 成一个或多个 `I-{issue-id}*`，且这些 issue 已回写到 milestone 的正式编排区。
+- 当前 milestone candidate 若进入 B2_IBM，已被 materialize 成一个或多个 `I-{issue-id}*`，且这些 issue 已回写到 milestone 的正式编排区。
 - 关键 IBM 产物完整，或已明确为什么必须 reroute。
 - `prd.md` 已达到 AI-ready quality bar，且 `pre-tests.md`、`tasks.md` 与之对齐。
 - candidate acceptance 已被深化为 issue-level acceptance。
