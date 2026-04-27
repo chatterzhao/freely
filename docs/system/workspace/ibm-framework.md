@@ -35,10 +35,10 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 | M | Milestone | 产出 candidate（`candidates.md`）：scope、non-goals、priority、status、milestone 归属 |
 
 **信号进入 B1_IBM**：
-- 平台 issue（github/gitee）：`task-source-scan.py` 下载到本地 `.freely/issues/`。raw issue 的 `restart_point=pre_brainstorm`，lead agent 路由到 B1_IBM
-- chat 插话：`freely chat` → `chat-routing skill` 判断属于哪个 issue → 创建 raw issue 或已有 issue 的 comment → 写入 `.freely/issues/`。新 raw issue 进入 scan → B1_IBM
+- 平台 issue（github/gitee）：`task-source-scan.py` 下载到本地 `docs/issues/`。raw issue 的 `restart_point=pre_brainstorm`，lead agent 路由到 B1_IBM
+- chat 插话：`freely chat` → `chat-routing skill` 判断属于哪个 issue → 创建 raw issue 或已有 issue 的 comment → 写入 `docs/issues/`。新 raw issue 进入 scan → B1_IBM
 - 其他信号（runtime anomaly、review 发现）：通过 chat 插话进入，同上
-- AI **永远不直接读平台内容**——只读本地 `.freely/issues/` 中的副本。平台内容由 scan 脚本下载一次
+- AI **永远不直接读平台内容**——只读本地 `docs/issues/` 中的副本。平台内容由 scan 脚本下载一次
 - 详细路由见 `context-source-skill` 和 `docs/system/workspace/three-loop-capability-lifecycle.md`
 
 **B1 回答**：这个值得做吗？排在哪？边界是什么？
@@ -124,7 +124,7 @@ IBM Framework 的 I（Input source）统一为 github/gitee issue。平台 issue
 ### 本地存储
 
 ```
-.freely/issues/
+docs/issues/
 ├── ISSUES.md                          # 所有 issue 的映射索引
 ├── raw-{YYYYMMDD}-{NNNN}/             # raw issue：B1_IBM 的 Input
 │   └── issue.md                       # issue 正文 + ## Comments 章节
@@ -135,7 +135,7 @@ IBM Framework 的 I（Input source）统一为 github/gitee issue。平台 issue
 ### 平台隔离
 
 - AI **永远不直接读写平台**（不调 github/gitee API）
-- **scan**（`task-source-scan.py`）是平台→本地的唯一桥梁：下载 issue、评论到 `.freely/issues/`
+- **scan**（`task-source-scan.py`）是平台→本地的唯一桥梁：下载 issue、评论到 `docs/issues/`
 - **sync**（`bin/issue-sync`）是本地→平台的唯一桥梁：创建 issue、更新状态、推送评论
 - sync 触发是确定性的生命周期事件（candidate promoted、phase_state 变更、merge），不是 AI 判断
 - 本地是唯一真相源。平台数据丢失时从本地重建

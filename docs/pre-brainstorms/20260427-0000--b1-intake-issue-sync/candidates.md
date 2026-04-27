@@ -18,11 +18,11 @@
   - issueme 提供了成熟的本地存储和 sync 参考设计
   - 这是一次性重构，后续新增平台或变更流程只需改脚本
 - proposed_scope:
-  - 新建 `.freely/issues/` 本地 issue 存储（目录结构 + ISSUES.md 索引）
+  - 新建 `docs/issues/` 本地 issue 存储（目录结构 + ISSUES.md 索引）
   - 实现 `bin/issue-sync` 脚本（push/pull，多平台）
   - 重构 `freely chat` → 底层写 issue comment 而非 `.freely/intake/`
   - 定义 B1/B2 生命周期 hook 触发 sync 的事件表
-  - 废弃 `.freely/intake/`，迁移到 `.freely/issues/`
+  - 废弃 `.freely/intake/`，迁移到 `docs/issues/`
   - gate 校验 issue 文档元数据规范
 - non_goals:
   - 不实现 TUI/GUI issue 界面（CLI-first）
@@ -38,7 +38,7 @@
 ### D1. 本地 issue 目录结构
 
 ```
-.freely/issues/
+docs/issues/
 ├── ISSUES.md                          # 索引：所有 issue 的映射表
 ├── raw-{YYYYMMDD}-{NNNN}/             # raw issue（B1 输入）
 │   └── issue.md                       # 正文 + ## Comments 章节（评论追加在此）
@@ -124,13 +124,13 @@ bin/issue-sync status <local-id>        # 查看同步状态
 
 **迁移策略**（不保留兼容，一次性重构）：
 
-1. 新建 `.freely/issues/` 目录结构
+1. 新建 `docs/issues/` 目录结构
 2. 迁移脚本 `bin/issue-migrate-intake`：
    - 读取 `.freely/intake/` 下所有 intake item
    - 保留 meta.env 中的 author、channel、session_refs
-   - 写入新的 `.freely/issues/` 结构
+   - 写入新的 `docs/issues/` 结构
 3. 验证迁移完整性后，删除 `.freely/intake/`
-4. `freely chat`、`freely intake chat` 改为写 `.freely/issues/`
+4. `freely chat`、`freely intake chat` 改为写 `docs/issues/`
 
 **`freely chat` 新行为**：
 ```
@@ -139,7 +139,7 @@ freely chat "xxx"
         ├── OPEN issue → comment
         ├── CLOSED issue → reopen + comment OR 新建 raw issue + link
         ├── 全新内容 → 新建 raw issue (proposed/needs_research)
-    → 写入 .freely/issues/comments/{comment-id}.md 或创建 raw-* 目录
+    → 写入 docs/issues/comments/{comment-id}.md 或创建 raw-* 目录
     → bin/issue-sync comment <issue-id> <comment-id>（异步，不阻塞）
 ```
 

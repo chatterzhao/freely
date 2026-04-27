@@ -18,7 +18,7 @@ B1_IBM 的 Input 有两个入口：
 ### 1. 本地 issue 存储结构
 
 ```
-.freely/issues/
+docs/issues/
 ├── ISSUES.md                # 索引：所有已知 issue 的映射表
 ├── {issue-local-id}/
 │   └── issue.md             # 正文 + ## Comments 章节（评论追加在此）
@@ -154,7 +154,7 @@ intake 的 claim/resolve 生命周期本质上是"issue 评论的处理状态"�
 | `message.txt` | `comments/{timestamp}.md` |
 | `LINKED_ARTIFACT` | 评论关联的 issue canonical path |
 
-**命令兼容**：`freely intake chat --issue <id>` 替代 `--linked-artifact`，底层写 `.freely/issues/<id>/comments/<ts>.md` 而非 `.freely/intake/<id>/message.txt`。
+**命令兼容**：`freely intake chat --issue <id>` 替代 `--linked-artifact`，底层写 `docs/issues/<id>/comments/<ts>.md` 而非 `.freely/intake/<id>/message.txt`。
 
 ## 未解决问题
 
@@ -216,10 +216,10 @@ primary_platform: github
 
 **参考 issueme**：Story = Issue 目录，`M{milestone}-{story-name}/` 包含 issue.md + requirements.md + pre-tests.md + tasks.md。目录名直接带 milestone 前缀，方便查找。
 
-**freely 的差异**：freely 已有 `docs/epics/{epic}/{story}/` 目录结构，不需要改名。但 `.freely/issues/` 可以作为平台 issue 的本地缓存层，与 `docs/epics/` 的 B2 产物分离：
+**freely 的差异**：freely 已有 `docs/epics/{epic}/{story}/` 目录结构，不需要改名。但 `docs/issues/` 可以作为平台 issue 的本地缓存层，与 `docs/epics/` 的 B2 产物分离：
 
 ```
-.freely/issues/              # 所有平台 issue 的本地缓存（B1 输入 + B2 同步）
+docs/issues/              # 所有平台 issue 的本地缓存（B1 输入 + B2 同步）
 ├── ISSUES.md                # 映射索引
 ├── raw-20260427-0001/       # raw issue
 │   ├── meta.env
@@ -238,7 +238,7 @@ docs/epics/{epic}/{story}/   # B2 产物（canonical issue 文档）
 └── code-reviews/
 ```
 
-两层不重复——`docs/epics/` 是 B2 治理产物，`.freely/issues/` 是平台同步缓存。linked issue 在两边都有记录，通过 `meta.env.canonical_issue_path` 关联。
+两层不重复——`docs/epics/` 是 B2 治理产物，`docs/issues/` 是平台同步缓存。linked issue 在两边都有记录，通过 `meta.env.canonical_issue_path` 关联。
 
 ### 13. issueme 可借鉴的设计
 
@@ -335,7 +335,7 @@ canonical: docs/epics/{epic}/{story}/issues/{name}.md
 **根本约束**：freely 的 AI（manager/worker/lead）**永远不直接读平台内容**，也**永远不直接写平台内容**。平台和本地之间只有两条脚本桥接：
 
 ```
-Platform (github/gitee)                    Local (.freely/issues/, docs/)
+Platform (github/gitee)                    Local (docs/issues/, docs/)
      │                                              │
      │  ──① scan 下载（task-source-scan.py）──→      │
      │     raw issue, comment, 状态                    │
@@ -374,7 +374,7 @@ Platform (github/gitee)                    Local (.freely/issues/, docs/)
 
 **重建流程**：
 ```
-1. 读取 .freely/issues/ISSUES.md 索引
+1. 读取 docs/issues/ISSUES.md 索引
 2. 对每个 issue，比较本地 hash 和平台状态
 3. 如果平台不存在 → 创建
 4. 如果平台存在但内容不一致 → 用本地内容覆盖（force push）
