@@ -170,3 +170,94 @@ intake 的 claim/resolve 生命周期本质上是"issue 评论的处理状态"�
 ## 决定
 
 暂不在此 brainstorms.md 中做决定。先列出所有需要收敛的问题，下一步产出 candidates.md。
+
+### 10. 平台 issue ID 管理
+
+**事实**：github 和 gitee 的 issue 编号都是平台自动分配的递增整数，不可自定义。本地 ID 和平台 ID 是两套体系，需要映射表。
+
+**参考 issueme**：`issue.md` frontmatter 中的 `platform_ids` 字段，记录每个平台的 ID、URL、同步状态：
+
+```yaml
+platform_ids:
+  github:
+    issue_id: "123"
+    url: "https://github.com/user/repo/issues/123"
+    synced_at: "2025-01-15T10:30:00Z"
+    status: synced
+  gitee:
+    issue_id: "456"
+    url: "https://gitee.com/user/repo/issues/456"
+    synced_at: "2025-01-15T10:35:00Z"
+    status: synced
+primary_platform: github
+```
+
+**freely 适配**：这个模式可以直接复用。`ISSUES.md` 索引中的 `platform_ids` 字段记录每个 issue 在各平台的 ID。新建 issue 时先创建本地 ID，同步到平台后回写平台 ID。
+
+**多平台同步策略**：
+- 主平台（primary）：push 优先，pull 优先
+- 副平台：mirror 模式，从主平台同步
+- 防止平台锁死：本地始终保留完整副本，随时可切换主平台
+
+### 11. 本地 issue ID 设计
+
+**现有 freely ID 体系**：
+- `C-YYYYMMDD-NNNN-A`：candidate（B1 产物）
+- `I-YYYYMMDD-NNNN-A`：正式 issue（B2 产物）
+- `M-YYYYMMDD-XXXX`：milestone
+
+**新的 issue local_id 需要区分来源**：
+- `raw-YYYYMMDD-NNNN`：raw issue（B1 输入，用户创建或平台拉取）
+- `I-YYYYMMDD-NNNN-A`：linked issue（B2 产出）——沿用现有格式
+- `inbox`：未归类的插话暂存
+
+**raw issue 到 linked issue 的关联**：
+- raw issue 的 `meta.env` 记录其 B2 产物路径：`canonical_issue_path: docs/epics/.../issues/...`
+- linked issue 的 `issue.md` frontmatter 反向引用：`source_raw_issue: raw-20260427-0001`
+- 用户评论 linked issue 时，sync 脚本通过 frontmatter 找到对应的平台 issue
+
+### 12. 本地存储组织形式
+
+**参考 issueme**：Story = Issue 目录，`M{milestone}-{story-name}/` 包含 issue.md + requirements.md + pre-tests.md + tasks.md。目录名直接带 milestone 前缀，方便查找。
+
+**freely 的差异**：freely 已有 `docs/epics/{epic}/{story}/` 目录结构，不需要改名。但 `.freely/issues/` 可以作为平台 issue 的本地缓存层，与 `docs/epics/` 的 B2 产物分离：
+
+```
+.freely/issues/              # 所有平台 issue 的本地缓存（B1 输入 + B2 同步）
+├── ISSUES.md                # 映射索引
+├── raw-20260427-0001/       # raw issue
+│   ├── meta.env
+│   ├── issue.md
+│   └── comments/
+└── I-20260426-0000-A/       # linked issue（B2 产物同步回本地）
+    ├── meta.env
+    ├── issue.md             # 从 docs/epics/.../issues/ 镜像
+    └── comments/
+
+docs/epics/{epic}/{story}/   # B2 产物（canonical issue 文档）
+├── issues/
+│   └── {issue-name}.md      # canonical issue 规格
+├── pre-tests.md
+├── tasks.md
+└── code-reviews/
+```
+
+两层不重复——`docs/epics/` 是 B2 治理产物，`.freely/issues/` 是平台同步缓存。linked issue 在两边都有记录，通过 `meta.env.canonical_issue_path` 关联。
+
+### 13. issueme 可借鉴的设计
+
+| issueme 设计 | freely 可复用 | 说明 |
+|---|---|---|
+| `platform_ids` frontmatter | ✅ 直接复用 | 多平台 ID 映射 |
+| `primary_platform` | ✅ 直接复用 | 主平台标记 |
+| hash 幂等 | ✅ 直接复用 | 变更检测，避免重复同步 |
+| Story = Issue 目录 | 🔶 部分复用 | freely 已有 `docs/epics/{epic}/{story}/` |
+| 讨论平台化存储 | ✅ 直接复用 | 评论存平台，本地只存元数据 |
+| 快速失败策略 | ✅ 直接复用 | 多平台网络检测 |
+| `sync.on_partial_failure` | ✅ 直接复用 | 部分平台失败时的行为 |
+| `runId` | 🔶 改名为 `session_refs` | freely 已有 session_refs 约定 |
+
+**不照搬的**：
+- issueme 的 Epic/Story/Milestone 层次 vs freely 的 B1/B2 IBM 框架——治理哲学不同，目录结构不同
+- issueme 的 AI 角色团队（PM/Arch/Dev 等）——freely 用 manager/worker/lead 三角色
+- issueme 的讨论区 UI——freely 是 CLI-first，TUI 只是可选的 shell
