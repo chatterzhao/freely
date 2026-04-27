@@ -32,6 +32,12 @@ Freely doc-loop 的治理框架。每个工作项在 doc-loop 中经历两个 I-
 | B | Brainstorm | 发散→收敛→决策。读边界（CONSTITUTION/LAWS/PROJECT_INTENT）、读验收、读依赖。产物：`brainstorms.md` |
 | M | Milestone | 产出 candidate（`candidates.md`）：scope、non-goals、priority、status、milestone 归属 |
 
+**信号进入 B1**：
+- github/gitee issue：`task-source-scan.py` 扫描到 raw issue 后，`restart_point=pre_brainstorm`，lead agent 路由到 B1
+- chat 插话：`freely chat` → `.freely/intake/` → `interruption-manager-handler` 分类为 `discovery` → 路由到 B1
+- 其他信号（runtime anomaly、review 发现）：先通过 chat 插话或创建平台 issue，再进入上述路径
+- 详细路由见 `context-source-skill` 和 `docs/system/workspace/three-loop-capability-lifecycle.md`
+
 **B1 回答**：这个值得做吗？排在哪？边界是什么？
 
 **目录**：`docs/pre-brainstorms/{b1-id}/`
