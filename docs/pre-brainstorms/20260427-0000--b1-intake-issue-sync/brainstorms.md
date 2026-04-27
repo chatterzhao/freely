@@ -261,3 +261,75 @@ docs/epics/{epic}/{story}/   # B2 产物（canonical issue 文档）
 - issueme 的 Epic/Story/Milestone 层次 vs freely 的 B1/B2 IBM 框架——治理哲学不同，目录结构不同
 - issueme 的 AI 角色团队（PM/Arch/Dev 等）——freely 用 manager/worker/lead 三角色
 - issueme 的讨论区 UI——freely 是 CLI-first，TUI 只是可选的 shell
+
+### 14. 里程碑 issue 的平台创建与内容
+
+**创建权限**：里程碑 issue（linked issue）只允许 freely 代码在 B2_IBM materialization 阶段创建。用户和第三方不应手动创建这类 issue——它们是 freely 的工作记录。
+
+**创建时机**：candidate 被 promoted → milestone committed_issues → B2_IBM 的 I-B-M 流程中，freely 在平台上创建对应的里程碑 issue。
+
+**issue 内容分层**：
+
+平台 issue 和本地文档各司其职：
+
+| 内容 | 在哪里 | 说明 |
+|------|--------|------|
+| 原始问题描述 | 平台 raw issue body | 用户创建时的原始内容 |
+| B1 预研讨论 | 本地 `docs/pre-brainstorms/{id}/brainstorms.md` | AI 内部分析，不上平台 |
+| B1 candidate | 本地 `docs/pre-brainstorms/{id}/candidates.md` | 本地治理产物 |
+| 里程碑 issue 规格 | **平台 linked issue body** | 正式 issue 文档的摘要：scope、acceptance、状态 |
+| 里程碑 issue 完整规格 | 本地 `docs/epics/{epic}/{story}/issues/{name}.md` | 详细版，平台 body 是摘要 |
+| B2/IBM 实现头脑风暴 | 本地 `docs/epics/{epic}/{story}/brainstorms/b-{issue}.md` | AI 实现设计，不上平台 |
+| PRD | 本地 `docs/epics/{epic}/{story}/prd.md` | 不上平台（可选） |
+| pre-tests | 本地 `docs/epics/{epic}/{story}/pre-tests.md` | 不上平台 |
+| tasks | 本地 `docs/epics/{epic}/{story}/tasks.md` | 不上平台 |
+| 用户反馈 | 平台 issue comment | 用户在平台上对里程碑 issue 的评论 |
+| AI 进展更新 | 平台 issue comment | freely 在关键节点写评论（如：B2 完成、进入 dev、合并） |
+
+**里程碑 issue body 内容**：不是把 brainstorm 搬上去——是把 issue 规格的精简版放上去：
+
+```markdown
+## Summary
+<1-2 sentence summary of what this issue is about>
+
+## Scope
+- <bullet list of in-scope items>
+
+## Non-Goals  
+- <bullet list of non-goals>
+
+## Status
+- phase_state: in_dev
+- canonical: docs/epics/{epic}/{story}/issues/{name}.md
+```
+
+**原始 raw issue 的关闭**：当 raw issue 被 promote 为里程碑 issue 后，freely 在 raw issue 上写一条评论引用新的里程碑 issue，然后关闭 raw issue。评论内容：
+
+```
+This issue has been promoted to a milestone issue: {platform_link}
+Canonical docs: docs/epics/{epic}/{story}/issues/{name}.md
+```
+
+这样用户在平台上看到 raw issue 已关闭，知道要去新的里程碑 issue 跟踪进展。
+
+### 15. 平台 issue 与本地文档的双向链接
+
+本地文档 ↔ 平台 issue 之间需要双向可追溯：
+
+**本地 → 平台**（通过 ISSUES.md 或 frontmatter）：
+```yaml
+# docs/epics/.../issues/{name}.md frontmatter
+platform_ids:
+  github:
+    issue_id: "42"
+    url: "https://github.com/user/repo/issues/42"
+```
+
+**平台 → 本地**（通过 issue body 中的链接）：
+```markdown
+canonical: docs/epics/{epic}/{story}/issues/{name}.md
+```
+
+**sync 脚本查找本地文档**：给定一个平台 issue URL，sync 脚本通过以下方式找到对应的本地文档：
+1. 查 ISSUES.md 索引（最快）
+2. 搜 `docs/epics/` 下所有 issue.md 的 frontmatter（兜底）
