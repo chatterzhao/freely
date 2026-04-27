@@ -672,9 +672,9 @@ parse_ai_spec() {
   }
 
   case "$tool" in
-    codex|kiro-cli|iflow|cc|cc-use-codex-cli) ;;
+    codex|kiro-cli|iflow|cc|cc-use-codex-cli|opencode) ;;
     *)
-      log_error "unsupported tool: $tool (supported: codex, kiro-cli, iflow, cc, cc-use-codex-cli)"
+      log_error "unsupported tool: $tool (supported: codex, kiro-cli, iflow, cc, cc-use-codex-cli, opencode)"
       exit 1
       ;;
   esac
