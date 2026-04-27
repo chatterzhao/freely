@@ -24,8 +24,8 @@
   - session pattern auto-detection
   - removing existing tool family cases
   - full generic launcher (keeps backward compat)
-- absorbed_by_issue: `I-20260401-0840-A`
-- absorbed_by_issue_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
-- absorption_reason: `Extends the all-tools surface by allowing alias-based tool customization.`
+- absorbed_by_issue: `I-20260426-0001-A`
+- absorbed_by_issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
+- absorption_reason: `Alias resolution is part of the same tool launcher enhancement as opencode integration. Absorbed into the new canonical issue I-20260426-0001-A.`
 - session_refs:
   - {tool: ccds, session_id: "20260426-alias-support", jsonl_path: "unavailable://manual", role: "author"}

@@ -8,7 +8,7 @@
 - source_class: `discovery`
 - route_kind: `pre_brainstorm`
 - phase_state: `done_pre_brainstorm`
-- candidate_status: `absorbed`
+- candidate_status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P1`
 - problem: `Freely runtime recognizes opencode as a valid tool name but has no launch implementation. The user needs to switch from codex to opencode due to API balance constraints.`
@@ -27,9 +27,9 @@
   - opencode slot/account switching support
   - opencode ACP adapter support
   - opencode --add-dir boundary support
-- absorbed_by_issue: `I-20260401-0840-A`
-- absorbed_by_issue_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
-- absorption_reason: `Adding a new tool launcher extends the all-tools surface; the unified slot contract is the canonical owner for multi-tool parity.`
+- promoted_issue_id: `I-20260426-0001-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
+- next_action: `Promoted to I-20260426-0001-A. Complete pre-tests and guarded develop merge.`
 - next_action: `Absorbed into I-20260401-0840-A. No independent issue needed.`
 - session_refs:
   - {tool: opencode, session_id: "20260426-opencode-integration", jsonl_path: "unavailable://manual", role: "author"}
