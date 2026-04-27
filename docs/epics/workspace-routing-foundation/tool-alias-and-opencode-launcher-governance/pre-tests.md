@@ -102,3 +102,15 @@
 - task_refs: `tasks.md#T-4`
 - case_design: `Set AI_TOOL_EXTRA_ARGS with custom flag. Verify flag appears in exec line before freely-managed flags.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260426-tool-alias-opencode-premerge-verification.md`
+
+### PT-5
+- id: `PT-5`
+- requirement: `AGENTS.md break-glass guidance hardened`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-5`
+- case_design: `Verify AGENTS.md line 114 explicitly lists forbidden break-glass patterns and narrowed verified_false_negative.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260426-break-glass-agents-guidance-hardening.md`
