@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/79"
     synced_at: "2026-04-27T11:21:52Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md"
+canonical_issue_path: "docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:21:52Z"
 hash: ""

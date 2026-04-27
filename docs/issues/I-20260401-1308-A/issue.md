@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/80"
     synced_at: "2026-04-27T11:21:56Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md"
 last_synced_comment_at:
   github: "2026-04-27T11:21:56Z"
 hash: ""

@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/76"
     synced_at: "2026-04-27T11:21:42Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:21:42Z"
 hash: ""

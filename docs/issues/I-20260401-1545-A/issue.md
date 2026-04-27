@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/81"
     synced_at: "2026-04-27T11:21:59Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:21:59Z"
 hash: ""
