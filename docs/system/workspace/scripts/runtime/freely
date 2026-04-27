@@ -3097,7 +3097,7 @@ tool_uses_claude_session_id() {
 tool_prefers_explicit_resume_target() {
   local tool="$1"
   case "$tool" in
-    codex|cc|cc-use-codex-cli) return 0 ;;
+    codex|cc|cc-use-codex-cli|opencode) return 0 ;;
     *) return 1 ;;
   esac
 }

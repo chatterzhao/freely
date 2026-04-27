@@ -241,7 +241,7 @@ tool_has_capability() {
 tool_accepts_explicit_resume_target() {
   local tool="$1"
   case "$tool" in
-    codex|iflow) return 0 ;;
+    codex|iflow|opencode) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -455,6 +455,18 @@ tool_run_direct_from_prompt_file() {
         exec env HOME="$claude_home" claude "${args[@]}" <"$prompt_file"
       fi
       exec claude "${args[@]}" <"$prompt_file"
+      ;;
+
+    opencode)
+      local -a args=(run --print-logs)
+      [[ -n "$project" ]] && args+=("--dir" "$project")
+      if [[ "$launch_kind" == "resume" ]] && [[ -n "$tool_resume_target" ]]; then
+        args+=("-s" "$tool_resume_target")
+      fi
+      if [[ "$mode" == "auto" ]]; then
+        args+=(--dangerously-skip-permissions)
+      fi
+      exec opencode "${args[@]}" "$(cat "$prompt_file")"
       ;;
     test-sleep)
       exec bash -lc 'echo "[TEST] mock AI CLI started"; sleep 5'
