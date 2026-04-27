@@ -15354,6 +15354,7 @@ apply_interruption_manager_decision() {
 }
 
 handle_interruption_intake_once() {
+  # TODO CHG 4.2: migrate to docs/issues/ model. Currently reads .freely/intake/ meta.
   local project="$1" intake_id="$2"
   local meta_file message_file status claimed_by handler_bin handler_output decision reaction classification why_text restart_point ownership handoff_text answer_text
   local lock_acquired="0"
@@ -18066,6 +18067,7 @@ cmd_intake_chat() {
 }
 
 cmd_intake_claim() {
+  # TODO CHG 2.2: migrate to docs/issues/ model. Currently writes .freely/intake/ meta.
   local project="" intake_id="" claimed_by="" reaction="" classification="" delegated_worktree="" linked_artifact="pending://claim-unlinked" status="" from_checkpoint="" expected_from_previous=""
   local meta_file claimed_at
   local -a trace_args=()
@@ -18115,6 +18117,7 @@ cmd_intake_claim() {
 }
 
 cmd_intake_resolve() {
+  # TODO CHG 2.2: migrate to docs/issues/ model. Currently writes .freely/intake/ meta.
   local project="" intake_id="" resolved_by="" reaction="" classification="" linked_artifact="pending://resolution-unlinked" delegated_worktree="" resolution_file="" absorption_target="" status="absorbed"
   local session_refs_override="" from_checkpoint="" expected_from_previous=""
   local meta_file claimed_by claimed_at reaction_existing classification_existing delegated_existing linked_existing resolution_content resolution_dir resolution_artifact
@@ -18216,6 +18219,7 @@ cmd_intake_resolve() {
 }
 
 cmd_intake_status() {
+  # TODO CHG 2.2: migrate to docs/issues/ model. Currently reads .freely/intake/.
   local project=""
   while [[ $# -gt 0 ]]; do
     case "$1" in

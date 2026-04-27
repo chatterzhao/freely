@@ -1181,6 +1181,27 @@ def main() -> int:
                     f"Prefer formal I-{{issue-id}} identities for new develop-bound work."
                 )
 
+    # GATE 6.2: linked issues must have platform_ids in docs/issues/
+    for issue_path in sorted(issue_bound_issue_paths):
+        matched = re.match(r".*/(I-\d{8}-\d{4}[A-Za-z0-9-]*)\.md$", issue_path)
+        if not matched:
+            continue
+        issue_local_id = matched.group(1)
+        docs_issue_file = os.path.join(ROOT_DIR, "docs", "issues", issue_local_id, "issue.md")
+        if os.path.exists(docs_issue_file):
+            with open(docs_issue_file) as f:
+                docs_text = f.read()
+            if "platform_ids:" not in docs_text or "issue_id:" not in docs_text.split("platform_ids:")[1][:100] if "platform_ids:" in docs_text else True:
+                errors.append(
+                    f"GATE 6.2: {issue_local_id} in docs/issues/ has no platform_ids. "
+                    "Run bin/issue-sync-bootstrap to sync before merge."
+                )
+        else:
+            errors.append(
+                f"GATE 6.2: {issue_local_id} has no docs/issues/ entry. "
+                "Run bin/issue-sync-bootstrap to create it before merge."
+            )
+
     if errors:
         print("[FAIL] develop merge governance gate blocked.")
         print("The following C/M/I lifecycle links are incomplete or inconsistent:")
