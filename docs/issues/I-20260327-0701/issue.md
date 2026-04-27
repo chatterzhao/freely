@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/61"
     synced_at: "2026-04-27T11:17:58Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:17:58Z"
 hash: ""
