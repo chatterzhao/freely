@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "112"
     url: "https://github.com/chatterzhao/freely/issues/112"
     synced_at: "2026-04-27T11:24:48Z"
+
+  gitee:
+    issue_id: "IJFO8S"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8S"
+    synced_at: "2026-04-27T13:16:30Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md"
 last_synced_comment_at:

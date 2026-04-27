@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "105"
     url: "https://github.com/chatterzhao/freely/issues/105"
     synced_at: "2026-04-27T11:24:10Z"
+
+  gitee:
+    issue_id: "IJFO8K"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8K"
+    synced_at: "2026-04-27T13:16:19Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/issues/project-level-agents-bootstrap-and-management-contract-governance.md"
 last_synced_comment_at:

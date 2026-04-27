@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "106"
     url: "https://github.com/chatterzhao/freely/issues/106"
     synced_at: "2026-04-27T11:24:14Z"
+
+  gitee:
+    issue_id: "IJFO8L"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8L"
+    synced_at: "2026-04-27T13:16:20Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md"
 last_synced_comment_at:

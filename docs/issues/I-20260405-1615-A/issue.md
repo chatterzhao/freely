@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "110"
     url: "https://github.com/chatterzhao/freely/issues/110"
     synced_at: "2026-04-27T11:24:37Z"
+
+  gitee:
+    issue_id: "IJFO8Q"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8Q"
+    synced_at: "2026-04-27T13:16:28Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md"
 last_synced_comment_at:

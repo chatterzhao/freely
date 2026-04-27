@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "107"
     url: "https://github.com/chatterzhao/freely/issues/107"
     synced_at: "2026-04-27T11:24:22Z"
+
+  gitee:
+    issue_id: "IJFO8M"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8M"
+    synced_at: "2026-04-27T13:16:22Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md"
 last_synced_comment_at:

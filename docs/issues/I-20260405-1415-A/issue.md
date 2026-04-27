@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "108"
     url: "https://github.com/chatterzhao/freely/issues/108"
     synced_at: "2026-04-27T11:24:28Z"
+
+  gitee:
+    issue_id: "IJFO8N"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8N"
+    synced_at: "2026-04-27T13:16:23Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md"
 last_synced_comment_at:

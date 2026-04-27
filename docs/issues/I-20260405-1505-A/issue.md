@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "109"
     url: "https://github.com/chatterzhao/freely/issues/109"
     synced_at: "2026-04-27T11:24:33Z"
+
+  gitee:
+    issue_id: "IJFO8P"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8P"
+    synced_at: "2026-04-27T13:16:27Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/issues/manager-semantic-loop-active-worker-suppression-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "104"
     url: "https://github.com/chatterzhao/freely/issues/104"
     synced_at: "2026-04-27T11:24:04Z"
+
+  gitee:
+    issue_id: "IJFO8I"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8I"
+    synced_at: "2026-04-27T13:16:18Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md"
 last_synced_comment_at:

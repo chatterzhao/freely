@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "111"
     url: "https://github.com/chatterzhao/freely/issues/111"
     synced_at: "2026-04-27T11:24:42Z"
+
+  gitee:
+    issue_id: "IJFO8R"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8R"
+    synced_at: "2026-04-27T13:16:29Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md"
 last_synced_comment_at:
