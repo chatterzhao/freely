@@ -247,3 +247,15 @@
 - task_refs: `tasks.md#T-17`
 - case_design: `Verify build_payload does not call scan_intake. Verify scan_raw_issues and scan_linked_issues are called.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-scan-clean-break.md`
+
+### PT-19
+- id: `PT-19`
+- requirement: `intake functions marked as DEPRECATED`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-19`
+- case_design: `Verify intake_dir_for_project and scan_intake have DEPRECATED comments.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-remaining-tasks.md`
