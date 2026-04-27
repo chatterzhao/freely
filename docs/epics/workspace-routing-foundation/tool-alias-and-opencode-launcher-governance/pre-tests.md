@@ -211,3 +211,15 @@
 - task_refs: `tasks.md#T-14`
 - case_design: `Verify chat without flags errors. Verify --issue appends comment. Verify --new-issue creates raw issue.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-chat-explicit-flags.md`
+
+### PT-15
+- id: `PT-15`
+- requirement: `chat usage text shows --issue and --new-issue flags`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-15`
+- case_design: `Verify usage text includes --issue, --new-issue, --urgent.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-chat-usage-update.md`
