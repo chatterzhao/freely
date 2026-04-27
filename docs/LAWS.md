@@ -107,7 +107,7 @@
 1. 原始发现源包括：`PROJECT_INTENT`、chat/session evidence、test、code-review、github-issue、治理漂移、运行时异常。
 2. 原始发现源必须先在合适的 dedicated worktree 中进入 `pre-brainstorm`，产出 candidate，再由 milestone 承接；不得直接伪装成 ready issue。
 3. `milestones.md` 是编排来源，不是原始发现源。
-4. `milestone.candidate_issues` 只能继续研究或进入 IBM，不得默认直接进入 dev-loop。
+4. `milestone.candidate_issues` 只能继续研究或进入 B2，不得默认直接进入 dev-loop。
 5. `milestone.committed_issues` 才是 milestone-owned issue 的正式入口。
 6. `progress` 与 `recovery` 属于延续来源；其中 `progress` 只跟踪 dev-loop 执行态。
 7. 研究项若当前仍不能收口，不得因为本轮未继续实现而静默消失；必须继续留在 `candidates.md` 与 `milestones.md.candidate_issues` 或等价的 issue-bound 挂起产物中，并写清 `next_action` 与重启条件。
@@ -125,12 +125,12 @@
 
 ---
 
-## 2B. IBM 与 Progress 边界（硬性要求）
+## 2B. B2 与 Progress 边界（硬性要求）
 
 判定规则：
-1. `IBM` 中的 `I` 是 milestone-owned issue，而不是任意发现到的问题。正式 IBM 产物目录必须先确定为 `docs/epics/{epic-name}/{story-name}/...`。
-2. candidate 未进入 milestone 前，不得声称已经进入 IBM。
-3. `progress` 只跟踪 dev-loop 中的实现、测试、阻塞、恢复与回写，不跟踪 candidate 收敛或纯 IBM 文档收敛。
+1. `B2_IBM` 中的 `I` 是 milestone-owned issue，而不是任意发现到的问题。正式 B2_IBM 产物目录必须先确定为 `docs/epics/{epic-name}/{story-name}/...`。
+2. candidate 未进入 milestone 前，不得声称已经进入 B2_IBM。
+3. `progress` 只跟踪 dev-loop 中的实现、测试、阻塞、恢复与回写，不跟踪 candidate 收敛或纯 B2 文档收敛。
 4. 若 dev-loop 暴露出边界外新问题，应回到 `pre-brainstorm`，而不是塞回当前 issue 进度。
 
 最小验收证据：
@@ -189,12 +189,12 @@
 判定规则：
 1. 以下流程标识的规范语义以本章为唯一事实源：
    - `source_class`: `discovery | milestone | continuation`
-   - `route_kind`: `pre_brainstorm | ibm | dev_loop | completion_verification | recovery`
-   - `phase_state`: `todo_pre_brainstorm | in_pre_brainstorm | done_pre_brainstorm | todo_ibm | in_ibm | done_ibm | in_dev | blocked_dev | in_verification | in_recovery | completed`
+   - `route_kind: `b2` | dev_loop | completion_verification | recovery`
+   - `phase_state`: `todo_pre_brainstorm | in_pre_brainstorm | done_pre_brainstorm | todo_b2 | in_b2 | done_b2 | in_dev | blocked_dev | in_verification | in_recovery | completed`
    - `runtime_state`: `attachable | resumable | restart_required | unavailable`
 2. `candidate.status` 只用于 pre-brainstorm 阶段，建议值保持为 `proposed | needs_research | blocked | promoted | absorbed | dropped`；不得拿它替代 issue 或 dev-loop 状态。
 2a. merge 到 `develop` 前，candidate 是否允许“没有下一环”只能由当前 `candidate.status` 判定：
-   - `proposed | needs_research | blocked`：允许暂时没有正式 IBM issue，但必须继续保留在 `docs/milestones.md.candidate_issues`，并写清 `next_action` 与 `revisit_trigger`
+   - `proposed | needs_research | blocked`：允许暂时没有正式 B2 issue，但必须继续保留在 `docs/milestones.md.candidate_issues`，并写清 `next_action` 与 `revisit_trigger`
    - `promoted`：不允许缺下一环；必须已经 materialize 为一个或多个 `I-{issue-id}*`
    - `absorbed`：允许不新开独立 issue，但必须明确写出吸收它的 owner issue 或等价 canonical owner
    - `dropped`：允许不进入下一环，但必须写清 `decision_reason`
@@ -203,17 +203,17 @@
    - `candidates.md.milestone` 必须与 `docs/milestones.md` 中实际承接它的 `M-*` 一致
    - 若当前 milestone 已明确不消费某条 `needs_research` candidate，必须显式决定：继续留在当前 milestone、谨慎后移到更合适且仍 active 的 milestone，或直接 `dropped`
    - 后移只允许发生在“已知更早会消费它的后续 active milestone”上；不得为了保持表面可见而把 candidate 长期停放到模糊远期 milestone
-3. `milestone_state` 只表达 milestone 队列归属，建议值保持为 `candidate | committed | completed`；不得再拿它表达 IBM / dev / verification 阶段。
+3. `milestone_state` 只表达 milestone 队列归属，建议值保持为 `candidate | committed | completed`；不得再拿它表达 B2 / dev / verification 阶段。
 4. 任何跨环迁移都必须同步更新对应产物，最少遵循：
    - `discovery -> pre_brainstorm`：更新 `brainstorms.md`、`candidates.md`、`milestones.md.candidate_issues`，并使用 `phase_state=todo_pre_brainstorm | in_pre_brainstorm`
-   - `candidate -> milestone-owned issue`：先把 `C-{issue-id}` 接入 milestone 的 `M-{issue-id}`；进入 IBM 时，`B` 必须把该 `M-{issue-id}` materialize 成一个或多个 `I-{issue-id}*`，并同步更新 `candidates.md.promoted_issue_path`、`docs/milestones.md.issue_path`、正式 `issue` 路径，以及这些 `I-*` 在 milestone 中的阶段与顺序，然后进入 `phase_state=in_ibm`
-   - `in_ibm -> done_ibm`：更新 `issue`、`docs/milestones.md`，不得强制创建 `progress`
-   - `done_ibm -> in_dev`：更新 `issue`、`docs/milestones.md`、`progress`
+   - `candidate -> milestone-owned issue`：先把 `C-{issue-id}` 接入 milestone 的 `M-{issue-id}`；进入 B2 时，`B` 必须把该 `M-{issue-id}` materialize 成一个或多个 `I-{issue-id}*`，并同步更新 `candidates.md.promoted_issue_path`、`docs/milestones.md.issue_path`、正式 `issue` 路径，以及这些 `I-*` 在 milestone 中的阶段与顺序，然后进入 `phase_state=in_b2`
+   - `in_b2 -> done_b2`：更新 `issue`、`docs/milestones.md`，不得强制创建 `progress`
+   - `done_b2 -> in_dev`：更新 `issue`、`docs/milestones.md`、`progress`
    - `in_dev -> blocked_dev`：更新 `issue`、`progress`、`docs/milestones.md`，并记录 blocker
    - `recovery`：更新 `progress` 或 `recovery`，并带回当前 `runtime_state` 与 `phase_state=in_recovery`
    - `in_verification -> completed`：更新 `issue`、`docs/milestones.md`、必要的 `progress/recovery` 完结记录，以及后续清理证据
 4a. 对 `pre-brainstorm -> candidate -> milestone -> issue -> progress/recovery -> completed/cleanup` 这条链，应按“治理事务”理解：只有相关 canonical artifacts 都同步后，当前迁移才算完成；不得只改其中一个文档就声称已完成收口。
-4b. `M-{issue-id}` 是 milestone candidate 身份，不等于最终执行编排身份；一旦 IBM materialization 产出一个或多个 `I-{issue-id}*`，milestone 的正式编排必须切到这些 `I-*`，原始 `M-*` 只保留来源与追溯语义。
+4b. `M-{issue-id}` 是 milestone candidate 身份，不等于最终执行编排身份；一旦 B2 materialization 产出一个或多个 `I-{issue-id}*`，milestone 的正式编排必须切到这些 `I-*`，原始 `M-*` 只保留来源与追溯语义。
 5. `session_refs` 是跨环证据字段；当 candidate 进入 issue、issue 进入 dev-loop、或进入 recovery 时，必须把当前有效会话证据继续写入下一层产物。
 6. `session_refs` 的最小字段为：
    - `tool`
@@ -229,7 +229,7 @@
    - `acceptance_reviews`
 8b. `acceptance_criteria` / `promotion_gate` / `open_questions` 属于 candidate-level acceptance boundary，不等于 issue / dev / verification 的实现验收。
 8c. `candidate_format_version: v2` 的 candidate 若进入 promotion 决策，至少应有一次独立 acceptance review 记录；高风险 candidate 优先多个 subagent 或 fresh process review。
-8d. 进入 IBM 后，必须把 candidate-level acceptance 深化为 issue-level acceptance，并反映在 issue / `prd.md` / `pre-tests.md` / `tasks.md` / issue-bound brainstorm 中。
+8d. 进入 B2 后，必须把 candidate-level acceptance 深化为 issue-level acceptance，并反映在 issue / `prd.md` / `pre-tests.md` / `tasks.md` / issue-bound brainstorm 中。
 8e. develop-bound implementation-bearing work（首批至少包括 `bin/`、`docs/system/`、`src/` 下的 capability materialization）必须在当前 owner issue 的 `verification_artifact_dir` 下写一份 issue-bound implementation decision note；该 note 是 dev-loop thoughtfulness 的 canonical surface，不得随机落点或复制成平行真相。最小字段至少包括：
    - `decision`
    - `why_this`
@@ -251,7 +251,7 @@
    - `rotate`：下一轮直接进入 `fresh_with_handoff`
 19. continuity artifact 的落点必须遵循 loop 分层，不得一律写成 `progress`：
    - `dev-loop` 写 `progress`
-   - `doc-loop` 写当前 issue / IBM / pre-brainstorm 产物
+   - `doc-loop` 写当前 issue / B2_IBM / pre-brainstorm 产物
    - `recovery` 写 `recovery` 或允许的等价恢复留痕
 20. 若 runtime 无法直接知道当前 loop 的精确文档路径，至少必须把 `summary_target_hint` 写入 prompt / handoff，由当前 AI 在下一跳先补 continuity，再继续业务推进。
 21. `needs_research` 或其他未收口 candidate 不得脱离 milestone 可见队列；除非显式写成 `dropped` 或已 materialize 为 milestone-owned issue，否则必须保留在 `milestones.md.candidate_issues`，并具备可执行的 `next_action` 与 `revisit_trigger` 或等价字段。
@@ -270,9 +270,9 @@
 flowchart LR
     A[todo_pre_brainstorm] --> B[in_pre_brainstorm]
     B --> C[done_pre_brainstorm]
-    C --> D[todo_ibm]
-    D --> E[in_ibm]
-    E --> F[done_ibm]
+    C --> D[todo_b2]
+    D --> E[in_b2]
+    E --> F[done_b2]
     F --> G[in_dev]
     G --> H[in_verification]
     H --> J[completed]
@@ -535,7 +535,7 @@ phase-1 break-glass merge commit 仍应包含：
 ## 11. 方法论总述（硬性要求）
 
 判定规则：
-1. Doc-loop 产物完整（`IBM` 业务产物与 `G` 治理产物按 issue 范围满足其一或组合，并保持可追溯）。
+1. Doc-loop 产物完整（`B2_IBM` 业务产物与 `G` 治理产物按 issue 范围满足其一或组合，并保持可追溯）。
 2. Dev-loop 产物完整，且测试证据可追溯。
 3. Auto-loop 路由可解释，回流状态正确。
 4. `map` 阶段定义 `PRE_TEST` 基线，提升/合并阶段使用执行后的 `TEST` 结果。

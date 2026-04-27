@@ -1,4 +1,7 @@
-# 预研头脑风暴索引
+# Pre-brainstorm 索引（IBM Framework B1）
+- 20260426-0003--ibm-framework-docs
+  - brainstorms: docs/pre-brainstorms/20260426-0003--ibm-framework-docs/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260426-0003--ibm-framework-docs/candidates.md
 - 20260426-0002--break-glass-agents-guidance
   - brainstorms: docs/pre-brainstorms/20260426-0002--break-glass-agents-guidance/brainstorms.md
   - candidates: docs/pre-brainstorms/20260426-0002--break-glass-agents-guidance/candidates.md

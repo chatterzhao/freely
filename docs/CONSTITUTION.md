@@ -251,7 +251,7 @@ Freely 遵循三个 loop 的方法论。
 ```text
 A:auto-loop（外循环）
 ├── 发现与路由 Issue
-├── 进入 D:doc-loop（前置收敛 / IBM 文档收敛）
+├── 进入 D:doc-loop（前置收敛 / B2_IBM 文档收敛）
 ├── 或进入 D:dev-loop-execution（开发实现环）
 ├── 基于 canonical evidence 做 completion / verification / cleanup judgment
 └── 吸收结果并进入下一轮

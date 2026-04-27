@@ -19,6 +19,7 @@ Freely 处于研究优先的整合阶段。
 - `docs/epics/`
 - `docs/progress/`
 - `docs/system/workspace/`
+- `docs/system/workspace/ibm-framework.md`（IBM Framework 能力真源）
 
 不要将遗留路径视为活跃工作流输入（例如：旧布局下的 `docs/brainstorms/`、`docs/planning/`、`docs/continuity/`、`docs/validation/`、`docs/reviews/`）。
 
@@ -65,19 +66,19 @@ Freely 处于研究优先的整合阶段。
    - 测未 merge 的主管态示例：`/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile/bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 2. **大重构先做 fleet sequencing audit**：若当前任务会同时改多层真源、跨多个现有 worktree / issue，或可能重排架构主干，先运行 `git worktree list --porcelain`、`./bin/wt-fleet-status`、`./bin/freely live-status --project <project-root>`、`./bin/freely fleet-status --project <project-root>`，并把结果与 `docs/milestones.md` / 相关 `progress` 对齐。优先收束 `dirty` 或仍在 `desired=running` 的 worktree，识别必须先合并的上游治理树，再决定是否开大重构 lane；不要在 fleet 状态模糊时直接开始深层重构。
 3. **首跳先判 loop，不要先判 cleanup**：
-   - 如果是 Freely 自举中暴露的新共性问题，先判它是否应成为 Freely 能力发现；若边界未稳定，先进入 `docs/pre-brainstorms/`
+   - 如果是 Freely 自举中暴露的新共性问题，先判它是否应成为 Freely 能力发现；若边界未稳定，先进入 B1_IBM（`docs/pre-brainstorms/`）
    - 如果当前变更已落在现有 issue scope 内，优先吸收到既有 `issue / milestones / progress / code-review` 生命周期，不要为了一个新 worktree 再伪造新 candidate / issue
    - 只有当问题已经是“现有 lifecycle 走到 merge / verification / cleanup 哪一步”时，才切到 worktree promotion / retirement 判断
-4. **头脑风暴路由**：
-   - 预研头脑风暴（不是基于 issue 文档）：文档放 `docs/pre-brainstorms/`
-   - IBM 头脑风暴（基于 issue 文档）：文档放 `docs/epics/{epic-name}/{story-name}/brainstorms/b-{issue-name}.md`
+4. **IBM Framework 路由**：工作项按 `docs/system/workspace/ibm-framework.md` 定义的两阶段推进。
+   - B1_IBM（Input → Brainstorm → Milestone）：Input source（github/gitee issue、chat 插话）→ 预研收敛 → candidate 入里程碑。文档落 `docs/pre-brainstorms/{b1-id}/`
+   - B2_IBM（Input → Brainstorm → Map）：Input source（milestone committed_issues 中的正式 issue）→ 实现设计 → Map 产物（epic/story/{name}/ + PRD + pre-tests + tasks + code-review）。文档落 `docs/epics/{epic-name}/{story-name}/`
 
 ## Freely 自举首跳
 
 Freely 开发 Freely 时，默认先问四件事：
 
 1. 这是新问题，还是现有 issue 的 continuation？
-   - 新问题：先走 pre-brainstorm / candidate / milestone
+   - 新问题：先走 B1_IBM → candidate → milestone
    - 现有 issue continuation：直接回到该 issue 的 doc-loop / dev-loop / verification
 2. 这是 Freely 自身产品架构、开发治理、可复用能力，还是单纯 worktree 生命周期问题？
    - Freely 自身产品架构：先看 `PROJECT_INTENT`、`CONSTITUTION`、`LAWS`，并在需要时回写 `AGENTS.md`
@@ -118,7 +119,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 ## 执行指引
 - 保持本文件简洁稳定；不要重复宪法/法律中的详细规则。
 - 将细节添加到规范文档中，然后在此引用。
-- 当出现不确定性时，打开/更新一个预研头脑风暴条目，先在那里收敛。
+- 当出现不确定性时，打开/更新一个 B1_IBM 条目，先在那里收敛。按 `docs/system/workspace/ibm-framework.md` 判定当前处于 B1_IBM 还是 B2_IBM。
 
 ## 项目级 AGENTS 管理
 - Freely 面向任意托管项目时，项目根目录的 `AGENTS.md` 是第一入口；应先读项目级 `AGENTS.md`，再读 Freely 的复用能力真源。
