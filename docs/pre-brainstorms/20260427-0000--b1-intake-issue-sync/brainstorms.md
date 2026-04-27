@@ -491,9 +491,11 @@ I-20260427-1030-A       key = "20260427-1030-A"    ← 以 C key 开头
 
 平台（github/gitee）评论有唯一整数 ID。sync 流程：
 
-1. 本地有新评论（`###` 章节的元数据行没有目标平台的 `comment_id`）
+1. 本地有新评论（`### comment-{local_id}`，元数据行中没有目标平台的 `comment_id`）
 2. `bin/issue-sync comment` → 调平台 API，POST 评论
 3. 平台返回 `{id: 12345}`
-4. sync 将 `comment_id` 写回该 `###` 的元数据行：`{source: chat, platform_ids: {github: {comment_id: "12345"}}}`
+4. sync 将 `comment_id` 写回该 `###` 的元数据行
 
 之后该评论在本地和平台之间有了双向映射。后续更新、删除等操作通过 platform comment_id 定位。
+
+**本地 ID 的作用**：chat 执行后立即生成，不阻塞等网络。本地引用（如 urgent signal、session_refs）用 local_id。平台 ID 是异步补充的——即使 sync 失败，本地 ID 仍然有效。

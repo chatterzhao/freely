@@ -196,7 +196,7 @@ issue 正文内容。
 
 ## Comments
 
-### 2026-04-27T10:25:00Z - human (chat)
+### comment-20260427T102500Z
 {source: chat, platform_ids: {github: {comment_id: "12345"}, gitee: {comment_id: "67890"}}}
 
 评论内容。
@@ -204,7 +204,8 @@ issue 正文内容。
 
 - 所有元数据在 YAML frontmatter 中（参考 issueme `data-model.md`）
 - `last_synced_comment_at`：sync 脚本只推送此时间戳后的新评论到平台
-- 每条评论的 `###` 标题下方的元数据行记录 `platform_ids`。sync 后将平台返回的 comment_id 写回此行
-- 评论没有本地独立 ID——时间戳 + 归属 issue + 平台 comment_id 三者共同定位
+- 每条评论的标题为 `### comment-{local_id}`。local_id 在创建时立即生成（`comment-YYYYMMDDTHHMMSSZ`），不依赖平台返回
+- `platform_ids` 记录平台上的 comment_id。sync 后异步写回，未同步时字段为空
+- 本地引用永远用 local_id，不依赖平台 ID 的存在
 - `hash`：内容幂等校验，避免重复推送
 - 每条评论是一个 `###` 章节，按时间倒序或正序排列
