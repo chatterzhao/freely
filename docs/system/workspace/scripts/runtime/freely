@@ -5225,11 +5225,6 @@ _write_chat_to_issue() {
 
   target_issue="${FREELY_CHAT_TARGET_ISSUE:-}"
 
-  # If no explicit --issue, route: script match → new raw issue
-  if [[ -z "$target_issue" ]]; then
-    target_issue="$(_route_chat_to_issue "$project" "$message")"
-  fi
-
   if [[ -n "$target_issue" ]]; then
     # --- Append as comment to existing issue ---
     issue_file="$issues_dir/$target_issue/issue.md"
@@ -18016,7 +18011,7 @@ cmd_tui() {
 }
 
 cmd_intake_chat() {
-  local project="" message="" message_file="" author="human" channel="chat" intake_id="" target_issue="" urgent=""
+  local project="" message="" message_file="" author="human" channel="chat" intake_id="" target_issue="" urgent="" new_issue=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -18025,6 +18020,7 @@ cmd_intake_chat() {
       --author) author="${2:-}"; shift 2 ;;
       --channel) channel="${2:-}"; shift 2 ;;
       --issue) target_issue="${2:-}"; shift 2 ;;
+      --new-issue) new_issue="true"; shift ;;
       --urgent) urgent="true"; shift ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
@@ -18036,8 +18032,19 @@ cmd_intake_chat() {
   fi
   [[ -n "$message" ]] || { log_error "missing --message or --message-file"; exit 1; }
 
+  # Require explicit intent: --issue or --new-issue
+  if [[ -z "$target_issue" && "$new_issue" != "true" ]]; then
+    log_error "missing --issue <id> or --new-issue: every chat must explicitly target an existing issue or create a new one"
+    exit 1
+  fi
+  if [[ -n "$target_issue" && "$new_issue" == "true" ]]; then
+    log_error "--issue and --new-issue are mutually exclusive"
+    exit 1
+  fi
+
   # Set env vars for _write_chat_to_issue
   [[ -n "$target_issue" ]] && export FREELY_CHAT_TARGET_ISSUE="$target_issue"
+  [[ -n "$new_issue" ]] && export FREELY_CHAT_NEW_ISSUE="$new_issue"
   [[ -n "$urgent" ]] && export FREELY_CHAT_URGENT="$urgent"
 
   intake_id="$(next_intake_id "$project" "$message")"
