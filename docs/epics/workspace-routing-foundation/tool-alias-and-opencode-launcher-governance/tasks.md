@@ -1,0 +1,31 @@
+# Tasks: tool-alias-and-opencode-launcher-governance
+
+## Completed
+
+### T-1
+- id: `T-1`
+- title: `Add opencode launch case to tool_run_direct_from_prompt_file`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-26`
+
+### T-2
+- id: `T-2`
+- title: `Add opencode session ID extraction in monitor-ai-cli.sh`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-26`
+
+### T-3
+- id: `T-3`
+- title: `Add shell alias resolution and AI_TOOL_EXTRA_ARGS injection`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-26`
+
+### T-4
+- id: `T-4`
+- title: `Add opencode to all tool validation lists`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-26`

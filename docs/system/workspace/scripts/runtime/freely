@@ -672,9 +672,9 @@ parse_ai_spec() {
   }
 
   case "$tool" in
-    codex|kiro-cli|iflow|cc|cc-use-codex-cli) ;;
+    codex|kiro-cli|iflow|cc|cc-use-codex-cli|opencode) ;;
     *)
-      log_error "unsupported tool: $tool (supported: codex, kiro-cli, iflow, cc, cc-use-codex-cli)"
+      log_error "unsupported tool: $tool (supported: codex, kiro-cli, iflow, cc, cc-use-codex-cli, opencode)"
       exit 1
       ;;
   esac
@@ -3097,7 +3097,7 @@ tool_uses_claude_session_id() {
 tool_prefers_explicit_resume_target() {
   local tool="$1"
   case "$tool" in
-    codex|cc|cc-use-codex-cli) return 0 ;;
+    codex|cc|cc-use-codex-cli|opencode) return 0 ;;
     *) return 1 ;;
   esac
 }

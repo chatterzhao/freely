@@ -95,6 +95,9 @@ extract_tool_session_id_from_log_if_present() {
     test-session)
       sed -n 's/^session id: //p' "$current_log_file" | head -n 1
       ;;
+    opencode)
+      sed -n 's/.*service=session id=\(ses_[A-Za-z0-9_]*\).*/\1/p' "$current_log_file" | head -n 1
+      ;;
     *)
       ;;
   esac

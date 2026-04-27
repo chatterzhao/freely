@@ -241,7 +241,7 @@ tool_has_capability() {
 tool_accepts_explicit_resume_target() {
   local tool="$1"
   case "$tool" in
-    codex|iflow) return 0 ;;
+    codex|iflow|opencode) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -366,6 +366,53 @@ tool_run_direct_from_prompt_file() {
   local claude_session_id="${15:-}"
   local tool_resume_target="${16:-}"
 
+  local -a tool_extra_args=()
+  if [[ -n "${AI_TOOL_EXTRA_ARGS:-}" ]]; then
+    IFS=' ' read -ra tool_extra_args <<< "${AI_TOOL_EXTRA_ARGS}"
+  fi
+
+  # Resolve shell alias if tool is not a known command (e.g. ccds-auto -> claude)
+  _resolve_tool_alias() {
+    local name="$1"
+    local resolved
+    # Known tool families: return as-is
+    case "$name" in
+      codex|kiro-cli|iflow|claude|cc|cc-use-codex-cli|opencode|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
+        printf '%s\n' "$name"
+        return 0
+        ;;
+    esac
+    # Unknown name: try zsh alias resolution (user's .zshrc aliases)
+    resolved=$(zsh -ic "alias '$name' 2>/dev/null" 2>/dev/null | sed -n "s/^${name}='\(.*\)'$/\1/p")
+    if [[ -n "$resolved" ]]; then
+      printf '%s\n' "$resolved"
+      return 0
+    fi
+    # Unresolved: return as-is (may fail later)
+    printf '%s\n' "$name"
+    return 0
+  }
+
+  local resolved_tool_full
+  resolved_tool_full=$(_resolve_tool_alias "$tool")
+  if [[ "$resolved_tool_full" != "$tool" ]]; then
+    # Alias was resolved: extract binary and prepend extra args to tool_extra_args
+    local resolved_bin="${resolved_tool_full%% *}"
+    local alias_extra="${resolved_tool_full#* }"
+    if [[ "$alias_extra" != "$resolved_tool_full" ]]; then
+      local -a alias_args
+      IFS=' ' read -ra alias_args <<< "$alias_extra"
+      tool_extra_args=("${alias_args[@]}" "${tool_extra_args[@]}")
+    fi
+    tool="$resolved_bin"
+  fi
+
+  # Allow AI_TOOL_FAMILY to override detected tool family (e.g. alias resolves to
+  # a wrapper script, but resume/session conventions follow a known family)
+  if [[ -n "${AI_TOOL_FAMILY:-}" ]]; then
+    tool="${AI_TOOL_FAMILY}"
+  fi
+
   case "$tool" in
     codex)
       wait_for_codex_slot_switch_idle_before_launch || return 1
@@ -384,7 +431,7 @@ tool_run_direct_from_prompt_file() {
       [[ -n "$model" ]] && args+=(-m "$model")
       [[ -n "$reasoning_effort" ]] && args+=(-c "model_reasoning_effort=\"$reasoning_effort\"")
       [[ "$mode" == "auto" ]] && args+=(--dangerously-bypass-approvals-and-sandbox)
-      exec codex "${args[@]}" - <"$prompt_file"
+      exec codex "${tool_extra_args[@]}" "${args[@]}" - <"$prompt_file"
       ;;
     iflow)
       local worktrees_root
@@ -400,25 +447,25 @@ tool_run_direct_from_prompt_file() {
         fi
       fi
       if [[ "$mode" == "auto" ]]; then
-        exec iflow "${args[@]}" -p "$(cat "$prompt_file")" -y --max-turns 100
+        exec iflow "${tool_extra_args[@]}" "${args[@]}" -p "$(cat "$prompt_file")" -y --max-turns 100
       else
-        exec iflow "${args[@]}" -p "$(cat "$prompt_file")" --default --max-turns 100
+        exec iflow "${tool_extra_args[@]}" "${args[@]}" -p "$(cat "$prompt_file")" --default --max-turns 100
       fi
       ;;
     kiro-cli)
       local selected_model="${model:-auto}"
       if [[ "$launch_kind" == "resume" ]]; then
         if [[ "$mode" == "auto" ]]; then
-          exec kiro-cli chat --resume --no-interactive --trust-all-tools --model "$selected_model" "继续上次未完成工作，按项目意图和宪法持续推进。"
+          exec kiro-cli "${tool_extra_args[@]}" chat --resume --no-interactive --trust-all-tools --model "$selected_model" "继续上次未完成工作，按项目意图和宪法持续推进。"
         else
-          exec kiro-cli chat --resume --model "$selected_model" "继续上次未完成工作，按项目意图和宪法持续推进。"
+          exec kiro-cli "${tool_extra_args[@]}" chat --resume --model "$selected_model" "继续上次未完成工作，按项目意图和宪法持续推进。"
         fi
       fi
 
       if [[ "$mode" == "auto" ]]; then
-        exec kiro-cli chat --no-interactive --trust-all-tools --model "$selected_model" <"$prompt_file"
+        exec kiro-cli "${tool_extra_args[@]}" chat --no-interactive --trust-all-tools --model "$selected_model" <"$prompt_file"
       else
-        exec kiro-cli chat --model "$selected_model" <"$prompt_file"
+        exec kiro-cli "${tool_extra_args[@]}" chat --model "$selected_model" <"$prompt_file"
       fi
       ;;
     cc|cc-use-codex-cli)
@@ -452,9 +499,21 @@ tool_run_direct_from_prompt_file() {
         args+=(--append-system-prompt "$system_prompt")
       fi
       if [[ -n "$claude_home" ]]; then
-        exec env HOME="$claude_home" claude "${args[@]}" <"$prompt_file"
+        exec env HOME="$claude_home" claude "${tool_extra_args[@]}" "${args[@]}" <"$prompt_file"
       fi
-      exec claude "${args[@]}" <"$prompt_file"
+      exec claude "${tool_extra_args[@]}" "${args[@]}" <"$prompt_file"
+      ;;
+
+    opencode)
+      local -a args=(run --print-logs)
+      [[ -n "$project" ]] && args+=("--dir" "$project")
+      if [[ "$launch_kind" == "resume" ]] && [[ -n "$tool_resume_target" ]]; then
+        args+=("-s" "$tool_resume_target")
+      fi
+      if [[ "$mode" == "auto" ]]; then
+        args+=(--dangerously-skip-permissions)
+      fi
+      exec opencode "${tool_extra_args[@]}" "${args[@]}" "$(cat "$prompt_file")"
       ;;
     test-sleep)
       exec bash -lc 'echo "[TEST] mock AI CLI started"; sleep 5'
