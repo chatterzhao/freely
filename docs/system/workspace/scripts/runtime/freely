@@ -1888,6 +1888,9 @@ manager_operator_stop_boundary_file() {
 }
 
 intake_dir_for_project() {
+  # DEPRECATED: .freely/intake/ replaced by docs/issues/ (IBM Framework B1_IBM).
+  # Chat now writes to docs/issues/raw-*/issue.md or appends comments.
+  # This function exists for backward compat only. Do not add new callers.
   local project="$1"
   echo "$(state_dir "$project")/intake"
 }

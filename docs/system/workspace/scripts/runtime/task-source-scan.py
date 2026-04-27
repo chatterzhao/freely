@@ -222,6 +222,9 @@ def restart_point_for_interruption(classification: str) -> str:
 
 
 def scan_intake(project: Path) -> list[dict]:
+    # DEPRECATED: .freely/intake/ scan is no longer called from build_payload.
+    # Replaced by scan_raw_issues() and scan_linked_issues().
+    # This function remains for historical data access only.
     items = []
     intake_root = project / ".freely" / "intake"
     if not intake_root.is_dir():
