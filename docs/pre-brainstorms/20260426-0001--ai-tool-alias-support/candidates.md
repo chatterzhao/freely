@@ -25,7 +25,9 @@
   - removing existing tool family cases
   - full generic launcher (keeps backward compat)
 - absorbed_by_issue: `I-20260426-0000-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
 - absorbed_by_issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
 - absorption_reason: `Alias resolution is part of the same tool launcher enhancement as opencode integration. Absorbed into the new canonical issue I-20260426-0000-A.`
+- decision_reason: `This candidate covers the AI_TOOL alias resolution change. Since it is implemented in the same files as the opencode launcher, it shares the same canonical owner issue I-20260426-0000-A.`
 - session_refs:
   - {tool: ccds, session_id: "20260426-alias-support", jsonl_path: "unavailable://manual", role: "author"}
