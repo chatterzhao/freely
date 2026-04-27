@@ -1,7 +1,4 @@
 # 预研头脑风暴索引
-- 20260426-0001--ai-tool-alias-support
-  - brainstorms: docs/pre-brainstorms/20260426-0001--ai-tool-alias-support/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260426-0001--ai-tool-alias-support/candidates.md
 - 20260426-0000--opencode-direct-launcher-integration
   - brainstorms: docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/brainstorms.md
   - candidates: docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/candidates.md
