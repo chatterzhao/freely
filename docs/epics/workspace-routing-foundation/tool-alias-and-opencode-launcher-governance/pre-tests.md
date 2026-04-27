@@ -150,3 +150,15 @@
 - task_refs: `tasks.md#T-9`
 - case_design: `Verify bash -n passes. Verify tool launch with and without AI_TOOL_EXTRA_ARGS.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-tool-extra-args-unbound.md`
+
+### PT-10
+- id: `PT-10`
+- requirement: `claude recognized in tool validation lists for alias resolution`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-10`
+- case_design: `Verify start-lead-agent.sh and tool-launchers.sh include claude in validation lists.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-claude-tool-validation.md`
