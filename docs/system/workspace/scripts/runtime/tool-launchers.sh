@@ -291,7 +291,7 @@ ensure_claude_runtime_home_for_launch() {
 tool_supports_add_dir_boundary() {
   local tool="$1"
   case "$tool" in
-    codex|iflow|cc|cc-use-codex-cli) return 0 ;;
+    codex|iflow|claude|claude|cc|cc-use-codex-cli) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -468,7 +468,7 @@ tool_run_direct_from_prompt_file() {
         exec kiro-cli "${tool_extra_args[@]:-}" chat --model "$selected_model" <"$prompt_file"
       fi
       ;;
-    cc|cc-use-codex-cli)
+    claude|cc|cc-use-codex-cli)
       local system_prompt worktrees_root project_branch claude_home_mode claude_home
       local -a args=(-p)
       worktrees_root="$(tool_boundary_add_dir "$tool" "$project")"
