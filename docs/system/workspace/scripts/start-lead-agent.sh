@@ -212,7 +212,7 @@ parse_ai_spec_or_fail() {
   }
 
   case "$tool" in
-    codex|kiro-cli|iflow|cc|cc-use-codex-cli|opencode|test-sleep|test-compact|test-once|test-session|test-route-only) ;;
+    codex|kiro-cli|iflow|cc|claude|cc-use-codex-cli|opencode|test-sleep|test-compact|test-once|test-session|test-route-only) ;;
     *)
       echo "[ERROR] unsupported tool: $tool" >&2
       exit 1
