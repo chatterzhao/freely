@@ -197,12 +197,14 @@ issue 正文内容。
 ## Comments
 
 ### 2026-04-27T10:25:00Z - human (chat)
-{source: chat}
+{source: chat, platform_ids: {github: {comment_id: "12345"}, gitee: {comment_id: "67890"}}}
 
 评论内容。
 ```
 
 - 所有元数据在 YAML frontmatter 中（参考 issueme `data-model.md`）
 - `last_synced_comment_at`：sync 脚本只推送此时间戳后的新评论到平台
+- 每条评论的 `###` 标题下方的元数据行记录 `platform_ids`。sync 后将平台返回的 comment_id 写回此行
+- 评论没有本地独立 ID——时间戳 + 归属 issue + 平台 comment_id 三者共同定位
 - `hash`：内容幂等校验，避免重复推送
 - 每条评论是一个 `###` 章节，按时间倒序或正序排列

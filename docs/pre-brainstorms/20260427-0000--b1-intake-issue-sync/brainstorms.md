@@ -486,3 +486,14 @@ I-20260427-1030-A       key = "20260427-1030-A"    ← 以 C key 开头
 - key 格式：`YYYYMMDD-HHMM`，HHMM 是 issue 创建的实际时间
 - `-A`/`-B` 后缀：candidate/issue 可以 split 成多个，共享 base key
 - 门禁校验：issue_key 必须以 candidate_key 开头（已有）。raw→C 的校验需新增
+
+### 22. 平台评论 ID 与本地评论的映射
+
+平台（github/gitee）评论有唯一整数 ID。sync 流程：
+
+1. 本地有新评论（`###` 章节的元数据行没有目标平台的 `comment_id`）
+2. `bin/issue-sync comment` → 调平台 API，POST 评论
+3. 平台返回 `{id: 12345}`
+4. sync 将 `comment_id` 写回该 `###` 的元数据行：`{source: chat, platform_ids: {github: {comment_id: "12345"}}}`
+
+之后该评论在本地和平台之间有了双向映射。后续更新、删除等操作通过 platform comment_id 定位。
