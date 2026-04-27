@@ -4,7 +4,7 @@
 
 ### Pre-merge focused gate acceptance
 
-- acceptance target: `opencode direct launcher + alias resolution`
+- acceptance target: `opencode direct launcher + AI_TOOL alias resolution`
 - testing layer: `integration + manual foreground`
 - target environment: `feature worktree`
 - required evidence: `syntax check, launch verification, session ID extraction, alias resolution`
@@ -20,23 +20,29 @@
 - target environment: `feature worktree`
 - required evidence: `bash -n pass on all modified files`
 - blocker taxonomy: `execution_pending_or_failed`
-- evidence_summary: `All modified files pass bash -n: tool-launchers.sh, monitor-ai-cli.sh, freely, start-lead-agent.sh.`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `The opencode case and alias resolver are shell functions without isolatable unit boundaries. bash -n is the appropriate validation at this layer.`
+- replacement_evidence: `All modified files pass bash -n syntax check: tool-launchers.sh, monitor-ai-cli.sh, freely, start-lead-agent.sh.`
 
 ## Integration
 - acceptance target: `opencode direct adapter launch and ccds alias resolution in daemon`
 - testing layer: `runtime integration daemon`
 - target environment: `feature worktree daemon`
-- required evidence: `daemon start, ai_launch_begin with tool=opencode, alias resolution log`
+- required evidence: `daemon start, ai_launch_begin event, alias resolution log`
 - blocker taxonomy: `execution_pending_or_failed`
-- evidence_summary: `Daemon start with AI_TOOL=opencode: lifecycle trace records ai_launch_begin with tool=opencode tool_adapter=direct. ccds alias resolution: zsh -ic returns claude --settings path, binary detection enters cc family.`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `Integration validation is through real daemon lifecycle observation, not isolated integration tests. PT items 1-4 cover the integration surface.`
+- replacement_evidence: `Daemon start recorded ai_launch_begin with tool=opencode, tool_adapter=direct. ccds alias resolved via zsh -ic to claude binary.`
 
 ## End-to-End
-- acceptance target: `full daemon lifecycle with opencode and ccds`
+- acceptance target: `full daemon lifecycle with opencode and ccds alias`
 - testing layer: `end-to-end daemon`
 - target environment: `real macOS host`
-- required evidence: `complete lifecycle from supervisor start to ai_cycle_finished`
+- required evidence: `supervisor start to ai_cycle_finished, session ID capture, model response`
 - blocker taxonomy: `execution_pending_or_failed`
-- evidence_summary: `Full daemon cycle: supervisor_started -> prompt build -> ai_launch_begin (tool=opencode/ccds) -> model response -> ai_cycle_finished. Session IDs captured.`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `E2E is validated by the Real-Environment section below, which runs on the real macOS host with the same daemon lifecycle.`
+- replacement_evidence: `Real-Environment section documents the full daemon cycle on macOS Darwin 25.3.`
 
 ## Real-Environment
 - acceptance target: `real macOS host with opencode v1.14.26 and ccds alias`
@@ -54,6 +60,7 @@
 - requirement: `opencode launches via direct adapter in auto mode`
 - evidence_level: `integration`
 - status: `pass`
+- surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-1`
@@ -65,6 +72,7 @@
 - requirement: `opencode session ID extracted from --print-logs output`
 - evidence_level: `integration`
 - status: `pass`
+- surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-2`
@@ -76,10 +84,11 @@
 - requirement: `AI_TOOL=ccds alias resolves to claude binary via zsh -ic`
 - evidence_level: `integration`
 - status: `pass`
+- surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-3`
-- case_design: `Set AI_TOOL=ccds. Verify alias resolves to claude --settings ~/.claude/settings_deepseek.json, enters cc family.`
+- case_design: `Set AI_TOOL=ccds. Verify alias resolves to claude --settings path, enters cc family.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260426-tool-alias-opencode-premerge-verification.md`
 
 ### PT-4
@@ -87,6 +96,7 @@
 - requirement: `AI_TOOL_EXTRA_ARGS injected into tool launch command`
 - evidence_level: `integration`
 - status: `pass`
+- surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-4`
