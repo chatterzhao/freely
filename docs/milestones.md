@@ -50,6 +50,22 @@ routing_policy:
 
 ### committed_issues
 
+1. `I-20260426-0000-A`
+- title: Add opencode direct launcher and AI_TOOL alias resolution
+- milestone_state: candidate
+- phase_state: `in_verification`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
+  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/tasks.md`
+  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260426-tool-alias-opencode-premerge-verification.md`
+
 1. `I-20260418-1900-A`
 - title: Runtime lifecycle receipt followthrough governance
 - milestone_state: candidate
