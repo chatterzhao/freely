@@ -35,9 +35,10 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 | M | Milestone | 产出 candidate（`candidates.md`）：scope、non-goals、priority、status、milestone 归属 |
 
 **信号进入 B1_IBM**：
-- github/gitee issue：`task-source-scan.py` 扫描到 raw issue 后，`restart_point=pre_brainstorm`，lead agent 路由到 B1_IBM
-- chat 插话：`freely chat` → `.freely/intake/` → `interruption-manager-handler` 分类为 `discovery` → 路由到 B1_IBM
-- 其他信号（runtime anomaly、review 发现）：先通过 chat 插话或创建平台 issue，再进入上述路径
+- 平台 issue（github/gitee）：`task-source-scan.py` 下载到本地 `.freely/issues/`。raw issue 的 `restart_point=pre_brainstorm`，lead agent 路由到 B1_IBM
+- chat 插话：`freely chat` → `chat-routing skill` 判断属于哪个 issue → 创建 raw issue 或已有 issue 的 comment → 写入 `.freely/issues/`。新 raw issue 进入 scan → B1_IBM
+- 其他信号（runtime anomaly、review 发现）：通过 chat 插话进入，同上
+- AI **永远不直接读平台内容**——只读本地 `.freely/issues/` 中的副本。平台内容由 scan 脚本下载一次
 - 详细路由见 `context-source-skill` 和 `docs/system/workspace/three-loop-capability-lifecycle.md`
 
 **B1 回答**：这个值得做吗？排在哪？边界是什么？
@@ -115,6 +116,51 @@ auto-loop ←→ 信号捕获、B1/B2 之间的 routing、completion/verificatio
 ```
 
 详细 routing 见 `docs/system/workspace/three-loop-capability-lifecycle.md`。治理规则见 `docs/LAWS.md` §2。
+
+## Issue 存储与平台隔离
+
+IBM Framework 的 I（Input source）统一为 github/gitee issue。平台 issue 通过 scan 下载到本地，AI 只读写本地副本。
+
+### 本地存储
+
+```
+.freely/issues/
+├── ISSUES.md                          # 所有 issue 的映射索引
+├── comments/
+│   └── {comment-id}.md                # 评论（frontmatter 记录归属 issue）
+├── raw-{YYYYMMDD}-{NNNN}/             # raw issue：B1_IBM 的 Input
+│   ├── meta.env                       # 平台 ID、状态、canonical 关联
+│   └── issue.md                       # issue 正文
+└── I-{YYYYMMDD}-{NNNN}-{split}/       # linked issue：B2_IBM 的产物
+    ├── meta.env                       # 平台 ID、canonical 路径
+    └── issue.md                       # 正式 issue 摘要
+```
+
+### 平台隔离
+
+- AI **永远不直接读写平台**（不调 github/gitee API）
+- **scan**（`task-source-scan.py`）是平台→本地的唯一桥梁：下载 issue、评论到 `.freely/issues/`
+- **sync**（`bin/issue-sync`）是本地→平台的唯一桥梁：创建 issue、更新状态、推送评论
+- sync 触发是确定性的生命周期事件（candidate promoted、phase_state 变更、merge），不是 AI 判断
+- 本地是唯一真相源。平台数据丢失时从本地重建
+
+### chat 插话 → issue
+
+每条 `freely chat` 必须落地为 issue 或已有 issue 的评论：
+
+- `chat-routing skill` 判断消息归属（OPEN issue→comment，CLOSED→reopen 或新建并 link，新内容→新建 raw issue）
+- skill 只做路由，不做价值判断。最终 promote/absorb/drop 由 B1_IBM 决定
+- 即使内容看似无价值，也创建 raw issue——B1 标记 `dropped` 并写清 `drop_reason`
+
+### issue 生命周期中的 sync 触发点
+
+| 事件 | sync 动作 |
+|------|----------|
+| chat 插话 | `issue-sync comment`（异步） |
+| candidate promoted | `issue-sync create`（创建里程碑 issue） |
+| phase_state→in_dev | `issue-sync comment`（异步） |
+| merge 到 develop | `issue-sync comment` + `issue-sync close`（关闭 raw issue） |
+| cleanup 完成 | `issue-sync close`（关闭里程碑 issue） |
 
 ## 术语约定
 
