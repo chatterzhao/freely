@@ -111,9 +111,9 @@
 - requirement: `opencode direct launcher integration`
 - evidence_level: `integration`
 - status: `pass`
-- surface_kind: `runtime`
+- surface_kind: `execution`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-1`
 - case_design: `Launch opencode via direct adapter in auto mode, verify session ID extraction from print-logs output, verify tool validation passes.`
-- artifact_ref: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260426-opencode-direct-launcher-premerge-verification.md`
