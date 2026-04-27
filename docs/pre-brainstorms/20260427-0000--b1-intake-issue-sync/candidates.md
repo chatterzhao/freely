@@ -41,10 +41,8 @@
 .freely/issues/
 ├── ISSUES.md                          # 索引：所有 issue 的映射表
 ├── raw-{YYYYMMDD}-{NNNN}/             # raw issue（B1 输入）
-│   ├── meta.env                       # 平台 ID、状态、last_synced_comment_at
 │   └── issue.md                       # 正文 + ## Comments 章节（评论追加在此）
 └── I-{YYYYMMDD}-{NNNN}-{split}/       # linked issue（B2 产出）
-    ├── meta.env                       # 平台 ID、canonical 路径、last_synced_comment_at
     └── issue.md                       # 摘要 + ## Comments 章节
 ```
 
