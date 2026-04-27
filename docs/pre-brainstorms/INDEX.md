@@ -1,4 +1,7 @@
 # 预研头脑风暴索引
+- 20260426-0002--break-glass-agents-guidance
+  - brainstorms: docs/pre-brainstorms/20260426-0002--break-glass-agents-guidance/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260426-0002--break-glass-agents-guidance/candidates.md
 - 20260426-0000--opencode-direct-launcher-integration
   - brainstorms: docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/brainstorms.md
   - candidates: docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/candidates.md
