@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "70"
     url: "https://github.com/chatterzhao/freely/issues/70"
     synced_at: "2026-04-27T11:21:22Z"
+
+  gitee:
+    issue_id: "IJFO78"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO78"
+    synced_at: "2026-04-27T13:15:19Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md"
 last_synced_comment_at:

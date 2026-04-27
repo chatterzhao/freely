@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "69"
     url: "https://github.com/chatterzhao/freely/issues/69"
     synced_at: "2026-04-27T11:21:19Z"
+
+  gitee:
+    issue_id: "IJFO77"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO77"
+    synced_at: "2026-04-27T13:15:17Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/issues/sensitive-local-artifact-ignore-governance.md"
 last_synced_comment_at:

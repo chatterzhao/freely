@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "68"
     url: "https://github.com/chatterzhao/freely/issues/68"
     synced_at: "2026-04-27T11:21:17Z"
+
+  gitee:
+    issue_id: "IJFO76"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO76"
+    synced_at: "2026-04-27T13:15:16Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/issues/ai-auth-change-wake-command-lifecycle-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "63"
     url: "https://github.com/chatterzhao/freely/issues/63"
     synced_at: "2026-04-27T11:20:51Z"
+
+  gitee:
+    issue_id: "IJFO71"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO71"
+    synced_at: "2026-04-27T13:15:09Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md"
 last_synced_comment_at:

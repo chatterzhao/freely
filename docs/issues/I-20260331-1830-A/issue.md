@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "72"
     url: "https://github.com/chatterzhao/freely/issues/72"
     synced_at: "2026-04-27T11:21:28Z"
+
+  gitee:
+    issue_id: "IJFO7B"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7B"
+    synced_at: "2026-04-27T13:15:21Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/issues/kiro-cli-runtime-availability-failure-governance.md"
 last_synced_comment_at:

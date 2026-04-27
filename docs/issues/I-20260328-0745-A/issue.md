@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "66"
     url: "https://github.com/chatterzhao/freely/issues/66"
     synced_at: "2026-04-27T11:21:08Z"
+
+  gitee:
+    issue_id: "IJFO74"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO74"
+    synced_at: "2026-04-27T13:15:13Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/issues/live-status-current-runtime-state-reconciliation-governance.md"
 last_synced_comment_at:

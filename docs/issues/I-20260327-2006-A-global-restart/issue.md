@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "64"
     url: "https://github.com/chatterzhao/freely/issues/64"
     synced_at: "2026-04-27T11:20:57Z"
+
+  gitee:
+    issue_id: "IJFO72"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO72"
+    synced_at: "2026-04-27T13:15:10Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md"
 last_synced_comment_at:

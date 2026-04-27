@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "65"
     url: "https://github.com/chatterzhao/freely/issues/65"
     synced_at: "2026-04-27T11:21:04Z"
+
+  gitee:
+    issue_id: "IJFO73"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO73"
+    synced_at: "2026-04-27T13:15:12Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md"
 last_synced_comment_at:

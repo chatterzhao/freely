@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "71"
     url: "https://github.com/chatterzhao/freely/issues/71"
     synced_at: "2026-04-27T11:21:26Z"
+
+  gitee:
+    issue_id: "IJFO79"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO79"
+    synced_at: "2026-04-27T13:15:20Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md"
 last_synced_comment_at:
