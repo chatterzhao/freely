@@ -186,3 +186,15 @@
 - task_refs: `tasks.md#T-12`
 - case_design: `Verify --issue appends ### comment to existing issue.md. Verify --urgent triggers signal for B2/dev/verification phases.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-chat-comment-append.md`
+
+### PT-13
+- id: `PT-13`
+- requirement: `chat message with issue reference routes to that issue as comment`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-13`
+- case_design: `Verify message with raw-xxx reference appends comment. Message without reference creates new raw issue.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-chat-routing-integration.md`
