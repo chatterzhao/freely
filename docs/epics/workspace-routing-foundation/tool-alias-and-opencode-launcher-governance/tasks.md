@@ -41,3 +41,9 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-26`
+### T-8
+- id: `T-8`
+- title: `B1 pre-brainstorm: chat intake→issue unification design`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-27`

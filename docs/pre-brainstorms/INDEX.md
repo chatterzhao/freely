@@ -1,4 +1,7 @@
 # Pre-brainstorm 索引（IBM Framework B1）
+- 20260427-0000--b1-intake-issue-sync
+  - brainstorms: docs/pre-brainstorms/20260427-0000--b1-intake-issue-sync/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260427-0000--b1-intake-issue-sync/candidates.md
 - 20260426-0003--ibm-framework-docs
   - brainstorms: docs/pre-brainstorms/20260426-0003--ibm-framework-docs/brainstorms.md
   - candidates: docs/pre-brainstorms/20260426-0003--ibm-framework-docs/candidates.md

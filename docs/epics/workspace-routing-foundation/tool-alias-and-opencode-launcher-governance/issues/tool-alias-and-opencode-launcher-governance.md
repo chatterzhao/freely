@@ -52,3 +52,8 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 ### C-20260426-0003-A: IBM Framework canonical documentation
 - absorbed_at: `2026-04-26`
 - reason: `Governance terminology unification. Formalized B1_IBM/B2_IBM naming across all active governance docs as Freely capability.`
+
+### C-20260427-0000-A: B1 intake→issue sync design
+- absorbed_at: `2026-04-27`
+- reason: `B1 pre-brainstorm design for unifying chat/intake into issue-centric model. 161 milestone issues synced to GitHub and Gitee. Platform adapter, storage layer, sync scripts implemented.`
+- scope: `brainstorms (26 sections), candidates (7 decisions), TASKS (30 items), ibm-framework.md update, docs/issues/ storage, bin/issue-* scripts, gitee-issue.py fix, platform-adapter.py`
