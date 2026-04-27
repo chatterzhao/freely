@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/132"
     synced_at: "2026-04-27T11:26:33Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:26:33Z"
 hash: ""
