@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "78"
     url: "https://github.com/chatterzhao/freely/issues/78"
     synced_at: "2026-04-27T11:21:49Z"
+
+  gitee:
+    issue_id: "IJFO7I"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7I"
+    synced_at: "2026-04-27T13:15:34Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md"
 last_synced_comment_at:

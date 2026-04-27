@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "73"
     url: "https://github.com/chatterzhao/freely/issues/73"
     synced_at: "2026-04-27T11:21:32Z"
+
+  gitee:
+    issue_id: "IJFO7C"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7C"
+    synced_at: "2026-04-27T13:15:23Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "74"
     url: "https://github.com/chatterzhao/freely/issues/74"
     synced_at: "2026-04-27T11:21:35Z"
+
+  gitee:
+    issue_id: "IJFO7E"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7E"
+    synced_at: "2026-04-27T13:15:29Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md"
 last_synced_comment_at:

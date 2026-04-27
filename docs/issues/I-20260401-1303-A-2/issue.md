@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "79"
     url: "https://github.com/chatterzhao/freely/issues/79"
     synced_at: "2026-04-27T11:21:52Z"
+
+  gitee:
+    issue_id: "IJFO7J"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7J"
+    synced_at: "2026-04-27T13:15:36Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md"
 last_synced_comment_at:

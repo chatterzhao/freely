@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "77"
     url: "https://github.com/chatterzhao/freely/issues/77"
     synced_at: "2026-04-27T11:21:45Z"
+
+  gitee:
+    issue_id: "IJFO7H"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7H"
+    synced_at: "2026-04-27T13:15:33Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md"
 last_synced_comment_at:

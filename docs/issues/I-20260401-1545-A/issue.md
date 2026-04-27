@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "81"
     url: "https://github.com/chatterzhao/freely/issues/81"
     synced_at: "2026-04-27T11:21:59Z"
+
+  gitee:
+    issue_id: "IJFO7L"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7L"
+    synced_at: "2026-04-27T13:15:39Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md"
 last_synced_comment_at:

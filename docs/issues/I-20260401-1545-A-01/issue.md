@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "82"
     url: "https://github.com/chatterzhao/freely/issues/82"
     synced_at: "2026-04-27T11:22:02Z"
+
+  gitee:
+    issue_id: "IJFO7N"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7N"
+    synced_at: "2026-04-27T13:15:40Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md"
 last_synced_comment_at:

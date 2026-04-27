@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "80"
     url: "https://github.com/chatterzhao/freely/issues/80"
     synced_at: "2026-04-27T11:21:56Z"
+
+  gitee:
+    issue_id: "IJFO7K"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7K"
+    synced_at: "2026-04-27T13:15:38Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md"
 last_synced_comment_at:

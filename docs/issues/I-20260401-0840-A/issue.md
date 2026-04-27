@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "76"
     url: "https://github.com/chatterzhao/freely/issues/76"
     synced_at: "2026-04-27T11:21:42Z"
+
+  gitee:
+    issue_id: "IJFO7G"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7G"
+    synced_at: "2026-04-27T13:15:31Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md"
 last_synced_comment_at:
