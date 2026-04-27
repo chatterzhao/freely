@@ -61,3 +61,7 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 ### Bug fix: tool_extra_args unbound variable
 - fixed_at: `2026-04-27`
 - reason: `tool_extra_args[@] under set -u caused unbound variable error when AI_TOOL_EXTRA_ARGS was not set. Fixed with :- default operator.`
+
+### Bug fix: claude not in tool validation lists
+- fixed_at: `2026-04-27`
+- reason: `cc-ds-auto resolves to claude binary, but start-lead-agent.sh and tool-launchers.sh validation lists were missing claude.`
