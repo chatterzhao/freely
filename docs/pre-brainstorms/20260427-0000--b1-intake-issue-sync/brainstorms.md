@@ -130,6 +130,35 @@ freely chat --issue <id> --urgent <message>     # 紧急插话
 freely chat --new-issue <message>               # 显式创建新 issue
 ```
 
+### 9. 现有 intake 子系统（`freely intake chat/claim/resolve/status`）
+
+当前 `freely intake` 是一套完整的轻量工作流：
+
+```
+freely intake chat    → 写入 .freely/intake/<id>/message.txt（带 meta.env）
+freely intake claim   → 标记 claimed_by + reaction + classification
+freely intake resolve → 标记 resolved（delegated/absorbed/dropped） + resolution_file
+freely intake status  → 列出所有 intake item 及其状态
+```
+
+`freely chat` 内部调用 `freely intake chat`，然后触发 interruption dispatch（如果是新消息且 runtime 未活跃则引导启动）。
+
+**与新模型的关系**：
+
+intake 的 claim/resolve 生命周期本质上是"issue 评论的处理状态"，可以直接映射：
+
+| 当前 intake 概念 | 新模型对应 |
+|---|---|
+| `intake chat` | 向 issue 写入评论 |
+| `intake claim` | 评论标记为 claimed，AI 开始处理 |
+| `intake resolve` | 评论处理完毕，标记 resolved + 记录处理结果 |
+| `intake status` | 查看某个 issue 的未处理评论队列 |
+| `meta.env` 字段 | 评论文件的 frontmatter |
+| `message.txt` | `comments/{timestamp}.md` |
+| `LINKED_ARTIFACT` | 评论关联的 issue canonical path |
+
+**命令兼容**：`freely intake chat --issue <id>` 替代 `--linked-artifact`，底层写 `.freely/issues/<id>/comments/<ts>.md` 而非 `.freely/intake/<id>/message.txt`。
+
 ## 未解决问题
 
 1. **inbox issue 何时由谁归类？** AI 定期扫描 inbox，将消息分配到正确的 issue。频率是多少？
