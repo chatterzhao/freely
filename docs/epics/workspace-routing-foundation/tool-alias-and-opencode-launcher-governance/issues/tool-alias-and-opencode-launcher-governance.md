@@ -44,4 +44,3 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 4. AI_TOOL_EXTRA_ARGS injected into all tool exec lines.
 5. AI_TOOL_FAMILY overrides detected family.
 6. Tool validation lists include opencode.
-
