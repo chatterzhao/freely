@@ -371,6 +371,48 @@ tool_run_direct_from_prompt_file() {
     IFS=' ' read -ra tool_extra_args <<< "${AI_TOOL_EXTRA_ARGS}"
   fi
 
+  # Resolve shell alias if tool is not a known command (e.g. ccds-auto -> claude)
+  _resolve_tool_alias() {
+    local name="$1"
+    local resolved
+    # Known tool families: return as-is
+    case "$name" in
+      codex|kiro-cli|iflow|claude|cc|cc-use-codex-cli|opencode|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
+        printf '%s\n' "$name"
+        return 0
+        ;;
+    esac
+    # Unknown name: try zsh alias resolution (user's .zshrc aliases)
+    resolved=$(zsh -ic "alias '$name' 2>/dev/null" 2>/dev/null | sed -n "s/^${name}='\(.*\)'$/\1/p")
+    if [[ -n "$resolved" ]]; then
+      printf '%s\n' "$resolved"
+      return 0
+    fi
+    # Unresolved: return as-is (may fail later)
+    printf '%s\n' "$name"
+    return 0
+  }
+
+  local resolved_tool_full
+  resolved_tool_full=$(_resolve_tool_alias "$tool")
+  if [[ "$resolved_tool_full" != "$tool" ]]; then
+    # Alias was resolved: extract binary and prepend extra args to tool_extra_args
+    local resolved_bin="${resolved_tool_full%% *}"
+    local alias_extra="${resolved_tool_full#* }"
+    if [[ "$alias_extra" != "$resolved_tool_full" ]]; then
+      local -a alias_args
+      IFS=' ' read -ra alias_args <<< "$alias_extra"
+      tool_extra_args=("${alias_args[@]}" "${tool_extra_args[@]}")
+    fi
+    tool="$resolved_bin"
+  fi
+
+  # Allow AI_TOOL_FAMILY to override detected tool family (e.g. alias resolves to
+  # a wrapper script, but resume/session conventions follow a known family)
+  if [[ -n "${AI_TOOL_FAMILY:-}" ]]; then
+    tool="${AI_TOOL_FAMILY}"
+  fi
+
   case "$tool" in
     codex)
       wait_for_codex_slot_switch_idle_before_launch || return 1
