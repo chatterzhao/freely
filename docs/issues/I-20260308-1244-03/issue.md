@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/4"
     synced_at: "2026-04-27T11:12:05Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md"
+canonical_issue_path: "docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md"
 last_synced_comment_at:
   github: "2026-04-27T11:12:05Z"
 hash: ""
