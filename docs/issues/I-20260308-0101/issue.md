@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "3"
     url: "https://github.com/chatterzhao/freely/issues/3"
     synced_at: "2026-04-27T11:12:01Z"
+
+  gitee:
+    issue_id: "IJFO4D"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4D"
+    synced_at: "2026-04-27T13:13:11Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md"
 last_synced_comment_at:

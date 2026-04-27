@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "5"
     url: "https://github.com/chatterzhao/freely/issues/5"
     synced_at: "2026-04-27T11:12:11Z"
+
+  gitee:
+    issue_id: "IJFO4H"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4H"
+    synced_at: "2026-04-27T13:13:14Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md"
 last_synced_comment_at:

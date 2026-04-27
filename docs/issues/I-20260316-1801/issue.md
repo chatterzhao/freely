@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "9"
     url: "https://github.com/chatterzhao/freely/issues/9"
     synced_at: "2026-04-27T11:12:27Z"
+
+  gitee:
+    issue_id: "IJFO4V"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4V"
+    synced_at: "2026-04-27T13:13:49Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md"
 last_synced_comment_at:

@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "8"
     url: "https://github.com/chatterzhao/freely/issues/8"
     synced_at: "2026-04-27T11:12:23Z"
+
+  gitee:
+    issue_id: "IJFO4U"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4U"
+    synced_at: "2026-04-27T13:13:48Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md"
 last_synced_comment_at:

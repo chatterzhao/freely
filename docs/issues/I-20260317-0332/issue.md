@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "10"
     url: "https://github.com/chatterzhao/freely/issues/10"
     synced_at: "2026-04-27T11:12:32Z"
+
+  gitee:
+    issue_id: "IJFO4X"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4X"
+    synced_at: "2026-04-27T13:13:50Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md"
 last_synced_comment_at:
