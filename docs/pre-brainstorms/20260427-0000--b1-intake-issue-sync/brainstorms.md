@@ -458,3 +458,31 @@ chat → 创建 raw issue (proposed) → scan → B1 预研 → candidate 标记
 - `user_withdrawn`：用户自己撤回
 
 平台上的关闭 comment 应写清 drop_reason，保持可追溯。
+
+### 20. 重构后的 Input 统一
+
+**之前**：两个入口——chat 插话和平台 issue，不同存储，不同路径。
+
+**之后**：只有一个 Input source——issue。
+
+用户的任何输入都是 issue 上的操作：
+- 新话题 → 新建 raw issue（`freely chat "新想法"` → `docs/issues/raw-20260427-1030/issue.md`）
+- 已有工作相关 → 对应 issue 的评论（`freely chat --issue raw-20260427-1000 "补充"` → 追加到该 issue.md 的 `## Comments`）
+
+`freely chat` 不是 Input source——它是本地的 issue 创建/评论工具。Input source 永远是 issue。
+
+### 21. Key 链规则
+
+raw、C、I 共享同一个 date-time key：
+
+```
+raw-20260427-1030       key = "20260427-1030"
+    ↓ B1_IBM
+C-20260427-1030-A       key = "20260427-1030-A"    ← 以 raw key 开头
+    ↓ milestone
+I-20260427-1030-A       key = "20260427-1030-A"    ← 以 C key 开头
+```
+
+- key 格式：`YYYYMMDD-HHMM`，HHMM 是 issue 创建的实际时间
+- `-A`/`-B` 后缀：candidate/issue 可以 split 成多个，共享 base key
+- 门禁校验：issue_key 必须以 candidate_key 开头（已有）。raw→C 的校验需新增
