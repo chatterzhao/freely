@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+# issue-sync: sync local docs/issues/ to platform (github/gitee)
+# Usage:
+#   bin/issue-sync create <local_id>
+#   bin/issue-sync update <local_id>
+#   bin/issue-sync close <local_id>
+#   bin/issue-sync comment <local_id>
+#   bin/issue-sync pull
+#   bin/issue-sync status <local_id>
+#   bin/issue-sync rebuild <local_id>
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+PROJECT="${ROOT_DIR}"
+ISSUES_DIR="$PROJECT/docs/issues"
+SCAN_STATE="$ISSUES_DIR/.scan-state"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  bin/issue-sync create <local_id>        Create platform issue from local
+  bin/issue-sync update <local_id>        Update platform issue body
+  bin/issue-sync close <local_id>         Close platform issue
+  bin/issue-sync comment <local_id>       Push unsynced comments to platform
+  bin/issue-sync pull                     Pull new comments from platform
+  bin/issue-sync status <local_id>        Show sync status
+  bin/issue-sync rebuild <local_id>       Force rebuild platform issue from local
+EOF
+}
+
+cmd="${1:-}"
+local_id="${2:-}"
+
+[[ -n "$cmd" ]] || { usage >&2; exit 1; }
+[[ -d "$ISSUES_DIR" ]] || { echo "[ERROR] $ISSUES_DIR not found" >&2; exit 1; }
+
+issue_file="$ISSUES_DIR/$local_id/issue.md"
+
+get_frontmatter_field() {
+  local field="$1" file="${2:-$issue_file}"
+  python3 -c "
+import yaml
+try:
+  with open('$file') as f:
+    content = f.read()
+  if content.startswith('---'):
+    parts = content.split('---', 2)
+    if len(parts) >= 3:
+      fm = yaml.safe_load(parts[1])
+      val = fm.get('$field', '')
+      print(val if val else '')
+except: pass
+" 2>/dev/null
+}
+
+get_primary_platform() {
+  get_frontmatter_field "primary_platform"
+}
+
+get_platform_ids() {
+  get_frontmatter_field "platform_ids"
+}
+
+# Get unsynced comments: ### sections without platform_ids for target platform
+get_unsynced_comments() {
+  local platform="$1"
+  python3 -c "
+import re
+with open('$issue_file') as f:
+    content = f.read()
+
+comments_section = content.split('## Comments', 1)
+if len(comments_section) < 2:
+    exit(0)
+
+section = comments_section[1]
+# Find all ### comment- entries
+pattern = r'### (comment-\S+)\n(\{[^}]+\})'
+for m in re.finditer(pattern, section):
+    header = m.group(1)
+    meta = m.group(2)
+    if '$platform' not in meta or 'comment_id' not in meta:
+        print(header)
+" 2>/dev/null
+}
+
+write_platform_comment_id() {
+  local comment_local_id="$1" platform="$2" platform_comment_id="$3"
+  python3 -c "
+import re
+with open('$issue_file') as f:
+    content = f.read()
+
+# Find the ### section and update its metadata line
+pattern = r'(### ' + re.escape('$comment_local_id') + r'\n)(\{[^}]+\})'
+replacement = r'\g<1>{source: chat, platform_ids: {' + '$platform' + r': {comment_id: \"' + '$platform_comment_id' + r'\"}}}'
+content = re.sub(pattern, replacement, content)
+
+with open('$issue_file', 'w') as f:
+    f.write(content)
+" 2>/dev/null
+}
+
+write_platform_issue_id() {
+  local platform="$1" platform_issue_id="$2"
+  python3 -c "
+import yaml, re
+with open('$issue_file') as f:
+    content = f.read()
+
+parts = content.split('---', 2)
+if len(parts) >= 3:
+    fm = yaml.safe_load(parts[1])
+    if 'platform_ids' not in fm:
+        fm['platform_ids'] = {}
+    fm['platform_ids']['$platform'] = {
+        'issue_id': '$platform_issue_id',
+        'synced_at': '$(date -u +"%Y-%m-%dT%H:%M:%SZ")'
+    }
+    new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True)
+    new_content = '---\n' + new_fm + '---' + parts[2]
+    with open('$issue_file', 'w') as f:
+        f.write(new_content)
+" 2>/dev/null
+}
+
+case "$cmd" in
+  create)
+    [[ -f "$issue_file" ]] || { echo "[ERROR] $issue_file not found" >&2; exit 1; }
+    echo "[issue-sync] create $local_id on platform..."
+    echo "[TODO] platform API call: create issue from $issue_file"
+    # TODO: Implement platform adapter call
+    ;;
+
+  comment)
+    [[ -f "$issue_file" ]] || { echo "[ERROR] $issue_file not found" >&2; exit 1; }
+    platform=$(get_primary_platform)
+    [[ -n "$platform" ]] || { echo "[ERROR] no primary_platform in frontmatter" >&2; exit 1; }
+    unsynced=$(get_unsynced_comments "$platform")
+    if [[ -z "$unsynced" ]]; then
+      echo "[issue-sync] no unsynced comments for $local_id on $platform"
+    else
+      echo "[issue-sync] pushing $(echo "$unsynced" | wc -l | tr -d ' ') comments..."
+      echo "[TODO] platform API call per comment"
+    fi
+    ;;
+
+  update|close)
+    [[ -f "$issue_file" ]] || { echo "[ERROR] $issue_file not found" >&2; exit 1; }
+    echo "[issue-sync] $cmd $local_id..."
+    echo "[TODO] platform API call: $cmd"
+    ;;
+
+  pull)
+    echo "[issue-sync] pulling from configured platforms..."
+    echo "[TODO] iterate platforms, fetch comments newer than last_synced_comment_at"
+    ;;
+
+  status)
+    [[ -f "$issue_file" ]] || { echo "[ERROR] $issue_file not found" >&2; exit 1; }
+    echo "local_id: $local_id"
+    echo "primary_platform: $(get_primary_platform)"
+    echo "platform_ids: $(get_platform_ids)"
+    synced=$(get_frontmatter_field "last_synced_comment_at")
+    echo "last_synced_comment_at: ${synced:-never}"
+    ;;
+
+  rebuild)
+    [[ -f "$issue_file" ]] || { echo "[ERROR] $issue_file not found" >&2; exit 1; }
+    echo "[issue-sync] rebuild $local_id (force push)..."
+    echo "[TODO] delete platform issue if exists, recreate from local"
+    ;;
+
+  *)
+    usage >&2; exit 1
+    ;;
+esac

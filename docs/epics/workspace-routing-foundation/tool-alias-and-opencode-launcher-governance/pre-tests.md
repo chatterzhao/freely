@@ -126,3 +126,15 @@
 - task_refs: `tasks.md#T-7`
 - case_design: `Verify ibm-framework.md defines B1_IBM/B2_IBM, all active docs (AGENTS.md, CONSTITUTION, three-loop, LAWS, skills, agents) use unified terminology, terminology table maps old→new.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260426-ibm-framework-docs.md`
+
+### PT-8
+- id: `PT-8`
+- requirement: `B1 intake→issue sync design complete and milestone issues synced to both platforms`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-8`
+- case_design: `Verify 161 milestone issues synced to GitHub and Gitee with correct platform_ids. Verify gitee-issue.py API path fix.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-b1-intake-issue-sync-design.md`

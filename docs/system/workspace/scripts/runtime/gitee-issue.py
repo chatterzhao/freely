@@ -145,9 +145,19 @@ def api_request(
 
 
 def repo_path(repo: str, suffix: str = "") -> str:
+    """Path for GET operations (list/get) - includes repo name in URL."""
     owner, name = repo.split("/", 1)
     base = f"/repos/{owner}/{name}/issues"
     return f"{base}{suffix}"
+
+def repo_path_post(repo: str, suffix: str = "") -> str:
+    """Path for POST/PATCH operations - repo name goes in body."""
+    owner, name = repo.split("/", 1)
+    base = f"/repos/{owner}/issues"
+    return f"{base}{suffix}"
+
+def repo_name(repo: str) -> str:
+    return repo.split("/", 1)[1]
 
 
 def cmd_list(args: argparse.Namespace) -> object:
@@ -175,6 +185,7 @@ def cmd_get(args: argparse.Namespace) -> object:
 def cmd_create(args: argparse.Namespace) -> object:
     repo = detect_repo(args.repo)
     body = {
+        "repo": repo_name(repo),
         "title": args.title,
         "body": body_value(args.body, args.body_file),
         "assignee": args.assignee,
@@ -183,7 +194,7 @@ def cmd_create(args: argparse.Namespace) -> object:
         "milestone": args.milestone,
         "priority": args.priority,
     }
-    return api_request(method="POST", path=repo_path(repo), body=body, auth_required=True)
+    return api_request(method="POST", path=repo_path_post(repo), body=body, auth_required=True)
 
 
 def cmd_update(args: argparse.Namespace) -> object:
