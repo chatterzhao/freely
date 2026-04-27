@@ -260,6 +260,43 @@ def scan_intake(project: Path) -> list[dict]:
     return items
 
 
+def scan_raw_issues(project: Path) -> list[dict]:
+    """Scan docs/issues/raw-*/ for unprocessed raw issues (new chat→issue model)."""
+    items = []
+    issues_root = project / "docs" / "issues"
+    if not issues_root.is_dir():
+        return items
+    for entry_dir in sorted([p for p in issues_root.iterdir() if p.is_dir() and p.name.startswith("raw-")]):
+        issue_file = entry_dir / "issue.md"
+        if not issue_file.is_file():
+            continue
+        content = issue_file.read_text(encoding="utf-8")
+        # Check if already linked to a candidate
+        if "canonical_issue_path:" in content:
+            canonical = ""
+            for line in content.splitlines():
+                if line.startswith("canonical_issue_path:"):
+                    canonical = line.split('"')[1] if '"' in line else ""
+            if canonical and canonical.strip():
+                continue  # Already processed through B1
+        items.append({
+            "source_family": "raw issue",
+            "source_type": "raw_issue",
+            "source_ref": f"issue://{entry_dir.name}",
+            "artifact_path": str(issue_file.relative_to(project)),
+            "status_markers": {
+                "status": "new",
+                "classification": "discovery",
+            },
+            "needs_action": True,
+            "restart_point": "pre_brainstorm",
+            "owner_hint": "worker",
+            "next_action": "Consume the raw issue into B1_IBM pre-brainstorm and produce a candidate.",
+            "message_preview": content.split("\n")[-1][:200] if content.split("\n") else "",
+        })
+    return items
+
+
 def scan_pre_brainstorms(project: Path) -> list[dict]:
     items = []
     root = project / "docs" / "pre-brainstorms"
@@ -778,6 +815,7 @@ def scan_external_gitee(project: Path) -> tuple[list[dict], dict]:
 def build_payload(project: Path) -> dict:
     sources = []
     sources.extend(scan_intake(project))
+    sources.extend(scan_raw_issues(project))
     sources.extend(scan_pre_brainstorms(project))
     sources.extend(scan_milestones(project))
     sources.extend(scan_progress(project))

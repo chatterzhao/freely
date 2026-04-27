@@ -5230,6 +5230,54 @@ RESOLUTION_ARTIFACT="$resolution_artifact"
 EOF
   printf '%s\n' "$message" >"$message_file"
   update_intake_pending_signal "$project"
+
+  # Also write to docs/issues/ (new issue-centric model)
+  _write_chat_to_issue "$project" "$intake_id" "$author" "$channel" "$message" "$session_refs" "$created_at"
+}
+
+# _write_chat_to_issue: write chat message to docs/issues/ as new raw issue or comment
+_write_chat_to_issue() {
+  local project="$1" intake_id="$2" author="$3" channel="$4" message="$5" session_refs="$6" created_at="$7"
+  local issues_dir issue_local_id issue_file
+  issues_dir="$project/docs/issues"
+  mkdir -p "$issues_dir"
+
+  # Generate local_id from timestamp
+  local ts
+  ts=$(date -u +"%Y%m%d-%H%M" 2>/dev/null || echo "${created_at:0:13}" | tr -d 'T:-' | sed 's/\(.\{8\}\)\(.\{4\}\).*/\1-\2/')
+  issue_local_id="raw-$ts"
+  # Avoid collision
+  local suffix=0
+  while [[ -d "$issues_dir/$issue_local_id" ]]; do
+    suffix=$((suffix + 1))
+    issue_local_id="raw-${ts}-${suffix}"
+  done
+
+  local issue_dir="$issues_dir/$issue_local_id"
+  mkdir -p "$issue_dir"
+
+  cat > "$issue_dir/issue.md" <<ISSUEEOF
+---
+local_id: $issue_local_id
+kind: raw
+status: proposed
+platform_ids: {}
+primary_platform: ""
+canonical_issue_path: ""
+last_synced_comment_at: {}
+hash: ""
+created_at: $created_at
+updated_at: $created_at
+intake_id: $intake_id
+author: $author
+channel: $channel
+session_refs: $session_refs
+---
+
+$message
+ISSUEEOF
+
+  log_info "chat written to docs/issues/$issue_local_id/issue.md"
 }
 
 write_interruption_resolution_artifact() {
