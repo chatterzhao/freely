@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/71"
     synced_at: "2026-04-27T11:21:26Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:21:26Z"
 hash: ""

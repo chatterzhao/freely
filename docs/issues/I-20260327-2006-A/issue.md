@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/63"
     synced_at: "2026-04-27T11:20:51Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:20:51Z"
 hash: ""
