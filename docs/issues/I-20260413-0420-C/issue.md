@@ -8,7 +8,7 @@ platform_ids:
     url: "https://github.com/chatterzhao/freely/issues/146"
     synced_at: "2026-04-27T11:27:23Z"
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md"
+canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md"
 last_synced_comment_at:
   github: "2026-04-27T11:27:23Z"
 hash: ""
