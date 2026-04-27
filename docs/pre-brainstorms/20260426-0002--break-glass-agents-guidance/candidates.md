@@ -8,7 +8,7 @@
 - source_class: `discovery`
 - route_kind: `pre_brainstorm`
 - phase_state: `done_pre_brainstorm`
-- candidate_status: `proposed`
+- status: `proposed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P1`
 - problem: `AGENTS.md break-glass guidance was too soft, enabling AI to rationalize bypass during dogfooding.`
