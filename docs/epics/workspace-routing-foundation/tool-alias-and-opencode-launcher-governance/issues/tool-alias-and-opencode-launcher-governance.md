@@ -65,3 +65,7 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 ### Bug fix: claude not in tool validation lists
 - fixed_at: `2026-04-27`
 - reason: `cc-ds-auto resolves to claude binary, but start-lead-agent.sh and tool-launchers.sh validation lists were missing claude.`
+
+### CHG 2.1-2.3: chat→issue migration
+- implemented_at: `2026-04-27`
+- reason: `write_intake_item now also writes to docs/issues/. New scan_raw_issues() in task-source-scan.py. Backward compatible.`
