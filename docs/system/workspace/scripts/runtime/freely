@@ -5225,6 +5225,11 @@ _write_chat_to_issue() {
 
   target_issue="${FREELY_CHAT_TARGET_ISSUE:-}"
 
+  # If no explicit --issue, route: script match → new raw issue
+  if [[ -z "$target_issue" ]]; then
+    target_issue="$(_route_chat_to_issue "$project" "$message")"
+  fi
+
   if [[ -n "$target_issue" ]]; then
     # --- Append as comment to existing issue ---
     issue_file="$issues_dir/$target_issue/issue.md"
@@ -5308,6 +5313,54 @@ _check_issue_active_and_signal() {
         ;;
     esac
   fi
+}
+
+# _route_chat_to_issue: determine which existing issue a chat message belongs to.
+# Returns local_id if match found, empty string otherwise (→ create new raw issue).
+# Script-based fast path: match keywords against open issue titles in ISSUES.md.
+# AI fallback via chat-routing skill is deferred (adds token cost).
+_route_chat_to_issue() {
+  local project="$1" message="$2"
+  local issues_index matched_id
+  issues_index="$project/docs/issues/ISSUES.md"
+
+  [[ -f "$issues_index" ]] || { echo ""; return 0; }
+
+  # Script-based: extract significant words from message, match against issue titles
+  local words
+  words=$(echo "$message" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9-' '\n' | grep -v '^.$' | head -20)
+  if [[ -z "$words" ]]; then
+    echo ""
+    return 0
+  fi
+
+  # Search ISSUES.md for matching issue IDs where the title shares keywords
+  matched_id=$(python3 -c "
+import re, sys
+msg = '''$message'''.lower()
+# Extract potential issue references from message (raw-xxx, I-xxx, #number)
+refs = re.findall(r'(?:raw-[\d-]+|I-[\d-]+[A-Za-z]*)', msg)
+if refs:
+    print(refs[0])
+    sys.exit(0)
+
+# Match against ISSUES.md: find issues whose title/ID shares words with message
+try:
+    with open('$issues_index') as f:
+        index = f.read()
+    # Look for issue IDs in the index
+    ids = re.findall(r'local_id:\s*(\S+)', index)
+    # Try exact ID match first
+    for iid in ids:
+        if iid.lower() in msg:
+            print(iid)
+            sys.exit(0)
+except: pass
+print('')
+" 2>/dev/null)
+
+  [[ -n "$matched_id" ]] && log_info "chat routed to existing issue: $matched_id"
+  printf '%s\n' "$matched_id"
 }
 
 write_interruption_resolution_artifact() {

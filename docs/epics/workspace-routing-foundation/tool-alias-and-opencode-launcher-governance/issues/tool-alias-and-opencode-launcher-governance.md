@@ -73,3 +73,7 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 ### CHG: chat --issue/--urgent + comment append
 - implemented_at: `2026-04-27`
 - reason: `--issue flag appends chat as ### comment. Active B2+dev+verification phases trigger urgent signal.`
+
+### CHG: chat routing auto-detection
+- implemented_at: `2026-04-27`
+- reason: `_route_chat_to_issue() extracts issue references from messages. Script-based matching against ISSUES.md.`
