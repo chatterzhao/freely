@@ -48,3 +48,7 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 ### C-20260426-0002-A: AGENTS.md break-glass guidance hardening
 - absorbed_at: `2026-04-26`
 - reason: `Post-merge governance fix. AGENTS.md guidance hardened to prevent future bypass rationalization.`
+
+### C-20260426-0003-A: IBM Framework canonical documentation
+- absorbed_at: `2026-04-26`
+- reason: `Governance terminology unification. Formalized B1_IBM/B2_IBM naming across all active governance docs as Freely capability.`

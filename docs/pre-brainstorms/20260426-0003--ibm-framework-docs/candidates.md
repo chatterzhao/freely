@@ -8,7 +8,7 @@
 - source_class: `discovery`
 - route_kind: `pre_brainstorm`
 - phase_state: `done_pre_brainstorm`
-- status: `proposed`
+- status: `absorbed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P1`
 - problem: `Governance terminology inconsistent. No canonical framework doc.`
@@ -18,3 +18,6 @@
 - next_action: `If the unified terminology proves sufficient during continued dogfooding, promote to formal issue. Otherwise revisit and strengthen.`
 - session_refs:
   - {tool: ccds, session_id: "20260426-ibm-framework", jsonl_path: "unavailable://manual", role: "author"}
+- absorbed_by_issue: `I-20260426-0000-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
+- decision_reason: `Governance documentation improvement absorbed into the canonical tool launcher governance issue, which is the active owner for framework-level changes.`
