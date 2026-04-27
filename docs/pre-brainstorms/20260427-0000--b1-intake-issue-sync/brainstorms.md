@@ -333,3 +333,61 @@ canonical: docs/epics/{epic}/{story}/issues/{name}.md
 **sync 脚本查找本地文档**：给定一个平台 issue URL，sync 脚本通过以下方式找到对应的本地文档：
 1. 查 ISSUES.md 索引（最快）
 2. 搜 `docs/epics/` 下所有 issue.md 的 frontmatter（兜底）
+
+### 16. 核心架构原则：平台与本地隔离，AI 只读本地
+
+**根本约束**：freely 的 AI（manager/worker/lead）**永远不直接读平台内容**，也**永远不直接写平台内容**。平台和本地之间只有两条脚本桥接：
+
+```
+Platform (github/gitee)                    Local (.freely/issues/, docs/)
+     │                                              │
+     │  ──① scan 下载（task-source-scan.py）──→      │
+     │     raw issue, comment, 状态                    │
+     │                                              │
+     │                                        AI 工作区（doc-loop, dev-loop）
+     │                                        只读本地文件，不感知平台
+     │                                              │
+     │  ←──② sync 上传（issue-sync 脚本）────         │
+     │     创建 issue, 写 comment, 更新状态              │
+     │     触发条件：hook / gate / 生命周期事件            │
+```
+
+**收益**：
+- **省 token**：平台内容 scan 时下载一次，AI 读本地副本，不消耗 API 调用
+- **平台解耦**：AI 代码不依赖任何平台 API。切换平台只需改 scan/sync 脚本
+- **可重同步**：本地是完整真相。任何时候可以 wipe 平台数据，从本地重建
+- **离线友好**：无网络时 AI 继续工作。sync 队列积压，网络恢复后批量推送
+- **确定性同步**：sync 触发条件是可枚举的 hook/gate 事件，不是 AI 判断
+
+**sync 触发条件**（可枚举的本地事件）：
+
+| 事件 | 触发条件 | sync 动作 |
+|------|---------|----------|
+| chat 插话 | `freely chat` 执行后 | 本地写入 issue comment → sync 推送到平台 |
+| candidate promoted | candidate status 变为 `promoted` | 创建里程碑 issue 到平台 |
+| B2 完成 | `phase_state` 变为 `done_b2_ibm` | 更新平台 issue body（scope + status） |
+| 进入 dev | `phase_state` 变为 `in_dev` | 写平台 comment："implementation started" |
+| 进入 verification | `phase_state` 变为 `in_verification` | 写平台 comment："verification in progress" |
+| 合并到 develop | merge commit 创建 | 写平台 comment："merged: {commit}" + 关闭 raw issue |
+| cleanup 完成 | worktree 退役 | 写平台 comment："cleanup done" + 关闭里程碑 issue |
+| 用户平台评论 | scan 检测到新评论 | 下载到本地 → 触发 auto-loop signal |
+
+### 17. 本地为唯一真相源
+
+平台 issue 是**本地真相的投影**，不是独立真相。任何时候平台数据丢失、错乱、或被手动修改，都从本地重建。
+
+**重建流程**：
+```
+1. 读取 .freely/issues/ISSUES.md 索引
+2. 对每个 issue，比较本地 hash 和平台状态
+3. 如果平台不存在 → 创建
+4. 如果平台存在但内容不一致 → 用本地内容覆盖（force push）
+5. 如果平台有本地没有的 comment → 下载（pull）
+```
+
+**hash 幂等**（参考 issueme）：每个 issue 计算 `hash = sha256(normalize(issue.md + comments))`。sync 时比较本地 hash 和上次 push 的 hash，相同则跳过。
+
+**平台冲突处理**：如果平台 issue 在 freely 不知情的情况下被修改（用户手动编辑），sync 脚本：
+- 下载平台版本，和本地版本 diff
+- 如果只是格式差异 → 本地覆盖平台
+- 如果有实质内容差异 → 保留两边，标记冲突，生成 conflict-{timestamp}.md 供人工处理
