@@ -44,12 +44,22 @@ def main():
     failed = []
     for local_id in batch:
         # Find canonical issue doc
-        result = subprocess.run(
-            ['find', 'docs/epics', '-path', '*/issues/*.md',
-             '-exec', 'grep', '-l', local_id, '{}', ';'],
-            capture_output=True, text=True
-        )
-        issue_file = result.stdout.strip().split('\n')[0] if result.stdout.strip() else ''
+        # Search only in */issues/*.md files for the canonical issue doc
+        issue_file = ''
+        for root, dirs, files in os.walk('docs/epics'):
+            if '/issues/' in root or root.endswith('/issues'):
+                for fname in files:
+                    if fname.endswith('.md'):
+                        full_path = os.path.join(root, fname)
+                        try:
+                            with open(full_path) as f:
+                                cont = f.read()
+                            if f'issue_id: `{local_id}`' in cont or f'issue_id: {local_id}' in cont:
+                                issue_file = full_path
+                                break
+                        except: pass
+            if issue_file:
+                break
 
         if issue_file:
             with open(issue_file) as f:
