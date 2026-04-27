@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "18"
     url: "https://github.com/chatterzhao/freely/issues/18"
     synced_at: "2026-04-27T11:13:40Z"
+
+  gitee:
+    issue_id: "IJFO59"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO59"
+    synced_at: "2026-04-27T13:14:02Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md"
 last_synced_comment_at:

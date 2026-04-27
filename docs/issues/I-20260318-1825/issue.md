@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "20"
     url: "https://github.com/chatterzhao/freely/issues/20"
     synced_at: "2026-04-27T11:13:54Z"
+
+  gitee:
+    issue_id: "IJFO5E"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5E"
+    synced_at: "2026-04-27T13:14:04Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/issues/worktree-hygiene-supervision-control-plane.md"
 last_synced_comment_at:

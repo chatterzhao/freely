@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "19"
     url: "https://github.com/chatterzhao/freely/issues/19"
     synced_at: "2026-04-27T11:13:47Z"
+
+  gitee:
+    issue_id: "IJFO5C"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5C"
+    synced_at: "2026-04-27T13:14:03Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md"
 last_synced_comment_at:

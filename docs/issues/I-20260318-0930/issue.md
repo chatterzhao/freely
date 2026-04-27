@@ -7,6 +7,11 @@ platform_ids:
     issue_id: "15"
     url: "https://github.com/chatterzhao/freely/issues/15"
     synced_at: "2026-04-27T11:13:23Z"
+
+  gitee:
+    issue_id: "IJFO53"
+    url: "https://gitee.com/zhaoquan/freely/issues/IJFO53"
+    synced_at: "2026-04-27T13:13:56Z"
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md"
 last_synced_comment_at:
