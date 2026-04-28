@@ -655,3 +655,17 @@
 - case_design: `Verify close accepts IJFOAK format. Verify PATCH uses repo_path_post. Verify 161 issues closable.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fix-gitee-close-api.md`
 
+
+
+### PT-52
+- id: `PT-52`
+- requirement: `freely new-session forces fresh launch even when JSONL dir has old sessions`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-52`
+- case_design: `Verify new-session writes FORCE_FRESH=true. Verify select_launch_kind checks FORCE_FRESH before JSONL fallback. Verify FORCE_FRESH stripped after first launch.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fix-force-fresh.md`
+

@@ -3279,7 +3279,7 @@ STATEEOF
         [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
         # Don't overwrite anchor fields — those are authoritative from this function.
         case "$key" in
-          LAST_TOOL_SESSION_ID|LAST_TOOL_RESUME_TARGET|LAST_LAUNCH_KIND|SESSION_PARENT_ID) ;;
+          LAST_TOOL_SESSION_ID|LAST_TOOL_RESUME_TARGET|LAST_LAUNCH_KIND|SESSION_PARENT_ID|FORCE_FRESH) ;;
           *) printf '%s=%s\n' "$key" "$value" >> "$anchor_tmp" ;;
         esac
       done < "$state_file"
@@ -14285,6 +14285,17 @@ select_launch_kind() {
       resume_required="check"  # start: check JSONL first
     fi
 
+    # FORCE_FRESH: set by 'freely new-session'. User explicitly requested a fresh
+    # launch — skip all JSONL fallback and resume logic.
+    if [[ "${FORCE_FRESH:-false}" == "true" ]]; then
+      log_info "FORCE_FRESH marker detected, forcing fresh launch"
+      LAUNCH_KIND_SELECTED="fresh"
+      LAUNCH_ROTATION_REASON="force_fresh"
+      unset FORCE_FRESH
+      _check_fresh_launch_circuit_breaker
+      return 0
+    fi
+
     if [[ "$resume_required" == "true" || "$resume_required" == "check" ]]; then
       local session_dir has_jsonl fallback_id
       session_dir="$(_tool_session_dir "$(_resolve_tool_family "$AI_TOOL")" "$PROJECT_ROOT" 2>/dev/null || true)"
@@ -17955,6 +17966,10 @@ cmd_new_session() {
   # Also clear handoff and continuity files
   rm -f "$(handoff_file "$project")" 2>/dev/null || true
   rm -f "$(manager_exit_contract_file "$project")" 2>/dev/null || true
+  # Write force-fresh marker so select_launch_kind skips JSONL fallback
+  mkdir -p "$(dirname "$state_file")"
+  echo 'FORCE_FRESH=true' > "$state_file"
+  log_info "force fresh marker set; next launch will skip resume"
   log_info "new session ready for project: $project. Next launch will be fresh."
 }
 
