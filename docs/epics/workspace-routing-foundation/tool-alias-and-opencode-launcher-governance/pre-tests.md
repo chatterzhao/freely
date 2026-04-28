@@ -641,3 +641,17 @@
 - case_design: `Verify phase_state=completed in docs/issues/I-20260426-0000-A/issue.md. Verify scan excludes completed issues.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fix-phase-state.md`
 
+
+
+### PT-51
+- id: `PT-51`
+- requirement: `gitee-issue.py close/update use correct PATCH path and accept string IDs`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-51`
+- case_design: `Verify close accepts IJFOAK format. Verify PATCH uses repo_path_post. Verify 161 issues closable.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fix-gitee-close-api.md`
+

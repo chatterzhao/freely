@@ -210,8 +210,8 @@ def cmd_update(args: argparse.Namespace) -> object:
     }
     return api_request(
         method="PATCH",
-        path=repo_path(repo, f"/{args.number}"),
-        body=body,
+        path=repo_path_post(repo, f"/{args.number}"),
+        body={**body, "repo": repo_name(repo)},
         auth_required=True,
     )
 
@@ -237,8 +237,8 @@ def cmd_close(args: argparse.Namespace) -> object:
         )
     return api_request(
         method="PATCH",
-        path=repo_path(repo, f"/{args.number}"),
-        body={"state": "closed"},
+        path=repo_path_post(repo, f"/{args.number}"),
+        body={"repo": repo_name(repo), "state": "closed"},
         auth_required=True,
     )
 
@@ -310,7 +310,7 @@ def build_parser() -> argparse.ArgumentParser:
     comment_parser.set_defaults(func=cmd_comment)
 
     close_parser = subparsers.add_parser("close")
-    close_parser.add_argument("number", type=int)
+    close_parser.add_argument("number")
     close_parser.add_argument("--comment")
     close_parser.set_defaults(func=cmd_close)
 
