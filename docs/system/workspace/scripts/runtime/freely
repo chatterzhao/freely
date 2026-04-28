@@ -14024,6 +14024,12 @@ select_launch_kind() {
   fi
 
   if tool_prefers_resume_evidence "$AI_TOOL" && ! tool_has_resume_evidence "$AI_TOOL" "$PROJECT_ROOT"; then
+    # AI_RESUME_ON_RESTART: prefer resume even without verified evidence (e.g. stall-killed)
+    if [[ "${AI_RESUME_ON_RESTART:-true}" == "true" ]]; then
+      LAUNCH_KIND_SELECTED="resume"
+      LAUNCH_ROTATION_REASON="prefer_resume_without_evidence"
+      return 0
+    fi
     LAUNCH_KIND_SELECTED="fresh_with_handoff"
     LAUNCH_ROTATION_REASON="missing_resume_evidence"
     return 0
