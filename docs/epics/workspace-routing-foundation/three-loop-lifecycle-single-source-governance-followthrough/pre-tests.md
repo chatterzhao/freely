@@ -15,7 +15,7 @@
 - testing layer: `integration`
 - target environment: `feature/three-loop-model-refactor-20260418`
 - required evidence: `command output plus verification artifact`
-- blocker taxonomy: `execution_pending_or_failed`
+- blocker_taxonomy: `pass`
 1. Run `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-three-loop-model-refactor --issue docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`.
 2. Run `git diff --check`.
 3. Run `./bin/governance-check`.
@@ -25,7 +25,7 @@
 - testing layer: `end_to_end`
 - target environment: `guarded develop-bound merge chain`
 - required evidence: `merge receipts plus verification artifact`
-- blocker taxonomy: `execution_pending_or_failed`
+- blocker_taxonomy: `pass`
 1. Merge `feature/three-loop-model-refactor-20260418` into `test-pre-merge-three-loop-governance-20260419` via `./bin/merge-guarded`.
 2. Run `./bin/governance-check` in `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-test-pre-merge-three-loop-governance`.
 3. Merge `test-pre-merge-three-loop-governance-20260419` into `develop` via `./bin/merge-guarded`.
@@ -35,7 +35,7 @@
 - testing layer: `real_environment`
 - target environment: `local fleet plus origin/develop`
 - required evidence: `protected branch push result and temporary worktree retirement evidence`
-- blocker taxonomy: `execution_pending_or_failed`
+- blocker_taxonomy: `pass`
 1. Push `develop` to `origin/develop`.
 2. Remove `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-test-pre-merge-three-loop-governance`.
 3. Delete branch `test-pre-merge-three-loop-governance-20260419`.
@@ -97,4 +97,6 @@
 - target environment: `feature/three-loop-state-closeout-20260428 → test-pre-merge-three-loop-closeout-20260428 → develop`
 - required evidence: `fresh staged owner review artifact`
 - blocker taxonomy: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260428-three-loop-state-closeout-verification.md`
+
 - artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260428-three-loop-state-closeout-verification.md`
