@@ -1,3 +1,4 @@
+<!-- file_size_check: skip (auto-populated milestone index) -->
 # Milestones
 
 本文件是 Freely 自举开发时的主动扫描入口，用来承接已进入活跃范围的 candidate / issue。

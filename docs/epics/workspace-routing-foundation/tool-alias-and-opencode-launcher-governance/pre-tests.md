@@ -415,3 +415,15 @@
 - task_refs: `tasks.md#T-32`
 - case_design: `Verify AGENTS.md has file size section. Verify bin/check-file-size runs without errors.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-file-size-guidelines.md`
+
+### PT-33
+- id: `PT-33`
+- requirement: `file size check configurable, skip markers work`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-33`
+- case_design: `Verify FILE_SIZE_WARN/ERROR from config.env. Verify skip markers exclude files. Verify 0 errors.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-file-size-config.md`

@@ -1,3 +1,4 @@
+<!-- file_size_check: skip (auto-generated ISSUES index) -->
 # Issues Index
 
 > Script-maintained cache. Do not edit manually.
@@ -1774,3 +1775,4 @@ comment_count: 0
 canonical_issue_path: ""
 updated_at: 2026-04-27T12:00:16Z
 ---
+# file-size: skip (auto-generated cache)
