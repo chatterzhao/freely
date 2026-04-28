@@ -367,3 +367,15 @@
 - task_refs: `tasks.md#T-28`
 - case_design: `Verify cc-ds-auto resolves to claude family. Verify ccglm resolves to claude family. Verify codex resolves to codex.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-auto-detect-tool-family.md`
+
+### PT-29
+- id: `PT-29`
+- requirement: `alias resolution works on zsh and bash`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-29`
+- case_design: `Verify alias resolved on zsh. Verify bash fallback when $SHELL is bash.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-cross-shell-alias.md`
