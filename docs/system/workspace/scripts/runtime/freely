@@ -3101,7 +3101,7 @@ _resolve_tool_family() {
   esac
   # Unknown: try zsh alias resolution
   local resolved
-  resolved=$(zsh -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
+  resolved=$(${SHELL:-bash} -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
   if [[ -n "$resolved" ]]; then
     local binary="${resolved%% *}"
     case "$binary" in
