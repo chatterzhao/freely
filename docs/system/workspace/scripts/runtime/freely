@@ -3316,17 +3316,21 @@ ensure_runtime_tool_session_anchor() {
     if claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
       current_verified="1"
     fi
-    # Enforcement: if AI_RESUME_ON_RESTART is set and we cannot find ANY valid
-    # session ID after all fallbacks, this is a hard error. Falling back to fresh
-    # would waste tokens re-sending the 60KB system prompt without cache.
-    if [[ "${AI_RESUME_ON_RESTART:-false}" == "true" && "$launch_kind" == "resume" ]]; then
+    # Enforcement: if AI_RESUME_ON_START or AI_RESUME_ON_RESTART require resume,
+    # and we cannot find ANY valid session ID after all fallbacks, this is a hard
+    # error. Falling back to fresh would waste tokens re-sending the full prompt.
+    local resume_required="false"
+    if [[ "${AI_RESUME_ON_RESTART:-false}" == "true" || "${AI_RESUME_ON_START:-false}" == "true" ]]; then
+      resume_required="true"
+    fi
+    if [[ "$resume_required" == "true" && "$launch_kind" == "resume" ]]; then
       if [[ -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
-        log_error "AI_RESUME_ON_RESTART=true but no valid session ID found (state file empty, tool dir has no JSONL). Cannot resume — this is a hard stop to prevent token waste."
-        log_error "To force a fresh session: ./bin/freely new-session --project <path> && ./bin/freely daemon start --project <path>"
+        log_error "AI_RESUME_ON_START/RESTART=true but no valid session ID found (state file empty, tool dir has no JSONL). Cannot resume."
+        log_error "To force a fresh session: ./bin/freely new-session --project $project && ./bin/freely daemon start --project $project"
         exit 1
       fi
       if ! claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
-        log_error "AI_RESUME_ON_RESTART=true but session ${CLAUDE_SESSION_ID_CURRENT} has no verifiable JSONL evidence. Cannot resume."
+        log_error "AI_RESUME_ON_START/RESTART=true but session ${CLAUDE_SESSION_ID_CURRENT} has no verifiable JSONL evidence. Cannot resume."
         log_error "The session may have been deleted or never completed a cycle. Use 'freely new-session' to force a fresh start."
         exit 1
       fi
@@ -14199,13 +14203,43 @@ select_launch_kind() {
     && [[ -z "${LAST_TOOL_SESSION_ID:-}" ]] \
     && [[ -z "${LAST_LAUNCH_KIND:-}" ]] \
     && [[ -z "${LAST_CYCLE_LOG:-}" ]]; then
-    # AI_RESUME_ON_START: if true and any previous session state exists, skip fresh
-    if [[ "${AI_RESUME_ON_START:-true}" == "true" ]]; then
-      local session_file
-      session_file="$(session_state_file "$PROJECT_ROOT")"
-      if [[ -f "$session_file" ]]; then
-        log_info "AI_RESUME_ON_START: previous session state found, skipping fresh start"
+    # AI_RESUME_ON_RESTART: restart means a previous launch already ran, so JSONL
+    # files MUST exist. If they don't, something is wrong — hard error, no fresh.
+    # AI_RESUME_ON_START: first start may not have JSONL yet. Check: if JSONL
+    # exists → must resume; if not → allow one fresh (first-ever launch).
+    local resume_required="false"
+    if [[ "${AI_RESUME_ON_RESTART:-false}" == "true" ]]; then
+      resume_required="true"  # restart: JSONL MUST exist, no exceptions
+    elif [[ "${AI_RESUME_ON_START:-true}" == "true" ]]; then
+      resume_required="check"  # start: check JSONL first
+    fi
+
+    if [[ "$resume_required" == "true" || "$resume_required" == "check" ]]; then
+      local session_dir has_jsonl fallback_id
+      session_dir="$(_tool_session_dir "$(_resolve_tool_family "$AI_TOOL")" "$PROJECT_ROOT" 2>/dev/null || true)"
+      if [[ -n "$session_dir" && -d "$session_dir" ]]; then
+        has_jsonl=$(find "$session_dir" -name "*.jsonl" -type f 2>/dev/null | head -1)
+      fi
+
+      if [[ -n "$has_jsonl" ]]; then
+        # JSONL files exist → MUST resume.
+        fallback_id="$(_find_recent_session_from_tool_dir "$PROJECT_ROOT" "$AI_TOOL" || true)"
+        if [[ -n "$fallback_id" ]]; then
+          log_info "resume: found JSONL session $fallback_id in $session_dir"
+          CLAUDE_SESSION_ID_CURRENT="$fallback_id"
+        else
+          log_error "JSONL files exist in $session_dir but could not extract valid session ID."
+          exit 1
+        fi
+      elif [[ "$resume_required" == "true" ]]; then
+        # Restart: JSONL MUST exist. Hard error.
+        log_error "AI_RESUME_ON_RESTART=true but no JSONL files found in $session_dir."
+        log_error "A previous launch should have created sessions. Something is wrong."
+        log_error "To force a fresh start: ./bin/freely new-session --project $PROJECT_ROOT"
+        exit 1
       else
+        # Start: no JSONL → first-ever launch. Allow one fresh.
+        log_info "AI_RESUME_ON_START: no JSONL sessions found, allowing initial fresh launch"
         LAUNCH_KIND_SELECTED="fresh"
         LAUNCH_ROTATION_REASON="initial_start"
         _check_fresh_launch_circuit_breaker
