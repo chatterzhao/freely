@@ -3251,6 +3251,48 @@ STATEEOF
   fi
 }
 
+# _find_recent_session_from_tool_dir: fallback when session-state.env has no valid ID.
+# Scans the tool-specific session directory for the most recent JSONL file.
+_find_recent_session_from_tool_dir() {
+  local project="$1" tool="$2"
+  local resolved_tool
+  resolved_tool="$(_resolve_tool_family "$tool")"
+  case "$resolved_tool" in
+    claude|cc|cc-use-codex-cli)
+      local claude_projects_dir="${HOME}/.claude/projects"
+      local project_slug
+      project_slug=$(printf '%s' "$project" | sed 's|/|-|g; s|^-||')
+      local session_dir="${claude_projects_dir}/${project_slug}"
+      if [[ -d "$session_dir" ]]; then
+        local latest_jsonl
+        latest_jsonl=$(find "$session_dir" -name "*.jsonl" -type f 2>/dev/null | sort | tail -1)
+        if [[ -n "$latest_jsonl" && -f "$latest_jsonl" ]]; then
+          local session_id
+          session_id=$(basename "$latest_jsonl" .jsonl)
+          if is_valid_uuid "$session_id"; then
+            printf '%s\n' "$session_id"
+            return 0
+          fi
+        fi
+      fi
+      ;;
+    codex)
+      local codex_dir="${CODEX_HOME:-$HOME/.codex}/sessions"
+      if [[ -d "$codex_dir" ]]; then
+        local latest_codex
+        latest_codex=$(find "$codex_dir" -name "*.jsonl" -type f 2>/dev/null | sort | tail -1)
+        if [[ -n "$latest_codex" ]]; then
+          local thread_id
+          thread_id=$(basename "$latest_codex" .jsonl)
+          printf '%s\n' "$thread_id"
+          return 0
+        fi
+      fi
+      ;;
+  esac
+  return 1
+}
+
 ensure_runtime_tool_session_anchor() {
   local tool="$1" launch_kind="$2" project="${3:-}"
   if tool_uses_claude_session_id "$tool"; then
@@ -3261,11 +3303,24 @@ ensure_runtime_tool_session_anchor() {
     if ! is_valid_uuid "${CLAUDE_SESSION_ID_PREVIOUS:-}"; then
       CLAUDE_SESSION_ID_PREVIOUS=""
     fi
+    # Fallback: if state file lost the session ID, scan the tool's session dir.
+    if [[ -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+      local fallback_id
+      fallback_id="$(_find_recent_session_from_tool_dir "$project" "$tool" || true)"
+      if [[ -n "$fallback_id" ]]; then
+        CLAUDE_SESSION_ID_CURRENT="$fallback_id"
+        log_info "session id recovered from tool directory: $fallback_id"
+      fi
+    fi
     if claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
       current_verified="1"
     fi
-    if [[ "$launch_kind" == "fresh" || "$launch_kind" == "fresh_with_handoff" || -z "${CLAUDE_SESSION_ID_CURRENT:-}" || ( "$launch_kind" == "resume" && "$current_verified" != "1" ) ]]; then
+    # Only generate a new UUID if we truly have no session to resume.
+    # Fresh launch kind still rotates; resume keeps the existing ID.
+    if [[ "$launch_kind" == "fresh" || "$launch_kind" == "fresh_with_handoff" ]]; then
       CLAUDE_SESSION_ID_PREVIOUS="${CLAUDE_SESSION_ID_CURRENT:-}"
+      CLAUDE_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
+    elif [[ -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
       CLAUDE_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
     fi
   fi
@@ -14076,6 +14131,30 @@ select_launch_kind() {
   handoff_rotation_reason="$(session_handoff_rotation_reason "$PROJECT_ROOT" || true)"
   resume_target_before_launch="$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")"
 
+  # Circuit breaker: if we're in a tight fresh-launch loop, stop early.
+  # Tracks fresh launches via session state; trips after MAX in cooldown window.
+  _check_fresh_launch_circuit_breaker() {
+    local now window count first_at
+    now="$(date +%s)"
+    window="${FRESH_LAUNCH_COOLDOWN_SECS:-300}"
+    count="${FRESH_LAUNCH_COUNT_CURRENT:-0}"
+    first_at="${FRESH_LAUNCH_FIRST_AT:-0}"
+    if [[ "$first_at" =~ ^[0-9]+$ ]] && (( now - first_at < window )); then
+      count=$((count + 1))
+      if (( count >= ${FRESH_LAUNCH_MAX_COUNT:-3} )); then
+        log_error "fresh launch circuit breaker tripped: ${count} in ${window}s. Token waste prevention."
+        write_workcell_state "$PROJECT_ROOT" "running" "up" "down" "fresh_launch_loop_detected"
+        : >"$(stop_marker_file "$PROJECT_ROOT")"
+        exit 0
+      fi
+    else
+      count=1
+      first_at="$now"
+    fi
+    FRESH_LAUNCH_COUNT_CURRENT="$count"
+    FRESH_LAUNCH_FIRST_AT="$first_at"
+  }
+
   case "$handoff_rotation_reason" in
     manager_exit_contract_repair|worker_exit_contract_repair)
       if [[ -n "$resume_target_before_launch" ]] && tool_has_resume_evidence "$AI_TOOL" "$PROJECT_ROOT"; then
@@ -14084,6 +14163,7 @@ select_launch_kind() {
       else
         LAUNCH_KIND_SELECTED="fresh_with_handoff"
         LAUNCH_ROTATION_REASON="missing_resume_evidence"
+        _check_fresh_launch_circuit_breaker
       fi
       return 0
       ;;
@@ -14104,11 +14184,13 @@ select_launch_kind() {
       else
         LAUNCH_KIND_SELECTED="fresh"
         LAUNCH_ROTATION_REASON="initial_start"
+        _check_fresh_launch_circuit_breaker
         return 0
       fi
     else
       LAUNCH_KIND_SELECTED="fresh"
       LAUNCH_ROTATION_REASON="initial_start"
+      _check_fresh_launch_circuit_breaker
       return 0
     fi
   fi
@@ -14116,30 +14198,35 @@ select_launch_kind() {
   if [[ "${ROTATE_ON_CONTEXT_COMPACTED:-1}" == "1" && "${LAST_CONTEXT_COMPACTED:-0}" == "1" ]]; then
     LAUNCH_KIND_SELECTED="fresh_with_handoff"
     LAUNCH_ROTATION_REASON="context_compacted"
+    _check_fresh_launch_circuit_breaker
     return 0
   fi
 
   if [[ "${RESUME_STREAK_CURRENT:-0}" -ge "${MAX_RESUME_STREAK:-24}" ]]; then
     LAUNCH_KIND_SELECTED="fresh_with_handoff"
     LAUNCH_ROTATION_REASON="resume_streak_limit"
+    _check_fresh_launch_circuit_breaker
     return 0
   fi
 
   if [[ "${LAST_ROUTE_ONLY_HANDOFF:-0}" == "1" && "${ROUTE_ONLY_STREAK_CURRENT:-0}" -ge "${MAX_ROUTE_ONLY_STREAK:-1}" ]]; then
     LAUNCH_KIND_SELECTED="fresh_with_handoff"
     LAUNCH_ROTATION_REASON="route_only_handoff"
+    _check_fresh_launch_circuit_breaker
     return 0
   fi
 
   if ratio_meets_threshold "${LAST_CONTEXT_RATIO:-}" "${CONTEXT_ROTATE_RATIO:-0.70}"; then
     LAUNCH_KIND_SELECTED="fresh_with_handoff"
     LAUNCH_ROTATION_REASON="context_usage_threshold"
+    _check_fresh_launch_circuit_breaker
     return 0
   fi
 
   if [[ "${LAST_PROJECT_DIRTY_ENTRIES:-0}" =~ ^[0-9]+$ ]] && (( LAST_PROJECT_DIRTY_ENTRIES >= ${CHECKPOINT_BLOCK_DIRTY_ENTRIES:-120} )); then
     LAUNCH_KIND_SELECTED="fresh_with_handoff"
     LAUNCH_ROTATION_REASON="checkpoint_dirty_budget"
+    _check_fresh_launch_circuit_breaker
     return 0
   fi
 
@@ -14152,6 +14239,7 @@ select_launch_kind() {
     fi
     LAUNCH_KIND_SELECTED="fresh_with_handoff"
     LAUNCH_ROTATION_REASON="missing_resume_evidence"
+    _check_fresh_launch_circuit_breaker
     return 0
   fi
 
