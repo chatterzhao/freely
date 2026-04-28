@@ -117,3 +117,10 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-27`
+
+### T-42
+- id: `T-42`
+- title: `Unified issue platform sync with raw/I-* distinction, auto-routing, merge hook`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-28`

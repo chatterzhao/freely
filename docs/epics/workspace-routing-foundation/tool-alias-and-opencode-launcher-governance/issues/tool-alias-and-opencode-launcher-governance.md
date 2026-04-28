@@ -126,3 +126,8 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 - fixed_at: `2026-04-27`
 - reason: `Two format mismatches: section header (code expected "worker prompts" plural, AI wrote "Worker Prompt" singular) and line format (code expected "- /path" list item, AI wrote "See: /path"). This caused all 150+ worker prompts to be invisible to the dispatch mechanism.`
 - scope: `docs/system/workspace/scripts/runtime/freely (manager_worker_prompt_paths_from_continuity_by_mode section normalization, line regex, rg fallback)`
+
+### Feature: issue platform sync complete (bin/issue-sync, chat routing, merge hook)
+- completed_at: `2026-04-28`
+- reason: `Replaced scattered sync scripts with unified bin/issue-sync. Added issue_title, promoted_from, absorbed_into to issue model. I-* body is self-contained summary + links (hybrid). Chat auto-routes raw→I-* when absorbed. Merge hook syncs changed issues to platforms. Deleted dead ISSUES.md.`
+- scope: `bin/issue-sync (create/update/comment/close/promote/status), docs/system/workspace/scripts/runtime/freely (chat auto-redirect), docs/system/workspace/scripts/worktree/merge-guarded (post-merge sync), docs/system/workspace/ibm-framework.md (design doc), bin/issue-index (fix stray 0), docs/issues/ISSUES.md (deleted)`

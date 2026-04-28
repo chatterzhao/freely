@@ -125,12 +125,35 @@ IBM Framework 的 I（Input source）统一为 github/gitee issue。平台 issue
 
 ```
 docs/issues/
-├── ISSUES.md                          # 所有 issue 的映射索引
 ├── raw-{YYYYMMDD}-{NNNN}/             # raw issue：B1_IBM 的 Input
 │   └── issue.md                       # issue 正文 + ## Comments 章节
 └── I-{YYYYMMDD}-{NNNN}-{split}/       # linked issue：B2_IBM 的产物
     └── issue.md                       # 正式 issue 摘要 + ## Comments 章节
 ```
+
+**raw-* 和 I-* 的关系**：
+
+```
+chat 插话 / 平台扫描
+        │
+        ▼
+   raw-*        kind: raw, status: proposed
+   B1_IBM       预研收敛 → candidate
+        │
+   ┌────┼────────────┐
+   │    │            │
+  drop absorb      promote → I-*   kind: linked, status: proposed
+                      │           B2_IBM 实现设计 → Map 产物
+                      │
+                 merge to develop
+                      │
+                 status: completed
+```
+
+- raw-* 只存在于 B1 阶段。一旦 promote 为 I-*，raw 的 `status` 变为 `absorbed`，`absorbed_into` 指向 I-*
+- I-* 是 B2 阶段的唯一 issue 标识。后续所有 chat、comment、状态变更都发生在 I-* 上
+- `chat --issue raw-xxx` 会自动检测 `status=absorbed`，路由到 `absorbed_into` 指向的 I-*
+- I-* 采用自包含摘要 + 链接模式：平台 body 包含足够上下文，深水区讨论链接到 B1 产物
 
 ### 平台隔离
 
@@ -144,19 +167,51 @@ docs/issues/
 
 每条 `freely chat` 必须落地为 issue 或已有 issue 的评论：
 
-- `chat-routing skill` 判断消息归属（OPEN issue→comment，CLOSED→reopen 或新建并 link，新内容→新建 raw issue）
+- 如果消息归属于已有 issue：`--issue <id>`，评论追加到该 issue
+- 如果是新话题：`--new-issue`，创建 raw issue
+- 如果 `--issue raw-xxx` 但该 raw 已被 promote（`status=absorbed`）：自动路由到 `absorbed_into` 指向的 I-*
 - skill 只做路由，不做价值判断。最终 promote/absorb/drop 由 B1_IBM 决定
 - 即使内容看似无价值，也创建 raw issue——B1 标记 `dropped` 并写清 `drop_reason`
 
 ### issue 生命周期中的 sync 触发点
 
-| 事件 | sync 动作 |
-|------|----------|
-| chat 插话 | `issue-sync comment`（异步） |
-| candidate promoted | `issue-sync create`（创建里程碑 issue） |
-| phase_state→in_dev | `issue-sync comment`（异步） |
-| merge 到 develop | `issue-sync comment` + `issue-sync close`（关闭 raw issue） |
-| cleanup 完成 | `issue-sync close`（关闭里程碑 issue） |
+| 事件 | sync 动作 | 触发机制 |
+|------|----------|---------|
+| chat 插话 | `issue-sync comment` | `freely chat` 内部调用 |
+| raw issue 创建 | `issue-sync create` | `freely chat --new-issue` 内部调用 |
+| candidate promoted → I-* | `issue-sync promote` | B1_IBM 收口时脚本调用 |
+| phase_state 变更 | `issue-sync update` | daemon worker 完成状态更新后 |
+| merge 到 develop | `issue-sync close`（关闭已完成的 I-*） | `merge-guarded` post-merge hook |
+| cleanup 完成 | `issue-sync close` | daemon worker 收口 |
+
+### 平台 issue 格式
+
+每个 platform issue 由三要素组成：标题前缀 + 标签 + metadata body。
+
+| 要素 | raw-* | I-* |
+|------|-------|-----|
+| 标题 | `[RAW-20260428-0542] <title>` | `[I-20260426-0000-A] <title>` |
+| 标签 | `kind/raw`, `phase/proposed` | `kind/linked`, `phase/<phase_state>` |
+| body | 元数据表 + issue 正文 | 元数据表 + Pre-Brainstorm Summary + Scope + References |
+
+body 结构（I-*）：
+```markdown
+## <issue_title>
+| local_id | kind | phase | promoted_from |
+|----------|------|-------|---------------|
+| I-xxx | linked | completed | raw-xxx |
+
+### Pre-Brainstorm Summary
+<2-3 句从 candidate.md 抽取的结论，足够让平台读者理解决策>
+
+### Scope
+<从 candidate.md 或 issue doc 提取的 scope/non-goals>
+
+### References
+- B1 预研: docs/pre-brainstorms/<b1-id>/
+- Candidate: docs/pre-brainstorms/<b1-id>/candidates.md#c-xxx
+- 正式 Issue: docs/epics/<epic>/<story>/issues/<name>.md
+```
 
 ## 术语约定
 
@@ -174,39 +229,63 @@ docs/issues/
 
 ```markdown
 ---
-local_id: raw-20260427-0001
-kind: raw
-status: proposed
+local_id: I-20260426-0000-A
+issue_title: "Add opencode direct launcher and AI_TOOL alias resolution"
+kind: linked
+status: completed
+phase_state: completed
+promoted_from: raw-20260426-0001            # I-* 专有：来源 raw issue
+absorbed_into: ""                           # raw-* 专有：被哪个 I-* 吸收
 platform_ids:
-  github: {issue_id: "42", synced_at: "2026-04-27T10:00:00Z"}
-  gitee: {issue_id: "17", synced_at: "2026-04-27T10:05:00Z"}
+  github: {issue_id: "42", url: "https://...", synced_at: "..."}
+  gitee: {issue_id: "IJFOAK", url: "https://...", synced_at: "..."}
 primary_platform: github
-canonical_issue_path: ""
-last_synced_comment_at: "2026-04-27T10:25:00Z"
-hash: "sha256:abc123..."
+canonical_issue_path: "docs/epics/.../issues/....md"
+last_synced_comment_at:
+  github: "2026-04-27T10:25:00Z"
+  gitee: "2026-04-27T10:25:00Z"
+hash: ""
 created_at: "2026-04-27T10:00:00Z"
 updated_at: "2026-04-27T10:25:00Z"
 session_refs:
   - {tool: ccds, session_id: "xxx", role: "author"}
 ---
 
-# Issue Title
+## Pre-Brainstorm Summary
+<简要结论，从 candidate.md 提取，I-* 专有>
 
-issue 正文内容。
+## Scope
+<scope/non-goals>
+
+## References
+- B1: docs/pre-brainstorms/{b1-id}/
+- Issue: docs/epics/{epic}/{story}/issues/{name}.md
 
 ## Comments
 
 ### comment-20260427T102500Z
-{source: chat, platform_ids: {github: {comment_id: "12345"}, gitee: {comment_id: "67890"}}}
+- source: chat
+- author: human
 
 评论内容。
-
-### comment-20260427T110000Z
-{source: github}
-
-从平台拉取的评论（已有 github comment_id 在 platform_ids 中）。
-
 ```
+
+**frontmatter 字段说明**：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `local_id` | string | 本地唯一 ID，`raw-{ts}` 或 `I-{ts}` |
+| `issue_title` | string | 人类可读标题，用于平台 issue 标题 |
+| `kind` | raw\|linked | raw = B1_IBM 输入，linked = B2_IBM 正式 issue |
+| `status` | string | proposed\|in_dev\|in_verification\|completed\|absorbed\|dropped |
+| `phase_state` | string | B2_IBM 阶段：in_b2_ibm\|in_dev\|in_verification\|completed |
+| `promoted_from` | string | I-* 专有：来源 raw-* 的 local_id |
+| `absorbed_into` | string | raw-* 专有：被 promote 到哪个 I-* |
+| `platform_ids` | dict | 每个平台的 issue_id、url、synced_at |
+| `primary_platform` | string | github\|gitee，优先推送/拉取的主平台 |
+| `canonical_issue_path` | string | I-* 专有：B2_IBM 正式 issue 文档路径 |
+| `last_synced_comment_at` | dict | 按平台记录最后评论同步时间 |
+| `created_at` / `updated_at` | ISO8601 | 时间戳 |
 
 - 所有元数据在 YAML frontmatter 中（参考 issueme `data-model.md`）
 - `platform_ids`：issue 级别记录每个平台的 issue_id 和同步时间。评论级别记录每个平台的 comment_id
