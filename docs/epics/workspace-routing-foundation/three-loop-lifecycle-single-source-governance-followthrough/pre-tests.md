@@ -52,7 +52,7 @@
 - requirement: `The governance-only docs diff is paired with a concrete candidate, issue, pre-tests, tasks, progress, and verification artifact so protected merge no longer sees a completed-family reopen without lawful owner evidence.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260419-three-loop-lifecycle-single-source-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260428-three-loop-state-closeout-verification.md`
 
 ### Canonical lifecycle document remains the only detailed truth
 - id: `three-loop-single-detailed-truth`
@@ -64,7 +64,7 @@
 - case_design: `Read the touched active truth files together and confirm the detailed lifecycle model lives only in the canonical document, while the other files defer to it rather than restating the same depth locally.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260419-three-loop-lifecycle-single-source-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260428-three-loop-state-closeout-verification.md`
 
 ### Consumer docs require read-and-sync behavior
 - id: `three-loop-consumer-read-sync-contract`
@@ -76,7 +76,7 @@
 - case_design: `Inspect the touched agent and skill docs and confirm they use the canonical lifecycle document as the detailed source of truth while preserving only the local consumer contract they need.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260419-three-loop-lifecycle-single-source-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260428-three-loop-state-closeout-verification.md`
 
 ### Guarded merge path preserves the governance closeout
 - id: `three-loop-single-source-guarded-merge`
@@ -88,7 +88,7 @@
 - case_design: `Merge the current feature into the disposable three-loop test-pre-merge batch, keep governance-check green there, then guardedly replay that batch into develop so the develop gate consumes this new owner chain instead of rejecting the completed-family followthrough.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260419-three-loop-lifecycle-single-source-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260428-three-loop-state-closeout-verification.md`
 
 ## Acceptance (state-closeout addendum 2026-04-28)
 
