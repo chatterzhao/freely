@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260421-1200-A`
 - title: `Runtime daemon self-loop followthrough governance`
-- phase_state: `in_verification`
+- phase_state: `done`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-daemon-self-loop-followthrough-governance`

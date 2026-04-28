@@ -3,7 +3,7 @@
 - issue_id: `I-20260421-1200-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - title: `Runtime daemon self-loop followthrough governance`
-- phase_state: `in_verification`
+- phase_state: `done`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-resume-incremental-output-evidence-guard-20260425`

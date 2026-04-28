@@ -86,31 +86,6 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `This narrow followthrough owner carries the final receipt-ledger repair for the absorbed runtime lifecycle batch and should retire the temporary followthrough feature and test-pre-merge worktrees immediately after canonical develop absorbs it. Continuation 2026-04-19: the first guarded replay fixed the test-pre-merge merge trailers but left a develop-bound diff that only carried the ledger file, so this owner remains active until the same replay batch also refreshes candidate/issue/progress/review evidence on canonical develop.`
 
-1. `I-20260421-1200-A`
-- title: Runtime daemon self-loop followthrough governance
-- milestone_state: candidate
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-daemon-self-loop-followthrough-governance.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/candidates.md`
-- evidence:
-  - `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/brainstorms.md`
-  - `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/candidates.md`
-  - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-runtime-daemon-self-loop-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`
-  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
-  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
-- completion_note: `This bounded followthrough owner exists only because real 2026-04-21 dogfooding still found one daemon self-loop blocker after the broader runtime lifecycle owners landed. Completion remains blocked until canonical develop proves Freely can finish one task to the current-project success standard, close the worktree, and continue to the next task.`
-
-
 1. `I-20260419-0333-A`
 - title: Runtime closeout selfhost validation followthrough governance
 - milestone_state: committed
@@ -1013,6 +988,20 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260421-1200-A`
+- title: Runtime daemon self-loop followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-daemon-self-loop-followthrough-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/candidates.md`
+- completion_note: `State reconciliation closeout: daemon self-loop followthrough was merged to develop via test-pre-merge-20260421-runtime-self-loop-blocker (commit 8f388c32). 57 code-review verification artifacts confirm the work was completed and verified. Only milestone/progress/issue state tracking needed updating.`
+
 
 1. `I-20260419-0915-A`
 - title: Three-loop lifecycle single-source governance followthrough
