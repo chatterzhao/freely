@@ -96,3 +96,10 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-27`
+
+### T-39
+- id: `T-39`
+- title: `Normalize rc=1 to 0 when debug log shows clean SessionEnd`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-27`
