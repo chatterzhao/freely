@@ -54,7 +54,8 @@ routing_policy:
 1. `I-20260426-0000-A`
 - title: Add opencode direct launcher and AI_TOOL alias resolution
 - milestone_state: candidate
-- phase_state: `in_verification`
+- phase_state: `completed`
+- completed_at: `2026-04-28`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
 - pretests_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/pre-tests.md`
@@ -70,7 +71,8 @@ routing_policy:
 1. `I-20260418-1900-A`
 - title: Runtime lifecycle receipt followthrough governance
 - milestone_state: candidate
-- phase_state: `in_verification`
+- phase_state: `completed`
+- completed_at: `2026-04-28`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
@@ -89,7 +91,8 @@ routing_policy:
 1. `I-20260419-0333-A`
 - title: Runtime closeout selfhost validation followthrough governance
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
+- completed_at: `2026-04-28`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-closeout-selfhost-validation-followthrough-governance.md`
@@ -116,7 +119,8 @@ routing_policy:
 1. `I-20260414-0255-A`
 - title: Freely start after-failure recovery handoff race root cause fix
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
+- completed_at: `2026-04-28`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-freely-start-auto-recovery-rootcause-governance.md`
@@ -140,7 +144,8 @@ routing_policy:
 1. `I-20260417-0445-A`
 - title: Runtime start/stop lifecycle and process leak governance
 - milestone_state: candidate
-- phase_state: `in_verification`
+- phase_state: `completed`
+- completed_at: `2026-04-28`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-start-stop-lifecycle-and-process-leak-governance.md`
@@ -177,7 +182,8 @@ routing_policy:
 1. `I-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance
 - milestone_state: candidate
-- phase_state: `in_verification`
+- phase_state: `completed`
+- completed_at: `2026-04-28`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-tasks-closeout-completion-and-adequacy-gate-governance.md`

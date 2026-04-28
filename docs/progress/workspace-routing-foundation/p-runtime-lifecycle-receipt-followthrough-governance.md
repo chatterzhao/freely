@@ -3,7 +3,7 @@
 - issue_id: `I-20260418-1900-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 - title: `Runtime lifecycle receipt followthrough governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`
@@ -39,3 +39,8 @@
 2. Retire `test-pre-merge-runtime-lifecycle-followthrough-20260424`; do not reuse it for another replay.
 3. Create a fresh disposable `test-pre-merge-*` batch from current `develop` and replay `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` into it via `./bin/merge-guarded`.
 4. Replay that temporary batch into `develop` via `./bin/merge-guarded`, then re-run governance followthrough on canonical `develop`.
+
+## Closeout
+
+- completed_at: `2026-04-28`
+- merge_evidence: `merged via e949c473`

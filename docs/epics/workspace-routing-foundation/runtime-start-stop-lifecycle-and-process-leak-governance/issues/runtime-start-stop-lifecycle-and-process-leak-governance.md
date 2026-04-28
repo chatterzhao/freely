@@ -2,7 +2,8 @@
 
 - issue_id: `I-20260417-0445-A`
 - title: `Runtime start/stop lifecycle and process leak governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
+- completed_at: `2026-04-28`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-start-stop-lifecycle-and-process-leak-governance`

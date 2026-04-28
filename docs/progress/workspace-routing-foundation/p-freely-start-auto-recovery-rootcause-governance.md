@@ -3,7 +3,7 @@
 - issue_id: `I-20260414-0255-A`
 - issue_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
 - title: `Freely start after-failure recovery handoff race root cause fix`
-- phase_state: `in_dev`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/freely-start-auto-recovery-rootcause-20260414`
@@ -334,3 +334,8 @@ IBM 已完成 materialization。当前 issue 仍处于 feature lane 的 `dev-loo
 1. 核对 tasks/pre-tests 中剩余 feature-lane verification 的真实状态，优先补齐可直接在当前 worktree 运行的 feature-local regressions 或把缺口如实写回
 2. 在 feature lane 完成 closeout 后，再创建 test-pre-merge 批次做装配验证
 3. 批次验证通过后按 canonical promote 路径进入 `develop`
+
+## Closeout
+
+- completed_at: `2026-04-28`
+- merge_evidence: `merged via 277378ac`

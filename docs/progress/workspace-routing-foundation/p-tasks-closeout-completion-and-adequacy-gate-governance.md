@@ -3,7 +3,7 @@
 - issue_id: `I-20260413-1640-A`
 - issue_path: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
 - title: `Tasks closeout completion and adequacy gate governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/tasks-closeout-gate-20260413`
@@ -36,3 +36,8 @@
 
 1. Replay the guarded `feature/tasks-closeout-gate-20260413 -> test-pre-merge-20260413-tasks-closeout-gate -> develop` chain with this owner evidence staged.
 2. Once the guarded merge lands, keep any further historical cleanup separate instead of widening `1640`.
+
+## Closeout
+
+- completed_at: `2026-04-28`
+- merge_evidence: `merged via 86dc37ce`
