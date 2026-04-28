@@ -68,3 +68,10 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-27`
+
+### T-35
+- id: `T-35`
+- title: `Show skipped files with [SKIP] prefix in check-file-size`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-27`

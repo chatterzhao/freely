@@ -439,3 +439,15 @@
 - task_refs: `tasks.md#T-34`
 - case_design: `Verify FILE_SIZE_TIP=300 default. Verify [TIP] output for files >300 lines. Verify tips counter in summary.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-file-size-tip.md`
+
+### PT-35
+- id: `PT-35`
+- requirement: `skipped files are shown in check-file-size output with [SKIP] prefix`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-35`
+- case_design: `Verify [SKIP] output for files with skip markers. Verify skips counter in summary. Verify no silent skips.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-file-size-skip-visible.md`
