@@ -3242,10 +3242,16 @@ _persist_session_anchor_early() {
     local state_file
     state_file="$(session_state_file "$project")"
     mkdir -p "$(dirname "$state_file")"
+    # SESSION_PARENT_ID: for fresh = own ID (self-rooted), for fork = parent's ID.
+    # This is immutable once set — resume does NOT change it.
+    if [[ -z "${SESSION_PARENT_ID:-}" ]]; then
+      SESSION_PARENT_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
+    fi
     cat >"$state_file" <<STATEEOF
 LAST_TOOL_SESSION_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
 LAST_TOOL_RESUME_TARGET="${CLAUDE_SESSION_ID_CURRENT:-}"
 LAST_LAUNCH_KIND="${mode_name:-resume}"
+SESSION_PARENT_ID="${SESSION_PARENT_ID:-}"
 STATEEOF
     log_info "session anchor persisted early: ${CLAUDE_SESSION_ID_CURRENT}"
   fi
