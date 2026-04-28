@@ -103,3 +103,10 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-27`
+
+### T-40
+- id: `T-40`
+- title: `Fix resume target extraction from debug log for Claude -p mode`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-27`

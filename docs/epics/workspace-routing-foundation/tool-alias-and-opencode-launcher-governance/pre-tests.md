@@ -499,3 +499,15 @@
 - task_refs: `tasks.md#T-39`
 - case_design: `Verify rc=1 with SessionEnd completed status 0 in debug log normalizes to ai_exit_rc_0. Verify rc=1 without SessionEnd stays ai_exit_rc_1.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-rc1-sessionend-normalize.md`
+
+### PT-40
+- id: `PT-40`
+- requirement: `resume target extracted from debug log, CLAUDE_SESSION_ID_CURRENT fallback`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-40`
+- case_design: `Verify session ID extracted from debug log. Verify main log fallback works. Verify CLAUDE_SESSION_ID_CURRENT fallback when both logs fail.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-resume-target-extraction.md`
