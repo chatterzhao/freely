@@ -11271,6 +11271,34 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   printf '%s\n' "$launched_count"
 }
 
+# _ai_shows_liveness: check multiple signals to determine if AI is genuinely active.
+# Returns 0 (active) if any signal shows recent work; 1 (inactive) otherwise.
+_ai_shows_liveness() {
+  local project="$1" ai_pid="$2" cycle_log="$3" threshold_secs="${4:-90}"
+  local now debug_log debug_mtime
+  now="$(date +%s)"
+
+  # Signal 1: debug log mtime (updated on every stream chunk / tool dispatch)
+  debug_log="${cycle_log%.log}.debug.log"
+  if [[ -f "$debug_log" ]]; then
+    debug_mtime="$(file_mtime_epoch "$debug_log" 2>/dev/null || true)"
+    if [[ -n "$debug_mtime" ]] && (( now - debug_mtime < threshold_secs )); then
+      return 0
+    fi
+  fi
+
+  # Signal 2: AI process exists and is in Running/Sleeping state
+  if [[ -n "$ai_pid" ]] && kill -0 "$ai_pid" 2>/dev/null; then
+    local proc_state
+    proc_state=$(ps -o state= -p "$ai_pid" 2>/dev/null | tr -d ' ')
+    if [[ "$proc_state" == "R" || "$proc_state" == "S" ]]; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
 manager_ai_stalled_with_pending_intake() {
   local project="$1" threshold_secs="${2:-90}"
   local ai_pid cycle_log intake_signal log_mtime signal_mtime now
@@ -11285,7 +11313,17 @@ manager_ai_stalled_with_pending_intake() {
   [[ -n "$log_mtime" && -n "$signal_mtime" ]] || return 1
   (( signal_mtime > log_mtime )) || return 1
   now="$(date +%s)"
-  (( now - log_mtime >= threshold_secs )) || return 1
+
+  # Multi-signal liveness check before declaring stall.
+  # A single mtime on the cycle log is unreliable — the AI may be
+  # actively streaming/reading without flushing the cycle log.
+  if (( now - log_mtime >= threshold_secs )); then
+    if _ai_shows_liveness "$project" "$ai_pid" "$cycle_log" "$threshold_secs"; then
+      return 1
+    fi
+    return 0
+  fi
+  return 1
 }
 
 latest_active_intake_meta_mtime_for_project() {
@@ -11346,8 +11384,15 @@ manager_ai_stalled_after_delegated_continuation_prompt() {
   [[ -n "$log_mtime" && -n "$prompt_mtime" ]] || return 1
 
   now="$(date +%s)"
-  (( now - log_mtime >= threshold_secs )) || return 1
-  (( now - prompt_mtime >= threshold_secs )) || return 1
+  if (( now - log_mtime >= threshold_secs && now - prompt_mtime >= threshold_secs )); then
+    if ! _ai_shows_liveness "$project" "$ai_pid" "$cycle_log" "$threshold_secs"; then
+      :
+    else
+      return 1
+    fi
+  else
+    return 1
+  fi
 
   if manager_delegated_supervision_quiet_period_waiting_on_active_worker "$project" "$prompt_mtime"; then
     return 1
@@ -11388,8 +11433,11 @@ manager_ai_stalled_without_runtime_progress() {
   [[ -n "$log_mtime" && -n "$prompt_mtime" ]] || return 1
 
   now="$(date +%s)"
-  (( now - log_mtime >= threshold_secs )) || return 1
-  (( now - prompt_mtime >= threshold_secs )) || return 1
+  if (( now - log_mtime >= threshold_secs && now - prompt_mtime >= threshold_secs )); then
+    _ai_shows_liveness "$project" "$ai_pid" "$cycle_log" "$threshold_secs" && return 1
+    return 0
+  fi
+  return 1
 }
 
 manager_delegated_supervision_quiet_period_waiting_on_active_worker() {
