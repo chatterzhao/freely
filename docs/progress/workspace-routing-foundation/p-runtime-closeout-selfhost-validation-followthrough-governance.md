@@ -3,7 +3,7 @@
 - issue_id: `I-20260419-0333-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
 - title: `Runtime closeout selfhost validation followthrough governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `in_verification`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/worker-recovery-sync-tooling-before-launch-20260424`
@@ -75,3 +75,8 @@
 1. Promote this runtime-launch fix through a fresh `test-pre-merge-*` replay into `develop`.
 2. Restart canonical `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` and verify retained cleanup replay now stays on continuation truth, clears stale repair handoff on the relaunched worker, and produces bounded cleanup truth instead of repair-only receipts.
 3. Only after that retained cleanup lane settles lawfully should manager move on to the next scan-selected task; until then, keep all other dirty retained-lane residue frozen.
+
+## Closeout
+
+- completed_at: `2026-04-28`
+- merge_evidence: `merged via 903537ad`

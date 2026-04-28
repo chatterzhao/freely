@@ -2,7 +2,8 @@
 
 - issue_id: `I-20260414-0255-A`
 - title: `Freely start codex after-failure recovery honors saved-slot order`
-- phase_state: `in_dev`
+- phase_state: `completed`
+- completed_at: `2026-04-28`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `freely-start-auto-recovery-rootcause-governance`

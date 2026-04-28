@@ -2,7 +2,8 @@
 
 - issue_id: `I-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance
-- phase_state: `in_verification`
+- phase_state: `completed`
+- completed_at: `2026-04-28`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `tasks-closeout-completion-and-adequacy-gate-governance`
