@@ -390,4 +390,16 @@
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-30`
 - case_design: `Verify claim updates frontmatter status. Verify resolve updates frontmatter. Verify legacy path still works.`
-- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-intake-crud-migration.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-todo-cleanup-complete.md`
+
+### PT-31
+- id: `PT-31`
+- requirement: `all TODO markers removed, CHG 2.2/4.2 migration verified`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-31`
+- case_design: `Verify zero TODO CHG markers in runtime scripts. Verify intake claim/resolve/handler work with docs/issues/.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-todo-cleanup-complete.md`
