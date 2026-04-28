@@ -50,159 +50,6 @@ routing_policy:
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
 ### committed_issues
-
-1. `I-20260426-0000-A`
-- title: Add opencode direct launcher and AI_TOOL alias resolution
-- milestone_state: candidate
-- phase_state: `completed`
-- completed_at: `2026-04-28`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/candidates.md`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
-  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/tasks.md`
-  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260426-tool-alias-opencode-premerge-verification.md`
-
-1. `I-20260418-1900-A`
-- title: Runtime lifecycle receipt followthrough governance
-- milestone_state: candidate
-- phase_state: `completed`
-- completed_at: `2026-04-28`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
-- source_brainstorm: `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/candidates.md`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
-  - `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
-  - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
-  - `./bin/governance-check`
-- completion_note: `This narrow followthrough owner carries the final receipt-ledger repair for the absorbed runtime lifecycle batch and should retire the temporary followthrough feature and test-pre-merge worktrees immediately after canonical develop absorbs it. Continuation 2026-04-19: the first guarded replay fixed the test-pre-merge merge trailers but left a develop-bound diff that only carried the ledger file, so this owner remains active until the same replay batch also refreshes candidate/issue/progress/review evidence on canonical develop.`
-
-1. `I-20260419-0333-A`
-- title: Runtime closeout selfhost validation followthrough governance
-- milestone_state: committed
-- phase_state: `completed`
-- completed_at: `2026-04-28`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-closeout-selfhost-validation-followthrough-governance.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260419-0333--runtime-closeout-selfhost-validation-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260419-0333--runtime-closeout-selfhost-validation-followthrough/candidates.md`
-- follow_on_to: `I-20260418-1900-A`
-- branch: `feature/checkpoint-runtime-closeout-selfhost-validation-20260419`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-runtime-closeout-selfhost-validation`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-runtime-closeout-selfhost-validation-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-start-lock-cleans-ambiguous-missing-state`
-  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-releases-start-lock-when-launch-fails`
-  - `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler`
-  - `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler-cc`
-- next_action: `Run diff hygiene plus governance-check in the current checkpoint worktree, then decide whether one real self-host replay is needed before any guarded premerge batch is opened.`
-- revisit_trigger: `If protected-worktree replay later proves the daemon/start-lock half and closeout-routing half are actually independent seams, split them then rather than widening this owner further.`
-
-1. `I-20260414-0255-A`
-- title: Freely start after-failure recovery handoff race root cause fix
-- milestone_state: committed
-- phase_state: `completed`
-- completed_at: `2026-04-28`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-freely-start-auto-recovery-rootcause-governance.md`
-- prd_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/prd.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/candidates.md`
-- follow_on_to: `I-20260410-1835-B`
-- branch: `feature/freely-start-auto-recovery-rootcause-20260414`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260414-feature-freely-start-auto-recovery-rootcause`
-- evidence:
-  - `docs/system/workspace/scripts/runtime/freely` (cleanup_supervisor fix)
-  - `docs/system/workspace/scripts/tests/test-freely-start-watchdog-recovers-when-fallback-tool-appears-late`
-  - `docs/system/workspace/scripts/tests/test-freely-worker-runtime-falls-through-to-cross-tool-after-failure`
-  - `docs/system/workspace/scripts/tests/test-watchdog-switch-to-codex-slot-accepts-actual-slot-without-json`
-- latest_session_ref: `{tool: codex, session_id: "019d8ca9-5ac6-74d1-858d-38f1a1937a69"}`
-- next_action: 延续当前 feature-lane dev-loop closeout；当前实现与 focused evidence 已存在，但仍需完成 tasks/pre-tests 中剩余的 feature verification、premerge 装配与 promote 准备
-- revisit_trigger: 当 feature-lane verification 全部收口后，切入 `test-pre-merge-*` 做 premerge-integration；若真实 replay 再次出现 after-failure handoff race 或 stop resurrection，再回到当前 issue 继续实现
-
-1. `I-20260417-0445-A`
-- title: Runtime start/stop lifecycle and process leak governance
-- milestone_state: candidate
-- phase_state: `completed`
-- completed_at: `2026-04-28`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-start-stop-lifecycle-and-process-leak-governance.md`
-- prd_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/prd.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract/candidates.md`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-precheck-ignores-self-owned-start-lock`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-rejects-when-runtime-already-running`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-releases-start-lock-when-launch-fails`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-interruption-manager-fast-path-control-validation`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-lifecycle-trace-log`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-lock-cleans-stalled-active-owner`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-self-owned-start-lock`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-rejects-when-runtime-already-running`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-releases-start-lock-when-startup-fails`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-discovered-watchers-and-dispatchers`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-detects-codex-session-permission-failure`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-detects-fast-exit-iflow-local-state-failure`
-  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-iflow-descendants-on-runtime-failure`
-  - `./bin/test-lane premerge-integration -- ./bin/governance-check`
-- completion_note: `The bounded runtime lifecycle owner now carries explicit repeated-start rejection, lawful start-lock handling, discovered relauncher cleanup, AI fast-exit containment, and guarded premerge adequacy evidence; the remaining closeout step is guarded promote into canonical develop plus one short protected-worktree followthrough replay.`
-
-1. `I-20260413-1640-A`
-- title: Tasks closeout completion and adequacy gate governance
-- milestone_state: candidate
-- phase_state: `completed`
-- completed_at: `2026-04-28`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-tasks-closeout-completion-and-adequacy-gate-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/candidates.md`
-- follow_on_to: `I-20260412-0225-A`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
-  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-tasks-closeout-completion-and-adequacy-gate-governance.md`
-  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
-  - `bash -n docs/system/workspace/scripts/quality/pretests-gate`
-  - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
-  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
-  - `./bin/governance-check`
-- completion_note: Current feature lane now binds owner `tasks.md` into completion and guarded adequacy checks inside `pretests-gate`; the remaining closeout step is the guarded upstream merge that lands this already-bounded repair on canonical `develop`.
-
 1. `I-20260419-1505-A`
 - title: Runtime supervisor attach reuse followthrough governance
 - milestone_state: committed
@@ -229,7 +76,7 @@ routing_policy:
 - next_action: `Keep this owner narrow, preserve the checkpoint evidence, and decide in a later pass whether guarded replay should happen directly or be absorbed by a newer runtime followthrough owner.`
 - revisit_trigger: `If later replay shows launcher-home isolation or supervisor attach should split into separate owners, reopen narrowly around the conflicting seam instead of silently widening this owner.`
 
-1. `I-20260419-1630-A`
+2. `I-20260419-1630-A`
 - title: Runtime startup self-healing governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -260,7 +107,7 @@ routing_policy:
 - next_action: `Keep the owner narrow, preserve the new path-equivalence verification evidence, then finish the guarded promote path for the current feature continuation.`
 - revisit_trigger: `If replay shows startup self-heal must make semantic continuation choices rather than machine-only repairs, split that follow-on back into a manager-owned recovery owner instead of widening this one.`
 
-1. `I-20260419-2245-A`
+3. `I-20260419-2245-A`
 - title: Runtime Claude launch and session evidence governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -288,7 +135,7 @@ routing_policy:
 - next_action: `Refresh the disposable premerge batch with this owner evidence, rerun the focused regressions there, and promote the bounded repair into develop.`
 - revisit_trigger: `If later replay proves the remaining failure is actually generic runtime truth drift rather than Claude-family launcher/session evidence, split that into a new owner instead of widening this one.`
 
-1. `I-20260412-0907-A`
+4. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
 - milestone_state: candidate
 - phase_state: `in_verification`
@@ -311,7 +158,7 @@ routing_policy:
   - `./bin/governance-check`
 - completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
 
-1. `I-20260407-1042-A`
+5. `I-20260407-1042-A`
 - title: GitHub-first external issue source governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -334,7 +181,7 @@ routing_policy:
   - `./bin/governance-check`
 - next_action: Keep this owner bounded to GitHub-first source contract truth, finish verification in the current closeout lane, and open provider API automation only as a follow-on implementation owner after canonical `develop` absorbs the governance package.
 
-1. `I-20260420-1130-A`
+6. `I-20260420-1130-A`
 - title: Manager task-source scan idle/replan boundary governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -361,7 +208,7 @@ routing_policy:
   - `./bin/governance-check`
 - next_action: Keep the patrol seam narrow, verify the idle/replan scan contract against the focused runtime tests, and route any future GitHub or Gitee provider expansion into a separate external-source implementation owner.
 
-1. `I-20260421-1530-A`
+7. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -391,6 +238,7 @@ routing_policy:
   - `bash -n docs/system/workspace/scripts/runtime/freely`
   - `./bin/governance-check`
 - next_action: Preserve this owner as the smallest implementation slice: complete guarded develop merge and run develop-side daemon/status replay before considering any broader status-family or scan-schema follow-on.
+
 
 ### candidate_issues
 
@@ -2784,6 +2632,159 @@ routing_policy:
 - evidence:
   - `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/code-reviews/20260326-stacked-merge-chain-canonical-replay-verification.md`
 - completion_note: stacked merge-chain 的 skill/reference/prompt truth 已在 canonical truth 中稳定存在；CLI/脚本级自动决策属于后续增量，不再阻塞当前 issue 收口
+
+19. `I-20260426-0000-A`
+- title: Add opencode direct launcher and AI_TOOL alias resolution
+- milestone_state: completed
+- phase_state: `completed`
+- completed_at: `2026-04-28`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
+  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/tasks.md`
+  - `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260426-tool-alias-opencode-premerge-verification.md`
+
+20. `I-20260418-1900-A`
+- title: Runtime lifecycle receipt followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- completed_at: `2026-04-28`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
+- source_brainstorm: `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
+  - `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+  - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
+  - `./bin/governance-check`
+- completion_note: `This narrow followthrough owner carries the final receipt-ledger repair for the absorbed runtime lifecycle batch and should retire the temporary followthrough feature and test-pre-merge worktrees immediately after canonical develop absorbs it. Continuation 2026-04-19: the first guarded replay fixed the test-pre-merge merge trailers but left a develop-bound diff that only carried the ledger file, so this owner remains active until the same replay batch also refreshes candidate/issue/progress/review evidence on canonical develop.`
+
+21. `I-20260419-0333-A`
+- title: Runtime closeout selfhost validation followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- completed_at: `2026-04-28`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-closeout-selfhost-validation-followthrough-governance.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-0333--runtime-closeout-selfhost-validation-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-0333--runtime-closeout-selfhost-validation-followthrough/candidates.md`
+- follow_on_to: `I-20260418-1900-A`
+- branch: `feature/checkpoint-runtime-closeout-selfhost-validation-20260419`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-runtime-closeout-selfhost-validation`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-runtime-closeout-selfhost-validation-followthrough-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
+  - `bash docs/system/workspace/scripts/tests/test-freely-start-lock-cleans-ambiguous-missing-state`
+  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-releases-start-lock-when-launch-fails`
+  - `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler`
+  - `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler-cc`
+- next_action: `Run diff hygiene plus governance-check in the current checkpoint worktree, then decide whether one real self-host replay is needed before any guarded premerge batch is opened.`
+- revisit_trigger: `If protected-worktree replay later proves the daemon/start-lock half and closeout-routing half are actually independent seams, split them then rather than widening this owner further.`
+
+22. `I-20260414-0255-A`
+- title: Freely start after-failure recovery handoff race root cause fix
+- milestone_state: completed
+- phase_state: `completed`
+- completed_at: `2026-04-28`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-freely-start-auto-recovery-rootcause-governance.md`
+- prd_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/prd.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260414-0255--freely-start-after-failure-recovery-handoff-race/candidates.md`
+- follow_on_to: `I-20260410-1835-B`
+- branch: `feature/freely-start-auto-recovery-rootcause-20260414`
+- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260414-feature-freely-start-auto-recovery-rootcause`
+- evidence:
+  - `docs/system/workspace/scripts/runtime/freely` (cleanup_supervisor fix)
+  - `docs/system/workspace/scripts/tests/test-freely-start-watchdog-recovers-when-fallback-tool-appears-late`
+  - `docs/system/workspace/scripts/tests/test-freely-worker-runtime-falls-through-to-cross-tool-after-failure`
+  - `docs/system/workspace/scripts/tests/test-watchdog-switch-to-codex-slot-accepts-actual-slot-without-json`
+- latest_session_ref: `{tool: codex, session_id: "019d8ca9-5ac6-74d1-858d-38f1a1937a69"}`
+- next_action: 延续当前 feature-lane dev-loop closeout；当前实现与 focused evidence 已存在，但仍需完成 tasks/pre-tests 中剩余的 feature verification、premerge 装配与 promote 准备
+- revisit_trigger: 当 feature-lane verification 全部收口后，切入 `test-pre-merge-*` 做 premerge-integration；若真实 replay 再次出现 after-failure handoff race 或 stop resurrection，再回到当前 issue 继续实现
+
+23. `I-20260417-0445-A`
+- title: Runtime start/stop lifecycle and process leak governance
+- milestone_state: completed
+- phase_state: `completed`
+- completed_at: `2026-04-28`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- prd_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/prd.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260417-0445--runtime-start-stop-process-lifecycle-and-leak-contract/candidates.md`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
+  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-precheck-ignores-self-owned-start-lock`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-rejects-when-runtime-already-running`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-releases-start-lock-when-launch-fails`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-interruption-manager-fast-path-control-validation`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-lifecycle-trace-log`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-lock-cleans-stalled-active-owner`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-self-owned-start-lock`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-rejects-when-runtime-already-running`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-releases-start-lock-when-startup-fails`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-discovered-watchers-and-dispatchers`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-detects-codex-session-permission-failure`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-detects-fast-exit-iflow-local-state-failure`
+  - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-iflow-descendants-on-runtime-failure`
+  - `./bin/test-lane premerge-integration -- ./bin/governance-check`
+- completion_note: `The bounded runtime lifecycle owner now carries explicit repeated-start rejection, lawful start-lock handling, discovered relauncher cleanup, AI fast-exit containment, and guarded premerge adequacy evidence; the remaining closeout step is guarded promote into canonical develop plus one short protected-worktree followthrough replay.`
+
+24. `I-20260413-1640-A`
+- title: Tasks closeout completion and adequacy gate governance
+- milestone_state: completed
+- phase_state: `completed`
+- completed_at: `2026-04-28`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-tasks-closeout-completion-and-adequacy-gate-governance.md`
+- source_brainstorm: `docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/candidates.md`
+- follow_on_to: `I-20260412-0225-A`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
+  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/prd.md`
+  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/tasks.md`
+  - `docs/progress/workspace-routing-foundation/p-tasks-closeout-completion-and-adequacy-gate-governance.md`
+  - `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
+  - `bash -n docs/system/workspace/scripts/quality/pretests-gate`
+  - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
+  - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
+  - `./bin/governance-check`
+- completion_note: Current feature lane now binds owner `tasks.md` into completion and guarded adequacy checks inside `pretests-gate`; the remaining closeout step is the guarded upstream merge that lands this already-bounded repair on canonical `develop`.
+
 
 ### candidate_issues
 
