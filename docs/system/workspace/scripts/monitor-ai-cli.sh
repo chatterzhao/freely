@@ -277,7 +277,11 @@ LAST_CLAUDE_JSONL_PATH="$last_claude_jsonl_path"
 LAST_CODEX_MCP_USED="$last_codex_mcp_used"
 LAST_CODEX_MCP_THREAD_ID="$last_codex_mcp_thread_id"
 LAST_CODEX_MCP_JSONL_PATH="$last_codex_mcp_jsonl_path"
-CLAUDE_SESSION_ID_CURRENT="$claude_session_id_current_state"
+# Protect: never overwrite valid UUID with empty.
+# _persist_session_anchor_early writes this before launch.
+if [[ -n "${claude_session_id_current_state:-}" ]]; then
+  CLAUDE_SESSION_ID_CURRENT="$claude_session_id_current_state"
+fi
 CLAUDE_SESSION_ID_PREVIOUS="$claude_session_id_previous_state"
 LAST_PROJECT_DIRTY_ENTRIES="$last_project_dirty_entries"
 LAST_WORKTREE_SUMMARY_TOTAL="$last_worktree_summary_total"
