@@ -475,3 +475,15 @@
 - task_refs: `tasks.md#T-37`
 - case_design: `Verify parse_ai_spec warns but does not exit on cc-ds-auto. Verify claude is in known list. Verify codex still works.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-parse-ai-spec-pass-through.md`
+
+### PT-38
+- id: `PT-38`
+- requirement: `cmd_chat parses --issue/--new-issue/--urgent flags, defaults to --new-issue`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-38`
+- case_design: `Verify cmd_chat --issue works. Verify --new-issue works. Verify --urgent flag is forwarded. Verify no-flag default to --new-issue.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-chat-issue-flags.md`

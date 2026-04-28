@@ -89,3 +89,10 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-27`
+
+### T-38
+- id: `T-38`
+- title: `Fix cmd_chat to parse --issue/--new-issue/--urgent flags`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-27`
