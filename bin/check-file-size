@@ -1,44 +1,56 @@
 #!/usr/bin/env bash
-# check-file-size: lint for file line count limits
-# Code: 500 warn, 1000 error. Docs: 500 warn, 1000 warn (keep, not block).
+# check-file-size: lint file line counts, configurable limits, skip markers.
+# Config (in .freely/config.env):
+#   FILE_SIZE_WARN=500      # warn threshold (default 500)
+#   FILE_SIZE_ERROR=1000    # error threshold (default 1000)
+# Skip markers anywhere in file:
+#   # file-size: skip       (shell/python)
+#   file_size_check: skip   (markdown frontmatter)
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
-CODE_WARN=500
-CODE_ERROR=1000
-DOC_WARN=500
-DOC_ERROR=1000
+WARN="${FILE_SIZE_WARN:-500}"
+ERROR="${FILE_SIZE_ERROR:-1000}"
 
 warnings=0
 errors=0
 
+should_skip() {
+  local file="$1"
+  grep -qiE "file.size:\s*skip|file_size_check:\s*skip" "$file" 2>/dev/null && return 0
+  return 1
+}
+
 check_file() {
-  local file="$1" kind="$2" warn="$3" error="$4"
+  local file="$1"
   local lines
+  should_skip "$file" && return 0
   lines=$(wc -l <"$file" | tr -d ' ')
-  if (( lines > error )); then
-    echo "[ERROR] $file: $lines lines (limit: $error)"
+  if (( lines > ERROR )); then
+    echo "[ERROR] $file: $lines lines (limit: $ERROR)"
     errors=$((errors + 1))
-  elif (( lines > warn )); then
-    echo "[WARN]  $file: $lines lines (limit: $warn)"
+  elif (( lines > WARN )); then
+    echo "[WARN]  $file: $lines lines (limit: $WARN)"
     warnings=$((warnings + 1))
   fi
 }
 
 # Code files
 while IFS= read -r -d '' f; do
-  case "$f" in
-    */freely) check_file "$f" code $CODE_WARN $CODE_ERROR ;; # legacy: allow warning only
-    *) check_file "$f" code $CODE_WARN $CODE_ERROR ;;
-  esac
-done < <(find "$ROOT_DIR/docs/system/workspace/scripts" "$ROOT_DIR/bin" -name "*.sh" -o -name "*.py" -print0 2>/dev/null)
+  check_file "$f"
+done < <(find "$ROOT_DIR/docs/system/workspace/scripts" "$ROOT_DIR/bin" \
+  \( -name "*.sh" -o -name "*.py" \) -print0 2>/dev/null)
 
-# Doc files (warn only)
+# Active governance docs
 while IFS= read -r -d '' f; do
-  check_file "$f" doc $DOC_WARN 999999
-done < <(find "$ROOT_DIR/docs" -name "*.md" -not -path "*/pre-brainstorms/*" -not -path "*/epics/*" -print0 2>/dev/null)
+  check_file "$f"
+done < <(find "$ROOT_DIR/AGENTS.md" "$ROOT_DIR/docs/CONSTITUTION.md" \
+  "$ROOT_DIR/docs/LAWS.md" "$ROOT_DIR/docs/PROJECT_INTENT.md" \
+  "$ROOT_DIR/docs/milestones.md" "$ROOT_DIR/docs/progress" \
+  "$ROOT_DIR/docs/system/workspace" \
+  -name "*.md" -print0 2>/dev/null)
 
 echo ""
-echo "Warnings: $warnings, Errors: $errors"
+echo "Limits: warn=$WARN error=$ERROR | Warnings: $warnings Errors: $errors"
 exit $(( errors > 0 ? 1 : 0 ))

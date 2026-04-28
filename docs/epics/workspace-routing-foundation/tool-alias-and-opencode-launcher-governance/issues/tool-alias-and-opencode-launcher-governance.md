@@ -81,3 +81,6 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 ### CHG 2.2/4.2: TODO markers removed
 - completed_at: `2026-04-27`
 - reason: `All intake CRUD functions migrated to docs/issues/. Handler bridge in place. Zero TODO markers remaining.`
+
+### File size check: configurable + skip markers
+- completed_at: `2026-04-27`
