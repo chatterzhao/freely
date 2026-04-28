@@ -427,3 +427,15 @@
 - task_refs: `tasks.md#T-33`
 - case_design: `Verify FILE_SIZE_WARN/ERROR from config.env. Verify skip markers exclude files. Verify 0 errors.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-file-size-config.md`
+
+### PT-34
+- id: `PT-34`
+- requirement: `file size check has TIP level for proactive refactoring hints`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-34`
+- case_design: `Verify FILE_SIZE_TIP=300 default. Verify [TIP] output for files >300 lines. Verify tips counter in summary.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-file-size-tip.md`

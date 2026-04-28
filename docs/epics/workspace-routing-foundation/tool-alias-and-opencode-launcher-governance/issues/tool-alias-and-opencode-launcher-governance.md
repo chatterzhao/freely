@@ -84,3 +84,10 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 
 ### File size check: configurable + skip markers
 - completed_at: `2026-04-27`
+- reason: `Made FILE_SIZE_WARN/ERROR configurable via .freely/config.env. Added skip markers for legacy/third-party files.`
+- scope: `bin/check-file-size rewritten, .freely/config.env updated`
+
+### File size check: TIP level for proactive refactoring hints
+- completed_at: `2026-04-27`
+- reason: `Added FILE_SIZE_TIP (default 300) threshold as a gentle nudge before WARN. Output [TIP] prefix.`
+- scope: `bin/check-file-size (tips counter, TIP level), .freely/config.env (FILE_SIZE_TIP=300)`

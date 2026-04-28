@@ -47,3 +47,24 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-27`
+
+### T-32
+- id: `T-32`
+- title: `Add file size guidelines to AGENTS.md and check script`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-27`
+
+### T-33
+- id: `T-33`
+- title: `Make file size check configurable, add skip markers`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-27`
+
+### T-34
+- id: `T-34`
+- title: `Add FILE_SIZE_TIP level for proactive refactoring hints`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-27`
