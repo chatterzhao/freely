@@ -121,6 +121,11 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - 将细节添加到规范文档中，然后在此引用。
 - 当出现不确定性时，打开/更新一个 B1_IBM 条目，先在那里收敛。按 `docs/system/workspace/ibm-framework.md` 判定当前处于 B1_IBM 还是 B2_IBM。
 
+### 文件规模
+- 脚本（.sh/.py）：500 行内优秀，1000 行警告，不得新增超过 1000 行的单体脚本。大文件应拆分为模块。
+- 文档（.md）：500 行内优秀，1000 行警告。久远的头脑风暴可以保持，活跃治理文档（AGENTS/CONSTITUTION/LAWS/PROJECT_INTENT）应力求精简。
+- 当前 `docs/system/workspace/scripts/runtime/freely`（~20K 行）是已知历史债务，需逐步拆分，不要在它上面追加新功能。
+
 ## 项目级 AGENTS 管理
 - Freely 面向任意托管项目时，项目根目录的 `AGENTS.md` 是第一入口；应先读项目级 `AGENTS.md`，再读 Freely 的复用能力真源。
 - 当前 Freely runtime 已具备最小 `AGENTS.md` 生成能力：若目标项目缺失该文件，`freely init` 路径会补一个项目级入口文件。
