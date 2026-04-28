@@ -3092,7 +3092,7 @@ PY
 tool_uses_claude_session_id() {
   local tool="$1"
   case "$tool" in
-    cc|cc-use-codex-cli) return 0 ;;
+    cc|cc-use-codex-cli|cc-ds-auto) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -16019,7 +16019,7 @@ tool_runtime_process_match_fallback_token() {
 tool_runtime_process_match_requires_project_owned_fallback() {
   local tool="$1"
   case "$tool" in
-    codex|iflow|kiro-cli|cc|cc-use-codex-cli) return 0 ;;
+    codex|iflow|kiro-cli|cc|cc-use-codex-cli|cc-ds-auto) return 0 ;;
     *) return 1 ;;
   esac
 }
