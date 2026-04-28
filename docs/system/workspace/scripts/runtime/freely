@@ -5279,6 +5279,31 @@ _write_chat_to_issue() {
       return 1
     fi
 
+    # Auto-redirect: if target is a raw-* that has been promoted to I-*,
+    # append the comment to the I-* instead and warn.
+    if [[ "$target_issue" == raw-* ]]; then
+      local absorbed_into
+      absorbed_into=$(python3 -c "
+import yaml
+with open('$issue_file') as f:
+  content = f.read()
+if content.startswith('---'):
+  parts = content.split('---', 2)
+  if len(parts) >= 3:
+    fm = yaml.safe_load(parts[1]) or {}
+    print(fm.get('absorbed_into', ''))
+" 2>/dev/null || true)
+      if [[ -n "$absorbed_into" && "$absorbed_into" != "None" ]]; then
+        log_warn "raw issue $target_issue was promoted to $absorbed_into, redirecting comment"
+        target_issue="$absorbed_into"
+        issue_file="$issues_dir/$target_issue/issue.md"
+        if [[ ! -f "$issue_file" ]]; then
+          log_error "redirect target not found: $target_issue (promoted from raw issue)"
+          return 1
+        fi
+      fi
+    fi
+
     local comment_id urgent_marker
     comment_id="comment-$(date -u +"%Y%m%dT%H%M%SZ" 2>/dev/null || echo "${created_at}" | tr -d 'T:-')"
     urgent_marker=""

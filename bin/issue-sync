@@ -1,177 +1,510 @@
 #!/usr/bin/env bash
-# issue-sync: sync local docs/issues/ to platform (github/gitee)
+# issue-sync: local docs/issues/ ↔ platform (GitHub/Gitee) bridge.
+#
+# This is the ONLY code that touches platform APIs. AI never directly
+# reads/writes GitHub or Gitee — it works on docs/issues/ and this
+# tool handles the local→platform sync.
+#
+# Issue model:
+#   raw-*  kind: raw     B1_IBM input, created from chat/platform scan
+#   I-*    kind: linked  B2_IBM input, promoted from candidate, on milestone
+#
+# Platform format:
+#   raw:  [RAW-20260428-0542] <title>   labels: kind/raw, phase/proposed
+#   I-*:  [I-20260426-0000-A] <title>   labels: kind/linked, phase/<state>
+#
+# Lifecycle:
+#   chat → raw-* → B1_IBM → promoted → I-* → B2_IBM → merge → completed
+#              ↓                                    ↓
+#         issue-sync create                   issue-sync update
+#         issue-sync close (after promote)    issue-sync close (after merge)
+#
 # Usage:
-#   bin/issue-sync create <local_id>
-#   bin/issue-sync update <local_id>
-#   bin/issue-sync close <local_id>
-#   bin/issue-sync comment <local_id>
-#   bin/issue-sync pull
-#   bin/issue-sync status <local_id>
-#   bin/issue-sync rebuild <local_id>
+#   bin/issue-sync create  <local_id>     Create platform issue
+#   bin/issue-sync update  <local_id>     Update title/body/labels on platform
+#   bin/issue-sync comment <local_id>     Push unsynced local comments to platform
+#   bin/issue-sync close   <local_id>     Close platform issue
+#   bin/issue-sync promote <raw_id> <I_id>  Close raw, create I-* with cross-ref
+#   bin/issue-sync status  <local_id>     Show sync status
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-PROJECT="${ROOT_DIR}"
-ISSUES_DIR="$PROJECT/docs/issues"
-SCAN_STATE="$ISSUES_DIR/.scan-state"
+ISSUES_DIR="$ROOT_DIR/docs/issues"
 
-usage() {
-  cat <<'EOF'
-Usage:
-  bin/issue-sync create <local_id>        Create platform issue from local
-  bin/issue-sync update <local_id>        Update platform issue body
-  bin/issue-sync close <local_id>         Close platform issue
-  bin/issue-sync comment <local_id>       Push unsynced comments to platform
-  bin/issue-sync pull                     Pull new comments from platform
-  bin/issue-sync status <local_id>        Show sync status
-  bin/issue-sync rebuild <local_id>       Force rebuild platform issue from local
-EOF
+# ── YAML helpers ─────────────────────────────────────────
+
+_fm_get() {
+  local file="$1" key="$2"
+  python3 -c "
+import yaml, sys
+with open('$file') as f: content = f.read()
+if not content.startswith('---'): sys.exit(0)
+parts = content.split('---', 2)
+if len(parts) < 3: sys.exit(0)
+fm = yaml.safe_load(parts[1]) or {}
+val = fm.get('$key','')
+if isinstance(val, dict):
+  import json; print(json.dumps(val))
+elif isinstance(val, list):
+  import json; print(json.dumps(val))
+elif val is not None:
+  print(val)
+" 2>/dev/null || true
 }
 
-cmd="${1:-}"
-local_id="${2:-}"
-
-[[ -n "$cmd" ]] || { usage >&2; exit 1; }
-[[ -d "$ISSUES_DIR" ]] || { echo "[ERROR] $ISSUES_DIR not found" >&2; exit 1; }
-
-issue_file="$ISSUES_DIR/$local_id/issue.md"
-
-get_frontmatter_field() {
-  local field="$1" file="${2:-$issue_file}"
+_fm_set() {
+  local file="$1" key="$2" value="$3"
   python3 -c "
 import yaml
-try:
-  with open('$file') as f:
-    content = f.read()
-  if content.startswith('---'):
-    parts = content.split('---', 2)
-    if len(parts) >= 3:
-      fm = yaml.safe_load(parts[1])
-      val = fm.get('$field', '')
-      print(val if val else '')
-except: pass
-" 2>/dev/null
+with open('$file') as f: content = f.read()
+parts = content.split('---', 2)
+fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+fm['$key'] = $value
+new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+body = parts[2] if len(parts) >= 3 else ''
+with open('$file', 'w') as f: f.write('---\n' + new_fm + '\n---' + body)
+" 2>/dev/null || true
 }
 
-get_primary_platform() {
-  get_frontmatter_field "primary_platform"
+_fm_set_str() {
+  local file="$1" key="$2" value="$3"
+  _fm_set "$file" "$key" "'$value'"
 }
 
-get_platform_ids() {
-  get_frontmatter_field "platform_ids"
+# ── title derivation ─────────────────────────────────────
+
+_issue_title() {
+  local file="$1" local_id="$2"
+  local title
+  title=$(_fm_get "$file" "issue_title")
+  if [[ -n "$title" && "$title" != "None" ]]; then
+    printf '%s\n' "$title"
+    return 0
+  fi
+  # Fallback: first # heading in body, or canonical doc
+  title=$(sed -n '/^---$/,/^---$/!p' "$file" | grep -m1 '^# ' | sed 's/^# //')
+  if [[ -z "$title" ]]; then
+    local canon; canon=$(_fm_get "$file" "canonical_issue_path")
+    if [[ -n "$canon" && "$canon" != "None" && -f "$ROOT_DIR/$canon" ]]; then
+      title=$(head -5 "$ROOT_DIR/$canon" | sed -n 's/^# //p' | head -1)
+    fi
+  fi
+  printf '%s\n' "${title:-$local_id}"
 }
 
-# Get unsynced comments: ### sections without platform_ids for target platform
-get_unsynced_comments() {
-  local platform="$1"
+_platform_title() {
+  local local_id="$1" file="$2"
+  local kind title
+  kind=$(_fm_get "$file" "kind")
+  title=$(_issue_title "$file" "$local_id")
+  case "$kind" in
+    raw)    printf '[RAW-%s] %s\n' "${local_id#raw-}" "$title" ;;
+    linked) printf '[%s] %s\n' "$local_id" "$title" ;;
+    *)      printf '[%s] %s\n' "$local_id" "$title" ;;
+  esac
+}
+
+# ── body assembly ────────────────────────────────────────
+
+_issue_body() {
+  local file="$1" local_id="$2"
+  local kind status title canon phase created updated
+  kind=$(_fm_get "$file" "kind")
+  status=$(_fm_get "$file" "status")
+  title=$(_issue_title "$file" "$local_id")
+  canon=$(_fm_get "$file" "canonical_issue_path")
+  phase=$(_fm_get "$file" "phase_state")
+  created=$(_fm_get "$file" "created_at")
+  updated=$(_fm_get "$file" "updated_at")
+
+  cat <<BODY
+## ${title}
+
+| Field | Value |
+|-------|-------|
+| local_id | \`${local_id}\` |
+| kind | \`${kind:-unknown}\` |
+| status | \`${status:-unknown}\` |
+| phase | \`${phase:-none}\` |
+| canonical | \`${canon:-none}\` |
+| created | ${created:-unknown} |
+| updated | ${updated:-unknown} |
+
+---
+
+$(sed -n '/^---$/,/^---$/!p' "$file" | sed '1{/^---$/d};/^---$/d' | grep -v '^## Comments' | head -80)
+BODY
+}
+
+_labels() {
+  local file="$1"
+  local kind status phase labels
+  kind=$(_fm_get "$file" "kind")
+  status=$(_fm_get "$file" "status")
+  phase=$(_fm_get "$file" "phase_state")
+  labels="kind/${kind:-unknown}"
+  [[ -n "$phase" && "$phase" != "None" ]] && labels="$labels,phase/$phase"
+  [[ -n "$status" && "$status" != "None" && "$status" != "$phase" ]] && labels="$labels,status/$status"
+  printf '%s\n' "$labels"
+}
+
+# ── platform detection ───────────────────────────────────
+
+_gh_repo() {
+  gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null || echo ""
+}
+
+_gitee_repo() {
+  git remote -v 2>/dev/null | awk '/gitee.*\(push\)/ {
+    n=split($2, a, "/"); sub(/\.git$/, "", a[n]);
+    printf "%s/%s", a[n-1], a[n]; exit
+  }'
+}
+
+# ── GitHub ops ───────────────────────────────────────────
+
+_gh_create() {
+  local title="$1" body="$2" labels="$3"
+  local result url
+  result=$(gh issue create --repo "$GH_REPO" --title "$title" --body "$body" --label "$labels" 2>&1)
+  url=$(printf '%s\n' "$result" | grep -o 'https://github.com/[^ ]*' | head -1)
+  printf '%s\n' "${url:-}"
+}
+
+_gh_comment() {
+  local issue_number="$1" message="$2"
+  gh issue comment "$issue_number" --repo "$GH_REPO" --body "$message" >/dev/null 2>&1 && echo "ok" || echo "fail"
+}
+
+_gh_close() {
+  local issue_number="$1" reason="${2:-completed}"
+  gh issue close "$issue_number" --repo "$GH_REPO" --reason "$reason" >/dev/null 2>&1 && echo "ok" || echo "fail"
+}
+
+_gh_update() {
+  local issue_number="$1" title="$2" body="$3" labels="$4"
+  gh issue edit "$issue_number" --repo "$GH_REPO" --title "$title" --body "$body" >/dev/null 2>&1 || true
+  # gh doesn't have --set-labels, so we add labels incrementally
+  IFS=',' read -ra LABEL_ARR <<< "$labels"
+  for lbl in "${LABEL_ARR[@]}"; do
+    gh issue edit "$issue_number" --repo "$GH_REPO" --add-label "$lbl" >/dev/null 2>&1 || true
+  done
+  echo "ok"
+}
+
+# ── Gitee ops ────────────────────────────────────────────
+
+_gitee_call() {
+  local method="$1" data="$2"
+  python3 "$ROOT_DIR/docs/system/workspace/scripts/runtime/gitee-issue.py" \
+    --repo "$GITEE_REPO" "$method" "$data" 2>/dev/null || echo '{"ok":false}'
+}
+
+# ── platform_ids helpers ─────────────────────────────────
+
+_gh_issue_number() {
+  local file="$1"
   python3 -c "
-import re
-with open('$issue_file') as f:
-    content = f.read()
-
-comments_section = content.split('## Comments', 1)
-if len(comments_section) < 2:
-    exit(0)
-
-section = comments_section[1]
-# Find all ### comment- entries
-pattern = r'### (comment-\S+)\n(\{[^}]+\})'
-for m in re.finditer(pattern, section):
-    header = m.group(1)
-    meta = m.group(2)
-    if '$platform' not in meta or 'comment_id' not in meta:
-        print(header)
-" 2>/dev/null
-}
-
-write_platform_comment_id() {
-  local comment_local_id="$1" platform="$2" platform_comment_id="$3"
-  python3 -c "
-import re
-with open('$issue_file') as f:
-    content = f.read()
-
-# Find the ### section and update its metadata line
-pattern = r'(### ' + re.escape('$comment_local_id') + r'\n)(\{[^}]+\})'
-replacement = r'\g<1>{source: chat, platform_ids: {' + '$platform' + r': {comment_id: \"' + '$platform_comment_id' + r'\"}}}'
-content = re.sub(pattern, replacement, content)
-
-with open('$issue_file', 'w') as f:
-    f.write(content)
-" 2>/dev/null
-}
-
-write_platform_issue_id() {
-  local platform="$1" platform_issue_id="$2"
-  python3 -c "
-import yaml, re
-with open('$issue_file') as f:
-    content = f.read()
-
+import yaml, json
+with open('$file') as f: content = f.read()
 parts = content.split('---', 2)
 if len(parts) >= 3:
-    fm = yaml.safe_load(parts[1])
-    if 'platform_ids' not in fm:
-        fm['platform_ids'] = {}
-    fm['platform_ids']['$platform'] = {
-        'issue_id': '$platform_issue_id',
-        'synced_at': '$(date -u +"%Y-%m-%dT%H:%M:%SZ")'
-    }
-    new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True)
-    new_content = '---\n' + new_fm + '---' + parts[2]
-    with open('$issue_file', 'w') as f:
-        f.write(new_content)
-" 2>/dev/null
+  fm = yaml.safe_load(parts[1]) or {}
+  ids = fm.get('platform_ids', {}) or {}
+  gh = ids.get('github', {}) or {}
+  print(gh.get('issue_id', ''))
+" 2>/dev/null || true
 }
 
-case "$cmd" in
-  create)
-    [[ -f "$issue_file" ]] || { echo "[ERROR] $issue_file not found" >&2; exit 1; }
-    echo "[issue-sync] create $local_id on platform..."
-    echo "[TODO] platform API call: create issue from $issue_file"
-    # TODO: Implement platform adapter call
-    ;;
+_gitee_issue_id() {
+  local file="$1"
+  python3 -c "
+import yaml
+with open('$file') as f: content = f.read()
+parts = content.split('---', 2)
+if len(parts) >= 3:
+  fm = yaml.safe_load(parts[1]) or {}
+  ids = fm.get('platform_ids', {}) or {}
+  gt = ids.get('gitee', {}) or {}
+  print(gt.get('issue_id', ''))
+" 2>/dev/null || true
+}
 
-  comment)
-    [[ -f "$issue_file" ]] || { echo "[ERROR] $issue_file not found" >&2; exit 1; }
-    platform=$(get_primary_platform)
-    [[ -n "$platform" ]] || { echo "[ERROR] no primary_platform in frontmatter" >&2; exit 1; }
-    unsynced=$(get_unsynced_comments "$platform")
-    if [[ -z "$unsynced" ]]; then
-      echo "[issue-sync] no unsynced comments for $local_id on $platform"
+_update_platform_ids() {
+  local file="$1" platform="$2" issue_id="$3" url="$4"
+  local ts; ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+  python3 -c "
+import yaml
+with open('$file') as f: content = f.read()
+parts = content.split('---', 2)
+fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+fm.setdefault('platform_ids', {})
+fm['platform_ids']['$platform'] = {'issue_id': '$issue_id', 'url': '$url', 'synced_at': '$ts'}
+fm['updated_at'] = '$ts'
+if not fm.get('primary_platform'): fm['primary_platform'] = '$platform'
+if not fm.get('created_at'): fm['created_at'] = '$ts'
+new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+body_text = parts[2] if len(parts) >= 3 else ''
+with open('$file', 'w') as f: f.write('---\n' + new_fm + '\n---' + body_text)
+" 2>/dev/null || true
+}
+
+# ── commands ─────────────────────────────────────────────
+
+cmd_create() {
+  local local_id="$1" file title body labels url ts
+  file="$ISSUES_DIR/$local_id/issue.md"
+  [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
+
+  title=$(_platform_title "$local_id" "$file")
+  body=$(_issue_body "$file" "$local_id")
+  labels=$(_labels "$file")
+
+  # GitHub
+  if [[ -n "${GH_REPO:-}" ]]; then
+    echo "[issue-sync] GitHub: creating issue..."
+    url=$(_gh_create "$title" "$body" "$labels")
+    if [[ -n "$url" ]]; then
+      local gh_num; gh_num=$(basename "$url")
+      echo "[issue-sync] GitHub: $url"
+      _update_platform_ids "$file" "github" "$gh_num" "$url"
     else
-      echo "[issue-sync] pushing $(echo "$unsynced" | wc -l | tr -d ' ') comments..."
-      echo "[TODO] platform API call per comment"
+      echo "[issue-sync] GitHub: FAILED"
     fi
-    ;;
+  fi
 
-  update|close)
-    [[ -f "$issue_file" ]] || { echo "[ERROR] $issue_file not found" >&2; exit 1; }
-    echo "[issue-sync] $cmd $local_id..."
-    echo "[TODO] platform API call: $cmd"
-    ;;
+  # Gitee
+  if [[ -n "${GITEE_REPO:-}" && -n "${GITEE_TOKEN:-}" ]]; then
+    echo "[issue-sync] Gitee: creating issue..."
+    local gitee_result gitee_id
+    gitee_result=$(_gitee_call "create" "{\"title\":\"$title\",\"body\":\"$(printf '%s' "$body" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))' | sed 's/^"//;s/"$//')\"}")
+    gitee_id=$(printf '%s\n' "$gitee_result" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('output',''))" 2>/dev/null || true)
+    if [[ -n "$gitee_id" ]]; then
+      echo "[issue-sync] Gitee: created $gitee_id"
+      _update_platform_ids "$file" "gitee" "$gitee_id" "https://gitee.com/$GITEE_REPO/issues/$gitee_id"
+    else
+      echo "[issue-sync] Gitee: FAILED - $gitee_result"
+    fi
+  fi
 
-  pull)
-    echo "[issue-sync] pulling from configured platforms..."
-    echo "[TODO] iterate platforms, fetch comments newer than last_synced_comment_at"
-    ;;
+  echo "[issue-sync] create complete: $local_id"
+}
 
-  status)
-    [[ -f "$issue_file" ]] || { echo "[ERROR] $issue_file not found" >&2; exit 1; }
-    echo "local_id: $local_id"
-    echo "primary_platform: $(get_primary_platform)"
-    echo "platform_ids: $(get_platform_ids)"
-    synced=$(get_frontmatter_field "last_synced_comment_at")
-    echo "last_synced_comment_at: ${synced:-never}"
-    ;;
+cmd_update() {
+  local local_id="$1" file title body labels gh_id gitee_id
+  file="$ISSUES_DIR/$local_id/issue.md"
+  [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
 
-  rebuild)
-    [[ -f "$issue_file" ]] || { echo "[ERROR] $issue_file not found" >&2; exit 1; }
-    echo "[issue-sync] rebuild $local_id (force push)..."
-    echo "[TODO] delete platform issue if exists, recreate from local"
-    ;;
+  title=$(_platform_title "$local_id" "$file")
+  body=$(_issue_body "$file" "$local_id")
+  labels=$(_labels "$file")
 
-  *)
-    usage >&2; exit 1
-    ;;
-esac
+  gh_id=$(_gh_issue_number "$file")
+  if [[ -n "${GH_REPO:-}" && -n "$gh_id" ]]; then
+    echo "[issue-sync] GitHub: updating #$gh_id"
+    _gh_update "$gh_id" "$title" "$body" "$labels"
+  fi
+
+  gitee_id=$(_gitee_issue_id "$file")
+  if [[ -n "${GITEE_REPO:-}" && -n "${GITEE_TOKEN:-}" && -n "$gitee_id" ]]; then
+    echo "[issue-sync] Gitee: updating $gitee_id"
+    _gitee_call "update" "{\"issue_id\":\"$gitee_id\",\"title\":\"$title\",\"body\":\"$(printf '%s' "$body" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))' | sed 's/^"//;s/"$//')\"}"
+  fi
+
+  _fm_set_str "$file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+  echo "[issue-sync] update complete: $local_id"
+}
+
+cmd_comment() {
+  local local_id="$1" file
+  file="$ISSUES_DIR/$local_id/issue.md"
+  [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
+
+  # Extract latest comment without platform_ids
+  local last_comment
+  last_comment=$(python3 -c "
+import re
+with open('$file') as f: content = f.read()
+# Find last ### comment- entry, extract text
+matches = list(re.finditer(r'### (comment-\S+)\n(\{[^}]+\})?\n(.*?)(?=\n### |\Z)', content, re.DOTALL))
+if matches:
+  m = matches[-1]
+  meta = m.group(2) or ''
+  body = m.group(3).strip()
+  # Only push if not already synced to both platforms
+  if 'github' not in meta or 'gitee' not in meta:
+    print(body)
+" 2>/dev/null || true)
+
+  if [[ -z "$last_comment" ]]; then
+    echo "[issue-sync] no unsynced comments for $local_id"
+    return 0
+  fi
+
+  local gh_id gitee_id ts
+  gh_id=$(_gh_issue_number "$file")
+  gitee_id=$(_gitee_issue_id "$file")
+  ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+  if [[ -n "${GH_REPO:-}" && -n "$gh_id" ]]; then
+    echo "[issue-sync] GitHub: adding comment to #$gh_id"
+    _gh_comment "$gh_id" "$last_comment"
+  fi
+
+  if [[ -n "${GITEE_REPO:-}" && -n "${GITEE_TOKEN:-}" && -n "$gitee_id" ]]; then
+    echo "[issue-sync] Gitee: adding comment to $gitee_id"
+    _gitee_call "comment" "{\"issue_id\":\"$gitee_id\",\"body\":\"$(printf '%s' "$last_comment" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))' | sed 's/^"//;s/"$//')\"}"
+  fi
+
+  # Update last_synced_comment_at
+  python3 -c "
+import yaml
+with open('$file') as f: content = f.read()
+parts = content.split('---', 2)
+fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+fm.setdefault('last_synced_comment_at', {})
+fm['last_synced_comment_at']['github'] = '$ts'
+fm['last_synced_comment_at']['gitee'] = '$ts'
+fm['updated_at'] = '$ts'
+new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+body_text = parts[2] if len(parts) >= 3 else ''
+with open('$file', 'w') as f: f.write('---\n' + new_fm + '\n---' + body_text)
+" 2>/dev/null || true
+
+  echo "[issue-sync] comment complete: $local_id"
+}
+
+cmd_close() {
+  local local_id="$1" reason="${2:-completed}" file gh_id gitee_id
+  file="$ISSUES_DIR/$local_id/issue.md"
+  [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
+
+  gh_id=$(_gh_issue_number "$file")
+  gitee_id=$(_gitee_issue_id "$file")
+
+  if [[ -n "${GH_REPO:-}" && -n "$gh_id" ]]; then
+    echo "[issue-sync] GitHub: closing #$gh_id"
+    _gh_close "$gh_id" "$reason"
+  fi
+
+  if [[ -n "${GITEE_REPO:-}" && -n "${GITEE_TOKEN:-}" && -n "$gitee_id" ]]; then
+    echo "[issue-sync] Gitee: closing $gitee_id"
+    _gitee_call "close" "{\"issue_id\":\"$gitee_id\"}" || true
+  fi
+
+  _fm_set_str "$file" "status" "closed"
+  _fm_set_str "$file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+  echo "[issue-sync] close complete: $local_id"
+}
+
+cmd_promote() {
+  local raw_id="$1" i_id="$2"
+  local raw_file i_file
+  raw_file="$ISSUES_DIR/$raw_id/issue.md"
+  i_file="$ISSUES_DIR/$i_id/issue.md"
+  [[ -f "$raw_file" ]] || { echo "[ERROR] $raw_file not found" >&2; exit 1; }
+  [[ -f "$i_file" ]] || { echo "[ERROR] $i_file not found" >&2; exit 1; }
+
+  echo "[issue-sync] promote: $raw_id → $i_id"
+
+  # 1. Create I-* on platforms
+  cmd_create "$i_id"
+
+  # 2. Add cross-reference comment to raw issue
+  local i_title; i_title=$(_issue_title "$i_file" "$i_id")
+  local comment_msg="Promoted to [$i_id]($(_fm_get "$i_file" "platform_ids.github.url" 2>/dev/null || echo "")): $i_title"
+  cat >> "$raw_file" <<COMMENT
+
+### comment-$(date -u +"%Y%m%dT%H%M%SZ")
+- source: system
+- event: promoted
+- target: $i_id
+
+$comment_msg
+COMMENT
+  cmd_comment "$raw_id"
+
+  # 3. Close raw issue on platforms
+  cmd_close "$raw_id" "completed"
+
+  # 4. Update raw local state
+  _fm_set_str "$raw_file" "status" "absorbed"
+  _fm_set_str "$raw_file" "absorbed_into" "$i_id"
+
+  # 5. Update I-* with reference back to raw
+  local raw_gh; raw_gh=$(_gh_issue_number "$raw_file")
+  local cross_ref="Promoted from raw issue"
+  [[ -n "$raw_gh" ]] && cross_ref="$cross_ref (#$raw_gh)"
+  cat >> "$i_file" <<CROSSREF
+
+### comment-$(date -u +"%Y%m%dT%H%M%SZ")
+- source: system
+- event: promoted_from
+- source_id: $raw_id
+
+$cross_ref
+CROSSREF
+
+  echo "[issue-sync] promote complete: $raw_id → $i_id"
+}
+
+cmd_status() {
+  local local_id="$1" file
+  file="$ISSUES_DIR/$local_id/issue.md"
+  [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
+
+  echo "local_id:        $local_id"
+  echo "kind:            $(_fm_get "$file" "kind")"
+  echo "status:          $(_fm_get "$file" "status")"
+  echo "phase_state:     $(_fm_get "$file" "phase_state")"
+  echo "issue_title:     $(_issue_title "$file" "$local_id")"
+  echo "primary_platform: $(_fm_get "$file" "primary_platform")"
+  echo "platform_ids:"
+  python3 -c "
+import yaml
+with open('$file') as f: content = f.read()
+parts = content.split('---', 2)
+if len(parts) >= 3:
+  fm = yaml.safe_load(parts[1]) or {}
+  ids = fm.get('platform_ids', {}) or {}
+  for plat, info in ids.items():
+    if isinstance(info, dict):
+      print(f'  {plat}: #{info.get(\"issue_id\",\"?\")}  {info.get(\"url\",\"\")}  synced={info.get(\"synced_at\",\"?\")}')
+" 2>/dev/null || true
+  echo "platform_title:  $(_platform_title "$local_id" "$file")"
+}
+
+# ── main ─────────────────────────────────────────────────
+
+main() {
+  local action="" local_id="" extra=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) ROOT_DIR="$2"; ISSUES_DIR="$ROOT_DIR/docs/issues"; shift 2 ;;
+      create|update|comment|close|promote|status)
+        action="$1"; shift; break ;;
+      *) echo "[ERROR] unknown action: $1" >&2; exit 1 ;;
+    esac
+  done
+
+  local_id="${1:-}"
+  extra="${2:-}"
+  [[ -n "$action" ]] || { echo "Usage: issue-sync <create|update|comment|close|promote|status> <local_id> [extra]" >&2; exit 1; }
+  [[ -n "$local_id" ]] || { echo "[ERROR] missing local_id" >&2; exit 1; }
+  [[ -d "$ISSUES_DIR" ]] || { echo "[ERROR] $ISSUES_DIR not found" >&2; exit 1; }
+
+  GH_REPO="${GH_REPO:-$(_gh_repo)}"
+  GITEE_REPO="${GITEE_REPO:-$(_gitee_repo)}"
+
+  case "$action" in
+    create)  cmd_create "$local_id" ;;
+    update)  cmd_update "$local_id" ;;
+    comment) cmd_comment "$local_id" ;;
+    close)   cmd_close "$local_id" "$extra" ;;
+    promote) cmd_promote "$local_id" "$extra" ;;
+    status)  cmd_status "$local_id" ;;
+  esac
+}
+
+main "$@"
