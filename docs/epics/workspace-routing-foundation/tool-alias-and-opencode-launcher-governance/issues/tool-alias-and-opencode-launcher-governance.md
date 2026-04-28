@@ -116,3 +116,8 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 - fixed_at: `2026-04-27`
 - reason: `Claude Code -p mode exits rc=1 after SessionEnd:other even when session completed cleanly. Daemon treated this as failure, creating a restart loop. Now checks debug log for SessionEnd completed with status 0 to normalize rc.`
 - scope: `docs/system/workspace/scripts/runtime/freely (rc normalization before exit reason recording)`
+
+### Bug fix: resume target extraction fails for Claude -p mode
+- fixed_at: `2026-04-27`
+- reason: `Session ID extraction searched the main cycle log (empty for claude -p). Now searches debug log first, with CLAUDE_SESSION_ID_CURRENT fallback. This enables resume to pass --resume flag.`
+- scope: `docs/system/workspace/scripts/monitor-ai-cli.sh (extract_tool_session_id_from_log_if_present, write_live_session_state_if_possible)`
