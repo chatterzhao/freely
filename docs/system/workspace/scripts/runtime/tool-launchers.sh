@@ -242,7 +242,7 @@ _resolve_tool_family() {
   esac
   # Try zsh alias resolution
   local resolved
-  resolved=$(zsh -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
+  resolved=$(${SHELL:-bash} -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
   if [[ -n "$resolved" ]]; then
     local binary="${resolved%% *}"
     case "$binary" in
@@ -406,7 +406,7 @@ tool_run_direct_from_prompt_file() {
         ;;
     esac
     # Unknown name: try zsh alias resolution (user's .zshrc aliases)
-    resolved=$(zsh -ic "alias '$name' 2>/dev/null" 2>/dev/null | sed -n "s/^${name}='\(.*\)'$/\1/p")
+    resolved=$(${SHELL:-bash} -ic "alias '$name' 2>/dev/null" 2>/dev/null | sed -n "s/^${name}='\(.*\)'$/\1/p")
     if [[ -n "$resolved" ]]; then
       printf '%s\n' "$resolved"
       return 0
