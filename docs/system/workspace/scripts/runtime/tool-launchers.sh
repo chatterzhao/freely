@@ -232,6 +232,27 @@ tool_adapter_supports_launch_kind() {
   printf '%s\n' "$(tool_supported_launch_kinds_for_adapter "$tool" "$adapter")" | tr ',' '\n' | sed 's/^ *//; s/ *$//' | grep -Fxq "$launch_kind"
 }
 
+# _resolve_tool_family: resolve alias to known tool family binary.
+# e.g. cc-ds-auto -> claude, ccglm -> claude. Returns original if no alias found.
+_resolve_tool_family() {
+  local tool="$1"
+  # Known binaries: return as-is
+  case "$tool" in
+    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) printf '%s\n' "$tool"; return 0 ;;
+  esac
+  # Try zsh alias resolution
+  local resolved
+  resolved=$(zsh -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
+  if [[ -n "$resolved" ]]; then
+    local binary="${resolved%% *}"
+    case "$binary" in
+      claude|codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary"; return 0 ;;
+    esac
+  fi
+  # Unresolved: return original
+  printf '%s\n' "$tool"
+}
+
 tool_has_capability() {
   local capabilities="$1" capability="$2"
   [[ -n "$capability" ]] || return 1
@@ -240,6 +261,7 @@ tool_has_capability() {
 
 tool_accepts_explicit_resume_target() {
   local tool="$1"
+  tool="$(_resolve_tool_family "$tool")"
   case "$tool" in
     codex|iflow|opencode) return 0 ;;
     *) return 1 ;;
@@ -248,6 +270,7 @@ tool_accepts_explicit_resume_target() {
 
 tool_requires_explicit_resume_target() {
   local tool="$1"
+  tool="$(_resolve_tool_family "$tool")"
   case "$tool" in
     codex) return 0 ;;
     *) return 1 ;;

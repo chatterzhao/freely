@@ -355,3 +355,15 @@
 - task_refs: `tasks.md#T-27`
 - case_design: `Verify tool_uses_claude_session_id returns true for cc-ds-auto. Verify session-state.env written after launch.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-cc-ds-auto-session.md`
+
+### PT-28
+- id: `PT-28`
+- requirement: `tool family auto-detected from alias resolution`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-28`
+- case_design: `Verify cc-ds-auto resolves to claude family. Verify ccglm resolves to claude family. Verify codex resolves to codex.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-auto-detect-tool-family.md`
