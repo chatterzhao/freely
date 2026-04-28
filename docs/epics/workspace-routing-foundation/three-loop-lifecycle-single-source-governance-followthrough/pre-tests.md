@@ -89,3 +89,12 @@
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260419-three-loop-lifecycle-single-source-followthrough-verification.md`
+
+## Acceptance (state-closeout addendum 2026-04-28)
+
+- acceptance target: `Governance-only state reconciliation closeout: confirm that the three-loop lifecycle single-source truth is already in develop and only state tracking needs updating.`
+- testing layer: `premerge-integration`
+- target environment: `feature/three-loop-state-closeout-20260428 → test-pre-merge-three-loop-closeout-20260428 → develop`
+- required evidence: `fresh staged owner review artifact`
+- blocker taxonomy: `definition_missing`
+- artifact_ref: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260428-three-loop-lifecycle-state-closeout-review.md`
