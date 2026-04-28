@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # check-file-size: lint file line counts, configurable limits, skip markers.
 # Config (in .freely/config.env):
-#   FILE_SIZE_WARN=500      # warn threshold (default 500)
-#   FILE_SIZE_ERROR=1000    # error threshold (default 1000)
+#   FILE_SIZE_TIP=300       # tip: consider future refactoring (default 300)
+#   FILE_SIZE_WARN=500      # warn: getting too long (default 500)
+#   FILE_SIZE_ERROR=1000    # error: must split (default 1000)
 # Skip markers anywhere in file:
 #   # file-size: skip       (shell/python)
 #   file_size_check: skip   (markdown frontmatter)
@@ -10,9 +11,11 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
+TIP="${FILE_SIZE_TIP:-300}"
 WARN="${FILE_SIZE_WARN:-500}"
 ERROR="${FILE_SIZE_ERROR:-1000}"
 
+tips=0
 warnings=0
 errors=0
 
@@ -33,6 +36,9 @@ check_file() {
   elif (( lines > WARN )); then
     echo "[WARN]  $file: $lines lines (limit: $WARN)"
     warnings=$((warnings + 1))
+  elif (( lines > TIP )); then
+    echo "[TIP]   $file: $lines lines (limit: $TIP)"
+    tips=$((tips + 1))
   fi
 }
 
@@ -52,5 +58,5 @@ done < <(find "$ROOT_DIR/AGENTS.md" "$ROOT_DIR/docs/CONSTITUTION.md" \
   -name "*.md" -print0 2>/dev/null)
 
 echo ""
-echo "Limits: warn=$WARN error=$ERROR | Warnings: $warnings Errors: $errors"
+echo "Limits: tip=$TIP warn=$WARN error=$ERROR | Tips: $tips Warnings: $warnings Errors: $errors"
 exit $(( errors > 0 ? 1 : 0 ))
