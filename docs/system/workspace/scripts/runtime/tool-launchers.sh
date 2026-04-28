@@ -506,7 +506,17 @@ tool_run_direct_from_prompt_file() {
       fi
       [[ -n "$worktrees_root" ]] && args+=(--add-dir "$worktrees_root")
       [[ -n "$debug_log_file" ]] && args+=(--debug-file "$debug_log_file")
-      if [[ "$launch_kind" == "resume" ]]; then
+      if [[ "$launch_kind" == "fork" ]]; then
+        # Fork: resume from parent session, write to new session ID.
+        # Inherits parent's full conversation context (prompt cache hit).
+        if [[ -n "$tool_resume_target" && -n "$claude_session_id" ]]; then
+          args+=(--resume "$tool_resume_target" --fork-session --session-id "$claude_session_id")
+        elif [[ -n "$tool_resume_target" ]]; then
+          args+=(--resume "$tool_resume_target" --fork-session)
+        elif [[ -n "$claude_session_id" ]]; then
+          args+=(--session-id "$claude_session_id")
+        fi
+      elif [[ "$launch_kind" == "resume" ]]; then
         if [[ -n "$tool_resume_target" ]]; then
           args+=(--resume "$tool_resume_target")
         elif [[ -n "$claude_session_id" ]]; then

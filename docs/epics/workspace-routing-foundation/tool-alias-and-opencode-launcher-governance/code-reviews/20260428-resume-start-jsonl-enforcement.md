@@ -12,3 +12,10 @@
 - start with JSONL: `pass` (forces resume)
 - start without JSONL: `pass` (allows one fresh)
 - restart without JSONL: `pass` (hard error)
+
+### Amendment 20260428-3: session state consistency audit
+- Fixed _persist_session_anchor_early from destructive cat > to merge mode
+- Added SESSION_PARENT_ID to write_session_state (was lost every cycle)
+- Added SESSION_PARENT_ID to write_live_session_state_if_possible
+- Fork launch kind added to tool-launchers.sh (claude --fork-session)
+- Session lifecycle protocol documented in docs/system/workspace/

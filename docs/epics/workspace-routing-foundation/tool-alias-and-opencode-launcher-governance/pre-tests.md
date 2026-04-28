@@ -585,3 +585,17 @@
 - task_refs: `tasks.md#T-46`
 - case_design: `Verify _tool_session_dir claude returns ~/.claude/projects/-Users-x-project (not Users-x-project). Verify find finds JSONL files in correct dir.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fix-claude-slug.md`
+
+
+### PT-47
+- id: `PT-47`
+- requirement: `session state consistency: SESSION_PARENT_ID survives full lifecycle, anchor merge preserves non-anchor fields, fork launch kind supported`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-47`
+- case_design: `Verify SESSION_PARENT_ID persisted across cycles. Verify anchor merge preserves FRESH_LAUNCH_COUNT. Verify fork launch kind produces --fork-session. Verify write_session_state includes SESSION_PARENT_ID.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-resume-start-jsonl-enforcement.md`
+
