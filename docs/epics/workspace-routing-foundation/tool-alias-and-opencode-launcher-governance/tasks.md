@@ -110,3 +110,10 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-27`
+
+### T-41
+- id: `T-41`
+- title: `Fix worker prompt path extraction from AI-written continuity files`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-27`

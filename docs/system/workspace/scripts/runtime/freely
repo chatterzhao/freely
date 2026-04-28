@@ -8157,6 +8157,12 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
       capture_runtime_worker_prompt=0
       capture_worker_prompt_path_list=0
       worker_prompts_subsection=""
+      # Normalize AI-written section header variations to canonical names.
+      # The AI may write "Worker Prompt" (singular), "Worker Dispatch",
+      # "Worker Delegation", "Worker Prompt References", etc.
+      if (section == "worker prompt" || section == "worker dispatch" || section == "worker prompt references" || section == "worker prompts in force") {
+        section = "worker prompts"
+      }
       next
     }
     /^# / {
@@ -8180,7 +8186,8 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
           worker_prompts_subsection="frozen"
           next
         }
-        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+        # Accept both list-item format (- /path/...) and prose format (See: /path/...)
+        if ($0 ~ /\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt/) {
           if (worker_prompts_subsection == "frozen") {
             if (mode != "launchable") {
               emit_prompt_paths($0)
@@ -8226,7 +8233,8 @@ manager_worker_prompt_paths_from_continuity_by_mode() {
           }
           next
         }
-        if ($0 ~ /^[[:space:]]*-[[:space:]]*`?\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt`?[[:space:]]*$/) {
+        # Accept both list-item and prose formats for worker prompt paths
+        if ($0 ~ /\/[^` ]+\/\.freely\/run\/worker-prompts\/[^` ]+\.txt/) {
           if (worker_prompts_subsection == "frozen") {
             if (mode != "launchable") {
               emit_prompt_paths($0)
@@ -9575,6 +9583,11 @@ latest_manager_worker_prompt_csv_from_continuity() {
   local continuity_file="$1"
   local csv
   csv="$(latest_manager_worker_prompt_paths_from_continuity "$continuity_file" | paste -sd, - || true)"
+  # Fallback: if structured extraction returns empty (e.g. AI wrote a
+  # non-canonical section header), use rg to find all prompt paths.
+  if [[ -z "${csv:-}" ]]; then
+    csv="$(all_manager_worker_prompt_paths_from_continuity "$continuity_file" | paste -sd, - || true)"
+  fi
   printf '%s\n' "${csv:-}"
   return 0
 }
