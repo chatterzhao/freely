@@ -487,3 +487,15 @@
 - task_refs: `tasks.md#T-38`
 - case_design: `Verify cmd_chat --issue works. Verify --new-issue works. Verify --urgent flag is forwarded. Verify no-flag default to --new-issue.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-chat-issue-flags.md`
+
+### PT-39
+- id: `PT-39`
+- requirement: `rc=1 normalized to 0 when debug log has clean SessionEnd`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-39`
+- case_design: `Verify rc=1 with SessionEnd completed status 0 in debug log normalizes to ai_exit_rc_0. Verify rc=1 without SessionEnd stays ai_exit_rc_1.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-rc1-sessionend-normalize.md`

@@ -111,3 +111,8 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 - fixed_at: `2026-04-27`
 - reason: `cmd_chat() documented --issue/--new-issue in usage but never parsed them. All chat messages were broken. Also default to --new-issue for backward compatibility.`
 - scope: `docs/system/workspace/scripts/runtime/freely (cmd_chat, submit_human_frontdoor_message, cmd_intake_chat)`
+
+### Bug fix: rc=1 exit after clean SessionEnd causes restart loop
+- fixed_at: `2026-04-27`
+- reason: `Claude Code -p mode exits rc=1 after SessionEnd:other even when session completed cleanly. Daemon treated this as failure, creating a restart loop. Now checks debug log for SessionEnd completed with status 0 to normalize rc.`
+- scope: `docs/system/workspace/scripts/runtime/freely (rc normalization before exit reason recording)`
