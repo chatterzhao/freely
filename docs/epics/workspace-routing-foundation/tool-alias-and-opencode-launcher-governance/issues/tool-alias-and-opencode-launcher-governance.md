@@ -101,3 +101,8 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 - completed_at: `2026-04-27`
 - reason: `Renamed TIP to DANGER and raised threshold from 300 to 750. DANGER sits between WARN (500) and ERROR (1000) with clear urgency.`
 - scope: `bin/check-file-size (dangers counter, [DANGER] output, check order WARN→DANGER→ERROR)`
+
+### Bug fix: parse_ai_spec hard reject blocks alias resolution
+- fixed_at: `2026-04-27`
+- reason: `parse_ai_spec() in freely rejected unknown tools with exit 1 before alias resolution could run. Changed to warn + pass through, added claude to known list.`
+- scope: `docs/system/workspace/scripts/runtime/freely (parse_ai_spec)`

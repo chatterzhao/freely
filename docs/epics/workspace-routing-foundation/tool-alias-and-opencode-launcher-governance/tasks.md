@@ -82,3 +82,10 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-27`
+
+### T-37
+- id: `T-37`
+- title: `Fix parse_ai_spec to pass through unknown tools for alias resolution`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-27`
