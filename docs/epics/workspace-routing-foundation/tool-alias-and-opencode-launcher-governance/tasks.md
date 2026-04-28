@@ -124,3 +124,10 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-28`
+
+### T-43
+- id: `T-43`
+- title: `Add dedup and scan-state to bin/issue-sync`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-28`

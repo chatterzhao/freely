@@ -535,3 +535,15 @@
 - task_refs: `tasks.md#T-42`
 - case_design: `Verify issue-sync create writes platform_ids to frontmatter. Verify update pushes title/body/labels. Verify promote closes raw + creates I-* with cross-refs. Verify merge-guarded triggers sync on changed issues.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-issue-platform-sync-architecture.md`
+
+### PT-43
+- id: `PT-43`
+- requirement: `bin/issue-sync dedup prevents duplicate platform issue creation and update`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-43`
+- case_design: `Verify create skips when platform_ids exist. Verify update skips when content hash unchanged. Verify scan shows none on first run. Verify batch only processes changed issues.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-issue-sync-dedup-scan-state.md`
