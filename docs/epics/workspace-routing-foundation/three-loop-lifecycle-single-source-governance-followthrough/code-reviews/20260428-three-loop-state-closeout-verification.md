@@ -24,3 +24,9 @@ All 6 acceptance items from the original pre-tests are satisfied by the canonica
 ## Merge Path
 
 feature/three-loop-state-closeout-20260428 → test-pre-merge-three-loop-closeout-20260428 → develop
+
+## Owner Issue
+
+- issue_id: I-20260419-0915-A
+- issue_path: docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md
+- source_candidate: docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/candidates.md#c-20260419-0915-a
