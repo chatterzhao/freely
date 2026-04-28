@@ -3258,8 +3258,10 @@ _tool_session_dir() {
   local resolved_tool="$1" project="$2"
   case "$resolved_tool" in
     claude|cc|cc-use-codex-cli)
+      # Slug is absolute path with '/' → '-'. Leading '/' becomes leading '-'.
+      # e.g. /Users/x/project → -Users-x-project
       local project_slug
-      project_slug=$(printf '%s' "$project" | sed 's|/|-|g; s|^-||')
+      project_slug=$(printf '%s' "$project" | sed 's|/|-|g')
       printf '%s\n' "${HOME}/.claude/projects/${project_slug}"
       ;;
     codex)
