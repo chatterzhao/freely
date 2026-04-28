@@ -103,8 +103,10 @@ try:
 except: print('unknown')
 " 2>/dev/null || echo "unknown")
 
-  # Count comments
-  comment_count=$(grep -c '^### comment-' "$f" 2>/dev/null || echo 0)
+  # Count comments. grep -c returns "0" to stdout but exits 1 on no matches.
+  # || echo 0 would double-output, so suppress exit and default empty to 0.
+  comment_count=$(grep -c '^### comment-' "$f" 2>/dev/null || true)
+  comment_count="${comment_count:-0}"
 
   # Append to index
   cat >> "$INDEX_FILE" << INDEXENTRY
