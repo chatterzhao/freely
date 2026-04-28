@@ -597,5 +597,19 @@
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-47`
 - case_design: `Verify SESSION_PARENT_ID persisted across cycles. Verify anchor merge preserves FRESH_LAUNCH_COUNT. Verify fork launch kind produces --fork-session. Verify write_session_state includes SESSION_PARENT_ID.`
-- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-resume-start-jsonl-enforcement.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fork-detection-startup.md`
+
+
+
+### PT-48
+- id: `PT-48`
+- requirement: `fork detection on startup: SESSION_PARENT_ID set + no own session → fork from parent; manager injects parent session to worker`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-48`
+- case_design: `Verify worker forks from parent when SESSION_PARENT_ID set. Verify fork generates child UUID while preserving parent ID. Verify fork passes --resume <parent> --fork-session --session-id <child>. Verify worker resume uses own ID after fork.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fork-detection-startup.md`
 
