@@ -5813,6 +5813,32 @@ csv_item_count() {
 
 rewrite_existing_intake_item() {
   local project="$1" intake_id="$2" status="$3" classification="$4" linked_artifact="$5" delegated_worktree="$6" reaction="$7" claimed_by="$8" claimed_at="$9" absorption_target="${10:-}" resolution_artifact="${11:-}" session_refs_override="${12:-}"
+
+  # New model: update docs/issues/<id>/issue.md frontmatter
+  if [[ "$intake_id" == raw-* || "$intake_id" == I-* ]]; then
+    local issue_file="$project/docs/issues/$intake_id/issue.md"
+    [[ -f "$issue_file" ]] || { log_error "issue not found: $intake_id"; exit 1; }
+    python3 -c "
+import re, sys
+with open('$issue_file') as f:
+    content = f.read()
+parts = content.split('---', 2)
+if len(parts) >= 3:
+    fm = parts[1]
+    fm = re.sub(r'^status:.*', 'status: $status', fm, flags=re.MULTILINE)
+    if '$claimed_by' and '$claimed_by' != 'None':
+        fm = re.sub(r'^claimed_by:.*', 'claimed_by: $claimed_by', fm, flags=re.MULTILINE) if 'claimed_by:' in fm else fm + '\nclaimed_by: $claimed_by'
+    if '$claimed_at' and '$claimed_at' != 'None':
+        fm = re.sub(r'^claimed_at:.*', 'claimed_at: $claimed_at', fm, flags=re.MULTILINE) if 'claimed_at:' in fm else fm + '\nclaimed_at: $claimed_at'
+    new_content = '---' + fm + '---' + parts[2]
+    with open('$issue_file', 'w') as f:
+        f.write(new_content)
+" 2>/dev/null || true
+    log_info "intake updated in docs/issues/: $intake_id -> $status"
+    return 0
+  fi
+
+  # Legacy: .freely/intake/ path
   local meta_file message_file author channel session_refs message created_at
   meta_file="$(intake_item_meta_file "$project" "$intake_id")"
   message_file="$(intake_item_message_file "$project" "$intake_id")"
@@ -18230,8 +18256,13 @@ cmd_intake_claim() {
   project="$(resolve_project_or_fail "$project" 1)"
   validate_reaction_or_fail "$reaction"
   validate_absorption_classification_or_fail "$classification"
-  meta_file="$(intake_item_meta_file "$project" "$intake_id")"
-  [[ -f "$meta_file" ]] || { log_error "intake item not found: $intake_id"; exit 1; }
+  if [[ "$intake_id" == raw-* || "$intake_id" == I-* ]]; then
+    # New model: intake_id is a docs/issues/ local_id, no meta.env check needed
+    :
+  else
+    meta_file="$(intake_item_meta_file "$project" "$intake_id")"
+    [[ -f "$meta_file" ]] || { log_error "intake item not found: $intake_id"; exit 1; }
+  fi
   claimed_at="$(current_timestamp_utc_for_machine)"
   if [[ -n "$delegated_worktree" ]]; then
     status="delegated"
@@ -18295,18 +18326,28 @@ cmd_intake_resolve() {
       exit 1
       ;;
   esac
-  meta_file="$(intake_item_meta_file "$project" "$intake_id")"
-  [[ -f "$meta_file" ]] || { log_error "intake item not found: $intake_id"; exit 1; }
-  claimed_by="$(meta_env_value "$meta_file" "CLAIMED_BY")"
-  claimed_at="$(meta_env_value "$meta_file" "CLAIMED_AT")"
-  reaction_existing="$(meta_env_value "$meta_file" "REACTION")"
-  classification_existing="$(meta_env_value "$meta_file" "CLASSIFICATION")"
-  delegated_existing="$(meta_env_value "$meta_file" "DELEGATED_WORKTREE")"
-  linked_existing="$(meta_env_value "$meta_file" "LINKED_ARTIFACT")"
-  [[ -n "$classification" ]] || classification="$classification_existing"
-  [[ -n "$delegated_worktree" ]] || delegated_worktree="$delegated_existing"
-  if [[ "$linked_artifact" == "pending://resolution-unlinked" && -n "$linked_existing" ]]; then
-    linked_artifact="$linked_existing"
+  if [[ "$intake_id" == raw-* || "$intake_id" == I-* ]]; then
+    # New model: read from docs/issues/ frontmatter
+    claimed_by=""
+    claimed_at=""
+    reaction_existing=""
+    classification_existing=""
+    delegated_existing=""
+    linked_existing=""
+  else
+    meta_file="$(intake_item_meta_file "$project" "$intake_id")"
+    [[ -f "$meta_file" ]] || { log_error "intake item not found: $intake_id"; exit 1; }
+    claimed_by="$(meta_env_value "$meta_file" "CLAIMED_BY")"
+    claimed_at="$(meta_env_value "$meta_file" "CLAIMED_AT")"
+    reaction_existing="$(meta_env_value "$meta_file" "REACTION")"
+    classification_existing="$(meta_env_value "$meta_file" "CLASSIFICATION")"
+    delegated_existing="$(meta_env_value "$meta_file" "DELEGATED_WORKTREE")"
+    linked_existing="$(meta_env_value "$meta_file" "LINKED_ARTIFACT")"
+    [[ -n "$classification" ]] || classification="$classification_existing"
+    [[ -n "$delegated_worktree" ]] || delegated_worktree="$delegated_existing"
+    if [[ "$linked_artifact" == "pending://resolution-unlinked" && -n "$linked_existing" ]]; then
+      linked_artifact="$linked_existing"
+    fi
   fi
   if [[ -z "$reaction" && -n "$reaction_existing" ]]; then
     reaction="$reaction_existing"
