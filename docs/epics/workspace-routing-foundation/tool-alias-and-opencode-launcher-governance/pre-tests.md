@@ -379,3 +379,15 @@
 - task_refs: `tasks.md#T-29`
 - case_design: `Verify alias resolved on zsh. Verify bash fallback when $SHELL is bash.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-cross-shell-alias.md`
+
+### PT-30
+- id: `PT-30`
+- requirement: `intake claim/resolve works with docs/issues/ raw-* IDs`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-30`
+- case_design: `Verify claim updates frontmatter status. Verify resolve updates frontmatter. Verify legacy path still works.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-intake-crud-migration.md`
