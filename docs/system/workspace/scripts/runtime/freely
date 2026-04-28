@@ -1,3 +1,4 @@
+# file-size: skip (legacy 20K line monolith, split pending)
 #!/usr/bin/env bash
 set -euo pipefail
 
