@@ -343,3 +343,15 @@
 - task_refs: `tasks.md#T-26`
 - case_design: `Verify session-state.env written after ensure_runtime_tool_session_anchor. Verify cc session ID extraction from debug log.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-persist-session-early.md`
+
+### PT-27
+- id: `PT-27`
+- requirement: `cc-ds-auto generates and persists Claude session ID`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-27`
+- case_design: `Verify tool_uses_claude_session_id returns true for cc-ds-auto. Verify session-state.env written after launch.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-cc-ds-auto-session.md`
