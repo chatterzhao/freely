@@ -3247,6 +3247,14 @@ _persist_session_anchor_early() {
     if [[ -z "${SESSION_PARENT_ID:-}" ]]; then
       SESSION_PARENT_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
     fi
+    # For fork: LAST_TOOL_RESUME_TARGET must be the PARENT UUID so the launch
+    # passes --resume <parent>. After fork completes, subsequent resumes use own ID.
+    local anchor_resume_target
+    if [[ "${mode_name:-}" == "fork" ]]; then
+      anchor_resume_target="${SESSION_PARENT_ID:-${CLAUDE_SESSION_ID_CURRENT:-}}"
+    else
+      anchor_resume_target="${CLAUDE_SESSION_ID_CURRENT:-}"
+    fi
     # Append anchor fields without destroying other session state.
     # _persist_session_anchor_early runs every cycle, BEFORE the full state
     # write. Using cat > would truncate the 40+ field file down to 4 fields,
@@ -3256,7 +3264,7 @@ _persist_session_anchor_early() {
     anchor_tmp="$(mktemp "${state_file}.anchor.XXXXXX")"
     cat >"$anchor_tmp" <<STATEEOF
 LAST_TOOL_SESSION_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
-LAST_TOOL_RESUME_TARGET="${CLAUDE_SESSION_ID_CURRENT:-}"
+LAST_TOOL_RESUME_TARGET="${anchor_resume_target}"
 LAST_LAUNCH_KIND="${mode_name:-resume}"
 SESSION_PARENT_ID="${SESSION_PARENT_ID:-}"
 STATEEOF
@@ -3365,11 +3373,17 @@ ensure_runtime_tool_session_anchor() {
       fi
     fi
 
-    # Only generate a new UUID if we truly have no session to resume.
-    # Fresh launch kind still rotates; resume keeps the existing ID.
+    # Generate new UUID for fresh/fork launches; resume keeps the existing ID.
     if [[ "$launch_kind" == "fresh" || "$launch_kind" == "fresh_with_handoff" ]]; then
       CLAUDE_SESSION_ID_PREVIOUS="${CLAUDE_SESSION_ID_CURRENT:-}"
       CLAUDE_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
+    elif [[ "$launch_kind" == "fork" ]]; then
+      # Fork: generate new child UUID, parent stays as SESSION_PARENT_ID.
+      # The parent's JSONL is NOT modified — child writes to its own file.
+      CLAUDE_SESSION_ID_PREVIOUS="${CLAUDE_SESSION_ID_CURRENT:-}"
+      CLAUDE_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
+      # SESSION_PARENT_ID already set by manager before worker launch; preserve it.
+      log_info "forked new session ${CLAUDE_SESSION_ID_CURRENT} from parent ${SESSION_PARENT_ID:-unknown}"
     elif [[ -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
       # No resume enforcement and no session → generate one (first-ever launch)
       CLAUDE_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
@@ -11240,6 +11254,18 @@ launch_worker_from_manager_prompt_if_needed() {
     return 0
   fi
   write_workcell_state "$target_project" "running" "down" "down" "manager_worker_launch_linkage"
+  # Pass parent session ID to worker so it can fork manager's context on startup.
+  if [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+    local worker_state_file
+    worker_state_file="$(session_state_file "$target_project")"
+    mkdir -p "$(dirname "$worker_state_file")"
+    cat >"$worker_state_file" <<SESSIONEOF
+SESSION_PARENT_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
+SESSION_PARENT_PROJECT="$manager_project"
+LAST_LAUNCH_KIND="fork"
+SESSIONEOF
+    log_info "worker session parent set: ${CLAUDE_SESSION_ID_CURRENT} → $target_project"
+  fi
   start_workcell_supervisor_async "$target_project" "$manager_project"
 }
 
@@ -14182,6 +14208,18 @@ select_launch_kind() {
   local resume_target_before_launch=""
   handoff_rotation_reason="$(session_handoff_rotation_reason "$PROJECT_ROOT" || true)"
   resume_target_before_launch="$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")"
+
+  # Fork detection: if this worktree has a SESSION_PARENT_ID set (by the
+  # delegating manager), and it has never launched before (no own session ID),
+  # fork from the parent to inherit its context with prompt cache hit.
+  if [[ -n "${SESSION_PARENT_ID:-}" && -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+    LAUNCH_KIND_SELECTED="fork"
+    LAUNCH_ROTATION_REASON="worker_fork_from_parent"
+    # Set resume target to parent so tool-launchers.sh passes --resume <parent>
+    LAST_TOOL_RESUME_TARGET="${SESSION_PARENT_ID:-}"
+    log_info "forking from parent session ${SESSION_PARENT_ID} for new worker"
+    return 0
+  fi
 
   # Circuit breaker: if we're in a tight fresh-launch loop, stop early.
   # Tracks fresh launches via session state; trips after MAX in cooldown window.
