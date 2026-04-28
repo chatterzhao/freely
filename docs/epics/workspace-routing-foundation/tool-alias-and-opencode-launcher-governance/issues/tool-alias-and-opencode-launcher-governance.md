@@ -121,3 +121,8 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 - fixed_at: `2026-04-27`
 - reason: `Session ID extraction searched the main cycle log (empty for claude -p). Now searches debug log first, with CLAUDE_SESSION_ID_CURRENT fallback. This enables resume to pass --resume flag.`
 - scope: `docs/system/workspace/scripts/monitor-ai-cli.sh (extract_tool_session_id_from_log_if_present, write_live_session_state_if_possible)`
+
+### Bug fix: worker prompt paths not extracted from continuity files
+- fixed_at: `2026-04-27`
+- reason: `Two format mismatches: section header (code expected "worker prompts" plural, AI wrote "Worker Prompt" singular) and line format (code expected "- /path" list item, AI wrote "See: /path"). This caused all 150+ worker prompts to be invisible to the dispatch mechanism.`
+- scope: `docs/system/workspace/scripts/runtime/freely (manager_worker_prompt_paths_from_continuity_by_mode section normalization, line regex, rg fallback)`

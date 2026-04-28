@@ -511,3 +511,15 @@
 - task_refs: `tasks.md#T-40`
 - case_design: `Verify session ID extracted from debug log. Verify main log fallback works. Verify CLAUDE_SESSION_ID_CURRENT fallback when both logs fail.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-resume-target-extraction.md`
+
+### PT-41
+- id: `PT-41`
+- requirement: `worker prompt paths extracted from continuity files with AI-written section headers and prose format`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-41`
+- case_design: `Verify "## Worker Prompt" (singular) + "See: /path" format extracts path. Verify "## Worker Prompts" (plural) + list format still works. Verify rg fallback works.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-worker-prompt-extraction.md`
