@@ -295,3 +295,15 @@
 - task_refs: `tasks.md#T-22`
 - case_design: `Verify cc-ds-auto passes tool validation.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-alias-validation.md`
+
+### PT-23
+- id: `PT-23`
+- requirement: `AI stall detection uses multi-signal liveness check`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-23`
+- case_design: `Verify _ai_shows_liveness checks debug log mtime and process state before declaring AI stalled.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-ai-stall-liveness.md`
