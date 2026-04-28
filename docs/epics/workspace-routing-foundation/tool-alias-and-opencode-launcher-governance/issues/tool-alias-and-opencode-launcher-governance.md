@@ -106,3 +106,8 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 - fixed_at: `2026-04-27`
 - reason: `parse_ai_spec() in freely rejected unknown tools with exit 1 before alias resolution could run. Changed to warn + pass through, added claude to known list.`
 - scope: `docs/system/workspace/scripts/runtime/freely (parse_ai_spec)`
+
+### Bug fix: cmd_chat not parsing --issue/--new-issue flags
+- fixed_at: `2026-04-27`
+- reason: `cmd_chat() documented --issue/--new-issue in usage but never parsed them. All chat messages were broken. Also default to --new-issue for backward compatibility.`
+- scope: `docs/system/workspace/scripts/runtime/freely (cmd_chat, submit_human_frontdoor_message, cmd_intake_chat)`
