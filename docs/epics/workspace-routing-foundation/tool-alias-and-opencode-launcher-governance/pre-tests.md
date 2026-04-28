@@ -451,3 +451,15 @@
 - task_refs: `tasks.md#T-35`
 - case_design: `Verify [SKIP] output for files with skip markers. Verify skips counter in summary. Verify no silent skips.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-file-size-skip-visible.md`
+
+### PT-36
+- id: `PT-36`
+- requirement: `TIP renamed to DANGER, threshold 750 between WARN 500 and ERROR 1000`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-36`
+- case_design: `Verify FILE_SIZE_DANGER=750 default. Verify [DANGER] output for files >750 lines. Verify check order: WARN → DANGER → ERROR.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-file-size-danger-rename.md`

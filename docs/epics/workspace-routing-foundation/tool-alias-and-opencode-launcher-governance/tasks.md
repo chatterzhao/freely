@@ -75,3 +75,10 @@
 - status: `completed`
 - phase: `dev-loop`
 - completed_at: `2026-04-27`
+
+### T-36
+- id: `T-36`
+- title: `Rename TIP to DANGER at 750 lines between WARN and ERROR`
+- status: `completed`
+- phase: `dev-loop`
+- completed_at: `2026-04-27`
