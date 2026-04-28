@@ -25,6 +25,9 @@ SESSION_EVIDENCE_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/
 }
 source "$SESSION_EVIDENCE_RESOLVER_LIB"
 
+SESSION_CACHE_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-cache.sh"
+[[ -f "$SESSION_CACHE_LIB" ]] && source "$SESSION_CACHE_LIB"
+
 BUILD_ARTIFACT_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-build-artifact-exposure"
 SUPPLY_CHAIN_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-supply-chain-baseline"
 TASK_SOURCE_SCAN_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/runtime/task-source-scan.py"

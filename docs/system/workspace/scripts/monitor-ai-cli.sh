@@ -98,15 +98,17 @@ extract_tool_session_id_from_log_if_present() {
     opencode)
       sed -n 's/.*service=session id=\(ses_[A-Za-z0-9_]*\).*/\1/p' "$current_log_file" | head -n 1
       ;;
-    cc|cc-ds-auto|cc-use-codex-cli|claude)
-      # Claude Code: session ID is in the debug log; main log may be empty for -p mode.
-      local claude_debug_log="${current_log_file%.log}.debug.log"
-      local session_id
-      session_id="$(sed -n 's/.*session[._]id[=:]\s*\([a-f0-9]\{8\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{12\}\).*/\1/p' "$claude_debug_log" 2>/dev/null | head -n 1)"
-      if [[ -z "$session_id" ]]; then
-        session_id="$(sed -n 's/.*session[._]id[=:]\s*\([a-f0-9]\{8\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{12\}\).*/\1/p' "$current_log_file" 2>/dev/null | head -n 1)"
+    cc|cc-ds-auto|cc-use-codex-cli|claude|codex|opencode)
+      # Delegate to session-cache module; fall back to inline extraction.
+      if declare -f session_extract_id_from_log >/dev/null 2>&1; then
+        session_extract_id_from_log "$current_tool" "$current_log_file"
+      else
+        local claude_debug_log="${current_log_file%.log}.debug.log"
+        local session_id
+        session_id="$(sed -n 's/.*session[._]id[=:]\s*\([a-f0-9]\{8\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{12\}\).*/\1/p' "$claude_debug_log" 2>/dev/null | head -n 1)"
+        [[ -z "$session_id" ]] && session_id="$(sed -n 's/.*session[._]id[=:]\s*\([a-f0-9]\{8\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{12\}\).*/\1/p' "$current_log_file" 2>/dev/null | head -n 1)"
+        printf '%s\n' "$session_id"
       fi
-      printf '%s\n' "$session_id"
       ;;
     *)
       ;;
