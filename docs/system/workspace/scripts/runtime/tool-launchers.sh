@@ -29,6 +29,9 @@ NETWORK_PROXY_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/net
 # shellcheck disable=SC1090
 source "$NETWORK_PROXY_RESOLVER_LIB"
 
+SESSION_CACHE_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-cache.sh"
+[[ -f "$SESSION_CACHE_LIB" ]] && source "$SESSION_CACHE_LIB"
+
 RUNTIME_ACP_PROMPT_CLIENT="$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py"
 
 codex_slot_switch_lock_dir_for_launch() {
@@ -506,10 +509,11 @@ tool_run_direct_from_prompt_file() {
       fi
       [[ -n "$worktrees_root" ]] && args+=(--add-dir "$worktrees_root")
       [[ -n "$debug_log_file" ]] && args+=(--debug-file "$debug_log_file")
+      # Session strategy: use the session-cache module if available.
       if [[ "$launch_kind" == "fork" ]]; then
-        # Fork: resume from parent session, write to new session ID.
-        # Inherits parent's full conversation context (prompt cache hit).
-        if [[ -n "$tool_resume_target" && -n "$claude_session_id" ]]; then
+        if [[ -n "$tool_resume_target" && -n "$claude_session_id" ]] && declare -f session_fork_args >/dev/null 2>&1; then
+          while IFS= read -r arg; do [[ -n "$arg" ]] && args+=("$arg"); done < <(session_fork_args "$tool" "$tool_resume_target" "$claude_session_id")
+        elif [[ -n "$tool_resume_target" && -n "$claude_session_id" ]]; then
           args+=(--resume "$tool_resume_target" --fork-session --session-id "$claude_session_id")
         elif [[ -n "$tool_resume_target" ]]; then
           args+=(--resume "$tool_resume_target" --fork-session)
@@ -517,13 +521,19 @@ tool_run_direct_from_prompt_file() {
           args+=(--session-id "$claude_session_id")
         fi
       elif [[ "$launch_kind" == "resume" ]]; then
-        if [[ -n "$tool_resume_target" ]]; then
+        if [[ -n "$tool_resume_target" ]] && declare -f session_resume_args >/dev/null 2>&1; then
+          while IFS= read -r arg; do [[ -n "$arg" ]] && args+=("$arg"); done < <(session_resume_args "$tool" "$tool_resume_target")
+        elif [[ -n "$tool_resume_target" ]]; then
           args+=(--resume "$tool_resume_target")
         elif [[ -n "$claude_session_id" ]]; then
           args+=(--session-id "$claude_session_id")
         fi
       elif [[ -n "$claude_session_id" ]]; then
-        args+=(--session-id "$claude_session_id")
+        if declare -f session_fresh_args >/dev/null 2>&1; then
+          while IFS= read -r arg; do [[ -n "$arg" ]] && args+=("$arg"); done < <(session_fresh_args "$tool" "$claude_session_id")
+        else
+          args+=(--session-id "$claude_session_id")
+        fi
       fi
       [[ -n "$model" && "$model" != "default" ]] && args+=(--model "$model")
       [[ -n "$reasoning_effort" ]] && args+=(--effort "$reasoning_effort")

@@ -613,3 +613,17 @@
 - case_design: `Verify worker forks from parent when SESSION_PARENT_ID set. Verify fork generates child UUID while preserving parent ID. Verify fork passes --resume <parent> --fork-session --session-id <child>. Verify worker resume uses own ID after fork.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fork-detection-startup.md`
 
+
+
+### PT-49
+- id: `PT-49`
+- requirement: `session-cache.sh module unified API for tool session operations`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-49`
+- case_design: `Verify session_fork_args for Claude outputs correct flags. Verify session_resume_args for Claude. Verify session_fresh_args for Claude. Verify session_dir_for_tool returns correct paths for Claude/Codex/OpenCode. Verify fallback code when module not loaded.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-session-cache-module.md`
+
