@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # check-file-size: lint file line counts, configurable limits, skip markers.
 # Config (in .freely/config.env):
-#   FILE_SIZE_TIP=300       # tip: consider future refactoring (default 300)
 #   FILE_SIZE_WARN=500      # warn: getting too long (default 500)
+#   FILE_SIZE_DANGER=750    # danger: approaching limit, plan split (default 750)
 #   FILE_SIZE_ERROR=1000    # error: must split (default 1000)
 # Skip markers anywhere in file:
 #   # file-size: skip       (shell/python)
@@ -11,12 +11,12 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
-TIP="${FILE_SIZE_TIP:-300}"
 WARN="${FILE_SIZE_WARN:-500}"
+DANGER="${FILE_SIZE_DANGER:-750}"
 ERROR="${FILE_SIZE_ERROR:-1000}"
 
-tips=0
 warnings=0
+dangers=0
 errors=0
 skips=0
 
@@ -30,20 +30,20 @@ check_file() {
   local file="$1"
   local lines
   if should_skip "$file"; then
-    echo "[SKIP]  $file"
+    echo "[SKIP]   $file"
     skips=$((skips + 1))
     return 0
   fi
   lines=$(wc -l <"$file" | tr -d ' ')
   if (( lines > ERROR )); then
-    echo "[ERROR] $file: $lines lines (limit: $ERROR)"
+    echo "[ERROR]  $file: $lines lines (limit: $ERROR)"
     errors=$((errors + 1))
+  elif (( lines > DANGER )); then
+    echo "[DANGER] $file: $lines lines (limit: $DANGER)"
+    dangers=$((dangers + 1))
   elif (( lines > WARN )); then
-    echo "[WARN]  $file: $lines lines (limit: $WARN)"
+    echo "[WARN]   $file: $lines lines (limit: $WARN)"
     warnings=$((warnings + 1))
-  elif (( lines > TIP )); then
-    echo "[TIP]   $file: $lines lines (limit: $TIP)"
-    tips=$((tips + 1))
   fi
 }
 
@@ -63,5 +63,5 @@ done < <(find "$ROOT_DIR/AGENTS.md" "$ROOT_DIR/docs/CONSTITUTION.md" \
   -name "*.md" -print0 2>/dev/null)
 
 echo ""
-echo "Limits: tip=$TIP warn=$WARN error=$ERROR | Tips: $tips Warnings: $warnings Errors: $errors Skips: $skips"
+echo "Limits: warn=$WARN danger=$DANGER error=$ERROR | Warnings: $warnings Dangers: $dangers Errors: $errors Skips: $skips"
 exit $(( errors > 0 ? 1 : 0 ))

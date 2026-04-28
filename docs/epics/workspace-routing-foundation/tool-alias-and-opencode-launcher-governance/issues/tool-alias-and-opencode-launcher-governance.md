@@ -96,3 +96,8 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 - completed_at: `2026-04-27`
 - reason: `Skipped files now shown with [SKIP] prefix and counted in summary instead of silently ignored.`
 - scope: `bin/check-file-size (skips counter, [SKIP] output)`
+
+### File size check: TIP → DANGER rename, threshold 750
+- completed_at: `2026-04-27`
+- reason: `Renamed TIP to DANGER and raised threshold from 300 to 750. DANGER sits between WARN (500) and ERROR (1000) with clear urgency.`
+- scope: `bin/check-file-size (dangers counter, [DANGER] output, check order WARN→DANGER→ERROR)`
