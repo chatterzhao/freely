@@ -558,7 +558,7 @@
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-44`
 - case_design: `Verify CLAUDE_SESSION_ID_CURRENT protected from empty overwrite. Verify JSONL fallback recovers session ID from tool directory. Verify circuit breaker trips after 3 fresh launches in 300s. Verify manager/worker session IDs are independent per worktree.`
-- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-resume-start-jsonl-enforcement.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fix-claude-slug.md`
 
 
 ### PT-45
@@ -571,5 +571,17 @@
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-45`
 - case_design: `Verify AI_RESUME_ON_START with JSONL files forces resume. Verify AI_RESUME_ON_START without JSONL allows one fresh. Verify AI_RESUME_ON_RESTART without JSONL hard-errors. Verify JSONL directory check is per-tool.`
-- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-resume-start-jsonl-enforcement.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fix-claude-slug.md`
 
+
+### PT-46
+- id: `PT-46`
+- requirement: `Claude session dir slug preserves leading - from absolute path`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-46`
+- case_design: `Verify _tool_session_dir claude returns ~/.claude/projects/-Users-x-project (not Users-x-project). Verify find finds JSONL files in correct dir.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fix-claude-slug.md`
