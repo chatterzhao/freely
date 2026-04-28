@@ -91,3 +91,8 @@ Freely runtime recognizes opencode as a valid tool name but has no launch implem
 - completed_at: `2026-04-27`
 - reason: `Added FILE_SIZE_TIP (default 300) threshold as a gentle nudge before WARN. Output [TIP] prefix.`
 - scope: `bin/check-file-size (tips counter, TIP level), .freely/config.env (FILE_SIZE_TIP=300)`
+
+### File size check: skip visibility
+- completed_at: `2026-04-27`
+- reason: `Skipped files now shown with [SKIP] prefix and counted in summary instead of silently ignored.`
+- scope: `bin/check-file-size (skips counter, [SKIP] output)`
