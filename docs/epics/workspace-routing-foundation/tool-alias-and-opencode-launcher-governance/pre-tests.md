@@ -319,3 +319,15 @@
 - task_refs: `tasks.md#T-24`
 - case_design: `Verify select_launch_kind returns resume when AI_RESUME_ON_RESTART=true and evidence missing.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-resume-config.md`
+
+### PT-25
+- id: `PT-25`
+- requirement: `AI_RESUME_ON_START skips fresh when session state exists`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-25`
+- case_design: `Verify daemon start with AI_RESUME_ON_START=true and existing session state falls through to resume.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-resume-on-start.md`

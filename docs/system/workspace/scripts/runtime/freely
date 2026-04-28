@@ -13988,9 +13988,22 @@ select_launch_kind() {
     && [[ -z "${LAST_TOOL_SESSION_ID:-}" ]] \
     && [[ -z "${LAST_LAUNCH_KIND:-}" ]] \
     && [[ -z "${LAST_CYCLE_LOG:-}" ]]; then
-    LAUNCH_KIND_SELECTED="fresh"
-    LAUNCH_ROTATION_REASON="initial_start"
-    return 0
+    # AI_RESUME_ON_START: if true and any previous session state exists, skip fresh
+    if [[ "${AI_RESUME_ON_START:-true}" == "true" ]]; then
+      local session_file
+      session_file="$(session_state_file "$PROJECT_ROOT")"
+      if [[ -f "$session_file" ]]; then
+        log_info "AI_RESUME_ON_START: previous session state found, skipping fresh start"
+      else
+        LAUNCH_KIND_SELECTED="fresh"
+        LAUNCH_ROTATION_REASON="initial_start"
+        return 0
+      fi
+    else
+      LAUNCH_KIND_SELECTED="fresh"
+      LAUNCH_ROTATION_REASON="initial_start"
+      return 0
+    fi
   fi
 
   if [[ "${ROTATE_ON_CONTEXT_COMPACTED:-1}" == "1" && "${LAST_CONTEXT_COMPACTED:-0}" == "1" ]]; then
