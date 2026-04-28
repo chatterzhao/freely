@@ -523,3 +523,15 @@
 - task_refs: `tasks.md#T-41`
 - case_design: `Verify "## Worker Prompt" (singular) + "See: /path" format extracts path. Verify "## Worker Prompts" (plural) + list format still works. Verify rg fallback works.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-worker-prompt-extraction.md`
+
+### PT-42
+- id: `PT-42`
+- requirement: `bin/issue-sync create/update/close/comment/promote works for raw and I-* issues on both platforms`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-42`
+- case_design: `Verify issue-sync create writes platform_ids to frontmatter. Verify update pushes title/body/labels. Verify promote closes raw + creates I-* with cross-refs. Verify merge-guarded triggers sync on changed issues.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-issue-platform-sync-architecture.md`
