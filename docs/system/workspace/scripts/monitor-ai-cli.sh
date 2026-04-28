@@ -98,6 +98,10 @@ extract_tool_session_id_from_log_if_present() {
     opencode)
       sed -n 's/.*service=session id=\(ses_[A-Za-z0-9_]*\).*/\1/p' "$current_log_file" | head -n 1
       ;;
+    cc|cc-ds-auto|cc-use-codex-cli|claude)
+      # Claude Code: session ID is a UUID in the debug log
+      sed -n 's/.*session[._]id[=:]\s*\([a-f0-9]\{8\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{12\}\).*/\1/p' "$current_log_file" | head -n 1
+      ;;
     *)
       ;;
   esac
