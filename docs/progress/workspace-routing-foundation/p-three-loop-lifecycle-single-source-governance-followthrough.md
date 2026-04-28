@@ -3,7 +3,7 @@
 - issue_id: `I-20260419-0915-A`
 - issue_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
 - title: `Three-loop lifecycle single-source governance followthrough`
-- phase_state: `in_verification`
+- phase_state: `done`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/three-loop-model-refactor-20260418`
