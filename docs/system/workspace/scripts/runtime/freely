@@ -3247,12 +3247,33 @@ _persist_session_anchor_early() {
     if [[ -z "${SESSION_PARENT_ID:-}" ]]; then
       SESSION_PARENT_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
     fi
-    cat >"$state_file" <<STATEEOF
+    # Append anchor fields without destroying other session state.
+    # _persist_session_anchor_early runs every cycle, BEFORE the full state
+    # write. Using cat > would truncate the 40+ field file down to 4 fields,
+    # losing FRESH_LAUNCH_COUNT_CURRENT, RESUME_STREAK_CURRENT, etc.
+    # Instead, write only the anchor fields to a temp file and merge.
+    local anchor_tmp
+    anchor_tmp="$(mktemp "${state_file}.anchor.XXXXXX")"
+    cat >"$anchor_tmp" <<STATEEOF
 LAST_TOOL_SESSION_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
 LAST_TOOL_RESUME_TARGET="${CLAUDE_SESSION_ID_CURRENT:-}"
 LAST_LAUNCH_KIND="${mode_name:-resume}"
 SESSION_PARENT_ID="${SESSION_PARENT_ID:-}"
 STATEEOF
+    # Merge: read existing file, update anchor fields, write back.
+    # If state file doesn't exist yet (first ever launch), just use the anchor.
+    if [[ -f "$state_file" ]]; then
+      local existing_anchor
+      while IFS='=' read -r key value; do
+        [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
+        # Don't overwrite anchor fields — those are authoritative from this function.
+        case "$key" in
+          LAST_TOOL_SESSION_ID|LAST_TOOL_RESUME_TARGET|LAST_LAUNCH_KIND|SESSION_PARENT_ID) ;;
+          *) printf '%s=%s\n' "$key" "$value" >> "$anchor_tmp" ;;
+        esac
+      done < "$state_file"
+    fi
+    mv "$anchor_tmp" "$state_file"
     log_info "session anchor persisted early: ${CLAUDE_SESSION_ID_CURRENT}"
   fi
 }
@@ -11794,7 +11815,7 @@ recover_stalled_worker_ai_if_needed() {
 }
 
 write_session_state() {
-  local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" prompt_file="$8" context_compacted="$9" context_ratio="${10}" primary_used_percent="${11}" primary_resets_at="${12}" secondary_used_percent="${13}" secondary_resets_at="${14}" route_only_handoff="${15}" route_only_streak="${16}" resume_streak="${17}" active_slot="${18}" slot_switch_reason="${19}" slot_switch_at="${20}" cycle_debug_log="${21}" claude_jsonl_path="${22}" codex_mcp_used="${23}" codex_mcp_thread_id="${24}" codex_mcp_jsonl_path="${25}" claude_session_id_current="${26}" claude_session_id_previous="${27}" project_dirty_entries="${28}" worktree_summary_total="${29}" worktree_summary_dirty="${30}" checkpoint_drift_streak="${31}" delegated_pending_ids="${32}" delegated_pending_count="${33}" delegated_consumed_ids="${34}" delegated_consumed_at="${35}" restart_storm_window_secs="${36}" restart_storm_count="${37}" process_churn_peak="${38}" restart_storm_signal_at="${39}" restart_storm_signal_reason="${40}" restart_storm_escalated_at="${41}" restart_storm_escalation_target="${42}" auto_recovery_attempted_tools_csv="${43}" auto_recovery_origin_tool="${44}"
+  local project="$1" tool_session_id="$2" tool_resume_target="$3" tool_jsonl_path="$4" launch_kind="$5" rotation_reason="$6" cycle_log="$7" prompt_file="$8" context_compacted="$9" context_ratio="${10}" primary_used_percent="${11}" primary_resets_at="${12}" secondary_used_percent="${13}" secondary_resets_at="${14}" route_only_handoff="${15}" route_only_streak="${16}" resume_streak="${17}" active_slot="${18}" slot_switch_reason="${19}" slot_switch_at="${20}" cycle_debug_log="${21}" claude_jsonl_path="${22}" codex_mcp_used="${23}" codex_mcp_thread_id="${24}" codex_mcp_jsonl_path="${25}" claude_session_id_current="${26}" claude_session_id_previous="${27}" project_dirty_entries="${28}" worktree_summary_total="${29}" worktree_summary_dirty="${30}" checkpoint_drift_streak="${31}" delegated_pending_ids="${32}" delegated_pending_count="${33}" delegated_consumed_ids="${34}" delegated_consumed_at="${35}" restart_storm_window_secs="${36}" restart_storm_count="${37}" process_churn_peak="${38}" restart_storm_signal_at="${39}" restart_storm_signal_reason="${40}" restart_storm_escalated_at="${41}" restart_storm_escalation_target="${42}" auto_recovery_attempted_tools_csv="${43}" auto_recovery_origin_tool="${44}" session_parent_id="${45:-}"
   local state_file tmp_state_file
   state_file="$(session_state_file "$project")"
   tmp_state_file="$(mktemp "${state_file}.tmp.XXXXXX")"
@@ -11843,6 +11864,7 @@ AUTO_RECOVERY_ORIGIN_TOOL="$auto_recovery_origin_tool"
 CHECKPOINT_DRIFT_STREAK_CURRENT="$checkpoint_drift_streak"
 ROUTE_ONLY_STREAK_CURRENT="$route_only_streak"
 RESUME_STREAK_CURRENT="$resume_streak"
+SESSION_PARENT_ID="$session_parent_id"
 EOF
   mv "$tmp_state_file" "$state_file"
 }
@@ -17406,7 +17428,7 @@ start_project_runtime() {
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
     LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
     LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
     if [[ "$mode_name" == "fresh" || "$mode_name" == "fresh_with_handoff" ]]; then
       rm -f "$(handoff_file "$PROJECT_ROOT")"
     fi
@@ -17685,7 +17707,7 @@ start_project_runtime() {
       record_restart_storm_signal "$PROJECT_ROOT" "$restart_signal_reason" "${restart_window_count:-0}" "${restart_window_peak:-0}"
     fi
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_capture_or_empty runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_capture_or_empty runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
     # Normalize rc=1 to 0 when the debug log shows a clean SessionEnd completion.
     # Claude Code -p mode may exit 1 even when the session ended gracefully (SessionEnd:other).
     if [[ "${rc:-0}" != "0" && -f "$cycle_debug_log" ]]; then
