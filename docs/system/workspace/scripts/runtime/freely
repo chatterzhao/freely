@@ -18098,10 +18098,13 @@ cmd_security_review_brief() {
 }
 
 cmd_chat() {
-  local project="" message=""
+  local project="" message="" target_issue="" new_issue="" urgent=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --issue) target_issue="${2:-}"; shift 2 ;;
+      --new-issue) new_issue="true"; shift ;;
+      --urgent) urgent="true"; shift ;;
       --help|-h) usage; exit 0 ;;
       *)
         if [[ -n "$message" ]]; then
@@ -18115,18 +18118,22 @@ cmd_chat() {
   done
   [[ -n "$message" ]] || { usage; exit 1; }
   project="$(resolve_project_or_fail "$project" 1)"
-  submit_human_frontdoor_message "$project" human chat "$message"
+  submit_human_frontdoor_message "$project" human chat "$message" "$target_issue" "$new_issue" "$urgent"
 }
 
 submit_human_frontdoor_message() {
-  local project="$1" author="$2" channel="$3" message="$4"
-  local had_active_runtime intake_output
+  local project="$1" author="$2" channel="$3" message="$4" target_issue="$5" new_issue="$6" urgent="$7"
+  local had_active_runtime intake_output intake_args
   had_active_runtime="0"
   if [[ -n "$(manager_supervisor_pid_for_project "$project")" || -n "$(runtime_ai_pid_hint_for_project "$project")" ]]; then
     had_active_runtime="1"
   fi
   bootstrap_interruption_entry_runtime_or_fail "$project"
-  intake_output="$(cmd_intake_chat --project "$project" --author "$author" --channel "$channel" --message "$message")"
+  intake_args=(--project "$project" --author "$author" --channel "$channel" --message "$message")
+  [[ -n "$target_issue" ]] && intake_args+=(--issue "$target_issue")
+  [[ "$new_issue" == "true" ]] && intake_args+=(--new-issue)
+  [[ "$urgent" == "true" ]] && intake_args+=(--urgent)
+  intake_output="$(cmd_intake_chat "${intake_args[@]}")"
   if [[ "$had_active_runtime" != "1" ]]; then
     ensure_interruption_dispatch_once "$project"
   fi
@@ -18202,10 +18209,9 @@ cmd_intake_chat() {
   fi
   [[ -n "$message" ]] || { log_error "missing --message or --message-file"; exit 1; }
 
-  # Require explicit intent: --issue or --new-issue
+  # Default to --new-issue when neither --issue nor --new-issue is specified
   if [[ -z "$target_issue" && "$new_issue" != "true" ]]; then
-    log_error "missing --issue <id> or --new-issue: every chat must explicitly target an existing issue or create a new one"
-    exit 1
+    new_issue="true"
   fi
   if [[ -n "$target_issue" && "$new_issue" == "true" ]]; then
     log_error "--issue and --new-issue are mutually exclusive"
