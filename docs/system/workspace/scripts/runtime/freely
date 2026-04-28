@@ -3089,18 +3089,44 @@ PY
   fi
 }
 
+# _resolve_tool_family: resolve alias to known tool family binary.
+# User creates any alias (e.g. cc-ds-auto, ccglm). Freely detects the
+# actual binary and applies the correct session/resume convention.
+# No code changes needed when adding new aliases.
+_resolve_tool_family() {
+  local tool="$1"
+  # Known tool families: return as-is
+  case "$tool" in
+    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) printf '%s\n' "$tool"; return 0 ;;
+  esac
+  # Unknown: try zsh alias resolution
+  local resolved
+  resolved=$(zsh -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
+  if [[ -n "$resolved" ]]; then
+    local binary="${resolved%% *}"
+    case "$binary" in
+      claude|codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary"; return 0 ;;
+    esac
+  fi
+  # Unresolved: return original
+  printf '%s\n' "$tool"
+}
+
 tool_uses_claude_session_id() {
   local tool="$1"
+  # Auto-detect: resolve alias -> binary, then check family
+  tool="$(_resolve_tool_family "$tool")"
   case "$tool" in
-    cc|cc-use-codex-cli|cc-ds-auto) return 0 ;;
+    claude|cc|cc-use-codex-cli) return 0 ;;
     *) return 1 ;;
   esac
 }
 
 tool_prefers_explicit_resume_target() {
   local tool="$1"
+  tool="$(_resolve_tool_family "$tool")"
   case "$tool" in
-    codex|cc|cc-use-codex-cli|opencode) return 0 ;;
+    codex|claude|cc|cc-use-codex-cli|opencode) return 0 ;;
     *) return 1 ;;
   esac
 }
