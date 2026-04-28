@@ -20,12 +20,14 @@
 #         issue-sync close (after promote)    issue-sync close (after merge)
 #
 # Usage:
-#   bin/issue-sync create  <local_id>     Create platform issue
-#   bin/issue-sync update  <local_id>     Update title/body/labels on platform
-#   bin/issue-sync comment <local_id>     Push unsynced local comments to platform
+#   bin/issue-sync create  <local_id>     Create platform issue (idempotent)
+#   bin/issue-sync update  <local_id>     Update platform issue (skips if unchanged)
+#   bin/issue-sync comment <local_id>     Push unsynced comments (skips if none)
 #   bin/issue-sync close   <local_id>     Close platform issue
 #   bin/issue-sync promote <raw_id> <I_id>  Close raw, create I-* with cross-ref
 #   bin/issue-sync status  <local_id>     Show sync status
+#   bin/issue-sync batch                  Sync all changed issues since last scan
+#   bin/issue-sync scan                   Show which issues changed since last scan
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
@@ -71,6 +73,127 @@ _fm_set_str() {
   _fm_set "$file" "$key" "'$value'"
 }
 
+# ── scan state & dedup ────────────────────────────────────
+
+SCAN_STATE="$ISSUES_DIR/.scan-state"
+
+_scan_state_get() {
+  local key="$1"
+  [[ -f "$SCAN_STATE" ]] || return 0
+  python3 -c "import json; d=json.load(open('$SCAN_STATE')); print(d.get('$key',''))" 2>/dev/null || true
+}
+
+_scan_state_set() {
+  local key="$1" value="$2"
+  local tmp
+  tmp=$(python3 -c "
+import json, os
+state = {}
+if os.path.exists('$SCAN_STATE'):
+  with open('$SCAN_STATE') as f: state = json.load(f)
+state['$key'] = $value
+print(json.dumps(state, indent=2, default=str))
+" 2>/dev/null || true)
+  printf '%s\n' "$tmp" > "$SCAN_STATE"
+}
+
+_scan_state_record_sync() {
+  local local_id="$1" file="$2"
+  local ts mtime
+  ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+  mtime=$(stat -f %m "$file" 2>/dev/null || echo 0)
+  python3 -c "
+import json, os
+state = {}
+if os.path.exists('$SCAN_STATE'):
+  with open('$SCAN_STATE') as f: state = json.load(f)
+state['last_sync_at'] = '$ts'
+state.setdefault('synced_issues', {})
+state['synced_issues']['$local_id'] = {'mtime': $mtime, 'synced_at': '$ts'}
+with open('$SCAN_STATE', 'w') as f: json.dump(state, f, indent=2, default=str)
+" 2>/dev/null || true
+}
+
+# Check if platform_ids already has a live issue for a platform.
+# Returns 0 (already exists) if found, 1 (needs create) otherwise.
+_already_on_platform() {
+  local file="$1" platform="$2"
+  local pid
+  pid=$(python3 -c "
+import yaml
+with open('$file') as f: content = f.read()
+parts = content.split('---', 2)
+if len(parts) >= 3:
+  fm = yaml.safe_load(parts[1]) or {}
+  ids = fm.get('platform_ids', {}) or {}
+  p = ids.get('$platform', {}) or {}
+  val = p.get('issue_id', '')
+  print(val)
+" 2>/dev/null || true)
+  [[ -n "$pid" && "$pid" != "None" ]]
+}
+
+# Content hash for change detection.
+_content_hash() {
+  local file="$1"
+  python3 -c "
+import hashlib
+with open('$file') as f: content = f.read()
+print(hashlib.sha256(content.encode()).hexdigest()[:16])
+" 2>/dev/null || true
+}
+
+# Check if content changed since last sync.
+# Returns 1 (unchanged) on first run (no stored hash = nothing to compare).
+_changed_since_last_sync() {
+  local local_id="$1" file="$2"
+  local last_hash current_hash
+  last_hash=$(python3 -c "
+import json, os
+if os.path.exists('$SCAN_STATE'):
+  with open('$SCAN_STATE') as f: state = json.load(f)
+  synced = state.get('synced_issues', {}).get('$local_id', {})
+  print(synced.get('hash', ''))
+" 2>/dev/null || true)
+  # No previous hash = first sync of this issue. Consider it unchanged
+  # to avoid spamming updates on initial batch run.
+  [[ -z "$last_hash" || "$last_hash" == "None" ]] && return 1
+  current_hash=$(_content_hash "$file")
+  [[ "$last_hash" != "$current_hash" ]]
+}
+
+# Check if there are unsynced comments since last_synced_comment_at.
+_has_unsynced_comments() {
+  local file="$1" platform="$2"
+  local last_sync
+  last_sync=$(python3 -c "
+import yaml
+with open('$file') as f: content = f.read()
+parts = content.split('---', 2)
+if len(parts) >= 3:
+  fm = yaml.safe_load(parts[1]) or {}
+  lsca = fm.get('last_synced_comment_at', {}) or {}
+  print(lsca.get('$platform', ''))
+" 2>/dev/null || true)
+  [[ -z "$last_sync" || "$last_sync" == "None" ]] && return 0  # never synced
+  # Check if any comment is newer
+  python3 -c "
+import re
+with open('$file') as f: content = f.read()
+parts = content.split('## Comments', 1)
+if len(parts) < 2: exit(1)
+import datetime
+last = datetime.datetime.fromisoformat('${last_sync}'.replace('Z', '+00:00'))
+for m in re.finditer(r'### (comment-\S+)', parts[1]):
+  ts_str = m.group(1).replace('comment-', '')
+  try:
+    ct = datetime.datetime.strptime(ts_str[:15], '%Y%m%dT%H%M%S').replace(tzinfo=datetime.timezone.utc)
+    if ct > last: exit(0)
+  except: pass
+exit(1)
+" 2>/dev/null
+}
+
 # ── title derivation ─────────────────────────────────────
 
 _issue_title() {
@@ -82,7 +205,7 @@ _issue_title() {
     return 0
   fi
   # Fallback: first # heading in body, or canonical doc
-  title=$(sed -n '/^---$/,/^---$/!p' "$file" | grep -m1 '^# ' | sed 's/^# //')
+  title=$(awk '/^---$/ && !skipped{skipped=1; next} /^---$/ && skipped{skipped=0; next} /^# /{print substr($0,3); exit}' "$file")
   if [[ -z "$title" ]]; then
     local canon; canon=$(_fm_get "$file" "canonical_issue_path")
     if [[ -n "$canon" && "$canon" != "None" && -f "$ROOT_DIR/$canon" ]]; then
@@ -132,7 +255,7 @@ _issue_body() {
 
 ---
 
-$(sed -n '/^---$/,/^---$/!p' "$file" | sed '1{/^---$/d};/^---$/d' | grep -v '^## Comments' | head -80)
+$(awk 'BEGIN{in_fm=0; skipped_first=0} /^---$/{ if(!skipped_first){skipped_first=1; next} else{next} } {print}' "$file" | grep -v '^## Comments' | head -80)
 BODY
 }
 
@@ -256,37 +379,48 @@ cmd_create() {
   file="$ISSUES_DIR/$local_id/issue.md"
   [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
 
-  title=$(_platform_title "$local_id" "$file")
-  body=$(_issue_body "$file" "$local_id")
-  labels=$(_labels "$file")
+  # Dedup: skip if already on platform
+  if [[ -n "${GH_REPO:-}" ]] && _already_on_platform "$file" "github"; then
+    echo "[issue-sync] skip create: $local_id already on GitHub"
+  else
+    title=$(_platform_title "$local_id" "$file")
+    body=$(_issue_body "$file" "$local_id")
+    labels=$(_labels "$file")
 
-  # GitHub
-  if [[ -n "${GH_REPO:-}" ]]; then
-    echo "[issue-sync] GitHub: creating issue..."
-    url=$(_gh_create "$title" "$body" "$labels")
-    if [[ -n "$url" ]]; then
-      local gh_num; gh_num=$(basename "$url")
-      echo "[issue-sync] GitHub: $url"
-      _update_platform_ids "$file" "github" "$gh_num" "$url"
-    else
-      echo "[issue-sync] GitHub: FAILED"
+    if [[ -n "${GH_REPO:-}" ]]; then
+      echo "[issue-sync] GitHub: creating issue..."
+      url=$(_gh_create "$title" "$body" "$labels")
+      if [[ -n "$url" ]]; then
+        local gh_num; gh_num=$(basename "$url")
+        echo "[issue-sync] GitHub: $url"
+        _update_platform_ids "$file" "github" "$gh_num" "$url"
+      else
+        echo "[issue-sync] GitHub: FAILED"
+      fi
     fi
   fi
 
-  # Gitee
+  # Gitee — same dedup
   if [[ -n "${GITEE_REPO:-}" && -n "${GITEE_TOKEN:-}" ]]; then
-    echo "[issue-sync] Gitee: creating issue..."
-    local gitee_result gitee_id
-    gitee_result=$(_gitee_call "create" "{\"title\":\"$title\",\"body\":\"$(printf '%s' "$body" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))' | sed 's/^"//;s/"$//')\"}")
-    gitee_id=$(printf '%s\n' "$gitee_result" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('output',''))" 2>/dev/null || true)
-    if [[ -n "$gitee_id" ]]; then
-      echo "[issue-sync] Gitee: created $gitee_id"
-      _update_platform_ids "$file" "gitee" "$gitee_id" "https://gitee.com/$GITEE_REPO/issues/$gitee_id"
+    if _already_on_platform "$file" "gitee"; then
+      echo "[issue-sync] skip create: $local_id already on Gitee"
     else
-      echo "[issue-sync] Gitee: FAILED - $gitee_result"
+      title=$(_platform_title "$local_id" "$file")
+      body=$(_issue_body "$file" "$local_id")
+      echo "[issue-sync] Gitee: creating issue..."
+      local gitee_result gitee_id
+      gitee_result=$(_gitee_call "create" "{\"title\":\"$title\",\"body\":\"$(printf '%s' "$body" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))' | sed 's/^"//;s/"$//')\"}")
+      gitee_id=$(printf '%s\n' "$gitee_result" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('output',''))" 2>/dev/null || true)
+      if [[ -n "$gitee_id" ]]; then
+        echo "[issue-sync] Gitee: created $gitee_id"
+        _update_platform_ids "$file" "gitee" "$gitee_id" "https://gitee.com/$GITEE_REPO/issues/$gitee_id"
+      else
+        echo "[issue-sync] Gitee: FAILED - $gitee_result"
+      fi
     fi
   fi
 
+  _scan_state_record_sync "$local_id" "$file"
   echo "[issue-sync] create complete: $local_id"
 }
 
@@ -294,6 +428,12 @@ cmd_update() {
   local local_id="$1" file title body labels gh_id gitee_id
   file="$ISSUES_DIR/$local_id/issue.md"
   [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
+
+  # Dedup: skip if content hasn't changed since last sync
+  if ! _changed_since_last_sync "$local_id" "$file"; then
+    echo "[issue-sync] skip update: $local_id unchanged since last sync"
+    return 0
+  fi
 
   title=$(_platform_title "$local_id" "$file")
   body=$(_issue_body "$file" "$local_id")
@@ -319,6 +459,11 @@ cmd_comment() {
   local local_id="$1" file
   file="$ISSUES_DIR/$local_id/issue.md"
   [[ -f "$file" ]] || { echo "[ERROR] $file not found" >&2; exit 1; }
+
+  # Dedup: check if there are unsynced comments
+  if [[ -n "${GH_REPO:-}" ]] && ! _has_unsynced_comments "$file" "github"; then
+    echo "[issue-sync] skip comment: no unsynced comments for $local_id (GitHub)"
+  fi
 
   # Extract latest comment without platform_ids
   local last_comment
@@ -448,6 +593,97 @@ CROSSREF
   echo "[issue-sync] promote complete: $raw_id → $i_id"
 }
 
+cmd_batch() {
+  local last_scan changed=0 synced=0
+  last_scan=$(_scan_state_get "last_sync_at")
+  echo "[issue-sync] batch: last sync = ${last_scan:-never}"
+
+  # Find all issue.md files modified since last sync
+  while IFS= read -r -d '' issue_file; do
+    local dir local_id
+    dir=$(dirname "$issue_file")
+    local_id=$(basename "$dir")
+    # Skip non-issue dirs
+    [[ "$local_id" == raw-* || "$local_id" == I-* ]] || continue
+
+    local kind
+    kind=$(_fm_get "$issue_file" "kind")
+    changed=1
+
+    case "$kind" in
+      raw)
+        local status; status=$(_fm_get "$issue_file" "status")
+        if [[ "$status" == "absorbed" || "$status" == "dropped" ]]; then
+          echo "[issue-sync] batch: close $local_id (status=$status)"
+          cmd_close "$local_id" "completed" || true
+        elif ! _already_on_platform "$issue_file" "github" 2>/dev/null; then
+          echo "[issue-sync] batch: create $local_id (raw, not on platform)"
+          cmd_create "$local_id" || true
+        fi
+        ;;
+      linked)
+        if _changed_since_last_sync "$local_id" "$issue_file"; then
+          local phase; phase=$(_fm_get "$issue_file" "phase_state")
+          echo "[issue-sync] batch: update $local_id (phase=$phase)"
+          cmd_update "$local_id" || true
+          if [[ "$phase" == "completed" ]]; then
+            cmd_close "$local_id" "completed" || true
+          fi
+        fi
+        # Always check for unsynced comments
+        cmd_comment "$local_id" || true
+        ;;
+    esac
+    synced=$((synced + 1))
+  done < <(find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null)
+
+  if [[ "$changed" -eq 0 ]]; then
+    echo "[issue-sync] batch: no changed issues"
+  else
+    echo "[issue-sync] batch: $synced issue(s) processed"
+  fi
+
+  # Update scan state
+  python3 -c "
+import json, os, datetime
+state = {}
+if os.path.exists('$SCAN_STATE'):
+  with open('$SCAN_STATE') as f: state = json.load(f)
+state['last_scan_at'] = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+with open('$SCAN_STATE', 'w') as f: json.dump(state, f, indent=2, default=str)
+" 2>/dev/null || true
+}
+
+cmd_scan() {
+  local last_scan
+  last_scan=$(_scan_state_get "last_sync_at")
+  echo "last_sync_at: ${last_scan:-never}"
+  echo ""
+  echo "Changed issues since last sync:"
+  local found=0
+  while IFS= read -r -d '' issue_file; do
+    local dir local_id
+    dir=$(dirname "$issue_file")
+    local_id=$(basename "$dir")
+    [[ "$local_id" == raw-* || "$local_id" == I-* ]] || continue
+
+    local kind status phase
+    kind=$(_fm_get "$issue_file" "kind")
+    status=$(_fm_get "$issue_file" "status")
+    phase=$(_fm_get "$issue_file" "phase_state")
+
+    if [[ "$kind" == "linked" ]] && _changed_since_last_sync "$local_id" "$issue_file"; then
+      echo "  UPDATE $local_id  kind=$kind phase=$phase  $(_issue_title "$issue_file" "$local_id")"
+      found=1
+    elif [[ "$kind" == "raw" ]] && ! _already_on_platform "$issue_file" "github" 2>/dev/null; then
+      echo "  CREATE $local_id  kind=$kind status=$status  $(_issue_title "$issue_file" "$local_id")"
+      found=1
+    fi
+  done < <(find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null)
+
+  [[ "$found" -eq 0 ]] && echo "  (none)"
+}
+
 cmd_status() {
   local local_id="$1" file
   file="$ISSUES_DIR/$local_id/issue.md"
@@ -482,7 +718,7 @@ main() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) ROOT_DIR="$2"; ISSUES_DIR="$ROOT_DIR/docs/issues"; shift 2 ;;
-      create|update|comment|close|promote|status)
+      create|update|comment|close|promote|status|batch|scan)
         action="$1"; shift; break ;;
       *) echo "[ERROR] unknown action: $1" >&2; exit 1 ;;
     esac
@@ -490,8 +726,10 @@ main() {
 
   local_id="${1:-}"
   extra="${2:-}"
-  [[ -n "$action" ]] || { echo "Usage: issue-sync <create|update|comment|close|promote|status> <local_id> [extra]" >&2; exit 1; }
-  [[ -n "$local_id" ]] || { echo "[ERROR] missing local_id" >&2; exit 1; }
+  [[ -n "$action" ]] || { echo "Usage: issue-sync <create|update|comment|close|promote|status|batch|scan> <local_id> [extra]" >&2; exit 1; }
+  if [[ "$action" != "batch" && "$action" != "scan" ]]; then
+    [[ -n "$local_id" ]] || { echo "[ERROR] missing local_id" >&2; exit 1; }
+  fi
   [[ -d "$ISSUES_DIR" ]] || { echo "[ERROR] $ISSUES_DIR not found" >&2; exit 1; }
 
   GH_REPO="${GH_REPO:-$(_gh_repo)}"
@@ -504,6 +742,8 @@ main() {
     close)   cmd_close "$local_id" "$extra" ;;
     promote) cmd_promote "$local_id" "$extra" ;;
     status)  cmd_status "$local_id" ;;
+    batch)   cmd_batch ;;
+    scan)    cmd_scan ;;
   esac
 }
 
