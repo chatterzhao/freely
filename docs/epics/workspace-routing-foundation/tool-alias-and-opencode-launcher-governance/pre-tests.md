@@ -627,3 +627,17 @@
 - case_design: `Verify session_fork_args for Claude outputs correct flags. Verify session_resume_args for Claude. Verify session_fresh_args for Claude. Verify session_dir_for_tool returns correct paths for Claude/Codex/OpenCode. Verify fallback code when module not loaded.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-session-cache-module.md`
 
+
+
+### PT-50
+- id: `PT-50`
+- requirement: `I-20260426-0000-A phase_state updated to completed`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-50`
+- case_design: `Verify phase_state=completed in docs/issues/I-20260426-0000-A/issue.md. Verify scan excludes completed issues.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fix-phase-state.md`
+
