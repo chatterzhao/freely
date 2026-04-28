@@ -13,3 +13,9 @@
 - Layer 2: JSONL fallback extracts session ID from ~/.claude/projects/<slug>/ ✓
 - Layer 3: 3 fresh launches in 300s → circuit breaker trips → daemon stops ✓
 - Manager/worker session isolation: different worktrees → different state files ✓
+
+### Amendment 20260428-2: resume enforcement + tool dir abstraction + new-session
+- AI_RESUME_ON_RESTART=true → zero tolerance for fresh launches (max_count=1 in circuit breaker)
+- ensure_runtime_tool_session_anchor errors immediately if no valid session found
+- _tool_session_dir() abstracts tool→session directory mapping
+- cmd_new_session() clears all session state for forced fresh starts
