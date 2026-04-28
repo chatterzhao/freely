@@ -403,3 +403,15 @@
 - task_refs: `tasks.md#T-31`
 - case_design: `Verify zero TODO CHG markers in runtime scripts. Verify intake claim/resolve/handler work with docs/issues/.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-todo-cleanup-complete.md`
+
+### PT-32
+- id: `PT-32`
+- requirement: `file size guidelines in AGENTS.md, check script runs`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-32`
+- case_design: `Verify AGENTS.md has file size section. Verify bin/check-file-size runs without errors.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-file-size-guidelines.md`
