@@ -331,3 +331,15 @@
 - task_refs: `tasks.md#T-25`
 - case_design: `Verify daemon start with AI_RESUME_ON_START=true and existing session state falls through to resume.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-resume-on-start.md`
+
+### PT-26
+- id: `PT-26`
+- requirement: `session state persisted immediately for resume after SIGTERM`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-26`
+- case_design: `Verify session-state.env written after ensure_runtime_tool_session_anchor. Verify cc session ID extraction from debug log.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-persist-session-early.md`

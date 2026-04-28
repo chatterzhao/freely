@@ -3208,6 +3208,23 @@ is_valid_uuid() {
   [[ "$value" =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$ ]]
 }
 
+# _persist_session_anchor_early: write session ID to disk immediately
+# so SIGTERM-killed sessions can be resumed on next launch.
+_persist_session_anchor_early() {
+  local project="$1" tool="$2"
+  if tool_uses_claude_session_id "$tool" && [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+    local state_file
+    state_file="$(session_state_file "$project")"
+    mkdir -p "$(dirname "$state_file")"
+    cat >"$state_file" <<STATEEOF
+LAST_TOOL_SESSION_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
+LAST_TOOL_RESUME_TARGET="${CLAUDE_SESSION_ID_CURRENT:-}"
+LAST_LAUNCH_KIND="${mode_name:-resume}"
+STATEEOF
+    log_info "session anchor persisted early: ${CLAUDE_SESSION_ID_CURRENT}"
+  fi
+}
+
 ensure_runtime_tool_session_anchor() {
   local tool="$1" launch_kind="$2" project="${3:-}"
   if tool_uses_claude_session_id "$tool"; then
@@ -17067,6 +17084,8 @@ start_project_runtime() {
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
     ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name" "$PROJECT_ROOT"
+    # Persist session anchor immediately so SIGTERM-killed sessions can resume
+    _persist_session_anchor_early "$PROJECT_ROOT" "$AI_TOOL"
     delegated_pending_ids="$(delegated_continuation_ids_for_project "$PROJECT_ROOT")"
     delegated_pending_count="$(csv_item_count "$delegated_pending_ids")"
     delegated_consumed_ids="${LAST_DELEGATED_CONTINUATION_CONSUMED_IDS:-}"
