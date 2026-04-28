@@ -110,29 +110,6 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
 - completion_note: `This bounded followthrough owner exists only because real 2026-04-21 dogfooding still found one daemon self-loop blocker after the broader runtime lifecycle owners landed. Completion remains blocked until canonical develop proves Freely can finish one task to the current-project success standard, close the worktree, and continue to the next task.`
 
-1. `I-20260419-0915-A`
-- title: Three-loop lifecycle single-source governance followthrough
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-three-loop-lifecycle-single-source-governance-followthrough.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/candidates.md`
-- follow_on_to: `I-20260324-0405`
-- evidence:
-  - `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/brainstorms.md`
-  - `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/candidates.md`
-  - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-three-loop-lifecycle-single-source-governance-followthrough.md`
-  - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260419-three-loop-lifecycle-single-source-followthrough-verification.md`
-  - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-three-loop-model-refactor --issue docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
-  - `./bin/governance-check`
-- completion_note: `This narrow governance-only followthrough keeps the detailed lifecycle model in one canonical document and requires downstream consumers to read/sync against it before the temporary feature and test-pre-merge worktrees retire.`
 
 1. `I-20260419-0333-A`
 - title: Runtime closeout selfhost validation followthrough governance
@@ -1036,6 +1013,21 @@ routing_policy:
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
 ### completed_issues
+
+1. `I-20260419-0915-A`
+- title: Three-loop lifecycle single-source governance followthrough
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-three-loop-lifecycle-single-source-governance-followthrough.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/tasks.md`
+- source_brainstorm: `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260419-0915--three-loop-single-source-followthrough/candidates.md`
+- follow_on_to: `I-20260324-0405`
+- completion_note: `State reconciliation closeout: changes already in develop at HEAD 56efde43. The detailed three-loop lifecycle model is in docs/system/workspace/three-loop-capability-lifecycle.md and all consumer docs reference it correctly. Feature worktree and branch previously retired.`
+
 
 1. `I-20260421-1330-A`
 - title: Absorbed merged lane routing followthrough governance

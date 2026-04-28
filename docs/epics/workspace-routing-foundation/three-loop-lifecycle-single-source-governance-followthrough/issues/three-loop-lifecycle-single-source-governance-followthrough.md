@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260419-0915-A`
 - title: `Three-loop lifecycle single-source governance followthrough`
-- phase_state: `in_verification`
+- phase_state: `done`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `three-loop-lifecycle-single-source-governance-followthrough`
