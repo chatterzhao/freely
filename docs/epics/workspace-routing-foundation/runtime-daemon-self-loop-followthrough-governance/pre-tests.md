@@ -15,7 +15,7 @@
 - testing layer: `integration`
 - target environment: `feature/runtime-daemon-self-loop-blocker-20260421`
 - required evidence: `focused runtime command output plus verification artifact`
-- blocker taxonomy: `execution_pending_or_failed`
+- blocker taxonomy: `pass`
 1. Run `bash docs/system/workspace/scripts/tests/test-freely-start-precheck-ignores-orphaned-ai-pid`.
 2. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`.
 3. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`.
@@ -83,7 +83,7 @@
 - testing layer: `end_to_end`
 - target environment: `guarded feature -> test-pre-merge -> develop replay`
 - required evidence: `merge receipts plus develop-side runtime observation`
-- blocker taxonomy: `execution_pending_or_failed`
+- blocker taxonomy: `pass`
 1. Merge `feature/runtime-daemon-self-loop-blocker-20260421` into `test-pre-merge-20260421-runtime-self-loop-blocker` via `./bin/merge-guarded`.
 2. Merge `test-pre-merge-20260421-runtime-self-loop-blocker` into `develop` via `./bin/merge-guarded`.
 3. On canonical `develop`, run `./bin/freely daemon start`.
@@ -131,7 +131,7 @@
 - case_design: `Launch daemon mode, send TERM directly without writing stop.marker, confirm runtime survives and logs daemon_signal_ignored, then run explicit daemon stop and confirm operator stop still records correctly.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Canonical develop proves autonomous continuation
 - id: `develop-self-host-daemon-continuation`
@@ -254,7 +254,7 @@
 - case_design: `Exercise manager-invalid, manager-stop, manager-stop-blocked-by-unresolved-worker, manager-delegate-without-launchable-worker, worker-invalid, worker-done, and worker-prompt directive paths so runtime proves prompt injection, post-cycle validation, precise same-session repair behavior, and no premature autonomy stop while recovery-owned worker truth remains open.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Cleanup handoff workers are not reclaimed before external cleanup surfaces run
 - id: `cleanup-handoff-not-auto-settled`
@@ -266,7 +266,7 @@
 - case_design: `Construct a merged cleanup-handoff worktree with full verification metadata plus external cleanup write scope and verify runtime neither reclaims ownership nor auto-settles it as retire_ready_merged_worker.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Reconnect retries stay local until the tool actually exits
 - id: `reconnect-does-not-trigger-early-cross-tool-switch`
@@ -278,7 +278,7 @@
 - case_design: `Emit a Codex transcript containing only ERROR: Reconnecting... x/5, verify monitor-ai-cli does not write the network-failure marker or kill the child early, then prove runtime classification still maps that log to execution_network_transient while 429 evidence still remains immediate kill/switch-worthy.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Benign Codex model-refresh timeout noise does not trigger runtime failure
 - id: `codex-model-refresh-timeout-noise-ignored`
@@ -362,7 +362,7 @@
 - case_design: `Walk one recovery episode across codex -> cc -> iflow -> kiro-cli failures and verify the attempted-tool memory is preserved within the episode while project tool selection returns to codex after exhaustion.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Materialized cleanup worker prompts carry selected tool truth
 - id: `materialized-cleanup-worker-selected-tool-truth`
@@ -422,7 +422,7 @@
 - case_design: `Seed session-state plus a manager_exit_contract_repair handoff and verify launch-kind selection stays on resume rather than rotating to fresh/initial_start.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Empty repair resume targets fall back before monitor preflight
 - id: `empty-repair-resume-target-falls-back-before-launch`
@@ -482,7 +482,7 @@
 - case_design: `Replay the Codex OAuth refresh transport-classification repair on the disposable protected lane, rerun the focused OAuth request-send network classification regressions plus owner gate there, and stage the refreshed owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260421-runtime-daemon-self-loop-followthrough-verification.md`
+- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Worker materialization and pipe-safe summary hold on feature lane
 - id: `worker-materialization-and-summary-feature-proof`
