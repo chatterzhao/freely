@@ -463,3 +463,15 @@
 - task_refs: `tasks.md#T-36`
 - case_design: `Verify FILE_SIZE_DANGER=750 default. Verify [DANGER] output for files >750 lines. Verify check order: WARN → DANGER → ERROR.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-file-size-danger-rename.md`
+
+### PT-37
+- id: `PT-37`
+- requirement: `parse_ai_spec passes through unknown tools for alias resolution`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-37`
+- case_design: `Verify parse_ai_spec warns but does not exit on cc-ds-auto. Verify claude is in known list. Verify codex still works.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-fix-parse-ai-spec-pass-through.md`
