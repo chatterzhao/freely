@@ -307,3 +307,15 @@
 - task_refs: `tasks.md#T-23`
 - case_design: `Verify _ai_shows_liveness checks debug log mtime and process state before declaring AI stalled.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-ai-stall-liveness.md`
+
+### PT-24
+- id: `PT-24`
+- requirement: `AI_RESUME_ON_RESTART=true prefers resume over fresh_with_handoff`
+- evidence_level: `integration`
+- status: `pass`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#T-24`
+- case_design: `Verify select_launch_kind returns resume when AI_RESUME_ON_RESTART=true and evidence missing.`
+- artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-resume-config.md`
