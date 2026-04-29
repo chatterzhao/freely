@@ -20,6 +20,7 @@ import socket
 import subprocess
 import sys
 import threading
+import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -297,6 +298,7 @@ def parse_args():
 
 def main():
     args = parse_args()
+    t_start = time.time()
     prompt_path = Path(args.prompt_file)
     prompt_text = prompt_path.read_text(encoding="utf-8")
     cwd = str(Path(args.cwd))
@@ -310,6 +312,7 @@ def main():
     else:
         print("[ERROR] must specify --bridge-socket or --agent", file=sys.stderr, flush=True)
         sys.exit(1)
+    t_transport = time.time()
 
     client = ACPClient(transport=transport, mode=args.mode)
     try:
@@ -370,6 +373,8 @@ def main():
             session_id = session_result["sessionId"]
             print(f"session id: {session_id}", flush=True)
 
+        t_session = time.time()
+
         # Model selection
         if args.reasoning_effort:
             print(
@@ -393,13 +398,19 @@ def main():
                 )
 
         # Send prompt
+        t_before_prompt = time.time()
         prompt_result = client.request(
             "session/prompt",
             {"sessionId": session_id, "prompt": [{"type": "text", "text": prompt_text}]},
             timeout=900,
         )
+        t_prompt_done = time.time()
         stop_reason = prompt_result.get("stopReason", "unknown")
         print(f"stop_reason={stop_reason}", flush=True)
+
+        # Timing report (to stderr so it doesn't pollute the session id: line)
+        prompt_kb = len(prompt_text.encode("utf-8")) / 1024
+        print(f"[TIMING] transport_connect={(t_transport - t_start):.1f}s session_new={(t_session - t_transport):.1f}s prompt_wait={(t_prompt_done - t_before_prompt):.1f}s total={(t_prompt_done - t_start):.1f}s prompt_size={prompt_kb:.1f}kb", file=sys.stderr, flush=True)
 
         if stop_reason != "end_turn":
             print(

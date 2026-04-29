@@ -17331,6 +17331,18 @@ ensure_no_active_supervisor_conflict() {
     log_warn "repairing partial project control-plane before supervisor restart: $old_pid"
     terminate_pid_with_graceful_wait "$old_pid" "partial project control-plane before supervisor restart"
     rm -f "$sup_pid_file"
+    # Also clean up stale dispatcher and watchdog to prevent repair loop
+    local stale_dispatcher_pid stale_watchdog_pid
+    stale_dispatcher_pid="$(cat "$(interruption_dispatcher_pid_file "$project")" 2>/dev/null || true)"
+    if [[ -n "$stale_dispatcher_pid" ]]; then
+      terminate_pid_with_graceful_wait "$stale_dispatcher_pid" "stale dispatcher during supervisor repair" 2>/dev/null || true
+      rm -f "$(interruption_dispatcher_pid_file "$project")"
+    fi
+    stale_watchdog_pid="$(cat "$(ensure_manager_watchdog_pid_file "$project")" 2>/dev/null || true)"
+    if [[ -n "$stale_watchdog_pid" ]]; then
+      terminate_pid_with_graceful_wait "$stale_watchdog_pid" "stale watchdog during supervisor repair" 2>/dev/null || true
+      rm -f "$(ensure_manager_watchdog_pid_file "$project")"
+    fi
   fi
   if [[ -f "$child_pid_file" ]]; then
     local active_ai_pid
