@@ -11691,9 +11691,7 @@ _ensure_acp_bridge_running() {
   local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
   python3 "$bridge_script" start --project "$project" --foreground </dev/null >>"$bridge_log" 2>&1 &
   disown "$!" 2>/dev/null || true
-
-  # Write bridge PID for tracking
-  echo "$!" > "$pid_file"
+  # Note: bridge writes its own PID file during start_server, don't overwrite it
 
   # Wait for readiness
   local waited=0
