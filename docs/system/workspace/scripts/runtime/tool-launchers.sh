@@ -652,13 +652,14 @@ tool_run_acp_from_prompt_file() {
         return 1
       fi
       freely_apply_project_network_proxy_env "$project"
-      exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" \
-        --agent "$claude_acp_bin" \
-        --cwd "$project" \
-        --prompt-file "$prompt_file" \
-        --mode "$mode" \
-        --model "$model" \
-        --reasoning-effort "$reasoning_effort"
+      local -a acp_args=(--agent "$claude_acp_bin" --cwd "$project" --prompt-file "$prompt_file" --mode "$mode" --model "$model" --reasoning-effort "$reasoning_effort")
+      # ACP session management: session/resume for resume, session/new for fresh
+      if [[ "$launch_kind" == "resume" && -n "$tool_resume_target" ]]; then
+        acp_args+=(--resume "$tool_resume_target")
+      elif [[ -n "$claude_session_id" ]]; then
+        acp_args+=(--session-id "$claude_session_id")
+      fi
+      exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" "${acp_args[@]}"
       ;;
     *)
       echo "[ERROR] unsupported ACP launcher for tool: $tool" >&2
