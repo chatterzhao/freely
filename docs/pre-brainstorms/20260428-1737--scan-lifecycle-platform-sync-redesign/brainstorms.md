@@ -15,14 +15,18 @@
 ### 1. 时间戳即身份
 
 ```
-raw-20260428-1737          ← raw issue
-C-20260428-1737             ← candidate（相同时间戳）
-I-20260428-1737             ← linked issue（相同时间戳）
+raw-20260428-1737              ← 一个问题（父），无后缀
+  B1 预研发散收敛 →
 
-B1 目录: 20260428-1737--xxx ← 复用时间戳
+  C-20260428-1737-A → I-20260428-1737-A  ← 子任务 A
+  C-20260428-1737-B → I-20260428-1737-B  ← 子任务 B
+  C-20260428-1737-C → I-20260428-1737-C  ← 子任务 C
+
+B1 目录: 20260428-1737--xxx  ← 一个 raw 一个 B1 目录
 ```
 
-三个阶段共享同一个 `YYYYMMDD-HHMM` 时间戳。HHMM 天然唯一，不需要序列号或后缀字母。门禁通过 `raw_key/issue_key/candidate_key` 的字符串相等验证身份链（不是 startswith，是完全匹配）。
+一个 raw 可以孵化多个 I-*（`-A`, `-B`, `-C` 后缀）。后缀在 C-* promote 时确定。
+raw 没有后缀（只有一个）。门禁通过 `startswith(raw_key)` 验证父子关系。
 
 ### 2. 一个 Item 一条命
 
@@ -231,14 +235,14 @@ Stage 8: Complete
 当前门禁验证 C → M → I（candidate → milestone → issue）。需要扩展为 **raw → C → M → I**。
 
 ```
-raw-20260428-1737          raw_key → "20260428-1737"
-C-20260428-1737             candidate_key → "20260428-1737"
-I-20260428-1737             issue_key → "20260428-1737"
+raw-20260428-1737                raw_key → "20260428-1737"
+C-20260428-1737-A                candidate_key → "20260428-1737-A"
+I-20260428-1737-A                issue_key → "20260428-1737-A"
 
-门禁验证（完全匹配，不是 startswith）：
-  raw_key == candidate_key == issue_key  → "20260428-1737" == "20260428-1737" ✓
+门禁验证（startswith）：
+  candidate_key.startswith(raw_key)    → "20260428-1737-A" starts with "20260428-1737" ✓
+  issue_key == candidate_key（去前缀） → C-xxx-A 和 I-xxx-A 的后缀一致 ✓
   milestones.md 中 issue 有 promoted_from 指向 raw ✓
-  raw issue 的 absorbed_into 指向 I-*  ✓
 ```
 
 新增 gate GATE 6.3：raw→I 身份链完整性。
@@ -363,7 +367,46 @@ pull comment 后：
   - 禁止在平台上手动创建 I-* 格式的 issue
 ```
 
-## 待决策
+## 平台 Issue 分类与自动修正
+
+### 问题
+
+Freely 内部严格规范标题格式（`raw-YYYYMMDD-HHMM` / `I-YYYYMMDD-HHMM-A`）。
+但平台上人类手工创建的 issue 标题不可控——有人写 "修复 bug"，有人写 "Feature: xxx"。
+不能依赖标题格式来判断 raw vs I-*。
+
+### 方案：标签为主要判断依据
+
+```
+平台 issue 分类逻辑：
+
+  1. 有 kind/linked 标签？ → I-*（可靠，freely 代码专属，人不会加这个标签）
+  2. 无 kind/linked 标签？ → raw（管它标题长什么样）
+```
+
+`kind/linked` 标签只在 `issue-sync promote` 时由 freely 代码添加——这是可靠的区分标记。
+
+### 自动修正
+
+`issue-sync pull` 或 `issue-sync normalize` 对不规范 raw 自动修正：
+
+```
+for each platform issue classified as raw:
+  if 无 kind/raw 标签 → 添加 kind/raw 标签
+  if 标题格式不规范 → 不改标题（保留原始标题溯源）
+  if 无 kind/raw 且内容明显是 bug report / feature request → 加对应标签
+```
+
+不修改 `kind/linked` 标签——那是 freely 代码的专属标记，脚本也不应增删。
+
+### Scan 影响
+
+```
+task-lifecycle-scan 拉取平台 issue：
+  按 kind/linked 标签过滤 I-*
+  其余全部按 raw 处理
+  本地 raw 目录的 issue.md 同步记录 platform_ids 和标签状态
+```
 
 1. HHMM 格式：是否强制新 ID 必须用 HHMM？（建议：是，历史不管）
 2. B1 目录格式：`YYYYMMDD-HHMM--slug` vs `YYYYMMDD-0000--slug`？（建议：统一 HHMM）
