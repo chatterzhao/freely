@@ -17644,6 +17644,8 @@ start_project_runtime() {
   fi
 
   while true; do
+    # Re-load session state each cycle so resume/fork decisions see latest values
+    load_session_state_or_defaults "$project"
     local ts prompt_file cycle_log cycle_debug_log mode_name watchdog_script workspace_root
     local delegated_pending_ids delegated_pending_count delegated_consumed_ids delegated_consumed_at
     if [[ "$stop_requested" -eq 1 || -f "$(stop_marker_file "$project")" ]]; then
