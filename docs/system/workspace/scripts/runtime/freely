@@ -11740,6 +11740,9 @@ _stop_acp_bridge() {
   if [[ -f "$bridge_script" ]]; then
     python3 "$bridge_script" stop --project "$project" >/dev/null 2>&1 || true
   fi
+  # Kill orphaned claude-agent-acp and claude child processes
+  pkill -f "claude-agent-acp" 2>/dev/null || true
+  pkill -f "claude.*--session-id.*--replay-user-messages" 2>/dev/null || true
   rm -f "$(_acp_bridge_pid_file "$project")" "$(_acp_bridge_socket "$project")"
 }
 
