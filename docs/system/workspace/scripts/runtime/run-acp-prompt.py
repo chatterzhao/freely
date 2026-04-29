@@ -188,6 +188,8 @@ def parse_args():
     parser.add_argument("--mode", choices=("auto", "step"), default="auto")
     parser.add_argument("--model", default="", help="Preferred model id when supported")
     parser.add_argument("--reasoning-effort", default="", help="Reasoning effort hint")
+    parser.add_argument("--session-id", default="", help="Desired session UUID for new sessions")
+    parser.add_argument("--resume", default="", help="Session ID to resume (session/load)")
     return parser.parse_args()
 
 
@@ -204,19 +206,34 @@ def main():
             {
                 "protocolVersion": 1,
                 "clientInfo": {"name": "freely", "title": "Freely ACP bridge", "version": "0.1"},
-                "clientCapabilities": {},
+                "clientCapabilities": {"loadSession": True, "resumeSession": True},
             },
         )
 
-        session_result = client.request(
-            "session/new",
-            {
+        # Resume existing session or create new one.
+        # session/resume: continues session without replaying history (cheaper).
+        # session/load: replays full history (use when worker needs full context).
+        if args.resume:
+            session_result = client.request(
+                "session/resume",
+                {
+                    "sessionId": args.resume,
+                    "cwd": str(Path(args.cwd)),
+                    "mcpServers": [],
+                },
+            )
+            session_id = session_result["sessionId"]
+            print(f"session id: {session_id} (resumed)", flush=True)
+        else:
+            new_params = {
                 "cwd": str(Path(args.cwd)),
                 "mcpServers": [],
-            },
-        )
-        session_id = session_result["sessionId"]
-        print(f"session id: {session_id}", flush=True)
+            }
+            if args.session_id:
+                new_params["sessionId"] = args.session_id
+            session_result = client.request("session/new", new_params)
+            session_id = session_result["sessionId"]
+            print(f"session id: {session_id}", flush=True)
 
         if args.reasoning_effort:
             print(
