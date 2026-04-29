@@ -141,11 +141,30 @@ def collect_lifecycle_items(project: Path) -> list[dict]:
         children = linked_children.get(key, [])
         items.append({"key": key, "raw": raw, "children": children})
 
-    # Standalone I-* (no raw parent)
+    # Standalone I-* (no raw parent) — use base key from ID
     for child in standalone_linked:
-        items.append({"key": child["linked_id"], "raw": None, "children": [child]})
+        base = _base_key(child["linked_id"])
+        items.append({"key": base, "raw": None, "children": [child]})
 
     return items
+
+
+def _base_key(local_id: str) -> str:
+    """Extract base time key from any issue ID.
+    raw-20260428-1737 → 20260428-1737
+    I-20260428-1737-A → 20260428-1737
+    I-20260428-1737 → 20260428-1737
+    """
+    inner = local_id
+    if inner.startswith("raw-"):
+        inner = inner[4:]
+    elif inner.startswith("I-"):
+        inner = inner[2:]
+    # Strip suffix letter: 20260428-1737-A → 20260428-1737
+    m = re.match(r"^(\d{8}-\d{4})-[A-Z]$", inner)
+    if m:
+        inner = m.group(1)
+    return inner
 
 
 def _parse_list(val: str) -> list[str]:
@@ -400,8 +419,10 @@ def build_payload(project: Path) -> dict:
 
 
 def _derive_action(stage: str, incomplete: list[str]) -> str:
-    # Priority order: early-stage blockers first, then platform close, then doc updates
-    if "not_promoted_to_I" in incomplete:
+    # Priority: doc updates first (cheapest), then platform close, then investigation
+    inc_str = " ".join(incomplete)
+
+    if "not_promoted_to_I" in inc_str:
         return "完成 B1 预研 → 产出 candidate → 决策 promote"
     if stage == "B1_proposed":
         return "创建 B1 预研目录，开始发散收敛"
@@ -409,16 +430,18 @@ def _derive_action(stage: str, incomplete: list[str]) -> str:
         return "完成 brainstorms.md，产出 candidates.md"
     if stage == "B1_candidate":
         return "决策 candidate：promote（创建 I-*）/ absorb（合并）/ drop（放弃）"
-    if "phase_not_completed" in incomplete:
-        return "更新 phase_state 为 completed，关闭平台 issue"
-    if "github_not_closed" in incomplete:
+    if "phase_not_completed" in inc_str:
+        return "更新 phase_state 为 completed"
+    if "not_on_any_platform" in inc_str:
+        return "issue-sync create 推送 I-* 到平台"
+    if "github_not_closed" in inc_str:
         return "issue-sync close github"
     if any("gitee" in i and "unchecked" not in i for i in incomplete):
         return "issue-sync close gitee"
     if any("unsynced" in i for i in incomplete):
         return "issue-sync comment 推送未同步评论"
     if any("unchecked" in i for i in incomplete):
-        return "运行 SKIP_PLATFORM_CHECK=0 扫描以检查平台状态"
+        return "运行完整 scan 检查平台状态"
     return "检查并完成收口步骤"
 
 
