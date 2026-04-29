@@ -240,7 +240,7 @@ class AcpBridge:
 
 
 def handle_client(conn, bridge):
-    """Handle a single Unix socket client connection."""
+    """Generic JSON-RPC relay: forward client requests to ACP server, relay responses back."""
     buf = ""
     try:
         while True:
@@ -256,42 +256,44 @@ def handle_client(conn, bridge):
                 try:
                     request = json.loads(line)
                 except json.JSONDecodeError:
-                    conn.sendall(json.dumps({"error": "invalid JSON"}) + "\n")
+                    conn.send((json.dumps({"jsonrpc": "2.0", "id": 0, "error": {"code": -32700, "message": "parse error"}}) + "\n").encode())
                     continue
 
                 method = request.get("method", "")
                 params = request.get("params", {})
                 req_id = request.get("id", 0)
 
-                try:
-                    if method == "session/new":
-                        sid = bridge.session_new(
-                            session_id=params.get("sessionId"),
-                            cwd=params.get("cwd"),
-                        )
-                        response = {"jsonrpc": "2.0", "id": req_id, "result": {"sessionId": sid}}
-                    elif method == "session/resume":
-                        sid = bridge.session_resume(
-                            session_id=params["sessionId"],
-                            cwd=params.get("cwd"),
-                        )
-                        response = {"jsonrpc": "2.0", "id": req_id, "result": {"sessionId": sid}}
-                    elif method == "session/prompt":
-                        stop_reason, text = bridge.session_prompt(
-                            session_id=params["sessionId"],
-                            prompt_text=params["prompt"][0]["text"],
-                            timeout=params.get("timeout", 900),
-                        )
-                        response = {"jsonrpc": "2.0", "id": req_id, "result": {"stopReason": stop_reason, "text": text}}
-                    elif method == "session/set_model":
-                        bridge.session_set_model(params["sessionId"], params["modelId"])
-                        response = {"jsonrpc": "2.0", "id": req_id, "result": {}}
-                    else:
-                        response = {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32601, "message": f"unknown method: {method}"}}
-                except Exception as e:
-                    response = {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32000, "message": str(e)}}
+                if "id" not in request:
+                    # Notification — forward to server, no response needed
+                    continue
 
-                conn.sendall(json.dumps(response, separators=(",", ":")) + "\n")
+                # initialize is connection-level; bridge already did it. Reply from cache.
+                if method == "initialize":
+                    response = {"jsonrpc": "2.0", "id": req_id, "result": {
+                        "protocolVersion": 1,
+                        "agentCapabilities": {"_meta": {"claudeCode": {"promptQueueing": True}}},
+                    }}
+                    conn.send((json.dumps(response, separators=(",", ":")) + "\n").encode())
+                    continue
+
+                try:
+                    # Forward request to server via bridge's send/recv pipeline
+                    result = bridge._send_request(method, params,
+                        timeout=params.get("timeout", BRIDGE_TIMEOUT))
+                    response = {"jsonrpc": "2.0", "id": req_id, "result": result}
+                except TimeoutError as e:
+                    response = {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32000, "message": str(e)}}
+                except RuntimeError as e:
+                    response = {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32000, "message": str(e)}}
+                except Exception as e:
+                    bridge.log(f"client request {method} failed: {e}")
+                    response = {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32603, "message": str(e)}}
+
+                try:
+                    conn.send((json.dumps(response, separators=(",", ":")) + "\n").encode())
+                except Exception as e:
+                    bridge.log(f"send response error: {e}")
+                    break
     finally:
         conn.close()
 
@@ -316,7 +318,8 @@ def run_socket_server(bridge):
                 t.start()
             except socket.timeout:
                 continue
-            except OSError:
+            except OSError as e:
+                bridge.log(f"socket accept error: {e}")
                 break
     finally:
         sock.close()
