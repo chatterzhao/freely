@@ -11687,10 +11687,12 @@ _ensure_acp_bridge_running() {
     return 1
   fi
 
-  python3 "$bridge_script" start --project "$project" >/dev/null 2>&1 || {
-    log_warn "failed to start ACP bridge"
-    return 1
-  }
+  # Use --foreground (no fork) + & to avoid child-process lifecycle issues
+  python3 "$bridge_script" start --project "$project" --foreground </dev/null &>/dev/null &
+  disown "$!" 2>/dev/null || true
+
+  # Write bridge PID for tracking
+  echo "$!" > "$pid_file"
 
   # Wait for readiness
   local waited=0
