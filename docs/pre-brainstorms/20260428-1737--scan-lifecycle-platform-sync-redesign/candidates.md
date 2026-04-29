@@ -1,129 +1,120 @@
-# Candidates — Scan Lifecycle + Platform Sync Redesign
+# Candidates — Issue Lifecycle + Scan + Platform Sync
 
-## C-20260428-1737-A: 统一生命周期 Scan 模块
+## C-20260428-1737-A: 统一生命周期 Scan 模块（task-lifecycle-scan.py）
 
 - status: proposed
-- scope: 重构 task-source-scan.py 为 task-lifecycle-scan.py，输出统一生命周期定位
+- scope: 一个 raw→I 链条一个 JSON 对象，只输出未完成项，8 项 completion checklist
+- type: 脚本
 - priority: P0
-- milestone: M-20260306-workspace-routing-foundation
 
-### 核心改动
+### 核心逻辑
 
-1. 时间戳即身份：raw-YYYYMMDD-HHMM → I-YYYYMMDD-HHMM，B1 目录 YYYYMMDD-HHMM--slug
-2. 8 阶段生命周期：B1_proposed → brainstorming → candidate → promoted → B2_active → verifying → 收口 → completed
-3. 平台状态交叉：本地 phase_state + GitHub/Gitee open/closed → 综合判定
-4. 评论同步检查：本地 comment → platform_ids 是否完整
-5. 区分"状态未改"和"事情没做"，给出不同 next_action
+1. 收集所有 raw + I-*，按时间戳 key 配对
+2. 一个 raw 可关联多个 I-*（-A/-B/-C 后缀），输出为 children 数组
+3. 逐个检查：phase_state / platform closed / comments resolved
+4. 全部通过 → 排除；任一未通过 → 输出，列具体 blockers
+5. 区分"状态未改"（platform 已关但 phase_state 未更新）和"事情没做"（真没实现）
 
-### Non-Goals
-
-- 不迁移历史 0000 格式的 ID
-- 不实现平台→本地评论拉取（独立任务）
-- 不改 issue-sync 的 comment 同步（独立任务）
-
-## C-20260428-1737-B: 修复 I-* ID 格式（HHMM）
+## C-20260428-1737-B: 修复 I-* ID 格式（HHMM + 后缀）
 
 - status: proposed
-- scope: 所有新创建的 I-* issue 使用 YYYYMMDD-HHMM 格式
+- scope: raw-YYYYMMDD-HHMM（无后缀），I-YYYYMMDD-HHMM-A/B/C（有后缀），B1 目录 YYYYMMDD-HHMM--slug
+- type: 脚本 + 文档
 - priority: P0
-- milestone: M-20260306-workspace-routing-foundation
 
-### 核心改动
+### 核心逻辑
 
-1. ibm-framework.md 示例改为 HHMM 格式
-2. B1 预研目录生成使用 HHMM（复用 raw 时间戳）
-3. I-* issue 创建时继承 B1 目录时间戳
+1. AI 创建 B1 目录时使用 HHMM（复用 raw 时间戳，不用 0000 序列号）
+2. AI 创建 candidate 时使用 C-YYYYMMDD-HHMM-A 格式
+3. issue-sync promote 时创建 I-YYYYMMDD-HHMM-A
+4. 门禁: candidate_key.startswith(raw_key)，candidate_key == issue_key（去前缀）
+5. 历史 0000 格式不管
 
-### Non-Goals
-
-- 历史 I-20260426-0000-A 保持不变
-
-## C-20260428-1737-C: 评论 sync + 回写 platform_ids
+## C-20260428-1737-C: issue-sync promote 完整流程
 
 - status: proposed
-- scope: issue-sync comment 后回写平台 comment_id 到本地
+- scope: 一个脚本调用完成 raw→I 的全部 sync 操作
+- type: 脚本
+- priority: P0
+
+### 核心逻辑
+
+```
+issue-sync promote raw-xxx:
+  1. 读取 raw，找到所有已 promote 的 candidates
+  2. 对每个 candidate:
+     a. 创建 I-* issue.md 本地
+     b. 创建平台 I-* issue（带 kind/linked 标签 + phase 标签）
+     c. 回写 platform_ids
+  3. 所有 candidates promote 完毕:
+     a. 在 raw 平台 issue 上添加 closing comment:
+        "拆解为以下任务: [I-xxx-A](url) [I-xxx-B](url)"
+     b. 关闭 raw 平台 issue（GitHub + Gitee）
+     c. 更新 raw 本地: status=absorbed
+```
+
+## C-20260428-1737-D: issue-sync pull + normalize
+
+- status: proposed
+- scope: 拉取平台 issue 和评论到本地；自动修正标签
+- type: 脚本
 - priority: P1
-- milestone: M-20260306-workspace-routing-foundation
 
-### 核心改动
+### 核心逻辑
 
-1. bin/issue-sync comment：同步后回写 platform_ids 到本地 comment 元数据
-2. last_synced_comment_at 按平台记录
-3. Scan 检查评论是否全部同步
+```
+issue-sync pull:
+  1. 拉取 GitHub + Gitee open issues
+  2. 合并去重（按 platform_ids 匹配本地已有 issue）
+  3. 新 issue → 创建本地 raw-YYYYMMDD-HHMM
+  4. 新评论 → 追加为本地 ### comment（status: pending）
+  5. normalize: 无 kind/* 标签的平台 issue → 加 kind/raw
+  6. I-* 格式标题但无 kind/linked 标签 → 仍按 raw 处理
+```
 
-## C-20260428-1737-D: 多平台去重
+## C-20260428-1737-E: 评论消费状态
 
 - status: proposed
-- scope: scan 外部平台时检测重复 issue
+- scope: 评论 status 字段（pending/resolved/noted），scan 检查未消费评论
+- type: 脚本 + AI prompt
+- priority: P1
+
+### 核心逻辑
+
+```
+本地 comment 元数据:
+  {source: github, status: pending, platform_ids: {github: {comment_id: "12345"}}}
+
+AI 消费:
+  pending → 读取 → 判断 →
+    resolved: 已回复解答
+    noted: 仅记录
+    new_raw: 超出范围，开新 raw，push reply
+
+scan 检查:
+  有 status=pending 的 comment → incomplete: "unresolved_comments:N"
+```
+
+## C-20260428-1737-F: 门禁 raw→C→M→I 链（GATE 6.3）
+
+- status: proposed
+- scope: governance-merge-gate 验证 raw→C→M→I 完整身份链
+- type: 脚本
+- priority: P1
+
+### 核心逻辑
+
+```
+gate 检查:
+  1. 每个 promoted candidate 必须有对应 raw，raw_key 前缀匹配
+  2. I-* 的 promoted_from 指向 raw
+  3. raw 的 status=absorbed（如果所有 C 都已 promote）
+  4. raw 平台 issue 已关闭（如果已 promote 完毕）
+```
+
+## C-20260428-1737-G: 更新 three-loop 图
+
+- status: proposed
+- scope: three-loop-capability-lifecycle.md 补充 raw 入口、platform sync、promote、评论消费
+- type: 文档
 - priority: P2
-- milestone: M-20260306-workspace-routing-foundation
-
-### 核心改动
-
-1. scan_external 检查本地是否已有相同 raw
-2. 匹配条件：title 相似度
-3. 已有 → 补 platform_ids
-
-## C-20260428-1737-E: issue-sync comment 统一工具
-
-- status: proposed
-- scope: 完善 bin/issue-sync comment 命令
-- priority: P1
-- milestone: M-20260306-workspace-routing-foundation
-
-## C-20260428-1737-F: 门禁扩展 raw→C→M→I 链
-
-- status: proposed
-- scope: governance-merge-gate 新增 GATE 6.3：raw→I 身份链完整性
-- priority: P1
-- milestone: M-20260306-workspace-routing-foundation
-
-### 核心改动
-
-1. gate 检查：promoted candidate 必须有对应的 raw-* issue
-2. raw_key / candidate_key / issue_key 时间戳前缀匹配
-3. raw.absorbed_into 指向正确的 I-*
-4. I-*.promoted_from 指向正确的 raw
-
-## C-20260428-1737-G: Platform Pull（平台→本地扫描）
-
-- status: proposed
-- scope: issue-sync pull 实现拉取平台 issue + 评论到本地
-- priority: P2
-- milestone: M-20260306-workspace-routing-foundation
-
-### 核心改动
-
-1. 拉取 GitHub + Gitee open issues
-2. 按 platform_ids 去重
-3. 新建 raw-* 或合并到已有 issue
-4. 拉取评论，按 comment_id 去重
-5. 评论追加为本地 ### comment-{新ID}
-
-## C-20260428-1737-H: 四层防重实现
-
-- status: promoted
-- scope: 在 issue-sync 所有 push/pull 操作中实现防重
-- priority: P0
-- promoted_issue_path: pending://I-20260428-1737（合并到 C-3）
-
-## C-20260428-1737-I: 更新 three-loop 图
-
-- status: proposed
-- scope: three-loop-capability-lifecycle.md 补充 raw issue 入口、platform sync、promote 动作、平台 close 检查
-- priority: P0
-- milestone: M-20260306-workspace-routing-foundation
-
-## C-20260428-1737-J: ibm-framework.md 修正
-
-- status: proposed
-- scope: 示例 ID 改为 HHMM、补充 raw→C→I 链、评论规范
-- priority: P1
-- milestone: M-20260306-workspace-routing-foundation
-
-## C-20260428-1737-K: session-lifecycle-protocol.md 完善
-
-- status: proposed
-- scope: 补充 fork 设计、FORCE_FRESH 机制、session 恢复策略
-- priority: P2
-- milestone: M-20260306-workspace-routing-foundation

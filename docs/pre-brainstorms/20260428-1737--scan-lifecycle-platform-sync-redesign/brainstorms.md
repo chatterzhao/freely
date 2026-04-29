@@ -1,415 +1,177 @@
-# Brainstorm: Scan Lifecycle + Platform Sync 重新设计
+# Brainstorm: Issue 生命周期 + Scan + Platform Sync 完整设计
 
-## 问题背景
-
-当前 scan 和 sync 各自独立，存在 5 大缺陷：
-
-1. **无生命周期关联**：raw→I-* 同一个工作项，扫出两个 item，AI 自己判断
-2. **linked_issues 只扫评论**：phase_state 过期但无评论就不触发
-3. **平台状态不交叉**：GitHub/Gitee open/closed 和本地 phase_state 无关联
-4. **无统一 stage**：每个 scan 给碎片信息，AI 重新翻文档
-5. **next_action 为空**：scan 不推导下一步，AI 每次重新判断
-
-## 核心设计原则
-
-### 1. 时间戳即身份
+## 全局链路（脚本做的 vs AI 做的）
 
 ```
-raw-20260428-1737              ← 一个问题（父），无后缀
-  B1 预研发散收敛 →
-
-  C-20260428-1737-A → I-20260428-1737-A  ← 子任务 A
-  C-20260428-1737-B → I-20260428-1737-B  ← 子任务 B
-  C-20260428-1737-C → I-20260428-1737-C  ← 子任务 C
-
-B1 目录: 20260428-1737--xxx  ← 一个 raw 一个 B1 目录
+┌─ Phase 1: Raw 创建 ─────────────────────────────────────────────┐
+│                                                                    │
+│  来源 A: chat 插话                                                 │
+│    [脚本] freely chat --new-issue                                  │
+│    [脚本] _write_chat_to_issue → docs/issues/raw-YYYYMMDD-HHMM/   │
+│    [脚本] issue-sync create raw-xxx → GitHub + Gitee             │
+│    [脚本] issue-sync normalize → 确保平台有 kind/raw 标签          │
+│                                                                    │
+│  来源 B: 平台直接创建（人手动开 issue）                              │
+│    [脚本] issue-sync pull → 拉取平台 open issues                   │
+│    [脚本] 按 platform_ids 去重 → 无匹配则创建本地 raw               │
+│    [脚本] issue-sync normalize → 补 kind/raw 标签                 │
+│                                                                    │
+│  来源 C: runtime anomaly / review 发现                             │
+│    [脚本] 同来源 A（通过 chat 自动化）                              │
+└────────────────────────────────────────────────────────────────────┘
+        │
+        ▼
+┌─ Phase 2: B1 预研 ───────────────────────────────────────────────┐
+│                                                                    │
+│  [AI] 读取 raw issue，判断是否需要预研                              │
+│  [AI] 创建 docs/pre-brainstorms/YYYYMMDD-HHMM--slug/              │
+│  [AI] 写 brainstorms.md（发散→收敛→决策）                          │
+│  [AI] 写 candidates.md（一个或多个 C-YYYYMMDD-HHMM-A/B/C）         │
+│  [脚本] gate 检查 candidate_key.startswith(raw_key)               │
+│                                                                    │
+│  raw 状态变迁:                                                     │
+│    status: proposed → (预研中) → (candidate 产出)                  │
+└────────────────────────────────────────────────────────────────────┘
+        │
+        ▼
+┌─ Phase 3: Promote（raw → I-*）────────────────────────────────────┐
+│                                                                    │
+│  [AI] 决策 promote C-xxx-A → I-xxx-A                               │
+│  [脚本] issue-sync promote raw-xxx C-xxx-A → I-xxx-A              │
+│    ① 本地创建 I-xxx-A/issue.md                                    │
+│       kind=linked, promoted_from=raw-xxx, phase_state=in_b2_ibm    │
+│    ② 平台创建 I-xxx-A（带 kind/linked 标签）                       │
+│    ③ 回写 platform_ids 到本地 I-xxx-A                             │
+│                                                                    │
+│  所有 candidate 都 promote 完毕 →                                  │
+│  [脚本] raw close on platforms:                                    │
+│    ① 评论: "拆解为以下任务: [I-xxx-A](url) [I-xxx-B](url)"        │
+│    ② 关闭 raw issue（GitHub + Gitee）                              │
+│  [脚本] raw 本地: status=absorbed, absorbed_into 留空（多个子）    │
+│                                                                    │
+│  raw 关闭后 → 所有后续讨论在各自 I-* 下进行                        │
+└────────────────────────────────────────────────────────────────────┘
+        │
+        ▼
+┌─ Phase 4: B2 实现 ───────────────────────────────────────────────┐
+│                                                                    │
+│  [AI] worker 在 feature worktree 上开发                            │
+│  [AI] 更新 phase_state: in_b2_ibm → done_b2_ibm → in_dev           │
+│  [脚本] phase_state 变更时 issue-sync update I-xxx                 │
+│  [脚本] 更新平台 issue 的 phase 标签                               │
+│                                                                    │
+│  评论处理:                                                         │
+│  [脚本] issue-sync pull → 拉取平台评论 → 追加为本地 ### comment    │
+│  [AI] 读取未消费评论，判断:                                        │
+│    ├─ 回复解答 → [脚本] issue-sync comment push reply              │
+│    ├─ 超出范围 → [AI] chat --new-issue 开新 raw                   │
+│    ├─ 需要改 body → [AI] 修改 issue.md                            │
+│    └─ 仅记录 → [AI] 标记 status: noted                            │
+│  [AI] 标记评论 status: resolved / noted                            │
+│  [脚本] scan 检查: 有未消费评论 → incomplete                       │
+└────────────────────────────────────────────────────────────────────┘
+        │
+        ▼
+┌─ Phase 5: 验证 + 完成 ───────────────────────────────────────────┐
+│                                                                    │
+│  [AI] worker 完成验证: phase_state=in_verification → completed    │
+│  [脚本] merge-guarded hook:                                       │
+│    issue-sync update I-xxx（更新 phase label）                     │
+│    issue-sync close I-xxx（GitHub + Gitee CLOSED）                │
+│  [脚本] milestones.md 移到 completed_issues                        │
+│                                                                    │
+│  [脚本] scan lifecycle check:                                      │
+│    ALL: phase=completed + github closed + gitee closed            │
+│         + all comments resolved + no unsynced comments             │
+│    → 排除（已完成）                                                │
+│    任一未满足 → 输出 item, 列出具体未完成项                        │
+└────────────────────────────────────────────────────────────────────┘
 ```
 
-一个 raw 可以孵化多个 I-*（`-A`, `-B`, `-C` 后缀）。后缀在 C-* promote 时确定。
-raw 没有后缀（只有一个）。门禁通过 `startswith(raw_key)` 验证父子关系。
+## Scan 输出格式
 
-### 2. 一个 Item 一条命
-
-Scan 输出：每个工作项一个 item，包含完整生命周期定位。
+一个 raw→I 链条一个 JSON 对象。只输出未完成的。完成的不出现。
 
 ```json
 {
-  "item_id": "20260428-1737",       // 共享时间戳 key
-  "raw_id": "raw-20260428-1737",    // 可能为 null（平台直接创建的）
-  "linked_id": "I-20260428-1737", // 可能为 null（未 promote）
-  "lifecycle_stage": "B2_verifying",
-  "next_action": "关闭 Gitee issue IJFOXX",
-  "next_action_kind": "platform_close",
-  "ready_for_worker": true
+  "items": [
+    {
+      "key": "20260428-1737",
+      "raw_id": "raw-20260428-1737",
+      "stage": "promoting",
+      "children": [
+        {"linked_id": "I-20260428-1737-A", "phase_state": "in_dev", "platform_created": true},
+        {"linked_id": "I-20260428-1737-B", "phase_state": null, "platform_created": false}
+      ],
+      "incomplete": [
+        "child_I-20260428-1737-B_not_created_on_platform",
+        "raw_still_open_on_github"
+      ],
+      "next_action": "issue-sync promote C-B → I-B; 所有 promote 完毕后关闭 raw",
+      "ready": false
+    }
+  ]
 }
 ```
 
-### 3. 区分"状态未改"和"事情没做"
+## 评论生命周期
 
 ```
-情况 A：phase_state=completed, GitHub closed, Gitee OPEN
-  → 事情做了，平台没收口
-  → next_action: "issue-sync close gitee"
+[脚本] pull 平台评论 → 本地 ### comment-YYYYMMDDTHHMMSSZ
+  {source: <platform>, status: pending, platform_ids: {<plat>: {comment_id: "xxx"}}}
 
-情况 B：phase_state=in_verification, 无 code-review
-  → 真没做完
-  → next_action: "完成验证：补充 code-review"
+[AI] 读取 → 判断:
+  resolved: 已回复解答，无需进一步行动
+  noted: 已记录，不回复
+  new_raw: 超出范围 → chat --new-issue → [脚本] push reply "已开 raw-xxx 跟进"
+
+[脚本] scan: 有 status=pending 的评论 → incomplete: "unresolved_comments:N"
 ```
 
-## Raw 产生方式与同步脚本
-
-### 来源 A：本地 chat 插话
+## 平台分类（标签判別）
 
 ```
-freely chat --new-issue "修复 daemon 重启循环"
-  → cmd_intake_chat → _write_chat_to_issue
-  → 创建 docs/issues/raw-YYYYMMDD-HHMM/issue.md
-     kind=raw, status=proposed, platform_ids={}
+[脚本] issue-sync pull 拉取平台 issue:
 
-同步：
-  freely chat 内部调用 issue-sync create raw-xxx
-  → GitHub 创建 issue → 回写 platform_ids.github
-  → Gitee 创建 issue → 回写 platform_ids.gitee
-  → 本地 issue.md frontmatter 更新 platform_ids
+  if issue.labels 包含 "kind/linked" → I-*（freely 代码专属标签）
+  else → raw
+
+[脚本] issue-sync normalize:
+  for each platform issue without kind/* label:
+    add "kind/raw" label
+  never add/remove "kind/linked"（only issue-sync promote does that）
 ```
 
-### 来源 B：平台直接创建
+## 新问题处理
 
 ```
-GitHub/Gitee 上有人手动创建 issue
-  → issue-sync pull（定期或触发）
-  → 拉取平台 open issues，按 platform_ids 去重
-  → 本地无匹配 → 创建 docs/issues/raw-YYYYMMDD-HHMM/issue.md
-     kind=raw, status=proposed
-     platform_ids 预填（源平台已有 ID）
-  
-同步：
-  issue-sync pull 检测到新 issue
-  → 本地创建 raw
-  → issue-sync create 补推缺失平台（如 GitHub 有但 Gitee 无）
-  → 本地更新 platform_ids（补上另一个平台的 ID）
+插话 → [AI] 判断归属:
+  ├─ 属于已有 I-* scope → comment 到该 I-*
+  └─ 新问题 → chat --new-issue → 新 raw → 独立 B1 → 独立 I-*
+
+raw 关闭后不再重开。新问题 = 新 raw = 新时间戳 = 新生命周期。
 ```
 
-### 来源 C：runtime anomaly / review 发现
-
-```
-daemon auto-loop 检测到异常
-  → freely chat --new-issue（自动化）
-  → 路径同来源 A
-```
-
-### 来源 D：平台评论
-
-```
-GitHub/Gitee 上有人给已有 issue 写评论
-  → issue-sync pull
-  → 按 platform_ids.{platform}.issue_id 匹配本地 issue
-  → 按 comment_id 去重
-  → 新评论 → 追加为 ### comment-{新本地ID} 到 issue.md
-  → 元数据：{source: <platform>, platform_ids: {<platform>: {comment_id: "xxx"}}}
-
-同步（补齐另一平台）：
-  本地已有评论但只在一侧平台有 → issue-sync comment 推送到缺失平台
-```
-
-### 同步脚本总览
-
-```
-触发                       脚本                     方向       防重
-────────────────────────────────────────────────────────────────────
-freely chat --new-issue    issue-sync create         local→GH+GT  platform_ids
-issue-sync pull            拉取平台 issue+评论       GH+GT→local  platform_ids + comment_id
-candidate promoted         issue-sync promote        local→GH+GT  platform_ids
-phase_state 变更           issue-sync update         local→GH+GT  content hash
-chat --issue 评论          issue-sync comment        local→GH+GT  comment platform_ids
-merge to develop           merge-guarded hook        local→GH+GT  (同上 update + close)
-```
-
-## 完整生命周期（8 个 Stage）
-
-```
-Stage 1: Raw 创建
-  来源 A：chat 插话 → freely chat --new-issue
-  来源 B：平台直接创建 → issue-sync pull 拉取
-  来源 C：runtime anomaly → freely chat --new-issue（自动）
-  来源 D：平台评论 → issue-sync pull 拉取评论
-  产物：docs/issues/raw-YYYYMMDD-HHMM/issue.md
-        kind=raw, status=proposed
-        platform_ids: {}（来源 A/C）或 {github: #N}（来源 B）
-  
-Stage 2: B1 proposed
-  判定：raw 存在，无 B1 目录
-  next_action: "进入 B1 预研"
-
-Stage 3: B1 brainstorming
-  判定：B1 目录存在，brainstorms.md 存在
-  next_action: "产出 candidate"
-
-Stage 4: B1 candidate
-  判定：candidates.md 存在，candidate.status != terminal
-  next_action: "决策 promote/absorb/drop"
-
-Stage 5: Promote（B1→B2 过渡）
-  本地：
-    I-* 创建：docs/issues/I-YYYYMMDD-HHMM/issue.md
-      kind=linked, promoted_from=raw-YYYYMMDD-HHMM, phase_state=in_b2_ibm
-    raw 更新：status=absorbed, absorbed_into=I-YYYYMMDD-HHMM
-    milestones.md：I-* 进入 committed_issues
-  同步（issue-sync promote）：
-    ① issue-sync create I-* → GitHub + Gitee 创建 I-* issue → 回写 platform_ids
-    ② raw 评论迁移：raw 上的 chat 评论 → issue-sync comment 推送到 I-* 平台 issue
-    ③ issue-sync close raw → GitHub + Gitee 关闭 raw issue（body 加 "promoted to I-xxx"）
-    ④ raw issue 本地更新 platform_ids（如果之前未同步）
-  判定：I-* 存在，raw.absorbed_into=I-*, platform_ids 有值
-
-Stage 6: B2 implementation
-  判定：phase_state in (in_b2_ibm, done_b2_ibm, in_dev, blocked_dev)
-  next_action: "继续实现"
-
-Stage 7: B2 verification
-  判定：phase_state=in_verification
-  next_action: "完成验证，准备收口"
-
-Stage 8: Complete
-  本地：
-    phase_state=completed, status=completed
-    milestones.md：移到 completed_issues
-  同步（merge-guarded hook → issue-sync close）：
-    ① issue-sync update I-*（更新 phase label 为 completed）
-    ② issue-sync close I-* → GitHub + Gitee CLOSED
-  判定 ALL：
-    phase_state=completed ✓
-    GitHub I-* issue CLOSED ✓
-    Gitee I-* issue CLOSED ✓
-    所有本地 ### comment 有完整 platform_ids ✓
-    last_synced_comment_at >= 最新本地 comment 时间 ✓
-  缺少任一项 → Stage 7.5（收口中，next_action 精确指出缺什么）
-```
-
-## 平台评论链路
-
-```
-本地 issue.md → ## Comments → ### comment-YYYYMMDDTHHMMSSZ
-  {source: chat, platform_ids: {}}
-  "评论文本"
-
-    ↓ issue-sync comment
-
-平台创建真实评论：
-  GitHub: comment_id="12345"
-  Gitee: comment_id="67890"
-
-    ↓ 回写
-
-本地 issue.md 更新：
-  ### comment-YYYYMMDDTHHMMSSZ
-  {source: chat, platform_ids: {github: {comment_id: "12345"}, gitee: {comment_id: "67890"}}}
-  "评论文本"
-```
-
-关键规则：
-- 评论永远以本地 `### comment-{local_id}` 为主键
-- 平台 comment_id 是元数据，回写到 platform_ids
-- 评论不同步到 issue description（body），始终作为平台"评论"
-- Scan 通过 platform_ids 判断评论是否同步
-
-## 多平台去重
-
-当用户在 GitHub 和 Gitee 上同时有 issue：
-- scan_external 拉取时检查本地是否已有相同 raw
-- 匹配条件：title/content 相似度
-- 已有 → 只更新 platform_ids（补上缺失平台）
-- 无 → 创建新 raw
-
-## 与现有代码的关系
-
-| 模块 | 当前 | 重构后 |
-|------|------|--------|
-| task-source-scan.py | 8 个独立 scan 函数 | task-lifecycle-scan.py（统一） |
-| issue-sync | 只做了 create/close | 加 comment sync + sync 回写 |
-| 门禁 raw_key | 已有 | 强化 HHMM 格式校验 |
-| 平台拉取 | scan_external_* | 加去重 + 评论拉取 |
-
-## 门禁链：raw → C → M → I
-
-当前门禁验证 C → M → I（candidate → milestone → issue）。需要扩展为 **raw → C → M → I**。
-
-```
-raw-20260428-1737                raw_key → "20260428-1737"
-C-20260428-1737-A                candidate_key → "20260428-1737-A"
-I-20260428-1737-A                issue_key → "20260428-1737-A"
-
-门禁验证（startswith）：
-  candidate_key.startswith(raw_key)    → "20260428-1737-A" starts with "20260428-1737" ✓
-  issue_key == candidate_key（去前缀） → C-xxx-A 和 I-xxx-A 的后缀一致 ✓
-  milestones.md 中 issue 有 promoted_from 指向 raw ✓
-```
-
-新增 gate GATE 6.3：raw→I 身份链完整性。
-
-## 双向同步设计
-
-同步不依赖 AI——全部由脚本和 hook 驱动。
-
-### Push（本地 → 平台）
-
-```
-触发点                动作                         防重
-─────────────────────────────────────────────────────────
-chat --new-issue      issue-sync create raw-*      检查 platform_ids 是否已有
-candidate promoted    issue-sync promote raw→I     检查 I-* 是否已创建
-phase_state 变更       issue-sync update             检查 content hash 是否变化
-chat --issue 评论      issue-sync comment            检查 comment platform_ids 是否已有
-merge to develop      issue-sync close + update     merge-guarded hook 触发
-```
-
-推送后回写：
-- create → 回写 `platform_ids.{platform}.issue_id`
-- comment → 回写 `platform_ids.{platform}.comment_id` 到对应 ### comment 元数据
-- close → 更新 `updated_at`
-
-### Pull（平台 → 本地）
-
-```
-issue-sync pull：
-  1. 拉取 GitHub open issues
-  2. 拉取 Gitee open issues
-  3. 合并去重：
-     - 按 platform_ids 匹配本地已有 issue → 只更新状态
-     - 无匹配 → 创建 raw-YYYYMMDD-HHMM（仅 raw，不创建 I-*）
-     - I-* 格式标题的 issue → 仍当 raw 处理（平台不应有外部 I-*）
-  4. 拉取评论：
-     - 按 comment platform_id 匹配本地 ### comment
-     - 已有的 comment_id → 跳过
-     - 新的 comment_id → 追加为 ### comment-{新本地ID}
-```
-
-## 防重设计（四层）
-
-### 第 1 层：Issue 创建防重（平台侧）
-
-```
-push create 前：
-  if platform_ids.{platform}.issue_id 已存在 → SKIP
-  if .scan-state 中 synced_issues 有此 ID + hash 匹配 → SKIP
-
-push create 后：
-  回写 platform_ids 到本地 issue.md frontmatter
-  更新 .scan-state synced_issues hash
-```
-
-### 第 2 层：Issue 拉取防重（本地侧）
-
-```
-pull create 前：
-  if 本地已有 issue 的 platform_ids 包含此平台 issue → SKIP
-  if 本地已有同 title 的 raw → MERGE（补 platform_ids）
-  if 无匹配 → CREATE raw-YYYYMMDD-HHMM
-```
-
-### 第 3 层：评论推送防重（平台侧）
-
-```
-push comment 前：
-  if ### comment 的 platform_ids.{platform}.comment_id 存在 → SKIP
-  if last_synced_comment_at.{platform} >= comment 时间 → SKIP
-
-push comment 后：
-  回写 platform_ids.{platform}.comment_id 到 comment 元数据行
-  更新 last_synced_comment_at.{platform}
-```
-
-### 第 4 层：评论拉取防重（本地侧）
-
-```
-pull comment 前：
-  if 本地已有 ### comment 的 platform_ids 包含此 comment_id → SKIP
-  
-pull comment 后：
-  创建 ### comment-YYYYMMDDTHHMMSSZ（新本地 ID）
-  元数据：{source: <platform>, platform_ids: {<platform>: {comment_id: "xxx"}}}
-```
-
-## 评论规范
-
-```
-规则 1：评论永远不写到 issue description（body）
-  平台 issue body = 元数据表 + 摘要 + 链接
-  评论 = 平台原生"评论"功能
-
-规则 2：本地主键 = ### comment-YYYYMMDDTHHMMSSZ
-  本地 ID 在创建时立即生成，不依赖平台返回
-
-规则 3：平台 ID 是回写元数据
-  {platform_ids: {github: {comment_id: "12345"}, gitee: {comment_id: "67890"}}}
-```
-
-## 双平台对齐
-
-```
-保证两边一致的原则：
-  1. 本地是真相源，平台是镜像
-  2. push 同时推到两个平台（对称）
-  3. pull 从两个平台拉取，合并到本地
-  4. 合并逻辑：
-     - 同一 issue 在两个平台都有 → platform_ids 包含两边 ID
-     - 一边有评论另一边没有 → push 补齐缺失平台的评论
-     - 两边都有同一评论 → 按 comment_id 去重（不重复创建本地 comment）
-```
-
-## 平台保护
-
-```
-规则：
-  - 平台上只允许 raw-* 类型的外部创建（人类/其他系统）
-  - I-* 类型 issue 只能由 freely 的 issue-sync promote 创建
-  - pull 时检测到 I-* 格式标题 → 视为 raw 处理（当作外部误操作）
-  - 禁止在平台上手动创建 I-* 格式的 issue
-```
-
-## 平台 Issue 分类与自动修正
-
-### 问题
-
-Freely 内部严格规范标题格式（`raw-YYYYMMDD-HHMM` / `I-YYYYMMDD-HHMM-A`）。
-但平台上人类手工创建的 issue 标题不可控——有人写 "修复 bug"，有人写 "Feature: xxx"。
-不能依赖标题格式来判断 raw vs I-*。
-
-### 方案：标签为主要判断依据
-
-```
-平台 issue 分类逻辑：
-
-  1. 有 kind/linked 标签？ → I-*（可靠，freely 代码专属，人不会加这个标签）
-  2. 无 kind/linked 标签？ → raw（管它标题长什么样）
-```
-
-`kind/linked` 标签只在 `issue-sync promote` 时由 freely 代码添加——这是可靠的区分标记。
-
-### 自动修正
-
-`issue-sync pull` 或 `issue-sync normalize` 对不规范 raw 自动修正：
-
-```
-for each platform issue classified as raw:
-  if 无 kind/raw 标签 → 添加 kind/raw 标签
-  if 标题格式不规范 → 不改标题（保留原始标题溯源）
-  if 无 kind/raw 且内容明显是 bug report / feature request → 加对应标签
-```
-
-不修改 `kind/linked` 标签——那是 freely 代码的专属标记，脚本也不应增删。
-
-### Scan 影响
-
-```
-task-lifecycle-scan 拉取平台 issue：
-  按 kind/linked 标签过滤 I-*
-  其余全部按 raw 处理
-  本地 raw 目录的 issue.md 同步记录 platform_ids 和标签状态
-```
-
-1. HHMM 格式：是否强制新 ID 必须用 HHMM？（建议：是，历史不管）
-2. B1 目录格式：`YYYYMMDD-HHMM--slug` vs `YYYYMMDD-0000--slug`？（建议：统一 HHMM）
-3. 多平台去重：用 title 相似度还是 hash？（建议：title 模糊匹配 + 人工确认）
-4. 平台→本地扫描：是否实现拉取平台评论到本地？（建议：需要，作为独立任务）
-5. 门禁扩展 raw→C→M→I：是否需要新增 GATE？（建议：需要，作为独立候选）
+## AI 做 vs 脚本做
+
+| 环节 | AI | 脚本 |
+|------|-----|------|
+| raw 创建 | 判断是否新开 | create + sync to platforms |
+| B1 预研 | 发散收敛、写 brainstorms/candidates | gate 验证 ID 链 |
+| promote | 决策 promote/absorb/drop | issue-sync promote（创建+关闭+评论） |
+| 评论消费 | 读评论、判断回复/开新 raw | pull + push comment + 回写 ID |
+| 实现 | 写代码、改文档 | issue-sync update phase/close |
+| scan | 消费 scan 结果做路由判断 | 扫描所有源、输出 incomplete items |
+| normalize | 无 | 补平台标签、去重 |
+
+## 待实现候选
+
+| ID | 内容 | 类型 | 优先级 |
+|----|------|------|--------|
+| C-1 | task-lifecycle-scan.py（统一 scan） | 脚本 | P0 |
+| C-2 | 修复 ID 格式（HHMM + 后缀） | 脚本+文档 | P0 |
+| C-3 | issue-sync promote 完整流程 | 脚本 | P0 |
+| C-4 | issue-sync pull + normalize | 脚本 | P1 |
+| C-5 | 评论消费状态（pending/resolved/noted） | 脚本+AI | P1 |
+| C-6 | 门禁 raw→C→M→I 链 | 脚本 | P1 |
+| C-7 | 更新 three-loop 图 | 文档 | P2 |
