@@ -2914,8 +2914,14 @@ valid_supervisor_pid_for_project() {
   local project="$1" pid="$2"
   [[ -n "$pid" ]] || return 1
   kill -0 "$pid" 2>/dev/null || return 1
-  supervisor_identity_matches_project_pid "$project" "$pid" || return 1
-  pid_matches_project "$pid" "$project" ""
+  # Process command line is the primary identity check. The identity file
+  # (supervisor.env) may be stale from a previous restart — process matching
+  # always reflects the current reality.
+  if pid_matches_project "$pid" "$project" ""; then
+    return 0
+  fi
+  # Fallback: try the identity file (more strict, used when process cmd is ambiguous)
+  supervisor_identity_matches_project_pid "$project" "$pid" 2>/dev/null
 }
 
 valid_discovered_supervisor_pid_for_project() {
