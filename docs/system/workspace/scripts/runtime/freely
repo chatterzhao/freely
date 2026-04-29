@@ -11521,10 +11521,31 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   printf '%s\n' "$launched_count"
 }
 
-# _ai_shows_liveness: check multiple signals to determine if AI is genuinely active.
+# _ai_shows_liveness: adapter-aware AI liveness check.
+# direct mode: check debug log mtime + process state (PID-based).
+# acp mode:    same signals work for current ACP client (run-acp-prompt.py exits when done).
+#              Future persistent ACP: replace with ACP session heartbeat.
 # Returns 0 (active) if any signal shows recent work; 1 (inactive) otherwise.
 _ai_shows_liveness() {
   local project="$1" ai_pid="$2" cycle_log="$3" threshold_secs="${4:-90}"
+  local adapter="${AI_TOOL_ADAPTER:-direct}"
+
+  case "$adapter" in
+    acp)
+      # ACP mode: client process (run-acp-prompt.py) still has PID + debug log.
+      # Future: when ACP sessions become persistent across cycles, replace
+      # PID check with ACP session/heartbeat check.
+      _ai_shows_liveness_pid_signals "$ai_pid" "$cycle_log" "$threshold_secs"
+      ;;
+    *)
+      _ai_shows_liveness_pid_signals "$ai_pid" "$cycle_log" "$threshold_secs"
+      ;;
+  esac
+}
+
+# _ai_shows_liveness_pid_signals: PID-based liveness check (works for direct + current ACP client).
+_ai_shows_liveness_pid_signals() {
+  local ai_pid="$1" cycle_log="$2" threshold_secs="${3:-90}"
   local now debug_log debug_mtime
   now="$(date +%s)"
 
