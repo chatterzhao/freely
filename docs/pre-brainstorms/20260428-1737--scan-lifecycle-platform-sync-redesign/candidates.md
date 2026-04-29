@@ -70,3 +70,46 @@
 - scope: 完善 bin/issue-sync comment 命令
 - priority: P1
 - milestone: M-20260306-workspace-routing-foundation
+
+## C-20260428-1737-F: 门禁扩展 raw→C→M→I 链
+
+- status: proposed
+- scope: governance-merge-gate 新增 GATE 6.3：raw→I 身份链完整性
+- priority: P1
+- milestone: M-20260306-workspace-routing-foundation
+
+### 核心改动
+
+1. gate 检查：promoted candidate 必须有对应的 raw-* issue
+2. raw_key / candidate_key / issue_key 时间戳前缀匹配
+3. raw.absorbed_into 指向正确的 I-*
+4. I-*.promoted_from 指向正确的 raw
+
+## C-20260428-1737-G: Platform Pull（平台→本地扫描）
+
+- status: proposed
+- scope: issue-sync pull 实现拉取平台 issue + 评论到本地
+- priority: P2
+- milestone: M-20260306-workspace-routing-foundation
+
+### 核心改动
+
+1. 拉取 GitHub + Gitee open issues
+2. 按 platform_ids 去重
+3. 新建 raw-* 或合并到已有 issue
+4. 拉取评论，按 comment_id 去重
+5. 评论追加为本地 ### comment-{新ID}
+
+## C-20260428-1737-H: 四层防重实现
+
+- status: proposed
+- scope: 在 issue-sync 所有 push/pull 操作中实现防重
+- priority: P0（跟随 C-A 实现）
+- milestone: M-20260306-workspace-routing-foundation
+
+### 四层
+
+1. Issue 创建防重（push）：platform_ids 检查 + content hash
+2. Issue 拉取防重（pull）：platform_ids 匹配 + title 合并
+3. 评论推送防重（push）：comment platform_ids 检查 + 时间戳
+4. 评论拉取防重（pull）：comment_id 匹配
