@@ -17957,6 +17957,9 @@ cmd_start() {
   fi
   append_runtime_event "$project" "user_start_precheck_clear" \
     "force=$force"
+  # Clear old supervisor identity so the new one can write fresh.
+  # Old identity has stale PID → watchdog rejects new supervisor.
+  rm -f "$(supervisor_identity_dir_for_project "$project")/supervisor.env" 2>/dev/null || true
   start_project_runtime "$project" "foreground"
 }
 
