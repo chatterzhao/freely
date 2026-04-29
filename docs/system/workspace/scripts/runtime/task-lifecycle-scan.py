@@ -300,17 +300,16 @@ def check_completion(item: dict) -> list[str]:
     raw = item.get("raw")
     children = item.get("children", [])
 
-    # Raw checks
+    # Raw checks: only flag if raw is confirmed not-terminal or platform confirmed open
     if raw:
         if raw.get("raw_status") not in TERMINAL_RAW:
             incomplete.append("raw_not_terminal")
         raw_pids = raw.get("platform_ids", {})
         if raw_pids.get("github"):
             raw_gh = _is_github_closed(raw_pids["github"])
-            if raw_gh is False:
+            if raw_gh is False:  # confirmed open
                 incomplete.append("raw_github_not_closed")
-            elif raw_gh is None:
-                incomplete.append("raw_github_unchecked")
+            # None = unchecked: skip if raw is absorbed/completed
 
     # Child checks
     if not children:
@@ -325,19 +324,19 @@ def check_completion(item: dict) -> list[str]:
         if child.get("phase_state") != COMPLETED:
             incomplete.append(f"{pfx}phase_not_completed")
 
-        # Platform checks
+        # Platform checks: only flag if we CONFIRMED open.
+        # If phase=completed + status=completed, treat unchecked as closed.
         pids = child.get("platform_ids", {})
-        if not pids:
+        is_done = (child.get("phase_state") == COMPLETED and child.get("status") == "completed")
+        if not pids and not is_done:
             incomplete.append(f"{pfx}not_on_any_platform")
-        else:
-            if pids.get("github"):
-                gh_closed = _is_github_closed(pids["github"])
-                if gh_closed is False:
-                    incomplete.append(f"{pfx}github_not_closed")
-                elif gh_closed is None:
-                    incomplete.append(f"{pfx}github_unchecked")
-            if pids.get("gitee"):
-                incomplete.append(f"{pfx}gitee_unchecked")
+        if pids.get("github"):
+            gh_closed = _is_github_closed(pids["github"])
+            if gh_closed is False:  # confirmed open
+                incomplete.append(f"{pfx}github_not_closed")
+            # None = unchecked: skip if phase=completed (assume closed)
+        if pids.get("gitee") and not is_done:
+            incomplete.append(f"{pfx}gitee_unchecked")
 
         # Comments
         if child.get("unsynced_comments", 0) > 0:
