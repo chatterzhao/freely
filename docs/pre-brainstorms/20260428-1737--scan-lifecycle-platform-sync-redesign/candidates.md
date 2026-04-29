@@ -102,14 +102,28 @@
 
 ## C-20260428-1737-H: 四层防重实现
 
-- status: proposed
+- status: promoted
 - scope: 在 issue-sync 所有 push/pull 操作中实现防重
-- priority: P0（跟随 C-A 实现）
+- priority: P0
+- promoted_issue_path: pending://I-20260428-1737（合并到 C-3）
+
+## C-20260428-1737-I: 更新 three-loop 图
+
+- status: proposed
+- scope: three-loop-capability-lifecycle.md 补充 raw issue 入口、platform sync、promote 动作、平台 close 检查
+- priority: P0
 - milestone: M-20260306-workspace-routing-foundation
 
-### 四层
+## C-20260428-1737-J: ibm-framework.md 修正
 
-1. Issue 创建防重（push）：platform_ids 检查 + content hash
-2. Issue 拉取防重（pull）：platform_ids 匹配 + title 合并
-3. 评论推送防重（push）：comment platform_ids 检查 + 时间戳
-4. 评论拉取防重（pull）：comment_id 匹配
+- status: proposed
+- scope: 示例 ID 改为 HHMM、补充 raw→C→I 链、评论规范
+- priority: P1
+- milestone: M-20260306-workspace-routing-foundation
+
+## C-20260428-1737-K: session-lifecycle-protocol.md 完善
+
+- status: proposed
+- scope: 补充 fork 设计、FORCE_FRESH 机制、session 恢复策略
+- priority: P2
+- milestone: M-20260306-workspace-routing-foundation
