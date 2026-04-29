@@ -3308,7 +3308,6 @@ _persist_session_anchor_early() {
     local anchor_tmp
     anchor_tmp="$(mktemp "${state_file}.anchor.XXXXXX")"
     cat >"$anchor_tmp" <<STATEEOF
-LAST_TOOL_SESSION_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
 LAST_TOOL_RESUME_TARGET="${anchor_resume_target}"
 LAST_LAUNCH_KIND="${mode_name:-resume}"
 SESSION_PARENT_ID="${SESSION_PARENT_ID:-}"
@@ -3321,7 +3320,7 @@ STATEEOF
         [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
         # Don't overwrite anchor fields — those are authoritative from this function.
         case "$key" in
-          LAST_TOOL_SESSION_ID|LAST_TOOL_RESUME_TARGET|LAST_LAUNCH_KIND|SESSION_PARENT_ID|FORCE_FRESH) ;;
+          LAST_TOOL_RESUME_TARGET|LAST_LAUNCH_KIND|SESSION_PARENT_ID|FORCE_FRESH) ;;
           *) printf '%s=%s\n' "$key" "$value" >> "$anchor_tmp" ;;
         esac
       done < "$state_file"
