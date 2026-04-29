@@ -152,6 +152,7 @@ chat 插话 / 平台扫描
 
 - raw-* 只存在于 B1 阶段。一旦 promote 为 I-*，raw 的 `status` 变为 `absorbed`，`absorbed_into` 指向 I-*
 - I-* 是 B2 阶段的唯一 issue 标识。后续所有 chat、comment、状态变更都发生在 I-* 上
+- **ID 格式**：`raw-YYYYMMDD-HHMM` / `C-YYYYMMDD-HHMM` / `I-YYYYMMDD-HHMM`。三个阶段共享同一时间戳，HHMM 是创建时间（不是序列号 0000）。门禁通过时间戳完全匹配验证 raw→C→I 身份链
 - `chat --issue raw-xxx` 会自动检测 `status=absorbed`，路由到 `absorbed_into` 指向的 I-*
 - I-* 采用自包含摘要 + 链接模式：平台 body 包含足够上下文，深水区讨论链接到 B1 产物
 
@@ -190,7 +191,7 @@ chat 插话 / 平台扫描
 
 | 要素 | raw-* | I-* |
 |------|-------|-----|
-| 标题 | `[RAW-20260428-0542] <title>` | `[I-20260426-0000-A] <title>` |
+| 标题 | `[RAW-20260428-0542] <title>` | `[I-20260426-1423] <title>` |
 | 标签 | `kind/raw`, `phase/proposed` | `kind/linked`, `phase/<phase_state>` |
 | body | 元数据表 + issue 正文 | 元数据表 + Pre-Brainstorm Summary + Scope + References |
 
@@ -229,7 +230,7 @@ body 结构（I-*）：
 
 ```markdown
 ---
-local_id: I-20260426-0000-A
+local_id: I-20260426-1423
 issue_title: "Add opencode direct launcher and AI_TOOL alias resolution"
 kind: linked
 status: completed
