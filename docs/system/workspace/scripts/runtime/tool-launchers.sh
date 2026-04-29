@@ -283,6 +283,39 @@ _resolve_tool_family() {
   printf '%s\n' "$tool"
 }
 
+# _apply_tool_alias_settings: resolve alias, extract --settings path, export env vars.
+# For ACP mode, this is how per-alias settings (e.g. cc-ds-flash-auto) are applied.
+_apply_tool_alias_settings() {
+  local tool="$1"
+  local resolved alias_path
+  # Only resolve if not a known binary name
+  case "$tool" in
+    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) return 0 ;;
+  esac
+  resolved=$(${SHELL:-bash} -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
+  [[ -n "$resolved" ]] || return 0
+  # Extract --settings <path> from the alias
+  alias_path=$(echo "$resolved" | sed -n 's/.*--settings \([^ ]*\).*/\1/p')
+  [[ -n "$alias_path" ]] || return 0
+  # Expand ~ to $HOME
+  alias_path="${alias_path/#\~/$HOME}"
+  [[ -f "$alias_path" ]] || return 0
+  # Read env vars from settings JSON and export them
+  while IFS='=' read -r key value; do
+    [[ -n "$key" ]] || continue
+    export "$key"="$value"
+  done < <(python3 -c "
+import json, sys
+try:
+    with open('$alias_path') as f:
+        d = json.load(f)
+    env = d.get('env', {})
+    for k, v in env.items():
+        print(f'{k}={v}')
+except: pass
+" 2>/dev/null)
+}
+
 tool_has_capability() {
   local capabilities="$1" capability="$2"
   [[ -n "$capability" ]] || return 1
@@ -651,6 +684,10 @@ tool_run_acp_from_prompt_file() {
   local debug_log_file="${14:-}"
   local claude_session_id="${15:-}"
   local tool_resume_target="${16:-}"
+
+  # Apply per-alias settings env vars (e.g. cc-ds-flash-auto → Flash model)
+  # Must be called BEFORE alias resolution to extract --settings from the alias.
+  _apply_tool_alias_settings "$tool"
 
   # Resolve alias (cc-ds-flash-auto → claude) before per-tool dispatch
   tool="$(_resolve_tool_family "$tool")"
