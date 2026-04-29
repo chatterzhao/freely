@@ -2750,8 +2750,10 @@ pid_matches_project() {
   if process_inspection_available; then
     cmd="$(ps -p "$pid" -o command= 2>/dev/null || true)"
     if [[ -n "$cmd" ]]; then
-      if [[ -n "$expected" ]] && [[ "$cmd" != *"$expected"* ]]; then
-        return 1
+      # Pattern check is advisory: exec -a names may not appear in ps output
+      # on some platforms (macOS). The authoritative check is --project path match.
+      if [[ -n "$expected" ]] && [[ "$cmd" == *"$expected"* ]]; then
+        return 0
       fi
       candidate_paths="$(awk '
         {
