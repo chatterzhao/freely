@@ -11687,6 +11687,35 @@ _ensure_acp_bridge_running() {
     return 1
   fi
 
+  # Apply per-alias settings env vars BEFORE starting bridge so
+  # claude-agent-acp inherits the correct API key, model, base URL.
+  # Same logic as _apply_tool_alias_settings in tool-launchers.sh
+  local tool_name="${AI_TOOL:-claude}"
+  case "$tool_name" in
+    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) ;;
+    *)
+      local resolved; resolved=$(${SHELL:-bash} -ic "alias '$tool_name' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool_name}='\\(.*\\)'$/\\1/p")
+      if [[ -n "$resolved" ]]; then
+        local alias_path; alias_path=$(echo "$resolved" | sed -n 's/.*--settings \([^ ]*\).*/\1/p')
+        alias_path="${alias_path/#\~/$HOME}"
+        if [[ -n "$alias_path" && -f "$alias_path" ]]; then
+          while IFS='=' read -r key value; do
+            [[ -n "$key" ]] || continue
+            export "$key"="$value"
+          done < <(python3 -c "
+import json
+try:
+    with open('$alias_path') as f:
+        d = json.load(f)
+    for k, v in d.get('env', {}).items():
+        print(f'{k}={v}')
+except: pass
+" 2>/dev/null)
+        fi
+      fi
+      ;;
+  esac
+
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
   local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
   python3 "$bridge_script" start --project "$project" --foreground </dev/null >>"$bridge_log" 2>&1 &
