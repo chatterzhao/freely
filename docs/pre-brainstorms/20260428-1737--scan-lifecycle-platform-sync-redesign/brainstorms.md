@@ -51,14 +51,86 @@ Scan 输出：每个工作项一个 item，包含完整生命周期定位。
   → next_action: "完成验证：补充 code-review"
 ```
 
+## Raw 产生方式与同步脚本
+
+### 来源 A：本地 chat 插话
+
+```
+freely chat --new-issue "修复 daemon 重启循环"
+  → cmd_intake_chat → _write_chat_to_issue
+  → 创建 docs/issues/raw-YYYYMMDD-HHMM/issue.md
+     kind=raw, status=proposed, platform_ids={}
+
+同步：
+  freely chat 内部调用 issue-sync create raw-xxx
+  → GitHub 创建 issue → 回写 platform_ids.github
+  → Gitee 创建 issue → 回写 platform_ids.gitee
+  → 本地 issue.md frontmatter 更新 platform_ids
+```
+
+### 来源 B：平台直接创建
+
+```
+GitHub/Gitee 上有人手动创建 issue
+  → issue-sync pull（定期或触发）
+  → 拉取平台 open issues，按 platform_ids 去重
+  → 本地无匹配 → 创建 docs/issues/raw-YYYYMMDD-HHMM/issue.md
+     kind=raw, status=proposed
+     platform_ids 预填（源平台已有 ID）
+  
+同步：
+  issue-sync pull 检测到新 issue
+  → 本地创建 raw
+  → issue-sync create 补推缺失平台（如 GitHub 有但 Gitee 无）
+  → 本地更新 platform_ids（补上另一个平台的 ID）
+```
+
+### 来源 C：runtime anomaly / review 发现
+
+```
+daemon auto-loop 检测到异常
+  → freely chat --new-issue（自动化）
+  → 路径同来源 A
+```
+
+### 来源 D：平台评论
+
+```
+GitHub/Gitee 上有人给已有 issue 写评论
+  → issue-sync pull
+  → 按 platform_ids.{platform}.issue_id 匹配本地 issue
+  → 按 comment_id 去重
+  → 新评论 → 追加为 ### comment-{新本地ID} 到 issue.md
+  → 元数据：{source: <platform>, platform_ids: {<platform>: {comment_id: "xxx"}}}
+
+同步（补齐另一平台）：
+  本地已有评论但只在一侧平台有 → issue-sync comment 推送到缺失平台
+```
+
+### 同步脚本总览
+
+```
+触发                       脚本                     方向       防重
+────────────────────────────────────────────────────────────────────
+freely chat --new-issue    issue-sync create         local→GH+GT  platform_ids
+issue-sync pull            拉取平台 issue+评论       GH+GT→local  platform_ids + comment_id
+candidate promoted         issue-sync promote        local→GH+GT  platform_ids
+phase_state 变更           issue-sync update         local→GH+GT  content hash
+chat --issue 评论          issue-sync comment        local→GH+GT  comment platform_ids
+merge to develop           merge-guarded hook        local→GH+GT  (同上 update + close)
+```
+
 ## 完整生命周期（8 个 Stage）
 
 ```
 Stage 1: Raw 创建
-  来源：chat 插话 / 平台 issue / runtime anomaly
+  来源 A：chat 插话 → freely chat --new-issue
+  来源 B：平台直接创建 → issue-sync pull 拉取
+  来源 C：runtime anomaly → freely chat --new-issue（自动）
+  来源 D：平台评论 → issue-sync pull 拉取评论
   产物：docs/issues/raw-YYYYMMDD-HHMM/issue.md
         kind=raw, status=proposed
-  判定：raw issue 存在
+        platform_ids: {}（来源 A/C）或 {github: #N}（来源 B）
   
 Stage 2: B1 proposed
   判定：raw 存在，无 B1 目录
@@ -73,9 +145,17 @@ Stage 4: B1 candidate
   next_action: "决策 promote/absorb/drop"
 
 Stage 5: Promote（B1→B2 过渡）
-  本地：I-* 创建，raw.absorbed_into=I-*, milestones.md 更新
-  平台：I-* issue 创建，raw issue 关闭，评论 sync
-  判定：I-* 存在，platform_ids 有值
+  本地：
+    I-* 创建：docs/issues/I-YYYYMMDD-HHMM-A/issue.md
+      kind=linked, promoted_from=raw-YYYYMMDD-HHMM, phase_state=in_b2_ibm
+    raw 更新：status=absorbed, absorbed_into=I-YYYYMMDD-HHMM-A
+    milestones.md：I-* 进入 committed_issues
+  同步（issue-sync promote）：
+    ① issue-sync create I-* → GitHub + Gitee 创建 I-* issue → 回写 platform_ids
+    ② raw 评论迁移：raw 上的 chat 评论 → issue-sync comment 推送到 I-* 平台 issue
+    ③ issue-sync close raw → GitHub + Gitee 关闭 raw issue（body 加 "promoted to I-xxx"）
+    ④ raw issue 本地更新 platform_ids（如果之前未同步）
+  判定：I-* 存在，raw.absorbed_into=I-*, platform_ids 有值
 
 Stage 6: B2 implementation
   判定：phase_state in (in_b2_ibm, done_b2_ibm, in_dev, blocked_dev)
@@ -86,12 +166,19 @@ Stage 7: B2 verification
   next_action: "完成验证，准备收口"
 
 Stage 8: Complete
+  本地：
+    phase_state=completed, status=completed
+    milestones.md：移到 completed_issues
+  同步（merge-guarded hook → issue-sync close）：
+    ① issue-sync update I-*（更新 phase label 为 completed）
+    ② issue-sync close I-* → GitHub + Gitee CLOSED
   判定 ALL：
     phase_state=completed ✓
     GitHub I-* issue CLOSED ✓
     Gitee I-* issue CLOSED ✓
-    所有本地评论有 platform_ids ✓
-  缺少任一项 → Stage 7.5（收口中）
+    所有本地 ### comment 有完整 platform_ids ✓
+    last_synced_comment_at >= 最新本地 comment 时间 ✓
+  缺少任一项 → Stage 7.5（收口中，next_action 精确指出缺什么）
 ```
 
 ## 平台评论链路
