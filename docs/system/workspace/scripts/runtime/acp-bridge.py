@@ -282,7 +282,18 @@ def handle_client(conn, bridge):
                 req_id = request.get("id", 0)
 
                 if "id" not in request:
-                    # Notification — forward to server, no response needed
+                    # Client notification — forward to server without waiting for response
+                    with bridge.server_lock:
+                        bridge.server_proc.stdin.write(line + "\n")
+                        bridge.server_proc.stdin.flush()
+                    continue
+
+                # Client-to-server RESPONSE (has id + result/error, no method):
+                # Forward directly to server stdin without waiting for a server response.
+                if "method" not in request and ("result" in request or "error" in request):
+                    with bridge.server_lock:
+                        bridge.server_proc.stdin.write(line + "\n")
+                        bridge.server_proc.stdin.flush()
                     continue
 
                 # initialize is connection-level; bridge already did it. Reply from cache.
