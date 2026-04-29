@@ -217,6 +217,7 @@ tool_default_adapter() {
 
 tool_supported_adapters() {
   local tool="$1"
+  tool="$(_resolve_tool_family "$tool")"
   case "$tool" in
     codex)
       printf 'direct\nacp\n'
@@ -238,6 +239,7 @@ tool_adapter_is_supported() {
 
 tool_supported_launch_kinds_for_adapter() {
   local tool="$1" adapter="$2"
+  tool="$(_resolve_tool_family "$tool")"
   case "$tool:$adapter" in
     codex:acp)
       # codex-acp does not yet support resume; fork = fresh + parent context
