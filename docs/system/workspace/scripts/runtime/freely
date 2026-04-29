@@ -17091,11 +17091,20 @@ stop_project_runtime() {
       clear_manager_worker_launch_state_for_fresh_restart "$project"
     fi
   fi
-  rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
+  # Preserve session state and ACP bridge on restart so next launch
+  # can session/resume with cache hits instead of reprocessing from scratch.
+  case "$stop_reason" in
+    operator_restart|global_restart)
+      # Keep session state and bridge alive for resume
+      ;;
+    *)
+      rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
+      if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+        _stop_acp_bridge "$project"
+      fi
+      ;;
+  esac
   rm -f "$stop_marker"
-  if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-    _stop_acp_bridge "$project"
-  fi
   write_workcell_state "$project" "stopped" "down" "down" "$stop_reason"
   if [[ "$stop_lock_acquired" == "1" ]]; then
     release_project_start_lock_for_runtime "$project"
