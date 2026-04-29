@@ -2,6 +2,8 @@
 local_id: I-20260319-1715
 kind: linked
 status: completed
+phase_state: completed
+completed_at: "2026-04-29"
 platform_ids:
   github:
     issue_id: "23"
