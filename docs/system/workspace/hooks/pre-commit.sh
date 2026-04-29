@@ -1,6 +1,69 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ── Secret detection gate ──────────────────────────────────────
+# Scans staged files for API keys, tokens, and credentials before commit.
+# Patterns: Anthropic/OpenAI/DeepSeek keys, generic high-entropy tokens.
+_scan_staged_for_secrets() {
+  local staged_files found=0
+  staged_files=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null || true)
+  [[ -n "$staged_files" ]] || return 0
+
+  # Patterns that indicate secrets
+  local patterns=(
+    'sk-[a-zA-Z0-9]{32,}'           # Anthropic/OpenAI/DeepSeek API keys
+    'sk-[a-zA-Z0-9_-]{32,}'         # Alternative key format
+    'ANTHROPIC_AUTH_TOKEN[[:space:]]*=[[:space:]]*[^[:space:]]{20,}'  # env var
+    'DEEPSEEK_API_KEY[[:space:]]*=[[:space:]]*[^[:space:]]{20,}'
+    'OPENAI_API_KEY[[:space:]]*=[[:space:]]*[^[:space:]]{20,}'
+    'api_key[[:space:]]*=[[:space:]]*["'"'"']?[a-zA-Z0-9_-]{20,}'  # generic
+    'secret[[:space:]]*=[[:space:]]*["'"'"']?[a-zA-Z0-9_-]{20,}'
+  )
+
+  while IFS= read -r file; do
+    [[ -n "$file" ]] || continue
+    [[ -f "$file" ]] || continue
+    # Skip binary files and generated files
+    case "$file" in
+      *.png|*.jpg|*.gif|*.ico|*.woff*|*.ttf|*.eot|*.lock|*.sum) continue ;;
+    esac
+    for pattern in "${patterns[@]}"; do
+      if grep -qE "$pattern" "$file" 2>/dev/null; then
+        echo "[SECURITY] Possible secret detected in: $file"
+        echo "  Pattern matched: $pattern"
+        found=1
+      fi
+    done
+  done <<< "$staged_files"
+
+  if [[ "$found" -eq 1 ]]; then
+    cat <<'MSG'
+
+┌─────────────────────────────────────────────────────────────┐
+│  COMMIT BLOCKED: Possible secrets detected in staged files  │
+│                                                             │
+│  API keys, tokens, and credentials must NOT be committed.   │
+│  Remove secrets and use environment variables or .gitignore │
+│  protected config files instead.                             │
+│                                                             │
+│  If this is a false positive, use:                          │
+│    git commit --no-verify                                   │
+└─────────────────────────────────────────────────────────────┘
+MSG
+    return 1
+  fi
+
+  # Also check for .claude/settings.json specifically
+  if echo "$staged_files" | grep -q '.claude/settings.json'; then
+    echo "[SECURITY] .claude/settings.json may contain API keys and is gitignored"
+    return 1
+  fi
+
+  return 0
+}
+
+_scan_staged_for_secrets || exit 1
+
 [[ -f "./bin/worktree-common.sh" ]] || exit 0
 # shellcheck disable=SC1091
 source ./bin/worktree-common.sh

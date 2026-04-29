@@ -69,3 +69,5 @@ temp/
 .vscode/
 .idea/
 __pycache__/
+.claude/settings.json
+.claude/settings.local.json
