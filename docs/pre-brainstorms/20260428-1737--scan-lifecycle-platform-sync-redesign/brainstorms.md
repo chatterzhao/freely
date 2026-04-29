@@ -29,8 +29,12 @@
 │  [AI] 写 candidates.md（一个或多个 C-YYYYMMDD-HHMM-A/B/C）         │
 │  [脚本] gate 检查 candidate_key.startswith(raw_key)               │
 │                                                                    │
-│  raw 状态变迁:                                                     │
-│    status: proposed → (预研中) → (candidate 产出)                  │
+│  raw 状态变迁（scan 通过文件存在性推导，不依赖单一状态字段）:       │
+│    status=proposed + 无 B1 目录 → B1_proposed                       │
+│    status=proposed + 有 B1 目录 → B1_brainstorming                  │
+│    status=proposed + 有 candidates.md → B1_candidate                │
+│    status=promoting + 部分 I-* 已创建 → promoting                   │
+│    status=absorbed + 全部 I-* 创建 + raw 平台关闭 → 完成            │
 └────────────────────────────────────────────────────────────────────┘
         │
         ▼
@@ -47,9 +51,19 @@
 │  [脚本] raw close on platforms:                                    │
 │    ① 评论: "拆解为以下任务: [I-xxx-A](url) [I-xxx-B](url)"        │
 │    ② 关闭 raw issue（GitHub + Gitee）                              │
-│  [脚本] raw 本地: status=absorbed, absorbed_into 留空（多个子）    │
+│  [脚本] raw 本地更新:                                              │
+│    status=absorbed                                                 │
+│    promoted_children: ["I-xxx-A", "I-xxx-B"]  ← 多个子的列表       │
+│    absorbed_into 留空（1:N 关系，不用单字段）                       │
 │                                                                    │
-│  raw 关闭后 → 所有后续讨论在各自 I-* 下进行                        │
+│  注意：promote 是逐个进行的，不要求全部同时。                       │
+│  每个 candidate promote 后就创建对应 I-*。                          │
+│  每次 promote 后更新 raw frontmatter:                               │
+│    promoted_children: ["I-xxx-A"] → ["I-xxx-A", "I-xxx-B"]         │
+│  最后一个 promote 完成时触发 raw close。                            │
+│  如果只 promote 了部分 → raw 保持 open → scan 显示 "promoting"     │
+│                                                                    │
+│  raw 关闭后 → 所有后续讨论在各自 I-* 下进行                         │
 └────────────────────────────────────────────────────────────────────┘
         │
         ▼
@@ -62,13 +76,16 @@
 │                                                                    │
 │  评论处理:                                                         │
 │  [脚本] issue-sync pull → 拉取平台评论 → 追加为本地 ### comment    │
-│  [AI] 读取未消费评论，判断:                                        │
-│    ├─ 回复解答 → [脚本] issue-sync comment push reply              │
-│    ├─ 超出范围 → [AI] chat --new-issue 开新 raw                   │
-│    ├─ 需要改 body → [AI] 修改 issue.md                            │
+│    元数据: {source: <plat>, status: pending, platform_ids: {...}}  │
+│  [AI] 读取 status=pending 的评论，判断:                             │
+│    ├─ 回复解答 → 本地写 reply → [脚本] issue-sync comment push     │
+│    │   → 回写 reply 的 platform_ids                                │
+│    ├─ 超出范围 → [AI] chat --new-issue 开新 raw                    │
+│    │   → [脚本] push reply "已开 raw-xxx 跟进"                     │
+│    ├─ 需要改 body → [AI] 修改 issue.md → [脚本] issue-sync update │
 │    └─ 仅记录 → [AI] 标记 status: noted                            │
-│  [AI] 标记评论 status: resolved / noted                            │
-│  [脚本] scan 检查: 有未消费评论 → incomplete                       │
+│  [AI] 标记原评论 status: resolved / noted                          │
+│  [脚本] scan: 有 status=pending 的评论 → incomplete                │
 └────────────────────────────────────────────────────────────────────┘
         │
         ▼
@@ -152,6 +169,25 @@
 raw 关闭后不再重开。新问题 = 新 raw = 新时间戳 = 新生命周期。
 ```
 
+## 同步触发点总览
+
+```
+生命周期事件                  sync 动作                  防重机制
+──────────────────────────────────────────────────────────────────
+chat --new-issue             issue-sync create raw      platform_ids 检查
+issue-sync pull 发现新平台 issue  本地创建 raw + normalize   platform_ids 匹配
+candidate promote（逐个）     issue-sync promote single   I-* platform_ids 检查
+最后一个 candidate promote   raw close + closing comment  raw platform_ids 检查
+phase_state 变更             issue-sync update           content hash 比对
+chat --issue 评论            issue-sync comment          comment platform_ids
+merge to develop（hook）     issue-sync update + close   merge diff 中的 issue 列表
+AI 回复评论                  issue-sync comment push     同上
+AI 修改 issue body           issue-sync update           同上
+issue-sync pull 发现新评论   追加本地 ### comment         comment platform_id 去重
+```
+
+所有 sync 由脚本/ hook 触发，不依赖 AI 判断。
+
 ## AI 做 vs 脚本做
 
 | 环节 | AI | 脚本 |
@@ -166,12 +202,14 @@ raw 关闭后不再重开。新问题 = 新 raw = 新时间戳 = 新生命周期
 
 ## 待实现候选
 
+详见 candidates.md。7 个 candidate（C-A ~ C-G），P0-P2 优先级。
+
 | ID | 内容 | 类型 | 优先级 |
 |----|------|------|--------|
-| C-1 | task-lifecycle-scan.py（统一 scan） | 脚本 | P0 |
-| C-2 | 修复 ID 格式（HHMM + 后缀） | 脚本+文档 | P0 |
-| C-3 | issue-sync promote 完整流程 | 脚本 | P0 |
-| C-4 | issue-sync pull + normalize | 脚本 | P1 |
-| C-5 | 评论消费状态（pending/resolved/noted） | 脚本+AI | P1 |
-| C-6 | 门禁 raw→C→M→I 链 | 脚本 | P1 |
-| C-7 | 更新 three-loop 图 | 文档 | P2 |
+| C-A | task-lifecycle-scan.py（统一 scan） | 脚本 | P0 |
+| C-B | 修复 ID 格式（HHMM + 后缀） | 脚本+文档 | P0 |
+| C-C | issue-sync promote 完整流程 | 脚本 | P0 |
+| C-D | issue-sync pull + normalize | 脚本 | P1 |
+| C-E | 评论消费状态（pending/resolved/noted） | 脚本+AI prompt | P1 |
+| C-F | 门禁 raw→C→M→I 链（GATE 6.3） | 脚本 | P1 |
+| C-G | 更新 three-loop 图 | 文档 | P2 |
