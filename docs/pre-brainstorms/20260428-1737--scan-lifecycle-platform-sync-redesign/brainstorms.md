@@ -15,13 +15,14 @@
 ### 1. 时间戳即身份
 
 ```
-raw-20260428-1737         ← HHMM 时间格式
-B1 dir: 20260428-1737--xxx  ← 复用 raw 的时间戳
-I-20260428-1737-A           ← 复用 raw 的时间戳，加 split letter
+raw-20260428-1737          ← raw issue
+C-20260428-1737             ← candidate（相同时间戳）
+I-20260428-1737             ← linked issue（相同时间戳）
 
-同一个工作项三个阶段共享同一时间戳。
-门禁通过 raw_key/issue_key/candidate_key 的 startswith 验证身份链。
+B1 目录: 20260428-1737--xxx ← 复用时间戳
 ```
+
+三个阶段共享同一个 `YYYYMMDD-HHMM` 时间戳。HHMM 天然唯一，不需要序列号或后缀字母。门禁通过 `raw_key/issue_key/candidate_key` 的字符串相等验证身份链（不是 startswith，是完全匹配）。
 
 ### 2. 一个 Item 一条命
 
@@ -31,7 +32,7 @@ Scan 输出：每个工作项一个 item，包含完整生命周期定位。
 {
   "item_id": "20260428-1737",       // 共享时间戳 key
   "raw_id": "raw-20260428-1737",    // 可能为 null（平台直接创建的）
-  "linked_id": "I-20260428-1737-A", // 可能为 null（未 promote）
+  "linked_id": "I-20260428-1737", // 可能为 null（未 promote）
   "lifecycle_stage": "B2_verifying",
   "next_action": "关闭 Gitee issue IJFOXX",
   "next_action_kind": "platform_close",
@@ -146,9 +147,9 @@ Stage 4: B1 candidate
 
 Stage 5: Promote（B1→B2 过渡）
   本地：
-    I-* 创建：docs/issues/I-YYYYMMDD-HHMM-A/issue.md
+    I-* 创建：docs/issues/I-YYYYMMDD-HHMM/issue.md
       kind=linked, promoted_from=raw-YYYYMMDD-HHMM, phase_state=in_b2_ibm
-    raw 更新：status=absorbed, absorbed_into=I-YYYYMMDD-HHMM-A
+    raw 更新：status=absorbed, absorbed_into=I-YYYYMMDD-HHMM
     milestones.md：I-* 进入 committed_issues
   同步（issue-sync promote）：
     ① issue-sync create I-* → GitHub + Gitee 创建 I-* issue → 回写 platform_ids
@@ -231,12 +232,11 @@ Stage 8: Complete
 
 ```
 raw-20260428-1737          raw_key → "20260428-1737"
-C-20260428-1737-A           candidate_key → "20260428-1737-A"
-I-20260428-1737-A           issue_key → "20260428-1737-A"
+C-20260428-1737             candidate_key → "20260428-1737"
+I-20260428-1737             issue_key → "20260428-1737"
 
-门禁验证：
-  candidate_key.startswith(raw_key)      → "20260428-1737-A" starts with "20260428-1737" ✓
-  issue_key.startswith(raw_key)          → same check ✓
+门禁验证（完全匹配，不是 startswith）：
+  raw_key == candidate_key == issue_key  → "20260428-1737" == "20260428-1737" ✓
   milestones.md 中 issue 有 promoted_from 指向 raw ✓
   raw issue 的 absorbed_into 指向 I-*  ✓
 ```

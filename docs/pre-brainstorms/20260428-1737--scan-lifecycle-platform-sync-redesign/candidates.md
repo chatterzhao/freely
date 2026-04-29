@@ -9,7 +9,7 @@
 
 ### 核心改动
 
-1. 时间戳即身份：raw-YYYYMMDD-HHMM → I-YYYYMMDD-HHMM-A，B1 目录 YYYYMMDD-HHMM--slug
+1. 时间戳即身份：raw-YYYYMMDD-HHMM → I-YYYYMMDD-HHMM，B1 目录 YYYYMMDD-HHMM--slug
 2. 8 阶段生命周期：B1_proposed → brainstorming → candidate → promoted → B2_active → verifying → 收口 → completed
 3. 平台状态交叉：本地 phase_state + GitHub/Gitee open/closed → 综合判定
 4. 评论同步检查：本地 comment → platform_ids 是否完整
