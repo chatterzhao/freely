@@ -11687,9 +11687,6 @@ _ensure_acp_bridge_running() {
     return 1
   fi
 
-  # Kill orphaned claude-agent-acp processes from previous bridge instances
-  pkill -f "claude-agent-acp" 2>/dev/null || true
-
   python3 "$bridge_script" start --project "$project" >/dev/null 2>&1 || {
     log_warn "failed to start ACP bridge"
     return 1
