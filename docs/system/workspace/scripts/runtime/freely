@@ -14418,13 +14418,18 @@ select_launch_kind() {
   # resume when a previous session ID exists, since resume gives cache hits.
   if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
     # Fork: worker inherits parent session context (same as direct mode).
-    # Fork: SESSION_PARENT_ID set (from manager delegation) and no own session yet.
-    # Prevent re-fork loop: if previous launch was already fork, fall through to fresh.
-    if [[ -n "${SESSION_PARENT_ID:-}" && -z "${CLAUDE_SESSION_ID_CURRENT:-}" && "${LAST_LAUNCH_KIND:-}" != "fork" ]]; then
-      LAUNCH_KIND_SELECTED="fork"
-      LAUNCH_ROTATION_REASON="worker_fork_from_parent_acp"
-      LAST_TOOL_RESUME_TARGET="${SESSION_PARENT_ID:-}"
-      return 0
+    # Fork: only for workers with a real parent session (SESSION_PARENT_ID set
+    # by manager delegation), no own session yet, and no previous launch done.
+    # Manager always skips fork — it has no parent.
+    if [[ -n "${SESSION_PARENT_ID:-}" && -z "${CLAUDE_SESSION_ID_CURRENT:-}" \
+          && "${LAST_LAUNCH_KIND:-}" != "fork" && -z "${LAST_LAUNCH_KIND:-}" ]]; then
+      local role; role="$(role_hint_for_project "$project")"
+      if [[ "$role" == "worker" ]]; then
+        LAUNCH_KIND_SELECTED="fork"
+        LAUNCH_ROTATION_REASON="worker_fork_from_parent_acp"
+        LAST_TOOL_RESUME_TARGET="${SESSION_PARENT_ID:-}"
+        return 0
+      fi
     fi
     if [[ -n "${LAST_TOOL_SESSION_ID:-}" || -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
       LAUNCH_KIND_SELECTED="resume"
