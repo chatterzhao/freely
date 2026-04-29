@@ -1,4 +1,23 @@
 #!/usr/bin/env bash
+# tool-launchers.sh: AI tool abstraction layer — per-tool launch syntax and adapter routing.
+#
+# Responsibilities:
+#   - Per-tool direct CLI launch syntax (claude, codex, kiro-cli, iflow, opencode)
+#   - Per-tool ACP launch syntax (claude-agent-acp, codex-acp via run-acp-prompt.py)
+#   - Adapter dispatch: direct vs acp (DEPRECATED(direct): to be removed when ACP stable)
+#   - Session state mapping: fresh → new, resume → resume, fork → new+context
+#   - Tool capability/feature detection (codex-cli, slot switching, MCP)
+#   - Network proxy resolution for each tool
+#
+# Direct mode (DEPRECATED):  monitor-ai-cli.sh calls tool_run_from_prompt_file → exec tool CLI
+# ACP mode (primary):        monitor-ai-acp.sh calls tool_run_from_prompt_file → exec run-acp-prompt.py
+#
+# Entry points used by monitors:
+#   tool_run_from_prompt_file <project> <tool> <adapter> <model> ... <launch_kind>
+#   tool_run_direct_from_prompt_file  (direct mode, DEPRECATED)
+#   tool_run_acp_from_prompt_file     (ACP native)
+#   tool_supported_adapters <tool>
+#   tool_supported_launch_kinds_for_adapter <tool> <adapter>
 
 _tool_launchers_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
@@ -221,9 +240,15 @@ tool_supported_launch_kinds_for_adapter() {
   local tool="$1" adapter="$2"
   case "$tool:$adapter" in
     codex:acp)
-      printf 'fresh\nfresh_with_handoff\n'
+      # codex-acp does not yet support resume; fork = fresh + parent context
+      printf 'fresh\nfork\nfresh_with_handoff\n'
+      ;;
+    *:acp)
+      # ACP native: all three session states supported
+      printf 'fresh\nresume\nfork\nfresh_with_handoff\n'
       ;;
     *)
+      # direct mode (DEPRECATED: will be removed when ACP is stable)
       printf 'fresh\nresume\nfresh_with_handoff\n'
       ;;
   esac
@@ -374,6 +399,8 @@ Freely runtime policy:
 EOF
 }
 
+# DEPRECATED(direct): direct mode will be removed once ACP is stable.
+# Only maintain for tools without ACP support (kiro-cli, iflow, opencode).
 tool_run_direct_from_prompt_file() {
   local project="$1"
   local tool="$2"
@@ -623,21 +650,28 @@ tool_run_acp_from_prompt_file() {
   local claude_session_id="${15:-}"
   local tool_resume_target="${16:-}"
 
+  local bridge_socket="${project}/.freely/run/acp-bridge.sock"
+
   case "$tool" in
     codex)
-      local codex_acp_bin
       [[ -f "$RUNTIME_ACP_PROMPT_CLIENT" ]] || {
         echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
         return 1
       }
+      local codex_acp_bin
       codex_acp_bin="$(ensure_codex_acp_binary_for_launch)" || return 1
+      # codex-acp bridge socket (separate from claude bridge)
+      local codex_bridge_socket="${project}/.freely/run/acp-codex-bridge.sock"
       freely_apply_project_network_proxy_env "$project"
       exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" \
-        --agent "$codex_acp_bin" \
+        --bridge-socket "$codex_bridge_socket" \
         --cwd "$project" \
         --prompt-file "$prompt_file" \
         --mode "$mode" \
         --model "$model" \
+        --launch-kind "$launch_kind" \
+        --session-id "${claude_session_id:-}" \
+        ${tool_resume_target:+--resume "$tool_resume_target"} \
         --reasoning-effort "$reasoning_effort"
       ;;
     claude|cc|cc-use-codex-cli)
@@ -645,20 +679,30 @@ tool_run_acp_from_prompt_file() {
         echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
         return 1
       }
-      local claude_acp_bin
-      claude_acp_bin="${FREELY_CLAUDE_ACP_BIN:-claude-agent-acp}"
-      if ! command -v "$claude_acp_bin" >/dev/null 2>&1; then
-        echo "[ERROR] claude-agent-acp not found. Install: npm install -g @agentclientprotocol/claude-agent-acp" >&2
-        return 1
-      fi
       freely_apply_project_network_proxy_env "$project"
-      local -a acp_args=(--agent "$claude_acp_bin" --cwd "$project" --prompt-file "$prompt_file" --mode "$mode" --model "$model" --reasoning-effort "$reasoning_effort")
-      # ACP session management: session/resume for resume, session/new for fresh
-      if [[ "$launch_kind" == "resume" && -n "$tool_resume_target" ]]; then
-        acp_args+=(--resume "$tool_resume_target")
-      elif [[ -n "$claude_session_id" ]]; then
-        acp_args+=(--session-id "$claude_session_id")
-      fi
+      local -a acp_args=(
+        --bridge-socket "$bridge_socket"
+        --cwd "$project"
+        --prompt-file "$prompt_file"
+        --mode "$mode"
+        --model "$model"
+        --launch-kind "$launch_kind"
+        --reasoning-effort "$reasoning_effort"
+      )
+      # Session management based on launch kind
+      case "$launch_kind" in
+        resume)
+          [[ -n "$tool_resume_target" ]] && acp_args+=(--resume "$tool_resume_target")
+          ;;
+        fork)
+          # Fork: worker gets own session, inherits parent context via prompt.
+          # Pass parent session ID as resume target for context reference.
+          [[ -n "$tool_resume_target" ]] && acp_args+=(--resume "$tool_resume_target")
+          ;;
+        fresh|fresh_with_handoff)
+          [[ -n "$claude_session_id" ]] && acp_args+=(--session-id "$claude_session_id")
+          ;;
+      esac
       exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" "${acp_args[@]}"
       ;;
     *)

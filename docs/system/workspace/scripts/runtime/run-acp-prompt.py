@@ -1,22 +1,55 @@
 #!/usr/bin/env python3
+"""run-acp-prompt.py: ACP JSON-RPC client for one-shot prompt execution.
+
+Two transport modes:
+  --bridge-socket <path>  Connect to persistent acp-bridge (server already running).
+                          Bridge keeps claude-agent-acp alive across cycles.
+  (default)               Spawn claude-agent-acp as subprocess, kill on exit.
+                          DEPRECATED: use bridge mode for persistent sessions.
+
+Session states (--launch-kind):
+  fresh   → session/new
+  resume  → session/resume <resume_target>
+  fork    → session/new (worker gets own session, context from prompt)
+"""
+
 import argparse
 import json
+import os
+import socket
 import subprocess
 import sys
 import threading
+from abc import ABC, abstractmethod
 from pathlib import Path
 
 
-class ACPClient:
-    def __init__(self, agent_cmd, mode):
-        self.mode = mode
-        self._next_id = 1
-        self._pending = {}
-        self._pending_lock = threading.Lock()
-        self._write_lock = threading.Lock()
-        self._stdout_done = threading.Event()
-        self._stderr_done = threading.Event()
-        self._stderr_lines = []
+# ── Transport abstraction ───────────────────────────────────────────
+
+class Transport(ABC):
+    """Abstract bidirectional JSON-RPC transport."""
+
+    @abstractmethod
+    def send(self, line: str) -> None:
+        """Send a newline-terminated JSON line."""
+
+    @abstractmethod
+    def recv(self) -> str:
+        """Receive a newline-terminated JSON line (blocking)."""
+
+    @abstractmethod
+    def close(self) -> None:
+        """Close transport. Bridge mode: disconnect only. Subprocess mode: kill server."""
+
+    @abstractmethod
+    def running(self) -> bool:
+        """Whether transport is still viable."""
+
+
+class SubprocessTransport(Transport):
+    """Spawn claude-agent-acp as subprocess. DEPRECATED: use SocketTransport."""
+
+    def __init__(self, agent_cmd):
         self.proc = subprocess.Popen(
             agent_cmd,
             stdin=subprocess.PIPE,
@@ -25,18 +58,101 @@ class ACPClient:
             text=True,
             bufsize=1,
         )
-        if self.proc.stdin is None or self.proc.stdout is None or self.proc.stderr is None:
+        if self.proc.stdin is None or self.proc.stdout is None:
             raise RuntimeError("failed to start ACP agent with piped stdio")
-        self._stdout_thread = threading.Thread(target=self._read_stdout, daemon=True)
+        # Stderr relay thread
+        self._stderr_lines = []
+        self._stderr_done = threading.Event()
         self._stderr_thread = threading.Thread(target=self._read_stderr, daemon=True)
-        self._stdout_thread.start()
         self._stderr_thread.start()
+
+    def send(self, line: str) -> None:
+        self.proc.stdin.write(line + "\n")
+        self.proc.stdin.flush()
+
+    def recv(self) -> str:
+        while True:
+            line = self.proc.stdout.readline()
+            if not line:
+                raise EOFError("ACP agent stdout closed")
+            return line.rstrip("\n")
+
+    def running(self) -> bool:
+        return self.proc.poll() is None
+
+    def close(self) -> None:
+        try:
+            if self.proc.stdin:
+                self.proc.stdin.close()
+        except OSError:
+            pass
+        if self.proc.poll() is None:
+            self.proc.terminate()
+            try:
+                self.proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                self.proc.kill()
+                self.proc.wait(timeout=5)
+        self._stderr_done.wait(timeout=1)
+
+    def _read_stderr(self):
+        try:
+            for raw_line in self.proc.stderr:
+                self._stderr_lines.append(raw_line)
+                sys.stderr.write(raw_line)
+                sys.stderr.flush()
+        finally:
+            self._stderr_done.set()
+
+
+class SocketTransport(Transport):
+    """Connect to persistent acp-bridge via Unix socket. Bridge keeps server alive."""
+
+    def __init__(self, socket_path):
+        if not os.path.exists(socket_path):
+            raise RuntimeError(f"bridge socket not found: {socket_path}")
+        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.sock.settimeout(900)  # match session/prompt timeout
+        self.sock.connect(socket_path)
+        self._file = self.sock.makefile("r", buffering=1)
+        self._write_lock = threading.Lock()
+
+    def send(self, line: str) -> None:
+        with self._write_lock:
+            self.sock.sendall((line + "\n").encode())
+
+    def recv(self) -> str:
+        line = self._file.readline()
+        if not line:
+            raise EOFError("bridge socket closed")
+        return line.rstrip("\n")
+
+    def running(self) -> bool:
+        return True  # socket stays open until explicit close
+
+    def close(self) -> None:
+        try:
+            self.sock.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+        self.sock.close()
+
+
+# ── ACP client ──────────────────────────────────────────────────────
+
+class ACPClient:
+    def __init__(self, transport: Transport, mode: str = "auto"):
+        self.transport = transport
+        self.mode = mode
+        self._next_id = 1
+        self._pending = {}
+        self._pending_lock = threading.Lock()
+        self._recv_thread = threading.Thread(target=self._recv_loop, daemon=True)
+        self._recv_thread.start()
 
     def _send(self, message):
         payload = json.dumps(message, separators=(",", ":"))
-        with self._write_lock:
-            self.proc.stdin.write(payload + "\n")
-            self.proc.stdin.flush()
+        self.transport.send(payload)
 
     def _respond(self, request_id, *, result=None, error=None):
         response = {"jsonrpc": "2.0", "id": request_id}
@@ -71,29 +187,23 @@ class ACPClient:
             raise RuntimeError(f"ACP {method} failed: {json.dumps(response['error'])}")
         return response.get("result", {})
 
-    def _read_stdout(self):
+    def _recv_loop(self):
         try:
-            for raw_line in self.proc.stdout:
-                line = raw_line.strip()
-                if not line:
+            while self.transport.running():
+                try:
+                    raw_line = self.transport.recv()
+                except EOFError:
+                    break
+                if not raw_line:
                     continue
                 try:
-                    message = json.loads(line)
+                    message = json.loads(raw_line)
                 except json.JSONDecodeError:
-                    print(f"[WARN] non-JSON ACP output: {line}", file=sys.stderr, flush=True)
+                    print(f"[WARN] non-JSON output: {raw_line[:200]}", file=sys.stderr, flush=True)
                     continue
                 self._handle_message(message)
-        finally:
-            self._stdout_done.set()
-
-    def _read_stderr(self):
-        try:
-            for raw_line in self.proc.stderr:
-                self._stderr_lines.append(raw_line)
-                sys.stderr.write(raw_line)
-                sys.stderr.flush()
-        finally:
-            self._stderr_done.set()
+        except Exception:
+            pass
 
     def _handle_message(self, message):
         if "id" in message and ("result" in message or "error" in message):
@@ -164,32 +274,24 @@ class ACPClient:
         self._respond(request_id, result={"outcome": {"outcome": "cancelled"}})
 
     def close(self):
-        try:
-            if self.proc.stdin:
-                self.proc.stdin.close()
-        except OSError:
-            pass
-        if self.proc.poll() is None:
-            self.proc.terminate()
-            try:
-                self.proc.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                self.proc.kill()
-                self.proc.wait(timeout=5)
-        self._stdout_done.wait(timeout=1)
-        self._stderr_done.wait(timeout=1)
+        self.transport.close()
 
+
+# ── CLI ─────────────────────────────────────────────────────────────
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run a one-shot ACP prompt against an agent.")
-    parser.add_argument("--agent", required=True, help="ACP agent executable")
+    parser.add_argument("--agent", default="", help="ACP agent executable (subprocess mode)")
+    parser.add_argument("--bridge-socket", default="", help="Unix socket path for persistent acp-bridge")
     parser.add_argument("--cwd", required=True, help="Session cwd")
     parser.add_argument("--prompt-file", required=True, help="Prompt file path")
     parser.add_argument("--mode", choices=("auto", "step"), default="auto")
     parser.add_argument("--model", default="", help="Preferred model id when supported")
     parser.add_argument("--reasoning-effort", default="", help="Reasoning effort hint")
     parser.add_argument("--session-id", default="", help="Desired session UUID for new sessions")
-    parser.add_argument("--resume", default="", help="Session ID to resume (session/load)")
+    parser.add_argument("--resume", default="", help="Session ID to resume via session/resume")
+    parser.add_argument("--launch-kind", choices=("fresh", "resume", "fork"), default="fresh",
+                        help="Session lifecycle state")
     return parser.parse_args()
 
 
@@ -197,84 +299,112 @@ def main():
     args = parse_args()
     prompt_path = Path(args.prompt_file)
     prompt_text = prompt_path.read_text(encoding="utf-8")
-    agent_cmd = [args.agent]
+    cwd = str(Path(args.cwd))
 
-    client = ACPClient(agent_cmd=agent_cmd, mode=args.mode)
+    # ── Transport selection ──────────────────────────────────────
+    if args.bridge_socket:
+        transport = SocketTransport(args.bridge_socket)
+    elif args.agent:
+        agent_cmd = [args.agent]
+        transport = SubprocessTransport(agent_cmd)
+    else:
+        print("[ERROR] must specify --bridge-socket or --agent", file=sys.stderr, flush=True)
+        sys.exit(1)
+
+    client = ACPClient(transport=transport, mode=args.mode)
     try:
-        init_result = client.request(
+        # Handshake
+        client.request(
             "initialize",
             {
                 "protocolVersion": 1,
-                "clientInfo": {"name": "freely", "title": "Freely ACP bridge", "version": "0.1"},
+                "clientInfo": {"name": "freely", "title": "Freely ACP", "version": "0.2"},
                 "clientCapabilities": {"loadSession": True, "resumeSession": True},
             },
+            timeout=30,
         )
 
-        # Resume existing session or create new one.
-        # session/resume: continues session without replaying history (cheaper).
-        # session/load: replays full history (use when worker needs full context).
-        if args.resume:
-            session_result = client.request(
-                "session/resume",
-                {
-                    "sessionId": args.resume,
-                    "cwd": str(Path(args.cwd)),
-                    "mcpServers": [],
-                },
-            )
-            session_id = session_result["sessionId"]
-            print(f"session id: {session_id} (resumed)", flush=True)
-        else:
-            new_params = {
-                "cwd": str(Path(args.cwd)),
-                "mcpServers": [],
-            }
+        # ── Session management (fresh | resume | fork) ──────────
+        launch_kind = args.launch_kind
+        resume_target = args.resume
+
+        if launch_kind == "resume" and resume_target:
+            # Resume existing session → cache hit.
+            # If session was lost (bridge restart), fall back to session/new.
+            try:
+                session_result = client.request(
+                    "session/resume",
+                    {"sessionId": resume_target, "cwd": cwd, "mcpServers": []},
+                    timeout=30,
+                )
+                session_id = session_result["sessionId"]
+                print(f"session id: {session_id} (resumed)", flush=True)
+            except Exception as e:
+                print(f"[WARN] session/resume failed ({e}), falling back to session/new", file=sys.stderr, flush=True)
+                new_params = {"cwd": cwd, "mcpServers": []}
+                if args.session_id:
+                    new_params["sessionId"] = args.session_id
+                session_result = client.request("session/new", new_params, timeout=30)
+                session_id = session_result["sessionId"]
+                print(f"session id: {session_id} (fresh after resume failure)", flush=True)
+
+        elif launch_kind == "fork":
+            # Worker forks from parent: gets own session, inherits context via prompt.
+            # Using session/new is safe — avoids sharing parent session across workers.
+            new_params = {"cwd": cwd, "mcpServers": []}
             if args.session_id:
                 new_params["sessionId"] = args.session_id
-            session_result = client.request("session/new", new_params)
+            session_result = client.request("session/new", new_params, timeout=30)
+            session_id = session_result["sessionId"]
+            if resume_target:
+                print(f"session id: {session_id} (fork from {resume_target})", flush=True)
+            else:
+                print(f"session id: {session_id} (fork)", flush=True)
+
+        else:
+            # fresh launch
+            new_params = {"cwd": cwd, "mcpServers": []}
+            if args.session_id:
+                new_params["sessionId"] = args.session_id
+            session_result = client.request("session/new", new_params, timeout=30)
             session_id = session_result["sessionId"]
             print(f"session id: {session_id}", flush=True)
 
+        # Model selection
         if args.reasoning_effort:
             print(
-                f"[WARN] ACP fresh-path prototype does not map reasoning_effort='{args.reasoning_effort}' yet",
-                file=sys.stderr,
-                flush=True,
+                f"[WARN] ACP reasoning_effort='{args.reasoning_effort}' not mapped yet",
+                file=sys.stderr, flush=True,
             )
 
         if args.model:
-            models_state = session_result.get("models") or init_result.get("models")
-            available_models = []
-            if isinstance(models_state, dict):
-                available_models = models_state.get("availableModels") or []
-            if any(model_info.get("modelId") == args.model for model_info in available_models):
+            models_state = session_result.get("models") or {}
+            available_models = models_state.get("availableModels") or []
+            if any(m.get("modelId") == args.model for m in available_models):
                 client.request(
                     "session/set_model",
-                    {
-                        "sessionId": session_id,
-                        "modelId": args.model,
-                    },
+                    {"sessionId": session_id, "modelId": args.model},
+                    timeout=10,
                 )
             else:
                 print(
-                    f"[WARN] ACP agent did not advertise requested model '{args.model}'; continuing with agent default",
-                    file=sys.stderr,
-                    flush=True,
+                    f"[WARN] model '{args.model}' not advertised; using agent default",
+                    file=sys.stderr, flush=True,
                 )
 
+        # Send prompt
         prompt_result = client.request(
             "session/prompt",
-            {
-                "sessionId": session_id,
-                "prompt": [{"type": "text", "text": prompt_text}],
-            },
+            {"sessionId": session_id, "prompt": [{"type": "text", "text": prompt_text}]},
             timeout=900,
         )
-        if prompt_result.get("stopReason") != "end_turn":
+        stop_reason = prompt_result.get("stopReason", "unknown")
+        print(f"stop_reason={stop_reason}", flush=True)
+
+        if stop_reason != "end_turn":
             print(
-                f"\n[WARN] ACP prompt finished with stopReason={prompt_result.get('stopReason')}",
-                file=sys.stderr,
-                flush=True,
+                f"[WARN] ACP prompt finished with stopReason={stop_reason}",
+                file=sys.stderr, flush=True,
             )
     finally:
         client.close()

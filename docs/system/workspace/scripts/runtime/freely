@@ -1,5 +1,21 @@
 # file-size: skip (legacy 20K line monolith, split pending)
 #!/usr/bin/env bash
+# freely: AI-native project runtime — daemon, supervisor, and lifecycle orchestrator.
+#
+# Responsibilities:
+#   - Daemon control plane: start/stop/status/restart project runtimes
+#   - Supervisor loop: builds prompts, selects launch kind, spawns AI cycles
+#   - AI lifecycle: dispatch to monitor-ai-cli.sh (direct) or monitor-ai-acp.sh (ACP)
+#   - Session management: fresh/resume/fork strategy, SESSION_PARENT_ID for workers
+#   - Stall detection: adapter-aware liveness check (_ai_shows_liveness)
+#   - ACP bridge lifecycle: _ensure_acp_bridge_running / _stop_acp_bridge
+#   - Workcell state machine: running/stopped/degraded + exit contracts
+#   - Issue lifecycle: scan, promote, finalize, platform sync
+#   - Rate limit + circuit breaker: slot switching, restart storm detection
+#
+# Adapter dispatch (AI_TOOL_ADAPTER):
+#   direct → monitor-ai-cli.sh (DEPRECATED: PID-based, to be removed)
+#   acp    → monitor-ai-acp.sh (primary: stopReason-based, persistent sessions)
 set -euo pipefail
 
 TOOL_NAME="freely"
@@ -3076,6 +3092,13 @@ valid_ai_pid_for_project() {
     source "$cfg"
     tool="${AI_TOOL:-codex}"
   fi
+
+  # ACP mode: the AI PID is the bridge PID (acp-bridge.py).
+  # Bridge has --project in its command line, matches via project path.
+  if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+    pid_matches_project "$pid" "$project" "" && return 0
+  fi
+
   while IFS= read -r fragment; do
     [[ -n "$fragment" ]] || continue
     pid_matches_project "$pid" "$project" "$fragment" && return 0
@@ -3151,6 +3174,17 @@ claude_has_verified_resume_evidence() {
 
 tool_runtime_resume_target_before_launch() {
   local tool="$1" project="${2:-}"
+
+  # ACP mode: sessions are persisted in-memory by the bridge.
+  # Resume target is the session ID from session state (no JSONL needed).
+  if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+    local sid="${CLAUDE_SESSION_ID_CURRENT:-${LAST_TOOL_SESSION_ID:-}}"
+    if [[ -n "$sid" ]]; then
+      printf '%s\n' "$sid"
+    fi
+    return 0
+  fi
+
   case "$tool" in
     cc|cc-use-codex-cli)
       if claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
@@ -4907,6 +4941,10 @@ extract_tool_session_id_from_log() {
       sed -n 's/^session id: //p' "$log_file" | head -n 1
       ;;
     *)
+      # ACP mode writes "session id: <sid>" to log (same format as codex)
+      if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+        sed -n 's/^session id: //p' "$log_file" | head -n 1
+      fi
       ;;
   esac
 }
@@ -11523,8 +11561,7 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
 
 # _ai_shows_liveness: adapter-aware AI liveness check.
 # direct mode: check debug log mtime + process state (PID-based).
-# acp mode:    same signals work for current ACP client (run-acp-prompt.py exits when done).
-#              Future persistent ACP: replace with ACP session heartbeat.
+# acp mode:    check debug log mtime + bridge process + Unix socket heartbeat.
 # Returns 0 (active) if any signal shows recent work; 1 (inactive) otherwise.
 _ai_shows_liveness() {
   local project="$1" ai_pid="$2" cycle_log="$3" threshold_secs="${4:-90}"
@@ -11532,10 +11569,7 @@ _ai_shows_liveness() {
 
   case "$adapter" in
     acp)
-      # ACP mode: client process (run-acp-prompt.py) still has PID + debug log.
-      # Future: when ACP sessions become persistent across cycles, replace
-      # PID check with ACP session/heartbeat check.
-      _ai_shows_liveness_pid_signals "$ai_pid" "$cycle_log" "$threshold_secs"
+      _ai_shows_liveness_acp "$project" "$ai_pid" "$cycle_log" "$threshold_secs"
       ;;
     *)
       _ai_shows_liveness_pid_signals "$ai_pid" "$cycle_log" "$threshold_secs"
@@ -11543,7 +11577,55 @@ _ai_shows_liveness() {
   esac
 }
 
-# _ai_shows_liveness_pid_signals: PID-based liveness check (works for direct + current ACP client).
+# _ai_shows_liveness_acp: ACP-native liveness check.
+# Signal 1: debug log mtime (same as direct — server writes on stream chunks).
+# Signal 2: bridge process alive (bridge PID = AI process handle).
+# Signal 3: Unix socket exists and accepts connections (bridge is responsive).
+_ai_shows_liveness_acp() {
+  local project="$1" ai_pid="$2" cycle_log="$3" threshold_secs="${4:-90}"
+  local now debug_log debug_mtime
+  now="$(date +%s)"
+
+  # Signal 1: debug log mtime
+  debug_log="${cycle_log%.log}.debug.log"
+  if [[ -f "$debug_log" ]]; then
+    debug_mtime="$(file_mtime_epoch "$debug_log" 2>/dev/null || true)"
+    if [[ -n "$debug_mtime" ]] && (( now - debug_mtime < threshold_secs )); then
+      return 0
+    fi
+  fi
+
+  # Signal 2: bridge process alive
+  if [[ -n "$ai_pid" ]] && kill -0 "$ai_pid" 2>/dev/null; then
+    local proc_state
+    proc_state=$(ps -o state= -p "$ai_pid" 2>/dev/null | tr -d ' ')
+    if [[ "$proc_state" == "R" || "$proc_state" == "S" ]]; then
+      return 0
+    fi
+  fi
+
+  # Signal 3: ACP bridge socket responsive
+  local bridge_socket="$project/.freely/run/acp-bridge.sock"
+  if [[ -S "$bridge_socket" ]]; then
+    # Quick socket probe: connect and disconnect (non-blocking check)
+    if python3 -c "
+import socket, sys
+try:
+    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    s.settimeout(2)
+    s.connect('$bridge_socket')
+    s.close()
+except Exception:
+    sys.exit(1)
+" 2>/dev/null; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+# _ai_shows_liveness_pid_signals: PID-based liveness check (direct mode).
 _ai_shows_liveness_pid_signals() {
   local ai_pid="$1" cycle_log="$2" threshold_secs="${3:-90}"
   local now debug_log debug_mtime
@@ -11568,6 +11650,67 @@ _ai_shows_liveness_pid_signals() {
   fi
 
   return 1
+}
+
+# ── ACP Bridge lifecycle ─────────────────────────────────────────
+# The ACP bridge (acp-bridge.py) keeps claude-agent-acp alive across AI cycles.
+# Managed only when AI_TOOL_ADAPTER=acp.
+
+_acp_bridge_pid_file() {
+  echo "$(run_dir_for_project "$1")/acp-bridge.pid"
+}
+
+_acp_bridge_socket() {
+  echo "$(run_dir_for_project "$1")/acp-bridge.sock"
+}
+
+_ensure_acp_bridge_running() {
+  local project="$1"
+  local pid_file socket
+  pid_file="$(_acp_bridge_pid_file "$project")"
+  socket="$(_acp_bridge_socket "$project")"
+
+  # Already running?
+  if [[ -f "$pid_file" ]]; then
+    local pid
+    pid=$(cat "$pid_file" 2>/dev/null || true)
+    if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null && [[ -S "$socket" ]]; then
+      return 0
+    fi
+    rm -f "$pid_file" "$socket"
+  fi
+
+  local bridge_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/acp-bridge.py"
+  [[ -f "$bridge_script" ]] || bridge_script="$(workspace_root_for_project "$project")/scripts/runtime/acp-bridge.py"
+  if [[ ! -f "$bridge_script" ]]; then
+    log_warn "acp-bridge.py not found, ACP bridge unavailable"
+    return 1
+  fi
+
+  python3 "$bridge_script" start --project "$project" >/dev/null 2>&1 || {
+    log_warn "failed to start ACP bridge"
+    return 1
+  }
+
+  # Wait for readiness
+  local waited=0
+  while [[ ! -S "$socket" ]] && (( waited < 50 )); do
+    sleep 0.1
+    waited=$((waited + 1))
+  done
+  [[ -S "$socket" ]] || { log_warn "ACP bridge socket did not appear"; return 1; }
+
+  append_runtime_event "$project" "acp_bridge_started" "bridge_pid=$(cat "$pid_file" 2>/dev/null || echo unknown)"
+}
+
+_stop_acp_bridge() {
+  local project="$1"
+  local bridge_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/acp-bridge.py"
+  [[ -f "$bridge_script" ]] || bridge_script="$(workspace_root_for_project "$project")/scripts/runtime/acp-bridge.py"
+  if [[ -f "$bridge_script" ]]; then
+    python3 "$bridge_script" stop --project "$project" >/dev/null 2>&1 || true
+  fi
+  rm -f "$(_acp_bridge_pid_file "$project")" "$(_acp_bridge_socket "$project")"
 }
 
 manager_ai_stalled_with_pending_intake() {
@@ -14240,6 +14383,27 @@ select_launch_kind() {
   local resume_target_before_launch=""
   handoff_rotation_reason="$(session_handoff_rotation_reason "$PROJECT_ROOT" || true)"
   resume_target_before_launch="$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")"
+
+  # ACP mode: sessions are persistent (managed by bridge). Always prefer
+  # resume when a previous session ID exists, since resume gives cache hits.
+  if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+    # Fork: worker inherits parent session context (same as direct mode).
+    if [[ -n "${SESSION_PARENT_ID:-}" && -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+      LAUNCH_KIND_SELECTED="fork"
+      LAUNCH_ROTATION_REASON="worker_fork_from_parent_acp"
+      LAST_TOOL_RESUME_TARGET="${SESSION_PARENT_ID:-}"
+      return 0
+    fi
+    if [[ -n "${LAST_TOOL_SESSION_ID:-}" || -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+      LAUNCH_KIND_SELECTED="resume"
+      LAUNCH_ROTATION_REASON="acp_session_persists"
+      return 0
+    fi
+    # No previous session → first ever launch
+    LAUNCH_KIND_SELECTED="fresh"
+    LAUNCH_ROTATION_REASON="acp_first_launch"
+    return 0
+  fi
 
   # Fork detection: if this worktree has a SESSION_PARENT_ID set (by the
   # delegating manager), and it has never launched before (no own session ID),
@@ -16926,6 +17090,9 @@ stop_project_runtime() {
   fi
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   rm -f "$stop_marker"
+  if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+    _stop_acp_bridge "$project"
+  fi
   write_workcell_state "$project" "stopped" "down" "down" "$stop_reason"
   if [[ "$stop_lock_acquired" == "1" ]]; then
     release_project_start_lock_for_runtime "$project"
@@ -17406,6 +17573,15 @@ start_project_runtime() {
   local FIRST_ROUND=true
   local LAUNCH_KIND_SELECTED="" LAUNCH_ROTATION_REASON=""
   load_session_state_or_defaults "$project"
+
+  # ACP bridge lifecycle: ensure persistent claude-agent-acp is running before first cycle
+  if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+    _ensure_acp_bridge_running "$project" || {
+      log_error "failed to start ACP bridge for project: $project"
+      exit 1
+    }
+  fi
+
   while true; do
     local ts prompt_file cycle_log cycle_debug_log mode_name watchdog_script workspace_root
     local delegated_pending_ids delegated_pending_count delegated_consumed_ids delegated_consumed_at
@@ -17560,8 +17736,16 @@ start_project_runtime() {
       echo "===== $(current_timestamp_local_for_display) mode=$mode_name tool=$AI_TOOL adapter=${tool_adapter:-unknown} ai_mode=$AI_MODE rotation_reason=${LAUNCH_ROTATION_REASON:-none} ====="
       local workspace_root monitor_script
       workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
-      monitor_script="$SELF_ROOT/docs/system/workspace/scripts/monitor-ai-cli.sh"
-      [[ -f "$monitor_script" ]] || monitor_script="$workspace_root/scripts/monitor-ai-cli.sh"
+      case "${AI_TOOL_ADAPTER:-direct}" in
+        acp)
+          monitor_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/monitor-ai-acp.sh"
+          [[ -f "$monitor_script" ]] || monitor_script="$workspace_root/scripts/runtime/monitor-ai-acp.sh"
+          ;;
+        *)
+          monitor_script="$SELF_ROOT/docs/system/workspace/scripts/monitor-ai-cli.sh"
+          [[ -f "$monitor_script" ]] || monitor_script="$workspace_root/scripts/monitor-ai-cli.sh"
+          ;;
+      esac
       bash "$monitor_script" \
         --project "$PROJECT_ROOT" \
         --tool "$AI_TOOL" \
