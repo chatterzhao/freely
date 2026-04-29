@@ -552,34 +552,22 @@ cmd_promote() {
 
   echo "[issue-sync] promote: $raw_id → $i_id"
 
-  # 1. Create I-* on platforms
+  # 1. Create I-* on platforms (with kind/linked label)
   cmd_create "$i_id"
 
-  # 2. Add cross-reference comment to raw issue
-  local i_title; i_title=$(_issue_title "$i_file" "$i_id")
-  local comment_msg="Promoted to [$i_id]($(_fm_get "$i_file" "platform_ids.github.url" 2>/dev/null || echo "")): $i_title"
-  cat >> "$raw_file" <<COMMENT
+  # 2. Update raw's promoted_children list
+  local promoted_json
+  promoted_json=$(_fm_get "$raw_file" "promoted_children")
+  if [[ -z "$promoted_json" || "$promoted_json" == "None" ]]; then
+    _fm_set_str "$raw_file" "promoted_children" "[\"$i_id\"]"
+  else
+    # Append to existing list
+    local new_list
+    new_list=$(python3 -c "import json; lst = json.loads('$promoted_json'); lst.append('$i_id'); print(json.dumps(lst))" 2>/dev/null || echo "[\"$i_id\"]")
+    _fm_set "$raw_file" "promoted_children" "$new_list"
+  fi
 
-### comment-$(date -u +"%Y%m%dT%H%M%SZ")
-- source: system
-- event: promoted
-- target: $i_id
-
-$comment_msg
-COMMENT
-  cmd_comment "$raw_id"
-
-  # 3. Close raw issue on platforms
-  cmd_close "$raw_id" "completed"
-
-  # 4. Update raw local state
-  _fm_set_str "$raw_file" "status" "absorbed"
-  _fm_set_str "$raw_file" "absorbed_into" "$i_id"
-
-  # 5. Update I-* with reference back to raw
-  local raw_gh; raw_gh=$(_gh_issue_number "$raw_file")
-  local cross_ref="Promoted from raw issue"
-  [[ -n "$raw_gh" ]] && cross_ref="$cross_ref (#$raw_gh)"
+  # 3. Update I-* with cross-reference back to raw
   cat >> "$i_file" <<CROSSREF
 
 ### comment-$(date -u +"%Y%m%dT%H%M%SZ")
@@ -587,10 +575,56 @@ COMMENT
 - event: promoted_from
 - source_id: $raw_id
 
-$cross_ref
+Promoted from $raw_id
 CROSSREF
 
-  echo "[issue-sync] promote complete: $raw_id → $i_id"
+  echo "[issue-sync] promote complete: $raw_id → $i_id (raw stays open until all children promoted)"
+}
+
+# cmd_promote_finalize: close raw after all children promoted.
+# Adds closing comment listing all I-* children, then closes raw on platforms.
+cmd_promote_finalize() {
+  local raw_id="$1"
+  local raw_file
+  raw_file="$ISSUES_DIR/$raw_id/issue.md"
+  [[ -f "$raw_file" ]] || { echo "[ERROR] $raw_file not found" >&2; exit 1; }
+
+  local promoted_json children_text
+  promoted_json=$(_fm_get "$raw_file" "promoted_children")
+  if [[ -z "$promoted_json" || "$promoted_json" == "None" ]]; then
+    echo "[issue-sync] promote-finalize: no children to finalize for $raw_id"
+    return 1
+  fi
+
+  # Build closing comment listing all children
+  children_text=$(python3 -c "
+import json
+children = json.loads('$promoted_json')
+lines = ['拆解为以下任务:']
+for i, cid in enumerate(children, 1):
+    lines.append(f'{i}. [{cid}](will-be-updated)')
+print('\n'.join(lines))
+" 2>/dev/null || echo "Promoted to: $promoted_json")
+
+  # Add closing comment to raw
+  cat >> "$raw_file" <<COMMENT
+
+### comment-$(date -u +"%Y%m%dT%H%M%SZ")
+- source: system
+- event: promote_finalized
+- children: $promoted_json
+
+$children_text
+COMMENT
+
+  # Push comment then close raw on platforms
+  cmd_comment "$raw_id"
+  cmd_close "$raw_id" "completed"
+
+  # Update raw local state
+  _fm_set_str "$raw_file" "status" "absorbed"
+
+  echo "[issue-sync] promote-finalize complete: $raw_id closed with $promoted_json"
 }
 
 cmd_batch() {
@@ -718,7 +752,7 @@ main() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) ROOT_DIR="$2"; ISSUES_DIR="$ROOT_DIR/docs/issues"; shift 2 ;;
-      create|update|comment|close|promote|status|batch|scan)
+      create|update|comment|close|promote|promote-finalize|status|batch|scan)
         action="$1"; shift; break ;;
       *) echo "[ERROR] unknown action: $1" >&2; exit 1 ;;
     esac
@@ -741,6 +775,7 @@ main() {
     comment) cmd_comment "$local_id" ;;
     close)   cmd_close "$local_id" "$extra" ;;
     promote) cmd_promote "$local_id" "$extra" ;;
+    promote-finalize) cmd_promote_finalize "$local_id" ;;
     status)  cmd_status "$local_id" ;;
     batch)   cmd_batch ;;
     scan)    cmd_scan ;;

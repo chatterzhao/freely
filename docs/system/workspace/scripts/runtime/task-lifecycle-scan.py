@@ -72,9 +72,10 @@ def parse_markdown_fields(path: Path) -> dict:
 # ── Item collection ──────────────────────────────────────
 
 def collect_lifecycle_items(project: Path) -> list[dict]:
-    """Collect all raw and I-* items, pair them by shared timestamp key."""
+    """Collect raw issues + their I-* children, grouped by shared base key."""
     raw_items: dict[str, dict] = {}
-    linked_items: dict[str, dict] = {}
+    linked_children: dict[str, list[dict]] = {}  # key → list of child dicts
+    standalone_linked: list[dict] = []  # I-* with no raw parent
     issues_dir = project / "docs" / "issues"
 
     if issues_dir.is_dir():
@@ -92,20 +93,28 @@ def collect_lifecycle_items(project: Path) -> list[dict]:
                 raw_items[key] = {
                     "raw_id": name, "raw_status": fm.get("status", "proposed"),
                     "raw_file": str(mf.relative_to(project)),
-                    "absorbed_into": fm.get("absorbed_into", ""),
+                    "promoted_children": _parse_list(fm.get("promoted_children", "")),
                     "platform_ids": _extract_platform_ids(fm),
                 }
             elif name.startswith("I-"):
-                key = name[2:]  # "I-20260428-1737" → "20260428-1737"
+                # I-YYYYMMDD-HHMM-A → base_key="YYYYMMDD-HHMM", suffix="A"
+                inner = name[2:]  # "20260428-1737-A"
+                # Split off the suffix letter
+                m = re.match(r"^(\d{8}-\d{4})-([A-Z])$", inner)
+                if m:
+                    base_key = m.group(1)
+                    suffix = m.group(2)
+                else:
+                    base_key = inner  # legacy format without suffix
+                    suffix = ""
                 title = fm.get("issue_title", "")
                 if not title:
                     body = parts[2] if len(parts := mf.read_text(encoding="utf-8").split("---", 2)) >= 3 else ""
-                    m = re.search(r"^# (.+)", body, re.MULTILINE)
-                    title = m.group(1) if m else name
-                linked_items[key] = {
+                    tm = re.search(r"^# (.+)", body, re.MULTILINE)
+                    title = tm.group(1) if tm else name
+                child = {
                     "linked_id": name, "phase_state": fm.get("phase_state", ""),
-                    "status": fm.get("status", ""),
-                    "title": title,
+                    "status": fm.get("status", ""), "title": title, "suffix": suffix,
                     "linked_file": str(mf.relative_to(project)),
                     "promoted_from": fm.get("promoted_from", ""),
                     "canonical_issue_path": fm.get("canonical_issue_path", ""),
@@ -113,24 +122,41 @@ def collect_lifecycle_items(project: Path) -> list[dict]:
                     "comment_count": _count_comments(mf),
                     "unsynced_comments": _count_unsynced(mf),
                 }
+                # Try to match to a raw parent by promoted_from
+                pf = fm.get("promoted_from", "")
+                if pf and pf.startswith("raw-"):
+                    raw_key = pf[4:]
+                    if raw_key in raw_items:
+                        linked_children.setdefault(raw_key, []).append(child)
+                        continue
+                # Try to match by base key
+                if base_key in raw_items:
+                    linked_children.setdefault(base_key, []).append(child)
+                else:
+                    standalone_linked.append(child)
 
-    # Merge: pair raw + linked by shared key
-    all_keys = set(raw_items.keys()) | set(linked_items.keys())
+    # Build output items
     items = []
-    for key in sorted(all_keys):
-        raw = raw_items.get(key)
-        linked = linked_items.get(key)
+    for key, raw in sorted(raw_items.items()):
+        children = linked_children.get(key, [])
+        items.append({"key": key, "raw": raw, "children": children})
 
-        # If raw was absorbed into a different I-*, follow the pointer
-        if raw and raw.get("absorbed_into"):
-            target_iid = raw["absorbed_into"]
-            target_key = target_iid[2:] if target_iid.startswith("I-") else target_iid
-            if target_key in linked_items and target_key != key:
-                linked = linked_items[target_key]
-                key = target_key  # reassign key to absorbing I-*
+    # Standalone I-* (no raw parent)
+    for child in standalone_linked:
+        items.append({"key": child["linked_id"], "raw": None, "children": [child]})
 
-        items.append({"key": key, "raw": raw, "linked": linked})
     return items
+
+
+def _parse_list(val: str) -> list[str]:
+    """Parse a YAML-like list string: "['a', 'b']" or "a, b" into a Python list."""
+    if not val:
+        return []
+    val = val.strip()
+    if val.startswith("[") and val.endswith("]"):
+        inner = val[1:-1]
+        return [x.strip().strip("'").strip('"') for x in inner.split(",") if x.strip()]
+    return [x.strip() for x in val.split(",") if x.strip()]
 
 
 def _extract_platform_ids(fm: dict) -> dict:
@@ -168,23 +194,23 @@ def _count_unsynced(issue_file: Path) -> int:
 
 def determine_stage(item: dict) -> str:
     raw = item.get("raw")
-    linked = item.get("linked")
+    children = item.get("children", [])
 
-    if not raw and not linked:
+    if not raw and not children:
         return "empty"
 
-    # Absorbed raw (pointing to another I-*)
+    # Absorbed raw
     if raw and raw.get("raw_status") == "absorbed":
-        if linked:
-            return _stage_from_linked(linked)
+        if children:
+            return _stage_from_children(children)
         return "absorbed"
 
     # Dropped raw
     if raw and raw.get("raw_status") == "dropped":
         return "dropped"
 
-    # Raw only, no I-* yet
-    if raw and not linked:
+    # Raw only, no children promoted yet
+    if raw and not children:
         b1_dir = _find_b1_dir(raw.get("raw_id", ""))
         if not b1_dir:
             return "B1_proposed"
@@ -195,11 +221,29 @@ def determine_stage(item: dict) -> str:
                 return "B1_candidate"
         return "B1_brainstorming"
 
-    # I-* exists
-    if linked:
-        return _stage_from_linked(linked)
+    # Have children in various stages
+    if children:
+        return _stage_from_children(children)
 
     return "unknown"
+
+
+def _stage_from_children(children: list[dict]) -> str:
+    phases = {c.get("phase_state", "") for c in children}
+    if not phases or phases == {""}:
+        # Children exist but no phase set → legacy issue or just promoted
+        # Check if any child has platform_ids (meaning promote was done)
+        has_platforms = any(c.get("platform_ids") for c in children)
+        if has_platforms:
+            return "B2_active"  # promoted to platforms, assume in development
+        return "promoting"  # children exist locally but not on platforms yet
+    if phases & ACTIVE_B2:
+        return "B2_active"
+    if "in_verification" in phases:
+        return "B2_verifying"
+    if phases == {COMPLETED} or COMPLETED in phases:
+        return "收口"
+    return "promoting"
 
 
 def _find_b1_dir(raw_id: str) -> Path | None:
@@ -235,44 +279,50 @@ def check_completion(item: dict) -> list[str]:
     """Return list of incomplete items. Empty list = fully complete (exclude from output)."""
     incomplete = []
     raw = item.get("raw")
-    linked = item.get("linked")
+    children = item.get("children", [])
 
-    # 1. raw_status_terminal
-    if raw and raw.get("raw_status") not in TERMINAL_RAW:
-        incomplete.append("raw_not_terminal")
-
-    # 2. linked_exists
-    if not linked:
-        incomplete.append("not_promoted_to_I")
-        return incomplete  # can't check further without I-*
-
-    # 3. phase_completed
-    if linked.get("phase_state") != COMPLETED:
-        incomplete.append("phase_not_completed")
-
-    # 4-5. platform issue closed
-    pids = linked.get("platform_ids", {})
-    if pids.get("github"):
-        gh_closed = _is_github_closed(pids["github"])
-        if gh_closed is False:
-            incomplete.append("github_not_closed")
-        elif gh_closed is None:
-            incomplete.append("github_status_unchecked")
-    # Gitee requires API token; mark as unchecked if we have a gitee ID
-    if pids.get("gitee"):
-        incomplete.append("gitee_status_unchecked")
-
-    # 6. raw platform closed (if raw was synced)
+    # Raw checks
     if raw:
+        if raw.get("raw_status") not in TERMINAL_RAW:
+            incomplete.append("raw_not_terminal")
         raw_pids = raw.get("platform_ids", {})
         if raw_pids.get("github"):
             raw_gh = _is_github_closed(raw_pids["github"])
             if raw_gh is False:
                 incomplete.append("raw_github_not_closed")
+            elif raw_gh is None:
+                incomplete.append("raw_github_unchecked")
 
-    # 7. comments synced
-    if linked.get("unsynced_comments", 0) > 0:
-        incomplete.append(f"unsynced_comments:{linked['unsynced_comments']}")
+    # Child checks
+    if not children:
+        incomplete.append("not_promoted_to_I")
+        return incomplete
+
+    for child in children:
+        cid = child.get("linked_id", "?")
+        pfx = f"{cid}:"
+
+        # Phase completed
+        if child.get("phase_state") != COMPLETED:
+            incomplete.append(f"{pfx}phase_not_completed")
+
+        # Platform checks
+        pids = child.get("platform_ids", {})
+        if not pids:
+            incomplete.append(f"{pfx}not_on_any_platform")
+        else:
+            if pids.get("github"):
+                gh_closed = _is_github_closed(pids["github"])
+                if gh_closed is False:
+                    incomplete.append(f"{pfx}github_not_closed")
+                elif gh_closed is None:
+                    incomplete.append(f"{pfx}github_unchecked")
+            if pids.get("gitee"):
+                incomplete.append(f"{pfx}gitee_unchecked")
+
+        # Comments
+        if child.get("unsynced_comments", 0) > 0:
+            incomplete.append(f"{pfx}unsynced_comments:{child['unsynced_comments']}")
 
     return incomplete
 
@@ -307,21 +357,29 @@ def build_payload(project: Path) -> dict:
             continue  # fully complete, exclude
         if stage in ("absorbed", "dropped") and not incomplete:
             continue  # terminal raw states, done
-        if not incomplete and not item.get("raw") and not item.get("linked"):
+        if not incomplete and not item.get("raw") and not item.get("children"):
             continue  # empty
 
         raw = item.get("raw") or {}
-        linked = item.get("linked") or {}
+        children = item.get("children", [])
 
         output.append({
             "key": item["key"],
             "stage": stage,
             "raw_id": raw.get("raw_id"),
-            "linked_id": linked.get("linked_id"),
-            "title": linked.get("title") or raw.get("raw_id", ""),
+            "title": raw.get("raw_id", "") or (children[0].get("title", "") if children else ""),
+            "children": [
+                {
+                    "id": c["linked_id"],
+                    "phase": c.get("phase_state") or None,
+                    "pids": c.get("platform_ids", {}),
+                    "unsynced": c.get("unsynced_comments", 0),
+                }
+                for c in children
+            ],
             "incomplete": incomplete,
             "next_action": _derive_action(stage, incomplete),
-            "ready": stage not in ("B1_candidate",) and "not_promoted_to_I" not in incomplete,
+            "ready": "not_promoted_to_I" not in incomplete,
         })
 
     by_stage = {}
