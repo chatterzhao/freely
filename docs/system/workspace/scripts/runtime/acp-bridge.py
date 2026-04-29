@@ -69,6 +69,8 @@ class AcpBridge:
     def start_server(self):
         """Launch claude-agent-acp and initialize handshake."""
         self.log(f"starting ACP server: {self.acp_bin}")
+        # Inherit environment but let explicitly-set vars (from alias settings) win
+        env = os.environ.copy()
         self.server_proc = subprocess.Popen(
             [self.acp_bin],
             stdin=subprocess.PIPE,
@@ -76,6 +78,7 @@ class AcpBridge:
             stderr=subprocess.PIPE,
             text=True,
             bufsize=1,
+            env=env,
         )
         # Write PID file
         os.makedirs(_runtime_dir(self.project), exist_ok=True)
