@@ -295,21 +295,28 @@ def _stage_from_linked(linked: dict) -> str:
 # ── Completion checklist ─────────────────────────────────
 
 def check_completion(item: dict) -> list[str]:
-    """Return list of incomplete items. Empty list = fully complete (exclude from output)."""
+    """Return list of incomplete items. Empty list = fully complete (exclude from output).
+
+    Highest authority: platform CLOSED. If all platform issues are confirmed closed,
+    the item is complete regardless of local state.
+    """
     incomplete = []
     raw = item.get("raw")
     children = item.get("children", [])
 
-    # Raw checks: only flag if raw is confirmed not-terminal or platform confirmed open
+    # Raw checks
     if raw:
         if raw.get("raw_status") not in TERMINAL_RAW:
-            incomplete.append("raw_not_terminal")
-        raw_pids = raw.get("platform_ids", {})
-        if raw_pids.get("github"):
-            raw_gh = _is_github_closed(raw_pids["github"])
-            if raw_gh is False:  # confirmed open
-                incomplete.append("raw_github_not_closed")
-            # None = unchecked: skip if raw is absorbed/completed
+            raw_pids = raw.get("platform_ids", {})
+            if raw_pids.get("github"):
+                raw_gh = _is_github_closed(raw_pids["github"])
+                if raw_gh is True:
+                    pass  # closed = done, skip all checks
+                elif raw_gh is False:
+                    incomplete.append("raw_github_not_closed")
+                # None = unchecked, don't flag
+            if not incomplete:
+                pass  # raw is done
 
     # Child checks
     if not children:
@@ -319,26 +326,32 @@ def check_completion(item: dict) -> list[str]:
     for child in children:
         cid = child.get("linked_id", "?")
         pfx = f"{cid}:"
+        pids = child.get("platform_ids", {})
 
-        # Phase completed
+        # Rule: if ALL platforms with IDs are confirmed CLOSED → item is complete.
+        # Don't check phase_state, comments, or anything else.
+        all_confirmed_closed = True
+        has_any_platform = False
+        if pids.get("github"):
+            has_any_platform = True
+            gh_closed = _is_github_closed(pids["github"])
+            if gh_closed is not True:  # False or None
+                all_confirmed_closed = False
+                if gh_closed is False:
+                    incomplete.append(f"{pfx}github_not_closed")
+        if pids.get("gitee"):
+            has_any_platform = True
+            # Gitee check requires API; skip for now
+            all_confirmed_closed = False
+
+        if has_any_platform and all_confirmed_closed:
+            continue  # platform says done → skip all other checks
+
+        # Platform not confirmed closed → check local state
         if child.get("phase_state") != COMPLETED:
             incomplete.append(f"{pfx}phase_not_completed")
-
-        # Platform checks: only flag if we CONFIRMED open.
-        # If phase=completed + status=completed, treat unchecked as closed.
-        pids = child.get("platform_ids", {})
-        is_done = (child.get("phase_state") == COMPLETED and child.get("status") == "completed")
-        if not pids and not is_done:
+        if not pids and child.get("phase_state") != COMPLETED:
             incomplete.append(f"{pfx}not_on_any_platform")
-        if pids.get("github"):
-            gh_closed = _is_github_closed(pids["github"])
-            if gh_closed is False:  # confirmed open
-                incomplete.append(f"{pfx}github_not_closed")
-            # None = unchecked: skip if phase=completed (assume closed)
-        if pids.get("gitee") and not is_done:
-            incomplete.append(f"{pfx}gitee_unchecked")
-
-        # Comments
         if child.get("unsynced_comments", 0) > 0:
             incomplete.append(f"{pfx}unsynced_comments:{child['unsynced_comments']}")
 
