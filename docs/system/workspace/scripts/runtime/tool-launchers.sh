@@ -652,6 +652,9 @@ tool_run_acp_from_prompt_file() {
   local claude_session_id="${15:-}"
   local tool_resume_target="${16:-}"
 
+  # Resolve alias (cc-ds-flash-auto → claude) before per-tool dispatch
+  tool="$(_resolve_tool_family "$tool")"
+
   local bridge_socket="${project}/.freely/run/acp-bridge.sock"
 
   case "$tool" in

@@ -14392,6 +14392,8 @@ select_launch_kind() {
       LAUNCH_KIND_SELECTED="fork"
       LAUNCH_ROTATION_REASON="worker_fork_from_parent_acp"
       LAST_TOOL_RESUME_TARGET="${SESSION_PARENT_ID:-}"
+      # Clear parent ID after forking to prevent re-fork loop on failure
+      unset SESSION_PARENT_ID
       return 0
     fi
     if [[ -n "${LAST_TOOL_SESSION_ID:-}" || -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
