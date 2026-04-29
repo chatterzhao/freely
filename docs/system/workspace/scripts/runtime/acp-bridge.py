@@ -54,6 +54,8 @@ class AcpBridge:
         self.running = False
         self.socket_path = _socket_path(project)
         self.server_ready = threading.Event()
+        self.clients = []  # connected client sockets for notification broadcast
+        self.clients_lock = threading.Lock()
 
     def log(self, msg):
         ts = time.strftime("%Y-%m-%dT%H:%M:%S")
@@ -137,13 +139,12 @@ class AcpBridge:
             container["response"] = msg
             event.set()
         elif "method" in msg and "id" not in msg:
-            # Notification from server — log but no action needed
+            # Notification from server — forward to all connected clients
             method = msg.get("method", "")
-            if method == "session/update":
-                self.log(f"notification: {method}")
+            self._broadcast_notification(msg)
         elif msg_id is not None:
             # Response for unknown request
-            self.log(f"response for unknown id: {msg_id}")
+            self.log(f"response for unknown id: {msg_id}, error={msg.get('error','')}")
 
     def _send_request(self, method, params, timeout=BRIDGE_TIMEOUT):
         """Send JSON-RPC request to server and wait for response."""
@@ -182,6 +183,20 @@ class AcpBridge:
                 raise RuntimeError(f"server error: {err.get('message', str(err))}")
 
             return response.get("result", {})
+
+    def _broadcast_notification(self, msg):
+        """Forward server notification to all connected clients."""
+        payload = json.dumps(msg, separators=(",", ":")) + "\n"
+        data = payload.encode()
+        with self.clients_lock:
+            dead = []
+            for sock in self.clients:
+                try:
+                    sock.send(data)
+                except Exception:
+                    dead.append(sock)
+            for sock in dead:
+                self.clients.remove(sock)
 
     def session_new(self, session_id=None, cwd=None):
         """Create a new ACP session."""
@@ -242,6 +257,9 @@ class AcpBridge:
 def handle_client(conn, bridge):
     """Generic JSON-RPC relay: forward client requests to ACP server, relay responses back."""
     buf = ""
+    # Register for notification broadcast
+    with bridge.clients_lock:
+        bridge.clients.append(conn)
     try:
         while True:
             data = conn.recv(4096)
@@ -295,6 +313,9 @@ def handle_client(conn, bridge):
                     bridge.log(f"send response error: {e}")
                     break
     finally:
+        with bridge.clients_lock:
+            if conn in bridge.clients:
+                bridge.clients.remove(conn)
         conn.close()
 
 
