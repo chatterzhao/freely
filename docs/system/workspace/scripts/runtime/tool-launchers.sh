@@ -202,8 +202,8 @@ tool_supported_adapters() {
     codex)
       printf 'direct\nacp\n'
       ;;
-    kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
-      printf 'direct\n'
+    kiro-cli|iflow|cc|cc-use-codex-cli|claude|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
+      printf 'direct\nacp\n'
       ;;
     *)
       printf 'direct\n'
@@ -634,6 +634,26 @@ tool_run_acp_from_prompt_file() {
       freely_apply_project_network_proxy_env "$project"
       exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" \
         --agent "$codex_acp_bin" \
+        --cwd "$project" \
+        --prompt-file "$prompt_file" \
+        --mode "$mode" \
+        --model "$model" \
+        --reasoning-effort "$reasoning_effort"
+      ;;
+    claude|cc|cc-use-codex-cli)
+      [[ -f "$RUNTIME_ACP_PROMPT_CLIENT" ]] || {
+        echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
+        return 1
+      }
+      local claude_acp_bin
+      claude_acp_bin="${FREELY_CLAUDE_ACP_BIN:-claude-agent-acp}"
+      if ! command -v "$claude_acp_bin" >/dev/null 2>&1; then
+        echo "[ERROR] claude-agent-acp not found. Install: npm install -g @agentclientprotocol/claude-agent-acp" >&2
+        return 1
+      fi
+      freely_apply_project_network_proxy_env "$project"
+      exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" \
+        --agent "$claude_acp_bin" \
         --cwd "$project" \
         --prompt-file "$prompt_file" \
         --mode "$mode" \
