@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# DEPRECATED: replaced by task-lifecycle-scan.py (lifecycle-aware, parent-child model).
+# This file is kept for reference. New code should use task-lifecycle-scan.py.
 from __future__ import annotations
 
 import argparse

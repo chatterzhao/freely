@@ -14303,15 +14303,29 @@ select_launch_kind() {
         has_jsonl=$(find "$session_dir" -name "*.jsonl" -type f 2>/dev/null | head -1)
       fi
 
+      # session-state.env exists → daemon was running before. Check JSONL.
+      local state_file_exists="false"
+      [[ -f "$(session_state_file "$PROJECT_ROOT")" ]] && state_file_exists="true"
+
       if [[ -n "$has_jsonl" ]]; then
-        # JSONL files exist → MUST resume.
-        fallback_id="$(_find_recent_session_from_tool_dir "$PROJECT_ROOT" "$AI_TOOL" || true)"
-        if [[ -n "$fallback_id" ]]; then
-          log_info "resume: found JSONL session $fallback_id in $session_dir"
-          CLAUDE_SESSION_ID_CURRENT="$fallback_id"
+        if [[ "$state_file_exists" == "true" || "$resume_required" == "true" ]]; then
+          # State file exists or restart required → MUST resume from JSONL.
+          fallback_id="$(_find_recent_session_from_tool_dir "$PROJECT_ROOT" "$AI_TOOL" || true)"
+          if [[ -n "$fallback_id" ]]; then
+            log_info "resume: found JSONL session $fallback_id in $session_dir"
+            CLAUDE_SESSION_ID_CURRENT="$fallback_id"
+          elif [[ "$resume_required" == "true" ]]; then
+            log_error "JSONL files exist but could not extract valid session ID."
+            exit 1
+          fi
         else
-          log_error "JSONL files exist in $session_dir but could not extract valid session ID."
-          exit 1
+          # Clean start (no state file) + JSONL exists from other sources.
+          # Don't force resume — allow fresh. JSONL files might be from other tools.
+          log_info "AI_RESUME_ON_START: clean start with existing JSONL, allowing fresh launch"
+          LAUNCH_KIND_SELECTED="fresh"
+          LAUNCH_ROTATION_REASON="initial_start"
+          _check_fresh_launch_circuit_breaker
+          return 0
         fi
       elif [[ "$resume_required" == "true" ]]; then
         # Restart: JSONL MUST exist. Hard error.
