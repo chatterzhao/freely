@@ -812,7 +812,7 @@ supervisor_identity_dir_for_project() {
 
 supervisor_identity_file_for_project_pid() {
   local project="$1" pid="$2"
-  echo "$(supervisor_identity_dir_for_project "$project")/supervisor-$pid.env"
+  echo "$(supervisor_identity_dir_for_project "$project")/supervisor.env"
 }
 
 logs_dir_for_project() {
