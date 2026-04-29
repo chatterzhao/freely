@@ -138,13 +138,13 @@ class AcpBridge:
             event, container = self.pending[msg_id]
             container["response"] = msg
             event.set()
-        elif "method" in msg and "id" not in msg:
-            # Notification from server — forward to all connected clients
-            method = msg.get("method", "")
+        elif "method" in msg:
+            # Server→client request/notification (e.g. session/request_permission).
+            # Broadcast to ALL connected clients so they can respond.
             self._broadcast_notification(msg)
         elif msg_id is not None:
-            # Response for unknown request
-            self.log(f"response for unknown id: {msg_id}, error={msg.get('error','')}")
+            # Response for unknown request — log for debugging
+            self.log(f"response for unknown id: {msg_id}, result={msg.get('result','')[:100]}")
 
     def _send_request(self, method, params, timeout=BRIDGE_TIMEOUT):
         """Send JSON-RPC request to server and wait for response."""
