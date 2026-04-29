@@ -11688,7 +11688,8 @@ _ensure_acp_bridge_running() {
   fi
 
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
-  python3 "$bridge_script" start --project "$project" --foreground </dev/null &>/dev/null &
+  local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
+  python3 "$bridge_script" start --project "$project" --foreground </dev/null >>"$bridge_log" 2>&1 &
   disown "$!" 2>/dev/null || true
 
   # Write bridge PID for tracking
