@@ -29,3 +29,5 @@
 - stale_lock_cleanup: `2026-04-30`
 
 - resume_evidence_fix: `2026-04-30`
+
+- alias_env_inheritance: `2026-04-30`
