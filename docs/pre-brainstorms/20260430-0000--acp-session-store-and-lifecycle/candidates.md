@@ -31,3 +31,5 @@
 - resume_evidence_fix: `2026-04-30`
 
 - alias_env_inheritance: `2026-04-30`
+
+- issue_id_date_false_positive: `2026-04-30`

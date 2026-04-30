@@ -85,3 +85,10 @@ Fix: call session/set_mode bypassPermissions after session/new in bridge + run-a
 ## follow-on: 2026-04-30 (9) alias env inheritance fix
 Moved _load_tool_launchers + _apply_tool_alias_settings before _bridge_ensure_running
 so ACP bridge inherits correct per-alias model/env vars instead of shell environment.
+
+## follow-on: 2026-04-30 (10) auth regex false positive fix
+Root cause: issue ID dates (e.g. 20260429, 20260430) contain substrings
+matching HTTP status codes (429). Old regex (401|402|403|429) matched
+these, causing false auth_or_rate_limit detection.
+Fix:  word boundaries so only standalone status codes match.
+Verified: "I-20260429-2000-A" → no_match, "HTTP 429" → MATCH.
