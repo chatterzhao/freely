@@ -71,8 +71,10 @@ class AcpBridge:
         self.log(f"starting ACP server: {self.acp_bin}")
         # Inherit environment but let explicitly-set vars (from alias settings) win
         env = os.environ.copy()
+        # Always bypass permissions in daemon mode — the ACP client handles
+        # permission decisions via session/request_permission protocol.
         self.server_proc = subprocess.Popen(
-            [self.acp_bin],
+            [self.acp_bin, "--permission-mode", "bypassPermissions"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
