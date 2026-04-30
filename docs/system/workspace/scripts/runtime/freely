@@ -3385,13 +3385,31 @@ ensure_runtime_tool_session_anchor() {
     if ! is_valid_uuid "${CLAUDE_SESSION_ID_PREVIOUS:-}"; then
       CLAUDE_SESSION_ID_PREVIOUS=""
     fi
-    # Fallback: if state file lost the session ID, scan the tool's session dir.
+    # Fallback: if state file lost the session ID.
+    # ACP mode: use session-store (SQLite), NOT tool directory scan.
+    # Non-ACP mode: scan the tool's session dir for JSONL files.
     if [[ -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
-      local fallback_id
-      fallback_id="$(_find_recent_session_from_tool_dir "$project" "$tool" || true)"
-      if [[ -n "$fallback_id" ]]; then
-        CLAUDE_SESSION_ID_CURRENT="$fallback_id"
-        log_info "session id recovered from tool directory: $fallback_id"
+      if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+        local _acp_db="$project/.freely/freely.db"
+        local _session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
+        if [[ -f "$_session_store_py" && -f "$_acp_db" ]]; then
+          local _acp_sid
+          _acp_sid=$(python3 "$_session_store_py" get-active \
+            --db "$_acp_db" \
+            --project "$project" \
+            --role "${FREELY_ROLE_HINT:-manager}" 2>/dev/null || true)
+          if [[ -n "$_acp_sid" ]] && is_valid_uuid "$_acp_sid"; then
+            CLAUDE_SESSION_ID_CURRENT="$_acp_sid"
+            log_info "session id recovered from session-store: $_acp_sid"
+          fi
+        fi
+      else
+        local fallback_id
+        fallback_id="$(_find_recent_session_from_tool_dir "$project" "$tool" || true)"
+        if [[ -n "$fallback_id" ]]; then
+          CLAUDE_SESSION_ID_CURRENT="$fallback_id"
+          log_info "session id recovered from tool directory: $fallback_id"
+        fi
       fi
     fi
     if claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
@@ -4940,10 +4958,8 @@ extract_tool_session_id_from_log() {
       sed -n 's/^session id: //p' "$log_file" | head -n 1
       ;;
     *)
-      # ACP mode writes "session id: <sid>" to log (same format as codex)
-      if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-        sed -n 's/^session id: //p' "$log_file" | head -n 1
-      fi
+      # ACP mode session ID is read from session-store (authoritative),
+      # NOT parsed from cycle log text.
       ;;
   esac
 }
@@ -5435,7 +5451,7 @@ _write_chat_to_issue() {
   local project="$1" intake_id="$2" author="$3" channel="$4" message="$5" session_refs="$6" created_at="$7"
   local target_issue chat_type issue_id db_path chat_id worktrees_root worktree_found
 
-  db_path="$project/.freely/chat-inbox.db"
+  db_path="$project/.freely/freely.db"
   target_issue="${FREELY_CHAT_TARGET_ISSUE:-}"
 
   if [[ -n "$target_issue" ]]; then
@@ -5447,7 +5463,7 @@ _write_chat_to_issue() {
     issue_id=""
   fi
 
-  # Step 1: INSERT into chat-inbox.db
+  # Step 1: INSERT into freely.db chats table
   chat_id=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" add \
     --db "$db_path" \
     --type "$chat_type" \
@@ -5457,7 +5473,7 @@ _write_chat_to_issue() {
     --channel "$channel" \
     --session-refs "$session_refs" \
     --intake-id "$intake_id" 2>/dev/null) || {
-      log_error "failed to write chat to chat-inbox.db"
+      log_error "failed to write chat to freely.db"
       return 1
     }
 
@@ -5468,7 +5484,7 @@ _write_chat_to_issue() {
       --db "$db_path" --id "$chat_id" --issue-id "$issue_id" >/dev/null 2>&1 || true
   fi
 
-  log_info "chat recorded: chat-inbox.db id=$chat_id type=$chat_type issue_id=$issue_id"
+  log_info "chat recorded: freely.db id=$chat_id type=$chat_type issue_id=$issue_id"
 
   # Step 2: Try direct sync if a worktree exists for this issue
   worktrees_root="${project}-worktrees"
@@ -11708,10 +11724,24 @@ _stop_acp_bridge() {
   if [[ -f "$bridge_script" ]]; then
     python3 "$bridge_script" stop --project "$project" >/dev/null 2>&1 || true
   fi
-  # Kill orphaned claude-agent-acp and claude child processes
-  pkill -f "claude-agent-acp" 2>/dev/null || true
-  pkill -f "claude.*--session-id.*--replay-user-messages" 2>/dev/null || true
+  # Kill all claude-agent-acp and claude child processes (SIGTERM first, then SIGKILL)
+  local patterns=(
+    "claude-agent-acp"
+    "claude.*--session-id.*--replay-user-messages"
+    "claude.*--resume [a-f0-9-]\{36\}"
+    "run-acp-prompt.py"
+  )
+  local p
+  for p in "${patterns[@]}"; do
+    pkill -f "$p" 2>/dev/null || true
+  done
+  sleep 0.5
+  for p in "${patterns[@]}"; do
+    pkill -9 -f "$p" 2>/dev/null || true
+  done
+  # Clean up state files
   rm -f "$(_acp_bridge_pid_file "$project")" "$(_acp_bridge_socket "$project")"
+  rm -f "$(run_dir_for_project "$project")/acp-bridge.log"
 }
 
 manager_ai_stalled_with_pending_intake() {
@@ -14385,13 +14415,10 @@ select_launch_kind() {
   handoff_rotation_reason="$(session_handoff_rotation_reason "$PROJECT_ROOT" || true)"
   resume_target_before_launch="$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")"
 
-  # ACP mode: sessions are persistent (managed by bridge). Always prefer
-  # resume when a previous session ID exists, since resume gives cache hits.
+  # ACP mode: session identity stored in session-store (SQLite).
+  # Query it directly — no cycle log parsing, no tool directory scanning.
   if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-    # Fork: worker inherits parent session context (same as direct mode).
-    # Fork: only for workers with a real parent session (SESSION_PARENT_ID set
-    # by manager delegation), no own session yet, and no previous launch done.
-    # Manager always skips fork — it has no parent.
+    # Fork: worker inherits parent session context.
     if [[ -n "${SESSION_PARENT_ID:-}" && -z "${CLAUDE_SESSION_ID_CURRENT:-}" \
           && "${LAST_LAUNCH_KIND:-}" != "fork" && -z "${LAST_LAUNCH_KIND:-}" ]]; then
       local role; role="$(role_hint_for_project "$project")"
@@ -14402,45 +14429,30 @@ select_launch_kind() {
         return 0
       fi
     fi
-    # Resume detection: check session-state.env first, then fall back to
-    # extracting session ID from the most recent cycle log (more reliable).
-    local acp_has_session=""
-    if [[ -n "${LAST_TOOL_SESSION_ID:-}" || -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
-      acp_has_session="1"
-    else
-      # Fallback: scan latest cycle log for a session ID
-      # bash 3.2 + pipefail: ls on empty glob triggers fatal exit even
-      # inside $(). Guard the pipeline with a nullglob check first.
-      local recent_log=""
-      local -a _cycle_candidates=()
-      if shopt -s nullglob 2>/dev/null; then
-        _cycle_candidates=("$logs_dir"/cycle-*.log)
-        shopt -u nullglob
-      else
-        local _f
-        for _f in "$logs_dir"/cycle-*.log; do
-          [[ -f "$_f" ]] || continue
-          _cycle_candidates+=("$_f")
-        done
-      fi
-      if [[ ${#_cycle_candidates[@]} -gt 0 ]]; then
-        recent_log=$(ls -t "${_cycle_candidates[@]}" 2>/dev/null | head -1)
-      fi
-      if [[ -n "$recent_log" && -f "$recent_log" ]]; then
-        local extracted; extracted=$(sed -n 's/^session id: //p' "$recent_log" | head -1)
-        if [[ -n "$extracted" ]]; then
-          CLAUDE_SESSION_ID_CURRENT="$extracted"
-          LAST_TOOL_SESSION_ID="$extracted"
-          acp_has_session="1"
-        fi
+    # Query session-store for active session (authoritative source).
+    local session_store_py sid
+    session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
+    local _acp_db="$PROJECT_ROOT/.freely/freely.db"
+    if [[ -f "$session_store_py" && -f "$_acp_db" ]]; then
+      sid=$(python3 "$session_store_py" get-active \
+        --db "$_acp_db" \
+        --project "$PROJECT_ROOT" \
+        --role "${FREELY_ROLE_HINT:-manager}" 2>/dev/null || true)
+      if [[ -n "$sid" ]] && is_valid_uuid "$sid"; then
+        CLAUDE_SESSION_ID_CURRENT="$sid"
+        LAST_TOOL_SESSION_ID="$sid"
+        LAUNCH_KIND_SELECTED="resume"
+        LAUNCH_ROTATION_REASON="acp_session_persists"
+        return 0
       fi
     fi
-    if [[ -n "$acp_has_session" ]]; then
+    # Fallback: if session-store unavailable, check in-memory vars.
+    if [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]] && is_valid_uuid "${CLAUDE_SESSION_ID_CURRENT:-}"; then
       LAUNCH_KIND_SELECTED="resume"
       LAUNCH_ROTATION_REASON="acp_session_persists"
       return 0
     fi
-    # No previous session → first ever launch
+    # No active session → first launch or all previous sessions failed.
     LAUNCH_KIND_SELECTED="fresh"
     LAUNCH_ROTATION_REASON="acp_first_launch"
     return 0
@@ -16457,11 +16469,15 @@ cmd_init() {
   register_project_in_registry "$project"
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "initialized"
-  # Initialize chat-inbox SQLite database
+  # Initialize freely.db (chats + sessions tables)
+  local freely_db="$project/.freely/freely.db"
   local chat_inbox_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
-  local chat_inbox_db="$project/.freely/chat-inbox.db"
+  local session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
   if [[ -f "$chat_inbox_py" ]]; then
-    python3 "$chat_inbox_py" init --db "$chat_inbox_db" >/dev/null 2>&1 || true
+    python3 "$chat_inbox_py" init --db "$freely_db" >/dev/null 2>&1 || true
+  fi
+  if [[ -f "$session_store_py" ]]; then
+    python3 "$session_store_py" init --db "$freely_db" >/dev/null 2>&1 || true
   fi
   log_info "initialized: $(config_file "$project")"
   load_config "$project"
@@ -17146,6 +17162,27 @@ stop_project_runtime() {
       if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
         _stop_acp_bridge "$project"
       fi
+      # Aggressively kill ALL project-related AI processes.
+      # SIGTERM first, brief wait, then SIGKILL for any survivors.
+      local _stop_patterns=(
+        "monitor-ai-acp.sh.*--project.*${project}"
+        "run-acp-prompt.py.*--bridge-socket"
+        "claude.*--session-id.*--replay-user-messages"
+        "claude.*--resume [a-f0-9-]\{36\}"
+        "claude-agent-acp"
+      )
+      local _p
+      for _p in "${_stop_patterns[@]}"; do
+        pkill -f "$_p" 2>/dev/null || true
+      done
+      sleep 0.3
+      for _p in "${_stop_patterns[@]}"; do
+        pkill -9 -f "$_p" 2>/dev/null || true
+      done
+      # Clean up session persistence (Claude tool-homes)
+      local _tool_home="${project}/.freely/tool-homes/claude"
+      rm -rf "${_tool_home}/.claude/sessions" 2>/dev/null || true
+      rm -rf "${_tool_home}/.claude/session-env" 2>/dev/null || true
       ;;
   esac
   rm -f "$stop_marker"
@@ -17782,12 +17819,14 @@ start_project_runtime() {
       rm -f "$(handoff_file "$PROJECT_ROOT")"
     fi
 
-    local tool_adapter failure_marker_file="" network_failure_marker_file=""
+    local tool_adapter failure_marker_file="" network_failure_marker_file="" bridge_lost_marker_file=""
     tool_adapter="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "$AI_TOOL")}"
     failure_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/tool-runtime-failure.marker"
     network_failure_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/network-failure.marker"
+    bridge_lost_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/bridge-lost.marker"
     rm -f "$failure_marker_file"
     rm -f "$network_failure_marker_file"
+    rm -f "$bridge_lost_marker_file"
     exit_if_stop_requested_before_launch
     log_info "launching $AI_TOOL via ${tool_adapter:-unknown} ($mode_name mode, ai_mode=$AI_MODE)"
     append_runtime_event "$project" "ai_launch_begin" \
@@ -17824,6 +17863,11 @@ start_project_runtime() {
           [[ -f "$monitor_script" ]] || monitor_script="$workspace_root/scripts/monitor-ai-cli.sh"
           ;;
       esac
+      # Per-adapter extra args (ACP-only args must not be passed to non-ACP monitors).
+      local -a _adapter_extra_args=()
+      if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+        _adapter_extra_args=(--bridge-lost-marker-file "$bridge_lost_marker_file")
+      fi
       bash "$monitor_script" \
         --project "$PROJECT_ROOT" \
         --tool "$AI_TOOL" \
@@ -17845,6 +17889,7 @@ start_project_runtime() {
         --log-file "$cycle_log" \
         --network-failure-marker-file "$network_failure_marker_file" \
         --failure-marker-file "$failure_marker_file" \
+        "${_adapter_extra_args[@]}" \
         --launch-kind "$mode_name"
     } >>"$loop_log" 2>&1
     local rc=$?
@@ -17996,6 +18041,7 @@ start_project_runtime() {
     network_failure_reason=""
     live_failure_reason=""
     live_network_failure_reason=""
+    live_bridge_lost_reason=""
     if [[ -f "$network_failure_marker_file" ]]; then
       live_network_failure_reason="$(tr -d '\r' <"$network_failure_marker_file" | awk 'NF { print; exit }' || true)"
       rm -f "$network_failure_marker_file"
@@ -18004,12 +18050,18 @@ start_project_runtime() {
       live_failure_reason="$(tr -d '\r' <"$failure_marker_file" | awk 'NF { print; exit }' || true)"
       rm -f "$failure_marker_file"
     fi
+    if [[ -f "$bridge_lost_marker_file" ]]; then
+      live_bridge_lost_reason="$(tr -d '\r' <"$bridge_lost_marker_file" | awk 'NF { print; exit }' || true)"
+      rm -f "$bridge_lost_marker_file"
+    fi
     if [[ -n "$live_network_failure_reason" ]]; then
       network_failure_reason="$(runtime_network_failure_reason_from_log "$PROJECT_ROOT" "$cycle_log" || true)"
     fi
     if [[ -n "$live_failure_reason" ]]; then
       slot_switch_reason="$live_failure_reason"
     fi
+    # bridge_session_lost is handled at session-store level (mark failed → fresh next launch).
+    # No slot switch needed — the tool itself is healthy, just the session is gone.
     if [[ "$AI_TOOL" == "codex" ]]; then
       rate_limit_reason="$(runtime_capture_or_empty codex_rate_limit_reason_from_usage "${primary_rate_limit_used_percent:-}" "${secondary_rate_limit_used_percent:-}")"
       rate_limit_reset_at="$(runtime_capture_or_empty codex_rate_limit_reset_at_for_reason "${rate_limit_reason:-}" "${primary_rate_limit_resets_at:-}" "${secondary_rate_limit_resets_at:-}")"

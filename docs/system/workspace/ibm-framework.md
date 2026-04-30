@@ -39,7 +39,7 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 
 **信号进入 B1_IBM**：
 - 平台 issue（github/gitee）：`task-source-scan.py` 下载到本地 `docs/issues/`。raw issue 的 `restart_point=pre_brainstorm`，lead agent 路由到 B1_IBM
-- chat 插话：`freely chat` → `chat-routing skill` 判断属于哪个 issue → 写入 `.freely/chat-inbox.db`（git-ignored 暂存，不污染 protected branch）。`task-source-scan` 扫出未消费的 chat，AI 判断后创建工位（wt-create 自动 materialize 到 `docs/issues/`）或追加评论
+- chat 插话：`freely chat` → `chat-routing skill` 判断属于哪个 issue → 写入 `.freely/freely.db`（git-ignored 暂存，不污染 protected branch）。`task-source-scan` 扫出未消费的 chat，AI 判断后创建工位（wt-create 自动 materialize 到 `docs/issues/`）或追加评论
 - chat 写入时若有对应工位，则直接同步到 worktree 的 `docs/issues/`，跳过暂存
 - 其他信号（runtime anomaly、review 发现）：通过 chat 插话进入，同上
 - AI **永远不直接读平台内容**——只读本地 `docs/issues/` 中的副本。平台内容由 scan 脚本下载一次
@@ -172,7 +172,7 @@ chat 插话 / 平台扫描
 
 每条 `freely chat` 必须落地为 issue 或已有 issue 的评论：
 
-- 所有 chat 先写入 `.freely/chat-inbox.db`（SQLite，git-ignored），不直接写 `docs/issues/`
+- 所有 chat 先写入 `.freely/freely.db`（SQLite，git-ignored），不直接写 `docs/issues/`
 - chat 写入时若有对应工位，直接同步到 worktree 的 `docs/issues/`，标记 consumed=1
 - 无工位时留在 DB（consumed=0），由 task-source-scan 扫出供 AI 判断
 - 如果是新话题（`--new-issue`）：AI 创建工位 → wt-create 自动 materialize 到 worktree 的 `docs/issues/`

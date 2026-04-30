@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Chat-inbox SQLite module.
 
-Stores chat intakes in .freely/chat-inbox.db (git-ignored) to avoid
+Stores chat intakes in .freely/freely.db (git-ignored, shared with session-store) to avoid
 polluting protected branches with docs/issues/ writes.
 
 Usage:
@@ -306,7 +306,7 @@ def _main() -> int:
 
     if args.cmd == "init":
         init_db(args.db)
-        print(f"chat-inbox.db initialized: {args.db}")
+        print(f"freely.db chats table initialized: {args.db}")
         return 0
 
     if args.cmd == "add":

@@ -341,7 +341,8 @@ def main():
                     timeout=30,
                 )
                 session_id = session_result["sessionId"]
-                print(f"session id: {session_id} (resumed)", flush=True)
+                print(session_id, flush=True)                                # line 1: clean UUID for machine parsing
+                print(f"session id: {session_id} (resumed)", flush=True)     # line 2: human log
             except Exception as e:
                 print(f"[WARN] session/resume failed ({e}), falling back to session/new", file=sys.stderr, flush=True)
                 new_params = {"cwd": cwd, "mcpServers": []}
@@ -349,7 +350,8 @@ def main():
                     new_params["sessionId"] = args.session_id
                 session_result = client.request("session/new", new_params, timeout=30)
                 session_id = session_result["sessionId"]
-                print(f"session id: {session_id} (fresh after resume failure)", flush=True)
+                print(session_id, flush=True)                                             # line 1: clean UUID
+                print(f"session id: {session_id} (fresh after resume failure)", flush=True) # line 2: human log
 
         elif launch_kind == "fork":
             # Worker forks from parent: gets own session, inherits context via prompt.
@@ -360,8 +362,10 @@ def main():
             session_result = client.request("session/new", new_params, timeout=30)
             session_id = session_result["sessionId"]
             if resume_target:
+                print(session_id, flush=True)
                 print(f"session id: {session_id} (fork from {resume_target})", flush=True)
             else:
+                print(session_id, flush=True)
                 print(f"session id: {session_id} (fork)", flush=True)
 
         else:
@@ -371,7 +375,8 @@ def main():
                 new_params["sessionId"] = args.session_id
             session_result = client.request("session/new", new_params, timeout=30)
             session_id = session_result["sessionId"]
-            print(f"session id: {session_id}", flush=True)
+            print(session_id, flush=True)                         # line 1: clean UUID
+            print(f"session id: {session_id}", flush=True)       # line 2: human log
 
         t_session = time.time()
 
