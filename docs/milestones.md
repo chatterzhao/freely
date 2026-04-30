@@ -258,6 +258,24 @@ routing_policy:
 - next_action: `Merge into develop via test-pre-merge batch.`
 
 
+24. `I-20260429-2000-A`
+- title: Gate dev experience: --range pre-flight + secret detection FP fix
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/issues/I-20260429-2000-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-gate-dev-experience-preflight.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/pre-tests.md`
+- source_brainstorm: `docs/pre-brainstorms/20260429-2000--gate-dev-experience-preflight/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260429-2000--gate-dev-experience-preflight/candidates.md`
+- branch: `feature/gate-dev-experience-improvements-20260429`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/issues/I-20260429-2000-A.md`
+  - `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/pre-tests.md`
+  - `docs/progress/workspace-routing-foundation/p-gate-dev-experience-preflight.md`
+  - `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/code-reviews/20260429-gate-dev-experience-preflight-verification.md`
+- next_action: `Merge into develop.`
+
 ### candidate_issues
 
 1. `C-20260417-0445-A`
