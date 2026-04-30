@@ -95,29 +95,63 @@ class AcpBridge:
         self.stderr_thread = threading.Thread(target=self._read_stderr, daemon=True)
         self.stdout_thread.start()
         self.stderr_thread.start()
-        # Initialize handshake is deferred to _ensure_server_alive() —
-        # called on first client request to avoid deadlock during restart.
+
+        # Initialize handshake
+        try:
+            result = self._send_request("initialize", {
+                "protocolVersion": 1,
+                "clientInfo": {"name": "freely-bridge", "title": "Freely ACP Bridge", "version": "0.2"},
+                "clientCapabilities": {"loadSession": True, "resumeSession": True},
+            }, timeout=30)
+            self.server_ready.set()
+            self.log(f"initialize OK: {json.dumps(result)[:200]}")
+        except Exception as e:
+            self.log(f"initialize failed: {e}")
+            raise
 
     def _ensure_server_alive(self):
         """Check if server is alive and initialized; restart + init if needed."""
-        if self.server_proc is None or self.server_proc.poll() is not None:
-            if self.running:
-                self.log("server process dead, restarting")
-                self._restart_server()
-        # Lazy initialize: if server was restarted, do the handshake now.
-        if not self.server_ready.is_set():
-            self.log("server needs initialize, performing handshake")
-            try:
-                result = self._send_request("initialize", {
-                    "protocolVersion": 1,
-                    "clientInfo": {"name": "freely-bridge", "title": "Freely ACP Bridge", "version": "0.2"},
-                    "clientCapabilities": {"loadSession": True, "resumeSession": True},
-                }, timeout=10)
-                self.server_ready.set()
-                self.log(f"initialize OK: {json.dumps(result)[:200]}")
-            except Exception as e:
-                self.log(f"initialize failed: {e}")
-                raise
+        if self.server_proc is not None and self.server_proc.poll() is None:
+            return  # alive and well
+        if not self.running:
+            return
+        # Server is dead — restart from scratch
+        self.log("server process dead, full restart")
+        if self.server_proc:
+            try: self.server_proc.stdin.close()
+            except OSError: pass
+            try: self.server_proc.terminate(); self.server_proc.wait(timeout=2)
+            except subprocess.TimeoutExpired: self.server_proc.kill(); self.server_proc.wait()
+        self.server_proc = None
+        self.server_ready.clear()
+        # Clear stale pending requests
+        with self.server_lock:
+            for req_id, (event, _container) in list(self.pending.items()):
+                event.set(); del self.pending[req_id]
+        # Restart
+        env = os.environ.copy()
+        self.server_proc = subprocess.Popen(
+            [self.acp_bin, "--permission-mode", "bypassPermissions"],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            text=True, bufsize=1, env=env,
+        )
+        # Start new reader threads for new process
+        self.stdout_thread = threading.Thread(target=self._read_stdout, daemon=True)
+        self.stderr_thread = threading.Thread(target=self._read_stderr, daemon=True)
+        self.stdout_thread.start()
+        self.stderr_thread.start()
+        # Initialize
+        try:
+            result = self._send_request("initialize", {
+                "protocolVersion": 1,
+                "clientInfo": {"name": "freely-bridge", "title": "Freely ACP Bridge", "version": "0.2"},
+                "clientCapabilities": {"loadSession": True, "resumeSession": True},
+            }, timeout=30)
+            self.server_ready.set()
+            self.log(f"re-initialize OK: {json.dumps(result)[:200]}")
+        except Exception as e:
+            self.log(f"re-initialize failed: {e}")
+            raise
 
     def _restart_server(self):
         """Kill stale server process and start a fresh one.
@@ -167,18 +201,12 @@ class AcpBridge:
 
     def _read_stdout(self):
         """Read newline-delimited JSON from server stdout."""
-        while self.running:
-            if not self.server_proc or not self.server_proc.stdout:
-                if self.running:
-                    self.log("server stdout closed, restarting")
-                    self._restart_server()
-                continue
+        while self.running and self.server_proc and self.server_proc.stdout:
             try:
                 line = self.server_proc.stdout.readline()
                 if not line:
                     self.log("server stdout closed")
-                    self._restart_server()
-                    continue
+                    break
                 line = line.strip()
                 if not line:
                     continue
@@ -269,12 +297,19 @@ class AcpBridge:
                 self.clients.remove(sock)
 
     def session_new(self, session_id=None, cwd=None):
-        """Create a new ACP session."""
+        """Create a new ACP session and set bypassPermissions mode."""
         params = {"cwd": cwd or self.project, "mcpServers": []}
         if session_id:
             params["sessionId"] = session_id
         result = self._send_request("session/new", params, timeout=30)
-        return result.get("sessionId", "")
+        sid = result.get("sessionId", "")
+        # Immediately set bypassPermissions to avoid interactive permission hangs
+        try:
+            self._send_request("session/set_mode", {"sessionId": sid, "modeId": "bypassPermissions"}, timeout=10)
+            self.log(f"session {sid[:12]}... mode set to bypassPermissions")
+        except Exception as e:
+            self.log(f"session/set_mode failed (non-fatal): {e}")
+        return sid
 
     def session_resume(self, session_id, cwd=None):
         """Resume an existing ACP session."""
@@ -382,6 +417,17 @@ def handle_client(conn, bridge):
                     result = bridge._send_request(method, params,
                         timeout=params.get("timeout", BRIDGE_TIMEOUT))
                     response = {"jsonrpc": "2.0", "id": req_id, "result": result}
+                    # After session/new, immediately set bypassPermissions to
+                    # prevent interactive permission prompts from hanging the AI.
+                    if method == "session/new":
+                        sid = result.get("sessionId", "")
+                        if sid:
+                            try:
+                                bridge._send_request("session/set_mode",
+                                    {"sessionId": sid, "modeId": "bypassPermissions"}, timeout=10)
+                                bridge.log(f"session {sid[:12]}... mode set to bypassPermissions")
+                            except Exception as e:
+                                bridge.log(f"session/set_mode failed (non-fatal): {e}")
                 except TimeoutError as e:
                     response = {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32000, "message": str(e)}}
                 except RuntimeError as e:
