@@ -3,138 +3,117 @@
 ## 问题
 
 `freely chat --new-issue` / `--issue <id>` 直接写入 `docs/issues/`，污染 protected branch。
-之前 `.freely/intake/` 用文件系统存储，231 条记录已占满，scan 会越来越慢。
+之前 `.freely/intake/` 用文件系统，扫描慢、格式不一致。
 
-## 调研：`docs/issues/` 读写依赖
+## 设计决策
 
-### 写入方
-| 入口 | 位置 | 操作 |
-|------|------|------|
-| `freely chat --new-issue` | `_write_chat_to_issue` L5494 | 创建 `raw-{ts}/issue.md` |
-| `freely chat --issue <id>` | `_write_chat_to_issue` L5442 | 追加 comment |
-| `issue-sync` | `bin/issue-sync` | 同步 platform_ids |
-| AI agent (B1 promote) | lead-agent | 创建 `I-*` linked issue |
+### ID：纯 UTC 时间戳
 
-### 读取方
-| 入口 | 位置 | 目的 |
-|------|------|------|
-| `task-source-scan` | `scan_raw_issues` | 扫描未处理 raw issue |
-| `task-source-scan` | `scan_linked_issues` | 扫描未读评论 |
-| `governance-merge-gate` | GATE 6.2/6.3 | 验证 C/M/I 链 |
-| `_route_chat_to_issue` | L5559 | chat 路由匹配 |
-| AI agent | lead-agent / context-source-skill | 任务路由 |
+- 数据库 `id` = UTC 时间戳（如 `20260429204530`），永远唯一，无时区问题
+- 前缀（`raw-` / `chat-`）是 scan 时根据 `chat_type` 组装的展示层逻辑，不存数据库
 
-## SQLite 方案
+### 状态：布尔 consumed
 
-### 为什么 SQLite
+- `consumed INTEGER DEFAULT 0` — 0=未消费，1=已消费
+- 写入默认 0，被消费后改 1
+- `WHERE consumed=0` 是简单整数索引扫描，比字符串快
 
-- 文件系统扫描 231+ 目录：每次 `iterdir()` + `read_text()` + YAML 解析，O(n) 磁盘 IO
-- SQLite：`SELECT ... WHERE status='pending' LIMIT 50`，索引查找，O(log n)
-- 单个 `.freely/chat-inbox.db` 文件，git-ignored
-- Python 标准库自带 `sqlite3`，零依赖
+### 角色边界：全部脚本化
 
-### 表结构
+- `freely chat` 写入 SQLite（脚本）
+- `task-source-scan.py` 读取 SQLite + 消费 + 标记（脚本）
+- AI agent 只消费 scan JSON 结果，不直接接触 SQLite
+
+## SQLite Schema
 
 ```sql
 CREATE TABLE IF NOT EXISTS chats (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    chat_id TEXT UNIQUE NOT NULL,
-    chat_type TEXT NOT NULL,          -- 'new-issue' | 'issue-id:raw-xxx' | 'issue-id:I-xxx'
+    id INTEGER PRIMARY KEY,              -- UTC timestamp YYYYMMDDHHMMSS
+    chat_type TEXT NOT NULL,             -- 'new-issue' | 'issue-id:raw-xxx' | 'issue-id:I-xxx'
     author TEXT NOT NULL DEFAULT 'human',
     channel TEXT NOT NULL DEFAULT 'chat',
     message TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'pending',
+    consumed INTEGER NOT NULL DEFAULT 0, -- 0=pending, 1=done
     session_refs TEXT DEFAULT '[]',
     created_at TEXT NOT NULL,
     intake_id TEXT,
-    claimed_at TEXT,
-    materialized_as TEXT,
-    error_message TEXT
+    materialized_as TEXT                 -- 消费后记录产物引用
 );
 
-CREATE INDEX IF NOT EXISTS idx_status ON chats(status);
-CREATE INDEX IF NOT EXISTS idx_type ON chats(chat_type);
-CREATE INDEX IF NOT EXISTS idx_created ON chats(created_at);
+CREATE INDEX IF NOT EXISTS idx_consumed ON chats(consumed);
 ```
 
-### Chat 写入流程
+## 写入流程
 
 ```
 freely chat --new-issue "消息"
-  → INSERT INTO chats (chat_id='raw-{ts}', chat_type='new-issue', ...)
-  → develop 无文件变更 ✓
+  → INSERT INTO chats (id={ts}, chat_type='new-issue', message='...')
+  → develop 零文件变更 ✓
 
 freely chat --issue raw-20260401-1200 "评论"
-  → INSERT INTO chats (chat_id='chat-{ts}', chat_type='issue-id:raw-20260401-1200', ...)
-  → develop 无文件变更 ✓
+  → INSERT INTO chats (id={ts}, chat_type='issue-id:raw-20260401-1200', ...)
 ```
 
-### Chat 消费流程
+## 消费流程（task-source-scan.py）
 
 ```
-task-source-scan.py::scan_chat_inbox()
-  → SELECT * FROM chats WHERE status='pending' ORDER BY created_at DESC LIMIT 50
-  → 返回给 AI agent
+SELECT * FROM chats WHERE consumed=0 ORDER BY id ASC LIMIT 50
 
-AI agent 根据 chat_type 处理：
+对每条 pending chat：
+
+  chat_type='new-issue'
+    → 组装 chat_id = "raw-{id}"
+    → 放入 scan JSON sources[]
+    → source_type='chat_intake', restart_point='pre_brainstorm'
+    → next_action='Create worktree, materialize as docs/issues/raw-{id}/issue.md'
+    → UPDATE consumed=1, materialized_as='raw-{id}'
+
+  chat_type='issue-id:raw-xxx'
+    → 查找 docs/issues/raw-xxx/issue.md
+       ├─ 找到且未关闭 → 组装 chat_id = "chat-{id}"
+       │    → source_type='chat_comment', restart_point='continuation'
+       │    → next_action='Append comment to raw-xxx'
+       │    → UPDATE consumed=1
+       │
+       ├─ 找到且 status=absorbed → 读取 absorbed_into (I-*)
+       │    → 重定向：追加到 I-* issue 的 Comments
+       │    → UPDATE consumed=1, materialized_as='{I-*}'
+       │
+       └─ 未找到或已关闭
+            → source_type='chat_orphan'
+            → next_action='Target issue closed/missing, AI decides: reopen or drop'
+            → UPDATE consumed=1（避免重复扫描）
+
+  chat_type='issue-id:I-xxx'
+    → 同上逻辑，查找 docs/issues/I-xxx/issue.md
 ```
 
-#### 分支 1：`chat_type = 'new-issue'`
+## AI agent 视角
 
-```
-chat_id = raw-{ts}
-  → AI 创建 worktree
-  → AI 在 worktree 中创建 docs/issues/raw-{ts}/issue.md
-  → UPDATE chats SET status='materialized', materialized_as='raw-{ts}'
-  → 继续 B1_IBM 预研
-```
+AI 只消费 scan JSON，看到的 source 已经过脚本预处理：
 
-#### 分支 2：`chat_type = 'issue-id:raw-{ts}'`
-
-```
-target = raw-{ts}
-  → 查找 docs/issues/raw-{ts}/issue.md
-     ├─ 找到且 status != absorbed/closed
-     │    → 追加 comment 到该 issue
-     │    → UPDATE chats SET status='delivered'
-     │
-     ├─ 找到且 status = absorbed（已被 promote 到 I-*）
-     │    → 读取 absorbed_into 字段获取 I-* ID
-     │    → 追加 comment 到 I-* issue
-     │    → UPDATE chats SET status='delivered', materialized_as='{I-*}'
-     │
-     └─ 未找到，或 status = closed/completed
-          → 选项 A: 自动转为 new-issue（创建新 raw issue）
-          → 选项 B: 记录 error_message，标记 status='error'
+```json
+{
+  "source_type": "chat_intake",
+  "source_ref": "intake://raw-20260429204530",
+  "restart_point": "pre_brainstorm",
+  "next_action": "Create worktree, materialize as docs/issues/raw-20260429204530/issue.md, then B1_IBM."
+}
 ```
 
-#### 分支 3：`chat_type = 'issue-id:I-{ts}'`
+AI 不需要知道 SQLite、chat-inbox 的存在。它拿到的是一个标准的 `discovery` source，按现有流程处理。
 
-```
-target = I-{ts}
-  → 查找 docs/issues/I-{ts}/issue.md
-     ├─ 找到且 phase_state 未完成
-     │    → 追加 comment
-     │    → UPDATE chats SET status='delivered'
-     │
-     └─ 未找到或已完成
-          → 同分支 2 的 closed 处理
-```
+## 旧 intake 不迁移
 
-### 旧数据迁移
+`.freely/intake/` 231 条记录全部为 absorbed/dropped，无 pending。保留不动，新 chat 全部走 SQLite。
 
-`.freely/intake/` 中 231 条记录，状态全部为 `absorbed` 或 `dropped`。
-方案：不迁移到 SQLite（已消费完毕，无 pending 项）。保留旧目录不动，新 chat 全部走 SQLite。
+## 与现有流程对比
 
-### 索引与性能
-
-- `WHERE status='pending'` — idx_status 覆盖，常数时间
-- `ORDER BY created_at DESC` — idx_created 覆盖
-- `LIMIT 50` — 只取最近 50 条 pending
-- 即使积累 10000 条记录，pending 通常只有个位数
-
-## 待决策
-
-1. **已关闭 issue 的评论处理**：自动转 new-issue 还是标记 error？
-2. **materialized 记录清理**：保留多久？定期 VACUUM？
-3. **chat-inbox.db 的 WAL 模式**：是否需要（并发读写）？
+| | 现在 | 改后 |
+|---|---|---|
+| chat 写入位置 | `docs/issues/` | `.freely/chat-inbox.db` |
+| develop 污染 | 是 | 否 |
+| 扫描方式 | `iterdir()` + `read_text()` | `SELECT WHERE consumed=0` |
+| 扫描复杂度 | O(n) 磁盘 IO | O(log n) 索引 |
+| AI 是否感知 | 直接读 issue.md | 只读 scan JSON |
+| 消费标记 | canonical_issue_path 非空 | consumed=1 |
