@@ -16,6 +16,9 @@ session_refs:
   - {tool: ccds, session_id: "20260430-doc-sync", role: "author"}
 ---
 
+- issue_id: `I-20260430-0010-A`
+- source_candidate: `docs/pre-brainstorms/20260430-0010--doc-sync-chat-inbox/candidates.md#C-20260430-0010-A`
+
 ## Pre-Brainstorm Summary
 
 Doc sync + governance-only path fix.
