@@ -47,3 +47,5 @@ Extended existing startup_self_heal mechanism (not a new function):
 - acp_no_inmemory_fallback: completed
 
 - acp_permission_fix: completed
+
+- alias_env_inheritance: completed

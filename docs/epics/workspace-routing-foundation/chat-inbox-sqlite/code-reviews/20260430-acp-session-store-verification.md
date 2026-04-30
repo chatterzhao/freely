@@ -81,3 +81,7 @@ restart race guard. Fresh 5s, resume 2s (cache hit).
 Root cause: --permission-mode bypassPermissions requires --allow-dangerously-skip-permissions
 to take effect on child claude process. Without it, Claude CLI silently falls back to default mode.
 Fix: call session/set_mode bypassPermissions after session/new in bridge + run-acp-prompt.py direct mode.
+
+## follow-on: 2026-04-30 (9) alias env inheritance fix
+Moved _load_tool_launchers + _apply_tool_alias_settings before _bridge_ensure_running
+so ACP bridge inherits correct per-alias model/env vars instead of shell environment.
