@@ -92,7 +92,7 @@ _detect_acp_failure() {
     [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
   fi
 
-  if grep -qE '(401|402|403|429|Unauthorized|Payment Required|insufficient_quota|rate_limit|quota exceeded|InsufficientBalance)' "$log_file" 2>/dev/null; then
+  if grep -qE '(\b401\b|\b402\b|\b403\b|\b429\b|Unauthorized|Payment Required|insufficient_quota|rate_limit|quota exceeded|InsufficientBalance)' "$log_file" 2>/dev/null; then
     [[ -n "$failure_marker" ]] && echo "auth_or_rate_limit" > "$failure_marker"
   fi
 
