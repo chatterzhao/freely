@@ -14511,13 +14511,9 @@ select_launch_kind() {
         return 0
       fi
     fi
-    # Fallback: if session-store unavailable, check in-memory vars.
-    if [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]] && is_valid_uuid "${CLAUDE_SESSION_ID_CURRENT:-}"; then
-      LAUNCH_KIND_SELECTED="resume"
-      LAUNCH_ROTATION_REASON="acp_session_persists"
-      return 0
-    fi
-    # No active session → first launch or all previous sessions failed.
+    # No active session in session-store → fresh launch.
+    # (Do NOT fall back to in-memory CLAUDE_SESSION_ID_CURRENT;
+    # session-store is the authoritative source for ACP mode.)
     LAUNCH_KIND_SELECTED="fresh"
     LAUNCH_ROTATION_REASON="acp_first_launch"
     return 0
