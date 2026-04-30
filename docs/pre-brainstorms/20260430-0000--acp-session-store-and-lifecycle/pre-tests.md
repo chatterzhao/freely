@@ -79,3 +79,55 @@ python3 session-store.py get-active --db .freely/freely.db --project $PWD
 # Verify extract_tool_session_id_from_log ACP branch removed
 # Verify ensure_runtime_tool_session_anchor non-ACP uses _find_recent_session_from_tool_dir
 ```
+
+## 2026-04-30 (3): DeepSeek API speed diagnosis
+
+### Test F: Baseline speed tests
+```bash
+# Simple English prompt (baseline)
+echo "say hello world" | claude -p --settings ~/.claude/settings_deepseek_flash.json --dangerously-skip-permissions
+# Expected: < 10s
+
+# Simple Chinese prompt
+echo "你好" | claude -p --settings ~/.claude/settings_deepseek_flash.json --dangerously-skip-permissions
+# Expected: < 10s
+
+# 1KB freely prompt
+head -c 1000 .freely/run/prompt-*.txt | claude -p --settings ~/.claude/settings_deepseek_flash.json --dangerously-skip-permissions
+# Expected: ~40s (Claude CLI overhead 3-4x vs direct API)
+```
+
+### Test G: Proxy elimination test
+```bash
+# Check for proxy
+env | grep -i proxy
+
+# Test without proxy
+env -u all_proxy -u http_proxy -u https_proxy \
+  claude -p --settings ~/.claude/settings_deepseek_flash.json --dangerously-skip-permissions < prompt.txt
+```
+
+### Test H: Direct API speed (bypass Claude CLI)
+```bash
+# Direct DeepSeek API call — establishes baseline
+curl -s -w "TIME=%{time_total}s HTTP=%{http_code}" --max-time 60 \
+  https://api.deepseek.com/anthropic/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $DEEPSEEK_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{"model":"deepseek-v4-flash","max_tokens":1000,"messages":[{"role":"user","content":"<prompt>"}]}'
+# Expected: ~13s for 34KB prompt (no Claude CLI overhead)
+```
+
+### Test I: Claude CLI overhead measurement
+```bash
+# Same prompt, compare direct API vs Claude CLI
+# Direct API: ~13s
+# Claude CLI:  ~50s (3-4x overhead)
+# Claude CLI is reading config, loading model list, etc.
+```
+
+### Key finding
+- DeepSeek API is NOT slow (~13s for 34KB)
+- Claude CLI adds 3-4x overhead (~50s)
+- Supervisors must not kill AI during active output — timeout should reset on each output event
