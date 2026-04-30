@@ -37,3 +37,5 @@ Extended existing startup_self_heal mechanism (not a new function):
 - Socket cleanup alongside stale bridge PID
 - Marker file cleanup on every start
 - Polluted session ID auto-heal
+
+- self_heal_stale_lock: completed
