@@ -4,31 +4,39 @@
 - date: `2026-04-30`
 - reviewer: `claude-opus-4.7`
 - issue: `I-20260429-2040-A`
-- scope: `session-store.py + run-acp-prompt.py + monitor-ai-acp.sh + freely select_launch_kind`
 
-## Verdict: PASS
+## decision
 
-## Implementation Decision Note
+Replace cycle-log text parsing + tool directory scanning with session-store.py SQLite as the authoritative ACP session identity source. Absorb into I-20260429-2040-A since it reuses the same freely.db + CLI pattern.
 
-This hotfix replaces fragile cycle-log text parsing with a SQLite-backed session identity store (`session-store.py`), absorbed into the existing `freely.db` pattern introduced by I-20260429-2040-A.
+## why_this
 
-### What changed
+The current session ID extraction chain is broken: run-acp-prompt.py outputs annotated IDs like "uuid (resumed)", monitor-ai-acp.sh extracts without stripping annotations, and select_launch_kind falls back to scanning ~/.claude/projects/ with alphabetical sort. This causes a crash loop where a stale session is repeatedly resumed and fails. The SQLite approach provides a single authoritative source that always stores clean UUIDs and properly tracks session lifecycle (active/failed/completed).
 
-| Component | Change | Risk |
-|---|---|---|
-| `session-store.py` | New CLI for session CRUD in freely.db | Low — follows chat-inbox.py pattern |
-| `run-acp-prompt.py` | Line 1 = clean UUID for machine parsing | Low — backward compatible (line 2 kept) |
-| `monitor-ai-acp.sh` | Persists session via session-store.py | Low — fallback to existing behavior |
-| `freely select_launch_kind` | ACP mode queries session-store | Low — fallback to in-memory vars |
-| `freely.db` rename | chat-inbox.db → freely.db | Low — new file, old file orphaned (no migration, pre-release) |
+## alternatives_considered
 
-### Self-review findings
+1. **Fix only the text parsing** (strip annotations from cycle log) — would fix the immediate bug but leaves the unreliable scanning fallback intact
+2. **Bridge generation number** — adds complexity (new file, generation tracking) without benefit since run-acp-prompt.py already handles session/resume → session/new fallback
+3. **JSON file per session** — simpler than SQLite but loses query capability needed for worker/supervisor scenarios
+4. **SQLite in freely.db (chosen)** — reuses existing DB pattern from chat-inbox, provides structured queries for future multi-agent coordination
 
-1. **CRITICAL (fixed):** `--bridge-lost-marker-file` was initially passed unconditionally to all monitor scripts. Fixed: now conditionally passed via bash array only for ACP adapter.
-2. **Pre-existing:** `_stop_patterns` in `stop_project_runtime` includes ACP-specific patterns in universal path. Not introduced by this change; follow-on work needed.
-3. **Verified:** All 5 code paths in `run-acp-prompt.py` output clean UUID line 1 before annotated line 2.
-4. **Verified:** Non-ACP paths (codex, iflow, kiro-cli) unaffected.
+## boundary_non_goals
 
-### Test evidence
+- Not modifying ACP bridge transport layer
+- Not changing non-ACP tool adapters (codex, iflow, kiro-cli)
+- Not adding bridge generation tracking (P1)
+- Not implementing SSE/HTTP event streaming (not applicable to CLI-first)
 
-See `docs/pre-brainstorms/20260430-0000--acp-session-store-and-lifecycle/pre-tests.md` — 6 test cases, all PASS.
+## residual_risk
+
+- `chat-inbox.db` → `freely.db` rename orphans existing unconsumed chat data; acceptable since pre-release
+- `_stop_patterns` in stop_project_runtime has pre-existing ACP-specific patterns in universal path; follow-on work needed
+- session-store.py discovery depends on `$(dirname "$0")` relative to monitor-ai-acp.sh; path must be preserved in install
+
+## scope
+
+session-store.py + run-acp-prompt.py + monitor-ai-acp.sh + freely select_launch_kind
+
+## verdict
+
+PASS — all 7 success criteria verified, critical regression found and fixed
