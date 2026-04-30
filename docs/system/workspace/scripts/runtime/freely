@@ -3444,25 +3444,44 @@ ensure_runtime_tool_session_anchor() {
         fi
       fi
     fi
-    if claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
+    # Resume evidence: ACP mode checks session-store (SQLite); non-ACP checks JSONL.
+    if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+      local _acp_evidence_db="$project/.freely/freely.db"
+      local _acp_evidence_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
+      if [[ -f "$_acp_evidence_py" && -f "$_acp_evidence_db" ]]; then
+        local _acp_evidence_sid
+        _acp_evidence_sid=$(python3 "$_acp_evidence_py" get-active \
+          --db "$_acp_evidence_db" \
+          --project "$project" \
+          --role "${FREELY_ROLE_HINT:-manager}" 2>/dev/null || true)
+        if [[ -n "$_acp_evidence_sid" ]] && is_valid_uuid "$_acp_evidence_sid"; then
+          current_verified="1"
+        fi
+      fi
+    elif claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
       current_verified="1"
     fi
     # Enforcement: if AI_RESUME_ON_START or AI_RESUME_ON_RESTART require resume,
     # and we cannot find ANY valid session ID after all fallbacks, this is a hard
     # error. Falling back to fresh would waste tokens re-sending the full prompt.
+    # ACP mode: session-store is the authoritative evidence source; JSONL is irrelevant.
     local resume_required="false"
     if [[ "${AI_RESUME_ON_RESTART:-false}" == "true" || "${AI_RESUME_ON_START:-false}" == "true" ]]; then
       resume_required="true"
     fi
     if [[ "$resume_required" == "true" && "$launch_kind" == "resume" ]]; then
       if [[ -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
-        log_error "AI_RESUME_ON_START/RESTART=true but no valid session ID found (state file empty, tool dir has no JSONL). Cannot resume."
+        log_error "AI_RESUME_ON_START/RESTART=true but no valid session ID found. Cannot resume."
         log_error "To force a fresh session: ./bin/freely new-session --project $project && ./bin/freely daemon start --project $project"
         exit 1
       fi
-      if ! claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
-        log_error "AI_RESUME_ON_START/RESTART=true but session ${CLAUDE_SESSION_ID_CURRENT} has no verifiable JSONL evidence. Cannot resume."
-        log_error "The session may have been deleted or never completed a cycle. Use 'freely new-session' to force a fresh start."
+      if [[ "$current_verified" != "1" ]]; then
+        if [[ "${AI_TOOL_ADAPTER:-direct}" != "acp" ]]; then
+          log_error "AI_RESUME_ON_START/RESTART=true but session ${CLAUDE_SESSION_ID_CURRENT} has no verifiable JSONL evidence. Cannot resume."
+        else
+          log_error "AI_RESUME_ON_START/RESTART=true but no active session in session-store for ${CLAUDE_SESSION_ID_CURRENT}. Cannot resume."
+        fi
+        log_error "To force a fresh session: ./bin/freely new-session --project $project && ./bin/freely daemon start --project $project"
         exit 1
       fi
     fi
