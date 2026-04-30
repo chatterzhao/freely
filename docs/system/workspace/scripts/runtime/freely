@@ -5433,101 +5433,70 @@ write_intake_item() {
 # Otherwise create a new raw issue.
 _write_chat_to_issue() {
   local project="$1" intake_id="$2" author="$3" channel="$4" message="$5" session_refs="$6" created_at="$7"
-  local issues_dir target_issue issue_file
-  issues_dir="$project/docs/issues"
-  mkdir -p "$issues_dir"
+  local target_issue chat_type issue_id db_path chat_id worktrees_root worktree_found
 
+  db_path="$project/.freely/chat-inbox.db"
   target_issue="${FREELY_CHAT_TARGET_ISSUE:-}"
 
   if [[ -n "$target_issue" ]]; then
-    # --- Append as comment to existing issue ---
-    issue_file="$issues_dir/$target_issue/issue.md"
-    if [[ ! -f "$issue_file" ]]; then
-      log_error "target issue not found: $target_issue"
-      return 1
-    fi
-
-    # Auto-redirect: if target is a raw-* that has been promoted to I-*,
-    # append the comment to the I-* instead and warn.
-    if [[ "$target_issue" == raw-* ]]; then
-      local absorbed_into
-      absorbed_into=$(python3 -c "
-import yaml
-with open('$issue_file') as f:
-  content = f.read()
-if content.startswith('---'):
-  parts = content.split('---', 2)
-  if len(parts) >= 3:
-    fm = yaml.safe_load(parts[1]) or {}
-    print(fm.get('absorbed_into', ''))
-" 2>/dev/null || true)
-      if [[ -n "$absorbed_into" && "$absorbed_into" != "None" ]]; then
-        log_warn "raw issue $target_issue was promoted to $absorbed_into, redirecting comment"
-        target_issue="$absorbed_into"
-        issue_file="$issues_dir/$target_issue/issue.md"
-        if [[ ! -f "$issue_file" ]]; then
-          log_error "redirect target not found: $target_issue (promoted from raw issue)"
-          return 1
-        fi
-      fi
-    fi
-
-    local comment_id urgent_marker
-    comment_id="comment-$(date -u +"%Y%m%dT%H%M%SZ" 2>/dev/null || echo "${created_at}" | tr -d 'T:-')"
-    urgent_marker=""
-    [[ "${FREELY_CHAT_URGENT:-}" == "true" ]] && urgent_marker=", urgent: true"
-
-    cat >> "$issue_file" <<COMMENTEOF
-
-### $comment_id
-{source: chat, author: $author, channel: $channel, intake_id: $intake_id, session_refs: $session_refs$urgent_marker}
-
-$message
-COMMENTEOF
-
-    log_info "chat comment appended to docs/issues/$target_issue/issue.md"
-
-    # If urgent and issue is active, trigger signal
-    if [[ "${FREELY_CHAT_URGENT:-}" == "true" ]]; then
-      _check_issue_active_and_signal "$project" "$target_issue"
-    fi
+    chat_type="comment"
+    issue_id="$target_issue"
   else
-    # --- Create new raw issue ---
-    local ts
-    ts=$(date -u +"%Y%m%d-%H%M" 2>/dev/null || echo "${created_at:0:13}" | tr -d 'T:-' | sed 's/\(.\{8\}\)\(.\{4\}\).*/\1-\2/')
-    local issue_local_id="raw-$ts"
-    local suffix=0
-    while [[ -d "$issues_dir/$issue_local_id" ]]; do
-      suffix=$((suffix + 1))
-      issue_local_id="raw-${ts}-${suffix}"
-    done
-
-    local issue_dir="$issues_dir/$issue_local_id"
-    mkdir -p "$issue_dir"
-
-    cat > "$issue_dir/issue.md" <<ISSUEEOF
----
-local_id: $issue_local_id
-kind: raw
-status: proposed
-platform_ids: {}
-primary_platform: ""
-canonical_issue_path: ""
-last_synced_comment_at: {}
-hash: ""
-created_at: $created_at
-updated_at: $created_at
-intake_id: $intake_id
-author: $author
-channel: $channel
-session_refs: $session_refs
----
-
-$message
-ISSUEEOF
-
-    log_info "chat written to docs/issues/$issue_local_id/issue.md"
+    chat_type="new-issue"
+    # issue_id will be set after INSERT returns the chat id
+    issue_id=""
   fi
+
+  # Step 1: INSERT into chat-inbox.db
+  chat_id=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" add \
+    --db "$db_path" \
+    --type "$chat_type" \
+    --issue-id "${issue_id:-pending}" \
+    --message "$message" \
+    --author "$author" \
+    --channel "$channel" \
+    --session-refs "$session_refs" \
+    --intake-id "$intake_id" 2>/dev/null) || {
+      log_error "failed to write chat to chat-inbox.db"
+      return 1
+    }
+
+  # For new-issue: update issue_id now that we have the chat id
+  if [[ "$chat_type" == "new-issue" ]]; then
+    issue_id="raw-$chat_id"
+    python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" _update_issue_id \
+      --db "$db_path" --id "$chat_id" --issue-id "$issue_id" >/dev/null 2>&1 || true
+  fi
+
+  log_info "chat recorded: chat-inbox.db id=$chat_id type=$chat_type issue_id=$issue_id"
+
+  # Step 2: Try direct sync if a worktree exists for this issue
+  worktrees_root="${project}-worktrees"
+  if [[ -d "$worktrees_root" ]]; then
+    worktree_found=$(find "$worktrees_root" -maxdepth 1 -type d -name "*${issue_id}*" 2>/dev/null | head -1)
+    if [[ -n "$worktree_found" && -d "$worktree_found/docs/issues/$issue_id" ]]; then
+      if [[ "$chat_type" == "new-issue" ]]; then
+        python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" materialize \
+          --db "$db_path" --id "$chat_id" --target "$worktree_found/docs/issues/$issue_id" >/dev/null 2>&1 \
+          && python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" consume \
+          --db "$db_path" --id "$chat_id" --materialized-as "$issue_id" >/dev/null 2>&1 \
+          && log_info "chat materialized directly to worktree: $worktree_found"
+      else
+        python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" materialize-comment \
+          --db "$db_path" --id "$chat_id" \
+          --issue-file "$worktree_found/docs/issues/$issue_id/issue.md" >/dev/null 2>&1 \
+          && python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" consume \
+          --db "$db_path" --id "$chat_id" >/dev/null 2>&1 \
+          && log_info "chat comment synced directly to worktree: $worktree_found"
+      fi
+      # Signal the daemon even for direct sync (worktree AI needs to notice)
+      update_intake_pending_signal "$project"
+      return 0
+    fi
+  fi
+
+  # Step 3: No worktree found — signal daemon for later processing
+  update_intake_pending_signal "$project"
 }
 
 # _check_issue_active_and_signal: if target issue is in dev-loop, update pending signal
@@ -16488,6 +16457,12 @@ cmd_init() {
   register_project_in_registry "$project"
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "initialized"
+  # Initialize chat-inbox SQLite database
+  local chat_inbox_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
+  local chat_inbox_db="$project/.freely/chat-inbox.db"
+  if [[ -f "$chat_inbox_py" ]]; then
+    python3 "$chat_inbox_py" init --db "$chat_inbox_db" >/dev/null 2>&1 || true
+  fi
   log_info "initialized: $(config_file "$project")"
   load_config "$project"
   echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"

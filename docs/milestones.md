@@ -276,6 +276,23 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/code-reviews/20260429-gate-dev-experience-preflight-verification.md`
 - next_action: `Merge into develop.`
 
+25. `I-20260429-2040-A`
+- title: SQLite chat-inbox staging for protected-branch chat intake
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-chat-inbox-sqlite.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/pre-tests.md`
+- source_brainstorm: `docs/pre-brainstorms/20260429-2040--chat-inbox-sqlite/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260429-2040--chat-inbox-sqlite/candidates.md`
+- branch: `feature/chat-inbox-sqlite-20260429`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
+  - `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/pre-tests.md`
+  - `docs/progress/workspace-routing-foundation/p-chat-inbox-sqlite.md`
+- next_action: `B2_IBM implementation in progress.`
+
 ### candidate_issues
 
 1. `C-20260417-0445-A`

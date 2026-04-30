@@ -863,9 +863,60 @@ def scan_external_gitee(project: Path) -> tuple[list[dict], dict]:
     return items, provider
 
 
+def scan_chat_inbox(project: Path) -> list[dict]:
+    """Scan .freely/chat-inbox.db for unconsumed chat intakes."""
+    items = []
+    db_path = project / ".freely" / "chat-inbox.db"
+    if not db_path.is_file():
+        return items
+    try:
+        import sqlite3
+        conn = sqlite3.connect(str(db_path))
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            "SELECT * FROM chats WHERE consumed = 0 ORDER BY id ASC LIMIT 50"
+        ).fetchall()
+        conn.close()
+    except Exception:
+        return items
+
+    for r in rows:
+        chat = dict(r)
+        chat_type = chat.get("chat_type", "")
+        issue_id = chat.get("issue_id", "")
+        msg = chat.get("message", "")[:200]
+        if chat_type == "new-issue":
+            restart_point = "pre_brainstorm"
+            next_action = (
+                f"Create worktree feature/{issue_id}-{{slug}}, "
+                "wt-create will auto-materialize from chat-inbox."
+            )
+        else:
+            restart_point = "continuation"
+            next_action = (
+                f"Deliver comment to {issue_id}. "
+                "If worktree exists, append there. Otherwise AI decides."
+            )
+        items.append({
+            "source_family": "human interruption",
+            "source_type": "chat_intake",
+            "source_ref": f"intake://{issue_id}",
+            "artifact_path": str(db_path.relative_to(project)),
+            "chat_type": chat_type,
+            "chat_id": chat["id"],
+            "status_markers": {"status": "new", "classification": "discovery"},
+            "needs_action": True,
+            "restart_point": restart_point,
+            "owner_hint": "worker",
+            "next_action": next_action,
+            "message_preview": msg,
+        })
+    return items
+
+
 def build_payload(project: Path) -> dict:
     sources = []
-    # .freely/intake/ is deprecated. scan_raw_issues and scan_linked_issues replace it.
+    sources.extend(scan_chat_inbox(project))
     sources.extend(scan_raw_issues(project))
     sources.extend(scan_linked_issues(project))
     sources.extend(scan_pre_brainstorms(project))
