@@ -7,6 +7,10 @@
   - brainstorms: docs/pre-brainstorms/20260429-2000--gate-dev-experience-preflight/brainstorms.md
   - candidates: docs/pre-brainstorms/20260429-2000--gate-dev-experience-preflight/candidates.md
 
+- 20260429-2040--chat-inbox-sqlite
+  - brainstorms: docs/pre-brainstorms/20260429-2040--chat-inbox-sqlite/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260429-2040--chat-inbox-sqlite/candidates.md
+
 - 20260427-0000--b1-intake-issue-sync
   - brainstorms: docs/pre-brainstorms/20260427-0000--b1-intake-issue-sync/brainstorms.md
   - candidates: docs/pre-brainstorms/20260427-0000--b1-intake-issue-sync/candidates.md
