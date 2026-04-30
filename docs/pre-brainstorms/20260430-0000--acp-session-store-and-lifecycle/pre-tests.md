@@ -1,6 +1,85 @@
 # Pre-tests — 20260430-0000--acp-session-store-and-lifecycle
 
-Hotfix absorbed into chat-inbox-sqlite (I-20260429-2040-A). Tests executed:
+Hotfix absorbed into chat-inbox-sqlite (I-20260429-2040-A).
+
+## 关键检查方法
+
+### 检查 1: 模型配置是否正确传递到子 claude 进程
+
+**检查目标**: 确认 alias 的 settings_deepseek_flash.json 被 bridge 消费，
+而不是被 shell 环境的 ANTHROPIC_MODEL 污染。
+
+**步骤**:
+```bash
+# 1. 模拟 monitor-ai-acp.sh 的流程
+source docs/system/workspace/scripts/runtime/tool-launchers.sh
+_apply_tool_alias_settings "cc-ds-flash-auto"
+echo "ANTHROPIC_MODEL=$ANTHROPIC_MODEL"  # 应该是 deepseek-v4-flash[1m]
+
+# 2. 启动 bridge
+python3 acp-bridge.py start --project $PWD
+
+# 3. 查询 session/new 返回的模型列表
+python3 -c "
+import socket, json
+sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+sock.connect('.freely/run/acp-bridge.sock')
+sock.settimeout(15)
+f = sock.makefile('r')
+# initialize
+sock.sendall(json.dumps({'jsonrpc':'2.0','id':1,'method':'initialize',
+  'params':{'protocolVersion':1,'clientInfo':{'name':'t','title':'t','version':'1.0'},
+  'clientCapabilities':{}}}).encode()+b'\n')
+f.readline()
+# session/new
+sock.sendall(json.dumps({'jsonrpc':'2.0','id':2,'method':'session/new',
+  'params':{'cwd':'.','mcpServers':[]}}).encode()+b'\n')
+for i in range(10):
+    m = json.loads(f.readline())
+    if m.get('id')==2 and 'result' in m:
+        mods = m['result']['models']
+        print(f'currentModelId: {mods[\"currentModelId\"]}')
+        for mod in mods['availableModels']:
+            print(f'  {mod[\"modelId\"]} → {mod[\"name\"]}')
+        break
+sock.close()
+"
+```
+
+**判定标准**:
+- ✅ `ANTHROPIC_MODEL=deepseek-v4-flash[1m]` (apply 后)
+- ✅ session/new 的 availableModels 中 sonnet/opus/haiku 都指向 `deepseek-v4-flash[1m]`
+- ❌ 如果 sonnet/opus 指向 `deepseek-v4-pro[1m]` → 环境变量污染
+
+### 检查 2: 权限模式是否正确设置
+
+**检查目标**: 确认 bridge 在 session/new 后调用了 session/set_mode bypassPermissions。
+
+**步骤**:
+```bash
+grep "set_mode\|bypassPermissions" .freely/run/acp-bridge.log
+```
+
+**判定标准**:
+- ✅ 日志中有 `"session <sid>... mode set to bypassPermissions"`
+- ✅ 子 claude 进程命令行包含 `--allow-dangerously-skip-permissions`
+- ❌ 如果有 `request_permission` → 权限未 bypass
+
+### 检查 3: 子 claude 进程完整命令行验证
+
+**步骤**:
+```bash
+ps aux | grep "claude.*session-id" | grep -v grep
+```
+
+**判定标准**:
+- 检查 `--output-format stream-json --input-format stream-json` (ACP 协议)
+- 检查 `--allow-dangerously-skip-permissions` (权限跳过)
+- 不应有 `--model` 显式指定 (模型由 settings/env 决定)
+
+---
+
+## Test 1: session-store.py CLI round-trip
 
 ## Test 1: session-store.py CLI round-trip
 - `python3 session-store.py init --db /tmp/test-freely.db`
