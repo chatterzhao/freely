@@ -2,28 +2,43 @@
 
 ## 为什么需要 chat-inbox
 
-`freely chat --new-issue` / `--issue <id>` 是人机插话入口。
-插话发生时还没有对应的 feature worktree。
+`freely chat --new-issue` / `--issue <id>` 是人机插话入口。插话时还没有 worktree。
 
-如果 chat 直接写入 `docs/issues/`，文件就落在 daemon 所在分支上。
-daemon 运行在 develop（protected branch），每次插话都在污染受保护分支。
+如果 chat 直接写 `docs/issues/`，文件落在 daemon 所在分支（develop，protected），
+每次插话都在污染受保护分支。
 
-所以需要一个**暂存区**：chat 先落地到 git-ignored 的 SQLite，
+解决方案：chat 先写入 git-ignored 的 `.freely/chat-inbox.db`（SQLite 暂存），
 scan 消费后进入 worktree 的 `docs/issues/`（Git 跟踪）。
 
 ## chat-inbox.db 的定位
 
-**故意设计为不健壮**：
-- 只存未消费的 chat（`consumed=0`）
-- 消费后内容原样进入 `docs/issues/`（Git 跟踪的 canonical 真相源）
-- 换电脑丢失 pending chat 可接受（插话是实时交互，用户重发即可）
-- chat ID 不需要被溯源——消费后内容已在 issue 里
+**故意不健壮**：
+- 只存 `consumed=0` 的 chat。消费后原样进入 `docs/issues/`
+- 换电脑丢失 pending chat 可接受（插话实时交互，重发即可）
+- chat ID 不被溯源——内容消费后已在 issue 里
 
-## ID 设计
+## 用户接口：不变
 
-纯 UTC 时间戳 `YYYYMMDDHHMMSS`，如 `20260429204530`。
-- 不翻译、不组合、不做时区转换
-- DB 内无前缀。`raw-` / `chat-` 前缀仅 scan 组装 source_ref 时附加
+```
+freely chat --new-issue "消息"       # 不变
+freely chat --issue <id> "评论"      # 不变
+freely intake chat ...               # 不变
+```
+
+内部唯一变化：`_write_chat_to_issue` 不再写 `docs/issues/`，
+改为调用内部命令写入 SQLite。
+
+## 内部命令（非用户面）
+
+```
+chat-inbox init                       # freely init 调用，建表
+chat-inbox add --type ... --msg ...   # _write_chat_to_issue 调用
+chat-inbox list [--limit 50]          # task-source-scan 调用
+chat-inbox consume <id>               # task-source-scan 消费后标记
+chat-inbox show <id>                  # debug 用
+```
+
+这些命令不暴露给用户。`freely chat` 参数和行为完全不变。
 
 ## SQLite Schema
 
@@ -43,104 +58,52 @@ CREATE TABLE IF NOT EXISTS chats (
 CREATE INDEX IF NOT EXISTS idx_consumed ON chats(consumed);
 ```
 
-## CLI 设计（CLI-first）
-
-```
-freely chat-inbox init                        → 建表（freely init 调用）
-freely chat-inbox add --type new-issue \      → 写入 chat（freely chat 调用）
-  --message "..." --author human
-freely chat-inbox add --type issue-id:xxx \   → 写入评论
-  --message "..."
-freely chat-inbox list [--limit 50]           → 列出未消费 chat（debug）
-freely chat-inbox show <id>                   → 查看 chat 内容（debug）
-freely chat-inbox consume <id> \              → 标记已消费（scan 调用）
-  --materialized-as <ref>
-```
-
-### 各 CLI 命令的调用方
-
-| 命令 | 调用方 | 说明 |
-|------|--------|------|
-| `chat-inbox init` | `freely init` | 项目初始化时建表 |
-| `chat-inbox add --type new-issue` | `freely chat --new-issue` | 插话新建 issue |
-| `chat-inbox add --type issue-id:xxx` | `freely chat --issue <id>` | 插话评论 |
-| `chat-inbox list` | `task-source-scan.py` / 人工 debug | 获取 pending 列表 |
-| `chat-inbox consume` | `task-source-scan.py` | 消费后标记 |
-
-### 实现：CLI 命令 → Python 模块
-
-```
-bin/freely chat-inbox ...
-  → docs/system/workspace/scripts/runtime/freely
-    → cmd_chat_inbox() 分发
-      → add/list/show/consume → chat_inbox.py 对应函数
-```
-
-`chat-inbox.py` 是纯函数模块，所有 SQLite 操作集中在此。
-CLI 命令是薄封装，负责参数解析后调用模块函数。
-
 ## 重构范围
 
 ### 新增
-
 | 文件 | 职责 |
 |------|------|
-| `docs/system/workspace/scripts/runtime/chat-inbox.py` | `init_db()` `add_chat()` `list_pending()` `show_chat()` `mark_consumed()` |
-| `freely` runtime `cmd_chat_inbox` | CLI 命令分发（add/list/show/consume/init） |
+| `chat-inbox.py` | `init_db()` `add_chat()` `list_pending()` `mark_consumed()` `show_chat()` |
 
 ### 修改
-
 | 调用方 | 改动 |
 |--------|------|
-| `freely init` | 增加调用 `chat-inbox init` |
-| `freely chat --new-issue` | `_write_chat_to_issue` → `chat-inbox add --type new-issue` |
-| `freely chat --issue <id>` | `_write_chat_to_issue` → `chat-inbox add --type issue-id:xxx` |
-| `task-source-scan.py::scan_chat_inbox()` | 调用 `chat-inbox list` + `chat-inbox consume` |
+| `freely init` | 调用 `chat-inbox init` |
+| `_write_chat_to_issue` — new-issue 分支 | `mkdir docs/issues/`+`cat > issue.md` → `chat-inbox add --type new-issue` |
+| `_write_chat_to_issue` — 评论分支 | `cat >> issue.md` → `chat-inbox add --type issue-id:xxx` |
+| `task-source-scan.py` | 新增 `scan_chat_inbox()`，调 `list` + `consume` |
 
 ### 不变
-
 | 组件 | 原因 |
 |------|------|
+| `freely chat` CLI 参数 | 用户接口不变 |
 | `scan_raw_issues` / `scan_linked_issues` | 继续扫 `docs/issues/` |
 | `governance-merge-gate` | 验证 `docs/issues/` |
 | AI agent | 只读 scan JSON + `docs/issues/` |
-| `issue-sync` | 从 `docs/issues/` 同步 |
-| B1_IBM → B2_IBM 全流程 | unchanged |
+| `issue-sync` | 从 `docs/issues/` 同步平台 |
+| B1→B2 全流程 | unchanged |
 
 ## 完整链路
 
 ```
-freely init
-  → chat-inbox init                          # CLI → init_db()
+freely chat --new-issue "msg"               # 用户接口不变
+  → _write_chat_to_issue
+    → chat-inbox add --type new-issue ...   # 内部：写入 SQLite
+  → develop 零变更 ✓
 
-freely chat --new-issue "msg"
-  → chat-inbox add --type new-issue ...       # CLI → add_chat()
+freely chat --issue raw-xxx "评论"          # 用户接口不变
+  → _write_chat_to_issue
+    → chat-inbox add --type issue-id:xxx .. # 内部：写入 SQLite
   → develop 零变更 ✓
 
 task-source-scan.py scan_chat_inbox()
-  → chat-inbox list                          # CLI → list_pending()
-  → 按 chat_type 组装 source
-  → chat-inbox consume <id>                  # CLI → mark_consumed()
+  → chat-inbox list                        # SELECT WHERE consumed=0
+  → 按 chat_type 组装 source JSON
+  → chat-inbox consume <id>                # UPDATE consumed=1
 
 AI agent 读 scan JSON
   → chat_intake source → 创建 worktree
-  → docs/issues/raw-{id}/issue.md（Git 跟踪）
+  → worktree/docs/issues/raw-{id}/issue.md
 
-后续 B1_IBM → B2_IBM → merge → issue-sync → platform
-  （完全不变）
-```
-
-## 消费分支逻辑（task-source-scan.py 内）
-
-```
-chat_type='new-issue'
-  → source_ref = "intake://raw-{id}"
-  → restart_point='pre_brainstorm'
-  → mark_consumed
-
-chat_type='issue-id:xxx'
-  → 查 docs/issues/xxx/issue.md
-     ├─ 找到未关闭 → source_type='chat_comment' → mark_consumed
-     ├─ absorbed → 重定向到 I-* → 追加评论 → mark_consumed
-     └─ 未找到/已关闭 → source_type='chat_orphan' → mark_consumed
+后续 B1_IBM → B2_IBM → merge → issue-sync → platform（完全不变）
 ```
