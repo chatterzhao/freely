@@ -1,4 +1,8 @@
 # Pre-brainstorm 索引（IBM Framework B1）
+- 20260429-1745--bash32-daemon-compat-fix
+  - brainstorms: docs/pre-brainstorms/20260429-1745--bash32-daemon-compat-fix/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260429-1745--bash32-daemon-compat-fix/candidates.md
+
 - 20260427-0000--b1-intake-issue-sync
   - brainstorms: docs/pre-brainstorms/20260427-0000--b1-intake-issue-sync/brainstorms.md
   - candidates: docs/pre-brainstorms/20260427-0000--b1-intake-issue-sync/candidates.md

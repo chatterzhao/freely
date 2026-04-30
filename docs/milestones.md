@@ -239,6 +239,24 @@ routing_policy:
   - `./bin/governance-check`
 - next_action: Preserve this owner as the smallest implementation slice: complete guarded develop merge and run develop-side daemon/status replay before considering any broader status-family or scan-schema follow-on.
 
+25. `I-20260429-1745-A`
+- title: macOS bash 3.2 daemon compatibility fix
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-bash32-daemon-compat-fix.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/pre-tests.md`
+- source_brainstorm: `docs/pre-brainstorms/20260429-1745--bash32-daemon-compat-fix/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260429-1745--bash32-daemon-compat-fix/candidates.md`
+- branch: `feature/fix-daemon-bash32-crash-20260429`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
+  - `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/pre-tests.md`
+  - `docs/progress/workspace-routing-foundation/p-bash32-daemon-compat-fix.md`
+  - `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
+- next_action: `Merge into develop via test-pre-merge batch.`
+
 
 ### candidate_issues
 
