@@ -51,3 +51,5 @@ Extended existing startup_self_heal mechanism (not a new function):
 - alias_env_inheritance: completed
 
 - auth_regex_fix: completed
+
+- bridge_pid_fix: completed

@@ -92,3 +92,9 @@ matching HTTP status codes (429). Old regex (401|402|403|429) matched
 these, causing false auth_or_rate_limit detection.
 Fix:  word boundaries so only standalone status codes match.
 Verified: "I-20260429-2000-A" → no_match, "HTTP 429" → MATCH.
+
+## follow-on: 2026-04-30 (11) bridge PID fix after fork
+
+Root cause: start_server() wrote os.getpid() before fork, placing parent PID in file.
+After parent exits, PID file has dead PID. stop sends SIGTERM to dead PID → no effect.
+Fix: move PID write to after fork so file contains daemon child PID.
